@@ -986,6 +986,7 @@ function drawMediaLayer(specificClip) {
 
 // Draw visual crosshair anchor point for punch/loupe zoom target
 function drawZoomTargetIndicator(dx, dy, w, h, clip) {
+  if (isExporting) return;
   const cx = dx + w * clip.zoomOriginX;
   const cy = dy + h * clip.zoomOriginY;
   ctx.save();
@@ -1075,6 +1076,7 @@ function drawMarqueeSelectionOverlay() {
 
 // Draw interactive bounding box & resize/drag corner handles
 function drawTransformHandles(x, y, w, h) {
+  if (isExporting) return;
   ctx.save();
   ctx.strokeStyle = '#00f0ff';
   ctx.lineWidth = 2;
@@ -5253,6 +5255,11 @@ async function exportVideoProject() {
   btnExport.disabled = true;
   btnExport.style.opacity = '0.7';
 
+  // Temporarily clear selection and editor overlays so they never bake into video
+  const prevSelectedClip = selectedClip;
+  selectedClip = null;
+  toggleAppleHud(false);
+
   // Pause regular live playback during render
   const wasPlaying = isPlaying;
   isPlaying = false;
@@ -5363,6 +5370,7 @@ async function exportVideoProject() {
 
       // Reset export state
       isExporting = false;
+      selectedClip = prevSelectedClip;
       btnExport.disabled = false;
       btnExport.style.opacity = '1';
       btnExport.innerHTML = originalBtnHTML;
@@ -5431,6 +5439,7 @@ async function exportVideoProject() {
     console.error('Export Error:', err);
     alert(`Failed to export video: ${err.message}`);
     isExporting = false;
+    selectedClip = prevSelectedClip;
     btnExport.disabled = false;
     btnExport.style.opacity = '1';
     btnExport.innerHTML = originalBtnHTML;
@@ -7318,12 +7327,16 @@ function drawDynamicAreaChart(ctx, cfg, x, y, w, h, elapsed, progress, easeOut) 
   ctx.lineTo(x + w, baselineY);
   ctx.stroke();
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
   ctx.font = '9px monospace';
   ctx.textAlign = 'center';
+  const customLabels = cfg.labels || [];
   for (let i = 0; i < n; i++) {
-    const tx = x + i * stepX;
-    ctx.fillText(`${i + 1}`, tx, baselineY + 12);
+    const lbl = customLabels[i] !== undefined ? customLabels[i] : `${i + 1}`;
+    if (lbl && lbl.trim() !== '') {
+      const tx = x + i * stepX;
+      ctx.fillText(lbl, tx, baselineY + 12);
+    }
   }
   ctx.restore();
 }
@@ -7984,6 +7997,7 @@ let modalPreviewStartTime = 0;
 
 function openChartCreatorModal() {
   modalEditingClip = null;
+  modalCustomLabels = null;
   const modal = document.getElementById('chart-creator-modal');
   const titleText = document.getElementById('chart-modal-title-text');
   const confirmBtnText = document.getElementById('btn-confirm-add-chart-text');
@@ -7999,6 +8013,7 @@ function openChartEditorModalForClip(clip) {
   if (!clip || !clip.chartConfig) return;
   modalEditingClip = clip;
   const cfg = clip.chartConfig;
+  modalCustomLabels = cfg.labels ? [...cfg.labels] : null;
   const modal = document.getElementById('chart-creator-modal');
   const titleText = document.getElementById('chart-modal-title-text');
   const confirmBtnText = document.getElementById('btn-confirm-add-chart-text');
@@ -8059,6 +8074,8 @@ function closeChartCreatorModal() {
 // Live interactive modal preview rendering loop & interactive node editing
 let isModalExpanded = false;
 let modalInteractiveNodes = []; // [{ x, y, r, idx, val, series: 1|2 }]
+let modalInteractiveTargets = []; // [{ type: 'title'|'axis-label', x, y, w, h, text, idx }]
+let modalCustomLabels = null;
 let draggingModalNodeIndex = -1;
 let draggingModalNodeSeries = 1;
 
@@ -8099,6 +8116,41 @@ function setupModalDirectCanvasInteraction() {
         tooltip.style.left = `${e.clientX - rect.left + 10}px`;
         tooltip.style.top = `${e.clientY - rect.top - 25}px`;
       }
+      return;
+    }
+
+    // Check if user tapped directly on title or axis label
+    const targetHit = modalInteractiveTargets.find(t => {
+      return coords.x >= t.x && coords.x <= (t.x + t.w) && coords.y >= t.y && coords.y <= (t.y + t.h);
+    });
+
+    if (targetHit) {
+      if (targetHit.type === 'title') {
+        const titleInput = document.getElementById('modal-chart-title');
+        const currentTitle = titleInput ? titleInput.value : (targetHit.text || '');
+        const newTitle = prompt('Edit or Clear Chart Title (leave blank to delete):', currentTitle);
+        if (newTitle !== null) {
+          if (titleInput) {
+            titleInput.value = newTitle.trim();
+            modalPreviewStartTime = performance.now() - 5000;
+          }
+        }
+      } else if (targetHit.type === 'axis-label') {
+        const currentLabel = targetHit.text || `${targetHit.idx + 1}`;
+        const newLabel = prompt(`Edit Axis Label #${targetHit.idx + 1} (leave blank to delete):`, currentLabel);
+        if (newLabel !== null) {
+          const rawData = document.getElementById('modal-chart-data')?.value || '';
+          const ptsCount = rawData.split(',').filter(s => !isNaN(parseFloat(s.trim()))).length || 15;
+          if (!modalCustomLabels) {
+            modalCustomLabels = Array.from({ length: ptsCount }, (_, i) => `${i + 1}`);
+          }
+          while (modalCustomLabels.length < ptsCount) {
+            modalCustomLabels.push(`${modalCustomLabels.length + 1}`);
+          }
+          modalCustomLabels[targetHit.idx] = newLabel.trim();
+          modalPreviewStartTime = performance.now() - 5000;
+        }
+      }
     }
   });
 
@@ -8112,7 +8164,10 @@ function setupModalDirectCanvasInteraction() {
           const dy = node.y - coords.y;
           return Math.sqrt(dx * dx + dy * dy) <= (node.r + 12);
         });
-        canvas.style.cursor = hit ? 'ns-resize' : 'crosshair';
+        const targetHit = modalInteractiveTargets.find(t => {
+          return coords.x >= t.x && coords.x <= (t.x + t.w) && coords.y >= t.y && coords.y <= (t.y + t.h);
+        });
+        canvas.style.cursor = hit ? 'ns-resize' : (targetHit ? 'pointer' : 'crosshair');
       }
       return;
     }
@@ -8217,18 +8272,27 @@ function startModalPreviewLoop() {
       glow: true
     };
 
+    if (modalCustomLabels && Array.isArray(modalCustomLabels)) {
+      previewCfg.labels = [...modalCustomLabels];
+    }
+
     if (selectedModalType === 'pyramid') {
       previewCfg.tierText = rawData.trim() || '3% BUYING NOW';
       previewCfg.tierIndex = 0;
     } else if (selectedModalType === 'bar') {
       const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
       previewCfg.values = vals.length > 0 ? vals : [10, 25, 40, 75, 50, 65, 80];
-      previewCfg.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].slice(0, previewCfg.values.length);
+      if (!previewCfg.labels) {
+        previewCfg.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].slice(0, previewCfg.values.length);
+      }
     } else {
       const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
       previewCfg.series1 = vals.length > 0 ? vals : [20, 50, 40, 80, 60, 30, 15];
       previewCfg.isDual = true;
       previewCfg.series2 = previewCfg.series1.map(v => Math.max(5, Math.round(v * 0.65)));
+      if (!previewCfg.labels) {
+        previewCfg.labels = Array.from({ length: previewCfg.series1.length }, (_, i) => `${i + 1}`);
+      }
     }
 
     const now = performance.now();
@@ -8250,7 +8314,20 @@ function startModalPreviewLoop() {
     // Chart Title Header
     pCtx.font = '800 16px "Inter", "Oswald", sans-serif';
     pCtx.fillStyle = '#ffffff';
-    pCtx.fillText(previewCfg.title || 'PREVIEW', 24, 28);
+    const displayTitle = previewCfg.title || 'PREVIEW';
+    pCtx.fillText(displayTitle, 24, 28);
+    const titleWidth = pCtx.measureText(displayTitle).width;
+
+    // Register title as interactive tap target
+    modalInteractiveTargets = [];
+    modalInteractiveTargets.push({
+      type: 'title',
+      x: 20,
+      y: 10,
+      w: Math.max(80, titleWidth + 20),
+      h: 24,
+      text: previewCfg.title
+    });
 
     pCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     pCtx.lineWidth = 1;
@@ -8270,7 +8347,7 @@ function startModalPreviewLoop() {
 
     if (previewCfg.type === 'bar') {
       drawStaggeredBarChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
-      // Track bar interactive drag zones
+      // Track bar interactive drag zones and bottom axis label targets
       const vals = previewCfg.values || [];
       const maxVal = Math.max(...vals) * 1.15 || 100;
       const stepX = chartW / vals.length;
@@ -8288,6 +8365,18 @@ function startModalPreviewLoop() {
           baselineY: chartY + chartH - 20,
           chartHeight: chartH - 25,
           maxVal
+        });
+
+        // Register axis label target for bar
+        const lbl = (previewCfg.labels && previewCfg.labels[idx] !== undefined) ? previewCfg.labels[idx] : `${idx + 1}`;
+        modalInteractiveTargets.push({
+          type: 'axis-label',
+          idx,
+          x: bx + bw / 2 - 18,
+          y: chartY + chartH - 12,
+          w: 36,
+          h: 24,
+          text: lbl
         });
       });
     } else if (previewCfg.type === 'pyramid') {
@@ -8321,6 +8410,18 @@ function startModalPreviewLoop() {
           baselineY,
           chartHeight,
           maxVal
+        });
+
+        // Register axis label target for area chart point
+        const lbl = (previewCfg.labels && previewCfg.labels[idx] !== undefined) ? previewCfg.labels[idx] : `${idx + 1}`;
+        modalInteractiveTargets.push({
+          type: 'axis-label',
+          idx,
+          x: nx - 16,
+          y: baselineY + 2,
+          w: 32,
+          h: 24,
+          text: lbl
         });
 
         // Draw interactive ring on node when hovered or dragged
@@ -8581,6 +8682,10 @@ function initChartsAndInfographicsEngine() {
       config.series1 = vals.length > 0 ? vals : [20, 50, 40, 80, 60, 30, 15];
       config.isDual = true;
       config.series2 = config.series1.map(v => Math.max(5, Math.round(v * 0.65)));
+    }
+
+    if (modalCustomLabels && Array.isArray(modalCustomLabels)) {
+      config.labels = [...modalCustomLabels];
     }
 
     if (modalEditingClip) {
