@@ -17,6 +17,9 @@
 | `fx-ai-cutout` | **AI Subject Isolation / Cutout** | Masking & Cutout | ✅ Implemented | Right-click -> *Remove Background* |
 | `fx-vector-sticker`| **Magnates Vector / Paper Cutout** | Stylization | ✅ Implemented | Right-click -> *Magnates Vector / Paper Cutout* |
 | `fx-kinetic-type` | **Kinetic Typography Engine** | Text & Titles | ✅ Implemented | Text Inspector -> Anim Dropdown + Accent color |
+| `fx-dynamic-area-chart`| **Progressive Dual-Line & Area Chart** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Dynamic Area Spread* |
+| `fx-staggered-bar` | **Staggered Metric Bar Pop-Up** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Staggered Bar Reveal* |
+| `fx-liquid-pyramid` | **Liquid Wave & Glowing Funnel / Pyramid** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Liquid Funnel Tier* |
 | `fx-procedural-sfx`| **Procedural SFX Engine** | Audio Design | ✅ Implemented | Auto-triggers on animation pops / whooshes |
 | `fx-voice-denoise` | **Voiceover Audio Denoise** | Audio Restoration| ✅ Implemented | Python Denoise Pipeline / Clean script |
 | `fx-split-blade` | **Playhead Razor / Split Blade** | Timeline Utility | ✅ Implemented | Shortcut `S` or Split Tool |
@@ -230,11 +233,186 @@
   }
   ```
 
+```
+
 ---
 
-## 🔊 4. Audio Architecture & Restoration
+## 📈 4. Motion Infographics & Animated Data Visuals
 
-### 4.1 WebAudio Procedural SFX Engine
+This section catalogs high-retention motion charts popularized by Vox, Johnny Harris, Magnates, and Alex Hormozi style video breakdowns. These graphics are not static data dumps; they animate progressively over time, highlight comparative gaps, and use luminous accents to command viewer attention.
+
+---
+
+### 4.1 Progressive Dual-Line & Area Spread Chart ("Cost Per Lead / Click")
+
+![Dynamic Dual-Line Area Chart](file:///c:/Users/user/Documents/antigravity/noble-bell/docs/assets/templates/dynamic_area_chart.png)
+![Cost Per Click Downward Draw](file:///c:/Users/user/Documents/antigravity/noble-bell/docs/assets/templates/cost_per_click_drop.png)
+
+* **System ID:** `fx-dynamic-area-chart` / `line_area_draw`
+* **Industry & Creator Aliases:** Trim Path Line Draw, Dynamic Area Fill, Gap Comparison Chart, Vox Metrics Sweep
+* **Visual Description:** 
+  * A continuous line graph starts with zero length and progressively draws itself from left to right across the canvas following a custom easing curve.
+  * Individual data node dots scale up in sequence as the leading edge of the stroke crosses their X coordinates.
+  * Beneath the curve, a semi-transparent monochrome or accent gradient fill unmasks simultaneously (or cascades downward) to reveal the volume/area.
+  * When showing two comparative curves (e.g. baseline vs. current), the shaded area between both curves dynamically shrinks or expands, exposing the "distance" or delta between the metrics.
+* **🎯 Editorial Intent & When to Use:**
+  * **Revealing Trends Over Time:** When narrating a timeline (e.g., *"between January and November, acquisition costs plummeted"*). The line draw paces the narration word-for-word.
+  * **Cost Drops & Disasters:** Highlighting a sharp falloff or cliff in metrics (e.g. CAC dropping to zero or revenue collapsing).
+  * **Comparative Spreads:** Emphasizing margin or discrepancy between two competing figures.
+* **⚠️ When NOT to Use (Anti-Patterns):**
+  * Do not display all data points instantaneously like a static slide; without the progressive write-on, the viewer's eyes wander before the speaker delivers the takeaway.
+  * Do not use overly erratic or chaotic line jitter that makes the overarching directional trend ambiguous.
+* **🤖 AI Narrative & Script Triggers:**
+  * Keywords: `cost per lead`, `cost per click`, `margin`, `dropped by`, `fell off a cliff`, `gap widened`, `over the course of months`
+  * Visual Asset Type: Time-series tables, financial reports, Google/Meta Ads dashboards.
+* **How to Achieve this Effect (Plain-Text Guide & Recipes):**
+  * **In Magnates Studio (Pre-built Template):**
+    1. Open the **Templates** tab -> **Infographics** -> select **"Dynamic Area Spread"**.
+    2. Enter or paste your numerical data points (or select presets like *Steep Decline*, *Volatile Growth*, *Dual Comparison*).
+    3. Set `Draw Duration` (default: `1.8s` with `cubic_bezier(0.25, 1, 0.5, 1)` easing).
+    4. Enable `Area Fill Gradient` and adjust fill opacity (`0.15` to `0.40`).
+    5. Check `Animate Node Points` to automatically spawn bouncing indicator dots on each coordinate.
+  * **In Video Editors (After Effects / Premiere):**
+    1. Draw your line path using the Pen Tool on a Shape Layer.
+    2. Add **Trim Paths** -> keyframe `End` from `0%` to `100%`. Set Easy Ease (`F9`) and pull the graph velocity handle forward for a snappy ramp-down.
+    3. Duplicate the shape layer, close the path to the bottom axis baseline, and add a Fill with a Vertical Linear Gradient.
+    4. Add a **Linear Wipe** (Angle: 90°) to the fill layer and link its completion percentage to the Trim Path `End` keyframe via an expression (`linear(value, 0, 100, 100, 0)`).
+  * **In Code / Web (SVG + CSS/JS):**
+    1. Compute total path length via `SVGPathElement.getTotalLength()`.
+    2. Set `stroke-dasharray: length` and animate `stroke-dashoffset` from `length` to `0`.
+    3. Apply an SVG `<clipPath>` bounding rectangle that animates its `width` from `0` to `100%` across the duration.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "create_infographic_chart",
+    "template": "dynamic_area_spread",
+    "parameters": {
+      "title": "COST PER LEAD",
+      "dataSeries": [
+        { "name": "Organic", "values": [42, 60, 50, 78, 62, 51, 68, 48, 70, 52, 64, 40, 68, 25, 18], "color": "#FFFFFF", "fillOpacity": 0.35 },
+        { "name": "Paid Ads", "values": [30, 48, 32, 64, 40, 22, 38, 32, 45, 18, 34, 15, 42, 10, 8], "color": "#B0B0B0", "fillOpacity": 0.20 }
+      ],
+      "animation": {
+        "type": "progressive_write_on",
+        "duration": 1.6,
+        "easing": "ease_out_cubic",
+        "staggerPoints": true
+      },
+      "showGridLines": true,
+      "showDistanceGap": true
+    }
+  }
+  ```
+
+---
+
+### 4.2 Staggered Metric Bar Pop-Up ("Conversion Rate")
+
+![Staggered Metric Bar Pop-Up](file:///c:/Users/user/Documents/antigravity/noble-bell/docs/assets/templates/staggered_bar_chart.png)
+
+* **System ID:** `fx-staggered-bar` / `bar_stagger_pop`
+* **Industry & Creator Aliases:** Kinetic Bar Chart, Sequential Growth Bars, Neon Pillar Reveal
+* **Visual Description:**
+  * Clean vertical columns/bars emerge from a grounded zero baseline, rising smoothly one by one with a slight staggered delay (e.g. 60ms between each column).
+  * Bars possess a signature high-visibility neon accent color (e.g., lime green `#76ff03` or neon cyan `#00f0ff`) against a dark matte background.
+  * The peak bar (or the target milestone month) triggers an intensified luminous outer glow or scale pulse when reached.
+* **🎯 Editorial Intent & When to Use:**
+  * **Categorical / Monthly Growth:** Showing progression from bad to great (e.g., *"our conversion rate climbed steadily every month until peaking in October"*).
+  * **Leaderboard Comparison:** Comparing multiple companies, products, or channels side-by-side.
+* **⚠️ When NOT to Use (Anti-Patterns):**
+  * Avoid animating all bars upward in unison; it lacks rhythm and fails to direct the viewer through the narrative progression.
+* **🤖 AI Narrative & Script Triggers:**
+  * Keywords: `conversion rate`, `monthly breakdown`, `soared`, `peaked at`, `month after month`, `consistently climbed`
+  * Visual Asset Type: Bar graphs, quarterly revenue comparisons, conversion funnel steps.
+* **How to Achieve this Effect (Plain-Text Guide & Recipes):**
+  * **In Magnates Studio (Pre-built Template):**
+    1. Select **Templates** -> **Infographics** -> **"Staggered Bar Reveal"**.
+    2. Input month labels (`Jan` through `Dec`) and values.
+    3. Choose bar highlight palette (e.g. *Neon Lime*, *Cyber Cyan*, *Electric Amber*).
+    4. Set `Stagger Delay` (default: `0.08s` per bar) and `Growth Easing` (`spring_soft` or `cubic_ease_out`).
+    5. Check `Highlight Peak Bar` to automatically apply outer bloom glow to the maximum value.
+  * **In Video Editors (After Effects):**
+    1. Set the anchor point of each bar shape layer to its bottom center.
+    2. Animate `Scale Y` from `0%` to `100%` with an easing curve like `easeOutBack` (overshoot `105%` before settling to `100%`).
+    3. Shift each layer in the timeline forward by 3 to 5 frames sequentially (Sequence Layers).
+    4. Add a Glow effect (Glow Radius: `40`, Intensity: `0.8`) on an adjustment layer or applied directly to the top bar.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "create_infographic_chart",
+    "template": "staggered_bar_reveal",
+    "parameters": {
+      "title": "CONVERSION RATE",
+      "labels": ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      "values": [12, 28, 25, 32, 60, 62, 40, 63, 72, 85, 52, 35],
+      "barColor": "#76FF03",
+      "staggerDelay": 0.07,
+      "riseDuration": 0.5,
+      "peakHighlight": { "index": 9, "glow": true }
+    }
+  }
+  ```
+
+---
+
+### 4.3 Liquid Wave & Glowing Funnel / Pyramid ("3% Buying Now")
+
+![Liquid Wave Glowing Pyramid](file:///c:/Users/user/Documents/antigravity/noble-bell/docs/assets/templates/liquid_glowing_pyramid.png)
+
+* **System ID:** `fx-liquid-pyramid` / `wave_funnel_glow`
+* **Industry & Creator Aliases:** Hormozi Funnel Pyramid, Organic Wave Fill, Buyer Hierarchy Tier, Neon Liquid Slog
+* **Visual Description:**
+  * A geometric segmented shape (such as a 4-tier buyer pyramid, market hierarchy triangle, or conversion funnel).
+  * Instead of a rigid straight divider, the active metric color sloshes and rolls with an **organic fluid wave / liquid meniscus** that rises up into the tier.
+  * As the liquid reaches its resting level, a luminous neon rim or ambient bloom radiates outward along the boundary, pulling immediate focus to the percentage or headline text (e.g., *"3% BUYING NOW"*).
+* **🎯 Editorial Intent & When to Use:**
+  * **Market Segmentation / Hierarchy:** Explaining audience proportions (e.g. Hormozi's famous *"The 3% who are ready to buy right now vs. the 97% who are not"*).
+  * **Liquid Thresholds:** Illustrating filling capacity, goal attainment, or energy levels with visceral physical motion.
+* **⚠️ When NOT to Use (Anti-Patterns):**
+  * Don't let the liquid wave cycle continuously at high speed during serious narration, as constant churning distracts from the core text reading. Let it settle into a calm, gentle breathing pulse.
+* **🤖 AI Narrative & Script Triggers:**
+  * Keywords: `pyramid`, `the top 3%`, `funnel`, `tier`, `hierarchy`, `majority of customers`, `only a fraction`, `ready to buy`
+  * Visual Asset Type: Funnels, marketing pyramids, maslow hierarchy diagrams, percentage split graphics.
+* **How to Achieve this Effect (Plain-Text Guide & Recipes):**
+  * **In Magnates Studio (Pre-built Template):**
+    1. Select **Templates** -> **Infographics** -> **"Liquid Pyramid Tier"**.
+    2. Choose tier level (e.g. `Tier 1: Top Apex`, `Tier 2: Mid Upper`, `Tier 3: Base`).
+    3. Input typography overlay (`"3% BUYING NOW"`).
+    4. Select accent fill color (`#B4FF00` Neon Chartreuse).
+    5. Set `Wave Agitation` (slosh amplitude) and `Liquid Rise Time` (`1.2s`).
+    6. Enable `Active Tier Bloom` for the neon perimeter glow.
+  * **In Video Editors (After Effects):**
+    1. Create the pyramid base vector shape with gray fill (`#333333`).
+    2. Duplicate the top segment into a new layer with bright lime color (`#B4FF00`).
+    3. Create a wave layer beneath it using a horizontal path with wavy bezier curves, or apply the **Wave Warp** effect (Wave Type: Sine, Wave Height: `18`, Wave Width: `120`, Direction: `0°`).
+    4. Animate the Y-position of the wave mask rising up from bottom to top of the tier.
+    5. Set the lime tier layer's Track Matte to the pyramid apex mask so the wave is strictly confined inside the triangle.
+    6. Apply **Glow / Deep Glow** to the apex layer with a soft feather.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "create_infographic_chart",
+    "template": "liquid_funnel_tier",
+    "parameters": {
+      "shape": "pyramid_4_tier",
+      "activeTierIndex": 0,
+      "tierName": "Apex",
+      "text": "3% BUYING NOW",
+      "liquidColor": "#B4FF00",
+      "baseColor": "#2A2A2A",
+      "waveHeight": 18,
+      "waveSpeed": 1.2,
+      "glowIntensity": 0.85,
+      "riseDuration": 1.2
+    }
+  }
+  ```
+
+---
+
+## 🔊 5. Audio Architecture & Restoration
+
+### 5.1 WebAudio Procedural SFX Engine
 * **System ID:** `procedural_sfx`
 * **Status:** ✅ Implemented
 * **🎯 Editorial Intent & When to Use:**
@@ -249,7 +427,7 @@
 
 ---
 
-### 4.2 Background Noise Removal (Audio Denoise)
+### 5.2 Background Noise Removal (Audio Denoise)
 * **System ID:** `audio_denoise_pipeline`
 * **Industry & Creator Aliases:** Speech Isolation, Voice De-hum, De-reverb, Studio Clean
 * **Status:** ✅ Implemented (`denoise.py` / `.agents/skills/audio-denoise`)
@@ -259,7 +437,7 @@
 
 ---
 
-## 🚀 5. Signature Composite Recipes (Combos)
+## 🚀 6. Signature Composite Recipes (Combos)
 
 These are multi-effect presets that give videos the signature high-production look:
 
@@ -277,9 +455,15 @@ These are multi-effect presets that give videos the signature high-production lo
   3. `Loupe Callout` magnifying the critical headline or revenue drop.
   4. Highlighted Kinetic Pop title in red `#ff334b`.
 
+### 🌟 Recipe C: "The Hormozi Metric Drop & Funnel"
+* **Components:**
+  1. `Dynamic Area Chart` drawing write-on showing steep cost drop.
+  2. Transition to `Liquid Pyramid Tier` highlighting `"3% BUYING NOW"`.
+  3. `Procedural SFX` (`bass_hit`) on the wave settlement + apex bloom.
+
 ---
 
-## 🔮 6. Roadmap & Planned Capabilities (Backlog)
+## 🔮 7. Roadmap & Planned Capabilities (Backlog)
 
 * [ ] **Animated Document Highlighter Sweep (`fx-highlighter-sweep`):** Realistic hand-drawn fluorescent highlighter bar moving across scanned PDF text.
 * [ ] **3D Parallax Tilt (`fx-parallax-tilt`):** 2.5D camera drift where foreground cutout shifts faster than the background on mouse drag or timeline playback.

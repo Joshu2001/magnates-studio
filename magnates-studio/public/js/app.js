@@ -37,6 +37,7 @@ let timelineClips = {
       layerOrder: 'front'
     }
   ],
+  chart: [],
   image: [],
   video: [],
   voiceover: [],
@@ -733,14 +734,15 @@ function drawMediaLayer(specificClip) {
         dh = maxH;
         dw = maxH * aspect;
       }
-    } else {
-      return;
     }
+  } else if (targetClip && targetClip.chartConfig) {
+    dw = 1080;
+    dh = 580;
   } else if (targetClip && targetClip.drawingStrokes) {
     dw = 1280;
     dh = 720;
   } else if (targetFile.isImage) {
-    if (!el.complete || !el.naturalWidth || !el.naturalHeight) {
+    if (!el || !el.complete || !el.naturalWidth || !el.naturalHeight) {
       return;
     }
     const aspect = el.naturalWidth / el.naturalHeight;
@@ -844,7 +846,9 @@ function drawMediaLayer(specificClip) {
       }
       ctx.restore();
     } else {
-      if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0 && targetClip.drawMode === 'live') {
+      if (targetClip?.chartConfig) {
+        drawInfographicChart(ctx, targetClip, dx, dy, finalW, finalH);
+      } else if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0 && targetClip.drawMode === 'live') {
         const elapsed = currentTime - targetClip.start;
         const drawProg = Math.min(1.0, Math.max(0.0, elapsed / Math.max(0.5, targetClip.duration * 0.85)));
         drawScreenInkOverlay(ctx, targetClip.drawingStrokes, targetClip.drawingFills, drawProg, targetClip.staggerParts);
@@ -960,8 +964,8 @@ function drawMediaLayer(specificClip) {
 
   ctx.restore();
 
-  // If this clip is selected and is an image or video, draw interactive transform highlight & handles
-  if (selectedClip && targetClip && selectedClip.clip.id === targetClip.id && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+  // If this clip is selected and is a chart, image, or video, draw interactive transform highlight & handles
+  if (selectedClip && targetClip && selectedClip.clip.id === targetClip.id && (selectedClip.trackType === 'chart' || selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
     drawTransformHandles(dx, dy, finalW, finalH);
 
     // If clip has zoom or loupe, also draw target crosshair indicator
@@ -1105,14 +1109,21 @@ function drawSortedVisualLayers() {
     }
   });
 
-  // 2. Active Image Clips
+  // 2. Active Chart / Infographic Clips
+  (timelineClips.chart || []).forEach(c => {
+    if (currentTime >= c.start && currentTime <= (c.start + c.duration)) {
+      activeItems.push({ type: 'chart', clip: c, zIndex: c.zIndex !== undefined ? c.zIndex : 25 });
+    }
+  });
+
+  // 3. Active Image Clips
   timelineClips.image.forEach(c => {
     if (currentTime >= c.start && currentTime <= (c.start + c.duration)) {
       activeItems.push({ type: 'image', clip: c, zIndex: c.zIndex !== undefined ? c.zIndex : 20 });
     }
   });
 
-  // 3. Active Text Clips
+  // 4. Active Text Clips
   const activeTexts = timelineClips.text.filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
   activeTexts.forEach(t => {
     activeItems.push({ type: 'text', clip: t, zIndex: t.zIndex !== undefined ? t.zIndex : 30 });
@@ -1131,7 +1142,7 @@ function drawSortedVisualLayers() {
   activeItems.sort((a, b) => a.zIndex - b.zIndex);
 
   activeItems.forEach(item => {
-    if (item.type === 'video' || item.type === 'image') {
+    if (item.type === 'video' || item.type === 'image' || item.type === 'chart') {
       drawMediaLayer(item.clip);
     } else if (item.type === 'text') {
       drawTextLayer(item.clip);
@@ -1576,6 +1587,7 @@ function addClipToTimeline(trackType, fileOrData, startSec, clipDuration = 6) {
 function renderAllTimelineTracks() {
   const trackMap = {
     text: document.getElementById('content-text'),
+    chart: document.getElementById('content-chart'),
     image: document.getElementById('content-image'),
     video: document.getElementById('content-video'),
     voiceover: document.getElementById('content-audio'),
@@ -1600,7 +1612,11 @@ function renderAllTimelineTracks() {
       block.style.width = `${widthPx}px`;
 
       let iconSvg = '';
-      if (clip.drawingStrokes) {
+      if (clip.chartConfig) {
+        iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>`;
+      } else if (clip.isIconSticker) {
+        iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+      } else if (clip.drawingStrokes) {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #ff334b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
       } else if (type === 'image') {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
@@ -1675,6 +1691,8 @@ function handleTimelineAddButtonClick(trackType, atTimeSec, triggerEl) {
     seekToTime(atTimeSec);
     showTextTimingAlert(`New kinetic text added at ${formatTimecode(atTimeSec)}!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
+  } else if (trackType === 'chart') {
+    openChartCreatorModal(atTimeSec);
   } else {
     // Open quick media picker popover or prompt file upload
     openTrackMediaPicker(trackType, atTimeSec, triggerEl);
@@ -1840,7 +1858,8 @@ function selectClip(clip, trackType) {
     }
 
     document.getElementById('btn-update-text').style.display = 'block';
-    document.getElementById('btn-delete-text').style.display = 'block';
+    const chartInspector = document.getElementById('card-chart-inspector');
+    if (chartInspector) chartInspector.style.display = 'none';
     inspector.style.display = 'none';
 
     // Highlight text editor card and scroll it into view
@@ -1849,10 +1868,25 @@ function selectClip(clip, trackType) {
       textEditorCard.style.display = 'block';
       textEditorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+  } else if (clip.chartConfig) {
+    // Show chart inspector card
+    const chartInspector = document.getElementById('card-chart-inspector');
+    if (chartInspector) {
+      chartInspector.style.display = 'block';
+      chartInspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      populateChartInspector(clip);
+    }
+    inspector.style.display = 'none';
+    const textEditorCard = document.getElementById('card-text-editor');
+    if (textEditorCard) textEditorCard.style.display = 'none';
   } else {
-    // Show clip inspector card
+    // Show standard clip inspector card
+    const chartInspector = document.getElementById('card-chart-inspector');
+    if (chartInspector) chartInspector.style.display = 'none';
+    const textEditorCard = document.getElementById('card-text-editor');
+    if (textEditorCard) textEditorCard.style.display = 'none';
     inspector.style.display = 'block';
-    document.getElementById('inspector-clip-type').textContent = clip.drawingStrokes ? 'DRAWING' : trackType.toUpperCase();
+    document.getElementById('inspector-clip-type').textContent = clip.drawingStrokes ? 'DRAWING' : (clip.isIconSticker ? 'ICON' : trackType.toUpperCase());
     document.getElementById('inspector-clip-name').textContent = clip.name || clip.file?.name || 'Clip';
     
     // Dynamic Mini Preview in Sidebar Inspector
@@ -2562,15 +2596,37 @@ document.querySelectorAll('.media-tabs .tab-btn').forEach(btn => {
 
     const mediaListEl = document.getElementById('media-list');
     const layersPanelEl = document.getElementById('layers-panel-container');
+    const chartsPanelEl = document.getElementById('charts-panel-container');
+    const iconsPanelEl = document.getElementById('icons-panel-container');
 
-    if (currentFilter === 'layers') {
+    if (currentFilter === 'charts') {
       if (mediaListEl) mediaListEl.style.display = 'none';
+      if (layersPanelEl) layersPanelEl.style.display = 'none';
+      if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+      if (chartsPanelEl) {
+        chartsPanelEl.style.display = 'flex';
+        renderChartsTemplatesPanel();
+      }
+    } else if (currentFilter === 'icons') {
+      if (mediaListEl) mediaListEl.style.display = 'none';
+      if (layersPanelEl) layersPanelEl.style.display = 'none';
+      if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+      if (iconsPanelEl) {
+        iconsPanelEl.style.display = 'flex';
+        renderIconsLibraryPanel();
+      }
+    } else if (currentFilter === 'layers') {
+      if (mediaListEl) mediaListEl.style.display = 'none';
+      if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+      if (iconsPanelEl) iconsPanelEl.style.display = 'none';
       if (layersPanelEl) {
         layersPanelEl.style.display = 'flex';
         renderLayersPanel();
       }
     } else {
       if (layersPanelEl) layersPanelEl.style.display = 'none';
+      if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+      if (iconsPanelEl) iconsPanelEl.style.display = 'none';
       if (mediaListEl) {
         mediaListEl.style.display = 'flex';
         renderMediaList(currentFilter);
@@ -3814,8 +3870,8 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 2. If an image/video clip is selected, check if click hit handles or bounding box
-    if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    // 2. If a chart or image/video clip is selected, check if click hit handles or bounding box
+    if (selectedClip && (selectedClip.trackType === 'chart' || selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
       const clip = selectedClip.clip;
       const b = clip._renderBounds;
       if (b) {
@@ -3844,7 +3900,7 @@ function initCanvasTransformInteraction() {
           }
         }
 
-        // Check if inside image bounding box to drag / reposition
+        // Check if inside bounding box to drag / reposition
         if (pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
           isTransforming = true;
           transformAction = 'drag';
@@ -3860,7 +3916,27 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 3. Check if user clicked on any visible Text layer to select and drag it
+    // 3. Check if user clicked on any visible Chart layer to select it
+    const activeChartClips = (timelineClips.chart || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeChartClips.length - 1; i >= 0; i--) {
+      const c = activeChartClips[i];
+      const b = c._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        selectClip(c, 'chart');
+        isTransforming = true;
+        transformAction = 'drag';
+        transformStartPos = pt;
+        transformInitialClip = {
+          scale: c.scale !== undefined ? c.scale : 1.0,
+          x: c.x || 0,
+          y: c.y || 0
+        };
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // 4. Check if user clicked on any visible Text layer to select and drag it
     const activeTextClips = timelineClips.text.filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
     for (let i = activeTextClips.length - 1; i >= 0; i--) {
       const t = activeTextClips[i];
@@ -3880,7 +3956,7 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 4. Check if user clicked on any visible image or video layer to select it
+    // 5. Check if user clicked on any visible image or video layer to select it
     const activeMediaClips = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
     // Check in reverse (topmost layer first)
     for (let i = activeMediaClips.length - 1; i >= 0; i--) {
@@ -3898,6 +3974,21 @@ function initCanvasTransformInteraction() {
           y: c.y || 0
         };
         e.preventDefault();
+        return;
+      }
+    }
+  });
+
+  // Double-click on canvas: If double-clicking a Chart, open the Big Center Modal to visually edit it
+  canvas.addEventListener('dblclick', (e) => {
+    const pt = getCanvasPointer(e);
+    const activeChartClips = (timelineClips.chart || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeChartClips.length - 1; i >= 0; i--) {
+      const c = activeChartClips[i];
+      const b = c._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        selectClip(c, 'chart');
+        openChartEditorModalForClip(c);
         return;
       }
     }
@@ -4757,6 +4848,9 @@ function getSerializableClips() {
       drawingFills: c.drawingFills ? JSON.parse(JSON.stringify(c.drawingFills)) : undefined,
       drawMode: c.drawMode,
       staggerParts: c.staggerParts,
+      chartConfig: c.chartConfig ? JSON.parse(JSON.stringify(c.chartConfig)) : undefined,
+      isIconSticker: c.isIconSticker,
+      iconType: c.iconType,
       file: c.file ? {
         name: c.file.name,
         url: c.file.url,
@@ -4770,6 +4864,7 @@ function getSerializableClips() {
 
   return {
     text: textClips,
+    chart: serializeMediaClips(timelineClips.chart || []),
     image: serializeMediaClips(timelineClips.image || []),
     video: serializeMediaClips(timelineClips.video || []),
     voiceover: serializeMediaClips(timelineClips.voiceover || []),
@@ -4812,8 +4907,8 @@ function loadProjectState() {
       timelineClips.text = state.text;
     }
 
-    // Restore media clips directly
-    ['image', 'video', 'voiceover', 'music'].forEach(trackType => {
+    // Restore media and chart clips directly
+    ['chart', 'image', 'video', 'voiceover', 'music'].forEach(trackType => {
       if (state[trackType] && state[trackType].length > 0) {
         timelineClips[trackType] = state[trackType];
       }
@@ -6313,14 +6408,28 @@ function renderLayersPanel() {
 
   // 3. Image / Sticker / Vector Drawing Clips
   timelineClips.image.forEach((imgClip, idx) => {
+    let layerDesc = 'Media Layer';
+    let layerIcon = `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
+    if (imgClip.chartConfig) {
+      layerDesc = `Infographic · ${imgClip.chartConfig.type === 'pyramid' ? 'Liquid Funnel' : (imgClip.chartConfig.type === 'bar' ? 'Staggered Bar' : 'Area Spread')}`;
+      layerIcon = `<svg viewBox="0 0 24 24" style="color:#00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>`;
+    } else if (imgClip.isIconSticker) {
+      layerDesc = 'Vector Icon Sticker';
+      layerIcon = `<svg viewBox="0 0 24 24" style="color:#ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+    } else if (imgClip.drawingStrokes) {
+      layerDesc = 'Vector Animated Drawing';
+    } else if (imgClip.cutoutCanvas) {
+      layerDesc = 'Cutout Subject';
+    }
+
     layers.push({
       id: imgClip.id,
       name: imgClip.name || imgClip.file?.name || `Image #${idx + 1}`,
-      desc: imgClip.drawingStrokes ? 'Vector Animated Drawing' : (imgClip.cutoutCanvas ? 'Cutout Subject' : 'Media Layer'),
+      desc: layerDesc,
       type: 'image',
       clip: imgClip,
-      icon: `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`,
-      active: selectedClip === imgClip,
+      icon: layerIcon,
+      active: selectedClip?.clip === imgClip,
       onSelect: () => {
         selectClip(imgClip, 'image');
         seekToTime(imgClip.start);
@@ -6501,7 +6610,9 @@ function initLayersPanelControls() {
         const action = el.dataset.layerAction;
         dropdown.style.display = 'none';
 
-        if (action === 'add_text') {
+        if (action === 'add_chart') {
+          openChartCreatorModal();
+        } else if (action === 'add_text') {
           const btnAddText = document.getElementById('btn-add-text');
           if (btnAddText) btnAddText.click();
           renderLayersPanel();
@@ -6527,4 +6638,1215 @@ document.addEventListener('DOMContentLoaded', () => {
       if (drawBtn) drawBtn.click();
     });
   }
+
+  // Initialize Animated Charts and Vector Icons Engines
+  initChartsAndInfographicsEngine();
+  initVectorIconsEngine();
 });
+
+// ====================================================================================
+// 📊 MOTION GRAPHIC INFOGRAPHICS & ANIMATED CHARTS ENGINE (Alex Hormozi / Vox Style)
+// ====================================================================================
+
+const PREBUILT_CHART_TEMPLATES = [
+  {
+    id: 'tpl-cost-per-lead',
+    type: 'area',
+    name: 'Dual-Line & Area Spread',
+    badge: 'Cost Per Lead',
+    desc: 'Traces progressive write-on curve, pops data nodes, and dynamically reveals volume difference gap between two metrics.',
+    config: {
+      type: 'area',
+      title: 'COST PER LEAD',
+      isDual: true,
+      series1: [42, 60, 50, 78, 62, 51, 68, 48, 70, 52, 64, 40, 68, 25, 18],
+      series2: [30, 48, 32, 64, 40, 22, 38, 32, 45, 18, 34, 15, 42, 10, 8],
+      color: '#ffffff',
+      color2: '#9aa5b8',
+      drawDuration: 1.8,
+      glow: true,
+      fillOpacity: 0.32
+    }
+  },
+  {
+    id: 'tpl-cost-per-click',
+    type: 'area',
+    name: 'Steep Cliff Drop Curve',
+    badge: 'Cost Per Click',
+    desc: 'High-contrast downward trend curve that writes on from left to right, dramatizing steep acquisition drops and cliff falls.',
+    config: {
+      type: 'area',
+      title: 'COST PER CLICK',
+      isDual: false,
+      series1: [48, 40, 44, 28, 32, 22, 28, 18, 14, 8, 7, 5, 4, 3, 2],
+      color: '#ffffff',
+      drawDuration: 1.6,
+      glow: true,
+      fillOpacity: 0.38
+    }
+  },
+  {
+    id: 'tpl-conversion-rate',
+    type: 'bar',
+    name: 'Staggered Metric Bar Reveal',
+    badge: 'Conversion Rate',
+    desc: 'Neon columns emerge sequentially from the baseline with a staggered spring pop, culminating in a glowing peak highlight.',
+    config: {
+      type: 'bar',
+      title: 'CONVERSION RATE',
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      values: [12, 28, 24, 30, 62, 64, 38, 64, 70, 84, 55, 36],
+      color: '#76ff03',
+      staggerDelay: 0.07,
+      drawDuration: 1.8,
+      glow: true,
+      peakIndex: 9
+    }
+  },
+  {
+    id: 'tpl-buying-now-pyramid',
+    type: 'pyramid',
+    name: 'Liquid Wave & Glowing Pyramid Tier',
+    badge: '3% Buying Now',
+    desc: 'Geometric audience hierarchy funnel where the active apex fills with an organic fluid wave slosh and neon rim glow.',
+    config: {
+      type: 'pyramid',
+      title: 'BUYER HIERARCHY',
+      tierIndex: 0,
+      tierText: '3% BUYING NOW',
+      color: '#b4ff00',
+      drawDuration: 1.8,
+      waveAgitation: 18,
+      glow: true
+    }
+  }
+];
+
+// Master Chart Drawing Function invoked within drawMediaLayer
+function drawInfographicChart(ctx, clip, dx, dy, w, h) {
+  const cfg = clip.chartConfig;
+  if (!cfg) return;
+
+  const elapsed = Math.max(0, currentTime - clip.start);
+  const animDuration = cfg.drawDuration || 1.8;
+  const progress = Math.min(1.0, elapsed / animDuration);
+
+  // Smooth cubic ease out curve
+  const easeOut = 1 - Math.pow(1 - progress, 3);
+
+  ctx.save();
+
+  // Bounding background card container
+  ctx.fillStyle = 'rgba(10, 12, 18, 0.94)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx.lineWidth = 2;
+  
+  // Rounded rect container
+  const radius = 12;
+  ctx.beginPath();
+  ctx.roundRect(dx, dy, w, h, radius);
+  ctx.fill();
+  ctx.stroke();
+
+  if (cfg.glow) {
+    ctx.shadowColor = cfg.color || '#00f0ff';
+    ctx.shadowBlur = 18;
+  }
+
+  // Draw chart header title
+  ctx.save();
+  ctx.font = '900 24px "Inter", "Oswald", sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.textAlign = 'left';
+  ctx.fillText(cfg.title || 'INFOGRAPHIC METRIC', dx + 28, dy + 42);
+
+  // Decorative divider line under title
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(dx + 28, dy + 54);
+  ctx.lineTo(dx + w - 28, dy + 54);
+  ctx.stroke();
+  ctx.restore();
+
+  // Route to specific chart renderer
+  if (cfg.type === 'bar') {
+    drawStaggeredBarChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
+  } else if (cfg.type === 'pyramid') {
+    drawLiquidPyramidChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 90, elapsed, progress);
+  } else {
+    // Default: area / line chart
+    drawDynamicAreaChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress, easeOut);
+  }
+
+  ctx.restore();
+}
+
+// 1. Dynamic Area & Dual-Line Spread Renderer
+function drawDynamicAreaChart(ctx, cfg, x, y, w, h, elapsed, progress, easeOut) {
+  const series1 = cfg.series1 || [40, 60, 50, 75, 60, 50, 65, 45, 70, 55, 60, 38, 65, 25, 18];
+  const series2 = cfg.series2 || [30, 48, 32, 64, 40, 22, 38, 32, 45, 18, 34, 15, 42, 10, 8];
+  const isDual = cfg.isDual !== false;
+  const col1 = cfg.color || '#ffffff';
+  const col2 = cfg.color2 || '#8ea1b8';
+
+  const maxVal = Math.max(...series1, ...(isDual ? series2 : [0])) * 1.15 || 100;
+  const n = series1.length;
+  const stepX = w / (n - 1);
+  const baselineY = y + h - 15;
+  const chartHeight = h - 25;
+
+  // Background Grid Lines
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = 1;
+  const gridRows = 5;
+  for (let r = 0; r <= gridRows; r++) {
+    const gy = baselineY - (chartHeight * (r / gridRows));
+    ctx.beginPath();
+    ctx.moveTo(x, gy);
+    ctx.lineTo(x + w, gy);
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // Helper to map index & value to canvas coords
+  const getPt = (idx, val) => ({
+    x: x + idx * stepX,
+    y: baselineY - (val / maxVal) * chartHeight
+  });
+
+  // Calculate write-on reveal point
+  const currentDrawIdx = Math.min(n - 1, (n - 1) * easeOut);
+  const fullPointsCount = Math.floor(currentDrawIdx);
+  const frac = currentDrawIdx - fullPointsCount;
+
+  // Function to build curve path up to current animated progress
+  function buildCurvePath(series) {
+    const pts = [];
+    for (let i = 0; i <= fullPointsCount; i++) {
+      pts.push(getPt(i, series[i]));
+    }
+    if (fullPointsCount < n - 1 && frac > 0) {
+      const pA = getPt(fullPointsCount, series[fullPointsCount]);
+      const pB = getPt(fullPointsCount + 1, series[fullPointsCount + 1]);
+      pts.push({
+        x: pA.x + (pB.x - pA.x) * frac,
+        y: pA.y + (pB.y - pA.y) * frac
+      });
+    }
+    return pts;
+  }
+
+  const pts1 = buildCurvePath(series1);
+  const pts2 = isDual ? buildCurvePath(series2) : [];
+
+  if (pts1.length < 2) return;
+
+  // A. Render Shaded Area Fill
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(pts1[0].x, baselineY);
+  pts1.forEach(pt => ctx.lineTo(pt.x, pt.y));
+  ctx.lineTo(pts1[pts1.length - 1].x, baselineY);
+  ctx.closePath();
+
+  const areaGrad = ctx.createLinearGradient(0, y, 0, baselineY);
+  areaGrad.addColorStop(0, hexToRgba(col1, cfg.fillOpacity || 0.35));
+  areaGrad.addColorStop(1, hexToRgba(col1, 0.02));
+  ctx.fillStyle = areaGrad;
+  ctx.fill();
+  ctx.restore();
+
+  // B. Render Secondary Benchmark Curve (if dual mode)
+  if (isDual && pts2.length >= 2) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(pts2[0].x, baselineY);
+    pts2.forEach(pt => ctx.lineTo(pt.x, pt.y));
+    ctx.lineTo(pts2[pts2.length - 1].x, baselineY);
+    ctx.closePath();
+    ctx.fillStyle = hexToRgba(col2, 0.18);
+    ctx.fill();
+
+    // Line 2 Stroke
+    ctx.strokeStyle = col2;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    pts2.forEach((pt, i) => (i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+    ctx.stroke();
+
+    // Secondary line node dots
+    ctx.fillStyle = col2;
+    pts2.forEach(pt => {
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  // C. Render Primary White Curve Stroke
+  ctx.save();
+  ctx.strokeStyle = col1;
+  ctx.lineWidth = 3.5;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  pts1.forEach((pt, i) => (i === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
+  ctx.stroke();
+
+  // D. Animated Node Points / Data Dots
+  pts1.forEach((pt, i) => {
+    // Pop in dot
+    const dotProgress = Math.min(1, Math.max(0, (easeOut * (n - 1) - i) + 1));
+    if (dotProgress > 0) {
+      ctx.save();
+      const dotRadius = 4.5 * dotProgress;
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = col1;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, dotRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  });
+
+  // Leading edge glow pulse
+  const leadPt = pts1[pts1.length - 1];
+  if (leadPt && progress < 1) {
+    ctx.save();
+    ctx.fillStyle = col1;
+    ctx.shadowColor = col1;
+    ctx.shadowBlur = 16;
+    ctx.beginPath();
+    ctx.arc(leadPt.x, leadPt.y, 6.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Bottom Axis Tick Marks
+  ctx.save();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x, baselineY);
+  ctx.lineTo(x + w, baselineY);
+  ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < n; i++) {
+    const tx = x + i * stepX;
+    ctx.fillText(`${i + 1}`, tx, baselineY + 12);
+  }
+  ctx.restore();
+}
+
+// 2. Staggered Metric Bar Pop-Up Renderer
+function drawStaggeredBarChart(ctx, cfg, x, y, w, h, elapsed, progress) {
+  const labels = cfg.labels || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const values = cfg.values || [12, 28, 25, 32, 60, 62, 40, 63, 72, 85, 52, 35];
+  const barColor = cfg.color || '#76ff03';
+  const peakIdx = cfg.peakIndex !== undefined ? cfg.peakIndex : values.indexOf(Math.max(...values));
+
+  const maxVal = Math.max(...values) * 1.15 || 100;
+  const n = values.length;
+  const barSlotWidth = w / n;
+  const barWidth = Math.max(14, barSlotWidth * 0.65);
+  const baselineY = y + h - 20;
+  const maxHeight = h - 35;
+
+  // Baseline line
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(x, baselineY);
+  ctx.lineTo(x + w, baselineY);
+  ctx.stroke();
+  ctx.restore();
+
+  const stagger = cfg.staggerDelay || 0.08;
+
+  values.forEach((val, idx) => {
+    const barStart = idx * stagger;
+    const barElapsed = Math.max(0, elapsed - barStart);
+    const barNormTime = Math.min(1.0, barElapsed / 0.45);
+
+    // Snappy spring overshoot ease: rises to 105% then settles to 100%
+    let barEase = 0;
+    if (barNormTime > 0) {
+      barEase = 1 + 2.7 * Math.pow(barNormTime - 1, 3) + 1.7 * Math.pow(barNormTime - 1, 2);
+    }
+    barEase = Math.min(1.06, Math.max(0, barEase));
+
+    const finalBarHeight = (val / maxVal) * maxHeight;
+    const currentHeight = finalBarHeight * barEase;
+    const barX = x + idx * barSlotWidth + (barSlotWidth - barWidth) / 2;
+    const barY = baselineY - currentHeight;
+
+    if (currentHeight > 1) {
+      ctx.save();
+      const isPeak = idx === peakIdx;
+
+      // Glow on peak bar or when glowing is enabled
+      if (isPeak || cfg.glow) {
+        ctx.shadowColor = barColor;
+        ctx.shadowBlur = isPeak ? 22 : 8;
+      }
+
+      ctx.fillStyle = barColor;
+      ctx.beginPath();
+      ctx.roundRect(barX, barY, barWidth, currentHeight, [3, 3, 0, 0]);
+      ctx.fill();
+
+      // Top highlight cap
+      ctx.fillStyle = '#ffffff';
+      ctx.globalAlpha = 0.45;
+      ctx.fillRect(barX, barY, barWidth, 3);
+      ctx.restore();
+    }
+
+    // Month Label
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 10px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(labels[idx] || `${idx + 1}`, barX + barWidth / 2, baselineY + 14);
+    ctx.restore();
+  });
+}
+
+// 3. Liquid Wave & Glowing Pyramid Tier Renderer
+function drawLiquidPyramidChart(ctx, cfg, x, y, w, h, elapsed, progress) {
+  const accentColor = cfg.color || '#b4ff00';
+  const tierIndex = cfg.tierIndex || 0; // 0 = Apex (Top)
+  const tierText = cfg.tierText || '3% BUYING NOW';
+
+  const centerX = x + w / 2;
+  const topY = y + 10;
+  const bottomY = y + h - 10;
+  const halfBase = Math.min(w * 0.42, (bottomY - topY) * 0.75);
+
+  const apexPt = { x: centerX, y: topY };
+  const baseLeft = { x: centerX - halfBase, y: bottomY };
+  const baseRight = { x: centerX + halfBase, y: bottomY };
+
+  // Total 4 Tiers ratios from top: 0.28, 0.52, 0.76, 1.0
+  const tierCutRatios = [0.32, 0.55, 0.78, 1.0];
+
+  // Draw pyramid tiers in dark slate
+  const numTiers = 4;
+  for (let t = numTiers - 1; t >= 0; t--) {
+    const topR = t === 0 ? 0 : tierCutRatios[t - 1];
+    const botR = tierCutRatios[t];
+
+    const yT = topY + (bottomY - topY) * topR;
+    const yB = topY + (bottomY - topY) * botR;
+    const xTL = centerX - halfBase * topR;
+    const xTR = centerX + halfBase * topR;
+    const xBL = centerX - halfBase * botR;
+    const xBR = centerX + halfBase * botR;
+
+    ctx.save();
+    ctx.beginPath();
+    if (t === 0) {
+      ctx.moveTo(apexPt.x, apexPt.y);
+      ctx.lineTo(xBR, yB);
+      ctx.lineTo(xBL, yB);
+    } else {
+      ctx.moveTo(xTL, yT);
+      ctx.lineTo(xTR, yT);
+      ctx.lineTo(xBR, yB);
+      ctx.lineTo(xBL, yB);
+    }
+    ctx.closePath();
+
+    // Dark tiered shading
+    const shade = 35 + t * 8;
+    ctx.fillStyle = `rgb(${shade}, ${shade + 2}, ${shade + 6})`;
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Active Tier Organic Wave Fill (Clip inside the Apex Triangle)
+  const activeBotY = topY + (bottomY - topY) * tierCutRatios[tierIndex];
+  const activeLeft = centerX - halfBase * tierCutRatios[tierIndex];
+  const activeRight = centerX + halfBase * tierCutRatios[tierIndex];
+
+  ctx.save();
+  // Clip strictly to Apex segment
+  ctx.beginPath();
+  ctx.moveTo(apexPt.x, apexPt.y);
+  ctx.lineTo(activeRight, activeBotY);
+  ctx.lineTo(activeLeft, activeBotY);
+  ctx.closePath();
+  ctx.clip();
+
+  // Wave calculation: liquid rises upward from bottom to top
+  const riseProg = Math.min(1.0, elapsed / 1.5);
+  const waveTargetY = activeBotY - (activeBotY - topY) * riseProg;
+  const waveAmp = (1 - riseProg * 0.4) * (cfg.waveAgitation || 14);
+  const waveFreq = 0.045;
+  const wavePhase = elapsed * 5.0;
+
+  // Build organic fluid wave path
+  ctx.beginPath();
+  ctx.moveTo(activeLeft - 20, activeBotY + 10);
+  for (let px = activeLeft - 20; px <= activeRight + 20; px += 4) {
+    const waveY = waveTargetY + Math.sin(px * waveFreq + wavePhase) * waveAmp;
+    ctx.lineTo(px, waveY);
+  }
+  ctx.lineTo(activeRight + 20, activeBotY + 10);
+  ctx.closePath();
+
+  ctx.fillStyle = accentColor;
+  ctx.shadowColor = accentColor;
+  ctx.shadowBlur = cfg.glow ? 24 : 0;
+  ctx.fill();
+
+  ctx.restore();
+
+  // Neon Rim Accent Stroke around apex tier
+  ctx.save();
+  ctx.strokeStyle = accentColor;
+  ctx.lineWidth = 3;
+  ctx.shadowColor = accentColor;
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.moveTo(apexPt.x, apexPt.y);
+  ctx.lineTo(activeRight, activeBotY);
+  ctx.lineTo(activeLeft, activeBotY);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+
+  // Tier Headline Typography ("3% BUYING NOW")
+  ctx.save();
+  const textY = topY + (activeBotY - topY) * 0.65;
+  ctx.font = '900 21px "Inter", "Oswald", sans-serif';
+  ctx.fillStyle = '#111317';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const lines = tierText.split('\n');
+  if (lines.length === 1 && tierText.includes(' ')) {
+    const parts = tierText.split(' ');
+    const line1 = parts[0];
+    const line2 = parts.slice(1).join(' ');
+    ctx.fillText(line1, centerX, textY - 11);
+    ctx.fillText(line2, centerX, textY + 12);
+  } else {
+    ctx.fillText(tierText, centerX, textY);
+  }
+  ctx.restore();
+}
+
+// Helper: Hex color to RGBA string
+function hexToRgba(hex, alpha) {
+  if (!hex || hex[0] !== '#') return `rgba(255, 255, 255, ${alpha})`;
+  let r = 255, g = 255, b = 255;
+  if (hex.length === 7) {
+    r = parseInt(hex.slice(1, 3), 16);
+    g = parseInt(hex.slice(3, 5), 16);
+    b = parseInt(hex.slice(5, 7), 16);
+  } else if (hex.length === 4) {
+    r = parseInt(hex[1] + hex[1], 16);
+    g = parseInt(hex[2] + hex[2], 16);
+    b = parseInt(hex[3] + hex[3], 16);
+  }
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Render Charts & Infographics Templates Library Panel
+function renderChartsTemplatesPanel() {
+  const container = document.getElementById('charts-templates-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  PREBUILT_CHART_TEMPLATES.forEach(tpl => {
+    const card = document.createElement('div');
+    card.className = 'chart-template-card';
+
+    let miniPreviewSvg = '';
+    if (tpl.type === 'area') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <polygon points="5,42 20,22 35,30 55,12 70,26 95,8 95,45 5,45" fill="rgba(0, 240, 255, 0.25)" />
+          <polyline points="5,42 20,22 35,30 55,12 70,26 95,8" fill="none" stroke="#00f0ff" stroke-width="2.5" />
+          <circle cx="95" cy="8" r="3" fill="#fff" />
+        </svg>
+      `;
+    } else if (tpl.type === 'bar') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <rect x="8" y="32" width="9" height="13" fill="#76ff03" rx="1"/>
+          <rect x="22" y="22" width="9" height="23" fill="#76ff03" rx="1"/>
+          <rect x="36" y="26" width="9" height="19" fill="#76ff03" rx="1"/>
+          <rect x="50" y="12" width="9" height="33" fill="#76ff03" rx="1"/>
+          <rect x="64" y="6" width="9" height="39" fill="#76ff03" rx="1" filter="drop-shadow(0 0 4px #76ff03)"/>
+          <rect x="78" y="18" width="9" height="27" fill="#76ff03" rx="1"/>
+        </svg>
+      `;
+    } else if (tpl.type === 'pyramid') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <polygon points="50,4 28,46 72,46" fill="#242833" />
+          <path d="M50,4 L39,24 Q45,21 50,24 T61,24 Z" fill="#b4ff00" filter="drop-shadow(0 0 6px #b4ff00)" />
+        </svg>
+      `;
+    }
+
+    card.innerHTML = `
+      <div class="chart-template-preview">
+        ${miniPreviewSvg}
+        <span class="badge" style="position: absolute; top: 6px; right: 6px; font-size: 9px; color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);">${tpl.badge}</span>
+      </div>
+      <div class="chart-template-meta">
+        <div class="chart-template-title">
+          <span>${tpl.name}</span>
+          <span style="font-size: 10px; color: #00f0ff;">+ Add</span>
+        </div>
+        <div class="chart-template-desc">${tpl.desc}</div>
+      </div>
+    `;
+
+    card.addEventListener('click', () => {
+      addChartClipToTimeline(tpl.config, currentTime, 6.0);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+// Add an Animated Chart as an interactive Timeline Clip
+function addChartClipToTimeline(chartConfig, startSec = currentTime, durationSec = 6.0) {
+  if (!timelineClips.chart) timelineClips.chart = [];
+
+  const newClip = {
+    id: `clip-chart-${Date.now()}`,
+    track: 'chart',
+    name: chartConfig.title || 'Animated Infographic',
+    start: Math.max(0, startSec),
+    duration: Math.max(2, durationSec),
+    scale: 1.0,
+    x: 0,
+    y: 0,
+    zIndex: 25,
+    layerOrder: 'front',
+    chartConfig: JSON.parse(JSON.stringify(chartConfig)),
+    file: {
+      name: `${chartConfig.title || 'Chart'}.chart`,
+      isImage: true,
+      url: ''
+    }
+  };
+
+  timelineClips.chart.push(newClip);
+  renderAllTimelineTracks();
+  selectClip(newClip, 'chart');
+  seekToTime(newClip.start);
+  recordState('Add Animated Chart Layer');
+  playSFX('whoosh', 0.6);
+  showTextTimingAlert(`Added "${newClip.name}" chart to timeline! Scrub playhead to watch animation.`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 3500);
+  return newClip;
+}
+
+// Populate Right Inspector fields when a chart clip is selected
+function populateChartInspector(clip) {
+  const cfg = clip.chartConfig;
+  if (!cfg) return;
+
+  const titleEl = document.getElementById('chart-inspector-title');
+  const typeBadge = document.getElementById('chart-type-badge');
+  const colorEl = document.getElementById('chart-inspector-color');
+  const durSlider = document.getElementById('chart-inspector-duration');
+  const durVal = document.getElementById('chart-inspector-dur-val');
+  const glowCheck = document.getElementById('chart-inspector-glow');
+  const startEl = document.getElementById('chart-start-input');
+  const durEl = document.getElementById('chart-dur-input');
+
+  if (titleEl) titleEl.value = cfg.title || '';
+  if (typeBadge) typeBadge.textContent = cfg.type === 'pyramid' ? 'Liquid Pyramid' : (cfg.type === 'bar' ? 'Staggered Bar' : 'Area Spread');
+  if (colorEl) colorEl.value = cfg.color || '#00f0ff';
+  if (durSlider) durSlider.value = Math.round((cfg.drawDuration || 1.8) * 10);
+  if (durVal) durVal.textContent = `${(cfg.drawDuration || 1.8).toFixed(1)}s`;
+  if (glowCheck) glowCheck.checked = cfg.glow !== false;
+  if (startEl) startEl.value = formatTimecode(clip.start);
+  if (durEl) durEl.value = formatTimecode(clip.duration);
+
+  // Toggle specific field visibility
+  const areaFields = document.getElementById('chart-inspector-area-fields');
+  const barFields = document.getElementById('chart-inspector-bar-fields');
+  const pyramidFields = document.getElementById('chart-inspector-pyramid-fields');
+
+  if (areaFields) areaFields.style.display = cfg.type === 'area' ? 'block' : 'none';
+  if (barFields) barFields.style.display = cfg.type === 'bar' ? 'block' : 'none';
+  if (pyramidFields) pyramidFields.style.display = cfg.type === 'pyramid' ? 'block' : 'none';
+
+  if (cfg.type === 'area') {
+    const s1El = document.getElementById('chart-inspector-series1');
+    const s2El = document.getElementById('chart-inspector-series2');
+    const rowS2 = document.getElementById('row-chart-inspector-series2');
+    if (s1El) s1El.value = (cfg.series1 || []).join(', ');
+    if (s2El) s2El.value = (cfg.series2 || []).join(', ');
+    if (rowS2) rowS2.style.display = cfg.isDual !== false ? 'block' : 'none';
+    document.getElementById('btn-chart-dual-true')?.classList.toggle('active', cfg.isDual !== false);
+    document.getElementById('btn-chart-dual-false')?.classList.toggle('active', cfg.isDual === false);
+  } else if (cfg.type === 'bar') {
+    const lblEl = document.getElementById('chart-inspector-bar-labels');
+    const valEl = document.getElementById('chart-inspector-bar-values');
+    if (lblEl) lblEl.value = (cfg.labels || []).join(', ');
+    if (valEl) valEl.value = (cfg.values || []).join(', ');
+  } else if (cfg.type === 'pyramid') {
+    const tierSel = document.getElementById('chart-inspector-pyramid-tier');
+    const textEl = document.getElementById('chart-inspector-pyramid-text');
+    if (tierSel) tierSel.value = cfg.tierIndex || 0;
+    if (textEl) textEl.value = cfg.tierText || '3% BUYING NOW';
+  }
+}
+
+// Chart Creator / Editor Modal Logic
+let modalEditingClip = null;
+let modalPreviewAnimFrame = null;
+let modalPreviewStartTime = 0;
+
+function openChartCreatorModal() {
+  modalEditingClip = null;
+  const modal = document.getElementById('chart-creator-modal');
+  const titleText = document.getElementById('chart-modal-title-text');
+  const confirmBtnText = document.getElementById('btn-confirm-add-chart-text');
+
+  if (titleText) titleText.textContent = 'Create Motion Graphic Chart & Infographic';
+  if (confirmBtnText) confirmBtnText.textContent = 'Add Animated Chart to Timeline';
+
+  if (modal) modal.style.display = 'flex';
+  startModalPreviewLoop();
+}
+
+function openChartEditorModalForClip(clip) {
+  if (!clip || !clip.chartConfig) return;
+  modalEditingClip = clip;
+  const cfg = clip.chartConfig;
+  const modal = document.getElementById('chart-creator-modal');
+  const titleText = document.getElementById('chart-modal-title-text');
+  const confirmBtnText = document.getElementById('btn-confirm-add-chart-text');
+
+  if (titleText) titleText.textContent = `Edit Chart: ${cfg.title || 'Infographic'}`;
+  if (confirmBtnText) confirmBtnText.textContent = 'Update Chart on Screen';
+
+  // Set active chart type card
+  selectedModalType = cfg.type || 'area';
+  document.querySelectorAll('.chart-type-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.chartType === selectedModalType);
+  });
+
+  // Populate inputs with clip's active configuration
+  const titleInput = document.getElementById('modal-chart-title');
+  const colorInput = document.getElementById('modal-chart-color');
+  const colorLabel = document.getElementById('modal-chart-color-label');
+  const durSlider = document.getElementById('modal-chart-duration');
+  const durVal = document.getElementById('modal-chart-duration-val');
+  const dataInput = document.getElementById('modal-chart-data');
+  const dataLabel = document.getElementById('modal-chart-data-label');
+
+  if (titleInput) titleInput.value = cfg.title || '';
+  if (colorInput) {
+    colorInput.value = cfg.color || '#00f0ff';
+    if (colorLabel) colorLabel.textContent = cfg.color || '#00f0ff';
+  }
+  if (durSlider) {
+    durSlider.value = Math.round((cfg.drawDuration || 1.8) * 10);
+    if (durVal) durVal.textContent = `${(cfg.drawDuration || 1.8).toFixed(1)}s`;
+  }
+
+  if (cfg.type === 'pyramid') {
+    if (dataLabel) dataLabel.textContent = 'Apex Tier Headline Text';
+    if (dataInput) dataInput.value = cfg.tierText || '3% BUYING NOW';
+  } else if (cfg.type === 'bar') {
+    if (dataLabel) dataLabel.textContent = 'Bar Values (CSV)';
+    if (dataInput) dataInput.value = (cfg.values || []).join(', ');
+  } else {
+    if (dataLabel) dataLabel.textContent = 'Data Values (CSV)';
+    if (dataInput) dataInput.value = (cfg.series1 || []).join(', ');
+  }
+
+  if (modal) modal.style.display = 'flex';
+  startModalPreviewLoop();
+}
+
+function closeChartCreatorModal() {
+  const modal = document.getElementById('chart-creator-modal');
+  if (modal) modal.style.display = 'none';
+  modalEditingClip = null;
+  if (modalPreviewAnimFrame) {
+    cancelAnimationFrame(modalPreviewAnimFrame);
+    modalPreviewAnimFrame = null;
+  }
+}
+
+// Live interactive modal preview rendering loop
+function startModalPreviewLoop() {
+  if (modalPreviewAnimFrame) {
+    cancelAnimationFrame(modalPreviewAnimFrame);
+  }
+  modalPreviewStartTime = performance.now();
+
+  function renderModalPreview() {
+    const previewCanvas = document.getElementById('modal-chart-preview-canvas');
+    if (!previewCanvas || previewCanvas.offsetParent === null) {
+      modalPreviewAnimFrame = null;
+      return;
+    }
+
+    const pCtx = previewCanvas.getContext('2d');
+    const pw = previewCanvas.width;
+    const ph = previewCanvas.height;
+
+    // Clear canvas
+    pCtx.clearRect(0, 0, pw, ph);
+
+    // Read current form values for real-time live preview
+    const title = document.getElementById('modal-chart-title')?.value || 'CHART';
+    const color = document.getElementById('modal-chart-color')?.value || '#00f0ff';
+    const durSec = (parseInt(document.getElementById('modal-chart-duration')?.value || '18') / 10);
+    const rawData = document.getElementById('modal-chart-data')?.value || '';
+
+    const previewCfg = {
+      type: selectedModalType,
+      title,
+      color,
+      drawDuration: durSec,
+      glow: true
+    };
+
+    if (selectedModalType === 'pyramid') {
+      previewCfg.tierText = rawData.trim() || '3% BUYING NOW';
+      previewCfg.tierIndex = 0;
+    } else if (selectedModalType === 'bar') {
+      const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      previewCfg.values = vals.length > 0 ? vals : [10, 25, 40, 75, 50, 65, 80];
+      previewCfg.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].slice(0, previewCfg.values.length);
+    } else {
+      const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      previewCfg.series1 = vals.length > 0 ? vals : [20, 50, 40, 80, 60, 30, 15];
+      previewCfg.isDual = true;
+      previewCfg.series2 = previewCfg.series1.map(v => Math.max(5, Math.round(v * 0.65)));
+    }
+
+    const now = performance.now();
+    const cycleDurationMs = (durSec + 1.2) * 1000;
+    const elapsedSec = ((now - modalPreviewStartTime) % cycleDurationMs) / 1000;
+    const progress = Math.min(1.0, elapsedSec / durSec);
+    const easeOut = 1 - Math.pow(1 - progress, 3);
+
+    // Draw container card
+    pCtx.save();
+    pCtx.fillStyle = 'rgba(12, 14, 20, 0.96)';
+    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    pCtx.lineWidth = 1.5;
+    pCtx.beginPath();
+    pCtx.roundRect(12, 10, pw - 24, ph - 20, 8);
+    pCtx.fill();
+    pCtx.stroke();
+
+    // Title
+    pCtx.font = '800 16px "Inter", "Oswald", sans-serif';
+    pCtx.fillStyle = '#ffffff';
+    pCtx.fillText(previewCfg.title || 'PREVIEW', 26, 32);
+
+    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    pCtx.lineWidth = 1;
+    pCtx.beginPath();
+    pCtx.moveTo(26, 40);
+    pCtx.lineTo(pw - 26, 40);
+    pCtx.stroke();
+    pCtx.restore();
+
+    // Render chart graphics
+    const chartX = 26;
+    const chartY = 50;
+    const chartW = pw - 52;
+    const chartH = ph - 68;
+
+    if (previewCfg.type === 'bar') {
+      drawStaggeredBarChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+    } else if (previewCfg.type === 'pyramid') {
+      drawLiquidPyramidChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+    } else {
+      drawDynamicAreaChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress, easeOut);
+    }
+
+    modalPreviewAnimFrame = requestAnimationFrame(renderModalPreview);
+  }
+
+  modalPreviewAnimFrame = requestAnimationFrame(renderModalPreview);
+}
+
+// Initialize Charts & Infographics UI & event listeners
+let selectedModalType = 'area';
+
+function initChartsAndInfographicsEngine() {
+  // Timeline Toolbar button
+  const btnTimelineChart = document.getElementById('tool-add-chart');
+  if (btnTimelineChart) {
+    btnTimelineChart.addEventListener('click', () => {
+      openChartCreatorModal();
+    });
+  }
+
+  // Sidebar Panel "New Chart" button
+  const btnCreateTrigger = document.getElementById('btn-create-chart-trigger');
+  if (btnCreateTrigger) {
+    btnCreateTrigger.addEventListener('click', () => {
+      openChartCreatorModal();
+    });
+  }
+
+  // Inspector "Edit in Pop-up Modal" button
+  document.getElementById('btn-chart-open-modal')?.addEventListener('click', () => {
+    if (selectedClip?.clip?.chartConfig) {
+      openChartEditorModalForClip(selectedClip.clip);
+    }
+  });
+
+  // Modal Replay Animation button
+  document.getElementById('btn-chart-modal-replay')?.addEventListener('click', () => {
+    modalPreviewStartTime = performance.now();
+  });
+
+  // Close modal listeners
+  document.getElementById('btn-close-chart-modal')?.addEventListener('click', closeChartCreatorModal);
+  document.getElementById('btn-cancel-chart-modal')?.addEventListener('click', closeChartCreatorModal);
+
+  // Modal Chart Type Cards
+  document.querySelectorAll('.chart-type-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.chart-type-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      selectedModalType = card.dataset.chartType;
+
+      const titleInput = document.getElementById('modal-chart-title');
+      const dataInput = document.getElementById('modal-chart-data');
+      const dataLabel = document.getElementById('modal-chart-data-label');
+      if (selectedModalType === 'area') {
+        if (dataLabel) dataLabel.textContent = 'Data Values (CSV)';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'COST PER LEAD';
+        if (dataInput && !modalEditingClip) dataInput.value = '42, 60, 50, 78, 62, 51, 68, 48, 70, 52, 64, 40, 68, 25, 18';
+      } else if (selectedModalType === 'bar') {
+        if (dataLabel) dataLabel.textContent = 'Bar Values (CSV)';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'CONVERSION RATE';
+        if (dataInput && !modalEditingClip) dataInput.value = '12, 28, 25, 32, 60, 62, 40, 63, 72, 85, 52, 35';
+      } else if (selectedModalType === 'pyramid') {
+        if (dataLabel) dataLabel.textContent = 'Apex Tier Headline Text';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'BUYER HIERARCHY';
+        if (dataInput && !modalEditingClip) dataInput.value = '3% BUYING NOW';
+      }
+      modalPreviewStartTime = performance.now();
+    });
+  });
+
+  // Modal Presets Quick Select
+  document.querySelectorAll('#modal-chart-presets-wrap button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#modal-chart-presets-wrap button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const presetKey = btn.dataset.preset;
+      const tpl = PREBUILT_CHART_TEMPLATES.find(t => t.id.includes(presetKey.replace(/_/g, '-')));
+      if (tpl) {
+        selectedModalType = tpl.type;
+        document.querySelectorAll('.chart-type-card').forEach(c => {
+          c.classList.toggle('active', c.dataset.chartType === selectedModalType);
+        });
+        const titleInput = document.getElementById('modal-chart-title');
+        const colorInput = document.getElementById('modal-chart-color');
+        const colorLabel = document.getElementById('modal-chart-color-label');
+        const dataInput = document.getElementById('modal-chart-data');
+        const dataLabel = document.getElementById('modal-chart-data-label');
+        if (titleInput) titleInput.value = tpl.config.title;
+        if (colorInput) {
+          colorInput.value = tpl.config.color;
+          if (colorLabel) colorLabel.textContent = tpl.config.color;
+        }
+        if (dataInput) {
+          if (tpl.type === 'pyramid') {
+            if (dataLabel) dataLabel.textContent = 'Apex Tier Headline Text';
+            dataInput.value = tpl.config.tierText;
+          } else if (tpl.type === 'bar') {
+            if (dataLabel) dataLabel.textContent = 'Bar Values (CSV)';
+            dataInput.value = tpl.config.values.join(', ');
+          } else {
+            if (dataLabel) dataLabel.textContent = 'Data Values (CSV)';
+            dataInput.value = tpl.config.series1.join(', ');
+          }
+        }
+        modalPreviewStartTime = performance.now();
+      }
+    });
+  });
+
+  // Color Picker in Modal
+  document.getElementById('modal-chart-color')?.addEventListener('input', (e) => {
+    const lbl = document.getElementById('modal-chart-color-label');
+    if (lbl) lbl.textContent = e.target.value;
+  });
+
+  // Duration Slider in Modal
+  const modalDur = document.getElementById('modal-chart-duration');
+  const modalDurVal = document.getElementById('modal-chart-duration-val');
+  if (modalDur && modalDurVal) {
+    modalDur.addEventListener('input', (e) => {
+      modalDurVal.textContent = `${(parseInt(e.target.value) / 10).toFixed(1)}s`;
+    });
+  }
+
+  // Confirm Add or Update Chart Button in Modal
+  document.getElementById('btn-confirm-add-chart')?.addEventListener('click', () => {
+    const title = document.getElementById('modal-chart-title')?.value || 'CHART';
+    const color = document.getElementById('modal-chart-color')?.value || '#00f0ff';
+    const durationSec = (parseInt(modalDur?.value || '18') / 10);
+    const rawData = document.getElementById('modal-chart-data')?.value || '';
+
+    let config = {
+      type: selectedModalType,
+      title,
+      color,
+      drawDuration: durationSec,
+      glow: true
+    };
+
+    if (selectedModalType === 'pyramid') {
+      config.tierText = rawData.trim() || '3% BUYING NOW';
+      config.tierIndex = modalEditingClip?.chartConfig?.tierIndex || 0;
+    } else if (selectedModalType === 'bar') {
+      const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      config.values = vals.length > 0 ? vals : [10, 25, 40, 75, 50];
+      config.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].slice(0, config.values.length);
+    } else {
+      const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      config.series1 = vals.length > 0 ? vals : [20, 50, 40, 80, 60, 30, 15];
+      config.isDual = true;
+      config.series2 = config.series1.map(v => Math.max(5, Math.round(v * 0.65)));
+    }
+
+    if (modalEditingClip) {
+      // Mutate existing clip in place
+      modalEditingClip.chartConfig = config;
+      modalEditingClip.name = config.title || 'Infographic';
+      renderAllTimelineTracks();
+      populateChartInspector(modalEditingClip);
+      recordState('Update Animated Chart');
+      showTextTimingAlert(`Updated "${modalEditingClip.name}" chart!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    } else {
+      // Add new clip
+      addChartClipToTimeline(config, currentTime, 6.0);
+    }
+
+    closeChartCreatorModal();
+  });
+
+  // Right Inspector Live Updates for Selected Chart
+  document.getElementById('chart-inspector-title')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.title = e.target.value;
+      selectedClip.clip.name = e.target.value || 'Infographic';
+      renderAllTimelineTracks();
+    }
+  });
+
+  document.getElementById('chart-inspector-color')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.color = e.target.value;
+    }
+  });
+
+  document.getElementById('chart-inspector-duration')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      const sec = parseInt(e.target.value) / 10;
+      selectedClip.clip.chartConfig.drawDuration = sec;
+      const lbl = document.getElementById('chart-inspector-dur-val');
+      if (lbl) lbl.textContent = `${sec.toFixed(1)}s`;
+    }
+  });
+
+  document.getElementById('chart-inspector-glow')?.addEventListener('change', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.glow = e.target.checked;
+    }
+  });
+
+  document.getElementById('btn-chart-dual-true')?.addEventListener('click', () => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.isDual = true;
+      document.getElementById('btn-chart-dual-true')?.classList.add('active');
+      document.getElementById('btn-chart-dual-false')?.classList.remove('active');
+      const rowS2 = document.getElementById('row-chart-inspector-series2');
+      if (rowS2) rowS2.style.display = 'block';
+      recordState('Toggle Chart Dual Mode');
+    }
+  });
+
+  document.getElementById('btn-chart-dual-false')?.addEventListener('click', () => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.isDual = false;
+      document.getElementById('btn-chart-dual-false')?.classList.add('active');
+      document.getElementById('btn-chart-dual-true')?.classList.remove('active');
+      const rowS2 = document.getElementById('row-chart-inspector-series2');
+      if (rowS2) rowS2.style.display = 'none';
+      recordState('Toggle Chart Single Mode');
+    }
+  });
+
+  document.getElementById('chart-inspector-series1')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      const vals = e.target.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      if (vals.length > 0) selectedClip.clip.chartConfig.series1 = vals;
+    }
+  });
+
+  document.getElementById('chart-inspector-series2')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      const vals = e.target.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      if (vals.length > 0) selectedClip.clip.chartConfig.series2 = vals;
+    }
+  });
+
+  document.getElementById('chart-inspector-bar-labels')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.labels = e.target.value.split(',').map(s => s.trim());
+    }
+  });
+
+  document.getElementById('chart-inspector-bar-values')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      const vals = e.target.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      if (vals.length > 0) selectedClip.clip.chartConfig.values = vals;
+    }
+  });
+
+  document.getElementById('chart-inspector-pyramid-tier')?.addEventListener('change', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.tierIndex = parseInt(e.target.value);
+      recordState('Change Pyramid Tier');
+    }
+  });
+
+  document.getElementById('chart-inspector-pyramid-text')?.addEventListener('input', (e) => {
+    if (selectedClip?.clip?.chartConfig) {
+      selectedClip.clip.chartConfig.tierText = e.target.value;
+    }
+  });
+
+  document.getElementById('btn-delete-chart')?.addEventListener('click', () => {
+    if (selectedClip?.clip) {
+      deleteClip('chart', selectedClip.clip.id);
+    }
+  });
+}
+
+// ====================================================================================
+// ⭐ VECTOR ICONS & BADGES ENGINE
+// ====================================================================================
+
+const VECTOR_ICONS_LIBRARY = [
+  { id: 'icon-dollar', name: 'Dollar / Cash', color: '#00e676', path: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z' },
+  { id: 'icon-trending-up', name: 'Trending Growth', color: '#00f0ff', path: 'M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z' },
+  { id: 'icon-trending-down', name: 'Crash / Decline', color: '#ff334b', path: 'M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z' },
+  { id: 'icon-target', name: 'Bullseye Target', color: '#ffd000', path: 'M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3-8c0 1.66-1.34 3-3 3s-3-1.34-3-3 1.34-3 3-3 3 1.34 3 3z' },
+  { id: 'icon-star', name: 'Premium Star', color: '#ffd000', path: 'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z' },
+  { id: 'icon-fire', name: 'Viral / Hot', color: '#ff6b35', path: 'M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z' },
+  { id: 'icon-alert', name: 'Warning Alert', color: '#ff334b', path: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z' },
+  { id: 'icon-verified', name: 'Verified Badge', color: '#00f0ff', path: 'M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z' },
+  { id: 'icon-lightning', name: 'Flash / Punch', color: '#ffd000', path: 'M7 2v11h3v9l7-12h-4l4-8z' },
+  { id: 'icon-chart-bar', name: 'Bar Metric', color: '#76ff03', path: 'M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z' },
+  { id: 'icon-document', name: 'Forensic Proof', color: '#ffffff', path: 'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z' },
+  { id: 'icon-skull', name: 'Scam / Danger', color: '#ff334b', path: 'M12 2C7.58 2 4 5.58 4 10c0 2.21.9 4.21 2.34 5.66L6 20h3v-2h2v2h2v-2h2v2h3l-.34-4.34C19.1 14.21 20 12.21 20 10c0-4.42-3.58-8-8-8zm-3 9c-.83 0-1.5-.67-1.5-1.5S8.17 8 9 8s1.5.67 1.5 1.5S9.83 11 9 11zm6 0c-.83 0-1.5-.67-1.5-1.5S14.17 8 15 8s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z' }
+];
+
+function renderIconsLibraryPanel(filterText = '') {
+  const container = document.getElementById('icons-grid-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const filtered = VECTOR_ICONS_LIBRARY.filter(i => {
+    if (!filterText) return true;
+    return i.name.toLowerCase().includes(filterText.toLowerCase()) || i.id.toLowerCase().includes(filterText.toLowerCase());
+  });
+
+  filtered.forEach(icon => {
+    const card = document.createElement('div');
+    card.className = 'icon-badge-card';
+    card.innerHTML = `
+      <div class="icon-badge-svg" style="color: ${icon.color};">
+        <svg viewBox="0 0 24 24"><path d="${icon.path}"/></svg>
+      </div>
+      <div class="icon-badge-name" title="${icon.name}">${icon.name}</div>
+    `;
+
+    card.addEventListener('click', () => {
+      addIconStickerToTimeline(icon);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function addIconStickerToTimeline(iconDef) {
+  // Generate clean SVG Data URI
+  const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="240" height="240" fill="${iconDef.color}"><path d="${iconDef.path}"/></svg>`;
+  const blob = new Blob([svgMarkup], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    const newClip = {
+      id: `clip-icon-${Date.now()}`,
+      name: `${iconDef.name} Icon`,
+      start: currentTime,
+      duration: 5.0,
+      scale: 0.65,
+      x: 0,
+      y: 0,
+      zIndex: 22,
+      layerOrder: 'front',
+      isIconSticker: true,
+      iconType: iconDef.id,
+      img: img,
+      file: { name: `${iconDef.name}.svg`, url, isImage: true }
+    };
+
+    timelineClips.image.push(newClip);
+    renderAllTimelineTracks();
+    selectClip(newClip, 'image');
+    recordState('Add Icon Sticker');
+    playSFX('whoosh', 0.5);
+    showTextTimingAlert(`Added "${iconDef.name}" sticker to canvas! Drag on screen to position or scale.`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  };
+  img.src = url;
+}
+
+function initVectorIconsEngine() {
+  const searchInput = document.getElementById('icon-search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      renderIconsLibraryPanel(e.target.value.trim());
+    });
+  }
+
+  const btnTimelineIcon = document.getElementById('tool-add-icon');
+  if (btnTimelineIcon) {
+    btnTimelineIcon.addEventListener('click', () => {
+      const tabIcons = document.getElementById('tab-btn-icons');
+      if (tabIcons) tabIcons.click();
+    });
+  }
+}
+

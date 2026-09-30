@@ -810,6 +810,11 @@ body {
   border-color: #ff334b;
 }
 
+.clip-block.chart {
+  background: #0f3542;
+  border-color: #00f0ff;
+}
+
 /* Timeline Inline Add (+) Buttons - Apple-like Minimalistic Thin Ring Style */
 .timeline-add-clip-btn {
   position: absolute;
@@ -2469,6 +2474,142 @@ canvas.tool-draw {
 .fs-time-pill:hover {
   color: #fff;
   text-decoration: underline;
+}
+
+/* ==================== CHARTS & INFOGRAPHICS ENGINE STYLES ==================== */
+.chart-template-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-template-card:hover {
+  border-color: #00f0ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 240, 255, 0.2);
+}
+
+.chart-template-preview {
+  height: 90px;
+  background: #090a0f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 8px;
+  position: relative;
+}
+
+.chart-template-meta {
+  padding: 8px 10px;
+}
+
+.chart-template-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-template-desc {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+.chart-type-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.chart-type-card:hover {
+  border-color: rgba(0, 240, 255, 0.5);
+}
+
+.chart-type-card.active {
+  border-color: #00f0ff;
+  background: rgba(0, 240, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+.chart-type-card-thumb {
+  height: 48px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-type-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.chart-type-card-desc {
+  font-size: 9.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ==================== ICONS & BADGES GRID STYLES ==================== */
+.icon-badge-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.icon-badge-card:hover {
+  border-color: #ffd000;
+  background: rgba(255, 208, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.icon-badge-svg {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-badge-svg svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.icon-badge-name {
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #d0d6e6;
+  text-align: center;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 2px;
 }
 
 

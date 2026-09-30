@@ -62,6 +62,8 @@
 
         <div class="media-tabs">
           <button class="tab-btn active" data-tab="all">All</button>
+          <button class="tab-btn" data-tab="charts" id="tab-btn-charts" title="Animated Charts & Infographics">Charts</button>
+          <button class="tab-btn" data-tab="icons" id="tab-btn-icons" title="Magnates Vector Icons & Badges">Icons</button>
           <button class="tab-btn" data-tab="layers" id="tab-btn-layers" title="Inspect & Manage Visual Canvas Layers">Layers</button>
           <button class="tab-btn" data-tab="audio">Audio</button>
           <button class="tab-btn" data-tab="video">Videos</button>
@@ -69,6 +71,39 @@
         </div>
         <div class="media-list" id="media-list">
           <div class="loading-spinner">No media loaded</div>
+        </div>
+
+        <!-- Dedicated Charts & Infographics Library Panel -->
+        <div id="charts-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+          <div class="layers-header-row">
+            <div class="layers-header-title">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+              <span>Infographics & Charts</span>
+            </div>
+            <button type="button" class="btn-add-layer-pill" id="btn-create-chart-trigger" title="Create Custom Animated Chart">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              <span>New Chart</span>
+            </button>
+          </div>
+          <div class="charts-templates-list" id="charts-templates-list" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:10px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Dedicated Icons & Badges Library Panel -->
+        <div id="icons-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+          <div class="layers-header-row">
+            <div class="layers-header-title">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>Vector Icons & Badges</span>
+            </div>
+          </div>
+          <div style="padding: 8px 10px 4px 10px;">
+            <input type="text" id="icon-search-input" placeholder="Search icons (dollar, arrow, growth...)" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:5px 8px; border-radius:4px; font-size:11px;">
+          </div>
+          <div class="icons-grid-container" id="icons-grid-container" style="flex:1; overflow-y:auto; padding:8px 10px; display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;">
+            <!-- Rendered by JS -->
+          </div>
         </div>
 
         <!-- Dedicated Layers Panel (Visible when Layers tab is selected) -->
@@ -119,6 +154,10 @@
             </div>
             <div class="dock-divider" style="width: 100%; height: 1px; margin: 4px 0;"></div>
             <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; padding: 2px 4px;">Overlay Layers:</div>
+            <div class="add-layer-option" data-layer-action="add_chart">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+              <span>Add Animated Chart</span>
+            </div>
             <div class="add-layer-option" data-layer-action="add_text">
               <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
               <span>Add Kinetic Text</span>
@@ -442,6 +481,15 @@
                 Draw / Pen
               </button>
               <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+              <button class="btn-tool" id="tool-add-chart" title="Add Animated Chart & Infographic">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                Charts
+              </button>
+              <button class="btn-tool" id="tool-add-icon" title="Add Vector Sticker / Icon">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Icons
+              </button>
+              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
               <button class="btn-tool" id="tool-undo" title="Undo Action (Ctrl+Z)">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.7 10.79 16.99 8 12.5 8z"/></svg>
                 Undo
@@ -491,7 +539,16 @@
               <div class="track-content" id="content-text"></div>
             </div>
 
-            <!-- Track 2: Images / Stills -->
+            <!-- Track 2: Animated Charts & Infographics -->
+            <div class="track chart-track" id="track-chart" data-track-type="chart">
+              <div class="track-label" style="color: #00f0ff;">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                Charts / FX
+              </div>
+              <div class="track-content" id="content-chart"></div>
+            </div>
+
+            <!-- Track 3: Images / Stills -->
             <div class="track" id="track-image" data-track-type="image">
               <div class="track-label">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
@@ -657,6 +714,130 @@
                 <button class="btn-sm active" id="btn-sil-white">White</button>
                 <button class="btn-sm" id="btn-sil-black">Black</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Animated Chart Inspector Card (Visible when an infographic chart is selected) -->
+        <div class="fx-card" id="card-chart-inspector" style="display: none;">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+              Chart & Infographic FX
+            </h4>
+            <span class="badge" id="chart-type-badge" style="color: #00f0ff;">Area Spread</span>
+          </div>
+          <div class="fx-body">
+            <div class="control-row">
+              <label>Chart Title</label>
+              <input type="text" id="chart-inspector-title" placeholder="Chart Title..." style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:5px 8px; border-radius:4px; font-size:12px; font-weight:700;">
+            </div>
+
+            <!-- Dynamic Settings based on Chart Type -->
+            <div id="chart-inspector-area-fields" style="display: none;">
+              <div class="control-row" style="margin-top: 8px;">
+                <label>Dual-Curve / Delta Gap Mode</label>
+                <div class="btn-group" style="display: flex; gap: 4px;">
+                  <button type="button" class="btn btn-secondary btn-sm active" id="btn-chart-dual-true" style="flex:1;">Dual Comparison</button>
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-chart-dual-false" style="flex:1;">Single Curve</button>
+                </div>
+              </div>
+              <div class="control-row" style="margin-top: 8px;">
+                <label>Primary Values (comma separated)</label>
+                <input type="text" id="chart-inspector-series1" placeholder="42, 60, 50, 78, 62, 51, 68, 48, 70, 25, 18" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:4px 6px; border-radius:4px; font-size:11px; font-family:monospace;">
+              </div>
+              <div class="control-row" id="row-chart-inspector-series2" style="margin-top: 8px;">
+                <label>Secondary Benchmark Values</label>
+                <input type="text" id="chart-inspector-series2" placeholder="30, 48, 32, 64, 40, 22, 38, 32, 45, 15, 8" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:4px 6px; border-radius:4px; font-size:11px; font-family:monospace;">
+              </div>
+            </div>
+
+            <div id="chart-inspector-bar-fields" style="display: none;">
+              <div class="control-row" style="margin-top: 8px;">
+                <label>Month / Category Labels (comma separated)</label>
+                <input type="text" id="chart-inspector-bar-labels" placeholder="Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:4px 6px; border-radius:4px; font-size:11px;">
+              </div>
+              <div class="control-row" style="margin-top: 8px;">
+                <label>Bar Values (comma separated)</label>
+                <input type="text" id="chart-inspector-bar-values" placeholder="12, 28, 25, 32, 60, 62, 40, 63, 72, 85, 52, 35" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:4px 6px; border-radius:4px; font-size:11px; font-family:monospace;">
+              </div>
+            </div>
+
+            <div id="chart-inspector-pyramid-fields" style="display: none;">
+              <div class="control-row" style="margin-top: 8px;">
+                <label>Active Glowing Segment / Tier</label>
+                <select id="chart-inspector-pyramid-tier" style="background:var(--bg-input); color:#fff; border:1px solid var(--border-color); padding:4px 6px; border-radius:4px; font-size:11px; width:100%;">
+                  <option value="0" selected>Tier 1: Top Apex (e.g. 3% Buying Now)</option>
+                  <option value="1">Tier 2: Upper Mid (e.g. 17% Information Gathering)</option>
+                  <option value="2">Tier 3: Lower Mid (e.g. 20% Problem Aware)</option>
+                  <option value="3">Tier 4: Base Foundation (e.g. 60% Unaware)</option>
+                </select>
+              </div>
+              <div class="control-row" style="margin-top: 8px;">
+                <label>Tier Headline Text</label>
+                <input type="text" id="chart-inspector-pyramid-text" placeholder="3% BUYING NOW" style="width:100%; background:var(--bg-input); border:1px solid var(--border-color); color:#fff; padding:4px 6px; border-radius:4px; font-size:11px;">
+              </div>
+            </div>
+
+            <!-- Common Color & Animation Controls -->
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <div class="control-row" style="flex: 1;">
+                <label>Accent Color</label>
+                <input type="color" id="chart-inspector-color" value="#76ff03" style="height:28px; width:100%; border:none; border-radius:4px; background:transparent; cursor:pointer;">
+              </div>
+              <div class="control-row" style="flex: 1;">
+                <label>Draw Duration</label>
+                <div style="display:flex; align-items:center; gap:4px;">
+                  <input type="range" id="chart-inspector-duration" min="8" max="40" value="18" step="1" style="flex:1;">
+                  <span id="chart-inspector-dur-val" style="font-size:10px; font-family:monospace; min-width:28px;">1.8s</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="control-row" style="margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="margin: 0;">Luminous Outer Bloom / Glow</label>
+                <label class="switch" style="width: 26px; height: 15px;">
+                  <input type="checkbox" id="chart-inspector-glow" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Manual Exact Timing (Start Time & Duration) -->
+            <div class="control-row" style="margin-top: 8px;">
+              <div style="display: flex; gap: 8px; width: 100%;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 11px; margin-bottom: 2px;">Start Time</label>
+                  <input type="text" id="chart-start-input" placeholder="00:00.00" value="00:00.00" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;">
+                </div>
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 11px; margin-bottom: 2px;">Duration</label>
+                  <input type="text" id="chart-dur-input" placeholder="00:06.00" value="00:06.00" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Layer Arrangement -->
+            <div class="control-row" style="margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 8px;">
+              <div class="btn-group" style="display: flex; gap: 4px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-chart-layer-back" style="flex: 1; padding: 5px 4px; font-size: 11px;">
+                  Send Behind Text
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm active" id="btn-chart-layer-front" style="flex: 1; padding: 5px 4px; font-size: 11px;">
+                  Bring to Front
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <button class="btn btn-primary btn-sm" id="btn-chart-open-modal" style="flex: 2; background: linear-gradient(135deg, #00f0ff, #0077ff); border: none; font-weight: 700;" title="Open visual pop-up editor">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #fff; margin-right: 4px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                Edit in Pop-up Modal
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-delete-chart" style="border-color: #ff334b; color: #ff334b; flex: 1;" title="Delete this chart">
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -1031,8 +1212,120 @@
     </main>
   </div>
 
+  <!-- Interactive Animated Chart Creator / Template Builder Modal -->
+  <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
+    <div class="vector-modal-box" style="max-width: 680px;">
+        <div class="vector-modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff; width: 18px; height: 18px;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+          <h3 id="chart-modal-title-text">Create Motion Graphic Chart & Infographic</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-chart-modal">&times;</button>
+      </div>
+      <div class="vector-modal-body" style="padding: 16px 20px;">
+        <!-- Live Visual Interactive Preview Canvas -->
+        <div style="margin-bottom: 14px; position: relative;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 0;">Live Motion Graphic Preview:</label>
+            <button type="button" id="btn-chart-modal-replay" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 10px; display: flex; align-items: center; gap: 4px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+              Replay Animation
+            </button>
+          </div>
+          <div style="width: 100%; height: 170px; background: #07090e; border: 1px solid #1f2536; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);">
+            <canvas id="modal-chart-preview-canvas" width="640" height="280" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart Type Cards Selector -->
+        <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 8px;">Select Chart Type & Animation Style:</label>
+        <div class="chart-type-selector-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;">
+          <div class="chart-type-card active" data-chart-type="area">
+            <div class="chart-type-card-thumb">
+              <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                <polygon points="10,40 25,20 40,28 60,10 75,25 90,12 90,45 10,45" fill="rgba(0, 240, 255, 0.25)" />
+                <polyline points="10,40 25,20 40,28 60,10 75,25 90,12" fill="none" stroke="#00f0ff" stroke-width="2.5" />
+              </svg>
+            </div>
+            <div class="chart-type-card-title">Dual-Line & Area</div>
+            <div class="chart-type-card-desc">Write-on curve, node pops & delta gap</div>
+          </div>
+          <div class="chart-type-card" data-chart-type="bar">
+            <div class="chart-type-card-thumb">
+              <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                <rect x="12" y="30" width="10" height="15" fill="#76ff03" rx="1"/>
+                <rect x="28" y="20" width="10" height="25" fill="#76ff03" rx="1"/>
+                <rect x="44" y="24" width="10" height="21" fill="#76ff03" rx="1"/>
+                <rect x="60" y="10" width="10" height="35" fill="#76ff03" rx="1"/>
+                <rect x="76" y="18" width="10" height="27" fill="#76ff03" rx="1"/>
+              </svg>
+            </div>
+            <div class="chart-type-card-title">Staggered Bars</div>
+            <div class="chart-type-card-desc">Sequential pop-up & peak bloom glow</div>
+          </div>
+          <div class="chart-type-card" data-chart-type="pyramid">
+            <div class="chart-type-card-thumb">
+              <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                <polygon points="50,5 30,45 70,45" fill="#2a2a2a" />
+                <path d="M50,5 L38,28 Q45,24 50,28 T62,28 Z" fill="#b4ff00" />
+              </svg>
+            </div>
+            <div class="chart-type-card-title">Liquid Pyramid Tier</div>
+            <div class="chart-type-card-desc">Organic fluid wave slosh & neon apex</div>
+          </div>
+        </div>
+
+        <!-- Form fields -->
+        <div class="control-row" style="margin-bottom: 10px;">
+          <label>Title</label>
+          <input type="text" id="modal-chart-title" value="COST PER LEAD" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 13px; font-weight: 700;">
+        </div>
+
+        <!-- Presets quick-select buttons -->
+        <div class="control-row" style="margin-bottom: 10px;">
+          <label>Load Visual Preset</label>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;" id="modal-chart-presets-wrap">
+            <button type="button" class="btn btn-secondary btn-sm active" data-preset="cost_per_lead">Cost Per Lead (Dual Spread)</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-preset="cost_per_click">Cost Per Click (Steep Cliff Drop)</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-preset="conversion_rate">Monthly Conversion Rate</button>
+            <button type="button" class="btn btn-secondary btn-sm" data-preset="buying_now_pyramid">3% Buying Now Pyramid</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+          <div class="control-row" style="flex: 1;">
+            <label>Color Theme</label>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <input type="color" id="modal-chart-color" value="#00f0ff" style="width: 38px; height: 30px; border: none; background: transparent; cursor: pointer;">
+              <span id="modal-chart-color-label" style="font-size: 11px; color: var(--text-muted);">#00f0ff (Cyber Cyan)</span>
+            </div>
+          </div>
+          <div class="control-row" style="flex: 1;">
+            <label>Animation Timing</label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="range" id="modal-chart-duration" min="10" max="40" value="18" step="1" style="flex: 1;">
+              <span id="modal-chart-duration-val" style="font-size: 11px; font-family: monospace;">1.8s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-row">
+          <label id="modal-chart-data-label">Data Values (CSV)</label>
+          <textarea id="modal-chart-data" rows="2" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 11px; font-family: monospace;" placeholder="Comma separated values...">42, 60, 50, 78, 62, 51, 68, 48, 70, 52, 64, 40, 68, 25, 18</textarea>
+        </div>
+      </div>
+      <div class="vector-modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-chart-modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-add-chart">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="fill: #fff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <span id="btn-confirm-add-chart-text">Add Animated Chart to Timeline</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=27"></script>
+  <script src="js/app.js?v=28"></script>
 </body>
 </html>
