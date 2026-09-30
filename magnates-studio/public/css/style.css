@@ -2109,4 +2109,366 @@ canvas.tool-draw {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
+/* ==================== APPLE-STYLE FULLSCREEN FLOATING HUD ("THE LITTLE DOT") ==================== */
+.fs-apple-hud-container {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 10050;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: auto;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
+  user-select: none;
+}
+
+/* Minimalist Frosted Glass Pill / Dot */
+.fs-apple-dot-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 22, 33, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+  padding: 6px 14px 6px 8px;
+  color: #f5f5f7;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.fs-apple-dot-pill:hover {
+  background: rgba(26, 32, 48, 0.88);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), 0 0 16px rgba(255, 51, 75, 0.25);
+}
+
+.fs-apple-dot-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Glowing Pulsing Ambient Beacon Dot */
+.fs-dot-beacon {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff334b;
+  box-shadow: 0 0 10px #ff334b, 0 0 20px rgba(255, 51, 75, 0.6);
+  position: relative;
+  flex-shrink: 0;
+  animation: appleBeaconPulse 2s infinite ease-in-out;
+}
+
+@keyframes appleBeaconPulse {
+  0% { transform: scale(0.95); opacity: 0.85; }
+  50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px #ff334b, 0 0 26px rgba(255, 51, 75, 0.8); }
+  100% { transform: scale(0.95); opacity: 0.85; }
+}
+
+.fs-dot-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.fs-dot-thumb img,
+.fs-dot-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fs-svg-icon {
+  width: 14px;
+  height: 14px;
+  fill: #ff334b;
+}
+
+.fs-dot-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-dot-badge {
+  background: rgba(255, 255, 255, 0.12);
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #00f0ff;
+  letter-spacing: 0.2px;
+}
+
+.fs-chevron {
+  width: 14px;
+  height: 14px;
+  fill: rgba(255, 255, 255, 0.5);
+  transition: transform 0.25s ease;
+  margin-left: -2px;
+}
+
+.fs-apple-hud-container.is-open .fs-chevron {
+  transform: rotate(180deg);
+}
+
+/* Expanded Apple-Grade Popover HUD */
+.fs-apple-popover {
+  margin-top: 10px;
+  width: 280px;
+  background: rgba(20, 24, 36, 0.78);
+  backdrop-filter: blur(36px) saturate(190%);
+  -webkit-backdrop-filter: blur(36px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: appleSpringOpen 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: top right;
+}
+
+@keyframes appleSpringOpen {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.fs-popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 2px;
+}
+
+.fs-popover-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fs-popover-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-popover-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 51, 75, 0.2);
+  color: #ff6b7e;
+  border: 1px solid rgba(255, 51, 75, 0.3);
+}
+
+.fs-popover-btn-close {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fs-popover-btn-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* 2x2 Quick Action Glyphs Grid */
+.fs-popover-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.fs-action-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 11px;
+  padding: 8px 10px;
+  color: #e0e4f0;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  outline: none;
+}
+
+.fs-action-pill svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.fs-action-pill:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #fff;
+}
+
+.fs-action-pill.is-active {
+  background: rgba(255, 51, 75, 0.22);
+  border-color: #ff334b;
+  color: #ff7082;
+  box-shadow: 0 0 12px rgba(255, 51, 75, 0.2);
+}
+
+.fs-action-pill.is-active-cyan {
+  background: rgba(0, 240, 255, 0.18);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+}
+
+/* Minimalist Slider Section */
+.fs-slider-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fs-slider-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.fs-val-highlight {
+  font-weight: 600;
+  color: #00f0ff;
+  font-family: monospace;
+}
+
+.fs-slider-track-wrap input[type="range"] {
+  width: 100%;
+  accent-color: #ff334b;
+  height: 4px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* Segmented Control Bar */
+.fs-seg-row {
+  display: flex;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.fs-seg-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  border-radius: 7px;
+  padding: 6px 4px;
+  color: #a8b0c4;
+  font-size: 10.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.fs-seg-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+.fs-seg-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.fs-seg-btn.is-active {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.fs-seg-btn.danger:hover {
+  background: rgba(255, 51, 75, 0.25);
+  color: #ff334b;
+}
+
+/* Time & Footer */
+.fs-time-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-muted);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 6px;
+}
+
+.fs-time-pill {
+  cursor: pointer;
+  color: #8da4d0;
+  transition: color 0.15s ease;
+}
+
+.fs-time-pill:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
 

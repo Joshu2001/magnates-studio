@@ -242,11 +242,12 @@ function playSFX(type, volumeOverride) {
 
 // FX Settings
 const fxState = {
-  grid: { enabled: true, depth: 45, opacity: 0.25, vignette: 0.85 },
+  grid: { enabled: true, depth: 45, opacity: 0.45, vignette: 0.55 },
   stageBackground: { type: 'cyber_grid', color: '#0a0b0e' }, // 'cyber_grid', 'solid_black', 'color', 'vox_cream', 'chroma_green'
-  particles: { enabled: true, count: 65, glow: 0.6, speed: 2 },
+  particles: { enabled: true, count: 65, glow: 0.7, speed: 2 },
   silhouette: { enabled: false, color: 'white' }
 };
+
 
 // Initialize Particle System
 function initParticles() {
@@ -263,23 +264,25 @@ function initParticles() {
   }
 }
 
-// Draw 3D Curved Perspective Grid
+// Draw 3D Curved Perspective Grid with Neon Cyber Glow
 function drawPerspectiveGrid() {
   if (!fxState.grid.enabled) return;
 
   const w = canvas.width;
   const h = canvas.height;
   const horizon = h * 0.45;
+  const numVLines = 26;
+  const vpX = w / 2;
+  const floorLineCount = 18;
+  const op = fxState.grid.opacity;
 
   ctx.save();
-  ctx.strokeStyle = `rgba(200, 220, 255, ${fxState.grid.opacity})`;
+
+  // === BASE GRID LAYER (standard lines) ===
+  ctx.strokeStyle = `rgba(180, 210, 255, ${op})`;
   ctx.lineWidth = 1.5;
 
   // Vertical perspective lines converging upward
-  const numVLines = 26;
-  const vpX = w / 2;
-  const vpY = horizon - (fxState.grid.depth * 4);
-
   for (let i = 0; i <= numVLines; i++) {
     const bottomX = (w / numVLines) * i;
     ctx.beginPath();
@@ -300,7 +303,6 @@ function drawPerspectiveGrid() {
   }
 
   // Horizontal floor lines
-  const floorLineCount = 18;
   for (let i = 0; i < floorLineCount; i++) {
     const t = i / floorLineCount;
     const lineY = horizon + (h - horizon) * Math.pow(t, 2.2);
@@ -318,7 +320,70 @@ function drawPerspectiveGrid() {
     ctx.stroke();
   }
 
-  // Vignette
+  // === NEON CYBER GLOW PASS ===
+  // Re-draw key lines with neon cyan glow for the signature cyber studio look
+  ctx.save();
+  ctx.shadowBlur = 20;
+  ctx.shadowColor = 'rgba(0, 200, 255, 0.75)';
+  ctx.strokeStyle = `rgba(60, 210, 255, ${Math.min(op * 1.8, 0.65)})`;
+  ctx.lineWidth = 1.0;
+
+  // Glow: floor perspective lines
+  for (let i = 0; i < floorLineCount; i++) {
+    const t = i / floorLineCount;
+    const lineY = horizon + (h - horizon) * Math.pow(t, 2.2);
+    ctx.beginPath();
+    ctx.moveTo(0, lineY);
+    ctx.lineTo(w, lineY);
+    ctx.stroke();
+  }
+
+  // Glow: vertical floor lines
+  for (let i = 0; i <= numVLines; i++) {
+    const bottomX = (w / numVLines) * i;
+    ctx.beginPath();
+    ctx.moveTo(vpX + (bottomX - vpX) * 0.1, horizon);
+    ctx.quadraticCurveTo(
+      vpX + (bottomX - vpX) * 0.5,
+      horizon + (h - horizon) * 0.4,
+      bottomX,
+      h
+    );
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // === GLOWING CYAN HORIZON ACCENT LINE ===
+  ctx.save();
+  ctx.shadowBlur = 30;
+  ctx.shadowColor = 'rgba(0, 220, 255, 1.0)';
+  ctx.strokeStyle = `rgba(0, 235, 255, ${Math.min(op * 2.5, 0.8)})`;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(0, horizon);
+  ctx.lineTo(w, horizon);
+  ctx.stroke();
+  // Softer outer glow
+  ctx.shadowBlur = 55;
+  ctx.strokeStyle = `rgba(80, 240, 255, ${Math.min(op * 1.5, 0.4)})`;
+  ctx.lineWidth = 1.0;
+  ctx.beginPath();
+  ctx.moveTo(0, horizon);
+  ctx.lineTo(w, horizon);
+  ctx.stroke();
+  ctx.restore();
+
+  // === FLOOR NEON BLOOM ===
+  ctx.save();
+  const floorGrad = ctx.createLinearGradient(0, horizon, 0, h);
+  floorGrad.addColorStop(0, `rgba(0, 140, 255, ${op * 0.18})`);
+  floorGrad.addColorStop(0.45, `rgba(0, 80, 200, ${op * 0.12})`);
+  floorGrad.addColorStop(1, 'rgba(0, 40, 120, 0)');
+  ctx.fillStyle = floorGrad;
+  ctx.fillRect(0, horizon, w, h - horizon);
+  ctx.restore();
+
+  // === DARK RADIAL VIGNETTE ===
   const grad = ctx.createRadialGradient(w / 2, h / 2, w * 0.2, w / 2, h / 2, w * 0.7);
   grad.addColorStop(0, 'rgba(10, 11, 15, 0)');
   grad.addColorStop(1, `rgba(5, 6, 8, ${fxState.grid.vignette})`);
@@ -328,7 +393,7 @@ function drawPerspectiveGrid() {
   ctx.restore();
 }
 
-// Draw Fire & Ember Particles
+// Draw Fire & Ember Particles (Neon Atmospheric)
 function drawParticles() {
   if (!fxState.particles.enabled) return;
 
@@ -338,19 +403,29 @@ function drawParticles() {
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
 
-  // Bottom fire glow
-  const fireGrad = ctx.createLinearGradient(0, h, 0, h - 300);
-  fireGrad.addColorStop(0, `rgba(255, 65, 20, ${fxState.particles.glow})`);
-  fireGrad.addColorStop(0.5, `rgba(255, 120, 30, ${fxState.particles.glow * 0.4})`);
+  // Bottom fire glow — wide warm bloom
+  const fireGrad = ctx.createLinearGradient(0, h, 0, h - 380);
+  fireGrad.addColorStop(0, `rgba(255, 55, 10, ${fxState.particles.glow})`);
+  fireGrad.addColorStop(0.35, `rgba(255, 100, 20, ${fxState.particles.glow * 0.55})`);
+  fireGrad.addColorStop(0.65, `rgba(255, 140, 40, ${fxState.particles.glow * 0.2})`);
   fireGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
   ctx.fillStyle = fireGrad;
-  ctx.fillRect(0, h - 300, w, 300);
+  ctx.fillRect(0, h - 380, w, 380);
 
-  // Floating sparks
+  // Floating sparks with per-particle glow
+  ctx.shadowBlur = 12;
   const count = fxState.particles.count;
   for (let i = 0; i < count; i++) {
     const p = particles[i];
-    ctx.fillStyle = `rgba(255, 180, 70, ${p.alpha})`;
+    // Alternate between orange embers and rare cyan sparks (adds depth / magic)
+    const isCyan = i % 18 === 0;
+    if (isCyan) {
+      ctx.shadowColor = 'rgba(80, 220, 255, 0.9)';
+      ctx.fillStyle = `rgba(100, 230, 255, ${p.alpha * 0.7})`;
+    } else {
+      ctx.shadowColor = `rgba(255, 160, 40, ${p.alpha * 0.8})`;
+      ctx.fillStyle = `rgba(255, ${140 + Math.floor(p.alpha * 60)}, ${40 + Math.floor(p.alpha * 30)}, ${p.alpha})`;
+    }
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
     ctx.fill();
@@ -1096,53 +1171,59 @@ function render(now) {
     });
   }
 
-  // Clear & Stage Background Layer
-  const bgType = fxState.stageBackground?.type || 'cyber_grid';
-  if (bgType === 'solid_black') {
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else if (bgType === 'color') {
-    ctx.fillStyle = fxState.stageBackground.color || '#0a0b0e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else if (bgType === 'vox_cream') {
-    ctx.fillStyle = '#f4eedb';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else if (bgType === 'chroma_green') {
-    ctx.fillStyle = '#00e676';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  } else {
-    // Default cyber grid / dark studio
-    ctx.fillStyle = '#0a0b0e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  try {
+    // Clear & Stage Background Layer
+    const bgType = fxState.stageBackground?.type || 'cyber_grid';
+    if (bgType === 'solid_black') {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'color') {
+      ctx.fillStyle = fxState.stageBackground.color || '#0a0b0e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'vox_cream') {
+      ctx.fillStyle = '#f4eedb';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'chroma_green') {
+      ctx.fillStyle = '#00e676';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else {
+      // Default cyber grid / dark studio
+      ctx.fillStyle = '#0a0b0e';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // 1. 3D Background Grid (when enabled or preset is cyber_grid)
+    if (bgType === 'cyber_grid' || fxState.grid.enabled) {
+      drawPerspectiveGrid();
+    }
+
+    // 2. Layer-Ordered Visual Elements (Media & Kinetic Text arranged by z-index)
+    drawSortedVisualLayers();
+
+    // 3. Mystery Silhouette Cutout
+    if (fxState.silhouette.enabled) {
+      drawSilhouetteOverlay();
+    }
+
+    // 4. Fire Particles / Atmosphere
+    drawParticles();
+
+    // 5. Active Marquee Drag Selection Overlay (when dragging area for Zoom or Loupe)
+    if (isMarqueeDragging) {
+      drawMarqueeSelectionOverlay();
+    }
+
+    // 6. Freehand Drawing Ink Overlay (Multi-brush vector strokes)
+    drawScreenInkOverlay(ctx);
+
+    updateUI();
+  } catch (err) {
+    console.error('[Magnates Render Error]', err);
   }
 
-  // 1. 3D Background Grid (when enabled or preset is cyber_grid)
-  if (bgType === 'cyber_grid' || fxState.grid.enabled) {
-    drawPerspectiveGrid();
-  }
-
-  // 2. Layer-Ordered Visual Elements (Media & Kinetic Text arranged by z-index)
-  drawSortedVisualLayers();
-
-  // 3. Mystery Silhouette Cutout
-  if (fxState.silhouette.enabled) {
-    drawSilhouetteOverlay();
-  }
-
-  // 4. Fire Particles / Atmosphere
-  drawParticles();
-
-  // 5. Active Marquee Drag Selection Overlay (when dragging area for Zoom or Loupe)
-  if (isMarqueeDragging) {
-    drawMarqueeSelectionOverlay();
-  }
-
-  // 6. Freehand Drawing Ink Overlay (Multi-brush vector strokes)
-  drawScreenInkOverlay(ctx);
-
-  updateUI();
   requestAnimationFrame(render);
 }
+
 
 function syncAudioPlayback() {
   // Voiceover track sync
@@ -1901,6 +1982,9 @@ function selectClip(clip, trackType) {
     // Scroll inspector into view in sidebar
     inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
+
+  // Update Apple-style Fullscreen Floating HUD
+  updateAppleFullscreenHud();
 }
 
 // Clip Mouse Interaction: Dragging to Move & Resizing Duration
@@ -4169,6 +4253,355 @@ function initScreenTextEditor() {
   });
 }
 
+// ==================== SCREEN FULLSCREEN & DOUBLE-TAP IMMERSIVE MODE ====================
+const canvasWrapper = document.querySelector('.canvas-wrapper');
+const btnCanvasFullscreen = document.getElementById('btn-canvas-fullscreen');
+
+function toggleCanvasFullscreen() {
+  if (!canvasWrapper) return;
+
+  if (document.fullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  } else if (canvasWrapper.classList.contains('is-immersive-fallback')) {
+    canvasWrapper.classList.remove('is-immersive-fallback');
+    updateFullscreenIcon(false);
+  } else {
+    // Request standard Fullscreen API on the canvas viewport
+    if (canvasWrapper.requestFullscreen) {
+      canvasWrapper.requestFullscreen().catch(() => {
+        // Fallback to CSS immersive mode if blocked by browser policy
+        canvasWrapper.classList.add('is-immersive-fallback');
+        updateFullscreenIcon(true);
+      });
+    } else if (canvasWrapper.webkitRequestFullscreen) {
+      canvasWrapper.webkitRequestFullscreen();
+    } else {
+      canvasWrapper.classList.add('is-immersive-fallback');
+      updateFullscreenIcon(true);
+    }
+  }
+}
+
+function updateFullscreenIcon(isFullscreen) {
+  const icon = document.getElementById('fullscreen-icon');
+  if (!icon) return;
+  if (isFullscreen) {
+    // Contract icon
+    icon.innerHTML = `<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>`;
+  } else {
+    // Expand icon
+    icon.innerHTML = `<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>`;
+  }
+  if (typeof updateAppleFullscreenHud === 'function') {
+    updateAppleFullscreenHud();
+  }
+}
+
+document.addEventListener('fullscreenchange', () => {
+  const isFs = !!document.fullscreenElement;
+  updateFullscreenIcon(isFs);
+});
+
+btnCanvasFullscreen?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleCanvasFullscreen();
+});
+
+// Double click / Double tap anywhere that is not a button or interaction on the screen to enter immersive mode
+let lastCanvasTouchTime = 0;
+canvasWrapper?.addEventListener('click', (e) => {
+  // If clicked directly on interactive controls, handles or input, ignore
+  if (e.target.closest('.canvas-controls') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
+    return;
+  }
+
+  const now = Date.now();
+  if (now - lastCanvasTouchTime < 350) {
+    // Double tap/click detected on viewport background or canvas
+    toggleCanvasFullscreen();
+    lastCanvasTouchTime = 0;
+  } else {
+    lastCanvasTouchTime = now;
+  }
+});
+
+// ESC key to exit CSS fallback immersive mode
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (canvasWrapper?.classList.contains('is-immersive-fallback')) {
+      canvasWrapper.classList.remove('is-immersive-fallback');
+      updateFullscreenIcon(false);
+    }
+  }
+});
+
+// ==================== APPLE-STYLE FULLSCREEN FLOATING HUD CONTROLLER ====================
+const fsAppleHudContainer = document.getElementById('fs-apple-hud-container');
+const fsAppleDotPill = document.getElementById('fs-apple-dot-pill');
+const fsApplePopover = document.getElementById('fs-apple-popover');
+let isAppleHudOpen = false;
+
+function isCanvasInFullscreen() {
+  return !!document.fullscreenElement || !!canvasWrapper?.classList.contains('is-immersive-fallback');
+}
+
+function updateAppleFullscreenHud() {
+  if (!fsAppleHudContainer) return;
+  const inFs = isCanvasInFullscreen();
+  
+  if (!inFs) {
+    fsAppleHudContainer.style.display = 'none';
+    if (fsApplePopover) fsApplePopover.style.display = 'none';
+    fsAppleHudContainer.classList.remove('is-open');
+    isAppleHudOpen = false;
+    return;
+  }
+
+  // We are in fullscreen
+  fsAppleHudContainer.style.display = 'flex';
+
+  const dotThumb = document.getElementById('fs-dot-thumb');
+  const dotLabel = document.getElementById('fs-dot-label');
+  const dotBadge = document.getElementById('fs-dot-badge');
+  const popoverTitle = document.getElementById('fs-popover-title');
+  const popoverTag = document.getElementById('fs-popover-tag');
+  const valScale = document.getElementById('fs-val-scale');
+  const inputScale = document.getElementById('fs-input-scale');
+  const lblTiming = document.getElementById('fs-lbl-timing');
+
+  const cur = selectedClip?.clip;
+  const track = selectedClip?.trackType;
+
+  if (cur) {
+    const name = cur.name || cur.file?.name || cur.text || 'Selected Clip';
+    const scalePct = Math.round((cur.scale || 1) * 100);
+
+    if (dotLabel) dotLabel.textContent = name;
+    if (dotBadge) dotBadge.textContent = `${scalePct}%`;
+    if (popoverTitle) popoverTitle.textContent = name;
+    if (popoverTag) popoverTag.textContent = cur.drawingStrokes ? 'DRAWING' : (track ? track.toUpperCase() : 'CLIP');
+
+    if (valScale) valScale.textContent = `${scalePct}%`;
+    if (inputScale) inputScale.value = scalePct;
+
+    if (lblTiming) {
+      lblTiming.textContent = `${formatTimecode(cur.start)} - ${formatTimecode(cur.start + cur.duration)}`;
+    }
+
+    // Set thumbnail
+    if (dotThumb) {
+      if (cur.drawingStrokes) {
+        dotThumb.innerHTML = `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#ff334b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>`;
+      } else if (track === 'image' && cur.file?.url) {
+        dotThumb.innerHTML = `<img src="${cur.file.url}" alt="">`;
+      } else if (track === 'video' && cur.file?.url) {
+        dotThumb.innerHTML = `<video src="${cur.file.url}" muted></video>`;
+      } else {
+        dotThumb.innerHTML = `<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#ff334b;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
+      }
+    }
+
+    // Update Action States
+    const actCutout = document.getElementById('fs-act-cutout');
+    const lblCutout = document.getElementById('fs-lbl-cutout');
+    if (actCutout && lblCutout) {
+      const hasCutout = !!cur.cutoutCanvas;
+      actCutout.classList.toggle('is-active', hasCutout);
+      lblCutout.textContent = hasCutout ? 'Restore BG' : 'Remove BG';
+    }
+
+    const actVector = document.getElementById('fs-act-vector');
+    const lblVector = document.getElementById('fs-lbl-vector');
+    if (actVector && lblVector) {
+      const hasVector = !!cur.vectorEffect;
+      actVector.classList.toggle('is-active-cyan', hasVector);
+      lblVector.textContent = hasVector ? 'Vector (On)' : 'Vector FX';
+    }
+
+    const actZoom = document.getElementById('fs-act-zoom');
+    const lblZoom = document.getElementById('fs-lbl-zoom');
+    if (actZoom && lblZoom) {
+      const hasZoom = !!cur.zoomEffect;
+      actZoom.classList.toggle('is-active-cyan', hasZoom);
+      lblZoom.textContent = hasZoom ? (cur.zoomEffect === 'snap' ? 'Punch (On)' : 'Loupe (On)') : 'Punch Zoom';
+    }
+
+    const actFront = document.getElementById('fs-act-front');
+    const actBack = document.getElementById('fs-act-back');
+    const isFront = (cur.layerOrder === 'front');
+    if (actFront) actFront.classList.toggle('is-active', isFront);
+    if (actBack) actBack.classList.toggle('is-active', !isFront);
+  } else {
+    // Ambient / Nothing explicitly selected
+    if (dotLabel) dotLabel.textContent = 'Full Screen';
+    if (dotBadge) dotBadge.textContent = 'Studio';
+    if (popoverTitle) popoverTitle.textContent = 'Magnates Studio';
+    if (popoverTag) popoverTag.textContent = 'VIEWPORT';
+    const mainTimecode = document.getElementById('timecode');
+    if (lblTiming) lblTiming.textContent = mainTimecode?.textContent || '00:00.00';
+  }
+}
+
+// Toggle Popover HUD open/closed
+function toggleAppleHud(forceState) {
+  if (!fsApplePopover || !fsAppleHudContainer) return;
+  isAppleHudOpen = forceState !== undefined ? forceState : !isAppleHudOpen;
+  
+  if (isAppleHudOpen) {
+    updateAppleFullscreenHud();
+    fsApplePopover.style.display = 'flex';
+    fsAppleHudContainer.classList.add('is-open');
+  } else {
+    fsApplePopover.style.display = 'none';
+    fsAppleHudContainer.classList.remove('is-open');
+  }
+}
+
+fsAppleDotPill?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleAppleHud();
+});
+
+document.getElementById('fs-popover-close')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleAppleHud(false);
+});
+
+// Prevent clicking inside HUD from collapsing or firing canvas events
+fsApplePopover?.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+// Quick Action Click Handlers inside HUD
+document.getElementById('fs-act-cutout')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (selectedClip && selectedClip.clip) {
+    toggleBackgroundRemoval(selectedClip.clip);
+    updateAppleFullscreenHud();
+  } else {
+    showTextTimingAlert('Select an image clip to remove background.', 'warning');
+  }
+});
+
+document.getElementById('fs-act-vector')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (selectedClip && selectedClip.clip) {
+    toggleMagnatesVectorEffect(selectedClip.clip);
+    updateAppleFullscreenHud();
+  } else {
+    showTextTimingAlert('Select an image clip for vector effect.', 'warning');
+  }
+});
+
+document.getElementById('fs-act-silhouette')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const silToggle = document.getElementById('fx-silhouette-enable');
+  if (silToggle) {
+    silToggle.checked = !silToggle.checked;
+    silToggle.dispatchEvent(new Event('change'));
+    document.getElementById('fs-act-silhouette')?.classList.toggle('is-active', silToggle.checked);
+    showTextTimingAlert(silToggle.checked ? 'Silhouette mode enabled' : 'Silhouette mode disabled', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
+});
+
+document.getElementById('fs-act-zoom')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const c = selectedClip?.clip;
+  if (!c) {
+    showTextTimingAlert('Select an image or video clip first.', 'warning');
+    return;
+  }
+  c.zoomEffect = c.zoomEffect === 'snap' ? null : 'snap';
+  if (!c.zoomScale) c.zoomScale = 2.2;
+  if (c.zoomStartTime === undefined) c.zoomStartTime = 0.5;
+  if (c.zoomOriginX === undefined) c.zoomOriginX = 0.5;
+  if (c.zoomOriginY === undefined) c.zoomOriginY = 0.5;
+  if (c.zoomEffect === 'snap') playSFX('snap_zoom');
+  selectClip(c, selectedClip.trackType);
+  updateAppleFullscreenHud();
+  recordState('Toggle Punch Zoom Effect');
+});
+
+// Scale Slider in HUD
+document.getElementById('fs-input-scale')?.addEventListener('input', (e) => {
+  const c = selectedClip?.clip;
+  if (!c) return;
+  const pct = parseInt(e.target.value, 10);
+  c.scale = pct / 100;
+  const valScale = document.getElementById('fs-val-scale');
+  const dotBadge = document.getElementById('fs-dot-badge');
+  if (valScale) valScale.textContent = `${pct}%`;
+  if (dotBadge) dotBadge.textContent = `${pct}%`;
+  renderAllTimelineTracks();
+});
+
+// Layer Order in HUD
+document.getElementById('fs-act-front')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const c = selectedClip?.clip;
+  if (!c) return;
+  c.layerOrder = 'front';
+  c.zIndex = 50;
+  updateAppleFullscreenHud();
+  renderAllTimelineTracks();
+  recordState('Bring Clip to Front');
+});
+
+document.getElementById('fs-act-back')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const c = selectedClip?.clip;
+  if (!c) return;
+  c.layerOrder = 'back';
+  c.zIndex = 10;
+  updateAppleFullscreenHud();
+  renderAllTimelineTracks();
+  recordState('Send Clip Behind Text');
+});
+
+document.getElementById('fs-act-center')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const c = selectedClip?.clip;
+  if (!c) return;
+  c.x = 0;
+  c.y = 0;
+  updateAppleFullscreenHud();
+  renderAllTimelineTracks();
+  recordState('Center Clip');
+  showTextTimingAlert('Centered clip coordinates.', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2000);
+});
+
+document.getElementById('fs-act-del')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (selectedClip && selectedClip.clip) {
+    const track = selectedClip.trackType;
+    const id = selectedClip.clip.id;
+    recordState('Delete Clip');
+    deleteClip(track, id);
+    selectedClip = null;
+    toggleAppleHud(false);
+  }
+});
+
+// More Options -> Opens the Studio Context Menu at HUD center
+document.getElementById('fs-btn-more-options')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (selectedClip && selectedClip.clip) {
+    const rect = fsAppleHudContainer.getBoundingClientRect();
+    showStudioContextMenu(rect.left - 230, rect.top + 40, selectedClip.clip, selectedClip.trackType);
+    toggleAppleHud(false);
+  }
+});
+
+// Hook into fullscreenchange to show/hide HUD
+function syncFullscreenHud() {
+  updateAppleFullscreenHud();
+}
+document.addEventListener('fullscreenchange', syncFullscreenHud);
+
 // Initialize Studio
 initParticles();
 loadMediaLibrary();
@@ -4299,87 +4732,6 @@ document.getElementById('btn-save-project')?.addEventListener('click', () => {
 
 // Periodic auto-save every 5 seconds
 setInterval(() => saveProjectState(false), 5000);
-
-// ==================== SCREEN FULLSCREEN & DOUBLE-TAP IMMERSIVE MODE ====================
-const canvasWrapper = document.querySelector('.canvas-wrapper');
-const btnCanvasFullscreen = document.getElementById('btn-canvas-fullscreen');
-
-function toggleCanvasFullscreen() {
-  if (!canvasWrapper) return;
-
-  if (document.fullscreenElement) {
-    if (document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    }
-  } else if (canvasWrapper.classList.contains('is-immersive-fallback')) {
-    canvasWrapper.classList.remove('is-immersive-fallback');
-    updateFullscreenIcon(false);
-  } else {
-    // Request standard Fullscreen API on the canvas viewport
-    if (canvasWrapper.requestFullscreen) {
-      canvasWrapper.requestFullscreen().catch(() => {
-        // Fallback to CSS immersive mode if blocked by browser policy
-        canvasWrapper.classList.add('is-immersive-fallback');
-        updateFullscreenIcon(true);
-      });
-    } else if (canvasWrapper.webkitRequestFullscreen) {
-      canvasWrapper.webkitRequestFullscreen();
-    } else {
-      canvasWrapper.classList.add('is-immersive-fallback');
-      updateFullscreenIcon(true);
-    }
-  }
-}
-
-function updateFullscreenIcon(isFullscreen) {
-  const icon = document.getElementById('fullscreen-icon');
-  if (!icon) return;
-  if (isFullscreen) {
-    // Contract icon
-    icon.innerHTML = `<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>`;
-  } else {
-    // Expand icon
-    icon.innerHTML = `<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>`;
-  }
-}
-
-document.addEventListener('fullscreenchange', () => {
-  const isFs = !!document.fullscreenElement;
-  updateFullscreenIcon(isFs);
-});
-
-btnCanvasFullscreen?.addEventListener('click', (e) => {
-  e.stopPropagation();
-  toggleCanvasFullscreen();
-});
-
-// Double click / Double tap anywhere that is not a button or interaction on the screen to enter immersive mode
-let lastCanvasTouchTime = 0;
-canvasWrapper?.addEventListener('click', (e) => {
-  // If clicked directly on interactive controls, handles or input, ignore
-  if (e.target.closest('.canvas-controls') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
-    return;
-  }
-
-  const now = Date.now();
-  if (now - lastCanvasTouchTime < 350) {
-    // Double tap/click detected on viewport background or canvas
-    toggleCanvasFullscreen();
-    lastCanvasTouchTime = 0;
-  } else {
-    lastCanvasTouchTime = now;
-  }
-});
-
-// ESC key to exit CSS fallback immersive mode
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    if (canvasWrapper?.classList.contains('is-immersive-fallback')) {
-      canvasWrapper.classList.remove('is-immersive-fallback');
-      updateFullscreenIcon(false);
-    }
-  }
-});
 
 // ==================== VIDEO EXPORT ENGINE (CLIENT-SIDE RENDERER & RECORDER) ====================
 let isExporting = false;
@@ -4730,13 +5082,29 @@ function showStudioContextMenu(x, y, clip, trackType) {
   `;
 
   menu.innerHTML = itemsHtml;
-  document.body.appendChild(menu);
 
-  // Position smartly within viewport bounds
+  // If in fullscreen or immersive mode, append menu inside canvasWrapper so browser doesn't hide it behind top-layer
+  const isFsActive = !!document.fullscreenElement || canvasWrapper?.classList.contains('is-immersive-fallback');
+  const mountTarget = isFsActive && canvasWrapper ? canvasWrapper : document.body;
+  mountTarget.appendChild(menu);
+
+  // Position smartly within viewport bounds (or canvasWrapper bounds if in fullscreen)
   const menuWidth = 220;
-  const menuHeight = menu.offsetHeight || 220;
-  const posX = Math.min(window.innerWidth - menuWidth - 10, Math.max(10, x));
-  const posY = Math.min(window.innerHeight - menuHeight - 10, Math.max(10, y));
+  const menuHeight = menu.offsetHeight || 240;
+  let posX = x;
+  let posY = y;
+
+  if (isFsActive && canvasWrapper) {
+    const wrapRect = canvasWrapper.getBoundingClientRect();
+    const relX = x - wrapRect.left;
+    const relY = y - wrapRect.top;
+    posX = Math.min(wrapRect.width - menuWidth - 14, Math.max(14, relX));
+    posY = Math.min(wrapRect.height - menuHeight - 14, Math.max(14, relY));
+  } else {
+    posX = Math.min(window.innerWidth - menuWidth - 10, Math.max(10, x));
+    posY = Math.min(window.innerHeight - menuHeight - 10, Math.max(10, y));
+  }
+
   menu.style.left = `${posX}px`;
   menu.style.top = `${posY}px`;
 
