@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Magnates Studio - Minimalist Documentary Editor</title>
+  <link rel="stylesheet" href="css/style.css?v=6">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Bar -->
+    <header class="top-nav">
+      <div class="brand">
+        <svg class="ui-icon" viewBox="0 0 24 24" style="width:18px; height:18px; color:var(--accent-red);"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+        <span class="brand-title">MAGNATES <span class="highlight">STUDIO</span></span>
+      </div>
+      <div class="project-info">
+        <span id="current-project">Android Updates & Bloatware</span>
+        <span class="badge" id="duration-badge">00:00 / 06:08</span>
+      </div>
+      <div class="actions">
+        <button class="btn btn-secondary" id="btn-record-voiceover" title="Record Voiceover from Microphone">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+          <span id="record-label">Record Voiceover</span>
+        </button>
+        <button class="btn btn-secondary" id="btn-snap-audio">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Load Voiceover
+        </button>
+        <button class="btn btn-secondary" id="btn-save-project" title="Save project state (text clips + layout) to browser storage">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
+          Save Project
+        </button>
+        <button class="btn btn-primary" id="btn-export">
+          <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
+          Export Video
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="workspace">
+      <!-- Left Panel: Media & Assets -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h3>Media Library</h3>
+          <span class="subtitle">Upload or select media</span>
+        </div>
+        
+        <!-- Batch Upload Area -->
+        <label class="upload-box" id="drop-zone" for="file-input">
+          <input type="file" id="file-input" multiple accept="audio/*,video/*,image/*" style="position:absolute; width:1px; height:1px; opacity:0;">
+          <div class="btn btn-secondary btn-block" style="pointer-events:none; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <svg class="ui-icon" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+            Upload Files (Batch)
+          </div>
+          <span class="upload-hint">or drag & drop files here</span>
+        </label>
+
+        <div class="media-tabs">
+          <button class="tab-btn active" data-tab="all">All</button>
+          <button class="tab-btn" data-tab="audio">Audio</button>
+          <button class="tab-btn" data-tab="video">Videos</button>
+          <button class="tab-btn" data-tab="images">Images</button>
+        </div>
+        <div class="media-list" id="media-list">
+          <div class="loading-spinner">No media loaded</div>
+        </div>
+      </aside>
+
+      <!-- Center: Canvas Viewport -->
+      <section class="viewport-section">
+        <div class="canvas-wrapper">
+          <canvas id="previewCanvas" width="1920" height="1080"></canvas>
+          
+          <!-- Quick overlay controls -->
+          <div class="canvas-controls">
+            <button class="icon-btn" id="btn-stop" title="Stop & Return to Start">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px;"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+            </button>
+            <button class="icon-btn" id="btn-rewind" title="Rewind 5s">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px;"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+              5s
+            </button>
+            <button class="icon-btn play-btn" id="btn-play">
+              <svg class="ui-icon" id="play-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
+              <span>Play</span>
+            </button>
+            <button class="icon-btn" id="btn-forward" title="Forward 5s">
+              5s
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px;"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+            </button>
+            <div class="speed-selector">
+              <label>Speed:</label>
+              <select id="playback-speed">
+                <option value="0.5">0.5x</option>
+                <option value="1" selected>1.0x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2.0x</option>
+              </select>
+            </div>
+            <span class="timecode" id="timecode">00:00.00</span>
+            <button class="icon-btn" id="btn-canvas-fullscreen" title="Full Screen Preview / Expand" style="margin-left: 4px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 7px;">
+              <svg class="ui-icon" id="fullscreen-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+
+          <!-- Floating On-Screen Text Editor & Apple-style Formatting Mini Toolbar -->
+          <div id="canvas-text-editor-container" class="canvas-text-editor-container" style="display: none;">
+            <div class="screen-text-toolbar" id="screen-text-toolbar">
+              <button class="screen-tb-btn" id="stb-accent-btn" title="Set Selected Text as Accent Highlight">
+                <span class="stb-accent-indicator"></span>
+                <span>Highlight Accent</span>
+              </button>
+              <div class="stb-divider"></div>
+              <div class="stb-font-group">
+                <button class="screen-tb-btn-icon" id="stb-size-down" title="Decrease Size">-</button>
+                <span class="stb-size-display" id="stb-size-display">64px</span>
+                <button class="screen-tb-btn-icon" id="stb-size-up" title="Increase Size">+</button>
+              </div>
+              <div class="stb-divider"></div>
+              <div class="stb-colors-group">
+                <input type="color" id="stb-text-color" class="stb-color-picker" title="Text Color" value="#ffffff">
+                <input type="color" id="stb-hl-color" class="stb-color-picker" title="Accent Highlight Color" value="#ff334b">
+              </div>
+              <div class="stb-divider"></div>
+              <button class="screen-tb-btn screen-tb-done" id="stb-done-btn" title="Done Editing (Escape or Click)">Done</button>
+            </div>
+            <textarea id="screen-text-input" class="screen-text-input" rows="2" placeholder="Enter kinetic text..."></textarea>
+          </div>
+        </div>
+
+        <!-- Timeline Section -->
+        <div class="timeline-container">
+          <div class="timeline-header">
+            <div class="timeline-tools">
+              <button class="btn-tool active" id="tool-select">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
+                Select
+              </button>
+              <button class="btn-tool" id="tool-split">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6-7.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zM19 3l-6 6 2 2 7-7V3h-3z"/></svg>
+                Split Clip
+              </button>
+              <button class="btn-tool" id="tool-delete">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Delete
+              </button>
+              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+              <button class="btn-tool" id="tool-undo" title="Undo Action (Ctrl+Z)">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.7 10.79 16.99 8 12.5 8z"/></svg>
+                Undo
+              </button>
+              <button class="btn-tool" id="tool-redo" title="Redo Action (Ctrl+Y)">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.49 0-8.2 2.79-9.57 7.22l2.37.78c1.05-3.19 4.06-5.5 7.6-5.5 1.96 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                Redo
+              </button>
+              <button class="btn-tool" id="tool-reset-timeline" title="Reset Timeline to Default State">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                Reset
+              </button>
+              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+              <button class="btn-tool" id="tool-toggle-expand" title="Expand Full Workspace / Hide Sidebars">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <span id="expand-btn-text">Expand Full</span>
+              </button>
+            </div>
+            <div class="zoom-controls">
+              <span>Zoom</span>
+              <input type="range" id="timeline-zoom" min="1" max="5" value="1" step="0.2">
+            </div>
+          </div>
+
+          <div class="timeline-ruler-container" id="timeline-ruler-container">
+            <div class="ruler-label">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.71L11 12.41V7h2v4.59l3.71 3.71-1.42 1.41z"/></svg>
+              <span>Time</span>
+            </div>
+            <div class="timeline-ruler" id="timeline-ruler">
+              <canvas id="ruler-canvas" height="24"></canvas>
+            </div>
+          </div>
+
+          <div class="timeline-tracks" id="timeline-tracks">
+            <!-- Playhead line -->
+            <div class="playhead" id="playhead">
+              <div class="playhead-handle"></div>
+            </div>
+
+            <!-- Track 1: Text / Typography -->
+            <div class="track" id="track-text" data-track-type="text">
+              <div class="track-label">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+                Kinetic Text
+              </div>
+              <div class="track-content" id="content-text"></div>
+            </div>
+
+            <!-- Track 2: Images / Stills -->
+            <div class="track" id="track-image" data-track-type="image">
+              <div class="track-label">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                Images
+              </div>
+              <div class="track-content" id="content-image"></div>
+            </div>
+
+            <!-- Track 3: B-Roll & Visuals -->
+            <div class="track" id="track-video" data-track-type="video">
+              <div class="track-label">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                Video Clips
+              </div>
+              <div class="track-content" id="content-video"></div>
+            </div>
+
+            <!-- Track 4: Audio / Voiceover -->
+            <div class="track audio-track" id="track-audio" data-track-type="voiceover">
+              <div class="track-label">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+                Voiceover
+              </div>
+              <div class="track-content" id="content-audio"></div>
+            </div>
+
+            <!-- Track 5: Music -->
+            <div class="track audio-track" id="track-music" data-track-type="music">
+              <div class="track-label">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                BGM Music
+              </div>
+              <div class="track-content" id="content-music"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Panel: Documentary FX Controls -->
+      <aside class="sidebar-right">
+        <div class="sidebar-header">
+          <h3>Documentary FX</h3>
+          <span class="subtitle">Magnates / Vox Style</span>
+        </div>
+
+        <!-- 3D Tech Grid -->
+        <div class="fx-card">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
+              3D Cyber Perspective Grid
+            </h4>
+            <label class="switch">
+              <input type="checkbox" id="fx-grid-enable" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="fx-body">
+            <div class="control-row">
+              <label>Curvature Depth</label>
+              <input type="range" id="fx-grid-depth" min="10" max="100" value="45">
+            </div>
+            <div class="control-row">
+              <label>Line Opacity</label>
+              <input type="range" id="fx-grid-opacity" min="5" max="100" value="25">
+            </div>
+            <div class="control-row">
+              <label>Dark Vignette</label>
+              <input type="range" id="fx-vignette" min="0" max="100" value="85">
+            </div>
+          </div>
+        </div>
+
+        <!-- Fire & Ember Particles -->
+        <div class="fx-card">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
+              Embers & Atmospheric Fire
+            </h4>
+            <label class="switch">
+              <input type="checkbox" id="fx-particles-enable" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="fx-body">
+            <div class="control-row">
+              <label>Ember Count</label>
+              <input type="range" id="fx-particles-count" min="10" max="150" value="65">
+            </div>
+            <div class="control-row">
+              <label>Bottom Fire Glow</label>
+              <input type="range" id="fx-fire-glow" min="0" max="100" value="60">
+            </div>
+            <div class="control-row">
+              <label>Speed</label>
+              <input type="range" id="fx-particles-speed" min="1" max="5" value="2">
+            </div>
+          </div>
+        </div>
+
+        <!-- Silhouette / Shadow Effect -->
+        <div class="fx-card">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              Mystery Silhouette Mode
+            </h4>
+            <label class="switch">
+              <input type="checkbox" id="fx-silhouette-enable">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="fx-body">
+            <p class="hint-text">Turns foreground cutout subjects into solid mysterious white or black figures.</p>
+            <div class="control-row">
+              <label>Color</label>
+              <div class="btn-group">
+                <button class="btn-sm active" id="btn-sil-white">White</button>
+                <button class="btn-sm" id="btn-sil-black">Black</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clip Inspector & Audio Options (Video, Image, Voiceover) -->
+        <div class="fx-card" id="card-clip-inspector" style="display: none;">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+              Selected Clip Settings
+            </h4>
+            <span class="badge" id="inspector-clip-type">Video</span>
+          </div>
+          <div class="fx-body">
+            <!-- Asset Mini Preview in Sidebar -->
+            <div id="inspector-mini-preview-container" style="display: flex; gap: 10px; align-items: center; padding: 8px; background: var(--bg-input); border-radius: 6px; border: 1px solid var(--border-color); margin-bottom: 10px;">
+              <div id="inspector-mini-thumb" style="width: 58px; height: 42px; border-radius: 4px; overflow: hidden; background: #000; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1);">
+                <!-- Dynamic Image or Video snapshot or Audio waveform icon -->
+              </div>
+              <div style="flex: 1; min-width: 0;">
+                <div id="inspector-clip-name" style="font-size: 11px; color: #fff; font-weight: 600; word-break: break-all; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div>
+                <div id="inspector-clip-sub" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Tap timeline to inspect</div>
+              </div>
+            </div>
+
+            <!-- Video Audio Options -->
+            <div id="inspector-video-audio-section" style="display: none; margin-top: 10px;">
+              <div class="fx-header" style="margin-bottom: 6px;">
+                <label style="font-size: 11px; color: var(--text-muted);">Video Audio Track</label>
+                <label class="switch">
+                  <input type="checkbox" id="inspector-video-sound" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <p class="hint-text">Mute or play audio directly embedded in this video file.</p>
+
+              <button class="btn btn-secondary btn-sm btn-block" id="btn-extract-voiceover" style="margin-top: 8px;">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+                Use Audio as Main Voiceover
+              </button>
+            </div>
+
+            <!-- Volume Control -->
+            <div class="control-row" id="inspector-volume-row" style="margin-top: 8px;">
+              <label>Volume: <span id="inspector-volume-val">100%</span></label>
+              <input type="range" id="inspector-volume" min="0" max="100" value="100">
+            </div>
+
+            <div class="control-row" style="margin-top: 8px;">
+              <div style="display: flex; gap: 8px; width: 100%;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 11px; margin-bottom: 2px;">Start Time</label>
+                  <input type="text" id="inspector-start-input" placeholder="00:00.00" value="00:00.00" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;">
+                </div>
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 11px; margin-bottom: 2px;">Duration</label>
+                  <input type="text" id="inspector-dur-input" placeholder="00:06.00" value="00:06.00" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;">
+                </div>
+              </div>
+              <span class="hint-text" style="margin-top: 4px;">Format: MM:SS.ms (e.g. 01:15.5) or seconds (e.g. 12.5)</span>
+            </div>
+
+            <!-- Layer Arrangement (Bring to Front / Send to Back) -->
+            <div class="control-row" id="inspector-layer-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="margin: 0;">Layer Order</label>
+                <span class="badge" id="inspector-layer-badge" style="font-size: 10px;">Behind Text</span>
+              </div>
+              <div class="btn-group" style="display: flex; gap: 4px; margin-top: 4px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-layer-back" style="flex: 1; padding: 6px 4px; font-size: 11px;" title="Send Behind Text / Other Layers">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M2 4h14v14H2V4zm16 4h4v14H8v-4h10V8z"/></svg>
+                  Send to Back
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-layer-front" style="flex: 1; padding: 6px 4px; font-size: 11px;" title="Bring in Front of Text / Top Layer">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M8 2h14v14H8V2zM4 6H2v16h16v-2H4V6z"/></svg>
+                  Bring to Front
+                </button>
+              </div>
+              <p class="hint-text" style="margin-top: 4px;">Control whether this image/video renders behind or on top of text and other elements.</p>
+            </div>
+
+            <div style="display: flex; gap: 6px; margin-top: 10px;">
+              <button class="btn btn-secondary btn-sm" id="btn-reset-inspector-clip" style="flex: 1;" title="Reset clip properties to original defaults">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                Reset
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-delete-inspector-clip" style="border-color: #ff334b; color: #ff334b;" title="Delete this clip">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kinetic Typography Controls & Styles -->
+        <div class="fx-card" id="card-text-editor">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+              Title / Text & Styles
+            </h4>
+            <div style="display: flex; gap: 4px;">
+              <button class="btn-sm" id="btn-toggle-text-history" title="View & Edit All Written Texts">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px;"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                All Texts (<span id="text-count-badge">1</span>)
+              </button>
+              <button class="btn-sm" id="btn-reset-text" title="Reset Text Styles to Default">Reset</button>
+              <button class="btn-sm" id="btn-new-text" title="New Text">+ New</button>
+            </div>
+          </div>
+          
+          <!-- All Written Texts Overview Drawer -->
+          <div id="text-history-drawer" style="display: none; padding: 10px; background: #131722; border-bottom: 1px solid var(--border-color); max-height: 220px; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.5px;">All Project Texts</span>
+              <span class="hint-text" style="margin: 0;">Click to select & edit</span>
+            </div>
+            <div id="text-history-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+          </div>
+
+          <div class="fx-body">
+            <div class="control-row">
+              <label>Text Content</label>
+              <textarea id="text-input" rows="2" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 12px; resize: vertical;" placeholder="e.g. Did Google pump and dump?">Did Google pump and dump?</textarea>
+            </div>
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Highlight Word (Accent Color)</label>
+              <input type="text" id="text-highlight" placeholder="pump and dump" value="pump and dump">
+            </div>
+
+            <!-- Manual Exact Timing (Start Time & Duration) -->
+            <div class="control-row" style="margin-top: 8px;">
+              <div style="display: flex; gap: 8px; width: 100%;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 11px; margin-bottom: 2px;">Start Time</label>
+                  <input type="text" id="text-start-input" placeholder="00:00.00" value="00:00.00" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;">
+                </div>
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 11px; margin-bottom: 2px;">Duration</label>
+                  <input type="text" id="text-dur-input" placeholder="00:05.00" value="00:05.00" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;">
+                </div>
+              </div>
+              <span class="hint-text" style="margin-top: 4px;">Set exact second/minute when text appears & lasts</span>
+              <!-- Conflict and Time Alert Notification Banner -->
+              <div id="text-timing-alert" style="display: none; margin-top: 6px; padding: 6px 8px; border-radius: 4px; font-size: 11px; line-height: 1.3;"></div>
+            </div>
+
+            <!-- Typography Custom Styling Options -->
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Font Family</label>
+              <select id="text-font" style="background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 4px; font-size: 11px;">
+                <option value="'Inter', sans-serif" selected>Inter (Clean Modern)</option>
+                <option value="'Oswald', sans-serif">Oswald (Bold Vox Punchy)</option>
+                <option value="'Courier New', monospace">Courier (Typewriter / Document)</option>
+                <option value="'Impact', sans-serif">Impact (Bold Meme / Dramatic)</option>
+                <option value="'Georgia', serif">Georgia (Editorial / Documentary)</option>
+              </select>
+            </div>
+
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Font Size: <span id="text-size-val">64px</span></label>
+              <input type="range" id="text-size" min="32" max="110" value="64">
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <div class="control-row" style="flex: 1;">
+                <label>Text Color</label>
+                <input type="color" id="text-color" value="#ffffff" style="height: 28px; width: 100%; border: none; border-radius: 4px; background: transparent; cursor: pointer;">
+              </div>
+              <div class="control-row" style="flex: 1;">
+                <label>Highlight Color</label>
+                <input type="color" id="text-highlight-color" value="#ff334b" style="height: 28px; width: 100%; border: none; border-radius: 4px; background: transparent; cursor: pointer;">
+              </div>
+            </div>
+
+            <!-- Color Presets & Templates -->
+            <div class="control-row" style="margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="margin: 0;">Color Presets & Templates</label>
+                <button type="button" class="btn-sm" id="btn-save-color-template" style="padding: 2px 7px; font-size: 10px; cursor: pointer;" title="Save current text colors as reusable template">+ Save Current</button>
+              </div>
+              <!-- Inline template name form (shown on Save click) -->
+              <div id="template-name-row" style="display: none; margin-bottom: 6px;">
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <input type="text" id="template-name-input" placeholder="Template name..." style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 3px 6px; border-radius: 4px; font-size: 11px;">
+                  <button type="button" class="btn-sm" id="btn-confirm-save-template" style="padding: 2px 8px; font-size: 10px; white-space: nowrap;">Save</button>
+                  <button type="button" class="btn-sm" id="btn-cancel-save-template" style="padding: 2px 8px; font-size: 10px;">Cancel</button>
+                </div>
+              </div>
+              <div class="color-palette-bar" id="color-palette-presets">
+                <div class="palette-chip active" data-text="#ffffff" data-hl="#ff334b" title="Magnates Media (White & Red)">
+                  <span class="color-dot" style="background:#ffffff;"></span>
+                  <span class="color-dot" style="background:#ff334b;"></span>
+                  <span>Magnates Red</span>
+                </div>
+                <div class="palette-chip" data-text="#ffffff" data-hl="#ffd000" title="Vox Documentary (White & Gold)">
+                  <span class="color-dot" style="background:#ffffff;"></span>
+                  <span class="color-dot" style="background:#ffd000;"></span>
+                  <span>Vox Gold</span>
+                </div>
+                <div class="palette-chip" data-text="#ffffff" data-hl="#00f0ff" title="Cyber Cyan">
+                  <span class="color-dot" style="background:#ffffff;"></span>
+                  <span class="color-dot" style="background:#00f0ff;"></span>
+                  <span>Cyber Cyan</span>
+                </div>
+                <div class="palette-chip" data-text="#ffffff" data-hl="#00e676" title="Cash Green">
+                  <span class="color-dot" style="background:#ffffff;"></span>
+                  <span class="color-dot" style="background:#00e676;"></span>
+                  <span>Finance Green</span>
+                </div>
+                <div class="palette-chip" data-text="#ffffff" data-hl="#ff9100" title="Amber Glow">
+                  <span class="color-dot" style="background:#ffffff;"></span>
+                  <span class="color-dot" style="background:#ff9100;"></span>
+                  <span>Amber Glow</span>
+                </div>
+              </div>
+              <div id="saved-templates-wrapper" style="margin-top: 6px; display: none;">
+                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 3px;">Your Saved Templates:</div>
+                <div class="saved-templates-list" id="saved-templates-list"></div>
+              </div>
+            </div>
+
+            <!-- Text Layer Arrangement -->
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Text Layer Arrangement</label>
+              <div class="btn-group" style="display: flex; gap: 4px; margin-top: 4px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-text-layer-back" style="flex: 1; padding: 5px 4px; font-size: 11px;" title="Render text behind media">
+                  Send Behind Media
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm active" id="btn-text-layer-front" style="flex: 1; padding: 5px 4px; font-size: 11px;" title="Render text on top of media">
+                  In Front of Media
+                </button>
+              </div>
+            </div>
+
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Animation Style</label>
+              <select id="text-anim" style="background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 4px; font-size: 11px;">
+                <option value="pop" selected>Kinetic Word Pop (Spoken Highlight)</option>
+                <option value="materialize">Thin Air Materialize (Glitch / Fade Out of Nowhere)</option>
+                <option value="slide_up">Slide Up (Bottom to Top Ease)</option>
+                <option value="slide_down">Slide Down (Top to Bottom Drop)</option>
+                <option value="slide_left">Fly In From Right (Left Sweep)</option>
+                <option value="slide_right">Fly In From Left (Right Sweep)</option>
+                <option value="zoom_in">Zoom In (Scale From Center)</option>
+                <option value="bounce">Bounce Land (Spring Overshoot)</option>
+                <option value="flip_in">Flip In (Horizontal 3D Flip)</option>
+                <option value="wipe_right">Wipe Right (Fast Word Reveal)</option>
+                <option value="stamp">Slam / Stamp Impact (Magnates Dramatic Drop)</option>
+                <option value="typewriter">Typewriter Reveal (Character by Character)</option>
+                <option value="fade">Smooth Cinematic Fade In</option>
+                <option value="none">Static Punchy</option>
+              </select>
+            </div>
+
+            <!-- Sound Effects (SFX) on Enter & Volume Control -->
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Sound Effect (SFX)</label>
+              <select id="text-sfx" style="background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 4px; font-size: 11px;">
+                <option value="whoosh" selected>Cinematic Whoosh / Swoosh</option>
+                <option value="bass_thud">Deep Bass Hit / Impact</option>
+                <option value="camera_click">Camera Shutter Click</option>
+                <option value="glitch_burst">Digital Glitch / Static Pop</option>
+                <option value="none">None (Silent)</option>
+              </select>
+            </div>
+
+            <!-- SFX Volume Slider -->
+            <div class="control-row" id="text-sfx-volume-row" style="margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <label style="margin: 0;">SFX Volume: <span id="text-sfx-vol-val">80%</span></label>
+                <button type="button" class="btn-sm" id="btn-preview-sfx" style="padding: 1px 6px; font-size: 10px;" title="Test and play sound effect">Play SFX</button>
+              </div>
+              <input type="range" id="text-sfx-volume" min="0" max="100" value="80">
+            </div>
+
+            <div class="control-row" style="margin-top: 8px;">
+              <label>Position Alignment</label>
+              <div class="btn-group">
+                <button class="btn-sm active" id="btn-text-pos-center">Center</button>
+                <button class="btn-sm" id="btn-text-pos-bottom">Bottom 1/3</button>
+                <button class="btn-sm" id="btn-text-pos-top">Top</button>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 6px; margin-top: 12px;">
+              <button class="btn btn-primary btn-sm" id="btn-add-text" style="flex: 1;">
+                Add Text
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-update-text" style="flex: 1; display: none;">
+                Update Selected
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btn-delete-text" style="border-color: #ff334b; color: #ff334b; display: none;">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <audio id="audio-player"></audio>
+  <audio id="bgm-player"></audio>
+  <script src="js/app.js?v=17"></script>
+</body>
+</html>
