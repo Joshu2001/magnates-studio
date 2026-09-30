@@ -41,7 +41,16 @@ let timelineClips = {
   image: [],
   video: [],
   voiceover: [],
-  music: []
+  music: [],
+  background: [
+    {
+      id: 'clip-bg-default',
+      start: 0,
+      duration: 60,
+      bgType: 'cyber_grid',
+      bgColor: '#0a0b0e'
+    }
+  ]
 };
 
 // ==================== UNDO / REDO HISTORY ENGINE ====================
@@ -1206,13 +1215,18 @@ function render(now) {
   }
 
   try {
-    // Clear & Stage Background Layer
-    const bgType = fxState.stageBackground?.type || 'cyber_grid';
-    if (bgType === 'solid_black') {
+    // Clear & Stage Background Layer (evaluate background track clips at currentTime if present)
+    const activeBgClip = (timelineClips.background || []).find(c => currentTime >= c.start && currentTime < (c.start + c.duration));
+    const bgType = activeBgClip ? (activeBgClip.bgType || 'cyber_grid') : (fxState.stageBackground?.type || 'cyber_grid');
+    const bgColor = activeBgClip ? (activeBgClip.bgColor || '#0a0b0e') : (fxState.stageBackground?.color || '#0a0b0e');
+
+    if (bgType === 'none') {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'solid_black') {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     } else if (bgType === 'color') {
-      ctx.fillStyle = fxState.stageBackground.color || '#0a0b0e';
+      ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     } else if (bgType === 'vox_cream') {
       ctx.fillStyle = '#f4eedb';
@@ -1222,12 +1236,12 @@ function render(now) {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     } else {
       // Default cyber grid / dark studio
-      ctx.fillStyle = '#0a0b0e';
+      ctx.fillStyle = bgColor || '#0a0b0e';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    // 1. 3D Background Grid (when enabled or preset is cyber_grid)
-    if (bgType === 'cyber_grid' || fxState.grid.enabled) {
+    // 1. 3D Background Grid (when enabled and preset is cyber_grid)
+    if (bgType === 'cyber_grid' && fxState.grid.enabled !== false) {
       drawPerspectiveGrid();
     }
 
@@ -1343,7 +1357,7 @@ function parseTimecode(val) {
 function updateUI() {
   document.getElementById('timecode').textContent = `${formatTime(currentTime)}.${Math.floor((currentTime % 1) * 100).toString().padStart(2, '0')}`;
   const playhead = document.getElementById('playhead');
-  playhead.style.left = `${110 + (currentTime * pps)}px`;
+  playhead.style.left = `${currentTime * pps}px`;
 
   // Update card progression bar under indicated file
   if (activeMediaFile && duration > 0) {
@@ -1591,7 +1605,8 @@ function renderAllTimelineTracks() {
     image: document.getElementById('content-image'),
     video: document.getElementById('content-video'),
     voiceover: document.getElementById('content-audio'),
-    music: document.getElementById('content-music')
+    music: document.getElementById('content-music'),
+    background: document.getElementById('content-background')
   };
 
   Object.keys(trackMap).forEach(type => {
@@ -1631,9 +1646,17 @@ function renderAllTimelineTracks() {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`;
       } else if (type === 'text') {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>`;
+      } else if (type === 'background') {
+        const bgLabels = { cyber_grid: 'Cyber Grid', solid_black: 'Solid Black', none: 'Transparent', color: 'Solid Tint', vox_cream: 'Vox Cream' };
+        const bgLabel = bgLabels[clip.bgType] || clip.bgType || 'Background';
+        iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color:#7c6fff;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>`;
+        // Apply bg-type-specific inline style for the block (set below)
+        block.dataset.bgType = clip.bgType || 'cyber_grid';
       }
 
-      const label = clip.file?.name || clip.text || 'Clip';
+      const label = type === 'background'
+        ? (() => { const m = { cyber_grid: 'Cyber Grid', solid_black: 'Solid Black', none: 'Transparent', color: 'Solid Tint', vox_cream: 'Vox Cream' }; return m[clip.bgType] || clip.bgType || 'Background'; })()
+        : (clip.file?.name || clip.text || 'Clip');
 
       // Left & Right Resize Handles
       const handleLeft = document.createElement('div');
@@ -1647,6 +1670,17 @@ function renderAllTimelineTracks() {
       contentEl.className = 'clip-block-content';
       contentEl.innerHTML = `${iconSvg} <span>${label}</span>`;
 
+      // Hover delete button (appears on hover over any clip)
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'clip-hover-delete';
+      deleteBtn.title = 'Remove clip';
+      deleteBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+      deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        recordState('Delete Clip');
+        deleteClip(type, clip.id);
+      });
+
       // Video Filmstrip Background
       if (type === 'video' && clip.file?.url) {
         const filmstripEl = document.createElement('div');
@@ -1657,6 +1691,7 @@ function renderAllTimelineTracks() {
 
       block.appendChild(handleLeft);
       block.appendChild(contentEl);
+      block.appendChild(deleteBtn);
       block.appendChild(handleRight);
 
       // Clip Interactions
@@ -1693,6 +1728,8 @@ function handleTimelineAddButtonClick(trackType, atTimeSec, triggerEl) {
     setTimeout(() => showTextTimingAlert(''), 2500);
   } else if (trackType === 'chart') {
     openChartCreatorModal(atTimeSec);
+  } else if (trackType === 'background') {
+    openBackgroundSegmentPicker(atTimeSec, triggerEl);
   } else {
     // Open quick media picker popover or prompt file upload
     openTrackMediaPicker(trackType, atTimeSec, triggerEl);
@@ -2081,11 +2118,23 @@ function attachClipInteractions(blockEl, clip, trackType) {
     const initialStart = clip.start;
     blockEl.classList.add('is-dragging');
 
+    const SNAP_THRESHOLD_SEC = 0.3; // seconds
     const onMouseMove = (moveEvent) => {
       const deltaX = moveEvent.clientX - startX;
       const deltaSec = deltaX / pps;
-      clip.start = Math.max(0, initialStart + deltaSec);
+      let newStart = Math.max(0, initialStart + deltaSec);
+
+      // --- Snap to playhead ---
+      if (Math.abs(newStart - currentTime) <= SNAP_THRESHOLD_SEC) {
+        newStart = currentTime;
+        blockEl.classList.add('is-snapped');
+      } else {
+        blockEl.classList.remove('is-snapped');
+      }
+
+      clip.start = newStart;
       blockEl.style.left = `${clip.start * pps}px`;
+
       // Update live timecode inputs if this clip is selected
       if (selectedClip && selectedClip.clip.id === clip.id) {
         const si = document.getElementById('inspector-start-input');
@@ -2105,6 +2154,7 @@ function attachClipInteractions(blockEl, clip, trackType) {
 
     const onMouseUp = () => {
       blockEl.classList.remove('is-dragging');
+      blockEl.classList.remove('is-snapped');
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
       recordState('Move Clip');
@@ -2270,6 +2320,14 @@ function initTimelineDragAndDrop() {
         const dropX = e.clientX - rect.left;
         const dropSec = Math.max(0, dropX / pps);
 
+        // Special handling for Chart template drag & drop
+        if (file.isChart && file.chartConfig) {
+          addChartClipToTimeline(file.chartConfig, dropSec, 6.0);
+          showTextTimingAlert(`Added "${file.name || 'Chart'}" to timeline at ${formatTime(dropSec)}`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 2500);
+          return;
+        }
+
         // Auto-routing & lane enforcement:
         // Automatically route media files to their respective dedicated tracks
         let targetType = 'image';
@@ -2333,20 +2391,62 @@ document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
       activeTool = 'delete';
       toggleDrawingDock(false);
     }
-    else if (btn.id === 'tool-snap-zoom') {
+  });
+});
+
+// Dropdown Toggles for FX & Elements in Toolbar
+function setupToolbarDropdown(triggerId, menuId) {
+  const trigger = document.getElementById(triggerId);
+  const menu = document.getElementById(menuId);
+  if (!trigger || !menu) return;
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isShowing = menu.classList.contains('show');
+    document.querySelectorAll('.tool-dropdown-menu').forEach(m => m.classList.remove('show'));
+    if (!isShowing) {
+      menu.classList.add('show');
+    }
+  });
+}
+
+setupToolbarDropdown('btn-dropdown-fx', 'menu-tool-fx');
+setupToolbarDropdown('btn-dropdown-elements', 'menu-tool-elements');
+
+window.addEventListener('click', () => {
+  document.querySelectorAll('.tool-dropdown-menu').forEach(m => m.classList.remove('show'));
+});
+
+// Tool menu items inside FX & Elements dropdowns
+document.querySelectorAll('.tool-menu-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.tool-dropdown-menu').forEach(m => m.classList.remove('show'));
+    canvas.classList.remove('tool-snap-zoom', 'tool-loupe', 'tool-draw');
+
+    if (item.id === 'tool-snap-zoom') {
       activeTool = 'snap-zoom';
       canvas.classList.add('tool-snap-zoom');
       toggleDrawingDock(false);
-    } else if (btn.id === 'tool-loupe') {
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    } else if (item.id === 'tool-loupe') {
       activeTool = 'loupe';
       canvas.classList.add('tool-loupe');
       toggleDrawingDock(false);
-    } else if (btn.id === 'tool-draw') {
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    } else if (item.id === 'tool-draw') {
       activeTool = 'draw';
       canvas.classList.add('tool-draw');
       toggleDrawingDock(true);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
       showTextTimingAlert('Drawing Mode Active! Hold click anywhere on screen for Pen quick-menu.', 'success');
       setTimeout(() => showTextTimingAlert(''), 3000);
+    } else if (item.id === 'tool-add-chart') {
+      openChartCreatorModal();
+    } else if (item.id === 'tool-add-icon') {
+      switchMediaCategory('icons');
     }
   });
 });
@@ -2421,7 +2521,7 @@ if (zoomSlider) {
     drawTimeRuler();
     renderAllTimelineTracks();
     const playhead = document.getElementById('playhead');
-    playhead.style.left = `${110 + (currentTime * pps)}px`;
+    playhead.style.left = `${currentTime * pps}px`;
   });
 }
 
@@ -2478,7 +2578,7 @@ function initPlayheadScrubbing() {
   const onScrubMove = (e) => {
     if (!isScrubbing) return;
     const rect = tracksContainer.getBoundingClientRect();
-    const clickX = e.clientX - rect.left - 110 + tracksContainer.scrollLeft;
+    const clickX = e.clientX - rect.left + tracksContainer.scrollLeft;
     seekToTime(clickX / pps);
   };
 
@@ -2511,7 +2611,7 @@ function initPlayheadScrubbing() {
     playhead.querySelector('.playhead-handle')?.classList.add('is-scrubbing');
 
     const rect = tracksContainer.getBoundingClientRect();
-    const clickX = e.clientX - rect.left - 110 + tracksContainer.scrollLeft;
+    const clickX = e.clientX - rect.left + tracksContainer.scrollLeft;
     if (clickX >= 0) {
       seekToTime(clickX / pps);
     }
@@ -2554,9 +2654,14 @@ function initPlayheadScrubbing() {
 
   // Synchronize horizontal scroll between timeline-tracks and ruler-canvas
   const rulerCanvas = document.getElementById('ruler-canvas');
+  const labelCol = document.getElementById('timeline-label-col');
   tracksContainer.addEventListener('scroll', () => {
     if (rulerCanvas) {
       rulerCanvas.style.transform = `translateX(-${tracksContainer.scrollLeft}px)`;
+    }
+    // Sync vertical scroll: keep label column aligned with tracks
+    if (labelCol) {
+      labelCol.scrollTop = tracksContainer.scrollTop;
     }
   });
 }
@@ -2587,51 +2692,76 @@ async function uploadFiles(files) {
   }
 }
 
-// Media Tab buttons (including Layers tab)
+function switchMediaCategory(targetCategory) {
+  currentFilter = targetCategory;
+
+  // Sync dropdown
+  const dropdown = document.getElementById('media-category-dropdown');
+  if (dropdown && dropdown.value !== targetCategory) {
+    dropdown.value = targetCategory;
+  }
+
+  // Sync pills
+  document.querySelectorAll('.media-pill-btn').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.pill === targetCategory);
+  });
+
+  const mediaListEl = document.getElementById('media-list');
+  const layersPanelEl = document.getElementById('layers-panel-container');
+  const chartsPanelEl = document.getElementById('charts-panel-container');
+  const iconsPanelEl = document.getElementById('icons-panel-container');
+
+  if (currentFilter === 'charts') {
+    if (mediaListEl) mediaListEl.style.display = 'none';
+    if (layersPanelEl) layersPanelEl.style.display = 'none';
+    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (chartsPanelEl) {
+      chartsPanelEl.style.display = 'flex';
+      renderChartsTemplatesPanel();
+    }
+  } else if (currentFilter === 'icons') {
+    if (mediaListEl) mediaListEl.style.display = 'none';
+    if (layersPanelEl) layersPanelEl.style.display = 'none';
+    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+    if (iconsPanelEl) {
+      iconsPanelEl.style.display = 'flex';
+      renderIconsLibraryPanel();
+    }
+  } else if (currentFilter === 'layers') {
+    if (mediaListEl) mediaListEl.style.display = 'none';
+    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (layersPanelEl) {
+      layersPanelEl.style.display = 'flex';
+      renderLayersPanel();
+    }
+  } else {
+    if (layersPanelEl) layersPanelEl.style.display = 'none';
+    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (mediaListEl) {
+      mediaListEl.style.display = 'flex';
+      renderMediaList(currentFilter);
+    }
+  }
+}
+
+// Media Category Dropdown listener
+document.getElementById('media-category-dropdown')?.addEventListener('change', (e) => {
+  switchMediaCategory(e.target.value);
+});
+
+// Media Category Quick Pill buttons
+document.querySelectorAll('.media-pill-btn').forEach(pill => {
+  pill.addEventListener('click', (e) => {
+    switchMediaCategory(e.currentTarget.dataset.pill);
+  });
+});
+
+// Legacy tab-btn support if invoked
 document.querySelectorAll('.media-tabs .tab-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
-    document.querySelectorAll('.media-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-    e.currentTarget.classList.add('active');
-    currentFilter = e.currentTarget.dataset.tab;
-
-    const mediaListEl = document.getElementById('media-list');
-    const layersPanelEl = document.getElementById('layers-panel-container');
-    const chartsPanelEl = document.getElementById('charts-panel-container');
-    const iconsPanelEl = document.getElementById('icons-panel-container');
-
-    if (currentFilter === 'charts') {
-      if (mediaListEl) mediaListEl.style.display = 'none';
-      if (layersPanelEl) layersPanelEl.style.display = 'none';
-      if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-      if (chartsPanelEl) {
-        chartsPanelEl.style.display = 'flex';
-        renderChartsTemplatesPanel();
-      }
-    } else if (currentFilter === 'icons') {
-      if (mediaListEl) mediaListEl.style.display = 'none';
-      if (layersPanelEl) layersPanelEl.style.display = 'none';
-      if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-      if (iconsPanelEl) {
-        iconsPanelEl.style.display = 'flex';
-        renderIconsLibraryPanel();
-      }
-    } else if (currentFilter === 'layers') {
-      if (mediaListEl) mediaListEl.style.display = 'none';
-      if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-      if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-      if (layersPanelEl) {
-        layersPanelEl.style.display = 'flex';
-        renderLayersPanel();
-      }
-    } else {
-      if (layersPanelEl) layersPanelEl.style.display = 'none';
-      if (chartsPanelEl) chartsPanelEl.style.display = 'none';
-      if (iconsPanelEl) iconsPanelEl.style.display = 'none';
-      if (mediaListEl) {
-        mediaListEl.style.display = 'flex';
-        renderMediaList(currentFilter);
-      }
-    }
+    switchMediaCategory(e.currentTarget.dataset.tab);
   });
 });
 
@@ -2829,6 +2959,114 @@ document.getElementById('btn-sil-black').addEventListener('click', (e) => {
   e.target.classList.add('active');
   document.getElementById('btn-sil-white').classList.remove('active');
 });
+
+// ==================== STAGE BACKDROP MODE ====================
+const bgModeSelect = document.getElementById('stage-bg-mode-select');
+const bgColorPicker = document.getElementById('stage-bg-color-picker');
+const bgColorPickerRow = document.getElementById('row-bg-color-picker');
+const bgColorVal = document.getElementById('stage-bg-color-val');
+const bgModeBadge = document.getElementById('badge-bg-mode');
+
+const BG_MODE_LABELS = {
+  cyber_grid: 'Cyber Set',
+  solid_black: 'Solid Black',
+  none: 'Transparent',
+  color: 'Solid Tint',
+  vox_cream: 'Vox Cream'
+};
+
+function applyBackdropMode(type, color) {
+  fxState.stageBackground = { type, color: color || '#0a0b0e' };
+  if (bgModeBadge) bgModeBadge.textContent = BG_MODE_LABELS[type] || type;
+  if (bgColorPickerRow) bgColorPickerRow.style.display = (type === 'color') ? 'block' : 'none';
+  // Disable 3D grid toggle visual if not cyber_grid
+  const gridEnable = document.getElementById('fx-grid-enable');
+  if (gridEnable) gridEnable.closest('.fx-card').style.opacity = (type === 'cyber_grid') ? '1' : '0.45';
+  // Sync the active background clip at current playhead position
+  const bgClips = timelineClips.background || [];
+  const activeClip = bgClips.find(c => currentTime >= c.start && currentTime < c.start + c.duration);
+  if (activeClip) {
+    activeClip.bgType = type;
+    activeClip.bgColor = color || '#0a0b0e';
+    renderAllTimelineTracks();
+  }
+}
+
+// Background segment picker popover — lets user pick a bg style for a new segment
+function openBackgroundSegmentPicker(atTimeSec, triggerEl) {
+  document.querySelectorAll('.bg-segment-picker-popover').forEach(p => p.remove());
+
+  const popover = document.createElement('div');
+  popover.className = 'track-media-picker-popover bg-segment-picker-popover';
+
+  const header = document.createElement('div');
+  header.className = 'track-media-picker-header';
+  header.innerHTML = `<span>Add Background Segment</span><span style="cursor:pointer;color:#ff6b7e;font-size:14px;line-height:1;" id="close-bg-picker">&times;</span>`;
+  popover.appendChild(header);
+
+  const bgOptions = [
+    { value: 'cyber_grid',  label: 'Cyber Grid',    color: '#1a1f35' },
+    { value: 'solid_black', label: 'Solid Black',   color: '#111111' },
+    { value: 'none',        label: 'Transparent',   color: '#2a2a2a' },
+    { value: 'color',       label: 'Solid Tint',    color: '#1a3a2a' },
+    { value: 'vox_cream',   label: 'Vox Cream',     color: '#3a3020' }
+  ];
+
+  const list = document.createElement('div');
+  list.style.cssText = 'display:flex;flex-direction:column;gap:6px;padding:8px 0;';
+
+  bgOptions.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.style.cssText = `display:flex;align-items:center;gap:10px;padding:8px 12px;background:${opt.color};border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#fff;font-size:12px;cursor:pointer;text-align:left;width:100%;`;
+    btn.innerHTML = `<span style="width:12px;height:12px;border-radius:3px;background:${opt.color};border:1px solid rgba(255,255,255,0.3);flex-shrink:0;"></span>${opt.label}`;
+    btn.addEventListener('click', () => {
+      const newClip = {
+        id: `clip-bg-${Date.now()}`,
+        start: atTimeSec,
+        duration: 10,
+        bgType: opt.value,
+        bgColor: opt.color
+      };
+      if (!timelineClips.background) timelineClips.background = [];
+      timelineClips.background.push(newClip);
+      recordState('Add Background Segment');
+      renderAllTimelineTracks();
+      popover.remove();
+    });
+    list.appendChild(btn);
+  });
+
+  popover.appendChild(list);
+
+  // Position near trigger
+  if (triggerEl) {
+    const r = triggerEl.getBoundingClientRect();
+    popover.style.cssText = `position:fixed;top:${r.bottom + 6}px;left:${r.left}px;z-index:9999;width:200px;`;
+  }
+  document.body.appendChild(popover);
+
+  document.getElementById('close-bg-picker')?.addEventListener('click', () => popover.remove());
+  setTimeout(() => {
+    const outsideClick = (e) => { if (!popover.contains(e.target)) { popover.remove(); document.removeEventListener('click', outsideClick); } };
+    document.addEventListener('click', outsideClick);
+  }, 0);
+}
+
+
+bgModeSelect?.addEventListener('change', (e) => {
+  applyBackdropMode(e.target.value, bgColorPicker?.value);
+  recordState('Change Stage Backdrop');
+});
+
+bgColorPicker?.addEventListener('input', (e) => {
+  if (bgColorVal) bgColorVal.textContent = e.target.value;
+  if (fxState.stageBackground?.type === 'color') {
+    fxState.stageBackground.color = e.target.value;
+  }
+});
+
+// Initialize badge state on load
+applyBackdropMode(fxState.stageBackground?.type || 'cyber_grid', fxState.stageBackground?.color || '#0a0b0e');
 
 // ==================== LIVE MICROPHONE VOICEOVER RECORDING ====================
 let mediaRecorder = null;
@@ -3642,7 +3880,16 @@ document.getElementById('tool-reset-timeline')?.addEventListener('click', () => 
       image: [],
       video: [],
       voiceover: [],
-      music: []
+      music: [],
+      background: [
+        {
+          id: 'clip-bg-default',
+          start: 0,
+          duration: 60,
+          bgType: 'cyber_grid',
+          bgColor: '#0a0b0e'
+        }
+      ]
     };
     currentTime = 0;
     selectedClip = null;
@@ -6784,6 +7031,63 @@ const PREBUILT_CHART_TEMPLATES = [
       waveAgitation: 18,
       glow: true
     }
+  },
+  {
+    id: 'tpl-market-share-donut',
+    type: 'donut',
+    name: 'Radial Pie & Donut Sweep',
+    badge: '78% Dominance',
+    desc: 'Vox-style circular ring gauge with dynamic sweep reveal, glowing counter and contextual market share statistics.',
+    config: {
+      type: 'donut',
+      title: 'MARKET DOMINANCE',
+      percent: 78,
+      metricLabel: 'GLOBAL SEARCH SHARE',
+      metricSublabel: 'Consolidated category revenue share',
+      color: '#00f0ff',
+      drawDuration: 1.6,
+      glow: true
+    }
+  },
+  {
+    id: 'tpl-leaderboard-ranking',
+    type: 'leaderboard',
+    name: 'Ranked Channel Leaderboard',
+    badge: 'Channel ROI',
+    desc: 'Horizontal comparative bar race comparing performance across advertising and traffic channels with score counters.',
+    config: {
+      type: 'leaderboard',
+      title: 'ACQUISITION CHANNELS',
+      color: '#00f0ff',
+      drawDuration: 1.8,
+      glow: true,
+      items: [
+        { name: 'Google Search Ads', val: 92, color: '#00f0ff' },
+        { name: 'Meta Instagram Ads', val: 74, color: '#76ff03' },
+        { name: 'TikTok Paid Reach', val: 58, color: '#ffd000' },
+        { name: 'YouTube TrueView', val: 42, color: '#ff334b' }
+      ]
+    }
+  },
+  {
+    id: 'tpl-conversion-funnel',
+    type: 'funnel',
+    name: 'Conversion Stage Funnel',
+    badge: 'Sales Pipeline',
+    desc: 'Alex Hormozi style conversion dropoff funnel with segmented tiers dramatizing attrition at each stage.',
+    config: {
+      type: 'funnel',
+      title: 'CUSTOMER PIPELINE',
+      color: '#00f0ff',
+      drawDuration: 1.8,
+      glow: true,
+      stages: [
+        { label: 'Impressions', count: '100,000', drop: '100%' },
+        { label: 'Clicks', count: '12,400', drop: '12.4%' },
+        { label: 'Opt-Ins', count: '3,800', drop: '3.8%' },
+        { label: 'Customers', count: '940', drop: '0.94%' }
+      ]
+    }
   }
 ];
 
@@ -6809,7 +7113,11 @@ function drawInfographicChart(ctx, clip, dx, dy, w, h) {
   // Rounded rect container
   const radius = 12;
   ctx.beginPath();
-  ctx.roundRect(dx, dy, w, h, radius);
+  if (ctx.roundRect) {
+    ctx.roundRect(dx, dy, w, h, radius);
+  } else {
+    ctx.rect(dx, dy, w, h);
+  }
   ctx.fill();
   ctx.stroke();
 
@@ -6839,6 +7147,12 @@ function drawInfographicChart(ctx, clip, dx, dy, w, h) {
     drawStaggeredBarChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
   } else if (cfg.type === 'pyramid') {
     drawLiquidPyramidChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 90, elapsed, progress);
+  } else if (cfg.type === 'donut') {
+    drawRadialDonutChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
+  } else if (cfg.type === 'leaderboard') {
+    drawLeaderboardChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
+  } else if (cfg.type === 'funnel') {
+    drawConversionFunnelChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
   } else {
     // Default: area / line chart
     drawDynamicAreaChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress, easeOut);
@@ -6881,8 +7195,9 @@ function drawDynamicAreaChart(ctx, cfg, x, y, w, h, elapsed, progress, easeOut) 
     y: baselineY - (val / maxVal) * chartHeight
   });
 
-  // Calculate write-on reveal point
-  const currentDrawIdx = Math.min(n - 1, (n - 1) * easeOut);
+  // Calculate write-on reveal point: ensure at least full static preview if paused or resting at start
+  const activeProg = isPlaying ? easeOut : (progress > 0 ? easeOut : 1.0);
+  const currentDrawIdx = Math.max(0.001, Math.min(n - 1, (n - 1) * activeProg));
   const fullPointsCount = Math.floor(currentDrawIdx);
   const frac = currentDrawIdx - fullPointsCount;
 
@@ -6899,6 +7214,9 @@ function drawDynamicAreaChart(ctx, cfg, x, y, w, h, elapsed, progress, easeOut) 
         x: pA.x + (pB.x - pA.x) * frac,
         y: pA.y + (pB.y - pA.y) * frac
       });
+    }
+    if (pts.length === 1 && n > 1) {
+      pts.push(getPt(1, series[1]));
     }
     return pts;
   }
@@ -7039,12 +7357,13 @@ function drawStaggeredBarChart(ctx, cfg, x, y, w, h, elapsed, progress) {
   values.forEach((val, idx) => {
     const barStart = idx * stagger;
     const barElapsed = Math.max(0, elapsed - barStart);
-    const barNormTime = Math.min(1.0, barElapsed / 0.45);
+    // If paused and at rest, show full preview (1.0)
+    const activeBarNorm = isPlaying ? Math.min(1.0, barElapsed / 0.45) : (progress > 0 ? Math.min(1.0, barElapsed / 0.45) : 1.0);
 
     // Snappy spring overshoot ease: rises to 105% then settles to 100%
     let barEase = 0;
-    if (barNormTime > 0) {
-      barEase = 1 + 2.7 * Math.pow(barNormTime - 1, 3) + 1.7 * Math.pow(barNormTime - 1, 2);
+    if (activeBarNorm > 0) {
+      barEase = 1 + 2.7 * Math.pow(activeBarNorm - 1, 3) + 1.7 * Math.pow(activeBarNorm - 1, 2);
     }
     barEase = Math.min(1.06, Math.max(0, barEase));
 
@@ -7155,7 +7474,8 @@ function drawLiquidPyramidChart(ctx, cfg, x, y, w, h, elapsed, progress) {
   ctx.clip();
 
   // Wave calculation: liquid rises upward from bottom to top
-  const riseProg = Math.min(1.0, elapsed / 1.5);
+  const activeRise = isPlaying ? Math.min(1.0, elapsed / 1.5) : (elapsed > 0 ? Math.min(1.0, elapsed / 1.5) : 1.0);
+  const riseProg = activeRise;
   const waveTargetY = activeBotY - (activeBotY - topY) * riseProg;
   const waveAmp = (1 - riseProg * 0.4) * (cfg.waveAgitation || 14);
   const waveFreq = 0.045;
@@ -7213,6 +7533,198 @@ function drawLiquidPyramidChart(ctx, cfg, x, y, w, h, elapsed, progress) {
   ctx.restore();
 }
 
+// 4. Vox / Magnates Style Radial Donut & Pie Segment Chart
+function drawRadialDonutChart(ctx, cfg, x, y, w, h, elapsed, progress) {
+  const activeProg = isPlaying ? progress : (progress > 0 ? progress : 1.0);
+  const percent = cfg.percent !== undefined ? cfg.percent : 78;
+  const primaryColor = cfg.color || '#00f0ff';
+  const label = cfg.metricLabel || 'MARKET DOMINANCE';
+  const sublabel = cfg.metricSublabel || 'Share of total category revenue';
+
+  const centerX = x + w * 0.32;
+  const centerY = y + h * 0.5;
+  const radius = Math.min(w * 0.22, h * 0.38);
+  const strokeW = Math.max(16, radius * 0.24);
+
+  // Background track ring
+  ctx.save();
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.lineWidth = strokeW;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Animated sweep arc
+  const startAngle = -Math.PI / 2;
+  const currentPercent = percent * activeProg;
+  const endAngle = startAngle + (Math.PI * 2 * (currentPercent / 100));
+
+  ctx.strokeStyle = primaryColor;
+  if (cfg.glow) {
+    ctx.shadowColor = primaryColor;
+    ctx.shadowBlur = 20;
+  }
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+  ctx.stroke();
+
+  // Center percentage counter text
+  ctx.restore();
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '900 44px "Inter", "Oswald", sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(`${Math.round(currentPercent)}%`, centerX, centerY - 4);
+
+  ctx.font = '700 13px "Inter", sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+  ctx.fillText('CONFIRMED', centerX, centerY + 28);
+
+  // Right info panel / legend
+  const infoX = x + w * 0.58;
+  const infoY = y + h * 0.34;
+  ctx.textAlign = 'left';
+  ctx.font = '900 24px "Inter", "Oswald", sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(label, infoX, infoY);
+
+  ctx.font = '500 15px "Inter", sans-serif';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+  ctx.fillText(sublabel, infoX, infoY + 30);
+
+  // Legend pill
+  ctx.fillStyle = hexToRgba(primaryColor, 0.16);
+  ctx.strokeStyle = primaryColor;
+  ctx.lineWidth = 1.5;
+  if (ctx.roundRect) ctx.roundRect(infoX, infoY + 60, 160, 36, 6);
+  else ctx.rect(infoX, infoY + 60, 160, 36);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 14px "Inter", sans-serif';
+  ctx.fillText(`+${Math.round(currentPercent * 1.4)}% vs Prev Year`, infoX + 14, infoY + 83);
+  ctx.restore();
+}
+
+// 5. Leaderboard / Horizontal Bar Comparison (Vox Ranking Style)
+function drawLeaderboardChart(ctx, cfg, x, y, w, h, elapsed, progress) {
+  const activeProg = isPlaying ? progress : (progress > 0 ? progress : 1.0);
+  const items = cfg.items || [
+    { name: 'Google Search Ads', val: 92, color: '#00f0ff' },
+    { name: 'Meta Instagram Ads', val: 74, color: '#76ff03' },
+    { name: 'TikTok Paid Reach', val: 58, color: '#ffd000' },
+    { name: 'YouTube TrueView', val: 42, color: '#ff334b' }
+  ];
+
+  const maxVal = Math.max(...items.map(i => i.val)) * 1.1 || 100;
+  const rowCount = items.length;
+  const rowH = Math.min(48, (h - 20) / rowCount);
+  const barMaxW = w - 260;
+
+  items.forEach((item, idx) => {
+    const rowY = y + 15 + idx * (rowH + 12);
+    const staggerProg = isPlaying ? Math.min(1.0, Math.max(0, (elapsed - idx * 0.1) / 0.5)) : activeProg;
+    const currentW = (item.val / maxVal) * barMaxW * (1 - Math.pow(1 - staggerProg, 3));
+
+    ctx.save();
+    // Name Label
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.font = '700 15px "Inter", sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`${idx + 1}. ${item.name}`, x + 10, rowY + rowH / 2);
+
+    // Track Background
+    const barStartX = x + 200;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+    if (ctx.roundRect) ctx.roundRect(barStartX, rowY + 4, barMaxW, rowH - 8, 4);
+    else ctx.rect(barStartX, rowY + 4, barMaxW, rowH - 8);
+    ctx.fill();
+
+    // Filled Bar
+    if (currentW > 2) {
+      ctx.fillStyle = item.color || cfg.color || '#00f0ff';
+      if (cfg.glow) {
+        ctx.shadowColor = item.color || cfg.color || '#00f0ff';
+        ctx.shadowBlur = 12;
+      }
+      if (ctx.roundRect) ctx.roundRect(barStartX, rowY + 4, currentW, rowH - 8, 4);
+      else ctx.rect(barStartX, rowY + 4, currentW, rowH - 8);
+      ctx.fill();
+    }
+
+    // Number score pill
+    ctx.textAlign = 'left';
+    ctx.font = '800 15px "Inter", monospace';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 0;
+    ctx.fillText(`${Math.round(item.val * staggerProg)}%`, barStartX + currentW + 12, rowY + rowH / 2);
+    ctx.restore();
+  });
+}
+
+// 6. Conversion Funnel Chart (Alex Hormozi / Marketing Stage Dropoff)
+function drawConversionFunnelChart(ctx, cfg, x, y, w, h, elapsed, progress) {
+  const activeProg = isPlaying ? progress : (progress > 0 ? progress : 1.0);
+  const stages = cfg.stages || [
+    { label: 'Impressions', count: '100,000', drop: '100%' },
+    { label: 'Clicks', count: '12,400', drop: '12.4%' },
+    { label: 'Opt-Ins', count: '3,800', drop: '3.8%' },
+    { label: 'Customers', count: '940', drop: '0.94%' }
+  ];
+
+  const n = stages.length;
+  const stageH = (h - 20) / n;
+  const topW = w * 0.85;
+  const botW = w * 0.28;
+  const primaryColor = cfg.color || '#00f0ff';
+
+  stages.forEach((st, idx) => {
+    const stageElapsed = isPlaying ? Math.min(1.0, Math.max(0, (elapsed - idx * 0.12) / 0.45)) : activeProg;
+    const ease = 1 - Math.pow(1 - stageElapsed, 3);
+    const rT = idx / n;
+    const rB = (idx + 1) / n;
+
+    const currentW1 = topW - (topW - botW) * rT;
+    const currentW2 = topW - (topW - botW) * rB;
+
+    const cX = x + w / 2;
+    const y1 = y + 10 + idx * stageH;
+    const y2 = y1 + stageH - 4;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(cX - (currentW1 / 2) * ease, y1);
+    ctx.lineTo(cX + (currentW1 / 2) * ease, y1);
+    ctx.lineTo(cX + (currentW2 / 2) * ease, y2);
+    ctx.lineTo(cX - (currentW2 / 2) * ease, y2);
+    ctx.closePath();
+
+    const alpha = 0.25 + (idx / n) * 0.65;
+    ctx.fillStyle = hexToRgba(primaryColor, alpha * ease);
+    ctx.strokeStyle = primaryColor;
+    ctx.lineWidth = 1.5;
+    if (cfg.glow && idx === n - 1) {
+      ctx.shadowColor = primaryColor;
+      ctx.shadowBlur = 18;
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    if (ease > 0.5) {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 15px "Inter", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${st.label}: ${st.count} (${st.drop})`, cX, (y1 + y2) / 2);
+    }
+    ctx.restore();
+  });
+}
+
 // Helper: Hex color to RGBA string
 function hexToRgba(hex, alpha) {
   if (!hex || hex[0] !== '#') return `rgba(255, 255, 255, ${alpha})`;
@@ -7238,6 +7750,8 @@ function renderChartsTemplatesPanel() {
   PREBUILT_CHART_TEMPLATES.forEach(tpl => {
     const card = document.createElement('div');
     card.className = 'chart-template-card';
+
+    card.draggable = true;
 
     let miniPreviewSvg = '';
     if (tpl.type === 'area') {
@@ -7266,6 +7780,32 @@ function renderChartsTemplatesPanel() {
           <path d="M50,4 L39,24 Q45,21 50,24 T61,24 Z" fill="#b4ff00" filter="drop-shadow(0 0 6px #b4ff00)" />
         </svg>
       `;
+    } else if (tpl.type === 'donut') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <circle cx="50" cy="25" r="18" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6"/>
+          <circle cx="50" cy="25" r="18" fill="none" stroke="#00f0ff" stroke-width="6" stroke-dasharray="113" stroke-dashoffset="26" stroke-linecap="round" transform="rotate(-90 50 25)"/>
+          <text x="50" y="29" fill="#ffffff" font-size="10" font-weight="900" text-anchor="middle" font-family="sans-serif">78%</text>
+        </svg>
+      `;
+    } else if (tpl.type === 'leaderboard') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <rect x="15" y="8" width="70" height="6" rx="2" fill="#00f0ff"/>
+          <rect x="15" y="18" width="54" height="6" rx="2" fill="#ffd000"/>
+          <rect x="15" y="28" width="40" height="6" rx="2" fill="#ff334b"/>
+          <rect x="15" y="38" width="28" height="6" rx="2" fill="rgba(255,255,255,0.4)"/>
+        </svg>
+      `;
+    } else if (tpl.type === 'funnel') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <polygon points="12,6 88,6 74,16 26,16" fill="rgba(0, 240, 255, 0.4)"/>
+          <polygon points="26,18 74,18 63,28 37,28" fill="rgba(0, 240, 255, 0.6)"/>
+          <polygon points="37,30 63,30 55,40 45,40" fill="rgba(0, 240, 255, 0.8)"/>
+          <polygon points="45,42 55,42 52,48 48,48" fill="#00f0ff"/>
+        </svg>
+      `;
     }
 
     card.innerHTML = `
@@ -7281,6 +7821,15 @@ function renderChartsTemplatesPanel() {
         <div class="chart-template-desc">${tpl.desc}</div>
       </div>
     `;
+
+    card.addEventListener('dragstart', (e) => {
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('application/json', JSON.stringify({
+        isChart: true,
+        name: tpl.name,
+        chartConfig: tpl.config
+      }));
+    });
 
     card.addEventListener('click', () => {
       addChartClipToTimeline(tpl.config, currentTime, 6.0);
@@ -7507,11 +8056,137 @@ function closeChartCreatorModal() {
   }
 }
 
-// Live interactive modal preview rendering loop
+// Live interactive modal preview rendering loop & interactive node editing
+let isModalExpanded = false;
+let modalInteractiveNodes = []; // [{ x, y, r, idx, val, series: 1|2 }]
+let draggingModalNodeIndex = -1;
+let draggingModalNodeSeries = 1;
+
+function setupModalDirectCanvasInteraction() {
+  const canvas = document.getElementById('modal-chart-preview-canvas');
+  const tooltip = document.getElementById('chart-drag-tooltip');
+  if (!canvas || canvas.dataset.hasInteractListeners) return;
+  canvas.dataset.hasInteractListeners = 'true';
+
+  function getCanvasCoords(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+      clientX: e.clientX,
+      clientY: e.clientY
+    };
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    const coords = getCanvasCoords(e);
+    // Find closest node within radius + 10
+    const hit = modalInteractiveNodes.find(node => {
+      const dx = node.x - coords.x;
+      const dy = node.y - coords.y;
+      return Math.sqrt(dx * dx + dy * dy) <= (node.r + 12);
+    });
+
+    if (hit) {
+      draggingModalNodeIndex = hit.idx;
+      draggingModalNodeSeries = hit.series || 1;
+      if (tooltip) {
+        tooltip.style.display = 'block';
+        tooltip.textContent = `Node ${hit.idx + 1}: ${Math.round(hit.val)}`;
+        const rect = canvas.getBoundingClientRect();
+        tooltip.style.left = `${e.clientX - rect.left + 10}px`;
+        tooltip.style.top = `${e.clientY - rect.top - 25}px`;
+      }
+    }
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (draggingModalNodeIndex < 0) {
+      // Hover feedback
+      if (canvas.offsetParent !== null) {
+        const coords = getCanvasCoords(e);
+        const hit = modalInteractiveNodes.find(node => {
+          const dx = node.x - coords.x;
+          const dy = node.y - coords.y;
+          return Math.sqrt(dx * dx + dy * dy) <= (node.r + 12);
+        });
+        canvas.style.cursor = hit ? 'ns-resize' : 'crosshair';
+      }
+      return;
+    }
+
+    const coords = getCanvasCoords(e);
+    const dataInput = document.getElementById('modal-chart-data');
+    if (!dataInput) return;
+
+    // Map y coordinate back to value
+    const lastNode = modalInteractiveNodes.find(n => n.idx === draggingModalNodeIndex && (n.series || 1) === draggingModalNodeSeries);
+    if (!lastNode || !lastNode.baselineY || !lastNode.chartHeight || !lastNode.maxVal) return;
+
+    const relY = Math.max(0, Math.min(lastNode.chartHeight, lastNode.baselineY - coords.y));
+    const newVal = Math.max(1, Math.round((relY / lastNode.chartHeight) * lastNode.maxVal));
+
+    if (selectedModalType === 'bar' || selectedModalType === 'area') {
+      const vals = dataInput.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      if (vals[draggingModalNodeIndex] !== undefined) {
+        vals[draggingModalNodeIndex] = newVal;
+        dataInput.value = vals.join(', ');
+      }
+    }
+
+    if (tooltip) {
+      const rect = canvas.getBoundingClientRect();
+      tooltip.style.display = 'block';
+      tooltip.textContent = `Val: ${newVal}`;
+      tooltip.style.left = `${e.clientX - rect.left + 12}px`;
+      tooltip.style.top = `${e.clientY - rect.top - 25}px`;
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (draggingModalNodeIndex >= 0) {
+      draggingModalNodeIndex = -1;
+      if (tooltip) tooltip.style.display = 'none';
+      modalPreviewStartTime = performance.now() - 5000; // Keep curve fully drawn
+    }
+  });
+
+  // Double click node to prompt exact numeric edit
+  canvas.addEventListener('dblclick', (e) => {
+    const coords = getCanvasCoords(e);
+    const hit = modalInteractiveNodes.find(node => {
+      const dx = node.x - coords.x;
+      const dy = node.y - coords.y;
+      return Math.sqrt(dx * dx + dy * dy) <= (node.r + 14);
+    });
+
+    if (hit) {
+      const promptVal = prompt(`Edit value for Point #${hit.idx + 1}:`, Math.round(hit.val));
+      if (promptVal !== null) {
+        const num = parseFloat(promptVal);
+        if (!isNaN(num)) {
+          const dataInput = document.getElementById('modal-chart-data');
+          if (dataInput) {
+            const vals = dataInput.value.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+            if (vals[hit.idx] !== undefined) {
+              vals[hit.idx] = Math.max(0, Math.round(num));
+              dataInput.value = vals.join(', ');
+              modalPreviewStartTime = performance.now() - 5000;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
 function startModalPreviewLoop() {
   if (modalPreviewAnimFrame) {
     cancelAnimationFrame(modalPreviewAnimFrame);
   }
+  setupModalDirectCanvasInteraction();
   modalPreviewStartTime = performance.now();
 
   function renderModalPreview() {
@@ -7562,41 +8237,103 @@ function startModalPreviewLoop() {
     const progress = Math.min(1.0, elapsedSec / durSec);
     const easeOut = 1 - Math.pow(1 - progress, 3);
 
-    // Draw container card
+    // Draw container card with generous aesthetic bounds
     pCtx.save();
-    pCtx.fillStyle = 'rgba(12, 14, 20, 0.96)';
-    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    pCtx.fillStyle = '#080a10';
+    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
     pCtx.lineWidth = 1.5;
     pCtx.beginPath();
-    pCtx.roundRect(12, 10, pw - 24, ph - 20, 8);
+    pCtx.roundRect(8, 6, pw - 16, ph - 12, 10);
     pCtx.fill();
     pCtx.stroke();
 
-    // Title
+    // Chart Title Header
     pCtx.font = '800 16px "Inter", "Oswald", sans-serif';
     pCtx.fillStyle = '#ffffff';
-    pCtx.fillText(previewCfg.title || 'PREVIEW', 26, 32);
+    pCtx.fillText(previewCfg.title || 'PREVIEW', 24, 28);
 
-    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+    pCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     pCtx.lineWidth = 1;
     pCtx.beginPath();
-    pCtx.moveTo(26, 40);
-    pCtx.lineTo(pw - 26, 40);
+    pCtx.moveTo(24, 36);
+    pCtx.lineTo(pw - 24, 36);
     pCtx.stroke();
     pCtx.restore();
 
-    // Render chart graphics
-    const chartX = 26;
-    const chartY = 50;
-    const chartW = pw - 52;
-    const chartH = ph - 68;
+    // Render chart graphics with padded boundaries so bottom axis & top peak never clip
+    const chartX = 32;
+    const chartY = 52;
+    const chartW = pw - 64;
+    const chartH = ph - 80;
+
+    modalInteractiveNodes = []; // Reset node detection for this frame
 
     if (previewCfg.type === 'bar') {
       drawStaggeredBarChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+      // Track bar interactive drag zones
+      const vals = previewCfg.values || [];
+      const maxVal = Math.max(...vals) * 1.15 || 100;
+      const stepX = chartW / vals.length;
+      vals.forEach((v, idx) => {
+        const bx = chartX + idx * stepX + stepX * 0.15;
+        const bw = stepX * 0.7;
+        const bh = (v / maxVal) * (chartH - 25);
+        const by = chartY + chartH - 20 - bh;
+        modalInteractiveNodes.push({
+          x: bx + bw / 2,
+          y: by,
+          r: 9,
+          idx,
+          val: v,
+          baselineY: chartY + chartH - 20,
+          chartHeight: chartH - 25,
+          maxVal
+        });
+      });
     } else if (previewCfg.type === 'pyramid') {
       drawLiquidPyramidChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+    } else if (previewCfg.type === 'donut') {
+      drawRadialDonutChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+    } else if (previewCfg.type === 'leaderboard') {
+      drawLeaderboardChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+    } else if (previewCfg.type === 'funnel') {
+      drawConversionFunnelChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
     } else {
       drawDynamicAreaChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress, easeOut);
+      // Track curve node points for direct dragging & double-click edits
+      const series1 = previewCfg.series1 || [];
+      const maxVal = Math.max(...series1, ...(previewCfg.isDual ? previewCfg.series2 : [0])) * 1.15 || 100;
+      const n = series1.length;
+      const stepX = chartW / (n - 1);
+      const baselineY = chartY + chartH - 20;
+      const chartHeight = chartH - 28;
+
+      series1.forEach((val, idx) => {
+        const nx = chartX + idx * stepX;
+        const ny = baselineY - (val / maxVal) * chartHeight;
+        modalInteractiveNodes.push({
+          x: nx,
+          y: ny,
+          r: 8,
+          idx,
+          val,
+          series: 1,
+          baselineY,
+          chartHeight,
+          maxVal
+        });
+
+        // Draw interactive ring on node when hovered or dragged
+        if (draggingModalNodeIndex === idx) {
+          pCtx.save();
+          pCtx.strokeStyle = '#00f0ff';
+          pCtx.lineWidth = 2.5;
+          pCtx.beginPath();
+          pCtx.arc(nx, ny, 11, 0, Math.PI * 2);
+          pCtx.stroke();
+          pCtx.restore();
+        }
+      });
     }
 
     modalPreviewAnimFrame = requestAnimationFrame(renderModalPreview);
@@ -7637,9 +8374,47 @@ function initChartsAndInfographicsEngine() {
     modalPreviewStartTime = performance.now();
   });
 
+  // Modal Expand / Full Screen Toggle button
+  const btnModalExpand = document.getElementById('btn-chart-modal-expand');
+  const modalBox = document.querySelector('#chart-creator-modal .vector-modal-box');
+  const previewBox = document.getElementById('chart-preview-container-box');
+  const expandText = document.getElementById('chart-modal-expand-text');
+  const previewCanvas = document.getElementById('modal-chart-preview-canvas');
+
+  if (btnModalExpand && modalBox) {
+    btnModalExpand.addEventListener('click', () => {
+      isModalExpanded = !isModalExpanded;
+      modalBox.classList.toggle('chart-modal-expanded', isModalExpanded);
+      previewBox?.classList.toggle('is-expanded', isModalExpanded);
+
+      if (isModalExpanded) {
+        expandText.textContent = 'Exit Full Screen';
+        btnModalExpand.classList.remove('btn-chart-expand-pulse');
+        if (previewCanvas) {
+          previewCanvas.width = 1200;
+          previewCanvas.height = 420;
+        }
+      } else {
+        expandText.textContent = 'Expand / Full Screen';
+        btnModalExpand.classList.add('btn-chart-expand-pulse');
+        if (previewCanvas) {
+          previewCanvas.width = 800;
+          previewCanvas.height = 340;
+        }
+      }
+      modalPreviewStartTime = performance.now();
+    });
+  }
+
   // Close modal listeners
-  document.getElementById('btn-close-chart-modal')?.addEventListener('click', closeChartCreatorModal);
-  document.getElementById('btn-cancel-chart-modal')?.addEventListener('click', closeChartCreatorModal);
+  document.getElementById('btn-close-chart-modal')?.addEventListener('click', () => {
+    if (isModalExpanded) btnModalExpand?.click();
+    closeChartCreatorModal();
+  });
+  document.getElementById('btn-cancel-chart-modal')?.addEventListener('click', () => {
+    if (isModalExpanded) btnModalExpand?.click();
+    closeChartCreatorModal();
+  });
 
   // Modal Chart Type Cards
   document.querySelectorAll('.chart-type-card').forEach(card => {
@@ -7663,6 +8438,18 @@ function initChartsAndInfographicsEngine() {
         if (dataLabel) dataLabel.textContent = 'Apex Tier Headline Text';
         if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'BUYER HIERARCHY';
         if (dataInput && !modalEditingClip) dataInput.value = '3% BUYING NOW';
+      } else if (selectedModalType === 'donut') {
+        if (dataLabel) dataLabel.textContent = 'Percentage Value (0-100)';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'MARKET DOMINANCE';
+        if (dataInput && !modalEditingClip) dataInput.value = '78';
+      } else if (selectedModalType === 'leaderboard') {
+        if (dataLabel) dataLabel.textContent = 'Leaderboard Items (Format: Name:Value:Delta, comma separated)';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'GLOBAL RANKINGS';
+        if (dataInput && !modalEditingClip) dataInput.value = 'Veritasium:28M:+4.2%, Vox:18M:+1.8%, Magnates:12M:+6.5%, Kurzgesagt:24M:+2.1%';
+      } else if (selectedModalType === 'funnel') {
+        if (dataLabel) dataLabel.textContent = 'Funnel Stages (Format: Stage:Count:Drop%, comma separated)';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'CONVERSION PIPELINE';
+        if (dataInput && !modalEditingClip) dataInput.value = 'Impressions:100K:100%, Clicks:12.4K:12.4%, Opt-Ins:3.8K:3.8%, Customers:940:0.94%';
       }
       modalPreviewStartTime = performance.now();
     });
@@ -7744,6 +8531,51 @@ function initChartsAndInfographicsEngine() {
       const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
       config.values = vals.length > 0 ? vals : [10, 25, 40, 75, 50];
       config.labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].slice(0, config.values.length);
+    } else if (selectedModalType === 'donut') {
+      const p = parseFloat(rawData.trim());
+      config.percent = !isNaN(p) ? Math.min(100, Math.max(0, p)) : 78;
+      config.metricLabel = title;
+      config.metricSublabel = 'Share of total category revenue';
+    } else if (selectedModalType === 'leaderboard') {
+      // Parse format Name:Value:Delta
+      const parts = rawData.split(',').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 0 && parts[0].includes(':')) {
+        config.channels = parts.map((str, idx) => {
+          const segs = str.split(':');
+          const channelColors = ['#00f0ff', '#ffd000', '#ff334b', '#76ff03', '#ffffff'];
+          return {
+            name: segs[0]?.trim() || `Channel ${idx + 1}`,
+            value: segs[1]?.trim() || '10M',
+            delta: segs[2]?.trim() || '+5%',
+            color: channelColors[idx % channelColors.length]
+          };
+        });
+      } else {
+        config.channels = [
+          { name: 'Veritasium', value: '28M Subs', delta: '+4.2% YoY', color: '#00f0ff' },
+          { name: 'Vox', value: '18M Subs', delta: '+1.8% YoY', color: '#ffd000' },
+          { name: 'Magnates Media', value: '12M Subs', delta: '+6.5% YoY', color: '#ff334b' }
+        ];
+      }
+    } else if (selectedModalType === 'funnel') {
+      const parts = rawData.split(',').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 0 && parts[0].includes(':')) {
+        config.stages = parts.map(str => {
+          const segs = str.split(':');
+          return {
+            label: segs[0]?.trim() || 'Stage',
+            count: segs[1]?.trim() || '1,000',
+            drop: segs[2]?.trim() || '10%'
+          };
+        });
+      } else {
+        config.stages = [
+          { label: 'Impressions', count: '100,000', drop: '100%' },
+          { label: 'Clicks', count: '12,400', drop: '12.4%' },
+          { label: 'Opt-Ins', count: '3,800', drop: '3.8%' },
+          { label: 'Customers', count: '940', drop: '0.94%' }
+        ];
+      }
     } else {
       const vals = rawData.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
       config.series1 = vals.length > 0 ? vals : [20, 50, 40, 80, 60, 30, 15];

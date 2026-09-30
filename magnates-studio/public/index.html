@@ -63,14 +63,26 @@
           <span class="upload-hint">or drag & drop files here</span>
         </label>
 
-        <div class="media-tabs">
-          <button class="tab-btn active" data-tab="all">All</button>
-          <button class="tab-btn" data-tab="charts" id="tab-btn-charts" title="Animated Charts & Infographics">Charts</button>
-          <button class="tab-btn" data-tab="icons" id="tab-btn-icons" title="Magnates Vector Icons & Badges">Icons</button>
-          <button class="tab-btn" data-tab="layers" id="tab-btn-layers" title="Inspect & Manage Visual Canvas Layers">Layers</button>
-          <button class="tab-btn" data-tab="audio">Audio</button>
-          <button class="tab-btn" data-tab="video">Videos</button>
-          <button class="tab-btn" data-tab="images">Images</button>
+        <div class="media-nav-container">
+          <div class="media-category-select-wrap">
+            <select id="media-category-dropdown" class="media-category-select">
+              <option value="all">📁 All Media Files</option>
+              <option value="charts">📊 Animated Charts & Infographics</option>
+              <option value="icons">⭐ Vector Icons & Stickers</option>
+              <option value="layers">📑 Visual Canvas Layers</option>
+              <option value="images">🖼️ Images & Photos</option>
+              <option value="video">🎬 Video Clips</option>
+              <option value="audio">🎵 Audio & Voiceovers</option>
+            </select>
+            <svg class="media-category-arrow" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+          </div>
+          <div class="media-quick-pills">
+            <button type="button" class="media-pill-btn active" data-pill="all">All</button>
+            <button type="button" class="media-pill-btn" data-pill="charts">Charts</button>
+            <button type="button" class="media-pill-btn" data-pill="icons">Icons</button>
+            <button type="button" class="media-pill-btn" data-pill="layers">Layers</button>
+            <button type="button" class="media-pill-btn" data-pill="images">Images</button>
+          </div>
         </div>
         <div class="media-list" id="media-list">
           <div class="loading-spinner">No media loaded</div>
@@ -457,59 +469,79 @@
         <!-- Timeline Section -->
         <div class="timeline-container">
           <div class="timeline-header">
-            <div class="timeline-tools">
-              <button class="btn-tool active" id="tool-select">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
-                Select
-              </button>
-              <button class="btn-tool" id="tool-split">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64zM6 8c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm0 12c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm6-7.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5.5.22.5.5-.22.5-.5.5zM19 3l-6 6 2 2 7-7V3h-3z"/></svg>
-                Split Clip
-              </button>
-              <button class="btn-tool" id="tool-delete">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                Delete
-              </button>
-              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
-              <button class="btn-tool" id="tool-snap-zoom" title="Click on image or screen to add snappy camera Punch Zoom">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
-                Punch Zoom
-              </button>
-              <button class="btn-tool" id="tool-loupe" title="Click on image to add documentary Magnifying Loupe / Circular Callout">
-                <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
-                Loupe Callout
-              </button>
-              <button class="btn-tool" id="tool-draw" title="Draw on Screen (Hold click anywhere on canvas for Quick Pen Radial Menu)">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                Draw / Pen
-              </button>
-              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
-              <button class="btn-tool" id="tool-add-chart" title="Add Animated Chart & Infographic">
-                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-                Charts
-              </button>
-              <button class="btn-tool" id="tool-add-icon" title="Add Vector Sticker / Icon">
-                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                Icons
-              </button>
-              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
-              <button class="btn-tool" id="tool-undo" title="Undo Action (Ctrl+Z)">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.7 10.79 16.99 8 12.5 8z"/></svg>
-                Undo
-              </button>
-              <button class="btn-tool" id="tool-redo" title="Redo Action (Ctrl+Y)">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.49 0-8.2 2.79-9.57 7.22l2.37.78c1.05-3.19 4.06-5.5 7.6-5.5 1.96 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
-                Redo
-              </button>
-              <button class="btn-tool" id="tool-reset-timeline" title="Reset Timeline to Default State">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-                Reset
-              </button>
-              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
-              <button class="btn-tool" id="tool-toggle-expand" title="Expand Full Workspace / Hide Sidebars">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                <span id="expand-btn-text">Expand Full</span>
-              </button>
+            <div class="timeline-tools timeline-tools-compact">
+              <!-- Group 1: Edit Tools Pill -->
+              <div class="tool-group-pill">
+                <button class="btn-tool active" id="tool-select" title="Selection Arrow (V)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
+                  <span>Select</span>
+                </button>
+                <button class="btn-tool" id="tool-split" title="Razor Split Clip (S)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+                  <span>Split</span>
+                </button>
+                <button class="btn-tool" id="tool-delete" title="Delete Clip (Del)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                  <span>Delete</span>
+                </button>
+              </div>
+
+              <!-- Group 2: FX & Annotations Dropdown -->
+              <div class="tool-dropdown-wrap" id="wrap-tool-fx">
+                <button type="button" class="tool-dropdown-btn" id="btn-dropdown-fx" title="Camera Zooms, Loupe Callouts & Inking">
+                  <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ff334b;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <span>FX & Draw ▾</span>
+                </button>
+                <div class="tool-dropdown-menu" id="menu-tool-fx">
+                  <button type="button" class="tool-menu-item" id="tool-snap-zoom">
+                    <svg class="ui-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
+                    <span>Punch Zoom</span>
+                  </button>
+                  <button type="button" class="tool-menu-item" id="tool-loupe">
+                    <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    <span>Loupe Callout</span>
+                  </button>
+                  <button type="button" class="tool-menu-item" id="tool-draw">
+                    <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                    <span>Freehand Inking</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Group 3: Elements Dropdown (Charts & Icons) -->
+              <div class="tool-dropdown-wrap" id="wrap-tool-elements">
+                <button type="button" class="tool-dropdown-btn" id="btn-dropdown-elements" title="Add Charts & Icons">
+                  <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                  <span>Elements ▾</span>
+                </button>
+                <div class="tool-dropdown-menu" id="menu-tool-elements">
+                  <button type="button" class="tool-menu-item" id="tool-add-chart">
+                    <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                    <span>Animated Chart</span>
+                  </button>
+                  <button type="button" class="tool-menu-item" id="tool-add-icon">
+                    <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>Vector Icon</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Group 4: History & Workspace Expand -->
+              <div class="tool-group-pill">
+                <button class="btn-tool" id="tool-undo" title="Undo (Ctrl+Z)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.7 10.79 16.99 8 12.5 8z"/></svg>
+                </button>
+                <button class="btn-tool" id="tool-redo" title="Redo (Ctrl+Y)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.49 0-8.2 2.79-9.57 7.22l2.37.78c1.05-3.19 4.06-5.5 7.6-5.5 1.96 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                </button>
+                <button class="btn-tool" id="tool-reset-timeline" title="Reset Timeline">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                </button>
+                <button class="btn-tool" id="tool-toggle-expand" title="Expand Full Workspace / Hide Sidebars">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                  <span id="expand-btn-text">Expand</span>
+                </button>
+              </div>
             </div>
             <div class="zoom-controls">
               <span>Zoom</span>
@@ -517,76 +549,115 @@
             </div>
           </div>
 
-          <div class="timeline-ruler-container" id="timeline-ruler-container">
-            <div class="ruler-label">
-              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.71L11 12.41V7h2v4.59l3.71 3.71-1.42 1.41z"/></svg>
-              <span>Time</span>
-            </div>
-            <div class="timeline-ruler" id="timeline-ruler">
-              <canvas id="ruler-canvas" height="24"></canvas>
-            </div>
-          </div>
+          <!-- Two-column timeline body: fixed labels | scrollable clips -->
+          <div class="timeline-body" id="timeline-body">
 
-          <div class="timeline-tracks" id="timeline-tracks">
-            <!-- Playhead line -->
-            <div class="playhead" id="playhead">
-              <div class="playhead-handle"></div>
-            </div>
+            <!-- LEFT: Fixed track label column -->
+            <div class="timeline-label-col" id="timeline-label-col">
+              <!-- "Time" header cell aligns with the ruler -->
+              <div class="ruler-label">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm3.3 14.71L11 12.41V7h2v4.59l3.71 3.71-1.42 1.41z"/></svg>
+                <span>Time</span>
+              </div>
 
-            <!-- Track 1: Text / Typography -->
-            <div class="track" id="track-text" data-track-type="text">
+              <!-- Label: Kinetic Text -->
               <div class="track-label">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
                 Kinetic Text
               </div>
-              <div class="track-content" id="content-text"></div>
-            </div>
 
-            <!-- Track 2: Animated Charts & Infographics -->
-            <div class="track chart-track" id="track-chart" data-track-type="chart">
+              <!-- Label: Charts / FX -->
               <div class="track-label" style="color: #00f0ff;">
                 <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
                 Charts / FX
               </div>
-              <div class="track-content" id="content-chart"></div>
-            </div>
 
-            <!-- Track 3: Images / Stills -->
-            <div class="track" id="track-image" data-track-type="image">
+              <!-- Label: Images -->
               <div class="track-label">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                 Images
               </div>
-              <div class="track-content" id="content-image"></div>
-            </div>
 
-            <!-- Track 3: B-Roll & Visuals -->
-            <div class="track" id="track-video" data-track-type="video">
+              <!-- Label: Video Clips -->
               <div class="track-label">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
                 Video Clips
               </div>
-              <div class="track-content" id="content-video"></div>
-            </div>
 
-            <!-- Track 4: Audio / Voiceover -->
-            <div class="track audio-track" id="track-audio" data-track-type="voiceover">
+              <!-- Label: Voiceover -->
               <div class="track-label">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
                 Voiceover
               </div>
-              <div class="track-content" id="content-audio"></div>
-            </div>
 
-            <!-- Track 5: Music -->
-            <div class="track audio-track" id="track-music" data-track-type="music">
+              <!-- Label: BGM Music -->
               <div class="track-label">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
                 BGM Music
               </div>
-              <div class="track-content" id="content-music"></div>
+
+              <!-- Label: Background -->
+              <div class="track-label" style="color: #7c6fff;">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #7c6fff;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+                Background
+              </div>
             </div>
-          </div>
+
+            <!-- RIGHT: Scrollable ruler + clip tracks -->
+            <div class="timeline-scroll-col" id="timeline-scroll-col">
+
+              <!-- Ruler -->
+              <div class="timeline-ruler-container" id="timeline-ruler-container">
+                <div class="timeline-ruler" id="timeline-ruler">
+                  <canvas id="ruler-canvas" height="24"></canvas>
+                </div>
+              </div>
+
+              <!-- Tracks (clip content only) -->
+              <div class="timeline-tracks" id="timeline-tracks">
+                <!-- Playhead line -->
+                <div class="playhead" id="playhead">
+                  <div class="playhead-handle"></div>
+                </div>
+
+                <!-- Track 1: Text / Typography -->
+                <div class="track" id="track-text" data-track-type="text">
+                  <div class="track-content" id="content-text"></div>
+                </div>
+
+                <!-- Track 2: Animated Charts & Infographics -->
+                <div class="track chart-track" id="track-chart" data-track-type="chart">
+                  <div class="track-content" id="content-chart"></div>
+                </div>
+
+                <!-- Track 3: Images / Stills -->
+                <div class="track" id="track-image" data-track-type="image">
+                  <div class="track-content" id="content-image"></div>
+                </div>
+
+                <!-- Track 4: B-Roll & Visuals -->
+                <div class="track" id="track-video" data-track-type="video">
+                  <div class="track-content" id="content-video"></div>
+                </div>
+
+                <!-- Track 5: Audio / Voiceover -->
+                <div class="track audio-track" id="track-audio" data-track-type="voiceover">
+                  <div class="track-content" id="content-audio"></div>
+                </div>
+
+                <!-- Track 6: Music -->
+                <div class="track audio-track" id="track-music" data-track-type="music">
+                  <div class="track-content" id="content-music"></div>
+                </div>
+
+                <!-- Track 7: Background -->
+                <div class="track bg-track" id="track-background" data-track-type="background">
+                  <div class="track-content" id="content-background"></div>
+                </div>
+              </div>
+
+            </div><!-- /.timeline-scroll-col -->
+          </div><!-- /.timeline-body -->
         </div>
       </section>
 
@@ -595,6 +666,37 @@
         <div class="sidebar-header">
           <h3>Documentary FX</h3>
           <span class="subtitle">Magnates / Vox Style</span>
+        </div>
+
+        <!-- Stage Backdrop & Background Mode Selector -->
+        <div class="fx-card" id="card-stage-backdrop">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>
+              Stage Backdrop Mode
+            </h4>
+            <span class="badge" id="badge-bg-mode" style="color: #00f0ff;">Cyber Set</span>
+          </div>
+          <div class="fx-body">
+            <p class="hint-text">Switch canvas background anytime in timeline (Cyber Set, Solid Black, Transparent / No BG, or Solid Color).</p>
+            <div class="control-row">
+              <label>Backdrop Style</label>
+              <select id="stage-bg-mode-select" class="media-category-select" style="font-size: 11.5px; padding: 5px 8px;">
+                <option value="cyber_grid">Cyber Set (3D Grid & Studio Glow)</option>
+                <option value="solid_black">Solid Black (High-Contrast Charts)</option>
+                <option value="none">No Background / Transparent</option>
+                <option value="color">Solid Studio Tint</option>
+                <option value="vox_cream">Vox Cream Document Backdrop</option>
+              </select>
+            </div>
+            <div class="control-row" id="row-bg-color-picker" style="display: none; margin-top: 6px;">
+              <label>Custom Tint</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="stage-bg-color-picker" value="#0a0b0e" style="width: 38px; height: 26px; border: none; background: transparent; cursor: pointer;">
+                <span id="stage-bg-color-val" style="font-size: 11px; font-family: monospace; color: var(--text-muted);">#0a0b0e</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 3D Tech Grid -->
@@ -1228,15 +1330,25 @@
       <div class="vector-modal-body" style="padding: 16px 20px;">
         <!-- Live Visual Interactive Preview Canvas -->
         <div style="margin-bottom: 14px; position: relative;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 0;">Live Motion Graphic Preview:</label>
-            <button type="button" id="btn-chart-modal-replay" class="btn btn-secondary btn-sm" style="padding: 2px 8px; font-size: 10px; display: flex; align-items: center; gap: 4px;">
-              <svg class="ui-icon" viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-              Replay Animation
-            </button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 0;">Live Motion Graphic Preview:</label>
+              <span style="font-size: 10px; color: #00f0ff; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25); border-radius: 4px; padding: 1px 6px;">💡 Tap points to edit</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" id="btn-chart-modal-expand" class="btn btn-sm btn-chart-expand-pulse" style="padding: 3px 10px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px;" title="Expand Chart to Full Screen & Direct Precision Edit">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+                <span id="chart-modal-expand-text">Expand / Full Screen</span>
+              </button>
+              <button type="button" id="btn-chart-modal-replay" class="btn btn-secondary btn-sm" style="padding: 3px 8px; font-size: 10px; display: flex; align-items: center; gap: 4px;">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                Replay
+              </button>
+            </div>
           </div>
-          <div style="width: 100%; height: 170px; background: #07090e; border: 1px solid #1f2536; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);">
-            <canvas id="modal-chart-preview-canvas" width="640" height="280" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+          <div id="chart-preview-container-box" class="chart-preview-container" style="width: 100%; height: 210px; background: #07090e; border: 1px solid #1f2536; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);">
+            <canvas id="modal-chart-preview-canvas" class="chart-preview-canvas-interactive" width="800" height="340" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+            <div id="chart-drag-tooltip" class="chart-drag-tooltip" style="display: none;"></div>
           </div>
         </div>
 
@@ -1275,6 +1387,40 @@
             </div>
             <div class="chart-type-card-title">Liquid Pyramid Tier</div>
             <div class="chart-type-card-desc">Organic fluid wave slosh & neon apex</div>
+          </div>
+          <div class="chart-type-card" data-chart-type="donut">
+            <div class="chart-type-card-thumb">
+              <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                <circle cx="50" cy="25" r="16" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="5"/>
+                <circle cx="50" cy="25" r="16" fill="none" stroke="#00f0ff" stroke-width="5" stroke-dasharray="100" stroke-dashoffset="24" stroke-linecap="round" transform="rotate(-90 50 25)"/>
+              </svg>
+            </div>
+            <div class="chart-type-card-title">Radial Donut & Ring</div>
+            <div class="chart-type-card-desc">Circular progress sweep & stat callout</div>
+          </div>
+          <div class="chart-type-card" data-chart-type="leaderboard">
+            <div class="chart-type-card-thumb">
+              <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                <rect x="15" y="8" width="70" height="6" rx="2" fill="#00f0ff"/>
+                <rect x="15" y="18" width="54" height="6" rx="2" fill="#ffd000"/>
+                <rect x="15" y="28" width="40" height="6" rx="2" fill="#ff334b"/>
+                <rect x="15" y="38" width="28" height="6" rx="2" fill="rgba(255,255,255,0.4)"/>
+              </svg>
+            </div>
+            <div class="chart-type-card-title">Leaderboard Ranking</div>
+            <div class="chart-type-card-desc">Ranked comparison bars & channel metrics</div>
+          </div>
+          <div class="chart-type-card" data-chart-type="funnel">
+            <div class="chart-type-card-thumb">
+              <svg viewBox="0 0 100 50" style="width: 100%; height: 100%;">
+                <polygon points="12,6 88,6 74,16 26,16" fill="rgba(0, 240, 255, 0.4)"/>
+                <polygon points="26,18 74,18 63,28 37,28" fill="rgba(0, 240, 255, 0.6)"/>
+                <polygon points="37,30 63,30 55,40 45,40" fill="rgba(0, 240, 255, 0.8)"/>
+                <polygon points="45,42 55,42 52,48 48,48" fill="#00f0ff"/>
+              </svg>
+            </div>
+            <div class="chart-type-card-title">Conversion Funnel</div>
+            <div class="chart-type-card-desc">Multi-stage pipeline & drop-off %</div>
           </div>
         </div>
 
@@ -1329,6 +1475,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=29"></script>
+  <script src="js/app.js?v=31"></script>
 </body>
 </html>
