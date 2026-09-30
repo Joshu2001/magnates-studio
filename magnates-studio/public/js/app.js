@@ -1102,6 +1102,9 @@ function render(now) {
     drawMarqueeSelectionOverlay();
   }
 
+  // 6. Freehand Drawing Ink Overlay (Multi-brush vector strokes)
+  drawScreenInkOverlay(ctx);
+
   updateUI();
   requestAnimationFrame(render);
 }
@@ -2132,17 +2135,34 @@ document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
     btn.classList.add('active');
 
     // Update canvas cursor styling based on active tool
-    canvas.classList.remove('tool-snap-zoom', 'tool-loupe');
+    canvas.classList.remove('tool-snap-zoom', 'tool-loupe', 'tool-draw');
 
-    if (btn.id === 'tool-select') activeTool = 'select';
-    else if (btn.id === 'tool-split') activeTool = 'split';
-    else if (btn.id === 'tool-delete') activeTool = 'delete';
+    if (btn.id === 'tool-select') {
+      activeTool = 'select';
+      toggleDrawingDock(false);
+    }
+    else if (btn.id === 'tool-split') {
+      activeTool = 'split';
+      toggleDrawingDock(false);
+    }
+    else if (btn.id === 'tool-delete') {
+      activeTool = 'delete';
+      toggleDrawingDock(false);
+    }
     else if (btn.id === 'tool-snap-zoom') {
       activeTool = 'snap-zoom';
       canvas.classList.add('tool-snap-zoom');
+      toggleDrawingDock(false);
     } else if (btn.id === 'tool-loupe') {
       activeTool = 'loupe';
       canvas.classList.add('tool-loupe');
+      toggleDrawingDock(false);
+    } else if (btn.id === 'tool-draw') {
+      activeTool = 'draw';
+      canvas.classList.add('tool-draw');
+      toggleDrawingDock(true);
+      showTextTimingAlert('Drawing Mode Active! Hold click anywhere on screen for Pen quick-menu.', 'success');
+      setTimeout(() => showTextTimingAlert(''), 3000);
     }
   });
 });
@@ -4871,3 +4891,482 @@ function toggleMagnatesVectorEffect(clip) {
   setTimeout(() => showTextTimingAlert(''), 2500);
 }
 
+// ==================== ON-SCREEN DRAWING, HOLD RADIAL MENU & VECTOR ENGINE ====================
+let drawingStrokes = []; // Array of { id, penType, color, size, points: [{x, y, p}], opacity }
+let currentStroke = null;
+let currentPenType = 'pen'; // 'pen', 'brush', 'highlighter', 'arrow', 'eraser'
+let currentDrawColor = '#ff334b';
+let currentDrawSize = 6;
+let drawingUndoStack = [];
+
+// Hold / Long Press Timer state
+let canvasHoldTimer = null;
+let canvasHoldStartPt = null;
+let isHoldingOnCanvas = false;
+let radialMenuVisible = false;
+
+// 1. Toggle Drawing Dock Visibility
+function toggleDrawingDock(show) {
+  const dock = document.getElementById('canvas-drawing-dock');
+  const radial = document.getElementById('canvas-hold-radial-menu');
+  if (dock) dock.style.display = show ? 'flex' : 'none';
+  if (!show && radial) radial.style.display = 'none';
+}
+
+// 2. Ink Overlay Render Loop function
+function drawScreenInkOverlay(targetCtx) {
+  if (!drawingStrokes.length && !currentStroke) return;
+
+  targetCtx.save();
+
+  const allStrokes = currentStroke ? [...drawingStrokes, currentStroke] : drawingStrokes;
+
+  for (const stroke of allStrokes) {
+    if (!stroke.points || stroke.points.length < 2) {
+      if (stroke.points && stroke.points.length === 1) {
+        // Draw dot
+        const p = stroke.points[0];
+        targetCtx.fillStyle = stroke.color;
+        targetCtx.beginPath();
+        targetCtx.arc(p.x, p.y, stroke.size / 2, 0, Math.PI * 2);
+        targetCtx.fill();
+      }
+      continue;
+    }
+
+    targetCtx.strokeStyle = stroke.color;
+    targetCtx.lineWidth = stroke.size;
+    targetCtx.lineCap = 'round';
+    targetCtx.lineJoin = 'round';
+
+    if (stroke.penType === 'highlighter') {
+      targetCtx.globalAlpha = 0.42;
+      targetCtx.lineWidth = stroke.size * 2.2;
+      targetCtx.lineCap = 'square';
+    } else if (stroke.penType === 'brush') {
+      targetCtx.globalAlpha = 0.95;
+    } else if (stroke.penType === 'eraser') {
+      // In preview composite mode
+      targetCtx.strokeStyle = '#0a0b0e';
+      targetCtx.lineWidth = stroke.size * 2;
+    } else {
+      targetCtx.globalAlpha = 1.0;
+    }
+
+    if (stroke.penType === 'arrow') {
+      // Draw straight arrow from start point to end point
+      const p1 = stroke.points[0];
+      const p2 = stroke.points[stroke.points.length - 1];
+      drawVectorArrow(targetCtx, p1.x, p1.y, p2.x, p2.y, stroke.color, stroke.size);
+    } else if (stroke.penType === 'brush') {
+      // Calligraphy / Fountain stroke with variable width based on velocity & pressure
+      drawCalligraphyStroke(targetCtx, stroke);
+    } else {
+      // Smooth Bezier Curve Path
+      targetCtx.beginPath();
+      targetCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+
+      for (let i = 1; i < stroke.points.length - 1; i++) {
+        const xc = (stroke.points[i].x + stroke.points[i + 1].x) / 2;
+        const yc = (stroke.points[i].y + stroke.points[i + 1].y) / 2;
+        targetCtx.quadraticCurveTo(stroke.points[i].x, stroke.points[i].y, xc, yc);
+      }
+      const last = stroke.points[stroke.points.length - 1];
+      targetCtx.lineTo(last.x, last.y);
+      targetCtx.stroke();
+    }
+  }
+
+  targetCtx.restore();
+}
+
+function drawVectorArrow(ctx, fromX, fromY, toX, toY, color, size) {
+  const headlen = Math.max(16, size * 2.8);
+  const angle = Math.atan2(toY - fromY, toX - fromX);
+
+  ctx.beginPath();
+  ctx.moveTo(fromX, fromY);
+  ctx.lineTo(toX, toY);
+  ctx.stroke();
+
+  // Arrow Head
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(toX, toY);
+  ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawCalligraphyStroke(ctx, stroke) {
+  const pts = stroke.points;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+    const speed = Math.min(20, Math.max(1, dist));
+    const width = Math.max(2, stroke.size * (1.6 - (speed / 20)));
+
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+  }
+}
+
+// 3. Setup Hold-to-Open Radial Menu & Canvas Pointer Events
+function initScreenDrawingEngine() {
+  const radialMenu = document.getElementById('canvas-hold-radial-menu');
+  const colorPicker = document.getElementById('draw-color-picker');
+  const sizeSlider = document.getElementById('draw-size-slider');
+  const sizeLabel = document.getElementById('draw-size-label');
+
+  // Pen type buttons in floating dock
+  const penButtons = document.querySelectorAll('.dock-btn[data-pen]');
+  penButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      penButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPenType = btn.dataset.pen;
+    });
+  });
+
+  // Radial items
+  const radialItems = document.querySelectorAll('.radial-item[data-pen]');
+  radialItems.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const p = item.dataset.pen;
+      currentPenType = p;
+      penButtons.forEach(b => {
+        b.classList.toggle('active', b.dataset.pen === p);
+      });
+      closeRadialMenu();
+      playUiSound('action');
+    });
+  });
+
+  const radialVectorBtn = document.getElementById('radial-item-vector');
+  if (radialVectorBtn) {
+    radialVectorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeRadialMenu();
+      vectorizeAndShowModal();
+    });
+  }
+
+  if (colorPicker) {
+    colorPicker.addEventListener('input', (e) => {
+      currentDrawColor = e.target.value;
+    });
+  }
+
+  if (sizeSlider) {
+    sizeSlider.addEventListener('input', (e) => {
+      currentDrawSize = parseInt(e.target.value);
+      if (sizeLabel) sizeLabel.textContent = `${currentDrawSize}px`;
+    });
+  }
+
+  // Undo button
+  const btnUndo = document.getElementById('btn-draw-undo');
+  if (btnUndo) {
+    btnUndo.addEventListener('click', () => {
+      if (drawingStrokes.length) {
+        drawingUndoStack.push(drawingStrokes.pop());
+        playUiSound('snap');
+      }
+    });
+  }
+
+  // Clear button
+  const btnClear = document.getElementById('btn-draw-clear');
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      if (drawingStrokes.length) {
+        drawingUndoStack = [...drawingStrokes];
+        drawingStrokes = [];
+        playUiSound('action');
+      }
+    });
+  }
+
+  // Close dock / exit drawing
+  const btnClose = document.getElementById('btn-draw-close');
+  if (btnClose) {
+    btnClose.addEventListener('click', () => {
+      const selectBtn = document.getElementById('tool-select');
+      if (selectBtn) selectBtn.click();
+    });
+  }
+
+  // Vectorize & Export SVG button
+  const btnVectorize = document.getElementById('btn-draw-vectorize');
+  if (btnVectorize) {
+    btnVectorize.addEventListener('click', () => {
+      vectorizeAndShowModal();
+    });
+  }
+
+  // Canvas Mouse / Pointer Listeners for Drawing & Long-Press Radial Hold
+  canvas.addEventListener('pointerdown', (e) => {
+    if (activeTool !== 'draw') return;
+    const pt = getCanvasPointer(e);
+
+    // Close radial menu if already open
+    if (radialMenuVisible) {
+      closeRadialMenu();
+      return;
+    }
+
+    // Start Hold Timer (340ms long-press summons radial toolbar at pointer)
+    isHoldingOnCanvas = false;
+    canvasHoldStartPt = { clientX: e.clientX, clientY: e.clientY, pt };
+
+    clearTimeout(canvasHoldTimer);
+    canvasHoldTimer = setTimeout(() => {
+      // Long press detected! Open Radial Menu
+      isHoldingOnCanvas = true;
+      openRadialMenu(canvasHoldStartPt.clientX, canvasHoldStartPt.clientY);
+      playUiSound('camera_click');
+    }, 320);
+
+    // Initialize stroke candidate
+    currentStroke = {
+      id: `stroke-${Date.now()}`,
+      penType: currentPenType,
+      color: currentDrawColor,
+      size: currentDrawSize,
+      points: [pt]
+    };
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (activeTool !== 'draw' || !currentStroke) return;
+    const pt = getCanvasPointer(e);
+
+    // If moved more than 7px before timer triggers, cancel hold menu and draw instead
+    if (canvasHoldStartPt && !isHoldingOnCanvas) {
+      const dist = Math.hypot(e.clientX - canvasHoldStartPt.clientX, e.clientY - canvasHoldStartPt.clientY);
+      if (dist > 7) {
+        clearTimeout(canvasHoldTimer);
+        canvasHoldTimer = null;
+      }
+    }
+
+    if (isHoldingOnCanvas) return; // Don't draw while radial menu is engaged
+
+    if (currentStroke.penType === 'eraser') {
+      // Erase strokes intersecting with eraser point
+      eraseStrokesAtPoint(pt, currentStroke.size * 2);
+    } else {
+      currentStroke.points.push(pt);
+    }
+  });
+
+  window.addEventListener('pointerup', () => {
+    clearTimeout(canvasHoldTimer);
+    canvasHoldTimer = null;
+
+    if (isHoldingOnCanvas) {
+      isHoldingOnCanvas = false;
+      currentStroke = null;
+      return;
+    }
+
+    if (currentStroke) {
+      if (currentStroke.points.length > 0 && currentStroke.penType !== 'eraser') {
+        drawingStrokes.push(currentStroke);
+      }
+      currentStroke = null;
+    }
+  });
+
+  function openRadialMenu(clientX, clientY) {
+    if (!radialMenu) return;
+    const wrapper = document.querySelector('.canvas-wrapper');
+    const rect = wrapper.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    radialMenu.style.left = `${x}px`;
+    radialMenu.style.top = `${y}px`;
+    radialMenu.style.display = 'block';
+    radialMenuVisible = true;
+  }
+
+  function closeRadialMenu() {
+    if (!radialMenu) return;
+    radialMenu.style.display = 'none';
+    radialMenuVisible = false;
+  }
+
+  function eraseStrokesAtPoint(pt, radius) {
+    drawingStrokes = drawingStrokes.filter(stroke => {
+      // If any point in stroke is within radius of eraser, remove it
+      for (const p of stroke.points) {
+        if (Math.hypot(p.x - pt.x, p.y - pt.y) <= radius) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  initVectorModalControls();
+}
+
+// 4. Vectorization Pipeline: Generates Lossless W3C SVG Paths directly from Strokes
+function generateVectorSVG() {
+  const w = canvas.width || 1920;
+  const h = canvas.height || 1080;
+
+  let svgPaths = '';
+  let pathCount = 0;
+
+  for (const s of drawingStrokes) {
+    if (!s.points || s.points.length === 0) continue;
+    pathCount++;
+
+    if (s.penType === 'arrow') {
+      const p1 = s.points[0];
+      const p2 = s.points[s.points.length - 1];
+      const headlen = Math.max(16, s.size * 2.8);
+      const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+      const a1x = p2.x - headlen * Math.cos(angle - Math.PI / 6);
+      const a1y = p2.y - headlen * Math.sin(angle - Math.PI / 6);
+      const a2x = p2.x - headlen * Math.cos(angle + Math.PI / 6);
+      const a2y = p2.y - headlen * Math.sin(angle + Math.PI / 6);
+
+      svgPaths += `  <line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${s.color}" stroke-width="${s.size}" stroke-linecap="round" />\n`;
+      svgPaths += `  <polygon points="${p2.x.toFixed(1)},${p2.y.toFixed(1)} ${a1x.toFixed(1)},${a1y.toFixed(1)} ${a2x.toFixed(1)},${a2y.toFixed(1)}" fill="${s.color}" />\n`;
+    } else {
+      // Build smooth SVG Quadratic Curve path data
+      let d = `M ${s.points[0].x.toFixed(1)} ${s.points[0].y.toFixed(1)}`;
+      for (let i = 1; i < s.points.length - 1; i++) {
+        const xc = ((s.points[i].x + s.points[i + 1].x) / 2).toFixed(1);
+        const yc = ((s.points[i].y + s.points[i + 1].y) / 2).toFixed(1);
+        d += ` Q ${s.points[i].x.toFixed(1)} ${s.points[i].y.toFixed(1)}, ${xc} ${yc}`;
+      }
+      if (s.points.length > 1) {
+        const last = s.points[s.points.length - 1];
+        d += ` L ${last.x.toFixed(1)} ${last.y.toFixed(1)}`;
+      }
+
+      const opacity = s.penType === 'highlighter' ? '0.45' : '1.0';
+      const strokeWidth = s.penType === 'highlighter' ? (s.size * 2.2).toFixed(1) : s.size;
+      const lineCap = s.penType === 'highlighter' ? 'square' : 'round';
+
+      svgPaths += `  <path d="${d}" fill="none" stroke="${s.color}" stroke-width="${strokeWidth}" stroke-linecap="${lineCap}" stroke-linejoin="round" opacity="${opacity}" />\n`;
+    }
+  }
+
+  const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">
+${svgPaths}</svg>`;
+
+  return { svgContent, pathCount };
+}
+
+function vectorizeAndShowModal() {
+  if (!drawingStrokes.length) {
+    showTextTimingAlert('Please draw something on the screen first before vectorizing!', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+    return;
+  }
+
+  const { svgContent, pathCount } = generateVectorSVG();
+  const modal = document.getElementById('vector-export-modal');
+  const container = document.getElementById('vector-preview-svg-container');
+  const pathsCountEl = document.getElementById('svg-paths-count');
+  const bytesCountEl = document.getElementById('svg-bytes-count');
+
+  if (container) container.innerHTML = svgContent;
+  if (pathsCountEl) pathsCountEl.textContent = pathCount;
+  if (bytesCountEl) bytesCountEl.textContent = `${(svgContent.length / 1024).toFixed(1)} KB`;
+  if (modal) modal.style.display = 'flex';
+  playUiSound('snap_zoom');
+}
+
+function initVectorModalControls() {
+  const modal = document.getElementById('vector-export-modal');
+  const btnClose = document.getElementById('btn-close-vector-modal');
+  const btnDownload = document.getElementById('btn-download-svg');
+  const btnCopy = document.getElementById('btn-copy-svg-code');
+  const btnAddLayer = document.getElementById('btn-add-svg-layer');
+
+  if (btnClose && modal) {
+    btnClose.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+  }
+
+  if (btnDownload) {
+    btnDownload.addEventListener('click', () => {
+      const { svgContent } = generateVectorSVG();
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `magnates-vector-drawing-${Date.now()}.svg`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showTextTimingAlert('Vector SVG downloaded successfully!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    });
+  }
+
+  if (btnCopy) {
+    btnCopy.addEventListener('click', () => {
+      const { svgContent } = generateVectorSVG();
+      navigator.clipboard.writeText(svgContent).then(() => {
+        showTextTimingAlert('Vector SVG Code copied to clipboard!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      });
+    });
+  }
+
+  if (btnAddLayer) {
+    btnAddLayer.addEventListener('click', () => {
+      const { svgContent } = generateVectorSVG();
+      const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => {
+        const newClip = {
+          id: `clip-vector-${Date.now()}`,
+          name: 'Vector Drawing Sticker',
+          start: currentTime,
+          duration: 4.0,
+          scale: 1.0,
+          x: 0,
+          y: 0,
+          img: img,
+          file: { name: 'vector-drawing.svg', url }
+        };
+        timelineClips.image.push(newClip);
+        renderAllTimelineTracks();
+        recordState('Add Vector Drawing Layer');
+        if (modal) modal.style.display = 'none';
+        showTextTimingAlert('Vector Drawing added as a movable timeline sticker layer!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 3000);
+      };
+      img.src = url;
+    });
+  }
+}
+
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  initScreenDrawingEngine();
+
+  // If running inside Electron desktop wrapper, listen for global shortcut
+  if (window.electronAPI && typeof window.electronAPI.onToggleDrawingMode === 'function') {
+    window.electronAPI.onToggleDrawingMode(() => {
+      const drawBtn = document.getElementById('tool-draw');
+      if (drawBtn) drawBtn.click();
+    });
+  }
+});

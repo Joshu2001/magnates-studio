@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magnates Studio - Minimalist Documentary Editor</title>
-  <link rel="stylesheet" href="css/style.css?v=7">
+  <link rel="stylesheet" href="css/style.css?v=8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
@@ -132,6 +132,127 @@
             </div>
             <textarea id="screen-text-input" class="screen-text-input" rows="2" placeholder="Enter kinetic text..."></textarea>
           </div>
+
+          <!-- Floating On-Screen Drawing Dock (Visible when in Draw Mode) -->
+          <div id="canvas-drawing-dock" class="canvas-drawing-dock" style="display: none;">
+            <div class="dock-drag-handle" title="Drawing Toolbar">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:14px; height:14px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              <span>Ink & Draw</span>
+            </div>
+            <div class="dock-divider"></div>
+            
+            <!-- Pen Presets -->
+            <div class="dock-pen-group">
+              <button class="dock-btn active" data-pen="pen" id="pen-type-ballpoint" title="Ballpoint Pen (Smooth Pressure Vector)">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                <span>Pen</span>
+              </button>
+              <button class="dock-btn" data-pen="brush" id="pen-type-brush" title="Fountain / Calligraphy Brush">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34a.996.996 0 0 0-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"/></svg>
+                <span>Brush</span>
+              </button>
+              <button class="dock-btn" data-pen="highlighter" id="pen-type-highlighter" title="Semi-Transparent Document Highlighter">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L12 20.53 3.5 12.03l9.19-9.19c.78-.78 2.05-.78 2.83 0l.72.72zm-7.78 9.9L12 17l6.36-6.36-3.53-3.54-6.37 6.36zM3 21h18v2H3z"/></svg>
+                <span>Highlighter</span>
+              </button>
+              <button class="dock-btn" data-pen="arrow" id="pen-type-arrow" title="Smart Vector Arrow & Pointer">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z"/></svg>
+                <span>Arrow</span>
+              </button>
+              <button class="dock-btn" data-pen="eraser" id="pen-type-eraser" title="Stroke & Pixel Eraser">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.94c.78.79.78 2.05 0 2.84L14.47 18.06c-.39.39-.9.59-1.41.59H6.83c-.53 0-1.04-.21-1.41-.59l-2.83-2.83c-.78-.78-.78-2.05 0-2.83l9.9-9.9c.79-.79 2.05-.79 2.84 0l.91.07zm-7.07 9.19l3.54 3.54 5.66-5.66-3.54-3.54-5.66 5.66z"/></svg>
+                <span>Eraser</span>
+              </button>
+            </div>
+
+            <div class="dock-divider"></div>
+
+            <!-- Color & Width Controls -->
+            <div class="dock-stroke-group">
+              <input type="color" id="draw-color-picker" class="draw-color-picker" value="#ff334b" title="Stroke Color">
+              <div class="dock-size-pill" title="Stroke Width">
+                <input type="range" id="draw-size-slider" min="2" max="60" value="6" step="1">
+                <span id="draw-size-label">6px</span>
+              </div>
+            </div>
+
+            <div class="dock-divider"></div>
+
+            <!-- Actions: Undo, Clear, Convert to Vector SVG -->
+            <div class="dock-action-group">
+              <button class="dock-icon-btn" id="btn-draw-undo" title="Undo Stroke (Ctrl+Z)">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.7 10.79 16.99 8 12.5 8z"/></svg>
+              </button>
+              <button class="dock-icon-btn" id="btn-draw-clear" title="Clear All Current Drawings">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+              <button class="dock-btn dock-btn-vector" id="btn-draw-vectorize" title="Convert Drawing into Vector SVG and add as layer">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 3l5 5h-4v4h-2v-4H7l5-5zm7 13H5c-.55 0-1-.45-1-1v-2h16v2c0 .55-.45 1-1 1z"/></svg>
+                <span>Vectorize & Export SVG</span>
+              </button>
+              <button class="dock-btn dock-btn-close" id="btn-draw-close" title="Exit Drawing Mode">Done</button>
+            </div>
+          </div>
+
+          <!-- On-Canvas Hold / Long-Press Radial Toolbar -->
+          <div id="canvas-hold-radial-menu" class="canvas-hold-radial-menu" style="display: none;">
+            <div class="radial-center-badge">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            </div>
+            <!-- Radial Options positioned around circle -->
+            <button class="radial-item" data-pen="pen" style="--angle: 0deg;" title="Pen">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            </button>
+            <button class="radial-item" data-pen="brush" style="--angle: 60deg;" title="Calligraphy Brush">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3z"/></svg>
+            </button>
+            <button class="radial-item" data-pen="highlighter" style="--angle: 120deg;" title="Highlighter">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.94-7.07 7.07-4.95-4.94 7.07-7.07z"/></svg>
+            </button>
+            <button class="radial-item" data-pen="arrow" style="--angle: 180deg;" title="Vector Arrow">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z"/></svg>
+            </button>
+            <button class="radial-item" data-pen="eraser" style="--angle: 240deg;" title="Eraser">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16.24 3.56l4.95 4.94L6.83 18.65l-2.83-2.83 9.9-9.9z"/></svg>
+            </button>
+            <button class="radial-item radial-item-vector" id="radial-item-vector" style="--angle: 300deg;" title="Vectorize SVG">
+              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 3l5 5h-4v4h-2v-4H7l5-5z"/></svg>
+            </button>
+          </div>
+
+          <!-- Vector Preview & Export Modal Dialog -->
+          <div id="vector-export-modal" class="vector-export-modal" style="display: none;">
+            <div class="vector-modal-box">
+              <div class="vector-modal-header">
+                <h3>Vectorized Drawing Output (Lossless SVG)</h3>
+                <button class="btn-close-modal" id="btn-close-vector-modal">&times;</button>
+              </div>
+              <div class="vector-modal-body">
+                <div class="vector-preview-area" id="vector-preview-svg-container">
+                  <!-- SVG will be injected here -->
+                </div>
+                <div class="vector-meta-info">
+                  <div class="stat-pill"><span id="svg-paths-count">0</span> Paths</div>
+                  <div class="stat-pill"><span id="svg-bytes-count">0 KB</span> Size</div>
+                  <div class="stat-pill highlight">Infinite Crisp Scaling</div>
+                </div>
+              </div>
+              <div class="vector-modal-footer">
+                <button class="btn btn-secondary" id="btn-download-svg">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                  Download .SVG File
+                </button>
+                <button class="btn btn-secondary" id="btn-copy-svg-code">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                  Copy SVG Code
+                </button>
+                <button class="btn btn-primary" id="btn-add-svg-layer">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                  Add as Timeline Sticker Layer
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Timeline Section -->
@@ -158,6 +279,10 @@
               <button class="btn-tool" id="tool-loupe" title="Click on image to add documentary Magnifying Loupe / Circular Callout">
                 <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
                 Loupe Callout
+              </button>
+              <button class="btn-tool" id="tool-draw" title="Draw on Screen (Hold click anywhere on canvas for Quick Pen Radial Menu)">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                Draw / Pen
               </button>
               <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
               <button class="btn-tool" id="tool-undo" title="Undo Action (Ctrl+Z)">
@@ -707,6 +832,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=20"></script>
+  <script src="js/app.js?v=21"></script>
 </body>
 </html>
