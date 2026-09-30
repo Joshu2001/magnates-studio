@@ -4445,11 +4445,13 @@ function initScreenTextEditor() {
 // ==================== SCREEN FULLSCREEN & DOUBLE-TAP IMMERSIVE MODE ====================
 const canvasWrapper = document.querySelector('.canvas-wrapper');
 const btnCanvasFullscreen = document.getElementById('btn-canvas-fullscreen');
+const btnAppFullscreen = document.getElementById('btn-app-fullscreen');
 
+// 1. Stage Preview Fullscreen (Center monitor only)
 function toggleCanvasFullscreen() {
   if (!canvasWrapper) return;
 
-  if (document.fullscreenElement) {
+  if (document.fullscreenElement === canvasWrapper) {
     if (document.exitFullscreen) {
       document.exitFullscreen().catch(() => {});
     }
@@ -4457,10 +4459,13 @@ function toggleCanvasFullscreen() {
     canvasWrapper.classList.remove('is-immersive-fallback');
     updateFullscreenIcon(false);
   } else {
-    // Request standard Fullscreen API on the canvas viewport
+    // If another element (or entire doc) is in fullscreen, exit it first
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+    // Request standard Fullscreen API specifically on the canvas viewport
     if (canvasWrapper.requestFullscreen) {
       canvasWrapper.requestFullscreen().catch(() => {
-        // Fallback to CSS immersive mode if blocked by browser policy
         canvasWrapper.classList.add('is-immersive-fallback');
         updateFullscreenIcon(true);
       });
@@ -4473,23 +4478,52 @@ function toggleCanvasFullscreen() {
   }
 }
 
+// 2. Entire Workspace Fullscreen (Whole application)
+function toggleAppFullscreen() {
+  const rootEl = document.documentElement;
+  if (document.fullscreenElement === rootEl || (document.fullscreenElement && document.fullscreenElement !== canvasWrapper)) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+  } else {
+    if (document.fullscreenElement) {
+      document.exitFullscreen().catch(() => {});
+    }
+    if (rootEl.requestFullscreen) {
+      rootEl.requestFullscreen().catch(() => {});
+    } else if (rootEl.webkitRequestFullscreen) {
+      rootEl.webkitRequestFullscreen();
+    }
+  }
+}
+
 function updateFullscreenIcon(isFullscreen) {
   const icon = document.getElementById('fullscreen-icon');
-  if (!icon) return;
-  if (isFullscreen) {
-    // Contract icon
-    icon.innerHTML = `<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>`;
-  } else {
-    // Expand icon
-    icon.innerHTML = `<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>`;
+  if (icon) {
+    if (isFullscreen) {
+      icon.innerHTML = `<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>`;
+    } else {
+      icon.innerHTML = `<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>`;
+    }
   }
+
+  const appIcon = document.getElementById('app-fullscreen-icon');
+  const isAppFs = document.fullscreenElement === document.documentElement;
+  if (appIcon) {
+    if (isAppFs) {
+      appIcon.innerHTML = `<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>`;
+    } else {
+      appIcon.innerHTML = `<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>`;
+    }
+  }
+
   if (typeof updateAppleFullscreenHud === 'function') {
     updateAppleFullscreenHud();
   }
 }
 
 document.addEventListener('fullscreenchange', () => {
-  const isFs = !!document.fullscreenElement;
+  const isFs = document.fullscreenElement === canvasWrapper;
   updateFullscreenIcon(isFs);
 });
 
@@ -4498,21 +4532,52 @@ btnCanvasFullscreen?.addEventListener('click', (e) => {
   toggleCanvasFullscreen();
 });
 
-// Double click / Double tap anywhere that is not a button or interaction on the screen to enter immersive mode
+btnAppFullscreen?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleAppFullscreen();
+});
+
+// Double click specifically on the canvas viewport: enter STAGE fullscreen
 let lastCanvasTouchTime = 0;
-canvasWrapper?.addEventListener('click', (e) => {
-  // If clicked directly on interactive controls, handles or input, ignore
-  if (e.target.closest('.canvas-controls') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
+canvas?.addEventListener('click', (e) => {
+  const now = Date.now();
+  if (now - lastCanvasTouchTime < 350) {
+    // If double clicking directly on an active text or chart element, let their dedicated editors handle it
+    const pt = getCanvasPointer(e);
+    const activeChartClips = (timelineClips.chart || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    const hitChart = activeChartClips.some(c => {
+      const b = c._renderBounds;
+      return b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h);
+    });
+    const activeTexts = (timelineClips.text || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    const hitText = activeTexts.some(c => {
+      const b = c._renderBounds;
+      return b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h);
+    });
+
+    if (!hitChart && !hitText) {
+      toggleCanvasFullscreen();
+    }
+    lastCanvasTouchTime = 0;
+  } else {
+    lastCanvasTouchTime = now;
+  }
+});
+
+// Double click anywhere outside the center canvas (e.g. top-nav, timeline background, blank space): Fullscreen ENTIRE APP
+let lastAppTouchTime = 0;
+document.addEventListener('click', (e) => {
+  // If clicked inside interactive controls, canvas monitor itself, inputs, modals, or buttons, ignore
+  if (e.target.closest('canvas') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select') || e.target.closest('textarea') || e.target.closest('.vector-export-modal') || e.target.closest('.timeline-clip') || e.target.closest('.clip')) {
     return;
   }
 
   const now = Date.now();
-  if (now - lastCanvasTouchTime < 350) {
-    // Double tap/click detected on viewport background or canvas
-    toggleCanvasFullscreen();
-    lastCanvasTouchTime = 0;
+  if (now - lastAppTouchTime < 350) {
+    toggleAppFullscreen();
+    lastAppTouchTime = 0;
   } else {
-    lastCanvasTouchTime = now;
+    lastAppTouchTime = now;
   }
 });
 
@@ -7229,6 +7294,11 @@ function renderChartsTemplatesPanel() {
 function addChartClipToTimeline(chartConfig, startSec = currentTime, durationSec = 6.0) {
   if (!timelineClips.chart) timelineClips.chart = [];
 
+  // 1. Auto-pause playback so user doesn't lose position
+  if (isPlaying) {
+    pausePlayback();
+  }
+
   const newClip = {
     id: `clip-chart-${Date.now()}`,
     track: 'chart',
@@ -7254,9 +7324,54 @@ function addChartClipToTimeline(chartConfig, startSec = currentTime, durationSec
   seekToTime(newClip.start);
   recordState('Add Animated Chart Layer');
   playSFX('whoosh', 0.6);
-  showTextTimingAlert(`Added "${newClip.name}" chart to timeline! Scrub playhead to watch animation.`, 'success');
+
+  // 2. Pulse "Edit in Pop-up Modal" button in sidebar
+  const editBtn = document.getElementById('btn-chart-open-modal');
+  if (editBtn) {
+    editBtn.classList.remove('btn-pulse-glow');
+    void editBtn.offsetWidth; // trigger reflow
+    editBtn.classList.add('btn-pulse-glow');
+  }
+
+  // 3. Show sleek floating cue toast directly on viewport
+  showChartConfigureCue(newClip);
+
+  showTextTimingAlert(`Added "${newClip.name}" chart! Edit in modal to configure.`, 'success');
   setTimeout(() => showTextTimingAlert(''), 3500);
   return newClip;
+}
+
+// Show a friendly on-canvas cue banner prompting user to configure or edit
+function showChartConfigureCue(clip) {
+  const existingCue = document.getElementById('chart-configure-cue');
+  if (existingCue) existingCue.remove();
+
+  const cue = document.createElement('div');
+  cue.id = 'chart-configure-cue';
+  cue.className = 'chart-cue-toast';
+  cue.innerHTML = `
+    <svg class="ui-icon" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: #00f0ff;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+    <span>Chart placed! Customize title, colors & numbers:</span>
+    <button type="button" id="btn-cue-open-editor">Open Editor</button>
+    <button type="button" id="btn-cue-dismiss" style="background: transparent; color: #8892b0; font-size: 14px; padding: 2px 6px; margin-left: -4px;">&times;</button>
+  `;
+
+  canvasWrapper?.appendChild(cue);
+
+  cue.querySelector('#btn-cue-open-editor')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cue.remove();
+    openChartEditorModalForClip(clip);
+  });
+
+  cue.querySelector('#btn-cue-dismiss')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cue.remove();
+  });
+
+  setTimeout(() => {
+    if (cue.parentNode) cue.remove();
+  }, 7000);
 }
 
 // Populate Right Inspector fields when a chart clip is selected

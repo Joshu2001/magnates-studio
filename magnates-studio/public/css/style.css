@@ -1845,14 +1845,86 @@ canvas.tool-draw {
   border-radius: 12px;
   width: 100%;
   max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
   animation: modalScaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes modalScaleUp {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+.vector-modal-header {
+  flex-shrink: 0;
+}
+
+.vector-modal-footer {
+  flex-shrink: 0;
+}
+
+.vector-modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+@keyframes pulseGlowBtn {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(0, 240, 255, 0.9);
+    transform: scale(1.03);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 240, 255, 0);
+    transform: scale(1);
+  }
+}
+
+.btn-pulse-glow {
+  animation: pulseGlowBtn 1s ease-in-out 3;
+}
+
+/* Floating Guided Cue Toast */
+.chart-cue-toast {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: rgba(15, 19, 30, 0.95);
+  border: 1px solid #00f0ff;
+  border-radius: 24px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 30px rgba(0, 240, 255, 0.25), 0 4px 12px rgba(0,0,0,0.6);
+  z-index: 100;
+  backdrop-filter: blur(8px);
+  animation: fadeInPop 0.25s ease-out;
+}
+
+.chart-cue-toast span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.chart-cue-toast button {
+  background: linear-gradient(135deg, #00f0ff, #0077ff);
+  border: none;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.chart-cue-toast button:hover {
+  opacity: 0.9;
 }
 
 .vector-modal-header {
