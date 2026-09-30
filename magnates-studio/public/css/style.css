@@ -1260,11 +1260,109 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  min-height: 26px;
 }
 
 .fx-header h4 {
   font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: #f3f4f6;
+}
+
+#card-text-editor .fx-header {
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Apple-Standard Minimalist Ghost Action Group */
+.inspector-action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  user-select: none;
+}
+
+.inspector-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  width: 26px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #8f97aa;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  outline: none;
+}
+
+#btn-toggle-text-history.inspector-tool-btn {
+  width: auto;
+  padding: 0 6px 0 5px;
+  gap: 4px;
+}
+
+.inspector-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.inspector-tool-btn:active {
+  transform: scale(0.93);
+}
+
+.inspector-tool-btn.active {
+  background: rgba(255, 51, 75, 0.16);
+  color: #ff334b;
+  border-color: rgba(255, 51, 75, 0.25);
+}
+
+.inspector-tool-btn .ui-icon {
+  width: 13px;
+  height: 13px;
+  margin: 0;
+  color: currentColor;
+  fill: currentColor;
+}
+
+.inspector-tool-btn .count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  font-size: 9px;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.12);
+  color: #c8cedd;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.inspector-tool-btn.active .count-pill {
+  background: #ff334b;
+  color: #ffffff;
+}
+
+.inspector-btn-add {
+  color: #b0b8cb;
+}
+.inspector-btn-add:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .control-row {
