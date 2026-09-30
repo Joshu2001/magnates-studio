@@ -242,12 +242,26 @@ function playSFX(type, volumeOverride) {
 
 // FX Settings
 const fxState = {
-  grid: { enabled: true, depth: 45, opacity: 0.45, vignette: 0.55 },
+  grid: {
+    enabled: true,
+    depth: 45,
+    opacity: 0.25,
+    vignette: 0.85,
+    color: '#c8dcff',
+    glowEnabled: false,
+    glowIntensity: 0.6
+  },
   stageBackground: { type: 'cyber_grid', color: '#0a0b0e' }, // 'cyber_grid', 'solid_black', 'color', 'vox_cream', 'chroma_green'
-  particles: { enabled: true, count: 65, glow: 0.7, speed: 2 },
+  particles: {
+    enabled: true,
+    count: 65,
+    glow: 0.6,
+    speed: 2,
+    color: '#ff4114',
+    glowEnabled: true
+  },
   silhouette: { enabled: false, color: 'white' }
 };
-
 
 // Initialize Particle System
 function initParticles() {
@@ -264,25 +278,41 @@ function initParticles() {
   }
 }
 
-// Draw 3D Curved Perspective Grid with Neon Cyber Glow
+// Helper to parse hex or named colors to RGB
+function parseColorToRgb(colorStr, defaultRgb = { r: 200, g: 220, b: 255 }) {
+  if (!colorStr) return defaultRgb;
+  if (colorStr.startsWith('#')) {
+    let hex = colorStr.slice(1);
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const num = parseInt(hex, 16);
+    if (!isNaN(num)) {
+      return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+    }
+  }
+  return defaultRgb;
+}
+
+// Draw 3D Curved Perspective Grid
 function drawPerspectiveGrid() {
   if (!fxState.grid.enabled) return;
 
   const w = canvas.width;
   const h = canvas.height;
   const horizon = h * 0.45;
-  const numVLines = 26;
-  const vpX = w / 2;
-  const floorLineCount = 18;
   const op = fxState.grid.opacity;
 
-  ctx.save();
+  // Resolve grid line color (default: soft blue/white #c8dcff)
+  const rgb = parseColorToRgb(fxState.grid.color, { r: 200, g: 220, b: 255 });
 
-  // === BASE GRID LAYER (standard lines) ===
-  ctx.strokeStyle = `rgba(180, 210, 255, ${op})`;
+  ctx.save();
+  ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${op})`;
   ctx.lineWidth = 1.5;
 
   // Vertical perspective lines converging upward
+  const numVLines = 26;
+  const vpX = w / 2;
+  const vpY = horizon - (fxState.grid.depth * 4);
+
   for (let i = 0; i <= numVLines; i++) {
     const bottomX = (w / numVLines) * i;
     ctx.beginPath();
@@ -303,6 +333,7 @@ function drawPerspectiveGrid() {
   }
 
   // Horizontal floor lines
+  const floorLineCount = 18;
   for (let i = 0; i < floorLineCount; i++) {
     const t = i / floorLineCount;
     const lineY = horizon + (h - horizon) * Math.pow(t, 2.2);
@@ -320,70 +351,63 @@ function drawPerspectiveGrid() {
     ctx.stroke();
   }
 
-  // === NEON CYBER GLOW PASS ===
-  // Re-draw key lines with neon cyan glow for the signature cyber studio look
-  ctx.save();
-  ctx.shadowBlur = 20;
-  ctx.shadowColor = 'rgba(0, 200, 255, 0.75)';
-  ctx.strokeStyle = `rgba(60, 210, 255, ${Math.min(op * 1.8, 0.65)})`;
-  ctx.lineWidth = 1.0;
+  // Optional: Cyber Glow & Horizon Bloom (ONLY rendered when user explicitly enables it)
+  if (fxState.grid.glowEnabled) {
+    const glowMult = fxState.grid.glowIntensity !== undefined ? fxState.grid.glowIntensity : 0.6;
 
-  // Glow: floor perspective lines
-  for (let i = 0; i < floorLineCount; i++) {
-    const t = i / floorLineCount;
-    const lineY = horizon + (h - horizon) * Math.pow(t, 2.2);
+    // Glowing lines pass
+    ctx.save();
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.8)`;
+    ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${Math.min(op * 1.6 * glowMult, 0.7)})`;
+    ctx.lineWidth = 1.0;
+
+    for (let i = 0; i < floorLineCount; i++) {
+      const t = i / floorLineCount;
+      const lineY = horizon + (h - horizon) * Math.pow(t, 2.2);
+      ctx.beginPath();
+      ctx.moveTo(0, lineY);
+      ctx.lineTo(w, lineY);
+      ctx.stroke();
+    }
+    for (let i = 0; i <= numVLines; i++) {
+      const bottomX = (w / numVLines) * i;
+      ctx.beginPath();
+      ctx.moveTo(vpX + (bottomX - vpX) * 0.1, horizon);
+      ctx.quadraticCurveTo(
+        vpX + (bottomX - vpX) * 0.5,
+        horizon + (h - horizon) * 0.4,
+        bottomX,
+        h
+      );
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Horizon line bloom
+    ctx.save();
+    ctx.shadowBlur = 32;
+    ctx.shadowColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1.0)`;
+    ctx.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${Math.min(op * 2.2 * glowMult, 0.85)})`;
+    ctx.lineWidth = 2.0;
     ctx.beginPath();
-    ctx.moveTo(0, lineY);
-    ctx.lineTo(w, lineY);
+    ctx.moveTo(0, horizon);
+    ctx.lineTo(w, horizon);
     ctx.stroke();
+    ctx.restore();
+
+    // Floor bloom gradient
+    ctx.save();
+    const floorGrad = ctx.createLinearGradient(0, horizon, 0, h);
+    floorGrad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${op * 0.18 * glowMult})`);
+    floorGrad.addColorStop(0.5, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${op * 0.08 * glowMult})`);
+    floorGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = floorGrad;
+    ctx.fillRect(0, horizon, w, h - horizon);
+    ctx.restore();
   }
 
-  // Glow: vertical floor lines
-  for (let i = 0; i <= numVLines; i++) {
-    const bottomX = (w / numVLines) * i;
-    ctx.beginPath();
-    ctx.moveTo(vpX + (bottomX - vpX) * 0.1, horizon);
-    ctx.quadraticCurveTo(
-      vpX + (bottomX - vpX) * 0.5,
-      horizon + (h - horizon) * 0.4,
-      bottomX,
-      h
-    );
-    ctx.stroke();
-  }
-  ctx.restore();
-
-  // === GLOWING CYAN HORIZON ACCENT LINE ===
-  ctx.save();
-  ctx.shadowBlur = 30;
-  ctx.shadowColor = 'rgba(0, 220, 255, 1.0)';
-  ctx.strokeStyle = `rgba(0, 235, 255, ${Math.min(op * 2.5, 0.8)})`;
-  ctx.lineWidth = 2.5;
-  ctx.beginPath();
-  ctx.moveTo(0, horizon);
-  ctx.lineTo(w, horizon);
-  ctx.stroke();
-  // Softer outer glow
-  ctx.shadowBlur = 55;
-  ctx.strokeStyle = `rgba(80, 240, 255, ${Math.min(op * 1.5, 0.4)})`;
-  ctx.lineWidth = 1.0;
-  ctx.beginPath();
-  ctx.moveTo(0, horizon);
-  ctx.lineTo(w, horizon);
-  ctx.stroke();
-  ctx.restore();
-
-  // === FLOOR NEON BLOOM ===
-  ctx.save();
-  const floorGrad = ctx.createLinearGradient(0, horizon, 0, h);
-  floorGrad.addColorStop(0, `rgba(0, 140, 255, ${op * 0.18})`);
-  floorGrad.addColorStop(0.45, `rgba(0, 80, 200, ${op * 0.12})`);
-  floorGrad.addColorStop(1, 'rgba(0, 40, 120, 0)');
-  ctx.fillStyle = floorGrad;
-  ctx.fillRect(0, horizon, w, h - horizon);
-  ctx.restore();
-
-  // === DARK RADIAL VIGNETTE ===
+  // Vignette
   const grad = ctx.createRadialGradient(w / 2, h / 2, w * 0.2, w / 2, h / 2, w * 0.7);
   grad.addColorStop(0, 'rgba(10, 11, 15, 0)');
   grad.addColorStop(1, `rgba(5, 6, 8, ${fxState.grid.vignette})`);
@@ -393,39 +417,38 @@ function drawPerspectiveGrid() {
   ctx.restore();
 }
 
-// Draw Fire & Ember Particles (Neon Atmospheric)
+// Draw Fire & Ember Particles
 function drawParticles() {
   if (!fxState.particles.enabled) return;
 
   const w = canvas.width;
   const h = canvas.height;
 
+  // Resolve particle and glow color (default: warm flame #ff4114)
+  const rgb = parseColorToRgb(fxState.particles.color, { r: 255, g: 65, b: 20 });
+  // Secondary lighter color for core bloom and sparks
+  const sparkR = Math.min(255, rgb.r + 20);
+  const sparkG = Math.min(255, rgb.g + 115);
+  const sparkB = Math.min(255, rgb.b + 50);
+
   ctx.save();
   ctx.globalCompositeOperation = 'screen';
 
-  // Bottom fire glow — wide warm bloom
-  const fireGrad = ctx.createLinearGradient(0, h, 0, h - 380);
-  fireGrad.addColorStop(0, `rgba(255, 55, 10, ${fxState.particles.glow})`);
-  fireGrad.addColorStop(0.35, `rgba(255, 100, 20, ${fxState.particles.glow * 0.55})`);
-  fireGrad.addColorStop(0.65, `rgba(255, 140, 40, ${fxState.particles.glow * 0.2})`);
-  fireGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = fireGrad;
-  ctx.fillRect(0, h - 380, w, 380);
+  // Bottom fire glow (rendered only if glowEnabled is true, default: true)
+  if (fxState.particles.glowEnabled !== false && fxState.particles.glow > 0) {
+    const fireGrad = ctx.createLinearGradient(0, h, 0, h - 300);
+    fireGrad.addColorStop(0, `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${fxState.particles.glow})`);
+    fireGrad.addColorStop(0.5, `rgba(${sparkR}, ${sparkG}, ${sparkB}, ${fxState.particles.glow * 0.4})`);
+    fireGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = fireGrad;
+    ctx.fillRect(0, h - 300, w, 300);
+  }
 
-  // Floating sparks with per-particle glow
-  ctx.shadowBlur = 12;
+  // Floating sparks
   const count = fxState.particles.count;
   for (let i = 0; i < count; i++) {
     const p = particles[i];
-    // Alternate between orange embers and rare cyan sparks (adds depth / magic)
-    const isCyan = i % 18 === 0;
-    if (isCyan) {
-      ctx.shadowColor = 'rgba(80, 220, 255, 0.9)';
-      ctx.fillStyle = `rgba(100, 230, 255, ${p.alpha * 0.7})`;
-    } else {
-      ctx.shadowColor = `rgba(255, 160, 40, ${p.alpha * 0.8})`;
-      ctx.fillStyle = `rgba(255, ${140 + Math.floor(p.alpha * 60)}, ${40 + Math.floor(p.alpha * 30)}, ${p.alpha})`;
-    }
+    ctx.fillStyle = `rgba(${sparkR}, ${sparkG}, ${sparkB}, ${p.alpha})`;
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
     ctx.fill();
@@ -2652,6 +2675,46 @@ document.getElementById('fx-vignette').addEventListener('input', (e) => {
   fxState.grid.vignette = parseInt(e.target.value) / 100;
 });
 
+// Grid Line Color and Preset Handlers
+const gridColorPicker = document.getElementById('fx-grid-color');
+const btnGridDefault = document.getElementById('btn-grid-color-default');
+const btnGridCyan = document.getElementById('btn-grid-color-cyan');
+const btnGridRed = document.getElementById('btn-grid-color-red');
+
+function setGridColor(hex) {
+  fxState.grid.color = hex;
+  if (gridColorPicker) gridColorPicker.value = hex;
+  if (btnGridDefault) btnGridDefault.classList.toggle('active', hex.toLowerCase() === '#c8dcff');
+  if (btnGridCyan) btnGridCyan.classList.toggle('active', hex.toLowerCase() === '#00f0ff');
+  if (btnGridRed) btnGridRed.classList.toggle('active', hex.toLowerCase() === '#ff334b');
+}
+
+gridColorPicker?.addEventListener('input', (e) => {
+  setGridColor(e.target.value);
+});
+btnGridDefault?.addEventListener('click', () => setGridColor('#c8dcff'));
+btnGridCyan?.addEventListener('click', () => setGridColor('#00f0ff'));
+btnGridRed?.addEventListener('click', () => setGridColor('#ff334b'));
+
+// Grid Cyber Glow & Horizon Bloom Handlers
+const gridGlowToggle = document.getElementById('fx-grid-glow-enable');
+const gridGlowControls = document.getElementById('fx-grid-glow-controls');
+const gridGlowSlider = document.getElementById('fx-grid-glow-intensity');
+const gridGlowVal = document.getElementById('fx-grid-glow-val');
+
+gridGlowToggle?.addEventListener('change', (e) => {
+  fxState.grid.glowEnabled = e.target.checked;
+  if (gridGlowControls) {
+    gridGlowControls.style.display = e.target.checked ? 'block' : 'none';
+  }
+});
+
+gridGlowSlider?.addEventListener('input', (e) => {
+  const pct = parseInt(e.target.value, 10);
+  fxState.grid.glowIntensity = pct / 100;
+  if (gridGlowVal) gridGlowVal.textContent = `${pct}%`;
+});
+
 document.getElementById('fx-particles-enable').addEventListener('change', (e) => {
   fxState.particles.enabled = e.target.checked;
 });
@@ -2661,6 +2724,41 @@ document.getElementById('fx-particles-count').addEventListener('input', (e) => {
 document.getElementById('fx-fire-glow').addEventListener('input', (e) => {
   fxState.particles.glow = parseInt(e.target.value) / 100;
 });
+
+// Bottom Fire Glow Toggle Handler
+const fireGlowToggle = document.getElementById('fx-fire-glow-enable');
+const fireGlowControls = document.getElementById('fx-fire-glow-controls');
+fireGlowToggle?.addEventListener('change', (e) => {
+  fxState.particles.glowEnabled = e.target.checked;
+  if (fireGlowControls) {
+    fireGlowControls.style.display = e.target.checked ? 'block' : 'none';
+  }
+});
+
+// Fire & Ember Color Handlers
+const fireColorPicker = document.getElementById('fx-fire-color');
+const btnFireDefault = document.getElementById('btn-fire-color-default');
+const btnFireCyan = document.getElementById('btn-fire-color-cyan');
+const btnFirePurple = document.getElementById('btn-fire-color-purple');
+const btnFireGreen = document.getElementById('btn-fire-color-green');
+
+function setFireColor(hex) {
+  fxState.particles.color = hex;
+  if (fireColorPicker) fireColorPicker.value = hex;
+  if (btnFireDefault) btnFireDefault.classList.toggle('active', hex.toLowerCase() === '#ff4114');
+  if (btnFireCyan) btnFireCyan.classList.toggle('active', hex.toLowerCase() === '#00f0ff');
+  if (btnFirePurple) btnFirePurple.classList.toggle('active', hex.toLowerCase() === '#b55fe6');
+  if (btnFireGreen) btnFireGreen.classList.toggle('active', hex.toLowerCase() === '#00e676');
+}
+
+fireColorPicker?.addEventListener('input', (e) => {
+  setFireColor(e.target.value);
+});
+btnFireDefault?.addEventListener('click', () => setFireColor('#ff4114'));
+btnFireCyan?.addEventListener('click', () => setFireColor('#00f0ff'));
+btnFirePurple?.addEventListener('click', () => setFireColor('#b55fe6'));
+btnFireGreen?.addEventListener('click', () => setFireColor('#00e676'));
+
 
 document.getElementById('fx-silhouette-enable').addEventListener('change', (e) => {
   fxState.silhouette.enabled = e.target.checked;

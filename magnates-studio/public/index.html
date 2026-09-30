@@ -556,11 +556,37 @@
             </div>
             <div class="control-row">
               <label>Line Opacity</label>
-              <input type="range" id="fx-grid-opacity" min="5" max="100" value="45">
+              <input type="range" id="fx-grid-opacity" min="5" max="100" value="25">
             </div>
             <div class="control-row">
               <label>Dark Vignette</label>
-              <input type="range" id="fx-vignette" min="0" max="100" value="55">
+              <input type="range" id="fx-vignette" min="0" max="100" value="85">
+            </div>
+            <div class="control-row">
+              <label>Grid Line Color</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="fx-grid-color" value="#c8dcff" style="width: 38px; height: 28px; padding: 1px 2px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-input); cursor: pointer;">
+                <button type="button" class="btn-sm active" id="btn-grid-color-default" style="font-size: 10px; padding: 3px 8px;">Default</button>
+                <button type="button" class="btn-sm" id="btn-grid-color-cyan" style="font-size: 10px; padding: 3px 8px; color: #00f0ff;">Cyan</button>
+                <button type="button" class="btn-sm" id="btn-grid-color-red" style="font-size: 10px; padding: 3px 8px; color: #ff334b;">Red</button>
+              </div>
+            </div>
+            <div class="control-row">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <label style="margin: 0;">Cyber Glow & Horizon Bloom</label>
+                <label class="switch" style="width: 26px; height: 15px;">
+                  <input type="checkbox" id="fx-grid-glow-enable">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <p class="hint-text" style="margin-bottom: 4px; font-size: 9.5px;">Adds glowing horizon accent line and floor bloom.</p>
+              <div id="fx-grid-glow-controls" style="display: none;">
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">
+                  <span>Glow Intensity</span>
+                  <span id="fx-grid-glow-val">60%</span>
+                </div>
+                <input type="range" id="fx-grid-glow-intensity" min="10" max="100" value="60">
+              </div>
             </div>
           </div>
         </div>
@@ -583,8 +609,26 @@
               <input type="range" id="fx-particles-count" min="10" max="150" value="65">
             </div>
             <div class="control-row">
-              <label>Bottom Fire Glow</label>
-              <input type="range" id="fx-fire-glow" min="0" max="100" value="60">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <label style="margin: 0;">Bottom Fire Glow</label>
+                <label class="switch" style="width: 26px; height: 15px;">
+                  <input type="checkbox" id="fx-fire-glow-enable" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div id="fx-fire-glow-controls">
+                <input type="range" id="fx-fire-glow" min="0" max="100" value="60">
+              </div>
+            </div>
+            <div class="control-row">
+              <label>Fire & Ember Color</label>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="color" id="fx-fire-color" value="#ff4114" style="width: 38px; height: 28px; padding: 1px 2px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-input); cursor: pointer;">
+                <button type="button" class="btn-sm active" id="btn-fire-color-default" style="font-size: 10px; padding: 3px 8px; color: #ff6b35;">Orange</button>
+                <button type="button" class="btn-sm" id="btn-fire-color-cyan" style="font-size: 10px; padding: 3px 8px; color: #00f0ff;">Cyan</button>
+                <button type="button" class="btn-sm" id="btn-fire-color-purple" style="font-size: 10px; padding: 3px 8px; color: #b55fe6;">Purple</button>
+                <button type="button" class="btn-sm" id="btn-fire-color-green" style="font-size: 10px; padding: 3px 8px; color: #00e676;">Green</button>
+              </div>
             </div>
             <div class="control-row">
               <label>Speed</label>
@@ -989,6 +1033,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=24"></script>
+  <script src="js/app.js?v=27"></script>
 </body>
 </html>
