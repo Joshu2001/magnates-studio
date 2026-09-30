@@ -585,10 +585,10 @@ function drawMediaLayer(specificClip) {
   }
 
   const targetFile = targetClip ? targetClip.file : activePreviewMedia;
-  if (!targetFile) return;
+  if (!targetFile && !targetClip?.drawingStrokes) return;
 
-  const el = getMediaElement(targetFile);
-  if (!el) return;
+  const el = targetFile ? getMediaElement(targetFile) : null;
+  if (!el && !targetClip?.drawingStrokes) return;
 
   const w = canvas.width;
   const h = canvas.height;
@@ -637,6 +637,9 @@ function drawMediaLayer(specificClip) {
     } else {
       return;
     }
+  } else if (targetClip && targetClip.drawingStrokes) {
+    dw = 1280;
+    dh = 720;
   } else if (targetFile.isImage) {
     if (!el.complete || !el.naturalWidth || !el.naturalHeight) {
       return;
@@ -727,7 +730,13 @@ function drawMediaLayer(specificClip) {
       ctx.scale(currentPunch, currentPunch);
       ctx.translate(-originPxX, -originPxY);
 
-      ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+      if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0 && targetClip.drawMode === 'live') {
+        const elapsed = currentTime - targetClip.start;
+        const drawProg = Math.min(1.0, Math.max(0.0, elapsed / Math.max(0.5, targetClip.duration * 0.85)));
+        drawScreenInkOverlay(ctx, targetClip.drawingStrokes, targetClip.drawingFills, drawProg, targetClip.staggerParts);
+      } else {
+        ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+      }
 
       if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
@@ -736,8 +745,15 @@ function drawMediaLayer(specificClip) {
       }
       ctx.restore();
     } else {
-      // Normal draw
-      ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+      if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0 && targetClip.drawMode === 'live') {
+        const elapsed = currentTime - targetClip.start;
+        const drawProg = Math.min(1.0, Math.max(0.0, elapsed / Math.max(0.5, targetClip.duration * 0.85)));
+        drawScreenInkOverlay(ctx, targetClip.drawingStrokes, targetClip.drawingFills, drawProg, targetClip.staggerParts);
+      } else if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0) {
+        drawScreenInkOverlay(ctx, targetClip.drawingStrokes, targetClip.drawingFills, 1.0, false);
+      } else if (renderSource) {
+        ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+      }
 
       // Subtle selection border if selected, or if vector effect is active
       if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
@@ -1461,7 +1477,9 @@ function renderAllTimelineTracks() {
       block.style.width = `${widthPx}px`;
 
       let iconSvg = '';
-      if (type === 'image') {
+      if (clip.drawingStrokes) {
+        iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #ff334b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+      } else if (type === 'image') {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
       } else if (type === 'video') {
         const audioBadge = clip.soundEnabled
@@ -1708,14 +1726,17 @@ function selectClip(clip, trackType) {
   } else {
     // Show clip inspector card
     inspector.style.display = 'block';
-    document.getElementById('inspector-clip-type').textContent = trackType.toUpperCase();
-    document.getElementById('inspector-clip-name').textContent = clip.file?.name || 'Clip';
+    document.getElementById('inspector-clip-type').textContent = clip.drawingStrokes ? 'DRAWING' : trackType.toUpperCase();
+    document.getElementById('inspector-clip-name').textContent = clip.name || clip.file?.name || 'Clip';
     
     // Dynamic Mini Preview in Sidebar Inspector
     const miniThumb = document.getElementById('inspector-mini-thumb');
     const miniSub = document.getElementById('inspector-clip-sub');
     if (miniThumb) {
-      if (trackType === 'image' && clip.file?.url) {
+      if (clip.drawingStrokes) {
+        miniThumb.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" style="width:20px;height:20px;fill:#ff334b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+        if (miniSub) miniSub.textContent = `Drawing • ${clip.drawMode === 'live' ? 'Speed-Draw Active' : 'Static'} • ${clip.staggerParts ? 'Staggered' : 'All Strokes'}`;
+      } else if (trackType === 'image' && clip.file?.url) {
         miniThumb.innerHTML = `<img src="${clip.file.url}" style="width:100%; height:100%; object-fit:cover;">`;
         if (miniSub) miniSub.textContent = `Image • ${((clip.scale || 1) * 100).toFixed(0)}% zoom • Drag on canvas to edit`;
       } else if (trackType === 'video' && clip.file?.url) {
@@ -3881,7 +3902,38 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 3. Fallback: if a clip is currently selected, open menu for it
+    // 3. Check if right-clicked on an active drawing stroke on screen
+    if (drawingStrokes.length > 0) {
+      for (let sIdx = drawingStrokes.length - 1; sIdx >= 0; sIdx--) {
+        const s = drawingStrokes[sIdx];
+        if (s.points && s.points.some(p => Math.hypot(p.x - pt.x, p.y - pt.y) <= Math.max(16, s.size * 2))) {
+          // Find drawing clip or prompt context menu for current vector sketch
+          const activeDrawClip = timelineClips.image.find(c => c.drawingStrokes && currentTime >= c.start && currentTime <= (c.start + c.duration));
+          if (activeDrawClip) {
+            selectClip(activeDrawClip, 'image');
+            showStudioContextMenu(e.clientX, e.clientY, activeDrawClip, 'image');
+            return;
+          } else {
+            // Auto-group strokes to temporary layer or open context menu for screen drawing
+            const tempDrawingClip = {
+              id: 'clip-screen-drawing',
+              name: 'Screen Drawing',
+              drawingStrokes: drawingStrokes,
+              drawMode: 'live',
+              staggerParts: false,
+              start: currentTime,
+              duration: 4.0,
+              layerOrder: 'front',
+              zIndex: 40
+            };
+            showStudioContextMenu(e.clientX, e.clientY, tempDrawingClip, 'image');
+            return;
+          }
+        }
+      }
+    }
+
+    // 4. Fallback: if a clip is currently selected, open menu for it
     if (selectedClip && selectedClip.clip) {
       showStudioContextMenu(e.clientX, e.clientY, selectedClip.clip, selectedClip.trackType);
     }
@@ -4132,6 +4184,10 @@ function getSerializableClips() {
       loupeShape: c.loupeShape,
       loupeWidth: c.loupeWidth,
       loupeHeight: c.loupeHeight,
+      drawingStrokes: c.drawingStrokes ? JSON.parse(JSON.stringify(c.drawingStrokes)) : undefined,
+      drawingFills: c.drawingFills ? JSON.parse(JSON.stringify(c.drawingFills)) : undefined,
+      drawMode: c.drawMode,
+      staggerParts: c.staggerParts,
       file: c.file ? {
         name: c.file.name,
         url: c.file.url,
@@ -4513,8 +4569,9 @@ function showStudioContextMenu(x, y, clip, trackType) {
   menu.className = 'studio-context-menu';
   activeStudioContextMenu = menu;
 
-  const clipLabel = clip.file?.name || clip.text || (trackType.toUpperCase() + ' Clip');
+  const clipLabel = clip.name || clip.file?.name || clip.text || (trackType.toUpperCase() + ' Clip');
   const isImage = trackType === 'image';
+  const isDrawing = isImage && !!clip.drawingStrokes;
   const hasCutout = isImage && !!clip.cutoutCanvas;
   const hasVector = isImage && !!clip.vectorEffect;
   const isFront = (clip.layerOrder === 'front');
@@ -4522,11 +4579,45 @@ function showStudioContextMenu(x, y, clip, trackType) {
   let itemsHtml = `
     <div class="context-menu-header">
       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${clipLabel}</span>
-      <span class="context-badge">${trackType.toUpperCase()}</span>
+      <span class="context-badge">${isDrawing ? 'DRAWING' : trackType.toUpperCase()}</span>
     </div>
   `;
 
-  if (isImage) {
+  if (isDrawing) {
+    const isLive = clip.drawMode === 'live';
+    const isStaggered = clip.staggerParts === true;
+    itemsHtml += `
+      <!-- Live Speed-Draw Animation (Whiteboard / Write-on) -->
+      <div class="context-menu-item ${isLive ? 'active-fx' : ''}" id="ctx-action-draw-live">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        <span>${isLive ? 'Live Speed-Draw (Active)' : 'Animate: Live Speed-Draw'}</span>
+        <span class="context-badge">${isLive ? 'On' : 'Write-on'}</span>
+      </div>
+
+      <!-- Stroke-by-Stroke Timing / Staggered Part Reveal -->
+      <div class="context-menu-item ${isStaggered ? 'active-fx' : ''}" id="ctx-action-draw-stagger">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        <span>${isStaggered ? 'Stagger Parts: Head → Body' : 'Stagger Stroke Timing'}</span>
+        <span class="context-badge">${isStaggered ? 'Sequential' : 'Instant'}</span>
+      </div>
+
+      <!-- Fill Hollow / Enclosed Shape -->
+      <div class="context-menu-item" id="ctx-action-draw-fill">
+        <svg viewBox="0 0 24 24"><path d="M19 11.5s-2-2.17-2-3.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5c0 1.33-1 3.5-1 3.5zm-3.86-1.07l-6.57-6.57a.996.996 0 0 0-1.41 0L2.71 8.31a.996.996 0 0 0 0 1.41l7.07 7.07c.39.39 1.02.39 1.41 0l4.57-4.57c.39-.39.39-1.02-.02-1.41z"/></svg>
+        <span>Fill Enclosed Shape (Color In)</span>
+        <span class="context-badge" style="color: #ff334b;">Bucket</span>
+      </div>
+
+      <!-- Add Text Overlay -->
+      <div class="context-menu-item" id="ctx-action-add-text">
+        <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+        <span>Add Kinetic Caption</span>
+        <span class="context-badge" style="color: #00f0ff;">Caption</span>
+      </div>
+
+      <div class="context-menu-divider"></div>
+    `;
+  } else if (isImage) {
     itemsHtml += `
       <!-- Add Text Overlay -->
       <div class="context-menu-item" id="ctx-action-add-text">
@@ -4612,6 +4703,32 @@ function showStudioContextMenu(x, y, clip, trackType) {
   menu.style.top = `${posY}px`;
 
   // Attach Event Handlers
+  menu.querySelector('#ctx-action-draw-live')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.drawMode = clip.drawMode === 'live' ? 'instant' : 'live';
+    selectClip(clip, trackType);
+    recordState('Toggle Live Speed-Draw Animation');
+    showTextTimingAlert(clip.drawMode === 'live' ? 'Live Speed-Draw Animation Active! Strokes write-on timed to voiceover.' : 'Speed-Draw disabled (Instant reveal).', 'success');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  });
+
+  menu.querySelector('#ctx-action-draw-stagger')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.staggerParts = !clip.staggerParts;
+    selectClip(clip, trackType);
+    recordState('Toggle Staggered Stroke Timing');
+    showTextTimingAlert(clip.staggerParts ? 'Staggered Stroke Timing Enabled! Head, body, and legs appear sequentially.' : 'Staggered timing disabled.', 'success');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  });
+
+  menu.querySelector('#ctx-action-draw-fill')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    fillClipEnclosedShape(clip);
+  });
+
   menu.querySelector('#ctx-action-add-text')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
@@ -4892,9 +5009,10 @@ function toggleMagnatesVectorEffect(clip) {
 }
 
 // ==================== ON-SCREEN DRAWING, HOLD RADIAL MENU & VECTOR ENGINE ====================
-let drawingStrokes = []; // Array of { id, penType, color, size, points: [{x, y, p}], opacity }
+let drawingStrokes = []; // Array of { id, penType, color, size, points: [{x, y, p}], opacity, fill, fillColor }
+let drawingFills = []; // Array of { id, x, y, color, points } for flood fills / enclosed contours
 let currentStroke = null;
-let currentPenType = 'pen'; // 'pen', 'brush', 'highlighter', 'arrow', 'eraser'
+let currentPenType = 'pen'; // 'pen', 'brush', 'highlighter', 'arrow', 'fill', 'eraser'
 let currentDrawColor = '#ff334b';
 let currentDrawSize = 6;
 let drawingUndoStack = [];
@@ -4913,24 +5031,90 @@ function toggleDrawingDock(show) {
   if (!show && radial) radial.style.display = 'none';
 }
 
-// 2. Ink Overlay Render Loop function
-function drawScreenInkOverlay(targetCtx) {
-  if (!drawingStrokes.length && !currentStroke) return;
+// 2. Ink Overlay Render Loop function (with Live Speed-Draw Animation & Staggered Part Timing)
+function drawScreenInkOverlay(targetCtx, customStrokes = null, customFills = null, progress = 1.0, isStaggered = false) {
+  const sourceStrokes = customStrokes || (currentStroke ? [...drawingStrokes, currentStroke] : drawingStrokes);
+  const sourceFills = customFills || drawingFills;
+  if (!sourceStrokes.length && !sourceFills.length && !currentStroke) return;
 
   targetCtx.save();
 
-  const allStrokes = currentStroke ? [...drawingStrokes, currentStroke] : drawingStrokes;
-
-  for (const stroke of allStrokes) {
-    if (!stroke.points || stroke.points.length < 2) {
-      if (stroke.points && stroke.points.length === 1) {
-        // Draw dot
-        const p = stroke.points[0];
-        targetCtx.fillStyle = stroke.color;
+  // 1. Render Enclosed Shape Fills First (so stroke lines stay crisp on top)
+  if (sourceFills && sourceFills.length > 0) {
+    for (const fill of sourceFills) {
+      if (progress < 0.25 && isStaggered) continue; // Reveal fill after contour starts
+      targetCtx.save();
+      targetCtx.fillStyle = fill.color || currentDrawColor;
+      if (fill.contour && fill.contour.length > 2) {
         targetCtx.beginPath();
-        targetCtx.arc(p.x, p.y, stroke.size / 2, 0, Math.PI * 2);
+        targetCtx.moveTo(fill.contour[0].x, fill.contour[0].y);
+        for (let i = 1; i < fill.contour.length; i++) {
+          targetCtx.lineTo(fill.contour[i].x, fill.contour[i].y);
+        }
+        targetCtx.closePath();
+        targetCtx.globalAlpha = fill.opacity !== undefined ? fill.opacity : 0.88;
         targetCtx.fill();
+      } else if (fill.imgCanvas) {
+        targetCtx.drawImage(fill.imgCanvas, 0, 0);
       }
+      targetCtx.restore();
+    }
+  }
+
+  // 2. Render Strokes (Progressively drawn if speed-draw mode is active)
+  const totalStrokes = sourceStrokes.length;
+  if (totalStrokes === 0) {
+    targetCtx.restore();
+    return;
+  }
+
+  const effectiveProgress = Math.min(1.0, Math.max(0.0, progress));
+
+  for (let sIdx = 0; sIdx < totalStrokes; sIdx++) {
+    const stroke = sourceStrokes[sIdx];
+    if (!stroke.points || stroke.points.length === 0) continue;
+
+    // Calculate how much of this stroke is visible based on overall clip progress
+    let strokeFraction = 1.0;
+    if (effectiveProgress < 1.0) {
+      if (isStaggered) {
+        // Staggered sequential stroke reveal: stroke 0 is Head, stroke 1 is Torso, stroke 2 is Leg, etc.
+        const strokeWindow = 1.0 / totalStrokes;
+        const strokeStart = sIdx * strokeWindow;
+        const strokeEnd = strokeStart + strokeWindow;
+        if (effectiveProgress < strokeStart) {
+          continue; // Part has not started yet
+        } else if (effectiveProgress >= strokeEnd) {
+          strokeFraction = 1.0; // Fully drawn
+        } else {
+          strokeFraction = (effectiveProgress - strokeStart) / strokeWindow;
+        }
+      } else {
+        // Continuous smooth drawing across entire sketch
+        const strokeWindow = 1.0 / totalStrokes;
+        const strokeStart = sIdx * strokeWindow;
+        const strokeEnd = strokeStart + strokeWindow;
+        if (effectiveProgress < strokeStart) {
+          continue;
+        } else if (effectiveProgress >= strokeEnd) {
+          strokeFraction = 1.0;
+        } else {
+          strokeFraction = (effectiveProgress - strokeStart) / strokeWindow;
+        }
+      }
+    }
+
+    const availablePointsCount = Math.max(1, Math.round(stroke.points.length * strokeFraction));
+    const pts = stroke.points.slice(0, availablePointsCount);
+    if (!pts.length) continue;
+
+    if (pts.length < 2) {
+      // Draw dot
+      const p = pts[0];
+      targetCtx.fillStyle = stroke.color;
+      targetCtx.beginPath();
+      targetCtx.arc(p.x, p.y, stroke.size / 2, 0, Math.PI * 2);
+      targetCtx.fill();
       continue;
     }
 
@@ -4946,7 +5130,6 @@ function drawScreenInkOverlay(targetCtx) {
     } else if (stroke.penType === 'brush') {
       targetCtx.globalAlpha = 0.95;
     } else if (stroke.penType === 'eraser') {
-      // In preview composite mode
       targetCtx.strokeStyle = '#0a0b0e';
       targetCtx.lineWidth = stroke.size * 2;
     } else {
@@ -4954,30 +5137,208 @@ function drawScreenInkOverlay(targetCtx) {
     }
 
     if (stroke.penType === 'arrow') {
-      // Draw straight arrow from start point to end point
-      const p1 = stroke.points[0];
-      const p2 = stroke.points[stroke.points.length - 1];
+      const p1 = pts[0];
+      const p2 = pts[pts.length - 1];
       drawVectorArrow(targetCtx, p1.x, p1.y, p2.x, p2.y, stroke.color, stroke.size);
     } else if (stroke.penType === 'brush') {
-      // Calligraphy / Fountain stroke with variable width based on velocity & pressure
-      drawCalligraphyStroke(targetCtx, stroke);
+      drawCalligraphyStroke(targetCtx, { ...stroke, points: pts });
     } else {
       // Smooth Bezier Curve Path
       targetCtx.beginPath();
-      targetCtx.moveTo(stroke.points[0].x, stroke.points[0].y);
+      targetCtx.moveTo(pts[0].x, pts[0].y);
 
-      for (let i = 1; i < stroke.points.length - 1; i++) {
-        const xc = (stroke.points[i].x + stroke.points[i + 1].x) / 2;
-        const yc = (stroke.points[i].y + stroke.points[i + 1].y) / 2;
-        targetCtx.quadraticCurveTo(stroke.points[i].x, stroke.points[i].y, xc, yc);
+      for (let i = 1; i < pts.length - 1; i++) {
+        const xc = (pts[i].x + pts[i + 1].x) / 2;
+        const yc = (pts[i].y + pts[i + 1].y) / 2;
+        targetCtx.quadraticCurveTo(pts[i].x, pts[i].y, xc, yc);
       }
-      const last = stroke.points[stroke.points.length - 1];
+      const last = pts[pts.length - 1];
       targetCtx.lineTo(last.x, last.y);
       targetCtx.stroke();
     }
   }
 
   targetCtx.restore();
+}
+
+// Flood Fill / Enclosed Shape Detection & Filling
+function floodFillCanvasAtPoint(pt, fillColor) {
+  const w = canvas.width;
+  const h = canvas.height;
+  const targetX = Math.round(pt.x);
+  const targetY = Math.round(pt.y);
+
+  if (targetX < 0 || targetX >= w || targetY < 0 || targetY >= h) return;
+
+  // 1. Try smart vector closed loop detection first (highest quality lossless fill)
+  const closedContour = findEnclosingStrokeContour(pt);
+  if (closedContour && closedContour.length > 2) {
+    const fillItem = {
+      id: `fill-${Date.now()}`,
+      color: fillColor,
+      contour: closedContour,
+      opacity: 0.9
+    };
+    drawingFills.push(fillItem);
+    drawingUndoStack.push({ type: 'fill', item: fillItem });
+    playUiSound('action');
+    showTextTimingAlert('Enclosed contour filled perfectly!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+    return;
+  }
+
+  // 2. High-speed raster flood fill on canvas pixel data
+  try {
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+    const startIdx = (targetY * w + targetX) * 4;
+    const targetR = data[startIdx];
+    const targetG = data[startIdx + 1];
+    const targetB = data[startIdx + 2];
+
+    // Parse fill color hex to RGB
+    const fillRGB = hexToRgb(fillColor) || { r: 255, g: 51, b: 75 };
+
+    if (Math.abs(targetR - fillRGB.r) < 15 && Math.abs(targetG - fillRGB.g) < 15 && Math.abs(targetB - fillRGB.b) < 15) {
+      return; // Already this color
+    }
+
+    const fillCanvas = document.createElement('canvas');
+    fillCanvas.width = w;
+    fillCanvas.height = h;
+    const fCtx = fillCanvas.getContext('2d');
+    const fImgData = fCtx.createImageData(w, h);
+    const fData = fImgData.data;
+
+    const visited = new Uint8Array(w * h);
+    const queue = [targetX, targetY];
+    visited[targetY * w + targetX] = 1;
+
+    let head = 0;
+    const maxPixels = 900000;
+    let filledCount = 0;
+
+    while (head < queue.length && filledCount < maxPixels) {
+      const qx = queue[head++];
+      const qy = queue[head++];
+      const pIdx = (qy * w + qx) * 4;
+
+      const r = data[pIdx];
+      const g = data[pIdx + 1];
+      const b = data[pIdx + 2];
+
+      // Stop at dark boundaries or stroke colors
+      const colorDist = Math.hypot(r - targetR, g - targetG, b - targetB);
+      if (colorDist < 48) {
+        fData[pIdx] = fillRGB.r;
+        fData[pIdx + 1] = fillRGB.g;
+        fData[pIdx + 2] = fillRGB.b;
+        fData[pIdx + 3] = 230; // crisp opaque fill
+        filledCount++;
+
+        const neighbors = [
+          [qx + 1, qy],
+          [qx - 1, qy],
+          [qx, qy + 1],
+          [qx, qy - 1]
+        ];
+
+        for (let n = 0; n < 4; n++) {
+          const nx = neighbors[n][0];
+          const ny = neighbors[n][1];
+          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+            const nIdx = ny * w + nx;
+            if (!visited[nIdx]) {
+              visited[nIdx] = 1;
+              queue.push(nx, ny);
+            }
+          }
+        }
+      }
+    }
+
+    fCtx.putImageData(fImgData, 0, 0);
+    const fillItem = {
+      id: `fill-raster-${Date.now()}`,
+      color: fillColor,
+      imgCanvas: fillCanvas
+    };
+    drawingFills.push(fillItem);
+    drawingUndoStack.push({ type: 'fill', item: fillItem });
+    playUiSound('action');
+    showTextTimingAlert('Hollow shape filled with color!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  } catch(e) {
+    console.error('Fill error:', e);
+  }
+}
+
+// Find enclosing vector stroke contour around click point
+function findEnclosingStrokeContour(pt) {
+  // If user drew a closed shape (e.g. circle / loop where start and end points are near each other)
+  for (let i = drawingStrokes.length - 1; i >= 0; i--) {
+    const s = drawingStrokes[i];
+    if (s.points && s.points.length >= 6) {
+      const pFirst = s.points[0];
+      const pLast = s.points[s.points.length - 1];
+      const loopDist = Math.hypot(pFirst.x - pLast.x, pFirst.y - pLast.y);
+
+      // If loop is closed within 48px, check if point is inside polygon
+      if (loopDist < 48 || isPointInPolygon(pt, s.points)) {
+        return s.points;
+      }
+    }
+  }
+  return null;
+}
+
+function isPointInPolygon(pt, polygon) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    const intersect = ((yi > pt.y) !== (yj > pt.y)) && (pt.x < (xj - xi) * (pt.y - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function hexToRgb(hex) {
+  const res = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return res ? {
+    r: parseInt(res[1], 16),
+    g: parseInt(res[2], 16),
+    b: parseInt(res[3], 16)
+  } : null;
+}
+
+// Right-click fill option for a drawing clip
+function fillClipEnclosedShape(clip) {
+  if (!clip) return;
+  const targetColor = currentDrawColor || '#ff334b';
+  if (clip.drawingStrokes && clip.drawingStrokes.length > 0) {
+    const allPts = [];
+    clip.drawingStrokes.forEach(s => {
+      if (s.points) allPts.push(...s.points);
+    });
+
+    if (allPts.length > 2) {
+      if (!clip.drawingFills) clip.drawingFills = [];
+      clip.drawingFills.push({
+        id: `fill-clip-${Date.now()}`,
+        color: targetColor,
+        contour: allPts,
+        opacity: 0.88
+      });
+      renderAllTimelineTracks();
+      recordState('Fill Drawing Shape');
+      showTextTimingAlert(`Drawing filled with ${targetColor}!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+      return;
+    }
+  }
+  showTextTimingAlert('No enclosed shape found to fill.', 'warning');
+  setTimeout(() => showTextTimingAlert(''), 2500);
 }
 
 function drawVectorArrow(ctx, fromX, fromY, toX, toY, color, size) {
@@ -5074,8 +5435,19 @@ function initScreenDrawingEngine() {
   const btnUndo = document.getElementById('btn-draw-undo');
   if (btnUndo) {
     btnUndo.addEventListener('click', () => {
-      if (drawingStrokes.length) {
-        drawingUndoStack.push(drawingStrokes.pop());
+      if (drawingUndoStack.length) {
+        const lastAction = drawingUndoStack.pop();
+        if (lastAction.type === 'fill') {
+          drawingFills = drawingFills.filter(f => f.id !== lastAction.item.id);
+        } else if (lastAction.points) {
+          drawingStrokes = drawingStrokes.filter(s => s.id !== lastAction.id);
+        }
+        playUiSound('snap');
+      } else if (drawingFills.length) {
+        drawingFills.pop();
+        playUiSound('snap');
+      } else if (drawingStrokes.length) {
+        drawingStrokes.pop();
         playUiSound('snap');
       }
     });
@@ -5085,9 +5457,10 @@ function initScreenDrawingEngine() {
   const btnClear = document.getElementById('btn-draw-clear');
   if (btnClear) {
     btnClear.addEventListener('click', () => {
-      if (drawingStrokes.length) {
+      if (drawingStrokes.length || drawingFills.length) {
         drawingUndoStack = [...drawingStrokes];
         drawingStrokes = [];
+        drawingFills = [];
         playUiSound('action');
       }
     });
@@ -5132,6 +5505,12 @@ function initScreenDrawingEngine() {
       openRadialMenu(canvasHoldStartPt.clientX, canvasHoldStartPt.clientY);
       playUiSound('camera_click');
     }, 320);
+
+    // If active tool is fill / paint bucket, flood fill shape immediately on click
+    if (currentPenType === 'fill') {
+      floodFillCanvasAtPoint(pt, currentDrawColor);
+      return;
+    }
 
     // Initialize stroke candidate
     currentStroke = {
@@ -5226,6 +5605,20 @@ function generateVectorSVG() {
   let svgPaths = '';
   let pathCount = 0;
 
+  // 1. Vector fills in SVG
+  for (const f of drawingFills) {
+    if (f.contour && f.contour.length > 2) {
+      pathCount++;
+      let d = `M ${f.contour[0].x.toFixed(1)} ${f.contour[0].y.toFixed(1)}`;
+      for (let i = 1; i < f.contour.length; i++) {
+        d += ` L ${f.contour[i].x.toFixed(1)} ${f.contour[i].y.toFixed(1)}`;
+      }
+      d += ' Z';
+      svgPaths += `  <path d="${d}" fill="${f.color}" opacity="${f.opacity !== undefined ? f.opacity : 0.88}" stroke="none" />\n`;
+    }
+  }
+
+  // 2. Vector strokes in SVG
   for (const s of drawingStrokes) {
     if (!s.points || s.points.length === 0) continue;
     pathCount++;
@@ -5344,14 +5737,19 @@ function initVectorModalControls() {
           x: 0,
           y: 0,
           img: img,
+          drawingStrokes: JSON.parse(JSON.stringify(drawingStrokes)),
+          drawingFills: JSON.parse(JSON.stringify(drawingFills)),
+          drawMode: 'live',
+          staggerParts: false,
           file: { name: 'vector-drawing.svg', url }
         };
         timelineClips.image.push(newClip);
         renderAllTimelineTracks();
+        selectClip(newClip, 'image');
         recordState('Add Vector Drawing Layer');
         if (modal) modal.style.display = 'none';
-        showTextTimingAlert('Vector Drawing added as a movable timeline sticker layer!', 'success');
-        setTimeout(() => showTextTimingAlert(''), 3000);
+        showTextTimingAlert('Drawing added as animated layer! Right-click anytime for Live Speed-Draw & Timing.', 'success');
+        setTimeout(() => showTextTimingAlert(''), 3500);
       };
       img.src = url;
     });
