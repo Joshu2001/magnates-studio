@@ -1429,3 +1429,103 @@ input:checked + .slider:before {
   color: #fff;
 }
 
+/* ==================== RIGHT-CLICK CONTEXT MENU ==================== */
+.studio-context-menu {
+  position: fixed;
+  z-index: 10000;
+  background: #171a24;
+  border: 1px solid #2e354a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75), 0 0 1px 1px rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  min-width: 220px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  user-select: none;
+  animation: contextFadeIn 0.12s ease-out;
+}
+
+@keyframes contextFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.context-menu-header {
+  padding: 6px 10px 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e6f0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.context-menu-item:hover {
+  background: #252a3b;
+  color: #fff;
+}
+
+.context-menu-item.active-fx {
+  background: rgba(255, 51, 75, 0.15);
+  color: #ff6b7e;
+}
+
+.context-menu-item.active-fx:hover {
+  background: rgba(255, 51, 75, 0.25);
+  color: #fff;
+}
+
+.context-menu-item.danger:hover {
+  background: rgba(255, 51, 75, 0.2);
+  color: #ff4d62;
+}
+
+.context-menu-item svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: #262c3e;
+  margin: 4px 0;
+}
+
+.context-badge {
+  margin-left: auto;
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: #23283a;
+  color: #8b92a5;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.context-menu-item:hover .context-badge {
+  background: #2f364d;
+  color: #d0d6e8;
+}
+
+

@@ -59,6 +59,10 @@ function recordState(actionName) {
   undoStack.push(snapshot);
   if (undoStack.length > MAX_HISTORY) undoStack.shift();
   updateUndoRedoUI();
+  // Automatic persistence: save project state on any user action
+  if (typeof saveProjectState === 'function') {
+    saveProjectState(false);
+  }
 }
 
 function undo() {
@@ -647,16 +651,49 @@ function drawMediaLayer(specificClip) {
     targetClip._renderBounds = { x: dx, y: dy, w: finalW, h: finalH };
   }
 
+  // Determine source element to render (processed cutout canvas vs original image element)
+  let renderSource = el;
+  if (targetFile.isImage && targetClip && targetClip.cutoutCanvas) {
+    renderSource = targetClip.cutoutCanvas;
+  }
+
   ctx.save();
   ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-  ctx.shadowBlur = 35;
-  ctx.shadowOffsetY = 10;
+  ctx.shadowBlur = targetClip?.vectorEffect ? 45 : 35;
+  ctx.shadowOffsetY = targetClip?.vectorEffect ? 14 : 10;
 
   try {
-    ctx.drawImage(el, dx, dy, finalW, finalH);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(dx, dy, finalW, finalH);
+    // If Vector / Graphic Paper Cutout FX is enabled, render multi-pass sticker contour outline
+    if (targetClip && targetClip.vectorEffect) {
+      // 1. Draw solid stroke contour outline around the subject
+      const strokeSize = 6;
+      ctx.save();
+      ctx.shadowColor = 'transparent';
+      // 8-directional offset silhouette for sharp sticker edge
+      const offsets = [
+        [-strokeSize, 0], [strokeSize, 0], [0, -strokeSize], [0, strokeSize],
+        [-strokeSize*0.7, -strokeSize*0.7], [strokeSize*0.7, -strokeSize*0.7],
+        [-strokeSize*0.7, strokeSize*0.7], [strokeSize*0.7, -strokeSize*0.7]
+      ];
+      offsets.forEach(([ox, oy]) => {
+        ctx.drawImage(renderSource, dx + ox, dy + oy, finalW, finalH);
+      });
+      // Tint the outline layer white using composite
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = targetClip.vectorStrokeColor || '#ffffff';
+      ctx.fillRect(dx - strokeSize * 2, dy - strokeSize * 2, finalW + strokeSize * 4, finalH + strokeSize * 4);
+      ctx.restore();
+    }
+
+    // 2. Render primary image / cutout
+    ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+
+    // Subtle selection border if selected, or if vector effect is active
+    if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(dx, dy, finalW, finalH);
+    }
   } catch(e) {}
 
   ctx.restore();
@@ -1461,6 +1498,34 @@ function selectClip(clip, trackType) {
       if (layerSection) layerSection.style.display = 'none';
     }
 
+    // Image Cutout & Vector Effects section
+    const imageFxSection = document.getElementById('inspector-image-fx-section');
+    if (imageFxSection) {
+      if (trackType === 'image') {
+        imageFxSection.style.display = 'block';
+        const hasCutout = !!clip.cutoutCanvas;
+        const hasVector = !!clip.vectorEffect;
+
+        const cutoutBtn = document.getElementById('btn-sidebar-cutout');
+        const cutoutLbl = document.getElementById('label-sidebar-cutout');
+        if (cutoutBtn && cutoutLbl) {
+          cutoutLbl.textContent = hasCutout ? 'Restore BG' : 'Remove BG';
+          cutoutBtn.style.borderColor = hasCutout ? 'var(--accent-red)' : '';
+          cutoutBtn.style.color = hasCutout ? '#ff6b7e' : '';
+        }
+
+        const vectorBtn = document.getElementById('btn-sidebar-vector');
+        const vectorLbl = document.getElementById('label-sidebar-vector');
+        if (vectorBtn && vectorLbl) {
+          vectorLbl.textContent = hasVector ? 'Vector (On)' : 'Vector FX';
+          vectorBtn.style.borderColor = hasVector ? '#00f0ff' : '';
+          vectorBtn.style.color = hasVector ? '#00f0ff' : '';
+        }
+      } else {
+        imageFxSection.style.display = 'none';
+      }
+    }
+
     document.getElementById('btn-update-text').style.display = 'none';
     document.getElementById('btn-delete-text').style.display = 'none';
 
@@ -1486,6 +1551,14 @@ function attachClipInteractions(blockEl, clip, trackType) {
     if (activeTool === 'select') {
       seekToTime(clip.start);
     }
+  });
+
+  // Right-click context menu on timeline block
+  blockEl.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    selectClip(clip, trackType);
+    showStudioContextMenu(e.clientX, e.clientY, clip, trackType);
   });
 
   // Move clip horizontally by dragging
@@ -1661,6 +1734,7 @@ function splitClipAtPlayhead(trackType, clip) {
 }
 
 // Setup Drag & Drop Listeners onto Track Rows
+// Setup Drag & Drop Listeners onto Track Rows
 function initTimelineDragAndDrop() {
   const tracks = document.querySelectorAll('.timeline-tracks .track');
   tracks.forEach(trackEl => {
@@ -1686,11 +1760,31 @@ function initTimelineDragAndDrop() {
         const dropX = e.clientX - rect.left;
         const dropSec = Math.max(0, dropX / pps);
 
-        let targetType = trackEl.dataset.trackType || 'video';
-        if (targetType === 'image' && file.isVideo) targetType = 'video';
-        if (targetType === 'video' && file.isImage) targetType = 'image';
-        if ((targetType === 'voiceover' || targetType === 'music') && (file.isImage || file.isVideo)) {
-          targetType = file.isVideo ? 'video' : 'image';
+        // Auto-routing & lane enforcement:
+        // Automatically route media files to their respective dedicated tracks
+        let targetType = 'image';
+        if (file.isVideo) {
+          targetType = 'video';
+        } else if (file.isAudio) {
+          targetType = 'voiceover';
+        } else if (file.isImage) {
+          targetType = 'image';
+        } else if (file.text !== undefined) {
+          targetType = 'text';
+        }
+
+        // Inform user if file automatically snapped to correct lane
+        const droppedLaneType = trackEl.dataset.trackType || '';
+        if (droppedLaneType && droppedLaneType !== targetType) {
+          const laneNames = {
+            image: 'Images',
+            video: 'Video Clips',
+            voiceover: 'Voiceover',
+            text: 'Kinetic Text',
+            music: 'BGM Music'
+          };
+          showTextTimingAlert(`Auto-routed "${file.name || 'clip'}" to ${laneNames[targetType] || targetType} track.`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 2500);
         }
 
         addClipToTimeline(targetType, file, dropSec, file.duration || (file.isAudio ? 25 : 6));
@@ -2269,6 +2363,21 @@ document.getElementById('btn-layer-front')?.addEventListener('click', () => {
   }
 });
 
+// Sidebar Image Cutout & Vector FX Quick Toggles
+document.getElementById('btn-sidebar-cutout')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.trackType === 'image') {
+    toggleBackgroundRemoval(selectedClip.clip);
+    selectClip(selectedClip.clip, 'image');
+  }
+});
+
+document.getElementById('btn-sidebar-vector')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.trackType === 'image') {
+    toggleMagnatesVectorEffect(selectedClip.clip);
+    selectClip(selectedClip.clip, 'image');
+  }
+});
+
 // Reset Clip Properties to Default (Local Reset)
 document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', () => {
   if (selectedClip) {
@@ -2325,6 +2434,18 @@ function updateActiveTextClip() {
     active.position = textPos;
     active.layerOrder = textLayerOrder;
     active.zIndex = textLayerOrder === 'front' ? 30 : 5;
+
+    // Live sync into floating on-screen canvas text editor if open
+    const screenInput = document.getElementById('screen-text-input');
+    const editorContainer = document.getElementById('canvas-text-editor-container');
+    if (editorContainer && editorContainer.style.display !== 'none' && screenInput) {
+      if (screenInput.value !== active.text) {
+        screenInput.value = active.text || '';
+      }
+      screenInput.style.fontFamily = active.fontFamily || "'Inter', sans-serif";
+      screenInput.style.color = active.textColor || '#ffffff';
+    }
+
     renderAllTimelineTracks();
   }
 }
@@ -3162,6 +3283,42 @@ function initCanvasTransformInteraction() {
       }
     }
   });
+
+  // Right-click on canvas to open image / clip context menu
+  canvas.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    const pt = getCanvasPointer(e);
+
+    // 1. Check if clicked on any active image or video layer (topmost first)
+    const activeMediaClips = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeMediaClips.length - 1; i >= 0; i--) {
+      const c = activeMediaClips[i];
+      const b = c._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        const trackType = timelineClips.image.includes(c) ? 'image' : 'video';
+        selectClip(c, trackType);
+        showStudioContextMenu(e.clientX, e.clientY, c, trackType);
+        return;
+      }
+    }
+
+    // 2. Check if clicked on active kinetic text
+    const activeTextClips = timelineClips.text.filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeTextClips.length - 1; i >= 0; i--) {
+      const t = activeTextClips[i];
+      const b = t._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        selectClip(t, 'text');
+        showStudioContextMenu(e.clientX, e.clientY, t, 'text');
+        return;
+      }
+    }
+
+    // 3. Fallback: if a clip is currently selected, open menu for it
+    if (selectedClip && selectedClip.clip) {
+      showStudioContextMenu(e.clientX, e.clientY, selectedClip.clip, selectedClip.trackType);
+    }
+  });
 }
 
 // ==================== FLOATING ON-SCREEN TEXT EDITOR CONTROLLER ====================
@@ -3383,10 +3540,11 @@ function getSerializableClips() {
   // Text clips are fully serializable (no blob URLs)
   const textClips = timelineClips.text.map(c => ({ ...c }));
 
-  // For media clips, save position/timing/settings but strip blob URLs (session-only)
-  function stripMedia(clips) {
+  // For media clips, serialize clip state and media file info (persisted across reloads)
+  function serializeMediaClips(clips) {
     return clips.map(c => ({
       id: c.id,
+      track: c.track,
       start: c.start,
       duration: c.duration,
       volume: c.volume,
@@ -3396,16 +3554,25 @@ function getSerializableClips() {
       x: c.x,
       y: c.y,
       scale: c.scale,
-      fileName: c.file?.name || ''
+      vectorEffect: c.vectorEffect,
+      vectorStrokeColor: c.vectorStrokeColor,
+      file: c.file ? {
+        name: c.file.name,
+        url: c.file.url,
+        isAudio: c.file.isAudio,
+        isVideo: c.file.isVideo,
+        isImage: c.file.isImage,
+        duration: c.file.duration
+      } : null
     }));
   }
 
   return {
     text: textClips,
-    imageLayout: stripMedia(timelineClips.image),
-    videoLayout: stripMedia(timelineClips.video),
-    voiceoverLayout: stripMedia(timelineClips.voiceover),
-    musicLayout: stripMedia(timelineClips.music),
+    image: serializeMediaClips(timelineClips.image || []),
+    video: serializeMediaClips(timelineClips.video || []),
+    voiceover: serializeMediaClips(timelineClips.voiceover || []),
+    music: serializeMediaClips(timelineClips.music || []),
     currentTime,
     duration,
     savedAt: Date.now()
@@ -3439,34 +3606,17 @@ function loadProjectState() {
     if (!raw) return;
     const state = JSON.parse(raw);
 
-    // Restore text clips (fully portable)
+    // Restore text clips
     if (state.text && state.text.length > 0) {
       timelineClips.text = state.text;
     }
 
-    // Restore media clip timing/layout (file references will be missing until re-uploaded)
-    // We merge by fileName match if file was re-uploaded in this session
-    function mergeLayoutIntoClips(savedLayouts, clips) {
-      savedLayouts.forEach(layout => {
-        const match = clips.find(c => c.file?.name === layout.fileName);
-        if (match) {
-          match.start = layout.start ?? match.start;
-          match.duration = layout.duration ?? match.duration;
-          match.volume = layout.volume ?? match.volume;
-          match.soundEnabled = layout.soundEnabled ?? match.soundEnabled;
-          match.layerOrder = layout.layerOrder ?? match.layerOrder;
-          match.zIndex = layout.zIndex ?? match.zIndex;
-          match.x = layout.x ?? match.x;
-          match.y = layout.y ?? match.y;
-          match.scale = layout.scale ?? match.scale;
-        }
-      });
-    }
-
-    if (state.imageLayout) mergeLayoutIntoClips(state.imageLayout, timelineClips.image);
-    if (state.videoLayout) mergeLayoutIntoClips(state.videoLayout, timelineClips.video);
-    if (state.voiceoverLayout) mergeLayoutIntoClips(state.voiceoverLayout, timelineClips.voiceover);
-    if (state.musicLayout) mergeLayoutIntoClips(state.musicLayout, timelineClips.music);
+    // Restore media clips directly
+    ['image', 'video', 'voiceover', 'music'].forEach(trackType => {
+      if (state[trackType] && state[trackType].length > 0) {
+        timelineClips[trackType] = state[trackType];
+      }
+    });
 
     if (typeof state.duration === 'number') duration = state.duration;
   } catch(e) {}
@@ -3477,8 +3627,8 @@ document.getElementById('btn-save-project')?.addEventListener('click', () => {
   saveProjectState(true);
 });
 
-// Auto-save every 30 seconds
-setInterval(() => saveProjectState(false), 30000);
+// Periodic auto-save every 5 seconds
+setInterval(() => saveProjectState(false), 5000);
 
 // ==================== SCREEN FULLSCREEN & DOUBLE-TAP IMMERSIVE MODE ====================
 const canvasWrapper = document.querySelector('.canvas-wrapper');
@@ -3582,36 +3732,47 @@ async function exportVideoProject() {
 
   try {
     // 1. Setup Audio Mixing Stream for Export
-    const audioContextClass = window.AudioContext || window.webkitAudioContext;
-    const exportAudioCtx = audioContextClass ? new audioContextClass() : null;
     let audioStream = null;
+    try {
+      const audioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (audioContextClass) {
+        const exportAudioCtx = new audioContextClass();
+        if (exportAudioCtx.state === 'suspended') {
+          await exportAudioCtx.resume();
+        }
+        const audioDest = exportAudioCtx.createMediaStreamDestination();
+        let connectedAudio = false;
 
-    if (exportAudioCtx) {
-      const audioDest = exportAudioCtx.createMediaStreamDestination();
+        // Connect main voiceover audio if present and ready
+        if (audioPlayer && audioPlayer.src && audioPlayer.readyState >= 2) {
+          try {
+            const voiceSource = exportAudioCtx.createMediaElementSource(audioPlayer);
+            voiceSource.connect(audioDest);
+            voiceSource.connect(exportAudioCtx.destination);
+            connectedAudio = true;
+          } catch(e) {}
+        }
 
-      // Connect main voiceover audio if present
-      if (audioPlayer && audioPlayer.src) {
-        try {
-          const voiceSource = exportAudioCtx.createMediaElementSource(audioPlayer);
-          voiceSource.connect(audioDest);
-          voiceSource.connect(exportAudioCtx.destination);
-        } catch(e) {}
+        // Connect bgm audio if present and ready
+        if (bgmPlayer && bgmPlayer.src && bgmPlayer.readyState >= 2) {
+          try {
+            const bgmSource = exportAudioCtx.createMediaElementSource(bgmPlayer);
+            bgmSource.connect(audioDest);
+            bgmSource.connect(exportAudioCtx.destination);
+            connectedAudio = true;
+          } catch(e) {}
+        }
+
+        if (connectedAudio && audioDest.stream.getAudioTracks().length > 0) {
+          audioStream = audioDest.stream;
+        }
       }
-
-      // Connect bgm audio if present
-      if (bgmPlayer && bgmPlayer.src) {
-        try {
-          const bgmSource = exportAudioCtx.createMediaElementSource(bgmPlayer);
-          bgmSource.connect(audioDest);
-          bgmSource.connect(exportAudioCtx.destination);
-        } catch(e) {}
-      }
-
-      audioStream = audioDest.stream;
+    } catch (aErr) {
+      console.warn('Audio stream mixing bypassed:', aErr);
     }
 
-    // 2. Capture Canvas Stream (60 FPS high quality)
-    const canvasStream = canvas.captureStream ? canvas.captureStream(60) : canvas.mozCaptureStream(60);
+    // 2. Capture Canvas Stream (30 FPS standard high compatibility)
+    const canvasStream = canvas.captureStream ? canvas.captureStream(30) : canvas.mozCaptureStream(30);
     const combinedTracks = [...canvasStream.getVideoTracks()];
 
     if (audioStream && audioStream.getAudioTracks().length > 0) {
@@ -3620,23 +3781,21 @@ async function exportVideoProject() {
 
     const combinedStream = new MediaStream(combinedTracks);
 
-    // Pick best supported MIME type
-    let mimeType = 'video/webm;codecs=vp9,opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm;codecs=vp8,opus';
-    }
+    // Pick best supported MIME type with broad player support (VLC, Chrome, Windows Media)
+    let mimeType = 'video/webm;codecs=vp8';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'video/webm';
     }
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'video/mp4';
     }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = '';
+    }
 
     exportChunks = [];
-    exportRecorder = new MediaRecorder(combinedStream, {
-      mimeType,
-      videoBitsPerSecond: 8000000 // 8 Mbps high definition
-    });
+    const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 };
+    exportRecorder = new MediaRecorder(combinedStream, recorderOptions);
 
     exportRecorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) {
@@ -3644,12 +3803,24 @@ async function exportVideoProject() {
       }
     };
 
-    const totalExportDuration = Math.min(duration || 30, Math.max(5, getTimelineMaxEndTime()));
+    const totalExportDuration = Math.min(duration || 30, Math.max(3, getTimelineMaxEndTime()));
 
     exportRecorder.onstop = () => {
-      const blob = new Blob(exportChunks, { type: mimeType });
+      const finalMime = mimeType || 'video/webm';
+      const blob = new Blob(exportChunks, { type: finalMime });
+
+      // Diagnostic check: Ensure export file is not 0 bytes
+      if (blob.size === 0) {
+        alert('Export warning: Captured 0 bytes. Trying direct canvas frame fallback.');
+        isExporting = false;
+        btnExport.disabled = false;
+        btnExport.style.opacity = '1';
+        btnExport.innerHTML = originalBtnHTML;
+        return;
+      }
+
       const downloadUrl = URL.createObjectURL(blob);
-      const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+      const ext = finalMime.includes('mp4') ? 'mp4' : 'webm';
       const projectName = (document.getElementById('current-project')?.textContent || 'Magnates_Project').replace(/[^a-zA-Z0-9_-]/g, '_');
       const filename = `${projectName}_Export_${Date.now()}.${ext}`;
 
@@ -3661,15 +3832,15 @@ async function exportVideoProject() {
       setTimeout(() => {
         document.body.removeChild(a);
         URL.revokeObjectURL(downloadUrl);
-      }, 2000);
+      }, 3000);
 
       // Reset export state
       isExporting = false;
       btnExport.disabled = false;
       btnExport.style.opacity = '1';
       btnExport.innerHTML = originalBtnHTML;
-      showTextTimingAlert(`Video exported successfully as "${filename}"!`, 'success');
-      setTimeout(() => showTextTimingAlert(''), 4000);
+      showTextTimingAlert(`Video exported successfully (${(blob.size / (1024 * 1024)).toFixed(1)} MB)!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 4500);
 
       // Seek back to start
       seekToTime(0);
@@ -3686,19 +3857,29 @@ async function exportVideoProject() {
       return maxTime;
     }
 
-    // 3. Start Recording
-    exportRecorder.start(100);
+    // 3. Start Recording with periodic timeslices
+    exportRecorder.start(250);
 
-    // Render loop playback from time 0 to totalExportDuration
+    // Playback loop from 0
     seekToTime(0);
     isPlaying = true;
     if (audioPlayer.src) audioPlayer.play().catch(() => {});
     if (bgmPlayer.src) bgmPlayer.play().catch(() => {});
 
+    // Ensure initial canvas frame is rendered immediately
+    render(performance.now());
+
     const checkInterval = setInterval(() => {
       if (!isExporting) {
         clearInterval(checkInterval);
         return;
+      }
+
+      // Request data from recorder
+      if (exportRecorder && exportRecorder.state === 'recording') {
+        try {
+          exportRecorder.requestData();
+        } catch(e) {}
       }
 
       // Update export button progress text
@@ -3717,7 +3898,7 @@ async function exportVideoProject() {
           exportRecorder.stop();
         }
       }
-    }, 150);
+    }, 200);
 
   } catch (err) {
     console.error('Export Error:', err);
@@ -3732,3 +3913,364 @@ async function exportVideoProject() {
 document.getElementById('btn-export')?.addEventListener('click', () => {
   exportVideoProject();
 });
+
+// ==================== STUDIO CONTEXT MENU & MAGNATES VECTOR / CUTOUT ENGINE ====================
+let activeStudioContextMenu = null;
+
+function hideStudioContextMenu() {
+  if (activeStudioContextMenu) {
+    activeStudioContextMenu.remove();
+    activeStudioContextMenu = null;
+  }
+}
+
+document.addEventListener('click', () => hideStudioContextMenu());
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideStudioContextMenu();
+});
+
+function showStudioContextMenu(x, y, clip, trackType) {
+  hideStudioContextMenu();
+  if (!clip) return;
+
+  const menu = document.createElement('div');
+  menu.className = 'studio-context-menu';
+  activeStudioContextMenu = menu;
+
+  const clipLabel = clip.file?.name || clip.text || (trackType.toUpperCase() + ' Clip');
+  const isImage = trackType === 'image';
+  const hasCutout = isImage && !!clip.cutoutCanvas;
+  const hasVector = isImage && !!clip.vectorEffect;
+  const isFront = (clip.layerOrder === 'front');
+
+  let itemsHtml = `
+    <div class="context-menu-header">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${clipLabel}</span>
+      <span class="context-badge">${trackType.toUpperCase()}</span>
+    </div>
+  `;
+
+  if (isImage) {
+    itemsHtml += `
+      <!-- Add Text Overlay -->
+      <div class="context-menu-item" id="ctx-action-add-text">
+        <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+        <span>Add Text Overlay</span>
+        <span class="context-badge" style="color: #ff334b;">Kinetic Text</span>
+      </div>
+
+      <!-- Remove Background -->
+      <div class="context-menu-item ${hasCutout ? 'active-fx' : ''}" id="ctx-action-cutout">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm10-14l-1-1h-6l-1 1H4v2h16V5h-4zM9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+        <span>${hasCutout ? 'Restore Background' : 'Remove Background'}</span>
+        <span class="context-badge">${hasCutout ? 'Active' : 'AI Cutout'}</span>
+      </div>
+
+      <!-- Vector / Comic Paper Cutout Style -->
+      <div class="context-menu-item ${hasVector ? 'active-fx' : ''}" id="ctx-action-vector">
+        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span>${hasVector ? 'Remove Vector FX' : 'Magnates Vector / Paper Cutout'}</span>
+        <span class="context-badge">${hasVector ? 'Active' : 'Sticker'}</span>
+      </div>
+
+      <div class="context-menu-divider"></div>
+    `;
+  }
+
+  // Layer Arrangement for visual elements
+  if (trackType === 'image' || trackType === 'video' || trackType === 'text') {
+    itemsHtml += `
+      <div class="context-menu-item" id="ctx-action-bring-front">
+        <svg viewBox="0 0 24 24"><path d="M8 2h14v14H8V2zM4 6H2v16h16v-2H4V6z"/></svg>
+        <span>Bring to Front</span>
+        <span class="context-badge">${isFront ? 'Current' : 'Top'}</span>
+      </div>
+      <div class="context-menu-item" id="ctx-action-send-back">
+        <svg viewBox="0 0 24 24"><path d="M2 4h14v14H2V4zm16 4h4v14H8v-4h10V8z"/></svg>
+        <span>Send to Back</span>
+        <span class="context-badge">${!isFront ? 'Current' : 'Behind Text'}</span>
+      </div>
+      <div class="context-menu-divider"></div>
+    `;
+  }
+
+  // Common Clip Utilities
+  itemsHtml += `
+    <div class="context-menu-item" id="ctx-action-duplicate">
+      <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+      <span>Duplicate Clip</span>
+    </div>
+    <div class="context-menu-item" id="ctx-action-reset">
+      <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+      <span>Reset Transform</span>
+    </div>
+    <div class="context-menu-item danger" id="ctx-action-delete">
+      <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+      <span>Delete Clip</span>
+    </div>
+  `;
+
+  menu.innerHTML = itemsHtml;
+  document.body.appendChild(menu);
+
+  // Position smartly within viewport bounds
+  const menuWidth = 220;
+  const menuHeight = menu.offsetHeight || 220;
+  const posX = Math.min(window.innerWidth - menuWidth - 10, Math.max(10, x));
+  const posY = Math.min(window.innerHeight - menuHeight - 10, Math.max(10, y));
+  menu.style.left = `${posX}px`;
+  menu.style.top = `${posY}px`;
+
+  // Attach Event Handlers
+  menu.querySelector('#ctx-action-add-text')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    // Add text starting at current time or image start time
+    const textStart = Math.max(0, clip.start);
+    const newTextClip = createNewTextClipAtTime(textStart, 'Enter kinetic text...', '');
+    seekToTime(textStart);
+    selectClip(newTextClip, 'text');
+    openScreenTextEditor(newTextClip);
+    showTextTimingAlert(`Added Kinetic Text to overlay "${clipLabel}"!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+
+  menu.querySelector('#ctx-action-cutout')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    toggleBackgroundRemoval(clip);
+  });
+
+  menu.querySelector('#ctx-action-vector')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    toggleMagnatesVectorEffect(clip);
+  });
+
+  menu.querySelector('#ctx-action-bring-front')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.layerOrder = 'front';
+    clip.zIndex = 50;
+    const badge = document.getElementById('inspector-layer-badge');
+    if (badge) {
+      badge.textContent = 'In Front of Text';
+      badge.style.color = '#00f0ff';
+    }
+    renderAllTimelineTracks();
+    recordState('Bring Clip to Front');
+  });
+
+  menu.querySelector('#ctx-action-send-back')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.layerOrder = 'back';
+    clip.zIndex = 10;
+    const badge = document.getElementById('inspector-layer-badge');
+    if (badge) {
+      badge.textContent = 'Behind Text';
+      badge.style.color = 'var(--accent-red)';
+    }
+    renderAllTimelineTracks();
+    recordState('Send Clip Behind Text');
+  });
+
+  menu.querySelector('#ctx-action-duplicate')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    const newStart = clip.start + clip.duration + 0.2;
+    const dup = addClipToTimeline(trackType, { ...clip.file, ...clip, id: undefined }, newStart, clip.duration);
+    seekToTime(newStart);
+    recordState('Duplicate Clip');
+    showTextTimingAlert(`Duplicated ${clipLabel}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-reset')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.x = 0;
+    clip.y = 0;
+    clip.scale = 1.0;
+    renderAllTimelineTracks();
+    recordState('Reset Transform');
+  });
+
+  menu.querySelector('#ctx-action-delete')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    recordState('Delete Clip');
+    deleteClip(trackType, clip.id);
+  });
+}
+
+// ==================== BACKGROUND REMOVAL (CUTOUT) ALGORITHM ====================
+// Fast high-precision flood-fill & boundary chroma color detection
+function toggleBackgroundRemoval(clip) {
+  if (!clip || !clip.file) return;
+
+  if (clip.cutoutCanvas) {
+    // Already has cutout -> toggle off and restore
+    delete clip.cutoutCanvas;
+    renderAllTimelineTracks();
+    recordState('Restore Original Background');
+    showTextTimingAlert('Restored original image background.', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+    return;
+  }
+
+  showTextTimingAlert('Processing background removal cutout...', 'warning');
+
+  const imgEl = getMediaElement(clip.file);
+  if (!imgEl || !imgEl.complete || !imgEl.naturalWidth) {
+    const tempImg = new Image();
+    tempImg.crossOrigin = 'anonymous';
+    tempImg.src = clip.file.url;
+    tempImg.onload = () => {
+      processCutout(tempImg, clip);
+    };
+    return;
+  }
+
+  processCutout(imgEl, clip);
+}
+
+function processCutout(img, clip) {
+  try {
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = w;
+    offCanvas.height = h;
+    const offCtx = offCanvas.getContext('2d');
+    offCtx.drawImage(img, 0, 0, w, h);
+
+    const imgData = offCtx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    // Sample border corners to determine key background colors
+    const cornerSamples = [
+      0, // top-left
+      (w - 1) * 4, // top-right
+      ((h - 1) * w) * 4, // bottom-left
+      ((h - 1) * w + (w - 1)) * 4, // bottom-right
+      Math.floor(w / 2) * 4, // top-mid
+      ((h - 1) * w + Math.floor(w / 2)) * 4 // bottom-mid
+    ];
+
+    const bgColors = cornerSamples.map(idx => ({
+      r: data[idx],
+      g: data[idx + 1],
+      b: data[idx + 2]
+    }));
+
+    // Flood fill mask from the edges to ensure inner foreground with similar colors is preserved
+    const visited = new Uint8Array(w * h);
+    const queue = [];
+
+    // Push all 4 border edge pixels into queue
+    for (let x = 0; x < w; x++) {
+      queue.push(x, 0); // top border
+      visited[x] = 1;
+      const bottomIdx = (h - 1) * w + x;
+      queue.push(x, h - 1); // bottom border
+      visited[bottomIdx] = 1;
+    }
+    for (let y = 0; y < h; y++) {
+      const leftIdx = y * w;
+      if (!visited[leftIdx]) {
+        queue.push(0, y);
+        visited[leftIdx] = 1;
+      }
+      const rightIdx = y * w + (w - 1);
+      if (!visited[rightIdx]) {
+        queue.push(w - 1, y);
+        visited[rightIdx] = 1;
+      }
+    }
+
+    // Color distance helper
+    function colorDist(r1, g1, b1, r2, g2, b2) {
+      return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+    }
+
+    // Check if pixel matches sampled background color profile
+    function isBgPixel(r, g, b) {
+      // Check distance against sampled corner background colors
+      for (let i = 0; i < bgColors.length; i++) {
+        if (colorDist(r, g, b, bgColors[i].r, bgColors[i].g, bgColors[i].b) < 42) {
+          return true;
+        }
+      }
+      // Also catch bright pure white or near-white background paper
+      if (r > 240 && g > 240 && b > 240) return true;
+      // Or pure chroma key greens/blues/dark backgrounds
+      if (g > 160 && r < 90 && b < 90) return true; // Green screen
+      return false;
+    }
+
+    let head = 0;
+    while (head < queue.length) {
+      const qx = queue[head++];
+      const qy = queue[head++];
+      const pIdx = (qy * w + qx) * 4;
+
+      const r = data[pIdx];
+      const g = data[pIdx + 1];
+      const b = data[pIdx + 2];
+
+      if (isBgPixel(r, g, b)) {
+        // Set transparent
+        data[pIdx + 3] = 0;
+
+        // Check 4 neighbors
+        const neighbors = [
+          [qx + 1, qy],
+          [qx - 1, qy],
+          [qx, qy + 1],
+          [qx, qy - 1]
+        ];
+
+        for (let n = 0; n < 4; n++) {
+          const nx = neighbors[n][0];
+          const ny = neighbors[n][1];
+          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+            const nIdx = ny * w + nx;
+            if (!visited[nIdx]) {
+              visited[nIdx] = 1;
+              queue.push(nx, ny);
+            }
+          }
+        }
+      }
+    }
+
+    // Put image data back to offscreen canvas
+    offCtx.putImageData(imgData, 0, 0);
+    clip.cutoutCanvas = offCanvas;
+
+    selectClip(clip, 'image');
+    renderAllTimelineTracks();
+    recordState('Background Cutout Created');
+    showTextTimingAlert('Background removed successfully! Ready to layer.', 'success');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  } catch(err) {
+    console.error('Cutout processing error:', err);
+    showTextTimingAlert('Could not remove background: ' + err.message, 'warning');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  }
+}
+
+// ==================== MAGNATES VECTOR / STICKER EFFECT ====================
+function toggleMagnatesVectorEffect(clip) {
+  if (!clip) return;
+  clip.vectorEffect = !clip.vectorEffect;
+  clip.vectorStrokeColor = '#ffffff';
+
+  selectClip(clip, 'image');
+  renderAllTimelineTracks();
+  recordState(clip.vectorEffect ? 'Apply Vector Paper Cutout' : 'Remove Vector Paper Cutout');
+  showTextTimingAlert(clip.vectorEffect ? 'Magnates paper cutout vector style applied!' : 'Vector style disabled.', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+}
+

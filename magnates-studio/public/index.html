@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magnates Studio - Minimalist Documentary Editor</title>
-  <link rel="stylesheet" href="css/style.css?v=6">
+  <link rel="stylesheet" href="css/style.css?v=7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
@@ -403,6 +403,25 @@
               <p class="hint-text" style="margin-top: 4px;">Control whether this image/video renders behind or on top of text and other elements.</p>
             </div>
 
+            <!-- Image Cutout & Vector Effects Section -->
+            <div class="control-row" id="inspector-image-fx-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; display: none;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="margin: 0;">Magnates Cutout & Vector</label>
+                <span class="badge" id="inspector-image-fx-badge" style="font-size: 10px; color: var(--accent-red);">Right-Click / Toggle</span>
+              </div>
+              <div class="btn-group" style="display: flex; gap: 4px; margin-top: 4px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-sidebar-cutout" style="flex: 1; padding: 6px 4px; font-size: 11px;" title="Remove Background (Cutout Subject)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm10-14l-1-1h-6l-1 1H4v2h16V5h-4zM9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+                  <span id="label-sidebar-cutout">Remove BG</span>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-sidebar-vector" style="flex: 1; padding: 6px 4px; font-size: 11px;" title="Apply Magnates Sticker / Vector Paper FX">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                  <span id="label-sidebar-vector">Vector FX</span>
+                </button>
+              </div>
+              <p class="hint-text" style="margin-top: 4px;">Isolate subject & add sticker contour or right-click directly on the image/timeline.</p>
+            </div>
+
             <div style="display: flex; gap: 6px; margin-top: 10px;">
               <button class="btn btn-secondary btn-sm" id="btn-reset-inspector-clip" style="flex: 1;" title="Reset clip properties to original defaults">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
@@ -626,6 +645,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=17"></script>
+  <script src="js/app.js?v=20"></script>
 </body>
 </html>
