@@ -151,6 +151,15 @@
                 Delete
               </button>
               <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+              <button class="btn-tool" id="tool-snap-zoom" title="Click on image or screen to add snappy camera Punch Zoom">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
+                Punch Zoom
+              </button>
+              <button class="btn-tool" id="tool-loupe" title="Click on image to add documentary Magnifying Loupe / Circular Callout">
+                <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                Loupe Callout
+              </button>
+              <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
               <button class="btn-tool" id="tool-undo" title="Undo Action (Ctrl+Z)">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.7 10.79 16.99 8 12.5 8z"/></svg>
                 Undo
@@ -420,6 +429,59 @@
                 </button>
               </div>
               <p class="hint-text" style="margin-top: 4px;">Isolate subject & add sticker contour or right-click directly on the image/timeline.</p>
+            </div>
+
+            <!-- Document Zoom & Loupe Callout (Logically Answered / Vox style) -->
+            <div class="control-row" id="inspector-zoom-fx-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <label style="margin: 0;">Document / Camera Zoom</label>
+                <span class="badge" id="inspector-zoom-fx-badge" style="font-size: 10px; color: #00f0ff;">None</span>
+              </div>
+              <div class="btn-group" style="display: flex; gap: 4px; margin-top: 4px;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-snap-zoom" style="flex: 1; padding: 6px 4px; font-size: 11px;" title="Punch zoom camera into click point">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
+                  Punch Zoom
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-loupe-zoom" style="flex: 1; padding: 6px 4px; font-size: 11px;" title="Circular Loupe magnifying callout over target point">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                  Loupe Lens
+                </button>
+              </div>
+              <div id="inspector-zoom-controls-body" style="display: none; margin-top: 8px; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px;">
+                <div class="control-row" style="margin-bottom: 6px;">
+                  <label style="display: flex; justify-content: space-between;">
+                    <span>Zoom Magnification</span>
+                    <span id="inspector-zoom-scale-val">2.2x</span>
+                  </label>
+                  <input type="range" id="inspector-zoom-scale" min="12" max="40" value="22" step="1">
+                </div>
+                <div class="control-row" id="row-loupe-shape" style="margin-bottom: 6px; display: none;">
+                  <label>Callout Shape</label>
+                  <div class="btn-group" style="display: flex; gap: 4px;">
+                    <button type="button" class="btn btn-secondary btn-sm active" id="btn-loupe-shape-circle" style="flex: 1; padding: 4px; font-size: 11px;">
+                      Circle Lens
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-loupe-shape-rect" style="flex: 1; padding: 4px; font-size: 11px;">
+                      Rect Box
+                    </button>
+                  </div>
+                </div>
+                <div class="control-row" id="row-loupe-radius" style="margin-bottom: 6px; display: none;">
+                  <label style="display: flex; justify-content: space-between;">
+                    <span id="label-loupe-size">Lens Size</span>
+                    <span id="inspector-loupe-radius-val">120px</span>
+                  </label>
+                  <input type="range" id="inspector-loupe-radius" min="40" max="320" value="120" step="5">
+                </div>
+                <div class="control-row" style="margin-bottom: 4px;">
+                  <label style="display: flex; justify-content: space-between;">
+                    <span>Zoom Timing In</span>
+                    <span id="inspector-zoom-start-val">0.0s</span>
+                  </label>
+                  <input type="range" id="inspector-zoom-start" min="0" max="60" value="10" step="1">
+                </div>
+                <p class="hint-text" style="margin-top: 4px;">Or click directly on the image with the Punch or Loupe tool selected to place the target coordinate.</p>
+              </div>
             </div>
 
             <div style="display: flex; gap: 6px; margin-top: 10px;">

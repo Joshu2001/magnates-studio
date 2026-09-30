@@ -223,6 +223,20 @@ function playSFX(type, volumeOverride) {
     gain.connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 0.22);
+  } else if (type === 'snap_zoom') {
+    // Logically Answered quick camera punch-in whoosh-snap
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(240, now);
+    osc.frequency.exponentialRampToValueAtTime(70, now + 0.18);
+    gain.gain.setValueAtTime(0.6 * volMult, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.22);
   }
 }
 
@@ -685,14 +699,147 @@ function drawMediaLayer(specificClip) {
       ctx.restore();
     }
 
-    // 2. Render primary image / cutout
-    ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+    // 2. Render primary image / cutout with Punch Zoom transformation
+    const hasSnapZoom = targetClip && targetClip.zoomEffect === 'snap';
+    const hasLoupe = targetClip && targetClip.zoomEffect === 'loupe';
 
-    // Subtle selection border if selected, or if vector effect is active
-    if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(dx, dy, finalW, finalH);
+    if (hasSnapZoom) {
+      // Calculate animated camera punch zoom
+      const zoomElapsed = currentTime - targetClip.start;
+      const zoomInAt = targetClip.zoomStartTime !== undefined ? targetClip.zoomStartTime : 0.5;
+      const targetScale = targetClip.zoomScale || 2.2;
+      const targetOriginX = targetClip.zoomOriginX !== undefined ? targetClip.zoomOriginX : 0.5;
+      const targetOriginY = targetClip.zoomOriginY !== undefined ? targetClip.zoomOriginY : 0.5;
+
+      let currentPunch = 1.0;
+      if (zoomElapsed >= zoomInAt) {
+        // Fast snappy cubic easing into target zoom
+        const t = Math.min(1, Math.max(0, (zoomElapsed - zoomInAt) / 0.42));
+        const ease = 1 - Math.pow(1 - t, 3.5);
+        currentPunch = 1.0 + (targetScale - 1.0) * ease;
+      }
+
+      ctx.save();
+      // Translate to zoom origin on image, scale, then translate back
+      const originPxX = dx + finalW * targetOriginX;
+      const originPxY = dy + finalH * targetOriginY;
+      ctx.translate(originPxX, originPxY);
+      ctx.scale(currentPunch, currentPunch);
+      ctx.translate(-originPxX, -originPxY);
+
+      ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+
+      if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(dx, dy, finalW, finalH);
+      }
+      ctx.restore();
+    } else {
+      // Normal draw
+      ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+
+      // Subtle selection border if selected, or if vector effect is active
+      if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(dx, dy, finalW, finalH);
+      }
+    }
+
+    // 3. Render Loupe / Magnifying Lens Callout (Logically Answered Circular Callout Effect)
+    if (hasLoupe) {
+      const loupeElapsed = currentTime - targetClip.start;
+      const loupeInAt = targetClip.zoomStartTime !== undefined ? targetClip.zoomStartTime : 0.5;
+      
+      if (loupeElapsed >= loupeInAt) {
+        const t = Math.min(1, Math.max(0, (loupeElapsed - loupeInAt) / 0.35));
+        // Springy pop ease
+        const ease = t < 1 ? Math.sin((t * Math.PI) / 2) * (1 + 0.1 * Math.sin(t * Math.PI)) : 1;
+        
+        const originNormX = targetClip.zoomOriginX !== undefined ? targetClip.zoomOriginX : 0.5;
+        const originNormY = targetClip.zoomOriginY !== undefined ? targetClip.zoomOriginY : 0.5;
+        const centerX = dx + finalW * originNormX;
+        const centerY = dy + finalH * originNormY;
+        const magScale = targetClip.zoomScale || 2.2;
+        const shape = targetClip.loupeShape || 'circle';
+        const isRect = shape === 'rect';
+
+        // Size parameters (support custom marquee width/height or radius)
+        const baseW = targetClip.loupeWidth || (targetClip.loupeRadius ? targetClip.loupeRadius * 2 : 240);
+        const baseH = targetClip.loupeHeight || (targetClip.loupeRadius ? targetClip.loupeRadius * 1.3 : 160);
+        const boxW = Math.max(20, baseW * ease);
+        const boxH = Math.max(20, baseH * ease);
+        const radius = Math.max(1, (targetClip.loupeRadius || 120) * ease);
+
+        ctx.save();
+
+        // Optional subtle darkening of background around image to make lens pop
+        ctx.save();
+        ctx.fillStyle = `rgba(5, 7, 12, ${0.45 * Math.min(1, t * 1.5)})`;
+        ctx.fillRect(dx, dy, finalW, finalH);
+        ctx.restore();
+
+        // Helper path function
+        const makePath = () => {
+          ctx.beginPath();
+          if (isRect) {
+            const rx = centerX - boxW / 2;
+            const ry = centerY - boxH / 2;
+            const corner = Math.min(12, boxW / 4, boxH / 4);
+            ctx.roundRect ? ctx.roundRect(rx, ry, boxW, boxH, corner) : ctx.rect(rx, ry, boxW, boxH);
+          } else {
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          }
+        };
+
+        // 3a. Deep Shadow under Callout
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+        ctx.shadowBlur = 32;
+        ctx.shadowOffsetY = 14;
+        makePath();
+        ctx.fillStyle = '#000000';
+        ctx.fill();
+        ctx.restore();
+
+        // 3b. Magnified Clipped Content
+        ctx.save();
+        makePath();
+        ctx.clip();
+
+        // Scale up centered directly on (centerX, centerY)
+        ctx.translate(centerX, centerY);
+        ctx.scale(magScale, magScale);
+        ctx.translate(-centerX, -centerY);
+        ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+        ctx.restore();
+
+        // 3c. Premium Border Ring / Bezel (White & Cyan Vox-style ring)
+        ctx.save();
+        makePath();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.7)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Tiny crosshair target reticle in center of callout
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(centerX - 8, centerY);
+        ctx.lineTo(centerX + 8, centerY);
+        ctx.moveTo(centerX, centerY - 8);
+        ctx.lineTo(centerX, centerY + 8);
+        ctx.stroke();
+
+        ctx.restore();
+
+        ctx.restore();
+      }
     }
   } catch(e) {}
 
@@ -701,7 +848,101 @@ function drawMediaLayer(specificClip) {
   // If this clip is selected and is an image or video, draw interactive transform highlight & handles
   if (selectedClip && targetClip && selectedClip.clip.id === targetClip.id && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
     drawTransformHandles(dx, dy, finalW, finalH);
+
+    // If clip has zoom or loupe, also draw target crosshair indicator
+    if (targetClip.zoomEffect && targetClip.zoomOriginX !== undefined) {
+      drawZoomTargetIndicator(dx, dy, finalW, finalH, targetClip);
+    }
   }
+}
+
+// Draw visual crosshair anchor point for punch/loupe zoom target
+function drawZoomTargetIndicator(dx, dy, w, h, clip) {
+  const cx = dx + w * clip.zoomOriginX;
+  const cy = dy + h * clip.zoomOriginY;
+  ctx.save();
+  ctx.strokeStyle = clip.zoomEffect === 'loupe' ? '#00f0ff' : '#ff334b';
+  ctx.fillStyle = clip.zoomEffect === 'loupe' ? 'rgba(0, 240, 255, 0.2)' : 'rgba(255, 51, 75, 0.2)';
+  ctx.lineWidth = 2;
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(cx - 20, cy);
+  ctx.lineTo(cx + 20, cy);
+  ctx.moveTo(cx, cy - 20);
+  ctx.lineTo(cx, cy + 20);
+  ctx.stroke();
+
+  // Label tag
+  ctx.font = 'bold 11px Inter, sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.shadowColor = 'rgba(0,0,0,0.8)';
+  ctx.shadowBlur = 4;
+  const label = clip.zoomEffect === 'loupe' ? 'Loupe Focus' : 'Punch Zoom Focus';
+  ctx.fillText(label, cx + 18, cy + 4);
+  ctx.restore();
+}
+
+// Draw live interactive marquee selection box while dragging on canvas
+function drawMarqueeSelectionOverlay() {
+  if (!isMarqueeDragging) return;
+  const x = Math.min(marqueeStartPt.x, marqueeCurrentPt.x);
+  const y = Math.min(marqueeStartPt.y, marqueeCurrentPt.y);
+  const w = Math.abs(marqueeCurrentPt.x - marqueeStartPt.x);
+  const h = Math.abs(marqueeCurrentPt.y - marqueeStartPt.y);
+
+  if (w < 4 && h < 4) return;
+
+  const isSnap = activeTool === 'snap-zoom';
+  const color = isSnap ? '#ff334b' : '#00f0ff';
+  const bgColor = isSnap ? 'rgba(255, 51, 75, 0.18)' : 'rgba(0, 240, 255, 0.18)';
+
+  ctx.save();
+  // Fill
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(x, y, w, h);
+
+  // Animated marching ants outline
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  const dashOffset = (performance.now() / 35) % 16;
+  ctx.lineDashOffset = -dashOffset;
+  ctx.setLineDash([8, 6]);
+  ctx.strokeRect(x, y, w, h);
+  ctx.setLineDash([]);
+
+  // Corner markers
+  const marker = 8;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2.5;
+  // Top-left
+  ctx.beginPath();
+  ctx.moveTo(x, y + marker); ctx.lineTo(x, y); ctx.lineTo(x + marker, y);
+  // Top-right
+  ctx.moveTo(x + w - marker, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + marker);
+  // Bottom-left
+  ctx.moveTo(x, y + h - marker); ctx.lineTo(x, y + h); ctx.lineTo(x + marker, y + h);
+  // Bottom-right
+  ctx.moveTo(x + w - marker, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - marker);
+  ctx.stroke();
+
+  // Floating dimension badge
+  ctx.font = '600 11px Inter, sans-serif';
+  const text = `${Math.round(w)} x ${Math.round(h)} px  (${isSnap ? 'Punch Area' : 'Loupe Area'})`;
+  const textW = ctx.measureText(text).width;
+  ctx.fillStyle = 'rgba(10, 14, 23, 0.88)';
+  ctx.fillRect(x + w / 2 - textW / 2 - 8, y + h + 8, textW + 16, 20);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + w / 2 - textW / 2 - 8, y + h + 8, textW + 16, 20);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(text, x + w / 2 - textW / 2, y + h + 22);
+
+  ctx.restore();
 }
 
 // Draw interactive bounding box & resize/drag corner handles
@@ -822,6 +1063,20 @@ function render(now) {
         }
       }
     });
+
+    // Trigger Punch / Loupe Zoom Sound Effect when playhead enters image zoom animation
+    [...timelineClips.image, ...timelineClips.video].forEach(m => {
+      if (m.zoomEffect) {
+        const zoomTriggerTime = m.start + (m.zoomStartTime !== undefined ? m.zoomStartTime : 0.5);
+        if (currentTime >= zoomTriggerTime && currentTime <= (zoomTriggerTime + 0.3)) {
+          const sfxKey = `${m.id}-zoom`;
+          if (!triggeredSFX.has(sfxKey)) {
+            playSFX('snap_zoom', 0.6);
+            triggeredSFX.add(sfxKey);
+          }
+        }
+      }
+    });
   }
 
   // Clear
@@ -841,6 +1096,11 @@ function render(now) {
 
   // 4. Fire Particles / Atmosphere
   drawParticles();
+
+  // 5. Active Marquee Drag Selection Overlay (when dragging area for Zoom or Loupe)
+  if (isMarqueeDragging) {
+    drawMarqueeSelectionOverlay();
+  }
 
   updateUI();
   requestAnimationFrame(render);
@@ -1526,6 +1786,69 @@ function selectClip(clip, trackType) {
       }
     }
 
+    // Document Zoom & Loupe Inspector Section
+    const zoomSection = document.getElementById('inspector-zoom-fx-section');
+    if (zoomSection) {
+      if (trackType === 'image' || trackType === 'video') {
+        zoomSection.style.display = 'block';
+        const zoomBadge = document.getElementById('inspector-zoom-fx-badge');
+        const zoomBody = document.getElementById('inspector-zoom-controls-body');
+        const snapBtn = document.getElementById('btn-inspector-snap-zoom');
+        const loupeBtn = document.getElementById('btn-inspector-loupe-zoom');
+        const rowLoupeRadius = document.getElementById('row-loupe-radius');
+
+        const effect = clip.zoomEffect || null;
+        if (zoomBadge) {
+          zoomBadge.textContent = effect === 'snap' ? 'Punch Zoom' : (effect === 'loupe' ? 'Loupe Callout' : 'None');
+          zoomBadge.style.color = effect ? '#00f0ff' : 'var(--text-muted)';
+        }
+
+        if (snapBtn) {
+          snapBtn.style.borderColor = effect === 'snap' ? '#00f0ff' : '';
+          snapBtn.style.color = effect === 'snap' ? '#00f0ff' : '';
+        }
+        if (loupeBtn) {
+          loupeBtn.style.borderColor = effect === 'loupe' ? '#00f0ff' : '';
+          loupeBtn.style.color = effect === 'loupe' ? '#00f0ff' : '';
+        }
+
+        if (effect && zoomBody) {
+          zoomBody.style.display = 'block';
+          const rowLoupeShape = document.getElementById('row-loupe-shape');
+          if (rowLoupeShape) rowLoupeShape.style.display = effect === 'loupe' ? 'block' : 'none';
+          if (rowLoupeRadius) rowLoupeRadius.style.display = effect === 'loupe' ? 'block' : 'none';
+
+          const shape = clip.loupeShape || 'circle';
+          const btnCircle = document.getElementById('btn-loupe-shape-circle');
+          const btnRect = document.getElementById('btn-loupe-shape-rect');
+          if (btnCircle) btnCircle.classList.toggle('active', shape === 'circle');
+          if (btnRect) btnRect.classList.toggle('active', shape === 'rect');
+
+          const scaleInput = document.getElementById('inspector-zoom-scale');
+          const scaleVal = document.getElementById('inspector-zoom-scale-val');
+          const curScale = clip.zoomScale || 2.2;
+          if (scaleInput) scaleInput.value = Math.round(curScale * 10);
+          if (scaleVal) scaleVal.textContent = `${curScale.toFixed(1)}x`;
+
+          const radInput = document.getElementById('inspector-loupe-radius');
+          const radVal = document.getElementById('inspector-loupe-radius-val');
+          const curRad = clip.loupeRadius || 120;
+          if (radInput) radInput.value = curRad;
+          if (radVal) radVal.textContent = `${curRad}px`;
+
+          const startInput = document.getElementById('inspector-zoom-start');
+          const startVal = document.getElementById('inspector-zoom-start-val');
+          const curStart = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
+          if (startInput) startInput.value = Math.round(curStart * 10);
+          if (startVal) startVal.textContent = `${curStart.toFixed(1)}s`;
+        } else if (zoomBody) {
+          zoomBody.style.display = 'none';
+        }
+      } else {
+        zoomSection.style.display = 'none';
+      }
+    }
+
     document.getElementById('btn-update-text').style.display = 'none';
     document.getElementById('btn-delete-text').style.display = 'none';
 
@@ -1798,11 +2121,29 @@ function initTimelineDragAndDrop() {
 // Timeline Header Tools
 document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
   btn.addEventListener('click', (e) => {
-    document.querySelectorAll('.timeline-tools .btn-tool').forEach(b => b.classList.remove('active'));
+    // Exclude undo, redo, reset, expand from active tool toggle
+    if (['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(btn.id)) return;
+
+    document.querySelectorAll('.timeline-tools .btn-tool').forEach(b => {
+      if (!['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(b.id)) {
+        b.classList.remove('active');
+      }
+    });
     btn.classList.add('active');
+
+    // Update canvas cursor styling based on active tool
+    canvas.classList.remove('tool-snap-zoom', 'tool-loupe');
+
     if (btn.id === 'tool-select') activeTool = 'select';
     else if (btn.id === 'tool-split') activeTool = 'split';
     else if (btn.id === 'tool-delete') activeTool = 'delete';
+    else if (btn.id === 'tool-snap-zoom') {
+      activeTool = 'snap-zoom';
+      canvas.classList.add('tool-snap-zoom');
+    } else if (btn.id === 'tool-loupe') {
+      activeTool = 'loupe';
+      canvas.classList.add('tool-loupe');
+    }
   });
 });
 
@@ -2378,6 +2719,95 @@ document.getElementById('btn-sidebar-vector')?.addEventListener('click', () => {
   }
 });
 
+// Sidebar Zoom Effect Mode Toggles (Punch Zoom & Loupe)
+document.getElementById('btn-inspector-snap-zoom')?.addEventListener('click', () => {
+  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    const clip = selectedClip.clip;
+    clip.zoomEffect = clip.zoomEffect === 'snap' ? null : 'snap';
+    if (!clip.zoomScale) clip.zoomScale = 2.2;
+    if (clip.zoomStartTime === undefined) clip.zoomStartTime = 0.5;
+    if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
+    if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
+    if (clip.zoomEffect === 'snap') playSFX('snap_zoom');
+    selectClip(clip, selectedClip.trackType);
+    recordState('Toggle Punch Zoom Effect');
+  }
+});
+
+document.getElementById('btn-inspector-loupe-zoom')?.addEventListener('click', () => {
+  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    const clip = selectedClip.clip;
+    clip.zoomEffect = clip.zoomEffect === 'loupe' ? null : 'loupe';
+    if (!clip.zoomScale) clip.zoomScale = 2.2;
+    if (!clip.loupeRadius) clip.loupeRadius = 120;
+    if (clip.zoomStartTime === undefined) clip.zoomStartTime = 0.5;
+    if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
+    if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
+    if (clip.zoomEffect === 'loupe') playSFX('snap_zoom');
+    selectClip(clip, selectedClip.trackType);
+    recordState('Toggle Loupe Callout Effect');
+  }
+});
+
+document.getElementById('inspector-zoom-scale')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 10;
+    selectedClip.clip.zoomScale = val;
+    const lbl = document.getElementById('inspector-zoom-scale-val');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}x`;
+  }
+});
+document.getElementById('inspector-zoom-scale')?.addEventListener('change', () => {
+  recordState('Change Zoom Scale');
+});
+
+// Callout Shape Toggles (Circle Lens vs Rectangular Box)
+document.getElementById('btn-loupe-shape-circle')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.loupeShape = 'circle';
+    document.getElementById('btn-loupe-shape-circle')?.classList.add('active');
+    document.getElementById('btn-loupe-shape-rect')?.classList.remove('active');
+    const lbl = document.getElementById('label-loupe-size');
+    if (lbl) lbl.textContent = 'Lens Radius';
+    recordState('Set Loupe Shape: Circle');
+  }
+});
+
+document.getElementById('btn-loupe-shape-rect')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.loupeShape = 'rect';
+    document.getElementById('btn-loupe-shape-rect')?.classList.add('active');
+    document.getElementById('btn-loupe-shape-circle')?.classList.remove('active');
+    const lbl = document.getElementById('label-loupe-size');
+    if (lbl) lbl.textContent = 'Box Size';
+    recordState('Set Loupe Shape: Rectangle');
+  }
+});
+
+document.getElementById('inspector-loupe-radius')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value);
+    selectedClip.clip.loupeRadius = val;
+    const lbl = document.getElementById('inspector-loupe-radius-val');
+    if (lbl) lbl.textContent = `${val}px`;
+  }
+});
+document.getElementById('inspector-loupe-radius')?.addEventListener('change', () => {
+  recordState('Change Loupe Radius');
+});
+
+document.getElementById('inspector-zoom-start')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 10;
+    selectedClip.clip.zoomStartTime = val;
+    const lbl = document.getElementById('inspector-zoom-start-val');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}s`;
+  }
+});
+document.getElementById('inspector-zoom-start')?.addEventListener('change', () => {
+  recordState('Change Zoom Timing');
+});
+
 // Reset Clip Properties to Default (Local Reset)
 document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', () => {
   if (selectedClip) {
@@ -2385,11 +2815,17 @@ document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', (
     selectedClip.clip.soundEnabled = true;
     selectedClip.clip.layerOrder = selectedClip.trackType === 'text' ? 'front' : 'back';
     selectedClip.clip.zIndex = selectedClip.trackType === 'text' ? 30 : 10;
-    // Reset image / video canvas transform
+    // Reset image / video canvas transform & zoom
     if (selectedClip.trackType === 'image' || selectedClip.trackType === 'video') {
       selectedClip.clip.x = 0;
       selectedClip.clip.y = 0;
       selectedClip.clip.scale = 1.0;
+      delete selectedClip.clip.zoomEffect;
+      delete selectedClip.clip.zoomScale;
+      delete selectedClip.clip.zoomStartTime;
+      delete selectedClip.clip.zoomOriginX;
+      delete selectedClip.clip.zoomOriginY;
+      delete selectedClip.clip.loupeRadius;
     }
     selectClip(selectedClip.clip, selectedClip.trackType);
     renderAllTimelineTracks();
@@ -3034,12 +3470,43 @@ function getCanvasPointer(e) {
   };
 }
 
+// Marquee Box Selection for Custom Area Zoom & Loupe
+let isMarqueeDragging = false;
+let marqueeStartPt = { x: 0, y: 0 };
+let marqueeCurrentPt = { x: 0, y: 0 };
+let marqueeTargetClip = null;
+
 function initCanvasTransformInteraction() {
   canvas.addEventListener('mousedown', (e) => {
-    // If not in select tool mode, ignore
-    if (activeTool !== 'select') return;
-
     const pt = getCanvasPointer(e);
+
+    // ==================== PUNCH ZOOM & LOUPE CALLOUT TOOL (CLICK OR MARQUEE DRAG) ====================
+    if (activeTool === 'snap-zoom' || activeTool === 'loupe') {
+      // Find top visible image or video layer clicked on
+      const activeMedia = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+      let targetMediaClip = null;
+      for (let i = activeMedia.length - 1; i >= 0; i--) {
+        const c = activeMedia[i];
+        const b = c._renderBounds;
+        if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+          targetMediaClip = c;
+          break;
+        }
+      }
+
+      if (targetMediaClip) {
+        // Start marquee drag selection
+        isMarqueeDragging = true;
+        marqueeStartPt = pt;
+        marqueeCurrentPt = pt;
+        marqueeTargetClip = targetMediaClip;
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // If not in select tool mode, ignore transform actions
+    if (activeTool !== 'select') return;
 
     // 1. If a text clip is currently selected and visible, check if click hit handles or bounding box
     if (selectedClip && selectedClip.trackType === 'text') {
@@ -3203,6 +3670,12 @@ function initCanvasTransformInteraction() {
   }, { passive: false });
 
   window.addEventListener('mousemove', (e) => {
+    // If currently dragging marquee selection for zoom or loupe
+    if (isMarqueeDragging) {
+      marqueeCurrentPt = getCanvasPointer(e);
+      return;
+    }
+
     if (!isTransforming || !selectedClip) return;
     const pt = getCanvasPointer(e);
     const clip = selectedClip.clip;
@@ -3242,7 +3715,81 @@ function initCanvasTransformInteraction() {
     }
   });
 
-  window.addEventListener('mouseup', () => {
+  window.addEventListener('mouseup', (e) => {
+    // Finish Marquee Dragging for Zoom / Loupe Tool
+    if (isMarqueeDragging && marqueeTargetClip) {
+      isMarqueeDragging = false;
+      const b = marqueeTargetClip._renderBounds;
+      if (b) {
+        const x1 = Math.min(marqueeStartPt.x, marqueeCurrentPt.x);
+        const y1 = Math.min(marqueeStartPt.y, marqueeCurrentPt.y);
+        const x2 = Math.max(marqueeStartPt.x, marqueeCurrentPt.x);
+        const y2 = Math.max(marqueeStartPt.y, marqueeCurrentPt.y);
+        const dragDist = Math.hypot(x2 - x1, y2 - y1);
+
+        const effectType = activeTool === 'snap-zoom' ? 'snap' : 'loupe';
+        marqueeTargetClip.zoomEffect = effectType;
+
+        if (dragDist > 16) {
+          // USER DRAGGED A CUSTOM AREA / RECTANGLE
+          const selCenterCanvasX = (x1 + x2) / 2;
+          const selCenterCanvasY = (y1 + y2) / 2;
+          const selWidth = Math.max(30, x2 - x1);
+          const selHeight = Math.max(20, y2 - y1);
+
+          // Calculate normalized center origin on target image
+          const normX = Math.max(0.02, Math.min(0.98, (selCenterCanvasX - b.x) / b.w));
+          const normY = Math.max(0.02, Math.min(0.98, (selCenterCanvasY - b.y) / b.h));
+          marqueeTargetClip.zoomOriginX = normX;
+          marqueeTargetClip.zoomOriginY = normY;
+
+          if (effectType === 'snap') {
+            // Calculate optimal punch zoom magnification to fit selected area
+            const scaleFactorX = b.w / selWidth;
+            const scaleFactorY = b.h / selHeight;
+            const optimalScale = Math.min(3.8, Math.max(1.4, Math.min(scaleFactorX, scaleFactorY)));
+            marqueeTargetClip.zoomScale = parseFloat(optimalScale.toFixed(1));
+          } else {
+            // Loupe Callout: Set to Rect Box Shape matching the dragged proportion!
+            marqueeTargetClip.loupeShape = 'rect';
+            marqueeTargetClip.loupeWidth = Math.round(selWidth * 1.35);
+            marqueeTargetClip.loupeHeight = Math.round(selHeight * 1.35);
+            marqueeTargetClip.loupeRadius = Math.round(Math.max(selWidth, selHeight) / 2);
+            marqueeTargetClip.zoomScale = 2.4;
+          }
+
+          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+          marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+
+          playSFX('snap_zoom');
+          const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
+          selectClip(marqueeTargetClip, trackType);
+          recordState(`Set ${effectType === 'snap' ? 'Punch Zoom' : 'Rectangle Loupe'} Area (${Math.round(selWidth)}x${Math.round(selHeight)})`);
+          showTextTimingAlert(`Zoom area selected! (${Math.round(selWidth)}x${Math.round(selHeight)})`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 2500);
+        } else {
+          // SIMPLE CLICK (NO DRAG)
+          const normX = Math.max(0.05, Math.min(0.95, (marqueeStartPt.x - b.x) / b.w));
+          const normY = Math.max(0.05, Math.min(0.95, (marqueeStartPt.y - b.y) / b.h));
+          marqueeTargetClip.zoomOriginX = normX;
+          marqueeTargetClip.zoomOriginY = normY;
+          if (!marqueeTargetClip.zoomScale) marqueeTargetClip.zoomScale = 2.2;
+          if (!marqueeTargetClip.loupeRadius) marqueeTargetClip.loupeRadius = 120;
+          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+          marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+
+          playSFX('snap_zoom');
+          const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
+          selectClip(marqueeTargetClip, trackType);
+          recordState(`Add ${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} at (${Math.round(normX * 100)}%, ${Math.round(normY * 100)}%)`);
+          showTextTimingAlert(`${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} placed!`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 2500);
+        }
+      }
+      marqueeTargetClip = null;
+      return;
+    }
+
     if (isTransforming) {
       const wasText = selectedClip && selectedClip.trackType === 'text';
       isTransforming = false;
@@ -3556,6 +4103,15 @@ function getSerializableClips() {
       scale: c.scale,
       vectorEffect: c.vectorEffect,
       vectorStrokeColor: c.vectorStrokeColor,
+      zoomEffect: c.zoomEffect,
+      zoomScale: c.zoomScale,
+      zoomStartTime: c.zoomStartTime,
+      zoomOriginX: c.zoomOriginX,
+      zoomOriginY: c.zoomOriginY,
+      loupeRadius: c.loupeRadius,
+      loupeShape: c.loupeShape,
+      loupeWidth: c.loupeWidth,
+      loupeHeight: c.loupeHeight,
       file: c.file ? {
         name: c.file.name,
         url: c.file.url,
@@ -3973,6 +4529,20 @@ function showStudioContextMenu(x, y, clip, trackType) {
         <span class="context-badge">${hasVector ? 'Active' : 'Sticker'}</span>
       </div>
 
+      <!-- Snap / Punch Camera Zoom -->
+      <div class="context-menu-item ${clip.zoomEffect === 'snap' ? 'active-fx' : ''}" id="ctx-action-snap-zoom">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
+        <span>${clip.zoomEffect === 'snap' ? 'Remove Punch Zoom' : 'Add Punch Zoom'}</span>
+        <span class="context-badge">${clip.zoomEffect === 'snap' ? 'Active' : 'Vox Zoom'}</span>
+      </div>
+
+      <!-- Magnifying Loupe / Circular Callout -->
+      <div class="context-menu-item ${clip.zoomEffect === 'loupe' ? 'active-fx' : ''}" id="ctx-action-loupe-zoom">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <span>${clip.zoomEffect === 'loupe' ? 'Remove Loupe Lens' : 'Add Loupe Callout'}</span>
+        <span class="context-badge">${clip.zoomEffect === 'loupe' ? 'Active' : 'Lens'}</span>
+      </div>
+
       <div class="context-menu-divider"></div>
     `;
   }
@@ -4045,6 +4615,33 @@ function showStudioContextMenu(x, y, clip, trackType) {
     e.stopPropagation();
     hideStudioContextMenu();
     toggleMagnatesVectorEffect(clip);
+  });
+
+  menu.querySelector('#ctx-action-snap-zoom')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.zoomEffect = clip.zoomEffect === 'snap' ? null : 'snap';
+    if (!clip.zoomScale) clip.zoomScale = 2.2;
+    if (clip.zoomStartTime === undefined) clip.zoomStartTime = 0.5;
+    if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
+    if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
+    if (clip.zoomEffect === 'snap') playSFX('snap_zoom');
+    selectClip(clip, trackType);
+    recordState('Toggle Punch Zoom Effect');
+  });
+
+  menu.querySelector('#ctx-action-loupe-zoom')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.zoomEffect = clip.zoomEffect === 'loupe' ? null : 'loupe';
+    if (!clip.zoomScale) clip.zoomScale = 2.2;
+    if (!clip.loupeRadius) clip.loupeRadius = 120;
+    if (clip.zoomStartTime === undefined) clip.zoomStartTime = 0.5;
+    if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
+    if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
+    if (clip.zoomEffect === 'loupe') playSFX('snap_zoom');
+    selectClip(clip, trackType);
+    recordState('Toggle Loupe Callout Effect');
   });
 
   menu.querySelector('#ctx-action-bring-front')?.addEventListener('click', (e) => {
