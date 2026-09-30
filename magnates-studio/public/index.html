@@ -62,12 +62,77 @@
 
         <div class="media-tabs">
           <button class="tab-btn active" data-tab="all">All</button>
+          <button class="tab-btn" data-tab="layers" id="tab-btn-layers" title="Inspect & Manage Visual Canvas Layers">Layers</button>
           <button class="tab-btn" data-tab="audio">Audio</button>
           <button class="tab-btn" data-tab="video">Videos</button>
           <button class="tab-btn" data-tab="images">Images</button>
         </div>
         <div class="media-list" id="media-list">
           <div class="loading-spinner">No media loaded</div>
+        </div>
+
+        <!-- Dedicated Layers Panel (Visible when Layers tab is selected) -->
+        <div id="layers-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+          <div class="layers-header-row">
+            <div class="layers-header-title">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9.07l-9-7-9 7 1.63 1.2L12 16z"/></svg>
+              <span>Canvas Layers</span>
+            </div>
+            <button type="button" class="btn-add-layer-pill" id="btn-add-layer-trigger" title="Add Layer / Stage Background">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              <span>Add Layer</span>
+            </button>
+          </div>
+
+          <!-- Add Layer Flyout Dropdown -->
+          <div id="add-layer-dropdown" class="add-layer-menu" style="display: none;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; padding: 2px 4px;">Stage & Background Presets:</div>
+            <div class="add-layer-option" data-layer-preset="cyber_grid">
+              <span class="add-layer-swatch" style="background: linear-gradient(135deg, #00f0ff, #25d366);"></span>
+              <span>3D Cyber Grid (Default)</span>
+            </div>
+            <div class="add-layer-option" data-layer-preset="solid_black">
+              <span class="add-layer-swatch" style="background: #000000;"></span>
+              <span>Solid Black Studio</span>
+            </div>
+            <div class="add-layer-option" data-layer-preset="dark_slate">
+              <span class="add-layer-swatch" style="background: #0d111a;"></span>
+              <span>Dark Slate Cinematic</span>
+            </div>
+            <div class="add-layer-option" data-layer-preset="vox_cream">
+              <span class="add-layer-swatch" style="background: #f4eedb;"></span>
+              <span>Vox Newspaper Cream</span>
+            </div>
+            <div class="add-layer-option" data-layer-preset="neon_red">
+              <span class="add-layer-swatch" style="background: #ff334b;"></span>
+              <span>Magnates Accent Red</span>
+            </div>
+            <div class="add-layer-option" data-layer-preset="chroma_green">
+              <span class="add-layer-swatch" style="background: #00e676;"></span>
+              <span>Chroma Studio Green</span>
+            </div>
+            <div class="add-layer-option" id="btn-layer-custom-color" style="display: flex; justify-content: space-between;">
+              <span style="display: flex; align-items: center; gap: 8px;">
+                <input type="color" id="input-layer-color" value="#1a233a" style="width: 16px; height: 16px; border-radius: 50%; border: none; cursor: pointer; padding: 0;">
+                <span>Custom Solid Color</span>
+              </span>
+            </div>
+            <div class="dock-divider" style="width: 100%; height: 1px; margin: 4px 0;"></div>
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; padding: 2px 4px;">Overlay Layers:</div>
+            <div class="add-layer-option" data-layer-action="add_text">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+              <span>Add Kinetic Text</span>
+            </div>
+            <div class="add-layer-option" data-layer-action="add_drawing">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              <span>Draw Screen Ink</span>
+            </div>
+          </div>
+
+          <!-- Active Layers List -->
+          <div class="layers-list" id="active-layers-list">
+            <!-- Dynamically populated -->
+          </div>
         </div>
       </aside>
 

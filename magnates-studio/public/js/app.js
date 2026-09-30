@@ -243,6 +243,7 @@ function playSFX(type, volumeOverride) {
 // FX Settings
 const fxState = {
   grid: { enabled: true, depth: 45, opacity: 0.25, vignette: 0.85 },
+  stageBackground: { type: 'cyber_grid', color: '#0a0b0e' }, // 'cyber_grid', 'solid_black', 'color', 'vox_cream', 'chroma_green'
   particles: { enabled: true, count: 65, glow: 0.6, speed: 2 },
   silhouette: { enabled: false, color: 'white' }
 };
@@ -1095,12 +1096,30 @@ function render(now) {
     });
   }
 
-  // Clear
-  ctx.fillStyle = '#0a0b0e';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  // Clear & Stage Background Layer
+  const bgType = fxState.stageBackground?.type || 'cyber_grid';
+  if (bgType === 'solid_black') {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else if (bgType === 'color') {
+    ctx.fillStyle = fxState.stageBackground.color || '#0a0b0e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else if (bgType === 'vox_cream') {
+    ctx.fillStyle = '#f4eedb';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else if (bgType === 'chroma_green') {
+    ctx.fillStyle = '#00e676';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else {
+    // Default cyber grid / dark studio
+    ctx.fillStyle = '#0a0b0e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
 
-  // 1. 3D Background Grid
-  drawPerspectiveGrid();
+  // 1. 3D Background Grid (when enabled or preset is cyber_grid)
+  if (bgType === 'cyber_grid' || fxState.grid.enabled) {
+    drawPerspectiveGrid();
+  }
 
   // 2. Layer-Ordered Visual Elements (Media & Kinetic Text arranged by z-index)
   drawSortedVisualLayers();
@@ -1539,6 +1558,9 @@ function renderAllTimelineTracks() {
       container.appendChild(addBtn);
     });
   });
+  if (currentFilter === 'layers') {
+    renderLayersPanel();
+  }
 }
 
 // Global handler for tapping timeline (+) button
@@ -2424,13 +2446,29 @@ async function uploadFiles(files) {
   }
 }
 
-// Media Tab buttons
+// Media Tab buttons (including Layers tab)
 document.querySelectorAll('.media-tabs .tab-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     document.querySelectorAll('.media-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    currentFilter = e.target.dataset.tab;
-    renderMediaList(currentFilter);
+    e.currentTarget.classList.add('active');
+    currentFilter = e.currentTarget.dataset.tab;
+
+    const mediaListEl = document.getElementById('media-list');
+    const layersPanelEl = document.getElementById('layers-panel-container');
+
+    if (currentFilter === 'layers') {
+      if (mediaListEl) mediaListEl.style.display = 'none';
+      if (layersPanelEl) {
+        layersPanelEl.style.display = 'flex';
+        renderLayersPanel();
+      }
+    } else {
+      if (layersPanelEl) layersPanelEl.style.display = 'none';
+      if (mediaListEl) {
+        mediaListEl.style.display = 'flex';
+        renderMediaList(currentFilter);
+      }
+    }
   });
 });
 
@@ -5756,9 +5794,265 @@ function initVectorModalControls() {
   }
 }
 
+// ==================== LAYERS PANEL & STAGE MANAGEMENT ====================
+function renderLayersPanel() {
+  const container = document.getElementById('active-layers-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const layers = [];
+
+  // 1. Screen Ink Freehand Drawing Layer (if any active ink exists)
+  if (drawingStrokes.length > 0 || drawingFills.length > 0) {
+    layers.push({
+      id: 'layer-ink-canvas',
+      name: `Freehand Ink (${drawingStrokes.length} strokes)`,
+      desc: 'Screen Drawing Layer',
+      type: 'drawing',
+      icon: `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>`,
+      active: activeTool === 'draw',
+      onSelect: () => {
+        const btn = document.getElementById('tool-draw');
+        if (btn) btn.click();
+      },
+      onDelete: () => {
+        drawingStrokes = [];
+        drawingFills = [];
+        drawingUndoStack = [];
+        renderLayersPanel();
+      }
+    });
+  }
+
+  // 2. Text Clips (Kinetic Typography)
+  timelineClips.text.forEach((tClip, idx) => {
+    layers.push({
+      id: tClip.id,
+      name: tClip.text ? `"${tClip.text.slice(0, 18)}..."` : `Text #${idx + 1}`,
+      desc: `${tClip.animStyle || 'pop'} · ${tClip.duration}s`,
+      type: 'text',
+      clip: tClip,
+      icon: `<svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>`,
+      active: selectedClip === tClip,
+      onSelect: () => {
+        selectClip(tClip, 'text');
+        seekToTime(tClip.start);
+      },
+      onDelete: () => {
+        deleteClip(tClip, 'text');
+        renderLayersPanel();
+      }
+    });
+  });
+
+  // 3. Image / Sticker / Vector Drawing Clips
+  timelineClips.image.forEach((imgClip, idx) => {
+    layers.push({
+      id: imgClip.id,
+      name: imgClip.name || imgClip.file?.name || `Image #${idx + 1}`,
+      desc: imgClip.drawingStrokes ? 'Vector Animated Drawing' : (imgClip.cutoutCanvas ? 'Cutout Subject' : 'Media Layer'),
+      type: 'image',
+      clip: imgClip,
+      icon: `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`,
+      active: selectedClip === imgClip,
+      onSelect: () => {
+        selectClip(imgClip, 'image');
+        seekToTime(imgClip.start);
+      },
+      onDelete: () => {
+        deleteClip(imgClip, 'image');
+        renderLayersPanel();
+      }
+    });
+  });
+
+  // 4. Video Clips
+  timelineClips.video.forEach((vClip, idx) => {
+    layers.push({
+      id: vClip.id,
+      name: vClip.file?.name || `Video #${idx + 1}`,
+      desc: `${vClip.duration}s video clip`,
+      type: 'video',
+      clip: vClip,
+      icon: `<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`,
+      active: selectedClip === vClip,
+      onSelect: () => {
+        selectClip(vClip, 'video');
+        seekToTime(vClip.start);
+      },
+      onDelete: () => {
+        deleteClip(vClip, 'video');
+        renderLayersPanel();
+      }
+    });
+  });
+
+  // 5. Stage & Background Grid Layer (Always at base)
+  const bgType = fxState.stageBackground?.type || 'cyber_grid';
+  let bgName = '3D Cyber Perspective Grid';
+  let bgDesc = 'Default Cyber Stage';
+  let bgIconColor = '#00f0ff';
+  if (bgType === 'solid_black') {
+    bgName = 'Solid Black Studio';
+    bgDesc = 'Pure Black Background';
+    bgIconColor = '#ffffff';
+  } else if (bgType === 'color') {
+    bgName = `Custom Color (${fxState.stageBackground.color})`;
+    bgDesc = 'Solid Color Stage';
+    bgIconColor = fxState.stageBackground.color;
+  } else if (bgType === 'vox_cream') {
+    bgName = 'Vox Cream Paper';
+    bgDesc = 'Vintage Newsprint Stage';
+    bgIconColor = '#f4eedb';
+  } else if (bgType === 'chroma_green') {
+    bgName = 'Chroma Green Studio';
+    bgDesc = 'Keyable Green Screen Stage';
+    bgIconColor = '#00e676';
+  }
+
+  layers.push({
+    id: 'layer-stage-background',
+    name: bgName,
+    desc: bgDesc,
+    type: 'stage',
+    icon: `<svg viewBox="0 0 24 24" style="fill: ${bgIconColor};"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>`,
+    active: false,
+    isStage: true,
+    onSelect: () => {
+      // Toggle dropdown or highlight FX card
+      const drop = document.getElementById('add-layer-dropdown');
+      if (drop) drop.style.display = drop.style.display === 'none' ? 'flex' : 'none';
+    }
+  });
+
+  // Render cards
+  layers.forEach(item => {
+    const card = document.createElement('div');
+    card.className = `layer-item-card ${item.active ? 'active' : ''}`;
+    card.innerHTML = `
+      <div class="layer-badge-icon">${item.icon}</div>
+      <div class="layer-info">
+        <div class="layer-name" title="${item.name}">${item.name}</div>
+        <div class="layer-type-desc">${item.desc}</div>
+      </div>
+      ${!item.isStage ? `
+        <button class="layer-action-btn" title="Delete Layer" data-del="true">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+      ` : `
+        <button class="layer-action-btn" title="Change Background Style" data-change-stage="true">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+      `}
+    `;
+
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('[data-del]')) {
+        e.stopPropagation();
+        if (item.onDelete) item.onDelete();
+        return;
+      }
+      if (item.onSelect) item.onSelect();
+      renderLayersPanel();
+    });
+
+    container.appendChild(card);
+  });
+}
+
+function initLayersPanelControls() {
+  const triggerBtn = document.getElementById('btn-add-layer-trigger');
+  const dropdown = document.getElementById('add-layer-dropdown');
+
+  if (triggerBtn && dropdown) {
+    triggerBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+      playUiSound('action');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target) && e.target !== triggerBtn) {
+        dropdown.style.display = 'none';
+      }
+    });
+
+    // Preset Background Selection
+    dropdown.querySelectorAll('[data-layer-preset]').forEach(el => {
+      el.addEventListener('click', () => {
+        const preset = el.dataset.layerPreset;
+        dropdown.style.display = 'none';
+
+        if (preset === 'cyber_grid') {
+          fxState.stageBackground = { type: 'cyber_grid', color: '#0a0b0e' };
+          fxState.grid.enabled = true;
+          const gridBox = document.getElementById('fx-grid-enable');
+          if (gridBox) gridBox.checked = true;
+          showTextTimingAlert('Stage set to 3D Cyber Perspective Grid!', 'success');
+        } else if (preset === 'solid_black') {
+          fxState.stageBackground = { type: 'solid_black', color: '#000000' };
+          fxState.grid.enabled = false;
+          const gridBox = document.getElementById('fx-grid-enable');
+          if (gridBox) gridBox.checked = false;
+          showTextTimingAlert('Stage set to Solid Black Studio!', 'success');
+        } else if (preset === 'dark_slate') {
+          fxState.stageBackground = { type: 'color', color: '#0d111a' };
+          fxState.grid.enabled = false;
+          showTextTimingAlert('Stage set to Dark Slate Cinematic!', 'success');
+        } else if (preset === 'vox_cream') {
+          fxState.stageBackground = { type: 'vox_cream', color: '#f4eedb' };
+          fxState.grid.enabled = false;
+          showTextTimingAlert('Stage set to Vox Newspaper Cream!', 'success');
+        } else if (preset === 'neon_red') {
+          fxState.stageBackground = { type: 'color', color: '#1a060a' };
+          fxState.grid.enabled = true;
+          showTextTimingAlert('Stage set to Magnates Accent Red stage!', 'success');
+        } else if (preset === 'chroma_green') {
+          fxState.stageBackground = { type: 'chroma_green', color: '#00e676' };
+          fxState.grid.enabled = false;
+          showTextTimingAlert('Stage set to Chroma Studio Green!', 'success');
+        }
+
+        renderLayersPanel();
+        recordState('Change Stage Background');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      });
+    });
+
+    // Custom Color Input
+    const colorInput = document.getElementById('input-layer-color');
+    if (colorInput) {
+      colorInput.addEventListener('input', (e) => {
+        fxState.stageBackground = { type: 'color', color: e.target.value };
+        fxState.grid.enabled = false;
+        renderLayersPanel();
+      });
+    }
+
+    // Overlay Actions: Add text or Draw ink
+    dropdown.querySelectorAll('[data-layer-action]').forEach(el => {
+      el.addEventListener('click', () => {
+        const action = el.dataset.layerAction;
+        dropdown.style.display = 'none';
+
+        if (action === 'add_text') {
+          const btnAddText = document.getElementById('btn-add-text');
+          if (btnAddText) btnAddText.click();
+          renderLayersPanel();
+        } else if (action === 'add_drawing') {
+          const btnDraw = document.getElementById('tool-draw');
+          if (btnDraw) btnDraw.click();
+          renderLayersPanel();
+        }
+      });
+    });
+  }
+}
+
 // Initialize on DOM ready
 document.addEventListener('DOMContentLoaded', () => {
   initScreenDrawingEngine();
+  initLayersPanelControls();
 
   // If running inside Electron desktop wrapper, listen for global shortcut
   if (window.electronAPI && typeof window.electronAPI.onToggleDrawingMode === 'function') {
