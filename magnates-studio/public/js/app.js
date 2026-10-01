@@ -592,6 +592,75 @@ function drawTextLayer(specificTextClip) {
     ctx.translate(-canvas.width / 2, -startY);
   }
 
+  // Dynamic Number Counter (Rolling Count-Up Animation: e.g. 10 -> 33 or 10 -> 1,014%)
+  if (animStyle === 'counter') {
+    let startVal = activeText.counterStart !== undefined ? activeText.counterStart : 0;
+    let endVal = activeText.counterEnd !== undefined ? activeText.counterEnd : null;
+    let suffix = activeText.counterSuffix !== undefined ? activeText.counterSuffix : null;
+    let prefix = activeText.counterPrefix !== undefined ? activeText.counterPrefix : '';
+    const countDuration = activeText.counterDuration || Math.min(2.0, activeText.duration || 2.0);
+
+    // Auto-parse numeric target, prefix, and suffix from clip text if not explicitly configured
+    if (endVal === null) {
+      const raw = activeText.text || '100';
+      const match = raw.match(/^([^0-9.-]*)([0-9.,]+)(.*)$/);
+      if (match) {
+        if (prefix === '') prefix = match[1] || '';
+        const numStr = match[2].replace(/,/g, '');
+        endVal = parseFloat(numStr) || 100;
+        if (suffix === null) suffix = match[3] || '';
+      } else {
+        endVal = parseFloat(raw.replace(/[^0-9.-]/g, '')) || 100;
+        if (suffix === null) suffix = '';
+      }
+    }
+    if (suffix === null) suffix = '';
+
+    // Smooth cubic ease-out count-up progression
+    const countProg = Math.min(1.0, Math.max(0, elapsed / countDuration));
+    const easeOut = 1 - Math.pow(1 - countProg, 3);
+    const currentVal = Math.round(startVal + (endVal - startVal) * easeOut);
+    const formattedVal = `${prefix}${currentVal.toLocaleString()}${suffix}`;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+    ctx.shadowBlur = 28;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = textColor;
+
+    // Pulse highlight glow as counter decelerates into lock
+    if (countProg > 0.85) {
+      ctx.shadowColor = highlightColor;
+      ctx.shadowBlur = 35;
+    }
+
+    ctx.fillText(formattedVal, currentX, currentY + animOffsetY);
+    ctx.restore();
+
+    const metrics = ctx.measureText(formattedVal);
+    const textWidth = metrics.width;
+    maxBoxX = currentX + textWidth;
+    minBoxX = currentX;
+    minBoxY = currentY - (fontSize * 0.55);
+    maxBoxY = currentY + (fontSize * 0.55);
+
+    // Store bounding box for interaction
+    const padding = 16;
+    const boxW = Math.max(80, (maxBoxX - minBoxX) + padding * 2);
+    const boxH = Math.max(fontSize + 16, (maxBoxY - minBoxY) + padding * 2);
+    const boxX = minBoxX - padding;
+    const boxY = minBoxY - padding;
+    activeText._renderBounds = { x: boxX, y: boxY, w: boxW, h: boxH };
+
+    ctx.restore();
+
+    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
+      drawTransformHandles(boxX, boxY, boxW, boxH);
+    }
+    return;
+  }
+
   words.forEach((word, idx) => {
     // Typewriter effect
     if (animStyle === 'typewriter') {
@@ -969,6 +1038,196 @@ function drawMediaLayer(specificClip) {
         ctx.restore();
       }
     }
+
+    // 4. Render Document Focus (Whiteout Fade / Dark Spotlight) & Animated Text Highlights
+    if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0) || (targetClip.productSpotlights && targetClip.productSpotlights.length > 0))) {
+      const docElapsed = currentTime - targetClip.start;
+      const docFocusInAt = targetClip.docFocusStartTime !== undefined ? targetClip.docFocusStartTime : 0.4;
+      const isWhiteout = targetClip.docStyle !== 'dark'; // Default to Whiteout Fade (Image 2 style)
+
+      // 4a. Whiteout or Dark Backdrop with Spotlight Cutout
+      if (targetClip.docFocus && targetClip.docFocusRect) {
+        const r = targetClip.docFocusRect;
+        const fx = dx + finalW * r.x;
+        const fy = dy + finalH * r.y;
+        const fw = Math.max(10, finalW * r.w);
+        const fh = Math.max(10, finalH * r.h);
+
+        // Smooth transition in
+        const t = Math.min(1.0, Math.max(0.0, (docElapsed - docFocusInAt) / 0.42));
+        const ease = 1 - Math.pow(1 - t, 3);
+        const defaultDim = isWhiteout ? 0.82 : 0.65;
+        const maxDim = (targetClip.docDimOpacity !== undefined ? targetClip.docDimOpacity : defaultDim) * ease;
+
+        if (maxDim > 0.01) {
+          ctx.save();
+          const feather = targetClip.docFeather !== undefined ? targetClip.docFeather : (isWhiteout ? 20 : 16);
+          
+          // Outer overlay canvas cutout
+          const offCanvas = document.createElement('canvas');
+          offCanvas.width = canvas.width;
+          offCanvas.height = canvas.height;
+          const offCtx = offCanvas.getContext('2d');
+
+          // Choose overlay color: White / Light Cream for Whiteout (Image 2 style), or Dark for Dark Spotlight
+          if (isWhiteout) {
+            offCtx.fillStyle = `rgba(255, 255, 255, ${maxDim})`;
+          } else {
+            offCtx.fillStyle = `rgba(10, 12, 16, ${maxDim})`;
+          }
+          offCtx.fillRect(dx, dy, finalW, finalH);
+
+          // Clear out the spotlight rectangle with soft feathered blur
+          offCtx.save();
+          offCtx.globalCompositeOperation = 'destination-out';
+          offCtx.filter = `blur(${feather}px)`;
+          offCtx.fillStyle = '#000000';
+          const pad = isWhiteout ? 6 : 4;
+          offCtx.fillRect(fx - pad, fy - pad, fw + pad * 2, fh + pad * 2);
+          offCtx.restore();
+
+          // Draw the whiteout / dimming mask over canvas
+          ctx.drawImage(offCanvas, 0, 0);
+
+          // If dark mode, add subtle glow border. If whiteout mode, leave natural or very subtle light ring
+          if (!isWhiteout) {
+            ctx.save();
+            ctx.strokeStyle = `rgba(56, 189, 248, ${0.45 * ease})`;
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(fx - 4, fy - 4, fw + 8, fh + 8);
+            ctx.restore();
+          }
+
+          ctx.restore();
+        }
+      }
+
+      // 4b. Live Animated Text Highlighter Bars (Wipes smoothly across text in real time)
+      if (targetClip.highlights && targetClip.highlights.length > 0) {
+        targetClip.highlights.forEach((hl, idx) => {
+          const defaultSweepSpeed = targetClip.docSweepSpeed || 0.6;
+          const hlStart = hl.startTime !== undefined ? hl.startTime : (docFocusInAt + 0.3 + idx * (defaultSweepSpeed * 0.8));
+          const hlDur = hl.duration || defaultSweepSpeed;
+          const hlElapsed = docElapsed - hlStart;
+          if (hlElapsed <= 0) return;
+
+          const progress = Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
+          const wipeEase = progress < 1 ? 1 - Math.pow(1 - progress, 2.2) : 1;
+
+          const hx = dx + finalW * hl.x;
+          const hy = dy + finalH * hl.y;
+          const hw = Math.max(4, finalW * hl.w);
+          const hh = Math.max(4, finalH * hl.h);
+
+          ctx.save();
+          ctx.globalCompositeOperation = 'multiply';
+          ctx.fillStyle = hl.color || '#38bdf8';
+          ctx.globalAlpha = hl.opacity !== undefined ? hl.opacity : 0.82;
+
+          const curW = hw * wipeEase;
+          const corner = Math.min(4, hh / 3.5);
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(hx, hy, curW, hh, corner);
+          } else {
+            ctx.rect(hx, hy, curW, hh);
+          }
+          ctx.fill();
+
+          if (progress > 0 && progress < 1.0) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.fillStyle = hl.color || '#38bdf8';
+            ctx.shadowColor = hl.color || '#38bdf8';
+            ctx.shadowBlur = 8;
+            ctx.fillRect(hx + curW - 2, hy, 3, hh);
+            ctx.restore();
+          }
+          ctx.restore();
+        });
+      }
+
+      // 4c. Product Spotlight: Animated pulsing border + corner reticle accents on highlighted products
+      if (targetClip.productSpotlights && targetClip.productSpotlights.length > 0) {
+        targetClip.productSpotlights.forEach((ps, idx) => {
+          const psStart = ps.startTime !== undefined ? ps.startTime : (docFocusInAt + 0.15 + idx * 0.45);
+          const psElapsed = docElapsed - psStart;
+          if (psElapsed <= 0) return;
+
+          // Entrance animation: snap in over 0.35s with cubic ease-out
+          const entryT = Math.min(1.0, psElapsed / 0.35);
+          const entryEase = 1 - Math.pow(1 - entryT, 3);
+
+          const spx = dx + finalW * ps.x;
+          const spy = dy + finalH * ps.y;
+          const spw = Math.max(20, finalW * ps.w);
+          const sph = Math.max(20, finalH * ps.h);
+
+          const color = ps.color || '#facc15';
+          const pulseFreq = ps.pulseSpeed || 1.8;
+          const pulseSine = Math.sin(psElapsed * pulseFreq * Math.PI * 2) * 0.5 + 0.5;
+          const glowAlpha = (ps.opacity !== undefined ? ps.opacity : 0.9) * entryEase * (0.55 + 0.45 * pulseSine);
+
+          // Pulsing glow border
+          ctx.save();
+          ctx.globalAlpha = glowAlpha;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 10 + pulseSine * 14;
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.5;
+          const cr = Math.min(6, Math.min(spw, sph) * 0.08);
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(spx, spy, spw, sph, cr);
+          } else {
+            ctx.rect(spx, spy, spw, sph);
+          }
+          ctx.stroke();
+          ctx.restore();
+
+          // Corner accent reticle marks
+          const accentLen = Math.min(spw, sph) * 0.22;
+          ctx.save();
+          ctx.globalAlpha = entryEase * (0.75 + 0.25 * pulseSine);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 3;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 8;
+          ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(spx, spy + accentLen); ctx.lineTo(spx, spy); ctx.lineTo(spx + accentLen, spy); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(spx + spw - accentLen, spy); ctx.lineTo(spx + spw, spy); ctx.lineTo(spx + spw, spy + accentLen); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(spx, spy + sph - accentLen); ctx.lineTo(spx, spy + sph); ctx.lineTo(spx + accentLen, spy + sph); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(spx + spw - accentLen, spy + sph); ctx.lineTo(spx + spw, spy + sph); ctx.lineTo(spx + spw, spy + sph - accentLen); ctx.stroke();
+          ctx.restore();
+
+          // Optional label badge floating above the spotlight box
+          if (ps.label) {
+            const labelFontSize = Math.max(11, Math.min(18, spw * 0.07));
+            ctx.save();
+            ctx.font = `700 ${labelFontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+            const labelW = ctx.measureText(ps.label).width + 14;
+            const labelH = labelFontSize + 10;
+            const labelX = spx + spw / 2 - labelW / 2;
+            const labelY = spy - labelH - 5;
+            ctx.globalAlpha = entryEase;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 12;
+            ctx.fillStyle = color;
+            if (ctx.roundRect) {
+              ctx.beginPath(); ctx.roundRect(labelX, labelY, labelW, labelH, 4); ctx.fill();
+            } else {
+              ctx.fillRect(labelX, labelY, labelW, labelH);
+            }
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#000000';
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.fillText(ps.label, labelX + labelW / 2, labelY + labelH / 2);
+            ctx.restore();
+          }
+        });
+      }
+    }
   } catch(e) {}
 
   ctx.restore();
@@ -1027,8 +1286,28 @@ function drawMarqueeSelectionOverlay() {
   if (w < 4 && h < 4) return;
 
   const isSnap = activeTool === 'snap-zoom';
-  const color = isSnap ? '#ff334b' : '#00f0ff';
-  const bgColor = isSnap ? 'rgba(255, 51, 75, 0.18)' : 'rgba(0, 240, 255, 0.18)';
+  const isDocFocus = activeTool === 'doc-focus';
+  const isDocHl = activeTool === 'doc-highlight';
+
+  let color = '#00f0ff';
+  let bgColor = 'rgba(0, 240, 255, 0.18)';
+  let toolLabel = 'Loupe Area';
+
+  if (isSnap) {
+    color = '#ff334b';
+    bgColor = 'rgba(255, 51, 75, 0.18)';
+    toolLabel = 'Punch Zoom Area';
+  } else if (isDocFocus) {
+    const isDark = (window._activeDocStyle === 'dark');
+    color = isDark ? '#a855f7' : '#38bdf8';
+    bgColor = isDark ? 'rgba(168, 85, 247, 0.22)' : 'rgba(56, 189, 248, 0.22)';
+    toolLabel = isDark ? 'Dark Spotlight (Dim rest)' : 'Whiteout Focus (Fade to white)';
+  } else if (isDocHl) {
+    const hlColor = document.getElementById('inspector-doc-hl-color')?.value || '#38bdf8';
+    color = hlColor;
+    bgColor = hlColor + '44';
+    toolLabel = 'Animated Highlight Sweep';
+  }
 
   ctx.save();
   // Fill
@@ -1061,7 +1340,7 @@ function drawMarqueeSelectionOverlay() {
 
   // Floating dimension badge
   ctx.font = '600 11px Inter, sans-serif';
-  const text = `${Math.round(w)} x ${Math.round(h)} px  (${isSnap ? 'Punch Area' : 'Loupe Area'})`;
+  const text = `${Math.round(w)} x ${Math.round(h)} px  (${toolLabel})`;
   const textW = ctx.measureText(text).width;
   ctx.fillStyle = 'rgba(10, 14, 23, 0.88)';
   ctx.fillRect(x + w / 2 - textW / 2 - 8, y + h + 8, textW + 16, 20);
@@ -1861,6 +2140,20 @@ function selectClip(clip, trackType) {
     const sfxEl = document.getElementById('text-sfx');
     if (sfxEl) sfxEl.value = clip.sfx || 'whoosh';
 
+    // Toggle and populate Rolling Counter controls if anim is 'counter'
+    const counterBox = document.getElementById('text-counter-controls');
+    if (counterBox) {
+      counterBox.style.display = clip.anim === 'counter' ? 'block' : 'none';
+      const cStart = document.getElementById('text-counter-start');
+      const cEnd = document.getElementById('text-counter-end');
+      const cDur = document.getElementById('text-counter-dur');
+      const cSuffix = document.getElementById('text-counter-suffix');
+      if (cStart) cStart.value = clip.counterStart !== undefined ? clip.counterStart : 0;
+      if (cEnd) cEnd.value = clip.counterEnd !== undefined ? clip.counterEnd : (parseFloat(String(clip.text || '').replace(/[^0-9.-]/g, '')) || 33);
+      if (cDur) cDur.value = clip.counterDuration !== undefined ? clip.counterDuration : 1.5;
+      if (cSuffix) cSuffix.value = clip.counterSuffix !== undefined ? clip.counterSuffix : '%';
+    }
+
     // Populate per-clip SFX volume slider
     const sfxVolSlider = document.getElementById('text-sfx-volume');
     const sfxVolLabel = document.getElementById('text-sfx-vol-val');
@@ -2069,6 +2362,92 @@ function selectClip(clip, trackType) {
         }
       } else {
         zoomSection.style.display = 'none';
+      }
+    }
+
+    // Article Focus (Spotlight Dimming) & Highlight Inspector Section
+    const docFocusSection = document.getElementById('inspector-doc-focus-section');
+    if (docFocusSection) {
+      if (trackType === 'image' || trackType === 'video') {
+        docFocusSection.style.display = 'block';
+        const docBadge = document.getElementById('inspector-doc-focus-badge');
+        const docBody = document.getElementById('inspector-doc-focus-controls-body');
+        const btnWhiteout = document.getElementById('btn-inspector-whiteout');
+        const btnDarkSpotlight = document.getElementById('btn-inspector-dark-spotlight');
+        const btnSpotlight = document.getElementById('btn-inspector-product-spotlight');
+
+        const hasFocus = !!clip.docFocus;
+        const isWhite = (clip.docStyle !== 'dark');
+        const hlCount = clip.highlights ? clip.highlights.length : 0;
+        const spCount = clip.productSpotlights ? clip.productSpotlights.length : 0;
+        const hasAnyFX = hasFocus || hlCount > 0 || spCount > 0;
+
+        if (docBadge) {
+          let badgeText = 'Off';
+          if (hasFocus) badgeText = isWhite ? 'Whiteout On' : 'Dark Spotlight';
+          else if (hlCount > 0 && spCount > 0) badgeText = `${hlCount} HL · ${spCount} Spotlight`;
+          else if (hlCount > 0) badgeText = `${hlCount} Highlights`;
+          else if (spCount > 0) badgeText = `${spCount} Spotlight${spCount > 1 ? 's' : ''}`;
+          docBadge.textContent = badgeText;
+          docBadge.style.color = hasAnyFX ? '#38bdf8' : 'var(--text-muted)';
+        }
+
+        if (btnWhiteout) {
+          const active = hasFocus && isWhite;
+          btnWhiteout.style.borderColor = active ? '#38bdf8' : '';
+          btnWhiteout.style.color = active ? '#38bdf8' : '';
+        }
+        if (btnDarkSpotlight) {
+          const active = hasFocus && !isWhite;
+          btnDarkSpotlight.style.borderColor = active ? '#c084fc' : '';
+          btnDarkSpotlight.style.color = active ? '#c084fc' : '';
+        }
+        if (btnDocHl) {
+          btnDocHl.style.borderColor = hlCount > 0 ? '#38bdf8' : '';
+          btnDocHl.style.color = hlCount > 0 ? '#38bdf8' : '';
+        }
+        if (btnSpotlight) {
+          btnSpotlight.style.borderColor = spCount > 0 ? '#facc15' : '';
+          btnSpotlight.style.color = spCount > 0 ? '#facc15' : '';
+        }
+
+        if (hasAnyFX && docBody) {
+          docBody.style.display = 'block';
+          const isWhite2 = (clip.docStyle !== 'dark');
+          const btnWhite = document.getElementById('btn-doc-style-white');
+          const btnDark = document.getElementById('btn-doc-style-dark');
+          if (btnWhite) btnWhite.classList.toggle('active', isWhite2);
+          if (btnDark) btnDark.classList.toggle('active', !isWhite2);
+
+          const lblDim = document.getElementById('label-doc-dim');
+          if (lblDim) lblDim.textContent = isWhite2 ? 'Whiteout Fade Level' : 'Dark Dim Level';
+
+          const dimInput = document.getElementById('inspector-doc-dim');
+          const dimVal = document.getElementById('inspector-doc-dim-val');
+          const curDim = Math.round((clip.docDimOpacity !== undefined ? clip.docDimOpacity : (isWhite2 ? 0.82 : 0.65)) * 100);
+          if (dimInput) dimInput.value = curDim;
+          if (dimVal) dimVal.textContent = `${curDim}%`;
+
+          const featherInput = document.getElementById('inspector-doc-feather');
+          const featherVal = document.getElementById('inspector-doc-feather-val');
+          const curFeather = clip.docFeather !== undefined ? clip.docFeather : (isWhite2 ? 20 : 16);
+          if (featherInput) featherInput.value = curFeather;
+          if (featherVal) featherVal.textContent = `${curFeather}px`;
+
+          const speedInput = document.getElementById('inspector-doc-speed');
+          const speedVal = document.getElementById('inspector-doc-speed-val');
+          const curSpeed = clip.docSweepSpeed !== undefined ? clip.docSweepSpeed : 0.6;
+          if (speedInput) speedInput.value = Math.round(curSpeed * 10);
+          if (speedVal) speedVal.textContent = `${curSpeed.toFixed(1)}s / line`;
+
+          // Show product spotlight label editor if spotlights present
+          const labelRow = document.getElementById('row-product-spotlight-label');
+          if (labelRow) labelRow.style.display = spCount > 0 ? 'block' : 'none';
+        } else if (docBody) {
+          docBody.style.display = 'none';
+        }
+      } else {
+        docFocusSection.style.display = 'none';
       }
     }
 
@@ -2437,6 +2816,32 @@ document.querySelectorAll('.tool-menu-item').forEach(item => {
       toggleDrawingDock(false);
       document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
       document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    } else if (item.id === 'tool-doc-focus') {
+      activeTool = 'doc-focus';
+      window._activeDocStyle = 'white';
+      canvas.classList.add('tool-doc-focus');
+      toggleDrawingDock(false);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      showTextTimingAlert('Whiteout Fade Active: Drag a rectangle over the paragraph to fade surrounding text to white.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 3500);
+    } else if (item.id === 'tool-doc-focus-dark') {
+      activeTool = 'doc-focus';
+      window._activeDocStyle = 'dark';
+      canvas.classList.add('tool-doc-focus');
+      toggleDrawingDock(false);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the target area to dim surroundings.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 3500);
+    } else if (item.id === 'tool-doc-highlight') {
+      activeTool = 'doc-highlight';
+      canvas.classList.add('tool-doc-highlight');
+      toggleDrawingDock(false);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      showTextTimingAlert('Highlighter Active: Drag across words or lines to create an animated drawing sweep.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 3500);
     } else if (item.id === 'tool-draw') {
       activeTool = 'draw';
       canvas.classList.add('tool-draw');
@@ -3365,6 +3770,237 @@ document.getElementById('inspector-zoom-start')?.addEventListener('change', () =
   recordState('Change Zoom Timing');
 });
 
+// Article Focus (Spotlight Dimming) & Highlight Inspector Event Listeners
+document.getElementById('btn-inspector-whiteout')?.addEventListener('click', () => {
+  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    activeTool = 'doc-focus';
+    window._activeDocStyle = 'white';
+    canvas.classList.add('tool-doc-focus');
+    toggleDrawingDock(false);
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    showTextTimingAlert('Whiteout Focus Active: Drag a rectangle over the target text on the image.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  }
+});
+
+document.getElementById('btn-inspector-dark-spotlight')?.addEventListener('click', () => {
+  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    activeTool = 'doc-focus';
+    window._activeDocStyle = 'dark';
+    canvas.classList.add('tool-doc-focus');
+    toggleDrawingDock(false);
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the target area to dim surroundings.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  }
+});
+
+document.getElementById('btn-inspector-doc-guide')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    openArticleFocusGuideModal(selectedClip.clip);
+  } else {
+    openArticleFocusGuideModal(null);
+  }
+});
+
+document.getElementById('btn-inspector-doc-highlight')?.addEventListener('click', () => {
+  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    activeTool = 'doc-highlight';
+    canvas.classList.add('tool-doc-highlight');
+    toggleDrawingDock(false);
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    showTextTimingAlert('Animated Highlighter Active: Drag across words/lines on the image.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  }
+});
+
+// Modal open & selection logic
+function openArticleFocusGuideModal(clip) {
+  const modal = document.getElementById('modal-doc-focus-guide');
+  if (!modal) return;
+  modal.style.display = 'flex';
+
+  const closeBtn = document.getElementById('btn-close-doc-guide');
+  const closeFooter = document.getElementById('btn-close-doc-guide-footer');
+  const closeModal = () => { modal.style.display = 'none'; };
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (closeFooter) closeFooter.onclick = closeModal;
+
+  const btnWhite = document.getElementById('btn-guide-start-whiteout');
+  const btnDark = document.getElementById('btn-guide-start-dark');
+
+  if (btnWhite) {
+    btnWhite.onclick = () => {
+      closeModal();
+      activeTool = 'doc-focus';
+      window._activeDocStyle = 'white';
+      canvas.classList.add('tool-doc-focus');
+      toggleDrawingDock(false);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      showTextTimingAlert('Step 1: Drag a box on the canvas over the text to white-out the rest.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 4000);
+    };
+  }
+
+  if (btnDark) {
+    btnDark.onclick = () => {
+      closeModal();
+      activeTool = 'doc-focus';
+      window._activeDocStyle = 'dark';
+      canvas.classList.add('tool-doc-focus');
+      toggleDrawingDock(false);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      showTextTimingAlert('Step 1: Drag a box on the canvas over the target area to dim surroundings.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 4000);
+    };
+  }
+
+  const btnProduct = document.getElementById('btn-guide-start-product-spotlight');
+  if (btnProduct) {
+    btnProduct.onclick = () => {
+      closeModal();
+      activeTool = 'doc-product-spotlight';
+      canvas.classList.add('tool-doc-highlight');
+      toggleDrawingDock(false);
+      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      const labelRow = document.getElementById('row-product-spotlight-label');
+      if (labelRow) labelRow.style.display = 'block';
+      showTextTimingAlert('Step 1: Drag a box around your product, price, CTA, or key element on the image.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 4000);
+    };
+  }
+}
+
+document.getElementById('inspector-doc-dim')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 100;
+    selectedClip.clip.docDimOpacity = val;
+    const lbl = document.getElementById('inspector-doc-dim-val');
+    if (lbl) lbl.textContent = `${Math.round(val * 100)}%`;
+  }
+});
+document.getElementById('inspector-doc-dim')?.addEventListener('change', () => {
+  recordState('Change Article Focus Dimming');
+});
+
+document.getElementById('inspector-doc-feather')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value);
+    selectedClip.clip.docFeather = val;
+    const lbl = document.getElementById('inspector-doc-feather-val');
+    if (lbl) lbl.textContent = `${val}px`;
+  }
+});
+document.getElementById('inspector-doc-feather')?.addEventListener('change', () => {
+  recordState('Change Spotlight Edge Feather');
+});
+
+// Focus Backdrop Style Toggles (Whiteout Fade vs Dark Spotlight)
+document.getElementById('btn-doc-style-white')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.docStyle = 'white';
+    selectedClip.clip.docDimOpacity = 0.82;
+    selectedClip.clip.docFeather = 20;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    recordState('Set Focus Style: Whiteout Fade');
+  }
+});
+
+document.getElementById('btn-doc-style-dark')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.docStyle = 'dark';
+    selectedClip.clip.docDimOpacity = 0.65;
+    selectedClip.clip.docFeather = 16;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    recordState('Set Focus Style: Dark Dim');
+  }
+});
+
+document.getElementById('inspector-doc-speed')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 10;
+    selectedClip.clip.docSweepSpeed = val;
+    const lbl = document.getElementById('inspector-doc-speed-val');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}s / line`;
+    if (selectedClip.clip.highlights) {
+      selectedClip.clip.highlights.forEach(h => h.duration = val);
+    }
+  }
+});
+document.getElementById('inspector-doc-speed')?.addEventListener('change', () => {
+  recordState('Change Highlight Sweep Speed');
+});
+
+document.getElementById('btn-clear-highlights')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.highlights = [];
+    selectedClip.clip.productSpotlights = [];
+    delete selectedClip.clip.docFocus;
+    delete selectedClip.clip.docFocusRect;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    recordState('Clear All Article FX');
+    showTextTimingAlert('All article FX cleared', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
+});
+
+// Clear Focus Only (preserve highlights & product spotlights)
+document.getElementById('btn-clear-focus-only')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    delete selectedClip.clip.docFocus;
+    delete selectedClip.clip.docFocusRect;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    recordState('Clear Article Focus Overlay');
+    showTextTimingAlert('Focus overlay cleared — highlights & spotlights preserved', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  }
+});
+
+// Inspector Product Spotlight button — activates doc-product-spotlight marquee tool
+document.getElementById('btn-inspector-product-spotlight')?.addEventListener('click', () => {
+  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    activeTool = 'doc-product-spotlight';
+    canvas.classList.add('tool-doc-highlight');
+    toggleDrawingDock(false);
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    const labelRow = document.getElementById('row-product-spotlight-label');
+    if (labelRow) labelRow.style.display = 'block';
+    showTextTimingAlert('Product Spotlight: Drag a box around any product, CTA, or key element.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  }
+});
+
+// Spotlight label live edit — updates label on the most recently added spotlight
+document.getElementById('inspector-spotlight-label')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip && selectedClip.clip.productSpotlights && selectedClip.clip.productSpotlights.length > 0) {
+    selectedClip.clip.productSpotlights[selectedClip.clip.productSpotlights.length - 1].label = e.target.value.trim();
+  }
+});
+
+// Toolbar: Product Spotlight tool menu item
+document.getElementById('tool-doc-product-spotlight')?.addEventListener('click', () => {
+  document.querySelectorAll('.tool-menu-item').forEach(m => m.classList.remove('active'));
+  document.getElementById('tool-doc-product-spotlight')?.classList.add('active');
+  document.querySelectorAll('.tool-dropdown-menu').forEach(m => m.classList.remove('show'));
+  activeTool = 'doc-product-spotlight';
+  canvas.classList.add('tool-doc-highlight');
+  toggleDrawingDock(false);
+  document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-dropdown-fx')?.classList.add('active');
+  const labelRow = document.getElementById('row-product-spotlight-label');
+  if (labelRow) labelRow.style.display = 'block';
+  showTextTimingAlert('Product Spotlight: Drag around any product, price tag, CTA or element to place an animated glowing border.', 'info');
+  setTimeout(() => showTextTimingAlert(''), 4000);
+});
+
+
 // Reset Clip Properties to Default (Local Reset)
 document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', () => {
   if (selectedClip) {
@@ -3383,6 +4019,12 @@ document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', (
       delete selectedClip.clip.zoomOriginX;
       delete selectedClip.clip.zoomOriginY;
       delete selectedClip.clip.loupeRadius;
+      delete selectedClip.clip.docFocus;
+      delete selectedClip.clip.docFocusRect;
+      delete selectedClip.clip.docDimOpacity;
+      delete selectedClip.clip.docFeather;
+      delete selectedClip.clip.highlights;
+      delete selectedClip.clip.productSpotlights;
     }
     selectClip(selectedClip.clip, selectedClip.trackType);
     renderAllTimelineTracks();
@@ -3427,6 +4069,18 @@ function updateActiveTextClip() {
     active.position = textPos;
     active.layerOrder = textLayerOrder;
     active.zIndex = textLayerOrder === 'front' ? 30 : 5;
+
+    // Rolling counter properties
+    if (active.anim === 'counter') {
+      const cStart = document.getElementById('text-counter-start');
+      const cEnd = document.getElementById('text-counter-end');
+      const cDur = document.getElementById('text-counter-dur');
+      const cSuffix = document.getElementById('text-counter-suffix');
+      if (cStart) active.counterStart = parseFloat(cStart.value) || 0;
+      if (cEnd) active.counterEnd = parseFloat(cEnd.value) || 33;
+      if (cDur) active.counterDuration = parseFloat(cDur.value) || 1.5;
+      if (cSuffix) active.counterSuffix = cSuffix.value !== undefined ? cSuffix.value : '%';
+    }
 
     // Live sync into floating on-screen canvas text editor if open
     const screenInput = document.getElementById('screen-text-input');
@@ -3597,8 +4251,33 @@ document.getElementById('text-highlight-color')?.addEventListener('change', () =
 });
 
 document.getElementById('text-anim')?.addEventListener('change', () => {
+  const isCounter = document.getElementById('text-anim')?.value === 'counter';
+  const counterBox = document.getElementById('text-counter-controls');
+  if (counterBox) counterBox.style.display = isCounter ? 'block' : 'none';
+
+  // If user selected counter and text has a number, pre-populate
+  if (isCounter) {
+    const active = getActiveTextClip();
+    const txt = active ? active.text : (document.getElementById('text-input')?.value || '33%');
+    const match = txt.match(/^([^0-9.-]*)([0-9.,]+)(.*)$/);
+    if (match) {
+      const num = parseFloat(match[2].replace(/,/g, '')) || 33;
+      const endEl = document.getElementById('text-counter-end');
+      const suffixEl = document.getElementById('text-counter-suffix');
+      if (endEl && !endEl.value) endEl.value = num;
+      if (suffixEl && !suffixEl.value) suffixEl.value = match[3] || '%';
+    }
+  }
+
   updateActiveTextClip();
   recordState('Change Animation');
+});
+
+// Live update on counter input changes
+['text-counter-start', 'text-counter-end', 'text-counter-dur', 'text-counter-suffix'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', () => {
+    updateActiveTextClip();
+  });
 });
 
 document.getElementById('text-sfx')?.addEventListener('change', () => {
@@ -3813,7 +4492,11 @@ document.getElementById('btn-add-text').addEventListener('click', () => {
     sfx,
     position: textPos,
     zIndex: zIdx,
-    layerOrder: textLayerOrder
+    layerOrder: textLayerOrder,
+    counterStart: parseFloat(document.getElementById('text-counter-start')?.value) || 0,
+    counterEnd: parseFloat(document.getElementById('text-counter-end')?.value) || 33,
+    counterDuration: parseFloat(document.getElementById('text-counter-dur')?.value) || 1.5,
+    counterSuffix: document.getElementById('text-counter-suffix')?.value !== undefined ? document.getElementById('text-counter-suffix')?.value : '%'
   }, insertTime, customDur);
 
   // Jump playhead directly to start of text clip so it immediately renders in canvas
@@ -4046,8 +4729,8 @@ function initCanvasTransformInteraction() {
   canvas.addEventListener('mousedown', (e) => {
     const pt = getCanvasPointer(e);
 
-    // ==================== PUNCH ZOOM & LOUPE CALLOUT TOOL (CLICK OR MARQUEE DRAG) ====================
-    if (activeTool === 'snap-zoom' || activeTool === 'loupe') {
+    // ==================== PUNCH ZOOM, LOUPE, DOC FOCUS & HIGHLIGHTER TOOLS ====================
+    if (activeTool === 'snap-zoom' || activeTool === 'loupe' || activeTool === 'doc-focus' || activeTool === 'doc-highlight' || activeTool === 'doc-product-spotlight') {
       // Find top visible image or video layer clicked on
       const activeMedia = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
       let targetMediaClip = null;
@@ -4328,63 +5011,185 @@ function initCanvasTransformInteraction() {
         const y2 = Math.max(marqueeStartPt.y, marqueeCurrentPt.y);
         const dragDist = Math.hypot(x2 - x1, y2 - y1);
 
-        const effectType = activeTool === 'snap-zoom' ? 'snap' : 'loupe';
-        marqueeTargetClip.zoomEffect = effectType;
+        if (activeTool === 'doc-focus') {
+          // USER SELECTED ARTICLE FOCUS (DIM SURROUNDINGS & SPOTLIGHT TARGET)
+          const selLeft = Math.min(x1, x2);
+          const selTop = Math.min(y1, y2);
+          const selW = Math.max(30, x2 - x1);
+          const selH = Math.max(20, y2 - y1);
 
-        if (dragDist > 16) {
-          // USER DRAGGED A CUSTOM AREA / RECTANGLE
-          const selCenterCanvasX = (x1 + x2) / 2;
-          const selCenterCanvasY = (y1 + y2) / 2;
-          const selWidth = Math.max(30, x2 - x1);
-          const selHeight = Math.max(20, y2 - y1);
+          const normX = Math.max(0, Math.min(0.95, (selLeft - b.x) / b.w));
+          const normY = Math.max(0, Math.min(0.95, (selTop - b.y) / b.h));
+          const normW = Math.min(1.0 - normX, Math.max(0.05, selW / b.w));
+          const normH = Math.min(1.0 - normY, Math.max(0.05, selH / b.h));
 
-          // Calculate normalized center origin on target image
-          const normX = Math.max(0.02, Math.min(0.98, (selCenterCanvasX - b.x) / b.w));
-          const normY = Math.max(0.02, Math.min(0.98, (selCenterCanvasY - b.y) / b.h));
-          marqueeTargetClip.zoomOriginX = normX;
-          marqueeTargetClip.zoomOriginY = normY;
+          const chosenStyle = window._activeDocStyle || (marqueeTargetClip.docStyle || 'white');
+          marqueeTargetClip.docStyle = chosenStyle;
+          marqueeTargetClip.docFocus = true;
+          marqueeTargetClip.docFocusRect = { x: normX, y: normY, w: normW, h: normH };
+          if (marqueeTargetClip.docDimOpacity === undefined) marqueeTargetClip.docDimOpacity = chosenStyle === 'white' ? 0.82 : 0.65;
+          if (marqueeTargetClip.docFeather === undefined) marqueeTargetClip.docFeather = chosenStyle === 'white' ? 20 : 16;
+          
+          // Also gently zoom camera into the paragraph for cinematic Vox effect
+          marqueeTargetClip.zoomEffect = 'snap';
+          marqueeTargetClip.zoomOriginX = normX + normW / 2;
+          marqueeTargetClip.zoomOriginY = normY + normH / 2;
+          const scaleFactorX = b.w / selW;
+          const scaleFactorY = b.h / selH;
+          const optimalScale = Math.min(2.8, Math.max(1.3, Math.min(scaleFactorX, scaleFactorY) * 0.85));
+          marqueeTargetClip.zoomScale = parseFloat(optimalScale.toFixed(1));
+          
+          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+          marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+          marqueeTargetClip.docFocusStartTime = parseFloat(relTime.toFixed(1));
 
-          if (effectType === 'snap') {
-            // Calculate optimal punch zoom magnification to fit selected area
-            const scaleFactorX = b.w / selWidth;
-            const scaleFactorY = b.h / selHeight;
-            const optimalScale = Math.min(3.8, Math.max(1.4, Math.min(scaleFactorX, scaleFactorY)));
-            marqueeTargetClip.zoomScale = parseFloat(optimalScale.toFixed(1));
-          } else {
-            // Loupe Callout: Set to Rect Box Shape matching the dragged proportion!
-            marqueeTargetClip.loupeShape = 'rect';
-            marqueeTargetClip.loupeWidth = Math.round(selWidth * 1.35);
-            marqueeTargetClip.loupeHeight = Math.round(selHeight * 1.35);
-            marqueeTargetClip.loupeRadius = Math.round(Math.max(selWidth, selHeight) / 2);
-            marqueeTargetClip.zoomScale = 2.4;
+          playSFX('snap_zoom');
+          const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
+          selectClip(marqueeTargetClip, trackType);
+          recordState(`Set Article ${chosenStyle === 'white' ? 'Whiteout' : 'Dark'} Focus`);
+          showTextTimingAlert(chosenStyle === 'white' ? 'Whiteout Focus active! Surrounding text whited out.' : 'Dark Spotlight active! Surrounding text dimmed.', 'success');
+          setTimeout(() => showTextTimingAlert(''), 3000);
+        } else if (activeTool === 'doc-highlight') {
+          // USER HIGHLIGHTED A LINE OR SENTENCE (ANIMATED LIVE SWEEP)
+          const selLeft = Math.min(x1, x2);
+          const selTop = Math.min(y1, y2);
+          const selW = Math.max(20, x2 - x1);
+          const selH = Math.max(12, y2 - y1);
+
+          const normX = Math.max(0, Math.min(0.95, (selLeft - b.x) / b.w));
+          const normY = Math.max(0, Math.min(0.95, (selTop - b.y) / b.h));
+          const normW = Math.min(1.0 - normX, Math.max(0.02, selW / b.w));
+          const normH = Math.min(1.0 - normY, Math.max(0.015, selH / b.h));
+
+          if (!marqueeTargetClip.highlights) marqueeTargetClip.highlights = [];
+          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+          const hlColor = document.getElementById('inspector-doc-hl-color')?.value || '#38bdf8';
+          const sweepSpeedInput = document.getElementById('inspector-doc-speed');
+          const speedSec = sweepSpeedInput ? (parseInt(sweepSpeedInput.value) / 10) : 0.6;
+
+          // Stagger subsequent lines seamlessly so each line draws right after the previous
+          const prevHl = marqueeTargetClip.highlights[marqueeTargetClip.highlights.length - 1];
+          let startSec = parseFloat((relTime + 0.05).toFixed(2));
+          if (prevHl && (startSec < (prevHl.startTime + prevHl.duration))) {
+            startSec = parseFloat((prevHl.startTime + prevHl.duration * 0.75).toFixed(2));
           }
 
-          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
-          marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+          marqueeTargetClip.highlights.push({
+            x: normX,
+            y: normY,
+            w: normW,
+            h: normH,
+            color: hlColor,
+            opacity: 0.82,
+            startTime: startSec,
+            duration: speedSec
+          });
 
-          playSFX('snap_zoom');
+          playSFX('pop');
           const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
           selectClip(marqueeTargetClip, trackType);
-          recordState(`Set ${effectType === 'snap' ? 'Punch Zoom' : 'Rectangle Loupe'} Area (${Math.round(selWidth)}x${Math.round(selHeight)})`);
-          showTextTimingAlert(`Zoom area selected! (${Math.round(selWidth)}x${Math.round(selHeight)})`, 'success');
+          recordState('Add Animated Text Highlight Bar');
+          showTextTimingAlert(`Added animated highlight sweep (${marqueeTargetClip.highlights.length} total)`, 'success');
           setTimeout(() => showTextTimingAlert(''), 2500);
+        } else if (activeTool === 'doc-product-spotlight') {
+          // USER PLACED A PRODUCT SPOTLIGHT (Pulsing glow border / reticle around product area)
+          const selLeft = Math.min(x1, x2);
+          const selTop = Math.min(y1, y2);
+          const selW = Math.max(30, x2 - x1);
+          const selH = Math.max(20, y2 - y1);
+
+          const normX = Math.max(0, Math.min(0.95, (selLeft - b.x) / b.w));
+          const normY = Math.max(0, Math.min(0.95, (selTop - b.y) / b.h));
+          const normW = Math.min(1.0 - normX, Math.max(0.03, selW / b.w));
+          const normH = Math.min(1.0 - normY, Math.max(0.03, selH / b.h));
+
+          if (!marqueeTargetClip.productSpotlights) marqueeTargetClip.productSpotlights = [];
+          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+          const spotColor = document.getElementById('inspector-doc-hl-color')?.value || '#facc15';
+
+          // Stagger spotlight entrances
+          const prevSp = marqueeTargetClip.productSpotlights[marqueeTargetClip.productSpotlights.length - 1];
+          let spStart = parseFloat((relTime + 0.1).toFixed(2));
+          if (prevSp) spStart = parseFloat((prevSp.startTime + 0.4).toFixed(2));
+
+          marqueeTargetClip.productSpotlights.push({
+            x: normX,
+            y: normY,
+            w: normW,
+            h: normH,
+            color: spotColor,
+            opacity: 0.9,
+            pulseSpeed: 1.8,
+            startTime: spStart,
+            label: ''
+          });
+
+          playSFX('snap_zoom');
+          const spTrackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
+          selectClip(marqueeTargetClip, spTrackType);
+          recordState('Add Product Spotlight');
+          showTextTimingAlert(`Product spotlight placed! (${marqueeTargetClip.productSpotlights.length} total) — Edit label in inspector`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 3000);
         } else {
-          // SIMPLE CLICK (NO DRAG)
-          const normX = Math.max(0.05, Math.min(0.95, (marqueeStartPt.x - b.x) / b.w));
-          const normY = Math.max(0.05, Math.min(0.95, (marqueeStartPt.y - b.y) / b.h));
-          marqueeTargetClip.zoomOriginX = normX;
-          marqueeTargetClip.zoomOriginY = normY;
-          if (!marqueeTargetClip.zoomScale) marqueeTargetClip.zoomScale = 2.2;
-          if (!marqueeTargetClip.loupeRadius) marqueeTargetClip.loupeRadius = 120;
-          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
-          marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+          // PUNCH ZOOM OR LOUPE
+          const effectType = activeTool === 'snap-zoom' ? 'snap' : 'loupe';
+          marqueeTargetClip.zoomEffect = effectType;
 
-          playSFX('snap_zoom');
-          const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
-          selectClip(marqueeTargetClip, trackType);
-          recordState(`Add ${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} at (${Math.round(normX * 100)}%, ${Math.round(normY * 100)}%)`);
-          showTextTimingAlert(`${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} placed!`, 'success');
-          setTimeout(() => showTextTimingAlert(''), 2500);
+          if (dragDist > 16) {
+            // USER DRAGGED A CUSTOM AREA / RECTANGLE
+            const selCenterCanvasX = (x1 + x2) / 2;
+            const selCenterCanvasY = (y1 + y2) / 2;
+            const selWidth = Math.max(30, x2 - x1);
+            const selHeight = Math.max(20, y2 - y1);
+
+            // Calculate normalized center origin on target image
+            const normX = Math.max(0.02, Math.min(0.98, (selCenterCanvasX - b.x) / b.w));
+            const normY = Math.max(0.02, Math.min(0.98, (selCenterCanvasY - b.y) / b.h));
+            marqueeTargetClip.zoomOriginX = normX;
+            marqueeTargetClip.zoomOriginY = normY;
+
+            if (effectType === 'snap') {
+              // Calculate optimal punch zoom magnification to fit selected area
+              const scaleFactorX = b.w / selWidth;
+              const scaleFactorY = b.h / selHeight;
+              const optimalScale = Math.min(3.8, Math.max(1.4, Math.min(scaleFactorX, scaleFactorY)));
+              marqueeTargetClip.zoomScale = parseFloat(optimalScale.toFixed(1));
+            } else {
+              // Loupe Callout: Set to Rect Box Shape matching the dragged proportion!
+              marqueeTargetClip.loupeShape = 'rect';
+              marqueeTargetClip.loupeWidth = Math.round(selWidth * 1.35);
+              marqueeTargetClip.loupeHeight = Math.round(selHeight * 1.35);
+              marqueeTargetClip.loupeRadius = Math.round(Math.max(selWidth, selHeight) / 2);
+              marqueeTargetClip.zoomScale = 2.4;
+            }
+
+            const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+            marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+
+            playSFX('snap_zoom');
+            const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
+            selectClip(marqueeTargetClip, trackType);
+            recordState(`Set ${effectType === 'snap' ? 'Punch Zoom' : 'Rectangle Loupe'} Area (${Math.round(selWidth)}x${Math.round(selHeight)})`);
+            showTextTimingAlert(`Zoom area selected! (${Math.round(selWidth)}x${Math.round(selHeight)})`, 'success');
+            setTimeout(() => showTextTimingAlert(''), 2500);
+          } else {
+            // SIMPLE CLICK (NO DRAG)
+            const normX = Math.max(0.05, Math.min(0.95, (marqueeStartPt.x - b.x) / b.w));
+            const normY = Math.max(0.05, Math.min(0.95, (marqueeStartPt.y - b.y) / b.h));
+            marqueeTargetClip.zoomOriginX = normX;
+            marqueeTargetClip.zoomOriginY = normY;
+            if (!marqueeTargetClip.zoomScale) marqueeTargetClip.zoomScale = 2.2;
+            if (!marqueeTargetClip.loupeRadius) marqueeTargetClip.loupeRadius = 120;
+            const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+            marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
+
+            playSFX('snap_zoom');
+            const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
+            selectClip(marqueeTargetClip, trackType);
+            recordState(`Add ${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} at (${Math.round(normX * 100)}%, ${Math.round(normY * 100)}%)`);
+            showTextTimingAlert(`${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} placed!`, 'success');
+            setTimeout(() => showTextTimingAlert(''), 2500);
+          }
         }
       }
       marqueeTargetClip = null;
@@ -5460,7 +6265,11 @@ function hideStudioContextMenu() {
   }
 }
 
-document.addEventListener('click', () => hideStudioContextMenu());
+document.addEventListener('click', (e) => {
+  if (activeStudioContextMenu && !activeStudioContextMenu.contains(e.target)) {
+    hideStudioContextMenu();
+  }
+});
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') hideStudioContextMenu();
 });
@@ -5556,6 +6365,27 @@ function showStudioContextMenu(x, y, clip, trackType) {
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
         <span>${clip.zoomEffect === 'loupe' ? 'Remove Loupe Lens' : 'Add Loupe Callout'}</span>
         <span class="context-badge">${clip.zoomEffect === 'loupe' ? 'Active' : 'Lens'}</span>
+      </div>
+
+      <!-- 1. Dark Document Spotlight (Original Dim Effect) -->
+      <div class="context-menu-item ${clip.docFocus && clip.docStyle === 'dark' ? 'active-fx' : ''}" id="ctx-action-dark-spotlight">
+        <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span>${clip.docFocus && clip.docStyle === 'dark' ? 'Edit Dark Spotlight' : 'Dark Document Spotlight (Dim)'}</span>
+        <span class="context-badge" style="color: #a855f7;">${clip.docFocus && clip.docStyle === 'dark' ? 'Active' : 'Original FX'}</span>
+      </div>
+
+      <!-- 2. Article Whiteout & Animated Highlight (New Article Focus) -->
+      <div class="context-menu-item ${clip.docFocus && clip.docStyle !== 'dark' ? 'active-fx' : ''}" id="ctx-action-whiteout-highlight">
+        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
+        <span>${clip.docFocus && clip.docStyle !== 'dark' ? 'Edit Whiteout & Highlight' : 'Article Whiteout & Highlight'}</span>
+        <span class="context-badge" style="color: #38bdf8;">${clip.docFocus && clip.docStyle !== 'dark' ? 'Active' : 'Article FX'}</span>
+      </div>
+
+      <!-- Quick FX Guide & Setup Modal Button -->
+      <div class="context-menu-item" id="ctx-action-focus-guide" style="background: rgba(56, 189, 248, 0.08); border-left: 2px solid #38bdf8;">
+        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span>Article FX Guide & Setup...</span>
+        <span class="context-badge" style="color: #38bdf8;">Wizard</span>
       </div>
 
       <div class="context-menu-divider"></div>
@@ -5699,6 +6529,42 @@ function showStudioContextMenu(x, y, clip, trackType) {
     if (clip.zoomEffect === 'loupe') playSFX('snap_zoom');
     selectClip(clip, trackType);
     recordState('Toggle Loupe Callout Effect');
+  });
+
+  // 1. Dark Document Spotlight (Original Dim Effect)
+  menu.querySelector('#ctx-action-dark-spotlight')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, trackType);
+    activeTool = 'doc-focus';
+    window._activeDocStyle = 'dark';
+    canvas.classList.add('tool-doc-focus');
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the target area to dim surroundings.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  });
+
+  // 2. Article Whiteout & Animated Highlight
+  menu.querySelector('#ctx-action-whiteout-highlight')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, trackType);
+    activeTool = 'doc-focus';
+    window._activeDocStyle = 'white';
+    canvas.classList.add('tool-doc-focus');
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    showTextTimingAlert('Whiteout Focus Active: Drag a box over the article paragraph to white-out surrounding text.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  });
+
+  // 3. Article FX Guide & Setup Modal
+  menu.querySelector('#ctx-action-focus-guide')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, trackType);
+    openArticleFocusGuideModal(clip);
   });
 
   menu.querySelector('#ctx-action-bring-front')?.addEventListener('click', (e) => {
@@ -7042,6 +7908,25 @@ const PREBUILT_CHART_TEMPLATES = [
     }
   },
   {
+    id: 'tpl-rolling-counter',
+    type: 'counter',
+    name: 'Dynamic Rolling Number Counter',
+    badge: '1,014% Metric',
+    desc: 'Kinetic Vox & Magnates high-impact count-up animation that ticks rapidly from start to target metric with easing.',
+    config: {
+      type: 'counter',
+      title: 'AUDIENCE SURGE',
+      startVal: 10,
+      endVal: 1014,
+      prefix: '',
+      suffix: '%',
+      sublabel: 'Exponential engagement velocity',
+      color: '#00f0ff',
+      drawDuration: 1.6,
+      glow: true
+    }
+  },
+  {
     id: 'tpl-market-share-donut',
     type: 'donut',
     name: 'Radial Pie & Donut Sweep',
@@ -7152,7 +8037,9 @@ function drawInfographicChart(ctx, clip, dx, dy, w, h) {
   ctx.restore();
 
   // Route to specific chart renderer
-  if (cfg.type === 'bar') {
+  if (cfg.type === 'counter') {
+    drawStatCounterChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
+  } else if (cfg.type === 'bar') {
     drawStaggeredBarChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 95, elapsed, progress);
   } else if (cfg.type === 'pyramid') {
     drawLiquidPyramidChart(ctx, cfg, dx + 30, dy + 70, w - 60, h - 90, elapsed, progress);
@@ -7738,6 +8625,100 @@ function drawConversionFunnelChart(ctx, cfg, x, y, w, h, elapsed, progress) {
   });
 }
 
+// 7. Dynamic Rolling Number Counter Infographic (Vox & Magnates Metric Impact)
+function drawStatCounterChart(ctx, cfg, x, y, w, h, elapsed, progress) {
+  const primaryColor = cfg.color || '#00f0ff';
+  const startVal = cfg.startVal !== undefined ? cfg.startVal : 0;
+  const endVal = cfg.endVal !== undefined ? cfg.endVal : 1014;
+  const prefix = cfg.prefix || '';
+  const suffix = cfg.suffix !== undefined ? cfg.suffix : '%';
+  const sublabel = cfg.sublabel || 'Exponential growth surge';
+  const drawDur = cfg.drawDuration || 1.6;
+
+  const countProg = Math.min(1.0, Math.max(0, elapsed / drawDur));
+  const easeOut = 1 - Math.pow(1 - countProg, 3);
+  const currentVal = Math.round(startVal + (endVal - startVal) * easeOut);
+
+  const centerX = x + w / 2;
+  const centerY = y + h * 0.46;
+
+  ctx.save();
+
+  // Background subtle glow radar / radial halo
+  if (cfg.glow) {
+    const radialGrad = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, Math.min(w, h) * 0.52);
+    radialGrad.addColorStop(0, hexToRgba(primaryColor, 0.18 * easeOut));
+    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = radialGrad;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, Math.min(w, h) * 0.52, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Ticking progress ring around counter (scaled nicely inside bounds)
+  const radius = Math.min(w * 0.32, h * 0.36);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Progress arc
+  if (countProg > 0) {
+    ctx.strokeStyle = primaryColor;
+    if (cfg.glow) {
+      ctx.shadowColor = primaryColor;
+      ctx.shadowBlur = 16;
+    }
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + (Math.PI * 2 * easeOut));
+    ctx.stroke();
+  }
+
+  // Format large numbers with locale commas (e.g. 1,014)
+  const displayNum = `${prefix}${currentVal.toLocaleString()}${suffix}`;
+
+  // Auto-fit font size dynamically to guarantee number fits comfortably inside the ring
+  const maxAvailableTextW = radius * 1.62;
+  let numFontSize = Math.min(54, Math.max(22, Math.floor(radius * 0.48)));
+  ctx.font = `900 ${numFontSize}px "Inter", "Oswald", sans-serif`;
+  let measuredW = ctx.measureText(displayNum).width;
+  while (measuredW > maxAvailableTextW && numFontSize > 18) {
+    numFontSize -= 2;
+    ctx.font = `900 ${numFontSize}px "Inter", "Oswald", sans-serif`;
+    measuredW = ctx.measureText(displayNum).width;
+  }
+
+  // Big Impact Number
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#ffffff';
+  if (cfg.glow) {
+    ctx.shadowColor = primaryColor;
+    ctx.shadowBlur = 24;
+  }
+  ctx.fillText(displayNum, centerX, centerY - 6);
+
+  // Sublabel / context badge (scaled to fit)
+  ctx.shadowBlur = 0;
+  const sublabelFontSize = Math.max(9, Math.min(12, Math.floor(radius * 0.12)));
+  ctx.font = `700 ${sublabelFontSize}px "Inter", sans-serif`;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.fillText(sublabel.toUpperCase(), centerX, centerY + numFontSize * 0.58 + 2);
+
+  // Bottom velocity indicator
+  const deltaVal = endVal - startVal;
+  const isPositive = deltaVal >= 0;
+  const deltaText = `${isPositive ? '+' : ''}${Math.round(deltaVal * easeOut).toLocaleString()}${suffix} DELTA`;
+  ctx.font = `800 ${Math.max(9, Math.min(11, sublabelFontSize - 1))}px "Inter", monospace`;
+  ctx.fillStyle = primaryColor;
+  ctx.fillText(deltaText, centerX, centerY + numFontSize * 0.58 + sublabelFontSize + 8);
+
+  ctx.restore();
+}
+
 // Helper: Hex color to RGBA string
 function hexToRgba(hex, alpha) {
   if (!hex || hex[0] !== '#') return `rgba(255, 255, 255, ${alpha})`;
@@ -7791,6 +8772,13 @@ function renderChartsTemplatesPanel() {
         <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
           <polygon points="50,4 28,46 72,46" fill="#242833" />
           <path d="M50,4 L39,24 Q45,21 50,24 T61,24 Z" fill="#b4ff00" filter="drop-shadow(0 0 6px #b4ff00)" />
+        </svg>
+      `;
+    } else if (tpl.type === 'counter') {
+      miniPreviewSvg = `
+        <svg viewBox="0 0 100 50" style="width: 85%; height: 100%;">
+          <text x="50" y="27" fill="#00f0ff" font-size="16" font-weight="900" text-anchor="middle" font-family="'Inter', sans-serif" filter="drop-shadow(0 0 5px #00f0ff)">1,014%</text>
+          <text x="50" y="42" fill="rgba(255,255,255,0.7)" font-size="8" font-weight="700" text-anchor="middle" letter-spacing="1">SURGE</text>
         </svg>
       `;
     } else if (tpl.type === 'donut') {
@@ -8027,8 +9015,8 @@ function openChartEditorModalForClip(clip) {
     c.classList.toggle('active', c.dataset.chartType === selectedModalType);
   });
 
-  // Populate inputs with clip's active configuration
   const titleInput = document.getElementById('modal-chart-title');
+  const quickTitleInput = document.getElementById('modal-chart-quick-title');
   const colorInput = document.getElementById('modal-chart-color');
   const colorLabel = document.getElementById('modal-chart-color-label');
   const durSlider = document.getElementById('modal-chart-duration');
@@ -8037,6 +9025,7 @@ function openChartEditorModalForClip(clip) {
   const dataLabel = document.getElementById('modal-chart-data-label');
 
   if (titleInput) titleInput.value = cfg.title || '';
+  if (quickTitleInput) quickTitleInput.value = cfg.title || '';
   if (colorInput) {
     colorInput.value = cfg.color || '#00f0ff';
     if (colorLabel) colorLabel.textContent = cfg.color || '#00f0ff';
@@ -8127,13 +9116,13 @@ function setupModalDirectCanvasInteraction() {
     if (targetHit) {
       if (targetHit.type === 'title') {
         const titleInput = document.getElementById('modal-chart-title');
+        const quickInput = document.getElementById('modal-chart-quick-title');
         const currentTitle = titleInput ? titleInput.value : (targetHit.text || '');
-        const newTitle = prompt('Edit or Clear Chart Title (leave blank to delete):', currentTitle);
+        const newTitle = prompt('Edit Chart Title:', currentTitle);
         if (newTitle !== null) {
-          if (titleInput) {
-            titleInput.value = newTitle.trim();
-            modalPreviewStartTime = performance.now() - 5000;
-          }
+          if (titleInput) titleInput.value = newTitle;
+          if (quickInput) quickInput.value = newTitle;
+          modalPreviewStartTime = performance.now() - 5000;
         }
       } else if (targetHit.type === 'axis-label') {
         const currentLabel = targetHit.text || `${targetHit.idx + 1}`;
@@ -8276,7 +9265,13 @@ function startModalPreviewLoop() {
       previewCfg.labels = [...modalCustomLabels];
     }
 
-    if (selectedModalType === 'pyramid') {
+    if (selectedModalType === 'counter') {
+      const parts = rawData.split(':').map(s => s.trim());
+      previewCfg.startVal = parseFloat(parts[0]) || 0;
+      previewCfg.endVal = parseFloat(parts[1]) || 1014;
+      previewCfg.suffix = parts[2] !== undefined ? parts[2] : '%';
+      previewCfg.sublabel = parts[3] || 'Exponential audience surge';
+    } else if (selectedModalType === 'pyramid') {
       previewCfg.tierText = rawData.trim() || '3% BUYING NOW';
       previewCfg.tierIndex = 0;
     } else if (selectedModalType === 'bar') {
@@ -8311,29 +9306,38 @@ function startModalPreviewLoop() {
     pCtx.fill();
     pCtx.stroke();
 
-    // Chart Title Header
-    pCtx.font = '800 16px "Inter", "Oswald", sans-serif';
+    // Chart Title Header (cleanly formatted, scales with expansion)
+    const titleFontSize = isModalExpanded ? 20 : 16;
+    pCtx.font = `800 ${titleFontSize}px "Inter", "Oswald", sans-serif`;
     pCtx.fillStyle = '#ffffff';
     const displayTitle = previewCfg.title || 'PREVIEW';
-    pCtx.fillText(displayTitle, 24, 28);
+    const titleY = isModalExpanded ? 34 : 28;
+    pCtx.fillText(displayTitle, 24, titleY);
     const titleWidth = pCtx.measureText(displayTitle).width;
 
-    // Register title as interactive tap target
+    // Register title as interactive tap target with generous clickable area
     modalInteractiveTargets = [];
     modalInteractiveTargets.push({
       type: 'title',
-      x: 20,
-      y: 10,
-      w: Math.max(80, titleWidth + 20),
-      h: 24,
+      x: 16,
+      y: 6,
+      w: Math.max(120, titleWidth + 30),
+      h: titleY + 12,
       text: previewCfg.title
     });
+
+    // Subtle editable indicator badge next to title
+    pCtx.save();
+    pCtx.font = '600 10px "Inter", sans-serif';
+    pCtx.fillStyle = 'rgba(0, 240, 255, 0.65)';
+    pCtx.fillText('✎ edit', 24 + titleWidth + 8, titleY - 1);
+    pCtx.restore();
 
     pCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     pCtx.lineWidth = 1;
     pCtx.beginPath();
-    pCtx.moveTo(24, 36);
-    pCtx.lineTo(pw - 24, 36);
+    pCtx.moveTo(24, titleY + 8);
+    pCtx.lineTo(pw - 24, titleY + 8);
     pCtx.stroke();
     pCtx.restore();
 
@@ -8345,7 +9349,9 @@ function startModalPreviewLoop() {
 
     modalInteractiveNodes = []; // Reset node detection for this frame
 
-    if (previewCfg.type === 'bar') {
+    if (previewCfg.type === 'counter') {
+      drawStatCounterChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
+    } else if (previewCfg.type === 'bar') {
       drawStaggeredBarChart(pCtx, previewCfg, chartX, chartY, chartW, chartH, elapsedSec, progress);
       // Track bar interactive drag zones and bottom axis label targets
       const vals = previewCfg.values || [];
@@ -8547,11 +9553,17 @@ function initChartsAndInfographicsEngine() {
         if (dataLabel) dataLabel.textContent = 'Leaderboard Items (Format: Name:Value:Delta, comma separated)';
         if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'GLOBAL RANKINGS';
         if (dataInput && !modalEditingClip) dataInput.value = 'Veritasium:28M:+4.2%, Vox:18M:+1.8%, Magnates:12M:+6.5%, Kurzgesagt:24M:+2.1%';
+      } else if (selectedModalType === 'counter') {
+        if (dataLabel) dataLabel.textContent = 'Counter Data (Format: Start:End:Suffix:Sublabel)';
+        if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'AUDIENCE SURGE';
+        if (dataInput && !modalEditingClip) dataInput.value = '10:1014:%:Exponential growth surge';
       } else if (selectedModalType === 'funnel') {
         if (dataLabel) dataLabel.textContent = 'Funnel Stages (Format: Stage:Count:Drop%, comma separated)';
         if (titleInput && (!modalEditingClip || !titleInput.value)) titleInput.value = 'CONVERSION PIPELINE';
         if (dataInput && !modalEditingClip) dataInput.value = 'Impressions:100K:100%, Clicks:12.4K:12.4%, Opt-Ins:3.8K:3.8%, Customers:940:0.94%';
       }
+      const quickTitle = document.getElementById('modal-chart-quick-title');
+      if (quickTitle && titleInput) quickTitle.value = titleInput.value;
       modalPreviewStartTime = performance.now();
     });
   });
@@ -8569,17 +9581,22 @@ function initChartsAndInfographicsEngine() {
           c.classList.toggle('active', c.dataset.chartType === selectedModalType);
         });
         const titleInput = document.getElementById('modal-chart-title');
+        const quickTitleInput = document.getElementById('modal-chart-quick-title');
         const colorInput = document.getElementById('modal-chart-color');
         const colorLabel = document.getElementById('modal-chart-color-label');
         const dataInput = document.getElementById('modal-chart-data');
         const dataLabel = document.getElementById('modal-chart-data-label');
         if (titleInput) titleInput.value = tpl.config.title;
+        if (quickTitleInput) quickTitleInput.value = tpl.config.title;
         if (colorInput) {
           colorInput.value = tpl.config.color;
           if (colorLabel) colorLabel.textContent = tpl.config.color;
         }
         if (dataInput) {
-          if (tpl.type === 'pyramid') {
+          if (tpl.type === 'counter') {
+            if (dataLabel) dataLabel.textContent = 'Counter Data (Format: Start:End:Suffix:Sublabel)';
+            dataInput.value = `${tpl.config.startVal}:${tpl.config.endVal}:${tpl.config.suffix}:${tpl.config.sublabel}`;
+          } else if (tpl.type === 'pyramid') {
             if (dataLabel) dataLabel.textContent = 'Apex Tier Headline Text';
             dataInput.value = tpl.config.tierText;
           } else if (tpl.type === 'bar') {
@@ -8593,6 +9610,17 @@ function initChartsAndInfographicsEngine() {
         modalPreviewStartTime = performance.now();
       }
     });
+  });
+
+  // Two-way synchronization between modal-chart-title and modal-chart-quick-title
+  const mainTitleInput = document.getElementById('modal-chart-title');
+  const quickTitleInput = document.getElementById('modal-chart-quick-title');
+
+  mainTitleInput?.addEventListener('input', (e) => {
+    if (quickTitleInput) quickTitleInput.value = e.target.value;
+  });
+  quickTitleInput?.addEventListener('input', (e) => {
+    if (mainTitleInput) mainTitleInput.value = e.target.value;
   });
 
   // Color Picker in Modal
@@ -8625,7 +9653,13 @@ function initChartsAndInfographicsEngine() {
       glow: true
     };
 
-    if (selectedModalType === 'pyramid') {
+    if (selectedModalType === 'counter') {
+      const parts = rawData.split(':').map(s => s.trim());
+      config.startVal = parseFloat(parts[0]) || 0;
+      config.endVal = parseFloat(parts[1]) || 1014;
+      config.suffix = parts[2] !== undefined ? parts[2] : '%';
+      config.sublabel = parts[3] || 'Exponential audience surge';
+    } else if (selectedModalType === 'pyramid') {
       config.tierText = rawData.trim() || '3% BUYING NOW';
       config.tierIndex = modalEditingClip?.chartConfig?.tierIndex || 0;
     } else if (selectedModalType === 'bar') {

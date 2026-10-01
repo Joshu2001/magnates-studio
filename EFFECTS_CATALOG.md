@@ -17,6 +17,7 @@
 | `fx-ai-cutout` | **AI Subject Isolation / Cutout** | Masking & Cutout | ✅ Implemented | Right-click -> *Remove Background* |
 | `fx-vector-sticker`| **Magnates Vector / Paper Cutout** | Stylization | ✅ Implemented | Right-click -> *Magnates Vector / Paper Cutout* |
 | `fx-kinetic-type` | **Kinetic Typography Engine** | Text & Titles | ✅ Implemented | Text Inspector -> Anim Dropdown + Accent color |
+| `fx-rolling-counter`| **Dynamic Rolling Number Counter** | Text & Infographics | ✅ Implemented | Text Inspector -> Anim -> *Dynamic Number Counter* or Charts -> *1,014% Metric* |
 | `fx-dynamic-area-chart`| **Progressive Dual-Line & Area Chart** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Dynamic Area Spread* |
 | `fx-staggered-bar` | **Staggered Metric Bar Pop-Up** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Staggered Bar Reveal* |
 | `fx-liquid-pyramid` | **Liquid Wave & Glowing Funnel / Pyramid** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Liquid Funnel Tier* |

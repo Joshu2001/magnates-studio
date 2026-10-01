@@ -1776,6 +1776,14 @@ canvas.tool-loupe {
   cursor: cell !important;
 }
 
+canvas.tool-doc-focus {
+  cursor: crosshair !important;
+}
+
+canvas.tool-doc-highlight {
+  cursor: text !important;
+}
+
 .btn-tool.active-tool {
   background: rgba(0, 240, 255, 0.15) !important;
   border-color: #00f0ff !important;
