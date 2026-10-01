@@ -1729,22 +1729,20 @@ function render(now) {
 
   if (isPlaying) {
     const speed = parseFloat(document.getElementById('playback-speed')?.value || '1');
-    if (audioPlayer.src && !audioPlayer.paused) {
-      currentTime = audioPlayer.currentTime;
-    } else {
-      currentTime += delta * speed;
-      if (currentTime > duration) {
-        currentTime = 0;
-        isPlaying = false;
-        triggeredSFX.clear();
-        const playBtn = document.getElementById('btn-play');
-        if (playBtn) {
-          playBtn.innerHTML = `
-            <svg class="ui-icon" id="play-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
-            <span>Play</span>
-          `;
-        }
+    currentTime += delta * speed;
+    if (currentTime > duration) {
+      currentTime = 0;
+      isPlaying = false;
+      triggeredSFX.clear();
+      const playBtn = document.getElementById('btn-play');
+      if (playBtn) {
+        playBtn.innerHTML = `
+          <svg class="ui-icon" id="play-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
+          <span>Play</span>
+        `;
       }
+      if (audioPlayer.src) audioPlayer.pause();
+      if (!bgmPlayer.paused) bgmPlayer.pause();
     }
     syncAudioPlayback();
 
@@ -1870,14 +1868,17 @@ function syncAudioPlayback() {
     if (audioPlayer.src !== activeVoice.file.url) {
       audioPlayer.src = activeVoice.file.url;
     }
-    const offset = currentTime - activeVoice.start;
+    const clipOffset = activeVoice.audioOffset || 0;
+    const offset = (currentTime - activeVoice.start) + clipOffset;
     if (audioPlayer.paused) audioPlayer.play().catch(() => {});
     if (Math.abs(audioPlayer.currentTime - offset) > 0.25) {
       audioPlayer.currentTime = offset;
     }
     audioPlayer.volume = (activeVoice.volume !== undefined ? activeVoice.volume : 100) / 100;
-  } else if (audioPlayer.src && !timelineClips.voiceover.length) {
-    // If audio is loaded as project background
+  } else {
+    if (audioPlayer.src && !audioPlayer.paused) {
+      audioPlayer.pause();
+    }
   }
 
   // Background music track sync
@@ -2126,6 +2127,68 @@ function renderFramesToContainer(frames, containerEl) {
   }
 }
 
+// Audio Waveform Generator and Cache
+const audioBufferCache = new Map();
+const waveformPointsCache = new Map();
+
+async function getAudioBufferForUrl(url) {
+  if (audioBufferCache.has(url)) {
+    return audioBufferCache.get(url);
+  }
+  try {
+    const res = await fetch(url);
+    const arrayBuf = await res.arrayBuffer();
+    const ctx = getAudioContext() || new (window.AudioContext || window.webkitAudioContext)();
+    const audioBuf = await ctx.decodeAudioData(arrayBuf);
+    audioBufferCache.set(url, audioBuf);
+    return audioBuf;
+  } catch (err) {
+    console.warn('[Magnates Audio] Could not decode audio buffer:', err);
+    return null;
+  }
+}
+
+async function renderAudioClipWaveform(clip, canvasEl) {
+  if (!canvasEl || !clip || !clip.file?.url) return;
+  const audioBuf = await getAudioBufferForUrl(clip.file.url);
+  if (!audioBuf) return;
+
+  const w = canvasEl.offsetWidth || 150;
+  const h = canvasEl.offsetHeight || 38;
+  canvasEl.width = w * window.devicePixelRatio;
+  canvasEl.height = h * window.devicePixelRatio;
+
+  const ctx = canvasEl.getContext('2d');
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.clearRect(0, 0, w, h);
+
+  const rawData = audioBuf.getChannelData(0);
+  const totalDuration = audioBuf.duration || clip.duration;
+  const offset = clip.audioOffset || 0;
+  const startSample = Math.floor((offset / totalDuration) * rawData.length);
+  const endSample = Math.min(rawData.length, Math.floor(((offset + clip.duration) / totalDuration) * rawData.length));
+  const clipSamples = endSample - startSample;
+  if (clipSamples <= 0) return;
+
+  const bars = Math.max(10, Math.floor(w / 3));
+  const step = Math.floor(clipSamples / bars);
+
+  ctx.fillStyle = clip.track === 'voiceover' ? 'rgba(42, 222, 137, 0.7)' : 'rgba(255, 208, 0, 0.7)';
+  const centerY = h / 2;
+
+  for (let i = 0; i < bars; i++) {
+    const s = startSample + (i * step);
+    let max = 0;
+    for (let j = 0; j < step && (s + j) < endSample; j += Math.max(1, Math.floor(step / 10))) {
+      const val = Math.abs(rawData[s + j]);
+      if (val > max) max = val;
+    }
+    const barHeight = Math.max(2, max * (h - 6));
+    const x = (i / bars) * w;
+    ctx.fillRect(x, centerY - barHeight / 2, 2, barHeight);
+  }
+}
+
 // Add Clip to specific Timeline Track
 function addClipToTimeline(trackType, fileOrData, startSec, clipDuration = 6) {
   const clipId = `clip-${trackType}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
@@ -2362,6 +2425,14 @@ function renderAllTimelineTracks() {
         filmstripEl.className = 'clip-filmstrip';
         block.appendChild(filmstripEl);
         generateFilmstrip(clip.file.url, clip.duration, filmstripEl);
+      }
+
+      // Audio Waveform Background (Voiceover & Music Tracks)
+      if ((type === 'voiceover' || type === 'music') && clip.file?.url) {
+        const waveCanvas = document.createElement('canvas');
+        waveCanvas.className = 'clip-waveform-canvas';
+        block.appendChild(waveCanvas);
+        renderAudioClipWaveform(clip, waveCanvas);
       }
 
       block.appendChild(handleLeft);
@@ -3439,11 +3510,29 @@ function seekToTime(targetSec) {
   currentTime = Math.max(0, Math.min(duration, targetSec));
   triggeredSFX.clear();
 
-  if (audioPlayer.src) {
-    audioPlayer.currentTime = currentTime;
+  const activeVoice = (timelineClips.voiceover || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+  if (activeVoice) {
+    if (audioPlayer.src !== activeVoice.file.url) {
+      audioPlayer.src = activeVoice.file.url;
+    }
+    const clipOffset = activeVoice.audioOffset || 0;
+    audioPlayer.currentTime = (currentTime - activeVoice.start) + clipOffset;
+  } else {
+    if (audioPlayer.src && !audioPlayer.paused) {
+      audioPlayer.pause();
+    }
   }
-  if (bgmPlayer.src) {
-    bgmPlayer.currentTime = currentTime;
+
+  const activeMusic = (timelineClips.music || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+  if (activeMusic) {
+    if (bgmPlayer.src !== activeMusic.file.url) {
+      bgmPlayer.src = activeMusic.file.url;
+    }
+    bgmPlayer.currentTime = (currentTime - activeMusic.start) % (bgmPlayer.duration || 60);
+  } else {
+    if (bgmPlayer.src && !bgmPlayer.paused) {
+      bgmPlayer.pause();
+    }
   }
 
   // Real-time video frame scrubbing
@@ -3718,10 +3807,7 @@ document.getElementById('btn-play').addEventListener('click', () => {
       <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:#fff;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
       <span>Pause</span>
     `;
-    if (audioPlayer.src) {
-      audioPlayer.currentTime = currentTime;
-      audioPlayer.play().catch(() => {});
-    }
+    syncAudioPlayback();
   } else {
     btn.innerHTML = `
       <svg class="ui-icon" id="play-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:#fff;"><path d="M8 5v14l11-7z"/></svg>
@@ -7538,6 +7624,15 @@ function showStudioContextMenu(x, y, clip, trackType) {
       <span class="context-badge" style="color: #38bdf8;">Library</span>
     </div>
 
+    ${(trackType === 'voiceover' || trackType === 'music') ? `
+    <!-- Precision Audio Cut / Trim Option -->
+    <div class="context-menu-item" id="ctx-action-audio-trim">
+      <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+      <span>Audio Precision Cut...</span>
+      <span class="context-badge" style="color: #00f0ff;">Trim</span>
+    </div>
+    ` : ''}
+
     <!-- Split at Playhead Option -->
     <div class="context-menu-item" id="ctx-action-split-playhead">
       <svg viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
@@ -7781,6 +7876,12 @@ function showStudioContextMenu(x, y, clip, trackType) {
     e.stopPropagation();
     hideStudioContextMenu();
     openTrackImagePickerModal(clip.start);
+  });
+
+  menu.querySelector('#ctx-action-audio-trim')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    openAudioTrimModal(clip, trackType);
   });
 
   menu.querySelector('#ctx-action-split-playhead')?.addEventListener('click', (e) => {
@@ -11571,6 +11672,8 @@ function showProjectContextMenu(e, proj, cardEl) {
 
   const dropdown = document.createElement('div');
   dropdown.className = 'project-menu-dropdown';
+  dropdown.style.position = 'fixed';
+  dropdown.style.zIndex = '999999';
 
   dropdown.innerHTML = `
     <button class="project-menu-item highlight" data-act="reuse">
@@ -11615,8 +11718,34 @@ function showProjectContextMenu(e, proj, cardEl) {
     });
   });
 
-  cardEl.appendChild(dropdown);
+  document.body.appendChild(dropdown);
   _activeProjectDropdown = dropdown;
+
+  // Calculate coordinates relative to viewport
+  const triggerEl = e.currentTarget || e.target;
+  let targetRect = null;
+  if (triggerEl && typeof triggerEl.getBoundingClientRect === 'function') {
+    targetRect = triggerEl.getBoundingClientRect();
+  } else if (cardEl && typeof cardEl.getBoundingClientRect === 'function') {
+    targetRect = cardEl.getBoundingClientRect();
+  }
+
+  const dropdownWidth = 185;
+  let posX = (targetRect ? targetRect.right - dropdownWidth : e.clientX);
+  let posY = (targetRect ? targetRect.bottom + 4 : e.clientY + 4);
+
+  // Keep within viewport bounds
+  if (posX + dropdownWidth > window.innerWidth - 10) {
+    posX = window.innerWidth - dropdownWidth - 10;
+  }
+  if (posX < 10) posX = 10;
+  if (posY + 220 > window.innerHeight) {
+    posY = (targetRect ? targetRect.top - 225 : e.clientY - 225);
+  }
+  if (posY < 10) posY = 10;
+
+  dropdown.style.left = `${posX}px`;
+  dropdown.style.top = `${posY}px`;
 }
 
 function renderProjectsPanel() {
@@ -12647,6 +12776,13 @@ document.getElementById('tool-cut')?.addEventListener('click', () => {
     showTextTimingAlert('Track is locked.', 'warning');
     return;
   }
+
+  // If selecting audio clip, open the Precision Audio Cut / Trim Tool
+  if (trackType === 'voiceover' || trackType === 'music') {
+    openAudioTrimModal(clip, trackType);
+    return;
+  }
+
   recordState('Cut Clip');
   deleteClip(trackType, clip.id);
   showTextTimingAlert('Clip cut from timeline.', 'success');
@@ -12816,3 +12952,275 @@ openTrackImagePickerModal = function(atTimeSec) {
   }
   _origOpenTrackImagePicker();
 };
+
+// ==================== PRECISION AUDIO CUT & TRIM MODAL SYSTEM ====================
+let _audioTrimClip = null;
+let _audioTrimTrackType = null;
+let _audioTrimAudioBuf = null;
+let _audioTrimInSec = 0;
+let _audioTrimOutSec = 0;
+let _audioTrimTotalDur = 0;
+let _audioTrimPreviewAudio = null;
+let _audioTrimIsDragging = null;
+
+async function openAudioTrimModal(clip, trackType) {
+  if (!clip || !clip.file?.url) {
+    showTextTimingAlert('No audio file found in selected clip.', 'warning');
+    return;
+  }
+
+  _audioTrimClip = clip;
+  _audioTrimTrackType = trackType;
+
+  const modal = document.getElementById('audio-trim-modal');
+  if (!modal) return;
+
+  const titleEl = document.getElementById('audio-trim-title');
+  if (titleEl) {
+    titleEl.textContent = `Cut & Trim: ${clip.file.name || 'Audio Clip'}`;
+  }
+
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.classList.add('is-open');
+
+  showTextTimingAlert('Loading audio waveform...', 'info');
+  const audioBuf = await getAudioBufferForUrl(clip.file.url);
+  _audioTrimAudioBuf = audioBuf;
+
+  const fileDur = audioBuf ? audioBuf.duration : (clip.duration || 60);
+  _audioTrimTotalDur = fileDur;
+
+  const currentOffset = clip.audioOffset || 0;
+  _audioTrimInSec = Math.max(0, Math.min(fileDur - 0.2, currentOffset));
+  _audioTrimOutSec = Math.min(fileDur, Math.max(_audioTrimInSec + 0.2, currentOffset + clip.duration));
+
+  drawAudioTrimWaveform();
+  updateAudioTrimUI();
+  setupAudioTrimInteractions();
+}
+
+function closeAudioTrimModal() {
+  const modal = document.getElementById('audio-trim-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('is-open');
+  }
+  if (_audioTrimPreviewAudio) {
+    _audioTrimPreviewAudio.pause();
+    _audioTrimPreviewAudio = null;
+  }
+  const previewBtn = document.getElementById('btn-audio-trim-preview');
+  if (previewBtn) {
+    previewBtn.innerHTML = `
+      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
+      <span>Preview Selection</span>
+    `;
+  }
+  _audioTrimClip = null;
+}
+
+function updateAudioTrimUI() {
+  const inInput = document.getElementById('audio-trim-in-input');
+  const outInput = document.getElementById('audio-trim-out-input');
+  const durLabel = document.getElementById('audio-trim-dur-label');
+  const dimLeft = document.getElementById('audio-trim-dim-left');
+  const dimRight = document.getElementById('audio-trim-dim-right');
+  const handleIn = document.getElementById('audio-trim-handle-in');
+  const handleOut = document.getElementById('audio-trim-handle-out');
+
+  const dur = Math.max(0, _audioTrimOutSec - _audioTrimInSec);
+  if (inInput) inInput.value = formatTimecode(_audioTrimInSec);
+  if (outInput) outInput.value = formatTimecode(_audioTrimOutSec);
+  if (durLabel) durLabel.textContent = `${formatTimecode(_audioTrimInSec)} - ${formatTimecode(_audioTrimOutSec)} (Dur: ${formatTimecode(dur)})`;
+
+  if (_audioTrimTotalDur > 0) {
+    const inPct = (_audioTrimInSec / _audioTrimTotalDur) * 100;
+    const outPct = (_audioTrimOutSec / _audioTrimTotalDur) * 100;
+
+    if (dimLeft) dimLeft.style.width = `${inPct}%`;
+    if (dimRight) dimRight.style.width = `${100 - outPct}%`;
+    if (handleIn) handleIn.style.left = `${inPct}%`;
+    if (handleOut) handleOut.style.left = `${outPct}%`;
+  }
+}
+
+function drawAudioTrimWaveform() {
+  const canvas = document.getElementById('audio-trim-waveform-canvas');
+  if (!canvas || !_audioTrimAudioBuf) return;
+
+  const wrap = document.getElementById('audio-trim-canvas-wrap');
+  const w = wrap ? wrap.clientWidth : 640;
+  const h = wrap ? wrap.clientHeight : 110;
+  canvas.width = w * window.devicePixelRatio;
+  canvas.height = h * window.devicePixelRatio;
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  ctx.clearRect(0, 0, w, h);
+
+  const rawData = _audioTrimAudioBuf.getChannelData(0);
+  const bars = Math.max(30, Math.floor(w / 3));
+  const step = Math.floor(rawData.length / bars);
+  const centerY = h / 2;
+
+  ctx.fillStyle = '#00f0ff';
+
+  for (let i = 0; i < bars; i++) {
+    const s = i * step;
+    let max = 0;
+    for (let j = 0; j < step && (s + j) < rawData.length; j += Math.max(1, Math.floor(step / 10))) {
+      const val = Math.abs(rawData[s + j]);
+      if (val > max) max = val;
+    }
+    const barHeight = Math.max(3, max * (h - 16));
+    const x = (i / bars) * w;
+    ctx.fillRect(x, centerY - barHeight / 2, 2, barHeight);
+  }
+}
+
+let _audioTrimListenersAttached = false;
+function setupAudioTrimInteractions() {
+  if (_audioTrimListenersAttached) return;
+  _audioTrimListenersAttached = true;
+
+  const wrap = document.getElementById('audio-trim-canvas-wrap');
+  const handleIn = document.getElementById('audio-trim-handle-in');
+  const handleOut = document.getElementById('audio-trim-handle-out');
+  const btnClose = document.getElementById('btn-audio-trim-close');
+  const btnCancel = document.getElementById('btn-audio-trim-cancel');
+  const btnApply = document.getElementById('btn-audio-trim-apply');
+  const btnPreview = document.getElementById('btn-audio-trim-preview');
+  const inInput = document.getElementById('audio-trim-in-input');
+  const outInput = document.getElementById('audio-trim-out-input');
+
+  btnClose?.addEventListener('click', closeAudioTrimModal);
+  btnCancel?.addEventListener('click', closeAudioTrimModal);
+
+  // Timecode manual input parsing
+  function parseTimecodeInput(val) {
+    if (!val) return 0;
+    const parts = val.trim().split(':');
+    if (parts.length === 2) {
+      return parseFloat(parts[0]) * 60 + parseFloat(parts[1]);
+    } else if (parts.length === 3) {
+      return parseFloat(parts[0]) * 3600 + parseFloat(parts[1]) * 60 + parseFloat(parts[2]);
+    }
+    return parseFloat(val) || 0;
+  }
+
+  inInput?.addEventListener('change', () => {
+    const t = Math.max(0, Math.min(_audioTrimOutSec - 0.2, parseTimecodeInput(inInput.value)));
+    _audioTrimInSec = t;
+    updateAudioTrimUI();
+  });
+
+  outInput?.addEventListener('change', () => {
+    const t = Math.min(_audioTrimTotalDur, Math.max(_audioTrimInSec + 0.2, parseTimecodeInput(outInput.value)));
+    _audioTrimOutSec = t;
+    updateAudioTrimUI();
+  });
+
+  // Handle Dragging
+  handleIn?.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    _audioTrimIsDragging = 'in';
+  });
+
+  handleOut?.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+    _audioTrimIsDragging = 'out';
+  });
+
+  // Clicking on canvas moves closest handle
+  wrap?.addEventListener('mousedown', (e) => {
+    if (e.target === handleIn || e.target === handleOut) return;
+    const rect = wrap.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickSec = Math.max(0, Math.min(_audioTrimTotalDur, (clickX / rect.width) * _audioTrimTotalDur));
+
+    const distIn = Math.abs(clickSec - _audioTrimInSec);
+    const distOut = Math.abs(clickSec - _audioTrimOutSec);
+
+    if (distIn < distOut) {
+      _audioTrimInSec = Math.min(_audioTrimOutSec - 0.2, clickSec);
+      _audioTrimIsDragging = 'in';
+    } else {
+      _audioTrimOutSec = Math.max(_audioTrimInSec + 0.2, clickSec);
+      _audioTrimIsDragging = 'out';
+    }
+    updateAudioTrimUI();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!_audioTrimIsDragging || !_audioTrimClip) return;
+    const rect = wrap.getBoundingClientRect();
+    const moveX = e.clientX - rect.left;
+    const moveSec = Math.max(0, Math.min(_audioTrimTotalDur, (moveX / rect.width) * _audioTrimTotalDur));
+
+    if (_audioTrimIsDragging === 'in') {
+      _audioTrimInSec = Math.min(_audioTrimOutSec - 0.2, moveSec);
+    } else if (_audioTrimIsDragging === 'out') {
+      _audioTrimOutSec = Math.max(_audioTrimInSec + 0.2, moveSec);
+    }
+    updateAudioTrimUI();
+  });
+
+  window.addEventListener('mouseup', () => {
+    _audioTrimIsDragging = null;
+  });
+
+  // Preview Button Play/Pause
+  btnPreview?.addEventListener('click', () => {
+    if (!_audioTrimClip || !_audioTrimClip.file?.url) return;
+
+    if (_audioTrimPreviewAudio && !_audioTrimPreviewAudio.paused) {
+      _audioTrimPreviewAudio.pause();
+      btnPreview.innerHTML = `
+        <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
+        <span>Preview Selection</span>
+      `;
+      return;
+    }
+
+    if (!_audioTrimPreviewAudio) {
+      _audioTrimPreviewAudio = new Audio(_audioTrimClip.file.url);
+    }
+    _audioTrimPreviewAudio.currentTime = _audioTrimInSec;
+    _audioTrimPreviewAudio.play().catch(() => {});
+    btnPreview.innerHTML = `
+      <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      <span>Pause Preview</span>
+    `;
+
+    const checkStop = () => {
+      if (_audioTrimPreviewAudio && _audioTrimPreviewAudio.currentTime >= _audioTrimOutSec) {
+        _audioTrimPreviewAudio.pause();
+        btnPreview.innerHTML = `
+          <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
+          <span>Preview Selection</span>
+        `;
+      } else if (_audioTrimPreviewAudio && !_audioTrimPreviewAudio.paused) {
+        requestAnimationFrame(checkStop);
+      }
+    };
+    requestAnimationFrame(checkStop);
+  });
+
+  // Apply Trim Button
+  btnApply?.addEventListener('click', () => {
+    if (!_audioTrimClip) return;
+    const dur = Math.max(0.2, _audioTrimOutSec - _audioTrimInSec);
+    recordState('Precision Cut Audio Clip');
+
+    _audioTrimClip.audioOffset = _audioTrimInSec;
+    _audioTrimClip.duration = dur;
+
+    // Update inspector inputs if selected
+    const di = document.getElementById('inspector-dur-input');
+    if (di) di.value = formatTimecode(_audioTrimClip.duration);
+
+    renderAllTimelineTracks();
+    closeAudioTrimModal();
+    showTextTimingAlert(`Trimmed audio: ${formatTimecode(_audioTrimInSec)} - ${formatTimecode(_audioTrimOutSec)} (${dur.toFixed(2)}s)`, 'success');
+  });
+}
