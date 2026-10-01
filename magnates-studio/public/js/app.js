@@ -92,6 +92,9 @@ function undo() {
   renderAllTimelineTracks();
   updateUI();
   updateUndoRedoUI();
+  if (typeof saveProjectState === 'function') {
+    saveProjectState(false);
+  }
 }
 
 function redo() {
@@ -111,6 +114,9 @@ function redo() {
   renderAllTimelineTracks();
   updateUI();
   updateUndoRedoUI();
+  if (typeof saveProjectState === 'function') {
+    saveProjectState(false);
+  }
 }
 
 function updateUndoRedoUI() {
@@ -7178,11 +7184,18 @@ function getSerializableClips() {
 function saveProjectState(showConfirm = false) {
   try {
     const state = getSerializableClips();
+    const projName = getCurrentProjectName();
+    state.projectName = projName;
+    if (_currentProjectId) {
+      state.projectId = _currentProjectId;
+      try { localStorage.setItem('magnates_active_project_id', _currentProjectId); } catch(e) {}
+    }
+    try { localStorage.setItem('magnates_active_project_name', projName); } catch(e) {}
     localStorage.setItem(STORAGE_KEY_PROJECT, JSON.stringify(state));
 
     // Also sync and persist to the "Saved Projects" list in the Projects tab
     if (typeof saveCurrentProjectToLibrary === 'function') {
-      saveCurrentProjectToLibrary(getCurrentProjectName(), false);
+      saveCurrentProjectToLibrary(projName, false);
     }
 
     if (showConfirm) {
@@ -7198,7 +7211,7 @@ function saveProjectState(showConfirm = false) {
           saveBtn.style.color = '';
         }, 1500);
       }
-      showTextTimingAlert?.(`Project "${getCurrentProjectName()}" saved to My Projects!`, 'success');
+      showTextTimingAlert?.(`Project "${projName}" saved to My Projects!`, 'success');
       setTimeout(() => showTextTimingAlert?.(''), 2000);
     }
   } catch(e) {}
@@ -7223,6 +7236,19 @@ function loadProjectState() {
     });
 
     if (typeof state.duration === 'number') duration = state.duration;
+
+    // Restore project name & project ID
+    const savedName = state.projectName || localStorage.getItem('magnates_active_project_name');
+    if (savedName) {
+      const nameEl = document.getElementById('current-project');
+      if (nameEl) nameEl.textContent = savedName;
+    }
+    if (state.projectId) {
+      _currentProjectId = state.projectId;
+    } else {
+      const savedId = localStorage.getItem('magnates_active_project_id');
+      if (savedId) _currentProjectId = savedId;
+    }
   } catch(e) {}
 }
 
@@ -7231,8 +7257,8 @@ document.getElementById('btn-save-project')?.addEventListener('click', () => {
   saveProjectState(true);
 });
 
-// Periodic auto-save every 5 seconds
-setInterval(() => saveProjectState(false), 5000);
+// Periodic auto-save every 3 seconds
+setInterval(() => saveProjectState(false), 3000);
 
 // ==================== VIDEO EXPORT ENGINE (CLIENT-SIDE RENDERER & RECORDER) ====================
 let isExporting = false;
@@ -11376,6 +11402,10 @@ function saveCurrentProjectToLibrary(name, alertUser = false) {
     if (idx >= 0) {
       projects[idx] = { ...projects[idx], ...state };
       saveAllProjects(projects);
+      try {
+        localStorage.setItem('magnates_active_project_id', _currentProjectId);
+        localStorage.setItem('magnates_active_project_name', projName);
+      } catch(e) {}
       renderProjectsPanel();
       if (alertUser) {
         showTextTimingAlert?.(`Saved "${projName}"!`, 'success');
@@ -11386,6 +11416,10 @@ function saveCurrentProjectToLibrary(name, alertUser = false) {
   }
   const id = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
   _currentProjectId = id;
+  try {
+    localStorage.setItem('magnates_active_project_id', id);
+    localStorage.setItem('magnates_active_project_name', projName);
+  } catch(e) {}
   projects.unshift({ id, ...state });
   saveAllProjects(projects);
   renderProjectsPanel();
@@ -11610,6 +11644,8 @@ async function renameProjectInLibrary(projectId) {
   if (_currentProjectId === projectId) {
     const nameEl = document.getElementById('current-project');
     if (nameEl) nameEl.textContent = proj.projectName;
+    try { localStorage.setItem('magnates_active_project_name', proj.projectName); } catch(e) {}
+    saveProjectState(false);
   }
   renderProjectsPanel();
   showTextTimingAlert('Renamed to "' + proj.projectName + '"', 'success');
@@ -11858,7 +11894,7 @@ setInterval(() => {
   if (_currentProjectId) {
     saveCurrentProjectToLibrary(getCurrentProjectName());
   }
-}, 10000);
+}, 5000);
 
 // Initialize project library on start
 (function initProjectLibraryStartup() {
@@ -11867,10 +11903,41 @@ setInterval(() => {
     // If no project has been explicitly saved yet, seed current project into library so it appears in Projects
     saveCurrentProjectToLibrary(getCurrentProjectName(), false);
   } else {
-    // Sync current active project ID if available
-    _currentProjectId = projects[0]?.id || null;
+    // If _currentProjectId was restored from localStorage, verify it exists in the library
+    const matched = _currentProjectId ? projects.find(p => p.id === _currentProjectId) : null;
+    if (matched) {
+      const nameEl = document.getElementById('current-project');
+      if (nameEl && matched.projectName) nameEl.textContent = matched.projectName;
+    } else {
+      const savedId = localStorage.getItem('magnates_active_project_id');
+      const foundSaved = savedId ? projects.find(p => p.id === savedId) : null;
+      if (foundSaved) {
+        _currentProjectId = foundSaved.id;
+        const nameEl = document.getElementById('current-project');
+        if (nameEl && foundSaved.projectName) nameEl.textContent = foundSaved.projectName;
+      } else {
+        _currentProjectId = projects[0]?.id || null;
+      }
+    }
   }
   renderProjectsPanel();
+
+  // Allow clicking the project title in the top bar to rename it directly with instant auto-save
+  const currentProjectEl = document.getElementById('current-project');
+  if (currentProjectEl && !currentProjectEl.dataset.editableBound) {
+    currentProjectEl.dataset.editableBound = 'true';
+    currentProjectEl.style.cursor = 'pointer';
+    currentProjectEl.title = 'Click to rename project';
+    currentProjectEl.addEventListener('click', async () => {
+      const cur = currentProjectEl.textContent.trim();
+      const updated = await nativePrompt('Rename Project', 'Enter project name:', cur, 'Save');
+      if (updated && updated.trim() && updated.trim() !== cur) {
+        currentProjectEl.textContent = updated.trim();
+        saveProjectState(false);
+        renderProjectsPanel();
+      }
+    });
+  }
 })();
 
 // ==================== FEATURE 2: IMAGE TRACK PICKER MODAL ====================
