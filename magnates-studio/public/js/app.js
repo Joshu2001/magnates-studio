@@ -11142,6 +11142,102 @@ function initVectorIconsEngine() {
 
 
 
+// ==================== NATIVE APPLE-STYLE DIALOG HELPERS (NO BROWSER POPUPS) ====================
+function showNativeDialog({ title = 'Notice', message = '', iconType = 'info', showInput = false, inputValue = '', confirmText = 'Confirm', confirmColor = '#00f0ff', cancelText = 'Cancel' }) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('native-dialog-modal');
+    if (!modal) {
+      resolve(showInput ? null : false);
+      return;
+    }
+
+    const titleEl = document.getElementById('native-dialog-title');
+    const msgEl = document.getElementById('native-dialog-message');
+    const iconContainer = document.getElementById('native-dialog-icon-container');
+    const inputContainer = document.getElementById('native-dialog-input-container');
+    const inputEl = document.getElementById('native-dialog-input');
+    const btnCancel = document.getElementById('btn-native-dialog-cancel');
+    const btnConfirm = document.getElementById('btn-native-dialog-confirm');
+
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
+
+    // Icon & theme styling
+    if (iconContainer) {
+      if (iconType === 'danger') {
+        iconContainer.style.background = 'rgba(255, 51, 75, 0.15)';
+        iconContainer.style.color = '#ff334b';
+        iconContainer.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>';
+      } else if (iconType === 'input' || iconType === 'project') {
+        iconContainer.style.background = 'rgba(0, 240, 255, 0.15)';
+        iconContainer.style.color = '#00f0ff';
+        iconContainer.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zm-8-2h8v-2h-8v2zm0-3h8V9h-8v2zm0-3h8V6h-8v2z"/></svg>';
+      } else {
+        iconContainer.style.background = 'rgba(56, 189, 248, 0.15)';
+        iconContainer.style.color = '#38bdf8';
+        iconContainer.innerHTML = '<svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+      }
+    }
+
+    if (inputContainer && inputEl) {
+      if (showInput) {
+        inputContainer.style.display = 'block';
+        inputEl.value = inputValue || '';
+        setTimeout(() => {
+          inputEl.focus();
+          inputEl.select();
+        }, 50);
+      } else {
+        inputContainer.style.display = 'none';
+      }
+    }
+
+    if (btnConfirm) {
+      btnConfirm.textContent = confirmText;
+      btnConfirm.style.color = confirmColor;
+    }
+    if (btnCancel) {
+      btnCancel.textContent = cancelText;
+    }
+
+    const cleanup = () => {
+      modal.style.display = 'none';
+      btnConfirm?.removeEventListener('click', onConfirm);
+      btnCancel?.removeEventListener('click', onCancel);
+      inputEl?.removeEventListener('keydown', onKeyDown);
+    };
+
+    const onConfirm = () => {
+      cleanup();
+      resolve(showInput ? (inputEl?.value || '') : true);
+    };
+
+    const onCancel = () => {
+      cleanup();
+      resolve(showInput ? null : false);
+    };
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Enter') onConfirm();
+      else if (e.key === 'Escape') onCancel();
+    };
+
+    btnConfirm?.addEventListener('click', onConfirm);
+    btnCancel?.addEventListener('click', onCancel);
+    inputEl?.addEventListener('keydown', onKeyDown);
+
+    modal.style.display = 'flex';
+  });
+}
+
+function nativeConfirm(title, message, iconType = 'danger', confirmText = 'Delete', confirmColor = '#ff334b') {
+  return showNativeDialog({ title, message, iconType, showInput: false, confirmText, confirmColor });
+}
+
+function nativePrompt(title, message, defaultValue = '', confirmText = 'Create') {
+  return showNativeDialog({ title, message, iconType: 'project', showInput: true, inputValue: defaultValue, confirmText, confirmColor: '#00f0ff' });
+}
+
 // ==================== FEATURE 1: MULTI-PROJECT SAVE / LOAD SYSTEM ====================
 const STORAGE_KEY_PROJECTS_LIST = 'magnates_projects_list';
 let _currentProjectId = null;
@@ -11194,6 +11290,80 @@ function saveCurrentProjectToLibrary(name, alertUser = false) {
   }
 }
 
+// Explicit New Project creation: Creates fresh workspace and distinct library entry
+function createNewProjectInLibrary(projectName) {
+  const projects = getAllProjects();
+  const id = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  const name = projectName?.trim() || 'Untitled Project';
+
+  // Fresh initial clips state
+  const freshClips = {
+    text: [
+      {
+        id: 'clip-text-1',
+        start: 0,
+        duration: 5,
+        text: 'Title of ' + name,
+        highlight: name,
+        fontFamily: "'Inter', sans-serif",
+        fontSize: 64,
+        textColor: '#ffffff',
+        highlightColor: '#ff334b',
+        anim: 'pop',
+        sfx: 'whoosh',
+        position: 'center',
+        zIndex: 30,
+        layerOrder: 'front'
+      }
+    ],
+    chart: [],
+    image: [],
+    video: [],
+    voiceover: [],
+    music: [],
+    background: [
+      {
+        id: 'clip-bg-default',
+        start: 0,
+        duration: 60,
+        bgType: 'cyber_grid',
+        bgColor: '#0a0b0e'
+      }
+    ]
+  };
+
+  const newProj = {
+    id,
+    projectName: name,
+    savedAt: Date.now(),
+    duration: 60,
+    currentTime: 0,
+    ...freshClips
+  };
+
+  // Add to projects list
+  projects.unshift(newProj);
+  saveAllProjects(projects);
+
+  // Activate and load in editor
+  _currentProjectId = id;
+  timelineClips = freshClips;
+  duration = 60;
+  currentTime = 0;
+
+  const nameEl = document.getElementById('current-project');
+  if (nameEl) nameEl.textContent = name;
+  const durBadge = document.getElementById('duration-badge');
+  if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+
+  renderAllTimelineTracks();
+  renderProjectsPanel();
+  saveProjectState(false);
+  playSFX('whoosh', 0.6);
+  showTextTimingAlert(`Created new project: "${name}"`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
 function loadProjectFromLibrary(projectId) {
   const projects = getAllProjects();
   const proj = projects.find(p => p.id === projectId);
@@ -11227,12 +11397,19 @@ function loadProjectFromLibrary(projectId) {
   setTimeout(() => showTextTimingAlert(''), 2500);
 }
 
-function deleteProjectFromLibrary(projectId) {
+async function deleteProjectFromLibrary(projectId) {
   const projects = getAllProjects();
   const proj = projects.find(p => p.id === projectId);
   if (!proj) return;
 
-  if (!confirm(`Delete project "${proj.projectName}" from your library?`)) return;
+  const confirmed = await nativeConfirm(
+    'Delete Project',
+    `Are you sure you want to delete "${proj.projectName}"? This action cannot be undone.`,
+    'danger',
+    'Delete Project',
+    '#ff334b'
+  );
+  if (!confirmed) return;
 
   const remaining = projects.filter(p => p.id !== projectId);
   saveAllProjects(remaining);
@@ -11316,11 +11493,11 @@ function exportProjectToFile(projectId) {
   }
 }
 
-function renameProjectInLibrary(projectId) {
+async function renameProjectInLibrary(projectId) {
   const projects = getAllProjects();
   const proj = projects.find(p => p.id === projectId);
   if (!proj) return;
-  const newName = prompt('Rename project:', proj.projectName);
+  const newName = await nativePrompt('Rename Project', 'Enter a new title for this project:', proj.projectName, 'Rename');
   if (!newName || !newName.trim()) return;
 
   proj.projectName = newName.trim();
@@ -11525,11 +11702,11 @@ function renderProjectsPanel() {
   });
 }
 
-document.getElementById('btn-new-project')?.addEventListener('click', () => {
-  const name = prompt('Project name:', getCurrentProjectName()) || getCurrentProjectName();
-  saveCurrentProjectToLibrary(name);
-  showTextTimingAlert('Project "' + name + '" saved as template!', 'success');
-  setTimeout(() => showTextTimingAlert(''), 2000);
+document.getElementById('btn-new-project')?.addEventListener('click', async () => {
+  const name = await nativePrompt('Create New Project', 'Enter project title:', 'Untitled Project', 'Create Project');
+  if (name && name.trim()) {
+    createNewProjectInLibrary(name.trim());
+  }
 });
 
 // Import Project File from Device listener

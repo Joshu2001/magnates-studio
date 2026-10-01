@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magnates Studio - Minimalist Documentary Editor</title>
-  <link rel="stylesheet" href="css/style.css?v=260">
+  <link rel="stylesheet" href="css/style.css?v=265">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
@@ -2110,10 +2110,28 @@
         </div>
       </div>
     </div>
+  <!-- Native Apple-Style Dialog Modal (Alert, Confirm, Prompt) -->
+  <div id="native-dialog-modal" class="vector-export-modal" style="display: none; z-index: 99999;">
+    <div class="vector-modal-box" style="max-width: 400px; border-radius: 12px; background: rgba(18, 20, 29, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); overflow: hidden; padding: 0;">
+      <div style="padding: 20px 20px 14px; text-align: center;">
+        <div id="native-dialog-icon-container" style="width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 51, 75, 0.12); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; color: var(--accent-red);">
+          <svg id="native-dialog-icon" viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        </div>
+        <h3 id="native-dialog-title" style="margin: 0 0 6px 0; font-size: 15px; font-weight: 700; color: #fff;">Confirm Action</h3>
+        <p id="native-dialog-message" style="margin: 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.45;">Are you sure?</p>
+        <div id="native-dialog-input-container" style="margin-top: 14px; display: none;">
+          <input type="text" id="native-dialog-input" style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 6px; color: #fff; padding: 8px 12px; font-size: 13px; outline: none; box-sizing: border-box;" placeholder="Enter name...">
+        </div>
+      </div>
+      <div style="display: flex; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.02);">
+        <button type="button" id="btn-native-dialog-cancel" style="flex: 1; padding: 12px; background: transparent; border: none; border-right: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s;">Cancel</button>
+        <button type="button" id="btn-native-dialog-confirm" style="flex: 1; padding: 12px; background: transparent; border: none; color: #00f0ff; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s;">Confirm</button>
+      </div>
+    </div>
   </div>
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=260"></script>
+  <script src="js/app.js?v=265"></script>
 </body>
 </html>

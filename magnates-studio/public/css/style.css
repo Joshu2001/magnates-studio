@@ -3438,6 +3438,7 @@ canvas.tool-draw {
   align-items: center;
   gap: 6px;
   min-width: 0;
+  width: 100%;
 }
 .apple-proj-name {
   font-size: 12px;
@@ -3446,6 +3447,8 @@ canvas.tool-draw {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 .apple-proj-active-pill {
   font-size: 9px;
