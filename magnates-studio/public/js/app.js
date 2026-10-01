@@ -661,6 +661,134 @@ function drawTextLayer(specificTextClip) {
     return;
   }
 
+  // ===== WORD CASCADE: CapCut/Reels-style words drop in from top with stagger =====
+  if (animStyle === 'word_cascade') {
+    const staggerPerWord = 0.12;
+    let cascadeX = startX;
+    let cascadeY = startY;
+    let cascadeMaxX = cascadeX;
+    const cascadeMinY = cascadeY - fontSize * 0.6;
+    const cascadeMaxY = cascadeY + fontSize * 0.6;
+
+    words.forEach((word, idx) => {
+      const wordElapsed = elapsed - idx * staggerPerWord;
+      if (wordElapsed <= 0) return;
+      const t = Math.min(1.0, wordElapsed / 0.18);
+      const ease = 1 - Math.pow(1 - t, 3);
+      const spring = ease + Math.sin(ease * Math.PI) * 0.08 * (1 - ease);
+      const offsetY = (1 - spring) * (-fontSize * 1.2);
+      const cleanWord = word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, wordElapsed / 0.1);
+      ctx.shadowColor = 'rgba(0,0,0,0.95)';
+      ctx.shadowBlur = 22;
+      ctx.shadowOffsetX = 3;
+      ctx.shadowOffsetY = 3;
+      ctx.fillStyle = highlightWords.includes(cleanWord) ? highlightColor : textColor;
+      ctx.fillText(word, cascadeX, cascadeY + offsetY);
+      ctx.restore();
+      cascadeX += ctx.measureText(word + ' ').width;
+      cascadeMaxX = cascadeX;
+    });
+
+    const pad = 16;
+    activeText._renderBounds = { x: startX - pad, y: cascadeMinY - pad, w: cascadeMaxX - startX + pad * 2, h: cascadeMaxY - cascadeMinY + pad * 2 };
+    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
+      drawTransformHandles(activeText._renderBounds.x, activeText._renderBounds.y, activeText._renderBounds.w, activeText._renderBounds.h);
+    }
+    ctx.restore();
+    return;
+  }
+
+  // ===== LETTER POP: Each letter bounces in individually with stagger =====
+  if (animStyle === 'letter_pop') {
+    const letters = (activeText.text || '').split('');
+    const staggerPerLetter = 0.055;
+    let lx = startX;
+    const lMinY = startY - fontSize * 0.65;
+    const lMaxY = startY + fontSize * 0.65;
+    let lMaxX = lx;
+
+    letters.forEach((char, idx) => {
+      const charElapsed = elapsed - idx * staggerPerLetter;
+      const cw = ctx.measureText(char).width;
+      if (charElapsed <= 0) { lx += cw; return; }
+      const t = Math.min(1.0, charElapsed / 0.22);
+      const spring = t < 0.6
+        ? (1 - Math.pow(1 - t / 0.6, 2)) * 1.18
+        : 1 + Math.sin((t - 0.6) * Math.PI / 0.4) * 0.09 * (1 - t);
+      const charScale = Math.max(0.05, spring);
+      const cx = lx + cw / 2;
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, charElapsed / 0.08);
+      ctx.shadowColor = 'rgba(0,0,0,0.95)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 3;
+      ctx.translate(cx, startY);
+      ctx.scale(charScale, charScale);
+      ctx.translate(-cx, -startY);
+      ctx.fillStyle = textColor;
+      ctx.fillText(char, lx, startY);
+      ctx.restore();
+      lMaxX = Math.max(lMaxX, lx + cw);
+      lx += cw;
+    });
+
+    const pad = 14;
+    activeText._renderBounds = { x: startX - pad, y: lMinY - pad, w: lMaxX - startX + pad * 2, h: lMaxY - lMinY + pad * 2 };
+    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
+      drawTransformHandles(activeText._renderBounds.x, activeText._renderBounds.y, activeText._renderBounds.w, activeText._renderBounds.h);
+    }
+    ctx.restore();
+    return;
+  }
+
+  // ===== GLITCH SCRAMBLE: Matrix/cyber decode — characters scramble then lock in left-to-right =====
+  if (animStyle === 'glitch_scramble') {
+    const fullText = activeText.text || '';
+    const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    const decodeDuration = Math.min((activeText.duration || 3) * 0.55, 1.4);
+    const lockedCount = Math.floor(Math.min(1.0, elapsed / decodeDuration) * fullText.length);
+    let sx = startX;
+    const sMinY = startY - fontSize * 0.65;
+    const sMaxY = startY + fontSize * 0.65;
+    let sMaxX = sx;
+
+    for (let i = 0; i < fullText.length; i++) {
+      const char = fullText[i];
+      const cw = ctx.measureText(char).width;
+      const isLocked = i < lockedCount;
+      let displayChar;
+      if (isLocked) {
+        displayChar = char;
+      } else if (i === lockedCount) {
+        displayChar = scrambleChars[Math.floor(elapsed * 35) % scrambleChars.length];
+      } else {
+        displayChar = scrambleChars[Math.abs(Math.round(elapsed * 12 + i * 7.3)) % scrambleChars.length];
+      }
+      ctx.save();
+      ctx.shadowColor = isLocked ? 'rgba(0,0,0,0.9)' : highlightColor;
+      ctx.shadowBlur = isLocked ? 20 : 14;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 3;
+      ctx.fillStyle = isLocked ? textColor : highlightColor;
+      ctx.globalAlpha = isLocked ? 1.0 : (0.6 + Math.sin(elapsed * 25 + i) * 0.4);
+      ctx.fillText(displayChar, sx, startY);
+      ctx.restore();
+      sMaxX = Math.max(sMaxX, sx + cw);
+      sx += cw;
+    }
+
+    const pad = 14;
+    activeText._renderBounds = { x: startX - pad, y: sMinY - pad, w: sMaxX - startX + pad * 2, h: sMaxY - sMinY + pad * 2 };
+    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
+      drawTransformHandles(activeText._renderBounds.x, activeText._renderBounds.y, activeText._renderBounds.w, activeText._renderBounds.h);
+    }
+    ctx.restore();
+    return;
+  }
+
   words.forEach((word, idx) => {
     // Typewriter effect
     if (animStyle === 'typewriter') {
@@ -1288,6 +1416,7 @@ function drawMarqueeSelectionOverlay() {
   const isSnap = activeTool === 'snap-zoom';
   const isDocFocus = activeTool === 'doc-focus';
   const isDocHl = activeTool === 'doc-highlight';
+  const isDocSpotlight = activeTool === 'doc-product-spotlight';
 
   let color = '#00f0ff';
   let bgColor = 'rgba(0, 240, 255, 0.18)';
@@ -1307,6 +1436,11 @@ function drawMarqueeSelectionOverlay() {
     color = hlColor;
     bgColor = hlColor + '44';
     toolLabel = 'Animated Highlight Sweep';
+  } else if (isDocSpotlight) {
+    const spotColor = document.getElementById('inspector-doc-hl-color')?.value || '#facc15';
+    color = spotColor;
+    bgColor = spotColor + '33';
+    toolLabel = '⬛ Product Spotlight';
   }
 
   ctx.save();
@@ -2711,26 +2845,29 @@ function initTimelineDragAndDrop() {
 
         // Auto-routing & lane enforcement:
         // Automatically route media files to their respective dedicated tracks
+        // If an audio file is dropped on the BGM Music track, route there instead of voiceover
+        const droppedLaneType = trackEl.dataset.trackType || '';
         let targetType = 'image';
         if (file.isVideo) {
           targetType = 'video';
         } else if (file.isAudio) {
-          targetType = 'voiceover';
+          // Respect explicit drop target: music track → BGM, anything else → voiceover
+          targetType = droppedLaneType === 'music' ? 'music' : 'voiceover';
         } else if (file.isImage) {
           targetType = 'image';
         } else if (file.text !== undefined) {
           targetType = 'text';
         }
 
-        // Inform user if file automatically snapped to correct lane
-        const droppedLaneType = trackEl.dataset.trackType || '';
+        // Inform user if file automatically snapped to a different lane
         if (droppedLaneType && droppedLaneType !== targetType) {
           const laneNames = {
             image: 'Images',
             video: 'Video Clips',
             voiceover: 'Voiceover',
             text: 'Kinetic Text',
-            music: 'BGM Music'
+            music: 'BGM Music',
+            background: 'Background'
           };
           showTextTimingAlert(`Auto-routed "${file.name || 'clip'}" to ${laneNames[targetType] || targetType} track.`, 'success');
           setTimeout(() => showTextTimingAlert(''), 2500);
