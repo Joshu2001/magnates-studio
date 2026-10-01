@@ -1862,7 +1862,33 @@ function renderMediaList(filter) {
 
       let targetTrack = 'image';
       if (file.isVideo) targetTrack = 'video';
-      else if (file.isAudio) targetTrack = 'voiceover';
+      else if (file.isAudio) {
+        // For audio files: show a quick toast choice between Voiceover and BGM Music
+        // Remove any existing audio route picker
+        document.getElementById('_audio-route-picker')?.remove();
+        const picker = document.createElement('div');
+        picker.id = '_audio-route-picker';
+        picker.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#171a24; border:1px solid #38bdf8; border-radius:8px; padding:10px 14px; z-index:99999; display:flex; flex-direction:column; gap:8px; box-shadow:0 10px 30px rgba(0,0,0,0.7); min-width:220px;';
+        picker.innerHTML = `
+          <div style="font-size:11px; font-weight:700; color:#94a3b8; text-align:center; margin-bottom:2px;">Add "${file.name.replace(/\.[^.]+$/, '')}" to:</div>
+          <div style="display:flex; gap:8px;">
+            <button id="_route-voiceover" style="flex:1; padding:6px 8px; background:rgba(56,189,248,0.12); border:1px solid #38bdf8; color:#38bdf8; border-radius:5px; font-size:11.5px; font-weight:600; cursor:pointer;">🎤 Voiceover</button>
+            <button id="_route-music" style="flex:1; padding:6px 8px; background:rgba(250,204,21,0.12); border:1px solid #facc15; color:#facc15; border-radius:5px; font-size:11.5px; font-weight:600; cursor:pointer;">🎵 BGM Music</button>
+          </div>
+        `;
+        document.body.appendChild(picker);
+        const removePicker = () => picker.remove();
+        setTimeout(removePicker, 7000); // auto-dismiss after 7s
+        document.getElementById('_route-voiceover').addEventListener('click', () => {
+          removePicker();
+          addClipToTimeline('voiceover', file, currentTime, file.duration || 25);
+        });
+        document.getElementById('_route-music').addEventListener('click', () => {
+          removePicker();
+          addClipToTimeline('music', file, currentTime, file.duration || 25);
+        });
+        return; // Don't fall through — picker handles it
+      }
 
       addClipToTimeline(targetTrack, file, currentTime, file.duration || (file.isAudio ? 25 : 6));
     });
@@ -6257,8 +6283,17 @@ async function exportVideoProject() {
 
     const combinedStream = new MediaStream(combinedTracks);
 
-    // Pick best supported MIME type with broad player support (VLC, Chrome, Windows Media)
-    let mimeType = 'video/webm;codecs=vp8';
+    // Pick best supported MIME type — prefer VP9 (better quality) then VP8 for broad compatibility
+    let mimeType = 'video/webm;codecs=vp9,opus';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/webm;codecs=vp9';
+    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/webm;codecs=vp8,opus';
+    }
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'video/webm;codecs=vp8';
+    }
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'video/webm';
     }
@@ -6270,7 +6305,8 @@ async function exportVideoProject() {
     }
 
     exportChunks = [];
-    const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 };
+    // 8 Mbps for Shorts/Reels-quality output (crisp text edges, smooth motion)
+    const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 8000000 } : { videoBitsPerSecond: 8000000 };
     exportRecorder = new MediaRecorder(combinedStream, recorderOptions);
 
     exportRecorder.ondataavailable = (e) => {
