@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magnates Studio - Minimalist Documentary Editor</title>
-  <link rel="stylesheet" href="css/style.css?v=10">
+  <link rel="stylesheet" href="css/style.css?v=250">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
@@ -63,6 +63,13 @@
           <span class="upload-hint">or drag & drop files here</span>
         </label>
 
+        <div class="media-search-container" style="padding: 0 10px 8px 10px;">
+          <div style="position: relative; display: flex; align-items: center;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="position: absolute; left: 8px; width: 13px; height: 13px; color: var(--text-muted); pointer-events: none;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            <input type="text" id="media-library-search" placeholder="Search media files..." style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px 5px 26px; border-radius: 5px; font-size: 11px; outline: none; transition: border-color 0.2s;">
+            <button id="media-library-search-clear" style="display: none; position: absolute; right: 6px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 0 2px;">&times;</button>
+          </div>
+        </div>
         <div class="media-nav-container">
           <div class="media-category-select-wrap">
             <select id="media-category-dropdown" class="media-category-select">
@@ -82,10 +89,35 @@
             <button type="button" class="media-pill-btn" data-pill="icons">Icons</button>
             <button type="button" class="media-pill-btn" data-pill="layers">Layers</button>
             <button type="button" class="media-pill-btn" data-pill="images">Images</button>
+            <button type="button" class="media-pill-btn" data-pill="projects">📁 Projects</button>
           </div>
         </div>
         <div class="media-list" id="media-list">
           <div class="loading-spinner">No media loaded</div>
+        </div>
+
+        <!-- Projects Panel -->
+        <div id="projects-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+          <div class="layers-header-row">
+            <div class="layers-header-title">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#ffd000;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+              <span>Saved Projects</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button type="button" class="btn-add-layer-pill" id="btn-import-project" title="Import Project Template from Device (.json)" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+                <span>Import</span>
+              </button>
+              <input type="file" id="file-import-project" accept=".json" style="display:none;">
+              <button type="button" class="btn-add-layer-pill" id="btn-new-project" title="Save as New Project">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <span>New</span>
+              </button>
+            </div>
+          </div>
+          <div id="projects-list" style="flex:1; overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:8px;">
+            <div class="loading-spinner" id="projects-empty-msg">No saved projects yet. Click "New" to save the current project.</div>
+          </div>
         </div>
 
         <!-- Dedicated Charts & Infographics Library Panel -->
@@ -476,9 +508,21 @@
                   <svg class="ui-icon" viewBox="0 0 24 24"><path d="M3 3l7 18 3-7 7-3L3 3z"/></svg>
                   <span>Select</span>
                 </button>
-                <button class="btn-tool" id="tool-split" title="Razor Split Clip (S)">
+                <button class="btn-tool" id="tool-split" title="Razor Split Clip at Playhead (S)">
                   <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
                   <span>Split</span>
+                </button>
+                <button class="btn-tool" id="tool-cut" title="Cut / Ripple Delete Selected Clip (Ctrl+X)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2z"/></svg>
+                  <span>Cut</span>
+                </button>
+                <button class="btn-tool" id="tool-trim-left" title="Trim Head to Playhead (Q)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg>
+                  <span>Trim [</span>
+                </button>
+                <button class="btn-tool" id="tool-trim-right" title="Trim Tail to Playhead (W)">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg>
+                  <span>Trim ]</span>
                 </button>
                 <button class="btn-tool" id="tool-delete" title="Delete Clip (Del)">
                   <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
@@ -574,44 +618,105 @@
 
               <!-- Label: Kinetic Text -->
               <div class="track-label">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
-                Kinetic Text
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+                  Kinetic Text
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="text" title="Lock Text Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Label: Charts / FX -->
               <div class="track-label" style="color: #00f0ff;">
-                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
-                Charts / FX
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                  Charts / FX
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="chart" title="Lock Charts Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Label: Images -->
               <div class="track-label">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                Images
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                  Images
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="image" title="Lock Images Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                  <button type="button" id="btn-images-track-pick" class="track-label-pick-btn" title="Pick images from media library">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Label: Video Clips -->
               <div class="track-label">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
-                Video Clips
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                  Video Clips
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-mute" data-track="video" title="Mute Video Audio">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                  </button>
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="video" title="Lock Video Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Label: Voiceover -->
               <div class="track-label">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
-                Voiceover
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
+                  Voiceover
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-mute" data-track="voiceover" title="Mute Voiceover">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                  </button>
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="voiceover" title="Lock Voiceover Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Label: BGM Music -->
               <div class="track-label">
-                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                BGM Music
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  BGM Music
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-mute" data-track="music" title="Mute BGM Music">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                  </button>
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="music" title="Lock Music Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                </div>
               </div>
 
               <!-- Label: Background -->
               <div class="track-label" style="color: #7c6fff;">
-                <svg class="ui-icon" viewBox="0 0 24 24" style="color: #7c6fff;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
-                Background
+                <span class="track-title-wrap">
+                  <svg class="ui-icon" viewBox="0 0 24 24" style="color: #7c6fff;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+                  Background
+                </span>
+                <div class="track-actions-group">
+                  <button type="button" class="track-action-btn track-btn-lock" data-track="background" title="Lock Background Track">
+                    <svg viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1469,6 +1574,11 @@
               <label>Sound Effect (SFX)</label>
               <select id="text-sfx" style="background: var(--bg-input); color: #fff; border: 1px solid var(--border-color); padding: 4px 6px; border-radius: 4px; font-size: 11px;">
                 <option value="whoosh" selected>Cinematic Whoosh / Swoosh</option>
+                <option value="pencil_circle">Pencil Circle Scratch (YouTuber Focus)</option>
+                <option value="pencil_scribble">Pencil Scribble / Underline</option>
+                <option value="marker_swipe">Marker Swipe (Mike Shake Squeak)</option>
+                <option value="paper_tear">Paper Tear / Ripped Sheet</option>
+                <option value="pop_cork">Pop Punch / Bubble Pop</option>
                 <option value="bass_thud">Deep Bass Hit / Impact</option>
                 <option value="camera_click">Camera Shutter Click</option>
                 <option value="glitch_burst">Digital Glitch / Static Pop</option>
@@ -1480,7 +1590,7 @@
             <div class="control-row" id="text-sfx-volume-row" style="margin-top: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
                 <label style="margin: 0;">SFX Volume: <span id="text-sfx-vol-val">80%</span></label>
-                <button type="button" class="btn-sm" id="btn-preview-sfx" style="padding: 1px 6px; font-size: 10px;" title="Test and play sound effect">Play SFX</button>
+                <button type="button" class="btn-sm" id="btn-preview-text-sfx" style="padding: 1px 6px; font-size: 10px;" title="Test and play sound effect">Play SFX</button>
               </div>
               <input type="range" id="text-sfx-volume" min="0" max="100" value="80">
             </div>
@@ -1773,8 +1883,183 @@
     </div>
   </div>
 
+  <!-- Transition Picker Modal -->
+  <div id="transition-picker-modal" class="vector-export-modal" style="display: none;">
+    <div class="vector-modal-box" style="max-width: 580px;">
+      <div class="vector-modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="color:#a855f7; width:18px; height:18px;"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg>
+          <h3 style="margin:0; font-size:15px; font-weight:700;">Clip Transitions &amp; Sound FX</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-transition-modal">&times;</button>
+      </div>
+      <div class="vector-modal-body" style="padding: 14px 16px;">
+        <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">Choose a visual transition and optional sound effect to play when switching between clips.</p>
+
+        <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">Visual Transition</div>
+        <div class="transition-options-grid" id="transition-options-grid">
+          <div class="transition-card active" data-transition="none">
+            <div class="transition-preview transition-preview-none"><div class="tp-left"></div><div class="tp-right"></div></div>
+            <span>None (Cut)</span>
+          </div>
+          <div class="transition-card" data-transition="fade">
+            <div class="transition-preview transition-preview-fade"><div class="tp-left"></div><div class="tp-right"></div></div>
+            <span>Fade</span>
+          </div>
+          <div class="transition-card" data-transition="slide_left">
+            <div class="transition-preview transition-preview-slide"><div class="tp-left" style="transform:translateX(-8px);"></div><div class="tp-right"></div></div>
+            <span>Slide Left</span>
+          </div>
+          <div class="transition-card" data-transition="slide_right">
+            <div class="transition-preview transition-preview-slide"><div class="tp-left" style="transform:translateX(8px);"></div><div class="tp-right"></div></div>
+            <span>Slide Right</span>
+          </div>
+          <div class="transition-card" data-transition="zoom_in">
+            <div class="transition-preview transition-preview-zoom"><div class="tp-left" style="transform:scale(1.2);"></div><div class="tp-right"></div></div>
+            <span>Zoom In</span>
+          </div>
+          <div class="transition-card" data-transition="zoom_out">
+            <div class="transition-preview transition-preview-zoom"><div class="tp-left" style="transform:scale(0.8);"></div><div class="tp-right"></div></div>
+            <span>Zoom Out</span>
+          </div>
+          <div class="transition-card" data-transition="wipe_left">
+            <div class="transition-preview transition-preview-wipe"><div class="tp-left" style="clip-path:inset(0 40% 0 0);"></div><div class="tp-right"></div></div>
+            <span>Wipe Left</span>
+          </div>
+          <div class="transition-card" data-transition="dissolve">
+            <div class="transition-preview transition-preview-dissolve"><div class="tp-left"></div><div class="tp-right"></div></div>
+            <span>Dissolve</span>
+          </div>
+          <div class="transition-card" data-transition="flash">
+            <div class="transition-preview" style="background:#fff; border-radius:4px; width:100%; height:40px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#000; font-weight:700;">FLASH</div>
+            <span>Flash Cut</span>
+          </div>
+          <div class="transition-card" data-transition="dip_black">
+            <div class="transition-preview" style="background:#000; border-radius:4px; width:100%; height:40px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#666; font-weight:700;">DIP</div>
+            <span>Dip to Black</span>
+          </div>
+          <div class="transition-card" data-transition="paper_drop">
+            <div class="transition-preview transition-preview-paper"><div class="tp-paper-top"></div><div class="tp-paper-rip"></div></div>
+            <span>Paper Drop</span>
+          </div>
+        </div>
+
+        <!-- Placement & Timing Control -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; padding: 10px 12px; margin: 12px 0 6px 0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+            <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Timeline Placement (Trigger Point)</span>
+            <button type="button" class="btn-sm btn-secondary" id="btn-transition-seek-playhead" style="font-size: 10px; padding: 2px 7px;">Snap to Playhead</button>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="text" id="transition-time-input" value="00:00.0" style="width: 85px; font-family: monospace; font-size: 11px; text-align: center; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; padding: 4px 6px;">
+            <input type="range" id="transition-time-slider" min="0" max="1000" value="0" step="1" style="flex:1;">
+            <span id="transition-time-preview-label" style="font-size: 11px; color: #00f0ff; font-family: monospace; min-width: 48px; text-align: right;">0.0s</span>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 0 4px 0;">
+          <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Duration</span>
+          <span id="transition-duration-val" style="font-size:12px; font-weight:700; color:#a855f7;">0.5s</span>
+        </div>
+        <input type="range" id="transition-duration-slider" min="1" max="25" value="5" step="1" style="width:100%;">
+
+        <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin:14px 0 8px 0;">Sound Effect</div>
+        <div class="transition-sfx-grid" id="transition-sfx-grid">
+          <div class="sfx-card active" data-sfx="none">
+            <svg viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            <span>Silent</span>
+          </div>
+          <div class="sfx-card" data-sfx="typewriter">
+            <svg viewBox="0 0 24 24"><path d="M20 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 5H5v-2h2v2zm10 0H9v-2h8v2zm0-3h-2v-2h2v2zm0-3h-2V8h2v2zm-4 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+            <span>Typewriter</span>
+          </div>
+          <div class="sfx-card" data-sfx="camera">
+            <svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 0 1 8.8 12 3.2 3.2 0 0 1 12 8.8 3.2 3.2 0 0 1 15.2 12 3.2 3.2 0 0 1 12 15.2M12 7a5 5 0 0 0-5 5 5 5 0 0 0 5 5 5 5 0 0 0 5-5A5 5 0 0 0 12 7M0 9.27L1.88 17H4c.45 0 .88-.15 1.22-.4L9 14.06V19h6v-4.94l3.78 2.54c.34.25.77.4 1.22.4h2.12L24 9.27l-4-1.02V7h-2v.54L12 5 6 7.54V7H4v1.25L0 9.27z"/></svg>
+            <span>Camera Click</span>
+          </div>
+          <div class="sfx-card" data-sfx="whoosh">
+            <svg viewBox="0 0 24 24"><path d="M3.5 18.5l6-6-6-6-1.5 1.5 4.5 4.5-4.5 4.5L3.5 18.5zm7 0l6-6-6-6-1.5 1.5L13.5 12l-4.5 4.5 1.5 1.5zm7 0l6-6-6-6-1.5 1.5 4.5 4.5-4.5 4.5 1.5 1.5z"/></svg>
+            <span>Whoosh</span>
+          </div>
+          <div class="sfx-card" data-sfx="click">
+            <svg viewBox="0 0 24 24"><path d="M9 2c-4.42 0-8 3.58-8 8s3.58 8 8 8c.34 0 .68-.02 1.01-.07L14 22l2-2-2.94-2.94C14.24 15.93 15 14.05 15 12V9h-4V7h6V5h-4V2H9zm0 2h2v2H9V4zm0 4h2v2H9V8zm0 4h2v1c0 .54-.1 1.07-.27 1.56L9 12.11V12z"/></svg>
+            <span>UI Click</span>
+          </div>
+          <div class="sfx-card" data-sfx="film_reel">
+            <svg viewBox="0 0 24 24"><path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg>
+            <span>Film Reel</span>
+          </div>
+          <div class="sfx-card" data-sfx="paper_tear">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-4-4h3V7h2v6h3l-4 4z"/></svg>
+            <span>Paper Rip</span>
+          </div>
+          <div class="sfx-card" data-sfx="pencil_circle">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            <span>Pencil Circle</span>
+          </div>
+          <div class="sfx-card" data-sfx="marker_swipe">
+            <svg viewBox="0 0 24 24"><path d="M18.5 4l-4.5 4.5 3 3L21.5 7c.7-.7.7-1.8 0-2.5l-.5-.5c-.7-.7-1.8-.7-2.5 0zM3 19.5L12.5 10l3 3L6 22.5 3 22.5v-3z"/></svg>
+            <span>Marker Swipe</span>
+          </div>
+          <div class="sfx-card" data-sfx="pop_cork">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <span>Pop Punch</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+          <button class="btn btn-secondary btn-sm" id="btn-preview-sfx" style="font-size:11px; display:flex; align-items:center; gap:4px;">
+            <svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:currentColor;"><path d="M8 5v14l11-7z"/></svg>
+            Preview SFX
+          </button>
+          <span style="font-size:11px; color:var(--text-muted);" id="sfx-preview-label">Click to hear selected sound</span>
+        </div>
+      </div>
+      <div class="vector-modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top:10px;">
+        <button class="btn btn-secondary" id="btn-cancel-transition-modal">Cancel</button>
+        <button class="btn btn-primary" id="btn-apply-transition">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+          Apply Transition
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image/Clip Media Picker Modal (for track image adding) -->
+  <div id="track-image-picker-modal" class="vector-export-modal" style="display: none;">
+    <div class="vector-modal-box" style="max-width: 520px;">
+      <div class="vector-modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="color:#38bdf8; width:18px; height:18px;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <h3 style="margin:0; font-size:15px; font-weight:700;">Add Images to Timeline</h3>
+        </div>
+        <button class="btn-close-modal" id="btn-close-track-image-modal">&times;</button>
+      </div>
+      <div class="vector-modal-body" style="padding:14px 16px;">
+        <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Select images from your library to add to the Images track. Multiple selections supported.</p>
+        <input type="file" id="input-track-image-upload" accept="image/*" multiple style="display:none;">
+        <button type="button" class="btn btn-secondary" id="btn-upload-track-image" style="width:100%; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:6px; padding:8px; border-style:dashed; border-color:#38bdf8; color:#38bdf8;">
+          <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+          <span>Upload New Images...</span>
+        </button>
+        <div style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">From Media Library:</div>
+        <div id="track-image-library-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap:8px; max-height:260px; overflow-y:auto; padding:4px;">
+        </div>
+      </div>
+      <div class="vector-modal-footer" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+        <span id="track-image-selected-count" style="font-size:11px; color:var(--text-muted);">0 selected</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary" id="btn-cancel-track-image-modal">Cancel</button>
+          <button class="btn btn-primary" id="btn-add-selected-images">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Add to Timeline
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=35"></script>
+  <script src="js/app.js?v=250"></script>
 </body>
 </html>
