@@ -7021,6 +7021,12 @@ function saveProjectState(showConfirm = false) {
   try {
     const state = getSerializableClips();
     localStorage.setItem(STORAGE_KEY_PROJECT, JSON.stringify(state));
+
+    // Also sync and persist to the "Saved Projects" list in the Projects tab
+    if (typeof saveCurrentProjectToLibrary === 'function') {
+      saveCurrentProjectToLibrary(getCurrentProjectName(), false);
+    }
+
     if (showConfirm) {
       const saveBtn = document.getElementById('btn-save-project');
       if (saveBtn) {
@@ -7034,6 +7040,8 @@ function saveProjectState(showConfirm = false) {
           saveBtn.style.color = '';
         }, 1500);
       }
+      showTextTimingAlert?.(`Project "${getCurrentProjectName()}" saved to My Projects!`, 'success');
+      setTimeout(() => showTextTimingAlert?.(''), 2000);
     }
   } catch(e) {}
 }
@@ -7060,7 +7068,7 @@ function loadProjectState() {
   } catch(e) {}
 }
 
-// Manual save button
+// Manual save button - saves state and guarantees presence in Saved Projects
 document.getElementById('btn-save-project')?.addEventListener('click', () => {
   saveProjectState(true);
 });
@@ -11083,10 +11091,11 @@ function getCurrentProjectName() {
   return document.getElementById('current-project')?.textContent?.trim() || 'Untitled Project';
 }
 
-function saveCurrentProjectToLibrary(name) {
+function saveCurrentProjectToLibrary(name, alertUser = false) {
   const projects = getAllProjects();
   const state = getSerializableClips();
-  state.projectName = name || getCurrentProjectName();
+  const projName = name || getCurrentProjectName();
+  state.projectName = projName;
   state.savedAt = Date.now();
 
   if (_currentProjectId) {
@@ -11095,6 +11104,10 @@ function saveCurrentProjectToLibrary(name) {
       projects[idx] = { ...projects[idx], ...state };
       saveAllProjects(projects);
       renderProjectsPanel();
+      if (alertUser) {
+        showTextTimingAlert?.(`Saved "${projName}"!`, 'success');
+        setTimeout(() => showTextTimingAlert?.(''), 2000);
+      }
       return;
     }
   }
@@ -11103,6 +11116,60 @@ function saveCurrentProjectToLibrary(name) {
   projects.unshift({ id, ...state });
   saveAllProjects(projects);
   renderProjectsPanel();
+  if (alertUser) {
+    showTextTimingAlert?.(`Project "${projName}" saved to My Projects!`, 'success');
+    setTimeout(() => showTextTimingAlert?.(''), 2000);
+  }
+}
+
+function loadProjectFromLibrary(projectId) {
+  const projects = getAllProjects();
+  const proj = projects.find(p => p.id === projectId);
+  if (!proj) return;
+
+  _currentProjectId = proj.id;
+
+  // Restore clips
+  if (proj.text && proj.text.length > 0) timelineClips.text = JSON.parse(JSON.stringify(proj.text));
+  else timelineClips.text = [];
+
+  ['chart', 'image', 'video', 'voiceover', 'music'].forEach(t => {
+    if (proj[t] && proj[t].length > 0) {
+      timelineClips[t] = JSON.parse(JSON.stringify(proj[t]));
+    } else {
+      timelineClips[t] = [];
+    }
+  });
+
+  if (typeof proj.duration === 'number') duration = proj.duration;
+  if (typeof proj.currentTime === 'number') currentTime = proj.currentTime;
+
+  const nameEl = document.getElementById('current-project');
+  if (nameEl) nameEl.textContent = proj.projectName || 'Untitled Project';
+
+  renderAllTimelineTracks();
+  renderProjectsPanel();
+  saveProjectState(false);
+  playSFX('whoosh', 0.6);
+  showTextTimingAlert(`Loaded project: "${proj.projectName}"`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
+function deleteProjectFromLibrary(projectId) {
+  const projects = getAllProjects();
+  const proj = projects.find(p => p.id === projectId);
+  if (!proj) return;
+
+  if (!confirm(`Delete project "${proj.projectName}" from your library?`)) return;
+
+  const remaining = projects.filter(p => p.id !== projectId);
+  saveAllProjects(remaining);
+  if (_currentProjectId === projectId) {
+    _currentProjectId = null;
+  }
+  renderProjectsPanel();
+  showTextTimingAlert(`Deleted project "${proj.projectName}"`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2000);
 }
 
 function reuseProjectAsTemplate(projectId) {
@@ -11312,39 +11379,69 @@ function renderProjectsPanel() {
   listEl.innerHTML = '';
   projects.forEach(proj => {
     const isCurrent = proj.id === _currentProjectId;
-    const savedDate = proj.savedAt ? new Date(proj.savedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown';
+    const savedDate = proj.savedAt ? new Date(proj.savedAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
     const clipCount = (proj.image?.length || 0) + (proj.video?.length || 0) + (proj.text?.length || 0) + (proj.chart?.length || 0);
 
     const card = document.createElement('div');
-    card.className = 'project-card' + (isCurrent ? ' is-current' : '');
+    card.className = 'project-card apple-project-card' + (isCurrent ? ' is-current' : '');
     card.innerHTML = `
-      <div class="project-card-name" title="${proj.projectName}">
-        ${proj.projectName}${isCurrent ? ' <span style="font-size:9px;color:#ffd000;font-weight:700;">(ACTIVE)</span>' : ''}
+      <div class="apple-proj-left">
+        <div class="apple-proj-icon-box">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zm-8-2h8v-2h-8v2zm0-3h8V9h-8v2zm0-3h8V6h-8v2z"/></svg>
+        </div>
+        <div class="apple-proj-details">
+          <div class="apple-proj-title-row">
+            <span class="apple-proj-name" title="${proj.projectName}">${proj.projectName}</span>
+            ${isCurrent ? '<span class="apple-proj-active-pill"><span class="apple-proj-dot"></span>Active</span>' : ''}
+          </div>
+          <div class="apple-proj-meta">
+            <span>${savedDate}</span>
+            <span class="apple-proj-dot-sep">•</span>
+            <span>${clipCount} item${clipCount !== 1 ? 's' : ''}</span>
+          </div>
+        </div>
       </div>
-      <div class="project-card-meta">
-        <span>${savedDate}</span>
-        <span>${clipCount} clip${clipCount !== 1 ? 's' : ''}</span>
-      </div>
-      <div class="project-card-actions">
-        <button class="project-card-btn reuse-btn project-card-reuse-btn" title="Reuse as new template (copies project)">Reuse</button>
-        <button class="project-card-btn project-card-load-btn" title="Open and edit this project">Load</button>
-        <button class="project-card-btn menu-trigger-btn project-card-menu-btn" title="Options / Export / Rename">⋯</button>
+      <div class="apple-proj-actions">
+        ${!isCurrent ? `
+        <button class="apple-proj-icon-btn project-card-load-btn" title="Open Project">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>` : ''}
+        <button class="apple-proj-icon-btn reuse-btn project-card-reuse-btn" title="Duplicate as Template">
+          <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+        </button>
+        <button class="apple-proj-icon-btn delete-btn project-card-delete-btn" title="Delete / Remove Project">
+          <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
+        <button class="apple-proj-icon-btn menu-trigger-btn project-card-menu-btn" title="More Options">
+          <svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
       </div>
     `;
 
     // Fast-access action buttons
-    card.querySelector('.project-card-reuse-btn').addEventListener('click', (e) => {
+    card.querySelector('.project-card-reuse-btn')?.addEventListener('click', (e) => {
       e.stopPropagation();
       reuseProjectAsTemplate(proj.id);
     });
-    card.querySelector('.project-card-load-btn').addEventListener('click', (e) => {
+    card.querySelector('.project-card-load-btn')?.addEventListener('click', (e) => {
       e.stopPropagation();
       loadProjectFromLibrary(proj.id);
     });
+    card.querySelector('.project-card-delete-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteProjectFromLibrary(proj.id);
+    });
     const menuBtn = card.querySelector('.project-card-menu-btn');
-    menuBtn.addEventListener('click', (e) => {
+    menuBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
       showProjectContextMenu(e, proj, card);
+    });
+
+    // Clicking anywhere on card loads it
+    card.addEventListener('click', () => {
+      if (!isCurrent) {
+        loadProjectFromLibrary(proj.id);
+      }
     });
 
     // Right-click context menu support
@@ -11380,6 +11477,19 @@ setInterval(() => {
     saveCurrentProjectToLibrary(getCurrentProjectName());
   }
 }, 10000);
+
+// Initialize project library on start
+(function initProjectLibraryStartup() {
+  const projects = getAllProjects();
+  if (projects.length === 0) {
+    // If no project has been explicitly saved yet, seed current project into library so it appears in Projects
+    saveCurrentProjectToLibrary(getCurrentProjectName(), false);
+  } else {
+    // Sync current active project ID if available
+    _currentProjectId = projects[0]?.id || null;
+  }
+  renderProjectsPanel();
+})();
 
 // ==================== FEATURE 2: IMAGE TRACK PICKER MODAL ====================
 let _trackImageSelectedFiles = new Set();

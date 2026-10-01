@@ -73,13 +73,13 @@
         <div class="media-nav-container">
           <div class="media-category-select-wrap">
             <select id="media-category-dropdown" class="media-category-select">
-              <option value="all">📁 All Media Files</option>
-              <option value="charts">📊 Animated Charts & Infographics</option>
-              <option value="icons">⭐ Vector Icons & Stickers</option>
-              <option value="layers">📑 Visual Canvas Layers</option>
-              <option value="images">🖼️ Images & Photos</option>
-              <option value="video">🎬 Video Clips</option>
-              <option value="audio">🎵 Audio & Voiceovers</option>
+              <option value="all">All Media Files</option>
+              <option value="charts">Animated Charts & Infographics</option>
+              <option value="icons">Vector Icons & Stickers</option>
+              <option value="layers">Visual Canvas Layers</option>
+              <option value="images">Images & Photos</option>
+              <option value="video">Video Clips</option>
+              <option value="audio">Audio & Voiceovers</option>
             </select>
             <svg class="media-category-arrow" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
           </div>
@@ -89,7 +89,10 @@
             <button type="button" class="media-pill-btn" data-pill="icons">Icons</button>
             <button type="button" class="media-pill-btn" data-pill="layers">Layers</button>
             <button type="button" class="media-pill-btn" data-pill="images">Images</button>
-            <button type="button" class="media-pill-btn" data-pill="projects">📁 Projects</button>
+            <button type="button" class="media-pill-btn" data-pill="projects" style="display:inline-flex; align-items:center; gap:4px;">
+              <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+              <span>Projects</span>
+            </button>
           </div>
         </div>
         <div class="media-list" id="media-list">
@@ -99,24 +102,24 @@
         <!-- Projects Panel -->
         <div id="projects-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
           <div class="layers-header-row">
-            <div class="layers-header-title">
-              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#ffd000;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-              <span>Saved Projects</span>
+            <div class="layers-header-title" style="display:flex; align-items:center; gap:6px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:14px; height:14px; fill:var(--text-muted);"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
+              <span style="font-weight:600; font-size:12px; color:#f1f5f9; letter-spacing:0.2px;">My Projects</span>
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
-              <button type="button" class="btn-add-layer-pill" id="btn-import-project" title="Import Project Template from Device (.json)" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);">
-                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
+              <button type="button" class="btn-add-layer-pill" id="btn-import-project" title="Import Project (.json)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius:6px; font-size:11px; padding:3px 8px;">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
                 <span>Import</span>
               </button>
               <input type="file" id="file-import-project" accept=".json" style="display:none;">
-              <button type="button" class="btn-add-layer-pill" id="btn-new-project" title="Save as New Project">
-                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:#fff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+              <button type="button" class="btn-add-layer-pill" id="btn-new-project" title="New Blank Project" style="background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.18); border-radius:6px; font-size:11px; padding:3px 8px; color:#fff;">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
                 <span>New</span>
               </button>
             </div>
           </div>
-          <div id="projects-list" style="flex:1; overflow-y:auto; padding:8px; display:flex; flex-direction:column; gap:8px;">
-            <div class="loading-spinner" id="projects-empty-msg">No saved projects yet. Click "New" to save the current project.</div>
+          <div id="projects-list" style="flex:1; overflow-y:auto; padding:10px 8px; display:flex; flex-direction:column; gap:6px;">
+            <div class="loading-spinner" id="projects-empty-msg" style="font-size:11px; color:var(--text-muted); text-align:center; padding:20px;">No saved projects yet.</div>
           </div>
         </div>
 
@@ -2060,6 +2063,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=250"></script>
+  <script src="js/app.js?v=253"></script>
 </body>
 </html>

@@ -3269,79 +3269,166 @@ canvas.tool-draw {
 }
 
 .project-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.09);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
   padding: 10px 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 .project-card:hover {
-  border-color: rgba(255, 208, 0, 0.5);
-  background: rgba(255,208,0,0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
 }
 .project-card.is-current {
-  border-color: rgba(255, 208, 0, 0.7);
-  background: rgba(255,208,0,0.08);
+  border-color: rgba(0, 230, 118, 0.4);
+  background: rgba(0, 230, 118, 0.04);
+  box-shadow: 0 0 12px rgba(0, 230, 118, 0.08);
 }
-.project-card-name {
-  font-size: 13px;
-  font-weight: 700;
+.apple-proj-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+.apple-proj-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+.project-card:hover .apple-proj-icon-box {
   color: #fff;
-  margin-bottom: 3px;
+  background: rgba(255, 255, 255, 0.1);
+}
+.project-card.is-current .apple-proj-icon-box {
+  background: rgba(0, 230, 118, 0.15);
+  color: #00e676;
+}
+.apple-proj-icon-box svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+.apple-proj-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+.apple-proj-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.apple-proj-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f5f9;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-right: 50px;
 }
-.project-card-meta {
+.apple-proj-active-pill {
+  font-size: 9px;
+  font-weight: 700;
+  color: #00e676;
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.25);
+  border-radius: 10px;
+  padding: 1px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+.apple-proj-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00e676;
+  box-shadow: 0 0 6px #00e676;
+}
+.apple-proj-meta {
   font-size: 10px;
   color: var(--text-muted);
   display: flex;
-  gap: 8px;
-}
-.project-card-actions {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: flex;
+  align-items: center;
   gap: 4px;
 }
-.project-card-btn {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: var(--text-muted);
-  border-radius: 4px;
-  padding: 3px 6px;
-  font-size: 10px;
-  cursor: pointer;
-  transition: all 0.15s;
+.apple-proj-dot-sep {
+  opacity: 0.4;
 }
-.project-card-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.project-card-btn.delete-btn:hover { background: rgba(255,51,75,0.2); color: #ff334b; border-color: rgba(255,51,75,0.4); }
-.project-card-btn.menu-trigger-btn:hover {
-  background: rgba(255,255,255,0.2);
+.apple-proj-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.apple-proj-icon-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.apple-proj-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
-.project-card-btn.reuse-btn {
-  background: rgba(0, 240, 255, 0.15);
-  border-color: rgba(0, 240, 255, 0.4);
-  color: #00f0ff;
+.apple-proj-icon-btn.project-card-load-btn:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
 }
-.project-card-btn.reuse-btn:hover {
-  background: rgba(0, 240, 255, 0.28);
+.apple-proj-icon-btn.reuse-btn:hover {
+  color: #a855f7;
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+.apple-proj-icon-btn.delete-btn:hover {
+  color: #ff334b;
+  background: rgba(255, 51, 75, 0.15);
+  border-color: rgba(255, 51, 75, 0.35);
+}
+.apple-proj-icon-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
 }
 .project-menu-dropdown {
   position: absolute;
-  top: 32px;
-  right: 8px;
-  background: #151922;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  top: 36px;
+  right: 6px;
+  background: #11141b;
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 8px;
   padding: 4px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
-  z-index: 1000;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.85);
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   min-width: 175px;
