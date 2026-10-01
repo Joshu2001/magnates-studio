@@ -6525,6 +6525,13 @@ function showStudioContextMenu(x, y, clip, trackType) {
         <span class="context-badge" style="color: #38bdf8;">Wizard</span>
       </div>
 
+      <!-- 3. Product Spotlight: Pulsing animated border on products / CTAs -->
+      <div class="context-menu-item ${(clip.productSpotlights && clip.productSpotlights.length > 0) ? 'active-fx' : ''}" id="ctx-action-product-spotlight" style="border-left: 2px solid #facc1560;">
+        <svg viewBox="0 0 24 24" style="color: #facc15;"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 3l3 3M21 3l-3 3M3 21l3-3M21 21l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>${(clip.productSpotlights && clip.productSpotlights.length > 0) ? `Edit Spotlights (${clip.productSpotlights.length})` : 'Add Product Spotlight'}</span>
+        <span class="context-badge" style="color: #facc15;">${(clip.productSpotlights && clip.productSpotlights.length > 0) ? 'Active' : 'Glow Pulse'}</span>
+      </div>
+
       <div class="context-menu-divider"></div>
     `;
   }
@@ -6702,6 +6709,21 @@ function showStudioContextMenu(x, y, clip, trackType) {
     hideStudioContextMenu();
     selectClip(clip, trackType);
     openArticleFocusGuideModal(clip);
+  });
+
+  menu.querySelector('#ctx-action-product-spotlight')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, trackType);
+    activeTool = 'doc-product-spotlight';
+    canvas.classList.add('tool-doc-highlight');
+    toggleDrawingDock(false);
+    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+    const labelRow = document.getElementById('row-product-spotlight-label');
+    if (labelRow) labelRow.style.display = 'block';
+    showTextTimingAlert('Product Spotlight: Drag a box around any product, price, CTA or element on the image.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 4000);
   });
 
   menu.querySelector('#ctx-action-bring-front')?.addEventListener('click', (e) => {
