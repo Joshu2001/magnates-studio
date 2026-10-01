@@ -800,6 +800,63 @@ body {
   text-overflow: ellipsis;
 }
 
+/* Timeline Clip Sub-Bars & Effect Badges */
+.clip-fx-tracks {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  z-index: 3;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.clip-fx-bar {
+  position: absolute;
+  height: 3px;
+  border-radius: 2px;
+  opacity: 0.92;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.clip-fx-bar.whiteout {
+  background: #38bdf8;
+}
+
+.clip-fx-bar.spotlight {
+  background: #a855f7;
+}
+
+.clip-fx-bar.highlight {
+  background: #ffff00;
+}
+
+.clip-fx-bar.zoom {
+  background: #ff334b;
+}
+
+.clip-fx-bar.scroll {
+  background: #10b981;
+}
+
+.clip-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-left: 4px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
 /* Filmstrip frame-by-frame background for video clips */
 .clip-filmstrip {
   position: absolute;

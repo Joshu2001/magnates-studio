@@ -431,6 +431,12 @@ function drawPerspectiveGrid() {
 function drawParticles() {
   if (!fxState.particles.enabled) return;
 
+  // Suppress fiery bottom glow and ember sparks when focusing on documents, articles, or highlights
+  const activeDoc = [...timelineClips.image, ...timelineClips.video].find(c =>
+    currentTime >= c.start && currentTime <= (c.start + c.duration) && (c.docFocus || (c.highlights && c.highlights.length > 0))
+  );
+  if (activeDoc) return;
+
   const w = canvas.width;
   const h = canvas.height;
 
@@ -661,134 +667,6 @@ function drawTextLayer(specificTextClip) {
     return;
   }
 
-  // ===== WORD CASCADE: CapCut/Reels-style words drop in from top with stagger =====
-  if (animStyle === 'word_cascade') {
-    const staggerPerWord = 0.12;
-    let cascadeX = startX;
-    let cascadeY = startY;
-    let cascadeMaxX = cascadeX;
-    const cascadeMinY = cascadeY - fontSize * 0.6;
-    const cascadeMaxY = cascadeY + fontSize * 0.6;
-
-    words.forEach((word, idx) => {
-      const wordElapsed = elapsed - idx * staggerPerWord;
-      if (wordElapsed <= 0) return;
-      const t = Math.min(1.0, wordElapsed / 0.18);
-      const ease = 1 - Math.pow(1 - t, 3);
-      const spring = ease + Math.sin(ease * Math.PI) * 0.08 * (1 - ease);
-      const offsetY = (1 - spring) * (-fontSize * 1.2);
-      const cleanWord = word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, wordElapsed / 0.1);
-      ctx.shadowColor = 'rgba(0,0,0,0.95)';
-      ctx.shadowBlur = 22;
-      ctx.shadowOffsetX = 3;
-      ctx.shadowOffsetY = 3;
-      ctx.fillStyle = highlightWords.includes(cleanWord) ? highlightColor : textColor;
-      ctx.fillText(word, cascadeX, cascadeY + offsetY);
-      ctx.restore();
-      cascadeX += ctx.measureText(word + ' ').width;
-      cascadeMaxX = cascadeX;
-    });
-
-    const pad = 16;
-    activeText._renderBounds = { x: startX - pad, y: cascadeMinY - pad, w: cascadeMaxX - startX + pad * 2, h: cascadeMaxY - cascadeMinY + pad * 2 };
-    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
-      drawTransformHandles(activeText._renderBounds.x, activeText._renderBounds.y, activeText._renderBounds.w, activeText._renderBounds.h);
-    }
-    ctx.restore();
-    return;
-  }
-
-  // ===== LETTER POP: Each letter bounces in individually with stagger =====
-  if (animStyle === 'letter_pop') {
-    const letters = (activeText.text || '').split('');
-    const staggerPerLetter = 0.055;
-    let lx = startX;
-    const lMinY = startY - fontSize * 0.65;
-    const lMaxY = startY + fontSize * 0.65;
-    let lMaxX = lx;
-
-    letters.forEach((char, idx) => {
-      const charElapsed = elapsed - idx * staggerPerLetter;
-      const cw = ctx.measureText(char).width;
-      if (charElapsed <= 0) { lx += cw; return; }
-      const t = Math.min(1.0, charElapsed / 0.22);
-      const spring = t < 0.6
-        ? (1 - Math.pow(1 - t / 0.6, 2)) * 1.18
-        : 1 + Math.sin((t - 0.6) * Math.PI / 0.4) * 0.09 * (1 - t);
-      const charScale = Math.max(0.05, spring);
-      const cx = lx + cw / 2;
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, charElapsed / 0.08);
-      ctx.shadowColor = 'rgba(0,0,0,0.95)';
-      ctx.shadowBlur = 20;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 3;
-      ctx.translate(cx, startY);
-      ctx.scale(charScale, charScale);
-      ctx.translate(-cx, -startY);
-      ctx.fillStyle = textColor;
-      ctx.fillText(char, lx, startY);
-      ctx.restore();
-      lMaxX = Math.max(lMaxX, lx + cw);
-      lx += cw;
-    });
-
-    const pad = 14;
-    activeText._renderBounds = { x: startX - pad, y: lMinY - pad, w: lMaxX - startX + pad * 2, h: lMaxY - lMinY + pad * 2 };
-    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
-      drawTransformHandles(activeText._renderBounds.x, activeText._renderBounds.y, activeText._renderBounds.w, activeText._renderBounds.h);
-    }
-    ctx.restore();
-    return;
-  }
-
-  // ===== GLITCH SCRAMBLE: Matrix/cyber decode — characters scramble then lock in left-to-right =====
-  if (animStyle === 'glitch_scramble') {
-    const fullText = activeText.text || '';
-    const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    const decodeDuration = Math.min((activeText.duration || 3) * 0.55, 1.4);
-    const lockedCount = Math.floor(Math.min(1.0, elapsed / decodeDuration) * fullText.length);
-    let sx = startX;
-    const sMinY = startY - fontSize * 0.65;
-    const sMaxY = startY + fontSize * 0.65;
-    let sMaxX = sx;
-
-    for (let i = 0; i < fullText.length; i++) {
-      const char = fullText[i];
-      const cw = ctx.measureText(char).width;
-      const isLocked = i < lockedCount;
-      let displayChar;
-      if (isLocked) {
-        displayChar = char;
-      } else if (i === lockedCount) {
-        displayChar = scrambleChars[Math.floor(elapsed * 35) % scrambleChars.length];
-      } else {
-        displayChar = scrambleChars[Math.abs(Math.round(elapsed * 12 + i * 7.3)) % scrambleChars.length];
-      }
-      ctx.save();
-      ctx.shadowColor = isLocked ? 'rgba(0,0,0,0.9)' : highlightColor;
-      ctx.shadowBlur = isLocked ? 20 : 14;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 3;
-      ctx.fillStyle = isLocked ? textColor : highlightColor;
-      ctx.globalAlpha = isLocked ? 1.0 : (0.6 + Math.sin(elapsed * 25 + i) * 0.4);
-      ctx.fillText(displayChar, sx, startY);
-      ctx.restore();
-      sMaxX = Math.max(sMaxX, sx + cw);
-      sx += cw;
-    }
-
-    const pad = 14;
-    activeText._renderBounds = { x: startX - pad, y: sMinY - pad, w: sMaxX - startX + pad * 2, h: sMaxY - sMinY + pad * 2 };
-    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
-      drawTransformHandles(activeText._renderBounds.x, activeText._renderBounds.y, activeText._renderBounds.w, activeText._renderBounds.h);
-    }
-    ctx.restore();
-    return;
-  }
-
   words.forEach((word, idx) => {
     // Typewriter effect
     if (animStyle === 'typewriter') {
@@ -881,6 +759,357 @@ function getMediaElement(file) {
 
 let activePreviewMedia = null;
 
+let _docMaskCanvas = null;
+function getDocMaskCanvas(w, h) {
+  if (!_docMaskCanvas) {
+    _docMaskCanvas = document.createElement('canvas');
+  }
+  const targetW = Math.max(64, Math.min(3840, Math.round(w)));
+  const targetH = Math.max(64, Math.min(2160, Math.round(h)));
+  if (_docMaskCanvas.width !== targetW || _docMaskCanvas.height !== targetH) {
+    _docMaskCanvas.width = targetW;
+    _docMaskCanvas.height = targetH;
+  }
+  return _docMaskCanvas;
+}
+
+let _docHlCanvas = null;
+function getDocHlCanvas(w, h) {
+  if (!_docHlCanvas) {
+    _docHlCanvas = document.createElement('canvas');
+  }
+  const targetW = Math.max(64, Math.min(3840, Math.round(w)));
+  const targetH = Math.max(64, Math.min(2160, Math.round(h)));
+  if (_docHlCanvas.width !== targetW || _docHlCanvas.height !== targetH) {
+    _docHlCanvas.width = targetW;
+    _docHlCanvas.height = targetH;
+  }
+  return _docHlCanvas;
+}
+
+function getClipDocumentScrollOffset(clip, time, baseW, baseH) {
+  if (!clip || !clip.docScroll || !clip.docScrollMode) {
+    return { x: 0, y: 0 };
+  }
+  const elapsed = time - clip.start;
+  const linger = clip.docScrollLinger !== undefined ? clip.docScrollLinger : 1.0;
+  if (elapsed <= linger) {
+    return { x: 0, y: 0 };
+  }
+
+  const travelDur = clip.docScrollSpeed !== undefined ? clip.docScrollSpeed : 3.0;
+  const scrollT = Math.min(1.0, Math.max(0.0, (elapsed - linger) / Math.max(0.5, travelDur)));
+  // Smooth cubic easeInOut for fluid cinematic reading motion
+  const ease = scrollT < 0.5 ? 4 * scrollT * scrollT * scrollT : 1 - Math.pow(-2 * scrollT + 2, 3) / 2;
+  const dist = clip.docScrollDistance || 280;
+
+  if (clip.docScrollMode === 'down') {
+    // Camera pans downwards into document -> document moves upward
+    return { x: 0, y: -dist * ease };
+  } else if (clip.docScrollMode === 'across') {
+    // Camera pans across to the right -> document moves left
+    return { x: -dist * ease, y: 0 };
+  } else if (clip.docScrollMode === 'zigzag') {
+    // Highlight Flow: Glides smoothly from first highlight to subsequent highlights
+    if (clip.highlights && clip.highlights.length >= 2) {
+      const h1 = clip.highlights[0];
+      const h2 = clip.highlights[clip.highlights.length - 1];
+      const deltaPxX = (h2.x - h1.x) * baseW;
+      const deltaPxY = (h2.y - h1.y) * baseH;
+      return { x: -deltaPxX * ease, y: -deltaPxY * ease };
+    } else {
+      // Default diagonal/zigzag flow down-right
+      return { x: -(dist * 0.4) * ease, y: -dist * ease };
+    }
+  }
+  return { x: 0, y: 0 };
+}
+
+function getClipPunchZoom(clip, time, baseDx, baseDy, baseW, baseH) {
+  if (!clip || clip.zoomEffect !== 'snap') {
+    return { scale: 1.0, originX: baseDx + baseW * 0.5, originY: baseDy + baseH * 0.5 };
+  }
+  const zoomElapsed = time - clip.start;
+  const zoomInAt = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
+  const targetScale = clip.zoomScale || 2.2;
+  const targetOriginX = clip.zoomOriginX !== undefined ? clip.zoomOriginX : 0.5;
+  const targetOriginY = clip.zoomOriginY !== undefined ? clip.zoomOriginY : 0.5;
+
+  let currentPunch = 1.0;
+  if (zoomElapsed >= zoomInAt) {
+    const t = Math.min(1.0, Math.max(0.0, (zoomElapsed - zoomInAt) / 0.42));
+    const ease = 1 - Math.pow(1 - t, 3.5);
+    currentPunch = 1.0 + (targetScale - 1.0) * ease;
+  }
+  const originPxX = baseDx + baseW * targetOriginX;
+  const originPxY = baseDy + baseH * targetOriginY;
+  return { scale: currentPunch, originX: originPxX, originY: originPxY };
+}
+
+function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH) {
+  const docElapsed = currentTime - targetClip.start;
+  const docFocusInAt = targetClip.docFocusStartTime !== undefined ? targetClip.docFocusStartTime : 0.4;
+  const isWhiteout = targetClip.docStyle !== 'dark';
+
+  // Calculate unwhiteout / timed auto-restore ease
+  let focusActiveEase = 1.0;
+  if (targetClip.docFocusDuration && targetClip.docFocusDuration > 0) {
+    const focusHold = targetClip.docFocusDuration;
+    const fadeOutStart = docFocusInAt + focusHold;
+    const fadeOutDur = 0.5;
+    if (docElapsed > fadeOutStart) {
+      const outProg = Math.min(1.0, Math.max(0.0, (docElapsed - fadeOutStart) / fadeOutDur));
+      focusActiveEase = 1.0 - (1 - Math.pow(1 - outProg, 3));
+    }
+  }
+
+  // 1. Whiteout Fade or Dark Spotlight Cutout
+  if (targetClip.docFocus && targetClip.docFocusRect) {
+    const r = targetClip.docFocusRect;
+    const fx = dx + finalW * r.x;
+    const fy = dy + finalH * r.y;
+    const fw = Math.max(10, finalW * r.w);
+    const fh = Math.max(10, finalH * r.h);
+
+    const t = Math.min(1.0, Math.max(0.0, (docElapsed - docFocusInAt) / 0.4));
+    const ease = (1 - Math.pow(1 - t, 3)) * focusActiveEase;
+    const defaultDim = 0.65; // Balanced 65% fade level for crisp legibility
+    const maxDim = (targetClip.docDimOpacity !== undefined ? targetClip.docDimOpacity : defaultDim) * ease;
+
+    if (maxDim > 0.01) {
+      const feather = targetClip.docFeather !== undefined ? targetClip.docFeather : (isWhiteout ? 18 : 16);
+      const maskW = Math.max(64, Math.round(finalW));
+      const maskH = Math.max(64, Math.round(finalH));
+      const maskCanvas = getDocMaskCanvas(maskW, maskH);
+      const maskCtx = maskCanvas.getContext('2d');
+      maskCtx.clearRect(0, 0, maskW, maskH);
+
+      // Choose overlay color: Clean white fade vs Dark theater dim
+      if (isWhiteout) {
+        maskCtx.fillStyle = `rgba(255, 255, 255, ${maxDim})`;
+      } else {
+        maskCtx.fillStyle = `rgba(10, 12, 16, ${maxDim})`;
+      }
+      maskCtx.fillRect(0, 0, maskW, maskH);
+
+      // Cutout spotlight with smooth feather blur
+      maskCtx.save();
+      maskCtx.globalCompositeOperation = 'destination-out';
+      maskCtx.filter = `blur(${feather}px)`;
+      maskCtx.fillStyle = '#000000';
+      const pad = isWhiteout ? 6 : 4;
+      const lx = maskW * r.x;
+      const ly = maskH * r.y;
+      const lw = Math.max(10, maskW * r.w);
+      const lh = Math.max(10, maskH * r.h);
+      maskCtx.fillRect(lx - pad, ly - pad, lw + pad * 2, lh + pad * 2);
+      maskCtx.restore();
+
+      // Draw mask over the image
+      ctx.drawImage(maskCanvas, dx, dy, finalW, finalH);
+
+      // Account for active camera punch zoom so screen handles match exact zoomed pixels on screen
+      const punch = getClipPunchZoom(targetClip, currentTime, dx, dy, finalW, finalH);
+      const pScale = punch.scale;
+      const screenFx = pScale > 1.001 ? punch.originX + (fx - punch.originX) * pScale : fx;
+      const screenFy = pScale > 1.001 ? punch.originY + (fy - punch.originY) * pScale : fy;
+      const screenFw = fw * pScale;
+      const screenFh = fh * pScale;
+
+      // Save exact screen coordinates of focus box for interactive dragging and resizing
+      targetClip._docFocusBounds = { 
+        x: screenFx, 
+        y: screenFy, 
+        w: screenFw, 
+        h: screenFh, 
+        dx, dy, finalW, finalH,
+        punchScale: pScale
+      };
+
+      // Prominent, professional focus frame with corner brackets and handles (fades with unwhiteout)
+      ctx.save();
+      ctx.globalAlpha = Math.max(0.0, Math.min(1.0, ease));
+      const borderColor = isWhiteout ? '#38bdf8' : '#a855f7';
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(fx, fy, fw, fh);
+
+      // Corner bracket accents
+      const cLen = Math.min(18, Math.min(fw, fh) * 0.35);
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = '#ffffff';
+      // TL
+      ctx.beginPath();
+      ctx.moveTo(fx, fy + cLen); ctx.lineTo(fx, fy); ctx.lineTo(fx + cLen, fy);
+      // TR
+      ctx.moveTo(fx + fw - cLen, fy); ctx.lineTo(fx + fw, fy); ctx.lineTo(fx + fw, fy + cLen);
+      // BL
+      ctx.moveTo(fx, fy + fh - cLen); ctx.lineTo(fx, fy + fh); ctx.lineTo(fx + cLen, fy + fh);
+      // BR
+      ctx.moveTo(fx + fw - cLen, fy + fh); ctx.lineTo(fx + fw, fy + fh); ctx.lineTo(fx + fw, fy + fh - cLen);
+      ctx.stroke();
+
+      // Drag tag handle (visible in editor, hidden during export)
+      if (!isExporting) {
+        ctx.font = 'bold 10px Inter, sans-serif';
+        const tagText = '✛ Focus & Highlight Box (Drag to move)';
+        const tagW = ctx.measureText(tagText).width;
+        ctx.fillStyle = 'rgba(10, 15, 26, 0.92)';
+        ctx.fillRect(fx + fw / 2 - tagW / 2 - 8, fy - 18, tagW + 16, 17);
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(fx + fw / 2 - tagW / 2 - 8, fy - 18, tagW + 16, 17);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(tagText, fx + fw / 2 - tagW / 2, fy - 6);
+      }
+      ctx.restore();
+    }
+  }
+
+  // 2. Live Animated Text Highlighter Bars (Pure Saturated Fluorescent Colors)
+  if (targetClip.highlights && targetClip.highlights.length > 0) {
+    const hlW = Math.max(64, Math.round(finalW));
+    const hlH = Math.max(64, Math.round(finalH));
+    const hlCanvas = getDocHlCanvas(hlW, hlH);
+    const hlCtx = hlCanvas.getContext('2d');
+    hlCtx.clearRect(0, 0, hlW, hlH);
+
+    let hasActiveHl = false;
+
+    targetClip.highlights.forEach((hl, idx) => {
+      const defaultSweepSpeed = targetClip.docSweepSpeed || 0.6;
+      const hlStart = hl.startTime !== undefined ? hl.startTime : (docFocusInAt + 0.3 + idx * (defaultSweepSpeed * 0.8));
+      const hlDur = hl.duration || defaultSweepSpeed;
+      const hlElapsed = docElapsed - hlStart;
+      if (hlElapsed <= 0) return;
+
+      const progress = Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
+      const wipeEase = progress < 1 ? 1 - Math.pow(1 - progress, 2.2) : 1;
+
+      const lx = hlW * hl.x;
+      const ly = hlH * hl.y;
+      const lw = Math.max(4, hlW * hl.w);
+      const lh = Math.max(4, hlH * hl.h);
+
+      let hlColor = hl.color || '#ffff00';
+      if (hlColor.toLowerCase() === '#facc15' || hlColor.toLowerCase() === '#ffe600') hlColor = '#ffff00';
+
+      hlCtx.save();
+      hlCtx.globalCompositeOperation = 'source-over';
+      hlCtx.fillStyle = hlColor;
+
+      const curW = lw * wipeEase;
+      const corner = Math.min(4, lh / 3.5);
+      hlCtx.beginPath();
+      if (hlCtx.roundRect) {
+        hlCtx.roundRect(lx, ly, curW, lh, corner);
+      } else {
+        hlCtx.rect(lx, ly, curW, lh);
+      }
+      hlCtx.fill();
+      hlCtx.restore();
+
+      // Screen bounds for highlight interaction under punch zoom
+      const hScreenX = pScale > 1.001 ? punch.originX + ((dx + finalW * hl.x) - punch.originX) * pScale : (dx + finalW * hl.x);
+      const hScreenY = pScale > 1.001 ? punch.originY + ((dy + finalH * hl.y) - punch.originY) * pScale : (dy + finalH * hl.y);
+      const hScreenW = lw * (finalW / Math.max(1, hlW)) * pScale;
+      const hScreenH = lh * (finalH / Math.max(1, hlH)) * pScale;
+      hl._screenBounds = { x: hScreenX, y: hScreenY, w: hScreenW, h: hScreenH, punchScale: pScale, index: idx };
+
+      hasActiveHl = true;
+    });
+
+    if (hasActiveHl) {
+      ctx.save();
+      // Luminous translucent highlighter tinting: keeps paper bright and colors vivid!
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 0.40 * focusActiveEase;
+      ctx.drawImage(hlCanvas, dx, dy, finalW, finalH);
+      ctx.restore();
+    }
+
+    // Interactive Highlight Bounding Box & Handles (visible when hovering or selected)
+    if (!isExporting && targetClip.highlights && targetClip.highlights.length > 0) {
+      targetClip.highlights.forEach((hl, idx) => {
+        const isSel = (window._selectedHighlightIndex === idx);
+        const isHov = (window._hoveredHighlightIndex === idx);
+        const shouldShow = isSel || isHov || (!targetClip.docFocus && window._selectedHighlightIndex === undefined);
+        if (!shouldShow) return;
+
+        const hx = dx + finalW * hl.x;
+        const hy = dy + finalH * hl.y;
+        const hw = Math.max(4, finalW * hl.w);
+        const hh = Math.max(4, finalH * hl.h);
+        let hlColor = hl.color || '#ffff00';
+        if (hlColor.toLowerCase() === '#facc15' || hlColor.toLowerCase() === '#ffe600') hlColor = '#ffff00';
+
+        ctx.save();
+        ctx.strokeStyle = isSel ? '#00f0ff' : 'rgba(0, 240, 255, 0.6)';
+        ctx.lineWidth = isSel ? 2 : 1.2;
+        if (!isSel) ctx.setLineDash([4, 3]);
+        ctx.strokeRect(hx, hy, hw, hh);
+        ctx.setLineDash([]);
+
+        // Interactive Corner & Edge handles for resizing the highlight
+        const hSz = isSel ? 6 : 5;
+        ctx.fillStyle = '#ffffff';
+        ctx.strokeStyle = '#00f0ff';
+        ctx.lineWidth = 1.5;
+        // TL, TR, BL, BR, R, L
+        [[hx, hy], [hx + hw, hy], [hx, hy + hh], [hx + hw, hy + hh], [hx + hw, hy + hh / 2], [hx, hy + hh / 2]].forEach(([cx, cy]) => {
+          ctx.fillRect(cx - hSz / 2, cy - hSz / 2, hSz, hSz);
+          ctx.strokeRect(cx - hSz / 2, cy - hSz / 2, hSz, hSz);
+        });
+
+        // Top tag for selected highlight
+        if (isSel) {
+          ctx.font = 'bold 9px Inter, sans-serif';
+          const tag = '🖍️ Highlight (Drag to move • Drag handles to resize)';
+          const tw = ctx.measureText(tag).width;
+          ctx.fillStyle = 'rgba(10, 15, 26, 0.92)';
+          ctx.fillRect(hx + hw / 2 - tw / 2 - 6, hy - 16, tw + 12, 14);
+          ctx.strokeStyle = '#00f0ff';
+          ctx.lineWidth = 1;
+          ctx.strokeRect(hx + hw / 2 - tw / 2 - 6, hy - 16, tw + 12, 14);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillText(tag, hx + hw / 2 - tw / 2, hy - 5);
+        }
+        ctx.restore();
+      });
+    }
+
+    // Pen tip glow while drawing (rendered directly on ctx for crisp luminescence)
+    targetClip.highlights.forEach((hl, idx) => {
+      const defaultSweepSpeed = targetClip.docSweepSpeed || 0.6;
+      const hlStart = hl.startTime !== undefined ? hl.startTime : (docFocusInAt + 0.3 + idx * (defaultSweepSpeed * 0.8));
+      const hlDur = hl.duration || defaultSweepSpeed;
+      const hlElapsed = docElapsed - hlStart;
+      if (hlElapsed <= 0) return;
+
+      const progress = Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
+      if (progress > 0 && progress < 1.0) {
+        const wipeEase = 1 - Math.pow(1 - progress, 2.2);
+        const hx = dx + finalW * hl.x;
+        const hy = dy + finalH * hl.y;
+        const hw = Math.max(4, finalW * hl.w);
+        const hh = Math.max(4, finalH * hl.h);
+        const curW = hw * wipeEase;
+
+        let hlColor = hl.color || '#ffff00';
+        if (hlColor.toLowerCase() === '#facc15' || hlColor.toLowerCase() === '#ffe600') hlColor = '#ffff00';
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.fillStyle = hlColor;
+        ctx.shadowColor = hlColor;
+        ctx.shadowBlur = 10;
+        ctx.fillRect(hx + curW - 2, hy, 3, hh);
+        ctx.restore();
+      }
+    });
+  }
+}
+
 // Draw Active Video / Image in Canvas Center & Handle Video Audio
 function drawMediaLayer(specificClip) {
   let targetClip = specificClip;
@@ -965,8 +1194,9 @@ function drawMediaLayer(specificClip) {
   const scale = (targetClip && targetClip.scale !== undefined) ? targetClip.scale : 1.0;
   const finalW = dw * scale;
   const finalH = dh * scale;
-  const offsetX = (targetClip && targetClip.x !== undefined) ? targetClip.x : 0;
-  const offsetY = (targetClip && targetClip.y !== undefined) ? targetClip.y : 0;
+  const scrollOffset = getClipDocumentScrollOffset(targetClip, currentTime, finalW, finalH);
+  const offsetX = ((targetClip && targetClip.x !== undefined) ? targetClip.x : 0) + scrollOffset.x;
+  const offsetY = ((targetClip && targetClip.y !== undefined) ? targetClip.y : 0) + scrollOffset.y;
   const dx = ((w - finalW) / 2) + offsetX;
   const dy = ((h - finalH) / 2) + offsetY;
 
@@ -1050,6 +1280,12 @@ function drawMediaLayer(specificClip) {
         ctx.lineWidth = 2;
         ctx.strokeRect(dx, dy, finalW, finalH);
       }
+
+      // Render Document Focus & Animated Highlights inside the camera punch-zoom space!
+      if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0))) {
+        renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH);
+      }
+
       ctx.restore();
     } else {
       if (targetClip?.chartConfig) {
@@ -1069,6 +1305,11 @@ function drawMediaLayer(specificClip) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 2;
         ctx.strokeRect(dx, dy, finalW, finalH);
+      }
+
+      // Render Document Focus & Animated Highlights on normal (unpunched) image
+      if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0))) {
+        renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH);
       }
     }
 
@@ -1166,206 +1407,19 @@ function drawMediaLayer(specificClip) {
         ctx.restore();
       }
     }
-
-    // 4. Render Document Focus (Whiteout Fade / Dark Spotlight) & Animated Text Highlights
-    if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0) || (targetClip.productSpotlights && targetClip.productSpotlights.length > 0))) {
-      const docElapsed = currentTime - targetClip.start;
-      const docFocusInAt = targetClip.docFocusStartTime !== undefined ? targetClip.docFocusStartTime : 0.4;
-      const isWhiteout = targetClip.docStyle !== 'dark'; // Default to Whiteout Fade (Image 2 style)
-
-      // 4a. Whiteout or Dark Backdrop with Spotlight Cutout
-      if (targetClip.docFocus && targetClip.docFocusRect) {
-        const r = targetClip.docFocusRect;
-        const fx = dx + finalW * r.x;
-        const fy = dy + finalH * r.y;
-        const fw = Math.max(10, finalW * r.w);
-        const fh = Math.max(10, finalH * r.h);
-
-        // Smooth transition in
-        const t = Math.min(1.0, Math.max(0.0, (docElapsed - docFocusInAt) / 0.42));
-        const ease = 1 - Math.pow(1 - t, 3);
-        const defaultDim = isWhiteout ? 0.82 : 0.65;
-        const maxDim = (targetClip.docDimOpacity !== undefined ? targetClip.docDimOpacity : defaultDim) * ease;
-
-        if (maxDim > 0.01) {
-          ctx.save();
-          const feather = targetClip.docFeather !== undefined ? targetClip.docFeather : (isWhiteout ? 20 : 16);
-          
-          // Outer overlay canvas cutout
-          const offCanvas = document.createElement('canvas');
-          offCanvas.width = canvas.width;
-          offCanvas.height = canvas.height;
-          const offCtx = offCanvas.getContext('2d');
-
-          // Choose overlay color: White / Light Cream for Whiteout (Image 2 style), or Dark for Dark Spotlight
-          if (isWhiteout) {
-            offCtx.fillStyle = `rgba(255, 255, 255, ${maxDim})`;
-          } else {
-            offCtx.fillStyle = `rgba(10, 12, 16, ${maxDim})`;
-          }
-          offCtx.fillRect(dx, dy, finalW, finalH);
-
-          // Clear out the spotlight rectangle with soft feathered blur
-          offCtx.save();
-          offCtx.globalCompositeOperation = 'destination-out';
-          offCtx.filter = `blur(${feather}px)`;
-          offCtx.fillStyle = '#000000';
-          const pad = isWhiteout ? 6 : 4;
-          offCtx.fillRect(fx - pad, fy - pad, fw + pad * 2, fh + pad * 2);
-          offCtx.restore();
-
-          // Draw the whiteout / dimming mask over canvas
-          ctx.drawImage(offCanvas, 0, 0);
-
-          // If dark mode, add subtle glow border. If whiteout mode, leave natural or very subtle light ring
-          if (!isWhiteout) {
-            ctx.save();
-            ctx.strokeStyle = `rgba(56, 189, 248, ${0.45 * ease})`;
-            ctx.lineWidth = 1.5;
-            ctx.strokeRect(fx - 4, fy - 4, fw + 8, fh + 8);
-            ctx.restore();
-          }
-
-          ctx.restore();
-        }
-      }
-
-      // 4b. Live Animated Text Highlighter Bars (Wipes smoothly across text in real time)
-      if (targetClip.highlights && targetClip.highlights.length > 0) {
-        targetClip.highlights.forEach((hl, idx) => {
-          const defaultSweepSpeed = targetClip.docSweepSpeed || 0.6;
-          const hlStart = hl.startTime !== undefined ? hl.startTime : (docFocusInAt + 0.3 + idx * (defaultSweepSpeed * 0.8));
-          const hlDur = hl.duration || defaultSweepSpeed;
-          const hlElapsed = docElapsed - hlStart;
-          if (hlElapsed <= 0) return;
-
-          const progress = Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
-          const wipeEase = progress < 1 ? 1 - Math.pow(1 - progress, 2.2) : 1;
-
-          const hx = dx + finalW * hl.x;
-          const hy = dy + finalH * hl.y;
-          const hw = Math.max(4, finalW * hl.w);
-          const hh = Math.max(4, finalH * hl.h);
-
-          ctx.save();
-          ctx.globalCompositeOperation = 'multiply';
-          ctx.fillStyle = hl.color || '#38bdf8';
-          ctx.globalAlpha = hl.opacity !== undefined ? hl.opacity : 0.82;
-
-          const curW = hw * wipeEase;
-          const corner = Math.min(4, hh / 3.5);
-          ctx.beginPath();
-          if (ctx.roundRect) {
-            ctx.roundRect(hx, hy, curW, hh, corner);
-          } else {
-            ctx.rect(hx, hy, curW, hh);
-          }
-          ctx.fill();
-
-          if (progress > 0 && progress < 1.0) {
-            ctx.save();
-            ctx.globalCompositeOperation = 'source-over';
-            ctx.fillStyle = hl.color || '#38bdf8';
-            ctx.shadowColor = hl.color || '#38bdf8';
-            ctx.shadowBlur = 8;
-            ctx.fillRect(hx + curW - 2, hy, 3, hh);
-            ctx.restore();
-          }
-          ctx.restore();
-        });
-      }
-
-      // 4c. Product Spotlight: Animated pulsing border + corner reticle accents on highlighted products
-      if (targetClip.productSpotlights && targetClip.productSpotlights.length > 0) {
-        targetClip.productSpotlights.forEach((ps, idx) => {
-          const psStart = ps.startTime !== undefined ? ps.startTime : (docFocusInAt + 0.15 + idx * 0.45);
-          const psElapsed = docElapsed - psStart;
-          if (psElapsed <= 0) return;
-
-          // Entrance animation: snap in over 0.35s with cubic ease-out
-          const entryT = Math.min(1.0, psElapsed / 0.35);
-          const entryEase = 1 - Math.pow(1 - entryT, 3);
-
-          const spx = dx + finalW * ps.x;
-          const spy = dy + finalH * ps.y;
-          const spw = Math.max(20, finalW * ps.w);
-          const sph = Math.max(20, finalH * ps.h);
-
-          const color = ps.color || '#facc15';
-          const pulseFreq = ps.pulseSpeed || 1.8;
-          const pulseSine = Math.sin(psElapsed * pulseFreq * Math.PI * 2) * 0.5 + 0.5;
-          const glowAlpha = (ps.opacity !== undefined ? ps.opacity : 0.9) * entryEase * (0.55 + 0.45 * pulseSine);
-
-          // Pulsing glow border
-          ctx.save();
-          ctx.globalAlpha = glowAlpha;
-          ctx.shadowColor = color;
-          ctx.shadowBlur = 10 + pulseSine * 14;
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 2.5;
-          const cr = Math.min(6, Math.min(spw, sph) * 0.08);
-          ctx.beginPath();
-          if (ctx.roundRect) {
-            ctx.roundRect(spx, spy, spw, sph, cr);
-          } else {
-            ctx.rect(spx, spy, spw, sph);
-          }
-          ctx.stroke();
-          ctx.restore();
-
-          // Corner accent reticle marks
-          const accentLen = Math.min(spw, sph) * 0.22;
-          ctx.save();
-          ctx.globalAlpha = entryEase * (0.75 + 0.25 * pulseSine);
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 3;
-          ctx.shadowColor = color;
-          ctx.shadowBlur = 8;
-          ctx.lineCap = 'round';
-          ctx.beginPath(); ctx.moveTo(spx, spy + accentLen); ctx.lineTo(spx, spy); ctx.lineTo(spx + accentLen, spy); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(spx + spw - accentLen, spy); ctx.lineTo(spx + spw, spy); ctx.lineTo(spx + spw, spy + accentLen); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(spx, spy + sph - accentLen); ctx.lineTo(spx, spy + sph); ctx.lineTo(spx + accentLen, spy + sph); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(spx + spw - accentLen, spy + sph); ctx.lineTo(spx + spw, spy + sph); ctx.lineTo(spx + spw, spy + sph - accentLen); ctx.stroke();
-          ctx.restore();
-
-          // Optional label badge floating above the spotlight box
-          if (ps.label) {
-            const labelFontSize = Math.max(11, Math.min(18, spw * 0.07));
-            ctx.save();
-            ctx.font = `700 ${labelFontSize}px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
-            const labelW = ctx.measureText(ps.label).width + 14;
-            const labelH = labelFontSize + 10;
-            const labelX = spx + spw / 2 - labelW / 2;
-            const labelY = spy - labelH - 5;
-            ctx.globalAlpha = entryEase;
-            ctx.shadowColor = color;
-            ctx.shadowBlur = 12;
-            ctx.fillStyle = color;
-            if (ctx.roundRect) {
-              ctx.beginPath(); ctx.roundRect(labelX, labelY, labelW, labelH, 4); ctx.fill();
-            } else {
-              ctx.fillRect(labelX, labelY, labelW, labelH);
-            }
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#000000';
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'center';
-            ctx.fillText(ps.label, labelX + labelW / 2, labelY + labelH / 2);
-            ctx.restore();
-          }
-        });
-      }
-    }
   } catch(e) {}
 
   ctx.restore();
 
   // If this clip is selected and is a chart, image, or video, draw interactive transform highlight & handles
   if (selectedClip && targetClip && selectedClip.clip.id === targetClip.id && (selectedClip.trackType === 'chart' || selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
-    drawTransformHandles(dx, dy, finalW, finalH);
+    // Hide giant full-image dashed transform border when document focus is active to keep text clean
+    if (!targetClip.docFocus && (!targetClip.zoomEffect || activeTool === 'snap-zoom' || activeTool === 'loupe')) {
+      drawTransformHandles(dx, dy, finalW, finalH);
+    }
 
-    // If clip has zoom or loupe, also draw target crosshair indicator
-    if (targetClip.zoomEffect && targetClip.zoomOriginX !== undefined) {
+    // Only draw target crosshair indicator if actively placing zoom with snap-zoom or loupe tools
+    if (targetClip.zoomEffect && targetClip.zoomOriginX !== undefined && (activeTool === 'snap-zoom' || activeTool === 'loupe')) {
       drawZoomTargetIndicator(dx, dy, finalW, finalH, targetClip);
     }
   }
@@ -1416,7 +1470,6 @@ function drawMarqueeSelectionOverlay() {
   const isSnap = activeTool === 'snap-zoom';
   const isDocFocus = activeTool === 'doc-focus';
   const isDocHl = activeTool === 'doc-highlight';
-  const isDocSpotlight = activeTool === 'doc-product-spotlight';
 
   let color = '#00f0ff';
   let bgColor = 'rgba(0, 240, 255, 0.18)';
@@ -1436,11 +1489,6 @@ function drawMarqueeSelectionOverlay() {
     color = hlColor;
     bgColor = hlColor + '44';
     toolLabel = 'Animated Highlight Sweep';
-  } else if (isDocSpotlight) {
-    const spotColor = document.getElementById('inspector-doc-hl-color')?.value || '#facc15';
-    color = spotColor;
-    bgColor = spotColor + '33';
-    toolLabel = '⬛ Product Spotlight';
   }
 
   ctx.save();
@@ -1649,61 +1697,6 @@ function render(now) {
     } else if (bgType === 'chroma_green') {
       ctx.fillStyle = '#00e676';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-    } else if (bgType === 'gradient_looping') {
-      // Slow-looping brand gradient (sinusoidal hue shift, high-quality for talking-head BG)
-      const t = performance.now() / 5000; // full cycle every 5s
-      const h1 = ((t * 60) % 360); // hue 1 rotates
-      const h2 = (h1 + 160) % 360;  // complementary offset
-      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-      grad.addColorStop(0, `hsl(${h1}, 60%, 7%)`);
-      grad.addColorStop(0.5, `hsl(${(h1 + 80) % 360}, 45%, 10%)`);
-      grad.addColorStop(1, `hsl(${h2}, 55%, 8%)`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    } else if (bgType === 'particles_dots') {
-      // Dark background + animated floating dot field
-      ctx.fillStyle = bgColor || '#060810';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // Generate deterministic dot positions and animate them with time
-      const t = performance.now() / 1000;
-      const numDots = 55;
-      ctx.save();
-      for (let i = 0; i < numDots; i++) {
-        // Deterministic but organic: use sin/cos with prime offsets
-        const seed = i * 7.83;
-        const bx = ((Math.sin(seed * 0.31) * 0.5 + 0.5) * canvas.width);
-        const by = ((Math.cos(seed * 0.19) * 0.5 + 0.5) * canvas.height);
-        const floatX = bx + Math.sin(t * 0.3 + seed) * 22;
-        const floatY = by + Math.cos(t * 0.22 + seed * 1.3) * 18;
-        const r = 1.5 + Math.abs(Math.sin(seed * 0.7 + t * 0.4)) * 3;
-        const a = 0.08 + Math.abs(Math.sin(seed * 0.4 + t * 0.25)) * 0.18;
-        ctx.globalAlpha = a;
-        ctx.fillStyle = '#38bdf8';
-        ctx.beginPath();
-        ctx.arc(floatX, floatY, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-    } else if (bgType === 'noise_grain') {
-      // Documentary / film-grain texture — solid color base + subtle noise overlay
-      ctx.fillStyle = bgColor || '#0d0d0d';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // Grain: randomly vary small pixels using time-seeded noise (lightweight)
-      const grainOpacity = 0.035;
-      const grainSize = 2;
-      ctx.save();
-      ctx.globalAlpha = grainOpacity;
-      const seed = Math.floor(performance.now() / 80); // changes every 80ms (film-rate flicker)
-      for (let gy = 0; gy < canvas.height; gy += grainSize * 2) {
-        for (let gx = 0; gx < canvas.width; gx += grainSize * 2) {
-          const n = ((Math.sin((gx + seed) * 0.07) + Math.cos((gy + seed) * 0.13)) * 0.5 + 0.5);
-          if (n > 0.6) {
-            ctx.fillStyle = n > 0.8 ? '#ffffff' : '#888888';
-            ctx.fillRect(gx, gy, grainSize, grainSize);
-          }
-        }
-      }
-      ctx.restore();
     } else {
       // Default cyber grid / dark studio
       ctx.fillStyle = bgColor || '#0a0b0e';
@@ -1917,33 +1910,7 @@ function renderMediaList(filter) {
 
       let targetTrack = 'image';
       if (file.isVideo) targetTrack = 'video';
-      else if (file.isAudio) {
-        // For audio files: show a quick toast choice between Voiceover and BGM Music
-        // Remove any existing audio route picker
-        document.getElementById('_audio-route-picker')?.remove();
-        const picker = document.createElement('div');
-        picker.id = '_audio-route-picker';
-        picker.style.cssText = 'position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#171a24; border:1px solid #38bdf8; border-radius:8px; padding:10px 14px; z-index:99999; display:flex; flex-direction:column; gap:8px; box-shadow:0 10px 30px rgba(0,0,0,0.7); min-width:220px;';
-        picker.innerHTML = `
-          <div style="font-size:11px; font-weight:700; color:#94a3b8; text-align:center; margin-bottom:2px;">Add "${file.name.replace(/\.[^.]+$/, '')}" to:</div>
-          <div style="display:flex; gap:8px;">
-            <button id="_route-voiceover" style="flex:1; padding:6px 8px; background:rgba(56,189,248,0.12); border:1px solid #38bdf8; color:#38bdf8; border-radius:5px; font-size:11.5px; font-weight:600; cursor:pointer;">🎤 Voiceover</button>
-            <button id="_route-music" style="flex:1; padding:6px 8px; background:rgba(250,204,21,0.12); border:1px solid #facc15; color:#facc15; border-radius:5px; font-size:11.5px; font-weight:600; cursor:pointer;">🎵 BGM Music</button>
-          </div>
-        `;
-        document.body.appendChild(picker);
-        const removePicker = () => picker.remove();
-        setTimeout(removePicker, 7000); // auto-dismiss after 7s
-        document.getElementById('_route-voiceover').addEventListener('click', () => {
-          removePicker();
-          addClipToTimeline('voiceover', file, currentTime, file.duration || 25);
-        });
-        document.getElementById('_route-music').addEventListener('click', () => {
-          removePicker();
-          addClipToTimeline('music', file, currentTime, file.duration || 25);
-        });
-        return; // Don't fall through — picker handles it
-      }
+      else if (file.isAudio) targetTrack = 'voiceover';
 
       addClipToTimeline(targetTrack, file, currentTime, file.duration || (file.isAudio ? 25 : 6));
     });
@@ -2164,7 +2131,77 @@ function renderAllTimelineTracks() {
       // Content wrapper
       const contentEl = document.createElement('div');
       contentEl.className = 'clip-block-content';
-      contentEl.innerHTML = `${iconSvg} <span>${label}</span>`;
+
+      // Build effect indicator tags for user awareness
+      let fxBadgesHtml = '';
+      if (clip.zoomEffect === 'snap') fxBadgesHtml += `<span class="clip-badge-tag" style="color: #ff334b; border-color: rgba(255, 51, 75, 0.4);">🔍 Zoom</span>`;
+      else if (clip.zoomEffect === 'loupe') fxBadgesHtml += `<span class="clip-badge-tag" style="color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);">🔍 Loupe</span>`;
+      if (clip.docFocus) {
+        const isWhite = (clip.docStyle !== 'dark');
+        fxBadgesHtml += `<span class="clip-badge-tag" style="color: ${isWhite ? '#38bdf8' : '#a855f7'}; border-color: ${isWhite ? 'rgba(56, 189, 248, 0.4)' : 'rgba(168, 85, 247, 0.4)'};">${isWhite ? '⚪ Whiteout' : '⚫ Spotlight'}</span>`;
+      }
+      if (clip.highlights && clip.highlights.length > 0) {
+        fxBadgesHtml += `<span class="clip-badge-tag" style="color: #ffff00; border-color: rgba(255, 255, 0, 0.4);">🖍️ ${clip.highlights.length} HL</span>`;
+      }
+      if (clip.docScroll) {
+        fxBadgesHtml += `<span class="clip-badge-tag" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4);">📜 Scroll</span>`;
+      }
+
+      contentEl.innerHTML = `${iconSvg} <span style="overflow: hidden; text-overflow: ellipsis;">${label}</span> ${fxBadgesHtml}`;
+
+      // Build colored mini-bars along the bottom of the timeline clip
+      const fxTracksEl = document.createElement('div');
+      fxTracksEl.className = 'clip-fx-tracks';
+
+      // Whiteout / Spotlight sub-bar
+      if (clip.docFocus) {
+        const fxBar = document.createElement('div');
+        fxBar.className = `clip-fx-bar ${clip.docStyle !== 'dark' ? 'whiteout' : 'spotlight'}`;
+        const fIn = (clip.docFocusStartTime !== undefined ? clip.docFocusStartTime : 0.4);
+        const fDur = (clip.docFocusDuration && clip.docFocusDuration > 0) ? clip.docFocusDuration : Math.max(0.1, clip.duration - fIn);
+        const leftPct = Math.min(100, Math.max(0, (fIn / clip.duration) * 100));
+        const widthPct = Math.min(100 - leftPct, Math.max(5, (fDur / clip.duration) * 100));
+        fxBar.style.left = `${leftPct}%`;
+        fxBar.style.width = `${widthPct}%`;
+        fxTracksEl.appendChild(fxBar);
+      }
+
+      // Highlight sub-bar
+      if (clip.highlights && clip.highlights.length > 0) {
+        const hlBar = document.createElement('div');
+        hlBar.className = 'clip-fx-bar highlight';
+        const hlStart = clip.highlights[0].startTime !== undefined ? clip.highlights[0].startTime : 0.7;
+        const hlDur = clip.highlights.reduce((acc, h) => acc + (h.duration || 0.6), 0);
+        const leftPct = Math.min(100, Math.max(0, (hlStart / clip.duration) * 100));
+        const widthPct = Math.min(100 - leftPct, Math.max(5, (hlDur / clip.duration) * 100));
+        hlBar.style.left = `${leftPct}%`;
+        hlBar.style.width = `${widthPct}%`;
+        fxTracksEl.appendChild(hlBar);
+      }
+
+      // Scroll sub-bar
+      if (clip.docScroll) {
+        const scBar = document.createElement('div');
+        scBar.className = 'clip-fx-bar scroll';
+        const scLinger = clip.docScrollLinger !== undefined ? clip.docScrollLinger : 1.0;
+        const scSpeed = clip.docScrollSpeed !== undefined ? clip.docScrollSpeed : 3.0;
+        const leftPct = Math.min(100, Math.max(0, (scLinger / clip.duration) * 100));
+        const widthPct = Math.min(100 - leftPct, Math.max(5, (scSpeed / clip.duration) * 100));
+        scBar.style.left = `${leftPct}%`;
+        scBar.style.width = `${widthPct}%`;
+        fxTracksEl.appendChild(scBar);
+      }
+
+      // Zoom sub-bar
+      if (clip.zoomEffect) {
+        const zmBar = document.createElement('div');
+        zmBar.className = 'clip-fx-bar zoom';
+        const zmIn = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
+        const leftPct = Math.min(100, Math.max(0, (zmIn / clip.duration) * 100));
+        zmBar.style.left = `${leftPct}%`;
+        zmBar.style.width = `${100 - leftPct}%`;
+        fxTracksEl.appendChild(zmBar);
+      }
 
       // Hover delete button (appears on hover over any clip)
       const deleteBtn = document.createElement('button');
@@ -2187,6 +2224,7 @@ function renderAllTimelineTracks() {
 
       block.appendChild(handleLeft);
       block.appendChild(contentEl);
+      if (fxTracksEl.children.length > 0) block.appendChild(fxTracksEl);
       block.appendChild(deleteBtn);
       block.appendChild(handleRight);
 
@@ -2587,65 +2625,56 @@ function selectClip(clip, trackType) {
         docFocusSection.style.display = 'block';
         const docBadge = document.getElementById('inspector-doc-focus-badge');
         const docBody = document.getElementById('inspector-doc-focus-controls-body');
-        const btnWhiteout = document.getElementById('btn-inspector-whiteout');
-        const btnDarkSpotlight = document.getElementById('btn-inspector-dark-spotlight');
-        const btnSpotlight = document.getElementById('btn-inspector-product-spotlight');
+        const btnDocFocus = document.getElementById('btn-inspector-doc-focus');
+        const btnDocHl = document.getElementById('btn-inspector-doc-highlight');
 
         const hasFocus = !!clip.docFocus;
-        const isWhite = (clip.docStyle !== 'dark');
         const hlCount = clip.highlights ? clip.highlights.length : 0;
-        const spCount = clip.productSpotlights ? clip.productSpotlights.length : 0;
-        const hasAnyFX = hasFocus || hlCount > 0 || spCount > 0;
 
         if (docBadge) {
-          let badgeText = 'Off';
-          if (hasFocus) badgeText = isWhite ? 'Whiteout On' : 'Dark Spotlight';
-          else if (hlCount > 0 && spCount > 0) badgeText = `${hlCount} HL · ${spCount} Spotlight`;
-          else if (hlCount > 0) badgeText = `${hlCount} Highlights`;
-          else if (spCount > 0) badgeText = `${spCount} Spotlight${spCount > 1 ? 's' : ''}`;
-          docBadge.textContent = badgeText;
-          docBadge.style.color = hasAnyFX ? '#38bdf8' : 'var(--text-muted)';
+          docBadge.textContent = hasFocus ? (hlCount > 0 ? `Focus + ${hlCount} HL` : 'Spotlight On') : (hlCount > 0 ? `${hlCount} Highlights` : 'Off');
+          docBadge.style.color = (hasFocus || hlCount > 0) ? '#38bdf8' : 'var(--text-muted)';
         }
 
-        if (btnWhiteout) {
-          const active = hasFocus && isWhite;
-          btnWhiteout.style.borderColor = active ? '#38bdf8' : '';
-          btnWhiteout.style.color = active ? '#38bdf8' : '';
+        const btnDocWhite = document.getElementById('btn-inspector-doc-white');
+        const btnDocDark = document.getElementById('btn-inspector-doc-dark');
+
+        const hasWhiteFocus = hasFocus && (clip.docStyle !== 'dark');
+        const hasDarkFocus = hasFocus && (clip.docStyle === 'dark');
+
+        if (btnDocWhite) {
+          btnDocWhite.style.borderColor = hasWhiteFocus ? '#38bdf8' : '';
+          btnDocWhite.style.color = hasWhiteFocus ? '#38bdf8' : '';
         }
-        if (btnDarkSpotlight) {
-          const active = hasFocus && !isWhite;
-          btnDarkSpotlight.style.borderColor = active ? '#c084fc' : '';
-          btnDarkSpotlight.style.color = active ? '#c084fc' : '';
+        if (btnDocDark) {
+          btnDocDark.style.borderColor = hasDarkFocus ? '#a855f7' : '';
+          btnDocDark.style.color = hasDarkFocus ? '#a855f7' : '';
         }
         if (btnDocHl) {
           btnDocHl.style.borderColor = hlCount > 0 ? '#38bdf8' : '';
           btnDocHl.style.color = hlCount > 0 ? '#38bdf8' : '';
         }
-        if (btnSpotlight) {
-          btnSpotlight.style.borderColor = spCount > 0 ? '#facc15' : '';
-          btnSpotlight.style.color = spCount > 0 ? '#facc15' : '';
-        }
 
-        if (hasAnyFX && docBody) {
+        if ((hasFocus || hlCount > 0) && docBody) {
           docBody.style.display = 'block';
-          const isWhite2 = (clip.docStyle !== 'dark');
+          const isWhite = (clip.docStyle !== 'dark');
           const btnWhite = document.getElementById('btn-doc-style-white');
           const btnDark = document.getElementById('btn-doc-style-dark');
-          if (btnWhite) btnWhite.classList.toggle('active', isWhite2);
-          if (btnDark) btnDark.classList.toggle('active', !isWhite2);
+          if (btnWhite) btnWhite.classList.toggle('active', isWhite);
+          if (btnDark) btnDark.classList.toggle('active', !isWhite);
 
           const lblDim = document.getElementById('label-doc-dim');
-          if (lblDim) lblDim.textContent = isWhite2 ? 'Whiteout Fade Level' : 'Dark Dim Level';
+          if (lblDim) lblDim.textContent = isWhite ? 'Whiteout Fade Level' : 'Dark Dim Level';
 
           const dimInput = document.getElementById('inspector-doc-dim');
           const dimVal = document.getElementById('inspector-doc-dim-val');
-          const curDim = Math.round((clip.docDimOpacity !== undefined ? clip.docDimOpacity : (isWhite2 ? 0.82 : 0.65)) * 100);
+          const curDim = Math.round((clip.docDimOpacity !== undefined ? clip.docDimOpacity : 0.65) * 100);
           if (dimInput) dimInput.value = curDim;
           if (dimVal) dimVal.textContent = `${curDim}%`;
 
           const featherInput = document.getElementById('inspector-doc-feather');
           const featherVal = document.getElementById('inspector-doc-feather-val');
-          const curFeather = clip.docFeather !== undefined ? clip.docFeather : (isWhite2 ? 20 : 16);
+          const curFeather = clip.docFeather !== undefined ? clip.docFeather : (isWhite ? 18 : 16);
           if (featherInput) featherInput.value = curFeather;
           if (featherVal) featherVal.textContent = `${curFeather}px`;
 
@@ -2655,14 +2684,77 @@ function selectClip(clip, trackType) {
           if (speedInput) speedInput.value = Math.round(curSpeed * 10);
           if (speedVal) speedVal.textContent = `${curSpeed.toFixed(1)}s / line`;
 
-          // Show product spotlight label editor if spotlights present
-          const labelRow = document.getElementById('row-product-spotlight-label');
-          if (labelRow) labelRow.style.display = spCount > 0 ? 'block' : 'none';
+          // Sync Un-whiteout / Timed Auto-Restore settings
+          const btnUnwhiteout = document.getElementById('btn-toggle-unwhiteout');
+          const rowUnwhiteoutSlider = document.getElementById('row-unwhiteout-slider');
+          const durInput = document.getElementById('inspector-doc-focus-dur');
+          const durVal = document.getElementById('inspector-doc-focus-dur-val');
+          const hasTimedFocus = (clip.docFocusDuration && clip.docFocusDuration > 0);
+          if (btnUnwhiteout) {
+            btnUnwhiteout.textContent = hasTimedFocus ? 'Timed (Auto-Restore)' : 'Hold Whole Clip';
+            btnUnwhiteout.style.color = hasTimedFocus ? '#38bdf8' : 'var(--text-muted)';
+            btnUnwhiteout.style.borderColor = hasTimedFocus ? '#38bdf8' : '';
+          }
+          if (rowUnwhiteoutSlider) rowUnwhiteoutSlider.style.display = hasTimedFocus ? 'block' : 'none';
+          if (durInput && hasTimedFocus) durInput.value = Math.round(clip.docFocusDuration * 10);
+          if (durVal && hasTimedFocus) durVal.textContent = `${clip.docFocusDuration.toFixed(1)}s`;
+
+          // Sync highlighter color picker & presets
+          const colorInput = document.getElementById('inspector-doc-hl-color');
+          const activeColor = clip.docHlColor || (clip.highlights && clip.highlights.length > 0 ? clip.highlights[clip.highlights.length - 1].color : '#38bdf8');
+          if (colorInput) colorInput.value = activeColor;
+          document.querySelectorAll('.hl-preset-btn').forEach(btn => {
+            const c = btn.getAttribute('data-color');
+            const isActive = c && activeColor && c.toLowerCase() === activeColor.toLowerCase();
+            btn.style.boxShadow = isActive ? '0 0 0 2px #ffffff' : 'none';
+            btn.style.fontWeight = isActive ? 'bold' : 'normal';
+          });
         } else if (docBody) {
           docBody.style.display = 'none';
         }
       } else {
         docFocusSection.style.display = 'none';
+      }
+    }
+
+    // Document Camera Scroll / Flow Inspector Section
+    const docScrollSection = document.getElementById('inspector-doc-scroll-section');
+    if (docScrollSection) {
+      if (trackType === 'image' || trackType === 'video') {
+        docScrollSection.style.display = 'block';
+        const scrollBadge = document.getElementById('inspector-doc-scroll-badge');
+        const scrollBody = document.getElementById('inspector-doc-scroll-controls-body');
+        const hasScroll = !!clip.docScroll;
+        if (scrollBadge) {
+          scrollBadge.textContent = hasScroll ? (clip.docScrollMode === 'across' ? 'Horizontal' : clip.docScrollMode === 'zigzag' ? 'Highlight Flow' : 'Top to Bottom') : 'Off';
+          scrollBadge.style.color = hasScroll ? '#10b981' : 'var(--text-muted)';
+        }
+        if (scrollBody) scrollBody.style.display = hasScroll ? 'block' : 'none';
+
+        document.querySelectorAll('.doc-scroll-preset-btn').forEach(btn => {
+          const mode = btn.getAttribute('data-mode');
+          btn.classList.toggle('active', hasScroll && clip.docScrollMode === mode);
+        });
+
+        const distInput = document.getElementById('inspector-doc-scroll-dist');
+        const distVal = document.getElementById('inspector-doc-scroll-dist-val');
+        const curDist = clip.docScrollDistance || 280;
+        if (distInput) distInput.value = curDist;
+        if (distVal) distVal.textContent = `${curDist}px`;
+
+        const lingerInput = document.getElementById('inspector-doc-scroll-linger');
+        const lingerVal = document.getElementById('inspector-doc-scroll-linger-val');
+        const curLinger = clip.docScrollLinger !== undefined ? clip.docScrollLinger : 1.0;
+        if (lingerInput) lingerInput.value = Math.round(curLinger * 10);
+        if (lingerVal) lingerVal.textContent = `${curLinger.toFixed(1)}s`;
+
+        const speedInput = document.getElementById('inspector-doc-scroll-speed');
+        const speedVal = document.getElementById('inspector-doc-scroll-speed-val');
+        const curSpeed = clip.docScrollSpeed !== undefined ? clip.docScrollSpeed : 3.0;
+        if (speedInput) speedInput.value = Math.round(curSpeed * 10);
+        if (speedVal) speedVal.textContent = `${curSpeed.toFixed(1)}s`;
+      } else {
+        docScrollSection.style.display = 'none';
       }
     }
 
@@ -2926,29 +3018,26 @@ function initTimelineDragAndDrop() {
 
         // Auto-routing & lane enforcement:
         // Automatically route media files to their respective dedicated tracks
-        // If an audio file is dropped on the BGM Music track, route there instead of voiceover
-        const droppedLaneType = trackEl.dataset.trackType || '';
         let targetType = 'image';
         if (file.isVideo) {
           targetType = 'video';
         } else if (file.isAudio) {
-          // Respect explicit drop target: music track → BGM, anything else → voiceover
-          targetType = droppedLaneType === 'music' ? 'music' : 'voiceover';
+          targetType = 'voiceover';
         } else if (file.isImage) {
           targetType = 'image';
         } else if (file.text !== undefined) {
           targetType = 'text';
         }
 
-        // Inform user if file automatically snapped to a different lane
+        // Inform user if file automatically snapped to correct lane
+        const droppedLaneType = trackEl.dataset.trackType || '';
         if (droppedLaneType && droppedLaneType !== targetType) {
           const laneNames = {
             image: 'Images',
             video: 'Video Clips',
             voiceover: 'Voiceover',
             text: 'Kinetic Text',
-            music: 'BGM Music',
-            background: 'Background'
+            music: 'BGM Music'
           };
           showTextTimingAlert(`Auto-routed "${file.name || 'clip'}" to ${laneNames[targetType] || targetType} track.`, 'success');
           setTimeout(() => showTextTimingAlert(''), 2500);
@@ -2962,33 +3051,61 @@ function initTimelineDragAndDrop() {
   });
 }
 
+// Centralized Studio Tool Switcher
+function setStudioTool(toolName, docStyle = null) {
+  activeTool = toolName;
+  canvas.classList.remove('tool-snap-zoom', 'tool-loupe', 'tool-draw', 'tool-doc-focus', 'tool-doc-highlight');
+  document.querySelectorAll('.timeline-tools .btn-tool').forEach(b => {
+    if (!['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(b.id)) {
+      b.classList.remove('active');
+    }
+  });
+
+  if (toolName === 'select') {
+    document.getElementById('tool-select')?.classList.add('active');
+    toggleDrawingDock(false);
+  } else if (toolName === 'split') {
+    document.getElementById('tool-split')?.classList.add('active');
+    toggleDrawingDock(false);
+  } else if (toolName === 'delete') {
+    document.getElementById('tool-delete')?.classList.add('active');
+    toggleDrawingDock(false);
+  } else if (toolName === 'snap-zoom') {
+    canvas.classList.add('tool-snap-zoom');
+    toggleDrawingDock(false);
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+  } else if (toolName === 'loupe') {
+    canvas.classList.add('tool-loupe');
+    toggleDrawingDock(false);
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+  } else if (toolName === 'doc-focus') {
+    if (docStyle) window._activeDocStyle = docStyle;
+    canvas.classList.add('tool-doc-focus');
+    toggleDrawingDock(false);
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+  } else if (toolName === 'doc-highlight') {
+    canvas.classList.add('tool-doc-highlight');
+    toggleDrawingDock(false);
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+  } else if (toolName === 'draw') {
+    canvas.classList.add('tool-draw');
+    toggleDrawingDock(true);
+    document.getElementById('btn-dropdown-fx')?.classList.add('active');
+  }
+}
+
 // Timeline Header Tools
 document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
   btn.addEventListener('click', (e) => {
     // Exclude undo, redo, reset, expand from active tool toggle
     if (['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(btn.id)) return;
 
-    document.querySelectorAll('.timeline-tools .btn-tool').forEach(b => {
-      if (!['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(b.id)) {
-        b.classList.remove('active');
-      }
-    });
-    btn.classList.add('active');
-
-    // Update canvas cursor styling based on active tool
-    canvas.classList.remove('tool-snap-zoom', 'tool-loupe', 'tool-draw');
-
     if (btn.id === 'tool-select') {
-      activeTool = 'select';
-      toggleDrawingDock(false);
-    }
-    else if (btn.id === 'tool-split') {
-      activeTool = 'split';
-      toggleDrawingDock(false);
-    }
-    else if (btn.id === 'tool-delete') {
-      activeTool = 'delete';
-      toggleDrawingDock(false);
+      setStudioTool('select');
+    } else if (btn.id === 'tool-split') {
+      setStudioTool('split');
+    } else if (btn.id === 'tool-delete') {
+      setStudioTool('delete');
     }
   });
 });
@@ -3020,52 +3137,25 @@ window.addEventListener('click', () => {
 document.querySelectorAll('.tool-menu-item').forEach(item => {
   item.addEventListener('click', () => {
     document.querySelectorAll('.tool-dropdown-menu').forEach(m => m.classList.remove('show'));
-    canvas.classList.remove('tool-snap-zoom', 'tool-loupe', 'tool-draw');
 
     if (item.id === 'tool-snap-zoom') {
-      activeTool = 'snap-zoom';
-      canvas.classList.add('tool-snap-zoom');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      setStudioTool('snap-zoom');
     } else if (item.id === 'tool-loupe') {
-      activeTool = 'loupe';
-      canvas.classList.add('tool-loupe');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      setStudioTool('loupe');
     } else if (item.id === 'tool-doc-focus') {
-      activeTool = 'doc-focus';
-      window._activeDocStyle = 'white';
-      canvas.classList.add('tool-doc-focus');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      setStudioTool('doc-focus', 'white');
       showTextTimingAlert('Whiteout Fade Active: Drag a rectangle over the paragraph to fade surrounding text to white.', 'info');
       setTimeout(() => showTextTimingAlert(''), 3500);
     } else if (item.id === 'tool-doc-focus-dark') {
-      activeTool = 'doc-focus';
-      window._activeDocStyle = 'dark';
-      canvas.classList.add('tool-doc-focus');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      setStudioTool('doc-focus', 'dark');
       showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the target area to dim surroundings.', 'info');
       setTimeout(() => showTextTimingAlert(''), 3500);
     } else if (item.id === 'tool-doc-highlight') {
-      activeTool = 'doc-highlight';
-      canvas.classList.add('tool-doc-highlight');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      setStudioTool('doc-highlight');
       showTextTimingAlert('Highlighter Active: Drag across words or lines to create an animated drawing sweep.', 'info');
       setTimeout(() => showTextTimingAlert(''), 3500);
     } else if (item.id === 'tool-draw') {
-      activeTool = 'draw';
-      canvas.classList.add('tool-draw');
-      toggleDrawingDock(true);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
+      setStudioTool('draw');
       showTextTimingAlert('Drawing Mode Active! Hold click anywhere on screen for Pen quick-menu.', 'success');
       setTimeout(() => showTextTimingAlert(''), 3000);
     } else if (item.id === 'tool-add-chart') {
@@ -3597,10 +3687,7 @@ const BG_MODE_LABELS = {
   solid_black: 'Solid Black',
   none: 'Transparent',
   color: 'Solid Tint',
-  vox_cream: 'Vox Cream',
-  gradient_looping: 'Looping Gradient',
-  particles_dots: 'Dot Field',
-  noise_grain: 'Film Grain'
+  vox_cream: 'Vox Cream'
 };
 
 function applyBackdropMode(type, color) {
@@ -3633,14 +3720,11 @@ function openBackgroundSegmentPicker(atTimeSec, triggerEl) {
   popover.appendChild(header);
 
   const bgOptions = [
-    { value: 'cyber_grid',        label: 'Cyber Grid',        color: '#1a1f35' },
-    { value: 'solid_black',       label: 'Solid Black',       color: '#111111' },
-    { value: 'none',              label: 'Transparent',       color: '#2a2a2a' },
-    { value: 'color',             label: 'Solid Tint',        color: '#1a3a2a' },
-    { value: 'vox_cream',         label: 'Vox Cream',         color: '#3a3020' },
-    { value: 'gradient_looping',  label: 'Looping Gradient',  color: '#181236' },
-    { value: 'particles_dots',    label: 'Floating Dots',     color: '#071626' },
-    { value: 'noise_grain',       label: 'Film Grain Doc',    color: '#1c1c1c' }
+    { value: 'cyber_grid',  label: 'Cyber Grid',    color: '#1a1f35' },
+    { value: 'solid_black', label: 'Solid Black',   color: '#111111' },
+    { value: 'none',        label: 'Transparent',   color: '#2a2a2a' },
+    { value: 'color',       label: 'Solid Tint',    color: '#1a3a2a' },
+    { value: 'vox_cream',   label: 'Vox Cream',     color: '#3a3020' }
   ];
 
   const list = document.createElement('div');
@@ -3994,112 +4078,204 @@ document.getElementById('inspector-zoom-start')?.addEventListener('change', () =
   recordState('Change Zoom Timing');
 });
 
-// Article Focus (Spotlight Dimming) & Highlight Inspector Event Listeners
-document.getElementById('btn-inspector-whiteout')?.addEventListener('click', () => {
+// Helper to get selected media clip or auto-select top visible media clip at currentTime
+function getOrSelectActiveMediaClip() {
   if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
-    activeTool = 'doc-focus';
-    window._activeDocStyle = 'white';
-    canvas.classList.add('tool-doc-focus');
-    toggleDrawingDock(false);
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    showTextTimingAlert('Whiteout Focus Active: Drag a rectangle over the target text on the image.', 'info');
+    return selectedClip;
+  }
+  const activeMedia = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+  if (activeMedia.length > 0) {
+    const topClip = activeMedia[activeMedia.length - 1];
+    const trackType = timelineClips.image.includes(topClip) ? 'image' : 'video';
+    selectClip(topClip, trackType);
+    return selectedClip;
+  }
+  return null;
+}
+
+// 1-Click Article Focus & Highlight Bundle Template (Vox / Documentary Presentation)
+function applyDocFocusBundle(sel) {
+  if (!sel || !sel.clip) return;
+  const clip = sel.clip;
+
+  // 1. Cinematic Punch Zoom (2.2x zoom focused on headline)
+  clip.zoomEffect = 'snap';
+  clip.zoomScale = 2.2;
+  clip.zoomStartTime = 0.3;
+
+  // 2. Whiteout Focus Fade
+  clip.docFocus = true;
+  clip.docStyle = 'white';
+  clip.docDimOpacity = 0.65;
+  clip.docFeather = 18;
+  clip.docSweepSpeed = 0.6;
+  clip.docHlColor = '#ffff00';
+
+  // 3. Focus box positioned over headline area
+  if (!clip.docFocusRect) {
+    clip.docFocusRect = { x: 0.10, y: 0.18, w: 0.80, h: 0.22 };
+  }
+  clip.zoomOriginX = clip.docFocusRect.x + clip.docFocusRect.w / 2;
+  clip.zoomOriginY = clip.docFocusRect.y + clip.docFocusRect.h / 2;
+
+  // 4. Pure fluorescent yellow highlight bar across the headline
+  clip.highlights = [{
+    x: clip.docFocusRect.x,
+    y: clip.docFocusRect.y,
+    w: clip.docFocusRect.w,
+    h: clip.docFocusRect.h,
+    color: '#ffff00',
+    opacity: 0.95,
+    startTime: 0.5,
+    duration: 0.7
+  }];
+
+  selectClip(clip, sel.trackType);
+  const docBody = document.getElementById('inspector-doc-focus-controls-body');
+  if (docBody) docBody.style.display = 'block';
+
+  recordState('Apply Article Focus & Highlight Bundle');
+  playSFX('pop');
+  showTextTimingAlert('✨ Template Applied: 2.2x Zoom + Whiteout Fade + Pure Yellow Highlight! Drag the box on canvas to reposition.', 'success');
+  setTimeout(() => showTextTimingAlert(''), 4500);
+}
+
+document.getElementById('btn-inspector-doc-bundle')?.addEventListener('click', () => {
+  const sel = getOrSelectActiveMediaClip();
+  if (sel) {
+    applyDocFocusBundle(sel);
+  } else {
+    showTextTimingAlert('Please add or position playhead over an article image first.', 'warning');
     setTimeout(() => showTextTimingAlert(''), 3000);
   }
 });
 
-document.getElementById('btn-inspector-dark-spotlight')?.addEventListener('click', () => {
-  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
-    activeTool = 'doc-focus';
-    window._activeDocStyle = 'dark';
-    canvas.classList.add('tool-doc-focus');
-    toggleDrawingDock(false);
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the target area to dim surroundings.', 'info');
+// Helper: Auto-detect bounding rectangle of existing highlights so Whiteout/Dark Spotlight does not overwrite them
+function autoDetectFocusRectFromHighlights(clip) {
+  if (clip.highlights && clip.highlights.length > 0) {
+    let minX = 1, minY = 1, maxX = 0, maxY = 0;
+    clip.highlights.forEach(h => {
+      minX = Math.min(minX, h.x);
+      minY = Math.min(minY, h.y);
+      maxX = Math.max(maxX, h.x + h.w);
+      maxY = Math.max(maxY, h.y + h.h);
+    });
+    const padX = 0.02;
+    const padY = 0.02;
+    const x = Math.max(0.01, minX - padX);
+    const y = Math.max(0.01, minY - padY);
+    const w = Math.min(0.98 - x, (maxX - minX) + padX * 2);
+    const h = Math.min(0.98 - y, (maxY - minY) + padY * 2);
+    return { x, y, w, h };
+  }
+  return clip.docFocusRect || { x: 0.12, y: 0.28, w: 0.76, h: 0.24 };
+}
+
+// Article Focus & Highlight Inspector Event Listeners (Independent & Modular)
+document.getElementById('btn-inspector-doc-white')?.addEventListener('click', () => {
+  const sel = getOrSelectActiveMediaClip();
+  if (sel) {
+    sel.clip.docFocus = true;
+    sel.clip.docStyle = 'white';
+    if (sel.clip.docDimOpacity === undefined) sel.clip.docDimOpacity = 0.65;
+    // Auto-detect existing highlights if present, preserving them!
+    sel.clip.docFocusRect = autoDetectFocusRectFromHighlights(sel.clip);
+    setStudioTool('doc-focus', 'white');
+    selectClip(sel.clip, sel.trackType);
+    const docBody = document.getElementById('inspector-doc-focus-controls-body');
+    if (docBody) docBody.style.display = 'block';
+    showTextTimingAlert('Whiteout Focus Active: Surrounding text faded cleanly. Drag on canvas anytime to adjust.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  } else {
+    showTextTimingAlert('Please add or position playhead over an image first.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  }
+});
+
+document.getElementById('btn-inspector-doc-dark')?.addEventListener('click', () => {
+  const sel = getOrSelectActiveMediaClip();
+  if (sel) {
+    sel.clip.docFocus = true;
+    sel.clip.docStyle = 'dark';
+    if (sel.clip.docDimOpacity === undefined) sel.clip.docDimOpacity = 0.65;
+    // Auto-detect existing highlights if present, preserving them!
+    sel.clip.docFocusRect = autoDetectFocusRectFromHighlights(sel.clip);
+    setStudioTool('doc-focus', 'dark');
+    selectClip(sel.clip, sel.trackType);
+    const docBody = document.getElementById('inspector-doc-focus-controls-body');
+    if (docBody) docBody.style.display = 'block';
+    showTextTimingAlert('Dark Spotlight Active: Surrounding text dimmed. Drag on canvas anytime to adjust.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  } else {
+    showTextTimingAlert('Please add or position playhead over an image first.', 'warning');
     setTimeout(() => showTextTimingAlert(''), 3000);
   }
 });
 
 document.getElementById('btn-inspector-doc-guide')?.addEventListener('click', () => {
-  if (selectedClip && selectedClip.clip) {
-    openArticleFocusGuideModal(selectedClip.clip);
-  } else {
-    openArticleFocusGuideModal(null);
-  }
+  openDocFocusGuideModal();
 });
 
 document.getElementById('btn-inspector-doc-highlight')?.addEventListener('click', () => {
-  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
-    activeTool = 'doc-highlight';
-    canvas.classList.add('tool-doc-highlight');
-    toggleDrawingDock(false);
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    showTextTimingAlert('Animated Highlighter Active: Drag across words/lines on the image.', 'info');
+  const sel = getOrSelectActiveMediaClip();
+  if (sel) {
+    setStudioTool('doc-highlight');
+    const docBody = document.getElementById('inspector-doc-focus-controls-body');
+    if (docBody) docBody.style.display = 'block';
+    showTextTimingAlert('Highlighter Active: Drag across words or lines on the canvas to add sweeping highlight bars.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  } else {
+    showTextTimingAlert('Please add or position playhead over an image first.', 'warning');
     setTimeout(() => showTextTimingAlert(''), 3000);
   }
 });
 
-// Modal open & selection logic
-function openArticleFocusGuideModal(clip) {
-  const modal = document.getElementById('modal-doc-focus-guide');
-  if (!modal) return;
-  modal.style.display = 'flex';
+// Color Presets (Cyan, Yellow, Green)
+document.querySelectorAll('.hl-preset-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const color = btn.getAttribute('data-color') || '#38bdf8';
+    const colorInput = document.getElementById('inspector-doc-hl-color');
+    if (colorInput) colorInput.value = color;
 
-  const closeBtn = document.getElementById('btn-close-doc-guide');
-  const closeFooter = document.getElementById('btn-close-doc-guide-footer');
-  const closeModal = () => { modal.style.display = 'none'; };
-  if (closeBtn) closeBtn.onclick = closeModal;
-  if (closeFooter) closeFooter.onclick = closeModal;
+    document.querySelectorAll('.hl-preset-btn').forEach(b => {
+      b.style.boxShadow = 'none';
+      b.style.fontWeight = 'normal';
+    });
+    btn.style.boxShadow = '0 0 0 2px #ffffff';
+    btn.style.fontWeight = 'bold';
 
-  const btnWhite = document.getElementById('btn-guide-start-whiteout');
-  const btnDark = document.getElementById('btn-guide-start-dark');
+    if (selectedClip && selectedClip.clip) {
+      if (selectedClip.clip.highlights && selectedClip.clip.highlights.length > 0) {
+        selectedClip.clip.highlights.forEach(h => h.color = color);
+      }
+      selectedClip.clip.docHlColor = color;
+      recordState('Change Highlighter Color Preset');
+    }
+    showTextTimingAlert(`Highlighter color: ${btn.textContent.trim()}`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+});
 
-  if (btnWhite) {
-    btnWhite.onclick = () => {
-      closeModal();
-      activeTool = 'doc-focus';
-      window._activeDocStyle = 'white';
-      canvas.classList.add('tool-doc-focus');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
-      showTextTimingAlert('Step 1: Drag a box on the canvas over the text to white-out the rest.', 'info');
-      setTimeout(() => showTextTimingAlert(''), 4000);
-    };
+// Custom Color Picker input
+document.getElementById('inspector-doc-hl-color')?.addEventListener('input', (e) => {
+  const color = e.target.value;
+  if (selectedClip && selectedClip.clip) {
+    if (selectedClip.clip.highlights && selectedClip.clip.highlights.length > 0) {
+      selectedClip.clip.highlights.forEach(h => h.color = color);
+    }
+    selectedClip.clip.docHlColor = color;
   }
-
-  if (btnDark) {
-    btnDark.onclick = () => {
-      closeModal();
-      activeTool = 'doc-focus';
-      window._activeDocStyle = 'dark';
-      canvas.classList.add('tool-doc-focus');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
-      showTextTimingAlert('Step 1: Drag a box on the canvas over the target area to dim surroundings.', 'info');
-      setTimeout(() => showTextTimingAlert(''), 4000);
-    };
-  }
-
-  const btnProduct = document.getElementById('btn-guide-start-product-spotlight');
-  if (btnProduct) {
-    btnProduct.onclick = () => {
-      closeModal();
-      activeTool = 'doc-product-spotlight';
-      canvas.classList.add('tool-doc-highlight');
-      toggleDrawingDock(false);
-      document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-      document.getElementById('btn-dropdown-fx')?.classList.add('active');
-      const labelRow = document.getElementById('row-product-spotlight-label');
-      if (labelRow) labelRow.style.display = 'block';
-      showTextTimingAlert('Step 1: Drag a box around your product, price, CTA, or key element on the image.', 'info');
-      setTimeout(() => showTextTimingAlert(''), 4000);
-    };
-  }
-}
+  document.querySelectorAll('.hl-preset-btn').forEach(b => {
+    const c = b.getAttribute('data-color');
+    const isActive = c && c.toLowerCase() === color.toLowerCase();
+    b.style.boxShadow = isActive ? '0 0 0 2px #ffffff' : 'none';
+    b.style.fontWeight = isActive ? 'bold' : 'normal';
+  });
+});
+document.getElementById('inspector-doc-hl-color')?.addEventListener('change', () => {
+  recordState('Change Custom Highlighter Color');
+});
 
 document.getElementById('inspector-doc-dim')?.addEventListener('input', (e) => {
   if (selectedClip && selectedClip.clip) {
@@ -4129,8 +4305,8 @@ document.getElementById('inspector-doc-feather')?.addEventListener('change', () 
 document.getElementById('btn-doc-style-white')?.addEventListener('click', () => {
   if (selectedClip && selectedClip.clip) {
     selectedClip.clip.docStyle = 'white';
-    selectedClip.clip.docDimOpacity = 0.82;
-    selectedClip.clip.docFeather = 20;
+    selectedClip.clip.docDimOpacity = 0.65;
+    selectedClip.clip.docFeather = 18;
     selectClip(selectedClip.clip, selectedClip.trackType);
     recordState('Set Focus Style: Whiteout Fade');
   }
@@ -4161,69 +4337,199 @@ document.getElementById('inspector-doc-speed')?.addEventListener('change', () =>
   recordState('Change Highlight Sweep Speed');
 });
 
-document.getElementById('btn-clear-highlights')?.addEventListener('click', () => {
-  if (selectedClip && selectedClip.clip) {
-    selectedClip.clip.highlights = [];
-    selectedClip.clip.productSpotlights = [];
-    delete selectedClip.clip.docFocus;
-    delete selectedClip.clip.docFocusRect;
-    selectClip(selectedClip.clip, selectedClip.trackType);
-    recordState('Clear All Article FX');
-    showTextTimingAlert('All article FX cleared', 'info');
-    setTimeout(() => showTextTimingAlert(''), 2000);
-  }
+// Article Focus & Highlighter Interactive Guide Modal
+function openDocFocusGuideModal() {
+  const modal = document.getElementById('doc-focus-guide-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+}
+
+function closeDocFocusGuideModal() {
+  const modal = document.getElementById('doc-focus-guide-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+document.getElementById('btn-close-doc-guide-modal')?.addEventListener('click', closeDocFocusGuideModal);
+document.getElementById('btn-cancel-doc-guide')?.addEventListener('click', closeDocFocusGuideModal);
+document.getElementById('doc-focus-guide-modal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'doc-focus-guide-modal') closeDocFocusGuideModal();
 });
 
-// Clear Focus Only (preserve highlights & product spotlights)
-document.getElementById('btn-clear-focus-only')?.addEventListener('click', () => {
+// Modal Style Card Selection: Whiteout vs Dark
+document.getElementById('btn-modal-select-whiteout')?.addEventListener('click', () => {
+  closeDocFocusGuideModal();
+  const sel = getOrSelectActiveMediaClip();
+  if (sel) {
+    sel.clip.docFocus = true;
+    sel.clip.docStyle = 'white';
+    if (sel.clip.docDimOpacity === undefined) sel.clip.docDimOpacity = 0.65;
+    if (!sel.clip.docFocusRect) {
+      sel.clip.docFocusRect = { x: 0.12, y: 0.28, w: 0.76, h: 0.24 };
+    }
+    selectClip(sel.clip, sel.trackType);
+  }
+  setStudioTool('doc-focus', 'white');
+  showTextTimingAlert('Whiteout Focus Active: Drag a rectangle over the paragraph to fade surrounding text to white.', 'info');
+  setTimeout(() => showTextTimingAlert(''), 4000);
+});
+
+document.getElementById('btn-modal-select-dark')?.addEventListener('click', () => {
+  closeDocFocusGuideModal();
+  const sel = getOrSelectActiveMediaClip();
+  if (sel) {
+    sel.clip.docFocus = true;
+    sel.clip.docStyle = 'dark';
+    if (sel.clip.docDimOpacity === undefined) sel.clip.docDimOpacity = 0.65;
+    if (!sel.clip.docFocusRect) {
+      sel.clip.docFocusRect = { x: 0.12, y: 0.28, w: 0.76, h: 0.24 };
+    }
+    selectClip(sel.clip, sel.trackType);
+  }
+  setStudioTool('doc-focus', 'dark');
+  showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the paragraph to dim surroundings into theater mode.', 'info');
+  setTimeout(() => showTextTimingAlert(''), 4000);
+});
+
+// Also allow clicking directly on the preview cards in the modal
+document.getElementById('modal-card-whiteout')?.addEventListener('click', (e) => {
+  if (e.target.id === 'btn-modal-select-whiteout') return;
+  document.getElementById('btn-modal-select-whiteout')?.click();
+});
+
+document.getElementById('modal-card-dark')?.addEventListener('click', (e) => {
+  if (e.target.id === 'btn-modal-select-dark') return;
+  document.getElementById('btn-modal-select-dark')?.click();
+});
+
+// Un-whiteout / Timed Focus Controls
+document.getElementById('btn-toggle-unwhiteout')?.addEventListener('click', () => {
   if (selectedClip && selectedClip.clip) {
-    delete selectedClip.clip.docFocus;
-    delete selectedClip.clip.docFocusRect;
-    selectClip(selectedClip.clip, selectedClip.trackType);
-    recordState('Clear Article Focus Overlay');
-    showTextTimingAlert('Focus overlay cleared — highlights & spotlights preserved', 'info');
+    const clip = selectedClip.clip;
+    if (clip.docFocusDuration && clip.docFocusDuration > 0) {
+      delete clip.docFocusDuration;
+      showTextTimingAlert('Focus stays for the entire clip', 'info');
+    } else {
+      clip.docFocusDuration = 2.0;
+      showTextTimingAlert('Timed focus active: Will smoothly un-whiteout after 2.0s', 'success');
+    }
+    selectClip(clip, selectedClip.trackType);
+    renderAllTimelineTracks();
+    recordState('Toggle Timed Focus (Auto-Restore)');
     setTimeout(() => showTextTimingAlert(''), 2500);
   }
 });
 
-// Inspector Product Spotlight button — activates doc-product-spotlight marquee tool
-document.getElementById('btn-inspector-product-spotlight')?.addEventListener('click', () => {
-  if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
-    activeTool = 'doc-product-spotlight';
-    canvas.classList.add('tool-doc-highlight');
-    toggleDrawingDock(false);
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    const labelRow = document.getElementById('row-product-spotlight-label');
-    if (labelRow) labelRow.style.display = 'block';
-    showTextTimingAlert('Product Spotlight: Drag a box around any product, CTA, or key element.', 'info');
-    setTimeout(() => showTextTimingAlert(''), 3500);
+document.getElementById('inspector-doc-focus-dur')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 10;
+    selectedClip.clip.docFocusDuration = val;
+    const lbl = document.getElementById('inspector-doc-focus-dur-val');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}s`;
+    renderAllTimelineTracks();
+  }
+});
+document.getElementById('inspector-doc-focus-dur')?.addEventListener('change', () => {
+  recordState('Change Focus Hold Duration');
+});
+
+// 1-Click Instant Un-whiteout button
+document.getElementById('btn-unwhiteout-now')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    delete selectedClip.clip.docFocus;
+    delete selectedClip.clip.docFocusDuration;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    renderAllTimelineTracks();
+    recordState('Un-whiteout Document');
+    showTextTimingAlert('Un-whiteout: Document restored!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
   }
 });
 
-// Spotlight label live edit — updates label on the most recently added spotlight
-document.getElementById('inspector-spotlight-label')?.addEventListener('input', (e) => {
-  if (selectedClip && selectedClip.clip && selectedClip.clip.productSpotlights && selectedClip.clip.productSpotlights.length > 0) {
-    selectedClip.clip.productSpotlights[selectedClip.clip.productSpotlights.length - 1].label = e.target.value.trim();
+// Document Camera Scroll Preset Buttons (Top to bottom, Horizontal, Highlight Flow)
+document.querySelectorAll('.doc-scroll-preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (selectedClip && selectedClip.clip) {
+      const mode = btn.getAttribute('data-mode');
+      const clip = selectedClip.clip;
+      clip.docScroll = true;
+      clip.docScrollMode = mode;
+      if (!clip.docScrollDistance) clip.docScrollDistance = 280;
+      if (clip.docScrollLinger === undefined) clip.docScrollLinger = 1.0;
+      if (!clip.docScrollSpeed) clip.docScrollSpeed = 3.0;
+      selectClip(clip, selectedClip.trackType);
+      renderAllTimelineTracks();
+      recordState(`Enable Document Camera Scroll: ${mode}`);
+      const modeLabels = { down: 'Top to bottom', across: 'Horizontal glide', zigzag: 'Highlight Flow' };
+      showTextTimingAlert(`Camera Scroll: ${modeLabels[mode] || mode} active!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    }
+  });
+});
+
+document.getElementById('inspector-doc-scroll-dist')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value);
+    selectedClip.clip.docScrollDistance = val;
+    const lbl = document.getElementById('inspector-doc-scroll-dist-val');
+    if (lbl) lbl.textContent = `${val}px`;
+    renderAllTimelineTracks();
+  }
+});
+document.getElementById('inspector-doc-scroll-dist')?.addEventListener('change', () => {
+  recordState('Change Document Scroll Distance');
+});
+
+document.getElementById('inspector-doc-scroll-linger')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 10;
+    selectedClip.clip.docScrollLinger = val;
+    const lbl = document.getElementById('inspector-doc-scroll-linger-val');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}s`;
+    renderAllTimelineTracks();
+  }
+});
+document.getElementById('inspector-doc-scroll-linger')?.addEventListener('change', () => {
+  recordState('Change Document Scroll Linger Time');
+});
+
+document.getElementById('inspector-doc-scroll-speed')?.addEventListener('input', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    const val = parseInt(e.target.value) / 10;
+    selectedClip.clip.docScrollSpeed = val;
+    const lbl = document.getElementById('inspector-doc-scroll-speed-val');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}s`;
+    renderAllTimelineTracks();
+  }
+});
+document.getElementById('inspector-doc-scroll-speed')?.addEventListener('change', () => {
+  recordState('Change Document Scroll Speed');
+});
+
+document.getElementById('btn-disable-doc-scroll')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    delete selectedClip.clip.docScroll;
+    delete selectedClip.clip.docScrollMode;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    renderAllTimelineTracks();
+    recordState('Disable Document Camera Scroll');
+    showTextTimingAlert('Document Camera Scroll disabled', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
   }
 });
 
-// Toolbar: Product Spotlight tool menu item
-document.getElementById('tool-doc-product-spotlight')?.addEventListener('click', () => {
-  document.querySelectorAll('.tool-menu-item').forEach(m => m.classList.remove('active'));
-  document.getElementById('tool-doc-product-spotlight')?.classList.add('active');
-  document.querySelectorAll('.tool-dropdown-menu').forEach(m => m.classList.remove('show'));
-  activeTool = 'doc-product-spotlight';
-  canvas.classList.add('tool-doc-highlight');
-  toggleDrawingDock(false);
-  document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-dropdown-fx')?.classList.add('active');
-  const labelRow = document.getElementById('row-product-spotlight-label');
-  if (labelRow) labelRow.style.display = 'block';
-  showTextTimingAlert('Product Spotlight: Drag around any product, price tag, CTA or element to place an animated glowing border.', 'info');
-  setTimeout(() => showTextTimingAlert(''), 4000);
+document.getElementById('btn-clear-highlights')?.addEventListener('click', () => {
+  const sel = getOrSelectActiveMediaClip();
+  if (sel && sel.clip) {
+    sel.clip.highlights = [];
+    delete sel.clip.docFocus;
+    delete sel.clip.docFocusRect;
+    selectClip(sel.clip, sel.trackType);
+    renderAllTimelineTracks();
+    recordState('Clear Article Focus & Highlights');
+    showTextTimingAlert('Article focus & highlights cleared', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
 });
-
 
 // Reset Clip Properties to Default (Local Reset)
 document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', () => {
@@ -4248,7 +4554,6 @@ document.getElementById('btn-reset-inspector-clip')?.addEventListener('click', (
       delete selectedClip.clip.docDimOpacity;
       delete selectedClip.clip.docFeather;
       delete selectedClip.clip.highlights;
-      delete selectedClip.clip.productSpotlights;
     }
     selectClip(selectedClip.clip, selectedClip.trackType);
     renderAllTimelineTracks();
@@ -4821,6 +5126,16 @@ window.addEventListener('keydown', (e) => {
   } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y' && !isInput) {
     e.preventDefault();
     redo();
+  } else if (e.key === 'Escape') {
+    if (activeTool !== 'select') {
+      setStudioTool('select');
+      isMarqueeDragging = false;
+      marqueeTargetClip = null;
+      showTextTimingAlert('Switched to Selection Tool', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+    }
+  } else if (!isInput && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === 'v') {
+    setStudioTool('select');
   }
 });
 
@@ -4928,9 +5243,12 @@ function renderAllTextsOverview() {
 
 // ==================== CANVAS INTERACTIVE TRANSFORM CONTROLS (DRAG & RESIZE) ====================
 let isTransforming = false;
-let transformAction = null; // 'drag' or 'resize'
+let transformAction = null; // 'drag', 'resize', 'doc-focus-drag', 'doc-focus-resize'
 let transformStartPos = { x: 0, y: 0 };
 let transformInitialClip = { x: 0, y: 0, scale: 1.0 };
+let transformInitialFocusRect = null;
+let transformInitialHighlights = null;
+let transformInitialZoomOrigin = null;
 let activeResizeHandle = null;
 
 function getCanvasPointer(e) {
@@ -4953,8 +5271,130 @@ function initCanvasTransformInteraction() {
   canvas.addEventListener('mousedown', (e) => {
     const pt = getCanvasPointer(e);
 
+    // 0. Check if click hits the interactive Document Focus Box & Handles (in select, doc-focus, or doc-highlight modes)
+    if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video') && selectedClip.clip.docFocus && selectedClip.clip._docFocusBounds) {
+      const fb = selectedClip.clip._docFocusBounds;
+      const handleSize = 22;
+      const corners = [
+        { type: 'tl', x: fb.x, y: fb.y },
+        { type: 'tr', x: fb.x + fb.w, y: fb.y },
+        { type: 'bl', x: fb.x, y: fb.y + fb.h },
+        { type: 'br', x: fb.x + fb.w, y: fb.y + fb.h }
+      ];
+
+      for (const c of corners) {
+        if (Math.abs(pt.x - c.x) <= handleSize && Math.abs(pt.y - c.y) <= handleSize) {
+          isTransforming = true;
+          transformAction = 'doc-focus-resize';
+          activeResizeHandle = c.type;
+          transformStartPos = pt;
+          transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
+          transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
+          transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+          e.preventDefault();
+          return;
+        }
+      }
+
+      // Check edge handles for easy resizing of sides
+      if (Math.abs(pt.x - (fb.x + fb.w)) <= 14 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+        isTransforming = true;
+        transformAction = 'doc-focus-resize';
+        activeResizeHandle = 'r';
+        transformStartPos = pt;
+        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
+        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
+        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+        e.preventDefault();
+        return;
+      }
+      if (Math.abs(pt.y - (fb.y + fb.h)) <= 14 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+        isTransforming = true;
+        transformAction = 'doc-focus-resize';
+        activeResizeHandle = 'b';
+        transformStartPos = pt;
+        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
+        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
+        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+        e.preventDefault();
+        return;
+      }
+      if (Math.abs(pt.x - fb.x) <= 14 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+        isTransforming = true;
+        transformAction = 'doc-focus-resize';
+        activeResizeHandle = 'l';
+        transformStartPos = pt;
+        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
+        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
+        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+        e.preventDefault();
+        return;
+      }
+      if (Math.abs(pt.y - fb.y) <= 14 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+        isTransforming = true;
+        transformAction = 'doc-focus-resize';
+        activeResizeHandle = 't';
+        transformStartPos = pt;
+        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
+        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
+        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+        e.preventDefault();
+        return;
+      }
+
+      // If clicking inside focus box or on its prominent drag tag
+      if (pt.x >= (fb.x - 8) && pt.x <= (fb.x + fb.w + 8) && pt.y >= (fb.y - 28) && pt.y <= (fb.y + fb.h + 8)) {
+        isTransforming = true;
+        transformAction = 'doc-focus-drag';
+        transformStartPos = pt;
+        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
+        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
+        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // 0b. Check if click hits an individual Highlight bar or its resize handles (to drag, jog, or adjust words)
+    if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video') && selectedClip.clip.highlights && selectedClip.clip.highlights.length > 0) {
+      let hitHlIdx = -1;
+      let hitHlAction = null;
+      let hitHlHandle = null;
+
+      for (let i = selectedClip.clip.highlights.length - 1; i >= 0; i--) {
+        const hl = selectedClip.clip.highlights[i];
+        const hb = hl._screenBounds;
+        if (!hb) continue;
+
+        const hSize = 16;
+        // Check resize handles: br, tl, r, l
+        if (Math.abs(pt.x - (hb.x + hb.w)) <= hSize && Math.abs(pt.y - (hb.y + hb.h)) <= hSize) {
+          hitHlIdx = i; hitHlAction = 'hl-resize'; hitHlHandle = 'br'; break;
+        } else if (Math.abs(pt.x - hb.x) <= hSize && Math.abs(pt.y - hb.y) <= hSize) {
+          hitHlIdx = i; hitHlAction = 'hl-resize'; hitHlHandle = 'tl'; break;
+        } else if (Math.abs(pt.x - (hb.x + hb.w)) <= hSize && pt.y >= (hb.y - 6) && pt.y <= (hb.y + hb.h + 6)) {
+          hitHlIdx = i; hitHlAction = 'hl-resize'; hitHlHandle = 'r'; break;
+        } else if (Math.abs(pt.x - hb.x) <= hSize && pt.y >= (hb.y - 6) && pt.y <= (hb.y + hb.h + 6)) {
+          hitHlIdx = i; hitHlAction = 'hl-resize'; hitHlHandle = 'l'; break;
+        } else if (pt.x >= (hb.x - 4) && pt.x <= (hb.x + hb.w + 4) && pt.y >= (hb.y - 18) && pt.y <= (hb.y + hb.h + 4)) {
+          hitHlIdx = i; hitHlAction = 'hl-drag'; hitHlHandle = 'drag'; break;
+        }
+      }
+
+      if (hitHlIdx >= 0) {
+        window._selectedHighlightIndex = hitHlIdx;
+        isTransforming = true;
+        transformAction = hitHlAction;
+        activeResizeHandle = hitHlHandle;
+        transformStartPos = pt;
+        transformInitialClip = { ...selectedClip.clip.highlights[hitHlIdx] };
+        e.preventDefault();
+        return;
+      }
+    }
+
     // ==================== PUNCH ZOOM, LOUPE, DOC FOCUS & HIGHLIGHTER TOOLS ====================
-    if (activeTool === 'snap-zoom' || activeTool === 'loupe' || activeTool === 'doc-focus' || activeTool === 'doc-highlight' || activeTool === 'doc-product-spotlight') {
+    if (activeTool === 'snap-zoom' || activeTool === 'loupe' || activeTool === 'doc-focus' || activeTool === 'doc-highlight') {
       // Find top visible image or video layer clicked on
       const activeMedia = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
       let targetMediaClip = null;
@@ -5184,11 +5624,166 @@ function initCanvasTransformInteraction() {
       return;
     }
 
+    // Mouse hover cursor hints when over focus box or highlights
+    if (!isTransforming && !isMarqueeDragging) {
+      if (selectedClip && selectedClip.clip && selectedClip.clip._docFocusBounds) {
+        const fb = selectedClip.clip._docFocusBounds;
+        const corners = [
+          { type: 'tl', x: fb.x, y: fb.y, cursor: 'nwse-resize' },
+          { type: 'tr', x: fb.x + fb.w, y: fb.y, cursor: 'nesw-resize' },
+          { type: 'bl', x: fb.x, y: fb.y + fb.h, cursor: 'nesw-resize' },
+          { type: 'br', x: fb.x + fb.w, y: fb.y + fb.h, cursor: 'nwse-resize' }
+        ];
+        const hoverCorner = corners.find(c => Math.abs(pt.x - c.x) <= 20 && Math.abs(pt.y - c.y) <= 20);
+        if (hoverCorner) {
+          canvas.style.cursor = hoverCorner.cursor;
+          return;
+        }
+        if (Math.abs(pt.x - (fb.x + fb.w)) <= 12 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+          canvas.style.cursor = 'ew-resize';
+          return;
+        }
+        if (Math.abs(pt.x - fb.x) <= 12 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+          canvas.style.cursor = 'ew-resize';
+          return;
+        }
+        if (Math.abs(pt.y - (fb.y + fb.h)) <= 12 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+          canvas.style.cursor = 'ns-resize';
+          return;
+        }
+        if (Math.abs(pt.y - fb.y) <= 12 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+          canvas.style.cursor = 'ns-resize';
+          return;
+        }
+        if (pt.x >= (fb.x - 8) && pt.x <= (fb.x + fb.w + 8) && pt.y >= (fb.y - 28) && pt.y <= (fb.y + fb.h + 8)) {
+          canvas.style.cursor = 'move';
+          return;
+        }
+      }
+
+      // Check hover over individual highlights
+      if (selectedClip && selectedClip.clip && selectedClip.clip.highlights) {
+        for (let i = selectedClip.clip.highlights.length - 1; i >= 0; i--) {
+          const hl = selectedClip.clip.highlights[i];
+          const hb = hl._screenBounds;
+          if (hb && pt.x >= (hb.x - 4) && pt.x <= (hb.x + hb.w + 4) && pt.y >= (hb.y - 18) && pt.y <= (hb.y + hb.h + 4)) {
+            canvas.style.cursor = 'move';
+            window._hoveredHighlightIndex = i;
+            return;
+          }
+        }
+        window._hoveredHighlightIndex = undefined;
+      }
+
+      canvas.style.cursor = 'default';
+    }
+
     if (!isTransforming || !selectedClip) return;
     const pt = getCanvasPointer(e);
     const clip = selectedClip.clip;
 
-    if (selectedClip.trackType === 'text') {
+    if (transformAction === 'hl-drag') {
+      const hl = clip.highlights && window._selectedHighlightIndex !== undefined ? clip.highlights[window._selectedHighlightIndex] : null;
+      if (hl && transformInitialClip) {
+        const pScale = hl._screenBounds?.punchScale || 1.0;
+        const b = clip._renderBounds;
+        const fw = (b ? b.w : canvas.width) * pScale;
+        const fh = (b ? b.h : canvas.height) * pScale;
+        const dx = (pt.x - transformStartPos.x) / Math.max(1, fw);
+        const dy = (pt.y - transformStartPos.y) / Math.max(1, fh);
+        hl.x = Math.max(0.01, Math.min(0.98 - hl.w, transformInitialClip.x + dx));
+        hl.y = Math.max(0.01, Math.min(0.98 - hl.h, transformInitialClip.y + dy));
+      }
+    } else if (transformAction === 'hl-resize') {
+      const hl = clip.highlights && window._selectedHighlightIndex !== undefined ? clip.highlights[window._selectedHighlightIndex] : null;
+      if (hl && transformInitialClip) {
+        const pScale = hl._screenBounds?.punchScale || 1.0;
+        const b = clip._renderBounds;
+        const fw = (b ? b.w : canvas.width) * pScale;
+        const fh = (b ? b.h : canvas.height) * pScale;
+        const dx = (pt.x - transformStartPos.x) / Math.max(1, fw);
+        const dy = (pt.y - transformStartPos.y) / Math.max(1, fh);
+        const init = transformInitialClip;
+        if (activeResizeHandle === 'r' || activeResizeHandle === 'br') {
+          hl.w = Math.max(0.015, Math.min(1.0 - init.x, init.w + dx));
+          if (activeResizeHandle === 'br') hl.h = Math.max(0.01, Math.min(1.0 - init.y, init.h + dy));
+        } else if (activeResizeHandle === 'l' || activeResizeHandle === 'tl') {
+          hl.x = Math.max(0.01, Math.min(init.x + init.w - 0.015, init.x + dx));
+          hl.w = Math.max(0.015, init.w - dx);
+          if (activeResizeHandle === 'tl') {
+            hl.y = Math.max(0.01, Math.min(init.y + init.h - 0.01, init.y + dy));
+            hl.h = Math.max(0.01, init.h - dy);
+          }
+        }
+      }
+    } else if (transformAction === 'doc-focus-drag') {
+      const dx = pt.x - transformStartPos.x;
+      const dy = pt.y - transformStartPos.y;
+      const pScale = clip._docFocusBounds?.punchScale || 1.0;
+      const fw = (clip._docFocusBounds ? clip._docFocusBounds.finalW : canvas.width) * pScale;
+      const fh = (clip._docFocusBounds ? clip._docFocusBounds.finalH : canvas.height) * pScale;
+      const deltaNormX = dx / Math.max(1, fw);
+      const deltaNormY = dy / Math.max(1, fh);
+
+      if (clip.docFocusRect && transformInitialFocusRect) {
+        clip.docFocusRect.x = Math.max(0.01, Math.min(0.98 - clip.docFocusRect.w, transformInitialFocusRect.x + deltaNormX));
+        clip.docFocusRect.y = Math.max(0.01, Math.min(0.98 - clip.docFocusRect.h, transformInitialFocusRect.y + deltaNormY));
+      }
+      // Move all linked animated highlights together with the focus box!
+      if (clip.highlights && transformInitialHighlights) {
+        clip.highlights.forEach((h, idx) => {
+          const initH = transformInitialHighlights[idx];
+          if (initH) {
+            h.x = Math.max(0.01, Math.min(0.98, initH.x + deltaNormX));
+            h.y = Math.max(0.01, Math.min(0.98, initH.y + deltaNormY));
+          }
+        });
+      }
+      // Also shift zoom center to follow the dragged focus box
+      if (clip.zoomOriginX !== undefined && transformInitialZoomOrigin && transformInitialZoomOrigin.x !== undefined) {
+        clip.zoomOriginX = Math.max(0.05, Math.min(0.95, transformInitialZoomOrigin.x + deltaNormX));
+        clip.zoomOriginY = Math.max(0.05, Math.min(0.95, transformInitialZoomOrigin.y + deltaNormY));
+      }
+    } else if (transformAction === 'doc-focus-resize') {
+      const dx = pt.x - transformStartPos.x;
+      const dy = pt.y - transformStartPos.y;
+      const pScale = clip._docFocusBounds?.punchScale || 1.0;
+      const fw = (clip._docFocusBounds ? clip._docFocusBounds.finalW : canvas.width) * pScale;
+      const fh = (clip._docFocusBounds ? clip._docFocusBounds.finalH : canvas.height) * pScale;
+      const deltaNormX = dx / Math.max(1, fw);
+      const deltaNormY = dy / Math.max(1, fh);
+      const init = transformInitialFocusRect;
+
+      if (clip.docFocusRect && init) {
+        if (activeResizeHandle === 'br') {
+          clip.docFocusRect.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
+          clip.docFocusRect.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
+        } else if (activeResizeHandle === 'tr') {
+          clip.docFocusRect.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
+          clip.docFocusRect.h = Math.max(0.02, init.h - deltaNormY);
+          clip.docFocusRect.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
+        } else if (activeResizeHandle === 'bl') {
+          clip.docFocusRect.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
+          clip.docFocusRect.w = Math.max(0.04, init.w - deltaNormX);
+          clip.docFocusRect.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
+        } else if (activeResizeHandle === 'tl') {
+          clip.docFocusRect.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
+          clip.docFocusRect.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
+          clip.docFocusRect.w = Math.max(0.04, init.w - deltaNormX);
+          clip.docFocusRect.h = Math.max(0.02, init.h - deltaNormY);
+        } else if (activeResizeHandle === 'r') {
+          clip.docFocusRect.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
+        } else if (activeResizeHandle === 'b') {
+          clip.docFocusRect.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
+        } else if (activeResizeHandle === 'l') {
+          clip.docFocusRect.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
+          clip.docFocusRect.w = Math.max(0.04, init.w - deltaNormX);
+        } else if (activeResizeHandle === 't') {
+          clip.docFocusRect.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
+          clip.docFocusRect.h = Math.max(0.02, init.h - deltaNormY);
+        }
+      }
+    } else if (selectedClip.trackType === 'text') {
       if (transformAction === 'drag') {
         const dx = pt.x - transformStartPos.x;
         const dy = pt.y - transformStartPos.y;
@@ -5224,6 +5819,18 @@ function initCanvasTransformInteraction() {
   });
 
   window.addEventListener('mouseup', (e) => {
+    if (transformAction === 'hl-drag' || transformAction === 'hl-resize') {
+      recordState('Adjust Highlight Box');
+      isTransforming = false;
+      transformAction = null;
+      return;
+    }
+    if (transformAction === 'doc-focus-drag' || transformAction === 'doc-focus-resize') {
+      recordState('Adjust Focus Box & Highlights');
+      isTransforming = false;
+      transformAction = null;
+      return;
+    }
     // Finish Marquee Dragging for Zoom / Loupe Tool
     if (isMarqueeDragging && marqueeTargetClip) {
       isMarqueeDragging = false;
@@ -5235,24 +5842,32 @@ function initCanvasTransformInteraction() {
         const y2 = Math.max(marqueeStartPt.y, marqueeCurrentPt.y);
         const dragDist = Math.hypot(x2 - x1, y2 - y1);
 
+        // Account for active camera punch zoom so coordinates land accurately on underlying text
+        const punch = getClipPunchZoom(marqueeTargetClip, currentTime, b.x, b.y, b.w, b.h);
+        const pScale = punch.scale;
+        const localX1 = pScale > 1.001 ? punch.originX + (x1 - punch.originX) / pScale : x1;
+        const localY1 = pScale > 1.001 ? punch.originY + (y1 - punch.originY) / pScale : y1;
+        const localX2 = pScale > 1.001 ? punch.originX + (x2 - punch.originX) / pScale : x2;
+        const localY2 = pScale > 1.001 ? punch.originY + (y2 - punch.originY) / pScale : y2;
+
+        const selLeft = Math.min(localX1, localX2);
+        const selTop = Math.min(localY1, localY2);
+        const selW = Math.max(20, Math.abs(localX2 - localX1));
+        const selH = Math.max(12, Math.abs(localY2 - localY1));
+
         if (activeTool === 'doc-focus') {
           // USER SELECTED ARTICLE FOCUS (DIM SURROUNDINGS & SPOTLIGHT TARGET)
-          const selLeft = Math.min(x1, x2);
-          const selTop = Math.min(y1, y2);
-          const selW = Math.max(30, x2 - x1);
-          const selH = Math.max(20, y2 - y1);
-
-          const normX = Math.max(0, Math.min(0.95, (selLeft - b.x) / b.w));
-          const normY = Math.max(0, Math.min(0.95, (selTop - b.y) / b.h));
+          const normX = Math.max(0.01, Math.min(0.95, (selLeft - b.x) / b.w));
+          const normY = Math.max(0.01, Math.min(0.95, (selTop - b.y) / b.h));
           const normW = Math.min(1.0 - normX, Math.max(0.05, selW / b.w));
-          const normH = Math.min(1.0 - normY, Math.max(0.05, selH / b.h));
+          const normH = Math.min(1.0 - normY, Math.max(0.04, selH / b.h));
 
           const chosenStyle = window._activeDocStyle || (marqueeTargetClip.docStyle || 'white');
           marqueeTargetClip.docStyle = chosenStyle;
           marqueeTargetClip.docFocus = true;
           marqueeTargetClip.docFocusRect = { x: normX, y: normY, w: normW, h: normH };
-          if (marqueeTargetClip.docDimOpacity === undefined) marqueeTargetClip.docDimOpacity = chosenStyle === 'white' ? 0.82 : 0.65;
-          if (marqueeTargetClip.docFeather === undefined) marqueeTargetClip.docFeather = chosenStyle === 'white' ? 20 : 16;
+          if (marqueeTargetClip.docDimOpacity === undefined) marqueeTargetClip.docDimOpacity = 0.65;
+          if (marqueeTargetClip.docFeather === undefined) marqueeTargetClip.docFeather = chosenStyle === 'white' ? 18 : 16;
           
           // Also gently zoom camera into the paragraph for cinematic Vox effect
           marqueeTargetClip.zoomEffect = 'snap';
@@ -5271,23 +5886,20 @@ function initCanvasTransformInteraction() {
           const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
           selectClip(marqueeTargetClip, trackType);
           recordState(`Set Article ${chosenStyle === 'white' ? 'Whiteout' : 'Dark'} Focus`);
-          showTextTimingAlert(chosenStyle === 'white' ? 'Whiteout Focus active! Surrounding text whited out.' : 'Dark Spotlight active! Surrounding text dimmed.', 'success');
+          showTextTimingAlert(chosenStyle === 'white' ? 'Whiteout Focus active! Surrounding text faded.' : 'Dark Spotlight active! Surrounding text dimmed.', 'success');
           setTimeout(() => showTextTimingAlert(''), 3000);
+          setStudioTool('select');
         } else if (activeTool === 'doc-highlight') {
           // USER HIGHLIGHTED A LINE OR SENTENCE (ANIMATED LIVE SWEEP)
-          const selLeft = Math.min(x1, x2);
-          const selTop = Math.min(y1, y2);
-          const selW = Math.max(20, x2 - x1);
-          const selH = Math.max(12, y2 - y1);
-
-          const normX = Math.max(0, Math.min(0.95, (selLeft - b.x) / b.w));
-          const normY = Math.max(0, Math.min(0.95, (selTop - b.y) / b.h));
-          const normW = Math.min(1.0 - normX, Math.max(0.02, selW / b.w));
-          const normH = Math.min(1.0 - normY, Math.max(0.015, selH / b.h));
+          const normX = Math.max(0.01, Math.min(0.95, (selLeft - b.x) / b.w));
+          const normY = Math.max(0.01, Math.min(0.95, (selTop - b.y) / b.h));
+          const normW = Math.min(1.0 - normX, Math.max(0.015, selW / b.w));
+          const normH = Math.min(1.0 - normY, Math.max(0.01, selH / b.h));
 
           if (!marqueeTargetClip.highlights) marqueeTargetClip.highlights = [];
           const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
-          const hlColor = document.getElementById('inspector-doc-hl-color')?.value || '#38bdf8';
+          let hlColor = document.getElementById('inspector-doc-hl-color')?.value || '#ffff00';
+          if (hlColor.toLowerCase() === '#facc15' || hlColor.toLowerCase() === '#ffe600') hlColor = '#ffff00';
           const sweepSpeedInput = document.getElementById('inspector-doc-speed');
           const speedSec = sweepSpeedInput ? (parseInt(sweepSpeedInput.value) / 10) : 0.6;
 
@@ -5304,7 +5916,7 @@ function initCanvasTransformInteraction() {
             w: normW,
             h: normH,
             color: hlColor,
-            opacity: 0.82,
+            opacity: 0.95,
             startTime: startSec,
             duration: speedSec
           });
@@ -5315,45 +5927,7 @@ function initCanvasTransformInteraction() {
           recordState('Add Animated Text Highlight Bar');
           showTextTimingAlert(`Added animated highlight sweep (${marqueeTargetClip.highlights.length} total)`, 'success');
           setTimeout(() => showTextTimingAlert(''), 2500);
-        } else if (activeTool === 'doc-product-spotlight') {
-          // USER PLACED A PRODUCT SPOTLIGHT (Pulsing glow border / reticle around product area)
-          const selLeft = Math.min(x1, x2);
-          const selTop = Math.min(y1, y2);
-          const selW = Math.max(30, x2 - x1);
-          const selH = Math.max(20, y2 - y1);
-
-          const normX = Math.max(0, Math.min(0.95, (selLeft - b.x) / b.w));
-          const normY = Math.max(0, Math.min(0.95, (selTop - b.y) / b.h));
-          const normW = Math.min(1.0 - normX, Math.max(0.03, selW / b.w));
-          const normH = Math.min(1.0 - normY, Math.max(0.03, selH / b.h));
-
-          if (!marqueeTargetClip.productSpotlights) marqueeTargetClip.productSpotlights = [];
-          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
-          const spotColor = document.getElementById('inspector-doc-hl-color')?.value || '#facc15';
-
-          // Stagger spotlight entrances
-          const prevSp = marqueeTargetClip.productSpotlights[marqueeTargetClip.productSpotlights.length - 1];
-          let spStart = parseFloat((relTime + 0.1).toFixed(2));
-          if (prevSp) spStart = parseFloat((prevSp.startTime + 0.4).toFixed(2));
-
-          marqueeTargetClip.productSpotlights.push({
-            x: normX,
-            y: normY,
-            w: normW,
-            h: normH,
-            color: spotColor,
-            opacity: 0.9,
-            pulseSpeed: 1.8,
-            startTime: spStart,
-            label: ''
-          });
-
-          playSFX('snap_zoom');
-          const spTrackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
-          selectClip(marqueeTargetClip, spTrackType);
-          recordState('Add Product Spotlight');
-          showTextTimingAlert(`Product spotlight placed! (${marqueeTargetClip.productSpotlights.length} total) — Edit label in inspector`, 'success');
-          setTimeout(() => showTextTimingAlert(''), 3000);
+          setStudioTool('select');
         } else {
           // PUNCH ZOOM OR LOUPE
           const effectType = activeTool === 'snap-zoom' ? 'snap' : 'loupe';
@@ -5361,10 +5935,10 @@ function initCanvasTransformInteraction() {
 
           if (dragDist > 16) {
             // USER DRAGGED A CUSTOM AREA / RECTANGLE
-            const selCenterCanvasX = (x1 + x2) / 2;
-            const selCenterCanvasY = (y1 + y2) / 2;
-            const selWidth = Math.max(30, x2 - x1);
-            const selHeight = Math.max(20, y2 - y1);
+            const selCenterCanvasX = selLeft + selW / 2;
+            const selCenterCanvasY = selTop + selH / 2;
+            const selWidth = selW;
+            const selHeight = selH;
 
             // Calculate normalized center origin on target image
             const normX = Math.max(0.02, Math.min(0.98, (selCenterCanvasX - b.x) / b.w));
@@ -5414,6 +5988,7 @@ function initCanvasTransformInteraction() {
             showTextTimingAlert(`${effectType === 'snap' ? 'Punch Zoom' : 'Loupe Callout'} placed!`, 'success');
             setTimeout(() => showTextTimingAlert(''), 2500);
           }
+          setStudioTool('select');
         }
       }
       marqueeTargetClip = null;
@@ -5525,6 +6100,44 @@ function initCanvasTransformInteraction() {
     // 4. Fallback: if a clip is currently selected, open menu for it
     if (selectedClip && selectedClip.clip) {
       showStudioContextMenu(e.clientX, e.clientY, selectedClip.clip, selectedClip.trackType);
+    }
+  });
+
+  // Keyboard shortcut listener for selected highlight (Jogging / Nudging with arrows, Delete/Backspace to remove)
+  window.addEventListener('keydown', (e) => {
+    if (window._selectedHighlightIndex === undefined || window._selectedHighlightIndex === null) return;
+    if (!selectedClip || !selectedClip.clip || !selectedClip.clip.highlights) return;
+    const hl = selectedClip.clip.highlights[window._selectedHighlightIndex];
+    if (!hl) return;
+
+    // Do not trigger if typing in an input or textarea
+    const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+    if (activeTag === 'input' || activeTag === 'textarea' || document.activeElement?.isContentEditable) return;
+
+    const step = e.shiftKey ? 0.01 : 0.002;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      hl.x = Math.max(0, hl.x - step);
+      recordState('Nudge Highlight Left');
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      hl.x = Math.min(1 - hl.w, hl.x + step);
+      recordState('Nudge Highlight Right');
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      hl.y = Math.max(0, hl.y - step);
+      recordState('Nudge Highlight Up');
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      hl.y = Math.min(1 - hl.h, hl.y + step);
+      recordState('Nudge Highlight Down');
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      selectedClip.clip.highlights.splice(window._selectedHighlightIndex, 1);
+      window._selectedHighlightIndex = undefined;
+      recordState('Delete Highlight');
+      showTextTimingAlert('Highlight deleted', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
     }
   });
 }
@@ -6344,17 +6957,8 @@ async function exportVideoProject() {
 
     const combinedStream = new MediaStream(combinedTracks);
 
-    // Pick best supported MIME type — prefer VP9 (better quality) then VP8 for broad compatibility
-    let mimeType = 'video/webm;codecs=vp9,opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm;codecs=vp9';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm;codecs=vp8,opus';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm;codecs=vp8';
-    }
+    // Pick best supported MIME type with broad player support (VLC, Chrome, Windows Media)
+    let mimeType = 'video/webm;codecs=vp8';
     if (!MediaRecorder.isTypeSupported(mimeType)) {
       mimeType = 'video/webm';
     }
@@ -6366,8 +6970,7 @@ async function exportVideoProject() {
     }
 
     exportChunks = [];
-    // 8 Mbps for Shorts/Reels-quality output (crisp text edges, smooth motion)
-    const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 8000000 } : { videoBitsPerSecond: 8000000 };
+    const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 };
     exportRecorder = new MediaRecorder(combinedStream, recorderOptions);
 
     exportRecorder.ondataavailable = (e) => {
@@ -6499,11 +7102,7 @@ function hideStudioContextMenu() {
   }
 }
 
-document.addEventListener('click', (e) => {
-  if (activeStudioContextMenu && !activeStudioContextMenu.contains(e.target)) {
-    hideStudioContextMenu();
-  }
-});
+document.addEventListener('click', () => hideStudioContextMenu());
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') hideStudioContextMenu();
 });
@@ -6601,32 +7200,39 @@ function showStudioContextMenu(x, y, clip, trackType) {
         <span class="context-badge">${clip.zoomEffect === 'loupe' ? 'Active' : 'Lens'}</span>
       </div>
 
-      <!-- 1. Dark Document Spotlight (Original Dim Effect) -->
-      <div class="context-menu-item ${clip.docFocus && clip.docStyle === 'dark' ? 'active-fx' : ''}" id="ctx-action-dark-spotlight">
+      <!-- 1. Dark Document Spotlight (Original Dim) -->
+      <div class="context-menu-item ${clip.docFocus && clip.docStyle === 'dark' ? 'active-fx' : ''}" id="ctx-action-doc-dark">
         <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-        <span>${clip.docFocus && clip.docStyle === 'dark' ? 'Edit Dark Spotlight' : 'Dark Document Spotlight (Dim)'}</span>
-        <span class="context-badge" style="color: #a855f7;">${clip.docFocus && clip.docStyle === 'dark' ? 'Active' : 'Original FX'}</span>
+        <span>${clip.docFocus && clip.docStyle === 'dark' ? 'Remove Dark Spotlight' : '⚫ Dark Document Spotlight'}</span>
+        <span class="context-badge" style="color: #a855f7;">${clip.docFocus && clip.docStyle === 'dark' ? 'Active' : 'Spotlight'}</span>
       </div>
 
-      <!-- 2. Article Whiteout & Animated Highlight (New Article Focus) -->
-      <div class="context-menu-item ${clip.docFocus && clip.docStyle !== 'dark' ? 'active-fx' : ''}" id="ctx-action-whiteout-highlight">
+      <!-- 2. Article Whiteout Fade -->
+      <div class="context-menu-item ${clip.docFocus && clip.docStyle !== 'dark' ? 'active-fx' : ''}" id="ctx-action-doc-white">
         <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
-        <span>${clip.docFocus && clip.docStyle !== 'dark' ? 'Edit Whiteout & Highlight' : 'Article Whiteout & Highlight'}</span>
-        <span class="context-badge" style="color: #38bdf8;">${clip.docFocus && clip.docStyle !== 'dark' ? 'Active' : 'Article FX'}</span>
+        <span>${clip.docFocus && clip.docStyle !== 'dark' ? 'Remove Article Whiteout' : '⚪ Article Whiteout Fade'}</span>
+        <span class="context-badge" style="color: #38bdf8;">${clip.docFocus && clip.docStyle !== 'dark' ? 'Active' : 'Whiteout'}</span>
       </div>
 
-      <!-- Quick FX Guide & Setup Modal Button -->
-      <div class="context-menu-item" id="ctx-action-focus-guide" style="background: rgba(56, 189, 248, 0.08); border-left: 2px solid #38bdf8;">
-        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-        <span>Article FX Guide & Setup...</span>
-        <span class="context-badge" style="color: #38bdf8;">Wizard</span>
+      <!-- 3. Animated Highlighter -->
+      <div class="context-menu-item ${clip.highlights && clip.highlights.length > 0 ? 'active-fx' : ''}" id="ctx-action-doc-hl">
+        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>
+        <span>🖍️ Add Animated Highlighter</span>
+        <span class="context-badge" style="color: #38bdf8;">${clip.highlights && clip.highlights.length > 0 ? `${clip.highlights.length} HL` : 'Sweep'}</span>
       </div>
 
-      <!-- 3. Product Spotlight: Pulsing animated border on products / CTAs -->
-      <div class="context-menu-item ${(clip.productSpotlights && clip.productSpotlights.length > 0) ? 'active-fx' : ''}" id="ctx-action-product-spotlight" style="border-left: 2px solid #facc1560;">
-        <svg viewBox="0 0 24 24" style="color: #facc15;"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 3l3 3M21 3l-3 3M3 21l3-3M21 21l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <span>${(clip.productSpotlights && clip.productSpotlights.length > 0) ? `Edit Spotlights (${clip.productSpotlights.length})` : 'Add Product Spotlight'}</span>
-        <span class="context-badge" style="color: #facc15;">${(clip.productSpotlights && clip.productSpotlights.length > 0) ? 'Active' : 'Glow Pulse'}</span>
+      <!-- 4. Document Camera Scroll / Flow (Right-Click Fast Option) -->
+      <div class="context-menu-item ${clip.docScroll ? 'active-fx' : ''}" id="ctx-action-doc-scroll">
+        <svg viewBox="0 0 24 24" style="color: #10b981;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+        <span>${clip.docScroll ? 'Remove Camera Scroll' : '📜 Document Camera Scroll (Down)'}</span>
+        <span class="context-badge" style="color: #10b981;">${clip.docScroll ? (clip.docScrollMode || 'Active') : 'Flow'}</span>
+      </div>
+
+      <!-- 5. Article FX Guide & Setup Modal -->
+      <div class="context-menu-item" id="ctx-action-doc-guide">
+        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-10-4.48-10-10-10zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+        <span>❓ Article FX Guide & Setup...</span>
+        <span class="context-badge" style="color: #00f0ff;">Tutorial</span>
       </div>
 
       <div class="context-menu-divider"></div>
@@ -6772,55 +7378,80 @@ function showStudioContextMenu(x, y, clip, trackType) {
     recordState('Toggle Loupe Callout Effect');
   });
 
-  // 1. Dark Document Spotlight (Original Dim Effect)
-  menu.querySelector('#ctx-action-dark-spotlight')?.addEventListener('click', (e) => {
+  menu.querySelector('#ctx-action-doc-dark')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.docFocus && clip.docStyle === 'dark') {
+      clip.docFocus = false;
+      recordState('Remove Dark Spotlight');
+      showTextTimingAlert('Dark Spotlight removed.', 'info');
+    } else {
+      clip.docFocus = true;
+      clip.docStyle = 'dark';
+      clip.docFocusRect = autoDetectFocusRectFromHighlights(clip);
+      recordState('Enable Dark Spotlight');
+      showTextTimingAlert('Dark Document Spotlight Active!', 'success');
+    }
+    selectClip(clip, trackType);
+    setStudioTool('select');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  });
+
+  menu.querySelector('#ctx-action-doc-white')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.docFocus && clip.docStyle !== 'dark') {
+      clip.docFocus = false;
+      recordState('Remove Article Whiteout');
+      showTextTimingAlert('Whiteout Fade removed.', 'info');
+    } else {
+      clip.docFocus = true;
+      clip.docStyle = 'white';
+      clip.docFocusRect = autoDetectFocusRectFromHighlights(clip);
+      recordState('Enable Article Whiteout Fade');
+      showTextTimingAlert('Article Whiteout Fade Active!', 'success');
+    }
+    selectClip(clip, trackType);
+    setStudioTool('select');
+    setTimeout(() => showTextTimingAlert(''), 3000);
+  });
+
+  menu.querySelector('#ctx-action-doc-hl')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
     selectClip(clip, trackType);
-    activeTool = 'doc-focus';
-    window._activeDocStyle = 'dark';
-    canvas.classList.add('tool-doc-focus');
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle over the target area to dim surroundings.', 'info');
+    setStudioTool('doc-highlight');
+    showTextTimingAlert('Highlighter Active: Drag across words or lines to add sweeping highlight bars.', 'info');
     setTimeout(() => showTextTimingAlert(''), 3500);
   });
 
-  // 2. Article Whiteout & Animated Highlight
-  menu.querySelector('#ctx-action-whiteout-highlight')?.addEventListener('click', (e) => {
+  menu.querySelector('#ctx-action-doc-scroll')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
+    if (clip.docScroll) {
+      delete clip.docScroll;
+      delete clip.docScrollMode;
+      recordState('Remove Document Camera Scroll');
+      showTextTimingAlert('Document Camera Scroll removed.', 'info');
+    } else {
+      clip.docScroll = true;
+      clip.docScrollMode = 'down';
+      if (!clip.docScrollDistance) clip.docScrollDistance = 280;
+      if (clip.docScrollLinger === undefined) clip.docScrollLinger = 1.0;
+      if (!clip.docScrollSpeed) clip.docScrollSpeed = 3.0;
+      recordState('Enable Document Camera Scroll');
+      showTextTimingAlert('Document Camera Scroll (Top-to-Bottom) Active!', 'success');
+    }
     selectClip(clip, trackType);
-    activeTool = 'doc-focus';
-    window._activeDocStyle = 'white';
-    canvas.classList.add('tool-doc-focus');
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    showTextTimingAlert('Whiteout Focus Active: Drag a box over the article paragraph to white-out surrounding text.', 'info');
-    setTimeout(() => showTextTimingAlert(''), 3500);
+    renderAllTimelineTracks();
+    setTimeout(() => showTextTimingAlert(''), 3000);
   });
 
-  // 3. Article FX Guide & Setup Modal
-  menu.querySelector('#ctx-action-focus-guide')?.addEventListener('click', (e) => {
+  menu.querySelector('#ctx-action-doc-guide')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
     selectClip(clip, trackType);
-    openArticleFocusGuideModal(clip);
-  });
-
-  menu.querySelector('#ctx-action-product-spotlight')?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    hideStudioContextMenu();
-    selectClip(clip, trackType);
-    activeTool = 'doc-product-spotlight';
-    canvas.classList.add('tool-doc-highlight');
-    toggleDrawingDock(false);
-    document.querySelectorAll('.tool-group-pill .btn-tool').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-dropdown-fx')?.classList.add('active');
-    const labelRow = document.getElementById('row-product-spotlight-label');
-    if (labelRow) labelRow.style.display = 'block';
-    showTextTimingAlert('Product Spotlight: Drag a box around any product, price, CTA or element on the image.', 'info');
-    setTimeout(() => showTextTimingAlert(''), 4000);
+    openDocFocusGuideModal();
   });
 
   menu.querySelector('#ctx-action-bring-front')?.addEventListener('click', (e) => {
@@ -8029,18 +8660,6 @@ function initLayersPanelControls() {
           fxState.stageBackground = { type: 'chroma_green', color: '#00e676' };
           fxState.grid.enabled = false;
           showTextTimingAlert('Stage set to Chroma Studio Green!', 'success');
-        } else if (preset === 'gradient_looping') {
-          fxState.stageBackground = { type: 'gradient_looping', color: '#060810' };
-          fxState.grid.enabled = false;
-          showTextTimingAlert('Stage set to Looping Brand Gradient!', 'success');
-        } else if (preset === 'particles_dots') {
-          fxState.stageBackground = { type: 'particles_dots', color: '#060810' };
-          fxState.grid.enabled = false;
-          showTextTimingAlert('Stage set to Floating Dot Field!', 'success');
-        } else if (preset === 'noise_grain') {
-          fxState.stageBackground = { type: 'noise_grain', color: '#0d0d0d' };
-          fxState.grid.enabled = false;
-          showTextTimingAlert('Stage set to Film Grain Documentary!', 'success');
         }
 
         renderLayersPanel();
