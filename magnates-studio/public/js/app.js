@@ -1649,6 +1649,61 @@ function render(now) {
     } else if (bgType === 'chroma_green') {
       ctx.fillStyle = '#00e676';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'gradient_looping') {
+      // Slow-looping brand gradient (sinusoidal hue shift, high-quality for talking-head BG)
+      const t = performance.now() / 5000; // full cycle every 5s
+      const h1 = ((t * 60) % 360); // hue 1 rotates
+      const h2 = (h1 + 160) % 360;  // complementary offset
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, `hsl(${h1}, 60%, 7%)`);
+      grad.addColorStop(0.5, `hsl(${(h1 + 80) % 360}, 45%, 10%)`);
+      grad.addColorStop(1, `hsl(${h2}, 55%, 8%)`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'particles_dots') {
+      // Dark background + animated floating dot field
+      ctx.fillStyle = bgColor || '#060810';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Generate deterministic dot positions and animate them with time
+      const t = performance.now() / 1000;
+      const numDots = 55;
+      ctx.save();
+      for (let i = 0; i < numDots; i++) {
+        // Deterministic but organic: use sin/cos with prime offsets
+        const seed = i * 7.83;
+        const bx = ((Math.sin(seed * 0.31) * 0.5 + 0.5) * canvas.width);
+        const by = ((Math.cos(seed * 0.19) * 0.5 + 0.5) * canvas.height);
+        const floatX = bx + Math.sin(t * 0.3 + seed) * 22;
+        const floatY = by + Math.cos(t * 0.22 + seed * 1.3) * 18;
+        const r = 1.5 + Math.abs(Math.sin(seed * 0.7 + t * 0.4)) * 3;
+        const a = 0.08 + Math.abs(Math.sin(seed * 0.4 + t * 0.25)) * 0.18;
+        ctx.globalAlpha = a;
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(floatX, floatY, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    } else if (bgType === 'noise_grain') {
+      // Documentary / film-grain texture — solid color base + subtle noise overlay
+      ctx.fillStyle = bgColor || '#0d0d0d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Grain: randomly vary small pixels using time-seeded noise (lightweight)
+      const grainOpacity = 0.035;
+      const grainSize = 2;
+      ctx.save();
+      ctx.globalAlpha = grainOpacity;
+      const seed = Math.floor(performance.now() / 80); // changes every 80ms (film-rate flicker)
+      for (let gy = 0; gy < canvas.height; gy += grainSize * 2) {
+        for (let gx = 0; gx < canvas.width; gx += grainSize * 2) {
+          const n = ((Math.sin((gx + seed) * 0.07) + Math.cos((gy + seed) * 0.13)) * 0.5 + 0.5);
+          if (n > 0.6) {
+            ctx.fillStyle = n > 0.8 ? '#ffffff' : '#888888';
+            ctx.fillRect(gx, gy, grainSize, grainSize);
+          }
+        }
+      }
+      ctx.restore();
     } else {
       // Default cyber grid / dark studio
       ctx.fillStyle = bgColor || '#0a0b0e';
@@ -3542,7 +3597,10 @@ const BG_MODE_LABELS = {
   solid_black: 'Solid Black',
   none: 'Transparent',
   color: 'Solid Tint',
-  vox_cream: 'Vox Cream'
+  vox_cream: 'Vox Cream',
+  gradient_looping: 'Looping Gradient',
+  particles_dots: 'Dot Field',
+  noise_grain: 'Film Grain'
 };
 
 function applyBackdropMode(type, color) {
@@ -3575,11 +3633,14 @@ function openBackgroundSegmentPicker(atTimeSec, triggerEl) {
   popover.appendChild(header);
 
   const bgOptions = [
-    { value: 'cyber_grid',  label: 'Cyber Grid',    color: '#1a1f35' },
-    { value: 'solid_black', label: 'Solid Black',   color: '#111111' },
-    { value: 'none',        label: 'Transparent',   color: '#2a2a2a' },
-    { value: 'color',       label: 'Solid Tint',    color: '#1a3a2a' },
-    { value: 'vox_cream',   label: 'Vox Cream',     color: '#3a3020' }
+    { value: 'cyber_grid',        label: 'Cyber Grid',        color: '#1a1f35' },
+    { value: 'solid_black',       label: 'Solid Black',       color: '#111111' },
+    { value: 'none',              label: 'Transparent',       color: '#2a2a2a' },
+    { value: 'color',             label: 'Solid Tint',        color: '#1a3a2a' },
+    { value: 'vox_cream',         label: 'Vox Cream',         color: '#3a3020' },
+    { value: 'gradient_looping',  label: 'Looping Gradient',  color: '#181236' },
+    { value: 'particles_dots',    label: 'Floating Dots',     color: '#071626' },
+    { value: 'noise_grain',       label: 'Film Grain Doc',    color: '#1c1c1c' }
   ];
 
   const list = document.createElement('div');
@@ -7968,6 +8029,18 @@ function initLayersPanelControls() {
           fxState.stageBackground = { type: 'chroma_green', color: '#00e676' };
           fxState.grid.enabled = false;
           showTextTimingAlert('Stage set to Chroma Studio Green!', 'success');
+        } else if (preset === 'gradient_looping') {
+          fxState.stageBackground = { type: 'gradient_looping', color: '#060810' };
+          fxState.grid.enabled = false;
+          showTextTimingAlert('Stage set to Looping Brand Gradient!', 'success');
+        } else if (preset === 'particles_dots') {
+          fxState.stageBackground = { type: 'particles_dots', color: '#060810' };
+          fxState.grid.enabled = false;
+          showTextTimingAlert('Stage set to Floating Dot Field!', 'success');
+        } else if (preset === 'noise_grain') {
+          fxState.stageBackground = { type: 'noise_grain', color: '#0d0d0d' };
+          fxState.grid.enabled = false;
+          showTextTimingAlert('Stage set to Film Grain Documentary!', 'success');
         }
 
         renderLayersPanel();
