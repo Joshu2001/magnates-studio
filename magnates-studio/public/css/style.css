@@ -139,17 +139,79 @@ body {
   max-height: calc(100vh - 52px);
   min-height: 0;
   overflow: hidden;
-  transition: grid-template-columns 0.25s ease;
+  transition: grid-template-columns 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Individual Sidebar Collapsing */
+.workspace.hide-left {
+  grid-template-columns: 0px 1fr 300px;
+}
+
+.workspace.hide-right {
+  grid-template-columns: 260px 1fr 0px;
+}
+
+.workspace.hide-left.hide-right {
+  grid-template-columns: 0px 1fr 0px;
 }
 
 /* Full Expand Mode: collapses sidebars to 0px, expanding center canvas & timeline */
 .workspace.is-expanded {
-  grid-template-columns: 0px 1fr 0px;
+  grid-template-columns: 0px 1fr 0px !important;
 }
 
-.workspace.is-expanded .sidebar,
+.workspace.hide-left .sidebar,
+.workspace.is-expanded .sidebar {
+  display: none !important;
+}
+
+.workspace.hide-right .sidebar-right,
 .workspace.is-expanded .sidebar-right {
   display: none !important;
+}
+
+/* Apple-style sidebar toggle controls */
+.apple-sidebar-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.apple-sidebar-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.apple-sidebar-btn.active {
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.12);
+  border-color: rgba(0, 240, 255, 0.25);
+}
+
+.btn-sidebar-collapse {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  color: var(--text-muted);
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.btn-sidebar-collapse:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Left Media Library */
@@ -161,6 +223,7 @@ body {
   min-height: 0;
   height: 100%;
   overflow: hidden;
+  transition: opacity 0.2s ease;
 }
 
 .sidebar-header {
@@ -967,14 +1030,14 @@ body {
   border-color: #2aa36b;
 }
 
-/* Hover-reveal delete button on all clips */
+/* Hover-reveal action buttons (delete & transition) on clips */
 .clip-hover-delete {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
-  transform: translateY(-50%) scale(0.8);
-  width: 18px;
-  height: 18px;
+  transform: translateY(-50%) scale(0.85);
+  width: 19px;
+  height: 19px;
   border-radius: 50%;
   background: rgba(255, 51, 75, 0.9);
   border: none;
@@ -986,18 +1049,53 @@ body {
   opacity: 0;
   pointer-events: none;
   z-index: 10;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
   padding: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .clip-hover-delete svg {
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   fill: currentColor;
 }
 
-.clip-block:hover .clip-hover-delete {
+.clip-hover-trans {
+  position: absolute;
+  right: 33px;
+  top: 50%;
+  transform: translateY(-50%) scale(0.85);
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: rgba(168, 85, 247, 0.85);
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  padding: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.clip-hover-trans svg {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}
+
+.clip-hover-trans.has-transition {
+  background: #a855f7;
+  box-shadow: 0 0 7px rgba(168, 85, 247, 0.8);
+}
+
+.clip-block:hover .clip-hover-delete,
+.clip-block:hover .clip-hover-trans {
   opacity: 1;
   pointer-events: auto;
   transform: translateY(-50%) scale(1);
@@ -1005,6 +1103,12 @@ body {
 
 .clip-hover-delete:hover {
   background: #ff1f3a;
+  transform: translateY(-50%) scale(1.15);
+}
+
+.clip-hover-trans:hover {
+  background: #c084fc;
+  color: #fff;
   transform: translateY(-50%) scale(1.15);
 }
 

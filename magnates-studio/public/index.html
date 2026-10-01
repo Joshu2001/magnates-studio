@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Magnates Studio - Minimalist Documentary Editor</title>
-  <link rel="stylesheet" href="css/style.css?v=250">
+  <link rel="stylesheet" href="css/style.css?v=260">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
@@ -41,6 +41,16 @@
         <button class="icon-btn" id="btn-app-fullscreen" title="Full Screen Entire Workspace (Double-click background)" style="padding: 6px 10px; margin-left: 4px;">
           <svg class="ui-icon" id="app-fullscreen-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
         </button>
+
+        <!-- Apple-style Window / Sidebar Layout Controls -->
+        <div class="apple-panel-toggles" style="display: flex; align-items: center; gap: 3px; margin-left: 8px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,0.12);">
+          <button class="icon-btn apple-sidebar-btn active" id="btn-toggle-left-sidebar" title="Toggle Media Library (Cmd/Ctrl + 1)" style="padding: 6px 8px; border-radius: 5px;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h5V6H4zm7 0v12h9V6h-9z"/></svg>
+          </button>
+          <button class="icon-btn apple-sidebar-btn active" id="btn-toggle-right-sidebar" title="Toggle Inspector & FX (Cmd/Ctrl + 2)" style="padding: 6px 8px; border-radius: 5px;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="width: 15px; height: 15px;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h9V6H4zm11 0v12h5V6h-5z"/></svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -48,9 +58,14 @@
     <main class="workspace">
       <!-- Left Panel: Media & Assets -->
       <aside class="sidebar">
-        <div class="sidebar-header">
-          <h3>Media Library</h3>
-          <span class="subtitle">Upload or select media</span>
+        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3>Media Library</h3>
+            <span class="subtitle">Upload or select media</span>
+          </div>
+          <button type="button" class="btn-sidebar-collapse" id="btn-collapse-left-sidebar" title="Collapse Media Library (Ctrl+1)">
+            <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
         </div>
         
         <!-- Batch Upload Area -->
@@ -783,9 +798,14 @@
 
       <!-- Right Panel: Documentary FX Controls -->
       <aside class="sidebar-right">
-        <div class="sidebar-header">
-          <h3>Documentary FX</h3>
-          <span class="subtitle">Magnates / Vox Style</span>
+        <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3>Documentary FX</h3>
+            <span class="subtitle">Magnates / Vox Style</span>
+          </div>
+          <button type="button" class="btn-sidebar-collapse" id="btn-collapse-right-sidebar" title="Collapse Inspector & FX (Ctrl+2)">
+            <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </button>
         </div>
 
         <!-- Stage Backdrop & Background Mode Selector -->
@@ -1948,15 +1968,46 @@
         </div>
 
         <!-- Placement & Timing Control -->
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 6px; padding: 10px 12px; margin: 12px 0 6px 0;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 12px; margin: 12px 0 6px 0;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
             <span style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Timeline Placement (Trigger Point)</span>
-            <button type="button" class="btn-sm btn-secondary" id="btn-transition-seek-playhead" style="font-size: 10px; padding: 2px 7px;">Snap to Playhead</button>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-sm btn-secondary" id="btn-transition-snap-cut" style="font-size: 10px; padding: 2px 7px; color: #a855f7; border-color: rgba(168,85,247,0.4);" title="Snap transition exactly to nearest clip boundary">Snap to Nearest Cut</button>
+              <button type="button" class="btn-sm btn-secondary" id="btn-transition-seek-playhead" style="font-size: 10px; padding: 2px 7px;">Snap to Playhead</button>
+            </div>
           </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <input type="text" id="transition-time-input" value="00:00.0" style="width: 85px; font-family: monospace; font-size: 11px; text-align: center; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; padding: 4px 6px;">
-            <input type="range" id="transition-time-slider" min="0" max="1000" value="0" step="1" style="flex:1;">
-            <span id="transition-time-preview-label" style="font-size: 11px; color: #00f0ff; font-family: monospace; min-width: 48px; text-align: right;">0.0s</span>
+
+          <!-- Dual-Frame Visual Comparison Preview (YouTube / NLE Style A/B frame preview) -->
+          <div id="transition-ab-preview-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px;">
+            <div style="position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 9.5px; font-weight: 700; color: #ff6b7e; text-transform: uppercase;">Outgoing (Clip A)</span>
+                <span id="trans-preview-a-time" style="font-size: 9px; font-family: monospace; color: var(--text-muted);">00:00.0</span>
+              </div>
+              <div style="position: relative; width: 100%; height: 86px; background: #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,107,126,0.3);">
+                <canvas id="trans-canvas-a" width="240" height="135" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+                <div id="trans-label-a" style="position: absolute; bottom: 2px; left: 4px; font-size: 9px; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 2px; color: #fff; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No clip</div>
+              </div>
+            </div>
+            <div style="position: relative;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 9.5px; font-weight: 700; color: #00f0ff; text-transform: uppercase;">Incoming (Clip B)</span>
+                <span id="trans-preview-b-time" style="font-size: 9px; font-family: monospace; color: var(--text-muted);">00:00.0</span>
+              </div>
+              <div style="position: relative; width: 100%; height: 86px; background: #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(0,240,255,0.3);">
+                <canvas id="trans-canvas-b" width="240" height="135" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+                <div id="trans-label-b" style="position: absolute; bottom: 2px; left: 4px; font-size: 9px; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 2px; color: #fff; max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">No clip</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scrubbing Placement Slider & Timestamp Input -->
+          <div style="position: relative;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="text" id="transition-time-input" value="00:00.0" style="width: 85px; font-family: monospace; font-size: 11px; text-align: center; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 4px; color: #fff; padding: 4px 6px;">
+              <input type="range" id="transition-time-slider" min="0" max="1000" value="0" step="1" style="flex:1;">
+              <span id="transition-time-preview-label" style="font-size: 11px; color: #00f0ff; font-family: monospace; min-width: 48px; text-align: right;">0.0s</span>
+            </div>
           </div>
         </div>
 
@@ -2063,6 +2114,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=253"></script>
+  <script src="js/app.js?v=260"></script>
 </body>
 </html>

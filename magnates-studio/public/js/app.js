@@ -2330,7 +2330,7 @@ function renderAllTimelineTracks() {
         fxTracksEl.appendChild(zmBar);
       }
 
-      // Hover delete button (appears on hover over any clip)
+      // Hover action buttons (delete & transition)
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'clip-hover-delete';
       deleteBtn.title = 'Remove clip';
@@ -2340,6 +2340,21 @@ function renderAllTimelineTracks() {
         recordState('Delete Clip');
         deleteClip(type, clip.id);
       });
+
+      // Hover Transition button (for images and videos)
+      let transBtn = null;
+      if (type === 'image' || type === 'video') {
+        transBtn = document.createElement('button');
+        const hasTrans = clip.transition && clip.transition !== 'none';
+        const transLabel = hasTrans ? (TRANSITION_TYPES[clip.transition]?.label || clip.transition) : '';
+        transBtn.className = 'clip-hover-trans' + (hasTrans ? ' has-transition' : '');
+        transBtn.title = hasTrans ? `Transition: ${transLabel} (Click to edit)` : 'Add Transition';
+        transBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg>`;
+        transBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openTransitionModal(clip, type);
+        });
+      }
 
       // Video Filmstrip Background
       if (type === 'video' && clip.file?.url) {
@@ -2352,6 +2367,7 @@ function renderAllTimelineTracks() {
       block.appendChild(handleLeft);
       block.appendChild(contentEl);
       if (fxTracksEl.children.length > 0) block.appendChild(fxTracksEl);
+      if (transBtn) block.appendChild(transBtn);
       block.appendChild(deleteBtn);
       block.appendChild(handleRight);
 
@@ -2503,6 +2519,11 @@ function selectClip(clip, trackType) {
   document.querySelectorAll('.clip-block').forEach(b => b.classList.remove('is-selected'));
   const el = document.getElementById(clip.id);
   if (el) el.classList.add('is-selected');
+
+  // Apple Intelligence: If inspector sidebar was collapsed, automatically glide it open to reveal clip settings
+  if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) {
+    toggleRightSidebar(true);
+  }
 
   if (clip.file) activePreviewMedia = clip.file;
 
@@ -5322,23 +5343,74 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// ==================== WORKSPACE EXPAND (HIDE SIDEBARS) ====================
+// ==================== WORKSPACE EXPAND & APPLE-STYLE SIDEBAR CONTROLS ====================
 let isWorkspaceExpanded = false;
+let isLeftSidebarOpen = true;
+let isRightSidebarOpen = true;
+
+function updateSidebarStateUI() {
+  const workspace = document.querySelector('.workspace');
+  if (!workspace) return;
+
+  workspace.classList.toggle('hide-left', !isLeftSidebarOpen);
+  workspace.classList.toggle('hide-right', !isRightSidebarOpen);
+  workspace.classList.toggle('is-expanded', isWorkspaceExpanded);
+
+  const btnLeft = document.getElementById('btn-toggle-left-sidebar');
+  const btnRight = document.getElementById('btn-toggle-right-sidebar');
+  if (btnLeft) btnLeft.classList.toggle('active', isLeftSidebarOpen && !isWorkspaceExpanded);
+  if (btnRight) btnRight.classList.toggle('active', isRightSidebarOpen && !isWorkspaceExpanded);
+
+  const btnToggleExpand = document.getElementById('tool-toggle-expand');
+  const expandText = document.getElementById('expand-btn-text');
+  if (btnToggleExpand) btnToggleExpand.classList.toggle('active', isWorkspaceExpanded);
+  if (expandText) expandText.textContent = isWorkspaceExpanded ? 'Show Panels' : 'Expand';
+
+  // Force canvas and track rendering to adapt to new dimensions smoothly
+  setTimeout(() => {
+    if (typeof resizeCanvas === 'function') resizeCanvas();
+  }, 100);
+}
+
+function toggleLeftSidebar(explicitState) {
+  isLeftSidebarOpen = explicitState !== undefined ? explicitState : !isLeftSidebarOpen;
+  if (isWorkspaceExpanded && isLeftSidebarOpen) isWorkspaceExpanded = false;
+  updateSidebarStateUI();
+}
+
+function toggleRightSidebar(explicitState) {
+  isRightSidebarOpen = explicitState !== undefined ? explicitState : !isRightSidebarOpen;
+  if (isWorkspaceExpanded && isRightSidebarOpen) isWorkspaceExpanded = false;
+  updateSidebarStateUI();
+}
+
+// Event Listeners for Apple Sidebar Buttons
+document.getElementById('btn-toggle-left-sidebar')?.addEventListener('click', () => toggleLeftSidebar());
+document.getElementById('btn-collapse-left-sidebar')?.addEventListener('click', () => toggleLeftSidebar(false));
+
+document.getElementById('btn-toggle-right-sidebar')?.addEventListener('click', () => toggleRightSidebar());
+document.getElementById('btn-collapse-right-sidebar')?.addEventListener('click', () => toggleRightSidebar(false));
+
 const btnToggleExpand = document.getElementById('tool-toggle-expand');
 if (btnToggleExpand) {
   btnToggleExpand.addEventListener('click', () => {
     isWorkspaceExpanded = !isWorkspaceExpanded;
-    const workspace = document.querySelector('.workspace');
-    if (workspace) {
-      workspace.classList.toggle('is-expanded', isWorkspaceExpanded);
-    }
-    btnToggleExpand.classList.toggle('active', isWorkspaceExpanded);
-    const expandText = document.getElementById('expand-btn-text');
-    if (expandText) {
-      expandText.textContent = isWorkspaceExpanded ? 'Show Panels' : 'Expand Full';
-    }
+    updateSidebarStateUI();
   });
 }
+
+// macOS / Pro NLE Keyboard Shortcuts: Cmd/Ctrl + 1 (Media), Cmd/Ctrl + 2 (Inspector)
+window.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+  if (isCmdOrCtrl && e.key === '1') {
+    e.preventDefault();
+    toggleLeftSidebar();
+  } else if (isCmdOrCtrl && e.key === '2') {
+    e.preventDefault();
+    toggleRightSidebar();
+  }
+});
 
 // ==================== SFX VOLUME SLIDER & PREVIEW BUTTON ====================
 const sfxVolumeSlider = document.getElementById('text-sfx-volume');
@@ -11569,11 +11641,54 @@ document.getElementById('btn-add-selected-images')?.addEventListener('click', ()
     setTimeout(() => showTextTimingAlert(''), 2000);
     return;
   }
+
+  // Determine starting insertion point:
+  // If track already has clips, insert at the end of the existing clips or at currentTime, whichever makes sense
+  const existingImages = timelineClips.image || [];
   let insertTime = currentTime;
+
+  // If currentTime is far beyond or behind, or if inserting from track header, place right after existing image clips if any, or at currentTime
+  if (existingImages.length > 0 && Math.abs(insertTime - 0) < 0.05) {
+    const lastClipEnd = Math.max(...existingImages.map(c => c.start + c.duration));
+    insertTime = lastClipEnd > 0 ? lastClipEnd + 0.1 : 0;
+  }
+
+  const initialInsertTime = insertTime;
+  const clipDuration = 6.0;
+  let firstAddedClip = null;
+
   _trackImageSelectedFiles.forEach(file => {
-    addClipToTimeline('image', file, insertTime, 6);
-    insertTime += 6.1;
+    const clip = addClipToTimeline('image', file, insertTime, clipDuration);
+    if (!firstAddedClip) firstAddedClip = clip;
+    insertTime += clipDuration;
   });
+
+  // Ensure total project duration accommodates all new clips
+  const neededDuration = insertTime + 10;
+  if (neededDuration > duration) {
+    duration = Math.max(duration, Math.ceil(neededDuration));
+    const durBadge = document.getElementById('duration-badge');
+    if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+    if (typeof drawTimeRuler === 'function') drawTimeRuler();
+  }
+
+  // Re-render tracks and transitions
+  renderAllTimelineTracks();
+  if (typeof injectTransitionChips === 'function') injectTransitionChips();
+
+  // Select first added clip and focus preview
+  if (firstAddedClip) {
+    selectClip(firstAddedClip, 'image');
+    seekToTime(initialInsertTime);
+
+    // Scroll timeline to make the new clips immediately visible
+    const tracksContainer = document.getElementById('timeline-tracks');
+    if (tracksContainer) {
+      const targetScroll = Math.max(0, (initialInsertTime * pps) - 40);
+      tracksContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+    }
+  }
+
   recordState('Add Images from Picker');
   document.getElementById('track-image-picker-modal').style.display = 'none';
   showTextTimingAlert('Added ' + _trackImageSelectedFiles.size + ' image(s) to timeline!', 'success');
@@ -11599,37 +11714,6 @@ let _transitionEditContext = null;
 
 function injectTransitionChips() {
   document.querySelectorAll('.transition-chip').forEach(c => c.remove());
-
-  ['image', 'video'].forEach(trackType => {
-    const clips = timelineClips[trackType] || [];
-    if (clips.length < 2) return;
-
-    const pps = parseFloat(document.getElementById('timeline-zoom')?.value || 1) * 100;
-    const sorted = [...clips].sort((a,b) => a.start - b.start);
-    const trackRowEl = document.getElementById('content-' + trackType);
-    if (!trackRowEl) return;
-
-    sorted.forEach((clip, i) => {
-      if (i === 0) return;
-      const chipLeftPx = clip.start * pps;
-
-      const chip = document.createElement('div');
-      chip.className = 'transition-chip' + (clip.transition && clip.transition !== 'none' ? ' has-transition' : '');
-      chip.style.left = `${chipLeftPx}px`;
-
-      const transLabel = (clip.transition && clip.transition !== 'none') ? (TRANSITION_TYPES[clip.transition]?.label || clip.transition) : 'FX';
-      chip.innerHTML = `
-        <svg viewBox="0 0 24 24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg>
-        <span class="transition-chip-label">${clip.transition && clip.transition !== 'none' ? transLabel : 'FX'}</span>
-      `;
-      chip.title = clip.transition && clip.transition !== 'none' ? `Transition: ${transLabel}` : 'Add Transition';
-      chip.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openTransitionModal(clip, trackType);
-      });
-      trackRowEl.appendChild(chip);
-    });
-  });
 }
 
 function openTransitionModal(clip, trackType) {
@@ -11668,8 +11752,105 @@ function openTransitionModal(clip, trackType) {
 
   // Seek playhead to this transition point so user can immediately view/scrub it
   seekToTime(clip.start);
+  updateTransitionModalThumbnails(clip.start);
 
   modal.style.display = 'flex';
+}
+
+// Render Outgoing (Clip A) and Incoming (Clip B) visual frames in the transition modal
+function updateTransitionModalThumbnails(sec) {
+  const canvasA = document.getElementById('trans-canvas-a');
+  const canvasB = document.getElementById('trans-canvas-b');
+  const labelA = document.getElementById('trans-label-a');
+  const labelB = document.getElementById('trans-label-b');
+  const timeA = document.getElementById('trans-preview-a-time');
+  const timeB = document.getElementById('trans-preview-b-time');
+
+  if (!canvasA || !canvasB) return;
+  const ctxA = canvasA.getContext('2d');
+  const ctxB = canvasB.getContext('2d');
+
+  const w = canvasA.width;
+  const h = canvasA.height;
+
+  // Clear previews
+  ctxA.fillStyle = '#0f1118';
+  ctxA.fillRect(0, 0, w, h);
+  ctxB.fillStyle = '#0f1118';
+  ctxB.fillRect(0, 0, w, h);
+
+  // Time labels
+  const timeA_sec = Math.max(0, sec - 0.05);
+  const timeB_sec = sec + 0.05;
+  if (timeA) timeA.textContent = formatTimecode(timeA_sec);
+  if (timeB) timeB.textContent = formatTimecode(timeB_sec);
+
+  // Find visual clips for Clip A (outgoing, just before/at transition point)
+  // and Clip B (incoming, at/just after transition point)
+  const visualClips = [
+    ...(timelineClips.video || []).map(c => ({ ...c, kind: 'video' })),
+    ...(timelineClips.image || []).map(c => ({ ...c, kind: 'image' }))
+  ].sort((a, b) => a.start - b.start);
+
+  // Outgoing clip: clip that covers or ends right before this point
+  let clipA = visualClips.filter(c => c.start <= sec && (c.start + c.duration) >= sec - 0.001).pop();
+  if (!clipA) {
+    clipA = visualClips.filter(c => (c.start + c.duration) <= sec).pop();
+  }
+
+  // Incoming clip: clip that covers or starts right at/after this point
+  let clipB = visualClips.find(c => c.start >= sec - 0.001);
+  if (!clipB) {
+    clipB = visualClips.find(c => c.start <= sec && (c.start + c.duration) > sec);
+  }
+
+  // Draw Clip A
+  if (clipA && clipA.file) {
+    const elA = getMediaElement(clipA.file);
+    if (elA) {
+      try {
+        if (clipA.kind === 'video' && elA.duration) {
+          const frameTime = Math.max(0, Math.min(elA.duration, (sec - clipA.start)));
+          elA.currentTime = frameTime;
+        }
+        ctxA.drawImage(elA, 0, 0, w, h);
+      } catch (e) {}
+    }
+    if (labelA) labelA.textContent = clipA.file.name || 'Clip A';
+  } else {
+    // Draw placeholder
+    ctxA.fillStyle = '#1e2230';
+    ctxA.fillRect(0, 0, w, h);
+    ctxA.fillStyle = '#64748b';
+    ctxA.font = '10px Inter, sans-serif';
+    ctxA.textAlign = 'center';
+    ctxA.fillText('No preceding clip', w / 2, h / 2 + 3);
+    if (labelA) labelA.textContent = 'None';
+  }
+
+  // Draw Clip B
+  if (clipB && clipB.file) {
+    const elB = getMediaElement(clipB.file);
+    if (elB) {
+      try {
+        if (clipB.kind === 'video' && elB.duration) {
+          const frameTime = Math.max(0, Math.min(elB.duration, (Math.max(0, sec - clipB.start))));
+          elB.currentTime = frameTime;
+        }
+        ctxB.drawImage(elB, 0, 0, w, h);
+      } catch (e) {}
+    }
+    if (labelB) labelB.textContent = clipB.file.name || 'Clip B';
+  } else {
+    // Draw placeholder
+    ctxB.fillStyle = '#1e2230';
+    ctxB.fillRect(0, 0, w, h);
+    ctxB.fillStyle = '#64748b';
+    ctxB.font = '10px Inter, sans-serif';
+    ctxB.textAlign = 'center';
+    ctxB.fillText('No following clip', w / 2, h / 2 + 3);
+    if (labelB) labelB.textContent = 'None';
+  }
 }
 
 document.querySelectorAll('.transition-card').forEach(card => {
@@ -11704,6 +11885,7 @@ document.getElementById('transition-time-slider')?.addEventListener('input', (e)
   if (inputEl) inputEl.value = formatTimecode(sec);
   if (labelEl) labelEl.textContent = sec.toFixed(1) + 's';
   seekToTime(sec);
+  updateTransitionModalThumbnails(sec);
   if (_transitionEditContext && _transitionEditContext.clip) {
     _transitionEditContext.clip.start = sec;
     renderAllTimelineTracks();
@@ -11725,6 +11907,7 @@ document.getElementById('transition-time-input')?.addEventListener('change', (e)
   if (labelEl) labelEl.textContent = sec.toFixed(1) + 's';
   e.target.value = formatTimecode(sec);
   seekToTime(sec);
+  updateTransitionModalThumbnails(sec);
   if (_transitionEditContext && _transitionEditContext.clip) {
     _transitionEditContext.clip.start = sec;
     renderAllTimelineTracks();
@@ -11739,10 +11922,59 @@ document.getElementById('btn-transition-seek-playhead')?.addEventListener('click
   if (sliderEl) sliderEl.value = Math.round(sec * 10);
   if (inputEl) inputEl.value = formatTimecode(sec);
   if (labelEl) labelEl.textContent = sec.toFixed(1) + 's';
+  seekToTime(sec);
+  updateTransitionModalThumbnails(sec);
   if (_transitionEditContext && _transitionEditContext.clip) {
     _transitionEditContext.clip.start = sec;
     renderAllTimelineTracks();
     showTextTimingAlert('Transition snapped to playhead (' + formatTimecode(sec) + ')', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  }
+});
+
+// Snap to Nearest Cut Button (Pareto Feature: Snaps exactly to clip boundary)
+document.getElementById('btn-transition-snap-cut')?.addEventListener('click', () => {
+  const allClips = [
+    ...(timelineClips.video || []),
+    ...(timelineClips.image || [])
+  ];
+
+  if (allClips.length === 0) return;
+
+  // Cut points are start times and end times of all clips
+  const cutPoints = [];
+  allClips.forEach(c => {
+    cutPoints.push(c.start);
+    cutPoints.push(c.start + c.duration);
+  });
+
+  const target = _transitionEditContext?.clip?.start ?? currentTime;
+  // Find nearest cut point
+  let nearest = cutPoints[0];
+  let minDiff = Math.abs(target - nearest);
+  for (const pt of cutPoints) {
+    const diff = Math.abs(target - pt);
+    if (diff < minDiff) {
+      minDiff = diff;
+      nearest = pt;
+    }
+  }
+
+  const sec = parseFloat(nearest.toFixed(1));
+  const sliderEl = document.getElementById('transition-time-slider');
+  const inputEl = document.getElementById('transition-time-input');
+  const labelEl = document.getElementById('transition-time-preview-label');
+  if (sliderEl) sliderEl.value = Math.round(sec * 10);
+  if (inputEl) inputEl.value = formatTimecode(sec);
+  if (labelEl) labelEl.textContent = sec.toFixed(1) + 's';
+
+  seekToTime(sec);
+  updateTransitionModalThumbnails(sec);
+
+  if (_transitionEditContext && _transitionEditContext.clip) {
+    _transitionEditContext.clip.start = sec;
+    renderAllTimelineTracks();
+    showTextTimingAlert('Snapped to nearest clip cutpoint (' + formatTimecode(sec) + ')', 'success');
     setTimeout(() => showTextTimingAlert(''), 1500);
   }
 });
