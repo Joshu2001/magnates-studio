@@ -2228,7 +2228,7 @@ canvas.tool-draw {
   box-shadow: 0 0 18px rgba(0, 240, 255, 0.8) !important;
 }
 
-/* ==================== VECTOR EXPORT MODAL ==================== */
+/* ==================== VECTOR EXPORT MODAL & NATIVE DIALOG ==================== */
 .vector-export-modal {
   position: fixed;
   inset: 0;
@@ -2240,6 +2240,15 @@ canvas.tool-draw {
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+#native-dialog-modal {
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+}
+
+#native-dialog-modal.is-open {
+  display: flex !important;
 }
 
 .vector-modal-box {

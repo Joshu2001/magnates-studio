@@ -11202,31 +11202,35 @@ function showNativeDialog({ title = 'Notice', message = '', iconType = 'info', s
 
     const cleanup = () => {
       modal.style.display = 'none';
+      modal.classList.remove('is-open');
       btnConfirm?.removeEventListener('click', onConfirm);
       btnCancel?.removeEventListener('click', onCancel);
       inputEl?.removeEventListener('keydown', onKeyDown);
     };
 
-    const onConfirm = () => {
+    const onConfirm = (ev) => {
+      if (ev) ev.stopPropagation();
       cleanup();
       resolve(showInput ? (inputEl?.value || '') : true);
     };
 
-    const onCancel = () => {
+    const onCancel = (ev) => {
+      if (ev) ev.stopPropagation();
       cleanup();
       resolve(showInput ? null : false);
     };
 
     const onKeyDown = (e) => {
-      if (e.key === 'Enter') onConfirm();
-      else if (e.key === 'Escape') onCancel();
+      if (e.key === 'Enter') onConfirm(e);
+      else if (e.key === 'Escape') onCancel(e);
     };
 
     btnConfirm?.addEventListener('click', onConfirm);
     btnCancel?.addEventListener('click', onCancel);
     inputEl?.addEventListener('keydown', onKeyDown);
 
-    modal.style.display = 'flex';
+    modal.style.setProperty('display', 'flex', 'important');
+    modal.classList.add('is-open');
   });
 }
 
