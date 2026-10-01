@@ -1871,7 +1871,8 @@ function syncAudioPlayback() {
   // Voiceover track sync
   const activeVoice = timelineClips.voiceover.find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
   if (activeVoice) {
-    if (audioPlayer.src !== activeVoice.file.url) {
+    if (audioPlayer.dataset.currentUrl !== activeVoice.file.url) {
+      audioPlayer.dataset.currentUrl = activeVoice.file.url;
       audioPlayer.src = activeVoice.file.url;
     }
     const clipOffset = activeVoice.audioOffset || 0;
@@ -1890,7 +1891,8 @@ function syncAudioPlayback() {
   // Background music track sync
   const activeMusic = timelineClips.music.find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
   if (activeMusic) {
-    if (bgmPlayer.src !== activeMusic.file.url) {
+    if (bgmPlayer.dataset.currentUrl !== activeMusic.file.url) {
+      bgmPlayer.dataset.currentUrl = activeMusic.file.url;
       bgmPlayer.src = activeMusic.file.url;
     }
     const offset = (currentTime - activeMusic.start) % (bgmPlayer.duration || 60);
@@ -2054,9 +2056,10 @@ function renderMediaList(filter) {
       playBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (file.isAudio) {
-          if (audioPlayer.src === file.url && !audioPlayer.paused) {
+          if (audioPlayer.dataset.currentUrl === file.url && !audioPlayer.paused) {
             audioPlayer.pause();
           } else {
+            audioPlayer.dataset.currentUrl = file.url;
             audioPlayer.src = file.url;
             audioPlayer.play().catch(() => {});
           }
@@ -3518,7 +3521,8 @@ function seekToTime(targetSec) {
 
   const activeVoice = (timelineClips.voiceover || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
   if (activeVoice) {
-    if (audioPlayer.src !== activeVoice.file.url) {
+    if (audioPlayer.dataset.currentUrl !== activeVoice.file.url) {
+      audioPlayer.dataset.currentUrl = activeVoice.file.url;
       audioPlayer.src = activeVoice.file.url;
     }
     const clipOffset = activeVoice.audioOffset || 0;
@@ -3531,7 +3535,8 @@ function seekToTime(targetSec) {
 
   const activeMusic = (timelineClips.music || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
   if (activeMusic) {
-    if (bgmPlayer.src !== activeMusic.file.url) {
+    if (bgmPlayer.dataset.currentUrl !== activeMusic.file.url) {
+      bgmPlayer.dataset.currentUrl = activeMusic.file.url;
       bgmPlayer.src = activeMusic.file.url;
     }
     bgmPlayer.currentTime = (currentTime - activeMusic.start) % (bgmPlayer.duration || 60);
@@ -7175,6 +7180,7 @@ function getSerializableClips() {
     video: serializeMediaClips(timelineClips.video || []),
     voiceover: serializeMediaClips(timelineClips.voiceover || []),
     music: serializeMediaClips(timelineClips.music || []),
+    background: (timelineClips.background || []).map(c => ({ ...c })),
     currentTime,
     duration,
     savedAt: Date.now()
@@ -7234,6 +7240,9 @@ function loadProjectState() {
         timelineClips[trackType] = state[trackType];
       }
     });
+    if (state.background && state.background.length > 0) {
+      timelineClips.background = state.background;
+    }
 
     if (typeof state.duration === 'number') duration = state.duration;
 
@@ -11899,6 +11908,27 @@ setInterval(() => {
 // Initialize project library on start
 (function initProjectLibraryStartup() {
   const projects = getAllProjects();
+
+  // Helper: restore all clip tracks from a project entry into the live editor
+  function restoreProjectClips(proj) {
+    if (!proj) return;
+    const nameEl = document.getElementById('current-project');
+    if (nameEl && proj.projectName) nameEl.textContent = proj.projectName;
+    if (proj.text && proj.text.length > 0) timelineClips.text = JSON.parse(JSON.stringify(proj.text));
+    ['chart', 'image', 'video', 'voiceover', 'music', 'background'].forEach(t => {
+      if (proj[t] && proj[t].length > 0) {
+        timelineClips[t] = JSON.parse(JSON.stringify(proj[t]));
+      } else if (t !== 'background') {
+        timelineClips[t] = [];
+      }
+    });
+    if (typeof proj.duration === 'number') {
+      duration = proj.duration;
+      const durBadge = document.getElementById('duration-badge');
+      if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+    }
+  }
+
   if (projects.length === 0) {
     // If no project has been explicitly saved yet, seed current project into library so it appears in Projects
     saveCurrentProjectToLibrary(getCurrentProjectName(), false);
@@ -11906,17 +11936,23 @@ setInterval(() => {
     // If _currentProjectId was restored from localStorage, verify it exists in the library
     const matched = _currentProjectId ? projects.find(p => p.id === _currentProjectId) : null;
     if (matched) {
-      const nameEl = document.getElementById('current-project');
-      if (nameEl && matched.projectName) nameEl.textContent = matched.projectName;
+      // Restore full content from the library entry (not just name)
+      restoreProjectClips(matched);
+      renderAllTimelineTracks();
     } else {
       const savedId = localStorage.getItem('magnates_active_project_id');
       const foundSaved = savedId ? projects.find(p => p.id === savedId) : null;
       if (foundSaved) {
         _currentProjectId = foundSaved.id;
-        const nameEl = document.getElementById('current-project');
-        if (nameEl && foundSaved.projectName) nameEl.textContent = foundSaved.projectName;
+        restoreProjectClips(foundSaved);
+        renderAllTimelineTracks();
       } else {
+        // Fall back to the most recent project
         _currentProjectId = projects[0]?.id || null;
+        if (projects[0]) {
+          restoreProjectClips(projects[0]);
+          renderAllTimelineTracks();
+        }
       }
     }
   }
