@@ -113,6 +113,32 @@ app.get('/api/media', (req, res) => {
   }
 });
 
+// Project persistence endpoints
+const projectFile = path.join(__dirname, 'project_state.json');
+
+app.get('/api/project/state', (req, res) => {
+  try {
+    if (fs.existsSync(projectFile)) {
+      const data = fs.readFileSync(projectFile, 'utf8');
+      res.json({ success: true, state: JSON.parse(data) });
+    } else {
+      res.json({ success: true, state: null });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/project/state', (req, res) => {
+  try {
+    const state = req.body;
+    fs.writeFileSync(projectFile, JSON.stringify(state, null, 2), 'utf8');
+    res.json({ success: true, message: 'Project state saved successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Magnates Studio running at http://localhost:${PORT}`);
 });

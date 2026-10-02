@@ -13,6 +13,10 @@
 | :--- | :--- | :--- | :--- | :--- |
 | `fx-punch-zoom` | **Snap Punch Zoom** | Motion & Framing | ✅ Implemented | Right-click Clip -> *Add Punch Zoom* or Tool `Z` |
 | `fx-loupe-callout`| **Magnifying Loupe Lens** | Motion & Callout | ✅ Implemented | Right-click Clip -> *Add Loupe Callout* or Tool `L` |
+| `fx-3d-fly-through`| **3D Camera Fly-Through (Depth Zoom)** | Transitions & Motion | ✅ Implemented | Right-click Clip -> *⚡ 3D Fly-Through* (1-Click) or Inspector |
+| `fx-directional-push`| **Directional Push / Pan Under (4-Way)**| Transitions & Motion | ✅ Implemented | Right-click Clip -> *➡️ Directional Push* (1-Click) or Inspector |
+| `fx-morph-cut` | **Morph Cut (Optical Blend)** | Transitions & Motion | ✅ Implemented | Right-click Clip -> *🌊 Morph Cut* (1-Click) or Chip |
+| `fx-foreground-reveal`| **Foreground Reveal / Split Wipe** | Transitions & Motion | ✅ Implemented | Right-click Clip -> *📐 Foreground Reveal* (1-Click) or Chip |
 | `fx-text-depth` | **Depth Text (Behind / Before Subject)** | Composition & Depth | ✅ Implemented | Right-click -> *Send to Back* / *Bring to Front* |
 | `fx-ai-cutout` | **AI Subject Isolation / Cutout** | Masking & Cutout | ✅ Implemented | Right-click -> *Remove Background* |
 | `fx-vector-sticker`| **Magnates Vector / Paper Cutout** | Stylization | ✅ Implemented | Right-click -> *Magnates Vector / Paper Cutout* |
@@ -109,6 +113,143 @@
       "zoomOriginY": 0.35,
       "bezelColor": "#00f0ff",
       "radiusRatio": 0.22
+    }
+  }
+  ```
+
+---
+
+### 1.3 3D Camera Fly-Through / Seamless Zoom-Through
+* **System ID:** `fx-3d-fly-through` / `fly_through`
+* **Industry & Creator Aliases:** Magnates Zoom-Through, 3D Camera Fly-Through, Continuous Depth Push, Parallax Camera Transition, Overlap Push-In
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** ⚡ Cinematic / Hypnotic Retention Flow
+* **Visual Description:** 
+  * The outgoing image (Clip A) begins scaling forward towards the viewer with cinematic motion blur and radial speed lines.
+  * **Crucial Overlap Dynamic:** Before Clip A disappears or finishes fading away, Clip B (the incoming image) emerges from deep center space (scale `0.45x`) and scales into full frame (`1.0x`).
+  * Because the two images overlap seamlessly during the transition, the viewer experiences them not as two separate static pictures, but as a continuous forward camera voyage through layered space.
+* **🎯 Editorial Intent & When to Use:**
+  * **Seamless Scene Transitions:** Moving between two narrative beats, historical photos, or case-study evidence without breaking the visual spell.
+  * **Retention Driving:** Eliminating hard jump cuts that cause viewers to look away or scroll.
+  * **High-Budget Documentary Flow:** Emulating the signature visual pacing of Magnates Media, Vox, and Bloomberg documentary segments.
+* **⚠️ When NOT to Use (Anti-Patterns):**
+  * Avoid overusing on every single cut (limit to major topic transitions, chapter openings, or rhythmic vocal peaks every 6–10 seconds).
+  * Ensure the incoming clip has enough resolution to avoid blur when scaling in.
+* **🤖 AI Narrative & Script Triggers:**
+  * Keywords: `next`, `meanwhile`, `behind closed doors`, `what happened next`, `then came`, `step two`
+  * Visual Asset Type: Two adjacent archival photos, portrait-to-landscape transitions, stock chart to executive photo.
+* **How to Achieve in Magnates Studio (UI Recipe):**
+  * **1-Click Method (Instant Context Menu):** Right-click the incoming clip on the timeline -> click **"⚡ 3D Fly-Through Transition"**. It automatically applies the `0.7s` duration and pairs it with the `whoosh` procedural sound effect.
+  * **2-Click Method (Timeline Transition Chip):** Click the purple **Transition Chip** situated between the two clips on the timeline -> select the **"⚡ 3D Fly-Through"** preset card -> Click **"Apply Transition"**.
+  * **Inspector Method:** Select the incoming clip -> set `Transition` to `3D Fly-Through` -> set duration (`0.5s`–`1.2s`) and SFX to `whoosh`.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "apply_clip_transition",
+    "clipId": "<target_clip_id>",
+    "parameters": {
+      "transition": "fly_through",
+      "duration": 0.7,
+      "sfx": "whoosh",
+      "direction": "center",
+      "overlapMode": "depth_continuous",
+      "scaleRangeOut": [1.0, 2.5],
+      "scaleRangeIn": [0.45, 1.0],
+      "radialBloom": true
+    }
+  }
+  ```
+
+---
+
+### 1.4 Directional Push & Underneath Layer Overlap
+* **System ID:** `fx-directional-push` / `directional_push`
+* **Industry & Creator Aliases:** Directional Pan Under, Continuous Push-In, Slide Reveal, YouTuber Overlap Transition, Multi-Angle Pan
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** ⚡ Kinetic / Continuous Momentum
+* **Visual Description:**
+  * **Directional Freedom:** Incoming Clip B emerges dynamically from the **Left (`⬅️`)**, **Right (`➡️`)**, **Top (`⬆️`)**, or **Bottom (`⬇️`)**.
+  * **Underneath Layer Overlap (Magnates Secret):** Unlike traditional hard slides where the first image is abruptly pushed off, Clip B appears **right underneath** Clip A while Clip A is still gliding and slowly dissolving. Clip B is already established in frame before Clip A leaves!
+  * Alternatively, set to **Push Over Top** with a cinematic drop shadow cast onto Clip A.
+* **🎯 Editorial Intent & When to Use:**
+  * **Directional Narrative Flow:** When presenting sequential ideas (e.g. left-to-right timeline progression, step 1 to step 2).
+  * **Maintaining Momentum:** Keeping high-energy storytelling flowing without visual halts.
+* **How to Achieve in Magnates Studio (UI Recipe):**
+  * **Method A (1-Click Context Menu):** Right-click the incoming clip -> select **"➡️ Directional Push / Pan Under"**. Clicking again cycles directions (`Left` -> `Right` -> `Top` -> `Bottom`).
+  * **Method B (Sidebar Inspector):** Select the clip -> in **"Selected Clip Settings"** under **"Transition & Overlap"**:
+    * Pick incoming direction: `⬅️ Left`, `➡️ Right`, `⬆️ Top`, `⬇️ Down`, or `🔍 Depth`.
+    * Toggle overlap mode: **"Layer Underneath"** vs **"Push Over Top"**.
+    * Adjust **Duration / Speed Slider** (`0.2s` to `2.5s`) or tap quick speed presets (`Fast 0.3s`, `Smooth 0.7s`, `Cinema 1.2s`).
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "apply_clip_transition",
+    "clipId": "<target_clip_id>",
+    "parameters": {
+      "transition": "directional_push",
+      "direction": "left",
+      "overlapMode": "underneath",
+      "duration": 0.7,
+      "sfx": "whoosh"
+    }
+  }
+  ```
+
+---
+
+### 1.5 Morph Cut / Optical Blend
+* **System ID:** `fx-morph-cut` / `morph_cut`
+* **Industry & Creator Aliases:** Morph Cut, Seamless Cut, Optical Flow Blend, Fluid Shape Morph
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** 🌊 Subtle / Invisible Continuity
+* **Visual Description:**
+  * Smooth optical flow cross-blend between two clips with directional micro-warping and luminous smear in the center.
+  * Eliminates harsh cut lines when jumping between similar angles or subjects.
+* **🎯 Editorial Intent & When to Use:**
+  * **Talking Head / Interview Jump Cuts:** Smoothing out vocal pauses, stutters, or awkward cuts between two similar headshots.
+  * **Before/After Comparisons:** Morphing an old logo into a new one, or a company's early office into their modern headquarters.
+* **How to Achieve in Magnates Studio (UI Recipe):**
+  * Click the **Transition Chip** on the cut point -> select **"Morph Cut"** card -> Click **Apply**.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "apply_clip_transition",
+    "clipId": "<target_clip_id>",
+    "parameters": {
+      "transition": "morph_cut",
+      "duration": 0.6,
+      "sfx": "whoosh",
+      "opticalSmear": true
+    }
+  }
+  ```
+
+---
+
+### 1.6 Foreground Reveal / Push Wipe
+* **System ID:** `fx-foreground-reveal` / `mask_reveal`
+* **Industry & Creator Aliases:** Foreground Wipe, Depth Split Reveal, Parallax Divider Wipe, Object Slide Reveal
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** 📐 Structural / Dynamic Reveal
+* **Visual Description:**
+  * Outgoing Clip A stays grounded while incoming Clip B sweeps in across an eased boundary line with a luminous neon cyan border and physical drop shadow.
+  * Both images are visible simultaneously on either side of the sweep line.
+* **🎯 Editorial Intent & When to Use:**
+  * **Comparative Reveals:** Contrasting two competitors (e.g. Apple vs. Android, Coke vs. Pepsi).
+  * **Document / Map Unmasking:** Revealing satellite maps, corporate structures, or redacted files.
+* **How to Achieve in Magnates Studio (UI Recipe):**
+  * Click the **Transition Chip** on the cut point -> select **"Foreground Reveal"** card -> Click **Apply**.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "apply_clip_transition",
+    "clipId": "<target_clip_id>",
+    "parameters": {
+      "transition": "mask_reveal",
+      "duration": 0.6,
+      "sfx": "whoosh",
+      "edgeColor": "#00f0ff",
+      "dropShadow": true
     }
   }
   ```
@@ -421,6 +562,7 @@ This section catalogs high-retention motion charts popularized by Vox, Johnny Ha
   * **Subconscious Tension:** Deep bass hits cue the viewer's brain that something serious or consequential just occurred.
 * **Sound Palette:**
   * `whoosh`: Bandpass filtered white noise frequency sweep. (Use on quick pans, text slides, and cutaways).
+  * `gentle_wind`: Soft blowing wind / ambient transition breeze with pinked resonance. (The signature Magnates Media / documentary scene transition gust).
   * `bass_hit` / `impact`: Deep 808 sub-bass drop with punch envelope. (Use on shocking title stamps and scene endings).
   * `snap_zoom`: High-speed camera whoosh-snap. (Use strictly on punch zooms).
   * `shutter_click`: Dual-click mechanical camera shutter. (Use on photo reveals or evidence presentation).

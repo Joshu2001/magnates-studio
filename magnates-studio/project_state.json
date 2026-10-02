@@ -1,0 +1,246 @@
+{
+  "projectName": "Android Updates & Bloatware (Vox Edit)",
+  "currentTime": 0,
+  "duration": 60,
+  "background": [
+    {
+      "id": "bg_vox_opening",
+      "track": "background",
+      "start": 0,
+      "duration": 2.5,
+      "bgType": "vox_cream",
+      "bgColor": "#f4eedb"
+    },
+    {
+      "id": "bg_cyber_grid",
+      "track": "background",
+      "start": 2.5,
+      "duration": 57.5,
+      "bgType": "cyber_grid",
+      "bgColor": "#0a0b0e"
+    }
+  ],
+  "image": [
+    {
+      "id": "clip_crowd_vox",
+      "track": "image",
+      "start": 0,
+      "duration": 2.5,
+      "x": 0,
+      "y": 0,
+      "scale": 1.08,
+      "layerOrder": 1,
+      "zIndex": 10,
+      "zoomEffect": "snap",
+      "zoomScale": 1.25,
+      "zoomStartTime": 0.05,
+      "zoomDuration": 0.45,
+      "zoomOriginX": 0.5,
+      "zoomOriginY": 0.5,
+      "zoomEasing": "easeOutCubic",
+      "transition": "none",
+      "highlights": [
+        {
+          "x": 0.44,
+          "y": 0.45,
+          "w": 0.14,
+          "h": 0.16,
+          "color": "#ffff00",
+          "opacity": 0.95,
+          "startTime": 0.15,
+          "duration": 0.55
+        }
+      ],
+      "file": {
+        "name": "crowdb.png",
+        "url": "/media/uploads/crowdb.png",
+        "isImage": true,
+        "isVideo": false,
+        "isAudio": false
+      }
+    },
+    {
+      "id": "clip_phone_update",
+      "track": "image",
+      "start": 2.5,
+      "duration": 1.7,
+      "x": 0,
+      "y": 0,
+      "scale": 1.05,
+      "layerOrder": 2,
+      "zIndex": 12,
+      "zoomEffect": "snap",
+      "zoomScale": 1.2,
+      "zoomStartTime": 0.1,
+      "zoomDuration": 0.35,
+      "zoomOriginX": 0.5,
+      "zoomOriginY": 0.45,
+      "zoomEasing": "easeOutCubic",
+      "transition": "cut",
+      "highlights": [
+        {
+          "x": 0.3,
+          "y": 0.35,
+          "w": 0.4,
+          "h": 0.2,
+          "color": "#ffff00",
+          "opacity": 0.9,
+          "startTime": 0.2,
+          "duration": 0.45
+        }
+      ],
+      "file": {
+        "name": "android_phone_modern.jpg",
+        "url": "/media/uploads/android_phone_modern.jpg",
+        "isImage": true,
+        "isVideo": false,
+        "isAudio": false
+      }
+    },
+    {
+      "id": "clip_bloatware_punch",
+      "track": "image",
+      "start": 4.2,
+      "duration": 2.7,
+      "x": 0,
+      "y": 0,
+      "scale": 1.1,
+      "layerOrder": 3,
+      "zIndex": 15,
+      "zoomEffect": "snap",
+      "zoomScale": 1.35,
+      "zoomStartTime": 0.1,
+      "zoomDuration": 0.3,
+      "zoomOriginX": 0.5,
+      "zoomOriginY": 0.48,
+      "zoomEasing": "easeOutCubic",
+      "transition": "cut",
+      "highlights": [
+        {
+          "x": 0.25,
+          "y": 0.35,
+          "w": 0.5,
+          "h": 0.22,
+          "color": "#ff334b",
+          "opacity": 0.95,
+          "startTime": 0.15,
+          "duration": 0.4
+        }
+      ],
+      "file": {
+        "name": "bloatware.jpg",
+        "url": "/media/uploads/bloatware.jpg",
+        "isImage": true,
+        "isVideo": false,
+        "isAudio": false
+      }
+    },
+    {
+      "id": "clip_sec_alert",
+      "track": "image",
+      "start": 6.9,
+      "duration": 3.0,
+      "x": 0,
+      "y": 0,
+      "scale": 1.05,
+      "layerOrder": 4,
+      "zIndex": 16,
+      "zoomEffect": "snap",
+      "zoomScale": 1.25,
+      "zoomStartTime": 0.3,
+      "zoomDuration": 0.4,
+      "zoomOriginX": 0.52,
+      "zoomOriginY": 0.5,
+      "zoomEasing": "easeOutCubic",
+      "transition": "cut",
+      "file": {
+        "name": "cyber_security_alert.jpg",
+        "url": "/media/uploads/cyber_security_alert.jpg",
+        "isImage": true,
+        "isVideo": false,
+        "isAudio": false
+      }
+    }
+  ],
+  "video": [],
+  "chart": [],
+  "voiceover": [
+    {
+      "id": "clip_main_voiceover",
+      "track": "voiceover",
+      "start": 0,
+      "duration": 60,
+      "volume": 100,
+      "soundEnabled": true,
+      "layerOrder": 0,
+      "zIndex": 0,
+      "file": {
+        "name": "voiceover_trimmed.wav",
+        "url": "/media/uploads/voiceover_trimmed.wav",
+        "isAudio": true,
+        "isVideo": false,
+        "isImage": false
+      }
+    }
+  ],
+  "music": [],
+  "text": [
+    {
+      "id": "text_vox_hook_1",
+      "track": "text",
+      "start": 0.05,
+      "duration": 2.35,
+      "text": "BILLIONS OF ANDROID USERS",
+      "highlight": "BILLIONS",
+      "position": "bottom",
+      "fontSize": 56,
+      "fontFamily": "'Oswald', sans-serif",
+      "textColor": "#1a1a1a",
+      "highlightColor": "#ff334b",
+      "anim": "pop",
+      "sfx": "camera_click",
+      "x": 260,
+      "y": 580,
+      "zIndex": 100,
+      "layerOrder": 5
+    },
+    {
+      "id": "text_vox_hook_2",
+      "track": "text",
+      "start": 2.5,
+      "duration": 1.6,
+      "text": "SYSTEM UPDATES",
+      "highlight": "UPDATES",
+      "position": "bottom",
+      "fontSize": 58,
+      "fontFamily": "'Oswald', sans-serif",
+      "textColor": "#ffffff",
+      "highlightColor": "#ffff00",
+      "anim": "slide_up",
+      "sfx": "whoosh",
+      "x": 360,
+      "y": 580,
+      "zIndex": 100,
+      "layerOrder": 6
+    },
+    {
+      "id": "text_vox_hook_3",
+      "track": "text",
+      "start": 4.2,
+      "duration": 2.5,
+      "text": "UNWANTED BLOATWARE",
+      "highlight": "BLOATWARE",
+      "position": "bottom",
+      "fontSize": 62,
+      "fontFamily": "'Oswald', sans-serif",
+      "textColor": "#ffffff",
+      "highlightColor": "#ff334b",
+      "anim": "pop",
+      "sfx": "snap_zoom",
+      "x": 290,
+      "y": 580,
+      "zIndex": 100,
+      "layerOrder": 7
+    }
+  ]
+}

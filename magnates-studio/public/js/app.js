@@ -16,6 +16,8 @@ let currentFilter = 'all';
 let pps = 15; // default 15px per second
 let activeTool = 'select'; // 'select', 'split', 'delete'
 let selectedClip = null; // { clip, trackType }
+let selectedEffectId = null; // { clipId, trackType, effectType, effectIndex }
+let selectedTransitionId = null; // { clipId, trackType }
 
 // Timeline multi-layer structure
 let timelineClips = {
@@ -89,6 +91,8 @@ function undo() {
   currentTime = prevState.currentTime;
   duration = prevState.duration;
   selectedClip = null;
+  selectedEffectId = null;
+  selectedTransitionId = null;
   renderAllTimelineTracks();
   updateUI();
   updateUndoRedoUI();
@@ -111,6 +115,8 @@ function redo() {
   currentTime = nextState.currentTime;
   duration = nextState.duration;
   selectedClip = null;
+  selectedEffectId = null;
+  selectedTransitionId = null;
   renderAllTimelineTracks();
   updateUI();
   updateUndoRedoUI();
@@ -351,6 +357,53 @@ function playSFX(type, volumeOverride) {
     g.connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 0.12);
+  } else if (type === 'gentle_wind' || type === 'wind' || type === 'breeze') {
+    // Gentle blowing wind / ambient transition gust (Magnates Media style)
+    // Pinkish soft noise swept through a smooth resonant lowpass/bandpass filter
+    const dur = 1.35;
+    const bufferSize = Math.floor(ctx.sampleRate * dur);
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      // 3-pole pinking filter approximation for warm airy wind texture without harsh treble
+      b0 = 0.99765 * b0 + white * 0.0990460;
+      b1 = 0.96300 * b1 + white * 0.2965164;
+      b2 = 0.57000 * b2 + white * 1.0526913;
+      output[i] = (b0 + b1 + b2 + white * 0.1848) * 0.22;
+    }
+    const noiseSource = ctx.createBufferSource();
+    noiseSource.buffer = noiseBuffer;
+
+    // Resonant bandpass filter that swells and gently recedes like an atmospheric breath/wind
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.Q.setValueAtTime(1.8, now);
+    filter.frequency.setValueAtTime(260, now);
+    filter.frequency.exponentialRampToValueAtTime(820, now + 0.45);
+    filter.frequency.exponentialRampToValueAtTime(380, now + 0.95);
+    filter.frequency.exponentialRampToValueAtTime(180, now + dur);
+
+    // Subtle lowpass companion for warmth
+    const lpFilter = ctx.createBiquadFilter();
+    lpFilter.type = 'lowpass';
+    lpFilter.frequency.setValueAtTime(1400, now);
+    lpFilter.frequency.exponentialRampToValueAtTime(2200, now + 0.45);
+    lpFilter.frequency.exponentialRampToValueAtTime(700, now + dur);
+
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.001 * volMult, now);
+    gain.gain.linearRampToValueAtTime(0.72 * volMult, now + 0.42);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    noiseSource.connect(filter);
+    filter.connect(lpFilter);
+    lpFilter.connect(gain);
+    gain.connect(ctx.destination);
+
+    noiseSource.start(now);
+    noiseSource.stop(now + dur);
   }
 }
 
@@ -929,20 +982,108 @@ function getClipDocumentScrollOffset(clip, time, baseW, baseH) {
   return { x: 0, y: 0 };
 }
 
+// Motion Blur Crowds & Commuter Swarms - Fast-moving high-angle time lapse pan & person-to-person drift
+function getClipMotionBlurCrowdTransform(clip, time, baseW, baseH) {
+  if (!clip || !clip.motionBlurCrowd) return null;
+  const elapsed = Math.max(0, time - clip.start);
+  const dur = Math.max(0.5, clip.duration || 6);
+  const t = Math.min(1.0, elapsed / dur);
+
+  // If user encircled custom numbered waypoints (1, 2, 3...)
+  const waypoints = clip.crowdWaypoints;
+  if (waypoints && waypoints.length >= 1) {
+    if (waypoints.length === 1) {
+      // Single encircled person: smoothly zoom into that exact person
+      const wp = waypoints[0];
+      const targetPanX = -(wp.x - 0.5) * baseW;
+      const targetPanY = -(wp.y - 0.5) * baseH;
+      const targetZoom = wp.zoomScale || 1.35;
+      const ease = 0.5 - 0.5 * Math.cos(t * Math.PI);
+      const panX = targetPanX * ease;
+      const panY = targetPanY * ease;
+      const zoomScale = 1.0 + (targetZoom - 1.0) * ease;
+      return { panX, panY, zoomScale };
+    }
+
+    // Multiple waypoints (e.g. 1 -> 2 -> 3 -> 4 -> 5): travel sequentially through each circled person
+    const segments = waypoints.length - 1;
+    const scaledT = t * segments;
+    const segIdx = Math.min(segments - 1, Math.floor(scaledT));
+    const localT = scaledT - segIdx;
+    
+    // Smooth S-curve easing between points
+    const ease = 0.5 - 0.5 * Math.cos(localT * Math.PI);
+
+    const wpA = waypoints[segIdx];
+    const wpB = waypoints[segIdx + 1];
+
+    const panAX = -(wpA.x - 0.5) * baseW;
+    const panAY = -(wpA.y - 0.5) * baseH;
+    const panBX = -(wpB.x - 0.5) * baseW;
+    const panBY = -(wpB.y - 0.5) * baseH;
+
+    const panX = panAX + (panBX - panAX) * ease;
+    const panY = panAY + (panBY - panAY) * ease;
+
+    // Dynamic zoom close in / zoom out between people
+    const zoomA = wpA.zoomScale || (clip.crowdZoomMode === 'wide' ? 1.08 : 1.32);
+    const zoomB = wpB.zoomScale || (clip.crowdZoomMode === 'wide' ? 1.08 : 1.32);
+    
+    // Dip or push in midpoint for natural camera breathing between crowd members
+    const midPulse = Math.sin(localT * Math.PI) * (clip.crowdZoomMode === 'wide' ? 0.05 : -0.12);
+    const zoomScale = (zoomA + (zoomB - zoomA) * ease) + midPulse;
+
+    return { panX, panY, zoomScale };
+  }
+
+  // Default automatic 5-point crowd weave when no manual lasso circles exist yet
+  // Smooth cinematic S-curve glide
+  const ease = 0.5 - 0.5 * Math.cos(t * Math.PI);
+  
+  // Person-to-person parallax drift: drifts along crowd movement vector with subtle micro-sway and zoom
+  const panDistanceX = baseW * 0.16;
+  const panDistanceY = baseH * 0.08;
+  const sway = Math.sin(t * Math.PI * 2) * (baseH * 0.015);
+  
+  const panX = -panDistanceX * (ease - 0.5);
+  const panY = -panDistanceY * (ease - 0.5) + sway;
+  
+  // High-momentum perspective scale surge
+  const zoomScale = (clip.crowdZoomMode === 'wide' ? 1.06 : 1.25) + 0.09 * Math.sin(t * Math.PI);
+
+  return { panX, panY, zoomScale };
+}
+
+function computeEasingValue(t, curve = 'easeOutCubic') {
+  const clamped = Math.min(1.0, Math.max(0.0, t));
+  switch (curve) {
+    case 'linear':
+      return clamped;
+    case 'easeInOutQuad':
+      return clamped < 0.5 ? 2 * clamped * clamped : 1 - Math.pow(-2 * clamped + 2, 2) / 2;
+    case 'spring':
+      return clamped < 1 ? Math.sin((clamped * Math.PI) / 2) * (1 + 0.12 * Math.sin(clamped * Math.PI)) : 1;
+    case 'easeOutCubic':
+    default:
+      return 1 - Math.pow(1 - clamped, 3.5);
+  }
+}
+
 function getClipPunchZoom(clip, time, baseDx, baseDy, baseW, baseH) {
   if (!clip || clip.zoomEffect !== 'snap') {
     return { scale: 1.0, originX: baseDx + baseW * 0.5, originY: baseDy + baseH * 0.5 };
   }
   const zoomElapsed = time - clip.start;
   const zoomInAt = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
+  const zoomDur = clip.zoomDuration || 0.42;
   const targetScale = clip.zoomScale || 2.2;
   const targetOriginX = clip.zoomOriginX !== undefined ? clip.zoomOriginX : 0.5;
   const targetOriginY = clip.zoomOriginY !== undefined ? clip.zoomOriginY : 0.5;
 
   let currentPunch = 1.0;
   if (zoomElapsed >= zoomInAt) {
-    const t = Math.min(1.0, Math.max(0.0, (zoomElapsed - zoomInAt) / 0.42));
-    const ease = 1 - Math.pow(1 - t, 3.5);
+    const t = (zoomElapsed - zoomInAt) / Math.max(0.05, zoomDur);
+    const ease = computeEasingValue(t, clip.zoomEasing || 'easeOutCubic');
     currentPunch = 1.0 + (targetScale - 1.0) * ease;
   }
   const originPxX = baseDx + baseW * targetOriginX;
@@ -952,43 +1093,56 @@ function getClipPunchZoom(clip, time, baseDx, baseDy, baseW, baseH) {
 
 function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH) {
   const docElapsed = currentTime - targetClip.start;
-  const docFocusInAt = targetClip.docFocusStartTime !== undefined ? targetClip.docFocusStartTime : 0.4;
-  const isWhiteout = targetClip.docStyle !== 'dark';
+  const punch = getClipPunchZoom(targetClip, currentTime, dx, dy, finalW, finalH);
+  const pScale = punch ? punch.scale : 1.0;
 
-  // Calculate unwhiteout / timed auto-restore ease
-  let focusActiveEase = 1.0;
-  if (targetClip.docFocusDuration && targetClip.docFocusDuration > 0) {
-    const focusHold = targetClip.docFocusDuration;
-    const fadeOutStart = docFocusInAt + focusHold;
-    const fadeOutDur = 0.5;
-    if (docElapsed > fadeOutStart) {
-      const outProg = Math.min(1.0, Math.max(0.0, (docElapsed - fadeOutStart) / fadeOutDur));
-      focusActiveEase = 1.0 - (1 - Math.pow(1 - outProg, 3));
-    }
+  // Normalise spotlights: targetClip.spotlights array OR legacy targetClip.docFocus
+  const spotlights = [];
+  if (Array.isArray(targetClip.spotlights) && targetClip.spotlights.length > 0) {
+    spotlights.push(...targetClip.spotlights);
+  } else if (targetClip.docFocus && targetClip.docFocusRect) {
+    spotlights.push({
+      rect: targetClip.docFocusRect,
+      style: targetClip.docStyle || 'dark',
+      dimOpacity: targetClip.docDimOpacity !== undefined ? targetClip.docDimOpacity : 0.65,
+      feather: targetClip.docFeather !== undefined ? targetClip.docFeather : (targetClip.docStyle === 'white' ? 18 : 16),
+      startTime: targetClip.docFocusStartTime !== undefined ? targetClip.docFocusStartTime : 0.4,
+      duration: targetClip.docFocusDuration || 0
+    });
   }
 
-  // 1. Whiteout Fade or Dark Spotlight Cutout
-  if (targetClip.docFocus && targetClip.docFocusRect) {
-    const r = targetClip.docFocusRect;
+  // 1. Render Spotlights (Whiteout or Dark Dim)
+  spotlights.forEach((spot, sIdx) => {
+    const isWhiteout = spot.style === 'white';
+    const sStart = spot.startTime !== undefined ? spot.startTime : 0.4;
+    let focusActiveEase = 1.0;
+    if (spot.duration && spot.duration > 0) {
+      const fadeOutStart = sStart + spot.duration;
+      const fadeOutDur = 0.5;
+      if (docElapsed > fadeOutStart) {
+        const outProg = Math.min(1.0, Math.max(0.0, (docElapsed - fadeOutStart) / fadeOutDur));
+        focusActiveEase = 1.0 - (1 - Math.pow(1 - outProg, 3));
+      }
+    }
+
+    const r = spot.rect || { x: 0.1, y: 0.2, w: 0.8, h: 0.25 };
     const fx = dx + finalW * r.x;
     const fy = dy + finalH * r.y;
     const fw = Math.max(10, finalW * r.w);
     const fh = Math.max(10, finalH * r.h);
 
-    const t = Math.min(1.0, Math.max(0.0, (docElapsed - docFocusInAt) / 0.4));
+    const t = Math.min(1.0, Math.max(0.0, (docElapsed - sStart) / 0.4));
     const ease = (1 - Math.pow(1 - t, 3)) * focusActiveEase;
-    const defaultDim = 0.65; // Balanced 65% fade level for crisp legibility
-    const maxDim = (targetClip.docDimOpacity !== undefined ? targetClip.docDimOpacity : defaultDim) * ease;
+    const maxDim = (spot.dimOpacity !== undefined ? spot.dimOpacity : 0.65) * ease;
 
     if (maxDim > 0.01) {
-      const feather = targetClip.docFeather !== undefined ? targetClip.docFeather : (isWhiteout ? 18 : 16);
+      const feather = spot.feather !== undefined ? spot.feather : (isWhiteout ? 18 : 16);
       const maskW = Math.max(64, Math.round(finalW));
       const maskH = Math.max(64, Math.round(finalH));
       const maskCanvas = getDocMaskCanvas(maskW, maskH);
       const maskCtx = maskCanvas.getContext('2d');
       maskCtx.clearRect(0, 0, maskW, maskH);
 
-      // Choose overlay color: Clean white fade vs Dark theater dim
       if (isWhiteout) {
         maskCtx.fillStyle = `rgba(255, 255, 255, ${maxDim})`;
       } else {
@@ -996,7 +1150,7 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
       }
       maskCtx.fillRect(0, 0, maskW, maskH);
 
-      // Cutout spotlight with smooth feather blur
+      // Cutout spotlight
       maskCtx.save();
       maskCtx.globalCompositeOperation = 'destination-out';
       maskCtx.filter = `blur(${feather}px)`;
@@ -1009,68 +1163,76 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
       maskCtx.fillRect(lx - pad, ly - pad, lw + pad * 2, lh + pad * 2);
       maskCtx.restore();
 
-      // Draw mask over the image
       ctx.drawImage(maskCanvas, dx, dy, finalW, finalH);
 
-      // Account for active camera punch zoom so screen handles match exact zoomed pixels on screen
-      const punch = getClipPunchZoom(targetClip, currentTime, dx, dy, finalW, finalH);
-      const pScale = punch.scale;
       const screenFx = pScale > 1.001 ? punch.originX + (fx - punch.originX) * pScale : fx;
       const screenFy = pScale > 1.001 ? punch.originY + (fy - punch.originY) * pScale : fy;
       const screenFw = fw * pScale;
       const screenFh = fh * pScale;
 
-      // Save exact screen coordinates of focus box for interactive dragging and resizing
-      targetClip._docFocusBounds = { 
-        x: screenFx, 
-        y: screenFy, 
-        w: screenFw, 
-        h: screenFh, 
+      spot._screenBounds = {
+        x: screenFx,
+        y: screenFy,
+        w: screenFw,
+        h: screenFh,
         dx, dy, finalW, finalH,
-        punchScale: pScale
+        punchScale: pScale,
+        spotIndex: sIdx
       };
 
-      // Prominent, professional focus frame with corner brackets and handles (fades with unwhiteout)
-      ctx.save();
-      ctx.globalAlpha = Math.max(0.0, Math.min(1.0, ease));
-      const borderColor = isWhiteout ? '#38bdf8' : '#a855f7';
-      ctx.strokeStyle = borderColor;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(fx, fy, fw, fh);
+      if (sIdx === 0) {
+        targetClip._docFocusBounds = spot._screenBounds;
+      }
 
-      // Corner bracket accents
-      const cLen = Math.min(18, Math.min(fw, fh) * 0.35);
-      ctx.lineWidth = 3.5;
-      ctx.strokeStyle = '#ffffff';
-      // TL
-      ctx.beginPath();
-      ctx.moveTo(fx, fy + cLen); ctx.lineTo(fx, fy); ctx.lineTo(fx + cLen, fy);
-      // TR
-      ctx.moveTo(fx + fw - cLen, fy); ctx.lineTo(fx + fw, fy); ctx.lineTo(fx + fw, fy + cLen);
-      // BL
-      ctx.moveTo(fx, fy + fh - cLen); ctx.lineTo(fx, fy + fh); ctx.lineTo(fx + cLen, fy + fh);
-      // BR
-      ctx.moveTo(fx + fw - cLen, fy + fh); ctx.lineTo(fx + fw, fy + fh); ctx.lineTo(fx + fw, fy + fh - cLen);
-      ctx.stroke();
+      // Editor-only visual indicators (STRICTLY HIDDEN during video playback and export)
+      if (!isExporting && !isPlaying) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0.0, Math.min(1.0, ease));
+        const borderColor = isWhiteout ? '#38bdf8' : '#a855f7';
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(fx, fy, fw, fh);
 
-      // Drag tag handle (visible in editor, hidden during export)
-      if (!isExporting) {
-        ctx.font = 'bold 10px Inter, sans-serif';
-        const tagText = '✛ Focus & Highlight Box (Drag to move)';
+        // Apple-style minimalist corner brackets
+        const cLen = Math.min(14, Math.min(fw, fh) * 0.3);
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(fx, fy + cLen); ctx.lineTo(fx, fy); ctx.lineTo(fx + cLen, fy);
+        ctx.moveTo(fx + fw - cLen, fy); ctx.lineTo(fx + fw, fy); ctx.lineTo(fx + fw, fy + cLen);
+        ctx.moveTo(fx, fy + fh - cLen); ctx.lineTo(fx, fy + fh); ctx.lineTo(fx + cLen, fy + fh);
+        ctx.moveTo(fx + fw - cLen, fy + fh); ctx.lineTo(fx + fw, fy + fh); ctx.lineTo(fx + fw, fy + fh - cLen);
+        ctx.stroke();
+
+        // Minimalist badge with sequence number (1, 2, 3...)
+        const spotNumber = sIdx + 1;
+        const tagText = `${spotNumber} Spotlight`;
+        ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
         const tagW = ctx.measureText(tagText).width;
-        ctx.fillStyle = 'rgba(10, 15, 26, 0.92)';
-        ctx.fillRect(fx + fw / 2 - tagW / 2 - 8, fy - 18, tagW + 16, 17);
+        const pillW = tagW + 16;
+        const pillH = 20;
+        const pillX = fx + 6;
+        const pillY = Math.max(dy + 4, fy - 24);
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(pillX, pillY, pillW, pillH, 6);
+        else ctx.rect(pillX, pillY, pillW, pillH);
+        ctx.fill();
+
         ctx.strokeStyle = borderColor;
         ctx.lineWidth = 1;
-        ctx.strokeRect(fx + fw / 2 - tagW / 2 - 8, fy - 18, tagW + 16, 17);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(tagText, fx + fw / 2 - tagW / 2, fy - 6);
-      }
-      ctx.restore();
-    }
-  }
+        ctx.stroke();
 
-  // 2. Live Animated Text Highlighter Bars (Pure Saturated Fluorescent Colors)
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(tagText, pillX + 8, pillY + pillH / 2);
+        ctx.restore();
+      }
+    }
+  });
+
+  // 2. Animated Highlighter Bars
   if (targetClip.highlights && targetClip.highlights.length > 0) {
     const hlW = Math.max(64, Math.round(finalW));
     const hlH = Math.max(64, Math.round(finalH));
@@ -1082,7 +1244,7 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
 
     targetClip.highlights.forEach((hl, idx) => {
       const defaultSweepSpeed = targetClip.docSweepSpeed || 0.6;
-      const hlStart = hl.startTime !== undefined ? hl.startTime : (docFocusInAt + 0.3 + idx * (defaultSweepSpeed * 0.8));
+      const hlStart = hl.startTime !== undefined ? hl.startTime : (0.4 + 0.3 + idx * (defaultSweepSpeed * 0.8));
       const hlDur = hl.duration || defaultSweepSpeed;
       const hlElapsed = docElapsed - hlStart;
       if (hlElapsed <= 0) return;
@@ -1125,15 +1287,14 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
 
     if (hasActiveHl) {
       ctx.save();
-      // Luminous translucent highlighter tinting: keeps paper bright and colors vivid!
       ctx.globalCompositeOperation = 'source-over';
-      ctx.globalAlpha = 0.40 * focusActiveEase;
+      ctx.globalAlpha = 0.45;
       ctx.drawImage(hlCanvas, dx, dy, finalW, finalH);
       ctx.restore();
     }
 
-    // Interactive Highlight Bounding Box & Handles (visible when hovering or selected)
-    if (!isExporting && targetClip.highlights && targetClip.highlights.length > 0) {
+    // Editor-only visual indicators for Highlights (STRICTLY HIDDEN during video playback and export)
+    if (!isExporting && !isPlaying && targetClip.highlights && targetClip.highlights.length > 0) {
       targetClip.highlights.forEach((hl, idx) => {
         const isSel = (window._selectedHighlightIndex === idx);
         const isHov = (window._hoveredHighlightIndex === idx);
@@ -1144,48 +1305,55 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
         const hy = dy + finalH * hl.y;
         const hw = Math.max(4, finalW * hl.w);
         const hh = Math.max(4, finalH * hl.h);
-        let hlColor = hl.color || '#ffff00';
-        if (hlColor.toLowerCase() === '#facc15' || hlColor.toLowerCase() === '#ffe600') hlColor = '#ffff00';
 
         ctx.save();
         ctx.strokeStyle = isSel ? '#00f0ff' : 'rgba(0, 240, 255, 0.6)';
-        ctx.lineWidth = isSel ? 2 : 1.2;
+        ctx.lineWidth = isSel ? 1.8 : 1.0;
         if (!isSel) ctx.setLineDash([4, 3]);
         ctx.strokeRect(hx, hy, hw, hh);
         ctx.setLineDash([]);
 
-        // Interactive Corner & Edge handles for resizing the highlight
-        const hSz = isSel ? 6 : 5;
+        // Interactive handles
+        const hSz = isSel ? 5 : 4;
         ctx.fillStyle = '#ffffff';
         ctx.strokeStyle = '#00f0ff';
-        ctx.lineWidth = 1.5;
-        // TL, TR, BL, BR, R, L
+        ctx.lineWidth = 1.2;
         [[hx, hy], [hx + hw, hy], [hx, hy + hh], [hx + hw, hy + hh], [hx + hw, hy + hh / 2], [hx, hy + hh / 2]].forEach(([cx, cy]) => {
           ctx.fillRect(cx - hSz / 2, cy - hSz / 2, hSz, hSz);
           ctx.strokeRect(cx - hSz / 2, cy - hSz / 2, hSz, hSz);
         });
 
-        // Top tag for selected highlight
-        if (isSel) {
-          ctx.font = 'bold 9px Inter, sans-serif';
-          const tag = '🖍️ Highlight (Drag to move • Drag handles to resize)';
-          const tw = ctx.measureText(tag).width;
-          ctx.fillStyle = 'rgba(10, 15, 26, 0.92)';
-          ctx.fillRect(hx + hw / 2 - tw / 2 - 6, hy - 16, tw + 12, 14);
-          ctx.strokeStyle = '#00f0ff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(hx + hw / 2 - tw / 2 - 6, hy - 16, tw + 12, 14);
-          ctx.fillStyle = '#ffffff';
-          ctx.fillText(tag, hx + hw / 2 - tw / 2, hy - 5);
-        }
+        // Apple-style clean numbered badge
+        const hlNumber = (spotlights.length) + idx + 1;
+        const tag = `${hlNumber} Highlight`;
+        ctx.font = '600 10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+        const tw = ctx.measureText(tag).width;
+        const pillW = tw + 14;
+        const pillH = 18;
+        const pillX = hx + 4;
+        const pillY = Math.max(dy + 4, hy - 20);
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(pillX, pillY, pillW, pillH, 5);
+        else ctx.rect(pillX, pillY, pillW, pillH);
+        ctx.fill();
+
+        ctx.strokeStyle = isSel ? '#00f0ff' : 'rgba(0, 240, 255, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(tag, pillX + 7, pillY + pillH / 2);
         ctx.restore();
       });
     }
 
-    // Pen tip glow while drawing (rendered directly on ctx for crisp luminescence)
+    // Pen tip glow while drawing
     targetClip.highlights.forEach((hl, idx) => {
       const defaultSweepSpeed = targetClip.docSweepSpeed || 0.6;
-      const hlStart = hl.startTime !== undefined ? hl.startTime : (docFocusInAt + 0.3 + idx * (defaultSweepSpeed * 0.8));
+      const hlStart = hl.startTime !== undefined ? hl.startTime : (0.4 + 0.3 + idx * (defaultSweepSpeed * 0.8));
       const hlDur = hl.duration || defaultSweepSpeed;
       const hlElapsed = docElapsed - hlStart;
       if (hlElapsed <= 0) return;
@@ -1299,8 +1467,11 @@ function drawMediaLayer(specificClip) {
   const finalW = dw * scale;
   const finalH = dh * scale;
   const scrollOffset = getClipDocumentScrollOffset(targetClip, currentTime, finalW, finalH);
-  const offsetX = ((targetClip && targetClip.x !== undefined) ? targetClip.x : 0) + scrollOffset.x;
-  const offsetY = ((targetClip && targetClip.y !== undefined) ? targetClip.y : 0) + scrollOffset.y;
+  const crowdTransform = getClipMotionBlurCrowdTransform(targetClip, currentTime, finalW, finalH);
+  const crowdPanX = crowdTransform ? crowdTransform.panX : 0;
+  const crowdPanY = crowdTransform ? crowdTransform.panY : 0;
+  const offsetX = ((targetClip && targetClip.x !== undefined) ? targetClip.x : 0) + scrollOffset.x + crowdPanX;
+  const offsetY = ((targetClip && targetClip.y !== undefined) ? targetClip.y : 0) + scrollOffset.y + crowdPanY;
   const dx = ((w - finalW) / 2) + offsetX;
   const dy = ((h - finalH) / 2) + offsetY;
 
@@ -1357,9 +1528,9 @@ function drawMediaLayer(specificClip) {
 
       let currentPunch = 1.0;
       if (zoomElapsed >= zoomInAt) {
-        // Fast snappy cubic easing into target zoom
-        const t = Math.min(1, Math.max(0, (zoomElapsed - zoomInAt) / 0.42));
-        const ease = 1 - Math.pow(1 - t, 3.5);
+        const zoomDur = targetClip.zoomDuration || 0.42;
+        const t = (zoomElapsed - zoomInAt) / Math.max(0.05, zoomDur);
+        const ease = computeEasingValue(t, targetClip.zoomEasing || 'easeOutCubic');
         currentPunch = 1.0 + (targetScale - 1.0) * ease;
       }
 
@@ -1392,6 +1563,15 @@ function drawMediaLayer(specificClip) {
 
       ctx.restore();
     } else {
+      ctx.save();
+      if (crowdTransform && crowdTransform.zoomScale) {
+        const cx = dx + finalW / 2;
+        const cy = dy + finalH / 2;
+        ctx.translate(cx, cy);
+        ctx.scale(crowdTransform.zoomScale, crowdTransform.zoomScale);
+        ctx.translate(-cx, -cy);
+      }
+
       if (targetClip?.chartConfig) {
         drawInfographicChart(ctx, targetClip, dx, dy, finalW, finalH);
       } else if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0 && targetClip.drawMode === 'live') {
@@ -1415,6 +1595,8 @@ function drawMediaLayer(specificClip) {
       if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0))) {
         renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH);
       }
+
+      ctx.restore();
     }
 
     // 3. Render Loupe / Magnifying Lens Callout (Logically Answered Circular Callout Effect)
@@ -1527,6 +1709,123 @@ function drawMediaLayer(specificClip) {
       drawZoomTargetIndicator(dx, dy, finalW, finalH, targetClip);
     }
   }
+
+  // Draw Motion Blur Crowds Numbered Encircled Waypoints & Journey Path
+  if (!isExporting && targetClip && targetClip.motionBlurCrowd && !crowdOverlaysHidden) {
+    drawCrowdWaypointsOverlay(ctx, dx, dy, finalW, finalH, targetClip);
+  }
+}
+
+// Global flag for 1-tap hide/show of crowd waypoints and toolbar
+let crowdOverlaysHidden = false;
+let crowdLassoPoints = [];
+let isCrowdLassoDrawing = false;
+
+function drawCrowdWaypointsOverlay(ctx, dx, dy, w, h, clip) {
+  const waypoints = clip.crowdWaypoints || [];
+  if (waypoints.length === 0 && (!isCrowdLassoDrawing || crowdLassoPoints.length === 0)) return;
+
+  ctx.save();
+
+  // 1. Draw connecting motion flight path between waypoints
+  if (waypoints.length >= 2) {
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([8, 6]);
+    ctx.beginPath();
+    waypoints.forEach((wp, idx) => {
+      const cx = dx + wp.x * w;
+      const cy = dy + wp.y * h;
+      if (idx === 0) ctx.moveTo(cx, cy);
+      else ctx.lineTo(cx, cy);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // 2. Draw each circled person / zone with number badge (1, 2, 3...)
+  waypoints.forEach((wp, idx) => {
+    const cx = dx + wp.x * w;
+    const cy = dy + wp.y * h;
+    const rx = Math.max(30, (wp.radiusX || 0.08) * w);
+    const ry = Math.max(36, (wp.radiusY || 0.12) * h);
+
+    // Neon glow loop encircle
+    ctx.save();
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 14;
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 3;
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.12)';
+
+    // If custom freehand loop points exist, draw exact lasso contour
+    if (wp.contour && wp.contour.length >= 3) {
+      ctx.beginPath();
+      wp.contour.forEach((pt, pIdx) => {
+        const px = dx + pt.x * w;
+        const py = dy + pt.y * h;
+        if (pIdx === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      });
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      // Elliptical encircle around person
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 3. Number Badge (1, 2, 3...)
+    const badgeR = 18;
+    const badgeX = cx - rx * 0.7;
+    const badgeY = cy - ry * 0.85;
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#00f0ff';
+    ctx.beginPath();
+    ctx.arc(badgeX, badgeY, badgeR, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#0a0d14';
+    ctx.font = '900 18px "Inter", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`${idx + 1}`, badgeX, badgeY + 1);
+
+    // Sub-label for surface area
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '700 11px "Inter", sans-serif';
+    ctx.fillText(`Target ${idx + 1}`, cx, cy + ry + 16);
+    ctx.restore();
+  });
+
+  // 4. Live drawing in-progress lasso
+  if (isCrowdLassoDrawing && crowdLassoPoints.length >= 2) {
+    ctx.save();
+    ctx.strokeStyle = '#00f0ff';
+    ctx.lineWidth = 3.5;
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    crowdLassoPoints.forEach((pt, idx) => {
+      if (idx === 0) ctx.moveTo(pt.x, pt.y);
+      else ctx.lineTo(pt.x, pt.y);
+    });
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  ctx.restore();
 }
 
 // Draw visual crosshair anchor point for punch/loupe zoom target
@@ -2259,6 +2558,155 @@ function addClipToTimeline(trackType, fileOrData, startSec, clipDuration = 6) {
   return clip;
 }
 
+// Effect Selection & Inspector Synchronization
+function selectEffect(clip, trackType, effectType, effectIndex = 0) {
+  selectedEffectId = { clipId: clip.id, trackType, effectType, effectIndex };
+  selectedClip = { clip, trackType };
+
+  // Make sure inspector sidebar is opened
+  if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) {
+    toggleRightSidebar(true);
+  }
+
+  // Deselect generic clip blocks
+  document.querySelectorAll('.clip-block').forEach(b => b.classList.remove('is-selected'));
+  const clipEl = document.getElementById(clip.id);
+  if (clipEl) clipEl.classList.add('is-selected');
+
+  // Highlight active effect bar
+  document.querySelectorAll('.clip-fx-bar').forEach(b => b.classList.remove('is-selected-fx'));
+  const activeFxBar = clipEl?.querySelector(`.clip-fx-bar[data-fx-type="${effectType}"][data-fx-index="${effectIndex}"]`) ||
+                      clipEl?.querySelector(`.clip-fx-bar.${effectType}`);
+  if (activeFxBar) activeFxBar.classList.add('is-selected-fx');
+
+  // Hide generic clip inspector & text editor; show effect inspector
+  const clipInspector = document.getElementById('card-clip-inspector');
+  const textEditor = document.getElementById('card-text-editor');
+  const chartInspector = document.getElementById('card-chart-inspector');
+  const fxInspector = document.getElementById('card-effect-inspector');
+
+  if (clipInspector) clipInspector.style.display = 'none';
+  if (textEditor) textEditor.style.display = 'none';
+  if (chartInspector) chartInspector.style.display = 'none';
+
+  if (fxInspector) {
+    fxInspector.style.display = 'block';
+    fxInspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  syncEffectInspectorControls();
+}
+
+function applyEffectTimingChange(clip, fxType, fxIndex, newOffset, newDur) {
+  const safeOffset = Math.max(0, Math.min(clip.duration - 0.2, newOffset));
+  const safeDur = Math.max(0.1, Math.min(clip.duration - safeOffset, newDur));
+
+  if (fxType === 'zoom') {
+    clip.zoomStartTime = safeOffset;
+    clip.zoomDuration = safeDur;
+  } else if (fxType === 'docFocus') {
+    clip.docFocusStartTime = safeOffset;
+    clip.docFocusDuration = safeDur;
+    if (Array.isArray(clip.spotlights) && clip.spotlights.length > 0) {
+      const sp = clip.spotlights[fxIndex] || clip.spotlights[0];
+      if (sp) {
+        sp.startTime = safeOffset;
+        sp.duration = safeDur;
+      }
+    }
+  } else if (fxType === 'highlight') {
+    if (clip.highlights && clip.highlights.length > 0) {
+      const hl = clip.highlights[fxIndex] || clip.highlights[0];
+      if (hl) {
+        hl.startTime = safeOffset;
+        hl.duration = safeDur;
+      }
+    }
+  } else if (fxType === 'scroll') {
+    clip.docScrollLinger = safeOffset;
+    clip.docScrollSpeed = safeDur;
+  }
+}
+
+function syncEffectInspectorControls() {
+  if (!selectedEffectId || !selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  const { effectType, effectIndex } = selectedEffectId;
+
+  // Parent clip indicator
+  const parentNameEl = document.getElementById('effect-parent-clip-name');
+  if (parentNameEl) {
+    parentNameEl.textContent = clip.name || clip.file?.name || 'Clip';
+  }
+
+  // Badge label
+  const badgeEl = document.getElementById('effect-inspector-badge');
+  const zoomControls = document.getElementById('effect-zoom-specific-controls');
+
+  let currentOffset = 0;
+  let currentDuration = 1.0;
+  let labelText = 'Effect';
+
+  if (effectType === 'zoom') {
+    currentOffset = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
+    currentDuration = clip.zoomDuration || Math.max(0.4, clip.duration - currentOffset);
+    labelText = clip.zoomEffect === 'snap' ? 'Punch Zoom' : 'Loupe Callout';
+    if (zoomControls) zoomControls.style.display = 'block';
+
+    const scaleSlider = document.getElementById('effect-zoom-scale-slider');
+    const scaleVal = document.getElementById('effect-zoom-scale-val');
+    const curScale = clip.zoomScale || 2.2;
+    if (scaleSlider) scaleSlider.value = Math.round(curScale * 10);
+    if (scaleVal) scaleVal.textContent = `${curScale.toFixed(1)}x`;
+  } else {
+    if (zoomControls) zoomControls.style.display = 'none';
+
+    if (effectType === 'docFocus') {
+      currentOffset = clip.docFocusStartTime !== undefined ? clip.docFocusStartTime : 0.4;
+      currentDuration = (clip.docFocusDuration && clip.docFocusDuration > 0) ? clip.docFocusDuration : Math.max(0.2, clip.duration - currentOffset);
+      labelText = clip.docStyle !== 'dark' ? 'Whiteout Focus' : 'Spotlight Focus';
+    } else if (effectType === 'highlight') {
+      const hl = (clip.highlights && clip.highlights[effectIndex]) ? clip.highlights[effectIndex] : (clip.highlights?.[0]);
+      currentOffset = hl?.startTime !== undefined ? hl.startTime : 0.7;
+      currentDuration = hl?.duration || 0.6;
+      labelText = `Highlight #${effectIndex + 1}`;
+    } else if (effectType === 'scroll') {
+      currentOffset = clip.docScrollLinger !== undefined ? clip.docScrollLinger : 1.0;
+      currentDuration = clip.docScrollSpeed !== undefined ? clip.docScrollSpeed : 3.0;
+      labelText = 'Camera Scroll';
+    } else if (effectType === 'motionBlur') {
+      currentOffset = 0;
+      currentDuration = clip.duration;
+      labelText = 'Motion Blur';
+    }
+  }
+
+  if (badgeEl) badgeEl.textContent = labelText;
+
+  // Sliders and Stepper Values
+  const startSlider = document.getElementById('effect-start-slider');
+  const startVal = document.getElementById('effect-start-val');
+  if (startSlider) {
+    startSlider.max = Math.max(10, Math.round(clip.duration * 10));
+    startSlider.value = Math.round(currentOffset * 10);
+  }
+  if (startVal) startVal.textContent = `${currentOffset.toFixed(2)}s`;
+
+  const durSlider = document.getElementById('effect-dur-slider');
+  const durVal = document.getElementById('effect-dur-val');
+  if (durSlider) {
+    durSlider.max = Math.max(10, Math.round(clip.duration * 10));
+    durSlider.value = Math.round(currentDuration * 10);
+  }
+  if (durVal) durVal.textContent = `${currentDuration.toFixed(2)}s`;
+
+  // Easing curve selector
+  const easingSelect = document.getElementById('effect-easing-select');
+  if (easingSelect) {
+    easingSelect.value = clip.zoomEasing || 'easeOutCubic';
+  }
+}
+
 // Render all clips onto timeline DOM
 function renderAllTimelineTracks() {
   const trackMap = {
@@ -2320,89 +2768,193 @@ function renderAllTimelineTracks() {
         ? (() => { const m = { cyber_grid: 'Cyber Grid', solid_black: 'Solid Black', none: 'Transparent', color: 'Solid Tint', vox_cream: 'Vox Cream' }; return m[clip.bgType] || clip.bgType || 'Background'; })()
         : (clip.file?.name || clip.text || 'Clip');
 
-      // Left & Right Resize Handles
+      // Thumbnail, repeating filmstrip and scrim overlay
+      if (type === 'image' && clip.file?.url) {
+        const filmstripEl = document.createElement('div');
+        filmstripEl.className = 'clip-image-filmstrip';
+        filmstripEl.style.backgroundImage = `url("${clip.file.url}")`;
+        filmstripEl.style.backgroundRepeat = 'repeat-x';
+        filmstripEl.style.backgroundSize = 'auto 100%';
+        block.appendChild(filmstripEl);
+
+        const scrimEl = document.createElement('div');
+        scrimEl.className = 'clip-scrim-overlay';
+        block.appendChild(scrimEl);
+      } else if (type === 'video' && clip.file?.url) {
+        const filmstripEl = document.createElement('div');
+        filmstripEl.className = 'clip-filmstrip';
+        // Set fallback thumbnail or poster if available
+        if (clip.file?.thumbnail || clip.file?.url) {
+          filmstripEl.style.backgroundImage = `url("${clip.file.thumbnail || clip.file.url}")`;
+          filmstripEl.style.backgroundRepeat = 'repeat-x';
+          filmstripEl.style.backgroundSize = 'auto 100%';
+        }
+        block.appendChild(filmstripEl);
+        generateFilmstrip(clip.file.url, clip.duration, filmstripEl);
+
+        const scrimEl = document.createElement('div');
+        scrimEl.className = 'clip-scrim-overlay';
+        block.appendChild(scrimEl);
+      }
+
+      // Thumbnail badge on left edge for image clips
+      let thumbBadgeHtml = '';
+      if (type === 'image' && clip.file?.url) {
+        thumbBadgeHtml = `<img src="${clip.file.url}" class="clip-thumb-badge" alt="thumb" />`;
+      }
+
+      // Left & Right Resize Handles for the clip
       const handleLeft = document.createElement('div');
       handleLeft.className = 'clip-handle clip-handle-left';
 
       const handleRight = document.createElement('div');
       handleRight.className = 'clip-handle clip-handle-right';
 
-      // Content wrapper
+      // Title row content wrapper (separated from effect subtrack)
       const contentEl = document.createElement('div');
       contentEl.className = 'clip-block-content';
 
-      // Build effect indicator tags for user awareness
-      let fxBadgesHtml = '';
-      if (clip.zoomEffect === 'snap') fxBadgesHtml += `<span class="clip-badge-tag" style="color: #ff334b; border-color: rgba(255, 51, 75, 0.4);">🔍 Zoom</span>`;
-      else if (clip.zoomEffect === 'loupe') fxBadgesHtml += `<span class="clip-badge-tag" style="color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);">🔍 Loupe</span>`;
-      if (clip.docFocus) {
-        const isWhite = (clip.docStyle !== 'dark');
-        fxBadgesHtml += `<span class="clip-badge-tag" style="color: ${isWhite ? '#38bdf8' : '#a855f7'}; border-color: ${isWhite ? 'rgba(56, 189, 248, 0.4)' : 'rgba(168, 85, 247, 0.4)'};">${isWhite ? '⚪ Whiteout' : '⚫ Spotlight'}</span>`;
-      }
-      if (clip.highlights && clip.highlights.length > 0) {
-        fxBadgesHtml += `<span class="clip-badge-tag" style="color: #ffff00; border-color: rgba(255, 255, 0, 0.4);">🖍️ ${clip.highlights.length} HL</span>`;
-      }
-      if (clip.docScroll) {
-        fxBadgesHtml += `<span class="clip-badge-tag" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4);">📜 Scroll</span>`;
+      // Responsive density: if width < 80px, show compact representation
+      const isCompact = widthPx < 80;
+      if (isCompact) {
+        let miniBadges = '';
+        if (clip.zoomEffect) miniBadges += '🔍';
+        if (clip.docFocus) miniBadges += '⚪';
+        if (clip.highlights?.length) miniBadges += '🖍️';
+        if (clip.docScroll) miniBadges += '📜';
+        contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="font-size:9px; font-weight:700;">${miniBadges || label.slice(0, 5)}</span>`;
+      } else {
+        contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; flex: 1;">${label}</span>`;
       }
 
-      contentEl.innerHTML = `${iconSvg} <span style="overflow: hidden; text-overflow: ellipsis;">${label}</span> ${fxBadgesHtml}`;
-
-      // Build colored mini-bars along the bottom of the timeline clip
+      // Effect subtrack overlay container (positioned over actual temporal span)
       const fxTracksEl = document.createElement('div');
       fxTracksEl.className = 'clip-fx-tracks';
 
-      // Whiteout / Spotlight sub-bar
-      if (clip.docFocus) {
-        const fxBar = document.createElement('div');
-        fxBar.className = `clip-fx-bar ${clip.docStyle !== 'dark' ? 'whiteout' : 'spotlight'}`;
-        const fIn = (clip.docFocusStartTime !== undefined ? clip.docFocusStartTime : 0.4);
-        const fDur = (clip.docFocusDuration && clip.docFocusDuration > 0) ? clip.docFocusDuration : Math.max(0.1, clip.duration - fIn);
-        const leftPct = Math.min(100, Math.max(0, (fIn / clip.duration) * 100));
-        const widthPct = Math.min(100 - leftPct, Math.max(5, (fDur / clip.duration) * 100));
-        fxBar.style.left = `${leftPct}%`;
-        fxBar.style.width = `${widthPct}%`;
-        fxTracksEl.appendChild(fxBar);
+      // Helper to add interactive effect bar with drag-handles & responsive density
+      const addEffectBar = (fxType, fxIndex, fxLabel, fxIcon, startOffset, fxDuration, cssClass) => {
+        const bar = document.createElement('div');
+        bar.className = `clip-fx-bar ${cssClass}`;
+        bar.dataset.fxType = fxType;
+        bar.dataset.fxIndex = fxIndex;
+        const isFxSelected = selectedEffectId && selectedEffectId.clipId === clip.id && selectedEffectId.effectType === fxType && selectedEffectId.effectIndex === fxIndex;
+        if (isFxSelected) bar.classList.add('is-selected-fx');
+
+        const leftPct = Math.min(100, Math.max(0, (startOffset / clip.duration) * 100));
+        const widthPct = Math.min(100 - leftPct, Math.max(8, (fxDuration / clip.duration) * 100));
+        bar.style.left = `${leftPct}%`;
+        bar.style.width = `${widthPct}%`;
+
+        // Responsive density: if clip < 80px or bar width < 38px, collapse label to icon
+        const showIconOnly = isCompact || (widthPct / 100 * widthPx) < 45;
+        bar.innerHTML = `
+          <div class="clip-fx-handle clip-fx-handle-left" title="Drag to adjust effect start"></div>
+          <span class="clip-fx-bar-label">${fxIcon} ${showIconOnly ? '' : fxLabel}</span>
+          <div class="clip-fx-handle clip-fx-handle-right" title="Drag to adjust effect duration"></div>
+        `;
+
+        // Click effect bar -> select effect & open Effect Settings panel
+        bar.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectEffect(clip, type, fxType, fxIndex);
+        });
+
+        // Left Drag Handle (trim effect start offset)
+        const leftHandle = bar.querySelector('.clip-fx-handle-left');
+        leftHandle.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          selectEffect(clip, type, fxType, fxIndex);
+          const startX = e.clientX;
+          const initialOffset = startOffset;
+          const initialDur = fxDuration;
+
+          const onMove = (moveEvt) => {
+            const deltaSec = (moveEvt.clientX - startX) / pps;
+            let newOffset = Math.max(0, Math.min(clip.duration - 0.2, initialOffset + deltaSec));
+            let newDur = Math.max(0.2, initialDur - (newOffset - initialOffset));
+            if (newOffset + newDur > clip.duration) newDur = clip.duration - newOffset;
+
+            applyEffectTimingChange(clip, fxType, fxIndex, newOffset, newDur);
+            renderAllTimelineTracks();
+            syncEffectInspectorControls();
+          };
+
+          const onUp = () => {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+            recordState(`Trim ${fxLabel} Start`);
+          };
+          window.addEventListener('mousemove', onMove);
+          window.addEventListener('mouseup', onUp);
+        });
+
+        // Right Drag Handle (adjust effect duration)
+        const rightHandle = bar.querySelector('.clip-fx-handle-right');
+        rightHandle.addEventListener('mousedown', (e) => {
+          e.stopPropagation();
+          e.preventDefault();
+          selectEffect(clip, type, fxType, fxIndex);
+          const startX = e.clientX;
+          const initialDur = fxDuration;
+
+          const onMove = (moveEvt) => {
+            const deltaSec = (moveEvt.clientX - startX) / pps;
+            let newDur = Math.max(0.2, Math.min(clip.duration - startOffset, initialDur + deltaSec));
+
+            applyEffectTimingChange(clip, fxType, fxIndex, startOffset, newDur);
+            renderAllTimelineTracks();
+            syncEffectInspectorControls();
+          };
+
+          const onUp = () => {
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+            recordState(`Adjust ${fxLabel} Duration`);
+          };
+          window.addEventListener('mousemove', onMove);
+          window.addEventListener('mouseup', onUp);
+        });
+
+        fxTracksEl.appendChild(bar);
+      };
+
+      // 1. Zoom effect sub-bar
+      if (clip.zoomEffect) {
+        const zmStart = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
+        const zmDur = clip.zoomDuration || Math.max(0.4, clip.duration - zmStart);
+        const zmLabel = clip.zoomEffect === 'snap' ? 'Punch Zoom' : 'Loupe';
+        addEffectBar('zoom', 0, zmLabel, '🔍', zmStart, zmDur, 'zoom');
       }
 
-      // Highlight sub-bar
+      // 2. Whiteout / Spotlight sub-bar
+      if (clip.docFocus) {
+        const fIn = clip.docFocusStartTime !== undefined ? clip.docFocusStartTime : 0.4;
+        const fDur = (clip.docFocusDuration && clip.docFocusDuration > 0) ? clip.docFocusDuration : Math.max(0.2, clip.duration - fIn);
+        const fLabel = clip.docStyle !== 'dark' ? 'Whiteout' : 'Spotlight';
+        addEffectBar('docFocus', 0, fLabel, clip.docStyle !== 'dark' ? '⚪' : '⚫', fIn, fDur, clip.docStyle !== 'dark' ? 'whiteout' : 'spotlight');
+      }
+
+      // 3. Highlight sub-bar
       if (clip.highlights && clip.highlights.length > 0) {
-        const hlBar = document.createElement('div');
-        hlBar.className = 'clip-fx-bar highlight';
         const hlStart = clip.highlights[0].startTime !== undefined ? clip.highlights[0].startTime : 0.7;
         const hlDur = clip.highlights.reduce((acc, h) => acc + (h.duration || 0.6), 0);
-        const leftPct = Math.min(100, Math.max(0, (hlStart / clip.duration) * 100));
-        const widthPct = Math.min(100 - leftPct, Math.max(5, (hlDur / clip.duration) * 100));
-        hlBar.style.left = `${leftPct}%`;
-        hlBar.style.width = `${widthPct}%`;
-        fxTracksEl.appendChild(hlBar);
+        addEffectBar('highlight', 0, `${clip.highlights.length} HL`, '🖍️', hlStart, hlDur, 'highlight');
       }
 
-      // Scroll sub-bar
+      // 4. Scroll sub-bar
       if (clip.docScroll) {
-        const scBar = document.createElement('div');
-        scBar.className = 'clip-fx-bar scroll';
         const scLinger = clip.docScrollLinger !== undefined ? clip.docScrollLinger : 1.0;
         const scSpeed = clip.docScrollSpeed !== undefined ? clip.docScrollSpeed : 3.0;
-        const leftPct = Math.min(100, Math.max(0, (scLinger / clip.duration) * 100));
-        const widthPct = Math.min(100 - leftPct, Math.max(5, (scSpeed / clip.duration) * 100));
-        scBar.style.left = `${leftPct}%`;
-        scBar.style.width = `${widthPct}%`;
-        fxTracksEl.appendChild(scBar);
+        addEffectBar('scroll', 0, 'Scroll', '📜', scLinger, scSpeed, 'scroll');
       }
 
-      // Zoom sub-bar
-      if (clip.zoomEffect) {
-        const zmBar = document.createElement('div');
-        zmBar.className = 'clip-fx-bar zoom';
-        const zmIn = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
-        const leftPct = Math.min(100, Math.max(0, (zmIn / clip.duration) * 100));
-        zmBar.style.left = `${leftPct}%`;
-        zmBar.style.width = `${100 - leftPct}%`;
-        fxTracksEl.appendChild(zmBar);
+      // 5. Motion blur sub-bar
+      if (clip.motionBlurCrowd) {
+        addEffectBar('motionBlur', 0, 'Motion Blur', '👥', 0, clip.duration, 'motion-blur');
       }
 
-      // Hover action buttons (delete & transition)
+      // Delete clip button
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'clip-hover-delete';
       deleteBtn.title = 'Remove clip';
@@ -2413,30 +2965,7 @@ function renderAllTimelineTracks() {
         deleteClip(type, clip.id);
       });
 
-      // Hover Transition button (for images and videos)
-      let transBtn = null;
-      if (type === 'image' || type === 'video') {
-        transBtn = document.createElement('button');
-        const hasTrans = clip.transition && clip.transition !== 'none';
-        const transLabel = hasTrans ? (TRANSITION_TYPES[clip.transition]?.label || clip.transition) : '';
-        transBtn.className = 'clip-hover-trans' + (hasTrans ? ' has-transition' : '');
-        transBtn.title = hasTrans ? `Transition: ${transLabel} (Click to edit)` : 'Add Transition';
-        transBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z"/></svg>`;
-        transBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          openTransitionModal(clip, type);
-        });
-      }
-
-      // Video Filmstrip Background
-      if (type === 'video' && clip.file?.url) {
-        const filmstripEl = document.createElement('div');
-        filmstripEl.className = 'clip-filmstrip';
-        block.appendChild(filmstripEl);
-        generateFilmstrip(clip.file.url, clip.duration, filmstripEl);
-      }
-
-      // Audio Waveform Background (Voiceover & Music Tracks)
+      // Audio Waveform Background
       if ((type === 'voiceover' || type === 'music') && clip.file?.url) {
         const waveCanvas = document.createElement('canvas');
         waveCanvas.className = 'clip-waveform-canvas';
@@ -2447,7 +2976,6 @@ function renderAllTimelineTracks() {
       block.appendChild(handleLeft);
       block.appendChild(contentEl);
       if (fxTracksEl.children.length > 0) block.appendChild(fxTracksEl);
-      if (transBtn) block.appendChild(transBtn);
       block.appendChild(deleteBtn);
       block.appendChild(handleRight);
 
@@ -2678,6 +3206,8 @@ function selectClip(clip, trackType) {
     document.getElementById('btn-update-text').style.display = 'block';
     const chartInspector = document.getElementById('card-chart-inspector');
     if (chartInspector) chartInspector.style.display = 'none';
+    const effectInspector = document.getElementById('card-effect-inspector');
+    if (effectInspector) effectInspector.style.display = 'none';
     inspector.style.display = 'none';
 
     // Highlight text editor card and scroll it into view
@@ -2694,6 +3224,8 @@ function selectClip(clip, trackType) {
       chartInspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       populateChartInspector(clip);
     }
+    const effectInspector = document.getElementById('card-effect-inspector');
+    if (effectInspector) effectInspector.style.display = 'none';
     inspector.style.display = 'none';
     const textEditorCard = document.getElementById('card-text-editor');
     if (textEditorCard) textEditorCard.style.display = 'none';
@@ -2701,6 +3233,8 @@ function selectClip(clip, trackType) {
     // Show standard clip inspector card
     const chartInspector = document.getElementById('card-chart-inspector');
     if (chartInspector) chartInspector.style.display = 'none';
+    const effectInspector = document.getElementById('card-effect-inspector');
+    if (effectInspector) effectInspector.style.display = 'none';
     const textEditorCard = document.getElementById('card-text-editor');
     if (textEditorCard) textEditorCard.style.display = 'none';
     inspector.style.display = 'block';
@@ -2788,6 +3322,53 @@ function selectClip(clip, trackType) {
       }
     }
 
+    // Clip Transition & Overlap Motion section sync
+    const transSection = document.getElementById('inspector-transition-section');
+    if (transSection) {
+      if (trackType === 'image' || trackType === 'video') {
+        transSection.style.display = 'block';
+        const transTypeSelect = document.getElementById('inspector-trans-type-select');
+        const transBadge = document.getElementById('inspector-transition-badge');
+        const transDurSlider = document.getElementById('inspector-trans-dur-slider');
+        const transDurVal = document.getElementById('inspector-trans-dur-val');
+        const transDirBadge = document.getElementById('inspector-trans-dir-badge');
+        const transDirBox = document.getElementById('inspector-trans-direction-box');
+        const transSpeedBox = document.getElementById('inspector-trans-speed-box');
+        const transModeBox = document.getElementById('inspector-trans-mode-box');
+
+        const curTrans = clip.transition || 'none';
+        const curDur = clip.transitionDuration !== undefined ? clip.transitionDuration : 0.7;
+        const curDir = clip.transitionDirection || (curTrans === 'fly_through' ? 'center' : 'left');
+        const curMode = clip.transitionMode || 'underneath';
+
+        if (transTypeSelect) transTypeSelect.value = curTrans;
+        if (transBadge) {
+          transBadge.textContent = curTrans !== 'none' ? (TRANSITION_TYPES[curTrans]?.label || curTrans) : 'None';
+          transBadge.style.color = curTrans !== 'none' ? '#a855f7' : 'var(--text-muted)';
+        }
+
+        if (transDurSlider) transDurSlider.value = Math.round(curDur * 10);
+        if (transDurVal) transDurVal.textContent = curDur.toFixed(1) + 's';
+        if (transDirBadge) transDirBadge.textContent = curDir.toUpperCase();
+
+        // Toggle direction buttons
+        document.querySelectorAll('.trans-dir-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.dir === curDir);
+        });
+
+        // Toggle mode buttons
+        document.getElementById('btn-trans-mode-under')?.classList.toggle('active', curMode === 'underneath');
+        document.getElementById('btn-trans-mode-over')?.classList.toggle('active', curMode === 'over');
+
+        const hasTrans = curTrans !== 'none';
+        if (transDirBox) transDirBox.style.display = hasTrans ? 'block' : 'none';
+        if (transSpeedBox) transSpeedBox.style.display = hasTrans ? 'block' : 'none';
+        if (transModeBox) transModeBox.style.display = hasTrans ? 'flex' : 'none';
+      } else {
+        transSection.style.display = 'none';
+      }
+    }
+
     // Document Zoom & Loupe Inspector Section
     const zoomSection = document.getElementById('inspector-zoom-fx-section');
     if (zoomSection) {
@@ -2861,12 +3442,155 @@ function selectClip(clip, trackType) {
         const btnDocFocus = document.getElementById('btn-inspector-doc-focus');
         const btnDocHl = document.getElementById('btn-inspector-doc-highlight');
 
-        const hasFocus = !!clip.docFocus;
+        // Normalize spotlights array for UI
+        if (!Array.isArray(clip.spotlights) && clip.docFocus && clip.docFocusRect) {
+          clip.spotlights = [{
+            rect: clip.docFocusRect,
+            style: clip.docStyle || 'dark',
+            dimOpacity: clip.docDimOpacity !== undefined ? clip.docDimOpacity : 0.65,
+            feather: clip.docFeather !== undefined ? clip.docFeather : (clip.docStyle === 'white' ? 18 : 16),
+            startTime: clip.docFocusStartTime !== undefined ? clip.docFocusStartTime : 0.4,
+            duration: clip.docFocusDuration || 2.5
+          }];
+        }
+
+        const spotCount = Array.isArray(clip.spotlights) ? clip.spotlights.length : (clip.docFocus ? 1 : 0);
+        const hasFocus = spotCount > 0;
         const hlCount = clip.highlights ? clip.highlights.length : 0;
+        const hasScroll = !!clip.docScroll;
+        const totalEffects = spotCount + hlCount + (hasScroll ? 1 : 0);
 
         if (docBadge) {
-          docBadge.textContent = hasFocus ? (hlCount > 0 ? `Focus + ${hlCount} HL` : 'Spotlight On') : (hlCount > 0 ? `${hlCount} Highlights` : 'Off');
-          docBadge.style.color = (hasFocus || hlCount > 0) ? '#38bdf8' : 'var(--text-muted)';
+          docBadge.textContent = totalEffects > 0 ? `${totalEffects} Effects` : 'Off';
+          docBadge.style.color = totalEffects > 0 ? '#38bdf8' : 'var(--text-muted)';
+        }
+
+        // Render Apple-style minimalist effect sequence chips
+        const seqContainer = document.getElementById('inspector-fx-sequence-container');
+        const chipsList = document.getElementById('inspector-fx-chips-list');
+        const totalCountLbl = document.getElementById('inspector-fx-total-count');
+
+        if (seqContainer && chipsList) {
+          if (totalEffects > 0) {
+            seqContainer.style.display = 'block';
+            if (totalCountLbl) totalCountLbl.textContent = `${totalEffects} effect${totalEffects > 1 ? 's' : ''}`;
+            chipsList.innerHTML = '';
+
+            let currentEffectNum = 1;
+
+            // Spotlights chips
+            if (Array.isArray(clip.spotlights)) {
+              clip.spotlights.forEach((sp, idx) => {
+                const num = currentEffectNum++;
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                const isSelected = window._activeFxEdit?.type === 'spotlight' && window._activeFxEdit?.index === idx;
+                chip.style.cssText = `
+                  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px;
+                  font-size: 10.5px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+                  background: ${isSelected ? 'rgba(56, 189, 248, 0.25)' : 'rgba(255,255,255,0.06)'};
+                  color: ${isSelected ? '#38bdf8' : '#e2e8f0'};
+                  border: 1px solid ${isSelected ? '#38bdf8' : 'rgba(255,255,255,0.12)'};
+                `;
+                chip.innerHTML = `<span style="font-weight:700; color:#38bdf8;">${num}</span> Spotlight (${(sp.duration || 2.5).toFixed(1)}s)`;
+                chip.addEventListener('click', () => {
+                  window._activeFxEdit = { type: 'spotlight', index: idx };
+                  currentTime = clip.start + (sp.startTime !== undefined ? sp.startTime : 0.4);
+                  renderCanvas();
+                  renderAllTimelineTracks();
+                  updateUI();
+                });
+                chipsList.appendChild(chip);
+              });
+            }
+
+            // Camera scroll chip if active
+            if (hasScroll) {
+              const num = currentEffectNum++;
+              const chip = document.createElement('button');
+              chip.type = 'button';
+              const isSelected = window._activeFxEdit?.type === 'scroll';
+              chip.style.cssText = `
+                display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px;
+                font-size: 10.5px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+                background: ${isSelected ? 'rgba(16, 185, 129, 0.25)' : 'rgba(255,255,255,0.06)'};
+                color: ${isSelected ? '#10b981' : '#e2e8f0'};
+                border: 1px solid ${isSelected ? '#10b981' : 'rgba(255,255,255,0.12)'};
+              `;
+              chip.innerHTML = `<span style="font-weight:700; color:#10b981;">${num}</span> Scroll (${(clip.docScrollSpeed || 3.0).toFixed(1)}s)`;
+              chip.addEventListener('click', () => {
+                window._activeFxEdit = { type: 'scroll' };
+                currentTime = clip.start + (clip.docScrollLinger || 1.0);
+                renderCanvas();
+                renderAllTimelineTracks();
+                updateUI();
+              });
+              chipsList.appendChild(chip);
+            }
+
+            // Highlight chips
+            if (clip.highlights) {
+              clip.highlights.forEach((hl, idx) => {
+                const num = currentEffectNum++;
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                const isSelected = window._activeFxEdit?.type === 'highlight' && window._activeFxEdit?.index === idx;
+                chip.style.cssText = `
+                  display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px;
+                  font-size: 10.5px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+                  background: ${isSelected ? 'rgba(0, 240, 255, 0.25)' : 'rgba(255,255,255,0.06)'};
+                  color: ${isSelected ? '#00f0ff' : '#e2e8f0'};
+                  border: 1px solid ${isSelected ? '#00f0ff' : 'rgba(255,255,255,0.12)'};
+                `;
+                chip.innerHTML = `<span style="font-weight:700; color:#00f0ff;">${num}</span> Highlight (${(hl.duration || 0.6).toFixed(1)}s)`;
+                chip.addEventListener('click', () => {
+                  window._activeFxEdit = { type: 'highlight', index: idx };
+                  window._selectedHighlightIndex = idx;
+                  currentTime = clip.start + (hl.startTime !== undefined ? hl.startTime : 0.4);
+                  renderCanvas();
+                  renderAllTimelineTracks();
+                  updateUI();
+                });
+                chipsList.appendChild(chip);
+              });
+            }
+
+            // Active effect inline duration editor
+            const activeEditBox = document.getElementById('inspector-fx-active-edit');
+            const activeTitle = document.getElementById('inspector-fx-active-title');
+            const activeDurVal = document.getElementById('inspector-fx-active-dur-val');
+            const activeDurInput = document.getElementById('inspector-fx-active-dur');
+
+            if (activeEditBox && window._activeFxEdit) {
+              activeEditBox.style.display = 'block';
+              if (window._activeFxEdit.type === 'spotlight' && Array.isArray(clip.spotlights)) {
+                const sp = clip.spotlights[window._activeFxEdit.index] || clip.spotlights[0];
+                if (sp) {
+                  const d = sp.duration || 2.5;
+                  if (activeTitle) activeTitle.textContent = `Spotlight #${window._activeFxEdit.index + 1} Duration`;
+                  if (activeDurVal) activeDurVal.textContent = `${d.toFixed(1)}s`;
+                  if (activeDurInput) activeDurInput.value = Math.round(d * 10);
+                }
+              } else if (window._activeFxEdit.type === 'highlight' && clip.highlights) {
+                const hl = clip.highlights[window._activeFxEdit.index] || clip.highlights[0];
+                if (hl) {
+                  const d = hl.duration || 0.6;
+                  if (activeTitle) activeTitle.textContent = `Highlight #${window._activeFxEdit.index + 1} Duration`;
+                  if (activeDurVal) activeDurVal.textContent = `${d.toFixed(1)}s`;
+                  if (activeDurInput) activeDurInput.value = Math.round(d * 10);
+                }
+              } else if (window._activeFxEdit.type === 'scroll') {
+                const d = clip.docScrollSpeed || 3.0;
+                if (activeTitle) activeTitle.textContent = 'Camera Scroll Duration';
+                if (activeDurVal) activeDurVal.textContent = `${d.toFixed(1)}s`;
+                if (activeDurInput) activeDurInput.value = Math.round(d * 10);
+              }
+            } else if (activeEditBox) {
+              activeEditBox.style.display = 'none';
+            }
+          } else {
+            seqContainer.style.display = 'none';
+          }
         }
 
         const btnDocWhite = document.getElementById('btn-inspector-doc-white');
@@ -2988,6 +3712,36 @@ function selectClip(clip, trackType) {
         if (speedVal) speedVal.textContent = `${curSpeed.toFixed(1)}s`;
       } else {
         docScrollSection.style.display = 'none';
+      }
+    }
+
+    // Motion Blur Crowds Inspector Section
+    const crowdSection = document.getElementById('inspector-crowd-motion-section');
+    if (crowdSection) {
+      if (trackType === 'image' || trackType === 'video') {
+        crowdSection.style.display = 'block';
+        const badge = document.getElementById('inspector-crowd-motion-badge');
+        const body = document.getElementById('inspector-crowd-motion-controls-body');
+        const hasCrowd = !!clip.motionBlurCrowd;
+        const wps = clip.crowdWaypoints || [];
+        if (badge) {
+          badge.textContent = hasCrowd ? (wps.length > 0 ? `${wps.length} Points` : 'Active') : 'Off';
+          badge.style.color = hasCrowd ? '#00f0ff' : 'var(--text-muted)';
+        }
+        if (body) body.style.display = hasCrowd ? 'block' : 'none';
+
+        const modeLabel = document.getElementById('inspector-crowd-mode-label');
+        const isWide = clip.crowdZoomMode === 'wide';
+        if (modeLabel) modeLabel.textContent = isWide ? 'Zoom-Out Wide' : 'Close-In Push';
+        const btnClose = document.getElementById('btn-inspector-crowd-mode-close');
+        const btnWide = document.getElementById('btn-inspector-crowd-mode-wide');
+        if (btnClose) btnClose.classList.toggle('active', !isWide);
+        if (btnWide) btnWide.classList.toggle('active', isWide);
+
+        const countEl = document.getElementById('inspector-crowd-waypoints-count');
+        if (countEl) countEl.textContent = `${wps.length} Persons`;
+      } else {
+        crowdSection.style.display = 'none';
       }
     }
 
@@ -4290,6 +5044,106 @@ document.getElementById('btn-sidebar-vector')?.addEventListener('click', () => {
   }
 });
 
+// ==================== SIDEBAR INSPECTOR: TRANSITIONS & MOTION ====================
+document.getElementById('inspector-trans-type-select')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  const val = e.target.value;
+  clip.transition = val;
+  if (val !== 'none') {
+    if (!clip.transitionDuration) clip.transitionDuration = TRANSITION_TYPES[val]?.duration || 0.7;
+    if (!clip.transitionDirection) clip.transitionDirection = (val === 'fly_through' ? 'center' : 'left');
+    if (!clip.transitionMode) clip.transitionMode = 'underneath';
+    if (!clip.transitionSfx) clip.transitionSfx = TRANSITION_TYPES[val]?.sfx || 'whoosh';
+    playSFX('whoosh');
+  }
+  selectClip(clip, selectedClip.trackType);
+  if (typeof injectTransitionChips === 'function') injectTransitionChips();
+  renderAllTimelineTracks();
+  recordState('Change Transition Type');
+  saveProjectState(false);
+  showTextTimingAlert(`Transition set: ${TRANSITION_TYPES[val]?.label || val}`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 1800);
+});
+
+document.querySelectorAll('.trans-dir-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!selectedClip || !selectedClip.clip) return;
+    const clip = selectedClip.clip;
+    const dir = btn.dataset.dir;
+    clip.transitionDirection = dir;
+    if (!clip.transition || clip.transition === 'none') {
+      clip.transition = dir === 'center' ? 'fly_through' : 'directional_push';
+      clip.transitionDuration = 0.7;
+      clip.transitionSfx = 'whoosh';
+    }
+    selectClip(clip, selectedClip.trackType);
+    playSFX('whoosh');
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    recordState('Set Transition Direction');
+    saveProjectState(false);
+    showTextTimingAlert(`Direction: ${dir.toUpperCase()}`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+});
+
+document.getElementById('btn-trans-mode-under')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!selectedClip || !selectedClip.clip) return;
+  selectedClip.clip.transitionMode = 'underneath';
+  selectClip(selectedClip.clip, selectedClip.trackType);
+  recordState('Set Overlap Mode Underneath');
+  saveProjectState(false);
+  showTextTimingAlert('Overlap: Incoming emerges UNDERNEATH', 'info');
+  setTimeout(() => showTextTimingAlert(''), 1500);
+});
+
+document.getElementById('btn-trans-mode-over')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (!selectedClip || !selectedClip.clip) return;
+  selectedClip.clip.transitionMode = 'over';
+  selectClip(selectedClip.clip, selectedClip.trackType);
+  recordState('Set Overlap Mode Over Top');
+  saveProjectState(false);
+  showTextTimingAlert('Overlap: Incoming pushes OVER TOP', 'info');
+  setTimeout(() => showTextTimingAlert(''), 1500);
+});
+
+document.getElementById('inspector-trans-dur-slider')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const val = parseInt(e.target.value) / 10;
+  selectedClip.clip.transitionDuration = val;
+  const durVal = document.getElementById('inspector-trans-dur-val');
+  if (durVal) durVal.textContent = val.toFixed(1) + 's';
+  if (typeof injectTransitionChips === 'function') injectTransitionChips();
+});
+
+document.getElementById('inspector-trans-dur-slider')?.addEventListener('change', () => {
+  recordState('Change Transition Duration');
+  saveProjectState(false);
+});
+
+document.querySelectorAll('.btn-trans-quick-speed').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!selectedClip || !selectedClip.clip) return;
+    const dur = parseFloat(btn.dataset.dur) || 0.7;
+    selectedClip.clip.transitionDuration = dur;
+    if (!selectedClip.clip.transition || selectedClip.clip.transition === 'none') {
+      selectedClip.clip.transition = 'fly_through';
+      selectedClip.clip.transitionDirection = 'center';
+      selectedClip.clip.transitionSfx = 'whoosh';
+    }
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    recordState('Set Transition Speed Preset');
+    saveProjectState(false);
+    showTextTimingAlert(`Speed set to ${dur.toFixed(1)}s`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+});
+
 // Sidebar Zoom Effect Mode Toggles (Punch Zoom & Loupe)
 document.getElementById('btn-inspector-snap-zoom')?.addEventListener('click', () => {
   if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
@@ -4476,16 +5330,12 @@ function autoDetectFocusRectFromHighlights(clip) {
 document.getElementById('btn-inspector-doc-white')?.addEventListener('click', () => {
   const sel = getOrSelectActiveMediaClip();
   if (sel) {
-    sel.clip.docFocus = true;
-    sel.clip.docStyle = 'white';
-    if (sel.clip.docDimOpacity === undefined) sel.clip.docDimOpacity = 0.65;
-    // Auto-detect existing highlights if present, preserving them!
-    sel.clip.docFocusRect = autoDetectFocusRectFromHighlights(sel.clip);
+    window._activeDocStyle = 'white';
     setStudioTool('doc-focus', 'white');
     selectClip(sel.clip, sel.trackType);
     const docBody = document.getElementById('inspector-doc-focus-controls-body');
     if (docBody) docBody.style.display = 'block';
-    showTextTimingAlert('Whiteout Focus Active: Surrounding text faded cleanly. Drag on canvas anytime to adjust.', 'info');
+    showTextTimingAlert('Whiteout Focus Active: Drag a rectangle across the document on canvas to place your spotlight.', 'info');
     setTimeout(() => showTextTimingAlert(''), 3500);
   } else {
     showTextTimingAlert('Please add or position playhead over an image first.', 'warning');
@@ -4496,16 +5346,12 @@ document.getElementById('btn-inspector-doc-white')?.addEventListener('click', ()
 document.getElementById('btn-inspector-doc-dark')?.addEventListener('click', () => {
   const sel = getOrSelectActiveMediaClip();
   if (sel) {
-    sel.clip.docFocus = true;
-    sel.clip.docStyle = 'dark';
-    if (sel.clip.docDimOpacity === undefined) sel.clip.docDimOpacity = 0.65;
-    // Auto-detect existing highlights if present, preserving them!
-    sel.clip.docFocusRect = autoDetectFocusRectFromHighlights(sel.clip);
+    window._activeDocStyle = 'dark';
     setStudioTool('doc-focus', 'dark');
     selectClip(sel.clip, sel.trackType);
     const docBody = document.getElementById('inspector-doc-focus-controls-body');
     if (docBody) docBody.style.display = 'block';
-    showTextTimingAlert('Dark Spotlight Active: Surrounding text dimmed. Drag on canvas anytime to adjust.', 'info');
+    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle across the document on canvas to place your spotlight.', 'info');
     setTimeout(() => showTextTimingAlert(''), 3500);
   } else {
     showTextTimingAlert('Please add or position playhead over an image first.', 'warning');
@@ -4731,6 +5577,63 @@ document.getElementById('inspector-doc-focus-dur')?.addEventListener('input', (e
 });
 document.getElementById('inspector-doc-focus-dur')?.addEventListener('change', () => {
   recordState('Change Focus Hold Duration');
+});
+
+// Apple-Style Effect Sequence: Duration Slider & Delete Button Handlers
+document.getElementById('inspector-fx-active-dur')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip || !window._activeFxEdit) return;
+  const clip = selectedClip.clip;
+  const val = parseInt(e.target.value) / 10;
+  const lbl = document.getElementById('inspector-fx-active-dur-val');
+  if (lbl) lbl.textContent = `${val.toFixed(1)}s`;
+
+  if (window._activeFxEdit.type === 'spotlight' && Array.isArray(clip.spotlights)) {
+    const sp = clip.spotlights[window._activeFxEdit.index];
+    if (sp) sp.duration = val;
+    clip.docFocusDuration = val;
+  } else if (window._activeFxEdit.type === 'highlight' && clip.highlights) {
+    const hl = clip.highlights[window._activeFxEdit.index];
+    if (hl) hl.duration = val;
+  } else if (window._activeFxEdit.type === 'scroll') {
+    clip.docScrollSpeed = val;
+  }
+  renderAllTimelineTracks();
+});
+
+document.getElementById('inspector-fx-active-dur')?.addEventListener('change', () => {
+  recordState('Change Effect Duration');
+  updateUI();
+});
+
+document.getElementById('btn-fx-delete-active')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip || !window._activeFxEdit) return;
+  const clip = selectedClip.clip;
+
+  if (window._activeFxEdit.type === 'spotlight' && Array.isArray(clip.spotlights)) {
+    clip.spotlights.splice(window._activeFxEdit.index, 1);
+    if (clip.spotlights.length === 0) {
+      delete clip.docFocus;
+      delete clip.docFocusRect;
+    } else {
+      clip.docFocusRect = clip.spotlights[0].rect;
+    }
+    showTextTimingAlert('Spotlight removed', 'info');
+  } else if (window._activeFxEdit.type === 'highlight' && clip.highlights) {
+    clip.highlights.splice(window._activeFxEdit.index, 1);
+    window._selectedHighlightIndex = undefined;
+    showTextTimingAlert('Highlight removed', 'info');
+  } else if (window._activeFxEdit.type === 'scroll') {
+    delete clip.docScroll;
+    delete clip.docScrollMode;
+    showTextTimingAlert('Camera scroll removed', 'info');
+  }
+
+  window._activeFxEdit = null;
+  recordState('Delete Effect');
+  selectClip(clip, selectedClip.trackType);
+  renderCanvas();
+  renderAllTimelineTracks();
+  updateUI();
 });
 
 // 1-Click Instant Un-whiteout button
@@ -5623,85 +6526,63 @@ function initCanvasTransformInteraction() {
   canvas.addEventListener('mousedown', (e) => {
     const pt = getCanvasPointer(e);
 
-    // 0. Check if click hits the interactive Document Focus Box & Handles (in select, doc-focus, or doc-highlight modes)
-    if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video') && selectedClip.clip.docFocus && selectedClip.clip._docFocusBounds) {
-      const fb = selectedClip.clip._docFocusBounds;
-      const handleSize = 22;
-      const corners = [
-        { type: 'tl', x: fb.x, y: fb.y },
-        { type: 'tr', x: fb.x + fb.w, y: fb.y },
-        { type: 'bl', x: fb.x, y: fb.y + fb.h },
-        { type: 'br', x: fb.x + fb.w, y: fb.y + fb.h }
-      ];
+    // 0. Check if click hits any interactive Document Spotlight Box & Handles
+    if (selectedClip && (selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+      const clip = selectedClip.clip;
+      const spots = Array.isArray(clip.spotlights) && clip.spotlights.length > 0 ? clip.spotlights : (clip.docFocus && clip._docFocusBounds ? [{ _screenBounds: clip._docFocusBounds, rect: clip.docFocusRect }] : []);
+      
+      let hitSpotIdx = -1;
+      let hitSpotAction = null;
+      let hitSpotHandle = null;
 
-      for (const c of corners) {
-        if (Math.abs(pt.x - c.x) <= handleSize && Math.abs(pt.y - c.y) <= handleSize) {
-          isTransforming = true;
-          transformAction = 'doc-focus-resize';
-          activeResizeHandle = c.type;
-          transformStartPos = pt;
-          transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
-          transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
-          transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
-          e.preventDefault();
-          return;
+      for (let s = spots.length - 1; s >= 0; s--) {
+        const sp = spots[s];
+        const fb = sp._screenBounds;
+        if (!fb) continue;
+
+        const handleSize = 22;
+        const corners = [
+          { type: 'tl', x: fb.x, y: fb.y },
+          { type: 'tr', x: fb.x + fb.w, y: fb.y },
+          { type: 'bl', x: fb.x, y: fb.y + fb.h },
+          { type: 'br', x: fb.x + fb.w, y: fb.y + fb.h }
+        ];
+
+        for (const c of corners) {
+          if (Math.abs(pt.x - c.x) <= handleSize && Math.abs(pt.y - c.y) <= handleSize) {
+            hitSpotIdx = s; hitSpotAction = 'doc-focus-resize'; hitSpotHandle = c.type; break;
+          }
+        }
+        if (hitSpotIdx >= 0) break;
+
+        if (Math.abs(pt.x - (fb.x + fb.w)) <= 14 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+          hitSpotIdx = s; hitSpotAction = 'doc-focus-resize'; hitSpotHandle = 'r'; break;
+        }
+        if (Math.abs(pt.y - (fb.y + fb.h)) <= 14 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+          hitSpotIdx = s; hitSpotAction = 'doc-focus-resize'; hitSpotHandle = 'b'; break;
+        }
+        if (Math.abs(pt.x - fb.x) <= 14 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+          hitSpotIdx = s; hitSpotAction = 'doc-focus-resize'; hitSpotHandle = 'l'; break;
+        }
+        if (Math.abs(pt.y - fb.y) <= 14 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+          hitSpotIdx = s; hitSpotAction = 'doc-focus-resize'; hitSpotHandle = 't'; break;
+        }
+
+        if (pt.x >= (fb.x - 8) && pt.x <= (fb.x + fb.w + 8) && pt.y >= (fb.y - 28) && pt.y <= (fb.y + fb.h + 8)) {
+          hitSpotIdx = s; hitSpotAction = 'doc-focus-drag'; hitSpotHandle = 'drag'; break;
         }
       }
 
-      // Check edge handles for easy resizing of sides
-      if (Math.abs(pt.x - (fb.x + fb.w)) <= 14 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+      if (hitSpotIdx >= 0) {
+        window._selectedSpotlightIndex = hitSpotIdx;
+        const targetSpot = spots[hitSpotIdx];
         isTransforming = true;
-        transformAction = 'doc-focus-resize';
-        activeResizeHandle = 'r';
+        transformAction = hitSpotAction;
+        activeResizeHandle = hitSpotHandle;
         transformStartPos = pt;
-        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
-        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
-        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
-        e.preventDefault();
-        return;
-      }
-      if (Math.abs(pt.y - (fb.y + fb.h)) <= 14 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
-        isTransforming = true;
-        transformAction = 'doc-focus-resize';
-        activeResizeHandle = 'b';
-        transformStartPos = pt;
-        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
-        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
-        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
-        e.preventDefault();
-        return;
-      }
-      if (Math.abs(pt.x - fb.x) <= 14 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
-        isTransforming = true;
-        transformAction = 'doc-focus-resize';
-        activeResizeHandle = 'l';
-        transformStartPos = pt;
-        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
-        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
-        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
-        e.preventDefault();
-        return;
-      }
-      if (Math.abs(pt.y - fb.y) <= 14 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
-        isTransforming = true;
-        transformAction = 'doc-focus-resize';
-        activeResizeHandle = 't';
-        transformStartPos = pt;
-        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
-        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
-        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
-        e.preventDefault();
-        return;
-      }
-
-      // If clicking inside focus box or on its prominent drag tag
-      if (pt.x >= (fb.x - 8) && pt.x <= (fb.x + fb.w + 8) && pt.y >= (fb.y - 28) && pt.y <= (fb.y + fb.h + 8)) {
-        isTransforming = true;
-        transformAction = 'doc-focus-drag';
-        transformStartPos = pt;
-        transformInitialFocusRect = { ...selectedClip.clip.docFocusRect };
-        transformInitialHighlights = (selectedClip.clip.highlights || []).map(h => ({ ...h }));
-        transformInitialZoomOrigin = { x: selectedClip.clip.zoomOriginX, y: selectedClip.clip.zoomOriginY };
+        transformInitialFocusRect = { ...(targetSpot.rect || clip.docFocusRect) };
+        transformInitialHighlights = (clip.highlights || []).map(h => ({ ...h }));
+        transformInitialZoomOrigin = { x: clip.zoomOriginX, y: clip.zoomOriginY };
         e.preventDefault();
         return;
       }
@@ -5740,6 +6621,27 @@ function initCanvasTransformInteraction() {
         activeResizeHandle = hitHlHandle;
         transformStartPos = pt;
         transformInitialClip = { ...selectedClip.clip.highlights[hitHlIdx] };
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // ==================== MOTION BLUR CROWD ENCIRCLE & LASSO TOOL ====================
+    if (activeTool === 'crowd-lasso') {
+      const activeMedia = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+      let targetMediaClip = null;
+      for (let i = activeMedia.length - 1; i >= 0; i--) {
+        const c = activeMedia[i];
+        const b = c._renderBounds;
+        if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+          targetMediaClip = c;
+          break;
+        }
+      }
+      if (targetMediaClip) {
+        isCrowdLassoDrawing = true;
+        crowdLassoPoints = [pt];
+        window._crowdLassoTargetClip = targetMediaClip;
         e.preventDefault();
         return;
       }
@@ -5970,46 +6872,59 @@ function initCanvasTransformInteraction() {
   }, { passive: false });
 
   window.addEventListener('mousemove', (e) => {
+    const pt = getCanvasPointer(e);
+
+    // If drawing crowd encircle lasso
+    if (isCrowdLassoDrawing) {
+      crowdLassoPoints.push(pt);
+      return;
+    }
+
     // If currently dragging marquee selection for zoom or loupe
     if (isMarqueeDragging) {
-      marqueeCurrentPt = getCanvasPointer(e);
+      marqueeCurrentPt = pt;
       return;
     }
 
     // Mouse hover cursor hints when over focus box or highlights
     if (!isTransforming && !isMarqueeDragging) {
-      if (selectedClip && selectedClip.clip && selectedClip.clip._docFocusBounds) {
-        const fb = selectedClip.clip._docFocusBounds;
-        const corners = [
-          { type: 'tl', x: fb.x, y: fb.y, cursor: 'nwse-resize' },
-          { type: 'tr', x: fb.x + fb.w, y: fb.y, cursor: 'nesw-resize' },
-          { type: 'bl', x: fb.x, y: fb.y + fb.h, cursor: 'nesw-resize' },
-          { type: 'br', x: fb.x + fb.w, y: fb.y + fb.h, cursor: 'nwse-resize' }
-        ];
-        const hoverCorner = corners.find(c => Math.abs(pt.x - c.x) <= 20 && Math.abs(pt.y - c.y) <= 20);
-        if (hoverCorner) {
-          canvas.style.cursor = hoverCorner.cursor;
-          return;
-        }
-        if (Math.abs(pt.x - (fb.x + fb.w)) <= 12 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
-          canvas.style.cursor = 'ew-resize';
-          return;
-        }
-        if (Math.abs(pt.x - fb.x) <= 12 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
-          canvas.style.cursor = 'ew-resize';
-          return;
-        }
-        if (Math.abs(pt.y - (fb.y + fb.h)) <= 12 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
-          canvas.style.cursor = 'ns-resize';
-          return;
-        }
-        if (Math.abs(pt.y - fb.y) <= 12 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
-          canvas.style.cursor = 'ns-resize';
-          return;
-        }
-        if (pt.x >= (fb.x - 8) && pt.x <= (fb.x + fb.w + 8) && pt.y >= (fb.y - 28) && pt.y <= (fb.y + fb.h + 8)) {
-          canvas.style.cursor = 'move';
-          return;
+      // Check hover over all spotlights
+      if (selectedClip && selectedClip.clip) {
+        const spots = Array.isArray(selectedClip.clip.spotlights) && selectedClip.clip.spotlights.length > 0 ? selectedClip.clip.spotlights : (selectedClip.clip.docFocus && selectedClip.clip._docFocusBounds ? [{ _screenBounds: selectedClip.clip._docFocusBounds }] : []);
+        for (let s = spots.length - 1; s >= 0; s--) {
+          const fb = spots[s]._screenBounds;
+          if (!fb) continue;
+          const corners = [
+            { type: 'tl', x: fb.x, y: fb.y, cursor: 'nwse-resize' },
+            { type: 'tr', x: fb.x + fb.w, y: fb.y, cursor: 'nesw-resize' },
+            { type: 'bl', x: fb.x, y: fb.y + fb.h, cursor: 'nesw-resize' },
+            { type: 'br', x: fb.x + fb.w, y: fb.y + fb.h, cursor: 'nwse-resize' }
+          ];
+          const hoverCorner = corners.find(c => Math.abs(pt.x - c.x) <= 20 && Math.abs(pt.y - c.y) <= 20);
+          if (hoverCorner) {
+            canvas.style.cursor = hoverCorner.cursor;
+            return;
+          }
+          if (Math.abs(pt.x - (fb.x + fb.w)) <= 12 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+            canvas.style.cursor = 'ew-resize';
+            return;
+          }
+          if (Math.abs(pt.x - fb.x) <= 12 && pt.y >= fb.y && pt.y <= (fb.y + fb.h)) {
+            canvas.style.cursor = 'ew-resize';
+            return;
+          }
+          if (Math.abs(pt.y - (fb.y + fb.h)) <= 12 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+            canvas.style.cursor = 'ns-resize';
+            return;
+          }
+          if (Math.abs(pt.y - fb.y) <= 12 && pt.x >= fb.x && pt.x <= (fb.x + fb.w)) {
+            canvas.style.cursor = 'ns-resize';
+            return;
+          }
+          if (pt.x >= (fb.x - 8) && pt.x <= (fb.x + fb.w + 8) && pt.y >= (fb.y - 28) && pt.y <= (fb.y + fb.h + 8)) {
+            canvas.style.cursor = 'move';
+            return;
+          }
         }
       }
 
@@ -6031,7 +6946,6 @@ function initCanvasTransformInteraction() {
     }
 
     if (!isTransforming || !selectedClip) return;
-    const pt = getCanvasPointer(e);
     const clip = selectedClip.clip;
 
     if (transformAction === 'hl-drag') {
@@ -6077,9 +6991,13 @@ function initCanvasTransformInteraction() {
       const deltaNormX = dx / Math.max(1, fw);
       const deltaNormY = dy / Math.max(1, fh);
 
-      if (clip.docFocusRect && transformInitialFocusRect) {
-        clip.docFocusRect.x = Math.max(0.01, Math.min(0.98 - clip.docFocusRect.w, transformInitialFocusRect.x + deltaNormX));
-        clip.docFocusRect.y = Math.max(0.01, Math.min(0.98 - clip.docFocusRect.h, transformInitialFocusRect.y + deltaNormY));
+      const targetSpot = (Array.isArray(clip.spotlights) && window._selectedSpotlightIndex !== undefined) ? clip.spotlights[window._selectedSpotlightIndex] : null;
+      const rectObj = targetSpot ? targetSpot.rect : clip.docFocusRect;
+
+      if (rectObj && transformInitialFocusRect) {
+        rectObj.x = Math.max(0.01, Math.min(0.98 - rectObj.w, transformInitialFocusRect.x + deltaNormX));
+        rectObj.y = Math.max(0.01, Math.min(0.98 - rectObj.h, transformInitialFocusRect.y + deltaNormY));
+        if (targetSpot) clip.docFocusRect = targetSpot.rect;
       }
       // Move all linked animated highlights together with the focus box!
       if (clip.highlights && transformInitialHighlights) {
@@ -6106,34 +7024,38 @@ function initCanvasTransformInteraction() {
       const deltaNormY = dy / Math.max(1, fh);
       const init = transformInitialFocusRect;
 
-      if (clip.docFocusRect && init) {
+      const targetSpot = (Array.isArray(clip.spotlights) && window._selectedSpotlightIndex !== undefined) ? clip.spotlights[window._selectedSpotlightIndex] : null;
+      const rectObj = targetSpot ? targetSpot.rect : clip.docFocusRect;
+
+      if (rectObj && init) {
         if (activeResizeHandle === 'br') {
-          clip.docFocusRect.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
-          clip.docFocusRect.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
+          rectObj.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
+          rectObj.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
         } else if (activeResizeHandle === 'tr') {
-          clip.docFocusRect.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
-          clip.docFocusRect.h = Math.max(0.02, init.h - deltaNormY);
-          clip.docFocusRect.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
+          rectObj.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
+          rectObj.h = Math.max(0.02, init.h - deltaNormY);
+          rectObj.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
         } else if (activeResizeHandle === 'bl') {
-          clip.docFocusRect.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
-          clip.docFocusRect.w = Math.max(0.04, init.w - deltaNormX);
-          clip.docFocusRect.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
+          rectObj.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
+          rectObj.w = Math.max(0.04, init.w - deltaNormX);
+          rectObj.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
         } else if (activeResizeHandle === 'tl') {
-          clip.docFocusRect.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
-          clip.docFocusRect.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
-          clip.docFocusRect.w = Math.max(0.04, init.w - deltaNormX);
-          clip.docFocusRect.h = Math.max(0.02, init.h - deltaNormY);
+          rectObj.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
+          rectObj.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
+          rectObj.w = Math.max(0.04, init.w - deltaNormX);
+          rectObj.h = Math.max(0.02, init.h - deltaNormY);
         } else if (activeResizeHandle === 'r') {
-          clip.docFocusRect.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
+          rectObj.w = Math.max(0.04, Math.min(1.0 - init.x, init.w + deltaNormX));
         } else if (activeResizeHandle === 'b') {
-          clip.docFocusRect.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
+          rectObj.h = Math.max(0.02, Math.min(1.0 - init.y, init.h + deltaNormY));
         } else if (activeResizeHandle === 'l') {
-          clip.docFocusRect.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
-          clip.docFocusRect.w = Math.max(0.04, init.w - deltaNormX);
+          rectObj.x = Math.max(0.01, Math.min(init.x + init.w - 0.04, init.x + deltaNormX));
+          rectObj.w = Math.max(0.04, init.w - deltaNormX);
         } else if (activeResizeHandle === 't') {
-          clip.docFocusRect.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
-          clip.docFocusRect.h = Math.max(0.02, init.h - deltaNormY);
+          rectObj.y = Math.max(0.01, Math.min(init.y + init.h - 0.02, init.y + deltaNormY));
+          rectObj.h = Math.max(0.02, init.h - deltaNormY);
         }
+        if (targetSpot) clip.docFocusRect = targetSpot.rect;
       }
     } else if (selectedClip.trackType === 'text') {
       if (transformAction === 'drag') {
@@ -6171,6 +7093,65 @@ function initCanvasTransformInteraction() {
   });
 
   window.addEventListener('mouseup', (e) => {
+    // Finish Motion Blur Crowd Encircle Lasso
+    if (isCrowdLassoDrawing && window._crowdLassoTargetClip) {
+      isCrowdLassoDrawing = false;
+      const targetClip = window._crowdLassoTargetClip;
+      const b = targetClip._renderBounds;
+      if (b && crowdLassoPoints.length >= 4) {
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        crowdLassoPoints.forEach(p => {
+          if (p.x < minX) minX = p.x;
+          if (p.x > maxX) maxX = p.x;
+          if (p.y < minY) minY = p.y;
+          if (p.y > maxY) maxY = p.y;
+        });
+
+        const lassoWidth = maxX - minX;
+        const lassoHeight = maxY - minY;
+        if (lassoWidth > 18 || lassoHeight > 18) {
+          const centerX = (minX + maxX) / 2;
+          const centerY = (minY + maxY) / 2;
+          const normX = Math.max(0.02, Math.min(0.98, (centerX - b.x) / b.w));
+          const normY = Math.max(0.02, Math.min(0.98, (centerY - b.y) / b.h));
+          const normRx = (lassoWidth / 2) / b.w;
+          const normRy = (lassoHeight / 2) / b.h;
+
+          // Normalized contour points for custom lasso shape
+          const contour = crowdLassoPoints.filter((_, i) => i % 3 === 0).map(p => ({
+            x: (p.x - b.x) / b.w,
+            y: (p.y - b.y) / b.h
+          }));
+
+          if (!targetClip.crowdWaypoints) targetClip.crowdWaypoints = [];
+          const wpIdx = targetClip.crowdWaypoints.length + 1;
+          const isWide = targetClip.crowdZoomMode === 'wide';
+          const defaultZoom = isWide ? 1.08 : 1.32;
+
+          targetClip.crowdWaypoints.push({
+            id: `wp-${Date.now()}-${wpIdx}`,
+            number: wpIdx,
+            x: normX,
+            y: normY,
+            radiusX: normRx,
+            radiusY: normRy,
+            contour: contour,
+            zoomScale: defaultZoom
+          });
+
+          targetClip.motionBlurCrowd = true;
+          playSFX('camera_click');
+          renderAllTimelineTracks();
+          recordState(`Encircled Crowd Person #${wpIdx}`);
+          showTextTimingAlert(`Person #${wpIdx} circled and numbered!`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 2500);
+        }
+      }
+      crowdLassoPoints = [];
+      window._crowdLassoTargetClip = null;
+      return;
+    }
+
     if (transformAction === 'hl-drag' || transformAction === 'hl-resize') {
       recordState('Adjust Highlight Box');
       isTransforming = false;
@@ -6214,14 +7195,39 @@ function initCanvasTransformInteraction() {
           const normW = Math.min(1.0 - normX, Math.max(0.05, selW / b.w));
           const normH = Math.min(1.0 - normY, Math.max(0.04, selH / b.h));
 
-          const chosenStyle = window._activeDocStyle || (marqueeTargetClip.docStyle || 'white');
+          const chosenStyle = window._activeDocStyle || (marqueeTargetClip.docStyle || 'dark');
+          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
+
+          if (!Array.isArray(marqueeTargetClip.spotlights)) {
+            marqueeTargetClip.spotlights = [];
+            if (marqueeTargetClip.docFocus && marqueeTargetClip.docFocusRect) {
+              marqueeTargetClip.spotlights.push({
+                rect: marqueeTargetClip.docFocusRect,
+                style: marqueeTargetClip.docStyle || 'dark',
+                dimOpacity: marqueeTargetClip.docDimOpacity !== undefined ? marqueeTargetClip.docDimOpacity : 0.65,
+                feather: marqueeTargetClip.docFeather !== undefined ? marqueeTargetClip.docFeather : 16,
+                startTime: marqueeTargetClip.docFocusStartTime !== undefined ? marqueeTargetClip.docFocusStartTime : 0.4,
+                duration: marqueeTargetClip.docFocusDuration || 2.5
+              });
+            }
+          }
+
+          const newSpot = {
+            rect: { x: normX, y: normY, w: normW, h: normH },
+            style: chosenStyle,
+            dimOpacity: marqueeTargetClip.docDimOpacity !== undefined ? marqueeTargetClip.docDimOpacity : 0.65,
+            feather: chosenStyle === 'white' ? 18 : 16,
+            startTime: parseFloat(relTime.toFixed(1)),
+            duration: marqueeTargetClip.docFocusDuration || 2.5
+          };
+          marqueeTargetClip.spotlights.push(newSpot);
+
           marqueeTargetClip.docStyle = chosenStyle;
           marqueeTargetClip.docFocus = true;
           marqueeTargetClip.docFocusRect = { x: normX, y: normY, w: normW, h: normH };
           if (marqueeTargetClip.docDimOpacity === undefined) marqueeTargetClip.docDimOpacity = 0.65;
           if (marqueeTargetClip.docFeather === undefined) marqueeTargetClip.docFeather = chosenStyle === 'white' ? 18 : 16;
           
-          // Also gently zoom camera into the paragraph for cinematic Vox effect
           marqueeTargetClip.zoomEffect = 'snap';
           marqueeTargetClip.zoomOriginX = normX + normW / 2;
           marqueeTargetClip.zoomOriginY = normY + normH / 2;
@@ -6230,15 +7236,14 @@ function initCanvasTransformInteraction() {
           const optimalScale = Math.min(2.8, Math.max(1.3, Math.min(scaleFactorX, scaleFactorY) * 0.85));
           marqueeTargetClip.zoomScale = parseFloat(optimalScale.toFixed(1));
           
-          const relTime = Math.max(0, currentTime - marqueeTargetClip.start);
           marqueeTargetClip.zoomStartTime = parseFloat(relTime.toFixed(1));
           marqueeTargetClip.docFocusStartTime = parseFloat(relTime.toFixed(1));
 
           playSFX('snap_zoom');
           const trackType = timelineClips.image.includes(marqueeTargetClip) ? 'image' : 'video';
           selectClip(marqueeTargetClip, trackType);
-          recordState(`Set Article ${chosenStyle === 'white' ? 'Whiteout' : 'Dark'} Focus`);
-          showTextTimingAlert(chosenStyle === 'white' ? 'Whiteout Focus active! Surrounding text faded.' : 'Dark Spotlight active! Surrounding text dimmed.', 'success');
+          recordState(`Add Spotlight #${marqueeTargetClip.spotlights.length}`);
+          showTextTimingAlert(`Added Spotlight #${marqueeTargetClip.spotlights.length}! Drag on canvas anytime to adjust.`, 'success');
           setTimeout(() => showTextTimingAlert(''), 3000);
           setStudioTool('select');
         } else if (activeTool === 'doc-highlight') {
@@ -6385,6 +7390,26 @@ function initCanvasTransformInteraction() {
         lastTextClickTime = now;
         lastClickedTextClipId = clickedText.id;
       }
+      return;
+    }
+
+    // Single-Tap on canvas: Toggle hide/show of Motion Blur Crowd circled waypoints & dock toolbar!
+    const activeMediaWithCrowd = [...timelineClips.image, ...timelineClips.video].find(c =>
+      currentTime >= c.start && currentTime <= (c.start + c.duration) && c.motionBlurCrowd
+    );
+    if (activeMediaWithCrowd) {
+      crowdOverlaysHidden = !crowdOverlaysHidden;
+      const dock = document.getElementById('canvas-crowd-dock');
+      if (dock) {
+        dock.style.display = crowdOverlaysHidden ? 'none' : 'flex';
+      }
+      const lbl = document.getElementById('lbl-crowd-toggle-hud');
+      if (lbl) {
+        lbl.textContent = crowdOverlaysHidden ? 'Show (1-Tap)' : 'Hide (1-Tap)';
+      }
+      showTextTimingAlert(crowdOverlaysHidden ? '👁️ Overlays Hidden (Tap to show)' : '✨ Overlays Visible', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+      return;
     }
   });
 
@@ -7148,6 +8173,11 @@ function getSerializableClips() {
       zoomStartTime: c.zoomStartTime,
       zoomOriginX: c.zoomOriginX,
       zoomOriginY: c.zoomOriginY,
+      zoomDuration: c.zoomDuration,
+      zoomEasing: c.zoomEasing,
+      highlights: c.highlights ? JSON.parse(JSON.stringify(c.highlights)) : undefined,
+      spotlights: c.spotlights ? JSON.parse(JSON.stringify(c.spotlights)) : undefined,
+      docSweepSpeed: c.docSweepSpeed,
       loupeRadius: c.loupeRadius,
       loupeShape: c.loupeShape,
       loupeWidth: c.loupeWidth,
@@ -7162,6 +8192,8 @@ function getSerializableClips() {
       transition: c.transition,
       transitionSfx: c.transitionSfx,
       transitionDuration: c.transitionDuration,
+      transitionDirection: c.transitionDirection,
+      transitionMode: c.transitionMode,
       file: c.file ? {
         name: c.file.name,
         url: c.file.url,
@@ -7223,41 +8255,77 @@ function saveProjectState(showConfirm = false) {
   } catch(e) {}
 }
 
-function loadProjectState() {
+function applyProjectState(state) {
+  if (!state) return;
+  // Restore text clips
+  if (state.text && Array.isArray(state.text)) {
+    timelineClips.text = state.text;
+  }
+  // Restore media and chart clips directly
+  ['chart', 'image', 'video', 'voiceover', 'music'].forEach(trackType => {
+    if (state[trackType] && Array.isArray(state[trackType])) {
+      timelineClips[trackType] = state[trackType];
+    }
+  });
+  if (state.background && Array.isArray(state.background)) {
+    timelineClips.background = state.background;
+  }
+  if (typeof state.duration === 'number') {
+    duration = state.duration;
+    const durBadge = document.getElementById('duration-badge');
+    if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+  }
+
+  // Restore voiceover audio element if present
+  if (timelineClips.voiceover && timelineClips.voiceover.length > 0) {
+    const voClip = timelineClips.voiceover[0];
+    if (voClip?.file?.url) {
+      audioPlayer.src = voClip.file.url;
+      audioPlayer.load();
+    }
+  }
+
+  // Restore project name & project ID
+  const savedName = state.projectName || localStorage.getItem('magnates_active_project_name');
+  if (savedName) {
+    const nameEl = document.getElementById('current-project');
+    if (nameEl) nameEl.textContent = savedName;
+  }
+  if (state.projectId) {
+    _currentProjectId = state.projectId;
+  } else {
+    const savedId = localStorage.getItem('magnates_active_project_id');
+    if (savedId) _currentProjectId = savedId;
+  }
+
+  renderAllTimelineTracks();
+  if (timelineClips.text.length > 0) {
+    selectClip(timelineClips.text[0], 'text');
+  }
+}
+
+async function loadProjectState() {
   try {
+    // 1. First check if backend has a project state
+    try {
+      const res = await fetch('/api/project/state');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.state) {
+          applyProjectState(data.state);
+          localStorage.setItem(STORAGE_KEY_PROJECT, JSON.stringify(data.state));
+          return;
+        }
+      }
+    } catch(err) {
+      console.warn('Backend project state fetch failed, falling back to localStorage', err);
+    }
+
+    // 2. Fallback to localStorage
     const raw = localStorage.getItem(STORAGE_KEY_PROJECT);
     if (!raw) return;
     const state = JSON.parse(raw);
-
-    // Restore text clips
-    if (state.text && state.text.length > 0) {
-      timelineClips.text = state.text;
-    }
-
-    // Restore media and chart clips directly
-    ['chart', 'image', 'video', 'voiceover', 'music'].forEach(trackType => {
-      if (state[trackType] && state[trackType].length > 0) {
-        timelineClips[trackType] = state[trackType];
-      }
-    });
-    if (state.background && state.background.length > 0) {
-      timelineClips.background = state.background;
-    }
-
-    if (typeof state.duration === 'number') duration = state.duration;
-
-    // Restore project name & project ID
-    const savedName = state.projectName || localStorage.getItem('magnates_active_project_name');
-    if (savedName) {
-      const nameEl = document.getElementById('current-project');
-      if (nameEl) nameEl.textContent = savedName;
-    }
-    if (state.projectId) {
-      _currentProjectId = state.projectId;
-    } else {
-      const savedId = localStorage.getItem('magnates_active_project_id');
-      if (savedId) _currentProjectId = savedId;
-    }
+    applyProjectState(state);
   } catch(e) {}
 }
 
@@ -7509,12 +8577,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
   const hasVector = isImage && !!clip.vectorEffect;
   const isFront = (clip.layerOrder === 'front');
 
-  let itemsHtml = `
-    <div class="context-menu-header">
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${clipLabel}</span>
-      <span class="context-badge">${isDrawing ? 'DRAWING' : trackType.toUpperCase()}</span>
-    </div>
-  `;
+  let itemsHtml = '';
 
   if (isDrawing) {
     const isLive = clip.drawMode === 'live';
@@ -7573,6 +8636,46 @@ function showStudioContextMenu(x, y, clip, trackType) {
         <span class="context-badge">${hasVector ? 'Active' : 'Sticker'}</span>
       </div>
 
+      <!-- Transitions Group (Magnates Continuous Overlap) -->
+      <div class="context-menu-divider"></div>
+      <div style="font-size: 10px; font-weight: 700; color: #a855f7; padding: 4px 12px 2px 12px; text-transform: uppercase; letter-spacing: 0.5px;">Continuous Overlap Transitions</div>
+
+      <!-- 1. 3D Camera Fly-Through -->
+      <div class="context-menu-item ${clip.transition === 'fly_through' ? 'active-fx' : ''}" id="ctx-action-fly-through">
+        <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M4 4h16v16H4V4m2 4v8l4-4-4-4m6 0v8l4-4-4-4" fill="currentColor"/></svg>
+        <span>${clip.transition === 'fly_through' ? 'Remove 3D Fly-Through' : '⚡ 3D Fly-Through (Depth Zoom)'}</span>
+        <span class="context-badge" style="color: #a855f7;">${clip.transition === 'fly_through' ? `${(clip.transitionDuration || 0.7).toFixed(1)}s` : '1-Click'}</span>
+      </div>
+
+      <!-- 2. Directional Push / Slide Under -->
+      <div class="context-menu-item ${clip.transition === 'directional_push' ? 'active-fx' : ''}" id="ctx-action-directional-push">
+        <svg viewBox="0 0 24 24" style="color: #3b82f6;"><path d="M6 17.59L7.41 19 12 14.42 16.59 19 18 17.59l-6-6zM6 11l1.41 1.41L12 7.83l4.59 4.58L18 11l-6-6z" transform="rotate(90 12 12)" fill="currentColor"/></svg>
+        <span>${clip.transition === 'directional_push' ? `Remove Slide (${clip.transitionDirection || 'left'})` : '➡️ Directional Push / Pan Under'}</span>
+        <span class="context-badge" style="color: #3b82f6;">${clip.transition === 'directional_push' ? (clip.transitionDirection || 'left').toUpperCase() : 'Pan'}</span>
+      </div>
+
+      <!-- 3. Morph Cut -->
+      <div class="context-menu-item ${clip.transition === 'morph_cut' ? 'active-fx' : ''}" id="ctx-action-morph-cut">
+        <svg viewBox="0 0 24 24" style="color: #06b6d4;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>
+        <span>${clip.transition === 'morph_cut' ? 'Remove Morph Cut' : '🌊 Morph Cut (Seamless Blend)'}</span>
+        <span class="context-badge" style="color: #06b6d4;">${clip.transition === 'morph_cut' ? 'Active' : 'Morph'}</span>
+      </div>
+
+      <!-- 4. Foreground Reveal Wipe -->
+      <div class="context-menu-item ${clip.transition === 'mask_reveal' ? 'active-fx' : ''}" id="ctx-action-mask-reveal">
+        <svg viewBox="0 0 24 24" style="color: #10b981;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>
+        <span>${clip.transition === 'mask_reveal' ? 'Remove Reveal' : '📐 Foreground Reveal (Split Wipe)'}</span>
+        <span class="context-badge" style="color: #10b981;">${clip.transition === 'mask_reveal' ? 'Active' : 'Reveal'}</span>
+      </div>
+
+      <!-- 5. Transition Speed & Direction Controls -->
+      <div class="context-menu-item" id="ctx-action-trans-settings">
+        <svg viewBox="0 0 24 24" style="color: #eab308;"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
+        <span>⚙️ Speed &amp; Direction Controls...</span>
+        <span class="context-badge" style="color: #eab308;">Settings</span>
+      </div>
+      <div class="context-menu-divider"></div>
+
       <!-- Snap / Punch Camera Zoom -->
       <div class="context-menu-item ${clip.zoomEffect === 'snap' ? 'active-fx' : ''}" id="ctx-action-snap-zoom">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
@@ -7588,24 +8691,31 @@ function showStudioContextMenu(x, y, clip, trackType) {
       </div>
 
       <!-- 1. Dark Document Spotlight (Original Dim) -->
-      <div class="context-menu-item ${clip.docFocus && clip.docStyle === 'dark' ? 'active-fx' : ''}" id="ctx-action-doc-dark">
+      <div class="context-menu-item" id="ctx-action-doc-dark">
         <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-        <span>${clip.docFocus && clip.docStyle === 'dark' ? 'Remove Dark Spotlight' : '⚫ Dark Document Spotlight'}</span>
-        <span class="context-badge" style="color: #a855f7;">${clip.docFocus && clip.docStyle === 'dark' ? 'Active' : 'Spotlight'}</span>
+        <span>⚫ Add Dark Spotlight</span>
+        <span class="context-badge" style="color: #a855f7;">${clip.spotlights && clip.spotlights.length > 0 ? `${clip.spotlights.length} Active` : (clip.docFocus && clip.docStyle === 'dark' ? '1 Active' : 'Spotlight')}</span>
       </div>
 
       <!-- 2. Article Whiteout Fade -->
-      <div class="context-menu-item ${clip.docFocus && clip.docStyle !== 'dark' ? 'active-fx' : ''}" id="ctx-action-doc-white">
+      <div class="context-menu-item" id="ctx-action-doc-white">
         <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
-        <span>${clip.docFocus && clip.docStyle !== 'dark' ? 'Remove Article Whiteout' : '⚪ Article Whiteout Fade'}</span>
-        <span class="context-badge" style="color: #38bdf8;">${clip.docFocus && clip.docStyle !== 'dark' ? 'Active' : 'Whiteout'}</span>
+        <span>⚪ Add Whiteout Fade</span>
+        <span class="context-badge" style="color: #38bdf8;">${clip.spotlights && clip.spotlights.some(s=>s.style==='white') ? 'Active' : (clip.docFocus && clip.docStyle !== 'dark' ? '1 Active' : 'Whiteout')}</span>
       </div>
 
       <!-- 3. Animated Highlighter -->
-      <div class="context-menu-item ${clip.highlights && clip.highlights.length > 0 ? 'active-fx' : ''}" id="ctx-action-doc-hl">
+      <div class="context-menu-item" id="ctx-action-doc-hl">
         <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>
         <span>🖍️ Add Animated Highlighter</span>
         <span class="context-badge" style="color: #38bdf8;">${clip.highlights && clip.highlights.length > 0 ? `${clip.highlights.length} HL` : 'Sweep'}</span>
+      </div>
+
+      <!-- Motion Blur Crowds & Commuter Swarms -->
+      <div class="context-menu-item ${clip.motionBlurCrowd ? 'active-fx' : ''}" id="ctx-action-motion-blur-crowd">
+        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        <span>Motion Blur Crowds</span>
+        <span class="context-badge" style="color: #00f0ff;">${clip.motionBlurCrowd ? 'Active' : 'Motion Blur'}</span>
       </div>
 
       <!-- 4. Document Camera Scroll / Flow (Right-Click Fast Option) -->
@@ -7691,7 +8801,70 @@ function showStudioContextMenu(x, y, clip, trackType) {
     </div>
   `;
 
-  menu.innerHTML = itemsHtml;
+  menu.innerHTML = `
+    <div class="context-menu-header">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${clipLabel}</span>
+      <span class="context-badge">${isDrawing ? 'DRAWING' : trackType.toUpperCase()}</span>
+    </div>
+    <div class="context-menu-search-wrapper">
+      <svg class="context-menu-search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <input type="text" class="context-menu-search-input" id="ctx-search-input" placeholder="Search actions (e.g. zoom, cut)..." autocomplete="off" spellcheck="false" />
+      <span class="context-menu-search-clear" id="ctx-search-clear" title="Clear search">&times;</span>
+    </div>
+    <div class="context-menu-items-scroll" id="ctx-scroll-container">
+      ${itemsHtml}
+    </div>
+  `;
+
+  // Search filter functionality
+  const searchInput = menu.querySelector('#ctx-search-input');
+  const searchClear = menu.querySelector('#ctx-search-clear');
+  const scrollContainer = menu.querySelector('#ctx-scroll-container');
+
+  if (searchInput) {
+    // Prevent clicking or typing in search from bubbling and dismissing menu
+    searchInput.addEventListener('click', (e) => e.stopPropagation());
+    searchInput.addEventListener('keydown', (e) => {
+      e.stopPropagation();
+      if (e.key === 'Escape') {
+        hideStudioContextMenu();
+      }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (searchClear) searchClear.style.display = q ? 'block' : 'none';
+
+      const items = scrollContainer.querySelectorAll('.context-menu-item');
+      items.forEach(item => {
+        const text = (item.textContent || '').toLowerCase();
+        const matches = !q || text.includes(q);
+        item.style.display = matches ? 'flex' : 'none';
+      });
+
+      // Also hide dividers if adjacent items are hidden or when searching
+      const dividers = scrollContainer.querySelectorAll('.context-menu-divider');
+      dividers.forEach(d => {
+        d.style.display = q ? 'none' : 'block';
+      });
+    });
+
+    if (searchClear) {
+      searchClear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+      });
+    }
+
+    // Auto-focus search input after mount
+    setTimeout(() => {
+      if (searchInput && document.body.contains(searchInput)) {
+        searchInput.focus();
+      }
+    }, 60);
+  }
 
   // If in fullscreen or immersive mode, append menu inside canvasWrapper so browser doesn't hide it behind top-layer
   const isFsActive = !!document.fullscreenElement || canvasWrapper?.classList.contains('is-immersive-fallback');
@@ -7699,8 +8872,8 @@ function showStudioContextMenu(x, y, clip, trackType) {
   mountTarget.appendChild(menu);
 
   // Position smartly within viewport bounds (or canvasWrapper bounds if in fullscreen)
-  const menuWidth = 220;
-  const menuHeight = menu.offsetHeight || 240;
+  const menuWidth = 250;
+  const menuHeight = menu.offsetHeight || 380;
   let posX = x;
   let posY = y;
 
@@ -7770,6 +8943,110 @@ function showStudioContextMenu(x, y, clip, trackType) {
     toggleMagnatesVectorEffect(clip);
   });
 
+  menu.querySelector('#ctx-action-fly-through')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.transition === 'fly_through') {
+      clip.transition = 'none';
+      showTextTimingAlert('Removed 3D Fly-Through transition', 'info');
+    } else {
+      clip.transition = 'fly_through';
+      clip.transitionDuration = clip.transitionDuration || 0.7;
+      clip.transitionDirection = 'center';
+      clip.transitionSfx = 'whoosh';
+      playSFX('whoosh');
+      showTextTimingAlert('⚡ 1-Click 3D Fly-Through Applied (Depth Zoom)', 'success');
+    }
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    selectClip(clip, trackType);
+    recordState('Toggle 3D Fly-Through Transition');
+    saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+
+  menu.querySelector('#ctx-action-directional-push')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.transition === 'directional_push') {
+      // Toggle / cycle directions: left -> right -> up -> down -> none
+      const currentDir = clip.transitionDirection || 'left';
+      if (currentDir === 'left') clip.transitionDirection = 'right';
+      else if (currentDir === 'right') clip.transitionDirection = 'up';
+      else if (currentDir === 'up') clip.transitionDirection = 'down';
+      else { clip.transition = 'none'; showTextTimingAlert('Removed Slide transition', 'info'); }
+      if (clip.transition !== 'none') showTextTimingAlert(`Slide direction: ${clip.transitionDirection.toUpperCase()}`, 'success');
+    } else {
+      clip.transition = 'directional_push';
+      clip.transitionDuration = clip.transitionDuration || 0.7;
+      clip.transitionDirection = 'left';
+      clip.transitionMode = 'underneath';
+      clip.transitionSfx = 'whoosh';
+      playSFX('whoosh');
+      showTextTimingAlert('➡️ 1-Click Directional Slide Under Applied (From Left)', 'success');
+    }
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    selectClip(clip, trackType);
+    recordState('Toggle Directional Push Transition');
+    saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+
+  menu.querySelector('#ctx-action-morph-cut')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.transition === 'morph_cut') {
+      clip.transition = 'none';
+      showTextTimingAlert('Removed Morph Cut', 'info');
+    } else {
+      clip.transition = 'morph_cut';
+      clip.transitionDuration = clip.transitionDuration || 0.6;
+      clip.transitionSfx = 'whoosh';
+      playSFX('whoosh');
+      showTextTimingAlert('🌊 1-Click Morph Cut Applied (Seamless Optical Blend)', 'success');
+    }
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    selectClip(clip, trackType);
+    recordState('Toggle Morph Cut Transition');
+    saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+
+  menu.querySelector('#ctx-action-mask-reveal')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.transition === 'mask_reveal') {
+      clip.transition = 'none';
+      showTextTimingAlert('Removed Foreground Reveal', 'info');
+    } else {
+      clip.transition = 'mask_reveal';
+      clip.transitionDuration = clip.transitionDuration || 0.6;
+      clip.transitionDirection = clip.transitionDirection || 'left';
+      clip.transitionSfx = 'whoosh';
+      playSFX('whoosh');
+      showTextTimingAlert('📐 1-Click Foreground Reveal Applied (Split Wipe)', 'success');
+    }
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    selectClip(clip, trackType);
+    recordState('Toggle Mask Reveal Transition');
+    saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+
+  menu.querySelector('#ctx-action-trans-settings')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, trackType);
+    const transSec = document.getElementById('inspector-transition-section');
+    if (transSec) {
+      transSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      transSec.style.outline = '2px solid #a855f7';
+      transSec.style.borderRadius = '6px';
+      setTimeout(() => { transSec.style.outline = 'none'; }, 2000);
+    }
+    showTextTimingAlert('Configure transition speed & direction in Inspector', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
   menu.querySelector('#ctx-action-snap-zoom')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
@@ -7800,39 +9077,21 @@ function showStudioContextMenu(x, y, clip, trackType) {
   menu.querySelector('#ctx-action-doc-dark')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
-    if (clip.docFocus && clip.docStyle === 'dark') {
-      clip.docFocus = false;
-      recordState('Remove Dark Spotlight');
-      showTextTimingAlert('Dark Spotlight removed.', 'info');
-    } else {
-      clip.docFocus = true;
-      clip.docStyle = 'dark';
-      clip.docFocusRect = autoDetectFocusRectFromHighlights(clip);
-      recordState('Enable Dark Spotlight');
-      showTextTimingAlert('Dark Document Spotlight Active!', 'success');
-    }
     selectClip(clip, trackType);
-    setStudioTool('select');
-    setTimeout(() => showTextTimingAlert(''), 3000);
+    window._activeDocStyle = 'dark';
+    setStudioTool('doc-focus', 'dark');
+    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle across the document on canvas to place your spotlight.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
   });
 
   menu.querySelector('#ctx-action-doc-white')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
-    if (clip.docFocus && clip.docStyle !== 'dark') {
-      clip.docFocus = false;
-      recordState('Remove Article Whiteout');
-      showTextTimingAlert('Whiteout Fade removed.', 'info');
-    } else {
-      clip.docFocus = true;
-      clip.docStyle = 'white';
-      clip.docFocusRect = autoDetectFocusRectFromHighlights(clip);
-      recordState('Enable Article Whiteout Fade');
-      showTextTimingAlert('Article Whiteout Fade Active!', 'success');
-    }
     selectClip(clip, trackType);
-    setStudioTool('select');
-    setTimeout(() => showTextTimingAlert(''), 3000);
+    window._activeDocStyle = 'white';
+    setStudioTool('doc-focus', 'white');
+    showTextTimingAlert('Whiteout Focus Active: Drag a rectangle across the document on canvas to place whiteout fade.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
   });
 
   menu.querySelector('#ctx-action-doc-hl')?.addEventListener('click', (e) => {
@@ -7841,6 +9100,27 @@ function showStudioContextMenu(x, y, clip, trackType) {
     selectClip(clip, trackType);
     setStudioTool('doc-highlight');
     showTextTimingAlert('Highlighter Active: Drag across words or lines to add sweeping highlight bars.', 'info');
+    setTimeout(() => showTextTimingAlert(''), 3500);
+  });
+
+  menu.querySelector('#ctx-action-motion-blur-crowd')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    if (clip.motionBlurCrowd) {
+      delete clip.motionBlurCrowd;
+      closeCrowdDock();
+      recordState('Remove Motion Blur Crowds Effect');
+      showTextTimingAlert('Motion Blur Crowds effect removed.', 'info');
+    } else {
+      clip.motionBlurCrowd = true;
+      if (!clip.crowdZoomMode) clip.crowdZoomMode = 'close';
+      recordState('Enable Motion Blur Crowds Effect');
+      openCrowdDock(clip);
+      showTextTimingAlert('Motion Blur Crowds Active! Use Lasso to circle person 1, 2, 3...', 'success');
+      playSFX('whoosh');
+    }
+    selectClip(clip, trackType);
+    renderAllTimelineTracks();
     setTimeout(() => showTextTimingAlert(''), 3500);
   });
 
@@ -7953,6 +9233,147 @@ function showStudioContextMenu(x, y, clip, trackType) {
     deleteClip(trackType, clip.id);
   });
 }
+
+// ==================== MOTION BLUR CROWD ENCIRCLE & WAYPOINT ENGINE ====================
+let activeCrowdEditingClip = null;
+
+function openCrowdDock(clip) {
+  activeCrowdEditingClip = clip;
+  crowdOverlaysHidden = false;
+  const dock = document.getElementById('canvas-crowd-dock');
+  if (dock) {
+    dock.style.display = 'flex';
+  }
+  setStudioTool('crowd-lasso');
+  updateCrowdDockUI(clip);
+}
+
+function closeCrowdDock() {
+  activeCrowdEditingClip = null;
+  const dock = document.getElementById('canvas-crowd-dock');
+  if (dock) {
+    dock.style.display = 'none';
+  }
+  if (activeTool === 'crowd-lasso') {
+    setStudioTool('select');
+  }
+}
+
+function updateCrowdDockUI(clip) {
+  const isWide = clip && clip.crowdZoomMode === 'wide';
+  const btnClose = document.getElementById('btn-crowd-zoom-in');
+  const btnWide = document.getElementById('btn-crowd-zoom-out');
+  if (btnClose) btnClose.classList.toggle('active', !isWide);
+  if (btnWide) btnWide.classList.toggle('active', isWide);
+}
+
+// Attach Crowd Dock Toolbar Buttons
+document.getElementById('btn-crowd-lasso')?.addEventListener('click', () => {
+  setStudioTool('crowd-lasso');
+  showTextTimingAlert('Lasso Tool Active: Draw circle around person on screen', 'info');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+});
+
+document.getElementById('btn-crowd-zoom-in')?.addEventListener('click', () => {
+  if (activeCrowdEditingClip) {
+    activeCrowdEditingClip.crowdZoomMode = 'close';
+    updateCrowdDockUI(activeCrowdEditingClip);
+    recordState('Set Crowd Zoom Mode: Close-In');
+    showTextTimingAlert('Camera mode: Close-in push between circled people', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
+});
+
+document.getElementById('btn-crowd-zoom-out')?.addEventListener('click', () => {
+  if (activeCrowdEditingClip) {
+    activeCrowdEditingClip.crowdZoomMode = 'wide';
+    updateCrowdDockUI(activeCrowdEditingClip);
+    recordState('Set Crowd Zoom Mode: Wide-Out');
+    showTextTimingAlert('Camera mode: Zoom-out wide overview flow', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
+});
+
+document.getElementById('btn-crowd-toggle-hud')?.addEventListener('click', () => {
+  crowdOverlaysHidden = !crowdOverlaysHidden;
+  const lbl = document.getElementById('lbl-crowd-toggle-hud');
+  if (lbl) lbl.textContent = crowdOverlaysHidden ? 'Show (1-Tap)' : 'Hide (1-Tap)';
+  showTextTimingAlert(crowdOverlaysHidden ? '👁️ Overlays Hidden (Tap screen to show)' : '✨ Overlays Visible', 'info');
+  setTimeout(() => showTextTimingAlert(''), 2000);
+});
+
+document.getElementById('btn-crowd-clear')?.addEventListener('click', () => {
+  if (activeCrowdEditingClip) {
+    activeCrowdEditingClip.crowdWaypoints = [];
+    recordState('Clear Crowd Waypoints');
+    renderAllTimelineTracks();
+    showTextTimingAlert('Cleared all circled waypoints.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
+});
+
+document.getElementById('btn-crowd-close')?.addEventListener('click', () => {
+  closeCrowdDock();
+  showTextTimingAlert('Crowd Journey Saved & Active!', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2000);
+});
+
+// Sidebar Inspector buttons for Motion Blur Crowds
+document.getElementById('btn-inspector-crowd-toggle')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    const clip = selectedClip.clip;
+    clip.motionBlurCrowd = !clip.motionBlurCrowd;
+    if (clip.motionBlurCrowd) {
+      if (!clip.crowdZoomMode) clip.crowdZoomMode = 'close';
+      openCrowdDock(clip);
+      showTextTimingAlert('Motion Blur Crowds Active! Use Lasso to circle person 1, 2, 3...', 'success');
+    } else {
+      closeCrowdDock();
+      showTextTimingAlert('Motion Blur Crowds disabled.', 'info');
+    }
+    selectClip(clip, selectedClip.trackType);
+    renderAllTimelineTracks();
+    recordState('Toggle Motion Blur Crowds from Inspector');
+  }
+});
+
+document.getElementById('btn-inspector-crowd-toolbar')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.motionBlurCrowd = true;
+    openCrowdDock(selectedClip.clip);
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    renderAllTimelineTracks();
+  }
+});
+
+document.getElementById('btn-inspector-crowd-mode-close')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.crowdZoomMode = 'close';
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    updateCrowdDockUI(selectedClip.clip);
+    recordState('Set Crowd Mode: Close-In');
+  }
+});
+
+document.getElementById('btn-inspector-crowd-mode-wide')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.crowdZoomMode = 'wide';
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    updateCrowdDockUI(selectedClip.clip);
+    recordState('Set Crowd Mode: Zoom-Out Wide');
+  }
+});
+
+document.getElementById('btn-clear-crowd-waypoints')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.crowdWaypoints = [];
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    renderAllTimelineTracks();
+    recordState('Clear Crowd Waypoints');
+    showTextTimingAlert('Cleared all circled waypoints.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  }
+});
 
 // ==================== BACKGROUND REMOVAL (CUTOUT) ALGORITHM ====================
 // Fast high-precision flood-fill & boundary chroma color detection
@@ -12110,23 +13531,79 @@ document.getElementById('btn-add-selected-images')?.addEventListener('click', ()
 
 // ==================== FEATURE 3: TRANSITIONS BETWEEN CLIPS ====================
 const TRANSITION_TYPES = {
-  none:       { label: 'None (Cut)',    duration: 0 },
-  fade:       { label: 'Fade',          duration: 0.5 },
-  slide_left: { label: 'Slide Left',    duration: 0.5 },
-  slide_right:{ label: 'Slide Right',   duration: 0.5 },
-  zoom_in:    { label: 'Zoom In',       duration: 0.5 },
-  zoom_out:   { label: 'Zoom Out',      duration: 0.5 },
-  wipe_left:  { label: 'Wipe Left',     duration: 0.5 },
-  dissolve:   { label: 'Dissolve',      duration: 0.6 },
-  flash:      { label: 'Flash Cut',     duration: 0.25 },
-  dip_black:  { label: 'Dip to Black',  duration: 0.6 },
-  paper_drop: { label: 'Paper Drop',    duration: 0.7 }
+  none:             { label: 'None (Cut)',                duration: 0 },
+  fly_through:      { label: '⚡ 3D Fly-Through',          duration: 0.7, sfx: 'whoosh' },
+  directional_push: { label: '➡️ Directional Push / Under', duration: 0.7, sfx: 'whoosh' },
+  morph_cut:        { label: '🌊 Morph Cut',              duration: 0.6, sfx: 'whoosh' },
+  mask_reveal:      { label: '📐 Foreground Reveal',      duration: 0.6, sfx: 'whoosh' },
+  fade:             { label: 'Fade',                      duration: 0.5 },
+  slide_left:       { label: 'Slide Left',                duration: 0.5 },
+  slide_right:      { label: 'Slide Right',               duration: 0.5 },
+  zoom_in:          { label: 'Zoom In',                   duration: 0.5 },
+  zoom_out:         { label: 'Zoom Out',                  duration: 0.5 },
+  wipe_left:        { label: 'Wipe Left',                 duration: 0.5 },
+  dissolve:         { label: 'Dissolve',                  duration: 0.6 },
+  flash:            { label: 'Flash Cut',                 duration: 0.25 },
+  dip_black:        { label: 'Dip to Black',              duration: 0.6 },
+  paper_drop:       { label: 'Paper Drop',                duration: 0.7, sfx: 'paper' }
 };
 
 let _transitionEditContext = null;
 
 function injectTransitionChips() {
   document.querySelectorAll('.transition-chip').forEach(c => c.remove());
+
+  const tracksToProcess = [
+    { type: 'video', container: document.getElementById('content-video') },
+    { type: 'image', container: document.getElementById('content-image') }
+  ];
+
+  tracksToProcess.forEach(({ type, container }) => {
+    if (!container) return;
+    const clips = (timelineClips[type] || []).slice().sort((a, b) => a.start - b.start);
+    if (clips.length < 2) return;
+
+    for (let i = 0; i < clips.length - 1; i++) {
+      const clipA = clips[i];
+      const clipB = clips[i + 1];
+      const cutTimeA = clipA.start + clipA.duration;
+      const cutTimeB = clipB.start;
+
+      // Check if clips are adjacent or nearly adjacent (gap < 0.45s)
+      if (Math.abs(cutTimeA - cutTimeB) < 0.45) {
+        const boundaryTime = cutTimeB;
+        const chip = document.createElement('div');
+        chip.className = 'transition-chip';
+        const hasTrans = clipB.transition && clipB.transition !== 'none';
+        if (hasTrans) chip.classList.add('has-transition');
+
+        const isSelected = selectedTransitionId && selectedTransitionId.clipId === clipB.id && selectedTransitionId.trackType === type;
+        if (isSelected) chip.classList.add('is-selected-transition');
+
+        chip.style.left = `${boundaryTime * pps}px`;
+
+        const transConfig = TRANSITION_TYPES[clipB.transition] || null;
+        const labelText = hasTrans ? `${transConfig?.label || clipB.transition} ${(clipB.transitionDuration || 0.5).toFixed(1)}s` : 'Add Transition';
+
+        chip.innerHTML = `
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <span class="transition-chip-label">${labelText}</span>
+        `;
+
+        chip.title = hasTrans ? `Transition: ${transConfig?.label || clipB.transition} (Click to edit)` : 'Click to add cut transition';
+
+        chip.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectedTransitionId = { clipId: clipB.id, trackType: type };
+          document.querySelectorAll('.transition-chip').forEach(c => c.classList.remove('is-selected-transition'));
+          chip.classList.add('is-selected-transition');
+          openTransitionModal(clipB, type);
+        });
+
+        container.appendChild(chip);
+      }
+    }
+  });
 }
 
 function openTransitionModal(clip, trackType) {
@@ -12270,6 +13747,22 @@ document.querySelectorAll('.transition-card').forEach(card => {
   card.addEventListener('click', () => {
     document.querySelectorAll('.transition-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
+    const tr = card.dataset.transition;
+    if (tr && TRANSITION_TYPES[tr]) {
+      const defDur = TRANSITION_TYPES[tr].duration;
+      const defSfx = TRANSITION_TYPES[tr].sfx;
+      const durationSlider = document.getElementById('transition-duration-slider');
+      const durVal = document.getElementById('transition-duration-val');
+      if (durationSlider && defDur !== undefined && defDur > 0) {
+        durationSlider.value = Math.round(defDur * 10);
+        if (durVal) durVal.textContent = defDur.toFixed(1) + 's';
+      }
+      if (defSfx) {
+        document.querySelectorAll('.sfx-card').forEach(s => {
+          s.classList.toggle('active', s.dataset.sfx === defSfx);
+        });
+      }
+    }
   });
 });
 
@@ -12636,8 +14129,267 @@ document.getElementById('btn-preview-sfx')?.addEventListener('click', () => {
 function applyTransitionEffect(ctx, w, h, transitionType, progress, nextClip) {
   if (!transitionType || transitionType === 'none' || progress <= 0 || progress >= 1) return;
 
+  // Resolve preceding clip (Clip A) and incoming clip (Clip B)
+  let prevClip = null;
+  if (nextClip) {
+    const allClips = [...(timelineClips.video || []), ...(timelineClips.image || [])].sort((a, b) => a.start - b.start);
+    const idx = allClips.findIndex(c => c.id === nextClip.id);
+    if (idx > 0) {
+      prevClip = allClips[idx - 1];
+    }
+  }
+
+  const drawClipMedia = (clip, scale = 1, alpha = 1, offX = 0, offY = 0) => {
+    if (!clip || !clip.file) return;
+    const el = getMediaElement(clip.file);
+    if (!el) return;
+    const nw = el.naturalWidth || el.videoWidth || w;
+    const nh = el.naturalHeight || el.videoHeight || h;
+    if (!nw || !nh) return;
+    const s = Math.max(w / nw, h / nh) * scale;
+    const dw = nw * s;
+    const dh = nh * s;
+    const dx = (w - dw) / 2 + offX;
+    const dy = (h - dh) / 2 + offY;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    ctx.drawImage(el, dx, dy, dw, dh);
+    ctx.restore();
+  };
+
   ctx.save();
   switch(transitionType) {
+    case 'fly_through': {
+      // 3D Camera Fly-Through / Seamless Zoom-Through (Magnates Media signature transition)
+      // Outgoing image zooms forward towards viewer; incoming image emerges from depth before outgoing vanishes
+      const p = progress;
+      const dir = nextClip?.transitionDirection || 'center';
+
+      const scaleA = 1.0 + Math.pow(p, 1.6) * 1.5;
+      const alphaA = p < 0.35 ? 1 : Math.max(0, 1 - (p - 0.35) / 0.45);
+
+      const easeOutB = 1 - Math.pow(1 - p, 2.2);
+      const scaleB = 0.45 + 0.55 * easeOutB;
+      const alphaB = p < 0.15 ? 0 : Math.min(1, (p - 0.15) / 0.5);
+
+      // Angled directional depth drift if direction is set
+      let offX_B = 0, offY_B = 0;
+      if (dir === 'left') offX_B = -w * 0.25 * (1 - easeOutB);
+      else if (dir === 'right') offX_B = w * 0.25 * (1 - easeOutB);
+      else if (dir === 'up') offY_B = -h * 0.25 * (1 - easeOutB);
+      else if (dir === 'down') offY_B = h * 0.25 * (1 - easeOutB);
+
+      if (prevClip) {
+        drawClipMedia(prevClip, scaleA, alphaA);
+      }
+      if (nextClip) {
+        drawClipMedia(nextClip, scaleB, alphaB, offX_B, offY_B);
+      }
+
+      // Radial speed blur lines & dynamic lens bloom at peak transition
+      const peak = Math.sin(p * Math.PI);
+      if (peak > 0.05) {
+        ctx.save();
+        const radGrad = ctx.createRadialGradient(w / 2, h / 2, 10, w / 2, h / 2, Math.max(w, h) * 0.7);
+        radGrad.addColorStop(0, `rgba(255, 255, 255, ${0.2 * peak})`);
+        radGrad.addColorStop(0.35, 'transparent');
+        radGrad.addColorStop(1, `rgba(0, 0, 0, ${0.45 * peak})`);
+        ctx.fillStyle = radGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 * peak})`;
+        ctx.lineWidth = 1.5;
+        const cx = w / 2;
+        const cy = h / 2;
+        for (let a = 0; a < 12; a++) {
+          const angle = (a / 12) * Math.PI * 2;
+          const r1 = Math.min(w, h) * 0.22;
+          const r2 = Math.max(w, h) * 0.65;
+          ctx.beginPath();
+          ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
+          ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      break;
+    }
+    case 'directional_push':
+    case 'slide_left':
+    case 'slide_right': {
+      // Directional Slide & Underneath Layer Overlap (Magnates YouTuber style)
+      // The user can choose the incoming direction (left, right, up, down)
+      // and whether Image 2 appears right UNDER Image 1 while Image 1 moves, or pushes over top!
+      const p = progress;
+      const dir = nextClip?.transitionDirection || (transitionType === 'slide_left' ? 'left' : (transitionType === 'slide_right' ? 'right' : 'left'));
+      const mode = nextClip?.transitionMode || 'underneath';
+
+      const easeOut = 1 - Math.pow(1 - p, 2.5);
+      const easeIn = Math.pow(p, 1.8);
+
+      let offX_A = 0, offY_A = 0;
+      let offX_B = 0, offY_B = 0;
+
+      if (dir === 'left') {
+        offX_B = -w * (1 - easeOut);
+        offX_A = easeIn * (w * 0.38);
+      } else if (dir === 'right') {
+        offX_B = w * (1 - easeOut);
+        offX_A = -easeIn * (w * 0.38);
+      } else if (dir === 'up') {
+        offY_B = -h * (1 - easeOut);
+        offY_A = easeIn * (h * 0.38);
+      } else if (dir === 'down') {
+        offY_B = h * (1 - easeOut);
+        offY_A = -easeIn * (h * 0.38);
+      } else {
+        // Center / Depth Push
+        const scaleA = 1.0 + easeIn * 0.6;
+        const scaleB = 0.55 + 0.45 * easeOut;
+        if (prevClip) drawClipMedia(prevClip, scaleA, Math.max(0, 1 - p * 1.3));
+        if (nextClip) drawClipMedia(nextClip, scaleB, Math.min(1, p * 1.5));
+        break;
+      }
+
+      // Outgoing Clip A fades out after Clip B is already visible underneath!
+      const alphaA = p < 0.35 ? 1 : Math.max(0, 1 - (p - 0.35) / 0.55);
+      const alphaB = Math.min(1, p / 0.15);
+
+      if (mode === 'underneath') {
+        // Clip B is rendered UNDERNEATH Clip A
+        if (nextClip) {
+          drawClipMedia(nextClip, 1, alphaB, offX_B, offY_B);
+        }
+        if (prevClip) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 32;
+          drawClipMedia(prevClip, 1, alphaA, offX_A, offY_A);
+          ctx.restore();
+        }
+      } else {
+        // Clip B pushes OVER TOP of Clip A
+        if (prevClip) {
+          drawClipMedia(prevClip, 1, alphaA, offX_A, offY_A);
+        }
+        if (nextClip) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 32;
+          drawClipMedia(nextClip, 1, alphaB, offX_B, offY_B);
+          ctx.restore();
+        }
+      }
+
+      // Dynamic directional motion blur streak in transition center
+      const midPeak = Math.sin(p * Math.PI);
+      if (midPeak > 0.08) {
+        ctx.save();
+        ctx.globalAlpha = midPeak * 0.12;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+      break;
+    }
+    case 'morph_cut': {
+      // Morph Cut / Seamless Cut: Optical flow cross-blend with micro directional warp
+      const p = progress;
+      const scaleA = 1.0 + p * 0.06;
+      const scaleB = 0.94 + p * 0.06;
+      const alphaA = 1 - p;
+      const alphaB = p;
+
+      if (prevClip) {
+        drawClipMedia(prevClip, scaleA, alphaA);
+      }
+      if (nextClip) {
+        drawClipMedia(nextClip, scaleB, alphaB);
+      }
+
+      const smear = Math.sin(p * Math.PI) * 0.22;
+      if (smear > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = smear;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+      break;
+    }
+    case 'mask_reveal': {
+      // Foreground / Split Reveal Wipe with 3D drop shadow and direction support
+      const p = 1 - Math.pow(1 - progress, 2.4);
+      const dir = nextClip?.transitionDirection || 'left';
+
+      if (prevClip) {
+        drawClipMedia(prevClip, 1, 1);
+      }
+      if (nextClip) {
+        ctx.save();
+        ctx.beginPath();
+        if (dir === 'right') {
+          const splitX = w * (1 - p);
+          ctx.rect(splitX, 0, w - splitX, h);
+          ctx.clip();
+          drawClipMedia(nextClip, 1, 1);
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 24;
+          ctx.shadowOffsetX = -6;
+          ctx.strokeStyle = '#00f0ff';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(splitX, 0);
+          ctx.lineTo(splitX, h);
+          ctx.stroke();
+        } else if (dir === 'up') {
+          const splitY = h * p;
+          ctx.rect(0, 0, w, splitY);
+          ctx.clip();
+          drawClipMedia(nextClip, 1, 1);
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 24;
+          ctx.shadowOffsetY = 6;
+          ctx.strokeStyle = '#00f0ff';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(0, splitY);
+          ctx.lineTo(w, splitY);
+          ctx.stroke();
+        } else if (dir === 'down') {
+          const splitY = h * (1 - p);
+          ctx.rect(0, splitY, w, h - splitY);
+          ctx.clip();
+          drawClipMedia(nextClip, 1, 1);
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 24;
+          ctx.shadowOffsetY = -6;
+          ctx.strokeStyle = '#00f0ff';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(0, splitY);
+          ctx.lineTo(w, splitY);
+          ctx.stroke();
+        } else {
+          // Default: from left
+          const splitX = w * p;
+          ctx.rect(0, 0, splitX, h);
+          ctx.clip();
+          drawClipMedia(nextClip, 1, 1);
+          ctx.shadowColor = 'rgba(0,0,0,0.85)';
+          ctx.shadowBlur = 24;
+          ctx.shadowOffsetX = 6;
+          ctx.strokeStyle = '#00f0ff';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(splitX, 0);
+          ctx.lineTo(splitX, h);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      break;
+    }
     case 'fade':
       ctx.globalAlpha = Math.sin(progress * Math.PI);
       ctx.fillStyle = '#000';
@@ -13326,4 +15078,173 @@ function setupAudioTrimInteractions() {
     closeAudioTrimModal();
     showTextTimingAlert(`Trimmed audio: ${formatTimecode(_audioTrimInSec)} - ${formatTimecode(_audioTrimOutSec)} (${dur.toFixed(2)}s)`, 'success');
   });
+}
+
+// ==================== EFFECT INSPECTOR CONTROLS WIRE-UP ====================
+function initEffectInspectorListeners() {
+  const startSlider = document.getElementById('effect-start-slider');
+  const durSlider = document.getElementById('effect-dur-slider');
+  const btnStartDec = document.getElementById('btn-effect-start-dec');
+  const btnStartInc = document.getElementById('btn-effect-start-inc');
+  const btnDurDec = document.getElementById('btn-effect-dur-dec');
+  const btnDurInc = document.getElementById('btn-effect-dur-inc');
+  const easingSelect = document.getElementById('effect-easing-select');
+  const zoomScaleSlider = document.getElementById('effect-zoom-scale-slider');
+  const btnBackToClip = document.getElementById('btn-back-to-clip-settings');
+  const btnDeleteEffect = document.getElementById('btn-delete-active-effect');
+
+  // Start Offset Slider
+  startSlider?.addEventListener('input', (e) => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const offset = parseInt(e.target.value) / 10;
+    const dur = durSlider ? parseInt(durSlider.value) / 10 : 1.0;
+    applyEffectTimingChange(selectedClip.clip, selectedEffectId.effectType, selectedEffectId.effectIndex, offset, dur);
+    renderAllTimelineTracks();
+    syncEffectInspectorControls();
+    renderCanvas();
+  });
+  startSlider?.addEventListener('change', () => {
+    recordState('Adjust Effect Start Offset');
+  });
+
+  // Start Stepper (-)
+  btnStartDec?.addEventListener('click', () => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const curVal = startSlider ? parseInt(startSlider.value) / 10 : 0;
+    const newVal = Math.max(0, parseFloat((curVal - 0.1).toFixed(2)));
+    const dur = durSlider ? parseInt(durSlider.value) / 10 : 1.0;
+    applyEffectTimingChange(selectedClip.clip, selectedEffectId.effectType, selectedEffectId.effectIndex, newVal, dur);
+    renderAllTimelineTracks();
+    syncEffectInspectorControls();
+    renderCanvas();
+    recordState('Nudge Effect Start Earlier');
+  });
+
+  // Start Stepper (+)
+  btnStartInc?.addEventListener('click', () => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const curVal = startSlider ? parseInt(startSlider.value) / 10 : 0;
+    const newVal = Math.min(selectedClip.clip.duration - 0.1, parseFloat((curVal + 0.1).toFixed(2)));
+    const dur = durSlider ? parseInt(durSlider.value) / 10 : 1.0;
+    applyEffectTimingChange(selectedClip.clip, selectedEffectId.effectType, selectedEffectId.effectIndex, newVal, dur);
+    renderAllTimelineTracks();
+    syncEffectInspectorControls();
+    renderCanvas();
+    recordState('Nudge Effect Start Later');
+  });
+
+  // Duration Slider
+  durSlider?.addEventListener('input', (e) => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const dur = Math.max(0.1, parseInt(e.target.value) / 10);
+    const offset = startSlider ? parseInt(startSlider.value) / 10 : 0;
+    applyEffectTimingChange(selectedClip.clip, selectedEffectId.effectType, selectedEffectId.effectIndex, offset, dur);
+    renderAllTimelineTracks();
+    syncEffectInspectorControls();
+    renderCanvas();
+  });
+  durSlider?.addEventListener('change', () => {
+    recordState('Adjust Effect Duration');
+  });
+
+  // Duration Stepper (-)
+  btnDurDec?.addEventListener('click', () => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const curVal = durSlider ? parseInt(durSlider.value) / 10 : 1;
+    const newVal = Math.max(0.1, parseFloat((curVal - 0.1).toFixed(2)));
+    const offset = startSlider ? parseInt(startSlider.value) / 10 : 0;
+    applyEffectTimingChange(selectedClip.clip, selectedEffectId.effectType, selectedEffectId.effectIndex, offset, newVal);
+    renderAllTimelineTracks();
+    syncEffectInspectorControls();
+    renderCanvas();
+    recordState('Shorten Effect Duration');
+  });
+
+  // Duration Stepper (+)
+  btnDurInc?.addEventListener('click', () => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const curVal = durSlider ? parseInt(durSlider.value) / 10 : 1;
+    const offset = startSlider ? parseInt(startSlider.value) / 10 : 0;
+    const newVal = Math.min(selectedClip.clip.duration - offset, parseFloat((curVal + 0.1).toFixed(2)));
+    applyEffectTimingChange(selectedClip.clip, selectedEffectId.effectType, selectedEffectId.effectIndex, offset, newVal);
+    renderAllTimelineTracks();
+    syncEffectInspectorControls();
+    renderCanvas();
+    recordState('Lengthen Effect Duration');
+  });
+
+  // Easing Selector
+  easingSelect?.addEventListener('change', (e) => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    selectedClip.clip.zoomEasing = e.target.value;
+    renderCanvas();
+    recordState(`Set Effect Easing to ${e.target.value}`);
+  });
+
+  // Zoom Scale Slider
+  zoomScaleSlider?.addEventListener('input', (e) => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const scale = parseInt(e.target.value) / 10;
+    selectedClip.clip.zoomScale = scale;
+    const scaleVal = document.getElementById('effect-zoom-scale-val');
+    if (scaleVal) scaleVal.textContent = `${scale.toFixed(1)}x`;
+    renderCanvas();
+  });
+  zoomScaleSlider?.addEventListener('change', () => {
+    recordState('Adjust Zoom Scale');
+  });
+
+  // Back to generic clip settings
+  btnBackToClip?.addEventListener('click', () => {
+    if (selectedClip?.clip && selectedClip?.trackType) {
+      selectedEffectId = null;
+      selectClip(selectedClip.clip, selectedClip.trackType);
+    }
+  });
+
+  // Delete Effect Button
+  btnDeleteEffect?.addEventListener('click', () => {
+    if (!selectedEffectId || !selectedClip?.clip) return;
+    const clip = selectedClip.clip;
+    const { effectType, effectIndex } = selectedEffectId;
+
+    if (effectType === 'zoom') {
+      delete clip.zoomEffect;
+      delete clip.zoomScale;
+      delete clip.zoomStartTime;
+      delete clip.zoomDuration;
+    } else if (effectType === 'docFocus') {
+      delete clip.docFocus;
+      delete clip.docFocusStartTime;
+      delete clip.docFocusDuration;
+      clip.spotlights = [];
+    } else if (effectType === 'highlight') {
+      if (Array.isArray(clip.highlights)) {
+        clip.highlights.splice(effectIndex, 1);
+        if (clip.highlights.length === 0) delete clip.highlights;
+      }
+    } else if (effectType === 'scroll') {
+      delete clip.docScroll;
+      delete clip.docScrollMode;
+      delete clip.docScrollSpeed;
+      delete clip.docScrollLinger;
+    } else if (effectType === 'motionBlur') {
+      delete clip.motionBlurCrowd;
+    }
+
+    recordState(`Delete ${effectType} Effect`);
+    selectedEffectId = null;
+    renderAllTimelineTracks();
+    renderCanvas();
+    selectClip(clip, selectedClip.trackType);
+    showTextTimingAlert('Effect removed from clip', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1800);
+  });
+}
+
+// Initialize on DOM ready or immediately
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initEffectInspectorListeners);
+} else {
+  initEffectInspectorListeners();
 }
