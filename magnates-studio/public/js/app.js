@@ -15665,8 +15665,8 @@ function createNewQuoteCardAtTime(startSec) {
     scale: 1.0,
 
     // Speaker / Avatar Shape Frame
-    speakerTitle: 'Alex Vance',
-    speakerSubtitle: 'Founder & CEO, Apex Global',
+    speakerTitle: 'Enter Name Here',
+    speakerSubtitle: 'Enter Title / Subtitle...',
     avatarShape: 'circle', // 'circle', 'rounded', 'hexagon', 'square'
     avatarSize: 110,
     avatarBorderColor: '#ffffff',
@@ -15674,7 +15674,7 @@ function createNewQuoteCardAtTime(startSec) {
     avatarFile: null, // { name, url }
 
     // Statement / Body Quote Text
-    quoteText: 'We are entering an era where clarity, conviction, and strategic agility define the leaders who reshape entire industries.',
+    quoteText: 'Enter your text here...',
     quoteEffect: 'typewriter', // 'typewriter', 'falling', 'pop', 'fade', 'slide_up', 'none'
     effectSpeed: 1.0,
     fontSize: 34,
@@ -16615,7 +16615,7 @@ function initQuoteCardListeners() {
   document.getElementById('tool-add-chat-quote')?.addEventListener('click', () => {
     const q = createNewQuoteCardAtTime(currentTime);
     q.cardStyle = 'chat_bubble';
-    q.speakerTitle = 'Alex Vance';
+    q.speakerTitle = 'Enter Name Here';
     q.speakerSubtitle = 'Online';
     selectClip(q, 'quote');
     showTextTimingAlert('Chat Bubble Quote Card Created!', 'success');
@@ -16626,7 +16626,7 @@ function initQuoteCardListeners() {
       e.stopPropagation();
       const q = createNewQuoteCardAtTime(currentTime);
       q.cardStyle = 'chat_bubble';
-      q.speakerTitle = 'Alex Vance';
+      q.speakerTitle = 'Enter Name Here';
       q.speakerSubtitle = 'Online';
       selectClip(q, 'quote');
       showTextTimingAlert('Chat Bubble Quote Card Created!', 'success');
@@ -17312,7 +17312,7 @@ function showCanvasBackgroundContextMenu(x, y) {
     hideStudioContextMenu();
     const q = createNewQuoteCardAtTime(currentTime);
     q.cardStyle = 'chat_bubble';
-    q.speakerTitle = 'Alex Vance';
+    q.speakerTitle = 'Enter Name Here';
     q.speakerSubtitle = 'Online';
     selectClip(q, 'quote');
     showTextTimingAlert('Chat Bubble Quote Card Created!', 'success');
