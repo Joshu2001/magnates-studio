@@ -15970,9 +15970,9 @@ function drawQuoteCardLayer(clip) {
   const showQuoteMarks = clip.quoteMarksVisible !== false && !isChatBubble;
   const markColor = clip.quoteMarkColor || '#ff334b';
 
-  const rawQuote = (!userQuote || editingQuote) ? '' : (userQuote || 'Type a message...');
+  const rawQuote = userQuote || 'Type a message...';
 
-  const textOffsetLeft = (showQuoteMarks ? 45 : (isChatBubble ? 30 : 0));
+  const textOffsetLeft = (showQuoteMarks ? 45 : (isChatBubble ? 20 : 0));
   const actualQuoteX = quoteStartX + textOffsetLeft;
   const actualQuoteMaxW = quoteMaxW - (textOffsetLeft * 2);
 
@@ -16223,7 +16223,12 @@ function drawQuoteCardLayer(clip) {
     avatar: { x: avatarCenterX - avatarRadius, y: avatarCenterY - avatarRadius, w: avatarRadius * 2, h: avatarRadius * 2 },
     name: { x: headerTextX, y: nameY - nameSt.size * 0.65, w: headerMaxW, h: nameSt.size * 1.3 },
     role: { x: headerTextX, y: roleY - roleSt.size * 0.65, w: headerMaxW, h: roleSt.size * 1.3 },
-    quoteBody: { x: actualQuoteX, y: quoteStartY - 6, w: actualQuoteMaxW, h: Math.max(lineSpacing * 2, Math.max(1, lines.length) * lineSpacing + 12) },
+    quoteBody: {
+      x: isChatBubble ? (quoteStartX + 12) : actualQuoteX,
+      y: quoteStartY - (isChatBubble ? 4 : 6),
+      w: isChatBubble ? Math.min(quoteMaxW - 24, Math.max(140, maxLineWidth + 24)) : actualQuoteMaxW,
+      h: isChatBubble ? (lines.length * lineSpacing + 16) : Math.max(lineSpacing * 2, Math.max(1, lines.length) * lineSpacing + 12)
+    },
     card: { x: cardX, y: cardY, w: cardW, h: cardH }
   };
 
@@ -17008,6 +17013,22 @@ function syncQuoteCardCanvasOverlay() {
         inputEl.style.color = fmtColor;
         inputEl.style.fontWeight = fmtBold ? '700' : '400';
         inputEl.style.fontStyle = fmtItalic ? 'italic' : 'normal';
+        inputEl.style.lineHeight = '1.5';
+
+        const isChatBubble = activeQuoteClip.cardStyle === 'chat_bubble';
+        if (f.name === 'quote' && isChatBubble) {
+          const isReceived = activeQuoteClip.chatDirection !== 'sent';
+          inputEl.style.background = isReceived ? '#e9e9eb' : '#007aff';
+          inputEl.style.color = isReceived ? '#1c1c1e' : '#ffffff';
+          inputEl.style.borderColor = 'rgba(0,0,0,0.2)';
+          inputEl.style.padding = '4px 8px';
+          inputEl.style.borderRadius = '12px';
+        } else {
+          inputEl.style.background = 'rgba(0, 0, 0, 0.18)';
+          inputEl.style.borderColor = '#38bdf8';
+          inputEl.style.padding = '0 4px';
+          inputEl.style.borderRadius = '6px';
+        }
 
         if (document.activeElement !== inputEl) {
           inputEl.value = f.defaultVal;
