@@ -16972,6 +16972,19 @@ function initQuoteCardListeners() {
     selectedClip = null;
     const q = (timelineClips.quote || []).find(c => c._editingField);
     if (q) q._editingField = null;
+
+    // Hide inspector cards on stage click
+    const quoteInspector = document.getElementById('card-quote-inspector');
+    if (quoteInspector) quoteInspector.style.display = 'none';
+    const textEditorCard = document.getElementById('card-text-editor');
+    if (textEditorCard) textEditorCard.style.display = 'none';
+    const clipInspector = document.getElementById('card-clip-inspector');
+    if (clipInspector) clipInspector.style.display = 'none';
+    const chartInspector = document.getElementById('card-chart-inspector');
+    if (chartInspector) chartInspector.style.display = 'none';
+    const effectInspector = document.getElementById('card-effect-inspector');
+    if (effectInspector) effectInspector.style.display = 'none';
+
     renderCanvas();
     syncQuoteCardCanvasOverlay();
   });

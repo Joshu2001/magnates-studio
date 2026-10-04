@@ -26,7 +26,7 @@
   "chart": [],
   "quote": [
     {
-      "id": "clip-quote-1791137422564-616",
+      "id": "clip-quote-1791138077636-443",
       "track": "quote",
       "isQuoteCard": true,
       "name": "Executive Statement Card",
@@ -46,7 +46,7 @@
       "avatarFile": null,
       "quoteText": "Enter your text here...",
       "quoteEffect": "typewriter",
-      "effectSpeed": 1.2,
+      "effectSpeed": 1,
       "fontSize": 34,
       "fontFamily": "'Inter', sans-serif",
       "textColor": "#ffffff",
@@ -362,7 +362,7 @@
   ],
   "currentTime": 0,
   "duration": 60,
-  "savedAt": 1791137870861,
+  "savedAt": 1791139070897,
   "projectName": "aa",
   "projectId": "proj_1791104852619_oggs"
 }
