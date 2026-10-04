@@ -26,25 +26,25 @@
   "chart": [],
   "quote": [
     {
-      "id": "clip-quote-1791133113153-135",
+      "id": "clip-quote-1791133771823-889",
       "track": "quote",
       "isQuoteCard": true,
       "name": "Executive Statement Card",
-      "start": 0,
+      "start": 2,
       "duration": 7,
       "zIndex": 28,
       "layerOrder": "front",
       "x": 0,
       "y": 0,
       "scale": 1,
-      "speakerTitle": "Alex Vance",
+      "speakerTitle": "Enter Name Here",
       "speakerSubtitle": "Online",
       "avatarShape": "circle",
       "avatarSize": 110,
       "avatarBorderColor": "#ffffff",
       "avatarBorderWidth": 3,
       "avatarFile": null,
-      "quoteText": "We are entering an era where clarity, conviction, and strategic agility define the leaders who reshape entire industries.",
+      "quoteText": "  nmmmmmmmmmbbvhere...",
       "quoteEffect": "typewriter",
       "effectSpeed": 1,
       "fontSize": 34,
@@ -111,8 +111,8 @@
         "quoteBody": {
           "x": 257,
           "y": 451,
-          "w": 1296.177734375,
-          "h": 118
+          "w": 473.7529296875,
+          "h": 67
         },
         "card": {
           "x": 140,
@@ -120,7 +120,10 @@
           "w": 1640,
           "h": 760
         }
-      }
+      },
+      "_editingField": null,
+      "quoteMarksVisible": false,
+      "quoteMarkColor": "#746365"
     }
   ],
   "image": [
@@ -362,7 +365,7 @@
   ],
   "currentTime": 0,
   "duration": 60,
-  "savedAt": 1791133551426,
+  "savedAt": 1791134330892,
   "projectName": "aa",
   "projectId": "proj_1791104852619_oggs"
 }

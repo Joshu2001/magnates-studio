@@ -4310,7 +4310,9 @@ canvas.tool-draw {
   opacity: 1;
   pointer-events: auto;
 }
-.canvas-quote-overlay .quote-overlay-effect-hud { display: none; }
+.canvas-quote-overlay .quote-overlay-effect-hud {
+  display: flex;
+}
 
 /* Avatar Hover HUD */
 .quote-overlay-avatar-hud {

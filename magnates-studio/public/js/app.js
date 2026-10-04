@@ -15976,7 +15976,7 @@ function drawQuoteCardLayer(clip) {
   const actualQuoteX = quoteStartX + textOffsetLeft;
   const actualQuoteMaxW = quoteMaxW - (textOffsetLeft * 2);
 
-  // Word wrap calculation
+  // Word wrap calculation on full text to keep speech bubble size fixed during typewriter / animation playback
   const words = rawQuote.split(' ');
   const lines = [];
   let curLine = '';
@@ -15994,7 +15994,7 @@ function drawQuoteCardLayer(clip) {
   if (curLine) lines.push(curLine);
   if (lines.length === 0) lines.push('Type a message...');
 
-  // Calculate actual text dimensions for dynamic chat bubble sizing
+  // Calculate actual text dimensions for dynamic chat bubble sizing based on FULL text
   let maxLineWidth = 120;
   lines.forEach(l => {
     const lw = ctx.measureText(l).width;
@@ -17093,8 +17093,14 @@ function syncQuoteCardCanvasOverlay() {
         if (qColor) qColor.value = curColor.startsWith('#') ? curColor : '#ffffff';
         if (qBold) qBold.classList.toggle('active', curBold);
         if (qItalic) qItalic.classList.toggle('active', curItalic);
-        if (qMarkCol) qMarkCol.value = curMarkColor.startsWith('#') ? curMarkColor : '#ff334b';
-        if (qToggleMarks) qToggleMarks.classList.toggle('active', curMarksVis);
+        if (qMarkCol) {
+          qMarkCol.value = curMarkColor.startsWith('#') ? curMarkColor : '#ff334b';
+          qMarkCol.style.display = isChatBubble ? 'none' : 'block';
+        }
+        if (qToggleMarks) {
+          qToggleMarks.classList.toggle('active', curMarksVis);
+          qToggleMarks.style.display = isChatBubble ? 'none' : 'block';
+        }
       }
     } else {
       formatBar.style.display = 'none';
