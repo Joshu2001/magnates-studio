@@ -40,6 +40,7 @@ let timelineClips = {
     }
   ],
   chart: [],
+  quote: [],
   image: [],
   video: [],
   voiceover: [],
@@ -856,7 +857,26 @@ function drawTextLayer(specificTextClip) {
       }
     }
 
-    ctx.fillText(word, currentX, currentY + animOffsetY);
+    // Falling / Cascade Drop animation
+    let wordOffsetY = animOffsetY;
+    let wordAlpha = 1.0;
+    if (animStyle === 'falling') {
+      const staggerDelay = 0.08 * idx;
+      const wordElapsed = Math.max(0, elapsed - staggerDelay);
+      const fallDur = 0.45;
+      const t = Math.min(1.0, wordElapsed / fallDur);
+      if (t <= 0) {
+        ctx.restore();
+        return;
+      }
+      // Elastic / bounce settle landing curve
+      const p = t < 0.7 ? Math.pow(t / 0.7, 2) : 1 + Math.sin((t - 0.7) * Math.PI / 0.3) * 0.08 * (1 - t);
+      wordOffsetY += (1 - p) * -90;
+      wordAlpha = Math.min(1.0, t * 2.5);
+      ctx.globalAlpha = (ctx.globalAlpha || 1.0) * wordAlpha;
+    }
+
+    ctx.fillText(word, currentX, currentY + wordOffsetY);
     ctx.restore();
 
     const metrics = ctx.measureText(word + ' ');
@@ -1991,6 +2011,13 @@ function drawSortedVisualLayers() {
     }
   });
 
+  // 2b. Active Statement / Quote Card Clips
+  (timelineClips.quote || []).forEach(c => {
+    if (currentTime >= c.start && currentTime <= (c.start + c.duration)) {
+      activeItems.push({ type: 'quote', clip: c, zIndex: c.zIndex !== undefined ? c.zIndex : 28 });
+    }
+  });
+
   // 3. Active Image Clips
   timelineClips.image.forEach(c => {
     if (currentTime >= c.start && currentTime <= (c.start + c.duration)) {
@@ -2019,6 +2046,8 @@ function drawSortedVisualLayers() {
   activeItems.forEach(item => {
     if (item.type === 'video' || item.type === 'image' || item.type === 'chart') {
       drawMediaLayer(item.clip);
+    } else if (item.type === 'quote') {
+      drawQuoteCardLayer(item.clip);
     } else if (item.type === 'text') {
       drawTextLayer(item.clip);
     }
@@ -2158,6 +2187,8 @@ function render(now) {
     }
 
     updateUI();
+    // Keep the on-canvas quote editor positioned/visible every frame (also when paused)
+    if (typeof syncQuoteCardCanvasOverlay === 'function') syncQuoteCardCanvasOverlay();
   } catch (err) {
     console.error('[Magnates Render Error]', err);
   }
@@ -2202,6 +2233,11 @@ function syncAudioPlayback() {
     bgmPlayer.volume = ((activeMusic.volume !== undefined ? activeMusic.volume : 40) / 100);
   } else {
     if (!bgmPlayer.paused) bgmPlayer.pause();
+  }
+
+  // Sync on-canvas interactive quote overlay if quote card is active
+  if (typeof syncQuoteCardCanvasOverlay === 'function') {
+    syncQuoteCardCanvasOverlay();
   }
 }
 
@@ -2724,10 +2760,11 @@ function renderAllTimelineTracks() {
     if (!container) return;
     container.innerHTML = '';
 
-    const clips = timelineClips[type] || [];
+    const clips = (type === 'chart' ? [...(timelineClips.chart || []), ...(timelineClips.quote || [])] : (timelineClips[type] || []));
     clips.forEach(clip => {
+      const actualTrackType = clip.isQuoteCard ? 'quote' : type;
       const block = document.createElement('div');
-      block.className = `clip-block ${type}`;
+      block.className = `clip-block ${actualTrackType}`;
       block.id = clip.id;
       if (selectedClip && selectedClip.clip.id === clip.id) block.classList.add('is-selected');
 
@@ -2737,7 +2774,9 @@ function renderAllTimelineTracks() {
       block.style.width = `${widthPx}px`;
 
       let iconSvg = '';
-      if (clip.chartConfig) {
+      if (clip.isQuoteCard || type === 'quote') {
+        iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>`;
+      } else if (clip.chartConfig) {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>`;
       } else if (clip.isIconSticker) {
         iconSvg = `<svg class="clip-icon" viewBox="0 0 24 24" style="color: #ffd000;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
@@ -2766,7 +2805,7 @@ function renderAllTimelineTracks() {
 
       const label = type === 'background'
         ? (() => { const m = { cyber_grid: 'Cyber Grid', solid_black: 'Solid Black', none: 'Transparent', color: 'Solid Tint', vox_cream: 'Vox Cream' }; return m[clip.bgType] || clip.bgType || 'Background'; })()
-        : (clip.file?.name || clip.text || 'Clip');
+        : (clip.speakerTitle ? `"${clip.quoteText?.slice(0, 18) || 'Quote'}..." - ${clip.speakerTitle}` : (clip.file?.name || clip.text || 'Clip'));
 
       // Thumbnail, repeating filmstrip and scrim overlay
       if (type === 'image' && clip.file?.url) {
@@ -2818,11 +2857,11 @@ function renderAllTimelineTracks() {
       const isCompact = widthPx < 80;
       if (isCompact) {
         let miniBadges = '';
-        if (clip.zoomEffect) miniBadges += '🔍';
-        if (clip.docFocus) miniBadges += '⚪';
-        if (clip.highlights?.length) miniBadges += '🖍️';
-        if (clip.docScroll) miniBadges += '📜';
-        contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="font-size:9px; font-weight:700;">${miniBadges || label.slice(0, 5)}</span>`;
+        if (clip.zoomEffect) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+        if (clip.docFocus) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2;vertical-align:-1px;margin-right:2px;"><circle cx="12" cy="12" r="9"/></svg>';
+        if (clip.highlights?.length) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>';
+        if (clip.docScroll) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
+        contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="font-size:9px; font-weight:700; display:inline-flex; align-items:center;">${miniBadges || label.slice(0, 5)}</span>`;
       } else {
         contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; flex: 1;">${label}</span>`;
       }
@@ -2849,7 +2888,7 @@ function renderAllTimelineTracks() {
         const showIconOnly = isCompact || (widthPct / 100 * widthPx) < 45;
         bar.innerHTML = `
           <div class="clip-fx-handle clip-fx-handle-left" title="Drag to adjust effect start"></div>
-          <span class="clip-fx-bar-label">${fxIcon} ${showIconOnly ? '' : fxLabel}</span>
+          <span class="clip-fx-bar-label" style="display:inline-flex; align-items:center; gap:3px;">${fxIcon} <span>${showIconOnly ? '' : fxLabel}</span></span>
           <div class="clip-fx-handle clip-fx-handle-right" title="Drag to adjust effect duration"></div>
         `;
 
@@ -2883,7 +2922,7 @@ function renderAllTimelineTracks() {
           const onUp = () => {
             window.removeEventListener('mousemove', onMove);
             window.removeEventListener('mouseup', onUp);
-            recordState(`Trim ${fxLabel} Start`);
+            recordState(`Adjust ${fxLabel} Duration`);
           };
           window.addEventListener('mousemove', onMove);
           window.addEventListener('mouseup', onUp);
@@ -2924,7 +2963,8 @@ function renderAllTimelineTracks() {
         const zmStart = clip.zoomStartTime !== undefined ? clip.zoomStartTime : 0.5;
         const zmDur = clip.zoomDuration || Math.max(0.4, clip.duration - zmStart);
         const zmLabel = clip.zoomEffect === 'snap' ? 'Punch Zoom' : 'Loupe';
-        addEffectBar('zoom', 0, zmLabel, '🔍', zmStart, zmDur, 'zoom');
+        const zmIcon = '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+        addEffectBar('zoom', 0, zmLabel, zmIcon, zmStart, zmDur, 'zoom');
       }
 
       // 2. Whiteout / Spotlight sub-bar
@@ -2932,26 +2972,32 @@ function renderAllTimelineTracks() {
         const fIn = clip.docFocusStartTime !== undefined ? clip.docFocusStartTime : 0.4;
         const fDur = (clip.docFocusDuration && clip.docFocusDuration > 0) ? clip.docFocusDuration : Math.max(0.2, clip.duration - fIn);
         const fLabel = clip.docStyle !== 'dark' ? 'Whiteout' : 'Spotlight';
-        addEffectBar('docFocus', 0, fLabel, clip.docStyle !== 'dark' ? '⚪' : '⚫', fIn, fDur, clip.docStyle !== 'dark' ? 'whiteout' : 'spotlight');
+        const fIcon = clip.docStyle !== 'dark'
+          ? '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2;"><circle cx="12" cy="12" r="9"/></svg>'
+          : '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;"><circle cx="12" cy="12" r="9"/></svg>';
+        addEffectBar('docFocus', 0, fLabel, fIcon, fIn, fDur, clip.docStyle !== 'dark' ? 'whiteout' : 'spotlight');
       }
 
       // 3. Highlight sub-bar
       if (clip.highlights && clip.highlights.length > 0) {
         const hlStart = clip.highlights[0].startTime !== undefined ? clip.highlights[0].startTime : 0.7;
         const hlDur = clip.highlights.reduce((acc, h) => acc + (h.duration || 0.6), 0);
-        addEffectBar('highlight', 0, `${clip.highlights.length} HL`, '🖍️', hlStart, hlDur, 'highlight');
+        const hlIcon = '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>';
+        addEffectBar('highlight', 0, `${clip.highlights.length} HL`, hlIcon, hlStart, hlDur, 'highlight');
       }
 
       // 4. Scroll sub-bar
       if (clip.docScroll) {
         const scLinger = clip.docScrollLinger !== undefined ? clip.docScrollLinger : 1.0;
         const scSpeed = clip.docScrollSpeed !== undefined ? clip.docScrollSpeed : 3.0;
-        addEffectBar('scroll', 0, 'Scroll', '📜', scLinger, scSpeed, 'scroll');
+        const scIcon = '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
+        addEffectBar('scroll', 0, 'Scroll', scIcon, scLinger, scSpeed, 'scroll');
       }
 
       // 5. Motion blur sub-bar
       if (clip.motionBlurCrowd) {
-        addEffectBar('motionBlur', 0, 'Motion Blur', '👥', 0, clip.duration, 'motion-blur');
+        const mbIcon = '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>';
+        addEffectBar('motionBlur', 0, 'Motion Blur', mbIcon, 0, clip.duration, 'motion-blur');
       }
 
       // Delete clip button
@@ -2962,7 +3008,7 @@ function renderAllTimelineTracks() {
       deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         recordState('Delete Clip');
-        deleteClip(type, clip.id);
+        deleteClip(actualTrackType, clip.id);
       });
 
       // Audio Waveform Background
@@ -2980,7 +3026,7 @@ function renderAllTimelineTracks() {
       block.appendChild(handleRight);
 
       // Clip Interactions
-      attachClipInteractions(block, clip, type);
+      attachClipInteractions(block, clip, actualTrackType);
 
       container.appendChild(block);
 
@@ -3204,6 +3250,8 @@ function selectClip(clip, trackType) {
     }
 
     document.getElementById('btn-update-text').style.display = 'block';
+    const quoteInspector = document.getElementById('card-quote-inspector');
+    if (quoteInspector) quoteInspector.style.display = 'none';
     const chartInspector = document.getElementById('card-chart-inspector');
     if (chartInspector) chartInspector.style.display = 'none';
     const effectInspector = document.getElementById('card-effect-inspector');
@@ -3216,8 +3264,25 @@ function selectClip(clip, trackType) {
       textEditorCard.style.display = 'block';
       textEditorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+  } else if (clip.isQuoteCard || trackType === 'quote') {
+    // Show quote card inspector card
+    const quoteInspector = document.getElementById('card-quote-inspector');
+    if (quoteInspector) {
+      quoteInspector.style.display = 'block';
+      quoteInspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      populateQuoteCardInspector(clip);
+    }
+    const chartInspector = document.getElementById('card-chart-inspector');
+    if (chartInspector) chartInspector.style.display = 'none';
+    const effectInspector = document.getElementById('card-effect-inspector');
+    if (effectInspector) effectInspector.style.display = 'none';
+    inspector.style.display = 'none';
+    const textEditorCard = document.getElementById('card-text-editor');
+    if (textEditorCard) textEditorCard.style.display = 'none';
   } else if (clip.chartConfig) {
     // Show chart inspector card
+    const quoteInspector = document.getElementById('card-quote-inspector');
+    if (quoteInspector) quoteInspector.style.display = 'none';
     const chartInspector = document.getElementById('card-chart-inspector');
     if (chartInspector) {
       chartInspector.style.display = 'block';
@@ -3231,6 +3296,8 @@ function selectClip(clip, trackType) {
     if (textEditorCard) textEditorCard.style.display = 'none';
   } else {
     // Show standard clip inspector card
+    const quoteInspector = document.getElementById('card-quote-inspector');
+    if (quoteInspector) quoteInspector.style.display = 'none';
     const chartInspector = document.getElementById('card-chart-inspector');
     if (chartInspector) chartInspector.style.display = 'none';
     const effectInspector = document.getElementById('card-effect-inspector');
@@ -3330,15 +3397,21 @@ function selectClip(clip, trackType) {
         const transTypeSelect = document.getElementById('inspector-trans-type-select');
         const transBadge = document.getElementById('inspector-transition-badge');
         const transDurSlider = document.getElementById('inspector-trans-dur-slider');
+        const transDurInput = document.getElementById('inspector-trans-dur-input');
         const transDurVal = document.getElementById('inspector-trans-dur-val');
         const transDirBadge = document.getElementById('inspector-trans-dir-badge');
         const transDirBox = document.getElementById('inspector-trans-direction-box');
         const transSpeedBox = document.getElementById('inspector-trans-speed-box');
         const transModeBox = document.getElementById('inspector-trans-mode-box');
+        const customDirPanel = document.getElementById('inspector-trans-custom-dir-panel');
+        const angleSlider = document.getElementById('inspector-trans-angle-slider');
+        const angleVal = document.getElementById('inspector-trans-angle-val');
+        const durDropdown = document.getElementById('inspector-trans-dur-dropdown');
 
         const curTrans = clip.transition || 'none';
         const curDur = clip.transitionDuration !== undefined ? clip.transitionDuration : 0.7;
         const curDir = clip.transitionDirection || (curTrans === 'fly_through' ? 'center' : 'left');
+        const curAngle = clip.transitionAngle !== undefined ? clip.transitionAngle : 45;
         const curMode = clip.transitionMode || 'underneath';
 
         if (transTypeSelect) transTypeSelect.value = curTrans;
@@ -3348,8 +3421,14 @@ function selectClip(clip, trackType) {
         }
 
         if (transDurSlider) transDurSlider.value = Math.round(curDur * 10);
-        if (transDurVal) transDurVal.textContent = curDur.toFixed(1) + 's';
-        if (transDirBadge) transDirBadge.textContent = curDir.toUpperCase();
+        if (transDurVal) transDurVal.textContent = curDur.toFixed(2) + 's';
+        if (transDurInput) transDurInput.value = curDur.toFixed(2);
+        if (transDirBadge) transDirBadge.textContent = curDir === 'custom' ? `CUSTOM (${curAngle}°)` : curDir.toUpperCase();
+
+        if (customDirPanel) customDirPanel.style.display = curDir === 'custom' ? 'block' : 'none';
+        if (angleSlider) angleSlider.value = curAngle;
+        if (angleVal) angleVal.textContent = `${curAngle}°`;
+        if (durDropdown) durDropdown.value = '';
 
         // Toggle direction buttons
         document.querySelectorAll('.trans-dir-btn').forEach(b => {
@@ -5115,13 +5194,98 @@ document.getElementById('inspector-trans-dur-slider')?.addEventListener('input',
   const val = parseInt(e.target.value) / 10;
   selectedClip.clip.transitionDuration = val;
   const durVal = document.getElementById('inspector-trans-dur-val');
-  if (durVal) durVal.textContent = val.toFixed(1) + 's';
+  const durInput = document.getElementById('inspector-trans-dur-input');
+  if (durVal) durVal.textContent = val.toFixed(2) + 's';
+  if (durInput) durInput.value = val.toFixed(2);
   if (typeof injectTransitionChips === 'function') injectTransitionChips();
 });
 
 document.getElementById('inspector-trans-dur-slider')?.addEventListener('change', () => {
   recordState('Change Transition Duration');
   saveProjectState(false);
+});
+
+// Manual numeric duration input
+const transDurInputEl = document.getElementById('inspector-trans-dur-input');
+if (transDurInputEl) {
+  transDurInputEl.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    const val = parseFloat(e.target.value);
+    if (!isNaN(val) && val > 0) {
+      selectedClip.clip.transitionDuration = val;
+      const slider = document.getElementById('inspector-trans-dur-slider');
+      if (slider) slider.value = Math.min(30, Math.max(2, Math.round(val * 10)));
+      if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    }
+  });
+  transDurInputEl.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    let val = parseFloat(e.target.value);
+    if (isNaN(val) || val <= 0.05) val = 0.1;
+    selectedClip.clip.transitionDuration = val;
+    e.target.value = val.toFixed(2);
+    recordState('Set Custom Duration');
+    saveProjectState(false);
+  });
+}
+
+// Duration preset dropdown
+document.getElementById('inspector-trans-dur-dropdown')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const val = e.target.value;
+  if (!val) return;
+  if (val === 'custom') {
+    transDurInputEl?.focus();
+    transDurInputEl?.select();
+    return;
+  }
+  const dur = parseFloat(val);
+  if (!isNaN(dur) && dur > 0) {
+    selectedClip.clip.transitionDuration = dur;
+    selectClip(selectedClip.clip, selectedClip.trackType);
+    recordState('Set Duration Dropdown');
+    saveProjectState(false);
+    showTextTimingAlert(`Duration: ${dur.toFixed(2)}s`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  }
+});
+
+// Custom Angle Slider
+const transAngleSlider = document.getElementById('inspector-trans-angle-slider');
+const transAngleVal = document.getElementById('inspector-trans-angle-val');
+if (transAngleSlider) {
+  transAngleSlider.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    const angle = parseInt(e.target.value, 10);
+    selectedClip.clip.transitionAngle = angle;
+    selectedClip.clip.transitionDirection = 'custom';
+    if (transAngleVal) transAngleVal.textContent = `${angle}°`;
+    const badge = document.getElementById('inspector-trans-dir-badge');
+    if (badge) badge.textContent = `CUSTOM (${angle}°)`;
+  });
+  transAngleSlider.addEventListener('change', () => {
+    recordState('Set Custom Angle');
+    saveProjectState(false);
+  });
+}
+
+// Custom quick angle buttons
+document.querySelectorAll('.trans-quick-angle-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!selectedClip || !selectedClip.clip) return;
+    const angle = parseInt(btn.dataset.angle, 10);
+    selectedClip.clip.transitionDirection = 'custom';
+    selectedClip.clip.transitionAngle = angle;
+    if (transAngleSlider) transAngleSlider.value = angle;
+    if (transAngleVal) transAngleVal.textContent = `${angle}°`;
+    const badge = document.getElementById('inspector-trans-dir-badge');
+    if (badge) badge.textContent = `CUSTOM (${angle}°)`;
+    recordState('Set Quick Angle');
+    saveProjectState(false);
+    showTextTimingAlert(`Direction: ${angle}°`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1200);
+  });
 });
 
 document.querySelectorAll('.btn-trans-quick-speed').forEach(btn => {
@@ -5291,7 +5455,7 @@ function applyDocFocusBundle(sel) {
 
   recordState('Apply Article Focus & Highlight Bundle');
   playSFX('pop');
-  showTextTimingAlert('✨ Template Applied: 2.2x Zoom + Whiteout Fade + Pure Yellow Highlight! Drag the box on canvas to reposition.', 'success');
+  showTextTimingAlert('Template Applied: 2.2x Zoom + Whiteout Fade + Pure Yellow Highlight! Drag the box on canvas to reposition.', 'success');
   setTimeout(() => showTextTimingAlert(''), 4500);
 }
 
@@ -6295,6 +6459,8 @@ document.getElementById('tool-reset-timeline')?.addEventListener('click', () => 
           layerOrder: 'front'
         }
       ],
+      chart: [],
+      quote: [],
       image: [],
       video: [],
       voiceover: [],
@@ -6720,8 +6886,8 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 2. If a chart or image/video clip is selected, check if click hit handles or bounding box
-    if (selectedClip && (selectedClip.trackType === 'chart' || selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
+    // 2. If a chart, quote or image/video clip is selected, check if click hit handles or bounding box
+    if (selectedClip && (selectedClip.trackType === 'chart' || selectedClip.trackType === 'quote' || selectedClip.trackType === 'image' || selectedClip.trackType === 'video')) {
       const clip = selectedClip.clip;
       const b = clip._renderBounds;
       if (b) {
@@ -6780,6 +6946,26 @@ function initCanvasTransformInteraction() {
           scale: c.scale !== undefined ? c.scale : 1.0,
           x: c.x || 0,
           y: c.y || 0
+        };
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // 3b. Check if user clicked on any visible Statement / Quote Card layer to select it
+    const activeQuoteClips = (timelineClips.quote || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeQuoteClips.length - 1; i >= 0; i--) {
+      const q = activeQuoteClips[i];
+      const b = q._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        selectClip(q, 'quote');
+        isTransforming = true;
+        transformAction = 'drag';
+        transformStartPos = pt;
+        transformInitialClip = {
+          scale: q.scale !== undefined ? q.scale : 1.0,
+          x: q.x || 0,
+          y: q.y || 0
         };
         e.preventDefault();
         return;
@@ -7393,6 +7579,17 @@ function initCanvasTransformInteraction() {
       return;
     }
 
+    // 2b. Check if clicked directly on an active quote card
+    const activeQuoteClips = (timelineClips.quote || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeQuoteClips.length - 1; i >= 0; i--) {
+      const q = activeQuoteClips[i];
+      const b = q._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        selectClip(q, 'quote');
+        return;
+      }
+    }
+
     // Single-Tap on canvas: Toggle hide/show of Motion Blur Crowd circled waypoints & dock toolbar!
     const activeMediaWithCrowd = [...timelineClips.image, ...timelineClips.video].find(c =>
       currentTime >= c.start && currentTime <= (c.start + c.duration) && c.motionBlurCrowd
@@ -7407,7 +7604,7 @@ function initCanvasTransformInteraction() {
       if (lbl) {
         lbl.textContent = crowdOverlaysHidden ? 'Show (1-Tap)' : 'Hide (1-Tap)';
       }
-      showTextTimingAlert(crowdOverlaysHidden ? '👁️ Overlays Hidden (Tap to show)' : '✨ Overlays Visible', 'info');
+      showTextTimingAlert(crowdOverlaysHidden ? 'Overlays Hidden (Tap to show)' : 'Overlays Visible', 'info');
       setTimeout(() => showTextTimingAlert(''), 2000);
       return;
     }
@@ -7443,6 +7640,18 @@ function initCanvasTransformInteraction() {
       }
     }
 
+    // 2b. Check if clicked on active quote card
+    const activeQuoteClips = (timelineClips.quote || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    for (let i = activeQuoteClips.length - 1; i >= 0; i--) {
+      const q = activeQuoteClips[i];
+      const b = q._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        selectClip(q, 'quote');
+        showStudioContextMenu(e.clientX, e.clientY, q, 'quote');
+        return;
+      }
+    }
+
     // 3. Check if right-clicked on an active drawing stroke on screen
     if (drawingStrokes.length > 0) {
       for (let sIdx = drawingStrokes.length - 1; sIdx >= 0; sIdx--) {
@@ -7474,10 +7683,14 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 4. Fallback: if a clip is currently selected, open menu for it
+    // 4. Fallback: If a clip is selected, open menu for it
     if (selectedClip && selectedClip.clip) {
       showStudioContextMenu(e.clientX, e.clientY, selectedClip.clip, selectedClip.trackType);
+      return;
     }
+
+    // 5. Canvas Stage Background / Blank Screen Context Menu (When clicked on empty canvas)
+    showCanvasBackgroundContextMenu(e.clientX, e.clientY);
   });
 
   // Keyboard shortcut listener for selected highlight (Jogging / Nudging with arrows, Delete/Backspace to remove)
@@ -8193,6 +8406,7 @@ function getSerializableClips() {
       transitionSfx: c.transitionSfx,
       transitionDuration: c.transitionDuration,
       transitionDirection: c.transitionDirection,
+      transitionAngle: c.transitionAngle,
       transitionMode: c.transitionMode,
       file: c.file ? {
         name: c.file.name,
@@ -8208,6 +8422,11 @@ function getSerializableClips() {
   return {
     text: textClips,
     chart: serializeMediaClips(timelineClips.chart || []),
+    quote: (timelineClips.quote || []).map(c => ({
+      ...c,
+      avatarFile: c.avatarFile ? { name: c.avatarFile.name, url: c.avatarFile.url } : null,
+      bgImageFile: c.bgImageFile ? { name: c.bgImageFile.name, url: c.bgImageFile.url } : null
+    })),
     image: serializeMediaClips(timelineClips.image || []),
     video: serializeMediaClips(timelineClips.video || []),
     voiceover: serializeMediaClips(timelineClips.voiceover || []),
@@ -8236,6 +8455,15 @@ function saveProjectState(showConfirm = false) {
       saveCurrentProjectToLibrary(projName, false);
     }
 
+    // Persist to backend server so reload never serves stale state
+    try {
+      fetch('/api/project/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      }).catch(() => {});
+    } catch(err) {}
+
     if (showConfirm) {
       const saveBtn = document.getElementById('btn-save-project');
       if (saveBtn) {
@@ -8261,8 +8489,8 @@ function applyProjectState(state) {
   if (state.text && Array.isArray(state.text)) {
     timelineClips.text = state.text;
   }
-  // Restore media and chart clips directly
-  ['chart', 'image', 'video', 'voiceover', 'music'].forEach(trackType => {
+  // Restore media, chart and quote clips directly
+  ['chart', 'quote', 'image', 'video', 'voiceover', 'music'].forEach(trackType => {
     if (state[trackType] && Array.isArray(state[trackType])) {
       timelineClips[trackType] = state[trackType];
     }
@@ -8306,12 +8534,31 @@ function applyProjectState(state) {
 
 async function loadProjectState() {
   try {
-    // 1. First check if backend has a project state
+    const rawLocal = localStorage.getItem(STORAGE_KEY_PROJECT);
+    let localState = null;
+    if (rawLocal) {
+      try { localState = JSON.parse(rawLocal); } catch(e) {}
+    }
+
+    // 1. Check if backend has a project state
     try {
       const res = await fetch('/api/project/state');
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.state) {
+          // Compare savedAt timestamps to never let an older backend file overwrite newer user edits
+          const backendTime = data.state.savedAt || 0;
+          const localTime = localState?.savedAt || 0;
+          if (localState && localTime > backendTime) {
+            applyProjectState(localState);
+            // Push newer local state to backend
+            fetch('/api/project/state', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(localState)
+            }).catch(() => {});
+            return;
+          }
           applyProjectState(data.state);
           localStorage.setItem(STORAGE_KEY_PROJECT, JSON.stringify(data.state));
           return;
@@ -8322,10 +8569,9 @@ async function loadProjectState() {
     }
 
     // 2. Fallback to localStorage
-    const raw = localStorage.getItem(STORAGE_KEY_PROJECT);
-    if (!raw) return;
-    const state = JSON.parse(raw);
-    applyProjectState(state);
+    if (localState) {
+      applyProjectState(localState);
+    }
   } catch(e) {}
 }
 
@@ -8615,6 +8861,13 @@ function showStudioContextMenu(x, y, clip, trackType) {
     `;
   } else if (isImage) {
     itemsHtml += `
+      <!-- Executive Quote / Statement Screen -->
+      <div class="context-menu-item" id="ctx-action-convert-quote" style="background: rgba(255, 51, 75, 0.12); border-left: 3px solid #ff334b;">
+        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+        <span style="font-weight: 700; color: #fff;">Statement / Quote Screen FX</span>
+        <span class="context-badge" style="color: #ff334b;">Executive</span>
+      </div>
+
       <!-- Add Text Overlay -->
       <div class="context-menu-item" id="ctx-action-add-text">
         <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
@@ -8643,35 +8896,35 @@ function showStudioContextMenu(x, y, clip, trackType) {
       <!-- 1. 3D Camera Fly-Through -->
       <div class="context-menu-item ${clip.transition === 'fly_through' ? 'active-fx' : ''}" id="ctx-action-fly-through">
         <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M4 4h16v16H4V4m2 4v8l4-4-4-4m6 0v8l4-4-4-4" fill="currentColor"/></svg>
-        <span>${clip.transition === 'fly_through' ? 'Remove 3D Fly-Through' : '⚡ 3D Fly-Through (Depth Zoom)'}</span>
+        <span>${clip.transition === 'fly_through' ? 'Remove 3D Fly-Through' : '3D Fly-Through (Depth Zoom)'}</span>
         <span class="context-badge" style="color: #a855f7;">${clip.transition === 'fly_through' ? `${(clip.transitionDuration || 0.7).toFixed(1)}s` : '1-Click'}</span>
       </div>
 
       <!-- 2. Directional Push / Slide Under -->
       <div class="context-menu-item ${clip.transition === 'directional_push' ? 'active-fx' : ''}" id="ctx-action-directional-push">
         <svg viewBox="0 0 24 24" style="color: #3b82f6;"><path d="M6 17.59L7.41 19 12 14.42 16.59 19 18 17.59l-6-6zM6 11l1.41 1.41L12 7.83l4.59 4.58L18 11l-6-6z" transform="rotate(90 12 12)" fill="currentColor"/></svg>
-        <span>${clip.transition === 'directional_push' ? `Remove Slide (${clip.transitionDirection || 'left'})` : '➡️ Directional Push / Pan Under'}</span>
+        <span>${clip.transition === 'directional_push' ? `Remove Slide (${clip.transitionDirection || 'left'})` : 'Directional Push / Pan Under'}</span>
         <span class="context-badge" style="color: #3b82f6;">${clip.transition === 'directional_push' ? (clip.transitionDirection || 'left').toUpperCase() : 'Pan'}</span>
       </div>
 
       <!-- 3. Morph Cut -->
       <div class="context-menu-item ${clip.transition === 'morph_cut' ? 'active-fx' : ''}" id="ctx-action-morph-cut">
         <svg viewBox="0 0 24 24" style="color: #06b6d4;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>
-        <span>${clip.transition === 'morph_cut' ? 'Remove Morph Cut' : '🌊 Morph Cut (Seamless Blend)'}</span>
+        <span>${clip.transition === 'morph_cut' ? 'Remove Morph Cut' : 'Morph Cut (Seamless Blend)'}</span>
         <span class="context-badge" style="color: #06b6d4;">${clip.transition === 'morph_cut' ? 'Active' : 'Morph'}</span>
       </div>
 
       <!-- 4. Foreground Reveal Wipe -->
       <div class="context-menu-item ${clip.transition === 'mask_reveal' ? 'active-fx' : ''}" id="ctx-action-mask-reveal">
         <svg viewBox="0 0 24 24" style="color: #10b981;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>
-        <span>${clip.transition === 'mask_reveal' ? 'Remove Reveal' : '📐 Foreground Reveal (Split Wipe)'}</span>
+        <span>${clip.transition === 'mask_reveal' ? 'Remove Reveal' : 'Foreground Reveal (Split Wipe)'}</span>
         <span class="context-badge" style="color: #10b981;">${clip.transition === 'mask_reveal' ? 'Active' : 'Reveal'}</span>
       </div>
 
       <!-- 5. Transition Speed & Direction Controls -->
       <div class="context-menu-item" id="ctx-action-trans-settings">
         <svg viewBox="0 0 24 24" style="color: #eab308;"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
-        <span>⚙️ Speed &amp; Direction Controls...</span>
+        <span>Speed &amp; Direction Controls...</span>
         <span class="context-badge" style="color: #eab308;">Settings</span>
       </div>
       <div class="context-menu-divider"></div>
@@ -8692,22 +8945,22 @@ function showStudioContextMenu(x, y, clip, trackType) {
 
       <!-- 1. Dark Document Spotlight (Original Dim) -->
       <div class="context-menu-item" id="ctx-action-doc-dark">
-        <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-        <span>⚫ Add Dark Spotlight</span>
+        <svg viewBox="0 0 24 24" style="color: #a855f7;"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg>
+        <span>Add Dark Spotlight</span>
         <span class="context-badge" style="color: #a855f7;">${clip.spotlights && clip.spotlights.length > 0 ? `${clip.spotlights.length} Active` : (clip.docFocus && clip.docStyle === 'dark' ? '1 Active' : 'Spotlight')}</span>
       </div>
 
       <!-- 2. Article Whiteout Fade -->
       <div class="context-menu-item" id="ctx-action-doc-white">
-        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>
-        <span>⚪ Add Whiteout Fade</span>
+        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <span>Add Whiteout Fade</span>
         <span class="context-badge" style="color: #38bdf8;">${clip.spotlights && clip.spotlights.some(s=>s.style==='white') ? 'Active' : (clip.docFocus && clip.docStyle !== 'dark' ? '1 Active' : 'Whiteout')}</span>
       </div>
 
       <!-- 3. Animated Highlighter -->
       <div class="context-menu-item" id="ctx-action-doc-hl">
         <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>
-        <span>🖍️ Add Animated Highlighter</span>
+        <span>Add Animated Highlighter</span>
         <span class="context-badge" style="color: #38bdf8;">${clip.highlights && clip.highlights.length > 0 ? `${clip.highlights.length} HL` : 'Sweep'}</span>
       </div>
 
@@ -8721,15 +8974,47 @@ function showStudioContextMenu(x, y, clip, trackType) {
       <!-- 4. Document Camera Scroll / Flow (Right-Click Fast Option) -->
       <div class="context-menu-item ${clip.docScroll ? 'active-fx' : ''}" id="ctx-action-doc-scroll">
         <svg viewBox="0 0 24 24" style="color: #10b981;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-        <span>${clip.docScroll ? 'Remove Camera Scroll' : '📜 Document Camera Scroll (Down)'}</span>
+        <span>${clip.docScroll ? 'Remove Camera Scroll' : 'Document Camera Scroll (Down)'}</span>
         <span class="context-badge" style="color: #10b981;">${clip.docScroll ? (clip.docScrollMode || 'Active') : 'Flow'}</span>
       </div>
 
       <!-- 5. Article FX Guide & Setup Modal -->
       <div class="context-menu-item" id="ctx-action-doc-guide">
         <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-10-4.48-10-10-10zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-        <span>❓ Article FX Guide & Setup...</span>
+        <span>Article FX Guide & Setup...</span>
         <span class="context-badge" style="color: #00f0ff;">Tutorial</span>
+      </div>
+
+      <div class="context-menu-divider"></div>
+    `;
+  } else if (clip.isQuoteCard || trackType === 'quote') {
+    itemsHtml += `
+      <!-- Replay Quote Animation -->
+      <div class="context-menu-item" id="ctx-action-quote-replay">
+        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+        <span>Replay Effect (${clip.quoteEffect || 'Typewriter'})</span>
+        <span class="context-badge" style="color: #ff334b;">Preview</span>
+      </div>
+
+      <!-- Change Text Effect (Typewriter <-> Falling) -->
+      <div class="context-menu-item" id="ctx-action-quote-toggle-fx">
+        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path fill="currentColor" d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/></svg>
+        <span>Switch to ${clip.quoteEffect === 'falling' ? 'Typewriter' : 'Falling'}</span>
+        <span class="context-badge" style="color: #00f0ff;">Toggle FX</span>
+      </div>
+
+      <!-- Pick Avatar Headshot -->
+      <div class="context-menu-item" id="ctx-action-quote-avatar">
+        <svg viewBox="0 0 24 24" style="color: #ffd000;"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Change Avatar Picture...</span>
+        <span class="context-badge">Shape</span>
+      </div>
+
+      <!-- Configure Screen Background & Glass -->
+      <div class="context-menu-item" id="ctx-action-quote-bg">
+        <svg viewBox="0 0 24 24" style="color: #a855f7;"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+        <span>Background & Glassmorphism...</span>
+        <span class="context-badge" style="color: #a855f7;">${clip.bgMode || 'Gradient'}</span>
       </div>
 
       <div class="context-menu-divider"></div>
@@ -8931,6 +9216,20 @@ function showStudioContextMenu(x, y, clip, trackType) {
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 
+  menu.querySelector('#ctx-action-convert-quote')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    const newQ = createNewQuoteCardAtTime(currentTime);
+    if (clip && clip.file) {
+      newQ.avatarFile = { name: clip.file.name, url: clip.file.url };
+    }
+    selectClip(newQ, 'quote');
+    renderAllTimelineTracks();
+    recordState('Add Statement / Quote Card');
+    showTextTimingAlert('Statement / Quote Screen FX Activated!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+
   menu.querySelector('#ctx-action-cutout')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
@@ -8955,7 +9254,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
       clip.transitionDirection = 'center';
       clip.transitionSfx = 'whoosh';
       playSFX('whoosh');
-      showTextTimingAlert('⚡ 1-Click 3D Fly-Through Applied (Depth Zoom)', 'success');
+      showTextTimingAlert('1-Click 3D Fly-Through Applied (Depth Zoom)', 'success');
     }
     if (typeof injectTransitionChips === 'function') injectTransitionChips();
     selectClip(clip, trackType);
@@ -8982,7 +9281,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
       clip.transitionMode = 'underneath';
       clip.transitionSfx = 'whoosh';
       playSFX('whoosh');
-      showTextTimingAlert('➡️ 1-Click Directional Slide Under Applied (From Left)', 'success');
+      showTextTimingAlert('1-Click Directional Slide Under Applied (From Left)', 'success');
     }
     if (typeof injectTransitionChips === 'function') injectTransitionChips();
     selectClip(clip, trackType);
@@ -9002,7 +9301,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
       clip.transitionDuration = clip.transitionDuration || 0.6;
       clip.transitionSfx = 'whoosh';
       playSFX('whoosh');
-      showTextTimingAlert('🌊 1-Click Morph Cut Applied (Seamless Optical Blend)', 'success');
+      showTextTimingAlert('1-Click Morph Cut Applied (Seamless Optical Blend)', 'success');
     }
     if (typeof injectTransitionChips === 'function') injectTransitionChips();
     selectClip(clip, trackType);
@@ -9023,7 +9322,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
       clip.transitionDirection = clip.transitionDirection || 'left';
       clip.transitionSfx = 'whoosh';
       playSFX('whoosh');
-      showTextTimingAlert('📐 1-Click Foreground Reveal Applied (Split Wipe)', 'success');
+      showTextTimingAlert('1-Click Foreground Reveal Applied (Split Wipe)', 'success');
     }
     if (typeof injectTransitionChips === 'function') injectTransitionChips();
     selectClip(clip, trackType);
@@ -9181,6 +9480,48 @@ function showStudioContextMenu(x, y, clip, trackType) {
     recordState('Send Clip Behind Text');
   });
 
+  // Quote Card Context Menu Actions
+  menu.querySelector('#ctx-action-quote-replay')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, 'quote');
+    seekToTime(clip.start);
+    isPlaying = true;
+    showTextTimingAlert(`Replaying "${clip.speakerTitle || 'Quote'}" (${clip.quoteEffect || 'Typewriter'})...`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-quote-toggle-fx')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    clip.quoteEffect = (clip.quoteEffect === 'falling') ? 'typewriter' : 'falling';
+    selectClip(clip, 'quote');
+    const effectSel = document.getElementById('quote-text-effect');
+    if (effectSel) effectSel.value = clip.quoteEffect;
+    recordState('Toggle Quote Text Effect');
+    showTextTimingAlert(`Quote effect set to ${clip.quoteEffect === 'falling' ? 'Falling Characters' : 'Typewriter'}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+
+  menu.querySelector('#ctx-action-quote-avatar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, 'quote');
+    const fileInp = document.getElementById('quote-avatar-file');
+    if (fileInp) fileInp.click();
+  });
+
+  menu.querySelector('#ctx-action-quote-bg')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    selectClip(clip, 'quote');
+    const bgSel = document.getElementById('quote-bg-mode');
+    if (bgSel) {
+      bgSel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      bgSel.focus();
+    }
+  });
+
   menu.querySelector('#ctx-action-transition')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
@@ -9298,7 +9639,7 @@ document.getElementById('btn-crowd-toggle-hud')?.addEventListener('click', () =>
   crowdOverlaysHidden = !crowdOverlaysHidden;
   const lbl = document.getElementById('lbl-crowd-toggle-hud');
   if (lbl) lbl.textContent = crowdOverlaysHidden ? 'Show (1-Tap)' : 'Hide (1-Tap)';
-  showTextTimingAlert(crowdOverlaysHidden ? '👁️ Overlays Hidden (Tap screen to show)' : '✨ Overlays Visible', 'info');
+  showTextTimingAlert(crowdOverlaysHidden ? 'Overlays Hidden (Tap screen to show)' : 'Overlays Visible', 'info');
   setTimeout(() => showTextTimingAlert(''), 2000);
 });
 
@@ -10354,6 +10695,27 @@ function renderLayersPanel() {
     });
   });
 
+  // 2b. Statement / Quote Cards
+  (timelineClips.quote || []).forEach((qClip, idx) => {
+    layers.push({
+      id: qClip.id,
+      name: qClip.speakerTitle ? `Quote: ${qClip.speakerTitle}` : `Quote Card #${idx + 1}`,
+      desc: `${qClip.quoteEffect || 'Typewriter'} · ${qClip.duration}s`,
+      type: 'quote',
+      clip: qClip,
+      icon: `<svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>`,
+      active: selectedClip?.clip === qClip,
+      onSelect: () => {
+        selectClip(qClip, 'quote');
+        seekToTime(qClip.start);
+      },
+      onDelete: () => {
+        deleteClip('quote', qClip.id);
+        renderLayersPanel();
+      }
+    });
+  });
+
   // 3. Image / Sticker / Vector Drawing Clips
   timelineClips.image.forEach((imgClip, idx) => {
     let layerDesc = 'Media Layer';
@@ -10558,7 +10920,10 @@ function initLayersPanelControls() {
         const action = el.dataset.layerAction;
         dropdown.style.display = 'none';
 
-        if (action === 'add_chart') {
+        if (action === 'add_quote') {
+          createNewQuoteCardAtTime(currentTime);
+          renderLayersPanel();
+        } else if (action === 'add_chart') {
           openChartCreatorModal();
         } else if (action === 'add_text') {
           const btnAddText = document.getElementById('btn-add-text');
@@ -12886,6 +13251,7 @@ function createNewProjectInLibrary(projectName) {
       }
     ],
     chart: [],
+    quote: [],
     image: [],
     video: [],
     voiceover: [],
@@ -13357,9 +13723,15 @@ setInterval(() => {
     // If _currentProjectId was restored from localStorage, verify it exists in the library
     const matched = _currentProjectId ? projects.find(p => p.id === _currentProjectId) : null;
     if (matched) {
-      // Restore full content from the library entry (not just name)
-      restoreProjectClips(matched);
-      renderAllTimelineTracks();
+      // Only restore from project library if it has clips and we don't already have more recent clips loaded
+      const hasExistingClips = (timelineClips.image && timelineClips.image.length > 0) || (timelineClips.text && timelineClips.text.length > 0);
+      if (!hasExistingClips) {
+        restoreProjectClips(matched);
+        renderAllTimelineTracks();
+      } else {
+        // Update library entry with our current newer clips
+        saveCurrentProjectToLibrary(getCurrentProjectName(), false);
+      }
     } else {
       const savedId = localStorage.getItem('magnates_active_project_id');
       const foundSaved = savedId ? projects.find(p => p.id === savedId) : null;
@@ -13532,10 +13904,10 @@ document.getElementById('btn-add-selected-images')?.addEventListener('click', ()
 // ==================== FEATURE 3: TRANSITIONS BETWEEN CLIPS ====================
 const TRANSITION_TYPES = {
   none:             { label: 'None (Cut)',                duration: 0 },
-  fly_through:      { label: '⚡ 3D Fly-Through',          duration: 0.7, sfx: 'whoosh' },
-  directional_push: { label: '➡️ Directional Push / Under', duration: 0.7, sfx: 'whoosh' },
-  morph_cut:        { label: '🌊 Morph Cut',              duration: 0.6, sfx: 'whoosh' },
-  mask_reveal:      { label: '📐 Foreground Reveal',      duration: 0.6, sfx: 'whoosh' },
+  fly_through:      { label: '3D Fly-Through',          duration: 0.7, sfx: 'whoosh' },
+  directional_push: { label: 'Directional Push / Under', duration: 0.7, sfx: 'whoosh' },
+  morph_cut:        { label: 'Morph Cut',              duration: 0.6, sfx: 'whoosh' },
+  mask_reveal:      { label: 'Foreground Reveal',      duration: 0.6, sfx: 'whoosh' },
   fade:             { label: 'Fade',                      duration: 0.5 },
   slide_left:       { label: 'Slide Left',                duration: 0.5 },
   slide_right:      { label: 'Slide Right',               duration: 0.5 },
@@ -14242,6 +14614,14 @@ function applyTransitionEffect(ctx, w, h, transitionType, progress, nextClip) {
       } else if (dir === 'down') {
         offY_B = h * (1 - easeOut);
         offY_A = -easeIn * (h * 0.38);
+      } else if (dir === 'custom') {
+        const rad = ((nextClip?.transitionAngle !== undefined ? nextClip.transitionAngle : 45) * Math.PI) / 180;
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+        offX_B = cos * w * (1 - easeOut);
+        offY_B = sin * h * (1 - easeOut);
+        offX_A = -cos * easeIn * (w * 0.38);
+        offY_A = -sin * easeIn * (h * 0.38);
       } else {
         // Center / Depth Push
         const scaleA = 1.0 + easeIn * 0.6;
@@ -15248,3 +15628,1778 @@ if (document.readyState === 'loading') {
 } else {
   initEffectInspectorListeners();
 }
+
+// ============================================================================
+// ==================== STATEMENT & QUOTE CARD SYSTEM ENGINE ==================
+// ============================================================================
+
+// Cache for avatar & background images loaded for quote cards
+const quoteImageCache = new Map();
+
+function getCachedQuoteImage(url) {
+  if (!url) return null;
+  if (quoteImageCache.has(url)) return quoteImageCache.get(url);
+  const img = new Image();
+  img.src = url;
+  quoteImageCache.set(url, img);
+  return img;
+}
+
+// 1. Create a new Statement / Quote Card Clip
+function createNewQuoteCardAtTime(startSec) {
+  const atTime = typeof startSec === 'number' ? Math.max(0, startSec) : currentTime;
+  const quoteId = `clip-quote-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  
+  // Default quote clip matching user reference image (Micha Kaufman, Fiverr CEO)
+  const quoteClip = {
+    id: quoteId,
+    track: 'quote',
+    isQuoteCard: true,
+    name: 'Executive Statement Card',
+    start: atTime,
+    duration: 7.0,
+    zIndex: 28,
+    layerOrder: 'front',
+    x: 0,
+    y: 0,
+    scale: 1.0,
+
+    // Speaker / Avatar Shape Frame
+    speakerTitle: 'Alex Vance',
+    speakerSubtitle: 'Founder & CEO, Apex Global',
+    avatarShape: 'circle', // 'circle', 'rounded', 'hexagon', 'square'
+    avatarSize: 110,
+    avatarBorderColor: '#ffffff',
+    avatarBorderWidth: 3,
+    avatarFile: null, // { name, url }
+
+    // Statement / Body Quote Text
+    quoteText: 'We are entering an era where clarity, conviction, and strategic agility define the leaders who reshape entire industries.',
+    quoteEffect: 'typewriter', // 'typewriter', 'falling', 'pop', 'fade', 'slide_up', 'none'
+    effectSpeed: 1.0,
+    fontSize: 34,
+    fontFamily: "'Inter', sans-serif",
+    textColor: '#ffffff',
+    subtitleColor: '#94a3b8',
+
+    // Screen Background & Glassmorphism Plate
+    bgMode: 'gradient', // 'gradient', 'solid', 'glass', 'image', 'stage'
+    bgColor1: '#262933', // center / inner highlight
+    bgColor2: '#0b0c10', // outer dark vignette
+    glassEnabled: true,
+    glassBlur: 16,
+    glassOpacity: 65,
+    bgImageFile: null, // { name, url }
+    bgDim: 45 // 0-100%
+  };
+
+  if (!timelineClips.quote) timelineClips.quote = [];
+  timelineClips.quote.push(quoteClip);
+
+  // Sync to timeline & select
+  seekToTime(atTime);
+  selectClip(quoteClip, 'quote');
+  renderAllTimelineTracks();
+  recordState('Add Statement / Quote Card');
+  saveProjectState(false);
+
+  showTextTimingAlert('Statement / Quote Card added at ' + formatTimecode(atTime) + '!', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+  return quoteClip;
+}
+
+// 2. Draw Statement / Quote Card on Canvas Layer
+function drawQuoteCardLayer(clip) {
+  if (!clip) return;
+  const elapsed = currentTime - clip.start;
+  if (elapsed < 0 || elapsed > clip.duration) return;
+
+  const w = canvas.width;  // 1920
+  const h = canvas.height; // 1080
+
+  ctx.save();
+
+  // Apply clip transform (pan / zoom)
+  const scale = clip.scale !== undefined ? clip.scale : 1.0;
+  const posX = clip.x || 0;
+  const posY = clip.y || 0;
+
+  if (scale !== 1.0 || posX !== 0 || posY !== 0) {
+    ctx.translate(w / 2 + posX, h / 2 + posY);
+    ctx.scale(scale, scale);
+    ctx.translate(-w / 2, -h / 2);
+  }
+
+  // --- Background Layer Rendering ---
+  const bgMode = clip.bgMode || 'gradient';
+  if (bgMode === 'gradient') {
+    // Cinematic Vignette Radial Gradient
+    const radGrad = ctx.createRadialGradient(w * 0.45, h * 0.42, 100, w * 0.5, h * 0.5, Math.max(w, h) * 0.75);
+    radGrad.addColorStop(0, clip.bgColor1 || '#262933');
+    radGrad.addColorStop(1, clip.bgColor2 || '#090a0d');
+    ctx.fillStyle = radGrad;
+    ctx.fillRect(0, 0, w, h);
+  } else if (bgMode === 'solid') {
+    ctx.fillStyle = clip.bgColor1 || '#111319';
+    ctx.fillRect(0, 0, w, h);
+  } else if (bgMode === 'image' && clip.bgImageFile?.url) {
+    const bgImg = getCachedQuoteImage(clip.bgImageFile.url);
+    if (bgImg && bgImg.complete && bgImg.naturalWidth) {
+      // Cover full canvas keeping aspect ratio
+      const aspectImg = bgImg.naturalWidth / bgImg.naturalHeight;
+      const aspectCanvas = w / h;
+      let sw = bgImg.naturalWidth;
+      let sh = bgImg.naturalHeight;
+      let sx = 0;
+      let sy = 0;
+      if (aspectImg > aspectCanvas) {
+        sw = bgImg.naturalHeight * aspectCanvas;
+        sx = (bgImg.naturalWidth - sw) / 2;
+      } else {
+        sh = bgImg.naturalWidth / aspectCanvas;
+        sy = (bgImg.naturalHeight - sh) / 2;
+      }
+      ctx.drawImage(bgImg, sx, sy, sw, sh, 0, 0, w, h);
+    } else {
+      ctx.fillStyle = '#0f1015';
+      ctx.fillRect(0, 0, w, h);
+    }
+
+    // Apply Dimming Vignette over background image so statement text remains crisp & readable
+    const dimAlpha = (clip.bgDim !== undefined ? clip.bgDim : 45) / 100;
+    if (dimAlpha > 0) {
+      ctx.fillStyle = `rgba(0, 0, 0, ${dimAlpha})`;
+      ctx.fillRect(0, 0, w, h);
+    }
+  }
+
+  // --- Dedicated Authentic iMessage / SMS Chat Bubble Renderer ---
+  // (Handled within main card plate below)
+
+  // --- Glassmorphism Plate Card Container (Like documentary graphics / iOS HUD) ---
+  const cardPadX = 140;
+  const cardW = 1640;
+  const cardH = 760;
+  const cardX = (w - cardW) / 2;
+  const cardY = (h - cardH) / 2;
+
+  const glassOn = clip.glassEnabled !== false && (bgMode === 'glass' || bgMode === 'image' || clip.glassEnabled);
+  if (glassOn) {
+    ctx.save();
+    const opVal = (clip.glassOpacity !== undefined ? clip.glassOpacity : 60) / 100;
+
+    // Draw frosted glass plate with rounded corners
+    const cr = 28;
+    ctx.beginPath();
+    ctx.roundRect(cardX, cardY, cardW, cardH, cr);
+
+    // If card style is Chat Bubble, attach speech bubble pointer tail
+    if (clip.cardStyle === 'chat_bubble') {
+      const tailX = cardX + 160;
+      const tailY = cardY + cardH;
+      ctx.moveTo(tailX - 25, tailY);
+      ctx.lineTo(tailX - 45, tailY + 35);
+      ctx.lineTo(tailX + 15, tailY);
+    }
+
+    // Subtle dark translucent background with specular top-edge sheen
+    ctx.fillStyle = `rgba(18, 22, 33, ${opVal})`;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    ctx.shadowBlur = 45;
+    ctx.shadowOffsetY = 15;
+    ctx.fill();
+
+    // Luminescent border stroke
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 1.5;
+    const borderGrad = ctx.createLinearGradient(cardX, cardY, cardX + cardW, cardY + cardH);
+    borderGrad.addColorStop(0, 'rgba(255, 255, 255, 0.25)');
+    borderGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.08)');
+    borderGrad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+    ctx.strokeStyle = borderGrad;
+    ctx.stroke();
+
+    // Top subtle white glass glare line
+    ctx.beginPath();
+    ctx.moveTo(cardX + cr, cardY + 1.5);
+    ctx.lineTo(cardX + cardW - cr, cardY + 1.5);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // --- Speaker Avatar Shape Frame & Image ---
+  const avatarRadius = (clip.avatarSize || 110) / 2;
+  const avatarCenterX = cardX + 160;
+  const avatarCenterY = cardY + 170;
+  const shape = clip.avatarShape || 'circle';
+
+  ctx.save();
+
+  // Shadow / Glow behind shape
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.65)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetY = 8;
+
+  // Clip Path for the shape
+  ctx.beginPath();
+  if (shape === 'rounded') {
+    const sSize = avatarRadius * 2;
+    ctx.roundRect(avatarCenterX - avatarRadius, avatarCenterY - avatarRadius, sSize, sSize, 22);
+  } else if (shape === 'hexagon') {
+    for (let i = 0; i < 6; i++) {
+      const angle = (i * Math.PI) / 3 - Math.PI / 6;
+      const hx = avatarCenterX + avatarRadius * Math.cos(angle);
+      const hy = avatarCenterY + avatarRadius * Math.sin(angle);
+      if (i === 0) ctx.moveTo(hx, hy);
+      else ctx.lineTo(hx, hy);
+    }
+    ctx.closePath();
+  } else if (shape === 'square') {
+    const sSize = avatarRadius * 2;
+    ctx.rect(avatarCenterX - avatarRadius, avatarCenterY - avatarRadius, sSize, sSize);
+  } else {
+    // Circle default
+    ctx.arc(avatarCenterX, avatarCenterY, avatarRadius, 0, Math.PI * 2);
+  }
+  ctx.fillStyle = '#1c2130';
+  ctx.fill();
+
+  ctx.save();
+  ctx.clip();
+
+  // Draw Avatar Picture if uploaded or chosen
+  let avatarDrawn = false;
+  if (clip.avatarFile?.url) {
+    const avImg = getCachedQuoteImage(clip.avatarFile.url);
+    if (avImg && avImg.complete && avImg.naturalWidth) {
+      const s = avatarRadius * 2;
+      ctx.drawImage(avImg, avatarCenterX - avatarRadius, avatarCenterY - avatarRadius, s, s);
+      avatarDrawn = true;
+    }
+  }
+
+  // Default avatar icon placeholder if no picture attached
+  if (!avatarDrawn) {
+    // Elegant silhouette speaker placeholder
+    ctx.fillStyle = '#2b334a';
+    ctx.fillRect(avatarCenterX - avatarRadius, avatarCenterY - avatarRadius, avatarRadius * 2, avatarRadius * 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+    ctx.beginPath();
+    ctx.arc(avatarCenterX, avatarCenterY - avatarRadius * 0.15, avatarRadius * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(avatarCenterX, avatarCenterY + avatarRadius * 0.85, avatarRadius * 0.72, Math.PI, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore(); // end clip
+
+  // Frame Outline Border & Outer Ring Glow
+  const bWidth = clip.avatarBorderWidth !== undefined ? clip.avatarBorderWidth : 3;
+  if (bWidth > 0) {
+    ctx.lineWidth = bWidth;
+    ctx.strokeStyle = clip.avatarBorderColor || '#ffffff';
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+    ctx.shadowBlur = 14;
+    ctx.stroke();
+  }
+
+  ctx.restore();
+
+  // --- Speaker Name Title & Role Subtitle (per-field styling) ---
+  const qs = (f, d) => ({
+    font: clip[f + 'Font'] || clip.fontFamily || "'Inter', sans-serif",
+    size: clip[f + 'Size'] || d.size,
+    color: clip[f + 'Color'] || d.color,
+    bold: clip[f + 'Bold'] !== undefined ? clip[f + 'Bold'] : d.bold,
+    italic: !!clip[f + 'Italic']
+  });
+  const nameSt = qs('name', { size: 60, color: clip.textColor || '#ffffff', bold: true });
+  const roleSt = qs('role', { size: 38, color: clip.subtitleColor || '#94a3b8', bold: false });
+  const quoteSt = qs('quote', { size: clip.fontSize || 34, color: '#f1f1f1', bold: false });
+  const fontStr = (s, light) => `${s.italic ? 'italic ' : ''}${s.bold ? 700 : (light ? 300 : 400)} ${s.size}px ${s.font}`;
+  clip._fmt = { name: nameSt, role: roleSt, quote: quoteSt };
+
+  const headerTextX = avatarCenterX + avatarRadius + 50;
+  const nameY = avatarCenterY - roleSt.size * 0.45;
+  const roleY = nameY + nameSt.size * 0.55 + roleSt.size * 0.7;
+  const nameText = clip.speakerTitle || 'Alex Vance';
+  const roleText = clip.speakerSubtitle || 'Founder & CEO, Apex Global';
+
+  ctx.save();
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+  ctx.shadowBlur = 10;
+  ctx.font = fontStr(nameSt);
+  const nameW = ctx.measureText(nameText).width;
+  if (clip._editingField !== 'name') {
+    ctx.fillStyle = nameSt.color;
+    ctx.fillText(nameText, headerTextX, nameY);
+  }
+  ctx.font = fontStr(roleSt, true);
+  const roleW = ctx.measureText(roleText).width;
+  if (clip._editingField !== 'role') {
+    ctx.fillStyle = roleSt.color;
+    ctx.fillText(roleText, headerTextX, roleY);
+  }
+  ctx.restore();
+
+  // --- Body Statement / Quote Text With Dynamic Effects ---
+  const quoteFontSize = quoteSt.size;
+  const quoteFontFamily = quoteSt.font;
+  const quoteStartY = avatarCenterY + avatarRadius + 70;
+  const quoteStartX = avatarCenterX - avatarRadius;
+  const quoteMaxW = cardW - 2 * (quoteStartX - cardX);
+  const lineSpacing = quoteFontSize * 1.5;
+  const quoteColor = quoteSt.color;
+
+  ctx.save();
+  ctx.font = fontStr(quoteSt, true);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+
+  const userQuote = (clip.quoteText || '').trim();
+  const editingQuote = clip._editingField === 'quote';
+
+  // Customizable quotation marks color & visibility OR Chat Bubble container
+  const isChatBubble = clip.cardStyle === 'chat_bubble';
+  const showQuoteMarks = clip.quoteMarksVisible !== false && !isChatBubble;
+  const markColor = clip.quoteMarkColor || '#ff334b';
+
+  const rawQuote = (!userQuote || editingQuote) ? '' : (userQuote || 'Type a message...');
+
+  const textOffsetLeft = (showQuoteMarks ? 45 : (isChatBubble ? 30 : 0));
+  const actualQuoteX = quoteStartX + textOffsetLeft;
+  const actualQuoteMaxW = quoteMaxW - (textOffsetLeft * 2);
+
+  // Word wrap calculation
+  const words = rawQuote.split(' ');
+  const lines = [];
+  let curLine = '';
+
+  words.forEach(w => {
+    const testLine = curLine ? `${curLine} ${w}` : w;
+    const testW = ctx.measureText(testLine).width;
+    if (testW > actualQuoteMaxW && curLine) {
+      lines.push(curLine);
+      curLine = w;
+    } else {
+      curLine = testLine;
+    }
+  });
+  if (curLine) lines.push(curLine);
+  if (lines.length === 0) lines.push('Type a message...');
+
+  // Calculate actual text dimensions for dynamic chat bubble sizing
+  let maxLineWidth = 120;
+  lines.forEach(l => {
+    const lw = ctx.measureText(l).width;
+    if (lw > maxLineWidth) maxLineWidth = lw;
+  });
+
+  const isReceived = clip.chatDirection !== 'sent';
+  const bubbleBg = isReceived ? '#e9e9eb' : '#007aff';
+  const bubbleTextColor = isReceived ? '#1c1c1e' : '#ffffff';
+  const actualQuoteColor = isChatBubble ? bubbleTextColor : quoteColor;
+
+  if (showQuoteMarks) {
+    // Opening quotation mark before text
+    ctx.save();
+    ctx.font = '700 64px Georgia, serif';
+    ctx.fillStyle = markColor;
+    ctx.shadowColor = markColor;
+    ctx.shadowBlur = 12;
+    ctx.fillText('“', quoteStartX, quoteStartY - 10);
+    ctx.restore();
+  } else if (isChatBubble) {
+    // Dynamic Bubble Sizing based on text content width & lines count
+    const bubbleW = Math.min(quoteMaxW, maxLineWidth + 60);
+    const bubbleH = lines.length * lineSpacing + 28;
+    const bx = quoteStartX;
+    const by = quoteStartY - 8;
+    const br = 20;
+
+    ctx.save();
+    ctx.fillStyle = bubbleBg;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+    ctx.shadowBlur = 18;
+    ctx.shadowOffsetY = 5;
+
+    // Rounded speech bubble main container
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bubbleW, bubbleH, br);
+    ctx.fill();
+
+    // Curved iMessage pointer tail at corner
+    ctx.beginPath();
+    const tailY = by + bubbleH;
+    if (isReceived) {
+      // Left received tail
+      ctx.moveTo(bx + 18, tailY - 1);
+      ctx.quadraticCurveTo(bx - 12, tailY + 12, bx - 18, tailY + 14);
+      ctx.quadraticCurveTo(bx - 4, tailY - 4, bx + 4, tailY - 16);
+    } else {
+      // Right sent tail
+      const tailX = bx + bubbleW;
+      ctx.moveTo(tailX - 18, tailY - 1);
+      ctx.quadraticCurveTo(tailX + 12, tailY + 12, tailX + 18, tailY + 14);
+      ctx.quadraticCurveTo(tailX + 4, tailY - 4, tailX - 4, tailY - 16);
+    }
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Total character count across all lines
+  const totalChars = rawQuote.length;
+
+  // When actively editing inline, hide canvas text to prevent duplicate overlapping text
+  if (!editingQuote) {
+    if (!isPlaying || effect === 'none') {
+      ctx.fillStyle = actualQuoteColor;
+      ctx.shadowColor = isChatBubble ? 'transparent' : 'rgba(0, 0, 0, 0.85)';
+      ctx.shadowBlur = isChatBubble ? 0 : 14;
+      lines.forEach((line, lIdx) => {
+        ctx.fillText(line, actualQuoteX, quoteStartY + lIdx * lineSpacing);
+      });
+    } else if (effect === 'typewriter') {
+    // Typewriter: Keystroke by keystroke reveal with speed control
+    const charsPerSec = 35 * speedMult;
+    const charsToShow = Math.floor(elapsed * charsPerSec);
+
+    let charCursor = 0;
+    lines.forEach((line, lIdx) => {
+      const lineY = quoteStartY + lIdx * lineSpacing;
+      if (charCursor >= charsToShow) return;
+
+      const remainingAllowed = charsToShow - charCursor;
+      const subLine = line.slice(0, remainingAllowed);
+
+      ctx.fillStyle = actualQuoteColor;
+      ctx.shadowColor = isChatBubble ? 'transparent' : 'rgba(0, 0, 0, 0.85)';
+      ctx.shadowBlur = isChatBubble ? 0 : 14;
+      ctx.fillText(subLine, actualQuoteX, lineY);
+
+      // Blinking typing block cursor at current typing position
+      if (remainingAllowed <= line.length && charsToShow < totalChars) {
+        const subW = ctx.measureText(subLine).width;
+        const blink = Math.sin(currentTime * 10) > 0;
+        if (blink) {
+          ctx.fillStyle = '#ff334b';
+          ctx.fillRect(quoteStartX + subW + 4, lineY + 4, 3, quoteFontSize * 0.9);
+        }
+      }
+
+      charCursor += line.length + 1; // +1 for space/newline
+    });
+  } else if (effect === 'falling') {
+    // Falling: Characters cascade in from above with gravity & bounce settling
+    const fallStagger = 0.025 / speedMult;
+    const fallDur = 0.42;
+
+    let charGlobalIdx = 0;
+    lines.forEach((line, lIdx) => {
+      const lineY = quoteStartY + lIdx * lineSpacing;
+      let lineX = quoteStartX;
+
+      for (let cIdx = 0; cIdx < line.length; cIdx++) {
+        const char = line[cIdx];
+        const charStart = charGlobalIdx * fallStagger;
+        const charElapsed = Math.max(0, elapsed - charStart);
+        charGlobalIdx++;
+
+        if (charElapsed <= 0) continue; // hasn't started falling yet
+
+        const t = Math.min(1.0, charElapsed / fallDur);
+        // Spring bounce settling curve
+        const p = t < 0.75
+          ? Math.pow(t / 0.75, 2)
+          : 1 + Math.sin((t - 0.75) * Math.PI / 0.25) * 0.12 * (1 - t);
+
+        const dropY = (1 - p) * -85;
+        const alpha = Math.min(1.0, t * 2.8);
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = quoteColor;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+        ctx.shadowBlur = 14;
+        ctx.fillText(char, lineX, lineY + dropY);
+        ctx.restore();
+
+        lineX += ctx.measureText(char).width;
+      }
+    });
+  } else if (effect === 'pop') {
+    // Kinetic Word Pop
+    let wordCursor = 0;
+    lines.forEach((line, lIdx) => {
+      const lineY = quoteStartY + lIdx * lineSpacing;
+      let lineX = quoteStartX;
+      const lineWords = line.split(' ');
+
+      lineWords.forEach(w => {
+        const wordStart = (wordCursor / Math.max(1, words.length)) * (2.5 / speedMult);
+        wordCursor++;
+
+        if (elapsed < wordStart) return;
+
+        ctx.save();
+        ctx.fillStyle = quoteColor;
+        if (elapsed >= wordStart && elapsed <= wordStart + 0.35) {
+          ctx.shadowColor = '#ff334b';
+          ctx.shadowBlur = 32;
+        } else {
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+          ctx.shadowBlur = 12;
+        }
+        ctx.fillText(w, lineX, lineY);
+        ctx.restore();
+
+        lineX += ctx.measureText(w + ' ').width;
+      });
+    });
+  } else if (effect === 'fade') {
+    // Cinematic Fade
+    const fadeProg = Math.min(1.0, elapsed / (1.2 / speedMult));
+    ctx.globalAlpha = fadeProg;
+    ctx.fillStyle = quoteColor;
+    lines.forEach((line, lIdx) => {
+      ctx.fillText(line, quoteStartX, quoteStartY + lIdx * lineSpacing);
+    });
+  } else if (effect === 'slide_up') {
+    // Slide Up Ease
+    const t = Math.min(1.0, elapsed / (0.8 / speedMult));
+    const ease = 1 - Math.pow(1 - t, 3);
+    const offset = (1 - ease) * 60;
+    ctx.globalAlpha = Math.min(1.0, t * 2.0);
+    ctx.fillStyle = quoteColor;
+    lines.forEach((line, lIdx) => {
+      ctx.fillText(line, quoteStartX, quoteStartY + lIdx * lineSpacing + offset);
+    });
+  } else {
+    // Static / Instant
+    ctx.fillStyle = quoteColor;
+    lines.forEach((line, lIdx) => {
+      ctx.fillText(line, actualQuoteX, quoteStartY + lIdx * lineSpacing);
+    });
+  }
+}
+
+  // Draw Closing Quotation Mark after text end
+  if (showQuoteMarks && lines.length > 0 && !editingQuote) {
+    const lastLineIdx = lines.length - 1;
+    const lastLineText = lines[lastLineIdx];
+    const lastLineY = quoteStartY + lastLineIdx * lineSpacing;
+    const lastLineW = ctx.measureText(lastLineText).width;
+    const closingX = Math.min(quoteStartX + quoteMaxW - 30, actualQuoteX + lastLineW + 10);
+
+    ctx.save();
+    ctx.font = '700 64px Georgia, serif';
+    ctx.fillStyle = markColor;
+    ctx.shadowColor = markColor;
+    ctx.shadowBlur = 12;
+    ctx.fillText('”', closingX, lastLineY - 10);
+    ctx.restore();
+  }
+
+
+  ctx.restore();
+
+  // Store interactive render bounds for selection, dragging & transform
+  clip._renderBounds = {
+    x: cardX,
+    y: cardY,
+    w: cardW,
+    h: cardH
+  };
+
+  const headerMaxW = cardX + cardW - headerTextX - 60;
+
+  clip._subBounds = {
+    avatar: { x: avatarCenterX - avatarRadius, y: avatarCenterY - avatarRadius, w: avatarRadius * 2, h: avatarRadius * 2 },
+    name: { x: headerTextX, y: nameY - nameSt.size * 0.65, w: headerMaxW, h: nameSt.size * 1.3 },
+    role: { x: headerTextX, y: roleY - roleSt.size * 0.65, w: headerMaxW, h: roleSt.size * 1.3 },
+    quoteBody: { x: actualQuoteX, y: quoteStartY - 6, w: actualQuoteMaxW, h: Math.max(lineSpacing * 2, Math.max(1, lines.length) * lineSpacing + 12) },
+    card: { x: cardX, y: cardY, w: cardW, h: cardH }
+  };
+
+  // Draw transform bounding box and corner handles if this quote clip is currently selected (unless currently editing text inline)
+  if (selectedClip && selectedClip.clip.id === clip.id && (selectedClip.trackType === 'quote' || clip.isQuoteCard) && !clip._editingField) {
+    drawTransformHandles(cardX, cardY, cardW, cardH);
+  }
+
+  ctx.restore();
+}
+
+// 3. Populate Quote Card Inspector Sidebar Controls
+function populateQuoteCardInspector(clip) {
+  if (!clip) return;
+
+  const titleInp = document.getElementById('quote-title');
+  const subInp = document.getElementById('quote-subtitle');
+  const bodyInp = document.getElementById('quote-body-text');
+  const effectSel = document.getElementById('quote-text-effect');
+  const speedSlider = document.getElementById('quote-effect-speed');
+  const speedLabel = document.getElementById('quote-effect-speed-label');
+  const fontSizeSlider = document.getElementById('quote-font-size');
+  const fontSizeVal = document.getElementById('quote-font-size-val');
+  const fontFamSel = document.getElementById('quote-font-family');
+  const bgModeSel = document.getElementById('quote-bg-mode');
+  const col1Inp = document.getElementById('quote-bg-color1');
+  const col1Val = document.getElementById('quote-bg-color1-val');
+  const col2Inp = document.getElementById('quote-bg-color2');
+  const col2Val = document.getElementById('quote-bg-color2-val');
+  const col2Wrap = document.getElementById('col-quote-bg-color2');
+  const rowColors = document.getElementById('row-quote-bg-colors');
+  const glassRow = document.getElementById('row-quote-glass-controls');
+  const glassBox = document.getElementById('quote-glass-enable');
+  const glassBlur = document.getElementById('quote-glass-blur');
+  const glassOp = document.getElementById('quote-glass-opacity');
+  const rowBgImg = document.getElementById('row-quote-bg-image');
+  const bgDim = document.getElementById('quote-bg-dim');
+  const borderCol = document.getElementById('quote-avatar-border-color');
+  const borderW = document.getElementById('quote-avatar-border-width');
+  const avSize = document.getElementById('quote-avatar-size');
+
+  if (titleInp) titleInp.value = clip.speakerTitle || '';
+  if (subInp) subInp.value = clip.speakerSubtitle || '';
+  if (bodyInp) bodyInp.value = clip.quoteText || '';
+  if (effectSel) effectSel.value = clip.quoteEffect || 'typewriter';
+  if (speedSlider) speedSlider.value = clip.effectSpeed || 1.0;
+  if (speedLabel) speedLabel.textContent = `${(clip.effectSpeed || 1.0).toFixed(1)}x`;
+  if (fontSizeSlider) fontSizeSlider.value = clip.fontSize || 34;
+  if (fontSizeVal) fontSizeVal.textContent = `${clip.fontSize || 34}px`;
+  if (fontFamSel) fontFamSel.value = clip.fontFamily || "'Inter', sans-serif";
+  if (bgModeSel) bgModeSel.value = clip.bgMode || 'gradient';
+  if (col1Inp) col1Inp.value = clip.bgColor1 || '#262933';
+  if (col1Val) col1Val.textContent = clip.bgColor1 || '#262933';
+  if (col2Inp) col2Inp.value = clip.bgColor2 || '#090a0d';
+  if (col2Val) col2Val.textContent = clip.bgColor2 || '#090a0d';
+  if (glassBox) glassBox.checked = clip.glassEnabled !== false;
+  if (glassBlur) glassBlur.value = clip.glassBlur !== undefined ? clip.glassBlur : 16;
+  if (glassOp) glassOp.value = clip.glassOpacity !== undefined ? clip.glassOpacity : 65;
+  if (bgDim) bgDim.value = clip.bgDim !== undefined ? clip.bgDim : 45;
+  if (borderCol) borderCol.value = clip.avatarBorderColor || '#ffffff';
+  if (borderW) borderW.value = clip.avatarBorderWidth !== undefined ? clip.avatarBorderWidth : 3;
+  if (avSize) avSize.value = clip.avatarSize || 110;
+
+  // Shape button active styling
+  const activeShape = clip.avatarShape || 'circle';
+  document.querySelectorAll('#quote-shape-group .btn-sm').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.shape === activeShape);
+  });
+
+  // Toggle visibility of gradient / solid / image / glass rows based on bgMode
+  const mode = clip.bgMode || 'gradient';
+  if (rowColors) rowColors.style.display = (mode === 'gradient' || mode === 'solid') ? 'block' : 'none';
+  if (col2Wrap) col2Wrap.style.display = (mode === 'gradient') ? 'block' : 'none';
+  if (rowBgImg) rowBgImg.style.display = (mode === 'image') ? 'block' : 'none';
+}
+
+// 4. Initialize Quote Card Inspector Listeners & Controls
+function initQuoteCardListeners() {
+  const titleInp = document.getElementById('quote-title');
+  const subInp = document.getElementById('quote-subtitle');
+  const bodyInp = document.getElementById('quote-body-text');
+  const effectSel = document.getElementById('quote-text-effect');
+  const speedSlider = document.getElementById('quote-effect-speed');
+  const speedLabel = document.getElementById('quote-effect-speed-label');
+  const fontSizeSlider = document.getElementById('quote-font-size');
+  const fontSizeVal = document.getElementById('quote-font-size-val');
+  const fontFamSel = document.getElementById('quote-font-family');
+  const bgModeSel = document.getElementById('quote-bg-mode');
+  const col1Inp = document.getElementById('quote-bg-color1');
+  const col1Val = document.getElementById('quote-bg-color1-val');
+  const col2Inp = document.getElementById('quote-bg-color2');
+  const col2Val = document.getElementById('quote-bg-color2-val');
+  const glassBox = document.getElementById('quote-glass-enable');
+  const glassBlur = document.getElementById('quote-glass-blur');
+  const glassOp = document.getElementById('quote-glass-opacity');
+  const bgDim = document.getElementById('quote-bg-dim');
+  const borderCol = document.getElementById('quote-avatar-border-color');
+  const borderW = document.getElementById('quote-avatar-border-width');
+  const avSize = document.getElementById('quote-avatar-size');
+  const avFileInp = document.getElementById('quote-avatar-file');
+  const avPickMediaBtn = document.getElementById('btn-quote-pick-media');
+  const avRemoveBtn = document.getElementById('btn-quote-remove-avatar');
+  const bgImgFileInp = document.getElementById('quote-bg-image-file');
+  const bgPickMediaBtn = document.getElementById('btn-quote-pick-bg-media');
+  const replayBtn = document.getElementById('btn-replay-quote-anim');
+  const deleteBtn = document.getElementById('btn-delete-quote-card');
+  const dupBtn = document.getElementById('btn-duplicate-quote');
+
+  const getActiveQuote = () => {
+    if (selectedClip?.clip && (selectedClip.trackType === 'quote' || selectedClip.clip.isQuoteCard)) {
+      return selectedClip.clip;
+    }
+    return (timelineClips.quote && timelineClips.quote.length > 0) ? timelineClips.quote[0] : null;
+  };
+
+  titleInp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.speakerTitle = e.target.value;
+    renderAllTimelineTracks();
+  });
+  titleInp?.addEventListener('change', () => recordState('Edit Speaker Title'));
+
+  subInp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.speakerSubtitle = e.target.value;
+  });
+  subInp?.addEventListener('change', () => recordState('Edit Speaker Subtitle'));
+
+  bodyInp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteText = e.target.value;
+    renderAllTimelineTracks();
+  });
+  bodyInp?.addEventListener('change', () => recordState('Edit Quote Text'));
+
+  effectSel?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteEffect = e.target.value;
+    recordState('Change Quote Effect');
+    showTextTimingAlert(`Effect changed to ${e.target.options[e.target.selectedIndex].text}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  speedSlider?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    const val = parseFloat(e.target.value);
+    q.effectSpeed = val;
+    if (speedLabel) speedLabel.textContent = `${val.toFixed(1)}x`;
+  });
+  speedSlider?.addEventListener('change', () => recordState('Change Quote Speed'));
+
+  fontSizeSlider?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.fontSize = parseInt(e.target.value);
+    if (fontSizeVal) fontSizeVal.textContent = `${q.fontSize}px`;
+  });
+  fontSizeSlider?.addEventListener('change', () => recordState('Change Quote Font Size'));
+
+  fontFamSel?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.fontFamily = e.target.value;
+    recordState('Change Quote Font');
+  });
+
+  bgModeSel?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.bgMode = e.target.value;
+    populateQuoteCardInspector(q);
+    recordState('Change Quote Background Mode');
+  });
+
+  col1Inp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.bgColor1 = e.target.value;
+    if (col1Val) col1Val.textContent = e.target.value;
+  });
+  col1Inp?.addEventListener('change', () => recordState('Change Quote Inner Color'));
+
+  col2Inp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.bgColor2 = e.target.value;
+    if (col2Val) col2Val.textContent = e.target.value;
+  });
+  col2Inp?.addEventListener('change', () => recordState('Change Quote Outer Color'));
+
+  glassBox?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.glassEnabled = e.target.checked;
+    recordState('Toggle Glassmorphism');
+  });
+
+  glassBlur?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.glassBlur = parseInt(e.target.value);
+  });
+  glassBlur?.addEventListener('change', () => recordState('Change Glass Blur'));
+
+  glassOp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.glassOpacity = parseInt(e.target.value);
+  });
+  glassOp?.addEventListener('change', () => recordState('Change Glass Opacity'));
+
+  bgDim?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.bgDim = parseInt(e.target.value);
+  });
+  bgDim?.addEventListener('change', () => recordState('Change Background Wallpaper Dim'));
+
+  borderCol?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.avatarBorderColor = e.target.value;
+  });
+  borderCol?.addEventListener('change', () => recordState('Change Frame Border Color'));
+
+  borderW?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.avatarBorderWidth = parseInt(e.target.value);
+  });
+  borderW?.addEventListener('change', () => recordState('Change Frame Border Width'));
+
+  avSize?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.avatarSize = parseInt(e.target.value);
+  });
+  avSize?.addEventListener('change', () => recordState('Change Avatar Size'));
+
+  // Shape Selector Buttons (Circle, Rounded, Hexagon, Square)
+  document.querySelectorAll('#quote-shape-group .btn-sm').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const q = getActiveQuote();
+      if (!q) return;
+      document.querySelectorAll('#quote-shape-group .btn-sm').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      q.avatarShape = btn.dataset.shape || 'circle';
+      recordState('Change Avatar Shape');
+    });
+  });
+
+  // Avatar Image Upload
+  avFileInp?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const q = getActiveQuote();
+    if (!q) return;
+    const reader = new FileReader();
+    reader.onload = (re) => {
+      q.avatarFile = { name: file.name, url: re.target.result };
+      recordState('Upload Speaker Avatar');
+      showTextTimingAlert('Speaker photo uploaded!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Pick Avatar from Media Library
+  avPickMediaBtn?.addEventListener('click', () => {
+    const q = getActiveQuote();
+    if (!q) return;
+    openQuoteImagePickerModal((chosenFile) => {
+      q.avatarFile = { name: chosenFile.name, url: chosenFile.url };
+      recordState('Select Avatar from Library');
+      showTextTimingAlert(`Selected avatar: "${chosenFile.name}"`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    });
+  });
+
+  // Remove Avatar Picture
+  avRemoveBtn?.addEventListener('click', () => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.avatarFile = null;
+    recordState('Remove Avatar Picture');
+    showTextTimingAlert('Removed avatar photo (Using silhouette frame)', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  // Background Image Upload
+  bgImgFileInp?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const q = getActiveQuote();
+    if (!q) return;
+    const reader = new FileReader();
+    reader.onload = (re) => {
+      q.bgImageFile = { name: file.name, url: re.target.result };
+      q.bgMode = 'image';
+      populateQuoteCardInspector(q);
+      recordState('Upload Background Image');
+      showTextTimingAlert('Custom background wallpaper set!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Pick Background Image from Media Library
+  bgPickMediaBtn?.addEventListener('click', () => {
+    const q = getActiveQuote();
+    if (!q) return;
+    openQuoteImagePickerModal((chosenFile) => {
+      q.bgImageFile = { name: chosenFile.name, url: chosenFile.url };
+      q.bgMode = 'image';
+      populateQuoteCardInspector(q);
+      recordState('Select Background from Library');
+      showTextTimingAlert(`Wallpaper set: "${chosenFile.name}"`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    });
+  });
+
+  // Replay Animation
+  replayBtn?.addEventListener('click', () => {
+    const q = getActiveQuote();
+    if (!q) return;
+    seekToTime(q.start);
+    isPlaying = true;
+    showTextTimingAlert('Replaying animation...', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  // Duplicate Card
+  dupBtn?.addEventListener('click', () => {
+    const q = getActiveQuote();
+    if (!q) return;
+    const newStart = q.start + q.duration + 0.5;
+    const cloned = JSON.parse(JSON.stringify(q));
+    cloned.id = `clip-quote-${Date.now()}`;
+    cloned.start = newStart;
+    if (!timelineClips.quote) timelineClips.quote = [];
+    timelineClips.quote.push(cloned);
+    seekToTime(newStart);
+    selectClip(cloned, 'quote');
+    renderAllTimelineTracks();
+    recordState('Duplicate Statement Card');
+    showTextTimingAlert('Statement Card duplicated!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  // Delete Card
+  deleteBtn?.addEventListener('click', () => {
+    const q = getActiveQuote();
+    if (!q) return;
+    deleteClip('quote', q.id);
+    recordState('Delete Statement Card');
+    showTextTimingAlert('Statement Card removed', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  // Wire up Top Toolbar / Dropdown / Canvas Overlay Buttons
+  document.getElementById('tool-add-quote')?.addEventListener('click', () => {
+    const q = createNewQuoteCardAtTime(currentTime);
+    q.cardStyle = 'executive';
+    selectClip(q, 'quote');
+  });
+  document.getElementById('tool-add-chat-quote')?.addEventListener('click', () => {
+    const q = createNewQuoteCardAtTime(currentTime);
+    q.cardStyle = 'chat_bubble';
+    q.speakerTitle = 'Alex Vance';
+    q.speakerSubtitle = 'Online';
+    selectClip(q, 'quote');
+    showTextTimingAlert('Chat Bubble Quote Card Created!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+  document.querySelectorAll('[data-layer-action="add_chat_quote"]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const q = createNewQuoteCardAtTime(currentTime);
+      q.cardStyle = 'chat_bubble';
+      q.speakerTitle = 'Alex Vance';
+      q.speakerSubtitle = 'Online';
+      selectClip(q, 'quote');
+      showTextTimingAlert('Chat Bubble Quote Card Created!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    });
+  });
+
+  document.getElementById('btn-canvas-quote-card')?.addEventListener('click', () => {
+    createNewQuoteCardAtTime(currentTime);
+  });
+
+  // ==================== ON-CANVAS DIRECT OVERLAY LISTENERS ====================
+  // Shape buttons in on-canvas HUD
+  document.querySelectorAll('#quote-overlay-avatar-hud .quote-hud-shape-btns .quote-hud-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const q = getActiveQuote();
+      if (!q) return;
+      q.avatarShape = btn.dataset.shape;
+      populateQuoteCardInspector(q);
+      recordState('Change Avatar Shape');
+      showTextTimingAlert(`Avatar shape changed to ${btn.dataset.shape}!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+    });
+  });
+
+  // Upload Headshot from canvas HUD
+  const overlayFileInput = document.getElementById('quote-overlay-file-input');
+  overlayFileInput?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const q = getActiveQuote();
+    if (!q) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      q.avatarFile = { name: file.name, url: evt.target.result };
+      populateQuoteCardInspector(q);
+      recordState('Upload Avatar Headshot');
+      showTextTimingAlert(`Headshot updated: "${file.name}"`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Pick Avatar from Library from canvas HUD
+  document.getElementById('quote-overlay-pick-media')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q) return;
+    openQuoteImagePickerModal((chosenFile) => {
+      q.avatarFile = { name: chosenFile.name, url: chosenFile.url };
+      populateQuoteCardInspector(q);
+      recordState('Pick Avatar from Library');
+      showTextTimingAlert(`Avatar set to "${chosenFile.name}"!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    });
+  });
+
+  // Inline Speaker Name
+  const overlayNameInp = document.getElementById('quote-overlay-name-input');
+  overlayNameInp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.speakerTitle = e.target.value;
+    const sideTitle = document.getElementById('quote-title');
+    if (sideTitle) sideTitle.value = e.target.value;
+    renderAllTimelineTracks();
+  });
+  overlayNameInp?.addEventListener('change', () => recordState('Edit Speaker Title'));
+
+  // Inline Speaker Subtitle
+  const overlayRoleInp = document.getElementById('quote-overlay-role-input');
+  overlayRoleInp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.speakerSubtitle = e.target.value;
+    const sideSub = document.getElementById('quote-subtitle');
+    if (sideSub) sideSub.value = e.target.value;
+  });
+  overlayRoleInp?.addEventListener('change', () => recordState('Edit Speaker Subtitle'));
+
+  // Inline Body Quote Textarea
+  const overlayTextInp = document.getElementById('quote-overlay-text-input');
+  overlayTextInp?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteText = e.target.value;
+    const sideBody = document.getElementById('quote-body-text');
+    if (sideBody) sideBody.value = e.target.value;
+    renderAllTimelineTracks();
+  });
+  overlayTextInp?.addEventListener('change', () => recordState('Edit Quote Text'));
+
+  // On-canvas Effect Selector
+  const overlayEffSel = document.getElementById('quote-overlay-effect-select');
+  overlayEffSel?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteEffect = e.target.value;
+    const sideEff = document.getElementById('quote-text-effect');
+    if (sideEff) sideEff.value = e.target.value;
+    recordState('Change Quote Effect');
+    showTextTimingAlert(`Effect changed to ${e.target.options[e.target.selectedIndex].text}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  // On-canvas Speed controls
+  document.getElementById('quote-overlay-speed-down')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q) return;
+    q.effectSpeed = Math.max(0.3, parseFloat(((q.effectSpeed || 1.0) - 0.2).toFixed(1)));
+    populateQuoteCardInspector(q);
+    recordState('Decrease Quote Speed');
+  });
+
+  document.getElementById('quote-overlay-speed-up')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q) return;
+    q.effectSpeed = Math.min(3.0, parseFloat(((q.effectSpeed || 1.0) + 0.2).toFixed(1)));
+    populateQuoteCardInspector(q);
+    recordState('Increase Quote Speed');
+  });
+
+  // On-canvas Replay button
+  document.getElementById('quote-overlay-replay')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q) return;
+    seekToTime(q.start);
+    isPlaying = true;
+    showTextTimingAlert('Replaying animation...', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  // Avatar direct tap click handler -> open image picker modal directly
+  document.getElementById('quote-hit-avatar')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q) return;
+    openQuoteImagePickerModal((chosenFile) => {
+      q.avatarFile = { name: chosenFile.name, url: chosenFile.url };
+      populateQuoteCardInspector(q);
+      recordState('Select Avatar from Library');
+      showTextTimingAlert(`Selected avatar: "${chosenFile.name}"`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+      renderCanvas();
+      syncQuoteCardCanvasOverlay();
+    });
+  });
+
+  // 1. Hit targets click handlers (open in-place field editor & format bar)
+  document.querySelectorAll('.quote-hit[data-field]').forEach(hit => {
+    hit.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const q = getActiveQuote();
+      if (!q) return;
+      const field = hit.dataset.field; // 'name', 'role', or 'quote'
+      q._editingField = field;
+      renderCanvas();
+      syncQuoteCardCanvasOverlay();
+      const inputEl = document.getElementById(field === 'quote' ? 'quote-overlay-text-input' : `quote-overlay-${field}-input`);
+      if (inputEl) {
+        inputEl.focus();
+        if (typeof inputEl.select === 'function') inputEl.select();
+      }
+    });
+  });
+
+  // 2. Inline edit field blur & escape key handlers
+  document.querySelectorAll('.quote-edit-field').forEach(input => {
+    input.addEventListener('blur', () => {
+      setTimeout(() => {
+        const activeEl = document.activeElement;
+        const overlay = document.getElementById('canvas-quote-overlay');
+        if (overlay && overlay.contains(activeEl)) return;
+        const q = getActiveQuote();
+        if (q && q._editingField) {
+          q._editingField = null;
+          recordState('Edit Quote Card Text');
+          renderCanvas();
+          syncQuoteCardCanvasOverlay();
+        }
+      }, 150);
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' || (e.key === 'Enter' && input.tagName === 'INPUT')) {
+        input.blur();
+      }
+    });
+  });
+
+  // 3. Word-Style Format Bar Control Handlers
+  document.getElementById('qfmt-font')?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q || !q._editingField) return;
+    q[q._editingField + 'Font'] = e.target.value;
+    recordState('Change Font');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+
+  document.getElementById('qfmt-smaller')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q || !q._editingField) return;
+    const f = q._editingField;
+    const curSize = q[f + 'Size'] || (f === 'name' ? 60 : (f === 'role' ? 38 : (q.fontSize || 34)));
+    q[f + 'Size'] = Math.max(12, curSize - 2);
+    recordState('Decrease Font Size');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+
+  document.getElementById('qfmt-bigger')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q || !q._editingField) return;
+    const f = q._editingField;
+    const curSize = q[f + 'Size'] || (f === 'name' ? 60 : (f === 'role' ? 38 : (q.fontSize || 34)));
+    q[f + 'Size'] = Math.min(140, curSize + 2);
+    recordState('Increase Font Size');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+
+  document.getElementById('qfmt-color')?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q || !q._editingField) return;
+    q[q._editingField + 'Color'] = e.target.value;
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+
+  document.getElementById('qfmt-color')?.addEventListener('change', () => {
+    recordState('Change Text Color');
+  });
+
+  document.getElementById('qfmt-bold')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q || !q._editingField) return;
+    const f = q._editingField;
+    const defBold = f === 'name';
+    const curBold = q[f + 'Bold'] !== undefined ? q[f + 'Bold'] : defBold;
+    q[f + 'Bold'] = !curBold;
+    recordState('Toggle Bold');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+
+  document.getElementById('qfmt-italic')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q || !q._editingField) return;
+    const f = q._editingField;
+    q[f + 'Italic'] = !q[f + 'Italic'];
+    recordState('Toggle Italic');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+
+  // Quotation Marks Color Picker
+  document.getElementById('qfmt-mark-color')?.addEventListener('input', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteMarkColor = e.target.value;
+    renderCanvas();
+  });
+  document.getElementById('qfmt-mark-color')?.addEventListener('change', () => {
+    recordState('Change Quotation Marks Color');
+  });
+
+  // Toggle Quotation Marks Visibility (Show / Remove)
+  document.getElementById('qfmt-toggle-marks')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteMarksVisible = q.quoteMarksVisible === false;
+    recordState('Toggle Quotation Marks');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+    showTextTimingAlert(q.quoteMarksVisible ? 'Quotation marks enabled' : 'Quotation marks hidden', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  // Wire canvas stage right-click for stage context menu (Screen & Background settings)
+  canvas?.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showCanvasBackgroundContextMenu(e.clientX, e.clientY);
+  });
+
+  // Wire canvas stage click (deselection of clips & bounding handles when clicking outside)
+  canvas?.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return; // Left click only
+    // Deselect quote / selected clip on stage click
+    selectedClip = null;
+    const q = (timelineClips.quote || []).find(c => c._editingField);
+    if (q) q._editingField = null;
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+  });
+}
+
+// 4b. Synchronize On-Canvas Interactive Quote Overlay with Real Canvas Coordinates
+function syncQuoteCardCanvasOverlay() {
+  const overlay = document.getElementById('canvas-quote-overlay');
+  if (!overlay || !canvasWrapper) return;
+
+  const isClipSelected = selectedClip && (selectedClip.trackType === 'quote' || selectedClip.clip?.isQuoteCard);
+  const activeQuoteClip = isClipSelected ? selectedClip.clip : null;
+
+  if (!activeQuoteClip || !activeQuoteClip._subBounds) {
+    overlay.style.display = 'none';
+    overlay.classList.remove('is-active');
+    return;
+  }
+
+  overlay.style.display = 'block';
+  overlay.classList.add('is-active');
+
+  const canvasRect = canvas.getBoundingClientRect();
+  const wrapperRect = canvasWrapper.getBoundingClientRect();
+  const scaleX = canvasRect.width / canvas.width;
+  const scaleY = canvasRect.height / canvas.height;
+  const offsetX = canvasRect.left - wrapperRect.left;
+  const offsetY = canvasRect.top - wrapperRect.top;
+
+  const sb = activeQuoteClip._subBounds;
+
+  // 1. Avatar Hit Area & HUD
+  const hitAvatar = document.getElementById('quote-hit-avatar');
+  const avatarHud = document.getElementById('quote-overlay-avatar-hud');
+  if (sb.avatar) {
+    const avX = offsetX + sb.avatar.x * scaleX;
+    const avY = offsetY + sb.avatar.y * scaleY;
+    const avW = sb.avatar.w * scaleX;
+    const avH = sb.avatar.h * scaleY;
+    if (hitAvatar) {
+      hitAvatar.style.display = 'block';
+      hitAvatar.style.left = `${avX}px`;
+      hitAvatar.style.top = `${avY}px`;
+      hitAvatar.style.width = `${avW}px`;
+      hitAvatar.style.height = `${avH}px`;
+    }
+    if (avatarHud) {
+      avatarHud.style.left = `${avX + avW / 2}px`;
+      avatarHud.style.top = `${avY + avH + 8}px`;
+      avatarHud.style.transform = 'translateX(-50%)';
+
+      const curShape = activeQuoteClip.avatarShape || 'circle';
+      avatarHud.querySelectorAll('.quote-hud-shape-btns .quote-hud-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.shape === curShape);
+      });
+    }
+  }
+
+  // 2. Text Fields (hit areas & inline inputs)
+  const editingField = activeQuoteClip._editingField;
+  const fields = [
+    { name: 'name', subKey: 'name', inputId: 'quote-overlay-name-input', hitId: 'quote-hit-name', defaultVal: activeQuoteClip.speakerTitle || '', defSize: 60, defBold: true, defColor: activeQuoteClip.textColor || '#ffffff' },
+    { name: 'role', subKey: 'role', inputId: 'quote-overlay-role-input', hitId: 'quote-hit-role', defaultVal: activeQuoteClip.speakerSubtitle || '', defSize: 38, defBold: false, defColor: activeQuoteClip.subtitleColor || '#94a3b8' },
+    { name: 'quote', subKey: 'quoteBody', inputId: 'quote-overlay-text-input', hitId: 'quote-hit-quote', defaultVal: activeQuoteClip.quoteText || '', defSize: activeQuoteClip.fontSize || 34, defBold: false, defColor: '#f1f1f1' }
+  ];
+
+  fields.forEach(f => {
+    const hitEl = document.getElementById(f.hitId);
+    const inputEl = document.getElementById(f.inputId);
+    const sub = sb[f.subKey];
+    if (!sub) return;
+
+    const x = offsetX + sub.x * scaleX;
+    const y = offsetY + sub.y * scaleY;
+    const w = sub.w * scaleX;
+    const h = sub.h * scaleY;
+
+    if (editingField === f.name) {
+      if (hitEl) hitEl.style.display = 'none';
+      if (inputEl) {
+        inputEl.style.display = 'block';
+        inputEl.style.left = `${x}px`;
+        inputEl.style.top = `${y}px`;
+        inputEl.style.width = `${w}px`;
+        inputEl.style.height = `${h}px`;
+
+        const fmtFont = activeQuoteClip[f.name + 'Font'] || activeQuoteClip.fontFamily || "'Inter', sans-serif";
+        const fmtSize = (activeQuoteClip[f.name + 'Size'] || f.defSize) * scaleY;
+        const fmtColor = activeQuoteClip[f.name + 'Color'] || f.defColor;
+        const fmtBold = activeQuoteClip[f.name + 'Bold'] !== undefined ? activeQuoteClip[f.name + 'Bold'] : f.defBold;
+        const fmtItalic = !!activeQuoteClip[f.name + 'Italic'];
+
+        inputEl.style.fontFamily = fmtFont;
+        inputEl.style.fontSize = `${fmtSize}px`;
+        inputEl.style.color = fmtColor;
+        inputEl.style.fontWeight = fmtBold ? '700' : '400';
+        inputEl.style.fontStyle = fmtItalic ? 'italic' : 'normal';
+
+        if (document.activeElement !== inputEl) {
+          inputEl.value = f.defaultVal;
+        }
+      }
+    } else {
+      if (inputEl) inputEl.style.display = 'none';
+      if (hitEl) {
+        hitEl.style.display = 'block';
+        hitEl.style.left = `${x}px`;
+        hitEl.style.top = `${y}px`;
+        hitEl.style.width = `${w}px`;
+        hitEl.style.height = `${h}px`;
+      }
+    }
+  });
+
+  // 3. Word-style Formatting Bar
+  const formatBar = document.getElementById('quote-format-bar');
+  if (formatBar) {
+    if (editingField) {
+      const activeF = fields.find(f => f.name === editingField);
+      const activeSub = activeF ? sb[activeF.subKey] : null;
+      if (activeSub) {
+        formatBar.style.display = 'flex';
+        const barLeft = offsetX + activeSub.x * scaleX;
+        const barTop = Math.max(10, offsetY + activeSub.y * scaleY - 44);
+        formatBar.style.left = `${barLeft}px`;
+        formatBar.style.top = `${barTop}px`;
+
+        const qFont = document.getElementById('qfmt-font');
+        const qSize = document.getElementById('qfmt-size');
+        const qColor = document.getElementById('qfmt-color');
+        const qBold = document.getElementById('qfmt-bold');
+        const qItalic = document.getElementById('qfmt-italic');
+        const qMarkCol = document.getElementById('qfmt-mark-color');
+        const qToggleMarks = document.getElementById('qfmt-toggle-marks');
+
+        const curFont = activeQuoteClip[editingField + 'Font'] || activeQuoteClip.fontFamily || "'Inter', sans-serif";
+        const curSize = activeQuoteClip[editingField + 'Size'] || (activeF ? activeF.defSize : 34);
+        const curColor = activeQuoteClip[editingField + 'Color'] || (activeF ? activeF.defColor : '#ffffff');
+        const curBold = activeQuoteClip[editingField + 'Bold'] !== undefined ? activeQuoteClip[editingField + 'Bold'] : (activeF ? activeF.defBold : false);
+        const curItalic = !!activeQuoteClip[editingField + 'Italic'];
+        const curMarkColor = activeQuoteClip.quoteMarkColor || '#ff334b';
+        const curMarksVis = activeQuoteClip.quoteMarksVisible !== false;
+
+        if (qFont) qFont.value = curFont;
+        if (qSize) qSize.textContent = curSize;
+        if (qColor) qColor.value = curColor.startsWith('#') ? curColor : '#ffffff';
+        if (qBold) qBold.classList.toggle('active', curBold);
+        if (qItalic) qItalic.classList.toggle('active', curItalic);
+        if (qMarkCol) qMarkCol.value = curMarkColor.startsWith('#') ? curMarkColor : '#ff334b';
+        if (qToggleMarks) qToggleMarks.classList.toggle('active', curMarksVis);
+      }
+    } else {
+      formatBar.style.display = 'none';
+    }
+  }
+
+  // 4. Effect & Speed Mini HUD (positioned right at bottom center of the card)
+  const effectHud = document.getElementById('quote-overlay-effect-hud');
+  if (effectHud && sb.card) {
+    const effX = offsetX + (sb.card.x + sb.card.w / 2) * scaleX;
+    const effY = offsetY + (sb.card.y + sb.card.h) * scaleY - 38;
+    effectHud.style.left = `${effX}px`;
+    effectHud.style.top = `${effY}px`;
+    effectHud.style.transform = 'translateX(-50%)';
+
+    const effSel = document.getElementById('quote-overlay-effect-select');
+    const spdVal = document.getElementById('quote-overlay-speed-val');
+    if (effSel && document.activeElement !== effSel) {
+      effSel.value = activeQuoteClip.quoteEffect || 'typewriter';
+    }
+    if (spdVal) {
+      spdVal.textContent = `${(activeQuoteClip.effectSpeed || 1.0).toFixed(1)}x`;
+    }
+  }
+}
+
+// 5. Quote Card Media Library Picker Modal
+function openQuoteImagePickerModal(onSelectCallback) {
+  document.getElementById('modal-quote-media-picker')?.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'modal-quote-media-picker';
+  modal.className = 'chart-modal-overlay is-open';
+  modal.style.display = 'flex';
+
+  const imageFiles = (mediaFiles || []).filter(m => m.isImage);
+
+  modal.innerHTML = `
+    <div class="chart-modal-card" style="max-width: 680px; width: 92%;">
+      <div class="chart-modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: #ff334b;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span style="font-weight: 700; font-size: 14px;">Select Image from Media Library</span>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-quote-picker">&times;</button>
+      </div>
+      <div style="padding: 14px 18px; max-height: 420px; overflow-y: auto;">
+        ${imageFiles.length === 0 ? `
+          <div style="text-align: center; padding: 30px; color: var(--text-muted); font-size: 12px;">
+            No image files loaded in library yet. Please upload files in Media Library on the left.
+          </div>
+        ` : `
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px;">
+            ${imageFiles.map(img => `
+              <div class="quote-picker-item" data-url="${img.url}" data-name="${img.name}" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden; cursor: pointer; transition: all 0.15s ease;">
+                <div style="height: 95px; width: 100%; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+                  <img src="${img.url}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 6px 8px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff;">
+                  ${img.name}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>
+      <div class="chart-modal-footer" style="display: flex; justify-content: flex-end; padding: 10px 18px;">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-quote-picker">Close</button>
+      </div>
+    </div>
+  `;
+
+  const isFsActive = !!document.fullscreenElement || canvasWrapper?.classList.contains('is-immersive-fallback');
+  const mountTarget = (isFsActive && canvasWrapper) ? canvasWrapper : document.body;
+  mountTarget.appendChild(modal);
+
+  const closeModal = () => modal.remove();
+  modal.querySelector('#btn-close-quote-picker')?.addEventListener('click', closeModal);
+  modal.querySelector('#btn-cancel-quote-picker')?.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  modal.querySelectorAll('.quote-picker-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const url = item.dataset.url;
+      const name = item.dataset.name;
+      if (onSelectCallback) onSelectCallback({ name, url });
+      renderCanvas();
+      syncQuoteCardCanvasOverlay();
+      closeModal();
+    });
+  });
+}
+
+// 6. Blank Screen / Canvas Stage Background Context Menu (On-click or right-click empty screen)
+function showCanvasBackgroundContextMenu(x, y) {
+  hideStudioContextMenu();
+
+  const menu = document.createElement('div');
+  menu.className = 'studio-context-menu';
+  activeStudioContextMenu = menu;
+
+  menu.innerHTML = `
+    <div class="context-menu-header">
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:170px;">Screen &amp; Background</span>
+      <span class="context-badge" style="color: #ff334b;">STAGE</span>
+    </div>
+    <div class="context-menu-items-scroll">
+      <!-- Create Executive Quote Card -->
+      <div class="context-menu-item" id="ctx-action-new-quote" style="background: rgba(255, 51, 75, 0.12);">
+        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+        <span style="font-weight: 700; color: #fff;">Executive Quote Card</span>
+        <span class="context-badge" style="color: #ff334b;">Quote</span>
+      </div>
+
+      <!-- Create Chat Bubble Quote Card -->
+      <div class="context-menu-item" id="ctx-action-chat-quote" style="background: rgba(0, 240, 255, 0.12);">
+        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+        <span style="font-weight: 700; color: #fff;">Chat Bubble Card</span>
+        <span class="context-badge" style="color: #00f0ff;">Messaging</span>
+      </div>
+
+      <div class="context-menu-divider"></div>
+      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); padding: 4px 12px 2px 12px; text-transform: uppercase; letter-spacing: 0.5px;">Screen Background Style</div>
+
+      <!-- Radial Gradient Preset (Cinematic Dark) -->
+      <div class="context-menu-item" id="ctx-action-bg-gradient">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle, #2d3345 0%, #0a0b0e 100%); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span>Cinematic Dark Gradient</span>
+        <span class="context-badge" style="color: #00f0ff;">Gradient</span>
+      </div>
+
+      <!-- Frosted Glass Stage -->
+      <div class="context-menu-item" id="ctx-action-bg-glass">
+        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+        <span>Frosted Glass Effect</span>
+        <span class="context-badge">Glass</span>
+      </div>
+
+      <!-- Solid Black Studio -->
+      <div class="context-menu-item" id="ctx-action-bg-black">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: #000000; border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span>Solid Black Studio</span>
+        <span class="context-badge">Solid</span>
+      </div>
+
+      <!-- Dark Slate Stage -->
+      <div class="context-menu-item" id="ctx-action-bg-slate">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: #0d111a; border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span>Dark Slate Cinematic</span>
+        <span class="context-badge">Color</span>
+      </div>
+
+      <!-- Image Wallpaper -->
+      <div class="context-menu-item" id="ctx-action-bg-image">
+        <svg viewBox="0 0 24 24" style="color: #ffaa00;"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        <span>Image Wallpaper Background...</span>
+        <span class="context-badge" style="color: #ffaa00;">Image</span>
+      </div>
+
+      <!-- 3D Cyber Perspective Grid -->
+      <div class="context-menu-item" id="ctx-action-bg-cyber">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #00f0ff, #25d366); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span>3D Cyber Tech Grid</span>
+        <span class="context-badge" style="color: #00f0ff;">3D</span>
+      </div>
+
+      <div class="context-menu-divider"></div>
+
+      <!-- Quick Add Overlay Options -->
+      <div class="context-menu-item" id="ctx-action-quick-text">
+        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+        <span>Add Kinetic Text...</span>
+        <span class="context-badge">Text</span>
+      </div>
+      <div class="context-menu-item" id="ctx-action-quick-chart">
+        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+        <span>Add Animated Chart...</span>
+        <span class="context-badge" style="color: #00f0ff;">Infographic</span>
+      </div>
+    </div>
+  `;
+
+  // Mount menu
+  const isFsActive = !!document.fullscreenElement || canvasWrapper?.classList.contains('is-immersive-fallback');
+  const mountTarget = isFsActive && canvasWrapper ? canvasWrapper : document.body;
+  mountTarget.appendChild(menu);
+
+  // Position
+  const menuWidth = 260;
+  const menuHeight = 360;
+  let posX = x;
+  let posY = y;
+  if (isFsActive && canvasWrapper) {
+    const wrapRect = canvasWrapper.getBoundingClientRect();
+    posX = Math.min(wrapRect.width - menuWidth - 14, Math.max(14, x - wrapRect.left));
+    posY = Math.min(wrapRect.height - menuHeight - 14, Math.max(14, y - wrapRect.top));
+  } else {
+    posX = Math.min(window.innerWidth - menuWidth - 10, Math.max(10, x));
+    posY = Math.min(window.innerHeight - menuHeight - 10, Math.max(10, y));
+  }
+  menu.style.left = `${posX}px`;
+  menu.style.top = `${posY}px`;
+
+  // Attach Menu Event Handlers
+  menu.querySelector('#ctx-action-new-quote')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    const q = createNewQuoteCardAtTime(currentTime);
+    q.cardStyle = 'executive';
+    selectClip(q, 'quote');
+  });
+
+  menu.querySelector('#ctx-action-chat-quote')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    const q = createNewQuoteCardAtTime(currentTime);
+    q.cardStyle = 'chat_bubble';
+    q.speakerTitle = 'Alex Vance';
+    q.speakerSubtitle = 'Online';
+    selectClip(q, 'quote');
+    showTextTimingAlert('Chat Bubble Quote Card Created!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-bg-gradient')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    fxState.stageBackground = { type: 'color', color: '#131722' };
+    fxState.grid.enabled = false;
+    const q = (timelineClips.quote || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    if (q) {
+      q.bgMode = 'gradient';
+      selectClip(q, 'quote');
+    }
+    renderLayersPanel();
+    renderCanvas();
+    recordState('Set Radial Gradient Background');
+    showTextTimingAlert('Cinematic Gradient Background Applied!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-bg-glass')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    const q = (timelineClips.quote || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+    if (q) {
+      q.glassEnabled = true;
+      q.bgMode = 'glass';
+      selectClip(q, 'quote');
+    } else {
+      // Spawn quote card with glass effect enabled
+      const newQ = createNewQuoteCardAtTime(currentTime);
+      newQ.glassEnabled = true;
+      newQ.bgMode = 'glass';
+      selectClip(newQ, 'quote');
+    }
+    recordState('Enable Frosted Glass Effect');
+    renderCanvas();
+    showTextTimingAlert('Frosted Glassmorphism Plate Active!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-bg-black')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    fxState.stageBackground = { type: 'solid_black', color: '#000000' };
+    fxState.grid.enabled = false;
+    renderLayersPanel();
+    renderCanvas();
+    recordState('Set Solid Black Studio');
+    showTextTimingAlert('Set stage to Solid Black Studio!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-bg-slate')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    fxState.stageBackground = { type: 'color', color: '#0d111a' };
+    fxState.grid.enabled = false;
+    renderLayersPanel();
+    renderCanvas();
+    recordState('Set Dark Slate Background');
+    showTextTimingAlert('Set stage to Dark Slate Cinematic!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-bg-image')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    openQuoteImagePickerModal((chosenFile) => {
+      if (!chosenFile) return;
+      const q = (timelineClips.quote || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+      if (q) {
+        q.bgMode = 'image';
+        q.bgImageFile = { name: chosenFile.name, url: chosenFile.url };
+        selectClip(q, 'quote');
+      } else {
+        const newQ = createNewQuoteCardAtTime(currentTime);
+        newQ.bgMode = 'image';
+        newQ.bgImageFile = { name: chosenFile.name, url: chosenFile.url };
+        selectClip(newQ, 'quote');
+      }
+      renderCanvas();
+      recordState('Set Image Wallpaper Background');
+      showTextTimingAlert('Wallpaper Background Applied!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    });
+  });
+
+  menu.querySelector('#ctx-action-bg-cyber')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    fxState.stageBackground = { type: 'cyber_grid', color: '#0a0b0e' };
+    fxState.grid.enabled = true;
+    renderLayersPanel();
+    renderCanvas();
+    recordState('Set 3D Cyber Perspective Grid');
+    showTextTimingAlert('Set stage to 3D Cyber Grid!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-quick-text')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    const btnAddText = document.getElementById('btn-add-text');
+    if (btnAddText) btnAddText.click();
+  });
+
+  menu.querySelector('#ctx-action-quick-chart')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    openChartCreatorModal(currentTime);
+  });
+}
+
+// Initialize Quote Card Listeners on DOM Ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initQuoteCardListeners);
+} else {
+  initQuoteCardListeners();
+}
+

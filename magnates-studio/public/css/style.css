@@ -3285,6 +3285,57 @@ canvas.tool-draw {
   margin-top: 2px;
 }
 
+/* ==================== MODAL OVERLAYS & CARDS ==================== */
+.chart-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.chart-modal-card {
+  background: #141722;
+  border: 1px solid #2e354a;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  animation: modalScaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chart-modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chart-modal-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: #0e1017;
+}
+
+.quote-picker-item:hover {
+  border-color: #ff334b !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(255, 51, 75, 0.3);
+}
+
 /* ==================== ICONS & BADGES GRID STYLES ==================== */
 .icon-badge-card {
   background: var(--bg-card);
@@ -4143,3 +4194,312 @@ canvas.tool-draw {
   outline: 2px dashed #38bdf8 !important;
   transform: scale(0.98);
 }
+
+/* ==================== STATEMENT & QUOTE CARDS ==================== */
+.clip-block.quote {
+  background: linear-gradient(135deg, rgba(255, 51, 75, 0.28), rgba(20, 24, 38, 0.95));
+  border: 1px solid rgba(255, 51, 75, 0.55);
+  box-shadow: inset 0 0 12px rgba(255, 51, 75, 0.15);
+}
+
+.clip-block.quote.is-selected {
+  outline: 2px solid #ff334b !important;
+  box-shadow: 0 0 16px rgba(255, 51, 75, 0.45) !important;
+}
+
+#quote-shape-group .btn-sm.active {
+  background: #ff334b !important;
+  color: #fff !important;
+  border-color: #ff334b !important;
+}
+
+.studio-quote-overlay-preview {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+}
+
+/* ==================== ON-CANVAS DIRECT QUOTE CARD OVERLAY & HOVER CONTROLS ==================== */
+.canvas-quote-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  transition: opacity 0.2s ease;
+}
+
+.canvas-quote-overlay.is-active {
+  pointer-events: none;
+}
+
+.quote-hit {
+  position: absolute;
+  display: none;
+  cursor: text;
+  border: 1px dashed transparent;
+  border-radius: 6px;
+  pointer-events: auto;
+  z-index: 51;
+  transition: border-color 0.12s, background 0.12s;
+}
+.quote-hit:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.05);
+}
+.quote-hit-avatar { cursor: pointer; border-radius: 50%; }
+.quote-hit-avatar:hover { background: transparent; border-color: transparent; }
+
+.quote-edit-field {
+  position: absolute;
+  display: none;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px dashed #38bdf8;
+  border-radius: 6px;
+  outline: none;
+  padding: 0 4px;
+  margin: 0;
+  resize: none;
+  overflow: hidden;
+  box-sizing: border-box;
+  line-height: 1.25;
+  pointer-events: auto;
+  z-index: 56;
+  caret-color: #fff;
+}
+
+.quote-format-bar {
+  position: absolute;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  background: rgba(20, 24, 35, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  z-index: 60;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+.quote-format-bar select,
+.quote-format-bar button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 11px;
+  padding: 3px 7px;
+  cursor: pointer;
+}
+.quote-format-bar button:hover { background: rgba(56, 189, 248, 0.3); }
+.quote-format-bar button.active { background: #38bdf8; color: #000; }
+.quote-format-bar input[type="color"] {
+  width: 26px; height: 22px; padding: 0; border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px; background: none; cursor: pointer;
+}
+.qfmt-size { min-width: 24px; text-align: center; font-size: 11px; font-weight: 700; color: #fff; }
+
+/* Avatar controls: only on hover over the headshot */
+.canvas-quote-overlay .quote-overlay-avatar-hud {
+  opacity: 0;
+  pointer-events: none;
+}
+.canvas-quote-overlay.is-active .quote-hit-avatar:hover + .quote-overlay-avatar-hud,
+.canvas-quote-overlay.is-active .quote-overlay-avatar-hud:hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+.canvas-quote-overlay .quote-overlay-effect-hud { display: none; }
+
+/* Avatar Hover HUD */
+.quote-overlay-avatar-hud {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 18, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 3px 6px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75), 0 0 12px rgba(255, 51, 75, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 55;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.quote-hud-shape-btns {
+  display: flex;
+  gap: 2px;
+}
+
+.quote-hud-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  padding: 3px 7px;
+  border-radius: 12px;
+  font-size: 11px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+}
+
+.quote-hud-btn:hover {
+  background: rgba(255, 51, 75, 0.25);
+  border-color: #ff334b;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.quote-hud-btn.active {
+  background: #ff334b !important;
+  color: #fff !important;
+  border-color: #ff334b !important;
+  box-shadow: 0 0 8px rgba(255, 51, 75, 0.6);
+}
+
+.quote-hud-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 0 3px;
+}
+
+/* Speaker Header Inline Edit HUD */
+.quote-overlay-header-hud {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 52;
+}
+
+.quote-inline-input {
+  background: rgba(15, 18, 26, 0.65);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 8px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  outline: none;
+  backdrop-filter: blur(6px);
+}
+
+.quote-inline-input:hover {
+  background: rgba(20, 24, 35, 0.85);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.quote-inline-input:focus {
+  background: rgba(18, 22, 33, 0.95);
+  border: 1px solid #ff334b;
+  box-shadow: 0 0 10px rgba(255, 51, 75, 0.4);
+}
+
+.quote-name-input {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.quote-role-input {
+  font-size: 11px;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+/* Central Quote Box with Quotation Marks */
+.quote-overlay-body-hud {
+  position: absolute;
+  z-index: 52;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.quote-deco-mark {
+  font-family: Georgia, serif;
+  font-size: 38px;
+  line-height: 1;
+  color: #ff334b;
+  opacity: 0.7;
+  user-select: none;
+  font-weight: 700;
+  flex-shrink: 0;
+  text-shadow: 0 0 12px rgba(255, 51, 75, 0.5);
+}
+
+.quote-inline-textarea {
+  width: 100%;
+  background: rgba(15, 18, 26, 0.7);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.95);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.5;
+  border-radius: 6px;
+  padding: 6px 10px;
+  resize: vertical;
+  outline: none;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(8px);
+}
+
+.quote-inline-textarea:hover {
+  background: rgba(20, 24, 35, 0.88);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.quote-inline-textarea:focus {
+  background: rgba(15, 18, 26, 0.95);
+  border: 1px solid #ff334b;
+  box-shadow: 0 0 14px rgba(255, 51, 75, 0.4);
+}
+
+/* Effect & Speed Mini HUD */
+.quote-overlay-effect-hud {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 18, 26, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 3px 8px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 55;
+}
+
+.quote-hud-select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 11px;
+  padding: 2px 6px;
+  outline: none;
+  cursor: pointer;
+}
+
+.quote-hud-replay-btn {
+  background: rgba(255, 51, 75, 0.18) !important;
+  color: #ff334b !important;
+  border-color: rgba(255, 51, 75, 0.45) !important;
+  font-weight: 700;
+}
+
+.quote-hud-replay-btn:hover {
+  background: #ff334b !important;
+  color: #fff !important;
+}
+
+

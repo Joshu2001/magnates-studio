@@ -219,6 +219,14 @@
             </div>
             <div class="dock-divider" style="width: 100%; height: 1px; margin: 4px 0;"></div>
             <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px; padding: 2px 4px;">Overlay Layers:</div>
+            <div class="add-layer-option" data-layer-action="add_quote">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+              <span>Add Statement / Quote Card</span>
+            </div>
+            <div class="add-layer-option" data-layer-action="add_chat_quote">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#00f0ff;"><path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+              <span>Add Chat Bubble Quote Card</span>
+            </div>
             <div class="add-layer-option" data-layer-action="add_chart">
               <svg class="ui-icon" viewBox="0 0 24 24" style="width:13px; height:13px; color:#00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
               <span>Add Animated Chart</span>
@@ -276,6 +284,10 @@
             <button class="icon-btn" id="btn-canvas-fullscreen" title="Full Screen Preview / Expand" style="margin-left: 4px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 7px;">
               <svg class="ui-icon" id="fullscreen-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
+            <button class="icon-btn" id="btn-canvas-quote-card" title="Create Statement / Quote Card" style="margin-left: 6px; color: #ff334b; border: 1px solid rgba(255, 51, 75, 0.4); background: rgba(255, 51, 75, 0.12); padding: 4px 8px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+              <span>Quote Card</span>
+            </button>
           </div>
 
           <!-- Floating On-Screen Text Editor & Apple-style Formatting Mini Toolbar -->
@@ -300,6 +312,81 @@
               <button class="screen-tb-btn screen-tb-done" id="stb-done-btn" title="Done Editing (Escape or Click)">Done</button>
             </div>
             <textarea id="screen-text-input" class="screen-text-input" rows="2" placeholder="Enter kinetic text..."></textarea>
+          </div>
+
+          <!-- Interactive On-Canvas Quote Card Editor & Hover Controls -->
+          <div id="canvas-quote-overlay" class="canvas-quote-overlay" style="display: none;">
+            <!-- 1. Floating Avatar Quick Controls (Shape Picker & Picture Swap) -->
+            <div id="quote-hit-avatar" class="quote-hit quote-hit-avatar"></div>
+            <div id="quote-overlay-avatar-hud" class="quote-overlay-avatar-hud">
+              <div class="quote-hud-shape-btns">
+                <button type="button" class="quote-hud-btn" data-shape="circle" title="Circle Shape">●</button>
+                <button type="button" class="quote-hud-btn" data-shape="rounded" title="Rounded Shape">■</button>
+                <button type="button" class="quote-hud-btn" data-shape="hexagon" title="Hexagon Shape">⬡</button>
+                <button type="button" class="quote-hud-btn" data-shape="square" title="Square Shape">□</button>
+              </div>
+              <div class="quote-hud-divider"></div>
+              <label class="quote-hud-btn quote-hud-upload-btn" title="Upload Headshot Picture">
+                <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                <input type="file" id="quote-overlay-file-input" accept="image/*" style="display: none;">
+              </label>
+              <button type="button" class="quote-hud-btn" id="quote-overlay-pick-media" title="Pick from Media Library">
+                <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+              </button>
+            </div>
+
+            <!-- 2. Invisible click zones over name / role / quote (edit in place on click) -->
+            <div id="quote-hit-name" class="quote-hit" data-field="name" title="Click to edit name"></div>
+            <div id="quote-hit-role" class="quote-hit" data-field="role" title="Click to edit role"></div>
+            <div id="quote-hit-quote" class="quote-hit" data-field="quote" title="Click to edit quote"></div>
+
+            <!-- 3. In-place editors (only visible while editing, styled like the card text) -->
+            <input type="text" id="quote-overlay-name-input" class="quote-edit-field" data-field="name" spellcheck="false" placeholder="Speaker name">
+            <input type="text" id="quote-overlay-role-input" class="quote-edit-field" data-field="role" spellcheck="false" placeholder="Role / Company">
+            <textarea id="quote-overlay-text-input" class="quote-edit-field" data-field="quote" spellcheck="false" rows="1" placeholder="Type the quote..."></textarea>
+
+            <!-- Word-style format bar for the field being edited -->
+            <div id="quote-format-bar" class="quote-format-bar">
+              <select id="qfmt-font" title="Font">
+                <option value="'Inter', sans-serif">Inter</option>
+                <option value="'Montserrat', sans-serif">Montserrat</option>
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Times New Roman', serif">Times</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Courier New', monospace">Courier</option>
+                <option value="Impact, sans-serif">Impact</option>
+              </select>
+              <button type="button" id="qfmt-smaller" title="Smaller">A-</button>
+              <span id="qfmt-size" class="qfmt-size">34</span>
+              <button type="button" id="qfmt-bigger" title="Bigger">A+</button>
+              <button type="button" id="qfmt-bold" title="Bold"><b>B</b></button>
+              <button type="button" id="qfmt-italic" title="Italic"><i>I</i></button>
+              <div class="quote-hud-divider" style="height:16px; margin:0 2px;"></div>
+              <input type="color" id="qfmt-mark-color" value="#ff334b" title="Quotation Marks Color">
+              <button type="button" id="qfmt-toggle-marks" class="qfmt-btn" title="Toggle Quotation Marks (Show/Remove)">“ ”</button>
+            </div>
+
+            <!-- 4. Floating Effect & Speed Toolbar for Quote -->
+            <div id="quote-overlay-effect-hud" class="quote-overlay-effect-hud">
+              <select id="quote-overlay-effect-select" class="quote-hud-select" title="Animation Effect">
+                <option value="typewriter">Typewriter (Live Typing)</option>
+                <option value="falling">Falling Characters</option>
+                <option value="pop">Kinetic Pop</option>
+                <option value="fade">Smooth Fade</option>
+                <option value="slide_up">Slide Up</option>
+                <option value="none">Static</option>
+              </select>
+              <div class="quote-hud-divider"></div>
+              <span style="font-size:11px; color:#aaa; margin-right:2px;">Speed:</span>
+              <button type="button" class="quote-hud-btn" id="quote-overlay-speed-down" title="Slower">-</button>
+              <span id="quote-overlay-speed-val" style="font-size:11px; font-weight:700; color:#fff; min-width:26px; text-align:center;">1.0x</span>
+              <button type="button" class="quote-hud-btn" id="quote-overlay-speed-up" title="Faster">+</button>
+              <div class="quote-hud-divider"></div>
+              <button type="button" class="quote-hud-btn quote-hud-replay-btn" id="quote-overlay-replay" title="Replay Animation">
+                <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                <span>Replay</span>
+              </button>
+            </div>
           </div>
 
           <!-- Floating On-Screen Drawing Dock (Visible when in Draw Mode) -->
@@ -625,13 +712,21 @@
                 </div>
               </div>
 
-              <!-- Group 3: Elements Dropdown (Charts & Icons) -->
+              <!-- Group 3: Elements Dropdown (Charts, Quote Cards & Icons) -->
               <div class="tool-dropdown-wrap" id="wrap-tool-elements">
-                <button type="button" class="tool-dropdown-btn" id="btn-dropdown-elements" title="Add Charts & Icons">
+                <button type="button" class="tool-dropdown-btn" id="btn-dropdown-elements" title="Add Charts, Quote Cards & Icons">
                   <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
                   <span>Elements ▾</span>
                 </button>
                 <div class="tool-dropdown-menu" id="menu-tool-elements">
+                  <button type="button" class="tool-menu-item" id="tool-add-quote">
+                    <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+                    <span>Statement / Quote Card</span>
+                  </button>
+                  <button type="button" class="tool-menu-item" id="tool-add-chat-quote">
+                    <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                    <span>Chat Bubble Quote Card</span>
+                  </button>
                   <button type="button" class="tool-menu-item" id="tool-add-chart">
                     <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
                     <span>Animated Chart</span>
@@ -1006,6 +1101,202 @@
           </div>
         </div>
 
+        <!-- Statement & Quote Card Inspector Card (Visible when a statement/quote card is selected) -->
+        <div class="fx-card" id="card-quote-inspector" style="display: none;">
+          <div class="fx-header">
+            <h4>
+              <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+              Statement Card FX
+            </h4>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="badge" id="quote-badge" style="color: #ff334b;">Executive Quote</span>
+              <button type="button" class="btn-sm" id="btn-duplicate-quote" style="padding: 2px 7px; font-size: 10px;" title="Duplicate Quote Card">Copy</button>
+            </div>
+          </div>
+          <div class="fx-body">
+            <!-- 1. Header: Speaker Info & Shape -->
+            <div style="font-size: 10px; font-weight: 700; color: #ff334b; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;">Speaker &amp; Shape Frame</div>
+            
+            <div class="control-row">
+              <label>Title / Name</label>
+              <input type="text" id="quote-title" placeholder="e.g. Alex Vance" value="Alex Vance" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;">
+            </div>
+
+            <div class="control-row" style="margin-top: 6px;">
+              <label>Subtitle / Role</label>
+              <input type="text" id="quote-subtitle" placeholder="e.g. Founder &amp; CEO, Apex Global" value="Founder &amp; CEO, Apex Global" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+            </div>
+
+            <div class="control-row" style="margin-top: 6px;">
+              <label>Avatar Shape Frame</label>
+              <div class="btn-group" id="quote-shape-group">
+                <button type="button" class="btn-sm active" data-shape="circle" id="btn-quote-shape-circle">Circle</button>
+                <button type="button" class="btn-sm" data-shape="rounded" id="btn-quote-shape-rounded">Rounded</button>
+                <button type="button" class="btn-sm" data-shape="hexagon" id="btn-quote-shape-hexagon">Hexagon</button>
+                <button type="button" class="btn-sm" data-shape="square" id="btn-quote-shape-square">Square</button>
+              </div>
+            </div>
+
+            <!-- Avatar Picture Upload & Preset Select -->
+            <div class="control-row" style="margin-top: 6px;">
+              <label>Avatar Picture</label>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <label class="btn-sm" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                  <span>Upload Headshot</span>
+                  <input type="file" id="quote-avatar-file" accept="image/*" style="display: none;">
+                </label>
+                <button type="button" class="btn-sm" id="btn-quote-pick-media" style="padding: 4px 8px; font-size: 11px;">Pick Library</button>
+                <button type="button" class="btn-sm" id="btn-quote-remove-avatar" style="padding: 4px 8px; font-size: 11px; color: var(--accent-red);" title="Remove speaker picture">&times;</button>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <div class="control-row" style="flex: 1;">
+                <label>Frame Border</label>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <input type="color" id="quote-avatar-border-color" value="#ffffff" style="width: 28px; height: 24px; border: none; background: transparent; cursor: pointer;">
+                  <input type="range" id="quote-avatar-border-width" min="0" max="10" value="3" style="flex: 1;">
+                </div>
+              </div>
+              <div class="control-row" style="flex: 1;">
+                <label>Avatar Size</label>
+                <input type="range" id="quote-avatar-size" min="50" max="200" value="110">
+              </div>
+            </div>
+
+            <div class="dock-divider" style="width: 100%; height: 1px; margin: 10px 0;"></div>
+
+            <!-- 2. Statement / Body Quote Text -->
+            <div style="font-size: 10px; font-weight: 700; color: #ff334b; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;">Quote Text &amp; Effects</div>
+
+            <div class="control-row">
+              <label>Quote Statement</label>
+              <textarea id="quote-body-text" rows="4" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 11.5px; line-height: 1.45; resize: vertical;" placeholder="Enter quote or statement text...">We are entering an era where clarity, conviction, and strategic agility define the leaders who reshape entire industries.</textarea>
+            </div>
+
+            <div class="control-row" style="margin-top: 6px;">
+              <label>Text Effect</label>
+              <select id="quote-text-effect" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 11.5px;">
+                <option value="typewriter" selected>Typewriter (Mimics Live Keystrokes)</option>
+                <option value="falling">Falling Characters / Cascade Drop</option>
+                <option value="pop">Kinetic Word Pop / Spoken Highlight</option>
+                <option value="fade">Cinematic Smooth Fade</option>
+                <option value="slide_up">Slide Up From Bottom</option>
+                <option value="none">Instant / Static</option>
+              </select>
+            </div>
+
+            <div class="control-row" style="margin-top: 6px;" id="row-quote-effect-speed">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                <label style="margin: 0;">Effect Speed &amp; Pacing</label>
+                <span id="quote-effect-speed-label" style="font-size: 10px; color: var(--text-muted);">1.0x (Normal)</span>
+              </div>
+              <input type="range" id="quote-effect-speed" min="0.3" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 6px;">
+              <div class="control-row" style="flex: 1;">
+                <label>Text Size (<span id="quote-font-size-val">34px</span>)</label>
+                <input type="range" id="quote-font-size" min="20" max="64" value="34">
+              </div>
+              <div class="control-row" style="flex: 1;">
+                <label>Font Family</label>
+                <select id="quote-font-family" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 11px;">
+                  <option value="'Inter', sans-serif" selected>Inter (Clean)</option>
+                  <option value="'Georgia', serif">Georgia (Editorial)</option>
+                  <option value="'Oswald', sans-serif">Oswald (Punchy)</option>
+                  <option value="'Courier New', monospace">Courier (Typewriter)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="dock-divider" style="width: 100%; height: 1px; margin: 10px 0;"></div>
+
+            <!-- 3. Screen Background & Glassmorphism -->
+            <div style="font-size: 10px; font-weight: 700; color: #ff334b; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px;">Screen Background &amp; Glass Effect</div>
+
+            <div class="control-row">
+              <label>Background Layer</label>
+              <select id="quote-bg-mode" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 11.5px;">
+                <option value="gradient" selected>Cinematic Radial Gradient (Magnates Dark)</option>
+                <option value="solid">Solid Studio Color</option>
+                <option value="glass">Frosted Glassmorphism Plate</option>
+                <option value="image">Custom Background Image (Wallpaper)</option>
+                <option value="stage">Follow Project Stage Background</option>
+              </select>
+            </div>
+
+            <!-- Custom solid / gradient color controls -->
+            <div class="control-row" id="row-quote-bg-colors" style="margin-top: 6px;">
+              <div style="display: flex; gap: 8px;">
+                <div style="flex: 1;">
+                  <label style="font-size: 10px; display: block; margin-bottom: 2px;">Color 1 (Inner)</label>
+                  <div style="display: flex; gap: 4px; align-items: center;">
+                    <input type="color" id="quote-bg-color1" value="#2a2d36" style="width: 30px; height: 24px; border: none; background: transparent; cursor: pointer;">
+                    <span id="quote-bg-color1-val" style="font-size: 10px; font-family: monospace; color: var(--text-muted);">#2a2d36</span>
+                  </div>
+                </div>
+                <div style="flex: 1;" id="col-quote-bg-color2">
+                  <label style="font-size: 10px; display: block; margin-bottom: 2px;">Color 2 (Outer)</label>
+                  <div style="display: flex; gap: 4px; align-items: center;">
+                    <input type="color" id="quote-bg-color2" value="#0a0b0e" style="width: 30px; height: 24px; border: none; background: transparent; cursor: pointer;">
+                    <span id="quote-bg-color2-val" style="font-size: 10px; font-family: monospace; color: var(--text-muted);">#0a0b0e</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Glass Effect Controls -->
+            <div id="row-quote-glass-controls" style="margin-top: 6px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #00f0ff;">Glassmorphism Plate</span>
+                <label class="switch" style="width: 26px; height: 15px;">
+                  <input type="checkbox" id="quote-glass-enable" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div>
+                  <label style="font-size: 10px; display: block; margin-bottom: 2px;">Blur Strength</label>
+                  <input type="range" id="quote-glass-blur" min="0" max="40" value="18">
+                </div>
+                <div>
+                  <label style="font-size: 10px; display: block; margin-bottom: 2px;">Card Opacity</label>
+                  <input type="range" id="quote-glass-opacity" min="10" max="95" value="65">
+                </div>
+              </div>
+            </div>
+
+            <!-- Background Image Selection (when bgMode === 'image') -->
+            <div class="control-row" id="row-quote-bg-image" style="display: none; margin-top: 6px;">
+              <label>Wallpaper Image</label>
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <label class="btn-sm" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M19 7v2.99s-1.99.01-2 0V7h-3s.01-1.99 0-2h3V2h2v3h3v2h-3zm-3 4V8h-3V5H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h-3zM5 19l3-4 2 3 3-4 4 5H5z"/></svg>
+                  <span>Upload BG</span>
+                  <input type="file" id="quote-bg-image-file" accept="image/*" style="display: none;">
+                </label>
+                <button type="button" class="btn-sm" id="btn-quote-pick-bg-media" style="padding: 4px 8px; font-size: 11px;">Media Library</button>
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <label style="font-size: 10px; margin: 0;">Dimming Vignette</label>
+                <input type="range" id="quote-bg-dim" min="0" max="90" value="45" style="width: 110px;">
+              </div>
+            </div>
+
+            <!-- Timing and quick actions -->
+            <div class="dock-divider" style="width: 100%; height: 1px; margin: 10px 0;"></div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-replay-quote-anim" style="flex: 1; padding: 6px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                <span>Replay Effect</span>
+              </button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-delete-quote-card" style="padding: 6px 12px; font-size: 11px;" title="Delete this Quote Card">Delete</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Animated Chart Inspector Card (Visible when an infographic chart is selected) -->
         <div class="fx-card" id="card-chart-inspector" style="display: none;">
           <div class="fx-header">
@@ -1241,11 +1532,11 @@
                 <label style="font-size: 10.5px; color: var(--text-muted); display: block; margin-bottom: 3px;">Effect Style</label>
                 <select id="inspector-trans-type-select" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px 8px; border-radius: 4px; font-size: 11px;">
                   <option value="none">None (Standard Cut)</option>
-                  <option value="fly_through">⚡ 3D Fly-Through (Continuous Depth Zoom)</option>
-                  <option value="directional_push">➡️ Directional Push / Pan Under</option>
-                  <option value="morph_cut">🌊 Morph Cut (Seamless Blend)</option>
-                  <option value="mask_reveal">📐 Foreground Reveal (Split Wipe)</option>
-                  <option value="paper_drop">📜 Ripped Paper Drop</option>
+                  <option value="fly_through">3D Fly-Through (Continuous Depth Zoom)</option>
+                  <option value="directional_push">Directional Push / Pan Under</option>
+                  <option value="morph_cut">Morph Cut (Seamless Blend)</option>
+                  <option value="mask_reveal">Foreground Reveal (Split Wipe)</option>
+                  <option value="paper_drop">Ripped Paper Drop</option>
                   <option value="fade">Fade to Black</option>
                   <option value="dissolve">Cross Dissolve</option>
                   <option value="flash">Flash Cut</option>
@@ -1258,12 +1549,46 @@
                   <span style="font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Incoming Direction</span>
                   <span id="inspector-trans-dir-badge" style="font-size: 9.5px; color: #38bdf8; font-weight: 700; text-transform: uppercase;">Center / Depth</span>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
-                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="left" title="Incoming emerges from Left under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center;">⬅️ Left</button>
-                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="right" title="Incoming emerges from Right under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center;">➡️ Right</button>
-                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="up" title="Incoming emerges from Top under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center;">⬆️ Top</button>
-                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="down" title="Incoming emerges from Bottom under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center;">⬇️ Down</button>
-                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn active" data-dir="center" title="3D Depth Push through Center" style="padding: 4px 1px; font-size: 10px; text-align: center;">🔍 Depth</button>
+                <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;">
+                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="left" title="Incoming emerges from Left under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                    <span>Left</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="right" title="Incoming emerges from Right under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    <span>Right</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="up" title="Incoming emerges from Top under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
+                    <span>Top</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="down" title="Incoming emerges from Bottom under Clip A" style="padding: 4px 1px; font-size: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
+                    <span>Down</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn active" data-dir="center" title="3D Depth Push through Center" style="padding: 4px 1px; font-size: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                    <span>Depth</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm trans-dir-btn" data-dir="custom" id="btn-trans-dir-custom" title="Custom Vector Angle & Offsets" style="padding: 4px 1px; font-size: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
+                    <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <span>Custom</span>
+                  </button>
+                </div>
+
+                <!-- Custom Direction Options Panel -->
+                <div id="inspector-trans-custom-dir-panel" style="display: none; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08);">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 9.5px; color: var(--text-muted); width: 40px;">Angle:</span>
+                    <input type="range" id="inspector-trans-angle-slider" min="0" max="360" value="45" step="5" style="flex: 1;">
+                    <span id="inspector-trans-angle-val" style="font-size: 10px; font-family: monospace; color: #38bdf8; min-width: 32px; text-align: right;">45°</span>
+                  </div>
+                  <div style="display: flex; gap: 4px; margin-top: 4px;">
+                    <button type="button" class="btn btn-secondary btn-sm trans-quick-angle-btn" data-angle="45" style="flex: 1; padding: 2px 4px; font-size: 9px;">↗ 45°</button>
+                    <button type="button" class="btn btn-secondary btn-sm trans-quick-angle-btn" data-angle="135" style="flex: 1; padding: 2px 4px; font-size: 9px;">↘ 135°</button>
+                    <button type="button" class="btn btn-secondary btn-sm trans-quick-angle-btn" data-angle="225" style="flex: 1; padding: 2px 4px; font-size: 9px;">↙ 225°</button>
+                    <button type="button" class="btn btn-secondary btn-sm trans-quick-angle-btn" data-angle="315" style="flex: 1; padding: 2px 4px; font-size: 9px;">↖ 315°</button>
+                  </div>
                 </div>
               </div>
 
@@ -1277,19 +1602,41 @@
                 </button>
               </div>
 
-              <!-- Speed & Duration Slider -->
+              <!-- Speed & Duration Slider with Manual Custom Input & Dropdown -->
               <div id="inspector-trans-speed-box" style="margin-bottom: 6px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                   <span style="font-size: 10.5px; color: var(--text-muted);">Duration / Speed</span>
-                  <span id="inspector-trans-dur-val" style="font-size: 11px; font-weight: 700; color: #a855f7; font-family: monospace;">0.7s</span>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="number" id="inspector-trans-dur-input" min="0.1" max="10.0" step="0.05" value="0.70" style="width: 58px; background: rgba(0,0,0,0.5); border: 1px solid rgba(168,85,247,0.4); border-radius: 4px; color: #a855f7; font-size: 11px; font-weight: 700; font-family: monospace; padding: 2px 4px; text-align: center; outline: none;" title="Manually type custom duration (e.g. 0.45s)">
+                    <span style="font-size: 10.5px; font-weight: 700; color: #a855f7;">s</span>
+                  </div>
                 </div>
-                <input type="range" id="inspector-trans-dur-slider" min="2" max="25" value="7" step="1" style="width: 100%;">
+                <input type="range" id="inspector-trans-dur-slider" min="2" max="30" value="7" step="1" style="width: 100%;">
                 
-                <!-- Quick Speed Presets -->
-                <div style="display: flex; gap: 4px; margin-top: 5px;">
-                  <button type="button" class="btn btn-secondary btn-sm btn-trans-quick-speed" data-dur="0.3" style="flex: 1; padding: 3px; font-size: 9.5px;">⚡ Fast 0.3s</button>
-                  <button type="button" class="btn btn-secondary btn-sm btn-trans-quick-speed" data-dur="0.7" style="flex: 1; padding: 3px; font-size: 9.5px;">🎯 Smooth 0.7s</button>
-                  <button type="button" class="btn btn-secondary btn-sm btn-trans-quick-speed" data-dur="1.2" style="flex: 1; padding: 3px; font-size: 9.5px;">🎬 Cinema 1.2s</button>
+                <!-- Speed Presets + Custom Select Dropdown -->
+                <div style="display: flex; gap: 4px; margin-top: 5px; align-items: center;">
+                  <button type="button" class="btn btn-secondary btn-sm btn-trans-quick-speed" data-dur="0.3" style="flex: 1; padding: 4px 2px; font-size: 9.5px; display: flex; align-items: center; justify-content: center; gap: 3px;">
+                    <svg viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor;"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    <span>Fast 0.3s</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm btn-trans-quick-speed" data-dur="0.7" style="flex: 1; padding: 4px 2px; font-size: 9.5px; display: flex; align-items: center; justify-content: center; gap: 3px;">
+                    <svg viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <span>Smooth 0.7s</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm btn-trans-quick-speed" data-dur="1.2" style="flex: 1; padding: 4px 2px; font-size: 9.5px; display: flex; align-items: center; justify-content: center; gap: 3px;">
+                    <svg viewBox="0 0 24 24" style="width: 10px; height: 10px; fill: currentColor;"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+                    <span>Cinema 1.2s</span>
+                  </button>
+                  <select id="inspector-trans-dur-dropdown" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px; border-radius: 4px; font-size: 9.5px;" title="Select preset or custom speed">
+                    <option value="">Preset...</option>
+                    <option value="0.2">Snappy (0.2s)</option>
+                    <option value="0.4">Brisk (0.4s)</option>
+                    <option value="0.6">Natural (0.6s)</option>
+                    <option value="0.9">Cinematic (0.9s)</option>
+                    <option value="1.5">Epic Slow (1.5s)</option>
+                    <option value="2.0">Dramatic (2.0s)</option>
+                    <option value="custom">Custom...</option>
+                  </select>
                 </div>
               </div>
 
@@ -1356,22 +1703,26 @@
                 <span class="badge" id="inspector-doc-focus-badge" style="font-size: 10px; color: #38bdf8;">Off</span>
               </div>
               <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-white" style="padding: 6px 4px; font-size: 11px;" title="Fade surrounding text to clean white/light gray">
-                  ⚪ Whiteout Focus
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-white" style="padding: 6px 4px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Fade surrounding text to clean white/light gray">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="12" cy="12" r="9"/></svg>
+                  <span>Whiteout Focus</span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-dark" style="padding: 6px 4px; font-size: 11px;" title="Dim surrounding text into theater darkness">
-                  ⚫ Dark Spotlight
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-dark" style="padding: 6px 4px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Dim surrounding text into theater darkness">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><circle cx="12" cy="12" r="9"/></svg>
+                  <span>Dark Spotlight</span>
                 </button>
                 <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-highlight" style="padding: 6px 4px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Drag animated highlighter bar across text">
                   <svg class="ui-icon" viewBox="0 0 24 24" style="color: #38bdf8; width: 14px; height: 14px; fill: currentColor;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>
                   <span>Highlighter</span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-guide" style="padding: 6px 4px; font-size: 11px; color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);" title="Open step-by-step visual tutorial and style picker">
-                  ❓ Guide
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-guide" style="padding: 6px 4px; font-size: 11px; color: #00f0ff; border-color: rgba(0, 240, 255, 0.4); display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Open step-by-step visual tutorial and style picker">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+                  <span>Guide</span>
                 </button>
               </div>
               <button type="button" class="btn btn-primary btn-sm" id="btn-inspector-doc-bundle" style="width: 100%; margin-top: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); border: none; font-weight: 600; font-size: 11px; padding: 6px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.25);" title="1-Click Template: 2.2x Zoom + Whiteout Fade + Pure Yellow Highlight!">
-                <span>✨ 1-Click Focus & Highlight Bundle</span>
+                <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6.4-4.8-6.4 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
+                <span>1-Click Focus & Highlight Bundle</span>
               </button>
               <!-- Apple-Style Minimalist Effect Sequence Stack -->
               <div id="inspector-fx-sequence-container" style="display: none; margin-top: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 10px;">
@@ -1400,11 +1751,13 @@
                 <div class="control-row" style="margin-bottom: 6px;">
                   <label>Surrounding Text Fade Style</label>
                   <div class="btn-group" style="display: flex; gap: 4px; margin-top: 3px;">
-                    <button type="button" class="btn btn-secondary btn-sm active" id="btn-doc-style-white" style="flex: 1; font-size: 11px; padding: 5px;">
-                      ⚪ Whiteout Fade
+                    <button type="button" class="btn btn-secondary btn-sm active" id="btn-doc-style-white" style="flex: 1; font-size: 11px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                      <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="12" cy="12" r="9"/></svg>
+                      <span>Whiteout Fade</span>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-doc-style-dark" style="flex: 1; font-size: 11px; padding: 5px;">
-                      ⚫ Dark Dim
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-doc-style-dark" style="flex: 1; font-size: 11px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                      <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><circle cx="12" cy="12" r="9"/></svg>
+                      <span>Dark Dim</span>
                     </button>
                   </div>
                 </div>
@@ -1412,7 +1765,10 @@
                 <!-- Un-whiteout / Timed Auto-Restore Duration -->
                 <div class="control-row" style="margin-bottom: 6px;">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label style="margin: 0; font-size: 11px;">⏱️ Un-whiteout (Timed Focus)</label>
+                    <label style="margin: 0; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                      <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                      <span>Timed Focus Duration</span>
+                    </label>
                     <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-unwhiteout" style="padding: 2px 6px; font-size: 10px;">
                       Hold Whole Clip
                     </button>
@@ -1462,32 +1818,39 @@
                   </div>
                 </div>
                 <div style="display: flex; gap: 4px; margin-top: 8px;">
-                  <button type="button" class="btn btn-secondary btn-sm" id="btn-unwhiteout-now" style="flex: 1; font-size: 11px; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);" title="Instantly remove whiteout & restore document view">
-                    ↩️ Un-whiteout Now
+                  <button type="button" class="btn btn-secondary btn-sm" id="btn-unwhiteout-now" style="flex: 1; font-size: 11px; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Instantly remove whiteout & restore document view">
+                    <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                    <span>Un-whiteout Now</span>
                   </button>
                   <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-highlights" style="flex: 1; font-size: 11px; color: #ff6b7e; border-color: rgba(255, 107, 126, 0.4);">
                     Clear Highlights
                   </button>
                 </div>
-                <p class="hint-text" style="margin-top: 6px;">💡 <b>Whiteout Fade</b> whites out the surrounding text like newspaper articles. Drag across any word/sentence to add an animated drawing sweep.</p>
+                <p class="hint-text" style="margin-top: 6px;"><b>Whiteout Fade</b> whites out surrounding text like newspaper articles. Drag across any word/sentence to add an animated drawing sweep.</p>
               </div>
             </div>
 
             <!-- Document Camera Scroll / Flow (Vox & Johnny Harris Style) -->
             <div class="control-row" id="inspector-doc-scroll-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <label style="margin: 0; color: #10b981;">📜 Document Camera Scroll / Flow</label>
+                <label style="margin: 0; color: #10b981; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                  <span>Document Camera Scroll / Flow</span>
+                </label>
                 <span class="badge" id="inspector-doc-scroll-badge" style="font-size: 10px; color: #10b981;">Off</span>
               </div>
               <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin-top: 4px;">
-                <button type="button" class="btn btn-secondary btn-sm doc-scroll-preset-btn" data-mode="down" style="padding: 6px 3px; font-size: 11px;" title="Smoothly scrolls down reading through bullet points or article">
-                  ⬇️ Top to Bottom
+                <button type="button" class="btn btn-secondary btn-sm doc-scroll-preset-btn" data-mode="down" style="padding: 6px 3px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 3px;" title="Smoothly scrolls down reading through bullet points or article">
+                  <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"/></svg>
+                  <span>Top to Bottom</span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm doc-scroll-preset-btn" data-mode="across" style="padding: 6px 3px; font-size: 11px;" title="Glides horizontally across newspaper columns or charts">
-                  ➡️ Horizontal
+                <button type="button" class="btn btn-secondary btn-sm doc-scroll-preset-btn" data-mode="across" style="padding: 6px 3px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 3px;" title="Glides horizontally across newspaper columns or charts">
+                  <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                  <span>Horizontal</span>
                 </button>
-                <button type="button" class="btn btn-secondary btn-sm doc-scroll-preset-btn" data-mode="zigzag" style="padding: 6px 3px; font-size: 11px;" title="Jumps & lingers from one highlighted paragraph to the next">
-                  ⚡ Highlight Flow
+                <button type="button" class="btn btn-secondary btn-sm doc-scroll-preset-btn" data-mode="zigzag" style="padding: 6px 3px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 3px;" title="Jumps & lingers from one highlighted paragraph to the next">
+                  <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+                  <span>Highlight Flow</span>
                 </button>
               </div>
 
@@ -1522,7 +1885,10 @@
             <!-- Motion Blur Crowds & Commuter Swarms Inspector Section -->
             <div class="control-row" id="inspector-crowd-motion-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <label style="margin: 0; color: #00f0ff;">👥 Motion Blur Crowds & Swarms</label>
+                <label style="margin: 0; color: #00f0ff; display: inline-flex; align-items: center; gap: 4px;">
+                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                  <span>Motion Blur Crowds & Swarms</span>
+                </label>
                 <span class="badge" id="inspector-crowd-motion-badge" style="font-size: 10px; color: #00f0ff;">Off</span>
               </div>
               <div style="display: flex; gap: 4px; margin-top: 4px;">
@@ -1541,11 +1907,13 @@
                     <span id="inspector-crowd-mode-label" style="color: #00f0ff; font-weight: 600;">Close-In Push</span>
                   </label>
                   <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-crowd-mode-close" style="padding: 5px 3px; font-size: 11px;">
-                      🔍 Close-in
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-crowd-mode-close" style="padding: 5px 3px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
+                      <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                      <span>Close-in</span>
                     </button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-crowd-mode-wide" style="padding: 5px 3px; font-size: 11px;">
-                      🌐 Zoom-out
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-crowd-mode-wide" style="padding: 5px 3px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
+                      <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3"/></svg>
+                      <span>Zoom-out</span>
                     </button>
                   </div>
                 </div>
@@ -1811,6 +2179,7 @@
                 <option value="stamp">Slam / Stamp Impact (Magnates Dramatic Drop)</option>
                 <option value="counter">Dynamic Number Counter (Rolling / Count-Up 1,014%)</option>
                 <option value="typewriter">Typewriter Reveal (Character by Character)</option>
+                <option value="falling">Falling Characters / Cascade Drop</option>
                 <option value="fade">Smooth Cinematic Fade In</option>
                 <option value="none">Static Punchy</option>
               </select>
@@ -1914,7 +2283,7 @@
             <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
               <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin: 0; white-space: nowrap;">Title:</label>
               <input type="text" id="modal-chart-quick-title" placeholder="Chart Title..." value="AUDIENCE SURGE" style="background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(0, 240, 255, 0.4); color: #fff; font-weight: 800; font-size: 12px; padding: 3px 8px; border-radius: 4px; width: 220px; outline: none;">
-              <span style="font-size: 10px; color: #00f0ff; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25); border-radius: 4px; padding: 1px 6px;">💡 Click title on canvas or type here</span>
+              <span style="font-size: 10px; color: #00f0ff; background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.25); border-radius: 4px; padding: 1px 6px;">Click title on canvas or type here</span>
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
               <button type="button" id="btn-chart-modal-expand" class="btn btn-sm btn-chart-expand-pulse" style="padding: 3px 10px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 5px;" title="Expand Chart to Full Screen & Direct Precision Edit">
@@ -2082,7 +2451,10 @@
           <!-- Card 1: Whiteout Fade -->
           <div class="chart-type-card active" id="modal-card-whiteout" style="border: 1px solid #38bdf8; background: rgba(56, 189, 248, 0.06); padding: 14px; border-radius: 8px; cursor: pointer;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-weight: 700; font-size: 13px; color: #38bdf8;">⚪ Whiteout Fade & Highlight</span>
+              <span style="font-weight: 700; font-size: 13px; color: #38bdf8; display: inline-flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="12" cy="12" r="9"/></svg>
+                <span>Whiteout Fade & Highlight</span>
+              </span>
               <span class="context-badge" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8;">Articles & News</span>
             </div>
             <!-- Mockup Preview SVG -->
@@ -2109,7 +2481,10 @@
           <!-- Card 2: Dark Spotlight -->
           <div class="chart-type-card" id="modal-card-dark" style="border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.35); padding: 14px; border-radius: 8px; cursor: pointer;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-weight: 700; font-size: 13px; color: #a855f7;">⚫ Dark Document Spotlight</span>
+              <span style="font-weight: 700; font-size: 13px; color: #a855f7; display: inline-flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><circle cx="12" cy="12" r="9"/></svg>
+                <span>Dark Document Spotlight</span>
+              </span>
               <span class="context-badge" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">Theater Mode</span>
             </div>
             <!-- Mockup Preview SVG -->
@@ -2133,8 +2508,9 @@
 
         <!-- 3 Simple Interactive Steps -->
         <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 16px;">
-          <h4 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #00f0ff;">
-            ⚡ 3-Step Quick Guide
+          <h4 style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #00f0ff; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>3-Step Quick Guide</span>
           </h4>
           <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px; line-height: 1.4;">
             <div style="display: flex; gap: 8px; align-items: flex-start;">
@@ -2179,7 +2555,7 @@
             <span>None (Cut)</span>
           </div>
           <div class="transition-card" data-transition="fly_through" style="border-color: rgba(168,85,247,0.45);">
-            <div class="transition-preview" style="background: radial-gradient(circle, #a855f7 0%, #1e1b4b 80%); border-radius:4px; width:100%; height:40px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; font-weight:800; letter-spacing:0.5px; text-shadow: 0 0 6px rgba(168,85,247,0.8);">⚡ 3D FLY</div>
+            <div class="transition-preview" style="background: radial-gradient(circle, #a855f7 0%, #1e1b4b 80%); border-radius:4px; width:100%; height:40px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; font-weight:800; letter-spacing:0.5px; text-shadow: 0 0 6px rgba(168,85,247,0.8);">3D FLY</div>
             <span style="color: #d8b4fe; font-weight: 600;">3D Fly-Through</span>
           </div>
           <div class="transition-card" data-transition="directional_push" style="border-color: rgba(59,130,246,0.45);">
