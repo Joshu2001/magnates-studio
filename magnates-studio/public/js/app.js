@@ -16722,20 +16722,48 @@ function initQuoteCardListeners() {
   });
   overlayTextInp?.addEventListener('change', () => recordState('Edit Quote Text'));
 
-  // On-canvas Effect Selector
-  const overlayEffSel = document.getElementById('quote-overlay-effect-select');
-  overlayEffSel?.addEventListener('mousedown', (e) => e.stopPropagation());
-  overlayEffSel?.addEventListener('change', (e) => {
-    const q = getActiveQuote();
-    if (!q) return;
-    q.quoteEffect = e.target.value;
-    const sideEff = document.getElementById('quote-text-effect');
-    if (sideEff) sideEff.value = e.target.value;
-    recordState('Change Quote Effect');
-    renderCanvas();
-    syncQuoteCardCanvasOverlay();
-    showTextTimingAlert(`Effect changed to ${e.target.options[e.target.selectedIndex].text}!`, 'success');
-    setTimeout(() => showTextTimingAlert(''), 1500);
+  // Custom Apple Dropdown Menu Toggle & Selection
+  const appleDropdown = document.getElementById('quote-overlay-effect-dropdown');
+  const appleTriggerBtn = document.getElementById('quote-effect-trigger-btn');
+  const appleTriggerLabel = document.getElementById('quote-effect-trigger-label');
+  const appleMenu = document.getElementById('quote-effect-menu');
+
+  appleTriggerBtn?.addEventListener('mousedown', (e) => e.stopPropagation());
+  appleTriggerBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    appleDropdown?.classList.toggle('is-open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (appleDropdown && !appleDropdown.contains(e.target)) {
+      appleDropdown.classList.remove('is-open');
+    }
+  });
+
+  appleMenu?.querySelectorAll('.apple-menu-item').forEach(item => {
+    item.addEventListener('mousedown', (e) => e.stopPropagation());
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const val = item.dataset.value;
+      const q = getActiveQuote();
+      if (!q) return;
+
+      q.quoteEffect = val;
+      const sideEff = document.getElementById('quote-text-effect');
+      if (sideEff) sideEff.value = val;
+
+      appleMenu.querySelectorAll('.apple-menu-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      if (appleTriggerLabel) appleTriggerLabel.textContent = item.querySelector('.apple-menu-text')?.textContent || val;
+
+      appleDropdown?.classList.remove('is-open');
+
+      recordState('Change Quote Effect');
+      renderCanvas();
+      syncQuoteCardCanvasOverlay();
+      showTextTimingAlert(`Effect set to: ${item.querySelector('.apple-menu-text')?.textContent}!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+    });
   });
 
   // Stop mousedown propagation on effect HUD container
@@ -17131,11 +17159,21 @@ function syncQuoteCardCanvasOverlay() {
     effectHud.style.top = `${effY}px`;
     effectHud.style.transform = 'translateX(-50%)';
 
-    const effSel = document.getElementById('quote-overlay-effect-select');
+    const appleTriggerLabel = document.getElementById('quote-effect-trigger-label');
+    const appleMenu = document.getElementById('quote-effect-menu');
     const spdVal = document.getElementById('quote-overlay-speed-val');
-    if (effSel && document.activeElement !== effSel) {
-      effSel.value = activeQuoteClip.quoteEffect || 'typewriter';
+    const curEff = activeQuoteClip.quoteEffect || 'typewriter';
+
+    if (appleMenu) {
+      appleMenu.querySelectorAll('.apple-menu-item').forEach(item => {
+        const isMatch = item.dataset.value === curEff;
+        item.classList.toggle('active', isMatch);
+        if (isMatch && appleTriggerLabel) {
+          appleTriggerLabel.textContent = item.querySelector('.apple-menu-text')?.textContent || curEff;
+        }
+      });
     }
+
     if (spdVal) {
       spdVal.textContent = `${(activeQuoteClip.effectSpeed || 1.0).toFixed(1)}x`;
     }

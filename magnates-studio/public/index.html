@@ -367,15 +367,38 @@
             </div>
 
             <!-- 4. Floating Effect & Speed Toolbar for Quote -->
-            <div id="quote-overlay-effect-hud" class="quote-overlay-effect-hud">
-              <select id="quote-overlay-effect-select" class="quote-hud-select" title="Animation Effect">
-                <option value="typewriter">Typewriter (Live Typing)</option>
-                <option value="falling">Falling Characters</option>
-                <option value="pop">Kinetic Pop</option>
-                <option value="fade">Smooth Fade</option>
-                <option value="slide_up">Slide Up</option>
-                <option value="none">Static</option>
-              </select>
+              <div class="custom-apple-dropdown" id="quote-overlay-effect-dropdown">
+                <button type="button" class="apple-dropdown-trigger" id="quote-effect-trigger-btn">
+                  <span id="quote-effect-trigger-label">Typewriter (Live Typing)</span>
+                  <svg viewBox="0 0 24 24" class="apple-dropdown-chevron"><path fill="currentColor" d="M7 10l5 5 5-5z"/></svg>
+                </button>
+                <div class="apple-dropdown-menu" id="quote-effect-menu">
+                  <div class="apple-menu-item active" data-value="typewriter">
+                    <span class="apple-menu-icon">⌨️</span>
+                    <span class="apple-menu-text">Typewriter (Live Typing)</span>
+                  </div>
+                  <div class="apple-menu-item" data-value="falling">
+                    <span class="apple-menu-icon">💧</span>
+                    <span class="apple-menu-text">Falling Characters</span>
+                  </div>
+                  <div class="apple-menu-item" data-value="pop">
+                    <span class="apple-menu-icon">💥</span>
+                    <span class="apple-menu-text">Kinetic Pop</span>
+                  </div>
+                  <div class="apple-menu-item" data-value="fade">
+                    <span class="apple-menu-icon">✨</span>
+                    <span class="apple-menu-text">Smooth Fade</span>
+                  </div>
+                  <div class="apple-menu-item" data-value="slide_up">
+                    <span class="apple-menu-icon">⬆️</span>
+                    <span class="apple-menu-text">Slide Up</span>
+                  </div>
+                  <div class="apple-menu-item" data-value="none">
+                    <span class="apple-menu-icon">⏸️</span>
+                    <span class="apple-menu-text">Static (No Animation)</span>
+                  </div>
+                </div>
+              </div>
               <div class="quote-hud-divider"></div>
               <span style="font-size:11px; color:#aaa; margin-right:2px;">Speed:</span>
               <button type="button" class="quote-hud-btn" id="quote-overlay-speed-down" title="Slower">-</button>
