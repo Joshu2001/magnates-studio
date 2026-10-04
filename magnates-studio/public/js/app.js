@@ -16722,48 +16722,100 @@ function initQuoteCardListeners() {
   });
   overlayTextInp?.addEventListener('change', () => recordState('Edit Quote Text'));
 
-  // Custom Apple Dropdown Menu Toggle & Selection
-  const appleDropdown = document.getElementById('quote-overlay-effect-dropdown');
-  const appleTriggerBtn = document.getElementById('quote-effect-trigger-btn');
-  const appleTriggerLabel = document.getElementById('quote-effect-trigger-label');
-  const appleMenu = document.getElementById('quote-effect-menu');
+  // Apple-grade Effect Selector Dropdown & Popover
+  const effectTrigger = document.getElementById('quote-effect-trigger');
+  const effectPopover = document.getElementById('quote-effect-popover');
+  const effectDropdownWrap = document.getElementById('quote-effect-dropdown-wrap');
+  const effectTriggerLabel = document.getElementById('quote-effect-trigger-label');
 
-  appleTriggerBtn?.addEventListener('mousedown', (e) => e.stopPropagation());
-  appleTriggerBtn?.addEventListener('click', (e) => {
+  const effectLabels = {
+    typewriter: 'Typewriter (Live Typing)',
+    falling: 'Falling Characters',
+    pop: 'Kinetic Pop',
+    fade: 'Cinematic Fade',
+    slide_up: 'Slide Up',
+    none: 'Static / Instant'
+  };
+
+  const closeEffectPopover = () => {
+    if (effectPopover) effectPopover.style.display = 'none';
+    effectDropdownWrap?.classList.remove('is-open');
+  };
+
+  effectTrigger?.addEventListener('mousedown', (e) => e.stopPropagation());
+  effectTrigger?.addEventListener('click', (e) => {
     e.stopPropagation();
-    appleDropdown?.classList.toggle('is-open');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (appleDropdown && !appleDropdown.contains(e.target)) {
-      appleDropdown.classList.remove('is-open');
+    if (!effectPopover) return;
+    const isVisible = effectPopover.style.display !== 'none';
+    if (isVisible) {
+      closeEffectPopover();
+    } else {
+      effectPopover.style.display = 'flex';
+      effectDropdownWrap?.classList.add('is-open');
+      const q = getActiveQuote();
+      const curEff = (q && q.quoteEffect) || 'typewriter';
+      document.querySelectorAll('.apple-hud-menu-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.effect === curEff);
+      });
     }
   });
 
-  appleMenu?.querySelectorAll('.apple-menu-item').forEach(item => {
+  // Effect Menu Item Click Handlers
+  document.querySelectorAll('.apple-hud-menu-item').forEach(item => {
     item.addEventListener('mousedown', (e) => e.stopPropagation());
     item.addEventListener('click', (e) => {
       e.stopPropagation();
-      const val = item.dataset.value;
+      const chosenEffect = item.dataset.effect;
       const q = getActiveQuote();
       if (!q) return;
 
-      q.quoteEffect = val;
+      q.quoteEffect = chosenEffect;
       const sideEff = document.getElementById('quote-text-effect');
-      if (sideEff) sideEff.value = val;
+      if (sideEff) sideEff.value = chosenEffect;
+      const hiddenSel = document.getElementById('quote-overlay-effect-select');
+      if (hiddenSel) hiddenSel.value = chosenEffect;
 
-      appleMenu.querySelectorAll('.apple-menu-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-      if (appleTriggerLabel) appleTriggerLabel.textContent = item.querySelector('.apple-menu-text')?.textContent || val;
+      if (effectTriggerLabel) {
+        effectTriggerLabel.textContent = effectLabels[chosenEffect] || chosenEffect;
+      }
 
-      appleDropdown?.classList.remove('is-open');
+      document.querySelectorAll('.apple-hud-menu-item').forEach(it => {
+        it.classList.toggle('active', it.dataset.effect === chosenEffect);
+      });
 
-      recordState('Change Quote Effect');
+      closeEffectPopover();
+      recordState(`Change Quote Effect to ${chosenEffect}`);
       renderCanvas();
       syncQuoteCardCanvasOverlay();
-      showTextTimingAlert(`Effect set to: ${item.querySelector('.apple-menu-text')?.textContent}!`, 'success');
+      showTextTimingAlert(`Effect changed to ${effectLabels[chosenEffect] || chosenEffect}!`, 'success');
       setTimeout(() => showTextTimingAlert(''), 1500);
     });
+  });
+
+  // Close popover when clicking anywhere else
+  document.addEventListener('click', (e) => {
+    if (effectDropdownWrap && !effectDropdownWrap.contains(e.target)) {
+      closeEffectPopover();
+    }
+  });
+
+  // Hidden native select listener (for two-way sync)
+  const overlayEffSel = document.getElementById('quote-overlay-effect-select');
+  overlayEffSel?.addEventListener('mousedown', (e) => e.stopPropagation());
+  overlayEffSel?.addEventListener('change', (e) => {
+    const q = getActiveQuote();
+    if (!q) return;
+    q.quoteEffect = e.target.value;
+    const sideEff = document.getElementById('quote-text-effect');
+    if (sideEff) sideEff.value = e.target.value;
+    if (effectTriggerLabel) {
+      effectTriggerLabel.textContent = effectLabels[e.target.value] || e.target.value;
+    }
+    recordState('Change Quote Effect');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
+    showTextTimingAlert(`Effect changed to ${effectLabels[e.target.value] || e.target.value}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 1500);
   });
 
   // Stop mousedown propagation on effect HUD container
@@ -16972,19 +17024,6 @@ function initQuoteCardListeners() {
     selectedClip = null;
     const q = (timelineClips.quote || []).find(c => c._editingField);
     if (q) q._editingField = null;
-
-    // Hide inspector cards on stage click
-    const quoteInspector = document.getElementById('card-quote-inspector');
-    if (quoteInspector) quoteInspector.style.display = 'none';
-    const textEditorCard = document.getElementById('card-text-editor');
-    if (textEditorCard) textEditorCard.style.display = 'none';
-    const clipInspector = document.getElementById('card-clip-inspector');
-    if (clipInspector) clipInspector.style.display = 'none';
-    const chartInspector = document.getElementById('card-chart-inspector');
-    if (chartInspector) chartInspector.style.display = 'none';
-    const effectInspector = document.getElementById('card-effect-inspector');
-    if (effectInspector) effectInspector.style.display = 'none';
-
     renderCanvas();
     syncQuoteCardCanvasOverlay();
   });
@@ -17172,20 +17211,27 @@ function syncQuoteCardCanvasOverlay() {
     effectHud.style.top = `${effY}px`;
     effectHud.style.transform = 'translateX(-50%)';
 
-    const appleTriggerLabel = document.getElementById('quote-effect-trigger-label');
-    const appleMenu = document.getElementById('quote-effect-menu');
+    const effSel = document.getElementById('quote-overlay-effect-select');
     const spdVal = document.getElementById('quote-overlay-speed-val');
-    const curEff = activeQuoteClip.quoteEffect || 'typewriter';
-
-    if (appleMenu) {
-      appleMenu.querySelectorAll('.apple-menu-item').forEach(item => {
-        const isMatch = item.dataset.value === curEff;
-        item.classList.toggle('active', isMatch);
-        if (isMatch && appleTriggerLabel) {
-          appleTriggerLabel.textContent = item.querySelector('.apple-menu-text')?.textContent || curEff;
-        }
-      });
+    const curEffect = activeQuoteClip.quoteEffect || 'typewriter';
+    if (effSel && document.activeElement !== effSel) {
+      effSel.value = curEffect;
     }
+    const effectTriggerLabel = document.getElementById('quote-effect-trigger-label');
+    const effectLabels = {
+      typewriter: 'Typewriter (Live Typing)',
+      falling: 'Falling Characters',
+      pop: 'Kinetic Pop',
+      fade: 'Cinematic Fade',
+      slide_up: 'Slide Up',
+      none: 'Static / Instant'
+    };
+    if (effectTriggerLabel) {
+      effectTriggerLabel.textContent = effectLabels[curEffect] || curEffect;
+    }
+    document.querySelectorAll('.apple-hud-menu-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.effect === curEffect);
+    });
 
     if (spdVal) {
       spdVal.textContent = `${(activeQuoteClip.effectSpeed || 1.0).toFixed(1)}x`;

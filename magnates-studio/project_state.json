@@ -26,11 +26,11 @@
   "chart": [],
   "quote": [
     {
-      "id": "clip-quote-1791138077636-443",
+      "id": "clip-quote-1791139544262-502",
       "track": "quote",
       "isQuoteCard": true,
       "name": "Executive Statement Card",
-      "start": 0,
+      "start": 60,
       "duration": 7,
       "zIndex": 28,
       "layerOrder": "front",
@@ -44,7 +44,7 @@
       "avatarBorderColor": "#ffffff",
       "avatarBorderWidth": 3,
       "avatarFile": null,
-      "quoteText": "Enter your text here...",
+      "quoteText": "here...",
       "quoteEffect": "typewriter",
       "effectSpeed": 1,
       "fontSize": 34,
@@ -111,7 +111,7 @@
         "quoteBody": {
           "x": 257,
           "y": 451,
-          "w": 369.9267578125,
+          "w": 144,
           "h": 67
         },
         "card": {
@@ -120,7 +120,8 @@
           "w": 1640,
           "h": 760
         }
-      }
+      },
+      "_editingField": null
     }
   ],
   "image": [
@@ -360,9 +361,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 0,
+  "currentTime": 60,
   "duration": 60,
-  "savedAt": 1791139070897,
+  "savedAt": 1791139865856,
   "projectName": "aa",
   "projectId": "proj_1791104852619_oggs"
 }
