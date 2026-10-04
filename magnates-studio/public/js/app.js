@@ -16717,11 +16717,14 @@ function initQuoteCardListeners() {
     const sideBody = document.getElementById('quote-body-text');
     if (sideBody) sideBody.value = e.target.value;
     renderAllTimelineTracks();
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
   });
   overlayTextInp?.addEventListener('change', () => recordState('Edit Quote Text'));
 
   // On-canvas Effect Selector
   const overlayEffSel = document.getElementById('quote-overlay-effect-select');
+  overlayEffSel?.addEventListener('mousedown', (e) => e.stopPropagation());
   overlayEffSel?.addEventListener('change', (e) => {
     const q = getActiveQuote();
     if (!q) return;
@@ -16729,6 +16732,8 @@ function initQuoteCardListeners() {
     const sideEff = document.getElementById('quote-text-effect');
     if (sideEff) sideEff.value = e.target.value;
     recordState('Change Quote Effect');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
     showTextTimingAlert(`Effect changed to ${e.target.options[e.target.selectedIndex].text}!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
@@ -16741,6 +16746,8 @@ function initQuoteCardListeners() {
     q.effectSpeed = Math.max(0.3, parseFloat(((q.effectSpeed || 1.0) - 0.2).toFixed(1)));
     populateQuoteCardInspector(q);
     recordState('Decrease Quote Speed');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
   });
 
   document.getElementById('quote-overlay-speed-up')?.addEventListener('click', (e) => {
@@ -16750,6 +16757,8 @@ function initQuoteCardListeners() {
     q.effectSpeed = Math.min(3.0, parseFloat(((q.effectSpeed || 1.0) + 0.2).toFixed(1)));
     populateQuoteCardInspector(q);
     recordState('Increase Quote Speed');
+    renderCanvas();
+    syncQuoteCardCanvasOverlay();
   });
 
   // On-canvas Replay button
