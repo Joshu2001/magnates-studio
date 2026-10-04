@@ -16029,26 +16029,39 @@ function drawQuoteCardLayer(clip) {
     ctx.shadowBlur = 18;
     ctx.shadowOffsetY = 5;
 
-    // Rounded speech bubble main container
+    // Unified continuous vector path for speech bubble with seamless integrated tail
+    const r = 18; // Corner radius
     ctx.beginPath();
-    ctx.roundRect(bx, by, bubbleW, bubbleH, br);
-    ctx.fill();
+    
+    // Top-left corner
+    ctx.moveTo(bx + r, by);
+    // Top side & top-right corner
+    ctx.lineTo(bx + bubbleW - r, by);
+    ctx.quadraticCurveTo(bx + bubbleW, by, bx + bubbleW, by + r);
 
-    // Curved iMessage pointer tail at corner
-    ctx.beginPath();
-    const tailY = by + bubbleH;
-    if (isReceived) {
-      // Left received tail
-      ctx.moveTo(bx + 18, tailY - 1);
-      ctx.quadraticCurveTo(bx - 12, tailY + 12, bx - 18, tailY + 14);
-      ctx.quadraticCurveTo(bx - 4, tailY - 4, bx + 4, tailY - 16);
+    if (!isReceived) {
+      // Sent (Right tail integrated into bottom-right)
+      ctx.lineTo(bx + bubbleW, by + bubbleH - r);
+      ctx.quadraticCurveTo(bx + bubbleW, by + bubbleH, bx + bubbleW - 4, by + bubbleH);
+      ctx.quadraticCurveTo(bx + bubbleW + 12, by + bubbleH + 10, bx + bubbleW + 14, by + bubbleH + 12);
+      ctx.quadraticCurveTo(bx + bubbleW + 4, by + bubbleH - 2, bx + bubbleW - 14, by + bubbleH);
+      ctx.lineTo(bx + r, by + bubbleH);
+      ctx.quadraticCurveTo(bx, by + bubbleH, bx, by + bubbleH - r);
+      ctx.lineTo(bx, by + r);
+      ctx.quadraticCurveTo(bx, by, bx + r, by);
     } else {
-      // Right sent tail
-      const tailX = bx + bubbleW;
-      ctx.moveTo(tailX - 18, tailY - 1);
-      ctx.quadraticCurveTo(tailX + 12, tailY + 12, tailX + 18, tailY + 14);
-      ctx.quadraticCurveTo(tailX + 4, tailY - 4, tailX - 4, tailY - 16);
+      // Received (Left tail integrated into bottom-left)
+      ctx.lineTo(bx + bubbleW, by + bubbleH - r);
+      ctx.quadraticCurveTo(bx + bubbleW, by + bubbleH, bx + bubbleW - r, by + bubbleH);
+      ctx.lineTo(bx + 14, by + bubbleH);
+      ctx.quadraticCurveTo(bx - 4, by + bubbleH - 2, bx - 14, by + bubbleH + 12);
+      ctx.quadraticCurveTo(bx - 12, by + bubbleH + 10, bx - 4, by + bubbleH);
+      ctx.quadraticCurveTo(bx, by + bubbleH, bx, by + bubbleH - r);
+      ctx.lineTo(bx, by + r);
+      ctx.quadraticCurveTo(bx, by, bx + r, by);
     }
+
+    ctx.closePath();
     ctx.fill();
     ctx.restore();
   }

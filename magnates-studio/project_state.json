@@ -26,7 +26,7 @@
   "chart": [],
   "quote": [
     {
-      "id": "clip-quote-1791132082434-912",
+      "id": "clip-quote-1791132863700-238",
       "track": "quote",
       "isQuoteCard": true,
       "name": "Executive Statement Card",
@@ -43,7 +43,10 @@
       "avatarSize": 110,
       "avatarBorderColor": "#ffffff",
       "avatarBorderWidth": 3,
-      "avatarFile": null,
+      "avatarFile": {
+        "name": "psychological.png",
+        "url": "/media/downloads/psychological.png"
+      },
       "quoteText": "We are entering an era where clarity, conviction, and strategic agility define the leaders who reshape entire industries.",
       "quoteEffect": "typewriter",
       "effectSpeed": 1,
@@ -109,10 +112,10 @@
           "h": 49.4
         },
         "quoteBody": {
-          "x": 275,
-          "y": 449,
-          "w": 1370,
-          "h": 102
+          "x": 257,
+          "y": 451,
+          "w": 1296.177734375,
+          "h": 118
         },
         "card": {
           "x": 140,
@@ -121,7 +124,7 @@
           "h": 760
         }
       },
-      "_editingField": "quote"
+      "_editingField": null
     }
   ],
   "image": [
@@ -363,7 +366,7 @@
   ],
   "currentTime": 0,
   "duration": 60,
-  "savedAt": 1791132590862,
+  "savedAt": 1791133010938,
   "projectName": "aa",
   "projectId": "proj_1791104852619_oggs"
 }
