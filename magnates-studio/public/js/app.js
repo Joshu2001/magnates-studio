@@ -16738,7 +16738,11 @@ function initQuoteCardListeners() {
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
 
+  // Stop mousedown propagation on effect HUD container
+  document.getElementById('quote-overlay-effect-hud')?.addEventListener('mousedown', (e) => e.stopPropagation());
+
   // On-canvas Speed controls
+  document.getElementById('quote-overlay-speed-down')?.addEventListener('mousedown', (e) => e.stopPropagation());
   document.getElementById('quote-overlay-speed-down')?.addEventListener('click', (e) => {
     e.stopPropagation();
     const q = getActiveQuote();
@@ -16750,6 +16754,7 @@ function initQuoteCardListeners() {
     syncQuoteCardCanvasOverlay();
   });
 
+  document.getElementById('quote-overlay-speed-up')?.addEventListener('mousedown', (e) => e.stopPropagation());
   document.getElementById('quote-overlay-speed-up')?.addEventListener('click', (e) => {
     e.stopPropagation();
     const q = getActiveQuote();
@@ -16762,6 +16767,7 @@ function initQuoteCardListeners() {
   });
 
   // On-canvas Replay button
+  document.getElementById('quote-overlay-replay')?.addEventListener('mousedown', (e) => e.stopPropagation());
   document.getElementById('quote-overlay-replay')?.addEventListener('click', (e) => {
     e.stopPropagation();
     const q = getActiveQuote();
