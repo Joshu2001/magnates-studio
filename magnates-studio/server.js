@@ -12,6 +12,11 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+const proxiesDir = path.join(uploadsDir, 'proxies');
+if (!fs.existsSync(proxiesDir)) {
+  fs.mkdirSync(proxiesDir, { recursive: true });
+}
+
 // Downloads folder
 const userDownloads = process.env.USERPROFILE 
   ? path.join(process.env.USERPROFILE, 'Downloads')
@@ -31,22 +36,58 @@ const upload = multer({ storage });
 app.use(express.json({ limit: '100mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/media/uploads', express.static(uploadsDir));
+app.use('/media/uploads/proxies', express.static(proxiesDir));
 if (fs.existsSync(userDownloads)) {
   app.use('/media/downloads', express.static(userDownloads));
+}
+
+// Background Proxy Transcoder for Zero-Lag Timeline Scrubbing
+function generateVideoProxy(inputPath, originalName, callback) {
+  try {
+    const parsed = path.parse(originalName);
+    const proxyFileName = `proxy_${parsed.name}.mp4`;
+    const proxyPath = path.join(proxiesDir, proxyFileName);
+
+    if (fs.existsSync(proxyPath)) {
+      if (callback) callback(null, { filename: proxyFileName, url: `/media/uploads/proxies/${encodeURIComponent(proxyFileName)}` });
+      return;
+    }
+
+    const cmd = `ffmpeg -y -i "${inputPath}" -vf "scale=-2:540" -c:v libx264 -preset ultrafast -tune fastdecode -crf 28 -g 15 -pix_fmt yuv420p -c:a aac -b:a 128k "${proxyPath}"`;
+    console.log(`[Proxy] Generating proxy for ${originalName}...`);
+    exec(cmd, (err) => {
+      if (err) {
+        console.error(`[Proxy] Error generating proxy for ${originalName}:`, err.message);
+        if (callback) callback(err);
+      } else {
+        console.log(`[Proxy] Successfully generated proxy: ${proxyFileName}`);
+        if (callback) callback(null, { filename: proxyFileName, url: `/media/uploads/proxies/${encodeURIComponent(proxyFileName)}` });
+      }
+    });
+  } catch (err) {
+    if (callback) callback(err);
+  }
 }
 
 // Batch file upload API
 app.post('/api/upload', upload.array('files', 100), (req, res) => {
   try {
-    const uploaded = (req.files || []).map(f => ({
-      name: f.originalname,
-      url: `/media/uploads/${encodeURIComponent(f.originalname)}`,
-      size: f.size,
-      path: f.path,
-      isAudio: ['.wav', '.mp3', '.ogg', '.m4a', '.aac'].includes(path.extname(f.originalname).toLowerCase()),
-      isVideo: ['.mp4', '.mov', '.webm', '.mkv'].includes(path.extname(f.originalname).toLowerCase()),
-      isImage: ['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(path.extname(f.originalname).toLowerCase())
-    }));
+    const uploaded = (req.files || []).map(f => {
+      const isVid = ['.mp4', '.mov', '.webm', '.mkv'].includes(path.extname(f.originalname).toLowerCase());
+      if (isVid) {
+        // Trigger background proxy generation immediately
+        generateVideoProxy(f.path, f.originalname);
+      }
+      return {
+        name: f.originalname,
+        url: `/media/uploads/${encodeURIComponent(f.originalname)}`,
+        size: f.size,
+        path: f.path,
+        isAudio: ['.wav', '.mp3', '.ogg', '.m4a', '.aac'].includes(path.extname(f.originalname).toLowerCase()),
+        isVideo: isVid,
+        isImage: ['.png', '.jpg', '.jpeg', '.webp', '.gif'].includes(path.extname(f.originalname).toLowerCase())
+      };
+    });
     res.json({ success: true, files: uploaded });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -190,6 +231,45 @@ app.post('/api/export/transcode', upload.single('video'), (req, res) => {
       url: `/media/uploads/${encodeURIComponent(outputFileName)}`,
       size: stat.size
     });
+  });
+});
+
+// Proxy Status and Request API
+app.get('/api/proxy/status', (req, res) => {
+  const filename = req.query.filename;
+  if (!filename) return res.status(400).json({ error: 'Filename query required' });
+
+  const parsed = path.parse(filename);
+  const proxyFileName = `proxy_${parsed.name}.mp4`;
+  const proxyPath = path.join(proxiesDir, proxyFileName);
+
+  if (fs.existsSync(proxyPath)) {
+    return res.json({
+      ready: true,
+      filename: proxyFileName,
+      url: `/media/uploads/proxies/${encodeURIComponent(proxyFileName)}`
+    });
+  }
+  res.json({ ready: false });
+});
+
+app.post('/api/proxy/generate', (req, res) => {
+  const { filename, path: clientPath } = req.body;
+  if (!filename) return res.status(400).json({ error: 'Filename required' });
+
+  // Locate input file in uploads or downloads
+  let inputPath = clientPath;
+  if (!inputPath || !fs.existsSync(inputPath)) {
+    const uploadCandidate = path.join(uploadsDir, filename);
+    const dlCandidate = path.join(userDownloads, filename);
+    if (fs.existsSync(uploadCandidate)) inputPath = uploadCandidate;
+    else if (fs.existsSync(dlCandidate)) inputPath = dlCandidate;
+    else return res.status(404).json({ error: 'Source video file not found' });
+  }
+
+  generateVideoProxy(inputPath, filename, (err, proxyInfo) => {
+    if (err) return res.status(500).json({ error: 'Failed to generate proxy', details: err.message });
+    res.json({ success: true, ...proxyInfo });
   });
 });
 

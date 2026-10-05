@@ -281,6 +281,14 @@
               </select>
             </div>
             <span class="timecode" id="timecode">00:00.00</span>
+            <button class="icon-btn active" id="btn-toggle-proxy" title="Toggle 540p Smart Proxy Mode (Ultra-Fast Zero-Lag Scrubbing)" style="margin-left: 6px; color: #ffd000; border: 1px solid rgba(255, 208, 0, 0.4); background: rgba(255, 208, 0, 0.12); padding: 4px 7px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>
+              <span id="label-proxy-status">Proxy 540p</span>
+            </button>
+            <button class="icon-btn" id="btn-open-hotkeys" title="Configure Keyboard Shortcuts & NLE Muscle-Memory Presets (Cmd+/)" style="margin-left: 4px; padding: 4px 6px; font-size: 10.5px; display: inline-flex; align-items: center; gap: 3px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px;"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+              <span>Hotkeys</span>
+            </button>
             <button class="icon-btn" id="btn-canvas-fullscreen" title="Full Screen Preview / Expand" style="margin-left: 4px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 7px;">
               <svg class="ui-icon" id="fullscreen-icon" viewBox="0 0 24 24" style="width:13px; height:13px;"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
             </button>
@@ -722,6 +730,12 @@
               <div class="apple-group-separator"></div>
               <button class="btn-apple-tool" id="tool-split" title="Split Clip at Playhead (S)" aria-label="Split">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+              </button>
+              <button class="btn-apple-tool" id="tool-slip" title="Slip Tool (Y) - Shift internal media offset without moving timeline position" aria-label="Slip">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 13h12v-2H6v2zm-2 4h16v-2H4v2zm4-8h8V7H8v2zM2 3v18h20V3H2zm18 16H4V5h16v14z"/></svg>
+              </button>
+              <button class="btn-apple-tool" id="tool-slide" title="Slide Tool (U) - Slide clip along track while rolling adjacent cut points" aria-label="Slide">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M4 11h4V8l4 4-4 4v-3H4v-2zm16 2h-4v3l-4-4 4-4v3h4v2z"/></svg>
               </button>
               <button class="btn-apple-tool" id="tool-trim-left" title="Trim Start to Playhead (Q)" aria-label="Trim Start">
                 <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 5h2v14H5zm13 1.5L9.5 12l8.5 5.5v-11z"/></svg>
@@ -1555,6 +1569,172 @@
                 </div>
               </div>
               <span class="hint-text" style="margin-top: 4px;">Format: MM:SS.ms (e.g. 01:15.5) or seconds (e.g. 12.5)</span>
+            </div>
+
+            <!-- Temporal Keyframing & Transform Controls -->
+            <div class="control-row" id="inspector-transform-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="margin: 0; display: flex; align-items: center; gap: 4px; font-weight: 700;">
+                  <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #00f0ff; fill: currentColor;"><path d="M12 2L4 12l8 10 8-10L12 2zm0 3.8L17.2 12 12 18.2 6.8 12 12 5.8z"/></svg>
+                  <span>Transform &amp; Keyframes</span>
+                </label>
+                <div style="display: flex; gap: 4px;">
+                  <button type="button" class="btn-micro-preset" id="btn-kf-jump-prev" title="Jump to Previous Keyframe">◀</button>
+                  <button type="button" class="btn-micro-preset active" id="btn-kf-add-playhead" title="Toggle Keyframe at Playhead (◆)">◆ Keyframe</button>
+                  <button type="button" class="btn-micro-preset" id="btn-kf-jump-next" title="Jump to Next Keyframe">▶</button>
+                </div>
+              </div>
+
+              <!-- Property Row: Scale -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label style="margin: 0; font-size: 11px;">Scale: <span id="inspector-scale-val">100%</span></label>
+                  <button type="button" class="kf-prop-diamond" id="kf-btn-scale" data-prop="scale" title="Toggle Scale Keyframe at Current Time">◆</button>
+                </div>
+                <input type="range" id="inspector-scale-slider" min="10" max="350" value="100">
+              </div>
+
+              <!-- Property Row: Rotation -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label style="margin: 0; font-size: 11px;">Rotation: <span id="inspector-rotate-val">0°</span></label>
+                  <button type="button" class="kf-prop-diamond" id="kf-btn-rotation" data-prop="rotation" title="Toggle Rotation Keyframe at Current Time">◆</button>
+                </div>
+                <input type="range" id="inspector-rotate-slider" min="-180" max="180" value="0">
+              </div>
+
+              <!-- Property Row: Position X & Y -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <div style="display: flex; gap: 8px;">
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <label style="margin: 0; font-size: 10.5px;">Pos X: <span id="inspector-posx-val">0</span></label>
+                      <button type="button" class="kf-prop-diamond" id="kf-btn-x" data-prop="x" title="Toggle X Keyframe">◆</button>
+                    </div>
+                    <input type="range" id="inspector-posx-slider" min="-600" max="600" value="0">
+                  </div>
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <label style="margin: 0; font-size: 10.5px;">Pos Y: <span id="inspector-posy-val">0</span></label>
+                      <button type="button" class="kf-prop-diamond" id="kf-btn-y" data-prop="y" title="Toggle Y Keyframe">◆</button>
+                    </div>
+                    <input type="range" id="inspector-posy-slider" min="-400" max="400" value="0">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Property Row: Opacity -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label style="margin: 0; font-size: 11px;">Opacity: <span id="inspector-opacity-val">100%</span></label>
+                  <button type="button" class="kf-prop-diamond" id="kf-btn-opacity" data-prop="opacity" title="Toggle Opacity Keyframe">◆</button>
+                </div>
+                <input type="range" id="inspector-opacity-slider" min="0" max="100" value="100">
+              </div>
+
+              <!-- Interpolation Easing & Curve Editor Opener -->
+              <div style="display: flex; gap: 6px; align-items: center; margin-top: 6px;">
+                <select id="inspector-kf-easing" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 4px 6px; border-radius: 4px; font-size: 10.5px;">
+                  <option value="ease">Smooth Ease (Cubic)</option>
+                  <option value="linear">Linear (Constant Speed)</option>
+                  <option value="bezier">Custom Bezier Curve</option>
+                  <option value="spring">Elastic Spring / Bounce</option>
+                </select>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-open-curve-editor" style="padding: 4px 8px; font-size: 10.5px; color: #00f0ff; border-color: rgba(0, 240, 255, 0.4);" title="Open Visual Curve / Graph Editor">
+                  Graph
+                </button>
+              </div>
+            </div>
+
+            <!-- Color Grading, 3D LUTs & Compositing Math Section -->
+            <div class="control-row" id="inspector-color-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="margin: 0; display: flex; align-items: center; gap: 4px; font-weight: 700;">
+                  <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #ffd000; fill: currentColor;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+                  <span>Color Pipeline &amp; Compositing</span>
+                </label>
+                <span class="badge" id="badge-color-profile" style="font-size: 10px; color: #ffd000;">Rec.709</span>
+              </div>
+
+              <!-- 3D LUT & Creative Looks -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <label style="font-size: 10.5px; color: var(--text-muted); display: block; margin-bottom: 2px;">3D Film LUT Preset</label>
+                <div style="display: flex; gap: 6px;">
+                  <select id="inspector-lut-select" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px; border-radius: 4px; font-size: 11px;">
+                    <option value="none">None (Rec.709 Neutral)</option>
+                    <option value="teal_orange">Cinematic Teal &amp; Orange</option>
+                    <option value="warm_kodak">Warm Kodak Portra 5207</option>
+                    <option value="bleach_bypass">Bleach Bypass Gritty</option>
+                    <option value="technicolor">Technicolor 1970s Vintage</option>
+                    <option value="noir">High-Contrast Noir B&amp;W</option>
+                    <option value="custom">Load Custom .cube LUT...</option>
+                  </select>
+                  <input type="file" id="input-custom-cube-lut" accept=".cube" style="display: none;">
+                </div>
+              </div>
+
+              <!-- Compositing Blend Mode -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <label style="font-size: 10.5px; color: var(--text-muted); display: block; margin-bottom: 2px;">Blend Mode (Compositing Math)</label>
+                <select id="inspector-blend-mode" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 5px; border-radius: 4px; font-size: 11px;">
+                  <option value="normal">Normal</option>
+                  <option value="screen">Screen (Light / Glow Overlay)</option>
+                  <option value="multiply">Multiply (Shadows / Paper Ink)</option>
+                  <option value="overlay">Overlay (High Contrast Pop)</option>
+                  <option value="lighter">Add / Lighter (Particle Glow)</option>
+                  <option value="color-dodge">Color Dodge (Intense Highlights)</option>
+                  <option value="soft-light">Soft Light (Subtle Blend)</option>
+                </select>
+              </div>
+
+              <!-- 3-Way Lift, Gamma, Gain (Shadows, Midtones, Highlights) -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <label style="display: flex; justify-content: space-between; font-size: 10.5px;">
+                  <span>Lift (Shadows):</span>
+                  <span id="inspector-lift-val">0</span>
+                </label>
+                <input type="range" id="inspector-lift-slider" min="-50" max="50" value="0">
+              </div>
+
+              <div class="control-row" style="margin-bottom: 6px;">
+                <label style="display: flex; justify-content: space-between; font-size: 10.5px;">
+                  <span>Gamma (Midtones):</span>
+                  <span id="inspector-gamma-val">0</span>
+                </label>
+                <input type="range" id="inspector-gamma-slider" min="-50" max="50" value="0">
+              </div>
+
+              <div class="control-row" style="margin-bottom: 6px;">
+                <label style="display: flex; justify-content: space-between; font-size: 10.5px;">
+                  <span>Gain (Highlights):</span>
+                  <span id="inspector-gain-val">0</span>
+                </label>
+                <input type="range" id="inspector-gain-slider" min="-50" max="50" value="0">
+              </div>
+
+              <!-- Temperature, Tint & Saturation -->
+              <div class="control-row" style="margin-bottom: 6px;">
+                <div style="display: flex; gap: 8px;">
+                  <div style="flex: 1;">
+                    <label style="display: flex; justify-content: space-between; font-size: 10px;">
+                      <span>Temp:</span>
+                      <span id="inspector-temp-val">0</span>
+                    </label>
+                    <input type="range" id="inspector-temp-slider" min="-50" max="50" value="0">
+                  </div>
+                  <div style="flex: 1;">
+                    <label style="display: flex; justify-content: space-between; font-size: 10px;">
+                      <span>Saturation:</span>
+                      <span id="inspector-sat-val">100%</span>
+                    </label>
+                    <input type="range" id="inspector-sat-slider" min="0" max="200" value="100">
+                  </div>
+                </div>
+              </div>
+
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-clip-color" style="width: 100%; margin-top: 4px; font-size: 10.5px;">
+                Reset Color Grading
+              </button>
             </div>
 
             <!-- Layer Arrangement (Bring to Front / Send to Back) -->
@@ -3080,6 +3260,107 @@
           <svg viewBox="0 0 24 24" class="render-icon"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
           <span id="export-render-btn-text">Start Export</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NLE Keyboard Shortcuts & Muscle-Memory Presets Modal -->
+  <div id="modal-hotkeys" class="modal-backdrop" style="display: none;">
+    <div class="modal-card hotkeys-modal-card" style="max-width: 650px; width: 90%; background: #131722; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.85); overflow: hidden; display: flex; flex-direction: column;">
+      <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="width: 20px; height: 20px; color: #00f0ff;"><path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/></svg>
+          <div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #fff;">Keyboard Shortcuts &amp; NLE Presets</h3>
+            <span style="font-size: 11px; color: var(--text-muted);">Switch layout to match your muscle memory or view active hotkeys</span>
+          </div>
+        </div>
+        <button type="button" class="btn-apple-icon" id="btn-close-hotkeys-modal" style="width: 28px; height: 28px;">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 18px 20px; overflow-y: auto; max-height: 70vh;">
+        <!-- NLE Preset Selector Pill Cluster -->
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 8px;">Industry NLE Layout Preset:</label>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+            <button type="button" class="btn btn-secondary btn-sm nle-preset-btn active" data-preset="magnates" style="padding: 8px 4px; font-size: 11px; text-align: center; border-radius: 6px;">
+              <b>Magnates</b> (Default)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm nle-preset-btn" data-preset="premiere" style="padding: 8px 4px; font-size: 11px; text-align: center; border-radius: 6px;">
+              <b>Premiere Pro</b>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm nle-preset-btn" data-preset="fcpx" style="padding: 8px 4px; font-size: 11px; text-align: center; border-radius: 6px;">
+              <b>Final Cut Pro</b>
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm nle-preset-btn" data-preset="davinci" style="padding: 8px 4px; font-size: 11px; text-align: center; border-radius: 6px;">
+              <b>DaVinci Resolve</b>
+            </button>
+          </div>
+        </div>
+
+        <!-- Shortcuts Table -->
+        <div style="border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.25);">
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+            <thead>
+              <tr style="background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); font-size: 10.5px; text-transform: uppercase;">
+                <th style="padding: 8px 12px;">Action / Operation</th>
+                <th style="padding: 8px 12px; text-align: right;">Key Binding</th>
+              </tr>
+            </thead>
+            <tbody id="hotkeys-table-body" style="color: #e2e8f0;">
+              <!-- Rendered dynamically based on active preset -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; gap: 8px; background: rgba(255,255,255,0.02);">
+        <button type="button" class="btn btn-primary btn-sm" id="btn-save-hotkeys-preset" style="padding: 6px 16px; font-weight: 600;">Apply Preset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Curve / Graph Keyframe Editor Modal -->
+  <div id="modal-curve-editor" class="modal-backdrop" style="display: none;">
+    <div class="modal-card curve-modal-card" style="max-width: 600px; width: 90%; background: #131722; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.85); overflow: hidden; display: flex; flex-direction: column;">
+      <div class="modal-header" style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #00f0ff;"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+          <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Keyframe Curve &amp; Graph Editor</h3>
+        </div>
+        <button type="button" class="btn-apple-icon" id="btn-close-curve-modal" style="width: 26px; height: 26px;">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <span style="font-size: 11px; color: var(--text-muted);">Curve Preset &amp; Tension Interpolation</span>
+          <div style="display: flex; gap: 4px;">
+            <button type="button" class="btn-micro-preset active curve-preset-btn" data-curve="easeInOutCubic">Ease In-Out</button>
+            <button type="button" class="btn-micro-preset curve-preset-btn" data-curve="linear">Linear</button>
+            <button type="button" class="btn-micro-preset curve-preset-btn" data-curve="spring">Spring</button>
+            <button type="button" class="btn-micro-preset curve-preset-btn" data-curve="easeOutBack">Overshoot</button>
+          </div>
+        </div>
+
+        <!-- Interactive Canvas Curve -->
+        <div style="background: #090c13; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; display: flex; justify-content: center; align-items: center; position: relative;">
+          <canvas id="curve-graph-canvas" width="480" height="220" style="width: 100%; max-width: 480px; height: 220px; display: block; border-radius: 4px;"></canvas>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 12px;">
+          <div style="flex: 1;">
+            <label style="display: flex; justify-content: space-between; font-size: 10.5px; margin-bottom: 2px;">
+              <span>Curve Tension / Curvature:</span>
+              <span id="curve-tension-val">0.50</span>
+            </label>
+            <input type="range" id="curve-tension-slider" min="10" max="90" value="50">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; gap: 8px; background: rgba(255,255,255,0.02);">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-curve-modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-apply-curve-modal">Apply Curve</button>
       </div>
     </div>
   </div>

@@ -913,25 +913,150 @@ function drawTextLayer(specificTextClip) {
   }
 }
 
+// ==================== SMART BACKGROUND PROXY & CACHE ENGINE ====================
+let isProxyModeEnabled = localStorage.getItem('magnates_proxy_mode') !== 'false'; // Default ON for zero-lag scrubbing
+const proxyUrlCache = new Map();
+
+function fetchVideoProxyIfNeeded(file) {
+  if (!file || !file.isVideo || file.proxyUrl || proxyUrlCache.has(file.name)) return;
+  fetch(`/api/proxy/status?filename=${encodeURIComponent(file.name)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.ready) {
+        file.proxyUrl = data.url;
+        proxyUrlCache.set(file.name, data.url);
+      } else {
+        fetch('/api/proxy/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, path: file.path })
+        })
+          .then(r => r.json())
+          .then(genData => {
+            if (genData.success && genData.url) {
+              file.proxyUrl = genData.url;
+              proxyUrlCache.set(file.name, genData.url);
+            }
+          })
+          .catch(() => {});
+      }
+    })
+    .catch(() => {});
+}
+
+// ==================== COLOR PIPELINE & COMPOSITING MATH ====================
+function getCanvasBlendMode(mode) {
+  switch (mode) {
+    case 'screen': return 'screen';
+    case 'multiply': return 'multiply';
+    case 'overlay': return 'overlay';
+    case 'lighter':
+    case 'add': return 'lighter';
+    case 'color-dodge': return 'color-dodge';
+    case 'soft-light': return 'soft-light';
+    case 'hard-light': return 'hard-light';
+    default: return 'source-over';
+  }
+}
+
+function buildClipColorFilter(clip) {
+  if (!clip) return 'none';
+  const filters = [];
+  const lift = clip.lift || 0;
+  const gamma = clip.gamma || 0;
+  const gain = clip.gain || 0;
+  const sat = clip.saturation !== undefined ? clip.saturation : 100;
+  const temp = clip.temperature || 0;
+  
+  const brightness = 100 + lift * 0.8 + gain * 0.6;
+  const contrast = 100 + gamma * 1.2;
+  
+  if (brightness !== 100) filters.push(`brightness(${brightness}%)`);
+  if (contrast !== 100) filters.push(`contrast(${contrast}%)`);
+  if (sat !== 100) filters.push(`saturate(${sat}%)`);
+  if (temp !== 0) {
+    if (temp > 0) {
+      filters.push(`sepia(${temp * 0.4}%)`);
+      filters.push(`hue-rotate(-${temp * 0.3}deg)`);
+    } else {
+      filters.push(`hue-rotate(${Math.abs(temp) * 0.6}deg)`);
+    }
+  }
+
+  if (clip.lut === 'teal_orange') {
+    filters.push('contrast(125%) saturate(130%) hue-rotate(-12deg)');
+  } else if (clip.lut === 'warm_kodak') {
+    filters.push('sepia(25%) contrast(108%) saturate(115%)');
+  } else if (clip.lut === 'bleach_bypass') {
+    filters.push('contrast(160%) saturate(55%) brightness(105%)');
+  } else if (clip.lut === 'technicolor') {
+    filters.push('contrast(135%) saturate(160%) hue-rotate(5deg)');
+  } else if (clip.lut === 'noir') {
+    filters.push('grayscale(100%) contrast(150%) brightness(95%)');
+  }
+
+  return filters.length > 0 ? filters.join(' ') : 'none';
+}
+
+// ==================== TEMPORAL KEYFRAMING ENGINE ====================
+function getClipInterpolatedProp(clip, propName, offsetTime, defaultVal) {
+  if (!clip || !clip.keyframes || !clip.keyframes[propName] || clip.keyframes[propName].length === 0) {
+    return (clip && clip[propName] !== undefined) ? clip[propName] : defaultVal;
+  }
+  const kfs = clip.keyframes[propName].slice().sort((a, b) => a.time - b.time);
+  if (offsetTime <= kfs[0].time) return kfs[0].value;
+  if (offsetTime >= kfs[kfs.length - 1].time) return kfs[kfs.length - 1].value;
+
+  for (let i = 0; i < kfs.length - 1; i++) {
+    const k1 = kfs[i];
+    const k2 = kfs[i + 1];
+    if (offsetTime >= k1.time && offsetTime <= k2.time) {
+      const span = k2.time - k1.time;
+      if (span <= 0.0001) return k2.value;
+      const progress = (offsetTime - k1.time) / span;
+      let ease = progress;
+      const easingType = k2.easing || clip.kfEasing || 'ease';
+      if (easingType === 'ease' || easingType === 'easeInOutCubic') {
+        ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      } else if (easingType === 'spring') {
+        ease = Math.sin(progress * Math.PI * 2) * (1 - progress) + progress;
+      } else if (easingType === 'easeOutBack') {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        ease = 1 + c3 * Math.pow(progress - 1, 3) + c1 * Math.pow(progress - 1, 2);
+      }
+      return k1.value + (k2.value - k1.value) * ease;
+    }
+  }
+  return defaultVal;
+}
+
 // Active media element cache
 const mediaElementCache = new Map();
 
 function getMediaElement(file) {
-  if (mediaElementCache.has(file.url)) {
-    return mediaElementCache.get(file.url);
+  if (!file) return null;
+  if (file.isVideo) fetchVideoProxyIfNeeded(file);
+
+  const effectiveUrl = (isProxyModeEnabled && file.isVideo && (file.proxyUrl || proxyUrlCache.get(file.name)))
+    ? (file.proxyUrl || proxyUrlCache.get(file.name))
+    : file.url;
+
+  if (mediaElementCache.has(effectiveUrl)) {
+    return mediaElementCache.get(effectiveUrl);
   }
   let el;
   if (file.isVideo) {
     el = document.createElement('video');
-    el.src = file.url;
+    el.src = effectiveUrl;
     el.muted = true; // start muted for preview
     el.playsInline = true;
     el.preload = 'auto';
   } else if (file.isImage) {
     el = new Image();
-    el.src = file.url;
+    el.src = effectiveUrl;
   }
-  if (el) mediaElementCache.set(file.url, el);
+  if (el) mediaElementCache.set(effectiveUrl, el);
   return el;
 }
 
@@ -1439,14 +1564,16 @@ function drawMediaLayer(specificClip) {
     if (isPlaying) {
       if (el.paused) el.play().catch(() => {});
       const startT = targetClip ? targetClip.start : 0;
-      const clipTime = (currentTime - startT) % (el.duration || 10);
+      const slipOff = targetClip?.mediaOffset || 0;
+      const clipTime = Math.max(0, (currentTime - startT + slipOff) % (el.duration || 10));
       if (Math.abs(el.currentTime - clipTime) > 0.25) {
         el.currentTime = Math.max(0, clipTime);
       }
     } else {
       if (!el.paused) el.pause();
       if (targetClip) {
-        const clipTime = (currentTime - targetClip.start) % (el.duration || 10);
+        const slipOff = targetClip?.mediaOffset || 0;
+        const clipTime = Math.max(0, (currentTime - targetClip.start + slipOff) % (el.duration || 10));
         if (Math.abs(el.currentTime - clipTime) > 0.1) {
           el.currentTime = Math.max(0, clipTime);
         }
@@ -1483,16 +1610,22 @@ function drawMediaLayer(specificClip) {
     }
   }
 
-  // Calculate base center coordinates plus custom transform offsets (stretch, scale, pan)
-  const scale = (targetClip && targetClip.scale !== undefined) ? targetClip.scale : 1.0;
-  const finalW = dw * scale;
-  const finalH = dh * scale;
+  // Calculate base center coordinates plus custom transform offsets (evaluated dynamically via Keyframing Engine)
+  const clipElapsed = targetClip ? Math.max(0, currentTime - targetClip.start) : 0;
+  const kfScale = getClipInterpolatedProp(targetClip, 'scale', clipElapsed, (targetClip && targetClip.scale !== undefined) ? targetClip.scale : 1.0);
+  const kfRot = getClipInterpolatedProp(targetClip, 'rotation', clipElapsed, (targetClip && targetClip.rotation !== undefined) ? targetClip.rotation : 0);
+  const kfPosX = getClipInterpolatedProp(targetClip, 'x', clipElapsed, (targetClip && targetClip.x !== undefined) ? targetClip.x : 0);
+  const kfPosY = getClipInterpolatedProp(targetClip, 'y', clipElapsed, (targetClip && targetClip.y !== undefined) ? targetClip.y : 0);
+  const kfOpacity = getClipInterpolatedProp(targetClip, 'opacity', clipElapsed, (targetClip && targetClip.opacity !== undefined) ? targetClip.opacity : 1.0);
+
+  const finalW = dw * kfScale;
+  const finalH = dh * kfScale;
   const scrollOffset = getClipDocumentScrollOffset(targetClip, currentTime, finalW, finalH);
   const crowdTransform = getClipMotionBlurCrowdTransform(targetClip, currentTime, finalW, finalH);
   const crowdPanX = crowdTransform ? crowdTransform.panX : 0;
   const crowdPanY = crowdTransform ? crowdTransform.panY : 0;
-  const offsetX = ((targetClip && targetClip.x !== undefined) ? targetClip.x : 0) + scrollOffset.x + crowdPanX;
-  const offsetY = ((targetClip && targetClip.y !== undefined) ? targetClip.y : 0) + scrollOffset.y + crowdPanY;
+  const offsetX = kfPosX + scrollOffset.x + crowdPanX;
+  const offsetY = kfPosY + scrollOffset.y + crowdPanY;
   const dx = ((w - finalW) / 2) + offsetX;
   const dy = ((h - finalH) / 2) + offsetY;
 
@@ -1508,6 +1641,18 @@ function drawMediaLayer(specificClip) {
   }
 
   ctx.save();
+  if (targetClip) {
+    ctx.globalCompositeOperation = getCanvasBlendMode(targetClip.blendMode || 'source-over');
+    ctx.filter = buildClipColorFilter(targetClip);
+    ctx.globalAlpha = Math.max(0, Math.min(1, kfOpacity));
+  }
+  if (kfRot !== 0) {
+    const cx = dx + finalW / 2;
+    const cy = dy + finalH / 2;
+    ctx.translate(cx, cy);
+    ctx.rotate((kfRot * Math.PI) / 180);
+    ctx.translate(-cx, -cy);
+  }
   ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
   ctx.shadowBlur = targetClip?.vectorEffect ? 45 : 35;
   ctx.shadowOffsetY = targetClip?.vectorEffect ? 14 : 10;
@@ -3183,6 +3328,29 @@ function renderAllTimelineTracks() {
       block.appendChild(deleteBtn);
       block.appendChild(handleRight);
 
+      // Add Keyframe Lane & Diamond Markers on Clip Block
+      if (clip.keyframes) {
+        const kfLane = document.createElement('div');
+        kfLane.className = 'clip-kf-lane';
+        const allKfTimes = new Set();
+        Object.values(clip.keyframes).forEach(arr => {
+          if (Array.isArray(arr)) arr.forEach(k => allKfTimes.add(k.time));
+        });
+        allKfTimes.forEach(t => {
+          const marker = document.createElement('div');
+          marker.className = 'clip-kf-marker';
+          const pct = Math.max(0, Math.min(100, (t / clip.duration) * 100));
+          marker.style.left = `${pct}%`;
+          marker.title = `Keyframe at +${t.toFixed(2)}s`;
+          marker.addEventListener('click', (e) => {
+            e.stopPropagation();
+            seekToTime(clip.start + t);
+          });
+          kfLane.appendChild(marker);
+        });
+        if (allKfTimes.size > 0) block.appendChild(kfLane);
+      }
+
       // Clip Interactions
       attachClipInteractions(block, clip, actualTrackType);
 
@@ -3505,6 +3673,94 @@ function selectClip(clip, trackType) {
       document.getElementById('inspector-volume-val').textContent = `${vol}%`;
     } else {
       volumeRow.style.display = 'none';
+    }
+
+    // Populate Transform & Temporal Keyframing Section
+    const transformSec = document.getElementById('inspector-transform-section');
+    if (transformSec) {
+      if (['image', 'video', 'chart'].includes(trackType)) {
+        transformSec.style.display = 'block';
+        const curScale = Math.round((clip.scale !== undefined ? clip.scale : 1.0) * 100);
+        const curRot = clip.rotation || 0;
+        const curX = clip.x || 0;
+        const curY = clip.y || 0;
+        const curOp = Math.round((clip.opacity !== undefined ? clip.opacity : 1.0) * 100);
+
+        const scaleSlider = document.getElementById('inspector-scale-slider');
+        const scaleVal = document.getElementById('inspector-scale-val');
+        if (scaleSlider) scaleSlider.value = curScale;
+        if (scaleVal) scaleVal.textContent = `${curScale}%`;
+
+        const rotSlider = document.getElementById('inspector-rotate-slider');
+        const rotVal = document.getElementById('inspector-rotate-val');
+        if (rotSlider) rotSlider.value = curRot;
+        if (rotVal) rotVal.textContent = `${curRot}°`;
+
+        const xSlider = document.getElementById('inspector-posx-slider');
+        const xVal = document.getElementById('inspector-posx-val');
+        if (xSlider) xSlider.value = curX;
+        if (xVal) xVal.textContent = `${curX}`;
+
+        const ySlider = document.getElementById('inspector-posy-slider');
+        const yVal = document.getElementById('inspector-posy-val');
+        if (ySlider) ySlider.value = curY;
+        if (yVal) yVal.textContent = `${curY}`;
+
+        const opSlider = document.getElementById('inspector-opacity-slider');
+        const opVal = document.getElementById('inspector-opacity-val');
+        if (opSlider) opSlider.value = curOp;
+        if (opVal) opVal.textContent = `${curOp}%`;
+
+        const easingSelect = document.getElementById('inspector-kf-easing');
+        if (easingSelect) easingSelect.value = clip.kfEasing || 'ease';
+
+        if (typeof updateInspectorKeyframeDiamonds === 'function') {
+          updateInspectorKeyframeDiamonds(clip);
+        }
+      } else {
+        transformSec.style.display = 'none';
+      }
+    }
+
+    // Populate Color Pipeline & Compositing Math Section
+    const colorSec = document.getElementById('inspector-color-section');
+    if (colorSec) {
+      if (['image', 'video', 'chart'].includes(trackType)) {
+        colorSec.style.display = 'block';
+        const lutSelect = document.getElementById('inspector-lut-select');
+        if (lutSelect) lutSelect.value = clip.lut || 'none';
+
+        const blendSelect = document.getElementById('inspector-blend-mode');
+        if (blendSelect) blendSelect.value = clip.blendMode || 'normal';
+
+        const liftSlider = document.getElementById('inspector-lift-slider');
+        const liftVal = document.getElementById('inspector-lift-val');
+        if (liftSlider) liftSlider.value = clip.lift || 0;
+        if (liftVal) liftVal.textContent = `${clip.lift || 0}`;
+
+        const gammaSlider = document.getElementById('inspector-gamma-slider');
+        const gammaVal = document.getElementById('inspector-gamma-val');
+        if (gammaSlider) gammaSlider.value = clip.gamma || 0;
+        if (gammaVal) gammaVal.textContent = `${clip.gamma || 0}`;
+
+        const gainSlider = document.getElementById('inspector-gain-slider');
+        const gainVal = document.getElementById('inspector-gain-val');
+        if (gainSlider) gainSlider.value = clip.gain || 0;
+        if (gainVal) gainVal.textContent = `${clip.gain || 0}`;
+
+        const tempSlider = document.getElementById('inspector-temp-slider');
+        const tempVal = document.getElementById('inspector-temp-val');
+        if (tempSlider) tempSlider.value = clip.temperature || 0;
+        if (tempVal) tempVal.textContent = `${clip.temperature || 0}`;
+
+        const satSlider = document.getElementById('inspector-sat-slider');
+        const satVal = document.getElementById('inspector-sat-val');
+        const curSat = clip.saturation !== undefined ? clip.saturation : 100;
+        if (satSlider) satSlider.value = curSat;
+        if (satVal) satVal.textContent = `${curSat}%`;
+      } else {
+        colorSec.style.display = 'none';
+      }
     }
 
     // Media Layer Order (Send to Back / Bring to Front)
@@ -4036,6 +4292,90 @@ function attachClipInteractions(blockEl, clip, trackType) {
       return;
     }
 
+    // SLIP TOOL INTERACTION (Y): Shift internal media offset without moving clip position
+    if (activeTool === 'slip') {
+      const initialOffset = clip.mediaOffset || 0;
+      let hasSlipped = false;
+      const onSlipMove = (moveEv) => {
+        const deltaX = moveEv.clientX - startX;
+        if (!hasSlipped && Math.abs(deltaX) > 4) {
+          hasSlipped = true;
+          document.body.style.cursor = 'ew-resize';
+        }
+        if (hasSlipped) {
+          const deltaSec = deltaX / pps;
+          clip.mediaOffset = Math.max(0, initialOffset - deltaSec);
+          showTextTimingAlert(`Slip: ${(deltaSec >= 0 ? '+' : '') + deltaSec.toFixed(2)}s | In-Point: ${formatTimecode(clip.mediaOffset)}`, 'info');
+          renderCanvas();
+        }
+      };
+      const onSlipUp = () => {
+        window.removeEventListener('mousemove', onSlipMove);
+        window.removeEventListener('mouseup', onSlipUp);
+        document.body.style.cursor = '';
+        if (hasSlipped) {
+          recordState('Slip Clip Content');
+          showTextTimingAlert(`Slipped clip content to ${formatTimecode(clip.mediaOffset || 0)}`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 1800);
+        }
+      };
+      window.addEventListener('mousemove', onSlipMove);
+      window.addEventListener('mouseup', onSlipUp);
+      return;
+    }
+
+    // SLIDE TOOL INTERACTION (U): Slide clip between neighbors while preserving sequence timing
+    if (activeTool === 'slide') {
+      let hasSlid = false;
+      const trackClips = (timelineClips[trackType] || []).slice().sort((a,b) => a.start - b.start);
+      const clipIdx = trackClips.findIndex(c => c.id === clip.id);
+      const prevClip = clipIdx > 0 ? trackClips[clipIdx - 1] : null;
+      const nextClip = clipIdx < trackClips.length - 1 ? trackClips[clipIdx + 1] : null;
+      const origStart = clip.start;
+      const origPrevDur = prevClip ? prevClip.duration : 0;
+      const origNextStart = nextClip ? nextClip.start : 0;
+      const origNextDur = nextClip ? nextClip.duration : 0;
+
+      const onSlideMove = (moveEv) => {
+        const deltaX = moveEv.clientX - startX;
+        if (!hasSlid && Math.abs(deltaX) > 4) {
+          hasSlid = true;
+          document.body.style.cursor = 'col-resize';
+        }
+        if (hasSlid) {
+          const deltaSec = deltaX / pps;
+          let clampedDelta = deltaSec;
+          if (prevClip) clampedDelta = Math.max(-(origPrevDur - 0.3), clampedDelta);
+          if (nextClip) clampedDelta = Math.min((origNextDur - 0.3), clampedDelta);
+
+          clip.start = Math.max(0, origStart + clampedDelta);
+          if (prevClip) prevClip.duration = origPrevDur + clampedDelta;
+          if (nextClip) {
+            nextClip.start = origNextStart + clampedDelta;
+            nextClip.duration = origNextDur - clampedDelta;
+          }
+          blockEl.style.left = `${clip.start * pps}px`;
+          renderAllTimelineTracks();
+          renderCanvas();
+          showTextTimingAlert(`Slide: ${(clampedDelta >= 0 ? '+' : '') + clampedDelta.toFixed(2)}s`, 'info');
+        }
+      };
+      const onSlideUp = () => {
+        window.removeEventListener('mousemove', onSlideMove);
+        window.removeEventListener('mouseup', onSlideUp);
+        document.body.style.cursor = '';
+        if (hasSlid) {
+          recordState('Slide Clip Along Track');
+          renderAllTimelineTracks();
+          showTextTimingAlert('Slide edit complete.', 'success');
+          setTimeout(() => showTextTimingAlert(''), 1800);
+        }
+      };
+      window.addEventListener('mousemove', onSlideMove);
+      window.addEventListener('mouseup', onSlideUp);
+      return;
+    }
+
     // Always select the clip immediately on mousedown
     selectClip(clip, trackType);
 
@@ -4359,11 +4699,21 @@ function setStudioTool(toolName, docStyle = null) {
     }
   });
 
+  document.body.classList.remove('tool-slip-active', 'tool-slide-active');
+
   if (toolName === 'select') {
     document.getElementById('tool-select')?.classList.add('active');
     toggleDrawingDock(false);
   } else if (toolName === 'split') {
     document.getElementById('tool-split')?.classList.add('active');
+    toggleDrawingDock(false);
+  } else if (toolName === 'slip') {
+    document.getElementById('tool-slip')?.classList.add('active');
+    document.body.classList.add('tool-slip-active');
+    toggleDrawingDock(false);
+  } else if (toolName === 'slide') {
+    document.getElementById('tool-slide')?.classList.add('active');
+    document.body.classList.add('tool-slide-active');
     toggleDrawingDock(false);
   } else if (toolName === 'delete') {
     document.getElementById('tool-delete')?.classList.add('active');
@@ -4406,6 +4756,14 @@ document.querySelectorAll('.timeline-tools .btn-tool, .apple-toolbar-group .btn-
       } else {
         setStudioTool('split');
       }
+    } else if (btn.id === 'tool-slip') {
+      setStudioTool('slip');
+      showTextTimingAlert('Slip Tool Active (Y): Drag inside clip to slip media content', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2200);
+    } else if (btn.id === 'tool-slide') {
+      setStudioTool('slide');
+      showTextTimingAlert('Slide Tool Active (U): Drag clip along timeline rolling cuts', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2200);
     } else if (btn.id === 'tool-delete') {
       if (typeof executeStudioDelete === 'function') {
         executeStudioDelete();
@@ -5375,6 +5733,482 @@ document.getElementById('btn-sidebar-vector')?.addEventListener('click', () => {
     toggleMagnatesVectorEffect(selectedClip.clip);
     selectClip(selectedClip.clip, 'image');
   }
+});
+
+// ==================== TEMPORAL KEYFRAMING & TRANSFORM CONTROLS ====================
+function updateInspectorKeyframeDiamonds(clip) {
+  if (!clip) return;
+  const clipTime = Math.max(0, currentTime - clip.start);
+  const TOLERANCE = 0.08;
+  const props = ['scale', 'rotation', 'x', 'y', 'opacity'];
+  props.forEach(p => {
+    const btn = document.querySelector(`.kf-prop-diamond[data-prop="${p}"]`);
+    if (!btn) return;
+    const hasKf = clip.keyframes && clip.keyframes[p] && clip.keyframes[p].some(k => Math.abs(k.time - clipTime) <= TOLERANCE);
+    btn.classList.toggle('active', !!hasKf);
+  });
+  const playheadKfBtn = document.getElementById('btn-kf-add-playhead');
+  if (playheadKfBtn) {
+    const hasAnyKf = clip.keyframes && Object.values(clip.keyframes).some(arr => Array.isArray(arr) && arr.some(k => Math.abs(k.time - clipTime) <= TOLERANCE));
+    playheadKfBtn.classList.toggle('active', !!hasAnyKf);
+    playheadKfBtn.textContent = hasAnyKf ? '◆ Delete Keyframe' : '◆ Add Keyframe';
+  }
+}
+
+function toggleClipPropertyKeyframe(clip, propName, currentVal) {
+  if (!clip) return;
+  clip.keyframes = clip.keyframes || {};
+  clip.keyframes[propName] = clip.keyframes[propName] || [];
+  const clipTime = Math.max(0, currentTime - clip.start);
+  const TOLERANCE = 0.08;
+  const existingIdx = clip.keyframes[propName].findIndex(k => Math.abs(k.time - clipTime) <= TOLERANCE);
+
+  if (existingIdx >= 0) {
+    clip.keyframes[propName].splice(existingIdx, 1);
+    showTextTimingAlert(`Removed ${propName} keyframe at ${formatTimecode(currentTime)}`, 'info');
+  } else {
+    clip.keyframes[propName].push({
+      time: clipTime,
+      value: currentVal,
+      easing: clip.kfEasing || 'ease'
+    });
+    clip.keyframes[propName].sort((a, b) => a.time - b.time);
+    showTextTimingAlert(`Added ${propName} keyframe at ${formatTimecode(currentTime)}`, 'success');
+  }
+  updateInspectorKeyframeDiamonds(clip);
+  renderAllTimelineTracks();
+  renderCanvas();
+  recordState(`Toggle ${propName} Keyframe`);
+}
+
+// Transform Sliders
+document.getElementById('inspector-scale-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-scale-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.scale = val / 100;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-rotate-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-rotate-val').textContent = `${val}°`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.rotation = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-posx-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-posx-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.x = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-posy-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-posy-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.y = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-opacity-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-opacity-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.opacity = val / 100;
+    renderCanvas();
+  }
+});
+
+document.querySelectorAll('.kf-prop-diamond').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!selectedClip || !selectedClip.clip) return;
+    const prop = btn.dataset.prop;
+    const clip = selectedClip.clip;
+    let val = clip[prop];
+    if (prop === 'scale' && val === undefined) val = 1.0;
+    if (prop === 'opacity' && val === undefined) val = 1.0;
+    if (prop === 'rotation' && val === undefined) val = 0;
+    if (prop === 'x' && val === undefined) val = 0;
+    if (prop === 'y' && val === undefined) val = 0;
+    toggleClipPropertyKeyframe(clip, prop, val);
+  });
+});
+
+document.getElementById('btn-kf-add-playhead')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  const props = ['scale', 'rotation', 'x', 'y', 'opacity'];
+  props.forEach(p => {
+    let val = clip[p];
+    if (p === 'scale' && val === undefined) val = 1.0;
+    if (p === 'opacity' && val === undefined) val = 1.0;
+    if (p === 'rotation' && val === undefined) val = 0;
+    if (p === 'x' && val === undefined) val = 0;
+    if (p === 'y' && val === undefined) val = 0;
+    toggleClipPropertyKeyframe(clip, p, val);
+  });
+});
+
+document.getElementById('btn-kf-jump-prev')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip || !selectedClip.clip.keyframes) return;
+  const clip = selectedClip.clip;
+  const curOffset = Math.max(0, currentTime - clip.start);
+  const times = [];
+  Object.values(clip.keyframes).forEach(arr => {
+    if (Array.isArray(arr)) arr.forEach(k => times.push(k.time));
+  });
+  const prevTimes = times.filter(t => t < curOffset - 0.05).sort((a,b) => b - a);
+  if (prevTimes.length > 0) {
+    seekToTime(clip.start + prevTimes[0]);
+  }
+});
+
+document.getElementById('btn-kf-jump-next')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip || !selectedClip.clip.keyframes) return;
+  const clip = selectedClip.clip;
+  const curOffset = Math.max(0, currentTime - clip.start);
+  const times = [];
+  Object.values(clip.keyframes).forEach(arr => {
+    if (Array.isArray(arr)) arr.forEach(k => times.push(k.time));
+  });
+  const nextTimes = times.filter(t => t > curOffset + 0.05).sort((a,b) => a - b);
+  if (nextTimes.length > 0) {
+    seekToTime(clip.start + nextTimes[0]);
+  }
+});
+
+document.getElementById('inspector-kf-easing')?.addEventListener('change', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.kfEasing = e.target.value;
+    recordState(`Set Keyframe Easing to ${e.target.value}`);
+    renderCanvas();
+  }
+});
+
+// ==================== COLOR PIPELINE & COMPOSITING MATH ====================
+document.getElementById('inspector-lut-select')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  if (e.target.value === 'custom') {
+    document.getElementById('input-custom-cube-lut')?.click();
+    return;
+  }
+  selectedClip.clip.lut = e.target.value;
+  recordState('Set 3D Film LUT Preset');
+  renderCanvas();
+});
+
+document.getElementById('input-custom-cube-lut')?.addEventListener('change', (e) => {
+  const file = e.target.files?.[0];
+  if (!file || !selectedClip || !selectedClip.clip) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    selectedClip.clip.lut = 'custom';
+    selectedClip.clip.customLutData = evt.target.result;
+    showTextTimingAlert(`Loaded 3D LUT "${file.name}"`, 'success');
+    renderCanvas();
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('inspector-blend-mode')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  selectedClip.clip.blendMode = e.target.value;
+  recordState('Set Blend Mode');
+  renderCanvas();
+});
+
+['lift', 'gamma', 'gain', 'temp', 'sat'].forEach(param => {
+  const slider = document.getElementById(`inspector-${param}-slider`);
+  const valLabel = document.getElementById(`inspector-${param}-val`);
+  slider?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    if (valLabel) valLabel.textContent = param === 'sat' ? `${val}%` : `${val}`;
+    if (!selectedClip || !selectedClip.clip) return;
+    if (param === 'lift') selectedClip.clip.lift = val;
+    if (param === 'gamma') selectedClip.clip.gamma = val;
+    if (param === 'gain') selectedClip.clip.gain = val;
+    if (param === 'temp') selectedClip.clip.temperature = val;
+    if (param === 'sat') selectedClip.clip.saturation = val;
+    renderCanvas();
+  });
+});
+
+document.getElementById('btn-reset-clip-color')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  clip.lift = 0;
+  clip.gamma = 0;
+  clip.gain = 0;
+  clip.temperature = 0;
+  clip.saturation = 100;
+  clip.lut = 'none';
+  clip.blendMode = 'normal';
+  selectClip(clip, selectedClip.trackType);
+  renderCanvas();
+  showTextTimingAlert('Reset color grading to Rec.709 neutral', 'info');
+});
+
+// ==================== PROXY MODE TOGGLE ====================
+const btnToggleProxy = document.getElementById('btn-toggle-proxy');
+const labelProxyStatus = document.getElementById('label-proxy-status');
+
+if (btnToggleProxy) {
+  const updateProxyBtnUI = () => {
+    btnToggleProxy.classList.toggle('active', isProxyModeEnabled);
+    if (labelProxyStatus) {
+      labelProxyStatus.textContent = isProxyModeEnabled ? 'Proxy 540p' : 'Full-Res';
+    }
+  };
+  updateProxyBtnUI();
+
+  btnToggleProxy.addEventListener('click', () => {
+    isProxyModeEnabled = !isProxyModeEnabled;
+    localStorage.setItem('magnates_proxy_mode', isProxyModeEnabled);
+    updateProxyBtnUI();
+    mediaElementCache.clear(); // Clear so elements re-instantiate with proxy or original
+    renderCanvas();
+    showTextTimingAlert(isProxyModeEnabled ? '⚡ Smart Proxy Mode: ON (Zero-Lag Scrubbing)' : 'Full-Resolution Master Playback Active', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+}
+
+// ==================== NLE PRESET SHORTCUTS MANAGER ====================
+let activeNlePreset = localStorage.getItem('magnates_nle_preset') || 'magnates';
+
+const NLE_PRESETS = {
+  magnates: {
+    name: 'Magnates Studio (Default)',
+    shortcuts: [
+      { action: 'Play / Pause', key: 'Space' },
+      { action: 'Selection Arrow Tool', key: 'V' },
+      { action: 'Razor Split at Playhead', key: 'S' },
+      { action: 'Slip Tool (Slide In/Out Offsets)', key: 'Y' },
+      { action: 'Slide Tool (Move Clip Rolling Cuts)', key: 'U' },
+      { action: 'Ripple Trim Head to Playhead', key: 'Q' },
+      { action: 'Ripple Trim Tail to Playhead', key: 'W' },
+      { action: 'Shuttle Reverse / Pause / Forward', key: 'J / K / L' },
+      { action: 'Frame-Accurate Stepping', key: '← / → (Shift: 10 frames)' },
+      { action: 'Cut / Copy / Paste Clip', key: 'Cmd/Ctrl + X / C / V' },
+      { action: 'Undo / Redo Atomic State', key: 'Cmd/Ctrl + Z / Y' },
+      { action: 'Delete Selected Clip', key: 'Del / Backspace' },
+      { action: 'Toggle Smart Proxy Mode', key: 'P' },
+      { action: 'Add / Remove Keyframe', key: 'K' }
+    ]
+  },
+  premiere: {
+    name: 'Adobe Premiere Pro',
+    shortcuts: [
+      { action: 'Play / Pause', key: 'Space' },
+      { action: 'Selection Tool', key: 'V' },
+      { action: 'Razor Tool (Split)', key: 'C' },
+      { action: 'Add Edit (Split Clip)', key: 'Cmd/Ctrl + K' },
+      { action: 'Slip Tool', key: 'Y' },
+      { action: 'Slide Tool', key: 'U' },
+      { action: 'Ripple Trim Previous Edit', key: 'Q' },
+      { action: 'Ripple Trim Next Edit', key: 'W' },
+      { action: 'Shuttle Reverse / Stop / Forward', key: 'J / K / L' },
+      { action: 'Step 1 Frame', key: '← / →' },
+      { action: 'Ripple Delete', key: 'Shift + Del' }
+    ]
+  },
+  fcpx: {
+    name: 'Final Cut Pro',
+    shortcuts: [
+      { action: 'Play / Pause', key: 'Space' },
+      { action: 'Select Tool', key: 'A' },
+      { action: 'Blade Tool (Split)', key: 'B' },
+      { action: 'Trim / Slip Tool', key: 'T' },
+      { action: 'Trim Start to Playhead', key: 'Option + [' },
+      { action: 'Trim End to Playhead', key: 'Option + ]' },
+      { action: 'Shuttle Left / Stop / Right', key: 'J / K / L' },
+      { action: 'Step 1 Frame', key: '← / →' }
+    ]
+  },
+  davinci: {
+    name: 'DaVinci Resolve',
+    shortcuts: [
+      { action: 'Play / Pause', key: 'Space' },
+      { action: 'Normal Edit / Selection', key: 'A' },
+      { action: 'Blade Edit Mode', key: 'B' },
+      { action: 'Split Clip at Playhead', key: 'Cmd/Ctrl + B' },
+      { action: 'Slip / Slide Mode', key: 'T' },
+      { action: 'Ripple Start to Playhead', key: 'Shift + [' },
+      { action: 'Ripple End to Playhead', key: 'Shift + ]' },
+      { action: 'Shuttle Controls', key: 'J / K / L' }
+    ]
+  }
+};
+
+function renderHotkeysTable(presetKey) {
+  const tableBody = document.getElementById('hotkeys-table-body');
+  if (!tableBody) return;
+  const preset = NLE_PRESETS[presetKey] || NLE_PRESETS.magnates;
+  tableBody.innerHTML = '';
+  preset.shortcuts.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+    tr.innerHTML = `
+      <td style="padding: 9px 12px; font-weight: 500;">${s.action}</td>
+      <td style="padding: 9px 12px; text-align: right;"><kbd>${s.key}</kbd></td>
+    `;
+    tableBody.appendChild(tr);
+  });
+}
+
+function openHotkeysModal() {
+  const modal = document.getElementById('modal-hotkeys');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  document.querySelectorAll('.nle-preset-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.preset === activeNlePreset);
+  });
+  renderHotkeysTable(activeNlePreset);
+}
+
+document.getElementById('btn-open-hotkeys')?.addEventListener('click', openHotkeysModal);
+document.getElementById('btn-close-hotkeys-modal')?.addEventListener('click', () => {
+  document.getElementById('modal-hotkeys').style.display = 'none';
+});
+
+document.querySelectorAll('.nle-preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nle-preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeNlePreset = btn.dataset.preset;
+    renderHotkeysTable(activeNlePreset);
+  });
+});
+
+document.getElementById('btn-save-hotkeys-preset')?.addEventListener('click', () => {
+  localStorage.setItem('magnates_nle_preset', activeNlePreset);
+  document.getElementById('modal-hotkeys').style.display = 'none';
+  showTextTimingAlert(`Applied ${NLE_PRESETS[activeNlePreset]?.name || activeNlePreset} layout!`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2200);
+});
+
+// ==================== CURVE / GRAPH EDITOR MODAL ====================
+let activeCurvePreset = 'easeInOutCubic';
+let activeCurveTension = 0.5;
+
+function drawCurveGraphCanvas() {
+  const c = document.getElementById('curve-graph-canvas');
+  if (!c) return;
+  const ctx2 = c.getContext('2d');
+  const w = c.width;
+  const h = c.height;
+
+  ctx2.clearRect(0, 0, w, h);
+
+  // Background Grid Lines
+  ctx2.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctx2.lineWidth = 1;
+  for (let x = 40; x < w; x += 40) {
+    ctx2.beginPath();
+    ctx2.moveTo(x, 0);
+    ctx2.lineTo(x, h);
+    ctx2.stroke();
+  }
+  for (let y = 30; y < h; y += 30) {
+    ctx2.beginPath();
+    ctx2.moveTo(0, y);
+    ctx2.lineTo(w, y);
+    ctx2.stroke();
+  }
+
+  // Draw Interpolation Curve
+  ctx2.strokeStyle = '#00f0ff';
+  ctx2.lineWidth = 3;
+  ctx2.shadowColor = 'rgba(0, 240, 255, 0.6)';
+  ctx2.shadowBlur = 8;
+  ctx2.beginPath();
+
+  const padX = 30;
+  const padY = 30;
+  const graphW = w - padX * 2;
+  const graphH = h - padY * 2;
+
+  for (let i = 0; i <= 100; i++) {
+    const t = i / 100;
+    let val = t;
+    if (activeCurvePreset === 'easeInOutCubic') {
+      val = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    } else if (activeCurvePreset === 'spring') {
+      val = Math.sin(t * Math.PI * 2) * (1 - t) + t;
+    } else if (activeCurvePreset === 'easeOutBack') {
+      const c1 = 1.70158 * activeCurveTension * 2;
+      const c3 = c1 + 1;
+      val = 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+    }
+    const px = padX + t * graphW;
+    const py = padY + graphH - val * graphH;
+    if (i === 0) ctx2.moveTo(px, py);
+    else ctx2.lineTo(px, py);
+  }
+  ctx2.stroke();
+
+  // Draw End Points (Diamonds)
+  ctx2.fillStyle = '#ffd000';
+  ctx2.shadowColor = '#ffd000';
+  ctx2.shadowBlur = 10;
+  const pts = [
+    { x: padX, y: padY + graphH },
+    { x: padX + graphW, y: padY }
+  ];
+  pts.forEach(pt => {
+    ctx2.beginPath();
+    ctx2.arc(pt.x, pt.y, 5, 0, Math.PI * 2);
+    ctx2.fill();
+  });
+}
+
+function openCurveEditorModal() {
+  const modal = document.getElementById('modal-curve-editor');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  drawCurveGraphCanvas();
+}
+
+document.getElementById('btn-open-curve-editor')?.addEventListener('click', openCurveEditorModal);
+document.getElementById('btn-close-curve-modal')?.addEventListener('click', () => {
+  document.getElementById('modal-curve-editor').style.display = 'none';
+});
+document.getElementById('btn-cancel-curve-modal')?.addEventListener('click', () => {
+  document.getElementById('modal-curve-editor').style.display = 'none';
+});
+
+document.querySelectorAll('.curve-preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.curve-preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCurvePreset = btn.dataset.curve;
+    drawCurveGraphCanvas();
+  });
+});
+
+document.getElementById('curve-tension-slider')?.addEventListener('input', (e) => {
+  activeCurveTension = parseInt(e.target.value) / 100;
+  document.getElementById('curve-tension-val').textContent = activeCurveTension.toFixed(2);
+  drawCurveGraphCanvas();
+});
+
+document.getElementById('btn-apply-curve-modal')?.addEventListener('click', () => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.kfEasing = activeCurvePreset;
+    const select = document.getElementById('inspector-kf-easing');
+    if (select) select.value = activeCurvePreset === 'easeInOutCubic' ? 'ease' : (activeCurvePreset === 'spring' ? 'spring' : 'bezier');
+    renderCanvas();
+    showTextTimingAlert(`Applied ${activeCurvePreset} curve interpolation!`, 'success');
+  }
+  document.getElementById('modal-curve-editor').style.display = 'none';
 });
 
 // ==================== SIDEBAR INSPECTOR: TRANSITIONS & MOTION ====================
@@ -15672,17 +16506,81 @@ document.getElementById('tool-trim-right')?.addEventListener('click', () => exec
 document.getElementById('tool-cut')?.addEventListener('click', () => executeStudioCut());
 document.getElementById('tool-delete')?.addEventListener('click', () => executeStudioDelete());
 
-// Keyboard shortcuts: Q (Trim Start), W (Trim End), S (Split), V (Select), Ctrl+X (Cut), Ctrl+C (Copy), Ctrl+V (Paste)
+// Professional NLE Keyboard Shortcuts Engine
 window.addEventListener('keydown', (e) => {
   const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable;
   if (isInput) return;
 
   const key = e.key.toLowerCase();
+  const isCmdOrCtrl = e.ctrlKey || e.metaKey;
 
-  if ((e.ctrlKey || e.metaKey) && key === 'x') {
+  // Open Hotkeys modal (Cmd + /)
+  if (isCmdOrCtrl && e.key === '/') {
+    e.preventDefault();
+    openHotkeysModal();
+    return;
+  }
+
+  // Toggle Proxy mode (P)
+  if (!isCmdOrCtrl && key === 'p') {
+    e.preventDefault();
+    document.getElementById('btn-toggle-proxy')?.click();
+    return;
+  }
+
+  // Play / Pause (Space)
+  if (e.code === 'Space') {
+    e.preventDefault();
+    document.getElementById('btn-play')?.click();
+    return;
+  }
+
+  // Frame-accurate step backward / forward (ArrowLeft / ArrowRight)
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const step = e.shiftKey ? (10 / 30) : (1 / 30);
+    seekToTime(Math.max(0, currentTime - step));
+    return;
+  }
+  if (e.key === 'ArrowRight') {
+    e.preventDefault();
+    const step = e.shiftKey ? (10 / 30) : (1 / 30);
+    seekToTime(Math.min(duration, currentTime + step));
+    return;
+  }
+
+  // J-K-L Shuttle Navigation
+  if (!isCmdOrCtrl) {
+    if (key === 'j') {
+      e.preventDefault();
+      seekToTime(Math.max(0, currentTime - 0.5));
+      showTextTimingAlert('Shuttle: Reverse (J)', 'info');
+      return;
+    }
+    if (key === 'k') {
+      e.preventDefault();
+      if (isPlaying) document.getElementById('btn-play')?.click();
+      showTextTimingAlert('Shuttle: Pause (K)', 'info');
+      return;
+    }
+    if (key === 'l') {
+      e.preventDefault();
+      if (!isPlaying) {
+        document.getElementById('btn-play')?.click();
+      } else {
+        seekToTime(Math.min(duration, currentTime + 0.5));
+      }
+      showTextTimingAlert('Shuttle: Forward (L)', 'info');
+      return;
+    }
+  }
+
+  // Clipboard
+  if (isCmdOrCtrl && key === 'x') {
     e.preventDefault();
     executeStudioCut();
-  } else if ((e.ctrlKey || e.metaKey) && key === 'c') {
+    return;
+  } else if (isCmdOrCtrl && key === 'c') {
     if (selectedClip && selectedClip.clip) {
       window._studioClipboard = {
         trackType: selectedClip.trackType,
@@ -15691,19 +16589,60 @@ window.addEventListener('keydown', (e) => {
       showTextTimingAlert('Clip copied to clipboard.', 'info');
       setTimeout(() => showTextTimingAlert(''), 1500);
     }
-  } else if ((e.ctrlKey || e.metaKey) && key === 'v') {
+    return;
+  } else if (isCmdOrCtrl && key === 'v') {
     e.preventDefault();
     executeStudioPaste();
-  } else if (key === 'q') {
-    executeStudioTrimStart();
-  } else if (key === 'w') {
-    executeStudioTrimEnd();
-  } else if (key === 's') {
+    return;
+  }
+
+  // Tools & Actions based on active NLE layout:
+  // 1. Slip Tool (Y or T in FCPX/DaVinci)
+  if (key === 'y' || (['fcpx', 'davinci'].includes(activeNlePreset) && key === 't')) {
+    setStudioTool('slip');
+    showTextTimingAlert('Slip Tool Active: Drag inside clip to slip content', 'info');
+    return;
+  }
+
+  // 2. Slide Tool (U)
+  if (key === 'u') {
+    setStudioTool('slide');
+    showTextTimingAlert('Slide Tool Active: Drag clip along timeline', 'info');
+    return;
+  }
+
+  // 3. Razor / Split Tool & Add Edit
+  const isSplitKey = key === 's' ||
+    (activeNlePreset === 'premiere' && (key === 'c' || (isCmdOrCtrl && key === 'k'))) ||
+    (['fcpx', 'davinci'].includes(activeNlePreset) && (key === 'b' || (isCmdOrCtrl && key === 'b')));
+
+  if (isSplitKey) {
+    e.preventDefault();
     executeStudioSplit();
-  } else if (key === 'v') {
+    return;
+  }
+
+  // 4. Select Tool
+  const isSelectKey = key === 'v' || (['fcpx', 'davinci'].includes(activeNlePreset) && key === 'a');
+  if (isSelectKey) {
     setStudioTool('select');
-  } else if (e.key === 'Delete' || e.key === 'Backspace') {
+    return;
+  }
+
+  // 5. Ripple Trims
+  if (key === 'q' || (e.altKey && e.key === '[')) {
+    executeStudioTrimStart();
+    return;
+  }
+  if (key === 'w' || (e.altKey && e.key === ']')) {
+    executeStudioTrimEnd();
+    return;
+  }
+
+  // 6. Delete
+  if (e.key === 'Delete' || e.key === 'Backspace') {
     executeStudioDelete();
+    return;
   }
 });
 

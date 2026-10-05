@@ -5596,3 +5596,139 @@ canvas.tool-draw {
   height: 15px;
   fill: currentColor;
 }
+
+/* ==========================================================================
+   Temporal Keyframing, Curve Graph Editor & Pro NLE Hotkeys UI
+   ========================================================================== */
+
+/* Keyframe Property Diamonds in Inspector */
+.kf-prop-diamond {
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s ease;
+}
+
+.kf-prop-diamond:hover {
+  border-color: #00f0ff;
+  color: #00f0ff;
+  background: rgba(0, 240, 255, 0.1);
+}
+
+.kf-prop-diamond.active {
+  border-color: #00f0ff;
+  background: #00f0ff;
+  color: #0a0b0e;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+  font-weight: bold;
+}
+
+/* Timeline Clip Keyframe Diamond Markers */
+.clip-kf-lane {
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.clip-kf-marker {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  transform: translate(-50%, 0) rotate(45deg);
+  background: #00f0ff;
+  border: 1px solid #000;
+  border-radius: 1px;
+  box-shadow: 0 0 4px rgba(0, 240, 255, 0.8);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.clip-kf-marker:hover {
+  transform: translate(-50%, 0) rotate(45deg) scale(1.4);
+  background: #ffd000;
+  box-shadow: 0 0 6px #ffd000;
+}
+
+/* Micro Presets (Bitrate, Keyframe jump, Curves) */
+.btn-micro-preset {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 3px 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-micro-preset:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-micro-preset.active {
+  background: rgba(0, 240, 255, 0.15);
+  border-color: #00f0ff;
+  color: #00f0ff;
+  font-weight: 600;
+}
+
+/* Hotkey Modal Kbd Badges */
+kbd {
+  display: inline-block;
+  padding: 3px 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Mono", "Segoe UI Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #e2e8f0;
+  background-color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.4);
+  margin: 0 2px;
+}
+
+.nle-preset-btn {
+  transition: all 0.18s ease;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.nle-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+.nle-preset-btn.active {
+  background: rgba(0, 240, 255, 0.15) !important;
+  border-color: #00f0ff !important;
+  color: #00f0ff !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+/* Slip & Slide Cursor feedback */
+body.tool-slip-active {
+  cursor: ew-resize !important;
+}
+
+body.tool-slide-active {
+  cursor: col-resize !important;
+}
+
