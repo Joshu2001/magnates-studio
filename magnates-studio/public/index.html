@@ -34,6 +34,10 @@
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></svg>
           Save Project
         </button>
+        <button class="btn btn-secondary" id="btn-save-as-template" title="Save current project structure & styling as reusable template" style="border-color: rgba(0, 240, 255, 0.4); color: #00f0ff;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Save as Template
+        </button>
         <button class="btn btn-primary" id="btn-export">
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
           Export Video
@@ -103,7 +107,10 @@
             <button type="button" class="media-pill-btn" data-pill="charts">Charts</button>
             <button type="button" class="media-pill-btn" data-pill="icons">Icons</button>
             <button type="button" class="media-pill-btn" data-pill="layers">Layers</button>
-            <button type="button" class="media-pill-btn" data-pill="images">Images</button>
+            <button type="button" class="media-pill-btn" data-pill="templates" style="display:inline-flex; align-items:center; gap:4px;">
+              <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+              <span>Templates</span>
+            </button>
             <button type="button" class="media-pill-btn" data-pill="projects" style="display:inline-flex; align-items:center; gap:4px;">
               <svg viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
               <span>Projects</span>
@@ -138,7 +145,33 @@
           </div>
         </div>
 
-        <!-- Dedicated Charts & Infographics Library Panel -->
+        <!-- Dedicated Templates Library Panel -->
+        <div id="templates-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
+          <div class="layers-header-row" style="padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(0,240,255,0.03);">
+            <div class="layers-header-title" style="display:flex; align-items:center; gap:6px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" style="width:14px; height:14px; fill:#00f0ff;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+              <span style="font-weight:700; font-size:12px; color:#fff; letter-spacing:0.3px;">Templates Hub</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button type="button" class="btn-add-layer-pill" id="btn-save-as-template-panel" title="Save current edit as custom template" style="background: rgba(0,240,255,0.12); border: 1px solid rgba(0,240,255,0.3); border-radius:6px; font-size:11px; padding:3px 8px; color:#00f0ff;">
+                <svg class="ui-icon" viewBox="0 0 24 24" style="width:11px; height:11px; fill:currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                <span>Save Current</span>
+              </button>
+            </div>
+          </div>
+          <!-- Template Category filter tabs -->
+          <div style="display: flex; gap: 4px; padding: 8px 10px; overflow-x: auto; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05);" id="templates-category-tabs">
+            <button type="button" class="template-filter-tab active" data-cat="all">All</button>
+            <button type="button" class="template-filter-tab" data-cat="custom">My Custom</button>
+            <button type="button" class="template-filter-tab" data-cat="tiktok_reels">TikTok / Reels</button>
+            <button type="button" class="template-filter-tab" data-cat="vlog">Vlog & Story</button>
+            <button type="button" class="template-filter-tab" data-cat="promo">Product Promo</button>
+            <button type="button" class="template-filter-tab" data-cat="kinetic">Kinetic Quote</button>
+          </div>
+          <div id="templates-list-container" style="flex:1; overflow-y:auto; padding:10px 8px; display:flex; flex-direction:column; gap:10px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
         <div id="charts-panel-container" style="display: none; flex: 1; flex-direction: column; overflow: hidden;">
           <div class="layers-header-row">
             <div class="layers-header-title">
@@ -3361,6 +3394,132 @@
       <div class="modal-footer" style="padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; gap: 8px; background: rgba(255,255,255,0.02);">
         <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-curve-modal">Close</button>
         <button type="button" class="btn btn-primary btn-sm" id="btn-apply-curve-modal">Apply Curve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save As Template Modal -->
+  <div id="modal-save-template" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 520px; width: 90%; background: #131722; border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.85); overflow: hidden; display: flex; flex-direction: column;">
+      <div class="modal-header" style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(0,240,255,0.04);">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #00f0ff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Save as Reusable Template</h3>
+        </div>
+        <button type="button" class="btn-apple-icon" id="btn-close-save-template-modal" style="width: 26px; height: 26px;">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Template Title</label>
+          <input type="text" id="tpl-input-name" placeholder="e.g. Viral Hook + Cyber Background + Stat Chart" style="width: 100%; background: #090c13; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;">
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Category</label>
+          <select id="tpl-select-category" style="width: 100%; background: #090c13; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;">
+            <option value="custom">My Custom Templates</option>
+            <option value="tiktok_reels">TikTok / Reels / Shorts (Vertical 9:16)</option>
+            <option value="vlog">Vlog &amp; Cinematic Story (16:9)</option>
+            <option value="promo">Product Promo &amp; Explainer</option>
+            <option value="kinetic">Kinetic Quote &amp; Typography</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Short Description / How to use</label>
+          <input type="text" id="tpl-input-desc" placeholder="e.g. Fast 3-second hook with audio swoosh, replace slot 1 with video" style="width: 100%; background: #090c13; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;">
+        </div>
+
+        <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.15); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #94a3b8; line-height: 1.4;">
+          💡 <strong style="color: #00f0ff;">Slot Generator:</strong> Your current video, image, chart, and text clips will automatically be converted into replaceable template slots so beginners can swap footage with 1 click!
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; gap: 8px; background: rgba(255,255,255,0.02);">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-save-template">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-save-template" style="background: #00f0ff; color: #000; font-weight: 700;">Save Template</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Beginner "Start With What You Have" Onboarding Wizard Modal -->
+  <div id="modal-beginner-onboarding" class="modal-backdrop" style="display: none;">
+    <div class="modal-card" style="max-width: 680px; width: 92%; background: #11141e; border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; box-shadow: 0 25px 80px rgba(0,0,0,0.9); overflow: hidden; display: flex; flex-direction: column;">
+      <div class="modal-header" style="padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, rgba(0,240,255,0.08), rgba(255,51,75,0.05));">
+        <div>
+          <span style="font-size: 10px; font-weight: 700; color: #00f0ff; text-transform: uppercase; letter-spacing: 1px;">Magnates Studio Guided Creator</span>
+          <h2 style="margin: 4px 0 0 0; font-size: 17px; font-weight: 800; color: #fff;">What are you starting with today?</h2>
+        </div>
+        <button type="button" class="btn-apple-icon" id="btn-close-onboarding-modal" style="width: 28px; height: 28px;">✕</button>
+      </div>
+
+      <div class="modal-body" style="padding: 22px 24px; display: flex; flex-direction: column; gap: 18px;">
+        <p style="margin: 0; font-size: 12.5px; color: #94a3b8; line-height: 1.5;">
+          Select your media ingredients below. We will instantly recommend templates engineered to match your content:
+        </p>
+
+        <!-- Ingredient choices grid -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;" id="onboarding-choices-grid">
+          <div class="onboarding-asset-card active" data-has="video">
+            <div class="onboarding-card-icon" style="background: rgba(0,240,255,0.12); color: #00f0ff;">
+              <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path fill="currentColor" d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+            </div>
+            <div>
+              <div class="onboarding-card-title">I have Video Clips</div>
+              <div class="onboarding-card-desc">Recorded phone clips, screen captures, or b-roll</div>
+            </div>
+            <input type="checkbox" class="onboarding-check" checked>
+          </div>
+
+          <div class="onboarding-asset-card" data-has="image">
+            <div class="onboarding-card-icon" style="background: rgba(255,208,0,0.12); color: #ffd000;">
+              <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            </div>
+            <div>
+              <div class="onboarding-card-title">I have Photos / Images</div>
+              <div class="onboarding-card-desc">Product shots, screenshots, graphics or logos</div>
+            </div>
+            <input type="checkbox" class="onboarding-check">
+          </div>
+
+          <div class="onboarding-asset-card" data-has="audio">
+            <div class="onboarding-card-icon" style="background: rgba(37,211,102,0.12); color: #25d366;">
+              <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+            <div>
+              <div class="onboarding-card-title">I have Voiceover / Audio</div>
+              <div class="onboarding-card-desc">A voice recording, podcast segment, or music track</div>
+            </div>
+            <input type="checkbox" class="onboarding-check">
+          </div>
+
+          <div class="onboarding-asset-card" data-has="text">
+            <div class="onboarding-card-icon" style="background: rgba(255,51,75,0.12); color: #ff334b;">
+              <svg viewBox="0 0 24 24" style="width:18px; height:18px;"><path fill="currentColor" d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"/></svg>
+            </div>
+            <div>
+              <div class="onboarding-card-title">I only have Text &amp; Ideas</div>
+              <div class="onboarding-card-desc">Quotes, statements, lists or statistics to animate</div>
+            </div>
+            <input type="checkbox" class="onboarding-check">
+          </div>
+        </div>
+
+        <!-- Recommended templates preview row -->
+        <div>
+          <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">
+            Recommended Templates Matching Your Assets:
+          </div>
+          <div id="onboarding-recommended-templates" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 14px 24px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-skip-onboarding">Start with Empty Canvas</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-view-all-templates-onboarding" style="background: #00f0ff; color: #000; font-weight: 700;">Browse All Templates</button>
       </div>
     </div>
   </div>

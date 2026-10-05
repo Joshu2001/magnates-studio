@@ -180,6 +180,62 @@ app.post('/api/project/state', (req, res) => {
   }
 });
 
+// Templates persistence endpoints
+const templatesFile = path.join(__dirname, 'templates_state.json');
+
+app.get('/api/templates', (req, res) => {
+  try {
+    if (fs.existsSync(templatesFile)) {
+      const data = fs.readFileSync(templatesFile, 'utf8');
+      res.json({ success: true, templates: JSON.parse(data) });
+    } else {
+      res.json({ success: true, templates: [] });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message, templates: [] });
+  }
+});
+
+app.post('/api/templates', (req, res) => {
+  try {
+    const newTemplate = req.body;
+    if (!newTemplate || !newTemplate.id || !newTemplate.name) {
+      return res.status(400).json({ success: false, error: 'Invalid template payload' });
+    }
+    let list = [];
+    if (fs.existsSync(templatesFile)) {
+      try {
+        list = JSON.parse(fs.readFileSync(templatesFile, 'utf8'));
+      } catch (e) { list = []; }
+    }
+    const existingIdx = list.findIndex(t => t.id === newTemplate.id);
+    if (existingIdx >= 0) {
+      list[existingIdx] = newTemplate;
+    } else {
+      list.unshift(newTemplate);
+    }
+    fs.writeFileSync(templatesFile, JSON.stringify(list, null, 2), 'utf8');
+    res.json({ success: true, message: 'Template saved successfully', template: newTemplate });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.delete('/api/templates/:id', (req, res) => {
+  try {
+    const templateId = req.params.id;
+    if (!fs.existsSync(templatesFile)) {
+      return res.json({ success: true });
+    }
+    let list = JSON.parse(fs.readFileSync(templatesFile, 'utf8'));
+    list = list.filter(t => t.id !== templateId);
+    fs.writeFileSync(templatesFile, JSON.stringify(list, null, 2), 'utf8');
+    res.json({ success: true, message: 'Template deleted' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Server-side Universal Video Transcoder & Export Processor
 const { exec } = require('child_process');
 

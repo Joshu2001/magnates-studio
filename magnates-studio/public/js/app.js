@@ -5163,14 +5163,27 @@ function switchMediaCategory(targetCategory) {
   const chartsPanelEl = document.getElementById('charts-panel-container');
   const iconsPanelEl = document.getElementById('icons-panel-container');
   const projectsPanelEl = document.getElementById('projects-panel-container');
+  const templatesPanelEl = document.getElementById('templates-panel-container');
 
   if (projectsPanelEl) projectsPanelEl.style.display = 'none';
+  if (templatesPanelEl) templatesPanelEl.style.display = 'none';
 
-  if (currentFilter === 'projects') {
+  if (currentFilter === 'templates') {
     if (mediaListEl) mediaListEl.style.display = 'none';
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (projectsPanelEl) projectsPanelEl.style.display = 'none';
+    if (templatesPanelEl) {
+      templatesPanelEl.style.display = 'flex';
+      renderTemplatesHub();
+    }
+  } else if (currentFilter === 'projects') {
+    if (mediaListEl) mediaListEl.style.display = 'none';
+    if (layersPanelEl) layersPanelEl.style.display = 'none';
+    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
     if (projectsPanelEl) {
       projectsPanelEl.style.display = 'flex';
       renderProjectsPanel();
@@ -5179,6 +5192,7 @@ function switchMediaCategory(targetCategory) {
     if (mediaListEl) mediaListEl.style.display = 'none';
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
     if (chartsPanelEl) {
       chartsPanelEl.style.display = 'flex';
       renderChartsTemplatesPanel();
@@ -5187,6 +5201,7 @@ function switchMediaCategory(targetCategory) {
     if (mediaListEl) mediaListEl.style.display = 'none';
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
     if (iconsPanelEl) {
       iconsPanelEl.style.display = 'flex';
       renderIconsLibraryPanel();
@@ -5195,6 +5210,7 @@ function switchMediaCategory(targetCategory) {
     if (mediaListEl) mediaListEl.style.display = 'none';
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
     if (layersPanelEl) {
       layersPanelEl.style.display = 'flex';
       renderLayersPanel();
@@ -5203,6 +5219,7 @@ function switchMediaCategory(targetCategory) {
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
     if (mediaListEl) {
       mediaListEl.style.display = 'flex';
       renderMediaList(currentFilter);
@@ -19111,4 +19128,499 @@ if (document.readyState === 'loading') {
 } else {
   initQuoteCardListeners();
 }
+
+// ==============================================================================
+// BEGINNER TEMPLATE SYSTEM & CUSTOM TEMPLATE GENERATOR
+// ==============================================================================
+const STORAGE_KEY_TEMPLATES_LIST = 'magnates_user_templates_v1';
+let currentTemplateCategoryFilter = 'all';
+
+// Built-in Curated Templates Engineered for Beginners
+const BUILTIN_TEMPLATES = [
+  {
+    id: 'tpl_tiktok_hook_viral',
+    name: 'TikTok / Reels Viral Hook & Drop',
+    category: 'tiktok_reels',
+    badge: '9:16 Vertical',
+    aspectRatio: '9:16',
+    duration: 12,
+    description: 'Punchy 3-second hook video with kinetic headline, followed by highlight showcase and CTA.',
+    requires: ['video', 'audio'],
+    slots: [
+      { id: 'slot-1', type: 'video', label: 'Hook Video Clip', duration: 3.5, hint: 'High-energy opener (first 3s)' },
+      { id: 'slot-2', type: 'video', label: 'Main Showcase Video', duration: 6.0, hint: 'Core action or product demo' },
+      { id: 'slot-3', type: 'text', label: 'Punchy Call-To-Action', duration: 2.5, text: 'FOLLOW FOR MORE 🚀' }
+    ],
+    previewBg: 'linear-gradient(135deg, #ff334b, #7928ca)',
+    state: {
+      duration: 12,
+      background: [{ id: 'bg-1', start: 0, duration: 12, bgType: 'cyber_grid', bgColor: '#0a0b0e' }],
+      text: [
+        { id: 'txt-1', start: 0, duration: 3.5, text: 'STOP SCROLLING ⚠️', highlight: 'STOP', fontSize: 58, textColor: '#ffffff', highlightColor: '#ff334b', anim: 'pop', sfx: 'whoosh', position: 'top' },
+        { id: 'txt-2', start: 3.5, duration: 6.0, text: 'Watch What Happens Next', highlight: 'Happens', fontSize: 44, textColor: '#ffffff', highlightColor: '#00f0ff', anim: 'slide', sfx: 'click', position: 'bottom' },
+        { id: 'txt-3', start: 9.5, duration: 2.5, text: 'Follow For Part 2 🚀', highlight: 'Part 2', fontSize: 50, textColor: '#ffffff', highlightColor: '#ffd000', anim: 'pop', sfx: 'whoosh', position: 'center' }
+      ],
+      chart: [],
+      quote: []
+    }
+  },
+  {
+    id: 'tpl_cinematic_vlog_intro',
+    name: 'Cinematic Vlog / Travel Opener',
+    category: 'vlog',
+    badge: '16:9 Cinematic',
+    aspectRatio: '16:9',
+    duration: 15,
+    description: 'Widescreen atmospheric title card with dark slate backdrop, elegant typography and quote.',
+    requires: ['video', 'image'],
+    slots: [
+      { id: 'slot-1', type: 'video', label: 'Opening Establishing Shot', duration: 5.0, hint: 'Scenic drone or landscape' },
+      { id: 'slot-2', type: 'quote', label: 'Narrative Quote Card', duration: 4.5, hint: 'Insightful documentary quote' },
+      { id: 'slot-3', type: 'video', label: 'B-Roll Action Reel', duration: 5.5, hint: 'Fast travel montage' }
+    ],
+    previewBg: 'linear-gradient(135deg, #0d111a, #1a233a)',
+    state: {
+      duration: 15,
+      background: [{ id: 'bg-1', start: 0, duration: 15, bgType: 'dark_slate', bgColor: '#0d111a' }],
+      text: [
+        { id: 'txt-1', start: 0, duration: 5.0, text: 'A JOURNEY INTO THE UNKNOWN', highlight: 'UNKNOWN', fontSize: 60, textColor: '#f8fafc', highlightColor: '#38bdf8', anim: 'fade', sfx: 'camera_shutter', position: 'center' }
+      ],
+      quote: [
+        { id: 'quote-1', start: 5.0, duration: 4.5, quoteText: '"To travel is to live twice."', authorName: 'Magnates Journal', sourceTag: 'Volume IV', bgMode: 'slate', anim: 'fade' }
+      ],
+      chart: []
+    }
+  },
+  {
+    id: 'tpl_product_promo_stats',
+    name: 'Product Promo & Growth Stat',
+    category: 'promo',
+    badge: 'Sales & Growth',
+    aspectRatio: '16:9',
+    duration: 14,
+    description: 'Ideal for startups: showcase product photo/video followed by an animated upward revenue chart.',
+    requires: ['image', 'video'],
+    slots: [
+      { id: 'slot-1', type: 'image', label: 'Product Hero Image', duration: 4.0, hint: 'Transparent PNG or photo' },
+      { id: 'slot-2', type: 'chart', label: 'Metric Infographic Chart', duration: 5.0, hint: 'Bar/Line/Donut stat' },
+      { id: 'slot-3', type: 'text', label: 'Closing Offer Headline', duration: 5.0, text: 'Get 50% Off Today' }
+    ],
+    previewBg: 'linear-gradient(135deg, #00f0ff, #0072ff)',
+    state: {
+      duration: 14,
+      background: [{ id: 'bg-1', start: 0, duration: 14, bgType: 'cyber_grid', bgColor: '#080a10' }],
+      text: [
+        { id: 'txt-1', start: 0, duration: 4.0, text: 'The Future of Content Creation', highlight: 'Future', fontSize: 54, textColor: '#ffffff', highlightColor: '#00f0ff', anim: 'pop', sfx: 'whoosh', position: 'top' },
+        { id: 'txt-2', start: 9.0, duration: 5.0, text: 'Claim Your Early Access Now', highlight: 'Early Access', fontSize: 50, textColor: '#ffffff', highlightColor: '#25d366', anim: 'pop', sfx: 'whoosh', position: 'center' }
+      ],
+      chart: [
+        { id: 'chart-1', start: 4.0, duration: 5.0, chartType: 'bar', title: 'User Retention Surge', labels: ['Q1', 'Q2', 'Q3', 'Q4'], values: [35, 58, 82, 96], barColor: '#00f0ff' }
+      ],
+      quote: []
+    }
+  },
+  {
+    id: 'tpl_kinetic_quote_podcast',
+    name: 'Kinetic Quote & Podcast Voiceover',
+    category: 'kinetic',
+    badge: 'Audio / Quote',
+    aspectRatio: '16:9',
+    duration: 10,
+    description: 'No footage needed! Perfect for voice recordings: animated typography with waveform audio backdrop.',
+    requires: ['audio', 'text'],
+    slots: [
+      { id: 'slot-1', type: 'voiceover', label: 'Voiceover Recording', duration: 10.0, hint: 'Drop recorded speech here' },
+      { id: 'slot-2', type: 'text', label: 'Key Statement Quote', duration: 6.0, text: 'Great things take time.' },
+      { id: 'slot-3', type: 'quote', label: 'Speaker Credit Badge', duration: 4.0, hint: 'Speaker name and role' }
+    ],
+    previewBg: 'linear-gradient(135deg, #f59e0b, #d97706)',
+    state: {
+      duration: 10,
+      background: [{ id: 'bg-1', start: 0, duration: 10, bgType: 'vox_cream', bgColor: '#f4eedb' }],
+      text: [
+        { id: 'txt-1', start: 0, duration: 6.0, text: '“Success is not final, failure is not fatal.”', highlight: 'Success', fontSize: 48, textColor: '#111827', highlightColor: '#ff334b', anim: 'typewriter', sfx: 'click', position: 'center' }
+      ],
+      quote: [
+        { id: 'quote-1', start: 6.0, duration: 4.0, quoteText: 'It is the courage to continue that counts.', authorName: 'Winston Churchill', sourceTag: 'Daily Wisdom', bgMode: 'cream', anim: 'fade' }
+      ],
+      chart: []
+    }
+  }
+];
+
+// Read user custom templates from localStorage & server
+function getCustomTemplates() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_TEMPLATES_LIST);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveCustomTemplates(list) {
+  try {
+    localStorage.setItem(STORAGE_KEY_TEMPLATES_LIST, JSON.stringify(list));
+  } catch (e) {}
+}
+
+function getAllAvailableTemplates() {
+  const custom = getCustomTemplates();
+  return [...custom, ...BUILTIN_TEMPLATES];
+}
+
+// 1. SAVE AS TEMPLATE LOGIC
+function openSaveAsTemplateModal() {
+  const modal = document.getElementById('modal-save-template');
+  if (!modal) return;
+  const nameInput = document.getElementById('tpl-input-name');
+  if (nameInput) {
+    nameInput.value = getCurrentProjectName() + ' Template';
+  }
+  const descInput = document.getElementById('tpl-input-desc');
+  if (descInput) {
+    descInput.value = 'Custom reusable template layout with saved effects';
+  }
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.classList.add('is-open');
+}
+
+function closeSaveAsTemplateModal() {
+  const modal = document.getElementById('modal-save-template');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('is-open');
+  }
+}
+
+async function handleConfirmSaveAsTemplate() {
+  const nameInput = document.getElementById('tpl-input-name');
+  const catSelect = document.getElementById('tpl-select-category');
+  const descInput = document.getElementById('tpl-input-desc');
+
+  const title = (nameInput?.value || '').trim() || 'Custom Template';
+  const category = catSelect?.value || 'custom';
+  const description = (descInput?.value || '').trim() || 'User created template layout';
+
+  // Snapshot current timeline state
+  const rawState = getSerializableClips();
+
+  // Extract slots dynamically from timeline
+  const slots = [];
+  if (timelineClips.video && timelineClips.video.length > 0) {
+    timelineClips.video.forEach((v, idx) => {
+      slots.push({ id: `slot-v-${idx+1}`, type: 'video', label: `Video Clip Slot ${idx+1}`, duration: v.duration || 4 });
+    });
+  }
+  if (timelineClips.image && timelineClips.image.length > 0) {
+    timelineClips.image.forEach((img, idx) => {
+      slots.push({ id: `slot-img-${idx+1}`, type: 'image', label: `Image Slot ${idx+1}`, duration: img.duration || 4 });
+    });
+  }
+  if (timelineClips.text && timelineClips.text.length > 0) {
+    timelineClips.text.forEach((t, idx) => {
+      slots.push({ id: `slot-txt-${idx+1}`, type: 'text', label: `Headline Slot ${idx+1}`, duration: t.duration || 3, text: t.text });
+    });
+  }
+  if (timelineClips.chart && timelineClips.chart.length > 0) {
+    slots.push({ id: 'slot-chart-1', type: 'chart', label: 'Animated Chart Slot', duration: 5 });
+  }
+
+  const newTemplate = {
+    id: 'tpl_custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    name: title,
+    category: category,
+    badge: 'Custom',
+    aspectRatio: '16:9',
+    duration: duration || 15,
+    description: description,
+    requires: ['custom'],
+    isCustom: true,
+    createdAt: Date.now(),
+    slots: slots.length > 0 ? slots : [
+      { id: 'slot-1', type: 'video', label: 'Primary Video Slot', duration: 5 },
+      { id: 'slot-2', type: 'text', label: 'Main Headline Slot', duration: 4 }
+    ],
+    previewBg: 'linear-gradient(135deg, #00f0ff, #a855f7)',
+    state: rawState
+  };
+
+  // Save to localStorage
+  const customList = getCustomTemplates();
+  customList.unshift(newTemplate);
+  saveCustomTemplates(customList);
+
+  // Sync with backend API
+  try {
+    await fetch('/api/templates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTemplate)
+    });
+  } catch (err) {}
+
+  closeSaveAsTemplateModal();
+  playSFX('pop_cork', 0.8);
+  showTextTimingAlert(`Saved "${title}" to Templates!`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+
+  // Refresh template hub view if currently viewing
+  renderTemplatesHub();
+}
+
+// 2. APPLY TEMPLATE TO WORKSPACE
+function applyTemplateToWorkspace(templateId) {
+  const allTemplates = getAllAvailableTemplates();
+  const tpl = allTemplates.find(t => t.id === templateId);
+  if (!tpl) return;
+
+  // Clone template state to protect original
+  const cloned = JSON.parse(JSON.stringify(tpl.state || {}));
+
+  // Create new active project instance from template
+  const newProjName = `${tpl.name} Project`;
+  _currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+
+  if (cloned.text && Array.isArray(cloned.text)) timelineClips.text = cloned.text;
+  else timelineClips.text = [];
+
+  ['chart', 'image', 'video', 'voiceover', 'music', 'background', 'quote'].forEach(track => {
+    if (cloned[track] && Array.isArray(cloned[track])) {
+      timelineClips[track] = cloned[track];
+    } else {
+      timelineClips[track] = [];
+    }
+  });
+
+  if (typeof tpl.duration === 'number') {
+    duration = tpl.duration;
+  }
+  currentTime = 0;
+
+  const nameEl = document.getElementById('current-project');
+  if (nameEl) nameEl.textContent = newProjName;
+  const durBadge = document.getElementById('duration-badge');
+  if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+
+  renderAllTimelineTracks();
+  saveProjectState(false);
+  playSFX('whoosh', 0.7);
+
+  showTextTimingAlert(`Applied Template: "${tpl.name}"! Replace slots or edit now.`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 3000);
+}
+
+// 3. RENDER TEMPLATES HUB
+function renderTemplatesHub() {
+  const container = document.getElementById('templates-list-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const allTemplates = getAllAvailableTemplates();
+  const filtered = currentTemplateCategoryFilter === 'all'
+    ? allTemplates
+    : currentTemplateCategoryFilter === 'custom'
+      ? allTemplates.filter(t => t.isCustom || t.category === 'custom')
+      : allTemplates.filter(t => t.category === currentTemplateCategoryFilter);
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 30px 10px; color: var(--text-muted); font-size: 11.5px;">
+        <svg class="ui-icon" viewBox="0 0 24 24" style="width: 28px; height: 28px; color: rgba(255,255,255,0.2); margin-bottom: 8px;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+        <div>No templates found in this category.</div>
+        <div style="font-size: 10px; margin-top: 4px; color: #64748b;">Click "Save Current" above to make your own!</div>
+      </div>
+    `;
+    return;
+  }
+
+  filtered.forEach(tpl => {
+    const card = document.createElement('div');
+    card.className = 'template-card';
+
+    const slotsCount = (tpl.slots && tpl.slots.length) || 2;
+    const isCustom = !!tpl.isCustom;
+
+    card.innerHTML = `
+      <div class="template-card-preview" style="background: ${tpl.previewBg || '#1e2436'};">
+        <span class="template-card-badge">${tpl.badge || 'Template'}</span>
+        <span class="template-card-duration">${formatTime(tpl.duration || 10)}</span>
+        <div style="font-size: 26px; opacity: 0.85;">✨</div>
+      </div>
+      <div>
+        <h4 class="template-card-title">${tpl.name}</h4>
+        <div class="template-card-desc">${tpl.description || 'Pre-designed high impact video template'}</div>
+      </div>
+      <div class="template-card-meta">
+        <div class="template-slots-badge">
+          <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          <span>${slotsCount} Smart Slots</span>
+        </div>
+        <div style="display: flex; gap: 6px;">
+          ${isCustom ? `<button type="button" class="btn-micro-del tpl-del-btn" title="Delete Template" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:11px;">🗑️</button>` : ''}
+          <button type="button" class="btn btn-secondary btn-sm tpl-use-btn" style="padding: 3px 8px; font-size: 10px; background: rgba(0,240,255,0.15); border-color:#00f0ff; color:#00f0ff; font-weight:700;">Use Template</button>
+        </div>
+      </div>
+    `;
+
+    card.querySelector('.tpl-use-btn')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      applyTemplateToWorkspace(tpl.id);
+    });
+
+    if (isCustom) {
+      card.querySelector('.tpl-del-btn')?.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const conf = await nativeConfirm('Delete Template', `Delete "${tpl.name}" from custom templates?`);
+        if (!conf) return;
+        const currentCustom = getCustomTemplates().filter(t => t.id !== tpl.id);
+        saveCustomTemplates(currentCustom);
+        try { fetch(`/api/templates/${tpl.id}`, { method: 'DELETE' }).catch(() => {}); } catch(e) {}
+        renderTemplatesHub();
+        showTextTimingAlert(`Deleted template "${tpl.name}"`, 'info');
+      });
+    }
+
+    card.addEventListener('click', () => {
+      applyTemplateToWorkspace(tpl.id);
+    });
+
+    container.appendChild(card);
+  });
+}
+
+// 4. BEGINNER ONBOARDING WIZARD ("Start With What You Have")
+function openBeginnerOnboardingModal() {
+  const modal = document.getElementById('modal-beginner-onboarding');
+  if (!modal) return;
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.classList.add('is-open');
+  renderOnboardingRecommendations();
+}
+
+function closeBeginnerOnboardingModal() {
+  const modal = document.getElementById('modal-beginner-onboarding');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('is-open');
+  }
+}
+
+function getSelectedOnboardingAssets() {
+  const cards = document.querySelectorAll('.onboarding-asset-card.active');
+  const assets = [];
+  cards.forEach(c => {
+    if (c.dataset.has) assets.push(c.dataset.has);
+  });
+  return assets;
+}
+
+function renderOnboardingRecommendations() {
+  const recContainer = document.getElementById('onboarding-recommended-templates');
+  if (!recContainer) return;
+  recContainer.innerHTML = '';
+
+  const selectedAssets = getSelectedOnboardingAssets();
+  const allTemplates = getAllAvailableTemplates();
+
+  // Match templates with selected ingredients
+  let matched = allTemplates.filter(tpl => {
+    if (!tpl.requires || tpl.requires.length === 0) return true;
+    return tpl.requires.some(req => selectedAssets.includes(req));
+  });
+
+  if (matched.length === 0) matched = allTemplates.slice(0, 3);
+  else matched = matched.slice(0, 3);
+
+  matched.forEach(tpl => {
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: #181d2c;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: all 0.2s ease;
+    `;
+    card.onmouseover = () => { card.style.borderColor = '#00f0ff'; card.style.transform = 'translateY(-2px)'; };
+    card.onmouseout = () => { card.style.borderColor = 'rgba(255,255,255,0.1)'; card.style.transform = 'none'; };
+
+    card.innerHTML = `
+      <div style="height: 60px; border-radius: 4px; background: ${tpl.previewBg || '#23293e'}; display: flex; align-items: center; justify-content: center; position: relative;">
+        <span style="position: absolute; top: 4px; left: 4px; font-size: 8px; font-weight: 700; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 3px; color: #00f0ff;">${tpl.badge || 'Template'}</span>
+        <span style="font-size: 20px;">🎬</span>
+      </div>
+      <div style="font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.2;">${tpl.name}</div>
+      <div style="font-size: 10px; color: #94a3b8; line-height: 1.3;">${tpl.slots?.length || 2} Replaceable Slots</div>
+      <button type="button" class="btn btn-primary btn-sm" style="margin-top: 4px; font-size: 10.5px; padding: 4px 8px; background: #00f0ff; color: #000; font-weight: 700; border: none;">Use This</button>
+    `;
+
+    card.addEventListener('click', () => {
+      closeBeginnerOnboardingModal();
+      applyTemplateToWorkspace(tpl.id);
+    });
+
+    recContainer.appendChild(card);
+  });
+}
+
+// Initialize Template Engine Listeners
+function initTemplateEngineListeners() {
+  // Top bar "Save as Template" button
+  document.getElementById('btn-save-as-template')?.addEventListener('click', openSaveAsTemplateModal);
+  // Panel "Save Current" button
+  document.getElementById('btn-save-as-template-panel')?.addEventListener('click', openSaveAsTemplateModal);
+
+  // Close Save Template modal
+  document.getElementById('btn-close-save-template-modal')?.addEventListener('click', closeSaveAsTemplateModal);
+  document.getElementById('btn-cancel-save-template')?.addEventListener('click', closeSaveAsTemplateModal);
+  document.getElementById('btn-confirm-save-template')?.addEventListener('click', handleConfirmSaveAsTemplate);
+
+  // Template Category Filter Tabs
+  document.querySelectorAll('#templates-category-tabs .template-filter-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      document.querySelectorAll('#templates-category-tabs .template-filter-tab').forEach(t => t.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      currentTemplateCategoryFilter = e.currentTarget.dataset.cat || 'all';
+      renderTemplatesHub();
+    });
+  });
+
+  // Beginner Onboarding Wizard Listeners
+  document.querySelectorAll('.onboarding-asset-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      card.classList.toggle('active');
+      const chk = card.querySelector('.onboarding-check');
+      if (chk) chk.checked = card.classList.contains('active');
+      renderOnboardingRecommendations();
+    });
+  });
+
+  document.getElementById('btn-close-onboarding-modal')?.addEventListener('click', closeBeginnerOnboardingModal);
+  document.getElementById('btn-skip-onboarding')?.addEventListener('click', closeBeginnerOnboardingModal);
+  document.getElementById('btn-view-all-templates-onboarding')?.addEventListener('click', () => {
+    closeBeginnerOnboardingModal();
+    switchMediaCategory('templates');
+  });
+
+  // Fetch initial templates from server if available
+  fetch('/api/templates')
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.success && Array.isArray(data.templates) && data.templates.length > 0) {
+        saveCustomTemplates(data.templates);
+      }
+    })
+    .catch(() => {});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTemplateEngineListeners);
+} else {
+  initTemplateEngineListeners();
+}
+
 
