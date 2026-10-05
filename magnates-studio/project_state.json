@@ -2,10 +2,10 @@
   "text": [
     {
       "id": "clip-text-1",
-      "start": 8.933333333333334,
+      "start": 0,
       "duration": 5,
-      "text": "Title of aa",
-      "highlight": "aa",
+      "text": "Title of LL",
+      "highlight": "LL",
       "fontFamily": "'Inter', sans-serif",
       "fontSize": 64,
       "textColor": "#ffffff",
@@ -16,280 +16,65 @@
       "zIndex": 30,
       "layerOrder": "front",
       "_renderBounds": {
-        "x": 204,
-        "y": 431.6,
-        "w": 357.8312530517578,
+        "x": 248.81400437636762,
+        "y": 781.1435684647303,
+        "w": 354.8937530517578,
         "h": 108.79999999999995
-      }
-    }
-  ],
-  "chart": [
-    {
-      "id": "clip-chart-1791163967357",
-      "track": "chart",
-      "start": 9.2,
-      "duration": 4.400000000000001,
-      "layerOrder": "front",
-      "zIndex": 25,
-      "x": 0,
-      "y": 0,
-      "scale": 1,
-      "chartConfig": {
-        "type": "area",
-        "title": "COST PER CLICK",
-        "isDual": false,
-        "series1": [
-          48,
-          40,
-          44,
-          28,
-          32,
-          22,
-          28,
-          18,
-          14,
-          8,
-          7,
-          5,
-          4,
-          3,
-          2
-        ],
-        "color": "#ffffff",
-        "drawDuration": 1.6,
-        "glow": true,
-        "fillOpacity": 0.38
       },
-      "file": {
-        "name": "COST PER CLICK.chart",
-        "url": "",
-        "isImage": true
-      }
+      "x": 264.8140043763676,
+      "y": 835.5435684647302
     }
   ],
+  "chart": [],
   "quote": [],
   "image": [
     {
-      "id": "clip-image-1791106192467-941",
+      "id": "clip-image-1791219025096-569",
       "track": "image",
-      "start": 0,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "povrt.png",
-        "url": "/media/uploads/povrt.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791106192587-891",
-      "track": "image",
-      "start": 0,
-      "duration": 6,
+      "start": 0.8000000000000007,
+      "duration": 23.6,
       "volume": 100,
       "soundEnabled": true,
       "layerOrder": "back",
       "zIndex": 20,
       "x": 0,
       "y": 0,
+      "scale": 1.7282222141514658,
+      "zoomEffect": "snap",
+      "zoomScale": 1.7,
+      "zoomStartTime": 9.3,
+      "zoomOriginX": 0.39769530203154635,
+      "zoomOriginY": 0.12075269239612418,
+      "spotlights": [
+        {
+          "rect": {
+            "x": 0.1495304406229213,
+            "y": 0.09472591638409349,
+            "w": 0.4963297228172501,
+            "h": 0.05205355202406139
+          },
+          "style": "white",
+          "dimOpacity": 0.65,
+          "feather": 18,
+          "startTime": 9.3,
+          "duration": 2.5,
+          "_screenBounds": {
+            "x": 88.14695991616622,
+            "y": 46.01702976069564,
+            "w": 1291.0846359663544,
+            "h": 73.77506910931412,
+            "dx": -146.06221705693815,
+            "dy": -62.63504383541192,
+            "finalW": 2212.1244341138763,
+            "finalH": 1205.2700876708238,
+            "punchScale": 1.1759121465175066,
+            "spotIndex": 0
+          }
+        }
+      ],
       "file": {
-        "name": "povrt.png",
-        "url": "/media/uploads/povrt.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108077448-473",
-      "track": "image",
-      "start": 6.1,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108079587-601",
-      "track": "image",
-      "start": 6.1,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108080688-314",
-      "track": "image",
-      "start": 6.1,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108081980-144",
-      "track": "image",
-      "start": 6.1,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108085419-153",
-      "track": "image",
-      "start": 6.1,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108379620-321",
-      "track": "image",
-      "start": 6.1,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108067276-452",
-      "track": "image",
-      "start": 12.933333333333334,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108495998-981",
-      "track": "image",
-      "start": 18.700000000000003,
-      "duration": 6.333333333333332,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "psychological.png",
-        "url": "/media/downloads/psychological.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108448669-210",
-      "track": "image",
-      "start": 24.8,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "transition": "slide_left",
-      "transitionSfx": "none",
-      "transitionDuration": 0.5,
-      "file": {
-        "name": "psychological.png",
-        "url": "/media/downloads/psychological.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108458285-525",
-      "track": "image",
-      "start": 24.866666666666667,
-      "duration": 15.2,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "psychological.png",
-        "url": "/media/downloads/psychological.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791110803855-883",
-      "track": "image",
-      "start": 40.666666666666664,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "beach.webp",
-        "url": "/media/downloads/beach.webp",
+        "name": "Tracking data.png",
+        "url": "/media/uploads/Tracking%20data.png",
         "isAudio": false,
         "isVideo": false,
         "isImage": true
@@ -297,7 +82,25 @@
     }
   ],
   "video": [],
-  "voiceover": [],
+  "voiceover": [
+    {
+      "id": "clip-voiceover-1791218194867-325",
+      "track": "voiceover",
+      "start": 1,
+      "duration": 368.144014,
+      "volume": 100,
+      "soundEnabled": true,
+      "layerOrder": "back",
+      "zIndex": 10,
+      "file": {
+        "name": "_Android_ Unwanted Updates and Bloat_.wav",
+        "url": "/media/uploads/_Android_%20Unwanted%20Updates%20and%20Bloat_.wav",
+        "isAudio": true,
+        "isVideo": false,
+        "isImage": false
+      }
+    }
+  ],
   "music": [],
   "background": [
     {
@@ -308,9 +111,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 0,
-  "duration": 60,
-  "savedAt": 1791172455944,
-  "projectName": "aa",
-  "projectId": "proj_1791104852619_oggs"
+  "currentTime": 10.133333333333333,
+  "duration": 368.144014,
+  "savedAt": 1791220422938,
+  "projectName": "LL",
+  "projectId": "proj_1791218145776_xils"
 }

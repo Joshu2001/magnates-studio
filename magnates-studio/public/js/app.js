@@ -3631,8 +3631,15 @@ function selectClip(clip, trackType) {
     const textEditorCard = document.getElementById('card-text-editor');
     if (textEditorCard) textEditorCard.style.display = 'none';
     inspector.style.display = 'block';
-    document.getElementById('inspector-clip-type').textContent = clip.drawingStrokes ? 'DRAWING' : (clip.isIconSticker ? 'ICON' : trackType.toUpperCase());
-    document.getElementById('inspector-clip-name').textContent = clip.name || clip.file?.name || 'Clip';
+    const typeLabel = clip.drawingStrokes ? 'DRAWING' : (clip.isIconSticker ? 'ICON' : trackType.toUpperCase());
+    const clipTitle = clip.name || clip.file?.name || 'Clip';
+    document.getElementById('inspector-clip-type').textContent = typeLabel;
+    document.getElementById('inspector-clip-name').textContent = clipTitle;
+    
+    const inspHeadTitle = document.getElementById('inspector-heading-title');
+    const inspHeadSub = document.getElementById('inspector-heading-sub');
+    if (inspHeadTitle) inspHeadTitle.textContent = typeLabel;
+    if (inspHeadSub) inspHeadSub.textContent = clipTitle;
     
     // Dynamic Mini Preview in Sidebar Inspector
     const miniThumb = document.getElementById('inspector-mini-thumb');
@@ -6003,7 +6010,7 @@ let activeNlePreset = localStorage.getItem('magnates_nle_preset') || 'magnates';
 
 const NLE_PRESETS = {
   magnates: {
-    name: 'Magnates Studio (Default)',
+    name: 'Regaarder Studio (Default)',
     shortcuts: [
       { action: 'Play / Pause', key: 'Space' },
       { action: 'Selection Arrow Tool', key: 'V' },
@@ -7996,17 +8003,25 @@ function initCanvasTransformInteraction() {
       const clip = selectedClip.clip;
       const b = clip._renderBounds;
       if (b) {
-        const handleSize = 24; // hit area in canvas coords
-        // Check corner handles: TL, TR, BL, BR
-        const corners = [
+        // Generous grab tolerance in canvas coords (scaled for display zoom)
+        const rect = canvas.getBoundingClientRect();
+        const displayScale = Math.max(1, canvas.width / (rect.width || 1));
+        const handleHitSize = Math.max(48, 18 * displayScale);
+
+        // Check 8 handles: TL, TR, BL, BR, T, B, L, R
+        const handles = [
           { type: 'tl', x: b.x, y: b.y },
           { type: 'tr', x: b.x + b.w, y: b.y },
           { type: 'bl', x: b.x, y: b.y + b.h },
-          { type: 'br', x: b.x + b.w, y: b.y + b.h }
+          { type: 'br', x: b.x + b.w, y: b.y + b.h },
+          { type: 'tc', x: b.x + b.w / 2, y: b.y },
+          { type: 'bc', x: b.x + b.w / 2, y: b.y + b.h },
+          { type: 'ml', x: b.x, y: b.y + b.h / 2 },
+          { type: 'mr', x: b.x + b.w, y: b.y + b.h / 2 }
         ];
 
-        for (const c of corners) {
-          if (Math.abs(pt.x - c.x) <= handleSize && Math.abs(pt.y - c.y) <= handleSize) {
+        for (const c of handles) {
+          if (Math.abs(pt.x - c.x) <= handleHitSize && Math.abs(pt.y - c.y) <= handleHitSize) {
             isTransforming = true;
             transformAction = 'resize';
             activeResizeHandle = c.type;
@@ -8017,12 +8032,15 @@ function initCanvasTransformInteraction() {
               y: clip.y || 0
             };
             e.preventDefault();
+            e.stopImmediatePropagation?.();
             return;
           }
         }
 
-        // Check if inside bounding box to drag / reposition
-        if (pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        // Check if inside bounding box (plus generous padding) to drag / reposition
+        const dragPadding = handleHitSize * 0.5;
+        if (pt.x >= (b.x - dragPadding) && pt.x <= (b.x + b.w + dragPadding) &&
+            pt.y >= (b.y - dragPadding) && pt.y <= (b.y + b.h + dragPadding)) {
           isTransforming = true;
           transformAction = 'drag';
           transformStartPos = pt;
@@ -8032,6 +8050,7 @@ function initCanvasTransformInteraction() {
             y: clip.y || 0
           };
           e.preventDefault();
+          e.stopImmediatePropagation?.();
           return;
         }
       }
@@ -8115,6 +8134,7 @@ function initCanvasTransformInteraction() {
           y: c.y || 0
         };
         e.preventDefault();
+        e.stopImmediatePropagation?.();
         return;
       }
     }
@@ -8374,7 +8394,26 @@ function initCanvasTransformInteraction() {
       } else if (transformAction === 'resize') {
         const dx = pt.x - transformStartPos.x;
         const dy = pt.y - transformStartPos.y;
-        const delta = Math.max(Math.abs(dx), Math.abs(dy)) * (dx > 0 || dy > 0 ? 1 : -1);
+        let delta = 0;
+        if (activeResizeHandle === 'br') {
+          delta = (dx + dy) / 2;
+        } else if (activeResizeHandle === 'tl') {
+          delta = (-dx - dy) / 2;
+        } else if (activeResizeHandle === 'tr') {
+          delta = (dx - dy) / 2;
+        } else if (activeResizeHandle === 'bl') {
+          delta = (-dx + dy) / 2;
+        } else if (activeResizeHandle === 'mr') {
+          delta = dx;
+        } else if (activeResizeHandle === 'ml') {
+          delta = -dx;
+        } else if (activeResizeHandle === 'bc') {
+          delta = dy;
+        } else if (activeResizeHandle === 'tc') {
+          delta = -dy;
+        } else {
+          delta = Math.max(Math.abs(dx), Math.abs(dy)) * (dx > 0 || dy > 0 ? 1 : -1);
+        }
         const scaleDelta = (delta / 400);
         clip.scale = Math.max(0.2, Math.min(3.5, transformInitialClip.scale + scaleDelta));
         const miniSub = document.getElementById('inspector-clip-sub');
@@ -9277,7 +9316,7 @@ function updateAppleFullscreenHud() {
     // Ambient / Nothing explicitly selected
     if (dotLabel) dotLabel.textContent = 'Full Screen';
     if (dotBadge) dotBadge.textContent = 'Studio';
-    if (popoverTitle) popoverTitle.textContent = 'Magnates Studio';
+    if (popoverTitle) popoverTitle.textContent = 'Regaarder Studio';
     if (popoverTag) popoverTag.textContent = 'VIEWPORT';
     const mainTimecode = document.getElementById('timecode');
     if (lblTiming) lblTiming.textContent = mainTimecode?.textContent || '00:00.00';
@@ -10167,50 +10206,46 @@ function showStudioContextMenu(x, y, clip, trackType) {
     `;
   } else if (isImage) {
     itemsHtml += `
-      <!-- Executive Quote / Statement Screen -->
-      <div class="context-menu-item" id="ctx-action-convert-quote" style="background: rgba(255, 51, 75, 0.12); border-left: 3px solid #ff334b;">
-        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
-        <span style="font-weight: 700; color: #fff;">Statement / Quote Screen FX</span>
-        <span class="context-badge" style="color: #ff334b;">Executive</span>
+      <!-- Remove Background -->
+      <div class="context-menu-item ${hasCutout ? 'active-fx' : ''}" id="ctx-action-cutout">
+        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm10-14l-1-1h-6l-1 1H4v2h16V5h-4zM9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+        <span>${hasCutout ? 'Restore Background' : 'Remove Background'}</span>
+        <span class="context-badge">${hasCutout ? 'Active' : 'AI'}</span>
+      </div>
+
+      <!-- Vector / Comic Paper Cutout Style -->
+      <div class="context-menu-item ${hasVector ? 'active-fx' : ''}" id="ctx-action-vector">
+        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+        <span>${hasVector ? 'Remove Vector Outline' : 'Convert to Vector / Cutout'}</span>
+        <span class="context-badge">${hasVector ? 'Active' : 'Vector'}</span>
       </div>
 
       <!-- Add Text Overlay -->
       <div class="context-menu-item" id="ctx-action-add-text">
         <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
         <span>Add Text Overlay</span>
-        <span class="context-badge" style="color: #ff334b;">Kinetic Text</span>
       </div>
 
-      <!-- Remove Background -->
-      <div class="context-menu-item ${hasCutout ? 'active-fx' : ''}" id="ctx-action-cutout">
-        <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm10-14l-1-1h-6l-1 1H4v2h16V5h-4zM9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
-        <span>${hasCutout ? 'Restore Background' : 'Remove Background'}</span>
-        <span class="context-badge">${hasCutout ? 'Active' : 'AI Cutout'}</span>
-      </div>
-
-      <!-- Vector / Comic Paper Cutout Style -->
-      <div class="context-menu-item ${hasVector ? 'active-fx' : ''}" id="ctx-action-vector">
-        <svg viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-        <span>${hasVector ? 'Remove Vector FX' : 'Magnates Vector / Paper Cutout'}</span>
-        <span class="context-badge">${hasVector ? 'Active' : 'Sticker'}</span>
+      <!-- Executive Quote / Statement Screen -->
+      <div class="context-menu-item" id="ctx-action-convert-quote">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+        <span>Convert to Quote Screen</span>
       </div>
 
       <!-- Transitions Group (Magnates Continuous Overlap) -->
       <div class="context-menu-divider"></div>
-      <div style="font-size: 10px; font-weight: 700; color: #a855f7; padding: 4px 12px 2px 12px; text-transform: uppercase; letter-spacing: 0.5px;">Continuous Overlap Transitions</div>
+      <div style="font-size: 10px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 2px 10px; text-transform: uppercase; letter-spacing: 0.5px;">Transitions</div>
 
       <!-- 1. 3D Camera Fly-Through -->
       <div class="context-menu-item ${clip.transition === 'fly_through' ? 'active-fx' : ''}" id="ctx-action-fly-through">
-        <svg viewBox="0 0 24 24" style="color: #a855f7;"><path d="M4 4h16v16H4V4m2 4v8l4-4-4-4m6 0v8l4-4-4-4" fill="currentColor"/></svg>
-        <span>${clip.transition === 'fly_through' ? 'Remove 3D Fly-Through' : '3D Fly-Through (Depth Zoom)'}</span>
-        <span class="context-badge" style="color: #a855f7;">${clip.transition === 'fly_through' ? `${(clip.transitionDuration || 0.7).toFixed(1)}s` : '1-Click'}</span>
+        <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4V4m2 4v8l4-4-4-4m6 0v8l4-4-4-4" fill="currentColor"/></svg>
+        <span>${clip.transition === 'fly_through' ? 'Remove 3D Fly-Through' : '3D Fly-Through'}</span>
       </div>
 
       <!-- 2. Directional Push / Slide Under -->
       <div class="context-menu-item ${clip.transition === 'directional_push' ? 'active-fx' : ''}" id="ctx-action-directional-push">
-        <svg viewBox="0 0 24 24" style="color: #3b82f6;"><path d="M6 17.59L7.41 19 12 14.42 16.59 19 18 17.59l-6-6zM6 11l1.41 1.41L12 7.83l4.59 4.58L18 11l-6-6z" transform="rotate(90 12 12)" fill="currentColor"/></svg>
-        <span>${clip.transition === 'directional_push' ? `Remove Slide (${clip.transitionDirection || 'left'})` : 'Directional Push / Pan Under'}</span>
-        <span class="context-badge" style="color: #3b82f6;">${clip.transition === 'directional_push' ? (clip.transitionDirection || 'left').toUpperCase() : 'Pan'}</span>
+        <svg viewBox="0 0 24 24"><path d="M6 17.59L7.41 19 12 14.42 16.59 19 18 17.59l-6-6zM6 11l1.41 1.41L12 7.83l4.59 4.58L18 11l-6-6z" transform="rotate(90 12 12)" fill="currentColor"/></svg>
+        <span>${clip.transition === 'directional_push' ? `Remove Slide (${clip.transitionDirection || 'left'})` : 'Directional Push'}</span>
       </div>
 
       <!-- 3. Morph Cut -->
@@ -18584,22 +18619,18 @@ function initQuoteCardListeners() {
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
 
-  // Wire canvas stage right-click for stage context menu (Screen & Background settings)
-  canvas?.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    showCanvasBackgroundContextMenu(e.clientX, e.clientY);
-  });
+  // (Stage background context menu is handled contextually by the primary canvas contextmenu router)
 
-  // Wire canvas stage click (deselection of clips & bounding handles when clicking outside)
+  // Wire canvas stage click (deselection of quote editing field when clicking truly outside)
   canvas?.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return; // Left click only
-    // Deselect quote / selected clip on stage click
-    selectedClip = null;
+    if (isTransforming) return; // Do not deselect if user is dragging, grabbing handles, or resizing!
     const q = (timelineClips.quote || []).find(c => c._editingField);
-    if (q) q._editingField = null;
-    renderCanvas();
-    syncQuoteCardCanvasOverlay();
+    if (q) {
+      q._editingField = null;
+      renderCanvas();
+      syncQuoteCardCanvasOverlay();
+    }
   });
 }
 
@@ -18890,81 +18921,73 @@ function showCanvasBackgroundContextMenu(x, y) {
 
   menu.innerHTML = `
     <div class="context-menu-header">
-      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:170px;">Screen &amp; Background</span>
-      <span class="context-badge" style="color: #ff334b;">STAGE</span>
+      <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:170px;">Stage &amp; Background</span>
+      <span class="context-badge">Stage</span>
     </div>
     <div class="context-menu-items-scroll">
       <!-- Create Executive Quote Card -->
-      <div class="context-menu-item" id="ctx-action-new-quote" style="background: rgba(255, 51, 75, 0.12);">
-        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
-        <span style="font-weight: 700; color: #fff;">Executive Quote Card</span>
-        <span class="context-badge" style="color: #ff334b;">Quote</span>
+      <div class="context-menu-item" id="ctx-action-new-quote">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+        <span style="font-weight: 500; color: #fff;">Executive Quote Card</span>
+        <span class="context-badge">Card</span>
       </div>
 
       <!-- Create Chat Bubble Quote Card -->
-      <div class="context-menu-item" id="ctx-action-chat-quote" style="background: rgba(0, 240, 255, 0.12);">
-        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-        <span style="font-weight: 700; color: #fff;">Chat Bubble Card</span>
-        <span class="context-badge" style="color: #00f0ff;">Messaging</span>
+      <div class="context-menu-item" id="ctx-action-chat-quote">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+        <span style="font-weight: 500; color: #fff;">Chat Bubble Card</span>
+        <span class="context-badge">Chat</span>
       </div>
 
       <div class="context-menu-divider"></div>
-      <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); padding: 4px 12px 2px 12px; text-transform: uppercase; letter-spacing: 0.5px;">Screen Background Style</div>
+      <div style="font-size: 10px; font-weight: 600; color: var(--text-muted); padding: 4px 10px 2px 10px; text-transform: uppercase; letter-spacing: 0.5px;">Stage Background</div>
 
       <!-- Radial Gradient Preset (Cinematic Dark) -->
       <div class="context-menu-item" id="ctx-action-bg-gradient">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle, #2d3345 0%, #0a0b0e 100%); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span style="width: 12px; height: 12px; border-radius: 50%; background: radial-gradient(circle, #3a4153 0%, #0a0b0e 100%); border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0;"></span>
         <span>Cinematic Dark Gradient</span>
-        <span class="context-badge" style="color: #00f0ff;">Gradient</span>
       </div>
 
       <!-- Frosted Glass Stage -->
       <div class="context-menu-item" id="ctx-action-bg-glass">
-        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
         <span>Frosted Glass Effect</span>
-        <span class="context-badge">Glass</span>
       </div>
 
       <!-- Solid Black Studio -->
       <div class="context-menu-item" id="ctx-action-bg-black">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: #000000; border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span style="width: 12px; height: 12px; border-radius: 50%; background: #000000; border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0;"></span>
         <span>Solid Black Studio</span>
-        <span class="context-badge">Solid</span>
       </div>
 
       <!-- Dark Slate Stage -->
       <div class="context-menu-item" id="ctx-action-bg-slate">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: #0d111a; border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
+        <span style="width: 12px; height: 12px; border-radius: 50%; background: #0d111a; border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0;"></span>
         <span>Dark Slate Cinematic</span>
-        <span class="context-badge">Color</span>
       </div>
 
       <!-- Image Wallpaper -->
       <div class="context-menu-item" id="ctx-action-bg-image">
-        <svg viewBox="0 0 24 24" style="color: #ffaa00;"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
         <span>Image Wallpaper Background...</span>
-        <span class="context-badge" style="color: #ffaa00;">Image</span>
       </div>
 
       <!-- 3D Cyber Perspective Grid -->
       <div class="context-menu-item" id="ctx-action-bg-cyber">
-        <span style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #00f0ff, #25d366); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0;"></span>
-        <span>3D Cyber Tech Grid</span>
-        <span class="context-badge" style="color: #00f0ff;">3D</span>
+        <span style="width: 12px; height: 12px; border-radius: 50%; background: #1f2937; border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0;"></span>
+        <span>3D Perspective Grid</span>
       </div>
 
       <div class="context-menu-divider"></div>
 
       <!-- Quick Add Overlay Options -->
       <div class="context-menu-item" id="ctx-action-quick-text">
-        <svg viewBox="0 0 24 24" style="color: #ff334b;"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
         <span>Add Kinetic Text...</span>
-        <span class="context-badge">Text</span>
       </div>
       <div class="context-menu-item" id="ctx-action-quick-chart">
-        <svg viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
         <span>Add Animated Chart...</span>
-        <span class="context-badge" style="color: #00f0ff;">Infographic</span>
       </div>
     </div>
   `;
@@ -19621,6 +19644,72 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initTemplateEngineListeners);
 } else {
   initTemplateEngineListeners();
+}
+
+// ==================== REGAARDER STUDIO: CONTEXTUAL TABS & CANVAS POPOVER ====================
+function initRegaarderStudioControls() {
+
+  // 2. Canvas Secondary Settings Popover
+  const btnCanvasSec = document.getElementById('btn-canvas-secondary-menu');
+  const canvasSecPopover = document.getElementById('canvas-secondary-popover');
+  if (btnCanvasSec && canvasSecPopover) {
+    btnCanvasSec.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = canvasSecPopover.style.display !== 'none';
+      canvasSecPopover.style.display = isVisible ? 'none' : 'flex';
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!canvasSecPopover.contains(e.target) && e.target !== btnCanvasSec) {
+        canvasSecPopover.style.display = 'none';
+      }
+    });
+  }
+
+  // 3. Vertical Navigation Rail (Uploads, Templates, Elements, Text, Icons, Layers, Projects)
+  const railBtns = document.querySelectorAll('.nav-rail .rail-btn');
+  railBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      railBtns.forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      const railTab = e.currentTarget.dataset.railTab;
+      const heading = document.getElementById('sidebar-panel-heading');
+      const sub = document.getElementById('sidebar-panel-sub');
+      
+      const titleMap = {
+        all: { title: 'Media Library', sub: 'Upload or select media files' },
+        templates: { title: 'Templates', sub: 'Pre-built structures & layouts' },
+        charts: { title: 'Elements', sub: 'Animated charts & widgets' },
+        text: { title: 'Kinetic Text', sub: 'Typography & titles' },
+        icons: { title: 'Icons & Stickers', sub: 'Vector iconography' },
+        layers: { title: 'Canvas Layers', sub: 'Stage backgrounds & overlays' },
+        projects: { title: 'Projects', sub: 'Saved project files & backups' }
+      };
+
+      if (titleMap[railTab] && heading && sub) {
+        heading.textContent = titleMap[railTab].title;
+        sub.textContent = titleMap[railTab].sub;
+      }
+
+      // If left sidebar was collapsed, automatically expand it to show the panel
+      const workspace = document.querySelector('.workspace');
+      if (workspace && workspace.classList.contains('hide-left')) {
+        workspace.classList.remove('hide-left');
+        const toggleBtn = document.getElementById('btn-toggle-left-sidebar');
+        if (toggleBtn) toggleBtn.classList.add('active');
+      }
+
+      if (typeof switchMediaCategory === 'function') {
+        switchMediaCategory(railTab);
+      }
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initRegaarderStudioControls);
+} else {
+  initRegaarderStudioControls();
 }
 
 

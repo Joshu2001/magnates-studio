@@ -4,7 +4,7 @@ const fs = require('fs');
 const multer = require('multer');
 
 const app = express();
-const PORT = 5173;
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5173;
 
 // Directory setup
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -329,6 +329,22 @@ app.post('/api/proxy/generate', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Magnates Studio running at http://localhost:${PORT}`);
-});
+function startServer(port) {
+  const server = app.listen(port);
+  
+  server.on('listening', () => {
+    const actualPort = server.address().port;
+    console.log(`Magnates Studio running at http://localhost:${actualPort}`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
+      startServer(port + 1);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+}
+
+startServer(DEFAULT_PORT);
