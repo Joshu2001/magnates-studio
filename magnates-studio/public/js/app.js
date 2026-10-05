@@ -18,6 +18,7 @@ let activeTool = 'select'; // 'select', 'split', 'delete'
 let selectedClip = null; // { clip, trackType }
 let selectedEffectId = null; // { clipId, trackType, effectType, effectIndex }
 let selectedTransitionId = null; // { clipId, trackType }
+let timelineViewMode = 'multi'; // 'multi' (discrete lanes) or 'consolidated' (single unified storyline)
 
 // Timeline multi-layer structure
 let timelineClips = {
@@ -2414,6 +2415,44 @@ function renderMediaList(filter) {
 
 // Video Filmstrip Generator
 const filmstripCache = new Map();
+const chartFilmstripCache = new Map();
+
+function generateChartFilmstrip(clip, containerEl) {
+  const cacheKey = `${clip.id}_${clip.duration}_${JSON.stringify(clip.chartConfig)}`;
+  if (chartFilmstripCache.has(cacheKey)) {
+    renderFramesToContainer(chartFilmstripCache.get(cacheKey), containerEl);
+    return;
+  }
+
+  const numFrames = 18;
+  const frames = [];
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = 160;
+  offCanvas.height = 90;
+  const offCtx = offCanvas.getContext('2d');
+
+  const totalDur = clip.duration || 6;
+  const animDur = clip.chartConfig?.drawDuration || 1.8;
+
+  // Render authentic chronological animation frames for the chart filmstrip
+  for (let i = 0; i < numFrames; i++) {
+    const frameT = (i / (numFrames - 1 || 1)) * totalDur;
+    offCtx.clearRect(0, 0, 160, 90);
+
+    // Save current time and mock currentTime for preview extraction
+    const originalTime = currentTime;
+    currentTime = clip.start + frameT;
+
+    // Draw authentic infographic chart onto frame thumbnail
+    drawInfographicChart(offCtx, clip, 0, 0, 160, 90);
+
+    currentTime = originalTime;
+    frames.push(offCanvas.toDataURL('image/jpeg', 0.8));
+  }
+
+  chartFilmstripCache.set(cacheKey, frames);
+  renderFramesToContainer(frames, containerEl);
+}
 
 function generateFilmstrip(videoUrl, clipDuration, containerEl) {
   if (filmstripCache.has(videoUrl)) {
@@ -2428,22 +2467,22 @@ function generateFilmstrip(videoUrl, clipDuration, containerEl) {
 
   v.onloadedmetadata = async () => {
     const totalDuration = v.duration || clipDuration || 10;
-    const numFrames = 12;
+    const numFrames = 24;
     const frames = [];
 
     const offscreenCanvas = document.createElement('canvas');
-    offscreenCanvas.width = 120;
-    offscreenCanvas.height = 68;
+    offscreenCanvas.width = 160;
+    offscreenCanvas.height = 90;
     const octx = offscreenCanvas.getContext('2d');
 
     for (let i = 0; i < numFrames; i++) {
-      const seekTime = Math.min(totalDuration - 0.05, (i / numFrames) * totalDuration + 0.05);
+      const seekTime = Math.min(totalDuration - 0.05, (i / (numFrames - 1 || 1)) * totalDuration);
       v.currentTime = seekTime;
       await new Promise(res => {
         const onSeeked = () => {
           v.removeEventListener('seeked', onSeeked);
-          octx.drawImage(v, 0, 0, 120, 68);
-          frames.push(offscreenCanvas.toDataURL('image/jpeg', 0.5));
+          octx.drawImage(v, 0, 0, 160, 90);
+          frames.push(offscreenCanvas.toDataURL('image/jpeg', 0.6));
           res();
         };
         v.addEventListener('seeked', onSeeked);
@@ -2458,16 +2497,17 @@ function generateFilmstrip(videoUrl, clipDuration, containerEl) {
 function renderFramesToContainer(frames, containerEl) {
   if (!containerEl || !frames || frames.length === 0) return;
   containerEl.innerHTML = '';
-  // Repeat frames to ensure full filmstrip coverage across the entire clip length
-  const repeatCount = Math.max(1, Math.ceil(containerEl.parentElement?.offsetWidth / (frames.length * 60)) || 2);
-  for (let r = 0; r < repeatCount; r++) {
-    frames.forEach(src => {
-      const img = document.createElement('img');
-      img.src = src;
-      img.className = 'filmstrip-frame';
-      img.draggable = false;
-      containerEl.appendChild(img);
-    });
+  // Repeat frames proportionally to clip length to create continuous filmstrip
+  const clipWidth = containerEl.parentElement?.offsetWidth || (frames.length * 60);
+  const frameWidthPx = 60;
+  const totalFramesNeeded = Math.max(frames.length, Math.ceil(clipWidth / frameWidthPx));
+  for (let i = 0; i < totalFramesNeeded; i++) {
+    const frameIndex = i % frames.length;
+    const img = document.createElement('img');
+    img.src = frames[frameIndex];
+    img.className = 'filmstrip-frame';
+    img.draggable = false;
+    containerEl.appendChild(img);
   }
 }
 
@@ -2755,14 +2795,51 @@ function renderAllTimelineTracks() {
     background: document.getElementById('content-background')
   };
 
+  // Synchronize timeline body mode class and label text
+  const timelineBodyEl = document.getElementById('timeline-body');
+  if (timelineBodyEl) {
+    timelineBodyEl.classList.toggle('consolidated-storyline-mode', timelineViewMode === 'consolidated');
+  }
+  const mainTrackLabelText = document.querySelector('.timeline-label-col .track-label[data-track-type="image"] .track-title-wrap');
+  if (mainTrackLabelText) {
+    if (timelineViewMode === 'consolidated') {
+      mainTrackLabelText.innerHTML = `
+        <svg class="ui-icon" viewBox="0 0 24 24" style="color: #00f0ff;"><path d="M19 4H5c-1.11 0-2 .9-2 2v12c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H5V6h14v12z"/></svg>
+        <span>Storyline</span>
+      `;
+    } else {
+      mainTrackLabelText.innerHTML = `
+        <svg class="ui-icon" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+        <span>Images</span>
+      `;
+    }
+  }
+
   Object.keys(trackMap).forEach(type => {
     const container = trackMap[type];
     if (!container) return;
     container.innerHTML = '';
 
-    const clips = (type === 'chart' ? [...(timelineClips.chart || []), ...(timelineClips.quote || [])] : (timelineClips[type] || []));
+    // In consolidated mode, visual clips (charts, quotes, images, videos) are unified on the primary storyline track ('image')
+    let clips = [];
+    if (timelineViewMode === 'consolidated') {
+      if (type === 'image') {
+        clips = [
+          ...(timelineClips.image || []),
+          ...(timelineClips.video || []),
+          ...(timelineClips.chart || []),
+          ...(timelineClips.quote || [])
+        ];
+      } else if (type === 'chart' || type === 'video') {
+        clips = []; // Hidden; unified on primary storyline track above
+      } else {
+        clips = timelineClips[type] || [];
+      }
+    } else {
+      clips = (type === 'chart' ? [...(timelineClips.chart || []), ...(timelineClips.quote || [])] : (timelineClips[type] || []));
+    }
     clips.forEach(clip => {
-      const actualTrackType = clip.isQuoteCard ? 'quote' : type;
+      const actualTrackType = clip.isQuoteCard ? 'quote' : (clip.chartConfig ? 'chart' : (clip.file?.isVideo ? 'video' : type));
       const block = document.createElement('div');
       block.className = `clip-block ${actualTrackType}`;
       block.id = clip.id;
@@ -2834,13 +2911,20 @@ function renderAllTimelineTracks() {
         const scrimEl = document.createElement('div');
         scrimEl.className = 'clip-scrim-overlay';
         block.appendChild(scrimEl);
+      } else if (clip.chartConfig || type === 'chart') {
+        // Continuous Frame-by-Frame Filmstrip matching exact on-screen animation & effects
+        const filmstripEl = document.createElement('div');
+        filmstripEl.className = 'clip-filmstrip';
+        block.appendChild(filmstripEl);
+        generateChartFilmstrip(clip, filmstripEl);
+
+        const scrimEl = document.createElement('div');
+        scrimEl.className = 'clip-scrim-overlay';
+        block.appendChild(scrimEl);
       }
 
-      // Thumbnail badge on left edge for image clips
+      // Thumbnail badge on left edge (only for non-filmstrip visual blocks if any)
       let thumbBadgeHtml = '';
-      if (type === 'image' && clip.file?.url) {
-        thumbBadgeHtml = `<img src="${clip.file.url}" class="clip-thumb-badge" alt="thumb" />`;
-      }
 
       // Left & Right Resize Handles for the clip
       const handleLeft = document.createElement('div');
@@ -2853,17 +2937,24 @@ function renderAllTimelineTracks() {
       const contentEl = document.createElement('div');
       contentEl.className = 'clip-block-content';
 
+      // For pure visual filmstrip clips (image/video/charts), keep visual strip completely clean with no blocking text
+      const isFilmstripClip = (type === 'image' || type === 'video') && clip.file?.url;
+      const isChartClip = !!(clip.chartConfig || type === 'chart');
+
       // Responsive density: if width < 80px, show compact representation
       const isCompact = widthPx < 80;
-      if (isCompact) {
+      if (isFilmstripClip || isChartClip) {
+        // Pristine filmstrip: title text is completely removed from on top of the filmstrip frames
+        contentEl.innerHTML = '';
+      } else if (isCompact) {
         let miniBadges = '';
-        if (clip.zoomEffect) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>';
+        if (clip.zoomEffect) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>';
         if (clip.docFocus) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2;vertical-align:-1px;margin-right:2px;"><circle cx="12" cy="12" r="9"/></svg>';
         if (clip.highlights?.length) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>';
         if (clip.docScroll) miniBadges += '<svg viewBox="0 0 24 24" style="width:10px;height:10px;fill:currentColor;vertical-align:-1px;margin-right:2px;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>';
-        contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="font-size:9px; font-weight:700; display:inline-flex; align-items:center;">${miniBadges || label.slice(0, 5)}</span>`;
+        contentEl.innerHTML = `${iconSvg} <span style="font-size:9px; font-weight:700; display:inline-flex; align-items:center;">${miniBadges || label.slice(0, 5)}</span>`;
       } else {
-        contentEl.innerHTML = `${thumbBadgeHtml || iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; flex: 1;">${label}</span>`;
+        contentEl.innerHTML = `${iconSvg} <span style="overflow: hidden; text-overflow: ellipsis; flex: 1;">${label}</span>`;
       }
 
       // Effect subtrack overlay container (positioned over actual temporal span)
@@ -3017,6 +3108,73 @@ function renderAllTimelineTracks() {
         waveCanvas.className = 'clip-waveform-canvas';
         block.appendChild(waveCanvas);
         renderAudioClipWaveform(clip, waveCanvas);
+      }
+
+      // Hover Scrub Needle & Preview Tooltip for precision cutting (Videos, Images, and Charts)
+      const canScrub = ((type === 'video' || type === 'image') && clip.file?.url) || (type === 'chart' || clip.chartConfig);
+      if (canScrub) {
+        const needle = document.createElement('div');
+        needle.className = 'clip-scrub-needle';
+        block.appendChild(needle);
+
+        let tooltipEl = document.getElementById('timeline-scrub-tooltip');
+        if (!tooltipEl) {
+          tooltipEl = document.createElement('div');
+          tooltipEl.id = 'timeline-scrub-tooltip';
+          tooltipEl.className = 'timeline-scrub-tooltip';
+          tooltipEl.innerHTML = `
+            <img class="timeline-scrub-tooltip-img" src="" alt="preview" />
+            <div class="timeline-scrub-tooltip-time">00:00.00</div>
+          `;
+          document.body.appendChild(tooltipEl);
+        }
+
+        block.addEventListener('mousemove', (e) => {
+          if (block.classList.contains('is-dragging')) return;
+          const rect = block.getBoundingClientRect();
+          const offsetX = e.clientX - rect.left;
+          const ratio = Math.max(0, Math.min(1, offsetX / rect.width));
+          const hoverTime = clip.start + (ratio * clip.duration);
+
+          needle.style.display = 'block';
+          needle.style.left = `${offsetX}px`;
+
+          const tooltipImg = tooltipEl.querySelector('.timeline-scrub-tooltip-img');
+          const tooltipTime = tooltipEl.querySelector('.timeline-scrub-tooltip-time');
+
+          if (tooltipImg) {
+            if (type === 'chart' || clip.chartConfig) {
+              const cacheKey = `${clip.id}_${clip.duration}_${JSON.stringify(clip.chartConfig)}`;
+              if (chartFilmstripCache.has(cacheKey)) {
+                const frames = chartFilmstripCache.get(cacheKey);
+                const frameIdx = Math.min(frames.length - 1, Math.floor(ratio * frames.length));
+                tooltipImg.src = frames[frameIdx];
+              }
+            } else if (type === 'image') {
+              tooltipImg.src = clip.file.url;
+            } else if (type === 'video' && filmstripCache.has(clip.file.url)) {
+              const frames = filmstripCache.get(clip.file.url);
+              const frameIdx = Math.min(frames.length - 1, Math.floor(ratio * frames.length));
+              tooltipImg.src = frames[frameIdx];
+            } else {
+              tooltipImg.src = clip.file?.thumbnail || clip.file?.url || '';
+            }
+          }
+
+          if (tooltipTime) {
+            tooltipTime.textContent = formatTimecode(hoverTime);
+          }
+
+          tooltipEl.style.left = `${e.clientX}px`;
+          tooltipEl.style.top = `${rect.top}px`;
+          tooltipEl.classList.add('is-visible');
+        });
+
+        block.addEventListener('mouseleave', () => {
+          needle.style.display = 'none';
+          const t = document.getElementById('timeline-scrub-tooltip');
+          if (t) t.classList.remove('is-visible');
+        });
       }
 
       block.appendChild(handleLeft);
@@ -4202,8 +4360,8 @@ function setStudioTool(toolName, docStyle = null) {
 // Timeline Header Tools
 document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
   btn.addEventListener('click', (e) => {
-    // Exclude undo, redo, reset, expand from active tool toggle
-    if (['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(btn.id)) return;
+    // Exclude undo, redo, reset, expand, and timeline mode buttons from active tool toggle
+    if (['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand', 'btn-mode-multi', 'btn-mode-consolidated'].includes(btn.id)) return;
 
     if (btn.id === 'tool-select') {
       setStudioTool('select');
@@ -4213,6 +4371,25 @@ document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
       setStudioTool('delete');
     }
   });
+});
+
+// Setup Mode Switcher: Multi-Track Pro vs Consolidated Storyline
+document.getElementById('btn-mode-multi')?.addEventListener('click', () => {
+  timelineViewMode = 'multi';
+  document.getElementById('btn-mode-multi')?.classList.add('active');
+  document.getElementById('btn-mode-consolidated')?.classList.remove('active');
+  renderAllTimelineTracks();
+  showTextTimingAlert('Switched to Multi-Track Pro View (Independent Lanes)', 'info');
+  setTimeout(() => showTextTimingAlert(''), 2200);
+});
+
+document.getElementById('btn-mode-consolidated')?.addEventListener('click', () => {
+  timelineViewMode = 'consolidated';
+  document.getElementById('btn-mode-consolidated')?.classList.add('active');
+  document.getElementById('btn-mode-multi')?.classList.remove('active');
+  renderAllTimelineTracks();
+  showTextTimingAlert('Switched to Consolidated Storyline (Unified Ribbon)', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2200);
 });
 
 // Dropdown Toggles for FX & Elements in Toolbar

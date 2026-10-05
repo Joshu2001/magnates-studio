@@ -23,107 +23,51 @@
       }
     }
   ],
-  "chart": [],
-  "quote": [
+  "chart": [
     {
-      "id": "clip-quote-1791139544262-502",
-      "track": "quote",
-      "isQuoteCard": true,
-      "name": "Executive Statement Card",
-      "start": 60,
-      "duration": 7,
-      "zIndex": 28,
+      "id": "clip-chart-1791163967357",
+      "track": "chart",
+      "start": 9.2,
+      "duration": 6,
       "layerOrder": "front",
+      "zIndex": 25,
       "x": 0,
       "y": 0,
       "scale": 1,
-      "speakerTitle": "Enter Name Here",
-      "speakerSubtitle": "Online",
-      "avatarShape": "circle",
-      "avatarSize": 110,
-      "avatarBorderColor": "#ffffff",
-      "avatarBorderWidth": 3,
-      "avatarFile": null,
-      "quoteText": "here...",
-      "quoteEffect": "typewriter",
-      "effectSpeed": 1,
-      "fontSize": 34,
-      "fontFamily": "'Inter', sans-serif",
-      "textColor": "#ffffff",
-      "subtitleColor": "#94a3b8",
-      "bgMode": "gradient",
-      "bgColor1": "#262933",
-      "bgColor2": "#0b0c10",
-      "glassEnabled": true,
-      "glassBlur": 16,
-      "glassOpacity": 65,
-      "bgImageFile": null,
-      "bgDim": 45,
-      "cardStyle": "chat_bubble",
-      "_fmt": {
-        "name": {
-          "font": "'Inter', sans-serif",
-          "size": 60,
-          "color": "#ffffff",
-          "bold": true,
-          "italic": false
-        },
-        "role": {
-          "font": "'Inter', sans-serif",
-          "size": 38,
-          "color": "#94a3b8",
-          "bold": false,
-          "italic": false
-        },
-        "quote": {
-          "font": "'Inter', sans-serif",
-          "size": 34,
-          "color": "#f1f1f1",
-          "bold": false,
-          "italic": false
-        }
+      "chartConfig": {
+        "type": "area",
+        "title": "COST PER CLICK",
+        "isDual": false,
+        "series1": [
+          48,
+          40,
+          44,
+          28,
+          32,
+          22,
+          28,
+          18,
+          14,
+          8,
+          7,
+          5,
+          4,
+          3,
+          2
+        ],
+        "color": "#ffffff",
+        "drawDuration": 1.6,
+        "glow": true,
+        "fillOpacity": 0.38
       },
-      "_renderBounds": {
-        "x": 140,
-        "y": 160,
-        "w": 1640,
-        "h": 760
-      },
-      "_subBounds": {
-        "avatar": {
-          "x": 245,
-          "y": 275,
-          "w": 110,
-          "h": 110
-        },
-        "name": {
-          "x": 405,
-          "y": 273.9,
-          "w": 1315,
-          "h": 78
-        },
-        "role": {
-          "x": 405,
-          "y": 347.8,
-          "w": 1315,
-          "h": 49.4
-        },
-        "quoteBody": {
-          "x": 257,
-          "y": 451,
-          "w": 144,
-          "h": 67
-        },
-        "card": {
-          "x": 140,
-          "y": 160,
-          "w": 1640,
-          "h": 760
-        }
-      },
-      "_editingField": null
+      "file": {
+        "name": "COST PER CLICK.chart",
+        "url": "",
+        "isImage": true
+      }
     }
   ],
+  "quote": [],
   "image": [
     {
       "id": "clip-image-1791106192467-941",
@@ -156,23 +100,6 @@
       "file": {
         "name": "povrt.png",
         "url": "/media/uploads/povrt.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108067276-452",
-      "track": "image",
-      "start": 12.933333333333334,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "mentall.png",
-        "url": "/media/uploads/mentall.png",
         "isAudio": false,
         "isVideo": false,
         "isImage": true
@@ -281,6 +208,40 @@
       }
     },
     {
+      "id": "clip-image-1791108067276-452",
+      "track": "image",
+      "start": 12.933333333333334,
+      "duration": 6,
+      "volume": 100,
+      "soundEnabled": true,
+      "layerOrder": "back",
+      "zIndex": 20,
+      "file": {
+        "name": "mentall.png",
+        "url": "/media/uploads/mentall.png",
+        "isAudio": false,
+        "isVideo": false,
+        "isImage": true
+      }
+    },
+    {
+      "id": "clip-image-1791108495998-981",
+      "track": "image",
+      "start": 18.700000000000003,
+      "duration": 6.333333333333332,
+      "volume": 100,
+      "soundEnabled": true,
+      "layerOrder": "back",
+      "zIndex": 20,
+      "file": {
+        "name": "psychological.png",
+        "url": "/media/downloads/psychological.png",
+        "isAudio": false,
+        "isVideo": false,
+        "isImage": true
+      }
+    },
+    {
       "id": "clip-image-1791108448669-210",
       "track": "image",
       "start": 24.8,
@@ -289,6 +250,9 @@
       "soundEnabled": true,
       "layerOrder": "back",
       "zIndex": 20,
+      "transition": "slide_left",
+      "transitionSfx": "none",
+      "transitionDuration": 0.5,
       "file": {
         "name": "psychological.png",
         "url": "/media/downloads/psychological.png",
@@ -301,24 +265,7 @@
       "id": "clip-image-1791108458285-525",
       "track": "image",
       "start": 24.866666666666667,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "file": {
-        "name": "psychological.png",
-        "url": "/media/downloads/psychological.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791108495998-981",
-      "track": "image",
-      "start": 19.033333333333335,
-      "duration": 6,
+      "duration": 15.2,
       "volume": 100,
       "soundEnabled": true,
       "layerOrder": "back",
@@ -361,9 +308,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 60,
+  "currentTime": 25.333333333333332,
   "duration": 60,
-  "savedAt": 1791139865856,
+  "savedAt": 1791167417451,
   "projectName": "aa",
   "projectId": "proj_1791104852619_oggs"
 }
