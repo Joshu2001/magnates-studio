@@ -4024,7 +4024,15 @@ function attachClipInteractions(blockEl, clip, trackType) {
 
     if (activeTool === 'split') {
       e.stopPropagation();
-      splitClipAtPlayhead(trackType, clip);
+      const rect = block.getBoundingClientRect();
+      const clickRatio = Math.max(0.01, Math.min(0.99, (e.clientX - rect.left) / rect.width));
+      const clickTime = clip.start + (clickRatio * clip.duration);
+      currentTime = clickTime;
+      updatePlayheadUI();
+      if (splitClipAtTime(trackType, clip, clickTime)) {
+        showTextTimingAlert('Split clip at ' + formatTimecode(clickTime), 'success');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+      }
       return;
     }
 
@@ -4229,19 +4237,46 @@ function deleteClip(trackType, clipId) {
   }
 }
 
-function splitClipAtPlayhead(trackType, clip) {
-  if (currentTime > clip.start && currentTime < (clip.start + clip.duration)) {
-    const originalEnd = clip.start + clip.duration;
-    clip.duration = currentTime - clip.start;
-    const secondHalf = {
-      ...clip,
-      id: `clip-${trackType}-${Date.now()}`,
-      start: currentTime,
-      duration: originalEnd - currentTime
-    };
-    timelineClips[trackType].push(secondHalf);
-    renderAllTimelineTracks();
+function splitClipAtTime(trackType, clip, splitTime) {
+  if (!clip || !trackType) return false;
+  if (isTrackLocked(trackType)) {
+    showTextTimingAlert('Track is locked.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
   }
+  if (splitTime <= clip.start || splitTime >= (clip.start + clip.duration)) {
+    return false;
+  }
+  const originalEnd = clip.start + clip.duration;
+  const firstDuration = splitTime - clip.start;
+  const secondDuration = originalEnd - splitTime;
+
+  // Update first half duration
+  clip.duration = firstDuration;
+
+  // Create second half with cloned properties and unique ID
+  const secondHalf = JSON.parse(JSON.stringify(clip));
+  secondHalf.id = `clip-${trackType}-${Date.now()}`;
+  secondHalf.start = splitTime;
+  secondHalf.duration = secondDuration;
+
+  // If video clip has inPoint, offset it
+  if (secondHalf.file && typeof secondHalf.file.inPoint === 'number') {
+    secondHalf.file.inPoint += firstDuration;
+  }
+
+  if (!timelineClips[trackType]) timelineClips[trackType] = [];
+  timelineClips[trackType].push(secondHalf);
+  timelineClips[trackType].sort((a, b) => a.start - b.start);
+
+  recordState('Split Clip');
+  renderAllTimelineTracks();
+  selectClip(secondHalf, trackType);
+  return true;
+}
+
+function splitClipAtPlayhead(trackType, clip) {
+  return splitClipAtTime(trackType, clip, currentTime);
 }
 
 // Setup Drag & Drop Listeners onto Track Rows
@@ -4318,8 +4353,8 @@ function initTimelineDragAndDrop() {
 function setStudioTool(toolName, docStyle = null) {
   activeTool = toolName;
   canvas.classList.remove('tool-snap-zoom', 'tool-loupe', 'tool-draw', 'tool-doc-focus', 'tool-doc-highlight');
-  document.querySelectorAll('.timeline-tools .btn-tool').forEach(b => {
-    if (!['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand'].includes(b.id)) {
+  document.querySelectorAll('.timeline-tools .btn-tool, .apple-toolbar-group .btn-apple-tool').forEach(b => {
+    if (!['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand', 'tool-cut', 'tool-trim-left', 'tool-trim-right'].includes(b.id)) {
       b.classList.remove('active');
     }
   });
@@ -4358,17 +4393,25 @@ function setStudioTool(toolName, docStyle = null) {
 }
 
 // Timeline Header Tools
-document.querySelectorAll('.timeline-tools .btn-tool').forEach(btn => {
+document.querySelectorAll('.timeline-tools .btn-tool, .apple-toolbar-group .btn-apple-tool').forEach(btn => {
   btn.addEventListener('click', (e) => {
-    // Exclude undo, redo, reset, expand, and timeline mode buttons from active tool toggle
-    if (['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand', 'btn-mode-multi', 'btn-mode-consolidated'].includes(btn.id)) return;
+    // Exclude undo, redo, reset, expand, and trim/cut/mode buttons from active tool toggle
+    if (['tool-undo', 'tool-redo', 'tool-reset-timeline', 'tool-toggle-expand', 'btn-mode-multi', 'btn-mode-consolidated', 'tool-cut', 'tool-trim-left', 'tool-trim-right'].includes(btn.id)) return;
 
     if (btn.id === 'tool-select') {
       setStudioTool('select');
     } else if (btn.id === 'tool-split') {
-      setStudioTool('split');
+      if (typeof executeStudioSplit === 'function') {
+        executeStudioSplit();
+      } else {
+        setStudioTool('split');
+      }
     } else if (btn.id === 'tool-delete') {
-      setStudioTool('delete');
+      if (typeof executeStudioDelete === 'function') {
+        executeStudioDelete();
+      } else {
+        setStudioTool('delete');
+      }
     }
   });
 });
@@ -4455,55 +4498,89 @@ function drawTimeRuler() {
   if (!rulerCanvas || !tracksContainer) return;
 
   const totalWidth = 5000;
-  if (rulerCanvas.width !== totalWidth) {
-    rulerCanvas.width = totalWidth;
-  }
-  const height = rulerCanvas.height || 24;
-  const ctxR = rulerCanvas.getContext('2d');
-  ctxR.clearRect(0, 0, totalWidth, height);
+  const height = 28;
+  const dpr = window.devicePixelRatio || 1;
 
-  // Determine major tick interval depending on zoom level (pps)
-  let majorIntervalSec = 5;
-  let minorTicksPerMajor = 5;
-  if (pps >= 45) {
-    majorIntervalSec = 1;
-    minorTicksPerMajor = 4;
-  } else if (pps >= 25) {
-    majorIntervalSec = 2;
-    minorTicksPerMajor = 4;
-  } else if (pps >= 10) {
-    majorIntervalSec = 5;
-    minorTicksPerMajor = 5;
+  if (rulerCanvas.width !== totalWidth * dpr || rulerCanvas.height !== height * dpr) {
+    rulerCanvas.width = totalWidth * dpr;
+    rulerCanvas.height = height * dpr;
+    rulerCanvas.style.width = totalWidth + 'px';
+    rulerCanvas.style.height = height + 'px';
+  }
+
+  const ctxR = rulerCanvas.getContext('2d');
+  ctxR.setTransform(1, 0, 0, 1, 0, 0);
+  ctxR.clearRect(0, 0, rulerCanvas.width, rulerCanvas.height);
+  ctxR.scale(dpr, dpr);
+
+  // Subtle bottom baseline
+  ctxR.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+  ctxR.lineWidth = 1;
+  ctxR.beginPath();
+  ctxR.moveTo(0, height - 0.5);
+  ctxR.lineTo(totalWidth, height - 0.5);
+  ctxR.stroke();
+
+  // Multi-tier granular intervals based on zoom (pps)
+  let majorIntervalSec;
+  let mediumIntervalSec;
+  let minorIntervalSec;
+
+  if (pps >= 60) {
+    majorIntervalSec = 1;      // e.g. 00:01, 00:02
+    mediumIntervalSec = 0.5;   // half seconds
+    minorIntervalSec = 0.1;    // tenths of a second micro-ticks
+  } else if (pps >= 35) {
+    majorIntervalSec = 1;      // every 1s
+    mediumIntervalSec = 0.5;   // half seconds
+    minorIntervalSec = 0.25;   // quarter seconds
+  } else if (pps >= 20) {
+    majorIntervalSec = 2;      // 00:00, 00:02, 00:04...
+    mediumIntervalSec = 1;     // 1 second ticks
+    minorIntervalSec = 0.5;    // half second micro ticks
+  } else if (pps >= 12) {
+    majorIntervalSec = 5;      // 00:00, 00:05, 00:10...
+    mediumIntervalSec = 1;     // every 1 second
+    minorIntervalSec = 0.5;    // every 0.5 second
   } else {
     majorIntervalSec = 10;
-    minorTicksPerMajor = 5;
+    mediumIntervalSec = 2;
+    minorIntervalSec = 1;
   }
 
-  const minorIntervalSec = majorIntervalSec / minorTicksPerMajor;
   const maxSec = totalWidth / pps;
 
-  ctxR.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace';
-  ctxR.fillStyle = '#8e96aa';
-  ctxR.strokeStyle = '#2d3345';
-  ctxR.lineWidth = 1;
-
-  for (let s = 0; s <= maxSec; s += minorIntervalSec) {
+  for (let s = 0; s <= maxSec; s = +(s + minorIntervalSec).toFixed(4)) {
     const x = Math.round(s * pps);
     const isMajor = Math.abs(Math.round(s / majorIntervalSec) * majorIntervalSec - s) < 0.001;
+    const isMedium = !isMajor && Math.abs(Math.round(s / mediumIntervalSec) * mediumIntervalSec - s) < 0.001;
 
     ctxR.beginPath();
     if (isMajor) {
-      ctxR.strokeStyle = '#5a6480';
-      ctxR.moveTo(x + 0.5, height - 10);
-      ctxR.lineTo(x + 0.5, height);
+      // Bold major tick
+      ctxR.strokeStyle = '#64748b';
+      ctxR.lineWidth = 1.2;
+      ctxR.moveTo(x + 0.5, height - 12);
+      ctxR.lineTo(x + 0.5, height - 1);
       ctxR.stroke();
 
-      const timeLabel = formatTime(s);
-      ctxR.fillText(timeLabel, x + 3, 11);
+      // Bold, bigger, crisp timecode label
+      ctxR.font = '600 11px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, monospace';
+      ctxR.fillStyle = '#f1f5f9';
+      ctxR.fillText(formatTime(s), x + 4, 13);
+    } else if (isMedium) {
+      // Medium tick
+      ctxR.strokeStyle = '#475569';
+      ctxR.lineWidth = 1;
+      ctxR.moveTo(x + 0.5, height - 7);
+      ctxR.lineTo(x + 0.5, height - 1);
+      ctxR.stroke();
     } else {
-      ctxR.strokeStyle = '#32394c';
-      ctxR.moveTo(x + 0.5, height - 5);
-      ctxR.lineTo(x + 0.5, height);
+      // Micro granular sub-tick
+      ctxR.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctxR.lineWidth = 1;
+      ctxR.moveTo(x + 0.5, height - 4);
+      ctxR.lineTo(x + 0.5, height - 1);
       ctxR.stroke();
     }
   }
@@ -8760,32 +8837,223 @@ document.getElementById('btn-save-project')?.addEventListener('click', () => {
 // Periodic auto-save every 3 seconds
 setInterval(() => saveProjectState(false), 3000);
 
-// ==================== VIDEO EXPORT ENGINE (CLIENT-SIDE RENDERER & RECORDER) ====================
+// ==================== APPLE-GRADE EXPORT STUDIO ENGINE & MODAL ====================
 let isExporting = false;
 let exportRecorder = null;
 let exportChunks = [];
+let exportCancelRequested = false;
 
-async function exportVideoProject() {
+const exportStudioConfig = {
+  aspectRatio: '16:9',
+  resolution: 1080,
+  fps: 30,
+  bitrate: 15,
+  format: 'mp4'
+};
+
+function getTimelineMaxEndTime() {
+  let maxTime = 5;
+  Object.keys(timelineClips).forEach(k => {
+    (timelineClips[k] || []).forEach(c => {
+      maxTime = Math.max(maxTime, c.start + c.duration);
+    });
+  });
+  return maxTime;
+}
+
+function getExportDimensions(ratio, res) {
+  res = parseInt(res, 10) || 1080;
+  if (ratio === '16:9') {
+    if (res === 720) return { width: 1280, height: 720 };
+    if (res === 1080) return { width: 1920, height: 1080 };
+    if (res === 1440) return { width: 2560, height: 1440 };
+    if (res === 2160) return { width: 3840, height: 2160 };
+    return { width: 1920, height: 1080 };
+  } else if (ratio === '9:16') {
+    if (res === 720) return { width: 720, height: 1280 };
+    if (res === 1080) return { width: 1080, height: 1920 };
+    if (res === 1440) return { width: 1440, height: 2560 };
+    if (res === 2160) return { width: 2160, height: 3840 };
+    return { width: 1080, height: 1920 };
+  } else if (ratio === '1:1') {
+    if (res === 720) return { width: 720, height: 720 };
+    if (res === 1080) return { width: 1080, height: 1080 };
+    if (res === 1440) return { width: 1440, height: 1440 };
+    if (res === 2160) return { width: 2160, height: 2160 };
+    return { width: 1080, height: 1080 };
+  }
+  return { width: 1920, height: 1080 };
+}
+
+function updateExportTelemetry() {
+  const { width, height } = getExportDimensions(exportStudioConfig.aspectRatio, exportStudioConfig.resolution);
+  const dimEl = document.getElementById('summary-dim');
+  if (dimEl) dimEl.textContent = `${width} × ${height}`;
+
+  const totalDur = Math.min(duration || 30, Math.max(3, getTimelineMaxEndTime()));
+  const durEl = document.getElementById('summary-dur');
+  if (durEl) durEl.textContent = formatTime(totalDur);
+
+  // Bitrate to MB: (Mbps * 1000000 / 8 * seconds) / (1024 * 1024)
+  const estMB = ((exportStudioConfig.bitrate * 1000000 / 8) * totalDur) / (1024 * 1024);
+  const sizeEl = document.getElementById('summary-size');
+  if (sizeEl) sizeEl.textContent = `~${estMB.toFixed(1)} MB`;
+
+  const readoutEl = document.getElementById('export-bitrate-readout');
+  if (readoutEl) {
+    let qualityTier = 'Standard';
+    if (exportStudioConfig.bitrate <= 8) qualityTier = 'Draft';
+    else if (exportStudioConfig.bitrate <= 16) qualityTier = 'High Quality';
+    else if (exportStudioConfig.bitrate <= 35) qualityTier = 'Pro Master';
+    else qualityTier = '4K UHD Ultra';
+    readoutEl.textContent = `${exportStudioConfig.bitrate} Mbps (${qualityTier})`;
+  }
+}
+
+function openExportStudioModal() {
+  const modal = document.getElementById('export-studio-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  updateExportTelemetry();
+}
+
+function closeExportStudioModal() {
+  const modal = document.getElementById('export-studio-modal');
+  if (!modal) return;
+  modal.style.display = 'none';
+  const progressBox = document.getElementById('export-progress-container');
+  if (progressBox) progressBox.style.display = 'none';
+  const btnStart = document.getElementById('btn-export-start');
+  if (btnStart) {
+    btnStart.disabled = false;
+    btnStart.innerHTML = `
+      <svg viewBox="0 0 24 24" class="render-icon"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
+      <span>Start Export</span>
+    `;
+  }
+}
+
+// Wire Modal Interactive Controls
+function initExportStudioUI() {
+  // Open / Close
+  document.getElementById('btn-export')?.addEventListener('click', openExportStudioModal);
+  document.getElementById('btn-export-close')?.addEventListener('click', () => {
+    if (isExporting) exportCancelRequested = true;
+    closeExportStudioModal();
+  });
+  document.getElementById('btn-export-modal-cancel')?.addEventListener('click', () => {
+    if (isExporting) exportCancelRequested = true;
+    closeExportStudioModal();
+  });
+
+  // Aspect Ratio Cards
+  document.querySelectorAll('.export-card-option').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.export-card-option').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      exportStudioConfig.aspectRatio = card.dataset.ratio || '16:9';
+      updateExportTelemetry();
+    });
+  });
+
+  // Resolution Chips
+  document.querySelectorAll('#export-resolution-chips .export-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#export-resolution-chips .export-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      exportStudioConfig.resolution = parseInt(chip.dataset.res, 10) || 1080;
+      updateExportTelemetry();
+    });
+  });
+
+  // Framerate Chips
+  document.querySelectorAll('#export-fps-chips .export-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#export-fps-chips .export-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      exportStudioConfig.fps = parseInt(chip.dataset.fps, 10) || 30;
+      updateExportTelemetry();
+    });
+  });
+
+  // Bitrate Slider & Presets
+  const slider = document.getElementById('export-bitrate-slider');
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      exportStudioConfig.bitrate = parseInt(e.target.value, 10);
+      document.querySelectorAll('.btn-micro-preset').forEach(b => {
+        b.classList.toggle('active', parseInt(b.dataset.bitrate, 10) === exportStudioConfig.bitrate);
+      });
+      updateExportTelemetry();
+    });
+  }
+
+  document.querySelectorAll('.btn-micro-preset').forEach(preset => {
+    preset.addEventListener('click', () => {
+      document.querySelectorAll('.btn-micro-preset').forEach(p => p.classList.remove('active'));
+      preset.classList.add('active');
+      const val = parseInt(preset.dataset.bitrate, 10);
+      exportStudioConfig.bitrate = val;
+      if (slider) slider.value = val;
+      updateExportTelemetry();
+    });
+  });
+
+  // Format Pills
+  const pillMp4 = document.getElementById('lbl-format-mp4');
+  const pillWebm = document.getElementById('lbl-format-webm');
+  pillMp4?.addEventListener('click', () => {
+    pillMp4.classList.add('active');
+    pillWebm?.classList.remove('active');
+    exportStudioConfig.format = 'mp4';
+  });
+  pillWebm?.addEventListener('click', () => {
+    pillWebm.classList.add('active');
+    pillMp4?.classList.remove('active');
+    exportStudioConfig.format = 'webm';
+  });
+
+  // Start Export Trigger
+  document.getElementById('btn-export-start')?.addEventListener('click', startStudioExport);
+}
+
+// Master Render Pipeline with FFmpeg Hardware Transcode
+async function startStudioExport() {
   if (isExporting) return;
-  const btnExport = document.getElementById('btn-export');
-  if (!btnExport) return;
 
-  const originalBtnHTML = btnExport.innerHTML;
+  const btnStart = document.getElementById('btn-export-start');
+  const progressBox = document.getElementById('export-progress-container');
+  const statusEl = document.getElementById('export-progress-status');
+  const pctEl = document.getElementById('export-progress-pct');
+  const barEl = document.getElementById('export-progress-bar');
+  const elapsedEl = document.getElementById('export-time-elapsed');
+  const etaEl = document.getElementById('export-time-eta');
+
   isExporting = true;
-  btnExport.disabled = true;
-  btnExport.style.opacity = '0.7';
+  exportCancelRequested = false;
+  if (btnStart) btnStart.disabled = true;
+  if (progressBox) progressBox.style.display = 'flex';
 
-  // Temporarily clear selection and editor overlays so they never bake into video
   const prevSelectedClip = selectedClip;
   selectedClip = null;
   toggleAppleHud(false);
 
-  // Pause regular live playback during render
   const wasPlaying = isPlaying;
   isPlaying = false;
 
+  const { width: targetW, height: targetH } = getExportDimensions(exportStudioConfig.aspectRatio, exportStudioConfig.resolution);
+  const origW = canvas.width;
+  const origH = canvas.height;
+
+  // Temporarily adapt canvas dimensions for render
+  canvas.width = targetW;
+  canvas.height = targetH;
+
+  const totalExportDuration = Math.min(duration || 30, Math.max(3, getTimelineMaxEndTime()));
+  const startTimeMs = performance.now();
+
   try {
-    // 1. Setup Audio Mixing Stream for Export
+    // 1. Audio mixing stream
     let audioStream = null;
     try {
       const audioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -8797,7 +9065,6 @@ async function exportVideoProject() {
         const audioDest = exportAudioCtx.createMediaStreamDestination();
         let connectedAudio = false;
 
-        // Connect main voiceover audio if present and ready
         if (audioPlayer && audioPlayer.src && audioPlayer.readyState >= 2) {
           try {
             const voiceSource = exportAudioCtx.createMediaElementSource(audioPlayer);
@@ -8807,7 +9074,6 @@ async function exportVideoProject() {
           } catch(e) {}
         }
 
-        // Connect bgm audio if present and ready
         if (bgmPlayer && bgmPlayer.src && bgmPlayer.readyState >= 2) {
           try {
             const bgmSource = exportAudioCtx.createMediaElementSource(bgmPlayer);
@@ -8822,34 +9088,26 @@ async function exportVideoProject() {
         }
       }
     } catch (aErr) {
-      console.warn('Audio stream mixing bypassed:', aErr);
+      console.warn('Audio mixing skipped:', aErr);
     }
 
-    // 2. Capture Canvas Stream (30 FPS standard high compatibility)
-    const canvasStream = canvas.captureStream ? canvas.captureStream(30) : canvas.mozCaptureStream(30);
+    // 2. Video Stream with target FPS
+    const canvasStream = canvas.captureStream ? canvas.captureStream(exportStudioConfig.fps) : canvas.mozCaptureStream(exportStudioConfig.fps);
     const combinedTracks = [...canvasStream.getVideoTracks()];
-
     if (audioStream && audioStream.getAudioTracks().length > 0) {
       combinedTracks.push(...audioStream.getAudioTracks());
     }
-
     const combinedStream = new MediaStream(combinedTracks);
 
-    // Pick best supported MIME type with broad player support (VLC, Chrome, Windows Media)
-    let mimeType = 'video/webm;codecs=vp8';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/webm';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'video/mp4';
-    }
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = '';
-    }
+    // Pick client capture codec
+    let mimeType = 'video/webm;codecs=vp9';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm;codecs=vp8';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'video/webm';
+    if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
 
     exportChunks = [];
-    const recorderOptions = mimeType ? { mimeType, videoBitsPerSecond: 5000000 } : { videoBitsPerSecond: 5000000 };
-    exportRecorder = new MediaRecorder(combinedStream, recorderOptions);
+    const bitsPerSec = exportStudioConfig.bitrate * 1000000;
+    exportRecorder = new MediaRecorder(combinedStream, mimeType ? { mimeType, videoBitsPerSecond: bitsPerSec } : { videoBitsPerSecond: bitsPerSec });
 
     exportRecorder.ondataavailable = (e) => {
       if (e.data && e.data.size > 0) {
@@ -8857,118 +9115,138 @@ async function exportVideoProject() {
       }
     };
 
-    const totalExportDuration = Math.min(duration || 30, Math.max(3, getTimelineMaxEndTime()));
-
-    exportRecorder.onstop = () => {
-      const finalMime = mimeType || 'video/webm';
-      const blob = new Blob(exportChunks, { type: finalMime });
-
-      // Diagnostic check: Ensure export file is not 0 bytes
-      if (blob.size === 0) {
-        alert('Export warning: Captured 0 bytes. Trying direct canvas frame fallback.');
-        isExporting = false;
-        btnExport.disabled = false;
-        btnExport.style.opacity = '1';
-        btnExport.innerHTML = originalBtnHTML;
-        return;
-      }
-
-      const downloadUrl = URL.createObjectURL(blob);
-      const ext = finalMime.includes('mp4') ? 'mp4' : 'webm';
-      const projectName = (document.getElementById('current-project')?.textContent || 'Magnates_Project').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const filename = `${projectName}_Export_${Date.now()}.${ext}`;
-
-      const a = document.createElement('a');
-      a.href = downloadUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(downloadUrl);
-      }, 3000);
-
-      // Reset export state
-      isExporting = false;
-      selectedClip = prevSelectedClip;
-      btnExport.disabled = false;
-      btnExport.style.opacity = '1';
-      btnExport.innerHTML = originalBtnHTML;
-      showTextTimingAlert(`Video exported successfully (${(blob.size / (1024 * 1024)).toFixed(1)} MB)!`, 'success');
-      setTimeout(() => showTextTimingAlert(''), 4500);
-
-      // Seek back to start
-      seekToTime(0);
-    };
-
-    // Calculate maximum timeline duration
-    function getTimelineMaxEndTime() {
-      let maxTime = 5;
-      Object.keys(timelineClips).forEach(k => {
-        (timelineClips[k] || []).forEach(c => {
-          maxTime = Math.max(maxTime, c.start + c.duration);
-        });
-      });
-      return maxTime;
-    }
-
-    // 3. Start Recording with periodic timeslices
+    // 3. Playback timeline capture
     exportRecorder.start(250);
-
-    // Playback loop from 0
     seekToTime(0);
     isPlaying = true;
     if (audioPlayer.src) audioPlayer.play().catch(() => {});
     if (bgmPlayer.src) bgmPlayer.play().catch(() => {});
-
-    // Ensure initial canvas frame is rendered immediately
     render(performance.now());
 
-    const checkInterval = setInterval(() => {
-      if (!isExporting) {
-        clearInterval(checkInterval);
-        return;
-      }
+    await new Promise((resolve, reject) => {
+      const checkInterval = setInterval(() => {
+        if (exportCancelRequested) {
+          clearInterval(checkInterval);
+          if (exportRecorder && exportRecorder.state === 'recording') exportRecorder.stop();
+          isPlaying = false;
+          if (audioPlayer) audioPlayer.pause();
+          if (bgmPlayer) bgmPlayer.pause();
+          reject(new Error('Export canceled by user.'));
+          return;
+        }
 
-      // Request data from recorder
-      if (exportRecorder && exportRecorder.state === 'recording') {
-        try {
-          exportRecorder.requestData();
-        } catch(e) {}
-      }
-
-      // Update export button progress text
-      const pct = Math.min(100, Math.round((currentTime / totalExportDuration) * 100));
-      btnExport.innerHTML = `
-        <svg class="ui-icon" viewBox="0 0 24 24" style="animation: spin 1s linear infinite;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-        Rendering ${pct}%...
-      `;
-
-      if (currentTime >= totalExportDuration) {
-        clearInterval(checkInterval);
-        isPlaying = false;
-        if (audioPlayer) audioPlayer.pause();
-        if (bgmPlayer) bgmPlayer.pause();
         if (exportRecorder && exportRecorder.state === 'recording') {
-          exportRecorder.stop();
+          try { exportRecorder.requestData(); } catch(e) {}
+        }
+
+        const elapsedSec = Math.max(1, (performance.now() - startTimeMs) / 1000);
+        const progressRatio = Math.min(1.0, currentTime / totalExportDuration);
+        const pct = Math.round(progressRatio * 100);
+
+        if (statusEl) statusEl.textContent = `Capturing frames (${exportStudioConfig.aspectRatio} ${targetW}x${targetH})...`;
+        if (pctEl) pctEl.textContent = `${pct}%`;
+        if (barEl) barEl.style.width = `${pct}%`;
+        if (elapsedEl) elapsedEl.textContent = `Elapsed: ${Math.round(elapsedSec)}s`;
+
+        const totalEstSec = elapsedSec / Math.max(0.05, progressRatio);
+        const remainingSec = Math.max(0, Math.round(totalEstSec - elapsedSec));
+        if (etaEl) etaEl.textContent = `ETA: ~${remainingSec}s`;
+
+        if (currentTime >= totalExportDuration) {
+          clearInterval(checkInterval);
+          isPlaying = false;
+          if (audioPlayer) audioPlayer.pause();
+          if (bgmPlayer) bgmPlayer.pause();
+
+          exportRecorder.onstop = () => resolve();
+          if (exportRecorder && exportRecorder.state === 'recording') {
+            exportRecorder.stop();
+          } else {
+            resolve();
+          }
+        }
+      }, 150);
+    });
+
+    // 4. Server-Side Universal FFmpeg Transcode or Direct Browser Fallback
+    if (statusEl) statusEl.textContent = `Encoding ${exportStudioConfig.format.toUpperCase()} via FFmpeg...`;
+    if (barEl) barEl.style.width = '100%';
+
+    const capturedBlob = new Blob(exportChunks, { type: mimeType || 'video/webm' });
+    const projectName = (document.getElementById('current-project')?.textContent || 'Magnates_Project').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    let finalDownloadUrl = null;
+    let finalFilename = `${projectName}_${exportStudioConfig.aspectRatio.replace(':', 'x')}_${targetW}x${targetH}_${Date.now()}.${exportStudioConfig.format}`;
+
+    try {
+      const formData = new FormData();
+      formData.append('video', capturedBlob, 'captured.webm');
+      formData.append('aspectRatio', exportStudioConfig.aspectRatio);
+      formData.append('width', targetW);
+      formData.append('height', targetH);
+      formData.append('fps', exportStudioConfig.fps);
+      formData.append('bitrate', `${exportStudioConfig.bitrate}M`);
+      formData.append('format', exportStudioConfig.format);
+      formData.append('projectName', projectName);
+
+      const resp = await fetch('/api/export/transcode', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.success && data.url) {
+          finalDownloadUrl = data.url;
+          finalFilename = data.filename;
         }
       }
-    }, 200);
+    } catch (serverErr) {
+      console.warn('Backend FFmpeg route unavailable, using direct browser fallback:', serverErr);
+    }
+
+    // Direct fallback if server transcode wasn't used
+    if (!finalDownloadUrl) {
+      finalDownloadUrl = URL.createObjectURL(capturedBlob);
+      finalFilename = `${projectName}_${exportStudioConfig.aspectRatio.replace(':', 'x')}_${targetW}x${targetH}.${capturedBlob.type.includes('mp4') ? 'mp4' : 'webm'}`;
+    }
+
+    // Trigger Browser Download
+    const a = document.createElement('a');
+    a.href = finalDownloadUrl;
+    a.download = finalFilename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      if (finalDownloadUrl.startsWith('blob:')) URL.revokeObjectURL(finalDownloadUrl);
+    }, 4000);
+
+    showTextTimingAlert(`Video exported successfully: ${finalFilename}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 4500);
 
   } catch (err) {
-    console.error('Export Error:', err);
-    alert(`Failed to export video: ${err.message}`);
+    if (!exportCancelRequested) {
+      console.error('Export Error:', err);
+      alert(`Export Failed: ${err.message}`);
+    } else {
+      showTextTimingAlert('Export cancelled.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    }
+  } finally {
+    // Restore Canvas Dimensions & UI
+    canvas.width = origW;
+    canvas.height = origH;
     isExporting = false;
     selectedClip = prevSelectedClip;
-    btnExport.disabled = false;
-    btnExport.style.opacity = '1';
-    btnExport.innerHTML = originalBtnHTML;
+    closeExportStudioModal();
+    seekToTime(0);
+    render(performance.now());
   }
 }
 
-document.getElementById('btn-export')?.addEventListener('click', () => {
-  exportVideoProject();
-});
+// Initialize Export Studio UI on load
+setTimeout(() => initExportStudioUI(), 200);
 
 // ==================== STUDIO CONTEXT MENU & MAGNATES VECTOR / CUTOUT ENGINE ====================
 let activeStudioContextMenu = null;
@@ -15176,93 +15454,256 @@ document.querySelectorAll('.track-btn-mute').forEach(btn => {
   });
 });
 
-// ==================== EDIT TOOLS: CUT, TRIM LEFT, TRIM RIGHT ====================
-document.getElementById('tool-cut')?.addEventListener('click', () => {
-  if (!selectedClip || !selectedClip.clip) {
-    showTextTimingAlert('Please select a clip to cut.', 'warning');
-    setTimeout(() => showTextTimingAlert(''), 2000);
-    return;
+// ==================== EDIT TOOLS: CUT, SPLIT, TRIM START/END, DELETE, CLIPBOARD ====================
+window._studioClipboard = null;
+
+function findClipUnderPlayhead() {
+  const trackPriority = ['video', 'image', 'chart', 'text', 'voiceover', 'music'];
+  for (const track of trackPriority) {
+    if (isTrackLocked(track)) continue;
+    const clips = timelineClips[track] || [];
+    const hit = clips.find(c => currentTime >= c.start && currentTime < (c.start + c.duration));
+    if (hit) return { trackType: track, clip: hit };
   }
-  const { trackType, clip } = selectedClip;
-  if (isTrackLocked(trackType)) {
-    showTextTimingAlert('Track is locked.', 'warning');
-    return;
+  return null;
+}
+
+function executeStudioSplit(atTime = currentTime) {
+  if (selectedClip && selectedClip.clip) {
+    const { trackType, clip } = selectedClip;
+    if (isTrackLocked(trackType)) {
+      showTextTimingAlert('Track is locked.', 'warning');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+      return false;
+    }
+    if (atTime > clip.start && atTime < (clip.start + clip.duration)) {
+      if (splitClipAtTime(trackType, clip, atTime)) {
+        showTextTimingAlert('Split clip at ' + formatTimecode(atTime), 'success');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+        return true;
+      }
+    }
   }
 
-  // If selecting audio clip, open the Precision Audio Cut / Trim Tool
-  if (trackType === 'voiceover' || trackType === 'music') {
-    openAudioTrimModal(clip, trackType);
-    return;
+  const hit = findClipUnderPlayhead();
+  if (hit) {
+    if (atTime > hit.clip.start && atTime < (hit.clip.start + hit.clip.duration)) {
+      if (splitClipAtTime(hit.trackType, hit.clip, atTime)) {
+        showTextTimingAlert(`Split ${hit.trackType} clip at ` + formatTimecode(atTime), 'success');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+        return true;
+      }
+    }
   }
+
+  setStudioTool('split');
+  showTextTimingAlert('Razor Blade active. Click any clip to cut.', 'info');
+  setTimeout(() => showTextTimingAlert(''), 2000);
+  return false;
+}
+
+function executeStudioTrimStart() {
+  let target = selectedClip;
+  if (!target || !target.clip || currentTime <= target.clip.start || currentTime >= (target.clip.start + target.clip.duration)) {
+    target = findClipUnderPlayhead();
+  }
+
+  if (!target || !target.clip) {
+    showTextTimingAlert('Place playhead inside a clip to trim start.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+    return false;
+  }
+
+  const { trackType, clip } = target;
+  if (isTrackLocked(trackType)) {
+    showTextTimingAlert('Track is locked.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
+  }
+
+  if (currentTime <= clip.start || currentTime >= (clip.start + clip.duration)) {
+    showTextTimingAlert('Playhead must be inside the clip to trim.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
+  }
+
+  const originalEnd = clip.start + clip.duration;
+  const trimmedAmount = currentTime - clip.start;
+  clip.start = currentTime;
+  clip.duration = originalEnd - currentTime;
+
+  if (clip.file && typeof clip.file.inPoint === 'number') {
+    clip.file.inPoint += trimmedAmount;
+  }
+
+  timelineClips[trackType].sort((a, b) => a.start - b.start);
+  recordState('Trim Start to Playhead');
+  renderAllTimelineTracks();
+  selectClip(clip, trackType);
+  showTextTimingAlert('Trimmed start to ' + formatTimecode(currentTime), 'success');
+  setTimeout(() => showTextTimingAlert(''), 1500);
+  return true;
+}
+
+function executeStudioTrimEnd() {
+  let target = selectedClip;
+  if (!target || !target.clip || currentTime <= target.clip.start || currentTime >= (target.clip.start + target.clip.duration)) {
+    target = findClipUnderPlayhead();
+  }
+
+  if (!target || !target.clip) {
+    showTextTimingAlert('Place playhead inside a clip to trim end.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+    return false;
+  }
+
+  const { trackType, clip } = target;
+  if (isTrackLocked(trackType)) {
+    showTextTimingAlert('Track is locked.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
+  }
+
+  if (currentTime <= clip.start || currentTime >= (clip.start + clip.duration)) {
+    showTextTimingAlert('Playhead must be inside the clip to trim.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
+  }
+
+  clip.duration = currentTime - clip.start;
+  timelineClips[trackType].sort((a, b) => a.start - b.start);
+  recordState('Trim End to Playhead');
+  renderAllTimelineTracks();
+  selectClip(clip, trackType);
+  showTextTimingAlert('Trimmed end to ' + formatTimecode(currentTime), 'success');
+  setTimeout(() => showTextTimingAlert(''), 1500);
+  return true;
+}
+
+function executeStudioCut() {
+  let target = selectedClip;
+  if (!target || !target.clip) {
+    target = findClipUnderPlayhead();
+  }
+
+  if (!target || !target.clip) {
+    showTextTimingAlert('Select a clip to cut.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+    return false;
+  }
+
+  const { trackType, clip } = target;
+  if (isTrackLocked(trackType)) {
+    showTextTimingAlert('Track is locked.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
+  }
+
+  window._studioClipboard = {
+    trackType,
+    clip: JSON.parse(JSON.stringify(clip))
+  };
 
   recordState('Cut Clip');
   deleteClip(trackType, clip.id);
-  showTextTimingAlert('Clip cut from timeline.', 'success');
+  showTextTimingAlert('Clip cut to clipboard (Ctrl+V to paste).', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2000);
+  return true;
+}
+
+function executeStudioDelete() {
+  let target = selectedClip;
+  if (!target || !target.clip) {
+    target = findClipUnderPlayhead();
+  }
+
+  if (!target || !target.clip) {
+    showTextTimingAlert('Select a clip to delete.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+    return false;
+  }
+
+  const { trackType, clip } = target;
+  if (isTrackLocked(trackType)) {
+    showTextTimingAlert('Track is locked.', 'warning');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return false;
+  }
+
+  recordState('Delete Clip');
+  deleteClip(trackType, clip.id);
+  showTextTimingAlert('Clip deleted.', 'info');
   setTimeout(() => showTextTimingAlert(''), 1500);
-});
+  return true;
+}
 
-// Trim Left: Trim clip start to playhead
-document.getElementById('tool-trim-left')?.addEventListener('click', () => {
-  if (!selectedClip || !selectedClip.clip) {
-    showTextTimingAlert('Please select a clip to trim.', 'warning');
-    setTimeout(() => showTextTimingAlert(''), 2000);
-    return;
+function executeStudioPaste() {
+  if (!window._studioClipboard || !window._studioClipboard.clip) {
+    return false;
   }
-  const { trackType, clip } = selectedClip;
+
+  const { trackType, clip } = window._studioClipboard;
   if (isTrackLocked(trackType)) {
     showTextTimingAlert('Track is locked.', 'warning');
-    return;
-  }
-  if (currentTime > clip.start && currentTime < (clip.start + clip.duration)) {
-    const originalEnd = clip.start + clip.duration;
-    clip.start = currentTime;
-    clip.duration = originalEnd - currentTime;
-    recordState('Trim Start to Playhead');
-    renderAllTimelineTracks();
-    showTextTimingAlert('Trimmed clip start to ' + formatTimecode(currentTime), 'success');
     setTimeout(() => showTextTimingAlert(''), 1500);
-  } else {
-    showTextTimingAlert('Playhead must be inside selected clip to trim.', 'warning');
-    setTimeout(() => showTextTimingAlert(''), 2000);
+    return false;
   }
-});
 
-// Trim Right: Trim clip end to playhead
-document.getElementById('tool-trim-right')?.addEventListener('click', () => {
-  if (!selectedClip || !selectedClip.clip) {
-    showTextTimingAlert('Please select a clip to trim.', 'warning');
-    setTimeout(() => showTextTimingAlert(''), 2000);
-    return;
-  }
-  const { trackType, clip } = selectedClip;
-  if (isTrackLocked(trackType)) {
-    showTextTimingAlert('Track is locked.', 'warning');
-    return;
-  }
-  if (currentTime > clip.start && currentTime < (clip.start + clip.duration)) {
-    clip.duration = currentTime - clip.start;
-    recordState('Trim End to Playhead');
-    renderAllTimelineTracks();
-    showTextTimingAlert('Trimmed clip end to ' + formatTimecode(currentTime), 'success');
-    setTimeout(() => showTextTimingAlert(''), 1500);
-  } else {
-    showTextTimingAlert('Playhead must be inside selected clip to trim.', 'warning');
-    setTimeout(() => showTextTimingAlert(''), 2000);
-  }
-});
+  const pastedClip = JSON.parse(JSON.stringify(clip));
+  pastedClip.id = `clip-${trackType}-${Date.now()}`;
+  pastedClip.start = currentTime;
 
-// Keyboard shortcuts: Q (Trim Left), W (Trim Right), S (Split)
+  if (!timelineClips[trackType]) timelineClips[trackType] = [];
+  timelineClips[trackType].push(pastedClip);
+  timelineClips[trackType].sort((a, b) => a.start - b.start);
+
+  recordState('Paste Clip');
+  renderAllTimelineTracks();
+  selectClip(pastedClip, trackType);
+  showTextTimingAlert('Pasted clip at ' + formatTimecode(currentTime), 'success');
+  setTimeout(() => showTextTimingAlert(''), 1500);
+  return true;
+}
+
+// Bind Button Clicks
+document.getElementById('tool-split')?.addEventListener('click', () => executeStudioSplit());
+document.getElementById('tool-trim-left')?.addEventListener('click', () => executeStudioTrimStart());
+document.getElementById('tool-trim-right')?.addEventListener('click', () => executeStudioTrimEnd());
+document.getElementById('tool-cut')?.addEventListener('click', () => executeStudioCut());
+document.getElementById('tool-delete')?.addEventListener('click', () => executeStudioDelete());
+
+// Keyboard shortcuts: Q (Trim Start), W (Trim End), S (Split), V (Select), Ctrl+X (Cut), Ctrl+C (Copy), Ctrl+V (Paste)
 window.addEventListener('keydown', (e) => {
-  const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+  const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable;
   if (isInput) return;
-  if (e.key.toLowerCase() === 'q') {
-    document.getElementById('tool-trim-left')?.click();
-  } else if (e.key.toLowerCase() === 'w') {
-    document.getElementById('tool-trim-right')?.click();
-  } else if (e.key.toLowerCase() === 's') {
+
+  const key = e.key.toLowerCase();
+
+  if ((e.ctrlKey || e.metaKey) && key === 'x') {
+    e.preventDefault();
+    executeStudioCut();
+  } else if ((e.ctrlKey || e.metaKey) && key === 'c') {
     if (selectedClip && selectedClip.clip) {
-      splitClipAtPlayhead(selectedClip.trackType, selectedClip.clip);
+      window._studioClipboard = {
+        trackType: selectedClip.trackType,
+        clip: JSON.parse(JSON.stringify(selectedClip.clip))
+      };
+      showTextTimingAlert('Clip copied to clipboard.', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1500);
     }
+  } else if ((e.ctrlKey || e.metaKey) && key === 'v') {
+    e.preventDefault();
+    executeStudioPaste();
+  } else if (key === 'q') {
+    executeStudioTrimStart();
+  } else if (key === 'w') {
+    executeStudioTrimEnd();
+  } else if (key === 's') {
+    executeStudioSplit();
+  } else if (key === 'v') {
+    setStudioTool('select');
+  } else if (e.key === 'Delete' || e.key === 'Backspace') {
+    executeStudioDelete();
   }
 });
 

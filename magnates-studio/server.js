@@ -139,6 +139,60 @@ app.post('/api/project/state', (req, res) => {
   }
 });
 
+// Server-side Universal Video Transcoder & Export Processor
+const { exec } = require('child_process');
+
+app.post('/api/export/transcode', upload.single('video'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No video file received.' });
+  }
+
+  const {
+    aspectRatio = '16:9',
+    width = 1920,
+    height = 1080,
+    fps = 30,
+    bitrate = '15M',
+    format = 'mp4',
+    projectName = 'Magnates_Project'
+  } = req.body;
+
+  const inputPath = req.file.path;
+  const safeName = (projectName || 'Magnates_Project').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const outputFileName = `${safeName}_${String(aspectRatio).replace(':', 'x')}_${width}x${height}_${Date.now()}.${format}`;
+  const outputPath = path.join(uploadsDir, outputFileName);
+
+  const bitrateStr = typeof bitrate === 'string' && (bitrate.endsWith('M') || bitrate.endsWith('k')) 
+    ? bitrate 
+    : `${bitrate}M`;
+
+  let ffmpegCmd = '';
+  if (format === 'mp4') {
+    ffmpegCmd = `ffmpeg -y -i "${inputPath}" -vf "scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black" -c:v libx264 -preset fast -b:v ${bitrateStr} -maxrate ${bitrateStr} -bufsize 20M -r ${fps} -pix_fmt yuv420p -c:a aac -b:a 192k "${outputPath}"`;
+  } else {
+    ffmpegCmd = `ffmpeg -y -i "${inputPath}" -vf "scale=${width}:${height}:force_original_aspect_ratio=decrease,pad=${width}:${height}:(ow-iw)/2:(oh-ih)/2:color=black" -c:v libvpx-vp9 -b:v ${bitrateStr} -r ${fps} -c:a libopus -b:a 192k "${outputPath}"`;
+  }
+
+  console.log(`[Export] Executing FFmpeg: ${ffmpegCmd}`);
+  exec(ffmpegCmd, (error, stdout, stderr) => {
+    // Delete temp raw file to prevent memory/disk leaks
+    try { fs.unlinkSync(inputPath); } catch(e) {}
+
+    if (error) {
+      console.error('[Export] FFmpeg error:', stderr);
+      return res.status(500).json({ error: 'FFmpeg transcode failed', details: stderr });
+    }
+
+    const stat = fs.statSync(outputPath);
+    res.json({
+      success: true,
+      filename: outputFileName,
+      url: `/media/uploads/${encodeURIComponent(outputFileName)}`,
+      size: stat.size
+    });
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Magnates Studio running at http://localhost:${PORT}`);
 });
