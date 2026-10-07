@@ -19698,6 +19698,17 @@ function initRegaarderStudioControls() {
         projects: { title: 'Projects', sub: 'Saved project files & backups' }
       };
 
+      if (railTab === 'templates') {
+        switchStudioView('home');
+        return;
+      }
+
+      // If user clicks Uploads, Elements, Text, Icons, Layers, Projects, switch to editor view if on home
+      const homeView = document.getElementById('home-templates-discovery');
+      if (homeView && homeView.style.display !== 'none') {
+        switchStudioView('editor');
+      }
+
       if (titleMap[railTab] && heading && sub) {
         heading.textContent = titleMap[railTab].title;
         sub.textContent = titleMap[railTab].sub;
@@ -19726,90 +19737,93 @@ if (document.readyState === 'loading') {
 
 /* =========================================================
    CANVA-STYLE HOMEPAGE TEMPLATE DISCOVERY CONTROLLER
+   With Live Hover Video Simulation Engine (2.5D Parallax BG Removal, Paper Shred, Gold Frame)
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
-    id: 'parallax-zoom',
-    title: '3D Parallax Depth Zoom',
+    id: 'subject-25d-parallax',
+    title: '2.5D Animated Subject Cutout (Auto BG Removed)',
     category: 'Parallax',
-    badge: 'Popular',
-    difficulty: 'Beginner',
-    timeToApply: '10 sec',
-    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.7), rgba(49, 46, 129, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Separates foreground subject from background with smooth 3D depth camera movement.',
-    tags: ['3D Motion', 'Photo to Video', 'Cinematic'],
-    defaultImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
-    centerLabel: '[ 3D PARALLAX DEPTH ]',
-    centerSub: 'Click to launch in Studio'
+    badge: 'Vox / Johnny Harris',
+    difficulty: 'Popular',
+    timeToApply: '6 sec',
+    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.7), rgba(76, 29, 149, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Automatically strips out the image background, leaving a clean 3D floating subject that moves over a panning environment.',
+    tags: ['2.5D Cutout', 'BG Removed', 'Vox Style'],
+    defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    cutoutImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
-    id: 'kinetic-type-split',
-    title: 'Kinetic Typography & Highlight',
-    category: 'Text & Titles',
-    badge: 'Trending',
+    id: 'paper-rip-shred',
+    title: 'Paper Rip & Shred Transition',
+    category: 'Transitions',
+    badge: 'James Jani Style',
     difficulty: '1-Click',
-    timeToApply: '5 sec',
-    previewGradient: 'linear-gradient(to top, rgba(136, 19, 55, 0.7), rgba(127, 29, 29, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Punchy animated text overlay with customized word accent highlight.',
-    tags: ['Social Media', 'Reels', 'Title Card'],
-    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
-    centerCustomHtml: '<span style="font-size: 19px; font-weight: 900; letter-spacing: -0.02em; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.8);">Title of <span style="color: #ef4444; font-weight: 900; text-decoration: underline; text-decoration-color: #a855f7;">REGAARDER</span></span>'
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.7), rgba(154, 52, 18, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Torn paper edge shred effect uncovering newspaper headlines or archival footage cut.',
+    tags: ['Paper Rip', 'Documentary', 'James Jani'],
+    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80'
   },
   {
-    id: 'cyber-glitch-pass',
-    title: 'Cyberpunk RGB Glitch Shift',
-    category: 'Glitches',
-    badge: 'New',
+    id: 'gold-frame-spin',
+    title: 'Dark Luxury Gold Frame 3D Spin',
+    category: 'Parallax',
+    badge: 'Magnates Media',
     difficulty: 'Beginner',
     timeToApply: '8 sec',
-    previewGradient: 'linear-gradient(to top, rgba(22, 78, 99, 0.7), rgba(30, 58, 138, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Futuristic chromatic aberration and visual noise pulse for high-energy cuts.',
-    tags: ['VFX', 'Cyberpunk', 'Transition'],
-    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
-    centerCustomHtml: '<div style="padding: 5px 12px; background: rgba(8, 47, 73, 0.9); border: 1px solid rgba(6, 182, 212, 0.6); color: #67e8f9; font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.12em; border-radius: 6px;">RGB_SHIFT_EFFECT</div>'
+    previewGradient: 'linear-gradient(to top, rgba(113, 63, 18, 0.7), rgba(180, 83, 9, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Floating 3D framed image with metallic gold bevel light reflections against textured shadow.',
+    tags: ['Magnates Media', 'Gold FX', '3D Frame'],
+    defaultImage: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&auto=format&fit=crop&q=80'
   },
   {
-    id: 'vintage-film-grain',
-    title: 'Retro 16mm Film Grain & Light Leak',
-    category: 'Color & Vibe',
-    badge: 'Pro Look',
+    id: 'archival-ink-highlight',
+    title: 'Archival Document & Ink Sweep',
+    category: 'Text & Titles',
+    badge: 'Vox / James Jani',
     difficulty: '1-Click',
-    timeToApply: '5 sec',
-    previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.7), rgba(154, 52, 18, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Warm nostalgic film emulsion texture, slight gate weave, and ambient light leaks.',
-    tags: ['Nostalgia', 'Aesthetic', 'Color Grade'],
-    defaultImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
-  },
-  {
-    id: 'glassmorphic-lower-third',
-    title: 'Glassmorphic Animated Lower Third',
-    category: 'Lower Thirds',
-    badge: 'Popular',
-    difficulty: 'Easy',
-    timeToApply: '12 sec',
-    previewGradient: 'linear-gradient(to top, rgba(6, 78, 59, 0.7), rgba(19, 78, 74, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Sleek translucent glass bar with animated title and accent badge for speakers.',
-    tags: ['Corporate', 'Interview', 'Clean'],
-    defaultImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80'
-  },
-  {
-    id: 'swoosh-zoom-transition',
-    title: 'Dynamic Speed Ramp Swoosh',
-    category: 'Transitions',
-    badge: 'Popular',
-    difficulty: 'Beginner',
     timeToApply: '6 sec',
-    previewGradient: 'linear-gradient(to top, rgba(112, 26, 117, 0.7), rgba(131, 24, 67, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Fast optical flow zoom with directional motion blur linking two clips seamlessly.',
-    tags: ['Vlog', 'Action', 'Fast Cut'],
-    defaultImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80'
+    previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.6), rgba(161, 98, 7, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Vintage document camera pan with an animated yellow/gold marker sweep highlighting keywords.',
+    tags: ['Highlighter', 'Archival', 'Vox Style'],
+    defaultImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'spotlight-lens-sweep',
+    title: 'Dramatic Spotlight & Vignette Cut',
+    category: 'Color & Vibe',
+    badge: 'James Jani',
+    difficulty: 'Easy',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.9), rgba(120, 53, 15, 0.3), rgba(15, 23, 42, 0.9))',
+    description: 'Cinematic warm spotlight cone scanning across a dark textured subject image.',
+    tags: ['Spotlight', 'Vignette', 'Cinematic'],
+    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'financial-graph-wipe',
+    title: 'Stock Graph & Neon Chart Transition',
+    category: 'Transitions',
+    badge: 'Magnates Media',
+    difficulty: 'Beginner',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(to top, rgba(6, 78, 59, 0.7), rgba(19, 78, 74, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Glowing neon stock market growth graph drawing across the screen as a seamless transition wipe.',
+    tags: ['Stock Chart', 'Finance', 'Magnates'],
+    defaultImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', 'Parallax', 'Text & Titles', 'Glitches', 'Transitions', 'Color & Vibe', 'Lower Thirds'];
+const TEMPLATE_CATEGORIES = ['All', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
+let activeHoverAnimFrame = null;
+let activeHoverCardEl = null;
+let hoverStartTime = 0;
 
 function switchStudioView(viewName) {
   const homeView = document.getElementById('home-templates-discovery');
@@ -19830,10 +19844,14 @@ function switchStudioView(viewName) {
       btnEditor.style.color = '#94a3b8';
       btnEditor.classList.remove('active');
     }
+    // Update vertical rail active tab to 'templates'
+    document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.railTab === 'templates');
+    });
     renderHomepageTemplates();
   } else {
     if (homeView) homeView.style.display = 'none';
-    if (editorView) editorView.style.display = 'flex';
+    if (editorView) editorView.style.display = 'grid';
     if (btnHome) {
       btnHome.style.background = 'transparent';
       btnHome.style.color = '#94a3b8';
@@ -19843,6 +19861,13 @@ function switchStudioView(viewName) {
       btnEditor.style.background = '#8b5cf6';
       btnEditor.style.color = '#fff';
       btnEditor.classList.add('active');
+    }
+    // Update vertical rail active tab to 'all' (Media/Uploads) if templates was active
+    const activeRail = document.querySelector('.nav-rail .rail-btn.active');
+    if (!activeRail || activeRail.dataset.railTab === 'templates') {
+      document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.railTab === 'all');
+      });
     }
     // Re-trigger layout sizing on canvas
     if (typeof renderCanvas === 'function') renderCanvas();
@@ -19882,6 +19907,7 @@ function renderHomepageTemplates() {
     const query = templateSearchQuery.toLowerCase().trim();
     const matchesSearch = !query ||
       t.title.toLowerCase().includes(query) ||
+      t.badge.toLowerCase().includes(query) ||
       t.description.toLowerCase().includes(query) ||
       t.tags.some(tag => tag.toLowerCase().includes(query));
     return matchesCat && matchesSearch;
@@ -19899,41 +19925,32 @@ function renderHomepageTemplates() {
       <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; color: #64748b;">
         <svg viewBox="0 0 24 24" style="width: 38px; height: 38px; fill: none; stroke: currentColor; stroke-width: 1.5; margin: 0 auto 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         <p style="font-size: 15px; font-weight: 600; color: #94a3b8; margin: 0;">No templates matched "${templateSearchQuery}"</p>
-        <p style="font-size: 12px; margin: 6px 0 0;">Try searching for "parallax", "text", "glitch", or pick another category.</p>
+        <p style="font-size: 12px; margin: 6px 0 0;">Try searching for "cutout", "paper rip", "gold frame", or "parallax".</p>
       </div>
     `;
     return;
   }
 
   grid.innerHTML = filtered.map(t => {
-    let centerContent = '';
-    if (t.centerCustomHtml) {
-      centerContent = t.centerCustomHtml;
-    } else if (t.centerLabel) {
-      centerContent = `
-        <div style="text-align: center;">
-          <div style="display: inline-block; padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
-            ${t.centerLabel}
-          </div>
-          ${t.centerSub ? `<div style="font-size: 10px; color: #cbd5e1; margin-top: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">${t.centerSub}</div>` : ''}
-        </div>
-      `;
-    }
-
     return `
       <div class="home-tpl-card" data-template-id="${t.id}">
-        <div class="home-tpl-media">
-          <img src="${t.defaultImage}" alt="${t.title}" class="home-tpl-img" />
+        <div class="home-tpl-media" id="media-wrap-${t.id}">
+          <img src="${t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" />
           <div class="home-tpl-overlay" style="background: ${t.previewGradient}; opacity: 0.65;"></div>
           
-          <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none;">
-            ${centerContent}
+          <div class="home-tpl-center-label" id="center-label-${t.id}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; transition: opacity 0.2s;">
+            <div style="padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); border: 1px solid rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+              [ ${t.category.toUpperCase()} ]
+            </div>
           </div>
 
-          <div class="home-tpl-badge">${t.badge}</div>
+          <!-- Container for dynamic Live Hover Video FX -->
+          <div class="home-tpl-fx-container" id="fx-container-${t.id}" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; display: none;"></div>
+
+          <div class="home-tpl-badge" id="badge-${t.id}">${t.badge}</div>
           <div class="home-tpl-time">${t.timeToApply}</div>
 
-          <div class="home-tpl-play-hover">
+          <div class="home-tpl-play-hover" id="play-hover-${t.id}">
             <div class="home-tpl-play-circle">
               <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: currentColor; margin-left: 2px;"><path d="M8 5v14l11-7z"/></svg>
             </div>
@@ -19951,7 +19968,7 @@ function renderHomepageTemplates() {
               ${t.tags.slice(0, 2).map(tag => `<span class="home-tpl-tag">#${tag}</span>`).join('')}
             </div>
             <span class="home-tpl-btn-use">
-              Use FX
+              Open FX
               <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
             </span>
           </div>
@@ -19960,12 +19977,157 @@ function renderHomepageTemplates() {
     `;
   }).join('');
 
+  // Attach hover video effect listeners and click handler to each card
   grid.querySelectorAll('.home-tpl-card').forEach(card => {
-    card.addEventListener('click', (e) => {
-      const tplId = e.currentTarget.dataset.templateId;
+    const tplId = card.dataset.templateId;
+    const tpl = EFFECT_TEMPLATES_DATA.find(item => item.id === tplId);
+
+    card.addEventListener('mouseenter', () => {
+      startTemplateHoverVideo(card, tpl);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      stopTemplateHoverVideo(card, tpl);
+    });
+
+    card.addEventListener('click', () => {
       applySelectedHomepageTemplate(tplId);
     });
   });
+}
+
+function startTemplateHoverVideo(cardEl, tpl) {
+  if (!tpl) return;
+  const tplId = tpl.id;
+  const fxContainer = cardEl.querySelector(`#fx-container-${tplId}`);
+  const defaultImg = cardEl.querySelector(`#default-img-${tplId}`);
+  const centerLabel = cardEl.querySelector(`#center-label-${tplId}`);
+  const badgeEl = cardEl.querySelector(`#badge-${tplId}`);
+  const playHover = cardEl.querySelector(`#play-hover-${tplId}`);
+
+  if (playHover) playHover.style.display = 'none';
+  if (defaultImg) defaultImg.style.opacity = '0';
+  if (centerLabel) centerLabel.style.opacity = '0';
+  if (badgeEl) {
+    badgeEl.textContent = 'LIVE PREVIEW';
+    badgeEl.style.background = '#ef4444';
+    badgeEl.classList.add('pulse-preview-badge');
+  }
+
+  if (fxContainer) {
+    fxContainer.style.display = 'block';
+    // Inject specialized HTML layers based on effect type
+    if (tplId === 'subject-25d-parallax') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+          <img id="fx-bg-${tplId}" src="${tpl.secondaryImage}" alt="Moving Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75);" />
+          <div id="fx-fg-wrap-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+            <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
+              <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" alt="Isolated Subject" style="max-height: 92%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4));" />
+            </div>
+          </div>
+          <div style="position: absolute; top: 12px; right: 12px; padding: 2px 8px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 1px solid rgba(192, 132, 252, 0.5);">
+            ✂️ BG REMOVED
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'paper-rip-shred') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden;">
+          <img src="${tpl.secondaryImage}" alt="Next Clip" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
+          <div id="fx-rip-${tplId}" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 20px rgba(0,0,0,0.9);">
+            <img src="${tpl.defaultImage}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'gold-frame-spin') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #0a0806; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: hidden;">
+          <div id="fx-frame-${tplId}" style="position: relative; width: 80%; height: 80%; border-radius: 8px; overflow: hidden; border: 4px solid rgba(245, 158, 11, 0.95); box-shadow: 0 15px 35px rgba(0,0,0,0.95);">
+            <img src="${tpl.defaultImage}" alt="Gold Frame" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.35) contrast(1.25);" />
+          </div>
+        </div>
+      `;
+    } else {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden;">
+          <img id="fx-bg-${tplId}" src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; filter: blur(3px) brightness(0.65);" />
+          <div id="fx-fg-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+            <img src="${tpl.defaultImage}" style="width: 78%; height: 78%; object-fit: cover; border-radius: 12px; box-shadow: 0 15px 30px rgba(0,0,0,0.9);" />
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  activeHoverCardEl = cardEl;
+  hoverStartTime = performance.now();
+
+  function animateHoverLoop(now) {
+    const t = (now - hoverStartTime) / 1000;
+
+    if (tplId === 'subject-25d-parallax') {
+      const bgZoom = 1 + Math.sin(t * 1.5) * 0.08;
+      const bgPanX = Math.sin(t * 2) * 18;
+      const fgPanX = -Math.sin(t * 2) * 25;
+      const fgPanY = Math.cos(t * 2.5) * 8;
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      const fgWrap = fxContainer?.querySelector(`#fx-fg-wrap-${tplId}`);
+      if (bgEl) bgEl.style.transform = `scale(${bgZoom}) translate(${bgPanX}px, 0px)`;
+      if (fgWrap) fgWrap.style.transform = `translate(${fgPanX}px, ${fgPanY}px) scale(1.12)`;
+    } else if (tplId === 'paper-rip-shred') {
+      const ripProgress = (Math.sin(t * 3) + 1) / 2;
+      const clipPathAngle = 100 - ripProgress * 100;
+      const ripEl = fxContainer?.querySelector(`#fx-rip-${tplId}`);
+      if (ripEl) {
+        ripEl.style.clipPath = `polygon(0 0, 100% 0, 100% ${clipPathAngle}%, 0 ${Math.min(100, clipPathAngle + 12)}%)`;
+      }
+    } else if (tplId === 'gold-frame-spin') {
+      const rotateY = Math.sin(t * 2.5) * 22;
+      const rotateX = Math.cos(t * 2) * 12;
+      const frameEl = fxContainer?.querySelector(`#fx-frame-${tplId}`);
+      if (frameEl) {
+        frameEl.style.transform = `perspective(600px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.02)`;
+      }
+    } else {
+      const shiftX = Math.sin(t * 3) * 14;
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      const fgEl = fxContainer?.querySelector(`#fx-fg-${tplId}`);
+      if (bgEl) bgEl.style.transform = `scale(1.15) translate(${-shiftX}px, 0)`;
+      if (fgEl) fgEl.style.transform = `translate(${shiftX}px, 0)`;
+    }
+
+    activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
+  }
+
+  activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
+}
+
+function stopTemplateHoverVideo(cardEl, tpl) {
+  if (activeHoverAnimFrame) {
+    cancelAnimationFrame(activeHoverAnimFrame);
+    activeHoverAnimFrame = null;
+  }
+  if (!tpl) return;
+  const tplId = tpl.id;
+  const fxContainer = cardEl.querySelector(`#fx-container-${tplId}`);
+  const defaultImg = cardEl.querySelector(`#default-img-${tplId}`);
+  const centerLabel = cardEl.querySelector(`#center-label-${tplId}`);
+  const badgeEl = cardEl.querySelector(`#badge-${tplId}`);
+  const playHover = cardEl.querySelector(`#play-hover-${tplId}`);
+
+  if (fxContainer) {
+    fxContainer.style.display = 'none';
+    fxContainer.innerHTML = '';
+  }
+  if (defaultImg) defaultImg.style.opacity = '0.85';
+  if (centerLabel) centerLabel.style.opacity = '1';
+  if (playHover) playHover.style.display = '';
+  if (badgeEl) {
+    badgeEl.textContent = tpl.badge;
+    badgeEl.style.background = 'rgba(139, 92, 246, 0.9)';
+    badgeEl.classList.remove('pulse-preview-badge');
+  }
 }
 
 function applySelectedHomepageTemplate(templateId) {
@@ -19980,34 +20142,76 @@ function applySelectedHomepageTemplate(templateId) {
   if (projTitle) projTitle.textContent = tpl.title;
 
   // 3. Customize timeline based on template type
-  if (templateId === 'parallax-zoom') {
-    // Add sample parallax photo into image timeline track
-    const sampleImg = {
-      id: `img-${Date.now()}`,
-      name: 'Parallax_Depth_Sample.jpg',
+  if (templateId === 'subject-25d-parallax') {
+    // Add 2.5D background scene and foreground subject into timeline
+    const bgClip = {
+      id: `img-bg-${Date.now()}`,
+      name: 'Environment_Scene.jpg',
+      url: tpl.secondaryImage,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      zoomStartTime: 0.1
+    };
+    const fgClip = {
+      id: `img-fg-${Date.now() + 1}`,
+      name: 'Cutout_Subject_Portrait.png',
       url: tpl.defaultImage,
       start: 0,
       duration: 6,
-      scale: 1.18,
-      zoomEffect: 'snap',
-      zoomScale: 1.25,
-      zoomStartTime: 0.2
+      scale: 1.05,
+      depth: 65,
+      zoomEffect: 'loupe'
     };
     if (timelineClips && timelineClips.image) {
-      timelineClips.image = [sampleImg];
+      timelineClips.image = [bgClip, fgClip];
       renderAllTimelineTracks();
-      selectClip(sampleImg, 'image');
+      selectClip(fgClip, 'image');
     }
-  } else if (templateId === 'kinetic-type-split') {
+  } else if (templateId === 'paper-rip-shred') {
+    const ripClip = {
+      id: `img-${Date.now()}`,
+      name: 'Documentary_Archival_Paper.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 5,
+      scale: 1.1,
+      transition: 'fly_through',
+      transitionDuration: 1.2
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [ripClip];
+      renderAllTimelineTracks();
+      selectClip(ripClip, 'image');
+    }
+  } else if (templateId === 'gold-frame-spin') {
+    const goldClip = {
+      id: `img-${Date.now()}`,
+      name: 'Magnates_Gold_Frame.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.2,
+      zoomEffect: 'snap',
+      zoomScale: 1.3
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [goldClip];
+      renderAllTimelineTracks();
+      selectClip(goldClip, 'image');
+    }
+  } else if (templateId === 'archival-ink-highlight') {
     const sampleText = {
       id: `txt-${Date.now()}`,
-      text: 'Title of REGAARDER',
+      text: 'THE STORY OF REGAARDER',
       highlight: 'REGAARDER',
-      highlightColor: '#ef4444',
+      highlightColor: '#facc15',
       anim: 'pop',
-      fontSize: 68,
+      fontSize: 62,
       start: 0,
-      duration: 5
+      duration: 6
     };
     if (timelineClips && timelineClips.text) {
       timelineClips.text.push(sampleText);
