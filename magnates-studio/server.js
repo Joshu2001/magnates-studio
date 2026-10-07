@@ -7,20 +7,31 @@ const app = express();
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5173;
 
 // Directory setup
-const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const baseUploadsDir = isServerless ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads');
+const uploadsDir = baseUploadsDir;
+
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('Could not initialize uploads directory:', e.message);
 }
 
 const proxiesDir = path.join(uploadsDir, 'proxies');
-if (!fs.existsSync(proxiesDir)) {
-  fs.mkdirSync(proxiesDir, { recursive: true });
+try {
+  if (!fs.existsSync(proxiesDir)) {
+    fs.mkdirSync(proxiesDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('Could not initialize proxies directory:', e.message);
 }
 
 // Downloads folder
 const userDownloads = process.env.USERPROFILE 
   ? path.join(process.env.USERPROFILE, 'Downloads')
-  : path.join(__dirname, 'uploads');
+  : uploadsDir;
 
 // Multer storage
 const storage = multer.diskStorage({
@@ -347,4 +358,8 @@ function startServer(port) {
   });
 }
 
-startServer(DEFAULT_PORT);
+if (!isServerless) {
+  startServer(DEFAULT_PORT);
+}
+
+module.exports = app;
