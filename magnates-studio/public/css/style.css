@@ -6239,5 +6239,214 @@ body.tool-slide-active {
   letter-spacing: 0.2px;
 }
 
+/* =========================================================
+   CANVA-STYLE HOMEPAGE TEMPLATE DISCOVERY STYLES
+   ========================================================= */
+.home-templates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .home-templates-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.home-cat-pill {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #181926;
+  color: #94a3b8;
+}
+
+.home-cat-pill:hover {
+  background: #1e2030;
+  color: #f1f5f9;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.home-cat-pill.active {
+  background: #8b5cf6;
+  color: #ffffff;
+  border-color: #a78bfa;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+}
+
+.home-tpl-card {
+  background: #171824;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.home-tpl-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.22);
+}
+
+.home-tpl-media {
+  position: relative;
+  height: 200px;
+  width: 100%;
+  overflow: hidden;
+  background: #090a0f;
+}
+
+.home-tpl-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+}
+
+.home-tpl-card:hover .home-tpl-img {
+  transform: scale(1.06);
+  opacity: 1;
+}
+
+.home-tpl-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.home-tpl-play-hover {
+  position: absolute;
+  inset: 0;
+  background: rgba(88, 28, 135, 0.35);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.25s ease;
+}
+
+.home-tpl-card:hover .home-tpl-play-hover {
+  opacity: 1;
+}
+
+.home-tpl-play-circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  transform: scale(0.8);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.home-tpl-card:hover .home-tpl-play-circle {
+  transform: scale(1);
+}
+
+.home-tpl-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(139, 92, 246, 0.9);
+  color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.home-tpl-time {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  font-family: monospace;
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.home-tpl-content {
+  padding: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.home-tpl-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1f5f9;
+  transition: color 0.2s;
+  margin: 0;
+}
+
+.home-tpl-card:hover .home-tpl-title {
+  color: #c084fc;
+}
+
+.home-tpl-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 6px 0 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.home-tpl-footer {
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.home-tpl-tag {
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+}
+
+.home-tpl-btn-use {
+  font-size: 12px;
+  font-weight: 600;
+  color: #c084fc;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  transition: transform 0.2s;
+}
+
+.home-tpl-card:hover .home-tpl-btn-use {
+  transform: translateX(3px);
+  color: #e9d5ff;
+}
+
 
 

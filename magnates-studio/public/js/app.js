@@ -19724,4 +19724,360 @@ if (document.readyState === 'loading') {
   initRegaarderStudioControls();
 }
 
+/* =========================================================
+   CANVA-STYLE HOMEPAGE TEMPLATE DISCOVERY CONTROLLER
+   ========================================================= */
+const EFFECT_TEMPLATES_DATA = [
+  {
+    id: 'parallax-zoom',
+    title: '3D Parallax Depth Zoom',
+    category: 'Parallax',
+    badge: 'Popular',
+    difficulty: 'Beginner',
+    timeToApply: '10 sec',
+    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.7), rgba(49, 46, 129, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Separates foreground subject from background with smooth 3D depth camera movement.',
+    tags: ['3D Motion', 'Photo to Video', 'Cinematic'],
+    defaultImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
+    centerLabel: '[ 3D PARALLAX DEPTH ]',
+    centerSub: 'Click to launch in Studio'
+  },
+  {
+    id: 'kinetic-type-split',
+    title: 'Kinetic Typography & Highlight',
+    category: 'Text & Titles',
+    badge: 'Trending',
+    difficulty: '1-Click',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(to top, rgba(136, 19, 55, 0.7), rgba(127, 29, 29, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Punchy animated text overlay with customized word accent highlight.',
+    tags: ['Social Media', 'Reels', 'Title Card'],
+    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+    centerCustomHtml: '<span style="font-size: 19px; font-weight: 900; letter-spacing: -0.02em; color: #fff; text-shadow: 0 4px 12px rgba(0,0,0,0.8);">Title of <span style="color: #ef4444; font-weight: 900; text-decoration: underline; text-decoration-color: #a855f7;">REGAARDER</span></span>'
+  },
+  {
+    id: 'cyber-glitch-pass',
+    title: 'Cyberpunk RGB Glitch Shift',
+    category: 'Glitches',
+    badge: 'New',
+    difficulty: 'Beginner',
+    timeToApply: '8 sec',
+    previewGradient: 'linear-gradient(to top, rgba(22, 78, 99, 0.7), rgba(30, 58, 138, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Futuristic chromatic aberration and visual noise pulse for high-energy cuts.',
+    tags: ['VFX', 'Cyberpunk', 'Transition'],
+    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    centerCustomHtml: '<div style="padding: 5px 12px; background: rgba(8, 47, 73, 0.9); border: 1px solid rgba(6, 182, 212, 0.6); color: #67e8f9; font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.12em; border-radius: 6px;">RGB_SHIFT_EFFECT</div>'
+  },
+  {
+    id: 'vintage-film-grain',
+    title: 'Retro 16mm Film Grain & Light Leak',
+    category: 'Color & Vibe',
+    badge: 'Pro Look',
+    difficulty: '1-Click',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.7), rgba(154, 52, 18, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Warm nostalgic film emulsion texture, slight gate weave, and ambient light leaks.',
+    tags: ['Nostalgia', 'Aesthetic', 'Color Grade'],
+    defaultImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'glassmorphic-lower-third',
+    title: 'Glassmorphic Animated Lower Third',
+    category: 'Lower Thirds',
+    badge: 'Popular',
+    difficulty: 'Easy',
+    timeToApply: '12 sec',
+    previewGradient: 'linear-gradient(to top, rgba(6, 78, 59, 0.7), rgba(19, 78, 74, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Sleek translucent glass bar with animated title and accent badge for speakers.',
+    tags: ['Corporate', 'Interview', 'Clean'],
+    defaultImage: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'swoosh-zoom-transition',
+    title: 'Dynamic Speed Ramp Swoosh',
+    category: 'Transitions',
+    badge: 'Popular',
+    difficulty: 'Beginner',
+    timeToApply: '6 sec',
+    previewGradient: 'linear-gradient(to top, rgba(112, 26, 117, 0.7), rgba(131, 24, 67, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Fast optical flow zoom with directional motion blur linking two clips seamlessly.',
+    tags: ['Vlog', 'Action', 'Fast Cut'],
+    defaultImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80'
+  }
+];
+
+const TEMPLATE_CATEGORIES = ['All', 'Parallax', 'Text & Titles', 'Glitches', 'Transitions', 'Color & Vibe', 'Lower Thirds'];
+
+let currentTemplateCategory = 'All';
+let templateSearchQuery = '';
+
+function switchStudioView(viewName) {
+  const homeView = document.getElementById('home-templates-discovery');
+  const editorView = document.getElementById('editor-workspace');
+  const btnHome = document.getElementById('btn-nav-view-home');
+  const btnEditor = document.getElementById('btn-nav-view-editor');
+
+  if (viewName === 'home') {
+    if (homeView) homeView.style.display = 'block';
+    if (editorView) editorView.style.display = 'none';
+    if (btnHome) {
+      btnHome.style.background = '#8b5cf6';
+      btnHome.style.color = '#fff';
+      btnHome.classList.add('active');
+    }
+    if (btnEditor) {
+      btnEditor.style.background = 'transparent';
+      btnEditor.style.color = '#94a3b8';
+      btnEditor.classList.remove('active');
+    }
+    renderHomepageTemplates();
+  } else {
+    if (homeView) homeView.style.display = 'none';
+    if (editorView) editorView.style.display = 'flex';
+    if (btnHome) {
+      btnHome.style.background = 'transparent';
+      btnHome.style.color = '#94a3b8';
+      btnHome.classList.remove('active');
+    }
+    if (btnEditor) {
+      btnEditor.style.background = '#8b5cf6';
+      btnEditor.style.color = '#fff';
+      btnEditor.classList.add('active');
+    }
+    // Re-trigger layout sizing on canvas
+    if (typeof renderCanvas === 'function') renderCanvas();
+  }
+}
+
+function renderHomepageCategories() {
+  const container = document.getElementById('home-category-pills');
+  if (!container) return;
+
+  container.innerHTML = TEMPLATE_CATEGORIES.map(cat => {
+    const isActive = cat === currentTemplateCategory;
+    return `
+      <button type="button" class="home-cat-pill ${isActive ? 'active' : ''}" data-cat="${cat}">
+        ${cat}
+      </button>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.home-cat-pill').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      currentTemplateCategory = e.currentTarget.dataset.cat;
+      renderHomepageCategories();
+      renderHomepageTemplates();
+    });
+  });
+}
+
+function renderHomepageTemplates() {
+  const grid = document.getElementById('home-templates-grid');
+  const countEl = document.getElementById('home-templates-count');
+  const headingEl = document.getElementById('home-templates-heading');
+  if (!grid) return;
+
+  const filtered = EFFECT_TEMPLATES_DATA.filter(t => {
+    const matchesCat = currentTemplateCategory === 'All' || t.category === currentTemplateCategory;
+    const query = templateSearchQuery.toLowerCase().trim();
+    const matchesSearch = !query ||
+      t.title.toLowerCase().includes(query) ||
+      t.description.toLowerCase().includes(query) ||
+      t.tags.some(tag => tag.toLowerCase().includes(query));
+    return matchesCat && matchesSearch;
+  });
+
+  if (countEl) countEl.textContent = `(${filtered.length} Available)`;
+  if (headingEl) {
+    headingEl.textContent = currentTemplateCategory === 'All'
+      ? 'Inspired By Your Creative Workflow'
+      : `${currentTemplateCategory} Templates`;
+  }
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 60px 20px; text-align: center; color: #64748b;">
+        <svg viewBox="0 0 24 24" style="width: 38px; height: 38px; fill: none; stroke: currentColor; stroke-width: 1.5; margin: 0 auto 12px;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <p style="font-size: 15px; font-weight: 600; color: #94a3b8; margin: 0;">No templates matched "${templateSearchQuery}"</p>
+        <p style="font-size: 12px; margin: 6px 0 0;">Try searching for "parallax", "text", "glitch", or pick another category.</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(t => {
+    let centerContent = '';
+    if (t.centerCustomHtml) {
+      centerContent = t.centerCustomHtml;
+    } else if (t.centerLabel) {
+      centerContent = `
+        <div style="text-align: center;">
+          <div style="display: inline-block; padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+            ${t.centerLabel}
+          </div>
+          ${t.centerSub ? `<div style="font-size: 10px; color: #cbd5e1; margin-top: 4px; text-shadow: 0 2px 6px rgba(0,0,0,0.8);">${t.centerSub}</div>` : ''}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="home-tpl-card" data-template-id="${t.id}">
+        <div class="home-tpl-media">
+          <img src="${t.defaultImage}" alt="${t.title}" class="home-tpl-img" />
+          <div class="home-tpl-overlay" style="background: ${t.previewGradient}; opacity: 0.65;"></div>
+          
+          <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none;">
+            ${centerContent}
+          </div>
+
+          <div class="home-tpl-badge">${t.badge}</div>
+          <div class="home-tpl-time">${t.timeToApply}</div>
+
+          <div class="home-tpl-play-hover">
+            <div class="home-tpl-play-circle">
+              <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: currentColor; margin-left: 2px;"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="home-tpl-content">
+          <div>
+            <h4 class="home-tpl-title">${t.title}</h4>
+            <p class="home-tpl-desc">${t.description}</p>
+          </div>
+
+          <div class="home-tpl-footer">
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              ${t.tags.slice(0, 2).map(tag => `<span class="home-tpl-tag">#${tag}</span>`).join('')}
+            </div>
+            <span class="home-tpl-btn-use">
+              Use FX
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  grid.querySelectorAll('.home-tpl-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      const tplId = e.currentTarget.dataset.templateId;
+      applySelectedHomepageTemplate(tplId);
+    });
+  });
+}
+
+function applySelectedHomepageTemplate(templateId) {
+  const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
+  if (!tpl) return;
+
+  // 1. Switch directly to Studio Editor view
+  switchStudioView('editor');
+
+  // 2. Set active project title to template
+  const projTitle = document.getElementById('current-project');
+  if (projTitle) projTitle.textContent = tpl.title;
+
+  // 3. Customize timeline based on template type
+  if (templateId === 'parallax-zoom') {
+    // Add sample parallax photo into image timeline track
+    const sampleImg = {
+      id: `img-${Date.now()}`,
+      name: 'Parallax_Depth_Sample.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.18,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      zoomStartTime: 0.2
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [sampleImg];
+      renderAllTimelineTracks();
+      selectClip(sampleImg, 'image');
+    }
+  } else if (templateId === 'kinetic-type-split') {
+    const sampleText = {
+      id: `txt-${Date.now()}`,
+      text: 'Title of REGAARDER',
+      highlight: 'REGAARDER',
+      highlightColor: '#ef4444',
+      anim: 'pop',
+      fontSize: 68,
+      start: 0,
+      duration: 5
+    };
+    if (timelineClips && timelineClips.text) {
+      timelineClips.text.push(sampleText);
+      renderAllTimelineTracks();
+      selectClip(sampleText, 'text');
+    }
+  }
+
+  showTextTimingAlert(`Loaded template: "${tpl.title}" into Studio!`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
+function initHomepageTemplateEvents() {
+  // Navigation top-bar view switcher
+  document.getElementById('btn-nav-view-home')?.addEventListener('click', () => switchStudioView('home'));
+  document.getElementById('btn-nav-view-editor')?.addEventListener('click', () => switchStudioView('editor'));
+
+  // Left rail templates button triggers home discovery view
+  document.querySelectorAll('.rail-btn[data-rail-tab="templates"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      switchStudioView('home');
+    });
+  });
+
+  // Search filter
+  const searchInput = document.getElementById('home-template-search-input');
+  const searchClear = document.getElementById('home-template-search-clear');
+  const btnGenerate = document.getElementById('btn-home-template-generate');
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      templateSearchQuery = e.target.value;
+      if (searchClear) searchClear.style.display = templateSearchQuery ? 'block' : 'none';
+      renderHomepageTemplates();
+    });
+  }
+
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      templateSearchQuery = '';
+      searchClear.style.display = 'none';
+      renderHomepageTemplates();
+    });
+  }
+
+  if (btnGenerate) {
+    btnGenerate.addEventListener('click', () => {
+      const q = (searchInput?.value || '').trim();
+      if (!q) {
+        showTextTimingAlert('Enter an effect topic or keyword to generate', 'info');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+        return;
+      }
+      showTextTimingAlert(`Generating AI timeline for "${q}"...`, 'info');
+      setTimeout(() => {
+        applySelectedHomepageTemplate('parallax-zoom');
+      }, 1000);
+    });
+  }
+
+  // Initial category & template renders
+  renderHomepageCategories();
+  renderHomepageTemplates();
+}
+
+// Initialize homepage discovery view immediately on script execution
+setTimeout(() => {
+  initHomepageTemplateEvents();
+}, 100);
+
+
 

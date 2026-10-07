@@ -22,6 +22,19 @@
         <span id="current-project" class="project-title-heading" title="Click to rename project">Android Updates & Bloatware</span>
         <span class="badge duration-badge" id="duration-badge">00:00 / 06:08</span>
       </div>
+
+      <!-- Studio Mode Segmented Toggle (Templates Home vs Video Studio) -->
+      <div class="top-nav-center-switcher" style="display: flex; align-items: center; background: rgba(18, 19, 28, 0.95); padding: 3px; border-radius: 9px; border: 1px solid rgba(255, 255, 255, 0.1); gap: 4px; margin: 0 12px;">
+        <button type="button" id="btn-nav-view-home" class="btn-nav-switcher active" style="padding: 4px 12px; font-size: 11.5px; border-radius: 7px; font-weight: 600; border: none; background: #8b5cf6; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          <span>Templates</span>
+        </button>
+        <button type="button" id="btn-nav-view-editor" class="btn-nav-switcher" style="padding: 4px 12px; font-size: 11.5px; border-radius: 7px; font-weight: 500; border: none; background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"/></svg>
+          <span>Studio Editor</span>
+        </button>
+      </div>
+
       <div class="actions">
         <!-- Contextual secondary tools -->
         <div class="actions-contextual-group">
@@ -71,7 +84,7 @@
     </header>
 
     <!-- Main Workspace -->
-    <main class="workspace">
+    <main class="workspace" id="editor-workspace" style="display: none;">
       <!-- Left Vertical Navigation Rail (Uploads, Templates, Elements, Text, Icons, Layers, Projects) -->
       <nav class="nav-rail" id="main-nav-rail" aria-label="Editor Tools Navigation Rail">
         <button type="button" class="rail-btn active" data-rail-tab="all" title="Media Library & Uploads">
@@ -2612,6 +2625,68 @@
           </div>
         </div>
       </aside>
+    </main>
+
+    <!-- =========================================================
+         1. HOMEPAGE TEMPLATE DISCOVERY VIEW (CANVA-STYLE FOR VIDEO FX)
+         ========================================================= -->
+    <main id="home-templates-discovery" class="home-templates-view" style="display: block; flex: 1; overflow-y: auto; background: #0C0D12; padding: 32px 24px 60px; color: #f8fafc;">
+      
+      <div style="max-width: 900px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px;">
+        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 9999px; background: rgba(147, 51, 234, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); color: #d8b4fe; font-size: 12px; font-weight: 500;">
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: #c084fc; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          <span>Beginner-Friendly AI Video Effects</span>
+        </div>
+        
+        <h2 style="font-size: clamp(28px, 4.5vw, 48px); font-weight: 800; letter-spacing: -0.03em; color: #ffffff; line-height: 1.15; margin: 0;">
+          Turn Static Media into <br />
+          <span style="background: linear-gradient(to right, #c084fc, #f472b6, #fde047); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Cinematic Motion Effects
+          </span>
+        </h2>
+        
+        <p style="color: #94a3b8; font-size: 14.5px; max-width: 580px; margin: 0 auto; line-height: 1.6;">
+          Select an effect template below, upload your media, and Regaarder Studio generates the multi-track depth timeline automatically.
+        </p>
+
+        <!-- Central Search Bar -->
+        <div style="position: relative; width: 100%; max-width: 640px; margin: 6px auto 0;">
+          <div style="display: flex; align-items: center; background: #171823; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 16px; padding: 6px 8px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: border-color 0.2s;">
+            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #64748b; stroke-width: 2; margin-left: 10px; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input
+              type="text"
+              id="home-template-search-input"
+              placeholder="Search video effects, parallax depth, kinetic text, glitch transitions..."
+              style="width: 100%; background: transparent; border: none; outline: none; padding: 8px 12px; font-size: 13.5px; color: #f1f5f9;"
+            />
+            <button id="home-template-search-clear" style="display: none; background: transparent; border: none; color: #64748b; cursor: pointer; padding: 4px; font-size: 16px; margin-right: 4px;">&times;</button>
+            <button id="btn-home-template-generate" style="background: linear-gradient(to right, #9333ea, #ef4444); border: none; color: #fff; font-weight: 600; font-size: 12px; padding: 9px 18px; border-radius: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.35); flex-shrink: 0;">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>Generate</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Pills -->
+        <div id="home-category-pills" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Template Cards Grid -->
+      <div style="max-width: 1240px; margin: 36px auto 0;">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 12px; margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: none; stroke: #c084fc; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+            <h3 id="home-templates-heading" style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc;">Inspired By Your Creative Workflow</h3>
+            <span id="home-templates-count" style="font-size: 12px; color: #64748b; font-family: monospace;">(6 Available)</span>
+          </div>
+        </div>
+
+        <div id="home-templates-grid" class="home-templates-grid">
+          <!-- Template cards dynamically rendered by JS -->
+        </div>
+      </div>
     </main>
   </div>
 
