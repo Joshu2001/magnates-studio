@@ -9800,11 +9800,23 @@ function updateExportTelemetry() {
   }
 }
 
-function openExportStudioModal() {
+function openExportStudioModal(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
   const modal = document.getElementById('export-studio-modal');
-  if (!modal) return;
+  if (!modal) {
+    console.error('export-studio-modal not found');
+    return;
+  }
   modal.style.display = 'flex';
-  updateExportTelemetry();
+  modal.style.zIndex = '999999';
+  try {
+    updateExportTelemetry();
+  } catch(err) {
+    console.warn('Telemetry update error:', err);
+  }
 }
 
 function closeExportStudioModal() {

@@ -31,8 +31,8 @@
     {
       "id": "clip-image-1791219025096-569",
       "track": "image",
-      "start": 0.8000000000000007,
-      "duration": 23.6,
+      "start": 13.333333333333334,
+      "duration": 11.066666666666668,
       "volume": 100,
       "soundEnabled": true,
       "layerOrder": "back",
@@ -41,17 +41,37 @@
       "y": 0,
       "scale": 1.7282222141514658,
       "zoomEffect": "snap",
-      "zoomScale": 1.7,
+      "zoomScale": 1.3,
       "zoomStartTime": 9.3,
-      "zoomOriginX": 0.39769530203154635,
-      "zoomOriginY": 0.12075269239612418,
+      "zoomOriginX": 0.48581915077664994,
+      "zoomOriginY": 0.11145741524897038,
+      "highlights": [
+        {
+          "x": 0.13940126260624275,
+          "y": 0.12075269239612418,
+          "w": 0.5105105720406001,
+          "h": 0.01,
+          "color": "#38bdf8",
+          "opacity": 0.95,
+          "startTime": 9.38,
+          "duration": 0.6,
+          "_screenBounds": {
+            "x": -67.58512035010938,
+            "y": 86.2655601659751,
+            "w": 1468.1067833698028,
+            "h": 15.668511139720712,
+            "punchScale": 1.3,
+            "index": 0
+          }
+        }
+      ],
       "spotlights": [
         {
           "rect": {
-            "x": 0.1495304406229213,
-            "y": 0.09472591638409349,
-            "w": 0.4963297228172501,
-            "h": 0.05205355202406139
+            "x": 0.18478325116276634,
+            "y": 0.07259265065577385,
+            "w": 0.4679680243705501,
+            "h": 0.11526143662470736
           },
           "style": "white",
           "dimOpacity": 0.65,
@@ -59,22 +79,65 @@
           "startTime": 9.3,
           "duration": 2.5,
           "_screenBounds": {
-            "x": 88.14695991616622,
-            "y": 46.01702976069564,
-            "w": 1291.0846359663544,
-            "h": 73.77506910931412,
+            "x": 62.92266713082131,
+            "y": 10.805945116165745,
+            "w": 1345.7645514223193,
+            "h": 180.597510373444,
             "dx": -146.06221705693815,
             "dy": -62.63504383541192,
             "finalW": 2212.1244341138763,
             "finalH": 1205.2700876708238,
-            "punchScale": 1.1759121465175066,
+            "punchScale": 1.3,
             "spotIndex": 0
+          }
+        },
+        {
+          "rect": {
+            "x": 0.13737542700290703,
+            "y": 0.07985347294864739,
+            "w": 0.6968874475474859,
+            "h": 0.06320788460064598
+          },
+          "style": "dark",
+          "dimOpacity": 0.65,
+          "feather": 16,
+          "startTime": 9.3,
+          "duration": 2.5,
+          "_screenBounds": {
+            "x": -73.4109409190371,
+            "y": 22.18257261410789,
+            "w": 2004.0822757111598,
+            "h": 99.03734439834027,
+            "dx": -146.06221705693815,
+            "dy": -62.63504383541192,
+            "finalW": 2212.1244341138763,
+            "finalH": 1205.2700876708238,
+            "punchScale": 1.3,
+            "spotIndex": 1
           }
         }
       ],
       "file": {
         "name": "Tracking data.png",
         "url": "/media/uploads/Tracking%20data.png",
+        "isAudio": false,
+        "isVideo": false,
+        "isImage": true
+      }
+    },
+    {
+      "id": "clip-image-1791221148872-481",
+      "track": "image",
+      "start": 3.8666666666666667,
+      "duration": 6,
+      "volume": 100,
+      "soundEnabled": true,
+      "layerOrder": "back",
+      "zIndex": 20,
+      "scale": 1.6161889283347104,
+      "file": {
+        "name": "daatatracking.png",
+        "url": "/media/uploads/daatatracking.png",
         "isAudio": false,
         "isVideo": false,
         "isImage": true
@@ -111,9 +174,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 10.133333333333333,
+  "currentTime": 12.157266666666802,
   "duration": 368.144014,
-  "savedAt": 1791220422938,
+  "savedAt": 1791253557418,
   "projectName": "LL",
   "projectId": "proj_1791218145776_xils"
 }

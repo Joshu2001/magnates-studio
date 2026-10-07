@@ -48,7 +48,7 @@
         </button>
 
         <!-- Primary: Export (Sophisticated & Prominent) -->
-        <button class="btn btn-primary" id="btn-export">
+        <button class="btn btn-primary" id="btn-export" onclick="openExportStudioModal(event)">
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
           <span>Export</span>
         </button>
@@ -3190,6 +3190,9 @@
         <button type="button" id="btn-audio-trim-cancel" style="flex: 1; padding: 12px; background: transparent; border: none; border-right: 1px solid rgba(255, 255, 255, 0.08); color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s;">Cancel</button>
         <button type="button" id="btn-audio-trim-apply" style="flex: 1; padding: 12px; background: transparent; border: none; color: #00f0ff; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s;">Apply Trim</button>
       </div>
+    </div>
+  </div>
+
   <!-- Apple-Style Studio Video Export Modal -->
   <div id="export-studio-modal" class="vector-export-modal" style="display: none; z-index: 99999;">
     <div class="vector-modal-box export-modal-box">
