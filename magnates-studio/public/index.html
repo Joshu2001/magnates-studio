@@ -3615,10 +3615,47 @@
               <input type="range" id="jani-slider-glow" min="5" max="35" value="18" style="width: 100%; accent-color: #00f2fe; cursor: pointer;" />
             </div>
 
-            <!-- Framed Headline Text Input -->
+            <!-- Framed Texts (Headline, Subtitle, Background Watermark) -->
             <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-              <label style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Framed Headline Text</label>
-              <input type="text" id="jani-input-headline" value="Illusion of Free Choice in Controlled Markets" style="width: 100%; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 7px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+              <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+                <span>✍ Edit Text Content</span>
+                <span style="font-size: 9.5px; color: #00f2fe; font-family: monospace;">LIVE SYNC</span>
+              </div>
+              <div>
+                <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Headline</label>
+                <input type="text" id="jani-input-headline" value="Illusion of Free Choice in Controlled Markets" style="width: 100%; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 7px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+              </div>
+              <div>
+                <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Description / Subtitle</label>
+                <textarea id="jani-input-subtext" rows="2" style="width: 100%; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; resize: vertical;">How systemic algorithms construct manufactured scarcity to maximize viewer retention.</textarea>
+              </div>
+              <div>
+                <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Background Watermark Title</label>
+                <input type="text" id="jani-input-bg-title" value="THE MONOPOLY TRAP" style="width: 100%; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: 'JetBrains Mono', monospace;" />
+              </div>
+            </div>
+
+            <!-- Puzzle Images Customizer (Upload / URL / Library) -->
+            <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+                <span>🖼 Edit Puzzle Images</span>
+                <label for="jani-upload-file-input" style="font-size: 10px; color: #00f2fe; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                  <span>📁 Upload Image</span>
+                </label>
+                <input type="file" id="jani-upload-file-input" accept="image/*" style="display: none;" />
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <select id="jani-piece-select" style="flex: 1; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;">
+                  <!-- Options generated dynamically -->
+                </select>
+                <button type="button" id="btn-jani-randomize-images" style="padding: 5px 10px; font-size: 10.5px; border-radius: 6px; background: #0b1322; border: 1px solid rgba(255,255,255,0.12); color: #38bdf8; cursor: pointer;" title="Shuffle stock images">
+                  🎲 Shuffle
+                </button>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="jani-input-image-title" placeholder="Node Title (e.g. ALGORITHM)" style="width: 45%; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+                <input type="text" id="jani-input-image-url" placeholder="Paste image URL..." style="flex: 1; background: #05070a; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              </div>
             </div>
 
             <!-- Palette Selection Buttons -->
@@ -4712,6 +4749,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=278"></script>
+  <script src="js/app.js?v=279"></script>
 </body>
 </html>

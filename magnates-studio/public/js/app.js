@@ -23101,13 +23101,16 @@ let janiSuiteState = {
   matteTheme: 'cyan',
   audioEnabled: true,
   headlineText: "Illusion of Free Choice in Controlled Markets",
+  subText: "How systemic algorithms construct manufactured scarcity to maximize viewer retention.",
+  bgTitle: "THE MONOPOLY TRAP",
+  selectedPieceIndex: 0,
   retentionScore: 98,
   timer: 14,
   timerInterval: null,
   audioCtx: null
 };
 
-const janiPuzzleThumbnails = [
+let janiPuzzleThumbnails = [
   { title: 'MARKET INDEX', url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&auto=format&fit=crop&q=80' },
   { title: 'CENTRAL BANK', url: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&auto=format&fit=crop&q=80' },
   { title: 'ALGORITHM', url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=80' },
@@ -23175,6 +23178,31 @@ function playJaniSFX(type = 'click') {
   }
 }
 
+function updateJaniPieceSelectOptions() {
+  const sel = document.getElementById('jani-piece-select');
+  if (!sel) return;
+  const total = janiSuiteState.gridSize * janiSuiteState.gridSize;
+  sel.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const item = janiPuzzleThumbnails[i % janiPuzzleThumbnails.length] || { title: `Node #${i + 1}` };
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `#0${i + 1}: ${item.title}`;
+    if (i === janiSuiteState.selectedPieceIndex) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  syncJaniPieceInputFields();
+}
+
+function syncJaniPieceInputFields() {
+  const idx = janiSuiteState.selectedPieceIndex;
+  const item = janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length] || { title: `Node #${idx + 1}`, url: '' };
+  const titleInput = document.getElementById('jani-input-image-title');
+  const urlInput = document.getElementById('jani-input-image-url');
+  if (titleInput) titleInput.value = item.title || '';
+  if (urlInput) urlInput.value = item.url || '';
+}
+
 function renderJaniPuzzleGrid() {
   const container = document.getElementById('jani-puzzle-grid');
   if (!container) return;
@@ -23192,13 +23220,14 @@ function renderJaniPuzzleGrid() {
     const randomTransX = isAssembled ? 0 : (Math.cos(i * 33) * 35).toFixed(1);
     const randomTransY = isAssembled ? 0 : (Math.sin(i * 44) * 35).toFixed(1);
     const opacity = isAssembled ? 1 : 0.75;
+    const isSelected = i === janiSuiteState.selectedPieceIndex;
 
     piece.style.transform = `translate(${randomTransX}px, ${randomTransY}px) rotate(${randomRotate}deg)`;
     piece.style.opacity = opacity;
     piece.style.transition = `all ${0.4 + (i * 0.06)}s cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
     piece.style.position = 'relative';
     piece.style.borderRadius = '8px';
-    piece.style.border = '1px solid rgba(0, 242, 254, 0.5)';
+    piece.style.border = isSelected ? '2px solid #00f2fe' : '1px solid rgba(0, 242, 254, 0.5)';
     piece.style.background = 'rgba(15, 23, 42, 0.9)';
     piece.style.overflow = 'hidden';
     piece.style.display = 'flex';
@@ -23207,11 +23236,11 @@ function renderJaniPuzzleGrid() {
     piece.style.justifyContent = 'center';
     piece.style.padding = '6px';
     piece.style.cursor = 'pointer';
-    piece.style.boxShadow = '0 4px 15px rgba(0, 242, 254, 0.2)';
+    piece.style.boxShadow = isSelected ? '0 0 18px rgba(0, 242, 254, 0.5)' : '0 4px 15px rgba(0, 242, 254, 0.2)';
 
-    const thumb = janiPuzzleThumbnails[i % janiPuzzleThumbnails.length];
+    const thumb = janiPuzzleThumbnails[i % janiPuzzleThumbnails.length] || { title: `NODE_${i + 1}`, url: '' };
 
-    if (janiSuiteState.showImages) {
+    if (janiSuiteState.showImages && thumb.url) {
       piece.innerHTML = `
         <img src="${thumb.url}" alt="${thumb.title}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.65; filter: grayscale(0.2) contrast(1.15);" onerror="this.style.display='none'">
         <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,7,10,0.95), rgba(5,7,10,0.35));"></div>
@@ -23229,13 +23258,18 @@ function renderJaniPuzzleGrid() {
       piece.innerHTML = `
         <div style="position: absolute; top: 4px; left: 6px; font-size: 8.5px; font-family: monospace; color: rgba(0,242,254,0.8);">#0${i + 1}</div>
         <div style="font-size: 20px; color: #00f2fe;">🧩</div>
-        <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; margin-top: 4px; text-transform: uppercase;">NODE_${i + 1}</span>
+        <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; margin-top: 4px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;">${thumb.title || 'NODE_' + (i + 1)}</span>
       `;
     }
 
     piece.onclick = () => {
+      janiSuiteState.selectedPieceIndex = i;
+      const sel = document.getElementById('jani-piece-select');
+      if (sel) sel.value = i;
+      syncJaniPieceInputFields();
       playJaniSFX('snap');
       triggerJaniSinglePieceToggle(i);
+      renderJaniPuzzleGrid();
     };
 
     container.appendChild(piece);
@@ -23396,6 +23430,7 @@ function openJaniSuite() {
   const modal = document.getElementById('modal-jani-suite');
   if (!modal) return;
   modal.style.display = 'flex';
+  updateJaniPieceSelectOptions();
   renderJaniPuzzleGrid();
   renderJaniRetentionChart();
 }
@@ -23489,6 +23524,7 @@ function bindJaniSuiteModalControls() {
     janiSuiteState.gridSize = parseInt(e.target.value) || 3;
     const lbl = document.getElementById('jani-val-grid');
     if (lbl) lbl.textContent = `${janiSuiteState.gridSize} x ${janiSuiteState.gridSize}`;
+    updateJaniPieceSelectOptions();
     renderJaniPuzzleGrid();
   });
 
@@ -23513,11 +23549,79 @@ function bindJaniSuiteModalControls() {
     setJaniMatteTheme(janiSuiteState.matteTheme);
   });
 
-  // Headline Input
+  // Headline Text Input (Live Sync)
   document.getElementById('jani-input-headline')?.addEventListener('input', (e) => {
     janiSuiteState.headlineText = e.target.value;
     const h = document.getElementById('jani-matte-headline');
     if (h) h.textContent = `"${e.target.value || 'Talking Point Focus'}"`;
+  });
+
+  // Subtitle / Description Text Input (Live Sync)
+  document.getElementById('jani-input-subtext')?.addEventListener('input', (e) => {
+    janiSuiteState.subText = e.target.value;
+    const s = document.getElementById('jani-matte-subtext');
+    if (s) s.textContent = e.target.value || '';
+  });
+
+  // Background Watermark Title Input (Live Sync)
+  document.getElementById('jani-input-bg-title')?.addEventListener('input', (e) => {
+    janiSuiteState.bgTitle = e.target.value;
+    const b = document.getElementById('jani-canvas-bg-title');
+    if (b) b.textContent = (e.target.value || 'THE NARRATIVE ARCHIVE').toUpperCase();
+  });
+
+  // Puzzle Piece Node Selector
+  document.getElementById('jani-piece-select')?.addEventListener('change', (e) => {
+    janiSuiteState.selectedPieceIndex = parseInt(e.target.value) || 0;
+    syncJaniPieceInputFields();
+    renderJaniPuzzleGrid();
+  });
+
+  // Puzzle Node Title Input
+  document.getElementById('jani-input-image-title')?.addEventListener('input', (e) => {
+    const idx = janiSuiteState.selectedPieceIndex;
+    if (janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length]) {
+      janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length].title = e.target.value.toUpperCase();
+      const selOpt = document.querySelector(`#jani-piece-select option[value="${idx}"]`);
+      if (selOpt) selOpt.textContent = `#0${idx + 1}: ${e.target.value.toUpperCase()}`;
+      renderJaniPuzzleGrid();
+    }
+  });
+
+  // Puzzle Node Image URL Input
+  document.getElementById('jani-input-image-url')?.addEventListener('input', (e) => {
+    const idx = janiSuiteState.selectedPieceIndex;
+    if (janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length]) {
+      janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length].url = e.target.value;
+      renderJaniPuzzleGrid();
+    }
+  });
+
+  // Upload Custom Image for Selected Puzzle Piece
+  document.getElementById('jani-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const idx = janiSuiteState.selectedPieceIndex;
+      if (janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length]) {
+        janiPuzzleThumbnails[idx % janiPuzzleThumbnails.length].url = ev.target.result;
+        syncJaniPieceInputFields();
+        renderJaniPuzzleGrid();
+        playJaniSFX('snap');
+        showTextTimingAlert(`Uploaded custom photo for Piece #${idx + 1}!`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Randomize / Shuffle Stock Images for Puzzle
+  document.getElementById('btn-jani-randomize-images')?.addEventListener('click', () => {
+    janiPuzzleThumbnails.sort(() => Math.random() - 0.5);
+    updateJaniPieceSelectOptions();
+    renderJaniPuzzleGrid();
+    playJaniSFX('snap');
   });
 
   // Copy CSS Code
