@@ -1054,6 +1054,10 @@ function getMediaElement(file) {
     el.preload = 'auto';
   } else if (file.isImage) {
     el = new Image();
+    el.crossOrigin = 'anonymous';
+    el.onload = () => {
+      if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    };
     el.src = effectiveUrl;
   }
   if (el) mediaElementCache.set(effectiveUrl, el);
@@ -1617,15 +1621,11 @@ function drawMediaLayer(specificClip) {
       return;
     }
     const aspect = el.naturalWidth / el.naturalHeight;
-    // If tagged as a background scene (or parallax background), scale to fill/cover the 16:9 canvas
+    // If tagged as a background scene (or parallax background), scale to fill/cover the 16:9 canvas (full-bleed cover)
     if (targetClip?.isBackgroundScene || targetClip?.parallaxRig === 'bg') {
-      if (aspect > maxW / maxH) {
-        dh = maxH;
-        dw = maxH * aspect;
-      } else {
-        dw = maxW;
-        dh = maxW / aspect;
-      }
+      const scaleCover = Math.max(maxW / (el.naturalWidth || maxW), maxH / (el.naturalHeight || maxH));
+      dw = (el.naturalWidth || maxW) * scaleCover;
+      dh = (el.naturalHeight || maxH) * scaleCover;
     } else {
       if (aspect > maxW / maxH) {
         dw = maxW;
@@ -1759,7 +1759,7 @@ function drawMediaLayer(specificClip) {
         ctx.drawImage(renderSource, dx, dy, finalW, finalH);
       }
 
-      if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
+      if (!isPlaying && !isExporting && !targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 2;
         ctx.strokeRect(dx, dy, finalW, finalH);
@@ -1855,7 +1855,7 @@ function drawMediaLayer(specificClip) {
       }
 
       // Subtle selection border if selected, or if vector effect is active
-      if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas && !targetClip?.goldFrameRig) {
+      if (!isPlaying && !isExporting && !targetClip?.vectorEffect && !targetClip?.cutoutCanvas && !targetClip?.goldFrameRig) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 2;
         ctx.strokeRect(dx, dy, finalW, finalH);
@@ -2210,7 +2210,7 @@ function drawMarqueeSelectionOverlay() {
 
 // Draw interactive bounding box & resize/drag corner handles
 function drawTransformHandles(x, y, w, h) {
-  if (isExporting) return;
+  if (isExporting || (isPlaying && !isTransforming)) return;
   ctx.save();
   ctx.strokeStyle = '#00f0ff';
   ctx.lineWidth = 2;
@@ -22582,12 +22582,16 @@ function generateCutoutCanvasForUrl(url, callback) {
       }
 
       function isBgPixel(r, g, b) {
+        // Protect human skin tones and warm facial tones from being classified as background
+        const isWarmSkin = (r > 95 && g > 40 && b > 20 && r > g && (r - g) > 15 && (r - b) > 15);
+        if (isWarmSkin) return false;
+
         for (let i = 0; i < bgColors.length; i++) {
-          if (colorDist(r, g, b, bgColors[i].r, bgColors[i].g, bgColors[i].b) < 48) return true;
+          if (colorDist(r, g, b, bgColors[i].r, bgColors[i].g, bgColors[i].b) < 32) return true;
         }
-        if (r > 235 && g > 235 && b > 235) return true; // white/near-white bg
-        if (r < 25 && g < 25 && b < 25) return true; // solid black studio bg
-        if (g > 150 && r < 90 && b < 90) return true; // green screen
+        if (r > 248 && g > 248 && b > 248) return true; // strict studio pure white
+        if (r < 12 && g < 12 && b < 12) return true; // strict solid black studio bg
+        if (g > 165 && r < 75 && b < 75) return true; // green screen
         return false;
       }
 
