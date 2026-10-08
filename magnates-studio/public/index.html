@@ -6534,6 +6534,549 @@
     </div>
   </div>
 
+  <!-- 1. Interactive Magnates Media Brightness, Contrast & Glow Suite Modal -->
+  <div id="modal-magnates-glow-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(8,4,12,0.88);">
+    <div class="vector-modal-box" style="max-width: 1040px; width: 94vw; max-height: 92vh; background: #090611; border: 1px solid rgba(245,158,11,0.35); box-shadow: 0 25px 65px rgba(0,0,0,0.88), 0 0 50px rgba(245,158,11,0.2); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="vector-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(30,18,6,0.7);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="color: #000; width: 16px; height: 16px;"><path d="M12 2a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0V3a1 1 0 0 1 1-1zm0 16a1 1 0 0 1 1 1v2a1 1 0 1 1-2 0v-2a1 1 0 0 1 1-1zm10-7a1 1 0 0 1-1 1h-2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zM5 12a1 1 0 0 1-1 1H2a1 1 0 1 1 0-2h2a1 1 0 0 1 1 1zm14.071-7.071a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0zm-12.728 12.728a1 1 0 0 1 0 1.414l-1.414 1.414a1 1 0 1 1-1.414-1.414l1.414-1.414a1 1 0 0 1 1.414 0zm12.728 0a1 1 0 0 1-1.414 0l-1.414-1.414a1 1 0 1 1 1.414-1.414l1.414 1.414a1 1 0 0 1 0 1.414zM7.757 6.343a1 1 0 0 1-1.414 0L4.93 4.93a1 1 0 0 1 1.414-1.414l1.414 1.414a1 1 0 0 1 0 1.414zM12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">BRIGHTNESS, CONTRAST &amp; GLOW SUITE</h3>
+              <span style="font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: rgba(245,158,11,0.18); border: 1px solid #f59e0b; color: #fbbf24; font-family: monospace; font-weight: 700;">MAGNATES MEDIA SIGNATURE</span>
+            </div>
+            <p style="margin: 2px 0 0; font-size: 11px; color: #94a3b8;">Stack brightness, punchy contrast curves, and dual inner/outer glows on PNG cutouts to make subjects pop against dark backdrops.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-magnates-glow-suite" style="padding: 5px 12px; font-size: 11px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-magnates-glow-suite" style="padding: 5px 14px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #000; border-radius: 6px; cursor: pointer; box-shadow: 0 0 16px rgba(245,158,11,0.4);">⚡ Apply to Timeline</button>
+          <button type="button" id="btn-close-magnates-glow-suite" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="display: flex; flex: 1; overflow: hidden; min-height: 480px;">
+        <!-- Left Stage Viewport (64%) -->
+        <div style="flex: 1.6; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08); background: #040207; overflow-y: auto;">
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid rgba(245,158,11,0.3); box-shadow: inset 0 0 30px rgba(0,0,0,0.95), 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+            <img id="magnates-glow-bg-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80" alt="Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.3; filter: contrast(160%) brightness(35%) blur(6px); display: block;" />
+            <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(245, 158, 11, 0.25) 0%, rgba(4, 2, 8, 0.95) 75%); pointer-events: none;"></div>
+
+            <!-- Subject with stacked glow layers -->
+            <div id="magnates-glow-subject-wrap" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
+              <!-- Outer Diffused Glow Halo -->
+              <div id="magnates-glow-halo-outer" style="position: absolute; inset: -22px; border-radius: 28px; background: radial-gradient(circle, rgba(245,158,11,0.6) 0%, transparent 70%); filter: blur(20px); pointer-events: none;"></div>
+              
+              <div id="magnates-glow-card-element" style="width: 140px; height: 180px; border-radius: 14px; overflow: hidden; position: relative; border: 2px solid #f59e0b; box-shadow: 0 0 35px rgba(245,158,11,0.7), inset 0 0 24px rgba(251,191,36,0.5), 0 25px 50px rgba(0,0,0,0.95); transition: all 0.1s ease;">
+                <img id="magnates-glow-portrait-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" alt="Cutout" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(130%) contrast(145%) saturate(125%); display: block;" />
+                <!-- Inner Rim Glow Overlay -->
+                <div id="magnates-glow-inner-rim" style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 20px #fbbf24; opacity: 0.85;"></div>
+              </div>
+
+              <div style="margin-top: 8px; background: rgba(5,3,9,0.95); border: 1px solid #f59e0b; padding: 2px 10px; border-radius: 9999px;">
+                <span id="magnates-glow-badge-status" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #fbbf24; letter-spacing: 1px;">
+                  PNG CUTOUT POP // DUAL GLOW ACTIVE
+                </span>
+              </div>
+            </div>
+
+            <!-- In-Stage Typography -->
+            <div style="position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 15; padding: 0 20px;">
+              <span id="magnates-glow-subcaption" style="font-family: monospace; font-size: 9px; font-weight: 800; color: #fbbf24; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">
+                STACKED BRIGHTNESS &amp; INNER/OUTER GLOW
+              </span>
+              <h2 id="magnates-glow-headline" style="font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px; margin: 0; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.95);">
+                THE TITAN'S ASCENT
+              </h2>
+            </div>
+
+            <!-- HUD Badges -->
+            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 20;">
+              <span id="magnates-glow-hud-bright" style="font-size: 10px; font-family: monospace; background: rgba(8,4,12,0.9); border: 1px solid #f59e0b; color: #fbbf24; padding: 3px 8px; border-radius: 4px; font-weight: 700;">BRIGHTNESS: +30%</span>
+              <span id="magnates-glow-hud-contrast" style="font-size: 10px; font-family: monospace; background: rgba(8,4,12,0.9); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">CONTRAST: 145%</span>
+            </div>
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 20;">
+              <span id="magnates-glow-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(8,4,12,0.9); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 5.0s</span>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-magnates-glow-play-pause" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #181104; border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; border-radius: 6px; cursor: pointer;">⏸ Pause</button>
+              <button type="button" id="btn-magnates-glow-reset" style="padding: 5px 10px; font-size: 11px; background: #181104; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">↺ Replay</button>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">
+              <span>PNG ISOLATION</span> <span style="color: #64748b;">|</span> <span style="color: #fbbf24; font-weight: 700;">DUAL GLOW COMPOSITE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column Inspector (36%) -->
+        <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #090611; overflow-y: auto;">
+          <!-- Typography -->
+          <div style="background: rgba(24,14,34,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Text &amp; Pop Title</span>
+              <span style="font-size: 9.5px; color: #f59e0b; font-family: monospace;">MAGNATES FX</span>
+            </div>
+            <input type="text" id="magnates-glow-input-headline" value="THE TITAN'S ASCENT" style="width: 100%; background: #050208; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            <input type="text" id="magnates-glow-input-subcaption" value="STACKED BRIGHTNESS & INNER/OUTER GLOW" style="width: 100%; background: #050208; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+          </div>
+
+          <!-- Cutout Image URL -->
+          <div style="background: rgba(24,14,34,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>👤 PNG Cutout Subject</span>
+              <button type="button" id="btn-magnates-glow-shuffle-portrait" style="padding: 2px 8px; font-size: 9.5px; border-radius: 4px; background: #1f132b; border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; cursor: pointer;">🎲 Stock</button>
+            </div>
+            <input type="text" id="magnates-glow-input-portrait" value="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" style="width: 100%; background: #050208; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+          </div>
+
+          <!-- Stacking Sliders -->
+          <div style="background: rgba(24,14,34,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">✨ Brightness, Contrast &amp; Glow Layers</div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px;">
+              <span style="color: #cbd5e1;">Brightness Boost</span>
+              <span id="magnates-glow-val-bright" style="font-family: monospace; color: #fbbf24;">+30%</span>
+            </div>
+            <input type="range" id="magnates-glow-slider-bright" min="0" max="60" value="30" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Contrast Punch</span>
+              <span id="magnates-glow-val-contrast" style="font-family: monospace; color: #fbbf24;">145%</span>
+            </div>
+            <input type="range" id="magnates-glow-slider-contrast" min="100" max="200" value="145" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Outer Glow Radius</span>
+              <span id="magnates-glow-val-glow-radius" style="font-family: monospace; color: #fbbf24;">35 px</span>
+            </div>
+            <input type="range" id="magnates-glow-slider-glow-radius" min="10" max="70" value="35" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <span style="font-size: 10.5px; color: #cbd5e1;">Enable Inner Rim Glow</span>
+              <input type="checkbox" id="magnates-glow-toggle-inner" checked style="accent-color: #f59e0b; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Formula Tip -->
+          <div style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 10px; font-size: 10px; color: #fde68a; line-height: 1.45;">
+            <strong style="color: #ffffff;">💡 Magnates Formula:</strong> Stacking brightness +30% with a tight inner rim glow and a wide diffuse outer glow separates dark subjects from deep backgrounds with iconic golden documentary energy.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Interactive Magnates Media Multi-Layered Drop Shadows Suite Modal -->
+  <div id="modal-magnates-shadows-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(3,7,18,0.88);">
+    <div class="vector-modal-box" style="max-width: 1040px; width: 94vw; max-height: 92vh; background: #060a16; border: 1px solid rgba(56,189,248,0.35); box-shadow: 0 25px 65px rgba(0,0,0,0.88), 0 0 50px rgba(56,189,248,0.2); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="vector-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(8,20,38,0.7);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffffff; width: 16px; height: 16px;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">MULTI-LAYERED DROP SHADOWS SUITE</h3>
+              <span style="font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: rgba(56,189,248,0.18); border: 1px solid #38bdf8; color: #7dd3fc; font-family: monospace; font-weight: 700;">MAGNATES MEDIA SIGNATURE</span>
+            </div>
+            <p style="margin: 2px 0 0; font-size: 11px; color: #94a3b8;">Apply 3-tier stacked drop shadows (contact shadow, ambient occlusion, diffuse falloff) with custom directional angles to float flat 2D cutouts.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-magnates-shadows-suite" style="padding: 5px 12px; font-size: 11px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-magnates-shadows-suite" style="padding: 5px 14px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #0284c7, #38bdf8); border: none; color: #ffffff; border-radius: 6px; cursor: pointer; box-shadow: 0 0 16px rgba(56,189,248,0.4);">⚡ Apply to Timeline</button>
+          <button type="button" id="btn-close-magnates-shadows-suite" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="display: flex; flex: 1; overflow: hidden; min-height: 480px;">
+        <!-- Left Stage Viewport (64%) -->
+        <div style="flex: 1.6; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08); background: #030712; overflow-y: auto;">
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #02040a; border-radius: 10px; overflow: hidden; border: 1px solid rgba(56,189,248,0.3); box-shadow: inset 0 0 30px rgba(0,0,0,0.95), 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; perspective: 800px;">
+            <img id="magnates-shadows-bg-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80" alt="Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; filter: grayscale(90%) brightness(35%); display: block;" />
+            <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: radial-gradient(rgba(56,189,248,0.18) 1.2px, transparent 1.2px); opacity: 0.6; pointer-events: none;"></div>
+
+            <!-- Floating Cutout Rig with 3-Layer Shadow -->
+            <div id="magnates-shadows-rig-wrap" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; transform-style: preserve-3d; transition: transform 0.08s ease-out;">
+              <div id="magnates-shadows-card-element" style="width: 140px; height: 180px; border-radius: 14px; overflow: hidden; position: relative; border: 1.5px solid rgba(56,189,248,0.6); background: #0a1120; transition: box-shadow 0.08s ease;">
+                <img id="magnates-shadows-portrait-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" alt="Cutout" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%) brightness(105%); display: block;" />
+              </div>
+
+              <div style="margin-top: 8px; background: rgba(2,6,23,0.95); border: 1px solid rgba(56,189,248,0.5); padding: 2px 10px; border-radius: 9999px;">
+                <span id="magnates-shadows-badge-status" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #38bdf8; letter-spacing: 1px;">
+                  3-TIER SHADOWS // ELEVATION: 40PX
+                </span>
+              </div>
+            </div>
+
+            <!-- In-Stage Typography -->
+            <div style="position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 15; padding: 0 20px;">
+              <span id="magnates-shadows-subcaption" style="font-family: monospace; font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">
+                MULTI-TIER DIRECTIONAL OCCLUSION
+              </span>
+              <h2 id="magnates-shadows-headline" style="font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px; margin: 0; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.95);">
+                THE MASTERMIND'S GAMBIT
+              </h2>
+            </div>
+
+            <!-- HUD Badges -->
+            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 20;">
+              <span id="magnates-shadows-hud-angle" style="font-size: 10px; font-family: monospace; background: rgba(3,7,18,0.9); border: 1px solid #38bdf8; color: #38bdf8; padding: 3px 8px; border-radius: 4px; font-weight: 700;">ANGLE: 135°</span>
+              <span id="magnates-shadows-hud-elevation" style="font-size: 10px; font-family: monospace; background: rgba(3,7,18,0.9); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">ELEVATION: 40px</span>
+            </div>
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 20;">
+              <span id="magnates-shadows-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(3,7,18,0.9); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 5.0s</span>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-magnates-shadows-play-pause" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #0f172a; border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 6px; cursor: pointer;">⏸ Pause</button>
+              <button type="button" id="btn-magnates-shadows-reset" style="padding: 5px 10px; font-size: 11px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">↺ Replay</button>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">
+              <span>3-TIER OCCLUSION</span> <span style="color: #64748b;">|</span> <span style="color: #38bdf8; font-weight: 700;">SPATIAL ELEVATION</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column Inspector (36%) -->
+        <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #060a16; overflow-y: auto;">
+          <!-- Typography -->
+          <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Text &amp; Float Title</span>
+              <span style="font-size: 9.5px; color: #38bdf8; font-family: monospace;">MAGNATES FX</span>
+            </div>
+            <input type="text" id="magnates-shadows-input-headline" value="THE MASTERMIND'S GAMBIT" style="width: 100%; background: #030712; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            <input type="text" id="magnates-shadows-input-subcaption" value="MULTI-TIER DIRECTIONAL OCCLUSION" style="width: 100%; background: #030712; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+          </div>
+
+          <!-- Cutout Image URL -->
+          <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>👤 2D Cutout Portrait</span>
+              <button type="button" id="btn-magnates-shadows-shuffle-portrait" style="padding: 2px 8px; font-size: 9.5px; border-radius: 4px; background: #0f172a; border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; cursor: pointer;">🎲 Stock</button>
+            </div>
+            <input type="text" id="magnates-shadows-input-portrait" value="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" style="width: 100%; background: #030712; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+          </div>
+
+          <!-- Shadow Layer Controls -->
+          <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">🕶️ Multi-Layer Drop Shadow Properties</div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px;">
+              <span style="color: #cbd5e1;">Shadow Direction Angle</span>
+              <span id="magnates-shadows-val-angle" style="font-family: monospace; color: #38bdf8;">135°</span>
+            </div>
+            <input type="range" id="magnates-shadows-slider-angle" min="0" max="360" value="135" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Elevation Distance</span>
+              <span id="magnates-shadows-val-elevation" style="font-family: monospace; color: #38bdf8;">40 px</span>
+            </div>
+            <input type="range" id="magnates-shadows-slider-elevation" min="10" max="80" value="40" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Shadow Blur &amp; Softness</span>
+              <span id="magnates-shadows-val-blur" style="font-family: monospace; color: #38bdf8;">30 px</span>
+            </div>
+            <input type="range" id="magnates-shadows-slider-blur" min="10" max="70" value="30" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <span style="font-size: 10.5px; color: #cbd5e1;">3D Spatial Float Hover</span>
+              <input type="checkbox" id="magnates-shadows-toggle-float" checked style="accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Formula Tip -->
+          <div style="background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 10px; font-size: 10px; color: #bae6fd; line-height: 1.45;">
+            <strong style="color: #ffffff;">💡 Magnates Formula:</strong> Never use a single flat drop shadow. Stacking 3 shadows (tight contact + medium ambient occlusion + wide soft diffuse) gives cutouts realistic physical height over documentary plates.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Interactive Magnates Media Color Grading & Shadowization Suite Modal -->
+  <div id="modal-magnates-shadowize-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(14,2,6,0.88);">
+    <div class="vector-modal-box" style="max-width: 1040px; width: 94vw; max-height: 92vh; background: #0c0205; border: 1px solid rgba(244,63,94,0.35); box-shadow: 0 25px 65px rgba(0,0,0,0.88), 0 0 50px rgba(244,63,94,0.2); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="vector-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(38,6,15,0.7);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, #e11d48, #be123c); display: flex; align-items: center; justify-content: center;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffffff; width: 16px; height: 16px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8v16z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">COLOR GRADING &amp; SHADOWIZATION SUITE</h3>
+              <span style="font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: rgba(244,63,94,0.18); border: 1px solid #f43f5e; color: #fda4af; font-family: monospace; font-weight: 700;">MAGNATES MEDIA SIGNATURE</span>
+            </div>
+            <p style="margin: 2px 0 0; font-size: 11px; color: #94a3b8;">Transform characters into flat ominous black silhouettes using Fill or stylize tension with duotone Gradient Colorize.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-magnates-shadowize-suite" style="padding: 5px 12px; font-size: 11px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-magnates-shadowize-suite" style="padding: 5px 14px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #e11d48, #be123c); border: none; color: #ffffff; border-radius: 6px; cursor: pointer; box-shadow: 0 0 16px rgba(244,63,94,0.4);">⚡ Apply to Timeline</button>
+          <button type="button" id="btn-close-magnates-shadowize-suite" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="display: flex; flex: 1; overflow: hidden; min-height: 480px;">
+        <!-- Left Stage Viewport (64%) -->
+        <div style="flex: 1.6; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08); background: #080104; overflow-y: auto;">
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid rgba(244,63,94,0.3); box-shadow: inset 0 0 30px rgba(0,0,0,0.95), 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+            <img id="magnates-shadowize-bg-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80" alt="Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.18; filter: contrast(180%) grayscale(100%); display: block;" />
+            <div id="magnates-shadowize-stage-grad" style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(225, 29, 72, 0.35) 0%, rgba(8, 1, 4, 0.98) 75%); pointer-events: none;"></div>
+
+            <!-- Subject with Shadowization Fill / Colorize -->
+            <div id="magnates-shadowize-subject-wrap" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
+              <div id="magnates-shadowize-card-element" style="width: 140px; height: 180px; border-radius: 14px; overflow: hidden; position: relative; border: 1.5px solid #f43f5e; box-shadow: 0 0 35px rgba(244,63,94,0.5), 0 20px 45px rgba(0,0,0,0.95); background: #000;">
+                <img id="magnates-shadowize-portrait-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" alt="Cutout" style="width: 100%; height: 100%; object-fit: cover; transition: filter 0.1s ease; display: block;" />
+                <div id="magnates-shadowize-fill-overlay" style="position: absolute; inset: 0; background: #000000; opacity: 0.8; pointer-events: none; mix-blend-mode: multiply; transition: opacity 0.1s ease;"></div>
+              </div>
+
+              <div style="margin-top: 8px; background: rgba(14,2,6,0.95); border: 1px solid rgba(244,63,94,0.6); padding: 2px 10px; border-radius: 9999px;">
+                <span id="magnates-shadowize-badge-status" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #fb7185; letter-spacing: 1px;">
+                  MODE: FLAT SILHOUETTE (FILL)
+                </span>
+              </div>
+            </div>
+
+            <!-- In-Stage Typography -->
+            <div style="position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 15; padding: 0 20px;">
+              <span id="magnates-shadowize-subcaption" style="font-family: monospace; font-size: 9px; font-weight: 800; color: #fb7185; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">
+                OMINOUS NOIR DOSSIER // TONAL SHADOWIZATION
+              </span>
+              <h2 id="magnates-shadowize-headline" style="font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px; margin: 0; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.95);">
+                THE UNSEEN CONSPIRATOR
+              </h2>
+            </div>
+
+            <!-- HUD Badges -->
+            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 20;">
+              <span id="magnates-shadowize-hud-mode" style="font-size: 10px; font-family: monospace; background: rgba(14,2,6,0.9); border: 1px solid #f43f5e; color: #fb7185; padding: 3px 8px; border-radius: 4px; font-weight: 700;">FILL SILHOUETTE: 80%</span>
+              <span id="magnates-shadowize-hud-tone" style="font-size: 10px; font-family: monospace; background: rgba(14,2,6,0.9); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">TONE: CRIMSON NOIR</span>
+            </div>
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 20;">
+              <span id="magnates-shadowize-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(14,2,6,0.9); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 5.0s</span>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-magnates-shadowize-play-pause" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #1c050c; border: 1px solid rgba(244,63,94,0.3); color: #fb7185; border-radius: 6px; cursor: pointer;">⏸ Pause</button>
+              <button type="button" id="btn-magnates-shadowize-reset" style="padding: 5px 10px; font-size: 11px; background: #1c050c; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">↺ Replay</button>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">
+              <span>TONAL COLORIZE</span> <span style="color: #64748b;">|</span> <span style="color: #fb7185; font-weight: 700;">FLAT SILHOUETTE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column Inspector (36%) -->
+        <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #0c0205; overflow-y: auto;">
+          <!-- Typography -->
+          <div style="background: rgba(38,6,15,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Text &amp; Noir Title</span>
+              <span style="font-size: 9.5px; color: #f43f5e; font-family: monospace;">MAGNATES FX</span>
+            </div>
+            <input type="text" id="magnates-shadowize-input-headline" value="THE UNSEEN CONSPIRATOR" style="width: 100%; background: #060103; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            <input type="text" id="magnates-shadowize-input-subcaption" value="OMINOUS NOIR DOSSIER // TONAL SHADOWIZATION" style="width: 100%; background: #060103; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+          </div>
+
+          <!-- Cutout Image URL -->
+          <div style="background: rgba(38,6,15,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>👤 Target Character Image</span>
+              <button type="button" id="btn-magnates-shadowize-shuffle-portrait" style="padding: 2px 8px; font-size: 9.5px; border-radius: 4px; background: #24050e; border: 1px solid rgba(244,63,94,0.3); color: #fb7185; cursor: pointer;">🎲 Stock</button>
+            </div>
+            <input type="text" id="magnates-shadowize-input-portrait" value="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" style="width: 100%; background: #060103; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+          </div>
+
+          <!-- Shadowization Modes -->
+          <div style="background: rgba(38,6,15,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">👤 Shadowization Mode &amp; Grading</div>
+
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="btn-shadowize-mode" data-mode="silhouette" style="flex: 1; padding: 6px 8px; font-size: 10.5px; font-weight: 700; border-radius: 6px; background: rgba(244,63,94,0.25); border: 1px solid #f43f5e; color: #fff; cursor: pointer;">Flat Silhouette (Fill)</button>
+              <button type="button" class="btn-shadowize-mode" data-mode="colorize" style="flex: 1; padding: 6px 8px; font-size: 10.5px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer;">Gradient Colorize</button>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 6px;">
+              <span style="color: #cbd5e1;">Fill Darkness / Intensity</span>
+              <span id="magnates-shadowize-val-intensity" style="font-family: monospace; color: #fb7185;">80%</span>
+            </div>
+            <input type="range" id="magnates-shadowize-slider-intensity" min="20" max="100" value="80" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Contrast Crunch</span>
+              <span id="magnates-shadowize-val-contrast" style="font-family: monospace; color: #fb7185;">180%</span>
+            </div>
+            <input type="range" id="magnates-shadowize-slider-contrast" min="100" max="250" value="180" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+          </div>
+
+          <!-- Formula Tip -->
+          <div style="background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.25); border-radius: 8px; padding: 10px; font-size: 10px; color: #fecdd3; line-height: 1.45;">
+            <strong style="color: #ffffff;">💡 Magnates Formula:</strong> Applying After Effects 'Fill' turned to pure pitch black converts talking head executives into shadowy nameless figures, amplifying investigative conspiracy storytelling.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Interactive Magnates Media Blend Modes Suite Modal -->
+  <div id="modal-magnates-blend-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(2,6,23,0.88);">
+    <div class="vector-modal-box" style="max-width: 1040px; width: 94vw; max-height: 92vh; background: #040816; border: 1px solid rgba(56,189,248,0.35); box-shadow: 0 25px 65px rgba(0,0,0,0.88), 0 0 50px rgba(56,189,248,0.2); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="vector-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(8,24,48,0.7);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #818cf8); display: flex; align-items: center; justify-content: center;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffffff; width: 16px; height: 16px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">BLEND MODES SUITE: SCREEN, DIFFERENCE &amp; OVERLAY</h3>
+              <span style="font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: rgba(56,189,248,0.18); border: 1px solid #38bdf8; color: #7dd3fc; font-family: monospace; font-weight: 700;">MAGNATES MEDIA SIGNATURE</span>
+            </div>
+            <p style="margin: 2px 0 0; font-size: 11px; color: #94a3b8;">Screen for snow/particles, Difference for film noise &amp; inverted text, and Overlay for antique clock mechanisms and paper textures.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-magnates-blend-suite" style="padding: 5px 12px; font-size: 11px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-magnates-blend-suite" style="padding: 5px 14px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #0284c7, #818cf8); border: none; color: #ffffff; border-radius: 6px; cursor: pointer; box-shadow: 0 0 16px rgba(56,189,248,0.4);">⚡ Apply to Timeline</button>
+          <button type="button" id="btn-close-magnates-blend-suite" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="display: flex; flex: 1; overflow: hidden; min-height: 480px;">
+        <!-- Left Stage Viewport (64%) -->
+        <div style="flex: 1.6; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08); background: #02050e; overflow-y: auto;">
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid rgba(56,189,248,0.3); box-shadow: inset 0 0 30px rgba(0,0,0,0.95), 0 10px 25px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;">
+            <img id="magnates-blend-bg-img" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80" alt="Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(130%) brightness(55%); display: block;" />
+
+            <!-- Particle / Snow Screen Blend Layer -->
+            <div id="magnates-blend-particles" style="position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; background-image: radial-gradient(#ffffff 1.2px, transparent 1.2px); background-size: 26px 26px; opacity: 0.85;"></div>
+
+            <!-- Overlay Antique Clock Layer -->
+            <div id="magnates-blend-clock-wrap" style="position: absolute; inset: 0; mix-blend-mode: overlay; pointer-events: none; display: flex; align-items: center; justify-content: center; opacity: 0.75;">
+              <svg id="magnates-blend-clock-svg" width="220" height="220" viewBox="0 0 100 100" style="stroke: #f59e0b; stroke-width: 1.5; fill: none;">
+                <circle cx="50" cy="50" r="46" stroke-dasharray="4 2" />
+                <circle cx="50" cy="50" r="38" opacity="0.5" />
+                <line x1="50" y1="50" x2="50" y2="18" stroke-width="2.5" />
+                <line x1="50" y1="50" x2="74" y2="50" stroke-width="3" />
+                <circle cx="50" cy="50" r="4" fill="#f59e0b" />
+              </svg>
+            </div>
+
+            <!-- Subject Text Card with Active Blend Mode -->
+            <div id="magnates-blend-card-element" style="position: relative; z-index: 10; padding: 14px 22px; background: rgba(15,23,42,0.85); border: 2px solid #38bdf8; border-radius: 12px; backdrop-filter: blur(8px); box-shadow: 0 15px 35px rgba(0,0,0,0.9); text-align: center; transition: all 0.15s ease;">
+              <div id="magnates-blend-card-sub" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #38bdf8; letter-spacing: 1.5px; text-transform: uppercase;">
+                ACTIVE BLEND: SCREEN MODE
+              </div>
+              <div id="magnates-blend-card-title" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 900; color: #ffffff; letter-spacing: 2px; margin-top: 2px;">
+                COMPOSITING TEXTURES
+              </div>
+            </div>
+
+            <!-- In-Stage Typography -->
+            <div style="position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 15; padding: 0 20px;">
+              <span id="magnates-blend-subcaption" style="font-family: monospace; font-size: 9px; font-weight: 800; color: #38bdf8; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">
+                SCREEN // DIFFERENCE // OVERLAY COMPOSITING
+              </span>
+              <h2 id="magnates-blend-headline" style="font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px; margin: 0; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.95);">
+                TEMPORAL DISTORTION
+              </h2>
+            </div>
+
+            <!-- HUD Badges -->
+            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 20;">
+              <span id="magnates-blend-hud-active" style="font-size: 10px; font-family: monospace; background: rgba(4,8,22,0.9); border: 1px solid #38bdf8; color: #38bdf8; padding: 3px 8px; border-radius: 4px; font-weight: 700;">MODE: SCREEN</span>
+              <span id="magnates-blend-hud-opacity" style="font-size: 10px; font-family: monospace; background: rgba(4,8,22,0.9); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">OPACITY: 85%</span>
+            </div>
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 20;">
+              <span id="magnates-blend-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(4,8,22,0.9); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 5.0s</span>
+            </div>
+          </div>
+
+          <!-- Controls Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-magnates-blend-play-pause" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #0f172a; border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 6px; cursor: pointer;">⏸ Pause</button>
+              <button type="button" id="btn-magnates-blend-reset" style="padding: 5px 10px; font-size: 11px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">↺ Replay</button>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">
+              <span>BLEND MATH</span> <span style="color: #64748b;">|</span> <span style="color: #38bdf8; font-weight: 700;">ORGANIC TEXTURE OVERLAY</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column Inspector (36%) -->
+        <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #040816; overflow-y: auto;">
+          <!-- Typography -->
+          <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Text &amp; Blend Title</span>
+              <span style="font-size: 9.5px; color: #38bdf8; font-family: monospace;">MAGNATES FX</span>
+            </div>
+            <input type="text" id="magnates-blend-input-headline" value="TEMPORAL DISTORTION" style="width: 100%; background: #02050e; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            <input type="text" id="magnates-blend-input-subcaption" value="SCREEN // DIFFERENCE // OVERLAY COMPOSITING" style="width: 100%; background: #02050e; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+          </div>
+
+          <!-- Blend Mode Selection Buttons -->
+          <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">🔮 Select Blend Mode</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+              <button type="button" class="btn-blend-mode-pick" data-blend="screen" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; background: rgba(56,189,248,0.25); border: 1px solid #38bdf8; color: #fff; cursor: pointer;">Screen</button>
+              <button type="button" class="btn-blend-mode-pick" data-blend="difference" style="padding: 7px 4px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer;">Difference</button>
+              <button type="button" class="btn-blend-mode-pick" data-blend="overlay" style="padding: 7px 4px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer;">Overlay</button>
+            </div>
+
+            <!-- Mode Description Pill -->
+            <div id="magnates-blend-mode-desc" style="margin-top: 4px; padding: 6px 8px; border-radius: 6px; background: rgba(2,6,23,0.8); border: 1px solid rgba(56,189,248,0.3); font-size: 9.5px; color: #7dd3fc; line-height: 1.4;">
+              Screen Mode: Drops black values completely to composite snow particles and anamorphic light bursts seamlessly over dark footage.
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 6px;">
+              <span style="color: #cbd5e1;">Blend Layer Opacity</span>
+              <span id="magnates-blend-val-opacity" style="font-family: monospace; color: #38bdf8;">85%</span>
+            </div>
+            <input type="range" id="magnates-blend-slider-opacity" min="20" max="100" value="85" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <span style="font-size: 10.5px; color: #cbd5e1;">Show Antique Clock Graphic</span>
+              <input type="checkbox" id="magnates-blend-toggle-clock" checked style="accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Formula Tip -->
+          <div style="background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 10px; font-size: 10px; color: #bae6fd; line-height: 1.45;">
+            <strong style="color: #ffffff;">💡 Magnates Formula:</strong> Screen drops all black pixels for glowing snow/sparks; Difference inverts tone under moving footage for jarring film noise; Overlay embeds mechanical clock hands into textured archival paper.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Animated Chart Creator / Template Builder Modal -->
   <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
     <div class="vector-modal-box" style="max-width: 680px;">
@@ -7506,6 +8049,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=290"></script>
+  <script src="js/app.js?v=291"></script>
 </body>
 </html>

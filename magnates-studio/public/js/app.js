@@ -20109,6 +20109,58 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['CC Vignette', 'Depth of Focus', 'DOF Blur', 'Magnates Media', 'Focus Pull', 'Cutout Isolation'],
     defaultImage: '/magnates_cc_vignette_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-brightness-glow',
+    title: 'Brightness, Contrast, & Glow (PNG Cutout Pop)',
+    category: 'Color & Vibe',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(16, 12, 4, 0.98), rgba(69, 39, 160, 0.6), rgba(245, 158, 11, 0.4), rgba(3, 2, 8, 0.98))',
+    description: 'Stacking brightness, contrast adjustments, and dual inner/outer glows on PNG cutout subjects to make them pop intensely against dark or blurred backdrops.',
+    tags: ['Brightness & Contrast', 'Inner Glow', 'Outer Glow', 'PNG Cutout Pop', 'Magnates Media'],
+    defaultImage: '/magnates_brightness_glow_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-multi-drop-shadows',
+    title: 'Multi-Layered Drop Shadows (2D Cutout Float)',
+    category: '3D Spatial',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(6, 8, 18, 0.98), rgba(15, 23, 42, 0.75), rgba(56, 189, 248, 0.35), rgba(2, 3, 8, 0.98))',
+    description: 'Applying stacked multi-tier drop shadows with custom directional angles to flat 2D cutouts so they float realistically over the background scene with spatial occlusion.',
+    tags: ['Multi-Layer Shadows', 'Drop Shadows', 'Cutout Elevation', 'Floating Card', 'Magnates Media'],
+    defaultImage: '/magnates_drop_shadows_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-shadowization',
+    title: 'Color Grading & Shadowization (Fill Silhouettes)',
+    category: 'Color & Vibe',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(24, 4, 10, 0.98), rgba(40, 6, 18, 0.75), rgba(244, 63, 94, 0.35), rgba(4, 1, 3, 0.98))',
+    description: 'Using Fill tools to transform characters into ominous flat black silhouettes or applying Gradient Colorize to stylize tone, mood, and dramatic investigative tension.',
+    tags: ['Shadowization', 'Fill Silhouette', 'Gradient Colorize', 'Noir Tension', 'Magnates Media'],
+    defaultImage: '/magnates_shadowization_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-blend-modes',
+    title: 'Blend Modes: Screen, Difference, & Overlay',
+    category: 'Color & Vibe',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(4, 8, 20, 0.98), rgba(10, 25, 47, 0.75), rgba(56, 189, 248, 0.35), rgba(1, 3, 10, 0.98))',
+    description: 'Compositing with Screen mode for snow/particles, Difference mode for film noise & inverted vintage text, and Overlay mode for antique clock animations and organic paper textures.',
+    tags: ['Blend Modes', 'Screen Blend', 'Difference Mode', 'Overlay Texture', 'Magnates Media'],
+    defaultImage: '/magnates_blend_modes_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -21008,6 +21060,113 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'magnates-media-brightness-glow') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #06030c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; filter: contrast(160%) brightness(35%) blur(4px);" />
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(245, 158, 11, 0.22) 0%, rgba(6, 3, 12, 0.95) 75%);"></div>
+          
+          <!-- Stacked Pop Cutout Subject -->
+          <div id="fx-glow-subject-${tplId}" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: all 0.08s ease;">
+            <div id="fx-glow-halo-${tplId}" style="position: absolute; inset: -14px; border-radius: 20px; background: radial-gradient(circle, rgba(245,158,11,0.5) 0%, transparent 75%); filter: blur(14px); pointer-events: none;"></div>
+            <div id="fx-glow-card-${tplId}" style="width: 105px; height: 130px; border-radius: 12px; overflow: hidden; border: 2px solid #f59e0b; position: relative; box-shadow: 0 0 25px rgba(245, 158, 11, 0.6), inset 0 0 18px rgba(251, 191, 36, 0.45), 0 20px 40px rgba(0,0,0,0.95);">
+              <img id="fx-glow-img-${tplId}" src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(130%) contrast(145%) saturate(125%);" />
+            </div>
+            <div style="margin-top: 6px; background: rgba(0,0,0,0.85); border: 1px solid rgba(245,158,11,0.6); padding: 2px 8px; border-radius: 9999px;">
+              <span id="fx-glow-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #fbbf24;">
+                BRIGHT: +30% // INNER+OUTER GLOW
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 8.5px; font-weight: 900; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
+            ✨ GLOW &amp; POP
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-media-multi-drop-shadows') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #030712; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
+          <!-- Ambient textured background -->
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; filter: grayscale(80%) brightness(30%);" />
+          <div style="position: absolute; inset: 0; background-size: 20px 20px; background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px); opacity: 0.7;"></div>
+
+          <!-- Multi-tier Floating 2D Cutout Card with stacked shadows -->
+          <div id="fx-shadow-rig-${tplId}" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; transform-style: preserve-3d; transition: transform 0.05s linear;">
+            <div id="fx-shadow-card-${tplId}" style="width: 110px; height: 135px; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(56,189,248,0.7); position: relative; background: #0b1120;">
+              <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%) brightness(105%);" />
+            </div>
+            <div style="margin-top: 6px; background: rgba(3,7,18,0.92); border: 1px solid rgba(56,189,248,0.5); padding: 2px 8px; border-radius: 9999px;">
+              <span id="fx-shadow-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8;">
+                3-TIER SHADOWS // ELEVATION 45PX
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
+            🕶️ 3-TIER SHADOWS
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-media-shadowization') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #0b0206; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Blood red noir atmosphere -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(225, 29, 72, 0.3) 0%, rgba(11, 2, 6, 0.98) 75%);"></div>
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: contrast(200%) grayscale(100%);" />
+
+          <!-- Cutout subject undergoing silhouette fill / colorize -->
+          <div id="fx-shadowize-wrap-${tplId}" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center;">
+            <div style="width: 105px; height: 130px; border-radius: 12px; overflow: hidden; border: 1.5px solid #f43f5e; box-shadow: 0 0 30px rgba(244,63,94,0.4), 0 15px 35px rgba(0,0,0,0.9); position: relative; background: #000000;">
+              <img id="fx-shadowize-img-${tplId}" src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; transition: filter 0.1s ease;" />
+              <!-- Flat Silhouette Fill Overlay -->
+              <div id="fx-shadowize-fill-${tplId}" style="position: absolute; inset: 0; background: #050103; opacity: 0; pointer-events: none; mix-blend-mode: multiply;"></div>
+            </div>
+            <div style="margin-top: 6px; background: rgba(0,0,0,0.85); border: 1px solid rgba(244,63,94,0.6); padding: 2px 8px; border-radius: 9999px;">
+              <span id="fx-shadowize-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #fb7185;">
+                MODE: GRADIENT COLORIZE // SILHOUETTE
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #e11d48, #9f1239); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(225,29,72,0.5);">
+            👤 NOIR SILHOUETTE
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-media-blend-modes') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #020617; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Base background photo -->
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(130%) brightness(50%);" />
+
+          <!-- Overlay/Difference/Screen dynamic blend visual elements -->
+          <div id="fx-blend-particle-layer-${tplId}" style="position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px; opacity: 0.85;"></div>
+          <div id="fx-blend-clock-overlay-${tplId}" style="position: absolute; inset: 0; mix-blend-mode: overlay; pointer-events: none; display: flex; align-items: center; justify-content: center; opacity: 0.75;">
+            <svg id="fx-blend-clock-svg-${tplId}" width="140" height="140" viewBox="0 0 100 100" style="opacity: 0.6; stroke: #f59e0b; stroke-width: 1.5; fill: none;">
+              <circle cx="50" cy="50" r="45" stroke-dasharray="4 2" />
+              <line x1="50" y1="50" x2="50" y2="20" stroke-width="2" />
+              <line x1="50" y1="50" x2="72" y2="50" stroke-width="2.5" />
+            </svg>
+          </div>
+
+          <!-- Foreground typographic element with Difference / Screen toggle -->
+          <div id="fx-blend-card-${tplId}" style="position: relative; z-index: 10; text-align: center; padding: 10px 16px; background: rgba(15,23,42,0.8); border: 1.5px solid #38bdf8; border-radius: 8px; backdrop-filter: blur(6px); box-shadow: 0 10px 25px rgba(0,0,0,0.85);">
+            <div id="fx-blend-title-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase;">
+              SCREEN &bull; DIFF &bull; OVERLAY
+            </div>
+            <div style="margin-top: 4px;">
+              <span id="fx-blend-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px;">
+                ACTIVE MODE: SCREEN (PARTICLES)
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #818cf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
+            🔮 BLEND MODES
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21422,6 +21581,77 @@ function startTemplateHoverVideo(cardEl, tpl) {
         const floatY = Math.sin(t * 1.8) * 4;
         fgCard.style.transform = `translateY(${floatY.toFixed(1)}px)`;
       }
+    } else if (tplId === 'magnates-media-brightness-glow') {
+      const pulseGlow = (0.7 + Math.sin(t * 3) * 0.3);
+      const brightVal = Math.floor(20 + Math.sin(t * 2.5) * 15);
+      const halo = fxContainer?.querySelector(`#fx-glow-halo-${tplId}`);
+      const card = fxContainer?.querySelector(`#fx-glow-card-${tplId}`);
+      const img = fxContainer?.querySelector(`#fx-glow-img-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-glow-meter-${tplId}`);
+      if (halo) halo.style.opacity = pulseGlow.toFixed(2);
+      if (card) card.style.boxShadow = `0 0 ${(25 + pulseGlow * 15).toFixed(0)}px rgba(245, 158, 11, ${(0.5 + pulseGlow * 0.3).toFixed(2)}), inset 0 0 18px rgba(251, 191, 36, 0.45), 0 20px 40px rgba(0,0,0,0.95)`;
+      if (img) img.style.filter = `brightness(${(115 + brightVal)}%) contrast(145%) saturate(125%)`;
+      if (meter) meter.textContent = `BRIGHT: +${brightVal}% // DUAL GLOW ${(pulseGlow * 100).toFixed(0)}%`;
+    } else if (tplId === 'magnates-media-multi-drop-shadows') {
+      const elev = 35 + Math.sin(t * 2.2) * 15;
+      const angle = (t * 45) % 360;
+      const rad = (angle * Math.PI) / 180;
+      const offX = Math.cos(rad) * (elev * 0.4);
+      const offY = Math.sin(rad) * (elev * 0.6);
+      const card = fxContainer?.querySelector(`#fx-shadow-card-${tplId}`);
+      const rig = fxContainer?.querySelector(`#fx-shadow-rig-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-shadow-meter-${tplId}`);
+      if (rig) rig.style.transform = `translateY(${-Math.sin(t * 2.2) * 8}px) rotateX(${(offY * 0.3).toFixed(1)}deg) rotateY(${(-offX * 0.3).toFixed(1)}deg)`;
+      if (card) {
+        card.style.boxShadow = `
+          ${(offX * 0.3).toFixed(1)}px ${(offY * 0.3).toFixed(1)}px 8px rgba(0,0,0,0.65),
+          ${(offX * 0.7).toFixed(1)}px ${(offY * 0.7).toFixed(1)}px 22px rgba(2,6,23,0.8),
+          ${offX.toFixed(1)}px ${offY.toFixed(1)}px ${(elev * 0.9).toFixed(1)}px rgba(0,0,0,0.95)
+        `;
+      }
+      if (meter) meter.textContent = `3-TIER SHADOWS // ELEVATION ${elev.toFixed(0)}PX`;
+    } else if (tplId === 'magnates-media-shadowization') {
+      const cycle = (t * 0.8) % 3;
+      const img = fxContainer?.querySelector(`#fx-shadowize-img-${tplId}`);
+      const fill = fxContainer?.querySelector(`#fx-shadowize-fill-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-shadowize-meter-${tplId}`);
+      if (cycle < 1.4) {
+        // Mode 1: Silhouette Fill
+        const fillOp = Math.min(1, cycle / 0.8);
+        if (fill) fill.style.opacity = fillOp.toFixed(2);
+        if (img) img.style.filter = `brightness(${(100 - fillOp * 90).toFixed(0)}%) contrast(180%)`;
+        if (meter) meter.textContent = `MODE: OMINOUS SILHOUETTE FILL ${(fillOp * 100).toFixed(0)}%`;
+      } else {
+        // Mode 2: Dramatic Noir Gradient Colorize
+        if (fill) fill.style.opacity = '0';
+        if (img) img.style.filter = `sepia(90%) hue-rotate(310deg) saturate(240%) contrast(160%) brightness(85%)`;
+        if (meter) meter.textContent = `MODE: CRIMSON GRADIENT COLORIZE`;
+      }
+    } else if (tplId === 'magnates-media-blend-modes') {
+      const modeCycle = Math.floor((t * 0.5) % 3);
+      const modes = ['SCREEN (SNOW / PARTICLES)', 'DIFFERENCE (INVERTED NOISE)', 'OVERLAY (ANTIQUE CLOCK)'];
+      const card = fxContainer?.querySelector(`#fx-blend-card-${tplId}`);
+      const pLayer = fxContainer?.querySelector(`#fx-blend-particle-layer-${tplId}`);
+      const clockSvg = fxContainer?.querySelector(`#fx-blend-clock-svg-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-blend-meter-${tplId}`);
+      if (clockSvg) clockSvg.style.transform = `rotate(${(t * 40).toFixed(1)}deg)`;
+      if (pLayer) {
+        const drift = (t * 30) % 240;
+        pLayer.style.backgroundPosition = `${drift}px ${drift}px`;
+      }
+      if (meter) meter.textContent = `ACTIVE: ${modes[modeCycle]}`;
+      if (card) {
+        if (modeCycle === 0) {
+          card.style.mixBlendMode = 'normal';
+          card.style.borderColor = '#38bdf8';
+        } else if (modeCycle === 1) {
+          card.style.mixBlendMode = 'difference';
+          card.style.borderColor = '#ffffff';
+        } else {
+          card.style.mixBlendMode = 'overlay';
+          card.style.borderColor = '#f59e0b';
+        }
+      }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
       const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
@@ -21824,6 +22054,22 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-cc-vignette-dof') {
     // Launch Magnates Media CC Vignette & Depth of Focus Suite
     openMagnatesCCVignetteSuite();
+    return;
+  } else if (templateId === 'magnates-media-brightness-glow') {
+    // Launch Magnates Media Brightness, Contrast & Glow Suite
+    openMagnatesBrightnessGlowSuite();
+    return;
+  } else if (templateId === 'magnates-media-multi-drop-shadows') {
+    // Launch Magnates Media Multi-Layered Drop Shadows Suite
+    openMagnatesDropShadowsSuite();
+    return;
+  } else if (templateId === 'magnates-media-shadowization') {
+    // Launch Magnates Media Color Grading & Shadowization Suite
+    openMagnatesShadowizationSuite();
+    return;
+  } else if (templateId === 'magnates-media-blend-modes') {
+    // Launch Magnates Media Blend Modes Suite
+    openMagnatesBlendModesSuite();
     return;
   }
 
@@ -23915,6 +24161,10 @@ function initHomepageTemplateEvents() {
   bindSubbassSuiteModalControls();
   bindMagnates3DProjectionSuiteModalControls();
   bindMagnatesCCVignetteSuiteModalControls();
+  bindMagnatesBrightnessGlowSuiteModalControls();
+  bindMagnatesDropShadowsSuiteModalControls();
+  bindMagnatesShadowizationSuiteModalControls();
+  bindMagnatesBlendModesSuiteModalControls();
 }
 
 /* =========================================================
@@ -28918,10 +29168,1018 @@ function bindMagnatesCCVignetteSuiteModalControls() {
   });
 }
 
+/* =========================================================
+   1. MAGNATES MEDIA BRIGHTNESS, CONTRAST & GLOW SUITE CONTROLLER
+   (Stacking brightness, contrast adjustments, and inner/outer glows on PNG cutouts to make them pop)
+   ========================================================= */
+let magnatesGlowState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  brightnessBoost: 30, // 0 to 60%
+  contrastPunch: 145, // 100 to 200%
+  glowRadius: 35, // 10 to 70px
+  innerGlowEnabled: true,
+  headline: "THE TITAN'S ASCENT",
+  subcaption: "STACKED BRIGHTNESS & INNER/OUTER GLOW",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  bgUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesGlowVisualStyles() {
+  const headlineEl = document.getElementById('magnates-glow-headline');
+  const subcaptionEl = document.getElementById('magnates-glow-subcaption');
+  const portraitImg = document.getElementById('magnates-glow-portrait-img');
+  const bgImg = document.getElementById('magnates-glow-bg-img');
+  const haloOuter = document.getElementById('magnates-glow-halo-outer');
+  const cardEl = document.getElementById('magnates-glow-card-element');
+  const innerRim = document.getElementById('magnates-glow-inner-rim');
+  const hudBright = document.getElementById('magnates-glow-hud-bright');
+  const hudContrast = document.getElementById('magnates-glow-hud-contrast');
+  const timerEl = document.getElementById('magnates-glow-timer-display');
+
+  if (headlineEl) headlineEl.textContent = magnatesGlowState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesGlowState.subcaption;
+  if (portraitImg && portraitImg.src !== magnatesGlowState.portraitUrl) portraitImg.src = magnatesGlowState.portraitUrl;
+  if (bgImg && bgImg.src !== magnatesGlowState.bgUrl) bgImg.src = magnatesGlowState.bgUrl;
+
+  const p = magnatesGlowState.playhead;
+  const dur = magnatesGlowState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const pulse = 0.8 + Math.sin(p * 2.8) * 0.25;
+  const currentBright = magnatesGlowState.brightnessBoost;
+  const currentContrast = magnatesGlowState.contrastPunch;
+  const currentRadius = magnatesGlowState.glowRadius;
+
+  if (hudBright) hudBright.textContent = `BRIGHTNESS: +${currentBright}%`;
+  if (hudContrast) hudContrast.textContent = `CONTRAST: ${currentContrast}%`;
+
+  if (portraitImg) {
+    portraitImg.style.filter = `brightness(${100 + currentBright}%) contrast(${currentContrast}%) saturate(125%)`;
+  }
+  if (cardEl) {
+    const glowAlpha = (0.55 * pulse).toFixed(2);
+    cardEl.style.boxShadow = `0 0 ${(currentRadius * pulse).toFixed(0)}px rgba(245, 158, 11, ${glowAlpha}), inset 0 0 ${(currentRadius * 0.5).toFixed(0)}px rgba(251, 191, 36, 0.4), 0 25px 50px rgba(0,0,0,0.95)`;
+  }
+  if (haloOuter) {
+    haloOuter.style.opacity = (pulse * 0.85).toFixed(2);
+  }
+  if (innerRim) {
+    innerRim.style.display = magnatesGlowState.innerGlowEnabled ? 'block' : 'none';
+  }
+}
+
+function renderMagnatesGlowLoop(timestamp) {
+  if (!magnatesGlowState.isPlaying) return;
+  if (!magnatesGlowState.lastTimestamp) magnatesGlowState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesGlowState.lastTimestamp) / 1000;
+  magnatesGlowState.lastTimestamp = timestamp;
+
+  magnatesGlowState.playhead += dt;
+  if (magnatesGlowState.playhead > magnatesGlowState.duration) {
+    magnatesGlowState.playhead = 0;
+  }
+
+  updateMagnatesGlowVisualStyles();
+  magnatesGlowState.animFrameId = requestAnimationFrame(renderMagnatesGlowLoop);
+}
+
+function openMagnatesBrightnessGlowSuite() {
+  const modal = document.getElementById('modal-magnates-glow-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesGlowState.isPlaying = true;
+  magnatesGlowState.playhead = 0;
+  magnatesGlowState.lastTimestamp = null;
+  if (magnatesGlowState.animFrameId) cancelAnimationFrame(magnatesGlowState.animFrameId);
+  magnatesGlowState.animFrameId = requestAnimationFrame(renderMagnatesGlowLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-glow-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesBrightnessGlowSuite() {
+  const modal = document.getElementById('modal-magnates-glow-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesGlowState.isPlaying = false;
+  if (magnatesGlowState.animFrameId) {
+    cancelAnimationFrame(magnatesGlowState.animFrameId);
+    magnatesGlowState.animFrameId = null;
+  }
+}
+
+function bindMagnatesBrightnessGlowSuiteModalControls() {
+  document.getElementById('btn-close-magnates-glow-suite')?.addEventListener('click', closeMagnatesBrightnessGlowSuite);
+  document.getElementById('btn-cancel-magnates-glow-suite')?.addEventListener('click', closeMagnatesBrightnessGlowSuite);
+
+  document.getElementById('btn-magnates-glow-play-pause')?.addEventListener('click', () => {
+    magnatesGlowState.isPlaying = !magnatesGlowState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-glow-play-pause');
+    if (magnatesGlowState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesGlowState.lastTimestamp = null;
+      magnatesGlowState.animFrameId = requestAnimationFrame(renderMagnatesGlowLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesGlowState.animFrameId) cancelAnimationFrame(magnatesGlowState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-glow-reset')?.addEventListener('click', () => {
+    magnatesGlowState.playhead = 0;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-slider-bright')?.addEventListener('input', (e) => {
+    magnatesGlowState.brightnessBoost = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-glow-val-bright');
+    if (label) label.textContent = `+${magnatesGlowState.brightnessBoost}%`;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-slider-contrast')?.addEventListener('input', (e) => {
+    magnatesGlowState.contrastPunch = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-glow-val-contrast');
+    if (label) label.textContent = `${magnatesGlowState.contrastPunch}%`;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-slider-glow-radius')?.addEventListener('input', (e) => {
+    magnatesGlowState.glowRadius = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-glow-val-glow-radius');
+    if (label) label.textContent = `${magnatesGlowState.glowRadius} px`;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-toggle-inner')?.addEventListener('change', (e) => {
+    magnatesGlowState.innerGlowEnabled = e.target.checked;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-input-headline')?.addEventListener('input', (e) => {
+    magnatesGlowState.headline = e.target.value;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesGlowState.subcaption = e.target.value;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let pIdx = 0;
+  document.getElementById('btn-magnates-glow-shuffle-portrait')?.addEventListener('click', () => {
+    pIdx = (pIdx + 1) % stockPortraits.length;
+    magnatesGlowState.portraitUrl = stockPortraits[pIdx];
+    const inputP = document.getElementById('magnates-glow-input-portrait');
+    if (inputP) inputP.value = magnatesGlowState.portraitUrl;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('magnates-glow-input-portrait')?.addEventListener('input', (e) => {
+    magnatesGlowState.portraitUrl = e.target.value;
+    updateMagnatesGlowVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-glow-suite')?.addEventListener('click', () => {
+    closeMagnatesBrightnessGlowSuite();
+
+    const bgClip = {
+      id: `img-glow-bg-${Date.now()}`,
+      url: magnatesGlowState.bgUrl,
+      start: 0,
+      duration: magnatesGlowState.duration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const popCutoutClip = {
+      id: `img-glow-subject-${Date.now() + 1}`,
+      url: magnatesGlowState.portraitUrl,
+      start: 0,
+      duration: magnatesGlowState.duration,
+      scale: 1.05,
+      glowEffect: true,
+      glowRadius: magnatesGlowState.glowRadius,
+      brightness: magnatesGlowState.brightnessBoost,
+      contrast: magnatesGlowState.contrastPunch,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    const headlineClip = {
+      id: `txt-glow-head-${Date.now() + 2}`,
+      text: magnatesGlowState.headline,
+      highlight: magnatesGlowState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: magnatesGlowState.duration
+    };
+
+    const glowMetaClip = {
+      id: `txt-glow-meta-${Date.now() + 3}`,
+      text: `BRIGHTNESS (+${magnatesGlowState.brightnessBoost}%) // DUAL GLOW ${magnatesGlowState.glowRadius}px`,
+      highlight: `+${magnatesGlowState.brightnessBoost}%`,
+      highlightColor: '#fbbf24',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesGlowState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, popCutoutClip];
+      timelineClips.text = [headlineClip, glowMetaClip];
+      renderAllTimelineTracks();
+      selectClip(popCutoutClip, 'image');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Brightness, Contrast & Glow Suite to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   2. MAGNATES MEDIA MULTI-LAYERED DROP SHADOWS SUITE CONTROLLER
+   (Applying multiple drop shadows with custom directional angles to flat 2D cutouts)
+   ========================================================= */
+let magnatesShadowsState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  shadowAngle: 135, // 0 to 360 deg
+  elevation: 40, // 10 to 80px
+  blurSoftness: 30, // 10 to 70px
+  spatialFloat: true,
+  headline: "THE MASTERMIND'S GAMBIT",
+  subcaption: "MULTI-TIER DIRECTIONAL OCCLUSION",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  bgUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesShadowsVisualStyles() {
+  const headlineEl = document.getElementById('magnates-shadows-headline');
+  const subcaptionEl = document.getElementById('magnates-shadows-subcaption');
+  const portraitImg = document.getElementById('magnates-shadows-portrait-img');
+  const bgImg = document.getElementById('magnates-shadows-bg-img');
+  const rigWrap = document.getElementById('magnates-shadows-rig-wrap');
+  const cardEl = document.getElementById('magnates-shadows-card-element');
+  const hudAngle = document.getElementById('magnates-shadows-hud-angle');
+  const hudElevation = document.getElementById('magnates-shadows-hud-elevation');
+  const timerEl = document.getElementById('magnates-shadows-timer-display');
+
+  if (headlineEl) headlineEl.textContent = magnatesShadowsState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesShadowsState.subcaption;
+  if (portraitImg && portraitImg.src !== magnatesShadowsState.portraitUrl) portraitImg.src = magnatesShadowsState.portraitUrl;
+  if (bgImg && bgImg.src !== magnatesShadowsState.bgUrl) bgImg.src = magnatesShadowsState.bgUrl;
+
+  const p = magnatesShadowsState.playhead;
+  const dur = magnatesShadowsState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const elev = magnatesShadowsState.elevation;
+  const ang = magnatesShadowsState.shadowAngle;
+  const blur = magnatesShadowsState.blurSoftness;
+
+  if (hudAngle) hudAngle.textContent = `ANGLE: ${ang}°`;
+  if (hudElevation) hudElevation.textContent = `ELEVATION: ${elev}px`;
+
+  const rad = (ang * Math.PI) / 180;
+  const offX = Math.cos(rad) * elev;
+  const offY = Math.sin(rad) * elev;
+
+  if (cardEl) {
+    // 3-Tier Multi-Layered Drop Shadow: Contact, Mid-Occlusion, Wide Diffuse
+    cardEl.style.boxShadow = `
+      ${(offX * 0.25).toFixed(1)}px ${(offY * 0.25).toFixed(1)}px 8px rgba(0,0,0,0.7),
+      ${(offX * 0.6).toFixed(1)}px ${(offY * 0.6).toFixed(1)}px ${(blur * 0.6).toFixed(1)}px rgba(2,6,23,0.85),
+      ${offX.toFixed(1)}px ${offY.toFixed(1)}px ${blur}px rgba(0,0,0,0.95)
+    `;
+  }
+
+  if (rigWrap) {
+    if (magnatesShadowsState.spatialFloat) {
+      const floatY = Math.sin(p * 2.4) * 6;
+      rigWrap.style.transform = `translateY(${floatY.toFixed(1)}px) rotateX(${(offY * 0.08).toFixed(1)}deg) rotateY(${(-offX * 0.08).toFixed(1)}deg)`;
+    } else {
+      rigWrap.style.transform = 'translateY(0px)';
+    }
+  }
+}
+
+function renderMagnatesShadowsLoop(timestamp) {
+  if (!magnatesShadowsState.isPlaying) return;
+  if (!magnatesShadowsState.lastTimestamp) magnatesShadowsState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesShadowsState.lastTimestamp) / 1000;
+  magnatesShadowsState.lastTimestamp = timestamp;
+
+  magnatesShadowsState.playhead += dt;
+  if (magnatesShadowsState.playhead > magnatesShadowsState.duration) {
+    magnatesShadowsState.playhead = 0;
+  }
+
+  updateMagnatesShadowsVisualStyles();
+  magnatesShadowsState.animFrameId = requestAnimationFrame(renderMagnatesShadowsLoop);
+}
+
+function openMagnatesDropShadowsSuite() {
+  const modal = document.getElementById('modal-magnates-shadows-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesShadowsState.isPlaying = true;
+  magnatesShadowsState.playhead = 0;
+  magnatesShadowsState.lastTimestamp = null;
+  if (magnatesShadowsState.animFrameId) cancelAnimationFrame(magnatesShadowsState.animFrameId);
+  magnatesShadowsState.animFrameId = requestAnimationFrame(renderMagnatesShadowsLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-shadows-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesDropShadowsSuite() {
+  const modal = document.getElementById('modal-magnates-shadows-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesShadowsState.isPlaying = false;
+  if (magnatesShadowsState.animFrameId) {
+    cancelAnimationFrame(magnatesShadowsState.animFrameId);
+    magnatesShadowsState.animFrameId = null;
+  }
+}
+
+function bindMagnatesDropShadowsSuiteModalControls() {
+  document.getElementById('btn-close-magnates-shadows-suite')?.addEventListener('click', closeMagnatesDropShadowsSuite);
+  document.getElementById('btn-cancel-magnates-shadows-suite')?.addEventListener('click', closeMagnatesDropShadowsSuite);
+
+  document.getElementById('btn-magnates-shadows-play-pause')?.addEventListener('click', () => {
+    magnatesShadowsState.isPlaying = !magnatesShadowsState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-shadows-play-pause');
+    if (magnatesShadowsState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesShadowsState.lastTimestamp = null;
+      magnatesShadowsState.animFrameId = requestAnimationFrame(renderMagnatesShadowsLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesShadowsState.animFrameId) cancelAnimationFrame(magnatesShadowsState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-shadows-reset')?.addEventListener('click', () => {
+    magnatesShadowsState.playhead = 0;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-slider-angle')?.addEventListener('input', (e) => {
+    magnatesShadowsState.shadowAngle = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-shadows-val-angle');
+    if (label) label.textContent = `${magnatesShadowsState.shadowAngle}°`;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-slider-elevation')?.addEventListener('input', (e) => {
+    magnatesShadowsState.elevation = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-shadows-val-elevation');
+    if (label) label.textContent = `${magnatesShadowsState.elevation} px`;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-slider-blur')?.addEventListener('input', (e) => {
+    magnatesShadowsState.blurSoftness = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-shadows-val-blur');
+    if (label) label.textContent = `${magnatesShadowsState.blurSoftness} px`;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-toggle-float')?.addEventListener('change', (e) => {
+    magnatesShadowsState.spatialFloat = e.target.checked;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-input-headline')?.addEventListener('input', (e) => {
+    magnatesShadowsState.headline = e.target.value;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesShadowsState.subcaption = e.target.value;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let pIdx = 0;
+  document.getElementById('btn-magnates-shadows-shuffle-portrait')?.addEventListener('click', () => {
+    pIdx = (pIdx + 1) % stockPortraits.length;
+    magnatesShadowsState.portraitUrl = stockPortraits[pIdx];
+    const inputP = document.getElementById('magnates-shadows-input-portrait');
+    if (inputP) inputP.value = magnatesShadowsState.portraitUrl;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('magnates-shadows-input-portrait')?.addEventListener('input', (e) => {
+    magnatesShadowsState.portraitUrl = e.target.value;
+    updateMagnatesShadowsVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-shadows-suite')?.addEventListener('click', () => {
+    closeMagnatesDropShadowsSuite();
+
+    const bgClip = {
+      id: `img-shd-bg-${Date.now()}`,
+      url: magnatesShadowsState.bgUrl,
+      start: 0,
+      duration: magnatesShadowsState.duration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const floatCutoutClip = {
+      id: `img-shd-subject-${Date.now() + 1}`,
+      url: magnatesShadowsState.portraitUrl,
+      start: 0,
+      duration: magnatesShadowsState.duration,
+      scale: 1.0,
+      shadowAngle: magnatesShadowsState.shadowAngle,
+      shadowElevation: magnatesShadowsState.elevation,
+      shadowBlur: magnatesShadowsState.blurSoftness,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.12,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    const headlineClip = {
+      id: `txt-shd-head-${Date.now() + 2}`,
+      text: magnatesShadowsState.headline,
+      highlight: magnatesShadowsState.headline.split(' ')[0] || '',
+      highlightColor: '#38bdf8',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: magnatesShadowsState.duration
+    };
+
+    const shadowMetaClip = {
+      id: `txt-shd-meta-${Date.now() + 3}`,
+      text: `MULTI-LAYER DROP SHADOWS // ${magnatesShadowsState.shadowAngle}° ELEVATION ${magnatesShadowsState.elevation}px`,
+      highlight: `${magnatesShadowsState.elevation}px`,
+      highlightColor: '#0284c7',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesShadowsState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, floatCutoutClip];
+      timelineClips.text = [headlineClip, shadowMetaClip];
+      renderAllTimelineTracks();
+      selectClip(floatCutoutClip, 'image');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Multi-Layered Drop Shadows to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   3. MAGNATES MEDIA COLOR GRADING & SHADOWIZATION SUITE CONTROLLER
+   (Using Fill tools to turn characters into flat black silhouettes or Gradient Colorize)
+   ========================================================= */
+let magnatesShadowizeState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  mode: 'silhouette', // 'silhouette' or 'colorize'
+  intensity: 80, // 20 to 100%
+  contrast: 180, // 100 to 250%
+  headline: "THE UNSEEN CONSPIRATOR",
+  subcaption: "OMINOUS NOIR DOSSIER // TONAL SHADOWIZATION",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  bgUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesShadowizeVisualStyles() {
+  const headlineEl = document.getElementById('magnates-shadowize-headline');
+  const subcaptionEl = document.getElementById('magnates-shadowize-subcaption');
+  const portraitImg = document.getElementById('magnates-shadowize-portrait-img');
+  const bgImg = document.getElementById('magnates-shadowize-bg-img');
+  const fillOverlay = document.getElementById('magnates-shadowize-fill-overlay');
+  const stageGrad = document.getElementById('magnates-shadowize-stage-grad');
+  const hudMode = document.getElementById('magnates-shadowize-hud-mode');
+  const badgeStatus = document.getElementById('magnates-shadowize-badge-status');
+  const timerEl = document.getElementById('magnates-shadowize-timer-display');
+
+  if (headlineEl) headlineEl.textContent = magnatesShadowizeState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesShadowizeState.subcaption;
+  if (portraitImg && portraitImg.src !== magnatesShadowizeState.portraitUrl) portraitImg.src = magnatesShadowizeState.portraitUrl;
+  if (bgImg && bgImg.src !== magnatesShadowizeState.bgUrl) bgImg.src = magnatesShadowizeState.bgUrl;
+
+  const p = magnatesShadowizeState.playhead;
+  const dur = magnatesShadowizeState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const intens = magnatesShadowizeState.intensity;
+  const cont = magnatesShadowizeState.contrast;
+
+  if (magnatesShadowizeState.mode === 'silhouette') {
+    if (fillOverlay) {
+      fillOverlay.style.opacity = (intens / 100).toFixed(2);
+      fillOverlay.style.background = '#000000';
+    }
+    if (portraitImg) {
+      portraitImg.style.filter = `brightness(${Math.max(5, 100 - intens)}%) contrast(${cont}%) grayscale(100%)`;
+    }
+    if (stageGrad) {
+      stageGrad.style.background = 'radial-gradient(circle at center, rgba(225, 29, 72, 0.35) 0%, rgba(8, 1, 4, 0.98) 75%)';
+    }
+    if (hudMode) hudMode.textContent = `FILL SILHOUETTE: ${intens}%`;
+    if (badgeStatus) badgeStatus.textContent = 'MODE: FLAT SILHOUETTE (FILL)';
+  } else {
+    // Gradient Colorize
+    if (fillOverlay) fillOverlay.style.opacity = '0';
+    if (portraitImg) {
+      portraitImg.style.filter = `sepia(90%) hue-rotate(310deg) saturate(240%) contrast(${cont}%) brightness(85%)`;
+    }
+    if (stageGrad) {
+      stageGrad.style.background = 'radial-gradient(circle at center, rgba(168, 85, 247, 0.35) 0%, rgba(8, 1, 4, 0.98) 75%)';
+    }
+    if (hudMode) hudMode.textContent = `GRADIENT COLORIZE: ACTIVE`;
+    if (badgeStatus) badgeStatus.textContent = 'MODE: CRIMSON DUOTONE GRADIENT';
+  }
+}
+
+function renderMagnatesShadowizeLoop(timestamp) {
+  if (!magnatesShadowizeState.isPlaying) return;
+  if (!magnatesShadowizeState.lastTimestamp) magnatesShadowizeState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesShadowizeState.lastTimestamp) / 1000;
+  magnatesShadowizeState.lastTimestamp = timestamp;
+
+  magnatesShadowizeState.playhead += dt;
+  if (magnatesShadowizeState.playhead > magnatesShadowizeState.duration) {
+    magnatesShadowizeState.playhead = 0;
+  }
+
+  updateMagnatesShadowizeVisualStyles();
+  magnatesShadowizeState.animFrameId = requestAnimationFrame(renderMagnatesShadowizeLoop);
+}
+
+function openMagnatesShadowizationSuite() {
+  const modal = document.getElementById('modal-magnates-shadowize-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesShadowizeState.isPlaying = true;
+  magnatesShadowizeState.playhead = 0;
+  magnatesShadowizeState.lastTimestamp = null;
+  if (magnatesShadowizeState.animFrameId) cancelAnimationFrame(magnatesShadowizeState.animFrameId);
+  magnatesShadowizeState.animFrameId = requestAnimationFrame(renderMagnatesShadowizeLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-shadowize-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesShadowizationSuite() {
+  const modal = document.getElementById('modal-magnates-shadowize-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesShadowizeState.isPlaying = false;
+  if (magnatesShadowizeState.animFrameId) {
+    cancelAnimationFrame(magnatesShadowizeState.animFrameId);
+    magnatesShadowizeState.animFrameId = null;
+  }
+}
+
+function bindMagnatesShadowizationSuiteModalControls() {
+  document.getElementById('btn-close-magnates-shadowize-suite')?.addEventListener('click', closeMagnatesShadowizationSuite);
+  document.getElementById('btn-cancel-magnates-shadowize-suite')?.addEventListener('click', closeMagnatesShadowizationSuite);
+
+  document.getElementById('btn-magnates-shadowize-play-pause')?.addEventListener('click', () => {
+    magnatesShadowizeState.isPlaying = !magnatesShadowizeState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-shadowize-play-pause');
+    if (magnatesShadowizeState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesShadowizeState.lastTimestamp = null;
+      magnatesShadowizeState.animFrameId = requestAnimationFrame(renderMagnatesShadowizeLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesShadowizeState.animFrameId) cancelAnimationFrame(magnatesShadowizeState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-shadowize-reset')?.addEventListener('click', () => {
+    magnatesShadowizeState.playhead = 0;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  // Mode pickers
+  document.querySelectorAll('.btn-shadowize-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-shadowize-mode').forEach(b => {
+        b.style.background = 'rgba(255,255,255,0.06)';
+        b.style.borderColor = 'rgba(255,255,255,0.12)';
+        b.style.color = '#cbd5e1';
+      });
+      e.currentTarget.style.background = 'rgba(244,63,94,0.25)';
+      e.currentTarget.style.borderColor = '#f43f5e';
+      e.currentTarget.style.color = '#fff';
+      magnatesShadowizeState.mode = e.currentTarget.dataset.mode;
+      updateMagnatesShadowizeVisualStyles();
+    });
+  });
+
+  document.getElementById('magnates-shadowize-slider-intensity')?.addEventListener('input', (e) => {
+    magnatesShadowizeState.intensity = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-shadowize-val-intensity');
+    if (label) label.textContent = `${magnatesShadowizeState.intensity}%`;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  document.getElementById('magnates-shadowize-slider-contrast')?.addEventListener('input', (e) => {
+    magnatesShadowizeState.contrast = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-shadowize-val-contrast');
+    if (label) label.textContent = `${magnatesShadowizeState.contrast}%`;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  document.getElementById('magnates-shadowize-input-headline')?.addEventListener('input', (e) => {
+    magnatesShadowizeState.headline = e.target.value;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  document.getElementById('magnates-shadowize-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesShadowizeState.subcaption = e.target.value;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let pIdx = 0;
+  document.getElementById('btn-magnates-shadowize-shuffle-portrait')?.addEventListener('click', () => {
+    pIdx = (pIdx + 1) % stockPortraits.length;
+    magnatesShadowizeState.portraitUrl = stockPortraits[pIdx];
+    const inputP = document.getElementById('magnates-shadowize-input-portrait');
+    if (inputP) inputP.value = magnatesShadowizeState.portraitUrl;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  document.getElementById('magnates-shadowize-input-portrait')?.addEventListener('input', (e) => {
+    magnatesShadowizeState.portraitUrl = e.target.value;
+    updateMagnatesShadowizeVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-shadowize-suite')?.addEventListener('click', () => {
+    closeMagnatesShadowizationSuite();
+
+    const bgClip = {
+      id: `img-shw-bg-${Date.now()}`,
+      url: magnatesShadowizeState.bgUrl,
+      start: 0,
+      duration: magnatesShadowizeState.duration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const silhouetteClip = {
+      id: `img-shw-subject-${Date.now() + 1}`,
+      url: magnatesShadowizeState.portraitUrl,
+      start: 0,
+      duration: magnatesShadowizeState.duration,
+      scale: 1.0,
+      shadowizeMode: magnatesShadowizeState.mode,
+      shadowizeIntensity: magnatesShadowizeState.intensity,
+      contrast: magnatesShadowizeState.contrast,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.12,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    const headlineClip = {
+      id: `txt-shw-head-${Date.now() + 2}`,
+      text: magnatesShadowizeState.headline,
+      highlight: magnatesShadowizeState.headline.split(' ')[0] || '',
+      highlightColor: '#f43f5e',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: magnatesShadowizeState.duration
+    };
+
+    const shadowizeMetaClip = {
+      id: `txt-shw-meta-${Date.now() + 3}`,
+      text: `SHADOWIZATION (${magnatesShadowizeState.mode.toUpperCase()}) // NOIR TENSION`,
+      highlight: magnatesShadowizeState.mode.toUpperCase(),
+      highlightColor: '#e11d48',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesShadowizeState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, silhouetteClip];
+      timelineClips.text = [headlineClip, shadowizeMetaClip];
+      renderAllTimelineTracks();
+      selectClip(silhouetteClip, 'image');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Color Grading & Shadowization to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   4. MAGNATES MEDIA BLEND MODES SUITE CONTROLLER
+   (Screen for snow/particles, Difference for inverted text/noise, Overlay for clocks/textures)
+   ========================================================= */
+let magnatesBlendState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  blendMode: 'screen', // 'screen', 'difference', 'overlay'
+  layerOpacity: 85, // 20 to 100%
+  showClock: true,
+  headline: "TEMPORAL DISTORTION",
+  subcaption: "SCREEN // DIFFERENCE // OVERLAY COMPOSITING",
+  bgUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesBlendVisualStyles() {
+  const headlineEl = document.getElementById('magnates-blend-headline');
+  const subcaptionEl = document.getElementById('magnates-blend-subcaption');
+  const bgImg = document.getElementById('magnates-blend-bg-img');
+  const particles = document.getElementById('magnates-blend-particles');
+  const clockWrap = document.getElementById('magnates-blend-clock-wrap');
+  const clockSvg = document.getElementById('magnates-blend-clock-svg');
+  const cardEl = document.getElementById('magnates-blend-card-element');
+  const cardSub = document.getElementById('magnates-blend-card-sub');
+  const hudActive = document.getElementById('magnates-blend-hud-active');
+  const hudOpacity = document.getElementById('magnates-blend-hud-opacity');
+  const timerEl = document.getElementById('magnates-blend-timer-display');
+
+  if (headlineEl) headlineEl.textContent = magnatesBlendState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesBlendState.subcaption;
+  if (bgImg && bgImg.src !== magnatesBlendState.bgUrl) bgImg.src = magnatesBlendState.bgUrl;
+
+  const p = magnatesBlendState.playhead;
+  const dur = magnatesBlendState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const op = (magnatesBlendState.layerOpacity / 100).toFixed(2);
+  const mode = magnatesBlendState.blendMode;
+
+  if (hudActive) hudActive.textContent = `MODE: ${mode.toUpperCase()}`;
+  if (hudOpacity) hudOpacity.textContent = `OPACITY: ${magnatesBlendState.layerOpacity}%`;
+
+  if (clockWrap) clockWrap.style.display = magnatesBlendState.showClock ? 'flex' : 'none';
+  if (clockSvg) clockSvg.style.transform = `rotate(${(p * 35).toFixed(1)}deg)`;
+
+  if (particles) {
+    const drift = (p * 25) % 200;
+    particles.style.backgroundPosition = `${drift}px ${drift}px`;
+    particles.style.opacity = op;
+  }
+
+  if (cardEl) {
+    if (mode === 'screen') {
+      cardEl.style.mixBlendMode = 'normal';
+      cardEl.style.borderColor = '#38bdf8';
+      cardEl.style.background = 'rgba(15,23,42,0.85)';
+      if (cardSub) cardSub.textContent = 'ACTIVE BLEND: SCREEN (PARTICLES)';
+    } else if (mode === 'difference') {
+      cardEl.style.mixBlendMode = 'difference';
+      cardEl.style.borderColor = '#ffffff';
+      cardEl.style.background = '#ffffff';
+      if (cardSub) cardSub.textContent = 'ACTIVE BLEND: DIFFERENCE (INVERT NOISE)';
+    } else {
+      cardEl.style.mixBlendMode = 'overlay';
+      cardEl.style.borderColor = '#f59e0b';
+      cardEl.style.background = 'rgba(245,158,11,0.5)';
+      if (cardSub) cardSub.textContent = 'ACTIVE BLEND: OVERLAY (ORGANIC TEXTURE)';
+    }
+  }
+}
+
+function renderMagnatesBlendLoop(timestamp) {
+  if (!magnatesBlendState.isPlaying) return;
+  if (!magnatesBlendState.lastTimestamp) magnatesBlendState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesBlendState.lastTimestamp) / 1000;
+  magnatesBlendState.lastTimestamp = timestamp;
+
+  magnatesBlendState.playhead += dt;
+  if (magnatesBlendState.playhead > magnatesBlendState.duration) {
+    magnatesBlendState.playhead = 0;
+  }
+
+  updateMagnatesBlendVisualStyles();
+  magnatesBlendState.animFrameId = requestAnimationFrame(renderMagnatesBlendLoop);
+}
+
+function openMagnatesBlendModesSuite() {
+  const modal = document.getElementById('modal-magnates-blend-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesBlendState.isPlaying = true;
+  magnatesBlendState.playhead = 0;
+  magnatesBlendState.lastTimestamp = null;
+  if (magnatesBlendState.animFrameId) cancelAnimationFrame(magnatesBlendState.animFrameId);
+  magnatesBlendState.animFrameId = requestAnimationFrame(renderMagnatesBlendLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-blend-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesBlendModesSuite() {
+  const modal = document.getElementById('modal-magnates-blend-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesBlendState.isPlaying = false;
+  if (magnatesBlendState.animFrameId) {
+    cancelAnimationFrame(magnatesBlendState.animFrameId);
+    magnatesBlendState.animFrameId = null;
+  }
+}
+
+function bindMagnatesBlendModesSuiteModalControls() {
+  document.getElementById('btn-close-magnates-blend-suite')?.addEventListener('click', closeMagnatesBlendModesSuite);
+  document.getElementById('btn-cancel-magnates-blend-suite')?.addEventListener('click', closeMagnatesBlendModesSuite);
+
+  document.getElementById('btn-magnates-blend-play-pause')?.addEventListener('click', () => {
+    magnatesBlendState.isPlaying = !magnatesBlendState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-blend-play-pause');
+    if (magnatesBlendState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesBlendState.lastTimestamp = null;
+      magnatesBlendState.animFrameId = requestAnimationFrame(renderMagnatesBlendLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesBlendState.animFrameId) cancelAnimationFrame(magnatesBlendState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-blend-reset')?.addEventListener('click', () => {
+    magnatesBlendState.playhead = 0;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  const blendDescs = {
+    screen: 'Screen Mode: Drops black values completely to composite snow particles and anamorphic light bursts seamlessly over dark footage.',
+    difference: 'Difference Mode: Subtracts pixel luminance under moving footage to produce jarring high-contrast inverted film noise & vintage titles.',
+    overlay: 'Overlay Mode: Multiplies darks and screens lights, embedding vintage clock mechanisms, film burns and paper textures into the background.'
+  };
+
+  document.querySelectorAll('.btn-blend-mode-pick').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-blend-mode-pick').forEach(b => {
+        b.style.background = 'rgba(255,255,255,0.06)';
+        b.style.borderColor = 'rgba(255,255,255,0.12)';
+        b.style.color = '#cbd5e1';
+      });
+      e.currentTarget.style.background = 'rgba(56,189,248,0.25)';
+      e.currentTarget.style.borderColor = '#38bdf8';
+      e.currentTarget.style.color = '#fff';
+      magnatesBlendState.blendMode = e.currentTarget.dataset.blend;
+
+      const descBox = document.getElementById('magnates-blend-mode-desc');
+      if (descBox) descBox.textContent = blendDescs[magnatesBlendState.blendMode] || '';
+
+      updateMagnatesBlendVisualStyles();
+    });
+  });
+
+  document.getElementById('magnates-blend-slider-opacity')?.addEventListener('input', (e) => {
+    magnatesBlendState.layerOpacity = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-blend-val-opacity');
+    if (label) label.textContent = `${magnatesBlendState.layerOpacity}%`;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  document.getElementById('magnates-blend-toggle-clock')?.addEventListener('change', (e) => {
+    magnatesBlendState.showClock = e.target.checked;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  document.getElementById('magnates-blend-input-headline')?.addEventListener('input', (e) => {
+    magnatesBlendState.headline = e.target.value;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  document.getElementById('magnates-blend-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesBlendState.subcaption = e.target.value;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-blend-suite')?.addEventListener('click', () => {
+    closeMagnatesBlendModesSuite();
+
+    const bgClip = {
+      id: `img-bld-bg-${Date.now()}`,
+      url: magnatesBlendState.bgUrl,
+      start: 0,
+      duration: magnatesBlendState.duration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const blendOverlayClip = {
+      id: `img-bld-overlay-${Date.now() + 1}`,
+      name: `Blend_${magnatesBlendState.blendMode.toUpperCase()}_Texture.png`,
+      url: '/magnates_blend_modes_thumbnail.svg',
+      start: 0,
+      duration: magnatesBlendState.duration,
+      scale: 1.0,
+      blendMode: magnatesBlendState.blendMode,
+      opacity: magnatesBlendState.layerOpacity / 100,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.15,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    const headlineClip = {
+      id: `txt-bld-head-${Date.now() + 2}`,
+      text: magnatesBlendState.headline,
+      highlight: magnatesBlendState.headline.split(' ')[0] || '',
+      highlightColor: '#38bdf8',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: magnatesBlendState.duration
+    };
+
+    const blendMetaClip = {
+      id: `txt-bld-meta-${Date.now() + 3}`,
+      text: `BLEND MODE: ${magnatesBlendState.blendMode.toUpperCase()} // OPACITY ${magnatesBlendState.layerOpacity}%`,
+      highlight: magnatesBlendState.blendMode.toUpperCase(),
+      highlightColor: '#0284c7',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesBlendState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, blendOverlayClip];
+      timelineClips.text = [headlineClip, blendMetaClip];
+      renderAllTimelineTracks();
+      selectClip(blendOverlayClip, 'image');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Blend Modes Suite to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
 // Initialize homepage discovery view immediately on script execution
 setTimeout(() => {
   initHomepageTemplateEvents();
 }, 100);
+
 
 
 
