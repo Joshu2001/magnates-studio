@@ -1,7 +1,7 @@
 {
   "text": [
     {
-      "id": "txt-1791472878926",
+      "id": "txt-1791474605908",
       "text": "MAGNATES",
       "highlight": "MAGNATES",
       "highlightColor": "#ff334b",
@@ -24,16 +24,14 @@
   "quote": [],
   "image": [
     {
-      "id": "img-1791473231535",
+      "id": "img-1791474670571",
       "start": 0,
       "duration": 5,
       "zIndex": 20,
-      "scale": 1.2,
-      "zoomEffect": "snap",
-      "zoomScale": 1.3,
+      "scale": 1.1,
       "file": {
         "name": "Custom_Gold_Frame.jpg",
-        "url": "blob:http://localhost:5174/d54a87a4-56e4-4e52-af35-51d27c1f1c80",
+        "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80",
         "isImage": true
       }
     }
@@ -68,9 +66,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 40.666666666666664,
+  "currentTime": 9.509300000000016,
   "duration": 368.144014,
-  "savedAt": 1791474340428,
+  "savedAt": 1791475180263,
   "projectName": "Dark Luxury Gold Frame 3D Spin",
   "projectId": "proj_1791218145776_xils"
 }

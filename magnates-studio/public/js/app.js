@@ -1596,6 +1596,22 @@ function drawMediaLayer(specificClip) {
   } else if (targetClip && targetClip.drawingStrokes) {
     dw = 1280;
     dh = 720;
+  } else if (targetClip?.goldFrameRig) {
+    // 1:1 match modal container width: 82% (1050px), height: 82% (590px)
+    dw = 1280 * 0.82;
+    dh = 720 * 0.82;
+  } else if (targetClip?.parallaxRig === 'fg' && targetFile.isImage) {
+    if (!el || !el.complete || !el.naturalWidth || !el.naturalHeight) {
+      return;
+    }
+    // Centered subject container matching modal: max-height 92% (662px), width bounded by 66% (845px)
+    const aspect = el.naturalWidth / el.naturalHeight;
+    dh = 720 * 0.92;
+    dw = dh * aspect;
+    if (dw > 1280 * 0.66) {
+      dw = 1280 * 0.66;
+      dh = dw / aspect;
+    }
   } else if (targetFile.isImage) {
     if (!el || !el.complete || !el.naturalWidth || !el.naturalHeight) {
       return;
@@ -1684,19 +1700,6 @@ function drawMediaLayer(specificClip) {
   ctx.shadowOffsetY = targetClip?.vectorEffect ? 14 : 10;
 
   try {
-    // If Gold Frame Rig is active, draw premium metallic gold border and inner glow
-    if (targetClip && targetClip.goldFrameRig) {
-      ctx.save();
-      ctx.shadowColor = 'rgba(245, 158, 11, 0.6)';
-      ctx.shadowBlur = 25;
-      ctx.strokeStyle = '#f59e0b';
-      ctx.lineWidth = 8;
-      ctx.strokeRect(dx - 4, dy - 4, finalW + 8, finalH + 8);
-      ctx.strokeStyle = '#fef08a';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(dx - 2, dy - 2, finalW + 4, finalH + 4);
-      ctx.restore();
-    }
 
     // If Vector / Graphic Paper Cutout FX is enabled, render multi-pass sticker contour outline
     if (targetClip && targetClip.vectorEffect) {
@@ -1786,12 +1789,73 @@ function drawMediaLayer(specificClip) {
         drawScreenInkOverlay(ctx, targetClip.drawingStrokes, targetClip.drawingFills, drawProg, targetClip.staggerParts);
       } else if (targetClip?.drawingStrokes && targetClip.drawingStrokes.length > 0) {
         drawScreenInkOverlay(ctx, targetClip.drawingStrokes, targetClip.drawingFills, 1.0, false);
+      } else if (targetClip?.goldFrameRig && renderSource) {
+        // 1:1 match modal: roundRect(8px), object-fit: cover, and metallic gold border
+        ctx.save();
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(dx, dy, finalW, finalH, 8);
+          ctx.clip();
+        }
+        // Object-fit: cover source cropping
+        const imgW = renderSource.naturalWidth || renderSource.width || finalW;
+        const imgH = renderSource.naturalHeight || renderSource.height || finalH;
+        const imgAspect = imgW / imgH;
+        const targetAspect = finalW / finalH;
+        let sx = 0, sy = 0, sw = imgW, sh = imgH;
+        if (imgAspect > targetAspect) {
+          sw = imgH * targetAspect;
+          sx = (imgW - sw) / 2;
+        } else {
+          sh = imgW / targetAspect;
+          sy = (imgH - sh) / 2;
+        }
+        ctx.drawImage(renderSource, sx, sy, sw, sh, dx, dy, finalW, finalH);
+        ctx.restore();
+
+        // Metallic Gold Border
+        ctx.save();
+        ctx.strokeStyle = '#f59e0b';
+        ctx.lineWidth = 6;
+        if (ctx.roundRect) {
+          ctx.beginPath();
+          ctx.roundRect(dx - 3, dy - 3, finalW + 6, finalH + 6, 8);
+          ctx.stroke();
+          ctx.strokeStyle = '#fef08a';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(dx - 1, dy - 1, finalW + 2, finalH + 2, 7);
+          ctx.stroke();
+        } else {
+          ctx.strokeRect(dx - 3, dy - 3, finalW + 6, finalH + 6);
+        }
+        ctx.restore();
+      } else if (targetClip?.paperRipRig && renderSource) {
+        // Dynamic paper tear angle clip matching modal
+        const tearProgress = (Math.sin(clipElapsed * 1.5) + 1) / 2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(dx, dy);
+        ctx.lineTo(dx + finalW, dy);
+        ctx.lineTo(dx + finalW, dy + finalH * tearProgress);
+        ctx.lineTo(dx, dy + Math.min(finalH, finalH * tearProgress + finalH * 0.08));
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+        // Tear edge glow line
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.9)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(dx, dy + Math.min(finalH, finalH * tearProgress + finalH * 0.08));
+        ctx.lineTo(dx + finalW, dy + finalH * tearProgress);
+        ctx.stroke();
+        ctx.restore();
       } else if (renderSource) {
         ctx.drawImage(renderSource, dx, dy, finalW, finalH);
       }
 
       // Subtle selection border if selected, or if vector effect is active
-      if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas) {
+      if (!targetClip?.vectorEffect && !targetClip?.cutoutCanvas && !targetClip?.goldFrameRig) {
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.lineWidth = 2;
         ctx.strokeRect(dx, dy, finalW, finalH);
@@ -22985,6 +23049,21 @@ function commitTopTemplateCustomizerToTimeline() {
     };
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [revealedClip, ripClip];
+      if (timelineClips.text) {
+        timelineClips.text = topCustomizerState.hasTextBehind ? [{
+          id: `txt-${Date.now() + 2}`,
+          text: topCustomizerState.textBehindContent || 'MAGNATES',
+          highlight: (topCustomizerState.textBehindContent || '').split(' ')[0] || '',
+          highlightColor: topCustomizerState.textBehindColor || '#ff334b',
+          anim: 'pop',
+          fontSize: 68,
+          fontFamily: 'Impact, sans-serif',
+          zIndex: 20,
+          layerOrder: 'middle',
+          start: 0,
+          duration: dur
+        }] : [];
+      }
       currentTime = 0;
       renderAllTimelineTracks();
       selectClip(ripClip, 'image');
@@ -23005,6 +23084,21 @@ function commitTopTemplateCustomizerToTimeline() {
     };
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [goldClip];
+      if (timelineClips.text) {
+        timelineClips.text = topCustomizerState.hasTextBehind ? [{
+          id: `txt-${Date.now() + 2}`,
+          text: topCustomizerState.textBehindContent || 'MAGNATES',
+          highlight: (topCustomizerState.textBehindContent || '').split(' ')[0] || '',
+          highlightColor: topCustomizerState.textBehindColor || '#ff334b',
+          anim: 'pop',
+          fontSize: 68,
+          fontFamily: 'Impact, sans-serif',
+          zIndex: 10,
+          layerOrder: 'middle',
+          start: 0,
+          duration: dur
+        }] : [];
+      }
       currentTime = 0;
       renderAllTimelineTracks();
       selectClip(goldClip, 'image');
@@ -23052,7 +23146,7 @@ function commitTopTemplateCustomizerToTimeline() {
     };
     if (timelineClips && timelineClips.image && timelineClips.text) {
       timelineClips.image = [bgClip, cutoutStickerClip];
-      timelineClips.text = [textBehind];
+      timelineClips.text = topCustomizerState.hasTextBehind ? [textBehind] : [];
       currentTime = 0;
       renderAllTimelineTracks();
       selectClip(cutoutStickerClip, 'image');
@@ -23073,6 +23167,21 @@ function commitTopTemplateCustomizerToTimeline() {
     };
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [baseClip];
+      if (timelineClips.text) {
+        timelineClips.text = topCustomizerState.hasTextBehind ? [{
+          id: `txt-${Date.now() + 2}`,
+          text: topCustomizerState.textBehindContent || 'MAGNATES',
+          highlight: '',
+          highlightColor: '#ff334b',
+          anim: 'pop',
+          fontSize: 68,
+          fontFamily: 'Impact, sans-serif',
+          zIndex: 10,
+          layerOrder: 'middle',
+          start: 0,
+          duration: dur
+        }] : [];
+      }
       currentTime = 0;
       renderAllTimelineTracks();
       selectClip(baseClip, 'image');
