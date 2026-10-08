@@ -19953,6 +19953,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Countdown Effect', 'James Jani', 'Panic Ticker', 'Audio Riser', 'Climax Impact'],
     defaultImage: '/jani_countdown_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'nonlinear-time-flash',
+    title: 'Nonlinear Flashbacks / Flashforwards',
+    category: 'Transitions',
+    badge: 'James Jani Signature',
+    difficulty: 'Instant',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(245, 158, 11, 0.7), rgba(168, 85, 247, 0.4), rgba(5, 3, 2, 0.95))',
+    description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45° motion blur sweeps, memory tint color grades, and archival headlines.',
+    tags: ['Flashback', 'Flashforward', 'Time Jump', 'White Flash', 'James Jani'],
+    defaultImage: '/jani_flashback_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20493,6 +20506,37 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'nonlinear-time-flash') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Visual Background Layer -->
+          <div id="fx-flashback-bg-wrap-${tplId}" style="position: absolute; inset: 0; transition: transform 0.08s ease-out;">
+            <img id="fx-flashback-img-${tplId}" src="${tpl.secondaryImage}" alt="Temporal Jump" style="width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(150%);" />
+          </div>
+
+          <!-- White Exposure Flash Cut Overlay -->
+          <div id="fx-flash-cut-${tplId}" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+            <span style="background: #ffffff; color: #000000; font-family: monospace; font-size: 11px; font-weight: 900; letter-spacing: 2px; padding: 3px 8px; border: 1px solid #000;">
+              FLASHBACK // -10 YEARS
+            </span>
+          </div>
+
+          <!-- Title Plate Layer -->
+          <div id="fx-flashback-plate-${tplId}" style="position: relative; z-index: 10; background: rgba(12,13,18,0.88); border: 1px solid rgba(168,85,247,0.5); border-radius: 8px; padding: 10px 16px; text-align: center; backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.85);">
+            <div style="font-family: monospace; font-size: 8px; font-weight: 800; color: #fbbf24; letter-spacing: 1.5px; text-transform: uppercase;">
+              FLASHBACK: 15 YEARS PRIOR
+            </div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 900; color: #ffffff; margin-top: 2px; letter-spacing: 1px;">
+              THE 2008 CRASH
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #a855f7); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
+            ⚡ FLASHBACK CUT
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20739,6 +20783,32 @@ function startTemplateHoverVideo(cardEl, tpl) {
       if (ticker) {
         const offset = (t * 50) % 200;
         ticker.style.transform = `translateX(-${offset}px)`;
+      }
+    } else if (tplId === 'nonlinear-time-flash') {
+      // 1. Periodic White Exposure Flash (cycle every 1.6s)
+      const isFlash = (t % 1.6) > 1.35;
+      const flashEl = fxContainer?.querySelector(`#fx-flash-cut-${tplId}`);
+      if (flashEl) {
+        flashEl.style.opacity = isFlash ? '0.96' : '0';
+      }
+
+      // 2. 45-degree directional motion blur and scale jitter
+      const bgWrap = fxContainer?.querySelector(`#fx-flashback-bg-wrap-${tplId}`);
+      const shiftDir = Math.sin(t * 12) * 15;
+      const bgImg = fxContainer?.querySelector(`#fx-flashback-img-${tplId}`);
+      if (bgWrap) {
+        bgWrap.style.transform = `scale(${isFlash ? '1.2' : '1.05'}) rotate(${isFlash ? '3deg' : '0deg'}) translate(${shiftDir}px, 0)`;
+      }
+      if (bgImg) {
+        const colorFilter = (t % 3) > 1.5 ? 'grayscale(100%) contrast(150%)' : 'hue-rotate(180deg) saturate(200%)';
+        bgImg.style.filter = `${colorFilter} blur(${isFlash ? '6px' : '0px'})`;
+      }
+
+      // 3. Floating Title Plate
+      const plate = fxContainer?.querySelector(`#fx-flashback-plate-${tplId}`);
+      if (plate) {
+        const floatY = Math.sin(t * 2.5) * 4;
+        plate.style.transform = `translateY(${floatY}px) scale(${isFlash ? 1.05 : 1})`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21094,6 +21164,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'jani-countdown-panic-suite') {
     // Launch James Jani Countdown Effect & Panic Ticker Suite
     openCountdownSuite();
+    return;
+  } else if (templateId === 'nonlinear-time-flash') {
+    // Launch James Jani Nonlinear Flashbacks & Flashforwards Suite
+    openFlashbackSuite();
     return;
   }
 
@@ -23173,6 +23247,7 @@ function initHomepageTemplateEvents() {
   bindDocument3DFXModalControls();
   bindJaniSuiteModalControls();
   bindCountdownSuiteModalControls();
+  bindFlashbackSuiteModalControls();
 }
 
 /* =========================================================
@@ -24451,6 +24526,317 @@ function bindCountdownSuiteModalControls() {
     }
 
     showTextTimingAlert('Applied James Jani Countdown Effect to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: NONLINEAR FLASHBACKS CONTROLLER
+   ========================================================= */
+let flashbackSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 10.0,
+  flashDuration: 350,
+  blurAngle: 45,
+  blurMagnitude: 28,
+  colorGrade: 'bw',
+  timeShiftMode: 'flashback', // 'flashback' or 'flashforward'
+  isFlashing: false,
+  headline: 'THE 2008 CRASH',
+  subcaption: 'FLASHBACK: 15 YEARS PRIOR',
+  imageUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  lastTime: performance.now()
+};
+
+const FLASHBACK_STOCK_IMAGES = [
+  'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
+];
+
+function playFlashbackAudioSFX(type = 'flash') {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    if (type === 'flash') {
+      // Whoosh high-pass sweep + impact pop
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.25);
+      gain.gain.setValueAtTime(0.5, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.25);
+    }
+  } catch (err) {}
+}
+
+function triggerTemporalShift(mode) {
+  flashbackSuiteState.timeShiftMode = mode;
+  flashbackSuiteState.isFlashing = true;
+  playFlashbackAudioSFX('flash');
+
+  const flashEl = document.getElementById('flashback-flash-cut');
+  const flashTag = document.getElementById('flashback-flash-tag');
+  const bgImg = document.getElementById('flashback-canvas-img');
+  const hudStatus = document.getElementById('flashback-hud-status');
+
+  if (flashTag) {
+    flashTag.textContent = mode === 'flashback' ? '⚡ TIME SHIFT: FLASHBACK (-10Y)' : '⚡ TIME SHIFT: FLASHFORWARD (+5Y)';
+  }
+
+  if (flashEl) {
+    flashEl.style.opacity = '1';
+  }
+
+  if (hudStatus) {
+    hudStatus.textContent = mode === 'flashback' ? 'STATE: MEMORY ARCHIVE' : 'STATE: FUTURE PROJECTION';
+  }
+
+  // Apply color grade and blur
+  updateFlashbackVisualStyles();
+
+  setTimeout(() => {
+    if (flashEl) flashEl.style.opacity = '0';
+    flashbackSuiteState.isFlashing = false;
+  }, flashbackSuiteState.flashDuration);
+
+  showTextTimingAlert(mode === 'flashback' ? '⚡ Triggered Flashback (-10 Years)' : '⚡ Triggered Flashforward (+5 Years)', 'info');
+  setTimeout(() => showTextTimingAlert(''), 2000);
+}
+
+function updateFlashbackVisualStyles() {
+  const bgImg = document.getElementById('flashback-canvas-img');
+  if (!bgImg) return;
+
+  const mode = flashbackSuiteState.timeShiftMode;
+  const grade = flashbackSuiteState.colorGrade;
+  let filterStr = '';
+
+  if (grade === 'bw') {
+    filterStr = 'grayscale(100%) contrast(150%) brightness(0.9)';
+  } else if (grade === 'cyan') {
+    filterStr = 'hue-rotate(180deg) saturate(180%) contrast(120%)';
+  } else {
+    filterStr = 'sepia(80%) contrast(140%) brightness(0.95)';
+  }
+
+  if (flashbackSuiteState.isFlashing) {
+    filterStr += ` blur(${flashbackSuiteState.blurMagnitude}px)`;
+  }
+
+  bgImg.style.filter = filterStr;
+}
+
+function renderFlashbackLoop(now) {
+  const delta = (now - flashbackSuiteState.lastTime) / 1000;
+  flashbackSuiteState.lastTime = now;
+
+  if (flashbackSuiteState.isPlaying) {
+    flashbackSuiteState.currentTime += delta;
+    if (flashbackSuiteState.currentTime >= flashbackSuiteState.duration) {
+      flashbackSuiteState.currentTime = 0;
+    }
+  }
+
+  // Update readouts
+  const pad = (n, w = 2) => String(n).padStart(w, '0');
+  const curSec = Math.floor(flashbackSuiteState.currentTime);
+  const curMs = Math.floor((flashbackSuiteState.currentTime % 1) * 100);
+  const durSec = Math.floor(flashbackSuiteState.duration);
+  const durMs = Math.floor((flashbackSuiteState.duration % 1) * 100);
+
+  const tReadout = document.getElementById('flashback-time-readout');
+  if (tReadout) {
+    tReadout.textContent = `00:${pad(curSec)}.${pad(curMs)} / 00:${pad(durSec)}.${pad(durMs)}`;
+  }
+
+  const pReadout = document.getElementById('flashback-playhead-readout');
+  if (pReadout) {
+    pReadout.textContent = `PLAYHEAD: 00:${pad(curSec)}.${pad(curMs)}`;
+  }
+
+  const needle = document.getElementById('flashback-playhead-needle');
+  if (needle) {
+    needle.style.left = `${(flashbackSuiteState.currentTime / flashbackSuiteState.duration) * 88 + 6}%`;
+  }
+
+  flashbackSuiteState.animFrameId = requestAnimationFrame(renderFlashbackLoop);
+}
+
+function openFlashbackSuite() {
+  const modal = document.getElementById('modal-flashback-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  flashbackSuiteState.lastTime = performance.now();
+  updateFlashbackVisualStyles();
+  if (!flashbackSuiteState.animFrameId) {
+    flashbackSuiteState.animFrameId = requestAnimationFrame(renderFlashbackLoop);
+  }
+}
+
+function closeFlashbackSuite() {
+  const modal = document.getElementById('modal-flashback-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  flashbackSuiteState.isPlaying = false;
+  const icon = document.getElementById('flashback-play-icon');
+  if (icon) icon.textContent = '▶';
+  if (flashbackSuiteState.animFrameId) {
+    cancelAnimationFrame(flashbackSuiteState.animFrameId);
+    flashbackSuiteState.animFrameId = null;
+  }
+}
+
+function bindFlashbackSuiteModalControls() {
+  document.getElementById('btn-close-flashback-suite')?.addEventListener('click', closeFlashbackSuite);
+
+  // Play / Pause
+  document.getElementById('btn-flashback-play')?.addEventListener('click', () => {
+    flashbackSuiteState.isPlaying = !flashbackSuiteState.isPlaying;
+    const icon = document.getElementById('flashback-play-icon');
+    if (icon) icon.textContent = flashbackSuiteState.isPlaying ? '❚❚' : '▶';
+  });
+
+  // Jump triggers
+  document.getElementById('btn-flashback-jump-past')?.addEventListener('click', () => triggerTemporalShift('flashback'));
+  document.getElementById('btn-flashback-trigger-past')?.addEventListener('click', () => triggerTemporalShift('flashback'));
+  document.getElementById('btn-flashback-jump-future')?.addEventListener('click', () => triggerTemporalShift('flashforward'));
+  document.getElementById('btn-flashback-trigger-future')?.addEventListener('click', () => triggerTemporalShift('flashforward'));
+
+  // Text inputs
+  document.getElementById('flashback-input-headline')?.addEventListener('input', (e) => {
+    flashbackSuiteState.headline = e.target.value;
+    const h = document.getElementById('flashback-display-headline');
+    if (h) h.textContent = e.target.value.toUpperCase();
+  });
+
+  document.getElementById('flashback-input-subcaption')?.addEventListener('input', (e) => {
+    flashbackSuiteState.subcaption = e.target.value;
+    const s = document.getElementById('flashback-display-subcaption');
+    if (s) s.textContent = e.target.value.toUpperCase();
+  });
+
+  // Image editing (URL input)
+  document.getElementById('flashback-input-img-url')?.addEventListener('input', (e) => {
+    const url = e.target.value.trim();
+    if (url) {
+      flashbackSuiteState.imageUrl = url;
+      const img = document.getElementById('flashback-canvas-img');
+      if (img) img.src = url;
+    }
+  });
+
+  // Upload custom photo
+  document.getElementById('flashback-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      flashbackSuiteState.imageUrl = ev.target.result;
+      const img = document.getElementById('flashback-canvas-img');
+      if (img) img.src = ev.target.result;
+      const urlInput = document.getElementById('flashback-input-img-url');
+      if (urlInput) urlInput.value = `[Uploaded: ${file.name}]`;
+      playFlashbackAudioSFX('flash');
+      showTextTimingAlert(`Uploaded custom archival photo: ${file.name}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Shuffle stock photo
+  document.getElementById('btn-flashback-shuffle-img')?.addEventListener('click', () => {
+    const nextImg = FLASHBACK_STOCK_IMAGES[Math.floor(Math.random() * FLASHBACK_STOCK_IMAGES.length)];
+    flashbackSuiteState.imageUrl = nextImg;
+    const img = document.getElementById('flashback-canvas-img');
+    if (img) img.src = nextImg;
+    const urlInput = document.getElementById('flashback-input-img-url');
+    if (urlInput) urlInput.value = nextImg;
+    playFlashbackAudioSFX('flash');
+  });
+
+  // Flash duration slider
+  document.getElementById('flashback-slider-duration')?.addEventListener('input', (e) => {
+    flashbackSuiteState.flashDuration = parseInt(e.target.value) || 350;
+    const lbl = document.getElementById('flashback-val-duration');
+    if (lbl) lbl.textContent = `${flashbackSuiteState.flashDuration}ms`;
+  });
+
+  // Motion blur slider
+  document.getElementById('flashback-slider-blur')?.addEventListener('input', (e) => {
+    flashbackSuiteState.blurMagnitude = parseInt(e.target.value) || 28;
+    const lbl = document.getElementById('flashback-val-blur');
+    if (lbl) lbl.textContent = `${flashbackSuiteState.blurMagnitude}px`;
+  });
+
+  // Color grade select
+  document.getElementById('flashback-select-grade')?.addEventListener('change', (e) => {
+    flashbackSuiteState.colorGrade = e.target.value;
+    updateFlashbackVisualStyles();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-flashback-apply-timeline')?.addEventListener('click', () => {
+    closeFlashbackSuite();
+    switchStudioView('editor');
+
+    const flashbackClip = {
+      id: `img-flashback-${Date.now()}`,
+      name: 'Nonlinear_Flashback_Scene.jpg',
+      url: flashbackSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: flashbackSuiteState.flashDuration / 1000
+    };
+
+    const headlineClip = {
+      id: `txt-flashback-headline-${Date.now() + 1}`,
+      text: flashbackSuiteState.headline,
+      highlight: flashbackSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#fbbf24',
+      anim: 'pop',
+      fontSize: 56,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-flashback-sub-${Date.now() + 2}`,
+      text: flashbackSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#c084fc',
+      anim: 'fade',
+      fontSize: 24,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [flashbackClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Nonlinear Flashback Suite to timeline!', 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
