@@ -21930,6 +21930,7 @@ let document3DFXState = {
   scene: null,
   camera: null,
   renderer: null,
+  controls: null,
   documentMesh: null,
   popoutMesh: null,
   docCanvas: null,
@@ -21938,7 +21939,12 @@ let document3DFXState = {
   animId: null,
   isPlaying: false,
   timelineProgress: 0,
+  playbackSpeed: 1.0,
   animTween: null,
+  isDraggingCanvas: false,
+  dragStartPos: { x: 0, y: 0 },
+  dragStartPitch: 45,
+  dragStartYaw: -20,
   header: "THE GLOBAL FINANCIAL GAZETTE",
   headline: "Uncovered Internal Files Reveal $4.2B Secret Market Algorithm Shift",
   dateline: "NEW YORK — SPECIAL INVESTIGATION REPORT — OCT 8, 2026",
@@ -22204,6 +22210,57 @@ function initDocument3DFXEngine() {
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
 
+  // OrbitControls if loaded
+  if (typeof THREE.OrbitControls !== 'undefined') {
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 - 0.05;
+    controls.addEventListener('change', () => {
+      const pos = camera.position;
+      const r = Math.sqrt(pos.x * pos.x + pos.y * pos.y + pos.z * pos.z);
+      if (r > 0.001) {
+        const p = Math.asin(Math.max(-1, Math.min(1, -pos.y / r))) * (180 / Math.PI);
+        const y = Math.atan2(pos.x, pos.z) * (180 / Math.PI);
+        document3DFXState.dist = Math.max(20, Math.min(110, r));
+        document3DFXState.pitch = Math.max(0, Math.min(75, p));
+        document3DFXState.yaw = Math.max(-60, Math.min(60, y));
+        syncDocFXInputs();
+      }
+    });
+    document3DFXState.controls = controls;
+  }
+
+  // Pointer drag listener for manual canvas rotation
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    document3DFXState.isDraggingCanvas = true;
+    document3DFXState.dragStartPos = { x: e.clientX, y: e.clientY };
+    document3DFXState.dragStartPitch = document3DFXState.pitch;
+    document3DFXState.dragStartYaw = document3DFXState.yaw;
+    renderer.domElement.style.cursor = 'grabbing';
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!document3DFXState.isDraggingCanvas) return;
+    const dx = e.clientX - document3DFXState.dragStartPos.x;
+    const dy = e.clientY - document3DFXState.dragStartPos.y;
+
+    document3DFXState.yaw = Math.max(-60, Math.min(60, document3DFXState.dragStartYaw + dx * 0.25));
+    document3DFXState.pitch = Math.max(0, Math.min(75, document3DFXState.dragStartPitch - dy * 0.25));
+    
+    syncDocFXInputs();
+    updateDocFXCameraTransform();
+  });
+
+  window.addEventListener('pointerup', () => {
+    if (document3DFXState.isDraggingCanvas) {
+      document3DFXState.isDraggingCanvas = false;
+      if (renderer && renderer.domElement) {
+        renderer.domElement.style.cursor = 'grab';
+      }
+    }
+  });
+
   // Lights
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
   scene.add(ambientLight);
@@ -22258,6 +22315,9 @@ function initDocument3DFXEngine() {
   updateDocFXCameraTransform();
 
   function animateDocLoop() {
+    if (document3DFXState.controls) {
+      document3DFXState.controls.update();
+    }
     if (document3DFXState.renderer && document3DFXState.scene && document3DFXState.camera) {
       document3DFXState.renderer.render(document3DFXState.scene, document3DFXState.camera);
     }
@@ -22285,8 +22345,111 @@ function closeDocument3DFXSuite() {
   }
 }
 
+function updateDocFXTimelineUI() {
+  const pct = Math.max(0, Math.min(100, document3DFXState.timelineProgress * 100));
+  const pBar = document.getElementById('doc-timeline-progress');
+  const pHead = document.getElementById('doc-playhead');
+  const tCurrent = document.getElementById('doc-time-current');
+
+  if (pBar) pBar.style.width = `${pct}%`;
+  if (pHead) pHead.style.left = `${pct}%`;
+
+  const totalSec = 4.0;
+  const currentSec = (document3DFXState.timelineProgress * totalSec).toFixed(2);
+  const sec = Math.floor(currentSec);
+  const ms = Math.floor((currentSec - sec) * 100);
+  if (tCurrent) {
+    tCurrent.textContent = `00:0${sec}.${ms < 10 ? '0' + ms : ms}`;
+  }
+}
+
+function startDocFXTimelineProgress(duration) {
+  if (document3DFXState.animTween) document3DFXState.animTween.kill();
+  const speed = document3DFXState.playbackSpeed || 1.0;
+  const adjDuration = duration / speed;
+
+  document3DFXState.animTween = gsap.to(document3DFXState, {
+    timelineProgress: 1.0,
+    duration: adjDuration,
+    ease: "none",
+    onUpdate: () => {
+      updateDocFXTimelineUI();
+    },
+    onComplete: () => {
+      document3DFXState.isPlaying = false;
+      const playIcon = document.getElementById('doc-play-icon');
+      if (playIcon) playIcon.textContent = '▶';
+    }
+  });
+}
+
+function toggleDocFXTimelinePlay() {
+  document3DFXState.isPlaying = !document3DFXState.isPlaying;
+  const playIcon = document.getElementById('doc-play-icon');
+  
+  if (document3DFXState.isPlaying) {
+    if (playIcon) playIcon.textContent = '❚❚';
+    if (document3DFXState.timelineProgress >= 1.0) {
+      document3DFXState.timelineProgress = 0;
+    }
+    triggerDocFXPresetAnimation('janiFlyby');
+  } else {
+    if (playIcon) playIcon.textContent = '▶';
+    if (document3DFXState.animTween) {
+      document3DFXState.animTween.pause();
+    }
+  }
+}
+
+function resetDocFXTimeline() {
+  if (document3DFXState.animTween) {
+    document3DFXState.animTween.kill();
+  }
+  document3DFXState.isPlaying = false;
+  document3DFXState.timelineProgress = 0;
+  const playIcon = document.getElementById('doc-play-icon');
+  if (playIcon) playIcon.textContent = '▶';
+  updateDocFXTimelineUI();
+
+  document3DFXState.pitch = 45;
+  document3DFXState.yaw = -20;
+  document3DFXState.roll = 8;
+  document3DFXState.dist = 55;
+  document3DFXState.hlProgress = 1.0;
+  syncDocFXInputs();
+  updateDocFXCameraTransform();
+  renderDocFXTexture();
+}
+
+function scrubDocFXTimeline(e) {
+  const track = document.getElementById('doc-timeline-track');
+  if (!track) return;
+  const rect = track.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const progress = Math.max(0, Math.min(1, clickX / rect.width));
+  document3DFXState.timelineProgress = progress;
+  updateDocFXTimelineUI();
+
+  // Scrub highlight progress to match timeline scrub
+  document3DFXState.hlProgress = progress;
+  const slider = document.getElementById('doc-range-hlprogress');
+  if (slider) slider.value = progress * 100;
+  const valLbl = document.getElementById('doc-val-hlprogress');
+  if (valLbl) valLbl.textContent = `${Math.round(progress * 100)}%`;
+  renderDocFXTexture();
+}
+
 function triggerDocFXPresetAnimation(presetType) {
   if (typeof gsap === 'undefined') return;
+  if (document3DFXState.animTween) document3DFXState.animTween.kill();
+
+  const playIcon = document.getElementById('doc-play-icon');
+  if (playIcon) playIcon.textContent = '❚❚';
+  document3DFXState.isPlaying = true;
+  document3DFXState.timelineProgress = 0;
+  updateDocFXTimelineUI();
+
+  const speed = document3DFXState.playbackSpeed || 1.0;
 
   if (presetType === 'janiFlyby') {
     document3DFXState.hlProgress = 0;
@@ -22299,7 +22462,7 @@ function triggerDocFXPresetAnimation(presetType) {
       yaw: 25,
       roll: -12,
       dist: 45,
-      duration: 3.5,
+      duration: 3.5 / speed,
       ease: "power2.inOut",
       onUpdate: () => {
         syncDocFXInputs();
@@ -22309,8 +22472,8 @@ function triggerDocFXPresetAnimation(presetType) {
 
     gsap.to(document3DFXState, {
       hlProgress: 1.0,
-      duration: 2.2,
-      delay: 0.8,
+      duration: 2.2 / speed,
+      delay: 0.8 / speed,
       ease: "power1.out",
       onUpdate: () => {
         const slider = document.getElementById('doc-range-hlprogress');
@@ -22324,11 +22487,13 @@ function triggerDocFXPresetAnimation(presetType) {
     if (document3DFXState.popoutMesh) {
       gsap.to(document3DFXState.popoutMesh.position, {
         z: 4.5,
-        duration: 2.0,
-        delay: 1.2,
+        duration: 2.0 / speed,
+        delay: 1.2 / speed,
         ease: "back.out(1.7)"
       });
     }
+
+    startDocFXTimelineProgress(3.5);
 
   } else if (presetType === 'voxHighlight') {
     document3DFXState.pitch = 30;
@@ -22343,7 +22508,7 @@ function triggerDocFXPresetAnimation(presetType) {
 
     gsap.to(document3DFXState, {
       hlProgress: 1.0,
-      duration: 1.8,
+      duration: 1.8 / speed,
       ease: "power2.out",
       onUpdate: () => {
         const slider = document.getElementById('doc-range-hlprogress');
@@ -22353,6 +22518,8 @@ function triggerDocFXPresetAnimation(presetType) {
         renderDocFXTexture();
       }
     });
+
+    startDocFXTimelineProgress(2.0);
 
   } else if (presetType === 'redactReveal') {
     loadDocFXArchetype('cia');
@@ -22364,7 +22531,7 @@ function triggerDocFXPresetAnimation(presetType) {
 
     gsap.to(document3DFXState, {
       redactWipe: 1.0,
-      duration: 2.5,
+      duration: 2.5 / speed,
       ease: "steps(12)",
       onUpdate: () => {
         const slider = document.getElementById('doc-range-redactwipe');
@@ -22375,15 +22542,19 @@ function triggerDocFXPresetAnimation(presetType) {
       }
     });
 
+    startDocFXTimelineProgress(2.8);
+
   } else if (presetType === 'headlinePop') {
     if (document3DFXState.popoutMesh) {
       document3DFXState.popoutMesh.position.z = 0;
       gsap.to(document3DFXState.popoutMesh.position, {
         z: 6.0,
-        duration: 1.5,
+        duration: 1.5 / speed,
         ease: "elastic.out(1, 0.5)"
       });
     }
+
+    startDocFXTimelineProgress(1.8);
   }
 }
 
@@ -22664,6 +22835,13 @@ function bindDocument3DFXModalControls() {
     });
   });
 
+  // Toggle 3D Wireframe
+  document.getElementById('btn-doc-toggle-wireframe')?.addEventListener('click', () => {
+    if (document3DFXState.documentMesh) {
+      document3DFXState.documentMesh.material.wireframe = !document3DFXState.documentMesh.material.wireframe;
+    }
+  });
+
   // High-Res Snapshot
   document.getElementById('btn-doc-snap-hires')?.addEventListener('click', () => {
     const { renderer, scene, camera } = document3DFXState;
@@ -22678,22 +22856,54 @@ function bindDocument3DFXModalControls() {
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 
-  // Playback Toggle
-  document.getElementById('btn-doc-toggle-play')?.addEventListener('click', () => {
+  // Render Motion Button (Simulate render animation + PNG snapshot download)
+  document.getElementById('btn-doc-render-motion')?.addEventListener('click', () => {
     triggerDocFXPresetAnimation('janiFlyby');
+    const btnText = document.getElementById('btn-doc-render-motion-text');
+    if (btnText) btnText.textContent = 'Rendering MP4...';
+    showTextTimingAlert('Rendering 3D Document Camera Motion Sequence...', 'info');
+    setTimeout(() => {
+      if (btnText) btnText.textContent = 'Render Motion';
+      const { renderer, scene, camera } = document3DFXState;
+      if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+        const dataURL = renderer.domElement.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `regaarder-jani-motion-${Date.now()}.png`;
+        link.href = dataURL;
+        link.click();
+      }
+      showTextTimingAlert('Motion render export complete!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    }, 3600);
   });
 
-  // Reset
-  document.getElementById('btn-doc-reset-play')?.addEventListener('click', () => {
-    document3DFXState.pitch = 45;
-    document3DFXState.yaw = -20;
-    document3DFXState.roll = 8;
-    document3DFXState.dist = 55;
-    document3DFXState.hlProgress = 1.0;
-    syncDocFXInputs();
-    updateDocFXCameraTransform();
-    renderDocFXTexture();
+  // Playback Toggle (Play / Pause)
+  document.getElementById('btn-doc-toggle-play')?.addEventListener('click', toggleDocFXTimelinePlay);
+
+  // Reset Timeline
+  document.getElementById('btn-doc-reset-play')?.addEventListener('click', resetDocFXTimeline);
+
+  // Playback Speed Selector
+  document.getElementById('doc-playback-speed')?.addEventListener('change', (e) => {
+    document3DFXState.playbackSpeed = parseFloat(e.target.value) || 1.0;
   });
+
+  // Timeline Scrubber Track Click & Drag
+  const timelineTrack = document.getElementById('doc-timeline-track');
+  if (timelineTrack) {
+    let isScrubbing = false;
+    timelineTrack.addEventListener('pointerdown', (e) => {
+      isScrubbing = true;
+      scrubDocFXTimeline(e);
+    });
+    window.addEventListener('pointermove', (e) => {
+      if (isScrubbing) scrubDocFXTimeline(e);
+    });
+    window.addEventListener('pointerup', () => {
+      isScrubbing = false;
+    });
+  }
 
   // Apply to Active Timeline
   document.getElementById('btn-doc-apply-timeline')?.addEventListener('click', () => {

@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Cinzel:wght@600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -3064,6 +3066,9 @@
 
         <!-- Preset Animation Action Buttons -->
         <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: #94a3b8; font-weight: 600; display: flex; align-items: center; gap: 4px; margin-right: 4px;">
+            <span style="color: #fbbf24;">✦</span> Quick Animations:
+          </span>
           <button type="button" class="btn-doc-anim-preset" data-anim="janiFlyby" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(168,85,247,0.5); background: rgba(168,85,247,0.22); color: #e9d5ff; cursor: pointer; display: flex; align-items: center; gap: 5px;">
             <span>✈</span> Jani 3D Flyover
           </button>
@@ -3078,12 +3083,19 @@
           </button>
         </div>
 
-        <!-- Snap / Apply / Close Actions -->
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- Snap / Render Motion / Apply / Close Actions -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" id="btn-doc-toggle-wireframe" style="padding: 6px 9px; font-size: 12px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer;" title="Toggle 3D Grid Overlay">
+            <span>⬚</span>
+          </button>
           <button type="button" id="btn-doc-snap-hires" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #6ee7b7; cursor: pointer; display: flex; align-items: center; gap: 5px;">
             <span>📷</span> Snap High-Res
           </button>
-          <button type="button" id="btn-doc-apply-timeline" style="padding: 6px 15px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #9333ea, #a855f7); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(168,85,247,0.45);">
+          <button type="button" id="btn-doc-render-motion" style="padding: 5px 13px; font-size: 11px; font-weight: 700; border-radius: 8px; background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #f3e8ff; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(168,85,247,0.3);">
+            <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #f87171;"></span>
+            <span id="btn-doc-render-motion-text">Render Motion</span>
+          </button>
+          <button type="button" id="btn-doc-apply-timeline" style="padding: 6px 14px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #9333ea, #a855f7); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(168,85,247,0.45);">
             <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             <span>Apply To Timeline</span>
           </button>
@@ -3338,23 +3350,77 @@
           <!-- Three.js Canvas Container -->
           <div id="doc-threejs-container" style="width: 100%; height: 100%; cursor: grab;"></div>
 
-          <!-- Floating Timeline Scrubber Bar -->
-          <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 14px; background: rgba(13, 16, 23, 0.94); backdrop-filter: blur(14px); padding: 8px 22px; border-radius: 9999px; border: 1px solid rgba(168,85,247,0.35); box-shadow: 0 12px 40px rgba(0,0,0,0.9);">
-            <button type="button" id="btn-doc-toggle-play" style="width: 36px; height: 36px; border-radius: 50%; background: #9333ea; color: #fff; border: none; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(168,85,247,0.5);">
-              ❚❚
-            </button>
-            <button type="button" id="btn-doc-reset-play" style="background: transparent; border: none; color: #94a3b8; font-size: 14px; cursor: pointer; padding: 4px;" title="Reset Timeline">
-              ↺
-            </button>
-            <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.15);"></div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 10px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">SCRUB:</span>
-              <input type="range" id="doc-timeline-slider" min="0" max="100" value="0" style="width: 140px; accent-color: #a855f7; cursor: pointer;" />
-              <span id="doc-time-display" style="font-size: 11px; font-weight: 700; color: #c084fc; font-family: 'JetBrains Mono', monospace;">00:00.00</span>
+          <!-- Prompt Hint Overlay (Centered floating pill) -->
+          <div style="position: absolute; bottom: 16px; z-index: 10; pointer-events: none; text-align: center;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(13, 16, 23, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(168, 85, 247, 0.35); padding: 6px 16px; border-radius: 9999px; font-size: 11px; color: #cbd5e1; box-shadow: 0 4px 16px rgba(0,0,0,0.6);">
+              <span style="color: #c084fc; font-size: 12px;">👆</span>
+              <span>Drag mouse on canvas to rotate perspective 3D plane manually</span>
             </div>
           </div>
         </div>
 
+      </div>
+
+      <!-- BOTTOM TIMELINE SCRUBBER PANEL -->
+      <div style="height: 80px; background: #0c0f17; border-top: 1px solid rgba(255, 255, 255, 0.08); padding: 10px 20px 8px 20px; display: flex; flex-direction: column; justify-content: space-between; flex-shrink: 0; z-index: 30;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <!-- Playback Controls -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" id="btn-doc-toggle-play" style="width: 32px; height: 32px; border-radius: 50%; background: #9333ea; color: #ffffff; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(168,85,247,0.45); transition: all 0.2s;">
+              <span id="doc-play-icon" style="font-size: 11px; margin-left: 1px;">▶</span>
+            </button>
+            <button type="button" id="btn-doc-reset-play" style="width: 28px; height: 28px; border-radius: 7px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px;" title="Reset Timeline to 0s">
+              <span>↺</span>
+            </button>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-left: 6px; display: flex; align-items: center; gap: 4px;">
+              <span id="doc-time-current" style="color: #c084fc; font-weight: 700;">00:00.00</span>
+              <span style="color: #64748b;">/</span>
+              <span id="doc-time-total" style="color: #64748b;">00:04.00</span>
+            </div>
+          </div>
+
+          <!-- Keyframe Track Indicators -->
+          <div style="display: flex; align-items: center; gap: 16px; font-size: 11px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background: #facc15;"></span> Highlight Sweep
+            </span>
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background: #38bdf8;"></span> 3D Plane Tilt Glide
+            </span>
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <span style="width: 7px; height: 7px; border-radius: 50%; background: #34d399;"></span> Pop-Out Z-Elevate
+            </span>
+          </div>
+
+          <!-- Speed Selector -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 10px; color: #94a3b8; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;">Speed:</span>
+            <select id="doc-playback-speed" style="background: #131826; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 11px; border-radius: 6px; padding: 3px 8px; outline: none; cursor: pointer;">
+              <option value="0.5">0.5x Slow</option>
+              <option value="1.0" selected>1.0x Normal</option>
+              <option value="1.5">1.5x Fast</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Timeline Scrubber Bar with Ruler and Keyframe Pins -->
+        <div id="doc-timeline-track" style="position: relative; width: 100%; height: 18px; background: #07090e; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; display: flex; align-items: center; cursor: pointer; overflow: hidden; padding: 0 2px;">
+          <!-- Background Ruler Lines -->
+          <div style="position: absolute; inset: 0; background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 12px); pointer-events: none;"></div>
+          
+          <!-- Keyframe markers -->
+          <div style="position: absolute; left: 15%; width: 5px; height: 11px; background: #facc15; border-radius: 2px; pointer-events: none;" title="Keyframe: Highlight Sweep (15%)"></div>
+          <div style="position: absolute; left: 40%; width: 5px; height: 11px; background: #38bdf8; border-radius: 2px; pointer-events: none;" title="Keyframe: Camera Sweep Midpoint (40%)"></div>
+          <div style="position: absolute; left: 75%; width: 5px; height: 11px; background: #34d399; border-radius: 2px; pointer-events: none;" title="Keyframe: Headline Elevation Max (75%)"></div>
+
+          <!-- Progress Fill -->
+          <div id="doc-timeline-progress" style="height: 6px; background: linear-gradient(90deg, #9333ea, #a855f7, #c084fc); border-radius: 3px; width: 0%; pointer-events: none; transition: width 0.05s linear;"></div>
+
+          <!-- Playhead Handle -->
+          <div id="doc-playhead" style="position: absolute; top: 1px; bottom: 1px; width: 12px; margin-left: -6px; background: #ffffff; border: 1px solid #9333ea; border-radius: 3px; box-shadow: 0 0 8px rgba(168,85,247,0.7); cursor: grab; display: flex; align-items: center; justify-content: center; left: 0%; pointer-events: none;">
+            <div style="width: 2px; height: 8px; background: #9333ea; border-radius: 1px;"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -4331,6 +4397,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=276"></script>
+  <script src="js/app.js?v=277"></script>
 </body>
 </html>
