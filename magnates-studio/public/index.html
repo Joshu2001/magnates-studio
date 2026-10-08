@@ -6561,6 +6561,137 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       UNIVERSAL INTERACTIVE TOP TEMPLATES CUSTOMIZER SUITE MODAL
+       Allows users to preview, swap foreground/background assets, adjust effects, and apply to timeline
+       ========================================================= -->
+  <div id="modal-top-template-customizer" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(5,7,14,0.92);">
+    <div class="vector-modal-box" style="max-width: 1080px; width: 94vw; max-height: 92vh; background: #070912; border: 1px solid rgba(168,85,247,0.4); box-shadow: 0 25px 65px rgba(0,0,0,0.9), 0 0 45px rgba(168,85,247,0.25); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="vector-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(18,16,28,0.85);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(147,51,234,0.4);">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffffff; width: 17px; height: 17px;"><path d="M12 2L15 8L22 9L17 14L18 21L12 17.5L6 21L7 14L2 9L9 8L12 2Z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 id="tpl-modal-title" style="margin: 0; font-size: 14.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.3px;">Template Customizer</h3>
+              <span id="tpl-modal-badge" style="font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #d8b4fe; font-family: monospace; font-weight: 700;">PRO FX</span>
+            </div>
+            <p id="tpl-modal-desc" style="margin: 2px 0 0; font-size: 11px; color: #94a3b8;">Customize layers, swap images, and preview live animation before inserting into timeline.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-top-tpl-modal" style="padding: 6px 14px; font-size: 11.5px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-top-tpl-timeline" style="padding: 6px 16px; font-size: 11.5px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6, #c084fc); border: none; color: #ffffff; border-radius: 6px; cursor: pointer; box-shadow: 0 0 16px rgba(168,85,247,0.45); display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <span>Apply to Timeline</span>
+          </button>
+          <button type="button" id="btn-close-top-tpl-modal" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Preview Canvas on Left, Controls & Image Switcher on Right) -->
+      <div style="display: flex; flex: 1; overflow: hidden; min-height: 480px;">
+        
+        <!-- Left Stage: Live Interactive Viewport -->
+        <div style="flex: 1.6; padding: 20px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08); background: #030408; overflow-y: auto;">
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(168,85,247,0.3); box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 12px 30px rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;">
+            
+            <!-- Live Preview Container -->
+            <div id="tpl-modal-preview-stage" style="position: absolute; inset: 0; overflow: hidden;">
+              <!-- Dynamic FX layers rendered by JS -->
+            </div>
+
+            <!-- Stage HUD Pill -->
+            <div style="position: absolute; bottom: 12px; left: 12px; z-index: 20; display: flex; gap: 6px;">
+              <span id="tpl-modal-hud-effect" style="font-size: 9.5px; font-family: monospace; background: rgba(8,10,20,0.85); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">EFFECT: ACTIVE</span>
+              <span id="tpl-modal-hud-depth" style="font-size: 9.5px; font-family: monospace; background: rgba(8,10,20,0.85); border: 1px solid rgba(168,85,247,0.3); color: #c084fc; padding: 3px 8px; border-radius: 4px;">3D DEPTH RIG</span>
+            </div>
+
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 20;">
+              <span id="tpl-modal-timer-badge" style="font-size: 10px; font-family: monospace; background: rgba(8,10,20,0.85); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.0s / 6.0s</span>
+            </div>
+          </div>
+
+          <!-- Playback and Scrub Controls -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-tpl-modal-play-toggle" style="padding: 5px 14px; font-size: 11px; font-weight: 700; background: #13141f; border: 1px solid rgba(255,255,255,0.12); color: #ffffff; border-radius: 6px; cursor: pointer;">⏸ Pause</button>
+              <button type="button" id="btn-tpl-modal-reset" style="padding: 5px 10px; font-size: 11px; background: #13141f; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">↺ Replay</button>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">
+              <span>STATUS: </span><span style="color: #34d399; font-weight: 700;">READY TO INSERT</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Layer Assets & Parameter Controls -->
+        <div style="flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: #070912; overflow-y: auto;">
+          <div style="font-size: 12px; font-weight: 700; color: #ffffff; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px;">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #a855f7;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+            <span>Template Layers &amp; Media</span>
+          </div>
+
+          <!-- Primary / Subject Media Switcher -->
+          <div id="tpl-modal-wrap-primary" style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="tpl-modal-label-primary" style="font-size: 11px; font-weight: 700; color: #d8b4fe;">👤 Subject / Foreground Cutout</span>
+              <label for="tpl-modal-upload-primary" style="font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(168,85,247,0.25); border: 1px solid #a855f7; color: #fff; cursor: pointer;">
+                Upload Image
+                <input type="file" id="tpl-modal-upload-primary" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <img id="tpl-modal-thumb-primary" src="" alt="Subject" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15);" />
+              <input type="text" id="tpl-modal-url-primary" placeholder="Image URL..." style="flex: 1; background: #030408; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Secondary / Background Media Switcher -->
+          <div id="tpl-modal-wrap-secondary" style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="tpl-modal-label-secondary" style="font-size: 11px; font-weight: 700; color: #38bdf8;">🌆 Background Environment</span>
+              <label for="tpl-modal-upload-secondary" style="font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(6,182,212,0.25); border: 1px solid #06b6d4; color: #fff; cursor: pointer;">
+                Upload Image
+                <input type="file" id="tpl-modal-upload-secondary" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <img id="tpl-modal-thumb-secondary" src="" alt="Background" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.15);" />
+              <input type="text" id="tpl-modal-url-secondary" placeholder="Background URL..." style="flex: 1; background: #030408; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Motion & Effect Tuning Parameters -->
+          <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">⚙️ Motion &amp; Depth Configuration</div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px;">
+              <span style="color: #cbd5e1;">Parallax Depth / Motion Intensity</span>
+              <span id="tpl-modal-val-depth" style="font-family: monospace; color: #c084fc;">65%</span>
+            </div>
+            <input type="range" id="tpl-modal-slider-depth" min="10" max="100" value="65" style="width: 100%; accent-color: #8b5cf6; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 2px;">
+              <span style="color: #cbd5e1;">Timeline Clip Duration</span>
+              <span id="tpl-modal-val-duration" style="font-family: monospace; color: #c084fc;">6 sec</span>
+            </div>
+            <input type="range" id="tpl-modal-slider-duration" min="2" max="12" value="6" style="width: 100%; accent-color: #8b5cf6; cursor: pointer;" />
+          </div>
+
+          <!-- Pro Tip -->
+          <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 10px; font-size: 10.5px; color: #e9d5ff; line-height: 1.45;">
+            <strong>💡 Pro Workflow:</strong> You can change the photo now or apply it immediately. All layers remain fully editable on your timeline once inserted!
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- 1. Interactive Magnates Media Brightness, Contrast & Glow Suite Modal -->
   <div id="modal-magnates-glow-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(8,4,12,0.88);">
     <div class="vector-modal-box" style="max-width: 1040px; width: 94vw; max-height: 92vh; background: #090611; border: 1px solid rgba(245,158,11,0.35); box-shadow: 0 25px 65px rgba(0,0,0,0.88), 0 0 50px rgba(245,158,11,0.2); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">

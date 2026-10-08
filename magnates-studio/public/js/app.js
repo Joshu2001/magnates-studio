@@ -21986,6 +21986,25 @@ function applySelectedHomepageTemplate(templateId) {
   const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
   if (!tpl) return;
 
+  // Intercept the top interactive templates to open the Pre-Application Customizer Studio Modal
+  const topCustomizerIds = [
+    'subject-25d-parallax',
+    'paper-rip-shred',
+    'gold-frame-spin',
+    'text-texturing-grunge',
+    'kinetic-decode-typewriter',
+    'magnates-paper-vector-cutout',
+    'vox-newspaper-cream-dossier',
+    'vintage-film-burn',
+    'parallax-zoom',
+    'cyber-glitch-pass'
+  ];
+
+  if (topCustomizerIds.includes(templateId)) {
+    openTopTemplateCustomizer(tpl);
+    return;
+  }
+
   // 1. Switch directly to Studio Editor view
   switchStudioView('editor');
 
@@ -22380,6 +22399,428 @@ function applySelectedHomepageTemplate(templateId) {
 
   showTextTimingAlert(`Loaded template: "${tpl.title}" into Studio!`, 'success');
   setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
+/* =========================================================
+   UNIVERSAL TOP TEMPLATES PRE-APPLICATION CUSTOMIZER CONTROLLER
+   Allows users to preview, swap custom images/assets, adjust parameters,
+   and apply the template to timeline.
+   ========================================================= */
+let topCustomizerState = {
+  currentTpl: null,
+  primaryUrl: '',
+  secondaryUrl: '',
+  depth: 65,
+  duration: 6,
+  isPlaying: true,
+  animId: null,
+  startTime: 0
+};
+
+function openTopTemplateCustomizer(tpl) {
+  if (!tpl) return;
+  topCustomizerState.currentTpl = tpl;
+  topCustomizerState.primaryUrl = tpl.defaultImage || '';
+  topCustomizerState.secondaryUrl = tpl.secondaryImage || tpl.defaultImage || '';
+  topCustomizerState.depth = 65;
+  topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
+  topCustomizerState.isPlaying = true;
+
+  const modal = document.getElementById('modal-top-template-customizer');
+  if (!modal) return;
+
+  // 1. Populate Header info
+  const titleEl = document.getElementById('tpl-modal-title');
+  if (titleEl) titleEl.textContent = tpl.title;
+  const badgeEl = document.getElementById('tpl-modal-badge');
+  if (badgeEl) badgeEl.textContent = tpl.badge || 'PRO FX';
+  const descEl = document.getElementById('tpl-modal-desc');
+  if (descEl) descEl.textContent = tpl.description || 'Customize template layers before applying to timeline.';
+
+  // 2. Populate Media inputs and thumbs
+  const primaryThumb = document.getElementById('tpl-modal-thumb-primary');
+  const primaryInput = document.getElementById('tpl-modal-url-primary');
+  if (primaryThumb) primaryThumb.src = topCustomizerState.primaryUrl;
+  if (primaryInput) primaryInput.value = topCustomizerState.primaryUrl;
+
+  const secondaryThumb = document.getElementById('tpl-modal-thumb-secondary');
+  const secondaryInput = document.getElementById('tpl-modal-url-secondary');
+  if (secondaryThumb) secondaryThumb.src = topCustomizerState.secondaryUrl;
+  if (secondaryInput) secondaryInput.value = topCustomizerState.secondaryUrl;
+
+  // Contextual labels
+  const labelPrim = document.getElementById('tpl-modal-label-primary');
+  const labelSec = document.getElementById('tpl-modal-label-secondary');
+  const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+  if (tpl.id === 'subject-25d-parallax') {
+    if (labelPrim) labelPrim.textContent = '👤 Cutout Subject / Foreground';
+    if (labelSec) labelSec.textContent = '🌆 Background Panning Scene';
+    if (wrapSec) wrapSec.style.display = 'flex';
+  } else if (tpl.id === 'paper-rip-shred') {
+    if (labelPrim) labelPrim.textContent = '📰 Top Paper Tear Layer';
+    if (labelSec) labelSec.textContent = '🎬 Revealed Clip / Footage';
+    if (wrapSec) wrapSec.style.display = 'flex';
+  } else if (tpl.id === 'gold-frame-spin') {
+    if (labelPrim) labelPrim.textContent = '🖼️ Framed Artwork / Image';
+    if (wrapSec) wrapSec.style.display = 'none';
+  } else {
+    if (labelPrim) labelPrim.textContent = '🖼️ Primary Subject / Asset';
+    if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
+    if (wrapSec) wrapSec.style.display = 'flex';
+  }
+
+  // 3. Populate Sliders
+  const sliderDepth = document.getElementById('tpl-modal-slider-depth');
+  const valDepth = document.getElementById('tpl-modal-val-depth');
+  if (sliderDepth) sliderDepth.value = topCustomizerState.depth;
+  if (valDepth) valDepth.textContent = `${topCustomizerState.depth}%`;
+
+  const sliderDur = document.getElementById('tpl-modal-slider-duration');
+  const valDur = document.getElementById('tpl-modal-val-duration');
+  if (sliderDur) sliderDur.value = topCustomizerState.duration;
+  if (valDur) valDur.textContent = `${topCustomizerState.duration} sec`;
+
+  // 4. Show modal
+  modal.style.display = 'flex';
+
+  // 5. Start live stage animation
+  renderTopTemplatePreviewStage();
+  startTopCustomizerLoop();
+}
+
+function closeTopTemplateCustomizer() {
+  const modal = document.getElementById('modal-top-template-customizer');
+  if (modal) modal.style.display = 'none';
+  if (topCustomizerState.animId) {
+    cancelAnimationFrame(topCustomizerState.animId);
+    topCustomizerState.animId = null;
+  }
+}
+
+function renderTopTemplatePreviewStage() {
+  const stage = document.getElementById('tpl-modal-preview-stage');
+  if (!stage || !topCustomizerState.currentTpl) return;
+  const tplId = topCustomizerState.currentTpl.id;
+  const prim = topCustomizerState.primaryUrl;
+  const sec = topCustomizerState.secondaryUrl;
+
+  if (tplId === 'subject-25d-parallax') {
+    stage.innerHTML = `
+      <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+        <img id="customizer-live-bg" src="${sec}" alt="Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75); transform: scale(1.15);" />
+        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+          <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4));" />
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'paper-rip-shred') {
+    stage.innerHTML = `
+      <div style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+        <img src="${sec}" alt="Revealed" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
+        <div id="customizer-live-rip" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.95);">
+          <img src="${prim}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'gold-frame-spin') {
+    stage.innerHTML = `
+      <div style="position: absolute; inset: 0; background: #090807; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden;">
+        <div id="customizer-live-frame" style="position: relative; width: 82%; height: 82%; border-radius: 8px; overflow: hidden; border: 4px solid rgba(245, 158, 11, 0.95); box-shadow: 0 20px 45px rgba(0,0,0,0.95);">
+          <img src="${prim}" alt="Framed" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.3) contrast(1.2);" />
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'magnates-paper-vector-cutout') {
+    stage.innerHTML = `
+      <div style="position: absolute; inset: 0; background: #08090d; overflow: hidden;">
+        <img src="${sec}" alt="Scene" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2);" />
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 2;">
+          <span style="font-family: Impact, sans-serif; font-size: 46px; font-weight: 900; color: #fff; letter-spacing: 2px;">MAGNATES</span>
+          <span style="font-family: Impact, sans-serif; font-size: 34px; font-weight: 900; color: #ff334b; letter-spacing: 3px;">SCANDAL</span>
+        </div>
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 3;">
+          <img src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
+        </div>
+      </div>
+    `;
+  } else {
+    stage.innerHTML = `
+      <div style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <img id="customizer-live-default-img" src="${prim}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15);" />
+      </div>
+    `;
+  }
+}
+
+function startTopCustomizerLoop() {
+  topCustomizerState.startTime = performance.now();
+
+  function loop(now) {
+    if (!topCustomizerState.isPlaying) {
+      topCustomizerState.animId = requestAnimationFrame(loop);
+      return;
+    }
+
+    const t = (now - topCustomizerState.startTime) / 1000;
+    const dur = topCustomizerState.duration || 6;
+    const cycle = (t % dur) / dur; // 0 to 1
+
+    const timerBadge = document.getElementById('tpl-modal-timer-badge');
+    if (timerBadge) {
+      timerBadge.textContent = `${(cycle * dur).toFixed(1)}s / ${dur.toFixed(1)}s`;
+    }
+
+    const tplId = topCustomizerState.currentTpl?.id;
+    const depthFactor = (topCustomizerState.depth || 65) / 100;
+
+    if (tplId === 'subject-25d-parallax') {
+      const bg = document.getElementById('customizer-live-bg');
+      const fg = document.getElementById('customizer-live-fg-wrap');
+      if (bg) {
+        const bgScale = 1.15 + Math.sin(t * 0.8) * 0.05 * depthFactor;
+        const bgX = Math.sin(t * 0.7) * 12 * depthFactor;
+        bg.style.transform = `scale(${bgScale}) translate(${bgX}px, 0)`;
+      }
+      if (fg) {
+        const fgScale = 1.0 + Math.sin(t * 0.8 + 0.5) * 0.06 * depthFactor;
+        const fgX = -Math.sin(t * 0.7) * 16 * depthFactor;
+        fg.style.transform = `scale(${fgScale}) translate(${fgX}px, 0)`;
+      }
+    } else if (tplId === 'paper-rip-shred') {
+      const rip = document.getElementById('customizer-live-rip');
+      if (rip) {
+        // Repeated tear sweep
+        const tearProgress = (Math.sin(t * 1.5) + 1) / 2; // 0 to 1
+        rip.style.clipPath = `polygon(0 0, 100% 0, 100% ${tearProgress * 100}%, 0 ${Math.min(100, tearProgress * 100 + 8)}%)`;
+      }
+    } else if (tplId === 'gold-frame-spin') {
+      const frame = document.getElementById('customizer-live-frame');
+      if (frame) {
+        const tiltX = Math.sin(t * 1.2) * 8 * depthFactor;
+        const tiltY = Math.cos(t * 1.0) * 10 * depthFactor;
+        frame.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+      }
+    }
+
+    topCustomizerState.animId = requestAnimationFrame(loop);
+  }
+
+  if (topCustomizerState.animId) cancelAnimationFrame(topCustomizerState.animId);
+  topCustomizerState.animId = requestAnimationFrame(loop);
+}
+
+function commitTopTemplateCustomizerToTimeline() {
+  const tpl = topCustomizerState.currentTpl;
+  if (!tpl) return;
+
+  closeTopTemplateCustomizer();
+
+  // 1. Switch to Studio Editor view
+  switchStudioView('editor');
+
+  // 2. Set active project title
+  const projTitle = document.getElementById('current-project');
+  if (projTitle) projTitle.textContent = tpl.title;
+
+  const prim = topCustomizerState.primaryUrl;
+  const sec = topCustomizerState.secondaryUrl;
+  const dur = topCustomizerState.duration || 6;
+  const depthVal = topCustomizerState.depth || 65;
+
+  // 3. Inject custom clips into timeline
+  if (tpl.id === 'subject-25d-parallax') {
+    const bgClip = {
+      id: `img-bg-${Date.now()}`,
+      name: 'Custom_Environment.jpg',
+      url: sec,
+      start: 0,
+      duration: dur,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      zoomStartTime: 0.1
+    };
+    const fgClip = {
+      id: `img-fg-${Date.now() + 1}`,
+      name: 'Custom_Cutout_Subject.png',
+      url: prim,
+      start: 0,
+      duration: dur,
+      scale: 1.05,
+      depth: depthVal,
+      zoomEffect: 'loupe'
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [bgClip, fgClip];
+      renderAllTimelineTracks();
+      selectClip(fgClip, 'image');
+    }
+  } else if (tpl.id === 'paper-rip-shred') {
+    const ripClip = {
+      id: `img-${Date.now()}`,
+      name: 'Custom_Paper_Tear.jpg',
+      url: prim,
+      start: 0,
+      duration: dur,
+      scale: 1.1,
+      transition: 'fly_through',
+      transitionDuration: 1.2
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [ripClip];
+      renderAllTimelineTracks();
+      selectClip(ripClip, 'image');
+    }
+  } else if (tpl.id === 'gold-frame-spin') {
+    const goldClip = {
+      id: `img-${Date.now()}`,
+      name: 'Custom_Gold_Frame.jpg',
+      url: prim,
+      start: 0,
+      duration: dur,
+      scale: 1.2,
+      zoomEffect: 'snap',
+      zoomScale: 1.3
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [goldClip];
+      renderAllTimelineTracks();
+      selectClip(goldClip, 'image');
+    }
+  } else if (tpl.id === 'magnates-paper-vector-cutout') {
+    const bgClip = {
+      id: `img-bg-${Date.now()}`,
+      name: 'Custom_Scene_Backdrop.jpg',
+      url: sec,
+      start: 0,
+      duration: dur,
+      scale: 1.15,
+      layerOrder: 'back'
+    };
+    const textBehind = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'THE CORRUPTION',
+      highlight: 'CORRUPTION',
+      highlightColor: '#ff334b',
+      anim: 'pop',
+      fontSize: 72,
+      fontFamily: 'Impact, sans-serif',
+      layerOrder: 'middle',
+      start: 0,
+      duration: dur
+    };
+    const cutoutStickerClip = {
+      id: `img-cutout-${Date.now() + 2}`,
+      name: 'Custom_Subject_Cutout.png',
+      url: prim,
+      start: 0,
+      duration: dur,
+      scale: 1.05,
+      vectorEffect: true,
+      vectorStrokeColor: '#ffffff',
+      layerOrder: 'front'
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, cutoutStickerClip];
+      timelineClips.text = [textBehind];
+      renderAllTimelineTracks();
+      selectClip(cutoutStickerClip, 'image');
+    }
+  } else {
+    const baseClip = {
+      id: `img-${Date.now()}`,
+      name: `${tpl.title.replace(/\s+/g, '_')}.jpg`,
+      url: prim,
+      start: 0,
+      duration: dur,
+      scale: 1.1,
+      transition: 'fly_through',
+      transitionDuration: 1.0
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [baseClip];
+      renderAllTimelineTracks();
+      selectClip(baseClip, 'image');
+    }
+  }
+
+  showTextTimingAlert(`Applied ${tpl.title} to timeline with your custom media!`, 'success');
+  setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
+function bindTopTemplateCustomizerEvents() {
+  document.getElementById('btn-close-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
+  document.getElementById('btn-cancel-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
+  document.getElementById('btn-apply-top-tpl-timeline')?.addEventListener('click', commitTopTemplateCustomizerToTimeline);
+
+  // Play/pause toggle
+  const playBtn = document.getElementById('btn-tpl-modal-play-toggle');
+  playBtn?.addEventListener('click', () => {
+    topCustomizerState.isPlaying = !topCustomizerState.isPlaying;
+    playBtn.textContent = topCustomizerState.isPlaying ? '⏸ Pause' : '▶ Play';
+  });
+
+  // Replay
+  document.getElementById('btn-tpl-modal-reset')?.addEventListener('click', () => {
+    topCustomizerState.startTime = performance.now();
+  });
+
+  // URL inputs change
+  document.getElementById('tpl-modal-url-primary')?.addEventListener('input', (e) => {
+    topCustomizerState.primaryUrl = e.target.value.trim();
+    const thumb = document.getElementById('tpl-modal-thumb-primary');
+    if (thumb) thumb.src = topCustomizerState.primaryUrl;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-url-secondary')?.addEventListener('input', (e) => {
+    topCustomizerState.secondaryUrl = e.target.value.trim();
+    const thumb = document.getElementById('tpl-modal-thumb-secondary');
+    if (thumb) thumb.src = topCustomizerState.secondaryUrl;
+    renderTopTemplatePreviewStage();
+  });
+
+  // File Upload Handlers (Local Image Select)
+  document.getElementById('tpl-modal-upload-primary')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      topCustomizerState.primaryUrl = url;
+      const input = document.getElementById('tpl-modal-url-primary');
+      if (input) input.value = url;
+      const thumb = document.getElementById('tpl-modal-thumb-primary');
+      if (thumb) thumb.src = url;
+      renderTopTemplatePreviewStage();
+    }
+  });
+
+  document.getElementById('tpl-modal-upload-secondary')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      topCustomizerState.secondaryUrl = url;
+      const input = document.getElementById('tpl-modal-url-secondary');
+      if (input) input.value = url;
+      const thumb = document.getElementById('tpl-modal-thumb-secondary');
+      if (thumb) thumb.src = url;
+      renderTopTemplatePreviewStage();
+    }
+  });
+
+  // Sliders
+  document.getElementById('tpl-modal-slider-depth')?.addEventListener('input', (e) => {
+    topCustomizerState.depth = parseInt(e.target.value) || 65;
+    const val = document.getElementById('tpl-modal-val-depth');
+    if (val) val.textContent = `${topCustomizerState.depth}%`;
+  });
+
+  document.getElementById('tpl-modal-slider-duration')?.addEventListener('input', (e) => {
+    topCustomizerState.duration = parseInt(e.target.value) || 6;
+    const val = document.getElementById('tpl-modal-val-duration');
+    if (val) val.textContent = `${topCustomizerState.duration} sec`;
+  });
 }
 
 /* =========================================================
@@ -24399,6 +24840,9 @@ function bindDocument3DFXModalControls() {
 }
 
 function initHomepageTemplateEvents() {
+  // Bind top template customizer modal buttons and controls
+  bindTopTemplateCustomizerEvents();
+
   // Navigation top-bar view switcher
   document.getElementById('btn-nav-view-home')?.addEventListener('click', () => switchStudioView('home'));
   document.getElementById('btn-nav-view-editor')?.addEventListener('click', () => switchStudioView('editor'));

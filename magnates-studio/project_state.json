@@ -22,12 +22,12 @@
   "quote": [],
   "image": [
     {
-      "id": "img-spatial-bg-1791441302677",
+      "id": "img-1791467976787",
       "start": 0,
-      "duration": 7,
-      "scale": 1.25,
-      "zoomEffect": "snap",
-      "zoomScale": 1.3,
+      "duration": 5,
+      "scale": 1.1,
+      "transition": "fly_through",
+      "transitionDuration": 1.2,
       "file": null
     }
   ],
@@ -63,7 +63,7 @@
   ],
   "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791467705270,
-  "projectName": "Ink Reveal & Stretchy Title Animation",
+  "savedAt": 1791469060291,
+  "projectName": "James Jani \"The Countdown Effect\" & Panic Ticker Tape",
   "projectId": "proj_1791218145776_xils"
 }
