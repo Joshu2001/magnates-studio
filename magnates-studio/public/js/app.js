@@ -21314,6 +21314,28 @@ function updateSpatialTimelineDisplay() {
   display.textContent = `00:${totalSec.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
 }
 
+function updateSpatialHUDTelemetry() {
+  const { camera, camSpeed } = spatial3DState;
+  if (!camera) return;
+
+  const hudX = document.getElementById('hud-cam-x');
+  const hudY = document.getElementById('hud-cam-y');
+  const hudZ = document.getElementById('hud-cam-z');
+  const hudVel = document.getElementById('hud-vel');
+  const hudFov = document.getElementById('hud-fov');
+
+  if (hudX) hudX.textContent = camera.position.x.toFixed(1);
+  if (hudY) hudY.textContent = camera.position.y.toFixed(1);
+  if (hudZ) hudZ.textContent = camera.position.z.toFixed(1);
+  if (hudVel) hudVel.textContent = `${camSpeed.toFixed(1)}x`;
+  if (hudFov) hudFov.textContent = `${Math.round(camera.fov)}°`;
+
+  const telem = document.getElementById('spatial-cam-telemetry');
+  if (telem) {
+    telem.textContent = `X: ${camera.position.x.toFixed(1)} | Y: ${camera.position.y.toFixed(1)} | Z: ${camera.position.z.toFixed(1)}`;
+  }
+}
+
 function updateSpatialCameraPosition() {
   const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw } = spatial3DState;
   if (!camera) return;
@@ -21343,7 +21365,8 @@ function updateSpatialCameraPosition() {
     camera.position.z += (targetZ - camera.position.z) * 0.08;
     camera.position.x += (targetX - camera.position.x) * 0.05;
     camera.position.y += (targetY - camera.position.y) * 0.05;
-    camera.rotation.set(0, 0, 0);
+    camera.rotation.x = (camPitch * Math.PI / 180);
+    camera.rotation.y = (camYaw * Math.PI / 180);
   } else if (flightMode === 'orbit') {
     // 360 sweeping orbit around center Z=-2000
     const angle = currentTime * Math.PI * 2;
@@ -21354,10 +21377,7 @@ function updateSpatialCameraPosition() {
     camera.lookAt(0, 0, -2000);
   }
 
-  const telem = document.getElementById('spatial-cam-telemetry');
-  if (telem) {
-    telem.textContent = `X: ${camera.position.x.toFixed(1)} | Y: ${camera.position.y.toFixed(1)} | Z: ${camera.position.z.toFixed(1)}`;
-  }
+  updateSpatialHUDTelemetry();
 }
 
 function initSpatialThreeJSEngine() {
@@ -21545,14 +21565,27 @@ function bindSpatial3DModalControls() {
     const lbl = document.getElementById('spatial-val-drift');
     if (lbl) lbl.textContent = `${spatial3DState.camDrift}%`;
   });
-  document.getElementById('spatial-range-fov')?.addEventListener('input', (e) => {
+  document.getElementById('spatial-range-fovwarp')?.addEventListener('input', (e) => {
     spatial3DState.fovWarp = parseFloat(e.target.value);
-    const lbl = document.getElementById('spatial-val-fov');
+    const lbl = document.getElementById('spatial-val-fovwarp');
     if (lbl) lbl.textContent = `${spatial3DState.fovWarp}°`;
     if (spatial3DState.camera) {
       spatial3DState.camera.fov = spatial3DState.fovWarp;
       spatial3DState.camera.updateProjectionMatrix();
     }
+  });
+
+  // 3D Parallax & Depth Angles: Pitch & Yaw
+  document.getElementById('spatial-range-pitch')?.addEventListener('input', (e) => {
+    spatial3DState.camPitch = parseFloat(e.target.value);
+    const lbl = document.getElementById('spatial-val-pitch');
+    if (lbl) lbl.textContent = `${spatial3DState.camPitch}°`;
+  });
+
+  document.getElementById('spatial-range-yaw')?.addEventListener('input', (e) => {
+    spatial3DState.camYaw = parseFloat(e.target.value);
+    const lbl = document.getElementById('spatial-val-yaw');
+    if (lbl) lbl.textContent = `${spatial3DState.camYaw}°`;
   });
 
   // Post FX Sliders
