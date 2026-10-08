@@ -20005,6 +20005,32 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Crushed Blacks', 'Low Saturation', 'Muted Tones', 'Color Offset', 'James Jani'],
     defaultImage: '/jani_monochrome_grading_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'heavy-elliptical-vignette',
+    title: 'Dark Financial Thriller & Heavy Vignette',
+    category: 'Color & Vibe',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(2, 3, 8, 0.98), rgba(7, 10, 18, 0.7), rgba(245, 158, 11, 0.25), rgba(1, 2, 4, 0.98))',
+    description: 'An Adjustment Clip with a heavily feathered elliptical mask (size constraint ~0.7, feathering >2.8x) that darkens frame edges to direct viewer focus strictly to the center narrative focal point.',
+    tags: ['Heavy Vignette', 'Elliptical Mask', 'Financial Thriller', 'Focal Pull', 'James Jani'],
+    defaultImage: '/jani_heavy_vignette_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'text-reveal-modifiers',
+    title: 'Text Reveal Modifiers & Character Offset Decode',
+    category: 'Text & Titles',
+    badge: 'James Jani Signature',
+    difficulty: 'Instant',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(5, 20, 13, 0.95), rgba(6, 31, 20, 0.7), rgba(16, 185, 129, 0.35), rgba(1, 4, 2, 0.98))',
+    description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines together" text assembly for investigative tension.',
+    tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
+    defaultImage: '/jani_text_reveal_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20658,6 +20684,48 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'heavy-elliptical-vignette') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img id="fx-vignette-bg-${tplId}" src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(135%) brightness(85%); transition: transform 0.1s ease;" />
+
+          <!-- Heavy Elliptical Mask Vignette Feather Overlay -->
+          <div id="fx-vignette-mask-${tplId}" style="position: absolute; inset: 0; pointer-events: none; transition: background 0.2s ease; background: radial-gradient(ellipse 70% 55% at center, transparent 20%, rgba(2, 3, 8, 0.75) 60%, rgba(0, 0, 0, 0.98) 100%);"></div>
+
+          <!-- Central Target Reticle Indicator -->
+          <div style="position: relative; z-index: 10; border: 1px solid rgba(245,158,11,0.4); border-radius: 9999px; padding: 6px 14px; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); box-shadow: 0 0 15px rgba(245,158,11,0.3);">
+            <span style="font-family: monospace; font-size: 8px; font-weight: 800; color: #fbbf24; letter-spacing: 1.5px;">
+              FOCAL PULL // MASK: 0.70x
+            </span>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #78350f); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
+            👁️ THRILLER VIGNETTE
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'text-reveal-modifiers') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #030805; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px;">
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: contrast(150%) grayscale(100%);" />
+
+          <!-- Terminal Matrix Glitch Decode Block -->
+          <div style="position: relative; z-index: 10; background: rgba(6, 26, 17, 0.9); border: 1.5px solid rgba(16, 185, 129, 0.5); border-radius: 8px; padding: 10px 16px; text-align: center; box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);">
+            <div style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #6ee7b7; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px;">
+              CHARACTER_OFFSET_DECODE
+            </div>
+            <div id="fx-decode-text-${tplId}" style="font-family: monospace; font-size: 11px; font-weight: 900; color: #34d399; letter-spacing: 1px;">
+              DECODE LINES TOGETHER
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #064e3b); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);">
+            ⚡ TEXT DECODE FX
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20971,6 +21039,29 @@ function startTemplateHoverVideo(cardEl, tpl) {
       }
       if (shiftLayer) {
         shiftLayer.style.transform = `scale(${zoom}) translate(${shiftX}px, 0px)`;
+      }
+    } else if (tplId === 'heavy-elliptical-vignette') {
+      const pulseSize = 68 + Math.sin(t * 2) * 7;
+      const maskEl = fxContainer?.querySelector(`#fx-vignette-mask-${tplId}`);
+      const bgEl = fxContainer?.querySelector(`#fx-vignette-bg-${tplId}`);
+      if (bgEl) {
+        bgEl.style.transform = `scale(${1.03 + Math.sin(t * 1.5) * 0.02})`;
+      }
+      if (maskEl) {
+        maskEl.style.background = `radial-gradient(ellipse ${pulseSize}% ${pulseSize * 0.8}% at center, transparent 15%, rgba(2, 3, 8, 0.75) 55%, rgba(0, 0, 0, 0.98) 100%)`;
+      }
+    } else if (tplId === 'text-reveal-modifiers') {
+      const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*!';
+      const target = "DECODE LINES TOGETHER";
+      const progress = Math.floor((t * 12) % (target.length + 8));
+      const scrambled = target.split('').map((char, i) => {
+        if (char === ' ') return ' ';
+        if (i < progress) return char;
+        return glyphs[Math.floor((t * 24 + i * 5) % glyphs.length)];
+      }).join('');
+      const decodeEl = fxContainer?.querySelector(`#fx-decode-text-${tplId}`);
+      if (decodeEl) {
+        decodeEl.textContent = scrambled;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21342,6 +21433,14 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'monochromatic-crushed-grading') {
     // Launch James Jani Deep Monochromatic / Low-Saturated Grading Suite
     openMonochromeSuite();
+    return;
+  } else if (templateId === 'heavy-elliptical-vignette') {
+    // Launch James Jani Dark Financial Thriller & Heavy Vignette Suite
+    openHeavyVignetteSuite();
+    return;
+  } else if (templateId === 'text-reveal-modifiers') {
+    // Launch James Jani Text Reveal Modifiers & Character Offset Decode Suite
+    openTextRevealSuite();
     return;
   }
 
@@ -23425,6 +23524,8 @@ function initHomepageTemplateEvents() {
   bindPuzzleRevealSuiteModalControls();
   bindLightRaysSuiteModalControls();
   bindMonochromeSuiteModalControls();
+  bindHeavyVignetteSuiteModalControls();
+  bindTextRevealSuiteModalControls();
 }
 
 /* =========================================================
@@ -25964,6 +26065,557 @@ function bindMonochromeSuiteModalControls() {
     }
 
     showTextTimingAlert('Applied Deep Monochromatic Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: DARK FINANCIAL THRILLER & HEAVY VIGNETTE SUITE CONTROLLER
+   ========================================================= */
+let heavyVignetteSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 10.0,
+  maskEnabled: true,
+  maskSize: 70, // 0.70x (range 30 to 95)
+  feathering: 28, // 2.8x (range 10 to 40)
+  darknessDepth: 96, // 96% (range 40 to 100)
+  headline: 'WALL STREET DARK POOLS',
+  subcaption: 'SPECIAL FINANCIAL INVESTIGATION',
+  imageUrl: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  stockImages: [
+    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=800&auto=format&fit=crop&q=80'
+  ]
+};
+
+function updateHeavyVignetteVisualStyles() {
+  const bgImg = document.getElementById('vignette-canvas-img');
+  const maskLayer = document.getElementById('vignette-mask-layer');
+  const reticle = document.getElementById('vignette-reticle');
+  const hudStatus = document.getElementById('vignette-hud-status');
+  const hudBtnState = document.getElementById('vignette-hud-mask-state');
+
+  const headlineEl = document.getElementById('vignette-display-headline');
+  const subcaptionEl = document.getElementById('vignette-display-subcaption');
+
+  if (headlineEl) headlineEl.textContent = heavyVignetteSuiteState.headline || 'WALL STREET DARK POOLS';
+  if (subcaptionEl) subcaptionEl.textContent = heavyVignetteSuiteState.subcaption || 'SPECIAL FINANCIAL INVESTIGATION';
+
+  if (bgImg && bgImg.src !== heavyVignetteSuiteState.imageUrl) {
+    bgImg.src = heavyVignetteSuiteState.imageUrl;
+  }
+
+  const s = heavyVignetteSuiteState.maskSize; // e.g. 70 -> 70%
+  const f = (heavyVignetteSuiteState.feathering / 10).toFixed(1); // e.g. 2.8
+  const d = (heavyVignetteSuiteState.darknessDepth / 100).toFixed(2); // e.g. 0.96
+
+  if (heavyVignetteSuiteState.maskEnabled) {
+    if (maskLayer) {
+      maskLayer.style.display = 'block';
+      const innerClear = Math.max(10, Math.floor(s * 0.3));
+      const midFade = Math.min(85, Math.floor(s * 0.85));
+      maskLayer.style.background = `radial-gradient(ellipse ${s}% ${Math.floor(s * 0.8)}% at center, transparent ${innerClear}%, rgba(2, 3, 8, ${d * 0.75}) ${midFade}%, rgba(0, 0, 0, ${d}) 100%)`;
+    }
+    if (reticle) reticle.style.display = 'flex';
+    if (hudStatus) hudStatus.textContent = `ELLIPTICAL FOCAL PULL: ACTIVE (SIZE ${s / 100}x, FEATHER ${f}x)`;
+    if (hudBtnState) hudBtnState.textContent = 'ENABLED';
+  } else {
+    if (maskLayer) maskLayer.style.display = 'none';
+    if (reticle) reticle.style.display = 'none';
+    if (hudStatus) hudStatus.textContent = 'ELLIPTICAL MASK: BYPASSED';
+    if (hudBtnState) hudBtnState.textContent = 'BYPASSED';
+  }
+}
+
+function renderHeavyVignetteLoop(now) {
+  if (heavyVignetteSuiteState.isPlaying) {
+    heavyVignetteSuiteState.currentTime += 0.033;
+    if (heavyVignetteSuiteState.currentTime > heavyVignetteSuiteState.duration) {
+      heavyVignetteSuiteState.currentTime = 0;
+    }
+  }
+
+  const t = heavyVignetteSuiteState.currentTime;
+  const dur = heavyVignetteSuiteState.duration;
+  const progressRatio = (t / dur) * 100;
+
+  // Animate playhead needle
+  const playhead = document.getElementById('vignette-playhead-needle');
+  if (playhead) {
+    playhead.style.left = `${progressRatio}%`;
+  }
+
+  // Update time readouts
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+    return `${m}:${s}.${ms}`;
+  };
+
+  const timeReadout = document.getElementById('vignette-time-readout');
+  if (timeReadout) {
+    timeReadout.textContent = `${formatTime(t)} / ${formatTime(dur)}`;
+  }
+  const playheadReadout = document.getElementById('vignette-playhead-readout');
+  if (playheadReadout) {
+    playheadReadout.textContent = `PLAYHEAD: ${formatTime(t)}`;
+  }
+
+  // Slow thriller zoom push into center
+  const bgContainer = document.getElementById('vignette-bg-container');
+  if (bgContainer) {
+    const zoom = 1.05 + Math.sin(t * 0.4) * 0.04;
+    bgContainer.style.transform = `scale(${zoom})`;
+  }
+
+  // Focal reticle pulse
+  const reticle = document.getElementById('vignette-reticle');
+  if (reticle && heavyVignetteSuiteState.maskEnabled) {
+    const pulseScale = 1 + Math.sin(t * 2.5) * 0.06;
+    reticle.style.transform = `translate(-50%, -50%) scale(${pulseScale})`;
+  }
+
+  heavyVignetteSuiteState.animFrameId = requestAnimationFrame(renderHeavyVignetteLoop);
+}
+
+function openHeavyVignetteSuite() {
+  const modal = document.getElementById('modal-heavy-vignette-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  heavyVignetteSuiteState.isPlaying = true;
+  const playIcon = document.getElementById('vignette-play-icon');
+  if (playIcon) playIcon.textContent = '❚❚';
+  updateHeavyVignetteVisualStyles();
+  if (!heavyVignetteSuiteState.animFrameId) {
+    heavyVignetteSuiteState.animFrameId = requestAnimationFrame(renderHeavyVignetteLoop);
+  }
+}
+
+function closeHeavyVignetteSuite() {
+  const modal = document.getElementById('modal-heavy-vignette-suite');
+  if (modal) modal.style.display = 'none';
+  heavyVignetteSuiteState.isPlaying = false;
+  if (heavyVignetteSuiteState.animFrameId) {
+    cancelAnimationFrame(heavyVignetteSuiteState.animFrameId);
+    heavyVignetteSuiteState.animFrameId = null;
+  }
+}
+
+function bindHeavyVignetteSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-heavy-vignette-suite')?.addEventListener('click', closeHeavyVignetteSuite);
+
+  // Play / Pause toggle
+  document.getElementById('btn-vignette-play')?.addEventListener('click', () => {
+    heavyVignetteSuiteState.isPlaying = !heavyVignetteSuiteState.isPlaying;
+    const playIcon = document.getElementById('vignette-play-icon');
+    if (playIcon) {
+      playIcon.textContent = heavyVignetteSuiteState.isPlaying ? '❚❚' : '▶';
+    }
+  });
+
+  // Toggle mask enable / bypass
+  document.getElementById('btn-vignette-toggle-mask')?.addEventListener('click', () => {
+    heavyVignetteSuiteState.maskEnabled = !heavyVignetteSuiteState.maskEnabled;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Headline sync
+  document.getElementById('vignette-input-headline')?.addEventListener('input', (e) => {
+    heavyVignetteSuiteState.headline = e.target.value;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Subcaption sync
+  document.getElementById('vignette-input-subcaption')?.addEventListener('input', (e) => {
+    heavyVignetteSuiteState.subcaption = e.target.value;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Image URL input
+  document.getElementById('vignette-input-img-url')?.addEventListener('change', (e) => {
+    if (e.target.value.trim()) {
+      heavyVignetteSuiteState.imageUrl = e.target.value.trim();
+      updateHeavyVignetteVisualStyles();
+    }
+  });
+
+  // Stock shuffle button
+  document.getElementById('btn-vignette-shuffle-img')?.addEventListener('click', () => {
+    const stocks = heavyVignetteSuiteState.stockImages;
+    const current = heavyVignetteSuiteState.imageUrl;
+    const others = stocks.filter(url => url !== current);
+    const chosen = others[Math.floor(Math.random() * others.length)] || stocks[0];
+    heavyVignetteSuiteState.imageUrl = chosen;
+    const urlInput = document.getElementById('vignette-input-img-url');
+    if (urlInput) urlInput.value = chosen;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Image file upload
+  document.getElementById('vignette-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (loadEvt) => {
+        heavyVignetteSuiteState.imageUrl = loadEvt.target.result;
+        const urlInput = document.getElementById('vignette-input-img-url');
+        if (urlInput) urlInput.value = file.name;
+        updateHeavyVignetteVisualStyles();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Mask Size slider
+  document.getElementById('vignette-slider-size')?.addEventListener('input', (e) => {
+    heavyVignetteSuiteState.maskSize = parseInt(e.target.value) || 70;
+    const lbl = document.getElementById('vignette-val-size');
+    if (lbl) lbl.textContent = `${(heavyVignetteSuiteState.maskSize / 100).toFixed(2)}x`;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Feathering slider
+  document.getElementById('vignette-slider-feather')?.addEventListener('input', (e) => {
+    heavyVignetteSuiteState.feathering = parseInt(e.target.value) || 28;
+    const lbl = document.getElementById('vignette-val-feather');
+    if (lbl) lbl.textContent = `${(heavyVignetteSuiteState.feathering / 10).toFixed(1)}x`;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Darkness Depth slider
+  document.getElementById('vignette-slider-darkness')?.addEventListener('input', (e) => {
+    heavyVignetteSuiteState.darknessDepth = parseInt(e.target.value) || 96;
+    const lbl = document.getElementById('vignette-val-darkness');
+    if (lbl) lbl.textContent = `${heavyVignetteSuiteState.darknessDepth}%`;
+    updateHeavyVignetteVisualStyles();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-vignette-apply-timeline')?.addEventListener('click', () => {
+    closeHeavyVignetteSuite();
+    switchStudioView('editor');
+
+    const footageClip = {
+      id: `img-vignette-${Date.now()}`,
+      name: 'Dark_Financial_Thriller_Scene.jpg',
+      url: heavyVignetteSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    const headlineClip = {
+      id: `txt-vignette-headline-${Date.now() + 1}`,
+      text: heavyVignetteSuiteState.headline,
+      highlight: heavyVignetteSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'pop',
+      fontSize: 54,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-vignette-sub-${Date.now() + 2}`,
+      text: heavyVignetteSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#fbbf24',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [footageClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Dark Financial Thriller Vignette Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: TEXT REVEAL MODIFIERS & CHARACTER OFFSET DECODE SUITE CONTROLLER
+   ========================================================= */
+let textRevealSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 8.0,
+  showCursor: true,
+  decodeSpeed: 12, // characters decoded per second
+  chaosPercentage: 80, // % random character glyphs
+  headline: 'DECODE LINES TOGETHER',
+  subcaption: 'SYSTEM PROTOCOL // DECODE',
+  imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  glyphs: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&*!<>/{}[];:',
+  stockImages: [
+    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1510519138195-068d82f0f48f?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&auto=format&fit=crop&q=80'
+  ]
+};
+
+function updateTextRevealVisualStyles() {
+  const bgImg = document.getElementById('text-decode-canvas-img');
+  const subcaptionEl = document.getElementById('text-decode-display-subcaption');
+  const cursorElem = document.getElementById('text-decode-cursor-elem');
+  const hudCursorState = document.getElementById('text-decode-hud-cursor-state');
+
+  if (subcaptionEl) subcaptionEl.textContent = textRevealSuiteState.subcaption || 'SYSTEM PROTOCOL // DECODE';
+
+  if (bgImg && bgImg.src !== textRevealSuiteState.imageUrl) {
+    bgImg.src = textRevealSuiteState.imageUrl;
+  }
+
+  if (cursorElem) {
+    cursorElem.style.display = textRevealSuiteState.showCursor ? 'inline-block' : 'none';
+  }
+  if (hudCursorState) {
+    hudCursorState.textContent = textRevealSuiteState.showCursor ? 'ON' : 'OFF';
+  }
+}
+
+function renderTextRevealLoop(now) {
+  if (textRevealSuiteState.isPlaying) {
+    textRevealSuiteState.currentTime += 0.033;
+    if (textRevealSuiteState.currentTime > textRevealSuiteState.duration) {
+      textRevealSuiteState.currentTime = 0;
+    }
+  }
+
+  const t = textRevealSuiteState.currentTime;
+  const dur = textRevealSuiteState.duration;
+  const progressRatio = (t / dur) * 100;
+
+  // Playhead needle
+  const playhead = document.getElementById('text-decode-playhead-needle');
+  if (playhead) {
+    playhead.style.left = `${progressRatio}%`;
+  }
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+    return `${m}:${s}.${ms}`;
+  };
+
+  const timeReadout = document.getElementById('text-decode-time-readout');
+  if (timeReadout) {
+    timeReadout.textContent = `${formatTime(t)} / ${formatTime(dur)}`;
+  }
+  const playheadReadout = document.getElementById('text-decode-playhead-readout');
+  if (playheadReadout) {
+    playheadReadout.textContent = `PLAYHEAD: ${formatTime(t)}`;
+  }
+
+  // Character Offset Scramble Decode Animation
+  const targetText = textRevealSuiteState.headline || 'DECODE LINES TOGETHER';
+  const speed = textRevealSuiteState.decodeSpeed; // e.g. 12
+  const charsRevealed = Math.floor(t * speed);
+  const glyphs = textRevealSuiteState.glyphs;
+
+  const scrambled = targetText.split('').map((char, index) => {
+    if (char === ' ') return ' ';
+    if (index < charsRevealed) {
+      return char;
+    }
+    // Randomized glyph based on chaos %
+    const chaosChance = textRevealSuiteState.chaosPercentage / 100;
+    if (Math.random() < chaosChance) {
+      const glyphIndex = Math.floor((t * 30 + index * 7) % glyphs.length);
+      return glyphs[glyphIndex];
+    }
+    return char;
+  }).join('');
+
+  const scrambleEl = document.getElementById('text-decode-scrambled-text');
+  if (scrambleEl) {
+    scrambleEl.textContent = scrambled;
+  }
+
+  // Subtle background zoom
+  const bgContainer = document.getElementById('text-decode-bg-container');
+  if (bgContainer) {
+    const zoom = 1.02 + Math.sin(t * 0.3) * 0.03;
+    bgContainer.style.transform = `scale(${zoom})`;
+  }
+
+  textRevealSuiteState.animFrameId = requestAnimationFrame(renderTextRevealLoop);
+}
+
+function openTextRevealSuite() {
+  const modal = document.getElementById('modal-text-reveal-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  textRevealSuiteState.isPlaying = true;
+  const playIcon = document.getElementById('text-decode-play-icon');
+  if (playIcon) playIcon.textContent = '❚❚';
+  updateTextRevealVisualStyles();
+  if (!textRevealSuiteState.animFrameId) {
+    textRevealSuiteState.animFrameId = requestAnimationFrame(renderTextRevealLoop);
+  }
+}
+
+function closeTextRevealSuite() {
+  const modal = document.getElementById('modal-text-reveal-suite');
+  if (modal) modal.style.display = 'none';
+  textRevealSuiteState.isPlaying = false;
+  if (textRevealSuiteState.animFrameId) {
+    cancelAnimationFrame(textRevealSuiteState.animFrameId);
+    textRevealSuiteState.animFrameId = null;
+  }
+}
+
+function bindTextRevealSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-text-reveal-suite')?.addEventListener('click', closeTextRevealSuite);
+
+  // Play / Pause toggle
+  document.getElementById('btn-text-decode-play')?.addEventListener('click', () => {
+    textRevealSuiteState.isPlaying = !textRevealSuiteState.isPlaying;
+    const playIcon = document.getElementById('text-decode-play-icon');
+    if (playIcon) {
+      playIcon.textContent = textRevealSuiteState.isPlaying ? '❚❚' : '▶';
+    }
+  });
+
+  // Toggle cursor
+  document.getElementById('btn-text-decode-toggle-cursor')?.addEventListener('click', () => {
+    textRevealSuiteState.showCursor = !textRevealSuiteState.showCursor;
+    updateTextRevealVisualStyles();
+  });
+
+  // Headline sync
+  document.getElementById('text-decode-input-headline')?.addEventListener('input', (e) => {
+    textRevealSuiteState.headline = e.target.value;
+  });
+
+  // Subcaption sync
+  document.getElementById('text-decode-input-subcaption')?.addEventListener('input', (e) => {
+    textRevealSuiteState.subcaption = e.target.value;
+    updateTextRevealVisualStyles();
+  });
+
+  // Image URL input
+  document.getElementById('text-decode-input-img-url')?.addEventListener('change', (e) => {
+    if (e.target.value.trim()) {
+      textRevealSuiteState.imageUrl = e.target.value.trim();
+      updateTextRevealVisualStyles();
+    }
+  });
+
+  // Stock shuffle button
+  document.getElementById('btn-text-decode-shuffle-img')?.addEventListener('click', () => {
+    const stocks = textRevealSuiteState.stockImages;
+    const current = textRevealSuiteState.imageUrl;
+    const others = stocks.filter(url => url !== current);
+    const chosen = others[Math.floor(Math.random() * others.length)] || stocks[0];
+    textRevealSuiteState.imageUrl = chosen;
+    const urlInput = document.getElementById('text-decode-input-img-url');
+    if (urlInput) urlInput.value = chosen;
+    updateTextRevealVisualStyles();
+  });
+
+  // Image file upload
+  document.getElementById('text-decode-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (loadEvt) => {
+        textRevealSuiteState.imageUrl = loadEvt.target.result;
+        const urlInput = document.getElementById('text-decode-input-img-url');
+        if (urlInput) urlInput.value = file.name;
+        updateTextRevealVisualStyles();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Speed slider
+  document.getElementById('text-decode-slider-speed')?.addEventListener('input', (e) => {
+    textRevealSuiteState.decodeSpeed = parseInt(e.target.value) || 12;
+    const lbl = document.getElementById('text-decode-val-speed');
+    if (lbl) lbl.textContent = `${textRevealSuiteState.decodeSpeed} ch/s`;
+  });
+
+  // Chaos slider
+  document.getElementById('text-decode-slider-chaos')?.addEventListener('input', (e) => {
+    textRevealSuiteState.chaosPercentage = parseInt(e.target.value) || 80;
+    const lbl = document.getElementById('text-decode-val-chaos');
+    if (lbl) lbl.textContent = `${textRevealSuiteState.chaosPercentage}%`;
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-text-decode-apply-timeline')?.addEventListener('click', () => {
+    closeTextRevealSuite();
+    switchStudioView('editor');
+
+    const footageClip = {
+      id: `img-decode-${Date.now()}`,
+      name: 'Terminal_Investigative_Backdrop.jpg',
+      url: textRevealSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    const headlineClip = {
+      id: `txt-decode-headline-${Date.now() + 1}`,
+      text: textRevealSuiteState.headline,
+      highlight: textRevealSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#10b981',
+      anim: 'typewriter',
+      fontSize: 56,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-decode-sub-${Date.now() + 2}`,
+      text: textRevealSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#34d399',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [footageClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Text Reveal Modifier Suite to timeline!', 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }

@@ -4881,6 +4881,385 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       JAMES JANI FX ENGINE: DARK FINANCIAL THRILLER & HEAVY VIGNETTE SUITE
+       ========================================================= -->
+  <div id="modal-heavy-vignette-suite" class="vector-export-modal" style="display: none; z-index: 99999; backdrop-filter: blur(14px); background: rgba(5, 5, 8, 0.94);">
+    <div class="vector-modal-box" style="width: 96vw; max-width: 1440px; height: 92vh; max-height: 920px; display: flex; flex-direction: column; background: #0c0d12; border: 1px solid rgba(245, 158, 11, 0.45); border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(245, 158, 11, 0.2);">
+      
+      <!-- Top Studio Header -->
+      <div style="height: 56px; padding: 0 20px; background: rgba(18, 19, 28, 0.96); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #f59e0b, #78350f); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);">
+            <span style="font-size: 16px;">🎬</span>
+          </div>
+          <div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+              <span>REGAARDER STUDIO</span>
+              <span style="font-size: 10px; padding: 1px 7px; border-radius: 4px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; font-family: monospace;">FINANCIAL THRILLER VIGNETTE</span>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">Heavy Feathered Elliptical Mask, Edge Darkening &amp; Center Focal Pull</div>
+          </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" id="btn-vignette-toggle-mask" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 7px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>👁</span> Mask: <span id="vignette-hud-mask-state">ENABLED</span>
+          </button>
+          <button type="button" id="btn-vignette-apply-timeline" style="padding: 6px 14px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-weight: 800; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Apply To Timeline</span>
+          </button>
+          <button type="button" id="btn-close-heavy-vignette-suite" style="background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 2px 8px; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Main Workspace -->
+      <div style="display: flex; flex: 1; min-height: 0; overflow: hidden; position: relative;">
+        
+        <!-- Left Stage / Video Viewport (65%) -->
+        <div style="flex: 1; display: flex; flex-direction: column; background: #0a0b0e; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.08);">
+          
+          <!-- Screen Frame -->
+          <div style="flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div id="vignette-stage-frame" style="position: relative; width: 100%; max-width: 860px; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(245,158,11,0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.95);">
+              
+              <!-- Background Image Layer -->
+              <div id="vignette-bg-container" style="position: absolute; inset: 0; transition: transform 0.08s ease-out;">
+                <img id="vignette-canvas-img" src="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80" alt="Financial Thriller Scene" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(135%) brightness(85%);" />
+              </div>
+
+              <!-- Heavy Feathered Elliptical Mask Overlay -->
+              <div id="vignette-mask-layer" style="position: absolute; inset: 0; pointer-events: none; transition: background 0.1s ease; background: radial-gradient(ellipse 70% 55% at center, transparent 20%, rgba(2, 3, 8, 0.75) 60%, rgba(0, 0, 0, 0.98) 100%);"></div>
+
+              <!-- Center Focal Target Reticle -->
+              <div id="vignette-reticle" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); pointer-events: none; width: 140px; height: 140px; border: 1px dashed rgba(245,158,11,0.4); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 30px rgba(245,158,11,0.15);">
+                <div style="width: 8px; height: 8px; border-radius: 50%; background: #fbbf24; box-shadow: 0 0 10px #fbbf24;"></div>
+              </div>
+
+              <!-- Center Title Plate Layer -->
+              <div id="vignette-title-plate" style="position: absolute; z-index: 15; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(8,10,15,0.85); border: 1.5px solid rgba(245,158,11,0.5); border-radius: 10px; padding: 18px 28px; text-align: center; backdrop-filter: blur(10px); box-shadow: 0 20px 45px rgba(0,0,0,0.95); width: 85%; max-width: 480px;">
+                <span id="vignette-display-subcaption" style="font-family: monospace; font-size: 9.5px; font-weight: 800; color: #fbbf24; letter-spacing: 2.5px; text-transform: uppercase; display: block; margin-bottom: 4px;">
+                  SPECIAL FINANCIAL INVESTIGATION
+                </span>
+                <h2 id="vignette-display-headline" style="font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 900; color: #ffffff; margin: 0; text-transform: uppercase; letter-spacing: 1.5px;">
+                  WALL STREET DARK POOLS
+                </h2>
+                <div style="height: 2px; background: linear-gradient(90deg, transparent, #f59e0b, transparent); margin: 8px auto 0 auto; width: 80%;"></div>
+              </div>
+
+              <!-- Live HUD Badge -->
+              <div style="position: absolute; top: 12px; left: 14px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; font-family: monospace; font-size: 9.5px; color: #e4e4e7; pointer-events: none; z-index: 20;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b;"></span>
+                <span id="vignette-hud-status">ELLIPTICAL FOCAL PULL: ACTIVE</span>
+              </div>
+
+              <!-- Floating Transport Readout Overlay -->
+              <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: rgba(18,19,28,0.9); backdrop-filter: blur(10px); padding: 5px 16px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.12); z-index: 25;">
+                <button type="button" id="btn-vignette-play" style="width: 28px; height: 28px; border-radius: 50%; background: #d97706; color: #fff; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                  <span id="vignette-play-icon" style="font-size: 10px; margin-left: 1px;">▶</span>
+                </button>
+                <span style="font-family: monospace; font-size: 11px; color: #cbd5e1;" id="vignette-time-readout">00:01.40 / 00:10.00</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Multi-Track Scrubbing Timeline -->
+          <div style="height: 105px; background: #12131c; border-top: 1px solid rgba(255,255,255,0.08); padding: 10px 18px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; color: #94a3b8;">
+              <span>VIGNETTE ADJUSTMENT CLIP TIMELINE</span>
+              <span style="font-family: monospace; color: #fbbf24;" id="vignette-playhead-readout">PLAYHEAD: 00:01.40</span>
+            </div>
+
+            <div style="position: relative; width: 100%; height: 62px; background: #0c0d12; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; padding: 4px; display: flex; flex-direction: column; gap: 4px;">
+              <!-- Playhead needle -->
+              <div id="vignette-playhead-needle" style="position: absolute; top: 0; bottom: 0; width: 2px; background: #f59e0b; z-index: 20; left: 14%; pointer-events: none; box-shadow: 0 0 6px #f59e0b;"></div>
+
+              <!-- Track 1: Heavy Feathered Elliptical Mask Track -->
+              <div style="display: flex; align-items: center; height: 25px; gap: 6px;">
+                <div style="width: 130px; font-size: 9px; font-weight: 800; color: #fbbf24; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); border-radius: 4px; padding: 2px 6px; text-align: center;">
+                  ELLIPTICAL MASK
+                </div>
+                <div style="flex: 1; height: 100%; background: rgba(255,255,255,0.03); border-radius: 4px; position: relative;">
+                  <div style="position: absolute; inset: 2px; background: linear-gradient(90deg, rgba(30,20,5,0.7), rgba(120,53,15,0.5), rgba(245,158,11,0.25)); border: 1px solid #f59e0b; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-family: monospace; font-weight: 700; color: #fde68a;">
+                    ADJUSTMENT CLIP (FEATHER: 2.8X)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Track 2: Center Focal Narrative Track -->
+              <div style="display: flex; align-items: center; height: 25px; gap: 6px;">
+                <div style="width: 130px; font-size: 9px; font-weight: 800; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); border-radius: 4px; padding: 2px 6px; text-align: center;">
+                  FOCAL PULL TEXT
+                </div>
+                <div style="flex: 1; height: 100%; background: rgba(255,255,255,0.03); border-radius: 4px; position: relative;">
+                  <div style="position: absolute; left: 8%; width: 84%; top: 2px; bottom: 2px; background: rgba(56,189,248,0.25); border: 1px solid #38bdf8; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-family: monospace; font-weight: 700; color: #e0f2fe;">
+                    CENTER TITLE &amp; EXPOSURE LOCK
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Inspector Controls (35%) -->
+        <div style="width: 380px; background: #12131c; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0;">
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <span style="font-size: 11.5px; font-weight: 800; color: #ffffff; text-transform: uppercase; font-family: monospace; display: flex; align-items: center; gap: 6px;">
+              <span style="color: #f59e0b;">🎬</span> Financial Thriller Controls
+            </span>
+            <span style="font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(245,158,11,0.15); color: #fbbf24; font-family: monospace;">JAMES JANI FX</span>
+          </div>
+
+          <!-- Text Editing Block -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Edit Headline &amp; Tagline</span>
+              <span style="font-size: 9.5px; color: #f59e0b; font-family: monospace;">LIVE SYNC</span>
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Headline Text</label>
+              <input type="text" id="vignette-input-headline" value="WALL STREET DARK POOLS" style="width: 100%; background: #0c0d12; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Subcaption Tagline</label>
+              <input type="text" id="vignette-input-subcaption" value="SPECIAL FINANCIAL INVESTIGATION" style="width: 100%; background: #0c0d12; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+            </div>
+          </div>
+
+          <!-- Image Editing & Upload Block -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>🖼 Background Footage Scene</span>
+              <label for="vignette-upload-file-input" style="font-size: 10px; color: #fbbf24; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                <span>📁 Upload Image</span>
+              </label>
+              <input type="file" id="vignette-upload-file-input" accept="image/*" style="display: none;" />
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="vignette-input-img-url" placeholder="Paste image URL..." value="https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80" style="flex: 1; background: #0c0d12; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              <button type="button" id="btn-vignette-shuffle-img" style="padding: 6px 10px; font-size: 10px; border-radius: 6px; background: #181926; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                🎲 Stock
+              </button>
+            </div>
+          </div>
+
+          <!-- Sliders: Mask Size Constraint, Edge Feathering, Darkness Depth -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px;">
+              <span style="color: #cbd5e1;">Elliptical Mask Size Constraint</span>
+              <span id="vignette-val-size" style="font-family: monospace; color: #fbbf24;">0.70x</span>
+            </div>
+            <input type="range" id="vignette-slider-size" min="30" max="95" value="70" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Edge Feathering Multiplier</span>
+              <span id="vignette-val-feather" style="font-family: monospace; color: #fbbf24;">2.8x</span>
+            </div>
+            <input type="range" id="vignette-slider-feather" min="10" max="40" value="28" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Outer Darkness Depth</span>
+              <span id="vignette-val-darkness" style="font-family: monospace; color: #fbbf24;">96%</span>
+            </div>
+            <input type="range" id="vignette-slider-darkness" min="40" max="100" value="96" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       JAMES JANI FX ENGINE: TEXT REVEAL MODIFIERS & CHARACTER OFFSET DECODE SUITE
+       ========================================================= -->
+  <div id="modal-text-reveal-suite" class="vector-export-modal" style="display: none; z-index: 99999; backdrop-filter: blur(14px); background: rgba(5, 5, 8, 0.94);">
+    <div class="vector-modal-box" style="width: 96vw; max-width: 1440px; height: 92vh; max-height: 920px; display: flex; flex-direction: column; background: #0c0d12; border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(16, 185, 129, 0.2);">
+      
+      <!-- Top Studio Header -->
+      <div style="height: 56px; padding: 0 20px; background: rgba(18, 19, 28, 0.96); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #10b981, #064e3b); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+            <span style="font-size: 16px;">💻</span>
+          </div>
+          <div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 13.5px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px;">
+              <span>REGAARDER STUDIO</span>
+              <span style="font-size: 10px; padding: 1px 7px; border-radius: 4px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-family: monospace;">TEXT REVEAL MODIFIERS</span>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">Character Offset Decode, Typewriter Cursor &amp; Assembly Tension</div>
+          </div>
+        </div>
+
+        <!-- Header Actions -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" id="btn-text-decode-toggle-cursor" style="padding: 6px 12px; font-size: 11px; font-weight: 700; border-radius: 7px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>▋</span> Cursor: <span id="text-decode-hud-cursor-state">ON</span>
+          </button>
+          <button type="button" id="btn-text-decode-apply-timeline" style="padding: 6px 14px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Apply To Timeline</span>
+          </button>
+          <button type="button" id="btn-close-text-reveal-suite" style="background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 2px 8px; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Main Workspace -->
+      <div style="display: flex; flex: 1; min-height: 0; overflow: hidden; position: relative;">
+        
+        <!-- Left Stage / Video Viewport (65%) -->
+        <div style="flex: 1; display: flex; flex-direction: column; background: #060b08; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.08);">
+          
+          <!-- Screen Frame -->
+          <div style="flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div id="text-decode-stage-frame" style="position: relative; width: 100%; max-width: 860px; aspect-ratio: 16/9; background: #020704; border-radius: 12px; overflow: hidden; border: 1px solid rgba(16,185,129,0.3); box-shadow: 0 20px 50px rgba(0,0,0,0.95);">
+              
+              <!-- Background Image Layer -->
+              <div id="text-decode-bg-container" style="position: absolute; inset: 0; transition: transform 0.08s ease-out;">
+                <img id="text-decode-canvas-img" src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80" alt="Investigative Cyber Scene" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.22; filter: contrast(160%) grayscale(100%);" />
+              </div>
+
+              <!-- Matrix Scanlines & Grid Overlay Layer -->
+              <div style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(16, 185, 129, 0.04) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 100% 4px, 40px 100%;"></div>
+
+              <!-- Center Terminal Decode Plate -->
+              <div id="text-decode-plate" style="position: absolute; z-index: 15; left: 50%; top: 50%; transform: translate(-50%, -50%); background: rgba(5,18,12,0.92); border: 1.5px solid rgba(16,185,129,0.6); border-radius: 12px; padding: 24px 34px; text-align: center; backdrop-filter: blur(12px); box-shadow: 0 20px 50px rgba(0,0,0,0.95), 0 0 30px rgba(16,185,129,0.25); width: 88%; max-width: 520px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 8px;">
+                  <span style="width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 1.5s infinite;"></span>
+                  <span id="text-decode-display-subcaption" style="font-family: monospace; font-size: 10px; font-weight: 800; color: #6ee7b7; letter-spacing: 2px; text-transform: uppercase;">
+                    SYSTEM PROTOCOL // DECODE
+                  </span>
+                </div>
+                <h2 id="text-decode-display-headline" style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 26px; font-weight: 900; color: #34d399; margin: 0; text-transform: uppercase; letter-spacing: 2px; min-height: 38px; display: flex; align-items: center; justify-content: center;">
+                  <span id="text-decode-scrambled-text">DECODE LINES TOGETHER</span>
+                  <span id="text-decode-cursor-elem" style="color: #10b981; margin-left: 4px; animation: blink 0.8s infinite;">▋</span>
+                </h2>
+                <div style="height: 2px; background: linear-gradient(90deg, transparent, #10b981, transparent); margin: 12px auto 0 auto; width: 75%;"></div>
+              </div>
+
+              <!-- Live HUD Badge -->
+              <div style="position: absolute; top: 12px; left: 14px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(16,185,129,0.3); padding: 4px 10px; border-radius: 20px; font-family: monospace; font-size: 9.5px; color: #6ee7b7; pointer-events: none; z-index: 20;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
+                <span id="text-decode-hud-status">GLYPH RANDOMIZER: SYNCED</span>
+              </div>
+
+              <!-- Floating Transport Readout Overlay -->
+              <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: rgba(18,19,28,0.9); backdrop-filter: blur(10px); padding: 5px 16px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.12); z-index: 25;">
+                <button type="button" id="btn-text-decode-play" style="width: 28px; height: 28px; border-radius: 50%; background: #059669; color: #fff; font-weight: 900; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                  <span id="text-decode-play-icon" style="font-size: 10px; margin-left: 1px;">▶</span>
+                </button>
+                <span style="font-family: monospace; font-size: 11px; color: #cbd5e1;" id="text-decode-time-readout">00:01.40 / 00:08.00</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Multi-Track Scrubbing Timeline -->
+          <div style="height: 105px; background: #12131c; border-top: 1px solid rgba(255,255,255,0.08); padding: 10px 18px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; color: #94a3b8;">
+              <span>TEXT DECODE MODIFIER TIMELINE</span>
+              <span style="font-family: monospace; color: #34d399;" id="text-decode-playhead-readout">PLAYHEAD: 00:01.40</span>
+            </div>
+
+            <div style="position: relative; width: 100%; height: 62px; background: #0c0d12; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; padding: 4px; display: flex; flex-direction: column; gap: 4px;">
+              <!-- Playhead needle -->
+              <div id="text-decode-playhead-needle" style="position: absolute; top: 0; bottom: 0; width: 2px; background: #10b981; z-index: 20; left: 17%; pointer-events: none; box-shadow: 0 0 6px #10b981;"></div>
+
+              <!-- Track 1: Glitch Character Decode Track -->
+              <div style="display: flex; align-items: center; height: 25px; gap: 6px;">
+                <div style="width: 140px; font-size: 8.5px; font-weight: 800; color: #34d399; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); border-radius: 4px; padding: 2px 6px; text-align: center;">
+                  CHARACTER OFFSET DECODE
+                </div>
+                <div style="flex: 1; height: 100%; background: rgba(255,255,255,0.03); border-radius: 4px; position: relative;">
+                  <div style="position: absolute; inset: 2px; background: linear-gradient(90deg, rgba(6,78,59,0.6), rgba(16,185,129,0.4), rgba(5,150,105,0.2)); border: 1px solid #10b981; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-family: monospace; font-weight: 700; color: #a7f3d0;">
+                    OFFSET SCRAMBLE &rarr; STABILIZE
+                  </div>
+                </div>
+              </div>
+
+              <!-- Track 2: Typewriter Cursor Track -->
+              <div style="display: flex; align-items: center; height: 25px; gap: 6px;">
+                <div style="width: 140px; font-size: 8.5px; font-weight: 800; color: #6ee7b7; background: rgba(110,231,183,0.15); border: 1px solid rgba(110,231,183,0.3); border-radius: 4px; padding: 2px 6px; text-align: center;">
+                  TYPEWRITER CURSOR
+                </div>
+                <div style="flex: 1; height: 100%; background: rgba(255,255,255,0.03); border-radius: 4px; position: relative;">
+                  <div style="position: absolute; left: 0%; width: 70%; top: 2px; bottom: 2px; background: rgba(110,231,183,0.25); border: 1px solid #6ee7b7; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-family: monospace; font-weight: 700; color: #ecfdf5;">
+                    BLINKING BLOCK CARET
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Inspector Controls (35%) -->
+        <div style="width: 380px; background: #12131c; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0;">
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <span style="font-size: 11.5px; font-weight: 800; color: #ffffff; text-transform: uppercase; font-family: monospace; display: flex; align-items: center; gap: 6px;">
+              <span style="color: #10b981;">💻</span> Text Decode Inspector
+            </span>
+            <span style="font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(16,185,129,0.15); color: #34d399; font-family: monospace;">JAMES JANI FX</span>
+          </div>
+
+          <!-- Text Editing Block -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Target Text &amp; Subcaption</span>
+              <span style="font-size: 9.5px; color: #10b981; font-family: monospace;">LIVE SYNC</span>
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Target Decoded Headline</label>
+              <input type="text" id="text-decode-input-headline" value="DECODE LINES TOGETHER" style="width: 100%; background: #0c0d12; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Subcaption / Protocol</label>
+              <input type="text" id="text-decode-input-subcaption" value="SYSTEM PROTOCOL // DECODE" style="width: 100%; background: #0c0d12; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+            </div>
+          </div>
+
+          <!-- Image Editing & Upload Block -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>🖼 Background Ambience Footage</span>
+              <label for="text-decode-upload-file-input" style="font-size: 10px; color: #34d399; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                <span>📁 Upload Image</span>
+              </label>
+              <input type="file" id="text-decode-upload-file-input" accept="image/*" style="display: none;" />
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="text-decode-input-img-url" placeholder="Paste image URL..." value="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80" style="flex: 1; background: #0c0d12; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              <button type="button" id="btn-text-decode-shuffle-img" style="padding: 6px 10px; font-size: 10px; border-radius: 6px; background: #181926; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                🎲 Stock
+              </button>
+            </div>
+          </div>
+
+          <!-- Sliders: Glitch Decode Speed, Character Offset Chaos, Cursor Toggle -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px;">
+              <span style="color: #cbd5e1;">Glitch Decode Speed</span>
+              <span id="text-decode-val-speed" style="font-family: monospace; color: #34d399;">12 ch/s</span>
+            </div>
+            <input type="range" id="text-decode-slider-speed" min="4" max="30" value="12" style="width: 100%; accent-color: #10b981; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Character Offset Chaos</span>
+              <span id="text-decode-val-chaos" style="font-family: monospace; color: #34d399;">80%</span>
+            </div>
+            <input type="range" id="text-decode-slider-chaos" min="10" max="100" value="80" style="width: 100%; accent-color: #10b981; cursor: pointer;" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Animated Chart Creator / Template Builder Modal -->
   <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
     <div class="vector-modal-box" style="max-width: 680px;">
@@ -5853,6 +6232,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=284"></script>
+  <script src="js/app.js?v=285"></script>
 </body>
 </html>
