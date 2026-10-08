@@ -22413,6 +22413,11 @@ let topCustomizerState = {
   depth: 65,
   duration: 6,
   isPlaying: true,
+  bgRemoved: true,
+  hasTextBehind: true,
+  textBehindContent: 'MAGNATES',
+  textBehindColor: '#ff334b',
+  layerOrder: 'front', // 'front' or 'back'
   animId: null,
   startTime: 0
 };
@@ -22425,6 +22430,11 @@ function openTopTemplateCustomizer(tpl) {
   topCustomizerState.depth = 65;
   topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
   topCustomizerState.isPlaying = true;
+  topCustomizerState.bgRemoved = tpl.id.includes('parallax') || tpl.id.includes('cutout');
+  topCustomizerState.hasTextBehind = tpl.id === 'magnates-paper-vector-cutout';
+  topCustomizerState.textBehindContent = 'MAGNATES';
+  topCustomizerState.textBehindColor = '#ff334b';
+  topCustomizerState.layerOrder = 'front';
 
   const modal = document.getElementById('modal-top-template-customizer');
   if (!modal) return;
@@ -22469,7 +22479,10 @@ function openTopTemplateCustomizer(tpl) {
     if (wrapSec) wrapSec.style.display = 'flex';
   }
 
-  // 3. Populate Sliders
+  // 3. Update Action button visual states
+  updateModalActionButtonsState();
+
+  // 4. Populate Sliders
   const sliderDepth = document.getElementById('tpl-modal-slider-depth');
   const valDepth = document.getElementById('tpl-modal-val-depth');
   if (sliderDepth) sliderDepth.value = topCustomizerState.depth;
@@ -22480,17 +22493,48 @@ function openTopTemplateCustomizer(tpl) {
   if (sliderDur) sliderDur.value = topCustomizerState.duration;
   if (valDur) valDur.textContent = `${topCustomizerState.duration} sec`;
 
-  // 4. Show modal
+  // 5. Show modal
   modal.style.display = 'flex';
 
-  // 5. Start live stage animation
+  // 6. Start live stage animation
   renderTopTemplatePreviewStage();
   startTopCustomizerLoop();
+}
+
+function updateModalActionButtonsState() {
+  const rmBtn = document.getElementById('btn-modal-action-remove-bg');
+  const rmLabel = document.getElementById('label-modal-action-remove-bg');
+  if (rmBtn && rmLabel) {
+    if (topCustomizerState.bgRemoved) {
+      rmBtn.style.background = 'rgba(168,85,247,0.35)';
+      rmBtn.style.borderColor = '#c084fc';
+      rmLabel.textContent = '✓ BG Removed';
+    } else {
+      rmBtn.style.background = 'rgba(147,51,234,0.18)';
+      rmBtn.style.borderColor = 'rgba(168,85,247,0.4)';
+      rmLabel.textContent = 'Remove Background';
+    }
+  }
+
+  const kineticBtn = document.getElementById('btn-modal-action-kinetic-text');
+  const kineticPanel = document.getElementById('modal-kinetic-text-panel');
+  if (kineticBtn && kineticPanel) {
+    if (topCustomizerState.hasTextBehind) {
+      kineticBtn.style.background = 'rgba(239,68,68,0.3)';
+      kineticBtn.style.borderColor = '#ef4444';
+      kineticPanel.style.display = 'flex';
+    } else {
+      kineticBtn.style.background = 'rgba(239,68,68,0.15)';
+      kineticBtn.style.borderColor = 'rgba(239,68,68,0.4)';
+      kineticPanel.style.display = 'none';
+    }
+  }
 }
 
 function closeTopTemplateCustomizer() {
   const modal = document.getElementById('modal-top-template-customizer');
   if (modal) modal.style.display = 'none';
+  hideModalStageContextMenu();
   if (topCustomizerState.animId) {
     cancelAnimationFrame(topCustomizerState.animId);
     topCustomizerState.animId = null;
@@ -22504,55 +22548,86 @@ function renderTopTemplatePreviewStage() {
   const prim = topCustomizerState.primaryUrl;
   const sec = topCustomizerState.secondaryUrl;
 
+  const subjectFilter = topCustomizerState.bgRemoved
+    ? 'drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4))'
+    : 'none';
+  const subjectBorder = topCustomizerState.bgRemoved
+    ? 'none'
+    : '2px solid rgba(255,255,255,0.2)';
+  const subjectZ = topCustomizerState.layerOrder === 'front' ? 4 : 1;
+  const textZ = 2;
+
+  const textBehindHtml = topCustomizerState.hasTextBehind ? `
+    <div id="customizer-live-text-behind" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: ${textZ};">
+      <span style="font-family: Impact, sans-serif; font-size: 52px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.9); line-height: 0.95;">
+        ${topCustomizerState.textBehindContent || 'MAGNATES'}
+      </span>
+      <span style="font-family: Impact, sans-serif; font-size: 34px; font-weight: 900; color: ${topCustomizerState.textBehindColor || '#ff334b'}; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,51,75,0.6); line-height: 0.95;">
+        EXPOSED
+      </span>
+    </div>
+  ` : '';
+
   if (tplId === 'subject-25d-parallax') {
     stage.innerHTML = `
-      <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: crosshair;">
         <img id="customizer-live-bg" src="${sec}" alt="Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75); transform: scale(1.15);" />
-        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+        ${textBehindHtml}
+        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ};">
           <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
-            <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4));" />
+            <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: ${subjectFilter}; border: ${subjectBorder}; border-radius: 8px;" />
           </div>
         </div>
       </div>
     `;
   } else if (tplId === 'paper-rip-shred') {
     stage.innerHTML = `
-      <div style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
         <img src="${sec}" alt="Revealed" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
-        <div id="customizer-live-rip" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.95);">
+        ${textBehindHtml}
+        <div id="customizer-live-rip" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.95); z-index: ${subjectZ};">
           <img src="${prim}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
         </div>
       </div>
     `;
   } else if (tplId === 'gold-frame-spin') {
     stage.innerHTML = `
-      <div style="position: absolute; inset: 0; background: #090807; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden;">
-        <div id="customizer-live-frame" style="position: relative; width: 82%; height: 82%; border-radius: 8px; overflow: hidden; border: 4px solid rgba(245, 158, 11, 0.95); box-shadow: 0 20px 45px rgba(0,0,0,0.95);">
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #090807; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden; cursor: crosshair;">
+        ${textBehindHtml}
+        <div id="customizer-live-frame" style="position: relative; width: 82%; height: 82%; border-radius: 8px; overflow: hidden; border: 4px solid rgba(245, 158, 11, 0.95); box-shadow: 0 20px 45px rgba(0,0,0,0.95); z-index: ${subjectZ};">
           <img src="${prim}" alt="Framed" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.3) contrast(1.2);" />
         </div>
       </div>
     `;
   } else if (tplId === 'magnates-paper-vector-cutout') {
     stage.innerHTML = `
-      <div style="position: absolute; inset: 0; background: #08090d; overflow: hidden;">
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #08090d; overflow: hidden; cursor: crosshair;">
         <img src="${sec}" alt="Scene" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2);" />
-        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 2;">
-          <span style="font-family: Impact, sans-serif; font-size: 46px; font-weight: 900; color: #fff; letter-spacing: 2px;">MAGNATES</span>
-          <span style="font-family: Impact, sans-serif; font-size: 34px; font-weight: 900; color: #ff334b; letter-spacing: 3px;">SCANDAL</span>
-        </div>
-        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 3;">
+        ${textBehindHtml}
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ};">
           <img src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
         </div>
       </div>
     `;
   } else {
     stage.innerHTML = `
-      <div style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-        <img id="customizer-live-default-img" src="${prim}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15);" />
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        ${textBehindHtml}
+        <img id="customizer-live-default-img" src="${prim}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15); z-index: ${subjectZ};" />
       </div>
     `;
   }
+
+  // Attach right-click context menu listener on the preview stage
+  const innerStage = document.getElementById('customizer-stage-inner');
+  if (innerStage) {
+    innerStage.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showModalStageContextMenu(e.clientX, e.clientY);
+    });
+  }
 }
+
 
 function startTopCustomizerLoop() {
   topCustomizerState.startTime = performance.now();
@@ -22640,7 +22715,8 @@ function commitTopTemplateCustomizerToTimeline() {
       scale: 1.15,
       zoomEffect: 'snap',
       zoomScale: 1.25,
-      zoomStartTime: 0.1
+      zoomStartTime: 0.1,
+      layerOrder: 'back'
     };
     const fgClip = {
       id: `img-fg-${Date.now() + 1}`,
@@ -22650,10 +22726,31 @@ function commitTopTemplateCustomizerToTimeline() {
       duration: dur,
       scale: 1.05,
       depth: depthVal,
-      zoomEffect: 'loupe'
+      zoomEffect: 'loupe',
+      vectorEffect: topCustomizerState.bgRemoved,
+      vectorStrokeColor: '#ffffff',
+      layerOrder: topCustomizerState.layerOrder || 'front'
     };
+
+    const textClips = [];
+    if (topCustomizerState.hasTextBehind) {
+      textClips.push({
+        id: `txt-${Date.now() + 2}`,
+        text: topCustomizerState.textBehindContent || 'MAGNATES',
+        highlight: (topCustomizerState.textBehindContent || '').split(' ')[0] || '',
+        highlightColor: topCustomizerState.textBehindColor || '#ff334b',
+        anim: 'pop',
+        fontSize: 68,
+        fontFamily: 'Impact, sans-serif',
+        layerOrder: 'middle',
+        start: 0,
+        duration: dur
+      });
+    }
+
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [bgClip, fgClip];
+      if (timelineClips.text) timelineClips.text = textClips;
       renderAllTimelineTracks();
       selectClip(fgClip, 'image');
     }
@@ -22821,6 +22918,97 @@ function bindTopTemplateCustomizerEvents() {
     const val = document.getElementById('tpl-modal-val-duration');
     if (val) val.textContent = `${topCustomizerState.duration} sec`;
   });
+
+  // Layer Actions: Remove Background
+  document.getElementById('btn-modal-action-remove-bg')?.addEventListener('click', () => {
+    topCustomizerState.bgRemoved = !topCustomizerState.bgRemoved;
+    updateModalActionButtonsState();
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(topCustomizerState.bgRemoved ? 'Auto background removed!' : 'Background restored', 'success');
+    setTimeout(() => showTextTimingAlert(''), 1800);
+  });
+
+  // Layer Actions: Add Kinetic Text Behind
+  document.getElementById('btn-modal-action-kinetic-text')?.addEventListener('click', () => {
+    topCustomizerState.hasTextBehind = !topCustomizerState.hasTextBehind;
+    updateModalActionButtonsState();
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(topCustomizerState.hasTextBehind ? 'Kinetic Text Behind added!' : 'Text Behind removed', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1800);
+  });
+
+  // Kinetic Text Inputs
+  document.getElementById('modal-kinetic-text-input')?.addEventListener('input', (e) => {
+    topCustomizerState.textBehindContent = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('modal-kinetic-text-color')?.addEventListener('input', (e) => {
+    topCustomizerState.textBehindColor = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
+  // Layer Actions: Bring to Front / Send Backward
+  document.getElementById('btn-modal-action-bring-front')?.addEventListener('click', () => {
+    topCustomizerState.layerOrder = 'front';
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert('Subject brought to front', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  document.getElementById('btn-modal-action-send-back')?.addEventListener('click', () => {
+    topCustomizerState.layerOrder = 'back';
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert('Subject sent behind text', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  // Context Menu Item Clicks
+  document.getElementById('ctx-modal-remove-bg')?.addEventListener('click', () => {
+    hideModalStageContextMenu();
+    topCustomizerState.bgRemoved = !topCustomizerState.bgRemoved;
+    updateModalActionButtonsState();
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('ctx-modal-add-kinetic-text')?.addEventListener('click', () => {
+    hideModalStageContextMenu();
+    topCustomizerState.hasTextBehind = !topCustomizerState.hasTextBehind;
+    updateModalActionButtonsState();
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('ctx-modal-bring-front')?.addEventListener('click', () => {
+    hideModalStageContextMenu();
+    topCustomizerState.layerOrder = 'front';
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('ctx-modal-send-back')?.addEventListener('click', () => {
+    hideModalStageContextMenu();
+    topCustomizerState.layerOrder = 'back';
+    renderTopTemplatePreviewStage();
+  });
+
+  // Hide context menu on global click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#modal-stage-context-menu')) {
+      hideModalStageContextMenu();
+    }
+  });
+}
+
+function showModalStageContextMenu(x, y) {
+  const menu = document.getElementById('modal-stage-context-menu');
+  if (!menu) return;
+  menu.style.display = 'block';
+  menu.style.left = `${Math.min(window.innerWidth - 200, x)}px`;
+  menu.style.top = `${Math.min(window.innerHeight - 150, y)}px`;
+}
+
+function hideModalStageContextMenu() {
+  const menu = document.getElementById('modal-stage-context-menu');
+  if (menu) menu.style.display = 'none';
 }
 
 /* =========================================================

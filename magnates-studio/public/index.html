@@ -6664,6 +6664,49 @@
             </div>
           </div>
 
+          <!-- Studio Layer Actions & Pro Tools (Matches Main Studio Editor) -->
+          <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; justify-content: space-between; align-items: center;">
+              <span>⚡ Studio Layer Actions</span>
+              <span style="font-size: 9.5px; color: #a855f7; font-family: monospace;">REAL-TIME FX</span>
+            </div>
+            
+            <!-- Quick Action Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <!-- 1. Remove Background Button -->
+              <button type="button" id="btn-modal-action-remove-bg" style="padding: 7px 10px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(168,85,247,0.4); background: rgba(147,51,234,0.18); color: #e9d5ff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 0A3 3 0 104.879 4.879a3 3 0 004.242 4.242zm0 5.758a3 3 0 10-4.242 4.242 3 3 0 004.242-4.242z"/></svg>
+                <span id="label-modal-action-remove-bg">Remove Background</span>
+              </button>
+
+              <!-- 2. Add Kinetic Text Behind -->
+              <button type="button" id="btn-modal-action-kinetic-text" style="padding: 7px 10px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.15); color: #fca5a5; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
+                <span id="label-modal-action-kinetic-text">+ Text Behind</span>
+              </button>
+
+              <!-- 3. Layer Order: Bring Forward -->
+              <button type="button" id="btn-modal-action-bring-front" style="padding: 7px 10px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 4l-7 7h4v9h6v-9h4l-7-7z"/></svg>
+                <span>Bring to Front</span>
+              </button>
+
+              <!-- 4. Layer Order: Send Backward -->
+              <button type="button" id="btn-modal-action-send-back" style="padding: 7px 10px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
+                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 20l7-7h-4V4h-6v9H5l7 7z"/></svg>
+                <span>Send Backward</span>
+              </button>
+            </div>
+
+            <!-- Kinetic Text Configuration Panel (toggleable) -->
+            <div id="modal-kinetic-text-panel" style="display: none; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08);">
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="modal-kinetic-text-input" value="MAGNATES" placeholder="Text behind subject..." style="flex: 1; background: #030408; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 800;" />
+                <input type="color" id="modal-kinetic-text-color" value="#ff334b" style="width: 32px; height: 28px; background: transparent; border: none; cursor: pointer;" title="Text Color" />
+              </div>
+            </div>
+          </div>
+
           <!-- Motion & Effect Tuning Parameters -->
           <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">⚙️ Motion &amp; Depth Configuration</div>
@@ -6683,7 +6726,24 @@
 
           <!-- Pro Tip -->
           <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 10px; font-size: 10.5px; color: #e9d5ff; line-height: 1.45;">
-            <strong>💡 Pro Workflow:</strong> You can change the photo now or apply it immediately. All layers remain fully editable on your timeline once inserted!
+            <strong>💡 Pro Workflow:</strong> Right-click anywhere on the preview video or use the buttons above to remove background, reorder layers, and add kinetic typography!
+          </div>
+
+          <!-- Modal Floating Stage Context Menu -->
+          <div id="modal-stage-context-menu" style="display: none; position: fixed; z-index: 100020; width: 190px; background: rgba(15, 17, 26, 0.98); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); padding: 4px; backdrop-filter: blur(10px);">
+            <button type="button" class="modal-ctx-item" id="ctx-modal-remove-bg" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <span>✂️ Auto Remove Background</span>
+            </button>
+            <button type="button" class="modal-ctx-item" id="ctx-modal-add-kinetic-text" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <span>🔤 Add Kinetic Text Behind</span>
+            </button>
+            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 3px 0;"></div>
+            <button type="button" class="modal-ctx-item" id="ctx-modal-bring-front" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <span>⬆️ Bring Subject to Front</span>
+            </button>
+            <button type="button" class="modal-ctx-item" id="ctx-modal-send-back" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <span>⬇️ Send Subject Backward</span>
+            </button>
           </div>
 
         </div>
