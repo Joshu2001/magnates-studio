@@ -22521,6 +22521,9 @@ let topCustomizerState = {
   hasTextBehind: true,
   textBehindContent: 'MAGNATES',
   textBehindColor: '#ff334b',
+  mainText: '',
+  subText: '',
+  textColor: '#ff334b',
   layerOrder: 'front', // 'front' or 'back'
   opacity: 100, // 0 to 100
   cutoutCanvas: null,
@@ -22699,26 +22702,90 @@ function openTopTemplateCustomizer(tpl) {
   if (secondaryThumb) secondaryThumb.src = topCustomizerState.secondaryUrl;
   if (secondaryInput) secondaryInput.value = topCustomizerState.secondaryUrl;
 
-  // Contextual labels
+  // Contextual labels & Text setup
   const labelPrim = document.getElementById('tpl-modal-label-primary');
   const labelSec = document.getElementById('tpl-modal-label-secondary');
   const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+  const wrapText = document.getElementById('tpl-modal-wrap-text');
+  const labelText = document.getElementById('tpl-modal-label-text');
+  const inputTextMain = document.getElementById('tpl-modal-input-text-main');
+  const inputTextSub = document.getElementById('tpl-modal-input-text-sub');
+  const colorTextMain = document.getElementById('tpl-modal-color-text-main');
+  const wrapSub = document.getElementById('tpl-modal-wrap-subtitle');
+
   if (tpl.id === 'subject-25d-parallax') {
     if (labelPrim) labelPrim.textContent = '👤 Cutout Subject / Foreground';
     if (labelSec) labelSec.textContent = '🌆 Background Panning Scene';
     if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.mainText = topCustomizerState.mainText || 'MAGNATES';
+    topCustomizerState.subText = topCustomizerState.subText || 'EXPOSED';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
+  } else if (tpl.id === 'magnates-paper-vector-cutout') {
+    if (labelPrim) labelPrim.textContent = '👤 Isolated Cutout / Sticker Subject';
+    if (labelSec) labelSec.textContent = '🌆 Background Atmosphere Scene';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.mainText = topCustomizerState.mainText || 'MAGNATES';
+    topCustomizerState.subText = topCustomizerState.subText || 'SCANDAL';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
+  } else if (tpl.id === 'text-texturing-grunge') {
+    if (labelPrim) labelPrim.textContent = '📜 Vintage Paper / Grunge Texture Backdrop';
+    if (labelSec) labelSec.textContent = '🎬 Secondary Accent / Overlay';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = true;
+    topCustomizerState.mainText = topCustomizerState.mainText || 'POWER & GREED';
+    topCustomizerState.subText = topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#c084fc';
+  } else if (tpl.id === 'kinetic-decode-typewriter') {
+    if (labelPrim) labelPrim.textContent = '💻 Matrix Code / Cyber Grid Texture';
+    if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = true;
+    topCustomizerState.mainText = topCustomizerState.mainText || 'THE ILLUSION OF CHOICE';
+    topCustomizerState.subText = topCustomizerState.subText || '[ HIGH TENSION REVEAL ]';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#00f0ff';
+  } else if (tpl.id === 'vox-newspaper-cream-dossier') {
+    if (labelPrim) labelPrim.textContent = '📰 Archival Document / Newspaper Asset';
+    if (labelSec) labelSec.textContent = '🎬 Supporting Background Footage';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.hasTextBehind = true;
+    topCustomizerState.mainText = topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER';
+    topCustomizerState.subText = topCustomizerState.subText || 'CLASSIFIED INTELLIGENCE REPORT';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
   } else if (tpl.id === 'paper-rip-shred') {
     if (labelPrim) labelPrim.textContent = '📰 Top Paper Tear Layer';
     if (labelSec) labelSec.textContent = '🎬 Revealed Clip / Footage';
     if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.mainText = topCustomizerState.mainText || 'BREAKING REVEAL';
+    topCustomizerState.subText = topCustomizerState.subText || 'THE SECRET ARCHIVES';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#facc15';
   } else if (tpl.id === 'gold-frame-spin') {
     if (labelPrim) labelPrim.textContent = '🖼️ Framed Artwork / Image';
     if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.mainText = topCustomizerState.mainText || 'THE MASTERPIECE';
+    topCustomizerState.subText = topCustomizerState.subText || 'PRIVATE COLLECTION';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#f59e0b';
   } else {
     if (labelPrim) labelPrim.textContent = '🖼️ Primary Subject / Asset';
     if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.mainText = topCustomizerState.mainText || tpl.title.split('&')[0].trim();
+    topCustomizerState.subText = topCustomizerState.subText || 'CINEMATIC SEQUENCE';
+    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
   }
+
+  topCustomizerState.textBehindContent = topCustomizerState.mainText;
+  topCustomizerState.textBehindColor = topCustomizerState.textColor;
+
+  // Sync to Text & Titles card inputs
+  if (inputTextMain) inputTextMain.value = topCustomizerState.mainText;
+  if (inputTextSub) inputTextSub.value = topCustomizerState.subText;
+  if (colorTextMain) colorTextMain.value = topCustomizerState.textColor;
+  if (wrapText) wrapText.style.display = 'flex';
+
+  const modalKineticInput = document.getElementById('modal-kinetic-text-input');
+  const modalKineticColor = document.getElementById('modal-kinetic-text-color');
+  if (modalKineticInput) modalKineticInput.value = topCustomizerState.mainText;
+  if (modalKineticColor) modalKineticColor.value = topCustomizerState.textColor;
 
   // 3. Update Action button visual states
   updateModalActionButtonsState();
@@ -22810,10 +22877,10 @@ function renderTopTemplatePreviewStage() {
   const textBehindHtml = topCustomizerState.hasTextBehind ? `
     <div id="customizer-live-text-behind" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: ${textZ};">
       <span style="font-family: Impact, sans-serif; font-size: 52px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.9); line-height: 0.95;">
-        ${topCustomizerState.textBehindContent || 'MAGNATES'}
+        ${topCustomizerState.mainText || topCustomizerState.textBehindContent || 'MAGNATES'}
       </span>
-      <span style="font-family: Impact, sans-serif; font-size: 34px; font-weight: 900; color: ${topCustomizerState.textBehindColor || '#ff334b'}; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,51,75,0.6); line-height: 0.95;">
-        EXPOSED
+      <span style="font-family: Impact, sans-serif; font-size: 34px; font-weight: 900; color: ${topCustomizerState.textColor || topCustomizerState.textBehindColor || '#ff334b'}; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,51,75,0.6); line-height: 0.95;">
+        ${topCustomizerState.subText || 'EXPOSED'}
       </span>
     </div>
   ` : '';
@@ -22852,10 +22919,56 @@ function renderTopTemplatePreviewStage() {
   } else if (tplId === 'magnates-paper-vector-cutout') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #08090d; overflow: hidden; cursor: crosshair;">
-        <img src="${sec}" alt="Scene" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2);" />
+        <img id="customizer-live-bg" src="${sec}" alt="Scene" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2);" />
         ${textBehindHtml}
-        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
+        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
           <img id="customizer-live-fg" src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'text-texturing-grunge') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #0e0c14; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
+        <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(147, 51, 234, 0.35) 0%, rgba(30, 27, 75, 0.6) 50%, #000 100%);"></div>
+        <img id="customizer-live-bg" src="${prim}" alt="Paper Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(2) grayscale(0.2);" />
+        <div id="customizer-live-grunge-plate" style="position: relative; text-align: center; z-index: 2; padding: 12px; pointer-events: none;">
+          <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 32px; font-weight: 900; letter-spacing: 4px; color: ${topCustomizerState.textColor || '#f3e8ff'}; margin: 0; text-transform: uppercase; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.95));">
+            ${topCustomizerState.mainText || 'POWER & GREED'}
+          </h3>
+          <div style="width: 70%; height: 2px; background: rgba(168, 85, 247, 0.85); margin: 6px auto; box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);"></div>
+          <span style="font-family: monospace; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d8b4fe; text-transform: uppercase; display: block;">
+            ${topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION'}
+          </span>
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'kinetic-decode-typewriter') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #090a10; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
+        <div style="position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(31,41,55,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(31,41,55,0.4) 1px, transparent 1px); background-size: 18px 18px; opacity: 0.35;"></div>
+        <img id="customizer-live-bg" src="${prim}" alt="Matrix Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; filter: contrast(1.5);" />
+        <div style="position: relative; z-index: 2; font-family: monospace; text-align: center;">
+          <span style="font-size: 11px; color: #c084fc; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 8px;">
+            ${topCustomizerState.subText || '[ HIGH TENSION REVEAL ]'}
+          </span>
+          <div id="customizer-live-decode-box" style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: ${topCustomizerState.textColor || '#00f0ff'}; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(192, 132, 252, 0.5); padding: 8px 16px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); display: inline-flex; align-items: center; gap: 4px;">
+            <span id="customizer-live-decode-text">${topCustomizerState.mainText || 'THE ILLUSION OF CHOICE'}</span>
+            <span style="display: inline-block; width: 8px; height: 18px; background: #a855f7;" class="pulse-preview-badge"></span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'vox-newspaper-cream-dossier') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4eedb; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img id="customizer-live-bg" src="${prim}" alt="Newspaper" style="width: 82%; height: 82%; object-fit: cover; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); filter: contrast(1.15);" />
+        <div style="position: absolute; bottom: 25px; left: 25px; right: 25px; background: rgba(28,25,23,0.9); padding: 10px 14px; border-radius: 6px; border-left: 4px solid ${topCustomizerState.textColor || '#ff334b'};">
+          <div style="font-family: Impact, sans-serif; font-size: 20px; color: #fff; letter-spacing: 1px; text-transform: uppercase;">
+            ${topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER'}
+          </div>
+          <div style="font-family: monospace; font-size: 9px; color: #fdba74; text-transform: uppercase;">
+            ${topCustomizerState.subText || 'CLASSIFIED INTELLIGENCE REPORT'}
+          </div>
         </div>
       </div>
     `;
@@ -22927,6 +23040,36 @@ function startTopCustomizerLoop() {
         const tiltY = Math.cos(t * 1.0) * 10 * depthFactor;
         frame.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
       }
+    } else if (tplId === 'magnates-paper-vector-cutout') {
+      const fgWrap = document.getElementById('customizer-live-fg-wrap');
+      const bgEl = document.getElementById('customizer-live-bg');
+      const textBehind = document.getElementById('customizer-live-text-behind');
+      const stickerPanX = Math.sin(t * 2.4) * 14 * depthFactor;
+      const stickerPanY = Math.cos(t * 2.0) * 10 * depthFactor;
+      const bgShiftX = -Math.sin(t * 2.4) * 8 * depthFactor;
+      const textScale = 1.0 + Math.sin(t * 1.8) * 0.05 * depthFactor;
+      if (fgWrap) fgWrap.style.transform = `translate(${stickerPanX}px, ${stickerPanY}px) scale(1.05)`;
+      if (bgEl) bgEl.style.transform = `scale(1.1) translate(${bgShiftX}px, 0)`;
+      if (textBehind) textBehind.style.transform = `scale(${textScale})`;
+    } else if (tplId === 'text-texturing-grunge') {
+      const jitterX = Math.sin(t * 14) * 2;
+      const jitterY = Math.cos(t * 16) * 2;
+      const bgZoom = 1.05 + Math.sin(t * 2) * 0.04;
+      const plate = document.getElementById('customizer-live-grunge-plate');
+      const bgEl = document.getElementById('customizer-live-bg');
+      if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+      if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
+    } else if (tplId === 'kinetic-decode-typewriter') {
+      const targetWord = topCustomizerState.mainText || "THE ILLUSION OF CHOICE";
+      const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const progress = Math.min(1, (t * 0.8) % 1.25);
+      const charsRevealed = Math.floor(progress * targetWord.length);
+      let displayed = targetWord.substring(0, charsRevealed);
+      if (charsRevealed < targetWord.length) {
+        displayed += glyphs[Math.floor((t * 50) % glyphs.length)];
+      }
+      const decodeSpan = document.getElementById('customizer-live-decode-text');
+      if (decodeSpan) decodeSpan.textContent = displayed;
     }
 
     topCustomizerState.animId = requestAnimationFrame(loop);
@@ -23169,6 +23312,115 @@ function commitTopTemplateCustomizerToTimeline() {
       renderAllTimelineTracks();
       selectClip(cutoutStickerClip, 'image');
     }
+  } else if (tpl.id === 'text-texturing-grunge') {
+    const textureClip = {
+      id: `img-tex-${Date.now()}`,
+      name: 'James_Jani_Paper_Texture.jpg',
+      url: prim,
+      file: { name: 'James_Jani_Paper_Texture.jpg', url: prim, isImage: true },
+      start: 0,
+      duration: dur,
+      scale: 1.15,
+      zIndex: 10
+    };
+    const mainTitle = {
+      id: `txt-${Date.now() + 1}`,
+      text: topCustomizerState.mainText || 'POWER & GREED',
+      highlight: (topCustomizerState.mainText || 'POWER & GREED').split(' ')[0] || 'POWER',
+      highlightColor: topCustomizerState.textColor || '#c084fc',
+      anim: 'pop',
+      fontSize: 68,
+      fontFamily: 'Playfair Display, Georgia, serif',
+      start: 0,
+      duration: dur,
+      zIndex: 20
+    };
+    const subtitle = {
+      id: `txt-${Date.now() + 2}`,
+      text: topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION',
+      highlight: '',
+      highlightColor: '#a855f7',
+      anim: 'slide_up',
+      fontSize: 28,
+      fontFamily: 'monospace',
+      start: 0.4,
+      duration: Math.max(0.1, dur - 0.4),
+      zIndex: 25
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [textureClip];
+      timelineClips.text = [mainTitle, subtitle];
+      currentTime = 0;
+      renderAllTimelineTracks();
+      selectClip(mainTitle, 'text');
+    }
+  } else if (tpl.id === 'kinetic-decode-typewriter') {
+    const matrixClip = {
+      id: `img-matrix-${Date.now()}`,
+      name: 'Cyber_Matrix_Tension.jpg',
+      url: prim,
+      file: { name: 'Cyber_Matrix_Tension.jpg', url: prim, isImage: true },
+      start: 0,
+      duration: dur,
+      scale: 1.2,
+      zIndex: 10
+    };
+    const decodeTitle = {
+      id: `txt-${Date.now() + 1}`,
+      text: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
+      highlight: (topCustomizerState.mainText || 'THE ILLUSION OF CHOICE').split(' ')[1] || 'ILLUSION',
+      highlightColor: topCustomizerState.textColor || '#00f0ff',
+      anim: 'typewriter',
+      fontSize: 58,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: dur,
+      zIndex: 20
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [matrixClip];
+      timelineClips.text = [decodeTitle];
+      currentTime = 0;
+      renderAllTimelineTracks();
+      selectClip(decodeTitle, 'text');
+    }
+  } else if (tpl.id === 'vox-newspaper-cream-dossier') {
+    if (fxState) {
+      fxState.stageBackground = { type: 'vox_cream', color: '#f4eedb' };
+    }
+    const docClip = {
+      id: `img-doc-${Date.now()}`,
+      name: 'Vox_Investigative_Paper.jpg',
+      url: prim,
+      file: { name: 'Vox_Investigative_Paper.jpg', url: prim, isImage: true },
+      start: 0,
+      duration: dur,
+      scale: 1.1,
+      zoomEffect: 'loupe',
+      zoomScale: 2.2,
+      zoomOriginX: 0.55,
+      zoomOriginY: 0.45,
+      zIndex: 10
+    };
+    const stampText = {
+      id: `txt-${Date.now() + 1}`,
+      text: topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER',
+      highlight: (topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER').split(' ')[0] || 'CONFIDENTIAL',
+      highlightColor: topCustomizerState.textColor || '#ff334b',
+      anim: 'stamp',
+      fontSize: 56,
+      fontFamily: 'Oswald, sans-serif',
+      start: 0.2,
+      duration: Math.max(0.1, dur - 0.2),
+      zIndex: 20
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [docClip];
+      timelineClips.text = [stampText];
+      currentTime = 0;
+      renderAllTimelineTracks();
+      selectClip(docClip, 'image');
+    }
   } else {
     const baseClip = {
       id: `img-${Date.now()}`,
@@ -23188,9 +23440,9 @@ function commitTopTemplateCustomizerToTimeline() {
       if (timelineClips.text) {
         timelineClips.text = topCustomizerState.hasTextBehind ? [{
           id: `txt-${Date.now() + 2}`,
-          text: topCustomizerState.textBehindContent || 'MAGNATES',
-          highlight: '',
-          highlightColor: '#ff334b',
+          text: topCustomizerState.mainText || topCustomizerState.textBehindContent || 'MAGNATES',
+          highlight: (topCustomizerState.mainText || '').split(' ')[0] || '',
+          highlightColor: topCustomizerState.textColor || '#ff334b',
           anim: 'pop',
           fontSize: 68,
           fontFamily: 'Impact, sans-serif',
@@ -23324,14 +23576,42 @@ function bindTopTemplateCustomizerEvents() {
     setTimeout(() => showTextTimingAlert(''), 1800);
   });
 
+  // Dedicated Text & Titles Card Inputs
+  document.getElementById('tpl-modal-input-text-main')?.addEventListener('input', (e) => {
+    topCustomizerState.mainText = e.target.value;
+    topCustomizerState.textBehindContent = e.target.value;
+    const modalKineticInput = document.getElementById('modal-kinetic-text-input');
+    if (modalKineticInput) modalKineticInput.value = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-input-text-sub')?.addEventListener('input', (e) => {
+    topCustomizerState.subText = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-color-text-main')?.addEventListener('input', (e) => {
+    topCustomizerState.textColor = e.target.value;
+    topCustomizerState.textBehindColor = e.target.value;
+    const modalKineticColor = document.getElementById('modal-kinetic-text-color');
+    if (modalKineticColor) modalKineticColor.value = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
   // Kinetic Text Inputs
   document.getElementById('modal-kinetic-text-input')?.addEventListener('input', (e) => {
     topCustomizerState.textBehindContent = e.target.value;
+    topCustomizerState.mainText = e.target.value;
+    const inputMain = document.getElementById('tpl-modal-input-text-main');
+    if (inputMain) inputMain.value = e.target.value;
     renderTopTemplatePreviewStage();
   });
 
   document.getElementById('modal-kinetic-text-color')?.addEventListener('input', (e) => {
     topCustomizerState.textBehindColor = e.target.value;
+    topCustomizerState.textColor = e.target.value;
+    const colorMain = document.getElementById('tpl-modal-color-text-main');
+    if (colorMain) colorMain.value = e.target.value;
     renderTopTemplatePreviewStage();
   });
 

@@ -27,14 +27,34 @@
   "quote": [],
   "image": [
     {
-      "id": "img-1791484358176",
+      "id": "img-rev-1791484534142",
       "start": 0,
-      "duration": 5,
-      "zIndex": 20,
-      "scale": 1.1,
+      "duration": 4,
+      "layerOrder": "back",
+      "zIndex": 10,
+      "scale": 1.05,
       "file": {
-        "name": "Custom_Gold_Frame.jpg",
-        "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80",
+        "name": "Custom_Revealed_Footage.jpg",
+        "url": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80",
+        "isImage": true
+      }
+    },
+    {
+      "id": "img-rip-1791484534143",
+      "start": 0,
+      "duration": 4,
+      "layerOrder": "front",
+      "zIndex": 25,
+      "x": -143.40481400437648,
+      "y": 291.28630705394187,
+      "scale": 2.01,
+      "vectorEffect": true,
+      "vectorStrokeColor": "#ffffff",
+      "transition": "fly_through",
+      "transitionDuration": 1.2,
+      "file": {
+        "name": "Custom_Paper_Tear.jpg",
+        "url": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80",
         "isImage": true
       }
     }
@@ -71,7 +91,7 @@
   ],
   "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791484457917,
-  "projectName": "Dark Luxury Gold Frame 3D Spin",
+  "savedAt": 1791485808272,
+  "projectName": "Paper Rip & Shred Transition",
   "projectId": "proj_1791218145776_xils"
 }
