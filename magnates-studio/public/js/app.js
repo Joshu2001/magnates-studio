@@ -20096,6 +20096,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['3D Projection', '50mm Camera', 'Null Object', 'Portrait Cutout', 'Spatial Depth', 'Magnates Media'],
     defaultImage: '/magnates_3d_projection_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-cc-vignette-dof',
+    title: 'Magnates Media CC Vignette & Depth of Focus',
+    category: 'Color & Vibe',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(2, 6, 23, 0.98), rgba(8, 47, 73, 0.75), rgba(56, 189, 248, 0.35), rgba(1, 4, 12, 0.98))',
+    description: 'Keyframing CC Vignette angles and depth-of-field blur to draw viewer focus strictly toward specific characters or cutouts, isolating subjects against blurred backgrounds.',
+    tags: ['CC Vignette', 'Depth of Focus', 'DOF Blur', 'Magnates Media', 'Focus Pull', 'Cutout Isolation'],
+    defaultImage: '/magnates_cc_vignette_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20968,6 +20981,33 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'magnates-media-cc-vignette-dof') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #03050c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Background with Depth of Focus Blur -->
+          <img id="fx-vignette-bg-${tplId}" src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(10px) brightness(40%) contrast(120%); transition: filter 0.1s ease;" />
+
+          <!-- Dynamic CC Vignette Radial Falloff -->
+          <div id="fx-vignette-overlay-${tplId}" style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at center, transparent 20%, rgba(2, 4, 10, 0.85) 70%, rgba(0, 0, 0, 0.98) 100%);"></div>
+
+          <!-- Sharp In-Focus Foreground Cutout Subject -->
+          <div id="fx-vignette-fg-${tplId}" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; transition: transform 0.05s ease;">
+            <div style="width: 100px; height: 125px; border-radius: 12px; overflow: hidden; border: 2px solid #38bdf8; box-shadow: 0 0 30px rgba(56,189,248,0.5), 0 15px 35px rgba(0,0,0,0.9); position: relative;">
+              <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(130%) brightness(105%);" />
+            </div>
+            <div style="margin-top: 6px; background: rgba(0,0,0,0.85); border: 1px solid rgba(56,189,248,0.5); padding: 2px 8px; border-radius: 9999px;">
+              <span id="fx-vignette-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8;">
+                DOF: 10px BLUR // VIGNETTE 85%
+              </span>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
+            🎯 CC VIGNETTE + DOF
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21371,6 +21411,17 @@ function startTemplateHoverVideo(cardEl, tpl) {
       if (bg) bg.style.transform = `translateZ(-100px) translate(${-orbitY * 0.4}px, ${-orbitX * 0.4}px)`;
       if (mid) mid.style.transform = `translateZ(0px) translate(${orbitY * 0.2}px, ${orbitX * 0.2}px)`;
       if (fg) fg.style.transform = `translateZ(140px) translate(${orbitY * 0.8}px, ${orbitX * 0.8}px)`;
+    } else if (tplId === 'magnates-media-cc-vignette-dof') {
+      const blurAmount = 6 + Math.sin(t * 2) * 5;
+      const bgImg = fxContainer?.querySelector(`#fx-vignette-bg-${tplId}`);
+      const fgCard = fxContainer?.querySelector(`#fx-vignette-fg-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-vignette-meter-${tplId}`);
+      if (bgImg) bgImg.style.filter = `blur(${blurAmount.toFixed(1)}px) brightness(40%) contrast(120%)`;
+      if (meter) meter.textContent = `DOF: ${blurAmount.toFixed(1)}px BLUR // VIGNETTE 85%`;
+      if (fgCard) {
+        const floatY = Math.sin(t * 1.8) * 4;
+        fgCard.style.transform = `translateY(${floatY.toFixed(1)}px)`;
+      }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
       const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
@@ -21769,6 +21820,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-3d-projection') {
     // Launch Magnates Media 3D Layer Projection & 50mm Camera Suite
     openMagnates3DProjectionSuite();
+    return;
+  } else if (templateId === 'magnates-media-cc-vignette-dof') {
+    // Launch Magnates Media CC Vignette & Depth of Focus Suite
+    openMagnatesCCVignetteSuite();
     return;
   }
 
@@ -23859,6 +23914,7 @@ function initHomepageTemplateEvents() {
   bindJLCutsSuiteModalControls();
   bindSubbassSuiteModalControls();
   bindMagnates3DProjectionSuiteModalControls();
+  bindMagnatesCCVignetteSuiteModalControls();
 }
 
 /* =========================================================
@@ -28564,6 +28620,300 @@ function bindMagnates3DProjectionSuiteModalControls() {
     }
 
     showTextTimingAlert(`Applied Magnates Media 3D Layer Projection (50mm Camera) to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   MAGNATES MEDIA CC VIGNETTE & DEPTH OF FOCUS SUITE CONTROLLER
+   (Keyframing CC Vignette angles and depth-of-field blur to draw viewer focus strictly toward cutouts)
+   ========================================================= */
+let magnatesCCVignetteState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  dofBlur: 10, // 0 to 20px blur
+  vignetteIntensity: 85, // 20 to 100%
+  vignetteAngle: 0, // 0 to 360 deg
+  showBackgroundCard: true, // boolean toggle for cutout background container
+  subjectFloat: true,
+  headline: "THE ARCHITECT'S CONFESSION",
+  subcaption: "CC VIGNETTE // DEPTH OF FOCUS PULL",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  bgUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesCCVignetteVisualStyles() {
+  const headlineEl = document.getElementById('magnates-vignette-headline');
+  const subcaptionEl = document.getElementById('magnates-vignette-subcaption');
+  const portraitImg = document.getElementById('magnates-vignette-portrait-img');
+  const bgImg = document.getElementById('magnates-vignette-bg-img');
+  const overlayEl = document.getElementById('magnates-vignette-overlay');
+  const subjectCard = document.getElementById('magnates-vignette-subject-card');
+  const badgeDof = document.getElementById('magnates-vignette-badge-dof');
+  const badgeVignette = document.getElementById('magnates-vignette-badge-vig');
+  const timerEl = document.getElementById('magnates-vignette-timer-display');
+  const cursor = document.getElementById('magnates-vignette-timeline-cursor');
+
+  if (headlineEl) headlineEl.textContent = magnatesCCVignetteState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesCCVignetteState.subcaption;
+  if (portraitImg && portraitImg.src !== magnatesCCVignetteState.portraitUrl) {
+    portraitImg.src = magnatesCCVignetteState.portraitUrl;
+  }
+  if (bgImg && bgImg.src !== magnatesCCVignetteState.bgUrl) {
+    bgImg.src = magnatesCCVignetteState.bgUrl;
+  }
+
+  const p = magnatesCCVignetteState.playhead;
+  const dur = magnatesCCVignetteState.duration;
+
+  if (cursor) {
+    cursor.style.left = `${(p / dur) * 100}%`;
+  }
+  if (timerEl) {
+    timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  }
+
+  // Dynamic breathe in DOF blur simulating continuous focus rack
+  const currentBlur = Math.max(0, magnatesCCVignetteState.dofBlur + Math.sin(p * 1.8) * 3);
+  if (bgImg) {
+    bgImg.style.filter = `blur(${currentBlur.toFixed(1)}px) brightness(42%) contrast(125%)`;
+  }
+
+  if (badgeDof) {
+    badgeDof.textContent = `DOF BLUR: ${currentBlur.toFixed(1)}px`;
+  }
+  if (badgeVignette) {
+    badgeVignette.textContent = `CC VIGNETTE: ${magnatesCCVignetteState.vignetteIntensity}%`;
+  }
+
+  // CC Vignette dark falloff gradient
+  const vigOp = (magnatesCCVignetteState.vignetteIntensity / 100).toFixed(2);
+  const ang = magnatesCCVignetteState.vignetteAngle;
+  if (overlayEl) {
+    overlayEl.style.background = `radial-gradient(ellipse at 50% 50%, transparent 22%, rgba(2, 4, 12, ${vigOp * 0.75}) 65%, rgba(0, 0, 0, ${vigOp}) 100%)`;
+    overlayEl.style.transform = `rotate(${ang}deg)`;
+  }
+
+  // Subject cutout card style (Visible card vs Transparent floating cutout)
+  if (subjectCard) {
+    if (magnatesCCVignetteState.showBackgroundCard) {
+      subjectCard.style.background = 'rgba(8, 12, 22, 0.92)';
+      subjectCard.style.border = '2px solid #38bdf8';
+      subjectCard.style.boxShadow = '0 0 35px rgba(56, 189, 248, 0.45), 0 20px 45px rgba(0, 0, 0, 0.95)';
+    } else {
+      subjectCard.style.background = 'transparent';
+      subjectCard.style.border = '1.5px dashed rgba(56, 189, 248, 0.4)';
+      subjectCard.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.85)';
+    }
+
+    if (magnatesCCVignetteState.subjectFloat) {
+      const floatY = Math.sin(p * 2.2) * 5;
+      subjectCard.style.transform = `translateY(${floatY.toFixed(1)}px) scale(1.02)`;
+    } else {
+      subjectCard.style.transform = 'translateY(0px) scale(1.0)';
+    }
+  }
+}
+
+function renderMagnatesCCVignetteLoop(timestamp) {
+  if (!magnatesCCVignetteState.isPlaying) return;
+  if (!magnatesCCVignetteState.lastTimestamp) magnatesCCVignetteState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesCCVignetteState.lastTimestamp) / 1000;
+  magnatesCCVignetteState.lastTimestamp = timestamp;
+
+  magnatesCCVignetteState.playhead += dt;
+  if (magnatesCCVignetteState.playhead > magnatesCCVignetteState.duration) {
+    magnatesCCVignetteState.playhead = 0;
+  }
+
+  updateMagnatesCCVignetteVisualStyles();
+  magnatesCCVignetteState.animFrameId = requestAnimationFrame(renderMagnatesCCVignetteLoop);
+}
+
+function openMagnatesCCVignetteSuite() {
+  const modal = document.getElementById('modal-magnates-vignette-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesCCVignetteState.isPlaying = true;
+  magnatesCCVignetteState.playhead = 0;
+  magnatesCCVignetteState.lastTimestamp = null;
+  if (magnatesCCVignetteState.animFrameId) cancelAnimationFrame(magnatesCCVignetteState.animFrameId);
+  magnatesCCVignetteState.animFrameId = requestAnimationFrame(renderMagnatesCCVignetteLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-vignette-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesCCVignetteSuite() {
+  const modal = document.getElementById('modal-magnates-vignette-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesCCVignetteState.isPlaying = false;
+  if (magnatesCCVignetteState.animFrameId) {
+    cancelAnimationFrame(magnatesCCVignetteState.animFrameId);
+    magnatesCCVignetteState.animFrameId = null;
+  }
+}
+
+function bindMagnatesCCVignetteSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-magnates-vignette-suite')?.addEventListener('click', closeMagnatesCCVignetteSuite);
+  document.getElementById('btn-cancel-magnates-vignette-suite')?.addEventListener('click', closeMagnatesCCVignetteSuite);
+
+  // Play / Pause
+  document.getElementById('btn-magnates-vignette-play-pause')?.addEventListener('click', () => {
+    magnatesCCVignetteState.isPlaying = !magnatesCCVignetteState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-vignette-play-pause');
+    if (magnatesCCVignetteState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesCCVignetteState.lastTimestamp = null;
+      magnatesCCVignetteState.animFrameId = requestAnimationFrame(renderMagnatesCCVignetteLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesCCVignetteState.animFrameId) cancelAnimationFrame(magnatesCCVignetteState.animFrameId);
+    }
+  });
+
+  // Replay
+  document.getElementById('btn-magnates-vignette-reset')?.addEventListener('click', () => {
+    magnatesCCVignetteState.playhead = 0;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  // Sliders: DOF Blur, Vignette Intensity, Vignette Angle
+  const sliderBlur = document.getElementById('magnates-vignette-slider-blur');
+  sliderBlur?.addEventListener('input', (e) => {
+    magnatesCCVignetteState.dofBlur = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-vignette-val-blur');
+    if (label) label.textContent = `${magnatesCCVignetteState.dofBlur} px`;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  const sliderIntensity = document.getElementById('magnates-vignette-slider-intensity');
+  sliderIntensity?.addEventListener('input', (e) => {
+    magnatesCCVignetteState.vignetteIntensity = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-vignette-val-intensity');
+    if (label) label.textContent = `${magnatesCCVignetteState.vignetteIntensity}%`;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  const sliderAngle = document.getElementById('magnates-vignette-slider-angle');
+  sliderAngle?.addEventListener('input', (e) => {
+    magnatesCCVignetteState.vignetteAngle = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-vignette-val-angle');
+    if (label) label.textContent = `${magnatesCCVignetteState.vignetteAngle}°`;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  // Cutout Background Card Toggle
+  const toggleCard = document.getElementById('magnates-vignette-toggle-card');
+  toggleCard?.addEventListener('change', (e) => {
+    magnatesCCVignetteState.showBackgroundCard = e.target.checked;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  // Text inputs
+  const inputHeadline = document.getElementById('magnates-vignette-input-headline');
+  inputHeadline?.addEventListener('input', (e) => {
+    magnatesCCVignetteState.headline = e.target.value;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  const inputSubcaption = document.getElementById('magnates-vignette-input-subcaption');
+  inputSubcaption?.addEventListener('input', (e) => {
+    magnatesCCVignetteState.subcaption = e.target.value;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  // Shuffle stock cutout portrait
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let portIdx = 0;
+  document.getElementById('btn-magnates-vignette-shuffle-portrait')?.addEventListener('click', () => {
+    portIdx = (portIdx + 1) % stockPortraits.length;
+    magnatesCCVignetteState.portraitUrl = stockPortraits[portIdx];
+    const inputP = document.getElementById('magnates-vignette-input-portrait');
+    if (inputP) inputP.value = magnatesCCVignetteState.portraitUrl;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  const inputPortrait = document.getElementById('magnates-vignette-input-portrait');
+  inputPortrait?.addEventListener('input', (e) => {
+    magnatesCCVignetteState.portraitUrl = e.target.value;
+    updateMagnatesCCVignetteVisualStyles();
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-apply-magnates-vignette-suite')?.addEventListener('click', () => {
+    closeMagnatesCCVignetteSuite();
+
+    // 1. Blurred Background Scene Clip
+    const bgClip = {
+      id: `img-vig-bg-${Date.now()}`,
+      url: magnatesCCVignetteState.bgUrl,
+      start: 0,
+      duration: magnatesCCVignetteState.duration,
+      scale: 1.15,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.2,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    // 2. Crisp Sharp Portrait Cutout (In Focus)
+    const portraitClip = {
+      id: `img-vig-subject-${Date.now() + 1}`,
+      url: magnatesCCVignetteState.portraitUrl,
+      start: 0,
+      duration: magnatesCCVignetteState.duration,
+      scale: 1.0,
+      zoomEffect: 'snap',
+      zoomScale: 1.12,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    // 3. Popping Headline Clip
+    const headlineClip = {
+      id: `txt-vig-head-${Date.now() + 2}`,
+      text: magnatesCCVignetteState.headline,
+      highlight: magnatesCCVignetteState.headline.split(' ')[0] || '',
+      highlightColor: '#38bdf8',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: magnatesCCVignetteState.duration
+    };
+
+    // 4. CC Vignette / Depth of Focus Metadata Overlay
+    const dofClip = {
+      id: `txt-vig-dof-${Date.now() + 3}`,
+      text: `CC VIGNETTE (${magnatesCCVignetteState.vignetteIntensity}%) // DOF BLUR ${magnatesCCVignetteState.dofBlur}px`,
+      highlight: `${magnatesCCVignetteState.vignetteIntensity}%`,
+      highlightColor: '#0284c7',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesCCVignetteState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, portraitClip];
+      timelineClips.text = [headlineClip, dofClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media CC Vignette & Depth of Focus to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
