@@ -20031,6 +20031,32 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
     defaultImage: '/jani_text_reveal_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'glow-drop-shadows',
+    title: 'Glow & Drop Shadows',
+    category: 'Text & Titles',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(30, 16, 53, 0.98), rgba(10, 5, 24, 0.7), rgba(168, 85, 247, 0.35), rgba(3, 1, 8, 0.98))',
+    description: 'Duplicated text layer technique. Heavy ambient glow on bottom layer with massive blur radius and soft drop shadows on top to isolate text from dark backdrops.',
+    tags: ['Duplicated Layer', 'Glow Radius', 'Drop Shadows', 'Text Contrast', 'James Jani'],
+    defaultImage: '/jani_glow_shadows_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: '3d-camera-move-rotation',
+    title: '3D Camera Move & Rotation',
+    category: '3D Spatial',
+    badge: 'James Jani Signature',
+    difficulty: 'Pro 3D',
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(24, 21, 52, 0.98), rgba(10, 10, 24, 0.7), rgba(99, 102, 241, 0.35), rgba(3, 3, 8, 0.98))',
+    description: 'Text mapped onto 3D layers with slow backward/forward camera tracking and subtle X/Y-rotation tweaks that make typography float dynamically in physical space.',
+    tags: ['3D Layers', 'Camera Tracking', 'X/Y Rotation', 'Spatial Depth', 'James Jani'],
+    defaultImage: '/jani_3d_camera_move_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20726,6 +20752,65 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'glow-drop-shadows') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #05020a; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 14px;">
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(140%) brightness(50%);" />
+
+          <!-- Background radial gradient -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(168,85,247,0.3) 0%, rgba(5,2,10,0.85) 75%);"></div>
+
+          <!-- Dual Layer Glow Container -->
+          <div style="position: relative; z-index: 10; text-align: center; width: 100%;">
+            <!-- Bottom Glow Layer (Blur Pulse) -->
+            <div id="fx-glow-bottom-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 900; color: #c084fc; letter-spacing: 5px; filter: blur(28px); opacity: 0.85; pointer-events: none;">
+              THE ILLUSION
+            </div>
+            <!-- Top Sharp Text with Drop Shadow -->
+            <div style="position: relative; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 5px; text-shadow: 0 10px 24px rgba(0,0,0,0.95), 0 2px 6px rgba(0,0,0,0.9);">
+              THE ILLUSION
+            </div>
+            <div style="margin-top: 6px; display: inline-block; font-family: monospace; font-size: 8px; font-weight: 800; color: #fbbf24; background: rgba(0,0,0,0.85); border: 1px solid rgba(245,158,11,0.4); padding: 2px 8px; border-radius: 9999px;">
+              DUPLICATED LAYER GLOW
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #a855f7, #6b21a8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
+            ✨ DUAL GLOW FX
+          </div>
+        </div>
+      `;
+    } else if (tplId === '3d-camera-move-rotation') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #060611; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 600px;">
+          <!-- Receding Grid Lines -->
+          <div style="position: absolute; inset: 0; opacity: 0.25; background-image: linear-gradient(rgba(99,102,241,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.4) 1px, transparent 1px); background-size: 24px 24px; transform: rotateX(60deg) translateY(-20px);"></div>
+
+          <!-- 3D Transform Object Container -->
+          <div id="fx-3d-rig-${tplId}" style="position: relative; z-index: 10; transform-style: preserve-3d; transition: transform 0.05s linear; text-align: center;">
+            <!-- Background Archival Card -->
+            <div style="position: absolute; top: -45px; left: -100px; width: 200px; height: 90px; background: rgba(15,23,42,0.85); border: 1px solid rgba(99,102,241,0.4); border-radius: 8px; transform: translateZ(-60px); box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
+              <div style="font-family: monospace; font-size: 7px; color: #818cf8; padding: 6px; text-align: left;">CAMERA_TRACKING // Z: 650PX</div>
+            </div>
+
+            <!-- Foreground Floating Text Plate -->
+            <div style="background: rgba(10,12,24,0.92); border: 1.5px solid #6366f1; border-radius: 10px; padding: 10px 20px; box-shadow: 0 0 25px rgba(99,102,241,0.4); transform: translateZ(50px);">
+              <div style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #a5b4fc; letter-spacing: 1.5px; margin-bottom: 2px;">
+                3D LAYER ROTATION
+              </div>
+              <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 900; color: #ffffff; letter-spacing: 2px;">
+                SPATIAL DEPTH
+              </div>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #6366f1, #3730a3); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(99,102,241,0.5);">
+            🎥 3D CAMERA TRACK
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21062,6 +21147,21 @@ function startTemplateHoverVideo(cardEl, tpl) {
       const decodeEl = fxContainer?.querySelector(`#fx-decode-text-${tplId}`);
       if (decodeEl) {
         decodeEl.textContent = scrambled;
+      }
+    } else if (tplId === 'glow-drop-shadows') {
+      const glowBlur = 24 + Math.sin(t * 3) * 12;
+      const glowEl = fxContainer?.querySelector(`#fx-glow-bottom-${tplId}`);
+      if (glowEl) {
+        glowEl.style.filter = `blur(${glowBlur}px)`;
+        glowEl.style.opacity = (0.7 + Math.sin(t * 3) * 0.25).toFixed(2);
+      }
+    } else if (tplId === '3d-camera-move-rotation') {
+      const rotY = Math.sin(t * 2) * 16;
+      const rotX = Math.cos(t * 1.5) * 10;
+      const trackZ = 20 + Math.sin(t * 1.2) * 35;
+      const rigEl = fxContainer?.querySelector(`#fx-3d-rig-${tplId}`);
+      if (rigEl) {
+        rigEl.style.transform = `translateZ(${trackZ}px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21441,6 +21541,14 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'text-reveal-modifiers') {
     // Launch James Jani Text Reveal Modifiers & Character Offset Decode Suite
     openTextRevealSuite();
+    return;
+  } else if (templateId === 'glow-drop-shadows') {
+    // Launch James Jani Glow & Drop Shadows Suite
+    openGlowShadowsSuite();
+    return;
+  } else if (templateId === '3d-camera-move-rotation') {
+    // Launch James Jani 3D Camera Move & Rotation Suite
+    openCamera3DMoveSuite();
     return;
   }
 
@@ -23526,6 +23634,8 @@ function initHomepageTemplateEvents() {
   bindMonochromeSuiteModalControls();
   bindHeavyVignetteSuiteModalControls();
   bindTextRevealSuiteModalControls();
+  bindGlowShadowsSuiteModalControls();
+  bindCamera3DMoveSuiteModalControls();
 }
 
 /* =========================================================
@@ -26616,6 +26726,593 @@ function bindTextRevealSuiteModalControls() {
     }
 
     showTextTimingAlert('Applied Text Reveal Modifier Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: GLOW & DROP SHADOWS SUITE CONTROLLER
+   ========================================================= */
+let glowShadowsSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 8.0,
+  dualLayersActive: true,
+  glowRadius: 45, // px (range 10 to 90)
+  glowIntensity: 75, // % (range 20 to 100)
+  dropShadowBlur: 20, // px (range 5 to 45)
+  headline: 'THE ILLUSION OF CONTROL',
+  subcaption: 'CONFIDENTIAL EVIDENCE // EXHIBIT A',
+  imageUrl: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  stockImages: [
+    'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'
+  ]
+};
+
+function updateGlowShadowsVisualStyles() {
+  const bgImg = document.getElementById('glow-shadows-canvas-img');
+  const subcaptionEl = document.getElementById('glow-shadows-display-subcaption');
+  const bottomGlowLayer = document.getElementById('glow-shadows-bottom-glow-layer');
+  const secondaryGlowLayer = document.getElementById('glow-shadows-secondary-glow-layer');
+  const topSharpLayer = document.getElementById('glow-shadows-top-sharp-layer');
+  const hudRadiusVal = document.getElementById('glow-shadows-hud-radius-val');
+  const hudStatus = document.getElementById('glow-shadows-hud-status');
+  const hudModeState = document.getElementById('glow-shadows-hud-mode-state');
+
+  const headline = glowShadowsSuiteState.headline || 'THE ILLUSION OF CONTROL';
+  if (bottomGlowLayer) bottomGlowLayer.textContent = headline;
+  if (secondaryGlowLayer) secondaryGlowLayer.textContent = headline;
+  if (topSharpLayer) topSharpLayer.textContent = headline;
+  if (subcaptionEl) subcaptionEl.textContent = glowShadowsSuiteState.subcaption || 'CONFIDENTIAL EVIDENCE // EXHIBIT A';
+
+  if (bgImg && bgImg.src !== glowShadowsSuiteState.imageUrl) {
+    bgImg.src = glowShadowsSuiteState.imageUrl;
+  }
+
+  const rad = glowShadowsSuiteState.glowRadius;
+  const opac = (glowShadowsSuiteState.glowIntensity / 100).toFixed(2);
+  const shadow = glowShadowsSuiteState.dropShadowBlur;
+
+  if (hudRadiusVal) hudRadiusVal.textContent = `${rad}px`;
+
+  if (glowShadowsSuiteState.dualLayersActive) {
+    if (bottomGlowLayer) {
+      bottomGlowLayer.style.display = 'block';
+      bottomGlowLayer.style.filter = `blur(${rad}px)`;
+      bottomGlowLayer.style.opacity = opac;
+    }
+    if (secondaryGlowLayer) {
+      secondaryGlowLayer.style.display = 'block';
+      secondaryGlowLayer.style.filter = `blur(${Math.max(10, Math.floor(rad * 0.45))}px)`;
+      secondaryGlowLayer.style.opacity = (opac * 0.6).toFixed(2);
+    }
+    if (topSharpLayer) {
+      topSharpLayer.style.textShadow = `0 ${shadow * 0.7}px ${shadow * 1.4}px rgba(0,0,0,0.98), 0 3px 6px rgba(0,0,0,0.9)`;
+    }
+    if (hudStatus) hudStatus.textContent = `DUAL-LAYER COMPOSITING: ACTIVE (GLOW ${rad}PX, SHADOW ${shadow}PX)`;
+    if (hudModeState) hudModeState.textContent = 'ACTIVE';
+  } else {
+    if (bottomGlowLayer) bottomGlowLayer.style.display = 'none';
+    if (secondaryGlowLayer) secondaryGlowLayer.style.display = 'none';
+    if (topSharpLayer) topSharpLayer.style.textShadow = 'none';
+    if (hudStatus) hudStatus.textContent = 'DUAL-LAYER GLOW: BYPASSED';
+    if (hudModeState) hudModeState.textContent = 'BYPASSED';
+  }
+}
+
+function renderGlowShadowsLoop(now) {
+  if (glowShadowsSuiteState.isPlaying) {
+    glowShadowsSuiteState.currentTime += 0.033;
+    if (glowShadowsSuiteState.currentTime > glowShadowsSuiteState.duration) {
+      glowShadowsSuiteState.currentTime = 0;
+    }
+  }
+
+  const t = glowShadowsSuiteState.currentTime;
+  const dur = glowShadowsSuiteState.duration;
+  const progressRatio = (t / dur) * 100;
+
+  // Animate playhead needle
+  const playhead = document.getElementById('glow-shadows-playhead-needle');
+  if (playhead) {
+    playhead.style.left = `${progressRatio}%`;
+  }
+
+  // Update time readouts
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+    return `${m}:${s}.${ms}`;
+  };
+
+  const timeReadout = document.getElementById('glow-shadows-time-readout');
+  if (timeReadout) {
+    timeReadout.textContent = `${formatTime(t)} / ${formatTime(dur)}`;
+  }
+  const playheadReadout = document.getElementById('glow-shadows-playhead-readout');
+  if (playheadReadout) {
+    playheadReadout.textContent = `PLAYHEAD: ${formatTime(t)}`;
+  }
+
+  // Atmospheric background scale
+  const bgContainer = document.getElementById('glow-shadows-bg-container');
+  if (bgContainer) {
+    const zoom = 1.04 + Math.sin(t * 0.4) * 0.03;
+    bgContainer.style.transform = `scale(${zoom})`;
+  }
+
+  // Breathing pulse on the bottom glow layer
+  const bottomGlow = document.getElementById('glow-shadows-bottom-glow-layer');
+  if (bottomGlow && glowShadowsSuiteState.dualLayersActive) {
+    const baseRad = glowShadowsSuiteState.glowRadius;
+    const pulseRad = baseRad + Math.sin(t * 2.8) * (baseRad * 0.2);
+    bottomGlow.style.filter = `blur(${pulseRad.toFixed(1)}px)`;
+  }
+
+  glowShadowsSuiteState.animFrameId = requestAnimationFrame(renderGlowShadowsLoop);
+}
+
+function openGlowShadowsSuite() {
+  const modal = document.getElementById('modal-glow-shadows-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  glowShadowsSuiteState.isPlaying = true;
+  const playIcon = document.getElementById('glow-shadows-play-icon');
+  if (playIcon) playIcon.textContent = '❚❚';
+  updateGlowShadowsVisualStyles();
+  if (!glowShadowsSuiteState.animFrameId) {
+    glowShadowsSuiteState.animFrameId = requestAnimationFrame(renderGlowShadowsLoop);
+  }
+}
+
+function closeGlowShadowsSuite() {
+  const modal = document.getElementById('modal-glow-shadows-suite');
+  if (modal) modal.style.display = 'none';
+  glowShadowsSuiteState.isPlaying = false;
+  if (glowShadowsSuiteState.animFrameId) {
+    cancelAnimationFrame(glowShadowsSuiteState.animFrameId);
+    glowShadowsSuiteState.animFrameId = null;
+  }
+}
+
+function bindGlowShadowsSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-glow-shadows-suite')?.addEventListener('click', closeGlowShadowsSuite);
+
+  // Play / Pause toggle
+  document.getElementById('btn-glow-shadows-play')?.addEventListener('click', () => {
+    glowShadowsSuiteState.isPlaying = !glowShadowsSuiteState.isPlaying;
+    const playIcon = document.getElementById('glow-shadows-play-icon');
+    if (playIcon) {
+      playIcon.textContent = glowShadowsSuiteState.isPlaying ? '❚❚' : '▶';
+    }
+  });
+
+  // Toggle mode (dual layers vs bypass)
+  document.getElementById('btn-glow-shadows-toggle-mode')?.addEventListener('click', () => {
+    glowShadowsSuiteState.dualLayersActive = !glowShadowsSuiteState.dualLayersActive;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Headline sync
+  document.getElementById('glow-shadows-input-headline')?.addEventListener('input', (e) => {
+    glowShadowsSuiteState.headline = e.target.value;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Subcaption sync
+  document.getElementById('glow-shadows-input-subcaption')?.addEventListener('input', (e) => {
+    glowShadowsSuiteState.subcaption = e.target.value;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Image URL input
+  document.getElementById('glow-shadows-input-img-url')?.addEventListener('change', (e) => {
+    if (e.target.value.trim()) {
+      glowShadowsSuiteState.imageUrl = e.target.value.trim();
+      updateGlowShadowsVisualStyles();
+    }
+  });
+
+  // Stock shuffle button
+  document.getElementById('btn-glow-shadows-shuffle-img')?.addEventListener('click', () => {
+    const stocks = glowShadowsSuiteState.stockImages;
+    const current = glowShadowsSuiteState.imageUrl;
+    const others = stocks.filter(url => url !== current);
+    const chosen = others[Math.floor(Math.random() * others.length)] || stocks[0];
+    glowShadowsSuiteState.imageUrl = chosen;
+    const urlInput = document.getElementById('glow-shadows-input-img-url');
+    if (urlInput) urlInput.value = chosen;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Image file upload
+  document.getElementById('glow-shadows-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (loadEvt) => {
+        glowShadowsSuiteState.imageUrl = loadEvt.target.result;
+        const urlInput = document.getElementById('glow-shadows-input-img-url');
+        if (urlInput) urlInput.value = file.name;
+        updateGlowShadowsVisualStyles();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Glow radius slider
+  document.getElementById('glow-shadows-slider-radius')?.addEventListener('input', (e) => {
+    glowShadowsSuiteState.glowRadius = parseInt(e.target.value) || 45;
+    const lbl = document.getElementById('glow-shadows-val-radius');
+    if (lbl) lbl.textContent = `${glowShadowsSuiteState.glowRadius}px`;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Glow intensity slider
+  document.getElementById('glow-shadows-slider-intensity')?.addEventListener('input', (e) => {
+    glowShadowsSuiteState.glowIntensity = parseInt(e.target.value) || 75;
+    const lbl = document.getElementById('glow-shadows-val-intensity');
+    if (lbl) lbl.textContent = `${glowShadowsSuiteState.glowIntensity}%`;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Drop shadow slider
+  document.getElementById('glow-shadows-slider-shadow')?.addEventListener('input', (e) => {
+    glowShadowsSuiteState.dropShadowBlur = parseInt(e.target.value) || 20;
+    const lbl = document.getElementById('glow-shadows-val-shadow');
+    if (lbl) lbl.textContent = `${glowShadowsSuiteState.dropShadowBlur}px`;
+    updateGlowShadowsVisualStyles();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-glow-shadows-apply-timeline')?.addEventListener('click', () => {
+    closeGlowShadowsSuite();
+    switchStudioView('editor');
+
+    const footageClip = {
+      id: `img-glow-${Date.now()}`,
+      name: 'Atmospheric_Noir_Backdrop.jpg',
+      url: glowShadowsSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    // Layer 1: Bottom Ambient Glow Text
+    const bottomGlowClip = {
+      id: `txt-glow-bottom-${Date.now() + 1}`,
+      text: glowShadowsSuiteState.headline,
+      highlight: '',
+      highlightColor: '#c084fc',
+      anim: 'pop',
+      fontSize: 56,
+      fontFamily: 'Inter, sans-serif',
+      layerOrder: 'middle',
+      start: 0,
+      duration: 6
+    };
+
+    // Layer 2: Top Crisp Text with Drop Shadow
+    const topSharpClip = {
+      id: `txt-glow-top-${Date.now() + 2}`,
+      text: glowShadowsSuiteState.headline,
+      highlight: glowShadowsSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'pop',
+      fontSize: 56,
+      fontFamily: 'Inter, sans-serif',
+      layerOrder: 'front',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-glow-sub-${Date.now() + 3}`,
+      text: glowShadowsSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#fbbf24',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [footageClip];
+      timelineClips.text = [topSharpClip, bottomGlowClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(topSharpClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Glow & Drop Shadows Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: 3D CAMERA MOVE & ROTATION SUITE CONTROLLER
+   ========================================================= */
+let camera3DSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 8.0,
+  trackingActive: true,
+  trackingDepth: 650, // px (range 200 to 1200)
+  rotationSensitivity: 14, // deg (range 2 to 32)
+  trackingSpeed: 5, // speed multiplier (range 1 to 10)
+  headline: 'SPATIAL PERSPECTIVE',
+  subcaption: 'PHYSICAL SPACE FLOATING',
+  imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  stockImages: [
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
+  ]
+};
+
+function updateCamera3DVisualStyles() {
+  const bgImg = document.getElementById('camera-3d-canvas-img');
+  const headlineEl = document.getElementById('camera-3d-display-headline');
+  const subcaptionEl = document.getElementById('camera-3d-display-subcaption');
+  const cardZReadout = document.getElementById('camera-3d-card-z-readout');
+  const hudStatus = document.getElementById('camera-3d-hud-status');
+  const hudTrackingState = document.getElementById('camera-3d-hud-tracking-state');
+
+  if (headlineEl) headlineEl.textContent = camera3DSuiteState.headline || 'SPATIAL PERSPECTIVE';
+  if (subcaptionEl) subcaptionEl.textContent = camera3DSuiteState.subcaption || 'PHYSICAL SPACE FLOATING';
+
+  if (bgImg && bgImg.src !== camera3DSuiteState.imageUrl) {
+    bgImg.src = camera3DSuiteState.imageUrl;
+  }
+
+  const depth = camera3DSuiteState.trackingDepth;
+  const rot = camera3DSuiteState.rotationSensitivity;
+
+  if (cardZReadout) cardZReadout.textContent = `-${Math.round(depth * 0.15)}PX`;
+
+  if (camera3DSuiteState.trackingActive) {
+    if (hudStatus) hudStatus.textContent = `CAMERA ROT: ±${rot}° // Z-PULLBACK: ${depth}PX`;
+    if (hudTrackingState) hudTrackingState.textContent = 'TRACKING';
+  } else {
+    if (hudStatus) hudStatus.textContent = '3D CAMERA RIG: LOCKED';
+    if (hudTrackingState) hudTrackingState.textContent = 'LOCKED';
+  }
+}
+
+function renderCamera3DLoop(now) {
+  if (camera3DSuiteState.isPlaying) {
+    camera3DSuiteState.currentTime += 0.033;
+    if (camera3DSuiteState.currentTime > camera3DSuiteState.duration) {
+      camera3DSuiteState.currentTime = 0;
+    }
+  }
+
+  const t = camera3DSuiteState.currentTime;
+  const dur = camera3DSuiteState.duration;
+  const progressRatio = (t / dur) * 100;
+
+  // Animate playhead needle
+  const playhead = document.getElementById('camera-3d-playhead-needle');
+  if (playhead) {
+    playhead.style.left = `${progressRatio}%`;
+  }
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+    return `${m}:${s}.${ms}`;
+  };
+
+  const timeReadout = document.getElementById('camera-3d-time-readout');
+  if (timeReadout) {
+    timeReadout.textContent = `${formatTime(t)} / ${formatTime(dur)}`;
+  }
+  const playheadReadout = document.getElementById('camera-3d-playhead-readout');
+  if (playheadReadout) {
+    playheadReadout.textContent = `PLAYHEAD: ${formatTime(t)}`;
+  }
+
+  // 3D Spatial Camera Tracking & Rotation Movement
+  const rigContainer = document.getElementById('camera-3d-rig-container');
+  if (rigContainer) {
+    if (camera3DSuiteState.trackingActive) {
+      const speedMult = camera3DSuiteState.trackingSpeed * 0.2;
+      const rotMax = camera3DSuiteState.rotationSensitivity;
+      const depthMax = camera3DSuiteState.trackingDepth;
+
+      const rotY = Math.sin(t * speedMult * 1.5) * rotMax;
+      const rotX = Math.cos(t * speedMult * 1.2) * (rotMax * 0.7);
+      const trackZ = Math.sin(t * speedMult * 0.8) * (depthMax * 0.25);
+
+      rigContainer.style.transform = `translateZ(${trackZ.toFixed(1)}px) rotateY(${rotY.toFixed(1)}deg) rotateX(${rotX.toFixed(1)}deg)`;
+    } else {
+      rigContainer.style.transform = 'translateZ(0px) rotateY(0deg) rotateX(0deg)';
+    }
+  }
+
+  camera3DSuiteState.animFrameId = requestAnimationFrame(renderCamera3DLoop);
+}
+
+function openCamera3DMoveSuite() {
+  const modal = document.getElementById('modal-camera-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  camera3DSuiteState.isPlaying = true;
+  const playIcon = document.getElementById('camera-3d-play-icon');
+  if (playIcon) playIcon.textContent = '❚❚';
+  updateCamera3DVisualStyles();
+  if (!camera3DSuiteState.animFrameId) {
+    camera3DSuiteState.animFrameId = requestAnimationFrame(renderCamera3DLoop);
+  }
+}
+
+function closeCamera3DMoveSuite() {
+  const modal = document.getElementById('modal-camera-3d-suite');
+  if (modal) modal.style.display = 'none';
+  camera3DSuiteState.isPlaying = false;
+  if (camera3DSuiteState.animFrameId) {
+    cancelAnimationFrame(camera3DSuiteState.animFrameId);
+    camera3DSuiteState.animFrameId = null;
+  }
+}
+
+function bindCamera3DMoveSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-camera-3d-suite')?.addEventListener('click', closeCamera3DMoveSuite);
+
+  // Play / Pause toggle
+  document.getElementById('btn-camera-3d-play')?.addEventListener('click', () => {
+    camera3DSuiteState.isPlaying = !camera3DSuiteState.isPlaying;
+    const playIcon = document.getElementById('camera-3d-play-icon');
+    if (playIcon) {
+      playIcon.textContent = camera3DSuiteState.isPlaying ? '❚❚' : '▶';
+    }
+  });
+
+  // Toggle tracking
+  document.getElementById('btn-camera-3d-toggle-tracking')?.addEventListener('click', () => {
+    camera3DSuiteState.trackingActive = !camera3DSuiteState.trackingActive;
+    updateCamera3DVisualStyles();
+  });
+
+  // Headline sync
+  document.getElementById('camera-3d-input-headline')?.addEventListener('input', (e) => {
+    camera3DSuiteState.headline = e.target.value;
+    updateCamera3DVisualStyles();
+  });
+
+  // Subcaption sync
+  document.getElementById('camera-3d-input-subcaption')?.addEventListener('input', (e) => {
+    camera3DSuiteState.subcaption = e.target.value;
+    updateCamera3DVisualStyles();
+  });
+
+  // Image URL input
+  document.getElementById('camera-3d-input-img-url')?.addEventListener('change', (e) => {
+    if (e.target.value.trim()) {
+      camera3DSuiteState.imageUrl = e.target.value.trim();
+      updateCamera3DVisualStyles();
+    }
+  });
+
+  // Stock shuffle button
+  document.getElementById('btn-camera-3d-shuffle-img')?.addEventListener('click', () => {
+    const stocks = camera3DSuiteState.stockImages;
+    const current = camera3DSuiteState.imageUrl;
+    const others = stocks.filter(url => url !== current);
+    const chosen = others[Math.floor(Math.random() * others.length)] || stocks[0];
+    camera3DSuiteState.imageUrl = chosen;
+    const urlInput = document.getElementById('camera-3d-input-img-url');
+    if (urlInput) urlInput.value = chosen;
+    updateCamera3DVisualStyles();
+  });
+
+  // Image file upload
+  document.getElementById('camera-3d-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (loadEvt) => {
+        camera3DSuiteState.imageUrl = loadEvt.target.result;
+        const urlInput = document.getElementById('camera-3d-input-img-url');
+        if (urlInput) urlInput.value = file.name;
+        updateCamera3DVisualStyles();
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Tracking depth slider
+  document.getElementById('camera-3d-slider-depth')?.addEventListener('input', (e) => {
+    camera3DSuiteState.trackingDepth = parseInt(e.target.value) || 650;
+    const lbl = document.getElementById('camera-3d-val-depth');
+    if (lbl) lbl.textContent = `${camera3DSuiteState.trackingDepth}px`;
+    updateCamera3DVisualStyles();
+  });
+
+  // Rotation sensitivity slider
+  document.getElementById('camera-3d-slider-rotation')?.addEventListener('input', (e) => {
+    camera3DSuiteState.rotationSensitivity = parseInt(e.target.value) || 14;
+    const lbl = document.getElementById('camera-3d-val-rotation');
+    if (lbl) lbl.textContent = `${camera3DSuiteState.rotationSensitivity}°`;
+    updateCamera3DVisualStyles();
+  });
+
+  // Tracking speed slider
+  document.getElementById('camera-3d-slider-speed')?.addEventListener('input', (e) => {
+    camera3DSuiteState.trackingSpeed = parseInt(e.target.value) || 5;
+    const lbl = document.getElementById('camera-3d-val-speed');
+    if (lbl) lbl.textContent = `${camera3DSuiteState.trackingSpeed}x`;
+    updateCamera3DVisualStyles();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-camera-3d-apply-timeline')?.addEventListener('click', () => {
+    closeCamera3DMoveSuite();
+    switchStudioView('editor');
+
+    const footageClip = {
+      id: `img-camera-3d-${Date.now()}`,
+      name: '3D_Archival_Card_Layer.jpg',
+      url: camera3DSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.2,
+      zoomEffect: 'snap',
+      zoomScale: 1.35,
+      transition: 'fly_through',
+      transitionDuration: 1.0
+    };
+
+    const headlineClip = {
+      id: `txt-camera-3d-headline-${Date.now() + 1}`,
+      text: camera3DSuiteState.headline,
+      highlight: camera3DSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#6366f1',
+      anim: 'pop',
+      fontSize: 58,
+      fontFamily: 'Inter, sans-serif',
+      layerOrder: 'front',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-camera-3d-sub-${Date.now() + 2}`,
+      text: camera3DSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#a5b4fc',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [footageClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert('Applied 3D Camera Move & Rotation Suite to timeline!', 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
