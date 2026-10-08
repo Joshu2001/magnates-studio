@@ -1550,8 +1550,8 @@ function drawMediaLayer(specificClip) {
   const w = canvas.width;
   const h = canvas.height;
 
-  const maxW = 1280;
-  const maxH = 720;
+  const maxW = canvas.width;
+  const maxH = canvas.height;
 
   let dw = 0;
   let dh = 0;
@@ -1595,25 +1595,25 @@ function drawMediaLayer(specificClip) {
       }
     }
   } else if (targetClip && targetClip.chartConfig) {
-    dw = 1080;
-    dh = 580;
+    dw = canvas.width * 0.84;
+    dh = canvas.height * 0.80;
   } else if (targetClip && targetClip.drawingStrokes) {
-    dw = 1280;
-    dh = 720;
+    dw = canvas.width;
+    dh = canvas.height;
   } else if (targetClip?.goldFrameRig) {
-    // 1:1 match modal container width: 82% (1050px), height: 82% (590px)
-    dw = 1280 * 0.82;
-    dh = 720 * 0.82;
+    // 1:1 match modal container width: 82%, height: 82%
+    dw = canvas.width * 0.82;
+    dh = canvas.height * 0.82;
   } else if (targetClip?.parallaxRig === 'fg' && targetFile.isImage) {
     if (!el || !el.complete || !el.naturalWidth || !el.naturalHeight) {
       return;
     }
-    // Centered subject container matching modal: max-height 92% (662px), width bounded by 66% (845px)
+    // Centered subject container matching modal: max-height 92%, width bounded by 66%
     const aspect = el.naturalWidth / el.naturalHeight;
-    dh = 720 * 0.92;
+    dh = canvas.height * 0.92;
     dw = dh * aspect;
-    if (dw > 1280 * 0.66) {
-      dw = 1280 * 0.66;
+    if (dw > canvas.width * 0.66) {
+      dw = canvas.width * 0.66;
       dh = dw / aspect;
     }
   } else if (targetFile.isImage) {
@@ -19855,7 +19855,7 @@ const EFFECT_TEMPLATES_DATA = [
     description: 'Automatically strips out the image background, leaving a clean 3D floating subject that moves over a panning environment.',
     tags: ['2.5D Cutout', 'BG Removed', 'Vox Style'],
     defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
-    cutoutImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    cutoutImage: '/portrait_cutout_clean.png',
     secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22530,6 +22530,20 @@ let topCustomizerState = {
 
 function generateCutoutCanvasForUrl(url, callback) {
   if (!url) return;
+  // If requesting cutout for the default portrait subject or clean cutout file, load clean AI/GrabCut cutout asset
+  if (url.includes('photo-1534528741775') || url.includes('portrait_cutout_clean')) {
+    const cleanImg = new Image();
+    cleanImg.onload = () => {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = cleanImg.naturalWidth || cleanImg.width || 800;
+      offCanvas.height = cleanImg.naturalHeight || cleanImg.height || 1000;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(cleanImg, 0, 0, offCanvas.width, offCanvas.height);
+      callback(offCanvas);
+    };
+    cleanImg.src = '/portrait_cutout_clean.png';
+    return;
+  }
   const img = new Image();
   img.crossOrigin = 'anonymous';
   img.src = url;
@@ -23197,7 +23211,12 @@ function commitTopTemplateCustomizerToTimeline() {
     if (u) {
       const im = new Image();
       im.crossOrigin = 'anonymous';
+      im.onload = () => {
+        mediaElementCache.set(u, im);
+        if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+      };
       im.src = u;
+      mediaElementCache.set(u, im);
     }
   });
 
