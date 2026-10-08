@@ -19979,6 +19979,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
     defaultImage: '/jani_puzzle_reveal_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'light-rays-lens-leaks',
+    title: 'Light Rays & Ambient Lens Leaks',
+    category: 'Color & Vibe',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(245, 158, 11, 0.75), rgba(168, 85, 247, 0.45), rgba(6, 182, 212, 0.25), rgba(5, 3, 8, 0.95))',
+    description: 'Subtle ambient light leaks, anamorphic lens flare streaks, and volumetric ray scattering overlayed on footage to emulate real camera lens imperfections.',
+    tags: ['Light Leaks', 'Lens Flare', 'Scattering', 'Anamorphic', 'James Jani'],
+    defaultImage: '/jani_light_rays_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20592,6 +20605,26 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'light-rays-lens-leaks') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+          <img id="fx-light-bg-${tplId}" src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; filter: brightness(0.85) contrast(1.15);" />
+
+          <!-- Dynamic Ambient Light Leak Orb -->
+          <div id="fx-leak-orb-${tplId}" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; transition: opacity 0.2s ease; background: radial-gradient(circle at 75% 25%, rgba(251, 146, 60, 0.85) 0%, rgba(244, 63, 94, 0.4) 35%, rgba(168, 85, 247, 0.15) 60%, transparent 80%);"></div>
+
+          <!-- Volumetric Conic Ray Beams -->
+          <div id="fx-conic-rays-${tplId}" style="position: absolute; inset: 0; pointer-events: none; opacity: 0.65; mix-blend-mode: color-dodge; background: conic-gradient(from 0deg at 20% 20%, rgba(253, 224, 71, 0.5), transparent 15%, rgba(249, 115, 22, 0.4) 30%, transparent 45%, rgba(168, 85, 247, 0.5) 60%, transparent 75%);"></div>
+
+          <!-- Anamorphic Lens Flare Line -->
+          <div id="fx-flare-line-${tplId}" style="position: absolute; top: 40%; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #22d3ee, #ffffff, #22d3ee, transparent); pointer-events: none; opacity: 0.85; mix-blend-mode: screen; filter: blur(1.5px) drop-shadow(0 0 10px #22d3ee);"></div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
+            ☀️ LENS LEAK &amp; RAYS
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20876,6 +20909,23 @@ function startTemplateHoverVideo(cardEl, tpl) {
           arcEl.style.transform = isRevealed ? 'scale(1)' : 'scale(0.92)';
           arcEl.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
         }
+      }
+    } else if (tplId === 'light-rays-lens-leaks') {
+      const sweepX = (Math.sin(t * 1.8) * 35) + 50;
+      const sweepY = (Math.cos(t * 1.2) * 25) + 35;
+      const deg = Math.floor((t * 45) % 360);
+      const orb = fxContainer?.querySelector(`#fx-leak-orb-${tplId}`);
+      const rays = fxContainer?.querySelector(`#fx-conic-rays-${tplId}`);
+      const flare = fxContainer?.querySelector(`#fx-flare-line-${tplId}`);
+
+      if (orb) {
+        orb.style.background = `radial-gradient(circle at ${sweepX}% ${sweepY}%, rgba(251, 146, 60, 0.9) 0%, rgba(244, 63, 94, 0.45) 35%, rgba(168, 85, 247, 0.2) 60%, transparent 80%)`;
+      }
+      if (rays) {
+        rays.style.background = `conic-gradient(from ${deg}deg at ${sweepX}% ${sweepY}%, rgba(253, 224, 71, 0.5), transparent 15%, rgba(249, 115, 22, 0.4) 30%, transparent 45%, rgba(168, 85, 247, 0.5) 60%, transparent 75%)`;
+      }
+      if (flare) {
+        flare.style.top = `${sweepY}%`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21239,6 +21289,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'puzzle-piece-reveal') {
     // Launch James Jani Puzzle Piece Reveal & Story Arc Masking Suite
     openPuzzleRevealSuite();
+    return;
+  } else if (templateId === 'light-rays-lens-leaks') {
+    // Launch James Jani Light Rays & Ambient Lens Leaks Suite
+    openLightRaysSuite();
     return;
   }
 
@@ -23320,6 +23374,7 @@ function initHomepageTemplateEvents() {
   bindCountdownSuiteModalControls();
   bindFlashbackSuiteModalControls();
   bindPuzzleRevealSuiteModalControls();
+  bindLightRaysSuiteModalControls();
 }
 
 /* =========================================================
@@ -25237,10 +25292,342 @@ function bindPuzzleRevealSuiteModalControls() {
   });
 }
 
+/* =========================================================
+   JAMES JANI FX ENGINE: LIGHT RAYS & AMBIENT LENS LEAKS CONTROLLER
+   ========================================================= */
+let lightRaysSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 10.0,
+  leakEnabled: true,
+  leakIntensity: 80,
+  beamAngle: 135,
+  colorMode: 'gold', // 'gold', 'cyan', 'violet'
+  sweepSpeed: 5,
+  headline: 'THE ARCHITECT OF ILLUSION',
+  subcaption: 'ANAMORPHIC FLARE & OPTICAL SCATTER',
+  imageUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  lastTime: performance.now()
+};
+
+const LIGHT_RAYS_STOCK_IMAGES = [
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80'
+];
+
+function playLightRaysSFX() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(520, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.005, now + 0.18);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  } catch (err) {}
+}
+
+function updateLightRaysVisualStyles() {
+  const leakLayer = document.getElementById('light-rays-leak-layer');
+  const conicLayer = document.getElementById('light-rays-conic-layer');
+  const flareStreak = document.getElementById('light-rays-flare-streak');
+  const imgEl = document.getElementById('light-rays-canvas-img');
+  const hudState = document.getElementById('light-rays-hud-leak-state');
+
+  if (hudState) hudState.textContent = lightRaysSuiteState.leakEnabled ? 'ON' : 'OFF';
+
+  if (!lightRaysSuiteState.leakEnabled) {
+    if (leakLayer) leakLayer.style.opacity = '0';
+    if (conicLayer) conicLayer.style.opacity = '0';
+    if (flareStreak) flareStreak.style.opacity = '0';
+    return;
+  }
+
+  const opacity = (lightRaysSuiteState.leakIntensity / 100);
+  if (leakLayer) leakLayer.style.opacity = `${opacity * 0.9}`;
+  if (conicLayer) conicLayer.style.opacity = `${opacity * 0.75}`;
+  if (flareStreak) flareStreak.style.opacity = `${opacity * 0.95}`;
+
+  // Color modes
+  if (lightRaysSuiteState.colorMode === 'cyan') {
+    if (leakLayer) {
+      leakLayer.style.background = 'radial-gradient(circle at 75% 25%, rgba(6,182,212,0.9) 0%, rgba(59,130,246,0.45) 40%, transparent 70%)';
+    }
+    if (conicLayer) {
+      conicLayer.style.background = `conic-gradient(from ${lightRaysSuiteState.beamAngle}deg at 70% 25%, rgba(34,211,238,0.6), transparent 15%, rgba(59,130,246,0.4) 30%, transparent 45%, rgba(147,51,234,0.4) 60%, transparent 75%)`;
+    }
+    if (flareStreak) {
+      flareStreak.style.background = 'linear-gradient(90deg, transparent, #22d3ee, #ffffff, #22d3ee, transparent)';
+      flareStreak.style.filter = 'blur(1.5px) drop-shadow(0 0 12px #22d3ee)';
+    }
+  } else if (lightRaysSuiteState.colorMode === 'violet') {
+    if (leakLayer) {
+      leakLayer.style.background = 'radial-gradient(circle at 25% 75%, rgba(168,85,247,0.9) 0%, rgba(236,72,153,0.45) 40%, transparent 70%)';
+    }
+    if (conicLayer) {
+      conicLayer.style.background = `conic-gradient(from ${lightRaysSuiteState.beamAngle}deg at 30% 70%, rgba(192,132,252,0.6), transparent 15%, rgba(236,72,153,0.4) 30%, transparent 45%, rgba(59,130,246,0.4) 60%, transparent 75%)`;
+    }
+    if (flareStreak) {
+      flareStreak.style.background = 'linear-gradient(90deg, transparent, #c084fc, #ffffff, #c084fc, transparent)';
+      flareStreak.style.filter = 'blur(1.5px) drop-shadow(0 0 12px #c084fc)';
+    }
+  } else {
+    // Default Golden Hour
+    if (leakLayer) {
+      leakLayer.style.background = 'radial-gradient(circle at 75% 25%, rgba(251,146,60,0.9) 0%, rgba(244,63,94,0.45) 40%, transparent 70%)';
+    }
+    if (conicLayer) {
+      conicLayer.style.background = `conic-gradient(from ${lightRaysSuiteState.beamAngle}deg at 70% 25%, rgba(253,224,71,0.6), transparent 15%, rgba(249,115,22,0.4) 30%, transparent 45%, rgba(168,85,247,0.4) 60%, transparent 75%)`;
+    }
+    if (flareStreak) {
+      flareStreak.style.background = 'linear-gradient(90deg, transparent, #fbbf24, #ffffff, #fbbf24, transparent)';
+      flareStreak.style.filter = 'blur(1.5px) drop-shadow(0 0 12px #fbbf24)';
+    }
+  }
+}
+
+function renderLightRaysLoop(now) {
+  const dt = (now - lightRaysSuiteState.lastTime) / 1000;
+  lightRaysSuiteState.lastTime = now;
+
+  if (lightRaysSuiteState.isPlaying) {
+    lightRaysSuiteState.currentTime += dt;
+    if (lightRaysSuiteState.currentTime >= lightRaysSuiteState.duration) {
+      lightRaysSuiteState.currentTime = 0;
+    }
+
+    const t = lightRaysSuiteState.currentTime;
+    const readout = document.getElementById('light-rays-time-readout');
+    const playheadReadout = document.getElementById('light-rays-playhead-readout');
+    const needle = document.getElementById('light-rays-playhead-needle');
+
+    const mins = Math.floor(t / 60);
+    const secs = Math.floor(t % 60);
+    const ms = Math.floor((t % 1) * 100);
+    const timeFormatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+
+    if (readout) readout.textContent = `${timeFormatted} / 00:10.00`;
+    if (playheadReadout) playheadReadout.textContent = `PLAYHEAD: ${timeFormatted}`;
+    if (needle) needle.style.left = `${(t / lightRaysSuiteState.duration) * 100}%`;
+
+    // Dynamic light ray and leak sweeping motion
+    if (lightRaysSuiteState.leakEnabled) {
+      const speed = lightRaysSuiteState.sweepSpeed * 0.4;
+      const sweepX = (Math.sin(t * speed) * 35) + 50;
+      const sweepY = (Math.cos(t * speed * 0.7) * 25) + 35;
+      const flareStreak = document.getElementById('light-rays-flare-streak');
+      const leakLayer = document.getElementById('light-rays-leak-layer');
+
+      if (flareStreak) {
+        flareStreak.style.top = `${sweepY}%`;
+      }
+      if (leakLayer) {
+        leakLayer.style.transform = `scale(${1 + Math.sin(t * 1.5) * 0.08})`;
+      }
+    }
+  }
+
+  lightRaysSuiteState.animFrameId = requestAnimationFrame(renderLightRaysLoop);
+}
+
+function openLightRaysSuite() {
+  const modal = document.getElementById('modal-light-rays-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  lightRaysSuiteState.isPlaying = true;
+  lightRaysSuiteState.lastTime = performance.now();
+  const icon = document.getElementById('light-rays-play-icon');
+  if (icon) icon.textContent = '❚❚';
+  updateLightRaysVisualStyles();
+  if (!lightRaysSuiteState.animFrameId) {
+    lightRaysSuiteState.animFrameId = requestAnimationFrame(renderLightRaysLoop);
+  }
+}
+
+function closeLightRaysSuite() {
+  const modal = document.getElementById('modal-light-rays-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  lightRaysSuiteState.isPlaying = false;
+  const icon = document.getElementById('light-rays-play-icon');
+  if (icon) icon.textContent = '▶';
+  if (lightRaysSuiteState.animFrameId) {
+    cancelAnimationFrame(lightRaysSuiteState.animFrameId);
+    lightRaysSuiteState.animFrameId = null;
+  }
+}
+
+function bindLightRaysSuiteModalControls() {
+  document.getElementById('btn-close-light-rays-suite')?.addEventListener('click', closeLightRaysSuite);
+
+  // Play / Pause
+  document.getElementById('btn-light-rays-play')?.addEventListener('click', () => {
+    lightRaysSuiteState.isPlaying = !lightRaysSuiteState.isPlaying;
+    const icon = document.getElementById('light-rays-play-icon');
+    if (icon) icon.textContent = lightRaysSuiteState.isPlaying ? '❚❚' : '▶';
+  });
+
+  // Toggle Leak
+  document.getElementById('btn-light-rays-toggle-leak')?.addEventListener('click', () => {
+    lightRaysSuiteState.leakEnabled = !lightRaysSuiteState.leakEnabled;
+    playLightRaysSFX();
+    updateLightRaysVisualStyles();
+  });
+
+  // Text inputs
+  document.getElementById('light-rays-input-headline')?.addEventListener('input', (e) => {
+    lightRaysSuiteState.headline = e.target.value.toUpperCase();
+    const h = document.getElementById('light-rays-display-headline');
+    if (h) h.textContent = e.target.value.toUpperCase();
+  });
+
+  document.getElementById('light-rays-input-subcaption')?.addEventListener('input', (e) => {
+    lightRaysSuiteState.subcaption = e.target.value.toUpperCase();
+    const s = document.getElementById('light-rays-display-subcaption');
+    if (s) s.textContent = e.target.value.toUpperCase();
+  });
+
+  // Image editing (URL input)
+  document.getElementById('light-rays-input-img-url')?.addEventListener('input', (e) => {
+    const url = e.target.value.trim();
+    if (url) {
+      lightRaysSuiteState.imageUrl = url;
+      const img = document.getElementById('light-rays-canvas-img');
+      if (img) img.src = url;
+    }
+  });
+
+  // Upload custom photo
+  document.getElementById('light-rays-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      lightRaysSuiteState.imageUrl = ev.target.result;
+      const img = document.getElementById('light-rays-canvas-img');
+      if (img) img.src = ev.target.result;
+      const urlInput = document.getElementById('light-rays-input-img-url');
+      if (urlInput) urlInput.value = `[Uploaded: ${file.name}]`;
+      playLightRaysSFX();
+      showTextTimingAlert(`Uploaded custom archival footage: ${file.name}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Shuffle stock photo
+  document.getElementById('btn-light-rays-shuffle-img')?.addEventListener('click', () => {
+    const nextImg = LIGHT_RAYS_STOCK_IMAGES[Math.floor(Math.random() * LIGHT_RAYS_STOCK_IMAGES.length)];
+    lightRaysSuiteState.imageUrl = nextImg;
+    const img = document.getElementById('light-rays-canvas-img');
+    if (img) img.src = nextImg;
+    const urlInput = document.getElementById('light-rays-input-img-url');
+    if (urlInput) urlInput.value = nextImg;
+    playLightRaysSFX();
+  });
+
+  // Mode Select
+  document.getElementById('light-rays-select-mode')?.addEventListener('change', (e) => {
+    lightRaysSuiteState.colorMode = e.target.value;
+    updateLightRaysVisualStyles();
+  });
+
+  // Intensity slider
+  document.getElementById('light-rays-slider-intensity')?.addEventListener('input', (e) => {
+    lightRaysSuiteState.leakIntensity = parseInt(e.target.value) || 80;
+    const lbl = document.getElementById('light-rays-val-intensity');
+    if (lbl) lbl.textContent = `${lightRaysSuiteState.leakIntensity}%`;
+    updateLightRaysVisualStyles();
+  });
+
+  // Beam Angle slider
+  document.getElementById('light-rays-slider-angle')?.addEventListener('input', (e) => {
+    lightRaysSuiteState.beamAngle = parseInt(e.target.value) || 135;
+    const lbl = document.getElementById('light-rays-val-angle');
+    if (lbl) lbl.textContent = `${lightRaysSuiteState.beamAngle}°`;
+    updateLightRaysVisualStyles();
+  });
+
+  // Speed slider
+  document.getElementById('light-rays-slider-speed')?.addEventListener('input', (e) => {
+    lightRaysSuiteState.sweepSpeed = parseInt(e.target.value) || 5;
+    const lbl = document.getElementById('light-rays-val-speed');
+    if (lbl) lbl.textContent = `${lightRaysSuiteState.sweepSpeed}x`;
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-light-rays-apply-timeline')?.addEventListener('click', () => {
+    closeLightRaysSuite();
+    switchStudioView('editor');
+
+    const footageClip = {
+      id: `img-lightrays-${Date.now()}`,
+      name: 'Anamorphic_Light_Ray_Scene.jpg',
+      url: lightRaysSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    const headlineClip = {
+      id: `txt-lightrays-headline-${Date.now() + 1}`,
+      text: lightRaysSuiteState.headline,
+      highlight: lightRaysSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'pop',
+      fontSize: 54,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-lightrays-sub-${Date.now() + 2}`,
+      text: lightRaysSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#fbbf24',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [footageClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Light Rays & Ambient Lens Leaks Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
 // Initialize homepage discovery view immediately on script execution
 setTimeout(() => {
   initHomepageTemplateEvents();
 }, 100);
+
 
 
 
