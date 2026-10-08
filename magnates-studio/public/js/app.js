@@ -19940,6 +19940,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Puzzle Metaphor', 'Alpha Matte', 'James Jani', 'Retention'],
     defaultImage: '/jani_puzzle_matte_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'jani-countdown-panic-suite',
+    title: 'James Jani "The Countdown Effect" & Panic Ticker Tape',
+    category: '3D Spatial',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(to top, rgba(239, 68, 68, 0.7), rgba(245, 158, 11, 0.35), rgba(9, 9, 11, 0.95))',
+    description: 'Build unbearable narrative suspense with customizable T-Minus digital clocks, collapsing stock tickers, dynamic charts, audio risers, and climax screen shake.',
+    tags: ['Countdown Effect', 'James Jani', 'Panic Ticker', 'Audio Riser', 'Climax Impact'],
+    defaultImage: '/jani_countdown_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20441,6 +20454,45 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'jani-countdown-panic-suite') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #080204; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px;">
+          <!-- Moving Technical Grid -->
+          <div style="position: absolute; inset: 0; background-size: 26px 26px; background-image: linear-gradient(to right, rgba(239,68,68,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(239,68,68,0.08) 1px, transparent 1px); opacity: 0.6;"></div>
+          
+          <!-- Animated Stock Collapse Curve SVG -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" preserveAspectRatio="none" viewBox="0 0 400 225">
+            <path id="fx-countdown-chart-${tplId}" d="M 0 100 Q 150 90, 260 140 T 400 185" fill="none" stroke="#ef4444" stroke-width="2.5" opacity="0.85" />
+          </svg>
+
+          <!-- Label -->
+          <div style="position: relative; z-index: 5; font-family: 'Chakra Petch', sans-serif; font-size: 9.5px; font-weight: 800; color: #a1a1aa; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">
+            FTX LIQUIDITY CRASH
+          </div>
+
+          <!-- Countdown Big Digits -->
+          <div id="fx-countdown-digits-${tplId}" style="position: relative; z-index: 5; font-family: 'Share Tech Mono', monospace; font-size: 26px; font-weight: 700; color: #ef4444; text-shadow: 0 0 16px rgba(239,68,68,0.8); letter-spacing: 1px;">
+            T-MINUS 00:04.280
+          </div>
+
+          <!-- Panic Meter -->
+          <div style="position: relative; z-index: 5; width: 65%; height: 2.5px; background: rgba(255,255,255,0.15); margin-top: 6px; border-radius: 2px; overflow: hidden;">
+            <div id="fx-countdown-bar-${tplId}" style="width: 70%; height: 100%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></div>
+          </div>
+
+          <!-- Bottom Live Ticker -->
+          <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(9,9,11,0.95); border-top: 1px solid rgba(239,68,68,0.5); padding: 3px 8px; overflow: hidden; white-space: nowrap;">
+            <span id="fx-countdown-ticker-${tplId}" style="font-family: monospace; font-size: 8px; color: #f87171; display: inline-block;">
+              $FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED
+            </span>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(239,68,68,0.5);">
+            ⏱️ COUNTDOWN FX
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20658,6 +20710,35 @@ function startTemplateHoverVideo(cardEl, tpl) {
             p.style.opacity = '0.75';
           }
         }
+      }
+    } else if (tplId === 'jani-countdown-panic-suite') {
+      // Countdown animation simulation
+      const remaining = Math.max(0, 10 - ((t * 2.5) % 10));
+      const sec = Math.floor(remaining);
+      const ms = Math.floor((remaining % 1) * 1000);
+      const pad = (n, w = 2) => String(n).padStart(w, '0');
+      
+      const digits = fxContainer?.querySelector(`#fx-countdown-digits-${tplId}`);
+      if (digits) {
+        digits.textContent = `T-MINUS 00:${pad(sec)}.${pad(ms, 3)}`;
+        if (remaining < 3) {
+          digits.style.color = '#ff334b';
+          digits.style.textShadow = '0 0 22px rgba(255, 51, 75, 1)';
+        } else {
+          digits.style.color = '#ef4444';
+          digits.style.textShadow = '0 0 16px rgba(239, 68, 68, 0.8)';
+        }
+      }
+
+      const bar = fxContainer?.querySelector(`#fx-countdown-bar-${tplId}`);
+      if (bar) {
+        bar.style.width = `${((10 - remaining) / 10) * 100}%`;
+      }
+
+      const ticker = fxContainer?.querySelector(`#fx-countdown-ticker-${tplId}`);
+      if (ticker) {
+        const offset = (t * 50) % 200;
+        ticker.style.transform = `translateX(-${offset}px)`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21009,6 +21090,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'jani-puzzle-narrative-suite') {
     // Launch James Jani Puzzle Reconstruction & Alpha Matte Suite
     openJaniSuite();
+    return;
+  } else if (templateId === 'jani-countdown-panic-suite') {
+    // Launch James Jani Countdown Effect & Panic Ticker Suite
+    openCountdownSuite();
     return;
   }
 
@@ -23087,6 +23172,7 @@ function initHomepageTemplateEvents() {
   bindSpatial3DModalControls();
   bindDocument3DFXModalControls();
   bindJaniSuiteModalControls();
+  bindCountdownSuiteModalControls();
 }
 
 /* =========================================================
@@ -23676,6 +23762,695 @@ function bindJaniSuiteModalControls() {
     }
 
     showTextTimingAlert('Applied James Jani Narrative Puzzle Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: "THE COUNTDOWN EFFECT" CONTROLLER
+   ========================================================= */
+let countdownSuiteState = {
+  isPlaying: false,
+  totalDuration: 10,
+  currentTime: 10,
+  lastFrameTime: performance.now(),
+  displayMode: 'tminus',
+  stylePreset: 'neon-red',
+  climaxTriggered: false,
+  shakeAmount: 0,
+  flashOpacity: 0,
+  lastTickSecond: -1,
+  audioEnabled: true,
+  audioCtx: null,
+  tickSynth: null,
+  riserOsc: null,
+  riserFilter: null,
+  noiseSynth: null,
+  animFrameId: null,
+  // Custom user content
+  title: "FTX LIQUIDITY CRASH",
+  quote: '"And in less than 48 hours... $32 Billion vanished into thin air."',
+  tickerText: "$FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED  •  $ETH $1,080 (-28.9%)  •  ALAMEDA RESEARCH BANKRUPT",
+  tickerEnabled: true,
+  tickerOffset: 0,
+  vignetteIntensity: 0.8,
+  crtEnabled: true,
+  shakeEnabled: true,
+  customBgImage: null,
+  customBgUrl: '',
+  chartPoints: []
+};
+
+const COUNTDOWN_PRESETS = {
+  ftx: {
+    title: "FTX LIQUIDITY CRASH",
+    duration: 10,
+    ticker: "$FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED  •  $ETH $1,080 (-28.9%)  •  ALAMEDA RESEARCH BANKRUPT",
+    quote: '"And in less than 48 hours... $32 Billion vanished into thin air."',
+    style: "neon-red"
+  },
+  theranos: {
+    title: "THERANOS FRAUD CLIMAX",
+    duration: 12,
+    ticker: "SEC INVESTIGATION DEEPENS  •  EDISON DEVICE VOIDED  •  FDA INJUNCTION ISSUED  •  VALUATION $9B -> $0",
+    quote: '"First they think you’re crazy, then they fight you, then you lose everything."',
+    style: "stark"
+  },
+  blackmonday: {
+    title: "OCTOBER 19, 1987 - BLACK MONDAY",
+    duration: 15,
+    ticker: "DOW JONES -22.6%  •  S&P 500 PANIC SELLING  •  LONDON STOCK EXCHANGE CRASHES  •  PROGRAMMED SELLING OVERWHELMED",
+    quote: '"The fastest single-day stock collapse in financial history."',
+    style: "matrix"
+  },
+  dotcom: {
+    title: "THE DOT-COM IMPLOSION",
+    duration: 8,
+    ticker: "NASDAQ -78%  •  PETS.COM LIQUIDATED  •  WEBVAN BANKRUPTCY  •  VENTURE CAPITAL DRY UP",
+    quote: '"Euphoria turned into an unprecedented digital carnage."',
+    style: "dramatic"
+  }
+};
+
+// Initialize chart data points
+for (let i = 0; i < 50; i++) {
+  countdownSuiteState.chartPoints.push(Math.random() * 0.4 + 0.5);
+}
+
+function initCountdownAudio() {
+  if (countdownSuiteState.audioCtx) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    countdownSuiteState.audioCtx = new AudioCtx();
+  } catch (err) {}
+}
+
+function playCountdownTick(isUrgent = false) {
+  if (!countdownSuiteState.audioEnabled) return;
+  initCountdownAudio();
+  const ctx = countdownSuiteState.audioCtx;
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+
+  try {
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(isUrgent ? 520 : 380, now);
+    osc.frequency.exponentialRampToValueAtTime(100, now + 0.04);
+    gain.gain.setValueAtTime(isUrgent ? 0.35 : 0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.04);
+  } catch (err) {}
+}
+
+function triggerCountdownClimaxImpact() {
+  countdownSuiteState.climaxTriggered = true;
+  if (countdownSuiteState.shakeEnabled) {
+    countdownSuiteState.shakeAmount = 26;
+    countdownSuiteState.flashOpacity = 0.85;
+  }
+  
+  // Audio climax impact
+  if (countdownSuiteState.audioEnabled) {
+    initCountdownAudio();
+    const ctx = countdownSuiteState.audioCtx;
+    if (ctx) {
+      if (ctx.state === 'suspended') ctx.resume();
+      try {
+        const now = ctx.currentTime;
+        // Deep sub-bass boom
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 1.2);
+        gain.gain.setValueAtTime(0.8, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 1.2);
+      } catch (err) {}
+    }
+  }
+
+  showCountdownToast("⚠️ SYSTEMIC COLLAPSE CLIMAX TRIGGERED!");
+}
+
+function showCountdownToast(msg) {
+  const toast = document.getElementById('countdown-toast');
+  const txt = document.getElementById('countdown-toast-msg');
+  if (!toast || !txt) return;
+  txt.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translate(-50%, 0px)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translate(-50%, 40px)';
+  }, 3200);
+}
+
+function drawCountdownBackground(ctx, w, h, progress) {
+  // If custom background image uploaded / set
+  if (countdownSuiteState.customBgImage && countdownSuiteState.customBgImage.complete) {
+    ctx.drawImage(countdownSuiteState.customBgImage, 0, 0, w, h);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(0, 0, w, h);
+  } else {
+    // Deep dark cinematic gradient
+    const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, w * 0.85);
+    bgGrad.addColorStop(0, '#120507');
+    bgGrad.addColorStop(0.6, '#080204');
+    bgGrad.addColorStop(1, '#000000');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  // Tech Grid Lines
+  ctx.strokeStyle = 'rgba(239, 68, 68, 0.08)';
+  ctx.lineWidth = 1;
+  const gridSize = 40;
+  for (let x = 0; x < w; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, h);
+    ctx.stroke();
+  }
+  for (let y = 0; y < h; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Crashing Stock Chart Line in Background
+  ctx.beginPath();
+  ctx.lineWidth = 4;
+  const lineGrad = ctx.createLinearGradient(0, 0, w, 0);
+  lineGrad.addColorStop(0, '#22c55e');
+  lineGrad.addColorStop(0.4, '#eab308');
+  lineGrad.addColorStop(1, '#ef4444');
+  ctx.strokeStyle = lineGrad;
+
+  const totalPoints = countdownSuiteState.chartPoints.length;
+  const step = w / (totalPoints - 1);
+
+  for (let i = 0; i < totalPoints; i++) {
+    let dropFactor = (i / totalPoints) > (1 - progress * 0.8) ? (1 + progress * 2.5) : 1;
+    let val = countdownSuiteState.chartPoints[i] / dropFactor;
+    if (progress > 0.7) val += (Math.random() - 0.5) * 0.08;
+    let x = i * step;
+    let y = h * 0.3 + (1 - val) * (h * 0.5);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Gradient under stock line
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.closePath();
+  const fillGrad = ctx.createLinearGradient(0, 0, 0, h);
+  fillGrad.addColorStop(0, 'rgba(239, 68, 68, 0.18)');
+  fillGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+}
+
+function drawCountdownEffect(ctx, w, h, remainingSec) {
+  const mins = Math.floor(remainingSec / 60);
+  const secs = Math.floor(remainingSec % 60);
+  const millis = Math.floor((remainingSec % 1) * 1000);
+  const pad = (n, width = 2) => String(n).padStart(width, '0');
+
+  let timeStr = "";
+  if (countdownSuiteState.displayMode === 'tminus') {
+    timeStr = `T-MINUS ${pad(mins)}:${pad(secs)}.${pad(millis, 3)}`;
+  } else {
+    timeStr = `23:${pad(59 - mins)}:${pad(59 - secs)}`;
+  }
+
+  ctx.save();
+
+  let primaryColor = "#ef4444";
+  let glowColor = "rgba(239, 68, 68, 0.8)";
+  let fontStack = "'Share Tech Mono', monospace";
+
+  if (countdownSuiteState.stylePreset === 'matrix') {
+    primaryColor = "#22c55e";
+    glowColor = "rgba(34, 197, 94, 0.8)";
+  } else if (countdownSuiteState.stylePreset === 'stark') {
+    primaryColor = "#ffffff";
+    glowColor = "rgba(255, 255, 255, 0.5)";
+    fontStack = "'Chakra Petch', sans-serif";
+  } else if (countdownSuiteState.stylePreset === 'dramatic') {
+    primaryColor = "#f59e0b";
+    glowColor = "rgba(245, 158, 11, 0.7)";
+    fontStack = "'Playfair Display', serif";
+  }
+
+  // Headline Banner Label
+  ctx.textAlign = 'center';
+  ctx.font = `700 22px 'Chakra Petch', sans-serif`;
+  ctx.fillStyle = '#a1a1aa';
+  ctx.fillText(countdownSuiteState.title.toUpperCase(), w / 2, h / 2 - 90);
+
+  // Main Digital Countdown Clock with Neon Glow
+  ctx.shadowColor = glowColor;
+  ctx.shadowBlur = 25;
+  ctx.fillStyle = primaryColor;
+  ctx.font = `700 80px ${fontStack}`;
+  ctx.fillText(timeStr, w / 2, h / 2 + 10);
+
+  // Sub-bar HUD accents
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.fillRect(w / 2 - 200, h / 2 + 45, 400, 2);
+
+  // Panic Meter Bar
+  const panicProgress = Math.max(0, Math.min(1, 1 - (remainingSec / countdownSuiteState.totalDuration)));
+  ctx.fillStyle = primaryColor;
+  ctx.fillRect(w / 2 - 200, h / 2 + 45, 400 * panicProgress, 3);
+
+  // Pulsing Warning Tag if time < 3s
+  if (remainingSec < 3 && remainingSec > 0) {
+    const pulseOpacity = (Math.sin(performance.now() * 0.02) + 1) / 2;
+    ctx.fillStyle = `rgba(239, 68, 68, ${pulseOpacity})`;
+    ctx.font = `700 16px 'Chakra Petch', sans-serif`;
+    ctx.fillText("⚠️ IMMINENT SYSTEMIC COLLAPSE", w / 2, h / 2 + 85);
+  }
+
+  ctx.restore();
+}
+
+function drawCountdownStockTicker(ctx, w, h) {
+  if (!countdownSuiteState.tickerEnabled) return;
+  const tickerH = 42;
+
+  ctx.fillStyle = 'rgba(9, 9, 11, 0.94)';
+  ctx.fillRect(0, h - tickerH, w, tickerH);
+
+  ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
+  ctx.fillRect(0, h - tickerH, w, 2);
+
+  ctx.save();
+  ctx.font = "600 15px 'Share Tech Mono', monospace";
+  ctx.fillStyle = "#f87171";
+
+  countdownSuiteState.tickerOffset -= 2.5;
+  const textWidth = ctx.measureText(countdownSuiteState.tickerText).width;
+  if (Math.abs(countdownSuiteState.tickerOffset) > textWidth) {
+    countdownSuiteState.tickerOffset = 0;
+  }
+
+  ctx.fillText(countdownSuiteState.tickerText + "   " + countdownSuiteState.tickerText, countdownSuiteState.tickerOffset + 20, h - 15);
+  ctx.restore();
+}
+
+function drawCountdownDramaticSubtitle(ctx, w, h) {
+  if (!countdownSuiteState.quote.trim()) return;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.font = `italic 22px 'Playfair Display', serif`;
+  ctx.fillStyle = 'rgba(244, 244, 245, 0.95)';
+  ctx.shadowColor = 'rgba(0,0,0,0.9)';
+  ctx.shadowBlur = 10;
+  ctx.fillText(countdownSuiteState.quote, w / 2, h - 75);
+  ctx.restore();
+}
+
+function drawCountdownAtmosphere(ctx, w, h) {
+  const intensity = countdownSuiteState.vignetteIntensity;
+  if (intensity > 0) {
+    const vigGrad = ctx.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w * 0.75);
+    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    vigGrad.addColorStop(1, `rgba(0,0,0,${intensity * 0.95})`);
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  if (countdownSuiteState.crtEnabled) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    for (let y = 0; y < h; y += 4) {
+      ctx.fillRect(0, y, w, 1);
+    }
+  }
+}
+
+function renderCountdownLoop(now) {
+  const canvas = document.getElementById('countdown-studio-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+
+  const deltaTime = (now - countdownSuiteState.lastFrameTime) / 1000;
+  countdownSuiteState.lastFrameTime = now;
+
+  if (countdownSuiteState.isPlaying) {
+    countdownSuiteState.currentTime -= deltaTime;
+    if (countdownSuiteState.currentTime <= 0) {
+      countdownSuiteState.currentTime = 0;
+      countdownSuiteState.isPlaying = false;
+      const icon = document.getElementById('countdown-play-icon');
+      if (icon) icon.textContent = '▶';
+      if (!countdownSuiteState.climaxTriggered) {
+        triggerCountdownClimaxImpact();
+      }
+    }
+  }
+
+  // Audio tick rate trigger
+  if (countdownSuiteState.isPlaying && countdownSuiteState.currentTime > 0) {
+    const secFloor = Math.floor(countdownSuiteState.currentTime);
+    if (secFloor !== countdownSuiteState.lastTickSecond) {
+      countdownSuiteState.lastTickSecond = secFloor;
+      playCountdownTick(countdownSuiteState.currentTime < 3);
+    }
+  }
+
+  const progress = Math.max(0, Math.min(1, 1 - (countdownSuiteState.currentTime / countdownSuiteState.totalDuration)));
+
+  // Screen shake
+  ctx.save();
+  if (countdownSuiteState.shakeAmount > 0) {
+    const dx = (Math.random() - 0.5) * countdownSuiteState.shakeAmount;
+    const dy = (Math.random() - 0.5) * countdownSuiteState.shakeAmount;
+    ctx.translate(dx, dy);
+    countdownSuiteState.shakeAmount *= 0.9;
+  }
+
+  ctx.clearRect(0, 0, w, h);
+
+  drawCountdownBackground(ctx, w, h, progress);
+  drawCountdownEffect(ctx, w, h, countdownSuiteState.currentTime);
+  drawCountdownStockTicker(ctx, w, h);
+  drawCountdownDramaticSubtitle(ctx, w, h);
+  drawCountdownAtmosphere(ctx, w, h);
+
+  ctx.restore();
+
+  // Climax red flash
+  if (countdownSuiteState.flashOpacity > 0) {
+    ctx.fillStyle = `rgba(239, 68, 68, ${countdownSuiteState.flashOpacity})`;
+    ctx.fillRect(0, 0, w, h);
+    countdownSuiteState.flashOpacity *= 0.88;
+  }
+
+  // Update timeline UI
+  const pad = (n, width = 2) => String(n).padStart(width, '0');
+  const sec = Math.floor(countdownSuiteState.currentTime % 60);
+  const ms = Math.floor((countdownSuiteState.currentTime % 1) * 1000);
+  const timeReadout = document.getElementById('countdown-time-readout');
+  if (timeReadout) timeReadout.textContent = `00:${pad(sec)}:${pad(ms, 3)}`;
+
+  const riserReadout = document.getElementById('countdown-riser-readout');
+  if (riserReadout) riserReadout.textContent = `${Math.round(100 + progress * 200)}%`;
+
+  const bar = document.getElementById('countdown-tension-bar');
+  if (bar) bar.style.width = `${progress * 100}%`;
+
+  const handle = document.getElementById('countdown-scrubber-handle');
+  if (handle) handle.style.left = `${progress * 100}%`;
+
+  countdownSuiteState.animFrameId = requestAnimationFrame(renderCountdownLoop);
+}
+
+function openCountdownSuite() {
+  const modal = document.getElementById('modal-countdown-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  countdownSuiteState.lastFrameTime = performance.now();
+  if (!countdownSuiteState.animFrameId) {
+    countdownSuiteState.animFrameId = requestAnimationFrame(renderCountdownLoop);
+  }
+}
+
+function closeCountdownSuite() {
+  const modal = document.getElementById('modal-countdown-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  countdownSuiteState.isPlaying = false;
+  const icon = document.getElementById('countdown-play-icon');
+  if (icon) icon.textContent = '▶';
+  if (countdownSuiteState.animFrameId) {
+    cancelAnimationFrame(countdownSuiteState.animFrameId);
+    countdownSuiteState.animFrameId = null;
+  }
+}
+
+function bindCountdownSuiteModalControls() {
+  document.getElementById('btn-close-countdown-suite')?.addEventListener('click', closeCountdownSuite);
+
+  // Play / Pause
+  document.getElementById('btn-countdown-play')?.addEventListener('click', () => {
+    initCountdownAudio();
+    countdownSuiteState.isPlaying = !countdownSuiteState.isPlaying;
+    const icon = document.getElementById('countdown-play-icon');
+    if (icon) icon.textContent = countdownSuiteState.isPlaying ? '❚❚' : '▶';
+    if (countdownSuiteState.currentTime <= 0) {
+      countdownSuiteState.currentTime = countdownSuiteState.totalDuration;
+      countdownSuiteState.climaxTriggered = false;
+    }
+  });
+
+  // Restart
+  document.getElementById('btn-countdown-restart')?.addEventListener('click', () => {
+    countdownSuiteState.currentTime = countdownSuiteState.totalDuration;
+    countdownSuiteState.climaxTriggered = false;
+    countdownSuiteState.isPlaying = false;
+    const icon = document.getElementById('countdown-play-icon');
+    if (icon) icon.textContent = '▶';
+  });
+
+  // Trigger Climax
+  document.getElementById('btn-countdown-trigger-climax')?.addEventListener('click', () => {
+    countdownSuiteState.currentTime = 0;
+    triggerCountdownClimaxImpact();
+  });
+
+  // Audio Toggle
+  document.getElementById('btn-countdown-audio-toggle')?.addEventListener('click', () => {
+    countdownSuiteState.audioEnabled = !countdownSuiteState.audioEnabled;
+    const txt = document.getElementById('countdown-audio-text');
+    const icn = document.getElementById('countdown-audio-icon');
+    if (countdownSuiteState.audioEnabled) {
+      if (txt) txt.textContent = 'Audio FX On';
+      if (icn) icn.textContent = '🔊';
+      playCountdownTick(false);
+    } else {
+      if (txt) txt.textContent = 'Audio FX Muted';
+      if (icn) icn.textContent = '🔇';
+    }
+  });
+
+  // Scenario Presets Switcher
+  document.getElementById('countdown-preset-select')?.addEventListener('change', (e) => {
+    const p = COUNTDOWN_PRESETS[e.target.value];
+    if (p) {
+      countdownSuiteState.title = p.title;
+      countdownSuiteState.totalDuration = p.duration;
+      countdownSuiteState.currentTime = p.duration;
+      countdownSuiteState.tickerText = p.ticker;
+      countdownSuiteState.quote = p.quote;
+      countdownSuiteState.stylePreset = p.style;
+      countdownSuiteState.climaxTriggered = false;
+
+      // Sync input fields
+      const inTitle = document.getElementById('countdown-input-title');
+      const inQuote = document.getElementById('countdown-input-quote');
+      const inTicker = document.getElementById('countdown-input-ticker');
+      const inStyle = document.getElementById('countdown-select-style');
+      const durSlider = document.getElementById('countdown-slider-duration');
+      const durVal = document.getElementById('countdown-val-duration');
+
+      if (inTitle) inTitle.value = p.title;
+      if (inQuote) inQuote.value = p.quote;
+      if (inTicker) inTicker.value = p.ticker;
+      if (inStyle) inStyle.value = p.style;
+      if (durSlider) durSlider.value = p.duration;
+      if (durVal) durVal.textContent = `${p.duration}s`;
+
+      showCountdownToast(`Loaded: ${p.title}`);
+    }
+  });
+
+  // Text Inputs Live Sync
+  document.getElementById('countdown-input-title')?.addEventListener('input', (e) => {
+    countdownSuiteState.title = e.target.value;
+  });
+
+  document.getElementById('countdown-input-quote')?.addEventListener('input', (e) => {
+    countdownSuiteState.quote = e.target.value;
+  });
+
+  document.getElementById('countdown-input-ticker')?.addEventListener('input', (e) => {
+    countdownSuiteState.tickerText = e.target.value;
+  });
+
+  document.getElementById('countdown-check-ticker')?.addEventListener('change', (e) => {
+    countdownSuiteState.tickerEnabled = e.target.checked;
+  });
+
+  // Custom Background Image Upload / URL
+  document.getElementById('countdown-upload-bg-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        countdownSuiteState.customBgImage = img;
+        const urlInput = document.getElementById('countdown-input-bg-url');
+        if (urlInput) urlInput.value = `[Uploaded: ${file.name}]`;
+        showCountdownToast('Custom background photo loaded!');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('countdown-input-bg-url')?.addEventListener('input', (e) => {
+    const url = e.target.value.trim();
+    if (url) {
+      const img = new Image();
+      img.onload = () => {
+        countdownSuiteState.customBgImage = img;
+        showCountdownToast('Loaded background image from URL');
+      };
+      img.src = url;
+    }
+  });
+
+  document.getElementById('btn-countdown-clear-bg')?.addEventListener('click', () => {
+    countdownSuiteState.customBgImage = null;
+    const urlInput = document.getElementById('countdown-input-bg-url');
+    if (urlInput) urlInput.value = '';
+    showCountdownToast('Cleared custom background');
+  });
+
+  // Duration Slider
+  document.getElementById('countdown-slider-duration')?.addEventListener('input', (e) => {
+    countdownSuiteState.totalDuration = parseInt(e.target.value) || 10;
+    countdownSuiteState.currentTime = countdownSuiteState.totalDuration;
+    const lbl = document.getElementById('countdown-val-duration');
+    if (lbl) lbl.textContent = `${countdownSuiteState.totalDuration}s`;
+  });
+
+  // Mode Buttons
+  document.querySelectorAll('.btn-countdown-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-countdown-mode').forEach(b => {
+        b.style.background = '#18181b';
+        b.style.borderColor = 'rgba(255,255,255,0.08)';
+        b.style.color = '#a1a1aa';
+      });
+      e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
+      e.currentTarget.style.borderColor = '#ef4444';
+      e.currentTarget.style.color = '#f87171';
+      countdownSuiteState.displayMode = e.currentTarget.dataset.mode;
+    });
+  });
+
+  // Style Preset Selector
+  document.getElementById('countdown-select-style')?.addEventListener('change', (e) => {
+    countdownSuiteState.stylePreset = e.target.value;
+  });
+
+  // Vignette Slider
+  document.getElementById('countdown-slider-vignette')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) || 80;
+    countdownSuiteState.vignetteIntensity = val / 100;
+    const lbl = document.getElementById('countdown-val-vignette');
+    if (lbl) lbl.textContent = `${val}%`;
+  });
+
+  // CRT Scanlines & Screen Shake Toggles
+  document.getElementById('countdown-check-crt')?.addEventListener('change', (e) => {
+    countdownSuiteState.crtEnabled = e.target.checked;
+  });
+
+  document.getElementById('countdown-check-shake')?.addEventListener('change', (e) => {
+    countdownSuiteState.shakeEnabled = e.target.checked;
+  });
+
+  // Timeline Scrubber Track Click & Drag
+  const scrubTrack = document.getElementById('countdown-timeline-track');
+  if (scrubTrack) {
+    let isScrubbing = false;
+    const handleScrub = (ev) => {
+      const rect = scrubTrack.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(ev.clientX - rect.left, rect.width));
+      const pct = clickX / rect.width;
+      countdownSuiteState.currentTime = countdownSuiteState.totalDuration * (1 - pct);
+      countdownSuiteState.climaxTriggered = false;
+    };
+    scrubTrack.addEventListener('pointerdown', (ev) => {
+      isScrubbing = true;
+      handleScrub(ev);
+    });
+    window.addEventListener('pointermove', (ev) => {
+      if (isScrubbing) handleScrub(ev);
+    });
+    window.addEventListener('pointerup', () => {
+      isScrubbing = false;
+    });
+  }
+
+  // Apply to Active Timeline
+  document.getElementById('btn-countdown-apply-timeline')?.addEventListener('click', () => {
+    closeCountdownSuite();
+    switchStudioView('editor');
+
+    const countdownBg = {
+      id: `img-countdown-${Date.now()}`,
+      name: 'James_Jani_Countdown_Panic.jpg',
+      url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+      start: 0,
+      duration: countdownSuiteState.totalDuration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.3
+    };
+
+    const countdownTitle = {
+      id: `txt-countdown-title-${Date.now() + 1}`,
+      text: countdownSuiteState.title,
+      highlight: countdownSuiteState.title.split(' ')[0] || '',
+      highlightColor: '#ef4444',
+      anim: 'pop',
+      fontSize: 56,
+      fontFamily: 'Chakra Petch, sans-serif',
+      start: 0,
+      duration: countdownSuiteState.totalDuration
+    };
+
+    const countdownQuote = {
+      id: `txt-countdown-quote-${Date.now() + 2}`,
+      text: countdownSuiteState.quote,
+      highlight: '',
+      highlightColor: '#f59e0b',
+      anim: 'fade',
+      fontSize: 26,
+      fontFamily: 'Playfair Display, serif',
+      start: 0.5,
+      duration: countdownSuiteState.totalDuration - 0.5
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [countdownBg];
+      timelineClips.text = [countdownTitle, countdownQuote];
+      renderAllTimelineTracks();
+      selectClip(countdownTitle, 'text');
+    }
+
+    showTextTimingAlert('Applied James Jani Countdown Effect to timeline!', 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }

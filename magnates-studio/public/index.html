@@ -3777,6 +3777,227 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       JAMES JANI FX ENGINE: "THE COUNTDOWN EFFECT" MODAL
+       ========================================================= -->
+  <div id="modal-countdown-suite" class="vector-export-modal" style="display: none; z-index: 99999; backdrop-filter: blur(14px); background: rgba(5, 5, 8, 0.94);">
+    <div class="vector-modal-box" style="width: 96vw; max-width: 1440px; height: 92vh; max-height: 920px; display: flex; flex-direction: column; background: #09090b; border: 1px solid rgba(239, 68, 68, 0.45); border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(239, 68, 68, 0.2);">
+      
+      <!-- Top Studio Header -->
+      <div style="height: 56px; padding: 0 20px; background: rgba(18, 18, 24, 0.96); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #ef4444, #f59e0b); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);">
+            <span style="font-size: 16px;">⏱️</span>
+          </div>
+          <div>
+            <div style="font-family: 'Chakra Petch', sans-serif; font-size: 13.5px; font-weight: 800; color: #ffffff; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+              <span>REGAARDER STUDIO</span>
+              <span style="font-size: 10px; padding: 1px 7px; border-radius: 4px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; font-family: 'Share Tech Mono', monospace;">COUNTDOWN FX v2.4</span>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: 'Share Tech Mono', monospace;">James Jani Style: "The Countdown Effect" &amp; Panic Ticker Tape</div>
+          </div>
+        </div>
+
+        <!-- Presets Selection & Controls -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #a1a1aa;">
+            <span>🎬 Scenario:</span>
+            <select id="countdown-preset-select" style="background: #18181b; border: 1px solid #27272a; color: #e4e4e7; font-size: 11px; border-radius: 6px; padding: 4px 8px; outline: none; cursor: pointer;">
+              <option value="ftx">FTX Collapse: T-Minus 24 Hours</option>
+              <option value="theranos">Theranos Blood Fraud Climax</option>
+              <option value="blackmonday">1987 Black Monday Crash</option>
+              <option value="dotcom">Dot-Com Bubble Burst</option>
+            </select>
+          </div>
+
+          <button type="button" id="btn-countdown-audio-toggle" style="padding: 5px 10px; font-size: 10.5px; font-family: 'Share Tech Mono', monospace; border-radius: 7px; background: #18181b; border: 1px solid rgba(255,255,255,0.12); color: #f87171; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span id="countdown-audio-icon">🔊</span>
+            <span id="countdown-audio-text">Audio FX On</span>
+          </button>
+
+          <button type="button" id="btn-countdown-trigger-climax" style="padding: 5px 12px; font-size: 11px; font-weight: 800; border-radius: 8px; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);">
+            <span>⚡</span> Trigger Climax
+          </button>
+
+          <button type="button" id="btn-countdown-apply-timeline" style="padding: 6px 14px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(16,185,129,0.4);">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Apply To Timeline</span>
+          </button>
+
+          <button type="button" id="btn-close-countdown-suite" style="background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 2px 8px; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Main Workspace -->
+      <div style="display: flex; flex: 1; min-height: 0; overflow: hidden; position: relative;">
+        
+        <!-- Left Stage / Canvas (65%) -->
+        <div style="flex: 1; display: flex; flex-direction: column; background: #030305; position: relative; overflow: hidden; border-right: 1px solid rgba(255,255,255,0.08);">
+          
+          <!-- Screen Canvas Frame -->
+          <div style="flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 20px;">
+            <div id="countdown-canvas-frame" style="position: relative; width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 20px 50px rgba(0,0,0,0.9);">
+              <canvas id="countdown-studio-canvas" width="1280" height="720" style="width: 100%; height: 100%; object-fit: contain; display: block;"></canvas>
+
+              <!-- Live HUD Badges -->
+              <div style="position: absolute; top: 12px; left: 14px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; font-family: 'Share Tech Mono', monospace; font-size: 9.5px; color: #e4e4e7; pointer-events: none;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #ef4444;"></span>
+                <span>TIMELINE LIVE PREVIEW</span>
+              </div>
+
+              <div style="position: absolute; top: 12px; right: 14px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); padding: 4px 10px; border-radius: 20px; font-family: 'Share Tech Mono', monospace; font-size: 9.5px; color: #a1a1aa; pointer-events: none;">
+                <span id="countdown-fps-display">60 FPS</span>
+              </div>
+
+              <!-- Toast notification -->
+              <div id="countdown-toast" style="position: absolute; bottom: 18px; left: 50%; transform: translate(-50%, 40px); background: rgba(24,24,27,0.95); border: 1px solid #ef4444; color: #fff; padding: 6px 18px; border-radius: 20px; font-family: 'Share Tech Mono', monospace; font-size: 11px; font-weight: 700; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3); opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 50; display: flex; align-items: center; gap: 6px;">
+                <span>⚠️</span>
+                <span id="countdown-toast-msg">COLLAPSE CLIMAX TRIGGERED!</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Timeline & Transport Controls Bar -->
+          <div style="height: 68px; background: #0c0c10; border-top: 1px solid rgba(255,255,255,0.08); padding: 8px 18px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" id="btn-countdown-play" style="width: 32px; height: 32px; border-radius: 50%; background: #ef4444; color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(239,68,68,0.4);" title="Play / Pause">
+                  <span id="countdown-play-icon" style="font-size: 12px; margin-left: 2px;">▶</span>
+                </button>
+                <button type="button" id="btn-countdown-restart" style="width: 30px; height: 30px; border-radius: 6px; background: #18181b; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; justify-content: center;" title="Restart Countdown">
+                  <span>↺</span>
+                </button>
+                <div style="font-family: 'Share Tech Mono', monospace; color: #ef4444; font-weight: 700; font-size: 14px; margin-left: 6px;" id="countdown-time-readout">
+                  00:10:000
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 12px; font-size: 11px; font-family: 'Share Tech Mono', monospace; color: #a1a1aa;">
+                <span>Tension Riser: <b id="countdown-riser-readout" style="color: #ef4444;">100%</b></span>
+              </div>
+            </div>
+
+            <!-- Scrubber Track -->
+            <div id="countdown-timeline-track" style="position: relative; width: 100%; height: 14px; background: #18181b; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08); cursor: pointer; overflow: hidden;">
+              <div id="countdown-tension-bar" style="position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: linear-gradient(90deg, #27272a, #7f1d1d, #ef4444); opacity: 0.85;"></div>
+              <div id="countdown-scrubber-handle" style="position: absolute; top: 0; bottom: 0; width: 3px; background: #ef4444; box-shadow: 0 0 8px #ef4444; left: 0%; transform: translateX(-50%); pointer-events: none;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Inspector Controls (35%) -->
+        <div style="width: 390px; background: #0c0c10; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; flex-shrink: 0;">
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <span style="font-size: 11.5px; font-weight: 800; color: #ffffff; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; display: flex; align-items: center; gap: 6px;">
+              <span style="color: #ef4444;">⚡</span> Countdown FX Parameters
+            </span>
+            <span style="font-size: 9.5px; padding: 2px 6px; border-radius: 4px; background: rgba(239,68,68,0.15); color: #f87171; font-family: monospace;">REAL-TIME SYNC</span>
+          </div>
+
+          <!-- Text Editing Block -->
+          <div style="background: rgba(24,24,27,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Edit Texts &amp; Quotes</span>
+              <span style="font-size: 9.5px; color: #f87171; font-family: monospace;">LIVE UPDATE</span>
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Timer Headline Title</label>
+              <input type="text" id="countdown-input-title" value="FTX LIQUIDITY CRASH" style="width: 100%; background: #050508; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: 'Chakra Petch', sans-serif;" />
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Dramatic Quote / Subtitle</label>
+              <textarea id="countdown-input-quote" rows="2" style="width: 100%; background: #050508; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; resize: vertical; font-family: 'Playfair Display', serif; font-style: italic;">"And in less than 48 hours... $32 Billion vanished into thin air."</textarea>
+            </div>
+          </div>
+
+          <!-- Stock Collapse Ticker Tape Editor -->
+          <div style="background: rgba(24,24,27,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 6px;">
+                <span>📈 Stock Collapse Ticker Tape</span>
+              </span>
+              <label style="font-size: 10px; color: #a1a1aa; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                <input type="checkbox" id="countdown-check-ticker" checked style="accent-color: #ef4444;" />
+                <span>Enable</span>
+              </label>
+            </div>
+            <textarea id="countdown-input-ticker" rows="3" style="width: 100%; background: #050508; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #f87171; font-size: 10.5px; outline: none; resize: vertical; font-family: 'Share Tech Mono', monospace;">$FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED  •  $ETH $1,080 (-28.9%)  •  ALAMEDA RESEARCH BANKRUPT</textarea>
+          </div>
+
+          <!-- Custom Background Image Editing & Upload -->
+          <div style="background: rgba(24,24,27,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>🖼 Background Image / Texture</span>
+              <label for="countdown-upload-bg-input" style="font-size: 10px; color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                <span>📁 Upload Image</span>
+              </label>
+              <input type="file" id="countdown-upload-bg-input" accept="image/*" style="display: none;" />
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="countdown-input-bg-url" placeholder="Paste custom backdrop URL or upload..." style="flex: 1; background: #050508; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              <button type="button" id="btn-countdown-clear-bg" style="padding: 6px 10px; font-size: 10px; border-radius: 6px; background: #18181b; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                Clear
+              </button>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #71717a;">
+              <span>Default: Dynamic vector stock crash graph</span>
+            </div>
+          </div>
+
+          <!-- Timer Configuration & Modes -->
+          <div style="background: rgba(24,24,27,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'Share Tech Mono', monospace;">
+              <span style="color: #cbd5e1; font-weight: 600;">⏱ Start Duration (Seconds)</span>
+              <span id="countdown-val-duration" style="color: #ef4444; font-weight: 700;">10s</span>
+            </div>
+            <input type="range" id="countdown-slider-duration" min="3" max="30" value="10" style="width: 100%; accent-color: #ef4444; cursor: pointer;" />
+            
+            <label style="font-size: 10px; color: #94a3b8; margin-top: 4px;">Display Mode</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" class="btn-countdown-mode active" data-mode="tminus" style="padding: 6px 4px; font-size: 10.5px; font-family: monospace; font-weight: 700; border-radius: 6px; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; color: #f87171; cursor: pointer; text-align: center;">
+                T-MINUS 00:00
+              </button>
+              <button type="button" class="btn-countdown-mode" data-mode="clock" style="padding: 6px 4px; font-size: 10.5px; font-family: monospace; border-radius: 6px; background: #18181b; border: 1px solid rgba(255,255,255,0.08); color: #a1a1aa; cursor: pointer; text-align: center;">
+                24H CLOCK
+              </button>
+            </div>
+          </div>
+
+          <!-- Visual Style Preset -->
+          <div style="background: rgba(24,24,27,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <label style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Visual Aesthetic Preset</label>
+            <select id="countdown-select-style" style="width: 100%; background: #050508; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 11px; outline: none; cursor: pointer;">
+              <option value="neon-red">James Jani Crimson Panic (Neon Red Glow)</option>
+              <option value="matrix">Financial Terminal Glitch (Green/Cyber)</option>
+              <option value="stark">Dark Wall Street Monochrome (Clean High-Contrast)</option>
+              <option value="dramatic">Cinematic Serif Downfall (Gold/Dramatic)</option>
+            </select>
+          </div>
+
+          <!-- Atmospheric Effects -->
+          <div style="background: rgba(24,24,27,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Atmospheric Overlays</span>
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #a1a1aa;">
+              <span>Vignette &amp; Shadow Pulse</span>
+              <span id="countdown-val-vignette" style="font-family: monospace; color: #ef4444;">80%</span>
+            </div>
+            <input type="range" id="countdown-slider-vignette" min="0" max="100" value="80" style="width: 100%; accent-color: #ef4444; cursor: pointer;" />
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="font-size: 10.5px; color: #d4d4d8;">Film Grain &amp; CRT Scanlines</span>
+              <input type="checkbox" id="countdown-check-crt" checked style="accent-color: #ef4444;" />
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: #d4d4d8;">Climax Screen Shake &amp; Red Flash</span>
+              <input type="checkbox" id="countdown-check-shake" checked style="accent-color: #ef4444;" />
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Animated Chart Creator / Template Builder Modal -->
   <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
     <div class="vector-modal-box" style="max-width: 680px;">
@@ -4749,6 +4970,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=279"></script>
+  <script src="js/app.js?v=280"></script>
 </body>
 </html>
