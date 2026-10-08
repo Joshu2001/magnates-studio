@@ -19772,12 +19772,37 @@ const EFFECT_TEMPLATES_DATA = [
     title: 'Dark Luxury Gold Frame 3D Spin',
     category: 'Parallax',
     badge: 'Magnates Media',
-    difficulty: 'Beginner',
-    timeToApply: '8 sec',
+    difficulty: 'Easy',
+    timeToApply: '5 sec',
     previewGradient: 'linear-gradient(to top, rgba(113, 63, 18, 0.7), rgba(180, 83, 9, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Floating 3D framed image with metallic gold bevel light reflections against textured shadow.',
+    description: 'Floating 3D framed image with metallic gold reflections, dramatic lighting, and slow 3D tilt movement.',
     tags: ['Magnates Media', 'Gold FX', '3D Frame'],
-    defaultImage: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'text-texturing-grunge',
+    title: 'James Jani Grunge Text & Paper Texture',
+    category: 'Text & Titles',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.8), rgba(49, 46, 129, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'Textured vintage paper, screen-print halftone noise, and distressed grunge overlay on bold cinematic titles.',
+    tags: ['Grunge Text', 'Paper Texture', 'James Jani'],
+    defaultImage: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'kinetic-decode-typewriter',
+    title: 'Tension Decode & Typewriter Kinetic Text',
+    category: 'Text & Titles',
+    badge: 'James Jani / Tension',
+    difficulty: '1-Click',
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.8), rgba(15, 23, 42, 0.6), rgba(0, 0, 0, 0.95))',
+    description: 'High-tension matrix character decoding and rapid typewriter reveal with blinking terminal block cursor.',
+    tags: ['Decode Text', 'Typewriter', 'Kinetic Typo'],
+    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'archival-ink-highlight',
@@ -19814,10 +19839,85 @@ const EFFECT_TEMPLATES_DATA = [
     description: 'Glowing neon stock market growth graph drawing across the screen as a seamless transition wipe.',
     tags: ['Stock Chart', 'Finance', 'Magnates'],
     defaultImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-paper-vector-cutout',
+    title: 'Magnates Paper Cutout & Sticker Contour (Depth Text Behind)',
+    category: 'Paper / Cutout',
+    badge: 'Magnates Vector FX',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(239, 68, 68, 0.75), rgba(185, 28, 28, 0.45), rgba(15, 23, 42, 0.9))',
+    description: 'Crisp multi-pass white contour outline sticker contour over isolated subject with massive bold kinetic typography placed directly behind the subject.',
+    tags: ['Paper Cutout', 'Sticker Contour', 'Text Behind', 'Magnates'],
+    defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'vox-newspaper-cream-dossier',
+    title: 'Vox Newspaper Cream & Archival Paper Dossier',
+    category: 'Paper / Cutout',
+    badge: 'Vox Aesthetic',
+    difficulty: '1-Click',
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(217, 119, 6, 0.7), rgba(245, 158, 11, 0.4), rgba(28, 25, 23, 0.9))',
+    description: 'Warm textured vintage newsprint cream parchment (#f4eedb) stage with paper cutout documents, stamp titles, and forensic loupe highlights.',
+    tags: ['Vox Paper', 'Newsprint Cream', 'Archival Dossier', 'Loupe'],
+    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'vintage-film-burn',
+    title: 'Film Burn & Gate Flash Transition',
+    category: 'Transitions',
+    badge: 'Johnny Harris',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(136, 19, 55, 0.7), rgba(120, 53, 15, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Analog film projector light burn flash cut with authentic warm grain texture.',
+    tags: ['Film Burn', 'Retro Cut', 'Johnny Harris'],
+    defaultImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'parallax-zoom',
+    title: '3D Parallax Depth Zoom',
+    category: 'Parallax',
+    badge: 'Popular',
+    difficulty: 'Beginner',
+    timeToApply: '10 sec',
+    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.6), rgba(49, 46, 129, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Separates foreground subject from background with smooth 3D depth camera movement.',
+    tags: ['3D Motion', 'Photo to Video', 'Cinematic'],
+    defaultImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'cyber-glitch-pass',
+    title: 'Cyberpunk RGB Glitch Shift',
+    category: 'Glitches',
+    badge: 'New',
+    difficulty: 'Beginner',
+    timeToApply: '8 sec',
+    previewGradient: 'linear-gradient(to top, rgba(22, 78, 99, 0.7), rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Futuristic chromatic aberration and visual noise pulse for high-energy cuts.',
+    tags: ['VFX', 'Cyberpunk', 'Transition'],
+    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'spatial-3d-motion-suite',
+    title: '3D Spatial Motion Titles & Parallax Rig',
+    category: '3D Spatial',
+    badge: 'James Jani Style',
+    difficulty: '1-Click',
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(180, 83, 9, 0.7), rgba(217, 119, 6, 0.35), rgba(7, 9, 14, 0.95))',
+    description: 'Cinematic 3D gold-bevel title floating over a glowing perspective floor grid with drifting document cards and cinematic camera pullback.',
+    tags: ['3D Titles', 'Camera Pullback', 'James Jani'],
+    defaultImage: '/spatial_3d_suite_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe'];
+const TEMPLATE_CATEGORIES = ['All', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Glitches'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
@@ -20048,6 +20148,177 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'text-texturing-grunge') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #0e0c14; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 16px;">
+          <!-- Distressed Paper / Grain Texture Backdrop -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(147, 51, 234, 0.35) 0%, rgba(30, 27, 75, 0.6) 50%, #000 100%);"></div>
+          <img id="fx-bg-${tplId}" src="${tpl.defaultImage}" alt="Paper Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(2) grayscale(0.2);" />
+          
+          <!-- Cinematic Grunge Text Plate -->
+          <div id="fx-grunge-plate-${tplId}" style="position: relative; text-align: center; z-index: 2; padding: 12px; pointer-events: none;">
+            <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 900; letter-spacing: 4px; color: #f3e8ff; margin: 0; text-transform: uppercase; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.95));">
+              POWER & GREED
+            </h3>
+            <div style="width: 70%; height: 2px; background: rgba(168, 85, 247, 0.85); margin: 6px auto; box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);"></div>
+            <span style="font-family: monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 3px; color: #d8b4fe; text-transform: uppercase; display: block;">
+              CHAPTER IV: THE MANIPULATION
+            </span>
+          </div>
+
+          <!-- Color burn vignette -->
+          <div style="position: absolute; inset: 0; background: rgba(88, 28, 135, 0.2); mix-blend-mode: color-burn; pointer-events: none;"></div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            📜 GRUNGE PAPER
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'kinetic-decode-typewriter') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #090a10; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px;">
+          <!-- Matrix Grid Overlay -->
+          <div style="position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(31,41,55,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(31,41,55,0.4) 1px, transparent 1px); background-size: 18px 18px; opacity: 0.35;"></div>
+          
+          <div style="position: relative; z-index: 2; font-family: monospace; text-align: center;">
+            <span style="font-size: 10px; color: #c084fc; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 8px;">
+              [ HIGH TENSION REVEAL ]
+            </span>
+            <div id="fx-decode-box-${tplId}" style="font-size: 16px; font-weight: 900; letter-spacing: 2px; color: #f8fafc; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(192, 132, 252, 0.5); padding: 8px 16px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); display: inline-flex; align-items: center; gap: 4px;">
+              <span id="fx-decode-text-${tplId}">THE ILLUSION</span>
+              <span style="display: inline-block; width: 8px; height: 16px; background: #a855f7;" class="pulse-preview-badge"></span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(88, 28, 135, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            ⚡ TENSION DECODE
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-paper-vector-cutout') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #08090d; overflow: hidden;">
+          <!-- Behind Background: Darkened scene -->
+          <img id="fx-bg-${tplId}" src="${tpl.secondaryImage}" alt="Background" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2) grayscale(0.4);" />
+          
+          <!-- Middle Layer: Massive Bold Kinetic Text Behind Subject -->
+          <div id="fx-text-behind-${tplId}" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: 2;">
+            <span style="font-family: Impact, sans-serif; font-size: 42px; font-weight: 900; color: rgba(255,255,255,0.92); letter-spacing: 2px; line-height: 0.95; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.9);">
+              MAGNATES
+            </span>
+            <span style="font-family: Impact, sans-serif; font-size: 32px; font-weight: 900; color: #ff334b; letter-spacing: 3px; line-height: 0.95; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,51,75,0.6);">
+              SCANDAL
+            </span>
+          </div>
+
+          <!-- Foreground Layer: Isolated Cutout Subject with Paper White Sticker Contour Outline -->
+          <div id="fx-fg-wrap-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 3;">
+            <div style="position: relative; width: 68%; height: 100%; display: flex; align-items: center; justify-content: center;">
+              <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" alt="Cutout Subject" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #ffffff) drop-shadow(4px 0 0 #ffffff) drop-shadow(-4px 0 0 #ffffff) drop-shadow(0 4px 0 #ffffff) drop-shadow(0 -4px 0 #ffffff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(239, 68, 68, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            ✂️ STICKER + TEXT BEHIND
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'vox-newspaper-cream-dossier') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #f4eedb; overflow: hidden;">
+          <!-- Vintage Newsprint Document Layer with subtle texture -->
+          <div style="position: absolute; inset: 0; background-color: #f4eedb; background-image: radial-gradient(rgba(0,0,0,0.06) 1px, transparent 0); background-size: 16px 16px; opacity: 0.9;"></div>
+          
+          <!-- Document Scan Paper Cutout -->
+          <div id="fx-paper-doc-${tplId}" style="position: absolute; inset: 8% 10%; background: #ffffff; border-radius: 4px; box-shadow: 0 12px 28px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.12); overflow: hidden; transform: rotate(-2deg); border: 1px solid rgba(0,0,0,0.08);">
+            <img src="${tpl.defaultImage}" alt="Newspaper Document" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.2) contrast(1.15);" />
+            <!-- Animated Yellow Highlight Stroke -->
+            <div id="fx-highlighter-${tplId}" style="position: absolute; top: 42%; left: 12%; height: 16px; background: rgba(254, 240, 138, 0.85); mix-blend-mode: multiply; border-radius: 3px; width: 0%;"></div>
+          </div>
+
+          <!-- Forensic Loupe Magnifier overlay circle -->
+          <div id="fx-loupe-${tplId}" style="position: absolute; width: 85px; height: 85px; border-radius: 50%; border: 3px solid #00f0ff; box-shadow: 0 8px 24px rgba(0,0,0,0.6), inset 0 0 12px rgba(0,240,255,0.4); overflow: hidden; pointer-events: none; z-index: 3;">
+            <img id="fx-loupe-inner-${tplId}" src="${tpl.defaultImage}" alt="Magnified Evidence" style="width: 180%; height: 180%; object-fit: cover; position: absolute; transform: scale(1.6);" />
+          </div>
+
+          <!-- Vox Style Badge -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(217, 119, 6, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            📜 VOX CREAM PAPER
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'vintage-film-burn') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+          <img src="${tpl.defaultImage}" alt="Film Burn Cut" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.4) contrast(1.25);" />
+          <div id="fx-burn-flash-${tplId}" style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(225,29,72,0.85), rgba(253,224,71,0.7)); mix-blend-mode: screen; opacity: 0; pointer-events: none;"></div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(225, 29, 72, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            🔥 FILM BURN
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'parallax-zoom') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+          <img id="fx-bg-${tplId}" src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(6px) brightness(0.65);" />
+          <div id="fx-fg-wrap-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+            <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" style="width: 80%; height: 80%; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.95); border: 1px solid rgba(255,255,255,0.25);" />
+          </div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            📐 3D PARALLAX
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'cyber-glitch-pass') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden; background: #040814;">
+          <img id="fx-glitch-cyan-${tplId}" src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; mix-blend-mode: screen; filter: drop-shadow(-4px 0px 0px rgba(6,182,212,0.9)) hue-rotate(90deg);" />
+          <img id="fx-glitch-red-${tplId}" src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; mix-blend-mode: screen; filter: drop-shadow(4px 0px 0px rgba(239,68,68,0.9)) hue-rotate(270deg);" />
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(6, 182, 212, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            ⚡ RGB GLITCH
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'spatial-3d-motion-suite') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; perspective: 700px; display: flex; align-items: center; justify-content: center;">
+          <!-- Perspective 3D Golden Grid -->
+          <div id="fx-spatial-grid-${tplId}" style="position: absolute; width: 140%; height: 140%; top: 20%; background-image: linear-gradient(to right, rgba(217,119,6,0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(217,119,6,0.3) 1px, transparent 1px); background-size: 20px 20px; transform: rotateX(70deg) translateZ(-60px); opacity: 0.6; pointer-events: none;"></div>
+          
+          <!-- Golden Ambient Dust Glow -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(245,158,11,0.25) 0%, transparent 65%); pointer-events: none;"></div>
+
+          <!-- Floating Secondary Dossier Card Left -->
+          <div id="fx-spatial-card1-${tplId}" style="position: absolute; left: 6%; top: 18%; width: 34%; height: 26%; background: rgba(15,23,42,0.9); border: 1px solid rgba(245,158,11,0.5); border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: none; transform: rotateY(25deg) rotateX(10deg);">
+            <div style="font-size: 7.5px; font-weight: 800; color: #f59e0b; font-family: 'Cinzel', serif; letter-spacing: 0.5px;">CLASSIFIED REPORT</div>
+            <div style="font-size: 6px; color: #94a3b8; font-family: monospace; margin-top: 2px;">FINANCIAL SCAN #8941</div>
+            <div style="height: 1.5px; background: #f59e0b; margin-top: 4px; width: 80%;"></div>
+          </div>
+
+          <!-- Floating Network Node Card Right -->
+          <div id="fx-spatial-card2-${tplId}" style="position: absolute; right: 6%; bottom: 18%; width: 34%; height: 26%; background: rgba(15,23,42,0.9); border: 1px solid rgba(6,182,212,0.5); border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: none; transform: rotateY(-20deg) rotateX(-8deg);">
+            <div style="font-size: 7.5px; font-weight: 800; color: #06b6d4; font-family: 'Cinzel', serif; letter-spacing: 0.5px;">MONOPOLY MAP</div>
+            <div style="font-size: 6px; color: #94a3b8; font-family: monospace; margin-top: 2px;">NODES: 14,200 ACTIVE</div>
+            <div style="height: 1.5px; background: #06b6d4; margin-top: 4px; width: 80%;"></div>
+          </div>
+
+          <!-- Central Extruded 3D Text Plate -->
+          <div id="fx-spatial-plate-${tplId}" style="position: relative; z-index: 5; text-align: center; background: rgba(10,13,22,0.92); border: 2px solid #f59e0b; border-radius: 10px; padding: 12px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.95), 0 0 25px rgba(245,158,11,0.4); transform-style: preserve-3d; transition: transform 0.05s ease-out;">
+            <h3 style="font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900; letter-spacing: 3px; color: #f59e0b; margin: 0; text-transform: uppercase; text-shadow: 0 0 16px rgba(245,158,11,0.6);">
+              THE SYSTEM
+            </h3>
+            <div style="width: 70%; height: 2px; background: #f59e0b; margin: 5px auto;"></div>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 8.5px; font-weight: 700; letter-spacing: 2px; color: #cbd5e1; text-transform: uppercase; display: block;">
+              MANIPULATION & CONTROL
+            </span>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #d97706, #f59e0b); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
+            ⚡ THREE.JS 3D SUITE
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20088,6 +20359,122 @@ function startTemplateHoverVideo(cardEl, tpl) {
       const frameEl = fxContainer?.querySelector(`#fx-frame-${tplId}`);
       if (frameEl) {
         frameEl.style.transform = `perspective(600px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.02)`;
+      }
+    } else if (tplId === 'text-texturing-grunge') {
+      // Subconscious handheld paper jitter and breathing vignette
+      const jitterX = Math.sin(t * 14) * 2;
+      const jitterY = Math.cos(t * 16) * 2;
+      const bgZoom = 1.05 + Math.sin(t * 2) * 0.04;
+      const plate = fxContainer?.querySelector(`#fx-grunge-plate-${tplId}`);
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+      if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
+    } else if (tplId === 'kinetic-decode-typewriter') {
+      // Matrix-style character scrambling decode loop
+      const targetWord = "THE ILLUSION OF CHOICE";
+      const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const progress = Math.min(1, (t * 0.8) % 1.25);
+      const charsRevealed = Math.floor(progress * targetWord.length);
+      let displayed = targetWord.substring(0, charsRevealed);
+      if (charsRevealed < targetWord.length) {
+        displayed += glyphs[Math.floor((t * 50) % glyphs.length)];
+      }
+      const decodeSpan = fxContainer?.querySelector(`#fx-decode-text-${tplId}`);
+      if (decodeSpan) decodeSpan.textContent = displayed;
+    } else if (tplId === 'magnates-paper-vector-cutout') {
+      // 3D Parallax floating of cutout sticker over background and breathing scale on text behind
+      const stickerPanX = Math.sin(t * 2.4) * 14;
+      const stickerPanY = Math.cos(t * 2.0) * 10;
+      const bgShiftX = -Math.sin(t * 2.4) * 8;
+      const textScale = 1.0 + Math.sin(t * 1.8) * 0.05;
+      const bgZoom = 1.1 + Math.cos(t * 1.5) * 0.04;
+      
+      const fgWrap = fxContainer?.querySelector(`#fx-fg-wrap-${tplId}`);
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      const textBehind = fxContainer?.querySelector(`#fx-text-behind-${tplId}`);
+
+      if (fgWrap) fgWrap.style.transform = `translate(${stickerPanX}px, ${stickerPanY}px) scale(1.05)`;
+      if (bgEl) bgEl.style.transform = `scale(${bgZoom}) translate(${bgShiftX}px, 0)`;
+      if (textBehind) textBehind.style.transform = `scale(${textScale})`;
+    } else if (tplId === 'vox-newspaper-cream-dossier') {
+      // Newspaper floating tilt + animated highlighter wipe + scanning loupe magnifier
+      const docRot = -2 + Math.sin(t * 1.6) * 1.5;
+      const docScale = 1.02 + Math.cos(t * 1.4) * 0.02;
+      const docEl = fxContainer?.querySelector(`#fx-paper-doc-${tplId}`);
+      if (docEl) docEl.style.transform = `rotate(${docRot}deg) scale(${docScale})`;
+
+      // Highlighter sweep progress cycles
+      const hlCycle = (Math.sin(t * 2.5) + 1) / 2;
+      const hlEl = fxContainer?.querySelector(`#fx-highlighter-${tplId}`);
+      if (hlEl) hlEl.style.width = `${Math.min(76, Math.max(0, hlCycle * 80))}%`;
+
+      // Forensic Loupe floating scan across document
+      const loupeX = 50 + Math.sin(t * 2.2) * 55;
+      const loupeY = 35 + Math.cos(t * 1.8) * 35;
+      const loupeEl = fxContainer?.querySelector(`#fx-loupe-${tplId}`);
+      const loupeInner = fxContainer?.querySelector(`#fx-loupe-inner-${tplId}`);
+      if (loupeEl) {
+        loupeEl.style.left = `${loupeX}px`;
+        loupeEl.style.top = `${loupeY}px`;
+      }
+      if (loupeInner) {
+        loupeInner.style.left = `${-loupeX * 0.6}px`;
+        loupeInner.style.top = `${-loupeY * 0.6}px`;
+      }
+    } else if (tplId === 'vintage-film-burn') {
+      // Periodic analog film projector light flash cut
+      const burnCycle = Math.abs(Math.sin(t * 3.5));
+      const burnEl = fxContainer?.querySelector(`#fx-burn-flash-${tplId}`);
+      if (burnEl) burnEl.style.opacity = `${burnCycle > 0.3 ? (burnCycle * 0.75) : 0}`;
+    } else if (tplId === 'parallax-zoom') {
+      // 3D Parallax Depth Zoom: foreground floats faster than blurred background
+      const shiftX = Math.sin(t * 2.8) * 14;
+      const shiftY = Math.cos(t * 2.2) * 8;
+      const bgZoom = 1.15 + Math.sin(t * 1.5) * 0.05;
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      const fgWrap = fxContainer?.querySelector(`#fx-fg-wrap-${tplId}`);
+      if (bgEl) bgEl.style.transform = `scale(${bgZoom}) translate(${-shiftX * 0.4}px, ${-shiftY * 0.4}px)`;
+      if (fgWrap) fgWrap.style.transform = `scale(1.05) translate(${shiftX}px, ${shiftY}px)`;
+    } else if (tplId === 'cyber-glitch-pass') {
+      // High-energy chromatic aberration jitter pulse
+      const isBurst = Math.sin(t * 12) > 0.4;
+      const glitchX = isBurst ? ((Math.random() - 0.5) * 16) : Math.sin(t * 20) * 2;
+      const cyanEl = fxContainer?.querySelector(`#fx-glitch-cyan-${tplId}`);
+      const redEl = fxContainer?.querySelector(`#fx-glitch-red-${tplId}`);
+      if (cyanEl) cyanEl.style.transform = `translate(${glitchX}px, 0) scale(1.06)`;
+      if (redEl) redEl.style.transform = `translate(${-glitchX}px, 0) scale(1.04)`;
+    } else if (tplId === 'spatial-3d-motion-suite') {
+      // James Jani After Effects slow Z-axis camera pullback + deep multi-plane parallax
+      // Cycle: slow dramatic zoom out (scale 1.35x -> 0.95x) with subtle 3D pitch & yaw
+      const zoomCycle = (Math.sin(t * 0.9 - Math.PI/2) + 1) / 2; // 0 (closest) to 1 (pulled back)
+      const camZProgress = 1.35 - zoomCycle * 0.42; // Slow Z-pullback scale
+      const camPitch = 8 - zoomCycle * 14 + Math.cos(t * 1.2) * 2; // Subtle X-tilt settling
+      const camYaw = Math.sin(t * 1.1) * 9; // Subtle Y-pan
+      
+      const plate = fxContainer?.querySelector(`#fx-spatial-plate-${tplId}`);
+      const grid = fxContainer?.querySelector(`#fx-spatial-grid-${tplId}`);
+      const card1 = fxContainer?.querySelector(`#fx-spatial-card1-${tplId}`);
+      const card2 = fxContainer?.querySelector(`#fx-spatial-card2-${tplId}`);
+
+      // Central extruded title moves with primary camera Z zoom
+      if (plate) {
+        plate.style.transform = `scale(${camZProgress}) rotateY(${camYaw}deg) rotateX(${camPitch}deg)`;
+      }
+      // Horizon floor grid stretches deep into perspective as camera pulls back
+      if (grid) {
+        const gridZ = -40 - zoomCycle * 50;
+        grid.style.transform = `rotateX(72deg) translateZ(${gridZ}px) translateY(${zoomCycle * 15}px)`;
+      }
+      // Floating document cards reveal their distance (parallax separation)
+      if (card1) {
+        const c1Scale = 1.15 - zoomCycle * 0.3;
+        const c1X = -zoomCycle * 12;
+        card1.style.transform = `translateX(${c1X}px) translateY(${Math.sin(t * 1.8) * 6}px) scale(${c1Scale}) rotateY(${24 + camYaw * 0.5}deg) rotateX(8deg)`;
+      }
+      if (card2) {
+        const c2Scale = 1.12 - zoomCycle * 0.28;
+        const c2X = zoomCycle * 14;
+        card2.style.transform = `translateX(${c2X}px) translateY(${-Math.sin(t * 1.8) * 6}px) scale(${c2Scale}) rotateY(${-22 + camYaw * 0.5}deg) rotateX(-6deg)`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -20202,26 +20589,1202 @@ function applySelectedHomepageTemplate(templateId) {
       renderAllTimelineTracks();
       selectClip(goldClip, 'image');
     }
-  } else if (templateId === 'archival-ink-highlight') {
-    const sampleText = {
-      id: `txt-${Date.now()}`,
-      text: 'THE STORY OF REGAARDER',
-      highlight: 'REGAARDER',
-      highlightColor: '#facc15',
+  } else if (templateId === 'magnates-paper-vector-cutout') {
+    // Cutout Subject with Paper Vector Outline + Bold Depth Text Behind
+    const bgClip = {
+      id: `img-bg-${Date.now()}`,
+      name: 'Background_Moody_Dossier.jpg',
+      url: tpl.secondaryImage,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      layerOrder: 'back'
+    };
+    const textBehind = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'THE CORRUPTION',
+      highlight: 'CORRUPTION',
+      highlightColor: '#ff334b',
       anim: 'pop',
-      fontSize: 62,
+      fontSize: 72,
+      fontFamily: 'Impact, sans-serif',
+      layerOrder: 'middle',
       start: 0,
       duration: 6
     };
-    if (timelineClips && timelineClips.text) {
-      timelineClips.text.push(sampleText);
+    const cutoutStickerClip = {
+      id: `img-cutout-${Date.now() + 2}`,
+      name: 'Magnates_Subject_Sticker.png',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.05,
+      vectorEffect: true,
+      vectorStrokeColor: '#ffffff',
+      layerOrder: 'front'
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, cutoutStickerClip];
+      timelineClips.text = [textBehind];
       renderAllTimelineTracks();
-      selectClip(sampleText, 'text');
+      selectClip(cutoutStickerClip, 'image');
     }
+  } else if (templateId === 'vox-newspaper-cream-dossier') {
+    // Vox Newspaper Cream Background + Document Cutout + Loupe
+    if (fxState) {
+      fxState.stageBackground = { type: 'vox_cream', color: '#f4eedb' };
+    }
+    const docClip = {
+      id: `img-doc-${Date.now()}`,
+      name: 'Vox_Investigative_Paper.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.1,
+      zoomEffect: 'loupe',
+      zoomScale: 2.2,
+      zoomOriginX: 0.55,
+      zoomOriginY: 0.45
+    };
+    const stampText = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'CONFIDENTIAL DOSSIER',
+      highlight: 'CONFIDENTIAL',
+      highlightColor: '#ff334b',
+      anim: 'stamp',
+      fontSize: 56,
+      fontFamily: 'Oswald, sans-serif',
+      start: 0.2,
+      duration: 5.8
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [docClip];
+      timelineClips.text = [stampText];
+      renderAllTimelineTracks();
+      selectClip(docClip, 'image');
+    }
+  } else if (templateId === 'text-texturing-grunge') {
+    // James Jani Vintage Paper & Distressed Grunge Texture Title
+    const textureClip = {
+      id: `img-tex-${Date.now()}`,
+      name: 'James_Jani_Paper_Texture.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.15
+    };
+    const grungeTitle = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'POWER & GREED',
+      highlight: 'POWER',
+      highlightColor: '#c084fc',
+      anim: 'pop',
+      fontSize: 68,
+      fontFamily: 'Playfair Display, Georgia, serif',
+      start: 0,
+      duration: 6
+    };
+    const subtitle = {
+      id: `txt-${Date.now() + 2}`,
+      text: 'CHAPTER IV: THE MANIPULATION',
+      highlight: '',
+      highlightColor: '#a855f7',
+      anim: 'slide_up',
+      fontSize: 28,
+      fontFamily: 'monospace',
+      start: 0.5,
+      duration: 5.5
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [textureClip];
+      timelineClips.text = [grungeTitle, subtitle];
+      renderAllTimelineTracks();
+      selectClip(grungeTitle, 'text');
+    }
+  } else if (templateId === 'kinetic-decode-typewriter') {
+    // Tension Matrix Decode & Typewriter Kinetic Text
+    const matrixClip = {
+      id: `img-matrix-${Date.now()}`,
+      name: 'Cyber_Matrix_Tension.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.2
+    };
+    const decodeTitle = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'THE ILLUSION OF CHOICE',
+      highlight: 'ILLUSION',
+      highlightColor: '#00f0ff',
+      anim: 'typewriter',
+      fontSize: 58,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: 6
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [matrixClip];
+      timelineClips.text = [decodeTitle];
+      renderAllTimelineTracks();
+      selectClip(decodeTitle, 'text');
+    }
+  } else if (templateId === 'vintage-film-burn') {
+    // Johnny Harris Vintage Film Burn & Projector Gate Flash Transition
+    const filmBurnClip = {
+      id: `img-film-${Date.now()}`,
+      name: 'Johnny_Harris_Film_Burn.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 5,
+      scale: 1.15,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+    const retroTitle = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'ARCHIVAL EVIDENCE',
+      highlight: 'EVIDENCE',
+      highlightColor: '#f59e0b',
+      anim: 'stamp',
+      fontSize: 54,
+      fontFamily: 'Oswald, sans-serif',
+      start: 0.2,
+      duration: 4.8
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [filmBurnClip];
+      timelineClips.text = [retroTitle];
+      renderAllTimelineTracks();
+      selectClip(filmBurnClip, 'image');
+    }
+  } else if (templateId === 'parallax-zoom') {
+    // 3D Parallax Depth Zoom: Foreground Subject + Blurred Backdrop
+    const bgClip = {
+      id: `img-bg-${Date.now()}`,
+      name: 'Cinematic_Backdrop_Blur.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.25,
+      zoomEffect: 'snap',
+      zoomScale: 1.15,
+      layerOrder: 'back'
+    };
+    const fgClip = {
+      id: `img-fg-${Date.now() + 1}`,
+      name: 'Subject_Focal_Depth.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.05,
+      zoomEffect: 'snap',
+      zoomScale: 1.35,
+      layerOrder: 'front'
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [bgClip, fgClip];
+      renderAllTimelineTracks();
+      selectClip(fgClip, 'image');
+    }
+  } else if (templateId === 'cyber-glitch-pass') {
+    // Cyberpunk RGB Glitch Shift Transition
+    const glitchClip = {
+      id: `img-glitch-${Date.now()}`,
+      name: 'Cyberpunk_RGB_Shift.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 5,
+      scale: 1.1,
+      transition: 'morph_cut',
+      transitionDuration: 0.6
+    };
+    const glitchTitle = {
+      id: `txt-${Date.now() + 1}`,
+      text: 'SYSTEM OVERRIDE',
+      highlight: 'OVERRIDE',
+      highlightColor: '#00f0ff',
+      anim: 'pop',
+      fontSize: 60,
+      fontFamily: 'monospace',
+      start: 0.1,
+      duration: 4.9
+    };
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [glitchClip];
+      timelineClips.text = [glitchTitle];
+      renderAllTimelineTracks();
+      selectClip(glitchClip, 'image');
+    }
+  } else if (templateId === 'spatial-3d-motion-suite') {
+    // Launch full Three.js 3D Spatial Motion Suite Studio
+    openSpatial3DMotionSuite();
+    return;
   }
 
   showTextTimingAlert(`Loaded template: "${tpl.title}" into Studio!`, 'success');
   setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
+/* =========================================================
+   3D SPATIAL MOTION SUITE: THREE.JS FULL RUNTIME CONTROLLER
+   (JAMES JANI MULTI-PLANE FLYTHROUGH & PARALLAX - REGAARDER PURPLE ACCENT)
+   ========================================================= */
+const SPATIAL_PRESETS = {
+  'docu-essay': [
+    { id: '1', type: 'text', title: 'THE SYSTEM', z: 600, x: -120, y: 80, scale: 1.2, color: '#f59e0b', subtitle: '', body: '' },
+    { id: '2', type: 'card', title: 'HEADLINE 1929', subtitle: 'FINANCIAL PANIC SPREADS', body: 'Markets tumble as investors grapple with unprecedented systemic instability and speculative fever.', z: -600, x: 220, y: -40, scale: 1.0, color: '#3b82f6' },
+    { id: '3', type: 'text', title: 'MANIPULATION', z: -1800, x: -280, y: -100, scale: 1.5, color: '#ef4444', subtitle: '', body: '' },
+    { id: '4', type: 'card', title: 'THE ARCHITECT', subtitle: 'BEHIND CLOSED DOORS', body: '"If you control the narrative, you control the perception of reality itself."', z: -3000, x: 180, y: 120, scale: 1.1, color: '#f59e0b' },
+    { id: '5', type: 'text', title: 'THE TRAP', z: -4200, x: 0, y: 0, scale: 2.2, color: '#a855f7', subtitle: '', body: '' }
+  ],
+  'cyber-matrix': [
+    { id: '1', type: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 800, x: -200, y: 100, scale: 1.0, color: '#10b981' },
+    { id: '2', type: 'text', title: 'ALGORITHMIC', z: -800, x: 250, y: -80, scale: 1.3, color: '#10b981', subtitle: '', body: '' },
+    { id: '3', type: 'card', title: 'NEURAL FEED', subtitle: 'SYNTHETIC REALITY', body: 'Deep spatial neural pathways floating in high dimensional tensor spaces.', z: -2200, x: -180, y: 150, scale: 1.1, color: '#38bdf8' },
+    { id: '4', type: 'text', title: 'QUANTUM REACH', z: -3800, x: 0, y: -50, scale: 2.0, color: '#06b6d4', subtitle: '', body: '' }
+  ],
+  'philosophy': [
+    { id: '1', type: 'card', title: 'EPISODE I', subtitle: 'THE SEARCH FOR TRUTH', body: 'We spend our entire lives mistaking the shadow on the wall for the reality in front of us.', z: 500, x: 0, y: 50, scale: 1.2, color: '#eab308' },
+    { id: '2', type: 'text', title: 'AWAKENING', z: -1200, x: -250, y: -120, scale: 1.6, color: '#eab308', subtitle: '', body: '' },
+    { id: '3', type: 'card', title: 'THE PARADOX', subtitle: 'PLATO\'S CAVE', body: 'Freedom is not the absence of boundaries, but the total awareness of them.', z: -2800, x: 220, y: 80, scale: 1.1, color: '#8b5cf6' },
+    { id: '4', type: 'text', title: 'BEYOND HORIZON', z: -4500, x: 0, y: 0, scale: 2.0, color: '#a855f7', subtitle: '', body: '' }
+  ]
+};
+
+let spatial3DState = {
+  scene: null,
+  camera: null,
+  renderer: null,
+  elements3D: [],
+  particlesMesh: null,
+  floorGrid: null,
+  ambientLight: null,
+  pointLight: null,
+  animId: null,
+  isPlaying: true,
+  flightMode: 'zoomthrough', // 'zoomthrough', 'pullback', 'orbit'
+  currentTime: 0, // 0 to 1
+  mouse: { x: 0, y: 0 },
+  activePreset: 'docu-essay',
+  camSpeed: 1.5,
+  camDrift: 35,
+  camPitch: 5,
+  camYaw: -8,
+  fovWarp: 55,
+  audioEnabled: false,
+  audioCtx: null,
+  lastZPassCheck: 1200,
+  fogDensity: 45,
+  lightIntensity: 100,
+  vignetteAmount: 80,
+  gridVisible: true,
+  dustVisible: true,
+  editingLayerIndex: -1 // -1 means adding new layer
+};
+
+function createSpatialTextPlane(item) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.font = '900 70px "Cinzel", "Inter", serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const planeColor = item.color || '#f59e0b';
+  ctx.shadowColor = planeColor;
+  ctx.shadowBlur = 24;
+  ctx.fillStyle = planeColor;
+  ctx.fillText(item.title, canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide
+  });
+
+  const planeGeo = new THREE.PlaneGeometry(800 * (item.scale || 1), 200 * (item.scale || 1));
+  const mesh = new THREE.Mesh(planeGeo, material);
+  mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
+  mesh.userData = {
+    id: item.id || Date.now().toString(),
+    type: 'text',
+    title: item.title,
+    initialZ: item.z || 0,
+    x: item.x || 0,
+    y: item.y || 0,
+    z: item.z || 0,
+    scale: item.scale || 1,
+    color: planeColor,
+    subtitle: item.subtitle || '',
+    body: item.body || ''
+  };
+  return mesh;
+}
+
+function wrapSpatialCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = (text || '').split(' ');
+  let line = '';
+  for (let n = 0; n < words.length; n++) {
+    let testLine = line + words[n] + ' ';
+    let metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line, x, y);
+      line = words[n] + ' ';
+      y += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, y);
+}
+
+function createSpatialCardPlane(item) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 500;
+  const ctx = canvas.getContext('2d');
+
+  const cardBorderColor = item.color || '#3b82f6';
+
+  // Card dark background gradient
+  const grad = ctx.createLinearGradient(0, 0, 800, 500);
+  grad.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
+  grad.addColorStop(1, 'rgba(25, 33, 56, 0.92)');
+
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(10, 10, 780, 480, 24);
+  } else {
+    ctx.rect(10, 10, 780, 480);
+  }
+  ctx.fill();
+
+  // Glow border with custom element color
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = cardBorderColor;
+  ctx.stroke();
+
+  // Eyebrow / Subtitle
+  ctx.font = 'bold 22px "Inter", sans-serif';
+  ctx.fillStyle = cardBorderColor;
+  ctx.fillText((item.subtitle || 'DOCUMENTARY ESSAY').toUpperCase(), 50, 70);
+
+  // Main Title
+  ctx.font = 'bold 42px "Cinzel", "Playfair Display", serif';
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillText(item.title || 'HEADLINE', 50, 130);
+
+  // Body text wrap
+  ctx.font = '22px "Inter", sans-serif';
+  ctx.fillStyle = '#cbd5e1';
+  wrapSpatialCanvasText(ctx, item.body || '', 50, 210, 680, 34);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide
+  });
+
+  const planeGeo = new THREE.PlaneGeometry(600 * (item.scale || 1), 375 * (item.scale || 1));
+  const mesh = new THREE.Mesh(planeGeo, material);
+  mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
+  mesh.userData = {
+    id: item.id || Date.now().toString(),
+    type: 'card',
+    title: item.title,
+    initialZ: item.z || 0,
+    x: item.x || 0,
+    y: item.y || 0,
+    z: item.z || 0,
+    scale: item.scale || 1,
+    color: cardBorderColor,
+    subtitle: item.subtitle || '',
+    body: item.body || ''
+  };
+  return mesh;
+}
+
+function createSpatialCodePlane(item) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 700;
+  canvas.height = 400;
+  const ctx = canvas.getContext('2d');
+
+  const codeColor = item.color || '#10b981';
+
+  // Dark terminal background
+  ctx.fillStyle = 'rgba(6, 9, 15, 0.95)';
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(10, 10, 680, 380, 16);
+  } else {
+    ctx.rect(10, 10, 680, 380);
+  }
+  ctx.fill();
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = codeColor;
+  ctx.stroke();
+
+  ctx.fillStyle = codeColor;
+  ctx.font = 'bold 20px "JetBrains Mono", monospace';
+  ctx.fillText('> ' + item.title, 40, 50);
+
+  ctx.font = '18px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#6ee7b7';
+  const lines = (item.text || item.body || '').split('\n');
+  lines.forEach((line, i) => {
+    ctx.fillText(line, 40, 110 + (i * 32));
+  });
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    side: THREE.DoubleSide
+  });
+
+  const planeGeo = new THREE.PlaneGeometry(550 * (item.scale || 1), 315 * (item.scale || 1));
+  const mesh = new THREE.Mesh(planeGeo, material);
+  mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
+  mesh.userData = {
+    id: item.id || Date.now().toString(),
+    type: 'code',
+    title: item.title,
+    initialZ: item.z || 0,
+    x: item.x || 0,
+    y: item.y || 0,
+    z: item.z || 0,
+    scale: item.scale || 1,
+    color: codeColor,
+    text: item.text || item.body || '',
+    subtitle: '',
+    body: item.text || item.body || ''
+  };
+  return mesh;
+}
+
+function buildSpatialDustParticles(scene) {
+  const particleCount = 700;
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    positions[i] = (Math.random() - 0.5) * 4000;
+    positions[i + 1] = (Math.random() - 0.5) * 3000;
+    positions[i + 2] = (Math.random() - 0.5) * 8000 - 2000;
+  }
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const material = new THREE.PointsMaterial({
+    color: 0xc084fc,
+    size: 5.5,
+    transparent: true,
+    opacity: 0.65,
+    blending: THREE.AdditiveBlending
+  });
+
+  const dust = new THREE.Points(geometry, material);
+  scene.add(dust);
+  return dust;
+}
+
+function loadSpatialPreset(presetKey) {
+  spatial3DState.activePreset = presetKey;
+  const scene = spatial3DState.scene;
+  if (!scene) return;
+
+  // Clear existing planes
+  spatial3DState.elements3D.forEach(obj => scene.remove(obj));
+  spatial3DState.elements3D = [];
+
+  // Update preset buttons styling
+  document.querySelectorAll('.btn-spatial-preset').forEach(btn => {
+    const isAct = btn.dataset.preset === presetKey;
+    btn.style.background = isAct ? 'rgba(168,85,247,0.25)' : 'rgba(18,19,28,0.8)';
+    btn.style.borderColor = isAct ? 'rgba(168,85,247,0.6)' : 'rgba(255,255,255,0.1)';
+    btn.style.color = isAct ? '#e9d5ff' : '#94a3b8';
+  });
+
+  const items = SPATIAL_PRESETS[presetKey] || SPATIAL_PRESETS['docu-essay'];
+  items.forEach(item => {
+    let mesh = null;
+    if (item.type === 'text') mesh = createSpatialTextPlane(item);
+    else if (item.type === 'card') mesh = createSpatialCardPlane(item);
+    else if (item.type === 'code') mesh = createSpatialCodePlane(item);
+
+    if (mesh) {
+      scene.add(mesh);
+      spatial3DState.elements3D.push(mesh);
+    }
+  });
+
+  renderSpatialLayerList();
+  resetSpatialCameraPath();
+}
+
+function renderSpatialLayerList() {
+  const container = document.getElementById('spatial-layers-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  spatial3DState.elements3D.forEach((mesh, index) => {
+    const u = mesh.userData;
+    const div = document.createElement('div');
+    div.style.cssText = "background: #121520; padding: 10px 12px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; font-size: 11px; transition: border-color 0.15s;";
+    const dotColor = u.color || (u.type === 'text' ? '#f59e0b' : u.type === 'card' ? '#3b82f6' : '#10b981');
+    
+    div.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; cursor: pointer;" class="spatial-layer-info-btn" data-index="${index}" title="Click to edit layer">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: ${dotColor}; flex-shrink: 0; box-shadow: 0 0 6px ${dotColor};"></span>
+        <div style="overflow: hidden;">
+          <div style="font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">${u.title}</div>
+          <div style="font-size: 9.5px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">X:${Math.round(mesh.position.x)} Y:${Math.round(mesh.position.y)}</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8;">
+        <span style="color: #c084fc; font-weight: 700;">Z: ${Math.round(mesh.position.z)}</span>
+        <button type="button" class="btn-edit-spatial-layer" data-index="${index}" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #e9d5ff; border-radius: 5px; cursor: pointer; padding: 2px 7px; font-size: 10px; font-weight: 600;" title="Edit coordinates, text & color">Edit</button>
+        <button type="button" class="btn-remove-spatial-layer" data-index="${index}" style="background: transparent; border: none; color: #f43f5e; cursor: pointer; padding: 2px 5px; font-size: 12px;" title="Delete plane">✕</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  // Edit layer listeners
+  container.querySelectorAll('.btn-edit-spatial-layer, .spatial-layer-info-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.index, 10);
+      openLayerEditorModal(idx);
+    });
+  });
+
+  // Remove layer listeners
+  container.querySelectorAll('.btn-remove-spatial-layer').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.index, 10);
+      removeSpatialLayer(idx);
+    });
+  });
+}
+
+function openLayerEditorModal(index = -1) {
+  spatial3DState.editingLayerIndex = index;
+  const modal = document.getElementById('modal-spatial-add-layer');
+  if (!modal) return;
+
+  const modalTitle = document.getElementById('spatial-layer-modal-title');
+  const typeSelect = document.getElementById('modal-layer-type');
+  const textInput = document.getElementById('modal-layer-text');
+  const subInput = document.getElementById('modal-layer-subtitle');
+  const bodyInput = document.getElementById('modal-layer-body');
+  const extraFields = document.getElementById('modal-layer-extra-card-fields');
+  const colorInput = document.getElementById('modal-layer-color');
+  const zSlider = document.getElementById('modal-layer-z-slider');
+  const zValDisplay = document.getElementById('modal-layer-z-val');
+  const posXInput = document.getElementById('modal-layer-x');
+  const posYInput = document.getElementById('modal-layer-y');
+  const posZInput = document.getElementById('modal-layer-z');
+  const scaleSlider = document.getElementById('modal-layer-scale-slider');
+  const scaleValDisplay = document.getElementById('modal-layer-scale-val');
+
+  if (index >= 0 && spatial3DState.elements3D[index]) {
+    const mesh = spatial3DState.elements3D[index];
+    const u = mesh.userData;
+
+    if (modalTitle) modalTitle.textContent = `Edit 3D Layer: ${u.title}`;
+    if (typeSelect) typeSelect.value = u.type || 'text';
+    if (textInput) textInput.value = u.title || '';
+    if (subInput) subInput.value = u.subtitle || '';
+    if (bodyInput) bodyInput.value = u.body || u.text || '';
+    if (colorInput) colorInput.value = u.color || '#f59e0b';
+    
+    const curZ = Math.round(mesh.position.z);
+    if (zSlider) zSlider.value = curZ;
+    if (zValDisplay) zValDisplay.textContent = curZ;
+    if (posZInput) posZInput.value = curZ;
+
+    if (posXInput) posXInput.value = Math.round(mesh.position.x);
+    if (posYInput) posYInput.value = Math.round(mesh.position.y);
+    if (scaleSlider) scaleSlider.value = (u.scale || 1.0).toFixed(1);
+    if (scaleValDisplay) scaleValDisplay.textContent = `${(u.scale || 1.0).toFixed(1)}x`;
+
+    if (extraFields) extraFields.style.display = u.type === 'card' ? 'flex' : 'none';
+  } else {
+    // Add New
+    if (modalTitle) modalTitle.textContent = 'Add 3D Spatial Element';
+    if (typeSelect) typeSelect.value = 'text';
+    if (textInput) textInput.value = 'THE ILLUSION OF CONTROL';
+    if (subInput) subInput.value = 'FINANCIAL COLLAPSE';
+    if (bodyInput) bodyInput.value = 'Markets tumble as investors grapple with unprecedented systemic instability.';
+    if (colorInput) colorInput.value = '#f59e0b';
+    if (zSlider) zSlider.value = -2500;
+    if (zValDisplay) zValDisplay.textContent = -2500;
+    if (posZInput) posZInput.value = -2500;
+    if (posXInput) posXInput.value = 0;
+    if (posYInput) posYInput.value = 0;
+    if (scaleSlider) scaleSlider.value = 1.2;
+    if (scaleValDisplay) scaleValDisplay.textContent = '1.2x';
+    if (extraFields) extraFields.style.display = 'none';
+  }
+
+  modal.style.display = 'flex';
+}
+
+function removeSpatialLayer(index) {
+  const mesh = spatial3DState.elements3D[index];
+  if (mesh && spatial3DState.scene) {
+    spatial3DState.scene.remove(mesh);
+    spatial3DState.elements3D.splice(index, 1);
+    renderSpatialLayerList();
+  }
+}
+
+function triggerSpatialWhooshSound() {
+  if (!spatial3DState.audioEnabled) return;
+  if (!spatial3DState.audioCtx) {
+    spatial3DState.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const ctx = spatial3DState.audioCtx;
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+
+  // Bandpass filter noise sweep whoosh
+  const bufferSize = ctx.sampleRate * 0.55;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.setValueAtTime(140, ctx.currentTime);
+  filter.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.28);
+  filter.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.55);
+  filter.Q.value = 3.2;
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.01, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.38, ctx.currentTime + 0.22);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  noise.start();
+  noise.stop(ctx.currentTime + 0.55);
+}
+
+function checkSpatialZPassWhoosh(camZ) {
+  if (!spatial3DState.audioEnabled) return;
+  spatial3DState.elements3D.forEach(mesh => {
+    const meshZ = mesh.position.z;
+    if (spatial3DState.lastZPassCheck > meshZ && camZ <= meshZ) {
+      triggerSpatialWhooshSound();
+    }
+  });
+  spatial3DState.lastZPassCheck = camZ;
+}
+
+function resetSpatialCameraPath() {
+  spatial3DState.currentTime = 0;
+  spatial3DState.lastZPassCheck = 1200;
+  const slider = document.getElementById('spatial-timeline-slider');
+  if (slider) slider.value = 0;
+  updateSpatialTimelineDisplay();
+}
+
+function updateSpatialTimelineDisplay() {
+  const display = document.getElementById('spatial-time-display');
+  if (!display) return;
+  const totalSec = Math.floor(spatial3DState.currentTime * 10);
+  const ms = Math.floor((spatial3DState.currentTime * 10 - totalSec) * 100);
+  display.textContent = `00:${totalSec.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
+}
+
+function updateSpatialCameraPosition() {
+  const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw } = spatial3DState;
+  if (!camera) return;
+
+  const driftFactor = camDrift / 100;
+
+  if (flightMode === 'zoomthrough') {
+    // Pass-through flight forward from Z=1200 down to Z=-5000
+    const targetZ = 1200 - (currentTime * 6200);
+    const targetX = Math.sin(currentTime * Math.PI * 3) * (180 * driftFactor) + (mouse.x * 40);
+    const targetY = Math.cos(currentTime * Math.PI * 2) * (120 * driftFactor) + (-mouse.y * 40);
+
+    camera.position.z += (targetZ - camera.position.z) * 0.08;
+    camera.position.x += (targetX - camera.position.x) * 0.05;
+    camera.position.y += (targetY - camera.position.y) * 0.05;
+
+    camera.rotation.x = (camPitch * Math.PI / 180) + (-mouse.y * 0.05);
+    camera.rotation.y = (camYaw * Math.PI / 180) + (-mouse.x * 0.05);
+
+    checkSpatialZPassWhoosh(camera.position.z);
+  } else if (flightMode === 'pullback') {
+    // James Jani reveal pullback from close macro (-4500) to wide view (1400)
+    const targetZ = -4500 + (currentTime * 5900);
+    const targetX = Math.cos(currentTime * Math.PI * 1.5) * (250 * driftFactor);
+    const targetY = Math.sin(currentTime * Math.PI * 1.5) * (150 * driftFactor);
+
+    camera.position.z += (targetZ - camera.position.z) * 0.08;
+    camera.position.x += (targetX - camera.position.x) * 0.05;
+    camera.position.y += (targetY - camera.position.y) * 0.05;
+    camera.rotation.set(0, 0, 0);
+  } else if (flightMode === 'orbit') {
+    // 360 sweeping orbit around center Z=-2000
+    const angle = currentTime * Math.PI * 2;
+    const radius = 2200;
+    camera.position.x = Math.sin(angle) * radius;
+    camera.position.z = -2000 + Math.cos(angle) * radius;
+    camera.position.y = 200 + Math.sin(angle * 2) * 300;
+    camera.lookAt(0, 0, -2000);
+  }
+
+  const telem = document.getElementById('spatial-cam-telemetry');
+  if (telem) {
+    telem.textContent = `X: ${camera.position.x.toFixed(1)} | Y: ${camera.position.y.toFixed(1)} | Z: ${camera.position.z.toFixed(1)}`;
+  }
+}
+
+function initSpatialThreeJSEngine() {
+  const container = document.getElementById('spatial-threejs-container');
+  if (!container || typeof THREE === 'undefined') return;
+
+  if (spatial3DState.renderer) {
+    // Resize existing viewport
+    const w = container.clientWidth || 800;
+    const h = container.clientHeight || 500;
+    spatial3DState.camera.aspect = w / h;
+    spatial3DState.camera.updateProjectionMatrix();
+    spatial3DState.renderer.setSize(w, h);
+    return;
+  }
+
+  const w = container.clientWidth || 800;
+  const h = container.clientHeight || 500;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x07080a);
+  scene.fog = new THREE.FogExp2(0x07080a, 0.00035);
+
+  const camera = new THREE.PerspectiveCamera(55, w / h, 1, 10000);
+  camera.position.set(0, 0, 1200);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x07080a, 1.0);
+
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
+
+  // Lighting with Regaarder Purple accent + high-contrast white keys
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
+  scene.add(ambientLight);
+
+  const dirLight = new THREE.DirectionalLight(0xa855f7, 1.2);
+  dirLight.position.set(500, 1000, 1000);
+  scene.add(dirLight);
+
+  const pointLight = new THREE.PointLight(0x38bdf8, 1.5, 3500);
+  pointLight.position.set(0, 0, -2000);
+  scene.add(pointLight);
+
+  // Regaarder Purple Floor Grid
+  const floorGrid = new THREE.GridHelper(8000, 40, 0xa855f7, 0x1e1b4b);
+  floorGrid.position.y = -600;
+  scene.add(floorGrid);
+
+  // Purple ambient spatial dust particles
+  const particlesMesh = buildSpatialDustParticles(scene);
+
+  spatial3DState.scene = scene;
+  spatial3DState.camera = camera;
+  spatial3DState.renderer = renderer;
+  spatial3DState.particlesMesh = particlesMesh;
+  spatial3DState.floorGrid = floorGrid;
+  spatial3DState.ambientLight = ambientLight;
+  spatial3DState.pointLight = pointLight;
+
+  container.addEventListener('mousemove', (e) => {
+    const rect = container.getBoundingClientRect();
+    spatial3DState.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    spatial3DState.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  });
+
+  loadSpatialPreset('docu-essay');
+
+  function animateSpatialEngine() {
+    if (spatial3DState.isPlaying) {
+      spatial3DState.currentTime += 0.002 * spatial3DState.camSpeed;
+      if (spatial3DState.currentTime > 1) spatial3DState.currentTime = 0;
+      const slider = document.getElementById('spatial-timeline-slider');
+      if (slider) slider.value = spatial3DState.currentTime * 100;
+      updateSpatialTimelineDisplay();
+    }
+
+    updateSpatialCameraPosition();
+
+    if (particlesMesh && spatial3DState.dustVisible) {
+      particlesMesh.rotation.y += 0.0003;
+      particlesMesh.rotation.x += 0.0001;
+    }
+
+    if (spatial3DState.renderer && spatial3DState.scene && spatial3DState.camera) {
+      spatial3DState.renderer.render(spatial3DState.scene, spatial3DState.camera);
+    }
+
+    spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
+  }
+
+  spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
+}
+
+function openSpatial3DMotionSuite() {
+  const modal = document.getElementById('modal-spatial-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    initSpatialThreeJSEngine();
+  }, 100);
+}
+
+function closeSpatial3DMotionSuite() {
+  const modal = document.getElementById('modal-spatial-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  if (spatial3DState.animId) {
+    cancelAnimationFrame(spatial3DState.animId);
+    spatial3DState.animId = null;
+  }
+}
+
+function bindSpatial3DModalControls() {
+  // Modal close buttons
+  document.getElementById('btn-close-spatial-3d-suite')?.addEventListener('click', closeSpatial3DMotionSuite);
+
+  // Tab switching: Camera Rig, 3D Layers, Post FX
+  const tabCam = document.getElementById('tab-spatial-cam');
+  const tabLayers = document.getElementById('tab-spatial-layers');
+  const tabFx = document.getElementById('tab-spatial-fx');
+  const panelCam = document.getElementById('spatial-panel-cam');
+  const panelLayers = document.getElementById('spatial-panel-layers');
+  const panelFx = document.getElementById('spatial-panel-fx');
+
+  function setSpatialTab(activeTab, activePanel) {
+    [tabCam, tabLayers, tabFx].forEach(t => {
+      if (!t) return;
+      t.style.background = 'transparent';
+      t.style.color = '#94a3b8';
+    });
+    [panelCam, panelLayers, panelFx].forEach(p => {
+      if (p) p.style.display = 'none';
+    });
+    if (activeTab) {
+      activeTab.style.background = 'rgba(168,85,247,0.25)';
+      activeTab.style.color = '#c084fc';
+    }
+    if (activePanel) activePanel.style.display = 'flex';
+  }
+
+  tabCam?.addEventListener('click', () => setSpatialTab(tabCam, panelCam));
+  tabLayers?.addEventListener('click', () => {
+    setSpatialTab(tabLayers, panelLayers);
+    renderSpatialLayerList();
+  });
+  tabFx?.addEventListener('click', () => setSpatialTab(tabFx, panelFx));
+
+  // Preset switching
+  document.querySelectorAll('.btn-spatial-preset').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const p = e.currentTarget.dataset.preset;
+      loadSpatialPreset(p);
+    });
+  });
+
+  // Flight Mode Buttons
+  document.querySelectorAll('.btn-spatial-cam-mode').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-spatial-cam-mode').forEach(b => {
+        b.style.background = '#131826';
+        b.style.borderColor = 'rgba(255,255,255,0.08)';
+        b.style.color = '#cbd5e1';
+      });
+      e.currentTarget.style.background = 'rgba(168,85,247,0.18)';
+      e.currentTarget.style.borderColor = '#a855f7';
+      e.currentTarget.style.color = '#e9d5ff';
+
+      const mode = e.currentTarget.dataset.mode;
+      spatial3DState.flightMode = mode;
+      resetSpatialCameraPath();
+    });
+  });
+
+  // Camera Sliders
+  document.getElementById('spatial-range-speed')?.addEventListener('input', (e) => {
+    spatial3DState.camSpeed = parseFloat(e.target.value);
+    const lbl = document.getElementById('spatial-val-speed');
+    if (lbl) lbl.textContent = `${spatial3DState.camSpeed.toFixed(1)}x`;
+  });
+  document.getElementById('spatial-range-drift')?.addEventListener('input', (e) => {
+    spatial3DState.camDrift = parseFloat(e.target.value);
+    const lbl = document.getElementById('spatial-val-drift');
+    if (lbl) lbl.textContent = `${spatial3DState.camDrift}%`;
+  });
+  document.getElementById('spatial-range-fov')?.addEventListener('input', (e) => {
+    spatial3DState.fovWarp = parseFloat(e.target.value);
+    const lbl = document.getElementById('spatial-val-fov');
+    if (lbl) lbl.textContent = `${spatial3DState.fovWarp}°`;
+    if (spatial3DState.camera) {
+      spatial3DState.camera.fov = spatial3DState.fovWarp;
+      spatial3DState.camera.updateProjectionMatrix();
+    }
+  });
+
+  // Post FX Sliders
+  document.getElementById('spatial-range-fog')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    spatial3DState.fogDensity = val;
+    const densityVal = 0.0001 + (val / 100) * 0.0008;
+    if (spatial3DState.scene && spatial3DState.scene.fog) {
+      spatial3DState.scene.fog.density = densityVal;
+    }
+    const lbl = document.getElementById('spatial-val-fog');
+    if (lbl) lbl.textContent = val < 30 ? 'Low' : val > 70 ? 'Heavy' : 'Medium';
+  });
+
+  document.getElementById('spatial-range-light')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    spatial3DState.lightIntensity = val;
+    if (spatial3DState.ambientLight) {
+      spatial3DState.ambientLight.intensity = (val / 100) * 0.95;
+    }
+    const lbl = document.getElementById('spatial-val-light');
+    if (lbl) lbl.textContent = `${val}%`;
+  });
+
+  // Grid & Dust Toggles
+  document.getElementById('btn-spatial-toggle-grid')?.addEventListener('click', () => {
+    spatial3DState.gridVisible = !spatial3DState.gridVisible;
+    if (spatial3DState.floorGrid) spatial3DState.floorGrid.visible = spatial3DState.gridVisible;
+    const btn = document.getElementById('btn-spatial-toggle-grid');
+    if (btn) {
+      btn.style.background = spatial3DState.gridVisible ? 'rgba(168,85,247,0.18)' : 'rgba(255,255,255,0.05)';
+      btn.style.borderColor = spatial3DState.gridVisible ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
+    }
+  });
+
+  document.getElementById('btn-spatial-toggle-dust')?.addEventListener('click', () => {
+    spatial3DState.dustVisible = !spatial3DState.dustVisible;
+    if (spatial3DState.particlesMesh) spatial3DState.particlesMesh.visible = spatial3DState.dustVisible;
+    const btn = document.getElementById('btn-spatial-toggle-dust');
+    if (btn) {
+      btn.style.background = spatial3DState.dustVisible ? 'rgba(168,85,247,0.18)' : 'rgba(255,255,255,0.05)';
+      btn.style.borderColor = spatial3DState.dustVisible ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
+    }
+  });
+
+  // Audio SFX Toggle
+  document.getElementById('btn-spatial-toggle-sfx')?.addEventListener('click', () => {
+    spatial3DState.audioEnabled = !spatial3DState.audioEnabled;
+    const icon = document.getElementById('spatial-sfx-icon');
+    const text = document.getElementById('spatial-sfx-text');
+    if (spatial3DState.audioEnabled) {
+      if (icon) icon.textContent = '🔊';
+      if (text) text.textContent = 'SFX ON';
+      triggerSpatialWhooshSound(); // Test feedback
+    } else {
+      if (icon) icon.textContent = '🔈';
+      if (text) text.textContent = 'SFX OFF';
+    }
+  });
+
+  // Playback Controls
+  document.getElementById('btn-spatial-toggle-play')?.addEventListener('click', () => {
+    spatial3DState.isPlaying = !spatial3DState.isPlaying;
+    const btn = document.getElementById('btn-spatial-toggle-play');
+    if (btn) btn.textContent = spatial3DState.isPlaying ? '❚❚' : '▶';
+  });
+
+  document.getElementById('btn-spatial-reset-path')?.addEventListener('click', () => {
+    resetSpatialCameraPath();
+  });
+
+  // Timeline Slider Scrub
+  document.getElementById('spatial-timeline-slider')?.addEventListener('input', (e) => {
+    spatial3DState.currentTime = parseFloat(e.target.value) / 100;
+    updateSpatialCameraPosition();
+    updateSpatialTimelineDisplay();
+  });
+
+  // Layer Modal Type Change Handler (shows extra fields for cards)
+  document.getElementById('modal-layer-type')?.addEventListener('change', (e) => {
+    const extraFields = document.getElementById('modal-layer-extra-card-fields');
+    if (extraFields) {
+      extraFields.style.display = e.target.value === 'card' ? 'flex' : 'none';
+    }
+  });
+
+  // Easy Z-slider & Nerds Exact Z input synchronization
+  const zSlider = document.getElementById('modal-layer-z-slider');
+  const zValDisplay = document.getElementById('modal-layer-z-val');
+  const posZInput = document.getElementById('modal-layer-z');
+
+  zSlider?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value);
+    if (zValDisplay) zValDisplay.textContent = Math.round(val);
+    if (posZInput) posZInput.value = Math.round(val);
+  });
+
+  posZInput?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 0;
+    if (zSlider) zSlider.value = val;
+    if (zValDisplay) zValDisplay.textContent = Math.round(val);
+  });
+
+  // Scale slider synchronization
+  document.getElementById('modal-layer-scale-slider')?.addEventListener('input', (e) => {
+    const sVal = document.getElementById('modal-layer-scale-val');
+    if (sVal) sVal.textContent = `${parseFloat(e.target.value).toFixed(1)}x`;
+  });
+
+  // Quick Color Dots click handler
+  document.querySelectorAll('.quick-color-dot').forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      const col = e.currentTarget.dataset.color;
+      const colorInput = document.getElementById('modal-layer-color');
+      if (colorInput) colorInput.value = col;
+    });
+  });
+
+  // Progressive Disclosure Toggle ("For Nerds" panel)
+  const btnToggleNerd = document.getElementById('btn-toggle-nerd-mode');
+  const nerdPanel = document.getElementById('spatial-nerd-panel');
+  const nerdChevron = document.getElementById('nerd-mode-chevron');
+
+  btnToggleNerd?.addEventListener('click', () => {
+    if (!nerdPanel) return;
+    const isHidden = nerdPanel.style.display === 'none' || !nerdPanel.style.display;
+    nerdPanel.style.display = isHidden ? 'flex' : 'none';
+    if (nerdChevron) nerdChevron.textContent = isHidden ? '▲' : '▼';
+  });
+
+  // Add Layer Modal open/close
+  const addModal = document.getElementById('modal-spatial-add-layer');
+  document.getElementById('btn-spatial-add-layer')?.addEventListener('click', () => {
+    openLayerEditorModal(-1);
+  });
+  document.getElementById('btn-close-add-layer-modal')?.addEventListener('click', () => {
+    if (addModal) addModal.style.display = 'none';
+  });
+  document.getElementById('btn-cancel-add-layer')?.addEventListener('click', () => {
+    if (addModal) addModal.style.display = 'none';
+  });
+
+  // Confirm Save / Add Layer
+  document.getElementById('btn-confirm-add-layer')?.addEventListener('click', () => {
+    const type = document.getElementById('modal-layer-type')?.value || 'text';
+    const title = document.getElementById('modal-layer-text')?.value || 'NEW 3D PLANE';
+    const subtitle = document.getElementById('modal-layer-subtitle')?.value || '';
+    const body = document.getElementById('modal-layer-body')?.value || '';
+    const color = document.getElementById('modal-layer-color')?.value || '#f59e0b';
+    const z = parseFloat(document.getElementById('modal-layer-z')?.value || document.getElementById('modal-layer-z-slider')?.value || '-2500');
+    const x = parseFloat(document.getElementById('modal-layer-x')?.value || '0');
+    const y = parseFloat(document.getElementById('modal-layer-y')?.value || '0');
+    const scale = parseFloat(document.getElementById('modal-layer-scale-slider')?.value || '1.0');
+
+    const item = {
+      id: spatial3DState.editingLayerIndex >= 0 ? (spatial3DState.elements3D[spatial3DState.editingLayerIndex]?.userData?.id || Date.now().toString()) : Date.now().toString(),
+      type,
+      title,
+      subtitle,
+      body,
+      text: body,
+      color,
+      x,
+      y,
+      z,
+      scale
+    };
+
+    let newMesh = null;
+    if (type === 'text') newMesh = createSpatialTextPlane(item);
+    else if (type === 'card') newMesh = createSpatialCardPlane(item);
+    else if (type === 'code') newMesh = createSpatialCodePlane(item);
+
+    if (newMesh && spatial3DState.scene) {
+      if (spatial3DState.editingLayerIndex >= 0 && spatial3DState.elements3D[spatial3DState.editingLayerIndex]) {
+        // Replace existing mesh in scene
+        const oldMesh = spatial3DState.elements3D[spatial3DState.editingLayerIndex];
+        spatial3DState.scene.remove(oldMesh);
+        spatial3DState.scene.add(newMesh);
+        spatial3DState.elements3D[spatial3DState.editingLayerIndex] = newMesh;
+        showTextTimingAlert(`Updated 3D Plane "${title}"!`, 'success');
+      } else {
+        // Add new mesh
+        spatial3DState.scene.add(newMesh);
+        spatial3DState.elements3D.push(newMesh);
+        showTextTimingAlert(`Created 3D Plane "${title}" at Z: ${Math.round(z)}!`, 'success');
+      }
+      renderSpatialLayerList();
+    }
+
+    if (addModal) addModal.style.display = 'none';
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-spatial-apply-timeline')?.addEventListener('click', () => {
+    closeSpatial3DMotionSuite();
+    switchStudioView('editor');
+
+    const firstItem = spatial3DState.elements3D[0]?.userData?.title || 'THE SYSTEM';
+    const sampleBg = {
+      id: `img-spatial-bg-${Date.now()}`,
+      name: 'Regaarder_3D_Spatial_Scene.jpg',
+      url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+      start: 0,
+      duration: 7,
+      scale: 1.25,
+      zoomEffect: 'snap',
+      zoomScale: 1.3
+    };
+    const sampleTitle = {
+      id: `txt-spatial-${Date.now() + 1}`,
+      text: firstItem,
+      highlight: firstItem.split(' ')[0] || '',
+      highlightColor: '#c084fc',
+      anim: 'pop',
+      fontSize: 70,
+      fontFamily: 'Cinzel, serif',
+      start: 0,
+      duration: 7
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [sampleBg];
+      timelineClips.text = [sampleTitle];
+      renderAllTimelineTracks();
+      selectClip(sampleTitle, 'text');
+    }
+
+    showTextTimingAlert(`Applied Regaarder 3D Spatial Scene "${firstItem}" to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
 }
 
 function initHomepageTemplateEvents() {
@@ -20276,6 +21839,7 @@ function initHomepageTemplateEvents() {
   // Initial category & template renders
   renderHomepageCategories();
   renderHomepageTemplates();
+  bindSpatial3DModalControls();
 }
 
 // Initialize homepage discovery view immediately on script execution

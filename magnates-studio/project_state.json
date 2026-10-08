@@ -1,147 +1,34 @@
 {
   "text": [
     {
-      "id": "clip-text-1",
-      "start": 0,
-      "duration": 5,
-      "text": "Title of LL",
-      "highlight": "LL",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 64,
-      "textColor": "#ffffff",
-      "highlightColor": "#ff334b",
+      "id": "txt-spatial-1791439835556",
+      "text": "THE SYSTEM",
+      "highlight": "THE",
+      "highlightColor": "#f59e0b",
       "anim": "pop",
-      "sfx": "whoosh",
-      "position": "center",
-      "zIndex": 30,
-      "layerOrder": "front",
+      "fontSize": 70,
+      "fontFamily": "Cinzel, serif",
+      "start": 0,
+      "duration": 7,
       "_renderBounds": {
-        "x": 248.81400437636762,
-        "y": 781.1435684647303,
-        "w": 354.8937530517578,
-        "h": 108.79999999999995
-      },
-      "x": 264.8140043763676,
-      "y": 835.5435684647302
+        "x": 204,
+        "y": 428,
+        "w": 517.7999420166016,
+        "h": 116
+      }
     }
   ],
   "chart": [],
   "quote": [],
   "image": [
     {
-      "id": "clip-image-1791219025096-569",
-      "track": "image",
-      "start": 13.333333333333334,
-      "duration": 11.066666666666668,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "x": 0,
-      "y": 0,
-      "scale": 1.7282222141514658,
+      "id": "img-spatial-bg-1791439835555",
+      "start": 0,
+      "duration": 7,
+      "scale": 1.25,
       "zoomEffect": "snap",
       "zoomScale": 1.3,
-      "zoomStartTime": 9.3,
-      "zoomOriginX": 0.48581915077664994,
-      "zoomOriginY": 0.11145741524897038,
-      "highlights": [
-        {
-          "x": 0.13940126260624275,
-          "y": 0.12075269239612418,
-          "w": 0.5105105720406001,
-          "h": 0.01,
-          "color": "#38bdf8",
-          "opacity": 0.95,
-          "startTime": 9.38,
-          "duration": 0.6,
-          "_screenBounds": {
-            "x": -67.58512035010938,
-            "y": 86.2655601659751,
-            "w": 1468.1067833698028,
-            "h": 15.668511139720712,
-            "punchScale": 1.3,
-            "index": 0
-          }
-        }
-      ],
-      "spotlights": [
-        {
-          "rect": {
-            "x": 0.18478325116276634,
-            "y": 0.07259265065577385,
-            "w": 0.4679680243705501,
-            "h": 0.11526143662470736
-          },
-          "style": "white",
-          "dimOpacity": 0.65,
-          "feather": 18,
-          "startTime": 9.3,
-          "duration": 2.5,
-          "_screenBounds": {
-            "x": 62.92266713082131,
-            "y": 10.805945116165745,
-            "w": 1345.7645514223193,
-            "h": 180.597510373444,
-            "dx": -146.06221705693815,
-            "dy": -62.63504383541192,
-            "finalW": 2212.1244341138763,
-            "finalH": 1205.2700876708238,
-            "punchScale": 1.3,
-            "spotIndex": 0
-          }
-        },
-        {
-          "rect": {
-            "x": 0.13737542700290703,
-            "y": 0.07985347294864739,
-            "w": 0.6968874475474859,
-            "h": 0.06320788460064598
-          },
-          "style": "dark",
-          "dimOpacity": 0.65,
-          "feather": 16,
-          "startTime": 9.3,
-          "duration": 2.5,
-          "_screenBounds": {
-            "x": -73.4109409190371,
-            "y": 22.18257261410789,
-            "w": 2004.0822757111598,
-            "h": 99.03734439834027,
-            "dx": -146.06221705693815,
-            "dy": -62.63504383541192,
-            "finalW": 2212.1244341138763,
-            "finalH": 1205.2700876708238,
-            "punchScale": 1.3,
-            "spotIndex": 1
-          }
-        }
-      ],
-      "file": {
-        "name": "Tracking data.png",
-        "url": "/media/uploads/Tracking%20data.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
-    },
-    {
-      "id": "clip-image-1791221148872-481",
-      "track": "image",
-      "start": 3.8666666666666667,
-      "duration": 6,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 20,
-      "scale": 1.6161889283347104,
-      "file": {
-        "name": "daatatracking.png",
-        "url": "/media/uploads/daatatracking.png",
-        "isAudio": false,
-        "isVideo": false,
-        "isImage": true
-      }
+      "file": null
     }
   ],
   "video": [],
@@ -176,7 +63,7 @@
   ],
   "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791402400376,
-  "projectName": "LL",
+  "savedAt": 1791441152336,
+  "projectName": "3D Spatial Motion Titles & Parallax Rig",
   "projectId": "proj_1791218145776_xils"
 }

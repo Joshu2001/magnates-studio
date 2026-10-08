@@ -7,7 +7,8 @@
   <link rel="stylesheet" href="css/style.css?v=303">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Cinzel:wght@600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
   <div class="app-container">
@@ -2688,6 +2689,313 @@
     </div><!-- /#app-body-container -->
   </div><!-- /.app-container -->
 
+  <!-- =========================================================
+       3D SPATIAL MOTION SUITE (JAMES JANI STYLE THREE.JS FULL ENGINE - REGAARDER PURPLE THEMED)
+       ========================================================= -->
+  <div id="modal-spatial-3d-suite" class="vector-export-modal" style="display: none; z-index: 99999; backdrop-filter: blur(14px); background: rgba(8, 10, 18, 0.92);">
+    <div class="vector-modal-box" style="width: 96vw; max-width: 1420px; height: 92vh; max-height: 900px; display: flex; flex-direction: column; background: #07090e; border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(168, 85, 247, 0.25);">
+      
+      <!-- Top Studio Header -->
+      <div style="height: 56px; padding: 0 20px; background: rgba(18, 19, 28, 0.96); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #7e22ce, #a855f7); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);">
+            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          </div>
+          <div>
+            <div style="font-family: 'Cinzel', serif; font-size: 13.5px; font-weight: 800; color: #c084fc; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+              <span>REGAARDER STUDIO</span>
+              <span style="font-size: 10px; padding: 1px 7px; border-radius: 4px; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.4); color: #d8b4fe; font-family: 'JetBrains Mono', monospace;">3D SPATIAL SUITE</span>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">After Effects Style Multi-Plane 3D Camera Flythrough & Parallax</div>
+          </div>
+        </div>
+
+        <!-- Preset Buttons -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn-spatial-preset active" data-preset="docu-essay" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(168,85,247,0.5); background: rgba(168,85,247,0.22); color: #e9d5ff; cursor: pointer;">
+            ● Docu-Essay
+          </button>
+          <button type="button" class="btn-spatial-preset" data-preset="cyber-matrix" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(18,19,28,0.8); color: #38bdf8; cursor: pointer;">
+            ● Cyber Matrix
+          </button>
+          <button type="button" class="btn-spatial-preset" data-preset="philosophy" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(18,19,28,0.8); color: #34d399; cursor: pointer;">
+            ● Philosophy
+          </button>
+        </div>
+
+        <!-- Audio + Action Buttons -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="btn-spatial-toggle-sfx" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <span id="spatial-sfx-icon">🔈</span>
+            <span id="spatial-sfx-text">SFX OFF</span>
+          </button>
+          <button type="button" id="btn-spatial-apply-timeline" style="padding: 6px 15px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #9333ea, #a855f7); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(168,85,247,0.45);">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Apply To Timeline</span>
+          </button>
+          <button type="button" id="btn-close-spatial-3d-suite" style="background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 2px 8px; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Main Body: Split View (Controls + Three.js Canvas) -->
+      <div style="display: flex; flex: 1; min-height: 0; overflow: hidden;">
+        
+        <!-- Left Sidebar Controls -->
+        <div style="width: 350px; background: #0c0f17; border-right: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; overflow-y: auto; padding: 18px; gap: 16px; flex-shrink: 0;">
+          
+          <!-- Mode Tabs (Camera Rig / 3D Layers / Atmosphere Post FX) -->
+          <div style="display: flex; gap: 3px; background: rgba(18,19,28,0.9); padding: 3px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.06);">
+            <button type="button" id="tab-spatial-cam" class="btn-spatial-tab active" style="flex: 1; padding: 6px 2px; font-size: 10.5px; font-weight: 700; border-radius: 6px; border: none; background: rgba(168,85,247,0.25); color: #c084fc; cursor: pointer;">Camera Rig</button>
+            <button type="button" id="tab-spatial-layers" class="btn-spatial-tab" style="flex: 1; padding: 6px 2px; font-size: 10.5px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer;">3D Layers</button>
+            <button type="button" id="tab-spatial-fx" class="btn-spatial-tab" style="flex: 1; padding: 6px 2px; font-size: 10.5px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer;">Post FX</button>
+          </div>
+
+          <!-- Tab Content: Camera Rig -->
+          <div id="spatial-panel-cam" style="display: flex; flex-direction: column; gap: 14px;">
+            <label style="display: block; font-size: 10.5px; font-weight: 700; color: #c084fc; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;">Flight Dynamics & Motion Curve</label>
+            
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button type="button" class="btn-spatial-cam-mode active" data-mode="zoomthrough" style="padding: 10px; border-radius: 8px; text-align: left; background: rgba(168,85,247,0.18); border: 1px solid #a855f7; color: #e9d5ff; cursor: pointer;">
+                <div style="font-size: 11.5px; font-weight: 700;">Pass-Through Flythrough</div>
+                <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Flies camera forward directly through 3D Z-planes</div>
+              </button>
+              <button type="button" class="btn-spatial-cam-mode" data-mode="pullback" style="padding: 10px; border-radius: 8px; text-align: left; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">
+                <div style="font-size: 11.5px; font-weight: 700;">Reveal Pullback (James Jani)</div>
+                <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Starts macro-tight and slowly zooms out on Z-axis</div>
+              </button>
+              <button type="button" class="btn-spatial-cam-mode" data-mode="orbit" style="padding: 10px; border-radius: 8px; text-align: left; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">
+                <div style="font-size: 11.5px; font-weight: 700;">3D Orbit Pan</div>
+                <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">360° wide sweeping orbital pan around active Z center</div>
+              </button>
+            </div>
+
+            <div style="padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+                  <span style="color: #94a3b8;">Zoom Speed (Z-Velocity)</span>
+                  <span id="spatial-val-speed" style="color: #c084fc; font-weight: 700;">1.5x</span>
+                </div>
+                <input type="range" id="spatial-range-speed" min="0.2" max="4.0" step="0.1" value="1.5" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+                  <span style="color: #94a3b8;">X/Y Motion Drift</span>
+                  <span id="spatial-val-drift" style="color: #c084fc; font-weight: 700;">35%</span>
+                </div>
+                <input type="range" id="spatial-range-drift" min="0" max="100" value="35" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+                  <span style="color: #94a3b8;">Field of View (FOV)</span>
+                  <span id="spatial-val-fov" style="color: #c084fc; font-weight: 700;">55°</span>
+                </div>
+                <input type="range" id="spatial-range-fov" min="30" max="90" value="55" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <button type="button" id="btn-spatial-toggle-grid" style="flex: 1; padding: 7px; border-radius: 7px; background: rgba(168,85,247,0.18); border: 1px solid rgba(168,85,247,0.5); color: #d8b4fe; font-size: 11px; font-weight: 700; cursor: pointer;">
+                  3D Purple Grid
+                </button>
+                <button type="button" id="btn-spatial-toggle-dust" style="flex: 1; padding: 7px; border-radius: 7px; background: rgba(168,85,247,0.18); border: 1px solid rgba(168,85,247,0.5); color: #d8b4fe; font-size: 11px; font-weight: 700; cursor: pointer;">
+                  Spatial Dust
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: 3D Layers -->
+          <div id="spatial-panel-layers" style="display: none; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #c084fc; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">Active Z-Space Planes</span>
+              <button type="button" id="btn-spatial-add-layer" style="padding: 3px 8px; border-radius: 6px; background: #9333ea; color: #fff; font-size: 10.5px; font-weight: 700; border: none; cursor: pointer;">+ Add Plane</button>
+            </div>
+
+            <!-- Dynamic Planes List -->
+            <div id="spatial-layers-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Tab Content: Post FX -->
+          <div id="spatial-panel-fx" style="display: none; flex-direction: column; gap: 14px;">
+            <label style="display: block; font-size: 10.5px; font-weight: 700; color: #c084fc; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;">Atmosphere & Lighting</label>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+                  <span style="color: #94a3b8;">Spatial Fog Density</span>
+                  <span id="spatial-val-fog" style="color: #c084fc; font-weight: 700;">Medium</span>
+                </div>
+                <input type="range" id="spatial-range-fog" min="0" max="100" value="45" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+                  <span style="color: #94a3b8;">Ambient Glow Intensity</span>
+                  <span id="spatial-val-light" style="color: #c084fc; font-weight: 700;">100%</span>
+                </div>
+                <input type="range" id="spatial-range-light" min="20" max="200" value="100" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+                  <span style="color: #94a3b8;">Lens Vignette</span>
+                  <span id="spatial-val-vignette" style="color: #c084fc; font-weight: 700;">Strong</span>
+                </div>
+                <input type="range" id="spatial-range-vignette" min="0" max="100" value="80" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 3D Spatial Canvas Viewport -->
+        <div style="flex: 1; position: relative; background: #07090e; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          
+          <!-- Live Telemetry Coordinates HUD (Regaarder Purple) -->
+          <div style="position: absolute; top: 14px; left: 18px; z-index: 10; display: flex; align-items: center; gap: 8px; background: rgba(18,19,28,0.88); backdrop-filter: blur(8px); padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(168,85,247,0.3); font-family: 'JetBrains Mono', monospace; font-size: 11px;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: #a855f7; animation: pulse 1.5s infinite;"></span>
+            <span style="color: #c084fc; font-weight: 700;">3D CAM TRACK:</span>
+            <span id="spatial-cam-telemetry" style="color: #e9d5ff; font-weight: 600;">X: 0.0 | Y: 0.0 | Z: 1200.0</span>
+          </div>
+
+          <!-- Three.js Canvas Container -->
+          <div id="spatial-threejs-container" style="width: 100%; height: 100%; cursor: grab;"></div>
+
+          <!-- Floating Playback & Flight Mode Bar -->
+          <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 14px; background: rgba(18,19,28,0.94); backdrop-filter: blur(12px); padding: 8px 22px; border-radius: 9999px; border: 1px solid rgba(168,85,247,0.35); box-shadow: 0 10px 35px rgba(0,0,0,0.85);">
+            <button type="button" id="btn-spatial-toggle-play" style="width: 34px; height: 34px; border-radius: 50%; background: #9333ea; color: #fff; border: none; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(168,85,247,0.5);">
+              ❚❚
+            </button>
+            <button type="button" id="btn-spatial-reset-path" style="background: transparent; border: none; color: #94a3b8; font-size: 14px; cursor: pointer;" title="Reset Camera to Start">
+              ↺
+            </button>
+            <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.15);"></div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 10px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">SCRUB:</span>
+              <input type="range" id="spatial-timeline-slider" min="0" max="100" value="0" style="width: 140px; accent-color: #a855f7; cursor: pointer;" />
+              <span id="spatial-time-display" style="font-size: 10.5px; font-weight: 700; color: #c084fc; font-family: 'JetBrains Mono', monospace;">00:00</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Adding / Editing 3D Spatial Element with Progressive Disclosure -->
+  <div id="modal-spatial-add-layer" class="vector-export-modal" style="display: none; z-index: 100000; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);">
+    <div class="vector-modal-box" style="width: 95vw; max-width: 500px; background: #0c0f17; border: 1px solid rgba(168,85,247,0.45); border-radius: 14px; padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 25px rgba(168,85,247,0.2);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #a855f7;"></span>
+          <h4 id="spatial-layer-modal-title" style="margin: 0; font-size: 13.5px; font-weight: 700; color: #e9d5ff;">Add 3D Spatial Element</h4>
+        </div>
+        <button type="button" id="btn-close-add-layer-modal" style="background: transparent; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; line-height: 1;">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 11.5px;">
+        <div>
+          <label style="display: block; color: #94a3b8; margin-bottom: 5px; font-weight: 600;">Element Type</label>
+          <select id="modal-layer-type" style="width: 100%; padding: 8px 10px; background: #131826; border: 1px solid rgba(255,255,255,0.12); border-radius: 7px; color: #f1f5f9; font-size: 11.5px;">
+            <option value="text">Kinetic Title Text</option>
+            <option value="card">Docu Quote / Headline Card</option>
+            <option value="code">Technical Code Snippet</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="display: block; color: #94a3b8; margin-bottom: 5px; font-weight: 600;">Main Title / Heading</label>
+          <input type="text" id="modal-layer-text" value="THE ILLUSION OF CONTROL" style="width: 100%; padding: 8px 10px; background: #131826; border: 1px solid rgba(255,255,255,0.12); border-radius: 7px; color: #f1f5f9; font-size: 12px;" />
+        </div>
+
+        <div id="modal-layer-extra-card-fields" style="display: none; flex-direction: column; gap: 10px;">
+          <div>
+            <label style="display: block; color: #94a3b8; margin-bottom: 5px; font-weight: 600;">Subtitle / Eyebrow</label>
+            <input type="text" id="modal-layer-subtitle" value="FINANCIAL COLLAPSE" style="width: 100%; padding: 8px 10px; background: #131826; border: 1px solid rgba(255,255,255,0.12); border-radius: 7px; color: #f1f5f9; font-size: 11.5px;" />
+          </div>
+          <div>
+            <label style="display: block; color: #94a3b8; margin-bottom: 5px; font-weight: 600;">Body Description / Quote</label>
+            <textarea id="modal-layer-body" rows="2" style="width: 100%; padding: 8px 10px; background: #131826; border: 1px solid rgba(255,255,255,0.12); border-radius: 7px; color: #f1f5f9; font-size: 11.5px; resize: vertical;">Markets tumble as investors grapple with unprecedented systemic instability.</textarea>
+          </div>
+        </div>
+
+        <!-- Easy Quick Controls: Color & Z-Depth Depth Slider -->
+        <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 9px; padding: 12px; display: flex; flex-direction: column; gap: 12px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+              <label style="color: #cbd5e1; font-weight: 600;">Z-Depth (Distance Along Path)</label>
+              <span id="modal-layer-z-val" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a855f7; font-weight: 700;">-2500</span>
+            </div>
+            <input type="range" id="modal-layer-z-slider" min="-5000" max="1000" step="50" value="-2500" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+            <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #64748b; margin-top: 3px;">
+              <span>Far Back (-5000)</span>
+              <span>Pass Center</span>
+              <span>Close Near (+1000)</span>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+            <label style="color: #cbd5e1; font-weight: 600;">Custom Element Color</label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <input type="color" id="modal-layer-color" value="#f59e0b" style="width: 32px; height: 28px; border: none; border-radius: 5px; background: transparent; cursor: pointer;" />
+              <div style="display: flex; gap: 4px;">
+                <span class="quick-color-dot" data-color="#f59e0b" style="width: 18px; height: 18px; border-radius: 50%; background: #f59e0b; cursor: pointer; display: inline-block;"></span>
+                <span class="quick-color-dot" data-color="#3b82f6" style="width: 18px; height: 18px; border-radius: 50%; background: #3b82f6; cursor: pointer; display: inline-block;"></span>
+                <span class="quick-color-dot" data-color="#ef4444" style="width: 18px; height: 18px; border-radius: 50%; background: #ef4444; cursor: pointer; display: inline-block;"></span>
+                <span class="quick-color-dot" data-color="#10b981" style="width: 18px; height: 18px; border-radius: 50%; background: #10b981; cursor: pointer; display: inline-block;"></span>
+                <span class="quick-color-dot" data-color="#a855f7" style="width: 18px; height: 18px; border-radius: 50%; background: #a855f7; cursor: pointer; display: inline-block;"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progressive Disclosure Button: Advanced Coordinates & Scale For Nerds -->
+        <div>
+          <button type="button" id="btn-toggle-nerd-mode" style="width: 100%; padding: 8px 12px; border-radius: 8px; background: rgba(168,85,247,0.1); border: 1px dashed rgba(168,85,247,0.4); color: #c084fc; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: space-between;">
+            <span style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              <span>Detailed 3D Coordinates & Scale (For Nerds)</span>
+            </span>
+            <span id="nerd-mode-chevron">▼</span>
+          </button>
+
+          <!-- Nerd Advanced Panel (Hidden by default) -->
+          <div id="spatial-nerd-panel" style="display: none; margin-top: 10px; padding: 12px; background: #080a10; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; flex-direction: column; gap: 10px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div>
+                <label style="display: block; font-size: 10px; color: #94a3b8; font-family: monospace; margin-bottom: 3px;">POS X</label>
+                <input type="number" id="modal-layer-x" value="0" step="10" style="width: 100%; padding: 5px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #38bdf8; font-family: monospace; font-size: 11px;" />
+              </div>
+              <div>
+                <label style="display: block; font-size: 10px; color: #94a3b8; font-family: monospace; margin-bottom: 3px;">POS Y</label>
+                <input type="number" id="modal-layer-y" value="0" step="10" style="width: 100%; padding: 5px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #34d399; font-family: monospace; font-size: 11px;" />
+              </div>
+              <div>
+                <label style="display: block; font-size: 10px; color: #94a3b8; font-family: monospace; margin-bottom: 3px;">EXACT Z</label>
+                <input type="number" id="modal-layer-z" value="-2500" step="50" style="width: 100%; padding: 5px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #a855f7; font-family: monospace; font-size: 11px;" />
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 10px; font-family: monospace; margin-bottom: 3px;">
+                <span style="color: #94a3b8;">SCALE FACTOR:</span>
+                <span id="modal-layer-scale-val" style="color: #cbd5e1; font-weight: 700;">1.2x</span>
+              </div>
+              <input type="range" id="modal-layer-scale-slider" min="0.4" max="3.5" step="0.1" value="1.2" style="width: 100%; accent-color: #a855f7;" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08);">
+        <button type="button" id="btn-cancel-add-layer" style="padding: 6px 14px; border-radius: 7px; background: #1e293b; color: #94a3b8; border: none; cursor: pointer; font-size: 11.5px;">Cancel</button>
+        <button type="button" id="btn-confirm-add-layer" style="padding: 6px 16px; border-radius: 7px; background: linear-gradient(135deg, #9333ea, #a855f7); color: #fff; border: none; cursor: pointer; font-size: 11.5px; font-weight: 700; box-shadow: 0 4px 14px rgba(168,85,247,0.4);">Save Plane</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Animated Chart Creator / Template Builder Modal -->
   <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
     <div class="vector-modal-box" style="max-width: 680px;">
@@ -3660,6 +3968,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=266"></script>
+  <script src="js/app.js?v=274"></script>
 </body>
 </html>
