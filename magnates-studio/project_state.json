@@ -1,25 +1,22 @@
 {
   "text": [
     {
-      "id": "clip-text-1",
-      "start": 0,
-      "duration": 5,
-      "text": "Did Google pump and dump?",
-      "highlight": "pump and dump",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 64,
-      "textColor": "#ffffff",
+      "id": "txt-1791498250986",
+      "text": "THE ILLUSION OF CHOICE",
+      "highlight": "ILLUSION",
       "highlightColor": "#ff334b",
-      "anim": "pop",
-      "sfx": "whoosh",
-      "position": "center",
-      "zIndex": 30,
-      "layerOrder": "front",
+      "anim": "typewriter",
+      "typeSpeed": 1,
+      "fontSize": 58,
+      "fontFamily": "monospace",
+      "start": 0,
+      "duration": 4,
+      "zIndex": 20,
       "_renderBounds": {
         "x": 204,
-        "y": 431.6,
-        "w": 951.5,
-        "h": 108.79999999999995
+        "y": 435.2,
+        "w": 765.439453125,
+        "h": 101.59999999999997
       }
     }
   ],
@@ -27,34 +24,14 @@
   "quote": [],
   "image": [
     {
-      "id": "img-rev-1791484534142",
+      "id": "img-matrix-1791498250985",
       "start": 0,
       "duration": 4,
-      "layerOrder": "back",
       "zIndex": 10,
-      "scale": 1.05,
+      "scale": 1.2,
       "file": {
-        "name": "Custom_Revealed_Footage.jpg",
-        "url": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80",
-        "isImage": true
-      }
-    },
-    {
-      "id": "img-rip-1791484534143",
-      "start": 0,
-      "duration": 4,
-      "layerOrder": "front",
-      "zIndex": 25,
-      "x": -143.40481400437648,
-      "y": 291.28630705394187,
-      "scale": 2.01,
-      "vectorEffect": true,
-      "vectorStrokeColor": "#ffffff",
-      "transition": "fly_through",
-      "transitionDuration": 1.2,
-      "file": {
-        "name": "Custom_Paper_Tear.jpg",
-        "url": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80",
+        "name": "Matrix_Rain_Engine.png",
+        "url": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80",
         "isImage": true
       }
     }
@@ -89,9 +66,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 0,
+  "currentTime": 16.16260000000002,
   "duration": 368.144014,
-  "savedAt": 1791486581185,
-  "projectName": "Paper Rip & Shred Transition",
+  "savedAt": 1791498760253,
+  "projectName": "Tension Decode & Typewriter Kinetic Text",
   "projectId": "proj_1791218145776_xils"
 }

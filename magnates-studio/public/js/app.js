@@ -826,6 +826,88 @@ function drawTextLayer(specificTextClip) {
     return;
   }
 
+  // Tension Matrix Decode & Typewriter Terminal Box (Exact 1:1 match with template modal preview)
+  if (animStyle === 'decode_typewriter' || activeText.matrixDecode || activeText.isMatrixDecode) {
+    const targetWord = activeText.text || "THE ILLUSION OF CHOICE";
+    const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const typeSpeed = activeText.typeSpeed || 1.0;
+    const dur = activeText.duration || 6;
+    const progress = Math.min(1, (elapsed * 0.8 * typeSpeed) % 1.25);
+    const charsRevealed = Math.floor(progress * targetWord.length);
+    let displayed = targetWord.substring(0, charsRevealed);
+    if (charsRevealed < targetWord.length) {
+      displayed += glyphs[Math.floor((elapsed * 50) % glyphs.length)];
+    }
+
+    const primaryColor = activeText.textColor || activeText.highlightColor || '#00ff41';
+    const subTitleText = activeText.subtitle || activeText.subText || '[ HIGH TENSION REVEAL ]';
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const centerX = activeText.x !== undefined ? activeText.x : canvas.width / 2;
+    const centerY = activeText.y !== undefined ? activeText.y : canvas.height / 2;
+
+    // Subtitle / Tag above decode box
+    if (subTitleText) {
+      ctx.font = '800 18px monospace';
+      ctx.fillStyle = '#a7f3d0';
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(0, 255, 65, 0.6)';
+      ctx.fillText(subTitleText, centerX, centerY - 48);
+    }
+
+    // Measure decoded text box
+    const decodeFontSize = activeText.fontSize || 38;
+    ctx.font = `900 ${decodeFontSize}px monospace`;
+    const textMetrics = ctx.measureText(targetWord);
+    const boxW = Math.max(340, textMetrics.width + 80);
+    const boxH = Math.max(68, decodeFontSize + 32);
+    const boxX = centerX - boxW / 2;
+    const boxY = centerY - boxH / 2 + 10;
+
+    // Translucent terminal container
+    ctx.fillStyle = 'rgba(5, 10, 8, 0.92)';
+    ctx.shadowBlur = 30;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+    ctx.fillRect(boxX, boxY, boxW, boxH);
+
+    // Glowing container border
+    ctx.strokeStyle = primaryColor;
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 18;
+    ctx.shadowColor = primaryColor;
+    ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+    // Render decoded text
+    ctx.fillStyle = primaryColor;
+    ctx.shadowBlur = 14;
+    ctx.shadowColor = primaryColor;
+    ctx.fillText(displayed, centerX - 12, centerY + 10);
+
+    // Blinking terminal cursor block
+    const isCursorVisible = Math.floor(elapsed * 4) % 2 === 0;
+    if (isCursorVisible) {
+      const currentTextWidth = ctx.measureText(displayed).width;
+      const cursorX = (centerX - 12) + (currentTextWidth / 2) + 6;
+      ctx.fillStyle = primaryColor;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = primaryColor;
+      ctx.fillRect(cursorX, centerY - decodeFontSize * 0.45 + 10, 10, decodeFontSize * 0.9);
+    }
+
+    // Set interactive bounds
+    activeText._renderBounds = { x: boxX, y: boxY, w: boxW, h: boxH };
+
+    ctx.restore();
+
+    if (selectedClip && selectedClip.clip.id === activeText.id && selectedClip.trackType === 'text') {
+      drawTransformHandles(boxX, boxY, boxW, boxH);
+    }
+    return;
+  }
+
   words.forEach((word, idx) => {
     // Typewriter effect
     if (animStyle === 'typewriter') {
@@ -22317,22 +22399,31 @@ function applySelectedHomepageTemplate(templateId) {
     // Tension Matrix Decode & Typewriter Kinetic Text
     const matrixClip = {
       id: `img-matrix-${Date.now()}`,
-      name: 'Cyber_Matrix_Tension.jpg',
+      name: 'Matrix_Rain_Engine.png',
       url: tpl.defaultImage,
       start: 0,
       duration: 6,
-      scale: 1.2
+      scale: 1.2,
+      zIndex: 10,
+      matrixRain: true,
+      matrixRainColor: '#00ff41',
+      matrixRainSpeed: 1.0,
+      matrixRainDensity: 16
     };
     const decodeTitle = {
       id: `txt-${Date.now() + 1}`,
       text: 'THE ILLUSION OF CHOICE',
-      highlight: 'ILLUSION',
-      highlightColor: '#00f0ff',
-      anim: 'typewriter',
-      fontSize: 58,
+      subtitle: '[ HIGH TENSION REVEAL ]',
+      textColor: '#00ff41',
+      highlightColor: '#00ff41',
+      anim: 'decode_typewriter',
+      matrixDecode: true,
+      typeSpeed: 1.0,
+      fontSize: 38,
       fontFamily: 'monospace',
       start: 0,
-      duration: 6
+      duration: 6,
+      zIndex: 20
     };
     if (timelineClips && timelineClips.image && timelineClips.text) {
       timelineClips.image = [matrixClip];
@@ -23507,11 +23598,13 @@ function commitTopTemplateCustomizerToTimeline() {
     const decodeTitle = {
       id: `txt-${Date.now() + 1}`,
       text: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
-      highlight: (topCustomizerState.mainText || 'THE ILLUSION OF CHOICE').split(' ')[1] || 'ILLUSION',
+      subtitle: topCustomizerState.subText || '[ HIGH TENSION REVEAL ]',
+      textColor: topCustomizerState.textColor || '#00ff41',
       highlightColor: topCustomizerState.textColor || '#00ff41',
-      anim: 'typewriter',
+      anim: 'decode_typewriter',
+      matrixDecode: true,
       typeSpeed: topCustomizerState.matrixTypeSpeed || 1.0,
-      fontSize: 58,
+      fontSize: 38,
       fontFamily: 'monospace',
       start: 0,
       duration: dur,
