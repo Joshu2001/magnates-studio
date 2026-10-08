@@ -20161,6 +20161,58 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Blend Modes', 'Screen Blend', 'Difference Mode', 'Overlay Texture', 'Magnates Media'],
     defaultImage: '/magnates_blend_modes_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-paper-blueprint',
+    title: 'Paper-Based & Blueprint Cutouts',
+    category: 'Paper / Cutout',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(2, 11, 24, 0.98), rgba(7, 27, 56, 0.75), rgba(56, 189, 248, 0.35), rgba(1, 6, 15, 0.98))',
+    description: '2D paper-style layers, floating cutout portraits, moving hands pinning evidence, and technical paper blueprint architectural grids.',
+    tags: ['Paper Cutout', 'Blueprint Grid', 'Floating Portraits', 'Moving Hands', 'Magnates Media'],
+    defaultImage: '/magnates_paper_blueprint_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-ink-reveal',
+    title: 'Ink Reveal & Stretchy Title Animation',
+    category: 'Text & Titles',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(10, 5, 18, 0.98), rgba(20, 7, 34, 0.75), rgba(168, 85, 247, 0.35), rgba(4, 2, 8, 0.98))',
+    description: 'Organic ink-bleed stains and dynamic stretchy title text animations to dramatically introduce key character names, historical dates, and chapter headers.',
+    tags: ['Ink Bleed', 'Stretchy Text', 'Chapter Reveal', 'Organic Splatter', 'Magnates Media'],
+    defaultImage: '/magnates_ink_reveal_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-article-highlight',
+    title: 'Article & Text Highlighting Panning Camera',
+    category: 'Paper / Cutout',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(20, 17, 11, 0.98), rgba(31, 26, 18, 0.75), rgba(245, 158, 11, 0.35), rgba(8, 6, 4, 0.98))',
+    description: 'Smoothly panning and scaling across archival newspaper clippings or financial dossiers while highlighting specific smoking-gun text blocks with marker pen FX.',
+    tags: ['Article Pan', 'Text Highlight', 'Newspaper Zoom', 'Marker Bleed', 'Magnates Media'],
+    defaultImage: '/magnates_article_highlight_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-particle-vfx',
+    title: 'Particle & VFX Overlays (Dust, Fire, Flare, Grain)',
+    category: 'Color & Vibe',
+    badge: 'Magnates Media Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(8, 2, 5, 0.98), rgba(20, 6, 9, 0.75), rgba(244, 63, 94, 0.35), rgba(3, 0, 2, 0.98))',
+    description: 'Atmospheric floating dust motes, anamorphic optical flares, burning ember fire sparks, organic volumetric smoke, and retro 35mm film grain overlays.',
+    tags: ['Dust Particles', 'Optical Flare', 'Fire Embers', 'Smoke Overlay', 'Film Grain', 'Magnates Media'],
+    defaultImage: '/magnates_particle_vfx_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -21167,6 +21219,166 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'magnates-media-paper-blueprint') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #061124; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Blueprint Technical Grid -->
+          <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: linear-gradient(to right, rgba(0,240,255,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,240,255,0.12) 1px, transparent 1px); opacity: 0.85;"></div>
+          
+          <!-- Blueprint Schematic Concentric Circles -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 400 225">
+            <circle cx="200" cy="112" r="70" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.5"/>
+            <line x1="60" y1="112" x2="340" y2="112" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.4"/>
+            <line x1="200" y1="20" x2="200" y2="205" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.4"/>
+          </svg>
+
+          <!-- Floating Paper Document Cutout -->
+          <div id="fx-bp-doc-${tplId}" style="position: absolute; width: 130px; height: 110px; background: #0a1f38; border: 1.5px solid #38bdf8; border-radius: 6px; box-shadow: 0 15px 30px rgba(0,0,0,0.9); transform: rotate(-5deg); padding: 8px; transition: transform 0.08s ease;">
+            <div style="font-family: monospace; font-size: 7px; color: #7dd3fc; font-weight: 800; border-bottom: 1px dashed rgba(56,189,248,0.5); padding-bottom: 3px;">
+              BLUEPRINT_SEC_08
+            </div>
+            <div style="margin-top: 6px; width: 100%; height: 45px; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-family: monospace; font-size: 7px; color: #38bdf8;">FIG 4A: ARCHITECTURE</span>
+            </div>
+          </div>
+
+          <!-- Floating Portrait Cutout (Sticker Stroke) -->
+          <div id="fx-bp-portrait-${tplId}" style="position: relative; z-index: 10; width: 95px; height: 125px; border-radius: 10px; background: #ffffff; padding: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.95); transform: rotate(4deg); transition: transform 0.08s ease;">
+            <div style="width: 100%; height: 100%; border-radius: 6px; overflow: hidden; background: #0f172a;">
+              <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+            </div>
+          </div>
+
+          <!-- Moving Hand Cutout Placing Evidence -->
+          <div id="fx-bp-hand-${tplId}" style="position: absolute; bottom: -10px; right: 15px; z-index: 20; pointer-events: none; transition: transform 0.08s ease; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.9));">
+            <svg width="110" height="90" viewBox="0 0 100 80">
+              <path d="M 60 70 L 40 25 L 65 15 L 90 55 Z" fill="#1e293b" stroke="#ffffff" stroke-width="2"/>
+              <path d="M 38 27 L 63 17 L 66 22 L 41 32 Z" fill="#ffffff"/>
+              <path d="M 40 30 C 30 38 18 45 10 40 C 4 36 6 28 15 22 L 45 8 C 50 5 60 8 62 14 Z" fill="#fbcfe8" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="8" cy="22" r="4.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/>
+            </svg>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(2,132,199,0.5);">
+            📐 BLUEPRINT &amp; PAPER
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-media-ink-reveal') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #080310; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Organic Ink Bleed Radial Gradient -->
+          <div id="fx-ink-bleed-${tplId}" style="position: absolute; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(168,85,247,0.85) 0%, rgba(124,58,237,0.5) 45%, transparent 75%); filter: blur(24px); transform: scale(0.6); opacity: 0.9; transition: transform 0.1s ease;"></div>
+
+          <!-- Stretchy Typography Block -->
+          <div style="position: relative; z-index: 10; text-align: center;">
+            <div style="font-family: 'Cinzel', serif; font-size: 8px; font-weight: 900; color: #d8b4fe; letter-spacing: 4px; text-transform: uppercase;">
+              CHAPTER IV &bull; DISCLOSURE
+            </div>
+            <div id="fx-ink-title-${tplId}" style="font-family: 'Cinzel', 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #ffffff; letter-spacing: 3px; margin-top: 4px; text-shadow: 0 0 20px rgba(168,85,247,0.8); transition: transform 0.08s ease;">
+              THE INHERITANCE
+            </div>
+            <div id="fx-ink-line-${tplId}" style="margin: 6px auto 0; width: 70%; height: 2px; background: linear-gradient(90deg, transparent, #c084fc, transparent); transition: width 0.1s ease;"></div>
+            <div style="margin-top: 5px;">
+              <span id="fx-ink-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #c084fc; background: rgba(0,0,0,0.8); padding: 2px 6px; border-radius: 4px;">
+                INK BLEED SPREAD: 85%
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #9333ea, #7c3aed); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(147,51,234,0.5);">
+            ✒️ INK REVEAL
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-media-article-highlight') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #120e09; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Newspaper Sheet with Panning Camera -->
+          <div id="fx-art-sheet-${tplId}" style="position: absolute; width: 140%; height: 140%; background: #eee5d4; border-radius: 6px; padding: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.9); transform-origin: center center; transition: transform 0.05s linear;">
+            <div style="border-bottom: 2px solid #292116; padding-bottom: 6px; text-align: center;">
+              <span style="font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 900; color: #1e170e; letter-spacing: 2px;">THE FINANCIAL CHRONICLE</span>
+            </div>
+            <div style="margin-top: 10px; font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 900; color: #110c06; text-align: center;">
+              MARKET COLLAPSES IN PANIC
+            </div>
+
+            <!-- Text Columns with Dynamic Marker Highlighter -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px;">
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <div style="height: 5px; background: #3b2f1f; width: 90%; border-radius: 2px;"></div>
+                <div style="height: 5px; background: #3b2f1f; width: 95%; border-radius: 2px;"></div>
+                <!-- Yellow Marker Stroke -->
+                <div id="fx-art-mark-1-${tplId}" style="background: rgba(250, 204, 21, 0.9); padding: 2px 4px; border-radius: 2px; width: 0%; overflow: hidden; white-space: nowrap; transition: width 0.15s ease;">
+                  <span style="font-family: monospace; font-size: 8px; font-weight: 900; color: #000;">$14,000,000,000 LOST</span>
+                </div>
+                <div style="height: 5px; background: #3b2f1f; width: 85%; border-radius: 2px;"></div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 5px;">
+                <div style="height: 5px; background: #3b2f1f; width: 80%; border-radius: 2px;"></div>
+                <!-- Yellow Marker Stroke #2 -->
+                <div id="fx-art-mark-2-${tplId}" style="background: rgba(250, 204, 21, 0.9); padding: 2px 4px; border-radius: 2px; width: 0%; overflow: hidden; white-space: nowrap; transition: width 0.15s ease;">
+                  <span style="font-family: monospace; font-size: 8px; font-weight: 900; color: #000;">NO BUYERS FOUND</span>
+                </div>
+                <div style="height: 5px; background: #3b2f1f; width: 90%; border-radius: 2px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Camera Optical Focus Reticle -->
+          <div style="position: absolute; inset: 0; pointer-events: none; border: 2px solid rgba(245,158,11,0.5); margin: 18px; border-radius: 8px; box-shadow: inset 0 0 25px rgba(0,0,0,0.6);">
+            <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.85); border: 1px solid #f59e0b; padding: 2px 6px; border-radius: 4px;">
+              <span id="fx-art-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #fbbf24;">
+                PAN SCAN: 140% // HIGHLIGHT PEN ACTIVE
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #d97706, #b45309); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(217,119,6,0.5);">
+            📰 TEXT HIGHLIGHT
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'magnates-media-particle-vfx') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #070104; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(160%) brightness(40%);" />
+          
+          <!-- Volumetric Smoke Orbs -->
+          <div id="fx-vfx-smoke-${tplId}" style="position: absolute; width: 260px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(148,163,184,0.3) 0%, transparent 70%); filter: blur(35px); pointer-events: none;"></div>
+
+          <!-- Bottom Fire & Ember Glow -->
+          <div id="fx-vfx-fire-${tplId}" style="position: absolute; bottom: -30px; left: 0; right: 0; height: 140px; background: radial-gradient(ellipse at bottom, rgba(239,68,68,0.7) 0%, rgba(249,115,22,0.4) 40%, transparent 80%); pointer-events: none; filter: blur(15px);"></div>
+
+          <!-- Floating Fire Embers / Particles SVG -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+            <circle id="fx-vfx-p1-${tplId}" cx="140" cy="180" r="2.5" fill="#fef08a" />
+            <circle id="fx-vfx-p2-${tplId}" cx="210" cy="150" r="3.2" fill="#f97316" />
+            <circle id="fx-vfx-p3-${tplId}" cx="280" cy="190" r="2.2" fill="#fbbf24" />
+            <circle id="fx-vfx-p4-${tplId}" cx="160" cy="90" r="2.8" fill="#ef4444" />
+            <circle id="fx-vfx-p5-${tplId}" cx="250" cy="70" r="3.5" fill="#fef08a" />
+          </svg>
+
+          <!-- Anamorphic Optical Flare Beam -->
+          <div id="fx-vfx-flare-${tplId}" style="position: absolute; top: 48%; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, #38bdf8, #ffffff, #fb923c, transparent); filter: blur(1px) drop-shadow(0 0 10px #38bdf8); opacity: 0.85; pointer-events: none;"></div>
+
+          <!-- Centered Title Plate -->
+          <div style="position: relative; z-index: 10; padding: 10px 18px; border-radius: 10px; background: rgba(14,4,8,0.85); border: 1.5px solid #f43f5e; box-shadow: 0 15px 35px rgba(0,0,0,0.95); text-align: center;">
+            <div style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 900; color: #ffffff; letter-spacing: 2px;">
+              ATMOSPHERIC PARTICLES
+            </div>
+            <div style="margin-top: 4px;">
+              <span id="fx-vfx-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #fda4af;">
+                DUST • FLARE • FIRE • GRAIN
+              </span>
+            </div>
+          </div>
+
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #e11d48, #be123c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(225,29,72,0.5);">
+            🔥 PARTICLE &amp; VFX
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21652,6 +21864,58 @@ function startTemplateHoverVideo(cardEl, tpl) {
           card.style.borderColor = '#f59e0b';
         }
       }
+    } else if (tplId === 'magnates-media-paper-blueprint') {
+      const docRot = -5 + Math.sin(t * 1.8) * 3;
+      const portRot = 4 + Math.cos(t * 2.2) * 4;
+      const handOffset = Math.sin(t * 2.5) * 12;
+      const doc = fxContainer?.querySelector(`#fx-bp-doc-${tplId}`);
+      const portrait = fxContainer?.querySelector(`#fx-bp-portrait-${tplId}`);
+      const hand = fxContainer?.querySelector(`#fx-bp-hand-${tplId}`);
+      if (doc) doc.style.transform = `rotate(${docRot.toFixed(1)}deg) translateY(${(-Math.sin(t * 1.8) * 4).toFixed(1)}px)`;
+      if (portrait) portrait.style.transform = `rotate(${portRot.toFixed(1)}deg) translateY(${(Math.sin(t * 2.2) * 5).toFixed(1)}px)`;
+      if (hand) hand.style.transform = `translate(${handOffset.toFixed(1)}px, ${(-Math.abs(handOffset * 0.8)).toFixed(1)}px)`;
+    } else if (tplId === 'magnates-media-ink-reveal') {
+      const bleedScale = 0.5 + ((t * 0.8) % 1.2) * 0.6;
+      const titleStretch = 1 + Math.sin(t * 2) * 0.08;
+      const lineProg = Math.min(100, Math.floor((((t * 0.8) % 1.2) / 1.2) * 100));
+      const bleedEl = fxContainer?.querySelector(`#fx-ink-bleed-${tplId}`);
+      const titleEl = fxContainer?.querySelector(`#fx-ink-title-${tplId}`);
+      const lineEl = fxContainer?.querySelector(`#fx-ink-line-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-ink-meter-${tplId}`);
+      if (bleedEl) bleedEl.style.transform = `scale(${bleedScale.toFixed(2)})`;
+      if (titleEl) titleEl.style.transform = `scaleX(${titleStretch.toFixed(2)})`;
+      if (lineEl) lineEl.style.width = `${lineProg}%`;
+      if (meter) meter.textContent = `INK BLEED SPREAD: ${lineProg}%`;
+    } else if (tplId === 'magnates-media-article-highlight') {
+      const panX = Math.sin(t * 1.4) * 25;
+      const panY = Math.cos(t * 1.2) * 15;
+      const zoom = 1.15 + Math.sin(t * 1.6) * 0.08;
+      const mark1Prog = Math.min(100, Math.floor((((t * 0.9) % 2) / 1) * 100));
+      const mark2Prog = Math.min(100, Math.max(0, Math.floor(((((t * 0.9) % 2) - 0.7) / 1) * 100)));
+      const sheet = fxContainer?.querySelector(`#fx-art-sheet-${tplId}`);
+      const m1 = fxContainer?.querySelector(`#fx-art-mark-1-${tplId}`);
+      const m2 = fxContainer?.querySelector(`#fx-art-mark-2-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-art-meter-${tplId}`);
+      if (sheet) sheet.style.transform = `scale(${zoom.toFixed(2)}) translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px)`;
+      if (m1) m1.style.width = `${mark1Prog}%`;
+      if (m2) m2.style.width = `${mark2Prog}%`;
+      if (meter) meter.textContent = `PAN SCAN: ${(zoom * 100).toFixed(0)}% // HIGHLIGHT PEN ACTIVE`;
+    } else if (tplId === 'magnates-media-particle-vfx') {
+      const smokeDrift = Math.sin(t * 1.2) * 20;
+      const flarePulse = 0.6 + Math.sin(t * 4) * 0.4;
+      const smokeEl = fxContainer?.querySelector(`#fx-vfx-smoke-${tplId}`);
+      const flareEl = fxContainer?.querySelector(`#fx-vfx-flare-${tplId}`);
+      if (smokeEl) smokeEl.style.transform = `translate(${smokeDrift.toFixed(1)}px, ${(-Math.sin(t * 1.5) * 10).toFixed(1)}px)`;
+      if (flareEl) flareEl.style.opacity = flarePulse.toFixed(2);
+      for (let i = 1; i <= 5; i++) {
+        const p = fxContainer?.querySelector(`#fx-vfx-p${i}-${tplId}`);
+        if (p) {
+          const cy = (200 - ((t * (25 + i * 10)) % 180));
+          const cx = Math.sin(t * 2 + i) * 15;
+          p.setAttribute('cy', cy.toFixed(1));
+          p.style.transform = `translateX(${cx.toFixed(1)}px)`;
+        }
+      }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
       const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
@@ -22070,6 +22334,22 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-blend-modes') {
     // Launch Magnates Media Blend Modes Suite
     openMagnatesBlendModesSuite();
+    return;
+  } else if (templateId === 'magnates-media-paper-blueprint') {
+    // Launch Magnates Media Paper-Based & Blueprint Cutouts Suite
+    openMagnatesPaperBlueprintSuite();
+    return;
+  } else if (templateId === 'magnates-media-ink-reveal') {
+    // Launch Magnates Media Ink Reveal Text Animation Suite
+    openMagnatesInkRevealSuite();
+    return;
+  } else if (templateId === 'magnates-media-article-highlight') {
+    // Launch Magnates Media Article & Text Highlighting Suite
+    openMagnatesArticleHighlightSuite();
+    return;
+  } else if (templateId === 'magnates-media-particle-vfx') {
+    // Launch Magnates Media Particle & VFX Overlays Suite
+    openMagnatesParticleVFXSuite();
     return;
   }
 
@@ -24165,6 +24445,10 @@ function initHomepageTemplateEvents() {
   bindMagnatesDropShadowsSuiteModalControls();
   bindMagnatesShadowizationSuiteModalControls();
   bindMagnatesBlendModesSuiteModalControls();
+  bindMagnatesPaperBlueprintSuiteModalControls();
+  bindMagnatesInkRevealSuiteModalControls();
+  bindMagnatesArticleHighlightSuiteModalControls();
+  bindMagnatesParticleVFXSuiteModalControls();
 }
 
 /* =========================================================
@@ -30171,6 +30455,892 @@ function bindMagnatesBlendModesSuiteModalControls() {
     }
 
     showTextTimingAlert(`Applied Magnates Media Blend Modes Suite to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   5. MAGNATES MEDIA PAPER-BASED & BLUEPRINT CUTOUTS SUITE CONTROLLER
+   (2D paper layers, floating portraits, moving hands, paper blueprint textures)
+   ========================================================= */
+let magnatesBPState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  paperAngle: 6, // 0 to 15 deg
+  showMovingHand: true,
+  showBlueprintGrid: true,
+  headline: "SCHEMATIC EVIDENCE",
+  subcaption: "TECHNICAL BLUEPRINT // 2D PAPER CUTOUT",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesBPVisualStyles() {
+  const headlineEl = document.getElementById('magnates-bp-headline');
+  const subcaptionEl = document.getElementById('magnates-bp-subcaption');
+  const portraitImg = document.getElementById('magnates-bp-portrait-img');
+  const portraitCard = document.getElementById('magnates-bp-portrait-card');
+  const docCard = document.getElementById('magnates-bp-doc-card');
+  const handWrap = document.getElementById('magnates-bp-hand-wrap');
+  const gridLayer = document.getElementById('magnates-bp-grid-layer');
+  const timerEl = document.getElementById('magnates-bp-timer-display');
+  const hudHand = document.getElementById('magnates-bp-hud-hand');
+  const hudGrid = document.getElementById('magnates-bp-hud-grid');
+
+  if (headlineEl) headlineEl.textContent = magnatesBPState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesBPState.subcaption;
+  if (portraitImg && portraitImg.src !== magnatesBPState.portraitUrl) portraitImg.src = magnatesBPState.portraitUrl;
+
+  const p = magnatesBPState.playhead;
+  const dur = magnatesBPState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const ang = magnatesBPState.paperAngle;
+  if (docCard) {
+    const floatY = Math.sin(p * 2.2) * 5;
+    docCard.style.transform = `rotate(${-ang}deg) translateY(${floatY.toFixed(1)}px)`;
+  }
+  if (portraitCard) {
+    const floatY2 = -Math.sin(p * 2.5) * 6;
+    portraitCard.style.transform = `rotate(${ang * 0.8}deg) translateY(${floatY2.toFixed(1)}px)`;
+  }
+  if (handWrap) {
+    handWrap.style.display = magnatesBPState.showMovingHand ? 'block' : 'none';
+    const handJitter = Math.sin(p * 3) * 14;
+    handWrap.style.transform = `translate(${handJitter.toFixed(1)}px, ${(-Math.abs(handJitter * 0.6)).toFixed(1)}px)`;
+  }
+  if (gridLayer) {
+    gridLayer.style.display = magnatesBPState.showBlueprintGrid ? 'block' : 'none';
+  }
+  if (hudHand) hudHand.textContent = magnatesBPState.showMovingHand ? 'MOVING HAND: PINNED' : 'MOVING HAND: OFF';
+  if (hudGrid) hudGrid.textContent = magnatesBPState.showBlueprintGrid ? 'BLUEPRINT: ACTIVE' : 'BLUEPRINT: OFF';
+}
+
+function renderMagnatesBPLoop(timestamp) {
+  if (!magnatesBPState.isPlaying) return;
+  if (!magnatesBPState.lastTimestamp) magnatesBPState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesBPState.lastTimestamp) / 1000;
+  magnatesBPState.lastTimestamp = timestamp;
+
+  magnatesBPState.playhead += dt;
+  if (magnatesBPState.playhead > magnatesBPState.duration) {
+    magnatesBPState.playhead = 0;
+  }
+
+  updateMagnatesBPVisualStyles();
+  magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
+}
+
+function openMagnatesPaperBlueprintSuite() {
+  const modal = document.getElementById('modal-magnates-paper-blueprint-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesBPState.isPlaying = true;
+  magnatesBPState.playhead = 0;
+  magnatesBPState.lastTimestamp = null;
+  if (magnatesBPState.animFrameId) cancelAnimationFrame(magnatesBPState.animFrameId);
+  magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesPaperBlueprintSuite() {
+  const modal = document.getElementById('modal-magnates-paper-blueprint-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesBPState.isPlaying = false;
+  if (magnatesBPState.animFrameId) {
+    cancelAnimationFrame(magnatesBPState.animFrameId);
+    magnatesBPState.animFrameId = null;
+  }
+}
+
+function bindMagnatesPaperBlueprintSuiteModalControls() {
+  document.getElementById('btn-close-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
+  document.getElementById('btn-cancel-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
+
+  document.getElementById('btn-magnates-bp-play-pause')?.addEventListener('click', () => {
+    magnatesBPState.isPlaying = !magnatesBPState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
+    if (magnatesBPState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesBPState.lastTimestamp = null;
+      magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesBPState.animFrameId) cancelAnimationFrame(magnatesBPState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-bp-reset')?.addEventListener('click', () => {
+    magnatesBPState.playhead = 0;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-slider-angle')?.addEventListener('input', (e) => {
+    magnatesBPState.paperAngle = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-bp-val-angle');
+    if (label) label.textContent = `${magnatesBPState.paperAngle}°`;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-toggle-hand')?.addEventListener('change', (e) => {
+    magnatesBPState.showMovingHand = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-toggle-grid')?.addEventListener('change', (e) => {
+    magnatesBPState.showBlueprintGrid = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-input-headline')?.addEventListener('input', (e) => {
+    magnatesBPState.headline = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesBPState.subcaption = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let pIdx = 0;
+  document.getElementById('btn-magnates-bp-shuffle-portrait')?.addEventListener('click', () => {
+    pIdx = (pIdx + 1) % stockPortraits.length;
+    magnatesBPState.portraitUrl = stockPortraits[pIdx];
+    const inputP = document.getElementById('magnates-bp-input-portrait');
+    if (inputP) inputP.value = magnatesBPState.portraitUrl;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-input-portrait')?.addEventListener('input', (e) => {
+    magnatesBPState.portraitUrl = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-bp-suite')?.addEventListener('click', () => {
+    closeMagnatesPaperBlueprintSuite();
+
+    const blueprintClip = {
+      id: `img-bp-bg-${Date.now()}`,
+      url: '/magnates_paper_blueprint_thumbnail.svg',
+      start: 0,
+      duration: magnatesBPState.duration,
+      scale: 1.1,
+      zoomEffect: 'snap',
+      zoomScale: 1.15,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const paperPortraitClip = {
+      id: `img-bp-portrait-${Date.now() + 1}`,
+      url: magnatesBPState.portraitUrl,
+      start: 0,
+      duration: magnatesBPState.duration,
+      scale: 1.05,
+      rotation: magnatesBPState.paperAngle,
+      stickerBorder: true,
+      shadowElevation: 35,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    const headlineClip = {
+      id: `txt-bp-head-${Date.now() + 2}`,
+      text: magnatesBPState.headline,
+      highlight: magnatesBPState.headline.split(' ')[0] || '',
+      highlightColor: '#00f0ff',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: magnatesBPState.duration
+    };
+
+    const bpMetaClip = {
+      id: `txt-bp-meta-${Date.now() + 3}`,
+      text: `BLUEPRINT SEC_08 // PAPER STICKER CUTOUT (${magnatesBPState.paperAngle}°)`,
+      highlight: 'BLUEPRINT',
+      highlightColor: '#0284c7',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesBPState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [blueprintClip, paperPortraitClip];
+      timelineClips.text = [headlineClip, bpMetaClip];
+      renderAllTimelineTracks();
+      selectClip(paperPortraitClip, 'image');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Paper & Blueprint Cutouts to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   6. MAGNATES MEDIA INK REVEAL & STRETCHY TITLE SUITE CONTROLLER
+   (Organic ink-bleed or stretchy title text to introduce names, dates, and chapters)
+   ========================================================= */
+let magnatesInkState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  bleedSpread: 85, // 30 to 150%
+  stretchMultiplier: 1.15, // 1.0 to 1.5x
+  title: "THE INHERITANCE",
+  chapter: "CHAPTER IV • DISCLOSURE",
+  dateText: "OCTOBER 24, 1929 // WALL STREET CRASH",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesInkVisualStyles() {
+  const titleEl = document.getElementById('magnates-ink-title-text');
+  const chapterEl = document.getElementById('magnates-ink-chapter-text');
+  const dateEl = document.getElementById('magnates-ink-date-text');
+  const blobEl = document.getElementById('magnates-ink-bleed-blob');
+  const lineEl = document.getElementById('magnates-ink-stretch-line');
+  const timerEl = document.getElementById('magnates-ink-timer-display');
+  const hudSpread = document.getElementById('magnates-ink-hud-spread');
+  const hudStretch = document.getElementById('magnates-ink-hud-stretch');
+
+  if (titleEl) titleEl.textContent = magnatesInkState.title;
+  if (chapterEl) chapterEl.textContent = magnatesInkState.chapter;
+  if (dateEl) dateEl.textContent = magnatesInkState.dateText;
+
+  const p = magnatesInkState.playhead;
+  const dur = magnatesInkState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const spread = magnatesInkState.bleedSpread / 100;
+  const stretch = magnatesInkState.stretchMultiplier;
+
+  const bleedProgress = Math.min(1.5, (0.4 + (p / dur) * spread));
+  if (blobEl) {
+    blobEl.style.transform = `scale(${bleedProgress.toFixed(2)})`;
+    blobEl.style.opacity = (0.7 + Math.sin(p * 2.5) * 0.2).toFixed(2);
+  }
+
+  const titleStretchNow = 1 + (stretch - 1) * Math.abs(Math.sin(p * 1.8));
+  if (titleEl) {
+    titleEl.style.transform = `scaleX(${titleStretchNow.toFixed(3)})`;
+  }
+  if (lineEl) {
+    lineEl.style.width = `${Math.min(90, 40 + (p / dur) * 50)}%`;
+  }
+
+  if (hudSpread) hudSpread.textContent = `INK SPREAD: ${magnatesInkState.bleedSpread}%`;
+  if (hudStretch) hudStretch.textContent = `STRETCH: ${magnatesInkState.stretchMultiplier.toFixed(2)}x`;
+}
+
+function renderMagnatesInkLoop(timestamp) {
+  if (!magnatesInkState.isPlaying) return;
+  if (!magnatesInkState.lastTimestamp) magnatesInkState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesInkState.lastTimestamp) / 1000;
+  magnatesInkState.lastTimestamp = timestamp;
+
+  magnatesInkState.playhead += dt;
+  if (magnatesInkState.playhead > magnatesInkState.duration) {
+    magnatesInkState.playhead = 0;
+  }
+
+  updateMagnatesInkVisualStyles();
+  magnatesInkState.animFrameId = requestAnimationFrame(renderMagnatesInkLoop);
+}
+
+function openMagnatesInkRevealSuite() {
+  const modal = document.getElementById('modal-magnates-ink-reveal-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesInkState.isPlaying = true;
+  magnatesInkState.playhead = 0;
+  magnatesInkState.lastTimestamp = null;
+  if (magnatesInkState.animFrameId) cancelAnimationFrame(magnatesInkState.animFrameId);
+  magnatesInkState.animFrameId = requestAnimationFrame(renderMagnatesInkLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-ink-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesInkRevealSuite() {
+  const modal = document.getElementById('modal-magnates-ink-reveal-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesInkState.isPlaying = false;
+  if (magnatesInkState.animFrameId) {
+    cancelAnimationFrame(magnatesInkState.animFrameId);
+    magnatesInkState.animFrameId = null;
+  }
+}
+
+function bindMagnatesInkRevealSuiteModalControls() {
+  document.getElementById('btn-close-magnates-ink-suite')?.addEventListener('click', closeMagnatesInkRevealSuite);
+  document.getElementById('btn-cancel-magnates-ink-suite')?.addEventListener('click', closeMagnatesInkRevealSuite);
+
+  document.getElementById('btn-magnates-ink-play-pause')?.addEventListener('click', () => {
+    magnatesInkState.isPlaying = !magnatesInkState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-ink-play-pause');
+    if (magnatesInkState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesInkState.lastTimestamp = null;
+      magnatesInkState.animFrameId = requestAnimationFrame(renderMagnatesInkLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesInkState.animFrameId) cancelAnimationFrame(magnatesInkState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-ink-reset')?.addEventListener('click', () => {
+    magnatesInkState.playhead = 0;
+    updateMagnatesInkVisualStyles();
+  });
+
+  document.getElementById('magnates-ink-slider-spread')?.addEventListener('input', (e) => {
+    magnatesInkState.bleedSpread = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-ink-val-spread');
+    if (label) label.textContent = `${magnatesInkState.bleedSpread}%`;
+    updateMagnatesInkVisualStyles();
+  });
+
+  document.getElementById('magnates-ink-slider-stretch')?.addEventListener('input', (e) => {
+    magnatesInkState.stretchMultiplier = parseInt(e.target.value, 10) / 100;
+    const label = document.getElementById('magnates-ink-val-stretch');
+    if (label) label.textContent = `${magnatesInkState.stretchMultiplier.toFixed(2)}x`;
+    updateMagnatesInkVisualStyles();
+  });
+
+  document.getElementById('magnates-ink-input-title')?.addEventListener('input', (e) => {
+    magnatesInkState.title = e.target.value;
+    updateMagnatesInkVisualStyles();
+  });
+
+  document.getElementById('magnates-ink-input-chapter')?.addEventListener('input', (e) => {
+    magnatesInkState.chapter = e.target.value;
+    updateMagnatesInkVisualStyles();
+  });
+
+  document.getElementById('magnates-ink-input-date')?.addEventListener('input', (e) => {
+    magnatesInkState.dateText = e.target.value;
+    updateMagnatesInkVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-ink-suite')?.addEventListener('click', () => {
+    closeMagnatesInkRevealSuite();
+
+    const parchmentClip = {
+      id: `img-ink-bg-${Date.now()}`,
+      url: '/magnates_ink_reveal_thumbnail.svg',
+      start: 0,
+      duration: magnatesInkState.duration,
+      scale: 1.12,
+      zoomEffect: 'snap',
+      zoomScale: 1.15,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const chapterClip = {
+      id: `txt-ink-chap-${Date.now() + 1}`,
+      text: magnatesInkState.chapter,
+      highlight: magnatesInkState.chapter.split(' ')[0] || '',
+      highlightColor: '#c084fc',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'Cinzel, serif',
+      start: 0,
+      duration: magnatesInkState.duration
+    };
+
+    const titleClip = {
+      id: `txt-ink-title-${Date.now() + 2}`,
+      text: magnatesInkState.title,
+      highlight: magnatesInkState.title.split(' ')[0] || '',
+      highlightColor: '#a855f7',
+      anim: 'pop',
+      fontSize: 54,
+      fontFamily: 'Cinzel, serif',
+      start: 0.2,
+      duration: magnatesInkState.duration - 0.2
+    };
+
+    const dateClip = {
+      id: `txt-ink-date-${Date.now() + 3}`,
+      text: magnatesInkState.dateText,
+      highlight: magnatesInkState.dateText.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'fade',
+      fontSize: 18,
+      fontFamily: 'monospace',
+      start: 0.4,
+      duration: magnatesInkState.duration - 0.4
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [parchmentClip];
+      timelineClips.text = [chapterClip, titleClip, dateClip];
+      renderAllTimelineTracks();
+      selectClip(titleClip, 'text');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Ink Reveal & Stretchy Title to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   7. MAGNATES MEDIA ARTICLE & TEXT HIGHLIGHTING SUITE CONTROLLER
+   (Smoothly panning/scaling across newspaper clippings while highlighting text blocks)
+   ========================================================= */
+let magnatesArticleState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  zoomScale: 150, // 110 to 220%
+  panDistance: 30, // 10 to 70px
+  headline: "THE CRASH OF 1929",
+  subcaption: "ARCHIVAL NEWSPAPER CAMERA PAN & SCAN",
+  markText1: "$14,000,000,000 DISAPPEARED",
+  markText2: "BROKERS CALL UNPAID MARGINS",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesArticleVisualStyles() {
+  const headlineEl = document.getElementById('magnates-art-headline');
+  const subcaptionEl = document.getElementById('magnates-art-subcaption');
+  const sheetEl = document.getElementById('magnates-art-sheet-card');
+  const m1Text = document.getElementById('magnates-art-mark-text-1');
+  const m2Text = document.getElementById('magnates-art-mark-text-2');
+  const m1Strip = document.getElementById('magnates-art-mark-strip-1');
+  const m2Strip = document.getElementById('magnates-art-mark-strip-2');
+  const timerEl = document.getElementById('magnates-art-timer-display');
+  const hudZoom = document.getElementById('magnates-art-hud-zoom');
+  const badgePan = document.getElementById('magnates-art-badge-pan');
+
+  if (headlineEl) headlineEl.textContent = magnatesArticleState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesArticleState.subcaption;
+  if (m1Text) m1Text.textContent = magnatesArticleState.markText1;
+  if (m2Text) m2Text.textContent = magnatesArticleState.markText2;
+
+  const p = magnatesArticleState.playhead;
+  const dur = magnatesArticleState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  const zoom = magnatesArticleState.zoomScale / 100;
+  const panDist = magnatesArticleState.panDistance;
+
+  if (sheetEl) {
+    const panX = Math.sin(p * 1.4) * panDist;
+    const panY = Math.cos(p * 1.1) * (panDist * 0.6);
+    sheetEl.style.transform = `scale(${zoom.toFixed(2)}) translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px)`;
+  }
+
+  // Staggered Highlighter pen fill
+  const prog1 = Math.min(100, Math.max(0, (p / (dur * 0.5)) * 100));
+  const prog2 = Math.min(100, Math.max(0, ((p - dur * 0.4) / (dur * 0.5)) * 100));
+  if (m1Strip) m1Strip.style.width = `${prog1}%`;
+  if (m2Strip) m2Strip.style.width = `${prog2}%`;
+
+  if (hudZoom) hudZoom.textContent = `ZOOM: ${magnatesArticleState.zoomScale}%`;
+  if (badgePan) badgePan.textContent = `CAMERA PAN SCAN: ACTIVE // ZOOM ${magnatesArticleState.zoomScale}%`;
+}
+
+function renderMagnatesArticleLoop(timestamp) {
+  if (!magnatesArticleState.isPlaying) return;
+  if (!magnatesArticleState.lastTimestamp) magnatesArticleState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesArticleState.lastTimestamp) / 1000;
+  magnatesArticleState.lastTimestamp = timestamp;
+
+  magnatesArticleState.playhead += dt;
+  if (magnatesArticleState.playhead > magnatesArticleState.duration) {
+    magnatesArticleState.playhead = 0;
+  }
+
+  updateMagnatesArticleVisualStyles();
+  magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
+}
+
+function openMagnatesArticleHighlightSuite() {
+  const modal = document.getElementById('modal-magnates-article-highlight-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesArticleState.isPlaying = true;
+  magnatesArticleState.playhead = 0;
+  magnatesArticleState.lastTimestamp = null;
+  if (magnatesArticleState.animFrameId) cancelAnimationFrame(magnatesArticleState.animFrameId);
+  magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-art-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesArticleHighlightSuite() {
+  const modal = document.getElementById('modal-magnates-article-highlight-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesArticleState.isPlaying = false;
+  if (magnatesArticleState.animFrameId) {
+    cancelAnimationFrame(magnatesArticleState.animFrameId);
+    magnatesArticleState.animFrameId = null;
+  }
+}
+
+function bindMagnatesArticleHighlightSuiteModalControls() {
+  document.getElementById('btn-close-magnates-art-suite')?.addEventListener('click', closeMagnatesArticleHighlightSuite);
+  document.getElementById('btn-cancel-magnates-art-suite')?.addEventListener('click', closeMagnatesArticleHighlightSuite);
+
+  document.getElementById('btn-magnates-art-play-pause')?.addEventListener('click', () => {
+    magnatesArticleState.isPlaying = !magnatesArticleState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-art-play-pause');
+    if (magnatesArticleState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesArticleState.lastTimestamp = null;
+      magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesArticleState.animFrameId) cancelAnimationFrame(magnatesArticleState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-art-reset')?.addEventListener('click', () => {
+    magnatesArticleState.playhead = 0;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-slider-zoom')?.addEventListener('input', (e) => {
+    magnatesArticleState.zoomScale = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-art-val-zoom');
+    if (label) label.textContent = `${magnatesArticleState.zoomScale}%`;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-slider-pan')?.addEventListener('input', (e) => {
+    magnatesArticleState.panDistance = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-art-val-pan');
+    if (label) label.textContent = `${magnatesArticleState.panDistance} px`;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-input-headline')?.addEventListener('input', (e) => {
+    magnatesArticleState.headline = e.target.value;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesArticleState.subcaption = e.target.value;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-input-mark-1')?.addEventListener('input', (e) => {
+    magnatesArticleState.markText1 = e.target.value;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-input-mark-2')?.addEventListener('input', (e) => {
+    magnatesArticleState.markText2 = e.target.value;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-art-suite')?.addEventListener('click', () => {
+    closeMagnatesArticleHighlightSuite();
+
+    const newspaperClip = {
+      id: `img-art-news-${Date.now()}`,
+      url: '/magnates_article_highlight_thumbnail.svg',
+      start: 0,
+      duration: magnatesArticleState.duration,
+      scale: magnatesArticleState.zoomScale / 100,
+      zoomEffect: 'drift_in',
+      zoomScale: (magnatesArticleState.zoomScale / 100) * 1.15,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    const highlight1Clip = {
+      id: `txt-art-h1-${Date.now() + 1}`,
+      text: magnatesArticleState.markText1,
+      highlight: magnatesArticleState.markText1,
+      highlightColor: '#facc15',
+      anim: 'pop',
+      fontSize: 28,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: magnatesArticleState.duration - 0.2
+    };
+
+    const highlight2Clip = {
+      id: `txt-art-h2-${Date.now() + 2}`,
+      text: magnatesArticleState.markText2,
+      highlight: magnatesArticleState.markText2,
+      highlightColor: '#facc15',
+      anim: 'pop',
+      fontSize: 28,
+      fontFamily: 'monospace',
+      start: 0.8,
+      duration: magnatesArticleState.duration - 0.8
+    };
+
+    const headlineClip = {
+      id: `txt-art-head-${Date.now() + 3}`,
+      text: magnatesArticleState.headline,
+      highlight: magnatesArticleState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'stamp',
+      fontSize: 50,
+      fontFamily: 'Cinzel, serif',
+      start: 0,
+      duration: magnatesArticleState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [newspaperClip];
+      timelineClips.text = [headlineClip, highlight1Clip, highlight2Clip];
+      renderAllTimelineTracks();
+      selectClip(highlight1Clip, 'text');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Article & Text Highlighting to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   8. MAGNATES MEDIA PARTICLE & VFX OVERLAYS SUITE CONTROLLER
+   (Floating dust particles, optical flares, fire, smoke, and retro film grain)
+   ========================================================= */
+let magnatesVFXState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  showFire: true,
+  showFlare: true,
+  showSmoke: true,
+  particleIntensity: 80, // 20 to 100%
+  headline: "FIRE, DUST & OPTICAL FLARES",
+  subcaption: "ORGANIC VFX COMPOSITING ENGINE",
+  bgUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnatesVFXVisualStyles() {
+  const headlineEl = document.getElementById('magnates-vfx-headline');
+  const subcaptionEl = document.getElementById('magnates-vfx-subcaption');
+  const fireLayer = document.getElementById('magnates-vfx-fire-layer');
+  const flareLayer = document.getElementById('magnates-vfx-flare-layer');
+  const smokeLayer = document.getElementById('magnates-vfx-smoke-layer');
+  const timerEl = document.getElementById('magnates-vfx-timer-display');
+  const hudParticles = document.getElementById('magnates-vfx-hud-particles');
+  const hudFlare = document.getElementById('magnates-vfx-hud-flare');
+
+  if (headlineEl) headlineEl.textContent = magnatesVFXState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnatesVFXState.subcaption;
+
+  const p = magnatesVFXState.playhead;
+  const dur = magnatesVFXState.duration;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+
+  if (fireLayer) {
+    fireLayer.style.display = magnatesVFXState.showFire ? 'block' : 'none';
+    const firePulse = (0.6 + Math.sin(p * 5) * 0.3).toFixed(2);
+    fireLayer.style.opacity = firePulse;
+  }
+
+  if (flareLayer) {
+    flareLayer.style.display = magnatesVFXState.showFlare ? 'block' : 'none';
+    const flarePulse = (0.7 + Math.sin(p * 3.5) * 0.3).toFixed(2);
+    flareLayer.style.opacity = flarePulse;
+  }
+
+  if (smokeLayer) {
+    smokeLayer.style.display = magnatesVFXState.showSmoke ? 'block' : 'none';
+    const driftX = Math.sin(p * 1.5) * 25;
+    smokeLayer.style.transform = `translate(${driftX.toFixed(1)}px, ${(-Math.sin(p * 1.8) * 12).toFixed(1)}px)`;
+  }
+
+  // Animate 5 fire dots rising
+  for (let i = 1; i <= 5; i++) {
+    const dot = document.getElementById(`magnates-vfx-dot-${i}`);
+    if (dot) {
+      const cy = (200 - ((p * (30 + i * 12)) % 180));
+      dot.setAttribute('cy', cy.toFixed(1));
+    }
+  }
+
+  if (hudParticles) hudParticles.textContent = `EMBERS: ${magnatesVFXState.particleIntensity}%`;
+  if (hudFlare) hudFlare.textContent = magnatesVFXState.showFlare ? 'OPTICAL FLARE: ON' : 'OPTICAL FLARE: OFF';
+}
+
+function renderMagnatesVFXLoop(timestamp) {
+  if (!magnatesVFXState.isPlaying) return;
+  if (!magnatesVFXState.lastTimestamp) magnatesVFXState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnatesVFXState.lastTimestamp) / 1000;
+  magnatesVFXState.lastTimestamp = timestamp;
+
+  magnatesVFXState.playhead += dt;
+  if (magnatesVFXState.playhead > magnatesVFXState.duration) {
+    magnatesVFXState.playhead = 0;
+  }
+
+  updateMagnatesVFXVisualStyles();
+  magnatesVFXState.animFrameId = requestAnimationFrame(renderMagnatesVFXLoop);
+}
+
+function openMagnatesParticleVFXSuite() {
+  const modal = document.getElementById('modal-magnates-particle-vfx-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnatesVFXState.isPlaying = true;
+  magnatesVFXState.playhead = 0;
+  magnatesVFXState.lastTimestamp = null;
+  if (magnatesVFXState.animFrameId) cancelAnimationFrame(magnatesVFXState.animFrameId);
+  magnatesVFXState.animFrameId = requestAnimationFrame(renderMagnatesVFXLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-vfx-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnatesParticleVFXSuite() {
+  const modal = document.getElementById('modal-magnates-particle-vfx-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnatesVFXState.isPlaying = false;
+  if (magnatesVFXState.animFrameId) {
+    cancelAnimationFrame(magnatesVFXState.animFrameId);
+    magnatesVFXState.animFrameId = null;
+  }
+}
+
+function bindMagnatesParticleVFXSuiteModalControls() {
+  document.getElementById('btn-close-magnates-vfx-suite')?.addEventListener('click', closeMagnatesParticleVFXSuite);
+  document.getElementById('btn-cancel-magnates-vfx-suite')?.addEventListener('click', closeMagnatesParticleVFXSuite);
+
+  document.getElementById('btn-magnates-vfx-play-pause')?.addEventListener('click', () => {
+    magnatesVFXState.isPlaying = !magnatesVFXState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-vfx-play-pause');
+    if (magnatesVFXState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnatesVFXState.lastTimestamp = null;
+      magnatesVFXState.animFrameId = requestAnimationFrame(renderMagnatesVFXLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnatesVFXState.animFrameId) cancelAnimationFrame(magnatesVFXState.animFrameId);
+    }
+  });
+
+  document.getElementById('btn-magnates-vfx-reset')?.addEventListener('click', () => {
+    magnatesVFXState.playhead = 0;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('magnates-vfx-toggle-fire')?.addEventListener('change', (e) => {
+    magnatesVFXState.showFire = e.target.checked;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('magnates-vfx-toggle-flare')?.addEventListener('change', (e) => {
+    magnatesVFXState.showFlare = e.target.checked;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('magnates-vfx-toggle-smoke')?.addEventListener('change', (e) => {
+    magnatesVFXState.showSmoke = e.target.checked;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('magnates-vfx-slider-intensity')?.addEventListener('input', (e) => {
+    magnatesVFXState.particleIntensity = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-vfx-val-intensity');
+    if (label) label.textContent = `${magnatesVFXState.particleIntensity}%`;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('magnates-vfx-input-headline')?.addEventListener('input', (e) => {
+    magnatesVFXState.headline = e.target.value;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('magnates-vfx-input-subcaption')?.addEventListener('input', (e) => {
+    magnatesVFXState.subcaption = e.target.value;
+    updateMagnatesVFXVisualStyles();
+  });
+
+  document.getElementById('btn-apply-magnates-vfx-suite')?.addEventListener('click', () => {
+    closeMagnatesParticleVFXSuite();
+
+    const bgClip = {
+      id: `img-vfx-bg-${Date.now()}`,
+      url: magnatesVFXState.bgUrl,
+      start: 0,
+      duration: magnatesVFXState.duration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const vfxOverlayClip = {
+      id: `img-vfx-overlay-${Date.now() + 1}`,
+      name: 'VFX_Particles_Flares_Overlay.png',
+      url: '/magnates_particle_vfx_thumbnail.svg',
+      start: 0,
+      duration: magnatesVFXState.duration,
+      scale: 1.0,
+      blendMode: 'screen',
+      opacity: magnatesVFXState.particleIntensity / 100,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.12,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    const headlineClip = {
+      id: `txt-vfx-head-${Date.now() + 2}`,
+      text: magnatesVFXState.headline,
+      highlight: magnatesVFXState.headline.split(' ')[0] || '',
+      highlightColor: '#f43f5e',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Cinzel, serif',
+      start: 0,
+      duration: magnatesVFXState.duration
+    };
+
+    const vfxMetaClip = {
+      id: `txt-vfx-meta-${Date.now() + 3}`,
+      text: `PARTICLES & VFX // FIRE, DUST & OPTICAL FLARES (${magnatesVFXState.particleIntensity}%)`,
+      highlight: 'OPTICAL FLARES',
+      highlightColor: '#e11d48',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnatesVFXState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, vfxOverlayClip];
+      timelineClips.text = [headlineClip, vfxMetaClip];
+      renderAllTimelineTracks();
+      selectClip(vfxOverlayClip, 'image');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media Particle & VFX Overlays to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
