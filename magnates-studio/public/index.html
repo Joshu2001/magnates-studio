@@ -6682,7 +6682,7 @@
               <!-- 2. Add Kinetic Text Behind -->
               <button type="button" id="btn-modal-action-kinetic-text" style="padding: 7px 10px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(239,68,68,0.4); background: rgba(239,68,68,0.15); color: #fca5a5; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.2s;">
                 <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>
-                <span id="label-modal-action-kinetic-text">+ Text Behind</span>
+                <span id="label-modal-action-kinetic-text">Text Behind</span>
               </button>
 
               <!-- 3. Layer Order: Bring Forward -->
@@ -6726,18 +6726,27 @@
 
           <!-- Pro Tip -->
           <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 10px; font-size: 10.5px; color: #e9d5ff; line-height: 1.45;">
-            <strong>💡 Pro Workflow:</strong> Right-click anywhere on the preview video or use the buttons above to remove background, reorder layers, and add kinetic typography!
+            <strong>💡 Pro Workflow:</strong> Right-click anywhere on the preview video or use the buttons above to remove background, control opacity, and layer kinetic typography!
           </div>
 
           <!-- Modal Floating Stage Context Menu -->
-          <div id="modal-stage-context-menu" style="display: none; position: fixed; z-index: 100020; width: 190px; background: rgba(15, 17, 26, 0.98); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); padding: 4px; backdrop-filter: blur(10px);">
+          <div id="modal-stage-context-menu" style="display: none; position: fixed; z-index: 100020; width: 215px; background: rgba(15, 17, 26, 0.98); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); padding: 6px; backdrop-filter: blur(10px);">
             <button type="button" class="modal-ctx-item" id="ctx-modal-remove-bg" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
               <span>✂️ Auto Remove Background</span>
             </button>
             <button type="button" class="modal-ctx-item" id="ctx-modal-add-kinetic-text" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
               <span>🔤 Add Kinetic Text Behind</span>
             </button>
-            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 3px 0;"></div>
+            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;"></div>
+            <!-- Opacity Control Section -->
+            <div style="padding: 6px 10px; font-size: 10.5px; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Layer Opacity</span>
+                <span id="ctx-modal-opacity-val" style="color: #c084fc; font-family: monospace; font-weight: 700;">100%</span>
+              </div>
+              <input type="range" id="ctx-modal-opacity-slider" min="0" max="100" value="100" style="width: 100%; accent-color: #a855f7; cursor: pointer; height: 4px;" />
+            </div>
+            <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;"></div>
             <button type="button" class="modal-ctx-item" id="ctx-modal-bring-front" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
               <span>⬆️ Bring Subject to Front</span>
             </button>

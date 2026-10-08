@@ -1,20 +1,21 @@
 {
   "text": [
     {
-      "id": "txt-spatial-1791441302678",
-      "text": "THE SYSTEM",
-      "highlight": "THE",
-      "highlightColor": "#c084fc",
+      "id": "txt-1791470827969",
+      "text": "MAGNATES MEDIA",
+      "highlight": "MAGNATES",
+      "highlightColor": "#db0a23",
       "anim": "pop",
-      "fontSize": 70,
-      "fontFamily": "Cinzel, serif",
+      "fontSize": 68,
+      "fontFamily": "Impact, sans-serif",
+      "layerOrder": "middle",
       "start": 0,
-      "duration": 7,
+      "duration": 12,
       "_renderBounds": {
         "x": 204,
-        "y": 428,
-        "w": 517.7999420166016,
-        "h": 116
+        "y": 429.2,
+        "w": 507.80078125,
+        "h": 113.59999999999997
       }
     }
   ],
@@ -22,12 +23,25 @@
   "quote": [],
   "image": [
     {
-      "id": "img-1791467976787",
+      "id": "img-bg-1791470827967",
       "start": 0,
-      "duration": 5,
-      "scale": 1.1,
-      "transition": "fly_through",
-      "transitionDuration": 1.2,
+      "duration": 12,
+      "layerOrder": "back",
+      "scale": 1.15,
+      "zoomEffect": "snap",
+      "zoomScale": 1.25,
+      "zoomStartTime": 0.1,
+      "file": null
+    },
+    {
+      "id": "img-fg-1791470827968",
+      "start": 0,
+      "duration": 12,
+      "layerOrder": "front",
+      "scale": 1.05,
+      "vectorEffect": false,
+      "vectorStrokeColor": "#ffffff",
+      "zoomEffect": "loupe",
       "file": null
     }
   ],
@@ -63,7 +77,7 @@
   ],
   "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791470385709,
-  "projectName": "James Jani \"The Countdown Effect\" & Panic Ticker Tape",
+  "savedAt": 1791472060306,
+  "projectName": "2.5D Animated Subject Cutout (Auto BG Removed)",
   "projectId": "proj_1791218145776_xils"
 }

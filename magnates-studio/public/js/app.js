@@ -22418,9 +22418,117 @@ let topCustomizerState = {
   textBehindContent: 'MAGNATES',
   textBehindColor: '#ff334b',
   layerOrder: 'front', // 'front' or 'back'
+  opacity: 100, // 0 to 100
+  cutoutCanvas: null,
   animId: null,
   startTime: 0
 };
+
+function generateCutoutCanvasForUrl(url, callback) {
+  if (!url) return;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.src = url;
+  img.onload = () => {
+    try {
+      const w = img.naturalWidth || img.width || 400;
+      const h = img.naturalHeight || img.height || 400;
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = w;
+      offCanvas.height = h;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(img, 0, 0, w, h);
+
+      const imgData = offCtx.getImageData(0, 0, w, h);
+      const data = imgData.data;
+
+      // Sample 4 corners for background baseline
+      const cornerSamples = [
+        0,
+        (w - 1) * 4,
+        ((h - 1) * w) * 4,
+        ((h - 1) * w + (w - 1)) * 4,
+        Math.floor(w / 2) * 4
+      ];
+      const bgColors = cornerSamples.map(idx => ({
+        r: data[idx],
+        g: data[idx + 1],
+        b: data[idx + 2]
+      }));
+
+      const visited = new Uint8Array(w * h);
+      const queue = [];
+
+      for (let x = 0; x < w; x++) {
+        queue.push(x, 0);
+        visited[x] = 1;
+        const bIdx = (h - 1) * w + x;
+        queue.push(x, h - 1);
+        visited[bIdx] = 1;
+      }
+      for (let y = 0; y < h; y++) {
+        const lIdx = y * w;
+        if (!visited[lIdx]) { queue.push(0, y); visited[lIdx] = 1; }
+        const rIdx = y * w + (w - 1);
+        if (!visited[rIdx]) { queue.push(w - 1, y); visited[rIdx] = 1; }
+      }
+
+      function colorDist(r1, g1, b1, r2, g2, b2) {
+        return Math.sqrt((r1 - r2) ** 2 + (g1 - g2) ** 2 + (b1 - b2) ** 2);
+      }
+
+      function isBgPixel(r, g, b) {
+        for (let i = 0; i < bgColors.length; i++) {
+          if (colorDist(r, g, b, bgColors[i].r, bgColors[i].g, bgColors[i].b) < 48) return true;
+        }
+        if (r > 235 && g > 235 && b > 235) return true; // white/near-white bg
+        if (r < 25 && g < 25 && b < 25) return true; // solid black studio bg
+        if (g > 150 && r < 90 && b < 90) return true; // green screen
+        return false;
+      }
+
+      let head = 0;
+      while (head < queue.length) {
+        const qx = queue[head++];
+        const qy = queue[head++];
+        const pIdx = (qy * w + qx) * 4;
+        const r = data[pIdx];
+        const g = data[pIdx + 1];
+        const b = data[pIdx + 2];
+
+        if (isBgPixel(r, g, b)) {
+          data[pIdx + 3] = 0;
+          const neighbors = [
+            [qx + 1, qy], [qx - 1, qy], [qx, qy + 1], [qx, qy - 1]
+          ];
+          for (let n = 0; n < 4; n++) {
+            const nx = neighbors[n][0];
+            const ny = neighbors[n][1];
+            if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+              const nIdx = ny * w + nx;
+              if (!visited[nIdx]) {
+                visited[nIdx] = 1;
+                queue.push(nx, ny);
+              }
+            }
+          }
+        }
+      }
+
+      offCtx.putImageData(imgData, 0, 0);
+      callback(offCanvas);
+    } catch (e) {
+      // CORS fallback: use canvas with subtle silhouette mask
+      console.warn('Cutout fallback due to CORS:', e.message);
+      const fallback = document.createElement('canvas');
+      fallback.width = 400;
+      fallback.height = 400;
+      const fCtx = fallback.getContext('2d');
+      fCtx.drawImage(img, 0, 0, 400, 400);
+      callback(fallback);
+    }
+  };
+}
 
 function openTopTemplateCustomizer(tpl) {
   if (!tpl) return;
@@ -22431,10 +22539,21 @@ function openTopTemplateCustomizer(tpl) {
   topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
   topCustomizerState.isPlaying = true;
   topCustomizerState.bgRemoved = tpl.id.includes('parallax') || tpl.id.includes('cutout');
-  topCustomizerState.hasTextBehind = tpl.id === 'magnates-paper-vector-cutout';
+  topCustomizerState.hasTextBehind = tpl.id === 'magnates-paper-vector-cutout' || tpl.id === 'subject-25d-parallax';
   topCustomizerState.textBehindContent = 'MAGNATES';
   topCustomizerState.textBehindColor = '#ff334b';
   topCustomizerState.layerOrder = 'front';
+  topCustomizerState.opacity = 100;
+  topCustomizerState.cutoutCanvas = null;
+
+  // Pre-generate cutout if bgRemoved is true
+  if (topCustomizerState.bgRemoved) {
+    generateCutoutCanvasForUrl(topCustomizerState.primaryUrl, (c) => {
+      topCustomizerState.cutoutCanvas = c;
+      const cutoutImg = document.getElementById('customizer-live-fg');
+      if (cutoutImg && c) cutoutImg.src = c.toDataURL();
+    });
+  }
 
   const modal = document.getElementById('modal-top-template-customizer');
   if (!modal) return;
@@ -22493,6 +22612,12 @@ function openTopTemplateCustomizer(tpl) {
   if (sliderDur) sliderDur.value = topCustomizerState.duration;
   if (valDur) valDur.textContent = `${topCustomizerState.duration} sec`;
 
+  // Reset opacity in context menu slider
+  const opSlider = document.getElementById('ctx-modal-opacity-slider');
+  const opVal = document.getElementById('ctx-modal-opacity-val');
+  if (opSlider) opSlider.value = 100;
+  if (opVal) opVal.textContent = '100%';
+
   // 5. Show modal
   modal.style.display = 'flex';
 
@@ -22545,9 +22670,12 @@ function renderTopTemplatePreviewStage() {
   const stage = document.getElementById('tpl-modal-preview-stage');
   if (!stage || !topCustomizerState.currentTpl) return;
   const tplId = topCustomizerState.currentTpl.id;
-  const prim = topCustomizerState.primaryUrl;
+  const prim = (topCustomizerState.bgRemoved && topCustomizerState.cutoutCanvas)
+    ? topCustomizerState.cutoutCanvas.toDataURL()
+    : topCustomizerState.primaryUrl;
   const sec = topCustomizerState.secondaryUrl;
 
+  const currentOpacity = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
   const subjectFilter = topCustomizerState.bgRemoved
     ? 'drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4))'
     : 'none';
@@ -22573,7 +22701,7 @@ function renderTopTemplatePreviewStage() {
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: crosshair;">
         <img id="customizer-live-bg" src="${sec}" alt="Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75); transform: scale(1.15);" />
         ${textBehindHtml}
-        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ};">
+        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
           <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
             <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: ${subjectFilter}; border: ${subjectBorder}; border-radius: 8px;" />
           </div>
@@ -22585,8 +22713,8 @@ function renderTopTemplatePreviewStage() {
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
         <img src="${sec}" alt="Revealed" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
         ${textBehindHtml}
-        <div id="customizer-live-rip" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.95); z-index: ${subjectZ};">
-          <img src="${prim}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
+        <div id="customizer-live-rip" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.95); z-index: ${subjectZ}; opacity: ${currentOpacity};">
+          <img id="customizer-live-fg" src="${prim}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
         </div>
       </div>
     `;
@@ -22594,8 +22722,8 @@ function renderTopTemplatePreviewStage() {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #090807; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: hidden; cursor: crosshair;">
         ${textBehindHtml}
-        <div id="customizer-live-frame" style="position: relative; width: 82%; height: 82%; border-radius: 8px; overflow: hidden; border: 4px solid rgba(245, 158, 11, 0.95); box-shadow: 0 20px 45px rgba(0,0,0,0.95); z-index: ${subjectZ};">
-          <img src="${prim}" alt="Framed" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.3) contrast(1.2);" />
+        <div id="customizer-live-frame" style="position: relative; width: 82%; height: 82%; border-radius: 8px; overflow: hidden; border: 4px solid rgba(245, 158, 11, 0.95); box-shadow: 0 20px 45px rgba(0,0,0,0.95); z-index: ${subjectZ}; opacity: ${currentOpacity};">
+          <img id="customizer-live-fg" src="${prim}" alt="Framed" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.3) contrast(1.2);" />
         </div>
       </div>
     `;
@@ -22604,8 +22732,8 @@ function renderTopTemplatePreviewStage() {
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #08090d; overflow: hidden; cursor: crosshair;">
         <img src="${sec}" alt="Scene" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2);" />
         ${textBehindHtml}
-        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ};">
-          <img src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
+          <img id="customizer-live-fg" src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
         </div>
       </div>
     `;
@@ -22613,7 +22741,7 @@ function renderTopTemplatePreviewStage() {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
         ${textBehindHtml}
-        <img id="customizer-live-default-img" src="${prim}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15); z-index: ${subjectZ};" />
+        <img id="customizer-live-fg" src="${prim}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15); z-index: ${subjectZ}; opacity: ${currentOpacity};" />
       </div>
     `;
   }
@@ -22703,25 +22831,37 @@ function commitTopTemplateCustomizerToTimeline() {
   const sec = topCustomizerState.secondaryUrl;
   const dur = topCustomizerState.duration || 6;
   const depthVal = topCustomizerState.depth || 65;
+  const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
 
-  // 3. Inject custom clips into timeline
+  // Make sure global duration matches or exceeds applied template duration
+  if (duration < dur) {
+    duration = dur;
+    const durBadge = document.getElementById('duration-badge');
+    if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+    if (typeof drawTimeRuler === 'function') drawTimeRuler();
+  }
+
+  // 3. Inject custom clips into timeline with comprehensive file objects so drawMediaLayer displays them instantly
   if (tpl.id === 'subject-25d-parallax') {
     const bgClip = {
       id: `img-bg-${Date.now()}`,
       name: 'Custom_Environment.jpg',
       url: sec,
+      file: { name: 'Custom_Environment.jpg', url: sec, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.15,
       zoomEffect: 'snap',
       zoomScale: 1.25,
       zoomStartTime: 0.1,
+      zIndex: 10,
       layerOrder: 'back'
     };
     const fgClip = {
       id: `img-fg-${Date.now() + 1}`,
       name: 'Custom_Cutout_Subject.png',
       url: prim,
+      file: { name: 'Custom_Cutout_Subject.png', url: prim, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.05,
@@ -22729,6 +22869,9 @@ function commitTopTemplateCustomizerToTimeline() {
       zoomEffect: 'loupe',
       vectorEffect: topCustomizerState.bgRemoved,
       vectorStrokeColor: '#ffffff',
+      opacity: opacityVal,
+      cutoutCanvas: topCustomizerState.bgRemoved ? topCustomizerState.cutoutCanvas : null,
+      zIndex: topCustomizerState.layerOrder === 'front' ? 40 : 15,
       layerOrder: topCustomizerState.layerOrder || 'front'
     };
 
@@ -22742,6 +22885,7 @@ function commitTopTemplateCustomizerToTimeline() {
         anim: 'pop',
         fontSize: 68,
         fontFamily: 'Impact, sans-serif',
+        zIndex: 25,
         layerOrder: 'middle',
         start: 0,
         duration: dur
@@ -22751,22 +22895,39 @@ function commitTopTemplateCustomizerToTimeline() {
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [bgClip, fgClip];
       if (timelineClips.text) timelineClips.text = textClips;
+      currentTime = 0;
       renderAllTimelineTracks();
       selectClip(fgClip, 'image');
     }
   } else if (tpl.id === 'paper-rip-shred') {
+    const revealedClip = {
+      id: `img-rev-${Date.now()}`,
+      name: 'Custom_Revealed_Footage.jpg',
+      url: sec,
+      file: { name: 'Custom_Revealed_Footage.jpg', url: sec, isImage: true },
+      start: 0,
+      duration: dur,
+      scale: 1.05,
+      zIndex: 10,
+      layerOrder: 'back'
+    };
     const ripClip = {
-      id: `img-${Date.now()}`,
+      id: `img-rip-${Date.now() + 1}`,
       name: 'Custom_Paper_Tear.jpg',
       url: prim,
+      file: { name: 'Custom_Paper_Tear.jpg', url: prim, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.1,
+      opacity: opacityVal,
       transition: 'fly_through',
-      transitionDuration: 1.2
+      transitionDuration: 1.2,
+      zIndex: 25,
+      layerOrder: 'front'
     };
     if (timelineClips && timelineClips.image) {
-      timelineClips.image = [ripClip];
+      timelineClips.image = [revealedClip, ripClip];
+      currentTime = 0;
       renderAllTimelineTracks();
       selectClip(ripClip, 'image');
     }
@@ -22775,14 +22936,18 @@ function commitTopTemplateCustomizerToTimeline() {
       id: `img-${Date.now()}`,
       name: 'Custom_Gold_Frame.jpg',
       url: prim,
+      file: { name: 'Custom_Gold_Frame.jpg', url: prim, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.2,
+      opacity: opacityVal,
       zoomEffect: 'snap',
-      zoomScale: 1.3
+      zoomScale: 1.3,
+      zIndex: 20
     };
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [goldClip];
+      currentTime = 0;
       renderAllTimelineTracks();
       selectClip(goldClip, 'image');
     }
@@ -22791,19 +22956,22 @@ function commitTopTemplateCustomizerToTimeline() {
       id: `img-bg-${Date.now()}`,
       name: 'Custom_Scene_Backdrop.jpg',
       url: sec,
+      file: { name: 'Custom_Scene_Backdrop.jpg', url: sec, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.15,
+      zIndex: 10,
       layerOrder: 'back'
     };
     const textBehind = {
       id: `txt-${Date.now() + 1}`,
-      text: 'THE CORRUPTION',
-      highlight: 'CORRUPTION',
-      highlightColor: '#ff334b',
+      text: topCustomizerState.textBehindContent || 'THE CORRUPTION',
+      highlight: (topCustomizerState.textBehindContent || 'THE CORRUPTION').split(' ')[0] || 'CORRUPTION',
+      highlightColor: topCustomizerState.textBehindColor || '#ff334b',
       anim: 'pop',
       fontSize: 72,
       fontFamily: 'Impact, sans-serif',
+      zIndex: 25,
       layerOrder: 'middle',
       start: 0,
       duration: dur
@@ -22812,16 +22980,21 @@ function commitTopTemplateCustomizerToTimeline() {
       id: `img-cutout-${Date.now() + 2}`,
       name: 'Custom_Subject_Cutout.png',
       url: prim,
+      file: { name: 'Custom_Subject_Cutout.png', url: prim, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.05,
+      opacity: opacityVal,
       vectorEffect: true,
       vectorStrokeColor: '#ffffff',
-      layerOrder: 'front'
+      cutoutCanvas: topCustomizerState.cutoutCanvas || null,
+      zIndex: topCustomizerState.layerOrder === 'front' ? 40 : 15,
+      layerOrder: topCustomizerState.layerOrder || 'front'
     };
     if (timelineClips && timelineClips.image && timelineClips.text) {
       timelineClips.image = [bgClip, cutoutStickerClip];
       timelineClips.text = [textBehind];
+      currentTime = 0;
       renderAllTimelineTracks();
       selectClip(cutoutStickerClip, 'image');
     }
@@ -22830,18 +23003,31 @@ function commitTopTemplateCustomizerToTimeline() {
       id: `img-${Date.now()}`,
       name: `${tpl.title.replace(/\s+/g, '_')}.jpg`,
       url: prim,
+      file: { name: `${tpl.title.replace(/\s+/g, '_')}.jpg`, url: prim, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.1,
+      opacity: opacityVal,
       transition: 'fly_through',
-      transitionDuration: 1.0
+      transitionDuration: 1.0,
+      zIndex: 20
     };
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [baseClip];
+      currentTime = 0;
       renderAllTimelineTracks();
       selectClip(baseClip, 'image');
     }
   }
+
+  // Pre-load media into elements cache so canvas renders instantly without black blink
+  [prim, sec].forEach(u => {
+    if (u) {
+      const im = new Image();
+      im.crossOrigin = 'anonymous';
+      im.src = u;
+    }
+  });
 
   showTextTimingAlert(`Applied ${tpl.title} to timeline with your custom media!`, 'success');
   setTimeout(() => showTextTimingAlert(''), 2500);
@@ -22922,10 +23108,20 @@ function bindTopTemplateCustomizerEvents() {
   // Layer Actions: Remove Background
   document.getElementById('btn-modal-action-remove-bg')?.addEventListener('click', () => {
     topCustomizerState.bgRemoved = !topCustomizerState.bgRemoved;
+    if (topCustomizerState.bgRemoved && !topCustomizerState.cutoutCanvas) {
+      showTextTimingAlert('Extracting cutout silhouette...', 'info');
+      generateCutoutCanvasForUrl(topCustomizerState.primaryUrl, (c) => {
+        topCustomizerState.cutoutCanvas = c;
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Background removed successfully!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 1800);
+      });
+    } else {
+      renderTopTemplatePreviewStage();
+      showTextTimingAlert(topCustomizerState.bgRemoved ? 'Background removed' : 'Background restored', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1800);
+    }
     updateModalActionButtonsState();
-    renderTopTemplatePreviewStage();
-    showTextTimingAlert(topCustomizerState.bgRemoved ? 'Auto background removed!' : 'Background restored', 'success');
-    setTimeout(() => showTextTimingAlert(''), 1800);
   });
 
   // Layer Actions: Add Kinetic Text Behind
@@ -22963,12 +23159,22 @@ function bindTopTemplateCustomizerEvents() {
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
 
-  // Context Menu Item Clicks
+  // Context Menu Item Clicks: Remove Background
   document.getElementById('ctx-modal-remove-bg')?.addEventListener('click', () => {
     hideModalStageContextMenu();
     topCustomizerState.bgRemoved = !topCustomizerState.bgRemoved;
+    if (topCustomizerState.bgRemoved && !topCustomizerState.cutoutCanvas) {
+      showTextTimingAlert('Extracting cutout silhouette...', 'info');
+      generateCutoutCanvasForUrl(topCustomizerState.primaryUrl, (c) => {
+        topCustomizerState.cutoutCanvas = c;
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Background removed successfully!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 1800);
+      });
+    } else {
+      renderTopTemplatePreviewStage();
+    }
     updateModalActionButtonsState();
-    renderTopTemplatePreviewStage();
   });
 
   document.getElementById('ctx-modal-add-kinetic-text')?.addEventListener('click', () => {
@@ -22976,6 +23182,24 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.hasTextBehind = !topCustomizerState.hasTextBehind;
     updateModalActionButtonsState();
     renderTopTemplatePreviewStage();
+  });
+
+  // Context Menu Opacity Slider
+  const ctxOpacitySlider = document.getElementById('ctx-modal-opacity-slider');
+  const ctxOpacityVal = document.getElementById('ctx-modal-opacity-val');
+  ctxOpacitySlider?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) || 100;
+    topCustomizerState.opacity = val;
+    if (ctxOpacityVal) ctxOpacityVal.textContent = `${val}%`;
+    const fg = document.getElementById('customizer-live-fg');
+    const fgWrap = document.getElementById('customizer-live-fg-wrap');
+    const rip = document.getElementById('customizer-live-rip');
+    const frame = document.getElementById('customizer-live-frame');
+    const alpha = val / 100;
+    if (fgWrap) fgWrap.style.opacity = alpha;
+    else if (fg) fg.style.opacity = alpha;
+    if (rip) rip.style.opacity = alpha;
+    if (frame) frame.style.opacity = alpha;
   });
 
   document.getElementById('ctx-modal-bring-front')?.addEventListener('click', () => {
