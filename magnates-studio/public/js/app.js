@@ -829,7 +829,8 @@ function drawTextLayer(specificTextClip) {
   words.forEach((word, idx) => {
     // Typewriter effect
     if (animStyle === 'typewriter') {
-      const wordsToShow = Math.floor(progress * words.length * 1.6);
+      const speedMult = activeText.typeSpeed || 1.0;
+      const wordsToShow = Math.floor(progress * words.length * 1.6 * speedMult);
       if (idx > wordsToShow) return;
     }
     // Wipe right: fast word-by-word reveal (quicker than typewriter)
@@ -2390,6 +2391,9 @@ function render(now) {
     } else if (bgType === 'chroma_green') {
       ctx.fillStyle = '#00e676';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+    } else if (bgType === 'matrix_rain') {
+      ctx.fillStyle = '#040608';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     } else {
       // Default cyber grid / dark studio
       ctx.fillStyle = bgColor || '#0a0b0e';
@@ -2399,6 +2403,26 @@ function render(now) {
     // 1. 3D Background Grid (when enabled and preset is cyber_grid)
     if (bgType === 'cyber_grid' && fxState.grid.enabled !== false) {
       drawPerspectiveGrid();
+    }
+
+    // 1.5. Matrix Digital Rain Background Stream
+    const matrixActiveClip = (timelineClips.image || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration) && c.matrixRain);
+    if (bgType === 'matrix_rain' || matrixActiveClip) {
+      const rainState = matrixActiveClip ? {
+        matrixRainDensity: matrixActiveClip.matrixRainDensity || 16,
+        matrixRainColor: matrixActiveClip.matrixRainColor || '#00ff41',
+        matrixRainSpeed: matrixActiveClip.matrixRainSpeed || 1.0,
+        matrixColumns: matrixActiveClip._matrixColumns || (matrixActiveClip._matrixColumns = [])
+      } : {
+        matrixRainDensity: fxState.stageBackground?.density || 16,
+        matrixRainColor: fxState.stageBackground?.rainColor || '#00ff41',
+        matrixRainSpeed: fxState.stageBackground?.speed || 1.0,
+        matrixColumns: fxState.stageBackground?._matrixColumns || (fxState.stageBackground._matrixColumns = [])
+      };
+      const nowTs = performance.now();
+      const dt = (nowTs - (rainState._lastTs || nowTs)) / 1000;
+      rainState._lastTs = nowTs;
+      renderMatrixRainCanvasFrame(ctx, canvas.width, canvas.height, rainState, Math.min(0.1, dt || 0.016));
     }
 
     // 2. Layer-Ordered Visual Elements (Media & Kinetic Text arranged by z-index)
@@ -22528,8 +22552,74 @@ let topCustomizerState = {
   opacity: 100, // 0 to 100
   cutoutCanvas: null,
   animId: null,
-  startTime: 0
+  startTime: 0,
+  // Matrix digital rain engine state
+  matrixRainEnabled: true,
+  matrixRainColor: '#00ff41',
+  matrixRainSpeed: 1.0,
+  matrixRainDensity: 16,
+  matrixTypeSpeed: 1.0,
+  matrixColumns: []
 };
+
+// Reusable Matrix Digital Rain Frame Renderer for both preview modal and main studio canvas
+const MATRIX_GLYPHS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ日10ｦｱｳｴｵｶｷｹｺｻｼｽｾｿﾀﾂﾃﾅﾆﾇﾈﾊﾋﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾜ";
+function renderMatrixRainCanvasFrame(ctx, width, height, state, dt) {
+  if (!ctx || !width || !height) return;
+  const fontSize = Math.max(10, state.matrixRainDensity || 16);
+  const colCount = Math.floor(width / fontSize);
+
+  // Initialize or re-init columns if dimensions or density changed
+  if (!state.matrixColumns || state.matrixColumns.length !== colCount) {
+    state.matrixColumns = [];
+    for (let i = 0; i < colCount; i++) {
+      state.matrixColumns.push({
+        y: Math.random() * -100,
+        speed: (Math.random() * 0.7 + 0.6) * (state.matrixRainSpeed || 1.0),
+        chars: []
+      });
+    }
+  }
+
+  // Semi-transparent fade pass for authentic phosphor trail fade
+  ctx.save();
+  ctx.fillStyle = 'rgba(5, 7, 12, 0.22)';
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.font = `bold ${fontSize}px monospace`;
+  const baseColor = state.matrixRainColor || '#00ff41';
+
+  for (let i = 0; i < colCount; i++) {
+    const col = state.matrixColumns[i];
+    const x = i * fontSize;
+    
+    // Pick random character
+    const char = MATRIX_GLYPHS[Math.floor(Math.random() * MATRIX_GLYPHS.length)];
+    
+    // Draw leading glowing white/cyan droplet head
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#ffffff';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(char, x, col.y);
+
+    // Draw previous character in user rain color
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = baseColor;
+    ctx.fillStyle = baseColor;
+    ctx.fillText(char, x, col.y - fontSize);
+
+    // Advance drop
+    const step = fontSize * col.speed * (dt ? dt * 45 : 1);
+    col.y += step;
+
+    // Reset when off bottom
+    if (col.y > height + 50 && Math.random() > 0.94) {
+      col.y = Math.random() * -60;
+      col.speed = (Math.random() * 0.7 + 0.6) * (state.matrixRainSpeed || 1.0);
+    }
+  }
+  ctx.restore();
+}
 
 function generateCutoutCanvasForUrl(url, callback) {
   if (!url) return;
@@ -22787,6 +22877,32 @@ function openTopTemplateCustomizer(tpl) {
   if (modalKineticInput) modalKineticInput.value = topCustomizerState.mainText;
   if (modalKineticColor) modalKineticColor.value = topCustomizerState.textColor;
 
+  // Matrix Rain Customizer Panel Sync
+  const wrapMatrix = document.getElementById('tpl-modal-wrap-matrix');
+  if (wrapMatrix) {
+    if (tpl.id === 'kinetic-decode-typewriter') {
+      wrapMatrix.style.display = 'flex';
+      const rainEnable = document.getElementById('tpl-modal-matrix-rain-enable');
+      if (rainEnable) rainEnable.checked = topCustomizerState.matrixRainEnabled !== false;
+      const rainColor = document.getElementById('tpl-modal-matrix-rain-color');
+      if (rainColor) rainColor.value = topCustomizerState.matrixRainColor || '#00ff41';
+      const rainSpeed = document.getElementById('tpl-modal-slider-matrix-speed');
+      const rainSpeedVal = document.getElementById('tpl-modal-val-matrix-speed');
+      if (rainSpeed) rainSpeed.value = topCustomizerState.matrixRainSpeed || 1.0;
+      if (rainSpeedVal) rainSpeedVal.textContent = `${(topCustomizerState.matrixRainSpeed || 1.0).toFixed(1)}x`;
+      const rainDensity = document.getElementById('tpl-modal-slider-matrix-density');
+      const rainDensityVal = document.getElementById('tpl-modal-val-matrix-density');
+      if (rainDensity) rainDensity.value = topCustomizerState.matrixRainDensity || 16;
+      if (rainDensityVal) rainDensityVal.textContent = (topCustomizerState.matrixRainDensity || 16) <= 14 ? 'Ultra Dense' : (topCustomizerState.matrixRainDensity || 16) <= 18 ? 'Dense' : 'Sparse';
+      const typeSpeed = document.getElementById('tpl-modal-slider-matrix-typespeed');
+      const typeSpeedVal = document.getElementById('tpl-modal-val-matrix-typespeed');
+      if (typeSpeed) typeSpeed.value = topCustomizerState.matrixTypeSpeed || 1.0;
+      if (typeSpeedVal) typeSpeedVal.textContent = `${(topCustomizerState.matrixTypeSpeed || 1.0).toFixed(1)}x`;
+    } else {
+      wrapMatrix.style.display = 'none';
+    }
+  }
+
   // 3. Update Action button visual states
   updateModalActionButtonsState();
 
@@ -22944,16 +23060,16 @@ function renderTopTemplatePreviewStage() {
     `;
   } else if (tplId === 'kinetic-decode-typewriter') {
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #090a10; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
-        <div style="position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(31,41,55,0.4) 1px, transparent 1px), linear-gradient(to bottom, rgba(31,41,55,0.4) 1px, transparent 1px); background-size: 18px 18px; opacity: 0.35;"></div>
-        <img id="customizer-live-bg" src="${prim}" alt="Matrix Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; filter: contrast(1.5);" />
-        <div style="position: relative; z-index: 2; font-family: monospace; text-align: center;">
-          <span style="font-size: 11px; color: #c084fc; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 8px;">
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #040608; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
+        <canvas id="customizer-live-matrix-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;"></canvas>
+        <img id="customizer-live-bg" src="${prim}" alt="Matrix Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: contrast(1.6); mix-blend-mode: screen; z-index: 2; pointer-events: none;" />
+        <div style="position: relative; z-index: 4; font-family: monospace; text-align: center; pointer-events: none;">
+          <span style="font-size: 11px; color: #a7f3d0; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 8px; text-shadow: 0 0 10px rgba(0,255,65,0.6);">
             ${topCustomizerState.subText || '[ HIGH TENSION REVEAL ]'}
           </span>
-          <div id="customizer-live-decode-box" style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: ${topCustomizerState.textColor || '#00f0ff'}; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(192, 132, 252, 0.5); padding: 8px 16px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); display: inline-flex; align-items: center; gap: 4px;">
+          <div id="customizer-live-decode-box" style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: ${topCustomizerState.textColor || '#00ff41'}; background: rgba(5, 10, 8, 0.92); border: 1px solid ${topCustomizerState.textColor || '#00ff41'}; padding: 10px 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px ${topCustomizerState.textColor || '#00ff41'}40; display: inline-flex; align-items: center; gap: 6px;">
             <span id="customizer-live-decode-text">${topCustomizerState.mainText || 'THE ILLUSION OF CHOICE'}</span>
-            <span style="display: inline-block; width: 8px; height: 18px; background: #a855f7;" class="pulse-preview-badge"></span>
+            <span style="display: inline-block; width: 8px; height: 20px; background: ${topCustomizerState.textColor || '#00ff41'}; box-shadow: 0 0 8px ${topCustomizerState.textColor || '#00ff41'};" class="pulse-preview-badge"></span>
           </div>
         </div>
       </div>
@@ -23060,9 +23176,28 @@ function startTopCustomizerLoop() {
       if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
       if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
     } else if (tplId === 'kinetic-decode-typewriter') {
+      // 1. Matrix Digital Rain Canvas Background
+      const rainCanvas = document.getElementById('customizer-live-matrix-canvas');
+      if (rainCanvas && topCustomizerState.matrixRainEnabled) {
+        if (!rainCanvas._initialized || rainCanvas.width !== rainCanvas.clientWidth) {
+          rainCanvas.width = rainCanvas.clientWidth || 540;
+          rainCanvas.height = rainCanvas.clientHeight || 360;
+          rainCanvas._initialized = true;
+        }
+        const rCtx = rainCanvas.getContext('2d');
+        const dt = (now - (topCustomizerState._lastRainNow || now)) / 1000;
+        topCustomizerState._lastRainNow = now;
+        renderMatrixRainCanvasFrame(rCtx, rainCanvas.width, rainCanvas.height, topCustomizerState, Math.min(0.1, dt || 0.016));
+      } else if (rainCanvas && !topCustomizerState.matrixRainEnabled) {
+        const rCtx = rainCanvas.getContext('2d');
+        rCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+      }
+
+      // 2. Interactive Kinetic Typewriter & Symbol Decryptor
       const targetWord = topCustomizerState.mainText || "THE ILLUSION OF CHOICE";
       const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      const progress = Math.min(1, (t * 0.8) % 1.25);
+      const typeSpeed = topCustomizerState.matrixTypeSpeed || 1.0;
+      const progress = Math.min(1, (t * 0.8 * typeSpeed) % 1.25);
       const charsRevealed = Math.floor(progress * targetWord.length);
       let displayed = targetWord.substring(0, charsRevealed);
       if (charsRevealed < targetWord.length) {
@@ -23357,20 +23492,25 @@ function commitTopTemplateCustomizerToTimeline() {
   } else if (tpl.id === 'kinetic-decode-typewriter') {
     const matrixClip = {
       id: `img-matrix-${Date.now()}`,
-      name: 'Cyber_Matrix_Tension.jpg',
+      name: 'Matrix_Rain_Engine.png',
       url: prim,
-      file: { name: 'Cyber_Matrix_Tension.jpg', url: prim, isImage: true },
+      file: { name: 'Matrix_Rain_Engine.png', url: prim, isImage: true },
       start: 0,
       duration: dur,
       scale: 1.2,
-      zIndex: 10
+      zIndex: 10,
+      matrixRain: topCustomizerState.matrixRainEnabled !== false,
+      matrixRainColor: topCustomizerState.matrixRainColor || '#00ff41',
+      matrixRainSpeed: topCustomizerState.matrixRainSpeed || 1.0,
+      matrixRainDensity: topCustomizerState.matrixRainDensity || 16
     };
     const decodeTitle = {
       id: `txt-${Date.now() + 1}`,
       text: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
       highlight: (topCustomizerState.mainText || 'THE ILLUSION OF CHOICE').split(' ')[1] || 'ILLUSION',
-      highlightColor: topCustomizerState.textColor || '#00f0ff',
+      highlightColor: topCustomizerState.textColor || '#00ff41',
       anim: 'typewriter',
+      typeSpeed: topCustomizerState.matrixTypeSpeed || 1.0,
       fontSize: 58,
       fontFamily: 'monospace',
       start: 0,
@@ -23613,6 +23753,41 @@ function bindTopTemplateCustomizerEvents() {
     const colorMain = document.getElementById('tpl-modal-color-text-main');
     if (colorMain) colorMain.value = e.target.value;
     renderTopTemplatePreviewStage();
+  });
+
+  // Matrix Rain Customizer Engine Event Listeners
+  document.getElementById('tpl-modal-matrix-rain-enable')?.addEventListener('change', (e) => {
+    topCustomizerState.matrixRainEnabled = e.target.checked;
+  });
+
+  document.getElementById('tpl-modal-matrix-rain-color')?.addEventListener('input', (e) => {
+    topCustomizerState.matrixRainColor = e.target.value;
+  });
+
+  document.getElementById('tpl-modal-slider-matrix-speed')?.addEventListener('input', (e) => {
+    topCustomizerState.matrixRainSpeed = parseFloat(e.target.value) || 1.0;
+    const lbl = document.getElementById('tpl-modal-val-matrix-speed');
+    if (lbl) lbl.textContent = `${topCustomizerState.matrixRainSpeed.toFixed(1)}x`;
+    if (topCustomizerState.matrixColumns) {
+      topCustomizerState.matrixColumns.forEach(c => {
+        c.speed = (Math.random() * 0.7 + 0.6) * topCustomizerState.matrixRainSpeed;
+      });
+    }
+  });
+
+  document.getElementById('tpl-modal-slider-matrix-density')?.addEventListener('input', (e) => {
+    topCustomizerState.matrixRainDensity = parseInt(e.target.value, 10) || 16;
+    const lbl = document.getElementById('tpl-modal-val-matrix-density');
+    if (lbl) {
+      lbl.textContent = topCustomizerState.matrixRainDensity <= 14 ? 'Ultra Dense' : topCustomizerState.matrixRainDensity <= 18 ? 'Dense' : 'Sparse';
+    }
+    topCustomizerState.matrixColumns = []; // Force re-partition on next frame
+  });
+
+  document.getElementById('tpl-modal-slider-matrix-typespeed')?.addEventListener('input', (e) => {
+    topCustomizerState.matrixTypeSpeed = parseFloat(e.target.value) || 1.0;
+    const lbl = document.getElementById('tpl-modal-val-matrix-typespeed');
+    if (lbl) lbl.textContent = `${topCustomizerState.matrixTypeSpeed.toFixed(1)}x`;
   });
 
   // Layer Actions: Bring to Front / Send Backward
