@@ -1,22 +1,25 @@
 {
   "text": [
     {
-      "id": "txt-1791475736541",
-      "text": "MAGNATES",
-      "highlight": "MAGNATES",
+      "id": "clip-text-1",
+      "start": 0,
+      "duration": 5,
+      "text": "Did Google pump and dump?",
+      "highlight": "pump and dump",
+      "fontFamily": "'Inter', sans-serif",
+      "fontSize": 64,
+      "textColor": "#ffffff",
       "highlightColor": "#ff334b",
       "anim": "pop",
-      "fontSize": 68,
-      "fontFamily": "Impact, sans-serif",
-      "zIndex": 25,
-      "layerOrder": "middle",
-      "start": 0,
-      "duration": 6,
+      "sfx": "whoosh",
+      "position": "center",
+      "zIndex": 30,
+      "layerOrder": "front",
       "_renderBounds": {
         "x": 204,
-        "y": 429.2,
-        "w": 327.109375,
-        "h": 113.59999999999997
+        "y": 431.6,
+        "w": 951.5,
+        "h": 108.79999999999995
       }
     }
   ],
@@ -24,32 +27,14 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791475736539",
+      "id": "img-1791484358176",
       "start": 0,
-      "duration": 6,
-      "layerOrder": "back",
-      "zIndex": 10,
-      "scale": 1.15,
+      "duration": 5,
+      "zIndex": 20,
+      "scale": 1.1,
       "file": {
-        "name": "Custom_Environment.jpg",
-        "url": "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80",
-        "isImage": true
-      }
-    },
-    {
-      "id": "img-fg-1791475736540",
-      "start": 0,
-      "duration": 6,
-      "layerOrder": "front",
-      "zIndex": 40,
-      "x": 341.5519765739384,
-      "y": -60.46875,
-      "scale": 0.5631108162518302,
-      "vectorEffect": false,
-      "vectorStrokeColor": "#ffffff",
-      "file": {
-        "name": "Custom_Cutout_Subject.png",
-        "url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+        "name": "Custom_Gold_Frame.jpg",
+        "url": "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80",
         "isImage": true
       }
     }
@@ -86,7 +71,7 @@
   ],
   "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791477882249,
-  "projectName": "2.5D Animated Subject Cutout (Auto BG Removed)",
+  "savedAt": 1791484457917,
+  "projectName": "Dark Luxury Gold Frame 3D Spin",
   "projectId": "proj_1791218145776_xils"
 }
