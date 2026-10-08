@@ -3041,6 +3041,324 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       3D DOCUMENT FX SUITE (JAMES JANI ARTICLE & NEWSPAPER FLYOVER ENGINE)
+       ========================================================= -->
+  <div id="modal-document-3d-suite" class="vector-export-modal" style="display: none; z-index: 99999; backdrop-filter: blur(14px); background: rgba(8, 10, 18, 0.92);">
+    <div class="vector-modal-box" style="width: 96vw; max-width: 1440px; height: 92vh; max-height: 920px; display: flex; flex-direction: column; background: #07090e; border: 1px solid rgba(168, 85, 247, 0.45); border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(168, 85, 247, 0.25);">
+      
+      <!-- Top Studio Header -->
+      <div style="height: 56px; padding: 0 20px; background: rgba(18, 19, 28, 0.96); border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div style="width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(135deg, #7e22ce, #a855f7); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);">
+            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-family: 'Cinzel', serif; font-size: 13.5px; font-weight: 800; color: #c084fc; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+              <span>REGAARDER STUDIO</span>
+              <span style="font-size: 10px; padding: 1px 7px; border-radius: 4px; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.4); color: #d8b4fe; font-family: 'JetBrains Mono', monospace;">DOCUMENT FX ENGINE</span>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">3D Article Mapping, Highlight Wipes, Redactions & Pop-Outs</div>
+          </div>
+        </div>
+
+        <!-- Preset Animation Action Buttons -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" class="btn-doc-anim-preset" data-anim="janiFlyby" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(168,85,247,0.5); background: rgba(168,85,247,0.22); color: #e9d5ff; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>✈</span> Jani 3D Flyover
+          </button>
+          <button type="button" class="btn-doc-anim-preset" data-anim="voxHighlight" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(18,19,28,0.8); color: #facc15; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>🖍</span> Vox Marker Glide
+          </button>
+          <button type="button" class="btn-doc-anim-preset" data-anim="redactReveal" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(18,19,28,0.8); color: #ef4444; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>⬛</span> Redaction Leak
+          </button>
+          <button type="button" class="btn-doc-anim-preset" data-anim="headlinePop" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(18,19,28,0.8); color: #34d399; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>❐</span> 3D Layer Pop-Out
+          </button>
+        </div>
+
+        <!-- Snap / Apply / Close Actions -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="btn-doc-snap-hires" style="padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 8px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.5); color: #6ee7b7; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+            <span>📷</span> Snap High-Res
+          </button>
+          <button type="button" id="btn-doc-apply-timeline" style="padding: 6px 15px; font-size: 11.5px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, #9333ea, #a855f7); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(168,85,247,0.45);">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <span>Apply To Timeline</span>
+          </button>
+          <button type="button" id="btn-close-document-3d-suite" style="background: transparent; border: none; color: #94a3b8; font-size: 24px; cursor: pointer; padding: 2px 8px; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Main Body: Split View (Controls + Three.js Canvas) -->
+      <div style="display: flex; flex: 1; min-height: 0; overflow: hidden;">
+        
+        <!-- Left Sidebar Inspector (Tabs: Document, 3D Camera, Jani FX, Paper) -->
+        <div style="width: 360px; background: #0c0f17; border-right: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; overflow-y: auto; padding: 18px; gap: 16px; flex-shrink: 0;">
+          
+          <!-- Mode Tabs -->
+          <div style="display: flex; gap: 3px; background: rgba(18,19,28,0.9); padding: 3px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.06);">
+            <button type="button" id="tab-doc-btn-content" class="btn-doc-tab active" style="flex: 1; padding: 6px 2px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; background: rgba(168,85,247,0.25); color: #c084fc; cursor: pointer;">Document</button>
+            <button type="button" id="tab-doc-btn-cam" class="btn-doc-tab" style="flex: 1; padding: 6px 2px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer;">3D Camera</button>
+            <button type="button" id="tab-doc-btn-fx" class="btn-doc-tab" style="flex: 1; padding: 6px 2px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer;">Jani FX</button>
+            <button type="button" id="tab-doc-btn-style" class="btn-doc-tab" style="flex: 1; padding: 6px 2px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer;">Paper</button>
+          </div>
+
+          <!-- TAB 1: Document Content & Archetypes -->
+          <div id="doc-panel-content" style="display: flex; flex-direction: column; gap: 14px; font-size: 11.5px;">
+            <div>
+              <label style="display: block; font-size: 10px; font-weight: 700; color: #c084fc; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px;">Preset Article Archetype</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button type="button" class="btn-doc-archetype active" data-arch="wsj" style="padding: 9px; border-radius: 8px; background: rgba(168,85,247,0.18); border: 1px solid #a855f7; color: #e9d5ff; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700; font-size: 11px;">Financial Times</div>
+                  <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Classic serif newspaper</div>
+                </button>
+                <button type="button" class="btn-doc-archetype" data-arch="cia" style="padding: 9px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700; font-size: 11px; color: #f87171;">Classified Leak</div>
+                  <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Top secret affidavit</div>
+                </button>
+                <button type="button" class="btn-doc-archetype" data-arch="tech" style="padding: 9px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700; font-size: 11px; color: #38bdf8;">Tech Blog / Web</div>
+                  <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Dark UI web article</div>
+                </button>
+                <button type="button" class="btn-doc-archetype" data-arch="legal" style="padding: 9px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700; font-size: 11px; color: #34d399;">Court Filing</div>
+                  <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Legal transcript paper</div>
+                </button>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <label style="display: block; color: #94a3b8; font-size: 10.5px; margin-bottom: 4px;">Publisher Header Text</label>
+                <input type="text" id="doc-input-header" value="THE GLOBAL FINANCIAL GAZETTE" style="width: 100%; padding: 7px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #f1f5f9; font-family: 'Cinzel', serif; font-size: 11px;" />
+              </div>
+              <div>
+                <label style="display: block; color: #94a3b8; font-size: 10.5px; margin-bottom: 4px;">Headline Title</label>
+                <textarea id="doc-input-headline" rows="2" style="width: 100%; padding: 7px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #f1f5f9; font-size: 11.5px; font-weight: 700; resize: vertical;">Uncovered Internal Files Reveal $4.2B Secret Market Algorithm Shift</textarea>
+              </div>
+              <div>
+                <label style="display: block; color: #94a3b8; font-size: 10.5px; margin-bottom: 4px;">Dateline / Subhead</label>
+                <input type="text" id="doc-input-dateline" value="NEW YORK — SPECIAL INVESTIGATION REPORT — OCT 8, 2026" style="width: 100%; padding: 7px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #cbd5e1; font-family: monospace; font-size: 10px;" />
+              </div>
+              <div>
+                <label style="display: block; color: #94a3b8; font-size: 10.5px; margin-bottom: 4px;">Main Key Excerpt / Paragraph</label>
+                <textarea id="doc-input-body" rows="4" style="width: 100%; padding: 7px; background: #131826; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e2e8f0; font-size: 11px; resize: vertical;">According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of the structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: 3D Camera & Motion Flyover -->
+          <div id="doc-panel-cam" style="display: none; flex-direction: column; gap: 14px; font-size: 11.5px;">
+            <label style="display: block; font-size: 10px; font-weight: 700; color: #c084fc; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;">Camera Perspective & Glide</label>
+            
+            <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Tilt Angle (Pitch / X)</span>
+                  <span id="doc-val-pitch" style="color: #a855f7; font-weight: 700;">45°</span>
+                </div>
+                <input type="range" id="doc-range-pitch" min="0" max="75" value="45" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Rotational Glide (Yaw / Y)</span>
+                  <span id="doc-val-yaw" style="color: #a855f7; font-weight: 700;">-20°</span>
+                </div>
+                <input type="range" id="doc-range-yaw" min="-60" max="60" value="-20" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Roll / Horizon Tilt (Z)</span>
+                  <span id="doc-val-roll" style="color: #a855f7; font-weight: 700;">8°</span>
+                </div>
+                <input type="range" id="doc-range-roll" min="-30" max="30" value="8" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Camera Zoom Distance</span>
+                  <span id="doc-val-dist" style="color: #38bdf8; font-weight: 700;">55</span>
+                </div>
+                <input type="range" id="doc-range-dist" min="20" max="110" value="55" style="width: 100%; accent-color: #38bdf8;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">3D Parallax Depth</span>
+                  <span id="doc-val-parallax" style="color: #34d399; font-weight: 700;">1.5x</span>
+                </div>
+                <input type="range" id="doc-range-parallax" min="0" max="3" step="0.1" value="1.5" style="width: 100%; accent-color: #34d399;" />
+              </div>
+            </div>
+
+            <!-- Trajectory presets -->
+            <div>
+              <label style="display: block; font-size: 10px; font-weight: 700; color: #c084fc; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px;">Camera Trajectory Presets</label>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <button type="button" class="btn-doc-traj" data-traj="slowSweep" style="padding: 7px 10px; border-radius: 6px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #e2e8f0; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 11px;">
+                  <span>Low-Angle Diagonal Sweep</span>
+                  <span style="color: #a855f7; font-family: monospace; font-size: 10px;">Jani Classic</span>
+                </button>
+                <button type="button" class="btn-doc-traj" data-traj="macroZoom" style="padding: 7px 10px; border-radius: 6px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #e2e8f0; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 11px;">
+                  <span>Headline Macro Push-In</span>
+                  <span style="color: #34d399; font-family: monospace; font-size: 10px;">Vox Style</span>
+                </button>
+                <button type="button" class="btn-doc-traj" data-traj="isometricSlide" style="padding: 7px 10px; border-radius: 6px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #e2e8f0; text-align: left; cursor: pointer; display: flex; justify-content: space-between; font-size: 11px;">
+                  <span>Isometric Horizontal Glide</span>
+                  <span style="color: #facc15; font-family: monospace; font-size: 10px;">Smooth Drift</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: James Jani FX (Highlights, Redactions, Pop-Outs) -->
+          <div id="doc-panel-fx" style="display: none; flex-direction: column; gap: 14px; font-size: 11.5px;">
+            <!-- Highlighter FX -->
+            <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="color: #facc15; font-weight: 700; font-size: 11.5px;">🖍 Text Highlight Overlay</label>
+                <input type="checkbox" id="doc-chk-highlight" checked style="accent-color: #a855f7;" />
+              </div>
+              <div>
+                <label style="display: block; color: #94a3b8; font-size: 10.5px; margin-bottom: 4px;">Marker Color</label>
+                <div style="display: flex; gap: 6px;">
+                  <span class="doc-hl-color-btn active" data-color="#facc15" style="width: 20px; height: 20px; border-radius: 50%; background: #facc15; cursor: pointer; border: 2px solid #fff;"></span>
+                  <span class="doc-hl-color-btn" data-color="#38bdf8" style="width: 20px; height: 20px; border-radius: 50%; background: #38bdf8; cursor: pointer;"></span>
+                  <span class="doc-hl-color-btn" data-color="#4ade80" style="width: 20px; height: 20px; border-radius: 50%; background: #4ade80; cursor: pointer;"></span>
+                  <span class="doc-hl-color-btn" data-color="#f472b6" style="width: 20px; height: 20px; border-radius: 50%; background: #f472b6; cursor: pointer;"></span>
+                  <span class="doc-hl-color-btn" data-color="#c084fc" style="width: 20px; height: 20px; border-radius: 50%; background: #c084fc; cursor: pointer;"></span>
+                </div>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Marker Draw Progress</span>
+                  <span id="doc-val-hlprogress" style="color: #facc15; font-weight: 700;">100%</span>
+                </div>
+                <input type="range" id="doc-range-hlprogress" min="0" max="100" value="100" style="width: 100%; accent-color: #facc15;" />
+              </div>
+            </div>
+
+            <!-- 3D Layer Pop-Out (Z-Plane Elevation) -->
+            <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="color: #38bdf8; font-weight: 700; font-size: 11.5px;">❐ 3D Layer Pop-Out (Z-Plane)</label>
+                <input type="checkbox" id="doc-chk-popout" checked style="accent-color: #a855f7;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Elevation Height (Z)</span>
+                  <span id="doc-val-popelevation" style="color: #38bdf8; font-weight: 700;">8.0 px</span>
+                </div>
+                <input type="range" id="doc-range-popelevation" min="0" max="25" step="0.5" value="8" style="width: 100%; accent-color: #38bdf8;" />
+              </div>
+            </div>
+
+            <!-- Classified Redaction Strip -->
+            <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <label style="color: #ef4444; font-weight: 700; font-size: 11.5px;">⬛ Animated Redaction Strip</label>
+                <input type="checkbox" id="doc-chk-redaction" style="accent-color: #ef4444;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Censor Wipe Coverage</span>
+                  <span id="doc-val-redactwipe" style="color: #ef4444; font-weight: 700;">80%</span>
+                </div>
+                <input type="range" id="doc-range-redactwipe" min="0" max="100" value="80" style="width: 100%; accent-color: #ef4444;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 4: Paper Styles & Lighting -->
+          <div id="doc-panel-style" style="display: none; flex-direction: column; gap: 14px; font-size: 11.5px;">
+            <div>
+              <label style="display: block; font-size: 10px; font-weight: 700; color: #c084fc; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px;">Paper Texture & Vintage Tone</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <button type="button" class="btn-doc-paper active" data-paper="aged" style="padding: 9px; border-radius: 8px; background: rgba(168,85,247,0.18); border: 1px solid #a855f7; color: #fde047; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700;">Aged Yellow News</div>
+                  <div style="font-size: 9.5px; color: #94a3b8;">Vintage paper tone</div>
+                </button>
+                <button type="button" class="btn-doc-paper" data-paper="stark" style="padding: 9px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #f8fafc; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700;">Clean White Print</div>
+                  <div style="font-size: 9.5px; color: #94a3b8;">High contrast modern</div>
+                </button>
+                <button type="button" class="btn-doc-paper" data-paper="darkmode" style="padding: 9px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #c084fc; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700;">OLED Dark Mode</div>
+                  <div style="font-size: 9.5px; color: #94a3b8;">Tech web UI style</div>
+                </button>
+                <button type="button" class="btn-doc-paper" data-paper="manuscript" style="padding: 9px; border-radius: 8px; background: #131826; border: 1px solid rgba(255,255,255,0.08); color: #6ee7b7; text-align: left; cursor: pointer;">
+                  <div style="font-weight: 700;">Court Blueprint</div>
+                  <div style="font-size: 9.5px; color: #94a3b8;">Cyan grid legal pad</div>
+                </button>
+              </div>
+            </div>
+
+            <div style="background: rgba(18,19,28,0.7); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Vignette Spot Darkness</span>
+                  <span id="doc-val-vignette" style="color: #a855f7; font-weight: 700;">65%</span>
+                </div>
+                <input type="range" id="doc-range-vignette" min="0" max="100" value="65" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px;">
+                  <span style="color: #94a3b8;">Depth Blur Simulation</span>
+                  <span id="doc-val-dofblur" style="color: #a855f7; font-weight: 700;">1.2px</span>
+                </div>
+                <input type="range" id="doc-range-dofblur" min="0" max="8" step="0.2" value="1.2" style="width: 100%; accent-color: #a855f7;" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 3D Document Canvas Viewport -->
+        <div style="flex: 1; position: relative; background: #07090e; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          
+          <!-- Top Left Realtime Status HUD -->
+          <div style="position: absolute; top: 16px; left: 18px; z-index: 10; background: rgba(13, 16, 23, 0.85); backdrop-filter: blur(12px); padding: 8px 14px; border-radius: 9px; border: 1px solid rgba(168,85,247,0.35); font-family: 'JetBrains Mono', monospace; font-size: 11px; display: flex; align-items: center; gap: 8px;">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: #34d399; animation: pulse 1.5s infinite;"></span>
+            <span style="color: #e2e8f0; font-weight: 700;">REALTIME 3D DOCUMENT SHADER</span>
+            <span style="color: #64748b;">|</span>
+            <span style="color: #a855f7;">60 FPS</span>
+          </div>
+
+          <!-- Quick Angle Snap Buttons (Top Right) -->
+          <div style="position: absolute; top: 16px; right: 18px; z-index: 10; display: flex; gap: 6px; background: rgba(13, 16, 23, 0.85); backdrop-filter: blur(12px); padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+            <button type="button" class="btn-doc-snap-view" data-snap="top" style="padding: 4px 10px; font-size: 10.5px; border-radius: 5px; border: none; background: #1e293b; color: #cbd5e1; cursor: pointer;">Top 2D</button>
+            <button type="button" class="btn-doc-snap-view" data-snap="iso" style="padding: 4px 10px; font-size: 10.5px; border-radius: 5px; border: none; background: #1e293b; color: #cbd5e1; cursor: pointer;">3D Iso</button>
+            <button type="button" class="btn-doc-snap-view active" data-snap="jani" style="padding: 4px 10px; font-size: 10.5px; border-radius: 5px; border: none; background: #9333ea; color: #ffffff; font-weight: 700; cursor: pointer;">Jani Angle</button>
+          </div>
+
+          <!-- Three.js Canvas Container -->
+          <div id="doc-threejs-container" style="width: 100%; height: 100%; cursor: grab;"></div>
+
+          <!-- Floating Timeline Scrubber Bar -->
+          <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 14px; background: rgba(13, 16, 23, 0.94); backdrop-filter: blur(14px); padding: 8px 22px; border-radius: 9999px; border: 1px solid rgba(168,85,247,0.35); box-shadow: 0 12px 40px rgba(0,0,0,0.9);">
+            <button type="button" id="btn-doc-toggle-play" style="width: 36px; height: 36px; border-radius: 50%; background: #9333ea; color: #fff; border: none; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(168,85,247,0.5);">
+              ❚❚
+            </button>
+            <button type="button" id="btn-doc-reset-play" style="background: transparent; border: none; color: #94a3b8; font-size: 14px; cursor: pointer; padding: 4px;" title="Reset Timeline">
+              ↺
+            </button>
+            <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.15);"></div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 10px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">SCRUB:</span>
+              <input type="range" id="doc-timeline-slider" min="0" max="100" value="0" style="width: 140px; accent-color: #a855f7; cursor: pointer;" />
+              <span id="doc-time-display" style="font-size: 11px; font-weight: 700; color: #c084fc; font-family: 'JetBrains Mono', monospace;">00:00.00</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Animated Chart Creator / Template Builder Modal -->
   <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
     <div class="vector-modal-box" style="max-width: 680px;">
@@ -4013,6 +4331,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=275"></script>
+  <script src="js/app.js?v=276"></script>
 </body>
 </html>

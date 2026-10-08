@@ -19914,6 +19914,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['3D Titles', 'Camera Pullback', 'James Jani'],
     defaultImage: '/spatial_3d_suite_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'document-3d-fx-engine',
+    title: 'James Jani 3D Document & Paper FX',
+    category: '3D Spatial',
+    badge: 'Documentary FX',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(147, 51, 234, 0.7), rgba(234, 179, 8, 0.35), rgba(7, 9, 14, 0.95))',
+    description: 'Cinematic 3D camera flyover of investigative newspapers with animated highlighter wipes, classified redaction leaks, and 3D headline pop-outs.',
+    tags: ['Document FX', 'Highlighter', 'James Jani'],
+    defaultImage: '/document_3d_fx_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20319,6 +20332,57 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'document-3d-fx-engine') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; perspective: 700px; display: flex; align-items: center; justify-content: center;">
+          <!-- 3D Perspective Paper Sheet -->
+          <div id="fx-doc-paper-${tplId}" style="position: relative; width: 78%; height: 82%; background: #fcfbf7; border-radius: 6px; box-shadow: 0 20px 45px rgba(0,0,0,0.95); padding: 12px; border: 1px solid #e2d9c8; transform-origin: center center; transform-style: preserve-3d; transition: transform 0.05s ease-out;">
+            <div style="height: 2px; background: #1c1917; margin-bottom: 4px;"></div>
+            <div style="font-family: 'Cinzel', serif; font-size: 10.5px; font-weight: 900; color: #1c1917; text-align: center; letter-spacing: 1.5px;">THE FINANCIAL GAZETTE</div>
+            <div style="height: 1px; background: #1c1917; margin-top: 4px; margin-bottom: 6px;"></div>
+            
+            <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 11px; font-weight: 900; color: #0f172a; line-height: 1.25; margin-bottom: 8px;">
+              Uncovered Files Reveal $4.2B Secret Algorithm Shift
+            </div>
+
+            <!-- Vox Marker Highlighter Strip -->
+            <div style="position: relative; margin-bottom: 6px;">
+              <div id="fx-doc-highlighter-${tplId}" style="position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: rgba(250, 204, 21, 0.9); border-radius: 3px; z-index: 1;"></div>
+              <span style="position: relative; z-index: 2; font-family: Georgia, serif; font-size: 8.5px; font-weight: 700; color: #1e1b4b; display: block; padding: 2px 4px;">
+                "Full structural vulnerabilities known since Q3."
+              </span>
+            </div>
+
+            <!-- Classified Redaction Censor Bar -->
+            <div id="fx-doc-redact-${tplId}" style="width: 65%; height: 10px; background: #050505; border-radius: 2px; margin-bottom: 6px;"></div>
+
+            <!-- Paragraph Mockup Lines -->
+            <div style="display: flex; gap: 8px;">
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 100%;"></div>
+                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 90%;"></div>
+                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 95%;"></div>
+              </div>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 100%;"></div>
+                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 85%;"></div>
+                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 92%;"></div>
+              </div>
+            </div>
+
+            <!-- 3D Pop-Out Headline Badge Card -->
+            <div id="fx-doc-popout-${tplId}" style="position: absolute; right: -8px; bottom: 12px; width: 55%; background: rgba(15,23,42,0.95); border: 1.5px solid #a855f7; border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); transform: translateZ(25px);">
+              <div style="font-size: 6px; font-weight: 800; color: #c084fc; font-family: monospace;">● 3D POP-OUT LAYER</div>
+              <div style="font-size: 8px; font-weight: 900; color: #ffffff; font-family: 'Cinzel', serif; margin-top: 2px;">THE ARCHITECT</div>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #7e22ce, #a855f7); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
+            📰 3D DOCUMENT FX
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20475,6 +20539,41 @@ function startTemplateHoverVideo(cardEl, tpl) {
         const c2Scale = 1.12 - zoomCycle * 0.28;
         const c2X = zoomCycle * 14;
         card2.style.transform = `translateX(${c2X}px) translateY(${-Math.sin(t * 1.8) * 6}px) scale(${c2Scale}) rotateY(${-22 + camYaw * 0.5}deg) rotateX(-6deg)`;
+      }
+    } else if (tplId === 'document-3d-fx-engine') {
+      // 3D paper camera flyover: dynamic tilt, highlighter reveal, and pop-out headline elevation
+      const flyCycle = (Math.sin(t * 1.2 - Math.PI/2) + 1) / 2; // 0 to 1
+      const rotX = 18 + Math.cos(t * 1.3) * 12;
+      const rotY = -14 + Math.sin(t * 1.1) * 18;
+      const rotZ = -4 + Math.sin(t * 0.8) * 5;
+      const paperScale = 1.05 + flyCycle * 0.12;
+
+      const paper = fxContainer?.querySelector(`#fx-doc-paper-${tplId}`);
+      const hl = fxContainer?.querySelector(`#fx-doc-highlighter-${tplId}`);
+      const popout = fxContainer?.querySelector(`#fx-doc-popout-${tplId}`);
+      const redact = fxContainer?.querySelector(`#fx-doc-redact-${tplId}`);
+
+      if (paper) {
+        paper.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg) scale(${paperScale})`;
+      }
+
+      // Highlighter progressive wipe sweep (0% to 100%)
+      if (hl) {
+        const hlWidth = Math.min(100, Math.max(0, ((t * 1.5) % 3.0) * 45));
+        hl.style.width = `${hlWidth}%`;
+      }
+
+      // Pop-out card lifts up off the sheet on Z-axis with 3D shadow
+      if (popout) {
+        const liftZ = 18 + Math.sin(t * 2.2) * 10;
+        popout.style.transform = `translateZ(${liftZ}px) translateY(${-liftZ * 0.3}px)`;
+        popout.style.boxShadow = `0 ${liftZ * 1.2}px ${liftZ * 1.6}px rgba(0,0,0,0.95)`;
+      }
+
+      // Redaction bar periodic wipe
+      if (redact) {
+        const redactW = 40 + Math.abs(Math.sin(t * 1.8)) * 50;
+        redact.style.width = `${redactW}%`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -20818,6 +20917,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'spatial-3d-motion-suite') {
     // Launch full Three.js 3D Spatial Motion Suite Studio
     openSpatial3DMotionSuite();
+    return;
+  } else if (templateId === 'document-3d-fx-engine') {
+    // Launch full Three.js James Jani 3D Document FX Studio
+    openDocument3DFXSuite();
     return;
   }
 
@@ -21820,6 +21923,817 @@ function bindSpatial3DModalControls() {
   });
 }
 
+/* =========================================================
+   JAMES JANI 3D DOCUMENT FX ENGINE: THREE.JS FULL RUNTIME CONTROLLER
+   ========================================================= */
+let document3DFXState = {
+  scene: null,
+  camera: null,
+  renderer: null,
+  documentMesh: null,
+  popoutMesh: null,
+  docCanvas: null,
+  docCtx: null,
+  textureMap: null,
+  animId: null,
+  isPlaying: false,
+  timelineProgress: 0,
+  animTween: null,
+  header: "THE GLOBAL FINANCIAL GAZETTE",
+  headline: "Uncovered Internal Files Reveal $4.2B Secret Market Algorithm Shift",
+  dateline: "NEW YORK — SPECIAL INVESTIGATION REPORT — OCT 8, 2026",
+  body: "According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of the structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.",
+  paperStyle: 'aged',
+  highlightColor: '#facc15',
+  enableHighlight: true,
+  hlProgress: 1.0,
+  enablePopout: true,
+  popElevation: 8.0,
+  enableRedaction: false,
+  redactWipe: 0.8,
+  vignetteIntensity: 0.65,
+  dofBlur: 1.2,
+  pitch: 45,
+  yaw: -20,
+  roll: 8,
+  dist: 55,
+  parallax: 1.5,
+  activeArchetype: 'wsj'
+};
+
+function initDocFXCanvas() {
+  if (document3DFXState.docCanvas) return;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1536;
+  canvas.height = 2048;
+  document3DFXState.docCanvas = canvas;
+  document3DFXState.docCtx = canvas.getContext('2d');
+}
+
+function renderDocFXTexture() {
+  const ctx = document3DFXState.docCtx;
+  const canvas = document3DFXState.docCanvas;
+  if (!ctx || !canvas) return;
+
+  const w = canvas.width;
+  const h = canvas.height;
+
+  // Paper styling
+  let bgColor = '#f7f4ea';
+  let textColor = '#1a1a1a';
+  let accentColor = '#851414';
+  let fontMain = '"Merriweather", Georgia, serif';
+  let fontHead = '"Cinzel", "Playfair Display", serif';
+
+  if (document3DFXState.paperStyle === 'stark') {
+    bgColor = '#ffffff';
+    textColor = '#0f172a';
+    accentColor = '#2563eb';
+  } else if (document3DFXState.paperStyle === 'darkmode') {
+    bgColor = '#0f172a';
+    textColor = '#f8fafc';
+    accentColor = '#a855f7';
+    fontMain = '"Inter", sans-serif';
+    fontHead = '"Inter", sans-serif';
+  } else if (document3DFXState.paperStyle === 'manuscript') {
+    bgColor = '#ecfeff';
+    textColor = '#083344';
+    accentColor = '#0891b2';
+    fontMain = '"Courier Prime", "Courier New", monospace';
+  }
+
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, w, h);
+
+  // Noise grain
+  ctx.fillStyle = 'rgba(0,0,0,0.02)';
+  for (let i = 0; i < 7000; i++) {
+    const rx = Math.random() * w;
+    const ry = Math.random() * h;
+    ctx.fillRect(rx, ry, 2, 2);
+  }
+
+  const margin = 110;
+  let curY = margin;
+
+  // Top header rule
+  ctx.strokeStyle = textColor;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 45;
+
+  // Publication title
+  ctx.fillStyle = accentColor;
+  ctx.font = `700 36px ${fontHead}`;
+  ctx.textAlign = 'center';
+  ctx.fillText((document3DFXState.header || '').toUpperCase(), w / 2, curY);
+
+  curY += 25;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 40;
+
+  // Dateline
+  ctx.fillStyle = textColor;
+  ctx.font = `600 20px monospace`;
+  ctx.textAlign = 'left';
+  ctx.fillText(document3DFXState.dateline || '', margin, curY);
+
+  curY += 35;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 70;
+
+  // Main Headline
+  ctx.fillStyle = textColor;
+  ctx.font = `bold 64px ${fontHead}`;
+  ctx.textAlign = 'left';
+
+  const headlineLines = wrapSpatialCanvasTextLines(ctx, document3DFXState.headline || '', w - (margin * 2));
+  headlineLines.forEach(line => {
+    ctx.fillText(line, margin, curY);
+    curY += 78;
+  });
+
+  curY += 30;
+  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 65;
+
+  // Two Column Body Layout
+  const colGap = 60;
+  const colWidth = (w - (margin * 2) - colGap) / 2;
+
+  ctx.font = `24px ${fontMain}`;
+  ctx.fillStyle = textColor;
+
+  const bodyLines = wrapSpatialCanvasTextLines(ctx, document3DFXState.body || '', colWidth);
+  let colY = curY;
+  let highlightBox = { x: margin - 10, y: colY - 26, width: colWidth + 20, height: 0 };
+
+  bodyLines.forEach(line => {
+    ctx.fillText(line, margin, colY);
+    colY += 38;
+  });
+  highlightBox.height = colY - highlightBox.y;
+
+  // Second column
+  let col2Y = curY;
+  const dummyColText = "Financial regulators declined to comment on pending proceedings. Meanwhile, trading volumes across major index funds surged by 34% within minutes of the market opening, forcing several high-frequency liquidity providers to suspend automated order routing temporarily.";
+  const col2Lines = wrapSpatialCanvasTextLines(ctx, dummyColText, colWidth);
+  col2Lines.forEach(line => {
+    ctx.fillText(line, margin + colWidth + colGap, col2Y);
+    col2Y += 38;
+  });
+
+  // Highlight Overlay
+  if (document3DFXState.enableHighlight && document3DFXState.hlProgress > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = document3DFXState.paperStyle === 'darkmode' ? 'screen' : 'multiply';
+    ctx.fillStyle = document3DFXState.highlightColor;
+    const animW = highlightBox.width * document3DFXState.hlProgress;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(highlightBox.x, highlightBox.y, animW, highlightBox.height, 6);
+    } else {
+      ctx.rect(highlightBox.x, highlightBox.y, animW, highlightBox.height);
+    }
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Redaction strip
+  if (document3DFXState.enableRedaction) {
+    ctx.save();
+    ctx.fillStyle = '#050505';
+    const redactionY = colY + 30;
+    const redactW = colWidth * document3DFXState.redactWipe;
+    ctx.fillRect(margin, redactionY, redactW, 32);
+    ctx.restore();
+  }
+
+  if (document3DFXState.textureMap) {
+    document3DFXState.textureMap.needsUpdate = true;
+  }
+}
+
+function wrapSpatialCanvasTextLines(ctx, text, maxWidth) {
+  const words = (text || '').split(' ');
+  const lines = [];
+  let currentLine = words[0] || '';
+
+  for (let i = 1; i < words.length; i++) {
+    const word = words[i];
+    const width = ctx.measureText(currentLine + " " + word).width;
+    if (width < maxWidth) {
+      currentLine += " " + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
+function updateDocFXCameraTransform() {
+  const { camera, documentMesh, pitch, yaw, roll, dist, parallax } = document3DFXState;
+  if (!camera || !documentMesh) return;
+
+  const pitchRad = (pitch * Math.PI) / 180;
+  const yawRad = (yaw * Math.PI) / 180;
+  const rollRad = (roll * Math.PI) / 180;
+
+  const x = dist * Math.sin(yawRad) * Math.cos(pitchRad);
+  const y = -dist * Math.cos(yawRad) * Math.sin(pitchRad);
+  const z = dist * Math.cos(pitchRad);
+
+  camera.position.set(x, y, z);
+  camera.rotation.z = rollRad;
+  camera.lookAt(0, 0, 0);
+
+  documentMesh.rotation.x = (pitch * 0.005) * parallax;
+  documentMesh.rotation.y = (yaw * 0.005) * parallax;
+}
+
+function initDocument3DFXEngine() {
+  const container = document.getElementById('doc-threejs-container');
+  if (!container || typeof THREE === 'undefined') return;
+
+  initDocFXCanvas();
+
+  if (document3DFXState.renderer) {
+    const w = container.clientWidth || 800;
+    const h = container.clientHeight || 500;
+    document3DFXState.camera.aspect = w / h;
+    document3DFXState.camera.updateProjectionMatrix();
+    document3DFXState.renderer.setSize(w, h);
+    renderDocFXTexture();
+    return;
+  }
+
+  const w = container.clientWidth || 800;
+  const h = container.clientHeight || 500;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+  camera.position.set(0, -35, 60);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+  scene.add(ambientLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
+  dirLight.position.set(30, 40, 70);
+  dirLight.castShadow = true;
+  scene.add(dirLight);
+
+  const fillLight = new THREE.DirectionalLight(0xc084fc, 0.4);
+  fillLight.position.set(-30, -20, 40);
+  scene.add(fillLight);
+
+  // Texture & Document Plane
+  const textureMap = new THREE.CanvasTexture(document3DFXState.docCanvas);
+  textureMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  document3DFXState.textureMap = textureMap;
+
+  const planeGeo = new THREE.PlaneGeometry(36, 48, 32, 32);
+  const planeMat = new THREE.MeshStandardMaterial({
+    map: textureMap,
+    roughness: 0.4,
+    metalness: 0.05,
+    side: THREE.DoubleSide
+  });
+
+  const documentMesh = new THREE.Mesh(planeGeo, planeMat);
+  documentMesh.castShadow = true;
+  documentMesh.receiveShadow = true;
+  scene.add(documentMesh);
+
+  // Floating Pop-out Headline Plane
+  const popGeo = new THREE.PlaneGeometry(32, 10);
+  const popMat = new THREE.MeshStandardMaterial({
+    map: textureMap,
+    roughness: 0.3,
+    transparent: true,
+    opacity: 0.98
+  });
+  const popoutMesh = new THREE.Mesh(popGeo, popMat);
+  popoutMesh.position.set(0, 8, document3DFXState.popElevation * 0.4);
+  popoutMesh.castShadow = true;
+  documentMesh.add(popoutMesh);
+
+  document3DFXState.scene = scene;
+  document3DFXState.camera = camera;
+  document3DFXState.renderer = renderer;
+  document3DFXState.documentMesh = documentMesh;
+  document3DFXState.popoutMesh = popoutMesh;
+
+  renderDocFXTexture();
+  updateDocFXCameraTransform();
+
+  function animateDocLoop() {
+    if (document3DFXState.renderer && document3DFXState.scene && document3DFXState.camera) {
+      document3DFXState.renderer.render(document3DFXState.scene, document3DFXState.camera);
+    }
+    document3DFXState.animId = requestAnimationFrame(animateDocLoop);
+  }
+  document3DFXState.animId = requestAnimationFrame(animateDocLoop);
+}
+
+function openDocument3DFXSuite() {
+  const modal = document.getElementById('modal-document-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    initDocument3DFXEngine();
+  }, 100);
+}
+
+function closeDocument3DFXSuite() {
+  const modal = document.getElementById('modal-document-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  if (document3DFXState.animId) {
+    cancelAnimationFrame(document3DFXState.animId);
+    document3DFXState.animId = null;
+  }
+}
+
+function triggerDocFXPresetAnimation(presetType) {
+  if (typeof gsap === 'undefined') return;
+
+  if (presetType === 'janiFlyby') {
+    document3DFXState.hlProgress = 0;
+    document3DFXState.enableHighlight = true;
+    document3DFXState.enablePopout = true;
+    renderDocFXTexture();
+
+    gsap.to(document3DFXState, {
+      pitch: 52,
+      yaw: 25,
+      roll: -12,
+      dist: 45,
+      duration: 3.5,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        syncDocFXInputs();
+        updateDocFXCameraTransform();
+      }
+    });
+
+    gsap.to(document3DFXState, {
+      hlProgress: 1.0,
+      duration: 2.2,
+      delay: 0.8,
+      ease: "power1.out",
+      onUpdate: () => {
+        const slider = document.getElementById('doc-range-hlprogress');
+        if (slider) slider.value = document3DFXState.hlProgress * 100;
+        const val = document.getElementById('doc-val-hlprogress');
+        if (val) val.textContent = `${Math.round(document3DFXState.hlProgress * 100)}%`;
+        renderDocFXTexture();
+      }
+    });
+
+    if (document3DFXState.popoutMesh) {
+      gsap.to(document3DFXState.popoutMesh.position, {
+        z: 4.5,
+        duration: 2.0,
+        delay: 1.2,
+        ease: "back.out(1.7)"
+      });
+    }
+
+  } else if (presetType === 'voxHighlight') {
+    document3DFXState.pitch = 30;
+    document3DFXState.yaw = 0;
+    document3DFXState.roll = 0;
+    document3DFXState.dist = 50;
+    syncDocFXInputs();
+    updateDocFXCameraTransform();
+
+    document3DFXState.hlProgress = 0;
+    renderDocFXTexture();
+
+    gsap.to(document3DFXState, {
+      hlProgress: 1.0,
+      duration: 1.8,
+      ease: "power2.out",
+      onUpdate: () => {
+        const slider = document.getElementById('doc-range-hlprogress');
+        if (slider) slider.value = document3DFXState.hlProgress * 100;
+        const val = document.getElementById('doc-val-hlprogress');
+        if (val) val.textContent = `${Math.round(document3DFXState.hlProgress * 100)}%`;
+        renderDocFXTexture();
+      }
+    });
+
+  } else if (presetType === 'redactReveal') {
+    loadDocFXArchetype('cia');
+    document3DFXState.enableRedaction = true;
+    document3DFXState.redactWipe = 0;
+    const chk = document.getElementById('doc-chk-redaction');
+    if (chk) chk.checked = true;
+    renderDocFXTexture();
+
+    gsap.to(document3DFXState, {
+      redactWipe: 1.0,
+      duration: 2.5,
+      ease: "steps(12)",
+      onUpdate: () => {
+        const slider = document.getElementById('doc-range-redactwipe');
+        if (slider) slider.value = document3DFXState.redactWipe * 100;
+        const val = document.getElementById('doc-val-redactwipe');
+        if (val) val.textContent = `${Math.round(document3DFXState.redactWipe * 100)}%`;
+        renderDocFXTexture();
+      }
+    });
+
+  } else if (presetType === 'headlinePop') {
+    if (document3DFXState.popoutMesh) {
+      document3DFXState.popoutMesh.position.z = 0;
+      gsap.to(document3DFXState.popoutMesh.position, {
+        z: 6.0,
+        duration: 1.5,
+        ease: "elastic.out(1, 0.5)"
+      });
+    }
+  }
+}
+
+function syncDocFXInputs() {
+  const pInput = document.getElementById('doc-range-pitch');
+  const yInput = document.getElementById('doc-range-yaw');
+  const rInput = document.getElementById('doc-range-roll');
+  const dInput = document.getElementById('doc-range-dist');
+  const parInput = document.getElementById('doc-range-parallax');
+
+  if (pInput) pInput.value = Math.round(document3DFXState.pitch);
+  if (yInput) yInput.value = Math.round(document3DFXState.yaw);
+  if (rInput) rInput.value = Math.round(document3DFXState.roll);
+  if (dInput) dInput.value = Math.round(document3DFXState.dist);
+  if (parInput) parInput.value = document3DFXState.parallax;
+
+  const pVal = document.getElementById('doc-val-pitch');
+  const yVal = document.getElementById('doc-val-yaw');
+  const rVal = document.getElementById('doc-val-roll');
+  const dVal = document.getElementById('doc-val-dist');
+  const parVal = document.getElementById('doc-val-parallax');
+
+  if (pVal) pVal.textContent = `${Math.round(document3DFXState.pitch)}°`;
+  if (yVal) yVal.textContent = `${Math.round(document3DFXState.yaw)}°`;
+  if (rVal) rVal.textContent = `${Math.round(document3DFXState.roll)}°`;
+  if (dVal) dVal.textContent = Math.round(document3DFXState.dist);
+  if (parVal) parVal.textContent = `${document3DFXState.parallax.toFixed(1)}x`;
+}
+
+function loadDocFXArchetype(archKey) {
+  document3DFXState.activeArchetype = archKey;
+
+  document.querySelectorAll('.btn-doc-archetype').forEach(btn => {
+    const isAct = btn.dataset.arch === archKey;
+    btn.style.background = isAct ? 'rgba(168,85,247,0.18)' : '#131826';
+    btn.style.borderColor = isAct ? '#a855f7' : 'rgba(255,255,255,0.08)';
+  });
+
+  const hInput = document.getElementById('doc-input-header');
+  const hlInput = document.getElementById('doc-input-headline');
+  const dateInput = document.getElementById('doc-input-dateline');
+  const bodyInput = document.getElementById('doc-input-body');
+
+  if (archKey === 'wsj') {
+    document3DFXState.header = "THE WALL STREET CHRONICLE";
+    document3DFXState.headline = "Federal Oversight Panel Launches Inquiry Into Autonomous Trading Signals";
+    document3DFXState.dateline = "WASHINGTON — FINANCIAL REGULATION DESK — OCT 8, 2026";
+    document3DFXState.body = "Subcommittee members requested unredacted internal communications regarding algorithmic risk thresholds following an unusual concentration of market orders executed during non-standard hours.";
+    document3DFXState.paperStyle = 'aged';
+  } else if (archKey === 'cia') {
+    document3DFXState.header = "TOP SECRET // CLASSIFIED INTELLIGENCE BRIEF";
+    document3DFXState.headline = "SPECIAL AFFIDAVIT CONCERNING PROJECT AEGIS MEMORANDA";
+    document3DFXState.dateline = "LOCATION UNDISCLOSED — LEVEL 5 CLEARANCE REQUIRED";
+    document3DFXState.body = "Witness testimony indicates that critical sensor logs were scrubbed prior to official archival submission. Surrounding personnel were instructed not to discuss anomalous telemetric readings recorded on June 14.";
+    document3DFXState.paperStyle = 'stark';
+    document3DFXState.enableRedaction = true;
+    const rChk = document.getElementById('doc-chk-redaction');
+    if (rChk) rChk.checked = true;
+  } else if (archKey === 'tech') {
+    document3DFXState.header = "TECHCRUNCH DIGEST";
+    document3DFXState.headline = "How Neural Renderer Engines Transformed Documentary Motion Graphics";
+    document3DFXState.dateline = "SAN FRANCISCO — MEDIA TECH — 2026 EDITION";
+    document3DFXState.body = "By projecting flat high-resolution document canvases onto real-time 3D web camera planes, video creators can synthesize cinematic Vox-style article flyovers directly inside web browsers.";
+    document3DFXState.paperStyle = 'darkmode';
+  } else if (archKey === 'legal') {
+    document3DFXState.header = "IN THE UNITED STATES DISTRICT COURT";
+    document3DFXState.headline = "PLAINTIFF'S MOTION FOR EMERGENCY INJUNCTIVE RELIEF";
+    document3DFXState.dateline = "CASE NO. 26-CV-8912 — EVIDENCE EXHIBIT B";
+    document3DFXState.body = "COMES NOW the Plaintiff, by and through counsel, and hereby submits this certified declaration setting forth irreparable harm arising from unauthorized intellectual property distribution.";
+    document3DFXState.paperStyle = 'manuscript';
+  }
+
+  if (hInput) hInput.value = document3DFXState.header;
+  if (hlInput) hlInput.value = document3DFXState.headline;
+  if (dateInput) dateInput.value = document3DFXState.dateline;
+  if (bodyInput) bodyInput.value = document3DFXState.body;
+
+  renderDocFXTexture();
+}
+
+function bindDocument3DFXModalControls() {
+  document.getElementById('btn-close-document-3d-suite')?.addEventListener('click', closeDocument3DFXSuite);
+
+  // Inspector Tabs (Content, Camera, FX, Style)
+  const tabBtnContent = document.getElementById('tab-doc-btn-content');
+  const tabBtnCam = document.getElementById('tab-doc-btn-cam');
+  const tabBtnFx = document.getElementById('tab-doc-btn-fx');
+  const tabBtnStyle = document.getElementById('tab-doc-btn-style');
+
+  const panelContent = document.getElementById('doc-panel-content');
+  const panelCam = document.getElementById('doc-panel-cam');
+  const panelFx = document.getElementById('doc-panel-fx');
+  const panelStyle = document.getElementById('doc-panel-style');
+
+  function setDocTab(activeBtn, activePanel) {
+    [tabBtnContent, tabBtnCam, tabBtnFx, tabBtnStyle].forEach(b => {
+      if (!b) return;
+      b.style.background = 'transparent';
+      b.style.color = '#94a3b8';
+    });
+    [panelContent, panelCam, panelFx, panelStyle].forEach(p => {
+      if (p) p.style.display = 'none';
+    });
+    if (activeBtn) {
+      activeBtn.style.background = 'rgba(168,85,247,0.25)';
+      activeBtn.style.color = '#c084fc';
+    }
+    if (activePanel) activePanel.style.display = 'flex';
+  }
+
+  tabBtnContent?.addEventListener('click', () => setDocTab(tabBtnContent, panelContent));
+  tabBtnCam?.addEventListener('click', () => setDocTab(tabBtnCam, panelCam));
+  tabBtnFx?.addEventListener('click', () => setDocTab(tabBtnFx, panelFx));
+  tabBtnStyle?.addEventListener('click', () => setDocTab(tabBtnStyle, panelStyle));
+
+  // Archetypes
+  document.querySelectorAll('.btn-doc-archetype').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const arch = e.currentTarget.dataset.arch;
+      loadDocFXArchetype(arch);
+    });
+  });
+
+  // Text Inputs
+  document.getElementById('doc-input-header')?.addEventListener('input', (e) => {
+    document3DFXState.header = e.target.value;
+    renderDocFXTexture();
+  });
+  document.getElementById('doc-input-headline')?.addEventListener('input', (e) => {
+    document3DFXState.headline = e.target.value;
+    renderDocFXTexture();
+  });
+  document.getElementById('doc-input-dateline')?.addEventListener('input', (e) => {
+    document3DFXState.dateline = e.target.value;
+    renderDocFXTexture();
+  });
+  document.getElementById('doc-input-body')?.addEventListener('input', (e) => {
+    document3DFXState.body = e.target.value;
+    renderDocFXTexture();
+  });
+
+  // Camera Sliders
+  document.getElementById('doc-range-pitch')?.addEventListener('input', (e) => {
+    document3DFXState.pitch = parseFloat(e.target.value);
+    const lbl = document.getElementById('doc-val-pitch');
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.pitch)}°`;
+    updateDocFXCameraTransform();
+  });
+  document.getElementById('doc-range-yaw')?.addEventListener('input', (e) => {
+    document3DFXState.yaw = parseFloat(e.target.value);
+    const lbl = document.getElementById('doc-val-yaw');
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.yaw)}°`;
+    updateDocFXCameraTransform();
+  });
+  document.getElementById('doc-range-roll')?.addEventListener('input', (e) => {
+    document3DFXState.roll = parseFloat(e.target.value);
+    const lbl = document.getElementById('doc-val-roll');
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.roll)}°`;
+    updateDocFXCameraTransform();
+  });
+  document.getElementById('doc-range-dist')?.addEventListener('input', (e) => {
+    document3DFXState.dist = parseFloat(e.target.value);
+    const lbl = document.getElementById('doc-val-dist');
+    if (lbl) lbl.textContent = Math.round(document3DFXState.dist);
+    updateDocFXCameraTransform();
+  });
+  document.getElementById('doc-range-parallax')?.addEventListener('input', (e) => {
+    document3DFXState.parallax = parseFloat(e.target.value);
+    const lbl = document.getElementById('doc-val-parallax');
+    if (lbl) lbl.textContent = `${document3DFXState.parallax.toFixed(1)}x`;
+    updateDocFXCameraTransform();
+  });
+
+  // Camera Trajectory buttons
+  document.querySelectorAll('.btn-doc-traj').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const traj = e.currentTarget.dataset.traj;
+      if (typeof gsap === 'undefined') return;
+      if (traj === 'slowSweep') {
+        gsap.to(document3DFXState, { pitch: 50, yaw: -30, roll: 10, dist: 50, duration: 2, onUpdate: () => { syncDocFXInputs(); updateDocFXCameraTransform(); } });
+      } else if (traj === 'macroZoom') {
+        gsap.to(document3DFXState, { pitch: 15, yaw: 0, roll: 0, dist: 28, duration: 2, onUpdate: () => { syncDocFXInputs(); updateDocFXCameraTransform(); } });
+      } else if (traj === 'isometricSlide') {
+        gsap.to(document3DFXState, { pitch: 45, yaw: 45, roll: 0, dist: 60, duration: 2, onUpdate: () => { syncDocFXInputs(); updateDocFXCameraTransform(); } });
+      }
+    });
+  });
+
+  // Quick Angle Snap buttons (Top 2D, 3D Iso, Jani Angle)
+  document.querySelectorAll('.btn-doc-snap-view').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-doc-snap-view').forEach(b => {
+        b.style.background = '#1e293b';
+        b.style.color = '#cbd5e1';
+      });
+      e.currentTarget.style.background = '#9333ea';
+      e.currentTarget.style.color = '#ffffff';
+
+      const snap = e.currentTarget.dataset.snap;
+      if (typeof gsap === 'undefined') return;
+      if (snap === 'top') {
+        gsap.to(document3DFXState, { pitch: 0, yaw: 0, roll: 0, dist: 65, duration: 1, onUpdate: () => { syncDocFXInputs(); updateDocFXCameraTransform(); } });
+      } else if (snap === 'iso') {
+        gsap.to(document3DFXState, { pitch: 45, yaw: -35, roll: 0, dist: 60, duration: 1, onUpdate: () => { syncDocFXInputs(); updateDocFXCameraTransform(); } });
+      } else if (snap === 'jani') {
+        gsap.to(document3DFXState, { pitch: 52, yaw: 22, roll: -8, dist: 48, duration: 1, onUpdate: () => { syncDocFXInputs(); updateDocFXCameraTransform(); } });
+      }
+    });
+  });
+
+  // FX Controls: Highlight
+  document.getElementById('doc-chk-highlight')?.addEventListener('change', (e) => {
+    document3DFXState.enableHighlight = e.target.checked;
+    renderDocFXTexture();
+  });
+  document.getElementById('doc-range-hlprogress')?.addEventListener('input', (e) => {
+    document3DFXState.hlProgress = parseFloat(e.target.value) / 100;
+    const lbl = document.getElementById('doc-val-hlprogress');
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.hlProgress * 100)}%`;
+    renderDocFXTexture();
+  });
+  document.querySelectorAll('.doc-hl-color-btn').forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      document.querySelectorAll('.doc-hl-color-btn').forEach(d => d.style.border = 'none');
+      e.currentTarget.style.border = '2px solid #fff';
+      document3DFXState.highlightColor = e.currentTarget.dataset.color;
+      renderDocFXTexture();
+    });
+  });
+
+  // FX Controls: Pop-out
+  document.getElementById('doc-chk-popout')?.addEventListener('change', (e) => {
+    document3DFXState.enablePopout = e.target.checked;
+    if (document3DFXState.popoutMesh) {
+      document3DFXState.popoutMesh.visible = document3DFXState.enablePopout;
+    }
+  });
+  document.getElementById('doc-range-popelevation')?.addEventListener('input', (e) => {
+    document3DFXState.popElevation = parseFloat(e.target.value);
+    const lbl = document.getElementById('doc-val-popelevation');
+    if (lbl) lbl.textContent = `${document3DFXState.popElevation.toFixed(1)} px`;
+    if (document3DFXState.popoutMesh) {
+      document3DFXState.popoutMesh.position.z = document3DFXState.popElevation * 0.4;
+    }
+  });
+
+  // FX Controls: Redaction
+  document.getElementById('doc-chk-redaction')?.addEventListener('change', (e) => {
+    document3DFXState.enableRedaction = e.target.checked;
+    renderDocFXTexture();
+  });
+  document.getElementById('doc-range-redactwipe')?.addEventListener('input', (e) => {
+    document3DFXState.redactWipe = parseFloat(e.target.value) / 100;
+    const lbl = document.getElementById('doc-val-redactwipe');
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.redactWipe * 100)}%`;
+    renderDocFXTexture();
+  });
+
+  // Paper Style buttons
+  document.querySelectorAll('.btn-doc-paper').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-doc-paper').forEach(b => {
+        b.style.background = '#131826';
+        b.style.borderColor = 'rgba(255,255,255,0.08)';
+      });
+      e.currentTarget.style.background = 'rgba(168,85,247,0.18)';
+      e.currentTarget.style.borderColor = '#a855f7';
+      document3DFXState.paperStyle = e.currentTarget.dataset.paper;
+      renderDocFXTexture();
+    });
+  });
+
+  // Quick Animation Presets
+  document.querySelectorAll('.btn-doc-anim-preset').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const animKey = e.currentTarget.dataset.anim;
+      triggerDocFXPresetAnimation(animKey);
+    });
+  });
+
+  // High-Res Snapshot
+  document.getElementById('btn-doc-snap-hires')?.addEventListener('click', () => {
+    const { renderer, scene, camera } = document3DFXState;
+    if (!renderer || !scene || !camera) return;
+    renderer.render(scene, camera);
+    const dataURL = renderer.domElement.toDataURL('image/png');
+    const link = document.createElement('a');
+    link.download = `regaarder-jani-document-${Date.now()}.png`;
+    link.href = dataURL;
+    link.click();
+    showTextTimingAlert('Exported high-resolution 3D document PNG!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+
+  // Playback Toggle
+  document.getElementById('btn-doc-toggle-play')?.addEventListener('click', () => {
+    triggerDocFXPresetAnimation('janiFlyby');
+  });
+
+  // Reset
+  document.getElementById('btn-doc-reset-play')?.addEventListener('click', () => {
+    document3DFXState.pitch = 45;
+    document3DFXState.yaw = -20;
+    document3DFXState.roll = 8;
+    document3DFXState.dist = 55;
+    document3DFXState.hlProgress = 1.0;
+    syncDocFXInputs();
+    updateDocFXCameraTransform();
+    renderDocFXTexture();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-doc-apply-timeline')?.addEventListener('click', () => {
+    closeDocument3DFXSuite();
+    switchStudioView('editor');
+
+    const sampleBg = {
+      id: `img-doc-3d-${Date.now()}`,
+      name: 'James_Jani_Document_Flyover.jpg',
+      url: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+      start: 0,
+      duration: 6,
+      scale: 1.2,
+      zoomEffect: 'snap',
+      zoomScale: 1.35
+    };
+    const sampleTitle = {
+      id: `txt-doc-${Date.now() + 1}`,
+      text: document3DFXState.headline,
+      highlight: document3DFXState.headline.split(' ')[0] || '',
+      highlightColor: '#facc15',
+      anim: 'pop',
+      fontSize: 64,
+      fontFamily: 'Cinzel, serif',
+      start: 0.5,
+      duration: 5.5
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [sampleBg];
+      timelineClips.text = [sampleTitle];
+      renderAllTimelineTracks();
+      selectClip(sampleTitle, 'text');
+    }
+
+    showTextTimingAlert('Applied 3D Document Flyover to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
 function initHomepageTemplateEvents() {
   // Navigation top-bar view switcher
   document.getElementById('btn-nav-view-home')?.addEventListener('click', () => switchStudioView('home'));
@@ -21873,6 +22787,7 @@ function initHomepageTemplateEvents() {
   renderHomepageCategories();
   renderHomepageTemplates();
   bindSpatial3DModalControls();
+  bindDocument3DFXModalControls();
 }
 
 // Initialize homepage discovery view immediately on script execution
