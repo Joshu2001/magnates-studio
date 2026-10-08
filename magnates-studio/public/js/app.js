@@ -19966,6 +19966,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Flashback', 'Flashforward', 'Time Jump', 'White Flash', 'James Jani'],
     defaultImage: '/jani_flashback_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'puzzle-piece-reveal',
+    title: 'The "Puzzle Piece" Reveal & Story Arc Masking',
+    category: '3D Spatial',
+    badge: 'James Jani Signature',
+    difficulty: 'Pro FX',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(168, 85, 247, 0.7), rgba(6, 182, 212, 0.4), rgba(3, 2, 7, 0.95))',
+    description: 'Jani’s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
+    tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
+    defaultImage: '/jani_puzzle_reveal_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20537,6 +20550,48 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'puzzle-piece-reveal') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #080912; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 14px;">
+          <!-- 4-Piece Story Arc Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; height: 100%; position: relative;">
+            <div id="fx-arc-0-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #a855f7; box-shadow: 0 0 15px rgba(168,85,247,0.4); display: flex; align-items: center; justify-content: center; background: #130e26;">
+              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
+              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #a855f7;">
+                #1 THE ORIGIN
+              </span>
+            </div>
+            <div id="fx-arc-1-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #06b6d4; box-shadow: 0 0 15px rgba(6,182,212,0.4); display: flex; align-items: center; justify-content: center; background: #081528;">
+              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
+              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #06b6d4;">
+                #2 THE CATALYST
+              </span>
+            </div>
+            <div id="fx-arc-2-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #f59e0b; box-shadow: 0 0 15px rgba(245,158,11,0.4); display: flex; align-items: center; justify-content: center; background: #1e1308;">
+              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
+              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #f59e0b;">
+                #3 THE ILLUSION
+              </span>
+            </div>
+            <div id="fx-arc-3-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center; background: #24080e;">
+              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
+              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #ef4444;">
+                #4 THE COLLAPSE
+              </span>
+            </div>
+          </div>
+
+          <!-- Connecting Story Arc Spline Overlay -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 200 120">
+            <path d="M 40 40 Q 100 80, 160 40 T 160 90" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="4 2" opacity="0.8" />
+          </svg>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #a855f7, #06b6d4); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
+            🧩 STORY ARC MASK
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20809,6 +20864,18 @@ function startTemplateHoverVideo(cardEl, tpl) {
       if (plate) {
         const floatY = Math.sin(t * 2.5) * 4;
         plate.style.transform = `translateY(${floatY}px) scale(${isFlash ? 1.05 : 1})`;
+      }
+    } else if (tplId === 'puzzle-piece-reveal') {
+      // 4-Piece progressive lock-in simulation along story arc
+      const cycle = (t * 1.5) % 3.6;
+      for (let i = 0; i < 4; i++) {
+        const arcEl = fxContainer?.querySelector(`#fx-arc-${i}-${tplId}`);
+        if (arcEl) {
+          const isRevealed = cycle > (i * 0.7);
+          arcEl.style.opacity = isRevealed ? '1' : '0.25';
+          arcEl.style.transform = isRevealed ? 'scale(1)' : 'scale(0.92)';
+          arcEl.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+        }
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21168,6 +21235,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'nonlinear-time-flash') {
     // Launch James Jani Nonlinear Flashbacks & Flashforwards Suite
     openFlashbackSuite();
+    return;
+  } else if (templateId === 'puzzle-piece-reveal') {
+    // Launch James Jani Puzzle Piece Reveal & Story Arc Masking Suite
+    openPuzzleRevealSuite();
     return;
   }
 
@@ -23248,6 +23319,7 @@ function initHomepageTemplateEvents() {
   bindJaniSuiteModalControls();
   bindCountdownSuiteModalControls();
   bindFlashbackSuiteModalControls();
+  bindPuzzleRevealSuiteModalControls();
 }
 
 /* =========================================================
@@ -24841,10 +24913,335 @@ function bindFlashbackSuiteModalControls() {
   });
 }
 
+/* =========================================================
+   JAMES JANI FX ENGINE: PUZZLE PIECE REVEAL & STORY ARC MASKING CONTROLLER
+   ========================================================= */
+let puzzleRevealSuiteState = {
+  isPlaying: false,
+  currentTime: 1.8,
+  duration: 8.0,
+  lockInSpeed: 6,
+  outlineGlow: 12,
+  centerTitle: 'NARRATIVE THREAD SYNCHRONIZED',
+  arcs: [
+    {
+      id: 0,
+      title: 'THE ORIGIN',
+      color: '#a855f7',
+      imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+      isLocked: true
+    },
+    {
+      id: 1,
+      title: 'THE CATALYST',
+      color: '#06b6d4',
+      imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+      isLocked: true
+    },
+    {
+      id: 2,
+      title: 'THE ILLUSION',
+      color: '#f59e0b',
+      imageUrl: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+      isLocked: true
+    },
+    {
+      id: 3,
+      title: 'THE COLLAPSE',
+      color: '#ef4444',
+      imageUrl: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+      isLocked: true
+    }
+  ],
+  animFrameId: null,
+  lastTime: performance.now()
+};
+
+const PUZZLE_REVEAL_STOCK_IMAGES = [
+  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'
+];
+
+function playPuzzleRevealSFX(type = 'lock') {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    if (type === 'lock') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+    } else {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(260, now);
+      osc.frequency.linearRampToValueAtTime(520, now + 0.2);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+    }
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.22);
+  } catch (err) {}
+}
+
+function updatePuzzleRevealDOM() {
+  // Update Center Title
+  const centerBadgeTitle = document.getElementById('puzzle-reveal-center-title');
+  if (centerBadgeTitle) centerBadgeTitle.textContent = puzzleRevealSuiteState.centerTitle;
+
+  // Update Arcs
+  puzzleRevealSuiteState.arcs.forEach(arc => {
+    const tag = document.getElementById(`puzzle-arc-tag-${arc.id}`);
+    if (tag) tag.textContent = `STORY ARC #${arc.id + 1}: ${arc.title.toUpperCase()}`;
+
+    const img = document.getElementById(`puzzle-arc-img-${arc.id}`);
+    if (img && arc.imageUrl) img.src = arc.imageUrl;
+
+    const card = document.getElementById(`puzzle-arc-card-${arc.id}`);
+    if (card) {
+      card.style.borderColor = arc.color;
+      card.style.boxShadow = `0 0 ${puzzleRevealSuiteState.outlineGlow * 1.5}px ${arc.color}66`;
+    }
+  });
+
+  // Update Spline Glow
+  const spline = document.getElementById('puzzle-reveal-spline-path');
+  if (spline) {
+    spline.style.filter = `drop-shadow(0 0 ${puzzleRevealSuiteState.outlineGlow}px rgba(34,211,238,0.85))`;
+  }
+}
+
+function renderPuzzleRevealLoop(now) {
+  const dt = (now - puzzleRevealSuiteState.lastTime) / 1000;
+  puzzleRevealSuiteState.lastTime = now;
+
+  if (puzzleRevealSuiteState.isPlaying) {
+    puzzleRevealSuiteState.currentTime += dt;
+    if (puzzleRevealSuiteState.currentTime >= puzzleRevealSuiteState.duration) {
+      puzzleRevealSuiteState.currentTime = 0;
+    }
+
+    const t = puzzleRevealSuiteState.currentTime;
+    const readout = document.getElementById('puzzle-reveal-time-readout');
+    const playheadReadout = document.getElementById('puzzle-reveal-playhead-readout');
+    const needle = document.getElementById('puzzle-reveal-playhead-needle');
+
+    const mins = Math.floor(t / 60);
+    const secs = Math.floor(t % 60);
+    const ms = Math.floor((t % 1) * 100);
+    const timeFormatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+
+    if (readout) readout.textContent = `${timeFormatted} / 00:08.00`;
+    if (playheadReadout) playheadReadout.textContent = `PLAYHEAD: ${timeFormatted}`;
+    if (needle) needle.style.left = `${(t / puzzleRevealSuiteState.duration) * 100}%`;
+
+    // Progressive arc reveal cycle simulation
+    const cycle = (t * (puzzleRevealSuiteState.lockInSpeed / 3)) % 4.8;
+    for (let i = 0; i < 4; i++) {
+      const card = document.getElementById(`puzzle-arc-card-${i}`);
+      if (card) {
+        const isRevealed = cycle > (i * 0.9);
+        card.style.opacity = isRevealed ? '1' : '0.28';
+        card.style.transform = isRevealed ? 'scale(1)' : 'scale(0.94)';
+      }
+    }
+  }
+
+  puzzleRevealSuiteState.animFrameId = requestAnimationFrame(renderPuzzleRevealLoop);
+}
+
+function openPuzzleRevealSuite() {
+  const modal = document.getElementById('modal-puzzle-reveal-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  puzzleRevealSuiteState.isPlaying = true;
+  puzzleRevealSuiteState.lastTime = performance.now();
+  const icon = document.getElementById('puzzle-reveal-play-icon');
+  if (icon) icon.textContent = '❚❚';
+  updatePuzzleRevealDOM();
+  if (!puzzleRevealSuiteState.animFrameId) {
+    puzzleRevealSuiteState.animFrameId = requestAnimationFrame(renderPuzzleRevealLoop);
+  }
+}
+
+function closePuzzleRevealSuite() {
+  const modal = document.getElementById('modal-puzzle-reveal-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  puzzleRevealSuiteState.isPlaying = false;
+  const icon = document.getElementById('puzzle-reveal-play-icon');
+  if (icon) icon.textContent = '▶';
+  if (puzzleRevealSuiteState.animFrameId) {
+    cancelAnimationFrame(puzzleRevealSuiteState.animFrameId);
+    puzzleRevealSuiteState.animFrameId = null;
+  }
+}
+
+function bindPuzzleRevealSuiteModalControls() {
+  document.getElementById('btn-close-puzzle-reveal-suite')?.addEventListener('click', closePuzzleRevealSuite);
+
+  // Play / Pause
+  document.getElementById('btn-puzzle-reveal-play')?.addEventListener('click', () => {
+    puzzleRevealSuiteState.isPlaying = !puzzleRevealSuiteState.isPlaying;
+    const icon = document.getElementById('puzzle-reveal-play-icon');
+    if (icon) icon.textContent = puzzleRevealSuiteState.isPlaying ? '❚❚' : '▶';
+  });
+
+  // Snap All Arcs
+  document.getElementById('btn-puzzle-reveal-snap-all')?.addEventListener('click', () => {
+    playPuzzleRevealSFX('lock');
+    for (let i = 0; i < 4; i++) {
+      const card = document.getElementById(`puzzle-arc-card-${i}`);
+      if (card) {
+        card.style.opacity = '1';
+        card.style.transform = 'scale(1.02)';
+        setTimeout(() => { card.style.transform = 'scale(1)'; }, 200);
+      }
+    }
+    showTextTimingAlert('All 4 Story Arcs Interlocked and Synchronized!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2200);
+  });
+
+  // Reset
+  document.getElementById('btn-puzzle-reveal-reset')?.addEventListener('click', () => {
+    puzzleRevealSuiteState.currentTime = 0;
+    playPuzzleRevealSFX('reset');
+    updatePuzzleRevealDOM();
+  });
+
+  // Center Premise Text Input
+  document.getElementById('puzzle-reveal-input-center-title')?.addEventListener('input', (e) => {
+    puzzleRevealSuiteState.centerTitle = e.target.value.toUpperCase();
+    const centerTitleEl = document.getElementById('puzzle-reveal-center-title');
+    if (centerTitleEl) centerTitleEl.textContent = puzzleRevealSuiteState.centerTitle;
+  });
+
+  // Arcs 0-3 Text & Image Bindings
+  [0, 1, 2, 3].forEach(idx => {
+    // Title Input
+    document.getElementById(`puzzle-input-title-${idx}`)?.addEventListener('input', (e) => {
+      puzzleRevealSuiteState.arcs[idx].title = e.target.value.toUpperCase();
+      const tag = document.getElementById(`puzzle-arc-tag-${idx}`);
+      if (tag) tag.textContent = `STORY ARC #${idx + 1}: ${e.target.value.toUpperCase()}`;
+    });
+
+    // URL Image Input
+    document.getElementById(`puzzle-input-url-${idx}`)?.addEventListener('input', (e) => {
+      const url = e.target.value.trim();
+      if (url) {
+        puzzleRevealSuiteState.arcs[idx].imageUrl = url;
+        const img = document.getElementById(`puzzle-arc-img-${idx}`);
+        if (img) img.src = url;
+      }
+    });
+
+    // Custom Image File Upload
+    document.getElementById(`puzzle-upload-file-${idx}`)?.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        puzzleRevealSuiteState.arcs[idx].imageUrl = ev.target.result;
+        const img = document.getElementById(`puzzle-arc-img-${idx}`);
+        if (img) img.src = ev.target.result;
+        const urlInput = document.getElementById(`puzzle-input-url-${idx}`);
+        if (urlInput) urlInput.value = `[Uploaded: ${file.name}]`;
+        playPuzzleRevealSFX('lock');
+        showTextTimingAlert(`Uploaded custom image for Arc #${idx + 1}: ${file.name}`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Shuffle Stock Image
+    document.getElementById(`btn-puzzle-shuffle-${idx}`)?.addEventListener('click', () => {
+      const nextImg = PUZZLE_REVEAL_STOCK_IMAGES[Math.floor(Math.random() * PUZZLE_REVEAL_STOCK_IMAGES.length)];
+      puzzleRevealSuiteState.arcs[idx].imageUrl = nextImg;
+      const img = document.getElementById(`puzzle-arc-img-${idx}`);
+      if (img) img.src = nextImg;
+      const urlInput = document.getElementById(`puzzle-input-url-${idx}`);
+      if (urlInput) urlInput.value = nextImg;
+      playPuzzleRevealSFX('lock');
+    });
+  });
+
+  // Speed slider
+  document.getElementById('puzzle-reveal-slider-speed')?.addEventListener('input', (e) => {
+    puzzleRevealSuiteState.lockInSpeed = parseInt(e.target.value) || 6;
+    const lbl = document.getElementById('puzzle-reveal-val-speed');
+    if (lbl) lbl.textContent = `${puzzleRevealSuiteState.lockInSpeed}x`;
+  });
+
+  // Glow slider
+  document.getElementById('puzzle-reveal-slider-glow')?.addEventListener('input', (e) => {
+    puzzleRevealSuiteState.outlineGlow = parseInt(e.target.value) || 12;
+    const lbl = document.getElementById('puzzle-reveal-val-glow');
+    if (lbl) lbl.textContent = `${puzzleRevealSuiteState.outlineGlow}px`;
+    updatePuzzleRevealDOM();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-puzzle-reveal-apply-timeline')?.addEventListener('click', () => {
+    closePuzzleRevealSuite();
+    switchStudioView('editor');
+
+    // Create 4 Story Arc Masked Clips
+    const arcClips = puzzleRevealSuiteState.arcs.map((arc, i) => ({
+      id: `img-puzzle-arc-${Date.now() + i}`,
+      name: `Story_Arc_${i + 1}_${arc.title.replace(/\s+/g, '_')}.jpg`,
+      url: arc.imageUrl,
+      start: i * 1.5,
+      duration: 6,
+      scale: 1.1,
+      zoomEffect: 'snap',
+      zoomScale: 1.2,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    }));
+
+    // Headline Text Clip for Central Theme
+    const themeClip = {
+      id: `txt-puzzle-theme-${Date.now() + 5}`,
+      text: puzzleRevealSuiteState.centerTitle,
+      highlight: puzzleRevealSuiteState.centerTitle.split(' ')[0] || '',
+      highlightColor: '#06b6d4',
+      anim: 'pop',
+      fontSize: 50,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: 7.5
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = arcClips;
+      timelineClips.text = [themeClip];
+      renderAllTimelineTracks();
+      selectClip(themeClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Story Arc Puzzle Reveal Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
 // Initialize homepage discovery view immediately on script execution
 setTimeout(() => {
   initHomepageTemplateEvents();
 }, 100);
+
 
 
 
