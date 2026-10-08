@@ -20083,6 +20083,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Sub-bass Drop', 'Audio Riser', 'Camera Cut', 'Attention Reset', 'Sound Design', 'James Jani'],
     defaultImage: '/jani_subbass_risers_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'magnates-media-3d-projection',
+    title: '3D Layer Projection & 50mm Camera',
+    category: '3D Spatial',
+    badge: 'Magnates Media Signature',
+    difficulty: 'Pro 3D',
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(20, 14, 5, 0.98), rgba(12, 18, 35, 0.75), rgba(245, 158, 11, 0.35), rgba(3, 4, 8, 0.98))',
+    description: 'Core 3D & Spatial Effects: Converting 2D cutout images, portraits, and text into 3D space by enabling 3D mode on layers and setting up a 3D camera (such as a 50mm focal length camera linked to a null object controller).',
+    tags: ['3D Projection', '50mm Camera', 'Null Object', 'Portrait Cutout', 'Spatial Depth', 'Magnates Media'],
+    defaultImage: '/magnates_3d_projection_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20914,6 +20927,47 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'magnates-media-3d-projection') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #05060b; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
+          <!-- 3D Spatial Grid Rays -->
+          <div style="position: absolute; inset: 0; opacity: 0.35; background-image: radial-gradient(circle at center, rgba(59,130,246,0.3) 0%, transparent 70%), linear-gradient(rgba(245,158,11,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.2) 1px, transparent 1px); background-size: 100% 100%, 28px 28px, 28px 28px; transform: rotateX(60deg) translateY(-20px);"></div>
+
+          <!-- Null Object Orbit Rig Container -->
+          <div id="fx-magnates-rig-${tplId}" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; transition: transform 0.05s linear;">
+            <!-- Background Archival Plate (Z: -100px) -->
+            <div id="fx-magnates-bg-${tplId}" style="position: absolute; width: 230px; height: 120px; background: #1c1917; border: 1px solid rgba(245,158,11,0.4); border-radius: 8px; padding: 10px; transform: translateZ(-100px); box-shadow: 0 10px 25px rgba(0,0,0,0.8); opacity: 0.7;">
+              <div style="font-family: monospace; font-size: 7.5px; color: #f59e0b; font-weight: 700;">ARCHIVAL PLATE // Z:-100px</div>
+              <div style="font-family: Georgia, serif; font-size: 8.5px; color: #cbd5e1; font-style: italic; margin-top: 4px; line-height: 1.2;">
+                "Global market shift recorded across major banking cartels..."
+              </div>
+            </div>
+
+            <!-- Midground 2D Cutout Portrait Layer (Z: 0px) -->
+            <div id="fx-magnates-mid-${tplId}" style="position: absolute; width: 110px; height: 140px; background: #0f172a; border: 2px solid #3b82f6; border-radius: 12px; overflow: hidden; transform: translateZ(0px); box-shadow: 0 0 25px rgba(59,130,246,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%);" />
+              <div style="position: absolute; bottom: 4px; background: rgba(0,0,0,0.85); border: 1px solid #38bdf8; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 6.5px; color: #38bdf8;">
+                PORTRAIT (Z:0px)
+              </div>
+            </div>
+
+            <!-- Foreground 3D Text & Null Linked Camera Card (Z: +140px) -->
+            <div id="fx-magnates-fg-${tplId}" style="position: absolute; bottom: 22px; background: rgba(8,10,18,0.92); border: 1.5px solid #f59e0b; border-radius: 8px; padding: 6px 14px; transform: translateZ(140px); box-shadow: 0 0 30px rgba(245,158,11,0.5); text-align: center;">
+              <div style="font-family: monospace; font-size: 7px; font-weight: 800; color: #fbbf24; letter-spacing: 1.5px; margin-bottom: 2px;">
+                50mm CAMERA // NULL OBJECT
+              </div>
+              <div style="font-family: 'Cinzel', serif; font-size: 11px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px;">
+                THE BILLIONAIRE PLAYBOOK
+              </div>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
+            🎥 3D PROJECTION FX
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21306,6 +21360,17 @@ function startTemplateHoverVideo(cardEl, tpl) {
         const shakeMag = (1 - impactProg) * 8;
         if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
       }
+    } else if (tplId === 'magnates-media-3d-projection') {
+      const orbitY = Math.sin(t * 1.6) * 14;
+      const orbitX = Math.cos(t * 1.2) * 7;
+      const rig = fxContainer?.querySelector(`#fx-magnates-rig-${tplId}`);
+      const bg = fxContainer?.querySelector(`#fx-magnates-bg-${tplId}`);
+      const mid = fxContainer?.querySelector(`#fx-magnates-mid-${tplId}`);
+      const fg = fxContainer?.querySelector(`#fx-magnates-fg-${tplId}`);
+      if (rig) rig.style.transform = `rotateY(${orbitY.toFixed(2)}deg) rotateX(${orbitX.toFixed(2)}deg)`;
+      if (bg) bg.style.transform = `translateZ(-100px) translate(${-orbitY * 0.4}px, ${-orbitX * 0.4}px)`;
+      if (mid) mid.style.transform = `translateZ(0px) translate(${orbitY * 0.2}px, ${orbitX * 0.2}px)`;
+      if (fg) fg.style.transform = `translateZ(140px) translate(${orbitY * 0.8}px, ${orbitX * 0.8}px)`;
     } else {
       const shiftX = Math.sin(t * 3) * 14;
       const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
@@ -21700,6 +21765,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'subbass-drops-risers') {
     // Launch James Jani Sub-bass Drops & Risers Suite
     openSubbassSuite();
+    return;
+  } else if (templateId === 'magnates-media-3d-projection') {
+    // Launch Magnates Media 3D Layer Projection & 50mm Camera Suite
+    openMagnates3DProjectionSuite();
     return;
   }
 
@@ -23789,6 +23858,7 @@ function initHomepageTemplateEvents() {
   bindCamera3DMoveSuiteModalControls();
   bindJLCutsSuiteModalControls();
   bindSubbassSuiteModalControls();
+  bindMagnates3DProjectionSuiteModalControls();
 }
 
 /* =========================================================
@@ -28191,6 +28261,309 @@ function bindSubbassSuiteModalControls() {
     }
 
     showTextTimingAlert(`Applied James Jani Sub-bass Drop & Riser to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   MAGNATES MEDIA 3D LAYER PROJECTION & 50MM CAMERA SUITE CONTROLLER
+   (Converting 2D cutout images, portraits, and text into 3D space with 50mm camera linked to null object)
+   ========================================================= */
+let magnates3DSuiteState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 6.0,
+  focalLength: 50, // 50mm camera focal length
+  nullOrbitSpeed: 4, // 1 to 10 speed multiplier
+  zSeparation: 140, // 20 to 300px
+  nullOrbitRange: 16, // max rotation degrees
+  enableGrid: true,
+  headline: "THE BILLIONAIRE PLAYBOOK",
+  subcaption: "50mm CAMERA RIG // NULL OBJECT CONTROLLER",
+  archivalText: "Unprecedented market shifts recorded across major global banking sectors...",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  bgPlateUrl: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateMagnates3DVisualStyles() {
+  const headlineEl = document.getElementById('magnates-stage-headline');
+  const subcaptionEl = document.getElementById('magnates-stage-subcaption');
+  const archivalTextEl = document.getElementById('magnates-stage-archival-text');
+  const portraitImg = document.getElementById('magnates-stage-portrait-img');
+  const bgPlateImg = document.getElementById('magnates-stage-bg-plate-img');
+  const gridFloor = document.getElementById('magnates-stage-grid-floor');
+  const rigContainer = document.getElementById('magnates-stage-3d-rig');
+  const layerArchival = document.getElementById('magnates-stage-layer-archival');
+  const layerPortrait = document.getElementById('magnates-stage-layer-portrait');
+  const layerText = document.getElementById('magnates-stage-layer-text');
+  const badgeFocal = document.getElementById('magnates-badge-focal');
+  const badgeZ = document.getElementById('magnates-badge-z');
+  const timerEl = document.getElementById('magnates-timer-display');
+  const cursor = document.getElementById('magnates-timeline-cursor');
+
+  if (headlineEl) headlineEl.textContent = magnates3DSuiteState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = magnates3DSuiteState.subcaption;
+  if (archivalTextEl) archivalTextEl.textContent = `"${magnates3DSuiteState.archivalText}"`;
+  if (portraitImg && portraitImg.src !== magnates3DSuiteState.portraitUrl) {
+    portraitImg.src = magnates3DSuiteState.portraitUrl;
+  }
+  if (bgPlateImg && bgPlateImg.src !== magnates3DSuiteState.bgPlateUrl) {
+    bgPlateImg.src = magnates3DSuiteState.bgPlateUrl;
+  }
+  if (gridFloor) {
+    gridFloor.style.display = magnates3DSuiteState.enableGrid ? 'block' : 'none';
+  }
+
+  const p = magnates3DSuiteState.playhead;
+  const dur = magnates3DSuiteState.duration;
+
+  if (cursor) {
+    cursor.style.left = `${(p / dur) * 100}%`;
+  }
+  if (timerEl) {
+    timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  }
+
+  if (badgeFocal) {
+    badgeFocal.textContent = `${magnates3DSuiteState.focalLength}mm CAMERA LINKED`;
+  }
+  if (badgeZ) {
+    badgeZ.textContent = `Z-SEP: ${magnates3DSuiteState.zSeparation}px`;
+  }
+
+  // 3D Orbit computation linked to simulated Null Object controller
+  const speed = magnates3DSuiteState.nullOrbitSpeed * 0.35;
+  const range = magnates3DSuiteState.nullOrbitRange;
+  const orbitY = Math.sin(p * speed) * range;
+  const orbitX = Math.cos(p * speed * 0.8) * (range * 0.5);
+
+  // Apply focal length perspective dynamic: 50mm translates to ~1200px perspective
+  const perspectivePx = Math.round(magnates3DSuiteState.focalLength * 24);
+  const viewport = document.getElementById('magnates-stage-viewport-outer');
+  if (viewport) {
+    viewport.style.perspective = `${perspectivePx}px`;
+  }
+
+  if (rigContainer) {
+    rigContainer.style.transform = `rotateY(${orbitY.toFixed(2)}deg) rotateX(${orbitX.toFixed(2)}deg)`;
+  }
+
+  const zSep = magnates3DSuiteState.zSeparation;
+  // Parallax offsets for the 3 distinct depth layers
+  if (layerArchival) {
+    layerArchival.style.transform = `translateZ(-${zSep}px) translate(${-orbitY * 0.7}px, ${-orbitX * 0.4}px) scale(0.9)`;
+  }
+  if (layerPortrait) {
+    layerPortrait.style.transform = `translateZ(0px) translate(${orbitY * 0.2}px, ${orbitX * 0.2}px)`;
+  }
+  if (layerText) {
+    layerText.style.transform = `translateZ(${zSep}px) translateY(85px) translate(${orbitY * 0.9}px, ${orbitX * 0.6}px)`;
+  }
+}
+
+function renderMagnates3DLoop(timestamp) {
+  if (!magnates3DSuiteState.isPlaying) return;
+  if (!magnates3DSuiteState.lastTimestamp) magnates3DSuiteState.lastTimestamp = timestamp;
+  const dt = (timestamp - magnates3DSuiteState.lastTimestamp) / 1000;
+  magnates3DSuiteState.lastTimestamp = timestamp;
+
+  magnates3DSuiteState.playhead += dt;
+  if (magnates3DSuiteState.playhead > magnates3DSuiteState.duration) {
+    magnates3DSuiteState.playhead = 0;
+  }
+
+  updateMagnates3DVisualStyles();
+  magnates3DSuiteState.animFrameId = requestAnimationFrame(renderMagnates3DLoop);
+}
+
+function openMagnates3DProjectionSuite() {
+  const modal = document.getElementById('modal-magnates-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  magnates3DSuiteState.isPlaying = true;
+  magnates3DSuiteState.playhead = 0;
+  magnates3DSuiteState.lastTimestamp = null;
+  if (magnates3DSuiteState.animFrameId) cancelAnimationFrame(magnates3DSuiteState.animFrameId);
+  magnates3DSuiteState.animFrameId = requestAnimationFrame(renderMagnates3DLoop);
+
+  const btnPlay = document.getElementById('btn-magnates-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeMagnates3DProjectionSuite() {
+  const modal = document.getElementById('modal-magnates-3d-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  magnates3DSuiteState.isPlaying = false;
+  if (magnates3DSuiteState.animFrameId) {
+    cancelAnimationFrame(magnates3DSuiteState.animFrameId);
+    magnates3DSuiteState.animFrameId = null;
+  }
+}
+
+function bindMagnates3DProjectionSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-magnates-3d-suite')?.addEventListener('click', closeMagnates3DProjectionSuite);
+  document.getElementById('btn-cancel-magnates-3d-suite')?.addEventListener('click', closeMagnates3DProjectionSuite);
+
+  // Play / Pause
+  document.getElementById('btn-magnates-play-pause')?.addEventListener('click', () => {
+    magnates3DSuiteState.isPlaying = !magnates3DSuiteState.isPlaying;
+    const btnPlay = document.getElementById('btn-magnates-play-pause');
+    if (magnates3DSuiteState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      magnates3DSuiteState.lastTimestamp = null;
+      magnates3DSuiteState.animFrameId = requestAnimationFrame(renderMagnates3DLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (magnates3DSuiteState.animFrameId) cancelAnimationFrame(magnates3DSuiteState.animFrameId);
+    }
+  });
+
+  // Replay
+  document.getElementById('btn-magnates-reset')?.addEventListener('click', () => {
+    magnates3DSuiteState.playhead = 0;
+    updateMagnates3DVisualStyles();
+  });
+
+  // Sliders: Focal Length, Null Orbit Speed, Z-Separation
+  const sliderFocal = document.getElementById('magnates-slider-focal');
+  sliderFocal?.addEventListener('input', (e) => {
+    magnates3DSuiteState.focalLength = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-val-focal');
+    if (label) label.textContent = `${magnates3DSuiteState.focalLength} mm`;
+    updateMagnates3DVisualStyles();
+  });
+
+  const sliderOrbit = document.getElementById('magnates-slider-orbit');
+  sliderOrbit?.addEventListener('input', (e) => {
+    magnates3DSuiteState.nullOrbitSpeed = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-val-orbit');
+    if (label) label.textContent = `${magnates3DSuiteState.nullOrbitSpeed}x`;
+  });
+
+  const sliderZ = document.getElementById('magnates-slider-z');
+  sliderZ?.addEventListener('input', (e) => {
+    magnates3DSuiteState.zSeparation = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-val-z');
+    if (label) label.textContent = `${magnates3DSuiteState.zSeparation} px`;
+    updateMagnates3DVisualStyles();
+  });
+
+  // Grid Floor Toggle
+  const toggleGrid = document.getElementById('magnates-toggle-grid');
+  toggleGrid?.addEventListener('change', (e) => {
+    magnates3DSuiteState.enableGrid = e.target.checked;
+    updateMagnates3DVisualStyles();
+  });
+
+  // Text inputs
+  const inputHeadline = document.getElementById('magnates-input-headline');
+  inputHeadline?.addEventListener('input', (e) => {
+    magnates3DSuiteState.headline = e.target.value;
+    updateMagnates3DVisualStyles();
+  });
+
+  const inputSubcaption = document.getElementById('magnates-input-subcaption');
+  inputSubcaption?.addEventListener('input', (e) => {
+    magnates3DSuiteState.subcaption = e.target.value;
+    updateMagnates3DVisualStyles();
+  });
+
+  const inputArchival = document.getElementById('magnates-input-archival');
+  inputArchival?.addEventListener('input', (e) => {
+    magnates3DSuiteState.archivalText = e.target.value;
+    updateMagnates3DVisualStyles();
+  });
+
+  // Stock Portrait Shuffle
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let portraitIdx = 0;
+  document.getElementById('btn-magnates-shuffle-portrait')?.addEventListener('click', () => {
+    portraitIdx = (portraitIdx + 1) % stockPortraits.length;
+    magnates3DSuiteState.portraitUrl = stockPortraits[portraitIdx];
+    const inputP = document.getElementById('magnates-input-portrait');
+    if (inputP) inputP.value = magnates3DSuiteState.portraitUrl;
+    updateMagnates3DVisualStyles();
+  });
+
+  const inputPortrait = document.getElementById('magnates-input-portrait');
+  inputPortrait?.addEventListener('input', (e) => {
+    magnates3DSuiteState.portraitUrl = e.target.value;
+    updateMagnates3DVisualStyles();
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-apply-magnates-suite')?.addEventListener('click', () => {
+    closeMagnates3DProjectionSuite();
+
+    // 1. Archival Plate Background Clip
+    const bgClip = {
+      id: `img-mag-bg-${Date.now()}`,
+      url: magnates3DSuiteState.bgPlateUrl,
+      start: 0,
+      duration: magnates3DSuiteState.duration,
+      scale: 1.1,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.15,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    // 2. Cutout Portrait Clip (3D Layer enabled, Z: 0px)
+    const portraitClip = {
+      id: `img-mag-portrait-${Date.now() + 1}`,
+      url: magnates3DSuiteState.portraitUrl,
+      start: 0,
+      duration: magnates3DSuiteState.duration,
+      scale: 1.0,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    // 3. 3D Projected Typography Headline
+    const headlineClip = {
+      id: `txt-mag-head-${Date.now() + 2}`,
+      text: magnates3DSuiteState.headline,
+      highlight: magnates3DSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'pop',
+      fontSize: 52,
+      fontFamily: 'Cinzel, serif',
+      start: 0,
+      duration: magnates3DSuiteState.duration
+    };
+
+    // 4. Null Object 50mm Camera Metadata Track
+    const cameraClip = {
+      id: `txt-mag-cam-${Date.now() + 3}`,
+      text: `3D PROJECTION // 50mm CAMERA RIG // Z-SEP ${magnates3DSuiteState.zSeparation}px`,
+      highlight: '50mm',
+      highlightColor: '#38bdf8',
+      anim: 'fade',
+      fontSize: 20,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: magnates3DSuiteState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, portraitClip];
+      timelineClips.text = [headlineClip, cameraClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert(`Applied Magnates Media 3D Layer Projection (50mm Camera) to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
