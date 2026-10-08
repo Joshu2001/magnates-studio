@@ -20070,6 +20070,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['J-Cut', 'L-Cut', 'Audio-Visual Pacing', 'Sound Bridge', 'Nonlinear Jump', 'James Jani'],
     defaultImage: '/jani_jl_cuts_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'subbass-drops-risers',
+    title: 'Sub-bass Drops & Risers (Attention Reset)',
+    category: 'Sound FX',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(42, 8, 21, 0.98), rgba(18, 4, 11, 0.75), rgba(244, 63, 94, 0.35), rgba(5, 1, 4, 0.98))',
+    description: 'Dramatic low-frequency bass sweeps (sub-bass dive to 28Hz) paired with a crescendo riser and sudden impact camera cuts to snap and reset viewer attention spans.',
+    tags: ['Sub-bass Drop', 'Audio Riser', 'Camera Cut', 'Attention Reset', 'Sound Design', 'James Jani'],
+    defaultImage: '/jani_subbass_risers_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20869,6 +20882,38 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'subbass-drops-risers') {
+      fxContainer.innerHTML = `
+        <div id="fx-subbass-card-wrap-${tplId}" style="position: absolute; inset: 0; background: #0c0206; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: transform 0.05s ease;">
+          <img id="fx-subbass-bg-${tplId}" src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(150%) brightness(50%); transition: transform 0.08s ease;" />
+
+          <!-- Shockwave Concussion Pulse Ring -->
+          <div id="fx-subbass-shockwave-${tplId}" style="position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 2px solid #f43f5e; box-shadow: 0 0 30px #f43f5e; pointer-events: none; opacity: 0; transform: scale(0.5); transition: all 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);"></div>
+
+          <!-- Flash Overlay for Camera Cut Reset -->
+          <div id="fx-subbass-flash-${tplId}" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; transition: opacity 0.1s ease;"></div>
+
+          <!-- Oscilloscope Frequency Arc -->
+          <div style="position: relative; z-index: 10; text-align: center; padding: 12px;">
+            <div id="fx-subbass-pitch-meter-${tplId}" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #fb7185; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">
+              PITCH RISER: 1.2 kHz ▲
+            </div>
+            <div id="fx-subbass-title-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(244,63,94,0.6);">
+              ATTENTION RESET
+            </div>
+            <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.85); border: 1px solid rgba(244,63,94,0.5); padding: 2px 10px; border-radius: 9999px;">
+              <span id="fx-subbass-hz-${tplId}" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #f43f5e;">
+                28 Hz SUB-BASS IMPACT
+              </span>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(244,63,94,0.5);">
+            🔊 SUB-BASS DROP
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21227,6 +21272,39 @@ function startTemplateHoverVideo(cardEl, tpl) {
       const waveEl = fxContainer?.querySelector(`#fx-jl-wave-${tplId}`);
       if (waveEl) {
         waveEl.textContent = waves[waveIndex];
+      }
+    } else if (tplId === 'subbass-drops-risers') {
+      const cycleTime = t % 3.0; // 3-second build and drop cycle
+      const cardWrap = fxContainer?.querySelector(`#fx-subbass-card-wrap-${tplId}`);
+      const shockwave = fxContainer?.querySelector(`#fx-subbass-shockwave-${tplId}`);
+      const flashEl = fxContainer?.querySelector(`#fx-subbass-flash-${tplId}`);
+      const pitchEl = fxContainer?.querySelector(`#fx-subbass-pitch-meter-${tplId}`);
+      const bgImg = fxContainer?.querySelector(`#fx-subbass-bg-${tplId}`);
+
+      if (cycleTime < 2.2) {
+        // Riser build-up phase (0.0s to 2.2s)
+        const progress = cycleTime / 2.2;
+        const currentHz = Math.floor(120 + progress * 1080);
+        if (pitchEl) pitchEl.textContent = `PITCH RISER: ${currentHz} Hz ▲`;
+        if (flashEl) flashEl.style.opacity = '0';
+        if (shockwave) {
+          shockwave.style.opacity = '0';
+          shockwave.style.transform = 'scale(0.5)';
+        }
+        if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 30) * progress * 2}px, ${Math.cos(t * 30) * progress * 2}px)`;
+        if (bgImg) bgImg.style.transform = `scale(${1.0 + progress * 0.1})`;
+      } else {
+        // Sub-bass impact & camera cut reset phase (2.2s to 3.0s)
+        const impactProg = (cycleTime - 2.2) / 0.8;
+        if (pitchEl) pitchEl.textContent = `28 Hz SUB IMPACT ▼`;
+        if (flashEl) flashEl.style.opacity = impactProg < 0.25 ? '0.85' : '0';
+        if (shockwave) {
+          shockwave.style.opacity = (1 - impactProg).toFixed(2);
+          shockwave.style.transform = `scale(${1 + impactProg * 2.5})`;
+        }
+        // Sudden camera impact recoil shake
+        const shakeMag = (1 - impactProg) * 8;
+        if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21618,6 +21696,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'audio-visual-jl-cuts') {
     // Launch James Jani Audio-Visual Pacing J-Cuts & L-Cuts Suite
     openJLCutsSuite();
+    return;
+  } else if (templateId === 'subbass-drops-risers') {
+    // Launch James Jani Sub-bass Drops & Risers Suite
+    openSubbassSuite();
     return;
   }
 
@@ -23706,6 +23788,7 @@ function initHomepageTemplateEvents() {
   bindGlowShadowsSuiteModalControls();
   bindCamera3DMoveSuiteModalControls();
   bindJLCutsSuiteModalControls();
+  bindSubbassSuiteModalControls();
 }
 
 /* =========================================================
@@ -27811,6 +27894,303 @@ function bindJLCutsSuiteModalControls() {
     }
 
     showTextTimingAlert(`Applied ${isJ ? 'J-Cut (Audio Pre-lap)' : 'L-Cut (Audio Linger)'} Pacing to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI SUB-BASS DROPS & RISERS SUITE CONTROLLER
+   (Dramatic low-frequency bass sweeps + sudden camera cuts to reset attention spans)
+   ========================================================= */
+let subbassSuiteState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 4.0,
+  impactPoint: 2.5, // point where riser peaks and drops into sub-bass slam
+  riserStartHz: 80,
+  riserEndHz: 1200,
+  subBassHz: 28,
+  recoilShake: 18,
+  flashCut: true,
+  headline: "THE ATTENTION RESET PROTOCOL",
+  subcaption: "SUB-BASS DROP 28Hz // 1-FRAME CAMERA CUT",
+  footageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateSubbassVisualStyles() {
+  const headlineEl = document.getElementById('subbass-stage-headline');
+  const subcaptionEl = document.getElementById('subbass-stage-subcaption');
+  const footageImg = document.getElementById('subbass-stage-bg-image');
+  const shockwave = document.getElementById('subbass-shockwave-ring');
+  const flashEl = document.getElementById('subbass-flash-layer');
+  const stageViewport = document.getElementById('subbass-stage-viewport');
+  const freqBadge = document.getElementById('subbass-badge-freq');
+  const statusBadge = document.getElementById('subbass-badge-status');
+
+  if (headlineEl) headlineEl.textContent = subbassSuiteState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = subbassSuiteState.subcaption;
+  if (footageImg && footageImg.src !== subbassSuiteState.footageUrl) {
+    footageImg.src = subbassSuiteState.footageUrl;
+  }
+
+  const p = subbassSuiteState.playhead;
+  const impact = subbassSuiteState.impactPoint;
+  const dur = subbassSuiteState.duration;
+
+  // Track cursor update
+  const cursor = document.getElementById('subbass-timeline-cursor');
+  if (cursor) {
+    cursor.style.left = `${(p / dur) * 100}%`;
+  }
+  const timerEl = document.getElementById('subbass-timer-display');
+  if (timerEl) {
+    timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  }
+
+  // Phase calculation
+  if (p < impact) {
+    // Phase 1: Rising Tension / Riser Sweep
+    const riserProgress = Math.min(1, p / impact);
+    const currentHz = Math.round(subbassSuiteState.riserStartHz + Math.pow(riserProgress, 2.2) * (subbassSuiteState.riserEndHz - subbassSuiteState.riserStartHz));
+    if (freqBadge) freqBadge.textContent = `${currentHz} Hz [RISER]`;
+    if (statusBadge) statusBadge.textContent = `TENSION BUILD ${(riserProgress * 100).toFixed(0)}%`;
+
+    // Visual building zoom + chromatic aberration vibration
+    const subtleVibe = Math.sin(p * 28) * (riserProgress * 2.5);
+    const zoomScale = 1.0 + riserProgress * 0.12;
+    if (stageViewport) {
+      stageViewport.style.transform = `scale(${zoomScale}) translate(${subtleVibe}px, ${-subtleVibe * 0.5}px)`;
+      stageViewport.style.filter = `brightness(${1 + riserProgress * 0.25}) contrast(${1 + riserProgress * 0.15})`;
+    }
+    if (flashEl) flashEl.style.opacity = '0';
+    if (shockwave) {
+      shockwave.style.opacity = '0';
+      shockwave.style.transform = 'scale(0.2)';
+    }
+  } else {
+    // Phase 2: Impact Point & Sub-bass Drop Slam
+    const dropProgress = (p - impact) / (dur - impact);
+    if (freqBadge) freqBadge.textContent = `${subbassSuiteState.subBassHz} Hz [SUB-BASS SLAM]`;
+    if (statusBadge) statusBadge.textContent = `ATTENTION RESET CUT`;
+
+    // Sudden 1-frame flash cut
+    const timeSinceImpact = p - impact;
+    if (flashEl && subbassSuiteState.flashCut) {
+      if (timeSinceImpact < 0.08) {
+        flashEl.style.opacity = '0.9';
+      } else {
+        flashEl.style.opacity = `${Math.max(0, 0.9 - (timeSinceImpact - 0.08) * 3.5)}`;
+      }
+    }
+
+    // Camera recoil shake decaying exponentially
+    const decay = Math.exp(-dropProgress * 4.5);
+    const shakeAmount = subbassSuiteState.recoilShake * decay;
+    const shakeX = (Math.random() - 0.5) * 2 * shakeAmount;
+    const shakeY = (Math.random() - 0.5) * 2 * shakeAmount;
+    const dropZoom = 1.0 + decay * 0.08;
+
+    if (stageViewport) {
+      stageViewport.style.transform = `scale(${dropZoom}) translate(${shakeX.toFixed(1)}px, ${shakeY.toFixed(1)}px)`;
+      stageViewport.style.filter = `brightness(1) contrast(${1 + decay * 0.3}) drop-shadow(0 0 ${decay * 35}px rgba(244,63,94,${decay * 0.8}))`;
+    }
+
+    // Shockwave expansion ring
+    if (shockwave) {
+      const ringScale = 0.5 + dropProgress * 2.8;
+      const ringOpacity = Math.max(0, (1 - dropProgress) * 0.85);
+      shockwave.style.transform = `scale(${ringScale})`;
+      shockwave.style.opacity = `${ringOpacity}`;
+    }
+  }
+}
+
+function renderSubbassLoop(timestamp) {
+  if (!subbassSuiteState.isPlaying) return;
+  if (!subbassSuiteState.lastTimestamp) subbassSuiteState.lastTimestamp = timestamp;
+  const dt = (timestamp - subbassSuiteState.lastTimestamp) / 1000;
+  subbassSuiteState.lastTimestamp = timestamp;
+
+  subbassSuiteState.playhead += dt;
+  if (subbassSuiteState.playhead > subbassSuiteState.duration) {
+    subbassSuiteState.playhead = 0;
+  }
+
+  updateSubbassVisualStyles();
+  subbassSuiteState.animFrameId = requestAnimationFrame(renderSubbassLoop);
+}
+
+function openSubbassSuite() {
+  const modal = document.getElementById('modal-subbass-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  subbassSuiteState.isPlaying = true;
+  subbassSuiteState.playhead = 0;
+  subbassSuiteState.lastTimestamp = null;
+  if (subbassSuiteState.animFrameId) cancelAnimationFrame(subbassSuiteState.animFrameId);
+  subbassSuiteState.animFrameId = requestAnimationFrame(renderSubbassLoop);
+
+  const btnPlay = document.getElementById('btn-subbass-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+}
+
+function closeSubbassSuite() {
+  const modal = document.getElementById('modal-subbass-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  subbassSuiteState.isPlaying = false;
+  if (subbassSuiteState.animFrameId) {
+    cancelAnimationFrame(subbassSuiteState.animFrameId);
+    subbassSuiteState.animFrameId = null;
+  }
+}
+
+function bindSubbassSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-subbass-suite')?.addEventListener('click', closeSubbassSuite);
+  document.getElementById('btn-cancel-subbass-suite')?.addEventListener('click', closeSubbassSuite);
+
+  // Play / Pause
+  document.getElementById('btn-subbass-play-pause')?.addEventListener('click', () => {
+    subbassSuiteState.isPlaying = !subbassSuiteState.isPlaying;
+    const btnPlay = document.getElementById('btn-subbass-play-pause');
+    if (subbassSuiteState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      subbassSuiteState.lastTimestamp = null;
+      subbassSuiteState.animFrameId = requestAnimationFrame(renderSubbassLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (subbassSuiteState.animFrameId) cancelAnimationFrame(subbassSuiteState.animFrameId);
+    }
+  });
+
+  // Reset
+  document.getElementById('btn-subbass-reset')?.addEventListener('click', () => {
+    subbassSuiteState.playhead = 0;
+    updateSubbassVisualStyles();
+  });
+
+  // Sliders: Sub-bass Hz, Recoil Shake, Riser End Hz
+  const sliderSubHz = document.getElementById('subbass-slider-hz');
+  sliderSubHz?.addEventListener('input', (e) => {
+    subbassSuiteState.subBassHz = parseInt(e.target.value, 10);
+    const label = document.getElementById('subbass-val-hz');
+    if (label) label.textContent = `${subbassSuiteState.subBassHz} Hz`;
+    updateSubbassVisualStyles();
+  });
+
+  const sliderShake = document.getElementById('subbass-slider-shake');
+  sliderShake?.addEventListener('input', (e) => {
+    subbassSuiteState.recoilShake = parseInt(e.target.value, 10);
+    const label = document.getElementById('subbass-val-shake');
+    if (label) label.textContent = `${subbassSuiteState.recoilShake} px`;
+  });
+
+  const sliderRiser = document.getElementById('subbass-slider-riser');
+  sliderRiser?.addEventListener('input', (e) => {
+    subbassSuiteState.riserEndHz = parseInt(e.target.value, 10);
+    const label = document.getElementById('subbass-val-riser');
+    if (label) label.textContent = `${(subbassSuiteState.riserEndHz / 1000).toFixed(1)} kHz`;
+  });
+
+  // Sudden Flash Cut Toggle
+  const toggleFlash = document.getElementById('subbass-toggle-flash');
+  toggleFlash?.addEventListener('change', (e) => {
+    subbassSuiteState.flashCut = e.target.checked;
+  });
+
+  // Text inputs
+  const inputHeadline = document.getElementById('subbass-input-headline');
+  inputHeadline?.addEventListener('input', (e) => {
+    subbassSuiteState.headline = e.target.value;
+    updateSubbassVisualStyles();
+  });
+
+  const inputSubcaption = document.getElementById('subbass-input-subcaption');
+  inputSubcaption?.addEventListener('input', (e) => {
+    subbassSuiteState.subcaption = e.target.value;
+    updateSubbassVisualStyles();
+  });
+
+  // Shuffle stock footage
+  const stockFootages = [
+    'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80'
+  ];
+  let stockIdx = 0;
+  document.getElementById('btn-subbass-shuffle-img')?.addEventListener('click', () => {
+    stockIdx = (stockIdx + 1) % stockFootages.length;
+    subbassSuiteState.footageUrl = stockFootages[stockIdx];
+    const inputUrl = document.getElementById('subbass-input-img');
+    if (inputUrl) inputUrl.value = subbassSuiteState.footageUrl;
+    updateSubbassVisualStyles();
+  });
+
+  const inputImg = document.getElementById('subbass-input-img');
+  inputImg?.addEventListener('input', (e) => {
+    subbassSuiteState.footageUrl = e.target.value;
+    updateSubbassVisualStyles();
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-apply-subbass-suite')?.addEventListener('click', () => {
+    closeSubbassSuite();
+
+    const riserDuration = subbassSuiteState.impactPoint;
+    const impactTime = riserDuration;
+
+    // Build timeline video clip with snap cut and shake
+    const videoClip = {
+      id: `img-subbass-${Date.now()}`,
+      url: subbassSuiteState.footageUrl,
+      start: 0,
+      duration: subbassSuiteState.duration,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'hard_cut',
+      transitionDuration: 0.1
+    };
+
+    // Build Headline Text Clip with dramatic pop
+    const headlineClip = {
+      id: `txt-subbass-head-${Date.now() + 1}`,
+      text: subbassSuiteState.headline,
+      highlight: subbassSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#f43f5e',
+      anim: 'pop',
+      fontSize: 52,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: subbassSuiteState.duration
+    };
+
+    // Build Sub-bass SFX Metadata Track
+    const subcaptionClip = {
+      id: `txt-subbass-sfx-${Date.now() + 2}`,
+      text: `SUB-BASS IMPACT @ ${impactTime.toFixed(1)}s // ${subbassSuiteState.subBassHz}Hz SLAM // ATTENTION RESET`,
+      highlight: `${subbassSuiteState.subBassHz}Hz`,
+      highlightColor: '#fb7185',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: subbassSuiteState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [videoClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert(`Applied James Jani Sub-bass Drop & Riser to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }

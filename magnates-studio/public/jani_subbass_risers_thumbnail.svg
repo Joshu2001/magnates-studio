@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background & Depth Gradients -->
+    <radialGradient id="subBassBg" cx="50%" cy="50%" r="80%">
+      <stop offset="0%" stop-color="#2a0815" />
+      <stop offset="45%" stop-color="#12040b" />
+      <stop offset="100%" stop-color="#050104" />
+    </radialGradient>
+    <radialGradient id="shockwaveGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.8" />
+      <stop offset="40%" stop-color="#e11d48" stop-opacity="0.3" />
+      <stop offset="80%" stop-color="#881337" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="riserRamp" cx="30%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#fb7185" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Glowing Waves & Shockwave Filter -->
+    <filter id="neonSubGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="12" result="blur1" />
+      <feGaussianBlur stdDeviation="4" result="blur2" />
+      <feMerge>
+        <feMergeNode in="blur1" />
+        <feMergeNode in="blur2" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="plateShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000000" flood-opacity="0.95" />
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#f43f5e" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Deep Low-Frequency Canvas Background -->
+  <rect width="800" height="450" fill="url(#subBassBg)" />
+  <circle cx="400" cy="225" r="320" fill="url(#shockwaveGlow)" />
+  <circle cx="250" cy="225" r="280" fill="url(#riserRamp)" />
+
+  <!-- Sub-bass Shockwave Ripples (Low-Frequency Concussion Rings) -->
+  <g stroke="#f43f5e" fill="none" opacity="0.45" stroke-linecap="round">
+    <circle cx="400" cy="225" r="90" stroke-width="3" stroke-dasharray="16 10" />
+    <circle cx="400" cy="225" r="150" stroke-width="2" stroke-dasharray="24 16" opacity="0.35" />
+    <circle cx="400" cy="225" r="215" stroke-width="1.5" stroke-dasharray="32 20" opacity="0.25" />
+    <circle cx="400" cy="225" r="280" stroke-width="1" opacity="0.15" />
+  </g>
+
+  <!-- Grid lines representing frequency scale (Hz) -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="80" y1="0" x2="80" y2="450" />
+    <line x1="200" y1="0" x2="200" y2="450" />
+    <line x1="320" y1="0" x2="320" y2="450" />
+    <line x1="440" y1="0" x2="440" y2="450" />
+    <line x1="560" y1="0" x2="560" y2="450" />
+    <line x1="680" y1="0" x2="680" y2="450" />
+    <line x1="0" y1="120" x2="800" y2="120" />
+    <line x1="0" y1="225" x2="800" y2="225" stroke-opacity="0.08" />
+    <line x1="0" y1="330" x2="800" y2="330" />
+  </g>
+
+  <!-- Dramatic Sub-Bass Drop Curve (Exponential Pitch Dive from High Riser to 28Hz Sub Impact) -->
+  <g filter="url(#neonSubGlow)">
+    <!-- Riser Build-Up Wave (Pitch Rises 0 to 400px) -->
+    <path d="M 60 260 Q 220 250 360 110 L 400 90" 
+          fill="none" stroke="#fb7185" stroke-width="3.5" stroke-linecap="round" />
+    
+    <!-- SUDDEN IMPACT BASS DROP VERTICAL CUT LINE (at x=400) -->
+    <line x1="400" y1="80" x2="400" y2="370" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+    
+    <!-- SUB-BASS SLAM RUMBLE (Exponential 28Hz Dive) -->
+    <path d="M 400 370 Q 480 370 540 330 T 640 340 T 740 335" 
+          fill="none" stroke="#f43f5e" stroke-width="6" stroke-linecap="round" />
+  </g>
+
+  <!-- Frequency Tags on Curve -->
+  <g font-family="monospace" font-size="9" font-weight="900" fill="#fda4af">
+    <text x="70" y="248">120 Hz BUILD-UP</text>
+    <text x="320" y="80">1.2 kHz CRESCENDO</text>
+    <text x="415" y="388" fill="#f43f5e">28 Hz SUB-BASS SLAM</text>
+  </g>
+
+  <!-- IMPACT CUT INDICATOR (Resetting Viewer Attention Spans) -->
+  <g transform="translate(400, 75)">
+    <rect x="-65" y="-14" width="130" height="26" rx="5" fill="#f43f5e" />
+    <text x="0" y="4" font-family="monospace" font-size="9.5" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1.5">
+      SUDDEN CUT RESET
+    </text>
+  </g>
+
+  <!-- Center Floating Studio Title Plate -->
+  <g transform="translate(400, 240)" filter="url(#plateShadow)">
+    <rect x="-260" y="-40" width="520" height="80" rx="16" fill="#0f0307" fill-opacity="0.94" stroke="#f43f5e" stroke-width="2" />
+    
+    <text x="0" y="-12" 
+          font-family="monospace" 
+          font-size="9.5" 
+          font-weight="800" 
+          letter-spacing="3" 
+          text-anchor="middle" 
+          fill="#fda4af">
+      SOUND DESIGN // ATTENTION SPAN RESET
+    </text>
+    
+    <text x="0" y="18" 
+          font-family="'Inter', sans-serif" 
+          font-size="22" 
+          font-weight="900" 
+          letter-spacing="2.5" 
+          text-anchor="middle" 
+          fill="#ffffff">
+      SUB-BASS DROPS &amp; RISERS
+    </text>
+  </g>
+
+  <!-- Subwoofer Frequency Waveform Oscilloscope Graphic at Bottom -->
+  <g transform="translate(400, 395)" stroke="#fb7185" stroke-width="2" stroke-linecap="round" opacity="0.8">
+    <line x1="-280" y1="0" x2="-280" y2="0" />
+    <line x1="-240" y1="-4" x2="-240" y2="4" />
+    <line x1="-200" y1="-8" x2="-200" y2="8" />
+    <line x1="-160" y1="-14" x2="-160" y2="14" />
+    <line x1="-120" y1="-22" x2="-120" y2="22" />
+    <line x1="-80" y1="-32" x2="-80" y2="32" stroke="#ffffff" stroke-width="3" />
+    <line x1="-40" y1="-44" x2="-40" y2="44" stroke="#ffffff" stroke-width="3" />
+    
+    <!-- Impact Center -->
+    <line x1="0" y1="-55" x2="0" y2="55" stroke="#f43f5e" stroke-width="4" filter="url(#neonSubGlow)" />
+    
+    <line x1="40" y1="-38" x2="40" y2="38" stroke="#f43f5e" stroke-width="3" />
+    <line x1="80" y1="-26" x2="80" y2="26" stroke="#f43f5e" stroke-width="3" />
+    <line x1="120" y1="-16" x2="120" y2="16" />
+    <line x1="160" y1="-10" x2="160" y2="10" />
+    <line x1="200" y1="-6" x2="200" y2="6" />
+    <line x1="240" y1="-3" x2="240" y2="3" />
+    <line x1="280" y1="0" x2="280" y2="0" />
+  </g>
+
+  <!-- Header HUD Badges -->
+  <g transform="translate(35, 40)">
+    <rect width="215" height="26" rx="6" fill="#1e040c" stroke="#f43f5e" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="14" y="17" font-family="monospace" font-size="10" font-weight="800" fill="#fda4af" letter-spacing="1.5">SUB-BASS RISER // 28HZ DROP</text>
+  </g>
+
+  <g transform="translate(620, 40)">
+    <rect width="145" height="26" rx="6" fill="#1e040c" stroke="#fb7185" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="12" y="17" font-family="monospace" font-size="10" font-weight="800" fill="#fecdd3" letter-spacing="1.5">IMPACT SHAKE: ON</text>
+  </g>
+</svg>

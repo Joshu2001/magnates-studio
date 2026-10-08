@@ -5919,6 +5919,207 @@
     </div>
   </div>
 
+  <!-- Interactive James Jani Sub-bass Drops & Risers Suite Modal -->
+  <div id="modal-subbass-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(5,6,10,0.88);">
+    <div class="vector-modal-box" style="max-width: 1040px; width: 94vw; max-height: 92vh; background: #0c0d14; border: 1px solid rgba(244,63,94,0.3); box-shadow: 0 25px 65px rgba(0,0,0,0.85), 0 0 45px rgba(244,63,94,0.18); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
+      
+      <!-- Modal Header -->
+      <div class="vector-modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); background: rgba(20,10,18,0.7);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 28px; height: 28px; border-radius: 6px; background: linear-gradient(135deg, #f43f5e, #be123c); display: flex; align-items: center; justify-content: center;">
+            <svg class="ui-icon" viewBox="0 0 24 24" style="color: #ffffff; width: 16px; height: 16px;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">SUB-BASS DROPS &amp; RISERS SUITE</h3>
+              <span style="font-size: 9.5px; padding: 2px 7px; border-radius: 10px; background: rgba(244,63,94,0.18); border: 1px solid #f43f5e; color: #fb7185; font-family: monospace; font-weight: 700;">JAMES JANI FX</span>
+            </div>
+            <p style="margin: 2px 0 0; font-size: 11px; color: #94a3b8;">Dramatic low-frequency bass sweeps paired with sudden camera cuts to reset viewer attention spans.</p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-subbass-suite" style="padding: 5px 12px; font-size: 11px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Cancel</button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-subbass-suite" style="padding: 5px 14px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #f43f5e, #e11d48); border: none; color: #ffffff; border-radius: 6px; cursor: pointer; box-shadow: 0 0 16px rgba(244,63,94,0.4);">⚡ Apply to Timeline</button>
+          <button type="button" id="btn-close-subbass-suite" style="background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; margin-left: 6px;">✕</button>
+        </div>
+      </div>
+
+      <!-- Modal Body (Two-Column Layout: Left Stage & Timeline, Right Inspector) -->
+      <div style="display: flex; flex: 1; overflow: hidden; min-height: 480px;">
+
+        <!-- Left Column: Stage Viewport & 2-Track Audio/Video Visualizer (64%) -->
+        <div style="flex: 1.6; padding: 18px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid rgba(255,255,255,0.08); background: #08090d; overflow-y: auto;">
+          
+          <!-- Cinema Stage Viewport -->
+          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid rgba(244,63,94,0.3); box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 10px 25px rgba(0,0,0,0.6);">
+            
+            <!-- Shaking Viewport Container -->
+            <div id="subbass-stage-viewport" style="position: absolute; inset: 0; width: 100%; height: 100%; transition: none; transform-origin: center center;">
+              <!-- Background Scene Footage -->
+              <img id="subbass-stage-bg-image" src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80" alt="Sub-bass Scene Footage" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+              <!-- Cinematic Vignette & Dark Tint -->
+              <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(0,0,0,0.2) 20%, rgba(0,0,0,0.85) 90%);"></div>
+              <!-- Grid Overlay -->
+              <div style="position: absolute; inset: 0; background-image: linear-gradient(rgba(244,63,94,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(244,63,94,0.06) 1px, transparent 1px); background-size: 32px 32px; pointer-events: none;"></div>
+            </div>
+
+            <!-- Expanding Sub-bass Shockwave Concussion Ring -->
+            <div id="subbass-shockwave-ring" style="position: absolute; top: 50%; left: 50%; width: 220px; height: 220px; margin-top: -110px; margin-left: -110px; border-radius: 50%; border: 3px solid rgba(244,63,94,0.9); box-shadow: 0 0 40px rgba(244,63,94,0.8), inset 0 0 30px rgba(244,63,94,0.5); opacity: 0; transform: scale(0.2); pointer-events: none; transition: none;"></div>
+
+            <!-- Sudden 1-Frame White Flash Cut Layer -->
+            <div id="subbass-flash-layer" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; transition: none;"></div>
+
+            <!-- In-Stage Cinematic Typography -->
+            <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; pointer-events: none; z-index: 5;">
+              <span id="subbass-stage-subcaption" style="font-family: monospace; font-size: 11px; letter-spacing: 2px; color: #fb7185; text-shadow: 0 2px 8px rgba(0,0,0,0.9); margin-bottom: 6px; font-weight: 700;">SUB-BASS DROP 28Hz // 1-FRAME CAMERA CUT</span>
+              <h2 id="subbass-stage-headline" style="font-size: 26px; font-weight: 900; color: #ffffff; text-transform: uppercase; letter-spacing: 1px; margin: 0; text-shadow: 0 4px 18px rgba(0,0,0,0.95), 0 0 24px rgba(244,63,94,0.4);">THE ATTENTION RESET PROTOCOL</h2>
+            </div>
+
+            <!-- Top Left Status / Frequency HUD Badges -->
+            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 10;">
+              <span id="subbass-badge-freq" style="font-size: 10px; font-family: monospace; background: rgba(12,13,20,0.85); border: 1px solid rgba(244,63,94,0.4); color: #fb7185; padding: 3px 8px; border-radius: 4px; font-weight: 700;">80 Hz [RISER]</span>
+              <span id="subbass-badge-status" style="font-size: 10px; font-family: monospace; background: rgba(12,13,20,0.85); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">TENSION BUILD 0%</span>
+            </div>
+
+            <!-- Top Right Timer -->
+            <div style="position: absolute; top: 12px; right: 12px; z-index: 10;">
+              <span id="subbass-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(12,13,20,0.85); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 4.0s</span>
+            </div>
+          </div>
+
+          <!-- Playback Bar -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-subbass-play-pause" style="padding: 5px 12px; font-size: 11px; font-weight: 700; background: #1c1d29; border: 1px solid rgba(255,255,255,0.12); color: #ffffff; border-radius: 6px; cursor: pointer;">⏸ Pause</button>
+              <button type="button" id="btn-subbass-reset" style="padding: 5px 10px; font-size: 11px; background: #1c1d29; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 6px; cursor: pointer;">↺ Replay</button>
+            </div>
+            <div style="font-size: 10.5px; color: #94a3b8; font-family: monospace;">
+              <span>TENSION: 0.0s - 2.5s</span> <span style="color: #64748b;">|</span> <span style="color: #fb7185; font-weight: 700;">IMPACT RESET: 2.5s</span>
+            </div>
+          </div>
+
+          <!-- 2-Track Audio & Visual Pacing Timeline Visualization -->
+          <div style="background: rgba(15,16,24,0.85); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; position: relative;">
+            <div style="font-size: 10.5px; font-weight: 700; color: #cbd5e1; display: flex; justify-content: space-between;">
+              <span>⚡ Audio-Visual Attention Reset Tracks</span>
+              <span style="font-family: monospace; color: #f43f5e; font-size: 9.5px;">2.5s IMPACT MARKER</span>
+            </div>
+
+            <!-- Track 1: Video Track with Camera Cut Trigger -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 9.5px; font-family: monospace; color: #94a3b8; width: 64px;">VIDEO V1</span>
+              <div style="flex: 1; height: 26px; background: #11121c; border-radius: 5px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+                <!-- Pre-cut footage block -->
+                <div style="position: absolute; left: 0; width: 62.5%; height: 100%; background: linear-gradient(90deg, #1e293b, #334155); display: flex; align-items: center; padding-left: 8px; font-size: 9.5px; color: #cbd5e1; font-weight: 600;">
+                  Scene Build-up (Zoom In)
+                </div>
+                <!-- Impact Cut Line -->
+                <div style="position: absolute; left: 62.5%; width: 2px; height: 100%; background: #ffffff; box-shadow: 0 0 8px #ffffff; z-index: 2;"></div>
+                <!-- Post-cut reset block -->
+                <div style="position: absolute; left: 62.5%; width: 37.5%; height: 100%; background: linear-gradient(90deg, #881337, #be123c); display: flex; align-items: center; padding-left: 8px; font-size: 9.5px; color: #ffe4e6; font-weight: 700;">
+                  ⚡ Sudden Cut + Camera Recoil Shake
+                </div>
+              </div>
+            </div>
+
+            <!-- Track 2: Audio Track with Riser Sweep & Sub-bass Slam -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 9.5px; font-family: monospace; color: #94a3b8; width: 64px;">AUDIO A1</span>
+              <div style="flex: 1; height: 32px; background: #11121c; border-radius: 5px; position: relative; overflow: hidden; border: 1px solid rgba(244,63,94,0.25);">
+                <!-- Riser pitch ramp -->
+                <div style="position: absolute; left: 0; width: 62.5%; height: 100%; background: linear-gradient(90deg, rgba(244,63,94,0.15), rgba(244,63,94,0.7)); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; font-size: 9px; font-family: monospace; color: #ffffff;">
+                  <span>▲ Riser Sweep (80Hz → 1.2kHz)</span>
+                  <span style="font-size: 12px; color: #f43f5e;">▲</span>
+                </div>
+                <!-- Sub-bass drop slam block -->
+                <div style="position: absolute; left: 62.5%; width: 37.5%; height: 100%; background: linear-gradient(90deg, #f43f5e, #9f1239); display: flex; align-items: center; padding-left: 8px; font-size: 9.5px; font-family: monospace; color: #ffffff; font-weight: 800; box-shadow: 0 0 12px rgba(244,63,94,0.5);">
+                  ▼ 28Hz SUB-BASS DROP SLAM
+                </div>
+              </div>
+            </div>
+
+            <!-- Timeline Playhead Scrubber Track -->
+            <div style="height: 6px; width: 100%; background: #0c0d14; border-radius: 3px; position: relative; margin-top: 2px;">
+              <div id="subbass-timeline-cursor" style="position: absolute; top: -14px; left: 0%; width: 2px; height: 32px; background: #00f0ff; box-shadow: 0 0 8px #00f0ff; pointer-events: none; z-index: 5;">
+                <div style="width: 8px; height: 8px; background: #00f0ff; border-radius: 50%; margin-left: -3px;"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Right Column: Inspector Controls & Sliders (36%) -->
+        <div style="flex: 1; padding: 18px; display: flex; flex-direction: column; gap: 14px; background: #0c0d14; overflow-y: auto;">
+          
+          <!-- Narrative Typography Inputs -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>✍ Text &amp; Tagline Content</span>
+              <span style="font-size: 9.5px; color: #f43f5e; font-family: monospace;">ATTENTION RESET</span>
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Headline</label>
+              <input type="text" id="subbass-input-headline" value="THE ATTENTION RESET PROTOCOL" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            </div>
+            <div>
+              <label style="font-size: 10px; color: #94a3b8; display: block; margin-bottom: 2px;">Subcaption / Audio Badge</label>
+              <input type="text" id="subbass-input-subcaption" value="SUB-BASS DROP 28Hz // 1-FRAME CAMERA CUT" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+            </div>
+          </div>
+
+          <!-- Footage Background Input -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
+              <span>🖼 Scene Footage Source</span>
+              <button type="button" id="btn-subbass-shuffle-img" style="padding: 2px 8px; font-size: 9.5px; border-radius: 4px; background: #181926; border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; cursor: pointer;">
+                🎲 Stock
+              </button>
+            </div>
+            <div>
+              <input type="text" id="subbass-input-img" value="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&auto=format&fit=crop&q=80" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Audio & Camera Dynamics Sliders -->
+          <div style="background: rgba(24,25,38,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #cbd5e1;">🎛 Audio &amp; Camera Impact Dynamics</div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px;">
+              <span style="color: #cbd5e1;">Sub-Bass Fundamental Frequency</span>
+              <span id="subbass-val-hz" style="font-family: monospace; color: #fb7185;">28 Hz</span>
+            </div>
+            <input type="range" id="subbass-slider-hz" min="20" max="60" value="28" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Impact Camera Recoil Shake</span>
+              <span id="subbass-val-shake" style="font-family: monospace; color: #fb7185;">18 px</span>
+            </div>
+            <input type="range" id="subbass-slider-shake" min="4" max="40" value="18" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #cbd5e1;">Riser Peak Frequency</span>
+              <span id="subbass-val-riser" style="font-family: monospace; color: #fb7185;">1.2 kHz</span>
+            </div>
+            <input type="range" id="subbass-slider-riser" min="600" max="2500" value="1200" step="50" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <span style="font-size: 10.5px; color: #cbd5e1;">1-Frame Flash Cut on Impact</span>
+              <input type="checkbox" id="subbass-toggle-flash" checked style="accent-color: #f43f5e; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Professional James Jani Insight Pill -->
+          <div style="background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.25); border-radius: 8px; padding: 10px; font-size: 10px; color: #fecdd3; line-height: 1.45;">
+            <strong style="color: #ffffff;">💡 Retention Theory:</strong> Sub-bass drops (20–40 Hz) stimulate physical resonance while the sudden 1-frame camera cut abruptly breaks visual monotony, rebooting dopamine and recapturing drifting viewer focus.
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Interactive Animated Chart Creator / Template Builder Modal -->
   <div id="chart-creator-modal" class="vector-export-modal" style="display: none;">
     <div class="vector-modal-box" style="max-width: 680px;">
@@ -6891,6 +7092,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=287"></script>
+  <script src="js/app.js?v=288"></script>
 </body>
 </html>
