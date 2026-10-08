@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <!-- Background Noir Gradient -->
+    <linearGradient id="noirBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#05070a" />
+      <stop offset="50%" stop-color="#0b0e14" />
+      <stop offset="100%" stop-color="#020305" />
+    </linearGradient>
+
+    <!-- Heavy Vignette Gradient -->
+    <radialGradient id="heavyVignette" cx="50%" cy="50%" r="70%">
+      <stop offset="25%" stop-color="#000000" stop-opacity="0" />
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.65" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.95" />
+    </radialGradient>
+
+    <!-- Cyan RGB Offset Channel Shift Gradient -->
+    <linearGradient id="cyanOffset" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.3" />
+    </linearGradient>
+
+    <!-- Dark Steel Metallic Frame Gradient -->
+    <linearGradient id="steelCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181c24" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#0d1017" stop-opacity="0.95" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Base Background -->
+  <rect width="400" height="225" fill="url(#noirBg)" />
+
+  <!-- High-Contrast Monochrome Silhouette Skyline / Architecture -->
+  <path d="M 0 170 L 35 150 L 35 180 L 70 130 L 105 130 L 105 190 L 140 110 L 175 110 L 195 90 L 215 110 L 240 110 L 265 140 L 290 140 L 315 105 L 345 105 L 365 160 L 400 145 L 400 225 L 0 225 Z" fill="#030407" />
+
+  <!-- Subtle Cyan Anamorphic Channel Shift Shadow -->
+  <path d="M 6 170 L 41 150 L 41 180 L 76 130 L 111 130 L 111 190 L 146 110 L 181 110 L 201 90 L 221 110 L 246 110 L 271 140 L 296 140 L 321 105 L 351 105 L 371 160 L 406 145 L 406 225 L 6 225 Z" fill="none" stroke="#06b6d4" stroke-width="1.2" opacity="0.45" />
+
+  <!-- Heavy Vignette Overlay -->
+  <rect width="400" height="225" fill="url(#heavyVignette)" />
+
+  <!-- Center Steel Monochrome Title Plate -->
+  <rect x="75" y="52" width="250" height="120" rx="8" fill="url(#steelCard)" stroke="#38bdf8" stroke-width="1.4" stroke-opacity="0.45" />
+  
+  <!-- Subtle Grain & Scan Lines -->
+  <line x1="85" y1="74" x2="315" y2="74" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1" />
+  <line x1="85" y1="148" x2="315" y2="148" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1" />
+
+  <text x="200" y="88" font-family="'Inter', -apple-system, sans-serif" font-size="8.5" font-weight="800" letter-spacing="3" fill="#38bdf8" text-anchor="middle">
+    CRUSHED BLACKS &amp; LOW-SAT
+  </text>
+  <text x="200" y="114" font-family="'Inter', sans-serif" font-size="14" font-weight="900" letter-spacing="2" fill="#ffffff" text-anchor="middle">
+    DEEP MONOCHROME
+  </text>
+  <text x="200" y="136" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" letter-spacing="1.5" fill="#94a3b8" text-anchor="middle">
+    RGB OFFSET // INVESTIGATIVE NOIR
+  </text>
+
+  <!-- Tag Pill Left -->
+  <rect x="14" y="14" width="144" height="20" rx="5" fill="#000000" fill-opacity="0.85" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.6" />
+  <circle cx="26" cy="24" r="3.5" fill="#38bdf8" />
+  <text x="36" y="27.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#bae6fd" letter-spacing="1">NOIR COLOR GRADE</text>
+
+  <!-- Tag Pill Right -->
+  <rect x="306" y="14" width="80" height="20" rx="5" fill="#000000" fill-opacity="0.85" stroke="#64748b" stroke-width="1" />
+  <text x="346" y="27.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#cbd5e1" text-anchor="middle">2 SEC APPLIED</text>
+</svg>

@@ -19992,6 +19992,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Light Leaks', 'Lens Flare', 'Scattering', 'Anamorphic', 'James Jani'],
     defaultImage: '/jani_light_rays_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'monochromatic-crushed-grading',
+    title: 'Deep Monochromatic / Low-Saturated Grading',
+    category: 'Color & Vibe',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.6), rgba(6, 182, 212, 0.25), rgba(2, 3, 5, 0.98))',
+    description: 'Muted tones, crushed black levels, heavy vignette, and shifted RGB channel offsets that emphasize shadow detail, build narrative tension, and deliver an investigative noir atmosphere.',
+    tags: ['Crushed Blacks', 'Low Saturation', 'Muted Tones', 'Color Offset', 'James Jani'],
+    defaultImage: '/jani_monochrome_grading_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20625,6 +20638,26 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'monochromatic-crushed-grading') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+          <!-- Low-saturation & Crushed Blacks Base Layer -->
+          <img id="fx-mono-bg-${tplId}" src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(85%) contrast(165%) brightness(75%); transition: transform 0.1s ease;" />
+
+          <!-- Cyan Channel Shift / RGB Offset Overlay -->
+          <div id="fx-mono-shift-${tplId}" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0.6; filter: grayscale(100%) sepia(80%) hue-rotate(180deg) opacity(50%);">
+            <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+
+          <!-- Deep Vignette Shadow -->
+          <div style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at center, transparent 25%, rgba(0,0,0,0.85) 100%);"></div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #1e293b); color: #38bdf8; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; border: 1px solid rgba(56,189,248,0.4); box-shadow: 0 4px 12px rgba(0,0,0,0.8);">
+            🎬 DEEP MONOCHROME
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20926,6 +20959,18 @@ function startTemplateHoverVideo(cardEl, tpl) {
       }
       if (flare) {
         flare.style.top = `${sweepY}%`;
+      }
+    } else if (tplId === 'monochromatic-crushed-grading') {
+      const shiftX = Math.sin(t * 3.2) * 6;
+      const zoom = 1.05 + Math.sin(t * 1.5) * 0.03;
+      const bgImg = fxContainer?.querySelector(`#fx-mono-bg-${tplId}`);
+      const shiftLayer = fxContainer?.querySelector(`#fx-mono-shift-${tplId}`);
+
+      if (bgImg) {
+        bgImg.style.transform = `scale(${zoom})`;
+      }
+      if (shiftLayer) {
+        shiftLayer.style.transform = `scale(${zoom}) translate(${shiftX}px, 0px)`;
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21293,6 +21338,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'light-rays-lens-leaks') {
     // Launch James Jani Light Rays & Ambient Lens Leaks Suite
     openLightRaysSuite();
+    return;
+  } else if (templateId === 'monochromatic-crushed-grading') {
+    // Launch James Jani Deep Monochromatic / Low-Saturated Grading Suite
+    openMonochromeSuite();
     return;
   }
 
@@ -23375,6 +23424,7 @@ function initHomepageTemplateEvents() {
   bindFlashbackSuiteModalControls();
   bindPuzzleRevealSuiteModalControls();
   bindLightRaysSuiteModalControls();
+  bindMonochromeSuiteModalControls();
 }
 
 /* =========================================================
@@ -25623,10 +25673,306 @@ function bindLightRaysSuiteModalControls() {
   });
 }
 
+/* =========================================================
+   JAMES JANI FX ENGINE: DEEP MONOCHROMATIC / LOW-SATURATED GRADING CONTROLLER
+   ========================================================= */
+let monochromeSuiteState = {
+  isPlaying: false,
+  currentTime: 1.4,
+  duration: 10.0,
+  gradingEnabled: true,
+  saturation: 20,
+  blackCrush: 75,
+  colorOffset: 8,
+  headline: 'SHADOW CORPORATIONS',
+  subcaption: 'CHAPTER II: THE UNTOUCHABLES',
+  imageUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  lastTime: performance.now()
+};
+
+const MONOCHROME_STOCK_IMAGES = [
+  'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+  'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
+];
+
+function playMonochromeSFX() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, now);
+    osc.frequency.exponentialRampToValueAtTime(120, now + 0.16);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.005, now + 0.16);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  } catch (err) {}
+}
+
+function updateMonochromeVisualStyles() {
+  const imgEl = document.getElementById('monochrome-canvas-img');
+  const shiftLayer = document.getElementById('monochrome-channel-shift-layer');
+  const shiftImg = document.getElementById('monochrome-shift-img');
+  const hudState = document.getElementById('monochrome-hud-grade-state');
+
+  if (hudState) hudState.textContent = monochromeSuiteState.gradingEnabled ? 'ON' : 'OFF';
+
+  if (!monochromeSuiteState.gradingEnabled) {
+    if (imgEl) {
+      imgEl.style.filter = 'brightness(100%) contrast(100%)';
+      imgEl.src = monochromeSuiteState.imageUrl;
+    }
+    if (shiftLayer) shiftLayer.style.display = 'none';
+    return;
+  }
+
+  if (shiftLayer) {
+    shiftLayer.style.display = monochromeSuiteState.colorOffset > 0 ? 'block' : 'none';
+    shiftLayer.style.transform = `translate(${monochromeSuiteState.colorOffset}px, 0)`;
+  }
+
+  if (imgEl) {
+    const gray = 100 - monochromeSuiteState.saturation;
+    const contrast = 100 + monochromeSuiteState.blackCrush;
+    const brightness = Math.max(45, 100 - (monochromeSuiteState.blackCrush * 0.35));
+    imgEl.style.filter = `grayscale(${gray}%) contrast(${contrast}%) brightness(${brightness}%)`;
+    imgEl.src = monochromeSuiteState.imageUrl;
+  }
+
+  if (shiftImg) {
+    shiftImg.src = monochromeSuiteState.imageUrl;
+  }
+}
+
+function renderMonochromeLoop(now) {
+  const dt = (now - monochromeSuiteState.lastTime) / 1000;
+  monochromeSuiteState.lastTime = now;
+
+  if (monochromeSuiteState.isPlaying) {
+    monochromeSuiteState.currentTime += dt;
+    if (monochromeSuiteState.currentTime >= monochromeSuiteState.duration) {
+      monochromeSuiteState.currentTime = 0;
+    }
+
+    const t = monochromeSuiteState.currentTime;
+    const readout = document.getElementById('monochrome-time-readout');
+    const playheadReadout = document.getElementById('monochrome-playhead-readout');
+    const needle = document.getElementById('monochrome-playhead-needle');
+
+    const mins = Math.floor(t / 60);
+    const secs = Math.floor(t % 60);
+    const ms = Math.floor((t % 1) * 100);
+    const timeFormatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
+
+    if (readout) readout.textContent = `${timeFormatted} / 00:10.00`;
+    if (playheadReadout) playheadReadout.textContent = `PLAYHEAD: ${timeFormatted}`;
+    if (needle) needle.style.left = `${(t / monochromeSuiteState.duration) * 100}%`;
+
+    // Subtle breathing push-in and chromatic drift
+    if (monochromeSuiteState.gradingEnabled) {
+      const zoom = 1.05 + Math.sin(t * 1.5) * 0.03;
+      const jitter = Math.sin(t * 3.5) * (monochromeSuiteState.colorOffset * 0.3);
+      const bgImg = document.getElementById('monochrome-canvas-img');
+      const shiftLayer = document.getElementById('monochrome-channel-shift-layer');
+
+      if (bgImg) bgImg.style.transform = `scale(${zoom})`;
+      if (shiftLayer) {
+        shiftLayer.style.transform = `scale(${zoom}) translate(${monochromeSuiteState.colorOffset + jitter}px, 0)`;
+      }
+    }
+  }
+
+  monochromeSuiteState.animFrameId = requestAnimationFrame(renderMonochromeLoop);
+}
+
+function openMonochromeSuite() {
+  const modal = document.getElementById('modal-monochrome-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  monochromeSuiteState.isPlaying = true;
+  monochromeSuiteState.lastTime = performance.now();
+  const icon = document.getElementById('monochrome-play-icon');
+  if (icon) icon.textContent = '❚❚';
+  updateMonochromeVisualStyles();
+  if (!monochromeSuiteState.animFrameId) {
+    monochromeSuiteState.animFrameId = requestAnimationFrame(renderMonochromeLoop);
+  }
+}
+
+function closeMonochromeSuite() {
+  const modal = document.getElementById('modal-monochrome-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  monochromeSuiteState.isPlaying = false;
+  const icon = document.getElementById('monochrome-play-icon');
+  if (icon) icon.textContent = '▶';
+  if (monochromeSuiteState.animFrameId) {
+    cancelAnimationFrame(monochromeSuiteState.animFrameId);
+    monochromeSuiteState.animFrameId = null;
+  }
+}
+
+function bindMonochromeSuiteModalControls() {
+  document.getElementById('btn-close-monochrome-suite')?.addEventListener('click', closeMonochromeSuite);
+
+  // Play / Pause
+  document.getElementById('btn-monochrome-play')?.addEventListener('click', () => {
+    monochromeSuiteState.isPlaying = !monochromeSuiteState.isPlaying;
+    const icon = document.getElementById('monochrome-play-icon');
+    if (icon) icon.textContent = monochromeSuiteState.isPlaying ? '❚❚' : '▶';
+  });
+
+  // Toggle Grade
+  document.getElementById('btn-monochrome-toggle-grade')?.addEventListener('click', () => {
+    monochromeSuiteState.gradingEnabled = !monochromeSuiteState.gradingEnabled;
+    playMonochromeSFX();
+    updateMonochromeVisualStyles();
+  });
+
+  // Text inputs
+  document.getElementById('monochrome-input-headline')?.addEventListener('input', (e) => {
+    monochromeSuiteState.headline = e.target.value.toUpperCase();
+    const h = document.getElementById('monochrome-display-headline');
+    if (h) h.textContent = e.target.value.toUpperCase();
+  });
+
+  document.getElementById('monochrome-input-subcaption')?.addEventListener('input', (e) => {
+    monochromeSuiteState.subcaption = e.target.value.toUpperCase();
+    const s = document.getElementById('monochrome-display-subcaption');
+    if (s) s.textContent = e.target.value.toUpperCase();
+  });
+
+  // Image editing (URL input)
+  document.getElementById('monochrome-input-img-url')?.addEventListener('input', (e) => {
+    const url = e.target.value.trim();
+    if (url) {
+      monochromeSuiteState.imageUrl = url;
+      updateMonochromeVisualStyles();
+    }
+  });
+
+  // Upload custom photo
+  document.getElementById('monochrome-upload-file-input')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      monochromeSuiteState.imageUrl = ev.target.result;
+      updateMonochromeVisualStyles();
+      const urlInput = document.getElementById('monochrome-input-img-url');
+      if (urlInput) urlInput.value = `[Uploaded: ${file.name}]`;
+      playMonochromeSFX();
+      showTextTimingAlert(`Uploaded custom noir footage: ${file.name}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Shuffle stock photo
+  document.getElementById('btn-monochrome-shuffle-img')?.addEventListener('click', () => {
+    const nextImg = MONOCHROME_STOCK_IMAGES[Math.floor(Math.random() * MONOCHROME_STOCK_IMAGES.length)];
+    monochromeSuiteState.imageUrl = nextImg;
+    const urlInput = document.getElementById('monochrome-input-img-url');
+    if (urlInput) urlInput.value = nextImg;
+    updateMonochromeVisualStyles();
+    playMonochromeSFX();
+  });
+
+  // Saturation slider
+  document.getElementById('monochrome-slider-saturation')?.addEventListener('input', (e) => {
+    monochromeSuiteState.saturation = parseInt(e.target.value) || 0;
+    const lbl = document.getElementById('monochrome-val-saturation');
+    if (lbl) lbl.textContent = `${monochromeSuiteState.saturation}%`;
+    updateMonochromeVisualStyles();
+  });
+
+  // Black Crush slider
+  document.getElementById('monochrome-slider-crush')?.addEventListener('input', (e) => {
+    monochromeSuiteState.blackCrush = parseInt(e.target.value) || 0;
+    const lbl = document.getElementById('monochrome-val-crush');
+    if (lbl) lbl.textContent = `${monochromeSuiteState.blackCrush}%`;
+    updateMonochromeVisualStyles();
+  });
+
+  // RGB Offset slider
+  document.getElementById('monochrome-slider-offset')?.addEventListener('input', (e) => {
+    monochromeSuiteState.colorOffset = parseInt(e.target.value) || 0;
+    const lbl = document.getElementById('monochrome-val-offset');
+    if (lbl) lbl.textContent = `${monochromeSuiteState.colorOffset}px`;
+    updateMonochromeVisualStyles();
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-monochrome-apply-timeline')?.addEventListener('click', () => {
+    closeMonochromeSuite();
+    switchStudioView('editor');
+
+    const footageClip = {
+      id: `img-monochrome-${Date.now()}`,
+      name: 'Deep_Monochrome_Noir_Scene.jpg',
+      url: monochromeSuiteState.imageUrl,
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    const headlineClip = {
+      id: `txt-monochrome-headline-${Date.now() + 1}`,
+      text: monochromeSuiteState.headline,
+      highlight: monochromeSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#38bdf8',
+      anim: 'pop',
+      fontSize: 54,
+      fontFamily: 'Inter, sans-serif',
+      start: 0,
+      duration: 6
+    };
+
+    const subcaptionClip = {
+      id: `txt-monochrome-sub-${Date.now() + 2}`,
+      text: monochromeSuiteState.subcaption,
+      highlight: '',
+      highlightColor: '#0284c7',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'monospace',
+      start: 0.2,
+      duration: 5.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [footageClip];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert('Applied Deep Monochromatic Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
 // Initialize homepage discovery view immediately on script execution
 setTimeout(() => {
   initHomepageTemplateEvents();
 }, 100);
+
 
 
 
