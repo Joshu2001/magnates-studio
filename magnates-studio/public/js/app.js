@@ -19909,11 +19909,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Style',
     difficulty: '1-Click',
     timeToApply: '4 sec',
-    previewGradient: 'linear-gradient(to top, rgba(180, 83, 9, 0.7), rgba(217, 119, 6, 0.35), rgba(7, 9, 14, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Cinematic 3D gold-bevel title floating over a glowing perspective floor grid with drifting document cards and cinematic camera pullback.',
     tags: ['3D Titles', 'Camera Pullback', 'James Jani'],
-    defaultImage: '/spatial_3d_suite_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'document-3d-fx-engine',
@@ -19922,11 +19922,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Documentary FX',
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(to top, rgba(147, 51, 234, 0.7), rgba(234, 179, 8, 0.35), rgba(7, 9, 14, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Cinematic 3D camera flyover of investigative newspapers with animated highlighter wipes, classified redaction leaks, and 3D headline pop-outs.',
     tags: ['Document FX', 'Highlighter', 'James Jani'],
-    defaultImage: '/document_3d_fx_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'jani-puzzle-narrative-suite',
@@ -19935,10 +19935,10 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '4 sec',
-    previewGradient: 'linear-gradient(to top, rgba(0, 242, 254, 0.65), rgba(79, 172, 254, 0.35), rgba(5, 7, 10, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Deconstruct complex narratives into 3x3 floating puzzle pieces and snap them into place with glowing geometric alpha matte talking points.',
     tags: ['Puzzle Metaphor', 'Alpha Matte', 'James Jani', 'Retention'],
-    defaultImage: '/jani_puzzle_matte_thumbnail.svg',
+    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -19948,10 +19948,10 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '5 sec',
-    previewGradient: 'linear-gradient(to top, rgba(239, 68, 68, 0.7), rgba(245, 158, 11, 0.35), rgba(9, 9, 11, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Build unbearable narrative suspense with customizable T-Minus digital clocks, collapsing stock tickers, dynamic charts, audio risers, and climax screen shake.',
     tags: ['Countdown Effect', 'James Jani', 'Panic Ticker', 'Audio Riser', 'Climax Impact'],
-    defaultImage: '/jani_countdown_thumbnail.svg',
+    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -19961,11 +19961,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: 'Instant',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(245, 158, 11, 0.7), rgba(168, 85, 247, 0.4), rgba(5, 3, 2, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45° motion blur sweeps, memory tint color grades, and archival headlines.',
     tags: ['Flashback', 'Flashforward', 'Time Jump', 'White Flash', 'James Jani'],
-    defaultImage: '/jani_flashback_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'puzzle-piece-reveal',
@@ -19974,11 +19974,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: 'Pro FX',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(to top, rgba(168, 85, 247, 0.7), rgba(6, 182, 212, 0.4), rgba(3, 2, 7, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Jani’s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
-    defaultImage: '/jani_puzzle_reveal_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'light-rays-lens-leaks',
@@ -19987,11 +19987,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(245, 158, 11, 0.75), rgba(168, 85, 247, 0.45), rgba(6, 182, 212, 0.25), rgba(5, 3, 8, 0.95))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Subtle ambient light leaks, anamorphic lens flare streaks, and volumetric ray scattering overlayed on footage to emulate real camera lens imperfections.',
     tags: ['Light Leaks', 'Lens Flare', 'Scattering', 'Anamorphic', 'James Jani'],
-    defaultImage: '/jani_light_rays_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'monochromatic-crushed-grading',
@@ -20000,11 +20000,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.6), rgba(6, 182, 212, 0.25), rgba(2, 3, 5, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Muted tones, crushed black levels, heavy vignette, and shifted RGB channel offsets that emphasize shadow detail, build narrative tension, and deliver an investigative noir atmosphere.',
     tags: ['Crushed Blacks', 'Low Saturation', 'Muted Tones', 'Color Offset', 'James Jani'],
-    defaultImage: '/jani_monochrome_grading_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'heavy-elliptical-vignette',
@@ -20013,11 +20013,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(2, 3, 8, 0.98), rgba(7, 10, 18, 0.7), rgba(245, 158, 11, 0.25), rgba(1, 2, 4, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'An Adjustment Clip with a heavily feathered elliptical mask (size constraint ~0.7, feathering >2.8x) that darkens frame edges to direct viewer focus strictly to the center narrative focal point.',
     tags: ['Heavy Vignette', 'Elliptical Mask', 'Financial Thriller', 'Focal Pull', 'James Jani'],
-    defaultImage: '/jani_heavy_vignette_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'text-reveal-modifiers',
@@ -20026,11 +20026,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: 'Instant',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(5, 20, 13, 0.95), rgba(6, 31, 20, 0.7), rgba(16, 185, 129, 0.35), rgba(1, 4, 2, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines together" text assembly for investigative tension.',
     tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
-    defaultImage: '/jani_text_reveal_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'glow-drop-shadows',
@@ -20039,11 +20039,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(30, 16, 53, 0.98), rgba(10, 5, 24, 0.7), rgba(168, 85, 247, 0.35), rgba(3, 1, 8, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Duplicated text layer technique. Heavy ambient glow on bottom layer with massive blur radius and soft drop shadows on top to isolate text from dark backdrops.',
     tags: ['Duplicated Layer', 'Glow Radius', 'Drop Shadows', 'Text Contrast', 'James Jani'],
-    defaultImage: '/jani_glow_shadows_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: '3d-camera-move-rotation',
@@ -20052,11 +20052,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: 'Pro 3D',
     timeToApply: '4 sec',
-    previewGradient: 'linear-gradient(to top, rgba(24, 21, 52, 0.98), rgba(10, 10, 24, 0.7), rgba(99, 102, 241, 0.35), rgba(3, 3, 8, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Text mapped onto 3D layers with slow backward/forward camera tracking and subtle X/Y-rotation tweaks that make typography float dynamically in physical space.',
     tags: ['3D Layers', 'Camera Tracking', 'X/Y Rotation', 'Spatial Depth', 'James Jani'],
-    defaultImage: '/jani_3d_camera_move_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'audio-visual-jl-cuts',
@@ -20065,11 +20065,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(25, 21, 48, 0.98), rgba(10, 8, 24, 0.75), rgba(6, 182, 212, 0.35), rgba(3, 2, 9, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'James Jani constantly shifts the audio track of the upcoming scene or voiceover so it plays before the visuals catch up (J-Cut), or lets dialogue bleed across the visual cut into the next shot (L-Cut) to bridge nonlinear jumps seamlessly.',
     tags: ['J-Cut', 'L-Cut', 'Audio-Visual Pacing', 'Sound Bridge', 'Nonlinear Jump', 'James Jani'],
-    defaultImage: '/jani_jl_cuts_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'subbass-drops-risers',
@@ -20078,11 +20078,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(42, 8, 21, 0.98), rgba(18, 4, 11, 0.75), rgba(244, 63, 94, 0.35), rgba(5, 1, 4, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Dramatic low-frequency bass sweeps (sub-bass dive to 28Hz) paired with a crescendo riser and sudden impact camera cuts to snap and reset viewer attention spans.',
     tags: ['Sub-bass Drop', 'Audio Riser', 'Camera Cut', 'Attention Reset', 'Sound Design', 'James Jani'],
-    defaultImage: '/jani_subbass_risers_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-3d-projection',
@@ -20091,11 +20091,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: 'Pro 3D',
     timeToApply: '4 sec',
-    previewGradient: 'linear-gradient(to top, rgba(20, 14, 5, 0.98), rgba(12, 18, 35, 0.75), rgba(245, 158, 11, 0.35), rgba(3, 4, 8, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Core 3D & Spatial Effects: Converting 2D cutout images, portraits, and text into 3D space by enabling 3D mode on layers and setting up a 3D camera (such as a 50mm focal length camera linked to a null object controller).',
     tags: ['3D Projection', '50mm Camera', 'Null Object', 'Portrait Cutout', 'Spatial Depth', 'Magnates Media'],
-    defaultImage: '/magnates_3d_projection_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-cc-vignette-dof',
@@ -20104,10 +20104,10 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(2, 6, 23, 0.98), rgba(8, 47, 73, 0.75), rgba(56, 189, 248, 0.35), rgba(1, 4, 12, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Keyframing CC Vignette angles and depth-of-field blur to draw viewer focus strictly toward specific characters or cutouts, isolating subjects against blurred backgrounds.',
     tags: ['CC Vignette', 'Depth of Focus', 'DOF Blur', 'Magnates Media', 'Focus Pull', 'Cutout Isolation'],
-    defaultImage: '/magnates_cc_vignette_thumbnail.svg',
+    defaultImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -20117,11 +20117,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(16, 12, 4, 0.98), rgba(69, 39, 160, 0.6), rgba(245, 158, 11, 0.4), rgba(3, 2, 8, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Stacking brightness, contrast adjustments, and dual inner/outer glows on PNG cutout subjects to make them pop intensely against dark or blurred backdrops.',
     tags: ['Brightness & Contrast', 'Inner Glow', 'Outer Glow', 'PNG Cutout Pop', 'Magnates Media'],
-    defaultImage: '/magnates_brightness_glow_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-multi-drop-shadows',
@@ -20130,10 +20130,10 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(6, 8, 18, 0.98), rgba(15, 23, 42, 0.75), rgba(56, 189, 248, 0.35), rgba(2, 3, 8, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Applying stacked multi-tier drop shadows with custom directional angles to flat 2D cutouts so they float realistically over the background scene with spatial occlusion.',
     tags: ['Multi-Layer Shadows', 'Drop Shadows', 'Cutout Elevation', 'Floating Card', 'Magnates Media'],
-    defaultImage: '/magnates_drop_shadows_thumbnail.svg',
+    defaultImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -20143,11 +20143,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(24, 4, 10, 0.98), rgba(40, 6, 18, 0.75), rgba(244, 63, 94, 0.35), rgba(4, 1, 3, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Using Fill tools to transform characters into ominous flat black silhouettes or applying Gradient Colorize to stylize tone, mood, and dramatic investigative tension.',
     tags: ['Shadowization', 'Fill Silhouette', 'Gradient Colorize', 'Noir Tension', 'Magnates Media'],
-    defaultImage: '/magnates_shadowization_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-blend-modes',
@@ -20156,11 +20156,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(4, 8, 20, 0.98), rgba(10, 25, 47, 0.75), rgba(56, 189, 248, 0.35), rgba(1, 3, 10, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Compositing with Screen mode for snow/particles, Difference mode for film noise & inverted vintage text, and Overlay mode for antique clock animations and organic paper textures.',
     tags: ['Blend Modes', 'Screen Blend', 'Difference Mode', 'Overlay Texture', 'Magnates Media'],
-    defaultImage: '/magnates_blend_modes_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-paper-blueprint',
@@ -20169,10 +20169,10 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(2, 11, 24, 0.98), rgba(7, 27, 56, 0.75), rgba(56, 189, 248, 0.35), rgba(1, 6, 15, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: '2D paper-style layers, floating cutout portraits, moving hands pinning evidence, and technical paper blueprint architectural grids.',
     tags: ['Paper Cutout', 'Blueprint Grid', 'Floating Portraits', 'Moving Hands', 'Magnates Media'],
-    defaultImage: '/magnates_paper_blueprint_thumbnail.svg',
+    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -20182,11 +20182,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(10, 5, 18, 0.98), rgba(20, 7, 34, 0.75), rgba(168, 85, 247, 0.35), rgba(4, 2, 8, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Organic ink-bleed stains and dynamic stretchy title text animations to dramatically introduce key character names, historical dates, and chapter headers.',
     tags: ['Ink Bleed', 'Stretchy Text', 'Chapter Reveal', 'Organic Splatter', 'Magnates Media'],
-    defaultImage: '/magnates_ink_reveal_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-article-highlight',
@@ -20195,11 +20195,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(20, 17, 11, 0.98), rgba(31, 26, 18, 0.75), rgba(245, 158, 11, 0.35), rgba(8, 6, 4, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Smoothly panning and scaling across archival newspaper clippings or financial dossiers while highlighting specific smoking-gun text blocks with marker pen FX.',
     tags: ['Article Pan', 'Text Highlight', 'Newspaper Zoom', 'Marker Bleed', 'Magnates Media'],
-    defaultImage: '/magnates_article_highlight_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-particle-vfx',
@@ -20208,11 +20208,11 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'Magnates Media Signature',
     difficulty: '1-Click',
     timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(8, 2, 5, 0.98), rgba(20, 6, 9, 0.75), rgba(244, 63, 94, 0.35), rgba(3, 0, 2, 0.98))',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Atmospheric floating dust motes, anamorphic optical flares, burning ember fire sparks, organic volumetric smoke, and retro 35mm film grain overlays.',
     tags: ['Dust Particles', 'Optical Flare', 'Fire Embers', 'Smoke Overlay', 'Film Grain', 'Magnates Media'],
-    defaultImage: '/magnates_particle_vfx_thumbnail.svg',
-    secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
+    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20243,6 +20243,12 @@ function switchStudioView(viewName) {
       btnEditor.style.color = '#94a3b8';
       btnEditor.classList.remove('active');
     }
+    // Hide editor-specific top bar controls on templates page
+    document.querySelectorAll('.editor-only-nav').forEach(el => {
+      el.style.display = 'none';
+    });
+    const newProjectBtn = document.getElementById('btn-templates-open-editor');
+    if (newProjectBtn) newProjectBtn.style.display = 'flex';
     // Update vertical rail active tab to 'templates'
     document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.railTab === 'templates');
@@ -20261,6 +20267,25 @@ function switchStudioView(viewName) {
       btnEditor.style.color = '#fff';
       btnEditor.classList.add('active');
     }
+    // Hide home-only New Project button in editor view
+    const newProjectBtn = document.getElementById('btn-templates-open-editor');
+    if (newProjectBtn) newProjectBtn.style.display = 'none';
+    // Show editor-specific top bar controls in Studio Editor mode
+    const projInfo = document.getElementById('top-project-info');
+    if (projInfo) projInfo.style.display = 'flex';
+    const ctxActions = document.getElementById('top-contextual-actions');
+    if (ctxActions) ctxActions.style.display = 'flex';
+    const saveBtn = document.getElementById('btn-save-project');
+    if (saveBtn) saveBtn.style.display = 'inline-flex';
+    const exportBtn = document.getElementById('btn-export');
+    if (exportBtn) exportBtn.style.display = 'inline-flex';
+    const div1 = document.getElementById('top-divider-1');
+    if (div1) div1.style.display = 'block';
+    const div2 = document.getElementById('top-divider-2');
+    if (div2) div2.style.display = 'block';
+    const panelToggles = document.getElementById('top-panel-toggles');
+    if (panelToggles) panelToggles.style.display = 'flex';
+
     // Update vertical rail active tab to 'all' (Media/Uploads) if templates was active
     const activeRail = document.querySelector('.nav-rail .rail-btn.active');
     if (!activeRail || activeRail.dataset.railTab === 'templates') {
@@ -20312,7 +20337,7 @@ function renderHomepageTemplates() {
     return matchesCat && matchesSearch;
   });
 
-  if (countEl) countEl.textContent = `(${filtered.length} Available)`;
+  if (countEl) countEl.textContent = `${filtered.length}`;
   if (headingEl) {
     headingEl.textContent = currentTemplateCategory === 'All'
       ? 'Inspired By Your Creative Workflow'
@@ -20335,10 +20360,10 @@ function renderHomepageTemplates() {
       <div class="home-tpl-card" data-template-id="${t.id}">
         <div class="home-tpl-media" id="media-wrap-${t.id}">
           <img src="${t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" />
-          <div class="home-tpl-overlay" style="background: ${t.previewGradient}; opacity: 0.65;"></div>
+          <div class="home-tpl-overlay" style="background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.65) 100%);"></div>
           
           <div class="home-tpl-center-label" id="center-label-${t.id}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; transition: opacity 0.2s;">
-            <div style="padding: 4px 12px; border-radius: 8px; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); border: 1px solid rgba(192, 132, 252, 0.4); color: #d8b4fe; font-size: 11px; font-family: monospace; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+            <div style="padding: 4px 14px; border-radius: 6px; background: rgba(0,0,0,0.82); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 10.5px; font-family: monospace; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;">
               [ ${t.category.toUpperCase()} ]
             </div>
           </div>
