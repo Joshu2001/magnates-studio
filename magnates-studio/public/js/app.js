@@ -20057,10 +20057,23 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['3D Layers', 'Camera Tracking', 'X/Y Rotation', 'Spatial Depth', 'James Jani'],
     defaultImage: '/jani_3d_camera_move_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'audio-visual-jl-cuts',
+    title: 'Audio-Visual Pacing: J-Cuts & L-Cuts',
+    category: 'Transitions',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(25, 21, 48, 0.98), rgba(10, 8, 24, 0.75), rgba(6, 182, 212, 0.35), rgba(3, 2, 9, 0.98))',
+    description: 'James Jani constantly shifts the audio track of the upcoming scene or voiceover so it plays before the visuals catch up (J-Cut), or lets dialogue bleed across the visual cut into the next shot (L-Cut) to bridge nonlinear jumps seamlessly.',
+    tags: ['J-Cut', 'L-Cut', 'Audio-Visual Pacing', 'Sound Bridge', 'Nonlinear Jump', 'James Jani'],
+    defaultImage: '/jani_jl_cuts_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Glitches'];
+const TEMPLATE_CATEGORIES = ['All', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
@@ -20811,6 +20824,51 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'audio-visual-jl-cuts') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #070914; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 12px;">
+          <!-- Dual Video & Audio Track Representation -->
+          <div style="position: relative; width: 100%; display: flex; flex-direction: column; gap: 8px;">
+            <!-- Track 1: Visual Cut Track -->
+            <div style="position: relative; height: 32px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden; display: flex;">
+              <div style="width: 55%; background: rgba(30,41,59,0.9); border-right: 2px solid #ef4444; display: flex; align-items: center; padding-left: 8px; font-family: monospace; font-size: 8px; color: #94a3b8; font-weight: 800;">
+                SCENE A (PRESENT)
+              </div>
+              <div style="flex: 1; background: rgba(15,23,42,0.95); display: flex; align-items: center; padding-left: 8px; font-family: monospace; font-size: 8px; color: #a5b4fc; font-weight: 800;">
+                SCENE B (FLASHBACK)
+              </div>
+              <div style="position: absolute; left: 55%; top: 0; bottom: 0; width: 2px; background: #ef4444;"></div>
+            </div>
+
+            <!-- Track 2: Audio J-Cut Pre-lap Track -->
+            <div style="position: relative; height: 38px; background: rgba(8,51,68,0.7); border: 1.5px solid #06b6d4; border-radius: 6px; overflow: hidden; display: flex; align-items: center; box-shadow: 0 0 20px rgba(6,182,212,0.3);">
+              <div style="position: absolute; left: 32%; width: 68%; top: 0; bottom: 0; background: linear-gradient(90deg, rgba(6,182,212,0.4), rgba(14,165,233,0.3)); border-left: 2px solid #22d3ee;">
+                <div style="display: flex; align-items: center; justify-content: space-between; height: 100%; padding: 0 8px;">
+                  <span style="font-family: monospace; font-size: 8px; font-weight: 800; color: #67e8f9;">
+                    J-CUT VOICEOVER PRE-LAP (-1.4s)
+                  </span>
+                  <span id="fx-jl-wave-${tplId}" style="color: #22d3ee; font-size: 11px; letter-spacing: 2px; filter: drop-shadow(0 0 6px #06b6d4);">
+                     ▂▃▅▆▇▆▅▃ 
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pre-Lap Bridge Bracket Indicator -->
+            <div style="position: relative; height: 14px; margin-top: 2px; display: flex; align-items: center;">
+              <div style="position: absolute; left: 32%; width: 23%; height: 2px; background: #00f0ff; box-shadow: 0 0 6px #00f0ff;"></div>
+              <span style="position: absolute; left: 33%; font-family: monospace; font-size: 7px; color: #38bdf8; font-weight: 800;">
+                AUDIO LEADS BEFORE VIDEO CUT
+              </span>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #06b6d4, #0e7490); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(6,182,212,0.5);">
+            🎧 J-CUT &amp; L-CUT PACING
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -21162,6 +21220,13 @@ function startTemplateHoverVideo(cardEl, tpl) {
       const rigEl = fxContainer?.querySelector(`#fx-3d-rig-${tplId}`);
       if (rigEl) {
         rigEl.style.transform = `translateZ(${trackZ}px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+      }
+    } else if (tplId === 'audio-visual-jl-cuts') {
+      const waves = [' ▂▃▅▆▇▆▅▃ ', '▂▃▅▇█▇▅▃▂ ', '▃▅▇███▇▅▃ ', '▅▇█████▇▅ ', '▃▅▇███▇▅▃ '];
+      const waveIndex = Math.floor((t * 8) % waves.length);
+      const waveEl = fxContainer?.querySelector(`#fx-jl-wave-${tplId}`);
+      if (waveEl) {
+        waveEl.textContent = waves[waveIndex];
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -21549,6 +21614,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === '3d-camera-move-rotation') {
     // Launch James Jani 3D Camera Move & Rotation Suite
     openCamera3DMoveSuite();
+    return;
+  } else if (templateId === 'audio-visual-jl-cuts') {
+    // Launch James Jani Audio-Visual Pacing J-Cuts & L-Cuts Suite
+    openJLCutsSuite();
     return;
   }
 
@@ -23636,6 +23705,7 @@ function initHomepageTemplateEvents() {
   bindTextRevealSuiteModalControls();
   bindGlowShadowsSuiteModalControls();
   bindCamera3DMoveSuiteModalControls();
+  bindJLCutsSuiteModalControls();
 }
 
 /* =========================================================
@@ -27313,6 +27383,434 @@ function bindCamera3DMoveSuiteModalControls() {
     }
 
     showTextTimingAlert('Applied 3D Camera Move & Rotation Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
+   JAMES JANI FX ENGINE: AUDIO-VISUAL PACING (J-CUTS & L-CUTS) SUITE CONTROLLER
+   ========================================================= */
+let jlCutsSuiteState = {
+  isPlaying: false,
+  currentTime: 3.5, // 0.0 to 8.0 seconds (cut happens at 4.0s)
+  duration: 8.0,
+  cutType: 'j-cut', // 'j-cut' (audio leads) or 'l-cut' (audio lingers)
+  offsetSeconds: 1.2, // pre-lap or post-lap offset duration
+  crossfadeDuration: 0.3,
+  duckingDb: 12,
+  headline: 'THE MOMENT EVERYTHING CHANGED',
+  subcaption: 'AUDIO PRE-LAP BRIDGE // VOICEOVER',
+  imageA: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+  imageB: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80',
+  animFrameId: null,
+  stockPairs: [
+    {
+      a: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+      b: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80',
+      title: 'THE MOMENT EVERYTHING CHANGED',
+      sub: 'AUDIO PRE-LAP BRIDGE // VOICEOVER'
+    },
+    {
+      a: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+      b: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+      title: 'BEFORE THE CRASH',
+      sub: 'INVESTIGATIVE AUDIO LEAD'
+    },
+    {
+      a: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+      b: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+      title: 'THE ARCHITECTS OF CRISIS',
+      sub: 'VOICEOVER PRE-LAP'
+    }
+  ]
+};
+
+function updateJLCutsVisualStyles() {
+  const imgA = document.getElementById('jl-cuts-scene-a-img');
+  const imgB = document.getElementById('jl-cuts-scene-b-img');
+  const headlineEl = document.getElementById('jl-cuts-display-headline');
+  const subcaptionEl = document.getElementById('jl-cuts-display-subcaption');
+  const hudOffsetVal = document.getElementById('jl-cuts-hud-status');
+  const hudModeState = document.getElementById('jl-cuts-hud-mode-state');
+  const explainerEl = document.getElementById('jl-cuts-mode-explainer');
+  const bridgeStatusEl = document.getElementById('jl-cuts-bridge-status-text');
+  const btnJ = document.getElementById('btn-select-j-cut');
+  const btnL = document.getElementById('btn-select-l-cut');
+
+  if (headlineEl) headlineEl.textContent = jlCutsSuiteState.headline || 'THE MOMENT EVERYTHING CHANGED';
+  if (subcaptionEl) subcaptionEl.textContent = jlCutsSuiteState.subcaption || 'AUDIO PRE-LAP BRIDGE // VOICEOVER';
+
+  if (imgA && imgA.src !== jlCutsSuiteState.imageA) imgA.src = jlCutsSuiteState.imageA;
+  if (imgB && imgB.src !== jlCutsSuiteState.imageB) imgB.src = jlCutsSuiteState.imageB;
+
+  const off = jlCutsSuiteState.offsetSeconds.toFixed(2);
+  const isJ = jlCutsSuiteState.cutType === 'j-cut';
+
+  if (hudOffsetVal) {
+    hudOffsetVal.textContent = isJ ? `AUDIO PRE-LAP OFFSET: ${off}s (LEADS EARLY)` : `AUDIO POST-LAP OFFSET: ${off}s (LINGERS)`;
+  }
+  if (hudModeState) {
+    hudModeState.textContent = isJ ? 'J-CUT (AUDIO LEADS)' : 'L-CUT (AUDIO LINGERS)';
+  }
+
+  // Update button highlights
+  if (btnJ && btnL) {
+    if (isJ) {
+      btnJ.style.background = '#083344';
+      btnJ.style.border = '1.5px solid #06b6d4';
+      btnJ.style.color = '#67e8f9';
+      btnL.style.background = '#181926';
+      btnL.style.border = '1px solid rgba(255,255,255,0.12)';
+      btnL.style.color = '#94a3b8';
+    } else {
+      btnL.style.background = '#083344';
+      btnL.style.border = '1.5px solid #06b6d4';
+      btnL.style.color = '#67e8f9';
+      btnJ.style.background = '#181926';
+      btnJ.style.border = '1px solid rgba(255,255,255,0.12)';
+      btnJ.style.color = '#94a3b8';
+    }
+  }
+
+  if (explainerEl) {
+    explainerEl.innerHTML = isJ
+      ? `Audio of the next scene plays <strong>${off}s before</strong> the visual cut occurs, creating seamless momentum into flashbacks or new topics.`
+      : `Audio from the outgoing scene continues to linger <strong>${off}s after</strong> the visual cuts to Scene B, anchoring narrative continuity.`;
+  }
+
+  // Update timeline representation bars
+  const audioBBar = document.getElementById('jl-cuts-audio-b-bar');
+  const audioABar = document.getElementById('jl-cuts-audio-a-bar');
+  const bridgeLabel = document.getElementById('jl-cuts-timeline-bridge-label');
+
+  // Video cut happens exactly at 50% (4.0s mark)
+  const cutPct = 50;
+  const offPct = (jlCutsSuiteState.offsetSeconds / jlCutsSuiteState.duration) * 100;
+
+  if (isJ) {
+    // J-Cut: Audio B starts earlier (cutPct - offPct)
+    const audioStartPct = Math.max(10, cutPct - offPct);
+    if (audioABar) audioABar.style.width = `${audioStartPct}%`;
+    if (audioBBar) {
+      audioBBar.style.left = `${audioStartPct}%`;
+      audioBBar.style.right = '0';
+    }
+    if (bridgeLabel) {
+      bridgeLabel.textContent = `J-CUT: AUDIO B LEADS BY ${off}s BEFORE VIDEO CUT`;
+    }
+    if (bridgeStatusEl) {
+      bridgeStatusEl.textContent = `J-CUT: UPCOMING AUDIO LEADING BY ${off}s`;
+    }
+  } else {
+    // L-Cut: Audio A lingers longer (cutPct + offPct)
+    const audioLingPct = Math.min(90, cutPct + offPct);
+    if (audioABar) audioABar.style.width = `${audioLingPct}%`;
+    if (audioBBar) {
+      audioBBar.style.left = `${audioLingPct}%`;
+      audioBBar.style.right = '0';
+    }
+    if (bridgeLabel) {
+      bridgeLabel.textContent = `L-CUT: AUDIO A LINGERS BY ${off}s AFTER VIDEO CUT`;
+    }
+    if (bridgeStatusEl) {
+      bridgeStatusEl.textContent = `L-CUT: OUTGOING AUDIO LINGERS BY ${off}s`;
+    }
+  }
+}
+
+function renderJLCutsLoop(now) {
+  if (jlCutsSuiteState.isPlaying) {
+    jlCutsSuiteState.currentTime += 0.033;
+    if (jlCutsSuiteState.currentTime > jlCutsSuiteState.duration) {
+      jlCutsSuiteState.currentTime = 0;
+    }
+  }
+
+  const t = jlCutsSuiteState.currentTime;
+  const dur = jlCutsSuiteState.duration;
+  const progressRatio = (t / dur) * 100;
+
+  // Animate playhead needle
+  const playhead = document.getElementById('jl-cuts-playhead-needle');
+  if (playhead) {
+    playhead.style.left = `${progressRatio}%`;
+  }
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+    return `${m}:${s}.${ms}`;
+  };
+
+  const timeReadout = document.getElementById('jl-cuts-time-readout');
+  if (timeReadout) {
+    timeReadout.textContent = `${formatTime(t)} / ${formatTime(dur)}`;
+  }
+  const playheadReadout = document.getElementById('jl-cuts-playhead-readout');
+  if (playheadReadout) {
+    playheadReadout.textContent = `PLAYHEAD: ${formatTime(t)}`;
+  }
+
+  // Crossfade Video at 4.0s (50% mark)
+  const videoCutTime = 4.0;
+  const sceneAContainer = document.getElementById('jl-cuts-scene-a-container');
+  const sceneBContainer = document.getElementById('jl-cuts-scene-b-container');
+
+  if (sceneAContainer && sceneBContainer) {
+    if (t < videoCutTime) {
+      sceneAContainer.style.opacity = '1';
+      sceneBContainer.style.opacity = '0';
+    } else {
+      sceneAContainer.style.opacity = '0';
+      sceneBContainer.style.opacity = '1';
+    }
+  }
+
+  // Audio Pre-lap / Post-lap State Determination
+  const isJ = jlCutsSuiteState.cutType === 'j-cut';
+  const off = jlCutsSuiteState.offsetSeconds;
+  const bridgeBox = document.getElementById('jl-cuts-bridge-indicator-box');
+  const bridgeStatusEl = document.getElementById('jl-cuts-bridge-status-text');
+  const stageWave = document.getElementById('jl-cuts-stage-waveform');
+
+  let inBridgeZone = false;
+  if (isJ) {
+    // J-Cut bridge zone: between (videoCutTime - off) and videoCutTime
+    inBridgeZone = (t >= (videoCutTime - off) && t < videoCutTime);
+  } else {
+    // L-Cut bridge zone: between videoCutTime and (videoCutTime + off)
+    inBridgeZone = (t >= videoCutTime && t < (videoCutTime + off));
+  }
+
+  if (bridgeBox) {
+    if (inBridgeZone) {
+      bridgeBox.style.background = 'rgba(6,182,212,0.35)';
+      bridgeBox.style.borderColor = '#00f0ff';
+      bridgeBox.style.boxShadow = '0 0 15px rgba(0,240,255,0.4)';
+      if (bridgeStatusEl) {
+        bridgeStatusEl.textContent = isJ 
+          ? `⚡ J-CUT PRE-LAP ACTIVE: HEAR SCENE B BEFORE SEEING IT!`
+          : `⚡ L-CUT LINGER ACTIVE: AUDIO A PERSISTS ACROSS CUT!`;
+      }
+    } else {
+      bridgeBox.style.background = 'rgba(8,51,68,0.7)';
+      bridgeBox.style.borderColor = '#06b6d4';
+      bridgeBox.style.boxShadow = 'none';
+      if (bridgeStatusEl) {
+        bridgeStatusEl.textContent = isJ
+          ? `J-CUT ACTIVE (UPCOMING VOICEOVER LEADS BY ${off.toFixed(2)}s)`
+          : `L-CUT ACTIVE (OUTGOING AUDIO LINGERS BY ${off.toFixed(2)}s)`;
+      }
+    }
+  }
+
+  // Live waveform animation
+  if (stageWave) {
+    const waves = [' ▂▃▅▆▇▆▅▃ ', '▂▃▅▇█▇▅▃▂ ', '▃▅▇███▇▅▃ ', '▅▇█████▇▅ ', '▃▅▇███▇▅▃ '];
+    const waveIndex = Math.floor((t * 8) % waves.length);
+    stageWave.textContent = waves[waveIndex];
+  }
+
+  jlCutsSuiteState.animFrameId = requestAnimationFrame(renderJLCutsLoop);
+}
+
+function openJLCutsSuite() {
+  const modal = document.getElementById('modal-jl-cuts-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  jlCutsSuiteState.isPlaying = true;
+  const playIcon = document.getElementById('jl-cuts-play-icon');
+  if (playIcon) playIcon.textContent = '❚❚';
+  updateJLCutsVisualStyles();
+  if (!jlCutsSuiteState.animFrameId) {
+    jlCutsSuiteState.animFrameId = requestAnimationFrame(renderJLCutsLoop);
+  }
+}
+
+function closeJLCutsSuite() {
+  const modal = document.getElementById('modal-jl-cuts-suite');
+  if (modal) modal.style.display = 'none';
+  jlCutsSuiteState.isPlaying = false;
+  if (jlCutsSuiteState.animFrameId) {
+    cancelAnimationFrame(jlCutsSuiteState.animFrameId);
+    jlCutsSuiteState.animFrameId = null;
+  }
+}
+
+function bindJLCutsSuiteModalControls() {
+  // Close modal
+  document.getElementById('btn-close-jl-cuts-suite')?.addEventListener('click', closeJLCutsSuite);
+
+  // Play / Pause toggle
+  document.getElementById('btn-jl-cuts-play')?.addEventListener('click', () => {
+    jlCutsSuiteState.isPlaying = !jlCutsSuiteState.isPlaying;
+    const playIcon = document.getElementById('jl-cuts-play-icon');
+    if (playIcon) {
+      playIcon.textContent = jlCutsSuiteState.isPlaying ? '❚❚' : '▶';
+    }
+  });
+
+  // Toggle bridge mode (J-Cut vs L-Cut) via header button
+  document.getElementById('btn-jl-cuts-toggle-type')?.addEventListener('click', () => {
+    jlCutsSuiteState.cutType = (jlCutsSuiteState.cutType === 'j-cut') ? 'l-cut' : 'j-cut';
+    updateJLCutsVisualStyles();
+  });
+
+  // Direct select J-Cut
+  document.getElementById('btn-select-j-cut')?.addEventListener('click', () => {
+    jlCutsSuiteState.cutType = 'j-cut';
+    updateJLCutsVisualStyles();
+  });
+
+  // Direct select L-Cut
+  document.getElementById('btn-select-l-cut')?.addEventListener('click', () => {
+    jlCutsSuiteState.cutType = 'l-cut';
+    updateJLCutsVisualStyles();
+  });
+
+  // Headline sync
+  document.getElementById('jl-cuts-input-headline')?.addEventListener('input', (e) => {
+    jlCutsSuiteState.headline = e.target.value;
+    updateJLCutsVisualStyles();
+  });
+
+  // Subcaption sync
+  document.getElementById('jl-cuts-input-subcaption')?.addEventListener('input', (e) => {
+    jlCutsSuiteState.subcaption = e.target.value;
+    updateJLCutsVisualStyles();
+  });
+
+  // Scene A Image URL
+  document.getElementById('jl-cuts-input-img-a')?.addEventListener('change', (e) => {
+    if (e.target.value.trim()) {
+      jlCutsSuiteState.imageA = e.target.value.trim();
+      updateJLCutsVisualStyles();
+    }
+  });
+
+  // Scene B Image URL
+  document.getElementById('jl-cuts-input-img-b')?.addEventListener('change', (e) => {
+    if (e.target.value.trim()) {
+      jlCutsSuiteState.imageB = e.target.value.trim();
+      updateJLCutsVisualStyles();
+    }
+  });
+
+  // Stock shuffle button
+  document.getElementById('btn-jl-cuts-shuffle-img')?.addEventListener('click', () => {
+    const pairs = jlCutsSuiteState.stockPairs;
+    const chosen = pairs[Math.floor(Math.random() * pairs.length)] || pairs[0];
+    jlCutsSuiteState.imageA = chosen.a;
+    jlCutsSuiteState.imageB = chosen.b;
+    jlCutsSuiteState.headline = chosen.title;
+    jlCutsSuiteState.subcaption = chosen.sub;
+
+    const inputA = document.getElementById('jl-cuts-input-img-a');
+    const inputB = document.getElementById('jl-cuts-input-img-b');
+    const inputH = document.getElementById('jl-cuts-input-headline');
+    const inputS = document.getElementById('jl-cuts-input-subcaption');
+
+    if (inputA) inputA.value = chosen.a;
+    if (inputB) inputB.value = chosen.b;
+    if (inputH) inputH.value = chosen.title;
+    if (inputS) inputS.value = chosen.sub;
+
+    updateJLCutsVisualStyles();
+  });
+
+  // Offset duration slider (40 to 250 -> 0.40s to 2.50s)
+  document.getElementById('jl-cuts-slider-offset')?.addEventListener('input', (e) => {
+    jlCutsSuiteState.offsetSeconds = (parseInt(e.target.value) || 120) / 100;
+    const lbl = document.getElementById('jl-cuts-val-offset');
+    if (lbl) lbl.textContent = `${jlCutsSuiteState.offsetSeconds.toFixed(2)}s`;
+    updateJLCutsVisualStyles();
+  });
+
+  // Crossfade slider
+  document.getElementById('jl-cuts-slider-crossfade')?.addEventListener('input', (e) => {
+    jlCutsSuiteState.crossfadeDuration = (parseInt(e.target.value) || 30) / 100;
+    const lbl = document.getElementById('jl-cuts-val-crossfade');
+    if (lbl) lbl.textContent = `${jlCutsSuiteState.crossfadeDuration.toFixed(2)}s`;
+  });
+
+  // Ducking slider
+  document.getElementById('jl-cuts-slider-ducking')?.addEventListener('input', (e) => {
+    jlCutsSuiteState.duckingDb = parseInt(e.target.value) || 12;
+    const lbl = document.getElementById('jl-cuts-val-ducking');
+    if (lbl) lbl.textContent = `-${jlCutsSuiteState.duckingDb} dB`;
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-jl-cuts-apply-timeline')?.addEventListener('click', () => {
+    closeJLCutsSuite();
+    switchStudioView('editor');
+
+    const off = jlCutsSuiteState.offsetSeconds;
+    const isJ = jlCutsSuiteState.cutType === 'j-cut';
+
+    // Scene A Video (starts at 0, lasts 4s)
+    const videoClipA = {
+      id: `img-jl-a-${Date.now()}`,
+      name: 'Scene_A_Outgoing.jpg',
+      url: jlCutsSuiteState.imageA,
+      start: 0,
+      duration: 4.0,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    // Scene B Video (starts at 4.0s, lasts 4s)
+    const videoClipB = {
+      id: `img-jl-b-${Date.now() + 1}`,
+      name: 'Scene_B_Incoming.jpg',
+      url: jlCutsSuiteState.imageB,
+      start: 4.0,
+      duration: 4.0,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    // Headline Text
+    const headlineClip = {
+      id: `txt-jl-headline-${Date.now() + 2}`,
+      text: jlCutsSuiteState.headline,
+      highlight: jlCutsSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#06b6d4',
+      anim: 'pop',
+      fontSize: 54,
+      fontFamily: 'Inter, sans-serif',
+      start: isJ ? Math.max(0, 4.0 - off) : 4.0,
+      duration: 4.0
+    };
+
+    // Subcaption Clip
+    const subcaptionClip = {
+      id: `txt-jl-sub-${Date.now() + 3}`,
+      text: isJ ? `J-CUT AUDIO PRE-LAP (-${off.toFixed(1)}s)` : `L-CUT AUDIO LINGER (+${off.toFixed(1)}s)`,
+      highlight: '',
+      highlightColor: '#38bdf8',
+      anim: 'fade',
+      fontSize: 22,
+      fontFamily: 'monospace',
+      start: isJ ? Math.max(0, 4.0 - off) : 4.0,
+      duration: 3.8
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [videoClipA, videoClipB];
+      timelineClips.text = [headlineClip, subcaptionClip];
+      renderAllTimelineTracks();
+      selectClip(headlineClip, 'text');
+    }
+
+    showTextTimingAlert(`Applied ${isJ ? 'J-Cut (Audio Pre-lap)' : 'L-Cut (Audio Linger)'} Pacing to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
