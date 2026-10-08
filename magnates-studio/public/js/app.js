@@ -19927,6 +19927,19 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Document FX', 'Highlighter', 'James Jani'],
     defaultImage: '/document_3d_fx_thumbnail.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'jani-puzzle-narrative-suite',
+    title: 'James Jani Puzzle & Alpha Matte Suite',
+    category: '3D Spatial',
+    badge: 'James Jani Signature',
+    difficulty: '1-Click',
+    timeToApply: '4 sec',
+    previewGradient: 'linear-gradient(to top, rgba(0, 242, 254, 0.65), rgba(79, 172, 254, 0.35), rgba(5, 7, 10, 0.95))',
+    description: 'Deconstruct complex narratives into 3x3 floating puzzle pieces and snap them into place with glowing geometric alpha matte talking points.',
+    tags: ['Puzzle Metaphor', 'Alpha Matte', 'James Jani', 'Retention'],
+    defaultImage: '/jani_puzzle_matte_thumbnail.svg',
+    secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
@@ -20383,6 +20396,51 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'jani-puzzle-narrative-suite') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #05070a; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
+          <!-- Background Grid Matrix -->
+          <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px); opacity: 0.6;"></div>
+          
+          <!-- Watermark Topic -->
+          <div style="position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 900; color: rgba(255,255,255,0.05); letter-spacing: 4px; text-transform: uppercase;">
+            THE MONOPOLY TRAP
+          </div>
+
+          <!-- Mini 3x3 Puzzle Reconstruction Grid -->
+          <div id="fx-puzzle-grid-${tplId}" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 68%; aspect-ratio: 1/1; position: absolute; z-index: 2;">
+            <div id="fx-piece-0-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-1-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-2-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-3-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-4-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-5-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-6-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-7-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+            <div id="fx-piece-8-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+          </div>
+
+          <!-- James Jani Glowing Alpha Matte Card -->
+          <div id="fx-matte-box-${tplId}" style="position: absolute; z-index: 5; background: rgba(8,11,18,0.92); border: 1.5px solid #ffffff; box-shadow: 0 0 20px rgba(0,242,254,0.7), inset 0 0 10px rgba(0,242,254,0.25); border-radius: 8px; padding: 10px 14px; width: 72%; text-align: center; backdrop-filter: blur(10px); transition: transform 0.08s ease-out;">
+            <div style="position: absolute; top: 0; left: 0; width: 8px; height: 8px; border-top: 2px solid #fff; border-left: 2px solid #fff;"></div>
+            <div style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; border-top: 2px solid #fff; border-right: 2px solid #fff;"></div>
+            <div style="position: absolute; bottom: 0; left: 0; width: 8px; height: 8px; border-bottom: 2px solid #fff; border-left: 2px solid #fff;"></div>
+            <div style="position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; border-bottom: 2px solid #fff; border-right: 2px solid #fff;"></div>
+            
+            <span style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #00f2fe; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 2px;">
+              ● PRIMARY TALKING POINT
+            </span>
+            <div style="font-size: 11px; font-weight: 800; color: #ffffff; line-height: 1.3;">
+              "Illusion of Free Choice"
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #00f2fe, #3b82f6); color: #05070a; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(0,242,254,0.5);">
+            🧩 PUZZLE + ALPHA MATTE
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -20574,6 +20632,32 @@ function startTemplateHoverVideo(cardEl, tpl) {
       if (redact) {
         const redactW = 40 + Math.abs(Math.sin(t * 1.8)) * 50;
         redact.style.width = `${redactW}%`;
+      }
+    } else if (tplId === 'jani-puzzle-narrative-suite') {
+      // Periodic assemble/break animation on puzzle pieces
+      const isAssembled = Math.sin(t * 1.5) > -0.2;
+      const matteBox = fxContainer?.querySelector(`#fx-matte-box-${tplId}`);
+      if (matteBox) {
+        const floatY = Math.sin(t * 2.2) * 5;
+        const scale = 1.0 + Math.sin(t * 1.8) * 0.03;
+        matteBox.style.transform = `translateY(${floatY}px) scale(${scale})`;
+      }
+
+      // Pieces scatter or snap
+      for (let i = 0; i < 9; i++) {
+        const p = fxContainer?.querySelector(`#fx-piece-${i}-${tplId}`);
+        if (p) {
+          if (isAssembled) {
+            p.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
+            p.style.opacity = '1';
+          } else {
+            const rx = Math.cos(i * 33 + t * 0.5) * 16;
+            const ry = Math.sin(i * 44 + t * 0.5) * 16;
+            const rot = Math.sin(i * 99) * 15;
+            p.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(0.92)`;
+            p.style.opacity = '0.75';
+          }
+        }
       }
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -20921,6 +21005,10 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'document-3d-fx-engine') {
     // Launch full Three.js James Jani 3D Document FX Studio
     openDocument3DFXSuite();
+    return;
+  } else if (templateId === 'jani-puzzle-narrative-suite') {
+    // Launch James Jani Puzzle Reconstruction & Alpha Matte Suite
+    openJaniSuite();
     return;
   }
 
@@ -22998,12 +23086,501 @@ function initHomepageTemplateEvents() {
   renderHomepageTemplates();
   bindSpatial3DModalControls();
   bindDocument3DFXModalControls();
+  bindJaniSuiteModalControls();
+}
+
+/* =========================================================
+   JAMES JANI NARRATIVE PUZZLE & ALPHA MATTE SUITE CONTROLLER
+   ========================================================= */
+let janiSuiteState = {
+  isPlaying: false,
+  puzzleAssembled: false,
+  showImages: true,
+  gridSize: 3,
+  glowRadius: 18,
+  matteTheme: 'cyan',
+  audioEnabled: true,
+  headlineText: "Illusion of Free Choice in Controlled Markets",
+  retentionScore: 98,
+  timer: 14,
+  timerInterval: null,
+  audioCtx: null
+};
+
+const janiPuzzleThumbnails = [
+  { title: 'MARKET INDEX', url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&auto=format&fit=crop&q=80' },
+  { title: 'CENTRAL BANK', url: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&auto=format&fit=crop&q=80' },
+  { title: 'ALGORITHM', url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&auto=format&fit=crop&q=80' },
+  { title: 'CORPORATE POWER', url: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80' },
+  { title: 'AFFIDAVIT LEAK', url: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&auto=format&fit=crop&q=80' },
+  { title: 'LIQUIDITY FLOW', url: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&auto=format&fit=crop&q=80' },
+  { title: 'SURVEILLANCE', url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=80' },
+  { title: 'HEADLINES', url: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=400&auto=format&fit=crop&q=80' },
+  { title: 'GOLD RESERVE', url: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400&auto=format&fit=crop&q=80' },
+  { title: 'WALL STREET', url: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&auto=format&fit=crop&q=80' },
+  { title: 'SECRET MONOPOLY', url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&auto=format&fit=crop&q=80' },
+  { title: 'MEDIA CONTROL', url: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400&auto=format&fit=crop&q=80' },
+  { title: 'TECH GIANT', url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&auto=format&fit=crop&q=80' },
+  { title: 'OFFSHORE ACCOUNTS', url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&auto=format&fit=crop&q=80' },
+  { title: 'PATENT MAP', url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80' },
+  { title: 'REGULATORY TRAP', url: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?w=400&auto=format&fit=crop&q=80' }
+];
+
+function playJaniSFX(type = 'click') {
+  if (!janiSuiteState.audioEnabled) return;
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    if (!janiSuiteState.audioCtx) janiSuiteState.audioCtx = new AudioCtx();
+    const ctx = janiSuiteState.audioCtx;
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    if (type === 'snap') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(120, now + 0.08);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } else if (type === 'bass') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.35);
+      gain.gain.setValueAtTime(0.6, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.05);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.05);
+    }
+  } catch (err) {
+    // Audio context fallback
+  }
+}
+
+function renderJaniPuzzleGrid() {
+  const container = document.getElementById('jani-puzzle-grid');
+  if (!container) return;
+  container.innerHTML = '';
+
+  const total = janiSuiteState.gridSize * janiSuiteState.gridSize;
+  container.style.gridTemplateColumns = `repeat(${janiSuiteState.gridSize}, 1fr)`;
+
+  for (let i = 0; i < total; i++) {
+    const piece = document.createElement('div');
+    piece.id = `jani-piece-${i}`;
+
+    const isAssembled = janiSuiteState.puzzleAssembled;
+    const randomRotate = isAssembled ? 0 : (Math.sin(i * 99) * 20).toFixed(1);
+    const randomTransX = isAssembled ? 0 : (Math.cos(i * 33) * 35).toFixed(1);
+    const randomTransY = isAssembled ? 0 : (Math.sin(i * 44) * 35).toFixed(1);
+    const opacity = isAssembled ? 1 : 0.75;
+
+    piece.style.transform = `translate(${randomTransX}px, ${randomTransY}px) rotate(${randomRotate}deg)`;
+    piece.style.opacity = opacity;
+    piece.style.transition = `all ${0.4 + (i * 0.06)}s cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
+    piece.style.position = 'relative';
+    piece.style.borderRadius = '8px';
+    piece.style.border = '1px solid rgba(0, 242, 254, 0.5)';
+    piece.style.background = 'rgba(15, 23, 42, 0.9)';
+    piece.style.overflow = 'hidden';
+    piece.style.display = 'flex';
+    piece.style.flexDirection = 'column';
+    piece.style.alignItems = 'center';
+    piece.style.justifyContent = 'center';
+    piece.style.padding = '6px';
+    piece.style.cursor = 'pointer';
+    piece.style.boxShadow = '0 4px 15px rgba(0, 242, 254, 0.2)';
+
+    const thumb = janiPuzzleThumbnails[i % janiPuzzleThumbnails.length];
+
+    if (janiSuiteState.showImages) {
+      piece.innerHTML = `
+        <img src="${thumb.url}" alt="${thumb.title}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.65; filter: grayscale(0.2) contrast(1.15);" onerror="this.style.display='none'">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,7,10,0.95), rgba(5,7,10,0.35));"></div>
+        <div style="position: absolute; top: 4px; left: 6px; z-index: 10; font-size: 8px; font-family: monospace; font-weight: 700; color: #00f2fe; background: rgba(5,7,10,0.85); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(0,242,254,0.3);">
+          #0${i + 1}
+        </div>
+        <div style="position: relative; z-index: 10; text-align: center; padding: 2px;">
+          <div style="font-size: 14px; filter: drop-shadow(0 0 8px rgba(0,242,254,0.8));">🧩</div>
+          <div style="font-size: 8.5px; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #f8fafc; text-transform: uppercase; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;">
+            ${thumb.title}
+          </div>
+        </div>
+      `;
+    } else {
+      piece.innerHTML = `
+        <div style="position: absolute; top: 4px; left: 6px; font-size: 8.5px; font-family: monospace; color: rgba(0,242,254,0.8);">#0${i + 1}</div>
+        <div style="font-size: 20px; color: #00f2fe;">🧩</div>
+        <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; margin-top: 4px; text-transform: uppercase;">NODE_${i + 1}</span>
+      `;
+    }
+
+    piece.onclick = () => {
+      playJaniSFX('snap');
+      triggerJaniSinglePieceToggle(i);
+    };
+
+    container.appendChild(piece);
+  }
+}
+
+function triggerJaniSinglePieceToggle(idx) {
+  const p = document.getElementById(`jani-piece-${idx}`);
+  if (!p) return;
+  const isReset = p.style.transform === 'translate(0px, 0px) rotate(0deg)';
+  if (isReset) {
+    const rx = (Math.cos(idx * 33) * 35).toFixed(1);
+    const ry = (Math.sin(idx * 44) * 35).toFixed(1);
+    const rot = (Math.sin(idx * 99) * 20).toFixed(1);
+    p.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg)`;
+    p.style.opacity = '0.75';
+  } else {
+    p.style.transform = 'translate(0px, 0px) rotate(0deg)';
+    p.style.opacity = '1';
+  }
+}
+
+function triggerJaniPuzzleAssemble() {
+  janiSuiteState.puzzleAssembled = true;
+  playJaniSFX('snap');
+  const hud = document.getElementById('jani-hud-status');
+  if (hud) hud.textContent = 'STATE: PUZZLE RECONSTRUCTION COMPLETE';
+  renderJaniPuzzleGrid();
+}
+
+function triggerJaniPuzzleBreak() {
+  janiSuiteState.puzzleAssembled = false;
+  playJaniSFX('click');
+  const hud = document.getElementById('jani-hud-status');
+  if (hud) hud.textContent = 'STATE: PUZZLE DECONSTRUCTED';
+  renderJaniPuzzleGrid();
+}
+
+function renderJaniRetentionChart() {
+  const canvas = document.getElementById('jani-retention-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.parentElement.clientWidth || 300;
+  canvas.height = canvas.parentElement.clientHeight || 55;
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+  const grad = ctx.createLinearGradient(0, 0, w, 0);
+  grad.addColorStop(0, '#4facfe');
+  grad.addColorStop(0.5, '#00f2fe');
+  grad.addColorStop(1, '#f59e0b');
+
+  ctx.beginPath();
+  ctx.moveTo(0, h * 0.7);
+  ctx.bezierCurveTo(w * 0.25, h * 0.6, w * 0.35, h * 0.2, w * 0.5, h * 0.3);
+  ctx.bezierCurveTo(w * 0.65, h * 0.4, w * 0.8, h * 0.1, w, h * 0.15);
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#00f2fe';
+  ctx.beginPath();
+  ctx.arc(w * 0.5, h * 0.3, 3.5, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#f59e0b';
+  ctx.beginPath();
+  ctx.arc(w * 0.8, h * 0.1, 3.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function showJaniDopamineToast() {
+  const toast = document.getElementById('jani-dopamine-toast');
+  if (!toast) return;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateY(0px)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(40px)';
+  }, 2800);
+}
+
+function triggerJaniDopaminePulse() {
+  playJaniSFX('bass');
+  triggerJaniPuzzleAssemble();
+  showJaniDopamineToast();
+}
+
+function setJaniMatteTheme(theme) {
+  janiSuiteState.matteTheme = theme;
+  playJaniSFX('click');
+  const box = document.getElementById('jani-alpha-matte-box');
+  const tag = document.getElementById('jani-matte-tag');
+  if (!box || !tag) return;
+
+  document.querySelectorAll('.btn-jani-theme').forEach(btn => {
+    const isAct = btn.dataset.theme === theme;
+    btn.style.background = isAct ? 'rgba(0,242,254,0.2)' : '#0b1322';
+    btn.style.borderColor = isAct ? '#00f2fe' : 'rgba(255,255,255,0.08)';
+  });
+
+  const r = janiSuiteState.glowRadius;
+  if (theme === 'cyan') {
+    box.style.background = 'rgba(8, 11, 18, 0.92)';
+    box.style.border = '1px solid rgba(255, 255, 255, 0.9)';
+    box.style.boxShadow = `0 0 ${r}px rgba(0, 242, 254, 0.6), inset 0 0 10px rgba(0, 242, 254, 0.2)`;
+    tag.style.color = '#00f2fe';
+  } else if (theme === 'gold') {
+    box.style.background = 'rgba(12, 10, 5, 0.92)';
+    box.style.border = '1px solid rgba(255, 255, 255, 0.9)';
+    box.style.boxShadow = `0 0 ${r}px rgba(245, 158, 11, 0.6), inset 0 0 10px rgba(245, 158, 11, 0.2)`;
+    tag.style.color = '#f59e0b';
+  } else {
+    box.style.background = 'rgba(10, 10, 10, 0.94)';
+    box.style.border = '2px solid #ffffff';
+    box.style.boxShadow = `0 0 ${r}px rgba(255, 255, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.2)`;
+    tag.style.color = '#ffffff';
+  }
+}
+
+function toggleJaniPlayback() {
+  janiSuiteState.isPlaying = !janiSuiteState.isPlaying;
+  playJaniSFX('click');
+  const icon = document.getElementById('jani-play-icon');
+  if (janiSuiteState.isPlaying) {
+    if (icon) icon.textContent = '❚❚';
+    janiSuiteState.timerInterval = setInterval(() => {
+      janiSuiteState.timer++;
+      if (janiSuiteState.timer > 165) janiSuiteState.timer = 0;
+      const min = String(Math.floor(janiSuiteState.timer / 60)).padStart(2, '0');
+      const sec = String(janiSuiteState.timer % 60).padStart(2, '0');
+      const tDisp = document.getElementById('jani-time-display');
+      if (tDisp) tDisp.textContent = `${min}:${sec} / 02:45`;
+
+      if (janiSuiteState.timer % 15 === 0 && janiSuiteState.timer > 0) {
+        triggerJaniPuzzleAssemble();
+      }
+    }, 1000);
+  } else {
+    if (icon) icon.textContent = '▶';
+    if (janiSuiteState.timerInterval) {
+      clearInterval(janiSuiteState.timerInterval);
+      janiSuiteState.timerInterval = null;
+    }
+  }
+}
+
+function resetJaniScene() {
+  playJaniSFX('click');
+  janiSuiteState.timer = 0;
+  const tDisp = document.getElementById('jani-time-display');
+  if (tDisp) tDisp.textContent = '00:00 / 02:45';
+  triggerJaniPuzzleBreak();
+}
+
+function openJaniSuite() {
+  const modal = document.getElementById('modal-jani-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  renderJaniPuzzleGrid();
+  renderJaniRetentionChart();
+}
+
+function closeJaniSuite() {
+  const modal = document.getElementById('modal-jani-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  if (janiSuiteState.timerInterval) {
+    clearInterval(janiSuiteState.timerInterval);
+    janiSuiteState.timerInterval = null;
+  }
+  janiSuiteState.isPlaying = false;
+  const icon = document.getElementById('jani-play-icon');
+  if (icon) icon.textContent = '▶';
+}
+
+function bindJaniSuiteModalControls() {
+  document.getElementById('btn-close-jani-suite')?.addEventListener('click', closeJaniSuite);
+
+  // Tabs (Studio / Guide / Code)
+  const tabBtnStudio = document.getElementById('tab-btn-jani-studio');
+  const tabBtnGuide = document.getElementById('tab-btn-jani-guide');
+  const tabBtnCode = document.getElementById('tab-btn-jani-code');
+
+  const viewStudio = document.getElementById('jani-view-studio');
+  const viewGuide = document.getElementById('jani-view-guide');
+  const viewCode = document.getElementById('jani-view-code');
+
+  function setJaniTab(activeBtn, activeView) {
+    [tabBtnStudio, tabBtnGuide, tabBtnCode].forEach(b => {
+      if (!b) return;
+      b.style.background = 'transparent';
+      b.style.color = '#94a3b8';
+      b.classList.remove('active');
+    });
+    [viewStudio, viewGuide, viewCode].forEach(v => {
+      if (v) v.style.display = 'none';
+    });
+    if (activeBtn) {
+      activeBtn.style.background = '#00f2fe';
+      activeBtn.style.color = '#05070a';
+      activeBtn.classList.add('active');
+    }
+    if (activeView) activeView.style.display = 'flex';
+  }
+
+  tabBtnStudio?.addEventListener('click', () => { playJaniSFX('click'); setJaniTab(tabBtnStudio, viewStudio); });
+  tabBtnGuide?.addEventListener('click', () => { playJaniSFX('click'); setJaniTab(tabBtnGuide, viewGuide); });
+  tabBtnCode?.addEventListener('click', () => { playJaniSFX('click'); setJaniTab(tabBtnCode, viewCode); });
+
+  // Quick Action Buttons
+  document.getElementById('btn-jani-assemble-puzzle')?.addEventListener('click', triggerJaniPuzzleAssemble);
+  document.getElementById('btn-jani-break-puzzle')?.addEventListener('click', triggerJaniPuzzleBreak);
+  document.getElementById('btn-jani-dopamine-spike')?.addEventListener('click', triggerJaniDopaminePulse);
+  document.getElementById('btn-jani-play-toggle')?.addEventListener('click', toggleJaniPlayback);
+  document.getElementById('btn-jani-reset')?.addEventListener('click', resetJaniScene);
+
+  // Cycle Matte Button
+  document.getElementById('btn-jani-cycle-matte')?.addEventListener('click', () => {
+    const themes = ['cyan', 'gold', 'monochrome'];
+    const nextIdx = (themes.indexOf(janiSuiteState.matteTheme) + 1) % themes.length;
+    setJaniMatteTheme(themes[nextIdx]);
+  });
+
+  // Theme Palette Selection
+  document.querySelectorAll('.btn-jani-theme').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const th = e.currentTarget.dataset.theme;
+      setJaniMatteTheme(th);
+    });
+  });
+
+  // SFX Toggle
+  document.getElementById('btn-jani-sfx-toggle')?.addEventListener('click', () => {
+    janiSuiteState.audioEnabled = !janiSuiteState.audioEnabled;
+    const txt = document.getElementById('jani-sfx-text');
+    const icn = document.getElementById('jani-sfx-icon');
+    if (janiSuiteState.audioEnabled) {
+      if (txt) txt.textContent = 'SFX: ON';
+      if (icn) icn.textContent = '🔊';
+      playJaniSFX('click');
+    } else {
+      if (txt) txt.textContent = 'SFX: OFF';
+      if (icn) icn.textContent = '🔇';
+    }
+  });
+
+  // Grid Complexity Slider
+  document.getElementById('jani-slider-grid')?.addEventListener('input', (e) => {
+    janiSuiteState.gridSize = parseInt(e.target.value) || 3;
+    const lbl = document.getElementById('jani-val-grid');
+    if (lbl) lbl.textContent = `${janiSuiteState.gridSize} x ${janiSuiteState.gridSize}`;
+    renderJaniPuzzleGrid();
+  });
+
+  // Textures Toggle
+  document.getElementById('btn-jani-toggle-textures')?.addEventListener('click', () => {
+    janiSuiteState.showImages = !janiSuiteState.showImages;
+    playJaniSFX('click');
+    const btn = document.getElementById('btn-jani-toggle-textures');
+    if (btn) {
+      btn.textContent = janiSuiteState.showImages ? 'IMAGES: ON' : 'IMAGES: OFF';
+      btn.style.color = janiSuiteState.showImages ? '#00f2fe' : '#94a3b8';
+      btn.style.background = janiSuiteState.showImages ? 'rgba(0,242,254,0.2)' : 'rgba(15,23,42,0.8)';
+    }
+    renderJaniPuzzleGrid();
+  });
+
+  // Glow Slider
+  document.getElementById('jani-slider-glow')?.addEventListener('input', (e) => {
+    janiSuiteState.glowRadius = parseInt(e.target.value) || 18;
+    const lbl = document.getElementById('jani-val-glow');
+    if (lbl) lbl.textContent = `${janiSuiteState.glowRadius}px`;
+    setJaniMatteTheme(janiSuiteState.matteTheme);
+  });
+
+  // Headline Input
+  document.getElementById('jani-input-headline')?.addEventListener('input', (e) => {
+    janiSuiteState.headlineText = e.target.value;
+    const h = document.getElementById('jani-matte-headline');
+    if (h) h.textContent = `"${e.target.value || 'Talking Point Focus'}"`;
+  });
+
+  // Copy CSS Code
+  document.getElementById('btn-jani-copy-code')?.addEventListener('click', () => {
+    const code = `.jani-alpha-matte {
+    background: rgba(8, 11, 18, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+    box-shadow: 0px 0px 18px rgba(0, 242, 254, 0.5), inset 0px 0px 12px rgba(0, 242, 254, 0.2);
+    backdrop-filter: blur(12px);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}`;
+    navigator.clipboard?.writeText(code);
+    playJaniSFX('snap');
+    showJaniDopamineToast();
+    showTextTimingAlert('Copied James Jani Alpha Matte CSS!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+
+  // Apply to Active Timeline
+  document.getElementById('btn-jani-apply-timeline')?.addEventListener('click', () => {
+    closeJaniSuite();
+    switchStudioView('editor');
+
+    const puzzleTopicBg = {
+      id: `img-jani-puzzle-${Date.now()}`,
+      name: 'The_Monopoly_Trap_Puzzle.jpg',
+      url: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80',
+      start: 0,
+      duration: 6,
+      scale: 1.15,
+      zoomEffect: 'snap',
+      zoomScale: 1.25
+    };
+    const matteTitle = {
+      id: `txt-jani-matte-${Date.now() + 1}`,
+      text: janiSuiteState.headlineText,
+      highlight: janiSuiteState.headlineText.split(' ')[0] || '',
+      highlightColor: '#00f2fe',
+      anim: 'pop',
+      fontSize: 58,
+      fontFamily: 'Inter, sans-serif',
+      start: 0.5,
+      duration: 5.5
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [puzzleTopicBg];
+      timelineClips.text = [matteTitle];
+      renderAllTimelineTracks();
+      selectClip(matteTitle, 'text');
+    }
+
+    showTextTimingAlert('Applied James Jani Narrative Puzzle Suite to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
 }
 
 // Initialize homepage discovery view immediately on script execution
 setTimeout(() => {
   initHomepageTemplateEvents();
 }, 100);
+
 
 
 
