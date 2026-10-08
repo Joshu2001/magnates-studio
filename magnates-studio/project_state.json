@@ -1,20 +1,21 @@
 {
   "text": [
     {
-      "id": "txt-1791470827969",
-      "text": "MAGNATES MEDIA",
+      "id": "txt-1791472878926",
+      "text": "MAGNATES",
       "highlight": "MAGNATES",
-      "highlightColor": "#db0a23",
+      "highlightColor": "#ff334b",
       "anim": "pop",
       "fontSize": 68,
       "fontFamily": "Impact, sans-serif",
+      "zIndex": 25,
       "layerOrder": "middle",
       "start": 0,
-      "duration": 12,
+      "duration": 6,
       "_renderBounds": {
         "x": 204,
         "y": 429.2,
-        "w": 507.80078125,
+        "w": 327.109375,
         "h": 113.59999999999997
       }
     }
@@ -23,26 +24,18 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791470827967",
+      "id": "img-1791473231535",
       "start": 0,
-      "duration": 12,
-      "layerOrder": "back",
-      "scale": 1.15,
+      "duration": 5,
+      "zIndex": 20,
+      "scale": 1.2,
       "zoomEffect": "snap",
-      "zoomScale": 1.25,
-      "zoomStartTime": 0.1,
-      "file": null
-    },
-    {
-      "id": "img-fg-1791470827968",
-      "start": 0,
-      "duration": 12,
-      "layerOrder": "front",
-      "scale": 1.05,
-      "vectorEffect": false,
-      "vectorStrokeColor": "#ffffff",
-      "zoomEffect": "loupe",
-      "file": null
+      "zoomScale": 1.3,
+      "file": {
+        "name": "Custom_Gold_Frame.jpg",
+        "url": "blob:http://localhost:5174/d54a87a4-56e4-4e52-af35-51d27c1f1c80",
+        "isImage": true
+      }
     }
   ],
   "video": [],
@@ -75,9 +68,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 0,
+  "currentTime": 40.666666666666664,
   "duration": 368.144014,
-  "savedAt": 1791472060306,
-  "projectName": "2.5D Animated Subject Cutout (Auto BG Removed)",
+  "savedAt": 1791474340428,
+  "projectName": "Dark Luxury Gold Frame 3D Spin",
   "projectId": "proj_1791218145776_xils"
 }

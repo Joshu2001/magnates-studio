@@ -1601,22 +1601,48 @@ function drawMediaLayer(specificClip) {
       return;
     }
     const aspect = el.naturalWidth / el.naturalHeight;
-    if (aspect > maxW / maxH) {
-      dw = maxW;
-      dh = maxW / aspect;
+    // If tagged as a background scene (or parallax background), scale to fill/cover the 16:9 canvas
+    if (targetClip?.isBackgroundScene || targetClip?.parallaxRig === 'bg') {
+      if (aspect > maxW / maxH) {
+        dh = maxH;
+        dw = maxH * aspect;
+      } else {
+        dw = maxW;
+        dh = maxW / aspect;
+      }
     } else {
-      dh = maxH;
-      dw = maxH * aspect;
+      if (aspect > maxW / maxH) {
+        dw = maxW;
+        dh = maxW / aspect;
+      } else {
+        dh = maxH;
+        dw = maxH * aspect;
+      }
     }
   }
 
   // Calculate base center coordinates plus custom transform offsets (evaluated dynamically via Keyframing Engine)
   const clipElapsed = targetClip ? Math.max(0, currentTime - targetClip.start) : 0;
-  const kfScale = getClipInterpolatedProp(targetClip, 'scale', clipElapsed, (targetClip && targetClip.scale !== undefined) ? targetClip.scale : 1.0);
-  const kfRot = getClipInterpolatedProp(targetClip, 'rotation', clipElapsed, (targetClip && targetClip.rotation !== undefined) ? targetClip.rotation : 0);
-  const kfPosX = getClipInterpolatedProp(targetClip, 'x', clipElapsed, (targetClip && targetClip.x !== undefined) ? targetClip.x : 0);
-  const kfPosY = getClipInterpolatedProp(targetClip, 'y', clipElapsed, (targetClip && targetClip.y !== undefined) ? targetClip.y : 0);
+  let kfScale = getClipInterpolatedProp(targetClip, 'scale', clipElapsed, (targetClip && targetClip.scale !== undefined) ? targetClip.scale : 1.0);
+  let kfRot = getClipInterpolatedProp(targetClip, 'rotation', clipElapsed, (targetClip && targetClip.rotation !== undefined) ? targetClip.rotation : 0);
+  let kfPosX = getClipInterpolatedProp(targetClip, 'x', clipElapsed, (targetClip && targetClip.x !== undefined) ? targetClip.x : 0);
+  let kfPosY = getClipInterpolatedProp(targetClip, 'y', clipElapsed, (targetClip && targetClip.y !== undefined) ? targetClip.y : 0);
   const kfOpacity = getClipInterpolatedProp(targetClip, 'opacity', clipElapsed, (targetClip && targetClip.opacity !== undefined) ? targetClip.opacity : 1.0);
+
+  // Template Rig Motion Simulation (1:1 identical to modal preview)
+  if (targetClip?.parallaxRig === 'bg') {
+    const depthFactor = (targetClip.parallaxDepth || 65) / 100;
+    kfScale *= (1.15 + Math.sin(clipElapsed * 0.8) * 0.05 * depthFactor);
+    kfPosX += Math.sin(clipElapsed * 0.7) * 24 * depthFactor;
+  } else if (targetClip?.parallaxRig === 'fg') {
+    const depthFactor = (targetClip.parallaxDepth || 65) / 100;
+    kfScale *= (1.0 + Math.sin(clipElapsed * 0.8 + 0.5) * 0.06 * depthFactor);
+    kfPosX -= Math.sin(clipElapsed * 0.7) * 32 * depthFactor;
+  } else if (targetClip?.goldFrameRig) {
+    const depthFactor = (targetClip.depth || 65) / 100;
+    const tiltRot = Math.sin(clipElapsed * 1.0) * 4 * depthFactor;
+    kfRot += tiltRot;
+  }
 
   const finalW = dw * kfScale;
   const finalH = dh * kfScale;
@@ -1654,10 +1680,24 @@ function drawMediaLayer(specificClip) {
     ctx.translate(-cx, -cy);
   }
   ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-  ctx.shadowBlur = targetClip?.vectorEffect ? 45 : 35;
+  ctx.shadowBlur = targetClip?.vectorEffect ? 45 : (targetClip?.goldFrameRig ? 55 : 35);
   ctx.shadowOffsetY = targetClip?.vectorEffect ? 14 : 10;
 
   try {
+    // If Gold Frame Rig is active, draw premium metallic gold border and inner glow
+    if (targetClip && targetClip.goldFrameRig) {
+      ctx.save();
+      ctx.shadowColor = 'rgba(245, 158, 11, 0.6)';
+      ctx.shadowBlur = 25;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(dx - 4, dy - 4, finalW + 8, finalH + 8);
+      ctx.strokeStyle = '#fef08a';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(dx - 2, dy - 2, finalW + 4, finalH + 4);
+      ctx.restore();
+    }
+
     // If Vector / Graphic Paper Cutout FX is enabled, render multi-pass sticker contour outline
     if (targetClip && targetClip.vectorEffect) {
       // 1. Draw solid stroke contour outline around the subject
@@ -22841,7 +22881,22 @@ function commitTopTemplateCustomizerToTimeline() {
     if (typeof drawTimeRuler === 'function') drawTimeRuler();
   }
 
-  // 3. Inject custom clips into timeline with comprehensive file objects so drawMediaLayer displays them instantly
+  // Automatically disable cyber grid, embers/particles, and mystery silhouette when applying special effect templates
+  if (fxState) {
+    fxState.grid.enabled = false;
+    fxState.particles.enabled = false;
+    fxState.silhouette.enabled = false;
+    fxState.stageBackground = { type: 'solid_black', color: '#000000' };
+
+    const gridCheckbox = document.getElementById('fx-grid-enable');
+    if (gridCheckbox) gridCheckbox.checked = false;
+    const partCheckbox = document.getElementById('fx-particles-enable');
+    if (partCheckbox) partCheckbox.checked = false;
+    const silCheckbox = document.getElementById('fx-silhouette-enable');
+    if (silCheckbox) silCheckbox.checked = false;
+  }
+
+  // 3. Inject custom clips into timeline with comprehensive file objects and template rig tags
   if (tpl.id === 'subject-25d-parallax') {
     const bgClip = {
       id: `img-bg-${Date.now()}`,
@@ -22851,9 +22906,9 @@ function commitTopTemplateCustomizerToTimeline() {
       start: 0,
       duration: dur,
       scale: 1.15,
-      zoomEffect: 'snap',
-      zoomScale: 1.25,
-      zoomStartTime: 0.1,
+      isBackgroundScene: true,
+      parallaxRig: 'bg',
+      parallaxDepth: depthVal,
       zIndex: 10,
       layerOrder: 'back'
     };
@@ -22866,7 +22921,8 @@ function commitTopTemplateCustomizerToTimeline() {
       duration: dur,
       scale: 1.05,
       depth: depthVal,
-      zoomEffect: 'loupe',
+      parallaxRig: 'fg',
+      parallaxDepth: depthVal,
       vectorEffect: topCustomizerState.bgRemoved,
       vectorStrokeColor: '#ffffff',
       opacity: opacityVal,
@@ -22908,6 +22964,7 @@ function commitTopTemplateCustomizerToTimeline() {
       start: 0,
       duration: dur,
       scale: 1.05,
+      isBackgroundScene: true,
       zIndex: 10,
       layerOrder: 'back'
     };
@@ -22920,6 +22977,7 @@ function commitTopTemplateCustomizerToTimeline() {
       duration: dur,
       scale: 1.1,
       opacity: opacityVal,
+      paperRipRig: true,
       transition: 'fly_through',
       transitionDuration: 1.2,
       zIndex: 25,
@@ -22939,10 +22997,10 @@ function commitTopTemplateCustomizerToTimeline() {
       file: { name: 'Custom_Gold_Frame.jpg', url: prim, isImage: true },
       start: 0,
       duration: dur,
-      scale: 1.2,
+      scale: 1.1,
       opacity: opacityVal,
-      zoomEffect: 'snap',
-      zoomScale: 1.3,
+      goldFrameRig: true,
+      depth: depthVal,
       zIndex: 20
     };
     if (timelineClips && timelineClips.image) {
@@ -22960,6 +23018,7 @@ function commitTopTemplateCustomizerToTimeline() {
       start: 0,
       duration: dur,
       scale: 1.15,
+      isBackgroundScene: true,
       zIndex: 10,
       layerOrder: 'back'
     };
