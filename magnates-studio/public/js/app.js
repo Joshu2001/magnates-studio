@@ -14813,13 +14813,13 @@ function getNextSequentialProjectName() {
   const projects = getAllProjects();
   let maxNum = 0;
   projects.forEach(p => {
-    const match = (p.projectName || '').match(/^Untitled Project (\d+)$/i);
+    const match = (p.projectName || '').match(/^(?:New Project|Untitled Project)\s*(\d+)$/i);
     if (match) {
       const num = parseInt(match[1]);
       if (num > maxNum) maxNum = num;
     }
   });
-  return `Untitled Project ${maxNum + 1}`;
+  return `New Project ${maxNum + 1}`;
 }
 
 // Explicit New Project creation: Creates fresh workspace and distinct library entry
@@ -22253,9 +22253,11 @@ function applySelectedHomepageTemplate(templateId) {
   // 1. Switch directly to Studio Editor view
   switchStudioView('editor');
 
-  // 2. Set active project title to template
+  // 2. Set active project title to sequential project name
   const projTitle = document.getElementById('current-project');
-  if (projTitle) projTitle.textContent = tpl.title;
+  const seqName = typeof getNextSequentialProjectName === 'function' ? getNextSequentialProjectName() : 'New Project 1';
+  if (projTitle) projTitle.textContent = seqName;
+  try { localStorage.setItem('magnates_active_project_name', seqName); } catch(e) {}
 
   // 3. Customize timeline based on template type
   if (templateId === 'subject-25d-parallax') {
