@@ -1808,18 +1808,18 @@ function drawMediaLayer(specificClip) {
     }
 
     // 2. Render primary image / cutout with Punch Zoom transformation
-    const hasSnapZoom = targetClip && targetClip.zoomEffect === 'snap';
-    const hasLoupe = targetClip && targetClip.zoomEffect === 'loupe';
+    const hasSnapZoom = targetClip && (targetClip.zoomEffect === 'snap' || targetClip._previewZoom);
+    const hasLoupe = targetClip && (targetClip.zoomEffect === 'loupe' || targetClip._previewLoupe);
 
     if (hasSnapZoom) {
       // Calculate animated camera punch zoom
       const zoomElapsed = currentTime - targetClip.start;
-      const zoomInAt = targetClip.zoomStartTime !== undefined ? targetClip.zoomStartTime : 0.5;
-      const targetScale = targetClip.zoomScale || 2.2;
+      const zoomInAt = targetClip._previewZoom ? 0 : (targetClip.zoomStartTime !== undefined ? targetClip.zoomStartTime : 0.5);
+      const targetScale = targetClip._previewZoom || targetClip.zoomScale || 2.2;
       const targetOriginX = targetClip.zoomOriginX !== undefined ? targetClip.zoomOriginX : 0.5;
       const targetOriginY = targetClip.zoomOriginY !== undefined ? targetClip.zoomOriginY : 0.5;
 
-      let currentPunch = 1.0;
+      let currentPunch = targetClip._previewZoom ? targetClip._previewZoom : 1.0;
       if (zoomElapsed >= zoomInAt) {
         const zoomDur = targetClip.zoomDuration || 0.42;
         const t = (zoomElapsed - zoomInAt) / Math.max(0.05, zoomDur);
@@ -3607,14 +3607,14 @@ function renderAllTimelineTracks() {
 
       // Plus (+) Button right after this clip with clean spacing
       const addBtn = document.createElement('button');
-      addBtn.className = 'timeline-add-clip-btn';
-      addBtn.title = `Add another ${type === 'text' ? 'kinetic text' : type} here`;
+      addBtn.className = 'timeline-add-clip-btn canva-plus-btn';
+      addBtn.title = `Add page, clip, or element here`;
       addBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`;
       const clipEndSec = clip.start + clip.duration;
-      addBtn.style.left = `${clipEndSec * pps + 14}px`;
+      addBtn.style.left = `${clipEndSec * pps + 10}px`;
       addBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        handleTimelineAddButtonClick(type, clipEndSec + 0.1, addBtn);
+        openCanvaAddMenu(clipEndSec + 0.05, addBtn);
       });
       container.appendChild(addBtn);
     });
@@ -3628,23 +3628,114 @@ function renderAllTimelineTracks() {
   }, 0);
 }
 
-// Global handler for tapping timeline (+) button
-function handleTimelineAddButtonClick(trackType, atTimeSec, triggerEl) {
-  if (trackType === 'text') {
-    const newClip = createNewTextClipAtTime(atTimeSec);
-    seekToTime(atTimeSec);
-    showTextTimingAlert(`New kinetic text added at ${formatTimecode(atTimeSec)}!`, 'success');
-    setTimeout(() => showTextTimingAlert(''), 2500);
-  } else if (trackType === 'chart') {
-    openChartCreatorModal(atTimeSec);
-  } else if (trackType === 'background') {
-    openBackgroundSegmentPicker(atTimeSec, triggerEl);
-  } else if (trackType === 'image') {
-    // Exact same modal as clicking the image track picker button
-    openTrackImagePickerModal(atTimeSec);
-  } else {
-    openTrackMediaPicker(trackType, atTimeSec, triggerEl);
-  }
+// Global Canva-Style Unified Add Popover Menu
+function openCanvaAddMenu(atTimeSec, triggerEl) {
+  document.querySelectorAll('.canva-add-popover').forEach(p => p.remove());
+
+  const popover = document.createElement('div');
+  popover.className = 'canva-add-popover';
+
+  const menuItems = [
+    {
+      id: 'opt-uploads',
+      icon: `<svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>`,
+      label: 'Uploads',
+      action: () => {
+        popover.remove();
+        openTrackMediaPicker('image', atTimeSec, triggerEl);
+      }
+    },
+    {
+      id: 'opt-videos',
+      icon: `<svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`,
+      label: 'Stock videos',
+      action: () => {
+        popover.remove();
+        openTrackMediaPicker('video', atTimeSec, triggerEl);
+      }
+    },
+    {
+      id: 'opt-photos',
+      icon: `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`,
+      label: 'Stock photos',
+      action: () => {
+        popover.remove();
+        openTrackImagePickerModal(atTimeSec);
+      }
+    },
+    {
+      id: 'opt-blank',
+      icon: `<svg viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path d="M7 7h10v2H7zm0 4h10v2H7z" opacity="0.3"/></svg>`,
+      label: 'Blank',
+      action: () => {
+        popover.remove();
+        insertBlankSceneAtTime(atTimeSec);
+      }
+    },
+    {
+      id: 'opt-kinetic',
+      icon: `<svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>`,
+      label: 'Kinetic Text',
+      action: () => {
+        popover.remove();
+        createNewTextClipAtTime(atTimeSec);
+        seekToTime(atTimeSec);
+        showTextTimingAlert(`New kinetic text added at ${formatTimecode(atTimeSec)}!`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      }
+    },
+    {
+      id: 'opt-charts',
+      icon: `<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>`,
+      label: 'Charts & FX',
+      action: () => {
+        popover.remove();
+        openChartCreatorModal(atTimeSec);
+      }
+    }
+  ];
+
+  menuItems.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'canva-add-item';
+    row.innerHTML = `
+      <span class="canva-add-icon">${item.icon}</span>
+      <span class="canva-add-label">${item.label}</span>
+    `;
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      item.action();
+    });
+    popover.appendChild(row);
+  });
+
+  document.body.appendChild(popover);
+
+  const rect = triggerEl.getBoundingClientRect();
+  popover.style.left = `${Math.min(window.innerWidth - 180, Math.max(12, rect.left - 60))}px`;
+  popover.style.bottom = `${Math.max(12, window.innerHeight - rect.top + 8)}px`;
+
+  const onDocClose = (evt) => {
+    if (!popover.contains(evt.target) && evt.target !== triggerEl) {
+      popover.remove();
+      document.removeEventListener('click', onDocClose);
+    }
+  };
+  setTimeout(() => document.addEventListener('click', onDocClose), 50);
+}
+
+// Function to insert a clean Blank scene / backdrop segment
+function insertBlankSceneAtTime(atTimeSec) {
+  const blankClip = addClipToTimeline('background', {
+    name: 'Blank Scene',
+    mode: 'solid_black',
+    color: '#000000',
+    duration: 5.0
+  }, atTimeSec, 5.0);
+  seekToTime(atTimeSec);
+  recordState('Insert Blank Scene');
+  showTextTimingAlert('Blank scene inserted!', 'success');
+  setTimeout(() => showTextTimingAlert(''), 2200);
 }
 
 // Helper to create and insert a distinct new text clip
@@ -4501,6 +4592,9 @@ function selectClip(clip, trackType) {
     inspector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  // Update Canva-Style Contextual Dynamic Top Action Bar
+  updateCanvaContextBar(clip, trackType);
+
   // Update Apple-style Fullscreen Floating HUD
   updateAppleFullscreenHud();
 }
@@ -5200,6 +5294,149 @@ function drawTimeRuler() {
   }
 }
 
+// ==================== CANVA-STYLE TOP CONTEXTUAL BAR & FOOTER CONTROLS ====================
+function updateCanvaContextBar(clip = null, trackType = null) {
+  const durLabel = document.getElementById('cbar-val-duration');
+  const bgRemoverBtn = document.getElementById('cbar-media-bg-remover');
+
+  if (clip) {
+    if (durLabel) durLabel.textContent = `${(clip.duration || 5.0).toFixed(1)}s`;
+    if (bgRemoverBtn) {
+      bgRemoverBtn.style.opacity = (trackType === 'image') ? '1' : '0.5';
+    }
+  }
+}
+
+// Wire up Canva Contextual Toolbar Actions
+function initCanvaContextBarListeners() {
+  // Top right actions: Split, Delete, Undo, Redo
+  document.getElementById('cbar-act-split')?.addEventListener('click', () => {
+    if (typeof executeStudioSplit === 'function') executeStudioSplit();
+  });
+  document.getElementById('cbar-act-delete')?.addEventListener('click', () => {
+    if (typeof executeStudioDelete === 'function') executeStudioDelete();
+  });
+  document.getElementById('cbar-act-undo')?.addEventListener('click', () => {
+    if (typeof undoState === 'function') undoState();
+  });
+  document.getElementById('cbar-act-redo')?.addEventListener('click', () => {
+    if (typeof redoState === 'function') redoState();
+  });
+
+  // Media Bar actions
+  document.getElementById('cbar-media-edit')?.addEventListener('click', () => {
+    if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) toggleRightSidebar(true);
+    document.getElementById('right-inspector')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('cbar-media-replace')?.addEventListener('click', () => {
+    if (selectedClip && selectedClip.clip) {
+      openTrackImagePickerModal(selectedClip.clip.start);
+    }
+  });
+
+  document.getElementById('cbar-media-bg-remover')?.addEventListener('click', () => {
+    if (selectedClip && selectedClip.trackType === 'image' && selectedClip.clip) {
+      const cutoutBtn = document.getElementById('btn-sidebar-cutout');
+      if (cutoutBtn) cutoutBtn.click();
+    }
+  });
+
+  document.getElementById('cbar-media-filter')?.addEventListener('click', () => {
+    if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) toggleRightSidebar(true);
+    const colorSec = document.getElementById('inspector-color-grading-section');
+    if (colorSec) colorSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  document.getElementById('cbar-media-audio')?.addEventListener('click', () => {
+    const volRow = document.getElementById('inspector-volume-row');
+    if (volRow) {
+      if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) toggleRightSidebar(true);
+      volRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
+
+  document.getElementById('cbar-media-flip')?.addEventListener('click', () => {
+    if (selectedClip && selectedClip.clip) {
+      selectedClip.clip.flipH = !selectedClip.clip.flipH;
+      renderCanvas();
+      recordState('Flip Media Horizontal');
+    }
+  });
+
+  document.getElementById('cbar-media-position')?.addEventListener('click', () => {
+    if (selectedClip && selectedClip.clip) {
+      selectedClip.clip.layerOrder = selectedClip.clip.layerOrder === 'front' ? 'behind' : 'front';
+      showTextTimingAlert(`Layer set to: ${selectedClip.clip.layerOrder === 'front' ? 'In Front of Text' : 'Behind Text'}`, 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+      renderCanvas();
+      renderAllTimelineTracks();
+    }
+  });
+
+  // Text Bar actions
+  document.getElementById('cbar-text-font')?.addEventListener('change', (e) => {
+    if (selectedClip && selectedClip.trackType === 'text' && selectedClip.clip) {
+      selectedClip.clip.fontFamily = e.target.value;
+      const textFont = document.getElementById('text-font');
+      if (textFont) textFont.value = e.target.value;
+      renderCanvas();
+      recordState('Change Text Font');
+    }
+  });
+
+  document.getElementById('cbar-text-size-down')?.addEventListener('click', () => {
+    if (selectedClip && selectedClip.trackType === 'text' && selectedClip.clip) {
+      selectedClip.clip.fontSize = Math.max(16, (selectedClip.clip.fontSize || 64) - 4);
+      document.getElementById('cbar-val-text-size').textContent = selectedClip.clip.fontSize;
+      renderCanvas();
+    }
+  });
+
+  document.getElementById('cbar-text-size-up')?.addEventListener('click', () => {
+    if (selectedClip && selectedClip.trackType === 'text' && selectedClip.clip) {
+      selectedClip.clip.fontSize = Math.min(160, (selectedClip.clip.fontSize || 64) + 4);
+      document.getElementById('cbar-val-text-size').textContent = selectedClip.clip.fontSize;
+      renderCanvas();
+    }
+  });
+
+  document.getElementById('cbar-text-color')?.addEventListener('input', (e) => {
+    if (selectedClip && selectedClip.trackType === 'text' && selectedClip.clip) {
+      selectedClip.clip.textColor = e.target.value;
+      document.getElementById('cbar-color-preview').style.background = e.target.value;
+      renderCanvas();
+    }
+  });
+
+  document.getElementById('cbar-text-hl-color')?.addEventListener('input', (e) => {
+    if (selectedClip && selectedClip.trackType === 'text' && selectedClip.clip) {
+      selectedClip.clip.highlightColor = e.target.value;
+      document.getElementById('cbar-hl-color-preview').style.background = e.target.value;
+      renderCanvas();
+    }
+  });
+
+  // Dedicated "Add Audio" Strip in Timeline
+  document.getElementById('canva-btn-add-audio')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openTrackMediaPicker('voiceover', currentTime, e.currentTarget);
+  });
+
+  // Footer storyline mode switcher
+  document.getElementById('btn-toggle-storyline-mode')?.addEventListener('click', () => {
+    timelineViewMode = (timelineViewMode === 'consolidated') ? 'multi' : 'consolidated';
+    const label = document.getElementById('label-view-mode');
+    if (label) label.textContent = timelineViewMode === 'consolidated' ? 'Pages & Clips' : 'Multi-Track Pro';
+    renderAllTimelineTracks();
+  });
+
+  // Footer Fullscreen Preview
+  document.getElementById('btn-footer-fullscreen')?.addEventListener('click', () => {
+    document.getElementById('btn-canvas-fullscreen')?.click();
+  });
+}
+
 // Timeline Zoom Slider
 const zoomSlider = document.getElementById('timeline-zoom');
 if (zoomSlider) {
@@ -5209,9 +5446,17 @@ if (zoomSlider) {
     drawTimeRuler();
     renderAllTimelineTracks();
     const playhead = document.getElementById('playhead');
-    playhead.style.left = `${currentTime * pps}px`;
+    if (playhead) playhead.style.left = `${currentTime * pps}px`;
+    const zoomDisplay = document.getElementById('canva-zoom-display');
+    if (zoomDisplay) zoomDisplay.textContent = `${Math.round(zoomVal * 100)}%`;
   });
 }
+
+// Initialize on DOM ready
+setTimeout(() => {
+  initCanvaContextBarListeners();
+  updateCanvaContextBar();
+}, 100);
 
 // ==================== INTERACTIVE TIMELINE SCRUBBING & SEEKING ====================
 let isScrubbing = false;
@@ -5420,16 +5665,30 @@ function switchMediaCategory(targetCategory) {
   const iconsPanelEl = document.getElementById('icons-panel-container');
   const projectsPanelEl = document.getElementById('projects-panel-container');
   const templatesPanelEl = document.getElementById('templates-panel-container');
+  const animatePanelEl = document.getElementById('animate-panel-container');
 
   if (projectsPanelEl) projectsPanelEl.style.display = 'none';
   if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+  if (animatePanelEl) animatePanelEl.style.display = 'none';
 
-  if (currentFilter === 'templates') {
+  if (currentFilter === 'animate') {
     if (mediaListEl) mediaListEl.style.display = 'none';
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
     if (projectsPanelEl) projectsPanelEl.style.display = 'none';
+    if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (animatePanelEl) {
+      animatePanelEl.style.display = 'flex';
+      if (typeof renderAnimatePanel === 'function') renderAnimatePanel();
+    }
+  } else if (currentFilter === 'templates') {
+    if (mediaListEl) mediaListEl.style.display = 'none';
+    if (layersPanelEl) layersPanelEl.style.display = 'none';
+    if (chartsPanelEl) chartsPanelEl.style.display = 'none';
+    if (iconsPanelEl) iconsPanelEl.style.display = 'none';
+    if (projectsPanelEl) projectsPanelEl.style.display = 'none';
+    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (templatesPanelEl) {
       templatesPanelEl.style.display = 'flex';
       renderTemplatesHub();
@@ -5440,6 +5699,7 @@ function switchMediaCategory(targetCategory) {
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
     if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (projectsPanelEl) {
       projectsPanelEl.style.display = 'flex';
       renderProjectsPanel();
@@ -5449,6 +5709,7 @@ function switchMediaCategory(targetCategory) {
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
     if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (chartsPanelEl) {
       chartsPanelEl.style.display = 'flex';
       renderChartsTemplatesPanel();
@@ -5458,6 +5719,7 @@ function switchMediaCategory(targetCategory) {
     if (layersPanelEl) layersPanelEl.style.display = 'none';
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (iconsPanelEl) {
       iconsPanelEl.style.display = 'flex';
       renderIconsLibraryPanel();
@@ -5467,6 +5729,7 @@ function switchMediaCategory(targetCategory) {
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
     if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (layersPanelEl) {
       layersPanelEl.style.display = 'flex';
       renderLayersPanel();
@@ -5476,6 +5739,7 @@ function switchMediaCategory(targetCategory) {
     if (chartsPanelEl) chartsPanelEl.style.display = 'none';
     if (iconsPanelEl) iconsPanelEl.style.display = 'none';
     if (templatesPanelEl) templatesPanelEl.style.display = 'none';
+    if (animatePanelEl) animatePanelEl.style.display = 'none';
     if (mediaListEl) {
       mediaListEl.style.display = 'flex';
       renderMediaList(currentFilter);
@@ -19979,6 +20243,7 @@ function initRegaarderStudioControls() {
         all: { title: 'Media Library', sub: 'Upload or select media files' },
         templates: { title: 'Templates', sub: 'Pre-built structures & layouts' },
         charts: { title: 'Elements', sub: 'Animated charts & widgets' },
+        animate: { title: 'Animate', sub: 'Camera zooms & visual effects' },
         text: { title: 'Kinetic Text', sub: 'Typography & titles' },
         icons: { title: 'Icons & Stickers', sub: 'Vector iconography' },
         layers: { title: 'Canvas Layers', sub: 'Stage backgrounds & overlays' },
@@ -20012,6 +20277,371 @@ function initRegaarderStudioControls() {
       if (typeof switchMediaCategory === 'function') {
         switchMediaCategory(railTab);
       }
+    });
+  });
+
+  // Top Canva Toolbar: "Animate" button opens Animate Side Panel
+  const btnCbarAnimate = document.getElementById('btn-cbar-animate');
+  if (btnCbarAnimate) {
+    btnCbarAnimate.addEventListener('click', () => {
+      // 1. Set active rail tab to 'animate'
+      document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.railTab === 'animate');
+      });
+      // 2. Update panel titles
+      const heading = document.getElementById('sidebar-panel-heading');
+      const sub = document.getElementById('sidebar-panel-sub');
+      if (heading) heading.textContent = 'Animate';
+      if (sub) sub.textContent = 'Camera zooms & visual effects';
+      // 3. Expand sidebar if collapsed
+      const workspace = document.querySelector('.workspace');
+      if (workspace && workspace.classList.contains('hide-left')) {
+        workspace.classList.remove('hide-left');
+        const toggleBtn = document.getElementById('btn-toggle-left-sidebar');
+        if (toggleBtn) toggleBtn.classList.add('active');
+      }
+      // 4. Switch category
+      switchMediaCategory('animate');
+    });
+  }
+
+  // Top Canva Toolbar: "Draw" button activates Freehand Drawing Mode directly
+  const btnCbarDraw = document.getElementById('btn-cbar-draw');
+  if (btnCbarDraw) {
+    btnCbarDraw.addEventListener('click', () => {
+      setStudioTool('draw');
+      showTextTimingAlert('Freehand Drawing Active! Hold click anywhere on screen for Pen quick-menu.', 'success');
+      setTimeout(() => showTextTimingAlert(''), 3000);
+    });
+  }
+}
+
+/* =========================================================
+   CANVA-STYLE ANIMATIONS & EFFECTS CONTROLLER
+   Grid Cards with Visual Previews, Live Hover on Canvas,
+   Intensity Slider & Remove Animation Support
+   ========================================================= */
+const CANVA_ANIMATIONS = [
+  {
+    id: 'snap-zoom',
+    name: 'Punch Zoom',
+    category: 'zoom',
+    desc: 'Instant 2.2x snap magnification onto focus target',
+    type: 'zoom',
+    iconClass: 'anim-icon-zoom',
+    badge: 'Vox Snap',
+    previewSvg: `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#c084fc;stroke-width:2;"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6M8 11h6"/></svg>`
+  },
+  {
+    id: 'loupe',
+    name: 'Loupe Callout',
+    category: 'focus',
+    desc: 'Magnifying inspection glass callout circle',
+    type: 'loupe',
+    iconClass: 'anim-icon-loupe',
+    badge: 'Forensic',
+    previewSvg: `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#38bdf8;stroke-width:2;"><circle cx="11" cy="11" r="8"/><circle cx="11" cy="11" r="3.5" fill="#38bdf8"/><path d="M17 17l4 4"/></svg>`
+  },
+  {
+    id: 'doc-focus-white',
+    name: 'Whiteout Fade',
+    category: 'focus',
+    desc: 'Surrounding text fades to white, spotlighting paragraph',
+    type: 'docFocusWhite',
+    iconClass: 'anim-icon-whiteout',
+    badge: 'Doc Focus',
+    previewSvg: `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#38bdf8;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 10h10v2H7zm0-3h10v2H7zm0 6h7v2H7z"/></svg>`
+  },
+  {
+    id: 'doc-focus-dark',
+    name: 'Dark Spotlight',
+    category: 'focus',
+    desc: 'Heavy feathered vignette darkens outer surroundings',
+    type: 'docFocusDark',
+    iconClass: 'anim-icon-spotlight',
+    badge: 'Spotlight',
+    previewSvg: `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#a855f7;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>`
+  },
+  {
+    id: 'doc-highlight',
+    name: 'Highlighter Sweep',
+    category: 'highlight',
+    desc: 'Dynamic fluorescent marker pen sweeping across text',
+    type: 'highlight',
+    iconClass: 'anim-bar-highlight',
+    badge: 'Johnny Harris',
+    previewSvg: `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#fbbf24;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/><path d="M2 22h20v2H2z"/></svg>`
+  },
+  {
+    id: 'pan-drift',
+    name: 'Pan & Drift',
+    category: 'motion',
+    desc: 'Continuous slow camera parallax floating drift',
+    type: 'drift',
+    iconClass: 'anim-icon-zoom',
+    badge: 'Ken Burns',
+    previewSvg: `<svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:none;stroke:#a855f7;stroke-width:2;"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`
+  }
+];
+
+let activeAnimCategoryFilter = 'all';
+
+function renderAnimatePanel() {
+  const grid = document.getElementById('animate-cards-grid');
+  const tabsContainer = document.getElementById('animate-category-tabs');
+  const drawer = document.getElementById('animate-controls-drawer');
+  const intensitySlider = document.getElementById('animate-intensity-slider');
+  const activeNameEl = document.getElementById('animate-active-name');
+  const activeValEl = document.getElementById('animate-active-val');
+  const btnRemove = document.getElementById('btn-remove-active-animation');
+  if (!grid) return;
+
+  // Setup sub-category tabs
+  if (tabsContainer && !tabsContainer.dataset.initialized) {
+    tabsContainer.dataset.initialized = 'true';
+    tabsContainer.querySelectorAll('button').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        tabsContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        activeAnimCategoryFilter = e.currentTarget.dataset.animCat;
+        renderAnimatePanel();
+      });
+    });
+  }
+
+  // Determine active clip animation
+  const sel = selectedClip;
+  const clip = sel?.clip;
+  let currentActiveId = null;
+  if (clip) {
+    if (clip.zoomEffect === 'snap') currentActiveId = 'snap-zoom';
+    else if (clip.zoomEffect === 'loupe') currentActiveId = 'loupe';
+    else if (clip.docFocus && clip.docStyle === 'white') currentActiveId = 'doc-focus-white';
+    else if (clip.docFocus && clip.docStyle === 'dark') currentActiveId = 'doc-focus-dark';
+    else if (clip.highlights && clip.highlights.length > 0) currentActiveId = 'doc-highlight';
+  }
+
+  const filtered = CANVA_ANIMATIONS.filter(a => {
+    return activeAnimCategoryFilter === 'all' || a.category === activeAnimCategoryFilter;
+  });
+
+  grid.innerHTML = filtered.map(anim => {
+    const isActive = anim.id === currentActiveId;
+    return `
+      <div class="canva-anim-card ${isActive ? 'active' : ''}" data-anim-id="${anim.id}" title="${anim.desc}">
+        <div class="canva-anim-thumb">
+          <div class="canva-anim-preview-box ${anim.iconClass}">
+            ${anim.previewSvg}
+          </div>
+        </div>
+        <div class="canva-anim-label">${anim.name}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Update controls drawer visibility & values
+  if (drawer) {
+    if (currentActiveId) {
+      drawer.style.display = 'flex';
+      const animObj = CANVA_ANIMATIONS.find(a => a.id === currentActiveId);
+      if (activeNameEl) activeNameEl.textContent = animObj ? animObj.name : 'Active Effect';
+      if (intensitySlider && clip) {
+        if (currentActiveId === 'snap-zoom') {
+          const val = clip.zoomScale || 2.2;
+          intensitySlider.min = 12;
+          intensitySlider.max = 40;
+          intensitySlider.value = Math.round(val * 10);
+          if (activeValEl) activeValEl.textContent = `${val.toFixed(1)}x`;
+        } else if (currentActiveId === 'loupe') {
+          const val = clip.loupeRadius || 120;
+          intensitySlider.min = 50;
+          intensitySlider.max = 240;
+          intensitySlider.value = val;
+          if (activeValEl) activeValEl.textContent = `${val}px`;
+        } else if (currentActiveId === 'doc-focus-white' || currentActiveId === 'doc-focus-dark') {
+          const val = clip.docDimOpacity !== undefined ? clip.docDimOpacity : 0.65;
+          intensitySlider.min = 20;
+          intensitySlider.max = 95;
+          intensitySlider.value = Math.round(val * 100);
+          if (activeValEl) activeValEl.textContent = `${Math.round(val * 100)}%`;
+        } else {
+          intensitySlider.min = 10;
+          intensitySlider.max = 100;
+          intensitySlider.value = 80;
+          if (activeValEl) activeValEl.textContent = 'Active';
+        }
+      }
+    } else {
+      drawer.style.display = 'none';
+    }
+  }
+
+  // Setup intensity slider live adjustments
+  if (intensitySlider && !intensitySlider.dataset.listening) {
+    intensitySlider.dataset.listening = 'true';
+    intensitySlider.addEventListener('input', (e) => {
+      const curClip = selectedClip?.clip;
+      if (!curClip) return;
+      const num = parseFloat(e.target.value);
+      if (curClip.zoomEffect === 'snap') {
+        curClip.zoomScale = parseFloat((num / 10).toFixed(1));
+        if (activeValEl) activeValEl.textContent = `${curClip.zoomScale.toFixed(1)}x`;
+      } else if (curClip.zoomEffect === 'loupe') {
+        curClip.loupeRadius = Math.round(num);
+        if (activeValEl) activeValEl.textContent = `${curClip.loupeRadius}px`;
+      } else if (curClip.docFocus) {
+        curClip.docDimOpacity = parseFloat((num / 100).toFixed(2));
+        if (activeValEl) activeValEl.textContent = `${Math.round(num)}%`;
+      }
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof updateInspector === 'function') updateInspector();
+    });
+  }
+
+  // Remove animation button listener
+  if (btnRemove && !btnRemove.dataset.listening) {
+    btnRemove.dataset.listening = 'true';
+    btnRemove.addEventListener('click', () => {
+      const curClip = selectedClip?.clip;
+      if (!curClip) return;
+      delete curClip.zoomEffect;
+      delete curClip.zoomScale;
+      delete curClip.zoomOriginX;
+      delete curClip.zoomOriginY;
+      delete curClip.zoomStartTime;
+      delete curClip.loupeShape;
+      delete curClip.loupeRadius;
+      delete curClip.docFocus;
+      delete curClip.docFocusRect;
+      delete curClip.docStyle;
+      delete curClip.docDimOpacity;
+      delete curClip.docFocusStartTime;
+      delete curClip.docFocusDuration;
+      curClip.highlights = [];
+      playSFX('trash');
+      showTextTimingAlert('Removed animation from clip', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+      renderAnimatePanel();
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof updateInspector === 'function') updateInspector();
+      if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    });
+  }
+
+  // Card click & hover preview handlers
+  grid.querySelectorAll('.canva-anim-card').forEach(card => {
+    const animId = card.dataset.animId;
+
+    // Hover: show dynamic preview directly on editing canvas!
+    card.addEventListener('mouseenter', () => {
+      const curClip = selectedClip?.clip;
+      if (!curClip) return;
+      // Temporarily simulate effect on canvas
+      if (animId === 'snap-zoom') {
+        curClip._previewZoom = 1.35;
+      } else if (animId === 'loupe') {
+        curClip._previewLoupe = true;
+      } else if (animId === 'doc-focus-white') {
+        curClip._previewDocFocus = 'white';
+      } else if (animId === 'doc-focus-dark') {
+        curClip._previewDocFocus = 'dark';
+      }
+      if (typeof renderCanvas === 'function') renderCanvas();
+    });
+
+    card.addEventListener('mouseleave', () => {
+      const curClip = selectedClip?.clip;
+      if (!curClip) return;
+      delete curClip._previewZoom;
+      delete curClip._previewLoupe;
+      delete curClip._previewDocFocus;
+      if (typeof renderCanvas === 'function') renderCanvas();
+    });
+
+    // Click: apply animation to selected clip (or active storyline media)
+    card.addEventListener('click', () => {
+      // Find active or first available media clip if none selected
+      let targetClip = selectedClip?.clip;
+      let targetTrackType = selectedClip?.trackType || 'image';
+      if (!targetClip) {
+        if (timelineClips.image && timelineClips.image.length > 0) {
+          targetClip = timelineClips.image[0];
+          targetTrackType = 'image';
+        } else if (timelineClips.video && timelineClips.video.length > 0) {
+          targetClip = timelineClips.video[0];
+          targetTrackType = 'video';
+        }
+      }
+
+      if (!targetClip) {
+        showTextTimingAlert('Please select a video or image clip to animate!', 'info');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+        return;
+      }
+
+      delete targetClip._previewZoom;
+      delete targetClip._previewLoupe;
+      delete targetClip._previewDocFocus;
+
+      if (animId === 'snap-zoom') {
+        targetClip.zoomEffect = 'snap';
+        if (!targetClip.zoomScale) targetClip.zoomScale = 2.2;
+        if (!targetClip.zoomOriginX) targetClip.zoomOriginX = 0.5;
+        if (!targetClip.zoomOriginY) targetClip.zoomOriginY = 0.38;
+        targetClip.zoomStartTime = 0.3;
+        delete targetClip.docFocus;
+      } else if (animId === 'loupe') {
+        targetClip.zoomEffect = 'loupe';
+        targetClip.zoomScale = 2.4;
+        targetClip.loupeShape = 'circle';
+        targetClip.loupeRadius = 125;
+        if (!targetClip.zoomOriginX) targetClip.zoomOriginX = 0.5;
+        if (!targetClip.zoomOriginY) targetClip.zoomOriginY = 0.4;
+        targetClip.zoomStartTime = 0.3;
+        delete targetClip.docFocus;
+      } else if (animId === 'doc-focus-white') {
+        targetClip.docFocus = true;
+        targetClip.docStyle = 'white';
+        targetClip.docDimOpacity = 0.65;
+        targetClip.docFeather = 18;
+        if (!targetClip.docFocusRect) targetClip.docFocusRect = { x: 0.12, y: 0.22, w: 0.76, h: 0.25 };
+        targetClip.docFocusStartTime = 0.4;
+        targetClip.docFocusDuration = 3.5;
+      } else if (animId === 'doc-focus-dark') {
+        targetClip.docFocus = true;
+        targetClip.docStyle = 'dark';
+        targetClip.docDimOpacity = 0.75;
+        targetClip.docFeather = 20;
+        if (!targetClip.docFocusRect) targetClip.docFocusRect = { x: 0.15, y: 0.20, w: 0.70, h: 0.50 };
+        targetClip.docFocusStartTime = 0.4;
+        targetClip.docFocusDuration = 3.5;
+      } else if (animId === 'doc-highlight') {
+        if (!Array.isArray(targetClip.highlights)) targetClip.highlights = [];
+        targetClip.highlights.push({
+          x: 0.14,
+          y: 0.35,
+          w: 0.72,
+          h: 0.08,
+          color: '#ffff00',
+          opacity: 0.95,
+          startTime: 0.5,
+          duration: 0.8
+        });
+      } else if (animId === 'pan-drift') {
+        targetClip.zoomEffect = 'snap';
+        targetClip.zoomScale = 1.18;
+        targetClip.zoomStartTime = 0.0;
+      }
+
+      playSFX('snap_zoom');
+      selectClip(targetClip, targetTrackType);
+      showTextTimingAlert(`Applied ${card.querySelector('.canva-anim-label')?.textContent || 'Animation'}!`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+
+      renderAnimatePanel();
+      if (typeof renderCanvas === 'function') renderCanvas();
+      if (typeof updateInspector === 'function') updateInspector();
+      if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
     });
   });
 }
@@ -20500,10 +21130,75 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Dust Particles', 'Optical Flare', 'Fire Embers', 'Smoke Overlay', 'Film Grain', 'Magnates Media'],
     defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'anim-punch-zoom',
+    title: 'Cinematic Punch Zoom (Snap Magnifier)',
+    category: 'Animations',
+    badge: 'Vox & YouTube Classic',
+    difficulty: '1-Click',
+    timeToApply: '1 sec',
+    previewGradient: 'linear-gradient(to top, rgba(168, 85, 247, 0.7), rgba(99, 102, 241, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Instant dynamic camera snap magnification onto key headlines, faces, or data graphs with spring-damping easing.',
+    tags: ['Punch Zoom', 'Camera Snap', 'Vox Style', 'Magnification', 'Animation'],
+    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'anim-loupe-callout',
+    title: 'Floating Loupe Forensic Callout',
+    category: 'Animations',
+    badge: 'Documentary Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(6, 182, 212, 0.7), rgba(59, 130, 246, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Circular or rectangular magnified glass loupe focusing viewer attention directly onto forensic evidence or document details.',
+    tags: ['Loupe Callout', 'Magnifier', 'Evidence Callout', 'Forensic', 'Animation'],
+    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'anim-whiteout-fade',
+    title: 'Whiteout Fade Focus (Document Dimmer)',
+    category: 'Animations',
+    badge: 'Vox Newspaper Style',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(56, 189, 248, 0.7), rgba(14, 165, 233, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Fades surrounding background article text into soft white, making the selected paragraph or quote crystal clear.',
+    tags: ['Whiteout Fade', 'Document Focus', 'Newspaper Focus', 'Vox Style', 'Animation'],
+    defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'anim-dark-spotlight',
+    title: 'Dark Spotlight Focus (Cinematic Dimming)',
+    category: 'Animations',
+    badge: 'Magnates Media Style',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(147, 51, 234, 0.7), rgba(88, 28, 135, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Darkens and vignettes everything outside the target subject with high-contrast feathered falloff for intense dramatic focus.',
+    tags: ['Dark Spotlight', 'Dim Surroundings', 'Vignette Focus', 'Dramatic', 'Animation'],
+    defaultImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'anim-animated-highlighter',
+    title: 'Animated Marker Highlighter Sweep',
+    category: 'Animations',
+    badge: 'Johnny Harris Signature',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(234, 179, 8, 0.7), rgba(202, 138, 4, 0.4), rgba(15, 23, 42, 0.9))',
+    description: 'Dynamic fluo-yellow, cyan, or neon marker sweep sliding live across text lines synchronized to your story timing.',
+    tags: ['Animated Highlighter', 'Marker Sweep', 'Yellow Pen', 'Johnny Harris', 'Animation'],
+    defaultImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
+const TEMPLATE_CATEGORIES = ['All', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
@@ -21689,6 +22384,63 @@ function startTemplateHoverVideo(cardEl, tpl) {
           </div>
         </div>
       `;
+    } else if (tplId === 'anim-punch-zoom') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img id="fx-anim-zoom-img-${tplId}" src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.08s ease; transform-origin: 50% 35%;" />
+          <div style="position: absolute; inset: 0; border: 2px solid rgba(168,85,247,0.5); pointer-events: none;"></div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #8b5cf6; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(139,92,246,0.6);">
+            🔍 PUNCH ZOOM 2.2X
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'anim-loupe-callout') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.75);" />
+          <div id="fx-anim-loupe-glass-${tplId}" style="position: absolute; width: 95px; height: 95px; border-radius: 50%; border: 3px solid #00f0ff; box-shadow: 0 8px 25px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,240,255,0.4); overflow: hidden; pointer-events: none;">
+            <img id="fx-anim-loupe-inner-${tplId}" src="${tpl.defaultImage}" style="width: 240%; height: 240%; object-fit: cover; position: absolute; transform: scale(1.8);" />
+          </div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #06b6d4; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(6,182,212,0.6);">
+            🔎 LOUPE CALLOUT
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'anim-whiteout-fade') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div id="fx-anim-white-overlay-${tplId}" style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.75); pointer-events: none;"></div>
+          <div style="position: absolute; top: 32%; left: 10%; right: 10%; height: 36%; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(255,255,255,0.7); border: 2px solid #38bdf8; overflow: hidden; pointer-events: none;">
+            <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; margin-top: -12%;" />
+          </div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #0284c7; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
+            ⬜ WHITEOUT FOCUS
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'anim-dark-spotlight') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div id="fx-anim-spotlight-${tplId}" style="position: absolute; width: 130px; height: 130px; border-radius: 50%; box-shadow: 0 0 0 9999px rgba(0,0,0,0.85); pointer-events: none; border: 1px solid rgba(168,85,247,0.6);"></div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #9333ea; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
+            🔦 DARK SPOTLIGHT
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'anim-animated-highlighter') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #0e1017; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15) brightness(0.9);" />
+          <div style="position: absolute; top: 40%; left: 12%; right: 12%; height: 22px; pointer-events: none;">
+            <div id="fx-anim-hl-bar-${tplId}" style="height: 100%; background: rgba(254, 240, 138, 0.9); mix-blend-mode: multiply; border-radius: 4px; width: 0%; box-shadow: 0 0 10px rgba(254, 240, 138, 0.8);"></div>
+          </div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #eab308; color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
+            🖍️ HIGHLIGHTER SWEEP
+          </div>
+        </div>
+      `;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -22226,6 +22978,32 @@ function startTemplateHoverVideo(cardEl, tpl) {
           p.style.transform = `translateX(${cx.toFixed(1)}px)`;
         }
       }
+    } else if (tplId === 'anim-punch-zoom') {
+      const zoomCycle = 1 + (Math.sin(t * 3.5) > 0 ? (Math.sin(t * 3.5) * 1.2) : 0);
+      const img = fxContainer?.querySelector(`#fx-anim-zoom-img-${tplId}`);
+      if (img) img.style.transform = `scale(${zoomCycle.toFixed(2)})`;
+    } else if (tplId === 'anim-loupe-callout') {
+      const loupeX = Math.sin(t * 2) * 35;
+      const loupeY = Math.cos(t * 2.2) * 20;
+      const glass = fxContainer?.querySelector(`#fx-anim-loupe-glass-${tplId}`);
+      const inner = fxContainer?.querySelector(`#fx-anim-loupe-inner-${tplId}`);
+      if (glass) glass.style.transform = `translate(${loupeX.toFixed(1)}px, ${loupeY.toFixed(1)}px)`;
+      if (inner) inner.style.transform = `translate(${(-loupeX * 1.5).toFixed(1)}px, ${(-loupeY * 1.5).toFixed(1)}px) scale(1.8)`;
+    } else if (tplId === 'anim-whiteout-fade') {
+      const fadeOp = 0.5 + Math.sin(t * 2) * 0.35;
+      const overlay = fxContainer?.querySelector(`#fx-anim-white-overlay-${tplId}`);
+      if (overlay) overlay.style.opacity = fadeOp.toFixed(2);
+    } else if (tplId === 'anim-dark-spotlight') {
+      const spotPulse = 120 + Math.sin(t * 2.5) * 25;
+      const spot = fxContainer?.querySelector(`#fx-anim-spotlight-${tplId}`);
+      if (spot) {
+        spot.style.width = `${spotPulse.toFixed(0)}px`;
+        spot.style.height = `${spotPulse.toFixed(0)}px`;
+      }
+    } else if (tplId === 'anim-animated-highlighter') {
+      const hlProg = Math.min(100, Math.floor(((t * 1.2) % 1.5 / 1.5) * 100));
+      const bar = fxContainer?.querySelector(`#fx-anim-hl-bar-${tplId}`);
+      if (bar) bar.style.width = `${hlProg}%`;
     } else {
       const shiftX = Math.sin(t * 3) * 14;
       const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
@@ -22691,6 +23469,108 @@ function applySelectedHomepageTemplate(templateId) {
     // Launch Magnates Media Particle & VFX Overlays Suite
     openMagnatesParticleVFXSuite();
     return;
+  } else if (templateId === 'anim-punch-zoom') {
+    const zoomClip = {
+      id: `img-${Date.now()}`,
+      name: 'Document_Headline.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.0,
+      zoomEffect: 'snap',
+      zoomScale: 2.2,
+      zoomStartTime: 0.4
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [zoomClip];
+      renderAllTimelineTracks();
+      selectClip(zoomClip, 'image');
+    }
+  } else if (templateId === 'anim-loupe-callout') {
+    const loupeClip = {
+      id: `img-${Date.now()}`,
+      name: 'Archival_Evidence.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.0,
+      zoomEffect: 'loupe',
+      zoomScale: 2.4,
+      zoomStartTime: 0.3,
+      loupeShape: 'circle',
+      loupeRadius: 130
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [loupeClip];
+      renderAllTimelineTracks();
+      selectClip(loupeClip, 'image');
+    }
+  } else if (templateId === 'anim-whiteout-fade') {
+    const whiteoutClip = {
+      id: `img-${Date.now()}`,
+      name: 'Newspaper_Paragraph.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.0,
+      docFocus: true,
+      docStyle: 'white',
+      docDimOpacity: 0.65,
+      docFeather: 18,
+      docFocusRect: { x: 0.12, y: 0.25, w: 0.76, h: 0.25 },
+      docFocusStartTime: 0.4,
+      docFocusDuration: 3.5
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [whiteoutClip];
+      renderAllTimelineTracks();
+      selectClip(whiteoutClip, 'image');
+    }
+  } else if (templateId === 'anim-dark-spotlight') {
+    const darkSpotClip = {
+      id: `img-${Date.now()}`,
+      name: 'Dramatic_Subject.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.0,
+      docFocus: true,
+      docStyle: 'dark',
+      docDimOpacity: 0.75,
+      docFeather: 20,
+      docFocusRect: { x: 0.25, y: 0.18, w: 0.50, h: 0.55 },
+      docFocusStartTime: 0.4,
+      docFocusDuration: 3.5
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [darkSpotClip];
+      renderAllTimelineTracks();
+      selectClip(darkSpotClip, 'image');
+    }
+  } else if (templateId === 'anim-animated-highlighter') {
+    const hlClip = {
+      id: `img-${Date.now()}`,
+      name: 'Archival_Record.jpg',
+      url: tpl.defaultImage,
+      start: 0,
+      duration: 6,
+      scale: 1.0,
+      highlights: [{
+        x: 0.15,
+        y: 0.35,
+        w: 0.70,
+        h: 0.08,
+        color: '#ffff00',
+        opacity: 0.95,
+        startTime: 0.5,
+        duration: 0.8
+      }]
+    };
+    if (timelineClips && timelineClips.image) {
+      timelineClips.image = [hlClip];
+      renderAllTimelineTracks();
+      selectClip(hlClip, 'image');
+    }
   }
 
   showTextTimingAlert(`Loaded template: "${tpl.title}" into Studio!`, 'success');

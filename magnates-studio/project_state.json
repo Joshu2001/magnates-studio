@@ -1,7 +1,7 @@
 {
   "text": [
     {
-      "id": "txt-1791537528339",
+      "id": "txt-1791546231681",
       "text": "MAGNATES",
       "highlight": "MAGNATES",
       "highlightColor": "#ff334b",
@@ -24,7 +24,7 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791537528336",
+      "id": "img-bg-1791546231679",
       "start": 0,
       "duration": 6,
       "layerOrder": "back",
@@ -37,7 +37,7 @@
       }
     },
     {
-      "id": "img-fg-1791537528337",
+      "id": "img-fg-1791546231680",
       "start": 0,
       "duration": 6,
       "layerOrder": "front",
@@ -45,6 +45,11 @@
       "scale": 1.05,
       "vectorEffect": false,
       "vectorStrokeColor": "#ffffff",
+      "zoomEffect": "snap",
+      "zoomScale": 2.9,
+      "zoomStartTime": 0.3,
+      "zoomOriginX": 0.5,
+      "zoomOriginY": 0.38,
       "file": {
         "name": "Custom_Cutout_Subject.png",
         "url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
@@ -82,9 +87,9 @@
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 0,
+  "currentTime": 1.9551000000000063,
   "duration": 368.144014,
-  "savedAt": 1791537589511,
-  "projectName": "New Project 8",
-  "projectId": "proj_1791537529329_u631"
+  "savedAt": 1791546285582,
+  "projectName": "New Project 13",
+  "projectId": "proj_1791546232412_exqn"
 }
