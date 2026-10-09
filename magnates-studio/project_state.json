@@ -1,7 +1,7 @@
 {
   "text": [
     {
-      "id": "txt-1791513902697",
+      "id": "txt-1791528733567",
       "text": "MAGNATES",
       "highlight": "MAGNATES",
       "highlightColor": "#ff334b",
@@ -24,13 +24,11 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791513902695",
+      "id": "img-bg-1791528733565",
       "start": 0,
       "duration": 6,
       "layerOrder": "back",
       "zIndex": 10,
-      "x": 0,
-      "y": 0,
       "scale": 1.15,
       "file": {
         "name": "Custom_Environment.jpg",
@@ -39,7 +37,7 @@
       }
     },
     {
-      "id": "img-fg-1791513902696",
+      "id": "img-fg-1791528733566",
       "start": 0,
       "duration": 6,
       "layerOrder": "front",
@@ -57,9 +55,9 @@
   "video": [],
   "voiceover": [
     {
-      "id": "clip-voiceover-1791218194867-325",
+      "id": "clip-voiceover-1791174140873-123",
       "track": "voiceover",
-      "start": 1,
+      "start": 0,
       "duration": 368.144014,
       "volume": 100,
       "soundEnabled": true,
@@ -77,16 +75,16 @@
   "music": [],
   "background": [
     {
-      "id": "clip-bg-default",
+      "id": "bg-1",
       "start": 0,
-      "duration": 60,
+      "duration": 15,
       "bgType": "cyber_grid",
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 2.0055,
+  "currentTime": 11.665100000000002,
   "duration": 368.144014,
-  "savedAt": 1791516217640,
-  "projectName": "2.5D Animated Subject Cutout (Auto BG Removed)",
-  "projectId": "proj_1791218145776_xils"
+  "savedAt": 1791529350314,
+  "projectName": "New Project 1",
+  "projectId": "proj_1791528735261_quda"
 }

@@ -2977,7 +2977,8 @@ function addClipToTimeline(trackType, fileOrData, startSec, clipDuration = 6) {
       duration = Math.max(duration, audioPlayer.duration || 60);
       clip.duration = audioPlayer.duration || clip.duration;
       renderAllTimelineTracks();
-      document.getElementById('duration-badge').textContent = `00:00 / ${formatTime(duration)}`;
+      const durBadge = document.getElementById('duration-badge');
+      if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
     };
   } else if (trackType === 'music') {
     bgmPlayer.src = clip.file.url;
@@ -5862,7 +5863,7 @@ if (btnRecordVoice) {
 }
 
 // Auto load voiceover button
-document.getElementById('btn-snap-audio').addEventListener('click', () => {
+document.getElementById('btn-snap-audio')?.addEventListener('click', () => {
   const targetAudio = mediaFiles.find(f => f.name.includes('Android') && f.isAudio);
   if (targetAudio) {
     addClipToTimeline('voiceover', targetAudio, 0, 368);
@@ -14809,13 +14810,15 @@ function saveCurrentProjectToLibrary(name, alertUser = false) {
   }
 }
 
-function getNextSequentialProjectName() {
+// Generate sequential project name: New Project 1, New Project 2, etc.
+function getNextProjectName() {
   const projects = getAllProjects();
   let maxNum = 0;
+  const regex = /^New Project\s+(\d+)$/i;
   projects.forEach(p => {
-    const match = (p.projectName || '').match(/^(?:New Project|Untitled Project)\s*(\d+)$/i);
+    const match = (p.projectName || '').match(regex);
     if (match) {
-      const num = parseInt(match[1]);
+      const num = parseInt(match[1], 10);
       if (num > maxNum) maxNum = num;
     }
   });
@@ -14826,7 +14829,7 @@ function getNextSequentialProjectName() {
 function createNewProjectInLibrary(projectName) {
   const projects = getAllProjects();
   const id = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-  const name = projectName?.trim() || getNextSequentialProjectName();
+  const name = projectName?.trim() || getNextProjectName();
 
   // Fresh initial clips state
   const freshClips = {
@@ -15266,7 +15269,8 @@ function renderProjectsPanel() {
 }
 
 document.getElementById('btn-new-project')?.addEventListener('click', async () => {
-  const name = await nativePrompt('Create New Project', 'Enter project title:', 'Untitled Project', 'Create Project');
+  const defaultTitle = getNextProjectName();
+  const name = await nativePrompt('Create New Project', 'Enter project title:', defaultTitle, 'Create Project');
   if (name && name.trim()) {
     createNewProjectInLibrary(name.trim());
   }
@@ -19658,7 +19662,7 @@ function applyTemplateToWorkspace(templateId) {
   const cloned = JSON.parse(JSON.stringify(tpl.state || {}));
 
   // Create new active project instance from template
-  const newProjName = `${tpl.name} Project`;
+  const newProjName = getNextProjectName();
   _currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 
   if (cloned.text && Array.isArray(cloned.text)) timelineClips.text = cloned.text;
@@ -20524,8 +20528,6 @@ function switchStudioView(viewName) {
     if (saveBtn) saveBtn.style.display = 'inline-flex';
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) exportBtn.style.display = 'inline-flex';
-    const div1 = document.getElementById('top-divider-1');
-    if (div1) div1.style.display = 'block';
     const div2 = document.getElementById('top-divider-2');
     if (div2) div2.style.display = 'block';
     const panelToggles = document.getElementById('top-panel-toggles');
@@ -22253,11 +22255,11 @@ function applySelectedHomepageTemplate(templateId) {
   // 1. Switch directly to Studio Editor view
   switchStudioView('editor');
 
-  // 2. Set active project title to sequential project name
+  // 2. Set active project title with sequential project naming
   const projTitle = document.getElementById('current-project');
-  const seqName = typeof getNextSequentialProjectName === 'function' ? getNextSequentialProjectName() : 'New Project 1';
+  const seqName = getNextProjectName();
   if (projTitle) projTitle.textContent = seqName;
-  try { localStorage.setItem('magnates_active_project_name', seqName); } catch(e) {}
+  _currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 
   // 3. Customize timeline based on template type
   if (templateId === 'subject-25d-parallax') {
@@ -23450,11 +23452,11 @@ function commitTopTemplateCustomizerToTimeline() {
   // 1. Switch to Studio Editor view
   switchStudioView('editor');
 
-  // 2. Set active project title to sequential project name
+  // 2. Set active project title with sequential project naming
   const projTitle = document.getElementById('current-project');
-  const seqName = getNextSequentialProjectName();
+  const seqName = getNextProjectName();
   if (projTitle) projTitle.textContent = seqName;
-  try { localStorage.setItem('magnates_active_project_name', seqName); } catch(e) {}
+  _currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
 
   const prim = topCustomizerState.primaryUrl;
   const sec = topCustomizerState.secondaryUrl;
@@ -26280,44 +26282,33 @@ function initHomepageTemplateEvents() {
     });
   }
 
-  // Initial category & template renders with robust error insulation
-  try { renderHomepageCategories(); } catch(e) { console.error('Categories render error:', e); }
-  try { renderHomepageTemplates(); } catch(e) { console.error('Templates render error:', e); }
-
-  const modalBinders = [
-    bindSpatial3DModalControls,
-    bindDocument3DFXModalControls,
-    bindJaniSuiteModalControls,
-    bindCountdownSuiteModalControls,
-    bindFlashbackSuiteModalControls,
-    bindPuzzleRevealSuiteModalControls,
-    bindLightRaysSuiteModalControls,
-    bindMonochromeSuiteModalControls,
-    bindHeavyVignetteSuiteModalControls,
-    bindTextRevealSuiteModalControls,
-    bindGlowShadowsSuiteModalControls,
-    bindCamera3DMoveSuiteModalControls,
-    bindJLCutsSuiteModalControls,
-    bindSubbassSuiteModalControls,
-    bindMagnates3DProjectionSuiteModalControls,
-    bindMagnatesCCVignetteSuiteModalControls,
-    bindMagnatesBrightnessGlowSuiteModalControls,
-    bindMagnatesDropShadowsSuiteModalControls,
-    bindMagnatesShadowizationSuiteModalControls,
-    bindMagnatesBlendModesSuiteModalControls,
-    bindMagnatesPaperBlueprintSuiteModalControls,
-    bindMagnatesInkRevealSuiteModalControls,
-    bindMagnatesArticleHighlightSuiteModalControls,
-    bindMagnatesParticleVFXSuiteModalControls
-  ];
-
-  modalBinders.forEach(fn => {
-    try {
-      if (typeof fn === 'function') fn();
-    } catch(err) {
-      console.warn('Modal binder error:', err);
-    }
-  });
+  // Initial category & template renders
+  renderHomepageCategories();
+  renderHomepageTemplates();
+  bindSpatial3DModalControls();
+  bindDocument3DFXModalControls();
+  bindJaniSuiteModalControls();
+  bindCountdownSuiteModalControls();
+  bindFlashbackSuiteModalControls();
+  bindPuzzleRevealSuiteModalControls();
+  bindLightRaysSuiteModalControls();
+  bindMonochromeSuiteModalControls();
+  bindHeavyVignetteSuiteModalControls();
+  bindTextRevealSuiteModalControls();
+  bindGlowShadowsSuiteModalControls();
+  bindCamera3DMoveSuiteModalControls();
+  bindJLCutsSuiteModalControls();
+  bindSubbassSuiteModalControls();
+  bindMagnates3DProjectionSuiteModalControls();
+  bindMagnatesCCVignetteSuiteModalControls();
+  bindMagnatesBrightnessGlowSuiteModalControls();
+  bindMagnatesDropShadowsSuiteModalControls();
+  bindMagnatesShadowizationSuiteModalControls();
+  bindMagnatesBlendModesSuiteModalControls();
+  bindMagnatesPaperBlueprintSuiteModalControls();
+  bindMagnatesInkRevealSuiteModalControls();
+  bindMagnatesArticleHighlightSuiteModalControls();
+  bindMagnatesParticleVFXSuiteModalControls();
 }
 
 /* =========================================================
@@ -33215,27 +33206,9 @@ function bindMagnatesParticleVFXSuiteModalControls() {
 }
 
 // Initialize homepage discovery view immediately on script execution
-function launchDiscoveryViewSafe() {
-  try {
-    initHomepageTemplateEvents();
-  } catch(e) {
-    console.error('Error in initHomepageTemplateEvents:', e);
-  }
-  try {
-    renderHomepageCategories();
-    renderHomepageTemplates();
-  } catch(e) {
-    console.error('Error rendering homepage discovery:', e);
-  }
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', launchDiscoveryViewSafe);
-} else {
-  launchDiscoveryViewSafe();
-}
-setTimeout(launchDiscoveryViewSafe, 150);
-setTimeout(launchDiscoveryViewSafe, 500);
+setTimeout(() => {
+  initHomepageTemplateEvents();
+}, 100);
 
 
 
