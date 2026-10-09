@@ -26278,33 +26278,44 @@ function initHomepageTemplateEvents() {
     });
   }
 
-  // Initial category & template renders
-  renderHomepageCategories();
-  renderHomepageTemplates();
-  bindSpatial3DModalControls();
-  bindDocument3DFXModalControls();
-  bindJaniSuiteModalControls();
-  bindCountdownSuiteModalControls();
-  bindFlashbackSuiteModalControls();
-  bindPuzzleRevealSuiteModalControls();
-  bindLightRaysSuiteModalControls();
-  bindMonochromeSuiteModalControls();
-  bindHeavyVignetteSuiteModalControls();
-  bindTextRevealSuiteModalControls();
-  bindGlowShadowsSuiteModalControls();
-  bindCamera3DMoveSuiteModalControls();
-  bindJLCutsSuiteModalControls();
-  bindSubbassSuiteModalControls();
-  bindMagnates3DProjectionSuiteModalControls();
-  bindMagnatesCCVignetteSuiteModalControls();
-  bindMagnatesBrightnessGlowSuiteModalControls();
-  bindMagnatesDropShadowsSuiteModalControls();
-  bindMagnatesShadowizationSuiteModalControls();
-  bindMagnatesBlendModesSuiteModalControls();
-  bindMagnatesPaperBlueprintSuiteModalControls();
-  bindMagnatesInkRevealSuiteModalControls();
-  bindMagnatesArticleHighlightSuiteModalControls();
-  bindMagnatesParticleVFXSuiteModalControls();
+  // Initial category & template renders with robust error insulation
+  try { renderHomepageCategories(); } catch(e) { console.error('Categories render error:', e); }
+  try { renderHomepageTemplates(); } catch(e) { console.error('Templates render error:', e); }
+
+  const modalBinders = [
+    bindSpatial3DModalControls,
+    bindDocument3DFXModalControls,
+    bindJaniSuiteModalControls,
+    bindCountdownSuiteModalControls,
+    bindFlashbackSuiteModalControls,
+    bindPuzzleRevealSuiteModalControls,
+    bindLightRaysSuiteModalControls,
+    bindMonochromeSuiteModalControls,
+    bindHeavyVignetteSuiteModalControls,
+    bindTextRevealSuiteModalControls,
+    bindGlowShadowsSuiteModalControls,
+    bindCamera3DMoveSuiteModalControls,
+    bindJLCutsSuiteModalControls,
+    bindSubbassSuiteModalControls,
+    bindMagnates3DProjectionSuiteModalControls,
+    bindMagnatesCCVignetteSuiteModalControls,
+    bindMagnatesBrightnessGlowSuiteModalControls,
+    bindMagnatesDropShadowsSuiteModalControls,
+    bindMagnatesShadowizationSuiteModalControls,
+    bindMagnatesBlendModesSuiteModalControls,
+    bindMagnatesPaperBlueprintSuiteModalControls,
+    bindMagnatesInkRevealSuiteModalControls,
+    bindMagnatesArticleHighlightSuiteModalControls,
+    bindMagnatesParticleVFXSuiteModalControls
+  ];
+
+  modalBinders.forEach(fn => {
+    try {
+      if (typeof fn === 'function') fn();
+    } catch(err) {
+      console.warn('Modal binder error:', err);
+    }
+  });
 }
 
 /* =========================================================
@@ -33202,9 +33213,27 @@ function bindMagnatesParticleVFXSuiteModalControls() {
 }
 
 // Initialize homepage discovery view immediately on script execution
-setTimeout(() => {
-  initHomepageTemplateEvents();
-}, 100);
+function launchDiscoveryViewSafe() {
+  try {
+    initHomepageTemplateEvents();
+  } catch(e) {
+    console.error('Error in initHomepageTemplateEvents:', e);
+  }
+  try {
+    renderHomepageCategories();
+    renderHomepageTemplates();
+  } catch(e) {
+    console.error('Error rendering homepage discovery:', e);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', launchDiscoveryViewSafe);
+} else {
+  launchDiscoveryViewSafe();
+}
+setTimeout(launchDiscoveryViewSafe, 150);
+setTimeout(launchDiscoveryViewSafe, 500);
 
 
 
