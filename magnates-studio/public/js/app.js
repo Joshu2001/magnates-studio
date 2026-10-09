@@ -14809,11 +14809,24 @@ function saveCurrentProjectToLibrary(name, alertUser = false) {
   }
 }
 
+function getNextSequentialProjectName() {
+  const projects = getAllProjects();
+  let maxNum = 0;
+  projects.forEach(p => {
+    const match = (p.projectName || '').match(/^Untitled Project (\d+)$/i);
+    if (match) {
+      const num = parseInt(match[1]);
+      if (num > maxNum) maxNum = num;
+    }
+  });
+  return `Untitled Project ${maxNum + 1}`;
+}
+
 // Explicit New Project creation: Creates fresh workspace and distinct library entry
 function createNewProjectInLibrary(projectName) {
   const projects = getAllProjects();
   const id = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-  const name = projectName?.trim() || 'Untitled Project';
+  const name = projectName?.trim() || getNextSequentialProjectName();
 
   // Fresh initial clips state
   const freshClips = {
@@ -23435,9 +23448,11 @@ function commitTopTemplateCustomizerToTimeline() {
   // 1. Switch to Studio Editor view
   switchStudioView('editor');
 
-  // 2. Set active project title
+  // 2. Set active project title to sequential project name
   const projTitle = document.getElementById('current-project');
-  if (projTitle) projTitle.textContent = tpl.title;
+  const seqName = getNextSequentialProjectName();
+  if (projTitle) projTitle.textContent = seqName;
+  try { localStorage.setItem('magnates_active_project_name', seqName); } catch(e) {}
 
   const prim = topCustomizerState.primaryUrl;
   const sec = topCustomizerState.secondaryUrl;
