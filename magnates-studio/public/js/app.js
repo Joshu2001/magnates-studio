@@ -1057,6 +1057,7 @@ function buildClipColorFilter(clip) {
   if (brightness !== 100) filters.push(`brightness(${brightness}%)`);
   if (contrast !== 100) filters.push(`contrast(${contrast}%)`);
   if (sat !== 100) filters.push(`saturate(${sat}%)`);
+  if (clip.blur && clip.blur > 0) filters.push(`blur(${clip.blur}px)`);
   if (temp !== 0) {
     if (temp > 0) {
       filters.push(`sepia(${temp * 0.4}%)`);
@@ -8969,20 +8970,7 @@ function initCanvasTransformInteraction() {
     e.preventDefault();
     const pt = getCanvasPointer(e);
 
-    // 1. Check if clicked on any active image or video layer (topmost first)
-    const activeMediaClips = [...timelineClips.image, ...timelineClips.video].filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
-    for (let i = activeMediaClips.length - 1; i >= 0; i--) {
-      const c = activeMediaClips[i];
-      const b = c._renderBounds;
-      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
-        const trackType = timelineClips.image.includes(c) ? 'image' : 'video';
-        selectClip(c, trackType);
-        showStudioContextMenu(e.clientX, e.clientY, c, trackType);
-        return;
-      }
-    }
-
-    // 2. Check if clicked on active kinetic text
+    // 1. Check if clicked on active kinetic text FIRST (higher z-index / foreground)
     const activeTextClips = timelineClips.text.filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
     for (let i = activeTextClips.length - 1; i >= 0; i--) {
       const t = activeTextClips[i];
@@ -8994,7 +8982,7 @@ function initCanvasTransformInteraction() {
       }
     }
 
-    // 2b. Check if clicked on active quote card
+    // 2. Check if clicked on active quote card (foreground)
     const activeQuoteClips = (timelineClips.quote || []).filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
     for (let i = activeQuoteClips.length - 1; i >= 0; i--) {
       const q = activeQuoteClips[i];
@@ -9002,6 +8990,21 @@ function initCanvasTransformInteraction() {
       if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
         selectClip(q, 'quote');
         showStudioContextMenu(e.clientX, e.clientY, q, 'quote');
+        return;
+      }
+    }
+
+    // 3. Check if clicked on any active image or video layer (respecting layerOrder/zIndex: front first, then back)
+    const activeMediaClips = [...timelineClips.image, ...timelineClips.video]
+      .filter(c => currentTime >= c.start && currentTime <= (c.start + c.duration))
+      .sort((a, b) => ((a.zIndex || 10) - (b.zIndex || 10)));
+    for (let i = activeMediaClips.length - 1; i >= 0; i--) {
+      const c = activeMediaClips[i];
+      const b = c._renderBounds;
+      if (b && pt.x >= b.x && pt.x <= (b.x + b.w) && pt.y >= b.y && pt.y <= (b.y + b.h)) {
+        const trackType = timelineClips.image.includes(c) ? 'image' : 'video';
+        selectClip(c, trackType);
+        showStudioContextMenu(e.clientX, e.clientY, c, trackType);
         return;
       }
     }
@@ -10633,11 +10636,11 @@ function showStudioContextMenu(x, y, clip, trackType) {
       <span class="context-badge">Cut</span>
     </div>
 
-    <div class="context-menu-divider"></div>
-
+    <!-- Duplicate Item / Clip Option -->
     <div class="context-menu-item" id="ctx-action-duplicate">
       <svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-      <span>Duplicate Clip</span>
+      <span>Duplicate Item</span>
+      <span class="context-badge" style="color: #00f0ff;">Copy</span>
     </div>
     <div class="context-menu-item" id="ctx-action-reset">
       <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
@@ -11112,10 +11115,29 @@ function showStudioContextMenu(x, y, clip, trackType) {
   menu.querySelector('#ctx-action-duplicate')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
-    const newStart = clip.start + clip.duration + 0.2;
-    const dup = addClipToTimeline(trackType, { ...clip.file, ...clip, id: undefined }, newStart, clip.duration);
+    const newStart = clip.start + 0.5;
+    
+    // Support duplicating text, quote, drawing, image, or video items
+    let dup;
+    if (trackType === 'quote' || clip.isQuoteCard) {
+      const cloned = JSON.parse(JSON.stringify(clip));
+      cloned.id = `clip-quote-${Date.now()}`;
+      cloned.start = newStart;
+      if (!timelineClips.quote) timelineClips.quote = [];
+      timelineClips.quote.push(cloned);
+      dup = cloned;
+      selectClip(cloned, 'quote');
+    } else {
+      const clonedData = { ...clip.file, ...clip, id: undefined, start: newStart };
+      // If it's a visual element, slightly offset position on preview canvas so duplicate is immediately visible
+      if (typeof clonedData.x === 'number') clonedData.x += 30;
+      if (typeof clonedData.y === 'number') clonedData.y += 30;
+      dup = addClipToTimeline(trackType, clonedData, newStart, clip.duration);
+    }
+    
     seekToTime(newStart);
-    recordState('Duplicate Clip');
+    renderAllTimelineTracks();
+    recordState('Duplicate Item');
     showTextTimingAlert(`Duplicated ${clipLabel}!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2000);
   });
@@ -22641,6 +22663,9 @@ let topCustomizerState = {
   textColor: '#ff334b',
   layerOrder: 'front', // 'front' or 'back'
   opacity: 100, // 0 to 100
+  blur: 2, // Background blur in px
+  extraImages: [], // Additional foreground cutout images [{ url, cutoutCanvas, x, y, scale }]
+  extraTexts: [], // Additional text overlays [{ text, color, fontSize, x, y }]
   cutoutCanvas: null,
   animId: null,
   startTime: 0,
@@ -22714,8 +22739,8 @@ function renderMatrixRainCanvasFrame(ctx, width, height, state, dt) {
 
 function generateCutoutCanvasForUrl(url, callback) {
   if (!url) return;
-  // If requesting cutout for the default portrait subject or clean cutout file, load clean AI/GrabCut cutout asset
-  if (url.includes('photo-1534528741775') || url.includes('portrait_cutout_clean')) {
+  // If requesting cutout for the default unsplash portrait subject, load default clean asset
+  if (url === 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80' || url === '/portrait_cutout_clean.png') {
     const cleanImg = new Image();
     cleanImg.onload = () => {
       const offCanvas = document.createElement('canvas');
@@ -23008,6 +23033,16 @@ function openTopTemplateCustomizer(tpl) {
   if (sliderDur) sliderDur.value = topCustomizerState.duration;
   if (valDur) valDur.textContent = `${topCustomizerState.duration} sec`;
 
+  const sliderBlur = document.getElementById('tpl-modal-slider-blur');
+  const valBlur = document.getElementById('tpl-modal-val-blur');
+  if (sliderBlur) sliderBlur.value = topCustomizerState.blur !== undefined ? topCustomizerState.blur : 2;
+  if (valBlur) valBlur.textContent = `${sliderBlur ? sliderBlur.value : 2}px`;
+
+  topCustomizerState.extraImages = [];
+  topCustomizerState.extraTexts = [];
+  updateExtraCutoutsListUI();
+  updateExtraTextsListUI();
+
   // Reset opacity in context menu slider
   const opSlider = document.getElementById('ctx-modal-opacity-slider');
   const opVal = document.getElementById('ctx-modal-opacity-val');
@@ -23020,6 +23055,62 @@ function openTopTemplateCustomizer(tpl) {
   // 6. Start live stage animation
   renderTopTemplatePreviewStage();
   startTopCustomizerLoop();
+}
+
+function updateExtraCutoutsListUI() {
+  const container = document.getElementById('tpl-modal-extra-cutouts-list');
+  if (!container) return;
+  container.innerHTML = (topCustomizerState.extraImages || []).map((img, idx) => `
+    <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 6px; padding: 4px 8px; font-size: 10px;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <img src="${(topCustomizerState.bgRemoved && img.cutoutCanvas) ? img.cutoutCanvas.toDataURL() : img.url}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 3px;" />
+        <span style="color: #e0f2fe; font-weight: 600;">Cutout Layer #${idx + 2}</span>
+      </div>
+      <button type="button" onclick="removeTopTemplateExtraCutout(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeTopTemplateExtraCutout(index) {
+  if (Array.isArray(topCustomizerState.extraImages)) {
+    topCustomizerState.extraImages.splice(index, 1);
+    updateExtraCutoutsListUI();
+    renderTopTemplatePreviewStage();
+  }
+}
+
+function updateExtraTextsListUI() {
+  const container = document.getElementById('tpl-modal-extra-texts-list');
+  if (!container) return;
+  container.innerHTML = (topCustomizerState.extraTexts || []).map((t, idx) => `
+    <div style="display: flex; align-items: center; gap: 6px; background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.3); border-radius: 6px; padding: 4px 8px;">
+      <input type="text" value="${t.text}" oninput="updateTopTemplateExtraText(${idx}, this.value)" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: bold; outline: none;" />
+      <input type="color" value="${t.color || '#38bdf8'}" onchange="updateTopTemplateExtraTextColor(${idx}, this.value)" style="width: 24px; height: 20px; background: transparent; border: none; cursor: pointer;" />
+      <button type="button" onclick="removeTopTemplateExtraText(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateTopTemplateExtraText(index, text) {
+  if (topCustomizerState.extraTexts && topCustomizerState.extraTexts[index]) {
+    topCustomizerState.extraTexts[index].text = text;
+    renderTopTemplatePreviewStage();
+  }
+}
+
+function updateTopTemplateExtraTextColor(index, color) {
+  if (topCustomizerState.extraTexts && topCustomizerState.extraTexts[index]) {
+    topCustomizerState.extraTexts[index].color = color;
+    renderTopTemplatePreviewStage();
+  }
+}
+
+function removeTopTemplateExtraText(index) {
+  if (Array.isArray(topCustomizerState.extraTexts)) {
+    topCustomizerState.extraTexts.splice(index, 1);
+    updateExtraTextsListUI();
+    renderTopTemplatePreviewStage();
+  }
 }
 
 function updateModalActionButtonsState() {
@@ -23092,11 +23183,41 @@ function renderTopTemplatePreviewStage() {
     </div>
   ` : '';
 
+  const blurVal = topCustomizerState.blur !== undefined ? topCustomizerState.blur : 2;
+
+  // Extra text overlays HTML
+  let extraTextsHtml = '';
+  if (Array.isArray(topCustomizerState.extraTexts)) {
+    extraTextsHtml = topCustomizerState.extraTexts.map((et, i) => `
+      <div style="position: absolute; bottom: ${20 + i * 36}px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+        <span style="font-family: Impact, sans-serif; font-size: ${et.fontSize || 32}px; font-weight: 900; color: ${et.color || '#38bdf8'}; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
+          ${et.text || 'Extra Text'}
+        </span>
+      </div>
+    `).join('');
+  }
+
+  // Extra image cutouts HTML
+  let extraImagesHtml = '';
+  if (Array.isArray(topCustomizerState.extraImages)) {
+    extraImagesHtml = topCustomizerState.extraImages.map((ei, i) => {
+      const eSrc = (topCustomizerState.bgRemoved && ei.cutoutCanvas) ? ei.cutoutCanvas.toDataURL() : ei.url;
+      const leftPct = 15 + (i * 25);
+      return `
+        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-start; padding-left: ${leftPct}%; pointer-events: none; z-index: ${subjectZ + 1};">
+          <img src="${eSrc}" alt="Extra Cutout" style="max-height: 75%; object-fit: contain; filter: ${subjectFilter}; border-radius: 8px;" />
+        </div>
+      `;
+    }).join('');
+  }
+
   if (tplId === 'subject-25d-parallax') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: crosshair;">
-        <img id="customizer-live-bg" src="${sec}" alt="Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75); transform: scale(1.15);" />
+        <img id="customizer-live-bg" src="${sec}" alt="Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(${blurVal}px) brightness(0.75); transform: scale(1.15);" />
         ${textBehindHtml}
+        ${extraTextsHtml}
+        ${extraImagesHtml}
         <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
           <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
             <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: ${subjectFilter}; border: ${subjectBorder}; border-radius: 8px;" />
@@ -23360,6 +23481,7 @@ function commitTopTemplateCustomizerToTimeline() {
       isBackgroundScene: true,
       parallaxRig: 'bg',
       parallaxDepth: depthVal,
+      blur: topCustomizerState.blur !== undefined ? topCustomizerState.blur : 2,
       zIndex: 10,
       layerOrder: 'back'
     };
@@ -23374,7 +23496,7 @@ function commitTopTemplateCustomizerToTimeline() {
       depth: depthVal,
       parallaxRig: 'fg',
       parallaxDepth: depthVal,
-      vectorEffect: topCustomizerState.bgRemoved,
+      vectorEffect: false, // Keep original natural photo colors, no white vector cutout mask
       vectorStrokeColor: '#ffffff',
       opacity: opacityVal,
       cutoutCanvas: topCustomizerState.bgRemoved ? topCustomizerState.cutoutCanvas : null,
@@ -23399,8 +23521,53 @@ function commitTopTemplateCustomizerToTimeline() {
       });
     }
 
+    // Add extra user-created text overlays
+    if (Array.isArray(topCustomizerState.extraTexts)) {
+      topCustomizerState.extraTexts.forEach((et, i) => {
+        textClips.push({
+          id: `txt-extra-${Date.now()}-${i}`,
+          text: et.text || 'Extra Text',
+          highlight: '',
+          highlightColor: et.color || '#38bdf8',
+          textColor: et.color || '#38bdf8',
+          anim: 'pop',
+          fontSize: et.fontSize || 42,
+          fontFamily: 'Impact, sans-serif',
+          zIndex: 35,
+          layerOrder: 'front',
+          start: 0,
+          duration: dur,
+          y: (canvas.height * 0.7) + (i * 50)
+        });
+      });
+    }
+
+    const imageClips = [bgClip, fgClip];
+    // Add extra user-added image cutouts
+    if (Array.isArray(topCustomizerState.extraImages)) {
+      topCustomizerState.extraImages.forEach((ei, i) => {
+        imageClips.push({
+          id: `img-extra-${Date.now()}-${i}`,
+          name: `Cutout_Subject_${i + 2}.png`,
+          url: ei.url,
+          file: { name: `Cutout_Subject_${i + 2}.png`, url: ei.url, isImage: true },
+          start: 0,
+          duration: dur,
+          scale: 0.9,
+          parallaxRig: 'fg',
+          parallaxDepth: depthVal,
+          vectorEffect: false,
+          cutoutCanvas: ei.cutoutCanvas || null,
+          x: (i + 1) * 70 - 35,
+          y: 20,
+          zIndex: 42 + i,
+          layerOrder: 'front'
+        });
+      });
+    }
+
     if (timelineClips && timelineClips.image) {
-      timelineClips.image = [bgClip, fgClip];
+      timelineClips.image = imageClips;
       if (timelineClips.text) timelineClips.text = textClips;
       currentTime = 0;
       renderAllTimelineTracks();
@@ -23747,11 +23914,22 @@ function bindTopTemplateCustomizerEvents() {
     if (file) {
       const url = URL.createObjectURL(file);
       topCustomizerState.primaryUrl = url;
+      topCustomizerState.cutoutCanvas = null; // Invalidate cached cutout so new image gets processed!
       const input = document.getElementById('tpl-modal-url-primary');
       if (input) input.value = url;
       const thumb = document.getElementById('tpl-modal-thumb-primary');
       if (thumb) thumb.src = url;
-      renderTopTemplatePreviewStage();
+      if (topCustomizerState.bgRemoved) {
+        showTextTimingAlert('Extracting cutout from your new image...', 'info');
+        generateCutoutCanvasForUrl(url, (c) => {
+          topCustomizerState.cutoutCanvas = c;
+          renderTopTemplatePreviewStage();
+          showTextTimingAlert('Background removed from new image!', 'success');
+          setTimeout(() => showTextTimingAlert(''), 1800);
+        });
+      } else {
+        renderTopTemplatePreviewStage();
+      }
     }
   });
 
@@ -23775,10 +23953,53 @@ function bindTopTemplateCustomizerEvents() {
     if (val) val.textContent = `${topCustomizerState.depth}%`;
   });
 
+  document.getElementById('tpl-modal-slider-blur')?.addEventListener('input', (e) => {
+    topCustomizerState.blur = parseFloat(e.target.value) || 0;
+    const val = document.getElementById('tpl-modal-val-blur');
+    if (val) val.textContent = `${topCustomizerState.blur}px`;
+    const bgImg = document.getElementById('customizer-live-bg');
+    if (bgImg) bgImg.style.filter = `blur(${topCustomizerState.blur}px) brightness(0.75)`;
+  });
+
   document.getElementById('tpl-modal-slider-duration')?.addEventListener('input', (e) => {
     topCustomizerState.duration = parseInt(e.target.value) || 6;
     const val = document.getElementById('tpl-modal-val-duration');
     if (val) val.textContent = `${topCustomizerState.duration} sec`;
+  });
+
+  // Add Additional Cutout Image Handler
+  document.getElementById('tpl-modal-add-image-cutout')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      showTextTimingAlert('Adding cutout image...', 'info');
+      generateCutoutCanvasForUrl(url, (c) => {
+        if (!Array.isArray(topCustomizerState.extraImages)) topCustomizerState.extraImages = [];
+        topCustomizerState.extraImages.push({
+          url: url,
+          cutoutCanvas: c
+        });
+        updateExtraCutoutsListUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert(`Added subject cutout (${topCustomizerState.extraImages.length} additional)!`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+      });
+    }
+  });
+
+  // Add Additional Text Overlay Handler
+  document.getElementById('tpl-modal-btn-add-text')?.addEventListener('click', () => {
+    if (!Array.isArray(topCustomizerState.extraTexts)) topCustomizerState.extraTexts = [];
+    const count = topCustomizerState.extraTexts.length + 1;
+    topCustomizerState.extraTexts.push({
+      text: `HEADING ${count}`,
+      color: '#38bdf8',
+      fontSize: 32
+    });
+    updateExtraTextsListUI();
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(`Added text overlay #${count}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 1800);
   });
 
   // Layer Actions: Remove Background
