@@ -1017,25 +1017,106 @@ body {
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
-/* Consolidated Storyline View: Hide redundant tracks and completely hide left label column for pure edge-to-edge filmstrip */
+/* Consolidated Storyline View: Canva-style layout with tightly stacked tracks and single primary ribbon */
+.timeline-container:has(.consolidated-storyline-mode),
+.timeline-container.storyline-mode {
+  height: 168px !important;
+}
+
 .timeline-body.consolidated-storyline-mode .timeline-label-col {
   display: none !important;
 }
 
+/* In Storyline mode, eliminate vertical scrolling — everything fits seamlessly in the compact container */
+.timeline-body.consolidated-storyline-mode .timeline-tracks {
+  overflow-y: hidden !important;
+}
+
 .timeline-body.consolidated-storyline-mode #track-chart,
 .timeline-body.consolidated-storyline-mode #track-video,
+.timeline-body.consolidated-storyline-mode #track-background,
 .timeline-body.consolidated-storyline-mode .track[data-track-type="chart"],
-.timeline-body.consolidated-storyline-mode .track[data-track-type="video"] {
+.timeline-body.consolidated-storyline-mode .track[data-track-type="video"],
+.timeline-body.consolidated-storyline-mode .track[data-track-type="background"] {
   display: none !important;
 }
 
+/* Tight vertical hierarchy like Canva: Text track sits immediately above main storyline blocks with minimal gap */
+.timeline-body.consolidated-storyline-mode #track-text,
+.timeline-body.consolidated-storyline-mode .track[data-track-type="text"] {
+  height: 26px !important;
+  min-height: 26px !important;
+  margin-bottom: 2px !important;
+  border-bottom: none !important;
+}
+
+.timeline-body.consolidated-storyline-mode #track-text .track-content,
+.timeline-body.consolidated-storyline-mode .track[data-track-type="text"] .track-content {
+  height: 26px !important;
+}
+
+.timeline-body.consolidated-storyline-mode #track-text .clip-block,
+.timeline-body.consolidated-storyline-mode .track[data-track-type="text"] .clip-block {
+  height: 22px !important;
+  top: 2px !important;
+  font-size: 10px !important;
+  border-radius: 4px !important;
+  padding: 0 6px !important;
+}
+
+/* Primary Storyline Track (Images/Clips) */
 .timeline-body.consolidated-storyline-mode .track[data-track-type="image"],
 .timeline-body.consolidated-storyline-mode .track[data-track-type="image"] .track-content {
-  height: 68px !important;
+  height: 66px !important;
+  border-bottom: none !important;
 }
 
 .timeline-body.consolidated-storyline-mode .track[data-track-type="image"] .clip-block {
   height: 62px !important;
+  top: 2px !important;
+  border-radius: 6px !important;
+}
+
+/* Audio Tracks (Voiceover & Music) sit directly in the Add Audio slot position */
+.timeline-body.consolidated-storyline-mode #track-audio,
+.timeline-body.consolidated-storyline-mode #track-music,
+.timeline-body.consolidated-storyline-mode .track.audio-track {
+  height: 28px !important;
+  min-height: 28px !important;
+  margin-top: 4px !important;
+  margin-bottom: 2px !important;
+  border-bottom: none !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-radius: 6px !important;
+}
+
+.timeline-body.consolidated-storyline-mode #track-audio .track-content,
+.timeline-body.consolidated-storyline-mode #track-music .track-content,
+.timeline-body.consolidated-storyline-mode .track.audio-track .track-content {
+  height: 28px !important;
+}
+
+.timeline-body.consolidated-storyline-mode #track-audio .clip-block,
+.timeline-body.consolidated-storyline-mode #track-music .clip-block,
+.timeline-body.consolidated-storyline-mode .track.audio-track .clip-block {
+  height: 24px !important;
+  top: 2px !important;
+  border-radius: 5px !important;
+  font-size: 10.5px !important;
+  background: #7c3aed !important;
+  border: 1px solid #9061f9 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.timeline-body.consolidated-storyline-mode #track-music .clip-block {
+  background: #6366f1 !important;
+  border-color: #818cf8 !important;
+}
+
+.timeline-body.consolidated-storyline-mode .canva-add-audio-strip {
+  padding: 3px 10px !important;
+  border-top: none !important;
 }
 
 .zoom-controls {

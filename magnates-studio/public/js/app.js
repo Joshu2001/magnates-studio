@@ -18,7 +18,7 @@ let activeTool = 'select'; // 'select', 'split', 'delete'
 let selectedClip = null; // { clip, trackType }
 let selectedEffectId = null; // { clipId, trackType, effectType, effectIndex }
 let selectedTransitionId = null; // { clipId, trackType }
-let timelineViewMode = 'multi'; // 'multi' (discrete lanes) or 'consolidated' (single unified storyline)
+let timelineViewMode = 'consolidated'; // 'multi' (discrete lanes) or 'consolidated' (single unified storyline)
 
 // Timeline multi-layer structure
 let timelineClips = {
@@ -3191,8 +3191,23 @@ function renderAllTimelineTracks() {
 
   // Synchronize timeline body mode class and label text
   const timelineBodyEl = document.getElementById('timeline-body');
+  const timelineContainerEl = document.querySelector('.timeline-container');
   if (timelineBodyEl) {
     timelineBodyEl.classList.toggle('consolidated-storyline-mode', timelineViewMode === 'consolidated');
+  }
+  if (timelineContainerEl) {
+    timelineContainerEl.classList.toggle('storyline-mode', timelineViewMode === 'consolidated');
+  }
+
+  // In Canva, the "Add audio" button lives in the audio slot; when audio clips exist, they sit right there and the empty button hides
+  const canvaAddAudioStrip = document.getElementById('canva-add-audio-strip');
+  const hasAudioClips = ((timelineClips.voiceover?.length || 0) + (timelineClips.music?.length || 0)) > 0;
+  if (canvaAddAudioStrip) {
+    if (timelineViewMode === 'consolidated') {
+      canvaAddAudioStrip.style.display = hasAudioClips ? 'none' : 'block';
+    } else {
+      canvaAddAudioStrip.style.display = 'block';
+    }
   }
   const mainTrackLabelText = document.querySelector('.timeline-label-col .track-label[data-track-type="image"] .track-title-wrap');
   if (mainTrackLabelText) {
@@ -3215,6 +3230,7 @@ function renderAllTimelineTracks() {
     container.innerHTML = '';
 
     // In consolidated mode, visual clips (charts, quotes, images, videos) are unified on the primary storyline track ('image')
+    // Background track is hidden and does not appear on Storyline
     let clips = [];
     if (timelineViewMode === 'consolidated') {
       if (type === 'image') {
@@ -3224,8 +3240,8 @@ function renderAllTimelineTracks() {
           ...(timelineClips.chart || []),
           ...(timelineClips.quote || [])
         ];
-      } else if (type === 'chart' || type === 'video') {
-        clips = []; // Hidden; unified on primary storyline track above
+      } else if (type === 'chart' || type === 'video' || type === 'background') {
+        clips = []; // Hidden; unified on primary storyline track or hidden on storyline
       } else {
         clips = timelineClips[type] || [];
       }
@@ -3605,18 +3621,21 @@ function renderAllTimelineTracks() {
 
       container.appendChild(block);
 
-      // Plus (+) Button right after this clip with clean spacing
-      const addBtn = document.createElement('button');
-      addBtn.className = 'timeline-add-clip-btn canva-plus-btn';
-      addBtn.title = `Add page, clip, or element here`;
-      addBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`;
-      const clipEndSec = clip.start + clip.duration;
-      addBtn.style.left = `${clipEndSec * pps + 10}px`;
-      addBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openCanvaAddMenu(clipEndSec + 0.05, addBtn);
-      });
-      container.appendChild(addBtn);
+      // Plus (+) Button right after this clip: In consolidated storyline mode, only render one plus button on the primary scene/page track
+      const shouldShowAddBtn = timelineViewMode !== 'consolidated' || type === 'image';
+      if (shouldShowAddBtn) {
+        const addBtn = document.createElement('button');
+        addBtn.className = 'timeline-add-clip-btn canva-plus-btn';
+        addBtn.title = `Add page, clip, or element here`;
+        addBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>`;
+        const clipEndSec = clip.start + clip.duration;
+        addBtn.style.left = `${clipEndSec * pps + 10}px`;
+        addBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openCanvaAddMenu(clipEndSec + 0.05, addBtn);
+        });
+        container.appendChild(addBtn);
+      }
     });
   });
   if (currentFilter === 'layers') {
@@ -15829,14 +15848,25 @@ let _transitionEditContext = null;
 function injectTransitionChips() {
   document.querySelectorAll('.transition-chip').forEach(c => c.remove());
 
-  const tracksToProcess = [
-    { type: 'video', container: document.getElementById('content-video') },
-    { type: 'image', container: document.getElementById('content-image') }
-  ];
+  const tracksToProcess = timelineViewMode === 'consolidated'
+    ? [{
+        type: 'image',
+        container: document.getElementById('content-image'),
+        clipsList: [
+          ...(timelineClips.image || []),
+          ...(timelineClips.video || []),
+          ...(timelineClips.chart || []),
+          ...(timelineClips.quote || [])
+        ]
+      }]
+    : [
+        { type: 'video', container: document.getElementById('content-video'), clipsList: timelineClips.video || [] },
+        { type: 'image', container: document.getElementById('content-image'), clipsList: timelineClips.image || [] }
+      ];
 
-  tracksToProcess.forEach(({ type, container }) => {
+  tracksToProcess.forEach(({ type, container, clipsList }) => {
     if (!container) return;
-    const clips = (timelineClips[type] || []).slice().sort((a, b) => a.start - b.start);
+    const clips = (clipsList || []).slice().sort((a, b) => a.start - b.start);
     if (clips.length < 2) return;
 
     for (let i = 0; i < clips.length - 1; i++) {
