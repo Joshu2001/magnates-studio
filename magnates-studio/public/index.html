@@ -143,10 +143,16 @@
             <h3 id="sidebar-panel-heading">Media</h3>
             <span class="subtitle" id="sidebar-panel-sub">Asset library</span>
           </div>
-          <button type="button" class="btn-sidebar-collapse" id="btn-collapse-left-sidebar" title="Collapse Left Panel (Cmd/Ctrl+1)">
-            <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          <!-- Top X Exit / Close Button (Canva style) -->
+          <button type="button" class="btn-sidebar-collapse" id="btn-collapse-left-sidebar" title="Close Panel (&times;)">
+            <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round;"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
         </div>
+
+        <!-- Canva Middle-Edge Floating Chevron Pill Button (‹) -->
+        <button type="button" class="canva-drawer-edge-pill" id="btn-canva-edge-chevron" title="Collapse Media Panel">
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
 
         <!-- Media Library Panel Content -->
         <div id="media-library-panel-content" class="media-library-panel-content">
@@ -1191,14 +1197,15 @@
           </div>
         </div>
 
-        <!-- 3D Tech Grid -->
-        <div class="fx-card">
-          <div class="fx-header">
+        <!-- 3D Tech Grid (Progressive Disclosure Accordion) -->
+        <div class="fx-card accordion-card" id="card-3d-grid">
+          <div class="fx-header" onclick="this.parentElement.classList.toggle('open')">
             <h4>
               <svg class="ui-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h4.68c.09.65.16 1.32.16 2 0 .68-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></svg>
               3D Cyber Perspective Grid
             </h4>
-            <label class="switch">
+            <svg class="accordion-chevron" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+            <label class="switch" onclick="event.stopPropagation()">
               <input type="checkbox" id="fx-grid-enable" checked>
               <span class="slider"></span>
             </label>
@@ -1245,14 +1252,15 @@
           </div>
         </div>
 
-        <!-- Fire & Ember Particles -->
-        <div class="fx-card">
-          <div class="fx-header">
+        <!-- Fire & Ember Particles (Progressive Disclosure Accordion) -->
+        <div class="fx-card accordion-card" id="card-particles">
+          <div class="fx-header" onclick="this.parentElement.classList.toggle('open')">
             <h4>
               <svg class="ui-icon" viewBox="0 0 24 24"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z"/></svg>
               Embers & Atmospheric Fire
             </h4>
-            <label class="switch">
+            <svg class="accordion-chevron" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+            <label class="switch" onclick="event.stopPropagation()">
               <input type="checkbox" id="fx-particles-enable" checked>
               <span class="slider"></span>
             </label>
@@ -1291,14 +1299,15 @@
           </div>
         </div>
 
-        <!-- Silhouette / Shadow Effect -->
-        <div class="fx-card">
-          <div class="fx-header">
+        <!-- Silhouette / Shadow Effect (Progressive Disclosure Accordion) -->
+        <div class="fx-card accordion-card" id="card-silhouette">
+          <div class="fx-header" onclick="this.parentElement.classList.toggle('open')">
             <h4>
               <svg class="ui-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
               Mystery Silhouette Mode
             </h4>
-            <label class="switch">
+            <svg class="accordion-chevron" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+            <label class="switch" onclick="event.stopPropagation()">
               <input type="checkbox" id="fx-silhouette-enable">
               <span class="slider"></span>
             </label>
@@ -1693,19 +1702,21 @@
               <span class="hint-text" style="margin-top: 4px;">Format: MM:SS.ms (e.g. 01:15.5) or seconds (e.g. 12.5)</span>
             </div>
 
-            <!-- Temporal Keyframing & Transform Controls -->
-            <div class="control-row" id="inspector-transform-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="margin: 0; display: flex; align-items: center; gap: 4px; font-weight: 700;">
+            <!-- Temporal Keyframing & Transform Controls (Progressive Disclosure Accordion) -->
+            <div class="control-row accordion-card open" id="inspector-transform-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 6px;">
+              <div class="fx-header" onclick="this.parentElement.classList.toggle('open')" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer;">
+                <label style="margin: 0; display: flex; align-items: center; gap: 4px; font-weight: 700; cursor: pointer;">
                   <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #00f0ff; fill: currentColor;"><path d="M12 2L4 12l8 10 8-10L12 2zm0 3.8L17.2 12 12 18.2 6.8 12 12 5.8z"/></svg>
                   <span>Transform &amp; Keyframes</span>
                 </label>
-                <div style="display: flex; gap: 4px;">
-                  <button type="button" class="btn-micro-preset" id="btn-kf-jump-prev" title="Jump to Previous Keyframe">◀</button>
-                  <button type="button" class="btn-micro-preset active" id="btn-kf-add-playhead" title="Toggle Keyframe at Playhead (◆)">◆ Keyframe</button>
-                  <button type="button" class="btn-micro-preset" id="btn-kf-jump-next" title="Jump to Next Keyframe">▶</button>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <button type="button" class="btn-micro-preset" id="btn-kf-jump-prev" title="Jump to Previous Keyframe" onclick="event.stopPropagation()">◀</button>
+                  <button type="button" class="btn-micro-preset active" id="btn-kf-add-playhead" title="Toggle Keyframe at Playhead (◆)" onclick="event.stopPropagation()">◆ Keyframe</button>
+                  <button type="button" class="btn-micro-preset" id="btn-kf-jump-next" title="Jump to Next Keyframe" onclick="event.stopPropagation()">▶</button>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" style="margin-left: 4px;"><path d="M19 9l-7 7-7-7"/></svg>
                 </div>
               </div>
+              <div class="fx-body">
 
               <!-- Property Row: Scale -->
               <div class="control-row" style="margin-bottom: 6px;">
@@ -1766,17 +1777,22 @@
                   Graph
                 </button>
               </div>
+              </div>
             </div>
 
-            <!-- Color Grading, 3D LUTs & Compositing Math Section -->
-            <div class="control-row" id="inspector-color-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="margin: 0; display: flex; align-items: center; gap: 4px; font-weight: 700;">
+            <!-- Color Grading, 3D LUTs & Compositing Math Section (Progressive Disclosure Accordion) -->
+            <div class="control-row accordion-card" id="inspector-color-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 6px;">
+              <div class="fx-header" onclick="this.parentElement.classList.toggle('open')" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer;">
+                <label style="margin: 0; display: flex; align-items: center; gap: 4px; font-weight: 700; cursor: pointer;">
                   <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; color: #ffd000; fill: currentColor;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.53 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
                   <span>Color Pipeline &amp; Compositing</span>
                 </label>
-                <span class="badge" id="badge-color-profile" style="font-size: 10px; color: #ffd000;">Rec.709</span>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <span class="badge" id="badge-color-profile" style="font-size: 10px; color: #ffd000;">Rec.709</span>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                </div>
               </div>
+              <div class="fx-body">
 
               <!-- 3D LUT & Creative Looks -->
               <div class="control-row" style="margin-bottom: 6px;">
@@ -1857,6 +1873,7 @@
               <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-clip-color" style="width: 100%; margin-top: 4px; font-size: 10.5px;">
                 Reset Color Grading
               </button>
+              </div>
             </div>
 
             <!-- Layer Arrangement (Bring to Front / Send to Back) -->

@@ -2296,33 +2296,70 @@ function drawMarqueeSelectionOverlay() {
 function drawTransformHandles(x, y, w, h) {
   if (isExporting || (isPlaying && !isTransforming)) return;
   ctx.save();
-  ctx.strokeStyle = '#00f0ff';
-  ctx.lineWidth = 2;
-  ctx.setLineDash([6, 4]);
+
+  // Canva-style solid vivid purple border with soft shadow
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 2.5;
+  ctx.shadowColor = 'rgba(139, 92, 246, 0.4)';
+  ctx.shadowBlur = 8;
   ctx.strokeRect(x, y, w, h);
-  ctx.setLineDash([]);
+  ctx.shadowBlur = 0;
 
-  // Corner and edge handles
-  const handleSize = 12;
-  ctx.fillStyle = '#ffffff';
-  ctx.strokeStyle = '#00f0ff';
-  ctx.lineWidth = 2;
-
-  const handles = [
-    { x: x - handleSize / 2, y: y - handleSize / 2 }, // Top-Left
-    { x: x + w - handleSize / 2, y: y - handleSize / 2 }, // Top-Right
-    { x: x - handleSize / 2, y: y + h - handleSize / 2 }, // Bottom-Left
-    { x: x + w - handleSize / 2, y: y + h - handleSize / 2 }, // Bottom-Right
-    { x: x + w / 2 - handleSize / 2, y: y - handleSize / 2 }, // Top-Center
-    { x: x + w / 2 - handleSize / 2, y: y + h - handleSize / 2 }, // Bottom-Center
-    { x: x - handleSize / 2, y: y + h / 2 - handleSize / 2 }, // Middle-Left
-    { x: x + w - handleSize / 2, y: y + h / 2 - handleSize / 2 } // Middle-Right
+  // Corner circles (Canva style)
+  const cornerR = 7;
+  const corners = [
+    { x: x, y: y },
+    { x: x + w, y: y },
+    { x: x, y: y + h },
+    { x: x + w, y: y + h }
   ];
 
-  handles.forEach(hnd => {
-    ctx.fillRect(hnd.x, hnd.y, handleSize, handleSize);
-    ctx.strokeRect(hnd.x, hnd.y, handleSize, handleSize);
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 2;
+  corners.forEach(c => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, cornerR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
   });
+
+  // Edge pill handles (Canva style: rounded vertical/horizontal pills)
+  const pillW = 16;
+  const pillH = 6;
+  // Top & Bottom horizontal pills
+  [ { x: x + w / 2 - pillW / 2, y: y - pillH / 2 },
+    { x: x + w / 2 - pillW / 2, y: y + h - pillH / 2 } ].forEach(p => {
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(p.x, p.y, pillW, pillH, 3) : ctx.rect(p.x, p.y, pillW, pillH);
+    ctx.fill();
+    ctx.stroke();
+  });
+  // Left & Right vertical pills
+  [ { x: x - pillH / 2, y: y + h / 2 - pillW / 2 },
+    { x: x + w - pillH / 2, y: y + h / 2 - pillW / 2 } ].forEach(p => {
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(p.x, p.y, pillH, pillW, 3) : ctx.rect(p.x, p.y, pillH, pillW);
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  // Floating rotation knob at bottom center (Canva style)
+  const rotKnobY = y + h + 24;
+  ctx.beginPath();
+  ctx.moveTo(x + w / 2, y + h);
+  ctx.lineTo(x + w / 2, rotKnobY);
+  ctx.strokeStyle = 'rgba(139, 92, 246, 0.6)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(x + w / 2, rotKnobY, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 2;
+  ctx.fill();
+  ctx.stroke();
 
   ctx.restore();
 }
@@ -7877,6 +7914,7 @@ function toggleRightSidebar(explicitState) {
 // Event Listeners for Apple Sidebar Buttons
 document.getElementById('btn-toggle-left-sidebar')?.addEventListener('click', () => toggleLeftSidebar());
 document.getElementById('btn-collapse-left-sidebar')?.addEventListener('click', () => toggleLeftSidebar(false));
+document.getElementById('btn-canva-edge-chevron')?.addEventListener('click', () => toggleLeftSidebar(false));
 
 document.getElementById('btn-toggle-right-sidebar')?.addEventListener('click', () => toggleRightSidebar());
 document.getElementById('btn-collapse-right-sidebar')?.addEventListener('click', () => toggleRightSidebar(false));
