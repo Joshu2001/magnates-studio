@@ -401,6 +401,9 @@ body {
   height: 100%;
   overflow: hidden;
   transition: opacity 0.2s ease;
+  position: relative;
+  z-index: 100;
+  box-shadow: 2px 0 16px rgba(0, 0, 0, 0.4);
 }
 
 .sidebar-header {
@@ -443,6 +446,8 @@ body {
   color: #0f172a;
   padding: 0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 10;
   transition: all 0.15s ease;
 }
 
@@ -6894,7 +6899,7 @@ body.tool-slide-active {
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 14px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
-  z-index: 500 !important; /* Above timeline toolbar, playhead, and all canvas overlays */
+  z-index: 1200 !important; /* Above canvas toolbar, stage overlays, and buttons */
   transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
   transform: translateX(0);
   opacity: 1;
@@ -8008,4 +8013,190 @@ body.tool-slide-active {
 #previewCanvas.aspect-1-1 { aspect-ratio: 1 / 1 !important; max-width: 480px !important; }
 #previewCanvas.aspect-4-5 { aspect-ratio: 4 / 5 !important; max-width: 420px !important; }
 #previewCanvas.aspect-21-9 { aspect-ratio: 21 / 9 !important; }
+
+/* ==================== MOBILE-GRADE ADJUST & FILTER STYLES ==================== */
+.filter-category-pills {
+  scrollbar-width: thin;
+}
+.filter-category-pills::-webkit-scrollbar {
+  height: 3px;
+}
+.filter-cat-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.filter-cat-pill:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+.filter-cat-pill.active {
+  background: #f472b6;
+  border-color: #f472b6;
+  color: #000;
+  font-weight: 700;
+}
+
+.filter-preset-card {
+  position: relative;
+  background: #181920;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+}
+.filter-preset-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.filter-preset-card.active {
+  border-color: #ffd000;
+  box-shadow: 0 0 10px rgba(255, 208, 0, 0.35);
+}
+.filter-preset-thumb {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+.filter-preset-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-top: 4px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.filter-preset-card.active .filter-preset-name {
+  color: #ffd000;
+}
+
+/* Underlined category tabs matching Canva/Image 1 */
+.fmodal-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 2px 8px 2px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.fmodal-tab-btn:hover {
+  color: #f1f5f9;
+}
+.fmodal-tab-btn.active {
+  color: #fff;
+  font-weight: 700;
+  border-bottom: 2px solid #8b5cf6;
+}
+
+.real-filter-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #1e2029;
+  border: 2px solid transparent;
+  transition: transform 0.15s, border-color 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.real-filter-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.real-filter-card.active {
+  border-color: #ffd000;
+  box-shadow: 0 0 10px rgba(255, 208, 0, 0.4);
+}
+.real-filter-img-wrap {
+  width: 100%;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  background: #0b0c10;
+  position: relative;
+}
+.real-filter-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.real-filter-label {
+  padding: 4px 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #e2e8f0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: #181922;
+}
+.real-filter-card.active .real-filter-label {
+  color: #ffd000;
+}
+
+/* Floating Confirmation Toast for Filter and Studio Operations */
+.studio-floating-toast {
+  position: fixed;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(244, 114, 182, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(244, 114, 182, 0.25);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 30px;
+  font-size: 12.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999999 !important;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.studio-floating-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.studio-floating-toast .toast-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f472b6;
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
 

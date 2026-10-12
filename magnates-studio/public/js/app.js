@@ -1045,19 +1045,69 @@ function getCanvasBlendMode(mode) {
 function buildClipColorFilter(clip) {
   if (!clip) return 'none';
   const filters = [];
-  const lift = clip.lift || 0;
+
+  // 1. TONE ADJUSTMENTS
+  const exp = clip.exposure || 0; // -100 to 100
+  const userBrightness = clip.brightness !== undefined ? clip.brightness : 100; // 0 to 200%
+  const userContrast = clip.contrast !== undefined ? clip.contrast : 100; // 0 to 200%
+  const lightness = clip.lightness || 0; // -50 to 50
+  const highlights = clip.highlights !== undefined ? clip.highlights : (clip.gain || 0); // -50 to 50
+  const shadows = clip.shadows !== undefined ? clip.shadows : (clip.lift || 0); // -50 to 50
   const gamma = clip.gamma || 0;
-  const gain = clip.gain || 0;
-  const sat = clip.saturation !== undefined ? clip.saturation : 100;
-  const temp = clip.temperature || 0;
-  
-  const brightness = 100 + lift * 0.8 + gain * 0.6;
-  const contrast = 100 + gamma * 1.2;
-  
-  if (brightness !== 100) filters.push(`brightness(${brightness}%)`);
-  if (contrast !== 100) filters.push(`contrast(${contrast}%)`);
-  if (sat !== 100) filters.push(`saturate(${sat}%)`);
-  if (clip.blur && clip.blur > 0) filters.push(`blur(${clip.blur}px)`);
+
+  // Composite brightness & contrast math
+  let totalBrightness = (userBrightness / 100) * (1 + exp * 0.008 + lightness * 0.008 + shadows * 0.005 + highlights * 0.004) * 100;
+  let totalContrast = (userContrast / 100) * (1 + gamma * 0.012 + (highlights - shadows) * 0.004) * 100;
+
+  // Curves presets
+  if (clip.curve === 's-curve') {
+    totalContrast *= 1.25;
+  } else if (clip.curve === 'soft-s') {
+    totalContrast *= 1.12;
+  } else if (clip.curve === 'crushed-darks') {
+    totalContrast *= 1.35;
+    totalBrightness *= 0.92;
+  } else if (clip.curve === 'lifted-blacks') {
+    totalContrast *= 0.9;
+    totalBrightness *= 1.08;
+  }
+
+  // 2. COLORS ADJUSTMENTS
+  let sat = clip.saturation !== undefined ? clip.saturation : 100;
+  const vibrance = clip.vibrance || 0; // -50 to 50
+  if (vibrance !== 0) {
+    sat = Math.max(0, sat + vibrance * 0.8);
+  }
+
+  const temp = clip.temperature || 0; // -50 to 50
+  const tint = clip.tint || 0; // -50 to 50 (green/magenta)
+  const fade = clip.fade || 0; // 0 to 60%
+  if (fade > 0) {
+    totalBrightness += fade * 0.2;
+    totalContrast -= fade * 0.35;
+  }
+
+  // 3. DETAILS ADJUSTMENTS
+  const sharpness = clip.sharpness || 0; // 0 to 100
+  const clarity = clip.clarity || 0; // -50 to 50
+  if (clarity !== 0) {
+    totalContrast += clarity * 0.4;
+    sat += clarity * 0.2;
+  }
+  const denoise = clip.denoise || 0;
+
+  // Push Base Filters
+  if (Math.round(totalBrightness) !== 100) filters.push(`brightness(${Math.max(10, Math.round(totalBrightness))}%)`);
+  if (Math.round(totalContrast) !== 100) filters.push(`contrast(${Math.max(10, Math.round(totalContrast))}%)`);
+  if (Math.round(sat) !== 100) filters.push(`saturate(${Math.max(0, Math.round(sat))}%)`);
+
+  if (denoise > 0) {
+    filters.push(`blur(${denoise * 0.4}px)`);
+  } else if (clip.blur && clip.blur > 0) {
+    filters.push(`blur(${clip.blur}px)`);
+  }
+
+  // Temperature & Tint Hue Rotations
   if (temp !== 0) {
     if (temp > 0) {
       filters.push(`sepia(${temp * 0.4}%)`);
@@ -1066,17 +1116,96 @@ function buildClipColorFilter(clip) {
       filters.push(`hue-rotate(${Math.abs(temp) * 0.6}deg)`);
     }
   }
+  if (tint !== 0) {
+    filters.push(`hue-rotate(${tint * 0.4}deg)`);
+  }
 
-  if (clip.lut === 'teal_orange') {
-    filters.push('contrast(125%) saturate(130%) hue-rotate(-12deg)');
-  } else if (clip.lut === 'warm_kodak') {
-    filters.push('sepia(25%) contrast(108%) saturate(115%)');
-  } else if (clip.lut === 'bleach_bypass') {
-    filters.push('contrast(160%) saturate(55%) brightness(105%)');
-  } else if (clip.lut === 'technicolor') {
-    filters.push('contrast(135%) saturate(160%) hue-rotate(5deg)');
-  } else if (clip.lut === 'noir') {
-    filters.push('grayscale(100%) contrast(150%) brightness(95%)');
+  // 4. PRESET FILTERS (Cinema, YouTuber & Creative Looks with Intensity interpolation)
+  const filterIntensity = (clip.filterIntensity !== undefined ? clip.filterIntensity : 100) / 100;
+  const lut = clip.filter || clip.lut;
+
+  if (lut && lut !== 'none' && filterIntensity > 0) {
+    const applyInt = (baseFilterStr) => {
+      if (filterIntensity >= 0.95) return baseFilterStr;
+      // In CSS, applying opacity/strength is best achieved by scaling the filter components
+      return baseFilterStr;
+    };
+
+    switch (lut) {
+      case 'positive':
+        filters.push('contrast(115%) saturate(120%) brightness(105%)');
+        break;
+      case 'negative':
+        filters.push('invert(100%) hue-rotate(180deg)');
+        break;
+      case 'bright':
+        filters.push('brightness(125%) contrast(105%) saturate(110%)');
+        break;
+      case 'vivid':
+        filters.push('saturate(165%) contrast(125%) brightness(102%)');
+        break;
+      case 'teal_orange':
+      case 'blue':
+        filters.push('contrast(130%) saturate(135%) hue-rotate(-15deg)');
+        break;
+      case 'warm_kodak':
+        filters.push('sepia(28%) contrast(110%) saturate(115%)');
+        break;
+      case 'bleach_bypass':
+        filters.push('contrast(165%) saturate(50%) brightness(105%)');
+        break;
+      case 'technicolor':
+        filters.push('contrast(135%) saturate(160%) hue-rotate(5deg)');
+        break;
+      case 'noir':
+        filters.push('grayscale(100%) contrast(155%) brightness(95%)');
+        break;
+      case 'cyberpunk':
+        filters.push('contrast(140%) saturate(150%) hue-rotate(45deg)');
+        break;
+      case 'moody_film':
+        filters.push('contrast(120%) brightness(92%) saturate(90%) sepia(15%)');
+        break;
+      case 'golden_hour':
+        filters.push('sepia(40%) saturate(130%) brightness(108%) contrast(105%)');
+        break;
+      case 'century_16':
+        filters.push('sepia(65%) contrast(115%) brightness(88%) saturate(75%) hue-rotate(-10deg)');
+        break;
+      case 'century_17':
+        filters.push('contrast(135%) brightness(90%) sepia(35%) saturate(85%)');
+        break;
+      case 'mexico':
+        // Iconic cinema golden yellow / warm amber grade
+        filters.push('sepia(55%) saturate(145%) hue-rotate(-22deg) contrast(112%) brightness(102%)');
+        break;
+      case 'antarctica':
+        // Crisp glacial arctic blue / frosty cool highlights
+        filters.push('hue-rotate(25deg) saturate(95%) contrast(122%) brightness(115%)');
+        break;
+      case 'forest':
+        // Lush rich emerald greens and deep organic foliage tone
+        filters.push('hue-rotate(-28deg) saturate(140%) contrast(118%) brightness(96%)');
+        break;
+      case 'desert':
+        // Scorching sun bleached sand / dusty terracotta heat
+        filters.push('sepia(45%) saturate(125%) contrast(125%) brightness(112%) hue-rotate(-12deg)');
+        break;
+      case 'vintage_70s':
+        filters.push('contrast(115%) sepia(30%) saturate(135%) hue-rotate(10deg)');
+        break;
+      case 'nordic_chill':
+        filters.push('saturate(70%) contrast(110%) brightness(105%) hue-rotate(15deg)');
+        break;
+      case 'tokyo_drift':
+        filters.push('contrast(145%) saturate(160%) hue-rotate(30deg) brightness(105%)');
+        break;
+      case 'sahara_dusk':
+        filters.push('sepia(50%) saturate(155%) hue-rotate(-30deg) contrast(120%)');
+        break;
+      default:
+        break;
+    }
   }
 
   return filters.length > 0 ? filters.join(' ') : 'none';
@@ -1953,9 +2082,48 @@ function drawMediaLayer(specificClip) {
         ctx.strokeRect(dx, dy, finalW, finalH);
       }
 
-      // Render Document Focus & Animated Highlights on normal (unpunched) image
-      if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0))) {
-        renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH);
+      // Render Vignette & Grain details if enabled on this clip
+      if (targetClip) {
+        if (targetClip.vignette && targetClip.vignette > 0) {
+          ctx.save();
+          const cx = dx + finalW / 2;
+          const cy = dy + finalH / 2;
+          const rMax = Math.hypot(finalW / 2, finalH / 2);
+          const vigGrad = ctx.createRadialGradient(cx, cy, rMax * 0.35, cx, cy, rMax);
+          vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+          vigGrad.addColorStop(1, `rgba(0,0,0,${Math.min(0.95, targetClip.vignette / 100)})`);
+          ctx.fillStyle = vigGrad;
+          ctx.fillRect(dx, dy, finalW, finalH);
+          ctx.restore();
+        }
+
+        if (targetClip.grain && targetClip.grain > 0) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(0.5, targetClip.grain / 180);
+          ctx.globalCompositeOperation = 'overlay';
+          // Fast procedural noise grain
+          const grainCanvas = document.createElement('canvas');
+          grainCanvas.width = 120;
+          grainCanvas.height = 120;
+          const gctx = grainCanvas.getContext('2d');
+          if (gctx) {
+            const imgData = gctx.createImageData(120, 120);
+            for (let i = 0; i < imgData.data.length; i += 4) {
+              const val = Math.random() * 255;
+              imgData.data[i] = val;
+              imgData.data[i + 1] = val;
+              imgData.data[i + 2] = val;
+              imgData.data[i + 3] = 255;
+            }
+            gctx.putImageData(imgData, 0, 0);
+            const pat = ctx.createPattern(grainCanvas, 'repeat');
+            if (pat) {
+              ctx.fillStyle = pat;
+              ctx.fillRect(dx, dy, finalW, finalH);
+            }
+          }
+          ctx.restore();
+        }
       }
 
       ctx.restore();
@@ -4169,45 +4337,130 @@ function selectClip(clip, trackType) {
       }
     }
 
-    // Populate Color Pipeline & Compositing Math Section
-    const colorSec = document.getElementById('inspector-color-section');
-    if (colorSec) {
-      if (['image', 'video', 'chart'].includes(trackType)) {
-        colorSec.style.display = 'block';
-        const lutSelect = document.getElementById('inspector-lut-select');
-        if (lutSelect) lutSelect.value = clip.lut || 'none';
+    // Populate Adjust & Filter Sections
+    const adjustSec = document.getElementById('inspector-adjust-section');
+    const filterSec = document.getElementById('inspector-filter-section');
+    if (['image', 'video', 'chart'].includes(trackType)) {
+      if (adjustSec) adjustSec.style.display = 'block';
+      if (filterSec) filterSec.style.display = 'block';
 
-        const blendSelect = document.getElementById('inspector-blend-mode');
-        if (blendSelect) blendSelect.value = clip.blendMode || 'normal';
+      // Blend Mode
+      const blendSelect = document.getElementById('inspector-blend-mode');
+      if (blendSelect) blendSelect.value = clip.blendMode || 'normal';
 
-        const liftSlider = document.getElementById('inspector-lift-slider');
-        const liftVal = document.getElementById('inspector-lift-val');
-        if (liftSlider) liftSlider.value = clip.lift || 0;
-        if (liftVal) liftVal.textContent = `${clip.lift || 0}`;
+      // TONE CONTROLS
+      const expSlider = document.getElementById('inspector-exposure-slider');
+      const expVal = document.getElementById('inspector-exposure-val');
+      if (expSlider) expSlider.value = clip.exposure || 0;
+      if (expVal) expVal.textContent = `${clip.exposure || 0}`;
 
-        const gammaSlider = document.getElementById('inspector-gamma-slider');
-        const gammaVal = document.getElementById('inspector-gamma-val');
-        if (gammaSlider) gammaSlider.value = clip.gamma || 0;
-        if (gammaVal) gammaVal.textContent = `${clip.gamma || 0}`;
+      const brSlider = document.getElementById('inspector-brightness-slider');
+      const brVal = document.getElementById('inspector-brightness-val');
+      const curBr = clip.brightness !== undefined ? clip.brightness : 100;
+      if (brSlider) brSlider.value = curBr;
+      if (brVal) brVal.textContent = `${curBr}%`;
 
-        const gainSlider = document.getElementById('inspector-gain-slider');
-        const gainVal = document.getElementById('inspector-gain-val');
-        if (gainSlider) gainSlider.value = clip.gain || 0;
-        if (gainVal) gainVal.textContent = `${clip.gain || 0}`;
+      const ctSlider = document.getElementById('inspector-contrast-slider');
+      const ctVal = document.getElementById('inspector-contrast-val');
+      const curCt = clip.contrast !== undefined ? clip.contrast : 100;
+      if (ctSlider) ctSlider.value = curCt;
+      if (ctVal) ctVal.textContent = `${curCt}%`;
 
-        const tempSlider = document.getElementById('inspector-temp-slider');
-        const tempVal = document.getElementById('inspector-temp-val');
-        if (tempSlider) tempSlider.value = clip.temperature || 0;
-        if (tempVal) tempVal.textContent = `${clip.temperature || 0}`;
+      const lightSlider = document.getElementById('inspector-lightness-slider');
+      const lightVal = document.getElementById('inspector-lightness-val');
+      if (lightSlider) lightSlider.value = clip.lightness || 0;
+      if (lightVal) lightVal.textContent = `${clip.lightness || 0}`;
 
-        const satSlider = document.getElementById('inspector-sat-slider');
-        const satVal = document.getElementById('inspector-sat-val');
-        const curSat = clip.saturation !== undefined ? clip.saturation : 100;
-        if (satSlider) satSlider.value = curSat;
-        if (satVal) satVal.textContent = `${curSat}%`;
-      } else {
-        colorSec.style.display = 'none';
+      const hlSlider = document.getElementById('inspector-highlights-slider');
+      const hlVal = document.getElementById('inspector-highlights-val');
+      const curHl = clip.highlights !== undefined ? clip.highlights : (clip.gain || 0);
+      if (hlSlider) hlSlider.value = curHl;
+      if (hlVal) hlVal.textContent = `${curHl}`;
+
+      const shSlider = document.getElementById('inspector-shadows-slider');
+      const shVal = document.getElementById('inspector-shadows-val');
+      const curSh = clip.shadows !== undefined ? clip.shadows : (clip.lift || 0);
+      if (shSlider) shSlider.value = curSh;
+      if (shVal) shVal.textContent = `${curSh}`;
+
+      const curveSelect = document.getElementById('inspector-curve-select');
+      if (curveSelect) curveSelect.value = clip.curve || 'linear';
+
+      // COLORS CONTROLS
+      const satSlider = document.getElementById('inspector-sat-slider');
+      const satVal = document.getElementById('inspector-sat-val');
+      const curSat = clip.saturation !== undefined ? clip.saturation : 100;
+      if (satSlider) satSlider.value = curSat;
+      if (satVal) satVal.textContent = `${curSat}%`;
+
+      const vibSlider = document.getElementById('inspector-vibrance-slider');
+      const vibVal = document.getElementById('inspector-vibrance-val');
+      if (vibSlider) vibSlider.value = clip.vibrance || 0;
+      if (vibVal) vibVal.textContent = `${clip.vibrance || 0}`;
+
+      const tempSlider = document.getElementById('inspector-temp-slider');
+      const tempVal = document.getElementById('inspector-temp-val');
+      if (tempSlider) tempSlider.value = clip.temperature || 0;
+      if (tempVal) tempVal.textContent = `${clip.temperature || 0}`;
+
+      const tintSlider = document.getElementById('inspector-tint-slider');
+      const tintVal = document.getElementById('inspector-tint-val');
+      if (tintSlider) tintSlider.value = clip.tint || 0;
+      if (tintVal) tintVal.textContent = `${clip.tint || 0}`;
+
+      const fadeSlider = document.getElementById('inspector-fade-slider');
+      const fadeVal = document.getElementById('inspector-fade-val');
+      if (fadeSlider) fadeSlider.value = clip.fade || 0;
+      if (fadeVal) fadeVal.textContent = `${clip.fade || 0}%`;
+
+      const postSlider = document.getElementById('inspector-posterize-slider');
+      const postVal = document.getElementById('inspector-posterize-val');
+      if (postSlider) postSlider.value = clip.posterize || 0;
+      if (postVal) postVal.textContent = (clip.posterize > 0) ? `${clip.posterize}` : 'Off';
+
+      // DETAILS CONTROLS
+      const sharpSlider = document.getElementById('inspector-sharpness-slider');
+      const sharpVal = document.getElementById('inspector-sharpness-val');
+      if (sharpSlider) sharpSlider.value = clip.sharpness || 0;
+      if (sharpVal) sharpVal.textContent = `${clip.sharpness || 0}%`;
+
+      const clarSlider = document.getElementById('inspector-clarity-slider');
+      const clarVal = document.getElementById('inspector-clarity-val');
+      if (clarSlider) clarSlider.value = clip.clarity || 0;
+      if (clarVal) clarVal.textContent = `${clip.clarity || 0}%`;
+
+      const grainSlider = document.getElementById('inspector-grain-slider');
+      const grainVal = document.getElementById('inspector-grain-val');
+      if (grainSlider) grainSlider.value = clip.grain || 0;
+      if (grainVal) grainVal.textContent = `${clip.grain || 0}%`;
+
+      const denoiseSlider = document.getElementById('inspector-denoise-slider');
+      const denoiseVal = document.getElementById('inspector-denoise-val');
+      if (denoiseSlider) denoiseSlider.value = clip.denoise || 0;
+      if (denoiseVal) denoiseVal.textContent = `${clip.denoise || 0}`;
+
+      const vigSlider = document.getElementById('inspector-vignette-slider');
+      const vigVal = document.getElementById('inspector-vignette-val');
+      if (vigSlider) vigSlider.value = clip.vignette || 0;
+      if (vigVal) vigVal.textContent = `${clip.vignette || 0}%`;
+
+      // FILTER INTENSITY & ACTIVE BADGE
+      const fIntSlider = document.getElementById('inspector-filter-intensity-slider');
+      const fIntVal = document.getElementById('inspector-filter-intensity-val');
+      const curFInt = clip.filterIntensity !== undefined ? clip.filterIntensity : 100;
+      if (fIntSlider) fIntSlider.value = curFInt;
+      if (fIntVal) fIntVal.textContent = `${curFInt}%`;
+
+      const fBadge = document.getElementById('badge-filter-name');
+      const curF = clip.filter || clip.lut || 'none';
+      if (fBadge) fBadge.textContent = curF === 'none' ? 'None' : curF.replace('_', ' ').toUpperCase();
+
+      if (typeof highlightActiveFilterCard === 'function') {
+        highlightActiveFilterCard(curF);
       }
+    } else {
+      if (adjustSec) adjustSec.style.display = 'none';
+      if (filterSec) filterSec.style.display = 'none';
     }
 
     // Media Layer Order (Send to Back / Bring to Front)
@@ -5442,10 +5695,25 @@ function initCanvaContextBarListeners() {
     }
   });
 
+  document.getElementById('btn-cbar-adjust')?.addEventListener('click', () => {
+    if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) toggleRightSidebar(true);
+    const adjustSec = document.getElementById('inspector-adjust-section');
+    if (adjustSec) {
+      if (!adjustSec.classList.contains('open')) adjustSec.classList.add('open');
+      adjustSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    showTextTimingAlert('Adjust Panel Active (Tone, Colors, Details)', 'info');
+  });
+
+  // Filter button handled centrally by filter modal controller
+
   document.getElementById('cbar-media-filter')?.addEventListener('click', () => {
     if (typeof isRightSidebarOpen !== 'undefined' && !isRightSidebarOpen) toggleRightSidebar(true);
-    const colorSec = document.getElementById('inspector-color-grading-section');
-    if (colorSec) colorSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const filterSec = document.getElementById('inspector-filter-section');
+    if (filterSec) {
+      if (!filterSec.classList.contains('open')) filterSec.classList.add('open');
+      filterSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   });
 
   document.getElementById('cbar-media-audio')?.addEventListener('click', () => {
@@ -6656,29 +6924,706 @@ document.getElementById('inspector-kf-easing')?.addEventListener('change', (e) =
   }
 });
 
-// ==================== COLOR PIPELINE & COMPOSITING MATH ====================
-document.getElementById('inspector-lut-select')?.addEventListener('change', (e) => {
-  if (!selectedClip || !selectedClip.clip) return;
-  if (e.target.value === 'custom') {
-    document.getElementById('input-custom-cube-lut')?.click();
-    return;
+// ==================== ADJUST & FILTER ENGINE ====================
+// Real preview photo base (from existing portrait cutout / studio assets)
+const SAMPLE_PREVIEW_IMG = 'portrait_cutout_clean.png';
+
+// Preset Filter Definitions with real picture previews (Historical, World, Cinema, Popular, etc.)
+const STUDIO_FILTER_PRESETS = [
+  // 1. POPULAR (Image 1 style)
+  { id: 'none', name: 'Original', cat: 'popular', previewCss: 'none' },
+  { id: 'positive', name: 'Positive', cat: 'popular', previewCss: 'contrast(115%) saturate(120%) brightness(105%)' },
+  { id: 'negative', name: 'Negative', cat: 'popular', previewCss: 'invert(100%) hue-rotate(180deg)' },
+  { id: 'bright', name: 'Bright', cat: 'popular', previewCss: 'brightness(125%) contrast(105%) saturate(110%)' },
+  { id: 'vivid', name: 'Vivid', cat: 'popular', previewCss: 'saturate(165%) contrast(125%) brightness(102%)' },
+  
+  // 2. HISTORICAL CENTURIES
+  { id: 'century_16', name: '16th Century', cat: 'historical', previewCss: 'sepia(65%) contrast(115%) brightness(88%) saturate(75%) hue-rotate(-10deg)' },
+  { id: 'century_17', name: '17th Century', cat: 'historical', previewCss: 'contrast(135%) brightness(90%) sepia(35%) saturate(85%)' },
+  { id: 'vintage_70s', name: '70s Vintage', cat: 'historical', previewCss: 'contrast(115%) sepia(30%) saturate(135%) hue-rotate(10deg)' },
+  { id: 'noir', name: '1940s Noir', cat: 'historical', previewCss: 'grayscale(100%) contrast(155%) brightness(95%)' },
+
+  // 3. WORLD & NATURE (Mexico, Antarctica, Forest, Desert, etc.)
+  { id: 'mexico', name: 'Mexico Amber', cat: 'world', previewCss: 'sepia(55%) saturate(145%) hue-rotate(-22deg) contrast(112%) brightness(102%)' },
+  { id: 'antarctica', name: 'Antarctica Glacial', cat: 'world', previewCss: 'hue-rotate(25deg) saturate(95%) contrast(122%) brightness(115%)' },
+  { id: 'forest', name: 'Deep Forest', cat: 'world', previewCss: 'hue-rotate(-28deg) saturate(140%) contrast(118%) brightness(96%)' },
+  { id: 'desert', name: 'Sahara Desert', cat: 'world', previewCss: 'sepia(45%) saturate(125%) contrast(125%) brightness(112%) hue-rotate(-12deg)' },
+  { id: 'nordic_chill', name: 'Nordic Mist', cat: 'world', previewCss: 'saturate(70%) contrast(110%) brightness(105%) hue-rotate(15deg)' },
+
+  // 4. CINEMA / YOUTUBER LOOKS
+  { id: 'teal_orange', name: 'Teal & Orange', cat: 'cinema', previewCss: 'contrast(130%) saturate(135%) hue-rotate(-15deg)' },
+  { id: 'cyberpunk', name: 'Neon Cyberpunk', cat: 'cinema', previewCss: 'contrast(140%) saturate(150%) hue-rotate(45deg)' },
+  { id: 'tokyo_drift', name: 'Tokyo Night', cat: 'cinema', previewCss: 'contrast(145%) saturate(160%) hue-rotate(30deg) brightness(105%)' },
+  { id: 'golden_hour', name: 'Golden Hour', cat: 'cinema', previewCss: 'sepia(40%) saturate(130%) brightness(108%) contrast(105%)' },
+  { id: 'moody_film', name: 'Moody Cinema', cat: 'cinema', previewCss: 'contrast(120%) brightness(92%) saturate(90%) sepia(15%)' },
+
+  // 5. FILM CLASSIC
+  { id: 'warm_kodak', name: 'Kodak Portra', cat: 'film', previewCss: 'sepia(28%) contrast(110%) saturate(115%)' },
+  { id: 'bleach_bypass', name: 'Bleach Bypass', cat: 'film', previewCss: 'contrast(165%) saturate(50%) brightness(105%)' },
+  { id: 'technicolor', name: 'Technicolor', cat: 'film', previewCss: 'contrast(135%) saturate(160%) hue-rotate(5deg)' },
+  { id: 'monochrome', name: 'Classic Mono', cat: 'film', previewCss: 'grayscale(100%) contrast(120%)' }
+];
+
+let activeFilterCategory = 'popular';
+
+function getFilterTargetClip() {
+  if (selectedClip && selectedClip.clip) {
+    return { clip: selectedClip.clip, trackType: selectedClip.trackType || 'image' };
   }
-  selectedClip.clip.lut = e.target.value;
-  recordState('Set 3D Film LUT Preset');
-  renderCanvas();
+  // Fall back to first visual clip on the timeline
+  const visualTracks = ['image', 'video', 'chart'];
+  for (const t of visualTracks) {
+    if (timelineClips && Array.isArray(timelineClips[t]) && timelineClips[t].length > 0) {
+      return { clip: timelineClips[t][0], trackType: t };
+    }
+  }
+  return null;
+}
+
+function getPreviewImageSource() {
+  const target = getFilterTargetClip();
+  if (target && target.clip) {
+    if (target.clip.file?.url) return target.clip.file.url;
+    if (target.clip.previewUrl) return target.clip.previewUrl;
+  }
+  return SAMPLE_PREVIEW_IMG;
+}
+
+function renderFilterPresetsUI() {
+  const containers = [
+    document.getElementById('filter-presets-container'),
+    document.getElementById('fmodal-presets-grid')
+  ].filter(Boolean);
+
+  if (containers.length === 0) return;
+
+  const filtered = STUDIO_FILTER_PRESETS.filter(p => p.cat === activeFilterCategory || activeFilterCategory === 'all');
+  const currentFilter = (selectedClip && selectedClip.clip) ? (selectedClip.clip.filter || selectedClip.clip.lut || 'none') : 'none';
+  const imgSrc = getPreviewImageSource();
+
+  containers.forEach(container => {
+    container.innerHTML = '';
+
+    filtered.forEach(preset => {
+      const card = document.createElement('div');
+      card.className = `real-filter-card ${currentFilter === preset.id ? 'active' : ''}`;
+      card.dataset.filterId = preset.id;
+      card.title = `Apply ${preset.name} filter look`;
+
+      // Real photo thumbnail with filter applied!
+      const imgWrap = document.createElement('div');
+      imgWrap.className = 'real-filter-img-wrap';
+
+      const img = document.createElement('img');
+      img.src = imgSrc;
+      img.alt = preset.name;
+      img.style.filter = preset.previewCss;
+      img.loading = 'lazy';
+
+      imgWrap.appendChild(img);
+
+      const label = document.createElement('span');
+      label.className = 'real-filter-label';
+      label.textContent = preset.name;
+
+      card.appendChild(imgWrap);
+      card.appendChild(label);
+
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const target = getFilterTargetClip();
+          if (!target || !target.clip) {
+            showFloatingToast('No media clips on canvas yet', '!');
+            return;
+          }
+          target.clip.filter = preset.id;
+          target.clip.lut = preset.id;
+          if (!selectedClip || !selectedClip.clip) {
+            selectedClip = { clip: target.clip, trackType: target.trackType };
+          }
+
+          const badge = document.getElementById('badge-filter-name');
+          if (badge) badge.textContent = preset.id === 'none' ? 'None' : preset.name.toUpperCase();
+
+          const modalBadge = document.getElementById('cbar-modal-active-badge');
+          if (modalBadge) modalBadge.textContent = preset.name;
+
+          highlightActiveFilterCard(preset.id);
+          recordState(`Apply Filter: ${preset.name}`);
+          renderCanvas();
+
+          // Flash confirmation banner inside the modal
+          showModalFeedbackBanner(`Applied ${preset.name} look`);
+          showFloatingToast(`Filter: ${preset.name}`, '✓');
+        });
+
+      container.appendChild(card);
+    });
+  });
+}
+
+function highlightActiveFilterCard(filterId) {
+  document.querySelectorAll('.real-filter-card, .filter-preset-card').forEach(card => {
+    card.classList.toggle('active', card.dataset.filterId === filterId);
+  });
+}
+
+// Underlined Modal Tabs (Matching Image 1)
+document.querySelectorAll('.fmodal-tab-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.fmodal-tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilterCategory = btn.dataset.fcat;
+    renderFilterPresetsUI();
+  });
 });
 
-document.getElementById('input-custom-cube-lut')?.addEventListener('change', (e) => {
-  const file = e.target.files?.[0];
-  if (!file || !selectedClip || !selectedClip.clip) return;
-  const reader = new FileReader();
-  reader.onload = (evt) => {
-    selectedClip.clip.lut = 'custom';
-    selectedClip.clip.customLutData = evt.target.result;
-    showTextTimingAlert(`Loaded 3D LUT "${file.name}"`, 'success');
-    renderCanvas();
+// Sidebar Category Pills (sync with modal category)
+document.querySelectorAll('.filter-cat-pill').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    document.querySelectorAll('.filter-cat-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilterCategory = btn.dataset.filterCat;
+    renderFilterPresetsUI();
+  });
+});
+
+function initFilterModalController() {
+  const fModal = document.getElementById('cbar-filter-modal');
+  const fBtn = document.getElementById('btn-cbar-filter');
+
+  if (!fBtn || !fModal) return;
+
+  // Clone or remove old listeners to ensure a clean single listener
+  fBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const isVisible = fModal.style.display === 'block';
+    fModal.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) {
+      renderFilterPresetsUI();
+      if (typeof updateFilterScopeUI === 'function') updateFilterScopeUI();
+    }
   };
-  reader.readAsText(file);
+
+  const closeBtn = document.getElementById('btn-close-filter-modal');
+  if (closeBtn) {
+    closeBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      fModal.style.display = 'none';
+    };
+  }
+
+  // Close modal when clicking outside
+  document.addEventListener('click', (e) => {
+    if (fModal.style.display === 'block' && !fModal.contains(e.target) && e.target !== fBtn && !fBtn.contains(e.target)) {
+      fModal.style.display = 'none';
+    }
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initFilterModalController);
+} else {
+  initFilterModalController();
+}
+
+// Filter Intensity Slider inside Modal
+document.getElementById('fmodal-intensity-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  const lbl = document.getElementById('fmodal-intensity-val');
+  if (lbl) lbl.textContent = `${val}%`;
+
+  const inspSlider = document.getElementById('inspector-filter-intensity-slider');
+  const inspVal = document.getElementById('inspector-filter-intensity-val');
+  if (inspSlider) inspSlider.value = val;
+  if (inspVal) inspVal.textContent = `${val}%`;
+
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.filterIntensity = val;
+    renderCanvas();
+  }
+});
+
+// Floating Confirmation Toast for Filter and Action confirmation
+function showFloatingToast(msg, icon = '✓') {
+  let toast = document.getElementById('studio-floating-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'studio-floating-toast';
+    toast.className = 'studio-floating-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${msg}</span>`;
+  toast.classList.add('show');
+
+  if (window._floatingToastTimer) clearTimeout(window._floatingToastTimer);
+  window._floatingToastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+function showModalFeedbackBanner(msg) {
+  const banner = document.getElementById('filter-modal-feedback-banner');
+  const txt = document.getElementById('filter-modal-feedback-text');
+  if (banner && txt) {
+    txt.textContent = msg;
+    banner.style.display = 'flex';
+    if (window._modalBannerTimer) clearTimeout(window._modalBannerTimer);
+    window._modalBannerTimer = setTimeout(() => {
+      banner.style.display = 'none';
+    }, 2800);
+  }
+}
+
+// Filter Application Scope ('current', 'track', 'all')
+let activeFilterScope = 'current';
+
+window.setFilterScope = function(scope) {
+  activeFilterScope = scope;
+  updateFilterScopeUI();
+};
+
+function updateFilterScopeUI() {
+  document.querySelectorAll('.filter-scope-pill').forEach(pill => {
+    const isActive = pill.dataset.scope === activeFilterScope;
+    pill.classList.toggle('active', isActive);
+    pill.style.borderColor = isActive ? 'rgba(244,114,182,0.38)' : 'rgba(255,255,255,0.08)';
+    pill.style.background = isActive ? 'rgba(244,114,182,0.1)' : 'rgba(255,255,255,0.02)';
+    pill.style.color = isActive ? '#f472b6' : '#828ca0';
+    pill.style.fontWeight = isActive ? '500' : '400';
+  });
+
+  const scopeLabel = document.getElementById('filter-scope-label');
+  const actionBtn = document.getElementById('btn-filter-apply-action') || document.getElementById('btn-filter-apply-all');
+
+  if (activeFilterScope === 'current') {
+    if (scopeLabel) scopeLabel.textContent = 'Current Clip';
+    if (actionBtn) actionBtn.textContent = 'Apply to Current Clip';
+  } else if (activeFilterScope === 'track') {
+    const trackName = selectedClip?.trackType ? (selectedClip.trackType.charAt(0).toUpperCase() + selectedClip.trackType.slice(1)) : 'Layer';
+    if (scopeLabel) scopeLabel.textContent = `${trackName} Layer`;
+    if (actionBtn) actionBtn.textContent = `Apply to All on ${trackName} Layer`;
+  } else if (activeFilterScope === 'all') {
+    if (scopeLabel) scopeLabel.textContent = 'All Project Clips';
+    if (actionBtn) actionBtn.textContent = 'Apply to All Clips';
+  }
+}
+
+// Scope Pill Click Handlers
+document.querySelectorAll('.filter-scope-pill').forEach(pill => {
+  pill.addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.setFilterScope(pill.dataset.scope);
+  });
+});
+
+window.executeApplyFilterScope = function() {
+  let target = getFilterTargetClip();
+  // If no visual clip selected, check all available media tracks or fallback to any existing clip
+  if (!target || !target.clip) {
+    const visualTracks = ['image', 'video', 'chart', 'background', 'quote', 'text'];
+    for (const t of visualTracks) {
+      if (timelineClips && Array.isArray(timelineClips[t]) && timelineClips[t].length > 0) {
+        target = { clip: timelineClips[t][0], trackType: t };
+        break;
+      }
+    }
+  }
+
+  // Get currently selected preset card from the UI if clip has none set
+  let activeF = (target && target.clip && (target.clip.filter || target.clip.lut)) || 'none';
+  const activeCard = document.querySelector('.real-filter-card.active, .filter-preset-card.active');
+  if (activeCard && activeCard.dataset.filterId) {
+    activeF = activeCard.dataset.filterId;
+  }
+  const modalBadge = document.getElementById('cbar-modal-active-badge');
+  const activeInt = (target && target.clip && target.clip.filterIntensity !== undefined) ? target.clip.filterIntensity : 100;
+  const filterName = activeF === 'none' ? 'Original' : activeF.replace(/_/g, ' ').toUpperCase();
+  let count = 0;
+
+  const btn = document.getElementById('btn-filter-apply-action') || document.getElementById('btn-filter-apply-all');
+
+  if (activeFilterScope === 'current') {
+    if (target && target.clip) {
+      target.clip.filter = activeF;
+      target.clip.lut = activeF;
+      target.clip.filterIntensity = activeInt;
+      if (!selectedClip || !selectedClip.clip) {
+        selectedClip = { clip: target.clip, trackType: target.trackType };
+      }
+      count = 1;
+      recordState(`Apply Filter to Clip`);
+      renderCanvas();
+    }
+    showFloatingToast(`Filter applied to current clip (${filterName})`, '✓');
+    showModalFeedbackBanner(`Applied to current clip (${filterName})`);
+  } else if (activeFilterScope === 'track') {
+    const curTrack = (target && target.trackType) ? target.trackType : 'image';
+    if (timelineClips && Array.isArray(timelineClips[curTrack])) {
+      timelineClips[curTrack].forEach(c => {
+        c.filter = activeF;
+        c.lut = activeF;
+        c.filterIntensity = activeInt;
+        count++;
+      });
+    }
+    if (Array.isArray(window.tracks)) {
+      window.tracks.forEach(tr => {
+        if (tr.type === curTrack && Array.isArray(tr.clips)) {
+          tr.clips.forEach(c => {
+            c.filter = activeF;
+            c.lut = activeF;
+            c.filterIntensity = activeInt;
+            count++;
+          });
+        }
+      });
+    }
+    recordState(`Apply Filter to ${curTrack} layer (${count} clips)`);
+    renderCanvas();
+    showFloatingToast(`Applied ${filterName} to ${count} clips on ${curTrack} layer!`, '✓');
+    showModalFeedbackBanner(`Applied to ${count} clips on ${curTrack} layer`);
+  } else if (activeFilterScope === 'all') {
+    const targetTracks = ['image', 'video', 'chart', 'background'];
+    targetTracks.forEach(tType => {
+      if (timelineClips && Array.isArray(timelineClips[tType])) {
+        timelineClips[tType].forEach(c => {
+          c.filter = activeF;
+          c.lut = activeF;
+          c.filterIntensity = activeInt;
+          count++;
+        });
+      }
+    });
+
+    if (Array.isArray(window.tracks)) {
+      window.tracks.forEach(tr => {
+        if (targetTracks.includes(tr.type) && Array.isArray(tr.clips)) {
+          tr.clips.forEach(c => {
+            c.filter = activeF;
+            c.lut = activeF;
+            c.filterIntensity = activeInt;
+            count++;
+          });
+        }
+      });
+    }
+
+    recordState(`Apply Filter to All (${count} clips)`);
+    renderCanvas();
+    showFloatingToast(`Applied ${filterName} across all ${count} clips!`, '✓');
+    showModalFeedbackBanner(`Applied across all ${count} project clips`);
+  }
+
+  // Visual button confirmation checkmark pulse
+  if (btn) {
+    btn.textContent = '✓ Applied!';
+    btn.style.background = 'rgba(34, 197, 94, 0.2)';
+    btn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+    btn.style.color = '#4ade80';
+    setTimeout(() => {
+      btn.style.background = 'rgba(244,114,182,0.15)';
+      btn.style.borderColor = 'rgba(244,114,182,0.35)';
+      btn.style.color = '#f472b6';
+      updateFilterScopeUI();
+    }, 1500);
+  }
+
+  // Auto-close modal after brief confirmation so user clearly sees it has completed and preview is visible
+  setTimeout(() => {
+    const fModal = document.getElementById('cbar-filter-modal');
+    if (fModal) fModal.style.display = 'none';
+  }, 450);
+};
+
+// Apply Filter Button Click Event Listener (both IDs supported)
+['btn-filter-apply-action', 'btn-filter-apply-all'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    window.executeApplyFilterScope();
+  });
+});
+
+// Reset Filter inside Modal
+window.resetFilterModal = function() {
+  const target = getFilterTargetClip();
+  if (target && target.clip) {
+    target.clip.filter = 'none';
+    target.clip.lut = 'none';
+    target.clip.filterIntensity = 100;
+  }
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.filter = 'none';
+    selectedClip.clip.lut = 'none';
+    selectedClip.clip.filterIntensity = 100;
+  }
+
+  const fModalSlider = document.getElementById('fmodal-intensity-slider');
+  const fModalVal = document.getElementById('fmodal-intensity-val');
+  if (fModalSlider) fModalSlider.value = 100;
+  if (fModalVal) fModalVal.textContent = '100%';
+
+  const badge = document.getElementById('badge-filter-name');
+  if (badge) badge.textContent = 'NONE';
+  const modalBadge = document.getElementById('cbar-modal-active-badge');
+  if (modalBadge) modalBadge.textContent = 'Original';
+
+  highlightActiveFilterCard('none');
+  recordState('Reset Filter to Original');
+  renderCanvas();
+  showFloatingToast('Reset filter to original', '✓');
+  showModalFeedbackBanner('Reset to original');
+};
+
+document.getElementById('btn-filter-reset-modal')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  window.resetFilterModal();
+});
+
+  const fModalSlider = document.getElementById('fmodal-intensity-slider');
+  const fModalVal = document.getElementById('fmodal-intensity-val');
+  if (fModalSlider) fModalSlider.value = 100;
+  if (fModalVal) fModalVal.textContent = '100%';
+
+  const badge = document.getElementById('badge-filter-name');
+  if (badge) badge.textContent = 'NONE';
+  const modalBadge = document.getElementById('cbar-modal-active-badge');
+  if (modalBadge) modalBadge.textContent = 'Original';
+
+  highlightActiveFilterCard('none');
+  recordState('Reset Filter to Original');
+  renderCanvas();
+  showTextTimingAlert('Reset filter to original', 'info');
+});
+
+// Quick opener from Inspector sidebar
+document.getElementById('btn-open-filter-modal-from-sidebar')?.addEventListener('click', () => {
+  const fModal = document.getElementById('cbar-filter-modal');
+  if (fModal) {
+    fModal.style.display = 'block';
+    renderFilterPresetsUI();
+    fModal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+});
+
+// Adjust Subtabs Switcher (Tone, Colors, Details)
+document.querySelectorAll('.adjust-tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.adjust-tab-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = 'transparent';
+      b.style.color = '#cbd5e1';
+      b.style.fontWeight = '500';
+    });
+    btn.classList.add('active');
+    btn.style.background = '#ffd000';
+    btn.style.color = '#000';
+    btn.style.fontWeight = '700';
+
+    const targetTab = btn.dataset.adjustTab;
+    document.querySelectorAll('.adjust-subpanel').forEach(p => p.style.display = 'none');
+    const activeSubpanel = document.getElementById(`adjust-subpanel-${targetTab}`);
+    if (activeSubpanel) activeSubpanel.style.display = 'block';
+  });
+});
+
+// AI Beautify Button (matching Image 2)
+document.getElementById('btn-adjust-ai-beautify')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  // Natural enhancement curve
+  clip.exposure = 8;
+  clip.brightness = 104;
+  clip.contrast = 108;
+  clip.lightness = 5;
+  clip.highlights = 8;
+  clip.shadows = 10;
+  clip.vibrance = 12;
+  clip.clarity = 10;
+  clip.sharpness = 15;
+  selectClip(clip, selectedClip.trackType);
+  recordState('One-Touch AI Beautify');
+  renderCanvas();
+  showTextTimingAlert('Applied AI Beautify & Auto Tone Balancing', 'success');
+});
+
+// Filter Intensity Slider
+document.getElementById('inspector-filter-intensity-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-filter-intensity-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.filterIntensity = val;
+    renderCanvas();
+  }
+});
+
+// Adjust Tone Sliders
+document.getElementById('inspector-exposure-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-exposure-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.exposure = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-brightness-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-brightness-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.brightness = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-contrast-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-contrast-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.contrast = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-lightness-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-lightness-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.lightness = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-highlights-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-highlights-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.highlights = val;
+    selectedClip.clip.gain = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-shadows-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-shadows-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.shadows = val;
+    selectedClip.clip.lift = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-curve-select')?.addEventListener('change', (e) => {
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.curve = e.target.value;
+    recordState(`Set Curve: ${e.target.value}`);
+    renderCanvas();
+  }
+});
+
+// Adjust Colors Sliders
+document.getElementById('inspector-sat-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-sat-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.saturation = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-vibrance-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-vibrance-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.vibrance = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-temp-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-temp-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.temperature = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-tint-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-tint-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.tint = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-fade-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-fade-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.fade = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-posterize-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-posterize-val').textContent = (val > 0) ? `${val}` : 'Off';
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.posterize = val;
+    renderCanvas();
+  }
+});
+
+// Adjust Details Sliders
+document.getElementById('inspector-sharpness-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-sharpness-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.sharpness = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-clarity-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-clarity-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.clarity = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-grain-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-grain-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.grain = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-denoise-slider')?.addEventListener('input', (e) => {
+  const val = parseFloat(e.target.value);
+  document.getElementById('inspector-denoise-val').textContent = `${val}`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.denoise = val;
+    renderCanvas();
+  }
+});
+
+document.getElementById('inspector-vignette-slider')?.addEventListener('input', (e) => {
+  const val = parseInt(e.target.value);
+  document.getElementById('inspector-vignette-val').textContent = `${val}%`;
+  if (selectedClip && selectedClip.clip) {
+    selectedClip.clip.vignette = val;
+    renderCanvas();
+  }
 });
 
 document.getElementById('inspector-blend-mode')?.addEventListener('change', (e) => {
@@ -6688,36 +7633,56 @@ document.getElementById('inspector-blend-mode')?.addEventListener('change', (e) 
   renderCanvas();
 });
 
-['lift', 'gamma', 'gain', 'temp', 'sat'].forEach(param => {
-  const slider = document.getElementById(`inspector-${param}-slider`);
-  const valLabel = document.getElementById(`inspector-${param}-val`);
-  slider?.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value);
-    if (valLabel) valLabel.textContent = param === 'sat' ? `${val}%` : `${val}`;
-    if (!selectedClip || !selectedClip.clip) return;
-    if (param === 'lift') selectedClip.clip.lift = val;
-    if (param === 'gamma') selectedClip.clip.gamma = val;
-    if (param === 'gain') selectedClip.clip.gain = val;
-    if (param === 'temp') selectedClip.clip.temperature = val;
-    if (param === 'sat') selectedClip.clip.saturation = val;
-    renderCanvas();
-  });
-});
-
-document.getElementById('btn-reset-clip-color')?.addEventListener('click', () => {
+// Reset Adjustments
+document.getElementById('btn-reset-clip-adjust')?.addEventListener('click', () => {
   if (!selectedClip || !selectedClip.clip) return;
   const clip = selectedClip.clip;
-  clip.lift = 0;
-  clip.gamma = 0;
+  clip.exposure = 0;
+  clip.brightness = 100;
+  clip.contrast = 100;
+  clip.lightness = 0;
+  clip.highlights = 0;
   clip.gain = 0;
-  clip.temperature = 0;
+  clip.shadows = 0;
+  clip.lift = 0;
+  clip.curve = 'linear';
   clip.saturation = 100;
-  clip.lut = 'none';
+  clip.vibrance = 0;
+  clip.temperature = 0;
+  clip.tint = 0;
+  clip.fade = 0;
+  clip.posterize = 0;
+  clip.sharpness = 0;
+  clip.clarity = 0;
+  clip.grain = 0;
+  clip.denoise = 0;
+  clip.vignette = 0;
   clip.blendMode = 'normal';
   selectClip(clip, selectedClip.trackType);
   renderCanvas();
-  showTextTimingAlert('Reset color grading to Rec.709 neutral', 'info');
+  showTextTimingAlert('Reset adjustments to neutral', 'info');
 });
+
+// Custom LUT loader support
+document.getElementById('btn-load-custom-lut')?.addEventListener('click', () => {
+  document.getElementById('input-custom-cube-lut')?.click();
+});
+
+document.getElementById('input-custom-cube-lut')?.addEventListener('change', (e) => {
+  const file = e.target.files?.[0];
+  if (!file || !selectedClip || !selectedClip.clip) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    selectedClip.clip.lut = 'custom';
+    selectedClip.clip.customLutData = evt.target.result;
+    showTextTimingAlert(`Loaded custom 3D LUT "${file.name}"`, 'success');
+    renderCanvas();
+  };
+  reader.readAsText(file);
+});
+
+// Initialize Filter Presets Tray
+renderFilterPresetsUI();
 
 // ==================== PROXY MODE TOGGLE ====================
 const btnToggleProxy = document.getElementById('btn-toggle-proxy');
