@@ -25934,7 +25934,7 @@ function renderTopTemplatePreviewStage() {
         ${extraImagesHtml}
         <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
           <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
-            <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: ${subjectFilter}; border: ${subjectBorder}; border-radius: 8px;" />
+            <img id="customizer-live-fg" src="${prim}" alt="Subject" style="max-height: 92%; object-fit: contain; filter: ${subjectFilter}; border: ${subjectBorder}; border-radius: 8px; -webkit-mask-image: linear-gradient(to bottom, black 82%, transparent 100%); mask-image: linear-gradient(to bottom, black 82%, transparent 100%);" />
           </div>
         </div>
       </div>
@@ -25964,7 +25964,7 @@ function renderTopTemplatePreviewStage() {
         <img id="customizer-live-bg" src="${sec}" alt="Scene" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.35) contrast(1.2);" />
         ${textBehindHtml}
         <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ}; opacity: ${currentOpacity};">
-          <img id="customizer-live-fg" src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
+          <img id="customizer-live-fg" src="${prim}" alt="Cutout" style="max-height: 94%; object-fit: contain; filter: drop-shadow(0 0 0 #fff) drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff) drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff) drop-shadow(0 15px 25px rgba(0,0,0,0.95)); -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%); mask-image: linear-gradient(to bottom, black 85%, transparent 100%);" />
         </div>
       </div>
     `;
@@ -27760,19 +27760,14 @@ function populateModalScenesStoryboard() {
     const thumbImg = sc.thumb || sceneTpl?.defaultImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
 
     return `
-      <div onclick="modalSelectStoryboardScene(${idx})" style="flex: 0 0 170px; height: 58px; min-height: 58px; background: ${isActive ? 'rgba(139, 92, 246, 0.12)' : '#08090e'}; border: 1px solid ${isActive ? 'rgba(139, 92, 246, 0.45)' : 'rgba(255, 255, 255, 0.05)'}; box-shadow: ${isActive ? '0 0 12px rgba(139, 92, 246, 0.15)' : 'none'}; border-radius: 8px; padding: 6px 10px; display: flex; gap: 8px; align-items: center; position: relative; cursor: pointer; transition: all 0.2s;" title="Scene ${idx + 1}">
+      <div onclick="modalSelectStoryboardScene(${idx})" style="flex: 0 0 160px; height: 54px; min-height: 54px; background: ${isActive ? 'rgba(139, 92, 246, 0.12)' : '#08090e'}; border: 1px solid ${isActive ? 'rgba(139, 92, 246, 0.45)' : 'rgba(255, 255, 255, 0.05)'}; box-shadow: ${isActive ? '0 0 12px rgba(139, 92, 246, 0.15)' : 'none'}; border-radius: 8px; padding: 6px 10px; display: flex; gap: 8px; align-items: center; position: relative; cursor: pointer; transition: all 0.2s;" title="Scene ${idx + 1}">
         <div style="width: 20px; height: 20px; border-radius: 50%; background: ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
           ${idx + 1}
         </div>
         <img src="${thumbImg}" alt="Scene" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400';" style="width: 38px; height: 38px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;" />
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
-          <div style="font-size: 11px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1;">${sc.title || 'Scene ' + (idx + 1)}</div>
-          <div style="font-size: 9.5px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1;">${sceneTpl ? (sceneTpl.title.split('(')[0].trim()) : 'Parallax'}</div>
-          <div>
-            <span style="font-size: 8px; padding: 1px 6px; border-radius: 10px; background: ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.06)'}; color: #ffffff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; display: inline-block;">
-              ${isActive ? 'ACTIVE' : 'READY'}
-            </span>
-          </div>
+          <div style="font-size: 11px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${sc.title || 'Scene ' + (idx + 1)}</div>
+          <div style="font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${sceneTpl ? (sceneTpl.title.split('(')[0].trim()) : 'Parallax'}</div>
         </div>
         ${projectScenes.length > 1 ? `
           <button type="button" onclick="event.stopPropagation(); modalRemoveStoryboardScene(${idx})" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 4px; position: absolute; top: 2px; right: 3px; line-height: 1;" title="Remove Scene" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#64748b';">✕</button>
