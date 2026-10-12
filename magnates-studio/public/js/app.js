@@ -2369,6 +2369,55 @@ function drawTransformHandles(x, y, w, h) {
   ctx.fill();
   ctx.stroke();
 
+  // If in Fill & Crop mode or crop active, draw rule-of-thirds framing grid & platform badge
+  const isCropMode = (typeof studioAspectState !== 'undefined' && (studioAspectState.fit === 'cover' || studioAspectState.ratio !== '16:9'));
+  if (isCropMode) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+
+    // Rule of thirds vertical lines
+    ctx.beginPath();
+    ctx.moveTo(x + w / 3, y);
+    ctx.lineTo(x + w / 3, y + h);
+    ctx.moveTo(x + (2 * w) / 3, y);
+    ctx.lineTo(x + (2 * w) / 3, y + h);
+    // Rule of thirds horizontal lines
+    ctx.moveTo(x, y + h / 3);
+    ctx.lineTo(x + w, y + h / 3);
+    ctx.moveTo(x, y + (2 * h) / 3);
+    ctx.lineTo(x + w, y + (2 * h) / 3);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Sleek Canva-style Crop Framing Pill above the clip
+    const badgeText = `✂ ${studioAspectState.ratio} Crop • Drag to Frame`;
+    ctx.font = '600 11px Inter, sans-serif';
+    const bW = ctx.measureText(badgeText).width + 18;
+    const bH = 22;
+    const bX = x + w / 2 - bW / 2;
+    const bY = Math.max(12, y - 32);
+
+    ctx.fillStyle = 'rgba(13, 17, 28, 0.92)';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    ctx.shadowBlur = 10;
+    if (ctx.roundRect) ctx.roundRect(bX, bY, bW, bH, 6);
+    else ctx.rect(bX, bY, bW, bH);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = '#8b5cf6';
+    ctx.lineWidth = 1.2;
+    if (ctx.roundRect) ctx.roundRect(bX, bY, bW, bH, 6);
+    else ctx.rect(bX, bY, bW, bH);
+    ctx.stroke();
+
+    ctx.fillStyle = '#f1f5f9';
+    ctx.fillText(badgeText, bX + 9, bY + 15);
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 
@@ -2632,7 +2681,10 @@ function syncAudioPlayback() {
     if (Math.abs(bgmPlayer.currentTime - offset) > 0.25) {
       bgmPlayer.currentTime = offset;
     }
-    bgmPlayer.volume = ((activeMusic.volume !== undefined ? activeMusic.volume : 40) / 100);
+    // Intelligent Audio Ducking: If voiceover is actively speaking, duck BGM by 65% for broadcast-quality clarity
+    const baseBgmVol = (activeMusic.volume !== undefined ? activeMusic.volume : 40) / 100;
+    const duckMultiplier = activeVoice ? 0.35 : 1.0;
+    bgmPlayer.volume = Math.max(0, Math.min(1, baseBgmVol * duckMultiplier));
   } else {
     if (!bgmPlayer.paused) bgmPlayer.pause();
   }
@@ -10512,6 +10564,15 @@ function openExportStudioModal(e) {
   }
   modal.style.display = 'flex';
   modal.style.zIndex = '999999';
+
+  // Sync active aspect ratio card with studioAspectState
+  if (typeof studioAspectState !== 'undefined' && studioAspectState.ratio) {
+    exportStudioConfig.aspectRatio = studioAspectState.ratio;
+    document.querySelectorAll('.export-card-option').forEach(c => {
+      c.classList.toggle('active', c.dataset.ratio === studioAspectState.ratio);
+    });
+  }
+
   try {
     updateExportTelemetry();
   } catch(err) {
@@ -25266,6 +25327,48 @@ function commitTopTemplateCustomizerToTimeline(isAppendScene = false) {
     refreshTimelineScenesUI();
     if (firstFocusClip) {
       selectClip(firstFocusClip, firstFocusClip.file ? 'image' : 'text');
+    }
+
+    // Carry over aspect ratio and crop fit from template customizer modal to studio editor
+    if (typeof modalAspectState !== 'undefined' && modalAspectState.ratio) {
+      studioAspectState.ratio = modalAspectState.ratio;
+      studioAspectState.fit = modalAspectState.fit || 'contain';
+
+      // Update studio aspect pill label
+      const studioVal = document.getElementById('studio-val-aspect');
+      if (studioVal && typeof ASPECT_RATIO_LABELS !== 'undefined') {
+        studioVal.textContent = ASPECT_RATIO_LABELS[studioAspectState.ratio] || studioAspectState.ratio;
+      }
+
+      // Update active classes in studio aspect menu
+      document.querySelectorAll('#studio-aspect-menu .aspect-menu-opt').forEach(opt => {
+        opt.classList.toggle('active', opt.dataset.ratio === studioAspectState.ratio);
+      });
+      document.querySelectorAll('#studio-aspect-menu .aspect-fit-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.fit === studioAspectState.fit);
+      });
+
+      // Update canvas CSS aspect ratio class
+      const cv = document.getElementById('previewCanvas');
+      if (cv) {
+        cv.classList.remove('aspect-16-9', 'aspect-9-16', 'aspect-1-1', 'aspect-4-5', 'aspect-21-9');
+        cv.classList.add(`aspect-${studioAspectState.ratio.replace(':', '-')}`);
+
+        const dims = getExportDimensions(studioAspectState.ratio, exportStudioConfig?.resolution || 1080);
+        cv.width = dims.width;
+        cv.height = dims.height;
+      }
+
+      // Sync with exportStudioConfig
+      if (typeof exportStudioConfig !== 'undefined') {
+        exportStudioConfig.aspectRatio = studioAspectState.ratio;
+      }
+      if (typeof updateExportTelemetry === 'function') {
+        updateExportTelemetry();
+      }
+      if (typeof renderCanvas === 'function') {
+        renderCanvas();
+      }
     }
   }
 
