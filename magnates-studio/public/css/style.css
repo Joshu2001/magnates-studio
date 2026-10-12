@@ -8200,4 +8200,341 @@ body.tool-slide-active {
   flex-shrink: 0;
 }
 
+/* ==================== VISUAL CLIP GUIDE (SPLIT / TRIM / CUT) ==================== */
+.visual-action-btn {
+  transition: all 0.18s ease;
+  position: relative;
+}
+.visual-action-btn:hover {
+  transform: translateY(-1px);
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+.visual-guide-trigger-btn {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.visual-guide-trigger-btn:hover {
+  transform: scale(1.1);
+  color: #e879f9 !important;
+  background: rgba(192, 132, 252, 0.2) !important;
+}
+.visual-guide-tab {
+  transition: all 0.15s ease;
+}
+.visual-guide-tab:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #fff !important;
+}
+.visual-guide-tab.active {
+  background: rgba(139, 92, 246, 0.18) !important;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  color: #c084fc !important;
+}
+.btn-timeline-tool-action:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
 
+/* ==================== SEEK BAR CUT MARKERS & SHADED RANGE ==================== */
+.hud-cut-range-highlight {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(244, 63, 94, 0.35);
+  border-left: 2px solid #f43f5e;
+  border-right: 2px solid #f43f5e;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.6);
+  pointer-events: none;
+  z-index: 5;
+  transition: width 0.1s ease, left 0.1s ease;
+}
+
+.hud-cut-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.hud-cut-marker:hover {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+.hud-cut-marker-1 {
+  background: #f43f5e;
+  border: 1.5px solid #ffffff;
+}
+.hud-cut-marker-2 {
+  background: #e11d48;
+  border: 1.5px solid #ffffff;
+}
+.hud-cut-marker-badge {
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Timeline Ruler Cut Range Flag Indicators */
+.timeline-cut-flag-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  pointer-events: none;
+  z-index: 45;
+}
+.timeline-cut-flag-marker.point-1 {
+  background: #f43f5e;
+  box-shadow: 0 0 6px #f43f5e;
+}
+.timeline-cut-flag-marker.point-2 {
+  background: #e11d48;
+  box-shadow: 0 0 6px #e11d48;
+}
+.timeline-cut-flag-tag {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: #f43f5e;
+  color: #fff;
+  font-size: 8.5px;
+  font-weight: 800;
+  padding: 1px 3px;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.7);
+  pointer-events: none;
+}
+.timeline-cut-range-lane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(244, 63, 94, 0.18);
+  border-left: 1.5px dashed #f43f5e;
+  border-right: 1.5px dashed #f43f5e;
+  pointer-events: none;
+  z-index: 40;
+}
+
+/* ==================== CANVA-STYLE TOP FILMSTRIP TRIMMER BAR ==================== */
+.canva-top-filmstrip-trimmer {
+  height: 52px;
+  background: #0d0f18;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  z-index: 49;
+  user-select: none;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  animation: slideDownTrimmer 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideDownTrimmer {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.c-trimmer-left-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.c-trimmer-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(168, 85, 247, 0.2);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.c-trimmer-duration-pill {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.c-trimmer-transport-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.c-trimmer-transport-btn:hover {
+  background: #a855f7;
+  border-color: #a855f7;
+}
+
+/* Filmstrip Track with Handles */
+.c-trimmer-track-container {
+  flex: 1;
+  height: 38px;
+  position: relative;
+  background: #12141f;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.c-trimmer-frames-strip {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  pointer-events: none;
+  background: #11131f;
+  z-index: 1;
+}
+.c-trimmer-thumb-cell,
+.c-trimmer-frame-cell {
+  height: 100%;
+  flex: 1;
+  min-width: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.95;
+  border-right: 1px solid rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+
+/* Dimmed Regions outside bounds */
+.c-trimmer-dim-left,
+.c-trimmer-dim-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.65);
+  pointer-events: none;
+  z-index: 2;
+}
+.c-trimmer-dim-left { left: 0; width: 0%; }
+.c-trimmer-dim-right { right: 0; width: 0%; }
+
+/* Active Selection Window */
+.c-trimmer-active-selection {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0%;
+  width: 100%;
+  border-top: 2.5px solid #8b5cf6;
+  border-bottom: 2.5px solid #8b5cf6;
+  z-index: 5;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+  pointer-events: none;
+}
+
+.c-trimmer-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 16px;
+  background: #7c3aed;
+  cursor: ew-resize;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.15s ease;
+}
+.c-trimmer-handle:hover,
+.c-trimmer-handle.dragging {
+  background: #a855f7;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+}
+.c-trimmer-handle.handle-left {
+  left: 0;
+  border-radius: 6px 0 0 6px;
+}
+.c-trimmer-handle.handle-right {
+  right: 0;
+  border-radius: 0 6px 6px 0;
+}
+.c-trimmer-handle-grip {
+  width: 3px;
+  height: 14px;
+  border-left: 1px solid rgba(255,255,255,0.7);
+  border-right: 1px solid rgba(255,255,255,0.7);
+}
+
+.c-trimmer-playhead-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #f43f5e;
+  box-shadow: 0 0 6px #f43f5e;
+  z-index: 6;
+  pointer-events: none;
+  left: 0%;
+}
+
+.c-trimmer-right-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.c-trimmer-done-btn {
+  background: #7c3aed !important;
+  color: #fff !important;
+  border: 1px solid rgba(168, 85, 247, 0.5) !important;
+  font-weight: 700 !important;
+  font-size: 11.5px !important;
+  padding: 5px 14px !important;
+  border-radius: 7px !important;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.c-trimmer-done-btn:hover {
+  background: #9333ea !important;
+  box-shadow: 0 4px 14px rgba(147, 51, 234, 0.4);
+}
+
+.c-trimmer-close-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1;
+}
+.c-trimmer-close-btn:hover {
+  color: #fff;
+}

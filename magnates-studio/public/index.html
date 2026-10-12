@@ -554,12 +554,24 @@
             </div>
           </div>
 
-          <!-- Quick Right Actions (Split, Delete, Undo, Redo) -->
+          <!-- Quick Right Actions (Split, Trim, Cut, Delete, Undo, Redo) -->
           <div class="canva-bar-right">
-            <button type="button" class="canva-bar-icon-btn" id="cbar-act-split" title="Split Clip at Playhead (S)">
-              <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
-            </button>
-            <button type="button" class="canva-bar-icon-btn canva-danger" id="cbar-act-delete" title="Delete (Del)">
+            <!-- Cut/Split/Trim Visual Guide Action Cluster -->
+            <div class="canva-cut-cluster" style="display: inline-flex; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 2px;">
+              <button type="button" class="canva-bar-icon-btn visual-action-btn" id="cbar-act-split" title="Split: Divide 1 clip into 2 parts (S)" data-visual-guide="split">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+              </button>
+              <button type="button" class="canva-bar-icon-btn visual-action-btn" id="cbar-act-trim" title="Trim: Shorten start/end boundaries ([ or ])" data-visual-guide="trim">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-4-4 4-4v3h4v2h-4v3z"/></svg>
+              </button>
+              <button type="button" class="canva-bar-icon-btn visual-action-btn" id="cbar-act-cut" title="Cut: Remove segment between (1) and (2)" data-visual-guide="cut">
+                <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+              </button>
+              <button type="button" class="canva-bar-icon-btn visual-guide-trigger-btn" id="cbar-act-visual-guide" title="Visual Guide: How to Cut, Split & Trim" style="color: #c084fc;">
+                <svg class="ui-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2.5"/></svg>
+              </button>
+            </div>
+            <button type="button" class="canva-bar-icon-btn canva-danger" id="cbar-act-delete" title="Delete Clip (Del)">
               <svg class="ui-icon" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
             </button>
             <div class="canva-bar-sep"></div>
@@ -572,9 +584,56 @@
           </div>
         </div>
 
+        <!-- Canva Top Precision Filmstrip Trimmer Bar (Progressively Disclosed) -->
+        <div id="canva-top-filmstrip-trimmer" class="canva-top-filmstrip-trimmer" style="display: none;">
+          <div class="c-trimmer-left-controls">
+            <span class="c-trimmer-badge" id="c-trimmer-mode-badge">TRIM</span>
+            <span class="c-trimmer-duration-pill" id="c-trimmer-duration-display">6.0s</span>
+            <button type="button" class="c-trimmer-transport-btn" id="btn-c-trimmer-play" title="Play / Pause Selection">
+              <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+
+          <!-- Filmstrip Track Container with Left & Right Purple Drag Handles -->
+          <div class="c-trimmer-track-container" id="c-trimmer-track-container">
+            <!-- Dynamic thumbnails strip generated via video canvas / frames -->
+            <div class="c-trimmer-frames-strip" id="c-trimmer-frames-strip">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Dark dimmed regions outside the active selection -->
+            <div class="c-trimmer-dim-left" id="c-trimmer-dim-left"></div>
+            <div class="c-trimmer-dim-right" id="c-trimmer-dim-right"></div>
+
+            <!-- Active Selected Window with Left and Right Handles -->
+            <div class="c-trimmer-active-selection" id="c-trimmer-active-selection">
+              <!-- Left Purple Handle -->
+              <div class="c-trimmer-handle handle-left" id="c-trimmer-handle-left" title="Drag to adjust Start time">
+                <div class="c-trimmer-handle-grip"></div>
+              </div>
+              
+              <!-- Red playhead indicator sliding within active selection -->
+              <div class="c-trimmer-playhead-line" id="c-trimmer-playhead-line"></div>
+
+              <!-- Right Purple Handle -->
+              <div class="c-trimmer-handle handle-right" id="c-trimmer-handle-right" title="Drag to adjust End time">
+                <div class="c-trimmer-handle-grip"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="c-trimmer-right-controls">
+            <!-- Mode Action Confirm Button (Trim / Cut) -->
+            <button type="button" class="btn btn-primary btn-sm c-trimmer-done-btn" id="btn-c-trimmer-done">
+              <span id="label-c-trimmer-done-btn">Done</span>
+            </button>
+            <button type="button" class="c-trimmer-close-btn" id="btn-c-trimmer-close" title="Cancel">&times;</button>
+          </div>
+        </div>
+
         <div class="canvas-wrapper">
           <!-- Floating Main Studio Canvas Format & Aspect Ratio Switcher -->
-          <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 16px; left: 16px; z-index: 10005;">
+          <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 16px; left: 16px; z-index: 40;">
             <button type="button" id="studio-btn-aspect" class="stage-aspect-pill-btn" title="Switch Video Format / Canvas Aspect Ratio">
               <span class="aspect-icon-badge">📐</span>
               <span id="studio-val-aspect" class="aspect-label">16:9 YouTube</span>
@@ -693,7 +752,7 @@
 
           <!-- YouTube-Style Floating Hover Player HUD on Main Studio Canvas -->
           <div id="studio-main-player-hud" class="studio-main-player-hud">
-            <!-- Sleek Scrubber Bar with Hover Tooltip -->
+            <!-- Sleek Scrubber Bar with Hover Tooltip & Visual Cut Markers -->
             <div id="studio-hud-scrubber-wrap" class="tpl-hud-scrubber-wrap" title="Seek timeline">
               <div id="studio-hud-preview-tooltip" class="tpl-hud-preview-tooltip">
                 <span id="studio-hud-tooltip-time">0:00</span>
@@ -1242,6 +1301,27 @@
                   </div>
                   <div id="timeline-scenes-pills-list" style="display: flex; align-items: center; gap: 6px;">
                     <!-- Rendered dynamically via JS: [ Scene 1 ] [ Scene 2 ] -->
+                  </div>
+
+                  <!-- Timeline Precision Tools: Split, Trim, Cut, and Guide -->
+                  <div class="timeline-edit-tools-capsule" style="display: flex; align-items: center; margin-left: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; padding: 2px 4px; gap: 3px;">
+                    <button type="button" class="btn-timeline-tool-action visual-action-btn" id="btn-tl-split" title="Split clip at playhead (S)" data-visual-guide="split" style="background:none; border:none; color:#cbd5e1; font-size:11px; font-weight:600; padding:3px 7px; border-radius:5px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                      <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+                      <span>Split</span>
+                    </button>
+                    <button type="button" class="btn-timeline-tool-action visual-action-btn" id="btn-tl-trim" title="Trim clip edges to playhead ([ or ])" data-visual-guide="trim" style="background:none; border:none; color:#cbd5e1; font-size:11px; font-weight:600; padding:3px 7px; border-radius:5px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                      <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-4-4 4-4v3h4v2h-4v3z"/></svg>
+                      <span>Trim</span>
+                    </button>
+                    <button type="button" class="btn-timeline-tool-action visual-action-btn" id="btn-tl-cut" title="Cut: Extract selected clip or segment" data-visual-guide="cut" style="background:none; border:none; color:#cbd5e1; font-size:11px; font-weight:600; padding:3px 7px; border-radius:5px; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                      <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:currentColor;"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                      <span id="label-tl-cut-btn">Cut</span>
+                    </button>
+                    <div style="width: 1px; height: 12px; background: rgba(255,255,255,0.1); margin: 0 1px;"></div>
+                    <button type="button" class="btn-timeline-tool-action visual-guide-trigger-btn" id="btn-tl-guide" title="Visual Guide: How Split, Trim & Cut work" style="background:none; border:none; color:#a855f7; font-size:11px; font-weight:700; padding:3px 6px; border-radius:5px; cursor:pointer; display:flex; align-items:center; gap:3px;">
+                      <svg viewBox="0 0 24 24" style="width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2.2;"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="3"/></svg>
+                      <span>Guide</span>
+                    </button>
                   </div>
                 </div>
 
@@ -9611,6 +9691,206 @@
         <button type="button" class="btn btn-secondary btn-sm" id="btn-skip-onboarding">Start with Empty Canvas</button>
         <button type="button" class="btn btn-primary btn-sm" id="btn-view-all-templates-onboarding" style="background: #00f0ff; color: #000; font-weight: 700;">Browse All Templates</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Visual Explainer Modal for Cutting, Splitting & Trimming -->
+  <div id="modal-visual-clip-guide" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100050; backdrop-filter: blur(16px); background: rgba(5,7,14,0.85);">
+    <div style="background: #0f121d; border: 1px solid rgba(255,255,255,0.16); border-radius: 16px; width: 620px; max-width: 95vw; box-shadow: 0 25px 60px rgba(0,0,0,0.9), 0 0 30px rgba(168,85,247,0.2); overflow: hidden; display: flex; flex-direction: column;">
+      
+      <!-- Modal Header -->
+      <div style="padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(168,85,247,0.06);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: #8b5cf6; display: flex; align-items: center; justify-content: center; color: #fff;">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M9.64 7.64c.23-.5.36-1.05.36-1.64 0-2.21-1.79-4-4-4S2 3.79 2 6s1.79 4 4 4c.59 0 1.14-.13 1.64-.36L10 12l-2.36 2.36C7.14 14.13 6.59 14 6 14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4c0-.59-.13-1.14-.36-1.64L12 14l7 7h3v-1L9.64 7.64z"/></svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: 0.2px;">Interactive Visual Editing Guide</h3>
+            <p style="margin: 2px 0 0 0; font-size: 11px; color: #94a3b8;">Difference between Splitting, Trimming, and Cutting (Picture Guide)</p>
+          </div>
+        </div>
+        <button type="button" id="btn-close-visual-clip-guide" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; padding: 4px; line-height: 1;">&times;</button>
+      </div>
+
+      <!-- Segment Selector Tabs -->
+      <div style="display: flex; gap: 4px; padding: 10px 16px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.06);">
+        <button type="button" class="visual-guide-tab active" data-guide-tab="split" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(139,92,246,0.3); background: rgba(139,92,246,0.15); color: #c084fc; font-weight: 700; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>✂️ 1. Split</span>
+          <span style="font-size: 10px; opacity: 0.8;">(1 ➔ 2 Parts)</span>
+        </button>
+        <button type="button" class="visual-guide-tab" data-guide-tab="trim" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #94a3b8; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>↔️ 2. Trim</span>
+          <span style="font-size: 10px; opacity: 0.8;">(Shorten Edges)</span>
+        </button>
+        <button type="button" class="visual-guide-tab" data-guide-tab="cut" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: #94a3b8; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <span>🗑️ 3. Cut / Remove</span>
+          <span style="font-size: 10px; opacity: 0.8;">(1 & 2 Middle)</span>
+        </button>
+      </div>
+
+      <!-- Interactive Tab Contents -->
+      <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+        
+        <!-- Tab 1: SPLIT -->
+        <div id="guide-content-split" class="guide-content-panel">
+          <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-size: 11px; font-weight: 700; color: #a855f7; text-transform: uppercase;">Visual Graphic Diagram:</span>
+              <span style="font-size: 10.5px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">Shortcut: S</span>
+            </div>
+            
+            <!-- Graphic Illustration: Splitting 1 clip into 2 -->
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Before -->
+              <div>
+                <span style="font-size: 10.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">BEFORE: Single Clip</span>
+                <div style="height: 38px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 6px; display: flex; align-items: center; justify-content: center; position: relative; border: 1px solid rgba(255,255,255,0.2);">
+                  <span style="color: #fff; font-size: 11px; font-weight: 700;">Clip A (Full Duration)</span>
+                  <!-- Needle pointer -->
+                  <div style="position: absolute; left: 50%; top: -6px; bottom: -6px; width: 2px; background: #f43f5e; box-shadow: 0 0 8px #f43f5e;">
+                    <div style="position: absolute; top: -4px; left: -4px; width: 10px; height: 10px; background: #f43f5e; transform: rotate(45deg);"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Arrow -->
+              <div style="text-align: center; color: #a855f7; font-size: 13px; font-weight: 800;">⬇️ Slices at red needle line</div>
+
+              <!-- After -->
+              <div>
+                <span style="font-size: 10.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">AFTER: 2 Independent Clips (Nothing Deleted!)</span>
+                <div style="display: flex; gap: 10px; height: 38px;">
+                  <div style="flex: 1; background: #3b82f6; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);">
+                    <span style="color: #fff; font-size: 11px; font-weight: 700;">Part 1</span>
+                  </div>
+                  <div style="flex: 1; background: #6366f1; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);">
+                    <span style="color: #fff; font-size: 11px; font-weight: 700;">Part 2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <p style="margin: 0; font-size: 11.5px; color: #cbd5e1; line-height: 1.4;">
+              💡 <strong>When to use:</strong> When you want to divide a video into two pieces so you can apply different effects, text, or color grades to only one half.
+            </p>
+            <button type="button" class="btn btn-primary btn-sm btn-guide-do-action" data-action="split" style="background: #8b5cf6; color: #fff; font-weight: 700; white-space: nowrap; margin-left: 12px;">
+              Split Here Now ✂️
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab 2: TRIM -->
+        <div id="guide-content-trim" class="guide-content-panel" style="display: none;">
+          <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Visual Graphic Diagram:</span>
+              <span style="font-size: 10.5px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">Shortcuts: [ or ]</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Before -->
+              <div>
+                <span style="font-size: 10.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">BEFORE: Long Clip with Dead Air / Pauses</span>
+                <div style="height: 38px; background: rgba(56, 189, 248, 0.15); border: 1px dashed rgba(56, 189, 248, 0.4); border-radius: 6px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px;">
+                  <span style="color: #ef4444; font-size: 10.5px; font-weight: 600;">[ Unwanted intro ]</span>
+                  <span style="color: #38bdf8; font-size: 11px; font-weight: 700;">Good Vocal Segment</span>
+                  <span style="color: #ef4444; font-size: 10.5px; font-weight: 600;">[ Unwanted silence ]</span>
+                </div>
+              </div>
+
+              <!-- Action Indicator -->
+              <div style="text-align: center; color: #38bdf8; font-size: 13px; font-weight: 800;">↔️ Drag outer handles inward to shorten start/end</div>
+
+              <!-- After -->
+              <div>
+                <span style="font-size: 10.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">AFTER: Clean, Shortened Clip (Ends trimmed)</span>
+                <div style="display: flex; justify-content: center;">
+                  <div style="width: 60%; height: 38px; background: #0284c7; border-radius: 6px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);">
+                    <div style="width: 4px; height: 16px; background: #fff; border-radius: 2px;"></div>
+                    <span style="color: #fff; font-size: 11px; font-weight: 700;">Clean Trimmed Clip</span>
+                    <div style="width: 4px; height: 16px; background: #fff; border-radius: 2px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <p style="margin: 0; font-size: 11.5px; color: #cbd5e1; line-height: 1.4;">
+              💡 <strong>When to use:</strong> To remove empty pauses at the beginning or end of your speech without touching anything in the middle.
+            </p>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="btn btn-secondary btn-sm btn-guide-do-action" data-action="trim-start" style="font-size: 11px; white-space: nowrap;">Trim Start [</button>
+              <button type="button" class="btn btn-primary btn-sm btn-guide-do-action" data-action="trim-end" style="background: #0284c7; font-size: 11px; white-space: nowrap;">Trim End ]</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: CUT -->
+        <div id="guide-content-cut" class="guide-content-panel" style="display: none;">
+          <div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <span style="font-size: 11px; font-weight: 700; color: #f43f5e; text-transform: uppercase;">Visual Graphic Diagram: Select 1 & 2</span>
+              <span style="font-size: 10.5px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">Shortcut: X or Del</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Step 1 & 2 selection visual -->
+              <div>
+                <span style="font-size: 10.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">STEP: Mark Point (1) and Point (2) where mistake happened</span>
+                <div style="display: flex; height: 38px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.15);">
+                  <div style="flex: 1; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10.5px; font-weight: 700;">
+                    Good Talk
+                  </div>
+                  <!-- Selected segment between 1 and 2 -->
+                  <div style="flex: 1.2; background: rgba(244, 63, 94, 0.25); border-left: 2px solid #f43f5e; border-right: 2px solid #f43f5e; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+                    <div style="position: absolute; left: 2px; top: 2px; font-size: 9px; font-weight: 800; background: #f43f5e; color: #fff; border-radius: 3px; padding: 1px 3px;">① Start Cut</div>
+                    <div style="position: absolute; right: 2px; top: 2px; font-size: 9px; font-weight: 800; background: #f43f5e; color: #fff; border-radius: 3px; padding: 1px 3px;">② End Cut</div>
+                    <span style="color: #f87171; font-size: 10.5px; font-weight: 700; margin-top: 10px;">❌ "Umm..." Blooper Removed</span>
+                  </div>
+                  <div style="flex: 1; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10.5px; font-weight: 700;">
+                    Good Talk
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action indicator -->
+              <div style="text-align: center; color: #f43f5e; font-size: 13px; font-weight: 800;">🗑️ The middle section is removed and remaining clips snap together</div>
+
+              <!-- After -->
+              <div>
+                <span style="font-size: 10.5px; color: #64748b; font-weight: 600; margin-bottom: 4px; display: block;">AFTER: Smooth Speech (Seamless Join)</span>
+                <div style="height: 38px; background: #2563eb; border-radius: 6px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);">
+                  <span style="color: #fff; font-size: 11px; font-weight: 700;">✓ Perfect Continuous Sentence (Blooper Gone!)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <p style="margin: 0; font-size: 11.5px; color: #cbd5e1; line-height: 1.4;">
+              💡 <strong>When to use:</strong> Split at <strong>Point 1</strong>, split at <strong>Point 2</strong>, then click <strong>Cut / Delete</strong> to remove the mistake in between.
+            </p>
+            <button type="button" class="btn btn-primary btn-sm btn-guide-do-action" data-action="cut" style="background: #e11d48; color: #fff; font-weight: 700; white-space: nowrap; margin-left: 12px;">
+              Cut Selected Segment ✂️
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer Quick Summary Pills -->
+      <div style="padding: 12px 20px; background: rgba(0,0,0,0.4); border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 8px;">
+          <span style="font-size: 10.5px; color: #94a3b8;">Summary:</span>
+          <span style="font-size: 10.5px; color: #c084fc; font-weight: 600;">Split = 1 ➔ 2</span>
+          <span style="font-size: 10.5px; color: #64748b;">•</span>
+          <span style="font-size: 10.5px; color: #38bdf8; font-weight: 600;">Trim = Outer Edges</span>
+          <span style="font-size: 10.5px; color: #64748b;">•</span>
+          <span style="font-size: 10.5px; color: #f43f5e; font-weight: 600;">Cut = Delete Middle</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-done-visual-clip-guide" style="font-size: 11.5px; border-radius: 7px; padding: 4px 14px;">Got It!</button>
+      </div>
+
     </div>
   </div>
 

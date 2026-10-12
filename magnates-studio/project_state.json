@@ -1,7 +1,7 @@
 {
   "text": [
     {
-      "id": "txt-1791809019799-4krt",
+      "id": "txt-1791815015150-3op6",
       "text": "MAGNATES",
       "highlight": "MAGNATES",
       "highlightColor": "#ff334b",
@@ -24,7 +24,7 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791809019799-8zuk",
+      "id": "img-bg-1791815015150-hjop",
       "start": 0,
       "duration": 6,
       "layerOrder": "back",
@@ -37,9 +37,9 @@
       }
     },
     {
-      "id": "img-fg-1791809019799-t5x9",
-      "start": 0,
-      "duration": 6,
+      "id": "img-fg-1791815015150-8jio",
+      "start": 0.2567766240926215,
+      "duration": 0.2,
       "layerOrder": "front",
       "zIndex": 40,
       "scale": 1.05,
@@ -54,10 +54,10 @@
   "video": [],
   "voiceover": [
     {
-      "id": "clip-voiceover-1791218194867-325",
+      "id": "clip-voiceover-1791809492103",
       "track": "voiceover",
-      "start": 1,
-      "duration": 368.144014,
+      "start": 83.88594703455725,
+      "duration": 285.25806696544277,
       "volume": 100,
       "soundEnabled": true,
       "layerOrder": "back",
@@ -76,7 +76,7 @@
     {
       "id": "clip-bg-default",
       "start": 0,
-      "duration": 60,
+      "duration": 10.30453374730022,
       "bgType": "cyber_grid",
       "bgColor": "#0a0b0e",
       "filter": "negative",
@@ -84,9 +84,9 @@
       "filterIntensity": 100
     }
   ],
-  "currentTime": 0,
+  "currentTime": 17.636776624092626,
   "duration": 368.144014,
-  "savedAt": 1791809090142,
-  "projectName": "New Project 32",
-  "projectId": "proj_1791809020825_dogg"
+  "savedAt": 1791815117143,
+  "projectName": "New Project 40",
+  "projectId": "proj_1791815017522_on69"
 }

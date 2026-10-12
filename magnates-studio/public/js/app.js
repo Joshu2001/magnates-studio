@@ -5312,8 +5312,29 @@ function splitClipAtTime(trackType, clip, splitTime) {
   timelineClips[trackType].push(secondHalf);
   timelineClips[trackType].sort((a, b) => a.start - b.start);
 
+  // If there are storyboard scenes (e.g., Scene 1), split the active scene into Scene 1 and Scene 2
+  if (Array.isArray(window.projectScenes) && window.projectScenes.length > 0) {
+    const scIdx = window.projectScenes.findIndex(sc => splitTime > sc.start && splitTime < (sc.start + sc.duration));
+    if (scIdx !== -1) {
+      const parentSc = window.projectScenes[scIdx];
+      const origScEnd = parentSc.start + parentSc.duration;
+      const firstScDur = splitTime - parentSc.start;
+      const secondScDur = origScEnd - splitTime;
+      parentSc.duration = firstScDur;
+
+      const secondSc = JSON.parse(JSON.stringify(parentSc));
+      secondSc.id = `scene-${Date.now()}`;
+      secondSc.start = splitTime;
+      secondSc.duration = secondScDur;
+      secondSc.title = `Scene ${window.projectScenes.length + 1}`;
+      window.projectScenes.splice(scIdx + 1, 0, secondSc);
+      if (typeof refreshTimelineScenesUI === 'function') refreshTimelineScenesUI();
+    }
+  }
+
   recordState('Split Clip');
   renderAllTimelineTracks();
+  if (typeof refreshTimelineScenesUI === 'function') refreshTimelineScenesUI();
   selectClip(secondHalf, trackType);
   return true;
 }
@@ -18154,6 +18175,7 @@ function findClipUnderPlayhead() {
 }
 
 function executeStudioSplit(atTime = currentTime) {
+  // 1. If a clip is explicitly selected and playhead is inside it, split that clip
   if (selectedClip && selectedClip.clip) {
     const { trackType, clip } = selectedClip;
     if (isTrackLocked(trackType)) {
@@ -18162,23 +18184,36 @@ function executeStudioSplit(atTime = currentTime) {
       return false;
     }
     if (atTime > clip.start && atTime < (clip.start + clip.duration)) {
+      // If there are background or paired layers belonging to this scene (e.g. background environment), split them synchronously
+      const sisterClips = (timelineClips[trackType] || []).filter(c => c.id !== clip.id && atTime > c.start && atTime < (c.start + c.duration));
+      sisterClips.forEach(c => splitClipAtTime(trackType, c, atTime));
+
       if (splitClipAtTime(trackType, clip, atTime)) {
-        showTextTimingAlert('Split clip at ' + formatTimecode(atTime), 'success');
+        showTextTimingAlert('Split clip into two at ' + formatTimecode(atTime), 'success');
         setTimeout(() => showTextTimingAlert(''), 1500);
         return true;
       }
     }
   }
 
-  const hit = findClipUnderPlayhead();
-  if (hit) {
-    if (atTime > hit.clip.start && atTime < (hit.clip.start + hit.clip.duration)) {
-      if (splitClipAtTime(hit.trackType, hit.clip, atTime)) {
-        showTextTimingAlert(`Split ${hit.trackType} clip at ` + formatTimecode(atTime), 'success');
-        setTimeout(() => showTextTimingAlert(''), 1500);
-        return true;
+  // 2. If playhead is inside clips, split all visual clips at playhead (so foreground + background split together)
+  let splitCount = 0;
+  ['video', 'image', 'chart', 'text'].forEach(track => {
+    if (isTrackLocked(track)) return;
+    const clips = (timelineClips[track] || []).slice();
+    clips.forEach(c => {
+      if (atTime > c.start && atTime < (c.start + c.duration)) {
+        if (splitClipAtTime(track, c, atTime)) {
+          splitCount++;
+        }
       }
-    }
+    });
+  });
+
+  if (splitCount > 0) {
+    showTextTimingAlert(`Split into two scenes at ` + formatTimecode(atTime), 'success');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+    return true;
   }
 
   setStudioTool('split');
@@ -36997,12 +37032,506 @@ function setupFormatSwitcherEvents() {
 setTimeout(() => {
   initHomepageTemplateEvents();
   setupFormatSwitcherEvents();
+  initVisualClipGuideSystem();
 }, 100);
 
+// ==================== INTERACTIVE VISUAL EDITING GUIDE (SPLIT / TRIM / CUT) ====================
+function openVisualClipGuide(defaultTab = 'split') {
+  const modal = document.getElementById('modal-visual-clip-guide');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  switchVisualGuideTab(defaultTab);
+}
 
+function closeVisualClipGuide() {
+  const modal = document.getElementById('modal-visual-clip-guide');
+  if (modal) modal.style.display = 'none';
+}
 
+function switchVisualGuideTab(tabName) {
+  document.querySelectorAll('.visual-guide-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.guideTab === tabName);
+  });
+  document.querySelectorAll('.guide-content-panel').forEach(p => {
+    p.style.display = 'none';
+  });
+  const activePanel = document.getElementById(`guide-content-${tabName}`);
+  if (activePanel) activePanel.style.display = 'block';
+}
 
+function initVisualClipGuideSystem() {
+  // Modal open/close listeners
+  document.querySelectorAll('.visual-guide-trigger-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openVisualClipGuide('split');
+    });
+  });
 
+  document.getElementById('btn-close-visual-clip-guide')?.addEventListener('click', closeVisualClipGuide);
+  document.getElementById('btn-done-visual-clip-guide')?.addEventListener('click', closeVisualClipGuide);
+  document.getElementById('modal-visual-clip-guide')?.addEventListener('click', (e) => {
+    if (e.target.id === 'modal-visual-clip-guide') closeVisualClipGuide();
+  });
 
+  // Tab switching inside modal
+  document.querySelectorAll('.visual-guide-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.stopPropagation();
+      switchVisualGuideTab(tab.dataset.guideTab);
+    });
+  });
 
+  // Direct action buttons inside modal
+  document.querySelectorAll('.btn-guide-do-action').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const action = btn.dataset.action;
+      closeVisualClipGuide();
+      if (action === 'split') {
+        if (typeof executeStudioSplit === 'function') executeStudioSplit();
+      } else if (action === 'trim-start') {
+        if (typeof executeStudioTrimStart === 'function') executeStudioTrimStart();
+      } else if (action === 'trim-end') {
+        if (typeof executeStudioTrimEnd === 'function') executeStudioTrimEnd();
+      } else if (action === 'cut') {
+        if (typeof executeStudioCut === 'function') executeStudioCut();
+      }
+    });
+  });
+
+  // Wire up Top Toolbar buttons
+  document.getElementById('cbar-act-trim')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCanvaFilmstripTrimmer('trim');
+  });
+  document.getElementById('cbar-act-cut')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCanvaFilmstripTrimmer('cut');
+  });
+  document.getElementById('cbar-media-duration')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCanvaFilmstripTrimmer('trim');
+  });
+
+  // Wire up Timeline Storyboard sequence bar buttons
+  document.getElementById('btn-tl-split')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (typeof executeStudioSplit === 'function') executeStudioSplit();
+  });
+  document.getElementById('btn-tl-trim')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCanvaFilmstripTrimmer('trim');
+  });
+  document.getElementById('btn-tl-cut')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openCanvaFilmstripTrimmer('cut');
+  });
+  document.getElementById('btn-tl-guide')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openVisualClipGuide('split');
+  });
+
+  // Initialize Canva Filmstrip Trimmer controller
+  initCanvaFilmstripTrimmer();
+
+  // Hotkeys: 'S' splits at playhead, '[' trims start, ']' trims end, 'Del' deletes clip
+  window.addEventListener('keydown', (e) => {
+    const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable;
+    if (isInput) return;
+    if (e.key === 's' || e.key === 'S') {
+      if (typeof executeStudioSplit === 'function') executeStudioSplit();
+    } else if (e.key === '[') {
+      if (typeof executeStudioTrimStart === 'function') executeStudioTrimStart();
+    } else if (e.key === ']') {
+      if (typeof executeStudioTrimEnd === 'function') executeStudioTrimEnd();
+    }
+  });
+}
+
+// ==================== CANVA-STYLE TOP PRECISION FILMSTRIP TRIMMER CONTROLLER ====================
+let canvaTrimmerState = {
+  isOpen: false,
+  mode: 'trim', // 'trim' or 'cut'
+  target: null, // { trackType, clip }
+  clipStart: 0,
+  clipDuration: 0,
+  trimStartSec: 0,
+  trimEndSec: 0,
+  draggingHandle: null // 'left' | 'right' | null
+};
+
+function openCanvaFilmstripTrimmer(mode = 'trim') {
+  let target = selectedClip;
+  if (!target || !target.clip) {
+    target = findClipUnderPlayhead();
+  }
+  if (!target || !target.clip) {
+    if (typeof showTextTimingAlert === 'function') {
+      showTextTimingAlert(`Select a clip first to ${mode}.`, 'warning');
+      setTimeout(() => showTextTimingAlert(''), 2200);
+    }
+    return;
+  }
+
+  const { trackType, clip } = target;
+  if (typeof isTrackLocked === 'function' && isTrackLocked(trackType)) {
+    if (typeof showTextTimingAlert === 'function') {
+      showTextTimingAlert('Track is locked.', 'warning');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+    }
+    return;
+  }
+
+  const trimmerBar = document.getElementById('canva-top-filmstrip-trimmer');
+  if (!trimmerBar) return;
+
+  canvaTrimmerState.isOpen = true;
+  canvaTrimmerState.mode = mode;
+  canvaTrimmerState.target = target;
+  canvaTrimmerState.clipStart = clip.start;
+  canvaTrimmerState.clipDuration = clip.duration;
+  canvaTrimmerState.trimStartSec = clip.start;
+  canvaTrimmerState.trimEndSec = clip.start + clip.duration;
+
+  // Update UI mode badges and labels
+  const modeBadge = document.getElementById('c-trimmer-mode-badge');
+  const doneBtnLabel = document.getElementById('label-c-trimmer-done-btn');
+  if (modeBadge) {
+    modeBadge.textContent = mode.toUpperCase();
+    modeBadge.style.background = mode === 'cut' ? '#ef4444' : '#7c3aed';
+  }
+  if (doneBtnLabel) {
+    doneBtnLabel.textContent = mode === 'cut' ? 'Cut Section' : 'Done Trim';
+  }
+
+  // Ensure Player HUD seek scrubber stays visible and interactive
+  const playerHud = document.getElementById('studio-main-player-hud');
+  if (playerHud) playerHud.classList.add('active');
+
+  // Display trimmer bar
+  trimmerBar.style.display = 'flex';
+
+  // Render thumbnails and update boundary handles
+  renderCanvaTrimmerFilmstrip(clip, trackType);
+  updateCanvaTrimmerSelectionUI();
+
+  // If playhead is outside the clip, seek to clip start
+  if (currentTime < clip.start || currentTime > clip.start + clip.duration) {
+    if (typeof seekToTime === 'function') seekToTime(clip.start);
+  }
+}
+
+function closeCanvaFilmstripTrimmer() {
+  const trimmerBar = document.getElementById('canva-top-filmstrip-trimmer');
+  if (trimmerBar) trimmerBar.style.display = 'none';
+  canvaTrimmerState.isOpen = false;
+  canvaTrimmerState.draggingHandle = null;
+
+  // Remove persistent active HUD class
+  const playerHud = document.getElementById('studio-main-player-hud');
+  if (playerHud) playerHud.classList.remove('active');
+}
+
+function renderCanvaTrimmerFilmstrip(clip, trackType) {
+  const strip = document.getElementById('c-trimmer-frames-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+
+  const numFrames = 14;
+
+  // 1. First priority: Check if main studio canvas has full composite (background + text + cutout subject)
+  const mainCanvas = document.getElementById('previewCanvas');
+  let compositeSnapshot = null;
+  if (mainCanvas && mainCanvas.width > 0 && mainCanvas.height > 0) {
+    try {
+      compositeSnapshot = mainCanvas.toDataURL('image/jpeg', 0.8);
+    } catch (e) {}
+  }
+
+  // 2. Resolve background environment image if present (so background is never missing)
+  const bgClip = (timelineClips.image || []).find(c => c.isBackgroundScene || c.parallaxRig === 'bg');
+  const bgUrl = bgClip?.file?.url || bgClip?.url || window.topCustomizerState?.secondaryUrl || (window.projectScenes && window.projectScenes[0]?.sec) || '';
+
+  // 3. Resolve cutout/foreground image
+  let fgUrl = clip.file?.url || clip.url || '';
+  if (clip.cutoutCanvas instanceof HTMLCanvasElement) {
+    try { fgUrl = clip.cutoutCanvas.toDataURL('image/png'); } catch (e) {}
+  } else if (window.topCustomizerState?.cutoutCanvas instanceof HTMLCanvasElement) {
+    try { fgUrl = window.topCustomizerState.cutoutCanvas.toDataURL('image/png'); } catch (e) {}
+  }
+
+  // 4. Render filmstrip cells showing full composition
+  for (let i = 0; i < numFrames; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'c-trimmer-thumb-cell';
+    cell.style.position = 'relative';
+    cell.style.overflow = 'hidden';
+
+    if (compositeSnapshot) {
+      // Full rendered composite from the stage (shows background, text behind, and subject cutout together!)
+      cell.style.backgroundImage = `url("${compositeSnapshot}")`;
+      cell.style.backgroundSize = 'cover';
+      cell.style.backgroundPosition = 'center';
+    } else if (bgUrl) {
+      // Layer background environment as base
+      cell.style.backgroundImage = `url("${bgUrl}")`;
+      cell.style.backgroundSize = 'cover';
+      cell.style.backgroundPosition = 'center';
+
+      // If foreground cutout exists, overlay it centered on top of background
+      if (fgUrl) {
+        const fgOverlay = document.createElement('div');
+        fgOverlay.style.position = 'absolute';
+        fgOverlay.style.inset = '0';
+        fgOverlay.style.backgroundImage = `url("${fgUrl}")`;
+        fgOverlay.style.backgroundSize = 'contain';
+        fgOverlay.style.backgroundRepeat = 'no-repeat';
+        fgOverlay.style.backgroundPosition = 'center';
+        fgOverlay.style.pointerEvents = 'none';
+        cell.appendChild(fgOverlay);
+      }
+    } else if (fgUrl) {
+      cell.style.backgroundImage = `url("${fgUrl}")`;
+      cell.style.backgroundSize = 'contain';
+      cell.style.backgroundRepeat = 'no-repeat';
+      cell.style.backgroundPosition = 'center';
+      cell.style.backgroundColor = '#181b2a';
+    } else {
+      const frameSec = clip.start + (i / (numFrames - 1 || 1)) * clip.duration;
+      cell.style.background = `linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95))`;
+      cell.style.color = '#94a3b8';
+      cell.style.fontSize = '10px';
+      cell.style.fontWeight = '600';
+      cell.textContent = frameSec.toFixed(1) + 's';
+    }
+    strip.appendChild(cell);
+  }
+}
+
+function updateCanvaTrimmerSelectionUI() {
+  const { clipStart, clipDuration, trimStartSec, trimEndSec } = canvaTrimmerState;
+  if (!clipDuration || clipDuration <= 0) return;
+
+  const leftPct = Math.max(0, Math.min(100, ((trimStartSec - clipStart) / clipDuration) * 100));
+  const rightPct = Math.max(0, Math.min(100, ((trimEndSec - clipStart) / clipDuration) * 100));
+  const widthPct = Math.max(0, rightPct - leftPct);
+
+  const selBox = document.getElementById('c-trimmer-active-selection');
+  const dimLeft = document.getElementById('c-trimmer-dim-left');
+  const dimRight = document.getElementById('c-trimmer-dim-right');
+  const durDisplay = document.getElementById('c-trimmer-duration-display');
+
+  if (selBox) {
+    selBox.style.left = `${leftPct}%`;
+    selBox.style.width = `${widthPct}%`;
+  }
+  if (dimLeft) {
+    dimLeft.style.width = `${leftPct}%`;
+  }
+  if (dimRight) {
+    dimRight.style.width = `${100 - rightPct}%`;
+  }
+  if (durDisplay) {
+    const selectedDur = Math.max(0, trimEndSec - trimStartSec);
+    durDisplay.textContent = `${selectedDur.toFixed(1)}s`;
+  }
+
+  // Update playhead line position relative to selection box
+  const playheadLine = document.getElementById('c-trimmer-playhead-line');
+  if (playheadLine) {
+    const relPlayhead = (currentTime - trimStartSec) / (Math.max(0.001, trimEndSec - trimStartSec));
+    if (relPlayhead >= 0 && relPlayhead <= 1) {
+      playheadLine.style.display = 'block';
+      playheadLine.style.left = `${relPlayhead * 100}%`;
+    } else {
+      playheadLine.style.display = 'none';
+    }
+  }
+}
+
+function applyCanvaTrimmerDone() {
+  const { mode, target, trimStartSec, trimEndSec, clipStart, clipDuration } = canvaTrimmerState;
+  if (!target || !target.clip) {
+    closeCanvaFilmstripTrimmer();
+    return;
+  }
+
+  const { trackType, clip } = target;
+
+  if (mode === 'trim') {
+    // Trim Start and End
+    const trimmedStartDelta = trimStartSec - clip.start;
+    const newDuration = Math.max(0.1, trimEndSec - trimStartSec);
+    clip.start = trimStartSec;
+    clip.duration = newDuration;
+
+    if (clip.file && typeof clip.file.inPoint === 'number') {
+      clip.file.inPoint += Math.max(0, trimmedStartDelta);
+    }
+
+    if (timelineClips[trackType]) {
+      timelineClips[trackType].sort((a, b) => a.start - b.start);
+    }
+    if (typeof recordState === 'function') recordState('Precision Filmstrip Trim');
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof selectClip === 'function') selectClip(clip, trackType);
+    if (typeof showTextTimingAlert === 'function') {
+      showTextTimingAlert(`Trimmed to ${newDuration.toFixed(1)}s`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    }
+  } else if (mode === 'cut') {
+    // Cut the selected range [trimStartSec, trimEndSec] from the clip
+    const cutStart = Math.max(clip.start, trimStartSec);
+    const cutEnd = Math.min(clip.start + clip.duration, trimEndSec);
+
+    if (cutStart <= clip.start + 0.05 && cutEnd >= clip.start + clip.duration - 0.05) {
+      // Cut entire clip
+      if (typeof executeStudioDelete === 'function') executeStudioDelete();
+    } else if (cutStart <= clip.start + 0.05) {
+      // Cut off starting segment
+      const removedDur = cutEnd - clip.start;
+      clip.start = cutEnd;
+      clip.duration = Math.max(0.1, clip.duration - removedDur);
+      if (clip.file && typeof clip.file.inPoint === 'number') clip.file.inPoint += removedDur;
+    } else if (cutEnd >= clip.start + clip.duration - 0.05) {
+      // Cut off trailing segment
+      clip.duration = Math.max(0.1, cutStart - clip.start);
+    } else {
+      // Cut middle section: split into two parts and remove center
+      const part1Duration = cutStart - clip.start;
+      const part2Start = cutEnd;
+      const part2Duration = (clip.start + clip.duration) - cutEnd;
+
+      const secondHalf = JSON.parse(JSON.stringify(clip));
+      secondHalf.id = `clip-${trackType}-${Date.now()}`;
+      secondHalf.start = part2Start;
+      secondHalf.duration = part2Duration;
+      if (secondHalf.file && typeof secondHalf.file.inPoint === 'number') {
+        secondHalf.file.inPoint += (cutEnd - clip.start);
+      }
+
+      clip.duration = part1Duration;
+      if (!timelineClips[trackType]) timelineClips[trackType] = [];
+      timelineClips[trackType].push(secondHalf);
+    }
+
+    if (timelineClips[trackType]) {
+      timelineClips[trackType].sort((a, b) => a.start - b.start);
+    }
+    if (typeof recordState === 'function') recordState('Cut Selected Section');
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof showTextTimingAlert === 'function') {
+      showTextTimingAlert(`Cut ${(cutEnd - cutStart).toFixed(1)}s section from clip`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    }
+  }
+
+  closeCanvaFilmstripTrimmer();
+  if (typeof renderCanvas === 'function') renderCanvas();
+}
+
+function initCanvaFilmstripTrimmer() {
+  const trimmerBar = document.getElementById('canva-top-filmstrip-trimmer');
+  const trackContainer = document.getElementById('c-trimmer-track-container');
+  const handleLeft = document.getElementById('c-trimmer-handle-left');
+  const handleRight = document.getElementById('c-trimmer-handle-right');
+  const doneBtn = document.getElementById('btn-c-trimmer-done');
+  const closeBtn = document.getElementById('btn-c-trimmer-close');
+  const playBtn = document.getElementById('btn-c-trimmer-play');
+
+  if (!trimmerBar || !trackContainer) return;
+
+  doneBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    applyCanvaTrimmerDone();
+  });
+
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeCanvaFilmstripTrimmer();
+  });
+
+  playBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (typeof togglePlayPause === 'function') {
+      togglePlayPause();
+    }
+  });
+
+  // Handle Dragging
+  const onPointerDown = (handleSide, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    canvaTrimmerState.draggingHandle = handleSide;
+    document.body.style.cursor = 'ew-resize';
+    (handleSide === 'left' ? handleLeft : handleRight)?.classList.add('dragging');
+
+    const onPointerMove = (moveEv) => {
+      if (!canvaTrimmerState.draggingHandle) return;
+      const rect = trackContainer.getBoundingClientRect();
+      const clientX = moveEv.clientX || (moveEv.touches && moveEv.touches[0]?.clientX) || 0;
+      let ratio = (clientX - rect.left) / rect.width;
+      ratio = Math.max(0, Math.min(1, ratio));
+
+      const { clipStart, clipDuration } = canvaTrimmerState;
+      const targetSec = clipStart + ratio * clipDuration;
+
+      if (canvaTrimmerState.draggingHandle === 'left') {
+        canvaTrimmerState.trimStartSec = Math.min(targetSec, canvaTrimmerState.trimEndSec - 0.2);
+        canvaTrimmerState.trimStartSec = Math.max(clipStart, canvaTrimmerState.trimStartSec);
+        if (typeof seekToTime === 'function') seekToTime(canvaTrimmerState.trimStartSec);
+      } else if (canvaTrimmerState.draggingHandle === 'right') {
+        canvaTrimmerState.trimEndSec = Math.max(targetSec, canvaTrimmerState.trimStartSec + 0.2);
+        canvaTrimmerState.trimEndSec = Math.min(clipStart + clipDuration, canvaTrimmerState.trimEndSec);
+        if (typeof seekToTime === 'function') seekToTime(canvaTrimmerState.trimEndSec);
+      }
+
+      updateCanvaTrimmerSelectionUI();
+    };
+
+    const onPointerUp = () => {
+      canvaTrimmerState.draggingHandle = null;
+      document.body.style.cursor = '';
+      handleLeft?.classList.remove('dragging');
+      handleRight?.classList.remove('dragging');
+      window.removeEventListener('mousemove', onPointerMove);
+      window.removeEventListener('mouseup', onPointerUp);
+      window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('touchend', onPointerUp);
+    };
+
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+    window.addEventListener('touchmove', onPointerMove);
+    window.addEventListener('touchend', onPointerUp);
+  };
+
+  handleLeft?.addEventListener('mousedown', (e) => onPointerDown('left', e));
+  handleLeft?.addEventListener('touchstart', (e) => onPointerDown('left', e), { passive: false });
+
+  handleRight?.addEventListener('mousedown', (e) => onPointerDown('right', e));
+  handleRight?.addEventListener('touchstart', (e) => onPointerDown('right', e), { passive: false });
+
+  // Clicking on filmstrip track to seek or position playhead
+  trackContainer.addEventListener('click', (e) => {
+    if (e.target.closest('.c-trimmer-handle')) return;
+    const rect = trackContainer.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const seekT = canvaTrimmerState.clipStart + ratio * canvaTrimmerState.clipDuration;
+    if (typeof seekToTime === 'function') seekToTime(seekT);
+    updateCanvaTrimmerSelectionUI();
+  });
+
+  // Hook into timeline update loop so trimmer playhead follows playback
+  const origUpdatePlayheadUI = window.updatePlayheadUI;
+  if (typeof origUpdatePlayheadUI === 'function') {
+    window.updatePlayheadUI = function(...args) {
+      origUpdatePlayheadUI.apply(this, args);
+      if (canvaTrimmerState.isOpen) {
+        updateCanvaTrimmerSelectionUI();
+      }
+    };
+  }
+}
 
