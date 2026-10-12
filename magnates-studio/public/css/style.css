@@ -1408,6 +1408,17 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reveal clip title text and badges only on hover or when clip is selected */
+.clip-block:hover .clip-block-content,
+.clip-block.is-selected .clip-block-content,
+.clip-block.is-dragging .clip-block-content {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* When clip has intra-clip effect bars, constrain content row to the upper half so title stays legible */
@@ -1417,7 +1428,7 @@ body {
   padding-top: 2px;
 }
 
-/* Timeline Clip Sub-Bars & Effect Badges */
+/* Timeline Clip Sub-Bars & Effect Badges (Reveals cleanly on hover) */
 .clip-fx-tracks {
   position: absolute;
   left: 0;
@@ -1428,6 +1439,17 @@ body {
   display: flex;
   align-items: center;
   pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.clip-block:hover .clip-fx-tracks,
+.clip-block.is-selected .clip-fx-tracks,
+.clip-block:has(.is-selected-fx) .clip-fx-tracks {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .clip-fx-bar {
@@ -3172,6 +3194,12 @@ canvas.tool-draw {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255, 255, 255, 0.1);
   overflow: hidden;
   animation: modalScaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.vector-modal-box.customizer-wide-box {
+  max-width: 920px !important;
+  width: 100% !important;
+  flex: 0 0 920px !important;
 }
 
 .vector-modal-header {
@@ -6720,6 +6748,112 @@ body.tool-slide-active {
   color: #e9d5ff;
 }
 
+/* Template Card Hover Share Button */
+.home-tpl-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  background: rgba(139, 92, 246, 0.15);
+  color: #d8b4fe;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.home-tpl-card:hover .home-tpl-share-btn {
+  opacity: 1;
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(168, 85, 247, 0.6);
+}
+
+.home-tpl-share-btn:hover {
+  background: #8b5cf6 !important;
+  color: #ffffff !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+}
+
+/* Timeline Scene Sequence Pills */
+.timeline-scene-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 10px 3px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.timeline-scene-pill:hover {
+  background: rgba(168, 85, 247, 0.22);
+  border-color: rgba(168, 85, 247, 0.55);
+  color: #f3e8ff;
+  max-width: 480px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), 0 0 14px rgba(168, 85, 247, 0.3);
+  z-index: 20;
+}
+
+.timeline-scene-pill.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(192, 132, 252, 0.28));
+  border-color: #a855f7;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.45);
+}
+
+.timeline-scene-pill-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: #000;
+  display: inline-block;
+}
+
+.timeline-scene-pill-title {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+  max-width: 140px;
+  transition: max-width 0.25s ease;
+}
+
+.timeline-scene-pill:hover .timeline-scene-pill-title {
+  max-width: 320px;
+}
+
+.timeline-scene-pill-time {
+  font-size: 9.5px;
+  font-family: ui-monospace, monospace;
+  color: #94a3b8;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-left: 2px;
+}
+
+.timeline-scene-pill.active .timeline-scene-pill-time {
+  color: #d8b4fe;
+}
+
 @keyframes pulsePreviewRed {
   0%, 100% {
     opacity: 1;
@@ -6835,6 +6969,17 @@ body.tool-slide-active {
   overflow: hidden !important;
 }
 
+.fx-card.accordion-card h4,
+.fx-card.accordion-card .fx-header label,
+.fx-card.accordion-card .fx-header span {
+  color: #f1f5f9 !important;
+}
+
+.fx-card.accordion-card .fx-header .ui-icon {
+  color: #00f0ff;
+  fill: currentColor;
+}
+
 .fx-card.accordion-card:hover {
   border-color: rgba(139, 92, 246, 0.35) !important;
   background: rgba(255, 255, 255, 0.03) !important;
@@ -6843,7 +6988,7 @@ body.tool-slide-active {
 .fx-card.accordion-card .fx-header {
   cursor: pointer;
   user-select: none;
-  padding: 2px 0;
+  padding: 4px 0;
   margin-bottom: 0 !important;
 }
 
@@ -7270,3 +7415,238 @@ body.tool-slide-active {
 .canva-footer-icon-btn svg {
   fill: currentColor;
 }
+
+@keyframes sidecardFloat {
+  0% { transform: translateY(2px) scale(0.98); }
+  100% { transform: translateY(-4px) scale(1.04); }
+}
+
+@keyframes sidecardRip {
+  0% { clip-path: polygon(0 0, 100% 0, 100% 10%, 0 18%); }
+  100% { clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%); }
+}
+
+@keyframes sidecardTilt {
+  0% { transform: perspective(400px) rotateY(-8deg) rotateX(4deg); }
+  100% { transform: perspective(400px) rotateY(8deg) rotateX(-4deg); }
+}
+
+@keyframes sidecardZoom {
+  0% { transform: scale(1.0); }
+  100% { transform: scale(1.1); }
+}
+
+
+/* Customizer Suite Sleek Scrollbars */
+#modal-top-template-customizer *::-webkit-scrollbar { width: 5px; height: 5px; }
+#modal-top-template-customizer *::-webkit-scrollbar-track { background: transparent; }
+#modal-top-template-customizer *::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 10px; }
+#modal-top-template-customizer *::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.4); }
+
+/* Layers & Media hover-only scrollbar */
+#tpl-modal-layers-panel {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.25s ease;
+}
+#tpl-modal-layers-panel::-webkit-scrollbar {
+  width: 5px;
+}
+#tpl-modal-layers-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+#tpl-modal-layers-panel::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+  transition: background 0.25s ease;
+}
+#tpl-modal-layers-panel:hover {
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+#tpl-modal-layers-panel:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+#tpl-modal-layers-panel:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.5);
+}
+
+/* YouTube-Style Player Floating HUD */
+.tpl-modal-player-hud,
+.studio-main-player-hud {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 24px 14px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.55) 60%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#tpl-modal-preview-stage-container:hover .tpl-modal-player-hud,
+#tpl-modal-preview-stage:hover .tpl-modal-player-hud,
+.canvas-wrapper:hover .studio-main-player-hud,
+#previewCanvas:hover ~ .studio-main-player-hud,
+.tpl-modal-player-hud:hover,
+.studio-main-player-hud:hover,
+.tpl-modal-player-hud.active,
+.studio-main-player-hud.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.studio-main-player-hud {
+  bottom: 46px;
+  max-width: 95%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0 0 8px 8px;
+}
+
+.canvas-wrapper:fullscreen .studio-main-player-hud,
+.canvas-wrapper:-webkit-full-screen .studio-main-player-hud,
+.canvas-wrapper.is-immersive-fallback .studio-main-player-hud {
+  bottom: 0 !important;
+  max-width: 100% !important;
+  border-radius: 0 !important;
+  padding-bottom: 24px !important;
+}
+
+.tpl-hud-scrubber-wrap {
+  width: 100%;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+}
+.tpl-hud-scrubber-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 4px;
+  position: relative;
+  transition: height 0.15s ease;
+}
+.tpl-hud-scrubber-wrap:hover .tpl-hud-scrubber-track {
+  height: 5px;
+}
+.tpl-hud-scrubber-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0%;
+  background: #a855f7;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.8);
+}
+.tpl-hud-scrubber-thumb {
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(0,0,0,0.8);
+  transform: translateY(-50%) scale(0);
+  transition: transform 0.15s ease;
+}
+.tpl-hud-scrubber-wrap:hover .tpl-hud-scrubber-thumb,
+.tpl-hud-scrubber-wrap.dragging .tpl-hud-scrubber-thumb {
+  transform: translateY(-50%) scale(1);
+}
+
+/* YouTube Floating Hover Timestamp & Thumbnail Tooltip */
+.tpl-hud-preview-tooltip {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  transform: translateX(-50%);
+  background: rgba(15, 17, 26, 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  color: #f1f5f9;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.8), 0 0 10px rgba(168, 85, 247, 0.3);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.tpl-hud-preview-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px 4px 0 4px;
+  border-style: solid;
+  border-color: rgba(15, 17, 26, 0.95) transparent transparent transparent;
+}
+.tpl-hud-scrubber-wrap:hover .tpl-hud-preview-tooltip,
+.tpl-hud-scrubber-wrap.dragging .tpl-hud-preview-tooltip {
+  opacity: 1;
+}
+
+.tpl-hud-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.tpl-hud-btn {
+  background: none;
+  border: none;
+  color: #f1f5f9;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.tpl-hud-btn:hover {
+  color: #c084fc;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Fullscreen Immersive Stage Mode for Modal Preview */
+#tpl-modal-preview-stage-container:fullscreen,
+#tpl-modal-preview-stage-container:-webkit-full-screen,
+#tpl-modal-preview-stage-container.is-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-height: none !important;
+  max-width: none !important;
+  z-index: 999999 !important;
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #000 !important;
+}
+
+#tpl-modal-preview-stage-container.is-fullscreen .tpl-modal-player-hud,
+#tpl-modal-preview-stage-container:fullscreen .tpl-modal-player-hud,
+#tpl-modal-preview-stage-container:-webkit-full-screen .tpl-modal-player-hud {
+  padding-bottom: 24px;
+}
+

@@ -1,9 +1,9 @@
 {
   "text": [
     {
-      "id": "txt-1791552658034",
-      "text": "MAGNATES",
-      "highlight": "MAGNATES",
+      "id": "txt-1791781867682-n9up",
+      "text": "2.5D",
+      "highlight": "2.5D",
       "highlightColor": "#ff334b",
       "anim": "pop",
       "fontSize": 68,
@@ -15,16 +15,29 @@
       "_renderBounds": {
         "x": 204,
         "y": 429.2,
-        "w": 327.109375,
+        "w": 164.74609375,
         "h": 113.59999999999997
       }
+    },
+    {
+      "id": "txt-1791781867684-9gc4",
+      "text": "James",
+      "highlight": "James",
+      "highlightColor": "#ff334b",
+      "anim": "pop",
+      "fontSize": 68,
+      "fontFamily": "Impact, sans-serif",
+      "zIndex": 10,
+      "layerOrder": "middle",
+      "start": 10,
+      "duration": 3
     }
   ],
   "chart": [],
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791552658032",
+      "id": "img-bg-1791781867682-zyn1",
       "start": 0,
       "duration": 6,
       "layerOrder": "back",
@@ -37,17 +50,60 @@
       }
     },
     {
-      "id": "img-fg-1791552658033",
+      "id": "img-fg-1791781867682-9utf",
       "start": 0,
       "duration": 6,
       "layerOrder": "front",
       "zIndex": 40,
+      "x": 0,
+      "y": 0,
       "scale": 1.05,
       "vectorEffect": false,
-      "vectorStrokeColor": "#ffffff",
       "file": {
         "name": "Custom_Cutout_Subject.png",
         "url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
+        "isImage": true
+      }
+    },
+    {
+      "id": "img-rev-1791781867683-bkrg",
+      "start": 6,
+      "duration": 4,
+      "layerOrder": "back",
+      "zIndex": 10,
+      "scale": 1.05,
+      "file": {
+        "name": "Custom_Revealed_Footage.jpg",
+        "url": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80",
+        "isImage": true
+      }
+    },
+    {
+      "id": "img-rip-1791781867683-5wa6",
+      "start": 6,
+      "duration": 4,
+      "layerOrder": "front",
+      "zIndex": 25,
+      "scale": 1.1,
+      "transition": "fly_through",
+      "transitionDuration": 1.2,
+      "file": {
+        "name": "Custom_Paper_Tear.jpg",
+        "url": "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80",
+        "isImage": true
+      }
+    },
+    {
+      "id": "img-1791781867683-07hi",
+      "start": 10,
+      "duration": 3,
+      "zIndex": 20,
+      "scale": 1.1,
+      "transition": "fly_through",
+      "transitionDuration": 1,
+      "file": {
+        "name": "James_Jani_Grunge_Text_&_Paper_Texture.jpg",
+        "url": "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80",
         "isImage": true
       }
     }
@@ -55,9 +111,9 @@
   "video": [],
   "voiceover": [
     {
-      "id": "clip-voiceover-1791174140873-123",
+      "id": "clip-voiceover-1791218194867-325",
       "track": "voiceover",
-      "start": 0,
+      "start": 1,
       "duration": 368.144014,
       "volume": 100,
       "soundEnabled": true,
@@ -75,16 +131,16 @@
   "music": [],
   "background": [
     {
-      "id": "bg-1",
+      "id": "clip-bg-default",
       "start": 0,
-      "duration": 15,
+      "duration": 60,
       "bgType": "cyber_grid",
       "bgColor": "#0a0b0e"
     }
   ],
-  "currentTime": 8.466666666666667,
+  "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791552745260,
-  "projectName": "New Project 18",
-  "projectId": "proj_1791552658515_ofjz"
+  "savedAt": 1791782624157,
+  "projectName": "New Project 12",
+  "projectId": "proj_1791781870591_n851"
 }

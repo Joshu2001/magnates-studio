@@ -2687,6 +2687,27 @@ function updateUI() {
   const playhead = document.getElementById('playhead');
   playhead.style.left = `${currentTime * pps}px`;
 
+  // Synchronize Main Studio YouTube-Style Floating HUD
+  const studioHudTime = document.getElementById('studio-hud-timecode');
+  if (studioHudTime) {
+    const curM = Math.floor(currentTime / 60);
+    const curS = Math.floor(currentTime % 60).toString().padStart(2, '0');
+    const totM = Math.floor((duration || 0) / 60);
+    const totS = Math.floor((duration || 0) % 60).toString().padStart(2, '0');
+    studioHudTime.textContent = `${curM}:${curS} / ${totM}:${totS}`;
+  }
+  const studioHudScrubberFill = document.getElementById('studio-hud-scrubber-fill');
+  if (studioHudScrubberFill && duration > 0) {
+    const pct = Math.min(100, Math.max(0, (currentTime / duration) * 100));
+    studioHudScrubberFill.style.width = `${pct}%`;
+  }
+  const iconPlay = document.getElementById('studio-hud-icon-play');
+  const iconPause = document.getElementById('studio-hud-icon-pause');
+  if (iconPlay && iconPause) {
+    iconPlay.style.display = isPlaying ? 'none' : 'block';
+    iconPause.style.display = isPlaying ? 'block' : 'none';
+  }
+
   // Update card progression bar under indicated file
   if (activeMediaFile && duration > 0) {
     const progId = `prog-${encodeURIComponent(activeMediaFile.name).replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -5864,8 +5885,89 @@ document.getElementById('btn-forward').addEventListener('click', () => {
   seekToTime(currentTime + 5);
 });
 
+// ==================== MAIN STUDIO FLOATING HUD CONTROLLER ====================
+const studioHudPlayBtn = document.getElementById('btn-studio-hud-play');
+studioHudPlayBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.getElementById('btn-play')?.click();
+});
+
+const studioHudReplayBtn = document.getElementById('btn-studio-hud-replay');
+studioHudReplayBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  seekToTime(0);
+});
+
+const studioHudExpandBtn = document.getElementById('btn-studio-hud-expand');
+studioHudExpandBtn?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  toggleCanvasFullscreen();
+});
+
+// Main Studio HUD Scrubber Drag & Hover Tooltip
+const studioScrubberWrap = document.getElementById('studio-hud-scrubber-wrap');
+const studioTooltip = document.getElementById('studio-hud-preview-tooltip');
+const studioTooltipTime = document.getElementById('studio-hud-tooltip-time');
+
+if (studioScrubberWrap) {
+  let isStudioScrubbing = false;
+
+  const getStudioScrubPctAndTarget = (clientX) => {
+    const rect = studioScrubberWrap.getBoundingClientRect();
+    const clickX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const pct = rect.width > 0 ? (clickX / rect.width) : 0;
+    const targetTime = pct * (duration || 0);
+    return { pct, targetTime, clickX };
+  };
+
+  const updateStudioTooltipPos = (clientX) => {
+    if (!studioTooltip) return;
+    const { targetTime, clickX } = getStudioScrubPctAndTarget(clientX);
+    studioTooltip.style.left = `${clickX}px`;
+    if (studioTooltipTime) {
+      const m = Math.floor(targetTime / 60);
+      const s = Math.floor(targetTime % 60).toString().padStart(2, '0');
+      const ms = Math.floor((targetTime % 1) * 10);
+      studioTooltipTime.textContent = `${m}:${s}.${ms}`;
+    }
+  };
+
+  studioScrubberWrap.addEventListener('mousemove', (e) => {
+    updateStudioTooltipPos(e.clientX);
+  });
+
+  studioScrubberWrap.addEventListener('mousedown', (e) => {
+    isStudioScrubbing = true;
+    studioScrubberWrap.classList.add('dragging');
+    const { targetTime } = getStudioScrubPctAndTarget(e.clientX);
+    seekToTime(targetTime);
+    updateStudioTooltipPos(e.clientX);
+
+    const onStudioMouseMove = (moveEvt) => {
+      if (!isStudioScrubbing) return;
+      const { targetTime: moveTarget } = getStudioScrubPctAndTarget(moveEvt.clientX);
+      seekToTime(moveTarget);
+      updateStudioTooltipPos(moveEvt.clientX);
+    };
+
+    const onStudioMouseUp = (upEvt) => {
+      if (isStudioScrubbing) {
+        isStudioScrubbing = false;
+        studioScrubberWrap.classList.remove('dragging');
+        const { targetTime: finalTarget } = getStudioScrubPctAndTarget(upEvt.clientX);
+        seekToTime(finalTarget);
+      }
+      window.removeEventListener('mousemove', onStudioMouseMove);
+      window.removeEventListener('mouseup', onStudioMouseUp);
+    };
+
+    window.addEventListener('mousemove', onStudioMouseMove);
+    window.addEventListener('mouseup', onStudioMouseUp);
+  });
+}
+
 // FX Toggle Handlers
-document.getElementById('fx-grid-enable').addEventListener('change', (e) => {
+document.getElementById('fx-grid-enable')?.addEventListener('change', (e) => {
   fxState.grid.enabled = e.target.checked;
 });
 document.getElementById('fx-grid-depth').addEventListener('input', (e) => {
@@ -5918,13 +6020,13 @@ gridGlowSlider?.addEventListener('input', (e) => {
   if (gridGlowVal) gridGlowVal.textContent = `${pct}%`;
 });
 
-document.getElementById('fx-particles-enable').addEventListener('change', (e) => {
+document.getElementById('fx-particles-enable')?.addEventListener('change', (e) => {
   fxState.particles.enabled = e.target.checked;
 });
-document.getElementById('fx-particles-count').addEventListener('input', (e) => {
+document.getElementById('fx-particles-count')?.addEventListener('input', (e) => {
   fxState.particles.count = parseInt(e.target.value);
 });
-document.getElementById('fx-fire-glow').addEventListener('input', (e) => {
+document.getElementById('fx-fire-glow')?.addEventListener('input', (e) => {
   fxState.particles.glow = parseInt(e.target.value) / 100;
 });
 
@@ -5963,7 +6065,7 @@ btnFirePurple?.addEventListener('click', () => setFireColor('#b55fe6'));
 btnFireGreen?.addEventListener('click', () => setFireColor('#00e676'));
 
 
-document.getElementById('fx-silhouette-enable').addEventListener('change', (e) => {
+document.getElementById('fx-silhouette-enable')?.addEventListener('change', (e) => {
   fxState.silhouette.enabled = e.target.checked;
 });
 document.getElementById('btn-sil-white').addEventListener('click', (e) => {
@@ -5996,9 +6098,19 @@ function applyBackdropMode(type, color) {
   fxState.stageBackground = { type, color: color || '#0a0b0e' };
   if (bgModeBadge) bgModeBadge.textContent = BG_MODE_LABELS[type] || type;
   if (bgColorPickerRow) bgColorPickerRow.style.display = (type === 'color') ? 'block' : 'none';
-  // Disable 3D grid toggle visual if not cyber_grid
-  const gridEnable = document.getElementById('fx-grid-enable');
-  if (gridEnable) gridEnable.closest('.fx-card').style.opacity = (type === 'cyber_grid') ? '1' : '0.45';
+  // Sync stage fx select dropdown
+  const stageFxSelect = document.getElementById('stage-fx-select');
+  if (stageFxSelect) {
+    if (type === 'cyber_grid') {
+      stageFxSelect.value = 'grid';
+      switchStageOverlayEffect('grid');
+    } else if (type === 'solid_black' || type === 'none') {
+      if (stageFxSelect.value === 'grid') {
+        stageFxSelect.value = 'none';
+        switchStageOverlayEffect('none');
+      }
+    }
+  }
   // Sync the active background clip at current playhead position
   const bgClips = timelineClips.background || [];
   const activeClip = bgClips.find(c => currentTime >= c.start && currentTime < c.start + c.duration);
@@ -6008,6 +6120,40 @@ function applyBackdropMode(type, color) {
     renderAllTimelineTracks();
   }
 }
+
+// Switch and display Stage Overlay Effect (Option 1: Single dropdown selector)
+function switchStageOverlayEffect(effectKey) {
+  const panels = {
+    grid: document.getElementById('panel-fx-grid'),
+    particles: document.getElementById('panel-fx-particles'),
+    silhouette: document.getElementById('panel-fx-silhouette')
+  };
+
+  Object.keys(panels).forEach(key => {
+    if (panels[key]) panels[key].style.display = (key === effectKey) ? 'block' : 'none';
+  });
+
+  // Enable selected effect and disable the others
+  fxState.grid.enabled = (effectKey === 'grid');
+  fxState.particles.enabled = (effectKey === 'particles');
+  fxState.silhouette.enabled = (effectKey === 'silhouette');
+
+  const gridToggle = document.getElementById('fx-grid-enable');
+  if (gridToggle) gridToggle.checked = (effectKey === 'grid');
+
+  const partToggle = document.getElementById('fx-particles-enable');
+  if (partToggle) partToggle.checked = (effectKey === 'particles');
+
+  const silToggle = document.getElementById('fx-silhouette-enable');
+  if (silToggle) silToggle.checked = (effectKey === 'silhouette');
+
+  if (typeof renderCanvas === 'function') renderCanvas();
+}
+
+document.getElementById('stage-fx-select')?.addEventListener('change', (e) => {
+  switchStageOverlayEffect(e.target.value);
+  recordState('Change Stage Overlay Effect');
+});
 
 // Background segment picker popover — lets user pick a bg style for a new segment
 function openBackgroundSegmentPicker(atTimeSec, triggerEl) {
@@ -6307,7 +6453,7 @@ function updateInspectorKeyframeDiamonds(clip) {
   if (playheadKfBtn) {
     const hasAnyKf = clip.keyframes && Object.values(clip.keyframes).some(arr => Array.isArray(arr) && arr.some(k => Math.abs(k.time - clipTime) <= TOLERANCE));
     playheadKfBtn.classList.toggle('active', !!hasAnyKf);
-    playheadKfBtn.textContent = hasAnyKf ? '◆ Delete Keyframe' : '◆ Add Keyframe';
+    playheadKfBtn.title = hasAnyKf ? 'Delete Keyframe at Playhead' : 'Add Keyframe at Playhead';
   }
 }
 
@@ -21291,6 +21437,8 @@ function switchStudioView(viewName) {
     if (saveBtn) saveBtn.style.display = 'inline-flex';
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) exportBtn.style.display = 'inline-flex';
+    const topShareBtn = document.getElementById('btn-top-share-project');
+    if (topShareBtn) topShareBtn.style.display = 'inline-flex';
     const div2 = document.getElementById('top-divider-2');
     if (div2) div2.style.display = 'block';
     const panelToggles = document.getElementById('top-panel-toggles');
@@ -21401,20 +21549,34 @@ function renderHomepageTemplates() {
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
               ${t.tags.slice(0, 2).map(tag => `<span class="home-tpl-tag">#${tag}</span>`).join('')}
             </div>
-            <span class="home-tpl-btn-use">
-              Open FX
-              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-            </span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="home-tpl-share-btn" data-share-tpl-id="${t.id}" title="Share template preset">
+                <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+              </button>
+              <span class="home-tpl-btn-use">
+                Open FX
+                <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+              </span>
+            </div>
           </div>
         </div>
       </div>
     `;
   }).join('');
 
-  // Attach hover video effect listeners and click handler to each card
+  // Attach hover video effect listeners, share button handler, and click handler to each card
   grid.querySelectorAll('.home-tpl-card').forEach(card => {
     const tplId = card.dataset.templateId;
     const tpl = EFFECT_TEMPLATES_DATA.find(item => item.id === tplId);
+
+    // Share button click handler
+    const shareBtn = card.querySelector('.home-tpl-share-btn');
+    if (shareBtn) {
+      shareBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openTemplateShareModal(tplId);
+      });
+    }
 
     card.addEventListener('mouseenter', () => {
       startTemplateHoverVideo(card, tpl);
@@ -21990,7 +22152,7 @@ function startTemplateHoverVideo(cardEl, tpl) {
               <div style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #a5b4fc; letter-spacing: 1.5px; margin-bottom: 2px;">
                 3D LAYER ROTATION
               </div>
-              <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 900; color: #ffffff; letter-spacing: 2px;">
+              <div style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 900; color: ${topCustomizerState.titleColor || '#ffffff'}; letter-spacing: 2px;">
                 SPATIAL DEPTH
               </div>
             </div>
@@ -23621,12 +23783,28 @@ let topCustomizerState = {
   isPlaying: true,
   bgRemoved: true,
   hasTextBehind: true,
+  textVisible: true, // Toggle text visibility without erasing inputs
+  activeTextTarget: 'main', // 'main' or 'sub'
+  mainStyle: {
+    fontFamily: 'Impact, sans-serif',
+    fontSize: 52,
+    bold: true,
+    italic: false,
+    layerPos: 'behind'
+  },
+  subStyle: {
+    fontFamily: 'Impact, sans-serif',
+    fontSize: 34,
+    bold: true,
+    italic: false,
+    layerPos: 'behind'
+  },
   textBehindContent: 'MAGNATES',
   textBehindColor: '#ff334b',
   mainText: '',
   subText: '',
   textColor: '#ff334b',
-  layerOrder: 'front', // 'front' or 'back'
+  layerOrder: 'front', // 'front' or 'back' (subject cutout)
   opacity: 100, // 0 to 100
   blur: 2, // Background blur in px
   extraImages: [], // Additional foreground cutout images [{ url, cutoutCanvas, x, y, scale }]
@@ -23642,6 +23820,73 @@ let topCustomizerState = {
   matrixTypeSpeed: 1.0,
   matrixColumns: []
 };
+
+function syncTopTemplateTypographyUI() {
+  const target = topCustomizerState.activeTextTarget || 'main';
+  const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+
+  // 1. Update target tab buttons visual state
+  const tabMain = document.getElementById('tpl-modal-tab-target-main');
+  const tabSub = document.getElementById('tpl-modal-tab-target-sub');
+  const targetLabel = document.getElementById('tpl-modal-active-target-label');
+
+  if (tabMain && tabSub) {
+    if (target === 'main') {
+      tabMain.style.background = 'rgba(168,85,247,0.25)';
+      tabMain.style.borderColor = 'rgba(168,85,247,0.5)';
+      tabMain.style.color = '#fff';
+      tabSub.style.background = 'transparent';
+      tabSub.style.borderColor = 'transparent';
+      tabSub.style.color = '#94a3b8';
+    } else {
+      tabSub.style.background = 'rgba(168,85,247,0.25)';
+      tabSub.style.borderColor = 'rgba(168,85,247,0.5)';
+      tabSub.style.color = '#fff';
+      tabMain.style.background = 'transparent';
+      tabMain.style.borderColor = 'transparent';
+      tabMain.style.color = '#94a3b8';
+    }
+  }
+
+  if (targetLabel) {
+    targetLabel.textContent = target === 'main' ? 'MAIN TITLE' : 'SUBTITLE';
+  }
+
+  // 2. Populate inputs with active target's values
+  const selFont = document.getElementById('tpl-modal-select-font-family');
+  if (selFont) selFont.value = styleObj.fontFamily || 'Impact, sans-serif';
+
+  const sliderFontSize = document.getElementById('tpl-modal-slider-font-size');
+  const valFontSize = document.getElementById('tpl-modal-val-font-size');
+  if (sliderFontSize) sliderFontSize.value = styleObj.fontSize || 52;
+  if (valFontSize) valFontSize.textContent = `${styleObj.fontSize || 52}px`;
+
+  const btnBold = document.getElementById('tpl-modal-btn-font-bold');
+  if (btnBold) {
+    btnBold.style.background = styleObj.bold ? 'rgba(168,85,247,0.25)' : '#161926';
+    btnBold.style.borderColor = styleObj.bold ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
+    btnBold.style.color = styleObj.bold ? '#ffffff' : '#94a3b8';
+  }
+
+  const btnItalic = document.getElementById('tpl-modal-btn-font-italic');
+  if (btnItalic) {
+    btnItalic.style.background = styleObj.italic ? 'rgba(168,85,247,0.25)' : '#161926';
+    btnItalic.style.borderColor = styleObj.italic ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
+    btnItalic.style.color = styleObj.italic ? '#ffffff' : '#94a3b8';
+  }
+
+  const btnPosBehind = document.getElementById('tpl-modal-btn-text-pos-behind');
+  const btnPosFront = document.getElementById('tpl-modal-btn-text-pos-front');
+  if (btnPosBehind && btnPosFront) {
+    const isBehind = (styleObj.layerPos !== 'front');
+    btnPosBehind.style.background = isBehind ? 'rgba(168,85,247,0.25)' : '#161926';
+    btnPosBehind.style.borderColor = isBehind ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.08)';
+    btnPosBehind.style.color = isBehind ? '#fff' : '#94a3b8';
+    btnPosFront.style.background = !isBehind ? 'rgba(168,85,247,0.25)' : '#161926';
+    btnPosFront.style.borderColor = !isBehind ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.08)';
+    btnPosFront.style.color = !isBehind ? '#fff' : '#94a3b8';
+  }
+}
 
 // Reusable Matrix Digital Rain Frame Renderer for both preview modal and main studio canvas
 const MATRIX_GLYPHS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ日10ｦｱｳｴｵｶｷｹｺｻｼｽｾｿﾀﾂﾃﾅﾆﾇﾈﾊﾋﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾜ";
@@ -23705,7 +23950,7 @@ function renderMatrixRainCanvasFrame(ctx, width, height, state, dt) {
 function generateCutoutCanvasForUrl(url, callback) {
   if (!url) return;
   // If requesting cutout for the default unsplash portrait subject, load default clean asset
-  if (url === 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80' || url === '/portrait_cutout_clean.png') {
+  if (url.includes('534528741775') || url === '/portrait_cutout_clean.png' || url === 'portrait_cutout_clean.png') {
     const cleanImg = new Image();
     cleanImg.onload = () => {
       const offCanvas = document.createElement('canvas');
@@ -23834,15 +24079,16 @@ function openTopTemplateCustomizer(tpl) {
   topCustomizerState.depth = 65;
   topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
   topCustomizerState.isPlaying = true;
-  topCustomizerState.bgRemoved = tpl.id.includes('parallax') || tpl.id.includes('cutout');
-  topCustomizerState.hasTextBehind = tpl.id === 'magnates-paper-vector-cutout' || tpl.id === 'subject-25d-parallax';
+  const isCutoutTpl = tpl.id === 'subject-25d-parallax' || tpl.id === 'magnates-paper-vector-cutout';
+  topCustomizerState.bgRemoved = isCutoutTpl;
+  topCustomizerState.hasTextBehind = isCutoutTpl;
   topCustomizerState.textBehindContent = 'MAGNATES';
   topCustomizerState.textBehindColor = '#ff334b';
   topCustomizerState.layerOrder = 'front';
   topCustomizerState.opacity = 100;
   topCustomizerState.cutoutCanvas = null;
 
-  // Pre-generate cutout if bgRemoved is true
+  // Pre-generate cutout only if template explicitly uses background-removed subject
   if (topCustomizerState.bgRemoved) {
     generateCutoutCanvasForUrl(topCustomizerState.primaryUrl, (c) => {
       topCustomizerState.cutoutCanvas = c;
@@ -23856,7 +24102,7 @@ function openTopTemplateCustomizer(tpl) {
 
   // 1. Populate Header info
   const titleEl = document.getElementById('tpl-modal-title');
-  if (titleEl) titleEl.textContent = tpl.title;
+  if (titleEl) titleEl.textContent = tpl.title.split('(')[0].trim();
   const badgeEl = document.getElementById('tpl-modal-badge');
   if (badgeEl) badgeEl.textContent = tpl.badge || 'PRO FX';
   const descEl = document.getElementById('tpl-modal-desc');
@@ -23867,11 +24113,29 @@ function openTopTemplateCustomizer(tpl) {
   const primaryInput = document.getElementById('tpl-modal-url-primary');
   if (primaryThumb) primaryThumb.src = topCustomizerState.primaryUrl;
   if (primaryInput) primaryInput.value = topCustomizerState.primaryUrl;
+  const primaryFilename = document.getElementById('tpl-modal-filename-primary');
+  if (primaryFilename) {
+    const rawP = topCustomizerState.primaryUrl || '';
+    let cleanP = 'Subject Cutout';
+    if (rawP.startsWith('blob:')) cleanP = 'Uploaded Asset';
+    else if (tpl.id === 'paper-rip-shred') cleanP = 'Paper Texture';
+    else if (tpl.id === 'text-texturing-grunge') cleanP = 'Grunge Backdrop';
+    else if (tpl.id === 'kinetic-decode-typewriter') cleanP = 'Matrix Grid';
+    primaryFilename.textContent = cleanP.length > 22 ? cleanP.substring(0, 20) + '...' : cleanP;
+  }
 
   const secondaryThumb = document.getElementById('tpl-modal-thumb-secondary');
   const secondaryInput = document.getElementById('tpl-modal-url-secondary');
   if (secondaryThumb) secondaryThumb.src = topCustomizerState.secondaryUrl;
   if (secondaryInput) secondaryInput.value = topCustomizerState.secondaryUrl;
+  const secondaryFilename = document.getElementById('tpl-modal-filename-secondary');
+  if (secondaryFilename) {
+    const rawS = topCustomizerState.secondaryUrl || '';
+    let cleanS = 'City Backdrop';
+    if (rawS.startsWith('blob:')) cleanS = 'Uploaded Scene';
+    else if (tpl.id === 'paper-rip-shred') cleanS = 'Revealed Clip';
+    secondaryFilename.textContent = cleanS.length > 22 ? cleanS.substring(0, 20) + '...' : cleanS;
+  }
 
   // Contextual labels & Text setup
   const labelPrim = document.getElementById('tpl-modal-label-primary');
@@ -23885,63 +24149,69 @@ function openTopTemplateCustomizer(tpl) {
   const wrapSub = document.getElementById('tpl-modal-wrap-subtitle');
 
   if (tpl.id === 'subject-25d-parallax') {
-    if (labelPrim) labelPrim.textContent = '👤 Cutout Subject / Foreground';
-    if (labelSec) labelSec.textContent = '🌆 Background Panning Scene';
+    if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground';
+    if (labelSec) labelSec.textContent = 'Background Panning Scene';
     if (wrapSec) wrapSec.style.display = 'flex';
-    topCustomizerState.mainText = topCustomizerState.mainText || 'MAGNATES';
-    topCustomizerState.subText = topCustomizerState.subText || 'EXPOSED';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
+    topCustomizerState.mainText = 'MAGNATES';
+    topCustomizerState.subText = 'EXPOSED';
+    topCustomizerState.titleColor = '#ffffff';
+    const colorTitle = document.getElementById('tpl-modal-color-text-title');
+    if (colorTitle) colorTitle.value = topCustomizerState.titleColor;
+    topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'magnates-paper-vector-cutout') {
     if (labelPrim) labelPrim.textContent = '👤 Isolated Cutout / Sticker Subject';
     if (labelSec) labelSec.textContent = '🌆 Background Atmosphere Scene';
     if (wrapSec) wrapSec.style.display = 'flex';
-    topCustomizerState.mainText = topCustomizerState.mainText || 'MAGNATES';
-    topCustomizerState.subText = topCustomizerState.subText || 'SCANDAL';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
+    topCustomizerState.mainText = 'MAGNATES';
+    topCustomizerState.subText = 'SCANDAL';
+    topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'text-texturing-grunge') {
     if (labelPrim) labelPrim.textContent = '📜 Vintage Paper / Grunge Texture Backdrop';
     if (labelSec) labelSec.textContent = '🎬 Secondary Accent / Overlay';
     if (wrapSec) wrapSec.style.display = 'none';
-    topCustomizerState.hasTextBehind = true;
-    topCustomizerState.mainText = topCustomizerState.mainText || 'POWER & GREED';
-    topCustomizerState.subText = topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#c084fc';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'POWER & GREED';
+    topCustomizerState.subText = 'CHAPTER IV: THE MANIPULATION';
+    topCustomizerState.textColor = '#c084fc';
   } else if (tpl.id === 'kinetic-decode-typewriter') {
     if (labelPrim) labelPrim.textContent = '💻 Matrix Code / Cyber Grid Texture';
     if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'none';
-    topCustomizerState.hasTextBehind = true;
-    topCustomizerState.mainText = topCustomizerState.mainText || 'THE ILLUSION OF CHOICE';
-    topCustomizerState.subText = topCustomizerState.subText || '[ HIGH TENSION REVEAL ]';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#00f0ff';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'THE ILLUSION OF CHOICE';
+    topCustomizerState.subText = '[ HIGH TENSION REVEAL ]';
+    topCustomizerState.textColor = '#00f0ff';
   } else if (tpl.id === 'vox-newspaper-cream-dossier') {
     if (labelPrim) labelPrim.textContent = '📰 Archival Document / Newspaper Asset';
     if (labelSec) labelSec.textContent = '🎬 Supporting Background Footage';
     if (wrapSec) wrapSec.style.display = 'flex';
-    topCustomizerState.hasTextBehind = true;
-    topCustomizerState.mainText = topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER';
-    topCustomizerState.subText = topCustomizerState.subText || 'CLASSIFIED INTELLIGENCE REPORT';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'CONFIDENTIAL DOSSIER';
+    topCustomizerState.subText = 'CLASSIFIED INTELLIGENCE REPORT';
+    topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'paper-rip-shred') {
     if (labelPrim) labelPrim.textContent = '📰 Top Paper Tear Layer';
     if (labelSec) labelSec.textContent = '🎬 Revealed Clip / Footage';
     if (wrapSec) wrapSec.style.display = 'flex';
-    topCustomizerState.mainText = topCustomizerState.mainText || 'BREAKING REVEAL';
-    topCustomizerState.subText = topCustomizerState.subText || 'THE SECRET ARCHIVES';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#facc15';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'BREAKING REVEAL';
+    topCustomizerState.subText = 'THE SECRET ARCHIVES';
+    topCustomizerState.textColor = '#facc15';
   } else if (tpl.id === 'gold-frame-spin') {
     if (labelPrim) labelPrim.textContent = '🖼️ Framed Artwork / Image';
     if (wrapSec) wrapSec.style.display = 'none';
-    topCustomizerState.mainText = topCustomizerState.mainText || 'THE MASTERPIECE';
-    topCustomizerState.subText = topCustomizerState.subText || 'PRIVATE COLLECTION';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#f59e0b';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'THE MASTERPIECE';
+    topCustomizerState.subText = 'PRIVATE COLLECTION';
+    topCustomizerState.textColor = '#f59e0b';
   } else {
     if (labelPrim) labelPrim.textContent = '🖼️ Primary Subject / Asset';
     if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'flex';
-    topCustomizerState.mainText = topCustomizerState.mainText || tpl.title.split('&')[0].trim();
-    topCustomizerState.subText = topCustomizerState.subText || 'CINEMATIC SEQUENCE';
-    topCustomizerState.textColor = topCustomizerState.textColor || '#ff334b';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = tpl.title.split('&')[0].trim();
+    topCustomizerState.subText = 'CINEMATIC SEQUENCE';
+    topCustomizerState.textColor = '#ff334b';
   }
 
   topCustomizerState.textBehindContent = topCustomizerState.mainText;
@@ -24008,6 +24278,9 @@ function openTopTemplateCustomizer(tpl) {
   updateExtraCutoutsListUI();
   updateExtraTextsListUI();
 
+  // Sync Typography UI Controls to active target (MAIN vs SUB)
+  syncTopTemplateTypographyUI();
+
   // Reset opacity in context menu slider
   const opSlider = document.getElementById('ctx-modal-opacity-slider');
   const opVal = document.getElementById('ctx-modal-opacity-val');
@@ -24017,7 +24290,11 @@ function openTopTemplateCustomizer(tpl) {
   // 5. Show modal
   modal.style.display = 'flex';
 
-  // 6. Start live stage animation
+  // 6. Populate templates sidebar drawer & sequence storyboard scenes
+  populateModalTemplatesSidebar();
+  populateModalScenesStoryboard();
+
+  // 7. Start live stage animation
   renderTopTemplatePreviewStage();
   startTopCustomizerLoop();
 }
@@ -24083,9 +24360,9 @@ function updateModalActionButtonsState() {
   const rmLabel = document.getElementById('label-modal-action-remove-bg');
   if (rmBtn && rmLabel) {
     if (topCustomizerState.bgRemoved) {
-      rmBtn.style.background = 'rgba(168,85,247,0.35)';
-      rmBtn.style.borderColor = '#c084fc';
-      rmLabel.textContent = '✓ BG Removed';
+      rmBtn.style.background = 'rgba(139,92,246,0.22)';
+      rmBtn.style.borderColor = 'rgba(168,85,247,0.45)';
+      rmLabel.textContent = 'BG Removed';
     } else {
       rmBtn.style.background = 'rgba(147,51,234,0.18)';
       rmBtn.style.borderColor = 'rgba(168,85,247,0.4)';
@@ -24095,16 +24372,19 @@ function updateModalActionButtonsState() {
 
   const kineticBtn = document.getElementById('btn-modal-action-kinetic-text');
   const kineticPanel = document.getElementById('modal-kinetic-text-panel');
-  if (kineticBtn && kineticPanel) {
+  if (kineticBtn) {
     if (topCustomizerState.hasTextBehind) {
-      kineticBtn.style.background = 'rgba(239,68,68,0.3)';
-      kineticBtn.style.borderColor = '#ef4444';
-      kineticPanel.style.display = 'flex';
+      kineticBtn.style.background = 'rgba(168,85,247,0.3)';
+      kineticBtn.style.borderColor = '#c084fc';
+      kineticBtn.style.color = '#ffffff';
     } else {
-      kineticBtn.style.background = 'rgba(239,68,68,0.15)';
-      kineticBtn.style.borderColor = 'rgba(239,68,68,0.4)';
-      kineticPanel.style.display = 'none';
+      kineticBtn.style.background = 'rgba(168,85,247,0.1)';
+      kineticBtn.style.borderColor = 'rgba(168,85,247,0.25)';
+      kineticBtn.style.color = '#c084fc';
     }
+  }
+  if (kineticPanel) {
+    kineticPanel.style.display = 'none';
   }
 }
 
@@ -24112,6 +24392,12 @@ function closeTopTemplateCustomizer() {
   const modal = document.getElementById('modal-top-template-customizer');
   if (modal) modal.style.display = 'none';
   hideModalStageContextMenu();
+  const previewStageContainer = document.getElementById('tpl-modal-preview-stage-container');
+  if (previewStageContainer) previewStageContainer.classList.remove('is-fullscreen');
+  if (document.fullscreenElement) {
+    if (document.exitFullscreen) document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
   if (topCustomizerState.animId) {
     cancelAnimationFrame(topCustomizerState.animId);
     topCustomizerState.animId = null;
@@ -24124,25 +24410,32 @@ function renderTopTemplatePreviewStage() {
   const tplId = topCustomizerState.currentTpl.id;
   const prim = (topCustomizerState.bgRemoved && topCustomizerState.cutoutCanvas)
     ? topCustomizerState.cutoutCanvas.toDataURL()
-    : topCustomizerState.primaryUrl;
+    : ((topCustomizerState.bgRemoved && topCustomizerState.currentTpl?.cutoutImage)
+        ? topCustomizerState.currentTpl.cutoutImage
+        : topCustomizerState.primaryUrl);
   const sec = topCustomizerState.secondaryUrl;
 
   const currentOpacity = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
   const subjectFilter = topCustomizerState.bgRemoved
     ? 'drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4))'
     : 'none';
-  const subjectBorder = topCustomizerState.bgRemoved
-    ? 'none'
-    : '2px solid rgba(255,255,255,0.2)';
+  const subjectBorder = 'none';
   const subjectZ = topCustomizerState.layerOrder === 'front' ? 4 : 1;
-  const textZ = 2;
+  const mStyle = topCustomizerState.mainStyle || { fontFamily: 'Impact, sans-serif', fontSize: 52, bold: true, italic: false, layerPos: 'behind' };
+  const sStyle = topCustomizerState.subStyle || { fontFamily: 'Impact, sans-serif', fontSize: 34, bold: true, italic: false, layerPos: 'behind' };
 
-  const textBehindHtml = topCustomizerState.hasTextBehind ? `
-    <div id="customizer-live-text-behind" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: ${textZ};">
-      <span style="font-family: Impact, sans-serif; font-size: 52px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.9); line-height: 0.95;">
+  const isTextShowing = topCustomizerState.textVisible !== false;
+
+  const mainZ = mStyle.layerPos === 'front' ? 10 : 2;
+  const subZ = sStyle.layerPos === 'front' ? 10 : 2;
+  const textContainerZ = (mStyle.layerPos === 'front' || sStyle.layerPos === 'front') ? 10 : 2;
+
+  const textBehindHtml = (topCustomizerState.hasTextBehind && isTextShowing) ? `
+    <div id="customizer-live-text-behind" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; z-index: ${textContainerZ};">
+      <span style="font-family: ${mStyle.fontFamily}; font-size: ${mStyle.fontSize}px; font-weight: ${mStyle.bold ? '900' : '400'}; font-style: ${mStyle.italic ? 'italic' : 'normal'}; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 4px 20px rgba(0,0,0,0.9); line-height: 0.95; z-index: ${mainZ};">
         ${topCustomizerState.mainText || topCustomizerState.textBehindContent || 'MAGNATES'}
       </span>
-      <span style="font-family: Impact, sans-serif; font-size: 34px; font-weight: 900; color: ${topCustomizerState.textColor || topCustomizerState.textBehindColor || '#ff334b'}; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,51,75,0.6); line-height: 0.95;">
+      <span style="font-family: ${sStyle.fontFamily}; font-size: ${sStyle.fontSize}px; font-weight: ${sStyle.bold ? '900' : '400'}; font-style: ${sStyle.italic ? 'italic' : 'normal'}; color: ${topCustomizerState.textColor || topCustomizerState.textBehindColor || '#ff334b'}; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255,51,75,0.6); line-height: 0.95; z-index: ${subZ}; margin-top: 4px;">
         ${topCustomizerState.subText || 'EXPOSED'}
       </span>
     </div>
@@ -24152,7 +24445,7 @@ function renderTopTemplatePreviewStage() {
 
   // Extra text overlays HTML
   let extraTextsHtml = '';
-  if (Array.isArray(topCustomizerState.extraTexts)) {
+  if (isTextShowing && Array.isArray(topCustomizerState.extraTexts)) {
     extraTextsHtml = topCustomizerState.extraTexts.map((et, i) => `
       <div style="position: absolute; bottom: ${20 + i * 36}px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
         <span style="font-family: Impact, sans-serif; font-size: ${et.fontSize || 32}px; font-weight: 900; color: ${et.color || '#38bdf8'}; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
@@ -24224,6 +24517,7 @@ function renderTopTemplatePreviewStage() {
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #0e0c14; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
         <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(147, 51, 234, 0.35) 0%, rgba(30, 27, 75, 0.6) 50%, #000 100%);"></div>
         <img id="customizer-live-bg" src="${prim}" alt="Paper Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(2) grayscale(0.2);" />
+        ${isTextShowing ? `
         <div id="customizer-live-grunge-plate" style="position: relative; text-align: center; z-index: 2; padding: 12px; pointer-events: none;">
           <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 32px; font-weight: 900; letter-spacing: 4px; color: ${topCustomizerState.textColor || '#f3e8ff'}; margin: 0; text-transform: uppercase; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.95));">
             ${topCustomizerState.mainText || 'POWER & GREED'}
@@ -24232,7 +24526,7 @@ function renderTopTemplatePreviewStage() {
           <span style="font-family: monospace; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d8b4fe; text-transform: uppercase; display: block;">
             ${topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION'}
           </span>
-        </div>
+        </div>` : ''}
       </div>
     `;
   } else if (tplId === 'kinetic-decode-typewriter') {
@@ -24240,6 +24534,7 @@ function renderTopTemplatePreviewStage() {
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #040608; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
         <canvas id="customizer-live-matrix-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;"></canvas>
         <img id="customizer-live-bg" src="${prim}" alt="Matrix Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: contrast(1.6); mix-blend-mode: screen; z-index: 2; pointer-events: none;" />
+        ${isTextShowing ? `
         <div style="position: relative; z-index: 4; font-family: monospace; text-align: center; pointer-events: none;">
           <span style="font-size: 11px; color: #a7f3d0; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 8px; text-shadow: 0 0 10px rgba(0,255,65,0.6);">
             ${topCustomizerState.subText || '[ HIGH TENSION REVEAL ]'}
@@ -24248,13 +24543,14 @@ function renderTopTemplatePreviewStage() {
             <span id="customizer-live-decode-text">${topCustomizerState.mainText || 'THE ILLUSION OF CHOICE'}</span>
             <span style="display: inline-block; width: 8px; height: 20px; background: ${topCustomizerState.textColor || '#00ff41'}; box-shadow: 0 0 8px ${topCustomizerState.textColor || '#00ff41'};" class="pulse-preview-badge"></span>
           </div>
-        </div>
+        </div>` : ''}
       </div>
     `;
   } else if (tplId === 'vox-newspaper-cream-dossier') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4eedb; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
         <img id="customizer-live-bg" src="${prim}" alt="Newspaper" style="width: 82%; height: 82%; object-fit: cover; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); filter: contrast(1.15);" />
+        ${isTextShowing ? `
         <div style="position: absolute; bottom: 25px; left: 25px; right: 25px; background: rgba(28,25,23,0.9); padding: 10px 14px; border-radius: 6px; border-left: 4px solid ${topCustomizerState.textColor || '#ff334b'};">
           <div style="font-family: Impact, sans-serif; font-size: 20px; color: #fff; letter-spacing: 1px; text-transform: uppercase;">
             ${topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER'}
@@ -24262,7 +24558,7 @@ function renderTopTemplatePreviewStage() {
           <div style="font-family: monospace; font-size: 9px; color: #fdba74; text-transform: uppercase;">
             ${topCustomizerState.subText || 'CLASSIFIED INTELLIGENCE REPORT'}
           </div>
-        </div>
+        </div>` : ''}
       </div>
     `;
   } else {
@@ -24285,6 +24581,179 @@ function renderTopTemplatePreviewStage() {
 }
 
 
+function updateTopCustomizerFrame(seqTime, now) {
+  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+  const totalSeqDur = hasMultipleScenes
+    ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
+    : (topCustomizerState.duration || 6);
+
+  // Synchronize attached sequence audio player
+  const audioEl = document.getElementById('modal-customizer-audio-player');
+  if (audioEl && audioEl.src && topCustomizerState.isPlaying) {
+    if (audioEl.paused) {
+      audioEl.currentTime = seqTime % (audioEl.duration || totalSeqDur);
+      audioEl.play().catch(() => {});
+    } else if (Math.abs(audioEl.currentTime - (seqTime % (audioEl.duration || totalSeqDur))) > 0.35) {
+      audioEl.currentTime = seqTime % (audioEl.duration || totalSeqDur);
+    }
+  }
+
+  // Determine currently active scene in sequence:
+  let runningTime = 0;
+  let currentSceneIdx = 0;
+  let localSceneT = seqTime;
+
+  if (hasMultipleScenes) {
+    for (let i = 0; i < projectScenes.length; i++) {
+      const scDur = projectScenes[i].duration || 6;
+      if (seqTime >= runningTime && seqTime < (runningTime + scDur)) {
+        currentSceneIdx = i;
+        localSceneT = seqTime - runningTime;
+        break;
+      }
+      runningTime += scDur;
+    }
+
+    // If active scene index changed during playback, switch stage & highlight!
+    if (currentSceneIdx !== activeStoryboardSceneIndex && projectScenes[currentSceneIdx]) {
+      activeStoryboardSceneIndex = currentSceneIdx;
+      const activeSc = projectScenes[activeStoryboardSceneIndex];
+      const scTpl = EFFECT_TEMPLATES_DATA.find(it => it.id === activeSc.tplId) || EFFECT_TEMPLATES_DATA[0];
+      topCustomizerState.currentTpl = scTpl;
+      topCustomizerState.primaryUrl = activeSc.prim || activeSc.thumb || scTpl.defaultImage;
+      topCustomizerState.secondaryUrl = activeSc.sec || scTpl.secondaryImage || scTpl.defaultImage;
+      topCustomizerState.duration = activeSc.duration || 6;
+      
+      const isCutoutTpl = scTpl.id === 'subject-25d-parallax' || scTpl.id === 'magnates-paper-vector-cutout';
+      topCustomizerState.bgRemoved = (activeSc.bgRemoved !== undefined) ? activeSc.bgRemoved : isCutoutTpl;
+      topCustomizerState.cutoutCanvas = activeSc.cutoutCanvas || null;
+      topCustomizerState.hasTextBehind = (activeSc.hasTextBehind !== undefined) ? activeSc.hasTextBehind : isCutoutTpl;
+      if (activeSc.mainText) topCustomizerState.mainText = activeSc.mainText;
+      if (activeSc.subText) topCustomizerState.subText = activeSc.subText;
+      if (activeSc.textColor) topCustomizerState.textColor = activeSc.textColor;
+
+      renderTopTemplatePreviewStage();
+      populateModalScenesStoryboard();
+      populateModalTemplatesSidebar();
+    }
+  }
+
+  const timerBadge = document.getElementById('tpl-modal-timer-badge');
+  if (timerBadge) {
+    timerBadge.textContent = `${seqTime.toFixed(1)}s / ${totalSeqDur.toFixed(1)}s (Scene ${activeStoryboardSceneIndex + 1})`;
+  }
+
+  // Update YouTube-Style Floating HUD Timecode & Scrubber
+  const hudTime = document.getElementById('tpl-hud-timecode');
+  if (hudTime) {
+    const curM = Math.floor(seqTime / 60);
+    const curS = Math.floor(seqTime % 60).toString().padStart(2, '0');
+    const totM = Math.floor(totalSeqDur / 60);
+    const totS = Math.floor(totalSeqDur % 60).toString().padStart(2, '0');
+    hudTime.textContent = `${curM}:${curS} / ${totM}:${totS}`;
+  }
+  const hudScrubberFill = document.getElementById('tpl-hud-scrubber-fill');
+  if (hudScrubberFill && totalSeqDur > 0) {
+    const pct = Math.min(100, Math.max(0, (seqTime / totalSeqDur) * 100));
+    hudScrubberFill.style.width = `${pct}%`;
+  }
+
+  const tplId = topCustomizerState.currentTpl?.id;
+  const depthFactor = (topCustomizerState.depth || 65) / 100;
+
+  if (tplId === 'subject-25d-parallax') {
+    const bg = document.getElementById('customizer-live-bg');
+    const fg = document.getElementById('customizer-live-fg-wrap');
+    if (bg) {
+      const bgScale = 1.15 + Math.sin(localSceneT * 0.8) * 0.05 * depthFactor;
+      const bgX = Math.sin(localSceneT * 0.7) * 12 * depthFactor;
+      bg.style.transform = `scale(${bgScale}) translate(${bgX}px, 0)`;
+    }
+    if (fg) {
+      const fgScale = 1.0 + Math.sin(localSceneT * 0.8 + 0.5) * 0.06 * depthFactor;
+      const fgX = -Math.sin(localSceneT * 0.7) * 16 * depthFactor;
+      fg.style.transform = `scale(${fgScale}) translate(${fgX}px, 0)`;
+    }
+  } else if (tplId === 'paper-rip-shred') {
+    const rip = document.getElementById('customizer-live-rip');
+    if (rip) {
+      const tearProgress = (Math.sin(localSceneT * 1.5) + 1) / 2;
+      rip.style.clipPath = `polygon(0 0, 100% 0, 100% ${tearProgress * 100}%, 0 ${Math.min(100, tearProgress * 100 + 8)}%)`;
+    }
+  } else if (tplId === 'gold-frame-spin') {
+    const frame = document.getElementById('customizer-live-frame');
+    if (frame) {
+      const tiltX = Math.sin(localSceneT * 1.2) * 8 * depthFactor;
+      const tiltY = Math.cos(localSceneT * 1.0) * 10 * depthFactor;
+      frame.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
+    }
+  } else if (tplId === 'magnates-paper-vector-cutout') {
+    const fgWrap = document.getElementById('customizer-live-fg-wrap');
+    const bgEl = document.getElementById('customizer-live-bg');
+    const textBehind = document.getElementById('customizer-live-text-behind');
+    const stickerPanX = Math.sin(localSceneT * 2.4) * 14 * depthFactor;
+    const stickerPanY = Math.cos(localSceneT * 2.0) * 10 * depthFactor;
+    const bgShiftX = -Math.sin(localSceneT * 2.4) * 8 * depthFactor;
+    const textScale = 1.0 + Math.sin(localSceneT * 1.8) * 0.05 * depthFactor;
+    if (fgWrap) fgWrap.style.transform = `translate(${stickerPanX}px, ${stickerPanY}px) scale(1.05)`;
+    if (bgEl) bgEl.style.transform = `scale(1.1) translate(${bgShiftX}px, 0)`;
+    if (textBehind) textBehind.style.transform = `scale(${textScale})`;
+  } else if (tplId === 'text-texturing-grunge') {
+    const jitterX = Math.sin(localSceneT * 14) * 2;
+    const jitterY = Math.cos(localSceneT * 16) * 2;
+    const bgZoom = 1.05 + Math.sin(localSceneT * 2) * 0.04;
+    const plate = document.getElementById('customizer-live-grunge-plate');
+    const bgEl = document.getElementById('customizer-live-bg');
+    if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+    if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
+  } else if (tplId === 'kinetic-decode-typewriter') {
+    const rainCanvas = document.getElementById('customizer-live-matrix-canvas');
+    if (rainCanvas && topCustomizerState.matrixRainEnabled) {
+      if (!rainCanvas._initialized || rainCanvas.width !== rainCanvas.clientWidth) {
+        rainCanvas.width = rainCanvas.clientWidth || 540;
+        rainCanvas.height = rainCanvas.clientHeight || 360;
+        rainCanvas._initialized = true;
+      }
+      const rCtx = rainCanvas.getContext('2d');
+      const dt = (now - (topCustomizerState._lastRainNow || now)) / 1000;
+      topCustomizerState._lastRainNow = now;
+      renderMatrixRainCanvasFrame(rCtx, rainCanvas.width, rainCanvas.height, topCustomizerState, Math.min(0.1, dt || 0.016));
+    } else if (rainCanvas && !topCustomizerState.matrixRainEnabled) {
+      const rCtx = rainCanvas.getContext('2d');
+      rCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
+    }
+
+    const targetWord = topCustomizerState.mainText || "THE ILLUSION OF CHOICE";
+    const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const typeSpeed = topCustomizerState.matrixTypeSpeed || 1.0;
+    const progress = Math.min(1, (localSceneT * 0.8 * typeSpeed) % 1.25);
+    const charsRevealed = Math.floor(progress * targetWord.length);
+    let displayed = targetWord.substring(0, charsRevealed);
+    if (charsRevealed < targetWord.length) {
+      displayed += glyphs[Math.floor((localSceneT * 50) % glyphs.length)];
+    }
+    const decodeSpan = document.getElementById('customizer-live-decode-text');
+    if (decodeSpan) decodeSpan.textContent = displayed;
+  }
+}
+
+function renderCustomizerFrameAtTime(targetTime) {
+  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+  const totalSeqDur = hasMultipleScenes
+    ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
+    : (topCustomizerState.duration || 6);
+
+  const clampedTime = Math.max(0, Math.min(targetTime, totalSeqDur));
+  topCustomizerState.startTime = performance.now() - (clampedTime * 1000);
+  
+  const aud = document.getElementById('modal-customizer-audio-player');
+  if (aud && aud.duration) {
+    aud.currentTime = clampedTime % aud.duration;
+  }
+
+  updateTopCustomizerFrame(clampedTime, performance.now());
+}
+
 function startTopCustomizerLoop() {
   topCustomizerState.startTime = performance.now();
 
@@ -24295,94 +24764,13 @@ function startTopCustomizerLoop() {
     }
 
     const t = (now - topCustomizerState.startTime) / 1000;
-    const dur = topCustomizerState.duration || 6;
-    const cycle = (t % dur) / dur; // 0 to 1
+    const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+    const totalSeqDur = hasMultipleScenes
+      ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
+      : (topCustomizerState.duration || 6);
 
-    const timerBadge = document.getElementById('tpl-modal-timer-badge');
-    if (timerBadge) {
-      timerBadge.textContent = `${(cycle * dur).toFixed(1)}s / ${dur.toFixed(1)}s`;
-    }
-
-    const tplId = topCustomizerState.currentTpl?.id;
-    const depthFactor = (topCustomizerState.depth || 65) / 100;
-
-    if (tplId === 'subject-25d-parallax') {
-      const bg = document.getElementById('customizer-live-bg');
-      const fg = document.getElementById('customizer-live-fg-wrap');
-      if (bg) {
-        const bgScale = 1.15 + Math.sin(t * 0.8) * 0.05 * depthFactor;
-        const bgX = Math.sin(t * 0.7) * 12 * depthFactor;
-        bg.style.transform = `scale(${bgScale}) translate(${bgX}px, 0)`;
-      }
-      if (fg) {
-        const fgScale = 1.0 + Math.sin(t * 0.8 + 0.5) * 0.06 * depthFactor;
-        const fgX = -Math.sin(t * 0.7) * 16 * depthFactor;
-        fg.style.transform = `scale(${fgScale}) translate(${fgX}px, 0)`;
-      }
-    } else if (tplId === 'paper-rip-shred') {
-      const rip = document.getElementById('customizer-live-rip');
-      if (rip) {
-        // Repeated tear sweep
-        const tearProgress = (Math.sin(t * 1.5) + 1) / 2; // 0 to 1
-        rip.style.clipPath = `polygon(0 0, 100% 0, 100% ${tearProgress * 100}%, 0 ${Math.min(100, tearProgress * 100 + 8)}%)`;
-      }
-    } else if (tplId === 'gold-frame-spin') {
-      const frame = document.getElementById('customizer-live-frame');
-      if (frame) {
-        const tiltX = Math.sin(t * 1.2) * 8 * depthFactor;
-        const tiltY = Math.cos(t * 1.0) * 10 * depthFactor;
-        frame.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.02)`;
-      }
-    } else if (tplId === 'magnates-paper-vector-cutout') {
-      const fgWrap = document.getElementById('customizer-live-fg-wrap');
-      const bgEl = document.getElementById('customizer-live-bg');
-      const textBehind = document.getElementById('customizer-live-text-behind');
-      const stickerPanX = Math.sin(t * 2.4) * 14 * depthFactor;
-      const stickerPanY = Math.cos(t * 2.0) * 10 * depthFactor;
-      const bgShiftX = -Math.sin(t * 2.4) * 8 * depthFactor;
-      const textScale = 1.0 + Math.sin(t * 1.8) * 0.05 * depthFactor;
-      if (fgWrap) fgWrap.style.transform = `translate(${stickerPanX}px, ${stickerPanY}px) scale(1.05)`;
-      if (bgEl) bgEl.style.transform = `scale(1.1) translate(${bgShiftX}px, 0)`;
-      if (textBehind) textBehind.style.transform = `scale(${textScale})`;
-    } else if (tplId === 'text-texturing-grunge') {
-      const jitterX = Math.sin(t * 14) * 2;
-      const jitterY = Math.cos(t * 16) * 2;
-      const bgZoom = 1.05 + Math.sin(t * 2) * 0.04;
-      const plate = document.getElementById('customizer-live-grunge-plate');
-      const bgEl = document.getElementById('customizer-live-bg');
-      if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
-      if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
-    } else if (tplId === 'kinetic-decode-typewriter') {
-      // 1. Matrix Digital Rain Canvas Background
-      const rainCanvas = document.getElementById('customizer-live-matrix-canvas');
-      if (rainCanvas && topCustomizerState.matrixRainEnabled) {
-        if (!rainCanvas._initialized || rainCanvas.width !== rainCanvas.clientWidth) {
-          rainCanvas.width = rainCanvas.clientWidth || 540;
-          rainCanvas.height = rainCanvas.clientHeight || 360;
-          rainCanvas._initialized = true;
-        }
-        const rCtx = rainCanvas.getContext('2d');
-        const dt = (now - (topCustomizerState._lastRainNow || now)) / 1000;
-        topCustomizerState._lastRainNow = now;
-        renderMatrixRainCanvasFrame(rCtx, rainCanvas.width, rainCanvas.height, topCustomizerState, Math.min(0.1, dt || 0.016));
-      } else if (rainCanvas && !topCustomizerState.matrixRainEnabled) {
-        const rCtx = rainCanvas.getContext('2d');
-        rCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
-      }
-
-      // 2. Interactive Kinetic Typewriter & Symbol Decryptor
-      const targetWord = topCustomizerState.mainText || "THE ILLUSION OF CHOICE";
-      const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      const typeSpeed = topCustomizerState.matrixTypeSpeed || 1.0;
-      const progress = Math.min(1, (t * 0.8 * typeSpeed) % 1.25);
-      const charsRevealed = Math.floor(progress * targetWord.length);
-      let displayed = targetWord.substring(0, charsRevealed);
-      if (charsRevealed < targetWord.length) {
-        displayed += glyphs[Math.floor((t * 50) % glyphs.length)];
-      }
-      const decodeSpan = document.getElementById('customizer-live-decode-text');
-      if (decodeSpan) decodeSpan.textContent = displayed;
-    }
+    const seqTime = t % totalSeqDur;
+    updateTopCustomizerFrame(seqTime, now);
 
     topCustomizerState.animId = requestAnimationFrame(loop);
   }
@@ -24391,106 +24779,137 @@ function startTopCustomizerLoop() {
   topCustomizerState.animId = requestAnimationFrame(loop);
 }
 
-function commitTopTemplateCustomizerToTimeline() {
-  const tpl = topCustomizerState.currentTpl;
-  if (!tpl) return;
+function getTimelineMaxDuration() {
+  let maxTime = 0;
+  if (typeof timelineClips === 'object' && timelineClips) {
+    Object.values(timelineClips).forEach(track => {
+      if (Array.isArray(track)) {
+        track.forEach(c => {
+          if (c && typeof c.start === 'number' && typeof c.duration === 'number') {
+            const end = c.start + c.duration;
+            if (end > maxTime) maxTime = end;
+          }
+        });
+      }
+    });
+  }
+  return maxTime;
+}
 
-  closeTopTemplateCustomizer();
+let projectScenes = [];
 
-  // 1. Switch to Studio Editor view
-  switchStudioView('editor');
+function refreshTimelineScenesUI() {
+  const container = document.getElementById('timeline-scenes-pills-list');
+  if (!container) return;
 
-  // 2. Set active project title with sequential project naming
-  const projTitle = document.getElementById('current-project');
-  const seqName = getNextProjectName();
-  if (projTitle) projTitle.textContent = seqName;
-  _currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-
-  const prim = topCustomizerState.primaryUrl;
-  const sec = topCustomizerState.secondaryUrl;
-  const dur = topCustomizerState.duration || 6;
-  const depthVal = topCustomizerState.depth || 65;
-  const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
-
-  // Make sure global duration matches or exceeds applied template duration
-  if (duration < dur) {
-    duration = dur;
-    const durBadge = document.getElementById('duration-badge');
-    if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
-    if (typeof drawTimeRuler === 'function') drawTimeRuler();
+  // Re-sync scenes if empty but clips exist
+  if (projectScenes.length === 0) {
+    const maxDur = getTimelineMaxDuration();
+    if (maxDur > 0) {
+      projectScenes.push({
+        id: 'scene-1',
+        title: 'Scene 1',
+        start: 0,
+        duration: maxDur
+      });
+    }
   }
 
-  // Automatically disable cyber grid, embers/particles, and mystery silhouette when applying special effect templates
-  if (fxState) {
-    fxState.grid.enabled = false;
-    fxState.particles.enabled = false;
-    fxState.silhouette.enabled = false;
-    fxState.stageBackground = { type: 'solid_black', color: '#000000' };
+  container.innerHTML = projectScenes.map((sc, idx) => {
+    const isActive = (currentTime >= sc.start && currentTime < (sc.start + sc.duration));
+    const thumbSrc = sc.thumb || (EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId)?.defaultImage) || '';
+    const cleanTitle = sc.title || `Scene ${idx + 1}`;
+    return `
+      <div class="timeline-scene-pill ${isActive ? 'active' : ''}" onclick="jumpToScene(${idx})" title="${cleanTitle} (${formatTime(sc.start)} - ${formatTime(sc.start + sc.duration)})">
+        ${thumbSrc ? `<img src="${thumbSrc}" class="timeline-scene-pill-thumb" alt="" />` : ''}
+        <span class="timeline-scene-pill-title">${cleanTitle}</span>
+        <span class="timeline-scene-pill-time">${formatTime(sc.start)} - ${formatTime(sc.start + sc.duration)}</span>
+      </div>
+    `;
+  }).join('');
+}
 
-    const gridCheckbox = document.getElementById('fx-grid-enable');
-    if (gridCheckbox) gridCheckbox.checked = false;
-    const partCheckbox = document.getElementById('fx-particles-enable');
-    if (partCheckbox) partCheckbox.checked = false;
-    const silCheckbox = document.getElementById('fx-silhouette-enable');
-    if (silCheckbox) silCheckbox.checked = false;
+function jumpToScene(idx) {
+  if (projectScenes && projectScenes[idx]) {
+    currentTime = projectScenes[idx].start;
+    if (typeof updatePlayheadPosition === 'function') updatePlayheadPosition();
+    if (typeof renderCanvas === 'function') renderCanvas();
+    refreshTimelineScenesUI();
   }
+}
 
-  // 3. Inject custom clips into timeline with comprehensive file objects and template rig tags
+function openAddNextTemplatePicker() {
+  // Open homepage templates view so user can choose next sequence template
+  switchStudioView('templates');
+  showTextTimingAlert('Select a template to append as next scene in your sequence!', 'info');
+  setTimeout(() => showTextTimingAlert(''), 3000);
+}
+
+function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
+  const {
+    prim, sec, depthVal, opacityVal, bgRemoved, cutoutCanvas,
+    hasTextBehind, textBehindContent, textBehindColor, mainText, subText,
+    textColor, extraTexts, extraImages, blur, layerOrder
+  } = opts;
+
+  let imageClips = [];
+  let textClips = [];
+  let focusClip = null;
+
   if (tpl.id === 'subject-25d-parallax') {
     const bgClip = {
-      id: `img-bg-${Date.now()}`,
+      id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Environment.jpg',
-      url: sec,
-      file: { name: 'Custom_Environment.jpg', url: sec, isImage: true },
-      start: 0,
+      url: sec || tpl.secondaryImage,
+      file: { name: 'Custom_Environment.jpg', url: sec || tpl.secondaryImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.15,
       isBackgroundScene: true,
       parallaxRig: 'bg',
       parallaxDepth: depthVal,
-      blur: topCustomizerState.blur !== undefined ? topCustomizerState.blur : 2,
+      blur: blur,
       zIndex: 10,
       layerOrder: 'back'
     };
     const fgClip = {
-      id: `img-fg-${Date.now() + 1}`,
+      id: `img-fg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Cutout_Subject.png',
-      url: prim,
-      file: { name: 'Custom_Cutout_Subject.png', url: prim, isImage: true },
-      start: 0,
+      url: prim || tpl.defaultImage,
+      file: { name: 'Custom_Cutout_Subject.png', url: prim || tpl.defaultImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.05,
       depth: depthVal,
       parallaxRig: 'fg',
       parallaxDepth: depthVal,
-      vectorEffect: false, // Keep original natural photo colors, no white vector cutout mask
-      vectorStrokeColor: '#ffffff',
+      vectorEffect: false,
       opacity: opacityVal,
-      cutoutCanvas: topCustomizerState.bgRemoved ? topCustomizerState.cutoutCanvas : null,
-      zIndex: topCustomizerState.layerOrder === 'front' ? 40 : 15,
-      layerOrder: topCustomizerState.layerOrder || 'front'
+      cutoutCanvas: bgRemoved ? cutoutCanvas : null,
+      zIndex: layerOrder === 'front' ? 40 : 15,
+      layerOrder: layerOrder || 'front'
     };
+    focusClip = fgClip;
+    imageClips = [bgClip, fgClip];
 
-    const textClips = [];
-    if (topCustomizerState.hasTextBehind) {
+    if (hasTextBehind) {
       textClips.push({
-        id: `txt-${Date.now() + 2}`,
-        text: topCustomizerState.textBehindContent || 'MAGNATES',
-        highlight: (topCustomizerState.textBehindContent || '').split(' ')[0] || '',
-        highlightColor: topCustomizerState.textBehindColor || '#ff334b',
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: textBehindContent || 'MAGNATES',
+        highlight: (textBehindContent || '').split(' ')[0] || '',
+        highlightColor: textBehindColor || '#ff334b',
         anim: 'pop',
         fontSize: 68,
         fontFamily: 'Impact, sans-serif',
         zIndex: 25,
         layerOrder: 'middle',
-        start: 0,
+        start: sceneStart,
         duration: dur
       });
     }
 
-    // Add extra user-created text overlays
-    if (Array.isArray(topCustomizerState.extraTexts)) {
-      topCustomizerState.extraTexts.forEach((et, i) => {
+    if (Array.isArray(extraTexts)) {
+      extraTexts.forEach((et, i) => {
         textClips.push({
           id: `txt-extra-${Date.now()}-${i}`,
           text: et.text || 'Extra Text',
@@ -24502,23 +24921,21 @@ function commitTopTemplateCustomizerToTimeline() {
           fontFamily: 'Impact, sans-serif',
           zIndex: 35,
           layerOrder: 'front',
-          start: 0,
+          start: sceneStart,
           duration: dur,
-          y: (canvas.height * 0.7) + (i * 50)
+          y: 400 + (i * 50)
         });
       });
     }
 
-    const imageClips = [bgClip, fgClip];
-    // Add extra user-added image cutouts
-    if (Array.isArray(topCustomizerState.extraImages)) {
-      topCustomizerState.extraImages.forEach((ei, i) => {
+    if (Array.isArray(extraImages)) {
+      extraImages.forEach((ei, i) => {
         imageClips.push({
           id: `img-extra-${Date.now()}-${i}`,
           name: `Cutout_Subject_${i + 2}.png`,
           url: ei.url,
           file: { name: `Cutout_Subject_${i + 2}.png`, url: ei.url, isImage: true },
-          start: 0,
+          start: sceneStart,
           duration: dur,
           scale: 0.9,
           parallaxRig: 'fg',
@@ -24532,21 +24949,13 @@ function commitTopTemplateCustomizerToTimeline() {
         });
       });
     }
-
-    if (timelineClips && timelineClips.image) {
-      timelineClips.image = imageClips;
-      if (timelineClips.text) timelineClips.text = textClips;
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(fgClip, 'image');
-    }
   } else if (tpl.id === 'paper-rip-shred') {
     const revealedClip = {
-      id: `img-rev-${Date.now()}`,
+      id: `img-rev-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Revealed_Footage.jpg',
-      url: sec,
-      file: { name: 'Custom_Revealed_Footage.jpg', url: sec, isImage: true },
-      start: 0,
+      url: sec || tpl.secondaryImage,
+      file: { name: 'Custom_Revealed_Footage.jpg', url: sec || tpl.secondaryImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.05,
       isBackgroundScene: true,
@@ -24554,11 +24963,11 @@ function commitTopTemplateCustomizerToTimeline() {
       layerOrder: 'back'
     };
     const ripClip = {
-      id: `img-rip-${Date.now() + 1}`,
+      id: `img-rip-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Paper_Tear.jpg',
-      url: prim,
-      file: { name: 'Custom_Paper_Tear.jpg', url: prim, isImage: true },
-      start: 0,
+      url: prim || tpl.defaultImage,
+      file: { name: 'Custom_Paper_Tear.jpg', url: prim || tpl.defaultImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.1,
       opacity: opacityVal,
@@ -24568,34 +24977,30 @@ function commitTopTemplateCustomizerToTimeline() {
       zIndex: 25,
       layerOrder: 'front'
     };
-    if (timelineClips && timelineClips.image) {
-      timelineClips.image = [revealedClip, ripClip];
-      if (timelineClips.text) {
-        timelineClips.text = topCustomizerState.hasTextBehind ? [{
-          id: `txt-${Date.now() + 2}`,
-          text: topCustomizerState.textBehindContent || 'MAGNATES',
-          highlight: (topCustomizerState.textBehindContent || '').split(' ')[0] || '',
-          highlightColor: topCustomizerState.textBehindColor || '#ff334b',
-          anim: 'pop',
-          fontSize: 68,
-          fontFamily: 'Impact, sans-serif',
-          zIndex: 20,
-          layerOrder: 'middle',
-          start: 0,
-          duration: dur
-        }] : [];
-      }
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(ripClip, 'image');
+    focusClip = ripClip;
+    imageClips = [revealedClip, ripClip];
+    if (hasTextBehind) {
+      textClips.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: textBehindContent || 'MAGNATES',
+        highlight: (textBehindContent || '').split(' ')[0] || '',
+        highlightColor: textBehindColor || '#ff334b',
+        anim: 'pop',
+        fontSize: 68,
+        fontFamily: 'Impact, sans-serif',
+        zIndex: 20,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur
+      });
     }
   } else if (tpl.id === 'gold-frame-spin') {
     const goldClip = {
-      id: `img-${Date.now()}`,
+      id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Gold_Frame.jpg',
-      url: prim,
-      file: { name: 'Custom_Gold_Frame.jpg', url: prim, isImage: true },
-      start: 0,
+      url: prim || tpl.defaultImage,
+      file: { name: 'Custom_Gold_Frame.jpg', url: prim || tpl.defaultImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.1,
       opacity: opacityVal,
@@ -24603,198 +25008,75 @@ function commitTopTemplateCustomizerToTimeline() {
       depth: depthVal,
       zIndex: 20
     };
-    if (timelineClips && timelineClips.image) {
-      timelineClips.image = [goldClip];
-      if (timelineClips.text) {
-        timelineClips.text = topCustomizerState.hasTextBehind ? [{
-          id: `txt-${Date.now() + 2}`,
-          text: topCustomizerState.textBehindContent || 'MAGNATES',
-          highlight: (topCustomizerState.textBehindContent || '').split(' ')[0] || '',
-          highlightColor: topCustomizerState.textBehindColor || '#ff334b',
-          anim: 'pop',
-          fontSize: 68,
-          fontFamily: 'Impact, sans-serif',
-          zIndex: 10,
-          layerOrder: 'middle',
-          start: 0,
-          duration: dur
-        }] : [];
-      }
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(goldClip, 'image');
+    focusClip = goldClip;
+    imageClips = [goldClip];
+    if (hasTextBehind) {
+      textClips.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: textBehindContent || 'MAGNATES',
+        highlight: (textBehindContent || '').split(' ')[0] || '',
+        highlightColor: textBehindColor || '#ff334b',
+        anim: 'pop',
+        fontSize: 68,
+        fontFamily: 'Impact, sans-serif',
+        zIndex: 10,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur
+      });
     }
   } else if (tpl.id === 'magnates-paper-vector-cutout') {
     const bgClip = {
-      id: `img-bg-${Date.now()}`,
+      id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Scene_Backdrop.jpg',
-      url: sec,
-      file: { name: 'Custom_Scene_Backdrop.jpg', url: sec, isImage: true },
-      start: 0,
+      url: sec || tpl.secondaryImage,
+      file: { name: 'Custom_Scene_Backdrop.jpg', url: sec || tpl.secondaryImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.15,
       isBackgroundScene: true,
       zIndex: 10,
       layerOrder: 'back'
     };
-    const textBehind = {
-      id: `txt-${Date.now() + 1}`,
-      text: topCustomizerState.textBehindContent || 'THE CORRUPTION',
-      highlight: (topCustomizerState.textBehindContent || 'THE CORRUPTION').split(' ')[0] || 'CORRUPTION',
-      highlightColor: topCustomizerState.textBehindColor || '#ff334b',
-      anim: 'pop',
-      fontSize: 72,
-      fontFamily: 'Impact, sans-serif',
-      zIndex: 25,
-      layerOrder: 'middle',
-      start: 0,
-      duration: dur
-    };
     const cutoutStickerClip = {
-      id: `img-cutout-${Date.now() + 2}`,
+      id: `img-cutout-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Subject_Cutout.png',
-      url: prim,
-      file: { name: 'Custom_Subject_Cutout.png', url: prim, isImage: true },
-      start: 0,
+      url: prim || tpl.defaultImage,
+      file: { name: 'Custom_Subject_Cutout.png', url: prim || tpl.defaultImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.05,
       opacity: opacityVal,
       vectorEffect: true,
       vectorStrokeColor: '#ffffff',
-      cutoutCanvas: topCustomizerState.cutoutCanvas || null,
-      zIndex: topCustomizerState.layerOrder === 'front' ? 40 : 15,
-      layerOrder: topCustomizerState.layerOrder || 'front'
+      cutoutCanvas: cutoutCanvas || null,
+      zIndex: layerOrder === 'front' ? 40 : 15,
+      layerOrder: layerOrder || 'front'
     };
-    if (timelineClips && timelineClips.image && timelineClips.text) {
-      timelineClips.image = [bgClip, cutoutStickerClip];
-      timelineClips.text = topCustomizerState.hasTextBehind ? [textBehind] : [];
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(cutoutStickerClip, 'image');
-    }
-  } else if (tpl.id === 'text-texturing-grunge') {
-    const textureClip = {
-      id: `img-tex-${Date.now()}`,
-      name: 'James_Jani_Paper_Texture.jpg',
-      url: prim,
-      file: { name: 'James_Jani_Paper_Texture.jpg', url: prim, isImage: true },
-      start: 0,
-      duration: dur,
-      scale: 1.15,
-      zIndex: 10
-    };
-    const mainTitle = {
-      id: `txt-${Date.now() + 1}`,
-      text: topCustomizerState.mainText || 'POWER & GREED',
-      highlight: (topCustomizerState.mainText || 'POWER & GREED').split(' ')[0] || 'POWER',
-      highlightColor: topCustomizerState.textColor || '#c084fc',
-      anim: 'pop',
-      fontSize: 68,
-      fontFamily: 'Playfair Display, Georgia, serif',
-      start: 0,
-      duration: dur,
-      zIndex: 20
-    };
-    const subtitle = {
-      id: `txt-${Date.now() + 2}`,
-      text: topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION',
-      highlight: '',
-      highlightColor: '#a855f7',
-      anim: 'slide_up',
-      fontSize: 28,
-      fontFamily: 'monospace',
-      start: 0.4,
-      duration: Math.max(0.1, dur - 0.4),
-      zIndex: 25
-    };
-    if (timelineClips && timelineClips.image && timelineClips.text) {
-      timelineClips.image = [textureClip];
-      timelineClips.text = [mainTitle, subtitle];
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(mainTitle, 'text');
-    }
-  } else if (tpl.id === 'kinetic-decode-typewriter') {
-    const matrixClip = {
-      id: `img-matrix-${Date.now()}`,
-      name: 'Matrix_Rain_Engine.png',
-      url: prim,
-      file: { name: 'Matrix_Rain_Engine.png', url: prim, isImage: true },
-      start: 0,
-      duration: dur,
-      scale: 1.2,
-      zIndex: 10,
-      matrixRain: topCustomizerState.matrixRainEnabled !== false,
-      matrixRainColor: topCustomizerState.matrixRainColor || '#00ff41',
-      matrixRainSpeed: topCustomizerState.matrixRainSpeed || 1.0,
-      matrixRainDensity: topCustomizerState.matrixRainDensity || 16
-    };
-    const decodeTitle = {
-      id: `txt-${Date.now() + 1}`,
-      text: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
-      subtitle: topCustomizerState.subText || '[ HIGH TENSION REVEAL ]',
-      textColor: topCustomizerState.textColor || '#00ff41',
-      highlightColor: topCustomizerState.textColor || '#00ff41',
-      anim: 'decode_typewriter',
-      matrixDecode: true,
-      typeSpeed: topCustomizerState.matrixTypeSpeed || 1.0,
-      fontSize: 38,
-      fontFamily: 'monospace',
-      start: 0,
-      duration: dur,
-      zIndex: 20
-    };
-    if (timelineClips && timelineClips.image && timelineClips.text) {
-      timelineClips.image = [matrixClip];
-      timelineClips.text = [decodeTitle];
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(decodeTitle, 'text');
-    }
-  } else if (tpl.id === 'vox-newspaper-cream-dossier') {
-    if (fxState) {
-      fxState.stageBackground = { type: 'vox_cream', color: '#f4eedb' };
-    }
-    const docClip = {
-      id: `img-doc-${Date.now()}`,
-      name: 'Vox_Investigative_Paper.jpg',
-      url: prim,
-      file: { name: 'Vox_Investigative_Paper.jpg', url: prim, isImage: true },
-      start: 0,
-      duration: dur,
-      scale: 1.1,
-      zoomEffect: 'loupe',
-      zoomScale: 2.2,
-      zoomOriginX: 0.55,
-      zoomOriginY: 0.45,
-      zIndex: 10
-    };
-    const stampText = {
-      id: `txt-${Date.now() + 1}`,
-      text: topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER',
-      highlight: (topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER').split(' ')[0] || 'CONFIDENTIAL',
-      highlightColor: topCustomizerState.textColor || '#ff334b',
-      anim: 'stamp',
-      fontSize: 56,
-      fontFamily: 'Oswald, sans-serif',
-      start: 0.2,
-      duration: Math.max(0.1, dur - 0.2),
-      zIndex: 20
-    };
-    if (timelineClips && timelineClips.image && timelineClips.text) {
-      timelineClips.image = [docClip];
-      timelineClips.text = [stampText];
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(docClip, 'image');
+    focusClip = cutoutStickerClip;
+    imageClips = [bgClip, cutoutStickerClip];
+    if (hasTextBehind) {
+      textClips.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: textBehindContent || 'THE CORRUPTION',
+        highlight: (textBehindContent || 'THE CORRUPTION').split(' ')[0] || 'CORRUPTION',
+        highlightColor: textBehindColor || '#ff334b',
+        anim: 'pop',
+        fontSize: 72,
+        fontFamily: 'Impact, sans-serif',
+        zIndex: 25,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur
+      });
     }
   } else {
     const baseClip = {
-      id: `img-${Date.now()}`,
+      id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: `${tpl.title.replace(/\s+/g, '_')}.jpg`,
-      url: prim,
-      file: { name: `${tpl.title.replace(/\s+/g, '_')}.jpg`, url: prim, isImage: true },
-      start: 0,
+      url: prim || tpl.defaultImage,
+      file: { name: `${tpl.title.replace(/\s+/g, '_')}.jpg`, url: prim || tpl.defaultImage, isImage: true },
+      start: sceneStart,
       duration: dur,
       scale: 1.1,
       opacity: opacityVal,
@@ -24802,67 +25084,436 @@ function commitTopTemplateCustomizerToTimeline() {
       transitionDuration: 1.0,
       zIndex: 20
     };
-    if (timelineClips && timelineClips.image) {
-      timelineClips.image = [baseClip];
-      if (timelineClips.text) {
-        timelineClips.text = topCustomizerState.hasTextBehind ? [{
-          id: `txt-${Date.now() + 2}`,
-          text: topCustomizerState.mainText || topCustomizerState.textBehindContent || 'MAGNATES',
-          highlight: (topCustomizerState.mainText || '').split(' ')[0] || '',
-          highlightColor: topCustomizerState.textColor || '#ff334b',
-          anim: 'pop',
-          fontSize: 68,
-          fontFamily: 'Impact, sans-serif',
-          zIndex: 10,
-          layerOrder: 'middle',
-          start: 0,
-          duration: dur
-        }] : [];
-      }
-      currentTime = 0;
-      renderAllTimelineTracks();
-      selectClip(baseClip, 'image');
+    focusClip = baseClip;
+    imageClips = [baseClip];
+    if (hasTextBehind) {
+      textClips.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: mainText || textBehindContent || 'MAGNATES',
+        highlight: (mainText || '').split(' ')[0] || '',
+        highlightColor: textColor || '#ff334b',
+        anim: 'pop',
+        fontSize: 68,
+        fontFamily: 'Impact, sans-serif',
+        zIndex: 10,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur
+      });
     }
   }
 
-  // Pre-load media into elements cache so canvas renders instantly without black blink
-  [prim, sec].forEach(u => {
-    if (u) {
-      const im = new Image();
-      im.crossOrigin = 'anonymous';
-      im.onload = () => {
+  return { imageClips, textClips, focusClip };
+}
+
+function commitTopTemplateCustomizerToTimeline(isAppendScene = false) {
+  closeTopTemplateCustomizer();
+  switchStudioView('editor');
+
+  const projTitle = document.getElementById('current-project');
+  if (!isAppendScene) {
+    const seqName = getNextProjectName();
+    if (projTitle) projTitle.textContent = seqName;
+    _currentProjectId = 'proj_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+  }
+
+  // Determine scenes to commit sequentially across all storyboard entries:
+  const scenesToCommit = (Array.isArray(projectScenes) && projectScenes.length > 0)
+    ? [...projectScenes]
+    : [{
+        id: `scene-${Date.now()}`,
+        title: `Scene 1: ${(topCustomizerState.currentTpl?.title || 'Preset').split(' ')[0]}`,
+        tplId: topCustomizerState.currentTpl?.id || 'subject-25d-parallax',
+        start: 0,
+        duration: topCustomizerState.duration || 6,
+        thumb: topCustomizerState.primaryUrl
+      }];
+
+  let runningOffset = isAppendScene ? getTimelineMaxDuration() : 0;
+  let allNewImageClips = [];
+  let allNewTextClips = [];
+  let firstFocusClip = null;
+
+  if (!isAppendScene) {
+    projectScenes = [];
+  }
+
+  scenesToCommit.forEach((sc, sIdx) => {
+    const scTpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId) || topCustomizerState.currentTpl || EFFECT_TEMPLATES_DATA[0];
+    const scDur = sc.duration || parseInt(scTpl.timeToApply) || 6;
+    const sceneStart = runningOffset;
+    const sceneEnd = sceneStart + scDur;
+    runningOffset = sceneEnd;
+
+    // Register into projectScenes
+    projectScenes.push({
+      id: sc.id || `scene-${Date.now()}-${sIdx}`,
+      title: sc.title || `Scene ${projectScenes.length + 1}: ${scTpl.title.split(' ')[0]}`,
+      start: sceneStart,
+      duration: scDur,
+      tplId: scTpl.id,
+      thumb: sc.thumb || scTpl.defaultImage
+    });
+
+    const prim = (sIdx === activeStoryboardSceneIndex)
+      ? (topCustomizerState.primaryUrl || sc.thumb || scTpl.defaultImage)
+      : (sc.thumb || scTpl.defaultImage);
+    const sec = (sIdx === activeStoryboardSceneIndex)
+      ? (topCustomizerState.secondaryUrl || scTpl.secondaryImage)
+      : (scTpl.secondaryImage);
+    const depthVal = topCustomizerState.depth || 65;
+    const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
+
+    const { imageClips, textClips, focusClip } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
+      prim, sec, depthVal, opacityVal,
+      bgRemoved: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.bgRemoved : false,
+      cutoutCanvas: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.cutoutCanvas : null,
+      hasTextBehind: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.hasTextBehind : true,
+      textBehindContent: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.textBehindContent : scTpl.title.split(' ')[0],
+      textBehindColor: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.textBehindColor : '#ff334b',
+      mainText: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.mainText : scTpl.title.split(' ')[0],
+      subText: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.subText : scTpl.category,
+      textColor: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.textColor : '#ff334b',
+      extraTexts: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.extraTexts : [],
+      extraImages: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.extraImages : [],
+      blur: topCustomizerState.blur !== undefined ? topCustomizerState.blur : 2,
+      layerOrder: topCustomizerState.layerOrder || 'front'
+    });
+
+    if (!firstFocusClip && focusClip) firstFocusClip = focusClip;
+    allNewImageClips = allNewImageClips.concat(imageClips);
+    allNewTextClips = allNewTextClips.concat(textClips);
+
+    // Pre-load media
+    [prim, sec].forEach(u => {
+      if (u) {
+        const im = new Image();
+        im.crossOrigin = 'anonymous';
+        im.onload = () => {
+          mediaElementCache.set(u, im);
+          if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+        };
+        im.src = u;
         mediaElementCache.set(u, im);
-        if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
-      };
-      im.src = u;
-      mediaElementCache.set(u, im);
-    }
+      }
+    });
   });
 
-  showTextTimingAlert(`Applied ${tpl.title} to timeline with your custom media!`, 'success');
+  // Global duration adjustment
+  if (duration < runningOffset) {
+    duration = runningOffset;
+    const durBadge = document.getElementById('duration-badge');
+    if (durBadge) durBadge.textContent = `00:00 / ${formatTime(duration)}`;
+    if (typeof drawTimeRuler === 'function') drawTimeRuler();
+  }
+
+  if (fxState) {
+    fxState.grid.enabled = false;
+    fxState.particles.enabled = false;
+    fxState.silhouette.enabled = false;
+    fxState.stageBackground = { type: 'solid_black', color: '#000000' };
+  }
+
+  // Update timelineClips with ALL multi-scene clips
+  if (timelineClips) {
+    if (!timelineClips.image) timelineClips.image = [];
+    if (!timelineClips.text) timelineClips.text = [];
+
+    if (isAppendScene) {
+      timelineClips.image = timelineClips.image.concat(allNewImageClips);
+      timelineClips.text = timelineClips.text.concat(allNewTextClips);
+    } else {
+      timelineClips.image = allNewImageClips;
+      timelineClips.text = allNewTextClips;
+      currentTime = 0;
+    }
+
+    // Attach sequence audio track if user added one in customizer!
+    if (window._customizerAudioTrack) {
+      if (!timelineClips.audio) timelineClips.audio = [];
+      const aud = window._customizerAudioTrack;
+      timelineClips.audio.push({
+        id: `aud-${Date.now()}`,
+        name: aud.name || 'Sequence_Audio.mp3',
+        url: aud.url,
+        file: { name: aud.name, url: aud.url, isAudio: true },
+        start: 0,
+        duration: runningOffset,
+        volume: 1.0
+      });
+    }
+
+    renderAllTimelineTracks();
+    refreshTimelineScenesUI();
+    if (firstFocusClip) {
+      selectClip(firstFocusClip, firstFocusClip.file ? 'image' : 'text');
+    }
+  }
+
+  showTextTimingAlert(`Applied ${scenesToCommit.length} scene(s) to timeline sequentially!`, 'success');
   setTimeout(() => showTextTimingAlert(''), 2500);
+}
+
+function setupModalCustomizerAudio() {
+  const fileInput = document.getElementById('modal-customizer-audio-file-input');
+  const player = document.getElementById('modal-customizer-audio-player');
+  const label = document.getElementById('modal-audio-track-label');
+  const sub = document.getElementById('modal-audio-track-sub');
+  const removeBtn = document.getElementById('btn-modal-customizer-remove-audio');
+
+  if (!fileInput || !player) return;
+
+  fileInput.onchange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      player.src = url;
+      player.load();
+      window._customizerAudioTrack = { url, name: file.name, file };
+      if (label) {
+        const shortAudio = file.name.length > 16 ? file.name.substring(0, 14) + '...' : file.name;
+        label.textContent = `🎵 ${shortAudio}`;
+      }
+      if (removeBtn) removeBtn.style.display = 'inline-block';
+      showTextTimingAlert(`Attached audio: ${file.name}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+      if (topCustomizerState.isPlaying) {
+        player.play().catch(() => {});
+      }
+    }
+  };
+
+  if (removeBtn) {
+    removeBtn.onclick = () => {
+      player.pause();
+      player.removeAttribute('src');
+      window._customizerAudioTrack = null;
+      fileInput.value = '';
+      if (label) label.textContent = 'Add Audio';
+      removeBtn.style.display = 'none';
+      showTextTimingAlert('Audio detached', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+    };
+  }
 }
 
 function bindTopTemplateCustomizerEvents() {
   document.getElementById('btn-close-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
   document.getElementById('btn-cancel-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
-  document.getElementById('btn-apply-top-tpl-timeline')?.addEventListener('click', commitTopTemplateCustomizerToTimeline);
+  document.getElementById('btn-apply-top-tpl-timeline')?.addEventListener('click', () => commitTopTemplateCustomizerToTimeline(false));
+  document.getElementById('btn-append-scene-timeline')?.addEventListener('click', () => commitTopTemplateCustomizerToTimeline(true));
 
-  // Play/pause toggle
-  const playBtn = document.getElementById('btn-tpl-modal-play-toggle');
-  playBtn?.addEventListener('click', () => {
-    topCustomizerState.isPlaying = !topCustomizerState.isPlaying;
-    playBtn.textContent = topCustomizerState.isPlaying ? '⏸ Pause' : '▶ Play';
-  });
+  // Play/pause sync function
+  const setCustomizerPlaying = (play) => {
+    topCustomizerState.isPlaying = play;
+    const playBtn = document.getElementById('btn-tpl-modal-play-toggle');
+    if (playBtn) playBtn.textContent = topCustomizerState.isPlaying ? '❚❚ Pause' : '▶ Play';
 
-  // Replay
-  document.getElementById('btn-tpl-modal-reset')?.addEventListener('click', () => {
+    const iconPlay = document.getElementById('tpl-hud-icon-play');
+    const iconPause = document.getElementById('tpl-hud-icon-pause');
+    if (iconPlay && iconPause) {
+      iconPlay.style.display = topCustomizerState.isPlaying ? 'none' : 'block';
+      iconPause.style.display = topCustomizerState.isPlaying ? 'block' : 'none';
+    }
+
+    const aud = document.getElementById('modal-customizer-audio-player');
+    if (aud) {
+      if (topCustomizerState.isPlaying && aud.src) aud.play().catch(() => {});
+      else if (!topCustomizerState.isPlaying) aud.pause();
+    }
+  };
+
+  const replayCustomizer = () => {
     topCustomizerState.startTime = performance.now();
+    activeStoryboardSceneIndex = 0;
+    const aud = document.getElementById('modal-customizer-audio-player');
+    if (aud) aud.currentTime = 0;
+  };
+
+  // Play/pause toggle (Bottom bar & HUD)
+  document.getElementById('btn-tpl-modal-play-toggle')?.addEventListener('click', () => {
+    setCustomizerPlaying(!topCustomizerState.isPlaying);
   });
+  document.getElementById('btn-tpl-hud-play')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setCustomizerPlaying(!topCustomizerState.isPlaying);
+  });
+
+  // Replay (Bottom bar & HUD)
+  document.getElementById('btn-tpl-modal-reset')?.addEventListener('click', replayCustomizer);
+  document.getElementById('btn-tpl-hud-replay')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    replayCustomizer();
+  });
+
+  // HUD Scrubber Drag Seeking & YouTube-style Floating Hover Tooltip
+  const scrubberWrap = document.getElementById('tpl-hud-scrubber-wrap');
+  const tooltip = document.getElementById('tpl-hud-preview-tooltip');
+  const tooltipTime = document.getElementById('tpl-hud-tooltip-time');
+
+  if (scrubberWrap) {
+    let isScrubbing = false;
+
+    const getScrubPctAndTarget = (clientX) => {
+      const rect = scrubberWrap.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+      const pct = rect.width > 0 ? (clickX / rect.width) : 0;
+      const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+      const totalSeqDur = hasMultipleScenes
+        ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
+        : (topCustomizerState.duration || 6);
+      return { pct, targetTime: pct * totalSeqDur, clickX };
+    };
+
+    const updateTooltipPos = (clientX) => {
+      if (!tooltip) return;
+      const { targetTime, clickX } = getScrubPctAndTarget(clientX);
+      tooltip.style.left = `${clickX}px`;
+      if (tooltipTime) {
+        const m = Math.floor(targetTime / 60);
+        const s = Math.floor(targetTime % 60).toString().padStart(2, '0');
+        const ms = Math.floor((targetTime % 1) * 10);
+        tooltipTime.textContent = `${m}:${s}.${ms}`;
+      }
+    };
+
+    scrubberWrap.addEventListener('mousemove', (e) => {
+      updateTooltipPos(e.clientX);
+    });
+
+    scrubberWrap.addEventListener('mousedown', (e) => {
+      isScrubbing = true;
+      scrubberWrap.classList.add('dragging');
+      const { targetTime } = getScrubPctAndTarget(e.clientX);
+      renderCustomizerFrameAtTime(targetTime);
+      updateTooltipPos(e.clientX);
+
+      const onWindowMouseMove = (moveEvt) => {
+        if (!isScrubbing) return;
+        const { targetTime: moveTarget } = getScrubPctAndTarget(moveEvt.clientX);
+        renderCustomizerFrameAtTime(moveTarget);
+        updateTooltipPos(moveEvt.clientX);
+      };
+
+      const onWindowMouseUp = (upEvt) => {
+        if (isScrubbing) {
+          isScrubbing = false;
+          scrubberWrap.classList.remove('dragging');
+          const { targetTime: finalTarget } = getScrubPctAndTarget(upEvt.clientX);
+          renderCustomizerFrameAtTime(finalTarget);
+        }
+        window.removeEventListener('mousemove', onWindowMouseMove);
+        window.removeEventListener('mouseup', onWindowMouseUp);
+      };
+
+      window.addEventListener('mousemove', onWindowMouseMove);
+      window.addEventListener('mouseup', onWindowMouseUp);
+    });
+  }
+
+  // Fullscreen Immersive Mode Toggle (HUD Button & Double-Tap / Double-Click)
+  const previewStageContainer = document.getElementById('tpl-modal-preview-stage-container');
+  const btnHudExpand = document.getElementById('btn-tpl-hud-expand');
+
+  const isStageFullscreen = () => {
+    return document.fullscreenElement === previewStageContainer ||
+      previewStageContainer?.classList.contains('is-fullscreen');
+  };
+
+  const toggleCustomizerFullscreen = () => {
+    if (!previewStageContainer) return;
+    if (!isStageFullscreen()) {
+      if (previewStageContainer.requestFullscreen) {
+        previewStageContainer.requestFullscreen().catch(() => {
+          previewStageContainer.classList.add('is-fullscreen');
+        });
+      } else if (previewStageContainer.webkitRequestFullscreen) {
+        previewStageContainer.webkitRequestFullscreen();
+      } else {
+        previewStageContainer.classList.add('is-fullscreen');
+      }
+      previewStageContainer.classList.add('is-fullscreen');
+      showTextTimingAlert('Entered Fullscreen Immersive Mode (Double tap to exit)', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1800);
+    } else {
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+      previewStageContainer.classList.remove('is-fullscreen');
+      showTextTimingAlert('Exited Fullscreen', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1500);
+    }
+  };
+
+  btnHudExpand?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleCustomizerFullscreen();
+  });
+
+  // Double-click to toggle fullscreen
+  previewStageContainer?.addEventListener('dblclick', (e) => {
+    if (e.target.closest('#tpl-modal-player-hud') || e.target.closest('button') || e.target.closest('input')) return;
+    toggleCustomizerFullscreen();
+  });
+
+  // Mobile / Touch double-tap handler to toggle fullscreen
+  let lastStageTouchTime = 0;
+  previewStageContainer?.addEventListener('touchend', (e) => {
+    if (e.target.closest('#tpl-modal-player-hud') || e.target.closest('button') || e.target.closest('input')) return;
+    const now = performance.now();
+    if (now - lastStageTouchTime < 320) {
+      e.preventDefault();
+      toggleCustomizerFullscreen();
+      lastStageTouchTime = 0;
+    } else {
+      lastStageTouchTime = now;
+    }
+  });
+
+  // Text Visibility Toggle (Takes text off canvas without erasing typed inputs)
+  document.getElementById('tpl-modal-btn-toggle-text-visibility')?.addEventListener('click', () => {
+    topCustomizerState.textVisible = !(topCustomizerState.textVisible !== false);
+    const icon = document.getElementById('tpl-modal-icon-text-visibility');
+    const label = document.getElementById('tpl-modal-label-text-visibility');
+    const btn = document.getElementById('tpl-modal-btn-toggle-text-visibility');
+    if (topCustomizerState.textVisible) {
+      if (icon) icon.textContent = '👁️';
+      if (label) label.textContent = 'Visible';
+      if (btn) {
+        btn.style.background = 'rgba(255,255,255,0.06)';
+        btn.style.borderColor = 'rgba(255,255,255,0.12)';
+        btn.style.color = '#cbd5e1';
+      }
+      showTextTimingAlert('Text visible on canvas', 'info');
+    } else {
+      if (icon) icon.textContent = '🙈';
+      if (label) label.textContent = 'Hidden';
+      if (btn) {
+        btn.style.background = 'rgba(239,68,68,0.14)';
+        btn.style.borderColor = 'rgba(239,68,68,0.3)';
+        btn.style.color = '#f87171';
+      }
+      showTextTimingAlert('Text taken off canvas (inputs saved)', 'info');
+    }
+    setTimeout(() => showTextTimingAlert(''), 1800);
+    renderTopTemplatePreviewStage();
+  });
+
+  // Customizer Audio Bar Handlers
+  setupModalCustomizerAudio();
 
   // URL inputs change
   document.getElementById('tpl-modal-url-primary')?.addEventListener('input', (e) => {
     topCustomizerState.primaryUrl = e.target.value.trim();
+    if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+      projectScenes[activeStoryboardSceneIndex].prim = topCustomizerState.primaryUrl;
+      projectScenes[activeStoryboardSceneIndex].thumb = topCustomizerState.primaryUrl;
+      populateModalScenesStoryboard();
+    }
     const thumb = document.getElementById('tpl-modal-thumb-primary');
     if (thumb) thumb.src = topCustomizerState.primaryUrl;
     renderTopTemplatePreviewStage();
@@ -24870,6 +25521,9 @@ function bindTopTemplateCustomizerEvents() {
 
   document.getElementById('tpl-modal-url-secondary')?.addEventListener('input', (e) => {
     topCustomizerState.secondaryUrl = e.target.value.trim();
+    if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+      projectScenes[activeStoryboardSceneIndex].sec = topCustomizerState.secondaryUrl;
+    }
     const thumb = document.getElementById('tpl-modal-thumb-secondary');
     if (thumb) thumb.src = topCustomizerState.secondaryUrl;
     renderTopTemplatePreviewStage();
@@ -24882,14 +25536,25 @@ function bindTopTemplateCustomizerEvents() {
       const url = URL.createObjectURL(file);
       topCustomizerState.primaryUrl = url;
       topCustomizerState.cutoutCanvas = null; // Invalidate cached cutout so new image gets processed!
+      if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+        projectScenes[activeStoryboardSceneIndex].prim = url;
+        projectScenes[activeStoryboardSceneIndex].thumb = url;
+        projectScenes[activeStoryboardSceneIndex].cutoutCanvas = null;
+        populateModalScenesStoryboard();
+      }
       const input = document.getElementById('tpl-modal-url-primary');
       if (input) input.value = url;
       const thumb = document.getElementById('tpl-modal-thumb-primary');
       if (thumb) thumb.src = url;
+      const fnP = document.getElementById('tpl-modal-filename-primary');
+      if (fnP) fnP.textContent = file.name;
       if (topCustomizerState.bgRemoved) {
         showTextTimingAlert('Extracting cutout from your new image...', 'info');
         generateCutoutCanvasForUrl(url, (c) => {
           topCustomizerState.cutoutCanvas = c;
+          if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+            projectScenes[activeStoryboardSceneIndex].cutoutCanvas = c;
+          }
           renderTopTemplatePreviewStage();
           showTextTimingAlert('Background removed from new image!', 'success');
           setTimeout(() => showTextTimingAlert(''), 1800);
@@ -24905,6 +25570,9 @@ function bindTopTemplateCustomizerEvents() {
     if (file) {
       const url = URL.createObjectURL(file);
       topCustomizerState.secondaryUrl = url;
+      if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+        projectScenes[activeStoryboardSceneIndex].sec = url;
+      }
       const input = document.getElementById('tpl-modal-url-secondary');
       if (input) input.value = url;
       const thumb = document.getElementById('tpl-modal-thumb-secondary');
@@ -25011,6 +25679,11 @@ function bindTopTemplateCustomizerEvents() {
     renderTopTemplatePreviewStage();
   });
 
+  document.getElementById('tpl-modal-color-text-title')?.addEventListener('input', (e) => {
+    topCustomizerState.titleColor = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
   document.getElementById('tpl-modal-color-text-main')?.addEventListener('input', (e) => {
     topCustomizerState.textColor = e.target.value;
     topCustomizerState.textBehindColor = e.target.value;
@@ -25028,13 +25701,117 @@ function bindTopTemplateCustomizerEvents() {
     renderTopTemplatePreviewStage();
   });
 
-  document.getElementById('modal-kinetic-text-color')?.addEventListener('input', (e) => {
-    topCustomizerState.textBehindColor = e.target.value;
-    topCustomizerState.textColor = e.target.value;
-    const colorMain = document.getElementById('tpl-modal-color-text-main');
-    if (colorMain) colorMain.value = e.target.value;
+  // Typography Target Tabs & Accordion Dropdown
+  const btnToggleTypo = document.getElementById('tpl-modal-btn-toggle-typography');
+  const panelTypo = document.getElementById('tpl-modal-typography-panel');
+  const arrowTypo = document.getElementById('tpl-modal-arrow-typography');
+
+  btnToggleTypo?.addEventListener('click', () => {
+    if (!panelTypo) return;
+    const isClosed = panelTypo.style.display === 'none' || !panelTypo.style.display;
+    panelTypo.style.display = isClosed ? 'flex' : 'none';
+    if (arrowTypo) arrowTypo.style.transform = isClosed ? 'rotate(180deg)' : 'rotate(0deg)';
+  });
+
+  const tabTargetMain = document.getElementById('tpl-modal-tab-target-main');
+  const tabTargetSub = document.getElementById('tpl-modal-tab-target-sub');
+
+  tabTargetMain?.addEventListener('click', () => {
+    topCustomizerState.activeTextTarget = 'main';
+    syncTopTemplateTypographyUI();
+  });
+
+  tabTargetSub?.addEventListener('click', () => {
+    topCustomizerState.activeTextTarget = 'sub';
+    syncTopTemplateTypographyUI();
+  });
+
+  // Typography Controls (Affects activeTextTarget: 'main' or 'sub' individually!)
+  document.getElementById('tpl-modal-select-font-family')?.addEventListener('change', (e) => {
+    const target = topCustomizerState.activeTextTarget || 'main';
+    const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+    styleObj.fontFamily = e.target.value;
     renderTopTemplatePreviewStage();
   });
+
+  document.getElementById('tpl-modal-slider-font-size')?.addEventListener('input', (e) => {
+    const sz = parseInt(e.target.value, 10) || 52;
+    const target = topCustomizerState.activeTextTarget || 'main';
+    const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+    styleObj.fontSize = sz;
+    const lbl = document.getElementById('tpl-modal-val-font-size');
+    if (lbl) lbl.textContent = `${sz}px`;
+    renderTopTemplatePreviewStage();
+  });
+
+  const btnBold = document.getElementById('tpl-modal-btn-font-bold');
+  btnBold?.addEventListener('click', () => {
+    const target = topCustomizerState.activeTextTarget || 'main';
+    const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+    styleObj.bold = !styleObj.bold;
+    if (btnBold) {
+      btnBold.style.background = styleObj.bold ? 'rgba(168,85,247,0.25)' : '#161926';
+      btnBold.style.borderColor = styleObj.bold ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
+      btnBold.style.color = styleObj.bold ? '#ffffff' : '#94a3b8';
+    }
+    renderTopTemplatePreviewStage();
+  });
+
+  const btnItalic = document.getElementById('tpl-modal-btn-font-italic');
+  btnItalic?.addEventListener('click', () => {
+    const target = topCustomizerState.activeTextTarget || 'main';
+    const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+    styleObj.italic = !styleObj.italic;
+    if (btnItalic) {
+      btnItalic.style.background = styleObj.italic ? 'rgba(168,85,247,0.25)' : '#161926';
+      btnItalic.style.borderColor = styleObj.italic ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
+      btnItalic.style.color = styleObj.italic ? '#ffffff' : '#94a3b8';
+    }
+    renderTopTemplatePreviewStage();
+  });
+
+  const btnPosBehind = document.getElementById('tpl-modal-btn-text-pos-behind');
+  const btnPosFront = document.getElementById('tpl-modal-btn-text-pos-front');
+
+  btnPosBehind?.addEventListener('click', () => {
+    const target = topCustomizerState.activeTextTarget || 'main';
+    const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+    styleObj.layerPos = 'behind';
+    if (btnPosBehind) {
+      btnPosBehind.style.background = 'rgba(168,85,247,0.25)';
+      btnPosBehind.style.borderColor = 'rgba(168,85,247,0.5)';
+      btnPosBehind.style.color = '#fff';
+    }
+    if (btnPosFront) {
+      btnPosFront.style.background = '#161926';
+      btnPosFront.style.borderColor = 'rgba(255,255,255,0.08)';
+      btnPosFront.style.color = '#94a3b8';
+    }
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(`${target === 'main' ? 'Main title' : 'Subtitle'} positioned behind subject cutout`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+  btnPosFront?.addEventListener('click', () => {
+    const target = topCustomizerState.activeTextTarget || 'main';
+    const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
+    styleObj.layerPos = 'front';
+    if (btnPosFront) {
+      btnPosFront.style.background = 'rgba(168,85,247,0.25)';
+      btnPosFront.style.borderColor = 'rgba(168,85,247,0.5)';
+      btnPosFront.style.color = '#fff';
+    }
+    if (btnPosBehind) {
+      btnPosBehind.style.background = '#161926';
+      btnPosBehind.style.borderColor = 'rgba(255,255,255,0.08)';
+      btnPosBehind.style.color = '#94a3b8';
+    }
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(`${target === 'main' ? 'Main title' : 'Subtitle'} positioned in front of subject cutout`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  });
+
+
 
   // Matrix Rain Customizer Engine Event Listeners
   document.getElementById('tpl-modal-matrix-rain-enable')?.addEventListener('change', (e) => {
@@ -25160,6 +25937,421 @@ function showModalStageContextMenu(x, y) {
 function hideModalStageContextMenu() {
   const menu = document.getElementById('modal-stage-context-menu');
   if (menu) menu.style.display = 'none';
+}
+
+/* =========================================================
+   GLOBAL PROJECT & TEMPLATE SHARE CONTROLLER
+   ========================================================= */
+let currentShareContext = { type: 'project', id: 'default' };
+
+function openGlobalShareModal(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  const modal = document.getElementById('modal-global-share-project');
+  if (!modal) return;
+
+  currentShareContext = { type: 'project', id: _currentProjectId || 'project_1' };
+  const title = document.getElementById('modal-share-title');
+  const sub = document.getElementById('modal-share-subtitle');
+  const linkInput = document.getElementById('input-global-share-link');
+
+  const projName = document.getElementById('current-project')?.textContent || 'Untitled Video Project';
+  if (title) title.textContent = `Share "${projName}"`;
+  if (sub) sub.textContent = 'Invite collaborators to edit sequence, or export preset link';
+  if (linkInput) {
+    const origin = window.location.origin || 'https://magnates.studio';
+    linkInput.value = `${origin}/?project=${encodeURIComponent(_currentProjectId || 'project')}&scenes=${projectScenes.length}`;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function openTemplateShareModal(templateId) {
+  const modal = document.getElementById('modal-global-share-project');
+  if (!modal) return;
+
+  const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined' ? EFFECT_TEMPLATES_DATA : []).find(t => t.id === templateId);
+  currentShareContext = { type: 'template', id: templateId, title: tpl?.title || 'Template' };
+
+  const title = document.getElementById('modal-share-title');
+  const sub = document.getElementById('modal-share-subtitle');
+  const linkInput = document.getElementById('input-global-share-link');
+
+  if (title) title.textContent = `Share Template: ${tpl?.title || 'Preset'}`;
+  if (sub) sub.textContent = 'Share this interactive effect rig with fellow creators';
+  if (linkInput) {
+    const origin = window.location.origin || 'https://magnates.studio';
+    linkInput.value = `${origin}/?template=${encodeURIComponent(templateId)}`;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeGlobalShareModal() {
+  const modal = document.getElementById('modal-global-share-project');
+  if (modal) modal.style.display = 'none';
+}
+
+function shareToSocialPlatform(platform) {
+  const linkInput = document.getElementById('input-global-share-link');
+  const shareUrl = linkInput ? linkInput.value : window.location.href;
+  const shareTitle = currentShareContext.title ? `Check out "${currentShareContext.title}" on Regaarder Studio!` : 'Check out my video project sequence on Regaarder Studio!';
+
+  let targetUrl = '';
+  if (platform === 'whatsapp') {
+    targetUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  } else if (platform === 'twitter') {
+    targetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  } else if (platform === 'tiktok') {
+    // Copy URL and open TikTok web
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showTextTimingAlert('Video preset link copied! Opening TikTok...', 'success');
+      setTimeout(() => {
+        window.open('https://www.tiktok.com/upload', '_blank', 'noopener,noreferrer');
+      }, 700);
+    });
+    return;
+  } else if (platform === 'discord') {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showTextTimingAlert('Project link copied for Discord! Paste into any server or chat.', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    });
+    return;
+  } else if (platform === 'canva') {
+    // Export/transfer to Canva flow
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showTextTimingAlert('Project asset link copied! Opening Canva...', 'info');
+      setTimeout(() => {
+        window.open('https://www.canva.com', '_blank', 'noopener,noreferrer');
+      }, 700);
+    });
+    return;
+  } else if (platform === 'figma') {
+    // Export to Figma flow
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      showTextTimingAlert('Storyboard link copied! Opening Figma...', 'info');
+      setTimeout(() => {
+        window.open('https://www.figma.com', '_blank', 'noopener,noreferrer');
+      }, 700);
+    });
+    return;
+  }
+}
+
+/* =========================================================
+   CUSTOMIZER MODAL TEMPLATES SIDEBAR & STORYBOARD CONTROLLERS
+   (Image 2 exact match: Rounded preview cards + scene sequence chaining)
+   ========================================================= */
+let activeStoryboardSceneIndex = 0;
+
+function toggleModalTemplatesDrawer() {
+  const drawer = document.getElementById('modal-tpl-sidebar-drawer');
+  if (!drawer) return;
+  const isHidden = window.getComputedStyle(drawer).display === 'none';
+  drawer.style.display = isHidden ? 'flex' : 'none';
+}
+
+function startSidebarTemplateHover(cardEl, tpl) {
+  if (!tpl) return;
+  const tplId = tpl.id;
+  const thumb = cardEl.querySelector(`#sidecard-thumb-${tplId}`);
+  const fxContainer = cardEl.querySelector(`#sidecard-fx-${tplId}`);
+  if (thumb) thumb.style.opacity = '0.15';
+  if (fxContainer) {
+    fxContainer.style.display = 'block';
+    if (tplId === 'subject-25d-parallax') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+          <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; filter: blur(1.5px) brightness(0.7); transform: scale(1.15);" />
+          <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+            <img src="${tpl.defaultImage}" style="max-height: 85%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.9)); animation: sidecardFloat 1.8s ease-in-out infinite alternate;" />
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'paper-rip-shred') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden;">
+          <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div style="position: absolute; inset: 0; border-bottom: 2px solid #fef08a; animation: sidecardRip 1.6s ease-in-out infinite alternate;">
+            <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'gold-frame-spin') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #0a0806; display: flex; align-items: center; justify-content: center; padding: 6px;">
+          <div style="width: 82%; height: 82%; border: 2.5px solid #f59e0b; border-radius: 6px; overflow: hidden; animation: sidecardTilt 2s ease-in-out infinite alternate;">
+            <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+        </div>
+      `;
+    } else {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden;">
+          <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; animation: sidecardZoom 2s ease-in-out infinite alternate;" />
+        </div>
+      `;
+    }
+  }
+}
+
+function stopSidebarTemplateHover(cardEl, tpl) {
+  if (!tpl) return;
+  const tplId = tpl.id;
+  const thumb = cardEl.querySelector(`#sidecard-thumb-${tplId}`);
+  const fxContainer = cardEl.querySelector(`#sidecard-fx-${tplId}`);
+  if (thumb) thumb.style.opacity = '0.9';
+  if (fxContainer) {
+    fxContainer.style.display = 'none';
+    fxContainer.innerHTML = '';
+  }
+}
+
+function populateModalTemplatesSidebar() {
+  const container = document.getElementById('modal-tpl-sidebar-cards-list');
+  if (!container || typeof EFFECT_TEMPLATES_DATA === 'undefined') return;
+
+  const currentTplId = topCustomizerState.currentTpl?.id;
+
+  // Short clean display names matching Image 2
+  const shortNames = {
+    'subject-25d-parallax': '2.5D Parallax',
+    'paper-rip-shred': 'Paper Tear',
+    'gold-frame-spin': 'Gold Frame 3D',
+    'magnates-paper-vector-cutout': 'Split Screen',
+    'kinetic-decode-typewriter': 'Kinetic Type',
+    'text-texturing-grunge': 'Grunge Title'
+  };
+
+  container.innerHTML = EFFECT_TEMPLATES_DATA.map(t => {
+    const isSelected = (t.id === currentTplId);
+    const displayName = t.title.split('(')[0].trim();
+
+    return `
+      <div onclick="modalSelectTemplateCard('${t.id}')" data-template-id="${t.id}" 
+           title="${t.title} - ${t.description}"
+           style="display: flex; flex-direction: column; background: #08090e; border: 1px solid ${isSelected ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255, 255, 255, 0.05)'}; border-radius: 10px; overflow: hidden; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: ${isSelected ? '0 0 16px rgba(139, 92, 246, 0.3)' : 'none'}; flex-shrink: 0; position: relative;" class="customizer-tpl-sidecard ${isSelected ? 'active-tpl-card' : ''}">
+        
+        <div style="height: 68px; width: 100%; position: relative; background: #000; overflow: hidden;">
+          <img id="sidecard-thumb-${t.id}" src="${t.defaultImage}" alt="${displayName}" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400';" style="width: 100%; height: 100%; object-fit: cover; opacity: ${isSelected ? '1' : '0.75'}; transition: opacity 0.2s ease;" />
+          <div id="sidecard-fx-${t.id}" style="display: none; position: absolute; inset: 0; overflow: hidden; pointer-events: none;"></div>
+          
+          ${isSelected ? `
+            <!-- Purple check badge matching active pills on homepage -->
+            <div style="position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: #8b5cf6; color: #fff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(139, 92, 246, 0.8); z-index: 5;">
+              ✓
+            </div>
+          ` : ''}
+        </div>
+
+        <div style="padding: 8px 10px; background: #0c0e15; min-height: 28px; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 11px; font-weight: 600; color: ${isSelected ? '#c084fc' : '#cbd5e1'}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            ${displayName}
+          </span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Attach hover live preview listeners
+  container.querySelectorAll('.customizer-tpl-sidecard').forEach(card => {
+    const tplId = card.getAttribute('data-template-id');
+    const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === tplId);
+    if (tpl) {
+      card.addEventListener('mouseenter', () => startSidebarTemplateHover(card, tpl));
+      card.addEventListener('mouseleave', () => stopSidebarTemplateHover(card, tpl));
+    }
+  });
+}
+
+function modalSelectTemplateCard(templateId) {
+  const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
+  if (!tpl) return;
+
+  // Snapshot current customizer state into the active scene before switching
+  if (Array.isArray(projectScenes) && projectScenes[activeStoryboardSceneIndex]) {
+    const curSc = projectScenes[activeStoryboardSceneIndex];
+    curSc.prim = topCustomizerState.primaryUrl;
+    curSc.sec = topCustomizerState.secondaryUrl;
+    curSc.bgRemoved = topCustomizerState.bgRemoved;
+    curSc.cutoutCanvas = topCustomizerState.cutoutCanvas;
+    curSc.hasTextBehind = topCustomizerState.hasTextBehind;
+    curSc.mainText = topCustomizerState.mainText;
+    curSc.subText = topCustomizerState.subText;
+    curSc.textColor = topCustomizerState.textColor;
+  }
+
+  const isAddingNew = (window._modalInAddSceneMode === true);
+  window._modalInAddSceneMode = false;
+
+  if (!Array.isArray(projectScenes) || projectScenes.length === 0) {
+    const dur = parseInt(tpl.timeToApply) || 6;
+    projectScenes = [
+      {
+        id: `scene-1`,
+        title: `Scene 1: ${tpl.title.split('(')[0].trim()}`,
+        tplId: tpl.id,
+        start: 0,
+        duration: dur,
+        thumb: tpl.defaultImage
+      }
+    ];
+    activeStoryboardSceneIndex = 0;
+  } else if (isAddingNew) {
+    // Explicitly tapped "+ Add Scene" button -> append a new scene
+    const dur = parseInt(tpl.timeToApply) || 6;
+    let totalDuration = 0;
+    projectScenes.forEach(s => { totalDuration += (s.duration || 6); });
+    const newIdx = projectScenes.length;
+    projectScenes.push({
+      id: `scene-${Date.now()}-${newIdx}`,
+      title: `Scene ${newIdx + 1}: ${tpl.title.split('(')[0].trim()}`,
+      tplId: tpl.id,
+      start: totalDuration,
+      duration: dur,
+      thumb: tpl.defaultImage
+    });
+    activeStoryboardSceneIndex = newIdx;
+    showTextTimingAlert(`Added Scene ${newIdx + 1}: ${tpl.title.split('(')[0].trim()}!`, 'success');
+  } else {
+    // User selected a template from the sidebar to customize for the current scene
+    const curSc = projectScenes[activeStoryboardSceneIndex];
+    if (curSc) {
+      curSc.tplId = tpl.id;
+      curSc.title = `Scene ${activeStoryboardSceneIndex + 1}: ${tpl.title.split('(')[0].trim()}`;
+      curSc.thumb = tpl.defaultImage;
+      curSc.prim = tpl.defaultImage;
+      curSc.sec = tpl.secondaryImage || tpl.defaultImage;
+      curSc.cutoutCanvas = null;
+      curSc.bgRemoved = (tpl.id === 'subject-25d-parallax' || tpl.id === 'magnates-paper-vector-cutout');
+    }
+  }
+
+  openTopTemplateCustomizer(tpl);
+  populateModalTemplatesSidebar();
+  populateModalScenesStoryboard();
+}
+
+function populateModalScenesStoryboard() {
+  const container = document.getElementById('modal-scenes-storyboard-row');
+  if (!container) return;
+
+  if (!Array.isArray(projectScenes) || projectScenes.length === 0) {
+    const dur = topCustomizerState.duration || 6;
+    projectScenes = [
+      {
+        id: 'scene-1',
+        title: 'Scene 1',
+        tplId: topCustomizerState.currentTpl?.id || 'subject-25d-parallax',
+        start: 0,
+        duration: dur,
+        thumb: topCustomizerState.primaryUrl || (topCustomizerState.currentTpl?.defaultImage)
+      }
+    ];
+    activeStoryboardSceneIndex = 0;
+  }
+
+  let html = projectScenes.map((sc, idx) => {
+    const isActive = (idx === activeStoryboardSceneIndex);
+    const sceneTpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId);
+    const thumbImg = sc.thumb || sceneTpl?.defaultImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+
+    return `
+      <div onclick="modalSelectStoryboardScene(${idx})" style="flex: 0 0 170px; height: 58px; min-height: 58px; background: ${isActive ? 'rgba(139, 92, 246, 0.12)' : '#08090e'}; border: 1px solid ${isActive ? 'rgba(139, 92, 246, 0.45)' : 'rgba(255, 255, 255, 0.05)'}; box-shadow: ${isActive ? '0 0 12px rgba(139, 92, 246, 0.15)' : 'none'}; border-radius: 8px; padding: 6px 10px; display: flex; gap: 8px; align-items: center; position: relative; cursor: pointer; transition: all 0.2s;" title="Scene ${idx + 1}">
+        <div style="width: 20px; height: 20px; border-radius: 50%; background: ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+          ${idx + 1}
+        </div>
+        <img src="${thumbImg}" alt="Scene" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400';" style="width: 38px; height: 38px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;" />
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 2px;">
+          <div style="font-size: 11px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1;">${sc.title || 'Scene ' + (idx + 1)}</div>
+          <div style="font-size: 9.5px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.1;">${sceneTpl ? (sceneTpl.title.split('(')[0].trim()) : 'Parallax'}</div>
+          <div>
+            <span style="font-size: 8px; padding: 1px 6px; border-radius: 10px; background: ${isActive ? '#8b5cf6' : 'rgba(255,255,255,0.06)'}; color: #ffffff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; display: inline-block;">
+              ${isActive ? 'ACTIVE' : 'READY'}
+            </span>
+          </div>
+        </div>
+        ${projectScenes.length > 1 ? `
+          <button type="button" onclick="event.stopPropagation(); modalRemoveStoryboardScene(${idx})" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 4px; position: absolute; top: 2px; right: 3px; line-height: 1;" title="Remove Scene" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#64748b';">✕</button>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+
+  // Clean Add Scene Card matching Image 2
+  html += `
+    <div onclick="modalAddNextSceneAction()" style="flex: 0 0 150px; height: 58px; min-height: 58px; border: 1px dashed rgba(255, 255, 255, 0.12); border-radius: 8px; background: #08090e; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 6px 10px; cursor: pointer; transition: all 0.2s; user-select: none;" title="Add next template scene" onmouseover="this.style.background='#10131e'; this.style.borderColor='rgba(139, 92, 246, 0.4)';" onmouseout="this.style.background='#08090e'; this.style.borderColor='rgba(255, 255, 255, 0.12)';">
+      <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center; color: #cbd5e1; font-size: 11px; font-weight: 600; line-height: 1;">+</div>
+      <span style="font-size: 10.5px; font-weight: 600; color: #cbd5e1; text-align: center; line-height: 1.1;">Add Scene</span>
+      <span style="font-size: 8px; color: #64748b; text-align: center; line-height: 1;">New template or shot</span>
+    </div>
+  `;
+
+  container.innerHTML = html;
+}
+
+function modalRemoveStoryboardScene(index) {
+  if (!Array.isArray(projectScenes) || projectScenes.length <= 1) {
+    showTextTimingAlert('Cannot remove the only scene in sequence.', 'warning');
+    return;
+  }
+  projectScenes.splice(index, 1);
+  if (activeStoryboardSceneIndex >= projectScenes.length) {
+    activeStoryboardSceneIndex = projectScenes.length - 1;
+  }
+  const currentScene = projectScenes[activeStoryboardSceneIndex];
+  const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === currentScene.tplId) || EFFECT_TEMPLATES_DATA[0];
+  openTopTemplateCustomizer(tpl);
+  populateModalTemplatesSidebar();
+  populateModalScenesStoryboard();
+  showTextTimingAlert('Scene removed from sequence.', 'info');
+}
+
+function modalSelectStoryboardScene(index) {
+  if (projectScenes && projectScenes[index]) {
+    // Snapshot current active scene before switching
+    if (projectScenes[activeStoryboardSceneIndex]) {
+      const curSc = projectScenes[activeStoryboardSceneIndex];
+      curSc.prim = topCustomizerState.primaryUrl;
+      curSc.sec = topCustomizerState.secondaryUrl;
+      curSc.bgRemoved = topCustomizerState.bgRemoved;
+      curSc.cutoutCanvas = topCustomizerState.cutoutCanvas;
+      curSc.hasTextBehind = topCustomizerState.hasTextBehind;
+      curSc.mainText = topCustomizerState.mainText;
+      curSc.subText = topCustomizerState.subText;
+      curSc.textColor = topCustomizerState.textColor;
+    }
+
+    activeStoryboardSceneIndex = index;
+    const sc = projectScenes[index];
+    const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId) || EFFECT_TEMPLATES_DATA[0];
+    openTopTemplateCustomizer(tpl);
+    if (sc.prim) topCustomizerState.primaryUrl = sc.prim;
+    if (sc.sec) topCustomizerState.secondaryUrl = sc.sec;
+    if (sc.bgRemoved !== undefined) topCustomizerState.bgRemoved = sc.bgRemoved;
+    if (sc.cutoutCanvas !== undefined) topCustomizerState.cutoutCanvas = sc.cutoutCanvas;
+    if (sc.hasTextBehind !== undefined) topCustomizerState.hasTextBehind = sc.hasTextBehind;
+    if (sc.mainText) topCustomizerState.mainText = sc.mainText;
+    if (sc.subText) topCustomizerState.subText = sc.subText;
+    if (sc.textColor) topCustomizerState.textColor = sc.textColor;
+
+    renderTopTemplatePreviewStage();
+    populateModalTemplatesSidebar();
+    populateModalScenesStoryboard();
+  }
+}
+
+function modalAddNextSceneAction() {
+  window._modalInAddSceneMode = true;
+  const drawer = document.getElementById('modal-tpl-sidebar-drawer');
+  if (drawer) {
+    drawer.style.display = 'flex';
+    drawer.style.boxShadow = 'inset 0 0 20px rgba(168,85,247,0.4)';
+    setTimeout(() => { if (drawer) drawer.style.boxShadow = 'none'; }, 1500);
+  }
+  showTextTimingAlert('Tap any template on the left to append it as a new scene!', 'info');
+  setTimeout(() => showTextTimingAlert(''), 2500);
 }
 
 /* =========================================================
