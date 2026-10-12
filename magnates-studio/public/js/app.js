@@ -7383,21 +7383,6 @@ document.getElementById('btn-filter-reset-modal')?.addEventListener('click', (e)
   window.resetFilterModal();
 });
 
-  const fModalSlider = document.getElementById('fmodal-intensity-slider');
-  const fModalVal = document.getElementById('fmodal-intensity-val');
-  if (fModalSlider) fModalSlider.value = 100;
-  if (fModalVal) fModalVal.textContent = '100%';
-
-  const badge = document.getElementById('badge-filter-name');
-  if (badge) badge.textContent = 'NONE';
-  const modalBadge = document.getElementById('cbar-modal-active-badge');
-  if (modalBadge) modalBadge.textContent = 'Original';
-
-  highlightActiveFilterCard('none');
-  recordState('Reset Filter to Original');
-  renderCanvas();
-  showTextTimingAlert('Reset filter to original', 'info');
-});
 
 // Quick opener from Inspector sidebar
 document.getElementById('btn-open-filter-modal-from-sidebar')?.addEventListener('click', () => {
