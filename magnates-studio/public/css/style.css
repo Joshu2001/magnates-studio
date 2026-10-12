@@ -7956,6 +7956,9 @@ body.tool-slide-active {
 }
 
 /* Modal Stage Dynamic Aspect Ratio Sizing */
+#tpl-modal-preview-stage-container {
+  overflow: visible !important;
+}
 #tpl-modal-preview-stage-container.aspect-16-9 { aspect-ratio: 16 / 9; max-width: 100%; }
 #tpl-modal-preview-stage-container.aspect-9-16 { aspect-ratio: 9 / 16; max-width: 280px; }
 #tpl-modal-preview-stage-container.aspect-1-1 { aspect-ratio: 1 / 1; max-width: 320px; }
@@ -7963,6 +7966,9 @@ body.tool-slide-active {
 #tpl-modal-preview-stage-container.aspect-21-9 { aspect-ratio: 21 / 9; max-width: 100%; }
 
 /* Main Studio Canvas Dynamic Aspect Ratio Sizing */
+.canvas-wrapper {
+  overflow: visible !important;
+}
 #previewCanvas.aspect-16-9 { aspect-ratio: 16 / 9 !important; }
 #previewCanvas.aspect-9-16 { aspect-ratio: 9 / 16 !important; max-width: 360px !important; }
 #previewCanvas.aspect-1-1 { aspect-ratio: 1 / 1 !important; max-width: 480px !important; }
