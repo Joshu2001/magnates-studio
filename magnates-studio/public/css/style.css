@@ -3992,13 +3992,14 @@ canvas.tool-draw {
 }
 
 /* ==================== MODAL OVERLAYS & CARDS ==================== */
+.modal-backdrop,
 .chart-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.78);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 10000;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 100050;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,7 +1,7 @@
 {
   "text": [
     {
-      "id": "txt-1791796199136-y7hi",
+      "id": "txt-1791800752788-tmy9",
       "text": "MAGNATES",
       "highlight": "MAGNATES",
       "highlightColor": "#ff334b",
@@ -24,7 +24,7 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791796199136-lsww",
+      "id": "img-bg-1791800752788-cm3h",
       "start": 0,
       "duration": 6,
       "layerOrder": "back",
@@ -37,7 +37,7 @@
       }
     },
     {
-      "id": "img-fg-1791796199136-5v6l",
+      "id": "img-fg-1791800752788-i3rs",
       "start": 0,
       "duration": 6,
       "layerOrder": "front",
@@ -79,14 +79,14 @@
       "duration": 60,
       "bgType": "cyber_grid",
       "bgColor": "#0a0b0e",
-      "filter": "none",
-      "lut": "none",
+      "filter": "negative",
+      "lut": "negative",
       "filterIntensity": 100
     }
   ],
   "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791796262152,
-  "projectName": "New Project 26",
-  "projectId": "proj_1791796201417_swwg"
+  "savedAt": 1791801522152,
+  "projectName": "New Project 31",
+  "projectId": "proj_1791800753667_i5kb"
 }

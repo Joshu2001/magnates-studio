@@ -5658,6 +5658,23 @@ function updateCanvaContextBar(clip = null, trackType = null) {
       bgRemoverBtn.style.opacity = (trackType === 'image') ? '1' : '0.5';
     }
   }
+
+  // Update Top Toolbar Filter button badge & appearance
+  const filterBadge = document.getElementById('btn-cbar-filter-badge');
+  const filterBtn = document.getElementById('btn-cbar-filter');
+  const currentF = (clip && (clip.filter || clip.lut)) || 'none';
+  if (filterBadge && filterBtn) {
+    if (currentF && currentF !== 'none') {
+      filterBadge.style.display = 'inline-block';
+      filterBadge.textContent = 'Applied';
+      filterBtn.style.borderColor = 'rgba(74, 222, 128, 0.45)';
+      filterBtn.style.background = 'rgba(34, 197, 94, 0.12)';
+    } else {
+      filterBadge.style.display = 'none';
+      filterBtn.style.borderColor = 'rgba(236, 72, 153, 0.35)';
+      filterBtn.style.background = 'rgba(236, 72, 153, 0.12)';
+    }
+  }
 }
 
 // Wire up Canva Contextual Toolbar Actions
@@ -7055,6 +7072,11 @@ function renderFilterPresetsUI() {
           // Flash confirmation banner inside the modal
           showModalFeedbackBanner(`Applied ${preset.name} look`);
           showFloatingToast(`Filter: ${preset.name}`, '✓');
+
+          // Update Top Contextual Bar Filter button status
+          if (typeof updateCanvaContextBar === 'function') {
+            updateCanvaContextBar(target.clip, target.trackType);
+          }
         });
 
       container.appendChild(card);
@@ -7332,11 +7354,16 @@ window.executeApplyFilterScope = function() {
     }, 1500);
   }
 
-  // Auto-close modal after brief confirmation so user clearly sees it has completed and preview is visible
+  // Update top contextual bar Filter button badge
+  if (typeof updateCanvaContextBar === 'function') {
+    updateCanvaContextBar(selectedClip?.clip, selectedClip?.trackType);
+  }
+
+  // Auto-close modal after confirmation so user can see '✓ Applied!' clearly
   setTimeout(() => {
     const fModal = document.getElementById('cbar-filter-modal');
     if (fModal) fModal.style.display = 'none';
-  }, 450);
+  }, 900);
 };
 
 // Apply Filter Button Click Event Listener (both IDs supported)
@@ -7376,6 +7403,9 @@ window.resetFilterModal = function() {
   renderCanvas();
   showFloatingToast('Reset filter to original', '✓');
   showModalFeedbackBanner('Reset to original');
+  if (typeof updateCanvaContextBar === 'function') {
+    updateCanvaContextBar(selectedClip?.clip, selectedClip?.trackType);
+  }
 };
 
 document.getElementById('btn-filter-reset-modal')?.addEventListener('click', (e) => {
@@ -21061,21 +21091,269 @@ function getAllAvailableTemplates() {
   return [...custom, ...BUILTIN_TEMPLATES];
 }
 
-// 1. SAVE AS TEMPLATE LOGIC
-function openSaveAsTemplateModal() {
+// 1. SAVE AS TEMPLATE LOGIC WITH LAYER ABSTRACTION
+let templateLayerAbstractionConfig = [];
+let _isTemplateModalFromCustomizer = false;
+
+function openSaveAsTemplateModal(isFromCustomizer = false) {
   const modal = document.getElementById('modal-save-template');
   if (!modal) return;
+
+  const customizerModal = document.getElementById('modal-top-template-customizer');
+  const isCustomizerActive = isFromCustomizer || (customizerModal && (customizerModal.style.display === 'flex' || window.getComputedStyle(customizerModal).display === 'flex'));
+  _isTemplateModalFromCustomizer = !!isCustomizerActive;
+
   const nameInput = document.getElementById('tpl-input-name');
   if (nameInput) {
-    nameInput.value = getCurrentProjectName() + ' Template';
+    if (isCustomizerActive && topCustomizerState && topCustomizerState.currentTpl) {
+      nameInput.value = (topCustomizerState.currentTpl.title || 'My Template') + ' (Custom)';
+    } else {
+      nameInput.value = getCurrentProjectName() + ' Template';
+    }
   }
   const descInput = document.getElementById('tpl-input-desc');
   if (descInput) {
-    descInput.value = 'Custom reusable template layout with saved effects';
+    if (isCustomizerActive && topCustomizerState && topCustomizerState.currentTpl) {
+      descInput.value = (topCustomizerState.currentTpl.description || 'Customized template layout') + ' - Reusable template';
+    } else {
+      descInput.value = 'Custom reusable template layout with saved layers and effects';
+    }
   }
+
+  // Draw snapshot of the current canvas onto the thumbnail canvas
+  const thumbCanvas = document.getElementById('tpl-thumbnail-canvas');
+  if (thumbCanvas) {
+    const ctx = thumbCanvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, thumbCanvas.width, thumbCanvas.height);
+      if (isCustomizerActive) {
+        // First try drawing cutout canvas or background image
+        let drawn = false;
+        if (topCustomizerState && topCustomizerState.primaryUrl) {
+          const img = mediaElementCache.get(topCustomizerState.primaryUrl);
+          if (img && img.complete) {
+            ctx.drawImage(img, 0, 0, thumbCanvas.width, thumbCanvas.height);
+            drawn = true;
+          }
+        }
+        if (!drawn && topCustomizerState && topCustomizerState.cutoutCanvas) {
+          ctx.drawImage(topCustomizerState.cutoutCanvas, 0, 0, thumbCanvas.width, thumbCanvas.height);
+          drawn = true;
+        }
+        if (!drawn) {
+          // Fallback to active main canvas or solid background
+          const mainCanvas = document.getElementById('previewCanvas');
+          if (mainCanvas && mainCanvas.width > 0) {
+            try { ctx.drawImage(mainCanvas, 0, 0, thumbCanvas.width, thumbCanvas.height); } catch(e) {}
+          }
+        }
+      } else {
+        const mainCanvas = document.getElementById('previewCanvas');
+        if (mainCanvas) {
+          try { ctx.drawImage(mainCanvas, 0, 0, thumbCanvas.width, thumbCanvas.height); } catch(e) {}
+        }
+      }
+    }
+  }
+
+  // Populate Layer Abstraction List
+  const listContainer = document.getElementById('tpl-layers-abstraction-list');
+  templateLayerAbstractionConfig = [];
+
+  if (listContainer) {
+    listContainer.innerHTML = '';
+
+    if (isCustomizerActive && topCustomizerState && topCustomizerState.currentTpl) {
+      // Build layers directly from Step 2 Top Customizer State!
+      // 1. Primary Subject / Cutout
+      if (topCustomizerState.primaryUrl) {
+        templateLayerAbstractionConfig.push({
+          clipId: 'cust-primary-subject',
+          trackType: 'image',
+          label: topCustomizerState.bgRemoved ? 'Cutout Subject / Foreground' : 'Primary Media Clip',
+          role: 'replaceable',
+          placeholderLabel: 'Subject Media / Cutout'
+        });
+      }
+      // 2. Background / Secondary Scene
+      if (topCustomizerState.secondaryUrl) {
+        templateLayerAbstractionConfig.push({
+          clipId: 'cust-secondary-bg',
+          trackType: 'background',
+          label: 'Background Panning Scene',
+          role: 'locked',
+          placeholderLabel: 'Background Scene'
+        });
+      }
+      // 3. Main Text Behind / Overlay
+      if (topCustomizerState.hasTextBehind && topCustomizerState.textVisible !== false) {
+        templateLayerAbstractionConfig.push({
+          clipId: 'cust-main-text',
+          trackType: 'text',
+          label: `Main Title: "${topCustomizerState.mainText || topCustomizerState.textBehindContent || 'MAGNATES'}"`,
+          role: 'replaceable',
+          placeholderLabel: 'Headline / Main Title'
+        });
+        if (topCustomizerState.subText) {
+          templateLayerAbstractionConfig.push({
+            clipId: 'cust-sub-text',
+            trackType: 'text',
+            label: `Subtitle: "${topCustomizerState.subText}"`,
+            role: 'replaceable',
+            placeholderLabel: 'Subtitle / Tagline'
+          });
+        }
+      }
+      // 4. Extra Texts
+      if (Array.isArray(topCustomizerState.extraTexts)) {
+        topCustomizerState.extraTexts.forEach((et, i) => {
+          templateLayerAbstractionConfig.push({
+            clipId: `cust-extra-text-${i}`,
+            trackType: 'text',
+            label: `Extra Text ${i+1}: "${et.text || ''}"`,
+            role: 'replaceable',
+            placeholderLabel: 'Extra Text'
+          });
+        });
+      }
+      // 5. Extra Images
+      if (Array.isArray(topCustomizerState.extraImages)) {
+        topCustomizerState.extraImages.forEach((ei, i) => {
+          templateLayerAbstractionConfig.push({
+            clipId: `cust-extra-img-${i}`,
+            trackType: 'image',
+            label: `Extra Cutout ${i+1}`,
+            role: 'replaceable',
+            placeholderLabel: 'Extra Image'
+          });
+        });
+      }
+      // 6. Audio
+      if (window._customizerAudioTrack) {
+        templateLayerAbstractionConfig.push({
+          clipId: 'cust-audio-track',
+          trackType: 'music',
+          label: `Audio: ${window._customizerAudioTrack.name || 'Sequence Track'}`,
+          role: 'locked',
+          placeholderLabel: 'Audio Track'
+        });
+      }
+    } else {
+      // From main timeline
+      const tracksToInspect = ['background', 'image', 'video', 'chart', 'text', 'quote', 'music', 'voiceover'];
+      let layerIndex = 0;
+
+      tracksToInspect.forEach(trackType => {
+        const clips = (timelineClips && timelineClips[trackType]) ? timelineClips[trackType] : [];
+        clips.forEach((clip, i) => {
+          layerIndex++;
+          const layerId = clip.id || `layer-${trackType}-${i}`;
+          const layerLabel = clip.name || clip.text || `${trackType.charAt(0).toUpperCase() + trackType.slice(1)} Clip ${i+1}`;
+          // Smart defaults: Backgrounds and music default to 'locked', foreground images & texts default to 'replaceable'
+          const isDefaultReplaceable = (trackType === 'text' || trackType === 'image' || trackType === 'video');
+          const role = isDefaultReplaceable ? 'replaceable' : 'locked';
+
+          templateLayerAbstractionConfig.push({
+            clipId: layerId,
+            trackType,
+            label: layerLabel,
+            role,
+            placeholderLabel: isDefaultReplaceable ? (trackType === 'text' ? 'Headline / Title' : 'Media Footage') : ''
+          });
+        });
+      });
+    }
+
+    if (templateLayerAbstractionConfig.length === 0) {
+      listContainer.innerHTML = `
+        <div style="text-align: center; padding: 20px 14px; color: #64748b; font-size: 11.5px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" style="width: 24px; height: 24px; fill: rgba(255,255,255,0.2);"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>
+          <span>No active layers detected. Default placeholders will be created automatically.</span>
+        </div>
+      `;
+    } else {
+      const getLayerIconSvg = (tType) => {
+        if (tType === 'image') return `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #38bdf8;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
+        if (tType === 'text') return `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #f59e0b;"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>`;
+        if (tType === 'video') return `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #ef4444;"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
+        if (tType === 'background') return `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #a855f7;"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 18.5c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l.91-.91C8.21 19.64 9.99 20.25 12 20.25c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>`;
+        return `<svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #10b981;"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`;
+      };
+
+      listContainer.innerHTML = templateLayerAbstractionConfig.map((item, idx) => {
+        const isLocked = item.role === 'locked';
+        const typeIcon = getLayerIconSvg(item.trackType);
+
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; gap: 10px; transition: background 0.18s;" onmouseover="this.style.background='rgba(255,255,255,0.05)';" onmouseout="this.style.background='rgba(255,255,255,0.03)';">
+            <div style="display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1;">
+              <div style="width: 24px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                ${typeIcon}
+              </div>
+              <div style="min-width: 0;">
+                <div style="font-size: 11.5px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                  ${item.label}
+                </div>
+                <div style="font-size: 9.5px; color: #64748b; font-family: monospace; letter-spacing: 0.5px;">${item.trackType.toUpperCase()} LAYER</div>
+              </div>
+            </div>
+
+            <!-- Custom Designed Abstraction Role Dropdown with Arrow SVG -->
+            <div style="position: relative; flex-shrink: 0;">
+              <select onchange="updateTemplateLayerRole(${idx}, this.value)" style="background: #090c13; border: 1px solid rgba(168,85,247,0.35); border-radius: 6px; color: #c084fc; font-size: 11px; padding: 5px 24px 5px 10px; outline: none; font-weight: 600; appearance: none; -webkit-appearance: none; cursor: pointer;">
+                <option value="replaceable" ${item.role === 'replaceable' ? 'selected' : ''}>Replaceable Slot</option>
+                <option value="locked" ${item.role === 'locked' ? 'selected' : ''}>Locked / Fixed</option>
+              </select>
+              <svg viewBox="0 0 24 24" style="position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 11px; height: 11px; fill: #c084fc; pointer-events: none;"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Update layer count badge in tabs
+    const countBadge = document.getElementById('tpl-layers-count-badge');
+    if (countBadge) {
+      countBadge.textContent = `${templateLayerAbstractionConfig.length} layer${templateLayerAbstractionConfig.length === 1 ? '' : 's'}`;
+    }
+  }
+
+  // Reset collapsible layer roles to closed by default
+  const wrap = document.getElementById('tpl-layers-collapsible-wrap');
+  const txt = document.getElementById('tpl-layers-toggle-text');
+  const chev = document.getElementById('tpl-layers-chevron');
+  if (wrap) wrap.style.display = 'none';
+  if (txt) txt.textContent = 'Customize';
+  if (chev) chev.style.transform = 'none';
+
+  modal.style.zIndex = '100060';
   modal.style.setProperty('display', 'flex', 'important');
   modal.classList.add('is-open');
 }
+
+window.toggleSaveTemplateLayers = function() {
+  const wrap = document.getElementById('tpl-layers-collapsible-wrap');
+  const txt = document.getElementById('tpl-layers-toggle-text');
+  const chev = document.getElementById('tpl-layers-chevron');
+  if (!wrap) return;
+
+  const isHidden = wrap.style.display === 'none' || !wrap.style.display;
+  if (isHidden) {
+    wrap.style.display = 'block';
+    if (txt) txt.textContent = 'Hide';
+    if (chev) chev.style.transform = 'rotate(180deg)';
+  } else {
+    wrap.style.display = 'none';
+    if (txt) txt.textContent = 'Customize';
+    if (chev) chev.style.transform = 'none';
+  }
+};
+
+window.updateTemplateLayerRole = function(idx, newRole) {
+  if (templateLayerAbstractionConfig && templateLayerAbstractionConfig[idx]) {
+    templateLayerAbstractionConfig[idx].role = newRole;
+  }
+};
 
 function closeSaveAsTemplateModal() {
   const modal = document.getElementById('modal-save-template');
@@ -21092,48 +21370,133 @@ async function handleConfirmSaveAsTemplate() {
 
   const title = (nameInput?.value || '').trim() || 'Custom Template';
   const category = catSelect?.value || 'custom';
-  const description = (descInput?.value || '').trim() || 'User created template layout';
+  const description = (descInput?.value || '').trim() || 'User created template layout with custom layers';
 
-  // Snapshot current timeline state
-  const rawState = getSerializableClips();
+  // Snapshot clips state
+  let rawState = null;
+  let customDuration = duration || 15;
 
-  // Extract slots dynamically from timeline
+  if (_isTemplateModalFromCustomizer && topCustomizerState && topCustomizerState.currentTpl) {
+    // Generate serializable clips for the customizer scenes
+    const scenesToCommit = (Array.isArray(projectScenes) && projectScenes.length > 0)
+      ? [...projectScenes]
+      : [{
+          id: `scene-${Date.now()}`,
+          title: `Scene 1: ${(topCustomizerState.currentTpl?.title || 'Preset').split(' ')[0]}`,
+          tplId: topCustomizerState.currentTpl?.id || 'subject-25d-parallax',
+          start: 0,
+          duration: topCustomizerState.duration || 6,
+          thumb: topCustomizerState.primaryUrl
+        }];
+
+    let runningOffset = 0;
+    let allImgs = [];
+    let allTxts = [];
+
+    scenesToCommit.forEach((sc, sIdx) => {
+      const scTpl = EFFECT_TEMPLATES_DATA.find(t => t.id === sc.tplId) || topCustomizerState.currentTpl || EFFECT_TEMPLATES_DATA[0];
+      const scDur = sc.duration || parseInt(scTpl.timeToApply) || 6;
+      const sceneStart = runningOffset;
+      runningOffset += scDur;
+
+      const prim = (sIdx === (typeof activeStoryboardSceneIndex !== 'undefined' ? activeStoryboardSceneIndex : 0))
+        ? (topCustomizerState.primaryUrl || sc.thumb || scTpl.defaultImage)
+        : (sc.thumb || scTpl.defaultImage);
+      const sec = (sIdx === (typeof activeStoryboardSceneIndex !== 'undefined' ? activeStoryboardSceneIndex : 0))
+        ? (topCustomizerState.secondaryUrl || scTpl.secondaryImage)
+        : (scTpl.secondaryImage);
+      const depthVal = topCustomizerState.depth || 65;
+      const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
+
+      const { imageClips, textClips } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
+        prim, sec, depthVal, opacityVal,
+        bgRemoved: topCustomizerState.bgRemoved,
+        cutoutCanvas: topCustomizerState.cutoutCanvas,
+        hasTextBehind: topCustomizerState.hasTextBehind,
+        textBehindContent: topCustomizerState.textBehindContent || topCustomizerState.mainText,
+        textBehindColor: topCustomizerState.textBehindColor || topCustomizerState.textColor,
+        mainText: topCustomizerState.mainText,
+        subText: topCustomizerState.subText,
+        textColor: topCustomizerState.textColor,
+        extraTexts: topCustomizerState.extraTexts || [],
+        extraImages: topCustomizerState.extraImages || [],
+        blur: topCustomizerState.blur !== undefined ? topCustomizerState.blur : 2,
+        layerOrder: topCustomizerState.layerOrder || 'front'
+      });
+
+      allImgs = allImgs.concat(imageClips);
+      allTxts = allTxts.concat(textClips);
+    });
+
+    customDuration = runningOffset || 6;
+    rawState = {
+      text: allTxts,
+      image: allImgs,
+      video: [],
+      audio: window._customizerAudioTrack ? [{
+        id: `aud-${Date.now()}`,
+        name: window._customizerAudioTrack.name || 'Sequence_Audio.mp3',
+        url: window._customizerAudioTrack.url,
+        file: { name: window._customizerAudioTrack.name, url: window._customizerAudioTrack.url, isAudio: true },
+        start: 0,
+        duration: customDuration,
+        volume: 0.8
+      }] : [],
+      background: []
+    };
+  } else {
+    rawState = getSerializableClips();
+  }
+
+  // Snapshot preview image thumbnail
+  const thumbCanvas = document.getElementById('tpl-thumbnail-canvas');
+  let thumbDataUrl = '';
+  if (thumbCanvas) {
+    try {
+      thumbDataUrl = thumbCanvas.toDataURL('image/jpeg', 0.85);
+    } catch (e) {}
+  }
+  if (!thumbDataUrl && topCustomizerState && topCustomizerState.primaryUrl) {
+    thumbDataUrl = topCustomizerState.primaryUrl;
+  }
+
+  // Compile replaceable slots for beginner swapping
   const slots = [];
-  if (timelineClips.video && timelineClips.video.length > 0) {
-    timelineClips.video.forEach((v, idx) => {
-      slots.push({ id: `slot-v-${idx+1}`, type: 'video', label: `Video Clip Slot ${idx+1}`, duration: v.duration || 4 });
-    });
-  }
-  if (timelineClips.image && timelineClips.image.length > 0) {
-    timelineClips.image.forEach((img, idx) => {
-      slots.push({ id: `slot-img-${idx+1}`, type: 'image', label: `Image Slot ${idx+1}`, duration: img.duration || 4 });
-    });
-  }
-  if (timelineClips.text && timelineClips.text.length > 0) {
-    timelineClips.text.forEach((t, idx) => {
-      slots.push({ id: `slot-txt-${idx+1}`, type: 'text', label: `Headline Slot ${idx+1}`, duration: t.duration || 3, text: t.text });
-    });
-  }
-  if (timelineClips.chart && timelineClips.chart.length > 0) {
-    slots.push({ id: 'slot-chart-1', type: 'chart', label: 'Animated Chart Slot', duration: 5 });
-  }
+  templateLayerAbstractionConfig.forEach((cfg, idx) => {
+    if (cfg.role === 'replaceable') {
+      slots.push({
+        id: `slot-${idx+1}`,
+        type: cfg.trackType,
+        label: cfg.label,
+        duration: 4
+      });
+    }
+  });
+
+  const chosenCategory = (category === 'custom' || !category) ? 'My Templates' : category;
 
   const newTemplate = {
     id: 'tpl_custom_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    title: title,
     name: title,
-    category: category,
-    badge: 'Custom',
+    category: chosenCategory,
+    origCategory: chosenCategory,
+    badge: '★ My Template',
     aspectRatio: '16:9',
-    duration: duration || 15,
+    duration: customDuration || 15,
     description: description,
+    difficulty: '1-Click',
+    timeToApply: 'Instant',
     requires: ['custom'],
     isCustom: true,
     createdAt: Date.now(),
+    tags: ['Custom', 'My Templates', chosenCategory],
+    defaultImage: thumbDataUrl || (topCustomizerState?.primaryUrl) || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400',
+    secondaryImage: (topCustomizerState?.secondaryUrl) || thumbDataUrl || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400',
+    layerAbstraction: templateLayerAbstractionConfig,
     slots: slots.length > 0 ? slots : [
-      { id: 'slot-1', type: 'video', label: 'Primary Video Slot', duration: 5 },
-      { id: 'slot-2', type: 'text', label: 'Main Headline Slot', duration: 4 }
+      { id: 'slot-1', type: 'image', label: 'Primary Subject Slot', duration: 5 }
     ],
-    previewBg: 'linear-gradient(135deg, #00f0ff, #a855f7)',
     state: rawState
   };
 
@@ -21142,22 +21505,45 @@ async function handleConfirmSaveAsTemplate() {
   customList.unshift(newTemplate);
   saveCustomTemplates(customList);
 
-  // Sync with backend API
-  try {
-    await fetch('/api/templates', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTemplate)
-    });
-  } catch (err) {}
+  // Sync with backend API (non-blocking)
+  fetch('/api/templates', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newTemplate)
+  }).catch(() => {});
 
+  // Close Save As Template modal
   closeSaveAsTemplateModal();
-  playSFX('pop_cork', 0.8);
-  showTextTimingAlert(`Saved "${title}" to Templates!`, 'success');
-  setTimeout(() => showTextTimingAlert(''), 2500);
 
-  // Refresh template hub view if currently viewing
+  // If opened from Step 2 customizer suite, also close the customizer so the user returns to the homepage where their template is rendered
+  if (_isTemplateModalFromCustomizer) {
+    if (typeof closeTopTemplateCustomizer === 'function') {
+      closeTopTemplateCustomizer();
+    }
+    if (typeof switchStudioView === 'function') {
+      switchStudioView('home');
+    }
+  }
+
+  // Switch category to "★ My Templates" or the user's selected category to immediately show the template
+  if (chosenCategory === 'My Templates') {
+    currentTemplateCategory = '★ My Templates';
+  } else {
+    currentTemplateCategory = chosenCategory;
+  }
+
+  playSFX('pop_cork', 0.8);
+
+  // Surface a sleek, high-visibility floating toast
+  const toastMsg = `Template "${title}" saved! Available in ${currentTemplateCategory} & All templates.`;
+  showFloatingToast(toastMsg, '★');
+  showTextTimingAlert(toastMsg, 'success');
+  setTimeout(() => showTextTimingAlert(''), 3500);
+
+  // Refresh template hub view and homepage
   renderTemplatesHub();
+  if (typeof renderHomepageCategories === 'function') renderHomepageCategories();
+  if (typeof renderHomepageTemplates === 'function') renderHomepageTemplates();
 }
 
 // 2. APPLY TEMPLATE TO WORKSPACE
@@ -21361,8 +21747,10 @@ function renderOnboardingRecommendations() {
 
 // Initialize Template Engine Listeners
 function initTemplateEngineListeners() {
-  // Top bar "Save as Template" button
+  // Top bar "Save as Template" button & "Turn into Template" buttons
   document.getElementById('btn-save-as-template')?.addEventListener('click', openSaveAsTemplateModal);
+  document.getElementById('btn-top-turn-template')?.addEventListener('click', openSaveAsTemplateModal);
+  document.getElementById('btn-stage-float-template')?.addEventListener('click', openSaveAsTemplateModal);
   // Panel "Save Current" button
   document.getElementById('btn-save-as-template-panel')?.addEventListener('click', openSaveAsTemplateModal);
 
@@ -22404,7 +22792,7 @@ const EFFECT_TEMPLATES_DATA = [
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
+const TEMPLATE_CATEGORIES = ['All', '★ My Templates', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
@@ -22441,6 +22829,7 @@ function switchStudioView(viewName) {
     document.querySelectorAll('.nav-rail .rail-btn').forEach(b => {
       b.classList.toggle('active', b.dataset.railTab === 'templates');
     });
+    renderHomepageCategories();
     renderHomepageTemplates();
   } else {
     if (homeView) homeView.style.display = 'none';
@@ -22465,6 +22854,8 @@ function switchStudioView(viewName) {
     if (ctxActions) ctxActions.style.display = 'flex';
     const saveBtn = document.getElementById('btn-save-project');
     if (saveBtn) saveBtn.style.display = 'inline-flex';
+    const turnTplBtn = document.getElementById('btn-top-turn-template');
+    if (turnTplBtn) turnTplBtn.style.display = 'inline-flex';
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) exportBtn.style.display = 'inline-flex';
     const topShareBtn = document.getElementById('btn-top-share-project');
@@ -22490,11 +22881,18 @@ function renderHomepageCategories() {
   const container = document.getElementById('home-category-pills');
   if (!container) return;
 
+  const customTpls = getCustomTemplates();
+  const customCount = customTpls.length;
+
   container.innerHTML = TEMPLATE_CATEGORIES.map(cat => {
     const isActive = cat === currentTemplateCategory;
+    const isCustomCat = cat === '★ My Templates';
+    const label = isCustomCat ? `★ My Templates (${customCount})` : cat;
+    const specialClass = isCustomCat ? 'is-my-templates-pill' : '';
+
     return `
-      <button type="button" class="home-cat-pill ${isActive ? 'active' : ''}" data-cat="${cat}">
-        ${cat}
+      <button type="button" class="home-cat-pill ${isActive ? 'active' : ''} ${specialClass}" data-cat="${cat}" style="${isCustomCat && isActive ? 'background: linear-gradient(135deg, #a855f7, #6366f1); border-color: #c084fc; color: #fff;' : isCustomCat ? 'border-color: rgba(168,85,247,0.4); color: #d8b4fe;' : ''}">
+        ${label}
       </button>
     `;
   }).join('');
@@ -22514,14 +22912,31 @@ function renderHomepageTemplates() {
   const headingEl = document.getElementById('home-templates-heading');
   if (!grid) return;
 
-  const filtered = EFFECT_TEMPLATES_DATA.filter(t => {
-    const matchesCat = currentTemplateCategory === 'All' || t.category === currentTemplateCategory;
+  // Merge user custom templates with built-in templates
+  const customTemplates = getCustomTemplates();
+  const allTemplates = [...customTemplates, ...EFFECT_TEMPLATES_DATA];
+
+  const filtered = allTemplates.filter(t => {
+    let matchesCat = false;
+    if (currentTemplateCategory === 'All') {
+      matchesCat = true;
+    } else if (currentTemplateCategory === '★ My Templates') {
+      matchesCat = !!t.isCustom || t.category === 'My Templates';
+    } else {
+      matchesCat = t.category === currentTemplateCategory || t.origCategory === currentTemplateCategory;
+    }
+
     const query = templateSearchQuery.toLowerCase().trim();
+    const titleStr = (t.title || t.name || '').toLowerCase();
+    const badgeStr = (t.badge || '').toLowerCase();
+    const descStr = (t.description || '').toLowerCase();
+    const tagsArr = Array.isArray(t.tags) ? t.tags : [];
     const matchesSearch = !query ||
-      t.title.toLowerCase().includes(query) ||
-      t.badge.toLowerCase().includes(query) ||
-      t.description.toLowerCase().includes(query) ||
-      t.tags.some(tag => tag.toLowerCase().includes(query));
+      titleStr.includes(query) ||
+      badgeStr.includes(query) ||
+      descStr.includes(query) ||
+      tagsArr.some(tag => String(tag).toLowerCase().includes(query));
+
     return matchesCat && matchesSearch;
   });
 
@@ -22529,7 +22944,9 @@ function renderHomepageTemplates() {
   if (headingEl) {
     headingEl.textContent = currentTemplateCategory === 'All'
       ? 'Inspired By Your Creative Workflow'
-      : `${currentTemplateCategory} Templates`;
+      : currentTemplateCategory === '★ My Templates'
+        ? 'My Created Templates & Custom Layouts'
+        : `${currentTemplateCategory} Templates`;
   }
 
   if (filtered.length === 0) {
@@ -22597,7 +23014,7 @@ function renderHomepageTemplates() {
   // Attach hover video effect listeners, share button handler, and click handler to each card
   grid.querySelectorAll('.home-tpl-card').forEach(card => {
     const tplId = card.dataset.templateId;
-    const tpl = EFFECT_TEMPLATES_DATA.find(item => item.id === tplId);
+    const tpl = allTemplates.find(item => item.id === tplId);
 
     // Share button click handler
     const shareBtn = card.querySelector('.home-tpl-share-btn');
@@ -24268,6 +24685,15 @@ function stopTemplateHoverVideo(cardEl, tpl) {
 }
 
 function applySelectedHomepageTemplate(templateId) {
+  // Check if it is a user custom template
+  const customTemplates = getCustomTemplates();
+  const customTpl = customTemplates.find(t => t.id === templateId);
+  if (customTpl) {
+    applyTemplateToWorkspace(templateId);
+    switchStudioView('editor');
+    return;
+  }
+
   const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
   if (!tpl) return;
 
@@ -26372,6 +26798,10 @@ function setupModalCustomizerAudio() {
 function bindTopTemplateCustomizerEvents() {
   document.getElementById('btn-close-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
   document.getElementById('btn-cancel-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
+  document.getElementById('btn-customizer-turn-template')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openSaveAsTemplateModal(true);
+  });
   document.getElementById('btn-apply-top-tpl-timeline')?.addEventListener('click', () => commitTopTemplateCustomizerToTimeline(false));
   document.getElementById('btn-append-scene-timeline')?.addEventListener('click', () => commitTopTemplateCustomizerToTimeline(true));
 

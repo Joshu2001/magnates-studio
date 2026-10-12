@@ -74,6 +74,12 @@
           <span>Save</span>
         </button>
 
+        <!-- Turn into Template Action Button (Editor Mode only) -->
+        <button type="button" class="btn btn-secondary editor-only-nav" id="btn-top-turn-template" title="Turn current composition into reusable template" style="display: none; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; font-weight: 600;">
+          <svg class="ui-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          <span>Turn into Template</span>
+        </button>
+
         <!-- Primary: Export (Editor Mode only) -->
         <button class="btn btn-primary editor-only-nav" id="btn-export" onclick="openExportStudioModal(event)" style="display: none;">
           <svg class="ui-icon" viewBox="0 0 24 24"><path d="M5 4v2h14V4H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
@@ -454,9 +460,10 @@
 
             <!-- Filter Button & Canva-Style Popover Modal -->
             <div class="cbar-filter-dropdown-wrap" style="position: relative;">
-              <button type="button" class="canva-bar-btn" id="btn-cbar-filter" onclick="const m=document.getElementById('cbar-filter-modal'); if(m){ const vis=m.style.display==='block'; m.style.display=vis?'none':'block'; if(!vis && typeof renderFilterPresetsUI==='function') renderFilterPresetsUI(); }" title="Cinema & YouTuber Filter Looks" style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.35); color: #f472b6; font-weight: 600; padding: 4px 10px; border-radius: 8px; white-space: nowrap; cursor: pointer;">
+              <button type="button" class="canva-bar-btn" id="btn-cbar-filter" onclick="const m=document.getElementById('cbar-filter-modal'); if(m){ const vis=m.style.display==='block'; m.style.display=vis?'none':'block'; if(!vis && typeof renderFilterPresetsUI==='function') renderFilterPresetsUI(); }" title="Cinema & YouTuber Filter Looks" style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.35); color: #f472b6; font-weight: 600; padding: 4px 10px; border-radius: 8px; white-space: nowrap; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;">
                 <svg class="ui-icon" viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #f472b6;"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
-                <span>Filter</span>
+                <span id="btn-cbar-filter-label">Filter</span>
+                <span id="btn-cbar-filter-badge" style="display: none; font-size: 9px; padding: 1px 5px; border-radius: 4px; background: rgba(34, 197, 94, 0.25); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.5); font-weight: 700;">Applied</span>
               </button>
 
               <!-- Canva-like Filter Modal / Popover -->
@@ -567,7 +574,7 @@
 
         <div class="canvas-wrapper">
           <!-- Floating Main Studio Canvas Format & Aspect Ratio Switcher -->
-          <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 16px; left: 16px; z-index: 40;">
+          <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 16px; left: 16px; z-index: 10005;">
             <button type="button" id="studio-btn-aspect" class="stage-aspect-pill-btn" title="Switch Video Format / Canvas Aspect Ratio">
               <span class="aspect-icon-badge">📐</span>
               <span id="studio-val-aspect" class="aspect-label">16:9 YouTube</span>
@@ -675,6 +682,12 @@
               </div>
             </div>
           </div>
+
+          <!-- Floating "Turn into Template" Smart Stage Pill -->
+          <button type="button" id="btn-stage-float-template" title="Save composition as reusable template" style="position: absolute; top: 16px; right: 16px; z-index: 45; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(15, 17, 26, 0.88); backdrop-filter: blur(12px); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 9999px; color: #e9d5ff; font-size: 11.5px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 18px rgba(0,0,0,0.4), 0 0 10px rgba(168,85,247,0.25); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);">
+            <span style="display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; font-size: 10px; font-weight: 800;">★</span>
+            <span>Turn into Template</span>
+          </button>
 
           <canvas id="previewCanvas" width="1920" height="1080"></canvas>
 
@@ -6901,8 +6914,12 @@
           <p id="tpl-modal-desc" style="display: none;"></p>
         </div>
 
-        <!-- Right: Apply to Timeline + Close -->
-        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+        <!-- Right: Turn into Template + Apply to Timeline + Close -->
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-customizer-turn-template" style="padding: 7px 14px; font-size: 11.5px; font-weight: 600; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #c084fc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s;" title="Save these customizations as your own reusable template">
+            <span style="display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; font-size: 9px; font-weight: 800;">★</span>
+            <span>Turn into Template</span>
+          </button>
           <button type="button" class="btn btn-primary btn-sm" id="btn-apply-top-tpl-timeline" style="padding: 8px 20px; font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: 1px solid rgba(192,132,252,0.4); color: #ffffff; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 16px rgba(139,92,246,0.35); display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s;" onmouseover="this.style.boxShadow='0 6px 20px rgba(139,92,246,0.5)'; this.style.transform='translateY(-1px)';" onmouseout="this.style.boxShadow='0 4px 16px rgba(139,92,246,0.35)'; this.style.transform='none';">
             <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M7.5 5.6L10 7 8.6 4.5 10 2 7.5 3.4 5 2l1.4 2.5L5 7zm12 9.8L17 14l1.4 2.5L17 19l2.5-1.4L22 19l-1.4-2.5L22 14zM22 2l-2.5 1.4L17 2l1.4 2.5L17 7l2.5-1.4L22 7l-1.4-2.5zm-7.63 5.29c-.39-.39-1.02-.39-1.41 0L1.29 18.96c-.39.39-.39 1.02 0 1.41l2.34 2.34c.39.39 1.02.39 1.41 0L16.7 11.05c.39-.39.39-1.02 0-1.41l-2.33-2.35zm-1.03 5.49l-2.12-2.12 7.07-7.07 2.12 2.12-7.07 7.07z"/></svg>
             <span>Apply to Timeline</span>
@@ -9444,47 +9461,91 @@
     </div>
   </div>
 
-  <!-- Save As Template Modal -->
-  <div id="modal-save-template" class="modal-backdrop" style="display: none;">
-    <div class="modal-card" style="max-width: 520px; width: 90%; background: #131722; border: 1px solid rgba(0, 240, 255, 0.25); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.85); overflow: hidden; display: flex; flex-direction: column;">
-      <div class="modal-header" style="padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; background: rgba(0,240,255,0.04);">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <svg class="ui-icon" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #00f0ff;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-          <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #fff;">Save as Reusable Template</h3>
+  <!-- Save As Template Modal with Clean Native Studio Proportions -->
+  <div id="modal-save-template" class="modal-backdrop" style="display: none; align-items: center; justify-content: center; z-index: 100060;">
+    <div class="modal-card" style="max-width: 460px; width: 92%; max-height: 88vh; background: #11131a; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 14px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9), 0 0 1px 1px rgba(255, 255, 255, 0.06); overflow: hidden; display: flex; flex-direction: column;">
+      
+      <!-- Clean Minimal Header -->
+      <div style="padding: 16px 20px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.02);">
+        <div>
+          <h3 style="margin: 0; font-size: 14px; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px;">Turn into Template</h3>
+          <p style="margin: 3px 0 0; font-size: 11px; color: #64748b;">Save this composition as a reusable preset</p>
         </div>
-        <button type="button" class="btn-apple-icon" id="btn-close-save-template-modal" style="width: 26px; height: 26px;">✕</button>
+        <button type="button" class="btn-apple-icon" id="btn-close-save-template-modal" style="width: 24px; height: 24px; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.18s;" onmouseover="this.style.color='#fff'; this.style.background='rgba(255,255,255,0.1)';" onmouseout="this.style.color='#94a3b8'; this.style.background='rgba(255,255,255,0.05)';">✕</button>
       </div>
 
-      <div class="modal-body" style="padding: 18px; display: flex; flex-direction: column; gap: 14px;">
-        <div>
-          <label style="display: block; font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Template Title</label>
-          <input type="text" id="tpl-input-name" placeholder="e.g. Viral Hook + Cyber Background + Stat Chart" style="width: 100%; background: #090c13; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;">
+      <!-- Compact Content Body -->
+      <div class="modal-body" style="padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto;">
+        
+        <!-- Media Snapshot & Core Properties -->
+        <div style="display: flex; gap: 14px; align-items: center;">
+          <div style="width: 104px; height: 68px; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid rgba(255, 255, 255, 0.1); flex-shrink: 0; position: relative;">
+            <canvas id="tpl-thumbnail-canvas" width="104" height="68" style="width: 100%; height: 100%; object-fit: cover;"></canvas>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8;">Template Title</label>
+            <input type="text" id="tpl-input-name" placeholder="Name your template" style="width: 100%; background: #0a0c12; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 7px; padding: 7px 10px; color: #f8fafc; font-size: 12px; outline: none; transition: border-color 0.18s;" onfocus="this.style.borderColor='#8b5cf6';" onblur="this.style.borderColor='rgba(255,255,255,0.12)';">
+          </div>
         </div>
 
-        <div>
-          <label style="display: block; font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Category</label>
-          <select id="tpl-select-category" style="width: 100%; background: #090c13; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;">
-            <option value="custom">My Custom Templates</option>
-            <option value="tiktok_reels">TikTok / Reels / Shorts (Vertical 9:16)</option>
-            <option value="vlog">Vlog &amp; Cinematic Story (16:9)</option>
-            <option value="promo">Product Promo &amp; Explainer</option>
-            <option value="kinetic">Kinetic Quote &amp; Typography</option>
-          </select>
+        <!-- Category & Format Row -->
+        <div style="display: grid; grid-template-columns: 1fr 90px; gap: 10px;">
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Category</label>
+            <div style="position: relative;">
+              <select id="tpl-select-category" style="width: 100%; background: #0a0c12; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 7px; padding: 7px 28px 7px 10px; color: #f1f5f9; font-size: 11.5px; outline: none; appearance: none; -webkit-appearance: none; cursor: pointer;">
+                <option value="custom" selected>★ My Custom Templates</option>
+                <option value="Animations">Animations</option>
+                <option value="3D Spatial">3D Spatial</option>
+                <option value="Paper / Cutout">Paper / Cutout</option>
+                <option value="Transitions">Transitions</option>
+                <option value="Parallax">Parallax</option>
+                <option value="Text & Titles">Text & Titles</option>
+                <option value="Color & Vibe">Color & Vibe</option>
+              </select>
+              <svg viewBox="0 0 24 24" style="position: absolute; right: 9px; top: 50%; transform: translateY(-50%); width: 11px; height: 11px; fill: #64748b; pointer-events: none;"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Aspect</label>
+            <input type="text" id="tpl-input-aspect" readonly value="16:9" style="width: 100%; background: #0a0c12; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 7px; padding: 7px 10px; color: #64748b; font-size: 11.5px; outline: none; text-align: center; font-weight: 600;">
+          </div>
         </div>
 
+        <!-- Optional Description -->
         <div>
-          <label style="display: block; font-size: 11px; font-weight: 600; color: #cbd5e1; margin-bottom: 6px;">Short Description / How to use</label>
-          <input type="text" id="tpl-input-desc" placeholder="e.g. Fast 3-second hook with audio swoosh, replace slot 1 with video" style="width: 100%; background: #090c13; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 12px; outline: none;">
+          <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Instruction / Note (Optional)</label>
+          <input type="text" id="tpl-input-desc" placeholder="e.g. Keeps background animation intact. Swap subject portrait." style="width: 100%; background: #0a0c12; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 7px; padding: 7px 10px; color: #f8fafc; font-size: 11.5px; outline: none; transition: border-color 0.18s;" onfocus="this.style.borderColor='#8b5cf6';" onblur="this.style.borderColor='rgba(255,255,255,0.12)';">
         </div>
 
-        <div style="background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.15); border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #94a3b8; line-height: 1.4;">
-          💡 <strong style="color: #00f0ff;">Slot Generator:</strong> Your current video, image, chart, and text clips will automatically be converted into replaceable template slots so beginners can swap footage with 1 click!
+        <!-- Collapsible Layer Abstraction Control -->
+        <div style="border-top: 1px solid rgba(255, 255, 255, 0.07); padding-top: 10px;">
+          <div id="btn-toggle-tpl-layers" onclick="toggleSaveTemplateLayers()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; padding: 4px 0;">
+            <div style="display: flex; align-items: center; gap: 7px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #e2e8f0;">Layer Roles</span>
+              <span id="tpl-layers-count-badge" style="font-size: 9.5px; padding: 1px 7px; border-radius: 9999px; background: rgba(255, 255, 255, 0.08); color: #cbd5e1; font-weight: 600;">4 layers</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #8b5cf6;">
+              <span id="tpl-layers-toggle-text">Customize</span>
+              <svg id="tpl-layers-chevron" viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor; transition: transform 0.2s;"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+          </div>
+
+          <div id="tpl-layers-collapsible-wrap" style="display: none; margin-top: 10px;">
+            <div id="tpl-layers-abstraction-list" style="max-height: 180px; overflow-y: auto; background: #08090f; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 6px; display: flex; flex-direction: column; gap: 5px;">
+              <!-- Rendered dynamically by openSaveAsTemplateModal() -->
+            </div>
+          </div>
         </div>
+
       </div>
 
-      <div class="modal-footer" style="padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: flex-end; gap: 8px; background: rgba(255,255,255,0.02);">
-        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-save-template">Cancel</button>
-        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-save-template" style="background: #00f0ff; color: #000; font-weight: 700;">Save Template</button>
+      <!-- Minimal Clean Footer -->
+      <div style="padding: 12px 20px; border-top: 1px solid rgba(255, 255, 255, 0.07); display: flex; justify-content: flex-end; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.01);">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-save-template" style="padding: 6px 14px; font-size: 11.5px; border-radius: 7px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1;">Cancel</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-confirm-save-template" style="background: #7c3aed; border: 1px solid rgba(139,92,246,0.5); color: #fff; font-weight: 600; padding: 6px 16px; border-radius: 7px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 11.5px; transition: background 0.18s;" onmouseover="this.style.background='#6d28d9';" onmouseout="this.style.background='#7c3aed';">
+          <span>Create Template</span>
+        </button>
       </div>
     </div>
   </div>
@@ -9572,6 +9633,6 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=313"></script>
+  <script src="js/app.js?v=316"></script>
 </body>
 </html>
