@@ -35411,12 +35411,13 @@ function setupFormatSwitcherEvents() {
     }
   });
 
-  // Aspect ratio option buttons
+  // Aspect ratio option buttons (with robust event delegation for nested SVG/mockups)
   document.querySelectorAll('.aspect-menu-opt').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const ratio = btn.dataset.ratio;
-      const target = btn.dataset.target; // 'modal' or 'studio'
+      const targetBtn = e.target.closest('.aspect-menu-opt') || btn;
+      const ratio = targetBtn.dataset.ratio;
+      const target = targetBtn.dataset.target; // 'modal' or 'studio'
       if (!ratio || !target) return;
 
       if (target === 'modal') {
@@ -35477,12 +35478,13 @@ function setupFormatSwitcherEvents() {
     });
   });
 
-  // Fit vs Fill crop buttons
+  // Fit vs Fill crop buttons (with robust event delegation)
   document.querySelectorAll('.aspect-fit-btn').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const fit = btn.dataset.fit; // 'contain' or 'cover'
-      const target = btn.dataset.target; // 'modal' or 'studio'
+      const targetBtn = e.target.closest('.aspect-fit-btn') || btn;
+      const fit = targetBtn.dataset.fit; // 'contain' or 'cover'
+      const target = targetBtn.dataset.target; // 'modal' or 'studio'
       if (!fit || !target) return;
 
       if (target === 'modal') {
