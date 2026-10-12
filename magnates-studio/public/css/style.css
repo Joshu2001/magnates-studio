@@ -7708,7 +7708,7 @@ body.tool-slide-active {
   top: calc(100% + 8px);
   left: 0;
   width: 320px;
-  max-height: 480px;
+  max-height: 380px;
   background: #0d111c;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 14px;
@@ -7720,8 +7720,42 @@ body.tool-slide-active {
   gap: 10px;
   animation: aspectMenuFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.25s ease;
+}
+
+/* Reveal sleek modern scrollbar on hover */
+.stage-aspect-menu:hover {
+  scrollbar-color: rgba(168, 85, 247, 0.5) rgba(255, 255, 255, 0.04);
+}
+
+.stage-aspect-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.stage-aspect-menu::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.stage-aspect-menu:hover::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.stage-aspect-menu::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+  transition: background 0.25s ease;
+}
+
+.stage-aspect-menu:hover::-webkit-scrollbar-thumb {
+  background: rgba(168, 85, 247, 0.5);
+}
+
+.stage-aspect-menu:hover::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
 }
 
 @keyframes aspectMenuFadeIn {
