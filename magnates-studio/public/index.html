@@ -494,6 +494,51 @@
         </div>
 
         <div class="canvas-wrapper">
+          <!-- Floating Main Studio Canvas Format & Aspect Ratio Switcher -->
+          <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 16px; left: 16px; z-index: 25;">
+            <button type="button" id="studio-btn-aspect" class="stage-aspect-pill-btn" title="Switch Video Format / Canvas Aspect Ratio">
+              <span class="aspect-icon-badge">📐</span>
+              <span id="studio-val-aspect" class="aspect-label">16:9 YouTube</span>
+              <span class="aspect-caret">▾</span>
+            </button>
+            <div id="studio-aspect-menu" class="stage-aspect-menu" style="display: none;">
+              <div class="aspect-menu-header">Canvas Format & Cropping</div>
+              <div class="aspect-menu-items">
+                <button type="button" class="aspect-menu-opt active" data-ratio="16:9" data-target="studio">
+                  <span class="opt-ratio">16:9</span>
+                  <span class="opt-desc">YouTube / Landscape</span>
+                  <span class="opt-badge">1920×1080</span>
+                </button>
+                <button type="button" class="aspect-menu-opt" data-ratio="9:16" data-target="studio">
+                  <span class="opt-ratio">9:16</span>
+                  <span class="opt-desc">TikTok / Reels / Shorts</span>
+                  <span class="opt-badge">1080×1920</span>
+                </button>
+                <button type="button" class="aspect-menu-opt" data-ratio="1:1" data-target="studio">
+                  <span class="opt-ratio">1:1</span>
+                  <span class="opt-desc">Instagram Square</span>
+                  <span class="opt-badge">1080×1080</span>
+                </button>
+                <button type="button" class="aspect-menu-opt" data-ratio="4:5" data-target="studio">
+                  <span class="opt-ratio">4:5</span>
+                  <span class="opt-desc">Instagram Portrait</span>
+                  <span class="opt-badge">1080×1350</span>
+                </button>
+                <button type="button" class="aspect-menu-opt" data-ratio="21:9" data-target="studio">
+                  <span class="opt-ratio">21:9</span>
+                  <span class="opt-desc">Ultrawide Cinema</span>
+                  <span class="opt-badge">2560×1080</span>
+                </button>
+              </div>
+              <div class="aspect-menu-divider"></div>
+              <div class="aspect-menu-section-title">Media Framing / Crop Fit</div>
+              <div class="aspect-crop-fit-row">
+                <button type="button" class="aspect-fit-btn active" data-fit="contain" data-target="studio" title="Fit Entire Frame (Letterbox)">Fit</button>
+                <button type="button" class="aspect-fit-btn" data-fit="cover" data-target="studio" title="Fill Screen & Crop Edges">Fill</button>
+              </div>
+            </div>
+          </div>
+
           <canvas id="previewCanvas" width="1920" height="1080"></canvas>
 
           <!-- YouTube-Style Floating Hover Player HUD on Main Studio Canvas -->
@@ -6583,6 +6628,51 @@
               <!-- Live Preview Container -->
               <div id="tpl-modal-preview-stage" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden;">
                 <!-- Dynamic FX layers rendered by JS -->
+              </div>
+
+              <!-- Top left Format Aspect Ratio Switcher Dropdown Pill -->
+              <div class="stage-aspect-dropdown-wrap" style="position: absolute; top: 12px; left: 12px; z-index: 25;">
+                <button type="button" id="tpl-modal-btn-aspect" class="stage-aspect-pill-btn" title="Switch Video Format / Aspect Ratio">
+                  <span class="aspect-icon-badge">📐</span>
+                  <span id="tpl-modal-val-aspect" class="aspect-label">16:9 YouTube</span>
+                  <span class="aspect-caret">▾</span>
+                </button>
+                <div id="tpl-modal-aspect-menu" class="stage-aspect-menu" style="display: none;">
+                  <div class="aspect-menu-header">Canvas Format & Cropping</div>
+                  <div class="aspect-menu-items">
+                    <button type="button" class="aspect-menu-opt active" data-ratio="16:9" data-target="modal">
+                      <span class="opt-ratio">16:9</span>
+                      <span class="opt-desc">YouTube / Landscape</span>
+                      <span class="opt-badge">1920×1080</span>
+                    </button>
+                    <button type="button" class="aspect-menu-opt" data-ratio="9:16" data-target="modal">
+                      <span class="opt-ratio">9:16</span>
+                      <span class="opt-desc">TikTok / Reels / Shorts</span>
+                      <span class="opt-badge">1080×1920</span>
+                    </button>
+                    <button type="button" class="aspect-menu-opt" data-ratio="1:1" data-target="modal">
+                      <span class="opt-ratio">1:1</span>
+                      <span class="opt-desc">Instagram Square</span>
+                      <span class="opt-badge">1080×1080</span>
+                    </button>
+                    <button type="button" class="aspect-menu-opt" data-ratio="4:5" data-target="modal">
+                      <span class="opt-ratio">4:5</span>
+                      <span class="opt-desc">Instagram Portrait</span>
+                      <span class="opt-badge">1080×1350</span>
+                    </button>
+                    <button type="button" class="aspect-menu-opt" data-ratio="21:9" data-target="modal">
+                      <span class="opt-ratio">21:9</span>
+                      <span class="opt-desc">Ultrawide Cinema</span>
+                      <span class="opt-badge">2560×1080</span>
+                    </button>
+                  </div>
+                  <div class="aspect-menu-divider"></div>
+                  <div class="aspect-menu-section-title">Media Framing / Crop Fit</div>
+                  <div class="aspect-crop-fit-row">
+                    <button type="button" class="aspect-fit-btn active" data-fit="contain" data-target="modal" title="Fit Entire Frame (Letterbox)">Fit</button>
+                    <button type="button" class="aspect-fit-btn" data-fit="cover" data-target="modal" title="Fill Screen & Crop Edges">Fill</button>
+                  </div>
+                </div>
               </div>
 
               <!-- Top right time code pill matching homepage tags -->

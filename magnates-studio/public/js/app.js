@@ -1669,13 +1669,20 @@ function drawMediaLayer(specificClip) {
     }
 
     if (el.videoWidth && el.videoHeight) {
-      const aspect = el.videoWidth / el.videoHeight;
-      if (aspect > maxW / maxH) {
-        dw = maxW;
-        dh = maxW / aspect;
+      const isCover = (typeof studioAspectState !== 'undefined' && studioAspectState.fit === 'cover');
+      if (isCover) {
+        const scaleCover = Math.max(maxW / el.videoWidth, maxH / el.videoHeight);
+        dw = el.videoWidth * scaleCover;
+        dh = el.videoHeight * scaleCover;
       } else {
-        dh = maxH;
-        dw = maxH * aspect;
+        const aspect = el.videoWidth / el.videoHeight;
+        if (aspect > maxW / maxH) {
+          dw = maxW;
+          dh = maxW / aspect;
+        } else {
+          dh = maxH;
+          dw = maxH * aspect;
+        }
       }
     }
   } else if (targetClip && targetClip.chartConfig) {
@@ -1704,13 +1711,14 @@ function drawMediaLayer(specificClip) {
     if (!el || !el.complete || !el.naturalWidth || !el.naturalHeight) {
       return;
     }
-    const aspect = el.naturalWidth / el.naturalHeight;
-    // If tagged as a background scene (or parallax background), scale to fill/cover the 16:9 canvas (full-bleed cover)
-    if (targetClip?.isBackgroundScene || targetClip?.parallaxRig === 'bg') {
+    const isCover = (typeof studioAspectState !== 'undefined' && studioAspectState.fit === 'cover');
+    // If tagged as a background scene (or parallax background), scale to fill/cover the canvas (full-bleed cover)
+    if (targetClip?.isBackgroundScene || targetClip?.parallaxRig === 'bg' || isCover) {
       const scaleCover = Math.max(maxW / (el.naturalWidth || maxW), maxH / (el.naturalHeight || maxH));
       dw = (el.naturalWidth || maxW) * scaleCover;
       dh = (el.naturalHeight || maxH) * scaleCover;
     } else {
+      const aspect = el.naturalWidth / el.naturalHeight;
       if (aspect > maxW / maxH) {
         dw = maxW;
         dh = maxW / aspect;
@@ -10451,7 +10459,18 @@ function getExportDimensions(ratio, res) {
     if (res === 1080) return { width: 1080, height: 1080 };
     if (res === 1440) return { width: 1440, height: 1440 };
     if (res === 2160) return { width: 2160, height: 2160 };
-    return { width: 1080, height: 1080 };
+  } else if (ratio === '4:5') {
+    if (res === 720) return { width: 720, height: 900 };
+    if (res === 1080) return { width: 1080, height: 1350 };
+    if (res === 1440) return { width: 1440, height: 1800 };
+    if (res === 2160) return { width: 2160, height: 2700 };
+    return { width: 1080, height: 1350 };
+  } else if (ratio === '21:9') {
+    if (res === 720) return { width: 1680, height: 720 };
+    if (res === 1080) return { width: 2560, height: 1080 };
+    if (res === 1440) return { width: 3440, height: 1440 };
+    if (res === 2160) return { width: 5120, height: 2160 };
+    return { width: 2560, height: 1080 };
   }
   return { width: 1920, height: 1080 };
 }
@@ -35345,9 +35364,159 @@ function bindMagnatesParticleVFXSuiteModalControls() {
   });
 }
 
-// Initialize homepage discovery view immediately on script execution
+// --- VIDEO FORMAT & ASPECT RATIO SWITCHER ENGINE (STUDIO & MODAL PREVIEW) ---
+let studioAspectState = { ratio: '16:9', fit: 'contain' };
+let modalAspectState = { ratio: '16:9', fit: 'contain' };
+
+const ASPECT_RATIO_LABELS = {
+  '16:9': '16:9 YouTube',
+  '9:16': '9:16 Shorts',
+  '1:1': '1:1 Square',
+  '4:5': '4:5 Portrait',
+  '21:9': '21:9 Cinema'
+};
+
+function setupFormatSwitcherEvents() {
+  const modalPillBtn = document.getElementById('tpl-modal-btn-aspect');
+  const modalMenu = document.getElementById('tpl-modal-aspect-menu');
+  const studioPillBtn = document.getElementById('studio-btn-aspect');
+  const studioMenu = document.getElementById('studio-aspect-menu');
+
+  // Toggle dropdowns
+  if (modalPillBtn && modalMenu) {
+    modalPillBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = modalMenu.style.display !== 'none';
+      modalMenu.style.display = isOpen ? 'none' : 'block';
+      if (studioMenu) studioMenu.style.display = 'none';
+    });
+  }
+
+  if (studioPillBtn && studioMenu) {
+    studioPillBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = studioMenu.style.display !== 'none';
+      studioMenu.style.display = isOpen ? 'none' : 'block';
+      if (modalMenu) modalMenu.style.display = 'none';
+    });
+  }
+
+  // Dismiss on outside click
+  document.addEventListener('click', (e) => {
+    if (modalMenu && !modalMenu.contains(e.target) && e.target !== modalPillBtn && !modalPillBtn?.contains(e.target)) {
+      modalMenu.style.display = 'none';
+    }
+    if (studioMenu && !studioMenu.contains(e.target) && e.target !== studioPillBtn && !studioPillBtn?.contains(e.target)) {
+      studioMenu.style.display = 'none';
+    }
+  });
+
+  // Aspect ratio option buttons
+  document.querySelectorAll('.aspect-menu-opt').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const ratio = btn.dataset.ratio;
+      const target = btn.dataset.target; // 'modal' or 'studio'
+      if (!ratio || !target) return;
+
+      if (target === 'modal') {
+        modalAspectState.ratio = ratio;
+        const valEl = document.getElementById('tpl-modal-val-aspect');
+        if (valEl) valEl.textContent = ASPECT_RATIO_LABELS[ratio] || ratio;
+
+        // Update active class in modal menu
+        document.querySelectorAll('#tpl-modal-aspect-menu .aspect-menu-opt').forEach(opt => {
+          opt.classList.toggle('active', opt.dataset.ratio === ratio);
+        });
+
+        // Update container aspect ratio class
+        const modalContainer = document.getElementById('tpl-modal-preview-stage-container');
+        if (modalContainer) {
+          modalContainer.classList.remove('aspect-16-9', 'aspect-9-16', 'aspect-1-1', 'aspect-4-5', 'aspect-21-9');
+          modalContainer.classList.add(`aspect-${ratio.replace(':', '-')}`);
+        }
+
+        if (typeof renderTopTemplatePreviewStage === 'function') {
+          renderTopTemplatePreviewStage();
+        }
+        if (modalMenu) modalMenu.style.display = 'none';
+      } else if (target === 'studio') {
+        studioAspectState.ratio = ratio;
+        const valEl = document.getElementById('studio-val-aspect');
+        if (valEl) valEl.textContent = ASPECT_RATIO_LABELS[ratio] || ratio;
+
+        // Update active class in studio menu
+        document.querySelectorAll('#studio-aspect-menu .aspect-menu-opt').forEach(opt => {
+          opt.classList.toggle('active', opt.dataset.ratio === ratio);
+        });
+
+        // Update canvas aspect ratio class
+        const cv = document.getElementById('previewCanvas');
+        if (cv) {
+          cv.classList.remove('aspect-16-9', 'aspect-9-16', 'aspect-1-1', 'aspect-4-5', 'aspect-21-9');
+          cv.classList.add(`aspect-${ratio.replace(':', '-')}`);
+
+          // Update canvas internal pixel dimensions
+          const dims = getExportDimensions(ratio, exportStudioConfig?.resolution || 1080);
+          cv.width = dims.width;
+          cv.height = dims.height;
+        }
+
+        // Sync with exportStudioConfig
+        if (typeof exportStudioConfig !== 'undefined') {
+          exportStudioConfig.aspectRatio = ratio;
+        }
+        if (typeof updateExportTelemetry === 'function') {
+          updateExportTelemetry();
+        }
+        if (typeof renderCanvas === 'function') {
+          renderCanvas();
+        }
+        if (studioMenu) studioMenu.style.display = 'none';
+      }
+    });
+  });
+
+  // Fit vs Fill crop buttons
+  document.querySelectorAll('.aspect-fit-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const fit = btn.dataset.fit; // 'contain' or 'cover'
+      const target = btn.dataset.target; // 'modal' or 'studio'
+      if (!fit || !target) return;
+
+      if (target === 'modal') {
+        modalAspectState.fit = fit;
+        document.querySelectorAll('#tpl-modal-aspect-menu .aspect-fit-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.fit === fit);
+        });
+        const modalContainer = document.getElementById('tpl-modal-preview-stage-container');
+        if (modalContainer) {
+          const imgs = modalContainer.querySelectorAll('img, video');
+          imgs.forEach(m => {
+            m.style.objectFit = fit;
+          });
+        }
+        if (typeof renderTopTemplatePreviewStage === 'function') {
+          renderTopTemplatePreviewStage();
+        }
+      } else if (target === 'studio') {
+        studioAspectState.fit = fit;
+        document.querySelectorAll('#studio-aspect-menu .aspect-fit-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.fit === fit);
+        });
+        if (typeof renderCanvas === 'function') {
+          renderCanvas();
+        }
+      }
+    });
+  });
+}
+
+// Initialize homepage discovery view and format switchers immediately on script execution
 setTimeout(() => {
   initHomepageTemplateEvents();
+  setupFormatSwitcherEvents();
 }, 100);
 
 
