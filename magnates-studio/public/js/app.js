@@ -25698,6 +25698,84 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = 'CONFIDENTIAL DOSSIER';
     topCustomizerState.subText = 'CLASSIFIED INTELLIGENCE REPORT';
     topCustomizerState.textColor = '#ff334b';
+  } else if (tpl.id === 'vintage-film-burn') {
+    if (labelPrim) labelPrim.textContent = '🎬 Vintage Scene Clip';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'THE GATE FLASH';
+    topCustomizerState.subText = 'ANALOG FILM TRANSITION';
+    topCustomizerState.textColor = '#f59e0b';
+  } else if (tpl.id === 'parallax-zoom') {
+    if (labelPrim) labelPrim.textContent = '👤 Floating Foreground Plate';
+    if (labelSec) labelSec.textContent = '🌆 Deep Parallax Background';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'BEYOND HORIZONS';
+    topCustomizerState.subText = '3D DEPTH PERSPECTIVE';
+    topCustomizerState.textColor = '#c084fc';
+  } else if (tpl.id === 'cyber-glitch-pass') {
+    if (labelPrim) labelPrim.textContent = '⚡ Target Footage Clip';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'SIGNAL OVERRIDE';
+    topCustomizerState.subText = 'RGB CHROMATIC ABERRATION';
+    topCustomizerState.textColor = '#00f0ff';
+  } else if (tpl.id === 'anim-punch-zoom') {
+    if (labelPrim) labelPrim.textContent = '🔍 Target Focus Image / Document';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'SMOKING GUN';
+    topCustomizerState.subText = 'DYNAMIC PUNCH ZOOM 2.2X';
+    topCustomizerState.textColor = '#c084fc';
+  } else if (tpl.id === 'anim-loupe-callout') {
+    if (labelPrim) labelPrim.textContent = '🔎 Document / Evidence Asset';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'FORENSIC CALLOUT';
+    topCustomizerState.subText = 'MAGNIFIED EVIDENCE LOUPE';
+    topCustomizerState.textColor = '#00f0ff';
+  } else if (tpl.id === 'anim-whiteout-fade') {
+    if (labelPrim) labelPrim.textContent = '📄 Newspaper / Article Scan';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'THE CONTRADICTION';
+    topCustomizerState.subText = 'WHITEOUT FADE ISOLATION';
+    topCustomizerState.textColor = '#0284c7';
+  } else if (tpl.id === 'anim-dark-spotlight') {
+    if (labelPrim) labelPrim.textContent = '🔦 Subject Image / Scene';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'FOCAL TARGET';
+    topCustomizerState.subText = 'CINEMATIC DARK SPOTLIGHT';
+    topCustomizerState.textColor = '#c084fc';
+  } else if (tpl.id === 'anim-animated-highlighter') {
+    if (labelPrim) labelPrim.textContent = '📜 Document Text Scan';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'VITAL EVIDENCE';
+    topCustomizerState.subText = 'ANIMATED MARKER SWEEP';
+    topCustomizerState.textColor = '#facc15';
+  } else if (tpl.id === 'spotlight-lens-sweep') {
+    if (labelPrim) labelPrim.textContent = '🔦 Target Portrait / Asset';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'THE INQUISITION';
+    topCustomizerState.subText = 'WARM SPOTLIGHT SWEEP';
+    topCustomizerState.textColor = '#f59e0b';
+  } else if (tpl.id === 'financial-graph-wipe') {
+    if (labelPrim) labelPrim.textContent = '📈 Market Footage Asset';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'MARKET CRASH';
+    topCustomizerState.subText = 'GROWTH GRAPH WIPE';
+    topCustomizerState.textColor = '#00ff41';
+  } else if (tpl.id === 'archival-ink-highlight') {
+    if (labelPrim) labelPrim.textContent = '📰 Historic Paper Article';
+    if (wrapSec) wrapSec.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'EXPOSED BY AUDIT';
+    topCustomizerState.subText = 'ARCHIVAL INK HIGHLIGHT';
+    topCustomizerState.textColor = '#fbbf24';
   } else if (tpl.id === 'paper-rip-shred') {
     if (labelPrim) labelPrim.textContent = '📰 Top Paper Tear Layer';
     if (labelSec) labelSec.textContent = '🎬 Revealed Clip / Footage';
@@ -26058,15 +26136,180 @@ function renderTopTemplatePreviewStage() {
   } else if (tplId === 'vox-newspaper-cream-dossier') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4eedb; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
-        <img id="customizer-live-bg" src="${prim}" alt="Newspaper" style="width: 82%; height: 82%; object-fit: cover; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); filter: contrast(1.15);" />
+        <div style="position: absolute; inset: 0; background-color: #f4eedb; background-image: radial-gradient(rgba(0,0,0,0.06) 1px, transparent 0); background-size: 16px 16px; opacity: 0.9;"></div>
+        <div id="customizer-live-vox-doc" style="position: absolute; inset: 6% 8%; background: #ffffff; border-radius: 6px; box-shadow: 0 15px 35px rgba(0,0,0,0.28), 0 2px 8px rgba(0,0,0,0.12); overflow: hidden; transform: rotate(-2deg); border: 1px solid rgba(0,0,0,0.08); z-index: ${subjectZ};">
+          <img id="customizer-live-bg" src="${prim}" alt="Newspaper Document" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.2) contrast(1.15);" />
+          <div id="customizer-live-vox-hl" style="position: absolute; top: 38%; left: 10%; height: 24px; background: rgba(254, 240, 138, 0.85); mix-blend-mode: multiply; border-radius: 4px; width: 0%; box-shadow: 0 0 12px rgba(254, 240, 138, 0.6);"></div>
+        </div>
+        <div id="customizer-live-vox-loupe" style="position: absolute; width: 120px; height: 120px; border-radius: 50%; border: 3px solid #00f0ff; box-shadow: 0 10px 30px rgba(0,0,0,0.7), inset 0 0 16px rgba(0,240,255,0.4); overflow: hidden; pointer-events: none; z-index: 5;">
+          <img id="customizer-live-vox-loupe-inner" src="${prim}" alt="Magnified Evidence" style="width: 200%; height: 200%; object-fit: cover; position: absolute; transform: scale(1.6);" />
+        </div>
         ${isTextShowing ? `
-        <div style="position: absolute; bottom: 25px; left: 25px; right: 25px; background: rgba(28,25,23,0.9); padding: 10px 14px; border-radius: 6px; border-left: 4px solid ${topCustomizerState.textColor || '#ff334b'};">
+        <div style="position: absolute; bottom: 20px; left: 20px; right: 20px; background: rgba(28,25,23,0.92); padding: 10px 16px; border-radius: 6px; border-left: 4px solid ${topCustomizerState.textColor || '#ff334b'}; box-shadow: 0 10px 25px rgba(0,0,0,0.6); z-index: 6;">
           <div style="font-family: Impact, sans-serif; font-size: 20px; color: #fff; letter-spacing: 1px; text-transform: uppercase;">
             ${topCustomizerState.mainText || 'CONFIDENTIAL DOSSIER'}
           </div>
-          <div style="font-family: monospace; font-size: 9px; color: #fdba74; text-transform: uppercase;">
+          <div style="font-family: monospace; font-size: 9.5px; color: #fdba74; text-transform: uppercase; margin-top: 2px;">
             ${topCustomizerState.subText || 'CLASSIFIED INTELLIGENCE REPORT'}
           </div>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'vintage-film-burn') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
+        <img id="customizer-live-bg" src="${prim}" alt="Film Burn Cut" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.4) contrast(1.25);" />
+        <div id="customizer-live-burn-flash" style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(245,158,11,0.95), rgba(225,29,72,0.9), rgba(253,224,71,0.75)); mix-blend-mode: screen; opacity: 0; pointer-events: none; z-index: 3;"></div>
+        <div id="customizer-live-burn-grain" style="position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 0); background-size: 4px 4px; opacity: 0.4; pointer-events: none; mix-blend-mode: overlay; z-index: 4;"></div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <span style="font-family: 'Cinzel', serif; font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 4px 15px rgba(0,0,0,0.95); display: block;">
+            ${topCustomizerState.mainText || 'THE GATE FLASH'}
+          </span>
+          <span style="font-family: monospace; font-size: 10px; color: #fde047; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'ANALOG FILM TRANSITION'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'parallax-zoom') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
+        <img id="customizer-live-bg" src="${sec}" alt="Background" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(6px) brightness(0.65); transform: scale(1.15);" />
+        ${textBehindHtml}
+        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: ${subjectZ};">
+          <img id="customizer-live-fg" src="${prim}" alt="Foreground Subject" style="width: 76%; height: 76%; object-fit: cover; border-radius: 12px; box-shadow: 0 25px 50px rgba(0,0,0,0.95); border: 1px solid rgba(255,255,255,0.25);" />
+        </div>
+        ${isTextShowing && !topCustomizerState.hasTextBehind ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 6;">
+          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
+            ${topCustomizerState.mainText || 'BEYOND HORIZONS'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #c084fc; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || '3D DEPTH PERSPECTIVE'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'cyber-glitch-pass') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #040814; cursor: crosshair;">
+        <img id="customizer-live-glitch-cyan" src="${prim}" alt="Cyber Glitch" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; mix-blend-mode: screen; filter: drop-shadow(-6px 0px 0px rgba(6,182,212,0.95)) hue-rotate(90deg);" />
+        <img id="customizer-live-glitch-red" src="${prim}" alt="Cyber Glitch" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; mix-blend-mode: screen; filter: drop-shadow(6px 0px 0px rgba(239,68,68,0.95)) hue-rotate(270deg);" />
+        <div id="customizer-live-glitch-scanlines" style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.4) 0px, rgba(0,0,0,0.4) 2px, transparent 2px, transparent 4px); pointer-events: none; z-index: 4;"></div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: monospace; font-size: 26px; font-weight: 900; color: #00f0ff; letter-spacing: 3px; text-transform: uppercase; margin: 0; text-shadow: 0 0 15px rgba(0,240,255,0.8);">
+            ${topCustomizerState.mainText || 'SIGNAL OVERRIDE'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #f43f5e; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'RGB CHROMATIC ABERRATION'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'anim-punch-zoom') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img id="customizer-live-zoom-img" src="${prim}" alt="Punch Zoom Target" style="width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 35%;" />
+        <div style="position: absolute; inset: 0; border: 2px solid rgba(168,85,247,0.4); pointer-events: none; z-index: 2;"></div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
+            ${topCustomizerState.mainText || 'SMOKING GUN'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #c084fc; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'DYNAMIC PUNCH ZOOM 2.2X'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'anim-loupe-callout') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img src="${prim}" alt="Evidence Image" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.75);" />
+        <div id="customizer-live-loupe-glass" style="position: absolute; width: 130px; height: 130px; border-radius: 50%; border: 3px solid #00f0ff; box-shadow: 0 10px 35px rgba(0,0,0,0.85), inset 0 0 20px rgba(0,240,255,0.4); overflow: hidden; pointer-events: none; z-index: 3;">
+          <img id="customizer-live-loupe-inner" src="${prim}" alt="Loupe Mag" style="width: 250%; height: 250%; object-fit: cover; position: absolute; transform: scale(1.8);" />
+        </div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
+            ${topCustomizerState.mainText || 'FORENSIC CALLOUT'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #00f0ff; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'MAGNIFIED EVIDENCE LOUPE'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'anim-whiteout-fade') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img src="${prim}" alt="Article Scan" style="width: 100%; height: 100%; object-fit: cover;" />
+        <div id="customizer-live-white-overlay" style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.75); pointer-events: none; z-index: 2;"></div>
+        <div style="position: absolute; top: 32%; left: 10%; right: 10%; height: 36%; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(255,255,255,0.75); border: 2px solid #38bdf8; overflow: hidden; pointer-events: none; z-index: 3;">
+          <img src="${prim}" alt="Focal Block" style="width: 100%; height: 100%; object-fit: cover; margin-top: -12%;" />
+        </div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #0f172a; letter-spacing: 2px; text-transform: uppercase; margin: 0;">
+            ${topCustomizerState.mainText || 'THE CONTRADICTION'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #0284c7; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'WHITEOUT FADE ISOLATION'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'anim-dark-spotlight' || tplId === 'spotlight-lens-sweep') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img src="${prim}" alt="Spotlight Subject" style="width: 100%; height: 100%; object-fit: cover;" />
+        <div id="customizer-live-spotlight" style="position: absolute; width: 170px; height: 170px; border-radius: 50%; box-shadow: 0 0 0 9999px rgba(0,0,0,0.85); pointer-events: none; border: 1.5px solid rgba(168,85,247,0.7); z-index: 2;"></div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
+            ${topCustomizerState.mainText || 'FOCAL TARGET'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #c084fc; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'CINEMATIC DARK SPOTLIGHT'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'anim-animated-highlighter' || tplId === 'archival-ink-highlight') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #0e1017; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img src="${prim}" alt="Highlighter Subject" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15) brightness(0.9);" />
+        <div style="position: absolute; top: 40%; left: 10%; right: 10%; height: 28px; pointer-events: none; z-index: 2;">
+          <div id="customizer-live-hl-bar" style="height: 100%; background: rgba(254, 240, 138, 0.9); mix-blend-mode: multiply; border-radius: 4px; width: 0%; box-shadow: 0 0 15px rgba(254, 240, 138, 0.8);"></div>
+        </div>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #fff; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 4px 15px rgba(0,0,0,0.9);">
+            ${topCustomizerState.mainText || 'VITAL EVIDENCE'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #facc15; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'ANIMATED MARKER SWEEP'}
+          </span>
+        </div>` : ''}
+      </div>
+    `;
+  } else if (tplId === 'financial-graph-wipe') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #040810; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <img src="${prim}" alt="Market Scene" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.5) contrast(1.3);" />
+        <svg id="customizer-live-graph-svg" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;">
+          <path id="customizer-live-graph-path" d="M 40,240 Q 140,200 220,160 T 360,90 T 520,40" fill="none" stroke="#00ff41" stroke-width="4" stroke-dasharray="600" stroke-dashoffset="600" filter="drop-shadow(0 0 10px #00ff41)" />
+        </svg>
+        ${isTextShowing ? `
+        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
+          <h2 style="font-family: monospace; font-size: 26px; font-weight: 900; color: #00ff41; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 0 0 15px rgba(0,255,65,0.7);">
+            ${topCustomizerState.mainText || 'MARKET CRASH'}
+          </h2>
+          <span style="font-family: monospace; font-size: 10px; color: #86efac; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
+            ${topCustomizerState.subText || 'GROWTH GRAPH WIPE'}
+          </span>
         </div>` : ''}
       </div>
     `;
@@ -26243,6 +26486,83 @@ function updateTopCustomizerFrame(seqTime, now) {
     }
     const decodeSpan = document.getElementById('customizer-live-decode-text');
     if (decodeSpan) decodeSpan.textContent = displayed;
+  } else if (tplId === 'vox-newspaper-cream-dossier') {
+    const docRot = -2 + Math.sin(localSceneT * 1.6) * 1.5;
+    const docScale = 1.02 + Math.cos(localSceneT * 1.4) * 0.02;
+    const docEl = document.getElementById('customizer-live-vox-doc');
+    if (docEl) docEl.style.transform = `rotate(${docRot}deg) scale(${docScale})`;
+
+    const hlCycle = (Math.sin(localSceneT * 2.5) + 1) / 2;
+    const hlEl = document.getElementById('customizer-live-vox-hl');
+    if (hlEl) hlEl.style.width = `${Math.min(76, Math.max(0, hlCycle * 80))}%`;
+
+    const loupeX = 50 + Math.sin(localSceneT * 2.2) * 55;
+    const loupeY = 35 + Math.cos(localSceneT * 1.8) * 35;
+    const loupeEl = document.getElementById('customizer-live-vox-loupe');
+    const loupeInner = document.getElementById('customizer-live-vox-loupe-inner');
+    if (loupeEl) {
+      loupeEl.style.left = `${loupeX}px`;
+      loupeEl.style.top = `${loupeY}px`;
+    }
+    if (loupeInner) {
+      loupeInner.style.left = `${-loupeX * 0.6}px`;
+      loupeInner.style.top = `${-loupeY * 0.6}px`;
+    }
+  } else if (tplId === 'vintage-film-burn') {
+    const burnCycle = Math.abs(Math.sin(localSceneT * 3.5));
+    const burnEl = document.getElementById('customizer-live-burn-flash');
+    if (burnEl) burnEl.style.opacity = `${burnCycle > 0.3 ? (burnCycle * 0.8) : 0}`;
+  } else if (tplId === 'parallax-zoom') {
+    const shiftX = Math.sin(localSceneT * 2.8) * 16 * depthFactor;
+    const shiftY = Math.cos(localSceneT * 2.2) * 10 * depthFactor;
+    const bgZoom = 1.15 + Math.sin(localSceneT * 1.5) * 0.06;
+    const bgEl = document.getElementById('customizer-live-bg');
+    const fgWrap = document.getElementById('customizer-live-fg-wrap');
+    if (bgEl) bgEl.style.transform = `scale(${bgZoom}) translate(${-shiftX * 0.4}px, ${-shiftY * 0.4}px)`;
+    if (fgWrap) fgWrap.style.transform = `scale(1.06) translate(${shiftX}px, ${shiftY}px)`;
+  } else if (tplId === 'cyber-glitch-pass') {
+    const isBurst = Math.sin(localSceneT * 12) > 0.35;
+    const glitchX = isBurst ? ((Math.random() - 0.5) * 18) : Math.sin(localSceneT * 20) * 2;
+    const cyanEl = document.getElementById('customizer-live-glitch-cyan');
+    const redEl = document.getElementById('customizer-live-glitch-red');
+    if (cyanEl) cyanEl.style.transform = `translate(${glitchX}px, 0) scale(1.06)`;
+    if (redEl) redEl.style.transform = `translate(${-glitchX}px, 0) scale(1.04)`;
+  } else if (tplId === 'anim-punch-zoom') {
+    const zoomCycle = 1 + (Math.sin(localSceneT * 3.5) > 0 ? (Math.sin(localSceneT * 3.5) * 1.25) : 0);
+    const img = document.getElementById('customizer-live-zoom-img');
+    if (img) img.style.transform = `scale(${zoomCycle.toFixed(2)})`;
+  } else if (tplId === 'anim-loupe-callout') {
+    const loupeX = Math.sin(localSceneT * 2) * 40;
+    const loupeY = Math.cos(localSceneT * 2.2) * 25;
+    const glass = document.getElementById('customizer-live-loupe-glass');
+    const inner = document.getElementById('customizer-live-loupe-inner');
+    if (glass) glass.style.transform = `translate(${loupeX.toFixed(1)}px, ${loupeY.toFixed(1)}px)`;
+    if (inner) inner.style.transform = `translate(${(-loupeX * 1.5).toFixed(1)}px, ${(-loupeY * 1.5).toFixed(1)}px) scale(1.8)`;
+  } else if (tplId === 'anim-whiteout-fade') {
+    const fadeOp = 0.5 + Math.sin(localSceneT * 2) * 0.38;
+    const overlay = document.getElementById('customizer-live-white-overlay');
+    if (overlay) overlay.style.opacity = fadeOp.toFixed(2);
+  } else if (tplId === 'anim-dark-spotlight' || tplId === 'spotlight-lens-sweep') {
+    const spotPulse = 140 + Math.sin(localSceneT * 2.5) * 35;
+    const spotX = Math.sin(localSceneT * 1.8) * 30;
+    const spotY = Math.cos(localSceneT * 1.5) * 20;
+    const spot = document.getElementById('customizer-live-spotlight');
+    if (spot) {
+      spot.style.width = `${spotPulse.toFixed(0)}px`;
+      spot.style.height = `${spotPulse.toFixed(0)}px`;
+      spot.style.transform = `translate(${spotX.toFixed(1)}px, ${spotY.toFixed(1)}px)`;
+    }
+  } else if (tplId === 'anim-animated-highlighter' || tplId === 'archival-ink-highlight') {
+    const hlProg = Math.min(100, Math.floor(((localSceneT * 1.2) % 1.6 / 1.6) * 100));
+    const bar = document.getElementById('customizer-live-hl-bar');
+    if (bar) bar.style.width = `${hlProg}%`;
+  } else if (tplId === 'financial-graph-wipe') {
+    const graphProg = (Math.sin(localSceneT * 1.5) + 1) / 2;
+    const path = document.getElementById('customizer-live-graph-path');
+    if (path) {
+      const offset = 600 - (graphProg * 600);
+      path.setAttribute('stroke-dashoffset', offset.toFixed(0));
+    }
   }
 }
 
