@@ -22464,7 +22464,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Cinematic 3D gold-bevel title floating over a glowing perspective floor grid with drifting document cards and cinematic camera pullback.',
     tags: ['3D Titles', 'Camera Pullback', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['spatial-3d-motion-suite']) || 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22477,7 +22477,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Cinematic 3D camera flyover of investigative newspapers with animated highlighter wipes, classified redaction leaks, and 3D headline pop-outs.',
     tags: ['Document FX', 'Highlighter', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['document-3d-fx-engine']) || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22490,7 +22490,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Deconstruct complex narratives into 3x3 floating puzzle pieces and snap them into place with glowing geometric alpha matte talking points.',
     tags: ['Puzzle Metaphor', 'Alpha Matte', 'James Jani', 'Retention'],
-    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['jani-puzzle-narrative-suite']) || 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22503,7 +22503,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Build unbearable narrative suspense with customizable T-Minus digital clocks, collapsing stock tickers, dynamic charts, audio risers, and climax screen shake.',
     tags: ['Countdown Effect', 'James Jani', 'Panic Ticker', 'Audio Riser', 'Climax Impact'],
-    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['jani-countdown-panic-suite']) || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22516,7 +22516,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45° motion blur sweeps, memory tint color grades, and archival headlines.',
     tags: ['Flashback', 'Flashforward', 'Time Jump', 'White Flash', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['nonlinear-time-flash']) || 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22529,7 +22529,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Jani’s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['puzzle-piece-reveal']) || 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22542,7 +22542,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Subtle ambient light leaks, anamorphic lens flare streaks, and volumetric ray scattering overlayed on footage to emulate real camera lens imperfections.',
     tags: ['Light Leaks', 'Lens Flare', 'Scattering', 'Anamorphic', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['light-rays-lens-leaks']) || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22555,7 +22555,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Muted tones, crushed black levels, heavy vignette, and shifted RGB channel offsets that emphasize shadow detail, build narrative tension, and deliver an investigative noir atmosphere.',
     tags: ['Crushed Blacks', 'Low Saturation', 'Muted Tones', 'Color Offset', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['monochromatic-crushed-grading']) || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22568,7 +22568,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'An Adjustment Clip with a heavily feathered elliptical mask (size constraint ~0.7, feathering >2.8x) that darkens frame edges to direct viewer focus strictly to the center narrative focal point.',
     tags: ['Heavy Vignette', 'Elliptical Mask', 'Financial Thriller', 'Focal Pull', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['heavy-elliptical-vignette']) || 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22581,7 +22581,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines together" text assembly for investigative tension.',
     tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['text-reveal-modifiers']) || 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22594,7 +22594,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Duplicated text layer technique. Heavy ambient glow on bottom layer with massive blur radius and soft drop shadows on top to isolate text from dark backdrops.',
     tags: ['Duplicated Layer', 'Glow Radius', 'Drop Shadows', 'Text Contrast', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['glow-drop-shadows']) || 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22607,7 +22607,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Text mapped onto 3D layers with slow backward/forward camera tracking and subtle X/Y-rotation tweaks that make typography float dynamically in physical space.',
     tags: ['3D Layers', 'Camera Tracking', 'X/Y Rotation', 'Spatial Depth', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['3d-camera-move-rotation']) || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22620,7 +22620,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'James Jani constantly shifts the audio track of the upcoming scene or voiceover so it plays before the visuals catch up (J-Cut), or lets dialogue bleed across the visual cut into the next shot (L-Cut) to bridge nonlinear jumps seamlessly.',
     tags: ['J-Cut', 'L-Cut', 'Audio-Visual Pacing', 'Sound Bridge', 'Nonlinear Jump', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['audio-visual-jl-cuts']) || 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22633,7 +22633,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Dramatic low-frequency bass sweeps (sub-bass dive to 28Hz) paired with a crescendo riser and sudden impact camera cuts to snap and reset viewer attention spans.',
     tags: ['Sub-bass Drop', 'Audio Riser', 'Camera Cut', 'Attention Reset', 'Sound Design', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['subbass-drops-risers']) || 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22646,7 +22646,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Core 3D & Spatial Effects: Converting 2D cutout images, portraits, and text into 3D space by enabling 3D mode on layers and setting up a 3D camera (such as a 50mm focal length camera linked to a null object controller).',
     tags: ['3D Projection', '50mm Camera', 'Null Object', 'Portrait Cutout', 'Spatial Depth', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-3d-projection']) || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22659,7 +22659,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Keyframing CC Vignette angles and depth-of-field blur to draw viewer focus strictly toward specific characters or cutouts, isolating subjects against blurred backgrounds.',
     tags: ['CC Vignette', 'Depth of Focus', 'DOF Blur', 'Magnates Media', 'Focus Pull', 'Cutout Isolation'],
-    defaultImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-cc-vignette-dof']) || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22672,7 +22672,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Stacking brightness, contrast adjustments, and dual inner/outer glows on PNG cutout subjects to make them pop intensely against dark or blurred backdrops.',
     tags: ['Brightness & Contrast', 'Inner Glow', 'Outer Glow', 'PNG Cutout Pop', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-brightness-glow']) || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22685,7 +22685,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Applying stacked multi-tier drop shadows with custom directional angles to flat 2D cutouts so they float realistically over the background scene with spatial occlusion.',
     tags: ['Multi-Layer Shadows', 'Drop Shadows', 'Cutout Elevation', 'Floating Card', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-multi-drop-shadows']) || 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22698,7 +22698,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Using Fill tools to transform characters into ominous flat black silhouettes or applying Gradient Colorize to stylize tone, mood, and dramatic investigative tension.',
     tags: ['Shadowization', 'Fill Silhouette', 'Gradient Colorize', 'Noir Tension', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-shadowization']) || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22711,7 +22711,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Compositing with Screen mode for snow/particles, Difference mode for film noise & inverted vintage text, and Overlay mode for antique clock animations and organic paper textures.',
     tags: ['Blend Modes', 'Screen Blend', 'Difference Mode', 'Overlay Texture', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-blend-modes']) || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22724,7 +22724,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: '2D paper-style layers, floating cutout portraits, moving hands pinning evidence, and technical paper blueprint architectural grids.',
     tags: ['Paper Cutout', 'Blueprint Grid', 'Floating Portraits', 'Moving Hands', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-paper-blueprint']) || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22737,7 +22737,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Organic ink-bleed stains and dynamic stretchy title text animations to dramatically introduce key character names, historical dates, and chapter headers.',
     tags: ['Ink Bleed', 'Stretchy Text', 'Chapter Reveal', 'Organic Splatter', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-ink-reveal']) || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22750,7 +22750,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Smoothly panning and scaling across archival newspaper clippings or financial dossiers while highlighting specific smoking-gun text blocks with marker pen FX.',
     tags: ['Article Pan', 'Text Highlight', 'Newspaper Zoom', 'Marker Bleed', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-article-highlight']) || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22763,7 +22763,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Atmospheric floating dust motes, anamorphic optical flares, burning ember fire sparks, organic volumetric smoke, and retro 35mm film grain overlays.',
     tags: ['Dust Particles', 'Optical Flare', 'Fire Embers', 'Smoke Overlay', 'Film Grain', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['magnates-media-particle-vfx']) || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22776,7 +22776,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(168, 85, 247, 0.7), rgba(99, 102, 241, 0.4), rgba(15, 23, 42, 0.9))',
     description: 'Instant dynamic camera snap magnification onto key headlines, faces, or data graphs with spring-damping easing.',
     tags: ['Punch Zoom', 'Camera Snap', 'Vox Style', 'Magnification', 'Animation'],
-    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['anim-punch-zoom']) || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22789,7 +22789,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(6, 182, 212, 0.7), rgba(59, 130, 246, 0.4), rgba(15, 23, 42, 0.9))',
     description: 'Circular or rectangular magnified glass loupe focusing viewer attention directly onto forensic evidence or document details.',
     tags: ['Loupe Callout', 'Magnifier', 'Evidence Callout', 'Forensic', 'Animation'],
-    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['anim-loupe-callout']) || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22802,7 +22802,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(56, 189, 248, 0.7), rgba(14, 165, 233, 0.4), rgba(15, 23, 42, 0.9))',
     description: 'Fades surrounding background article text into soft white, making the selected paragraph or quote crystal clear.',
     tags: ['Whiteout Fade', 'Document Focus', 'Newspaper Focus', 'Vox Style', 'Animation'],
-    defaultImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['anim-whiteout-fade']) || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22815,7 +22815,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(147, 51, 234, 0.7), rgba(88, 28, 135, 0.4), rgba(15, 23, 42, 0.9))',
     description: 'Darkens and vignettes everything outside the target subject with high-contrast feathered falloff for intense dramatic focus.',
     tags: ['Dark Spotlight', 'Dim Surroundings', 'Vignette Focus', 'Dramatic', 'Animation'],
-    defaultImage: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['anim-dark-spotlight']) || 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -22828,7 +22828,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(to top, rgba(234, 179, 8, 0.7), rgba(202, 138, 4, 0.4), rgba(15, 23, 42, 0.9))',
     description: 'Dynamic fluo-yellow, cyan, or neon marker sweep sliding live across text lines synchronized to your story timing.',
     tags: ['Animated Highlighter', 'Marker Sweep', 'Yellow Pen', 'Johnny Harris', 'Animation'],
-    defaultImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80',
+    defaultImage: (typeof window !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS && window.AUTHENTIC_TEMPLATE_SNAPSHOTS['anim-animated-highlighter']) || 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
   }
 ];
