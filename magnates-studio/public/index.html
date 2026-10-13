@@ -3333,7 +3333,7 @@
           </div>
 
           <!-- Three.js Canvas Container -->
-          <div id="spatial-threejs-container" style="width: 100%; height: 100%; cursor: grab;"></div>
+          <div id="spatial-threejs-container-legacy" style="width: 100%; height: 100%; cursor: grab;"></div>
 
           <!-- Floating Playback, Flight Mode Bar & Scrubber (Matching Image 2) -->
           <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10; display: flex; align-items: center; gap: 12px; background: rgba(13, 16, 23, 0.94); backdrop-filter: blur(14px); padding: 8px 20px; border-radius: 9999px; border: 1px solid rgba(168,85,247,0.35); box-shadow: 0 12px 40px rgba(0,0,0,0.9);">
@@ -3539,7 +3539,7 @@
               </div>
 
               <!-- Three.js Canvas Container -->
-              <div id="doc-threejs-container" style="width: 100%; height: 100%; cursor: grab;"></div>
+              <div id="doc-threejs-container-legacy" style="width: 100%; height: 100%; cursor: grab;"></div>
 
               <!-- Hint Overlay -->
               <div style="position: absolute; bottom: 12px; z-index: 10; pointer-events: none; text-align: center;">
@@ -7245,6 +7245,9 @@
             </div>
           </div>
 
+          <!-- Section: 3D Controls (spatial / document 3D templates) -->
+          <div id="tpl-modal-3d-controls" style="display: none; flex-direction: column; gap: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);"></div>
+
           <!-- Hidden extra inputs kept for JS compatibility -->
           <div style="display: none;">
             <span id="tpl-modal-val-depth">65%</span>
@@ -9699,6 +9702,7 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=316"></script>
+  <script src="js/app.js?v=317"></script>
+<script src="js/tpl-3d-inspector.js?v=1"></script>
 </body>
 </html>

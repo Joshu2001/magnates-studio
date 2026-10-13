@@ -24134,7 +24134,8 @@ function startTemplateHoverVideo(cardEl, tpl) {
   hoverStartTime = performance.now();
 
   function animateHoverLoop(now) {
-    const t = (hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000;
+    const t = ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
+    const _fx = (hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 };
 
     if (tplId === 'subject-25d-parallax') {
       const bgZoom = 1 + Math.sin(t * 1.5) * 0.08;
@@ -24246,9 +24247,9 @@ function startTemplateHoverVideo(cardEl, tpl) {
       // James Jani After Effects slow Z-axis camera pullback + deep multi-plane parallax
       // Cycle: slow dramatic zoom out (scale 1.35x -> 0.95x) with subtle 3D pitch & yaw
       const zoomCycle = (Math.sin(t * 0.9 - Math.PI/2) + 1) / 2; // 0 (closest) to 1 (pulled back)
-      const camZProgress = 1.35 - zoomCycle * 0.42; // Slow Z-pullback scale
-      const camPitch = 8 - zoomCycle * 14 + Math.cos(t * 1.2) * 2; // Subtle X-tilt settling
-      const camYaw = Math.sin(t * 1.1) * 9; // Subtle Y-pan
+      const camZProgress = (1.35 - zoomCycle * 0.42) * _fx.zoom; // Slow Z-pullback scale
+      const camPitch = 8 - zoomCycle * 14 + Math.cos(t * 1.2) * 2 + _fx.pitch; // Subtle X-tilt settling
+      const camYaw = Math.sin(t * 1.1) * 9 + _fx.yaw; // Subtle Y-pan
       
       const plate = fxContainer?.querySelector(`#fx-spatial-plate-${tplId}`);
       const grid = fxContainer?.querySelector(`#fx-spatial-grid-${tplId}`);
@@ -24257,7 +24258,7 @@ function startTemplateHoverVideo(cardEl, tpl) {
 
       // Central extruded title moves with primary camera Z zoom
       if (plate) {
-        plate.style.transform = `scale(${camZProgress}) rotateY(${camYaw}deg) rotateX(${camPitch}deg)`;
+        plate.style.transform = `scale(${camZProgress}) rotateY(${camYaw}deg) rotateX(${camPitch}deg) rotateZ(${_fx.roll}deg)`;
       }
       // Horizon floor grid stretches deep into perspective as camera pulls back
       if (grid) {
@@ -24278,10 +24279,10 @@ function startTemplateHoverVideo(cardEl, tpl) {
     } else if (tplId === 'document-3d-fx-engine') {
       // 3D paper camera flyover: dynamic tilt, highlighter reveal, and pop-out headline elevation
       const flyCycle = (Math.sin(t * 1.2 - Math.PI/2) + 1) / 2; // 0 to 1
-      const rotX = 18 + Math.cos(t * 1.3) * 12;
-      const rotY = -14 + Math.sin(t * 1.1) * 18;
-      const rotZ = -4 + Math.sin(t * 0.8) * 5;
-      const paperScale = 1.05 + flyCycle * 0.12;
+      const rotX = 18 + Math.cos(t * 1.3) * 12 + _fx.pitch;
+      const rotY = -14 + Math.sin(t * 1.1) * 18 + _fx.yaw;
+      const rotZ = -4 + Math.sin(t * 0.8) * 5 + _fx.roll;
+      const paperScale = (1.05 + flyCycle * 0.12) * _fx.zoom;
 
       const paper = fxContainer?.querySelector(`#fx-doc-paper-${tplId}`);
       const hl = fxContainer?.querySelector(`#fx-doc-highlighter-${tplId}`);
@@ -25991,12 +25992,14 @@ function closeTopTemplateCustomizer() {
   hoverBridgeActive = false;
   hoverExternalT = null;
   if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+  if (window.tpl3DOnClose) window.tpl3DOnClose();
 }
 
 function renderTopTemplatePreviewStage() {
   const stage = document.getElementById('tpl-modal-preview-stage');
   if (!stage || !topCustomizerState.currentTpl) return;
   const tplId = topCustomizerState.currentTpl.id;
+  if (window.tpl3DSync) window.tpl3DSync(tplId);
   const prim = (topCustomizerState.bgRemoved && topCustomizerState.cutoutCanvas)
     ? topCustomizerState.cutoutCanvas.toDataURL()
     : ((topCustomizerState.bgRemoved && topCustomizerState.currentTpl?.cutoutImage)
@@ -26007,6 +26010,12 @@ function renderTopTemplatePreviewStage() {
   if (BRIDGED_HOVER_TEMPLATE_IDS.has(tplId)) {
     const btpl = topCustomizerState.currentTpl;
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    if (window.tpl3DUse3D && window.tpl3DUse3D(tplId)) {
+      hoverBridgeActive = false;
+      hoverExternalT = null;
+      window.tpl3DMountStage(stage, tplId);
+      return;
+    }
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000;">
         <img id="default-img-${tplId}" src="${prim || btpl.defaultImage}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0;" />
@@ -26016,6 +26025,7 @@ function renderTopTemplatePreviewStage() {
     hoverExternalT = 0;
     const btplView = Object.assign({}, btpl, { defaultImage: prim || btpl.defaultImage, secondaryImage: sec || btpl.secondaryImage || btpl.defaultImage });
     startTemplateHoverVideo(stage, btplView);
+    if (window.tpl3DAfterVideoStage) window.tpl3DAfterVideoStage(stage, tplId);
     return;
   }
   hoverBridgeActive = false;
@@ -26354,6 +26364,7 @@ function renderTopTemplatePreviewStage() {
 
 function updateTopCustomizerFrame(seqTime, now) {
   if (hoverBridgeActive) hoverExternalT = seqTime;
+  if (window.tpl3DOnFrame) window.tpl3DOnFrame(seqTime);
   const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
   const totalSeqDur = hasMultipleScenes
     ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
@@ -27227,6 +27238,7 @@ function bindTopTemplateCustomizerEvents() {
 
   const replayCustomizer = () => {
     topCustomizerState.startTime = performance.now();
+    if (window.tpl3DOnReplay) window.tpl3DOnReplay();
     activeStoryboardSceneIndex = 0;
     const aud = document.getElementById('modal-customizer-audio-player');
     if (aud) aud.currentTime = 0;
