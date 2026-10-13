@@ -1,64 +1,21 @@
 {
-  "text": [
-    {
-      "id": "txt-vig-head-1791815264515",
-      "text": "THE ARCHITECT'S CONFESSION",
-      "highlight": "THE",
-      "highlightColor": "#38bdf8",
-      "anim": "pop",
-      "fontSize": 50,
-      "fontFamily": "Inter, sans-serif",
-      "start": 0,
-      "duration": 5,
-      "_renderBounds": {
-        "x": 204,
-        "y": 440,
-        "w": 844.2314453125,
-        "h": 92
-      }
-    },
-    {
-      "id": "txt-vig-dof-1791815264516",
-      "text": "CC VIGNETTE (85%) // DOF BLUR 10px",
-      "highlight": "85%",
-      "highlightColor": "#0284c7",
-      "anim": "fade",
-      "fontSize": 20,
-      "fontFamily": "monospace",
-      "start": 0,
-      "duration": 5,
-      "_renderBounds": {
-        "x": 204,
-        "y": 458,
-        "w": 416.86328125,
-        "h": 56
-      }
-    }
-  ],
+  "text": [],
   "chart": [],
   "quote": [],
   "image": [
     {
-      "id": "img-1791815291557",
+      "id": "img-1791869882661-s7ex",
       "start": 0,
-      "duration": 6,
-      "scale": 1,
-      "spotlights": [
-        {
-          "rect": {
-            "x": 0.12,
-            "y": 0.25,
-            "w": 0.76,
-            "h": 0.25
-          },
-          "style": "white",
-          "dimOpacity": 0.65,
-          "feather": 18,
-          "startTime": 0.4,
-          "duration": 3.5
-        }
-      ],
-      "file": null
+      "duration": 3,
+      "zIndex": 20,
+      "scale": 1.1,
+      "transition": "fly_through",
+      "transitionDuration": 1,
+      "file": {
+        "name": "James_Jani_3D_Document_&_Paper_FX.jpg",
+        "url": "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80",
+        "isImage": true
+      }
     }
   ],
   "video": [],
@@ -94,9 +51,9 @@
       "filterIntensity": 100
     }
   ],
-  "currentTime": 0,
+  "currentTime": 5.0303000000000155,
   "duration": 368.144014,
-  "savedAt": 1791869636472,
-  "projectName": "New Project 54",
-  "projectId": "proj_1791856961005_51re"
+  "savedAt": 1791870716471,
+  "projectName": "New Project 55",
+  "projectId": "proj_1791869883480_x98v"
 }

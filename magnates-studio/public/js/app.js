@@ -2640,7 +2640,9 @@ function drawSortedVisualLayers() {
   activeItems.sort((a, b) => a.zIndex - b.zIndex);
 
   activeItems.forEach(item => {
-    if (item.type === 'video' || item.type === 'image' || item.type === 'chart') {
+    if (item.type === 'image' && item.clip && item.clip.fxScene && window.tplFxDrawClip) {
+      window.tplFxDrawClip(item.clip);
+    } else if (item.type === 'video' || item.type === 'image' || item.type === 'chart') {
       drawMediaLayer(item.clip);
     } else if (item.type === 'quote') {
       drawQuoteCardLayer(item.clip);
@@ -21443,7 +21445,7 @@ async function handleConfirmSaveAsTemplate() {
       const depthVal = topCustomizerState.depth || 65;
       const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
 
-      const { imageClips, textClips } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
+      let { imageClips, textClips } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
         prim, sec, depthVal, opacityVal,
         bgRemoved: topCustomizerState.bgRemoved,
         cutoutCanvas: topCustomizerState.cutoutCanvas,
@@ -21459,6 +21461,10 @@ async function handleConfirmSaveAsTemplate() {
         layerOrder: topCustomizerState.layerOrder || 'front'
       });
 
+      if (window.tpl3DIsFx && window.tpl3DIsFx(scTpl.id)) {
+        imageClips = [window.tpl3DMakeClip(scTpl, { sceneStart, scDur, prim, sec })];
+        textClips = [];
+      }
       allImgs = allImgs.concat(imageClips);
       allTxts = allTxts.concat(textClips);
     });
@@ -23077,7 +23083,7 @@ function renderHomepageTemplates() {
 const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
 let hoverBridgeActive = false;
 let hoverExternalT = null;
-function startTemplateHoverVideo(cardEl, tpl) {
+function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
   const tplId = tpl.id;
   const fxContainer = cardEl.querySelector(`#fx-container-${tplId}`);
@@ -24130,12 +24136,16 @@ function startTemplateHoverVideo(cardEl, tpl) {
     }
   }
 
-  activeHoverCardEl = cardEl;
-  hoverStartTime = performance.now();
+  if (!manual) {
+    activeHoverCardEl = cardEl;
+    hoverStartTime = performance.now();
+  }
 
   function animateHoverLoop(now) {
-    const t = ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
-    const _fx = (hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 };
+    const t = manual
+      ? manual.t * ((manual.fx && manual.fx.speed) || 1)
+      : ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
+    const _fx = manual ? Object.assign({ pitch: 0, yaw: 0, roll: 0, zoom: 1 }, manual.fx || {}) : ((hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 });
 
     if (tplId === 'subject-25d-parallax') {
       const bgZoom = 1 + Math.sin(t * 1.5) * 0.08;
@@ -24690,9 +24700,15 @@ function startTemplateHoverVideo(cardEl, tpl) {
       if (fgEl) fgEl.style.transform = `translate(${shiftX}px, 0)`;
     }
 
-    activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
+    if ((manual || hoverBridgeActive) && fxContainer && tplId !== 'spatial-3d-motion-suite' && tplId !== 'document-3d-fx-engine') {
+      fxContainer.style.transform = (_fx.pitch || _fx.yaw || _fx.roll || (_fx.zoom !== 1))
+        ? `perspective(900px) rotateX(${_fx.pitch}deg) rotateY(${_fx.yaw}deg) rotateZ(${_fx.roll}deg) scale(${_fx.zoom})`
+        : '';
+    }
+    if (!manual) activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
   }
 
+  if (manual) return (tt) => { manual.t = tt; animateHoverLoop(0); };
   activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
 }
 
@@ -27024,7 +27040,7 @@ function commitTopTemplateCustomizerToTimeline(isAppendScene = false) {
     const depthVal = topCustomizerState.depth || 65;
     const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
 
-    const { imageClips, textClips, focusClip } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
+    let { imageClips, textClips, focusClip } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
       prim, sec, depthVal, opacityVal,
       bgRemoved: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.bgRemoved : false,
       cutoutCanvas: (sIdx === activeStoryboardSceneIndex) ? topCustomizerState.cutoutCanvas : null,
@@ -27040,6 +27056,11 @@ function commitTopTemplateCustomizerToTimeline(isAppendScene = false) {
       layerOrder: topCustomizerState.layerOrder || 'front'
     });
 
+    if (window.tpl3DIsFx && window.tpl3DIsFx(scTpl.id)) {
+      const fxClip = window.tpl3DMakeClip(scTpl, { sceneStart, scDur, prim, sec });
+      imageClips = [fxClip]; textClips = []; focusClip = fxClip;
+      if (window.tplFxPreload) window.tplFxPreload(fxClip);
+    }
     if (!firstFocusClip && focusClip) firstFocusClip = focusClip;
     allNewImageClips = allNewImageClips.concat(imageClips);
     allNewTextClips = allNewTextClips.concat(textClips);
