@@ -479,6 +479,7 @@
 
   // ---------------------------------------------------------------- customizer stage hooks
   function mount3D(stage, tplId) {
+    applyModeLayout(true);
     const k = kindOf(tplId), cid = k === 'spatial' ? 'spatial-threejs-container' : 'doc-threejs-container';
     stage.innerHTML = `<div id="customizer-stage-inner" style="position:absolute;inset:0;overflow:hidden;background:#07090e;"><div data-3d-stage="1" style="position:absolute;inset:0;cursor:grab;"></div></div>`;
     const container = stage.querySelector('[data-3d-stage]');
@@ -494,6 +495,8 @@
         spatial3DState.mouse.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
       });
       lastKey = ''; window.tpl3DSync(tplId);
+      setTimeout(fit, 60);
+      setTimeout(fit, 180);
     }, 50);
     function fit() {
       const w = container.clientWidth || 800, h = container.clientHeight || 450;
@@ -518,10 +521,71 @@
     slotsFor(tplId).forEach(sl => { if (sl.def != null && nodes[sl.def] && ov[sl.key] != null) nodes[sl.def].nodeValue = ov[sl.key]; });
   }
 
+  function applyModeLayout(is3D) {
+    const sb = document.getElementById('tpl-modal-storyboard-container');
+    const pb = document.getElementById('tpl-modal-playback-bar');
+    const box = document.getElementById('tpl-modal-preview-canvas-box');
+    const stageCont = document.getElementById('tpl-modal-preview-stage-container');
+    const hud = document.getElementById('tpl-modal-player-hud');
+    const aspectBtn = document.getElementById('tpl-modal-btn-aspect');
+    const timerBadge = document.getElementById('tpl-modal-timer-badge');
+
+    if (is3D) {
+      if (sb) sb.style.display = 'none';
+      if (pb) pb.style.display = 'none';
+      if (hud) hud.style.display = 'none';
+      if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = 'none';
+      if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = 'none';
+      if (box) {
+        box.style.padding = '0';
+        box.style.border = 'none';
+        box.style.background = 'transparent';
+        box.style.gap = '0';
+        box.style.flex = '1';
+        box.style.height = '100%';
+        box.style.minHeight = '0';
+      }
+      if (stageCont) {
+        stageCont.style.maxHeight = 'none';
+        stageCont.style.height = '100%';
+        stageCont.style.minHeight = '480px';
+        stageCont.style.flex = '1';
+        stageCont.style.borderRadius = '14px';
+        stageCont.style.border = '1px solid rgba(255,255,255,0.08)';
+        stageCont.style.overflow = 'hidden';
+      }
+    } else {
+      if (sb) sb.style.display = '';
+      if (pb) pb.style.display = '';
+      if (hud) hud.style.display = '';
+      if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = '';
+      if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = '';
+      if (box) {
+        box.style.padding = '';
+        box.style.border = '';
+        box.style.background = '';
+        box.style.gap = '';
+        box.style.flex = '1';
+        box.style.height = '';
+        box.style.minHeight = '';
+      }
+      if (stageCont) {
+        stageCont.style.maxHeight = '320px';
+        stageCont.style.height = '';
+        stageCont.style.minHeight = '250px';
+        stageCont.style.flex = '1';
+        stageCont.style.borderRadius = '10px';
+        stageCont.style.border = '';
+        stageCont.style.overflow = 'visible';
+      }
+    }
+  }
+
   window.tpl3DUse3D = (id) => has3D(kindOf(id), id) && entry(id).mode === '3d';
   window.tpl3DMountStage = mount3D;
   window.tpl3DAfterVideoStage = function (stage, tplId) {
     if (!kindOf(tplId)) return;
+    applyModeLayout(false);
     const before = Object.keys(videoNodes[tplId] || {}).length;
     collectVideoNodes(stage, tplId);
     if (before !== Object.keys(videoNodes[tplId]).length || !(host() && host().innerHTML)) { lastKey = ''; window.tpl3DSync(tplId); }
@@ -530,7 +594,9 @@
     bindHost();
     curTpl = kindOf(tplId) ? tplId : null;
     if (curTpl) window.tpl3DFx = entry(tplId).fx;
-    const key = tplId + '|' + (curTpl ? entry(tplId).mode : '');
+    const mode = curTpl ? entry(tplId).mode : 'video';
+    applyModeLayout(has3D(kindOf(tplId), tplId) && mode === '3d');
+    const key = tplId + '|' + (curTpl ? mode : '');
     if (key === lastKey) return;
     lastKey = key; openLayerIdx = -1;
     build(tplId);
@@ -538,6 +604,7 @@
   window.tpl3DOnFrame = function (seqTime) { seqNow = seqTime; };
   window.tpl3DOnReplay = function () { seqNow = 0; };
   window.tpl3DOnClose = function () {
+    applyModeLayout(false);
     if (curTpl) capture(curTpl);
     if (resizeObs) { resizeObs.disconnect(); resizeObs = null; }
     ['spatial', 'doc'].forEach(k => { const st = stOf(k); stopLoop(k); if (st.renderer) getHolder().appendChild(st.renderer.domElement); });
