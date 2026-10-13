@@ -1,22 +1,37 @@
 {
   "text": [
     {
-      "id": "txt-1791815015150-3op6",
-      "text": "MAGNATES",
-      "highlight": "MAGNATES",
-      "highlightColor": "#ff334b",
+      "id": "txt-vig-head-1791815264515",
+      "text": "THE ARCHITECT'S CONFESSION",
+      "highlight": "THE",
+      "highlightColor": "#38bdf8",
       "anim": "pop",
-      "fontSize": 68,
-      "fontFamily": "Impact, sans-serif",
-      "zIndex": 25,
-      "layerOrder": "middle",
+      "fontSize": 50,
+      "fontFamily": "Inter, sans-serif",
       "start": 0,
-      "duration": 6,
+      "duration": 5,
       "_renderBounds": {
         "x": 204,
-        "y": 429.2,
-        "w": 327.109375,
-        "h": 113.59999999999997
+        "y": 440,
+        "w": 844.2314453125,
+        "h": 92
+      }
+    },
+    {
+      "id": "txt-vig-dof-1791815264516",
+      "text": "CC VIGNETTE (85%) // DOF BLUR 10px",
+      "highlight": "85%",
+      "highlightColor": "#0284c7",
+      "anim": "fade",
+      "fontSize": 20,
+      "fontFamily": "monospace",
+      "start": 0,
+      "duration": 5,
+      "_renderBounds": {
+        "x": 204,
+        "y": 458,
+        "w": 416.86328125,
+        "h": 56
       }
     }
   ],
@@ -24,31 +39,26 @@
   "quote": [],
   "image": [
     {
-      "id": "img-bg-1791815015150-hjop",
+      "id": "img-1791815291557",
       "start": 0,
       "duration": 6,
-      "layerOrder": "back",
-      "zIndex": 10,
-      "scale": 1.15,
-      "file": {
-        "name": "Custom_Environment.jpg",
-        "url": "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80",
-        "isImage": true
-      }
-    },
-    {
-      "id": "img-fg-1791815015150-8jio",
-      "start": 0.2567766240926215,
-      "duration": 0.2,
-      "layerOrder": "front",
-      "zIndex": 40,
-      "scale": 1.05,
-      "vectorEffect": false,
-      "file": {
-        "name": "Custom_Cutout_Subject.png",
-        "url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&auto=format&fit=crop&q=80",
-        "isImage": true
-      }
+      "scale": 1,
+      "spotlights": [
+        {
+          "rect": {
+            "x": 0.12,
+            "y": 0.25,
+            "w": 0.76,
+            "h": 0.25
+          },
+          "style": "white",
+          "dimOpacity": 0.65,
+          "feather": 18,
+          "startTime": 0.4,
+          "duration": 3.5
+        }
+      ],
+      "file": null
     }
   ],
   "video": [],
@@ -84,9 +94,9 @@
       "filterIntensity": 100
     }
   ],
-  "currentTime": 17.636776624092626,
+  "currentTime": 0,
   "duration": 368.144014,
-  "savedAt": 1791815117143,
-  "projectName": "New Project 40",
-  "projectId": "proj_1791815017522_on69"
+  "savedAt": 1791859010148,
+  "projectName": "New Project 54",
+  "projectId": "proj_1791856961005_51re"
 }

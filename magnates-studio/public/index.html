@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Regaarder Studio - Professional Creative Video Editor</title>
-  <link rel="stylesheet" href="css/style.css?v=306">
+  <link rel="stylesheet" href="css/style.css?v=307">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Oswald:wght@600;700&family=Playfair+Display:ital,wght@0,700;1,700&family=Cinzel:wght@600;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -7008,37 +7008,42 @@
         </div>
       </div>
 
-      <!-- 2. THREE INDEPENDENT COLUMNS WITH AIRY BREATHING SPACE -->
-      <div style="display: flex; align-items: stretch; gap: 20px; flex: 1; min-height: 0; width: 100%;">
+      <!-- 2. TWO-COLUMN SLEEK WORKSPACE (HERO PREVIEW ON LEFT + INSPECTOR ON RIGHT) -->
+      <div style="display: flex; align-items: stretch; gap: 20px; flex: 1; min-height: 0; width: 100%; position: relative;">
         
-        <!-- COLUMN 1: LEFT TEMPLATES RAIL -->
-        <div id="modal-tpl-sidebar-outer-col" style="display: flex; flex-direction: column; flex-shrink: 0; width: 230px;">
-          <div id="modal-tpl-sidebar-drawer" style="width: 100%; height: 100%; max-height: calc(90vh - 120px); background: #0e1017; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden;">
-            <!-- Header with pill badge -->
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 14px 10px; flex-shrink: 0;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: #c084fc;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
-                <span style="font-size: 12px; font-weight: 700; color: #f8fafc; letter-spacing: 0.3px;">Templates</span>
-              </div>
-              <span style="font-size: 10px; color: #64748b; background: rgba(255,255,255,0.04); padding: 2px 6px; border-radius: 4px;">Library</span>
-            </div>
+        <!-- FLOATING SLIDE-OVER TEMPLATES BUTTON (Hovering pill, zero screen nesting) -->
+        <button type="button" id="btn-toggle-modal-templates" class="modal-tpl-floating-btn" onclick="toggleModalTemplatesDrawer()" title="Browse & switch templates">
+          <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: #c084fc;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          <span>Templates</span>
+          <span class="btn-badge">Library</span>
+        </button>
 
-            <!-- Search Input -->
-            <div style="padding: 0 12px 12px; flex-shrink: 0;">
-              <div style="position: relative; display: flex; align-items: center;">
-                <svg viewBox="0 0 24 24" style="position: absolute; left: 10px; width: 13px; height: 13px; fill: none; stroke: #64748b; stroke-width: 2.2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="modal-tpl-search-input" placeholder="Search templates..." oninput="handleModalTemplateSearch(this.value)" style="width: 100%; background: #08090e; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 7px 10px 7px 30px; color: #cbd5e1; font-size: 11px; outline: none;" onfocus="this.style.borderColor='rgba(168,85,247,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'" />
-              </div>
+        <!-- FLOATING SLIDE-OVER TEMPLATES DRAWER -->
+        <div id="modal-tpl-sidebar-drawer" class="floating-drawer">
+          <!-- Header with close button -->
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 14px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: #c084fc;"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+              <span style="font-size: 12px; font-weight: 700; color: #f8fafc; letter-spacing: 0.3px;">Templates Library</span>
             </div>
+            <button type="button" onclick="toggleModalTemplatesDrawer()" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 16px; padding: 2px 6px; line-height: 1;" title="Close templates menu">✕</button>
+          </div>
 
-            <!-- Template Cards Vertical Scroll -->
-            <div id="modal-tpl-sidebar-cards-list" style="flex: 1; overflow-y: auto; padding: 0 10px 12px; display: flex; flex-direction: column; gap: 8px;">
-              <!-- Populated dynamically by populateModalTemplatesSidebar() -->
+          <!-- Search Input -->
+          <div style="padding: 10px 12px 8px; flex-shrink: 0;">
+            <div style="position: relative; display: flex; align-items: center;">
+              <svg viewBox="0 0 24 24" style="position: absolute; left: 10px; width: 13px; height: 13px; fill: none; stroke: #64748b; stroke-width: 2.2;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="modal-tpl-search-input" placeholder="Search templates..." oninput="handleModalTemplateSearch(this.value)" style="width: 100%; background: #08090e; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 7px 10px 7px 30px; color: #cbd5e1; font-size: 11px; outline: none;" onfocus="this.style.borderColor='rgba(168,85,247,0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'" />
             </div>
+          </div>
+
+          <!-- Template Cards Vertical Scroll -->
+          <div id="modal-tpl-sidebar-cards-list" style="flex: 1; overflow-y: auto; padding: 0 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+            <!-- Populated dynamically by populateModalTemplatesSidebar() -->
           </div>
         </div>
 
-        <!-- COLUMN 2: CENTER STAGE (Hero Preview + Clean Bottom Storyboard) -->
+        <!-- MAIN COLUMN 1: CENTER PREVIEW & TIMELINE STAGE (65-70% width, non-nested, spacious cinema canvas) -->
         <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px;">
           
           <!-- 1. Center Preview Canvas Container (Spacious, seamless dark bezel) -->

@@ -24732,24 +24732,42 @@ function applySelectedHomepageTemplate(templateId) {
   const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
   if (!tpl) return;
 
-  // Intercept the top interactive templates to open the Pre-Application Customizer Studio Modal
-  const topCustomizerIds = [
-    'subject-25d-parallax',
-    'paper-rip-shred',
-    'gold-frame-spin',
-    'text-texturing-grunge',
-    'kinetic-decode-typewriter',
-    'magnates-paper-vector-cutout',
-    'vox-newspaper-cream-dossier',
-    'vintage-film-burn',
-    'parallax-zoom',
-    'cyber-glitch-pass'
-  ];
+  // Dedicated interactive full suites launch their dedicated suite preview modals
+  const dedicatedSuiteMap = {
+    'spatial-3d-motion-suite': openSpatial3DMotionSuite,
+    'document-3d-fx-engine': openDocument3DFXSuite,
+    'jani-puzzle-narrative-suite': openJaniSuite,
+    'jani-countdown-panic-suite': openCountdownSuite,
+    'nonlinear-time-flash': openFlashbackSuite,
+    'puzzle-piece-reveal': openPuzzleRevealSuite,
+    'light-rays-lens-leaks': openLightRaysSuite,
+    'monochromatic-crushed-grading': openMonochromeSuite,
+    'heavy-elliptical-vignette': openHeavyVignetteSuite,
+    'text-reveal-modifiers': openTextRevealSuite,
+    'glow-drop-shadows': openGlowShadowsSuite,
+    '3d-camera-move-rotation': openCamera3DMoveSuite,
+    'audio-visual-jl-cuts': openJLCutsSuite,
+    'subbass-drops-risers': openSubbassSuite,
+    'magnates-media-3d-projection': openMagnates3DProjectionSuite,
+    'magnates-media-cc-vignette-dof': openMagnatesCCVignetteSuite,
+    'magnates-media-brightness-glow': openMagnatesBrightnessGlowSuite,
+    'magnates-media-multi-drop-shadows': openMagnatesDropShadowsSuite,
+    'magnates-media-shadowization': openMagnatesShadowizationSuite,
+    'magnates-media-blend-modes': openMagnatesBlendModesSuite,
+    'magnates-media-paper-blueprint': openMagnatesPaperBlueprintSuite,
+    'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
+    'magnates-media-article-highlight': openMagnatesArticleHighlightSuite,
+    'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
+  };
 
-  if (topCustomizerIds.includes(templateId)) {
-    openTopTemplateCustomizer(tpl);
+  if (dedicatedSuiteMap[templateId]) {
+    dedicatedSuiteMap[templateId]();
     return;
   }
+
+  // All other templates open the unified sleek Customizer preview stage first
+  openTopTemplateCustomizer(tpl);
+  return;
 
   // 1. Switch directly to Studio Editor view
   switchStudioView('editor');
@@ -27768,6 +27786,9 @@ function modalSelectTemplateCard(templateId) {
   openTopTemplateCustomizer(tpl);
   populateModalTemplatesSidebar();
   populateModalScenesStoryboard();
+  // Auto-close floating drawer after selecting a template so viewport stays clean
+  const drawer = document.getElementById('modal-tpl-sidebar-drawer');
+  if (drawer) drawer.style.display = 'none';
 }
 
 function populateModalScenesStoryboard() {
