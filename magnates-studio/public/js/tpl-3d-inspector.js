@@ -12,8 +12,28 @@
   const RW = 720, RH = 405; // offscreen raster size for timeline rendering
 
   const isBridged = (id) => typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(id);
-  const kindOf = (id) => id === 'spatial-3d-motion-suite' ? 'spatial' : id === 'document-3d-fx-engine' ? 'doc' : (isBridged(id) ? 'generic' : null);
-  const has3D = (k) => k === 'spatial' || k === 'doc';
+  // All templates under 3D Spatial category have the Video / 3D switcher!
+  const SPATIAL_3D_CATEGORY_IDS = new Set([
+    'spatial-3d-motion-suite',
+    'document-3d-fx-engine',
+    'jani-puzzle-narrative-suite',
+    'jani-countdown-panic-suite',
+    'puzzle-piece-reveal',
+    '3d-camera-move-rotation',
+    'magnates-media-3d-projection',
+    'magnates-media-multi-drop-shadows'
+  ]);
+  const is3DSpatial = (id) => {
+    if (!id) return false;
+    if (SPATIAL_3D_CATEGORY_IDS.has(id)) return true;
+    if (typeof EFFECT_TEMPLATES_DATA !== 'undefined') {
+      const t = EFFECT_TEMPLATES_DATA.find(x => x.id === id);
+      if (t && t.category === '3D Spatial') return true;
+    }
+    return false;
+  };
+  const kindOf = (id) => id === 'document-3d-fx-engine' ? 'doc' : (is3DSpatial(id) ? 'spatial' : (isBridged(id) ? 'generic' : null));
+  const has3D = (k, id) => k === 'spatial' || k === 'doc' || is3DSpatial(id);
   const stOf = (k) => k === 'spatial' ? spatial3DState : document3DFXState;
 
   // ---------------------------------------------------------------- store
@@ -265,9 +285,9 @@
     if (!k) { h.style.display = 'none'; h.innerHTML = ''; return; }
     h.style.display = 'flex';
     const e = entry(tplId); const fx = e.fx;
-    const mode = has3D(k) ? e.mode : 'video';
+    const mode = has3D(k, tplId) ? e.mode : 'video';
     let html = `<div style="display:flex;align-items:center;justify-content:space-between;"><span style="${lbl}">Effect Controls</span>`;
-    if (has3D(k)) {
+    if (has3D(k, tplId)) {
       html += `<div style="display:flex;gap:3px;background:rgba(18,19,28,.9);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,.08);">
         <button type="button" data-act="mode-video" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === 'video' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === 'video' ? '#fff' : '#94a3b8'};">▶ Video</button>
         <button type="button" data-act="mode-3d" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === '3d' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === '3d' ? '#fff' : '#94a3b8'};">⬡ 3D</button></div>`;
@@ -498,7 +518,7 @@
     slotsFor(tplId).forEach(sl => { if (sl.def != null && nodes[sl.def] && ov[sl.key] != null) nodes[sl.def].nodeValue = ov[sl.key]; });
   }
 
-  window.tpl3DUse3D = (id) => has3D(kindOf(id)) && entry(id).mode === '3d';
+  window.tpl3DUse3D = (id) => has3D(kindOf(id), id) && entry(id).mode === '3d';
   window.tpl3DMountStage = mount3D;
   window.tpl3DAfterVideoStage = function (stage, tplId) {
     if (!kindOf(tplId)) return;
@@ -646,7 +666,7 @@
     const cw = cv.width, ch = cv.height;
     c.save();
     try {
-      if (has3D(k) && sc.entry.mode === '3d' && typeof THREE !== 'undefined') {
+      if (has3D(k, sc.tplId) && sc.entry.mode === '3d' && typeof THREE !== 'undefined') {
         draw3DClip(c, clip, t, cw, ch);
       } else {
         let r = rast[clip.id];
