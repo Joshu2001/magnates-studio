@@ -23074,6 +23074,9 @@ function renderHomepageTemplates() {
   });
 }
 
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
+let hoverBridgeActive = false;
+let hoverExternalT = null;
 function startTemplateHoverVideo(cardEl, tpl) {
   if (!tpl) return;
   const tplId = tpl.id;
@@ -24131,7 +24134,7 @@ function startTemplateHoverVideo(cardEl, tpl) {
   hoverStartTime = performance.now();
 
   function animateHoverLoop(now) {
-    const t = (now - hoverStartTime) / 1000;
+    const t = (hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000;
 
     if (tplId === 'subject-25d-parallax') {
       const bgZoom = 1 + Math.sin(t * 1.5) * 0.08;
@@ -24693,6 +24696,7 @@ function startTemplateHoverVideo(cardEl, tpl) {
 }
 
 function stopTemplateHoverVideo(cardEl, tpl) {
+  if (hoverBridgeActive) return;
   if (activeHoverAnimFrame) {
     cancelAnimationFrame(activeHoverAnimFrame);
     activeHoverAnimFrame = null;
@@ -24759,11 +24763,6 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-article-highlight': openMagnatesArticleHighlightSuite,
     'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
   };
-
-  if (dedicatedSuiteMap[templateId]) {
-    dedicatedSuiteMap[templateId]();
-    return;
-  }
 
   // All other templates open the unified sleek Customizer preview stage first
   openTopTemplateCustomizer(tpl);
@@ -25989,6 +25988,9 @@ function closeTopTemplateCustomizer() {
     cancelAnimationFrame(topCustomizerState.animId);
     topCustomizerState.animId = null;
   }
+  hoverBridgeActive = false;
+  hoverExternalT = null;
+  if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
 }
 
 function renderTopTemplatePreviewStage() {
@@ -26001,6 +26003,23 @@ function renderTopTemplatePreviewStage() {
         ? topCustomizerState.currentTpl.cutoutImage
         : topCustomizerState.primaryUrl);
   const sec = topCustomizerState.secondaryUrl;
+
+  if (BRIDGED_HOVER_TEMPLATE_IDS.has(tplId)) {
+    const btpl = topCustomizerState.currentTpl;
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+        <img id="default-img-${tplId}" src="${prim || btpl.defaultImage}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0;" />
+        <div id="fx-container-${tplId}" style="position: absolute; inset: 0; display: none;"></div>
+      </div>`;
+    hoverBridgeActive = true;
+    hoverExternalT = 0;
+    const btplView = Object.assign({}, btpl, { defaultImage: prim || btpl.defaultImage, secondaryImage: sec || btpl.secondaryImage || btpl.defaultImage });
+    startTemplateHoverVideo(stage, btplView);
+    return;
+  }
+  hoverBridgeActive = false;
+  hoverExternalT = null;
 
   const currentOpacity = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
   const subjectFilter = topCustomizerState.bgRemoved
@@ -26334,6 +26353,7 @@ function renderTopTemplatePreviewStage() {
 
 
 function updateTopCustomizerFrame(seqTime, now) {
+  if (hoverBridgeActive) hoverExternalT = seqTime;
   const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
   const totalSeqDur = hasMultipleScenes
     ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
@@ -27180,6 +27200,13 @@ function bindTopTemplateCustomizerEvents() {
 
   // Play/pause sync function
   const setCustomizerPlaying = (play) => {
+    if (play !== topCustomizerState.isPlaying) {
+      if (!play) {
+        topCustomizerState.pausedElapsedMs = performance.now() - topCustomizerState.startTime;
+      } else if (typeof topCustomizerState.pausedElapsedMs === 'number') {
+        topCustomizerState.startTime = performance.now() - topCustomizerState.pausedElapsedMs;
+      }
+    }
     topCustomizerState.isPlaying = play;
     const playBtn = document.getElementById('btn-tpl-modal-play-toggle');
     if (playBtn) playBtn.textContent = topCustomizerState.isPlaying ? '❚❚ Pause' : '▶ Play';
