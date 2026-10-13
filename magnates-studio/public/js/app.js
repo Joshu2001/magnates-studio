@@ -23005,7 +23005,7 @@ function renderHomepageTemplates() {
     return `
       <div class="home-tpl-card" data-template-id="${t.id}">
         <div class="home-tpl-media" id="media-wrap-${t.id}">
-          <img src="${t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" />
+          <img src="${(typeof window.tplGetSnapshot === 'function' && window.tplGetSnapshot(t.id)) || t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" />
           <div class="home-tpl-overlay" style="background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.65) 100%);"></div>
           
           <div class="home-tpl-center-label" id="center-label-${t.id}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; transition: opacity 0.2s;">
@@ -24730,7 +24730,13 @@ function stopTemplateHoverVideo(cardEl, tpl) {
     fxContainer.style.display = 'none';
     fxContainer.innerHTML = '';
   }
-  if (defaultImg) defaultImg.style.opacity = '0.85';
+  if (defaultImg) {
+    defaultImg.style.opacity = '0.85';
+    if (typeof window.tplGetSnapshot === 'function') {
+      const snap = window.tplGetSnapshot(tplId);
+      if (snap && snap.startsWith('data:')) defaultImg.src = snap;
+    }
+  }
   if (centerLabel) centerLabel.style.opacity = '1';
   if (playHover) playHover.style.display = '';
   if (badgeEl) {
@@ -28069,7 +28075,7 @@ function populateModalTemplatesSidebar() {
            style="display: flex; flex-direction: column; background: #08090e; border: 1px solid ${isSelected ? 'rgba(139, 92, 246, 0.5)' : 'rgba(255, 255, 255, 0.05)'}; border-radius: 10px; overflow: hidden; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: ${isSelected ? '0 0 16px rgba(139, 92, 246, 0.3)' : 'none'}; flex-shrink: 0; position: relative;" class="customizer-tpl-sidecard ${isSelected ? 'active-tpl-card' : ''}">
         
         <div style="height: 68px; width: 100%; position: relative; background: #000; overflow: hidden;">
-          <img id="sidecard-thumb-${t.id}" src="${t.defaultImage}" alt="${displayName}" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400';" style="width: 100%; height: 100%; object-fit: cover; opacity: ${isSelected ? '1' : '0.75'}; transition: opacity 0.2s ease;" />
+          <img id="sidecard-thumb-${t.id}" src="${(typeof window.tplGetSnapshot === 'function' && window.tplGetSnapshot(t.id)) || t.defaultImage}" alt="${displayName}" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400';" style="width: 100%; height: 100%; object-fit: cover; opacity: ${isSelected ? '1' : '0.75'}; transition: opacity 0.2s ease;" />
           <div id="sidecard-fx-${t.id}" style="display: none; position: absolute; inset: 0; overflow: hidden; pointer-events: none;"></div>
           
           ${isSelected ? `

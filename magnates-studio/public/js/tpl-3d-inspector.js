@@ -42,10 +42,15 @@
   let saveTimer = null;
   function persist() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => { try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (_) { } }, 250);
+    saveTimer = setTimeout(() => {
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (_) { }
+      if (curTpl && typeof window.tplCaptureCurrentSnapshot === 'function') {
+        window.tplCaptureCurrentSnapshot(curTpl);
+      }
+    }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { mode: 'video', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null };
+    if (!store[id]) store[id] = { mode: 'video', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
     return store[id];
   }
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };
@@ -745,5 +750,156 @@
     } catch (err) { drawPlaceholder(c, clip, cw, ch); }
     c.restore();
   };
+  // --- Dynamic Live Thumbnail / Authentic Snapshot System
+  window.tplGetSnapshot = function (tplId) {
+    if (!tplId) return null;
+    const e = store[tplId];
+    if (e && e.snapshot) return e.snapshot;
+    return null;
+  };
+
+  window.tplCaptureCurrentSnapshot = function (tplId) {
+    if (!tplId) return null;
+    try {
+      const e = entry(tplId);
+      const is3D = has3D(kindOf(tplId), tplId) && e.mode === '3d';
+      const snapCv = document.createElement('canvas');
+      snapCv.width = 400; snapCv.height = 225;
+      const sctx = snapCv.getContext('2d');
+
+      if (is3D && typeof THREE !== 'undefined') {
+        const k = kindOf(tplId), st = stOf(k);
+        if (st && st.renderer && st.renderer.domElement) {
+          sctx.drawImage(st.renderer.domElement, 0, 0, 400, 225);
+          const data = snapCv.toDataURL('image/jpeg', 0.85);
+          if (data && data.length > 50) {
+            e.snapshot = data;
+            persist();
+            window.tplRefreshCardThumbnails(tplId, data);
+            return data;
+          }
+        }
+      }
+
+      // For video / CSS hover stage, capture from active stage element if present
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const stageInner = stage ? stage.querySelector('#customizer-stage-inner') : null;
+      if (stageInner) {
+        // Also rasterise via SVG foreignObject
+        const clone = stageInner.cloneNode(true);
+        const wrapper = document.createElement('div');
+        wrapper.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+        wrapper.style.cssText = `position:relative;width:400px;height:225px;overflow:hidden;background:#000;`;
+        wrapper.appendChild(clone);
+        let markup = new XMLSerializer().serializeToString(wrapper);
+        markup = markup.replace(/src="(https?:[^"]+)"/g, (m, u) => {
+          const raw = u.replace(/&amp;/g, '&'); const d = dataUrlFor(raw);
+          return d ? `src="${d}"` : m;
+        });
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225"><foreignObject x="0" y="0" width="400" height="225">${markup}</foreignObject></svg>`;
+        const im = new Image();
+        im.onload = () => {
+          try {
+            sctx.clearRect(0, 0, 400, 225);
+            sctx.drawImage(im, 0, 0, 400, 225);
+            const data = snapCv.toDataURL('image/jpeg', 0.85);
+            if (data && data.length > 50) {
+              e.snapshot = data;
+              persist();
+              window.tplRefreshCardThumbnails(tplId, data);
+            }
+          } catch (_) {}
+        };
+        im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+      }
+    } catch (_) {}
+    return null;
+  };
+
+  window.tplRefreshCardThumbnails = function (tplId, url) {
+    if (!tplId || !url) return;
+    const defImg = document.querySelector(`.home-tpl-card[data-template-id="${tplId}"] #default-img-${tplId}`);
+    if (defImg) { defImg.src = url; defImg.style.opacity = '1'; }
+    const sideImg = document.getElementById(`sidecard-thumb-${tplId}`);
+    if (sideImg) { sideImg.src = url; sideImg.style.opacity = '1'; }
+  };
+
+  // Generate an authentic snapshot from the template's real CSS/SVG scene at t=1.5s
+  window.tplGenerateAuthenticSnapshot = function (tpl, cb) {
+    if (!tpl || !tpl.id) return;
+    const tplId = tpl.id;
+    const e = entry(tplId);
+    if (e.snapshot) { if (cb) cb(e.snapshot); return; }
+
+    try {
+      const hostEl = document.createElement('div');
+      hostEl.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+      hostEl.style.cssText = `position:relative;width:400px;height:225px;overflow:hidden;background:#000;`;
+      hostEl.innerHTML = `<img id="default-img-${tplId}" src="${esc(tpl.defaultImage)}" alt="" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:0;" /><div id="fx-container-${tplId}" style="position:absolute;left:0;top:0;right:0;bottom:0;display:none;"></div>`;
+      
+      const manual = { t: 1.5, fx: e.fx || { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 } };
+      if (typeof startTemplateHoverVideo === 'function') {
+        const step = startTemplateHoverVideo(hostEl, tpl, manual);
+        if (step) step(1.5);
+      }
+
+      // apply any custom stored texts
+      const ov = e.texts || {};
+      const slots = (tplId === 'spatial-3d-motion-suite') ? SPATIAL_SLOTS : (tplId === 'document-3d-fx-engine') ? DOC_SLOTS : null;
+      const fxc = hostEl.querySelector('#fx-container-' + tplId);
+      if (fxc) {
+        const w = document.createTreeWalker(fxc, NodeFilter.SHOW_TEXT); let n;
+        while ((n = w.nextNode())) {
+          const t = n.nodeValue.trim(); if (!t) continue;
+          if (slots) { const sl = slots.find(x => x.def === t); if (sl && ov[sl.key] != null) n.nodeValue = ov[sl.key]; }
+          else if (ov[t] != null) n.nodeValue = ov[t];
+        }
+      }
+
+      let markup = new XMLSerializer().serializeToString(hostEl);
+      markup = markup.replace(/src="(https?:[^"]+)"/g, (m, u) => {
+        const raw = u.replace(/&amp;/g, '&'); const d = dataUrlFor(raw);
+        return d ? `src="${d}"` : m;
+      });
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="225"><foreignObject x="0" y="0" width="400" height="225">${markup}</foreignObject></svg>`;
+      const im = new Image();
+      im.onload = () => {
+        try {
+          const cv = document.createElement('canvas'); cv.width = 400; cv.height = 225;
+          const ctx = cv.getContext('2d');
+          ctx.drawImage(im, 0, 0, 400, 225);
+          const data = cv.toDataURL('image/jpeg', 0.85);
+          if (data && data.length > 50) {
+            e.snapshot = data;
+            persist();
+            window.tplRefreshCardThumbnails(tplId, data);
+            if (cb) cb(data);
+          }
+        } catch (_) {}
+      };
+      im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    } catch (_) {}
+  };
+
+  // Pre-generate authentic snapshots for all templates on idle
+  window.tplWarmAllSnapshots = function () {
+    if (typeof EFFECT_TEMPLATES_DATA === 'undefined') return;
+    let idx = 0;
+    function next() {
+      if (idx >= EFFECT_TEMPLATES_DATA.length) return;
+      const t = EFFECT_TEMPLATES_DATA[idx++];
+      if (!entry(t.id).snapshot) {
+        window.tplGenerateAuthenticSnapshot(t, () => setTimeout(next, 60));
+      } else {
+        setTimeout(next, 10);
+      }
+    }
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(() => setTimeout(next, 300));
+    } else {
+      setTimeout(next, 500);
+    }
+  };
+
   window.tplFxPreload = function (clip) { if (clip && clip.fxScene) { dataUrlFor(clip.fxScene.prim); dataUrlFor(clip.fxScene.sec); } };
 })();
