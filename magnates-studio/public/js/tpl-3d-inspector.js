@@ -755,9 +755,6 @@
     if (!tplId) return null;
     const e = store[tplId];
     if (e && e.snapshot) return e.snapshot;
-    if (typeof window.AUTHENTIC_TEMPLATE_SNAPSHOTS !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS[tplId]) {
-      return window.AUTHENTIC_TEMPLATE_SNAPSHOTS[tplId];
-    }
     return null;
   };
 
