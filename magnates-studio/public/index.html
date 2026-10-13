@@ -3897,6 +3897,37 @@
                 <span>🧠</span>
                 <span>DOPAMINE HIT: CONCEPT RECONSTRUCTED (+35% RETENTION)</span>
               </div>
+
+              <!-- YouTube-Style Floating Hover Player HUD -->
+              <div id="jani-player-hud" class="tpl-modal-player-hud">
+                <div id="jani-hud-scrubber-wrap" class="tpl-hud-scrubber-wrap" title="Seek timeline">
+                  <div class="tpl-hud-scrubber-track">
+                    <div id="jani-hud-scrubber-fill" class="tpl-hud-scrubber-fill">
+                      <div class="tpl-hud-scrubber-thumb"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tpl-hud-controls-row">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" id="btn-jani-hud-play" class="tpl-hud-btn" title="Play / Pause">
+                      <svg id="jani-hud-icon-pause" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                      <svg id="jani-hud-icon-play" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor; display: none;"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button type="button" id="btn-jani-hud-replay" class="tpl-hud-btn" title="Replay Narrative Sequence">
+                      <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                    </button>
+                    <span id="jani-hud-timecode" style="font-size: 11px; font-weight: 500; font-family: ui-monospace, monospace; color: #cbd5e1; margin-left: 4px;">
+                      00:14 / 02:45
+                    </span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 5px; font-size: 10px; color: #a855f7; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(168,85,247,0.3);">
+                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 6px #a855f7;"></span>
+                      <span style="font-weight: 600;">ALPHA MATTE</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- YouTube-Style Controls Toolbar Under Video -->
@@ -4108,6 +4139,37 @@
               <div id="countdown-toast" style="position: absolute; bottom: 18px; left: 50%; transform: translate(-50%, 40px); background: rgba(24,24,27,0.95); border: 1px solid #ef4444; color: #fff; padding: 6px 18px; border-radius: 20px; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 700; box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3); opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 50; display: flex; align-items: center; gap: 6px;">
                 <span>⚠️</span>
                 <span id="countdown-toast-msg">COLLAPSE CLIMAX TRIGGERED!</span>
+              </div>
+
+              <!-- YouTube-Style Floating Hover Player HUD -->
+              <div id="countdown-player-hud" class="tpl-modal-player-hud">
+                <div id="countdown-hud-scrubber-wrap" class="tpl-hud-scrubber-wrap" title="Seek timeline">
+                  <div class="tpl-hud-scrubber-track">
+                    <div id="countdown-hud-scrubber-fill" class="tpl-hud-scrubber-fill">
+                      <div class="tpl-hud-scrubber-thumb"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tpl-hud-controls-row">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" id="btn-countdown-hud-play" class="tpl-hud-btn" title="Play / Pause">
+                      <svg id="countdown-hud-icon-pause" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                      <svg id="countdown-hud-icon-play" viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor; display: none;"><path d="M8 5v14l11-7z"/></svg>
+                    </button>
+                    <button type="button" id="btn-countdown-hud-replay" class="tpl-hud-btn" title="Replay Countdown">
+                      <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                    </button>
+                    <span id="countdown-hud-timecode" style="font-size: 11px; font-weight: 500; font-family: ui-monospace, monospace; color: #cbd5e1; margin-left: 4px;">
+                      00:10:000
+                    </span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 5px; font-size: 10px; color: #ef4444; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 12px; border: 1px solid rgba(239,68,68,0.3);">
+                      <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 6px #ef4444;"></span>
+                      <span style="font-weight: 600;">LIVE PANIC</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 

@@ -29631,6 +29631,9 @@ function openDocument3DFXSuite() {
   modal.style.display = 'flex';
   setTimeout(() => {
     initDocument3DFXEngine();
+    setTimeout(() => {
+      triggerDocFXPresetAnimation('janiFlyby');
+    }, 250);
   }, 100);
 }
 
@@ -30626,26 +30629,55 @@ function setJaniMatteTheme(theme) {
   }
 }
 
+function updateJaniHudUI() {
+  const min = String(Math.floor(janiSuiteState.timer / 60)).padStart(2, '0');
+  const sec = String(janiSuiteState.timer % 60).padStart(2, '0');
+  const tDisp = document.getElementById('jani-time-display');
+  if (tDisp) tDisp.textContent = `${min}:${sec} / 02:45`;
+
+  const hudTime = document.getElementById('jani-hud-timecode');
+  if (hudTime) hudTime.textContent = `${min}:${sec} / 02:45`;
+
+  const hudFill = document.getElementById('jani-hud-scrubber-fill');
+  if (hudFill) {
+    const pct = Math.min(100, Math.max(0, (janiSuiteState.timer / 165) * 100));
+    hudFill.style.width = `${pct}%`;
+  }
+
+  const hudPlayIcon = document.getElementById('jani-hud-icon-play');
+  const hudPauseIcon = document.getElementById('jani-hud-icon-pause');
+  if (hudPlayIcon && hudPauseIcon) {
+    if (janiSuiteState.isPlaying) {
+      hudPlayIcon.style.display = 'none';
+      hudPauseIcon.style.display = 'block';
+    } else {
+      hudPlayIcon.style.display = 'block';
+      hudPauseIcon.style.display = 'none';
+    }
+  }
+}
+
 function toggleJaniPlayback() {
   janiSuiteState.isPlaying = !janiSuiteState.isPlaying;
   playJaniSFX('click');
   const icon = document.getElementById('jani-play-icon');
   if (janiSuiteState.isPlaying) {
     if (icon) icon.textContent = '❚❚';
-    janiSuiteState.timerInterval = setInterval(() => {
-      janiSuiteState.timer++;
-      if (janiSuiteState.timer > 165) janiSuiteState.timer = 0;
-      const min = String(Math.floor(janiSuiteState.timer / 60)).padStart(2, '0');
-      const sec = String(janiSuiteState.timer % 60).padStart(2, '0');
-      const tDisp = document.getElementById('jani-time-display');
-      if (tDisp) tDisp.textContent = `${min}:${sec} / 02:45`;
+    updateJaniHudUI();
+    if (!janiSuiteState.timerInterval) {
+      janiSuiteState.timerInterval = setInterval(() => {
+        janiSuiteState.timer++;
+        if (janiSuiteState.timer > 165) janiSuiteState.timer = 0;
+        updateJaniHudUI();
 
-      if (janiSuiteState.timer % 15 === 0 && janiSuiteState.timer > 0) {
-        triggerJaniPuzzleAssemble();
-      }
-    }, 1000);
+        if (janiSuiteState.timer % 15 === 0 && janiSuiteState.timer > 0) {
+          triggerJaniPuzzleAssemble();
+        }
+      }, 1000);
+    }
   } else {
     if (icon) icon.textContent = '▶';
+    updateJaniHudUI();
     if (janiSuiteState.timerInterval) {
       clearInterval(janiSuiteState.timerInterval);
       janiSuiteState.timerInterval = null;
@@ -30656,8 +30688,7 @@ function toggleJaniPlayback() {
 function resetJaniScene() {
   playJaniSFX('click');
   janiSuiteState.timer = 0;
-  const tDisp = document.getElementById('jani-time-display');
-  if (tDisp) tDisp.textContent = '00:00 / 02:45';
+  updateJaniHudUI();
   triggerJaniPuzzleBreak();
 }
 
@@ -30668,19 +30699,23 @@ function openJaniSuite() {
   updateJaniPieceSelectOptions();
   renderJaniPuzzleGrid();
   renderJaniRetentionChart();
+  if (!janiSuiteState.isPlaying) {
+    toggleJaniPlayback();
+  }
 }
 
 function closeJaniSuite() {
   const modal = document.getElementById('modal-jani-suite');
   if (!modal) return;
   modal.style.display = 'none';
+  janiSuiteState.isPlaying = false;
+  const icon = document.getElementById('jani-play-icon');
+  if (icon) icon.textContent = '▶';
+  updateJaniHudUI();
   if (janiSuiteState.timerInterval) {
     clearInterval(janiSuiteState.timerInterval);
     janiSuiteState.timerInterval = null;
   }
-  janiSuiteState.isPlaying = false;
-  const icon = document.getElementById('jani-play-icon');
-  if (icon) icon.textContent = '▶';
 }
 
 function bindJaniSuiteModalControls() {
@@ -30723,6 +30758,38 @@ function bindJaniSuiteModalControls() {
   document.getElementById('btn-jani-dopamine-spike')?.addEventListener('click', triggerJaniDopaminePulse);
   document.getElementById('btn-jani-play-toggle')?.addEventListener('click', toggleJaniPlayback);
   document.getElementById('btn-jani-reset')?.addEventListener('click', resetJaniScene);
+
+  // Floating HUD buttons & Scrubber
+  document.getElementById('btn-jani-hud-play')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleJaniPlayback();
+  });
+  document.getElementById('btn-jani-hud-replay')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetJaniScene();
+  });
+
+  const janiHudScrub = document.getElementById('jani-hud-scrubber-wrap');
+  if (janiHudScrub) {
+    let isJaniScrubbing = false;
+    const handleJaniScrub = (ev) => {
+      const rect = janiHudScrub.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(ev.clientX - rect.left, rect.width));
+      const pct = clickX / rect.width;
+      janiSuiteState.timer = Math.floor(pct * 165);
+      updateJaniHudUI();
+    };
+    janiHudScrub.addEventListener('pointerdown', (ev) => {
+      isJaniScrubbing = true;
+      handleJaniScrub(ev);
+    });
+    window.addEventListener('pointermove', (ev) => {
+      if (isJaniScrubbing) handleJaniScrub(ev);
+    });
+    window.addEventListener('pointerup', () => {
+      isJaniScrubbing = false;
+    });
+  }
 
   // Cycle Matte Button
   document.getElementById('btn-jani-cycle-matte')?.addEventListener('click', () => {
@@ -31328,6 +31395,24 @@ function renderCountdownLoop(now) {
   const handle = document.getElementById('countdown-scrubber-handle');
   if (handle) handle.style.left = `${progress * 100}%`;
 
+  const hudFill = document.getElementById('countdown-hud-scrubber-fill');
+  if (hudFill) hudFill.style.width = `${progress * 100}%`;
+
+  const hudTime = document.getElementById('countdown-hud-timecode');
+  if (hudTime) hudTime.textContent = `00:${pad(sec)}:${pad(ms, 3)}`;
+
+  const hudPlayIcon = document.getElementById('countdown-hud-icon-play');
+  const hudPauseIcon = document.getElementById('countdown-hud-icon-pause');
+  if (hudPlayIcon && hudPauseIcon) {
+    if (countdownSuiteState.isPlaying) {
+      hudPlayIcon.style.display = 'none';
+      hudPauseIcon.style.display = 'block';
+    } else {
+      hudPlayIcon.style.display = 'block';
+      hudPauseIcon.style.display = 'none';
+    }
+  }
+
   countdownSuiteState.animFrameId = requestAnimationFrame(renderCountdownLoop);
 }
 
@@ -31335,7 +31420,10 @@ function openCountdownSuite() {
   const modal = document.getElementById('modal-countdown-suite');
   if (!modal) return;
   modal.style.display = 'flex';
+  countdownSuiteState.isPlaying = true;
   countdownSuiteState.lastFrameTime = performance.now();
+  const icon = document.getElementById('countdown-play-icon');
+  if (icon) icon.textContent = '❚❚';
   if (!countdownSuiteState.animFrameId) {
     countdownSuiteState.animFrameId = requestAnimationFrame(renderCountdownLoop);
   }
@@ -31357,8 +31445,7 @@ function closeCountdownSuite() {
 function bindCountdownSuiteModalControls() {
   document.getElementById('btn-close-countdown-suite')?.addEventListener('click', closeCountdownSuite);
 
-  // Play / Pause
-  document.getElementById('btn-countdown-play')?.addEventListener('click', () => {
+  const toggleCountdownPlay = () => {
     initCountdownAudio();
     countdownSuiteState.isPlaying = !countdownSuiteState.isPlaying;
     const icon = document.getElementById('countdown-play-icon');
@@ -31367,16 +31454,52 @@ function bindCountdownSuiteModalControls() {
       countdownSuiteState.currentTime = countdownSuiteState.totalDuration;
       countdownSuiteState.climaxTriggered = false;
     }
+  };
+
+  // Play / Pause (Bottom bar & Floating HUD)
+  document.getElementById('btn-countdown-play')?.addEventListener('click', toggleCountdownPlay);
+  document.getElementById('btn-countdown-hud-play')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleCountdownPlay();
   });
 
-  // Restart
-  document.getElementById('btn-countdown-restart')?.addEventListener('click', () => {
+  const resetCountdownPlay = () => {
     countdownSuiteState.currentTime = countdownSuiteState.totalDuration;
     countdownSuiteState.climaxTriggered = false;
-    countdownSuiteState.isPlaying = false;
+    countdownSuiteState.isPlaying = true;
     const icon = document.getElementById('countdown-play-icon');
-    if (icon) icon.textContent = '▶';
+    if (icon) icon.textContent = '❚❚';
+  };
+
+  // Restart / Replay (Bottom bar & Floating HUD)
+  document.getElementById('btn-countdown-restart')?.addEventListener('click', resetCountdownPlay);
+  document.getElementById('btn-countdown-hud-replay')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    resetCountdownPlay();
   });
+
+  // HUD Scrubber Seeking
+  const hudScrubWrap = document.getElementById('countdown-hud-scrubber-wrap');
+  if (hudScrubWrap) {
+    let isHudScrubbing = false;
+    const handleHudScrub = (ev) => {
+      const rect = hudScrubWrap.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(ev.clientX - rect.left, rect.width));
+      const pct = clickX / rect.width;
+      countdownSuiteState.currentTime = countdownSuiteState.totalDuration * (1 - pct);
+      countdownSuiteState.climaxTriggered = false;
+    };
+    hudScrubWrap.addEventListener('pointerdown', (ev) => {
+      isHudScrubbing = true;
+      handleHudScrub(ev);
+    });
+    window.addEventListener('pointermove', (ev) => {
+      if (isHudScrubbing) handleHudScrub(ev);
+    });
+    window.addEventListener('pointerup', () => {
+      isHudScrubbing = false;
+    });
+  }
 
   // Trigger Climax
   document.getElementById('btn-countdown-trigger-climax')?.addEventListener('click', () => {
@@ -31753,7 +31876,10 @@ function openFlashbackSuite() {
   const modal = document.getElementById('modal-flashback-suite');
   if (!modal) return;
   modal.style.display = 'flex';
+  flashbackSuiteState.isPlaying = true;
   flashbackSuiteState.lastTime = performance.now();
+  const icon = document.getElementById('flashback-play-icon');
+  if (icon) icon.textContent = '❚❚';
   updateFlashbackVisualStyles();
   if (!flashbackSuiteState.animFrameId) {
     flashbackSuiteState.animFrameId = requestAnimationFrame(renderFlashbackLoop);
