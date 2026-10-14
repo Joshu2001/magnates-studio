@@ -28428,17 +28428,30 @@ function bindTopTemplateCustomizerEvents() {
   // Granular Particle Preset Switchers (Dust, Snow, Stars, Fog)
   const particleTypes = ['dust', 'snow', 'stars', 'fog'];
   particleTypes.forEach(pt => {
-    const btn = document.getElementById(`btn-part-${pt}`);
+    const btn = document.getElementById(`btn-particle-${pt}`) || document.getElementById(`btn-part-${pt}`);
     if (btn) {
       btn.addEventListener('click', () => {
         topCustomizerState.particleType = pt;
+        if (!topCustomizerState.enableDustParticles) {
+          topCustomizerState.enableDustParticles = true;
+          const chk = document.getElementById('tpl-modal-toggle-dust');
+          if (chk) chk.checked = true;
+          const c = document.getElementById('customizer-dust-canvas');
+          if (c) c.style.display = 'block';
+        }
         particleTypes.forEach(o => {
-          const ob = document.getElementById(`btn-part-${o}`);
+          const ob = document.getElementById(`btn-particle-${o}`) || document.getElementById(`btn-part-${o}`);
           if (ob) {
             if (o === pt) {
-              ob.className = 'flex-1 py-1 px-1.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-center cursor-pointer transition';
+              ob.style.borderColor = 'rgba(245,158,11,0.6)';
+              ob.style.background = 'rgba(245,158,11,0.22)';
+              ob.style.color = '#fef08a';
+              ob.style.fontWeight = '700';
             } else {
-              ob.className = 'flex-1 py-1 px-1.5 rounded text-[10px] bg-slate-800/80 text-slate-400 hover:text-white border border-slate-700/60 text-center cursor-pointer transition';
+              ob.style.borderColor = 'rgba(255,255,255,0.1)';
+              ob.style.background = 'rgba(255,255,255,0.04)';
+              ob.style.color = '#94a3b8';
+              ob.style.fontWeight = '600';
             }
           }
         });
