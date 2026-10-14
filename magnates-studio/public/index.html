@@ -7037,11 +7037,7 @@
                   <span>↺ Replay</span>
                 </button>
               </div>
-              <div style="display: flex; align-items: center; gap: 6px; font-size: 11px;">
-                <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.8);"></span>
-                <span style="color: #94a3b8; font-weight: 500;">Live Render:</span>
-                <span style="color: #10b981; font-weight: 600; letter-spacing: 0.3px;">READY</span>
-              </div>
+
             </div>
           </div>
 
@@ -7106,10 +7102,15 @@
                   <span id="tpl-modal-label-primary" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Cutout Subject</span>
                   <span id="tpl-modal-filename-primary" style="font-size: 9.5px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">portrait_subject.png</span>
                 </div>
-                <label for="tpl-modal-upload-primary" style="font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#cbd5e1';">
-                  Replace
-                  <input type="file" id="tpl-modal-upload-primary" accept="image/*" style="display: none;" />
-                </label>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <button type="button" id="btn-tpl-modal-edit-cutout" title="Interactive Cutout & Silhouette Tracer" style="font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.35); color: #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                    <span>✂</span> Trace
+                  </button>
+                  <label for="tpl-modal-upload-primary" style="font-size: 10.5px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer; white-space: nowrap; transition: all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.color='#fff';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.color='#cbd5e1';">
+                    Replace
+                    <input type="file" id="tpl-modal-upload-primary" accept="image/*" style="display: none;" />
+                  </label>
+                </div>
                 <input type="text" id="tpl-modal-url-primary" style="display: none;" />
               </div>
               <div id="tpl-modal-extra-cutouts-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
@@ -7127,6 +7128,86 @@
                 <input type="file" id="tpl-modal-upload-secondary" accept="image/*" style="display: none;" />
               </label>
               <input type="text" id="tpl-modal-url-secondary" style="display: none;" />
+            </div>
+          </div>
+
+                    <!-- Section: Parallax Layer Motion & Depth Controls -->
+          <div id="tpl-modal-spooner-controls" style="display: flex; flex-direction: column; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px;">Layer Motion Direction</span>
+              <div style="display: flex; gap: 4px;">
+                <button type="button" id="spooner-btn-dir-push" style="padding: 2px 7px; font-size: 9px; font-weight: 700; border-radius: 4px; background: rgba(56,189,248,0.22); border: 1px solid rgba(56,189,248,0.6); color: #38bdf8; cursor: pointer;">PUSH IN</button>
+                <button type="button" id="spooner-btn-dir-pull" style="padding: 2px 7px; font-size: 9px; font-weight: 600; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">PULL OUT</button>
+              </div>
+            </div>
+
+            <!-- Individual Layer Direction Pickers -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 8px;">
+              <!-- Foreground Subject Direction -->
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Foreground Subject</span>
+                <div style="display: flex; gap: 3px;">
+                  <button type="button" id="spooner-fg-dir-push" style="padding: 2px 6px; font-size: 9px; font-weight: 700; border-radius: 4px; background: rgba(56,189,248,0.25); border: 1px solid rgba(56,189,248,0.6); color: #38bdf8; cursor: pointer;">Push In</button>
+                  <button type="button" id="spooner-fg-dir-pull" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Pull Out</button>
+                  <button type="button" id="spooner-fg-dir-drift" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Drift</button>
+                </div>
+              </div>
+
+              <!-- Background Plate Direction -->
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Background Scene</span>
+                <div style="display: flex; gap: 3px;">
+                  <button type="button" id="spooner-bg-dir-push" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Push In</button>
+                  <button type="button" id="spooner-bg-dir-pull" style="padding: 2px 6px; font-size: 9px; font-weight: 700; border-radius: 4px; background: rgba(168,85,247,0.25); border: 1px solid rgba(168,85,247,0.6); color: #c084fc; cursor: pointer;">Pull Out</button>
+                  <button type="button" id="spooner-bg-dir-drift" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Drift</button>
+                </div>
+              </div>
+
+              <!-- Text Behind Direction -->
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Text Behind</span>
+                <div style="display: flex; gap: 3px;">
+                  <button type="button" id="spooner-txt-dir-push" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Push In</button>
+                  <button type="button" id="spooner-txt-dir-pull" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Pull Out</button>
+                  <button type="button" id="spooner-txt-dir-static" style="padding: 2px 6px; font-size: 9px; font-weight: 700; border-radius: 4px; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.5); color: #38bdf8; cursor: pointer;">Drift</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Foreground Zoom Depth Slider -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                <span style="color: #cbd5e1;">Subject Zoom Scale</span>
+                <span id="tpl-modal-val-spooner-fg-zoom" style="color: #38bdf8; font-family: monospace; font-weight: 700;">100% -> 120%</span>
+              </div>
+              <input type="range" id="tpl-modal-slider-spooner-fg-zoom" min="100" max="150" value="120" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+            </div>
+
+            <!-- Background Zoom Depth Slider -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                <span style="color: #cbd5e1;">Backdrop Zoom Scale</span>
+                <span id="tpl-modal-val-spooner-bg-zoom" style="color: #c084fc; font-family: monospace; font-weight: 700;">106% -> 100%</span>
+              </div>
+              <input type="range" id="tpl-modal-slider-spooner-bg-zoom" min="100" max="140" value="106" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+            </div>
+
+            <!-- Horizontal Parallax Pan -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                <span style="color: #cbd5e1;">Parallax Camera Pan</span>
+                <span id="tpl-modal-val-spooner-pan" style="color: #38bdf8; font-family: monospace; font-weight: 700;">+-14 px</span>
+              </div>
+              <input type="range" id="tpl-modal-slider-spooner-pan" min="0" max="40" value="14" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+            </div>
+
+            <!-- Backdrop Inpaint Blur -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                <span style="color: #cbd5e1;">Backdrop Softness / Blur</span>
+                <span id="tpl-modal-val-spooner-blur" style="color: #94a3b8; font-family: monospace; font-weight: 700;">0.0 px</span>
+              </div>
+              <input type="range" id="tpl-modal-slider-spooner-blur" min="0" max="10" step="0.5" value="0.0" style="width: 100%; accent-color: #94a3b8; height: 3px; cursor: pointer;" />
             </div>
           </div>
 
@@ -7341,6 +7422,185 @@
       </div>
 
       <!-- Modal Floating Stage Context Menu -->
+      <div id="modal-image-cutout-editor" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100020; backdrop-filter: blur(16px); background: rgba(3,5,10,0.96); padding: 18px 20px; overflow: hidden;">
+    <div class="vector-modal-box" style="display: flex; flex-direction: column; width: 95vw; max-width: 1400px; height: 92vh; background: #07090e; border: 1px solid rgba(56,189,248,0.3); border-radius: 18px; box-shadow: 0 25px 70px rgba(0,0,0,0.95), 0 0 1px 1px rgba(56,189,248,0.2); overflow: hidden; position: relative;">
+      <!-- Top Bar Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.07); background: #0a0d14; flex-shrink: 0;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 14px rgba(56,189,248,0.4);">
+            <svg viewBox="0 0 24 24" style="width: 17px; height: 17px; fill: none; stroke: #fff; stroke-width: 2;"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+          </div>
+          <div>
+            <div style="font-size: 14px; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+              <span>Interactive Cutout &amp; Silhouette Tracer</span>
+              <span style="font-size: 10px; padding: 1px 6px; border-radius: 4px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; font-family: monospace;">PRECISION MASK ENGINE</span>
+            </div>
+            <div style="font-size: 10px; color: #94a3b8; margin-top: 1px;">
+              Click to place polygon lasso boundary points around your subject &bull; Double-click or click start point to close shape
+            </div>
+          </div>
+        </div>
+        <!-- Header Actions -->
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label for="cutout-tool-upload-image" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <span>📁 Load Custom Image</span>
+            <input type="file" id="cutout-tool-upload-image" accept="image/*" style="display: none;" />
+          </label>
+          <button type="button" id="btn-cutout-editor-save" style="padding: 7px 18px; font-size: 11.5px; font-weight: 700; border-radius: 7px; background: linear-gradient(135deg, #0284c7, #2563eb); border: 1px solid rgba(56,189,248,0.4); color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(37,99,235,0.4);">
+            <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor;"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
+            <span>Apply Cutout to Scene</span>
+          </button>
+          <button type="button" id="btn-cutout-editor-close" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px;">✕</button>
+        </div>
+      </div>
+      <!-- Main Workspace: Toolbar + Canvas Workspace + Live Comparison Strip -->
+      <div style="display: flex; flex: 1; min-height: 0; background: #05060b;">
+        <!-- Left Tool Palette -->
+        <div style="width: 220px; background: #080a11; border-right: 1px solid rgba(255,255,255,0.06); padding: 14px 12px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex-shrink: 0;">
+          <!-- Mode Selector -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <!-- AI Automatic Subject Extraction & Precision Matting -->
+            <div style="display: flex; flex-direction: column; gap: 6px; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.06);">
+              <button type="button" id="btn-cutout-ai-auto" style="padding: 8px 10px; font-size: 11px; font-weight: 700; border-radius: 7px; background: linear-gradient(135deg, rgba(168,85,247,0.25), rgba(56,189,248,0.25)); border: 1px solid rgba(168,85,247,0.5); color: #e9d5ff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 12px rgba(168,85,247,0.15);">
+                <span>⚡</span> <span>Auto AI Cutout (Instant)</span>
+              </button>
+              <div style="font-size: 9px; color: #94a3b8; text-align: center;">Clean sub-pixel edge matting without manual lasso</div>
+            </div>
+            <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px;">Manual Fine-Tune Tools</span>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 5px;">
+              <button type="button" id="btn-tool-mode-freehand" class="cutout-tool-btn" style="padding: 7px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(56,189,248,0.4); background: rgba(56,189,248,0.15); color: #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span>✏️</span> <span>Freehand Smooth Lasso</span>
+              </button>
+              <button type="button" id="btn-tool-mode-lasso" class="cutout-tool-btn" style="padding: 7px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span>📐</span> <span>Polygon Lasso (Points)</span>
+              </button>
+              <button type="button" id="btn-tool-mode-brush" class="cutout-tool-btn" style="padding: 7px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span>🖌️</span> <span>Brush (Keep)</span>
+              </button>
+              <button type="button" id="btn-tool-mode-eraser" class="cutout-tool-btn" style="padding: 7px 10px; font-size: 11px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span>🧹</span> <span>Eraser (Cut Away)</span>
+              </button>
+            </div>
+          </div>
+          <!-- Brush Size Control (when Brush/Eraser is active) -->
+          <div id="cutout-brush-settings" style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8;">
+              <span>Brush Diameter</span>
+              <span id="cutout-val-brush-size" style="font-family: monospace; color: #38bdf8;">25 px</span>
+            </div>
+            <input type="range" id="cutout-slider-brush-size" min="4" max="100" value="25" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+          </div>
+          <!-- Edge Feather Control -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #94a3b8;">
+              <span>Edge Softness / Feather</span>
+              <span id="cutout-val-feather" style="font-family: monospace; color: #38bdf8;">0.0 px</span>
+            </div>
+            <input type="range" id="cutout-slider-feather" min="0" max="8" step="0.5" value="0" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+          </div>
+          <!-- Lasso Shape Actions -->
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px;">Lasso Points</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <button type="button" id="btn-cutout-panel-undo" title="Undo last point or brush stroke (Ctrl+Z)" style="padding: 6px 8px; font-size: 10.5px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span>↩</span> <span>Undo</span>
+              </button>
+              <button type="button" id="btn-cutout-panel-redo" title="Redo last undone step (Ctrl+Y)" style="padding: 6px 8px; font-size: 10.5px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #e2e8f0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span>↪</span> <span>Redo</span>
+              </button>
+            </div>
+            <button type="button" id="btn-cutout-close-poly" style="padding: 6px 8px; font-size: 10.5px; font-weight: 600; border-radius: 6px; background: rgba(56,189,248,0.12); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              ✓ Seal / Close Subject Shape
+            </button>
+            <button type="button" id="btn-cutout-clear-all" style="padding: 5px 8px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.25); color: #fca5a5; cursor: pointer;">
+              🗑️ Reset All Points
+            </button>
+          </div>
+          <!-- Mask Inversion & Background Inpaint Generation -->
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10.5px; color: #cbd5e1;">Invert Mask</span>
+              <input type="checkbox" id="cutout-toggle-invert" style="accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10.5px; color: #cbd5e1;">Auto-Generate Inpainted BG Plate</span>
+              <input type="checkbox" id="cutout-toggle-inpaint" checked style="accent-color: #22c55e; cursor: pointer;" />
+            </div>
+          </div>
+          <!-- View Display Modes -->
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px;">Display Backdrop</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <button type="button" id="btn-cutout-bg-checker" class="cutout-bg-mode-btn" style="padding: 4px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(56,189,248,0.4); background: rgba(56,189,248,0.1); color: #38bdf8; cursor: pointer;">Checkerboard</button>
+              <button type="button" id="btn-cutout-bg-black" class="cutout-bg-mode-btn" style="padding: 4px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">Solid Dark</button>
+              <button type="button" id="btn-cutout-bg-white" class="cutout-bg-mode-btn" style="padding: 4px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">Solid Light</button>
+              <button type="button" id="btn-cutout-bg-mask" class="cutout-bg-mode-btn" style="padding: 4px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">Ruby Mask</button>
+            </div>
+          </div>
+          <!-- Shortcuts Hint -->
+          <div style="margin-top: auto; padding: 8px; border-radius: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); font-size: 9px; color: #64748b; line-height: 1.4;">
+            💡 <b>Tips:</b> Double-click anywhere to seal contour. Press <b>Ctrl+Z</b> to delete previous anchor point.
+          </div>
+        </div>
+        <!-- Center Tracing Canvas Viewport -->
+        <div style="flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; align-items: center; justify-content: center; background: #020408;">
+          <!-- Zoom / Pan HUD -->
+          <div style="position: absolute; top: 12px; left: 16px; z-index: 10; display: flex; align-items: center; gap: 8px; background: rgba(10,13,20,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 10px;">
+            <button type="button" id="btn-cutout-zoom-out" style="background: none; border: none; color: #cbd5e1; font-size: 14px; cursor: pointer; padding: 0 4px;">−</button>
+            <span id="cutout-val-zoom" style="font-family: monospace; font-size: 11px; color: #38bdf8; min-width: 45px; text-align: center;">100%</span>
+            <button type="button" id="btn-cutout-zoom-in" style="background: none; border: none; color: #cbd5e1; font-size: 14px; cursor: pointer; padding: 0 4px;">+</button>
+            <button type="button" id="btn-cutout-zoom-reset" style="background: none; border: none; color: #94a3b8; font-size: 10px; cursor: pointer; margin-left: 4px; padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);">Fit</button>
+          </div>
+          <!-- Canvas Frame Container -->
+          <div id="cutout-canvas-scroll-container" style="position: relative; width: 100%; height: 100%; overflow: auto; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+            <!-- Checkerboard Background Pattern container -->
+            <div id="cutout-canvas-wrapper" style="position: relative; box-shadow: 0 15px 40px rgba(0,0,0,0.8); background-image: linear-gradient(45deg, #181c26 25%, transparent 25%), linear-gradient(-45deg, #181c26 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #181c26 75%), linear-gradient(-45deg, transparent 75%, #181c26 75%); background-size: 20px 20px; background-position: 0 0, 0 10px, 10px -10px, -10px 0px;">
+              <!-- Base Original Image Canvas -->
+              <canvas id="cutout-base-canvas" style="display: block;"></canvas>
+              <!-- Interactive Drawing / Vector Path Canvas overlay -->
+              <canvas id="cutout-overlay-canvas" style="position: absolute; top: 0; left: 0; pointer-events: none;"></canvas>
+            </div>
+          </div>
+          <!-- Bottom Status Bar -->
+          <div style="position: absolute; bottom: 10px; right: 16px; background: rgba(10,13,20,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 10px; font-family: monospace; font-size: 9.5px; color: #94a3b8; pointer-events: none;">
+            <span id="cutout-status-points">0 Points Placed</span> &bull; <span id="cutout-status-dims">0 x 0 px</span>
+          </div>
+        </div>
+        <!-- Right Side Live Dual-Card Preview Strip -->
+        <div style="width: 250px; background: #080a11; border-left: 1px solid rgba(255,255,255,0.06); padding: 14px 12px; display: flex; flex-direction: column; gap: 14px; overflow-y: auto; flex-shrink: 0;">
+          <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px;">Live Output Cards</span>
+          <!-- Card 1: Foreground Cutout Preview -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(56,189,248,0.2); border-radius: 8px; padding: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; font-weight: 600; color: #f1f5f9;">1. Isolated Subject</span>
+              <span style="font-size: 9px; font-family: monospace; color: #38bdf8;">CUTOUT</span>
+            </div>
+            <div style="width: 100%; height: 130px; border-radius: 6px; overflow: hidden; background: radial-gradient(#1e293b, #090d16); display: flex; align-items: center; justify-content: center; position: relative;">
+              <img id="cutout-preview-fg-thumb" src="" alt="Subject Cutout" style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+            </div>
+          </div>
+          <!-- Card 2: Inpainted Background Plate Preview -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(34,197,94,0.25); border-radius: 8px; padding: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; font-weight: 600; color: #f1f5f9;">2. Inpainted Background</span>
+              <span style="font-size: 9px; font-family: monospace; color: #4ade80;">HOLE FILLED</span>
+            </div>
+            <div style="width: 100%; height: 130px; border-radius: 6px; overflow: hidden; background: #030712; display: flex; align-items: center; justify-content: center; position: relative;">
+              <img id="cutout-preview-bg-thumb" src="" alt="Inpainted Plate" style="max-width: 100%; max-height: 100%; object-fit: cover;" />
+            </div>
+          </div>
+          <!-- Presets for fast 1-click test -->
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <span style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px;">Load Template Preset</span>
+            <button type="button" id="btn-cutout-load-hiker-preset" style="padding: 6px 8px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); color: #cbd5e1; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 6px;">
+              <span>🏔️</span> <span>Hiker Mountain Photo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
       <div id="modal-stage-context-menu" style="display: none; position: fixed; z-index: 100020; width: 215px; background: rgba(15, 17, 26, 0.98); border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.9); padding: 6px; backdrop-filter: blur(10px);">
         <button type="button" class="modal-ctx-item" id="ctx-modal-remove-bg" style="width: 100%; padding: 7px 10px; font-size: 11px; text-align: left; background: none; border: none; color: #f1f5f9; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
           <span>✂️ Background Remover</span>
