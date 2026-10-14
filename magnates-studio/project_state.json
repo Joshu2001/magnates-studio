@@ -25,55 +25,22 @@
   ],
   "chart": [],
   "quote": [],
-  "image": [
-    {
-      "id": "fx-spatial-3d-motion-suite-1791873375141-5h9y",
-      "start": 0,
-      "duration": 4,
-      "zIndex": 20,
-      "file": {
-        "name": "3D Spatial Motion Titles & Parallax Rig (FX)",
-        "url": "https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80",
-        "isImage": true
-      }
-    }
-  ],
+  "image": [],
   "video": [],
-  "voiceover": [
-    {
-      "id": "clip-voiceover-1791809492103",
-      "track": "voiceover",
-      "start": 83.88594703455725,
-      "duration": 285.25806696544277,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 10,
-      "file": {
-        "name": "_Android_ Unwanted Updates and Bloat_.wav",
-        "url": "/media/uploads/_Android_%20Unwanted%20Updates%20and%20Bloat_.wav",
-        "isAudio": true,
-        "isVideo": false,
-        "isImage": false
-      }
-    }
-  ],
+  "voiceover": [],
   "music": [],
   "background": [
     {
       "id": "clip-bg-default",
       "start": 0,
-      "duration": 10.30453374730022,
+      "duration": 60,
       "bgType": "cyber_grid",
-      "bgColor": "#0a0b0e",
-      "filter": "negative",
-      "lut": "negative",
-      "filterIntensity": 100
+      "bgColor": "#0a0b0e"
     }
   ],
   "currentTime": 0,
-  "duration": 368.144014,
-  "savedAt": 1791878396473,
-  "projectName": "New Project 57",
-  "projectId": "proj_1791873378030_5au2"
+  "duration": 368.14,
+  "savedAt": 1791982914309,
+  "projectName": "New Project 1",
+  "projectId": "proj_1791974087227_m6iw"
 }

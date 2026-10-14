@@ -7,55 +7,71 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
           <linearGradient id="bg-sp" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#04060b"/>
-            <stop offset="100%" stop-color="#0b101c"/>
+            <stop offset="0%" stop-color="#020306"/>
+            <stop offset="50%" stop-color="#080c14"/>
+            <stop offset="100%" stop-color="#020305"/>
           </linearGradient>
-          <radialGradient id="glow-sp" cx="50%" cy="45%" r="55%">
-            <stop offset="0%" stop-color="rgba(245,158,11,0.3)"/>
+          <radialGradient id="spotlight-sp" cx="50%" cy="38%" r="55%">
+            <stop offset="0%" stop-color="rgba(217,119,6,0.16)"/>
+            <stop offset="60%" stop-color="rgba(15,23,42,0.04)"/>
             <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
           </radialGradient>
-          <filter id="gold-shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="rgba(245,158,11,0.45)"/>
+          <linearGradient id="gold-foil" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fef08a"/>
+            <stop offset="25%" stop-color="#d97706"/>
+            <stop offset="50%" stop-color="#fde68a"/>
+            <stop offset="75%" stop-color="#b45309"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
+          </linearGradient>
+          <filter id="heavy-ao" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="rgba(0,0,0,0.96)"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.85)"/>
           </filter>
         </defs>
         <rect width="400" height="225" fill="url(#bg-sp)"/>
-        <!-- 3D Perspective Grid -->
-        <g stroke="rgba(217,119,6,0.3)" stroke-width="1" opacity="0.65">
-          <line x1="200" y1="90" x2="-50" y2="230"/>
-          <line x1="200" y1="90" x2="30" y2="230"/>
-          <line x1="200" y1="90" x2="110" y2="230"/>
-          <line x1="200" y1="90" x2="190" y2="230"/>
-          <line x1="200" y1="90" x2="270" y2="230"/>
-          <line x1="200" y1="90" x2="350" y2="230"/>
-          <line x1="200" y1="90" x2="430" y2="230"/>
-          <line x1="200" y1="90" x2="510" y2="230"/>
-          <line x1="50" y1="130" x2="350" y2="130"/>
-          <line x1="20" y1="160" x2="380" y2="160"/>
-          <line x1="-10" y1="195" x2="410" y2="195"/>
-        </g>
-        <rect width="400" height="225" fill="url(#glow-sp)"/>
-        <!-- Left Classified Card -->
-        <g transform="translate(30, 45) rotate(8)">
-          <rect width="110" height="55" rx="5" fill="#0f172a" stroke="rgba(245,158,11,0.6)" stroke-width="1.2"/>
-          <text x="10" y="18" fill="#f59e0b" font-family="serif" font-weight="900" font-size="7.5" letter-spacing="1">CLASSIFIED REPORT</text>
-          <text x="10" y="30" fill="#94a3b8" font-family="monospace" font-size="6">FINANCIAL SCAN #8941</text>
-          <line x1="10" y1="38" x2="85" y2="38" stroke="#f59e0b" stroke-width="1.5"/>
-        </g>
-        <!-- Right Monopoly Map Card -->
-        <g transform="translate(265, 120) rotate(-6)">
-          <rect width="110" height="55" rx="5" fill="#0f172a" stroke="rgba(6,182,212,0.6)" stroke-width="1.2"/>
-          <text x="10" y="18" fill="#06b6d4" font-family="serif" font-weight="900" font-size="7.5" letter-spacing="1">MONOPOLY MAP</text>
-          <text x="10" y="30" fill="#94a3b8" font-family="monospace" font-size="6">NODES: 14,200 ACTIVE</text>
-          <line x1="10" y1="38" x2="85" y2="38" stroke="#06b6d4" stroke-width="1.5"/>
-        </g>
-        <!-- Center Gold Plaque -->
-        <g transform="translate(100, 68)" filter="url(#gold-shadow)">
-          <rect width="200" height="85" rx="8" fill="#090d16" stroke="#f59e0b" stroke-width="2"/>
-          <text x="100" y="42" fill="#f59e0b" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="19" letter-spacing="3" text-anchor="middle">THE SYSTEM</text>
-          <line x1="45" y1="52" x2="155" y2="52" stroke="#f59e0b" stroke-width="1.8"/>
-          <text x="100" y="68" fill="#cbd5e1" font-family="monospace" font-weight="700" font-size="8" letter-spacing="2" text-anchor="middle">MANIPULATION &amp; CONTROL</text>
-        </g>
+        <ellipse cx="200" cy="225" rx="260" ry="75" fill="#04060c" opacity="0.8"/>
+        <rect width="400" height="225" fill="url(#spotlight-sp)"/>
         
+        <!-- Receding architectural perspective grid floor -->
+        <g stroke="rgba(255,255,255,0.035)" stroke-width="1">
+          <line x1="200" y1="105" x2="-60" y2="225"/>
+          <line x1="200" y1="105" x2="40" y2="225"/>
+          <line x1="200" y1="105" x2="140" y2="225"/>
+          <line x1="200" y1="105" x2="260" y2="225"/>
+          <line x1="200" y1="105" x2="360" y2="225"/>
+          <line x1="200" y1="105" x2="460" y2="225"/>
+          <line x1="30" y1="155" x2="370" y2="155"/>
+          <line x1="-20" y1="190" x2="420" y2="190"/>
+        </g>
+
+        <!-- Deep Receding Dossier Folders (Tangible Paper Texture, No Neon Outlines) -->
+        <g transform="translate(35, 48) rotate(5)" filter="url(#heavy-ao)">
+          <rect width="115" height="62" rx="2" fill="#181513" stroke="#292524" stroke-width="1"/>
+          <rect x="0" y="0" width="115" height="10" fill="#120f0e"/>
+          <text x="8" y="7" fill="#a8a29e" font-family="monospace" font-size="5" font-weight="700" letter-spacing="1">DEPT. TREASURY // CLASSIFIED</text>
+          <text x="8" y="24" fill="#e7e5e4" font-family="Georgia, serif" font-size="8.5" font-weight="700">CONFIDENTIAL SCAN</text>
+          <text x="8" y="36" fill="#78716c" font-family="monospace" font-size="6">OCT 1929 - AUDIT #409</text>
+          <rect x="55" y="42" width="50" height="14" rx="1" fill="none" stroke="#991b1b" stroke-width="1" stroke-dasharray="14, 1" opacity="0.85"/>
+          <text x="80" y="52" fill="#991b1b" font-family="monospace" font-size="6.5" font-weight="900" letter-spacing="1" text-anchor="middle" opacity="0.9">VERIFIED</text>
+        </g>
+
+        <!-- Receding Ledger Plate Right -->
+        <g transform="translate(260, 115) rotate(-5)" filter="url(#heavy-ao)">
+          <rect width="115" height="62" rx="2" fill="#0c111d" stroke="#1e293b" stroke-width="1"/>
+          <rect x="0" y="0" width="115" height="10" fill="#080c16"/>
+          <text x="8" y="7" fill="#64748b" font-family="monospace" font-size="5" font-weight="700" letter-spacing="1">FINANCIAL MONOPOLY LEDGER</text>
+          <text x="8" y="24" fill="#cbd5e1" font-family="Georgia, serif" font-size="8.5" font-weight="700">BANKING CONGLOMERATE</text>
+          <text x="8" y="36" fill="#64748b" font-family="monospace" font-size="6">CAPITAL FLOW: $84.2B</text>
+          <line x1="8" y1="45" x2="100" y2="45" stroke="#1e293b" stroke-width="0.8"/>
+          <line x1="8" y1="51" x2="85" y2="51" stroke="#1e293b" stroke-width="0.8"/>
+        </g>
+
+        <!-- Pure Cinematic Floating Gold Typography (No tacky border box!) -->
+        <g transform="translate(200, 108)" filter="url(#heavy-ao)">
+          <text x="0" y="-6" fill="url(#gold-foil)" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="26" letter-spacing="5" text-anchor="middle">THE SYSTEM</text>
+          <line x1="-85" y1="7" x2="85" y2="7" stroke="url(#gold-foil)" stroke-width="1" opacity="0.8"/>
+          <text x="0" y="21" fill="#94a3b8" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="7.5" letter-spacing="3" text-anchor="middle">MANIPULATION &amp; CONTROL</text>
+        </g>
       </svg>
     `)}`,
 
@@ -64,38 +80,53 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
           <linearGradient id="bg-doc" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#08090d"/>
-            <stop offset="100%" stop-color="#141822"/>
+            <stop offset="0%" stop-color="#050608"/>
+            <stop offset="100%" stop-color="#0d1117"/>
           </linearGradient>
-          <filter id="paper-drop" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="rgba(0,0,0,0.85)"/>
+          <filter id="paper-shadow" x="-15%" y="-15%" width="130%" height="130%">
+            <feDropShadow dx="-4" dy="16" stdDeviation="16" flood-color="rgba(0,0,0,0.95)"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.85)"/>
           </filter>
+          <linearGradient id="paper-cream" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#fdfbf7"/>
+            <stop offset="100%" stop-color="#ede7db"/>
+          </linearGradient>
         </defs>
         <rect width="400" height="225" fill="url(#bg-doc)"/>
-        <!-- 3D Slanted Paper -->
-        <g transform="translate(60, 20) skewY(-3)" filter="url(#paper-drop)">
-          <rect width="280" height="185" rx="4" fill="#fdfcf7" stroke="#e2d9c8" stroke-width="1"/>
-          <line x1="20" y1="18" x2="260" y2="18" stroke="#1c1917" stroke-width="2"/>
-          <text x="140" y="34" fill="#1c1917" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="13" letter-spacing="2" text-anchor="middle">THE FINANCIAL GAZETTE</text>
-          <text x="140" y="45" fill="#78716c" font-family="monospace" font-size="6" letter-spacing="1" text-anchor="middle">VOL. XCIV • SPECIAL INVESTIGATIVE REPORT • OCT 2026</text>
-          <line x1="20" y1="52" x2="260" y2="52" stroke="#1c1917" stroke-width="0.8"/>
-          <!-- Article Columns & Highlighter -->
-          <text x="25" y="70" fill="#dc2626" font-family="sans-serif" font-weight="900" font-size="10">BILLIONS VANISHED OVERNIGHT</text>
-          <!-- Yellow Highlighter Stroke -->
-          <rect x="23" y="77" width="165" height="13" fill="#fef08a" opacity="0.9" rx="2"/>
-          <text x="26" y="87" fill="#000" font-family="monospace" font-weight="800" font-size="7.5">OFFSHORE WIRE LEAKS CONFIRMED</text>
-          <!-- Classified Redaction Blocks -->
-          <rect x="25" y="100" width="115" height="8" fill="#1c1917" rx="1"/>
-          <rect x="145" y="100" width="70" height="8" fill="#1c1917" rx="1"/>
-          <rect x="25" y="112" width="220" height="6" fill="#e2d9c8" rx="1"/>
-          <rect x="25" y="122" width="180" height="6" fill="#e2d9c8" rx="1"/>
-          <!-- Red Pinpoint Stamp -->
-          <g transform="translate(195, 130) rotate(-10)">
-            <rect width="65" height="22" rx="3" fill="none" stroke="#ef4444" stroke-width="1.8"/>
-            <text x="32.5" y="15" fill="#ef4444" font-family="monospace" font-weight="900" font-size="8.5" letter-spacing="1" text-anchor="middle">EVIDENCE #1</text>
+        
+        <!-- Camera-tilted 3D Newsprint Sheet (Realistic paper tone, fiber border, deep drop shadow) -->
+        <g transform="translate(65, 18) skewY(-2.5) rotate(1.2)" filter="url(#paper-shadow)">
+          <rect width="275" height="190" fill="url(#paper-cream)" stroke="#dcd3c1" stroke-width="0.8"/>
+          
+          <!-- Newspaper Masthead Header -->
+          <line x1="18" y1="16" x2="257" y2="16" stroke="#292524" stroke-width="2.5"/>
+          <text x="137.5" y="32" fill="#1c1917" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="14" letter-spacing="3" text-anchor="middle">THE FINANCIAL GAZETTE</text>
+          <text x="137.5" y="42" fill="#78716c" font-family="'Times New Roman', serif" font-size="5.5" letter-spacing="1" font-style="italic" text-anchor="middle">SPECIAL INVESTIGATIVE REPORT • VOL. XCIV • OCT 24, 1929</text>
+          <line x1="18" y1="48" x2="257" y2="48" stroke="#292524" stroke-width="0.8"/>
+          
+          <!-- Urgent Headline -->
+          <text x="22" y="66" fill="#1c1917" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="11" letter-spacing="0.2">BILLIONS VANISHED OVERNIGHT</text>
+          
+          <!-- Realistic Textured Highlighter with Multiply Blend -->
+          <rect x="20" y="73" width="175" height="13" fill="#facc15" opacity="0.65" rx="1.5" style="mix-blend-mode: multiply;"/>
+          <text x="23" y="83" fill="#0f172a" font-family="'Times New Roman', Georgia, serif" font-weight="800" font-size="8">OFFSHORE WIRE LEAKS CONFIRMED</text>
+          
+          <!-- Authentic Ragged Redaction Bars -->
+          <rect x="22" y="96" width="118" height="7" fill="#1c1917"/>
+          <rect x="144" y="96" width="65" height="7" fill="#1c1917"/>
+          
+          <!-- Body Text Mockup -->
+          <line x1="22" y1="110" x2="245" y2="110" stroke="#78716c" stroke-width="1"/>
+          <line x1="22" y1="118" x2="225" y2="118" stroke="#78716c" stroke-width="1"/>
+          <line x1="22" y1="126" x2="250" y2="126" stroke="#78716c" stroke-width="1"/>
+          <line x1="22" y1="134" x2="190" y2="134" stroke="#78716c" stroke-width="1"/>
+          
+          <!-- Distressed Rubber Stamp (Angled, Faded Ink Texture) -->
+          <g transform="translate(185, 138) rotate(-9)">
+            <rect width="66" height="24" rx="1" fill="none" stroke="#b91c1c" stroke-width="1.8" stroke-dasharray="32, 1, 12, 1" opacity="0.88"/>
+            <text x="33" y="16" fill="#b91c1c" font-family="monospace" font-weight="900" font-size="8.5" letter-spacing="1.5" text-anchor="middle" opacity="0.9">EVIDENCE #1</text>
           </g>
         </g>
-        
       </svg>
     `)}`,
 
@@ -104,55 +135,46 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
           <linearGradient id="bg-puz" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#05070a"/>
-            <stop offset="100%" stop-color="#0b1320"/>
+            <stop offset="0%" stop-color="#030407"/>
+            <stop offset="100%" stop-color="#0a0e17"/>
           </linearGradient>
-          <filter id="cyan-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="rgba(0,242,254,0.65)"/>
+          <filter id="puz-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="rgba(0,0,0,0.92)"/>
           </filter>
         </defs>
         <rect width="400" height="225" fill="url(#bg-puz)"/>
-        <!-- Background Grid -->
-        <g stroke="rgba(255,255,255,0.06)" stroke-width="1">
-          <line x1="0" y1="50" x2="400" y2="50"/><line x1="0" y1="110" x2="400" y2="110"/><line x1="0" y1="170" x2="400" y2="170"/>
-          <line x1="80" y1="0" x2="80" y2="225"/><line x1="160" y1="0" x2="160" y2="225"/><line x1="240" y1="0" x2="240" y2="225"/><line x1="320" y1="0" x2="320" y2="225"/>
-        </g>
-        <text x="200" y="70" fill="rgba(255,255,255,0.07)" font-family="monospace" font-weight="900" font-size="28" letter-spacing="6" text-anchor="middle">THE MONOPOLY TRAP</text>
-        <!-- 3x3 Floating Puzzle Grid -->
-        <g transform="translate(130, 45)">
-          <rect x="0" y="0" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="21" y="27" font-size="18" text-anchor="middle">🧩</text>
-          <rect x="48" y="0" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="69" y="27" font-size="18" text-anchor="middle">🧩</text>
-          <rect x="96" y="0" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="117" y="27" font-size="18" text-anchor="middle">🧩</text>
-
-          <rect x="0" y="48" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="21" y="75" font-size="18" text-anchor="middle">🧩</text>
-          <rect x="48" y="48" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="69" y="75" font-size="18" text-anchor="middle">🧩</text>
-          <rect x="96" y="48" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="117" y="75" font-size="18" text-anchor="middle">🧩</text>
-
-          <rect x="0" y="96" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="21" y="123" font-size="18" text-anchor="middle">🧩</text>
-          <rect x="48" y="96" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="69" y="123" font-size="18" text-anchor="middle">🧩</text>
-          <rect x="96" y="96" width="42" height="42" rx="4" fill="#0f172a" stroke="#00f2fe" stroke-width="1.2"/>
-          <text x="117" y="123" font-size="18" text-anchor="middle">🧩</text>
-        </g>
-        <!-- Center Alpha Matte Box -->
-        <g transform="translate(85, 75)" filter="url(#cyan-glow)">
-          <rect width="230" height="75" rx="8" fill="#080b12" stroke="#ffffff" stroke-width="1.8"/>
-          <!-- Corner brackets -->
-          <path d="M 6 16 L 6 6 L 16 6" fill="none" stroke="#00f2fe" stroke-width="2.5"/>
-          <path d="M 224 16 L 224 6 L 214 6" fill="none" stroke="#00f2fe" stroke-width="2.5"/>
-          <path d="M 6 59 L 6 69 L 16 69" fill="none" stroke="#00f2fe" stroke-width="2.5"/>
-          <path d="M 224 59 L 224 69 L 214 69" fill="none" stroke="#00f2fe" stroke-width="2.5"/>
-          <text x="115" y="28" fill="#00f2fe" font-family="monospace" font-weight="900" font-size="8" letter-spacing="2" text-anchor="middle">● PRIMARY TALKING POINT</text>
-          <text x="115" y="52" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="15" text-anchor="middle">"Illusion of Free Choice"</text>
-        </g>
         
+        <!-- Ghosted Architectural Background Grid -->
+        <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+          <line x1="0" y1="56" x2="400" y2="56"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="168" x2="400" y2="168"/>
+          <line x1="100" y1="0" x2="100" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="300" y1="0" x2="300" y2="225"/>
+        </g>
+        <text x="200" y="58" fill="rgba(255,255,255,0.04)" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="24" letter-spacing="8" text-anchor="middle">THE MONOPOLY TRAP</text>
+        
+        <!-- 3x3 Interlocking Tactical Narrative Jigsaw (Real silhouettes, NO emojis!) -->
+        <g transform="translate(136, 42)" filter="url(#puz-shadow)">
+          <rect x="0" y="0" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          <rect x="44" y="0" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          <rect x="88" y="0" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          
+          <rect x="0" y="44" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          <!-- The missing focal piece (illuminated in subtle amber) -->
+          <rect x="44" y="44" width="38" height="38" rx="2" fill="#1e1808" stroke="#d97706" stroke-width="1.2"/>
+          <circle cx="63" cy="63" r="6" fill="#f59e0b" opacity="0.6"/>
+          <rect x="88" y="44" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          
+          <rect x="0" y="88" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          <rect x="44" y="88" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+          <rect x="88" y="88" width="38" height="38" rx="2" fill="#0f172a" stroke="#1e293b" stroke-width="0.8"/>
+        </g>
+
+        <!-- Clean Minimalist Editorial Alpha Matte Lower-Third (No tacky cyan brackets) -->
+        <g transform="translate(75, 126)" filter="url(#puz-shadow)">
+          <rect width="250" height="64" rx="4" fill="rgba(8,12,20,0.94)" stroke="#334155" stroke-width="0.8"/>
+          <line x1="0" y1="0" x2="35" y2="0" stroke="#f59e0b" stroke-width="2"/>
+          <text x="20" y="24" fill="#f59e0b" font-family="'Inter', sans-serif" font-weight="700" font-size="7.5" letter-spacing="2">KEY NARRATIVE THESIS</text>
+          <text x="20" y="45" fill="#f8fafc" font-family="'Playfair Display', Georgia, serif" font-weight="800" font-size="14" font-style="italic">"The Illusion of Free Choice"</text>
+        </g>
       </svg>
     `)}`,
 
@@ -161,31 +183,36 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
           <linearGradient id="bg-cd" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#080204"/>
-            <stop offset="100%" stop-color="#180408"/>
+            <stop offset="0%" stop-color="#040203"/>
+            <stop offset="100%" stop-color="#0e0407"/>
           </linearGradient>
-          <filter id="red-glow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="rgba(239,68,68,0.85)"/>
+          <filter id="crt-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="rgba(220,38,38,0.7)"/>
           </filter>
         </defs>
         <rect width="400" height="225" fill="url(#bg-cd)"/>
-        <!-- Red Market Grid -->
-        <g stroke="rgba(239,68,68,0.12)" stroke-width="1">
-          <line x1="0" y1="35" x2="400" y2="35"/><line x1="0" y1="75" x2="400" y2="75"/><line x1="0" y1="115" x2="400" y2="115"/><line x1="0" y1="155" x2="400" y2="155"/>
-          <line x1="60" y1="0" x2="60" y2="195"/><line x1="140" y1="0" x2="140" y2="195"/><line x1="220" y1="0" x2="220" y2="195"/><line x1="300" y1="0" x2="300" y2="195"/>
-        </g>
-        <!-- Collapsing Stock Chart Line -->
-        <path d="M 0 100 Q 150 90, 250 140 T 400 185" fill="none" stroke="#ef4444" stroke-width="3" opacity="0.85"/>
-        <text x="200" y="65" fill="#a1a1aa" font-family="'Chakra Petch', sans-serif" font-weight="900" font-size="11" letter-spacing="3" text-anchor="middle">FTX LIQUIDITY CRASH</text>
-        <!-- T-Minus Digits -->
-        <text x="200" y="115" fill="#ef4444" font-family="monospace" font-weight="900" font-size="30" letter-spacing="2" text-anchor="middle" filter="url(#red-glow)">T-MINUS 00:04.280</text>
-        <!-- Panic Meter Bar -->
-        <rect x="75" y="130" width="250" height="4" fill="rgba(255,255,255,0.15)" rx="2"/>
-        <rect x="75" y="130" width="180" height="4" fill="#ef4444" rx="2" filter="url(#red-glow)"/>
-        <!-- Bottom Live Ticker Tape -->
-        <rect x="0" y="195" width="400" height="30" fill="#09090b" stroke="#ef4444" stroke-width="1"/>
-        <text x="200" y="214" fill="#f87171" font-family="monospace" font-weight="700" font-size="9" letter-spacing="1" text-anchor="middle">$FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED</text>
         
+        <!-- Financial Candlestick Crash & Depths -->
+        <g stroke="rgba(255,255,255,0.03)" stroke-width="1">
+          <line x1="0" y1="40" x2="400" y2="40"/><line x1="0" y1="80" x2="400" y2="80"/><line x1="0" y1="120" x2="400" y2="120"/><line x1="0" y1="160" x2="400" y2="160"/>
+        </g>
+        
+        <!-- Crimson Trailing Liquidity Line -->
+        <path d="M 0 75 Q 160 70, 240 125 T 400 178" fill="none" stroke="#b91c1c" stroke-width="2.5" opacity="0.9"/>
+        <path d="M 0 75 Q 160 70, 240 125 T 400 178 L 400 200 L 0 200 Z" fill="rgba(185,28,28,0.06)"/>
+        
+        <text x="200" y="62" fill="#71717a" font-family="'Inter', sans-serif" font-weight="700" font-size="9" letter-spacing="2.5" text-anchor="middle">LIQUIDITY COLLAPSE // T-MINUS CLOCK</text>
+        
+        <!-- Authentic Mechanical / CRT Monospace Digits -->
+        <text x="200" y="112" fill="#ef4444" font-family="'JetBrains Mono', 'Courier New', monospace" font-weight="800" font-size="28" letter-spacing="2" text-anchor="middle" filter="url(#crt-glow)">00:04.280</text>
+        
+        <!-- Suspense Tension Meter -->
+        <rect x="90" y="128" width="220" height="3" fill="#27272a" rx="1.5"/>
+        <rect x="90" y="128" width="165" height="3" fill="#dc2626" rx="1.5" filter="url(#crt-glow)"/>
+        
+        <!-- Recessed Dark Ticker Bar -->
+        <rect x="0" y="196" width="400" height="29" fill="#050304" stroke="#27272a" stroke-width="0.8"/>
+        <text x="200" y="214" fill="#f87171" font-family="monospace" font-weight="600" font-size="8.5" letter-spacing="1" text-anchor="middle">$FTT -94.2%  •  $BTC -22.4%  •  WITHDRAWALS HALTED</text>
       </svg>
     `)}`,
 
@@ -217,25 +244,50 @@
     // 19. The "Puzzle Piece" Reveal & Story Arc Masking
     'puzzle-piece-reveal': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-        <rect width="400" height="225" fill="#080912"/>
-        <!-- 4-Quadrant Arc Mask -->
-        <g transform="translate(45, 30)">
-          <!-- Quad 1 -->
-          <rect x="0" y="0" width="145" height="75" rx="6" fill="#130e26" stroke="#a855f7" stroke-width="1.8"/>
-          <text x="72.5" y="42" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">#1 THE ORIGIN</text>
-          <!-- Quad 2 -->
-          <rect x="165" y="0" width="145" height="75" rx="6" fill="#081528" stroke="#06b6d4" stroke-width="1.8"/>
-          <text x="237.5" y="42" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">#2 THE CATALYST</text>
-          <!-- Quad 3 -->
-          <rect x="0" y="90" width="145" height="75" rx="6" fill="#1e1308" stroke="#f59e0b" stroke-width="1.8"/>
-          <text x="72.5" y="132" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">#3 THE ILLUSION</text>
-          <!-- Quad 4 -->
-          <rect x="165" y="90" width="145" height="75" rx="6" fill="#24080e" stroke="#ef4444" stroke-width="1.8"/>
-          <text x="237.5" y="132" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">#4 THE COLLAPSE</text>
-        </g>
-        <!-- Story arc connecting curve -->
-        <path d="M 115 65 Q 200 120, 280 65 T 280 160" fill="none" stroke="#22d3ee" stroke-width="2.5" stroke-dasharray="6 4"/>
+        <defs>
+          <linearGradient id="bg-arc" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#05060a"/>
+            <stop offset="100%" stop-color="#0c0e17"/>
+          </linearGradient>
+          <filter id="slate-shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="rgba(0,0,0,0.85)"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-arc)"/>
         
+        <!-- Narrative Investigation Board (Organized cohesive case folders, NOT neon boxes) -->
+        <g transform="translate(48, 25)" filter="url(#slate-shadow)">
+          <!-- Dossier 1 -->
+          <rect x="0" y="0" width="144" height="76" rx="2" fill="#13151f" stroke="#262a3d" stroke-width="1"/>
+          <line x1="0" y1="0" x2="144" y2="0" stroke="#64748b" stroke-width="1.5"/>
+          <text x="14" y="24" fill="#94a3b8" font-family="monospace" font-size="6" font-weight="700">ACT I // INVESTIGATION</text>
+          <text x="14" y="44" fill="#f8fafc" font-family="'Cinzel', Georgia, serif" font-weight="800" font-size="11">THE ORIGIN</text>
+          <text x="14" y="58" fill="#64748b" font-family="Georgia, serif" font-size="6.5" font-style="italic">Foundation of the scheme</text>
+          
+          <!-- Dossier 2 -->
+          <rect x="160" y="0" width="144" height="76" rx="2" fill="#13151f" stroke="#262a3d" stroke-width="1"/>
+          <line x1="0" y1="0" x2="144" y2="0" stroke="#0ea5e9" stroke-width="1.5"/>
+          <text x="174" y="24" fill="#38bdf8" font-family="monospace" font-size="6" font-weight="700">ACT II // ESCALATION</text>
+          <text x="174" y="44" fill="#f8fafc" font-family="'Cinzel', Georgia, serif" font-weight="800" font-size="11">THE CATALYST</text>
+          <text x="174" y="58" fill="#64748b" font-family="Georgia, serif" font-size="6.5" font-style="italic">Capital inflow explosion</text>
+          
+          <!-- Dossier 3 -->
+          <rect x="0" y="90" width="144" height="76" rx="2" fill="#13151f" stroke="#262a3d" stroke-width="1"/>
+          <line x1="0" y1="0" x2="144" y2="0" stroke="#f59e0b" stroke-width="1.5"/>
+          <text x="14" y="114" fill="#fbbf24" font-family="monospace" font-size="6" font-weight="700">ACT III // DECEPTION</text>
+          <text x="14" y="134" fill="#f8fafc" font-family="'Cinzel', Georgia, serif" font-weight="800" font-size="11">THE ILLUSION</text>
+          <text x="14" y="148" fill="#64748b" font-family="Georgia, serif" font-size="6.5" font-style="italic">Manufactured confidence</text>
+          
+          <!-- Dossier 4 -->
+          <rect x="160" y="90" width="144" height="76" rx="2" fill="#181114" stroke="#3b1b22" stroke-width="1"/>
+          <line x1="0" y1="0" x2="144" y2="0" stroke="#dc2626" stroke-width="1.5"/>
+          <text x="174" y="114" fill="#f87171" font-family="monospace" font-size="6" font-weight="700">ACT IV // CLIMAX</text>
+          <text x="174" y="134" fill="#f8fafc" font-family="'Cinzel', Georgia, serif" font-weight="800" font-size="11">THE COLLAPSE</text>
+          <text x="174" y="148" fill="#991b1b" font-family="Georgia, serif" font-size="6.5" font-style="italic">Systemic liquidation</text>
+        </g>
+        
+        <!-- Cinematic Crimson Evidence Thread Connection (Organic, not dotted neon) -->
+        <path d="M 120 62 C 170 85, 230 40, 270 62 S 120 150, 120 150 C 170 170, 220 140, 260 150" fill="none" stroke="#b91c1c" stroke-width="1.4" opacity="0.85"/>
       </svg>
     `)}`,
 
@@ -339,26 +391,49 @@
     // 25. 3D Camera Move & Rotation
     '3d-camera-move-rotation': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-        <rect width="400" height="225" fill="#060611"/>
-        <!-- Receding grid -->
-        <g stroke="rgba(99,102,241,0.3)" stroke-width="1">
-          <line x1="200" y1="70" x2="-20" y2="230"/>
-          <line x1="200" y1="70" x2="70" y2="230"/>
-          <line x1="200" y1="70" x2="160" y2="230"/>
-          <line x1="200" y1="70" x2="240" y2="230"/>
-          <line x1="200" y1="70" x2="330" y2="230"/>
-          <line x1="200" y1="70" x2="420" y2="230"/>
-          <line x1="50" y1="130" x2="350" y2="130"/>
-          <line x1="20" y1="170" x2="380" y2="170"/>
-        </g>
-        <!-- Slanted 3D plate -->
-        <g transform="translate(100, 65) skewY(-4)">
-          <rect width="200" height="85" rx="8" fill="rgba(15,23,42,0.92)" stroke="rgba(99,102,241,0.6)" stroke-width="1.8"/>
-          <text x="100" y="32" fill="#818cf8" font-family="monospace" font-weight="800" font-size="8" letter-spacing="1" text-anchor="middle">3D LAYER ROTATION // CAMERA PULL</text>
-          <text x="100" y="58" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="900" font-size="16" letter-spacing="2" text-anchor="middle">SPATIAL DEPTH</text>
-          <line x1="50" y1="68" x2="150" y2="68" stroke="#818cf8" stroke-width="1.5"/>
+        <defs>
+          <linearGradient id="bg-cam" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#020306"/>
+            <stop offset="100%" stop-color="#0a0c16"/>
+          </linearGradient>
+          <radialGradient id="cam-spot" cx="50%" cy="45%" r="60%">
+            <stop offset="0%" stop-color="rgba(56,189,248,0.12)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          </radialGradient>
+          <filter id="plate-depth" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="-10" dy="18" stdDeviation="18" flood-color="rgba(0,0,0,0.95)"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.85)"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-cam)"/>
+        <rect width="400" height="225" fill="url(#cam-spot)"/>
+        
+        <!-- Receding 3D Architectural Spatial Room (Fine lines, camera FOV) -->
+        <g stroke="rgba(255,255,255,0.04)" stroke-width="1">
+          <line x1="200" y1="80" x2="-40" y2="230"/>
+          <line x1="200" y1="80" x2="60" y2="230"/>
+          <line x1="200" y1="80" x2="160" y2="230"/>
+          <line x1="200" y1="80" x2="240" y2="230"/>
+          <line x1="200" y1="80" x2="340" y2="230"/>
+          <line x1="200" y1="80" x2="440" y2="230"/>
+          <line x1="20" y1="160" x2="380" y2="160"/>
         </g>
         
+        <!-- Background Depth Layer (Z: -200px) -->
+        <g transform="translate(65, 38) rotate(4)" opacity="0.45">
+          <rect width="140" height="70" rx="3" fill="#1e293b"/>
+          <text x="14" y="24" fill="#94a3b8" font-family="'Cinzel', serif" font-size="8">ARCHIVAL EVIDENCE</text>
+        </g>
+        
+        <!-- Realistic 3D Angled Matte Plate with Thickness & Rim Light -->
+        <g transform="translate(95, 62) skewY(-3.5)" filter="url(#plate-depth)">
+          <rect width="210" height="92" rx="4" fill="#090d16" stroke="#1e293b" stroke-width="1"/>
+          <!-- Top edge bevel specular light -->
+          <line x1="2" y1="2" x2="208" y2="2" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          <text x="105" y="32" fill="#38bdf8" font-family="'Inter', sans-serif" font-weight="700" font-size="7" letter-spacing="2" text-anchor="middle">50mm FOCAL LENS // PARALLAX RIG</text>
+          <text x="105" y="60" fill="#f8fafc" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="18" letter-spacing="3" text-anchor="middle">SPATIAL DEPTH</text>
+          <text x="105" y="76" fill="#64748b" font-family="monospace" font-size="6.5" letter-spacing="1" text-anchor="middle">EASE-IN-OUT // ROTATION X: 4° Y: -8°</text>
+        </g>
       </svg>
     `)}`,
 
@@ -401,28 +476,48 @@
     // 28. 3D Layer Projection & 50mm Camera
     'magnates-media-3d-projection': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-        <rect width="400" height="225" fill="#05060b"/>
-        <!-- Background Archival Plate (Z: -100px) -->
-        <g transform="translate(80, 35)">
-          <rect width="240" height="110" rx="8" fill="#1c1917" stroke="rgba(245,158,11,0.4)" stroke-width="1.2" opacity="0.7"/>
-          <text x="15" y="24" fill="#f59e0b" font-family="monospace" font-weight="700" font-size="8">ARCHIVAL PLATE // Z:-100px</text>
-          <text x="15" y="44" fill="#cbd5e1" font-family="Georgia, serif" font-size="9" font-style="italic">"Global market shift recorded across banking cartels..."</text>
-        </g>
-        <!-- Midground Cutout Portrait Plate (Z: 0px) -->
-        <g transform="translate(145, 45)">
-          <rect width="110" height="115" rx="8" fill="#0f172a" stroke="#3b82f6" stroke-width="2"/>
-          <circle cx="55" cy="50" r="30" fill="#1e293b"/>
-          <text x="55" y="55" font-size="28" text-anchor="middle">👤</text>
-          <rect x="15" y="92" width="80" height="15" rx="3" fill="#000" stroke="#38bdf8" stroke-width="1"/>
-          <text x="55" y="103" fill="#38bdf8" font-family="monospace" font-size="6.5" text-anchor="middle">PORTRAIT (Z:0px)</text>
-        </g>
-        <!-- Foreground Title Plate (Z: +140px) -->
-        <g transform="translate(90, 160)">
-          <rect width="220" height="42" rx="6" fill="rgba(8,10,18,0.95)" stroke="#f59e0b" stroke-width="1.8"/>
-          <text x="110" y="17" fill="#fbbf24" font-family="monospace" font-weight="800" font-size="7" letter-spacing="1.5" text-anchor="middle">50mm CAMERA // NULL OBJECT</text>
-          <text x="110" y="32" fill="#ffffff" font-family="Cinzel, serif" font-weight="900" font-size="11" letter-spacing="1.5" text-anchor="middle">THE BILLIONAIRE PLAYBOOK</text>
+        <defs>
+          <linearGradient id="bg-proj" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#020306"/>
+            <stop offset="100%" stop-color="#080b12"/>
+          </linearGradient>
+          <filter id="portrait-shadow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="-6" dy="16" stdDeviation="16" flood-color="rgba(0,0,0,0.95)"/>
+            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.85)"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-proj)"/>
+        
+        <!-- Background Archival Document Plane (Receding Z-depth) -->
+        <g transform="translate(60, 28) rotate(-3)" opacity="0.55">
+          <rect width="250" height="130" rx="3" fill="#181512" stroke="#292524" stroke-width="1"/>
+          <text x="18" y="24" fill="#a8a29e" font-family="'Times New Roman', serif" font-weight="700" font-size="9" letter-spacing="1">WALL STREET HISTORICAL ARCHIVE</text>
+          <text x="18" y="44" fill="#78716c" font-family="Georgia, serif" font-size="8" font-style="italic">"Unprecedented concentration of industrial capital..."</text>
+          <line x1="18" y1="55" x2="230" y2="55" stroke="#292524" stroke-width="0.8"/>
         </g>
         
+        <!-- Authentic Historical Engraving Portrait Cutout (No cheap emoji!) -->
+        <g transform="translate(148, 38)" filter="url(#portrait-shadow)">
+          <!-- Lithograph Card Base -->
+          <rect width="104" height="126" rx="4" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+          <!-- Classical Tycoon Silhouette Lithograph -->
+          <ellipse cx="52" cy="46" rx="20" ry="24" fill="#1e293b"/>
+          <path d="M 22 108 C 22 74, 82 74, 82 108 Z" fill="#1e293b"/>
+          <!-- Formal Bowtie & Lapel lines -->
+          <polygon points="52,72 45,67 45,77" fill="#cbd5e1"/>
+          <polygon points="52,72 59,67 59,77" fill="#cbd5e1"/>
+          <circle cx="52" cy="72" r="2.5" fill="#f8fafc"/>
+          <!-- Oval Vignette Framing -->
+          <ellipse cx="52" cy="62" rx="38" ry="46" fill="none" stroke="#d97706" stroke-width="1" opacity="0.6"/>
+        </g>
+
+        <!-- Foreground Floating Gilded Lower Title -->
+        <g transform="translate(85, 162)" filter="url(#portrait-shadow)">
+          <rect width="230" height="42" rx="3" fill="rgba(8,11,18,0.96)" stroke="#334155" stroke-width="0.8"/>
+          <line x1="0" y1="0" x2="230" y2="0" stroke="#f59e0b" stroke-width="1.8"/>
+          <text x="115" y="16" fill="#f59e0b" font-family="'Inter', sans-serif" font-weight="700" font-size="6.5" letter-spacing="2" text-anchor="middle">BIOGRAPHICAL PROFILE</text>
+          <text x="115" y="31" fill="#ffffff" font-family="'Cinzel', serif" font-weight="900" font-size="11.5" letter-spacing="1.5" text-anchor="middle">THE BILLIONAIRE PLAYBOOK</text>
+        </g>
       </svg>
     `)}`,
 
@@ -471,20 +566,44 @@
     'magnates-media-multi-drop-shadows': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
-          <filter id="tier-shadows" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="rgba(0,0,0,0.9)"/>
-            <feDropShadow dx="0" dy="20" stdDeviation="15" flood-color="rgba(56,189,248,0.4)"/>
+          <linearGradient id="bg-tier" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#020306"/>
+            <stop offset="100%" stop-color="#080a10"/>
+          </linearGradient>
+          <!-- Dual-stage authentic physical shadows (AO + diffuse cast shadow, not cyan neon glow) -->
+          <filter id="physical-shadows" x="-40%" y="-40%" width="180%" height="180%">
+            <!-- Tight Contact Ambient Occlusion -->
+            <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.95)"/>
+            <!-- Deep directional floor shadow -->
+            <feDropShadow dx="-4" dy="24" stdDeviation="16" flood-color="rgba(0,0,0,0.92)"/>
           </filter>
         </defs>
-        <rect width="400" height="225" fill="#030712"/>
-        <g transform="translate(145, 30)" filter="url(#tier-shadows)">
-          <rect width="110" height="135" rx="12" fill="#0b1120" stroke="rgba(56,189,248,0.8)" stroke-width="1.8"/>
-          <circle cx="55" cy="60" r="32" fill="#1e293b"/>
-          <text x="55" y="70" font-size="34" text-anchor="middle">👤</text>
-        </g>
-        <rect x="100" y="178" width="200" height="22" rx="11" fill="rgba(3,7,18,0.95)" stroke="rgba(56,189,248,0.5)" stroke-width="1.2"/>
-        <text x="200" y="192" fill="#38bdf8" font-family="monospace" font-weight="800" font-size="7.5" text-anchor="middle">3-TIER SHADOWS // ELEVATION 45PX</text>
+        <rect width="400" height="225" fill="url(#bg-tier)"/>
         
+        <!-- Dark Studio Tabletop Surface -->
+        <ellipse cx="200" cy="220" rx="250" ry="60" fill="#04060a"/>
+        
+        <!-- Recessed background card -->
+        <g transform="translate(100, 35) rotate(-4)" opacity="0.35">
+          <rect width="120" height="140" rx="4" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+        </g>
+        
+        <!-- Floating 300gsm Cutout Subject with Multi-Tier Natural Shadows -->
+        <g transform="translate(145, 30)" filter="url(#physical-shadows)">
+          <rect width="110" height="135" rx="4" fill="#0f172a" stroke="#334155" stroke-width="0.8"/>
+          <!-- Top edge light rim catch -->
+          <line x1="2" y1="2" x2="108" y2="2" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+          <!-- Historical Engraving Figure -->
+          <ellipse cx="55" cy="52" rx="22" ry="26" fill="#1e293b"/>
+          <path d="M 22 120 C 22 82, 88 82, 88 120 Z" fill="#1e293b"/>
+          <circle cx="55" cy="52" r="16" fill="#334155"/>
+        </g>
+        
+        <!-- Clean Status Bar -->
+        <g transform="translate(110, 180)">
+          <rect width="180" height="22" rx="3" fill="rgba(8,12,20,0.95)" stroke="#1e293b" stroke-width="0.8"/>
+          <text x="90" y="14" fill="#94a3b8" font-family="'Inter', sans-serif" font-weight="700" font-size="7" letter-spacing="1.5" text-anchor="middle">TACTILE ELEVATION // 45PX DROP</text>
+        </g>
       </svg>
     `)}`,
 

@@ -30,7 +30,8 @@
 | `fx-split-blade` | **Playhead Razor / Split Blade** | Timeline Utility | ✅ Implemented | Shortcut `S` or Split Tool |
 | `fx-magnetic-snap` | **Magnetic Timeline & Layer Snapping** | Timeline Utility | 🚧 Experimental | Auto-snap to playhead / adjacent clip boundaries |
 | `fx-document-scan` | **Vox Document Highlighter Sweep** | Motion & Callout | ⏳ Backlog | Planned: Animated yellow/cyan pen stroke |
-| `fx-parallax-tilt` | **3D Parallax Camera Drift** | 2.5D Camera | ⏳ Backlog | Planned: 3D perspective tilt on cutout + backdrop |
+| `fx-parallax-tilt` | **OG 3-Layer Parallax Engine** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *OG 3-Layer Parallax Engine* |
+| `fx-spooner-parallax` | **2.5D Parallax Photo Effect** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *2.5D Parallax Photo Effect* or Clip Menu -> *⚡ 2.5D Parallax Photo* |
 | `fx-paper-texture` | **Stop-Motion Crumpled Paper Overlay** | Texture & Grain | ⏳ Backlog | Planned: 12fps cycling grain blend mode |
 
 ---
@@ -604,11 +605,18 @@ These are multi-effect presets that give videos the signature high-production lo
   2. Transition to `Liquid Pyramid Tier` highlighting `"3% BUYING NOW"`.
   3. `Procedural SFX` (`bass_hit`) on the wave settlement + apex bloom.
 
+### 🌟 Recipe D: "The 2.5D Parallax Photo Push (Chris Spooner Pipeline)"
+* **Components:**
+  1. `Isolated Subject Cutout` (e.g. Hiker / Portrait) on foreground with edge feathering and drop shadow.
+  2. `Clean Inpainted Plate` behind subject (telea content-aware expansion) eliminating ghost silhouettes.
+  3. `Multi-Plane Z-Depth` separation (180px optical offset).
+  4. `Push-In Zoom Keyframing` (FG 1.35x vs BG 1.08x) with subtle camera tilt orbit and gentle atmospheric wind SFX.
+
 ---
 
 ## 🔮 7. Roadmap & Planned Capabilities (Backlog)
 
 * [ ] **Animated Document Highlighter Sweep (`fx-highlighter-sweep`):** Realistic hand-drawn fluorescent highlighter bar moving across scanned PDF text.
-* [ ] **3D Parallax Tilt (`fx-parallax-tilt`):** 2.5D camera drift where foreground cutout shifts faster than the background on mouse drag or timeline playback.
+* [x] **2.5D Parallax Photo Effect (`fx-spooner-parallax`):** Multi-step Photoshop timeline parallax pipeline with subject isolation, clean inpaint plate, Z-separation, and camera push-in zoom.
 * [ ] **Stop-Motion Frame Rate Limiter (`fx-posterize-time`):** Restricting cutout animation to 12fps / 8fps for an authentic paper collage feel.
 * [ ] **Auto Subtitle Whisper Alignment (`fx-auto-captions`):** Direct audio-to-kinetic-text alignment with karaoke-style per-word highlighting.

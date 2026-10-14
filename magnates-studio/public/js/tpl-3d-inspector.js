@@ -14,6 +14,7 @@
   const isBridged = (id) => typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(id);
   // All templates under 3D Spatial category have the Video / 3D switcher!
   const SPATIAL_3D_CATEGORY_IDS = new Set([
+    'og-parallax-depth-engine',
     'spatial-3d-motion-suite',
     'document-3d-fx-engine',
     'jani-puzzle-narrative-suite',
@@ -56,13 +57,14 @@
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };
 
   // ---------------------------------------------------------------- text slots
+  // Pure parallax defaults to clean canvas (no text by default)
   const SPATIAL_SLOTS = [
-    { key: 'title', label: 'Main Title', def: 'THE SYSTEM' },
-    { key: 'subtitle', label: 'Subtitle', def: 'MANIPULATION & CONTROL' },
-    { key: 'a-title', label: 'Card A Title', def: 'CLASSIFIED REPORT' },
-    { key: 'a-sub', label: 'Card A Detail', def: 'FINANCIAL SCAN #8941' },
-    { key: 'b-title', label: 'Card B Title', def: 'MONOPOLY MAP' },
-    { key: 'b-sub', label: 'Card B Detail', def: 'NODES: 14,200 ACTIVE' }
+    { key: 'title', label: 'Main Title', def: '' },
+    { key: 'subtitle', label: 'Subtitle', def: '' },
+    { key: 'a-title', label: 'Card A Title', def: '' },
+    { key: 'a-sub', label: 'Card A Detail', def: '' },
+    { key: 'b-title', label: 'Card B Title', def: '' },
+    { key: 'b-sub', label: 'Card B Detail', def: '' }
   ];
   const DOC_SLOTS = [
     { key: 'masthead', label: 'Masthead', def: 'THE FINANCIAL GAZETTE' },
@@ -150,6 +152,27 @@
     }
     return e.doc;
   }
+  function ensurePuzzle(e) {
+    if (!e.puzzle) {
+      e.puzzle = {
+        bgVisible: true,
+        bgOpacity: 0.35,
+        gridVisible: true,
+        watermarkVisible: true,
+        thesisVisible: true,
+        tileRounding: 4,
+        tileGap: 6,
+        borderColor: '#1e293b',
+        accentColor: '#f59e0b',
+        pulseGlow: true
+      };
+    }
+    return e.puzzle;
+  }
+  window.tplGetPuzzleConfig = function () {
+    const e = entry('jani-puzzle-narrative-suite');
+    return ensurePuzzle(e);
+  };
   function applyDocStatic(e) {
     const p = ensureDoc(e), d = document3DFXState;
     const sig = JSON.stringify([p, e.texts]);
@@ -317,7 +340,56 @@
         row('v-zoom', 'Zoom / Depth', 0.6, 1.6, 0.05, fx.zoom, v => v.toFixed(2) + 'x'),
         `<button type="button" data-act="v-reset" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cbd5e1;cursor:pointer;">Reset Motion</button>`
       ].join(''));
-      html += section('Text', textHtml || '<span style="font-size:10.5px;color:#64748b;">Text appears once the preview starts.</span>');
+
+      if (tplId === 'jani-puzzle-narrative-suite') {
+        const pz = ensurePuzzle(e);
+        html += section('Layer Visibility', [
+          `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            ${btn('pz-toggle-bg', 'Background Image', pz.bgVisible)}
+            ${btn('pz-toggle-grid', 'Puzzle Pieces (3x3)', pz.gridVisible)}
+            ${btn('pz-toggle-thesis', 'Editorial Thesis Card', pz.thesisVisible)}
+            ${btn('pz-toggle-watermark', 'Watermark Title', pz.watermarkVisible)}
+          </div>`
+        ].join(''));
+
+        html += section('Tile Shape & Layout', [
+          row('pz-rounding', 'Corner Rounding', 0, 16, 1, pz.tileRounding, v => v + 'px'),
+          row('pz-gap', 'Tile Spacing / Dispersion', 0, 16, 1, pz.tileGap, v => v + 'px'),
+          row('pz-bgop', 'Backdrop Scene Opacity', 0, 100, 5, Math.round(pz.bgOpacity * 100), v => v + '%')
+        ].join(''));
+
+        html += section('Colors & Borders', [
+          `<div style="display:flex;gap:12px;align-items:center;padding:4px 0;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#94a3b8;flex:1;">
+              Accent Glow
+              <input type="color" data-k="pz-accent" value="${pz.accentColor}" style="border:none;background:transparent;cursor:pointer;width:24px;height:24px;padding:0;" />
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#94a3b8;flex:1;">
+              Tile Border
+              <input type="color" data-k="pz-border" value="${pz.borderColor}" style="border:none;background:transparent;cursor:pointer;width:24px;height:24px;padding:0;" />
+            </label>
+          </div>`
+        ].join(''));
+      }
+
+      // Text is optional with a clean + Add Text button
+      const hasAnyText = slots.some(sl => {
+        const val = e.texts[sl.key] != null ? e.texts[sl.key] : sl.def;
+        return val && val.trim().length > 0;
+      });
+      if (hasAnyText || e.showTextSection) {
+        html += section('Text & Kinetic Titles', `
+          <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+            <button type="button" data-act="clear-all-text-slots" style="font-size:9.5px;padding:2px 6px;border-radius:4px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;cursor:pointer;">Clear All Text</button>
+          </div>
+          ${textHtml}
+        `);
+      } else {
+        html += `<div style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);border-radius:6px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10.5px;color:#64748b;">No text overlays active (Clean Canvas)</span>
+          <button type="button" data-act="add-kinetic-slot" style="font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(56,189,248,0.2);border:1px solid rgba(56,189,248,0.5);color:#38bdf8;cursor:pointer;">+ Add Text</button>
+        </div>`;
+      }
     } else if (k === 'spatial') {
       const s = spatial3DState;
       html += section('Text', textHtml);
@@ -447,6 +519,31 @@
     else if (key === 'd-popelev') { ensureDoc(e).popElevation = v; d.popElevation = v; lab(String(v)); }
     else if (key === 'd-redwipe') { ensureDoc(e).redactWipe = v / 100; d.redactWipe = v / 100; d._texDirty = true; lab(v + '%'); }
     else if (key === 'd-hlcolor') { ensureDoc(e).highlightColor = v; d.highlightColor = v; d._texDirty = true; }
+    else if (key === 'pz-rounding') {
+      const pz = ensurePuzzle(e); pz.tileRounding = v; lab(v + 'px');
+      document.querySelectorAll(`#fx-puzzle-grid-${tplId} > div`).forEach(el => el.style.borderRadius = v + 'px');
+    }
+    else if (key === 'pz-gap') {
+      const pz = ensurePuzzle(e); pz.tileGap = v; lab(v + 'px');
+      const g = document.getElementById(`fx-puzzle-grid-${tplId}`); if (g) g.style.gap = v + 'px';
+    }
+    else if (key === 'pz-bgop') {
+      const pz = ensurePuzzle(e); pz.bgOpacity = v / 100; lab(v + '%');
+      const bg = document.getElementById(`fx-puzzle-bg-${tplId}`); if (bg && pz.bgVisible) bg.style.opacity = (v / 100);
+    }
+    else if (key === 'pz-accent') {
+      const pz = ensurePuzzle(e); pz.accentColor = v;
+      const c4 = document.getElementById(`fx-piece-4-${tplId}`); if (c4) { c4.style.borderColor = v; c4.style.boxShadow = `0 0 20px ${v}55, 0 12px 30px rgba(0,0,0,0.9)`; }
+      const pulse = document.getElementById('fx-piece-4-pulse'); if (pulse) pulse.style.background = `radial-gradient(circle, ${v}40 0%, transparent 70%)`;
+      const dot = document.getElementById('fx-piece-4-dot'); if (dot) { dot.style.background = v; dot.style.boxShadow = `0 0 8px ${v}`; }
+      const tag = document.getElementById(`fx-matte-tag-${tplId}`); if (tag) tag.style.color = v;
+      const box = document.getElementById(`fx-matte-box-${tplId}`); if (box) box.style.borderTopColor = v;
+    }
+    else if (key === 'pz-border') {
+      const pz = ensurePuzzle(e); pz.borderColor = v;
+      document.querySelectorAll(`#fx-puzzle-grid-${tplId} > div`).forEach(el => { if (el.id !== `fx-piece-4-${tplId}`) el.style.borderColor = v; });
+      const box = document.getElementById(`fx-matte-box-${tplId}`); if (box) { box.style.borderLeftColor = v; box.style.borderRightColor = v; box.style.borderBottomColor = v; }
+    }
     capture(tplId);
     persist();
   }
@@ -454,6 +551,16 @@
   function onClick(ev) {
     const b = ev.target.closest('[data-act]'); if (!b || !curTpl) return;
     const act = b.dataset.act, tplId = curTpl, e = entry(tplId), s = spatial3DState, d = document3DFXState;
+    if (act === 'add-kinetic-slot') {
+      e.showTextSection = true;
+      e.texts['title'] = 'CINEMATIC HORIZON';
+      persist(); build(tplId); return;
+    }
+    if (act === 'clear-all-text-slots') {
+      e.showTextSection = false;
+      slotsFor(tplId).forEach(sl => { e.texts[sl.key] = ''; });
+      persist(); build(tplId); return;
+    }
     if (act === 'mode-video' || act === 'mode-3d') {
       capture(tplId);
       e.mode = act === 'mode-3d' ? '3d' : 'video'; persist(); lastKey = '';
@@ -461,6 +568,26 @@
       return;
     }
     if (act === 'v-reset') { Object.assign(e.fx, { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }); persist(); build(tplId); return; }
+    if (act === 'pz-toggle-bg') {
+      const pz = ensurePuzzle(e); pz.bgVisible = !pz.bgVisible;
+      const bg = document.getElementById(`fx-puzzle-bg-${tplId}`); if (bg) bg.style.opacity = pz.bgVisible ? pz.bgOpacity : 0;
+      persist(); build(tplId); return;
+    }
+    if (act === 'pz-toggle-grid') {
+      const pz = ensurePuzzle(e); pz.gridVisible = !pz.gridVisible;
+      const g = document.getElementById(`fx-puzzle-grid-${tplId}`); if (g) g.style.display = pz.gridVisible ? 'grid' : 'none';
+      persist(); build(tplId); return;
+    }
+    if (act === 'pz-toggle-thesis') {
+      const pz = ensurePuzzle(e); pz.thesisVisible = !pz.thesisVisible;
+      const box = document.getElementById(`fx-matte-box-${tplId}`); if (box) box.style.display = pz.thesisVisible ? 'block' : 'none';
+      persist(); build(tplId); return;
+    }
+    if (act === 'pz-toggle-watermark') {
+      const pz = ensurePuzzle(e); pz.watermarkVisible = !pz.watermarkVisible;
+      const wm = document.getElementById(`fx-puzzle-watermark-${tplId}`); if (wm) wm.style.display = pz.watermarkVisible ? 'block' : 'none';
+      persist(); build(tplId); return;
+    }
     if (act === 's-grid') { s.gridVisible = !s.gridVisible; if (s.floorGrid) s.floorGrid.visible = s.gridVisible; capture(tplId); build(tplId); return; }
     if (act === 's-dust') { s.dustVisible = !s.dustVisible; if (s.particlesMesh) s.particlesMesh.visible = s.dustVisible; capture(tplId); build(tplId); return; }
     if (act.startsWith('preset-')) { loadSpatialPreset(act.slice(7)); e.texts = {}; openLayerIdx = -1; capture(tplId); build(tplId); return; }

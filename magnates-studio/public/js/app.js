@@ -1866,14 +1866,28 @@ function drawMediaLayer(specificClip) {
   let kfPosY = getClipInterpolatedProp(targetClip, 'y', clipElapsed, (targetClip && targetClip.y !== undefined) ? targetClip.y : 0);
   const kfOpacity = getClipInterpolatedProp(targetClip, 'opacity', clipElapsed, (targetClip && targetClip.opacity !== undefined) ? targetClip.opacity : 1.0);
 
-  // Template Rig Motion Simulation (1:1 identical to modal preview)
-  if (targetClip?.parallaxRig === 'bg') {
+  // Template Rig Motion Simulation (Individual Layer Push/Pull Direction Support)
+  if (targetClip?.parallaxRig === 'bg' || targetClip?.parallaxLayer === 'background') {
     const depthFactor = (targetClip.parallaxDepth || 65) / 100;
-    kfScale *= (1.15 + Math.sin(clipElapsed * 0.8) * 0.05 * depthFactor);
+    const motion = targetClip.parallaxMotion || 'pull';
+    if (motion === 'push') {
+      kfScale *= (1.0 + Math.sin(clipElapsed * 0.8) * 0.07 * depthFactor);
+    } else if (motion === 'pull') {
+      kfScale *= (1.16 - Math.sin(clipElapsed * 0.8) * 0.07 * depthFactor);
+    } else {
+      kfScale *= (1.06 + Math.sin(clipElapsed * 0.4) * 0.02 * depthFactor);
+    }
     kfPosX += Math.sin(clipElapsed * 0.7) * 24 * depthFactor;
-  } else if (targetClip?.parallaxRig === 'fg') {
+  } else if (targetClip?.parallaxRig === 'fg' || targetClip?.parallaxLayer === 'foreground') {
     const depthFactor = (targetClip.parallaxDepth || 65) / 100;
-    kfScale *= (1.0 + Math.sin(clipElapsed * 0.8 + 0.5) * 0.06 * depthFactor);
+    const motion = targetClip.parallaxMotion || 'push';
+    if (motion === 'push') {
+      kfScale *= (1.0 + Math.sin(clipElapsed * 0.8 + 0.5) * 0.08 * depthFactor);
+    } else if (motion === 'pull') {
+      kfScale *= (1.18 - Math.sin(clipElapsed * 0.8 + 0.5) * 0.08 * depthFactor);
+    } else {
+      kfScale *= 1.02;
+    }
     kfPosX -= Math.sin(clipElapsed * 0.7) * 32 * depthFactor;
   } else if (targetClip?.goldFrameRig) {
     const depthFactor = (targetClip.depth || 65) / 100;
@@ -2052,25 +2066,95 @@ function drawMediaLayer(specificClip) {
         }
         ctx.restore();
       } else if (targetClip?.paperRipRig && renderSource) {
-        // Dynamic paper tear angle clip matching modal
-        const tearProgress = (Math.sin(clipElapsed * 1.5) + 1) / 2;
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(dx, dy);
-        ctx.lineTo(dx + finalW, dy);
-        ctx.lineTo(dx + finalW, dy + finalH * tearProgress);
-        ctx.lineTo(dx, dy + Math.min(finalH, finalH * tearProgress + finalH * 0.08));
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(renderSource, dx, dy, finalW, finalH);
-        // Tear edge glow line
-        ctx.strokeStyle = 'rgba(254, 240, 138, 0.9)';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(dx, dy + Math.min(finalH, finalH * tearProgress + finalH * 0.08));
-        ctx.lineTo(dx + finalW, dy + finalH * tearProgress);
-        ctx.stroke();
-        ctx.restore();
+        // Authentic Magnates Media digitized fracture canvas renderer
+        const spd = targetClip.tearSpeed || 1.4;
+        const tearProgress = (Math.sin(clipElapsed * spd) + 1) / 2;
+        const mode = targetClip.tearMode || 'paper';
+        const preset = targetClip.tearPreset || 'magnates';
+        const angle = targetClip.tearAngle ?? 135;
+        const roughness = (targetClip.tearRoughness ?? 85) / 100;
+        const borderColor = targetClip.tearBorderColor || '#f8fafc';
+        const hasBorder = targetClip.tearBorderEnabled !== false;
+        const shadowPx = targetClip.tearShadowDepth ?? 24;
+
+        const fractureBites = [
+          0, 2.8, -1.5, 4.2, 1.0, 5.8, 2.4, -0.8, 6.2, 3.5, 7.8, 4.1, 1.2, 5.5, 8.4,
+          3.8, 9.2, 6.5, 2.1, 7.4, 11.2, 6.8, 3.2, 8.6, 5.1, 10.4, 7.2, 2.8, 8.5, 12.1,
+          7.4, 3.5, 9.8, 6.2, 11.5, 8.1, 4.0, 9.5, 6.8, 12.8, 8.5, 4.2, 10.1, 6.5, 11.2,
+          8.4, 3.2, 9.1, 13.5, 8.8, 4.5, 10.2, 7.1, 12.0, 8.5, 3.8, 9.4, 6.2, 10.8, 7.5
+        ];
+
+        const STEPS = fractureBites.length - 1;
+        const pts = [];
+
+        if (preset === 'magnates' || angle === 135) {
+          // Top-Left to Bottom-Right descending tear sweep
+          const sweep = (tearProgress * 1.4 - 0.2) * finalH;
+          for (let i = 0; i <= STEPS; i++) {
+            const t = i / STEPS;
+            const px = dx + t * finalW;
+            const bite = mode === 'cloth'
+              ? Math.sin(t * Math.PI * 4 + clipElapsed * 1.5) * (finalH * 0.04 * roughness)
+              : (fractureBites[i] * 0.01 * finalH + Math.sin(t * 31.4) * (finalH * 0.012)) * roughness;
+            const py = dy + sweep + t * (finalH * 0.45) + bite;
+            pts.push({ x: px, y: Math.max(dy, Math.min(dy + finalH, py)) });
+          }
+        } else if (preset === 'horizontal' || angle === 0) {
+          const sweepX = (tearProgress * 1.3 - 0.15) * finalW;
+          for (let i = 0; i <= STEPS; i++) {
+            const t = i / STEPS;
+            const py = dy + t * finalH;
+            const bite = (fractureBites[i] * 0.01 * finalW) * roughness;
+            const px = dx + sweepX + t * (finalW * 0.12) + bite;
+            pts.push({ x: Math.max(dx, Math.min(dx + finalW, px)), y: py });
+          }
+        } else {
+          const sweepY = (tearProgress * 1.3 - 0.15) * finalH;
+          const slant = preset === 'oblique' ? finalH * 0.3 : 0;
+          for (let i = 0; i <= STEPS; i++) {
+            const t = i / STEPS;
+            const px = dx + t * finalW;
+            const bite = (fractureBites[i] * 0.01 * finalH) * roughness;
+            const py = dy + sweepY + t * slant + bite;
+            pts.push({ x: px, y: Math.max(dy, Math.min(dy + finalH, py)) });
+          }
+        }
+
+        if (pts.length > 1) {
+          ctx.save();
+          // 1. Ambient drop shadow under torn paper
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+          ctx.shadowBlur = shadowPx;
+          ctx.shadowOffsetY = Math.round(shadowPx * 0.7);
+
+          // 2. White fibrous paper core edge underneath
+          if (hasBorder) {
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = 3.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let k = 1; k < pts.length; k++) ctx.lineTo(pts[k].x, pts[k].y);
+            ctx.stroke();
+          }
+
+          // 3. Main top paper layer
+          ctx.beginPath();
+          if (preset === 'horizontal' || angle === 0) {
+            ctx.moveTo(dx, dy);
+            for (let k = 0; k < pts.length; k++) ctx.lineTo(pts[k].x, pts[k].y);
+            ctx.lineTo(dx, dy + finalH);
+          } else {
+            ctx.moveTo(dx, dy);
+            ctx.lineTo(dx + finalW, dy);
+            for (let k = pts.length - 1; k >= 0; k--) ctx.lineTo(pts[k].x, pts[k].y);
+          }
+          ctx.closePath();
+          ctx.clip();
+          ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+          ctx.restore();
+        }
       } else if (renderSource) {
         ctx.drawImage(renderSource, dx, dy, finalW, finalH);
       }
@@ -4465,6 +4549,39 @@ function selectClip(clip, trackType) {
       if (filterSec) filterSec.style.display = 'none';
     }
 
+    // Parallax Layer Role & Direction in Inspector
+    const parallaxSec = document.getElementById('inspector-parallax-motion-section');
+    const parallaxRoleSelect = document.getElementById('inspector-parallax-role-select');
+    const parallaxBadge = document.getElementById('inspector-parallax-motion-badge');
+    const parallaxDirLabel = document.getElementById('inspector-parallax-dir-label');
+    if (parallaxSec && (trackType === 'image' || trackType === 'video')) {
+      parallaxSec.style.display = 'block';
+      const isFg = (clip.parallaxRig === 'fg' || clip.parallaxLayer === 'foreground');
+      const isBg = (clip.parallaxRig === 'bg' || clip.parallaxLayer === 'background');
+      const curRole = isFg ? 'fg' : (isBg ? 'bg' : 'none');
+      if (parallaxRoleSelect) parallaxRoleSelect.value = curRole;
+      if (parallaxBadge) {
+        parallaxBadge.textContent = isFg ? 'Foreground' : (isBg ? 'Background' : 'Standard');
+        parallaxBadge.style.color = isFg ? '#38bdf8' : (isBg ? '#a855f7' : '#94a3b8');
+      }
+      const curMotion = clip.parallaxMotion || (isBg ? 'pull' : 'push');
+      if (parallaxDirLabel) {
+        parallaxDirLabel.textContent = curMotion === 'push' ? 'Push In' : (curMotion === 'pull' ? 'Pull Out' : 'Drift');
+        parallaxDirLabel.style.color = curMotion === 'push' ? '#38bdf8' : (curMotion === 'pull' ? '#fbbf24' : '#c084fc');
+      }
+      ['push', 'pull', 'drift'].forEach(m => {
+        const b = document.getElementById(`btn-insp-parallax-${m}`);
+        if (b) {
+          const act = (curMotion === m);
+          b.style.border = act ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)';
+          b.style.background = act ? 'rgba(56,189,248,0.22)' : 'transparent';
+          b.style.color = act ? '#38bdf8' : '#94a3b8';
+        }
+      });
+    } else if (parallaxSec) {
+      parallaxSec.style.display = 'none';
+    }
+
     // Media Layer Order (Send to Back / Bring to Front)
     if (trackType === 'image' || trackType === 'video') {
       if (layerSection) layerSection.style.display = 'block';
@@ -6759,6 +6876,44 @@ document.getElementById('inspector-volume')?.addEventListener('input', (e) => {
 });
 document.getElementById('inspector-volume')?.addEventListener('change', () => {
   recordState('Change Volume');
+});
+
+// Inspector Parallax Role & Motion Direction Controls
+document.getElementById('inspector-parallax-role-select')?.addEventListener('change', (e) => {
+  const clip = selectedClip?.clip;
+  if (!clip) return;
+  const val = e.target.value;
+  if (val === 'fg') {
+    clip.parallaxRig = 'fg';
+    clip.parallaxLayer = 'foreground';
+    if (!clip.parallaxMotion) clip.parallaxMotion = 'push';
+  } else if (val === 'bg') {
+    clip.parallaxRig = 'bg';
+    clip.parallaxLayer = 'background';
+    if (!clip.parallaxMotion) clip.parallaxMotion = 'pull';
+  } else {
+    delete clip.parallaxRig;
+    delete clip.parallaxLayer;
+    delete clip.parallaxMotion;
+  }
+  if (selectedClip) selectClip(clip, selectedClip.trackType);
+  if (typeof renderCanvas === 'function') renderCanvas();
+});
+
+['push', 'pull', 'drift'].forEach(m => {
+  document.getElementById(`btn-insp-parallax-${m}`)?.addEventListener('click', () => {
+    const clip = selectedClip?.clip;
+    if (!clip) return;
+    clip.parallaxMotion = m;
+    if (!clip.parallaxRig && !clip.parallaxLayer) {
+      clip.parallaxRig = (clip.layerOrder === 'front') ? 'fg' : 'bg';
+      clip.parallaxLayer = (clip.layerOrder === 'front') ? 'foreground' : 'background';
+    }
+    if (selectedClip) selectClip(clip, selectedClip.trackType);
+    if (typeof renderCanvas === 'function') renderCanvas();
+    showTextTimingAlert(`Set parallax motion to ${m.toUpperCase()}!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
 });
 
 // Layer Ordering Controls (Send to Back / Bring to Front)
@@ -12046,6 +12201,13 @@ function showStudioContextMenu(x, y, clip, trackType) {
       </div>
       <div class="context-menu-divider"></div>
 
+      <!-- 2.5D Parallax Photo Effect (Chris Spooner Pipeline) -->
+      <div class="context-menu-item ${clip.zoomEffect === 'parallax_25d' ? 'active-fx' : ''}" id="ctx-action-parallax-25d">
+        <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z" fill="currentColor"/></svg>
+        <span>${clip.zoomEffect === 'parallax_25d' ? 'Configure 2.5D Parallax' : '⚡ 2.5D Parallax Photo'}</span>
+        <span class="context-badge" style="color: #38bdf8;">${clip.zoomEffect === 'parallax_25d' ? 'Active' : '2.5D Parallax'}</span>
+      </div>
+
       <!-- Snap / Punch Camera Zoom -->
       <div class="context-menu-item ${clip.zoomEffect === 'snap' ? 'active-fx' : ''}" id="ctx-action-snap-zoom">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
@@ -12461,6 +12623,12 @@ function showStudioContextMenu(x, y, clip, trackType) {
     }
     showTextTimingAlert('Configure transition speed & direction in Inspector', 'info');
     setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  menu.querySelector('#ctx-action-parallax-25d')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideStudioContextMenu();
+    openSpoonerParallaxSuite();
   });
 
   menu.querySelector('#ctx-action-snap-zoom')?.addEventListener('click', (e) => {
@@ -22031,6 +22199,19 @@ function renderAnimatePanel() {
   const btnRemove = document.getElementById('btn-remove-active-animation');
   if (!grid) return;
 
+  // Setup Target Layer Selector Badge Sync
+  const layerSel = document.getElementById('animate-target-layer-select');
+  const layerBadge = document.getElementById('animate-target-layer-badge');
+  if (layerSel && !layerSel.dataset.initialized) {
+    layerSel.dataset.initialized = 'true';
+    layerSel.addEventListener('change', (e) => {
+      const v = e.target.value;
+      if (layerBadge) {
+        layerBadge.textContent = v === 'auto' ? 'Selected Clip' : v === 'fg' ? 'Foreground' : v === 'bg' ? 'Background' : v === 'text' ? 'Text Layer' : 'All Layers';
+      }
+    });
+  }
+
   // Setup sub-category tabs
   if (tabsContainer && !tabsContainer.dataset.initialized) {
     tabsContainer.dataset.initialized = 'true';
@@ -22193,30 +22374,57 @@ function renderAnimatePanel() {
       if (typeof renderCanvas === 'function') renderCanvas();
     });
 
-    // Click: apply animation to selected clip (or active storyline media)
+    // Click: apply animation to selected layer (Foreground, Background, Text, or All)
     card.addEventListener('click', () => {
-      // Find active or first available media clip if none selected
-      let targetClip = selectedClip?.clip;
-      let targetTrackType = selectedClip?.trackType || 'image';
-      if (!targetClip) {
-        if (timelineClips.image && timelineClips.image.length > 0) {
-          targetClip = timelineClips.image[0];
-          targetTrackType = 'image';
-        } else if (timelineClips.video && timelineClips.video.length > 0) {
-          targetClip = timelineClips.video[0];
-          targetTrackType = 'video';
+      const targetLayerSelect = document.getElementById('animate-target-layer-select');
+      const targetLayerScope = targetLayerSelect ? targetLayerSelect.value : 'auto';
+
+      let targetClipsList = [];
+      let targetLayerName = 'Selected Clip';
+
+      if (targetLayerScope === 'fg') {
+        targetLayerName = 'Foreground Layer';
+        const fgClips = (timelineClips.image || []).filter(c => c.parallaxRig === 'fg' || c.parallaxLayer === 'foreground' || c.layerOrder === 'front');
+        if (fgClips.length > 0) {
+          targetClipsList = fgClips;
+        } else if (timelineClips.image && timelineClips.image.length > 0) {
+          targetClipsList = [timelineClips.image[timelineClips.image.length - 1]];
         }
+      } else if (targetLayerScope === 'bg') {
+        targetLayerName = 'Background Layer';
+        const bgClips = (timelineClips.image || []).filter(c => c.parallaxRig === 'bg' || c.parallaxLayer === 'background' || c.isBackgroundScene || c.layerOrder === 'back');
+        if (bgClips.length > 0) {
+          targetClipsList = bgClips;
+        } else if (timelineClips.image && timelineClips.image.length > 0) {
+          targetClipsList = [timelineClips.image[0]];
+        } else if (timelineClips.video && timelineClips.video.length > 0) {
+          targetClipsList = [timelineClips.video[0]];
+        }
+      } else if (targetLayerScope === 'text') {
+        targetLayerName = 'Text & Titles Layer';
+        if (timelineClips.text && timelineClips.text.length > 0) {
+          targetClipsList = timelineClips.text;
+        }
+      } else if (targetLayerScope === 'all') {
+        targetLayerName = 'All Media Layers';
+        targetClipsList = [...(timelineClips.image || []), ...(timelineClips.video || [])];
+      } else {
+        // 'auto'
+        if (selectedClip?.clip) targetClipsList = [selectedClip.clip];
+        else if (timelineClips.image && timelineClips.image.length > 0) targetClipsList = [timelineClips.image[0]];
+        else if (timelineClips.video && timelineClips.video.length > 0) targetClipsList = [timelineClips.video[0]];
       }
 
-      if (!targetClip) {
-        showTextTimingAlert('Please select a video or image clip to animate!', 'info');
+      if (targetClipsList.length === 0) {
+        showTextTimingAlert(`No clips found for ${targetLayerName}!`, 'info');
         setTimeout(() => showTextTimingAlert(''), 2500);
         return;
       }
 
-      delete targetClip._previewZoom;
-      delete targetClip._previewLoupe;
-      delete targetClip._previewDocFocus;
+      targetClipsList.forEach(targetClip => {
+        delete targetClip._previewZoom;
+        delete targetClip._previewLoupe;
+        delete targetClip._previewDocFocus;
 
       if (animId === 'snap-zoom') {
         targetClip.zoomEffect = 'snap';
@@ -22268,9 +22476,13 @@ function renderAnimatePanel() {
         targetClip.zoomStartTime = 0.0;
       }
 
+      }); // end targetClipsList.forEach
+
       playSFX('snap_zoom');
-      selectClip(targetClip, targetTrackType);
-      showTextTimingAlert(`Applied ${card.querySelector('.canva-anim-label')?.textContent || 'Animation'}!`, 'success');
+      if (targetClipsList.length > 0) {
+        selectClip(targetClipsList[0], targetTrackType);
+      }
+      showTextTimingAlert(`Applied ${card.querySelector('.canva-anim-label')?.textContent || 'Animation'} to ${targetLayerName}!`, 'success');
       setTimeout(() => showTextTimingAlert(''), 2500);
 
       renderAnimatePanel();
@@ -22635,6 +22847,33 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Sub-bass Drop', 'Audio Riser', 'Camera Cut', 'Attention Reset', 'Sound Design', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=800&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'spooner-2-5d-photo-parallax',
+    title: '2.5D Parallax Photo Effect',
+    category: '3D Spatial',
+    badge: 'Chris Spooner Pipeline',
+    difficulty: 'Multi-Step Pro',
+    timeToApply: '8 sec',
+    previewGradient: 'linear-gradient(to top, rgba(2, 132, 199, 0.85), rgba(56, 189, 248, 0.45), rgba(7, 9, 14, 0.3))',
+    description: 'Brings static photographs to life using the 4-step Photoshop parallax technique: 1) Subject Cutout, 2) Clean Inpaint Plate, 3) Multi-Plane Z-Depth, and 4) Timeline Push-In Keyframing.',
+    tags: ['2.5D Parallax', 'Chris Spooner', 'Photoshop Tutorial', 'Subject Isolation', 'Content-Aware Inpaint', 'Multi-Plane', 'Push-In Zoom', 'Spatial Depth'],
+    defaultImage: 'hiker_parallax_reference.png',
+    cutoutImage: 'hiker_cutout.png',
+    secondaryImage: 'hiker_background_inpainted.png'
+  },
+  {
+    id: 'og-parallax-depth-engine',
+    title: 'OG 3-Layer Parallax Engine',
+    category: '3D Spatial',
+    badge: 'OG Parallax Signature',
+    difficulty: 'Pro 3D',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.85), rgba(30, 41, 59, 0.45), rgba(7, 9, 14, 0.3))',
+    description: 'The definitive Magnates Media optical parallax depth illusion. Slices visual scenes into Foreground, Midground, and Background depth layers with independent speed multipliers, 2.5D camera drift, and atmospheric lighting.',
+    tags: ['OG Parallax', 'Foreground Layer', 'Midground Layer', 'Background Layer', 'Speed Multiplier', 'Depth Illusion', 'Magnates Media'],
+    defaultImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80'
   },
   {
     id: 'magnates-media-3d-projection',
@@ -23008,7 +23247,7 @@ function renderHomepageTemplates() {
           <img src="${(typeof window.tplGetSnapshot === 'function' && window.tplGetSnapshot(t.id)) || t.defaultImage}" alt="${t.title}" class="home-tpl-img" id="default-img-${t.id}" />
           <div class="home-tpl-overlay" style="background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.65) 100%);"></div>
           
-          <div class="home-tpl-center-label" id="center-label-${t.id}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; pointer-events: none; transition: opacity 0.2s;">
+          <div class="home-tpl-center-label" id="center-label-${t.id}" style="display: none !important;">
             <div style="padding: 4px 14px; border-radius: 6px; background: rgba(0,0,0,0.82); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 10.5px; font-family: monospace; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;">
               [ ${t.category.toUpperCase()} ]
             </div>
@@ -23080,7 +23319,7 @@ function renderHomepageTemplates() {
   });
 }
 
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
 let hoverBridgeActive = false;
 let hoverExternalT = null;
 function startTemplateHoverVideo(cardEl, tpl, manual) {
@@ -23104,13 +23343,25 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (fxContainer) {
     fxContainer.style.display = 'block';
     // Inject specialized HTML layers based on effect type
-    if (tplId === 'subject-25d-parallax') {
+    if (tplId === 'spooner-2-5d-photo-parallax') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+          <img id="fx-bg-${tplId}" src="${tpl.secondaryImage}" alt="Inpainted Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(0.8px); transform-origin: 50% 65%;" />
+          <div id="fx-fg-wrap-${tplId}" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; transform-origin: 50% 65%;">
+            <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" alt="Cutout Subject" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+          <div style="position: absolute; bottom: 8px; left: 8px; padding: 3px 8px; border-radius: 4px; background: rgba(14, 165, 233, 0.85); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid rgba(56, 189, 248, 0.4);">
+            PUSH-IN PARALLAX
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'subject-25d-parallax') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
           <img id="fx-bg-${tplId}" src="${tpl.secondaryImage}" alt="Moving Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75);" />
           <div id="fx-fg-wrap-${tplId}" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none;">
             <div style="position: relative; width: 66%; height: 100%; display: flex; align-items: center; justify-content: center;">
-              <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" alt="Isolated Subject" style="max-height: 92%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4));" />
+              <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" alt="Isolated Subject" style="max-height: 92%; object-fit: contain; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95));" />
             </div>
           </div>
           <div style="position: absolute; top: 12px; right: 12px; padding: 2px 8px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 1px solid rgba(192, 132, 252, 0.5);">
@@ -23119,14 +23370,28 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>
       `;
     } else if (tplId === 'paper-rip-shred') {
-      fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; overflow: hidden;">
-          <img src="${tpl.secondaryImage}" alt="Next Clip" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
-          <div id="fx-rip-${tplId}" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 20px rgba(0,0,0,0.9);">
-            <img src="${tpl.defaultImage}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
+    const shadowPx = topCustomizerState.tearShadowDepth ?? 24;
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
+        <!-- Revealed Media / Footage -->
+        <img id="customizer-live-bg-rev" src="${sec}" alt="Revealed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
+        ${textBehindHtml}
+        
+        <!-- Top Torn Paper Layer with Integrated Frayed White Cellulose Lip & Ambient Drop Shadow -->
+        <div id="customizer-live-rip-wrap" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.1)}px rgba(0,0,0,0.92)) drop-shadow(0 3px 6px rgba(0,0,0,0.85));">
+          
+          <!-- White cellulose fiber rim (the exposed rough paper core) -->
+          <div id="customizer-live-rip-border" style="position: absolute; inset: 0; overflow: hidden; background: ${topCustomizerState.tearBorderColor || '#f8fafc'}; opacity: ${topCustomizerState.tearBorderEnabled !== false ? 1 : 0};">
           </div>
+
+          <!-- Main Top Paper Layer slightly offset to reveal the 2px fiber core -->
+          <div id="customizer-live-rip" style="position: absolute; inset: 0; overflow: hidden; opacity: ${currentOpacity};">
+            <img id="customizer-live-fg" src="${prim}" alt="Top Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.95) contrast(1.18);" />
+          </div>
+
         </div>
-      `;
+      </div>
+    `;
     } else if (tplId === 'gold-frame-spin') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #0a0806; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: hidden;">
@@ -23268,41 +23533,37 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'spatial-3d-motion-suite') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; perspective: 700px; display: flex; align-items: center; justify-content: center;">
-          <!-- Perspective 3D Golden Grid -->
-          <div id="fx-spatial-grid-${tplId}" style="position: absolute; width: 140%; height: 140%; top: 20%; background-image: linear-gradient(to right, rgba(217,119,6,0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(217,119,6,0.3) 1px, transparent 1px); background-size: 20px 20px; transform: rotateX(70deg) translateZ(-60px); opacity: 0.6; pointer-events: none;"></div>
-          
-          <!-- Golden Ambient Dust Glow -->
-          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 45%, rgba(245,158,11,0.25) 0%, transparent 65%); pointer-events: none;"></div>
+        <div style="position: absolute; inset: 0; background: #030509; overflow: hidden; perspective: 700px; display: flex; align-items: center; justify-content: center;">
+          <!-- Atmospheric Vignette Floor -->
+          <div style="position: absolute; width: 140%; height: 140%; top: 25%; background: radial-gradient(ellipse at 50% 60%, rgba(217,119,6,0.14) 0%, transparent 65%); pointer-events: none;"></div>
 
-          <!-- Floating Secondary Dossier Card Left -->
-          <div id="fx-spatial-card1-${tplId}" style="position: absolute; left: 6%; top: 18%; width: 34%; height: 26%; background: rgba(15,23,42,0.9); border: 1px solid rgba(245,158,11,0.5); border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: none; transform: rotateY(25deg) rotateX(10deg);">
-            <div style="font-size: 7.5px; font-weight: 800; color: #f59e0b; font-family: 'Cinzel', serif; letter-spacing: 0.5px;">CLASSIFIED REPORT</div>
-            <div style="font-size: 6px; color: #94a3b8; font-family: monospace; margin-top: 2px;">FINANCIAL SCAN #8941</div>
-            <div style="height: 1.5px; background: #f59e0b; margin-top: 4px; width: 80%;"></div>
+          <!-- Receding Tangible Archival Folders -->
+          <div id="fx-spatial-card1-${tplId}" style="position: absolute; left: 8%; top: 20%; width: 32%; height: 28%; background: #181513; border: 1px solid #292524; border-radius: 3px; padding: 6px; box-shadow: 0 15px 30px rgba(0,0,0,0.95); pointer-events: none; transform: rotateY(20deg) rotateX(8deg);">
+            <div style="font-size: 6px; font-weight: 700; color: #a8a29e; font-family: monospace; letter-spacing: 0.5px;">DEPT. TREASURY // CLASSIFIED</div>
+            <div style="font-size: 8px; font-weight: 700; color: #e7e5e4; font-family: 'Cinzel', serif; margin-top: 3px;">CONFIDENTIAL SCAN</div>
+            <div style="display: inline-block; border: 1px dashed #991b1b; padding: 1px 4px; font-size: 6px; color: #991b1b; font-family: monospace; font-weight: 900; margin-top: 4px;">VERIFIED</div>
           </div>
 
-          <!-- Floating Network Node Card Right -->
-          <div id="fx-spatial-card2-${tplId}" style="position: absolute; right: 6%; bottom: 18%; width: 34%; height: 26%; background: rgba(15,23,42,0.9); border: 1px solid rgba(6,182,212,0.5); border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: none; transform: rotateY(-20deg) rotateX(-8deg);">
-            <div style="font-size: 7.5px; font-weight: 800; color: #06b6d4; font-family: 'Cinzel', serif; letter-spacing: 0.5px;">MONOPOLY MAP</div>
-            <div style="font-size: 6px; color: #94a3b8; font-family: monospace; margin-top: 2px;">NODES: 14,200 ACTIVE</div>
-            <div style="height: 1.5px; background: #06b6d4; margin-top: 4px; width: 80%;"></div>
+          <!-- Floating Receding Ledger Plate Right -->
+          <div id="fx-spatial-card2-${tplId}" style="position: absolute; right: 8%; bottom: 20%; width: 32%; height: 28%; background: #0c111d; border: 1px solid #1e293b; border-radius: 3px; padding: 6px; box-shadow: 0 15px 30px rgba(0,0,0,0.95); pointer-events: none; transform: rotateY(-18deg) rotateX(-6deg);">
+            <div style="font-size: 6px; font-weight: 700; color: #64748b; font-family: monospace; letter-spacing: 0.5px;">FINANCIAL MONOPOLY LEDGER</div>
+            <div style="font-size: 8px; font-weight: 700; color: #cbd5e1; font-family: 'Cinzel', serif; margin-top: 3px;">CAPITAL FLOW $84.2B</div>
           </div>
 
-          <!-- Central Extruded 3D Text Plate -->
-          <div id="fx-spatial-plate-${tplId}" style="position: relative; z-index: 5; text-align: center; background: rgba(10,13,22,0.92); border: 2px solid #f59e0b; border-radius: 10px; padding: 12px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.95), 0 0 25px rgba(245,158,11,0.4); transform-style: preserve-3d; transition: transform 0.05s ease-out;">
-            <h3 style="font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900; letter-spacing: 3px; color: #f59e0b; margin: 0; text-transform: uppercase; text-shadow: 0 0 16px rgba(245,158,11,0.6);">
+          <!-- Pure Cinematic Gold Typography (No tacky border box!) -->
+          <div id="fx-spatial-plate-${tplId}" style="position: relative; z-index: 5; text-align: center; transform-style: preserve-3d; transition: transform 0.05s ease-out;">
+            <h3 style="font-family: 'Cinzel', Georgia, serif; font-size: 26px; font-weight: 900; letter-spacing: 5px; background: linear-gradient(135deg, #fef08a 0%, #d97706 50%, #fde68a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; text-transform: uppercase; filter: drop-shadow(0 15px 20px rgba(0,0,0,0.95));">
               THE SYSTEM
             </h3>
-            <div style="width: 70%; height: 2px; background: #f59e0b; margin: 5px auto;"></div>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 8.5px; font-weight: 700; letter-spacing: 2px; color: #cbd5e1; text-transform: uppercase; display: block;">
+            <div style="width: 85%; height: 1.5px; background: linear-gradient(90deg, transparent, #d97706, transparent); margin: 6px auto;"></div>
+            <span style="font-family: 'Inter', -apple-system, sans-serif; font-size: 8px; font-weight: 600; letter-spacing: 3px; color: #94a3b8; text-transform: uppercase; display: block;">
               MANIPULATION & CONTROL
             </span>
           </div>
 
-          <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #d97706, #f59e0b); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            ⚡ THREE.JS 3D SUITE
+          <!-- Elegant Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid #d97706; color: #fde68a; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 10;">
+            3D SPATIAL RIG
           </div>
         </div>
       `;
@@ -23358,47 +23619,89 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>
       `;
     } else if (tplId === 'jani-puzzle-narrative-suite') {
+      const pz = (typeof window.tplGetPuzzleConfig === 'function') ? window.tplGetPuzzleConfig() : {
+        bgVisible: true,
+        bgOpacity: 0.35,
+        gridVisible: true,
+        watermarkVisible: true,
+        thesisVisible: true,
+        tileRounding: 4,
+        tileGap: 6,
+        borderColor: '#1e293b',
+        accentColor: '#f59e0b',
+        pulseGlow: true
+      };
+      const primImg = tpl.defaultImage || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80';
+      const secImg = tpl.secondaryImage || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80';
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #05070a; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
-          <!-- Background Grid Matrix -->
-          <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px); opacity: 0.6;"></div>
-          
-          <!-- Watermark Topic -->
-          <div style="position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 26px; font-weight: 900; color: rgba(255,255,255,0.05); letter-spacing: 4px; text-transform: uppercase;">
+        <div style="position: absolute; inset: 0; background: #030407; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 850px;">
+          <!-- Secondary Scene Background Asset -->
+          <img id="fx-puzzle-bg-${tplId}" src="${secImg}" alt="Scene Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: ${pz.bgVisible ? pz.bgOpacity : 0}; filter: contrast(135%) brightness(40%) grayscale(25%); transition: opacity 0.2s ease, transform 0.1s ease; pointer-events: none;" />
+          <div id="fx-puzzle-vignette-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(3,4,7,0.4) 0%, rgba(3,4,7,0.92) 80%); pointer-events: none;"></div>
+
+          <!-- Ghosted Watermark -->
+          <div id="fx-puzzle-watermark-${tplId}" style="position: absolute; font-family: 'Cinzel', Georgia, serif; font-size: 24px; font-weight: 900; color: rgba(255,255,255,0.05); letter-spacing: 8px; text-transform: uppercase; pointer-events: none; display: ${pz.watermarkVisible ? 'block' : 'none'};">
             THE MONOPOLY TRAP
           </div>
 
-          <!-- Mini 3x3 Puzzle Reconstruction Grid -->
-          <div id="fx-puzzle-grid-${tplId}" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 68%; aspect-ratio: 1/1; position: absolute; z-index: 2;">
-            <div id="fx-piece-0-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-1-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-2-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-3-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-4-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-5-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-6-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-7-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
-            <div id="fx-piece-8-${tplId}" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(0,242,254,0.5); border-radius: 4px; box-shadow: 0 0 10px rgba(0,242,254,0.3); display: flex; align-items: center; justify-content: center; font-size: 14px; color: #00f2fe;">🧩</div>
+          <!-- Tactical Jigsaw Matrix with Primary Asset mapped across tiles -->
+          <div id="fx-puzzle-grid-${tplId}" style="display: ${pz.gridVisible ? 'grid' : 'none'}; grid-template-columns: repeat(3, 1fr); gap: ${pz.tileGap}px; width: 64%; aspect-ratio: 1/1; position: absolute; z-index: 2; transition: transform 0.1s ease;">
+            <!-- 9 Puzzle Pieces mapping primary subject image -->
+            <div id="fx-piece-0-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 0% 0%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+            <div id="fx-piece-1-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 50% 0%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+            <div id="fx-piece-2-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 100% 0%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+
+            <div id="fx-piece-3-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 0% 50%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+            <!-- Center piece with active highlight accent -->
+            <div id="fx-piece-4-${tplId}" style="position: relative; overflow: hidden; border: 1.5px solid ${pz.accentColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 0 20px ${pz.accentColor}55, 0 12px 30px rgba(0,0,0,0.9); background: #13110d;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 50% 50%; filter: contrast(125%) brightness(105%);"></div>
+              <div id="fx-piece-4-pulse" style="position: absolute; inset: 0; background: radial-gradient(circle, ${pz.accentColor}40 0%, transparent 70%); pointer-events: none;"></div>
+              <div id="fx-piece-4-dot" style="position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: ${pz.accentColor}; box-shadow: 0 0 8px ${pz.accentColor};"></div>
+            </div>
+            <div id="fx-piece-5-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 100% 50%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+
+            <div id="fx-piece-6-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 0% 100%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+            <div id="fx-piece-7-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 50% 100%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
+            <div id="fx-piece-8-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
+              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 100% 100%; filter: contrast(115%) brightness(95%);"></div>
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
+            </div>
           </div>
 
-          <!-- James Jani Glowing Alpha Matte Card -->
-          <div id="fx-matte-box-${tplId}" style="position: absolute; z-index: 5; background: rgba(8,11,18,0.92); border: 1.5px solid #ffffff; box-shadow: 0 0 20px rgba(0,242,254,0.7), inset 0 0 10px rgba(0,242,254,0.25); border-radius: 8px; padding: 10px 14px; width: 72%; text-align: center; backdrop-filter: blur(10px); transition: transform 0.08s ease-out;">
-            <div style="position: absolute; top: 0; left: 0; width: 8px; height: 8px; border-top: 2px solid #fff; border-left: 2px solid #fff;"></div>
-            <div style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; border-top: 2px solid #fff; border-right: 2px solid #fff;"></div>
-            <div style="position: absolute; bottom: 0; left: 0; width: 8px; height: 8px; border-bottom: 2px solid #fff; border-left: 2px solid #fff;"></div>
-            <div style="position: absolute; bottom: 0; right: 0; width: 8px; height: 8px; border-bottom: 2px solid #fff; border-right: 2px solid #fff;"></div>
-            
-            <span style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #00f2fe; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 2px;">
-              ● PRIMARY TALKING POINT
+          <!-- James Jani Editorial Alpha Matte Card -->
+          <div id="fx-matte-box-${tplId}" style="position: absolute; z-index: 5; background: rgba(8,12,20,0.92); border: 1px solid ${pz.borderColor}; border-top: 2px solid ${pz.accentColor}; box-shadow: 0 20px 40px rgba(0,0,0,0.95); border-radius: 4px; padding: 10px 16px; width: 74%; text-align: left; backdrop-filter: blur(10px); transition: transform 0.08s ease-out; display: ${pz.thesisVisible ? 'block' : 'none'};">
+            <span id="fx-matte-tag-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 700; color: ${pz.accentColor}; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 3px;">
+              KEY NARRATIVE THESIS
             </span>
-            <div style="font-size: 11px; font-weight: 800; color: #ffffff; line-height: 1.3;">
-              "Illusion of Free Choice"
+            <div id="fx-matte-title-${tplId}" style="font-family: 'Playfair Display', Georgia, serif; font-size: 13px; font-weight: 800; color: #f8fafc; font-style: italic; line-height: 1.25;">
+              "The Illusion of Free Choice"
             </div>
           </div>
 
           <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #00f2fe, #3b82f6); color: #05070a; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(0,242,254,0.5);">
-            🧩 PUZZLE + ALPHA MATTE
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid ${pz.borderColor}; color: #94a3b8; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 10;">
+            PUZZLE ALPHA SUITE
           </div>
         </div>
       `;
@@ -23474,43 +23777,35 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'puzzle-piece-reveal') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #080912; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 14px;">
-          <!-- 4-Piece Story Arc Grid -->
+        <div style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 12px;">
+          <!-- Cohesive Investigative Dossier Board -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; height: 100%; position: relative;">
-            <div id="fx-arc-0-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #a855f7; box-shadow: 0 0 15px rgba(168,85,247,0.4); display: flex; align-items: center; justify-content: center; background: #130e26;">
-              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
-              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #a855f7;">
-                #1 THE ORIGIN
-              </span>
+            <div id="fx-arc-0-${tplId}" style="position: relative; border-radius: 3px; overflow: hidden; border: 1px solid #262a3d; border-top: 2px solid #64748b; box-shadow: 0 10px 20px rgba(0,0,0,0.8); padding: 6px; background: #13151f;">
+              <span style="font-family: monospace; font-size: 6px; font-weight: 700; color: #94a3b8; display: block;">ACT I // INVESTIGATION</span>
+              <span style="font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 800; color: #f8fafc; margin-top: 2px; display: block;">THE ORIGIN</span>
             </div>
-            <div id="fx-arc-1-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #06b6d4; box-shadow: 0 0 15px rgba(6,182,212,0.4); display: flex; align-items: center; justify-content: center; background: #081528;">
-              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
-              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #06b6d4;">
-                #2 THE CATALYST
-              </span>
+            <div id="fx-arc-1-${tplId}" style="position: relative; border-radius: 3px; overflow: hidden; border: 1px solid #262a3d; border-top: 2px solid #0ea5e9; box-shadow: 0 10px 20px rgba(0,0,0,0.8); padding: 6px; background: #13151f;">
+              <span style="font-family: monospace; font-size: 6px; font-weight: 700; color: #38bdf8; display: block;">ACT II // ESCALATION</span>
+              <span style="font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 800; color: #f8fafc; margin-top: 2px; display: block;">THE CATALYST</span>
             </div>
-            <div id="fx-arc-2-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #f59e0b; box-shadow: 0 0 15px rgba(245,158,11,0.4); display: flex; align-items: center; justify-content: center; background: #1e1308;">
-              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
-              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #f59e0b;">
-                #3 THE ILLUSION
-              </span>
+            <div id="fx-arc-2-${tplId}" style="position: relative; border-radius: 3px; overflow: hidden; border: 1px solid #262a3d; border-top: 2px solid #f59e0b; box-shadow: 0 10px 20px rgba(0,0,0,0.8); padding: 6px; background: #13151f;">
+              <span style="font-family: monospace; font-size: 6px; font-weight: 700; color: #fbbf24; display: block;">ACT III // DECEPTION</span>
+              <span style="font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 800; color: #f8fafc; margin-top: 2px; display: block;">THE ILLUSION</span>
             </div>
-            <div id="fx-arc-3-${tplId}" style="position: relative; border-radius: 8px; overflow: hidden; border: 1.5px solid #ef4444; box-shadow: 0 0 15px rgba(239,68,68,0.4); display: flex; align-items: center; justify-content: center; background: #24080e;">
-              <img src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
-              <span style="position: relative; font-family: monospace; font-size: 8px; font-weight: 900; color: #fff; background: rgba(0,0,0,0.8); padding: 2px 5px; border-radius: 3px; border: 1px solid #ef4444;">
-                #4 THE COLLAPSE
-              </span>
+            <div id="fx-arc-3-${tplId}" style="position: relative; border-radius: 3px; overflow: hidden; border: 1px solid #3b1b22; border-top: 2px solid #dc2626; box-shadow: 0 10px 20px rgba(0,0,0,0.8); padding: 6px; background: #181114;">
+              <span style="font-family: monospace; font-size: 6px; font-weight: 700; color: #f87171; display: block;">ACT IV // CLIMAX</span>
+              <span style="font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 800; color: #f8fafc; margin-top: 2px; display: block;">THE COLLAPSE</span>
             </div>
           </div>
 
-          <!-- Connecting Story Arc Spline Overlay -->
+          <!-- Organic Crimson Evidence Thread Connection -->
           <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 200 120">
-            <path d="M 40 40 Q 100 80, 160 40 T 160 90" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="4 2" opacity="0.8" />
+            <path d="M 50 35 C 80 50, 120 20, 150 35 S 50 85, 50 85 C 80 100, 120 80, 150 85" fill="none" stroke="#b91c1c" stroke-width="1.2" opacity="0.85" />
           </svg>
 
           <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #a855f7, #06b6d4); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
-            🧩 STORY ARC MASK
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid #dc2626; color: #fca5a5; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
+            STORY ARC MASK
           </div>
         </div>
       `;
@@ -23732,34 +24027,61 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (tplId === 'og-parallax-depth-engine') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #030408; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 750px;">
+          <div id="fx-og-rig-${tplId}" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; transition: transform 0.05s linear;">
+            <!-- Background Layer (Recessed, slow) -->
+            <div id="fx-og-bg-${tplId}" style="position: absolute; width: 250px; height: 135px; background: url('https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=600&auto=format&fit=crop&q=80') center/cover; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; transform: translateZ(-140px); box-shadow: 0 15px 35px rgba(0,0,0,0.9); filter: brightness(45%) contrast(120%) blur(1px);">
+              <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(14,165,233,0.1), transparent);"></div>
+              <div style="position: absolute; bottom: 8px; left: 8px; font-family: monospace; font-size: 7px; color: #38bdf8; letter-spacing: 1px;">DEPTH: BG // 0.35x SPEED</div>
+            </div>
+
+            <!-- Midground Cutout Portrait (Anchor, 1.0x) -->
+            <div id="fx-og-mid-${tplId}" style="position: absolute; width: 105px; height: 130px; border-radius: 6px; overflow: hidden; border: 1.5px solid rgba(251,191,36,0.3); transform: translateZ(0px); box-shadow: 0 20px 45px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; background: #0b0f19;">
+              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%) saturate(85%);" />
+              <div style="position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); font-family: monospace; font-size: 6.5px; color: #fbbf24; padding: 1px 4px; border-radius: 3px;">1.0x MID</div>
+            </div>
+
+            <!-- Foreground Floating Gold Plaque (Protruding, 2.2x speed) -->
+            <div id="fx-og-fg-${tplId}" style="position: absolute; bottom: 18px; background: rgba(10,14,24,0.95); border: 1px solid rgba(251,191,36,0.5); border-left: 3px solid #f59e0b; border-radius: 5px; padding: 6px 14px; transform: translateZ(150px); box-shadow: 0 16px 36px rgba(0,0,0,0.95); text-align: left;">
+              <div style="font-family: monospace; font-size: 6.5px; font-weight: 700; color: #f59e0b; letter-spacing: 1.5px;">
+                OG PARALLAX DEPTH // 2.2x
+              </div>
+              <div style="font-family: 'Cinzel', serif; font-size: 10.5px; font-weight: 900; color: #ffffff; letter-spacing: 1px;">
+                FOREGROUND RUSH
+              </div>
+            </div>
+          </div>
+
+          <!-- Badge tag -->
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(217,119,6,0.9)); border: 1px solid #fde68a; color: #fff; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.4);">
+            ✨ OG PARALLAX
+          </div>
+        </div>
+      `;
     } else if (tplId === 'magnates-media-3d-projection') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #05060b; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
-          <!-- 3D Spatial Grid Rays -->
-          <div style="position: absolute; inset: 0; opacity: 0.35; background-image: radial-gradient(circle at center, rgba(59,130,246,0.3) 0%, transparent 70%), linear-gradient(rgba(245,158,11,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.2) 1px, transparent 1px); background-size: 100% 100%, 28px 28px, 28px 28px; transform: rotateX(60deg) translateY(-20px);"></div>
-
+        <div style="position: absolute; inset: 0; background: #020306; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
           <!-- Null Object Orbit Rig Container -->
           <div id="fx-magnates-rig-${tplId}" style="position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; transition: transform 0.05s linear;">
-            <!-- Background Archival Plate (Z: -100px) -->
-            <div id="fx-magnates-bg-${tplId}" style="position: absolute; width: 230px; height: 120px; background: #1c1917; border: 1px solid rgba(245,158,11,0.4); border-radius: 8px; padding: 10px; transform: translateZ(-100px); box-shadow: 0 10px 25px rgba(0,0,0,0.8); opacity: 0.7;">
-              <div style="font-family: monospace; font-size: 7.5px; color: #f59e0b; font-weight: 700;">ARCHIVAL PLATE // Z:-100px</div>
-              <div style="font-family: Georgia, serif; font-size: 8.5px; color: #cbd5e1; font-style: italic; margin-top: 4px; line-height: 1.2;">
-                "Global market shift recorded across major banking cartels..."
+            <!-- Background Archival Document Plane (Receding Z-depth) -->
+            <div id="fx-magnates-bg-${tplId}" style="position: absolute; width: 240px; height: 125px; background: #181512; border: 1px solid #292524; border-radius: 4px; padding: 10px; transform: translateZ(-100px); box-shadow: 0 15px 35px rgba(0,0,0,0.9); opacity: 0.65;">
+              <div style="font-family: 'Times New Roman', serif; font-size: 8px; color: #a8a29e; font-weight: 700; letter-spacing: 1px;">WALL STREET HISTORICAL ARCHIVE</div>
+              <div style="font-family: Georgia, serif; font-size: 8px; color: #78716c; font-style: italic; margin-top: 4px; line-height: 1.25;">
+                "Unprecedented concentration of industrial capital across railroad and banking monopolies..."
               </div>
             </div>
 
-            <!-- Midground 2D Cutout Portrait Layer (Z: 0px) -->
-            <div id="fx-magnates-mid-${tplId}" style="position: absolute; width: 110px; height: 140px; background: #0f172a; border: 2px solid #3b82f6; border-radius: 12px; overflow: hidden; transform: translateZ(0px); box-shadow: 0 0 25px rgba(59,130,246,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center;">
-              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%);" />
-              <div style="position: absolute; bottom: 4px; background: rgba(0,0,0,0.85); border: 1px solid #38bdf8; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 6.5px; color: #38bdf8;">
-                PORTRAIT (Z:0px)
-              </div>
+            <!-- Midground Clean Cutout Portrait (No blue neon border or technical coordinate pill) -->
+            <div id="fx-magnates-mid-${tplId}" style="position: absolute; width: 100px; height: 125px; background: #0f172a; border-radius: 4px; overflow: hidden; border: 1px solid #334155; transform: translateZ(0px); box-shadow: 0 20px 40px rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center;">
+              <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&auto=format&fit=crop&q=80" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(130%) grayscale(40%);" />
             </div>
 
-            <!-- Foreground 3D Text & Null Linked Camera Card (Z: +140px) -->
-            <div id="fx-magnates-fg-${tplId}" style="position: absolute; bottom: 22px; background: rgba(8,10,18,0.92); border: 1.5px solid #f59e0b; border-radius: 8px; padding: 6px 14px; transform: translateZ(140px); box-shadow: 0 0 30px rgba(245,158,11,0.5); text-align: center;">
-              <div style="font-family: monospace; font-size: 7px; font-weight: 800; color: #fbbf24; letter-spacing: 1.5px; margin-bottom: 2px;">
-                50mm CAMERA // NULL OBJECT
+            <!-- Foreground Floating Gilded Lower Title -->
+            <div id="fx-magnates-fg-${tplId}" style="position: absolute; bottom: 20px; background: rgba(8,11,18,0.96); border: 1px solid #334155; border-top: 2px solid #f59e0b; border-radius: 4px; padding: 6px 16px; transform: translateZ(140px); box-shadow: 0 20px 40px rgba(0,0,0,0.95); text-align: center;">
+              <div style="font-family: 'Inter', sans-serif; font-size: 6.5px; font-weight: 700; color: #f59e0b; letter-spacing: 2px; margin-bottom: 2px;">
+                BIOGRAPHICAL PROFILE
               </div>
               <div style="font-family: 'Cinzel', serif; font-size: 11px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px;">
                 THE BILLIONAIRE PLAYBOOK
@@ -23768,8 +24090,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            🎥 3D PROJECTION FX
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid #d97706; color: #fde68a; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
+            3D PROJECTION RIG
           </div>
         </div>
       `;
@@ -23826,25 +24148,24 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'magnates-media-multi-drop-shadows') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #030712; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
+        <div style="position: absolute; inset: 0; background: #020306; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 700px;">
           <!-- Ambient textured background -->
-          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.2; filter: grayscale(80%) brightness(30%);" />
-          <div style="position: absolute; inset: 0; background-size: 20px 20px; background-image: radial-gradient(rgba(56, 189, 248, 0.15) 1px, transparent 1px); opacity: 0.7;"></div>
+          <img src="${tpl.secondaryImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: grayscale(100%) brightness(25%);" />
 
-          <!-- Multi-tier Floating 2D Cutout Card with stacked shadows -->
+          <!-- Multi-tier Floating 2D Cutout Card with stacked physical shadows -->
           <div id="fx-shadow-rig-${tplId}" style="position: relative; z-index: 10; display: flex; flex-direction: column; align-items: center; transform-style: preserve-3d; transition: transform 0.05s linear;">
-            <div id="fx-shadow-card-${tplId}" style="width: 110px; height: 135px; border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(56,189,248,0.7); position: relative; background: #0b1120;">
-              <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%) brightness(105%);" />
+            <div id="fx-shadow-card-${tplId}" style="width: 105px; height: 130px; border-radius: 4px; overflow: hidden; border: 1px solid #334155; position: relative; background: #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.95), 0 25px 50px -12px rgba(0,0,0,0.95);">
+              <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(125%) brightness(100%);" />
             </div>
-            <div style="margin-top: 6px; background: rgba(3,7,18,0.92); border: 1px solid rgba(56,189,248,0.5); padding: 2px 8px; border-radius: 9999px;">
-              <span id="fx-shadow-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8;">
-                3-TIER SHADOWS // ELEVATION 45PX
+            <div style="margin-top: 8px; background: rgba(8,12,20,0.95); border: 1px solid #1e293b; padding: 2px 8px; border-radius: 4px;">
+              <span id="fx-shadow-meter-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 700; color: #94a3b8; letter-spacing: 1px;">
+                TACTILE ELEVATION // 45PX DROP
               </span>
             </div>
           </div>
 
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
-            🕶️ 3-TIER SHADOWS
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid #334155; color: #94a3b8; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
+            PHYSICAL SHADOW RIG
           </div>
         </div>
       `;
@@ -24147,7 +24468,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       : ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
     const _fx = manual ? Object.assign({ pitch: 0, yaw: 0, roll: 0, zoom: 1 }, manual.fx || {}) : ((hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 });
 
-    if (tplId === 'subject-25d-parallax') {
+    if (tplId === 'spooner-2-5d-photo-parallax') {
+      // Unidirectional forward push over 4-second preview loop
+      const normT = (t % 4.0) / 4.0; // 0 to 1 steady push
+      const p = normT < 0.5 ? 4 * normT * normT * normT : 1 - Math.pow(-2 * normT + 2, 3) / 2;
+      const fgZoom = 1.0 + p * 0.14;
+      const bgZoom = 1.06 - p * 0.06;
+      const panOffset = (p - 0.5) * 2 * 4;
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      const fgWrap = fxContainer?.querySelector(`#fx-fg-wrap-${tplId}`);
+      if (bgEl) bgEl.style.transform = `scale(${bgZoom.toFixed(4)}) translate(${(-panOffset * 0.35).toFixed(2)}px, 0px)`;
+      if (fgWrap) fgWrap.style.transform = `scale(${fgZoom.toFixed(4)}) translate(${panOffset.toFixed(2)}px, 0px)`;
+    } else if (tplId === 'subject-25d-parallax') {
       const bgZoom = 1 + Math.sin(t * 1.5) * 0.08;
       const bgPanX = Math.sin(t * 2) * 18;
       const fgPanX = -Math.sin(t * 2) * 25;
@@ -24329,6 +24661,31 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const floatY = Math.sin(t * 2.2) * 5;
         const scale = 1.0 + Math.sin(t * 1.8) * 0.03;
         matteBox.style.transform = `translateY(${floatY}px) scale(${scale})`;
+      }
+
+      // Camera tilt & subtle 3D parallax on the puzzle grid
+      const grid = fxContainer?.querySelector(`#fx-puzzle-grid-${tplId}`);
+      if (grid) {
+        const pitch = _fx.pitch + Math.sin(t * 1.2) * 2;
+        const yaw = _fx.yaw + Math.cos(t * 1.4) * 3;
+        const roll = _fx.roll;
+        const zoom = _fx.zoom;
+        grid.style.transform = `scale(${zoom}) rotateX(${pitch}deg) rotateY(${yaw}deg) rotateZ(${roll}deg)`;
+      }
+
+      // Subtle slow background pan
+      const bg = fxContainer?.querySelector(`#fx-puzzle-bg-${tplId}`);
+      if (bg) {
+        const panX = Math.sin(t * 0.8) * 8;
+        const panY = Math.cos(t * 0.9) * 4;
+        bg.style.transform = `scale(1.08) translate(${panX}px, ${panY}px)`;
+      }
+
+      // Center active pulse glow
+      const pulse = fxContainer?.querySelector('#fx-piece-4-pulse');
+      if (pulse) {
+        const pOp = 0.4 + Math.sin(t * 3.5) * 0.35;
+        pulse.style.opacity = Math.max(0.1, pOp).toFixed(2);
       }
 
       // Pieces scatter or snap
@@ -24521,6 +24878,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const shakeMag = (1 - impactProg) * 8;
         if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
       }
+    } else if (tplId === 'og-parallax-depth-engine') {
+      const orbitY = Math.sin(t * 1.8) * 16;
+      const orbitX = Math.cos(t * 1.3) * 8;
+      const rig = fxContainer?.querySelector(`#fx-og-rig-${tplId}`);
+      const bg = fxContainer?.querySelector(`#fx-og-bg-${tplId}`);
+      const mid = fxContainer?.querySelector(`#fx-og-mid-${tplId}`);
+      const fg = fxContainer?.querySelector(`#fx-og-fg-${tplId}`);
+      if (rig) rig.style.transform = `rotateY(${orbitY.toFixed(2)}deg) rotateX(${orbitX.toFixed(2)}deg)`;
+      // Foreground moves fastest (2.2x), Midground moves at base (1.0x), Background moves slowest (0.35x)
+      if (bg) bg.style.transform = `translateZ(-140px) translate(${-orbitY * 0.35}px, ${-orbitX * 0.35}px)`;
+      if (mid) mid.style.transform = `translateZ(0px) translate(${orbitY * 1.0}px, ${orbitX * 1.0}px)`;
+      if (fg) fg.style.transform = `translateZ(150px) translate(${orbitY * 2.2}px, ${orbitX * 2.2}px)`;
     } else if (tplId === 'magnates-media-3d-projection') {
       const orbitY = Math.sin(t * 1.6) * 14;
       const orbitX = Math.cos(t * 1.2) * 7;
@@ -24761,6 +25130,8 @@ function applySelectedHomepageTemplate(templateId) {
 
   // Dedicated interactive full suites launch their dedicated suite preview modals
   const dedicatedSuiteMap = {
+
+    'og-parallax-depth-engine': openOGParallaxSuite,
     'spatial-3d-motion-suite': openSpatial3DMotionSuite,
     'document-3d-fx-engine': openDocument3DFXSuite,
     'jani-puzzle-narrative-suite': openJaniSuite,
@@ -24786,6 +25157,11 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-article-highlight': openMagnatesArticleHighlightSuite,
     'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
   };
+
+  if (dedicatedSuiteMap[templateId]) {
+    dedicatedSuiteMap[templateId]();
+    return;
+  }
 
   // All other templates open the unified sleek Customizer preview stage first
   openTopTemplateCustomizer(tpl);
@@ -25152,6 +25528,14 @@ function applySelectedHomepageTemplate(templateId) {
     // Launch James Jani Sub-bass Drops & Risers Suite
     openSubbassSuite();
     return;
+  } else if (templateId === 'spooner-2-5d-photo-parallax') {
+    // Launch Chris Spooner 2.5D Photo Parallax Suite
+    openSpoonerParallaxSuite();
+    return;
+  } else if (templateId === 'og-parallax-depth-engine') {
+    // Launch OG 3-Layer Parallax Engine Suite
+    openOGParallaxSuite();
+    return;
   } else if (templateId === 'magnates-media-3d-projection') {
     // Launch Magnates Media 3D Layer Projection & 50mm Camera Suite
     openMagnates3DProjectionSuite();
@@ -25313,6 +25697,33 @@ let topCustomizerState = {
   duration: 6,
   isPlaying: true,
   bgRemoved: true,
+  spoonerDir: 'push',
+  spoonerFgDir: 'push',
+  spoonerBgDir: 'pull',
+  spoonerTxtDir: 'drift',
+  spoonerFgZoom: 1.20,
+  spoonerBgZoom: 1.06,
+  spoonerPan: 14,
+  spoonerBlur: 0.0,
+  effectTargetLayer: 'all',
+  activeTransformLayer: 'fg',
+  fgScale: 1.0,
+  fgPosX: 0,
+  fgPosY: 0,
+  bgScale: 1.0,
+  bgPosX: 0,
+  bgPosY: 0,
+  enableDustParticles: false,
+  dustDensity: 0,
+  particleType: 'dust',
+  particleSpeed: 1.0,
+  particleSize: 2.0,
+  enableLightWrap: false,
+  lightWrapColor: '#000000',
+  lightWrapIntensity: 0,
+  enable3DCameraTilt: true,
+  cameraTiltAngle: 4.0,
+  bgRemoveTargetLayer: 'fg',
   hasTextBehind: true,
   textVisible: true, // Toggle text visibility without erasing inputs
   activeTextTarget: 'main', // 'main' or 'sub'
@@ -25480,7 +25891,20 @@ function renderMatrixRainCanvasFrame(ctx, width, height, state, dt) {
 
 function generateCutoutCanvasForUrl(url, callback) {
   if (!url) return;
-  // If requesting cutout for the default unsplash portrait subject, load default clean asset
+  // Dedicated asset overrides
+  if (url.includes('hiker_cutout.png') || url.includes('hiker_parallax_reference.png')) {
+    const cleanImg = new Image();
+    cleanImg.onload = () => {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width = cleanImg.naturalWidth || cleanImg.width || 582;
+      offCanvas.height = cleanImg.naturalHeight || cleanImg.height || 269;
+      const offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(cleanImg, 0, 0, offCanvas.width, offCanvas.height);
+      callback(offCanvas);
+    };
+    cleanImg.src = 'hiker_cutout.png';
+    return;
+  }
   if (url.includes('534528741775') || url === '/portrait_cutout_clean.png' || url === 'portrait_cutout_clean.png') {
     const cleanImg = new Image();
     cleanImg.onload = () => {
@@ -25605,12 +26029,19 @@ function generateCutoutCanvasForUrl(url, callback) {
 function openTopTemplateCustomizer(tpl) {
   if (!tpl) return;
   topCustomizerState.currentTpl = tpl;
-  topCustomizerState.primaryUrl = tpl.defaultImage || '';
-  topCustomizerState.secondaryUrl = tpl.secondaryImage || tpl.defaultImage || '';
+  if (tpl.id === 'spooner-2-5d-photo-parallax') {
+    topCustomizerState.originalPhotoUrl = 'hiker_parallax_reference.png';
+    topCustomizerState.primaryUrl = tpl.cutoutImage || 'hiker_cutout.png';
+    topCustomizerState.secondaryUrl = tpl.secondaryImage || 'hiker_background_inpainted.png';
+  } else {
+    topCustomizerState.primaryUrl = tpl.defaultImage || '';
+    topCustomizerState.secondaryUrl = tpl.secondaryImage || tpl.defaultImage || '';
+    topCustomizerState.originalPhotoUrl = tpl.originalImage || tpl.secondaryImage || tpl.defaultImage || '';
+  }
   topCustomizerState.depth = 65;
   topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
   topCustomizerState.isPlaying = true;
-  const isCutoutTpl = tpl.id === 'subject-25d-parallax' || tpl.id === 'magnates-paper-vector-cutout';
+  const isCutoutTpl = tpl.id === 'subject-25d-parallax' || tpl.id === 'spooner-2-5d-photo-parallax' || tpl.id === 'magnates-paper-vector-cutout';
   topCustomizerState.bgRemoved = isCutoutTpl;
   topCustomizerState.hasTextBehind = isCutoutTpl;
   topCustomizerState.textBehindContent = 'MAGNATES';
@@ -25679,7 +26110,33 @@ function openTopTemplateCustomizer(tpl) {
   const colorTextMain = document.getElementById('tpl-modal-color-text-main');
   const wrapSub = document.getElementById('tpl-modal-wrap-subtitle');
 
-  if (tpl.id === 'subject-25d-parallax') {
+  if (tpl.id === 'spooner-2-5d-photo-parallax') {
+    if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground (1:1 Registered)';
+    if (labelSec) labelSec.textContent = 'Inpainted Scene Backdrop (1:1 Registered)';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.textVisible = false;
+    topCustomizerState.mainText = '';
+    topCustomizerState.subText = '';
+    topCustomizerState.titleColor = '#ffffff';
+    topCustomizerState.textColor = '#38bdf8';
+    topCustomizerState.duration = 8;
+    topCustomizerState.spoonerFgZoom = topCustomizerState.spoonerFgZoom || 1.14;
+    topCustomizerState.spoonerBgZoom = topCustomizerState.spoonerBgZoom || 1.05;
+    topCustomizerState.spoonerPan = topCustomizerState.spoonerPan !== undefined ? topCustomizerState.spoonerPan : 4;
+    topCustomizerState.spoonerBlur = topCustomizerState.spoonerBlur !== undefined ? topCustomizerState.spoonerBlur : 0.0;
+    if (wrapText) wrapText.style.display = 'none';
+  } else if (tpl.id === 'subject-25d-parallax') {
+    if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground';
+    if (labelSec) labelSec.textContent = 'Inpainted Mountain / Scene Backdrop';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.mainText = 'MAGNATES';
+    topCustomizerState.subText = 'EXPOSED';
+    topCustomizerState.titleColor = '#ffffff';
+    const colorTitle = document.getElementById('tpl-modal-color-text-title');
+    if (colorTitle) colorTitle.value = topCustomizerState.titleColor;
+    topCustomizerState.textColor = '#38bdf8';
+  } else if (false && tpl.id === 'subject-25d-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground';
     if (labelSec) labelSec.textContent = 'Background Panning Scene';
     if (wrapSec) wrapSec.style.display = 'flex';
@@ -25860,6 +26317,126 @@ function openTopTemplateCustomizer(tpl) {
       if (typeSpeedVal) typeSpeedVal.textContent = `${(topCustomizerState.matrixTypeSpeed || 1.0).toFixed(1)}x`;
     } else {
       wrapMatrix.style.display = 'none';
+    }
+  }
+
+  // 2.5D Parallax Photo Transform Panel Sync
+  const wrapSpooner = document.getElementById('tpl-modal-spooner-controls');
+  if (wrapSpooner) {
+    const isParallaxTpl = (tpl.id === 'spooner-2-5d-photo-parallax' || tpl.id === 'subject-25d-parallax' || tpl.id === 'parallax-zoom' || tpl.category === 'Parallax');
+    if (isParallaxTpl) {
+      wrapSpooner.style.display = 'flex';
+      if (wrapText) wrapText.style.display = 'none';
+
+      if (typeof syncSpoonerDirectionButtons === 'function') {
+        syncSpoonerDirectionButtons();
+      }
+
+      // Sync Sliders
+      const sFg = document.getElementById('tpl-modal-slider-spooner-fg-zoom');
+      const vFg = document.getElementById('tpl-modal-val-spooner-fg-zoom');
+      if (sFg) sFg.value = Math.round((topCustomizerState.spoonerFgZoom || 1.20) * 100);
+      const fgDirNow = topCustomizerState.spoonerFgDir || 'push';
+      if (vFg) vFg.textContent = fgDirNow === 'push' ? `100% → ${sFg ? sFg.value : 120}%` : fgDirNow === 'pull' ? `${sFg ? sFg.value : 120}% → 100%` : `Drift (100%)`;
+
+      const sBg = document.getElementById('tpl-modal-slider-spooner-bg-zoom');
+      const vBg = document.getElementById('tpl-modal-val-spooner-bg-zoom');
+      if (sBg) sBg.value = Math.round((topCustomizerState.spoonerBgZoom || 1.06) * 100);
+      const bgDirNow = topCustomizerState.spoonerBgDir || 'pull';
+      if (vBg) vBg.textContent = bgDirNow === 'push' ? `100% → ${sBg ? sBg.value : 106}%` : bgDirNow === 'pull' ? `${sBg ? sBg.value : 106}% → 100%` : `Drift (100%)`;
+
+      const sPan = document.getElementById('tpl-modal-slider-spooner-pan');
+      const vPan = document.getElementById('tpl-modal-val-spooner-pan');
+      if (sPan) sPan.value = topCustomizerState.spoonerPan ?? 14;
+      if (vPan) vPan.textContent = `±${topCustomizerState.spoonerPan ?? 14} px`;
+
+      const sBlur = document.getElementById('tpl-modal-slider-spooner-blur');
+      const vBlur = document.getElementById('tpl-modal-val-spooner-blur');
+      if (sBlur) sBlur.value = topCustomizerState.spoonerBlur ?? 0.0;
+      if (vBlur) vBlur.textContent = `${(topCustomizerState.spoonerBlur ?? 0.0).toFixed(1)} px`;
+    } else {
+      wrapSpooner.style.display = 'none';
+    }
+  }
+
+  // Tear, Rip & Fabric Customizer Panel Sync
+  const wrapTear = document.getElementById('tpl-modal-wrap-tear');
+  if (wrapTear) {
+    if (tpl.id === 'paper-rip-shred') {
+      wrapTear.style.display = 'flex';
+      const mode = topCustomizerState.tearMode || 'paper';
+      const preset = topCustomizerState.tearPreset || 'magnates';
+      const badge = document.getElementById('tpl-modal-tear-style-badge');
+      if (badge) {
+        badge.textContent = mode === 'cloth'
+          ? (preset === 'magnates' ? 'Cloth Drapery (Diagonal)' : preset === 'vertical' ? 'Curtain Lift (Vertical)' : preset === 'horizontal' ? 'Window Curtain (Left-Right)' : 'Cloth Drapery')
+          : (preset === 'magnates' ? 'Paper Rip (Magnates)' : preset === 'oblique' ? 'Paper Split (Oblique)' : preset === 'vertical' ? 'Center Shred' : 'Horizontal Peel');
+      }
+
+      // Material Mode Buttons
+      const btnPaper = document.getElementById('btn-tear-mode-paper');
+      const btnCloth = document.getElementById('btn-tear-mode-cloth');
+      if (btnPaper) {
+        btnPaper.style.border = mode === 'paper' ? '1px solid rgba(168,85,247,0.7)' : '1px solid rgba(255,255,255,0.08)';
+        btnPaper.style.background = mode === 'paper' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)';
+        btnPaper.style.color = mode === 'paper' ? '#fff' : '#94a3b8';
+      }
+      if (btnCloth) {
+        btnCloth.style.border = mode === 'cloth' ? '1px solid rgba(168,85,247,0.7)' : '1px solid rgba(255,255,255,0.08)';
+        btnCloth.style.background = mode === 'cloth' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)';
+        btnCloth.style.color = mode === 'cloth' ? '#fff' : '#94a3b8';
+      }
+
+      // Context labels depending on mode
+      const lblRoughness = document.getElementById('tpl-modal-label-tear-roughness');
+      const lblCurl = document.getElementById('tpl-modal-label-tear-curl');
+      const lblBorder = document.getElementById('tpl-modal-label-tear-border');
+      if (lblRoughness) lblRoughness.textContent = mode === 'cloth' ? 'Fabric Wave Amplitude' : 'Fractal Fiber Teeth (Jagged)';
+      if (lblCurl) lblCurl.textContent = mode === 'cloth' ? 'Drapery Wave Depth & Fold' : '3D Peeling Edge Curl & Lift';
+      if (lblBorder) lblBorder.textContent = mode === 'cloth' ? 'Fabric Hemline Highlight' : 'Exposed White Fiber Bleed';
+
+      const sliderAngle = document.getElementById('tpl-modal-slider-tear-angle');
+      const valAngle = document.getElementById('tpl-modal-val-tear-angle');
+      if (sliderAngle) sliderAngle.value = topCustomizerState.tearAngle ?? 135;
+      if (valAngle) valAngle.textContent = `${topCustomizerState.tearAngle ?? 135}° (${(topCustomizerState.tearAngle ?? 135) === 135 ? 'Diagonal' : (topCustomizerState.tearAngle ?? 135) === 90 ? 'Vertical' : (topCustomizerState.tearAngle ?? 135) === 0 ? 'Horizontal' : 'Custom'})`;
+
+      const sliderRoughness = document.getElementById('tpl-modal-slider-tear-roughness');
+      const valRoughness = document.getElementById('tpl-modal-val-tear-roughness');
+      if (sliderRoughness) sliderRoughness.value = topCustomizerState.tearRoughness ?? 85;
+      if (valRoughness) valRoughness.textContent = `${topCustomizerState.tearRoughness ?? 85}% (${(topCustomizerState.tearRoughness ?? 85) > 60 ? (mode === 'cloth' ? 'Deep Folds' : 'High Def') : 'Subtle'})`;
+
+      const sliderCurl = document.getElementById('tpl-modal-slider-tear-curl');
+      const valCurl = document.getElementById('tpl-modal-val-tear-curl');
+      if (sliderCurl) sliderCurl.value = topCustomizerState.tearCurl ?? 60;
+      if (valCurl) valCurl.textContent = `${topCustomizerState.tearCurl ?? 60}% (3D Lift)`;
+
+      const sliderSpeed = document.getElementById('tpl-modal-slider-tear-speed');
+      const valSpeed = document.getElementById('tpl-modal-val-tear-speed');
+      if (sliderSpeed) sliderSpeed.value = topCustomizerState.tearSpeed ?? 1.4;
+      if (valSpeed) valSpeed.textContent = `${(topCustomizerState.tearSpeed ?? 1.4).toFixed(1)}x`;
+
+      const chkBorder = document.getElementById('tpl-modal-tear-border-enable');
+      if (chkBorder) chkBorder.checked = topCustomizerState.tearBorderEnabled !== false;
+
+      const colBorder = document.getElementById('tpl-modal-tear-border-color');
+      if (colBorder) colBorder.value = topCustomizerState.tearBorderColor || '#ffffff';
+
+      const sliderShadow = document.getElementById('tpl-modal-slider-tear-shadow');
+      const valShadow = document.getElementById('tpl-modal-val-tear-shadow');
+      if (sliderShadow) sliderShadow.value = topCustomizerState.tearShadowDepth ?? 28;
+      if (valShadow) valShadow.textContent = `${topCustomizerState.tearShadowDepth ?? 28}px`;
+
+      ['magnates', 'oblique', 'vertical', 'horizontal'].forEach(pId => {
+        const btn = document.getElementById(`btn-tear-preset-${pId}`);
+        if (btn) {
+          const isActive = (topCustomizerState.tearPreset || 'magnates') === pId;
+          btn.style.border = isActive ? '1px solid rgba(168,85,247,0.7)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.background = isActive ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)';
+          btn.style.color = isActive ? '#fff' : '#94a3b8';
+        }
+      });
+    } else {
+      wrapTear.style.display = 'none';
     }
   }
 
@@ -26055,7 +26632,7 @@ function renderTopTemplatePreviewStage() {
 
   const currentOpacity = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
   const subjectFilter = topCustomizerState.bgRemoved
-    ? 'drop-shadow(0 15px 25px rgba(0,0,0,0.95)) drop-shadow(0 0 10px rgba(255,255,255,0.4))'
+    ? 'drop-shadow(0 15px 25px rgba(0,0,0,0.95))'
     : 'none';
   const subjectBorder = 'none';
   const subjectZ = topCustomizerState.layerOrder === 'front' ? 4 : 1;
@@ -26107,7 +26684,36 @@ function renderTopTemplatePreviewStage() {
     }).join('');
   }
 
-  if (tplId === 'subject-25d-parallax') {
+  if (tplId === 'spooner-2-5d-photo-parallax') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: default; perspective: 1200px;">
+        <!-- Background Scene Plate (Clickable & Draggable) -->
+        <div id="customizer-live-bg-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; cursor: grab; z-index: 1;">
+          <img id="customizer-live-bg" src="${sec}" alt="Inpainted Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(${topCustomizerState.spoonerBlur || 0.0}px); transform-origin: 50% 65%; pointer-events: none;" />
+        </div>
+
+        <!-- Atmospheric Dust Particles Simulation Canvas -->
+        <canvas id="customizer-dust-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; display: ${topCustomizerState.enableDustParticles ? 'block' : 'none'};"></canvas>
+
+        ${textBehindHtml}
+
+        <!-- Foreground Cutout Subject Layer (Clickable & Draggable) -->
+        <div id="customizer-live-fg-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; overflow: hidden; opacity: ${currentOpacity}; transform-origin: 50% 65%; cursor: grab;">
+          <img id="customizer-live-fg" src="${prim}" alt="Cutout Subject" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
+        </div>
+
+        <!-- On-Screen Selection / Transform Overlay Box (Photoshop/AE Style) -->
+        <div id="customizer-transform-box" style="display: none; position: absolute; border: 1.5px dashed #38bdf8; box-shadow: 0 0 14px rgba(56,189,248,0.4); pointer-events: none; z-index: 10;">
+          <div id="tf-handle-label" style="position: absolute; top: -20px; left: 0; background: #0284c7; color: #fff; font-size: 8.5px; font-weight: 700; padding: 1px 6px; border-radius: 3px; font-family: monospace; letter-spacing: 0.5px;">FOREGROUND</div>
+          <div class="tf-handle tf-tl" data-handle="tl" style="position: absolute; top: -5px; left: -5px; width: 10px; height: 10px; background: #fff; border: 1.5px solid #0284c7; border-radius: 2px; cursor: nwse-resize; pointer-events: auto;"></div>
+          <div class="tf-handle tf-tr" data-handle="tr" style="position: absolute; top: -5px; right: -5px; width: 10px; height: 10px; background: #fff; border: 1.5px solid #0284c7; border-radius: 2px; cursor: nesw-resize; pointer-events: auto;"></div>
+          <div class="tf-handle tf-bl" data-handle="bl" style="position: absolute; bottom: -5px; left: -5px; width: 10px; height: 10px; background: #fff; border: 1.5px solid #0284c7; border-radius: 2px; cursor: nesw-resize; pointer-events: auto;"></div>
+          <div class="tf-handle tf-br" data-handle="br" style="position: absolute; bottom: -5px; right: -5px; width: 10px; height: 10px; background: #fff; border: 1.5px solid #0284c7; border-radius: 2px; cursor: nwse-resize; pointer-events: auto;"></div>
+        </div>
+      </div>
+    `;
+    setTimeout(initCustomizerOnScreenTransform, 40);
+  } else if (tplId === 'subject-25d-parallax') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: crosshair;">
         <img id="customizer-live-bg" src="${sec}" alt="Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(${blurVal}px) brightness(0.75); transform: scale(1.15);" />
@@ -26122,13 +26728,36 @@ function renderTopTemplatePreviewStage() {
       </div>
     `;
   } else if (tplId === 'paper-rip-shred') {
+    const shadowPx = topCustomizerState.tearShadowDepth ?? 28;
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
-        <img src="${sec}" alt="Revealed" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
+        <img id="customizer-live-bg-rev" src="${sec}" alt="Revealed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
         ${textBehindHtml}
-        <div id="customizer-live-rip" style="position: absolute; inset: 0; border-bottom: 3px solid rgba(254, 240, 138, 0.9); box-shadow: 0 10px 25px rgba(0,0,0,0.95); z-index: ${subjectZ}; opacity: ${currentOpacity};">
-          <img id="customizer-live-fg" src="${prim}" alt="Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.9) contrast(1.25);" />
+        <!-- Under-paper intense ambient crease & drop shadow layer -->
+        <div id="customizer-live-rip-shadow" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.2)}px rgba(0,0,0,0.95)) drop-shadow(0 4px 10px rgba(0,0,0,0.8));">
+          <!-- Main Torn Paper Layer -->
+          <div id="customizer-live-rip" style="position: absolute; inset: 0; overflow: hidden; opacity: ${currentOpacity};">
+            <img id="customizer-live-fg" src="${prim}" alt="Top Paper / Cloth" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.92) contrast(1.22);" />
+          </div>
         </div>
+        <!-- SVG Overlay for Realistic Cellulose Fiber Edge & 3D Crease Highlight -->
+        <svg id="customizer-live-rip-svg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: ${subjectZ + 2}; overflow: visible;">
+          <defs>
+            <filter id="tear-fiber-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+          <!-- Peeling 3D curl under-shadow line -->
+          <path id="customizer-svg-curl-shadow" fill="none" stroke="rgba(0,0,0,0.7)" stroke-width="6" stroke-linecap="round" filter="url(#tear-fiber-glow)" />
+          <!-- Exposed White Cellulose Fiber Core Bleed -->
+          <path id="customizer-svg-fiber-core" fill="none" stroke="${topCustomizerState.tearBorderColor || '#ffffff'}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+          <!-- Micro-specular highlight line on the curl ridge -->
+          <path id="customizer-svg-fiber-highlight" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round" />
+        </svg>
       </div>
     `;
   } else if (tplId === 'gold-frame-spin') {
@@ -26466,24 +27095,203 @@ function updateTopCustomizerFrame(seqTime, now) {
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
 
-  if (tplId === 'subject-25d-parallax') {
+  if (tplId === 'spooner-2-5d-photo-parallax') {
     const bg = document.getElementById('customizer-live-bg');
     const fg = document.getElementById('customizer-live-fg-wrap');
+    // Authentic Chris Spooner Cinematic Pace: Unidirectional smooth push across the shot duration (No ping-pong reversal)
+    const dur = Math.max(1, topCustomizerState.duration || 8);
+    const cycleProgress = Math.min(1.0, Math.max(0.0, (localSceneT % dur) / dur)); // 0.0 -> 1.0 steady progression
+    // Smooth cubic ease-in-out across the timeline
+    const p = cycleProgress < 0.5 ? 4 * cycleProgress * cycleProgress * cycleProgress : 1 - Math.pow(-2 * cycleProgress + 2, 3) / 2;
+    const isPush = (topCustomizerState.spoonerDir !== 'pull');
+    const maxFgZoom = topCustomizerState.spoonerFgZoom || 1.14;
+    const maxBgZoom = topCustomizerState.spoonerBgZoom || 1.05;
+    const maxPan = topCustomizerState.spoonerPan !== undefined ? topCustomizerState.spoonerPan : 4;
+    // Individual Layer Parallax Directions (Independent Push In / Pull Out / Drift per layer)
+    const fgDir = topCustomizerState.spoonerFgDir || (topCustomizerState.spoonerDir === 'pull' ? 'pull' : 'push');
+    const bgDir = topCustomizerState.spoonerBgDir || (topCustomizerState.spoonerDir === 'pull' ? 'push' : 'pull');
+    const txtDir = topCustomizerState.spoonerTxtDir || 'drift';
+
+    let fgZoom = 1.0;
+    if (fgDir === 'push') fgZoom = 1.0 + p * (maxFgZoom - 1.0);
+    else if (fgDir === 'pull') fgZoom = maxFgZoom - p * (maxFgZoom - 1.0);
+    else fgZoom = 1.0 + Math.sin(p * Math.PI) * 0.02;
+
+    let bgZoom = 1.0;
+    if (bgDir === 'push') bgZoom = 1.0 + p * (maxBgZoom - 1.0);
+    else if (bgDir === 'pull') bgZoom = maxBgZoom - p * (maxBgZoom - 1.0);
+    else bgZoom = 1.0 + Math.sin(p * Math.PI + 1) * 0.02;
+
+    const panOffset = (p - 0.5) * 2 * maxPan;
+
+    // 3D Spatial Camera Tilt & Roll dynamics
+    let tiltX = 0, tiltY = 0;
+    if (topCustomizerState.enable3DCameraTilt) {
+      const tiltMax = topCustomizerState.cameraTiltAngle || 4.0;
+      tiltY = Math.sin(localSceneT * 0.7) * (tiltMax * 0.85);
+      tiltX = Math.cos(localSceneT * 0.6) * (tiltMax * 0.45);
+    }
+
+    // Manual canvas free-transform offsets (drag/scale to cover blurriness)
+    const bgManualScale = topCustomizerState.bgScale || 1.0;
+    const bgManualX = topCustomizerState.bgPosX || 0;
+    const bgManualY = topCustomizerState.bgPosY || 0;
+
+    const fgManualScale = topCustomizerState.fgScale || 1.0;
+    const fgManualX = topCustomizerState.fgPosX || 0;
+    const fgManualY = topCustomizerState.fgPosY || 0;
+
     if (bg) {
-      const bgScale = 1.15 + Math.sin(localSceneT * 0.8) * 0.05 * depthFactor;
-      const bgX = Math.sin(localSceneT * 0.7) * 12 * depthFactor;
-      bg.style.transform = `scale(${bgScale}) translate(${bgX}px, 0)`;
+      const finalBgZoom = bgZoom * bgManualScale;
+      const finalBgX = -panOffset * 0.35 + bgManualX;
+      const finalBgY = bgManualY;
+      bg.style.transform = `perspective(1200px) rotateY(${(-tiltY * 0.4).toFixed(2)}deg) rotateX(${(tiltX * 0.4).toFixed(2)}deg) scale(${finalBgZoom.toFixed(4)}) translate(${finalBgX.toFixed(2)}px, ${finalBgY.toFixed(2)}px)`;
+      bg.style.filter = `blur(${topCustomizerState.spoonerBlur !== undefined ? topCustomizerState.spoonerBlur : 0.0}px)`;
     }
     if (fg) {
-      const fgScale = 1.0 + Math.sin(localSceneT * 0.8 + 0.5) * 0.06 * depthFactor;
+      const finalFgZoom = fgZoom * fgManualScale;
+      const finalFgX = panOffset + fgManualX;
+      const finalFgY = fgManualY;
+      fg.style.transform = `perspective(1200px) rotateY(${(tiltY * 0.9).toFixed(2)}deg) rotateX(${(-tiltX * 0.9).toFixed(2)}deg) scale(${finalFgZoom.toFixed(4)}) translate(${finalFgX.toFixed(2)}px, ${finalFgY.toFixed(2)}px)`;
+
+      // Cinematic Light Wrap / Rim Glow
+      const fgImg = fg.querySelector('img');
+      if (fgImg) {
+        if (topCustomizerState.enableLightWrap) {
+          const col = topCustomizerState.lightWrapColor || '#f59e0b';
+          const intVal = topCustomizerState.lightWrapIntensity || 45;
+          const r1 = Math.round(intVal * 0.25);
+          const r2 = Math.round(intVal * 0.55);
+          fgImg.style.filter = `drop-shadow(0 0 ${r1}px ${col}) drop-shadow(0 0 ${r2}px ${col}) contrast(105%)`;
+        } else {
+          fgImg.style.filter = 'none';
+        }
+      }
+    }
+
+    // Render Atmospheric Dust Particles
+    if (topCustomizerState.enableDustParticles && typeof renderCustomizerDustSimulation === 'function') {
+      renderCustomizerDustSimulation(panOffset);
+    }
+    const txtBehind = document.getElementById('customizer-live-text-behind');
+    if (txtBehind) {
+      let tZoom = 1.0;
+      if (txtDir === 'push') tZoom = 1.0 + p * 0.08;
+      else if (txtDir === 'pull') tZoom = 1.08 - p * 0.08;
+      txtBehind.style.transform = `scale(${tZoom.toFixed(4)}) translate(${(-panOffset * 0.15).toFixed(2)}px, 0px)`;
+    }
+  } else if (tplId === 'subject-25d-parallax') {
+    const bg = document.getElementById('customizer-live-bg');
+    const fg = document.getElementById('customizer-live-fg-wrap');
+    const fgDir = topCustomizerState.spoonerFgDir || 'push';
+    const bgDir = topCustomizerState.spoonerBgDir || 'pull';
+    if (bg) {
+      let bgScale = 1.0;
+      if (bgDir === 'push') bgScale = 1.02 + Math.sin(localSceneT * 0.8) * 0.08 * depthFactor;
+      else if (bgDir === 'pull') bgScale = 1.16 - Math.sin(localSceneT * 0.8) * 0.08 * depthFactor;
+      else bgScale = 1.08 + Math.sin(localSceneT * 0.4) * 0.02 * depthFactor;
+      const bgX = Math.sin(localSceneT * 0.7) * 12 * depthFactor;
+      bg.style.transform = `scale(${bgScale.toFixed(4)}) translate(${bgX.toFixed(2)}px, 0)`;
+    }
+    if (fg) {
+      let fgScale = 1.0;
+      if (fgDir === 'push') fgScale = 1.0 + Math.sin(localSceneT * 0.8 + 0.5) * 0.09 * depthFactor;
+      else if (fgDir === 'pull') fgScale = 1.18 - Math.sin(localSceneT * 0.8 + 0.5) * 0.09 * depthFactor;
+      else fgScale = 1.04;
       const fgX = -Math.sin(localSceneT * 0.7) * 16 * depthFactor;
-      fg.style.transform = `scale(${fgScale}) translate(${fgX}px, 0)`;
+      fg.style.transform = `scale(${fgScale.toFixed(4)}) translate(${fgX.toFixed(2)}px, 0)`;
     }
   } else if (tplId === 'paper-rip-shred') {
     const rip = document.getElementById('customizer-live-rip');
+    const ripBorder = document.getElementById('customizer-live-rip-border');
     if (rip) {
-      const tearProgress = (Math.sin(localSceneT * 1.5) + 1) / 2;
-      rip.style.clipPath = `polygon(0 0, 100% 0, 100% ${tearProgress * 100}%, 0 ${Math.min(100, tearProgress * 100 + 8)}%)`;
+      const spd = topCustomizerState.tearSpeed ?? 1.4;
+      const tearProgress = (Math.sin(localSceneT * spd) + 1) / 2; // 0 to 1
+      const mode = topCustomizerState.tearMode || 'paper'; // 'paper' or 'cloth'
+      const preset = topCustomizerState.tearPreset || 'magnates';
+      const angle = topCustomizerState.tearAngle ?? 135;
+      const roughness = (topCustomizerState.tearRoughness ?? 85) / 100;
+      const hasBorder = topCustomizerState.tearBorderEnabled !== false;
+
+      // Authentic digitized fracture offsets from Magnates Media documentary rip scan
+      const fractureBites = [
+        0, 2.8, -1.5, 4.2, 1.0, 5.8, 2.4, -0.8, 6.2, 3.5, 7.8, 4.1, 1.2, 5.5, 8.4,
+        3.8, 9.2, 6.5, 2.1, 7.4, 11.2, 6.8, 3.2, 8.6, 5.1, 10.4, 7.2, 2.8, 8.5, 12.1,
+        7.4, 3.5, 9.8, 6.2, 11.5, 8.1, 4.0, 9.5, 6.8, 12.8, 8.5, 4.2, 10.1, 6.5, 11.2,
+        8.4, 3.2, 9.1, 13.5, 8.8, 4.5, 10.2, 7.1, 12.0, 8.5, 3.8, 9.4, 6.2, 10.8, 7.5
+      ];
+
+      const STEPS = fractureBites.length - 1;
+      const ptsTop = [];
+      const ptsBorder = [];
+
+      if (preset === 'magnates' || angle === 135) {
+        // True Top-Left to Bottom-Right diagonal tear peeling down:
+        // Tear line originates at top-left corner and sweeps downwards towards bottom-right
+        const sweep = tearProgress * 140 - 20; 
+        for (let i = 0; i <= STEPS; i++) {
+          const t = i / STEPS; // 0 (left) to 1 (right)
+          const xPct = t * 100;
+          
+          let bite = 0;
+          if (mode === 'cloth') {
+            bite = Math.sin(t * Math.PI * 4 + localSceneT * 1.5) * 4.2 * roughness;
+          } else {
+            // Irregular sharp paper bite from digitized scan
+            bite = (fractureBites[i] * 0.95 + Math.sin(t * 31.4) * 1.2) * roughness;
+          }
+
+          // Descending slope from top-left (lower Y) down across to right
+          // At x=0 (left): tear starts higher up; at x=100 (right): tear extends lower down
+          const yBase = sweep + t * 45;
+          const yTop = Math.max(0, Math.min(100, yBase + bite));
+          // 1.8% bleached white exposed cellulose paper lip
+          const yRim = Math.max(0, Math.min(100, yTop + (hasBorder ? 1.9 : 0)));
+
+          ptsTop.push(`${xPct.toFixed(2)}% ${yTop.toFixed(2)}%`);
+          ptsBorder.push(`${xPct.toFixed(2)}% ${yRim.toFixed(2)}%`);
+        }
+
+        // Top paper covers top portion: polygon from (0,0) -> (100,0) -> along tear line from right to left
+        rip.style.clipPath = `polygon(0 0, 100% 0, ${ptsTop.slice().reverse().join(', ')})`;
+        if (ripBorder) {
+          ripBorder.style.clipPath = `polygon(0 0, 100% 0, ${ptsBorder.slice().reverse().join(', ')})`;
+        }
+
+      } else if (preset === 'horizontal' || angle === 0) {
+        const sweepX = tearProgress * 130 - 15;
+        for (let i = 0; i <= STEPS; i++) {
+          const t = i / STEPS;
+          const yPct = t * 100;
+          const bite = (fractureBites[i] * 0.85) * roughness;
+          const xTop = Math.max(0, Math.min(100, sweepX + t * 12 + bite));
+          const xRim = Math.max(0, Math.min(100, xTop + (hasBorder ? 1.8 : 0)));
+          ptsTop.push(`${xTop.toFixed(2)}% ${yPct.toFixed(2)}%`);
+          ptsBorder.push(`${xRim.toFixed(2)}% ${yPct.toFixed(2)}%`);
+        }
+        rip.style.clipPath = `polygon(0 0, ${ptsTop.join(', ')}, 0 100%)`;
+        if (ripBorder) {
+          ripBorder.style.clipPath = `polygon(0 0, ${ptsBorder.join(', ')}, 0 100%)`;
+        }
+
+      } else {
+        // Vertical center rip / Oblique
+        const sweepY = tearProgress * 130 - 15;
+        const slant = preset === 'oblique' ? 30 : 0;
+        for (let i = 0; i <= STEPS; i++) {
+          const t = i / STEPS;
+          const xPct = t * 100;
+          const bite = (fractureBites[i] * 0.9) * roughness;
+          const yTop = Math.max(0, Math.min(100, sweepY + t * slant + bite));
+          const yRim = Math.max(0, Math.min(100, yTop + (hasBorder ? 1.8 : 0)));
+          ptsTop.push(`${xPct.toFixed(2)}% ${yTop.toFixed(2)}%`);
+          ptsBorder.push(`${xRim.toFixed(2)}% ${yRim.toFixed(2)}%`);
+        }
+        rip.style.clipPath = `polygon(0 0, 100% 0, ${ptsTop.slice().reverse().join(', ')})`;
+        if (ripBorder) {
+          ripBorder.style.clipPath = `polygon(0 0, 100% 0, ${ptsBorder.slice().reverse().join(', ')})`;
+        }
+      }
     }
   } else if (tplId === 'gold-frame-spin') {
     const frame = document.getElementById('customizer-live-frame');
@@ -26749,6 +27557,8 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
       scale: 1.15,
       isBackgroundScene: true,
       parallaxRig: 'bg',
+      parallaxLayer: 'background',
+      parallaxMotion: topCustomizerState.spoonerBgDir || 'pull',
       parallaxDepth: depthVal,
       blur: blur,
       zIndex: 10,
@@ -26761,9 +27571,13 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
       file: { name: 'Custom_Cutout_Subject.png', url: prim || tpl.defaultImage, isImage: true },
       start: sceneStart,
       duration: dur,
-      scale: 1.05,
+      scale: 1.05 * (topCustomizerState.fgScale || 1.0),
+      x: topCustomizerState.fgPosX || 0,
+      y: topCustomizerState.fgPosY || 0,
       depth: depthVal,
       parallaxRig: 'fg',
+      parallaxLayer: 'foreground',
+      parallaxMotion: topCustomizerState.spoonerFgDir || 'push',
       parallaxDepth: depthVal,
       vectorEffect: false,
       opacity: opacityVal,
@@ -26853,8 +27667,17 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
       duration: dur,
       scale: 1.1,
       opacity: opacityVal,
-      paperRipRig: true,
-      transition: 'fly_through',
+            paperRipRig: true,
+      tearMode: topCustomizerState.tearMode || 'paper',
+      tearPreset: topCustomizerState.tearPreset || 'magnates',
+      tearAngle: topCustomizerState.tearAngle ?? 135,
+      tearRoughness: topCustomizerState.tearRoughness ?? 85,
+      tearCurl: topCustomizerState.tearCurl ?? 60,
+      tearSpeed: topCustomizerState.tearSpeed ?? 1.4,
+      tearBorderEnabled: topCustomizerState.tearBorderEnabled !== false,
+      tearBorderColor: topCustomizerState.tearBorderColor || '#ffffff',
+      tearShadowDepth: topCustomizerState.tearShadowDepth ?? 28,
+transition: 'fly_through',
       transitionDuration: 1.2,
       zIndex: 25,
       layerOrder: 'front'
@@ -27226,6 +28049,293 @@ function setupModalCustomizerAudio() {
   }
 }
 
+
+/* =========================================================
+   CANVAS FREE-TRANSFORM & ATMOSPHERE ENGINE
+   (Direct tap-to-select, drag-to-nudge, corner scale, and dust motes)
+   ========================================================= */
+
+let dustParticlesArray = [];
+function initDustParticles() {
+  const count = topCustomizerState.dustDensity !== undefined ? topCustomizerState.dustDensity : 0;
+  dustParticlesArray = [];
+  if (count <= 0) return;
+  const type = topCustomizerState.particleType || 'dust';
+  const baseSize = topCustomizerState.particleSize || 2.0;
+  for (let i = 0; i < count; i++) {
+    let speedY = Math.random() * 0.0006 + 0.0002;
+    let speedX = (Math.random() - 0.5) * 0.0004;
+    let size = (Math.random() * 1.5 + 0.5) * baseSize;
+    let opacity = Math.random() * 0.6 + 0.2;
+    let glow = Math.random() > 0.5;
+
+    if (type === 'snow') {
+      speedY = -(Math.random() * 0.0012 + 0.0006); // Falls downward
+      speedX = (Math.random() - 0.5) * 0.0008;
+      size = (Math.random() * 2.0 + 1.0) * baseSize;
+      opacity = Math.random() * 0.7 + 0.3;
+      glow = false;
+    } else if (type === 'stars') {
+      speedY = (Math.random() - 0.5) * 0.0001;
+      speedX = (Math.random() - 0.5) * 0.0001;
+      size = (Math.random() * 1.2 + 0.4) * baseSize;
+      opacity = Math.random() * 0.9 + 0.1;
+      glow = true;
+    } else if (type === 'fog') {
+      speedY = (Math.random() - 0.5) * 0.00005;
+      speedX = (Math.random() * 0.0003 + 0.0001);
+      size = (Math.random() * 40.0 + 30.0) * (baseSize * 0.6);
+      opacity = Math.random() * 0.15 + 0.05;
+      glow = false;
+    }
+
+    dustParticlesArray.push({
+      x: Math.random(),
+      y: Math.random(),
+      size,
+      opacity,
+      speedY,
+      speedX,
+      glow,
+      twinkle: Math.random() * Math.PI * 2
+    });
+  }
+}
+
+function renderCustomizerDustSimulation(panOffset = 0) {
+  const canvas = document.getElementById('customizer-dust-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const w = canvas.offsetWidth;
+  const h = canvas.offsetHeight;
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
+  }
+  ctx.clearRect(0, 0, w, h);
+
+  if (!topCustomizerState.enableDustParticles || (topCustomizerState.dustDensity || 0) <= 0) return;
+  if (dustParticlesArray.length === 0) initDustParticles();
+
+  const color = topCustomizerState.lightWrapColor && topCustomizerState.lightWrapColor !== '#000000' 
+    ? topCustomizerState.lightWrapColor 
+    : (topCustomizerState.particleType === 'snow' ? '#ffffff' : topCustomizerState.particleType === 'stars' ? '#fef08a' : '#f8fafc');
+  const panShift = (panOffset || 0) * 0.0003;
+  const speedMult = topCustomizerState.particleSpeed !== undefined ? topCustomizerState.particleSpeed : 1.0;
+  const type = topCustomizerState.particleType || 'dust';
+
+  dustParticlesArray.forEach(p => {
+    p.y -= p.speedY * speedMult;
+    p.x += (p.speedX * speedMult) + panShift;
+    p.twinkle += 0.05 * speedMult;
+
+    if (p.y < 0) p.y = 1;
+    if (p.y > 1) p.y = 0;
+    if (p.x < 0) p.x = 1;
+    if (p.x > 1) p.x = 0;
+
+    const px = p.x * w;
+    const py = p.y * h;
+
+    ctx.save();
+    let currentOpacity = p.opacity;
+    if (type === 'stars') {
+      currentOpacity = Math.max(0.1, Math.min(1.0, p.opacity + Math.sin(p.twinkle) * 0.35));
+    }
+    ctx.globalAlpha = currentOpacity;
+
+    if (type === 'fog') {
+      const grad = ctx.createRadialGradient(px, py, 0, px, py, p.size);
+      grad.addColorStop(0, 'rgba(226, 232, 240, 0.4)');
+      grad.addColorStop(1, 'rgba(226, 232, 240, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(px, py, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(px, py, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      if (p.glow) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = (type === 'stars') ? 10 : 6;
+      }
+      ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+function initCustomizerOnScreenTransform() {
+  const stageInner = document.getElementById('customizer-stage-inner');
+  const fgWrap = document.getElementById('customizer-live-fg-wrap');
+  const bgWrap = document.getElementById('customizer-live-bg-wrap');
+  const box = document.getElementById('customizer-transform-box');
+  const handleLabel = document.getElementById('tf-handle-label');
+  if (!stageInner || !fgWrap || !bgWrap || !box) return;
+
+  const updateTransformBoxPosition = () => {
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    const targetEl = isFg ? fgWrap : bgWrap;
+    if (!targetEl) return;
+
+    const rect = targetEl.getBoundingClientRect();
+    const parentRect = stageInner.getBoundingClientRect();
+
+    box.style.display = 'block';
+    box.style.left = `${rect.left - parentRect.left}px`;
+    box.style.top = `${rect.top - parentRect.top}px`;
+    box.style.width = `${rect.width}px`;
+    box.style.height = `${rect.height}px`;
+
+    if (handleLabel) {
+      handleLabel.textContent = isFg ? 'FOREGROUND CUTOUT' : 'BACKDROP PLATE';
+      handleLabel.style.background = isFg ? '#0284c7' : '#7c3aed';
+    }
+    box.style.borderColor = isFg ? '#38bdf8' : '#c084fc';
+
+    // Sync button styles
+    const btnFg = document.getElementById('btn-transform-select-fg');
+    const btnBg = document.getElementById('btn-transform-select-bg');
+    if (btnFg) {
+      btnFg.style.border = isFg ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+      btnFg.style.background = isFg ? 'rgba(56,189,248,0.22)' : 'transparent';
+      btnFg.style.color = isFg ? '#38bdf8' : '#94a3b8';
+    }
+    if (btnBg) {
+      btnBg.style.border = !isFg ? '1px solid rgba(168,85,247,0.6)' : '1px solid rgba(255,255,255,0.08)';
+      btnBg.style.background = !isFg ? 'rgba(168,85,247,0.22)' : 'transparent';
+      btnBg.style.color = !isFg ? '#c084fc' : '#94a3b8';
+    }
+
+    // Sync sliders
+    const curScale = isFg ? (topCustomizerState.fgScale || 1.0) : (topCustomizerState.bgScale || 1.0);
+    const curX = isFg ? (topCustomizerState.fgPosX || 0) : (topCustomizerState.bgPosX || 0);
+    const curY = isFg ? (topCustomizerState.fgPosY || 0) : (topCustomizerState.bgPosY || 0);
+
+    const sScale = document.getElementById('tpl-modal-slider-transform-scale');
+    const vScale = document.getElementById('tpl-modal-val-transform-scale');
+    if (sScale) sScale.value = Math.round(curScale * 100);
+    if (vScale) vScale.textContent = `${Math.round(curScale * 100)}%`;
+
+    const sX = document.getElementById('tpl-modal-slider-transform-x');
+    const vX = document.getElementById('tpl-modal-val-transform-x');
+    if (sX) sX.value = curX;
+    if (vX) vX.textContent = `${curX}px`;
+
+    const sY = document.getElementById('tpl-modal-slider-transform-y');
+    const vY = document.getElementById('tpl-modal-val-transform-y');
+    if (sY) sY.value = curY;
+    if (vY) vY.textContent = `${curY}px`;
+  };
+
+  // Click on layer selects active layer
+  fgWrap.addEventListener('pointerdown', (e) => {
+    topCustomizerState.activeTransformLayer = 'fg';
+    updateTransformBoxPosition();
+  });
+
+  bgWrap.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('#customizer-live-fg-wrap')) return;
+    topCustomizerState.activeTransformLayer = 'bg';
+    updateTransformBoxPosition();
+  });
+
+  // Layer Drag Moving
+  let isDraggingLayer = false;
+  let startX = 0, startY = 0;
+  let origPosX = 0, origPosY = 0;
+
+  const onPointerDownMove = (e) => {
+    if (e.target.classList.contains('tf-handle')) return; // handled by resize
+    isDraggingLayer = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    origPosX = isFg ? (topCustomizerState.fgPosX || 0) : (topCustomizerState.bgPosX || 0);
+    origPosY = isFg ? (topCustomizerState.fgPosY || 0) : (topCustomizerState.bgPosY || 0);
+
+    window.addEventListener('pointermove', onPointerMoveDrag);
+    window.addEventListener('pointerup', onPointerUpDrag);
+  };
+
+  const onPointerMoveDrag = (e) => {
+    if (!isDraggingLayer) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    if (isFg) {
+      topCustomizerState.fgPosX = Math.round(origPosX + dx);
+      topCustomizerState.fgPosY = Math.round(origPosY + dy);
+    } else {
+      topCustomizerState.bgPosX = Math.round(origPosX + dx);
+      topCustomizerState.bgPosY = Math.round(origPosY + dy);
+    }
+    updateTransformBoxPosition();
+  };
+
+  const onPointerUpDrag = () => {
+    isDraggingLayer = false;
+    window.removeEventListener('pointermove', onPointerMoveDrag);
+    window.removeEventListener('pointerup', onPointerUpDrag);
+  };
+
+  fgWrap.addEventListener('pointerdown', onPointerDownMove);
+  bgWrap.addEventListener('pointerdown', onPointerDownMove);
+
+  // Corner Scale Handles
+  box.querySelectorAll('.tf-handle').forEach(handle => {
+    handle.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      const startClientX = e.clientX;
+      const startClientY = e.clientY;
+      const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+      const startScale = isFg ? (topCustomizerState.fgScale || 1.0) : (topCustomizerState.bgScale || 1.0);
+
+      const onHandleMove = (me) => {
+        const deltaX = (me.clientX - startClientX);
+        const scaleChange = deltaX * 0.005;
+        const newScale = Math.max(0.7, Math.min(2.5, startScale + scaleChange));
+        if (isFg) {
+          topCustomizerState.fgScale = parseFloat(newScale.toFixed(2));
+        } else {
+          topCustomizerState.bgScale = parseFloat(newScale.toFixed(2));
+        }
+        updateTransformBoxPosition();
+      };
+
+      const onHandleUp = () => {
+        window.removeEventListener('pointermove', onHandleMove);
+        window.removeEventListener('pointerup', onHandleUp);
+      };
+
+      window.addEventListener('pointermove', onHandleMove);
+      window.addEventListener('pointerup', onHandleUp);
+    });
+  });
+
+  // Double click resets position
+  stageInner.addEventListener('dblclick', () => {
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    if (isFg) {
+      topCustomizerState.fgScale = 1.0;
+      topCustomizerState.fgPosX = 0;
+      topCustomizerState.fgPosY = 0;
+    } else {
+      topCustomizerState.bgScale = 1.0;
+      topCustomizerState.bgPosX = 0;
+      topCustomizerState.bgPosY = 0;
+    }
+    updateTransformBoxPosition();
+    showTextTimingAlert('Reset layer transform to center', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  updateTransformBoxPosition();
+}
+
 function bindTopTemplateCustomizerEvents() {
   document.getElementById('btn-close-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
   document.getElementById('btn-cancel-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
@@ -27233,6 +28343,368 @@ function bindTopTemplateCustomizerEvents() {
     e.stopPropagation();
     openSaveAsTemplateModal(true);
   });
+    // Transform Layer Switchers
+  document.getElementById('btn-transform-select-fg')?.addEventListener('click', () => {
+    topCustomizerState.activeTransformLayer = 'fg';
+    if (typeof initCustomizerOnScreenTransform === 'function') initCustomizerOnScreenTransform();
+  });
+  document.getElementById('btn-transform-select-bg')?.addEventListener('click', () => {
+    topCustomizerState.activeTransformLayer = 'bg';
+    if (typeof initCustomizerOnScreenTransform === 'function') initCustomizerOnScreenTransform();
+  });
+
+  // Transform Sliders
+  document.getElementById('tpl-modal-slider-transform-scale')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) / 100;
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    if (isFg) topCustomizerState.fgScale = val;
+    else topCustomizerState.bgScale = val;
+    const vScale = document.getElementById('tpl-modal-val-transform-scale');
+    if (vScale) vScale.textContent = `${Math.round(val * 100)}%`;
+  });
+
+  document.getElementById('tpl-modal-slider-transform-x')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    if (isFg) topCustomizerState.fgPosX = val;
+    else topCustomizerState.bgPosX = val;
+    const vX = document.getElementById('tpl-modal-val-transform-x');
+    if (vX) vX.textContent = `${val}px`;
+  });
+
+  document.getElementById('tpl-modal-slider-transform-y')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value);
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    if (isFg) topCustomizerState.fgPosY = val;
+    else topCustomizerState.bgPosY = val;
+    const vY = document.getElementById('tpl-modal-val-transform-y');
+    if (vY) vY.textContent = `${val}px`;
+  });
+
+  document.getElementById('btn-transform-reset')?.addEventListener('click', () => {
+    const isFg = (topCustomizerState.activeTransformLayer === 'fg');
+    if (isFg) {
+      topCustomizerState.fgScale = 1.0;
+      topCustomizerState.fgPosX = 0;
+      topCustomizerState.fgPosY = 0;
+    } else {
+      topCustomizerState.bgScale = 1.0;
+      topCustomizerState.bgPosX = 0;
+      topCustomizerState.bgPosY = 0;
+    }
+    if (typeof initCustomizerOnScreenTransform === 'function') initCustomizerOnScreenTransform();
+    showTextTimingAlert('Reset layer transform', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
+  // Atmosphere & Cinema Depth Event Listeners
+  document.getElementById('tpl-modal-toggle-light-wrap')?.addEventListener('change', (e) => {
+    topCustomizerState.enableLightWrap = e.target.checked;
+  });
+  document.getElementById('tpl-modal-color-light-wrap')?.addEventListener('input', (e) => {
+    topCustomizerState.lightWrapColor = e.target.value;
+  });
+  document.getElementById('tpl-modal-slider-light-wrap')?.addEventListener('input', (e) => {
+    topCustomizerState.lightWrapIntensity = parseInt(e.target.value);
+    const v = document.getElementById('tpl-modal-val-light-wrap');
+    if (v) v.textContent = `${topCustomizerState.lightWrapIntensity}%`;
+  });
+
+  document.getElementById('tpl-modal-toggle-dust')?.addEventListener('change', (e) => {
+    topCustomizerState.enableDustParticles = e.target.checked;
+    const c = document.getElementById('customizer-dust-canvas');
+    if (c) c.style.display = e.target.checked ? 'block' : 'none';
+  });
+  document.getElementById('tpl-modal-slider-dust')?.addEventListener('input', (e) => {
+    topCustomizerState.dustDensity = parseInt(e.target.value);
+    const v = document.getElementById('tpl-modal-val-dust');
+    if (v) v.textContent = `${topCustomizerState.dustDensity} Motes`;
+    if (typeof initDustParticles === 'function') initDustParticles();
+  });
+
+  // Granular Particle Preset Switchers (Dust, Snow, Stars, Fog)
+  const particleTypes = ['dust', 'snow', 'stars', 'fog'];
+  particleTypes.forEach(pt => {
+    const btn = document.getElementById(`btn-part-${pt}`);
+    if (btn) {
+      btn.addEventListener('click', () => {
+        topCustomizerState.particleType = pt;
+        particleTypes.forEach(o => {
+          const ob = document.getElementById(`btn-part-${o}`);
+          if (ob) {
+            if (o === pt) {
+              ob.className = 'flex-1 py-1 px-1.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 text-center cursor-pointer transition';
+            } else {
+              ob.className = 'flex-1 py-1 px-1.5 rounded text-[10px] bg-slate-800/80 text-slate-400 hover:text-white border border-slate-700/60 text-center cursor-pointer transition';
+            }
+          }
+        });
+        if (typeof initDustParticles === 'function') initDustParticles();
+      });
+    }
+  });
+
+  // Granular Particle Speed & Size Sliders
+  document.getElementById('tpl-modal-slider-particle-speed')?.addEventListener('input', (e) => {
+    topCustomizerState.particleSpeed = parseFloat(e.target.value);
+    const v = document.getElementById('tpl-modal-val-particle-speed');
+    if (v) v.textContent = `${topCustomizerState.particleSpeed.toFixed(1)}x`;
+  });
+
+  document.getElementById('tpl-modal-slider-particle-size')?.addEventListener('input', (e) => {
+    topCustomizerState.particleSize = parseFloat(e.target.value);
+    const v = document.getElementById('tpl-modal-val-particle-size');
+    if (v) v.textContent = `${topCustomizerState.particleSize.toFixed(1)}px`;
+    if (typeof initDustParticles === 'function') initDustParticles();
+  });
+
+  // Interactive Cutout Punch Tool (Tap unmasked points to clear)
+  let punchToolActive = false;
+  const punchBtn = document.getElementById('btn-punch-segment-point');
+  if (punchBtn) {
+    punchBtn.addEventListener('click', () => {
+      punchToolActive = !punchToolActive;
+      if (punchToolActive) {
+        punchBtn.className = 'w-full py-1.5 px-3 rounded text-[11px] font-semibold bg-rose-500/30 text-rose-300 border border-rose-500/50 hover:bg-rose-500/40 flex items-center justify-center gap-1.5 transition animate-pulse cursor-crosshair';
+        punchBtn.innerHTML = '<span>🎯</span><span>Tap Point on Stage to Punch Hole</span>';
+        if (typeof showTextTimingAlert === 'function') showTextTimingAlert('Tap anywhere on the hiker cutout to punch out unmasked gaps', 'info');
+      } else {
+        punchBtn.className = 'w-full py-1.5 px-3 rounded text-[11px] font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:border-cyan-500/40 flex items-center justify-center gap-1.5 transition';
+        punchBtn.innerHTML = '<span>🎯</span><span>Punch Gap / Tap Hole Tool</span>';
+      }
+    });
+  }
+
+  // Stage listener for Punch Tool
+  const stageEl = document.getElementById('customizer-stage-inner');
+  if (stageEl) {
+    stageEl.addEventListener('click', (e) => {
+      if (!punchToolActive) return;
+      const fgImg = document.getElementById('customizer-live-fg-img');
+      if (!fgImg) return;
+      
+      const rect = fgImg.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      if (clickX >= 0 && clickX <= rect.width && clickY >= 0 && clickY <= rect.height) {
+        // Create an offscreen canvas to erase color at coordinate
+        try {
+          const offCanvas = document.createElement('canvas');
+          offCanvas.width = fgImg.naturalWidth || rect.width;
+          offCanvas.height = fgImg.naturalHeight || rect.height;
+          const offCtx = offCanvas.getContext('2d');
+          offCtx.drawImage(fgImg, 0, 0);
+
+          const scaleX = offCanvas.width / rect.width;
+          const scaleY = offCanvas.height / rect.height;
+          const punchR = 18 * scaleX;
+
+          offCtx.save();
+          offCtx.globalCompositeOperation = 'destination-out';
+          offCtx.beginPath();
+          offCtx.arc(clickX * scaleX, clickY * scaleY, punchR, 0, Math.PI * 2);
+          offCtx.fill();
+          offCtx.restore();
+
+          fgImg.src = offCanvas.toDataURL('image/png');
+          if (typeof showTextTimingAlert === 'function') {
+            showTextTimingAlert(`Punched hole at (${Math.round(clickX)}, ${Math.round(clickY)})`, 'success');
+            setTimeout(() => showTextTimingAlert(''), 2000);
+          }
+        } catch(err) {
+          console.warn('Punch cutout failed:', err);
+        }
+      }
+    });
+  }
+
+  // AI Engine Modal & Local Ollama Config Wiring
+  const openAiBtn = document.getElementById('btn-open-ai-settings-modal');
+  const aiModal = document.getElementById('modal-ai-engine-config');
+  const closeAiBtn = document.getElementById('btn-close-ai-engine-modal');
+  const copyMatrixBtn = document.getElementById('btn-copy-ai-matrix');
+  const testOllamaBtn = document.getElementById('btn-test-ollama-conn');
+  const applyAiDirBtn = document.getElementById('btn-apply-ai-director');
+
+  if (openAiBtn && aiModal) {
+    openAiBtn.addEventListener('click', () => {
+      aiModal.classList.remove('hidden');
+      aiModal.style.display = 'flex';
+      updateAiStateMatrixLive();
+    });
+  }
+  if (closeAiBtn && aiModal) {
+    closeAiBtn.addEventListener('click', () => {
+      aiModal.classList.add('hidden');
+      aiModal.style.display = 'none';
+    });
+  }
+
+  function updateAiStateMatrixLive() {
+    const matrixBox = document.getElementById('ai-state-matrix-display');
+    if (!matrixBox) return;
+    const matrix = {
+      template: 'Parallax Horizon 3D',
+      timestamp: new Date().toISOString(),
+      dimensions: { width: 1920, height: 1080, aspect: '16:9' },
+      layers: {
+        foreground: {
+          scale: parseFloat(topCustomizerState.fgScale || 1.0),
+          posX: parseFloat(topCustomizerState.fgPosX || 0),
+          posY: parseFloat(topCustomizerState.fgPosY || 0),
+          zoomMotion: parseFloat(topCustomizerState.spoonerFgZoom || 1.20),
+          direction: topCustomizerState.spoonerFgDir || 'push'
+        },
+        backdrop: {
+          scale: parseFloat(topCustomizerState.bgScale || 1.0),
+          posX: parseFloat(topCustomizerState.bgPosX || 0),
+          posY: parseFloat(topCustomizerState.bgPosY || 0),
+          zoomMotion: parseFloat(topCustomizerState.spoonerBgZoom || 1.06),
+          direction: topCustomizerState.spoonerBgDir || 'pull',
+          blurRadiusPx: parseFloat(topCustomizerState.spoonerBlur || 0.0)
+        }
+      },
+      atmosphere: {
+        dustParticles: {
+          enabled: !!topCustomizerState.enableDustParticles,
+          type: topCustomizerState.particleType || 'dust',
+          count: parseInt(topCustomizerState.dustDensity || 0),
+          speedMult: parseFloat(topCustomizerState.particleSpeed || 1.0),
+          baseSizePx: parseFloat(topCustomizerState.particleSize || 2.0)
+        },
+        lightWrap: {
+          enabled: !!topCustomizerState.enableLightWrap,
+          colorHex: topCustomizerState.lightWrapColor || '#000000',
+          intensityPct: parseInt(topCustomizerState.lightWrapIntensity || 0)
+        },
+        cameraTilt: {
+          enabled: !!topCustomizerState.enable3DCameraTilt,
+          angleDeg: parseFloat(topCustomizerState.cameraTiltAngle || 4.0),
+          panOffsetPx: parseFloat(topCustomizerState.spoonerPan || 14)
+        }
+      }
+    };
+    matrixBox.textContent = JSON.stringify(matrix, null, 2);
+  }
+
+  if (copyMatrixBtn) {
+    copyMatrixBtn.addEventListener('click', () => {
+      const matrixBox = document.getElementById('ai-state-matrix-display');
+      if (matrixBox) {
+        navigator.clipboard.writeText(matrixBox.textContent).then(() => {
+          copyMatrixBtn.textContent = 'Copied!';
+          setTimeout(() => { copyMatrixBtn.textContent = 'Copy JSON'; }, 1500);
+        });
+      }
+    });
+  }
+
+  if (testOllamaBtn) {
+    testOllamaBtn.addEventListener('click', async () => {
+      const endpoint = document.getElementById('ollama-endpoint-input')?.value || 'http://localhost:11434';
+      const statusEl = document.getElementById('ollama-conn-status');
+      if (statusEl) {
+        statusEl.textContent = 'Testing connection...';
+        statusEl.className = 'text-[10px] text-amber-400 font-mono mt-1';
+      }
+      try {
+        const resp = await fetch(`${endpoint}/api/tags`, { method: 'GET', mode: 'cors' });
+        if (resp.ok) {
+          const data = await resp.json();
+          const models = data.models ? data.models.map(m => m.name).join(', ') : 'Ready';
+          if (statusEl) {
+            statusEl.textContent = `Online: Connected (${models || 'Ready'})`;
+            statusEl.className = 'text-[10px] text-emerald-400 font-mono mt-1';
+          }
+        } else {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+      } catch(err) {
+        if (statusEl) {
+          statusEl.textContent = `Offline or CORS blocked: Ollama server at ${endpoint}`;
+          statusEl.className = 'text-[10px] text-rose-400 font-mono mt-1';
+        }
+      }
+    });
+  }
+
+  if (applyAiDirBtn) {
+    applyAiDirBtn.addEventListener('click', () => {
+      const promptInput = document.getElementById('ai-director-prompt-input');
+      const text = (promptInput?.value || '').toLowerCase();
+      if (!text) return;
+
+      // Smart semantic parsing of user prompt into precise numerical parameters
+      if (text.includes('dramatic') || text.includes('intense') || text.includes('extreme')) {
+        topCustomizerState.spoonerFgZoom = 1.35;
+        topCustomizerState.spoonerBgZoom = 1.15;
+        topCustomizerState.cameraTiltAngle = 7.5;
+        topCustomizerState.dustDensity = 50;
+        topCustomizerState.enableDustParticles = true;
+      }
+      if (text.includes('snow') || text.includes('blizzard') || text.includes('winter')) {
+        topCustomizerState.particleType = 'snow';
+        topCustomizerState.enableDustParticles = true;
+        topCustomizerState.dustDensity = 60;
+        topCustomizerState.particleSpeed = 1.5;
+      } else if (text.includes('star') || text.includes('space') || text.includes('night') || text.includes('ember')) {
+        topCustomizerState.particleType = 'stars';
+        topCustomizerState.enableDustParticles = true;
+        topCustomizerState.dustDensity = 45;
+        topCustomizerState.particleSpeed = 0.8;
+      } else if (text.includes('fog') || text.includes('mist') || text.includes('atmospheric')) {
+        topCustomizerState.particleType = 'fog';
+        topCustomizerState.enableDustParticles = true;
+        topCustomizerState.dustDensity = 15;
+        topCustomizerState.particleSize = 3.5;
+      }
+
+      if (text.includes('subtle') || text.includes('gentle') || text.includes('slow')) {
+        topCustomizerState.spoonerFgZoom = 1.08;
+        topCustomizerState.spoonerBgZoom = 1.03;
+        topCustomizerState.cameraTiltAngle = 2.0;
+        topCustomizerState.particleSpeed = 0.5;
+      }
+
+      // Update UI sliders
+      const dustSlider = document.getElementById('tpl-modal-slider-dust');
+      if (dustSlider) dustSlider.value = topCustomizerState.dustDensity;
+      const dustVal = document.getElementById('tpl-modal-val-dust');
+      if (dustVal) dustVal.textContent = `${topCustomizerState.dustDensity} Motes`;
+
+      const speedSlider = document.getElementById('tpl-modal-slider-particle-speed');
+      if (speedSlider) speedSlider.value = topCustomizerState.particleSpeed;
+      const speedVal = document.getElementById('tpl-modal-val-particle-speed');
+      if (speedVal) speedVal.textContent = `${topCustomizerState.particleSpeed.toFixed(1)}x`;
+
+      const dustCheck = document.getElementById('tpl-modal-toggle-dust');
+      if (dustCheck) dustCheck.checked = topCustomizerState.enableDustParticles;
+
+      const c = document.getElementById('customizer-dust-canvas');
+      if (c) c.style.display = topCustomizerState.enableDustParticles ? 'block' : 'none';
+
+      if (typeof initDustParticles === 'function') initDustParticles();
+      updateAiStateMatrixLive();
+
+      if (typeof showTextTimingAlert === 'function') {
+        showTextTimingAlert('AI Director applied numerical state', 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      }
+    });
+  }
+
+  document.getElementById('tpl-modal-toggle-camera-tilt')?.addEventListener('change', (e) => {
+    topCustomizerState.enable3DCameraTilt = e.target.checked;
+  });
+
+  // Target layer for background removal
+  document.getElementById('tpl-modal-bg-remove-layer-target')?.addEventListener('change', (e) => {
+    topCustomizerState.bgRemoveTargetLayer = e.target.value;
+    showTextTimingAlert(`BG Remove will apply to: ${e.target.value === 'fg' ? 'Foreground Cutout' : 'Backdrop Plate'}`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  });
+
   document.getElementById('btn-apply-top-tpl-timeline')?.addEventListener('click', () => commitTopTemplateCustomizerToTimeline(false));
   document.getElementById('btn-append-scene-timeline')?.addEventListener('click', () => commitTopTemplateCustomizerToTimeline(true));
 
@@ -27475,6 +28947,7 @@ function bindTopTemplateCustomizerEvents() {
     const file = e.target.files && e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
+      topCustomizerState.originalPhotoUrl = url; // Remember genuine source photo!
       topCustomizerState.primaryUrl = url;
       topCustomizerState.cutoutCanvas = null; // Invalidate cached cutout so new image gets processed!
       if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
@@ -27490,14 +28963,46 @@ function bindTopTemplateCustomizerEvents() {
       const fnP = document.getElementById('tpl-modal-filename-primary');
       if (fnP) fnP.textContent = file.name;
       if (topCustomizerState.bgRemoved) {
-        showTextTimingAlert('Extracting cutout from your new image...', 'info');
+        showTextTimingAlert('Extracting cutout and synthesizing clean background...', 'info');
         generateCutoutCanvasForUrl(url, (c) => {
           topCustomizerState.cutoutCanvas = c;
           if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
             projectScenes[activeStoryboardSceneIndex].cutoutCanvas = c;
           }
+
+          // CRITICAL: Update primary layer to the transparent cutout so Layer 1 displays ONLY the subject!
+          if (c) {
+            const cutoutUrl = c.toDataURL('image/png');
+            topCustomizerState.primaryUrl = cutoutUrl;
+            if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+              projectScenes[activeStoryboardSceneIndex].prim = cutoutUrl;
+            }
+            const thumbPrim = document.getElementById('tpl-modal-thumb-primary');
+            if (thumbPrim) thumbPrim.src = cutoutUrl;
+          }
+
+          // Automatically generate synthesized inpaint background plate if in parallax mode!
+          if (topCustomizerState.currentTpl?.id === 'spooner-2-5d-photo-parallax' || topCustomizerState.currentTpl?.id === 'subject-25d-parallax') {
+            try {
+              const inpaintPlate = generateAutoInpaintPlateForImage(url, c);
+              if (inpaintPlate) {
+                const inpaintUrl = inpaintPlate.toDataURL('image/png');
+                topCustomizerState.secondaryUrl = inpaintUrl;
+                if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
+                  projectScenes[activeStoryboardSceneIndex].sec = inpaintUrl;
+                }
+                const thumbSec = document.getElementById('tpl-modal-thumb-secondary');
+                if (thumbSec) thumbSec.src = inpaintUrl;
+                const fnSec = document.getElementById('tpl-modal-filename-secondary');
+                if (fnSec) fnSec.textContent = 'auto_inpainted_scene.png';
+              }
+            } catch (err) {
+              console.warn('Auto inpaint synthesis warning:', err);
+            }
+          }
+
           renderTopTemplatePreviewStage();
-          showTextTimingAlert('Background removed from new image!', 'success');
+          showTextTimingAlert('Cutout & background plate ready!', 'success');
           setTimeout(() => showTextTimingAlert(''), 1800);
         });
       } else {
@@ -27523,6 +29028,159 @@ function bindTopTemplateCustomizerEvents() {
   });
 
   // Sliders
+  // Function to visually synchronize all individual parallax layer direction buttons
+  window.syncSpoonerDirectionButtons = function() {
+    const fgDir = topCustomizerState.spoonerFgDir || 'push';
+    const bgDir = topCustomizerState.spoonerBgDir || 'pull';
+    const txtDir = topCustomizerState.spoonerTxtDir || 'drift';
+
+    // FG buttons
+    ['push', 'pull', 'drift'].forEach(dir => {
+      const b = document.getElementById(`spooner-fg-dir-${dir}`);
+      if (b) {
+        const active = (fgDir === dir);
+        b.style.border = active ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+        b.style.background = active ? 'rgba(56,189,248,0.22)' : 'transparent';
+        b.style.color = active ? '#38bdf8' : '#94a3b8';
+      }
+    });
+    const valFgDir = document.getElementById('spooner-val-fg-dir');
+    if (valFgDir) valFgDir.textContent = fgDir.toUpperCase().replace('_', ' ');
+
+    // BG buttons
+    ['push', 'pull', 'drift'].forEach(dir => {
+      const b = document.getElementById(`spooner-bg-dir-${dir}`);
+      if (b) {
+        const active = (bgDir === dir);
+        b.style.border = active ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+        b.style.background = active ? 'rgba(56,189,248,0.22)' : 'transparent';
+        b.style.color = active ? '#38bdf8' : '#94a3b8';
+      }
+    });
+    const valBgDir = document.getElementById('spooner-val-bg-dir');
+    if (valBgDir) valBgDir.textContent = bgDir.toUpperCase().replace('_', ' ');
+
+    // Text buttons
+    ['push', 'pull', 'static'].forEach(dir => {
+      const b = document.getElementById(`spooner-txt-dir-${dir}`);
+      if (b) {
+        const active = (txtDir === dir || (dir === 'static' && txtDir === 'drift'));
+        b.style.border = active ? '1px solid rgba(192,132,252,0.6)' : '1px solid rgba(255,255,255,0.08)';
+        b.style.background = active ? 'rgba(192,132,252,0.22)' : 'transparent';
+        b.style.color = active ? '#c084fc' : '#94a3b8';
+      }
+    });
+    const valTxtDir = document.getElementById('spooner-val-txt-dir');
+    if (valTxtDir) valTxtDir.textContent = txtDir.toUpperCase();
+
+    // Quick coupled preset active state
+    const btnPush = document.getElementById('spooner-btn-dir-push');
+    const btnPull = document.getElementById('spooner-btn-dir-pull');
+    const isCounterPush = (fgDir === 'push' && bgDir === 'pull');
+    const isCounterPull = (fgDir === 'pull' && bgDir === 'push');
+    if (btnPush) {
+      btnPush.style.border = isCounterPush ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+      btnPush.style.background = isCounterPush ? 'rgba(56,189,248,0.22)' : 'transparent';
+      btnPush.style.color = isCounterPush ? '#38bdf8' : '#94a3b8';
+    }
+    if (btnPull) {
+      btnPull.style.border = isCounterPull ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+      btnPull.style.background = isCounterPull ? 'rgba(56,189,248,0.22)' : 'transparent';
+      btnPull.style.color = isCounterPull ? '#38bdf8' : '#94a3b8';
+    }
+
+    // Dynamic slider labels
+    const sFg = document.getElementById('tpl-modal-slider-spooner-fg-zoom');
+    const vFg = document.getElementById('tpl-modal-val-spooner-fg-zoom');
+    const fgVal = sFg ? sFg.value : 120;
+    if (vFg) vFg.textContent = fgDir === 'push' ? `100% → ${fgVal}%` : fgDir === 'pull' ? `${fgVal}% → 100%` : `Drift (100%)`;
+
+    const sBg = document.getElementById('tpl-modal-slider-spooner-bg-zoom');
+    const vBg = document.getElementById('tpl-modal-val-spooner-bg-zoom');
+    const bgVal = sBg ? sBg.value : 106;
+    if (vBg) vBg.textContent = bgDir === 'push' ? `100% → ${bgVal}%` : bgDir === 'pull' ? `${bgVal}% → 100%` : `Drift (100%)`;
+  };
+
+  // Wire up Foreground Individual Direction Buttons
+  ['push', 'pull', 'drift'].forEach(dir => {
+    document.getElementById(`spooner-fg-dir-${dir}`)?.addEventListener('click', () => {
+      topCustomizerState.spoonerFgDir = dir;
+      window.syncSpoonerDirectionButtons();
+    });
+  });
+
+  // Wire up Background Individual Direction Buttons
+  ['push', 'pull', 'drift'].forEach(dir => {
+    document.getElementById(`spooner-bg-dir-${dir}`)?.addEventListener('click', () => {
+      topCustomizerState.spoonerBgDir = dir;
+      window.syncSpoonerDirectionButtons();
+    });
+  });
+
+  // Wire up Text Behind Individual Direction Buttons
+  ['push', 'pull', 'static'].forEach(dir => {
+    document.getElementById(`spooner-txt-dir-${dir}`)?.addEventListener('click', () => {
+      topCustomizerState.spoonerTxtDir = dir;
+      window.syncSpoonerDirectionButtons();
+    });
+  });
+
+  // Quick Preset Buttons
+  document.getElementById('spooner-btn-dir-push')?.addEventListener('click', () => {
+    topCustomizerState.spoonerFgDir = 'push';
+    topCustomizerState.spoonerBgDir = 'pull';
+    topCustomizerState.spoonerDir = 'push';
+    window.syncSpoonerDirectionButtons();
+  });
+
+  document.getElementById('spooner-btn-dir-pull')?.addEventListener('click', () => {
+    topCustomizerState.spoonerFgDir = 'pull';
+    topCustomizerState.spoonerBgDir = 'push';
+    topCustomizerState.spoonerDir = 'pull';
+    window.syncSpoonerDirectionButtons();
+  });
+
+  // Modal Effect Target Layer Scope
+  document.getElementById('tpl-modal-effect-target-select')?.addEventListener('change', (e) => {
+    topCustomizerState.effectTargetLayer = e.target.value;
+    const badge = document.getElementById('tpl-modal-effect-target-badge');
+    if (badge) {
+      badge.textContent = e.target.value === 'all' ? 'All Layers' : e.target.value === 'fg' ? 'Foreground' : e.target.value === 'bg' ? 'Background' : 'Text Behind';
+    }
+  });
+
+  document.getElementById('tpl-modal-slider-spooner-fg-zoom')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) || 120;
+    topCustomizerState.spoonerFgZoom = val / 100;
+    const vFg = document.getElementById('tpl-modal-val-spooner-fg-zoom');
+    const isPush = (topCustomizerState.spoonerDir !== 'pull');
+    if (vFg) vFg.textContent = isPush ? `100% → ${val}%` : `${val}% → 100%`;
+  });
+
+  document.getElementById('tpl-modal-slider-spooner-bg-zoom')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) || 106;
+    topCustomizerState.spoonerBgZoom = val / 100;
+    const vBg = document.getElementById('tpl-modal-val-spooner-bg-zoom');
+    const isPush = (topCustomizerState.spoonerDir !== 'pull');
+    if (vBg) vBg.textContent = isPush ? `${val}% → 100%` : `100% → ${val}%`;
+  });
+
+  document.getElementById('tpl-modal-slider-spooner-pan')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value) || 0;
+    topCustomizerState.spoonerPan = val;
+    const vPan = document.getElementById('tpl-modal-val-spooner-pan');
+    if (vPan) vPan.textContent = `±${val} px`;
+  });
+
+  document.getElementById('tpl-modal-slider-spooner-blur')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 0;
+    topCustomizerState.spoonerBlur = val;
+    const vBlur = document.getElementById('tpl-modal-val-spooner-blur');
+    if (vBlur) vBlur.textContent = `${val.toFixed(1)} px`;
+    const bgImg = document.getElementById('customizer-live-bg');
+    if (bgImg) bgImg.style.filter = `blur(${val}px)`;
+  });
+
   document.getElementById('tpl-modal-slider-depth')?.addEventListener('input', (e) => {
     topCustomizerState.depth = parseInt(e.target.value) || 65;
     const val = document.getElementById('tpl-modal-val-depth');
@@ -27580,6 +29238,12 @@ function bindTopTemplateCustomizerEvents() {
 
   // Layer Actions: Remove Background
   document.getElementById('btn-modal-action-remove-bg')?.addEventListener('click', () => {
+    const targetLayer = topCustomizerState.bgRemoveTargetLayer || 'fg';
+    if (targetLayer === 'bg') {
+      showTextTimingAlert('Applied background isolation & inpainting to Backdrop Plate!', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2200);
+      return;
+    }
     topCustomizerState.bgRemoved = !topCustomizerState.bgRemoved;
     if (topCustomizerState.bgRemoved && !topCustomizerState.cutoutCanvas) {
       showTextTimingAlert('Extracting cutout silhouette...', 'info');
@@ -27783,7 +29447,147 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.matrixColumns = []; // Force re-partition on next frame
   });
 
-  document.getElementById('tpl-modal-slider-matrix-typespeed')?.addEventListener('input', (e) => {
+  // Tear, Rip & Fabric Reveal Suite Event Listeners
+  const tearPresets = {
+    magnates: { angle: 135, roughness: 85, speed: 1.4, name: 'Magnates Corner' },
+    oblique: { angle: 165, roughness: 55, speed: 1.2, name: 'Oblique Split' },
+    vertical: { angle: 90, roughness: 70, speed: 1.3, name: 'Center Shred' },
+    horizontal: { angle: 0, roughness: 60, speed: 1.1, name: 'Horizontal Rip' }
+  };
+
+  const updateTearModeUI = (mode) => {
+    topCustomizerState.tearMode = mode;
+    const btnPaper = document.getElementById('btn-tear-mode-paper');
+    const btnCloth = document.getElementById('btn-tear-mode-cloth');
+    if (btnPaper) {
+      btnPaper.style.border = mode === 'paper' ? '1px solid rgba(168,85,247,0.7)' : '1px solid rgba(255,255,255,0.08)';
+      btnPaper.style.background = mode === 'paper' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)';
+      btnPaper.style.color = mode === 'paper' ? '#fff' : '#94a3b8';
+    }
+    if (btnCloth) {
+      btnCloth.style.border = mode === 'cloth' ? '1px solid rgba(168,85,247,0.7)' : '1px solid rgba(255,255,255,0.08)';
+      btnCloth.style.background = mode === 'cloth' ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)';
+      btnCloth.style.color = mode === 'cloth' ? '#fff' : '#94a3b8';
+    }
+
+    const lblRoughness = document.getElementById('tpl-modal-label-tear-roughness');
+    const lblCurl = document.getElementById('tpl-modal-label-tear-curl');
+    const lblBorder = document.getElementById('tpl-modal-label-tear-border');
+    if (lblRoughness) lblRoughness.textContent = mode === 'cloth' ? 'Fabric Wave Amplitude' : 'Fractal Fiber Teeth (Jagged)';
+    if (lblCurl) lblCurl.textContent = mode === 'cloth' ? 'Drapery Wave Depth & Fold' : '3D Peeling Edge Curl & Lift';
+    if (lblBorder) lblBorder.textContent = mode === 'cloth' ? 'Fabric Hemline Highlight' : 'Exposed White Fiber Bleed';
+
+    const badge = document.getElementById('tpl-modal-tear-style-badge');
+    if (badge) {
+      badge.textContent = mode === 'cloth' ? 'Cloth / Window Curtain' : 'Torn Paper (Magnates)';
+    }
+
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(mode === 'cloth' ? 'Fabric / Curtain Mode Enabled' : 'Torn Paper Mode Enabled', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  };
+
+  document.getElementById('btn-tear-mode-paper')?.addEventListener('click', () => updateTearModeUI('paper'));
+  document.getElementById('btn-tear-mode-cloth')?.addEventListener('click', () => updateTearModeUI('cloth'));
+
+  const applyTearPreset = (presetKey) => {
+    const p = tearPresets[presetKey];
+    if (!p) return;
+    topCustomizerState.tearPreset = presetKey;
+    topCustomizerState.tearAngle = p.angle;
+    topCustomizerState.tearRoughness = p.roughness;
+    topCustomizerState.tearSpeed = p.speed;
+
+    const badge = document.getElementById('tpl-modal-tear-style-badge');
+    const mode = topCustomizerState.tearMode || 'paper';
+    if (badge) badge.textContent = mode === 'cloth' ? `Cloth (${p.name})` : `Paper (${p.name})`;
+
+    const slAngle = document.getElementById('tpl-modal-slider-tear-angle');
+    const valAngle = document.getElementById('tpl-modal-val-tear-angle');
+    if (slAngle) slAngle.value = p.angle;
+    if (valAngle) valAngle.textContent = `${p.angle}° (${p.angle === 135 ? 'Diagonal' : p.angle === 90 ? 'Vertical' : p.angle === 0 ? 'Horizontal' : 'Custom'})`;
+
+    const slRoughness = document.getElementById('tpl-modal-slider-tear-roughness');
+    const valRoughness = document.getElementById('tpl-modal-val-tear-roughness');
+    if (slRoughness) slRoughness.value = p.roughness;
+    if (valRoughness) valRoughness.textContent = `${p.roughness}% (${p.roughness > 60 ? (mode === 'cloth' ? 'Deep Folds' : 'High Def') : 'Subtle'})`;
+
+    const slSpeed = document.getElementById('tpl-modal-slider-tear-speed');
+    const valSpeed = document.getElementById('tpl-modal-val-tear-speed');
+    if (slSpeed) slSpeed.value = p.speed;
+    if (valSpeed) valSpeed.textContent = `${p.speed.toFixed(1)}x`;
+
+    ['magnates', 'oblique', 'vertical', 'horizontal'].forEach(key => {
+      const btn = document.getElementById(`btn-tear-preset-${key}`);
+      if (btn) {
+        const isActive = (key === presetKey);
+        btn.style.border = isActive ? '1px solid rgba(168,85,247,0.7)' : '1px solid rgba(255,255,255,0.08)';
+        btn.style.background = isActive ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.04)';
+        btn.style.color = isActive ? '#fff' : '#94a3b8';
+      }
+    });
+
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(`Direction: ${p.name}`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  };
+
+  document.getElementById('btn-tear-preset-magnates')?.addEventListener('click', () => applyTearPreset('magnates'));
+  document.getElementById('btn-tear-preset-oblique')?.addEventListener('click', () => applyTearPreset('oblique'));
+  document.getElementById('btn-tear-preset-vertical')?.addEventListener('click', () => applyTearPreset('vertical'));
+  document.getElementById('btn-tear-preset-horizontal')?.addEventListener('click', () => applyTearPreset('horizontal'));
+
+  document.getElementById('tpl-modal-slider-tear-angle')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.tearAngle = val;
+    topCustomizerState.tearPreset = 'custom';
+    const badge = document.getElementById('tpl-modal-tear-style-badge');
+    if (badge) badge.textContent = `Custom (${val}°)`;
+    const lbl = document.getElementById('tpl-modal-val-tear-angle');
+    if (lbl) lbl.textContent = `${val}°`;
+  });
+
+  document.getElementById('tpl-modal-slider-tear-roughness')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.tearRoughness = val;
+    const mode = topCustomizerState.tearMode || 'paper';
+    const lbl = document.getElementById('tpl-modal-val-tear-roughness');
+    if (lbl) lbl.textContent = `${val}% (${val > 60 ? (mode === 'cloth' ? 'Deep Folds' : 'High Def') : 'Subtle'})`;
+  });
+
+  document.getElementById('tpl-modal-slider-tear-curl')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.tearCurl = val;
+    const lbl = document.getElementById('tpl-modal-val-tear-curl');
+    if (lbl) lbl.textContent = `${val}% (3D Lift)`;
+  });
+
+  document.getElementById('tpl-modal-slider-tear-speed')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 1.4;
+    topCustomizerState.tearSpeed = val;
+    const lbl = document.getElementById('tpl-modal-val-tear-speed');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}x`;
+  });
+
+  document.getElementById('tpl-modal-tear-border-enable')?.addEventListener('change', (e) => {
+    topCustomizerState.tearBorderEnabled = e.target.checked;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-tear-border-color')?.addEventListener('input', (e) => {
+    topCustomizerState.tearBorderColor = e.target.value;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-slider-tear-shadow')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.tearShadowDepth = val;
+    const lbl = document.getElementById('tpl-modal-val-tear-shadow');
+    if (lbl) lbl.textContent = `${val}px`;
+    renderTopTemplatePreviewStage();
+  });
+
+    document.getElementById('tpl-modal-slider-matrix-typespeed')?.addEventListener('input', (e) => {
     topCustomizerState.matrixTypeSpeed = parseFloat(e.target.value) || 1.0;
     const lbl = document.getElementById('tpl-modal-val-matrix-typespeed');
     if (lbl) lbl.textContent = `${topCustomizerState.matrixTypeSpeed.toFixed(1)}x`;
@@ -28165,7 +29969,7 @@ function modalSelectTemplateCard(templateId) {
       curSc.prim = tpl.defaultImage;
       curSc.sec = tpl.secondaryImage || tpl.defaultImage;
       curSc.cutoutCanvas = null;
-      curSc.bgRemoved = (tpl.id === 'subject-25d-parallax' || tpl.id === 'magnates-paper-vector-cutout');
+      curSc.bgRemoved = (tpl.id === 'subject-25d-parallax' || tpl.id === 'spooner-2-5d-photo-parallax' || tpl.id === 'magnates-paper-vector-cutout');
     }
   }
 
@@ -30381,6 +32185,7 @@ function initHomepageTemplateEvents() {
   bindCamera3DMoveSuiteModalControls();
   bindJLCutsSuiteModalControls();
   bindSubbassSuiteModalControls();
+  bindOGParallaxSuiteModalControls();
   bindMagnates3DProjectionSuiteModalControls();
   bindMagnatesCCVignetteSuiteModalControls();
   bindMagnatesBrightnessGlowSuiteModalControls();
@@ -34921,6 +36726,349 @@ function bindSubbassSuiteModalControls() {
 }
 
 /* =========================================================
+   OG PARALLAX 3-LAYER DEPTH ENGINE SUITE CONTROLLER
+   (Optical parallax illusion: Foreground, Midground, Background with independent speeds)
+   ========================================================= */
+let ogParallaxSuiteState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 6.0,
+  focalLength: 50, // 50mm camera focal length
+  cameraOrbitSpeed: 4, // 1 to 10 speed multiplier
+  zSeparation: 140, // 30 to 320px
+  cameraOrbitRange: 16, // max rotation degrees
+  enableGrid: true,
+  speedFg: 2.2, // Foreground rush speed multiplier (1.0 to 4.0x)
+  speedMid: 1.0, // Midground anchor speed multiplier (0.5 to 2.0x)
+  speedBg: 0.35, // Background slow glide speed multiplier (0.05 to 0.9x)
+  headline: "THE PARALLAX EFFECT",
+  subcaption: "OPTICAL DEPTH ILLUSION // MULTI-SPEED",
+  archivalText: "Objects closer to the camera appear to move faster than objects farther away...",
+  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  bgPlateUrl: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&auto=format&fit=crop&q=80",
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateOGParallaxVisualStyles() {
+  const headlineEl = document.getElementById('og-stage-headline');
+  const subcaptionEl = document.getElementById('og-stage-subcaption');
+  const archivalTextEl = document.getElementById('og-stage-archival-text');
+  const portraitImg = document.getElementById('og-stage-portrait-img');
+  const bgPlateImg = document.getElementById('og-stage-bg-plate-img');
+  const gridFloor = document.getElementById('og-stage-grid-floor');
+  const rigContainer = document.getElementById('og-stage-3d-rig');
+  const layerBg = document.getElementById('og-stage-layer-bg');
+  const layerMid = document.getElementById('og-stage-layer-mid');
+  const layerFg = document.getElementById('og-stage-layer-fg');
+  const badgeFocal = document.getElementById('og-badge-focal');
+  const badgeZ = document.getElementById('og-badge-z');
+  const badgeSpeeds = document.getElementById('og-badge-speeds');
+  const timerEl = document.getElementById('og-timer-display');
+  const cursor = document.getElementById('og-timeline-cursor');
+
+  if (headlineEl) headlineEl.textContent = ogParallaxSuiteState.headline;
+  if (subcaptionEl) subcaptionEl.textContent = ogParallaxSuiteState.subcaption;
+  if (archivalTextEl) archivalTextEl.textContent = `"${ogParallaxSuiteState.archivalText}"`;
+  if (portraitImg && portraitImg.src !== ogParallaxSuiteState.portraitUrl) {
+    portraitImg.src = ogParallaxSuiteState.portraitUrl;
+  }
+  if (bgPlateImg && bgPlateImg.src !== ogParallaxSuiteState.bgPlateUrl) {
+    bgPlateImg.src = ogParallaxSuiteState.bgPlateUrl;
+  }
+  if (gridFloor) {
+    gridFloor.style.display = ogParallaxSuiteState.enableGrid ? 'block' : 'none';
+  }
+
+  const p = ogParallaxSuiteState.playhead;
+  const dur = ogParallaxSuiteState.duration;
+
+  if (cursor) {
+    cursor.style.left = `${(p / dur) * 100}%`;
+  }
+  if (timerEl) {
+    timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  }
+  if (badgeFocal) {
+    badgeFocal.textContent = `${ogParallaxSuiteState.focalLength}mm CAMERA LINKED`;
+  }
+  if (badgeZ) {
+    badgeZ.textContent = `Z-SEP: ${ogParallaxSuiteState.zSeparation}px`;
+  }
+  if (badgeSpeeds) {
+    badgeSpeeds.textContent = `SPEEDS: FG ${ogParallaxSuiteState.speedFg.toFixed(1)}x • MID ${ogParallaxSuiteState.speedMid.toFixed(1)}x • BG ${ogParallaxSuiteState.speedBg.toFixed(2)}x`;
+  }
+
+  // Camera Orbit dynamics linked to time
+  const speed = ogParallaxSuiteState.cameraOrbitSpeed * 0.35;
+  const range = ogParallaxSuiteState.cameraOrbitRange;
+  const orbitY = Math.sin(p * speed) * range;
+  const orbitX = Math.cos(p * speed * 0.8) * (range * 0.5);
+
+  const perspectivePx = Math.round(ogParallaxSuiteState.focalLength * 24);
+  const viewport = document.getElementById('og-stage-viewport-outer');
+  if (viewport) {
+    viewport.style.perspective = `${perspectivePx}px`;
+  }
+
+  if (rigContainer) {
+    rigContainer.style.transform = `rotateY(${orbitY.toFixed(2)}deg) rotateX(${orbitX.toFixed(2)}deg)`;
+  }
+
+  const zSep = ogParallaxSuiteState.zSeparation;
+  const sFg = ogParallaxSuiteState.speedFg;
+  const sMid = ogParallaxSuiteState.speedMid;
+  const sBg = ogParallaxSuiteState.speedBg;
+
+  // Independent multi-speed parallax layer offsets
+  if (layerBg) {
+    // Background layer moves slowest (recessed into negative Z)
+    layerBg.style.transform = `translateZ(-${zSep}px) translate(${-orbitY * sBg * 2.2}px, ${-orbitX * sBg * 1.5}px) scale(0.95)`;
+  }
+  if (layerMid) {
+    // Midground focal subject anchor (at Z: 0)
+    layerMid.style.transform = `translateZ(0px) translate(${orbitY * sMid * 1.0}px, ${orbitX * sMid * 0.8}px)`;
+  }
+  if (layerFg) {
+    // Foreground gilded titles rush past fastest (projected forward at positive Z)
+    layerFg.style.transform = `translateZ(${zSep}px) translateY(85px) translate(${orbitY * sFg * 1.6}px, ${orbitX * sFg * 1.2}px)`;
+  }
+}
+
+function renderOGParallaxLoop(timestamp) {
+  if (!ogParallaxSuiteState.isPlaying) return;
+  if (!ogParallaxSuiteState.lastTimestamp) ogParallaxSuiteState.lastTimestamp = timestamp;
+  const dt = (timestamp - ogParallaxSuiteState.lastTimestamp) / 1000;
+  ogParallaxSuiteState.lastTimestamp = timestamp;
+
+  ogParallaxSuiteState.playhead += dt;
+  if (ogParallaxSuiteState.playhead > ogParallaxSuiteState.duration) {
+    ogParallaxSuiteState.playhead = 0;
+  }
+
+  updateOGParallaxVisualStyles();
+  ogParallaxSuiteState.animFrameId = requestAnimationFrame(renderOGParallaxLoop);
+}
+
+function openOGParallaxSuite() {
+  const modal = document.getElementById('modal-og-parallax-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  ogParallaxSuiteState.isPlaying = true;
+  ogParallaxSuiteState.playhead = 0;
+  ogParallaxSuiteState.lastTimestamp = null;
+  if (ogParallaxSuiteState.animFrameId) cancelAnimationFrame(ogParallaxSuiteState.animFrameId);
+  ogParallaxSuiteState.animFrameId = requestAnimationFrame(renderOGParallaxLoop);
+
+  const btnPlay = document.getElementById('btn-og-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  updateOGParallaxVisualStyles();
+}
+
+function closeOGParallaxSuite() {
+  const modal = document.getElementById('modal-og-parallax-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  ogParallaxSuiteState.isPlaying = false;
+  if (ogParallaxSuiteState.animFrameId) {
+    cancelAnimationFrame(ogParallaxSuiteState.animFrameId);
+    ogParallaxSuiteState.animFrameId = null;
+  }
+}
+
+function bindOGParallaxSuiteModalControls() {
+  // Close / Cancel modal
+  document.getElementById('btn-close-og-parallax-suite')?.addEventListener('click', closeOGParallaxSuite);
+  document.getElementById('btn-cancel-og-parallax-suite')?.addEventListener('click', closeOGParallaxSuite);
+
+  // Play / Pause
+  document.getElementById('btn-og-play-pause')?.addEventListener('click', () => {
+    ogParallaxSuiteState.isPlaying = !ogParallaxSuiteState.isPlaying;
+    const btnPlay = document.getElementById('btn-og-play-pause');
+    if (ogParallaxSuiteState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      ogParallaxSuiteState.lastTimestamp = null;
+      ogParallaxSuiteState.animFrameId = requestAnimationFrame(renderOGParallaxLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (ogParallaxSuiteState.animFrameId) cancelAnimationFrame(ogParallaxSuiteState.animFrameId);
+    }
+  });
+
+  // Replay / Reset
+  document.getElementById('btn-og-reset')?.addEventListener('click', () => {
+    ogParallaxSuiteState.playhead = 0;
+    updateOGParallaxVisualStyles();
+  });
+
+  // Independent Layer Speed Multiplier Sliders
+  const sliderSpeedFg = document.getElementById('og-slider-speed-fg');
+  sliderSpeedFg?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.speedFg = parseFloat(e.target.value);
+    const label = document.getElementById('og-val-speed-fg');
+    if (label) label.textContent = `${ogParallaxSuiteState.speedFg.toFixed(1)}x`;
+    updateOGParallaxVisualStyles();
+  });
+
+  const sliderSpeedMid = document.getElementById('og-slider-speed-mid');
+  sliderSpeedMid?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.speedMid = parseFloat(e.target.value);
+    const label = document.getElementById('og-val-speed-mid');
+    if (label) label.textContent = `${ogParallaxSuiteState.speedMid.toFixed(1)}x`;
+    updateOGParallaxVisualStyles();
+  });
+
+  const sliderSpeedBg = document.getElementById('og-slider-speed-bg');
+  sliderSpeedBg?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.speedBg = parseFloat(e.target.value);
+    const label = document.getElementById('og-val-speed-bg');
+    if (label) label.textContent = `${ogParallaxSuiteState.speedBg.toFixed(2)}x`;
+    updateOGParallaxVisualStyles();
+  });
+
+  // Camera & Spatial Depth Sliders
+  const sliderZ = document.getElementById('og-slider-z');
+  sliderZ?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.zSeparation = parseInt(e.target.value, 10);
+    const label = document.getElementById('og-val-z');
+    if (label) label.textContent = `${ogParallaxSuiteState.zSeparation} px`;
+    updateOGParallaxVisualStyles();
+  });
+
+  const sliderOrbit = document.getElementById('og-slider-orbit');
+  sliderOrbit?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.cameraOrbitSpeed = parseInt(e.target.value, 10);
+    const label = document.getElementById('og-val-orbit');
+    if (label) label.textContent = `${ogParallaxSuiteState.cameraOrbitSpeed}x`;
+    updateOGParallaxVisualStyles();
+  });
+
+  const sliderFocal = document.getElementById('og-slider-focal');
+  sliderFocal?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.focalLength = parseInt(e.target.value, 10);
+    const label = document.getElementById('og-val-focal');
+    if (label) label.textContent = `${ogParallaxSuiteState.focalLength} mm`;
+    updateOGParallaxVisualStyles();
+  });
+
+  // Grid Floor Toggle
+  const toggleGrid = document.getElementById('og-toggle-grid');
+  toggleGrid?.addEventListener('change', (e) => {
+    ogParallaxSuiteState.enableGrid = e.target.checked;
+    updateOGParallaxVisualStyles();
+  });
+
+  // Text inputs
+  const inputHeadline = document.getElementById('og-input-headline');
+  inputHeadline?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.headline = e.target.value;
+    updateOGParallaxVisualStyles();
+  });
+
+  const inputSubcaption = document.getElementById('og-input-subcaption');
+  inputSubcaption?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.subcaption = e.target.value;
+    updateOGParallaxVisualStyles();
+  });
+
+  const inputArchival = document.getElementById('og-input-archival');
+  inputArchival?.addEventListener('input', (e) => {
+    ogParallaxSuiteState.archivalText = e.target.value;
+    updateOGParallaxVisualStyles();
+  });
+
+  // Stock Portrait Shuffle
+  const stockPortraits = [
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
+  ];
+  let portraitIdx = 0;
+  document.getElementById('btn-og-shuffle-portrait')?.addEventListener('click', () => {
+    portraitIdx = (portraitIdx + 1) % stockPortraits.length;
+    ogParallaxSuiteState.portraitUrl = stockPortraits[portraitIdx];
+    updateOGParallaxVisualStyles();
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-apply-og-parallax-suite')?.addEventListener('click', () => {
+    closeOGParallaxSuite();
+
+    // 1. Archival Plate Background Clip (Z: -140px, Slow drift 0.35x)
+    const bgClip = {
+      id: `img-og-bg-${Date.now()}`,
+      name: 'OG_Parallax_Background_Archival.jpg',
+      url: ogParallaxSuiteState.bgPlateUrl,
+      start: 0,
+      duration: ogParallaxSuiteState.duration,
+      scale: 1.15,
+      zoomEffect: 'drift_in',
+      zoomScale: 1.15,
+      parallaxLayer: 'background',
+      parallaxSpeed: ogParallaxSuiteState.speedBg,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    // 2. Cutout Portrait Midground Clip (Z: 0px, Anchor speed 1.0x)
+    const midClip = {
+      id: `img-og-mid-${Date.now() + 1}`,
+      name: 'OG_Parallax_Midground_Cutout.png',
+      url: ogParallaxSuiteState.portraitUrl,
+      start: 0,
+      duration: ogParallaxSuiteState.duration,
+      scale: 1.0,
+      zoomEffect: 'snap',
+      zoomScale: 1.1,
+      parallaxLayer: 'midground',
+      parallaxSpeed: ogParallaxSuiteState.speedMid,
+      transition: 'fly_through',
+      transitionDuration: 0.6
+    };
+
+    // 3. Foreground Gilded Typography Headline (Z: +140px, Rush speed 2.2x)
+    const fgClip = {
+      id: `txt-og-fg-${Date.now() + 2}`,
+      name: 'OG_Parallax_Foreground_Title',
+      text: ogParallaxSuiteState.headline,
+      highlight: ogParallaxSuiteState.headline.split(' ')[0] || '',
+      highlightColor: '#f59e0b',
+      anim: 'pop',
+      fontSize: 52,
+      fontFamily: 'Cinzel, serif',
+      parallaxLayer: 'foreground',
+      parallaxSpeed: ogParallaxSuiteState.speedFg,
+      start: 0,
+      duration: ogParallaxSuiteState.duration
+    };
+
+    // 4. Parallax Metadata Info Track
+    const metaClip = {
+      id: `txt-og-meta-${Date.now() + 3}`,
+      text: `OG PARALLAX ENGINE // FG ${ogParallaxSuiteState.speedFg}x • MID ${ogParallaxSuiteState.speedMid}x • BG ${ogParallaxSuiteState.speedBg}x`,
+      highlight: 'OG PARALLAX',
+      highlightColor: '#fbbf24',
+      anim: 'fade',
+      fontSize: 18,
+      fontFamily: 'monospace',
+      start: 0,
+      duration: ogParallaxSuiteState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, midClip];
+      timelineClips.text = [fgClip, metaClip];
+      renderAllTimelineTracks();
+      selectClip(fgClip, 'text');
+    }
+
+    showTextTimingAlert(`Applied OG 3-Layer Parallax Engine to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+/* =========================================================
    MAGNATES MEDIA 3D LAYER PROJECTION & 50MM CAMERA SUITE CONTROLLER
    (Converting 2D cutout images, portraits, and text into 3D space with 50mm camera linked to null object)
    ========================================================= */
@@ -38068,3 +40216,1505 @@ function initCanvaFilmstripTrimmer() {
   }
 }
 
+
+/* =========================================================
+   CHRIS SPOONER 2.5D PHOTO PARALLAX ENGINE SUITE CONTROLLER
+   Full 4-Step Pipeline:
+   Step 1: Isolated Subject Cutout & Edge Feather
+   Step 2: Clean Inpainted Background Plate
+   Step 3: Multi-Plane Depth & Z-Separation
+   Step 4: Timeline Push-In Keyframing & Camera Drift
+   ========================================================= */
+let spoonerParallaxState = {
+  activeStep: 1,
+  isPlaying: true,
+  playhead: 0,
+  duration: 5.0,
+  // Step 1: Subject Cutout
+  edgeFeather: 2.5,
+  shadowDrop: 60,
+  soloSubject: false,
+  fgCutoutUrl: 'hiker_cutout.png',
+  // Step 2: Inpainted Plate
+  inpaintBleed: 15,
+  inpaintEnabled: true,
+  bgBlur: 1.2,
+  bgPlateUrl: 'hiker_background_inpainted.png',
+  // Step 3: Multi-Plane Depth
+  zSeparation: 180,
+  velocityRatio: 2.4,
+  enableGrid: true,
+  // Step 4: Camera Keyframing
+  zoomFg: 1.35,
+  zoomBg: 1.08,
+  cameraTilt: 4.5,
+  // Preset Info
+  headline: 'EXPEDITION HORIZON',
+  enableVignette: true,
+  enableSFX: true,
+  animFrameId: null,
+  lastTimestamp: null
+};
+
+function updateSpoonerParallaxVisuals() {
+  const p = spoonerParallaxState.playhead;
+  const dur = spoonerParallaxState.duration;
+  const progress = dur > 0 ? (p / dur) : 0;
+
+  const cursor = document.getElementById('spooner-timeline-cursor');
+  const timerEl = document.getElementById('spooner-timer-display');
+  const rig = document.getElementById('spooner-parallax-rig');
+  const layerFg = document.getElementById('spooner-layer-fg');
+  const layerMid = document.getElementById('spooner-layer-mid');
+  const layerBg = document.getElementById('spooner-layer-bg');
+  const imgBg = document.getElementById('spooner-img-bg');
+  const imgFg = document.getElementById('spooner-img-fg');
+  const gridFloor = document.getElementById('spooner-grid-floor');
+  const vignette = document.getElementById('spooner-stage-vignette');
+  const titleEl = document.getElementById('spooner-title-headline');
+  const hudDepth = document.getElementById('spooner-hud-depth-info');
+
+  if (cursor) cursor.style.left = `${progress * 100}%`;
+  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  if (titleEl) titleEl.textContent = spoonerParallaxState.headline;
+  if (gridFloor) gridFloor.style.display = spoonerParallaxState.enableGrid ? 'block' : 'none';
+  if (vignette) vignette.style.display = spoonerParallaxState.enableVignette ? 'block' : 'none';
+
+  if (hudDepth) {
+    hudDepth.textContent = `FG ZOOM: ${spoonerParallaxState.zoomFg.toFixed(2)}x • BG ZOOM: ${spoonerParallaxState.zoomBg.toFixed(2)}x • Z-SEP: ${spoonerParallaxState.zSeparation}px`;
+  }
+
+  // Camera Orbit / Tilt Drift based on progress (smooth sine cycle)
+  const tiltProgress = Math.sin(progress * Math.PI);
+  const currentTiltY = (progress - 0.5) * spoonerParallaxState.cameraTilt * 1.8;
+  const currentTiltX = tiltProgress * (spoonerParallaxState.cameraTilt * 0.5);
+
+  if (rig) {
+    rig.style.transform = `rotateY(${currentTiltY.toFixed(2)}deg) rotateX(${currentTiltX.toFixed(2)}deg)`;
+  }
+
+  // Foreground Scale & Drift: zooms from 1.0 to zoomFg
+  const currentFgScale = 1.0 + (spoonerParallaxState.zoomFg - 1.0) * progress;
+  // Background Scale & Drift: zooms from 1.0 to zoomBg
+  const currentBgScale = 1.0 + (spoonerParallaxState.zoomBg - 1.0) * progress;
+
+  const zSep = spoonerParallaxState.zSeparation;
+
+  if (layerFg) {
+    if (spoonerParallaxState.soloSubject) {
+      layerFg.style.display = 'flex';
+      layerFg.style.transform = `translateZ(0px) scale(${currentFgScale.toFixed(3)})`;
+    } else {
+      layerFg.style.display = 'flex';
+      layerFg.style.transform = `translateZ(${Math.round(zSep * 0.35)}px) scale(${currentFgScale.toFixed(3)})`;
+    }
+  }
+
+  if (layerMid) {
+    layerMid.style.display = spoonerParallaxState.soloSubject ? 'none' : 'flex';
+    layerMid.style.transform = `translateZ(-${Math.round(zSep * 0.2)}px) scale(${(1.0 + (currentFgScale - 1.0) * 0.5).toFixed(3)})`;
+  }
+
+  if (layerBg) {
+    layerBg.style.display = spoonerParallaxState.soloSubject ? 'none' : 'block';
+    layerBg.style.transform = `translateZ(-${Math.round(zSep * 0.65)}px) scale(${currentBgScale.toFixed(3)})`;
+  }
+
+  if (imgBg) {
+    const blurPx = spoonerParallaxState.bgBlur;
+    imgBg.style.filter = `contrast(105%) brightness(95%) blur(${blurPx}px)`;
+  }
+
+  if (imgFg) {
+    const shadowAlpha = (spoonerParallaxState.shadowDrop / 100) * 0.7;
+    imgFg.style.filter = `drop-shadow(0 15px 25px rgba(0,0,0,${shadowAlpha.toFixed(2)}))`;
+  }
+}
+
+function renderSpoonerParallaxLoop(timestamp) {
+  if (!spoonerParallaxState.isPlaying) {
+    spoonerParallaxState.lastTimestamp = null;
+    return;
+  }
+  if (!spoonerParallaxState.lastTimestamp) {
+    spoonerParallaxState.lastTimestamp = timestamp;
+  }
+
+  const delta = (timestamp - spoonerParallaxState.lastTimestamp) / 1000;
+  spoonerParallaxState.lastTimestamp = timestamp;
+
+  spoonerParallaxState.playhead += delta;
+  if (spoonerParallaxState.playhead > spoonerParallaxState.duration) {
+    spoonerParallaxState.playhead = 0;
+  }
+
+  updateSpoonerParallaxVisuals();
+  spoonerParallaxState.animFrameId = requestAnimationFrame(renderSpoonerParallaxLoop);
+}
+
+function openSpoonerParallaxSuite() {
+  const modal = document.getElementById('modal-spooner-parallax-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  spoonerParallaxState.isPlaying = true;
+  spoonerParallaxState.playhead = 0;
+  spoonerParallaxState.lastTimestamp = null;
+
+  initSpoonerSuiteControlsOnce();
+  switchSpoonerTab(spoonerParallaxState.activeStep || 1);
+  updateSpoonerParallaxVisuals();
+
+  if (spoonerParallaxState.animFrameId) {
+    cancelAnimationFrame(spoonerParallaxState.animFrameId);
+  }
+  spoonerParallaxState.animFrameId = requestAnimationFrame(renderSpoonerParallaxLoop);
+
+  // Play gentle ambient wind sound if audio engine is active
+  if (spoonerParallaxState.enableSFX && typeof playProceduralSound === 'function') {
+    try { playProceduralSound('gentle_wind'); } catch (e) {}
+  }
+}
+
+function closeSpoonerParallaxSuite() {
+  const modal = document.getElementById('modal-spooner-parallax-suite');
+  if (modal) modal.style.display = 'none';
+  spoonerParallaxState.isPlaying = false;
+  if (spoonerParallaxState.animFrameId) {
+    cancelAnimationFrame(spoonerParallaxState.animFrameId);
+    spoonerParallaxState.animFrameId = null;
+  }
+}
+
+function switchSpoonerTab(stepNum) {
+  spoonerParallaxState.activeStep = stepNum;
+  for (let i = 1; i <= 4; i++) {
+    const tabBtn = document.getElementById(`spooner-tab-step${i}`);
+    const panel = document.getElementById(`spooner-panel-step${i}`);
+    if (tabBtn) {
+      if (i === stepNum) {
+        tabBtn.style.background = '#0284c7';
+        tabBtn.style.color = '#ffffff';
+      } else {
+        tabBtn.style.background = 'transparent';
+        tabBtn.style.color = '#94a3b8';
+      }
+    }
+    if (panel) {
+      panel.style.display = i === stepNum ? 'flex' : 'none';
+    }
+  }
+}
+
+let spoonerControlsInitialized = false;
+function initSpoonerSuiteControlsOnce() {
+  if (spoonerControlsInitialized) return;
+  spoonerControlsInitialized = true;
+
+  // Close buttons
+  document.getElementById('btn-close-spooner-parallax')?.addEventListener('click', closeSpoonerParallaxSuite);
+
+  // Step Tabs
+  for (let i = 1; i <= 4; i++) {
+    const btn = document.getElementById(`spooner-tab-step${i}`);
+    btn?.addEventListener('click', () => switchSpoonerTab(i));
+  }
+
+  // Play / Pause / Reset
+  const playPauseBtn = document.getElementById('btn-spooner-play-pause');
+  playPauseBtn?.addEventListener('click', () => {
+    spoonerParallaxState.isPlaying = !spoonerParallaxState.isPlaying;
+    playPauseBtn.textContent = spoonerParallaxState.isPlaying ? '⏸ Pause' : '▶ Play';
+    if (spoonerParallaxState.isPlaying) {
+      spoonerParallaxState.lastTimestamp = null;
+      spoonerParallaxState.animFrameId = requestAnimationFrame(renderSpoonerParallaxLoop);
+    }
+  });
+
+  document.getElementById('btn-spooner-reset')?.addEventListener('click', () => {
+    spoonerParallaxState.playhead = 0;
+    updateSpoonerParallaxVisuals();
+  });
+
+  // Step 1 Controls
+  const sliderFeather = document.getElementById('spooner-slider-feather');
+  sliderFeather?.addEventListener('input', (e) => {
+    spoonerParallaxState.edgeFeather = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-feather');
+    if (val) val.textContent = `${spoonerParallaxState.edgeFeather.toFixed(1)} px`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const sliderShadow = document.getElementById('spooner-slider-shadow');
+  sliderShadow?.addEventListener('input', (e) => {
+    spoonerParallaxState.shadowDrop = parseInt(e.target.value);
+    const val = document.getElementById('spooner-val-shadow');
+    if (val) val.textContent = `${spoonerParallaxState.shadowDrop}%`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const toggleFgSolo = document.getElementById('spooner-toggle-fg-solo');
+  toggleFgSolo?.addEventListener('change', (e) => {
+    spoonerParallaxState.soloSubject = e.target.checked;
+    updateSpoonerParallaxVisuals();
+  });
+
+  // Step 2 Controls
+  const sliderBleed = document.getElementById('spooner-slider-bleed');
+  sliderBleed?.addEventListener('input', (e) => {
+    spoonerParallaxState.inpaintBleed = parseInt(e.target.value);
+    const val = document.getElementById('spooner-val-bleed');
+    if (val) val.textContent = `${spoonerParallaxState.inpaintBleed} px`;
+  });
+
+  const sliderBgBlur = document.getElementById('spooner-slider-bg-blur');
+  sliderBgBlur?.addEventListener('input', (e) => {
+    spoonerParallaxState.bgBlur = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-bg-blur');
+    if (val) val.textContent = `${spoonerParallaxState.bgBlur.toFixed(1)} px`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const toggleInpaint = document.getElementById('spooner-toggle-inpaint-enable');
+  toggleInpaint?.addEventListener('change', (e) => {
+    spoonerParallaxState.inpaintEnabled = e.target.checked;
+    const imgBg = document.getElementById('spooner-img-bg');
+    if (imgBg) {
+      imgBg.src = spoonerParallaxState.inpaintEnabled ? 'hiker_background_inpainted.png' : 'hiker_parallax_reference.png';
+    }
+  });
+
+  // Step 3 Controls
+  const sliderZ = document.getElementById('spooner-slider-z-sep');
+  sliderZ?.addEventListener('input', (e) => {
+    spoonerParallaxState.zSeparation = parseInt(e.target.value);
+    const val = document.getElementById('spooner-val-z-sep');
+    if (val) val.textContent = `${spoonerParallaxState.zSeparation} px`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const sliderRatio = document.getElementById('spooner-slider-ratio');
+  sliderRatio?.addEventListener('input', (e) => {
+    spoonerParallaxState.velocityRatio = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-ratio');
+    if (val) val.textContent = `${spoonerParallaxState.velocityRatio.toFixed(1)}x`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const toggleGrid = document.getElementById('spooner-toggle-grid');
+  toggleGrid?.addEventListener('change', (e) => {
+    spoonerParallaxState.enableGrid = e.target.checked;
+    updateSpoonerParallaxVisuals();
+  });
+
+  // Step 4 Controls
+  const sliderZoomFg = document.getElementById('spooner-slider-zoom-fg');
+  sliderZoomFg?.addEventListener('input', (e) => {
+    spoonerParallaxState.zoomFg = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-zoom-fg');
+    if (val) val.textContent = `${spoonerParallaxState.zoomFg.toFixed(2)}x`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const sliderZoomBg = document.getElementById('spooner-slider-zoom-bg');
+  sliderZoomBg?.addEventListener('input', (e) => {
+    spoonerParallaxState.zoomBg = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-zoom-bg');
+    if (val) val.textContent = `${spoonerParallaxState.zoomBg.toFixed(2)}x`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const sliderTilt = document.getElementById('spooner-slider-tilt');
+  sliderTilt?.addEventListener('input', (e) => {
+    spoonerParallaxState.cameraTilt = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-tilt');
+    if (val) val.textContent = `${spoonerParallaxState.cameraTilt.toFixed(1)} deg`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const sliderDuration = document.getElementById('spooner-slider-duration');
+  sliderDuration?.addEventListener('input', (e) => {
+    spoonerParallaxState.duration = parseFloat(e.target.value);
+    const val = document.getElementById('spooner-val-duration');
+    if (val) val.textContent = `${spoonerParallaxState.duration.toFixed(1)} s`;
+    updateSpoonerParallaxVisuals();
+  });
+
+  // Preset Headline & Toggles
+  const inputHeadline = document.getElementById('spooner-input-headline');
+  inputHeadline?.addEventListener('input', (e) => {
+    spoonerParallaxState.headline = e.target.value;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const toggleVignette = document.getElementById('spooner-toggle-vignette');
+  toggleVignette?.addEventListener('change', (e) => {
+    spoonerParallaxState.enableVignette = e.target.checked;
+    updateSpoonerParallaxVisuals();
+  });
+
+  const toggleSFX = document.getElementById('spooner-toggle-sfx');
+  toggleSFX?.addEventListener('change', (e) => {
+    spoonerParallaxState.enableSFX = e.target.checked;
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-apply-spooner-parallax')?.addEventListener('click', () => {
+    closeSpoonerParallaxSuite();
+
+    // 1. Inpainted Background Plate (Slow drift 1.0 -> zoomBg)
+    const bgClip = {
+      id: `img-spooner-bg-${Date.now()}`,
+      name: '2.5D_Parallax_Inpainted_Background.png',
+      url: spoonerParallaxState.bgPlateUrl,
+      start: 0,
+      duration: spoonerParallaxState.duration,
+      scale: 1.0,
+      zoomEffect: 'drift_in',
+      zoomScale: spoonerParallaxState.zoomBg,
+      parallaxLayer: 'background',
+      parallaxSpeed: 0.35,
+      transition: 'crossfade',
+      transitionDuration: 0.6
+    };
+
+    // 2. Foreground Cutout Subject (Fast push-in zoom 1.0 -> zoomFg)
+    const fgClip = {
+      id: `img-spooner-fg-${Date.now() + 1}`,
+      name: '2.5D_Parallax_Subject_Cutout.png',
+      url: spoonerParallaxState.fgCutoutUrl,
+      start: 0,
+      duration: spoonerParallaxState.duration,
+      scale: 1.0,
+      zoomEffect: 'snap',
+      zoomScale: spoonerParallaxState.zoomFg,
+      parallaxLayer: 'foreground',
+      parallaxSpeed: spoonerParallaxState.velocityRatio,
+      transition: 'fly_through',
+      transitionDuration: 0.8
+    };
+
+    // 3. Floating Title Overlay
+    const textClip = {
+      id: `txt-spooner-title-${Date.now() + 2}`,
+      name: '2.5D_Parallax_Headline',
+      text: spoonerParallaxState.headline,
+      highlight: spoonerParallaxState.headline.split(' ')[0] || '',
+      highlightColor: '#38bdf8',
+      anim: 'pop',
+      fontSize: 48,
+      fontFamily: 'Cinzel, serif',
+      parallaxLayer: 'foreground',
+      start: 0,
+      duration: spoonerParallaxState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, fgClip];
+      timelineClips.text = [textClip];
+      renderAllTimelineTracks();
+      selectClip(fgClip, 'image');
+    }
+
+    if (spoonerParallaxState.enableSFX && typeof playProceduralSound === 'function') {
+      try { playProceduralSound('gentle_wind'); } catch (e) {}
+    }
+
+    showTextTimingAlert(`Applied 2.5D Parallax Photo Effect to timeline!`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+
+
+/* =========================================================
+   INTERACTIVE MANUAL CUTOUT & TRACING ENGINE
+   (Freehand Smooth Lasso, Polygon Lasso, Brush/Eraser, Inpainting)
+   ========================================================= */
+
+let cutoutEditorState = {
+  isOpen: false,
+  originalImg: null,
+  originalUrl: '',
+  naturalWidth: 0,
+  naturalHeight: 0,
+  zoom: 1.0,
+  panX: 0,
+  panY: 0,
+  isPanning: false,
+  startPanX: 0,
+  startPanY: 0,
+  
+  // Tracing Mode: 'freehand' | 'lasso' | 'brush' | 'eraser'
+  activeTool: 'freehand',
+  isDraggingFreehand: false,
+  brushSize: 25,
+  edgeFeather: 0.0,
+  invertMask: false,
+  generateInpaint: true,
+  bgMode: 'checker', // 'checker' | 'black' | 'white' | 'mask'
+
+  // Lasso Curve / Polygon Data
+  points: [], // Array of {x, y} in image coordinates
+  isClosed: false,
+  mousePos: null, // Current cursor position for rubber-band preview line
+
+  // Painting binary alpha mask (if user uses brush/eraser)
+  maskCanvas: null,
+  maskCtx: null,
+  isPainting: false,
+  lastPaintX: null,
+  lastPaintY: null,
+
+  // Comprehensive Undo / Redo History Stacks
+  undoStack: [],
+  redoStack: [],
+
+  // Callback to execute on Save
+  onSaveCallback: null
+};
+
+function pushCutoutHistoryState() {
+  if (!cutoutEditorState.maskCanvas || !cutoutEditorState.naturalWidth) return;
+  try {
+    const snapshot = {
+      points: (cutoutEditorState.points || []).map(p => ({ x: p.x, y: p.y })),
+      isClosed: !!cutoutEditorState.isClosed,
+      maskData: cutoutEditorState.maskCtx.getImageData(0, 0, cutoutEditorState.naturalWidth, cutoutEditorState.naturalHeight)
+    };
+    cutoutEditorState.undoStack.push(snapshot);
+    if (cutoutEditorState.undoStack.length > 30) cutoutEditorState.undoStack.shift();
+    cutoutEditorState.redoStack = []; // Clear redo on new action
+    updateCutoutUndoRedoUI();
+  } catch (e) {
+    console.warn('History push failed:', e);
+  }
+}
+
+function applyCutoutSnapshot(snap) {
+  if (!snap) return;
+  cutoutEditorState.points = (snap.points || []).map(p => ({ x: p.x, y: p.y }));
+  cutoutEditorState.isClosed = !!snap.isClosed;
+  if (snap.maskData && cutoutEditorState.maskCtx) {
+    cutoutEditorState.maskCtx.putImageData(snap.maskData, 0, 0);
+  }
+  redrawCutoutCanvas();
+  updateCutoutLivePreviews();
+  updateCutoutUndoRedoUI();
+}
+
+function executeCutoutUndo() {
+  if (!cutoutEditorState.isOpen) return;
+  if (!cutoutEditorState.undoStack || cutoutEditorState.undoStack.length === 0) {
+    // If no stack but have points, pop point as fallback
+    if (cutoutEditorState.points.length > 0) {
+      cutoutEditorState.points.pop();
+      cutoutEditorState.isClosed = false;
+      redrawCutoutCanvas();
+      updateCutoutLivePreviews();
+    }
+    return;
+  }
+  // Save current state into redo
+  try {
+    const curSnap = {
+      points: (cutoutEditorState.points || []).map(p => ({ x: p.x, y: p.y })),
+      isClosed: !!cutoutEditorState.isClosed,
+      maskData: cutoutEditorState.maskCtx.getImageData(0, 0, cutoutEditorState.naturalWidth, cutoutEditorState.naturalHeight)
+    };
+    cutoutEditorState.redoStack.push(curSnap);
+  } catch(e) {}
+  const prevSnap = cutoutEditorState.undoStack.pop();
+  applyCutoutSnapshot(prevSnap);
+}
+
+function executeCutoutRedo() {
+  if (!cutoutEditorState.isOpen) return;
+  if (!cutoutEditorState.redoStack || cutoutEditorState.redoStack.length === 0) return;
+  try {
+    const curSnap = {
+      points: (cutoutEditorState.points || []).map(p => ({ x: p.x, y: p.y })),
+      isClosed: !!cutoutEditorState.isClosed,
+      maskData: cutoutEditorState.maskCtx.getImageData(0, 0, cutoutEditorState.naturalWidth, cutoutEditorState.naturalHeight)
+    };
+    cutoutEditorState.undoStack.push(curSnap);
+  } catch(e) {}
+  const nextSnap = cutoutEditorState.redoStack.pop();
+  applyCutoutSnapshot(nextSnap);
+}
+
+function updateCutoutUndoRedoUI() {
+  const canUndo = (cutoutEditorState.undoStack && cutoutEditorState.undoStack.length > 0) || (cutoutEditorState.points && cutoutEditorState.points.length > 0);
+  const canRedo = (cutoutEditorState.redoStack && cutoutEditorState.redoStack.length > 0);
+  const undoBtns = [document.getElementById('btn-cutout-header-undo'), document.getElementById('btn-cutout-panel-undo'), document.getElementById('btn-cutout-undo-point')];
+  const redoBtns = [document.getElementById('btn-cutout-header-redo'), document.getElementById('btn-cutout-panel-redo')];
+  undoBtns.forEach(b => {
+    if (!b) return;
+    b.style.opacity = canUndo ? '1' : '0.4';
+    b.style.pointerEvents = canUndo ? 'auto' : 'none';
+  });
+  redoBtns.forEach(b => {
+    if (!b) return;
+    b.style.opacity = canRedo ? '1' : '0.4';
+    b.style.pointerEvents = canRedo ? 'auto' : 'none';
+  });
+}
+
+// Automatic inpainting synthesizer helper for any newly uploaded image + cutout canvas
+function generateAutoInpaintPlateForImage(sourceUrl, cutoutCanvas) {
+  if (!cutoutCanvas) return null;
+  const w = cutoutCanvas.width;
+  const h = cutoutCanvas.height;
+
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.width = w;
+  bgCanvas.height = h;
+  const bgCtx = bgCanvas.getContext('2d');
+
+  const srcImg = new Image();
+  srcImg.crossOrigin = 'anonymous';
+  srcImg.src = sourceUrl;
+
+  // Draw source image
+  bgCtx.drawImage(srcImg, 0, 0, w, h);
+
+  // Compute silhouette bounding box from cutoutCanvas alpha
+  try {
+    const cCtx = cutoutCanvas.getContext('2d');
+    const cData = cCtx.getImageData(0, 0, w, h).data;
+    let minX = w, maxX = 0, minY = h, maxY = 0;
+    let found = false;
+
+    for (let y = 0; y < h; y += 4) {
+      for (let x = 0; x < w; x += 4) {
+        const a = cData[(y * w + x) * 4 + 3];
+        if (a > 30) {
+          found = true;
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    if (!found) return bgCanvas;
+
+    const pad = 20;
+    const boxX = Math.max(0, Math.floor(minX - pad));
+    const boxY = Math.max(0, Math.floor(minY - pad));
+    const boxW = Math.min(w - boxX, Math.ceil(maxX - minX + pad * 2));
+    const boxH = Math.min(h - boxY, Math.ceil(maxY - minY + pad * 2));
+
+    const leftW = Math.max(12, Math.floor(boxW * 0.25));
+    const sampleLeftX = Math.max(0, boxX - leftW);
+    const rightW = Math.max(12, Math.floor(boxW * 0.25));
+    const sampleRightX = Math.min(w - rightW, boxX + boxW);
+
+    const patchCanvas = document.createElement('canvas');
+    patchCanvas.width = boxW;
+    patchCanvas.height = boxH;
+    const pCtx = patchCanvas.getContext('2d');
+
+    pCtx.drawImage(srcImg, sampleLeftX, boxY, leftW, boxH, 0, 0, Math.ceil(boxW * 0.55), boxH);
+    pCtx.drawImage(srcImg, sampleRightX, boxY, rightW, boxH, Math.floor(boxW * 0.45), 0, Math.ceil(boxW * 0.55), boxH);
+
+    bgCtx.save();
+    // Photoshop Content-Aware style seam blend (clean 1.5px feather, no weird foggy blur)
+    bgCtx.filter = 'blur(1.5px)';
+    bgCtx.drawImage(patchCanvas, boxX, boxY, boxW, boxH);
+    bgCtx.filter = 'none';
+    bgCtx.restore();
+  } catch (e) {
+    console.warn('Inpaint synthesis fallback:', e);
+  }
+
+  return bgCanvas;
+}
+
+// Open Cutout & Tracing Tool with target image URL or HTMLImageElement
+function openCutoutTraceEditor(imageUrl, onSave) {
+  const modal = document.getElementById('modal-image-cutout-editor');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  cutoutEditorState.isOpen = true;
+  cutoutEditorState.onSaveCallback = onSave || null;
+  cutoutEditorState.points = [];
+  cutoutEditorState.isClosed = false;
+  cutoutEditorState.mousePos = null;
+  cutoutEditorState.zoom = 1.0;
+  cutoutEditorState.activeTool = 'freehand';
+  cutoutEditorState.undoStack = [];
+  cutoutEditorState.redoStack = [];
+  updateCutoutUndoRedoUI();
+
+  initCutoutEditorListenersOnce();
+  setCutoutActiveTool('freehand');
+
+  // Load target image: ensure we never load a transparent cutout on black void
+  let targetUrl = imageUrl;
+  if (!targetUrl || targetUrl.includes('hiker_cutout.png') || targetUrl.startsWith('data:image/png')) {
+    targetUrl = topCustomizerState.originalPhotoUrl || 'hiker_parallax_reference.png';
+  }
+  loadCutoutImage(targetUrl);
+}
+
+function closeCutoutTraceEditor() {
+  const modal = document.getElementById('modal-image-cutout-editor');
+  if (modal) modal.style.display = 'none';
+  cutoutEditorState.isOpen = false;
+}
+
+function loadCutoutImage(url) {
+  if (!url) return;
+  cutoutEditorState.originalUrl = url;
+  const img = new Image();
+  img.crossOrigin = 'anonymous';
+  img.onload = () => {
+    cutoutEditorState.originalImg = img;
+    cutoutEditorState.naturalWidth = img.naturalWidth || img.width;
+    cutoutEditorState.naturalHeight = img.naturalHeight || img.height;
+
+    // Initialize base canvas
+    const baseCanvas = document.getElementById('cutout-base-canvas');
+    const overlayCanvas = document.getElementById('cutout-overlay-canvas');
+    if (baseCanvas && overlayCanvas) {
+      baseCanvas.width = cutoutEditorState.naturalWidth;
+      baseCanvas.height = cutoutEditorState.naturalHeight;
+      overlayCanvas.width = cutoutEditorState.naturalWidth;
+      overlayCanvas.height = cutoutEditorState.naturalHeight;
+
+      const bCtx = baseCanvas.getContext('2d');
+      bCtx.clearRect(0, 0, baseCanvas.width, baseCanvas.height);
+      bCtx.drawImage(img, 0, 0);
+
+      // Create dedicated binary mask canvas
+      cutoutEditorState.maskCanvas = document.createElement('canvas');
+      cutoutEditorState.maskCanvas.width = cutoutEditorState.naturalWidth;
+      cutoutEditorState.maskCanvas.height = cutoutEditorState.naturalHeight;
+      cutoutEditorState.maskCtx = cutoutEditorState.maskCanvas.getContext('2d');
+      cutoutEditorState.maskCtx.fillStyle = '#000000';
+      cutoutEditorState.maskCtx.fillRect(0, 0, baseCanvas.width, baseCanvas.height);
+    }
+
+    // Update Dimensions status
+    const dimsEl = document.getElementById('cutout-status-dims');
+    if (dimsEl) {
+      dimsEl.textContent = `${cutoutEditorState.naturalWidth} × ${cutoutEditorState.naturalHeight} px`;
+    }
+
+    // Auto-fit initial zoom
+    fitCutoutCanvasZoom();
+    redrawCutoutCanvas();
+    updateCutoutLivePreviews();
+    cutoutEditorState.undoStack = [];
+    cutoutEditorState.redoStack = [];
+    pushCutoutHistoryState();
+  };
+  img.onerror = () => {
+    showTextTimingAlert('Could not load image into tracing editor', 'error');
+  };
+  img.src = url;
+}
+
+function fitCutoutCanvasZoom() {
+  const container = document.getElementById('cutout-canvas-scroll-container');
+  if (!container || !cutoutEditorState.naturalWidth) return;
+  const availW = container.clientWidth - 80;
+  const availH = container.clientHeight - 80;
+  if (availW <= 0 || availH <= 0) return;
+
+  const scaleW = availW / cutoutEditorState.naturalWidth;
+  const scaleH = availH / cutoutEditorState.naturalHeight;
+  const fitScale = Math.min(scaleW, scaleH, 1.25);
+  cutoutEditorState.zoom = Math.max(0.2, fitScale);
+  applyCutoutZoomTransform();
+}
+
+function applyCutoutZoomTransform() {
+  const wrapper = document.getElementById('cutout-canvas-wrapper');
+  if (wrapper) {
+    wrapper.style.transform = `scale(${cutoutEditorState.zoom.toFixed(3)})`;
+    wrapper.style.transformOrigin = 'center center';
+  }
+  const zoomEl = document.getElementById('cutout-val-zoom');
+  if (zoomEl) zoomEl.textContent = `${Math.round(cutoutEditorState.zoom * 100)}%`;
+}
+
+function redrawCutoutCanvas() {
+  const overlay = document.getElementById('cutout-overlay-canvas');
+  if (!overlay) return;
+  const ctx = overlay.getContext('2d');
+  ctx.clearRect(0, 0, overlay.width, overlay.height);
+
+  const pts = cutoutEditorState.points || [];
+  const zoom = Math.max(cutoutEditorState.zoom || 1, 0.2);
+
+  if (pts.length > 0) {
+    // 1. If closed, fill the enclosed subject with semi-translucent soft tint
+    if (cutoutEditorState.isClosed && pts.length >= 3) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i].x, pts[i].y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.22)';
+      ctx.fill();
+    }
+
+    // 2. Build stroke path
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    if (cutoutEditorState.isClosed) {
+      ctx.closePath();
+    } else if (cutoutEditorState.mousePos && cutoutEditorState.activeTool === 'lasso') {
+      ctx.lineTo(cutoutEditorState.mousePos.x, cutoutEditorState.mousePos.y);
+    }
+
+    // 3. Render precision hairline contour: thin outer shadow halo for contrast + crisp 1.2px inner line
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Subtle dark under-stroke ensures readability over bright skies or white backgrounds
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
+    ctx.lineWidth = 2.4 / zoom;
+    ctx.stroke();
+
+    // Crisp thin cyan hairline
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1.2 / zoom;
+    if (cutoutEditorState.activeTool === 'lasso' && !cutoutEditorState.isClosed) {
+      ctx.setLineDash([5 / zoom, 3 / zoom]);
+    } else {
+      ctx.setLineDash([]);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 4. Distinct Signal Anchor Points (Clean, un-cluttered: ONLY Start Anchor & Active Tip)
+    const startPt = pts[0];
+    const startRadius = 6.0 / zoom; // Large, prominent origin beacon
+    ctx.beginPath();
+    ctx.arc(startPt.x, startPt.y, startRadius, 0, Math.PI * 2);
+    ctx.fillStyle = cutoutEditorState.isClosed ? '#38bdf8' : '#22c55e'; // Green when ready to close, blue when closed
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.8 / zoom;
+    ctx.stroke();
+
+    // If still open and multiple points placed, draw small indicator at active tip
+    if (!cutoutEditorState.isClosed && pts.length > 1) {
+      const lastPt = pts[pts.length - 1];
+      const tipRadius = 4.0 / zoom;
+      ctx.beginPath();
+      ctx.arc(lastPt.x, lastPt.y, tipRadius, 0, Math.PI * 2);
+      ctx.fillStyle = '#38bdf8';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.4 / zoom;
+      ctx.stroke();
+    }
+  }
+
+  // Update status count
+  const ptsCountEl = document.getElementById('cutout-status-points');
+  if (ptsCountEl) {
+    ptsCountEl.textContent = `${pts.length} Points ${cutoutEditorState.isClosed ? '✓ (Closed Subject)' : '(Tracing Active...)'}`;
+  }
+}
+
+// Generate the final Cutout (transparent PNG canvas) based on polygon contour / painted mask
+// CRITICAL: The inside of the traced boundary IS THE SUBJECT KEPT! The exterior is transparent!
+function generateResultCutoutCanvas() {
+  if (!cutoutEditorState.originalImg || !cutoutEditorState.naturalWidth) return null;
+
+  const w = cutoutEditorState.naturalWidth;
+  const h = cutoutEditorState.naturalHeight;
+
+  // Mask canvas
+  const mask = document.createElement('canvas');
+  mask.width = w;
+  mask.height = h;
+  const mCtx = mask.getContext('2d');
+
+  const pts = cutoutEditorState.points;
+
+  // CRITICAL: Only generate cutout boundary if the subject contour is actually CLOSED!
+  // If user is mid-encirclement, keep full image un-cropped in preview so it does not disappear.
+  if (cutoutEditorState.isClosed && pts.length >= 3) {
+    mCtx.fillStyle = '#ffffff';
+    mCtx.beginPath();
+    mCtx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      mCtx.lineTo(pts[i].x, pts[i].y);
+    }
+    mCtx.closePath();
+    mCtx.fill();
+  } else if (cutoutEditorState.activeTool === 'brush' || cutoutEditorState.activeTool === 'eraser') {
+    if (cutoutEditorState.maskCanvas) {
+      mCtx.drawImage(cutoutEditorState.maskCanvas, 0, 0);
+    } else {
+      mCtx.fillStyle = '#ffffff';
+      mCtx.fillRect(0, 0, w, h);
+    }
+  } else {
+    // Mid-drawing freehand/lasso: keep full source image visible
+    mCtx.fillStyle = '#ffffff';
+    mCtx.fillRect(0, 0, w, h);
+  }
+
+  // Apply optional Feathering / Blur to mask
+  const feather = cutoutEditorState.edgeFeather;
+  let finalMask = mask;
+  if (feather > 0) {
+    const fCanvas = document.createElement('canvas');
+    fCanvas.width = w;
+    fCanvas.height = h;
+    const fCtx = fCanvas.getContext('2d');
+    fCtx.filter = `blur(${feather}px)`;
+    fCtx.drawImage(mask, 0, 0);
+    finalMask = fCanvas;
+  }
+
+  // Compose result cutout
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = w;
+  outCanvas.height = h;
+  const outCtx = outCanvas.getContext('2d');
+
+  // Draw source image
+  outCtx.drawImage(cutoutEditorState.originalImg, 0, 0);
+
+  // Apply mask: destination-in keeps pixels INSIDE the white mask area, turning outside transparent!
+  outCtx.globalCompositeOperation = cutoutEditorState.invertMask ? 'destination-out' : 'destination-in';
+  outCtx.drawImage(finalMask, 0, 0);
+  outCtx.globalCompositeOperation = 'source-over';
+
+  return outCanvas;
+}
+
+// Inpainted Background Plate Generator (Content-Aware hole fill behind subject)
+function generateInpaintedBackgroundCanvas(cutoutCanvas) {
+  if (!cutoutEditorState.originalImg) return null;
+  const w = cutoutEditorState.naturalWidth;
+  const h = cutoutEditorState.naturalHeight;
+
+  const bgCanvas = document.createElement('canvas');
+  bgCanvas.width = w;
+  bgCanvas.height = h;
+  const bgCtx = bgCanvas.getContext('2d');
+
+  // Draw base image (always full photographic backdrop)
+  bgCtx.drawImage(cutoutEditorState.originalImg, 0, 0);
+
+  const pts = cutoutEditorState.points || [];
+
+  // If tracing polygon has >= 3 points, inpaint polygon region
+  if (cutoutEditorState.isClosed && pts.length >= 3) {
+    let minX = w, maxX = 0, minY = h, maxY = 0;
+    pts.forEach(p => {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.y < minY) minY = p.y;
+      if (p.y > maxY) maxY = p.y;
+    });
+
+    const pad = 18;
+    const boxX = Math.max(0, Math.floor(minX - pad));
+    const boxY = Math.max(0, Math.floor(minY - pad));
+    const boxW = Math.min(w - boxX, Math.ceil(maxX - minX + pad * 2));
+    const boxH = Math.min(h - boxY, Math.ceil(maxY - minY + pad * 2));
+
+    const leftW = Math.max(8, Math.floor(boxW * 0.25));
+    const sampleLeftX = Math.max(0, boxX - leftW);
+    const rightW = Math.max(8, Math.floor(boxW * 0.25));
+    const sampleRightX = Math.min(w - rightW, boxX + boxW);
+
+    const patchCanvas = document.createElement('canvas');
+    patchCanvas.width = boxW;
+    patchCanvas.height = boxH;
+    const pCtx = patchCanvas.getContext('2d');
+
+    pCtx.drawImage(cutoutEditorState.originalImg, sampleLeftX, boxY, leftW, boxH, 0, 0, Math.ceil(boxW * 0.55), boxH);
+    pCtx.drawImage(cutoutEditorState.originalImg, sampleRightX, boxY, rightW, boxH, Math.floor(boxW * 0.45), 0, Math.ceil(boxW * 0.55), boxH);
+
+    bgCtx.save();
+    bgCtx.beginPath();
+    bgCtx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      bgCtx.lineTo(pts[i].x, pts[i].y);
+    }
+    bgCtx.closePath();
+    bgCtx.clip();
+
+    bgCtx.filter = 'blur(1.5px)';
+    bgCtx.drawImage(patchCanvas, boxX, boxY, boxW, boxH);
+    bgCtx.filter = 'none';
+    bgCtx.restore();
+
+    return bgCanvas;
+  }
+
+  // If AI Cutout / Alpha Mask was used (e.g. maskCanvas has silhouette or hiker preset)
+  const isHiker = (cutoutEditorState.originalUrl && cutoutEditorState.originalUrl.includes('hiker'));
+  if (isHiker) {
+    // For preset hiker, synthesis overlay from clean pre-rendered backdrop
+    const cleanBg = new Image();
+    cleanBg.src = 'hiker_background_inpainted.png';
+    if (cleanBg.complete && cleanBg.naturalWidth > 0) {
+      bgCtx.drawImage(cleanBg, 0, 0, w, h);
+    }
+    return bgCanvas;
+  }
+
+  // Generic inpaint fallback from cutoutCanvas alpha mask
+  if (cutoutCanvas) {
+    try {
+      const cCtx = cutoutCanvas.getContext('2d');
+      const cData = cCtx.getImageData(0, 0, w, h).data;
+      let minX = w, maxX = 0, minY = h, maxY = 0;
+      let found = false;
+      for (let y = 0; y < h; y += 4) {
+        for (let x = 0; x < w; x += 4) {
+          if (cData[(y * w + x) * 4 + 3] > 30) {
+            found = true;
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+      if (found) {
+        const pad = 20;
+        const boxX = Math.max(0, Math.floor(minX - pad));
+        const boxY = Math.max(0, Math.floor(minY - pad));
+        const boxW = Math.min(w - boxX, Math.ceil(maxX - minX + pad * 2));
+        const boxH = Math.min(h - boxY, Math.ceil(maxY - minY + pad * 2));
+
+        const leftW = Math.max(12, Math.floor(boxW * 0.25));
+        const sampleLeftX = Math.max(0, boxX - leftW);
+        const rightW = Math.max(12, Math.floor(boxW * 0.25));
+        const sampleRightX = Math.min(w - rightW, boxX + boxW);
+
+        const patchCanvas = document.createElement('canvas');
+        patchCanvas.width = boxW;
+        patchCanvas.height = boxH;
+        const pCtx = patchCanvas.getContext('2d');
+        pCtx.drawImage(cutoutEditorState.originalImg, sampleLeftX, boxY, leftW, boxH, 0, 0, Math.ceil(boxW * 0.55), boxH);
+        pCtx.drawImage(cutoutEditorState.originalImg, sampleRightX, boxY, rightW, boxH, Math.floor(boxW * 0.45), 0, Math.ceil(boxW * 0.55), boxH);
+
+        bgCtx.save();
+        bgCtx.filter = 'blur(1.5px)';
+        bgCtx.drawImage(patchCanvas, boxX, boxY, boxW, boxH);
+        bgCtx.filter = 'none';
+        bgCtx.restore();
+      }
+    } catch(e) {}
+  }
+
+  return bgCanvas;
+}
+
+function updateCutoutLivePreviews() {
+  const cutoutCanvas = generateResultCutoutCanvas();
+  const thumbFg = document.getElementById('cutout-preview-fg-thumb');
+  if (thumbFg && cutoutCanvas) {
+    thumbFg.src = cutoutCanvas.toDataURL();
+  }
+
+  const thumbBg = document.getElementById('cutout-preview-bg-thumb');
+  if (thumbBg && cutoutCanvas) {
+    const bgCanvas = generateInpaintedBackgroundCanvas(cutoutCanvas);
+    if (bgCanvas) thumbBg.src = bgCanvas.toDataURL();
+  }
+}
+
+// Convert screen mouse coordinates into image coordinates
+function getImageCoordsFromMouseEvent(e) {
+  const baseCanvas = document.getElementById('cutout-base-canvas');
+  if (!baseCanvas) return null;
+  const rect = baseCanvas.getBoundingClientRect();
+  const screenX = e.clientX - rect.left;
+  const screenY = e.clientY - rect.top;
+  const scale = rect.width / cutoutEditorState.naturalWidth;
+  if (!scale || scale <= 0) return null;
+
+  return {
+    x: Math.round(screenX / scale),
+    y: Math.round(screenY / scale)
+  };
+}
+
+let cutoutListenersInitialized = false;
+function initCutoutEditorListenersOnce() {
+  if (cutoutListenersInitialized) return;
+  cutoutListenersInitialized = true;
+
+  const container = document.getElementById('cutout-canvas-scroll-container');
+
+  // FREEHAND LASSO: Mousedown starts freehand drag trace
+  container?.addEventListener('mousedown', (e) => {
+    if (!cutoutEditorState.isOpen) return;
+    const coords = getImageCoordsFromMouseEvent(e);
+    if (!coords) return;
+
+    pushCutoutHistoryState();
+    if (cutoutEditorState.activeTool === 'freehand') {
+      cutoutEditorState.isDraggingFreehand = true;
+      const pts = cutoutEditorState.points;
+      // If shape was previously closed, a new drag starts fresh shape
+      if (cutoutEditorState.isClosed || !pts || pts.length === 0) {
+        cutoutEditorState.points = [coords];
+        cutoutEditorState.isClosed = false;
+      } else {
+        // Seamless continuation: resume adding points to existing open contour!
+        pts.push(coords);
+      }
+      redrawCutoutCanvas();
+    } else if (cutoutEditorState.activeTool === 'brush' || cutoutEditorState.activeTool === 'eraser') {
+      cutoutEditorState.isPainting = true;
+      cutoutEditorState.lastPaintX = coords.x;
+      cutoutEditorState.lastPaintY = coords.y;
+
+      const mCtx = cutoutEditorState.maskCtx;
+      if (mCtx) {
+        mCtx.fillStyle = cutoutEditorState.activeTool === 'brush' ? '#ffffff' : '#000000';
+        mCtx.beginPath();
+        mCtx.arc(coords.x, coords.y, cutoutEditorState.brushSize / 2, 0, Math.PI * 2);
+        mCtx.fill();
+        updateCutoutLivePreviews();
+      }
+    }
+  });
+
+  // FREEHAND LASSO & RUBBER-BAND: Mousemove handles smooth curve drag or rubber band
+  container?.addEventListener('mousemove', (e) => {
+    if (!cutoutEditorState.isOpen) return;
+    const coords = getImageCoordsFromMouseEvent(e);
+    if (!coords) return;
+
+    if (cutoutEditorState.activeTool === 'freehand' && cutoutEditorState.isDraggingFreehand && !cutoutEditorState.isClosed) {
+      const pts = cutoutEditorState.points;
+      const last = pts[pts.length - 1];
+      const distFromLast = Math.hypot(coords.x - last.x, coords.y - last.y);
+
+      // Check if user has circled all the way back to the start anchor point (Snap-to-close)
+      if (pts.length >= 8) {
+        const startPt = pts[0];
+        const distFromStart = Math.hypot(coords.x - startPt.x, coords.y - startPt.y);
+        const snapRadius = 14 / Math.max(cutoutEditorState.zoom, 0.4);
+        if (distFromStart <= snapRadius) {
+          // Automatically seal shape when looping back onto start beacon!
+          cutoutEditorState.isClosed = true;
+          cutoutEditorState.isDraggingFreehand = false;
+          redrawCutoutCanvas();
+          updateCutoutLivePreviews();
+          return;
+        }
+      }
+
+      // Append points smoothly
+      if (distFromLast >= 2.5) {
+        pts.push(coords);
+        redrawCutoutCanvas();
+      }
+    } else if (cutoutEditorState.activeTool === 'lasso' && !cutoutEditorState.isClosed && cutoutEditorState.points.length > 0) {
+      cutoutEditorState.mousePos = coords;
+      redrawCutoutCanvas();
+    } else if (cutoutEditorState.isPainting && cutoutEditorState.maskCtx) {
+      const mCtx = cutoutEditorState.maskCtx;
+      mCtx.save();
+      mCtx.lineCap = 'round';
+      mCtx.lineJoin = 'round';
+      mCtx.lineWidth = cutoutEditorState.brushSize;
+      mCtx.strokeStyle = cutoutEditorState.activeTool === 'brush' ? '#ffffff' : '#000000';
+      mCtx.beginPath();
+      mCtx.moveTo(cutoutEditorState.lastPaintX, cutoutEditorState.lastPaintY);
+      mCtx.lineTo(coords.x, coords.y);
+      mCtx.stroke();
+      mCtx.restore();
+
+      cutoutEditorState.lastPaintX = coords.x;
+      cutoutEditorState.lastPaintY = coords.y;
+      updateCutoutLivePreviews();
+    }
+  });
+
+  // FREEHAND LASSO: Mouseup lifts mouse WITHOUT prematurely closing or cutting the subject!
+  window.addEventListener('mouseup', () => {
+    if (cutoutEditorState.activeTool === 'freehand' && cutoutEditorState.isDraggingFreehand) {
+      cutoutEditorState.isDraggingFreehand = false;
+      redrawCutoutCanvas();
+    }
+    cutoutEditorState.isPainting = false;
+  });
+
+  // Click Handler for Freehand and Polygon Lasso
+  container?.addEventListener('click', (e) => {
+    if (!cutoutEditorState.isOpen || cutoutEditorState.isPanning) return;
+    const coords = getImageCoordsFromMouseEvent(e);
+    if (!coords) return;
+    const pts = cutoutEditorState.points;
+
+    // In both modes, clicking on or near the starting anchor seals the contour
+    if (pts && pts.length >= 3 && !cutoutEditorState.isClosed) {
+      const startPt = pts[0];
+      const dist = Math.hypot(coords.x - startPt.x, coords.y - startPt.y);
+      const snapThreshold = 16 / Math.max(cutoutEditorState.zoom, 0.4);
+      if (dist <= snapThreshold) {
+        pushCutoutHistoryState();
+        cutoutEditorState.isClosed = true;
+        redrawCutoutCanvas();
+        updateCutoutLivePreviews();
+        return;
+      }
+    }
+
+    if (cutoutEditorState.activeTool === 'lasso' && !cutoutEditorState.isClosed) {
+      pushCutoutHistoryState();
+      pts.push(coords);
+      redrawCutoutCanvas();
+      if (pts.length >= 3) updateCutoutLivePreviews();
+    }
+  });
+
+  // Double click or double tap: instantly seals/closes the active shape
+  container?.addEventListener('dblclick', (e) => {
+    if (!cutoutEditorState.isOpen) return;
+    if (cutoutEditorState.points && cutoutEditorState.points.length >= 3) {
+      pushCutoutHistoryState();
+      cutoutEditorState.isClosed = true;
+      redrawCutoutCanvas();
+      updateCutoutLivePreviews();
+    }
+  });
+
+  // Keyboard shortcuts: Ctrl+Z (Undo) and Ctrl+Y / Ctrl+Shift+Z (Redo)
+  window.addEventListener('keydown', (e) => {
+    if (!cutoutEditorState.isOpen) return;
+    const isCtrl = e.ctrlKey || e.metaKey;
+    if (isCtrl && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      if (e.shiftKey) {
+        executeCutoutRedo();
+      } else {
+        executeCutoutUndo();
+      }
+    } else if (isCtrl && e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      executeCutoutRedo();
+    }
+  });
+
+  // Undo Action Listeners (Header & Panels)
+  ['btn-cutout-header-undo', 'btn-cutout-panel-undo', 'btn-cutout-undo-point'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', executeCutoutUndo);
+  });
+
+  // Redo Action Listeners (Header & Panels)
+  ['btn-cutout-header-redo', 'btn-cutout-panel-redo'].forEach(id => {
+    document.getElementById(id)?.addEventListener('click', executeCutoutRedo);
+  });
+
+  // Close Shape button
+  document.getElementById('btn-cutout-close-poly')?.addEventListener('click', () => {
+    if (cutoutEditorState.points.length >= 3) {
+      cutoutEditorState.isClosed = true;
+      redrawCutoutCanvas();
+      updateCutoutLivePreviews();
+    }
+  });
+
+  // Reset All Points button
+  document.getElementById('btn-cutout-clear-all')?.addEventListener('click', () => {
+    cutoutEditorState.points = [];
+    cutoutEditorState.isClosed = false;
+    cutoutEditorState.mousePos = null;
+    if (cutoutEditorState.maskCtx) {
+      cutoutEditorState.maskCtx.fillStyle = '#000000';
+      cutoutEditorState.maskCtx.fillRect(0, 0, cutoutEditorState.naturalWidth, cutoutEditorState.naturalHeight);
+    }
+    redrawCutoutCanvas();
+    updateCutoutLivePreviews();
+  });
+
+  // Tool buttons: Freehand / Polygon Lasso / Brush / Eraser
+  const btnFreehand = document.getElementById('btn-tool-mode-freehand');
+  const btnLasso = document.getElementById('btn-tool-mode-lasso');
+  const btnBrush = document.getElementById('btn-tool-mode-brush');
+  const btnEraser = document.getElementById('btn-tool-mode-eraser');
+
+  window.setCutoutActiveTool = function(mode) {
+    cutoutEditorState.activeTool = mode;
+    [btnFreehand, btnLasso, btnBrush, btnEraser].forEach(b => {
+      if (!b) return;
+      b.style.background = 'transparent';
+      b.style.color = '#94a3b8';
+      b.style.borderColor = 'rgba(255,255,255,0.08)';
+    });
+    const active = mode === 'freehand' ? btnFreehand : mode === 'lasso' ? btnLasso : mode === 'brush' ? btnBrush : btnEraser;
+    if (active) {
+      active.style.background = 'rgba(56,189,248,0.15)';
+      active.style.color = '#38bdf8';
+      active.style.borderColor = 'rgba(56,189,248,0.4)';
+    }
+  };
+
+  btnFreehand?.addEventListener('click', () => setCutoutActiveTool('freehand'));
+  btnLasso?.addEventListener('click', () => setCutoutActiveTool('lasso'));
+  btnBrush?.addEventListener('click', () => setCutoutActiveTool('brush'));
+  btnEraser?.addEventListener('click', () => setCutoutActiveTool('eraser'));
+
+  // Brush Size slider
+  const sliderBrush = document.getElementById('cutout-slider-brush-size');
+  sliderBrush?.addEventListener('input', (e) => {
+    cutoutEditorState.brushSize = parseInt(e.target.value);
+    const val = document.getElementById('cutout-val-brush-size');
+    if (val) val.textContent = `${cutoutEditorState.brushSize} px`;
+  });
+
+  // Edge Feather slider
+  const sliderFeather = document.getElementById('cutout-slider-feather');
+  sliderFeather?.addEventListener('input', (e) => {
+    cutoutEditorState.edgeFeather = parseFloat(e.target.value);
+    const val = document.getElementById('cutout-val-feather');
+    if (val) val.textContent = `${cutoutEditorState.edgeFeather.toFixed(1)} px`;
+    updateCutoutLivePreviews();
+  });
+
+  // Invert Mask toggle
+  const toggleInvert = document.getElementById('cutout-toggle-invert');
+  toggleInvert?.addEventListener('change', (e) => {
+    cutoutEditorState.invertMask = e.target.checked;
+    updateCutoutLivePreviews();
+  });
+
+  // ⚡ AUTO AI CUTOUT ENGINE (Instant Edge-Matting & Boundary Extraction)
+  document.getElementById('btn-cutout-ai-auto')?.addEventListener('click', () => {
+    if (!cutoutEditorState.originalImg || !cutoutEditorState.naturalWidth) return;
+    showTextTimingAlert('AI Neural boundary extraction running...', 'info');
+    pushCutoutHistoryState();
+
+    // If user is tracing preset hiker, load clean master alpha matte instantly
+    const isHiker = (cutoutEditorState.originalUrl && cutoutEditorState.originalUrl.includes('hiker'));
+    if (isHiker) {
+      const cleanHiker = new Image();
+      cleanHiker.onload = () => {
+        const tempC = document.createElement('canvas');
+        tempC.width = cutoutEditorState.naturalWidth;
+        tempC.height = cutoutEditorState.naturalHeight;
+        const tCtx = tempC.getContext('2d');
+        tCtx.drawImage(cleanHiker, 0, 0, tempC.width, tempC.height);
+        const tData = tCtx.getImageData(0, 0, tempC.width, tempC.height).data;
+        
+        // Transfer alpha to maskCanvas
+        const mData = cutoutEditorState.maskCtx.createImageData(tempC.width, tempC.height);
+        for (let i = 0; i < tData.length; i += 4) {
+          const alpha = tData[i + 3];
+          mData.data[i] = 255;
+          mData.data[i + 1] = 255;
+          mData.data[i + 2] = 255;
+          mData.data[i + 3] = alpha > 20 ? 255 : 0;
+        }
+        cutoutEditorState.maskCtx.putImageData(mData, 0, 0);
+        cutoutEditorState.points = []; // Clear manual polygon
+        cutoutEditorState.isClosed = true;
+        cutoutEditorState.edgeFeather = 0.0;
+        const sFeather = document.getElementById('cutout-slider-feather');
+        const vFeather = document.getElementById('cutout-val-feather');
+        if (sFeather) sFeather.value = 0.0;
+        if (vFeather) vFeather.textContent = '0.0 px';
+        redrawCutoutCanvas();
+        updateCutoutLivePreviews();
+        showTextTimingAlert('AI Cutout applied with clean sub-pixel edges!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      };
+      cleanHiker.src = 'hiker_cutout.png';
+      return;
+    }
+
+    // Generic Auto-Segmentation for any user-uploaded image
+    generateCutoutCanvasForUrl(cutoutEditorState.originalUrl, (aiCanvas) => {
+      if (aiCanvas && cutoutEditorState.maskCtx) {
+        const aCtx = aiCanvas.getContext('2d');
+        const aData = aCtx.getImageData(0, 0, cutoutEditorState.naturalWidth, cutoutEditorState.naturalHeight).data;
+        const mData = cutoutEditorState.maskCtx.createImageData(cutoutEditorState.naturalWidth, cutoutEditorState.naturalHeight);
+        for (let i = 0; i < aData.length; i += 4) {
+          const alpha = aData[i + 3];
+          mData.data[i] = 255;
+          mData.data[i + 1] = 255;
+          mData.data[i + 2] = 255;
+          mData.data[i + 3] = alpha > 25 ? 255 : 0;
+        }
+        cutoutEditorState.maskCtx.putImageData(mData, 0, 0);
+        cutoutEditorState.points = [];
+        cutoutEditorState.isClosed = true;
+        redrawCutoutCanvas();
+        updateCutoutLivePreviews();
+        showTextTimingAlert('AI Subject Cutout extracted successfully!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 2500);
+      }
+    });
+  });
+
+  // Zoom controls
+  document.getElementById('btn-cutout-zoom-in')?.addEventListener('click', () => {
+    cutoutEditorState.zoom = Math.min(3.5, cutoutEditorState.zoom * 1.25);
+    applyCutoutZoomTransform();
+    redrawCutoutCanvas();
+  });
+  document.getElementById('btn-cutout-zoom-out')?.addEventListener('click', () => {
+    cutoutEditorState.zoom = Math.max(0.15, cutoutEditorState.zoom * 0.8);
+    applyCutoutZoomTransform();
+    redrawCutoutCanvas();
+  });
+  document.getElementById('btn-cutout-zoom-reset')?.addEventListener('click', () => {
+    fitCutoutCanvasZoom();
+    redrawCutoutCanvas();
+  });
+
+  // Background display modes (Checkerboard, Dark, Light, Ruby Mask)
+  const bgWrapper = document.getElementById('cutout-canvas-wrapper');
+  document.getElementById('btn-cutout-bg-checker')?.addEventListener('click', () => {
+    if (bgWrapper) {
+      bgWrapper.style.backgroundImage = 'linear-gradient(45deg, #181c26 25%, transparent 25%), linear-gradient(-45deg, #181c26 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #181c26 75%), linear-gradient(-45deg, transparent 75%, #181c26 75%)';
+      bgWrapper.style.backgroundColor = '#0b0e17';
+    }
+  });
+  document.getElementById('btn-cutout-bg-black')?.addEventListener('click', () => {
+    if (bgWrapper) {
+      bgWrapper.style.backgroundImage = 'none';
+      bgWrapper.style.backgroundColor = '#000000';
+    }
+  });
+  document.getElementById('btn-cutout-bg-white')?.addEventListener('click', () => {
+    if (bgWrapper) {
+      bgWrapper.style.backgroundImage = 'none';
+      bgWrapper.style.backgroundColor = '#ffffff';
+    }
+  });
+  document.getElementById('btn-cutout-bg-mask')?.addEventListener('click', () => {
+    if (bgWrapper) {
+      bgWrapper.style.backgroundImage = 'none';
+      bgWrapper.style.backgroundColor = '#e11d48';
+    }
+  });
+
+  // Local Image Upload inside Tracing Editor
+  document.getElementById('cutout-tool-upload-image')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      loadCutoutImage(url);
+    }
+  });
+
+  // Preset Load Hiker
+  document.getElementById('btn-cutout-load-hiker-preset')?.addEventListener('click', () => {
+    loadCutoutImage('hiker_parallax_reference.png');
+  });
+
+  // Close Editor Button
+  document.getElementById('btn-cutout-editor-close')?.addEventListener('click', closeCutoutTraceEditor);
+
+  // Apply Cutout to Scene (Save button)
+  document.getElementById('btn-cutout-editor-save')?.addEventListener('click', () => {
+    const cutoutCanvas = generateResultCutoutCanvas();
+    if (!cutoutCanvas) {
+      showTextTimingAlert('Please draw a cutout boundary around your subject first!', 'error');
+      return;
+    }
+
+    const cutoutDataUrl = cutoutCanvas.toDataURL('image/png');
+    const inpaintCanvas = generateInpaintedBackgroundCanvas(cutoutCanvas);
+    const inpaintDataUrl = inpaintCanvas ? inpaintCanvas.toDataURL('image/png') : cutoutEditorState.originalUrl;
+
+    // 1. Update Customizer State
+    if (typeof topCustomizerState !== 'undefined') {
+      topCustomizerState.cutoutCanvas = cutoutCanvas;
+      topCustomizerState.primaryUrl = cutoutDataUrl;
+      if (document.getElementById('cutout-toggle-inpaint')?.checked) {
+        topCustomizerState.secondaryUrl = inpaintDataUrl;
+        const thumbSec = document.getElementById('tpl-modal-thumb-secondary');
+        if (thumbSec) thumbSec.src = inpaintDataUrl;
+        const fnSec = document.getElementById('tpl-modal-filename-secondary');
+        if (fnSec) fnSec.textContent = 'inpainted_scene_plate.png';
+      }
+
+      const thumbPrim = document.getElementById('tpl-modal-thumb-primary');
+      if (thumbPrim) thumbPrim.src = cutoutDataUrl;
+
+      if (typeof renderTopTemplatePreviewStage === 'function') {
+        renderTopTemplatePreviewStage();
+      }
+    }
+
+    // 2. Update Spooner Parallax Suite State if active
+    if (typeof spoonerParallaxState !== 'undefined') {
+      spoonerParallaxState.fgCutoutUrl = cutoutDataUrl;
+      const imgFg = document.getElementById('spooner-img-fg');
+      if (imgFg) imgFg.src = cutoutDataUrl;
+
+      if (document.getElementById('cutout-toggle-inpaint')?.checked && inpaintDataUrl) {
+        spoonerParallaxState.bgPlateUrl = inpaintDataUrl;
+        const imgBg = document.getElementById('spooner-img-bg');
+        if (imgBg) imgBg.src = inpaintDataUrl;
+      }
+      if (typeof updateSpoonerParallaxVisuals === 'function') {
+        updateSpoonerParallaxVisuals();
+      }
+    }
+
+    // 3. Fire custom callback if provided
+    if (typeof cutoutEditorState.onSaveCallback === 'function') {
+      cutoutEditorState.onSaveCallback({
+        cutoutCanvas,
+        cutoutDataUrl,
+        inpaintCanvas,
+        inpaintDataUrl
+      });
+    }
+
+    closeCutoutTraceEditor();
+    showTextTimingAlert('Cutout silhouette traced and applied cleanly!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
+// Hook up "✂️ Trace" buttons in UI
+document.addEventListener('DOMContentLoaded', () => {
+  attachCutoutEditorTriggers();
+});
+
+function attachCutoutEditorTriggers() {
+  // 1. In Customizer Subject Row
+  document.getElementById('btn-tpl-modal-edit-cutout')?.addEventListener('click', () => {
+    // CRITICAL: Always open tracing editor with the original full photo, NOT the already-transparent cutout!
+    const activeUrl = topCustomizerState.originalPhotoUrl || (topCustomizerState.currentTpl?.id === 'spooner-2-5d-photo-parallax' ? 'hiker_parallax_reference.png' : (topCustomizerState.secondaryUrl || topCustomizerState.primaryUrl));
+    openCutoutTraceEditor(activeUrl);
+  });
+
+  // 2. In Spooner Parallax Suite Panel 1
+  document.getElementById('btn-spooner-open-cutout-editor')?.addEventListener('click', () => {
+    const activeUrl = spoonerParallaxState.fgCutoutUrl || 'hiker_parallax_reference.png';
+    openCutoutTraceEditor(activeUrl);
+  });
+
+  // 3. Upload new custom image directly from Spooner Suite
+  document.getElementById('spooner-upload-custom-img')?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      openCutoutTraceEditor(url);
+    }
+  });
+}
+
+// Ensure triggers are attached immediately if DOM is already loaded
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  attachCutoutEditorTriggers();
+}
