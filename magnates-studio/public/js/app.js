@@ -25714,12 +25714,12 @@ let topCustomizerState = {
   bgPosX: 0,
   bgPosY: 0,
   enableDustParticles: false,
-  dustDensity: 0,
+  dustDensity: 30,
   particleType: 'dust',
   particleSpeed: 1.0,
   particleSize: 2.0,
   enableLightWrap: false,
-  lightWrapColor: '#000000',
+  lightWrapColor: '#f59e0b',
   lightWrapIntensity: 0,
   enable3DCameraTilt: true,
   cameraTiltAngle: 4.0,
@@ -26118,6 +26118,9 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.textVisible = false;
     topCustomizerState.mainText = '';
     topCustomizerState.subText = '';
+    topCustomizerState.enableLightWrap = false;
+    topCustomizerState.lightWrapIntensity = 0;
+    topCustomizerState.enableDustParticles = false;
     topCustomizerState.titleColor = '#ffffff';
     topCustomizerState.textColor = '#38bdf8';
     topCustomizerState.duration = 8;
@@ -29973,12 +29976,18 @@ function modalSelectTemplateCard(templateId) {
     }
   }
 
+  const drawer = document.getElementById('modal-tpl-sidebar-drawer');
+  if (drawer) drawer.style.display = 'none';
+
+  if (typeof dedicatedSuiteMap !== 'undefined' && dedicatedSuiteMap[tpl.id]) {
+    closeTopTemplateCustomizer();
+    dedicatedSuiteMap[tpl.id]();
+    return;
+  }
+
   openTopTemplateCustomizer(tpl);
   populateModalTemplatesSidebar();
   populateModalScenesStoryboard();
-  // Auto-close floating drawer after selecting a template so viewport stays clean
-  const drawer = document.getElementById('modal-tpl-sidebar-drawer');
-  if (drawer) drawer.style.display = 'none';
 }
 
 function populateModalScenesStoryboard() {
