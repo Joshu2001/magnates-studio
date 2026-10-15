@@ -333,7 +333,7 @@
 
     if (mode === 'video') {
       html += section('Motion', [
-        row('v-speed', 'Playback Speed', 0.2, 3, 0.1, fx.speed, v => v.toFixed(1) + 'x'),
+        row('v-speed', 'Playback Speed', -3.0, 3.0, 0.1, fx.speed, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
         row('v-pitch', 'Tilt Pitch (X)', -40, 40, 1, fx.pitch, v => v + '°'),
         row('v-yaw', 'Rotation Yaw (Y)', -40, 40, 1, fx.yaw, v => v + '°'),
         row('v-roll', 'Roll (Z)', -30, 30, 1, fx.roll, v => v + '°'),
@@ -481,7 +481,7 @@
     const lab = (t) => setLabel(key, t);
 
     if (key.startsWith('tx-')) { setText(tplId, slotsFor(tplId)[parseInt(key.slice(3), 10)], v); }
-    else if (key === 'v-speed') { fx.speed = v; lab(v.toFixed(1) + 'x'); }
+    else if (key === 'v-speed') { fx.speed = v; lab((v >= 0 ? '+' : '') + v.toFixed(1) + 'x'); }
     else if (key === 'v-pitch') { fx.pitch = v; lab(v + '°'); }
     else if (key === 'v-yaw') { fx.yaw = v; lab(v + '°'); }
     else if (key === 'v-roll') { fx.roll = v; lab(v + '°'); }

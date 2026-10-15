@@ -22505,6 +22505,22 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'dark-power-sigil',
+    title: 'Dark Power Sigil (Act 1 Multiplane Dolly & FX)',
+    category: 'Parallax',
+    badge: 'Magnates Media',
+    difficulty: 'Pro Motion',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(to top, rgba(6, 78, 59, 0.8), rgba(4, 120, 87, 0.4), rgba(2, 6, 23, 0.95))',
+    description: 'Act 1 Cinematic: Multiplane parallax separation with framing hand silhouettes, breathing neon aura, electric discharge arcs, and customizable emblem core.',
+    tags: ['Dark Sigil', 'OpenAI Act 1', 'Multiplane', '2.5D Parallax', 'Lightning FX'],
+    defaultImage: '/dark_power_sigil_core.png',
+    cutoutImage: '/dark_power_sigil_hands.png',
+    secondaryImage: '/dark_power_sigil_bg.png',
+    previewThumb: '/dark_power_sigil_thumb.jpg'
+  },
+
+  {
     id: 'subject-25d-parallax',
     title: '2.5D Animated Subject Cutout (Auto BG Removed)',
     category: 'Parallax',
@@ -23319,7 +23335,7 @@ function renderHomepageTemplates() {
   });
 }
 
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
 let hoverBridgeActive = false;
 let hoverExternalT = null;
 function startTemplateHoverVideo(cardEl, tpl, manual) {
@@ -23355,7 +23371,51 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'subject-25d-parallax') {
+    } else if (tplId === 'dark-power-sigil') {
+      const z0 = topCustomizerState.sigilZ0 || tpl.secondaryImage || '/dark_power_sigil_bg.png';
+      const z3l = topCustomizerState.sigilZ3L || '/dark_power_sigil_hand_left.png';
+      const z3r = topCustomizerState.sigilZ3R || '/dark_power_sigil_hand_right.png';
+      const z4 = topCustomizerState.sigilZ4 || tpl.defaultImage || '/dark_power_sigil_core.png';
+      const auraCol = topCustomizerState.sigilAuraColor || '#2effc6';
+      const hasAura = topCustomizerState.sigilAura !== false;
+      const hasLight = topCustomizerState.sigilLightning !== false;
+      const hasVig = topCustomizerState.sigilVignette !== false;
+      const hasHandL = topCustomizerState.sigilHandLeft !== false;
+      const hasHandR = topCustomizerState.sigilHandRight !== false;
+
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #010403; overflow: hidden; perspective: 1200px;">
+          <!-- Z=0 Atmosphere Backdrop -->
+          <div id="fx-bg-wrap-${tplId}" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden;">
+            <img id="fx-bg-${tplId}" src="${z0}" alt="Atmosphere" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85); transform-origin: center center;" />
+          </div>
+
+          <!-- Z=1 Lightning Arc Discharges -->
+          <div id="fx-lightning-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 35% 35%, rgba(120,255,230,0.85), transparent 50%), radial-gradient(ellipse at 65% 65%, ${auraCol}cc, transparent 55%); opacity: ${hasLight ? '0' : '0'}; display: ${hasLight ? 'block' : 'none'}; mix-blend-mode: color-dodge; pointer-events: none; z-index: 2;"></div>
+
+          <!-- Z=2 Radial Breathing Aura Emitter -->
+          <div id="fx-aura-${tplId}" style="position: absolute; width: 340px; height: 340px; left: 50%; top: 50%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, ${auraCol} 0%, ${auraCol}33 45%, transparent 70%); filter: blur(36px); opacity: ${hasAura ? '0.7' : '0'}; display: ${hasAura ? 'block' : 'none'}; pointer-events: none; z-index: 3;"></div>
+
+          <!-- Z=3a Framing Cutout (Left Arm Entering from Left) -->
+          <div id="fx-hand-left-wrap-${tplId}" data-sigil-layer-key="z3l" data-sigil-layer-name="Layer 1 (Left)" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; display: ${hasHandL ? 'flex' : 'none'}; align-items: center; justify-content: flex-start;">
+            <img id="fx-hand-left-${tplId}" src="${z3l}" alt="Left Arm Cutout" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 20px ${auraCol}44); transform-origin: left center;" />
+          </div>
+
+          <!-- Z=3b Framing Cutout (Right Arm Entering from Right) -->
+          <div id="fx-hand-right-wrap-${tplId}" data-sigil-layer-key="z3r" data-sigil-layer-name="Layer 2 (Right)" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; display: ${hasHandR ? 'flex' : 'none'}; align-items: center; justify-content: flex-end;">
+            <img id="fx-hand-right-${tplId}" src="${z3r}" alt="Right Arm Cutout" style="position: absolute; right: 0; top: 0; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 20px ${auraCol}44); transform-origin: right center;" />
+          </div>
+
+          <!-- Z=4 Hero Core Emblem (Logo / Crest) -->
+          <div id="fx-core-wrap-${tplId}" data-sigil-layer-key="z4" data-sigil-layer-name="Hero Emblem" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+            <img id="fx-core-${tplId}" src="${z4}" alt="Emblem Core" style="position: absolute; width: 175px; height: 175px; object-fit: contain; filter: drop-shadow(0 0 28px ${auraCol}); transform-origin: center center;" />
+          </div>
+
+          <!-- Z=5 Foreground Vignette Overlay -->
+          <div id="fx-vignette-${tplId}" style="position: absolute; inset: 0; box-shadow: inset 0 0 110px rgba(0,0,0,0.92); pointer-events: none; z-index: 6; display: ${hasVig ? 'block' : 'none'};"></div>
+        </div>
+      `;
+} else if (tplId === 'subject-25d-parallax') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
           <img id="fx-bg-${tplId}" src="${tpl.secondaryImage}" alt="Moving Scene" style="width: 100%; height: 100%; object-fit: cover; filter: blur(2px) brightness(0.75);" />
@@ -24468,7 +24528,150 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       : ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
     const _fx = manual ? Object.assign({ pitch: 0, yaw: 0, roll: 0, zoom: 1 }, manual.fx || {}) : ((hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 });
 
-    if (tplId === 'spooner-2-5d-photo-parallax') {
+    if (tplId === 'dark-power-sigil') {
+      // Act 1 Cinematic Motion Sequence
+      const durationSec = Math.max(1, topCustomizerState.sigilDuration || topCustomizerState.duration || 5.0);
+      const playSpeed = topCustomizerState.sigilSpeed !== undefined ? topCustomizerState.sigilSpeed : 1.0;
+      const dollyMax = topCustomizerState.sigilDolly || 1.18;
+      const parallaxMax = topCustomizerState.sigilParallax !== undefined ? topCustomizerState.sigilParallax : 18;
+      const pulseSec = topCustomizerState.sigilPulse || 1.4;
+      const travelPx = topCustomizerState.sigilTravel !== undefined ? topCustomizerState.sigilTravel : 80;
+      const pathLeft = topCustomizerState.sigilPathLeft || 'lateral-in';
+      const pathRight = topCustomizerState.sigilPathRight || 'lateral-in';
+      const pathCore = topCustomizerState.sigilPathCore || 'push-float';
+      const hasLightning = topCustomizerState.sigilLightning !== false;
+      const hasAura = topCustomizerState.sigilAura !== false;
+      const hasVignette = topCustomizerState.sigilVignette !== false;
+      const hasHandL = topCustomizerState.sigilHandLeft !== false;
+      const hasHandR = topCustomizerState.sigilHandRight !== false;
+      const auraColor = topCustomizerState.sigilAuraColor || '#2effc6';
+
+      // Calibrated preview progression over customized duration with speed scalar
+      const scaledT = t * playSpeed;
+      const normT = Math.min(1.0, Math.max(0.0, (scaledT % durationSec) / durationSec));
+      // Smooth cinematic easeInOutCubic
+      const smoothP = normT < 0.5 ? 4 * normT * normT * normT : 1 - Math.pow(-2 * normT + 2, 3) / 2;
+
+      // Update timer pill & hud if open in customizer
+      const timerBadge = document.getElementById('tpl-modal-timer-badge');
+      if (timerBadge) {
+        timerBadge.textContent = `${(normT * durationSec).toFixed(1)}s / ${durationSec.toFixed(1)}s (Scene 1)`;
+      }
+
+      // 1. Slow Dramatic Dolly Zoom on background atmosphere
+      const bgZoom = 1.0 + smoothP * (dollyMax - 1.0);
+      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
+      if (bgEl) {
+        bgEl.style.transform = `scale(${bgZoom.toFixed(4)})`;
+      }
+
+      // Helper function for trajectory calculations
+      const computeTrajectoryTransform = (pathType, isLeft, p, timeVal) => {
+        const sign = isLeft ? -1 : 1;
+        const entryFactor = (1 - p);
+        let transX = sign * travelPx * entryFactor;
+        let transY = 0;
+        let rotDeg = 0;
+        let scaleVal = 1.0 + p * 0.08;
+
+        if (pathType === 'diagonal-down') {
+          transY = -50 * entryFactor;
+          transX = sign * (travelPx * 0.8) * entryFactor;
+        } else if (pathType === 'diagonal-up') {
+          transY = 50 * entryFactor;
+          transX = sign * (travelPx * 0.8) * entryFactor;
+        } else if (pathType === 'spiral-in') {
+          rotDeg = sign * 25 * entryFactor;
+          transY = Math.sin(p * Math.PI) * 20;
+          transX = sign * travelPx * entryFactor;
+        } else if (pathType === 'zoom-only') {
+          transX = 0;
+          transY = 0;
+          scaleVal = 0.65 + p * 0.45;
+        }
+
+        // Add subtle organic idle breathing drift once settled
+        const driftX = Math.sin(timeVal * 1.5) * (parallaxMax * 0.35) * sign;
+        const driftY = Math.cos(timeVal * 1.8) * (parallaxMax * 0.15);
+        return { transX: transX + driftX, transY: transY + driftY, rotDeg, scaleVal };
+      };
+
+      // 2. Multiplane Parallax Separation & Independent Hand Entrances
+      const offZ3L = topCustomizerState.sigilOffsets?.z3l || { x: 0, y: 0 };
+      const offZ3R = topCustomizerState.sigilOffsets?.z3r || { x: 0, y: 0 };
+      const offZ4 = topCustomizerState.sigilOffsets?.z4 || { x: 0, y: 0 };
+
+      // Left arm / Framing Layer 1
+      const handLeftWrap = fxContainer?.querySelector(`#fx-hand-left-wrap-${tplId}`);
+      const handLeftEl = fxContainer?.querySelector(`#fx-hand-left-${tplId}`);
+      if (handLeftWrap) handLeftWrap.style.display = hasHandL ? 'flex' : 'none';
+      if (handLeftEl && hasHandL) {
+        const t3l = computeTrajectoryTransform(pathLeft, true, smoothP, scaledT);
+        handLeftEl.style.transform = `translate(${(t3l.transX + offZ3L.x).toFixed(2)}px, ${(t3l.transY + offZ3L.y).toFixed(2)}px) rotate(${t3l.rotDeg.toFixed(1)}deg) scale(${t3l.scaleVal.toFixed(3)})`;
+      }
+
+      // Right arm / Framing Layer 2
+      const handRightWrap = fxContainer?.querySelector(`#fx-hand-right-wrap-${tplId}`);
+      const handRightEl = fxContainer?.querySelector(`#fx-hand-right-${tplId}`);
+      if (handRightWrap) handRightWrap.style.display = hasHandR ? 'flex' : 'none';
+      if (handRightEl && hasHandR) {
+        const t3r = computeTrajectoryTransform(pathRight, false, smoothP, scaledT);
+        handRightEl.style.transform = `translate(${(t3r.transX + offZ3R.x).toFixed(2)}px, ${(t3r.transY + offZ3R.y).toFixed(2)}px) rotate(${t3r.rotDeg.toFixed(1)}deg) scale(${t3r.scaleVal.toFixed(3)})`;
+      }
+
+      // 3. Central Hero Core Emblem
+      const coreWrap = fxContainer?.querySelector(`#fx-core-wrap-${tplId}`);
+      const coreEl = fxContainer?.querySelector(`#fx-core-${tplId}`);
+      if (coreEl) {
+        const coreZoom = 1.0 + smoothP * ((dollyMax - 1.0) * 1.35);
+        let coreY = Math.sin(scaledT * 2.2) * (parallaxMax * 0.25);
+        let coreRot = 0;
+
+        if (pathCore === 'slow-spin') {
+          coreRot = (scaledT * 25) % 360;
+        } else if (pathCore === 'burst-zoom') {
+          const warpZoom = Math.pow(smoothP, 2.5) * 1.4 + 1.0;
+          coreEl.style.transform = `translate(${offZ4.x.toFixed(2)}px, ${offZ4.y.toFixed(2)}px) scale(${warpZoom.toFixed(3)})`;
+        } else if (pathCore === 'static-glow') {
+          coreY = 0;
+        }
+
+        if (pathCore !== 'burst-zoom') {
+          coreEl.style.transform = `translate(${offZ4.x.toFixed(2)}px, ${(coreY + offZ4.y).toFixed(2)}px) scale(${coreZoom.toFixed(3)}) rotate(${coreRot.toFixed(1)}deg)`;
+        }
+      }
+
+      // 4. Breathing Neon Rim Aura Pulse
+      const auraEl = fxContainer?.querySelector(`#fx-aura-${tplId}`);
+      if (auraEl) {
+        auraEl.style.display = hasAura ? 'block' : 'none';
+        if (hasAura) {
+          const pulsePhase = Math.sin((scaledT * Math.PI * 2) / pulseSec);
+          const auraScale = 0.92 + pulsePhase * 0.16;
+          const auraOp = 0.5 + pulsePhase * 0.25;
+          auraEl.style.transform = `translate(-50%, -50%) scale(${auraScale.toFixed(3)})`;
+          auraEl.style.opacity = `${auraOp.toFixed(2)}`;
+          auraEl.style.background = `radial-gradient(circle, ${auraColor} 0%, ${auraColor}33 45%, transparent 70%)`;
+        }
+      }
+
+      // 5. Electric Lightning Discharge Arc Flash
+      const lightEl = fxContainer?.querySelector(`#fx-lightning-${tplId}`);
+      if (lightEl) {
+        lightEl.style.display = hasLightning ? 'block' : 'none';
+        if (hasLightning) {
+          const lPhase = (scaledT * 4.2) % 1.0;
+          const isArc = lPhase > 0.82 || ((scaledT * 7.5) % 1.0 > 0.92);
+          lightEl.style.opacity = isArc ? (0.7 + Math.random() * 0.3).toFixed(2) : '0';
+        }
+      }
+
+      // 6. Foreground Vignette
+      const vigEl = fxContainer?.querySelector(`#fx-vignette-${tplId}`);
+      if (vigEl) {
+        vigEl.style.display = hasVignette ? 'block' : 'none';
+      }
+    } else if (tplId === 'spooner-2-5d-photo-parallax') {
       // Unidirectional forward push over 4-second preview loop
       const normT = (t % 4.0) / 4.0; // 0 to 1 steady push
       const p = normT < 0.5 ? 4 * normT * normT * normT : 1 - Math.pow(-2 * normT + 2, 3) / 2;
@@ -26110,17 +26313,49 @@ function openTopTemplateCustomizer(tpl) {
   const colorTextMain = document.getElementById('tpl-modal-color-text-main');
   const wrapSub = document.getElementById('tpl-modal-wrap-subtitle');
 
+  // Universal Template Isolation Reset: hide all template-specific panels by default
+  const sigilWrapEl = document.getElementById('tpl-modal-wrap-sigil-fx');
+  if (sigilWrapEl) sigilWrapEl.style.display = 'none';
+  const spoonerWrapEl = document.getElementById('tpl-modal-spooner-controls');
+  if (spoonerWrapEl) spoonerWrapEl.style.display = 'none';
+  const matrixWrapEl = document.getElementById('tpl-modal-wrap-matrix');
+  if (matrixWrapEl) matrixWrapEl.style.display = 'none';
+  const tearWrapEl = document.getElementById('tpl-modal-wrap-tear');
+  if (tearWrapEl) tearWrapEl.style.display = 'none';
+  const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
+  if (atmosphereWrapEl) atmosphereWrapEl.style.display = 'flex';
+  const primWrapEl = document.getElementById('tpl-modal-wrap-primary');
+  if (primWrapEl) primWrapEl.style.display = 'flex';
+  const secWrapEl = document.getElementById('tpl-modal-wrap-secondary');
+  if (secWrapEl) secWrapEl.style.display = 'flex';
+  const txtWrapEl = document.getElementById('tpl-modal-wrap-text');
+  if (txtWrapEl) txtWrapEl.style.display = 'flex';
+
+  // 3D Interactive Mode button & floating toolbar: scope strictly to dark-power-sigil or 3D templates
+  const btn3DMode = document.getElementById('btn-toggle-3d-interactive-mode');
+  if (btn3DMode) {
+    btn3DMode.style.display = (tpl.id === 'dark-power-sigil' || tpl.is3D) ? 'inline-flex' : 'none';
+  }
+  const floatBar = document.getElementById('sigil-floating-layer-toolbar');
+  if (floatBar) floatBar.style.display = 'none';
+  topCustomizerState.is3DMode = false;
+  topCustomizerState.selectedSigilLayer = null;
+
   if (tpl.id === 'spooner-2-5d-photo-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground (1:1 Registered)';
     if (labelSec) labelSec.textContent = 'Inpainted Scene Backdrop (1:1 Registered)';
     if (wrapSec) wrapSec.style.display = 'flex';
+    if (spoonerWrapEl) spoonerWrapEl.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.textVisible = false;
     topCustomizerState.mainText = '';
     topCustomizerState.subText = '';
     topCustomizerState.enableLightWrap = false;
     topCustomizerState.lightWrapIntensity = 0;
-    topCustomizerState.enableDustParticles = false;
+    topCustomizerState.enableDustParticles = topCustomizerState.enableDustParticles !== undefined ? topCustomizerState.enableDustParticles : true;
+    topCustomizerState.dustDensity = topCustomizerState.dustDensity !== undefined ? topCustomizerState.dustDensity : 35;
+    topCustomizerState.particleType = topCustomizerState.particleType || 'snow';
+    topCustomizerState.particleSpeed = topCustomizerState.particleSpeed !== undefined ? topCustomizerState.particleSpeed : 10;
     topCustomizerState.titleColor = '#ffffff';
     topCustomizerState.textColor = '#38bdf8';
     topCustomizerState.duration = 8;
@@ -26129,7 +26364,432 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.spoonerPan = topCustomizerState.spoonerPan !== undefined ? topCustomizerState.spoonerPan : 4;
     topCustomizerState.spoonerBlur = topCustomizerState.spoonerBlur !== undefined ? topCustomizerState.spoonerBlur : 0.0;
     if (wrapText) wrapText.style.display = 'none';
-  } else if (tpl.id === 'subject-25d-parallax') {
+  } else if (tpl.id === 'dark-power-sigil') {
+    // Show 6-layer Sigil inspector, hide default 2-layer rows
+    const sigilWrap = document.getElementById('tpl-modal-wrap-sigil-fx');
+    if (sigilWrap) sigilWrap.style.display = 'flex';
+    const primWrap = document.getElementById('tpl-modal-wrap-primary');
+    if (primWrap) primWrap.style.display = 'none';
+    const secWrap = document.getElementById('tpl-modal-wrap-secondary');
+    if (secWrap) secWrap.style.display = 'none';
+    const txtWrap = document.getElementById('tpl-modal-wrap-text');
+    if (txtWrap) txtWrap.style.display = 'none';
+    if (spoonerWrapEl) spoonerWrapEl.style.display = 'none';
+    const spoonerWrap = document.getElementById('tpl-modal-wrap-spooner-controls');
+    if (spoonerWrap) spoonerWrap.style.display = 'none';
+
+    // State defaults
+    topCustomizerState.sigilDuration = topCustomizerState.sigilDuration || 5.0;
+    topCustomizerState.sigilSpeed = topCustomizerState.sigilSpeed !== undefined ? topCustomizerState.sigilSpeed : 1.0;
+    topCustomizerState.sigilDolly = topCustomizerState.sigilDolly || 1.18;
+    topCustomizerState.sigilParallax = topCustomizerState.sigilParallax !== undefined ? topCustomizerState.sigilParallax : 18;
+    topCustomizerState.sigilPulse = topCustomizerState.sigilPulse || 1.4;
+    topCustomizerState.sigilTravel = topCustomizerState.sigilTravel !== undefined ? topCustomizerState.sigilTravel : 80;
+    topCustomizerState.sigilPathLeft = topCustomizerState.sigilPathLeft || 'lateral-in';
+    topCustomizerState.sigilPathRight = topCustomizerState.sigilPathRight || 'lateral-in';
+    topCustomizerState.sigilPathCore = topCustomizerState.sigilPathCore || 'push-float';
+    topCustomizerState.sigilLightning = topCustomizerState.sigilLightning !== undefined ? topCustomizerState.sigilLightning : true;
+    topCustomizerState.sigilAura = topCustomizerState.sigilAura !== undefined ? topCustomizerState.sigilAura : true;
+    topCustomizerState.sigilAuraColor = topCustomizerState.sigilAuraColor || '#2effc6';
+    topCustomizerState.sigilVignette = topCustomizerState.sigilVignette !== undefined ? topCustomizerState.sigilVignette : true;
+    topCustomizerState.sigilHandLeft = topCustomizerState.sigilHandLeft !== undefined ? topCustomizerState.sigilHandLeft : true;
+    topCustomizerState.sigilHandRight = topCustomizerState.sigilHandRight !== undefined ? topCustomizerState.sigilHandRight : true;
+    topCustomizerState.sigilZ0 = topCustomizerState.sigilZ0 || tpl.secondaryImage || '/dark_power_sigil_bg.png';
+    topCustomizerState.sigilZ3L = topCustomizerState.sigilZ3L || '/dark_power_sigil_hand_left.png';
+    topCustomizerState.sigilZ3R = topCustomizerState.sigilZ3R || '/dark_power_sigil_hand_right.png';
+    topCustomizerState.sigilZ4 = topCustomizerState.sigilZ4 || tpl.defaultImage || '/dark_power_sigil_core.png';
+
+    // Synchronize UI control values to current state
+    const slDur = document.getElementById('sigil-slider-duration');
+    const valDur = document.getElementById('sigil-val-duration');
+    if (slDur) slDur.value = topCustomizerState.sigilDuration || 5.0;
+    if (valDur) valDur.textContent = `${(topCustomizerState.sigilDuration || 5.0).toFixed(1)} sec`;
+
+    const slSpd = document.getElementById('sigil-slider-speed');
+    const valSpd = document.getElementById('sigil-val-speed');
+    if (slSpd) slSpd.value = Math.round((topCustomizerState.sigilSpeed !== undefined ? topCustomizerState.sigilSpeed : 1.0) * 10);
+    if (valSpd) valSpd.textContent = `${(topCustomizerState.sigilSpeed !== undefined ? topCustomizerState.sigilSpeed : 1.0).toFixed(1)}x`;
+
+    const selPathL = document.getElementById('sigil-select-path-left');
+    if (selPathL) selPathL.value = topCustomizerState.sigilPathLeft || 'lateral-in';
+
+    const selPathR = document.getElementById('sigil-select-path-right');
+    if (selPathR) selPathR.value = topCustomizerState.sigilPathRight || 'lateral-in';
+
+    const selPathC = document.getElementById('sigil-select-path-core');
+    if (selPathC) selPathC.value = topCustomizerState.sigilPathCore || 'push-float';
+
+    const slTravel = document.getElementById('sigil-slider-travel');
+    const valTravel = document.getElementById('sigil-val-travel');
+    if (slTravel) slTravel.value = topCustomizerState.sigilTravel !== undefined ? topCustomizerState.sigilTravel : 80;
+    if (valTravel) valTravel.textContent = `${topCustomizerState.sigilTravel !== undefined ? topCustomizerState.sigilTravel : 80} px`;
+
+    const slDolly = document.getElementById('sigil-slider-dolly');
+    const valDolly = document.getElementById('sigil-val-dolly');
+    if (slDolly) slDolly.value = Math.round((topCustomizerState.sigilDolly || 1.18) * 100);
+    if (valDolly) valDolly.textContent = `100% -> ${slDolly ? slDolly.value : 118}%`;
+
+    const slPara = document.getElementById('sigil-slider-parallax');
+    const valPara = document.getElementById('sigil-val-parallax');
+    if (slPara) slPara.value = topCustomizerState.sigilParallax !== undefined ? topCustomizerState.sigilParallax : 18;
+    if (valPara) valPara.textContent = `±${slPara ? slPara.value : 18} px`;
+
+    const slPulse = document.getElementById('sigil-slider-pulse');
+    const valPulse = document.getElementById('sigil-val-pulse');
+    if (slPulse) slPulse.value = Math.round((topCustomizerState.sigilPulse || 1.4) * 10);
+    if (valPulse) valPulse.textContent = `${(topCustomizerState.sigilPulse || 1.4).toFixed(1)} sec`;
+
+    const colAura = document.getElementById('sigil-color-aura');
+    if (colAura) colAura.value = topCustomizerState.sigilAuraColor || '#2effc6';
+
+    const chkLight = document.getElementById('sigil-toggle-lightning');
+    if (chkLight) chkLight.checked = topCustomizerState.sigilLightning !== false;
+
+    const chkAura = document.getElementById('sigil-toggle-aura');
+    if (chkAura) chkAura.checked = topCustomizerState.sigilAura !== false;
+
+    const chkVig = document.getElementById('sigil-toggle-vignette');
+    if (chkVig) chkVig.checked = topCustomizerState.sigilVignette !== false;
+
+    const chkHandL = document.getElementById('sigil-toggle-hand-left');
+    if (chkHandL) chkHandL.checked = topCustomizerState.sigilHandLeft !== false;
+
+    const chkHandR = document.getElementById('sigil-toggle-hand-right');
+    if (chkHandR) chkHandR.checked = topCustomizerState.sigilHandRight !== false;
+
+    // Attach listeners once
+    if (!window._sigilListenersAttached) {
+      window._sigilListenersAttached = true;
+
+      slDur?.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        topCustomizerState.sigilDuration = val;
+        topCustomizerState.duration = val;
+        if (valDur) valDur.textContent = `${val.toFixed(1)} sec`;
+      });
+
+      slSpd?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value) / 10.0;
+        topCustomizerState.sigilSpeed = val;
+        if (valSpd) valSpd.textContent = `${val.toFixed(1)}x`;
+      });
+
+      selPathL?.addEventListener('change', (e) => {
+        topCustomizerState.sigilPathLeft = e.target.value;
+      });
+
+      selPathR?.addEventListener('change', (e) => {
+        topCustomizerState.sigilPathRight = e.target.value;
+      });
+
+      selPathC?.addEventListener('change', (e) => {
+        topCustomizerState.sigilPathCore = e.target.value;
+      });
+
+      slTravel?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        topCustomizerState.sigilTravel = val;
+        if (valTravel) valTravel.textContent = `${val} px`;
+      });
+
+      slDolly?.addEventListener('input', (e) => {
+        topCustomizerState.sigilDolly = parseInt(e.target.value) / 100.0;
+        if (valDolly) valDolly.textContent = `100% -> ${e.target.value}%`;
+      });
+
+      slPara?.addEventListener('input', (e) => {
+        topCustomizerState.sigilParallax = parseInt(e.target.value);
+        if (valPara) valPara.textContent = `±${e.target.value} px`;
+      });
+
+      slPulse?.addEventListener('input', (e) => {
+        topCustomizerState.sigilPulse = parseInt(e.target.value) / 10.0;
+        if (valPulse) valPulse.textContent = `${(parseInt(e.target.value)/10.0).toFixed(1)} sec`;
+      });
+
+      colAura?.addEventListener('input', (e) => {
+        topCustomizerState.sigilAuraColor = e.target.value;
+      });
+
+      document.getElementById('sigil-toggle-lightning')?.addEventListener('change', (e) => {
+        topCustomizerState.sigilLightning = e.target.checked;
+        const el = document.getElementById(`fx-lightning-dark-power-sigil`);
+        if (el) el.style.display = e.target.checked ? 'block' : 'none';
+      });
+
+      document.getElementById('sigil-toggle-aura')?.addEventListener('change', (e) => {
+        topCustomizerState.sigilAura = e.target.checked;
+        const el = document.getElementById(`fx-aura-dark-power-sigil`);
+        if (el) el.style.display = e.target.checked ? 'block' : 'none';
+      });
+
+      document.getElementById('sigil-toggle-vignette')?.addEventListener('change', (e) => {
+        topCustomizerState.sigilVignette = e.target.checked;
+        const el = document.getElementById(`fx-vignette-dark-power-sigil`);
+        if (el) el.style.display = e.target.checked ? 'block' : 'none';
+      });
+
+      document.getElementById('sigil-toggle-hand-left')?.addEventListener('change', (e) => {
+        topCustomizerState.sigilHandLeft = e.target.checked;
+        const el = document.getElementById(`fx-hand-left-wrap-dark-power-sigil`);
+        if (el) el.style.display = e.target.checked ? 'flex' : 'none';
+      });
+
+      document.getElementById('sigil-toggle-hand-right')?.addEventListener('change', (e) => {
+        topCustomizerState.sigilHandRight = e.target.checked;
+        const el = document.getElementById(`fx-hand-right-wrap-dark-power-sigil`);
+        if (el) el.style.display = e.target.checked ? 'flex' : 'none';
+      });
+
+      // Layer replacement uploads
+      const bindUpload = (inputEl, thumbEl, key, domTargetId) => {
+        if (!inputEl) return;
+        inputEl.onchange = (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          const url = URL.createObjectURL(file);
+          topCustomizerState[key] = url;
+          if (thumbEl) thumbEl.src = url;
+
+          // Directly update every matching element in the DOM
+          const stageMatches = document.querySelectorAll(`img[id*="${domTargetId}"], [id^="${domTargetId}"]`);
+          stageMatches.forEach(m => { 
+            if (m.tagName === 'IMG') m.src = url;
+          });
+
+          // Also check explicit ID
+          const liveEl = document.getElementById(domTargetId);
+          if (liveEl && liveEl.tagName === 'IMG') liveEl.src = url;
+
+          // Re-render preview stage with updated layer state
+          renderTopTemplatePreviewStage();
+
+          showTextTimingAlert(`Layer updated: ${file.name}`, 'success');
+          setTimeout(() => showTextTimingAlert(''), 2000);
+          inputEl.value = ''; // Reset so the same file or new files can be re-selected freely
+        };
+      };
+
+      bindUpload(document.getElementById('sigil-upload-z0'), document.getElementById('sigil-thumb-z0'), 'sigilZ0', 'fx-bg-dark-power-sigil');
+      bindUpload(document.getElementById('sigil-upload-z3l'), document.getElementById('sigil-thumb-z3l'), 'sigilZ3L', 'fx-hand-left-dark-power-sigil');
+      bindUpload(document.getElementById('sigil-upload-z3r'), document.getElementById('sigil-thumb-z3r'), 'sigilZ3R', 'fx-hand-right-dark-power-sigil');
+      bindUpload(document.getElementById('sigil-upload-z4'), document.getElementById('sigil-thumb-z4'), 'sigilZ4', 'fx-core-dark-power-sigil');
+
+      // Helper function to remove background from a specific layer
+      const applyLayerCutout = (stateKey, thumbId, domTargetId, layerName) => {
+        const currentSrc = topCustomizerState[stateKey];
+        if (!currentSrc) return;
+        showTextTimingAlert(`Keying background for ${layerName}...`, 'info');
+        generateCutoutCanvasForUrl(currentSrc, (cutoutCanvas) => {
+          try {
+            const transparentDataUrl = cutoutCanvas.toDataURL('image/png');
+            topCustomizerState[stateKey] = transparentDataUrl;
+            const thumb = document.getElementById(thumbId);
+            if (thumb) thumb.src = transparentDataUrl;
+            
+            const stageMatches = document.querySelectorAll(`img[id*="${domTargetId}"], [id^="${domTargetId}"]`);
+            stageMatches.forEach(m => { if (m.tagName === 'IMG') m.src = transparentDataUrl; });
+            const liveEl = document.getElementById(domTargetId);
+            if (liveEl && liveEl.tagName === 'IMG') liveEl.src = transparentDataUrl;
+
+            renderTopTemplatePreviewStage();
+            showTextTimingAlert(`✂ Background removed from ${layerName}!`, 'success');
+            setTimeout(() => showTextTimingAlert(''), 2500);
+          } catch (err) {
+            console.error('Key BG error:', err);
+            showTextTimingAlert('Could not auto-key background on this layer', 'error');
+            setTimeout(() => showTextTimingAlert(''), 2500);
+          }
+        });
+      };
+
+      // Wire per-layer background removal buttons
+      document.getElementById('btn-sigil-cutout-z3l')?.addEventListener('click', () => {
+        applyLayerCutout('sigilZ3L', 'sigil-thumb-z3l', 'fx-hand-left-dark-power-sigil', 'Layer 1 (Left)');
+      });
+      document.getElementById('btn-sigil-cutout-z3r')?.addEventListener('click', () => {
+        applyLayerCutout('sigilZ3R', 'sigil-thumb-z3r', 'fx-hand-right-dark-power-sigil', 'Layer 2 (Right)');
+      });
+      document.getElementById('btn-sigil-cutout-z4')?.addEventListener('click', () => {
+        applyLayerCutout('sigilZ4', 'sigil-thumb-z4', 'fx-core-dark-power-sigil', 'Hero Core Emblem');
+      });
+
+      // 3D Interactive Mode & Layer Dragging
+      topCustomizerState.is3DMode = false;
+      topCustomizerState.selectedSigilLayer = null;
+      topCustomizerState.sigilOffsets = topCustomizerState.sigilOffsets || {
+        z3l: { x: 0, y: 0 },
+        z3r: { x: 0, y: 0 },
+        z4: { x: 0, y: 0 }
+      };
+      topCustomizerState.sigilBrightness = topCustomizerState.sigilBrightness || {
+        z3l: 100,
+        z3r: 100,
+        z4: 100
+      };
+
+      const btnToggle3D = document.getElementById('btn-toggle-3d-interactive-mode');
+      const floatingToolbar = document.getElementById('sigil-floating-layer-toolbar');
+      const floatLabel = document.getElementById('sigil-floating-layer-label');
+      const floatBright = document.getElementById('sigil-float-brightness');
+
+      const update3DModeUI = () => {
+        const is3D = !!topCustomizerState.is3DMode;
+        if (btnToggle3D) {
+          btnToggle3D.style.background = is3D ? 'rgba(46,255,198,0.25)' : 'rgba(168,85,247,0.15)';
+          btnToggle3D.style.borderColor = is3D ? '#2effc6' : 'rgba(168,85,247,0.5)';
+          btnToggle3D.style.color = is3D ? '#2effc6' : '#c084fc';
+          const dot = document.getElementById('pill-3d-dot');
+          if (dot) {
+            dot.style.background = is3D ? '#2effc6' : '#a855f7';
+            dot.style.boxShadow = is3D ? '0 0 10px #2effc6' : '0 0 8px #a855f7';
+          }
+          const lbl = document.getElementById('label-3d-mode');
+          if (lbl) lbl.textContent = is3D ? '3D MODE: ON (CLICK TO SELECT)' : '3D EDIT MODE';
+        }
+
+        // Enable or disable pointer events on selectable layers
+        const leftWrap = document.getElementById('fx-hand-left-wrap-dark-power-sigil');
+        const rightWrap = document.getElementById('fx-hand-right-wrap-dark-power-sigil');
+        const coreWrap = document.getElementById('fx-core-wrap-dark-power-sigil');
+
+        [
+          { wrap: leftWrap, key: 'z3l', name: 'Layer 1 (Left)' },
+          { wrap: rightWrap, key: 'z3r', name: 'Layer 2 (Right)' },
+          { wrap: coreWrap, key: 'z4', name: 'Hero Emblem' }
+        ].forEach(({ wrap, key, name }) => {
+          if (!wrap) return;
+          if (is3D) {
+            wrap.style.pointerEvents = 'auto';
+            wrap.style.cursor = 'grab';
+            wrap.setAttribute('data-sigil-layer-key', key);
+            wrap.setAttribute('data-sigil-layer-name', name);
+          } else {
+            wrap.style.pointerEvents = 'none';
+            wrap.style.cursor = 'default';
+            wrap.style.outline = 'none';
+          }
+        });
+
+        if (!is3D && floatingToolbar) {
+          floatingToolbar.style.display = 'none';
+          topCustomizerState.selectedSigilLayer = null;
+        }
+      };
+
+      btnToggle3D?.addEventListener('click', () => {
+        topCustomizerState.is3DMode = !topCustomizerState.is3DMode;
+        update3DModeUI();
+        showTextTimingAlert(topCustomizerState.is3DMode ? '3D Interactive Mode ON: Click any layer to move or key BG' : '3D Mode OFF', 'info');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+      });
+
+      // Layer Selection & Canvas Drag-to-Position
+      let isDraggingLayer = false;
+      let dragStartX = 0;
+      let dragStartY = 0;
+      let dragInitialOffsetX = 0;
+      let dragInitialOffsetY = 0;
+
+      const stageWrap = document.getElementById('tpl-modal-preview-stage-container') || document.getElementById('customizer-stage-wrap');
+      if (stageWrap) {
+        stageWrap.addEventListener('pointerdown', (e) => {
+          if (!topCustomizerState.is3DMode) return;
+          const targetLayer = e.target.closest('[data-sigil-layer-key]');
+          if (!targetLayer) {
+            if (!e.target.closest('#sigil-floating-layer-toolbar')) {
+              topCustomizerState.selectedSigilLayer = null;
+              if (floatingToolbar) floatingToolbar.style.display = 'none';
+              document.querySelectorAll('[data-sigil-layer-key]').forEach(el => el.style.outline = 'none');
+            }
+            return;
+          }
+
+          const layerKey = targetLayer.getAttribute('data-sigil-layer-key');
+          const layerName = targetLayer.getAttribute('data-sigil-layer-name') || layerKey;
+          topCustomizerState.selectedSigilLayer = layerKey;
+
+          // Outline selected layer
+          document.querySelectorAll('[data-sigil-layer-key]').forEach(el => el.style.outline = 'none');
+          targetLayer.style.outline = '2px dashed #2effc6';
+
+          // Position floating toolbar above selected layer
+          if (floatingToolbar) {
+            floatingToolbar.style.display = 'flex';
+            if (floatLabel) floatLabel.textContent = layerName;
+            if (floatBright) floatBright.value = topCustomizerState.sigilBrightness[layerKey] || 100;
+            const rect = targetLayer.getBoundingClientRect();
+            const stageRect = stageWrap.getBoundingClientRect();
+            const topPos = Math.max(10, rect.top - stageRect.top - 42);
+            const leftPos = Math.max(10, Math.min(stageRect.width - 240, rect.left - stageRect.left + (rect.width / 2) - 100));
+            floatingToolbar.style.top = `${topPos}px`;
+            floatingToolbar.style.left = `${leftPos}px`;
+          }
+
+          isDraggingLayer = true;
+          dragStartX = e.clientX;
+          dragStartY = e.clientY;
+          dragInitialOffsetX = topCustomizerState.sigilOffsets[layerKey]?.x || 0;
+          dragInitialOffsetY = topCustomizerState.sigilOffsets[layerKey]?.y || 0;
+          targetLayer.style.cursor = 'grabbing';
+          e.preventDefault();
+        });
+
+        window.addEventListener('pointermove', (e) => {
+          if (!isDraggingLayer || !topCustomizerState.selectedSigilLayer) return;
+          const dx = e.clientX - dragStartX;
+          const dy = e.clientY - dragStartY;
+          const key = topCustomizerState.selectedSigilLayer;
+          topCustomizerState.sigilOffsets[key] = {
+            x: dragInitialOffsetX + dx,
+            y: dragInitialOffsetY + dy
+          };
+        });
+
+        window.addEventListener('pointerup', () => {
+          if (isDraggingLayer) {
+            isDraggingLayer = false;
+            document.querySelectorAll('[data-sigil-layer-key]').forEach(el => {
+              if (topCustomizerState.is3DMode) el.style.cursor = 'grab';
+            });
+          }
+        });
+      }
+
+      // Floating Toolbar Actions: Key BG for selected layer
+      document.getElementById('btn-float-remove-bg')?.addEventListener('click', () => {
+        const key = topCustomizerState.selectedSigilLayer;
+        if (!key) return;
+        if (key === 'z3l') {
+          applyLayerCutout('sigilZ3L', 'sigil-thumb-z3l', 'fx-hand-left-dark-power-sigil', 'Layer 1 (Left)');
+        } else if (key === 'z3r') {
+          applyLayerCutout('sigilZ3R', 'sigil-thumb-z3r', 'fx-hand-right-dark-power-sigil', 'Layer 2 (Right)');
+        } else if (key === 'z4') {
+          applyLayerCutout('sigilZ4', 'sigil-thumb-z4', 'fx-core-dark-power-sigil', 'Hero Emblem');
+        }
+      });
+
+      // Floating Toolbar: Reset Position
+      document.getElementById('btn-float-reset-pos')?.addEventListener('click', () => {
+        const key = topCustomizerState.selectedSigilLayer;
+        if (!key) return;
+        topCustomizerState.sigilOffsets[key] = { x: 0, y: 0 };
+        showTextTimingAlert(`Starting position reset for ${key.toUpperCase()}`, 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+      });
+
+      // Floating Toolbar: Adjust Brightness for this layer only
+      floatBright?.addEventListener('input', (e) => {
+        const key = topCustomizerState.selectedSigilLayer;
+        if (!key) return;
+        const b = parseInt(e.target.value);
+        topCustomizerState.sigilBrightness[key] = b;
+        const targetId = key === 'z3l' ? 'fx-hand-left-dark-power-sigil' : (key === 'z3r' ? 'fx-hand-right-dark-power-sigil' : 'fx-core-dark-power-sigil');
+        const img = document.getElementById(targetId);
+        if (img) img.style.filter = `brightness(${b}%)`;
+      });
+    }
+} else if (tpl.id === 'subject-25d-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground';
     if (labelSec) labelSec.textContent = 'Inpainted Mountain / Scene Backdrop';
     if (wrapSec) wrapSec.style.display = 'flex';
@@ -26484,7 +27144,7 @@ function openTopTemplateCustomizer(tpl) {
   populateModalScenesStoryboard();
 
   // 7. Start live stage animation
-  renderTopTemplatePreviewStage();
+  renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   startTopCustomizerLoop();
 }
 
@@ -26506,7 +27166,7 @@ function removeTopTemplateExtraCutout(index) {
   if (Array.isArray(topCustomizerState.extraImages)) {
     topCustomizerState.extraImages.splice(index, 1);
     updateExtraCutoutsListUI();
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   }
 }
 
@@ -26525,14 +27185,14 @@ function updateExtraTextsListUI() {
 function updateTopTemplateExtraText(index, text) {
   if (topCustomizerState.extraTexts && topCustomizerState.extraTexts[index]) {
     topCustomizerState.extraTexts[index].text = text;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   }
 }
 
 function updateTopTemplateExtraTextColor(index, color) {
   if (topCustomizerState.extraTexts && topCustomizerState.extraTexts[index]) {
     topCustomizerState.extraTexts[index].color = color;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   }
 }
 
@@ -26540,7 +27200,7 @@ function removeTopTemplateExtraText(index) {
   if (Array.isArray(topCustomizerState.extraTexts)) {
     topCustomizerState.extraTexts.splice(index, 1);
     updateExtraTextsListUI();
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   }
 }
 
@@ -27069,7 +27729,7 @@ function updateTopCustomizerFrame(seqTime, now) {
       if (activeSc.subText) topCustomizerState.subText = activeSc.subText;
       if (activeSc.textColor) topCustomizerState.textColor = activeSc.textColor;
 
-      renderTopTemplatePreviewStage();
+      renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
       populateModalScenesStoryboard();
       populateModalTemplatesSidebar();
     }
@@ -28929,7 +29589,7 @@ function bindTopTemplateCustomizerEvents() {
       showTextTimingAlert('Text taken off canvas (inputs saved)', 'info');
     }
     setTimeout(() => showTextTimingAlert(''), 1800);
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // Customizer Audio Bar Handlers
@@ -28945,7 +29605,7 @@ function bindTopTemplateCustomizerEvents() {
     }
     const thumb = document.getElementById('tpl-modal-thumb-primary');
     if (thumb) thumb.src = topCustomizerState.primaryUrl;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-url-secondary')?.addEventListener('input', (e) => {
@@ -28955,7 +29615,7 @@ function bindTopTemplateCustomizerEvents() {
     }
     const thumb = document.getElementById('tpl-modal-thumb-secondary');
     if (thumb) thumb.src = topCustomizerState.secondaryUrl;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // File Upload Handlers (Local Image Select)
@@ -29017,12 +29677,12 @@ function bindTopTemplateCustomizerEvents() {
             }
           }
 
-          renderTopTemplatePreviewStage();
+          renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
           showTextTimingAlert('Cutout & background plate ready!', 'success');
           setTimeout(() => showTextTimingAlert(''), 1800);
         });
       } else {
-        renderTopTemplatePreviewStage();
+        renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
       }
     }
   });
@@ -29039,7 +29699,7 @@ function bindTopTemplateCustomizerEvents() {
       if (input) input.value = url;
       const thumb = document.getElementById('tpl-modal-thumb-secondary');
       if (thumb) thumb.src = url;
-      renderTopTemplatePreviewStage();
+      renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     }
   });
 
@@ -29230,7 +29890,7 @@ function bindTopTemplateCustomizerEvents() {
           cutoutCanvas: c
         });
         updateExtraCutoutsListUI();
-        renderTopTemplatePreviewStage();
+        renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
         showTextTimingAlert(`Added subject cutout (${topCustomizerState.extraImages.length} additional)!`, 'success');
         setTimeout(() => showTextTimingAlert(''), 2000);
       });
@@ -29247,7 +29907,7 @@ function bindTopTemplateCustomizerEvents() {
       fontSize: 32
     });
     updateExtraTextsListUI();
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert(`Added text overlay #${count}!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 1800);
   });
@@ -29265,12 +29925,12 @@ function bindTopTemplateCustomizerEvents() {
       showTextTimingAlert('Extracting cutout silhouette...', 'info');
       generateCutoutCanvasForUrl(topCustomizerState.primaryUrl, (c) => {
         topCustomizerState.cutoutCanvas = c;
-        renderTopTemplatePreviewStage();
+        renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
         showTextTimingAlert('Background removed successfully!', 'success');
         setTimeout(() => showTextTimingAlert(''), 1800);
       });
     } else {
-      renderTopTemplatePreviewStage();
+      renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
       showTextTimingAlert(topCustomizerState.bgRemoved ? 'Background removed' : 'Background restored', 'info');
       setTimeout(() => showTextTimingAlert(''), 1800);
     }
@@ -29281,7 +29941,7 @@ function bindTopTemplateCustomizerEvents() {
   document.getElementById('btn-modal-action-kinetic-text')?.addEventListener('click', () => {
     topCustomizerState.hasTextBehind = !topCustomizerState.hasTextBehind;
     updateModalActionButtonsState();
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert(topCustomizerState.hasTextBehind ? 'Kinetic Text Behind added!' : 'Text Behind removed', 'info');
     setTimeout(() => showTextTimingAlert(''), 1800);
   });
@@ -29292,17 +29952,17 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.textBehindContent = e.target.value;
     const modalKineticInput = document.getElementById('modal-kinetic-text-input');
     if (modalKineticInput) modalKineticInput.value = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-input-text-sub')?.addEventListener('input', (e) => {
     topCustomizerState.subText = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-color-text-title')?.addEventListener('input', (e) => {
     topCustomizerState.titleColor = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-color-text-main')?.addEventListener('input', (e) => {
@@ -29310,7 +29970,7 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.textBehindColor = e.target.value;
     const modalKineticColor = document.getElementById('modal-kinetic-text-color');
     if (modalKineticColor) modalKineticColor.value = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // Kinetic Text Inputs
@@ -29319,7 +29979,7 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.mainText = e.target.value;
     const inputMain = document.getElementById('tpl-modal-input-text-main');
     if (inputMain) inputMain.value = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // Typography Target Tabs & Accordion Dropdown
@@ -29352,7 +30012,7 @@ function bindTopTemplateCustomizerEvents() {
     const target = topCustomizerState.activeTextTarget || 'main';
     const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
     styleObj.fontFamily = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-slider-font-size')?.addEventListener('input', (e) => {
@@ -29362,7 +30022,7 @@ function bindTopTemplateCustomizerEvents() {
     styleObj.fontSize = sz;
     const lbl = document.getElementById('tpl-modal-val-font-size');
     if (lbl) lbl.textContent = `${sz}px`;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   const btnBold = document.getElementById('tpl-modal-btn-font-bold');
@@ -29375,7 +30035,7 @@ function bindTopTemplateCustomizerEvents() {
       btnBold.style.borderColor = styleObj.bold ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
       btnBold.style.color = styleObj.bold ? '#ffffff' : '#94a3b8';
     }
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   const btnItalic = document.getElementById('tpl-modal-btn-font-italic');
@@ -29388,7 +30048,7 @@ function bindTopTemplateCustomizerEvents() {
       btnItalic.style.borderColor = styleObj.italic ? 'rgba(168,85,247,0.5)' : 'rgba(255,255,255,0.1)';
       btnItalic.style.color = styleObj.italic ? '#ffffff' : '#94a3b8';
     }
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   const btnPosBehind = document.getElementById('tpl-modal-btn-text-pos-behind');
@@ -29408,7 +30068,7 @@ function bindTopTemplateCustomizerEvents() {
       btnPosFront.style.borderColor = 'rgba(255,255,255,0.08)';
       btnPosFront.style.color = '#94a3b8';
     }
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert(`${target === 'main' ? 'Main title' : 'Subtitle'} positioned behind subject cutout`, 'info');
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
@@ -29427,7 +30087,7 @@ function bindTopTemplateCustomizerEvents() {
       btnPosBehind.style.borderColor = 'rgba(255,255,255,0.08)';
       btnPosBehind.style.color = '#94a3b8';
     }
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert(`${target === 'main' ? 'Main title' : 'Subtitle'} positioned in front of subject cutout`, 'info');
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
@@ -29498,7 +30158,7 @@ function bindTopTemplateCustomizerEvents() {
       badge.textContent = mode === 'cloth' ? 'Cloth / Window Curtain' : 'Torn Paper (Magnates)';
     }
 
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert(mode === 'cloth' ? 'Fabric / Curtain Mode Enabled' : 'Torn Paper Mode Enabled', 'info');
     setTimeout(() => showTextTimingAlert(''), 1500);
   };
@@ -29543,7 +30203,7 @@ function bindTopTemplateCustomizerEvents() {
       }
     });
 
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert(`Direction: ${p.name}`, 'info');
     setTimeout(() => showTextTimingAlert(''), 1500);
   };
@@ -29587,12 +30247,12 @@ function bindTopTemplateCustomizerEvents() {
 
   document.getElementById('tpl-modal-tear-border-enable')?.addEventListener('change', (e) => {
     topCustomizerState.tearBorderEnabled = e.target.checked;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-tear-border-color')?.addEventListener('input', (e) => {
     topCustomizerState.tearBorderColor = e.target.value;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-slider-tear-shadow')?.addEventListener('input', (e) => {
@@ -29600,7 +30260,7 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.tearShadowDepth = val;
     const lbl = document.getElementById('tpl-modal-val-tear-shadow');
     if (lbl) lbl.textContent = `${val}px`;
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
     document.getElementById('tpl-modal-slider-matrix-typespeed')?.addEventListener('input', (e) => {
@@ -29612,14 +30272,14 @@ function bindTopTemplateCustomizerEvents() {
   // Layer Actions: Bring to Front / Send Backward
   document.getElementById('btn-modal-action-bring-front')?.addEventListener('click', () => {
     topCustomizerState.layerOrder = 'front';
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert('Subject brought to front', 'info');
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
 
   document.getElementById('btn-modal-action-send-back')?.addEventListener('click', () => {
     topCustomizerState.layerOrder = 'back';
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     showTextTimingAlert('Subject sent behind text', 'info');
     setTimeout(() => showTextTimingAlert(''), 1500);
   });
@@ -29632,12 +30292,12 @@ function bindTopTemplateCustomizerEvents() {
       showTextTimingAlert('Extracting cutout silhouette...', 'info');
       generateCutoutCanvasForUrl(topCustomizerState.primaryUrl, (c) => {
         topCustomizerState.cutoutCanvas = c;
-        renderTopTemplatePreviewStage();
+        renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
         showTextTimingAlert('Background removed successfully!', 'success');
         setTimeout(() => showTextTimingAlert(''), 1800);
       });
     } else {
-      renderTopTemplatePreviewStage();
+      renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     }
     updateModalActionButtonsState();
   });
@@ -29646,7 +30306,7 @@ function bindTopTemplateCustomizerEvents() {
     hideModalStageContextMenu();
     topCustomizerState.hasTextBehind = !topCustomizerState.hasTextBehind;
     updateModalActionButtonsState();
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // Context Menu Opacity Slider
@@ -29670,13 +30330,13 @@ function bindTopTemplateCustomizerEvents() {
   document.getElementById('ctx-modal-bring-front')?.addEventListener('click', () => {
     hideModalStageContextMenu();
     topCustomizerState.layerOrder = 'front';
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('ctx-modal-send-back')?.addEventListener('click', () => {
     hideModalStageContextMenu();
     topCustomizerState.layerOrder = 'back';
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // Hide context menu on global click
@@ -30013,13 +30673,17 @@ function populateModalScenesStoryboard() {
       {
         id: 'scene-1',
         title: 'Scene 1',
-        tplId: topCustomizerState.currentTpl?.id || 'subject-25d-parallax',
+        tplId: topCustomizerState.currentTpl?.id || 'spooner-2-5d-photo-parallax',
         start: 0,
         duration: dur,
         thumb: topCustomizerState.primaryUrl || (topCustomizerState.currentTpl?.defaultImage)
       }
     ];
     activeStoryboardSceneIndex = 0;
+  } else if (projectScenes.length === 1 && topCustomizerState.currentTpl) {
+    // When switching templates with single default scene, keep Scene 1 in sync with active template
+    projectScenes[0].tplId = topCustomizerState.currentTpl.id;
+    projectScenes[0].thumb = topCustomizerState.primaryUrl || topCustomizerState.currentTpl.defaultImage;
   }
 
   let html = projectScenes.map((sc, idx) => {
@@ -30101,7 +30765,7 @@ function modalSelectStoryboardScene(index) {
     if (sc.subText) topCustomizerState.subText = sc.subText;
     if (sc.textColor) topCustomizerState.textColor = sc.textColor;
 
-    renderTopTemplatePreviewStage();
+    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     populateModalTemplatesSidebar();
     populateModalScenesStoryboard();
   }
@@ -39654,7 +40318,7 @@ function setupFormatSwitcherEvents() {
         }
 
         if (typeof renderTopTemplatePreviewStage === 'function') {
-          renderTopTemplatePreviewStage();
+          renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
         }
         if (modalMenu) modalMenu.style.display = 'none';
       } else if (target === 'studio') {
@@ -39716,7 +40380,7 @@ function setupFormatSwitcherEvents() {
           });
         }
         if (typeof renderTopTemplatePreviewStage === 'function') {
-          renderTopTemplatePreviewStage();
+          renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
         }
       } else if (target === 'studio') {
         studioAspectState.fit = fit;
@@ -41671,7 +42335,7 @@ function initCutoutEditorListenersOnce() {
       if (thumbPrim) thumbPrim.src = cutoutDataUrl;
 
       if (typeof renderTopTemplatePreviewStage === 'function') {
-        renderTopTemplatePreviewStage();
+        renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
       }
     }
 

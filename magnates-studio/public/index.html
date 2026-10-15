@@ -6973,6 +6973,28 @@
                     </button>
                   </div>
                 </div>
+
+                <!-- 3D Interactive Mode Switch -->
+                <button type="button" id="btn-toggle-3d-interactive-mode" style="margin-left: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 20px; background: rgba(168,85,247,0.15); border: 1.5px solid rgba(168,85,247,0.5); color: #c084fc; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); transition: all 0.2s;" title="Switch to 3D Selection Mode to freely select, move, scale, and adjust individual layers on canvas">
+                  <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #a855f7; box-shadow: 0 0 8px #a855f7;" id="pill-3d-dot"></span>
+                  <span id="label-3d-mode">3D EDIT MODE</span>
+                </button>
+              </div>
+
+              <!-- Floating Context Toolbar over selected object -->
+              <div id="sigil-floating-layer-toolbar" style="display: none; position: absolute; z-index: 1000; background: rgba(15,23,42,0.95); border: 1px solid rgba(168,85,247,0.6); box-shadow: 0 10px 25px rgba(0,0,0,0.9); border-radius: 8px; padding: 4px 8px; align-items: center; gap: 6px; backdrop-filter: blur(8px);">
+                <span id="sigil-floating-layer-label" style="font-size: 10px; font-weight: 800; color: #2effc6; text-transform: uppercase; font-family: monospace;">Layer 1</span>
+                <div style="width: 1px; height: 14px; background: rgba(255,255,255,0.15);"></div>
+                <button type="button" id="btn-float-remove-bg" style="font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.5); color: #38bdf8; cursor: pointer;" title="Extract cutout & key out background for this layer only">
+                  ✂ Key BG
+                </button>
+                <button type="button" id="btn-float-reset-pos" style="font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; cursor: pointer;" title="Reset starting coordinates">
+                  Reset Pos
+                </button>
+                <div style="display: flex; align-items: center; gap: 4px;" title="Layer Brightness / Filter">
+                  <span style="font-size: 9px; color: #94a3b8;">Bright:</span>
+                  <input type="range" id="sigil-float-brightness" min="40" max="180" value="100" style="width: 50px; accent-color: #2effc6; height: 3px; cursor: pointer;" />
+                </div>
               </div>
 
               <!-- Top right time code pill matching homepage tags -->
@@ -7114,6 +7136,232 @@
                 <input type="text" id="tpl-modal-url-primary" style="display: none;" />
               </div>
               <div id="tpl-modal-extra-cutouts-list" style="display: flex; flex-direction: column; gap: 4px;"></div>
+            </div>
+
+            <!-- =========================================================
+                 DARK POWER SIGIL (ACT 1) 6-LAYER INSPECTOR & FX CONTROLS
+                 ========================================================= -->
+            <div id="tpl-modal-wrap-sigil-fx" style="display: none; flex-direction: column; gap: 14px;">
+              
+              <!-- 6-Layer Architecture Stack -->
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 11px; font-weight: 700; color: #2effc6; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                  Act 1 Visual Layers (Z=0 to Z=5)
+                  <span style="font-size: 9px; color: #64748b; font-family: monospace;">6 Stacked</span>
+                </span>
+
+                <!-- Z=0 Background Atmosphere -->
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=0</span>
+                  <img id="sigil-thumb-z0" src="/dark_power_sigil_bg.png" style="width: 28px; height: 28px; border-radius: 4px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1);" />
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; font-weight: 600; color: #f1f5f9;">Atmosphere Backdrop</span>
+                    <span style="font-size: 9px; color: #64748b;">Dark cosmic haze void</span>
+                  </div>
+                  <label for="sigil-upload-z0" style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                    Replace
+                    <input type="file" id="sigil-upload-z0" accept="image/*" style="display: none;" />
+                  </label>
+                </div>
+
+                <!-- Z=1 Lightning Arc FX -->
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=1</span>
+                  <div style="width: 28px; height: 28px; border-radius: 4px; background: #0c1a17; border: 1px solid rgba(46,255,198,0.3); display: grid; place-items: center; color: #2effc6; font-size: 13px;">
+                    FX
+                  </div>
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; font-weight: 600; color: #f1f5f9;">Lightning Arcs FX</span>
+                    <span style="font-size: 9px; color: #64748b;">Procedural color-dodge</span>
+                  </div>
+                  <input type="checkbox" id="sigil-toggle-lightning" checked style="accent-color: #2effc6; cursor: pointer;" />
+                </div>
+
+                <!-- Z=2 Radial Breathing Aura -->
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=2</span>
+                  <input type="color" id="sigil-color-aura" value="#2effc6" style="width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; background: transparent; padding: 0;" />
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; font-weight: 600; color: #f1f5f9;">Back Shadow / Glow Emitter</span>
+                    <span style="font-size: 9px; color: #64748b;">Radial breathing pulse</span>
+                  </div>
+                  <input type="checkbox" id="sigil-toggle-aura" checked style="accent-color: #2effc6; cursor: pointer;" />
+                </div>
+
+                <!-- Z=3a Framing Subject 1 (Left / Entrance) -->
+                <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=3L</span>
+                    <img id="sigil-thumb-z3l" src="/dark_power_sigil_hand_left.png" style="width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: #000; border: 1px solid rgba(255,255,255,0.1);" />
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                      <input type="text" id="sigil-name-z3l" value="Layer 1: Framing Subject (Left)" style="background: transparent; border: none; font-size: 11px; font-weight: 600; color: #f1f5f9; outline: none; padding: 0;" />
+                      <span style="font-size: 9px; color: #64748b;">Modular Cutout / Graphic</span>
+                    </div>
+                    <input type="checkbox" id="sigil-toggle-hand-left" checked style="accent-color: #2effc6; cursor: pointer; margin-right: 2px;" title="Toggle Layer Visibility" />
+                    <button type="button" id="btn-sigil-cutout-z3l" style="font-size: 9.5px; font-weight: 700; padding: 3px 6px; border-radius: 5px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; cursor: pointer;" title="Remove white/solid background from this layer">
+                      ✂ Key BG
+                    </button>
+                    <label for="sigil-upload-z3l" style="font-size: 10px; font-weight: 500; padding: 3px 7px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                      Replace
+                      <input type="file" id="sigil-upload-z3l" accept="image/*" style="display: none;" />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Z=3b Framing Subject 2 (Right / Entrance) -->
+                <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=3R</span>
+                    <img id="sigil-thumb-z3r" src="/dark_power_sigil_hand_right.png" style="width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: #000; border: 1px solid rgba(255,255,255,0.1);" />
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                      <input type="text" id="sigil-name-z3r" value="Layer 2: Framing Subject (Right)" style="background: transparent; border: none; font-size: 11px; font-weight: 600; color: #f1f5f9; outline: none; padding: 0;" />
+                      <span style="font-size: 9px; color: #64748b;">Modular Cutout / Graphic</span>
+                    </div>
+                    <input type="checkbox" id="sigil-toggle-hand-right" checked style="accent-color: #2effc6; cursor: pointer; margin-right: 2px;" title="Toggle Layer Visibility" />
+                    <button type="button" id="btn-sigil-cutout-z3r" style="font-size: 9.5px; font-weight: 700; padding: 3px 6px; border-radius: 5px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; cursor: pointer;" title="Remove white/solid background from this layer">
+                      ✂ Key BG
+                    </button>
+                    <label for="sigil-upload-z3r" style="font-size: 10px; font-weight: 500; padding: 3px 7px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                      Replace
+                      <input type="file" id="sigil-upload-z3r" accept="image/*" style="display: none;" />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Z=4 Hero Center Element (Logo / Emblem / Object) -->
+                <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=4</span>
+                    <img id="sigil-thumb-z4" src="/dark_power_sigil_core.png" style="width: 28px; height: 28px; border-radius: 4px; object-fit: contain; background: #000; border: 1px solid rgba(255,255,255,0.1);" />
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                      <input type="text" id="sigil-name-z4" value="Layer 3: Hero Core / Central Emblem" style="background: transparent; border: none; font-size: 11px; font-weight: 600; color: #f1f5f9; outline: none; padding: 0;" />
+                      <span style="font-size: 9px; color: #64748b;">Central Focus Asset</span>
+                    </div>
+                    <button type="button" id="btn-sigil-cutout-z4" style="font-size: 9.5px; font-weight: 700; padding: 3px 6px; border-radius: 5px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; cursor: pointer;" title="Remove white/solid background from this layer">
+                      ✂ Key BG
+                    </button>
+                    <label for="sigil-upload-z4" style="font-size: 10px; font-weight: 500; padding: 3px 7px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                      Replace
+                      <input type="file" id="sigil-upload-z4" accept="image/*" style="display: none;" />
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Z=5 Foreground Vignette Overlay -->
+                <div style="display: flex; align-items: center; gap: 8px; background: rgba(46,255,198,0.03); border: 1px solid rgba(46,255,198,0.12); border-radius: 8px; padding: 6px 8px;">
+                  <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #2effc6; background: rgba(46,255,198,0.1); padding: 2px 4px; border-radius: 4px;">Z=5</span>
+                  <div style="width: 28px; height: 28px; border-radius: 4px; background: #000; box-shadow: inset 0 0 10px rgba(46,255,198,0.4); border: 1px solid rgba(255,255,255,0.1);"></div>
+                  <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                    <span style="font-size: 11px; font-weight: 600; color: #f1f5f9;">Vignette & Haze Overlay</span>
+                    <span style="font-size: 9px; color: #64748b;">Soft dark feathered edges</span>
+                  </div>
+                  <input type="checkbox" id="sigil-toggle-vignette" checked style="accent-color: #2effc6; cursor: pointer;" />
+                </div>
+              </div>
+
+              <!-- Dedicated Act 1 Motion Parameters (Effects 1.1 - 1.4) -->
+              <div style="display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px;">
+                <span style="font-size: 11px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">
+                  Act 1 Motion Choreography Controls
+                </span>
+
+                <!-- Effect 1.1: Slow Dramatic Dolly Zoom -->
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span style="color: #cbd5e1;">Effect 1.1 — Dolly Zoom (Scale %)</span>
+                    <span id="sigil-val-dolly" style="color: #2effc6; font-family: monospace; font-weight: 700;">100% -> 118%</span>
+                  </div>
+                  <input type="range" id="sigil-slider-dolly" min="105" max="140" value="118" style="width: 100%; accent-color: #2effc6; height: 3px; cursor: pointer;" />
+                </div>
+
+                <!-- Effect 1.2: Multiplane Parallax Separation -->
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span style="color: #cbd5e1;">Effect 1.2 — Multiplane Separation (Offset px)</span>
+                    <span id="sigil-val-parallax" style="color: #38bdf8; font-family: monospace; font-weight: 700;">±18 px</span>
+                  </div>
+                  <input type="range" id="sigil-slider-parallax" min="0" max="45" value="18" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+                </div>
+
+                <!-- Effect 1.3: Rim-Light Pulse Duration -->
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                    <span style="color: #cbd5e1;">Effect 1.3 — Breathing Pulse Cycle</span>
+                    <span id="sigil-val-pulse" style="color: #c084fc; font-family: monospace; font-weight: 700;">1.4 sec</span>
+                  </div>
+                  <input type="range" id="sigil-slider-pulse" min="5" max="35" value="14" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+                </div>
+
+                <!-- Sequence Duration & Animation Speed Calibration -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
+                  <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px;">
+                      <span style="color: #94a3b8; font-weight: 700;">DURATION</span>
+                      <span id="sigil-val-duration" style="color: #2effc6; font-family: monospace; font-weight: 700;">5.0 sec</span>
+                    </div>
+                    <input type="range" id="sigil-slider-duration" min="2" max="15" step="0.5" value="5" style="width: 100%; accent-color: #2effc6; height: 3px; cursor: pointer;" />
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px;">
+                      <span style="color: #94a3b8; font-weight: 700;">PLAY SPEED</span>
+                      <span id="sigil-val-speed" style="color: #38bdf8; font-family: monospace; font-weight: 700;">1.0x</span>
+                    </div>
+                    <input type="range" id="sigil-slider-speed" min="2" max="30" step="1" value="10" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+                  </div>
+                </div>
+
+                <!-- Motion Trajectory & Movement Paths -->
+                <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
+                  <span style="font-size: 10px; font-weight: 700; color: #a855f7; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                    Movement Trajectory Paths
+                    <span style="font-size: 8.5px; color: #94a3b8; font-family: monospace;">CHOREOGRAPHY</span>
+                  </span>
+
+                  <!-- Left Arm Trajectory Path -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10px;">
+                    <span style="color: #cbd5e1;">Left Arm Path:</span>
+                    <select id="sigil-select-path-left" style="background: #111420; border: 1px solid rgba(46,255,198,0.3); border-radius: 4px; color: #2effc6; font-size: 9.5px; font-weight: 600; padding: 2px 6px; cursor: pointer; outline: none;">
+                      <option value="lateral-in">Horizontal Slide (Left -> Center)</option>
+                      <option value="diagonal-down">Diagonal In (Top-Left -> Center)</option>
+                      <option value="diagonal-up">Diagonal In (Bottom-Left -> Center)</option>
+                      <option value="spiral-in">Vortex Arc / Swirl In</option>
+                      <option value="zoom-only">Anchor Center / Zoom In</option>
+                    </select>
+                  </div>
+
+                  <!-- Right Arm Trajectory Path -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10px;">
+                    <span style="color: #cbd5e1;">Right Arm Path:</span>
+                    <select id="sigil-select-path-right" style="background: #111420; border: 1px solid rgba(46,255,198,0.3); border-radius: 4px; color: #2effc6; font-size: 9.5px; font-weight: 600; padding: 2px 6px; cursor: pointer; outline: none;">
+                      <option value="lateral-in">Horizontal Slide (Right -> Center)</option>
+                      <option value="diagonal-down">Diagonal In (Top-Right -> Center)</option>
+                      <option value="diagonal-up">Diagonal In (Bottom-Right -> Center)</option>
+                      <option value="spiral-in">Vortex Arc / Swirl In</option>
+                      <option value="zoom-only">Anchor Center / Zoom In</option>
+                    </select>
+                  </div>
+
+                  <!-- Emblem Trajectory Path -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; font-size: 10px;">
+                    <span style="color: #cbd5e1;">Core Emblem Path:</span>
+                    <select id="sigil-select-path-core" style="background: #111420; border: 1px solid rgba(56,189,248,0.3); border-radius: 4px; color: #38bdf8; font-size: 9.5px; font-weight: 600; padding: 2px 6px; cursor: pointer; outline: none;">
+                      <option value="push-float">Dolly Push + Subtle Vertical Bob</option>
+                      <option value="slow-spin">Dolly Push + Continuous Gyro Spin</option>
+                      <option value="burst-zoom">Explosive Warp Push</option>
+                      <option value="static-glow">Static Center (Breathing Glow Only)</option>
+                    </select>
+                  </div>
+
+                  <!-- Manual Entrance Distance Offset Slider -->
+                  <div style="display: flex; flex-direction: column; gap: 3px; margin-top: 4px; border-top: 1px dashed rgba(255,255,255,0.06); padding-top: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 9.5px;">
+                      <span style="color: #cbd5e1;">Lateral Travel Distance</span>
+                      <span id="sigil-val-travel" style="color: #c084fc; font-family: monospace; font-weight: 700;">80 px</span>
+                    </div>
+                    <input type="range" id="sigil-slider-travel" min="0" max="220" value="80" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Background Layer Row -->
@@ -7327,7 +7575,7 @@
           </div>
 
                     <!-- Granular Atmosphere & Cinema Depth (Dust, Snow, Stars, Fog) -->
-          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div id="tpl-modal-wrap-atmosphere" style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 10px; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.6px;">Atmosphere &amp; Cinema Depth</span>
               <span style="font-size: 9px; color: #f59e0b; font-family: monospace; font-weight: 700;">GRANULAR VFX</span>
@@ -7354,7 +7602,7 @@
 
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span style="font-size: 9px; color: #64748b;">SPEED</span>
-                <input type="range" id="tpl-modal-slider-particle-speed" min="1" max="30" value="10" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <input type="range" id="tpl-modal-slider-particle-speed" min="-30" max="30" value="10" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
                 <span id="tpl-modal-val-particle-speed" style="font-size: 9px; font-family: monospace; color: #cbd5e1;">1.0x</span>
               </div>
             </div>
