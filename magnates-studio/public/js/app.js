@@ -27647,6 +27647,40 @@ function syncTopTemplateDocHighlighterUI() {
     }
   }
 
+  // Ensure + Add Line button is bound reliably
+  const btnAddLine = document.getElementById('btn-tpl-modal-add-hl-line');
+  if (btnAddLine && !btnAddLine._boundDocAddLine) {
+    btnAddLine._boundDocAddLine = true;
+    btnAddLine.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!Array.isArray(topCustomizerState.docHighlights)) topCustomizerState.docHighlights = [];
+      const docLines = getActiveDocLines();
+      const nextIdx = topCustomizerState.docHighlights.length;
+      const targetLine = docLines[nextIdx % docLines.length] || { normX: 0.125, normY: 0.265 + (nextIdx * 0.046), normW: 0.515, normH: 0.039, text: 'Custom line' };
+
+      const newHl = {
+        x: targetLine.normX,
+        y: targetLine.normY,
+        w: targetLine.normW,
+        h: targetLine.normH,
+        color: '#fef08a',
+        startTime: 0.3 + (nextIdx * 0.7),
+        duration: topCustomizerState.docSweepSpeed || 0.8,
+        label: `Line ${nextIdx + 1}`
+      };
+
+      topCustomizerState.docHighlights.push(newHl);
+      topCustomizerState.selectedDocTarget = 'highlight';
+      topCustomizerState.selectedDocHlIdx = nextIdx;
+
+      syncTopTemplateDocHighlighterUI();
+      renderTopTemplatePreviewStage();
+      showTextTimingAlert(`Added highlight Line #${nextIdx + 1}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 1800);
+    });
+  }
+
   // Sweep speed slider
   const sSpd = document.getElementById('tpl-modal-slider-hl-speed');
   const vSpd = document.getElementById('tpl-modal-val-hl-speed');
@@ -27971,7 +28005,7 @@ function getActiveDocLines() {
               ${topCustomizerState.customDocStyle === 'nytimes' ? `
                 <!-- THE NEW YORK TIMES MASTHEAD & LAYOUT -->
                 <g transform="translate(240, 55)">
-                  <text x="720" y="58" text-anchor="middle" font-family="'Chomsky', 'Times New Roman', serif" font-size="64" font-weight="900" fill="#121212" letter-spacing="1">The New York Times</text>
+                  <text x="720" y="58" text-anchor="middle" font-family="'Chomsky', 'Times New Roman', serif" font-size="64" font-weight="900" fill="#121212" letter-spacing="1">${topCustomizerState.customDocTitle || 'The New York Times'}</text>
                   <line x1="0" y1="80" x2="1440" y2="80" stroke="#121212" stroke-width="1.8" />
                   <line x1="0" y1="84" x2="1440" y2="84" stroke="#121212" stroke-width="0.8" />
                   <text x="0" y="106" font-family="'Times New Roman', serif" font-size="15" fill="#555" font-style="italic">Late Edition • Vol. CLXXIV No. 60,320</text>
@@ -27982,7 +28016,7 @@ function getActiveDocLines() {
               ` : topCustomizerState.customDocStyle === 'wsj' ? `
                 <!-- THE WALL STREET JOURNAL MASTHEAD & LAYOUT -->
                 <g transform="translate(240, 55)">
-                  <text x="720" y="58" text-anchor="middle" font-family="'Times New Roman', 'Baskerville', serif" font-size="58" font-weight="900" fill="#0f172a" letter-spacing="3">THE WALL STREET JOURNAL.</text>
+                  <text x="720" y="58" text-anchor="middle" font-family="'Times New Roman', 'Baskerville', serif" font-size="58" font-weight="900" fill="#0f172a" letter-spacing="3">${(topCustomizerState.customDocTitle || 'THE WALL STREET JOURNAL').toUpperCase()}</text>
                   <line x1="0" y1="78" x2="1440" y2="78" stroke="#0f172a" stroke-width="3" />
                   <text x="0" y="104" font-family="'Inter', sans-serif" font-size="13" fill="#64748b" font-weight="700">BUSINESS & FINANCE • MARKETS</text>
                   <text x="1440" y="104" text-anchor="end" font-family="'Inter', sans-serif" font-size="13" fill="#64748b">GLOBAL ARCHIVE</text>
@@ -27995,13 +28029,13 @@ function getActiveDocLines() {
                   <rect x="20" y="18" width="340" height="42" fill="#dc2626" rx="4" />
                   <text x="190" y="47" text-anchor="middle" font-family="'Impact', monospace" font-size="28" fill="#fff" letter-spacing="4">TOP SECRET // NOFORN</text>
                   <text x="1400" y="48" text-anchor="end" font-family="'Courier New', monospace" font-size="18" font-weight="700" fill="#dc2626">DECLASSIFIED - EO 13526</text>
-                  <text x="24" y="96" font-family="'Courier New', monospace" font-size="16" font-weight="700" fill="#475569">CASE: 2024-DEF-8842 // EXECUTIVE OVERSIGHT INQUIRY</text>
+                  <text x="24" y="96" font-family="'Courier New', monospace" font-size="16" font-weight="700" fill="#475569">CASE: 2024-DEF-8842 // ${topCustomizerState.customDocTitle || 'EXECUTIVE OVERSIGHT INQUIRY'}</text>
                   <line x1="0" y1="126" x2="1440" y2="126" stroke="#475569" stroke-width="2" />
                 </g>
               ` : `
                 <!-- FORBES EDITORIAL MASTHEAD & AUDIO BAR -->
                 <g transform="translate(240, 55)">
-                  <text x="720" y="50" text-anchor="middle" font-family="'Georgia', serif" font-size="46" font-weight="900" fill="#0f172a" letter-spacing="1.5">Forbes</text>
+                  <text x="720" y="50" text-anchor="middle" font-family="'Georgia', serif" font-size="46" font-weight="900" fill="#0f172a" letter-spacing="1.5">${topCustomizerState.customDocTitle || 'Forbes'}</text>
                 </g>
                 <g transform="translate(240, 115)">
                   <rect x="0" y="0" width="1440" height="74" rx="37" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
@@ -30227,16 +30261,19 @@ function initDocDirectCanvasEditing() {
         const newW = Math.max(0.04, Math.min(0.85, startW + deltaNorm));
         curHl.w = parseFloat(newW.toFixed(3));
 
-        // Update live visual box and SVG rect
+        // Update live visual box and SVG / HTML rect
         tfBox.style.width = `${(curHl.w * 100).toFixed(2)}%`;
         const svgBar = document.getElementById(`customizer-svg-hl-bar-${topCustomizerState.selectedDocHlIdx}`);
         if (svgBar) svgBar.setAttribute('width', String(Math.round(curHl.w * 1920)));
+        const htmlWrap = document.getElementById(`customizer-doc-hl-wrap-${topCustomizerState.selectedDocHlIdx}`);
+        if (htmlWrap) htmlWrap.style.width = `${(curHl.w * 100).toFixed(2)}%`;
         if (toolbar) toolbar.style.left = `${((curHl.x + curHl.w / 2) * 100).toFixed(2)}%`;
       };
 
       const onPointerUpR = () => {
         window.removeEventListener('pointermove', onPointerMoveR);
         window.removeEventListener('pointerup', onPointerUpR);
+        syncTopTemplateDocHighlighterUI();
         updateDocTfBoxPosition();
       };
 
@@ -30309,12 +30346,18 @@ function initDocDirectCanvasEditing() {
           svgBar.setAttribute('x', String(Math.round(curHl.x * 1920)));
           svgBar.setAttribute('width', String(Math.round(curHl.w * 1920)));
         }
+        const htmlWrap = document.getElementById(`customizer-doc-hl-wrap-${topCustomizerState.selectedDocHlIdx}`);
+        if (htmlWrap) {
+          htmlWrap.style.left = `${(curHl.x * 100).toFixed(2)}%`;
+          htmlWrap.style.width = `${(curHl.w * 100).toFixed(2)}%`;
+        }
         if (toolbar) toolbar.style.left = `${((curHl.x + curHl.w / 2) * 100).toFixed(2)}%`;
       };
 
       const onPointerUpL = () => {
         window.removeEventListener('pointermove', onPointerMoveL);
         window.removeEventListener('pointerup', onPointerUpL);
+        syncTopTemplateDocHighlighterUI();
         updateDocTfBoxPosition();
       };
 
@@ -30760,15 +30803,34 @@ function initCustomArticleBuilder() {
   }
 
   // Publication Style Switcher (Forbes, NY Times, WSJ, Classified Dossier)
+  const inputPubName = document.getElementById('inline-input-publication-name');
   document.querySelectorAll('.btn-inline-article-style, .btn-article-style').forEach(btn => {
     btn.onclick = (e) => {
       e.stopPropagation();
       const st = btn.getAttribute('data-style') || 'forbes';
       topCustomizerState.customDocStyle = st;
-      if (st === 'forbes') topCustomizerState.customDocFont = "'Georgia', 'Merriweather', serif";
-      else if (st === 'nytimes') topCustomizerState.customDocFont = "'Cheltenham', 'Times New Roman', serif";
-      else if (st === 'wsj') topCustomizerState.customDocFont = "'Exchange', 'Times New Roman', serif";
-      else if (st === 'dossier') topCustomizerState.customDocFont = "'Courier New', Courier, monospace";
+
+      const styleDefaults = {
+        forbes: 'Forbes',
+        nytimes: 'The New York Times',
+        wsj: 'The Wall Street Journal',
+        dossier: 'EXECUTIVE OVERSIGHT INQUIRY'
+      };
+
+      if (st === 'forbes') {
+        topCustomizerState.customDocFont = "'Georgia', 'Merriweather', serif";
+      } else if (st === 'nytimes') {
+        topCustomizerState.customDocFont = "'Cheltenham', 'Times New Roman', serif";
+      } else if (st === 'wsj') {
+        topCustomizerState.customDocFont = "'Exchange', 'Times New Roman', serif";
+      } else if (st === 'dossier') {
+        topCustomizerState.customDocFont = "'Courier New', Courier, monospace";
+      }
+
+      if (styleDefaults[st]) {
+        topCustomizerState.customDocTitle = styleDefaults[st];
+        if (inputPubName) inputPubName.value = styleDefaults[st];
+      }
 
       document.querySelectorAll('.btn-inline-article-style, .btn-article-style').forEach(b => {
         const isMatch = b.getAttribute('data-style') === st;
@@ -30778,7 +30840,13 @@ function initCustomArticleBuilder() {
       });
 
       updateCustomArticleRealtime();
+      renderTopTemplatePreviewStage();
     };
+  });
+
+  inputPubName?.addEventListener('input', (e) => {
+    topCustomizerState.customDocTitle = e.target.value.trim() || 'Custom News';
+    renderTopTemplatePreviewStage();
   });
 
   // Real-Time Live Input Update as User Types
