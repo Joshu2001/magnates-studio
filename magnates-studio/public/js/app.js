@@ -27238,8 +27238,12 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.particleType = topCustomizerState.particleType || 'dust';
     topCustomizerState.dustDensity = topCustomizerState.dustDensity || 30;
     topCustomizerState.selectedDocHlIdx = 0;
+    topCustomizerState.selectedDocTarget = 'highlight';
     topCustomizerState.is3DMode = false;
-    topCustomizerState.docRedactW = 0.491;
+    topCustomizerState.docRedactW = 0.510;
+    topCustomizerState.docRedactX = 0.125;
+    topCustomizerState.docRedactY = 0.354;
+    topCustomizerState.docRedactH = 0.041;
     topCustomizerState.docHighlights = [
       {
         x: 0.125,
@@ -28003,7 +28007,7 @@ const FORBES_DOC_LINES = [
 
               <!-- LAYER 4: FORENSIC REDACTION CENSOR BAR (PHYSICALLY COVERS THE TEXT) -->
               <g id="customizer-doc-svg-redacts">
-                <rect id="customizer-svg-redact-bar" x="240" y="382" width="0" height="44" rx="3" fill="#09090b" opacity="${isRedact ? 0.98 : 0}" />
+                <rect id="customizer-svg-redact-bar" class="doc-interactive-redact" x="${Math.round((topCustomizerState.docRedactX || 0.125) * 1920)}" y="${Math.round((topCustomizerState.docRedactY || 0.354) * 1080)}" width="0" height="${Math.round((topCustomizerState.docRedactH || 0.041) * 1080)}" rx="3" fill="#09090b" opacity="${isRedact ? 0.98 : 0}" style="cursor: pointer; pointer-events: ${isRedact ? 'auto' : 'none'};" />
               </g>
             </svg>
           `}
@@ -28741,7 +28745,7 @@ function updateTopCustomizerFrame(seqTime, now) {
     const svgRedact = document.getElementById('customizer-svg-redact-bar');
     if (svgRedact) {
       if (topCustomizerState.docRedact) {
-        const rTargetW = Math.round((topCustomizerState.docRedactW || 0.491) * 1920);
+        const rTargetW = Math.round((topCustomizerState.docRedactW || 0.510) * 1920);
         const rStart = 1.0;
         const rDur = 0.7;
         if (loopT < rStart) {
@@ -28759,7 +28763,7 @@ function updateTopCustomizerFrame(seqTime, now) {
 
     const htmlRedact = document.getElementById('customizer-doc-redact-bar');
     if (htmlRedact && topCustomizerState.docRedact) {
-      const rTargetPct = Math.round((topCustomizerState.docRedactW || 0.491) * 100);
+      const rTargetPct = Math.round((topCustomizerState.docRedactW || 0.510) * 100);
       const rStart = 1.0;
       const rDur = 0.7;
       if (loopT < rStart) {
@@ -29893,9 +29897,77 @@ function initDocDirectCanvasEditing() {
   let curIdx = topCustomizerState.selectedDocHlIdx !== undefined ? topCustomizerState.selectedDocHlIdx : 0;
   if (curIdx >= highlights.length) curIdx = Math.max(0, highlights.length - 1);
   topCustomizerState.selectedDocHlIdx = curIdx;
+  if (!topCustomizerState.selectedDocTarget) {
+    topCustomizerState.selectedDocTarget = topCustomizerState.docRedact ? 'redact' : 'highlight';
+  }
 
   // 1. Update Direct Transform Box Position
   function updateDocTfBoxPosition() {
+    const isRedactTarget = (topCustomizerState.selectedDocTarget === 'redact');
+    const badge = document.getElementById('doc-tf-badge');
+    const btnRedact = document.getElementById('btn-doc-float-redact');
+    const lbl = document.getElementById('doc-float-line-label');
+
+    if (isRedactTarget) {
+      if (!topCustomizerState.docRedact) {
+        // Redact was turned off, fallback to highlight
+        topCustomizerState.selectedDocTarget = 'highlight';
+        updateDocTfBoxPosition();
+        return;
+      }
+
+      const rx = topCustomizerState.docRedactX !== undefined ? topCustomizerState.docRedactX : 0.125;
+      const ry = topCustomizerState.docRedactY !== undefined ? topCustomizerState.docRedactY : 0.354;
+      const rw = topCustomizerState.docRedactW !== undefined ? topCustomizerState.docRedactW : 0.510;
+      const rh = topCustomizerState.docRedactH !== undefined ? topCustomizerState.docRedactH : 0.041;
+
+      tfBox.style.display = 'block';
+      tfBox.style.left = `${(rx * 100).toFixed(2)}%`;
+      tfBox.style.top = `${(ry * 100).toFixed(2)}%`;
+      tfBox.style.width = `${(rw * 100).toFixed(2)}%`;
+      tfBox.style.height = `${(rh * 100).toFixed(2)}%`;
+      tfBox.style.borderColor = '#ef4444';
+      tfBox.style.boxShadow = '0 0 14px rgba(239, 68, 68, 0.6)';
+
+      if (badge) {
+        badge.textContent = `⬛ FORENSIC REDACTION (${(rw * 100).toFixed(0)}% COVERAGE)`;
+        badge.style.background = '#09090b';
+        badge.style.color = '#ef4444';
+        badge.style.border = '1px solid #ef4444';
+      }
+
+      if (toolbar) {
+        toolbar.style.display = 'flex';
+        toolbar.style.left = `${((rx + rw / 2) * 100).toFixed(2)}%`;
+        toolbar.style.top = `${(ry * 100).toFixed(2)}%`;
+        toolbar.style.borderColor = '#ef4444';
+        if (lbl) {
+          lbl.textContent = `⬛ REDACT STRIP`;
+          lbl.style.color = '#f87171';
+        }
+        if (btnRedact) {
+          btnRedact.textContent = `✨ Unredact`;
+          btnRedact.title = 'Convert censor strip back to editable highlight text';
+          btnRedact.style.background = 'rgba(56, 189, 248, 0.2)';
+          btnRedact.style.borderColor = '#38bdf8';
+          btnRedact.style.color = '#38bdf8';
+        }
+      }
+      return;
+    }
+
+    // Target is normal highlight
+    tfBox.style.borderColor = '#facc15';
+    tfBox.style.boxShadow = '0 0 14px rgba(250,204,21,0.5)';
+    if (toolbar) toolbar.style.borderColor = '#facc15';
+    if (btnRedact) {
+      btnRedact.textContent = `⬛ Redact`;
+      btnRedact.title = 'Toggle between Highlight and Redact Bar';
+      btnRedact.style.background = '#09090b';
+      btnRedact.style.borderColor = 'rgba(255,255,255,0.25)';
+      btnRedact.style.color = '#fff';
+    }
+
     const curHl = (topCustomizerState.docHighlights && topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx]);
     if (!curHl) {
       tfBox.style.display = 'none';
@@ -29908,35 +29980,72 @@ function initDocDirectCanvasEditing() {
     tfBox.style.width = `${(curHl.w * 100).toFixed(2)}%`;
     tfBox.style.height = `${(curHl.h * 100).toFixed(2)}%`;
 
-    const badge = document.getElementById('doc-tf-badge');
     if (badge) {
       badge.textContent = `LINE ${topCustomizerState.selectedDocHlIdx + 1} (${(curHl.duration || 0.8).toFixed(1)}s)`;
       badge.style.background = curHl.color || '#facc15';
       badge.style.color = (curHl.color === '#ef4444' || curHl.color === '#09090b') ? '#fff' : '#000';
+      badge.style.border = 'none';
     }
 
     if (toolbar) {
       toolbar.style.display = 'flex';
       toolbar.style.left = `${((curHl.x + curHl.w / 2) * 100).toFixed(2)}%`;
       toolbar.style.top = `${(curHl.y * 100).toFixed(2)}%`;
-      const lbl = document.getElementById('doc-float-line-label');
-      if (lbl) lbl.textContent = `LINE ${topCustomizerState.selectedDocHlIdx + 1}`;
+      if (lbl) {
+        lbl.textContent = `LINE ${topCustomizerState.selectedDocHlIdx + 1}`;
+        lbl.style.color = '#fef08a';
+      }
     }
   }
 
   updateDocTfBoxPosition();
 
-  // 2. Drag Right Handle: Shorten / Lengthen Highlight
+  // 2. Drag Right Handle: Shorten / Lengthen Highlight or Redaction Bar
   const handleR = document.getElementById('doc-tf-handle-r');
   if (handleR) {
     handleR.onpointerdown = (e) => {
       e.stopPropagation();
       e.preventDefault();
       const startClientX = e.clientX;
+      const stageW = stageInner.clientWidth || 800;
+      const isRedactTarget = (topCustomizerState.selectedDocTarget === 'redact');
+
+      if (isRedactTarget) {
+        const startW = topCustomizerState.docRedactW !== undefined ? topCustomizerState.docRedactW : 0.510;
+        const rx = topCustomizerState.docRedactX !== undefined ? topCustomizerState.docRedactX : 0.125;
+
+        const onPointerMoveRRedact = (me) => {
+          const deltaX = (me.clientX - startClientX);
+          const deltaNorm = deltaX / stageW;
+          const newW = Math.max(0.04, Math.min(0.85, startW + deltaNorm));
+          topCustomizerState.docRedactW = parseFloat(newW.toFixed(3));
+
+          tfBox.style.width = `${(newW * 100).toFixed(2)}%`;
+          const svgRedact = document.getElementById('customizer-svg-redact-bar');
+          if (svgRedact) svgRedact.setAttribute('width', String(Math.round(newW * 1920)));
+          const htmlRedact = document.getElementById('customizer-doc-redact-bar');
+          if (htmlRedact) htmlRedact.style.width = `${Math.round(newW * 100)}%`;
+          if (toolbar) toolbar.style.left = `${((rx + newW / 2) * 100).toFixed(2)}%`;
+
+          const badge = document.getElementById('doc-tf-badge');
+          if (badge) badge.textContent = `⬛ FORENSIC REDACTION (${(newW * 100).toFixed(0)}% COVERAGE)`;
+        };
+
+        const onPointerUpRRedact = () => {
+          window.removeEventListener('pointermove', onPointerMoveRRedact);
+          window.removeEventListener('pointerup', onPointerUpRRedact);
+          updateDocTfBoxPosition();
+        };
+
+        window.addEventListener('pointermove', onPointerMoveRRedact);
+        window.addEventListener('pointerup', onPointerUpRRedact);
+        return;
+      }
+
+      // Drag right handle for Highlight
       const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
       if (!curHl) return;
       const startW = curHl.w;
-      const stageW = stageInner.clientWidth || 800;
 
       const onPointerMoveR = (me) => {
         const deltaX = (me.clientX - startClientX);
@@ -29962,18 +30071,54 @@ function initDocDirectCanvasEditing() {
     };
   }
 
-  // 3. Drag Left Handle: Adjust Start Position & Shorten
+  // 3. Drag Left Handle: Adjust Start Position & Shorten Highlight or Redaction Bar
   const handleL = document.getElementById('doc-tf-handle-l');
   if (handleL) {
     handleL.onpointerdown = (e) => {
       e.stopPropagation();
       e.preventDefault();
       const startClientX = e.clientX;
+      const stageW = stageInner.clientWidth || 800;
+      const isRedactTarget = (topCustomizerState.selectedDocTarget === 'redact');
+
+      if (isRedactTarget) {
+        const startX = topCustomizerState.docRedactX !== undefined ? topCustomizerState.docRedactX : 0.125;
+        const startW = topCustomizerState.docRedactW !== undefined ? topCustomizerState.docRedactW : 0.510;
+
+        const onPointerMoveLRedact = (me) => {
+          const deltaX = (me.clientX - startClientX);
+          const deltaNorm = deltaX / stageW;
+          const newX = Math.max(0.02, Math.min(startX + startW - 0.04, startX + deltaNorm));
+          const newW = Math.max(0.04, startW - (newX - startX));
+          topCustomizerState.docRedactX = parseFloat(newX.toFixed(3));
+          topCustomizerState.docRedactW = parseFloat(newW.toFixed(3));
+
+          tfBox.style.left = `${(newX * 100).toFixed(2)}%`;
+          tfBox.style.width = `${(newW * 100).toFixed(2)}%`;
+          const svgRedact = document.getElementById('customizer-svg-redact-bar');
+          if (svgRedact) {
+            svgRedact.setAttribute('x', String(Math.round(newX * 1920)));
+            svgRedact.setAttribute('width', String(Math.round(newW * 1920)));
+          }
+          if (toolbar) toolbar.style.left = `${((newX + newW / 2) * 100).toFixed(2)}%`;
+        };
+
+        const onPointerUpLRedact = () => {
+          window.removeEventListener('pointermove', onPointerMoveLRedact);
+          window.removeEventListener('pointerup', onPointerUpLRedact);
+          updateDocTfBoxPosition();
+        };
+
+        window.addEventListener('pointermove', onPointerMoveLRedact);
+        window.addEventListener('pointerup', onPointerUpLRedact);
+        return;
+      }
+
+      // Drag left handle for Highlight
       const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
       if (!curHl) return;
       const startX = curHl.x;
       const startW = curHl.w;
-      const stageW = stageInner.clientWidth || 800;
 
       const onPointerMoveL = (me) => {
         const deltaX = (me.clientX - startClientX);
@@ -30010,11 +30155,24 @@ function initDocDirectCanvasEditing() {
       e.stopPropagation();
       const idx = parseInt(hlEl.getAttribute('data-index'), 10);
       if (!isNaN(idx)) {
+        topCustomizerState.selectedDocTarget = 'highlight';
         topCustomizerState.selectedDocHlIdx = idx;
         updateDocTfBoxPosition();
       }
     };
   });
+
+  // Click Redact Bar Directly to Select It
+  const redactBarEl = document.getElementById('customizer-svg-redact-bar') || document.getElementById('customizer-doc-redact-bar');
+  if (redactBarEl) {
+    redactBarEl.onclick = (e) => {
+      e.stopPropagation();
+      topCustomizerState.selectedDocTarget = 'redact';
+      updateDocTfBoxPosition();
+      showTextTimingAlert('Selected Forensic Redaction Bar: Drag handles to adjust censor coverage', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    };
+  }
 
   // 5. Smart Text Awareness: Click or Hover Text Lines to Snap Highlight
   document.querySelectorAll('.doc-snappable-line').forEach(lineEl => {
@@ -30036,6 +30194,7 @@ function initDocDirectCanvasEditing() {
       // Check if this line is already highlighted
       const existingIdx = topCustomizerState.docHighlights.findIndex(h => Math.abs(h.y - targetLine.normY) < 0.025);
       if (existingIdx !== -1) {
+        topCustomizerState.selectedDocTarget = 'highlight';
         topCustomizerState.selectedDocHlIdx = existingIdx;
         updateDocTfBoxPosition();
         showTextTimingAlert(`Selected Line #${existingIdx + 1}`, 'info');
@@ -30056,6 +30215,7 @@ function initDocDirectCanvasEditing() {
         label: `Line ${nextIdx + 1}`
       });
 
+      topCustomizerState.selectedDocTarget = 'highlight';
       topCustomizerState.selectedDocHlIdx = nextIdx;
       syncTopTemplateDocHighlighterUI();
       renderTopTemplatePreviewStage();
@@ -30069,8 +30229,39 @@ function initDocDirectCanvasEditing() {
     btn.onclick = (e) => {
       e.stopPropagation();
       const c = btn.getAttribute('data-color');
+      if (!c) return;
+
+      // If current target is Redact bar, picking a color converts it into a highlight with that color!
+      if (topCustomizerState.selectedDocTarget === 'redact') {
+        const line3 = FORBES_DOC_LINES[2] || { normX: 0.125, normY: 0.354, normW: 0.510, normH: 0.039 };
+        topCustomizerState.docRedact = false;
+        const chk = document.getElementById('chk-tpl-modal-doc-redact');
+        if (chk) chk.checked = false;
+
+        const nextIdx = (topCustomizerState.docHighlights || []).length;
+        topCustomizerState.docHighlights.push({
+          x: topCustomizerState.docRedactX || line3.normX,
+          y: topCustomizerState.docRedactY || line3.normY,
+          w: topCustomizerState.docRedactW || line3.normW,
+          h: topCustomizerState.docRedactH || line3.normH,
+          color: c,
+          startTime: 0.3 + (nextIdx * 0.7),
+          duration: topCustomizerState.docSweepSpeed || 0.8,
+          label: `Line ${nextIdx + 1}`
+        });
+
+        topCustomizerState.selectedDocTarget = 'highlight';
+        topCustomizerState.selectedDocHlIdx = nextIdx;
+        syncTopTemplateDocHighlighterUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert(`Unredacted & converted to highlight line #${nextIdx + 1}`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+        return;
+      }
+
+      // Normal highlight color change
       const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
-      if (curHl && c) {
+      if (curHl) {
         curHl.color = c;
         const svgBar = document.getElementById(`customizer-svg-hl-bar-${topCustomizerState.selectedDocHlIdx}`);
         if (svgBar) svgBar.setAttribute('fill', c);
@@ -30080,25 +30271,68 @@ function initDocDirectCanvasEditing() {
     };
   });
 
-  // Toggle Redact from Toolbar
+  // Toggle / Unredact from Toolbar
   const btnRedact = document.getElementById('btn-doc-float-redact');
   if (btnRedact) {
     btnRedact.onclick = (e) => {
       e.stopPropagation();
+      if (topCustomizerState.selectedDocTarget === 'redact') {
+        // Unredact: Convert censor bar back into an editable highlight
+        const line3 = FORBES_DOC_LINES[2] || { normX: 0.125, normY: 0.354, normW: 0.510, normH: 0.039 };
+        topCustomizerState.docRedact = false;
+        const chk = document.getElementById('chk-tpl-modal-doc-redact');
+        if (chk) chk.checked = false;
+
+        const nextIdx = (topCustomizerState.docHighlights || []).length;
+        topCustomizerState.docHighlights.push({
+          x: topCustomizerState.docRedactX || line3.normX,
+          y: topCustomizerState.docRedactY || line3.normY,
+          w: topCustomizerState.docRedactW || line3.normW,
+          h: topCustomizerState.docRedactH || line3.normH,
+          color: '#fef08a',
+          startTime: 0.3 + (nextIdx * 0.7),
+          duration: topCustomizerState.docSweepSpeed || 0.8,
+          label: `Line ${nextIdx + 1}`
+        });
+
+        topCustomizerState.selectedDocTarget = 'highlight';
+        topCustomizerState.selectedDocHlIdx = nextIdx;
+        syncTopTemplateDocHighlighterUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert(`Unredacted line! Restored as editable highlight #${nextIdx + 1}`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2200);
+        return;
+      }
+
+      // If on highlight line, switch Redact on and select it
       topCustomizerState.docRedact = !topCustomizerState.docRedact;
       const chk = document.getElementById('chk-tpl-modal-doc-redact');
       if (chk) chk.checked = topCustomizerState.docRedact;
+      if (topCustomizerState.docRedact) {
+        topCustomizerState.selectedDocTarget = 'redact';
+      }
       renderTopTemplatePreviewStage();
-      showTextTimingAlert(topCustomizerState.docRedact ? 'Forensic Redaction Strip ON' : 'Redaction Strip OFF', 'info');
+      showTextTimingAlert(topCustomizerState.docRedact ? 'Forensic Redaction Strip ON (Selected for editing)' : 'Redaction Strip OFF', 'info');
       setTimeout(() => showTextTimingAlert(''), 1800);
     };
   }
 
-  // Delete Current Highlight from Toolbar
+  // Delete Current Highlight or Redaction from Toolbar
   const btnDel = document.getElementById('btn-doc-float-del');
   if (btnDel) {
     btnDel.onclick = (e) => {
       e.stopPropagation();
+      if (topCustomizerState.selectedDocTarget === 'redact') {
+        topCustomizerState.docRedact = false;
+        const chk = document.getElementById('chk-tpl-modal-doc-redact');
+        if (chk) chk.checked = false;
+        topCustomizerState.selectedDocTarget = 'highlight';
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Redaction strip removed', 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+        return;
+      }
+
       if (topCustomizerState.docHighlights && topCustomizerState.docHighlights.length > 0) {
         topCustomizerState.docHighlights.splice(topCustomizerState.selectedDocHlIdx, 1);
         topCustomizerState.selectedDocHlIdx = Math.max(0, topCustomizerState.selectedDocHlIdx - 1);
@@ -30115,6 +30349,15 @@ function initDocDirectCanvasEditing() {
   if (btnUndo) {
     btnUndo.onclick = (e) => {
       e.stopPropagation();
+      if (topCustomizerState.selectedDocTarget === 'redact') {
+        topCustomizerState.docRedactX = 0.125;
+        topCustomizerState.docRedactW = 0.510;
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Reset Redact Bar coverage to 100% full line', 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+        return;
+      }
+
       const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
       if (curHl) {
         curHl.x = 0.125;
@@ -43711,6 +43954,13 @@ function attachModalDocHighlighterListeners() {
 
   document.getElementById('chk-tpl-modal-doc-redact')?.addEventListener('change', (e) => {
     topCustomizerState.docRedact = e.target.checked;
+    if (topCustomizerState.docRedact) {
+      topCustomizerState.selectedDocTarget = 'redact';
+      showTextTimingAlert('Forensic Redaction Bar Enabled: Click & drag handles on canvas to resize or click Unredact', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2500);
+    } else {
+      topCustomizerState.selectedDocTarget = 'highlight';
+    }
     renderTopTemplatePreviewStage();
   });
 
