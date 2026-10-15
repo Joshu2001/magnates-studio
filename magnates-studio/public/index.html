@@ -2018,6 +2018,87 @@
             </div>
 
             <!-- Adjust & Color Grade Section (Tone, Colors, Details) -->
+            
+            <!-- ==================== DOCUMENT HIGHLIGHTING & FOCUS SECTION ==================== -->
+            <div class="control-row accordion-card open" id="inspector-doc-focus-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 8px;">
+              <div class="fx-header" onclick="this.parentElement.classList.toggle('open')" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer;">
+                <label style="margin: 0; display: flex; align-items: center; gap: 6px; font-weight: 700; cursor: pointer; color: #facc15;">
+                  <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; fill: currentColor;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>
+                  <span style="letter-spacing: 0.3px;">Document Highlighting & Focus</span>
+                </label>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                  <span class="badge" id="inspector-doc-focus-badge" style="font-size: 10px; color: #facc15; background: rgba(250, 204, 21, 0.15); padding: 2px 6px; border-radius: 4px;">0 Lines</span>
+                  <svg class="accordion-chevron" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+              <div class="fx-body">
+                <!-- 1. Active Highlighter Lines List & Color / Undo Controls -->
+                <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px; margin-bottom: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #f1f5f9;">Highlighter Lines</span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btn-sidebar-add-highlight" style="padding: 2px 8px; font-size: 10.5px; color: #facc15; border-color: rgba(250, 204, 21, 0.5); font-weight: 600;">
+                      + Add Line
+                    </button>
+                  </div>
+                  <div id="sidebar-highlights-list" style="display: flex; flex-direction: column; gap: 6px;">
+                    <!-- Injected dynamically per line -->
+                  </div>
+                </div>
+
+                <!-- 2. Optional Framing & Effects Toggles -->
+                <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 8px; margin-bottom: 8px;">
+                  <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Optional Focus Treatments</div>
+                  
+                  <!-- Whiteout Fade Toggle -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                    <label style="margin: 0; font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                      <input type="checkbox" id="chk-sidebar-whiteout" style="cursor: pointer;">
+                      <span>Whiteout Fade (Clean Paper)</span>
+                    </label>
+                    <span id="badge-whiteout-status" style="font-size: 9.5px; color: #38bdf8;">Off</span>
+                  </div>
+
+                  <!-- Dark Spotlight Toggle -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                    <label style="margin: 0; font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                      <input type="checkbox" id="chk-sidebar-darkout" style="cursor: pointer;">
+                      <span>Dark Spotlight (Theater Dim)</span>
+                    </label>
+                    <span id="badge-darkout-status" style="font-size: 9.5px; color: #a855f7;">Off</span>
+                  </div>
+
+                  <!-- Punch Zoom Toggle -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
+                    <label style="margin: 0; font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                      <input type="checkbox" id="chk-sidebar-punch-zoom" style="cursor: pointer;">
+                      <span>Punch Zoom (Vox Push-In)</span>
+                    </label>
+                    <span id="badge-punch-status" style="font-size: 9.5px; color: #ff334b;">Off</span>
+                  </div>
+
+                  <!-- Magnifying Loupe Toggle -->
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 0;">
+                    <label style="margin: 0; font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                      <input type="checkbox" id="chk-sidebar-loupe" style="cursor: pointer;">
+                      <span>Magnifying Loupe Lens</span>
+                    </label>
+                    <span id="badge-loupe-status" style="font-size: 9.5px; color: #00f0ff;">Off</span>
+                  </div>
+                </div>
+
+                <!-- 3. Dim & Sweep Sliders (Contextual) -->
+                <div id="sidebar-doc-sliders" style="display: none;">
+                  <div class="control-row" style="margin-bottom: 6px;">
+                    <label style="display: flex; justify-content: space-between; font-size: 10.5px;">
+                      <span id="label-sidebar-dim">Fade Level</span>
+                      <span id="inspector-doc-dim-val">65%</span>
+                    </label>
+                    <input type="range" id="inspector-doc-dim" min="20" max="98" value="65" step="2">
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="control-row accordion-card open" id="inspector-adjust-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 6px;">
               <div class="fx-header" onclick="this.parentElement.classList.toggle('open')" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer;">
                 <label style="margin: 0; display: flex; align-items: center; gap: 5px; font-weight: 700; cursor: pointer;">
@@ -2504,139 +2585,6 @@
             </div>
 
             <!-- Article Focus (Spotlight Dimming) & Highlight FX Section -->
-            <div class="control-row" id="inspector-doc-focus-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <label style="margin: 0; color: #38bdf8;">Article Spotlight & Highlight</label>
-                <span class="badge" id="inspector-doc-focus-badge" style="font-size: 10px; color: #38bdf8;">Off</span>
-              </div>
-              <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 4px;">
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-white" style="padding: 6px 4px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Fade surrounding text to clean white/light gray">
-                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="12" cy="12" r="9"/></svg>
-                  <span>Whiteout Focus</span>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-dark" style="padding: 6px 4px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Dim surrounding text into theater darkness">
-                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><circle cx="12" cy="12" r="9"/></svg>
-                  <span>Dark Spotlight</span>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-highlight" style="padding: 6px 4px; font-size: 11px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Drag animated highlighter bar across text">
-                  <svg class="ui-icon" viewBox="0 0 24 24" style="color: #38bdf8; width: 14px; height: 14px; fill: currentColor;"><path d="M16.5 4.5l3 3L7.5 19.5 4 20l.5-3.5L16.5 4.5z"/></svg>
-                  <span>Highlighter</span>
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" id="btn-inspector-doc-guide" style="padding: 6px 4px; font-size: 11px; color: #00f0ff; border-color: rgba(0, 240, 255, 0.4); display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Open step-by-step visual tutorial and style picker">
-                  <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm1.07-7.75l-.9.92C12.45 11.9 12 12.5 12 14h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-                  <span>Guide</span>
-                </button>
-              </div>
-              <button type="button" class="btn btn-primary btn-sm" id="btn-inspector-doc-bundle" style="width: 100%; margin-top: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); border: none; font-weight: 600; font-size: 11px; padding: 6px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(56, 189, 248, 0.25);" title="1-Click Template: 2.2x Zoom + Whiteout Fade + Pure Yellow Highlight!">
-                <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6.4-4.8-6.4 4.8 2.4-7.2-6-4.8h7.6z"/></svg>
-                <span>1-Click Focus & Highlight Bundle</span>
-              </button>
-              <!-- Apple-Style Minimalist Effect Sequence Stack -->
-              <div id="inspector-fx-sequence-container" style="display: none; margin-top: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 10px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                  <span style="font-size: 11px; font-weight: 600; color: #f1f5f9; letter-spacing: 0.2px;">Applied Effects Sequence</span>
-                  <span id="inspector-fx-total-count" style="font-size: 10px; color: #94a3b8;">0 effects</span>
-                </div>
-                <div id="inspector-fx-chips-list" style="display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px;">
-                  <!-- Dynamic minimalist chips injected here -->
-                </div>
-                <!-- Inline minimal duration editor for currently selected effect -->
-                <div id="inspector-fx-active-edit" style="display: none; background: rgba(0,0,0,0.3); border-radius: 6px; padding: 6px 8px; margin-top: 6px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10.5px; color: #cbd5e1; margin-bottom: 4px;">
-                    <span id="inspector-fx-active-title" style="font-weight: 500;">Effect Duration</span>
-                    <span id="inspector-fx-active-dur-val" style="font-weight: 600; color: #38bdf8;">2.0s</span>
-                  </div>
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                    <input type="range" id="inspector-fx-active-dur" min="3" max="60" value="20" step="1" style="flex: 1;">
-                    <button type="button" id="btn-fx-delete-active" class="btn btn-secondary btn-sm" style="padding: 2px 7px; font-size: 10px; color: #f43f5e; border-color: rgba(244, 63, 94, 0.4);" title="Remove this effect">Delete</button>
-                  </div>
-                </div>
-              </div>
-
-              <div id="inspector-doc-focus-controls-body" style="display: none; margin-top: 8px; background: rgba(0,0,0,0.25); padding: 8px; border-radius: 6px;">
-                <!-- Focus Backdrop Style: Whiteout Fade vs Dark Spotlight -->
-                <div class="control-row" style="margin-bottom: 6px;">
-                  <label>Surrounding Text Fade Style</label>
-                  <div class="btn-group" style="display: flex; gap: 4px; margin-top: 3px;">
-                    <button type="button" class="btn btn-secondary btn-sm active" id="btn-doc-style-white" style="flex: 1; font-size: 11px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
-                      <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2;"><circle cx="12" cy="12" r="9"/></svg>
-                      <span>Whiteout Fade</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-doc-style-dark" style="flex: 1; font-size: 11px; padding: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
-                      <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><circle cx="12" cy="12" r="9"/></svg>
-                      <span>Dark Dim</span>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Un-whiteout / Timed Auto-Restore Duration -->
-                <div class="control-row" style="margin-bottom: 6px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <label style="margin: 0; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
-                      <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; fill: currentColor;"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-                      <span>Timed Focus Duration</span>
-                    </label>
-                    <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-unwhiteout" style="padding: 2px 6px; font-size: 10px;">
-                      Hold Whole Clip
-                    </button>
-                  </div>
-                  <div id="row-unwhiteout-slider" style="display: none; margin-top: 5px;">
-                    <label style="display: flex; justify-content: space-between; font-size: 10px;">
-                      <span>Focus Hold Duration</span>
-                      <span id="inspector-doc-focus-dur-val">2.0s</span>
-                    </label>
-                    <input type="range" id="inspector-doc-focus-dur" min="5" max="60" value="20" step="5">
-                    <p class="hint-text" style="margin-top: 3px; font-size: 10px;">Fades surrounding text for 2.0s, then automatically un-whiteouts smoothly back to normal full page.</p>
-                  </div>
-                </div>
-
-                <div class="control-row" style="margin-bottom: 6px;">
-                  <label style="display: flex; justify-content: space-between;">
-                    <span id="label-doc-dim">Whiteout Fade Level</span>
-                    <span id="inspector-doc-dim-val">65%</span>
-                  </label>
-                  <input type="range" id="inspector-doc-dim" min="20" max="98" value="65" step="2">
-                </div>
-                <div class="control-row" style="margin-bottom: 6px;">
-                  <label style="display: flex; justify-content: space-between;">
-                    <span>Edge Softness (Feather)</span>
-                    <span id="inspector-doc-feather-val">20px</span>
-                  </label>
-                  <input type="range" id="inspector-doc-feather" min="0" max="50" value="20" step="2">
-                </div>
-
-                <div class="control-row" style="margin-bottom: 6px;">
-                  <label style="display: flex; justify-content: space-between;">
-                    <span>Highlight Sweep Speed</span>
-                    <span id="inspector-doc-speed-val">0.6s / line</span>
-                  </label>
-                  <input type="range" id="inspector-doc-speed" min="2" max="25" value="6" step="1">
-                </div>
-
-                <div class="control-row" style="margin-bottom: 6px;">
-                  <label>Highlighter Marker Color</label>
-                  <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px;">
-                    <input type="color" id="inspector-doc-hl-color" value="#38bdf8" style="width: 32px; height: 26px; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; cursor: pointer;">
-                    <div style="display: flex; gap: 4px; flex: 1;">
-                      <button type="button" class="btn btn-secondary btn-sm hl-preset-btn" data-color="#00f0ff" style="background: rgba(0, 240, 255, 0.25); color: #00f0ff; border: 1px solid #00f0ff; padding: 2px 6px; font-size: 10px; border-radius: 3px;">Cyan</button>
-                      <button type="button" class="btn btn-secondary btn-sm hl-preset-btn" data-color="#ffff00" style="background: rgba(255, 255, 0, 0.25); color: #ffff00; border: 1px solid #ffff00; padding: 2px 6px; font-size: 10px; border-radius: 3px;">Yellow</button>
-                      <button type="button" class="btn btn-secondary btn-sm hl-preset-btn" data-color="#00ff66" style="background: rgba(0, 255, 102, 0.25); color: #00ff66; border: 1px solid #00ff66; padding: 2px 6px; font-size: 10px; border-radius: 3px;">Green</button>
-                    </div>
-                  </div>
-                </div>
-                <div style="display: flex; gap: 4px; margin-top: 8px;">
-                  <button type="button" class="btn btn-secondary btn-sm" id="btn-unwhiteout-now" style="flex: 1; font-size: 11px; color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); display: inline-flex; align-items: center; justify-content: center; gap: 4px;" title="Instantly remove whiteout & restore document view">
-                    <svg viewBox="0 0 24 24" style="width: 11px; height: 11px; fill: currentColor;"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
-                    <span>Un-whiteout Now</span>
-                  </button>
-                  <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-highlights" style="flex: 1; font-size: 11px; color: #ff6b7e; border-color: rgba(255, 107, 126, 0.4);">
-                    Clear Highlights
-                  </button>
-                </div>
-                <p class="hint-text" style="margin-top: 6px;"><b>Whiteout Fade</b> whites out surrounding text like newspaper articles. Drag across any word/sentence to add an animated drawing sweep.</p>
-              </div>
-            </div>
-
             <!-- Document Camera Scroll / Flow (Vox & Johnny Harris Style) -->
             <div class="control-row" id="inspector-doc-scroll-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
@@ -6857,11 +6805,11 @@
           
           <!-- 1. Center Preview Canvas Container (Spacious, seamless dark bezel) -->
           <div id="tpl-modal-preview-canvas-box" style="background: #0e1017; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
-            <!-- Flush Preview Stage: Rounded cinema frame with subtle inset shadow -->
-            <div id="tpl-modal-preview-stage-container" style="position: relative; width: 100%; flex: 1; min-height: 250px; max-height: 320px; background: #000; border-radius: 10px; overflow: visible; border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
+            <!-- Flush Preview Stage: Rounded cinema frame with subtle inset shadow & responsive 16:9 ratio -->
+            <div id="tpl-modal-preview-stage-container" style="position: relative; width: 100%; aspect-ratio: 16 / 9; max-height: 480px; min-height: 240px; margin: 0 auto; background: #000; border-radius: 10px; overflow: visible; border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
               
-              <!-- Live Preview Container -->
-              <div id="tpl-modal-preview-stage" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden;">
+              <!-- Live Preview Container: centered 16:9 stage that adapts responsively -->
+              <div id="tpl-modal-preview-stage" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; border-radius: 10px;">
                 <!-- Dynamic FX layers rendered by JS -->
               </div>
 
@@ -6997,8 +6945,27 @@
                 </div>
               </div>
 
-              <!-- Top right time code pill matching homepage tags -->
-              <div style="position: absolute; top: 12px; right: 12px; z-index: 20; pointer-events: none;">
+              <!-- Document Floating Highlight & Redact Quick Toolbar -->
+              <div id="doc-floating-highlight-toolbar" style="display: none; position: absolute; z-index: 1000; background: rgba(15, 23, 42, 0.95); border: 1.5px solid #facc15; box-shadow: 0 12px 30px rgba(0,0,0,0.85); border-radius: 9px; padding: 5px 10px; align-items: center; gap: 8px; backdrop-filter: blur(10px); transform: translate(-50%, -100%); margin-top: -10px;">
+                <span id="doc-float-line-label" style="font-size: 10px; font-weight: 800; color: #fef08a; font-family: monospace; white-space: nowrap;">LINE 1</span>
+                <div style="width: 1px; height: 14px; background: rgba(255,255,255,0.18);"></div>
+                <div style="display: flex; gap: 4px;" title="Change Marker Color">
+                  <button type="button" class="btn-doc-float-color" data-color="#fef08a" style="width: 15px; height: 15px; border-radius: 50%; background: #fef08a; border: 1.5px solid #fff; cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="btn-doc-float-color" data-color="#ef4444" style="width: 15px; height: 15px; border-radius: 50%; background: #ef4444; border: 1.5px solid transparent; cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="btn-doc-float-color" data-color="#06b6d4" style="width: 15px; height: 15px; border-radius: 50%; background: #06b6d4; border: 1.5px solid transparent; cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="btn-doc-float-color" data-color="#22c55e" style="width: 15px; height: 15px; border-radius: 50%; background: #22c55e; border: 1.5px solid transparent; cursor: pointer; padding: 0;"></button>
+                </div>
+                <div style="width: 1px; height: 14px; background: rgba(255,255,255,0.18);"></div>
+                <button type="button" id="btn-doc-float-redact" style="font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #09090b; border: 1px solid rgba(255,255,255,0.25); color: #fff; cursor: pointer;" title="Toggle between Highlight and Redact Bar">⬛ Redact</button>
+                <button type="button" id="btn-doc-float-undo" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; padding: 2px 4px;" title="Reset / Undo">↺</button>
+                <button type="button" id="btn-doc-float-del" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px; padding: 2px 4px; font-weight: bold;" title="Remove this highlight">🗑</button>
+              </div>
+
+              <!-- Top right time code pill matching homepage tags + Fullscreen Toggle -->
+              <div style="position: absolute; top: 12px; right: 12px; z-index: 20; display: flex; align-items: center; gap: 8px;">
+                <button type="button" id="btn-tpl-modal-fullscreen" style="background: rgba(0,0,0,0.75); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(8px); display: flex; align-items: center; gap: 4px;" title="Toggle Fullscreen Stage">
+                  <span>⤢</span> Fullscreen
+                </button>
                 <span id="tpl-modal-timer-badge" style="font-size: 11px; font-weight: 600; font-family: ui-monospace, monospace; background: rgba(0,0,0,0.75); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.12); color: #f1f5f9; padding: 4px 10px; border-radius: 20px;">2.4s / 6.0s (Scene 1)</span>
               </div>
 
@@ -7050,12 +7017,12 @@
             </div>
 
             <!-- Playback Controls Bar -->
-            <div id="tpl-modal-playback-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; flex-shrink: 0; padding: 2px 4px 0;">
+            <div id="tpl-modal-playback-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; flex-shrink: 0; padding: 6px 4px 0; margin-top: 12px;">
               <div style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" id="btn-tpl-modal-play-toggle" style="padding: 6px 16px; font-size: 11.5px; font-weight: 600; background: #151824; border: 1px solid rgba(255,255,255,0.1); color: #f8fafc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s;" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
+                <button type="button" id="btn-tpl-modal-play-toggle" style="padding: 7px 18px; font-size: 11.5px; font-weight: 600; background: #151824; border: 1px solid rgba(255,255,255,0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
                   <span>❚❚ Pause</span>
                 </button>
-                <button type="button" id="btn-tpl-modal-reset" style="padding: 6px 14px; font-size: 11.5px; font-weight: 500; background: #151824; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s;" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
+                <button type="button" id="btn-tpl-modal-reset" style="padding: 7px 16px; font-size: 11.5px; font-weight: 500; background: #151824; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
                   <span>↺ Replay</span>
                 </button>
               </div>
@@ -7459,6 +7426,118 @@
             </div>
           </div>
 
+          <!-- Section: Document Highlighting & Focus (for Document / Forbes Templates) -->
+          <div id="tpl-modal-wrap-doc-highlighter" style="display: none; flex-direction: column; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #facc15; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 5px;">
+                <span>🖍️</span> Document Highlighting
+              </span>
+              <button type="button" id="btn-tpl-modal-add-hl-line" style="font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 5px; background: rgba(250,204,21,0.18); border: 1px solid rgba(250,204,21,0.45); color: #fef08a; cursor: pointer; display: flex; align-items: center; gap: 3px;">
+                <span>+</span> Add Line
+              </button>
+            </div>
+
+            <!-- List of dynamic highlight lines with color pickers and trash buttons -->
+            <div id="tpl-modal-highlights-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+
+            <!-- Sweep Speed Slider -->
+            <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 6px 8px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10px;">
+                <span style="color: #cbd5e1;">Marker Sweep Speed</span>
+                <span id="tpl-modal-val-hl-speed" style="color: #facc15; font-family: monospace; font-weight: 700;">0.8s</span>
+              </div>
+              <input type="range" id="tpl-modal-slider-hl-speed" min="2" max="25" value="8" style="width: 100%; accent-color: #facc15; height: 3px; cursor: pointer;" />
+            </div>
+
+            <!-- Optional Focus & Camera Toggles -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 8px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Optional Effects</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-whiteout" style="accent-color: #38bdf8; cursor: pointer;" />
+                  <span>Whiteout Fade</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-darkout" style="accent-color: #a855f7; cursor: pointer;" />
+                  <span>Dark Spotlight</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-punch-zoom" style="accent-color: #f59e0b; cursor: pointer;" />
+                  <span>Punch Zoom</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-loupe" style="accent-color: #06b6d4; cursor: pointer;" />
+                  <span>Loupe Lens</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-camera-scroll" style="accent-color: #10b981; cursor: pointer;" />
+                  <span>Camera Scroll</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-doc-tilt" style="accent-color: #ec4899; cursor: pointer;" />
+                  <span>3D Tilt Angle</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-doc-bounce" style="accent-color: #6366f1; cursor: pointer;" />
+                  <span>Bounce Pop-in</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #e2e8f0; cursor: pointer;">
+                  <input type="checkbox" id="chk-tpl-modal-doc-redact" style="accent-color: #ef4444; cursor: pointer;" />
+                  <span>Redact Bar</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Visual Color Grading / Filters Panel -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9.5px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">Visual Filters &amp; Grade</span>
+                <span id="tpl-modal-val-filter-name" style="font-size: 9px; color: #94a3b8; font-family: monospace;">Original</span>
+              </div>
+              <select id="tpl-modal-select-filter" style="width: 100%; background: #161926; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #e2e8f0; font-size: 10.5px; font-weight: 600; outline: none; cursor: pointer;">
+                <option value="none">Original (No Filter)</option>
+                <option value="vintage_70s">Vintage Paper / Archival</option>
+                <option value="noir">1940s Noir / High Contrast B&amp;W</option>
+                <option value="warm_kodak">Warm Kodak Tone</option>
+                <option value="nordic_chill">Nordic Mist / Cool Forensic</option>
+                <option value="teal_orange">Teal &amp; Orange Cinema</option>
+                <option value="bright">Clean High Key / Bright</option>
+                <option value="mexico">Amber Golden Hour</option>
+              </select>
+            </div>
+
+            <!-- Studio Motion & Transform Controls (Scale, Rotation, Position, Easing) -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 8px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #c084fc; text-transform: uppercase;">Transform &amp; Motion Curve</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>SCALE</span>
+                    <span id="tpl-modal-val-doc-scale">100%</span>
+                  </div>
+                  <input type="range" id="tpl-modal-slider-doc-scale" min="80" max="180" value="100" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>ROTATION</span>
+                    <span id="tpl-modal-val-doc-rot">0&deg;</span>
+                  </div>
+                  <input type="range" id="tpl-modal-slider-doc-rot" min="-25" max="25" value="0" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+                </div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>EASING CURVE</span>
+                </div>
+                <select id="tpl-modal-select-doc-easing" style="width: 100%; background: #161926; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; padding: 3px 6px; color: #cbd5e1; font-size: 10px; outline: none; cursor: pointer;">
+                  <option value="cubic">Smooth Ease Cubic (Cinematic)</option>
+                  <option value="linear">Linear (Constant Speed)</option>
+                  <option value="snap">Snap / Pop Instant</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
           <!-- Section: Typography -->
           <div id="tpl-modal-wrap-text" style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -7635,7 +7714,7 @@
           </div>
 
           <!-- Section: AI Engine (Ollama / Local Gemma & Remote API) -->
-          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+          <div id="tpl-modal-wrap-ai-engine" style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 10px; font-weight: 700; color: #c084fc; text-transform: uppercase; letter-spacing: 0.6px;">AI Parallax Assistant</span>
               <span style="font-size: 9px; color: #a855f7; font-family: monospace;">OLLAMA / API</span>

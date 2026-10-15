@@ -1610,9 +1610,15 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
       const hlStart = hl.startTime !== undefined ? hl.startTime : (0.4 + 0.3 + idx * (defaultSweepSpeed * 0.8));
       const hlDur = hl.duration || defaultSweepSpeed;
       const hlElapsed = docElapsed - hlStart;
-      if (hlElapsed <= 0) return;
+      // In editor mode while paused, keep highlights visible so users can see and edit them
+      let progress = 1.0;
+      if (isPlaying) {
+        if (hlElapsed <= 0) return;
+        progress = Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
+      } else {
+        progress = hlElapsed <= 0 ? 1.0 : Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
+      }
 
-      const progress = Math.min(1.0, Math.max(0.0, hlElapsed / hlDur));
       const wipeEase = progress < 1 ? 1 - Math.pow(1 - progress, 2.2) : 1;
 
       const lx = hlW * hl.x;
@@ -4753,6 +4759,214 @@ function selectClip(clip, trackType) {
         const docBody = document.getElementById('inspector-doc-focus-controls-body');
         const btnDocFocus = document.getElementById('btn-inspector-doc-focus');
         const btnDocHl = document.getElementById('btn-inspector-doc-highlight');
+
+        // Wire up New Sidebar Document Highlighting & Focus Controls
+        const hlListEl = document.getElementById('sidebar-highlights-list');
+        const highlights = clip.highlights || [];
+        if (docBadge) {
+          docBadge.textContent = `${highlights.length} Line${highlights.length === 1 ? '' : 's'}`;
+        }
+        if (hlListEl) {
+          if (highlights.length === 0) {
+            hlListEl.innerHTML = `
+              <div style="font-size: 10.5px; color: #94a3b8; font-style: italic; padding: 4px 0;">
+                No highlight lines. Click "+ Add Line" to highlight a sentence.
+              </div>
+            `;
+          } else {
+            hlListEl.innerHTML = highlights.map((hl, idx) => {
+              const isSel = (window._selectedHighlightIndex === idx);
+              const color = hl.color || '#ffff00';
+              return `
+                <div class="sidebar-hl-item" data-index="${idx}" style="background: rgba(255,255,255,0.04); border: 1px solid ${isSel ? '#facc15' : 'rgba(255,255,255,0.08)'}; border-radius: 5px; padding: 6px 8px; margin-bottom: 4px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 4px;">
+                      <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${color};"></span>
+                      Line #${idx + 1}
+                    </span>
+                    <button type="button" class="btn-sidebar-del-hl" data-index="${idx}" style="background: none; border: none; color: #ff334b; font-size: 10px; cursor: pointer; padding: 1px 4px; font-weight: 600;" title="Delete this highlight line">
+                      🗑 Delete
+                    </button>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                      <button type="button" class="btn-sidebar-hl-color" data-index="${idx}" data-color="#ffff00" style="width: 18px; height: 18px; border-radius: 3px; background: #ffff00; border: ${color === '#ffff00' ? '2px solid #fff' : '1px solid rgba(0,0,0,0.4)'}; cursor: pointer;" title="Yellow Marker"></button>
+                      <button type="button" class="btn-sidebar-hl-color" data-index="${idx}" data-color="#ff334b" style="width: 18px; height: 18px; border-radius: 3px; background: #ff334b; border: ${color === '#ff334b' ? '2px solid #fff' : '1px solid rgba(0,0,0,0.4)'}; cursor: pointer;" title="Red Marker"></button>
+                      <button type="button" class="btn-sidebar-hl-color" data-index="${idx}" data-color="#00f0ff" style="width: 18px; height: 18px; border-radius: 3px; background: #00f0ff; border: ${color === '#00f0ff' ? '2px solid #fff' : '1px solid rgba(0,0,0,0.4)'}; cursor: pointer;" title="Cyan Marker"></button>
+                      <button type="button" class="btn-sidebar-hl-color" data-index="${idx}" data-color="#10b981" style="width: 18px; height: 18px; border-radius: 3px; background: #10b981; border: ${color === '#10b981' ? '2px solid #fff' : '1px solid rgba(0,0,0,0.4)'}; cursor: pointer;" title="Green Marker"></button>
+                    </div>
+                    <span style="font-size: 10px; color: #94a3b8;">${(hl.duration || 0.6).toFixed(1)}s sweep</span>
+                  </div>
+                </div>
+              `;
+            }).join('');
+
+            hlListEl.querySelectorAll('.btn-sidebar-del-hl').forEach(b => {
+              b.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const dIdx = parseInt(e.currentTarget.dataset.index);
+                if (clip.highlights && clip.highlights[dIdx] !== undefined) {
+                  clip.highlights.splice(dIdx, 1);
+                  window._selectedHighlightIndex = Math.max(0, clip.highlights.length - 1);
+                  recordState('Delete Highlight Line');
+                  playSFX('pop');
+                  renderCanvas();
+                  renderAllTimelineTracks();
+                  updateInspector();
+                  saveProjectState(false);
+                }
+              });
+            });
+
+            hlListEl.querySelectorAll('.btn-sidebar-hl-color').forEach(b => {
+              b.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const cIdx = parseInt(e.currentTarget.dataset.index);
+                const newColor = e.currentTarget.dataset.color;
+                if (clip.highlights && clip.highlights[cIdx]) {
+                  clip.highlights[cIdx].color = newColor;
+                  recordState('Change Highlight Color');
+                  renderCanvas();
+                  updateInspector();
+                  saveProjectState(false);
+                }
+              });
+            });
+
+            hlListEl.querySelectorAll('.sidebar-hl-item').forEach(el => {
+              el.addEventListener('click', (e) => {
+                if (e.target.closest('.btn-sidebar-del-hl') || e.target.closest('.btn-sidebar-hl-color')) return;
+                const sIdx = parseInt(el.dataset.index);
+                window._selectedHighlightIndex = sIdx;
+                updateInspector();
+                renderCanvas();
+              });
+            });
+          }
+        }
+
+        // Bind + Add Line button
+        const btnAddLine = document.getElementById('btn-sidebar-add-highlight');
+        if (btnAddLine) {
+          btnAddLine.onclick = () => {
+            if (!Array.isArray(clip.highlights)) clip.highlights = [];
+            const relT = Math.max(0, currentTime - clip.start);
+            const lineNum = clip.highlights.length;
+            const newY = Math.min(0.85, 0.468 + (lineNum * 0.046));
+            clip.highlights.push({
+              x: 0.235,
+              y: newY,
+              w: 0.495,
+              h: 0.046,
+              color: '#ffff00',
+              startTime: parseFloat(relT.toFixed(2)),
+              duration: 0.7
+            });
+            window._selectedHighlightIndex = clip.highlights.length - 1;
+            recordState('Add Highlight Line');
+            playSFX('pop');
+            renderCanvas();
+            renderAllTimelineTracks();
+            updateInspector();
+            saveProjectState(false);
+          };
+        }
+
+        // Sync Checkboxes for Optional Focus & Framing
+        const chkWhiteout = document.getElementById('chk-sidebar-whiteout');
+        const badgeWhiteout = document.getElementById('badge-whiteout-status');
+        const chkDarkout = document.getElementById('chk-sidebar-darkout');
+        const badgeDarkout = document.getElementById('badge-darkout-status');
+        const chkPunch = document.getElementById('chk-sidebar-punch-zoom');
+        const badgePunch = document.getElementById('badge-punch-status');
+        const chkLoupe = document.getElementById('chk-sidebar-loupe');
+        const badgeLoupe = document.getElementById('badge-loupe-status');
+
+        const isWhite = !!(clip.docFocus && clip.docStyle === 'white');
+        const isDark = !!(clip.docFocus && clip.docStyle === 'dark');
+        const isPunch = (clip.zoomEffect === 'snap');
+        const isLoupe = (clip.zoomEffect === 'loupe');
+
+        if (chkWhiteout) {
+          chkWhiteout.checked = isWhite;
+          if (badgeWhiteout) {
+            badgeWhiteout.textContent = isWhite ? 'Active' : 'Off';
+            badgeWhiteout.style.color = isWhite ? '#38bdf8' : 'var(--text-muted)';
+          }
+          chkWhiteout.onchange = () => {
+            clip.docFocus = chkWhiteout.checked;
+            clip.docStyle = 'white';
+            if (clip.docFocus && !clip.docFocusRect) clip.docFocusRect = { x: 0.15, y: 0.35, w: 0.70, h: 0.28 };
+            if (clip.docFocus) playSFX('pop');
+            recordState('Toggle Whiteout Fade');
+            renderCanvas();
+            renderAllTimelineTracks();
+            updateInspector();
+            saveProjectState(false);
+          };
+        }
+
+        if (chkDarkout) {
+          chkDarkout.checked = isDark;
+          if (badgeDarkout) {
+            badgeDarkout.textContent = isDark ? 'Active' : 'Off';
+            badgeDarkout.style.color = isDark ? '#a855f7' : 'var(--text-muted)';
+          }
+          chkDarkout.onchange = () => {
+            clip.docFocus = chkDarkout.checked;
+            clip.docStyle = 'dark';
+            if (clip.docFocus && !clip.docFocusRect) clip.docFocusRect = { x: 0.15, y: 0.35, w: 0.70, h: 0.28 };
+            if (clip.docFocus) playSFX('pop');
+            recordState('Toggle Dark Spotlight');
+            renderCanvas();
+            renderAllTimelineTracks();
+            updateInspector();
+            saveProjectState(false);
+          };
+        }
+
+        if (chkPunch) {
+          chkPunch.checked = isPunch;
+          if (badgePunch) {
+            badgePunch.textContent = isPunch ? 'Active' : 'Off';
+            badgePunch.style.color = isPunch ? '#ff334b' : 'var(--text-muted)';
+          }
+          chkPunch.onchange = () => {
+            clip.zoomEffect = chkPunch.checked ? 'snap' : null;
+            if (chkPunch.checked) {
+              if (!clip.zoomScale) clip.zoomScale = 1.35;
+              clip.zoomStartTime = Math.max(0, currentTime - clip.start);
+              playSFX('snap_zoom');
+            }
+            recordState('Toggle Punch Zoom');
+            renderCanvas();
+            renderAllTimelineTracks();
+            updateInspector();
+            saveProjectState(false);
+          };
+        }
+
+        if (chkLoupe) {
+          chkLoupe.checked = isLoupe;
+          if (badgeLoupe) {
+            badgeLoupe.textContent = isLoupe ? 'Active' : 'Off';
+            badgeLoupe.style.color = isLoupe ? '#00f0ff' : 'var(--text-muted)';
+          }
+          chkLoupe.onchange = () => {
+            clip.zoomEffect = chkLoupe.checked ? 'loupe' : null;
+            if (chkLoupe.checked) {
+              if (!clip.zoomScale) clip.zoomScale = 2.0;
+              if (!clip.loupeRadius) clip.loupeRadius = 110;
+              clip.zoomStartTime = Math.max(0, currentTime - clip.start);
+              playSFX('snap_zoom');
+            }
+            recordState('Toggle Loupe Callout');
+            renderCanvas();
+            renderAllTimelineTracks();
+            updateInspector();
+            saveProjectState(false);
+          };
+        }
 
         // Normalize spotlights array for UI
         if (!Array.isArray(clip.spotlights) && clip.docFocus && clip.docFocusRect) {
@@ -9934,6 +10148,26 @@ function initCanvasTransformInteraction() {
           }
         }
 
+        // Check if click hit any active highlight bar or handle FIRST
+        if (clip.highlights && clip.highlights.length > 0) {
+          for (let hIdx = clip.highlights.length - 1; hIdx >= 0; hIdx--) {
+            const hl = clip.highlights[hIdx];
+            const hb = hl._screenBounds;
+            if (hb && pt.x >= hb.x - 8 && pt.x <= hb.x + hb.w + 8 && pt.y >= hb.y - 8 && pt.y <= hb.y + hb.h + 8) {
+              window._selectedHighlightIndex = hIdx;
+              window._isDraggingHighlight = true;
+              window._dragHighlightIdx = hIdx;
+              window._dragHlMouseStart = { x: pt.x, y: pt.y };
+              window._dragHlInitial = { x: hl.x, y: hl.y, w: hl.w, h: hl.h };
+              window._dragHlTargetClip = clip;
+              if (typeof updateInspector === 'function') updateInspector();
+              if (typeof renderCanvas === 'function') renderCanvas();
+              e.preventDefault();
+              return;
+            }
+          }
+        }
+
         // Check if inside bounding box (plus generous padding) to drag / reposition
         const dragPadding = handleHitSize * 0.5;
         if (pt.x >= (b.x - dragPadding) && pt.x <= (b.x + b.w + dragPadding) &&
@@ -10381,7 +10615,14 @@ function initCanvasTransformInteraction() {
 
     if (transformAction === 'hl-drag' || transformAction === 'hl-resize') {
       recordState('Adjust Highlight Box');
-      isTransforming = false;
+      if (window._isDraggingHighlight) {
+      window._isDraggingHighlight = false;
+      window._dragHlTargetClip = null;
+      if (typeof recordState === 'function') recordState('Move Highlight Box');
+      if (typeof saveProjectState === 'function') saveProjectState(false);
+      if (typeof renderCanvas === 'function') renderCanvas();
+    }
+    isTransforming = false;
       transformAction = null;
       return;
     }
@@ -12634,57 +12875,128 @@ function showStudioContextMenu(x, y, clip, trackType) {
   menu.querySelector('#ctx-action-snap-zoom')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
-    clip.zoomEffect = clip.zoomEffect === 'snap' ? null : 'snap';
-    if (!clip.zoomScale) clip.zoomScale = 2.2;
-    if (clip.zoomStartTime === undefined) clip.zoomStartTime = 0.5;
-    if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
-    if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
-    if (clip.zoomEffect === 'snap') playSFX('snap_zoom');
+    clip.zoomEffect = (clip.zoomEffect === 'snap') ? null : 'snap';
+    if (clip.zoomEffect === 'snap') {
+      if (!clip.zoomScale) clip.zoomScale = 1.35;
+      clip.zoomStartTime = Math.max(0, currentTime - clip.start);
+      if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
+      if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
+      playSFX('snap_zoom');
+      showTextTimingAlert('Punch Zoom Applied (Vox Beat Zoom)', 'success');
+    } else {
+      showTextTimingAlert('Punch Zoom Removed', 'info');
+    }
     selectClip(clip, trackType);
     recordState('Toggle Punch Zoom Effect');
+    if (typeof renderCanvas === 'function') renderCanvas();
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof updateInspector === 'function') updateInspector();
+    if (typeof saveProjectState === 'function') saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2500);
   });
 
   menu.querySelector('#ctx-action-loupe-zoom')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
-    clip.zoomEffect = clip.zoomEffect === 'loupe' ? null : 'loupe';
-    if (!clip.zoomScale) clip.zoomScale = 2.2;
-    if (!clip.loupeRadius) clip.loupeRadius = 120;
-    if (clip.zoomStartTime === undefined) clip.zoomStartTime = 0.5;
-    if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
-    if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
-    if (clip.zoomEffect === 'loupe') playSFX('snap_zoom');
+    clip.zoomEffect = (clip.zoomEffect === 'loupe') ? null : 'loupe';
+    if (clip.zoomEffect === 'loupe') {
+      if (!clip.zoomScale) clip.zoomScale = 2.0;
+      if (!clip.loupeRadius) clip.loupeRadius = 110;
+      clip.zoomStartTime = Math.max(0, currentTime - clip.start);
+      if (clip.zoomOriginX === undefined) clip.zoomOriginX = 0.5;
+      if (clip.zoomOriginY === undefined) clip.zoomOriginY = 0.5;
+      playSFX('snap_zoom');
+      showTextTimingAlert('Loupe Callout Lens Added', 'success');
+    } else {
+      showTextTimingAlert('Loupe Callout Lens Removed', 'info');
+    }
     selectClip(clip, trackType);
     recordState('Toggle Loupe Callout Effect');
+    if (typeof renderCanvas === 'function') renderCanvas();
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof updateInspector === 'function') updateInspector();
+    if (typeof saveProjectState === 'function') saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2500);
   });
 
   menu.querySelector('#ctx-action-doc-dark')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
+    const isCurrentlyDark = clip.docFocus && clip.docStyle === 'dark';
+    if (isCurrentlyDark) {
+      clip.docFocus = false;
+      showTextTimingAlert('Dark Spotlight Removed', 'info');
+    } else {
+      clip.docFocus = true;
+      clip.docStyle = 'dark';
+      clip.docDimOpacity = clip.docDimOpacity !== undefined ? clip.docDimOpacity : 0.65;
+      clip.docFocusStartTime = Math.max(0, currentTime - clip.start);
+      if (!clip.docFocusRect) clip.docFocusRect = { x: 0.15, y: 0.35, w: 0.70, h: 0.28 };
+      playSFX('pop');
+      showTextTimingAlert('Dark Spotlight Applied (Theater Dim)', 'success');
+    }
     selectClip(clip, trackType);
-    window._activeDocStyle = 'dark';
-    setStudioTool('doc-focus', 'dark');
-    showTextTimingAlert('Dark Spotlight Active: Drag a rectangle across the document on canvas to place your spotlight.', 'info');
-    setTimeout(() => showTextTimingAlert(''), 3500);
+    recordState('Toggle Dark Spotlight Focus');
+    if (typeof renderCanvas === 'function') renderCanvas();
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof updateInspector === 'function') updateInspector();
+    if (typeof saveProjectState === 'function') saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2500);
   });
 
   menu.querySelector('#ctx-action-doc-white')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
+    const isCurrentlyWhite = clip.docFocus && clip.docStyle !== 'dark';
+    if (isCurrentlyWhite) {
+      clip.docFocus = false;
+      showTextTimingAlert('Whiteout Focus Removed', 'info');
+    } else {
+      clip.docFocus = true;
+      clip.docStyle = 'white';
+      clip.docDimOpacity = clip.docDimOpacity !== undefined ? clip.docDimOpacity : 0.65;
+      clip.docFocusStartTime = Math.max(0, currentTime - clip.start);
+      if (!clip.docFocusRect) clip.docFocusRect = { x: 0.15, y: 0.35, w: 0.70, h: 0.28 };
+      playSFX('pop');
+      showTextTimingAlert('Whiteout Focus Applied (Fade Background)', 'success');
+    }
     selectClip(clip, trackType);
-    window._activeDocStyle = 'white';
-    setStudioTool('doc-focus', 'white');
-    showTextTimingAlert('Whiteout Focus Active: Drag a rectangle across the document on canvas to place whiteout fade.', 'info');
-    setTimeout(() => showTextTimingAlert(''), 3500);
+    recordState('Toggle Whiteout Focus');
+    if (typeof renderCanvas === 'function') renderCanvas();
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof updateInspector === 'function') updateInspector();
+    if (typeof saveProjectState === 'function') saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 2500);
   });
 
   menu.querySelector('#ctx-action-doc-hl')?.addEventListener('click', (e) => {
     e.stopPropagation();
     hideStudioContextMenu();
+    if (!Array.isArray(clip.highlights)) clip.highlights = [];
+    const relT = Math.max(0, currentTime - clip.start);
+    const lineNum = clip.highlights.length;
+    // Position highlight naturally over text
+    const defaultY = Math.min(0.85, 0.468 + (lineNum * 0.046));
+    const newHl = {
+      x: 0.235,
+      y: defaultY,
+      w: 0.495,
+      h: 0.046,
+      color: '#ffff00',
+      startTime: parseFloat(relT.toFixed(2)),
+      duration: 0.7
+    };
+    clip.highlights.push(newHl);
+    window._selectedHighlightIndex = clip.highlights.length - 1;
+    playSFX('pop');
     selectClip(clip, trackType);
-    setStudioTool('doc-highlight');
-    showTextTimingAlert('Highlighter Active: Drag across words or lines to add sweeping highlight bars.', 'info');
-    setTimeout(() => showTextTimingAlert(''), 3500);
+    recordState('Add Animated Highlight Line');
+    showTextTimingAlert(`Added Highlighter Line #${clip.highlights.length}! Drag or customize on sidebar.`, 'success');
+    if (typeof renderCanvas === 'function') renderCanvas();
+    if (typeof renderAllTimelineTracks === 'function') renderAllTimelineTracks();
+    if (typeof updateInspector === 'function') updateInspector();
+    if (typeof saveProjectState === 'function') saveProjectState(false);
+    setTimeout(() => showTextTimingAlert(''), 3000);
   });
 
   menu.querySelector('#ctx-action-motion-blur-crowd')?.addEventListener('click', (e) => {
@@ -22505,6 +22817,20 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'doc-highlighter-loupe-suite',
+    title: 'Article & Document Highlighter',
+    category: 'Paper / Cutout',
+    origCategory: 'Text & Titles',
+    badge: 'Vox / Johnny Harris',
+    difficulty: '1-Click',
+    timeToApply: '6 sec',
+    previewGradient: 'linear-gradient(to top, rgba(202, 138, 4, 0.8), rgba(161, 98, 7, 0.4), rgba(15, 23, 42, 0.95))',
+    description: 'Signature investigative document highlighter: authentic Forbes article scan with animated yellow marker sweep hugging real sentences, full on-canvas selection handles, and sidebar controls.',
+    tags: ['Documentary', 'Highlighter', 'Whiteout', 'Dark Spotlight', 'Loupe Lens', 'Vox Style'],
+    defaultImage: '/forbes_article_hd.svg',
+    previewThumb: '/forbes_article_hd.svg'
+  },
+  {
     id: 'dark-power-sigil',
     title: 'Dark Power Sigil (Act 1 Multiplane Dolly & FX)',
     category: 'Parallax',
@@ -23627,7 +23953,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (tplId === 'doc-highlighter-loupe-suite') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="${tpl.defaultImage || '/forbes_article_hd.svg'}" style="width: 100%; height: 100%; object-fit: contain;" />
+          <div style="position: absolute; top: 28.5%; left: 12.5%; width: 54.2%; height: 4.6%; pointer-events: none;">
+            <div id="fx-doc-hl-yellow-${tplId}" style="height: 100%; width: 0%; background: rgba(255, 255, 0, 0.78); mix-blend-mode: multiply; border-radius: 2px;"></div>
+          </div>
+          <div style="position: absolute; top: 33.0%; left: 12.5%; width: 49.2%; height: 4.6%; pointer-events: none;">
+            <div id="fx-doc-hl-red-${tplId}" style="height: 100%; width: 0%; background: rgba(255, 255, 0, 0.78); mix-blend-mode: multiply; border-radius: 2px;"></div>
+          </div>
+        </div>
+      `;
     } else if (tplId === 'document-3d-fx-engine') {
+
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; perspective: 700px; display: flex; align-items: center; justify-content: center;">
           <!-- 3D Perspective Paper Sheet -->
@@ -24470,7 +24809,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'anim-whiteout-fade') {
+    } else if (tplId === 'doc-highlighter-loupe-suite') {
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <img src="${prim || '/forbes_article_reference.png'}" alt="Forbes Article" style="width: 100%; height: 100%; object-fit: cover;" />
+        <!-- Pure naturally hugging yellow highlighter bars across actual Forbes sentences -->
+        <div style="position: absolute; top: 46.8%; left: 23.5%; width: 49.5%; height: 4.6%; pointer-events: none; z-index: 3;">
+          <div id="customizer-live-hl-yellow" style="height: 100%; width: 0%; background: rgba(255, 255, 0, 0.75); mix-blend-mode: multiply; border-radius: 2px;"></div>
+        </div>
+        <div style="position: absolute; top: 51.2%; left: 23.5%; width: 45.0%; height: 4.6%; pointer-events: none; z-index: 3;">
+          <div id="customizer-live-hl-red" style="height: 100%; width: 0%; background: rgba(255, 255, 0, 0.75); mix-blend-mode: multiply; border-radius: 2px;"></div>
+        </div>
+      </div>
+    `;
+  } else if (tplId === 'anim-whiteout-fade') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -24820,6 +25172,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const c2Scale = 1.12 - zoomCycle * 0.28;
         const c2X = zoomCycle * 14;
         card2.style.transform = `translateX(${c2X}px) translateY(${-Math.sin(t * 1.8) * 6}px) scale(${c2Scale}) rotateY(${-22 + camYaw * 0.5}deg) rotateX(-6deg)`;
+      }
+    } else if (tplId === 'doc-highlighter-loupe-suite') {
+      const yellowBar = fxContainer?.querySelector(`#fx-doc-hl-yellow-${tplId}`);
+      const redBar = fxContainer?.querySelector(`#fx-doc-hl-red-${tplId}`);
+      const cycle = (t * 1.2) % 3.5;
+      if (yellowBar) {
+        const yProg = Math.min(100, Math.max(0, (cycle - 0.3) * 120));
+        yellowBar.style.width = `${yProg}%`;
+      }
+      if (redBar) {
+        const rProg = Math.min(100, Math.max(0, (cycle - 1.2) * 120));
+        redBar.style.width = `${rProg}%`;
       }
     } else if (tplId === 'document-3d-fx-engine') {
       // 3D paper camera flyover: dynamic tilt, highlighter reveal, and pop-out headline elevation
@@ -26338,8 +26702,23 @@ function openTopTemplateCustomizer(tpl) {
   }
   const floatBar = document.getElementById('sigil-floating-layer-toolbar');
   if (floatBar) floatBar.style.display = 'none';
-  topCustomizerState.is3DMode = false;
-  topCustomizerState.selectedSigilLayer = null;
+  // Trace vs Select Text contextual button
+  const btnTrace = document.getElementById('btn-tpl-modal-edit-cutout');
+  if (btnTrace) {
+    if (tpl.id === 'doc-highlighter-loupe-suite') {
+      btnTrace.innerHTML = '<span>🖍️</span> Select Text';
+      btnTrace.title = 'Draw or click to select text sentence on the document';
+      btnTrace.style.background = 'rgba(250, 204, 21, 0.15)';
+      btnTrace.style.borderColor = 'rgba(250, 204, 21, 0.4)';
+      btnTrace.style.color = '#fef08a';
+    } else {
+      btnTrace.innerHTML = '<span>✂</span> Trace';
+      btnTrace.title = 'Interactive Cutout & Silhouette Tracer';
+      btnTrace.style.background = 'rgba(56, 189, 248, 0.12)';
+      btnTrace.style.borderColor = 'rgba(56, 189, 248, 0.35)';
+      btnTrace.style.color = '#38bdf8';
+    }
+  }
 
   if (tpl.id === 'spooner-2-5d-photo-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground (1:1 Registered)';
@@ -26832,6 +27211,57 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = 'THE ILLUSION OF CHOICE';
     topCustomizerState.subText = '[ HIGH TENSION REVEAL ]';
     topCustomizerState.textColor = '#00f0ff';
+  } else if (tpl.id === 'doc-highlighter-loupe-suite') {
+    if (labelPrim) labelPrim.textContent = '📄 Forbes Article Document (HD Vector)';
+    if (wrapSec) wrapSec.style.display = 'none';
+    const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
+    if (aiEngineWrap) aiEngineWrap.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'VITAL EVIDENCE';
+    topCustomizerState.subText = 'INVESTIGATIVE ARTICLE HIGHLIGHT';
+    topCustomizerState.textColor = '#ffff00';
+    topCustomizerState.docStyle = 'none';
+    topCustomizerState.docSweepSpeed = topCustomizerState.docSweepSpeed || 0.8;
+    topCustomizerState.docWhiteout = false;
+    topCustomizerState.docDarkout = false;
+    topCustomizerState.docPunchZoom = false;
+    topCustomizerState.docLoupe = false;
+    topCustomizerState.docCameraScroll = false;
+    topCustomizerState.docTilt = false;
+    topCustomizerState.docBounce = false;
+    topCustomizerState.docRedact = false;
+    topCustomizerState.docFilter = topCustomizerState.docFilter || 'none';
+    topCustomizerState.docScale = topCustomizerState.docScale || 1.0;
+    topCustomizerState.docRot = topCustomizerState.docRot || 0;
+    topCustomizerState.docEasing = topCustomizerState.docEasing || 'cubic';
+    topCustomizerState.enableDustParticles = topCustomizerState.enableDustParticles !== undefined ? topCustomizerState.enableDustParticles : true;
+    topCustomizerState.particleType = topCustomizerState.particleType || 'dust';
+    topCustomizerState.dustDensity = topCustomizerState.dustDensity || 30;
+    topCustomizerState.selectedDocHlIdx = 0;
+    topCustomizerState.is3DMode = false;
+    topCustomizerState.docRedactW = 0.491;
+    topCustomizerState.docHighlights = [
+      {
+        x: 0.125,
+        y: 0.265,
+        w: 0.515,
+        h: 0.039,
+        color: '#fef08a',
+        startTime: 0.3,
+        duration: 0.8,
+        label: 'Line 1'
+      },
+      {
+        x: 0.125,
+        y: 0.309,
+        w: 0.456,
+        h: 0.039,
+        color: '#fef08a',
+        startTime: 1.1,
+        duration: 0.7,
+        label: 'Line 2'
+      }
+    ];
   } else if (tpl.id === 'vox-newspaper-cream-dossier') {
     if (labelPrim) labelPrim.textContent = '📰 Archival Document / Newspaper Asset';
     if (labelSec) labelSec.textContent = '🎬 Supporting Background Footage';
@@ -27127,6 +27557,9 @@ function openTopTemplateCustomizer(tpl) {
   updateExtraCutoutsListUI();
   updateExtraTextsListUI();
 
+  // Sync Document Highlighting & Focus controls for Document templates
+  syncTopTemplateDocHighlighterUI();
+
   // Sync Typography UI Controls to active target (MAIN vs SUB)
   syncTopTemplateTypographyUI();
 
@@ -27146,6 +27579,117 @@ function openTopTemplateCustomizer(tpl) {
   // 7. Start live stage animation
   renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   startTopCustomizerLoop();
+}
+
+function syncTopTemplateDocHighlighterUI() {
+  const wrapHl = document.getElementById('tpl-modal-wrap-doc-highlighter');
+  if (!wrapHl) return;
+  const isDocTpl = topCustomizerState.currentTpl?.id === 'doc-highlighter-loupe-suite';
+  if (!isDocTpl) {
+    wrapHl.style.display = 'none';
+    return;
+  }
+  wrapHl.style.display = 'flex';
+
+  const listEl = document.getElementById('tpl-modal-highlights-list');
+  const highlights = topCustomizerState.docHighlights || [];
+  if (listEl) {
+    if (highlights.length === 0) {
+      listEl.innerHTML = `
+        <div style="font-size: 10px; color: #94a3b8; font-style: italic; padding: 4px 0;">
+          No highlight lines. Click "+ Add Line" to highlight sentences.
+        </div>
+      `;
+    } else {
+      listEl.innerHTML = highlights.map((hl, idx) => {
+        const color = hl.color || '#ffff00';
+        return `
+          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #f1f5f9;">Line ${idx + 1}</span>
+              <div style="display: flex; gap: 3px;">
+                ${['#ffff00', '#ef4444', '#06b6d4', '#22c55e'].map(c => `
+                  <button type="button" class="btn-tpl-modal-hl-color" data-index="${idx}" data-color="${c}" style="width: 14px; height: 14px; border-radius: 50%; background: ${c}; border: 1.5px solid ${color.toLowerCase() === c.toLowerCase() ? '#fff' : 'transparent'}; cursor: pointer; padding: 0; box-shadow: ${color.toLowerCase() === c.toLowerCase() ? '0 0 6px ' + c : 'none'};"></button>
+                `).join('')}
+              </div>
+            </div>
+            <button type="button" class="btn-tpl-modal-hl-del" data-index="${idx}" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px 4px;" title="Delete this highlight line">🗑</button>
+          </div>
+        `;
+      }).join('');
+
+      listEl.querySelectorAll('.btn-tpl-modal-hl-color').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const i = parseInt(btn.dataset.index, 10);
+          const c = btn.dataset.color;
+          if (topCustomizerState.docHighlights[i]) {
+            topCustomizerState.docHighlights[i].color = c;
+            syncTopTemplateDocHighlighterUI();
+            renderTopTemplatePreviewStage();
+          }
+        });
+      });
+
+      listEl.querySelectorAll('.btn-tpl-modal-hl-del').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const i = parseInt(btn.dataset.index, 10);
+          topCustomizerState.docHighlights.splice(i, 1);
+          syncTopTemplateDocHighlighterUI();
+          renderTopTemplatePreviewStage();
+        });
+      });
+    }
+  }
+
+  // Sweep speed slider
+  const sSpd = document.getElementById('tpl-modal-slider-hl-speed');
+  const vSpd = document.getElementById('tpl-modal-val-hl-speed');
+  if (sSpd) sSpd.value = Math.round((topCustomizerState.docSweepSpeed || 0.8) * 10);
+  if (vSpd) vSpd.textContent = `${(topCustomizerState.docSweepSpeed || 0.8).toFixed(1)}s`;
+
+  // Focus checkboxes
+  const chkW = document.getElementById('chk-tpl-modal-whiteout');
+  const chkD = document.getElementById('chk-tpl-modal-darkout');
+  const chkP = document.getElementById('chk-tpl-modal-punch-zoom');
+  const chkL = document.getElementById('chk-tpl-modal-loupe');
+  const chkScroll = document.getElementById('chk-tpl-modal-camera-scroll');
+  const chkTilt = document.getElementById('chk-tpl-modal-doc-tilt');
+  const chkBounce = document.getElementById('chk-tpl-modal-doc-bounce');
+  const chkRedact = document.getElementById('chk-tpl-modal-doc-redact');
+
+  if (chkW) chkW.checked = !!topCustomizerState.docWhiteout;
+  if (chkD) chkD.checked = !!topCustomizerState.docDarkout;
+  if (chkP) chkP.checked = !!topCustomizerState.docPunchZoom;
+  if (chkL) chkL.checked = !!topCustomizerState.docLoupe;
+  if (chkScroll) chkScroll.checked = !!topCustomizerState.docCameraScroll;
+  if (chkTilt) chkTilt.checked = !!topCustomizerState.docTilt;
+  if (chkBounce) chkBounce.checked = !!topCustomizerState.docBounce;
+  if (chkRedact) chkRedact.checked = !!topCustomizerState.docRedact;
+
+  // Filter dropdown
+  const selFilter = document.getElementById('tpl-modal-select-filter');
+  const valFilterName = document.getElementById('tpl-modal-val-filter-name');
+  if (selFilter) selFilter.value = topCustomizerState.docFilter || 'none';
+  if (valFilterName && selFilter) {
+    const selOpt = selFilter.options[selFilter.selectedIndex];
+    if (selOpt) valFilterName.textContent = selOpt.text.split('(')[0].trim();
+  }
+
+  // Transform inputs
+  const slScale = document.getElementById('tpl-modal-slider-doc-scale');
+  const valScale = document.getElementById('tpl-modal-val-doc-scale');
+  if (slScale) slScale.value = Math.round((topCustomizerState.docScale || 1.0) * 100);
+  if (valScale) valScale.textContent = `${Math.round((topCustomizerState.docScale || 1.0) * 100)}%`;
+
+  const slRot = document.getElementById('tpl-modal-slider-doc-rot');
+  const valRot = document.getElementById('tpl-modal-val-doc-rot');
+  if (slRot) slRot.value = Math.round(topCustomizerState.docRot || 0);
+  if (valRot) valRot.textContent = `${Math.round(topCustomizerState.docRot || 0)}°`;
+
+  const selEasing = document.getElementById('tpl-modal-select-doc-easing');
+  if (selEasing) selEasing.value = topCustomizerState.docEasing || 'cubic';
 }
 
 function updateExtraCutoutsListUI() {
@@ -27347,7 +27891,148 @@ function renderTopTemplatePreviewStage() {
     }).join('');
   }
 
-  if (tplId === 'spooner-2-5d-photo-parallax') {
+const FORBES_DOC_LINES = [
+  { id: 'deck-0', normX: 0.125, normY: 0.265, normW: 0.515, normH: 0.039, text: 'Unlike other rich nations, the U.S. has no national requirement' },
+  { id: 'deck-1', normX: 0.125, normY: 0.309, normW: 0.456, normH: 0.039, text: 'for paid medical, parental or family caregiving leave. But' },
+  { id: 'deck-2', normX: 0.125, normY: 0.354, normW: 0.491, normH: 0.039, text: 'Democratic run states have been rolling out their own mandates.' },
+  { id: 'body-0', normX: 0.188, normY: 0.489, normW: 0.457, normH: 0.028, text: 'his past January, a new Minnesota law took effect entitling private sector' },
+  { id: 'body-1', normX: 0.188, normY: 0.526, normW: 0.478, normH: 0.028, text: 'workers to take up to 12 weeks of leave for family or medical needs, with a' },
+  { id: 'body-2', normX: 0.188, normY: 0.563, normW: 0.482, normH: 0.028, text: 'state-paid benefit of up to $1,423 a week, and a guarantee of reinstatement' },
+  { id: 'body-3', normX: 0.125, normY: 0.606, normW: 0.552, normH: 0.028, text: 'once the leave is over. In response, Steve Gilbertson, the owner of Electramatic...' }
+];
+
+  if (tplId === 'doc-highlighter-loupe-suite') {
+    const highlights = topCustomizerState.docHighlights || [];
+    const isWhiteout = !!topCustomizerState.docWhiteout;
+    const isDarkout = !!topCustomizerState.docDarkout;
+    const isPunch = !!topCustomizerState.docPunchZoom;
+    const isLoupe = !!topCustomizerState.docLoupe;
+    const isRedact = !!topCustomizerState.docRedact;
+    const is3D = !!topCustomizerState.is3DMode;
+    const docSrc = prim || '/forbes_article_hd.svg';
+    const docFilterMap = {
+      none: 'none',
+      vintage_70s: 'contrast(115%) sepia(30%) saturate(135%) hue-rotate(10deg)',
+      noir: 'grayscale(100%) contrast(155%) brightness(95%)',
+      warm_kodak: 'sepia(25%) saturate(130%) contrast(110%) brightness(102%)',
+      nordic_chill: 'saturate(70%) contrast(110%) brightness(105%) hue-rotate(15deg)',
+      teal_orange: 'contrast(130%) saturate(140%) hue-rotate(-15deg)',
+      bright: 'brightness(115%) contrast(108%) saturate(105%)',
+      mexico: 'sepia(45%) saturate(125%) contrast(125%) brightness(112%) hue-rotate(-12deg)'
+    };
+    const filterCss = docFilterMap[topCustomizerState.docFilter || 'none'] || 'none';
+    const initScale = (topCustomizerState.docScale || 1.0) * (isPunch ? 1.28 : 1.0);
+    const initRot = topCustomizerState.docRot || 0;
+
+    // Check if custom uploaded bitmap image or HD vector SVG
+    const isCustomImage = prim && !prim.includes('forbes_article') && !prim.endsWith('.svg');
+
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; user-select: none; perspective: ${is3D ? '1100px' : 'none'};">
+        <!-- Scaled Document Container for Motion, Tilt, Scroll & Punch Zoom -->
+        <div id="customizer-doc-zoom-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: 38% 32%; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); transform: ${is3D ? `perspective(1000px) rotateX(15deg) rotateY(-14deg) scale(${(initScale * 1.02).toFixed(3)})` : `scale(${initScale.toFixed(3)}) rotate(${initRot.toFixed(1)}deg)`};">
+          
+          ${isCustomImage ? `
+            <img id="customizer-doc-img" src="${docSrc}" alt="Article & Document" style="width: 100%; height: 100%; object-fit: contain; pointer-events: none; filter: ${filterCss};" />
+            <div id="customizer-doc-highlights-layer" style="position: absolute; inset: 0; pointer-events: none; z-index: 5;">
+              ${highlights.map((hl, i) => `
+                <div id="customizer-doc-hl-wrap-${i}" style="position: absolute; top: ${(hl.y * 100).toFixed(2)}%; left: ${(hl.x * 100).toFixed(2)}%; width: ${(hl.w * 100).toFixed(2)}%; height: ${(hl.h * 100).toFixed(2)}%; pointer-events: none;">
+                  <div id="customizer-doc-hl-bar-${i}" style="height: 100%; width: 0%; background: ${hl.color || '#fef08a'}; mix-blend-mode: multiply; opacity: 0.78; border-radius: 2px;"></div>
+                </div>
+              `).join('')}
+            </div>
+            <div id="customizer-doc-redact-bar" style="position: absolute; top: 35.4%; left: 12.5%; width: 0%; height: 32px; background: #09090b; border-radius: 2px; z-index: 6; pointer-events: none; box-shadow: 0 2px 6px rgba(0,0,0,0.5); display: ${isRedact ? 'block' : 'none'};"></div>
+          ` : `
+            <!-- AUTHENTIC MULTI-LAYER DOCUMENT SVG: Text is 100% physically in front of highlights! -->
+            <svg id="customizer-doc-svg" viewBox="0 0 1920 1080" style="width: 100%; height: 100%; display: block; filter: ${filterCss}; overflow: visible; user-select: none;">
+              <!-- LAYER 1: BASE DOCUMENT PAPER & GRAPHICS -->
+              <rect width="1920" height="1080" fill="#ffffff" />
+              <rect width="1920" height="1080" fill="#faf9f6" opacity="0.5" />
+              <g transform="translate(240, 110)">
+                <rect x="0" y="0" width="1440" height="74" rx="37" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" />
+                <circle cx="42" cy="37" r="20" fill="#0f172a" />
+                <polygon points="37,27 37,47 52,37" fill="#ffffff" />
+                <rect x="80" y="26" width="580" height="10" rx="5" fill="#cbd5e1" />
+                <rect x="80" y="43" width="320" height="8" rx="4" fill="#e2e8f0" />
+                <circle cx="1390" cy="37" r="16" fill="#f1f5f9" />
+                <rect x="1382" y="35" width="16" height="4" rx="2" fill="#94a3b8" />
+              </g>
+              <text x="240" y="230" fill="#64748b" font-family="'Inter', -apple-system, sans-serif" font-size="18" font-weight="500">
+                This voice experience is generated by AI. <tspan fill="#2563eb" font-weight="600">Learn more</tspan>
+              </text>
+              <line x1="240" y1="465" x2="1680" y2="465" stroke="#e2e8f0" stroke-width="1.5" />
+
+              <!-- LAYER 2: HIGHLIGHT RECTS (PHYSICALLY UNDER THE TEXT) -->
+              <g id="customizer-doc-svg-highlights">
+                ${highlights.map((hl, i) => {
+                  const rx = Math.round(hl.x * 1920);
+                  const ry = Math.round(hl.y * 1080);
+                  const rw = Math.round(hl.w * 1920);
+                  const rh = Math.round(hl.h * 1080);
+                  const col = hl.color || '#fef08a';
+                  return `
+                    <g id="customizer-svg-hl-group-${i}" class="doc-interactive-hl" data-index="${i}">
+                      <rect id="customizer-svg-hl-bar-${i}" x="${rx}" y="${ry}" width="0" height="${rh}" rx="4" fill="${col}" opacity="0.88" />
+                    </g>
+                  `;
+                }).join('')}
+              </g>
+
+              <!-- LAYER 3: CRISP BLACK TYPOGRAPHY (PHYSICALLY IN FRONT OF HIGHLIGHTS!) -->
+              <g id="customizer-doc-svg-text" style="cursor: pointer;">
+                <g transform="translate(240, 275)">
+                  <text font-family="'Georgia', 'Merriweather', serif" font-size="35.5" fill="#1e293b" font-weight="400" letter-spacing="-0.2">
+                    <tspan class="doc-snappable-line" data-line-id="deck-0" x="0" y="46">Unlike other rich nations, the U.S. has no national requirement</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="deck-1" x="0" y="94">for paid medical, parental or family caregiving leave. But</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="deck-2" x="0" y="142">Democratic run states have been rolling out their own mandates.</tspan>
+                  </text>
+                </g>
+                <g transform="translate(240, 520)">
+                  <text x="0" y="128" font-family="'Georgia', 'Merriweather', serif" font-size="144" font-weight="700" fill="#0f172a">T</text>
+                  <text font-family="'Georgia', 'Merriweather', serif" font-size="24" fill="#334155" line-height="1.5">
+                    <tspan class="doc-snappable-line" data-line-id="body-0" x="122" y="38" font-weight="700" fill="#0f172a">his past January<tspan font-weight="400" fill="#334155">, a new Minnesota law took effect entitling private sector</tspan></tspan>
+                    <tspan class="doc-snappable-line" data-line-id="body-1" x="122" y="78">workers to take up to 12 weeks of leave for family or medical needs, with a</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="body-2" x="122" y="118">state-paid benefit of up to $1,423 a week, and a guarantee of reinstatement</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="body-3" x="0" y="164">once the leave is over. In response, Steve Gilbertson, the owner of Electramatic, a</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="body-4" x="0" y="206">custom electrical cable assembly manufacturer in northern Minneapolis, decided to hire</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="body-5" x="0" y="248">a dozen extra employees just to make sure both shifts at his plant would be fully staffed.</tspan>
+                    <tspan class="doc-snappable-line" data-line-id="body-6" x="0" y="290">"Someone could come in today and ask for (time off starting) tomorrow," worries</tspan>
+                  </text>
+                </g>
+              </g>
+
+              <!-- LAYER 4: FORENSIC REDACTION CENSOR BAR (PHYSICALLY COVERS THE TEXT) -->
+              <g id="customizer-doc-svg-redacts">
+                <rect id="customizer-svg-redact-bar" x="240" y="382" width="0" height="44" rx="3" fill="#09090b" opacity="${isRedact ? 0.98 : 0}" />
+              </g>
+            </svg>
+          `}
+
+          <!-- Whiteout Fade Overlay -->
+          <div id="customizer-doc-whiteout-overlay" style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.65); pointer-events: none; z-index: 10; display: ${isWhiteout ? 'block' : 'none'};"></div>
+
+          <!-- Dark Spotlight Overlay -->
+          <div id="customizer-doc-darkout-overlay" style="position: absolute; inset: 0; background: radial-gradient(circle 260px at 40% 32%, transparent 0%, rgba(0, 0, 0, 0.76) 100%); pointer-events: none; z-index: 10; display: ${isDarkout ? 'block' : 'none'};"></div>
+
+          <!-- Forensic Loupe Lens Magnifier -->
+          <div id="customizer-doc-loupe-wrap" style="position: absolute; width: 140px; height: 140px; border-radius: 50%; border: 3px solid #06b6d4; box-shadow: 0 12px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(6,182,212,0.4); overflow: hidden; pointer-events: none; z-index: 12; display: ${isLoupe ? 'block' : 'none'}; top: 22%; left: 34%;">
+            <img src="${docSrc}" alt="Magnified Evidence" style="width: 220%; height: 220%; object-fit: contain; position: absolute; top: -60%; left: -60%; filter: contrast(1.15) ${filterCss !== 'none' ? filterCss : ''};" />
+          </div>
+
+          <!-- On-Canvas Direct Edit Bounding Box with Resize & Shorten Handles -->
+          <div id="doc-direct-transform-box" style="display: none; position: absolute; border: 2px dashed #facc15; box-shadow: 0 0 14px rgba(250,204,21,0.5); z-index: 30; border-radius: 3px; pointer-events: none;">
+            <div id="doc-tf-handle-l" style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 20px; background: #fff; border: 2px solid #eab308; border-radius: 3px; cursor: ew-resize; pointer-events: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.3);" title="Drag to adjust start"></div>
+            <div id="doc-tf-handle-r" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 20px; background: #fff; border: 2px solid #eab308; border-radius: 3px; cursor: ew-resize; pointer-events: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.3);" title="Drag to shorten or lengthen highlight"></div>
+            <div id="doc-tf-badge" style="position: absolute; top: -20px; left: 0; background: #eab308; color: #000; font-size: 8.5px; font-weight: 800; font-family: monospace; padding: 1px 6px; border-radius: 3px; white-space: nowrap;">LINE 1 (0.8s)</div>
+          </div>
+        </div>
+
+        <!-- Atmospheric Dust / Snow / Stars / Fog Particles Simulation Canvas -->
+        <canvas id="customizer-dust-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; display: ${topCustomizerState.enableDustParticles ? 'block' : 'none'};"></canvas>
+      </div>
+    `;
+    setTimeout(initDocDirectCanvasEditing, 40);
+  } else if (tplId === 'spooner-2-5d-photo-parallax') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: default; perspective: 1200px;">
         <!-- Background Scene Plate (Clickable & Draggable) -->
@@ -28010,6 +28695,136 @@ function updateTopCustomizerFrame(seqTime, now) {
     }
     const decodeSpan = document.getElementById('customizer-live-decode-text');
     if (decodeSpan) decodeSpan.textContent = displayed;
+  } else if (tplId === 'doc-highlighter-loupe-suite') {
+    // Atmospheric Dust / Snow / Stars / Fog simulation tick
+    if (topCustomizerState.enableDustParticles && typeof renderCustomizerDustSimulation === 'function') {
+      renderCustomizerDustSimulation();
+    }
+
+    const highlights = topCustomizerState.docHighlights || [];
+    const dur = Math.max(1, topCustomizerState.duration || 6);
+    const loopT = localSceneT % dur;
+    const sweepSpeed = Math.max(0.2, topCustomizerState.docSweepSpeed || 0.8);
+
+    // Animate SVG Highlights (Physically Under the Text)
+    highlights.forEach((hl, idx) => {
+      const start = hl.startTime !== undefined ? hl.startTime : (0.3 + idx * 0.7);
+      const hDur = hl.duration || sweepSpeed;
+      const targetW = Math.round(hl.w * 1920);
+
+      const svgBar = document.getElementById(`customizer-svg-hl-bar-${idx}`);
+      if (svgBar) {
+        if (loopT < start) {
+          svgBar.setAttribute('width', '0');
+        } else if (loopT >= start + hDur) {
+          svgBar.setAttribute('width', String(targetW));
+        } else {
+          const prog = (loopT - start) / hDur;
+          svgBar.setAttribute('width', String(Math.round(targetW * prog)));
+        }
+      }
+
+      const htmlBar = document.getElementById(`customizer-doc-hl-bar-${idx}`);
+      if (htmlBar) {
+        if (loopT < start) {
+          htmlBar.style.width = '0%';
+        } else if (loopT >= start + hDur) {
+          htmlBar.style.width = '100%';
+        } else {
+          const prog = (loopT - start) / hDur;
+          htmlBar.style.width = `${Math.min(100, Math.max(0, prog * 100)).toFixed(1)}%`;
+        }
+      }
+    });
+
+    // Animate Forensic Redaction Censor Bar (Physically Covers the Text)
+    const svgRedact = document.getElementById('customizer-svg-redact-bar');
+    if (svgRedact) {
+      if (topCustomizerState.docRedact) {
+        const rTargetW = Math.round((topCustomizerState.docRedactW || 0.491) * 1920);
+        const rStart = 1.0;
+        const rDur = 0.7;
+        if (loopT < rStart) {
+          svgRedact.setAttribute('width', '0');
+        } else if (loopT >= rStart + rDur) {
+          svgRedact.setAttribute('width', String(rTargetW));
+        } else {
+          const rProg = (loopT - rStart) / rDur;
+          svgRedact.setAttribute('width', String(Math.round(rTargetW * rProg)));
+        }
+      } else {
+        svgRedact.setAttribute('width', '0');
+      }
+    }
+
+    const htmlRedact = document.getElementById('customizer-doc-redact-bar');
+    if (htmlRedact && topCustomizerState.docRedact) {
+      const rTargetPct = Math.round((topCustomizerState.docRedactW || 0.491) * 100);
+      const rStart = 1.0;
+      const rDur = 0.7;
+      if (loopT < rStart) {
+        htmlRedact.style.width = '0%';
+      } else if (loopT >= rStart + rDur) {
+        htmlRedact.style.width = `${rTargetPct}%`;
+      } else {
+        const rProg = (loopT - rStart) / rDur;
+        htmlRedact.style.width = `${(rProg * rTargetPct).toFixed(1)}%`;
+      }
+    }
+
+    // Dynamic Camera Scroll, 3D Tilt, Bounce Pop-In, Punch Zoom & Transform
+    const zoomWrap = document.getElementById('customizer-doc-zoom-wrap');
+    if (zoomWrap) {
+      let panX = 0;
+      let panY = 0;
+      if (topCustomizerState.docCameraScroll) {
+        panY = Math.sin(localSceneT * 0.8) * 26;
+        panX = Math.cos(localSceneT * 0.6) * 10;
+      }
+
+      let tiltX = 0;
+      let tiltY = 0;
+      if (topCustomizerState.docTilt) {
+        tiltX = Math.sin(localSceneT * 1.3) * 5.5;
+        tiltY = Math.cos(localSceneT * 1.1) * -6.5;
+      }
+
+      let bounceScale = 1.0;
+      if (topCustomizerState.docBounce) {
+        const bT = Math.min(1, loopT / 0.65);
+        bounceScale = Math.sin(-13 * (bT + 1) * Math.PI / 2) * Math.pow(2, -10 * bT) + 1;
+      }
+
+      const isPunch = !!topCustomizerState.docPunchZoom;
+      const baseScale = (topCustomizerState.docScale || 1.0) * (isPunch ? 1.28 : 1.0) * bounceScale;
+      const baseRot = topCustomizerState.docRot || 0;
+
+      let transformStr = `translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px) scale(${baseScale.toFixed(3)}) rotate(${baseRot.toFixed(1)}deg)`;
+      if (topCustomizerState.is3DMode) {
+        const aX = topCustomizerState.doc3DAngleX !== undefined ? topCustomizerState.doc3DAngleX : 15;
+        const aY = topCustomizerState.doc3DAngleY !== undefined ? topCustomizerState.doc3DAngleY : -14;
+        transformStr = `perspective(1000px) rotateX(${aX.toFixed(1)}deg) rotateY(${aY.toFixed(1)}deg) ` + transformStr;
+      } else if (topCustomizerState.docTilt) {
+        transformStr = `perspective(900px) rotateX(${tiltX.toFixed(1)}deg) rotateY(${tiltY.toFixed(1)}deg) ` + transformStr;
+      }
+      zoomWrap.style.transform = transformStr;
+    }
+
+    // Loupe Lens floating scan animation if enabled
+    if (topCustomizerState.docLoupe) {
+      const loupeWrap = document.getElementById('customizer-doc-loupe-wrap');
+      if (loupeWrap) {
+        const lx = 34 + Math.sin(localSceneT * 1.5) * 12;
+        const ly = 22 + Math.cos(localSceneT * 1.2) * 8;
+        loupeWrap.style.left = `${lx}%`;
+        loupeWrap.style.top = `${ly}%`;
+        const loupeImg = loupeWrap.querySelector('img');
+        if (loupeImg) {
+          loupeImg.style.left = `${-60 - (lx - 34) * 2}%`;
+          loupeImg.style.top = `${-60 - (ly - 22) * 2}%`;
+        }
+      }
+    }
   } else if (tplId === 'vox-newspaper-cream-dossier') {
     const docRot = -2 + Math.sin(localSceneT * 1.6) * 1.5;
     const docScale = 1.02 + Math.cos(localSceneT * 1.4) * 0.02;
@@ -28432,6 +29247,75 @@ transition: 'fly_through',
         anim: 'pop',
         fontSize: 72,
         fontFamily: 'Impact, sans-serif',
+        zIndex: 25,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur
+      });
+    }
+  } else if (tpl.id === 'doc-highlighter-loupe-suite') {
+    const docClip = {
+      id: `img-doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Article_Document_Evidence_HD.svg',
+      url: prim || tpl.defaultImage || '/forbes_article_hd.svg',
+      file: { name: 'Article_Document_Evidence_HD.svg', url: prim || tpl.defaultImage || '/forbes_article_hd.svg', isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: topCustomizerState.docScale || 1.0,
+      rotation: topCustomizerState.docRot || 0,
+      easing: topCustomizerState.docEasing || 'cubic',
+      filterPreset: topCustomizerState.docFilter || 'none',
+      opacity: opacityVal,
+      zIndex: 20,
+      layerOrder: 'front',
+      docFocus: !!(topCustomizerState.docWhiteout || topCustomizerState.docDarkout),
+      docStyle: topCustomizerState.docWhiteout ? 'white' : (topCustomizerState.docDarkout ? 'dark' : 'none'),
+      docSweepSpeed: topCustomizerState.docSweepSpeed || 0.8,
+      cameraScroll: !!topCustomizerState.docCameraScroll,
+      docTilt: !!topCustomizerState.docTilt,
+      docBounce: !!topCustomizerState.docBounce,
+      docRedact: !!topCustomizerState.docRedact,
+      enableAtmosphere: !!topCustomizerState.enableDustParticles,
+      particleType: topCustomizerState.particleType || 'dust',
+      dustDensity: topCustomizerState.dustDensity || 30,
+      zoomEffect: topCustomizerState.docPunchZoom ? 'snap' : (topCustomizerState.docLoupe ? 'loupe' : null),
+      zoomScale: topCustomizerState.docPunchZoom ? 1.28 : 2.0,
+      zoomOriginX: 0.38,
+      zoomOriginY: 0.32,
+      highlights: (topCustomizerState.docHighlights && topCustomizerState.docHighlights.length > 0)
+        ? JSON.parse(JSON.stringify(topCustomizerState.docHighlights))
+        : [
+            {
+              x: 0.125,
+              y: 0.285,
+              w: 0.542,
+              h: 0.046,
+              color: '#fef08a',
+              startTime: 0.3,
+              duration: topCustomizerState.docSweepSpeed || 0.8
+            },
+            {
+              x: 0.125,
+              y: 0.330,
+              w: 0.492,
+              h: 0.046,
+              color: '#fef08a',
+              startTime: 1.1,
+              duration: topCustomizerState.docSweepSpeed || 0.7
+            }
+          ]
+    };
+    focusClip = docClip;
+    imageClips = [docClip];
+    if (hasTextBehind && (mainText || textBehindContent)) {
+      textClips.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: mainText || textBehindContent,
+        highlight: (mainText || textBehindContent || '').split(' ')[0] || '',
+        highlightColor: textColor || '#facc15',
+        anim: 'pop',
+        fontSize: 54,
+        fontFamily: 'Inter, sans-serif',
         zIndex: 25,
         layerOrder: 'middle',
         start: sceneStart,
@@ -28999,6 +29883,356 @@ function initCustomizerOnScreenTransform() {
   updateTransformBoxPosition();
 }
 
+function initDocDirectCanvasEditing() {
+  const stageInner = document.getElementById('customizer-stage-inner');
+  const tfBox = document.getElementById('doc-direct-transform-box');
+  const toolbar = document.getElementById('doc-floating-highlight-toolbar');
+  if (!stageInner || !tfBox) return;
+
+  const highlights = topCustomizerState.docHighlights || [];
+  let curIdx = topCustomizerState.selectedDocHlIdx !== undefined ? topCustomizerState.selectedDocHlIdx : 0;
+  if (curIdx >= highlights.length) curIdx = Math.max(0, highlights.length - 1);
+  topCustomizerState.selectedDocHlIdx = curIdx;
+
+  // 1. Update Direct Transform Box Position
+  function updateDocTfBoxPosition() {
+    const curHl = (topCustomizerState.docHighlights && topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx]);
+    if (!curHl) {
+      tfBox.style.display = 'none';
+      if (toolbar) toolbar.style.display = 'none';
+      return;
+    }
+    tfBox.style.display = 'block';
+    tfBox.style.left = `${(curHl.x * 100).toFixed(2)}%`;
+    tfBox.style.top = `${(curHl.y * 100).toFixed(2)}%`;
+    tfBox.style.width = `${(curHl.w * 100).toFixed(2)}%`;
+    tfBox.style.height = `${(curHl.h * 100).toFixed(2)}%`;
+
+    const badge = document.getElementById('doc-tf-badge');
+    if (badge) {
+      badge.textContent = `LINE ${topCustomizerState.selectedDocHlIdx + 1} (${(curHl.duration || 0.8).toFixed(1)}s)`;
+      badge.style.background = curHl.color || '#facc15';
+      badge.style.color = (curHl.color === '#ef4444' || curHl.color === '#09090b') ? '#fff' : '#000';
+    }
+
+    if (toolbar) {
+      toolbar.style.display = 'flex';
+      toolbar.style.left = `${((curHl.x + curHl.w / 2) * 100).toFixed(2)}%`;
+      toolbar.style.top = `${(curHl.y * 100).toFixed(2)}%`;
+      const lbl = document.getElementById('doc-float-line-label');
+      if (lbl) lbl.textContent = `LINE ${topCustomizerState.selectedDocHlIdx + 1}`;
+    }
+  }
+
+  updateDocTfBoxPosition();
+
+  // 2. Drag Right Handle: Shorten / Lengthen Highlight
+  const handleR = document.getElementById('doc-tf-handle-r');
+  if (handleR) {
+    handleR.onpointerdown = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const startClientX = e.clientX;
+      const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
+      if (!curHl) return;
+      const startW = curHl.w;
+      const stageW = stageInner.clientWidth || 800;
+
+      const onPointerMoveR = (me) => {
+        const deltaX = (me.clientX - startClientX);
+        const deltaNorm = deltaX / stageW;
+        const newW = Math.max(0.04, Math.min(0.85, startW + deltaNorm));
+        curHl.w = parseFloat(newW.toFixed(3));
+
+        // Update live visual box and SVG rect
+        tfBox.style.width = `${(curHl.w * 100).toFixed(2)}%`;
+        const svgBar = document.getElementById(`customizer-svg-hl-bar-${topCustomizerState.selectedDocHlIdx}`);
+        if (svgBar) svgBar.setAttribute('width', String(Math.round(curHl.w * 1920)));
+        if (toolbar) toolbar.style.left = `${((curHl.x + curHl.w / 2) * 100).toFixed(2)}%`;
+      };
+
+      const onPointerUpR = () => {
+        window.removeEventListener('pointermove', onPointerMoveR);
+        window.removeEventListener('pointerup', onPointerUpR);
+        updateDocTfBoxPosition();
+      };
+
+      window.addEventListener('pointermove', onPointerMoveR);
+      window.addEventListener('pointerup', onPointerUpR);
+    };
+  }
+
+  // 3. Drag Left Handle: Adjust Start Position & Shorten
+  const handleL = document.getElementById('doc-tf-handle-l');
+  if (handleL) {
+    handleL.onpointerdown = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const startClientX = e.clientX;
+      const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
+      if (!curHl) return;
+      const startX = curHl.x;
+      const startW = curHl.w;
+      const stageW = stageInner.clientWidth || 800;
+
+      const onPointerMoveL = (me) => {
+        const deltaX = (me.clientX - startClientX);
+        const deltaNorm = deltaX / stageW;
+        const newX = Math.max(0.02, Math.min(startX + startW - 0.04, startX + deltaNorm));
+        const newW = Math.max(0.04, startW - (newX - startX));
+        curHl.x = parseFloat(newX.toFixed(3));
+        curHl.w = parseFloat(newW.toFixed(3));
+
+        tfBox.style.left = `${(curHl.x * 100).toFixed(2)}%`;
+        tfBox.style.width = `${(curHl.w * 100).toFixed(2)}%`;
+        const svgBar = document.getElementById(`customizer-svg-hl-bar-${topCustomizerState.selectedDocHlIdx}`);
+        if (svgBar) {
+          svgBar.setAttribute('x', String(Math.round(curHl.x * 1920)));
+          svgBar.setAttribute('width', String(Math.round(curHl.w * 1920)));
+        }
+        if (toolbar) toolbar.style.left = `${((curHl.x + curHl.w / 2) * 100).toFixed(2)}%`;
+      };
+
+      const onPointerUpL = () => {
+        window.removeEventListener('pointermove', onPointerMoveL);
+        window.removeEventListener('pointerup', onPointerUpL);
+        updateDocTfBoxPosition();
+      };
+
+      window.addEventListener('pointermove', onPointerMoveL);
+      window.addEventListener('pointerup', onPointerUpL);
+    };
+  }
+
+  // 4. Click Existing Highlight to Select It
+  document.querySelectorAll('.doc-interactive-hl').forEach(hlEl => {
+    hlEl.onclick = (e) => {
+      e.stopPropagation();
+      const idx = parseInt(hlEl.getAttribute('data-index'), 10);
+      if (!isNaN(idx)) {
+        topCustomizerState.selectedDocHlIdx = idx;
+        updateDocTfBoxPosition();
+      }
+    };
+  });
+
+  // 5. Smart Text Awareness: Click or Hover Text Lines to Snap Highlight
+  document.querySelectorAll('.doc-snappable-line').forEach(lineEl => {
+    lineEl.style.transition = 'opacity 0.2s';
+    lineEl.onpointerenter = () => {
+      lineEl.style.opacity = '0.7';
+    };
+    lineEl.onpointerleave = () => {
+      lineEl.style.opacity = '1.0';
+    };
+    lineEl.onclick = (e) => {
+      e.stopPropagation();
+      const lineId = lineEl.getAttribute('data-line-id');
+      const targetLine = FORBES_DOC_LINES.find(l => l.id === lineId);
+      if (!targetLine) return;
+
+      if (!topCustomizerState.docHighlights) topCustomizerState.docHighlights = [];
+
+      // Check if this line is already highlighted
+      const existingIdx = topCustomizerState.docHighlights.findIndex(h => Math.abs(h.y - targetLine.normY) < 0.025);
+      if (existingIdx !== -1) {
+        topCustomizerState.selectedDocHlIdx = existingIdx;
+        updateDocTfBoxPosition();
+        showTextTimingAlert(`Selected Line #${existingIdx + 1}`, 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+        return;
+      }
+
+      // Add new snapped highlight matching sentence bounds
+      const nextIdx = topCustomizerState.docHighlights.length;
+      topCustomizerState.docHighlights.push({
+        x: targetLine.normX,
+        y: targetLine.normY,
+        w: targetLine.normW,
+        h: targetLine.normH,
+        color: '#fef08a',
+        startTime: 0.3 + (nextIdx * 0.7),
+        duration: topCustomizerState.docSweepSpeed || 0.8,
+        label: `Line ${nextIdx + 1}`
+      });
+
+      topCustomizerState.selectedDocHlIdx = nextIdx;
+      syncTopTemplateDocHighlighterUI();
+      renderTopTemplatePreviewStage();
+      showTextTimingAlert(`Targeted sentence: Snapped highlight line #${nextIdx + 1}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    };
+  });
+
+  // 6. Floating Toolbar Quick Actions
+  toolbar?.querySelectorAll('.btn-doc-float-color').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const c = btn.getAttribute('data-color');
+      const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
+      if (curHl && c) {
+        curHl.color = c;
+        const svgBar = document.getElementById(`customizer-svg-hl-bar-${topCustomizerState.selectedDocHlIdx}`);
+        if (svgBar) svgBar.setAttribute('fill', c);
+        syncTopTemplateDocHighlighterUI();
+        updateDocTfBoxPosition();
+      }
+    };
+  });
+
+  // Toggle Redact from Toolbar
+  const btnRedact = document.getElementById('btn-doc-float-redact');
+  if (btnRedact) {
+    btnRedact.onclick = (e) => {
+      e.stopPropagation();
+      topCustomizerState.docRedact = !topCustomizerState.docRedact;
+      const chk = document.getElementById('chk-tpl-modal-doc-redact');
+      if (chk) chk.checked = topCustomizerState.docRedact;
+      renderTopTemplatePreviewStage();
+      showTextTimingAlert(topCustomizerState.docRedact ? 'Forensic Redaction Strip ON' : 'Redaction Strip OFF', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1800);
+    };
+  }
+
+  // Delete Current Highlight from Toolbar
+  const btnDel = document.getElementById('btn-doc-float-del');
+  if (btnDel) {
+    btnDel.onclick = (e) => {
+      e.stopPropagation();
+      if (topCustomizerState.docHighlights && topCustomizerState.docHighlights.length > 0) {
+        topCustomizerState.docHighlights.splice(topCustomizerState.selectedDocHlIdx, 1);
+        topCustomizerState.selectedDocHlIdx = Math.max(0, topCustomizerState.selectedDocHlIdx - 1);
+        syncTopTemplateDocHighlighterUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Highlight line removed', 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+      }
+    };
+  }
+
+  // Undo / Reset Length
+  const btnUndo = document.getElementById('btn-doc-float-undo');
+  if (btnUndo) {
+    btnUndo.onclick = (e) => {
+      e.stopPropagation();
+      const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
+      if (curHl) {
+        curHl.x = 0.125;
+        curHl.w = 0.515;
+        syncTopTemplateDocHighlighterUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Reset line length to default sentence bounds', 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+      }
+    };
+  }
+
+  // Initialize 3D Mode & Fullscreen Triggers
+  initDoc3DModeControls();
+  initDocFullscreenToggle();
+}
+
+function initDoc3DModeControls() {
+  const btn3D = document.getElementById('btn-toggle-3d-interactive-mode');
+  const stageInner = document.getElementById('customizer-stage-inner');
+  const zoomWrap = document.getElementById('customizer-doc-zoom-wrap');
+  if (!btn3D || !stageInner || !zoomWrap) return;
+
+  const update3DUI = () => {
+    const is3D = !!topCustomizerState.is3DMode;
+    btn3D.style.background = is3D ? 'rgba(46,255,198,0.25)' : 'rgba(168,85,247,0.15)';
+    btn3D.style.borderColor = is3D ? '#2effc6' : 'rgba(168,85,247,0.5)';
+    btn3D.style.color = is3D ? '#2effc6' : '#c084fc';
+    const dot = document.getElementById('pill-3d-dot');
+    if (dot) {
+      dot.style.background = is3D ? '#2effc6' : '#a855f7';
+      dot.style.boxShadow = is3D ? '0 0 10px #2effc6' : '0 0 8px #a855f7';
+    }
+    const lbl = document.getElementById('label-3d-mode');
+    if (lbl) lbl.textContent = is3D ? '3D EDIT: ON (DRAG TO ROTATE)' : '3D EDIT MODE';
+  };
+
+  update3DUI();
+
+  btn3D.onclick = () => {
+    topCustomizerState.is3DMode = !topCustomizerState.is3DMode;
+    update3DUI();
+    renderTopTemplatePreviewStage();
+    showTextTimingAlert(topCustomizerState.is3DMode ? '3D Interactive Mode ON: Drag canvas to tilt document' : '3D Interactive Mode OFF', 'info');
+    setTimeout(() => showTextTimingAlert(''), 2000);
+  };
+
+  // Interactive 3D Orbit Dragging on Stage
+  let isOrbiting = false;
+  let startX = 0;
+  let startY = 0;
+  let initialAngleX = topCustomizerState.doc3DAngleX || 15;
+  let initialAngleY = topCustomizerState.doc3DAngleY || -14;
+
+  stageInner.onpointerdown = (e) => {
+    if (!topCustomizerState.is3DMode) return;
+    if (e.target.closest('#doc-direct-transform-box') || e.target.closest('#doc-floating-highlight-toolbar') || e.target.closest('button')) return;
+    isOrbiting = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    initialAngleX = topCustomizerState.doc3DAngleX !== undefined ? topCustomizerState.doc3DAngleX : 15;
+    initialAngleY = topCustomizerState.doc3DAngleY !== undefined ? topCustomizerState.doc3DAngleY : -14;
+
+    const onPointerMoveOrbit = (me) => {
+      if (!isOrbiting) return;
+      const dx = me.clientX - startX;
+      const dy = me.clientY - startY;
+      topCustomizerState.doc3DAngleX = Math.max(-35, Math.min(45, initialAngleX - dy * 0.25));
+      topCustomizerState.doc3DAngleY = Math.max(-45, Math.min(45, initialAngleY + dx * 0.25));
+    };
+
+    const onPointerUpOrbit = () => {
+      isOrbiting = false;
+      window.removeEventListener('pointermove', onPointerMoveOrbit);
+      window.removeEventListener('pointerup', onPointerUpOrbit);
+    };
+
+    window.addEventListener('pointermove', onPointerMoveOrbit);
+    window.addEventListener('pointerup', onPointerUpOrbit);
+  };
+}
+
+function initDocFullscreenToggle() {
+  const btnFs = document.getElementById('btn-tpl-modal-fullscreen');
+  const modalBox = document.querySelector('#top-template-customizer-modal .vector-modal-box');
+  if (!btnFs || !modalBox) return;
+
+  btnFs.onclick = (e) => {
+    e.stopPropagation();
+    const isFull = modalBox.getAttribute('data-fullscreen') === 'true';
+    if (!isFull) {
+      modalBox.setAttribute('data-fullscreen', 'true');
+      modalBox.style.maxWidth = '99vw';
+      modalBox.style.maxHeight = '98vh';
+      modalBox.style.width = '99vw';
+      modalBox.style.height = '98vh';
+      btnFs.innerHTML = '<span>⤡</span> Exit Fullscreen';
+      btnFs.style.borderColor = '#2effc6';
+      btnFs.style.color = '#2effc6';
+    } else {
+      modalBox.setAttribute('data-fullscreen', 'false');
+      modalBox.style.maxWidth = '1320px';
+      modalBox.style.maxHeight = '94vh';
+      modalBox.style.width = '95vw';
+      modalBox.style.height = '';
+      btnFs.innerHTML = '<span>⤢</span> Fullscreen';
+      btnFs.style.borderColor = 'rgba(255,255,255,0.15)';
+      btnFs.style.color = '#cbd5e1';
+    }
+  };
+}
+
+function toggleDocTextSelection() {
+  if (typeof initDocDirectCanvasEditing === 'function') initDocDirectCanvasEditing();
+  showTextTimingAlert('Click any sentence to snap a highlight, or drag handles to shorten', 'info');
+  setTimeout(() => showTextTimingAlert(''), 3000);
+}
+
 function bindTopTemplateCustomizerEvents() {
   document.getElementById('btn-close-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
   document.getElementById('btn-cancel-top-tpl-modal')?.addEventListener('click', closeTopTemplateCustomizer);
@@ -29092,13 +30326,11 @@ function bindTopTemplateCustomizerEvents() {
     if (btn) {
       btn.addEventListener('click', () => {
         topCustomizerState.particleType = pt;
-        if (!topCustomizerState.enableDustParticles) {
-          topCustomizerState.enableDustParticles = true;
-          const chk = document.getElementById('tpl-modal-toggle-dust');
-          if (chk) chk.checked = true;
-          const c = document.getElementById('customizer-dust-canvas');
-          if (c) c.style.display = 'block';
-        }
+        topCustomizerState.enableDustParticles = true;
+        const chk = document.getElementById('tpl-modal-toggle-dust');
+        if (chk) chk.checked = true;
+        const c = document.getElementById('customizer-dust-canvas');
+        if (c) c.style.display = 'block';
         particleTypes.forEach(o => {
           const ob = document.getElementById(`btn-particle-${o}`) || document.getElementById(`btn-part-${o}`);
           if (ob) {
@@ -42379,6 +43611,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function attachCutoutEditorTriggers() {
   // 1. In Customizer Subject Row
   document.getElementById('btn-tpl-modal-edit-cutout')?.addEventListener('click', () => {
+    if (topCustomizerState.currentTpl?.id === 'doc-highlighter-loupe-suite') {
+      if (typeof toggleDocTextSelection === 'function') toggleDocTextSelection();
+      return;
+    }
     // CRITICAL: Always open tracing editor with the original full photo, NOT the already-transparent cutout!
     const activeUrl = topCustomizerState.originalPhotoUrl || (topCustomizerState.currentTpl?.id === 'spooner-2-5d-photo-parallax' ? 'hiker_parallax_reference.png' : (topCustomizerState.secondaryUrl || topCustomizerState.primaryUrl));
     openCutoutTraceEditor(activeUrl);
@@ -42400,7 +43636,128 @@ function attachCutoutEditorTriggers() {
   });
 }
 
+function attachModalDocHighlighterListeners() {
+  // "+ Add Line" button in template customizer modal
+  document.getElementById('btn-tpl-modal-add-hl-line')?.addEventListener('click', () => {
+    if (!topCustomizerState.docHighlights) topCustomizerState.docHighlights = [];
+    const idx = topCustomizerState.docHighlights.length;
+    topCustomizerState.docHighlights.push({
+      x: 0.125,
+      y: Math.min(0.85, 0.285 + (idx * 0.045)),
+      w: 0.490,
+      h: 0.046,
+      color: '#ffff00',
+      startTime: 0.3 + (idx * 0.7),
+      duration: topCustomizerState.docSweepSpeed || 0.8
+    });
+    syncTopTemplateDocHighlighterUI();
+    renderTopTemplatePreviewStage();
+  });
+
+  // Marker sweep speed slider
+  document.getElementById('tpl-modal-slider-hl-speed')?.addEventListener('input', (e) => {
+    const val = (parseFloat(e.target.value) || 8) / 10;
+    topCustomizerState.docSweepSpeed = val;
+    const v = document.getElementById('tpl-modal-val-hl-speed');
+    if (v) v.textContent = `${val.toFixed(1)}s`;
+    if (topCustomizerState.docHighlights) {
+      topCustomizerState.docHighlights.forEach(hl => { hl.duration = val; });
+    }
+  });
+
+  // Optional Focus toggles in template customizer modal
+  document.getElementById('chk-tpl-modal-whiteout')?.addEventListener('change', (e) => {
+    topCustomizerState.docWhiteout = e.target.checked;
+    if (e.target.checked) {
+      topCustomizerState.docDarkout = false;
+      const d = document.getElementById('chk-tpl-modal-darkout');
+      if (d) d.checked = false;
+    }
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('chk-tpl-modal-darkout')?.addEventListener('change', (e) => {
+    topCustomizerState.docDarkout = e.target.checked;
+    if (e.target.checked) {
+      topCustomizerState.docWhiteout = false;
+      const w = document.getElementById('chk-tpl-modal-whiteout');
+      if (w) w.checked = false;
+    }
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('chk-tpl-modal-punch-zoom')?.addEventListener('change', (e) => {
+    topCustomizerState.docPunchZoom = e.target.checked;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('chk-tpl-modal-loupe')?.addEventListener('change', (e) => {
+    topCustomizerState.docLoupe = e.target.checked;
+    renderTopTemplatePreviewStage();
+  });
+
+  // Additional Studio Effects: Camera Scroll, 3D Tilt, Bounce Pop-In, Redact Bar
+  document.getElementById('chk-tpl-modal-camera-scroll')?.addEventListener('change', (e) => {
+    topCustomizerState.docCameraScroll = e.target.checked;
+  });
+
+  document.getElementById('chk-tpl-modal-doc-tilt')?.addEventListener('change', (e) => {
+    topCustomizerState.docTilt = e.target.checked;
+  });
+
+  document.getElementById('chk-tpl-modal-doc-bounce')?.addEventListener('change', (e) => {
+    topCustomizerState.docBounce = e.target.checked;
+  });
+
+  document.getElementById('chk-tpl-modal-doc-redact')?.addEventListener('change', (e) => {
+    topCustomizerState.docRedact = e.target.checked;
+    renderTopTemplatePreviewStage();
+  });
+
+  // Color Grading Filter Dropdown
+  document.getElementById('tpl-modal-select-filter')?.addEventListener('change', (e) => {
+    topCustomizerState.docFilter = e.target.value;
+    const valFilterName = document.getElementById('tpl-modal-val-filter-name');
+    if (valFilterName) {
+      const selOpt = e.target.options[e.target.selectedIndex];
+      if (selOpt) valFilterName.textContent = selOpt.text.split('(')[0].trim();
+    }
+    renderTopTemplatePreviewStage();
+  });
+
+  // Scale Slider (50% - 200%)
+  document.getElementById('tpl-modal-slider-doc-scale')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10) / 100;
+    topCustomizerState.docScale = val;
+    const vScale = document.getElementById('tpl-modal-val-doc-scale');
+    if (vScale) vScale.textContent = `${parseInt(e.target.value, 10)}%`;
+    const zoomWrap = document.getElementById('customizer-doc-zoom-wrap');
+    if (zoomWrap) zoomWrap.style.transform = `scale(${(val * (topCustomizerState.docPunchZoom ? 1.28 : 1.0)).toFixed(3)}) rotate(${(topCustomizerState.docRot || 0).toFixed(1)}deg)`;
+  });
+
+  // Rotation Slider (-45deg to +45deg)
+  document.getElementById('tpl-modal-slider-doc-rot')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.docRot = val;
+    const vRot = document.getElementById('tpl-modal-val-doc-rot');
+    if (vRot) vRot.textContent = `${val}°`;
+    const zoomWrap = document.getElementById('customizer-doc-zoom-wrap');
+    if (zoomWrap) zoomWrap.style.transform = `scale(${((topCustomizerState.docScale || 1.0) * (topCustomizerState.docPunchZoom ? 1.28 : 1.0)).toFixed(3)}) rotate(${val.toFixed(1)}deg)`;
+  });
+
+  // Easing Curve Dropdown
+  document.getElementById('tpl-modal-select-doc-easing')?.addEventListener('change', (e) => {
+    topCustomizerState.docEasing = e.target.value;
+  });
+}
+
 // Ensure triggers are attached immediately if DOM is already loaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   attachCutoutEditorTriggers();
+  attachModalDocHighlighterListeners();
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    attachCutoutEditorTriggers();
+    attachModalDocHighlighterListeners();
+  });
 }

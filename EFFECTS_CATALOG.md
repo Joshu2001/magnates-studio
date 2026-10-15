@@ -29,7 +29,7 @@
 | `fx-voice-denoise` | **Voiceover Audio Denoise** | Audio Restoration| ✅ Implemented | Python Denoise Pipeline / Clean script |
 | `fx-split-blade` | **Playhead Razor / Split Blade** | Timeline Utility | ✅ Implemented | Shortcut `S` or Split Tool |
 | `fx-magnetic-snap` | **Magnetic Timeline & Layer Snapping** | Timeline Utility | 🚧 Experimental | Auto-snap to playhead / adjacent clip boundaries |
-| `fx-document-scan` | **Vox Document Highlighter Sweep** | Motion & Callout | ⏳ Backlog | Planned: Animated yellow/cyan pen stroke |
+| `fx-document-scan` | **Vox Document Highlighter Sweep & Loupe Suite** | Motion & Callout | ✅ Implemented | Templates -> *Document Highlighter & Forensic Loupe Suite* or Clip Menu -> *Add Animated Highlighter* / *Add Whiteout Fade* |
 | `fx-parallax-tilt` | **OG 3-Layer Parallax Engine** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *OG 3-Layer Parallax Engine* |
 | `fx-spooner-parallax` | **2.5D Parallax Photo Effect** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *2.5D Parallax Photo Effect* or Clip Menu -> *⚡ 2.5D Parallax Photo* |
 | `fx-paper-texture` | **Stop-Motion Crumpled Paper Overlay** | Texture & Grain | ⏳ Backlog | Planned: 12fps cycling grain blend mode |

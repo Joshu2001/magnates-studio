@@ -27,16 +27,17 @@
   "quote": [],
   "image": [
     {
-      "id": "img-1791995272349-dkgw",
+      "id": "img-1792069231815-cbxz",
       "start": 0,
-      "duration": 8,
+      "duration": 6,
       "zIndex": 20,
-      "scale": 1.1,
+      "x": -238,
+      "scale": 0.59,
       "transition": "fly_through",
       "transitionDuration": 1,
       "file": {
-        "name": "2.5D_Parallax_Photo_Effect.jpg",
-        "url": "hiker_cutout.png",
+        "name": "Forbes_Article_&_Document_Highlighter.jpg",
+        "url": "/forbes_article_hd.svg",
         "isImage": true
       }
     }
@@ -55,7 +56,7 @@
   ],
   "currentTime": 0,
   "duration": 368.14,
-  "savedAt": 1792048210042,
-  "projectName": "New Project 2",
-  "projectId": "proj_1791995273839_luui"
+  "savedAt": 1792075163894,
+  "projectName": "New Project 6",
+  "projectId": "proj_1792069233209_0tqi"
 }
