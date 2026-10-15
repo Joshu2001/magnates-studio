@@ -28048,11 +28048,11 @@ function getActiveDocLines() {
             <img src="${docSrc}" alt="Magnified Evidence" style="width: 220%; height: 220%; object-fit: contain; position: absolute; top: -60%; left: -60%; filter: contrast(1.15) ${filterCss !== 'none' ? filterCss : ''};" />
           </div>
 
-          <!-- On-Canvas Direct Edit Bounding Box with Resize & Shorten Handles -->
-          <div id="doc-direct-transform-box" style="display: none; position: absolute; border: 2px dashed #facc15; box-shadow: 0 0 14px rgba(250,204,21,0.5); z-index: 30; border-radius: 3px; pointer-events: none;">
+          <!-- On-Canvas Direct Edit Bounding Box with Full-Body Move & Resize Handles -->
+          <div id="doc-direct-transform-box" style="display: none; position: absolute; border: 2px dashed #facc15; box-shadow: 0 0 14px rgba(250,204,21,0.5); z-index: 30; border-radius: 3px; cursor: grab; pointer-events: auto;" title="Click & drag anywhere on this box to move position">
             <div id="doc-tf-handle-l" style="position: absolute; left: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 20px; background: #fff; border: 2px solid #eab308; border-radius: 3px; cursor: ew-resize; pointer-events: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.3);" title="Drag to adjust start"></div>
             <div id="doc-tf-handle-r" style="position: absolute; right: -6px; top: 50%; transform: translateY(-50%); width: 12px; height: 20px; background: #fff; border: 2px solid #eab308; border-radius: 3px; cursor: ew-resize; pointer-events: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.3);" title="Drag to shorten or lengthen highlight"></div>
-            <div id="doc-tf-badge" style="position: absolute; top: -20px; left: 0; background: #eab308; color: #000; font-size: 8.5px; font-weight: 800; font-family: monospace; padding: 1px 6px; border-radius: 3px; white-space: nowrap;">LINE 1 (0.8s)</div>
+            <div id="doc-tf-badge" style="position: absolute; top: -20px; left: 0; background: #eab308; color: #000; font-size: 8.5px; font-weight: 800; font-family: monospace; padding: 1px 6px; border-radius: 3px; white-space: nowrap; pointer-events: none;">LINE 1 (0.8s)</div>
           </div>
         </div>
 
@@ -30025,6 +30025,118 @@ function initDocDirectCanvasEditing() {
 
   updateDocTfBoxPosition();
 
+  // 1b. Full-Body Move: Drag Anywhere on the Selection Box to Reposition (X and Y with Line Snapping)
+  tfBox.onpointerdown = (e) => {
+    // If clicking left or right handle, don't trigger whole box move
+    if (e.target.id === 'doc-tf-handle-l' || e.target.id === 'doc-tf-handle-r') return;
+    e.stopPropagation();
+    e.preventDefault();
+
+    const startClientX = e.clientX;
+    const startClientY = e.clientY;
+    const stageW = stageInner.clientWidth || 800;
+    const stageH = stageInner.clientHeight || 450;
+    const isRedactTarget = (topCustomizerState.selectedDocTarget === 'redact');
+    tfBox.style.cursor = 'grabbing';
+
+    if (isRedactTarget) {
+      const origX = topCustomizerState.docRedactX !== undefined ? topCustomizerState.docRedactX : 0.125;
+      const origY = topCustomizerState.docRedactY !== undefined ? topCustomizerState.docRedactY : 0.354;
+      const rw = topCustomizerState.docRedactW !== undefined ? topCustomizerState.docRedactW : 0.510;
+
+      const onPointerMoveBodyRedact = (me) => {
+        const deltaX = (me.clientX - startClientX) / stageW;
+        const deltaY = (me.clientY - startClientY) / stageH;
+        let newX = Math.max(0.02, Math.min(0.98 - rw, origX + deltaX));
+        let newY = Math.max(0.05, Math.min(0.92, origY + deltaY));
+
+        topCustomizerState.docRedactX = parseFloat(newX.toFixed(3));
+        topCustomizerState.docRedactY = parseFloat(newY.toFixed(3));
+
+        tfBox.style.left = `${(newX * 100).toFixed(2)}%`;
+        tfBox.style.top = `${(newY * 100).toFixed(2)}%`;
+        const svgRedact = document.getElementById('customizer-svg-redact-bar');
+        if (svgRedact) {
+          svgRedact.setAttribute('x', String(Math.round(newX * 1920)));
+          svgRedact.setAttribute('y', String(Math.round(newY * 1080)));
+        }
+        if (toolbar) {
+          toolbar.style.left = `${((newX + rw / 2) * 100).toFixed(2)}%`;
+          toolbar.style.top = `${(newY * 100).toFixed(2)}%`;
+        }
+      };
+
+      const onPointerUpBodyRedact = () => {
+        tfBox.style.cursor = 'grab';
+        window.removeEventListener('pointermove', onPointerMoveBodyRedact);
+        window.removeEventListener('pointerup', onPointerUpBodyRedact);
+        updateDocTfBoxPosition();
+      };
+
+      window.addEventListener('pointermove', onPointerMoveBodyRedact);
+      window.addEventListener('pointerup', onPointerUpBodyRedact);
+      return;
+    }
+
+    // Move Normal Highlight
+    const curHl = topCustomizerState.docHighlights[topCustomizerState.selectedDocHlIdx];
+    if (!curHl) return;
+    const origX = curHl.x;
+    const origY = curHl.y;
+    const hw = curHl.w;
+
+    const onPointerMoveBodyHl = (me) => {
+      const deltaX = (me.clientX - startClientX) / stageW;
+      const deltaY = (me.clientY - startClientY) / stageH;
+      let newX = Math.max(0.02, Math.min(0.98 - hw, origX + deltaX));
+      let newY = Math.max(0.05, Math.min(0.92, origY + deltaY));
+
+      curHl.x = parseFloat(newX.toFixed(3));
+      curHl.y = parseFloat(newY.toFixed(3));
+
+      tfBox.style.left = `${(newX * 100).toFixed(2)}%`;
+      tfBox.style.top = `${(newY * 100).toFixed(2)}%`;
+      const svgBar = document.getElementById(`customizer-svg-hl-bar-${topCustomizerState.selectedDocHlIdx}`);
+      if (svgBar) {
+        svgBar.setAttribute('x', String(Math.round(newX * 1920)));
+        svgBar.setAttribute('y', String(Math.round(newY * 1080)));
+      }
+      const htmlWrap = document.getElementById(`customizer-doc-hl-wrap-${topCustomizerState.selectedDocHlIdx}`);
+      if (htmlWrap) {
+        htmlWrap.style.left = `${(newX * 100).toFixed(2)}%`;
+        htmlWrap.style.top = `${(newY * 100).toFixed(2)}%`;
+      }
+      if (toolbar) {
+        toolbar.style.left = `${((newX + hw / 2) * 100).toFixed(2)}%`;
+        toolbar.style.top = `${(newY * 100).toFixed(2)}%`;
+      }
+    };
+
+    const onPointerUpBodyHl = () => {
+      tfBox.style.cursor = 'grab';
+      window.removeEventListener('pointermove', onPointerMoveBodyHl);
+      window.removeEventListener('pointerup', onPointerUpBodyHl);
+
+      // Magnetic Snap to nearest document sentence line if within 30px
+      const docLines = getActiveDocLines();
+      const nearestLine = docLines.find(l => Math.abs(l.normY - curHl.y) < 0.035);
+      if (nearestLine) {
+        curHl.y = nearestLine.normY;
+        if (Math.abs(curHl.x - nearestLine.normX) < 0.08) {
+          curHl.x = nearestLine.normX;
+          curHl.w = nearestLine.normW;
+        }
+        showTextTimingAlert(`Snapped to "${nearestLine.text.slice(0, 32)}..."`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+      }
+      updateDocTfBoxPosition();
+      renderTopTemplatePreviewStage();
+    };
+
+    window.addEventListener('pointermove', onPointerMoveBodyHl);
+    window.addEventListener('pointerup', onPointerUpBodyHl);
+  };
+
   // 2. Drag Right Handle: Shorten / Lengthen Highlight or Redaction Bar
   const handleR = document.getElementById('doc-tf-handle-r');
   if (handleR) {
@@ -30503,101 +30615,156 @@ function toggleDocTextSelection() {
 }
 
 function initCustomArticleBuilder() {
-  const modal = document.getElementById('modal-custom-article-builder');
+  const inlineDrawer = document.getElementById('doc-inline-article-editor');
   const btnOpen = document.getElementById('btn-tpl-modal-edit-article-text');
-  const btnClose = document.getElementById('btn-close-article-builder');
-  const btnCancel = document.getElementById('btn-cancel-article-builder');
-  const btnApply = document.getElementById('btn-apply-article-builder');
-  const inputHeadline = document.getElementById('input-article-headline');
-  const inputBody = document.getElementById('input-article-body');
+  const btnCloseInline = document.getElementById('btn-close-inline-article-editor');
+  const inputHeadline = document.getElementById('inline-input-article-headline');
+  const inputBody = document.getElementById('inline-input-article-body');
 
-  if (!modal || !btnOpen) return;
+  // Also support modal fallback if needed
+  const modal = document.getElementById('modal-custom-article-builder');
+  const btnCloseModal = document.getElementById('btn-close-article-builder');
+  const btnCancelModal = document.getElementById('btn-cancel-article-builder');
 
-  btnOpen.onclick = () => {
-    modal.style.display = 'flex';
-    if (!inputHeadline.value) {
-      inputHeadline.value = 'Unlike other rich nations, the U.S. has no national requirement for paid medical, parental or family caregiving leave.';
-    }
-    if (!inputBody.value) {
-      inputBody.value = 'Democratic run states have been rolling out their own mandates. This past January, a new state law took effect entitling private sector workers to take up to 12 weeks of leave for family or medical needs.';
+  if (!btnOpen) return;
+
+  // Toggle inline real-time drawer
+  btnOpen.onclick = (e) => {
+    e.stopPropagation();
+    if (!inlineDrawer) return;
+    const isShowing = inlineDrawer.style.display === 'flex';
+    inlineDrawer.style.display = isShowing ? 'none' : 'flex';
+    btnOpen.style.background = isShowing ? 'rgba(56,189,248,0.18)' : 'rgba(56,189,248,0.35)';
+
+    if (!isShowing) {
+      if (!inputHeadline.value) {
+        inputHeadline.value = 'Unlike other rich nations, the U.S. has no national requirement for paid medical or parental leave.';
+      }
+      if (!inputBody.value) {
+        inputBody.value = 'Democratic run states have been rolling out their own mandates. This past January, a new Minnesota law took effect entitling private sector workers to take up to 12 weeks of leave.';
+      }
+      updateCustomArticleRealtime();
     }
   };
 
-  const closeModal = () => { modal.style.display = 'none'; };
-  if (btnClose) btnClose.onclick = closeModal;
-  if (btnCancel) btnCancel.onclick = closeModal;
-
-  // Preset quick samples
-  document.getElementById('btn-sample-article-tech')?.addEventListener('click', () => {
-    inputHeadline.value = 'Artificial Intelligence models are rapidly entering high-stakes decision making without standardized evaluation protocols.';
-    inputBody.value = 'Researchers found that autonomous agent reasoning loops can drastically reduce human cognitive load when paired with native vector feedback interfaces.';
-  });
-  document.getElementById('btn-sample-article-finance')?.addEventListener('click', () => {
-    inputHeadline.value = 'Global central banks signal coordinated rate adjustments as headline inflation metrics stabilize across core economies.';
-    inputBody.value = 'Institutional funds have reallocated billions into high-yield sovereign notes, creating unprecedented liquidity shifts in equity markets.';
-  });
-  document.getElementById('btn-sample-article-gov')?.addEventListener('click', () => {
-    inputHeadline.value = 'CLASSIFIED MEMORANDUM: Internal oversight committee uncovers undisclosed procurement discrepancies dating back to FY2021.';
-    inputBody.value = 'Department officials have initiated emergency audits into unauthorized defense subcontracting networks, citing national security concerns.';
-  });
-
-  // Apply custom text to vector document
-  if (btnApply) {
-    btnApply.onclick = () => {
-      const headlineText = (inputHeadline.value || '').trim();
-      const bodyText = (inputBody.value || '').trim();
-      if (!headlineText && !bodyText) {
-        showTextTimingAlert('Please enter headline or body text', 'warning');
-        return;
-      }
-
-      // Convert sentences into snappable vector line definitions
-      const combinedSentences = [];
-      if (headlineText) {
-        headlineText.split(/(?<=[.?!])\s+/).forEach(s => { if (s.trim()) combinedSentences.push(s.trim()); });
-      }
-      if (bodyText) {
-        bodyText.split(/(?<=[.?!])\s+/).forEach(s => { if (s.trim()) combinedSentences.push(s.trim()); });
-      }
-
-      const generatedLines = [];
-      let curY = 0.265;
-      combinedSentences.slice(0, 7).forEach((sent, idx) => {
-        const charLen = sent.length;
-        const normW = Math.max(0.32, Math.min(0.65, charLen * 0.0075));
-        generatedLines.push({
-          id: `custom-line-${idx}`,
-          normX: 0.125,
-          normY: parseFloat(curY.toFixed(3)),
-          normW: parseFloat(normW.toFixed(3)),
-          normH: 0.038,
-          text: sent
-        });
-        curY += 0.046;
-      });
-
-      topCustomizerState.customDocLines = generatedLines;
-      topCustomizerState.primaryUrl = ''; // Clear bitmap image to enforce 4K vector SVG rendering!
-      topCustomizerState.docHighlights = [
-        {
-          x: generatedLines[0].normX,
-          y: generatedLines[0].normY,
-          w: generatedLines[0].normW,
-          h: generatedLines[0].normH,
-          color: '#fef08a',
-          startTime: 0.3,
-          duration: 0.8,
-          label: 'Line 1'
-        }
-      ];
-
-      closeModal();
-      syncTopTemplateDocHighlighterUI();
-      renderTopTemplatePreviewStage();
-      showTextTimingAlert('Generated 4K Vector Document! 100% crisp on fullscreen zooms.', 'success');
-      setTimeout(() => showTextTimingAlert(''), 2500);
+  if (btnCloseInline) {
+    btnCloseInline.onclick = (e) => {
+      e.stopPropagation();
+      if (inlineDrawer) inlineDrawer.style.display = 'none';
+      if (btnOpen) btnOpen.style.background = 'rgba(56,189,248,0.18)';
     };
   }
+
+  // Publication Style Switcher (Forbes, NY Times, WSJ, Classified Dossier)
+  document.querySelectorAll('.btn-inline-article-style, .btn-article-style').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const st = btn.getAttribute('data-style') || 'forbes';
+      topCustomizerState.customDocStyle = st;
+      if (st === 'forbes') topCustomizerState.customDocFont = "'Georgia', 'Merriweather', serif";
+      else if (st === 'nytimes') topCustomizerState.customDocFont = "'Cheltenham', 'Times New Roman', serif";
+      else if (st === 'wsj') topCustomizerState.customDocFont = "'Exchange', 'Times New Roman', serif";
+      else if (st === 'dossier') topCustomizerState.customDocFont = "'Courier New', Courier, monospace";
+
+      document.querySelectorAll('.btn-inline-article-style, .btn-article-style').forEach(b => {
+        const isMatch = b.getAttribute('data-style') === st;
+        b.style.background = isMatch ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.04)';
+        b.style.borderColor = isMatch ? '#38bdf8' : 'rgba(255,255,255,0.1)';
+        b.style.color = isMatch ? '#fff' : '#cbd5e1';
+      });
+
+      updateCustomArticleRealtime();
+    };
+  });
+
+  // Real-Time Live Input Update as User Types
+  function updateCustomArticleRealtime() {
+    const headlineText = (inputHeadline?.value || '').trim();
+    const bodyText = (inputBody?.value || '').trim();
+    if (!headlineText && !bodyText) return;
+
+    const combinedSentences = [];
+    if (headlineText) {
+      headlineText.split(/(?<=[.?!])\s+/).forEach(s => { if (s.trim()) combinedSentences.push(s.trim()); });
+    }
+    if (bodyText) {
+      bodyText.split(/(?<=[.?!])\s+/).forEach(s => { if (s.trim()) combinedSentences.push(s.trim()); });
+    }
+
+    const generatedLines = [];
+    let curY = 0.265;
+    combinedSentences.slice(0, 8).forEach((sent, idx) => {
+      const charLen = sent.length;
+      const normW = Math.max(0.32, Math.min(0.68, charLen * 0.0076));
+      generatedLines.push({
+        id: `custom-line-${idx}`,
+        normX: 0.125,
+        normY: parseFloat(curY.toFixed(3)),
+        normW: parseFloat(normW.toFixed(3)),
+        normH: 0.038,
+        text: sent
+      });
+      curY += 0.046;
+    });
+
+    topCustomizerState.customDocLines = generatedLines;
+    topCustomizerState.primaryUrl = ''; // Clear raw screenshot bitmap so infinite 4K SVG text renders!
+
+    // Ensure line 1 highlight is valid
+    if (!topCustomizerState.docHighlights || topCustomizerState.docHighlights.length === 0) {
+      topCustomizerState.docHighlights = [{
+        x: generatedLines[0].normX,
+        y: generatedLines[0].normY,
+        w: generatedLines[0].normW,
+        h: generatedLines[0].normH,
+        color: '#ffff00',
+        startTime: 0.3,
+        duration: 0.8,
+        label: 'Line 1'
+      }];
+    }
+
+    syncTopTemplateDocHighlighterUI();
+    renderTopTemplatePreviewStage();
+  }
+
+  // Bind live typing events
+  inputHeadline?.addEventListener('input', updateCustomArticleRealtime);
+  inputBody?.addEventListener('input', updateCustomArticleRealtime);
+
+  // Quick Sample Presets
+  const samples = {
+    tech: {
+      head: 'Artificial Intelligence models are rapidly entering high-stakes decision making without standardized evaluation protocols.',
+      body: 'Researchers found that autonomous agent reasoning loops can drastically reduce human cognitive load when paired with native vector feedback interfaces. Editorial workflows benefit directly from deterministic typography.'
+    },
+    finance: {
+      head: 'Global central banks signal coordinated rate adjustments as headline inflation metrics stabilize across core economies.',
+      body: 'Institutional funds have reallocated billions into high-yield sovereign notes, creating unprecedented liquidity shifts in equity markets. Analysts predict extended capital consolidation throughout Q4.'
+    },
+    gov: {
+      head: 'CLASSIFIED MEMORANDUM: Internal oversight committee uncovers undisclosed procurement discrepancies dating back to FY2021.',
+      body: 'Department officials have initiated emergency audits into unauthorized defense subcontracting networks, citing national security concerns. Whistleblower disclosures corroborate findings.'
+    }
+  };
+
+  const loadSample = (key) => {
+    if (!samples[key]) return;
+    if (inputHeadline) inputHeadline.value = samples[key].head;
+    if (inputBody) inputBody.value = samples[key].body;
+    updateCustomArticleRealtime();
+    showTextTimingAlert(`Loaded ${key.toUpperCase()} Article Sample!`, 'info');
+    setTimeout(() => showTextTimingAlert(''), 1500);
+  };
+
+  document.getElementById('btn-inline-sample-tech')?.addEventListener('click', (e) => { e.stopPropagation(); loadSample('tech'); });
+  document.getElementById('btn-inline-sample-finance')?.addEventListener('click', (e) => { e.stopPropagation(); loadSample('finance'); });
+  document.getElementById('btn-inline-sample-gov')?.addEventListener('click', (e) => { e.stopPropagation(); loadSample('gov'); });
+
+  // Modal event fallback compatibility
+  const closeModal = () => { if (modal) modal.style.display = 'none'; };
+  if (btnCloseModal) btnCloseModal.onclick = closeModal;
+  if (btnCancelModal) btnCancelModal.onclick = closeModal;
 }
 
 function initDocOcrVectorizeEvents() {
@@ -44054,21 +44221,47 @@ function attachCutoutEditorTriggers() {
 }
 
 function attachModalDocHighlighterListeners() {
-  // "+ Add Line" button in template customizer modal
+  // "+ Add Line" button in template customizer modal: Smart-snaps to next unhighlighted sentence
   document.getElementById('btn-tpl-modal-add-hl-line')?.addEventListener('click', () => {
     if (!topCustomizerState.docHighlights) topCustomizerState.docHighlights = [];
     const idx = topCustomizerState.docHighlights.length;
+    const docLines = getActiveDocLines();
+
+    // Find the next line from the document that is not already covered by a highlight
+    let nextTargetLine = docLines.find(l => {
+      return !topCustomizerState.docHighlights.some(h => Math.abs(h.y - l.normY) < 0.025);
+    });
+
+    // If all predefined lines are covered or custom image without text lines, place directly below the last highlight
+    if (!nextTargetLine) {
+      const lastHl = topCustomizerState.docHighlights[idx - 1];
+      const newY = lastHl ? Math.min(0.85, lastHl.y + (lastHl.h || 0.038) + 0.015) : 0.265;
+      nextTargetLine = {
+        normX: lastHl ? lastHl.x : 0.125,
+        normY: newY,
+        normW: lastHl ? lastHl.w : 0.515,
+        normH: 0.038,
+        text: `Line ${idx + 1}`
+      };
+    }
+
     topCustomizerState.docHighlights.push({
-      x: 0.125,
-      y: Math.min(0.85, 0.285 + (idx * 0.045)),
-      w: 0.490,
-      h: 0.046,
+      x: nextTargetLine.normX,
+      y: nextTargetLine.normY,
+      w: nextTargetLine.normW,
+      h: nextTargetLine.normH,
       color: '#ffff00',
       startTime: 0.3 + (idx * 0.7),
-      duration: topCustomizerState.docSweepSpeed || 0.8
+      duration: topCustomizerState.docSweepSpeed || 0.8,
+      label: `Line ${idx + 1}`
     });
+
+    topCustomizerState.selectedDocTarget = 'highlight';
+    topCustomizerState.selectedDocHlIdx = idx;
     syncTopTemplateDocHighlighterUI();
     renderTopTemplatePreviewStage();
+    showTextTimingAlert(`Added Line ${idx + 1}: Snapped to "${(nextTargetLine.text || '').slice(0, 30)}..."`, 'success');
+    setTimeout(() => showTextTimingAlert(''), 2000);
   });
 
   // Marker sweep speed slider
