@@ -25,43 +25,38 @@
   ],
   "chart": [],
   "quote": [],
-  "image": [],
-  "video": [],
-  "voiceover": [
+  "image": [
     {
-      "id": "clip-voiceover-1791809492103",
-      "track": "voiceover",
-      "start": 83.88594703455725,
-      "duration": 285.25806696544277,
-      "volume": 100,
-      "soundEnabled": true,
-      "layerOrder": "back",
-      "zIndex": 10,
+      "id": "img-1792069231815-cbxz",
+      "start": 0,
+      "duration": 6,
+      "zIndex": 20,
+      "x": -238,
+      "scale": 0.59,
+      "transition": "fly_through",
+      "transitionDuration": 1,
       "file": {
-        "name": "_Android_ Unwanted Updates and Bloat_.wav",
-        "url": "/media/uploads/_Android_%20Unwanted%20Updates%20and%20Bloat_.wav",
-        "isAudio": true,
-        "isVideo": false,
-        "isImage": false
+        "name": "Forbes_Article_&_Document_Highlighter.jpg",
+        "url": "/forbes_article_hd.svg",
+        "isImage": true
       }
     }
   ],
+  "video": [],
+  "voiceover": [],
   "music": [],
   "background": [
     {
       "id": "clip-bg-default",
       "start": 0,
-      "duration": 10.30453374730022,
+      "duration": 60,
       "bgType": "cyber_grid",
-      "bgColor": "#0a0b0e",
-      "filter": "negative",
-      "lut": "negative",
-      "filterIntensity": 100
+      "bgColor": "#0a0b0e"
     }
   ],
   "currentTime": 0,
-  "duration": 368.144014,
-  "savedAt": 1792080319963,
-  "projectName": "New Project 60",
-  "projectId": "proj_1791947081429_1yhh"
+  "duration": 368.14,
+  "savedAt": 1792082599902,
+  "projectName": "New Project 6",
+  "projectId": "proj_1792069233209_0tqi"
 }

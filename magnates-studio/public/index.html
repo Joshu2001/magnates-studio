@@ -6959,6 +6959,8 @@
                 <button type="button" id="btn-doc-float-redact" style="font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #09090b; border: 1px solid rgba(255,255,255,0.25); color: #fff; cursor: pointer;" title="Toggle between Highlight and Redact Bar">⬛ Redact</button>
                 <button type="button" id="btn-doc-float-undo" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 12px; padding: 2px 4px;" title="Reset / Undo">↺</button>
                 <button type="button" id="btn-doc-float-del" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px; padding: 2px 4px; font-weight: bold;" title="Remove this highlight">🗑</button>
+                <div style="width: 1px; height: 14px; background: rgba(255,255,255,0.18);"></div>
+                <button type="button" id="btn-doc-float-done" style="font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: #22c55e; border: 1px solid #4ade80; color: #000; cursor: pointer; display: flex; align-items: center; gap: 3px;" title="Done editing (hide toolbar to preview clean document)">✓ Done</button>
               </div>
 
               <!-- Top right time code pill matching homepage tags + Fullscreen Toggle -->
@@ -7459,6 +7461,33 @@
                   <button type="button" class="btn-inline-article-style" data-style="nytimes" style="padding: 4px 2px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 9.5px; font-weight: 600; cursor: pointer;">NY Times</button>
                   <button type="button" class="btn-inline-article-style" data-style="wsj" style="padding: 4px 2px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 9.5px; font-weight: 600; cursor: pointer;">WSJ</button>
                   <button type="button" class="btn-inline-article-style" data-style="dossier" style="padding: 4px 2px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; font-size: 9.5px; font-weight: 600; cursor: pointer;">Classified</button>
+                </div>
+              </div>
+
+              <!-- Rich Typography Controls (Real Document Styling) -->
+              <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Typography Styling</span>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="color" id="inline-input-article-color" value="#1e293b" title="Text Color" style="width: 18px; height: 18px; border: none; border-radius: 3px; cursor: pointer; background: transparent; padding: 0;" />
+                    <button type="button" id="btn-inline-toggle-bold" style="width: 20px; height: 18px; font-size: 10px; font-weight: bold; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 3px; cursor: pointer;" title="Bold">B</button>
+                    <button type="button" id="btn-inline-toggle-italic" style="width: 20px; height: 18px; font-size: 10px; font-style: italic; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 3px; cursor: pointer;" title="Italic">I</button>
+                    <button type="button" id="btn-inline-toggle-underline" style="width: 20px; height: 18px; font-size: 10px; text-decoration: underline; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; border-radius: 3px; cursor: pointer;" title="Underline">U</button>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <select id="inline-select-article-font" style="flex: 1; background: #030712; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #f8fafc; font-size: 9.5px; padding: 2px 4px; outline: none;">
+                    <option value="'Georgia', 'Merriweather', serif">Georgia Serif</option>
+                    <option value="'Cheltenham', 'Times New Roman', serif">NY Times Editorial</option>
+                    <option value="'Exchange', 'Times New Roman', serif">WSJ Financial Serif</option>
+                    <option value="'Courier New', Courier, monospace">Classified Monospace</option>
+                    <option value="'Inter', -apple-system, sans-serif">Modern Sans-Serif</option>
+                    <option value="'Impact', sans-serif">Bold Headline Impact</option>
+                  </select>
+                  <div style="display: flex; align-items: center; gap: 3px;">
+                    <span style="font-size: 8.5px; color: #94a3b8;">Size:</span>
+                    <input type="number" id="inline-input-article-size" min="18" max="52" value="34" style="width: 36px; background: #030712; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #f8fafc; font-size: 9.5px; padding: 1px 3px; text-align: center;" />
+                  </div>
                 </div>
               </div>
 
