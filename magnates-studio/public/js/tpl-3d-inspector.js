@@ -727,7 +727,8 @@
     curTpl = kindOf(tplId) ? tplId : null;
     if (curTpl) window.tpl3DFx = entry(tplId).fx;
     const mode = curTpl ? entry(tplId).mode : 'video';
-    applyModeLayout(has3D(kindOf(tplId), tplId) && mode === '3d');
+    const isCustom3D = (typeof topCustomizerState !== 'undefined' && !!topCustomizerState.is3DMode);
+    applyModeLayout((has3D(kindOf(tplId), tplId) && mode === '3d') || isCustom3D);
     const key = tplId + '|' + (curTpl ? mode : '');
     if (key === lastKey) return;
     lastKey = key; openLayerIdx = -1;

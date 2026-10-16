@@ -26695,10 +26695,10 @@ function openTopTemplateCustomizer(tpl) {
   const txtWrapEl = document.getElementById('tpl-modal-wrap-text');
   if (txtWrapEl) txtWrapEl.style.display = 'flex';
 
-  // 3D Interactive Mode button & floating toolbar: scope strictly to dark-power-sigil or 3D templates
+  // 3D Interactive Mode button & floating toolbar: scope to dark-power-sigil, 3D templates, or doc highlighter
   const btn3DMode = document.getElementById('btn-toggle-3d-interactive-mode');
   if (btn3DMode) {
-    btn3DMode.style.display = (tpl.id === 'dark-power-sigil' || tpl.is3D) ? 'inline-flex' : 'none';
+    btn3DMode.style.display = (tpl.id === 'dark-power-sigil' || tpl.is3D || tpl.id === 'doc-highlighter-loupe-suite') ? 'inline-flex' : 'none';
   }
   const floatBar = document.getElementById('sigil-floating-layer-toolbar');
   if (floatBar) floatBar.style.display = 'none';
@@ -27563,6 +27563,7 @@ function openTopTemplateCustomizer(tpl) {
 
   // Sync Document Highlighting & Focus controls for Document templates
   syncTopTemplateDocHighlighterUI();
+  if (typeof initCustomArticleBuilder === 'function') initCustomArticleBuilder();
 
   // Sync Typography UI Controls to active target (MAIN vs SUB)
   syncTopTemplateTypographyUI();
@@ -27595,6 +27596,35 @@ function syncTopTemplateDocHighlighterUI() {
   }
   wrapHl.style.display = 'flex';
 
+  // In 3D Mode, instantly hide playback controls & sequence storyboard so the preview stage expands to full viewport
+  const playbackBar = document.getElementById('tpl-modal-playback-bar');
+  const storyboardContainer = document.getElementById('tpl-modal-storyboard-container');
+  const stageBox = document.getElementById('tpl-modal-preview-stage-container');
+  const canvasBox = document.getElementById('tpl-modal-preview-canvas-box');
+  const is3D = !!topCustomizerState.is3DMode;
+
+  if (playbackBar) {
+    playbackBar.style.display = is3D ? 'none' : 'flex';
+  }
+  if (storyboardContainer) {
+    storyboardContainer.style.display = is3D ? 'none' : 'flex';
+  }
+  if (stageBox) {
+    if (is3D) {
+      stageBox.style.maxHeight = 'calc(88vh - 60px)';
+      stageBox.style.height = '100%';
+      stageBox.style.flex = '1';
+    } else {
+      stageBox.style.maxHeight = '480px';
+      stageBox.style.height = '';
+      stageBox.style.flex = '';
+    }
+  }
+  if (canvasBox) {
+    canvasBox.style.flex = is3D ? '1' : '';
+    canvasBox.style.height = is3D ? '100%' : '';
+  }
+
   const listEl = document.getElementById('tpl-modal-highlights-list');
   const highlights = topCustomizerState.docHighlights || [];
   if (listEl) {
@@ -27607,10 +27637,11 @@ function syncTopTemplateDocHighlighterUI() {
     } else {
       listEl.innerHTML = highlights.map((hl, idx) => {
         const color = hl.color || '#ffff00';
+        const isSelected = (topCustomizerState.selectedDocTarget === 'highlight' && topCustomizerState.selectedDocHlIdx === idx);
         return `
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px;">
+          <div class="doc-sidebar-hl-item" data-index="${idx}" style="display: flex; align-items: center; justify-content: space-between; background: ${isSelected ? 'rgba(250,204,21,0.18)' : 'rgba(255,255,255,0.04)'}; border: 1px solid ${isSelected ? '#facc15' : 'rgba(255,255,255,0.08)'}; border-radius: 6px; padding: 5px 8px; cursor: pointer; transition: background 0.15s, border-color 0.15s;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 10.5px; font-weight: 700; color: #f1f5f9;">Line ${idx + 1}</span>
+              <span style="font-size: 10.5px; font-weight: 700; color: ${isSelected ? '#fef08a' : '#f1f5f9'};">Line ${idx + 1}</span>
               <div style="display: flex; gap: 3px;">
                 ${['#ffff00', '#ef4444', '#06b6d4', '#22c55e'].map(c => `
                   <button type="button" class="btn-tpl-modal-hl-color" data-index="${idx}" data-color="${c}" style="width: 14px; height: 14px; border-radius: 50%; background: ${c}; border: 1.5px solid ${color.toLowerCase() === c.toLowerCase() ? '#fff' : 'transparent'}; cursor: pointer; padding: 0; box-shadow: ${color.toLowerCase() === c.toLowerCase() ? '0 0 6px ' + c : 'none'};"></button>
@@ -27621,6 +27652,19 @@ function syncTopTemplateDocHighlighterUI() {
           </div>
         `;
       }).join('');
+
+      listEl.querySelectorAll('.doc-sidebar-hl-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.btn-tpl-modal-hl-color') || e.target.closest('.btn-tpl-modal-hl-del')) return;
+          const idx = parseInt(item.getAttribute('data-index'), 10);
+          if (!isNaN(idx)) {
+            topCustomizerState.selectedDocTarget = 'highlight';
+            topCustomizerState.selectedDocHlIdx = idx;
+            syncTopTemplateDocHighlighterUI();
+            initDocDirectCanvasEditing();
+          }
+        });
+      });
 
       listEl.querySelectorAll('.btn-tpl-modal-hl-color').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -27640,6 +27684,9 @@ function syncTopTemplateDocHighlighterUI() {
           e.stopPropagation();
           const i = parseInt(btn.dataset.index, 10);
           topCustomizerState.docHighlights.splice(i, 1);
+          if (topCustomizerState.selectedDocHlIdx >= topCustomizerState.docHighlights.length) {
+            topCustomizerState.selectedDocHlIdx = Math.max(0, topCustomizerState.docHighlights.length - 1);
+          }
           syncTopTemplateDocHighlighterUI();
           renderTopTemplatePreviewStage();
         });
@@ -27647,17 +27694,31 @@ function syncTopTemplateDocHighlighterUI() {
     }
   }
 
-  // Ensure + Add Line button is bound reliably
+  // Ensure + Add Line button is bound reliably directly via onclick
   const btnAddLine = document.getElementById('btn-tpl-modal-add-hl-line');
-  if (btnAddLine && !btnAddLine._boundDocAddLine) {
-    btnAddLine._boundDocAddLine = true;
-    btnAddLine.addEventListener('click', (e) => {
+  if (btnAddLine) {
+    btnAddLine.onclick = (e) => {
       e.stopPropagation();
       e.preventDefault();
       if (!Array.isArray(topCustomizerState.docHighlights)) topCustomizerState.docHighlights = [];
       const docLines = getActiveDocLines();
       const nextIdx = topCustomizerState.docHighlights.length;
-      const targetLine = docLines[nextIdx % docLines.length] || { normX: 0.125, normY: 0.265 + (nextIdx * 0.046), normW: 0.515, normH: 0.039, text: 'Custom line' };
+
+      // Smart snap to next unhighlighted line or position below the last highlight
+      let targetLine = docLines.find(l => {
+        return !topCustomizerState.docHighlights.some(h => Math.abs(h.y - l.normY) < 0.025);
+      });
+      if (!targetLine) {
+        const lastHl = topCustomizerState.docHighlights[nextIdx - 1];
+        const newY = lastHl ? Math.min(0.85, lastHl.y + (lastHl.h || 0.038) + 0.015) : 0.265;
+        targetLine = {
+          normX: lastHl ? lastHl.x : 0.125,
+          normY: newY,
+          normW: lastHl ? lastHl.w : 0.515,
+          normH: 0.038,
+          text: `Line ${nextIdx + 1}`
+        };
+      }
 
       const newHl = {
         x: targetLine.normX,
@@ -27676,9 +27737,42 @@ function syncTopTemplateDocHighlighterUI() {
 
       syncTopTemplateDocHighlighterUI();
       renderTopTemplatePreviewStage();
+      setTimeout(() => {
+        if (typeof initDocDirectCanvasEditing === 'function') initDocDirectCanvasEditing();
+        const tfBox = document.getElementById('doc-direct-transform-box');
+        if (tfBox) tfBox.style.display = 'block';
+      }, 50);
       showTextTimingAlert(`Added highlight Line #${nextIdx + 1}`, 'success');
       setTimeout(() => showTextTimingAlert(''), 1800);
-    });
+    };
+  }
+
+  // Bind Video / 3D segmented switcher buttons in Document Highlighting section
+  const btnDocModeVid = document.getElementById('btn-doc-mode-video');
+  const btnDocMode3D = document.getElementById('btn-doc-mode-3d');
+  const is3DActive = !!topCustomizerState.is3DMode;
+  if (btnDocModeVid && btnDocMode3D) {
+    btnDocModeVid.style.background = is3DActive ? 'transparent' : 'rgba(168,85,247,0.35)';
+    btnDocModeVid.style.color = is3DActive ? '#94a3b8' : '#fff';
+    btnDocMode3D.style.background = is3DActive ? 'rgba(168,85,247,0.35)' : 'transparent';
+    btnDocMode3D.style.color = is3DActive ? '#fff' : '#94a3b8';
+
+    btnDocModeVid.onclick = (e) => {
+      e.stopPropagation();
+      topCustomizerState.is3DMode = false;
+      syncTopTemplateDocHighlighterUI();
+      renderTopTemplatePreviewStage();
+      showTextTimingAlert('Switched to Video Mode (Flat Canvas)', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1800);
+    };
+    btnDocMode3D.onclick = (e) => {
+      e.stopPropagation();
+      topCustomizerState.is3DMode = true;
+      syncTopTemplateDocHighlighterUI();
+      renderTopTemplatePreviewStage();
+      showTextTimingAlert('Switched to 3D Mode: Drag document canvas to orbit/tilt in 3D', 'success');
+      setTimeout(() => showTextTimingAlert(''), 2200);
+    };
   }
 
   // Sweep speed slider
@@ -27742,7 +27836,7 @@ function updateExtraCutoutsListUI() {
   const container = document.getElementById('tpl-modal-extra-cutouts-list');
   if (!container) return;
   container.innerHTML = (topCustomizerState.extraImages || []).map((img, idx) => `
-    <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 6px; padding: 4px 8px; font-size: 10px;">
+    <div class="tpl-layer-item-row" data-extra-idx="${idx}" style="display: flex; align-items: center; justify-content: space-between; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); border-radius: 6px; padding: 4px 8px; font-size: 10px; cursor: pointer;">
       <div style="display: flex; align-items: center; gap: 6px;">
         <img src="${(topCustomizerState.bgRemoved && img.cutoutCanvas) ? img.cutoutCanvas.toDataURL() : img.url}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 3px;" />
         <span style="color: #e0f2fe; font-weight: 600;">Cutout Layer #${idx + 2}</span>
@@ -27750,6 +27844,7 @@ function updateExtraCutoutsListUI() {
       <button type="button" onclick="removeTopTemplateExtraCutout(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
     </div>
   `).join('');
+  initTplLayersContextMenu();
 }
 
 function removeTopTemplateExtraCutout(index) {
@@ -27758,6 +27853,107 @@ function removeTopTemplateExtraCutout(index) {
     updateExtraCutoutsListUI();
     renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   }
+}
+
+// Right-Click Context Menu to Duplicate Layers
+let _activeLayerContextTarget = null;
+function initTplLayersContextMenu() {
+  const menu = document.getElementById('tpl-layer-context-menu');
+  const btnDup = document.getElementById('btn-ctx-duplicate-layer');
+  if (!menu || !btnDup) return;
+
+  const showMenu = (e, targetInfo) => {
+    e.preventDefault();
+    e.stopPropagation();
+    _activeLayerContextTarget = targetInfo;
+    menu.style.display = 'block';
+    menu.style.left = `${Math.min(window.innerWidth - 160, e.clientX)}px`;
+    menu.style.top = `${Math.min(window.innerHeight - 80, e.clientY)}px`;
+  };
+
+  const hideMenu = () => {
+    menu.style.display = 'none';
+    _activeLayerContextTarget = null;
+  };
+
+  // Attach right-click contextmenu to Primary Subject Layer
+  const primaryWrap = document.getElementById('tpl-modal-wrap-primary');
+  if (primaryWrap) {
+    primaryWrap.oncontextmenu = (e) => {
+      showMenu(e, { type: 'primary' });
+    };
+  }
+
+  // Attach right-click contextmenu to Secondary Background Layer
+  const secWrap = document.getElementById('tpl-modal-wrap-secondary');
+  if (secWrap) {
+    secWrap.oncontextmenu = (e) => {
+      showMenu(e, { type: 'secondary' });
+    };
+  }
+
+  // Attach right-click to extra cutout items
+  document.querySelectorAll('.tpl-layer-item-row').forEach(row => {
+    row.oncontextmenu = (e) => {
+      const idx = parseInt(row.getAttribute('data-extra-idx'), 10);
+      showMenu(e, { type: 'extra', index: idx });
+    };
+  });
+
+  // Global dismiss
+  window.addEventListener('click', hideMenu);
+  window.addEventListener('contextmenu', (e) => {
+    if (!e.target.closest('#tpl-modal-wrap-primary') && !e.target.closest('#tpl-modal-wrap-secondary') && !e.target.closest('.tpl-layer-item-row')) {
+      hideMenu();
+    }
+  });
+
+  // Handle Duplicate Layer click
+  btnDup.onclick = (e) => {
+    e.stopPropagation();
+    if (!_activeLayerContextTarget) return;
+
+    if (!Array.isArray(topCustomizerState.extraImages)) {
+      topCustomizerState.extraImages = [];
+    }
+
+    if (_activeLayerContextTarget.type === 'primary') {
+      const primUrl = topCustomizerState.primaryUrl || topCustomizerState.currentTpl?.defaultImage;
+      if (primUrl) {
+        topCustomizerState.extraImages.push({
+          url: primUrl,
+          cutoutCanvas: topCustomizerState.cutoutCanvas || null
+        });
+        updateExtraCutoutsListUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Duplicated Subject Layer into Layers stack!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+      }
+    } else if (_activeLayerContextTarget.type === 'secondary') {
+      const secUrl = topCustomizerState.secondaryUrl || topCustomizerState.currentTpl?.secondaryImage || topCustomizerState.currentTpl?.defaultImage;
+      if (secUrl) {
+        topCustomizerState.extraImages.push({
+          url: secUrl,
+          cutoutCanvas: null
+        });
+        updateExtraCutoutsListUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert('Duplicated Background Layer into Layers stack!', 'success');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+      }
+    } else if (_activeLayerContextTarget.type === 'extra') {
+      const orig = topCustomizerState.extraImages[_activeLayerContextTarget.index];
+      if (orig) {
+        topCustomizerState.extraImages.push(Object.assign({}, orig));
+        updateExtraCutoutsListUI();
+        renderTopTemplatePreviewStage();
+        showTextTimingAlert(`Duplicated Cutout Layer #${_activeLayerContextTarget.index + 2}!`, 'success');
+        setTimeout(() => showTextTimingAlert(''), 2000);
+      }
+    }
+
+    hideMenu();
+  };
 }
 
 function updateExtraTextsListUI() {
@@ -27845,6 +28041,26 @@ function closeTopTemplateCustomizer() {
   hoverExternalT = null;
   if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
   if (window.tpl3DOnClose) window.tpl3DOnClose();
+}
+
+let FORBES_DOC_LINES = [
+  { id: 'deck-0', normX: 0.125, normY: 0.265, normW: 0.515, normH: 0.039, text: 'Unlike other rich nations, the U.S. has no national requirement' },
+  { id: 'deck-1', normX: 0.125, normY: 0.309, normW: 0.456, normH: 0.039, text: 'for paid medical, parental or family caregiving leave. But' },
+  { id: 'deck-2', normX: 0.125, normY: 0.354, normW: 0.510, normH: 0.039, text: 'Democratic run states have been rolling out their own mandates.' },
+  { id: 'body-0', normX: 0.188, normY: 0.489, normW: 0.457, normH: 0.028, text: 'his past January, a new Minnesota law took effect entitling private sector' },
+  { id: 'body-1', normX: 0.188, normY: 0.526, normW: 0.478, normH: 0.028, text: 'workers to take up to 12 weeks of leave for family or medical needs, with a' },
+  { id: 'body-2', normX: 0.188, normY: 0.563, normW: 0.482, normH: 0.028, text: 'state-paid benefit of up to $1,423 a week, and a guarantee of reinstatement' },
+  { id: 'body-3', normX: 0.125, normY: 0.606, normW: 0.552, normH: 0.028, text: 'once the leave is over. In response, Steve Gilbertson, the owner of Electramatic, a' },
+  { id: 'body-4', normX: 0.125, normY: 0.645, normW: 0.565, normH: 0.028, text: 'custom electrical cable assembly manufacturer in northern Minneapolis, decided to hire' },
+  { id: 'body-5', normX: 0.125, normY: 0.684, normW: 0.560, normH: 0.028, text: 'a dozen extra employees just to make sure both shifts at his plant would be fully staffed.' },
+  { id: 'body-6', normX: 0.125, normY: 0.723, normW: 0.540, normH: 0.028, text: '"Someone could come in today and ask for (time off starting) tomorrow," worries' }
+];
+
+function getActiveDocLines() {
+  if (topCustomizerState.customDocLines && topCustomizerState.customDocLines.length > 0) {
+    return topCustomizerState.customDocLines;
+  }
+  return FORBES_DOC_LINES;
 }
 
 function renderTopTemplatePreviewStage() {
@@ -27937,23 +28153,6 @@ function renderTopTemplatePreviewStage() {
     }).join('');
   }
 
-let FORBES_DOC_LINES = [
-  { id: 'deck-0', normX: 0.125, normY: 0.265, normW: 0.515, normH: 0.039, text: 'Unlike other rich nations, the U.S. has no national requirement' },
-  { id: 'deck-1', normX: 0.125, normY: 0.309, normW: 0.456, normH: 0.039, text: 'for paid medical, parental or family caregiving leave. But' },
-  { id: 'deck-2', normX: 0.125, normY: 0.354, normW: 0.510, normH: 0.039, text: 'Democratic run states have been rolling out their own mandates.' },
-  { id: 'body-0', normX: 0.188, normY: 0.489, normW: 0.457, normH: 0.028, text: 'his past January, a new Minnesota law took effect entitling private sector' },
-  { id: 'body-1', normX: 0.188, normY: 0.526, normW: 0.478, normH: 0.028, text: 'workers to take up to 12 weeks of leave for family or medical needs, with a' },
-  { id: 'body-2', normX: 0.188, normY: 0.563, normW: 0.482, normH: 0.028, text: 'state-paid benefit of up to $1,423 a week, and a guarantee of reinstatement' },
-  { id: 'body-3', normX: 0.125, normY: 0.606, normW: 0.552, normH: 0.028, text: 'once the leave is over. In response, Steve Gilbertson, the owner of Electramatic...' }
-];
-
-function getActiveDocLines() {
-  if (topCustomizerState.customDocLines && topCustomizerState.customDocLines.length > 0) {
-    return topCustomizerState.customDocLines;
-  }
-  return FORBES_DOC_LINES;
-}
-
   if (tplId === 'doc-highlighter-loupe-suite') {
     const highlights = topCustomizerState.docHighlights || [];
     const isWhiteout = !!topCustomizerState.docWhiteout;
@@ -27962,22 +28161,26 @@ function getActiveDocLines() {
     const isLoupe = !!topCustomizerState.docLoupe;
     const isRedact = !!topCustomizerState.docRedact;
     const is3D = !!topCustomizerState.is3DMode;
-    const docSrc = prim || '/forbes_article_hd.svg';
     const docFilterMap = {
       none: 'none',
-      vintage_70s: 'contrast(115%) sepia(30%) saturate(135%) hue-rotate(10deg)',
-      noir: 'grayscale(100%) contrast(155%) brightness(95%)',
-      warm_kodak: 'sepia(25%) saturate(130%) contrast(110%) brightness(102%)',
-      nordic_chill: 'saturate(70%) contrast(110%) brightness(105%) hue-rotate(15deg)',
-      teal_orange: 'contrast(130%) saturate(140%) hue-rotate(-15deg)',
-      bright: 'brightness(115%) contrast(108%) saturate(105%)',
-      mexico: 'sepia(45%) saturate(125%) contrast(125%) brightness(112%) hue-rotate(-12deg)'
+      vintage_70s: 'contrast(120%) sepia(42%) saturate(140%) brightness(96%) hue-rotate(5deg)',
+      film_grain_borders: 'contrast(128%) saturate(115%) brightness(95%) sepia(20%)',
+      burnt_edges: 'contrast(135%) sepia(50%) saturate(145%) brightness(90%) hue-rotate(-8deg)',
+      newspaper_halftone: 'grayscale(100%) contrast(175%) brightness(98%)',
+      noir: 'grayscale(100%) contrast(165%) brightness(92%)',
+      warm_kodak: 'sepia(30%) saturate(135%) contrast(115%) brightness(102%)',
+      nordic_chill: 'saturate(70%) contrast(115%) brightness(105%) hue-rotate(15deg)',
+      teal_orange: 'contrast(135%) saturate(145%) hue-rotate(-15deg)',
+      bright: 'brightness(118%) contrast(112%) saturate(108%)',
+      mexico: 'sepia(50%) saturate(135%) contrast(130%) brightness(110%) hue-rotate(-14deg)'
     };
-    const filterCss = docFilterMap[topCustomizerState.docFilter || 'none'] || 'none';
+    const docSrc = prim || '/forbes_article_hd.svg';
+    const activeFilterKey = topCustomizerState.docFilter || 'none';
+    const filterCss = docFilterMap[activeFilterKey] || 'none';
+    const isFilmOrGrain = (activeFilterKey === 'film_grain_borders' || activeFilterKey === 'vintage_70s' || activeFilterKey === 'newspaper_halftone');
+    const isBurntOrVignette = (activeFilterKey === 'burnt_edges' || activeFilterKey === 'film_grain_borders');
     const initScale = (topCustomizerState.docScale || 1.0) * (isPunch ? 1.28 : 1.0);
     const initRot = topCustomizerState.docRot || 0;
-
-    // Check if custom uploaded bitmap image or HD vector SVG
     const isCustomImage = prim && !prim.includes('forbes_article') && !prim.endsWith('.svg');
 
     stage.innerHTML = `
@@ -28118,6 +28321,12 @@ function getActiveDocLines() {
           <div id="customizer-doc-loupe-wrap" style="position: absolute; width: 140px; height: 140px; border-radius: 50%; border: 3px solid #06b6d4; box-shadow: 0 12px 35px rgba(0,0,0,0.5), inset 0 0 20px rgba(6,182,212,0.4); overflow: hidden; pointer-events: none; z-index: 12; display: ${isLoupe ? 'block' : 'none'}; top: 22%; left: 34%;">
             <img src="${docSrc}" alt="Magnified Evidence" style="width: 220%; height: 220%; object-fit: contain; position: absolute; top: -60%; left: -60%; filter: contrast(1.15) ${filterCss !== 'none' ? filterCss : ''};" />
           </div>
+
+          <!-- YouTuber Old Paper Texture & 16mm Film Grain Procedural Overlay -->
+          <div id="customizer-doc-paper-texture-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 13; mix-blend-mode: multiply; opacity: ${isFilmOrGrain ? '0.45' : '0'}; display: ${isFilmOrGrain ? 'block' : 'none'}; background-image: radial-gradient(rgba(0,0,0,0.06) 1px, transparent 0), radial-gradient(rgba(120,53,15,0.08) 1px, transparent 0); background-size: 8px 8px, 12px 12px; background-position: 0 0, 4px 4px;"></div>
+
+          <!-- YouTuber Burnt Edges & Heavy Dark Grunge Border Vignette -->
+          <div id="customizer-doc-grunge-border-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 14; display: ${isBurntOrVignette ? 'block' : 'none'}; box-shadow: inset 0 0 70px 25px rgba(18, 12, 6, 0.78), inset 0 0 15px rgba(0,0,0,0.9); border: 1px solid rgba(69, 26, 3, 0.45);"></div>
 
           <!-- On-Canvas Direct Edit Bounding Box with Full-Body Move & Resize Handles -->
           <div id="doc-direct-transform-box" style="display: none; position: absolute; border: 2px dashed #facc15; box-shadow: 0 0 14px rgba(250,204,21,0.5); z-index: 30; border-radius: 3px; cursor: grab; pointer-events: auto;" title="Click & drag anywhere on this box to move position">
@@ -28811,10 +29020,14 @@ function updateTopCustomizerFrame(seqTime, now) {
       const start = hl.startTime !== undefined ? hl.startTime : (0.3 + idx * 0.7);
       const hDur = hl.duration || sweepSpeed;
       const targetW = Math.round(hl.w * 1920);
+      const isSelected = (topCustomizerState.selectedDocTarget === 'highlight' && idx === topCustomizerState.selectedDocHlIdx);
+      const forceFull = !topCustomizerState.isPlaying || isSelected;
 
       const svgBar = document.getElementById(`customizer-svg-hl-bar-${idx}`);
       if (svgBar) {
-        if (loopT < start) {
+        if (forceFull) {
+          svgBar.setAttribute('width', String(targetW));
+        } else if (loopT < start) {
           svgBar.setAttribute('width', '0');
         } else if (loopT >= start + hDur) {
           svgBar.setAttribute('width', String(targetW));
@@ -28826,7 +29039,9 @@ function updateTopCustomizerFrame(seqTime, now) {
 
       const htmlBar = document.getElementById(`customizer-doc-hl-bar-${idx}`);
       if (htmlBar) {
-        if (loopT < start) {
+        if (forceFull) {
+          htmlBar.style.width = '100%';
+        } else if (loopT < start) {
           htmlBar.style.width = '0%';
         } else if (loopT >= start + hDur) {
           htmlBar.style.width = '100%';
@@ -28838,13 +29053,17 @@ function updateTopCustomizerFrame(seqTime, now) {
     });
 
     // Animate Forensic Redaction Censor Bar (Physically Covers the Text)
+    const isRedactSelected = (topCustomizerState.selectedDocTarget === 'redact');
+    const forceRedactFull = !topCustomizerState.isPlaying || isRedactSelected;
     const svgRedact = document.getElementById('customizer-svg-redact-bar');
     if (svgRedact) {
       if (topCustomizerState.docRedact) {
         const rTargetW = Math.round((topCustomizerState.docRedactW || 0.510) * 1920);
         const rStart = 1.0;
         const rDur = 0.7;
-        if (loopT < rStart) {
+        if (forceRedactFull) {
+          svgRedact.setAttribute('width', String(rTargetW));
+        } else if (loopT < rStart) {
           svgRedact.setAttribute('width', '0');
         } else if (loopT >= rStart + rDur) {
           svgRedact.setAttribute('width', String(rTargetW));
@@ -28862,7 +29081,9 @@ function updateTopCustomizerFrame(seqTime, now) {
       const rTargetPct = Math.round((topCustomizerState.docRedactW || 0.510) * 100);
       const rStart = 1.0;
       const rDur = 0.7;
-      if (loopT < rStart) {
+      if (forceRedactFull) {
+        htmlRedact.style.width = `${rTargetPct}%`;
+      } else if (loopT < rStart) {
         htmlRedact.style.width = '0%';
       } else if (loopT >= rStart + rDur) {
         htmlRedact.style.width = `${rTargetPct}%`;
@@ -29375,6 +29596,9 @@ transition: 'fly_through',
       docTilt: !!topCustomizerState.docTilt,
       docBounce: !!topCustomizerState.docBounce,
       docRedact: !!topCustomizerState.docRedact,
+      is3DMode: !!topCustomizerState.is3DMode,
+      doc3DAngleX: topCustomizerState.doc3DAngleX !== undefined ? topCustomizerState.doc3DAngleX : 15,
+      doc3DAngleY: topCustomizerState.doc3DAngleY !== undefined ? topCustomizerState.doc3DAngleY : -14,
       enableAtmosphere: !!topCustomizerState.enableDustParticles,
       particleType: topCustomizerState.particleType || 'dust',
       dustDensity: topCustomizerState.dustDensity || 30,
@@ -29709,24 +29933,46 @@ function initDustParticles() {
   if (count <= 0) return;
   const type = topCustomizerState.particleType || 'dust';
   const baseSize = topCustomizerState.particleSize || 2.0;
-  for (let i = 0; i < count; i++) {
+
+  // For birds, create 2 tight natural V-flock clusters so they fly together instead of scattered randomly
+  const birdFlockCenters = [
+    { cx: 0.25 + Math.random() * 0.15, cy: 0.22 + Math.random() * 0.10 },
+    { cx: 0.65 + Math.random() * 0.15, cy: 0.32 + Math.random() * 0.12 }
+  ];
+
+  // For fireworks, create 3 burst epicenters
+  const fwCenters = [
+    { cx: 0.28, cy: 0.30, hue: 45, phase: 0 },
+    { cx: 0.72, cy: 0.26, hue: 320, phase: 2.1 },
+    { cx: 0.50, cy: 0.42, hue: 190, phase: 4.2 }
+  ];
+
+  const effectiveCount = type === 'birds' ? Math.min(count, 16) : count;
+
+  for (let i = 0; i < effectiveCount; i++) {
+    let x = Math.random();
+    let y = Math.random();
     let speedY = Math.random() * 0.0006 + 0.0002;
     let speedX = (Math.random() - 0.5) * 0.0004;
     let size = (Math.random() * 1.5 + 0.5) * baseSize;
     let opacity = Math.random() * 0.6 + 0.2;
     let glow = Math.random() > 0.5;
+    let wingCycle = Math.random() * Math.PI * 2;
+    let fwCenterIdx = i % 3;
+    let fwAngle = Math.random() * Math.PI * 2;
+    let fwRadialSpeed = Math.random() * 0.22 + 0.06;
 
     if (type === 'snow') {
-      speedY = -(Math.random() * 0.0012 + 0.0006); // Falls downward
+      speedY = -(Math.random() * 0.0014 + 0.0006); // Falls downward
       speedX = (Math.random() - 0.5) * 0.0008;
-      size = (Math.random() * 2.0 + 1.0) * baseSize;
-      opacity = Math.random() * 0.7 + 0.3;
-      glow = false;
+      size = (Math.random() * 2.2 + 1.5) * baseSize;
+      opacity = Math.random() * 0.5 + 0.45;
+      glow = true;
     } else if (type === 'stars') {
-      speedY = (Math.random() - 0.5) * 0.0001;
-      speedX = (Math.random() - 0.5) * 0.0001;
-      size = (Math.random() * 1.2 + 0.4) * baseSize;
-      opacity = Math.random() * 0.9 + 0.1;
+      speedY = (Math.random() - 0.5) * 0.00008;
+      speedX = (Math.random() - 0.5) * 0.00008;
+      size = (Math.random() * 1.8 + 1.0) * baseSize;
+      opacity = Math.random() * 0.7 + 0.3;
       glow = true;
     } else if (type === 'fog') {
       speedY = (Math.random() - 0.5) * 0.00005;
@@ -29734,17 +29980,58 @@ function initDustParticles() {
       size = (Math.random() * 40.0 + 30.0) * (baseSize * 0.6);
       opacity = Math.random() * 0.15 + 0.05;
       glow = false;
+    } else if (type === 'birds') {
+      // Cluster birds into cohesive V-shaped flocks!
+      const flock = birdFlockCenters[i % 2];
+      const rank = Math.floor(i / 2);
+      const side = (i % 4 < 2) ? 1 : -1;
+      x = (flock.cx + rank * 0.022 + (Math.random() - 0.5) * 0.01) % 1;
+      y = Math.max(0.08, Math.min(0.85, flock.cy + side * rank * 0.016 + (Math.random() - 0.5) * 0.008));
+      speedY = 0.00012; // Gentle upward glide
+      speedX = -(0.0012 + (i % 2) * 0.0002); // Cohesive flock speed moving left
+      size = (Math.max(0.55, 1.0 - rank * 0.06)) * 7.5 * (baseSize * 0.5);
+      opacity = Math.random() * 0.25 + 0.7;
+      wingCycle = rank * 0.45; // Synchronized wave phase across the flock
+      glow = false;
+    } else if (type === 'leaves') {
+      // Falling autumn leaves tumbling and swaying
+      speedY = -(Math.random() * 0.0011 + 0.0005);
+      speedX = (Math.random() * 0.0010 + 0.0002);
+      size = (Math.random() * 4.5 + 4.5) * (baseSize * 0.5);
+      opacity = Math.random() * 0.35 + 0.65;
+      glow = false;
+    } else if (type === 'fire') {
+      // Rising fire flames & glowing embers from the bottom
+      y = 0.65 + Math.random() * 0.35;
+      speedY = Math.random() * 0.0028 + 0.0012; // Rapidly rise upward
+      speedX = (Math.random() - 0.5) * 0.0012;
+      size = (Math.random() * 3.5 + 2.0) * baseSize;
+      opacity = Math.random() * 0.55 + 0.45;
+      glow = true;
+    } else if (type === 'fireworks') {
+      const c = fwCenters[fwCenterIdx];
+      x = c.cx;
+      y = c.cy;
+      size = (Math.random() * 2.0 + 1.2) * baseSize;
+      opacity = 0.95;
+      glow = true;
     }
 
     dustParticlesArray.push({
-      x: Math.random(),
-      y: Math.random(),
+      x,
+      y,
       size,
       opacity,
       speedY,
       speedX,
       glow,
-      twinkle: Math.random() * Math.PI * 2
+      twinkle: Math.random() * Math.PI * 2,
+      wingCycle,
+      rot: Math.random() * Math.PI * 2,
+      hue: Math.floor(Math.random() * 55) + 10,
+      fwCenterIdx,
+      fwAngle,
+      fwRadialSpeed
     });
   }
 }
@@ -29766,37 +30053,191 @@ function renderCustomizerDustSimulation(panOffset = 0) {
   if (!topCustomizerState.enableDustParticles || (topCustomizerState.dustDensity || 0) <= 0) return;
   if (dustParticlesArray.length === 0) initDustParticles();
 
-  const color = topCustomizerState.lightWrapColor && topCustomizerState.lightWrapColor !== '#000000' 
-    ? topCustomizerState.lightWrapColor 
-    : (topCustomizerState.particleType === 'snow' ? '#ffffff' : topCustomizerState.particleType === 'stars' ? '#fef08a' : '#f8fafc');
+  const type = topCustomizerState.particleType || 'dust';
+  const useLightWrapColor = topCustomizerState.enableLightWrap && topCustomizerState.lightWrapColor && topCustomizerState.lightWrapColor !== '#000000';
+  const color = useLightWrapColor
+    ? topCustomizerState.lightWrapColor
+    : (type === 'snow' ? '#ffffff' : type === 'stars' ? '#f59e0b' : '#cbd5e1');
   const panShift = (panOffset || 0) * 0.0003;
   const speedMult = topCustomizerState.particleSpeed !== undefined ? topCustomizerState.particleSpeed : 1.0;
-  const type = topCustomizerState.particleType || 'dust';
 
-  dustParticlesArray.forEach(p => {
-    p.y -= p.speedY * speedMult;
-    p.x += (p.speedX * speedMult) + panShift;
+  const fwCenters = [
+    { cx: 0.28, cy: 0.30, hue: 42 },
+    { cx: 0.72, cy: 0.26, hue: 330 },
+    { cx: 0.50, cy: 0.42, hue: 195 }
+  ];
+
+  dustParticlesArray.forEach((p, idx) => {
     p.twinkle += 0.05 * speedMult;
+    p.wingCycle = (p.wingCycle || 0) + 0.16 * speedMult;
+    p.rot = (p.rot || 0) + 0.035 * speedMult;
 
-    if (p.y < 0) p.y = 1;
-    if (p.y > 1) p.y = 0;
-    if (p.x < 0) p.x = 1;
-    if (p.x > 1) p.x = 0;
+    if (type === 'fireworks') {
+      // Radial expanding firework shell burst cycle
+      const c = fwCenters[p.fwCenterIdx || 0];
+      const cycle = ((performance.now() * 0.0007 * Math.max(0.3, speedMult)) + (p.fwCenterIdx || 0) * 0.33) % 1.0;
+      const easeOut = 1 - Math.pow(1 - cycle, 3);
+      const radiusX = easeOut * p.fwRadialSpeed;
+      const radiusY = easeOut * p.fwRadialSpeed * (w / Math.max(1, h));
+      const gravityDrop = cycle * cycle * 0.08;
+      p.x = c.cx + Math.cos(p.fwAngle) * radiusX;
+      p.y = c.cy + Math.sin(p.fwAngle) * radiusY + gravityDrop;
+      p._fwAlpha = Math.max(0, 1 - Math.pow(cycle, 1.8));
+      p._fwCycle = cycle;
+      p._fwHue = (c.hue + (idx % 5) * 18) % 360;
+    } else {
+      p.y -= p.speedY * speedMult;
+      if (type === 'leaves' || type === 'snow') {
+        p.x += (p.speedX + Math.sin(p.twinkle) * 0.0007) * speedMult + panShift;
+      } else if (type === 'fire') {
+        p.x += (p.speedX + Math.sin(p.twinkle * 1.8) * 0.0006) * speedMult + panShift;
+      } else {
+        p.x += (p.speedX * speedMult) + panShift;
+      }
+
+      if (p.y < 0) p.y = 1;
+      if (p.y > 1) p.y = 0;
+      if (p.x < 0) p.x = 1;
+      if (p.x > 1) p.x = 0;
+    }
 
     const px = p.x * w;
     const py = p.y * h;
 
     ctx.save();
     let currentOpacity = p.opacity;
-    if (type === 'stars') {
-      currentOpacity = Math.max(0.1, Math.min(1.0, p.opacity + Math.sin(p.twinkle) * 0.35));
+    if (type === 'stars' || type === 'fire') {
+      currentOpacity = Math.max(0.15, Math.min(1.0, p.opacity + Math.sin(p.twinkle * 1.5) * 0.35));
+    } else if (type === 'fireworks') {
+      currentOpacity = p._fwAlpha !== undefined ? p._fwAlpha : 0.8;
     }
     ctx.globalAlpha = currentOpacity;
 
-    if (type === 'fog') {
+    if (type === 'snow') {
+      // Crisp 6-branch snowflake crystal + soft icy halo so it's unmistakable even on white paper
+      const r = p.size * 1.4;
+      ctx.shadowColor = 'rgba(56, 189, 248, 0.85)';
+      ctx.shadowBlur = 6;
+      ctx.strokeStyle = '#e0f2fe';
+      ctx.fillStyle = '#ffffff';
+      ctx.lineWidth = Math.max(1.2, r * 0.22);
+      ctx.translate(px, py);
+      ctx.rotate(p.rot * 0.5);
+      for (let b = 0; b < 3; b++) {
+        ctx.beginPath();
+        ctx.moveTo(-r, 0);
+        ctx.lineTo(r, 0);
+        ctx.stroke();
+        ctx.rotate(Math.PI / 3);
+      }
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.35, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === 'stars') {
+      // Authentic 4-point sparkling diamond star with cross rays
+      const r = p.size * 2.2;
+      ctx.translate(px, py);
+      ctx.fillStyle = '#f59e0b';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, -r);
+      ctx.quadraticCurveTo(r * 0.18, -r * 0.18, r, 0);
+      ctx.quadraticCurveTo(r * 0.18, r * 0.18, 0, r);
+      ctx.quadraticCurveTo(-r * 0.18, r * 0.18, -r, 0);
+      ctx.quadraticCurveTo(-r * 0.18, -r * 0.18, 0, -r);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === 'birds') {
+      // Cohesive silhouette bird with curved gull wings & body
+      const s = p.size * 1.25;
+      const flap = Math.sin(p.wingCycle) * (s * 0.75);
+      ctx.strokeStyle = '#1e293b';
+      ctx.fillStyle = '#1e293b';
+      ctx.lineWidth = Math.max(1.6, s * 0.22);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      // Left wing
+      ctx.moveTo(px - s * 1.15, py - flap * 0.55);
+      ctx.quadraticCurveTo(px - s * 0.5, py - flap, px, py);
+      // Right wing
+      ctx.quadraticCurveTo(px + s * 0.5, py - flap, px + s * 1.15, py - flap * 0.55);
+      ctx.stroke();
+      // Subtle bird body center
+      ctx.beginPath();
+      ctx.ellipse(px, py + 0.5, s * 0.18, s * 0.10, 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === 'leaves') {
+      // Pointed autumn leaf with central vein and stem
+      const s = p.size * 1.35;
+      ctx.translate(px, py);
+      ctx.rotate(p.rot + Math.sin(p.twinkle) * 0.45);
+      const leafGrad = ctx.createLinearGradient(-s, -s * 0.5, s, s * 0.5);
+      leafGrad.addColorStop(0, '#ea580c');
+      leafGrad.addColorStop(0.55, '#d97706');
+      leafGrad.addColorStop(1, '#9a3412');
+      ctx.fillStyle = leafGrad;
+      ctx.beginPath();
+      ctx.moveTo(-s, 0);
+      ctx.quadraticCurveTo(0, -s * 0.75, s, 0);
+      ctx.quadraticCurveTo(0, s * 0.75, -s, 0);
+      ctx.closePath();
+      ctx.fill();
+      // Central vein + petiole stem
+      ctx.strokeStyle = '#7c2d12';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-s * 1.25, 0);
+      ctx.lineTo(s * 0.75, 0);
+      ctx.stroke();
+    } else if (type === 'fire') {
+      // Rising teardrop flame tongue + bright yellow core & red-orange ember trail
+      const s = p.size * 1.3;
+      ctx.translate(px, py);
+      const sway = Math.sin(p.twinkle * 2) * 0.2;
+      ctx.rotate(sway);
+      const fireGrad = ctx.createLinearGradient(0, -s * 1.8, 0, s);
+      fireGrad.addColorStop(0, 'rgba(220, 38, 38, 0)');
+      fireGrad.addColorStop(0.35, '#ef4444');
+      fireGrad.addColorStop(0.7, '#f97316');
+      fireGrad.addColorStop(1, '#fef08a');
+      ctx.fillStyle = fireGrad;
+      ctx.shadowColor = '#ea580c';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, -s * 1.8);
+      ctx.quadraticCurveTo(s * 0.9, 0, 0, s);
+      ctx.quadraticCurveTo(-s * 0.9, 0, 0, -s * 1.8);
+      ctx.closePath();
+      ctx.fill();
+    } else if (type === 'fireworks') {
+      // Radial firework streak with glowing tail toward burst center
+      const fwColor = `hsl(${p._fwHue || 45}, 95%, 60%)`;
+      const tailLen = p.size * 2.8 * (1 - (p._fwCycle || 0) * 0.5);
+      const tx = px - Math.cos(p.fwAngle) * tailLen;
+      const ty = py - Math.sin(p.fwAngle) * tailLen;
+      ctx.strokeStyle = fwColor;
+      ctx.lineWidth = Math.max(1.5, p.size * 0.55);
+      ctx.lineCap = 'round';
+      ctx.shadowColor = fwColor;
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(px, py);
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(px, py, p.size * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+    } else if (type === 'fog') {
       const grad = ctx.createRadialGradient(px, py, 0, px, py, p.size);
-      grad.addColorStop(0, 'rgba(226, 232, 240, 0.4)');
-      grad.addColorStop(1, 'rgba(226, 232, 240, 0)');
+      grad.addColorStop(0, 'rgba(148, 163, 184, 0.35)');
+      grad.addColorStop(1, 'rgba(148, 163, 184, 0)');
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(px, py, p.size, 0, Math.PI * 2);
@@ -29807,7 +30248,7 @@ function renderCustomizerDustSimulation(panOffset = 0) {
       ctx.fillStyle = color;
       if (p.glow) {
         ctx.shadowColor = color;
-        ctx.shadowBlur = (type === 'stars') ? 10 : 6;
+        ctx.shadowBlur = 6;
       }
       ctx.fill();
     }
@@ -30403,82 +30844,65 @@ function initDocDirectCanvasEditing() {
       lineEl.style.opacity = '1.0';
     };
 
-    // Support Click or Drag to Highlight
-    let dragStartX = 0;
-    let isDraggingText = false;
+    // Support Simple Click on Sentence to Snap Highlight (Dragging is handled by stageMarqueeEl)
+    let clickStartX = 0;
+    let clickStartY = 0;
 
     lineEl.onpointerdown = (downEv) => {
-      dragStartX = downEv.clientX;
-      isDraggingText = false;
+      clickStartX = downEv.clientX;
+      clickStartY = downEv.clientY;
+    };
 
-      const onPointerMoveText = (moveEv) => {
-        if (Math.abs(moveEv.clientX - dragStartX) > 12) {
-          isDraggingText = true;
-        }
-      };
+    lineEl.onclick = (clickEv) => {
+      // If user dragged more than 8px, let the stage marquee tracer handle it instead!
+      if (Math.hypot(clickEv.clientX - clickStartX, clickEv.clientY - clickStartY) > 8) {
+        return;
+      }
+      clickEv.stopPropagation();
 
-      const onPointerUpText = (upEv) => {
-        window.removeEventListener('pointermove', onPointerMoveText);
-        window.removeEventListener('pointerup', onPointerUpText);
+      const lineId = lineEl.getAttribute('data-line-id');
+      const docLines = getActiveDocLines();
+      const targetLine = docLines.find(l => l.id === lineId);
+      if (!targetLine) return;
 
-        const lineId = lineEl.getAttribute('data-line-id');
-        const docLines = getActiveDocLines();
-        const targetLine = docLines.find(l => l.id === lineId);
-        if (!targetLine) return;
+      if (!Array.isArray(topCustomizerState.docHighlights)) topCustomizerState.docHighlights = [];
 
-        const stageW = stageInner.clientWidth || 800;
-        let hlX = targetLine.normX;
-        let hlW = targetLine.normW;
-
-        if (isDraggingText) {
-          // Compute custom dragged span on this line
-          const startNorm = Math.min(dragStartX, upEv.clientX) / stageW;
-          const endNorm = Math.max(dragStartX, upEv.clientX) / stageW;
-          hlX = Math.max(targetLine.normX, parseFloat(startNorm.toFixed(3)));
-          hlW = Math.max(0.06, Math.min(targetLine.normW, parseFloat((endNorm - startNorm).toFixed(3))));
-        }
-
-        if (!topCustomizerState.docHighlights) topCustomizerState.docHighlights = [];
-
-        // Check if this line is already highlighted
-        const existingIdx = topCustomizerState.docHighlights.findIndex(h => Math.abs(h.y - targetLine.normY) < 0.025);
-        if (existingIdx !== -1 && !isDraggingText) {
-          topCustomizerState.selectedDocTarget = 'highlight';
-          topCustomizerState.selectedDocHlIdx = existingIdx;
-          updateDocTfBoxPosition();
-          showTextTimingAlert(`Selected Line #${existingIdx + 1}`, 'info');
-          setTimeout(() => showTextTimingAlert(''), 1500);
-          return;
-        }
-
-        const nextIdx = (existingIdx !== -1 && isDraggingText) ? existingIdx : topCustomizerState.docHighlights.length;
-        const newHl = {
-          x: hlX,
-          y: targetLine.normY,
-          w: hlW,
-          h: targetLine.normH,
-          color: '#fef08a',
-          startTime: 0.3 + (nextIdx * 0.7),
-          duration: topCustomizerState.docSweepSpeed || 0.8,
-          label: `Line ${nextIdx + 1}`
-        };
-
-        if (existingIdx !== -1 && isDraggingText) {
-          topCustomizerState.docHighlights[existingIdx] = newHl;
-        } else {
-          topCustomizerState.docHighlights.push(newHl);
-        }
-
+      // Check if this line is already highlighted
+      const existingIdx = topCustomizerState.docHighlights.findIndex(h => Math.abs(h.y - targetLine.normY) < 0.025);
+      if (existingIdx !== -1) {
         topCustomizerState.selectedDocTarget = 'highlight';
-        topCustomizerState.selectedDocHlIdx = nextIdx;
+        topCustomizerState.selectedDocHlIdx = existingIdx;
         syncTopTemplateDocHighlighterUI();
-        renderTopTemplatePreviewStage();
-        showTextTimingAlert(isDraggingText ? `Created custom highlight span (${(hlW * 100).toFixed(0)}% width)` : `Snapped highlight line #${nextIdx + 1}`, 'success');
-        setTimeout(() => showTextTimingAlert(''), 2000);
+        updateDocTfBoxPosition();
+        showTextTimingAlert(`Selected Line #${existingIdx + 1}`, 'info');
+        setTimeout(() => showTextTimingAlert(''), 1500);
+        return;
+      }
+
+      const nextIdx = topCustomizerState.docHighlights.length;
+      const newHl = {
+        x: targetLine.normX,
+        y: targetLine.normY,
+        w: targetLine.normW,
+        h: targetLine.normH,
+        color: '#fef08a',
+        startTime: 0.3 + (nextIdx * 0.7),
+        duration: topCustomizerState.docSweepSpeed || 0.8,
+        label: `Line ${nextIdx + 1}`
       };
 
-      window.addEventListener('pointermove', onPointerMoveText);
-      window.addEventListener('pointerup', onPointerUpText);
+      topCustomizerState.docHighlights.push(newHl);
+      topCustomizerState.selectedDocTarget = 'highlight';
+      topCustomizerState.selectedDocHlIdx = nextIdx;
+      syncTopTemplateDocHighlighterUI();
+      renderTopTemplatePreviewStage();
+      setTimeout(() => {
+        if (typeof initDocDirectCanvasEditing === 'function') initDocDirectCanvasEditing();
+        const box = document.getElementById('doc-direct-transform-box');
+        if (box) box.style.display = 'block';
+      }, 50);
+      showTextTimingAlert(`Snapped highlight Line #${nextIdx + 1}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
     };
   });
 
@@ -30640,14 +31064,144 @@ function initDocDirectCanvasEditing() {
     };
   }
 
-  // Dismiss toolbar & transform box when tapping empty stage background
-  stageInner.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('#doc-direct-transform-box') || e.target.closest('#doc-floating-highlight-toolbar') || e.target.closest('.doc-snappable-line') || e.target.closest('.doc-interactive-hl') || e.target.closest('.doc-interactive-redact') || e.target.closest('button')) {
+  // 7. Direct Stage Drag-to-Highlight / Tracing Marquee
+  // Enables drawing/tracing a highlight box anywhere across text or document image!
+  let stageMarqueeEl = document.getElementById('doc-stage-drag-marquee');
+  if (!stageMarqueeEl) {
+    stageMarqueeEl = document.createElement('div');
+    stageMarqueeEl.id = 'doc-stage-drag-marquee';
+    stageMarqueeEl.style.cssText = 'position: absolute; display: none; border: 2px dashed #facc15; background: rgba(254, 240, 138, 0.35); pointer-events: none; z-index: 50; border-radius: 4px; box-shadow: 0 0 10px rgba(250,204,21,0.5);';
+    stageInner.appendChild(stageMarqueeEl);
+  }
+
+  let isTracingStage = false;
+  let traceStartClientX = 0;
+  let traceStartClientY = 0;
+
+  stageInner.onpointerdown = (e) => {
+    // If clicking transform box, handles, toolbar, or interactive form controls, skip
+    if (e.target.closest('#doc-direct-transform-box') || e.target.closest('#doc-floating-highlight-toolbar') || e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
       return;
     }
-    if (toolbar) toolbar.style.display = 'none';
-    if (tfBox) tfBox.style.display = 'none';
-  });
+    // If in 3D Mode, let 3D orbit handler take precedence unless user explicitly tapped "Select Text"
+    if (topCustomizerState.is3DMode && !topCustomizerState.isDrawingTextMode) {
+      return;
+    }
+
+    const zoomWrap = document.getElementById('customizer-doc-zoom-wrap') || stageInner;
+    const wrapRect = zoomWrap.getBoundingClientRect();
+    if (e.clientX < wrapRect.left || e.clientX > wrapRect.right || e.clientY < wrapRect.top || e.clientY > wrapRect.bottom) {
+      if (toolbar) toolbar.style.display = 'none';
+      if (tfBox) tfBox.style.display = 'none';
+      return;
+    }
+
+    traceStartClientX = e.clientX;
+    traceStartClientY = e.clientY;
+    isTracingStage = false;
+
+    const onPointerMoveStage = (me) => {
+      const dist = Math.hypot(me.clientX - traceStartClientX, me.clientY - traceStartClientY);
+      if (dist > 8) {
+        isTracingStage = true;
+        const stageRect = stageInner.getBoundingClientRect();
+        const minX = Math.min(traceStartClientX, me.clientX) - stageRect.left;
+        const minY = Math.min(traceStartClientY, me.clientY) - stageRect.top;
+        const w = Math.abs(me.clientX - traceStartClientX);
+        const h = Math.abs(me.clientY - traceStartClientY);
+
+        stageMarqueeEl.style.display = 'block';
+        stageMarqueeEl.style.left = `${minX}px`;
+        stageMarqueeEl.style.top = `${minY}px`;
+        stageMarqueeEl.style.width = `${w}px`;
+        stageMarqueeEl.style.height = `${h}px`;
+      }
+    };
+
+    const onPointerUpStage = (ue) => {
+      window.removeEventListener('pointermove', onPointerMoveStage);
+      window.removeEventListener('pointerup', onPointerUpStage);
+      stageMarqueeEl.style.display = 'none';
+
+      if (!isTracingStage) {
+        // Simple tap: check if tapped directly on a snappable line or highlight
+        if (ue.target.closest('.doc-snappable-line') || ue.target.closest('.doc-interactive-hl') || ue.target.closest('.doc-interactive-redact')) {
+          return;
+        }
+        // Tapped empty area: dismiss toolbar and transform box
+        if (toolbar) toolbar.style.display = 'none';
+        if (tfBox) tfBox.style.display = 'none';
+        return;
+      }
+
+      // User traced a box across the document!
+      const currentZoomWrap = document.getElementById('customizer-doc-zoom-wrap') || stageInner;
+      const wrapR = currentZoomWrap.getBoundingClientRect();
+      const leftNorm = Math.max(0.02, (Math.min(traceStartClientX, ue.clientX) - wrapR.left) / wrapR.width);
+      const rightNorm = Math.min(0.98, (Math.max(traceStartClientX, ue.clientX) - wrapR.left) / wrapR.width);
+      const topNorm = Math.max(0.05, (Math.min(traceStartClientY, ue.clientY) - wrapR.top) / wrapR.height);
+      const bottomNorm = Math.min(0.95, (Math.max(traceStartClientY, ue.clientY) - wrapR.top) / wrapR.height);
+      const centerNormY = (topNorm + bottomNorm) / 2;
+      const tracedW = Math.max(0.05, rightNorm - leftNorm);
+
+      const docLines = getActiveDocLines();
+      // Find closest document line vertically within reasonable distance
+      let closestLine = null;
+      let minLineDist = Infinity;
+      docLines.forEach(l => {
+        const d = Math.abs(l.normY - centerNormY);
+        if (d < minLineDist) {
+          minLineDist = d;
+          closestLine = l;
+        }
+      });
+
+      if (!Array.isArray(topCustomizerState.docHighlights)) topCustomizerState.docHighlights = [];
+      const nextIdx = topCustomizerState.docHighlights.length;
+
+      let hlX = parseFloat(leftNorm.toFixed(3));
+      let hlY = parseFloat(topNorm.toFixed(3));
+      let hlW = parseFloat(tracedW.toFixed(3));
+      let hlH = parseFloat((bottomNorm - topNorm).toFixed(3));
+
+      // If close to a document line (within 7.5% vertical distance), snap vertically to the line height and baseline while keeping the user's exact dragged horizontal span
+      if (closestLine && minLineDist < 0.075) {
+        hlY = closestLine.normY;
+        hlH = closestLine.normH;
+      } else {
+        hlH = Math.max(0.032, Math.min(0.08, hlH));
+      }
+
+      const newHl = {
+        x: hlX,
+        y: hlY,
+        w: hlW,
+        h: hlH,
+        color: '#fef08a',
+        startTime: 0.3 + (nextIdx * 0.7),
+        duration: topCustomizerState.docSweepSpeed || 0.8,
+        label: `Line ${nextIdx + 1}`
+      };
+
+      topCustomizerState.docHighlights.push(newHl);
+      topCustomizerState.selectedDocTarget = 'highlight';
+      topCustomizerState.selectedDocHlIdx = nextIdx;
+      topCustomizerState.isDrawingTextMode = false;
+
+      syncTopTemplateDocHighlighterUI();
+      renderTopTemplatePreviewStage();
+      setTimeout(() => {
+        if (typeof initDocDirectCanvasEditing === 'function') initDocDirectCanvasEditing();
+        const activeTfBox = document.getElementById('doc-direct-transform-box');
+        if (activeTfBox) activeTfBox.style.display = 'block';
+      }, 50);
+      showTextTimingAlert(`Traced & highlighted Line #${nextIdx + 1}`, 'success');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    };
+
+    window.addEventListener('pointermove', onPointerMoveStage);
+    window.addEventListener('pointerup', onPointerUpStage);
+  };
 
   // Re-show toolbar & transform box whenever clicking anywhere on the highlight box
   tfBox.addEventListener('click', (e) => {
@@ -30677,7 +31231,7 @@ function initDoc3DModeControls() {
       dot.style.boxShadow = is3D ? '0 0 10px #2effc6' : '0 0 8px #a855f7';
     }
     const lbl = document.getElementById('label-3d-mode');
-    if (lbl) lbl.textContent = is3D ? '3D EDIT: ON (DRAG TO ROTATE)' : '3D EDIT MODE';
+    if (lbl) lbl.textContent = is3D ? '3D EDIT: ON (HOVER TO TILT)' : '3D EDIT MODE';
   };
 
   update3DUI();
@@ -30685,20 +31239,34 @@ function initDoc3DModeControls() {
   btn3D.onclick = () => {
     topCustomizerState.is3DMode = !topCustomizerState.is3DMode;
     update3DUI();
+    syncTopTemplateDocHighlighterUI();
     renderTopTemplatePreviewStage();
-    showTextTimingAlert(topCustomizerState.is3DMode ? '3D Interactive Mode ON: Drag canvas to tilt document' : '3D Interactive Mode OFF', 'info');
+    showTextTimingAlert(topCustomizerState.is3DMode ? '3D Interactive Mode ON: Hover mouse across canvas to tilt' : '3D Interactive Mode OFF', 'info');
     setTimeout(() => showTextTimingAlert(''), 2000);
   };
 
-  // Interactive 3D Orbit Dragging on Stage
+  // Hover-to-Tilt 3D Tracking: User just hovers mouse without needing to click-drag!
+  stageInner.addEventListener('pointermove', (e) => {
+    if (!topCustomizerState.is3DMode || topCustomizerState.isDrawingTextMode || isOrbiting) return;
+    const rect = stageInner.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const normX = ((e.clientX - rect.left) / rect.width) - 0.5; // -0.5 to +0.5
+    const normY = ((e.clientY - rect.top) / rect.height) - 0.5; // -0.5 to +0.5
+
+    // Smooth responsive tilt mapping: horizontal moves tilt Y angle, vertical moves tilt X angle
+    topCustomizerState.doc3DAngleY = parseFloat((normX * 36).toFixed(2));
+    topCustomizerState.doc3DAngleX = parseFloat((-normY * 28).toFixed(2));
+  });
+
+  // Interactive 3D Orbit Dragging on Stage (also retained for users who want to click-drag)
   let isOrbiting = false;
   let startX = 0;
   let startY = 0;
   let initialAngleX = topCustomizerState.doc3DAngleX || 15;
   let initialAngleY = topCustomizerState.doc3DAngleY || -14;
 
-  stageInner.onpointerdown = (e) => {
-    if (!topCustomizerState.is3DMode) return;
+  stageInner.addEventListener('pointerdown', (e) => {
+    if (!topCustomizerState.is3DMode || topCustomizerState.isDrawingTextMode) return;
     if (e.target.closest('#doc-direct-transform-box') || e.target.closest('#doc-floating-highlight-toolbar') || e.target.closest('button')) return;
     isOrbiting = true;
     startX = e.clientX;
@@ -30722,7 +31290,7 @@ function initDoc3DModeControls() {
 
     window.addEventListener('pointermove', onPointerMoveOrbit);
     window.addEventListener('pointerup', onPointerUpOrbit);
-  };
+  });
 }
 
 function initDocFullscreenToggle() {
@@ -30756,9 +31324,27 @@ function initDocFullscreenToggle() {
 }
 
 function toggleDocTextSelection() {
+  topCustomizerState.isDrawingTextMode = !topCustomizerState.isDrawingTextMode;
+  const stageInner = document.getElementById('customizer-stage-inner');
+  const btnTrace = document.getElementById('btn-tpl-modal-edit-cutout');
+  if (topCustomizerState.isDrawingTextMode) {
+    if (stageInner) stageInner.style.cursor = 'crosshair';
+    if (btnTrace) {
+      btnTrace.style.background = 'rgba(250, 204, 21, 0.4)';
+      btnTrace.style.borderColor = '#facc15';
+      btnTrace.style.color = '#fff';
+    }
+    showTextTimingAlert('Box Draw Mode ACTIVE: Click and drag anywhere across the document to draw a highlight box', 'success');
+  } else {
+    if (stageInner) stageInner.style.cursor = 'default';
+    if (btnTrace) {
+      btnTrace.style.background = 'rgba(250, 204, 21, 0.15)';
+      btnTrace.style.borderColor = 'rgba(250, 204, 21, 0.4)';
+      btnTrace.style.color = '#fef08a';
+    }
+    showTextTimingAlert('Box Draw Mode OFF. Click sentences or lines to highlight.', 'info');
+  }
   if (typeof initDocDirectCanvasEditing === 'function') initDocDirectCanvasEditing();
-  showTextTimingAlert('Click any sentence to snap a highlight, or drag handles to shorten', 'info');
-  setTimeout(() => showTextTimingAlert(''), 3000);
 }
 
 function initCustomArticleBuilder() {
@@ -31125,8 +31711,8 @@ function bindTopTemplateCustomizerEvents() {
     if (typeof initDustParticles === 'function') initDustParticles();
   });
 
-  // Granular Particle Preset Switchers (Dust, Snow, Stars, Fog)
-  const particleTypes = ['dust', 'snow', 'stars', 'fog'];
+  // Granular Particle Preset Switchers (Dust, Snow, Stars, Fog, Birds, Leaves, Fire, Fireworks)
+  const particleTypes = ['dust', 'snow', 'stars', 'fog', 'birds', 'leaves', 'fire', 'fireworks'];
   particleTypes.forEach(pt => {
     const btn = document.getElementById(`btn-particle-${pt}`) || document.getElementById(`btn-part-${pt}`);
     if (btn) {
@@ -44440,48 +45026,8 @@ function attachCutoutEditorTriggers() {
 }
 
 function attachModalDocHighlighterListeners() {
-  // "+ Add Line" button in template customizer modal: Smart-snaps to next unhighlighted sentence
-  document.getElementById('btn-tpl-modal-add-hl-line')?.addEventListener('click', () => {
-    if (!topCustomizerState.docHighlights) topCustomizerState.docHighlights = [];
-    const idx = topCustomizerState.docHighlights.length;
-    const docLines = getActiveDocLines();
+  // "+ Add Line" button listener is handled in syncTopTemplateDocHighlighterUI()
 
-    // Find the next line from the document that is not already covered by a highlight
-    let nextTargetLine = docLines.find(l => {
-      return !topCustomizerState.docHighlights.some(h => Math.abs(h.y - l.normY) < 0.025);
-    });
-
-    // If all predefined lines are covered or custom image without text lines, place directly below the last highlight
-    if (!nextTargetLine) {
-      const lastHl = topCustomizerState.docHighlights[idx - 1];
-      const newY = lastHl ? Math.min(0.85, lastHl.y + (lastHl.h || 0.038) + 0.015) : 0.265;
-      nextTargetLine = {
-        normX: lastHl ? lastHl.x : 0.125,
-        normY: newY,
-        normW: lastHl ? lastHl.w : 0.515,
-        normH: 0.038,
-        text: `Line ${idx + 1}`
-      };
-    }
-
-    topCustomizerState.docHighlights.push({
-      x: nextTargetLine.normX,
-      y: nextTargetLine.normY,
-      w: nextTargetLine.normW,
-      h: nextTargetLine.normH,
-      color: '#ffff00',
-      startTime: 0.3 + (idx * 0.7),
-      duration: topCustomizerState.docSweepSpeed || 0.8,
-      label: `Line ${idx + 1}`
-    });
-
-    topCustomizerState.selectedDocTarget = 'highlight';
-    topCustomizerState.selectedDocHlIdx = idx;
-    syncTopTemplateDocHighlighterUI();
-    renderTopTemplatePreviewStage();
-    showTextTimingAlert(`Added Line ${idx + 1}: Snapped to "${(nextTargetLine.text || '').slice(0, 30)}..."`, 'success');
-    setTimeout(() => showTextTimingAlert(''), 2000);
-  });
 
   // Marker sweep speed slider
   document.getElementById('tpl-modal-slider-hl-speed')?.addEventListener('input', (e) => {

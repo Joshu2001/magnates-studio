@@ -7430,10 +7430,17 @@
 
           <!-- Section: Document Highlighting & Focus (for Document / Forbes Templates) -->
           <div id="tpl-modal-wrap-doc-highlighter" style="display: none; flex-direction: column; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 10.5px; font-weight: 700; color: #facc15; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 5px;">
-                <span>🖍️</span> Document Highlighting
-              </span>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 10.5px; font-weight: 700; color: #facc15; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 5px;">
+                  <span>🖍️</span> Document Highlighting
+                </span>
+                <!-- Video / 3D Mode Switcher -->
+                <div id="doc-mode-switcher-wrap" style="display: flex; gap: 2px; background: rgba(18,19,28,0.9); padding: 2px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);">
+                  <button type="button" id="btn-doc-mode-video" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: rgba(168,85,247,0.35); color: #fff; transition: all 0.2s;" title="Flat Video Playback View">▶ Video</button>
+                  <button type="button" id="btn-doc-mode-3d" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: #94a3b8; transition: all 0.2s;" title="Cinematic 3D Tilt & Orbit View">⬡ 3D</button>
+                </div>
+              </div>
               <div style="display: flex; align-items: center; gap: 4px;">
                 <button type="button" id="btn-tpl-modal-edit-article-text" style="font-size: 9.5px; font-weight: 700; padding: 3px 8px; border-radius: 5px; background: rgba(56,189,248,0.18); border: 1.5px solid #38bdf8; color: #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 0 10px rgba(56,189,248,0.25);" title="Type custom article text in real time with live screen updates">
                   <span>✍️</span> Type Article
@@ -7591,14 +7598,17 @@
                 <span id="tpl-modal-val-filter-name" style="font-size: 9px; color: #94a3b8; font-family: monospace;">Original</span>
               </div>
               <select id="tpl-modal-select-filter" style="width: 100%; background: #161926; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #e2e8f0; font-size: 10.5px; font-weight: 600; outline: none; cursor: pointer;">
-                <option value="none">Original (No Filter)</option>
-                <option value="vintage_70s">Vintage Paper / Archival</option>
-                <option value="noir">1940s Noir / High Contrast B&amp;W</option>
-                <option value="warm_kodak">Warm Kodak Tone</option>
-                <option value="nordic_chill">Nordic Mist / Cool Forensic</option>
-                <option value="teal_orange">Teal &amp; Orange Cinema</option>
-                <option value="bright">Clean High Key / Bright</option>
-                <option value="mexico">Amber Golden Hour</option>
+                <option value="none">Original (Clean White)</option>
+                <option value="vintage_70s">📜 Old Archival Paper Grain &amp; Tone</option>
+                <option value="film_grain_borders">🎞️ 16mm Film Grain &amp; Grunge Borders</option>
+                <option value="burnt_edges">🔥 Burnt Edges &amp; Sepia Vignette</option>
+                <option value="newspaper_halftone">📰 Newspaper Halftone &amp; Print Noise</option>
+                <option value="noir">🕶️ 1940s Noir / High Contrast B&amp;W</option>
+                <option value="warm_kodak">📷 Warm Kodak Tone</option>
+                <option value="nordic_chill">❄️ Nordic Mist / Cool Forensic</option>
+                <option value="teal_orange">🎬 Teal &amp; Orange Cinema</option>
+                <option value="bright">✨ Clean High Key / Bright</option>
+                <option value="mexico">🌅 Amber Golden Hour</option>
               </select>
             </div>
 
@@ -7756,12 +7766,16 @@
               <span style="font-size: 9px; color: #f59e0b; font-family: monospace; font-weight: 700;">GRANULAR VFX</span>
             </div>
 
-            <!-- Particle Presets: Dust, Snow, Stars, Fog -->
+            <!-- Particle Presets: Dust, Snow, Stars, Fog, Birds, Leaves, Fire, Fireworks -->
             <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
               <button type="button" id="btn-particle-dust" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(245,158,11,0.5); background: rgba(245,158,11,0.2); color: #fef08a; cursor: pointer;">Dust</button>
               <button type="button" id="btn-particle-snow" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;">Snow</button>
               <button type="button" id="btn-particle-stars" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;">Stars</button>
               <button type="button" id="btn-particle-fog" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;">Fog</button>
+              <button type="button" id="btn-particle-birds" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;" title="Flock of cinematic silhouette birds flying across the scene">Birds</button>
+              <button type="button" id="btn-particle-leaves" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;" title="Autumn leaves swaying and tumbling down">Leaves</button>
+              <button type="button" id="btn-particle-fire" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;" title="Rising glowing fire embers and sparkles">Fire</button>
+              <button type="button" id="btn-particle-fireworks" class="btn-particle-opt" style="padding: 4px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #94a3b8; cursor: pointer;" title="Sparkling festive fireworks burst particles">Fireworks</button>
             </div>
 
             <!-- Particle Controls -->
@@ -7842,6 +7856,14 @@
 
         </div>
 
+      </div>
+
+      <!-- Layer Right-Click Context Menu -->
+      <div id="tpl-layer-context-menu" style="display: none; position: fixed; z-index: 100050; background: #0f131f; border: 1px solid rgba(168,85,247,0.45); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.85); padding: 4px; min-width: 140px; backdrop-filter: blur(12px);">
+        <button type="button" id="btn-ctx-duplicate-layer" style="width: 100%; display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: transparent; border: none; border-radius: 6px; color: #f8fafc; font-size: 11px; font-weight: 600; cursor: pointer; text-align: left; transition: background 0.15s;" onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='transparent'">
+          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: #c084fc; stroke-width: 2;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span>Duplicate Layer</span>
+        </button>
       </div>
 
       <!-- Modal Floating Stage Context Menu -->
@@ -10528,8 +10550,8 @@
 
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
-  <script src="js/app.js?v=318"></script>
-<script src="js/tpl-snapshots.js"></script>
-<script src="js/tpl-3d-inspector.js?v=2"></script>
+  <script src="js/app.js?v=321"></script>
+<script src="js/tpl-snapshots.js?v=2"></script>
+<script src="js/tpl-3d-inspector.js?v=5"></script>
 </body>
 </html>
