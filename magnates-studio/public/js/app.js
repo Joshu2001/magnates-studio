@@ -28392,6 +28392,8 @@ function renderTopTemplatePreviewStage() {
         ${textBehindHtml}
         <!-- Under-paper intense ambient crease & drop shadow layer -->
         <div id="customizer-live-rip-shadow" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.2)}px rgba(0,0,0,0.95)) drop-shadow(0 4px 10px rgba(0,0,0,0.8));">
+          <!-- Exposed paper-fiber rim follows the same tear path as the top layer -->
+          <div id="customizer-live-rip-border" style="position: absolute; inset: 0; overflow: hidden; background: ${topCustomizerState.tearBorderColor || '#f8fafc'}; opacity: ${topCustomizerState.tearBorderEnabled !== false ? 1 : 0};"></div>
           <!-- Main Torn Paper Layer -->
           <div id="customizer-live-rip" style="position: absolute; inset: 0; overflow: hidden; opacity: ${currentOpacity};">
             <img id="customizer-live-fg" src="${prim}" alt="Top Paper / Cloth" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.92) contrast(1.22);" />
@@ -33115,8 +33117,8 @@ function startSidebarTemplateHover(cardEl, tpl) {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
           <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover;" />
-          <div style="position: absolute; inset: 0; border-bottom: 2px solid #fef08a; animation: sidecardRip 1.6s ease-in-out infinite alternate;">
-            <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div id="fx-rip-${tplId}" style="position: absolute; inset: 0; overflow: hidden; background: #fef08a; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)); animation: sidecardRip 1.6s ease-in-out infinite alternate;">
+            <img src="${tpl.defaultImage}" alt="Torn paper preview" style="position: absolute; inset: 0 0 2px 0; width: 100%; height: calc(100% - 2px); object-fit: cover;" />
           </div>
         </div>
       `;
