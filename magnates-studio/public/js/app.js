@@ -23756,28 +23756,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>
       `;
     } else if (tplId === 'paper-rip-shred') {
-    const shadowPx = topCustomizerState.tearShadowDepth ?? 24;
-    stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
-        <!-- Revealed Media / Footage -->
-        <img id="customizer-live-bg-rev" src="${sec}" alt="Revealed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
-        ${textBehindHtml}
-        
-        <!-- Top Torn Paper Layer with Integrated Frayed White Cellulose Lip & Ambient Drop Shadow -->
-        <div id="customizer-live-rip-wrap" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.1)}px rgba(0,0,0,0.92)) drop-shadow(0 3px 6px rgba(0,0,0,0.85));">
-          
-          <!-- White cellulose fiber rim (the exposed rough paper core) -->
-          <div id="customizer-live-rip-border" style="position: absolute; inset: 0; overflow: hidden; background: ${topCustomizerState.tearBorderColor || '#f8fafc'}; opacity: ${topCustomizerState.tearBorderEnabled !== false ? 1 : 0};">
+      fxContainer.innerHTML = `
+        <div style="position:absolute;inset:0;overflow:hidden;background:#08090e;perspective:900px;">
+          <img src="${tpl.secondaryImage || tpl.defaultImage}" alt="Revealed footage" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+          <div id="fx-rip-border-${tplId}" style="position:absolute;inset:0;overflow:hidden;background:#fef08a;clip-path:polygon(0 0,100% 0,100% 14%,0 22%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.8));">
+            <div id="fx-rip-${tplId}" style="position:absolute;inset:0;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 12%,0 20%);">
+              <img src="${tpl.defaultImage}" alt="Torn paper layer" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+            </div>
           </div>
-
-          <!-- Main Top Paper Layer slightly offset to reveal the 2px fiber core -->
-          <div id="customizer-live-rip" style="position: absolute; inset: 0; overflow: hidden; opacity: ${currentOpacity};">
-            <img id="customizer-live-fg" src="${prim}" alt="Top Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.95) contrast(1.18);" />
-          </div>
-
+          <div style="position:absolute;right:7px;top:7px;padding:2px 6px;border-radius:4px;background:rgba(15,23,42,.85);color:#fef08a;font-size:8px;font-weight:800;letter-spacing:.06em;">PAPER RIP</div>
         </div>
-      </div>
-    `;
+      `;
     } else if (tplId === 'gold-frame-spin') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #0a0806; display: flex; align-items: center; justify-content: center; padding: 16px; overflow: hidden;">
@@ -25047,8 +25036,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const ripProgress = (Math.sin(t * 3) + 1) / 2;
       const clipPathAngle = 100 - ripProgress * 100;
       const ripEl = fxContainer?.querySelector(`#fx-rip-${tplId}`);
+      const rimEl = fxContainer?.querySelector(`#fx-rip-border-${tplId}`);
       if (ripEl) {
         ripEl.style.clipPath = `polygon(0 0, 100% 0, 100% ${clipPathAngle}%, 0 ${Math.min(100, clipPathAngle + 12)}%)`;
+        if (rimEl) rimEl.style.clipPath = `polygon(0 0, 100% 0, 100% ${Math.min(100, clipPathAngle + 2)}%, 0 ${Math.min(100, clipPathAngle + 14)}%)`;
       }
     } else if (tplId === 'gold-frame-spin') {
       const rotateY = Math.sin(t * 2.5) * 22;
@@ -26628,6 +26619,31 @@ function openTopTemplateCustomizer(tpl) {
 
   const modal = document.getElementById('modal-top-template-customizer');
   if (!modal) return;
+
+  const paperModeSwitcher = document.getElementById('paper-rip-mode-switcher');
+  const paperModeVideo = document.getElementById('btn-paper-rip-mode-video');
+  const paperMode3D = document.getElementById('btn-paper-rip-mode-3d');
+  if (paperModeSwitcher) paperModeSwitcher.style.display = tpl.id === 'paper-rip-shred' ? 'flex' : 'none';
+  const syncPaperModeButtons = () => {
+    const is3D = topCustomizerState.paperPreviewMode === '3d';
+    [[paperModeVideo, !is3D], [paperMode3D, is3D]].forEach(([button, active]) => {
+      if (!button) return;
+      button.style.background = active ? 'rgba(168,85,247,.35)' : 'transparent';
+      button.style.color = active ? '#fff' : '#94a3b8';
+      button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  };
+  if (paperModeVideo) paperModeVideo.onclick = () => {
+    topCustomizerState.paperPreviewMode = 'video';
+    syncPaperModeButtons();
+    renderTopTemplatePreviewStage();
+  };
+  if (paperMode3D) paperMode3D.onclick = () => {
+    topCustomizerState.paperPreviewMode = '3d';
+    syncPaperModeButtons();
+    renderTopTemplatePreviewStage();
+  };
+  syncPaperModeButtons();
 
   // 1. Populate Header info
   const titleEl = document.getElementById('tpl-modal-title');
@@ -28386,12 +28402,14 @@ function renderTopTemplatePreviewStage() {
     `;
   } else if (tplId === 'paper-rip-shred') {
     const shadowPx = topCustomizerState.tearShadowDepth ?? 28;
+    const paperIs3D = topCustomizerState.paperPreviewMode === '3d';
+    const paperPlaneTransform = paperIs3D ? 'perspective(1100px) rotateX(12deg) rotateY(-10deg) translateZ(24px) scale(.9)' : 'none';
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair;">
-        <img id="customizer-live-bg-rev" src="${sec}" alt="Revealed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.05);" />
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair; perspective: 1100px; transform-style: preserve-3d;">
+        <img id="customizer-live-bg-rev" src="${sec}" alt="Revealed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: ${paperIs3D ? 'translateZ(-28px) scale(1.12)' : 'scale(1.05)'}; transition: transform 500ms ease;" />
         ${textBehindHtml}
         <!-- Under-paper intense ambient crease & drop shadow layer -->
-        <div id="customizer-live-rip-shadow" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.2)}px rgba(0,0,0,0.95)) drop-shadow(0 4px 10px rgba(0,0,0,0.8));">
+        <div id="customizer-live-rip-shadow" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; transform: ${paperPlaneTransform}; transform-style: preserve-3d; transform-origin: center center; transition: transform 500ms ease; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.2)}px rgba(0,0,0,0.95)) drop-shadow(0 4px 10px rgba(0,0,0,0.8));">
           <!-- Exposed paper-fiber rim follows the same tear path as the top layer -->
           <div id="customizer-live-rip-border" style="position: absolute; inset: 0; overflow: hidden; background: ${topCustomizerState.tearBorderColor || '#f8fafc'}; opacity: ${topCustomizerState.tearBorderEnabled !== false ? 1 : 0};"></div>
           <!-- Main Torn Paper Layer -->
@@ -28400,7 +28418,7 @@ function renderTopTemplatePreviewStage() {
           </div>
         </div>
         <!-- SVG Overlay for Realistic Cellulose Fiber Edge & 3D Crease Highlight -->
-        <svg id="customizer-live-rip-svg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: ${subjectZ + 2}; overflow: visible;">
+        <svg id="customizer-live-rip-svg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: ${subjectZ + 2}; overflow: visible; transform: ${paperPlaneTransform}; transform-origin: center center; transition: transform 500ms ease;">
           <defs>
             <filter id="tear-fiber-glow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur" />
