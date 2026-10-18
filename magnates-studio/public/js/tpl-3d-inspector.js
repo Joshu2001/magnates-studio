@@ -34,7 +34,10 @@
     return false;
   };
   const kindOf = (id) => id === 'document-3d-fx-engine' ? 'doc' : (is3DSpatial(id) ? 'spatial' : (isBridged(id) ? 'generic' : null));
-  const has3D = (k, id) => k === 'spatial' || k === 'doc' || is3DSpatial(id);
+  // Business Storytelling / map templates also get the Video / 3D switch: the studio's
+  // generic CSS-3D stage transform gives them real depth (rotateX/rotateY + dolly zoom).
+  const BIZ_3D_IDS = (typeof BIZ_STORY_IDS !== 'undefined') ? new Set(BIZ_STORY_IDS) : new Set();
+  const has3D = (k, id) => k === 'spatial' || k === 'doc' || is3DSpatial(id) || BIZ_3D_IDS.has(id);
   const stOf = (k) => k === 'spatial' ? spatial3DState : document3DFXState;
 
   // ---------------------------------------------------------------- store
@@ -610,7 +613,67 @@
   }
 
   // ---------------------------------------------------------------- customizer stage hooks
+  // ---------------------------------------------------------------- biz 3D (CSS depth stage)
+  let biz3DTilt = { x: 0, y: 0 };
+  function mountBiz3D(stage, tplId) {
+    applyModeLayout(true);
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    const btpl = topCustomizerState.currentTpl;
+    const prim = (topCustomizerState.bgRemoved && topCustomizerState.cutoutCanvas)
+      ? topCustomizerState.cutoutCanvas.toDataURL() : (btpl && btpl.defaultImage);
+    const sec = topCustomizerState.secondaryUrl || (btpl && btpl.secondaryImage);
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position:absolute;inset:0;overflow:hidden;background:#04060c;">
+        <div class="biz3d-space" style="position:absolute;inset:-8%;perspective:1100px;perspective-origin:50% 42%;">
+          <div class="biz3d-plate" id="biz3d-plate-${tplId}"
+               style="position:absolute;inset:0;transform-style:preserve-3d;will-change:transform;box-shadow:0 40px 120px rgba(0,0,0,.75), 0 4px 24px rgba(124,92,255,.18);border-radius:6px;overflow:hidden;background:#05080f;">
+            <img id="default-img-${tplId}" src="${prim || ''}" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;" />
+            <div id="fx-container-${tplId}" style="position:absolute;inset:0;display:block;"></div>
+            <div class="biz3d-sheen"></div>
+            <div class="biz3d-floor"></div>
+          </div>
+        </div>
+      </div>`;
+    const plate = stage.querySelector('#biz3d-plate-' + tplId);
+    const fxc = stage.querySelector('#fx-container-' + tplId);
+    const view = Object.assign({}, btpl, { defaultImage: prim, secondaryImage: sec });
+    startTemplateHoverVideo(fxc, view, { t: 0, stage3D: true, fx: entry(tplId).fx });
+    const space = stage.querySelector('.biz3d-space');
+    space.addEventListener('mousemove', (ev) => {
+      const r = space.getBoundingClientRect();
+      biz3DTilt.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
+      biz3DTilt.y = ((ev.clientY - r.top) / r.height) * 2 - 1;
+    });
+    space.addEventListener('mouseleave', () => { biz3DTilt.x = 0; biz3DTilt.y = 0; });
+    ensureBiz3DDriver();
+    lastKey = ''; window.tpl3DSync(tplId);
+  }
+  // per-frame depth update for the biz 3D plate (called from the customizer RAF loop)
+  window.tpl3DBiz3DUpdate = function (tplId) {
+    const plate = document.getElementById('biz3d-plate-' + tplId);
+    if (!plate) return;
+    const e = entry(tplId); const fx = e.fx;
+    const yaw = (fx.yaw || 0) + biz3DTilt.x * 6;
+    const pitch = (fx.pitch || 0) - biz3DTilt.y * 4;
+    plate.style.transform = `rotateX(${pitch}deg) rotateY(${yaw}deg) rotateZ(${fx.roll || 0}deg) scale(${fx.zoom || 1}) translateZ(${((fx.zoom || 1) - 1) * 160}px)`;
+  };
+  // self-sustaining RAF driver while a biz template is open in 3D mode
+  let biz3DDriverOn = false;
+  function ensureBiz3DDriver() {
+    if (biz3DDriverOn) return; biz3DDriverOn = true;
+    (function tick() {
+      if (!curTpl || !BIZ_3D_IDS.has(curTpl) || entry(curTpl).mode !== '3d') { biz3DDriverOn = false; return; }
+      window.tpl3DBiz3DUpdate(curTpl);
+      requestAnimationFrame(tick);
+    })();
+  }
+
   function mount3D(stage, tplId) {
+    // Business Storytelling / map templates: keep the live CSS animation stage and give it
+    // real depth — perspective tilt (pitch/yaw/roll), dolly zoom, cinematic light sweep.
+    if (BIZ_3D_IDS.has(tplId)) { hoverBridgeActive = false; mountBiz3D(stage, tplId); return; }
     applyModeLayout(true);
     const k = kindOf(tplId), cid = k === 'spatial' ? 'spatial-threejs-container' : 'doc-threejs-container';
     stage.innerHTML = `<div id="customizer-stage-inner" style="position:absolute;inset:0;overflow:hidden;background:#07090e;"><div data-3d-stage="1" style="position:absolute;inset:0;cursor:grab;"></div></div>`;
