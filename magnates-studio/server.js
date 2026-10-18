@@ -45,6 +45,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(express.json({ limit: '100mb' }));
+// Never cache JS/CSS/HTML — prevents stale bundles hiding newly added templates
+app.use((req, res, next) => {
+  if (/\.(js|css|html)(\?|$)/.test(req.path)) {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/media/uploads', express.static(uploadsDir));
 app.use('/media/uploads/proxies', express.static(proxiesDir));

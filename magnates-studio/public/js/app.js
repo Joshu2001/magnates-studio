@@ -23755,6 +23755,32 @@ const EFFECT_TEMPLATES_DATA = [
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pyr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0f0f"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pyr)"/><text x="200" y="26" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" letter-spacing="2" text-anchor="middle">STRUCTURE UNSUSTAINABLE</text><polygon points="200,42 236,84 164,84" fill="#ffd23f"/><text x="200" y="72" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">FOUNDER</text><polygon points="150,96 250,96 268,128 132,128" fill="#ff8c42"/><text x="200" y="118" fill="#000" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">EARLY INVESTORS · +400%</text><polygon points="120,140 280,140 302,172 98,172" fill="#c1440e"/><text x="200" y="162" fill="#fff" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LATE ADOPTERS · BREAK-EVEN</text><polygon points="88,184 312,184 336,214 64,214" fill="#5a1e1e"/><text x="200" y="204" fill="#ff9d9d" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LAST 90% · TOTAL LOSS</text><path d="M 196 42 L 204 96 L 192 140 L 206 214" stroke="#000" stroke-width="3" fill="none" opacity="0.55"/></svg>`)}`
   },
   {
+    id: 'investigate-globe',
+    title: 'Investigative Globe (Johnny Harris Zoom)',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'JOHNNY HARRIS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Slowly rotating wireframe globe that zooms into a hotspot, drops a red pin and stamps a location label — the signature Johnny Harris "but here\'s where it gets crazy" map move.',
+    tags: ['Business Storytelling', 'Investigative Globe (Johnny Harris Zoom)', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#04070f"/><circle cx="170" cy="115" r="80" fill="#0a1226" stroke="#1e3a6e" stroke-width="1.5"/><g stroke="#1e3a6e" stroke-width="1" fill="none" opacity="0.8"><ellipse cx="170" cy="115" rx="80" ry="26"/><ellipse cx="170" cy="115" rx="80" ry="55"/><ellipse cx="170" cy="115" rx="28" ry="80"/><line x1="90" y1="115" x2="250" y2="115"/></g><path d="M 130 80 q 20 -12 40 -4 t 30 10 q -14 10 -34 6 t -36 -12z" fill="#16325c" opacity="0.9"/><path d="M 150 140 q 26 -8 44 4 t -10 20 q -26 4 -44 -8 z" fill="#16325c" opacity="0.9"/><circle cx="205" cy="98" r="4" fill="#ff4757"/><circle cx="205" cy="98" r="10" fill="none" stroke="#ff4757" stroke-width="1.5" opacity="0.6"/><text x="218" y="88" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="11">DUBAI</text><text x="218" y="101" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8">THE MONEY LANDS HERE →</text></svg>`)}`
+  },
+  {
+    id: 'world-map-flyover',
+    title: 'World Map Connection Flyover',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DOCUMENTARY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Flat dark world map where city dots light up one by one and great-circle arcs draw themselves between them — supply chains, trade routes, empire expansion.',
+    tags: ['Business Storytelling', 'World Map Connection Flyover', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 95 75 Q 150 20 215 55" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 215 55 Q 270 30 315 72" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 315 72 Q 250 120 155 152" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><circle cx="95" cy="75" r="5" fill="#ffd23f"/><circle cx="215" cy="55" r="5" fill="#ffd23f"/><circle cx="315" cy="72" r="5" fill="#ffd23f"/><circle cx="155" cy="152" r="6" fill="#00f0ff"/><text x="155" y="172" fill="#00f0ff" font-family="monospace" font-size="8" text-anchor="middle">SINGAPORE · FINAL ASSEMBLY</text><text x="200" y="20" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="10" letter-spacing="2" text-anchor="middle">GLOBAL SUPPLY CHAIN · 2026</text></svg>`)}`
+  },
+  {
     id: 'money-trail-map',
     title: 'Offshore Money Trail Map',
     category: 'Business Storytelling',
@@ -23766,6 +23792,71 @@ const EFFECT_TEMPLATES_DATA = [
     description: 'Dark world map with glowing dotted arcs hopping shell companies between tax havens until cash lands in one account. The follow-the-money sequence.',
     tags: ['Business Storytelling', 'Offshore Money Trail Map', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#060a14"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 90 80 Q 160 20 230 62" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 230 62 Q 290 40 320 92" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 320 92 Q 260 130 160 158" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><circle cx="90" cy="80" r="6" fill="#00f0ff"/><circle cx="230" cy="62" r="6" fill="#00f0ff"/><circle cx="320" cy="92" r="6" fill="#00f0ff"/><circle cx="160" cy="158" r="8" fill="#ffd23f"/><text x="90" y="66" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">DELIVERY CO.</text><text x="230" y="48" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">CAYMAN SHELL</text><text x="320" y="78" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">TRUST FUND</text><text x="160" y="180" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">PERSONAL ACCOUNT · $47M</text></svg>`)}`
+  },
+  {
+    id: 'country-morph-highlight',
+    title: 'Country Morph Highlight',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'JOHNNY HARRIS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Flat dot-map where one country floods red, detaches and lifts off the map with a drop shadow while everything else dims — the "this one place is the whole story" reveal.',
+    tags: ['Business Storytelling', 'Country Morph Highlight', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="245" cy="90" r="16"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757"/><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757" transform="translate(6,-14)" opacity="0.95"/><text x="215" y="150" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="13" text-anchor="middle">PANAMA</text><text x="215" y="166" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8" text-anchor="middle">0.1% OF LAND · 5% OF TRADE</text></svg>`)}`
+  },
+  {
+    id: 'zoomout-context-card',
+    title: 'Zoom-Out Context Card',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'JOHNNY HARRIS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Camera punches way out from a tiny pin to reveal the whole map, then stamps a stat card: "this tiny island controls X% of Y". The scale-reversal beat.',
+    tags: ['Business Storytelling', 'Zoom-Out Context Card', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#04070f"/><g fill="#12203a"><circle cx="90" cy="80" r="30"/><circle cx="140" cy="110" r="22"/><circle cx="230" cy="70" r="26"/><circle cx="300" cy="100" r="20"/><circle cx="180" cy="160" r="18"/></g><circle cx="238" cy="82" r="5" fill="#ff4757"/><rect x="252" y="52" width="132" height="60" rx="6" fill="rgba(4,7,15,0.9)" stroke="#ff4757" stroke-width="1.5"/><text x="318" y="76" fill="#ffd23f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="20" text-anchor="middle">72%</text><text x="318" y="94" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">OF GLOBAL SHIPPING REGISTRIES</text><text x="318" y="106" fill="rgba(255,255,255,0.45)" font-family="monospace" font-size="7" text-anchor="middle">POPULATION: 103,000</text></svg>`)}`
+  },
+  {
+    id: 'border-conflict-shading',
+    title: 'Border Conflict Shading',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'GEOPOLITICS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Two territories tint blue and red on a flat map, the disputed strip between them fills with hazard hatching and pulses, with a CLAIMED / DISPUTED legend.',
+    tags: ['Business Storytelling', 'Border Conflict Shading', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><pattern id="hatch-bc" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="8" stroke="#ffd23f" stroke-width="3"/></pattern></defs><rect width="400" height="225" fill="#05080f"/><path d="M 40 40 L 170 30 L 190 110 L 150 190 L 50 170 Z" fill="rgba(0,164,239,0.28)" stroke="#00a4ef" stroke-width="1.5"/><path d="M 230 34 L 360 44 L 350 176 L 250 196 L 226 116 Z" fill="rgba(255,71,87,0.28)" stroke="#ff4757" stroke-width="1.5"/><path d="M 170 30 L 230 34 L 226 116 L 190 110 Z" fill="url(#hatch-bc)" opacity="0.85"/><text x="105" y="115" fill="#00a4ef" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="12" text-anchor="middle">COUNTRY A</text><text x="295" y="115" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="12" text-anchor="middle">COUNTRY B</text><text x="200" y="20" fill="#ffd23f" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">DISPUTED CORRIDOR</text></svg>`)}`
+  },
+  {
+    id: 'sanctions-embargo-arrows',
+    title: 'Sanctions & Embargo Reroute',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'FORENSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'A direct trade route gets drawn in, slammed with a red BLOCKED ✕ stamp, then a longer smuggling reroute draws itself around the blockade. Sanctions-evasion storytelling.',
+    tags: ['Business Storytelling', 'Sanctions Embargo Arrows', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="110" r="26"/><circle cx="320" cy="110" r="26"/><circle cx="200" cy="60" r="18"/></g><path d="M 106 110 L 292 110" stroke="#00f0ff" stroke-width="3" stroke-dasharray="6 5" fill="none"/><g stroke="#ff4757" stroke-width="7" stroke-linecap="round"><line x1="186" y1="92" x2="214" y2="128"/><line x1="214" y1="92" x2="186" y2="128"/></g><text x="200" y="150" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">BLOCKED</text><path d="M 96 92 Q 150 30 210 44 T 306 90" stroke="#ffd23f" stroke-width="3" fill="none" marker-end="url(#arr-sx)"/><defs><marker id="arr-sx" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ffd23f"/></marker></defs><text x="200" y="24" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">REROUTED VIA DUBAI · +$14M/YR</text></svg>`)}`
+  },
+  {
+    id: 'timeline-scrubber-map',
+    title: 'Timeline Scrubber Map',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DOCUMENTARY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Empire territory spreads across a map as a big year counter scrubs forward (1990 → 2026) with an animated timeline handle — expansion, collapse or acquisition over time.',
+    tags: ['Business Storytelling', 'Timeline Scrubber Map', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><g fill="#7c5cff" opacity="0.85"><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="240" cy="60" r="18"/><circle cx="222" cy="78" r="14"/></g><text x="26" y="42" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="30">2018</text><text x="26" y="58" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8">PEAK EXPANSION</text><line x1="30" y1="200" x2="370" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="3"/><line x1="30" y1="200" x2="240" y2="200" stroke="#7c5cff" stroke-width="3"/><circle cx="240" cy="200" r="7" fill="#7c5cff" stroke="#fff" stroke-width="2"/><text x="30" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">1990</text><text x="345" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">2026</text></svg>`)}`
   },
   // === Business Storytelling suite (Magnates channel templates) ===
   {
@@ -24759,7 +24850,7 @@ function renderHomepageTemplates() {
 }
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
-const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map'];
+const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
 const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 let hoverBridgeActive = false;
 let hoverExternalT = null;
@@ -24835,6 +24926,69 @@ function bizStoryHoverMarkup(id) {
           <path class="mt-arc mt-a3" d="M 268 70 Q 200 115 90 128"/>
         </svg>
         <div class="mt-node mt-n1">DELIVERY CO.</div><div class="mt-node mt-n2">CAYMAN SHELL</div><div class="mt-node mt-n3">TRUST FUND</div><div class="mt-node mt-n4">PERSONAL ACCOUNT · $47M</div>`;
+    case 'investigate-globe':
+      return `<div class="jg-space"></div>
+        <div class="jg-stage"><div class="jg-globe">
+          <div class="jg-grat jg-grat-h"></div><div class="jg-grat jg-grat-h2"></div>
+          <div class="jg-grat jg-grat-v"></div><div class="jg-grat jg-grat-v2"></div>
+          <div class="jg-land jg-land-1"></div><div class="jg-land jg-land-2"></div>
+          <div class="jg-ping"></div>
+          <div class="jg-pin"><span></span></div>
+        </div></div>
+        <div class="jg-callout"><b>DUBAI</b><i>where the money actually lands</i></div>`;
+    case 'world-map-flyover':
+      return `<div class="wm-head">GLOBAL SUPPLY CHAIN · 2026</div>
+        <div class="wm-map">
+          <svg class="wm-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
+            <path class="wm-arc wm-w1" d="M 45 55 Q 110 8 178 48"/>
+            <path class="wm-arc wm-w2" d="M 178 48 Q 236 24 262 68"/>
+            <path class="wm-arc wm-w3" d="M 262 68 Q 200 112 92 126"/>
+          </svg>
+          <div class="wm-city wm-c1">NEW YORK</div><div class="wm-city wm-c2">ROTTERDAM</div><div class="wm-city wm-c3">SHENZHEN</div><div class="wm-city wm-c4 wm-final">SINGAPORE</div>
+        </div>`;
+    case 'country-morph-highlight':
+      return `<div class="cm-map">
+          <svg class="cm-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
+            <g fill="#12203a"><circle cx="55" cy="50" r="18"/><circle cx="90" cy="70" r="13"/><circle cx="205" cy="95" r="11"/><circle cx="255" cy="80" r="14"/><circle cx="120" cy="125" r="12"/></g>
+            <polygon class="cm-country" points="138,38 172,32 188,52 182,78 158,88 138,72"/>
+          </svg></div>
+        <div class="cm-label"><b>PANAMA</b><i>0.1% of land · 5% of global trade</i></div>`;
+    case 'zoomout-context-card':
+      return `<div class="zc-window"><div class="zc-map">
+          <div class="zc-blob zc-b1"></div><div class="zc-blob zc-b2"></div><div class="zc-blob zc-b3"></div><div class="zc-blob zc-b4"></div>
+          <div class="zc-pin"></div>
+        </div></div>
+        <div class="zc-card"><b>72%</b><span>OF GLOBAL SHIPPING REGISTRIES</span><i>population: 103,000</i></div>`;
+    case 'border-conflict-shading':
+      return `<div class="bc-map">
+          <svg class="bc-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
+            <defs><pattern id="hatchbc" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="0" y2="7" stroke="#ffd23f" stroke-width="2.5"/></pattern></defs>
+            <path class="bc-terr bc-ta" d="M 25 30 L 125 22 L 140 80 L 110 140 L 32 126 Z" fill="rgba(0,164,239,0.25)" stroke="#00a4ef" stroke-width="1.5"/>
+            <path class="bc-terr bc-tb" d="M 175 24 L 272 32 L 264 128 L 188 142 L 170 84 Z" fill="rgba(255,71,87,0.25)" stroke="#ff4757" stroke-width="1.5"/>
+            <path class="bc-strip" d="M 125 22 L 175 24 L 170 84 L 140 80 Z" fill="url(#hatchbc)"/>
+          </svg>
+          <div class="bc-name bc-na">COUNTRY A</div><div class="bc-name bc-nb">COUNTRY B</div>
+        </div>
+        <div class="bc-legend"><span class="bc-lg1">CLAIMED</span><span class="bc-lg2">DISPUTED CORRIDOR</span></div>`;
+    case 'sanctions-embargo-arrows':
+      return `<div class="sx-map">
+          <div class="sx-land sx-l1"></div><div class="sx-land sx-l2"></div><div class="sx-land sx-l3"></div>
+          <svg class="sx-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
+            <path class="sx-route sx-direct" d="M 55 90 L 245 90"/>
+            <path class="sx-route sx-reroute" d="M 60 74 Q 120 20 175 34 T 240 70"/>
+          </svg>
+          <div class="sx-x"><span></span><span></span></div>
+          <div class="sx-stamp">BLOCKED</div>
+          <div class="sx-note">REROUTED VIA DUBAI · +$14M/YR</div>
+        </div>`;
+    case 'timeline-scrubber-map':
+      return `<div class="tsm-year"><span class="tsm-y-a">1990</span><span class="tsm-y-b">1999</span><span class="tsm-y-c">2008</span><span class="tsm-y-d">2017</span><span class="tsm-y-e">2026</span></div>
+        <div class="tsm-map">
+          <div class="tsm-land tsm-base"></div>
+          <div class="tsm-empire tsm-e1"></div><div class="tsm-empire tsm-e2"></div><div class="tsm-empire tsm-e3"></div><div class="tsm-empire tsm-e4"></div>
+        </div>
+        <div class="tsm-bar"><div class="tsm-fill"></div><div class="tsm-handle"></div></div>
+        <div class="tsm-ticks"><span>1990</span><span>2000</span><span>2010</span><span>2026</span></div>`;
     default:
       return '';
   }
