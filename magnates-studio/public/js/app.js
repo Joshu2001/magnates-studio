@@ -23858,6 +23858,201 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Business Storytelling', 'Timeline Scrubber Map', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><g fill="#7c5cff" opacity="0.85"><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="240" cy="60" r="18"/><circle cx="222" cy="78" r="14"/></g><text x="26" y="42" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="30">2018</text><text x="26" y="58" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8">PEAK EXPANSION</text><line x1="30" y1="200" x2="370" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="3"/><line x1="30" y1="200" x2="240" y2="200" stroke="#7c5cff" stroke-width="3"/><circle cx="240" cy="200" r="7" fill="#7c5cff" stroke="#fff" stroke-width="2"/><text x="30" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">1990</text><text x="345" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">2026</text></svg>`)}`
   },
+  {
+    id: 'blueprint-buildon',
+    title: 'Blueprint Build-On',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DOCUMENTARY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Technical blueprint lines self-draw across a grid while nodes pop in and labels fade up under a scanning light sweep — perfect for explaining systems, supply chains or schemes.',
+    tags: ['Business Storytelling', 'Blueprint Build-On', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cg%20stroke%3D%22rgba%2856%2C189%2C248%2C.12%29%22%20stroke-width%3D%221%22%3E%3Cline%20x1%3D%220%22%20y1%3D%2245%22%20x2%3D%22400%22%20y2%3D%2245%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2290%22%20x2%3D%22400%22%20y2%3D%2290%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22135%22%20x2%3D%22400%22%20y2%3D%22135%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%2F%3E%3Cline%20x1%3D%2260%22%20y1%3D%220%22%20x2%3D%2260%22%20y2%3D%22225%22%2F%3E%3Cline%20x1%3D%22140%22%20y1%3D%220%22%20x2%3D%22140%22%20y2%3D%22225%22%2F%3E%3Cline%20x1%3D%22220%22%20y1%3D%220%22%20x2%3D%22220%22%20y2%3D%22225%22%2F%3E%3Cline%20x1%3D%22300%22%20y1%3D%220%22%20x2%3D%22300%22%20y2%3D%22225%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M%2060%20160%20L%2060%2090%20L%20160%2090%20L%20160%20160%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%222.5%22%2F%3E%3Cpath%20d%3D%22M%20160%20120%20L%20260%20120%20L%20260%2060%20L%20340%2060%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%222.5%22%20stroke-dasharray%3D%227%205%22%2F%3E%3Ccircle%20cx%3D%2260%22%20cy%3D%2290%22%20r%3D%226%22%20fill%3D%22%2305080f%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%22160%22%20cy%3D%2290%22%20r%3D%226%22%20fill%3D%22%2338bdf8%22%2F%3E%3Ccircle%20cx%3D%22260%22%20cy%3D%2260%22%20r%3D%226%22%20fill%3D%22%2338bdf8%22%2F%3E%3Ctext%20x%3D%2272%22%20y%3D%2280%22%20fill%3D%22rgba%28255%2C255%2C255%2C.75%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20letter-spacing%3D%222%22%3ESUPPLY%20HUB%3C%2Ftext%3E%3Ctext%20x%3D%22172%22%20y%3D%22110%22%20fill%3D%22rgba%28255%2C255%2C255%2C.75%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20letter-spacing%3D%222%22%3EASSEMBLY%3C%2Ftext%3E%3Ctext%20x%3D%22272%22%20y%3D%2250%22%20fill%3D%22rgba%28255%2C255%2C255%2C.75%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20letter-spacing%3D%222%22%3EEXPORT%3C%2Ftext%3E%3Crect%20x%3D%220%22%20y%3D%2296%22%20width%3D%22400%22%20height%3D%2226%22%20fill%3D%22rgba%2856%2C189%2C248%2C.08%29%22%2F%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'ledger-ticker',
+    title: 'Flip Ledger Board',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'FINANCE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Mechanical split-flap ledger: line items flip in one by one with counters ticking up to a highlighted bottom-line total. Earnings reports as a departure board.',
+    tags: ['Business Storytelling', 'Flip Ledger Board', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%230a0d14%22%2F%3E%3Crect%20x%3D%2230%22%20y%3D%2226%22%20width%3D%22340%22%20height%3D%22176%22%20rx%3D%228%22%20fill%3D%22%2311151f%22%20stroke%3D%22%23232b3a%22%2F%3E%3Ctext%20x%3D%2246%22%20y%3D%2252%22%20fill%3D%22%23e8b64c%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2213%22%20letter-spacing%3D%222%22%3EMERIDIAN%20CAPITAL%3C%2Ftext%3E%3Ctext%20x%3D%22354%22%20y%3D%2252%22%20fill%3D%22rgba%28255%2C255%2C255%2C.4%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22end%22%3EFY%202024%3C%2Ftext%3E%3Cg%20font-family%3D%22monospace%22%20font-size%3D%2211%22%3E%3Crect%20x%3D%2246%22%20y%3D%2266%22%20width%3D%22308%22%20height%3D%2224%22%20fill%3D%22%23171d2a%22%2F%3E%3Ctext%20x%3D%2256%22%20y%3D%2282%22%20fill%3D%22rgba%28255%2C255%2C255%2C.7%29%22%3EREVENUE%3C%2Ftext%3E%3Ctext%20x%3D%22344%22%20y%3D%2282%22%20fill%3D%22%234ade80%22%20text-anchor%3D%22end%22%3E%244.20B%20%2B18%25%3C%2Ftext%3E%3Crect%20x%3D%2246%22%20y%3D%2294%22%20width%3D%22308%22%20height%3D%2224%22%20fill%3D%22%23141a26%22%2F%3E%3Ctext%20x%3D%2256%22%20y%3D%22110%22%20fill%3D%22rgba%28255%2C255%2C255%2C.7%29%22%3EGROSS%20MARGIN%3C%2Ftext%3E%3Ctext%20x%3D%22344%22%20y%3D%22110%22%20fill%3D%22%234ade80%22%20text-anchor%3D%22end%22%3E61.4%25%20%2B3.1%3C%2Ftext%3E%3Crect%20x%3D%2246%22%20y%3D%22122%22%20width%3D%22308%22%20height%3D%2224%22%20fill%3D%22%23171d2a%22%2F%3E%3Ctext%20x%3D%2256%22%20y%3D%22138%22%20fill%3D%22rgba%28255%2C255%2C255%2C.7%29%22%3EOPERATING%20COSTS%3C%2Ftext%3E%3Ctext%20x%3D%22344%22%20y%3D%22138%22%20fill%3D%22%23ff4757%22%20text-anchor%3D%22end%22%3E%242.97B%20%2B9%25%3C%2Ftext%3E%3Crect%20x%3D%2246%22%20y%3D%22156%22%20width%3D%22308%22%20height%3D%2230%22%20fill%3D%22%231c2434%22%20stroke%3D%22%23e8b64c%22%20stroke-width%3D%221%22%2F%3E%3Ctext%20x%3D%2256%22%20y%3D%22175%22%20fill%3D%22%23ffffff%22%20font-weight%3D%22bold%22%3ENET%20PROFIT%3C%2Ftext%3E%3Ctext%20x%3D%22344%22%20y%3D%22175%22%20fill%3D%22%23e8b64c%22%20text-anchor%3D%22end%22%20font-weight%3D%22bold%22%3E%241.23B%20%2B27%25%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'balance-seesaw',
+    title: 'Balance Sheet Seesaw',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'FORENSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'A physical beam balance tips as DEBT and CASH pans load up, chains straining, until the verdict stamp slams down: who actually owns the company.',
+    tags: ['Business Storytelling', 'Balance Sheet Seesaw', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cpolygon%20points%3D%22200%2C120%20178%2C196%20222%2C196%22%20fill%3D%22%231c2434%22%20stroke%3D%22%23334155%22%2F%3E%3Crect%20x%3D%22150%22%20y%3D%22196%22%20width%3D%22100%22%20height%3D%228%22%20rx%3D%223%22%20fill%3D%22%23334155%22%2F%3E%3Cg%20transform%3D%22rotate%28-14%20200%20118%29%22%3E%3Crect%20x%3D%2270%22%20y%3D%22112%22%20width%3D%22260%22%20height%3D%2210%22%20rx%3D%224%22%20fill%3D%22%23e8b64c%22%2F%3E%3Cline%20x1%3D%2296%22%20y1%3D%22122%22%20x2%3D%2296%22%20y2%3D%22150%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%22304%22%20y1%3D%22122%22%20x2%3D%22304%22%20y2%3D%22142%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M%2066%20150%20a%2030%2016%200%200%200%2060%200%20z%22%20fill%3D%22%23ff4757%22%20opacity%3D%22.85%22%2F%3E%3Cpath%20d%3D%22M%20274%20142%20a%2030%2016%200%200%200%2060%200%20z%22%20fill%3D%22%234ade80%22%20opacity%3D%22.85%22%2F%3E%3Ctext%20x%3D%2296%22%20y%3D%22146%22%20fill%3D%22%23fff%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3EDEBT%20%2484B%3C%2Ftext%3E%3Ctext%20x%3D%22304%22%20y%3D%22138%22%20fill%3D%22%23fff%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3ECASH%20%2431B%3C%2Ftext%3E%3C%2Fg%3E%3Crect%20x%3D%22118%22%20y%3D%2224%22%20width%3D%22164%22%20height%3D%2230%22%20rx%3D%224%22%20fill%3D%22rgba%28255%2C71%2C87%2C.15%29%22%20stroke%3D%22%23ff4757%22%20transform%3D%22rotate%28-4%20200%2039%29%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2244%22%20fill%3D%22%23ff4757%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2213%22%20letter-spacing%3D%222%22%20text-anchor%3D%22middle%22%20transform%3D%22rotate%28-4%20200%2044%29%22%3EINSOLVENT%20IN%2014%20MO%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'domino-cascade',
+    title: 'Domino Cascade Collapse',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'CRISIS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Five labeled dominoes fall in perfect chain reaction with a shockwave ripple at each impact — contagion, default cascades and supplier collapses.',
+    tags: ['Business Storytelling', 'Domino Cascade Collapse', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cline%20x1%3D%2220%22%20y1%3D%22180%22%20x2%3D%22380%22%20y2%3D%22180%22%20stroke%3D%22%23233046%22%20stroke-width%3D%222%22%2F%3E%3Cg%20font-family%3D%22monospace%22%20font-size%3D%229%22%20fill%3D%22%23cbd5e1%22%3E%3Crect%20x%3D%2252%22%20y%3D%22104%22%20width%3D%2234%22%20height%3D%2276%22%20rx%3D%224%22%20fill%3D%22%231e293b%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%221.5%22%20transform%3D%22rotate%28-52%2069%20142%29%22%2F%3E%3Ctext%20x%3D%2266%22%20y%3D%22120%22%20transform%3D%22rotate%28-52%2069%20142%29%22%3EBANK%3C%2Ftext%3E%3Crect%20x%3D%22122%22%20y%3D%22104%22%20width%3D%2234%22%20height%3D%2276%22%20rx%3D%224%22%20fill%3D%22%231e293b%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%221.5%22%20transform%3D%22rotate%28-30%20139%20142%29%22%2F%3E%3Ctext%20x%3D%22136%22%20y%3D%22120%22%20transform%3D%22rotate%28-30%20139%20142%29%22%3ELENDER%3C%2Ftext%3E%3Crect%20x%3D%22192%22%20y%3D%22104%22%20width%3D%2234%22%20height%3D%2276%22%20rx%3D%224%22%20fill%3D%22%231e293b%22%20stroke%3D%22%23ffd23f%22%20stroke-width%3D%221.5%22%20transform%3D%22rotate%28-10%20209%20142%29%22%2F%3E%3Ctext%20x%3D%22206%22%20y%3D%22122%22%3ESUPPLIER%3C%2Ftext%3E%3Crect%20x%3D%22262%22%20y%3D%22104%22%20width%3D%2234%22%20height%3D%2276%22%20rx%3D%224%22%20fill%3D%22%231e293b%22%20stroke%3D%22%23ff4757%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%22268%22%20y%3D%2298%22%3ERETAILER%3C%2Ftext%3E%3Crect%20x%3D%22332%22%20y%3D%22104%22%20width%3D%2234%22%20height%3D%2276%22%20rx%3D%224%22%20fill%3D%22%231e293b%22%20stroke%3D%22%23ff4757%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%22336%22%20y%3D%2298%22%3ECONSUMER%3C%2Ftext%3E%3C%2Fg%3E%3Ccircle%20cx%3D%2288%22%20cy%3D%22150%22%20r%3D%2214%22%20fill%3D%22none%22%20stroke%3D%22rgba%2856%2C189%2C248%2C.5%29%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22212%22%20fill%3D%22rgba%28255%2C255%2C255%2C.6%29%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20letter-spacing%3D%223%22%20text-anchor%3D%22middle%22%3EONE%20DEFAULT%20-%20FIVE%20COLLAPSES%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'shield-crack',
+    title: 'Moat Shield Crack',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'ANALYSIS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'A steel moat shield holds firm, then a fracture races down its face with sparks and branching cracks — competitive advantage dying in real time.',
+    tags: ['Business Storytelling', 'Moat Shield Crack', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22shg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%233b4a63%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%231a2333%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cpath%20d%3D%22M200%2030%20L282%2058%20L276%20132%20Q270%20176%20200%20202%20Q130%20176%20124%20132%20L118%2058%20Z%22%20fill%3D%22url%28%23shg%29%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22118%22%20fill%3D%22%23e8b64c%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2220%22%20letter-spacing%3D%224%22%20text-anchor%3D%22middle%22%3EMOAT%3C%2Ftext%3E%3Cpath%20d%3D%22M200%2030%20L194%2062%20L208%2088%20L196%20122%20L206%20156%20L198%20202%22%20fill%3D%22none%22%20stroke%3D%22%23ff4757%22%20stroke-width%3D%223%22%2F%3E%3Cpath%20d%3D%22M194%2062%20L170%2074%20M208%2088%20L236%2098%20M196%20122%20L166%20138%22%20fill%3D%22none%22%20stroke%3D%22%23ff4757%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22170%22%20cy%3D%2274%22%20r%3D%223%22%20fill%3D%22%23ffd23f%22%2F%3E%3Ccircle%20cx%3D%22236%22%20cy%3D%2298%22%20r%3D%223%22%20fill%3D%22%23ffd23f%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2224%22%20fill%3D%22rgba%28255%2C255%2C255%2C.55%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20letter-spacing%3D%223%22%20text-anchor%3D%22middle%22%3EPRICING%20POWER%20ERODES%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'leverage-snowball',
+    title: 'Leverage Debt Snowball',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'FINANCE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'A debt ball rolls toward camera growing larger while concentric leverage rings deploy behind it and an equity percentage counter spins up — margin spiral.',
+    tags: ['Business Storytelling', 'Leverage Debt Snowball', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cpath%20d%3D%22M%200%20200%20L%20400%20150%22%20stroke%3D%22%23233046%22%20stroke-width%3D%223%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22120%22%20r%3D%2272%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C71%2C87%2C.25%29%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%226%206%22%2F%3E%3Ccircle%20cx%3D%22285%22%20cy%3D%22124%22%20r%3D%2252%22%20fill%3D%22none%22%20stroke%3D%22rgba%28255%2C71%2C87%2C.45%29%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%226%206%22%2F%3E%3Ccircle%20cx%3D%22278%22%20cy%3D%22130%22%20r%3D%2234%22%20fill%3D%22%231a1030%22%20stroke%3D%22%23ff4757%22%20stroke-width%3D%222.5%22%2F%3E%3Ctext%20x%3D%22278%22%20y%3D%22135%22%20fill%3D%22%23ff4757%22%20font-family%3D%22monospace%22%20font-size%3D%2212%22%20text-anchor%3D%22middle%22%3Ex%3C%2Ftext%3E%3Ccircle%20cx%3D%22120%22%20cy%3D%22172%22%20r%3D%2214%22%20fill%3D%22%232b1b45%22%20stroke%3D%22%237c5cff%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%22120%22%20y%3D%22176%22%20fill%3D%22%23c9b8ff%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22middle%22%3Ex1%3C%2Ftext%3E%3Ctext%20x%3D%22330%22%20y%3D%2240%22%20fill%3D%22%234ade80%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2222%22%3E%2B412%25%3C%2Ftext%3E%3Ctext%20x%3D%22330%22%20y%3D%2256%22%20fill%3D%22rgba%28255%2C255%2C255%2C.45%29%22%20font-family%3D%22monospace%22%20font-size%3D%228%22%20letter-spacing%3D%222%22%3EEQUITY%20ON%20PAPER%3C%2Ftext%3E%3Ctext%20x%3D%22290%22%20y%3D%22212%22%20fill%3D%22rgba%28255%2C255%2C255%2C.5%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22middle%22%3EDEBT%20%249B%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'chapter-title-plate',
+    title: 'Netflix Chapter Title Plate',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'PACING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Grainy cinematic chapter card: kicker rule draws, giant title slides up word-by-word, subtitle fades in — Netflix doc pacing built in.',
+    tags: ['Business Storytelling', 'Netflix Chapter Title Plate', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22cg%22%20cx%3D%2250%25%22%20cy%3D%2240%25%22%20r%3D%2270%25%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%231c1c26%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2307070a%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2307070a%22%2F%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url%28%23cg%29%22%20opacity%3D%22.6%22%2F%3E%3Ctext%20x%3D%2252%22%20y%3D%2296%22%20fill%3D%22%23e8b64c%22%20font-family%3D%22monospace%22%20font-size%3D%2211%22%20letter-spacing%3D%226%22%3ECHAPTER%20III%3C%2Ftext%3E%3Crect%20x%3D%2252%22%20y%3D%22104%22%20width%3D%22120%22%20height%3D%222%22%20fill%3D%22%23e8b64c%22%2F%3E%3Ctext%20x%3D%2250%22%20y%3D%22146%22%20fill%3D%22%23ffffff%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22bold%22%20font-size%3D%2230%22%3ETHE%20%249%20BILLION%3C%2Ftext%3E%3Ctext%20x%3D%2250%22%20y%3D%22176%22%20fill%3D%22%23ffffff%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22bold%22%20font-size%3D%2230%22%3EBLUFF%3C%2Ftext%3E%3Ctext%20x%3D%2252%22%20y%3D%22198%22%20fill%3D%22rgba%28255%2C255%2C255%2C.45%29%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20letter-spacing%3D%222%22%3EWEWORK%202010-2019%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'whip-transition',
+    title: 'B-Roll Whip Transition',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'TRANSITION',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Full-frame whip pan: outgoing plate rockets left smeared with directional blur, flash frame, incoming plate whips in from the right. Punchy scene changes.',
+    tags: ['Business Storytelling', 'B-Roll Whip Transition', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Crect%20x%3D%2210%22%20y%3D%2230%22%20width%3D%22150%22%20height%3D%22165%22%20rx%3D%226%22%20fill%3D%22%23141b2a%22%20stroke%3D%22%232b3a55%22%20transform%3D%22skewX%28-14%29%22%2F%3E%3Ctext%20x%3D%2255%22%20y%3D%22120%22%20fill%3D%22rgba%28255%2C255%2C255%2C.35%29%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2216%22%20transform%3D%22skewX%28-14%29%22%3EBEFORE%3C%2Ftext%3E%3Crect%20x%3D%22250%22%20y%3D%2230%22%20width%3D%22150%22%20height%3D%22165%22%20rx%3D%226%22%20fill%3D%22%231a2436%22%20stroke%3D%22%233b5578%22%20transform%3D%22skewX%28-14%29%20translate%2860%200%29%22%2F%3E%3Ctext%20x%3D%22300%22%20y%3D%22120%22%20fill%3D%22rgba%28255%2C255%2C255%2C.8%29%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2216%22%20transform%3D%22skewX%28-14%29%20translate%2860%200%29%22%3EAFTER%3C%2Ftext%3E%3Cg%20stroke%3D%22rgba%28255%2C255%2C255%2C.5%29%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%3E%3Cline%20x1%3D%22150%22%20y1%3D%2270%22%20x2%3D%22230%22%20y2%3D%2270%22%2F%3E%3Cline%20x1%3D%22140%22%20y1%3D%22112%22%20x2%3D%22240%22%20y2%3D%22112%22%2F%3E%3Cline%20x1%3D%22150%22%20y1%3D%22154%22%20x2%3D%22230%22%20y2%3D%22154%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%22186%22%20y%3D%220%22%20width%3D%2210%22%20height%3D%22225%22%20fill%3D%22rgba%28255%2C255%2C255%2C.14%29%22%2F%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'ui-mockup',
+    title: 'Animated App UI Mockup',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'PRODUCT',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'A phone mockup comes alive: balance counter rolls up, sparkline draws itself, transaction rows slide in and a tap ripple pulses — Stripe/Revolut style B-roll.',
+    tags: ['Business Storytelling', 'Animated App UI Mockup', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Crect%20x%3D%22146%22%20y%3D%2214%22%20width%3D%22108%22%20height%3D%22200%22%20rx%3D%2214%22%20fill%3D%22%230d1220%22%20stroke%3D%22%232b3a55%22%20stroke-width%3D%222%22%2F%3E%3Crect%20x%3D%22186%22%20y%3D%2220%22%20width%3D%2228%22%20height%3D%225%22%20rx%3D%222.5%22%20fill%3D%22%232b3a55%22%2F%3E%3Ctext%20x%3D%22158%22%20y%3D%2244%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%229%22%3EACME%20BANK%3C%2Ftext%3E%3Ctext%20x%3D%22158%22%20y%3D%2270%22%20fill%3D%22rgba%28255%2C255%2C255%2C.4%29%22%20font-family%3D%22monospace%22%20font-size%3D%227%22%20letter-spacing%3D%222%22%3EBALANCE%3C%2Ftext%3E%3Ctext%20x%3D%22158%22%20y%3D%2288%22%20fill%3D%22%234ade80%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2216%22%3E%2412%2C480%3C%2Ftext%3E%3Cpolyline%20points%3D%22158%2C124%20176%2C118%20194%2C120%20212%2C106%20230%2C100%20244%2C90%22%20fill%3D%22none%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%222%22%2F%3E%3Crect%20x%3D%22158%22%20y%3D%22136%22%20width%3D%2284%22%20height%3D%2218%22%20rx%3D%224%22%20fill%3D%22%23141b2a%22%2F%3E%3Ctext%20x%3D%22164%22%20y%3D%22148%22%20fill%3D%22rgba%28255%2C255%2C255%2C.7%29%22%20font-family%3D%22monospace%22%20font-size%3D%227%22%3EStripe%20payout%20%2B%244%2C200%3C%2Ftext%3E%3Crect%20x%3D%22158%22%20y%3D%22158%22%20width%3D%2284%22%20height%3D%2218%22%20rx%3D%224%22%20fill%3D%22%23141b2a%22%2F%3E%3Ctext%20x%3D%22164%22%20y%3D%22170%22%20fill%3D%22rgba%28255%2C255%2C255%2C.7%29%22%20font-family%3D%22monospace%22%20font-size%3D%227%22%3EAWS%20hosting%20-%241%2C140%3C%2Ftext%3E%3Ccircle%20cx%3D%22200%22%20cy%3D%22196%22%20r%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22rgba%2856%2C189%2C248%2C.5%29%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'chat-thread',
+    title: 'Auto-Playing Chat Thread',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DRAMA',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'iMessage-style thread types itself out: bubbles pop in alternating sides with delivery ticks and a typing indicator — group-chat receipts that tell the story.',
+    tags: ['Business Storytelling', 'Auto-Playing Chat Thread', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%230a0d14%22%2F%3E%3Crect%20x%3D%2224%22%20y%3D%2218%22%20width%3D%22352%22%20height%3D%22192%22%20rx%3D%2214%22%20fill%3D%22%2310141d%22%20stroke%3D%22%23232b3a%22%2F%3E%3Ccircle%20cx%3D%2248%22%20cy%3D%2242%22%20r%3D%2210%22%20fill%3D%22%237c5cff%22%2F%3E%3Ctext%20x%3D%2266%22%20y%3D%2246%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22700%22%20font-size%3D%2211%22%3ECo-founder%20group%3C%2Ftext%3E%3Ctext%20x%3D%22356%22%20y%3D%2246%22%20fill%3D%22%234ade80%22%20font-family%3D%22monospace%22%20font-size%3D%228%22%20text-anchor%3D%22end%22%3Eonline%3C%2Ftext%3E%3Crect%20x%3D%2244%22%20y%3D%2266%22%20width%3D%22170%22%20height%3D%2234%22%20rx%3D%2216%22%20fill%3D%22%232a2f3a%22%2F%3E%3Ctext%20x%3D%2258%22%20y%3D%2287%22%20fill%3D%22%23e5e7eb%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%3EWe%20just%20got%20TermSheet%20A.%3C%2Ftext%3E%3Crect%20x%3D%22210%22%20y%3D%22108%22%20width%3D%2296%22%20height%3D%2230%22%20rx%3D%2215%22%20fill%3D%22%230a84ff%22%2F%3E%3Ctext%20x%3D%22224%22%20y%3D%22127%22%20fill%3D%22%23fff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%3EHow%20much%3F%3C%2Ftext%3E%3Crect%20x%3D%2244%22%20y%3D%22146%22%20width%3D%22210%22%20height%3D%2234%22%20rx%3D%2216%22%20fill%3D%22%232a2f3a%22%2F%3E%3Ctext%20x%3D%2258%22%20y%3D%22167%22%20fill%3D%22%23e5e7eb%22%20font-family%3D%22sans-serif%22%20font-size%3D%2210%22%3E%2440M%20at%20a%20%24300M%20valuation%3C%2Ftext%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22200%22%20r%3D%224%22%20fill%3D%22%234b5563%22%2F%3E%3Ccircle%20cx%3D%22194%22%20cy%3D%22200%22%20r%3D%224%22%20fill%3D%22%236b7280%22%2F%3E%3Ccircle%20cx%3D%22208%22%20cy%3D%22200%22%20r%3D%224%22%20fill%3D%22%234b5563%22%2F%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'flowchart-builder',
+    title: 'Flowchart Node Builder',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'EXPLAINER',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Nodes punch in and connector lines draw between them with ownership tags fading on the wires — corporate structures and scheme maps assembled live.',
+    tags: ['Business Storytelling', 'Flowchart Node Builder', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cg%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%222%22%20fill%3D%22none%22%3E%3Cline%20x1%3D%22200%22%20y1%3D%2262%22%20x2%3D%22200%22%20y2%3D%2288%22%2F%3E%3Cline%20x1%3D%22200%22%20y1%3D%2288%22%20x2%3D%22120%22%20y2%3D%22118%22%2F%3E%3Cline%20x1%3D%22200%22%20y1%3D%2288%22%20x2%3D%22280%22%20y2%3D%22118%22%2F%3E%3Cline%20x1%3D%22120%22%20y1%3D%22150%22%20x2%3D%22120%22%20y2%3D%22170%22%2F%3E%3Cline%20x1%3D%22280%22%20y1%3D%22150%22%20x2%3D%22280%22%20y2%3D%22170%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%22140%22%20y%3D%2230%22%20width%3D%22120%22%20height%3D%2232%22%20rx%3D%226%22%20fill%3D%22%23141b2a%22%20stroke%3D%22%23e8b64c%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2250%22%20fill%3D%22%23e8b64c%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3EHOLDING%20CO.%3C%2Ftext%3E%3Crect%20x%3D%22140%22%20y%3D%2288%22%20width%3D%22120%22%20height%3D%2230%22%20rx%3D%226%22%20fill%3D%22%23141b2a%22%20stroke%3D%22%2338bdf8%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22107%22%20fill%3D%22%2338bdf8%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3EOFFSHORE%20SPV%3C%2Ftext%3E%3Crect%20x%3D%2270%22%20y%3D%22150%22%20width%3D%22100%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%23141b2a%22%20stroke%3D%22%2364748b%22%2F%3E%3Ctext%20x%3D%22120%22%20y%3D%22168%22%20fill%3D%22%23cbd5e1%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22middle%22%3ESHELL%20A%3C%2Ftext%3E%3Crect%20x%3D%22230%22%20y%3D%22150%22%20width%3D%22100%22%20height%3D%2228%22%20rx%3D%226%22%20fill%3D%22%23141b2a%22%20stroke%3D%22%2364748b%22%2F%3E%3Ctext%20x%3D%22280%22%20y%3D%22168%22%20fill%3D%22%23cbd5e1%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22middle%22%3ESHELL%20B%3C%2Ftext%3E%3Crect%20x%3D%22148%22%20y%3D%22112%22%20width%3D%2234%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%230a84ff%22%2F%3E%3Ctext%20x%3D%22165%22%20y%3D%22124%22%20fill%3D%22%23fff%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22middle%22%3E49%25%3C%2Ftext%3E%3Crect%20x%3D%22218%22%20y%3D%22112%22%20width%3D%2234%22%20height%3D%2216%22%20rx%3D%223%22%20fill%3D%22%23ff4757%22%2F%3E%3Ctext%20x%3D%22235%22%20y%3D%22124%22%20fill%3D%22%23fff%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20text-anchor%3D%22middle%22%3E51%25%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'versus-showdown',
+    title: 'Vs Split Showdown',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DRAMA',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Two rivals slam in from opposite edges, the VS blade twists between them with spark bursts and rim-light flares — classic showdown framing.',
+    tags: ['Business Storytelling', 'Vs Split Showdown', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%22185%22%20height%3D%22225%22%20fill%3D%22%230c1626%22%2F%3E%3Crect%20x%3D%22215%22%20y%3D%220%22%20width%3D%22185%22%20height%3D%22225%22%20fill%3D%22%23200c12%22%2F%3E%3Cline%20x1%3D%22200%22%20y1%3D%220%22%20x2%3D%22200%22%20y2%3D%22225%22%20stroke%3D%22%23e8b64c%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%2292%22%20y%3D%22100%22%20fill%3D%22%2338bdf8%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2226%22%20text-anchor%3D%22middle%22%3EBEZOS%3C%2Ftext%3E%3Ctext%20x%3D%2292%22%20y%3D%22122%22%20fill%3D%22rgba%28255%2C255%2C255%2C.5%29%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3E%24238B%3C%2Ftext%3E%3Ctext%20x%3D%22308%22%20y%3D%22100%22%20fill%3D%22%23ff4757%22%20font-family%3D%22sans-serif%22%20font-weight%3D%22900%22%20font-size%3D%2226%22%20text-anchor%3D%22middle%22%3EMUSK%3C%2Ftext%3E%3Ctext%20x%3D%22308%22%20y%3D%22122%22%20fill%3D%22rgba%28255%2C255%2C255%2C.5%29%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20text-anchor%3D%22middle%22%3E%24210B%3C%2Ftext%3E%3Ccircle%20cx%3D%22200%22%20cy%3D%22104%22%20r%3D%2226%22%20fill%3D%22%230a0d14%22%20stroke%3D%22%23e8b64c%22%20stroke-width%3D%223%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22112%22%20fill%3D%22%23e8b64c%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22900%22%20font-size%3D%2218%22%20text-anchor%3D%22middle%22%3EVS%3C%2Ftext%3E%3Ctext%20x%3D%22200%22%20y%3D%22206%22%20fill%3D%22rgba%28255%2C255%2C255%2C.55%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20letter-spacing%3D%223%22%20text-anchor%3D%22middle%22%3ETHE%20RICHEST%20RIVALRY%20EVER%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'searchlight-reveal',
+    title: 'Searchlight Reveal',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'NOIR',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Pitch-black frame swept by a volumetric searchlight cone; hidden headline emerges only inside the beam with drifting dust motes — secret documents vibe.',
+    tags: ['Business Storytelling', 'Searchlight Reveal', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23020308%22%2F%3E%3Cpolygon%20points%3D%22330%2C0%20400%2C0%20210%2C225%20120%2C225%22%20fill%3D%22rgba%28255%2C236%2C180%2C.06%29%22%2F%3E%3Cpolygon%20points%3D%22340%2C0%20380%2C0%20250%2C225%20200%2C225%22%20fill%3D%22rgba%28255%2C236%2C180%2C.10%29%22%2F%3E%3Ctext%20x%3D%22150%22%20y%3D%22120%22%20fill%3D%22%23e9e2c8%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22bold%22%20font-size%3D%2217%22%3ETHE%20BOARD%20KNEW%3C%2Ftext%3E%3Ctext%20x%3D%22150%22%20y%3D%22144%22%20fill%3D%22%23ffd23f%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22bold%22%20font-size%3D%2217%22%3EIN%202017%3C%2Ftext%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%2260%22%20r%3D%222%22%20fill%3D%22rgba%28255%2C255%2C255%2C.3%29%22%2F%3E%3Ccircle%20cx%3D%22240%22%20cy%3D%2290%22%20r%3D%221.5%22%20fill%3D%22rgba%28255%2C255%2C255%2C.25%29%22%2F%3E%3Ccircle%20cx%3D%22300%22%20cy%3D%2240%22%20r%3D%222%22%20fill%3D%22rgba%28255%2C255%2C255%2C.2%29%22%2F%3E%3Ccircle%20cx%3D%22260%22%20cy%3D%22160%22%20r%3D%221.5%22%20fill%3D%22rgba%28255%2C255%2C255%2C.3%29%22%2F%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'receipt-itemizer',
+    title: 'Receipt Itemizer',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'EXPLAINER',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Thermal receipt scrolls line items into place with a highlight cursor tracking each cost before the total stamps — unit economics you can feel.',
+    tags: ['Business Storytelling', 'Receipt Itemizer', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cpath%20d%3D%22M%20130%2014%20L%20270%2014%20L%20270%20200%20L%20260%20194%20L%20250%20200%20L%20240%20194%20L%20230%20200%20L%20220%20194%20L%20210%20200%20L%20200%20194%20L%20190%20200%20L%20180%20194%20L%20170%20200%20L%20160%20194%20L%20150%20200%20L%20140%20194%20L%20130%20200%20Z%22%20fill%3D%22%23efe9dc%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2236%22%20fill%3D%22%231a1a1a%22%20font-family%3D%22monospace%22%20font-size%3D%2210%22%20font-weight%3D%22bold%22%20text-anchor%3D%22middle%22%3ECOST%20OF%20A%20SINGLE%20BURGER%3C%2Ftext%3E%3Cline%20x1%3D%22142%22%20y1%3D%2244%22%20x2%3D%22258%22%20y2%3D%2244%22%20stroke%3D%22%23999999%22%20stroke-dasharray%3D%223%203%22%2F%3E%3Cg%20font-family%3D%22monospace%22%20font-size%3D%229%22%20fill%3D%22%23222222%22%3E%3Ctext%20x%3D%22146%22%20y%3D%2264%22%3EPatty%20and%20bun%3C%2Ftext%3E%3Ctext%20x%3D%22254%22%20y%3D%2264%22%20text-anchor%3D%22end%22%3E%242.10%3C%2Ftext%3E%3Ctext%20x%3D%22146%22%20y%3D%2282%22%3ELabor%3C%2Ftext%3E%3Ctext%20x%3D%22254%22%20y%3D%2282%22%20text-anchor%3D%22end%22%3E%243.40%3C%2Ftext%3E%3Crect%20x%3D%22140%22%20y%3D%2290%22%20width%3D%22120%22%20height%3D%2214%22%20fill%3D%22rgba%28232%2C182%2C76%2C.4%29%22%2F%3E%3Ctext%20x%3D%22146%22%20y%3D%22100%22%3EReal%20estate%3C%2Ftext%3E%3Ctext%20x%3D%22254%22%20y%3D%22100%22%20text-anchor%3D%22end%22%3E%242.85%3C%2Ftext%3E%3Ctext%20x%3D%22146%22%20y%3D%22118%22%3EMarketing%3C%2Ftext%3E%3Ctext%20x%3D%22254%22%20y%3D%22118%22%20text-anchor%3D%22end%22%3E%241.60%3C%2Ftext%3E%3C%2Fg%3E%3Cline%20x1%3D%22142%22%20y1%3D%22132%22%20x2%3D%22258%22%20y2%3D%22132%22%20stroke%3D%22%23999999%22%20stroke-dasharray%3D%223%203%22%2F%3E%3Ctext%20x%3D%22146%22%20y%3D%22150%22%20fill%3D%22%23111111%22%20font-family%3D%22monospace%22%20font-size%3D%2211%22%20font-weight%3D%22bold%22%3ETOTAL%3C%2Ftext%3E%3Ctext%20x%3D%22254%22%20y%3D%22150%22%20fill%3D%22%23111111%22%20font-family%3D%22monospace%22%20font-size%3D%2211%22%20font-weight%3D%22bold%22%20text-anchor%3D%22end%22%3E%249.95%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
+  {
+    id: 'certificate-fan',
+    title: 'Stock Certificate Fan',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'HERITAGE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Vintage share certificates fan out one by one with paper physics, a wax seal thuds onto the top card and serial numbers roll — IPO and cap-table storytelling.',
+    tags: ['Business Storytelling', 'Stock Certificate Fan', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent('%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%2305080f%22%2F%3E%3Cg%20stroke-width%3D%222%22%3E%3Crect%20x%3D%2290%22%20y%3D%2252%22%20width%3D%22150%22%20height%3D%22110%22%20rx%3D%224%22%20fill%3D%22%23d8cdb2%22%20stroke%3D%22%238a7c5c%22%20transform%3D%22rotate%28-14%20165%20107%29%22%2F%3E%3Crect%20x%3D%22130%22%20y%3D%2246%22%20width%3D%22150%22%20height%3D%22110%22%20rx%3D%224%22%20fill%3D%22%23e4dabf%22%20stroke%3D%22%238a7c5c%22%20transform%3D%22rotate%28-2%20205%20101%29%22%2F%3E%3Crect%20x%3D%22170%22%20y%3D%2250%22%20width%3D%22150%22%20height%3D%22110%22%20rx%3D%224%22%20fill%3D%22%23f0e7cf%22%20stroke%3D%22%238a7c5c%22%20transform%3D%22rotate%289%20245%20105%29%22%2F%3E%3C%2Fg%3E%3Crect%20x%3D%22186%22%20y%3D%2266%22%20width%3D%22118%22%20height%3D%2278%22%20rx%3D%222%22%20fill%3D%22none%22%20stroke%3D%22%236b5d3f%22%20stroke-dasharray%3D%222%202%22%20transform%3D%22rotate%289%20245%20105%29%22%2F%3E%3Ctext%20x%3D%22245%22%20y%3D%2298%22%20fill%3D%22%233c3212%22%20font-family%3D%22Georgia%2Cserif%22%20font-weight%3D%22bold%22%20font-size%3D%2211%22%20text-anchor%3D%22middle%22%20transform%3D%22rotate%289%20245%2098%29%22%3ESHARE%20CERTIFICATE%3C%2Ftext%3E%3Ctext%20x%3D%22245%22%20y%3D%22116%22%20fill%3D%22%236b5d3f%22%20font-family%3D%22monospace%22%20font-size%3D%228%22%20text-anchor%3D%22middle%22%20transform%3D%22rotate%289%20245%20116%29%22%3ENo.%2000414%3C%2Ftext%3E%3Ccircle%20cx%3D%22292%22%20cy%3D%22146%22%20r%3D%2213%22%20fill%3D%22%23a32020%22%20stroke%3D%22%237a1616%22%20stroke-width%3D%222%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22200%22%20fill%3D%22rgba%28255%2C255%2C255%2C.6%29%22%20font-family%3D%22monospace%22%20font-size%3D%229%22%20letter-spacing%3D%223%22%20text-anchor%3D%22middle%22%3ESERIES%20A%20-%204%2C000%2C000%20SHARES%3C%2Ftext%3E%3C%2Fsvg%3E')}`
+  },
   // === Business Storytelling suite (Magnates channel templates) ===
   {
     id: 'directional-push-split-wipe',
@@ -24850,7 +25045,7 @@ function renderHomepageTemplates() {
 }
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
-const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
+const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map','blueprint-buildon','ledger-ticker','balance-seesaw','domino-cascade','shield-crack','leverage-snowball','chapter-title-plate','whip-transition','ui-mockup','chat-thread','flowchart-builder','versus-showdown','searchlight-reveal','receipt-itemizer','certificate-fan'];
 const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 let hoverBridgeActive = false;
 let hoverExternalT = null;
@@ -24945,6 +25140,162 @@ function bizStoryHoverMarkup(id) {
             <path class="wm-arc wm-w3" d="M 262 68 Q 200 112 92 126"/>
           </svg>
           <div class="wm-city wm-c1">NEW YORK</div><div class="wm-city wm-c2">ROTTERDAM</div><div class="wm-city wm-c3">SHENZHEN</div><div class="wm-city wm-c4 wm-final">SINGAPORE</div>
+        </div>`;
+    case 'blueprint-buildon':
+      return `<div class="mbp-stage">
+          <div class="mbp-grid"></div>
+          <svg class="mbp-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
+            <path class="mbp-draw mbp-d1" d="M 40 120 L 40 60 L 120 60 L 120 120"/>
+            <path class="mbp-draw mbp-d2" d="M 120 90 L 200 90 L 200 40 L 260 40"/>
+            <circle class="mbp-node mbp-n1" cx="40" cy="60" r="4"/>
+            <circle class="mbp-node mbp-n2" cx="120" cy="60" r="4"/>
+            <circle class="mbp-node mbp-n3" cx="200" cy="40" r="4"/>
+          </svg>
+          <div class="mbp-label mbp-l1">SUPPLY HUB</div>
+          <div class="mbp-label mbp-l2">ASSEMBLY</div>
+          <div class="mbp-label mbp-l3">EXPORT</div>
+          <div class="mbp-scan"></div>
+        </div>`;
+    case 'ledger-ticker':
+      return `<div class="mld-board">
+          <div class="mld-head"><span class="mld-brand">MERIDIAN CAPITAL</span><span class="mld-fy">FY 2024 · AUDITED</span></div>
+          <div class="mld-row mld-r1"><span>REVENUE</span><b class="mld-num">$4.20B</b><i class="mld-chg up">▲ +18%</i></div>
+          <div class="mld-row mld-r2"><span>GROSS MARGIN</span><b class="mld-num">61.4%</b><i class="mld-chg up">▲ +3.1</i></div>
+          <div class="mld-row mld-r3"><span>OPERATING COSTS</span><b class="mld-num">$2.97B</b><i class="mld-chg dn">▼ +9%</i></div>
+          <div class="mld-row mld-r4"><span>FREE CASH FLOW</span><b class="mld-num">$310M</b><i class="mld-chg up">▲ +44%</i></div>
+          <div class="mld-row mld-r5 mld-total"><span>NET PROFIT</span><b class="mld-num">$1.23B</b><i class="mld-chg up">▲ +27%</i></div>
+          <div class="mld-cursor"></div>
+        </div>`;
+    case 'balance-seesaw':
+      return `<div class="msw-stage">
+          <div class="msw-beamwrap">
+            <div class="msw-beam">
+              <div class="msw-pan msw-left"><b>DEBT</b><span>$84B</span></div>
+              <div class="msw-pan msw-right"><b>CASH</b><span>$31B</span></div>
+            </div>
+            <div class="msw-chain msw-cl"></div><div class="msw-chain msw-cr"></div>
+          </div>
+          <div class="msw-fulcrum"></div>
+          <div class="msw-base"></div>
+          <div class="msw-verdict">INSOLVENT IN 14 MONTHS</div>
+        </div>`;
+    case 'domino-cascade':
+      return `<div class="mdo-stage">
+          <div class="mdo-floor"></div>
+          <div class="mdo-tile mdo-t1">BANK</div>
+          <div class="mdo-tile mdo-t2">LENDER</div>
+          <div class="mdo-tile mdo-t3">SUPPLIER</div>
+          <div class="mdo-tile mdo-t4">RETAILER</div>
+          <div class="mdo-tile mdo-t5">CONSUMER</div>
+          <div class="mdo-shock"></div>
+          <div class="mdo-caption">ONE DEFAULT · FIVE COLLAPSES</div>
+        </div>`;
+    case 'shield-crack':
+      return `<div class="msh-stage">
+          <svg class="msh-svg" viewBox="0 0 160 160">
+            <path class="msh-badge" d="M80 14 L138 36 L134 92 Q128 126 80 148 Q32 126 26 92 L22 36 Z"/>
+            <text x="80" y="88" text-anchor="middle" class="msh-moat">MOAT</text>
+            <path class="msh-crack msh-c1" d="M80 14 L74 44 L86 66 L76 96 L84 122 L78 148"/>
+            <path class="msh-crack msh-c2" d="M74 44 L52 58 M86 66 L110 74 M76 96 L50 110"/>
+          </svg>
+          <div class="msh-sparks"></div>
+          <div class="msh-caption">PRICING POWER ERODES</div>
+        </div>`;
+    case 'leverage-snowball':
+      return `<div class="mlv-stage">
+          <div class="mlv-road"></div>
+          <div class="mlv-ball"><span>×1</span></div>
+          <div class="mlv-ring mlv-rg1">DEBT $200M</div>
+          <div class="mlv-ring mlv-rg2">DEBT $1.4B</div>
+          <div class="mlv-ring mlv-rg3">DEBT $9B</div>
+          <div class="mlv-pct"><b>+412%</b><i>EQUITY ON PAPER</i></div>
+        </div>`;
+    case 'chapter-title-plate':
+      return `<div class="mcp-stage">
+          <div class="mcp-bg"></div>
+          <div class="mcp-inner">
+            <div class="mcp-kicker">CHAPTER</div>
+            <div class="mcp-rule"></div>
+            <div class="mcp-title">THE $9 BILLION BLUFF</div>
+            <div class="mcp-sub">WeWork · 2010—2019</div>
+          </div>
+          <div class="mcp-grain"></div>
+        </div>`;
+    case 'whip-transition':
+      return `<div class="mwp-stage">
+          <div class="mwp-panel mwp-a"><span>BEFORE</span></div>
+          <div class="mwp-panel mwp-b"><span>AFTER</span></div>
+          <div class="mwp-blur"></div>
+          <div class="mwp-flash"></div>
+        </div>`;
+    case 'ui-mockup':
+      return `<div class="mui-stage">
+          <div class="mui-phone">
+            <div class="mui-notch"></div>
+            <div class="mui-bar"><b>ACME BANK</b><span>●●● WiFi ▮</span></div>
+            <div class="mui-bal"><i>BALANCE</i><b>$<span class="mui-count">12,480</span></b></div>
+            <div class="mui-graph"><svg viewBox="0 0 200 60" preserveAspectRatio="none"><polyline class="mui-line" points="0,52 30,46 60,48 90,34 120,36 150,20 200,8"/></svg></div>
+            <div class="mui-row mui-r1"><em>↑</em><span>Stripe payout</span><b>+$4,200</b></div>
+            <div class="mui-row mui-r2"><em>↓</em><span>AWS hosting</span><b class="dn">-$1,140</b></div>
+            <div class="mui-ripple"></div>
+          </div>
+        </div>`;
+    case 'chat-thread':
+      return `<div class="mch-stage">
+          <div class="mch-head"><span class="mch-av"></span><b>Co-founder group</b><i>online</i></div>
+          <div class="mch-bub mch-b1 mch-in"><span>We just got TermSheet A.</span><em>9:41 PM</em></div>
+          <div class="mch-bub mch-b2 mch-out"><span>How much?</span><em>9:41 PM</em></div>
+          <div class="mch-bub mch-b3 mch-in"><span>$40M at a $300M valuation 🤯</span><em>9:42 PM</em></div>
+          <div class="mch-typing mch-b4"><i></i><i></i><i></i></div>
+        </div>`;
+    case 'flowchart-builder':
+      return `<div class="mfc-stage">
+          <svg class="mfc-links" viewBox="0 0 300 160" preserveAspectRatio="none">
+            <path class="mfc-link mfc-k1" d="M150 42 L150 66"/>
+            <path class="mfc-link mfc-k2" d="M150 66 L78 92"/><path class="mfc-link mfc-k3" d="M150 66 L222 92"/>
+            <path class="mfc-link mfc-k4" d="M78 112 L78 128"/><path class="mfc-link mfc-k5" d="M222 112 L222 128"/>
+          </svg>
+          <div class="mfc-node mfc-root">HOLDING CO.</div>
+          <div class="mfc-node mfc-mid">OFFSHORE SPV</div>
+          <div class="mfc-node mfc-leaf mfc-l1">SHELL A</div>
+          <div class="mfc-node mfc-leaf mfc-l2">SHELL B</div>
+          <div class="mfc-tag mfc-t1">49%</div>
+          <div class="mfc-tag mfc-t2">51%</div>
+        </div>`;
+    case 'versus-showdown':
+      return `<div class="mvs-stage">
+          <div class="mvs-side mvs-left"><b>BEZOS</b><span>Net worth $238B</span></div>
+          <div class="mvs-vs">VS</div>
+          <div class="mvs-side mvs-right"><b>MUSK</b><span>Net worth $210B</span></div>
+          <div class="mvs-sparkL"></div><div class="mvs-sparkR"></div>
+          <div class="mvs-foot">THE RICHEST RIVALRY IN HISTORY</div>
+        </div>`;
+    case 'searchlight-reveal':
+      return `<div class="msl-stage">
+          <div class="msl-dark"></div>
+          <div class="msl-text">THE BOARD KNEW IN <b>2017</b></div>
+          <div class="msl-cone"></div>
+          <div class="msl-dust"></div>
+        </div>`;
+    case 'receipt-itemizer':
+      return `<div class="mrp-stage">
+          <div class="mrp-paper">
+            <div class="mrp-h">COST OF A SINGLE BURGER</div>
+            <div class="mrp-line mrp-l1"><span>Patty &amp; bun</span><b>$2.10</b></div>
+            <div class="mrp-line mrp-l2"><span>Labor</span><b>$3.40</b></div>
+            <div class="mrp-line mrp-l3"><span>Real estate</span><b>$2.85</b></div>
+            <div class="mrp-line mrp-l4"><span>Marketing</span><b>$1.60</b></div>
+            <div class="mrp-sum"><span>TOTAL</span><b>$9.95</b></div>
+          </div>
+          <div class="mrp-cursor"></div>
+        </div>`;
+    case 'certificate-fan':
+      return `<div class="mcf-stage">
+          <div class="mcf-cert mcf-c1"><span>SHARE CERTIFICATE</span><em>No. 00412</em></div>
+          <div class="mcf-cert mcf-c2"><span>SHARE CERTIFICATE</span><em>No. 00413</em></div>
+          <div class="mcf-cert mcf-c3"><span>SHARE CERTIFICATE</span><em>No. 00414</em></div>
+          <div class="mcf-wax"></div>
+          <div class="mcf-cap">SERIES A · 4,000,000 SHARES</div>
         </div>`;
     case 'country-morph-highlight':
       return `<div class="cm-map">
