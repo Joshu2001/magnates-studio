@@ -22232,7 +22232,10 @@ async function handleConfirmSaveAsTemplate() {
       const depthVal = topCustomizerState.depth || 65;
       const opacityVal = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
 
+      const currentCtxData = (typeof window.tplGetContextualData === 'function' && scTpl) ? window.tplGetContextualData(scTpl.id) : null;
       let { imageClips, textClips } = buildClipsForTemplateScene(scTpl, sceneStart, scDur, {
+        customData: currentCtxData,
+        transforms: topCustomizerState.transforms || {},
         prim, sec, depthVal, opacityVal,
         bgRemoved: topCustomizerState.bgRemoved,
         cutoutCanvas: topCustomizerState.cutoutCanvas,
@@ -24933,17 +24936,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         <div class="tpl-docheight" ${deskStyle}>
           <div class="doc" style="position: absolute; top: 10%; left: 14%; right: 14%; bottom: 10%; background: #ffffff; border-radius: 8px; box-shadow: 0 12px 35px rgba(0,0,0,0.35); padding: 18px 24px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08);">
             <div class="doc-header" style="font-size: 11.5px; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase;">${docTitle}</div>
-            <div class="doc-text-line l1" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
-              <span style="position: relative; z-index: 2;">${l1}</span>
-              ${hlIdx === 1 || hlIdx === 'all' ? `<div class="highlight" style="position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
-            </div>
-            <div class="doc-text-line l2" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
-              <span style="position: relative; z-index: 2;">${l2}</span>
-              ${hlIdx === 2 || hlIdx === 'all' ? `<div class="highlight" style="position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
-            </div>
-            <div class="doc-text-line l3" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
-              <span style="position: relative; z-index: 2;">${l3}</span>
-              ${hlIdx === 3 || hlIdx === 'all' ? `<div class="highlight" style="position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
+            <div class="dh-stage-lines-wrap" style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+              ${(Array.isArray(data.lines) ? data.lines : [
+                { text: l1, highlighted: true },
+                { text: l2, highlighted: true },
+                { text: l3, highlighted: false }
+              ]).map((ln, i) => `
+                <div class="doc-text-line l${i+1}" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
+                  <span style="position: relative; z-index: 2;">${ln.text}</span>
+                  ${ln.highlighted ? `<div class="highlight" style="position: absolute; inset: 0; background: ${ln.color || hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
+                </div>
+              `).join('')}
             </div>
             <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #cbd5e1; padding-top: 6px; font-size: 8.5px; color: #94a3b8; font-family: monospace;">
               <span>AUTHORIZED SIGNATURE</span>
@@ -29818,6 +29821,9 @@ function renderTopTemplatePreviewStage() {
       window.tplUpdateStageWithContextualData(tplId, window.tplGetContextualData(tplId));
     }
     if (window.tpl3DAfterVideoStage) window.tpl3DAfterVideoStage(stage, tplId);
+    if (typeof window.initUniversalStageTransformEngine === 'function') {
+      setTimeout(window.initUniversalStageTransformEngine, 40);
+    }
     return;
   }
   hoverBridgeActive = false;

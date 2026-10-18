@@ -359,10 +359,11 @@
     'docheight': {
       type: 'docheight',
       docTitle: 'CONFIDENTIAL AGREEMENT',
-      line1: '1. Intellectual property rights reserved.',
-      line2: '2. Total liability shall not exceed $10,000,000.',
-      line3: '3. Immediate termination upon breach of clause.',
-      hlIndex: 2,
+      lines: [
+        { id: 1, text: '1. Intellectual property rights reserved.', highlighted: true },
+        { id: 2, text: '2. Total liability shall not exceed $10,000,000.', highlighted: true },
+        { id: 3, text: '3. Immediate termination upon breach of clause.', highlighted: false }
+      ],
       hlColor: '#facc15'
     },
 
@@ -613,21 +614,29 @@
     } else if (tplId === 'docheight') {
       const head = fxc.querySelector('.doc-header');
       if (head && data.docTitle) head.textContent = data.docTitle;
-      const l1 = fxc.querySelector('.l1 span'); if (l1 && data.line1) l1.textContent = data.line1;
-      const l2 = fxc.querySelector('.l2 span'); if (l2 && data.line2) l2.textContent = data.line2;
-      const l3 = fxc.querySelector('.l3 span'); if (l3 && data.line3) l3.textContent = data.line3;
+      const lines = Array.isArray(data.lines) ? data.lines : [
+        { id: 1, text: data.line1 || '1. Intellectual property rights reserved.', highlighted: true },
+        { id: 2, text: data.line2 || '2. Total liability shall not exceed $10,000,000.', highlighted: true },
+        { id: 3, text: data.line3 || '3. Immediate termination upon breach of clause.', highlighted: false }
+      ];
       const hlCol = data.hlColor || '#facc15';
-      const hlIdx = data.hlIndex !== undefined ? data.hlIndex : 2;
-      fxc.querySelectorAll('.highlight').forEach(el => el.remove());
-      const lines = [fxc.querySelector('.l1'), fxc.querySelector('.l2'), fxc.querySelector('.l3')];
-      lines.forEach((lineEl, idx) => {
-        if (lineEl && (hlIdx === idx + 1 || hlIdx === 'all')) {
-          const hl = document.createElement('div');
-          hl.className = 'highlight';
-          hl.style.cssText = `position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;`;
-          lineEl.appendChild(hl);
+      const docEl = fxc.querySelector('.doc');
+      if (docEl) {
+        let linesContainer = docEl.querySelector('.dh-stage-lines-wrap');
+        if (!linesContainer) {
+          docEl.querySelectorAll('.doc-text-line').forEach(el => el.remove());
+          linesContainer = document.createElement('div');
+          linesContainer.className = 'dh-stage-lines-wrap';
+          linesContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px; flex: 1;';
+          docEl.appendChild(linesContainer);
         }
-      });
+        linesContainer.innerHTML = lines.map((ln, i) => `
+          <div class="doc-text-line l${i+1}" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
+            <span style="position: relative; z-index: 2;">${ln.text}</span>
+            ${ln.highlighted ? `<div class="highlight" style="position: absolute; inset: 0; background: ${ln.color || hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
+          </div>
+        `).join('');
+      }
     } else if (tplId === 'ticker') {
       const head = fxc.querySelector('.t-head');
       if (head && data.title) head.textContent = data.title;
@@ -1263,7 +1272,11 @@
         { label: 'Magenta Pink', val: '#f43f5e' },
         { label: 'Amber Orange', val: '#fb923c' }
       ];
-      const curHl = data.hlIndex !== undefined ? data.hlIndex : 2;
+      const lines = Array.isArray(data.lines) ? data.lines : [
+        { id: 1, text: data.line1 || '1. Intellectual property rights reserved.', highlighted: true },
+        { id: 2, text: data.line2 || '2. Total liability shall not exceed $10,000,000.', highlighted: true },
+        { id: 3, text: data.line3 || '3. Immediate termination upon breach of clause.', highlighted: false }
+      ];
 
       container.innerHTML = `
         <div style="background: rgba(250,204,21,0.06); border: 1px solid rgba(250,204,21,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
@@ -1272,60 +1285,46 @@
               <span style="font-size: 13px;">📄</span>
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">DOCUMENT HIGHLIGHT CONTROLS</span>
             </div>
-            <span style="font-size: 9px; color: #facc15; font-weight: 700; background: rgba(250,204,21,0.15); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
+            <button type="button" id="dh-btn-add-line" style="font-size: 9.5px; font-weight: 700; color: #facc15; cursor: pointer; padding: 2px 7px; border-radius: 4px; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.35);">
+              + Add Line
+            </button>
           </div>
 
-          <!-- Document Header -->
+          <!-- Document Title -->
           <div style="display: flex; flex-direction: column; gap: 3px;">
             <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Document Title</span>
             <input type="text" id="dh-input-title" value="${data.docTitle || 'CONFIDENTIAL AGREEMENT'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11.5px; font-weight: 700; outline: none;" />
           </div>
 
-          <!-- Text Line 1 -->
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Line 1 Sentence</span>
-              <span style="font-size: 9px; color: ${curHl === 1 || curHl === 'all' ? '#facc15' : '#64748b'}; font-weight: 700;">${curHl === 1 || curHl === 'all' ? '● HIGHLIGHTED' : ''}</span>
-            </div>
-            <input type="text" id="dh-input-l1" value="${data.line1 || '1. Intellectual property rights reserved.'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; outline: none;" />
-          </div>
-
-          <!-- Text Line 2 -->
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Line 2 Sentence</span>
-              <span style="font-size: 9px; color: ${curHl === 2 || curHl === 'all' ? '#facc15' : '#64748b'}; font-weight: 700;">${curHl === 2 || curHl === 'all' ? '● HIGHLIGHTED' : ''}</span>
-            </div>
-            <input type="text" id="dh-input-l2" value="${data.line2 || '2. Total liability shall not exceed $10,000,000.'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; outline: none;" />
-          </div>
-
-          <!-- Text Line 3 -->
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Line 3 Sentence</span>
-              <span style="font-size: 9px; color: ${curHl === 3 || curHl === 'all' ? '#facc15' : '#64748b'}; font-weight: 700;">${curHl === 3 || curHl === 'all' ? '● HIGHLIGHTED' : ''}</span>
-            </div>
-            <input type="text" id="dh-input-l3" value="${data.line3 || '3. Immediate termination upon breach of clause.'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; outline: none;" />
-          </div>
-
-          <!-- Highlight Target Selector -->
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Active Highlight Pass</span>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-              ${[1, 2, 3, 'all'].map(idx => `
-                <button type="button" class="dh-hl-btn" data-hl="${idx}" style="padding: 4px 6px; font-size: 9.5px; font-weight: 700; border-radius: 4px; cursor: pointer; ${curHl == idx ? 'background: rgba(250,204,21,0.25); border: 1px solid #facc15; color: #fff;' : 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8;'}">${idx === 'all' ? 'All Lines' : 'Line ' + idx}</button>
+          <!-- Document Clauses & Independent Highlight Passes -->
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Document Clauses &amp; Highlights</span>
+            <div id="dh-lines-list" style="display: flex; flex-direction: column; gap: 8px;">
+              ${lines.map((ln, idx) => `
+                <div class="dh-line-card" data-idx="${idx}" style="background: rgba(0,0,0,0.4); border: 1px solid ${ln.highlighted ? (data.hlColor || '#facc15') : 'rgba(255,255,255,0.08)'}; border-radius: 7px; padding: 7px 9px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                    <span style="font-size: 9.5px; font-weight: 800; font-family: monospace; color: #94a3b8;">LINE ${idx + 1}</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <button type="button" class="dh-line-toggle-hl" data-idx="${idx}" style="font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 3px; ${ln.highlighted ? `background: rgba(250,204,21,0.22); border: 1px solid ${data.hlColor || '#facc15'}; color: #fff;` : 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #64748b;'}">
+                        <span>${ln.highlighted ? '🖍️ Highlighted' : '○ Normal'}</span>
+                      </button>
+                      ${lines.length > 1 ? `<button type="button" class="dh-line-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Delete this line">✕</button>` : ''}
+                    </div>
+                  </div>
+                  <input type="text" class="dh-line-input-text" data-idx="${idx}" value="${ln.text}" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10.5px; font-family: 'Georgia', serif; outline: none;" placeholder="Sentence clause..." />
+                </div>
               `).join('')}
             </div>
           </div>
 
-          <!-- Highlight Color -->
-          <div style="display: flex; align-items: center; justify-content: space-between;">
+          <!-- Highlight Marker Tint & Color Dots -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
             <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Marker Tint</span>
-            <div style="display: flex; align-items: center; gap: 5px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
               <input type="color" id="dh-input-color" value="${data.hlColor || '#facc15'}" style="width: 24px; height: 20px; border: none; background: transparent; cursor: pointer;" />
               <div style="display: flex; gap: 4px;">
                 ${hlColors.map(c => `
-                  <button type="button" class="dh-color-dot" data-val="${c.val}" style="width: 16px; height: 16px; border-radius: 50%; background: ${c.val}; border: 1px solid rgba(255,255,255,0.3); cursor: pointer;" title="${c.label}"></button>
+                  <button type="button" class="dh-color-dot" data-val="${c.val}" style="width: 17px; height: 17px; border-radius: 50%; background: ${c.val}; border: 1.5px solid ${c.val === data.hlColor ? '#fff' : 'rgba(255,255,255,0.2)'}; cursor: pointer;" title="${c.label}"></button>
                 `).join('')}
               </div>
             </div>
@@ -1336,20 +1335,45 @@
       // Wire docheight controls
       const tInp = container.querySelector('#dh-input-title');
       if (tInp) tInp.oninput = (e) => window.tplSetContextualData('docheight', { docTitle: e.target.value });
-      const l1Inp = container.querySelector('#dh-input-l1');
-      if (l1Inp) l1Inp.oninput = (e) => window.tplSetContextualData('docheight', { line1: e.target.value });
-      const l2Inp = container.querySelector('#dh-input-l2');
-      if (l2Inp) l2Inp.oninput = (e) => window.tplSetContextualData('docheight', { line2: e.target.value });
-      const l3Inp = container.querySelector('#dh-input-l3');
-      if (l3Inp) l3Inp.oninput = (e) => window.tplSetContextualData('docheight', { line3: e.target.value });
 
-      container.querySelectorAll('.dh-hl-btn').forEach(btn => {
+      container.querySelectorAll('.dh-line-input-text').forEach(inp => {
+        inp.oninput = (e) => {
+          const idx = parseInt(e.target.dataset.idx, 10);
+          lines[idx].text = e.target.value;
+          window.tplSetContextualData('docheight', { lines: [...lines] });
+        };
+      });
+
+      container.querySelectorAll('.dh-line-toggle-hl').forEach(btn => {
         btn.onclick = () => {
-          const val = btn.dataset.hl === 'all' ? 'all' : parseInt(btn.dataset.hl, 10);
-          window.tplSetContextualData('docheight', { hlIndex: val });
+          const idx = parseInt(btn.dataset.idx, 10);
+          lines[idx].highlighted = !lines[idx].highlighted;
+          window.tplSetContextualData('docheight', { lines: [...lines] });
           window.tplRenderContextualInspector('docheight');
         };
       });
+
+      container.querySelectorAll('.dh-line-del').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.dataset.idx, 10);
+          lines.splice(idx, 1);
+          window.tplSetContextualData('docheight', { lines: [...lines] });
+          window.tplRenderContextualInspector('docheight');
+        };
+      });
+
+      const addLineBtn = container.querySelector('#dh-btn-add-line');
+      if (addLineBtn) {
+        addLineBtn.onclick = () => {
+          lines.push({
+            id: Date.now(),
+            text: `${lines.length + 1}. Newly added confidential stipulation.`,
+            highlighted: true
+          });
+          window.tplSetContextualData('docheight', { lines: [...lines] });
+          window.tplRenderContextualInspector('docheight');
+        };
+      }
 
       const colInp = container.querySelector('#dh-input-color');
       if (colInp) {

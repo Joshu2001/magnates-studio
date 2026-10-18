@@ -7083,9 +7083,7 @@
           </div>
 
           <!-- Section: Media Layers -->
-          <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; justify-content: space-between;">
-              <span>Layers</span>
+          <div id="tpl-modal-standard-layers-section" style="display: flex; flex-direction: column; gap: 8px; position: sticky; top: -14px; background: #0c0e15; z-index: 25; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08);"><div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; justify-content: space-between;"><span>Layers</span>
               <label for="tpl-modal-add-image-cutout" id="tpl-modal-btn-add-image" title="Add Layer" style="font-size: 10px; font-weight: 500; color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 2px;">
                 + Add Layer
                 <input type="file" id="tpl-modal-add-image-cutout" accept="image/*" style="display: none;" />
@@ -10722,8 +10720,9 @@
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
   <script src="js/tpl-snapshots.js?v=10"></script>
-  <script src="js/app.js?v=342"></script>
+  <script src="js/app.js?v=343"></script>
   <script src="js/tpl-3d-inspector.js?v=11"></script>
-  <script src="js/tpl-contextual-inspector.js?v=6"></script>
+  <script src="js/tpl-stage-transform.js?v=2"></script>
+  <script src="js/tpl-contextual-inspector.js?v=7"></script>
 </body>
 </html>
