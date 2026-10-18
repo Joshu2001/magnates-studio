@@ -1,0 +1,48 @@
+{
+  "text": [
+    {
+      "id": "clip-text-1",
+      "start": 0,
+      "duration": 5,
+      "text": "Did Google pump and dump?",
+      "highlight": "pump and dump",
+      "fontFamily": "'Inter', sans-serif",
+      "fontSize": 95,
+      "textColor": "#ffffff",
+      "highlightColor": "#ff334b",
+      "anim": "pop",
+      "sfx": "whoosh",
+      "position": "center",
+      "zIndex": 30,
+      "layerOrder": "front",
+      "_renderBounds": {
+        "x": 227.56430580414212,
+        "y": 440.4909090909091,
+        "w": 1396.8828125,
+        "h": 146
+      },
+      "x": 243.56430580414212,
+      "y": 513.4909090909091
+    }
+  ],
+  "chart": [],
+  "quote": [],
+  "image": [],
+  "video": [],
+  "voiceover": [],
+  "music": [],
+  "background": [
+    {
+      "id": "clip-bg-default",
+      "start": 0,
+      "duration": 60,
+      "bgType": "cyber_grid",
+      "bgColor": "#0a0b0e"
+    }
+  ],
+  "currentTime": 0,
+  "duration": 368.14,
+  "savedAt": 1792317486806,
+  "projectName": "Android Updates & Bloatware",
+  "projectId": "proj_1790871455184_b5r7"
+}

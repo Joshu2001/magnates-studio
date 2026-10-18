@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <!-- Dark Background -->
+    <linearGradient id="bgThrill" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020306" />
+      <stop offset="50%" stop-color="#070a12" />
+      <stop offset="100%" stop-color="#010204" />
+    </linearGradient>
+
+    <!-- Heavy Elliptical Mask Vignette (Size constraint 0.7, Feathered) -->
+    <radialGradient id="heavyElliptical" cx="50%" cy="50%" rx="38%" ry="32%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0" />
+      <stop offset="35%" stop-color="#000000" stop-opacity="0.25" />
+      <stop offset="65%" stop-color="#020308" stop-opacity="0.82" />
+      <stop offset="100%" stop-color="#000002" stop-opacity="0.98" />
+    </radialGradient>
+
+    <!-- Golden Accent Line Glow -->
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0" />
+      <stop offset="50%" stop-color="#fbbf24" stop-opacity="1" />
+      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base Canvas -->
+  <rect width="400" height="225" fill="url(#bgThrill)" />
+
+  <!-- Background Financial District Silhouettes & Chart Line -->
+  <path d="M 0 160 L 50 145 L 80 165 L 120 120 L 160 135 L 200 90 L 240 115 L 290 80 L 330 110 L 370 70 L 400 95 L 400 225 L 0 225 Z" fill="#04070e" />
+  <path d="M 0 160 Q 120 130, 200 90 T 400 95" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.35" stroke-dasharray="4 2" />
+
+  <!-- Center Focal Target Reticle Circles -->
+  <ellipse cx="200" cy="112" rx="100" ry="60" fill="none" stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="6 4" />
+  <ellipse cx="200" cy="112" rx="45" ry="28" fill="none" stroke="#fbbf24" stroke-width="1" stroke-opacity="0.45" />
+
+  <!-- Heavy Elliptical Mask Feathering Overlay (The Core Feature) -->
+  <rect width="400" height="225" fill="url(#heavyElliptical)" />
+
+  <!-- Central Title Plate -->
+  <rect x="75" y="58" width="250" height="108" rx="8" fill="#05070c" fill-opacity="0.85" stroke="#f59e0b" stroke-width="1.4" stroke-opacity="0.5" />
+  
+  <text x="200" y="86" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="800" letter-spacing="2.5" fill="#f59e0b" text-anchor="middle">
+    FOCAL MASK // CONSTRAINT 0.7X
+  </text>
+  <text x="200" y="112" font-family="'Inter', sans-serif" font-size="13" font-weight="900" letter-spacing="2" fill="#ffffff" text-anchor="middle">
+    DARK FINANCIAL THRILLER
+  </text>
+  <text x="200" y="132" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" letter-spacing="1.5" fill="#cbd5e1" text-anchor="middle">
+    HEAVY VIGNETTE // FEATHER 2.8X
+  </text>
+  <line x1="100" y1="140" x2="300" y2="140" stroke="url(#amberGlow)" stroke-width="1.5" />
+
+  <!-- Tag Pill Left -->
+  <rect x="14" y="14" width="144" height="20" rx="5" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="1" />
+  <circle cx="26" cy="24" r="3.5" fill="#f59e0b" />
+  <text x="36" y="27.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#fef08a" letter-spacing="1">THRILLER VIGNETTE</text>
+
+  <!-- Tag Pill Right -->
+  <rect x="306" y="14" width="80" height="20" rx="5" fill="#000000" fill-opacity="0.85" stroke="#f59e0b" stroke-width="1" />
+  <text x="346" y="27.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#fbbf24" text-anchor="middle">2 SEC APPLIED</text>
+</svg>

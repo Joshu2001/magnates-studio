@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="puzzleArcBgGrad" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#140728"/>
+      <stop offset="55%" stop-color="#090514"/>
+      <stop offset="100%" stop-color="#030207"/>
+    </radialGradient>
+
+    <!-- Neon Cyan & Purple Glow Filter -->
+    <filter id="neonArcGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur1"/>
+      <feGaussianBlur stdDeviation="15" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <linearGradient id="puzzleGlowStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+
+    <linearGradient id="arcSplineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="35%" stop-color="#06b6d4"/>
+      <stop offset="70%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep Dark Background -->
+  <rect width="400" height="225" fill="url(#puzzleArcBgGrad)"/>
+
+  <!-- Technical Grid Matrix -->
+  <g stroke="rgba(168, 85, 247, 0.08)" stroke-width="1">
+    <line x1="0" y1="38" x2="400" y2="38"/>
+    <line x1="0" y1="76" x2="400" y2="76"/>
+    <line x1="0" y1="114" x2="400" y2="114"/>
+    <line x1="0" y1="152" x2="400" y2="152"/>
+    <line x1="0" y1="190" x2="400" y2="190"/>
+    <line x1="50" y1="0" x2="50" y2="225"/>
+    <line x1="100" y1="0" x2="100" y2="225"/>
+    <line x1="150" y1="0" x2="150" y2="225"/>
+    <line x1="200" y1="0" x2="200" y2="225"/>
+    <line x1="250" y1="0" x2="250" y2="225"/>
+    <line x1="300" y1="0" x2="300" y2="225"/>
+    <line x1="350" y1="0" x2="350" y2="225"/>
+  </g>
+
+  <!-- Top Badges -->
+  <rect x="14" y="12" width="135" height="20" rx="6" fill="rgba(10, 10, 20, 0.85)" stroke="rgba(168, 85, 247, 0.5)" stroke-width="1"/>
+  <circle cx="24" cy="22" r="3.5" fill="#a855f7"/>
+  <text x="34" y="25.5" fill="#c084fc" font-family="'Share Tech Mono', monospace" font-size="8" font-weight="700" letter-spacing="1">STORY ARC MASK</text>
+
+  <rect x="300" y="12" width="86" height="20" rx="6" fill="rgba(10, 10, 20, 0.85)" stroke="rgba(6, 182, 212, 0.5)" stroke-width="1"/>
+  <text x="309" y="25.5" fill="#38bdf8" font-family="'Share Tech Mono', monospace" font-size="8" font-weight="700" letter-spacing="1">ARC LOCK-IN</text>
+
+  <!-- 4-Piece Interlocking Story Arc Grid -->
+  <!-- Arc 1: The Origin -->
+  <g transform="translate(48, 45)">
+    <rect width="144" height="66" rx="8" fill="#130e26" stroke="#a855f7" stroke-width="1.8" filter="url(#neonArcGlow)"/>
+    <rect width="144" height="66" rx="8" fill="#130e26" stroke="#c084fc" stroke-width="1.2"/>
+    <!-- Simulated Documentary footage texture -->
+    <path d="M 10 50 Q 50 15 90 40 T 135 25" fill="none" stroke="rgba(168,85,247,0.3)" stroke-width="3"/>
+    <rect x="8" y="8" width="20" height="14" rx="3" fill="#a855f7"/>
+    <text x="18" y="18" fill="#ffffff" font-family="'Share Tech Mono', monospace" font-size="8" font-weight="900" text-anchor="middle">#1</text>
+    <text x="35" y="19" fill="#ffffff" font-family="'Inter', sans-serif" font-size="9" font-weight="800">THE ORIGIN</text>
+    <text x="10" y="52" fill="#94a3b8" font-family="'Share Tech Mono', monospace" font-size="7.5">GENESIS OF SYSTEM</text>
+  </g>
+
+  <!-- Arc 2: The Catalyst -->
+  <g transform="translate(208, 45)">
+    <rect width="144" height="66" rx="8" fill="#081528" stroke="#06b6d4" stroke-width="1.8" filter="url(#neonArcGlow)"/>
+    <rect width="144" height="66" rx="8" fill="#081528" stroke="#38bdf8" stroke-width="1.2"/>
+    <path d="M 10 25 Q 60 55 100 20 T 135 45" fill="none" stroke="rgba(6,182,212,0.3)" stroke-width="3"/>
+    <rect x="8" y="8" width="20" height="14" rx="3" fill="#06b6d4"/>
+    <text x="18" y="18" fill="#000000" font-family="'Share Tech Mono', monospace" font-size="8" font-weight="900" text-anchor="middle">#2</text>
+    <text x="35" y="19" fill="#ffffff" font-family="'Inter', sans-serif" font-size="9" font-weight="800">THE CATALYST</text>
+    <text x="10" y="52" fill="#94a3b8" font-family="'Share Tech Mono', monospace" font-size="7.5">ACCELERATION SHIFT</text>
+  </g>
+
+  <!-- Arc 3: The Illusion -->
+  <g transform="translate(48, 120)">
+    <rect width="144" height="66" rx="8" fill="#1e1308" stroke="#f59e0b" stroke-width="1.8" filter="url(#neonArcGlow)"/>
+    <rect width="144" height="66" rx="8" fill="#1e1308" stroke="#fbbf24" stroke-width="1.2"/>
+    <path d="M 10 35 Q 45 60 85 20 T 135 40" fill="none" stroke="rgba(245,158,11,0.3)" stroke-width="3"/>
+    <rect x="8" y="8" width="20" height="14" rx="3" fill="#f59e0b"/>
+    <text x="18" y="18" fill="#000000" font-family="'Share Tech Mono', monospace" font-size="8" font-weight="900" text-anchor="middle">#3</text>
+    <text x="35" y="19" fill="#ffffff" font-family="'Inter', sans-serif" font-size="9" font-weight="800">THE ILLUSION</text>
+    <text x="10" y="52" fill="#94a3b8" font-family="'Share Tech Mono', monospace" font-size="7.5">MANUFACTURED TRUST</text>
+  </g>
+
+  <!-- Arc 4: The Collapse -->
+  <g transform="translate(208, 120)">
+    <rect width="144" height="66" rx="8" fill="#24080e" stroke="#ef4444" stroke-width="1.8" filter="url(#neonArcGlow)"/>
+    <rect width="144" height="66" rx="8" fill="#24080e" stroke="#f87171" stroke-width="1.2"/>
+    <path d="M 10 20 Q 55 10 90 55 T 135 60" fill="none" stroke="rgba(239,68,68,0.3)" stroke-width="3"/>
+    <rect x="8" y="8" width="20" height="14" rx="3" fill="#ef4444"/>
+    <text x="18" y="18" fill="#ffffff" font-family="'Share Tech Mono', monospace" font-size="8" font-weight="900" text-anchor="middle">#4</text>
+    <text x="35" y="19" fill="#ffffff" font-family="'Inter', sans-serif" font-size="9" font-weight="800">THE COLLAPSE</text>
+    <text x="10" y="52" fill="#94a3b8" font-family="'Share Tech Mono', monospace" font-size="7.5">FINAL REVELATION</text>
+  </g>
+
+  <!-- Glowing Spline Connecting All 4 Narrative Arcs (Jani's story arc curve) -->
+  <path d="M 120 78 C 180 115, 220 50, 280 78 S 140 180, 120 153 S 240 120, 280 153" fill="none" stroke="url(#arcSplineGrad)" stroke-width="3" stroke-dasharray="6 3" filter="url(#neonArcGlow)"/>
+
+  <!-- Center Narrative Anchor Tag -->
+  <g transform="translate(200, 115)">
+    <circle cx="0" cy="0" r="14" fill="#0c0d14" stroke="#ffffff" stroke-width="2" filter="url(#neonArcGlow)"/>
+    <text x="0" y="4" fill="#38bdf8" font-family="'Share Tech Mono', monospace" font-size="10" font-weight="900" text-anchor="middle">🧩</text>
+  </g>
+
+  <!-- Bottom Ticker Bar -->
+  <rect x="0" y="198" width="400" height="27" fill="rgba(8, 9, 14, 0.95)"/>
+  <line x1="0" y1="198" x2="400" y2="198" stroke="rgba(6, 182, 212, 0.6)" stroke-width="1.5"/>
+  <text x="14" y="215" fill="#cbd5e1" font-family="'Share Tech Mono', monospace" font-size="8.5">
+    JANI METAPHOR: 4-ARC STORY MASKING  •  INTERLOCKING PUZZLE REVEAL  •  ARC LOCK-IN: 6X
+  </text>
+</svg>

@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <!-- Dark Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0712" />
+      <stop offset="50%" stop-color="#140b24" />
+      <stop offset="100%" stop-color="#050308" />
+    </linearGradient>
+
+    <!-- Golden Hour Light Leak -->
+    <radialGradient id="leakGold" cx="80%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.95" />
+      <stop offset="25%" stop-color="#f97316" stop-opacity="0.75" />
+      <stop offset="55%" stop-color="#ec4899" stop-opacity="0.4" />
+      <stop offset="80%" stop-color="#8b5cf6" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Violet Ambient Ray -->
+    <radialGradient id="leakViolet" cx="20%" cy="80%" r="65%">
+      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.7" />
+      <stop offset="40%" stop-color="#7c3aed" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Anamorphic Cyan Flare -->
+    <linearGradient id="anamorphicStreak" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0" />
+      <stop offset="35%" stop-color="#06b6d4" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="65%" stop-color="#06b6d4" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#06b6d4" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Ray Beams -->
+    <linearGradient id="ray1" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.6" />
+      <stop offset="60%" stop-color="#f97316" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas Background -->
+  <rect width="400" height="225" fill="url(#bgGrad)" />
+
+  <!-- Subtle Film Grain / Dust Specks -->
+  <circle cx="120" cy="60" r="1.5" fill="#fef08a" opacity="0.6" />
+  <circle cx="180" cy="140" r="2" fill="#fed7aa" opacity="0.5" />
+  <circle cx="290" cy="85" r="1.5" fill="#ffffff" opacity="0.7" />
+  <circle cx="70" cy="170" r="2.5" fill="#c084fc" opacity="0.4" />
+  <circle cx="340" cy="180" r="1.8" fill="#f43f5e" opacity="0.5" />
+
+  <!-- Volumetric Angled Light Rays -->
+  <polygon points="360,0 400,0 220,225 150,225" fill="url(#ray1)" opacity="0.55" />
+  <polygon points="300,0 350,0 120,225 60,225" fill="url(#ray1)" opacity="0.35" />
+  <polygon points="400,30 400,90 280,225 210,225" fill="url(#ray1)" opacity="0.4" />
+
+  <!-- Ambient Light Leak Orbs -->
+  <rect width="400" height="225" fill="url(#leakGold)" style="mix-blend-mode: screen;" />
+  <rect width="400" height="225" fill="url(#leakViolet)" style="mix-blend-mode: screen;" />
+
+  <!-- Anamorphic Lens Flare Horizontal Streak -->
+  <rect x="0" y="88" width="400" height="4" fill="url(#anamorphicStreak)" opacity="0.85" style="mix-blend-mode: screen; filter: drop-shadow(0 0 8px #06b6d4);" />
+  <circle cx="280" cy="90" r="9" fill="#ffffff" opacity="0.9" style="filter: drop-shadow(0 0 15px #fde047);" />
+
+  <!-- Center Card Frame / Subject Silouette -->
+  <rect x="80" y="55" width="240" height="115" rx="8" fill="#090a12" fill-opacity="0.75" stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.5" />
+  
+  <text x="200" y="96" font-family="'Inter', -apple-system, sans-serif" font-size="11" font-weight="900" letter-spacing="2.5" fill="#fbbf24" text-anchor="middle">
+    LIGHT RAYS &amp; AMBIENT LEAKS
+  </text>
+  <text x="200" y="118" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" letter-spacing="1.5" fill="#e2e8f0" text-anchor="middle">
+    ANAMORPHIC FLARE &amp; OPTICAL SCATTER
+  </text>
+
+  <!-- Tag Pill -->
+  <rect x="14" y="14" width="138" height="20" rx="5" fill="#000000" fill-opacity="0.75" stroke="#f59e0b" stroke-width="1" />
+  <circle cx="26" cy="24" r="3.5" fill="#f59e0b" />
+  <text x="36" y="27.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#fef08a" letter-spacing="1">OPTICAL LENS FX</text>
+
+  <rect x="306" y="14" width="80" height="20" rx="5" fill="#000000" fill-opacity="0.75" stroke="#06b6d4" stroke-width="1" />
+  <text x="346" y="27.5" font-family="monospace" font-size="7.5" font-weight="800" fill="#38bdf8" text-anchor="middle">2 SEC APPLIED</text>
+</svg>

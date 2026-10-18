@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background & Depth Gradients -->
+    <radialGradient id="audioBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#191530" />
+      <stop offset="55%" stop-color="#0a0818" />
+      <stop offset="100%" stop-color="#030209" />
+    </radialGradient>
+    <radialGradient id="coreCyan" cx="30%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#0891b2" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="corePurple" cx="70%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#a855f7" stop-opacity="0.35" />
+      <stop offset="60%" stop-color="#7e22ce" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Waveform Glow Filter -->
+    <filter id="waveGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="plateShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.9" />
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#06b6d4" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Deep Noir Background Canvas -->
+  <rect width="800" height="450" fill="url(#audioBg)" />
+  <circle cx="280" cy="225" r="300" fill="url(#coreCyan)" />
+  <circle cx="520" cy="225" r="300" fill="url(#corePurple)" />
+
+  <!-- Subtle Studio Audio Timeline Grid Lines -->
+  <g stroke="#ffffff" stroke-opacity="0.05" stroke-width="1">
+    <line x1="100" y1="0" x2="100" y2="450" />
+    <line x1="200" y1="0" x2="200" y2="450" />
+    <line x1="300" y1="0" x2="300" y2="450" />
+    <line x1="400" y1="0" x2="400" y2="450" stroke="#00f0ff" stroke-opacity="0.2" stroke-dasharray="4 4" />
+    <line x1="500" y1="0" x2="500" y2="450" />
+    <line x1="600" y1="0" x2="600" y2="450" />
+    <line x1="700" y1="0" x2="700" y2="450" />
+  </g>
+
+  <!-- VISUAL CUT LINE (Cut Boundary at x=400) -->
+  <g transform="translate(400, 0)">
+    <line x1="0" y1="75" x2="0" y2="375" stroke="#ef4444" stroke-width="2" stroke-dasharray="6 4" opacity="0.8" />
+    <!-- Marker flag -->
+    <rect x="-42" y="75" width="84" height="20" rx="4" fill="#ef4444" />
+    <text x="0" y="89" font-family="monospace" font-size="9" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="1">VIDEO CUT</text>
+  </g>
+
+  <!-- TIMELINE TRACK 1: VIDEO CLIP (Scene A & Scene B) -->
+  <g transform="translate(100, 120)">
+    <!-- Scene A Video -->
+    <rect x="0" y="0" width="300" height="48" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1.5" />
+    <text x="14" y="28" font-family="'Inter', sans-serif" font-size="12" font-weight="800" fill="#94a3b8">VIDEO TRACK // SCENE A (PRESENT)</text>
+
+    <!-- Scene B Video (Starts precisely at cut line x=300) -->
+    <rect x="300" y="0" width="300" height="48" rx="6" fill="#0f172a" stroke="#6366f1" stroke-width="2" />
+    <text x="314" y="28" font-family="'Inter', sans-serif" font-size="12" font-weight="800" fill="#a5b4fc">SCENE B (FLASHBACK REVEAL)</text>
+  </g>
+
+  <!-- TIMELINE TRACK 2: AUDIO J-CUT (Starts BEFORE the Video Cut!) -->
+  <g transform="translate(100, 185)">
+    <!-- Ambient Scene A Audio -->
+    <rect x="0" y="0" width="180" height="52" rx="6" fill="#161e2e" stroke="#334155" stroke-width="1.5" />
+    <text x="14" y="30" font-family="monospace" font-size="10" font-weight="700" fill="#64748b">AUDIO A (OFFICE AMBIENCE)</text>
+
+    <!-- J-CUT AUDIO LEAD: Shifts 120px earlier than the Video Cut! -->
+    <rect x="180" y="0" width="420" height="52" rx="6" fill="#083344" stroke="#06b6d4" stroke-width="2" />
+    
+    <!-- Animated Stylized Waveforms inside the J-Cut Audio Block -->
+    <g stroke="#22d3ee" stroke-width="2.5" stroke-linecap="round" filter="url(#waveGlow)" opacity="0.9">
+      <!-- Pre-lap Audio Lead-in (Playing under Scene A!) -->
+      <line x1="200" y1="26" x2="200" y2="26" />
+      <line x1="212" y1="18" x2="212" y2="34" />
+      <line x1="224" y1="12" x2="224" y2="40" />
+      <line x1="236" y1="16" x2="236" y2="36" />
+      <line x1="248" y1="8" x2="248" y2="44" />
+      <line x1="260" y1="14" x2="260" y2="38" />
+      <line x1="272" y1="10" x2="272" y2="42" />
+      <line x1="284" y1="6" x2="284" y2="46" />
+      <line x1="296" y1="12" x2="296" y2="40" />
+
+      <!-- Full Voiceover Waveform into Scene B -->
+      <line x1="308" y1="4" x2="308" y2="48" stroke="#38bdf8" />
+      <line x1="320" y1="8" x2="320" y2="44" stroke="#38bdf8" />
+      <line x1="332" y1="14" x2="332" y2="38" stroke="#38bdf8" />
+      <line x1="344" y1="6" x2="344" y2="46" stroke="#38bdf8" />
+      <line x1="356" y1="12" x2="356" y2="40" stroke="#38bdf8" />
+      <line x1="368" y1="18" x2="368" y2="34" stroke="#38bdf8" />
+      <line x1="380" y1="10" x2="380" y2="42" stroke="#38bdf8" />
+      <line x1="392" y1="8" x2="392" y2="44" stroke="#38bdf8" />
+      <line x1="404" y1="14" x2="404" y2="38" stroke="#38bdf8" />
+      <line x1="416" y1="16" x2="416" y2="36" stroke="#38bdf8" />
+      <line x1="428" y1="12" x2="428" y2="40" stroke="#38bdf8" />
+      <line x1="440" y1="20" x2="440" y2="32" stroke="#38bdf8" />
+    </g>
+
+    <text x="460" y="31" font-family="'Inter', sans-serif" font-size="11" font-weight="800" fill="#67e8f9">
+      J-CUT: UPCOMING VOICEOVER LEADS (1.20s EARLY)
+    </text>
+  </g>
+
+  <!-- Graphic Bridge Bracket Illustrating the Pre-Lap -->
+  <g transform="translate(280, 252)">
+    <line x1="0" y1="0" x2="120" y2="0" stroke="#00f0ff" stroke-width="2" />
+    <line x1="0" y1="-5" x2="0" y2="5" stroke="#00f0ff" stroke-width="2" />
+    <line x1="120" y1="-5" x2="120" y2="5" stroke="#00f0ff" stroke-width="2" />
+    <text x="60" y="16" font-family="monospace" font-size="9" font-weight="800" fill="#00f0ff" text-anchor="middle" letter-spacing="1">
+      AUDIO PRE-LAP BRIDGE: -1.2s
+    </text>
+  </g>
+
+  <!-- Center Floating Studio Title Plate -->
+  <g transform="translate(400, 340)" filter="url(#plateShadow)">
+    <rect x="-240" y="-30" width="480" height="60" rx="14" fill="#070a14" fill-opacity="0.94" stroke="#06b6d4" stroke-width="1.8" />
+    <text x="0" y="-8" 
+          font-family="monospace" 
+          font-size="9.5" 
+          font-weight="800" 
+          letter-spacing="2.5" 
+          text-anchor="middle" 
+          fill="#38bdf8">
+      AUDIO-VISUAL PACING // SOUND DESIGN
+    </text>
+    <text x="0" y="15" 
+          font-family="'Inter', sans-serif" 
+          font-size="18" 
+          font-weight="900" 
+          letter-spacing="3" 
+          text-anchor="middle" 
+          fill="#ffffff">
+      J-CUTS &amp; L-CUTS NARRATIVE BRIDGE
+    </text>
+  </g>
+
+  <!-- Header HUD Badges -->
+  <g transform="translate(35, 40)">
+    <rect width="210" height="26" rx="6" fill="#0b1120" stroke="#06b6d4" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="14" y="17" font-family="monospace" font-size="10" font-weight="800" fill="#38bdf8" letter-spacing="1.5">AUDIO-VISUAL PACING // JJ</text>
+  </g>
+
+  <g transform="translate(620, 40)">
+    <rect width="145" height="26" rx="6" fill="#180e2b" stroke="#a855f7" stroke-width="1" stroke-opacity="0.6"/>
+    <text x="12" y="17" font-family="monospace" font-size="10" font-weight="800" fill="#d8b4fe" letter-spacing="1.5">J-CUT / L-CUT SYNC</text>
+  </g>
+</svg>

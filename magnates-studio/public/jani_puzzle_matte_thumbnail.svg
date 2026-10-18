@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Gradient with Dark Cyber Atmosphere -->
+    <radialGradient id="cyberBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#081426" stop-opacity="0.95" />
+      <stop offset="60%" stop-color="#05070a" stop-opacity="0.98" />
+      <stop offset="100%" stop-color="#020306" stop-opacity="1" />
+    </radialGradient>
+
+    <!-- Cyan Glow Filter -->
+    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#00f2fe" flood-opacity="0.75" />
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.8" />
+    </filter>
+
+    <!-- Gold Accent Filter -->
+    <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#f59e0b" flood-opacity="0.7" />
+    </filter>
+
+    <!-- Puzzle Piece Border Gradients -->
+    <linearGradient id="pieceGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f2fe" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.4" />
+    </linearGradient>
+
+    <linearGradient id="pieceGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#1e293b" stop-opacity="0.8" />
+    </linearGradient>
+
+    <linearGradient id="alphaMatteGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f2fe" />
+      <stop offset="50%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="800" height="450" fill="url(#cyberBg)" />
+
+  <!-- Blueprint Analytical Grid Pattern -->
+  <g stroke="#ffffff" stroke-opacity="0.04" stroke-width="1">
+    <line x1="0" y1="50" x2="800" y2="50" />
+    <line x1="0" y1="100" x2="800" y2="100" />
+    <line x1="0" y1="150" x2="800" y2="150" />
+    <line x1="0" y1="200" x2="800" y2="200" />
+    <line x1="0" y1="250" x2="800" y2="250" />
+    <line x1="0" y1="300" x2="800" y2="300" />
+    <line x1="0" y1="350" x2="800" y2="350" />
+    <line x1="0" y1="400" x2="800" y2="400" />
+    
+    <line x1="80" y1="0" x2="80" y2="450" />
+    <line x1="160" y1="0" x2="160" y2="450" />
+    <line x1="240" y1="0" x2="240" y2="450" />
+    <line x1="320" y1="0" x2="320" y2="450" />
+    <line x1="400" y1="0" x2="400" y2="450" />
+    <line x1="480" y1="0" x2="480" y2="450" />
+    <line x1="560" y1="0" x2="560" y2="450" />
+    <line x1="640" y1="0" x2="640" y2="450" />
+    <line x1="720" y1="0" x2="720" y2="450" />
+  </g>
+
+  <!-- Faint Watermark Topic Title -->
+  <text x="400" y="240" font-family="'JetBrains Mono', monospace" font-size="44" font-weight="900" fill="#ffffff" fill-opacity="0.06" text-anchor="middle" letter-spacing="8">THE MONOPOLY TRAP</text>
+
+  <!-- 3x3 Puzzle Reconstruction Matrix Nodes -->
+  <!-- Row 1 -->
+  <g transform="translate(190, 48) rotate(-4)" opacity="0.85">
+    <rect width="125" height="85" rx="8" fill="#0f172a" stroke="url(#pieceGrad1)" stroke-width="1.5" />
+    <rect width="32" height="12" rx="3" x="8" y="8" fill="#0369a1" fill-opacity="0.6" />
+    <text x="12" y="17" font-family="monospace" font-size="7" font-weight="700" fill="#38bdf8">#01 MARKET</text>
+    <circle cx="62" cy="46" r="14" fill="#0284c7" fill-opacity="0.2" />
+    <path d="M57 46 h10 M62 41 v10" stroke="#00f2fe" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(335, 42)" filter="url(#cyanGlow)">
+    <rect width="130" height="90" rx="8" fill="#0b1322" stroke="#00f2fe" stroke-width="2" />
+    <rect width="36" height="12" rx="3" x="8" y="8" fill="#0284c7" fill-opacity="0.7" />
+    <text x="12" y="17" font-family="monospace" font-size="7" font-weight="700" fill="#e0f2fe">#02 ALGO</text>
+    <!-- Graph bars preview -->
+    <rect x="52" y="55" width="6" height="18" fill="#38bdf8" rx="1"/>
+    <rect x="62" y="45" width="6" height="28" fill="#00f2fe" rx="1"/>
+    <rect x="72" y="38" width="6" height="35" fill="#f59e0b" rx="1"/>
+  </g>
+
+  <g transform="translate(485, 52) rotate(5)" opacity="0.85">
+    <rect width="125" height="85" rx="8" fill="#0f172a" stroke="url(#pieceGrad1)" stroke-width="1.5" />
+    <rect width="36" height="12" rx="3" x="8" y="8" fill="#0369a1" fill-opacity="0.6" />
+    <text x="12" y="17" font-family="monospace" font-size="7" font-weight="700" fill="#38bdf8">#03 POWER</text>
+    <circle cx="62" cy="48" r="12" fill="#0284c7" fill-opacity="0.2"/>
+    <polygon points="62,40 70,55 54,55" fill="none" stroke="#38bdf8" stroke-width="2"/>
+  </g>
+
+  <!-- Row 2 (Surrounding Alpha Matte Box) -->
+  <g transform="translate(175, 155) rotate(-3)" opacity="0.8">
+    <rect width="125" height="85" rx="8" fill="#0b1322" stroke="url(#pieceGrad2)" stroke-width="1.5" />
+    <text x="12" y="18" font-family="monospace" font-size="7" font-weight="700" fill="#94a3b8">#04 LEAK</text>
+  </g>
+
+  <g transform="translate(500, 160) rotate(4)" opacity="0.8">
+    <rect width="125" height="85" rx="8" fill="#0b1322" stroke="url(#pieceGrad2)" stroke-width="1.5" />
+    <text x="12" y="18" font-family="monospace" font-size="7" font-weight="700" fill="#94a3b8">#06 VAULT</text>
+  </g>
+
+  <!-- Row 3 Bottom Nodes -->
+  <g transform="translate(195, 260) rotate(4)" opacity="0.75">
+    <rect width="125" height="85" rx="8" fill="#0b1322" stroke="url(#pieceGrad2)" stroke-width="1.5" />
+    <text x="12" y="18" font-family="monospace" font-size="7" font-weight="700" fill="#94a3b8">#07 SYSTEM</text>
+  </g>
+  <g transform="translate(338, 270) rotate(-2)" opacity="0.8">
+    <rect width="125" height="85" rx="8" fill="#0b1322" stroke="url(#pieceGrad1)" stroke-width="1.5" />
+    <text x="12" y="18" font-family="monospace" font-size="7" font-weight="700" fill="#38bdf8">#08 FLOW</text>
+  </g>
+  <g transform="translate(480, 265) rotate(-3)" opacity="0.75">
+    <rect width="125" height="85" rx="8" fill="#0b1322" stroke="url(#pieceGrad2)" stroke-width="1.5" />
+    <text x="12" y="18" font-family="monospace" font-size="7" font-weight="700" fill="#94a3b8">#09 TRAP</text>
+  </g>
+
+  <!-- CENTER FOREGROUND: James Jani Signature Glowing Alpha Matte Bounding Box -->
+  <g transform="translate(230, 135)" filter="url(#cyanGlow)">
+    <!-- Alpha Matte Fill with Frosted Glass Look -->
+    <rect width="340" height="150" rx="8" fill="#080b12" fill-opacity="0.94" stroke="#ffffff" stroke-width="1.8" />
+    
+    <!-- Precision Corner Accent Framing Notches -->
+    <polyline points="2,14 2,2 14,2" fill="none" stroke="#ffffff" stroke-width="2.5" />
+    <polyline points="326,2 338,2 338,14" fill="none" stroke="#ffffff" stroke-width="2.5" />
+    <polyline points="2,136 2,148 14,148" fill="none" stroke="#ffffff" stroke-width="2.5" />
+    <polyline points="326,148 338,148 338,136" fill="none" stroke="#ffffff" stroke-width="2.5" />
+
+    <!-- Badge Tag -->
+    <g transform="translate(170, 28)">
+      <circle cx="-75" cy="0" r="3.5" fill="#00f2fe" filter="url(#cyanGlow)" />
+      <text x="-65" y="4" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="800" fill="#00f2fe" letter-spacing="2">PRIMARY TALKING POINT</text>
+    </g>
+
+    <!-- Main Headline in Quotations -->
+    <text x="170" y="68" font-family="'Inter', sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="-0.2">
+      "Illusion of Free Choice in
+    </text>
+    <text x="170" y="92" font-family="'Inter', sans-serif" font-size="16" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="-0.2">
+      Controlled Markets"
+    </text>
+
+    <!-- Subtext Explainer -->
+    <text x="170" y="120" font-family="'Inter', sans-serif" font-size="9" font-weight="500" fill="#94a3b8" text-anchor="middle">
+      How systemic algorithms construct manufactured scarcity.
+    </text>
+
+    <!-- Bottom Neon Line -->
+    <line x1="20" y1="138" x2="320" y2="138" stroke="url(#alphaMatteGrad)" stroke-width="2" stroke-linecap="round" />
+  </g>
+
+  <!-- HUD Badges Top Left & Right -->
+  <g transform="translate(24, 24)">
+    <rect width="185" height="24" rx="6" fill="#0b1322" fill-opacity="0.85" stroke="#1e293b" stroke-width="1" />
+    <circle cx="14" cy="12" r="4" fill="#10b981" />
+    <text x="26" y="16" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" fill="#94a3b8">PUZZLE RECONSTRUCTION</text>
+  </g>
+
+  <g transform="translate(630, 24)">
+    <rect width="145" height="24" rx="6" fill="#0b1322" fill-opacity="0.85" stroke="#1e293b" stroke-width="1" />
+    <text x="14" y="16" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" fill="#00f2fe">RETENTION: 98%</text>
+  </g>
+
+  <!-- Bottom Retention Spike Pill -->
+  <g transform="translate(265, 395)" filter="url(#goldGlow)">
+    <rect width="270" height="28" rx="14" fill="url(#alphaMatteGrad)" />
+    <text x="135" y="18" font-family="'Inter', sans-serif" font-size="9.5" font-weight="900" fill="#05070a" text-anchor="middle" letter-spacing="0.5">
+      ⚡ DOPAMINE HIT: RETENTION SPIKE +35%
+    </text>
+  </g>
+</svg>
