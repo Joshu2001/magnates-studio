@@ -791,4 +791,48 @@
   };
 
   window.AUTHENTIC_TEMPLATE_SNAPSHOTS = SNAPSHOTS;
+  SNAPSHOTS['directional-push-split-wipe'] = `data:image/svg+xml;utf8,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+      <defs>
+        <linearGradient id="dp-scene-b" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#090c12"/>
+          <stop offset="100%" stop-color="#131924"/>
+        </linearGradient>
+        <linearGradient id="dp-scene-a" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#18202c"/>
+          <stop offset="100%" stop-color="#222d3d"/>
+        </linearGradient>
+        <linearGradient id="dp-shadow" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="rgba(0,0,0,0.88)"/>
+          <stop offset="45%" stop-color="rgba(0,0,0,0.38)"/>
+          <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="225" fill="#05070b"/>
+      <g transform="translate(200, 112.5) scale(0.88) translate(-200, -112.5)">
+        <rect x="18" y="12" width="364" height="201" rx="6" fill="url(#dp-scene-b)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+        <line x1="18" y1="79" x2="382" y2="79" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="18" y1="146" x2="382" y2="146" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <line x1="260" y1="12" x2="260" y2="213" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+        <text x="285" y="106" fill="#f8fafc" font-family="'Inter', sans-serif" font-weight="900" font-size="14" letter-spacing="2" text-anchor="middle">SCENE B</text>
+        <text x="285" y="124" fill="#94a3b8" font-family="monospace" font-weight="700" font-size="8.5" letter-spacing="1.2" text-anchor="middle">PULLING FROM -216 Z</text>
+        <path d="M 325 142 L 245 142 M 245 142 L 253 137 M 245 142 L 253 147" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <rect x="172" y="0" width="54" height="225" fill="url(#dp-shadow)"/>
+      <g>
+        <rect x="0" y="0" width="172" height="225" fill="url(#dp-scene-a)"/>
+        <rect x="28" y="88" width="118" height="22" fill="rgba(255,255,255,0.04)"/>
+        <rect x="14" y="88" width="118" height="22" fill="rgba(255,255,255,0.07)"/>
+        <text x="86" y="104" fill="rgba(248,250,252,0.9)" font-family="'Inter', sans-serif" font-weight="900" font-size="13" letter-spacing="2" text-anchor="middle">SCENE A</text>
+        <text x="86" y="122" fill="#94a3b8" font-family="monospace" font-weight="700" font-size="8" letter-spacing="1" text-anchor="middle">SUB-DOOR PUSH</text>
+        <path d="M 118 142 L 52 142 M 52 142 L 60 137 M 52 142 L 60 147" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="172" y1="0" x2="172" y2="225" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+      </g>
+      <rect x="12" y="193" width="142" height="20" rx="4" fill="rgba(0,0,0,0.65)" stroke="rgba(255,255,255,0.14)" stroke-width="1"/>
+      <text x="83" y="206" fill="#e2e8f0" font-family="monospace" font-weight="700" font-size="8" letter-spacing="1" text-anchor="middle">4-WAY PUSH · -Z PULL</text>
+    </svg>
+  `)}`;
+  window.tplGetSnapshot = function (id) {
+    return SNAPSHOTS[id] || null;
+  };
 })();

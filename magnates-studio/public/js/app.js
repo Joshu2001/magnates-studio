@@ -2071,6 +2071,313 @@ function drawMediaLayer(specificClip) {
           ctx.strokeRect(dx - 3, dy - 3, finalW + 6, finalH + 6);
         }
         ctx.restore();
+      } else if (targetClip?.directionalPushRig && renderSource) {
+        const spd = Math.max(0.25, targetClip.pushSpeed ?? 0.8);
+        const cycleDur = 3.2 / spd;
+        const phaseNorm = (clipElapsed % cycleDur) / cycleDur;
+        let rawCycle = 0;
+        if (phaseNorm < 0.16) rawCycle = 0;
+        else if (phaseNorm < 0.74) rawCycle = (phaseNorm - 0.16) / 0.58;
+        else rawCycle = 1;
+
+        const curveType = targetClip.pushCurve || 'whip';
+        let progress = rawCycle;
+        if (curveType === 'whip') {
+          progress = rawCycle < 0.5 ? 8 * Math.pow(rawCycle, 4) : 1 - Math.pow(-2 * rawCycle + 2, 4) / 2;
+        } else if (curveType === 'smooth') {
+          progress = 0.5 - 0.5 * Math.cos(rawCycle * Math.PI);
+        } else if (curveType === 'elastic') {
+          const c4 = (2 * Math.PI) / 3;
+          progress = rawCycle === 0 ? 0 : rawCycle === 1 ? 1 : Math.pow(2, -10 * rawCycle) * Math.sin((rawCycle * 10 - 0.75) * c4) + 1;
+          progress = Math.max(0, Math.min(1.04, progress));
+        }
+
+        const pClamped = Math.max(0, Math.min(1, progress));
+        const zDepthRatio = (targetClip.pushZDepth ?? 18) / 100;
+        const shadowDepthPx = (targetClip.pushShadow ?? 42) * (finalW / 1280);
+        const mode = targetClip.pushMode || 'push';
+        const dir = targetClip.pushDirection || 'left';
+        const role = targetClip.pushRole || 'outgoing';
+        const motionBlur = targetClip.pushMotionBlur !== false;
+        const blurIntensity = targetClip.pushBlurIntensity ?? 32;
+        const samples = Math.max(2, Math.min(16, targetClip.pushSamples ?? 10));
+        const seamWidth = targetClip.pushSeamWidth ?? 0;
+        const seamColor = targetClip.pushSeamColor || '#ffffff';
+
+        const velocity = (rawCycle > 0.005 && rawCycle < 0.995) ? Math.sin(rawCycle * Math.PI) : 0;
+        const blurPx = motionBlur ? velocity * blurIntensity * (finalW / 1280) : 0;
+
+        if (role === 'outgoing' && targetClip.pushSfxEnabled !== false && isPlaying) {
+          const curCycleIdx = Math.floor(clipElapsed / cycleDur);
+          if (rawCycle > 0.08 && rawCycle < 0.35 && targetClip._lastSfxCycleIdx !== curCycleIdx) {
+            targetClip._lastSfxCycleIdx = curCycleIdx;
+            if (typeof window.playPushWhooshSFX === 'function') {
+              window.playPushWhooshSFX(
+                targetClip.pushSfxProfile || 'deep-whoosh',
+                (targetClip.pushSfxVol ?? 80) / 100,
+                spd,
+                (targetClip.pushSfxStretch ?? 135) / 100
+              );
+            }
+          }
+        }
+
+        function drawWithBlurZ(renderX, renderY, renderW, renderH, scaleZ, brightnessVal, bvx, bvy) {
+          const blurOverscan = (Math.abs(bvx) + Math.abs(bvy) > 1.5) ? 1.035 : 1.0;
+          const finalScale = scaleZ * blurOverscan;
+          const rw = renderW * finalScale;
+          const rh = renderH * finalScale;
+          const rx = renderX + (renderW - rw) / 2;
+          const ry = renderY + (renderH - rh) / 2;
+          const baseAlpha = targetClip.opacity !== undefined ? (targetClip.opacity > 1 ? targetClip.opacity / 100 : targetClip.opacity) : 1.0;
+
+          ctx.save();
+          ctx.shadowColor = 'transparent';
+          if (Math.abs(bvx) + Math.abs(bvy) > 1.5) {
+            const stepAlpha = 1 / samples;
+            for (let s = 0; s < samples; s++) {
+              const factor = (s / (samples - 1) - 0.5);
+              ctx.globalAlpha = Math.min(1, baseAlpha * stepAlpha * 1.45);
+              ctx.drawImage(renderSource, rx + factor * bvx, ry + factor * bvy, rw, rh);
+            }
+          } else {
+            ctx.globalAlpha = baseAlpha;
+            ctx.drawImage(renderSource, rx, ry, rw, rh);
+          }
+
+          if (brightnessVal < 0.99) {
+            ctx.globalAlpha = Math.max(0, Math.min(0.85, 1 - brightnessVal));
+            ctx.fillStyle = '#020408';
+            ctx.fillRect(renderX - 2, renderY - 2, renderW + 4, renderH + 4);
+          }
+          ctx.restore();
+        }
+
+        const inScaleZ = (1 - zDepthRatio) + zDepthRatio * pClamped;
+        const inBrightness = (1 - zDepthRatio * 2.1 * (1 - pClamped));
+
+        if (mode === 'push') {
+          let px = dx, py = dy;
+          let bvx = (dir === 'left' || dir === 'right') ? blurPx : 0;
+          let bvy = (dir === 'up' || dir === 'down') ? blurPx : 0;
+          const parallaxLead = 0.28;
+
+          if (role === 'incoming') {
+            if (dir === 'left') px = dx + (1 - progress) * finalW * parallaxLead;
+            else if (dir === 'right') px = dx - (1 - progress) * finalW * parallaxLead;
+            else if (dir === 'up') py = dy + (1 - progress) * finalH * parallaxLead;
+            else if (dir === 'down') py = dy - (1 - progress) * finalH * parallaxLead;
+            drawWithBlurZ(px, py, finalW, finalH, inScaleZ, inBrightness, bvx * 0.65, bvy * 0.65);
+          } else {
+            if (dir === 'left') px = dx - progress * finalW;
+            else if (dir === 'right') px = dx + progress * finalW;
+            else if (dir === 'up') py = dy - progress * finalH;
+            else if (dir === 'down') py = dy + progress * finalH;
+
+            // Cast Sub-Door Contact Shadow onto incoming scene underneath
+            if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995) {
+              ctx.save();
+              ctx.shadowColor = 'transparent';
+              const shSpread = shadowDepthPx * 2.2;
+              let grad;
+              if (dir === 'left') {
+                const edgeX = px + finalW;
+                grad = ctx.createLinearGradient(edgeX, 0, edgeX + shSpread, 0);
+                grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+                grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(edgeX, dy, shSpread, finalH);
+              } else if (dir === 'right') {
+                const edgeX = px;
+                grad = ctx.createLinearGradient(edgeX, 0, edgeX - shSpread, 0);
+                grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+                grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(edgeX - shSpread, dy, shSpread, finalH);
+              } else if (dir === 'up') {
+                const edgeY = py + finalH;
+                grad = ctx.createLinearGradient(0, edgeY, 0, edgeY + shSpread);
+                grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+                grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(dx, edgeY, finalW, shSpread);
+              } else if (dir === 'down') {
+                const edgeY = py;
+                grad = ctx.createLinearGradient(0, edgeY, 0, edgeY - shSpread);
+                grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+                grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+                grad.addColorStop(1, 'rgba(0,0,0,0)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(dx, edgeY - shSpread, finalW, shSpread);
+              }
+              ctx.restore();
+            }
+
+            if (pClamped < 0.998) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.rect(px, py, finalW, finalH);
+              ctx.clip();
+              drawWithBlurZ(px, py, finalW, finalH, 1.0 - pClamped * (zDepthRatio * 0.35), 1.0 - pClamped * 0.18, bvx, bvy);
+              ctx.restore();
+            }
+
+            if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+              ctx.save();
+              ctx.strokeStyle = seamColor;
+              ctx.lineWidth = seamWidth;
+              ctx.beginPath();
+              if (dir === 'left') { ctx.moveTo(px + finalW, dy); ctx.lineTo(px + finalW, dy + finalH); }
+              else if (dir === 'right') { ctx.moveTo(px, dy); ctx.lineTo(px, dy + finalH); }
+              else if (dir === 'up') { ctx.moveTo(dx, py + finalH); ctx.lineTo(dx + finalW, py + finalH); }
+              else if (dir === 'down') { ctx.moveTo(dx, py); ctx.lineTo(dx + finalW, py); }
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        } else if (mode === 'split-h') {
+          const halfW = finalW / 2;
+          const splitOffset = progress * halfW;
+          if (role === 'incoming') {
+            drawWithBlurZ(dx, dy, finalW, finalH, inScaleZ, inBrightness, blurPx * 0.35, 0);
+          } else {
+            if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995) {
+              const shSpread = shadowDepthPx * 2.0;
+              ctx.save();
+              ctx.shadowColor = 'transparent';
+              const lEdge = dx + halfW - splitOffset;
+              const gL = ctx.createLinearGradient(lEdge, 0, lEdge + shSpread, 0);
+              gL.addColorStop(0, 'rgba(0,0,0,0.9)'); gL.addColorStop(0.4, 'rgba(0,0,0,0.42)'); gL.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = gL; ctx.fillRect(lEdge, dy, shSpread, finalH);
+
+              const rEdge = dx + halfW + splitOffset;
+              const gR = ctx.createLinearGradient(rEdge, 0, rEdge - shSpread, 0);
+              gR.addColorStop(0, 'rgba(0,0,0,0.9)'); gR.addColorStop(0.4, 'rgba(0,0,0,0.42)'); gR.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = gR; ctx.fillRect(rEdge - shSpread, dy, shSpread, finalH);
+              ctx.restore();
+            }
+
+            if (halfW - splitOffset > 0.5) {
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx, dy, halfW - splitOffset, finalH); ctx.clip();
+              drawWithBlurZ(dx - splitOffset, dy, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, blurPx, 0); ctx.restore();
+
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx + halfW + splitOffset, dy, halfW - splitOffset, finalH); ctx.clip();
+              drawWithBlurZ(dx + splitOffset, dy, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, blurPx, 0); ctx.restore();
+            }
+
+            if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+              ctx.save();
+              ctx.strokeStyle = seamColor;
+              ctx.lineWidth = seamWidth;
+              ctx.beginPath();
+              ctx.moveTo(dx + halfW - splitOffset, dy); ctx.lineTo(dx + halfW - splitOffset, dy + finalH);
+              ctx.moveTo(dx + halfW + splitOffset, dy); ctx.lineTo(dx + halfW + splitOffset, dy + finalH);
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        } else if (mode === 'split-v') {
+          const halfH = finalH / 2;
+          const splitOffset = progress * halfH;
+          if (role === 'incoming') {
+            drawWithBlurZ(dx, dy, finalW, finalH, inScaleZ, inBrightness, 0, blurPx * 0.35);
+          } else {
+            if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995) {
+              const shSpread = shadowDepthPx * 2.0;
+              ctx.save();
+              ctx.shadowColor = 'transparent';
+              const tEdge = dy + halfH - splitOffset;
+              const gT = ctx.createLinearGradient(0, tEdge, 0, tEdge + shSpread);
+              gT.addColorStop(0, 'rgba(0,0,0,0.9)'); gT.addColorStop(0.4, 'rgba(0,0,0,0.42)'); gT.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = gT; ctx.fillRect(dx, tEdge, finalW, shSpread);
+
+              const bEdge = dy + halfH + splitOffset;
+              const gB = ctx.createLinearGradient(0, bEdge, 0, bEdge - shSpread);
+              gB.addColorStop(0, 'rgba(0,0,0,0.9)'); gB.addColorStop(0.4, 'rgba(0,0,0,0.42)'); gB.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = gB; ctx.fillRect(dx, bEdge - shSpread, finalW, shSpread);
+              ctx.restore();
+            }
+
+            if (halfH - splitOffset > 0.5) {
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx, dy, finalW, halfH - splitOffset); ctx.clip();
+              drawWithBlurZ(dx, dy - splitOffset, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, 0, blurPx); ctx.restore();
+
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx, dy + halfH + splitOffset, finalW, halfH - splitOffset); ctx.clip();
+              drawWithBlurZ(dx, dy + splitOffset, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, 0, blurPx); ctx.restore();
+            }
+
+            if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+              ctx.save();
+              ctx.strokeStyle = seamColor;
+              ctx.lineWidth = seamWidth;
+              ctx.beginPath();
+              ctx.moveTo(dx, dy + halfH - splitOffset); ctx.lineTo(dx + finalW, dy + halfH - splitOffset);
+              ctx.moveTo(dx, dy + halfH + splitOffset); ctx.lineTo(dx + finalW, dy + halfH + splitOffset);
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        } else if (mode === 'quad') {
+          const halfW = finalW / 2;
+          const halfH = finalH / 2;
+          const offX = progress * halfW;
+          const offY = progress * halfH;
+          if (role === 'incoming') {
+            drawWithBlurZ(dx, dy, finalW, finalH, inScaleZ, inBrightness, blurPx * 0.3, blurPx * 0.3);
+          } else {
+            const qw = halfW - offX;
+            const qh = halfH - offY;
+            if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995 && qw > 0.5 && qh > 0.5) {
+              ctx.save();
+              ctx.fillStyle = '#000000';
+              ctx.shadowColor = 'rgba(0,0,0,0.92)';
+              ctx.shadowBlur = shadowDepthPx * 1.4;
+              ctx.fillRect(dx, dy, qw, qh);
+              ctx.fillRect(dx + halfW + offX, dy, qw, qh);
+              ctx.fillRect(dx, dy + halfH + offY, qw, qh);
+              ctx.fillRect(dx + halfW + offX, dy + halfH + offY, qw, qh);
+              ctx.restore();
+            }
+
+            if (qw > 0.5 && qh > 0.5) {
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx, dy, qw, qh); ctx.clip();
+              drawWithBlurZ(dx - offX, dy - offY, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx + halfW + offX, dy, qw, qh); ctx.clip();
+              drawWithBlurZ(dx + offX, dy - offY, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx, dy + halfH + offY, qw, qh); ctx.clip();
+              drawWithBlurZ(dx - offX, dy + offY, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+
+              ctx.save();
+              ctx.beginPath(); ctx.rect(dx + halfW + offX, dy + halfH + offY, qw, qh); ctx.clip();
+              drawWithBlurZ(dx + offX, dy + offY, finalW, finalH, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+            }
+
+            if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+              ctx.save();
+              ctx.strokeStyle = seamColor;
+              ctx.lineWidth = seamWidth;
+              ctx.beginPath();
+              ctx.moveTo(dx + halfW - offX, dy); ctx.lineTo(dx + halfW - offX, dy + finalH);
+              ctx.moveTo(dx + halfW + offX, dy); ctx.lineTo(dx + halfW + offX, dy + finalH);
+              ctx.moveTo(dx, dy + halfH - offY); ctx.lineTo(dx + finalW, dy + halfH - offY);
+              ctx.moveTo(dx, dy + halfH + offY); ctx.lineTo(dx + finalW, dy + halfH + offY);
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        }
       } else if (targetClip?.paperRipRig && renderSource) {
         // Authentic Magnates Media digitized fracture canvas renderer
         const spd = targetClip.tearSpeed || 1.4;
@@ -22817,6 +23124,19 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'directional-push-split-wipe',
+    title: 'Directional Push & Split Wipe (4-Way & Motion Blur)',
+    category: 'Transitions',
+    badge: 'Pro Transition',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.55), rgba(2, 6, 23, 0.98))',
+    description: 'Cinema NLE 4-way push & split wipe: pushes outgoing scene out while pulling incoming footage forward from Negative-Z depth with sub-door contact shadow, clamped directional motion blur, and velocity-adaptive whoosh SFX.',
+    tags: ['Push Wipe', 'Split Wipe', 'Negative-Z Depth', 'Sub-Door Blur', 'Adaptive Whoosh SFX', 'Pro NLE Transition'],
+    defaultImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+    secondaryImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80'
+  },
+  {
     id: 'doc-highlighter-loupe-suite',
     title: 'Article & Document Highlighter',
     category: 'Paper / Cutout',
@@ -23752,6 +24072,22 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
           <div style="position: absolute; top: 12px; right: 12px; padding: 2px 8px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 1px solid rgba(192, 132, 252, 0.5);">
             ✂️ BG REMOVED
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'directional-push-split-wipe') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; overflow: hidden; background: #020408; perspective: 900px;">
+          <!-- Incoming Scene B recessed in Negative-Z space -->
+          <img id="fx-push-sec-${tplId}" src="${tpl.secondaryImage}" alt="Scene B" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center; transform: scale(0.82); filter: brightness(0.55) contrast(1.12);" />
+          
+          <!-- Outgoing Scene A sliding door with deep Sub-Door Ambient Contact Shadow -->
+          <div id="fx-push-out-wrap-${tplId}" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; box-shadow: 28px 0 55px rgba(0,0,0,0.96), 6px 0 14px rgba(0,0,0,0.85);">
+            <img id="fx-push-prim-${tplId}" src="${tpl.defaultImage}" alt="Scene A" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform-origin: center center;" />
+          </div>
+
+          <div style="position: absolute; bottom: 8px; left: 8px; padding: 2px 7px; border-radius: 4px; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(255,255,255,0.18); color: #f8fafc; font-size: 8px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; font-family: monospace;">
+            NLE PUSH • -Z DEPTH PULL
           </div>
         </div>
       `;
@@ -25032,6 +25368,37 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const fgWrap = fxContainer?.querySelector(`#fx-fg-wrap-${tplId}`);
       if (bgEl) bgEl.style.transform = `scale(${bgZoom}) translate(${bgPanX}px, 0px)`;
       if (fgWrap) fgWrap.style.transform = `translate(${fgPanX}px, ${fgPanY}px) scale(1.12)`;
+    } else if (tplId === 'directional-push-split-wipe') {
+      // Pro NLE cadence: Hold Scene A -> Decisive Whip Push -> Hold Scene B
+      const cycleDur = 3.2;
+      const phaseT = (t % cycleDur) / cycleDur;
+      let rawP = 0;
+      if (phaseT < 0.15) rawP = 0;
+      else if (phaseT < 0.72) rawP = (phaseT - 0.15) / 0.57;
+      else rawP = 1;
+      const easeP = rawP < 0.5 ? 4 * rawP * rawP * rawP : 1 - Math.pow(-2 * rawP + 2, 3) / 2;
+      const vel = Math.sin(rawP * Math.PI);
+
+      const outWrap = fxContainer?.querySelector(`#fx-push-out-wrap-${tplId}`);
+      const primImg = fxContainer?.querySelector(`#fx-push-prim-${tplId}`);
+      const secImg = fxContainer?.querySelector(`#fx-push-sec-${tplId}`);
+
+      if (outWrap) {
+        outWrap.style.transform = `translate3d(${(-easeP * 100).toFixed(2)}%, 0, 0)`;
+      }
+      if (primImg) {
+        const outScale = 1.0 - easeP * 0.08 + vel * 0.03;
+        primImg.style.transform = `scale(${outScale.toFixed(3)})`;
+        primImg.style.filter = `brightness(${(1 - easeP * 0.25).toFixed(2)})`;
+      }
+      if (secImg) {
+        // Negative-Z recess pull: starts at 0.82 scale in -Z space and pulls to 1.00
+        const inScale = 0.82 + easeP * 0.18;
+        const inShiftX = (1 - easeP) * 18;
+        const inBright = 0.52 + easeP * 0.48;
+        secImg.style.transform = `translate3d(${inShiftX.toFixed(2)}%, 0, 0) scale(${inScale.toFixed(3)})`;
+        secImg.style.filter = `brightness(${inBright.toFixed(2)}) contrast(${(1.14 - easeP * 0.14).toFixed(2)})`;
+      }
     } else if (tplId === 'paper-rip-shred') {
       const ripProgress = (Math.sin(t * 3) + 1) / 2;
       const clipPathAngle = 100 - ripProgress * 100;
@@ -26702,6 +27069,8 @@ function openTopTemplateCustomizer(tpl) {
   if (matrixWrapEl) matrixWrapEl.style.display = 'none';
   const tearWrapEl = document.getElementById('tpl-modal-wrap-tear');
   if (tearWrapEl) tearWrapEl.style.display = 'none';
+  const pushWrapEl = document.getElementById('tpl-modal-push-controls');
+  if (pushWrapEl) pushWrapEl.style.display = 'none';
   const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
   if (atmosphereWrapEl) atmosphereWrapEl.style.display = 'flex';
   const primWrapEl = document.getElementById('tpl-modal-wrap-primary');
@@ -27368,6 +27737,29 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = 'EXPOSED BY AUDIT';
     topCustomizerState.subText = 'ARCHIVAL INK HIGHLIGHT';
     topCustomizerState.textColor = '#fbbf24';
+  } else if (tpl.id === 'directional-push-split-wipe') {
+    if (labelPrim) labelPrim.textContent = '🎬 Outgoing Scene (Clip A: Pushed Out)';
+    if (labelSec) labelSec.textContent = '🎬 Incoming Scene (Clip B: Pulled from -Z)';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'NEXT CHAPTER';
+    topCustomizerState.subText = 'SEAMLESS TRANSITION';
+    topCustomizerState.textColor = '#f8fafc';
+    if (!topCustomizerState.pushMode) topCustomizerState.pushMode = 'push';
+    if (!topCustomizerState.pushDirection) topCustomizerState.pushDirection = 'left';
+    if (topCustomizerState.pushZDepth === undefined) topCustomizerState.pushZDepth = 18;
+    if (topCustomizerState.pushShadow === undefined) topCustomizerState.pushShadow = 42;
+    if (topCustomizerState.pushMotionBlur === undefined) topCustomizerState.pushMotionBlur = true;
+    if (topCustomizerState.pushBlurIntensity === undefined) topCustomizerState.pushBlurIntensity = 32;
+    if (topCustomizerState.pushSamples === undefined) topCustomizerState.pushSamples = 10;
+    if (!topCustomizerState.pushCurve) topCustomizerState.pushCurve = 'whip';
+    if (topCustomizerState.pushSpeed === undefined) topCustomizerState.pushSpeed = 0.8;
+    if (topCustomizerState.pushSeamWidth === undefined) topCustomizerState.pushSeamWidth = 0;
+    if (!topCustomizerState.pushSeamColor) topCustomizerState.pushSeamColor = '#ffffff';
+    if (topCustomizerState.pushSfxEnabled === undefined) topCustomizerState.pushSfxEnabled = true;
+    if (!topCustomizerState.pushSfxProfile) topCustomizerState.pushSfxProfile = 'deep-whoosh';
+    if (topCustomizerState.pushSfxStretch === undefined) topCustomizerState.pushSfxStretch = 135;
+    if (topCustomizerState.pushSfxVol === undefined) topCustomizerState.pushSfxVol = 80;
   } else if (tpl.id === 'paper-rip-shred') {
     if (labelPrim) labelPrim.textContent = '📰 Top Paper Tear Layer';
     if (labelSec) labelSec.textContent = '🎬 Revealed Clip / Footage';
@@ -27472,7 +27864,111 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
 
-  // Tear, Rip & Fabric Customizer Panel Sync
+  // Directional Push & Split Wipe Controls Sync
+  const wrapPush = document.getElementById('tpl-modal-push-controls');
+  if (wrapPush) {
+    if (tpl.id === 'directional-push-split-wipe') {
+      wrapPush.style.display = 'flex';
+      if (wrapText) wrapText.style.display = 'none';
+
+      const badge = document.getElementById('tpl-modal-push-preset-badge');
+      if (badge) {
+        const m = topCustomizerState.pushMode || 'push';
+        const d = (topCustomizerState.pushDirection || 'left').toUpperCase();
+        badge.textContent = m === 'push' ? `Push ${d}` : m === 'split-h' ? 'Split Horiz' : m === 'split-v' ? 'Split Vert' : '4-Way Quad';
+      }
+
+      ['push', 'split-h', 'split-v', 'quad'].forEach(m => {
+        const btn = document.getElementById('btn-push-mode-' + m);
+        if (btn) {
+          const isAct = (topCustomizerState.pushMode || 'push') === m;
+          btn.style.background = isAct ? 'rgba(255,255,255,0.14)' : 'transparent';
+          btn.style.border = isAct ? '1px solid rgba(255,255,255,0.45)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.color = isAct ? '#ffffff' : '#94a3b8';
+        }
+      });
+
+      const dirRow = document.getElementById('push-direction-row');
+      if (dirRow) {
+        dirRow.style.display = (topCustomizerState.pushMode || 'push') === 'push' ? 'flex' : 'none';
+      }
+      ['left', 'right', 'up', 'down'].forEach(d => {
+        const btn = document.getElementById('push-dir-' + d);
+        if (btn) {
+          const isAct = (topCustomizerState.pushDirection || 'left') === d;
+          btn.style.background = isAct ? 'rgba(255,255,255,0.16)' : 'transparent';
+          btn.style.border = isAct ? '1px solid rgba(255,255,255,0.45)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.color = isAct ? '#ffffff' : '#94a3b8';
+        }
+      });
+
+      const sZDepth = document.getElementById('tpl-modal-slider-push-zdepth');
+      const vZDepth = document.getElementById('tpl-modal-val-push-zdepth');
+      const zVal = topCustomizerState.pushZDepth ?? 18;
+      if (sZDepth) sZDepth.value = zVal;
+      if (vZDepth) vZDepth.textContent = zVal === 0 ? '0 Z (Flat 2D)' : `-${Math.round(zVal * 12)} Z (${100 - zVal}% → 100%)`;
+
+      const sShadow = document.getElementById('tpl-modal-slider-push-shadow');
+      const vShadow = document.getElementById('tpl-modal-val-push-shadow');
+      const shVal = topCustomizerState.pushShadow ?? 42;
+      if (sShadow) sShadow.value = shVal;
+      if (vShadow) vShadow.textContent = `${shVal} px (${shVal >= 35 ? 'Deep Shadow' : shVal > 0 ? 'Soft Shadow' : 'Off'})`;
+
+      const toggleBlur = document.getElementById('push-toggle-motionblur');
+      if (toggleBlur) toggleBlur.checked = topCustomizerState.pushMotionBlur !== false;
+      const sBlur = document.getElementById('tpl-modal-slider-push-blur');
+      const vBlur = document.getElementById('tpl-modal-val-push-blur');
+      if (sBlur) sBlur.value = topCustomizerState.pushBlurIntensity ?? 32;
+      if (vBlur) vBlur.textContent = `${topCustomizerState.pushBlurIntensity ?? 32} px`;
+
+      const sSamples = document.getElementById('tpl-modal-slider-push-samples');
+      const vSamples = document.getElementById('tpl-modal-val-push-samples');
+      if (sSamples) sSamples.value = topCustomizerState.pushSamples ?? 10;
+      if (vSamples) vSamples.textContent = `${topCustomizerState.pushSamples ?? 10} ghost passes`;
+
+      ['whip', 'smooth', 'elastic', 'linear'].forEach(c => {
+        const btn = document.getElementById('btn-push-curve-' + c);
+        if (btn) {
+          const isAct = (topCustomizerState.pushCurve || 'whip') === c;
+          btn.style.background = isAct ? 'rgba(56,189,248,0.22)' : 'transparent';
+          btn.style.border = isAct ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.color = isAct ? '#38bdf8' : '#94a3b8';
+        }
+      });
+
+      const sSpeed = document.getElementById('tpl-modal-slider-push-speed');
+      const vSpeed = document.getElementById('tpl-modal-val-push-speed');
+      const spdVal = topCustomizerState.pushSpeed ?? 0.8;
+      if (sSpeed) sSpeed.value = Math.round(spdVal * 10);
+      if (vSpeed) vSpeed.textContent = `${spdVal.toFixed(1)}x (${spdVal >= 1.4 ? 'Fast Whip' : spdVal <= 0.9 ? 'Cinematic' : 'Snappy'})`;
+
+      const colSeam = document.getElementById('push-seam-color');
+      if (colSeam) colSeam.value = topCustomizerState.pushSeamColor || '#ffffff';
+      const sSeam = document.getElementById('tpl-modal-slider-push-seam');
+      const vSeam = document.getElementById('tpl-modal-val-push-seam');
+      const seamW = topCustomizerState.pushSeamWidth ?? 0;
+      if (sSeam) sSeam.value = seamW;
+      if (vSeam) vSeam.textContent = seamW === 0 ? '0 px (Off)' : `${seamW} px`;
+
+      const toggleSfx = document.getElementById('push-toggle-sfx');
+      if (toggleSfx) toggleSfx.checked = topCustomizerState.pushSfxEnabled !== false;
+      const selSfx = document.getElementById('push-select-sfx-profile');
+      if (selSfx) selSfx.value = topCustomizerState.pushSfxProfile || 'deep-whoosh';
+      const sSfxStretch = document.getElementById('tpl-modal-slider-push-sfx-stretch');
+      const vSfxStretch = document.getElementById('tpl-modal-val-push-sfx-stretch');
+      const stretchVal = topCustomizerState.pushSfxStretch ?? 135;
+      if (sSfxStretch) sSfxStretch.value = stretchVal;
+      if (vSfxStretch) vSfxStretch.textContent = `${(stretchVal / 100).toFixed(2)}x (${stretchVal >= 120 ? 'Slowed' : stretchVal <= 85 ? 'Tight' : 'Sync'})`;
+      const sSfxVol = document.getElementById('tpl-modal-slider-push-sfx-vol');
+      const vSfxVol = document.getElementById('tpl-modal-val-push-sfx-vol');
+      if (sSfxVol) sSfxVol.value = topCustomizerState.pushSfxVol ?? 80;
+      if (vSfxVol) vSfxVol.textContent = `${topCustomizerState.pushSfxVol ?? 80}%`;
+    } else {
+      wrapPush.style.display = 'none';
+    }
+  }
+
+    // Tear, Rip & Fabric Customizer Panel Sync
   const wrapTear = document.getElementById('tpl-modal-wrap-tear');
   if (wrapTear) {
     if (tpl.id === 'paper-rip-shred') {
@@ -28400,6 +28896,33 @@ function renderTopTemplatePreviewStage() {
         </div>
       </div>
     `;
+  } else if (tplId === 'directional-push-split-wipe') {
+    const isVidPrim = (prim && (prim.includes('.mp4') || prim.includes('.webm') || (prim.startsWith('blob:') && topCustomizerState.primaryIsVideo)));
+    const isVidSec = (sec && (sec.includes('.mp4') || sec.includes('.webm') || (sec.startsWith('blob:') && topCustomizerState.secondaryIsVideo)));
+
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #020408; cursor: crosshair;">
+        <canvas id="customizer-live-push-canvas" width="1280" height="720" style="width: 100%; height: 100%; object-fit: contain; display: block;"></canvas>
+        <div style="display: none;">
+          ${isVidPrim 
+            ? `<video id="push-source-prim" src="${prim}" autoplay loop muted playsinline></video>`
+            : `<img id="push-source-prim" src="${prim}" alt="Primary" />`
+          }
+          ${isVidSec
+            ? `<video id="push-source-sec" src="${sec}" autoplay loop muted playsinline></video>`
+            : `<img id="push-source-sec" src="${sec}" alt="Secondary" />`
+          }
+        </div>
+        <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; display: flex; align-items: center; gap: 8px; z-index: 50;">
+          <span style="font-size: 9.5px; font-weight: 700; color: #f8fafc; background: rgba(9,13,22,0.85); border: 1px solid rgba(255,255,255,0.18); padding: 3px 8px; border-radius: 4px; font-family: monospace; letter-spacing: 0.04em;">
+            NLE PUSH • -Z DEPTH PULL • SUB-DOOR SHADOW
+          </span>
+          <span id="push-hud-phase" style="font-size: 9.5px; color: #cbd5e1; background: rgba(9,13,22,0.75); border: 1px solid rgba(255,255,255,0.1); padding: 3px 7px; border-radius: 4px; font-family: monospace;">
+            HOLD A
+          </span>
+        </div>
+      </div>
+    `;
   } else if (tplId === 'paper-rip-shred') {
     const shadowPx = topCustomizerState.tearShadowDepth ?? 28;
     const paperIs3D = topCustomizerState.paperPreviewMode === '3d';
@@ -28877,6 +29400,385 @@ function updateTopCustomizerFrame(seqTime, now) {
       else fgScale = 1.04;
       const fgX = -Math.sin(localSceneT * 0.7) * 16 * depthFactor;
       fg.style.transform = `scale(${fgScale.toFixed(4)}) translate(${fgX.toFixed(2)}px, 0)`;
+    }
+  } else if (tplId === 'directional-push-split-wipe') {
+    const canvas = document.getElementById('customizer-live-push-canvas');
+    const elPrim = document.getElementById('push-source-prim');
+    const elSec = document.getElementById('push-source-sec');
+    const hudPhase = document.getElementById('push-hud-phase');
+    
+    if (canvas && (elPrim || elSec)) {
+      const ctx = canvas.getContext('2d');
+      const cw = canvas.width;
+      const ch = canvas.height;
+      
+      // Pro NLE Cadence: Hold Scene A (0..16%) -> Decisive Wipe (16..74%) -> Hold Scene B (74..100%)
+      const spd = Math.max(0.25, topCustomizerState.pushSpeed ?? 0.8);
+      const cycleDur = 3.2 / spd;
+      const phaseNorm = (localSceneT % cycleDur) / cycleDur;
+      let rawCycle = 0;
+      if (phaseNorm < 0.16) rawCycle = 0;
+      else if (phaseNorm < 0.74) rawCycle = (phaseNorm - 0.16) / 0.58;
+      else rawCycle = 1;
+      
+      const curveType = topCustomizerState.pushCurve || 'whip';
+      let progress = rawCycle;
+      if (curveType === 'whip') {
+        progress = rawCycle < 0.5 ? 8 * Math.pow(rawCycle, 4) : 1 - Math.pow(-2 * rawCycle + 2, 4) / 2;
+      } else if (curveType === 'smooth') {
+        progress = 0.5 - 0.5 * Math.cos(rawCycle * Math.PI);
+      } else if (curveType === 'elastic') {
+        const c4 = (2 * Math.PI) / 3;
+        progress = rawCycle === 0 ? 0 : rawCycle === 1 ? 1 : Math.pow(2, -10 * rawCycle) * Math.sin((rawCycle * 10 - 0.75) * c4) + 1;
+        progress = Math.max(0, Math.min(1.04, progress));
+      }
+      
+      const zDepthRatio = (topCustomizerState.pushZDepth ?? 18) / 100;
+      const shadowDepthPx = topCustomizerState.pushShadow ?? 42;
+      const mode = topCustomizerState.pushMode || 'push';
+      const dir = topCustomizerState.pushDirection || 'left';
+      const motionBlur = topCustomizerState.pushMotionBlur !== false;
+      const blurIntensity = topCustomizerState.pushBlurIntensity ?? 32;
+      const samples = Math.max(2, Math.min(16, topCustomizerState.pushSamples ?? 10));
+      const seamWidth = topCustomizerState.pushSeamWidth ?? 0;
+      const seamColor = topCustomizerState.pushSeamColor || '#ffffff';
+      
+      const velocity = (rawCycle > 0.005 && rawCycle < 0.995) ? Math.sin(rawCycle * Math.PI) : 0;
+      const blurPx = motionBlur ? velocity * blurIntensity : 0;
+
+      if (hudPhase) {
+        const zCurrent = Math.round(-(1 - Math.min(1, progress)) * (topCustomizerState.pushZDepth ?? 18) * 12);
+        const phaseLabel = rawCycle === 0 ? 'HOLD A' : rawCycle === 1 ? 'HOLD B' : `${Math.round(progress * 100)}% WIPE`;
+        hudPhase.textContent = `${phaseLabel} | ${zCurrent}Z → 0Z`;
+      }
+      
+      if (topCustomizerState.pushSfxEnabled !== false && topCustomizerState.isPlaying) {
+        if (!window._lastPushWhooshCycle) window._lastPushWhooshCycle = -1;
+        const curCycleIdx = Math.floor(localSceneT / cycleDur);
+        if (rawCycle > 0.08 && rawCycle < 0.35 && window._lastPushWhooshCycle !== curCycleIdx) {
+          window._lastPushWhooshCycle = curCycleIdx;
+          if (typeof window.playPushWhooshSFX === 'function') {
+            window.playPushWhooshSFX(
+              topCustomizerState.pushSfxProfile || 'deep-whoosh',
+              (topCustomizerState.pushSfxVol ?? 80) / 100,
+              spd,
+              (topCustomizerState.pushSfxStretch ?? 135) / 100
+            );
+          }
+        }
+      }
+      
+      ctx.fillStyle = '#020408';
+      ctx.fillRect(0, 0, cw, ch);
+      
+      // Helper: Draw a source element with cover aspect, Negative-Z scale, ambient occlusion dimming, and clamped directional motion blur
+      function drawPlatePro(sourceEl, dx, dy, dw, dh, scaleZ, brightnessVal, blurVecX, blurVecY) {
+        if (!sourceEl) return;
+        const srcW = sourceEl.videoWidth || sourceEl.naturalWidth || cw;
+        const srcH = sourceEl.videoHeight || sourceEl.naturalHeight || ch;
+        if (!srcW || !srcH) return;
+
+        // Compute object-fit: cover crop
+        const srcAspect = srcW / srcH;
+        const dstAspect = dw / dh;
+        let sx = 0, sy = 0, sw = srcW, sh = srcH;
+        if (srcAspect > dstAspect) {
+          sw = srcH * dstAspect;
+          sx = (srcW - sw) / 2;
+        } else {
+          sh = srcW / dstAspect;
+          sy = (srcH - sh) / 2;
+        }
+
+        // Slight overscan during high velocity so motion blur never exposes black borders
+        const blurOverscan = (Math.abs(blurVecX) + Math.abs(blurVecY) > 1.5) ? 1.035 : 1.0;
+        const finalScale = scaleZ * blurOverscan;
+        const rw = dw * finalScale;
+        const rh = dh * finalScale;
+        const rx = dx + (dw - rw) / 2;
+        const ry = dy + (dh - rh) / 2;
+
+        ctx.save();
+        if (Math.abs(blurVecX) + Math.abs(blurVecY) > 1.5) {
+          const stepAlpha = 1 / samples;
+          for (let s = 0; s < samples; s++) {
+            const factor = (s / (samples - 1) - 0.5);
+            const ox = factor * blurVecX;
+            const oy = factor * blurVecY;
+            ctx.globalAlpha = Math.min(1, stepAlpha * 1.45);
+            ctx.drawImage(sourceEl, sx, sy, sw, sh, rx + ox, ry + oy, rw, rh);
+          }
+        } else {
+          ctx.drawImage(sourceEl, sx, sy, sw, sh, rx, ry, rw, rh);
+        }
+
+        // Ambient Occlusion / Negative-Z depth shadow overlay (faster than CSS filter in 60fps canvas loop)
+        if (brightnessVal < 0.99) {
+          ctx.globalAlpha = Math.max(0, Math.min(0.85, 1 - brightnessVal));
+          ctx.fillStyle = '#020408';
+          ctx.fillRect(dx - 2, dy - 2, dw + 4, dh + 4);
+        }
+        ctx.restore();
+      }
+
+      // Incoming Scene B Negative-Z depth pull: starts recessed at (1 - zDepthRatio) scale and darkened by AO, pulls to 1.0 scale & 1.0 exposure
+      const pClamped = Math.max(0, Math.min(1, progress));
+      const inScaleZ = (1 - zDepthRatio) + zDepthRatio * pClamped;
+      const inBrightness = (1 - zDepthRatio * 2.1 * (1 - pClamped));
+
+      if (mode === 'push') {
+        let outX = 0, outY = 0, inX = 0, inY = 0;
+        let bvx = 0, bvy = 0;
+        const parallaxLead = 0.28; // Incoming scene translates from recessed parallax offset while pulling forward in Z
+
+        if (dir === 'left') {
+          outX = -progress * cw;
+          inX = (1 - progress) * cw * parallaxLead;
+          bvx = blurPx;
+        } else if (dir === 'right') {
+          outX = progress * cw;
+          inX = -(1 - progress) * cw * parallaxLead;
+          bvx = blurPx;
+        } else if (dir === 'up') {
+          outY = -progress * ch;
+          inY = (1 - progress) * ch * parallaxLead;
+          bvy = blurPx;
+        } else if (dir === 'down') {
+          outY = progress * ch;
+          inY = -(1 - progress) * ch * parallaxLead;
+          bvy = blurPx;
+        }
+
+        // 1. Draw Incoming Scene B in Negative-Z space underneath
+        drawPlatePro(elSec, inX, inY, cw, ch, inScaleZ, inBrightness, bvx * 0.65, bvy * 0.65);
+
+        // 2. Cast Sub-Door Contact Shadow from Outgoing Door onto Incoming Scene B
+        if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995) {
+          ctx.save();
+          const shSpread = shadowDepthPx * 2.2;
+          let grad;
+          if (dir === 'left') {
+            const edgeX = outX + cw;
+            grad = ctx.createLinearGradient(edgeX, 0, edgeX + shSpread, 0);
+            grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+            grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(edgeX, 0, shSpread, ch);
+          } else if (dir === 'right') {
+            const edgeX = outX;
+            grad = ctx.createLinearGradient(edgeX, 0, edgeX - shSpread, 0);
+            grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+            grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(edgeX - shSpread, 0, shSpread, ch);
+          } else if (dir === 'up') {
+            const edgeY = outY + ch;
+            grad = ctx.createLinearGradient(0, edgeY, 0, edgeY + shSpread);
+            grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+            grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, edgeY, cw, shSpread);
+          } else if (dir === 'down') {
+            const edgeY = outY;
+            grad = ctx.createLinearGradient(0, edgeY, 0, edgeY - shSpread);
+            grad.addColorStop(0, 'rgba(0,0,0,0.88)');
+            grad.addColorStop(0.35, 'rgba(0,0,0,0.45)');
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, edgeY - shSpread, cw, shSpread);
+          }
+          ctx.restore();
+        }
+
+        // 3. Draw Outgoing Scene A Door (clamped to door bounds so blur never bleeds across seam)
+        if (pClamped < 0.998) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(outX, outY, cw, ch);
+          ctx.clip();
+          const outScaleZ = 1.0 - pClamped * (zDepthRatio * 0.35);
+          const outBright = 1.0 - pClamped * 0.18;
+          drawPlatePro(elPrim, outX, outY, cw, ch, outScaleZ, outBright, bvx, bvy);
+          ctx.restore();
+        }
+
+        // 4. Optional Edge Bevel Line (0px off by default)
+        if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+          ctx.save();
+          ctx.strokeStyle = seamColor;
+          ctx.lineWidth = seamWidth;
+          ctx.beginPath();
+          if (dir === 'left') { ctx.moveTo(outX + cw, 0); ctx.lineTo(outX + cw, ch); }
+          else if (dir === 'right') { ctx.moveTo(outX, 0); ctx.lineTo(outX, ch); }
+          else if (dir === 'up') { ctx.moveTo(0, outY + ch); ctx.lineTo(cw, outY + ch); }
+          else if (dir === 'down') { ctx.moveTo(0, outY); ctx.lineTo(cw, outY); }
+          ctx.stroke();
+          ctx.restore();
+        }
+      } else if (mode === 'split-h') {
+        const halfW = cw / 2;
+        const splitOffset = progress * halfW;
+        // 1. Incoming Scene B pulling forward from Negative-Z
+        drawPlatePro(elSec, 0, 0, cw, ch, inScaleZ, inBrightness, blurPx * 0.35, 0);
+
+        // 2. Sub-Door Contact Shadows cast inward onto Scene B
+        if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995) {
+          const shSpread = shadowDepthPx * 2.0;
+          ctx.save();
+          const leftDoorEdge = halfW - splitOffset;
+          const gL = ctx.createLinearGradient(leftDoorEdge, 0, leftDoorEdge + shSpread, 0);
+          gL.addColorStop(0, 'rgba(0,0,0,0.9)');
+          gL.addColorStop(0.4, 'rgba(0,0,0,0.42)');
+          gL.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = gL;
+          ctx.fillRect(leftDoorEdge, 0, shSpread, ch);
+
+          const rightDoorEdge = halfW + splitOffset;
+          const gR = ctx.createLinearGradient(rightDoorEdge, 0, rightDoorEdge - shSpread, 0);
+          gR.addColorStop(0, 'rgba(0,0,0,0.9)');
+          gR.addColorStop(0.4, 'rgba(0,0,0,0.42)');
+          gR.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = gR;
+          ctx.fillRect(rightDoorEdge - shSpread, 0, shSpread, ch);
+          ctx.restore();
+        }
+
+        // 3. Left & Right Outgoing Sub-Doors
+        if (halfW - splitOffset > 0.5) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(0, 0, halfW - splitOffset, ch);
+          ctx.clip();
+          drawPlatePro(elPrim, -splitOffset, 0, cw, ch, 1.0, 1.0 - pClamped * 0.15, blurPx, 0);
+          ctx.restore();
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(halfW + splitOffset, 0, halfW - splitOffset, ch);
+          ctx.clip();
+          drawPlatePro(elPrim, splitOffset, 0, cw, ch, 1.0, 1.0 - pClamped * 0.15, blurPx, 0);
+          ctx.restore();
+        }
+
+        if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+          ctx.save();
+          ctx.strokeStyle = seamColor;
+          ctx.lineWidth = seamWidth;
+          ctx.beginPath();
+          ctx.moveTo(halfW - splitOffset, 0); ctx.lineTo(halfW - splitOffset, ch);
+          ctx.moveTo(halfW + splitOffset, 0); ctx.lineTo(halfW + splitOffset, ch);
+          ctx.stroke();
+          ctx.restore();
+        }
+      } else if (mode === 'split-v') {
+        const halfH = ch / 2;
+        const splitOffset = progress * halfH;
+        // 1. Incoming Scene B pulling forward from Negative-Z
+        drawPlatePro(elSec, 0, 0, cw, ch, inScaleZ, inBrightness, 0, blurPx * 0.35);
+
+        // 2. Sub-Door Contact Shadows cast inward onto Scene B
+        if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995) {
+          const shSpread = shadowDepthPx * 2.0;
+          ctx.save();
+          const topDoorEdge = halfH - splitOffset;
+          const gT = ctx.createLinearGradient(0, topDoorEdge, 0, topDoorEdge + shSpread);
+          gT.addColorStop(0, 'rgba(0,0,0,0.9)');
+          gT.addColorStop(0.4, 'rgba(0,0,0,0.42)');
+          gT.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = gT;
+          ctx.fillRect(0, topDoorEdge, cw, shSpread);
+
+          const botDoorEdge = halfH + splitOffset;
+          const gB = ctx.createLinearGradient(0, botDoorEdge, 0, botDoorEdge - shSpread);
+          gB.addColorStop(0, 'rgba(0,0,0,0.9)');
+          gB.addColorStop(0.4, 'rgba(0,0,0,0.42)');
+          gB.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = gB;
+          ctx.fillRect(0, botDoorEdge - shSpread, cw, shSpread);
+          ctx.restore();
+        }
+
+        if (halfH - splitOffset > 0.5) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(0, 0, cw, halfH - splitOffset);
+          ctx.clip();
+          drawPlatePro(elPrim, 0, -splitOffset, cw, ch, 1.0, 1.0 - pClamped * 0.15, 0, blurPx);
+          ctx.restore();
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(0, halfH + splitOffset, cw, halfH - splitOffset);
+          ctx.clip();
+          drawPlatePro(elPrim, 0, splitOffset, cw, ch, 1.0, 1.0 - pClamped * 0.15, 0, blurPx);
+          ctx.restore();
+        }
+
+        if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+          ctx.save();
+          ctx.strokeStyle = seamColor;
+          ctx.lineWidth = seamWidth;
+          ctx.beginPath();
+          ctx.moveTo(0, halfH - splitOffset); ctx.lineTo(cw, halfH - splitOffset);
+          ctx.moveTo(0, halfH + splitOffset); ctx.lineTo(cw, halfH + splitOffset);
+          ctx.stroke();
+          ctx.restore();
+        }
+      } else if (mode === 'quad') {
+        const halfW = cw / 2;
+        const halfH = ch / 2;
+        const offX = progress * halfW;
+        const offY = progress * halfH;
+        // 1. Incoming Scene B pulling forward from Negative-Z
+        drawPlatePro(elSec, 0, 0, cw, ch, inScaleZ, inBrightness, blurPx * 0.3, blurPx * 0.3);
+
+        // 2. 4-Way Sub-Door Contact Shadows
+        if (shadowDepthPx > 0 && pClamped > 0.005 && pClamped < 0.995 && (halfW - offX > 0.5)) {
+          ctx.save();
+          ctx.fillStyle = '#000000';
+          ctx.shadowColor = 'rgba(0,0,0,0.92)';
+          ctx.shadowBlur = shadowDepthPx * 1.4;
+          const qw = halfW - offX;
+          const qh = halfH - offY;
+          ctx.fillRect(0, 0, qw, qh);
+          ctx.fillRect(halfW + offX, 0, qw, qh);
+          ctx.fillRect(0, halfH + offY, qw, qh);
+          ctx.fillRect(halfW + offX, halfH + offY, qw, qh);
+          ctx.restore();
+        }
+
+        if (halfW - offX > 0.5 && halfH - offY > 0.5) {
+          const qw = halfW - offX;
+          const qh = halfH - offY;
+          ctx.save(); ctx.beginPath(); ctx.rect(0, 0, qw, qh); ctx.clip();
+          drawPlatePro(elPrim, -offX, -offY, cw, ch, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+
+          ctx.save(); ctx.beginPath(); ctx.rect(halfW + offX, 0, qw, qh); ctx.clip();
+          drawPlatePro(elPrim, offX, -offY, cw, ch, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+
+          ctx.save(); ctx.beginPath(); ctx.rect(0, halfH + offY, qw, qh); ctx.clip();
+          drawPlatePro(elPrim, -offX, offY, cw, ch, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+
+          ctx.save(); ctx.beginPath(); ctx.rect(halfW + offX, halfH + offY, qw, qh); ctx.clip();
+          drawPlatePro(elPrim, offX, offY, cw, ch, 1.0, 1.0 - pClamped * 0.15, blurPx * 0.7, blurPx * 0.7); ctx.restore();
+        }
+
+        if (seamWidth > 0 && pClamped > 0.01 && pClamped < 0.99) {
+          ctx.save();
+          ctx.strokeStyle = seamColor;
+          ctx.lineWidth = seamWidth;
+          ctx.beginPath();
+          ctx.moveTo(halfW - offX, 0); ctx.lineTo(halfW - offX, ch);
+          ctx.moveTo(halfW + offX, 0); ctx.lineTo(halfW + offX, ch);
+          ctx.moveTo(0, halfH - offY); ctx.lineTo(cw, halfH - offY);
+          ctx.moveTo(0, halfH + offY); ctx.lineTo(cw, halfH + offY);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
     }
   } else if (tplId === 'paper-rip-shred') {
     const rip = document.getElementById('customizer-live-rip');
@@ -29463,6 +30365,81 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
           layerOrder: 'front'
         });
       });
+    }
+  } else if (tpl.id === 'directional-push-split-wipe') {
+    const isPrimVid = (prim && (prim.includes('.mp4') || prim.includes('.webm') || (topCustomizerState && topCustomizerState.primaryIsVideo)));
+    const isSecVid = (sec && (sec.includes('.mp4') || sec.includes('.webm') || (topCustomizerState && topCustomizerState.secondaryIsVideo)));
+
+    const outClip = {
+      id: `clip-out-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: isPrimVid ? 'Outgoing_Scene_ClipA.mp4' : 'Outgoing_Scene_ClipA.jpg',
+      url: prim || tpl.defaultImage,
+      file: { name: isPrimVid ? 'Outgoing_Scene_ClipA.mp4' : 'Outgoing_Scene_ClipA.jpg', url: prim || tpl.defaultImage, isVideo: !!isPrimVid, isImage: !isPrimVid },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.0,
+      opacity: opacityVal,
+      directionalPushRig: true,
+      pushRole: 'outgoing',
+      pushMode: topCustomizerState.pushMode || 'push',
+      pushDirection: topCustomizerState.pushDirection || 'left',
+      pushZDepth: topCustomizerState.pushZDepth ?? 18,
+      pushShadow: topCustomizerState.pushShadow ?? 42,
+      pushMotionBlur: topCustomizerState.pushMotionBlur !== false,
+      pushBlurIntensity: topCustomizerState.pushBlurIntensity ?? 32,
+      pushSamples: topCustomizerState.pushSamples ?? 10,
+      pushCurve: topCustomizerState.pushCurve || 'whip',
+      pushSpeed: topCustomizerState.pushSpeed ?? 0.8,
+      pushSeamWidth: topCustomizerState.pushSeamWidth ?? 0,
+      pushSeamColor: topCustomizerState.pushSeamColor || '#ffffff',
+      pushSfxEnabled: topCustomizerState.pushSfxEnabled !== false,
+      pushSfxProfile: topCustomizerState.pushSfxProfile || 'deep-whoosh',
+      pushSfxStretch: topCustomizerState.pushSfxStretch ?? 135,
+      pushSfxVol: topCustomizerState.pushSfxVol ?? 80,
+      transition: 'push',
+      transitionDuration: 1.2,
+      zIndex: 25,
+      layerOrder: 'front'
+    };
+
+    const inClip = {
+      id: `clip-in-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: isSecVid ? 'Incoming_Scene_ClipB.mp4' : 'Incoming_Scene_ClipB.jpg',
+      url: sec || tpl.secondaryImage,
+      file: { name: isSecVid ? 'Incoming_Scene_ClipB.mp4' : 'Incoming_Scene_ClipB.jpg', url: sec || tpl.secondaryImage, isVideo: !!isSecVid, isImage: !isSecVid },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.0,
+      directionalPushRig: true,
+      pushRole: 'incoming',
+      pushMode: topCustomizerState.pushMode || 'push',
+      pushDirection: topCustomizerState.pushDirection || 'left',
+      pushZDepth: topCustomizerState.pushZDepth ?? 18,
+      pushShadow: topCustomizerState.pushShadow ?? 42,
+      pushMotionBlur: topCustomizerState.pushMotionBlur !== false,
+      pushBlurIntensity: topCustomizerState.pushBlurIntensity ?? 32,
+      pushSamples: topCustomizerState.pushSamples ?? 10,
+      pushCurve: topCustomizerState.pushCurve || 'whip',
+      pushSpeed: topCustomizerState.pushSpeed ?? 0.8,
+      pushSeamWidth: topCustomizerState.pushSeamWidth ?? 0,
+      pushSeamColor: topCustomizerState.pushSeamColor || '#ffffff',
+      isBackgroundScene: true,
+      zIndex: 10,
+      layerOrder: 'back'
+    };
+
+    focusClip = outClip;
+    if (isPrimVid) {
+      if (!videoClips) videoClips = [];
+      videoClips.push(outClip);
+    } else {
+      imageClips.push(outClip);
+    }
+    if (isSecVid) {
+      if (!videoClips) videoClips = [];
+      videoClips.push(inClip);
+    } else {
+      imageClips.push(inClip);
     }
   } else if (tpl.id === 'paper-rip-shred') {
     const revealedClip = {
@@ -32348,6 +33325,287 @@ function bindTopTemplateCustomizerEvents() {
   });
 
   // Sliders
+  
+  // =========================================================
+  // DIRECTIONAL PUSH & SPLIT WIPE EVENT LISTENERS & SFX ENGINE
+  // =========================================================
+  window.playPushWhooshSFX = function(profile, vol, visualSpeed, sfxStretch) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const masterVol = (vol !== undefined ? vol : ((topCustomizerState.pushSfxVol ?? 80) / 100)) * (sfxVolume || 0.8);
+    if (masterVol <= 0.001) return;
+
+    // Velocity-Adaptive Time-Stretch & Pitch Factor:
+    // Slow display speed (e.g. 0.5x) or high sfxStretch (e.g. 1.8x) stretches the whoosh duration and lowers pitch
+    const spd = Math.max(0.3, visualSpeed !== undefined ? visualSpeed : (topCustomizerState.pushSpeed ?? 0.8));
+    const stretch = Math.max(0.5, sfxStretch !== undefined ? sfxStretch : ((topCustomizerState.pushSfxStretch ?? 135) / 100));
+    const timeScale = Math.max(0.45, Math.min(3.2, stretch / spd));
+    const pitchScale = Math.max(0.42, Math.min(1.8, Math.pow(spd / stretch, 0.55)));
+
+    const gainNode = ctx.createGain();
+    gainNode.connect(ctx.destination);
+
+    if (profile === 'fast-whip') {
+      const dur = Math.min(1.4, 0.28 * timeScale);
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520 * pitchScale, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(38, 95 * pitchScale), now + dur);
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.linearRampToValueAtTime(masterVol * 0.68, now + dur * 0.32);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(gainNode);
+      osc.start(now);
+      osc.stop(now + dur);
+    } else if (profile === 'air-rush') {
+      const dur = Math.min(2.2, 0.58 * timeScale);
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      // Pink-ish smoothed noise for organic air draw
+      let b0 = 0, b1 = 0, b2 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.997 * b0 + white * 0.029;
+        b1 = 0.985 * b1 + white * 0.032;
+        b2 = 0.950 * b2 + white * 0.048;
+        output[i] = (b0 + b1 + b2 + white * 0.18) * 0.65;
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.Q.value = 1.6;
+      filter.frequency.setValueAtTime(Math.max(80, 180 * pitchScale), now);
+      filter.frequency.exponentialRampToValueAtTime(Math.max(220, 740 * pitchScale), now + dur * 0.42);
+      filter.frequency.exponentialRampToValueAtTime(Math.max(55, 110 * pitchScale), now + dur);
+      noise.connect(filter);
+      filter.connect(gainNode);
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.linearRampToValueAtTime(masterVol * 0.75, now + dur * 0.42);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      noise.start(now);
+      noise.stop(now + dur);
+    } else if (profile === 'heavy-slam') {
+      const dur = Math.min(1.8, 0.52 * timeScale);
+      const osc = ctx.createOscillator();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(Math.max(65, 150 * pitchScale), now);
+      osc.frequency.exponentialRampToValueAtTime(32, now + dur);
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.linearRampToValueAtTime(masterVol * 0.9, now + dur * 0.18);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(gainNode);
+      osc.start(now);
+      osc.stop(now + dur);
+    } else {
+      // 'deep-whoosh': Layered Sub-Bass + Filtered Air Draw that slows and adapts to display speed
+      const dur = Math.min(2.4, 0.62 * timeScale);
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      let lastOut = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        output[i] = (lastOut + (0.045 * white)) / 1.045;
+        lastOut = output[i];
+        output[i] *= 2.6;
+      }
+      const brownNoise = ctx.createBufferSource();
+      brownNoise.buffer = noiseBuffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.Q.value = 2.1;
+      const lowF = Math.max(55, 115 * pitchScale);
+      const peakF = Math.max(240, 680 * pitchScale);
+      const tailF = Math.max(42, 75 * pitchScale);
+      filter.frequency.setValueAtTime(lowF, now);
+      filter.frequency.exponentialRampToValueAtTime(peakF, now + dur * 0.46);
+      filter.frequency.exponentialRampToValueAtTime(tailF, now + dur);
+      brownNoise.connect(filter);
+      filter.connect(gainNode);
+
+      // Warm sub-bass body layer synchronized with the door's velocity peak
+      const subOsc = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(Math.max(45, 72 * pitchScale), now);
+      subOsc.frequency.exponentialRampToValueAtTime(Math.max(58, 118 * pitchScale), now + dur * 0.44);
+      subOsc.frequency.exponentialRampToValueAtTime(34, now + dur);
+      subGain.gain.setValueAtTime(0.001, now);
+      subGain.gain.linearRampToValueAtTime(masterVol * 0.48, now + dur * 0.44);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      subOsc.connect(subGain);
+      subGain.connect(ctx.destination);
+
+      gainNode.gain.setValueAtTime(0.001, now);
+      gainNode.gain.linearRampToValueAtTime(masterVol * 0.88, now + dur * 0.46);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      brownNoise.start(now);
+      brownNoise.stop(now + dur);
+      subOsc.start(now);
+      subOsc.stop(now + dur);
+    }
+  };
+
+  ['push', 'split-h', 'split-v', 'quad'].forEach(m => {
+    document.getElementById('btn-push-mode-' + m)?.addEventListener('click', () => {
+      topCustomizerState.pushMode = m;
+      const badge = document.getElementById('tpl-modal-push-preset-badge');
+      const d = (topCustomizerState.pushDirection || 'left').toUpperCase();
+      if (badge) badge.textContent = m === 'push' ? `Push ${d}` : m === 'split-h' ? 'Split Horiz' : m === 'split-v' ? 'Split Vert' : '4-Way Quad';
+
+      ['push', 'split-h', 'split-v', 'quad'].forEach(other => {
+        const btn = document.getElementById('btn-push-mode-' + other);
+        if (btn) {
+          const isAct = other === m;
+          btn.style.background = isAct ? 'rgba(255,255,255,0.14)' : 'transparent';
+          btn.style.border = isAct ? '1px solid rgba(255,255,255,0.45)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.color = isAct ? '#ffffff' : '#94a3b8';
+        }
+      });
+      const dirRow = document.getElementById('push-direction-row');
+      if (dirRow) dirRow.style.display = m === 'push' ? 'flex' : 'none';
+    });
+  });
+
+  ['left', 'right', 'up', 'down'].forEach(d => {
+    document.getElementById('push-dir-' + d)?.addEventListener('click', () => {
+      topCustomizerState.pushDirection = d;
+      const badge = document.getElementById('tpl-modal-push-preset-badge');
+      if (badge) badge.textContent = `Push ${d.toUpperCase()}`;
+      ['left', 'right', 'up', 'down'].forEach(other => {
+        const btn = document.getElementById('push-dir-' + other);
+        if (btn) {
+          const isAct = other === d;
+          btn.style.background = isAct ? 'rgba(255,255,255,0.16)' : 'transparent';
+          btn.style.border = isAct ? '1px solid rgba(255,255,255,0.45)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.color = isAct ? '#ffffff' : '#94a3b8';
+        }
+      });
+    });
+  });
+
+  document.getElementById('tpl-modal-slider-push-zdepth')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushZDepth = val;
+    const lbl = document.getElementById('tpl-modal-val-push-zdepth');
+    if (lbl) lbl.textContent = val === 0 ? '0 Z (Flat 2D)' : `-${Math.round(val * 12)} Z (${100 - val}% → 100%)`;
+  });
+
+  document.getElementById('tpl-modal-slider-push-shadow')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushShadow = val;
+    const lbl = document.getElementById('tpl-modal-val-push-shadow');
+    if (lbl) lbl.textContent = `${val} px (${val >= 35 ? 'Deep Shadow' : val > 0 ? 'Soft Shadow' : 'Off'})`;
+  });
+
+  document.getElementById('push-toggle-motionblur')?.addEventListener('change', (e) => {
+    topCustomizerState.pushMotionBlur = e.target.checked;
+  });
+  document.getElementById('tpl-modal-slider-push-blur')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushBlurIntensity = val;
+    const lbl = document.getElementById('tpl-modal-val-push-blur');
+    if (lbl) lbl.textContent = `${val} px`;
+  });
+  document.getElementById('tpl-modal-slider-push-samples')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushSamples = val;
+    const lbl = document.getElementById('tpl-modal-val-push-samples');
+    if (lbl) lbl.textContent = `${val} ghost passes`;
+  });
+
+  ['whip', 'smooth', 'elastic', 'linear'].forEach(c => {
+    document.getElementById('btn-push-curve-' + c)?.addEventListener('click', () => {
+      topCustomizerState.pushCurve = c;
+      ['whip', 'smooth', 'elastic', 'linear'].forEach(other => {
+        const btn = document.getElementById('btn-push-curve-' + other);
+        if (btn) {
+          const isAct = other === c;
+          btn.style.background = isAct ? 'rgba(56,189,248,0.22)' : 'transparent';
+          btn.style.border = isAct ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+          btn.style.color = isAct ? '#38bdf8' : '#94a3b8';
+        }
+      });
+    });
+  });
+
+  document.getElementById('tpl-modal-slider-push-speed')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10) / 10;
+    topCustomizerState.pushSpeed = val;
+    const lbl = document.getElementById('tpl-modal-val-push-speed');
+    if (lbl) lbl.textContent = `${val.toFixed(1)}x (${val >= 1.4 ? 'Fast Whip' : val <= 0.9 ? 'Cinematic' : 'Snappy'})`;
+  });
+
+  document.getElementById('push-seam-color')?.addEventListener('input', (e) => {
+    topCustomizerState.pushSeamColor = e.target.value;
+  });
+  document.getElementById('tpl-modal-slider-push-seam')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushSeamWidth = val;
+    const lbl = document.getElementById('tpl-modal-val-push-seam');
+    if (lbl) lbl.textContent = val === 0 ? '0 px (Off)' : `${val} px`;
+  });
+
+  document.getElementById('push-toggle-sfx')?.addEventListener('change', (e) => {
+    topCustomizerState.pushSfxEnabled = e.target.checked;
+  });
+  document.getElementById('push-select-sfx-profile')?.addEventListener('change', (e) => {
+    topCustomizerState.pushSfxProfile = e.target.value;
+    if (typeof window.playPushWhooshSFX === 'function') {
+      window.playPushWhooshSFX(
+        topCustomizerState.pushSfxProfile || 'deep-whoosh',
+        (topCustomizerState.pushSfxVol ?? 80) / 100,
+        topCustomizerState.pushSpeed ?? 0.8,
+        (topCustomizerState.pushSfxStretch ?? 135) / 100
+      );
+    }
+  });
+  document.getElementById('tpl-modal-slider-push-sfx-stretch')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushSfxStretch = val;
+    const lbl = document.getElementById('tpl-modal-val-push-sfx-stretch');
+    if (lbl) lbl.textContent = `${(val / 100).toFixed(2)}x (${val >= 120 ? 'Slowed' : val <= 85 ? 'Tight' : 'Sync'})`;
+  });
+  document.getElementById('tpl-modal-slider-push-sfx-vol')?.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    topCustomizerState.pushSfxVol = val;
+    const lbl = document.getElementById('tpl-modal-val-push-sfx-vol');
+    if (lbl) lbl.textContent = `${val}%`;
+  });
+  document.getElementById('btn-push-preview-sfx')?.addEventListener('click', () => {
+    if (typeof window.playPushWhooshSFX === 'function') {
+      window.playPushWhooshSFX(
+        topCustomizerState.pushSfxProfile || 'deep-whoosh',
+        (topCustomizerState.pushSfxVol ?? 80) / 100,
+        topCustomizerState.pushSpeed ?? 0.8,
+        (topCustomizerState.pushSfxStretch ?? 135) / 100
+      );
+    }
+  });
+
+  const origUploadPrim = document.getElementById('tpl-modal-upload-primary');
+  origUploadPrim?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file && file.type && file.type.startsWith('video/')) {
+      topCustomizerState.primaryIsVideo = true;
+    } else if (file) {
+      topCustomizerState.primaryIsVideo = false;
+    }
+  });
+
+  const origUploadSec = document.getElementById('tpl-modal-upload-secondary');
+  origUploadSec?.addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file && file.type && file.type.startsWith('video/')) {
+      topCustomizerState.secondaryIsVideo = true;
+    } else if (file) {
+      topCustomizerState.secondaryIsVideo = false;
+    }
+  });
+
   // Function to visually synchronize all individual parallax layer direction buttons
   window.syncSpoonerDirectionButtons = function() {
     const fgDir = topCustomizerState.spoonerFgDir || 'push';
@@ -33180,6 +34438,7 @@ function populateModalTemplatesSidebar() {
   const shortNames = {
     'subject-25d-parallax': '2.5D Parallax',
     'paper-rip-shred': 'Paper Tear',
+    'directional-push-split-wipe': 'Push & Split',
     'gold-frame-spin': 'Gold Frame 3D',
     'magnates-paper-vector-cutout': 'Split Screen',
     'kinetic-decode-typewriter': 'Kinetic Type',
