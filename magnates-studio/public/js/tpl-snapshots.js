@@ -787,7 +787,347 @@
         <text x="200" y="145" fill="#eab308" font-family="monospace" font-weight="700" font-size="8.5" letter-spacing="1" text-anchor="middle">&gt;&gt; REAL-TIME MARKER PEN STROKE &lt;&lt;</text>
         
       </svg>
-    `)}`
+    `)}`,
+
+    // F11. Fed Rate Timeline
+    'fedrate': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-fed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a2e"/><stop offset="100%" stop-color="#05101a"/></linearGradient>
+          <linearGradient id="bar-fed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="rgba(139,92,246,0.2)"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-fed)"/>
+        <text x="24" y="38" fill="rgba(255,255,255,0.7)" font-family="monospace" font-size="12" font-weight="700" letter-spacing="1.5">FED FUNDS RATE</text>
+        <text x="376" y="38" fill="#8b5cf6" font-family="monospace" font-size="22" font-weight="900" text-anchor="end">5.25%</text>
+        <g transform="translate(24, 52)">
+          <rect x="0" y="28" width="24" height="112" rx="3" fill="url(#bar-fed)"/>
+          <rect x="36" y="46" width="24" height="94" rx="3" fill="url(#bar-fed)"/>
+          <rect x="72" y="65" width="24" height="75" rx="3" fill="url(#bar-fed)"/>
+          <rect x="108" y="78" width="24" height="62" rx="3" fill="url(#bar-fed)"/>
+          <rect x="144" y="90" width="24" height="50" rx="3" fill="url(#bar-fed)"/>
+          <rect x="180" y="102" width="24" height="38" rx="3" fill="url(#bar-fed)"/>
+          <rect x="216" y="108" width="24" height="32" rx="3" fill="url(#bar-fed)"/>
+          <rect x="252" y="121" width="24" height="19" rx="3" fill="url(#bar-fed)"/>
+          <rect x="288" y="127" width="24" height="13" rx="3" fill="url(#bar-fed)"/>
+          <rect x="324" y="108" width="24" height="32" rx="3" fill="url(#bar-fed)"/>
+          <line x1="0" y1="145" x2="352" y2="145" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+        </g>
+        <g fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="10">
+          <text x="24" y="212">1980</text>
+          <text x="110" y="212">1990</text>
+          <text x="195" y="212">2000</text>
+          <text x="280" y="212">2010</text>
+          <text x="376" y="212" text-anchor="end">2024</text>
+        </g>
+      </svg>
+    `)}`,
+
+    // F12. Bear vs Bull
+    'bearbull': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-bb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#090a12"/></linearGradient>
+          <linearGradient id="bear-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient>
+          <linearGradient id="bull-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-bb)"/>
+        <circle cx="110" cy="95" r="38" fill="url(#bear-g)"/>
+        <text x="110" y="105" font-size="34" text-anchor="middle">🐻</text>
+        <text x="110" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BEAR</text>
+        <text x="110" y="176" fill="#ef4444" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">-20%</text>
+
+        <text x="200" y="104" fill="rgba(255,255,255,0.3)" font-family="'Inter', sans-serif" font-weight="900" font-size="22" letter-spacing="2" text-anchor="middle">VS</text>
+
+        <circle cx="290" cy="95" r="38" fill="url(#bull-g)"/>
+        <text x="290" y="105" font-size="34" text-anchor="middle">🐂</text>
+        <text x="290" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BULL</text>
+        <text x="290" y="176" fill="#10b981" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">+150%</text>
+      </svg>
+    `)}`,
+
+    // F13. Stock Certificate
+    'certificate': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-cert" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1f130a"/><stop offset="100%" stop-color="#0d0703"/></linearGradient>
+          <linearGradient id="cert-paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8f2e4"/><stop offset="100%" stop-color="#eddcc2"/></linearGradient>
+          <radialGradient id="gold-seal" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#b45309"/></radialGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-cert)"/>
+        <g transform="translate(60, 20)">
+          <rect width="280" height="185" rx="5" fill="url(#cert-paper)" stroke="#8b5a3c" stroke-width="2.5"/>
+          <rect x="6" y="6" width="268" height="173" rx="3" fill="none" stroke="#8b5a3c" stroke-width="1" stroke-dasharray="4,2"/>
+          <text x="140" y="38" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-weight="700" font-size="17" text-anchor="middle">Apple Inc.</text>
+          <text x="140" y="52" fill="#8b5a3c" font-family="monospace" font-size="7.5" font-weight="700" letter-spacing="2" text-anchor="middle">SHARES OF COMMON STOCK</text>
+          <line x1="40" y1="60" x2="240" y2="60" stroke="#8b5a3c" stroke-width="0.8"/>
+          <text x="140" y="80" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="11" text-anchor="middle">This certifies that holder owns</text>
+          <text x="140" y="112" fill="#7c3aed" font-family="monospace" font-weight="900" font-size="24" text-anchor="middle">100 SHARES</text>
+          <text x="140" y="138" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="10.5" text-anchor="middle">Dated January 1, 2024</text>
+          <circle cx="242" cy="150" r="18" fill="url(#gold-seal)"/>
+          <text x="242" y="156" font-size="14" text-anchor="middle">🏆</text>
+        </g>
+      </svg>
+    `)}`,
+
+    // F14. Crypto Wallet
+    'cryptowallet': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-cw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10121e"/><stop offset="100%" stop-color="#07080f"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-cw)"/>
+        <text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">CRYPTO WALLET</text>
+        <text x="376" y="36" fill="#ffffff" font-family="monospace" font-weight="900" font-size="20" text-anchor="end">$47,280</text>
+
+        <g transform="translate(24, 52)">
+          <!-- BTC -->
+          <rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+          <circle cx="24" cy="23" r="14" fill="#f7931a"/>
+          <text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">₿</text>
+          <text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">BTC</text>
+          <text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Bitcoin</text>
+          <text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">0.5 BTC</text>
+          <text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+3.2%</text>
+
+          <!-- ETH -->
+          <g transform="translate(0, 54)">
+            <rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <circle cx="24" cy="23" r="14" fill="#627eea"/>
+            <text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">Ξ</text>
+            <text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">ETH</text>
+            <text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Ethereum</text>
+            <text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">5 ETH</text>
+            <text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+2.1%</text>
+          </g>
+
+          <!-- SOL -->
+          <g transform="translate(0, 108)">
+            <rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <circle cx="24" cy="23" r="14" fill="#9945ff"/>
+            <text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">◎</text>
+            <text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">SOL</text>
+            <text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Solana</text>
+            <text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">100 SOL</text>
+            <text x="336" y="34" fill="#ef4444" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">-1.4%</text>
+          </g>
+        </g>
+      </svg>
+    `)}`,
+
+    // F15. Real Estate Property
+    'realestate': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-re" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#111c13"/><stop offset="100%" stop-color="#070d08"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-re)"/>
+        <g transform="translate(24, 20)">
+          <rect width="64" height="54" rx="8" fill="#8b5a3c"/>
+          <text x="32" y="36" font-size="28" text-anchor="middle">🏠</text>
+          <text x="78" y="26" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">123 Main St, Austin TX</text>
+          <text x="78" y="44" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="10">Single Family Home · $450,000</text>
+        </g>
+        <g transform="translate(24, 90)">
+          <rect x="0" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/>
+          <text x="84" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">ROI</text>
+          <text x="84" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">12.5%</text>
+
+          <rect x="184" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/>
+          <text x="268" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">CAP RATE</text>
+          <text x="268" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">6.8%</text>
+
+          <rect x="0" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/>
+          <text x="84" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">MONTHLY CASH FLOW</text>
+          <text x="84" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">$1,240/mo</text>
+
+          <rect x="184" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/>
+          <text x="268" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">5YR APPRECIATION</text>
+          <text x="268" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">+35%</text>
+        </g>
+      </svg>
+    `)}`,
+
+    // F16. Credit Score Gauge
+    'creditscore': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-cs" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121422"/><stop offset="100%" stop-color="#07080f"/></linearGradient>
+          <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="50%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#10b981"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-cs)"/>
+        <text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1.5" text-anchor="middle">CREDIT SCORE GAUGE</text>
+        <g transform="translate(200, 145) scale(2.2)">
+          <path d="M -30 0 A 30 30 0 0 1 30 0" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M -30 0 A 30 30 0 0 1 30 0" fill="none" stroke="url(#scoreGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="72 94.25"/>
+        </g>
+        <text x="200" y="140" fill="#ffffff" font-family="monospace" font-weight="900" font-size="34" letter-spacing="-1" text-anchor="middle">742</text>
+        <text x="200" y="160" fill="rgba(255,255,255,0.6)" font-family="'Inter', sans-serif" font-weight="700" font-size="10" letter-spacing="1.5" text-anchor="middle">EXCELLENT</text>
+        <g fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="10">
+          <text x="90" y="185">300</text>
+          <text x="160" y="185">500</text>
+          <text x="240" y="185">700</text>
+          <text x="310" y="185" text-anchor="end">850</text>
+        </g>
+      </svg>
+    `)}`,
+
+    // F17. 50/30/20 Budget
+    'budget': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-bgt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#080911"/></linearGradient>
+          <linearGradient id="b-needs" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient>
+          <linearGradient id="b-wants" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f472b6"/></linearGradient>
+          <linearGradient id="b-sav" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-bgt)"/>
+        <text x="200" y="35" fill="rgba(255,255,255,0.75)" font-family="'Inter', sans-serif" font-weight="700" font-size="13" letter-spacing="0.5" text-anchor="middle">50/30/20 BUDGET · $5,000/MO</text>
+
+        <g transform="translate(30, 60)">
+          <!-- Needs -->
+          <text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Needs</text>
+          <rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/>
+          <rect x="70" y="6" width="115" height="24" rx="4" fill="url(#b-needs)"/>
+          <text x="175" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$2,500</text>
+          <text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">50%</text>
+
+          <!-- Wants -->
+          <g transform="translate(0, 42)">
+            <text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Wants</text>
+            <rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/>
+            <rect x="70" y="6" width="69" height="24" rx="4" fill="url(#b-wants)"/>
+            <text x="130" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,500</text>
+            <text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">30%</text>
+          </g>
+
+          <!-- Savings -->
+          <g transform="translate(0, 84)">
+            <text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Savings</text>
+            <rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/>
+            <rect x="70" y="6" width="46" height="24" rx="4" fill="url(#b-sav)"/>
+            <text x="108" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,000</text>
+            <text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">20%</text>
+          </g>
+        </g>
+      </svg>
+    `)}`,
+
+    // F18. Market Crash
+    'crash': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0a0a"/><stop offset="100%" stop-color="#0b0404"/></linearGradient>
+          <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.6"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-cr)"/>
+        <text x="24" y="34" fill="#ffffff" font-family="monospace" font-weight="900" font-size="16">S&amp;P 500</text>
+        <text x="24" y="52" fill="#ef4444" font-family="'Inter', sans-serif" font-weight="700" font-size="11">▼ -34%</text>
+        <text x="376" y="42" fill="#ef4444" font-family="monospace" font-weight="900" font-size="24" text-anchor="end">2,191</text>
+        <g transform="translate(24, 70)">
+          <path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120 L 352 135 L 0 135 Z" fill="url(#redGrad)"/>
+          <path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+        </g>
+      </svg>
+    `)}`,
+
+    // F19. Dividend Calendar
+    'dividend': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-div" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#070810"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-div)"/>
+        <text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">DIVIDEND CALENDAR</text>
+        <text x="376" y="34" fill="#fbbf24" font-family="monospace" font-weight="900" font-size="15" text-anchor="end">4.2% · $350/mo</text>
+        <g transform="translate(24, 52)">
+          ${[...Array(24)].map((_, i) => {
+            const r = Math.floor(i / 6);
+            const c = i % 6;
+            const isPay = [4, 11, 17, 22].includes(i);
+            return `
+              <g transform="translate(${c * 60}, ${r * 38})">
+                <rect width="52" height="32" rx="4" fill="${isPay ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.03)'}" stroke="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.06)'}"/>
+                <text x="26" y="16" fill="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.5)'}" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">${i + 1}</text>
+                ${isPay ? `<text x="26" y="27" fill="#fbbf24" font-family="monospace" font-size="7" font-weight="700" text-anchor="middle">$87</text>` : ''}
+              </g>
+            `;
+          }).join('')}
+        </g>
+      </svg>
+    `)}`,
+
+    // F20. Supply & Demand Curves
+    'supplydemand': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="bg-sd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f4ebd9"/><stop offset="100%" stop-color="#e4d2b2"/></linearGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-sd)"/>
+        <text x="200" y="30" fill="#3a2418" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">HOUSING MARKET CURVES</text>
+        <g transform="translate(60, 45)">
+          <line x1="20" y1="120" x2="260" y2="120" stroke="#3a2418" stroke-width="1.5"/>
+          <line x1="20" y1="10" x2="20" y2="120" stroke="#3a2418" stroke-width="1.5"/>
+          <!-- Supply curve -->
+          <path d="M 30 110 Q 140 70 250 15" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+          <!-- Demand curve -->
+          <path d="M 30 15 Q 140 70 250 110" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+          <!-- Equilibrium point -->
+          <circle cx="140" cy="70" r="6" fill="#7c3aed"/>
+        </g>
+        <g transform="translate(50, 195)" font-family="monospace" font-size="10" fill="#3a2418">
+          <circle cx="10" cy="5" r="4" fill="#ef4444"/>
+          <text x="20" y="9">Supply</text>
+
+          <circle cx="110" cy="5" r="4" fill="#10b981"/>
+          <text x="120" y="9">Demand</text>
+
+          <circle cx="210" cy="5" r="4" fill="#7c3aed"/>
+          <text x="220" y="9">Eq: $350K / 1,200 units</text>
+        </g>
+      </svg>
+    `)}`,
+
+
+      'candle': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cnd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cnd)"/><text x="24" y="34" fill="#ffffff" font-family="monospace" font-weight="900" font-size="16">AAPL</text><text x="24" y="52" fill="#00d68f" font-family="monospace" font-weight="700" font-size="11">+2.34%</text><text x="376" y="42" fill="#00d68f" font-family="monospace" font-weight="900" font-size="22" text-anchor="end">$187.44</text><g transform="translate(30, 70)"><g transform="translate(0,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="30" width="16" height="50" rx="2" fill="#00d68f"/></g><g transform="translate(34,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#ff4757" stroke-width="1.5"/><rect x="4" y="20" width="16" height="40" rx="2" fill="#ff4757"/></g><g transform="translate(68,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="25" width="16" height="55" rx="2" fill="#00d68f"/></g><g transform="translate(102,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="35" width="16" height="45" rx="2" fill="#00d68f"/></g><g transform="translate(136,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#ff4757" stroke-width="1.5"/><rect x="4" y="15" width="16" height="35" rx="2" fill="#ff4757"/></g><g transform="translate(170,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="20" width="16" height="50" rx="2" fill="#00d68f"/></g><g transform="translate(204,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="30" width="16" height="60" rx="2" fill="#00d68f"/></g><g transform="translate(238,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#ff4757" stroke-width="1.5"/><rect x="4" y="25" width="16" height="40" rx="2" fill="#ff4757"/></g><g transform="translate(272,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="20" width="16" height="55" rx="2" fill="#00d68f"/></g><g transform="translate(306,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="15" width="16" height="45" rx="2" fill="#00d68f"/></g></g></svg>`)}`,
+    'balance': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="30" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">APPLE INC. · BALANCE SHEET</text><rect x="40" y="42" width="320" height="30" rx="4" fill="rgba(139,90,60,0.12)"/><text x="200" y="62" fill="#3a2418" font-family="monospace" font-weight="800" font-size="13" text-anchor="middle">ASSETS = LIABILITIES + EQUITY</text><g transform="translate(40, 85)" font-family="monospace" font-size="10" fill="#3a2418"><text x="10" y="15">Cash &amp; Equivalents</text><text x="310" y="15" text-anchor="end" font-weight="700">$29.9B</text><text x="10" y="35">Marketable Securities</text><text x="310" y="35" text-anchor="end" font-weight="700">$61.5B</text><line x1="10" y1="46" x2="310" y2="46" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><text x="10" y="62">Short-term Debt</text><text x="310" y="62" text-anchor="end" font-weight="700">$16.2B</text><text x="10" y="80">Long-term Debt</text><text x="310" y="80" text-anchor="end" font-weight="700">$95.7B</text><line x1="10" y1="92" x2="310" y2="92" stroke="#8b5a3c" stroke-width="1.5"/><text x="10" y="110" font-weight="900" fill="#7c5cff">Shareholders' Equity</text><text x="310" y="110" text-anchor="end" font-weight="900" fill="#7c5cff">$62.1B</text></g></svg>`)}`,
+    'compound': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient><linearGradient id="c-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00d68f" stop-opacity="0.4"/><stop offset="100%" stop-color="#00d68f" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cp)"/><text x="24" y="32" fill="rgba(255,255,255,0.6)" font-family="monospace" font-size="10">INITIAL: $1,000</text><text x="376" y="34" fill="#00d68f" font-family="monospace" font-weight="900" font-size="22" text-anchor="end">$1,000,000</text><text x="376" y="50" fill="#ffd23f" font-family="monospace" font-weight="700" font-size="11" text-anchor="end">1000x MULTIPLIER</text><g transform="translate(24, 60)"><path d="M 0 115 Q 80 110 160 90 T 260 50 T 352 10 L 352 125 L 0 125 Z" fill="url(#c-area)"/><path d="M 0 115 Q 80 110 160 90 T 260 50 T 352 10" fill="none" stroke="#00d68f" stroke-width="3" stroke-linecap="round"/></g><g fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="9"><text x="24" y="210">Year 0</text><text x="110" y="210">Year 10</text><text x="195" y="210">Year 20</text><text x="280" y="210">Year 30</text><text x="376" y="210" text-anchor="end">Year 40</text></g></svg>`)}`,
+    'wealth': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-wl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-wl)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1.5" text-anchor="middle">NET WORTH COMPARISON</text><g transform="translate(24, 60)"><text x="0" y="18" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Jeff Bezos</text><rect x="90" y="2" width="260" height="24" rx="4" fill="url(#b-sp)"/><rect x="90" y="2" width="250" height="24" rx="4" fill="#1da1f2"/><text x="330" y="18" fill="#fff" font-family="monospace" font-weight="900" font-size="11" text-anchor="end">$200B</text><text x="0" y="58" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Elon Musk</text><rect x="90" y="42" width="260" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="90" y="42" width="225" height="24" rx="4" fill="#ff5c8a"/><text x="305" y="58" fill="#fff" font-family="monospace" font-weight="900" font-size="11" text-anchor="end">$180B</text><text x="0" y="98" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Avg Person</text><rect x="90" y="82" width="260" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="90" y="82" width="8" height="24" rx="3" fill="#8a8a95"/><text x="105" y="98" fill="#8a8a95" font-family="monospace" font-weight="700" font-size="11">$97K</text></g></svg>`)}`,
+    'bloom': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#000"/><g transform="translate(10, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">US EQUITIES ▲</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">SPX 4,582 <tspan fill="#00d68f">+0.8%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">NDX 15,942 <tspan fill="#00d68f">+1.2%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DJI 35,281 <tspan fill="#ff4757">-0.3%</tspan></text></g><g transform="translate(205, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#ff4757" font-family="monospace" font-weight="900" font-size="8.5">RATES / FX ▼</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">US10Y 4.32%</text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">EUR/USD 1.0842</text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DXY 105.42</text></g><g transform="translate(10, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">COMMODITIES ▲</text><text x="8" y="45" fill="#fff" font-family="monospace" font-size="9">GOLD 1,987.40</text><text x="8" y="65" fill="#fff" font-family="monospace" font-size="9">BRENT 82.50</text></g><g transform="translate(205, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">CRYPTO ▲</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">BTC $43,280 <tspan fill="#00d68f">+3.2%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">ETH $2,280 <tspan fill="#00d68f">+2.1%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">SOL $42.10 <tspan fill="#ff4757">-1.4%</tspan></text></g></svg>`)}`,
+    'ticker': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tk)"/><text x="200" y="65" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="13" letter-spacing="2" text-anchor="middle">LIVE MARKET TICKER TAPE</text><g transform="translate(15, 95)"><rect width="370" height="48" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)"/><g transform="translate(18, 29)" font-family="monospace" font-weight="700" font-size="13"><text x="0" y="0" fill="#fff">AAPL 187.44 <tspan fill="#00d68f">+2.3%</tspan></text><text x="135" y="0" fill="#fff">TSLA 248.50 <tspan fill="#00d68f">+5.7%</tspan></text><text x="270" y="0" fill="#fff">NVDA 487 <tspan fill="#00d68f">+4.1%</tspan></text></g></g></svg>`)}`,
+    'inflation': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-inf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a0a0a"/><stop offset="100%" stop-color="#100505"/></linearGradient><linearGradient id="bill-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#85bb65"/><stop offset="100%" stop-color="#5a8a3f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-inf)"/><text x="200" y="38" fill="rgba(255,255,255,0.7)" font-family="monospace" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">1980 → 2024 PURCHASING POWER</text><g transform="translate(130, 60)"><rect width="140" height="70" rx="6" fill="url(#bill-g)" stroke="rgba(255,255,255,0.3)"/><text x="70" y="44" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="24" text-anchor="middle">$100</text></g><text x="200" y="165" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" text-anchor="middle">-72%</text><text x="200" y="185" fill="#ff4757" font-family="monospace" font-weight="700" font-size="10" letter-spacing="1" text-anchor="middle">PURCHASING POWER LOST</text></svg>`)}`,
+    'snowball': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sno" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sno)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">DEBT SNOWBALL PAYOFF</text><g transform="translate(25, 52)"><g transform="translate(0,0)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">✓</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Credit Card</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$5,000</text></g><g transform="translate(0,34)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">✓</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Car Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$12,000</text></g><g transform="translate(0,68)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Student Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="110" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$28,000</text></g><g transform="translate(0,102)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Mortgage</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="150" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$250,000</text></g></g></svg>`)}`,
+    'pie': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pie" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pie)"/><text x="200" y="28" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">PORTFOLIO ALLOCATION</text><g transform="translate(130, 42)"><circle cx="70" cy="70" r="48" fill="none" stroke="#7c5cff" stroke-width="26" stroke-dasharray="180 301.6"/><circle cx="70" cy="70" r="48" fill="none" stroke="#ff5c8a" stroke-width="26" stroke-dasharray="60 301.6" stroke-dashoffset="-180"/><circle cx="70" cy="70" r="48" fill="none" stroke="#5cffdc" stroke-width="26" stroke-dasharray="30 301.6" stroke-dashoffset="-240"/><circle cx="70" cy="70" r="48" fill="none" stroke="#ffd23f" stroke-width="26" stroke-dasharray="16 301.6" stroke-dashoffset="-270"/><circle cx="70" cy="70" r="48" fill="none" stroke="#8a8a95" stroke-width="26" stroke-dasharray="15.6 301.6" stroke-dashoffset="-286"/><text x="70" y="68" fill="#fff" font-family="monospace" font-weight="900" font-size="14" text-anchor="middle">$100K</text><text x="70" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8" text-anchor="middle">TOTAL</text></g><g transform="translate(30, 195)" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.8)"><circle cx="10" cy="6" r="4" fill="#7c5cff"/><text x="18" y="9">Stocks 60%</text><circle cx="95" cy="6" r="4" fill="#ff5c8a"/><text x="103" y="9">Bonds 20%</text><circle cx="175" cy="6" r="4" fill="#5cffdc"/><text x="183" y="9">RE 10%</text><circle cx="240" cy="6" r="4" fill="#ffd23f"/><text x="248" y="9">Crypto 5%</text><circle cx="315" cy="6" r="4" fill="#8a8a95"/><text x="323" y="9">Cash 5%</text></g></svg>`)}`,
+    'receipt': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(90, 15)"><rect width="220" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.1)"/><text x="110" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="12" letter-spacing="1" text-anchor="middle">GROCERY MART</text><line x1="20" y1="32" x2="200" y2="32" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g transform="translate(20, 48)" font-family="monospace" font-size="9.5" fill="#3a2418"><text x="0" y="0">Organic Milk</text><text x="180" y="0" text-anchor="end" font-weight="700">$6.99</text><text x="0" y="20">Avocados (3)</text><text x="180" y="20" text-anchor="end" font-weight="700">$4.50</text><text x="0" y="40">Sourdough Bread</text><text x="180" y="40" text-anchor="end" font-weight="700">$7.25</text><text x="0" y="60">Free Range Eggs</text><text x="180" y="60" text-anchor="end" font-weight="700">$8.99</text><line x1="0" y1="75" x2="180" y2="75" stroke="#3a2418" stroke-width="1.5"/><text x="0" y="95" font-weight="900" font-size="12">TOTAL</text><text x="180" y="95" text-anchor="end" font-weight="900" font-size="12" fill="#7c5cff">$27.73</text></g></g></svg>`)}`,
+    'google': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#fff"/><g transform="translate(200, 42)"><text font-family="'Space Grotesk', sans-serif" font-size="34" font-weight="700" text-anchor="middle"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC05">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan></text></g><g transform="translate(50, 68)"><rect width="300" height="36" rx="18" fill="#fff" stroke="#dfe1e5" stroke-width="1.2"/><circle cx="20" cy="18" r="6" fill="none" stroke="#9aa0a6" stroke-width="1.8"/><line x1="24" y1="22" x2="29" y2="27" stroke="#9aa0a6" stroke-width="1.8"/><text x="36" y="23" fill="#202124" font-family="'Inter', sans-serif" font-size="12">what happened to...</text><line x1="165" y1="10" x2="165" y2="26" stroke="#202124" stroke-width="1.5"/></g><g transform="translate(65, 120)" font-family="'Inter', sans-serif" font-size="11" fill="#202124"><text x="0" y="0">🔍 what happened to db cooper</text><text x="0" y="24">🔍 what happened in chernobyl</text><text x="0" y="48">🔍 what happened last night</text></g></svg>`)}`,
+    'imessage': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-im" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5f5f7"/><stop offset="100%" stop-color="#e8e8ed"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-im)"/><text x="200" y="24" fill="#555" font-family="'Inter', sans-serif" font-weight="600" font-size="10" text-anchor="middle">iMessage Thread</text><g transform="translate(30, 42)"><rect width="180" height="32" rx="16" fill="#e9e9eb"/><text x="16" y="20" fill="#000" font-family="'Inter', sans-serif" font-size="11">hey, are you up?</text><g transform="translate(160, 40)"><rect width="180" height="32" rx="16" fill="#007aff"/><text x="16" y="20" fill="#fff" font-family="'Inter', sans-serif" font-size="11">yeah why</text></g><g transform="translate(0, 80)"><rect width="210" height="32" rx="16" fill="#e9e9eb"/><text x="16" y="20" fill="#000" font-family="'Inter', sans-serif" font-size="11">you need to see this rn</text></g><g transform="translate(150, 120)"><rect width="190" height="32" rx="16" fill="#007aff"/><text x="16" y="20" fill="#fff" font-family="'Inter', sans-serif" font-size="11">omg what happened</text></g></g></svg>`)}`,
+    'subscribe': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a24"/><stop offset="100%" stop-color="#0a0a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sub)"/><g transform="translate(200, 95)"><rect x="-90" y="-24" width="180" height="48" rx="8" fill="#cc0000"/><text x="-15" y="6" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="15" text-anchor="middle">SUBSCRIBE</text><circle cx="60" cy="0" r="14" fill="rgba(255,255,255,0.2)"/><text x="60" y="5" font-size="14" text-anchor="middle">🔔</text></g><text x="200" y="160" fill="rgba(255,255,255,0.8)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="13" text-anchor="middle"><tspan fill="#fff" font-size="16">1.2M</tspan> subscribers</text></svg>`)}`,
+    'countdown': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-cd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2a1040"/><stop offset="100%" stop-color="#0a0515"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-cd)"/><circle cx="200" cy="112" r="70" fill="none" stroke="rgba(124,92,255,0.3)" stroke-width="3"/><text x="200" y="145" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="110" letter-spacing="-3" text-anchor="middle">7</text><text x="200" y="185" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="3" text-anchor="middle">OF 10</text></svg>`)}`,
+    'redcircle': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-rc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a2a4a"/><stop offset="100%" stop-color="#1a1020"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-rc)"/><rect x="70" y="40" width="260" height="145" rx="8" fill="#2a1a3a" stroke="rgba(255,255,255,0.1)"/><circle cx="160" cy="112" r="42" fill="none" stroke="#ff2a2a" stroke-width="4.5"/><line x1="225" y1="75" x2="195" y2="95" stroke="#ff2a2a" stroke-width="4.5"/><polygon points="190,98 198,90 204,100" fill="#ff2a2a"/><text x="290" y="90" fill="#ff2a2a" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="44" text-anchor="middle">?</text></svg>`)}`,
+    'chart': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-ch" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient><linearGradient id="ch-grd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5cff8a" stop-opacity="0.5"/><stop offset="100%" stop-color="#5cff8a" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-ch)"/><text x="24" y="32" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="16">TSLA</text><text x="24" y="48" fill="#5cff8a" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">▲ +12.4%</text><text x="376" y="38" fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="22" text-anchor="end">$248.50</text><g transform="translate(24, 70)"><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10 L 352 120 L 0 120 Z" fill="url(#ch-grd)"/><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10" fill="none" stroke="#5cff8a" stroke-width="2.5" stroke-linecap="round"/></g></svg>`)}`,
+    'typewriter': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><line x1="45" y1="0" x2="45" y2="225" stroke="rgba(220,80,80,0.4)" stroke-width="1.5"/><g transform="translate(65, 95)"><text fill="#2a1a10" font-family="'Courier New', monospace" font-weight="700" font-size="16">The letter arrived at midnight...</text><text y="30" fill="rgba(42,26,16,0.6)" font-family="'Courier New', monospace" font-size="11">— November 14, 1987</text></g></svg>`)}`,
+    'notif': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-nf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-nf)"/><g transform="translate(45, 30)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="20">📸</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">New follower</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">@creator started following you</text></g><g transform="translate(45, 90)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><rect x="16" y="10" width="28" height="28" rx="6" fill="#003087"/><text x="30" y="29" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">P</text><text x="54" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Payment received</text><text x="54" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">$2,450.00 from Client</text></g><g transform="translate(45, 150)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="18">✉️</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Partnership opportunity</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">Hey, loved your last video...</text></g></svg>`)}`,
+    'hormozi': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-hz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-hz)"/><text x="60" y="60" font-size="34">🔥</text><text x="340" y="180" font-size="34" text-anchor="end">💰</text><text x="200" y="125" fill="#ffd23f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" letter-spacing="-1" text-anchor="middle">THIS ONE TRICK</text></svg>`)}`,
+    'kenburns': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-kb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2c1810"/><stop offset="50%" stop-color="#5a3a28"/><stop offset="100%" stop-color="#8b5a3c"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-kb)"/><rect width="400" height="225" fill="black" opacity="0.25"/><text x="200" y="190" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="18" letter-spacing="4" text-anchor="middle">TOKYO · 1987</text></svg>`)}`,
+    'tweet': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tw)"/><g transform="translate(45, 38)"><rect width="310" height="150" rx="14" fill="#fff"/><circle cx="28" cy="28" r="16" fill="#1da1f2"/><text x="28" y="33" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">A</text><text x="54" y="24" fill="#0f1419" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Alex Hormozi <tspan fill="#1da1f2">✓</tspan></text><text x="54" y="38" fill="#536471" font-family="'Inter', sans-serif" font-size="10">@alexmormozi</text><text x="20" y="75" fill="#0f1419" font-family="'Inter', sans-serif" font-size="11.5">The best investment you can make is in yourself.</text><line x1="20" y1="108" x2="290" y2="108" stroke="#eff3f4" stroke-width="1"/><text x="20" y="128" fill="#536471" font-family="'Inter', sans-serif" font-size="10"><tspan fill="#0f1419" font-weight="700">12.4K</tspan> Likes   <tspan fill="#0f1419" font-weight="700">3.2K</tspan> Reposts</text></g></svg>`)}`,
+    'money': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-my" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a3d1f"/><stop offset="100%" stop-color="#051a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-my)"/><g transform="translate(200, 115)"><text fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="52" letter-spacing="-2" text-anchor="middle">$127,450</text><text y="32" fill="rgba(255,255,255,0.6)" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="3" text-anchor="middle">MONTHLY REVENUE</text></g></svg>`)}`,
+    'glitch': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="203" y="127" fill="#ff006e" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><text x="197" y="123" fill="#00f5d4" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><text x="200" y="125" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><line x1="0" y1="120" x2="400" y2="120" stroke="#fff" stroke-width="1.5" opacity="0.6"/></svg>`)}`,
+    'map': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-mp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a3a5c"/><stop offset="100%" stop-color="#0f2540"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-mp)"/><ellipse cx="200" cy="115" rx="100" ry="50" fill="rgba(92,255,220,0.15)" stroke="rgba(92,255,220,0.3)"/><circle cx="200" cy="115" r="30" fill="none" stroke="#ff5c8a" opacity="0.5"/><text x="200" y="112" font-size="28" text-anchor="middle">📍</text><rect x="130" y="45" width="140" height="28" rx="14" fill="rgba(0,0,0,0.6)"/><text x="200" y="63" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5" text-anchor="middle">Chernobyl, Ukraine</text></svg>`)}`,
+    'news': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="24" y="130" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22">Tech Giant Announces Layoffs</text><g transform="translate(24, 150)"><rect width="80" height="32" fill="#e63946"/><text x="40" y="20" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" text-anchor="middle">🔴 LIVE</text><rect x="80" y="0" width="272" height="32" fill="#fff"/><text x="92" y="20" fill="#0a0a0f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Markets down 3% • CEO resigns</text></g></svg>`)}`,
+    'quote': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-qt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8d5b7"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-qt)"/><text x="40" y="90" fill="rgba(139,90,60,0.15)" font-family="Georgia, serif" font-size="100" font-weight="900">“</text><g transform="translate(60, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-style="italic" font-size="18">The obstacle is the way.</text><text y="38" fill="#8b5a3c" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="2">— MARCUS AURELIUS</text></g></svg>`)}`,
+    'polaroid': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pol" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a1a3a"/><stop offset="100%" stop-color="#1a0a20"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pol)"/><g transform="translate(130, 20) rotate(-12)"><rect width="100" height="125" rx="3" fill="#fff"/><rect x="8" y="8" width="84" height="84" rx="2" fill="#ff7a59"/><text x="50" y="112" fill="#333" font-family="monospace" font-size="8" text-anchor="middle">Tokyo</text></g><g transform="translate(170, 35) rotate(6)"><rect width="100" height="125" rx="3" fill="#fff"/><rect x="8" y="8" width="84" height="84" rx="2" fill="#5cffdc"/><text x="50" y="112" fill="#333" font-family="monospace" font-size="8" text-anchor="middle">Summer</text></g></svg>`)}`,
+    'comic': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd23f"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cm)"/><polygon points="200,30 222,85 285,85 235,120 255,175 200,140 145,175 165,120 115,85 178,85" fill="#fff"/><text x="200" y="132" fill="#fff" stroke="#000" stroke-width="4" paint-order="stroke fill" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="64" text-anchor="middle">POW!</text></svg>`)}`,
+    'vhs': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-vh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-vh)"/><text x="24" y="32" fill="#ff2a2a" font-family="'Courier New', monospace" font-weight="900" font-size="12">🔴 REC</text><text x="376" y="32" fill="#fff" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="end">SP 0:00:18</text><text x="200" y="125" fill="#fff" font-family="'Courier New', monospace" font-weight="900" font-size="34" letter-spacing="3" text-anchor="middle">SUMMER 89</text><text x="200" y="200" fill="rgba(255,255,255,0.7)" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="middle">OCT 18 1989</text></svg>`)}`,
+    'progress': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-prg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient><linearGradient id="p-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-prg)"/><g transform="translate(50, 75)"><text x="0" y="10" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="14">Goal Progress</text><rect x="0" y="24" width="300" height="16" rx="8" fill="rgba(255,255,255,0.1)"/><rect x="0" y="24" width="300" height="16" rx="8" fill="url(#p-bar)"/><text x="150" y="85" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="36" text-anchor="middle">100%</text></g></svg>`)}`,
+    'scramble': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sc)"/><text x="200" y="125" fill="#5cff8a" font-family="'Courier New', monospace" font-weight="900" font-size="30" letter-spacing="2" text-anchor="middle">ACCESS GRANTED</text></svg>`)}`,
+    'newspaper': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="38" fill="#8b5a3c" font-family="Georgia, serif" font-weight="900" font-size="12" letter-spacing="4" text-anchor="middle">THE DAILY TIMES</text><line x1="40" y1="48" x2="360" y2="48" stroke="#3a2418" stroke-width="2"/><g transform="translate(40, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">HISTORIC DISCOVERY</text><text y="28" fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">SHOCKS THE WORLD</text><text y="58" fill="#5a3a28" font-family="Georgia, serif" font-style="italic" font-size="12" text-anchor="middle" x="160">Experts call it a major breakthrough</text></g></svg>`)}`,
+    'instagram': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f0f2f5"/><g transform="translate(100, 15)"><rect width="200" height="195" rx="10" fill="#fff"/><circle cx="24" cy="20" r="10" fill="#ff7a59"/><text x="42" y="24" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">@creator</text><rect x="0" y="38" width="200" height="110" fill="#7c5cff"/><text x="100" y="105" font-size="38" text-anchor="middle">❤️</text><text x="12" y="168" font-size="12">❤️ 💬 📤</text><text x="12" y="184" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5">12,453 likes</text></g></svg>`)}`,
+    'checklist': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`,
+    'parallax': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-px" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1033"/><stop offset="50%" stop-color="#3d1f5c"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-px)"/><circle cx="200" cy="70" r="42" fill="#ffd27a" opacity="0.9"/><polygon points="0,225 60,120 120,170 200,90 280,160 340,110 400,180 400,225" fill="#2a1540"/><polygon points="0,225 40,140 100,180 180,110 260,170 320,125 400,170 400,225" fill="#120820"/><rect x="185" y="145" width="30" height="60" rx="4" fill="#000"/><text x="200" y="215" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="12" letter-spacing="2" text-anchor="middle">DEPTH PARALLAX</text></svg>`)}`,
+    'textbehind': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff5c8a"/><stop offset="100%" stop-color="#7c5cff"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tb)"/><text x="200" y="135" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="82" letter-spacing="-2" text-anchor="middle">DREAM</text><path d="M 130 140 C 130 60, 270 60, 270 140 L 250 225 L 150 225 Z" fill="#1a1024"/><circle cx="200" cy="90" r="32" fill="#2a1a3a"/></svg>`)}`,
+    'docheight': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(60, 25)"><rect width="280" height="175" rx="6" fill="#fff" stroke="#d4d0c4" stroke-width="1.2"/><rect x="25" y="45" width="160" height="12" rx="2" fill="rgba(255,220,50,0.7)"/><rect x="25" y="80" width="200" height="12" rx="2" fill="rgba(255,220,50,0.7)"/><rect x="25" y="115" width="130" height="12" rx="2" fill="rgba(255,220,50,0.7)"/><line x1="25" y1="30" x2="255" y2="30" stroke="#d4d0c4" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="65" x2="230" y2="65" stroke="#d4d0c4" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="100" x2="240" y2="100" stroke="#d4d0c4" stroke-width="5" stroke-linecap="round"/><line x1="25" y1="135" x2="190" y2="135" stroke="#d4d0c4" stroke-width="5" stroke-linecap="round"/></g></svg>`)}`,
+    'kinetic': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="kg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="400" height="225" fill="#0a0a15"/><text x="40" y="65" fill="url(#kg1)" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="44" letter-spacing="-1">CREATE</text><text x="180" y="125" fill="#5cffdc" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="38" letter-spacing="-1">INSPIRE</text><text x="70" y="190" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="52" letter-spacing="-2">DELIVER</text></svg>`)}`,
+    'split': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="sp-l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a2a4a"/><stop offset="100%" stop-color="#1a1020"/></linearGradient><linearGradient id="sp-r" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff7a59"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="200" height="225" fill="url(#sp-l)"/><rect x="200" width="200" height="225" fill="url(#sp-r)"/><circle cx="200" cy="112" r="60" fill="#e8d5c4"/><line x1="200" y1="0" x2="200" y2="225" stroke="#fff" stroke-width="3"/><text x="100" y="200" fill="rgba(255,255,255,0.7)" font-family="monospace" font-size="11" text-anchor="middle">BEFORE</text><text x="300" y="200" fill="#fff" font-family="monospace" font-weight="900" font-size="11" text-anchor="middle">AFTER</text></svg>`)}`,
+    'zoom': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-zm" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2a1a3a"/><stop offset="100%" stop-color="#0a0a15"/></radialGradient><linearGradient id="p-prod" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd27a"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-zm)"/><circle cx="200" cy="112" r="85" fill="none" stroke="rgba(255,210,122,0.15)" stroke-width="4"/><g transform="translate(150, 45)"><rect width="100" height="135" rx="14" fill="url(#p-prod)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/><rect x="18" y="25" width="64" height="35" rx="4" fill="rgba(255,255,255,0.3)"/><text x="50" y="100" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="14" text-anchor="middle">LUXE</text></g></svg>`)}`,
   };
 
   window.AUTHENTIC_TEMPLATE_SNAPSHOTS = SNAPSHOTS;
@@ -835,4 +1175,12 @@
   window.tplGetSnapshot = function (id) {
     return SNAPSHOTS[id] || null;
   };
+  // Update any already-rendered homepage template cards immediately
+  document.querySelectorAll('.home-tpl-card').forEach(function (card) {
+    var id = card.getAttribute('data-template-id');
+    if (id && SNAPSHOTS[id]) {
+      var img = card.querySelector('#default-img-' + id);
+      if (img) img.src = SNAPSHOTS[id];
+    }
+  });
 })();

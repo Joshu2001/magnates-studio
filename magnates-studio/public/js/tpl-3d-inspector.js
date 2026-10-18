@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   const HOST_ID = 'tpl-modal-3d-controls';
-  const STORE_KEY = 'magnates_fx_store_v1';
+  const STORE_KEY = 'magnates_fx_store_v2';
   const RW = 720, RH = 405; // offscreen raster size for timeline rendering
 
   const isBridged = (id) => typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(id);
@@ -653,6 +653,58 @@
     slotsFor(tplId).forEach(sl => { if (sl.def != null && nodes[sl.def] && ov[sl.key] != null) nodes[sl.def].nodeValue = ov[sl.key]; });
   }
 
+  let stageTheaterActive = false;
+
+  function updateTheaterButtonUI() {
+    const btn = document.getElementById('btn-tpl-modal-theater');
+    const icon = document.getElementById('tpl-theater-icon');
+    const label = document.getElementById('tpl-theater-label');
+    if (!btn) return;
+    if (stageTheaterActive) {
+      btn.style.background = 'rgba(168,85,247,0.28)';
+      btn.style.borderColor = '#c084fc';
+      btn.style.color = '#ffffff';
+      btn.style.boxShadow = '0 0 14px rgba(168,85,247,0.4)';
+      if (icon) icon.textContent = '⤡';
+      if (label) label.textContent = 'Exit Theater';
+      btn.setAttribute('aria-pressed', 'true');
+      btn.title = 'Exit Theater / Standard Stage View';
+    } else {
+      btn.style.background = 'rgba(0,0,0,0.75)';
+      btn.style.borderColor = 'rgba(255,255,255,0.18)';
+      btn.style.color = '#cbd5e1';
+      btn.style.boxShadow = 'none';
+      if (icon) icon.textContent = '⛶';
+      if (label) label.textContent = 'Theater View';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.title = 'Toggle Theater / Expanded Stage View (Takes full vertical space)';
+    }
+  }
+
+  window.tplToggleStageTheater = function (force) {
+    stageTheaterActive = (typeof force === 'boolean') ? force : !stageTheaterActive;
+    updateTheaterButtonUI();
+    const tplId = curTpl || (typeof topCustomizerState !== 'undefined' && topCustomizerState.currentTpl?.id);
+    const mode = (tplId && store[tplId]) ? store[tplId].mode : 'video';
+    const isCustom3D = (typeof topCustomizerState !== 'undefined' && !!topCustomizerState.is3DMode);
+    const is3D = (tplId && has3D(kindOf(tplId), tplId) && mode === '3d') || isCustom3D;
+    applyModeLayout(is3D);
+  };
+  window.tplIsStageTheater = () => stageTheaterActive;
+
+  function initTheaterToggle() {
+    const btn = document.getElementById('btn-tpl-modal-theater');
+    if (btn && !btn.dataset.theaterBound) {
+      btn.dataset.theaterBound = '1';
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        window.tplToggleStageTheater();
+      };
+    }
+    updateTheaterButtonUI();
+  }
+  window.tplInitTheaterToggle = initTheaterToggle;
+
   function applyModeLayout(is3D) {
     const sb = document.getElementById('tpl-modal-storyboard-container');
     const pb = document.getElementById('tpl-modal-playback-bar');
@@ -662,12 +714,21 @@
     const aspectBtn = document.getElementById('tpl-modal-btn-aspect');
     const timerBadge = document.getElementById('tpl-modal-timer-badge');
 
-    if (is3D) {
+    const isTheater = typeof stageTheaterActive !== 'undefined' && !!stageTheaterActive;
+    const isExpanded = is3D || isTheater;
+
+    if (isExpanded) {
       if (sb) sb.style.display = 'none';
       if (pb) pb.style.display = 'none';
-      if (hud) hud.style.display = 'none';
-      if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = 'none';
-      if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = 'none';
+      if (is3D) {
+        if (hud) hud.style.display = 'none';
+        if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = 'none';
+        if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = 'none';
+      } else {
+        if (hud) hud.style.display = '';
+        if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = '';
+        if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = '';
+      }
       if (box) {
         box.style.padding = '0';
         box.style.border = 'none';
@@ -711,6 +772,7 @@
         stageCont.style.overflow = 'visible';
       }
     }
+    updateTheaterButtonUI();
   }
 
   window.tpl3DUse3D = (id) => has3D(kindOf(id), id) && entry(id).mode === '3d';
@@ -737,6 +799,8 @@
   window.tpl3DOnFrame = function (seqTime) { seqNow = seqTime; };
   window.tpl3DOnReplay = function () { seqNow = 0; };
   window.tpl3DOnClose = function () {
+    stageTheaterActive = false;
+    updateTheaterButtonUI();
     applyModeLayout(false);
     if (curTpl) capture(curTpl);
     if (resizeObs) { resizeObs.disconnect(); resizeObs = null; }
@@ -750,6 +814,9 @@
   window.tpl3DMakeClip = function (tpl, o) {
     if (curTpl === tpl.id) capture(tpl.id);
     const snap = JSON.parse(JSON.stringify(entry(tpl.id)));
+    if (typeof window.tplGetContextualData === 'function') {
+      snap.contextualData = window.tplGetContextualData(tpl.id);
+    }
     const url = o.prim || tpl.defaultImage;
     return {
       id: `fx-${tpl.id}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -797,6 +864,9 @@
     hostEl.innerHTML = `<img id="default-img-${id}" src="${esc(tpl.defaultImage)}" alt="" style="position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:0;" /><div id="fx-container-${id}" style="position:absolute;left:0;top:0;right:0;bottom:0;display:none;"></div>`;
     const manual = { t: 0, fx: sc.entry.fx || { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 } };
     const step = startTemplateHoverVideo(hostEl, tpl, manual);
+    if (sc.entry && sc.entry.contextualData && window.tplUpdateStageWithContextualData) {
+      window.tplUpdateStageWithContextualData(id, sc.entry.contextualData);
+    }
     // text overrides
     const ov = sc.entry.texts || {};
     const slots = (id === 'spatial-3d-motion-suite') ? SPATIAL_SLOTS : (id === 'document-3d-fx-engine') ? DOC_SLOTS : null;
@@ -882,10 +952,12 @@
   window.tplGetSnapshot = function (tplId) {
     if (!tplId) return null;
     const e = store[tplId];
-    if (e && e.snapshot) return e.snapshot;
+    const hasCustomEdits = e && ((e.texts && Object.keys(e.texts).length > 0) || e.mode === '3d');
+    if (hasCustomEdits && e.snapshot) return e.snapshot;
     if (typeof window.AUTHENTIC_TEMPLATE_SNAPSHOTS !== 'undefined' && window.AUTHENTIC_TEMPLATE_SNAPSHOTS[tplId]) {
       return window.AUTHENTIC_TEMPLATE_SNAPSHOTS[tplId];
     }
+    if (e && e.snapshot) return e.snapshot;
     return null;
   };
 
@@ -1033,4 +1105,11 @@
   };
 
   window.tplFxPreload = function (clip) { if (clip && clip.fxScene) { dataUrlFor(clip.fxScene.prim); dataUrlFor(clip.fxScene.sec); } };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheaterToggle);
+  } else {
+    initTheaterToggle();
+  }
 })();
+

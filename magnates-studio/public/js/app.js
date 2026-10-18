@@ -23124,6 +23124,530 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'parallax',
+    title: 'Depth Parallax Multi-Layer',
+    category: 'Parallax',
+    origCategory: 'Parallax',
+    badge: 'TRENDING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Cinematic layered depth with foreground, midground, and background multi-plane motion.',
+    tags: ['Parallax', 'Depth Parallax Multi-Layer', 'Creator Motion'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-px" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1033"/><stop offset="50%" stop-color="#3d1f5c"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-px)"/><circle cx="200" cy="70" r="42" fill="#ffd27a" opacity="0.9"/><polygon points="0,225 60,120 120,170 200,90 280,160 340,110 400,180 400,225" fill="#2a1540"/><polygon points="0,225 40,140 100,180 180,110 260,170 320,125 400,170 400,225" fill="#120820"/><rect x="185" y="145" width="30" height="60" rx="4" fill="#000"/><text x="200" y="215" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="12" letter-spacing="2" text-anchor="middle">DEPTH PARALLAX</text></svg>`)}`
+  },
+  {
+    id: 'textbehind',
+    title: 'Text Behind Object',
+    category: 'Text & Titles',
+    origCategory: 'Text & Titles',
+    badge: 'POPULAR',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Bold typography that tucks behind your subject for a sleek magazine-cover aesthetic.',
+    tags: ['Text & Titles', 'Text Behind Object', 'Creator Motion'],
+    defaultImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22transparent%22%2F%3E%3Cpath%20d%3D%22M%2040%20145%20C%2040%2075%2C%20160%2075%2C%20160%20145%20L%20145%20200%20L%2055%20200%20Z%22%20fill%3D%22%231a1024%22%20stroke%3D%22%237c5cff%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2285%22%20r%3D%2234%22%20fill%3D%22%232a1a3a%22%20stroke%3D%22%23ff5c8a%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E',
+    secondaryImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ff5c8a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c5cff%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23bg)%22%2F%3E%3C%2Fsvg%3E'
+  },
+  {
+    id: 'docheight',
+    title: 'Document Key Highlight',
+    category: 'Paper / Cutout',
+    origCategory: 'Paper / Cutout',
+    badge: 'PRO',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated yellow highlighter sweeping across key document passages with realistic paper sheen.',
+    tags: ['Paper / Cutout', 'Document Key Highlight', 'Creator Motion'],
+    defaultImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E',
+    secondaryImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E'
+  },
+  {
+    id: 'kinetic',
+    title: 'Kinetic Typography Stack',
+    category: 'Text & Titles',
+    origCategory: 'Text & Titles',
+    badge: 'NEW',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'High-energy typography that slides, scales, and pulses dynamically to the rhythm.',
+    tags: ['Text & Titles', 'Kinetic Typography Stack', 'Creator Motion'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="kg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="400" height="225" fill="#0a0a15"/><text x="40" y="65" fill="url(#kg1)" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="44" letter-spacing="-1">CREATE</text><text x="180" y="125" fill="#5cffdc" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="38" letter-spacing="-1">INSPIRE</text><text x="70" y="190" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="52" letter-spacing="-2">DELIVER</text></svg>`)}`
+  },
+  {
+    id: 'split',
+    title: 'Split Reveal (Before / After)',
+    category: 'Transitions',
+    origCategory: 'Transitions',
+    badge: 'CLASSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Dramatic split-screen comparison revealing vibrant color footage vs. monochrome archival grade.',
+    tags: ['Transitions', 'Split Reveal (Before / After)', 'Creator Motion'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="sp-l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a2a4a"/><stop offset="100%" stop-color="#1a1020"/></linearGradient><linearGradient id="sp-r" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff7a59"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="200" height="225" fill="url(#sp-l)"/><rect x="200" width="200" height="225" fill="url(#sp-r)"/><circle cx="200" cy="112" r="60" fill="#e8d5c4"/><line x1="200" y1="0" x2="200" y2="225" stroke="#fff" stroke-width="3"/><text x="100" y="200" fill="rgba(255,255,255,0.7)" font-family="monospace" font-size="11" text-anchor="middle">BEFORE</text><text x="300" y="200" fill="#fff" font-family="monospace" font-weight="900" font-size="11" text-anchor="middle">AFTER</text></svg>`)}`
+  },
+  {
+    id: 'zoom',
+    title: '3D Product Zoom & Spin',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'PREMIUM',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Cinematic 3D rotating product zoom with dynamic optical rays and directional lighting.',
+    tags: ['3D Spatial', '3D Product Zoom & Spin', 'Creator Motion'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-zm" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2a1a3a"/><stop offset="100%" stop-color="#0a0a15"/></radialGradient><linearGradient id="p-prod" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd27a"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-zm)"/><circle cx="200" cy="112" r="85" fill="none" stroke="rgba(255,210,122,0.15)" stroke-width="4"/><g transform="translate(150, 45)"><rect width="100" height="135" rx="14" fill="url(#p-prod)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/><rect x="18" y="25" width="64" height="35" rx="4" fill="rgba(255,255,255,0.3)"/><text x="50" y="100" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="14" text-anchor="middle">LUXE</text></g></svg>`)}`
+  },
+
+  {
+    id: 'candle',
+    title: 'Candlestick Chart',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'TRADING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'OHLC candlestick chart animating in candle by candle. The standard for stock/crypto price action breakdowns.',
+    tags: ['Finance', 'Candlestick Chart', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cnd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cnd)"/><text x="24" y="34" fill="#ffffff" font-family="monospace" font-weight="900" font-size="16">AAPL</text><text x="24" y="52" fill="#00d68f" font-family="monospace" font-weight="700" font-size="11">+2.34%</text><text x="376" y="42" fill="#00d68f" font-family="monospace" font-weight="900" font-size="22" text-anchor="end">$187.44</text><g transform="translate(30, 70)"><g transform="translate(0,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="30" width="16" height="50" rx="2" fill="#00d68f"/></g><g transform="translate(34,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#ff4757" stroke-width="1.5"/><rect x="4" y="20" width="16" height="40" rx="2" fill="#ff4757"/></g><g transform="translate(68,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="25" width="16" height="55" rx="2" fill="#00d68f"/></g><g transform="translate(102,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="35" width="16" height="45" rx="2" fill="#00d68f"/></g><g transform="translate(136,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#ff4757" stroke-width="1.5"/><rect x="4" y="15" width="16" height="35" rx="2" fill="#ff4757"/></g><g transform="translate(170,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="20" width="16" height="50" rx="2" fill="#00d68f"/></g><g transform="translate(204,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="30" width="16" height="60" rx="2" fill="#00d68f"/></g><g transform="translate(238,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#ff4757" stroke-width="1.5"/><rect x="4" y="25" width="16" height="40" rx="2" fill="#ff4757"/></g><g transform="translate(272,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="20" width="16" height="55" rx="2" fill="#00d68f"/></g><g transform="translate(306,0)"><line x1="12" y1="0" x2="12" y2="120" stroke="#00d68f" stroke-width="1.5"/><rect x="4" y="15" width="16" height="45" rx="2" fill="#00d68f"/></g></g></svg>`)}`
+  },
+  {
+    id: 'balance',
+    title: 'Balance Sheet Breakdown',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'ACCOUNTING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Assets = Liabilities + Equity formula with line-by-line highlighting. Perfect for accounting explainers.',
+    tags: ['Finance', 'Balance Sheet Breakdown', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="30" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">APPLE INC. · BALANCE SHEET</text><rect x="40" y="42" width="320" height="30" rx="4" fill="rgba(139,90,60,0.12)"/><text x="200" y="62" fill="#3a2418" font-family="monospace" font-weight="800" font-size="13" text-anchor="middle">ASSETS = LIABILITIES + EQUITY</text><g transform="translate(40, 85)" font-family="monospace" font-size="10" fill="#3a2418"><text x="10" y="15">Cash &amp; Equivalents</text><text x="310" y="15" text-anchor="end" font-weight="700">$29.9B</text><text x="10" y="35">Marketable Securities</text><text x="310" y="35" text-anchor="end" font-weight="700">$61.5B</text><line x1="10" y1="46" x2="310" y2="46" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><text x="10" y="62">Short-term Debt</text><text x="310" y="62" text-anchor="end" font-weight="700">$16.2B</text><text x="10" y="80">Long-term Debt</text><text x="310" y="80" text-anchor="end" font-weight="700">$95.7B</text><line x1="10" y1="92" x2="310" y2="92" stroke="#8b5a3c" stroke-width="1.5"/><text x="10" y="110" font-weight="900" fill="#7c5cff">Shareholders' Equity</text><text x="310" y="110" text-anchor="end" font-weight="900" fill="#7c5cff">$62.1B</text></g></svg>`)}`
+  },
+  {
+    id: 'compound',
+    title: 'Compound Interest Curve',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'WEALTH',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Exponential growth curve drawing itself with multiplier. The #1 visual for "start investing early" content.',
+    tags: ['Finance', 'Compound Interest Curve', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient><linearGradient id="c-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00d68f" stop-opacity="0.4"/><stop offset="100%" stop-color="#00d68f" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cp)"/><text x="24" y="32" fill="rgba(255,255,255,0.6)" font-family="monospace" font-size="10">INITIAL: $1,000</text><text x="376" y="34" fill="#00d68f" font-family="monospace" font-weight="900" font-size="22" text-anchor="end">$1,000,000</text><text x="376" y="50" fill="#ffd23f" font-family="monospace" font-weight="700" font-size="11" text-anchor="end">1000x MULTIPLIER</text><g transform="translate(24, 60)"><path d="M 0 115 Q 80 110 160 90 T 260 50 T 352 10 L 352 125 L 0 125 Z" fill="url(#c-area)"/><path d="M 0 115 Q 80 110 160 90 T 260 50 T 352 10" fill="none" stroke="#00d68f" stroke-width="3" stroke-linecap="round"/></g><g fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="9"><text x="24" y="210">Year 0</text><text x="110" y="210">Year 10</text><text x="195" y="210">Year 20</text><text x="280" y="210">Year 30</text><text x="376" y="210" text-anchor="end">Year 40</text></g></svg>`)}`
+  },
+  {
+    id: 'wealth',
+    title: 'Wealth Comparison Bars',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'INEQUALITY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Horizontal bar chart comparing net worths (Bezos vs. average person). The viral "wealth gap" visual.',
+    tags: ['Finance', 'Wealth Comparison Bars', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-wl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-wl)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1.5" text-anchor="middle">NET WORTH COMPARISON</text><g transform="translate(24, 60)"><text x="0" y="18" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Jeff Bezos</text><rect x="90" y="2" width="260" height="24" rx="4" fill="url(#b-sp)"/><rect x="90" y="2" width="250" height="24" rx="4" fill="#1da1f2"/><text x="330" y="18" fill="#fff" font-family="monospace" font-weight="900" font-size="11" text-anchor="end">$200B</text><text x="0" y="58" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Elon Musk</text><rect x="90" y="42" width="260" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="90" y="42" width="225" height="24" rx="4" fill="#ff5c8a"/><text x="305" y="58" fill="#fff" font-family="monospace" font-weight="900" font-size="11" text-anchor="end">$180B</text><text x="0" y="98" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Avg Person</text><rect x="90" y="82" width="260" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="90" y="82" width="8" height="24" rx="3" fill="#8a8a95"/><text x="105" y="98" fill="#8a8a95" font-family="monospace" font-weight="700" font-size="11">$97K</text></g></svg>`)}`
+  },
+  {
+    id: 'bloom',
+    title: 'Bloomberg Terminal',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'PRO',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Multi-panel terminal look with flickering data. The signature aesthetic of serious market analysis.',
+    tags: ['Finance', 'Bloomberg Terminal', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#000"/><g transform="translate(10, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">US EQUITIES ▲</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">SPX 4,582 <tspan fill="#00d68f">+0.8%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">NDX 15,942 <tspan fill="#00d68f">+1.2%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DJI 35,281 <tspan fill="#ff4757">-0.3%</tspan></text></g><g transform="translate(205, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#ff4757" font-family="monospace" font-weight="900" font-size="8.5">RATES / FX ▼</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">US10Y 4.32%</text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">EUR/USD 1.0842</text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DXY 105.42</text></g><g transform="translate(10, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">COMMODITIES ▲</text><text x="8" y="45" fill="#fff" font-family="monospace" font-size="9">GOLD 1,987.40</text><text x="8" y="65" fill="#fff" font-family="monospace" font-size="9">BRENT 82.50</text></g><g transform="translate(205, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">CRYPTO ▲</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">BTC $43,280 <tspan fill="#00d68f">+3.2%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">ETH $2,280 <tspan fill="#00d68f">+2.1%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">SOL $42.10 <tspan fill="#ff4757">-1.4%</tspan></text></g></svg>`)}`
+  },
+  {
+    id: 'ticker',
+    title: 'Stock Ticker Tape',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'MARKETS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Scrolling ticker tape with live prices and % changes. Classic financial newsroom look.',
+    tags: ['Finance', 'Stock Ticker Tape', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tk" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tk)"/><text x="200" y="65" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="13" letter-spacing="2" text-anchor="middle">LIVE MARKET TICKER TAPE</text><g transform="translate(15, 95)"><rect width="370" height="48" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)"/><g transform="translate(18, 29)" font-family="monospace" font-weight="700" font-size="13"><text x="0" y="0" fill="#fff">AAPL 187.44 <tspan fill="#00d68f">+2.3%</tspan></text><text x="135" y="0" fill="#fff">TSLA 248.50 <tspan fill="#00d68f">+5.7%</tspan></text><text x="270" y="0" fill="#fff">NVDA 487 <tspan fill="#00d68f">+4.1%</tspan></text></g></g></svg>`)}`
+  },
+  {
+    id: 'inflation',
+    title: 'Inflation Shrink',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'ECONOMICS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Dollar bill shrinking to show purchasing power loss. The perfect visual for "what $100 bought then vs now".',
+    tags: ['Finance', 'Inflation Shrink', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-inf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a0a0a"/><stop offset="100%" stop-color="#100505"/></linearGradient><linearGradient id="bill-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#85bb65"/><stop offset="100%" stop-color="#5a8a3f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-inf)"/><text x="200" y="38" fill="rgba(255,255,255,0.7)" font-family="monospace" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">1980 → 2024 PURCHASING POWER</text><g transform="translate(130, 60)"><rect width="140" height="70" rx="6" fill="url(#bill-g)" stroke="rgba(255,255,255,0.3)"/><text x="70" y="44" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="24" text-anchor="middle">$100</text></g><text x="200" y="165" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" text-anchor="middle">-72%</text><text x="200" y="185" fill="#ff4757" font-family="monospace" font-weight="700" font-size="10" letter-spacing="1" text-anchor="middle">PURCHASING POWER LOST</text></svg>`)}`
+  },
+  {
+    id: 'snowball',
+    title: 'Debt Snowball',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'BANKING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Debts paying off one by one with checkmarks. The Dave Ramsey method visualized.',
+    tags: ['Finance', 'Debt Snowball', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sno" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sno)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">DEBT SNOWBALL PAYOFF</text><g transform="translate(25, 52)"><g transform="translate(0,0)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">✓</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Credit Card</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$5,000</text></g><g transform="translate(0,34)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">✓</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Car Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$12,000</text></g><g transform="translate(0,68)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Student Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="110" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$28,000</text></g><g transform="translate(0,102)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Mortgage</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="150" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$250,000</text></g></g></svg>`)}`
+  },
+  {
+    id: 'pie',
+    title: 'Portfolio Allocation Pie',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'INVESTING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated pie chart building up slice by slice. Perfect for "how I allocate my portfolio" videos.',
+    tags: ['Finance', 'Portfolio Allocation Pie', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pie" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pie)"/><text x="200" y="28" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">PORTFOLIO ALLOCATION</text><g transform="translate(130, 42)"><circle cx="70" cy="70" r="48" fill="none" stroke="#7c5cff" stroke-width="26" stroke-dasharray="180 301.6"/><circle cx="70" cy="70" r="48" fill="none" stroke="#ff5c8a" stroke-width="26" stroke-dasharray="60 301.6" stroke-dashoffset="-180"/><circle cx="70" cy="70" r="48" fill="none" stroke="#5cffdc" stroke-width="26" stroke-dasharray="30 301.6" stroke-dashoffset="-240"/><circle cx="70" cy="70" r="48" fill="none" stroke="#ffd23f" stroke-width="26" stroke-dasharray="16 301.6" stroke-dashoffset="-270"/><circle cx="70" cy="70" r="48" fill="none" stroke="#8a8a95" stroke-width="26" stroke-dasharray="15.6 301.6" stroke-dashoffset="-286"/><text x="70" y="68" fill="#fff" font-family="monospace" font-weight="900" font-size="14" text-anchor="middle">$100K</text><text x="70" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8" text-anchor="middle">TOTAL</text></g><g transform="translate(30, 195)" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.8)"><circle cx="10" cy="6" r="4" fill="#7c5cff"/><text x="18" y="9">Stocks 60%</text><circle cx="95" cy="6" r="4" fill="#ff5c8a"/><text x="103" y="9">Bonds 20%</text><circle cx="175" cy="6" r="4" fill="#5cffdc"/><text x="183" y="9">RE 10%</text><circle cx="240" cy="6" r="4" fill="#ffd23f"/><text x="248" y="9">Crypto 5%</text><circle cx="315" cy="6" r="4" fill="#8a8a95"/><text x="323" y="9">Cash 5%</text></g></svg>`)}`
+  },
+  {
+    id: 'receipt',
+    title: 'Receipt / Invoice',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'SPENDING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Itemized receipt with running total. Perfect for "how much I spent on…" or expense breakdown content.',
+    tags: ['Finance', 'Receipt / Invoice', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(90, 15)"><rect width="220" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.1)"/><text x="110" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="12" letter-spacing="1" text-anchor="middle">GROCERY MART</text><line x1="20" y1="32" x2="200" y2="32" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g transform="translate(20, 48)" font-family="monospace" font-size="9.5" fill="#3a2418"><text x="0" y="0">Organic Milk</text><text x="180" y="0" text-anchor="end" font-weight="700">$6.99</text><text x="0" y="20">Avocados (3)</text><text x="180" y="20" text-anchor="end" font-weight="700">$4.50</text><text x="0" y="40">Sourdough Bread</text><text x="180" y="40" text-anchor="end" font-weight="700">$7.25</text><text x="0" y="60">Free Range Eggs</text><text x="180" y="60" text-anchor="end" font-weight="700">$8.99</text><line x1="0" y1="75" x2="180" y2="75" stroke="#3a2418" stroke-width="1.5"/><text x="0" y="95" font-weight="900" font-size="12">TOTAL</text><text x="180" y="95" text-anchor="end" font-weight="900" font-size="12" fill="#7c5cff">$27.73</text></g></g></svg>`)}`
+  },
+  {
+    id: 'google',
+    title: 'Google Search Typing',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'DOC FAVORITE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated Google search with typing cursor and auto-suggestions. The signature look of every documentary channel.',
+    tags: ['Animations', 'Google Search Typing', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#fff"/><g transform="translate(200, 42)"><text font-family="'Space Grotesk', sans-serif" font-size="34" font-weight="700" text-anchor="middle"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC05">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan></text></g><g transform="translate(50, 68)"><rect width="300" height="36" rx="18" fill="#fff" stroke="#dfe1e5" stroke-width="1.2"/><circle cx="20" cy="18" r="6" fill="none" stroke="#9aa0a6" stroke-width="1.8"/><line x1="24" y1="22" x2="29" y2="27" stroke="#9aa0a6" stroke-width="1.8"/><text x="36" y="23" fill="#202124" font-family="'Inter', sans-serif" font-size="12">what happened to...</text><line x1="165" y1="10" x2="165" y2="26" stroke="#202124" stroke-width="1.5"/></g><g transform="translate(65, 120)" font-family="'Inter', sans-serif" font-size="11" fill="#202124"><text x="0" y="0">🔍 what happened to db cooper</text><text x="0" y="24">🔍 what happened in chernobyl</text><text x="0" y="48">🔍 what happened last night</text></g></svg>`)}`
+  },
+  {
+    id: 'imessage',
+    title: 'iMessage Thread',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'STORY GOLD',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Realistic iMessage conversation with typing bubbles. Perfect for Reddit stories, drama, and "text gone wrong" videos.',
+    tags: ['Animations', 'iMessage Thread', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-im" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5f5f7"/><stop offset="100%" stop-color="#e8e8ed"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-im)"/><text x="200" y="24" fill="#555" font-family="'Inter', sans-serif" font-weight="600" font-size="10" text-anchor="middle">iMessage Thread</text><g transform="translate(30, 42)"><rect width="180" height="32" rx="16" fill="#e9e9eb"/><text x="16" y="20" fill="#000" font-family="'Inter', sans-serif" font-size="11">hey, are you up?</text><g transform="translate(160, 40)"><rect width="180" height="32" rx="16" fill="#007aff"/><text x="16" y="20" fill="#fff" font-family="'Inter', sans-serif" font-size="11">yeah why</text></g><g transform="translate(0, 80)"><rect width="210" height="32" rx="16" fill="#e9e9eb"/><text x="16" y="20" fill="#000" font-family="'Inter', sans-serif" font-size="11">you need to see this rn</text></g><g transform="translate(150, 120)"><rect width="190" height="32" rx="16" fill="#007aff"/><text x="16" y="20" fill="#fff" font-family="'Inter', sans-serif" font-size="11">omg what happened</text></g></g></svg>`)}`
+  },
+  {
+    id: 'subscribe',
+    title: 'Subscribe Button CTA',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'MUST-HAVE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated subscribe button with click, bell ring, and counter. Drop this in every video for more subs.',
+    tags: ['Animations', 'Subscribe Button CTA', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a24"/><stop offset="100%" stop-color="#0a0a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sub)"/><g transform="translate(200, 95)"><rect x="-90" y="-24" width="180" height="48" rx="8" fill="#cc0000"/><text x="-15" y="6" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="15" text-anchor="middle">SUBSCRIBE</text><circle cx="60" cy="0" r="14" fill="rgba(255,255,255,0.2)"/><text x="60" y="5" font-size="14" text-anchor="middle">🔔</text></g><text x="200" y="160" fill="rgba(255,255,255,0.8)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="13" text-anchor="middle"><tspan fill="#fff" font-size="16">1.2M</tspan> subscribers</text></svg>`)}`
+  },
+  {
+    id: 'countdown',
+    title: 'Countdown / Top 10',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'LIST FORMAT',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Dramatic number reveal with expanding ring. Perfect for "Top 10", countdowns, and list-style videos.',
+    tags: ['Animations', 'Countdown / Top 10', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-cd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2a1040"/><stop offset="100%" stop-color="#0a0515"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-cd)"/><circle cx="200" cy="112" r="70" fill="none" stroke="rgba(124,92,255,0.3)" stroke-width="3"/><text x="200" y="145" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="110" letter-spacing="-3" text-anchor="middle">7</text><text x="200" y="185" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="3" text-anchor="middle">OF 10</text></svg>`)}`
+  },
+  {
+    id: 'redcircle',
+    title: 'Red Circle Highlight',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'YOUTUBE STYLE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Classic YouTube-style red circle + arrow pointing at something. The universal "look here" effect.',
+    tags: ['Animations', 'Red Circle Highlight', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-rc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a2a4a"/><stop offset="100%" stop-color="#1a1020"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-rc)"/><rect x="70" y="40" width="260" height="145" rx="8" fill="#2a1a3a" stroke="rgba(255,255,255,0.1)"/><circle cx="160" cy="112" r="42" fill="none" stroke="#ff2a2a" stroke-width="4.5"/><line x1="225" y1="75" x2="195" y2="95" stroke="#ff2a2a" stroke-width="4.5"/><polygon points="190,98 198,90 204,100" fill="#ff2a2a"/><text x="290" y="90" fill="#ff2a2a" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="44" text-anchor="middle">?</text></svg>`)}`
+  },
+  {
+    id: 'chart',
+    title: 'Stock Chart Drawing',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'FINANCE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated line chart drawing itself with glowing green line. Finance, crypto, and business channels love this.',
+    tags: ['Finance', 'Stock Chart Drawing', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-ch" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient><linearGradient id="ch-grd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5cff8a" stop-opacity="0.5"/><stop offset="100%" stop-color="#5cff8a" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-ch)"/><text x="24" y="32" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="16">TSLA</text><text x="24" y="48" fill="#5cff8a" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">▲ +12.4%</text><text x="376" y="38" fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="22" text-anchor="end">$248.50</text><g transform="translate(24, 70)"><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10 L 352 120 L 0 120 Z" fill="url(#ch-grd)"/><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10" fill="none" stroke="#5cff8a" stroke-width="2.5" stroke-linecap="round"/></g></svg>`)}`
+  },
+  {
+    id: 'typewriter',
+    title: 'Typewriter Reveal',
+    category: 'Text & Titles',
+    origCategory: 'Text & Titles',
+    badge: 'CLASSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Vintage typewriter effect on aged paper. Perfect for true crime, history, and dramatic storytelling.',
+    tags: ['Text & Titles', 'Typewriter Reveal', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><line x1="45" y1="0" x2="45" y2="225" stroke="rgba(220,80,80,0.4)" stroke-width="1.5"/><g transform="translate(65, 95)"><text fill="#2a1a10" font-family="'Courier New', monospace" font-weight="700" font-size="16">The letter arrived at midnight...</text><text y="30" fill="rgba(42,26,16,0.6)" font-family="'Courier New', monospace" font-size="11">— November 14, 1987</text></g></svg>`)}`
+  },
+  {
+    id: 'notif',
+    title: 'Phone Notification Stack',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'MODERN',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Stacked phone notifications sliding in (Instagram, PayPal, Email). Great for "day in the life" and business content.',
+    tags: ['Animations', 'Phone Notification Stack', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-nf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-nf)"/><g transform="translate(45, 30)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="20">📸</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">New follower</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">@creator started following you</text></g><g transform="translate(45, 90)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><rect x="16" y="10" width="28" height="28" rx="6" fill="#003087"/><text x="30" y="29" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">P</text><text x="54" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Payment received</text><text x="54" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">$2,450.00 from Client</text></g><g transform="translate(45, 150)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="18">✉️</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Partnership opportunity</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">Hey, loved your last video...</text></g></svg>`)}`
+  },
+  {
+    id: 'hormozi',
+    title: 'Hormozi Captions',
+    category: 'Text & Titles',
+    origCategory: 'Text & Titles',
+    badge: '#1 REQUESTED',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Word-by-word animated captions with color highlights and emoji pops.',
+    tags: ['Text & Titles', 'Hormozi Captions', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-hz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-hz)"/><text x="60" y="60" font-size="34">🔥</text><text x="340" y="180" font-size="34" text-anchor="end">💰</text><text x="200" y="125" fill="#ffd23f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" letter-spacing="-1" text-anchor="middle">THIS ONE TRICK</text></svg>`)}`
+  },
+  {
+    id: 'kenburns',
+    title: 'Ken Burns Cinematic',
+    category: 'Parallax',
+    origCategory: 'Parallax',
+    badge: 'CLASSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Slow cinematic zoom + pan on any photo. Perfect for storytelling B-roll.',
+    tags: ['Parallax', 'Ken Burns Cinematic', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-kb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2c1810"/><stop offset="50%" stop-color="#5a3a28"/><stop offset="100%" stop-color="#8b5a3c"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-kb)"/><rect width="400" height="225" fill="black" opacity="0.25"/><text x="200" y="190" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="18" letter-spacing="4" text-anchor="middle">TOKYO · 1987</text></svg>`)}`
+  },
+  {
+    id: 'tweet',
+    title: 'Tweet / Social Proof',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'VIRAL',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated tweet popup with verified badge and engagement stats.',
+    tags: ['Animations', 'Tweet / Social Proof', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tw)"/><g transform="translate(45, 38)"><rect width="310" height="150" rx="14" fill="#fff"/><circle cx="28" cy="28" r="16" fill="#1da1f2"/><text x="28" y="33" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">A</text><text x="54" y="24" fill="#0f1419" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Alex Hormozi <tspan fill="#1da1f2">✓</tspan></text><text x="54" y="38" fill="#536471" font-family="'Inter', sans-serif" font-size="10">@alexmormozi</text><text x="20" y="75" fill="#0f1419" font-family="'Inter', sans-serif" font-size="11.5">The best investment you can make is in yourself.</text><line x1="20" y1="108" x2="290" y2="108" stroke="#eff3f4" stroke-width="1"/><text x="20" y="128" fill="#536471" font-family="'Inter', sans-serif" font-size="10"><tspan fill="#0f1419" font-weight="700">12.4K</tspan> Likes   <tspan fill="#0f1419" font-weight="700">3.2K</tspan> Reposts</text></g></svg>`)}`
+  },
+  {
+    id: 'money',
+    title: 'Money Counter',
+    category: 'Finance',
+    origCategory: 'Finance',
+    badge: 'FINANCE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated dollar amount that counts up.',
+    tags: ['Finance', 'Money Counter', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-my" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a3d1f"/><stop offset="100%" stop-color="#051a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-my)"/><g transform="translate(200, 115)"><text fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="52" letter-spacing="-2" text-anchor="middle">$127,450</text><text y="32" fill="rgba(255,255,255,0.6)" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="3" text-anchor="middle">MONTHLY REVENUE</text></g></svg>`)}`
+  },
+  {
+    id: 'glitch',
+    title: 'Glitch Reveal',
+    category: 'Glitches',
+    origCategory: 'Glitches',
+    badge: 'DRAMA',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Cyberpunk-style RGB glitch with scan line.',
+    tags: ['Glitches', 'Glitch Reveal', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="203" y="127" fill="#ff006e" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><text x="197" y="123" fill="#00f5d4" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><text x="200" y="125" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><line x1="0" y1="120" x2="400" y2="120" stroke="#fff" stroke-width="1.5" opacity="0.6"/></svg>`)}`
+  },
+  {
+    id: 'map',
+    title: 'Map Pin Drop',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'STORY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated location pin with ripple effect.',
+    tags: ['Animations', 'Map Pin Drop', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-mp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a3a5c"/><stop offset="100%" stop-color="#0f2540"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-mp)"/><ellipse cx="200" cy="115" rx="100" ry="50" fill="rgba(92,255,220,0.15)" stroke="rgba(92,255,220,0.3)"/><circle cx="200" cy="115" r="30" fill="none" stroke="#ff5c8a" opacity="0.5"/><text x="200" y="112" font-size="28" text-anchor="middle">📍</text><rect x="130" y="45" width="140" height="28" rx="14" fill="rgba(0,0,0,0.6)"/><text x="200" y="63" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5" text-anchor="middle">Chernobyl, Ukraine</text></svg>`)}`
+  },
+  {
+    id: 'news',
+    title: 'Breaking News Banner',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'NEWS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'CNN-style breaking news lower third with scrolling ticker.',
+    tags: ['Animations', 'Breaking News Banner', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="24" y="130" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22">Tech Giant Announces Layoffs</text><g transform="translate(24, 150)"><rect width="80" height="32" fill="#e63946"/><text x="40" y="20" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" text-anchor="middle">🔴 LIVE</text><rect x="80" y="0" width="272" height="32" fill="#fff"/><text x="92" y="20" fill="#0a0a0f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Markets down 3% • CEO resigns</text></g></svg>`)}`
+  },
+  {
+    id: 'quote',
+    title: 'Cinematic Quote Card',
+    category: 'Text & Titles',
+    origCategory: 'Text & Titles',
+    badge: 'MOTIVATION',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Elegant animated quote with author reveal.',
+    tags: ['Text & Titles', 'Cinematic Quote Card', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-qt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8d5b7"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-qt)"/><text x="40" y="90" fill="rgba(139,90,60,0.15)" font-family="Georgia, serif" font-size="100" font-weight="900">“</text><g transform="translate(60, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-style="italic" font-size="18">The obstacle is the way.</text><text y="38" fill="#8b5a3c" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="2">— MARCUS AURELIUS</text></g></svg>`)}`
+  },
+  {
+    id: 'polaroid',
+    title: 'Polaroid Stack',
+    category: 'Paper / Cutout',
+    origCategory: 'Paper / Cutout',
+    badge: 'MEMORY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Stacked polaroid photos fanning out. Perfect for memory/travel videos.',
+    tags: ['Paper / Cutout', 'Polaroid Stack', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pol" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a1a3a"/><stop offset="100%" stop-color="#1a0a20"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pol)"/><g transform="translate(130, 20) rotate(-12)"><rect width="100" height="125" rx="3" fill="#fff"/><rect x="8" y="8" width="84" height="84" rx="2" fill="#ff7a59"/><text x="50" y="112" fill="#333" font-family="monospace" font-size="8" text-anchor="middle">Tokyo</text></g><g transform="translate(170, 35) rotate(6)"><rect width="100" height="125" rx="3" fill="#fff"/><rect x="8" y="8" width="84" height="84" rx="2" fill="#5cffdc"/><text x="50" y="112" fill="#333" font-family="monospace" font-size="8" text-anchor="middle">Summer</text></g></svg>`)}`
+  },
+  {
+    id: 'comic',
+    title: 'Comic POW!',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'FUN',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Comic book explosion with POW text. Great for reaction/humor content.',
+    tags: ['Animations', 'Comic POW!', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd23f"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cm)"/><polygon points="200,30 222,85 285,85 235,120 255,175 200,140 145,175 165,120 115,85 178,85" fill="#fff"/><text x="200" y="132" fill="#fff" stroke="#000" stroke-width="4" paint-order="stroke fill" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="64" text-anchor="middle">POW!</text></svg>`)}`
+  },
+  {
+    id: 'vhs',
+    title: 'VHS Retro Overlay',
+    category: 'Color & Vibe',
+    origCategory: 'Color & Vibe',
+    badge: 'RETRO',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Vintage VHS tape look with scanlines, tracking, and REC indicator.',
+    tags: ['Color & Vibe', 'VHS Retro Overlay', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-vh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-vh)"/><text x="24" y="32" fill="#ff2a2a" font-family="'Courier New', monospace" font-weight="900" font-size="12">🔴 REC</text><text x="376" y="32" fill="#fff" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="end">SP 0:00:18</text><text x="200" y="125" fill="#fff" font-family="'Courier New', monospace" font-weight="900" font-size="34" letter-spacing="3" text-anchor="middle">SUMMER 89</text><text x="200" y="200" fill="rgba(255,255,255,0.7)" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="middle">OCT 18 1989</text></svg>`)}`
+  },
+  {
+    id: 'progress',
+    title: 'Progress Bar',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'GOAL',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated progress bar filling to 100%. Perfect for goal/challenge videos.',
+    tags: ['Animations', 'Progress Bar', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-prg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient><linearGradient id="p-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-prg)"/><g transform="translate(50, 75)"><text x="0" y="10" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="14">Goal Progress</text><rect x="0" y="24" width="300" height="16" rx="8" fill="rgba(255,255,255,0.1)"/><rect x="0" y="24" width="300" height="16" rx="8" fill="url(#p-bar)"/><text x="150" y="85" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="36" text-anchor="middle">100%</text></g></svg>`)}`
+  },
+  {
+    id: 'scramble',
+    title: 'Text Scramble / Hacker',
+    category: 'Text & Titles',
+    origCategory: 'Text & Titles',
+    badge: 'TECH',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Matrix-style text scramble reveal. Great for tech/cybersecurity content.',
+    tags: ['Text & Titles', 'Text Scramble / Hacker', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sc)"/><text x="200" y="125" fill="#5cff8a" font-family="'Courier New', monospace" font-weight="900" font-size="30" letter-spacing="2" text-anchor="middle">ACCESS GRANTED</text></svg>`)}`
+  },
+  {
+    id: 'newspaper',
+    title: 'Newspaper Headline',
+    category: 'Paper / Cutout',
+    origCategory: 'Paper / Cutout',
+    badge: 'CLASSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Vintage newspaper headline reveal. Perfect for history/news content.',
+    tags: ['Paper / Cutout', 'Newspaper Headline', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="38" fill="#8b5a3c" font-family="Georgia, serif" font-weight="900" font-size="12" letter-spacing="4" text-anchor="middle">THE DAILY TIMES</text><line x1="40" y1="48" x2="360" y2="48" stroke="#3a2418" stroke-width="2"/><g transform="translate(40, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">HISTORIC DISCOVERY</text><text y="28" fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">SHOCKS THE WORLD</text><text y="58" fill="#5a3a28" font-family="Georgia, serif" font-style="italic" font-size="12" text-anchor="middle" x="160">Experts call it a major breakthrough</text></g></svg>`)}`
+  },
+  {
+    id: 'instagram',
+    title: 'Instagram Post',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'SOCIAL',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Instagram post with double-tap heart animation. Perfect for social media content.',
+    tags: ['Animations', 'Instagram Post', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f0f2f5"/><g transform="translate(100, 15)"><rect width="200" height="195" rx="10" fill="#fff"/><circle cx="24" cy="20" r="10" fill="#ff7a59"/><text x="42" y="24" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">@creator</text><rect x="0" y="38" width="200" height="110" fill="#7c5cff"/><text x="100" y="105" font-size="38" text-anchor="middle">❤️</text><text x="12" y="168" font-size="12">❤️ 💬 📤</text><text x="12" y="184" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5">12,453 likes</text></g></svg>`)}`
+  },
+  {
+    id: 'checklist',
+    title: 'Animated Checklist',
+    category: 'Animations',
+    origCategory: 'Animations',
+    badge: 'PRODUCTIVITY',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Checklist items appearing and checking off. Perfect for "how to" and productivity content.',
+    tags: ['Animations', 'Animated Checklist', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`
+  },
+
+  {
     id: 'directional-push-split-wipe',
     title: 'Directional Push & Split Wipe (4-Way & Motion Blur)',
     category: 'Transitions',
@@ -23731,10 +24255,142 @@ const EFFECT_TEMPLATES_DATA = [
     tags: ['Animated Highlighter', 'Marker Sweep', 'Yellow Pen', 'Johnny Harris', 'Animation'],
     defaultImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&auto=format&fit=crop&q=80'
+  },
+
+  // ===== FINANCE & WEALTH VOL. 2 TEMPLATES =====
+  {
+    id: 'fedrate',
+    title: 'Fed Rate Timeline',
+    category: 'Finance',
+    origCategory: 'Macro & Fed',
+    badge: 'MACRO',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(180deg, #0a1a2e 0%, #05101a 100%)',
+    description: 'Federal funds rate bars from 1970-2024. Essential for macro content explaining rate hikes and cuts.',
+    tags: ['Fed Rate', 'Macro', 'Interest Rates', 'Finance', 'Economics'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-fed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a2e"/><stop offset="100%" stop-color="#05101a"/></linearGradient><linearGradient id="bar-fed" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="rgba(139,92,246,0.2)"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-fed)"/><text x="24" y="38" fill="rgba(255,255,255,0.7)" font-family="monospace" font-size="12" font-weight="700" letter-spacing="1.5">FED FUNDS RATE</text><text x="376" y="38" fill="#8b5cf6" font-family="monospace" font-size="22" font-weight="900" text-anchor="end">5.25%</text><g transform="translate(24, 52)"><rect x="0" y="28" width="24" height="112" rx="3" fill="url(#bar-fed)"/><rect x="36" y="46" width="24" height="94" rx="3" fill="url(#bar-fed)"/><rect x="72" y="65" width="24" height="75" rx="3" fill="url(#bar-fed)"/><rect x="108" y="78" width="24" height="62" rx="3" fill="url(#bar-fed)"/><rect x="144" y="90" width="24" height="50" rx="3" fill="url(#bar-fed)"/><rect x="180" y="102" width="24" height="38" rx="3" fill="url(#bar-fed)"/><rect x="216" y="108" width="24" height="32" rx="3" fill="url(#bar-fed)"/><rect x="252" y="121" width="24" height="19" rx="3" fill="url(#bar-fed)"/><rect x="288" y="127" width="24" height="13" rx="3" fill="url(#bar-fed)"/><rect x="324" y="108" width="24" height="32" rx="3" fill="url(#bar-fed)"/><line x1="0" y1="145" x2="352" y2="145" stroke="rgba(255,255,255,0.12)" stroke-width="1"/></g><g fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="10"><text x="24" y="212">1980</text><text x="110" y="212">1990</text><text x="195" y="212">2000</text><text x="280" y="212">2010</text><text x="376" y="212" text-anchor="end">2024</text></g></svg>`)}`
+  },
+  {
+    id: 'bearbull',
+    title: 'Bear vs Bull Market',
+    category: 'Finance',
+    origCategory: 'Market Analysis',
+    badge: 'MARKETS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #121324 0%, #090a12 100%)',
+    description: 'Bear vs Bull icon comparison with dynamic percentage change cards. The classic market sentiment visual.',
+    tags: ['Bear Market', 'Bull Market', 'Stocks', 'Finance', 'Sentiment'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-bb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#090a12"/></linearGradient><linearGradient id="bear-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient><linearGradient id="bull-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-bb)"/><circle cx="110" cy="95" r="38" fill="url(#bear-g)"/><text x="110" y="105" font-size="34" text-anchor="middle">🐻</text><text x="110" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BEAR</text><text x="110" y="176" fill="#ef4444" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">-20%</text><text x="200" y="104" fill="rgba(255,255,255,0.3)" font-family="'Inter', sans-serif" font-weight="900" font-size="22" letter-spacing="2" text-anchor="middle">VS</text><circle cx="290" cy="95" r="38" fill="url(#bull-g)"/><text x="290" y="105" font-size="34" text-anchor="middle">🐂</text><text x="290" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BULL</text><text x="290" y="176" fill="#10b981" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">+150%</text></svg>`)}`
+  },
+  {
+    id: 'certificate',
+    title: 'Stock Certificate',
+    category: 'Finance',
+    origCategory: 'Market Analysis',
+    badge: 'VALUE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #1f130a 0%, #0d0703 100%)',
+    description: 'Vintage stock certificate with gold seal. Perfect for value investing and company history content.',
+    tags: ['Stock Certificate', 'Apple', 'Shares', 'Vintage', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cert" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1f130a"/><stop offset="100%" stop-color="#0d0703"/></linearGradient><linearGradient id="cert-paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8f2e4"/><stop offset="100%" stop-color="#eddcc2"/></linearGradient><radialGradient id="gold-seal" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#b45309"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-cert)"/><g transform="translate(60, 20)"><rect width="280" height="185" rx="5" fill="url(#cert-paper)" stroke="#8b5a3c" stroke-width="2.5"/><rect x="6" y="6" width="268" height="173" rx="3" fill="none" stroke="#8b5a3c" stroke-width="1" stroke-dasharray="4,2"/><text x="140" y="38" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-weight="700" font-size="17" text-anchor="middle">Apple Inc.</text><text x="140" y="52" fill="#8b5a3c" font-family="monospace" font-size="7.5" font-weight="700" letter-spacing="2" text-anchor="middle">SHARES OF COMMON STOCK</text><line x1="40" y1="60" x2="240" y2="60" stroke="#8b5a3c" stroke-width="0.8"/><text x="140" y="80" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="11" text-anchor="middle">This certifies that holder owns</text><text x="140" y="112" fill="#7c3aed" font-family="monospace" font-weight="900" font-size="24" text-anchor="middle">100 SHARES</text><text x="140" y="138" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="10.5" text-anchor="middle">Dated January 1, 2024</text><circle cx="242" cy="150" r="18" fill="url(#gold-seal)"/><text x="242" y="156" font-size="14" text-anchor="middle">🏆</text></g></svg>`)}`
+  },
+  {
+    id: 'cryptowallet',
+    title: 'Crypto Wallet Balance',
+    category: 'Finance',
+    origCategory: 'Crypto',
+    badge: 'CRYPTO',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #10121e 0%, #07080f 100%)',
+    description: 'Multi-asset crypto wallet with BTC, ETH, and SOL holding breakdowns and realtime percentage indicators.',
+    tags: ['Crypto', 'Bitcoin', 'Ethereum', 'Solana', 'Wallet', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10121e"/><stop offset="100%" stop-color="#07080f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cw)"/><text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">CRYPTO WALLET</text><text x="376" y="36" fill="#ffffff" font-family="monospace" font-weight="900" font-size="20" text-anchor="end">$47,280</text><g transform="translate(24, 52)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#f7931a"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">₿</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">BTC</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Bitcoin</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">0.5 BTC</text><text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+3.2%</text><g transform="translate(0, 54)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#627eea"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">Ξ</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">ETH</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Ethereum</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">5 ETH</text><text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+2.1%</text></g><g transform="translate(0, 108)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#9945ff"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">◎</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">SOL</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Solana</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">100 SOL</text><text x="336" y="34" fill="#ef4444" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">-1.4%</text></g></g></svg>`)}`
+  },
+  {
+    id: 'realestate',
+    title: 'Real Estate Deal Analyzer',
+    category: 'Finance',
+    origCategory: 'Real Estate',
+    badge: 'REAL ESTATE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #111c13 0%, #070d08 100%)',
+    description: 'Property card with ROI, cap rate, monthly cash flow, and 5-year appreciation metrics.',
+    tags: ['Real Estate', 'ROI', 'Cap Rate', 'Cash Flow', 'Property', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-re" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#111c13"/><stop offset="100%" stop-color="#070d08"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-re)"/><g transform="translate(24, 20)"><rect width="64" height="54" rx="8" fill="#8b5a3c"/><text x="32" y="36" font-size="28" text-anchor="middle">🏠</text><text x="78" y="26" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">123 Main St, Austin TX</text><text x="78" y="44" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="10">Single Family Home · $450,000</text></g><g transform="translate(24, 90)"><rect x="0" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="84" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">ROI</text><text x="84" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">12.5%</text><rect x="184" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="268" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">CAP RATE</text><text x="268" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">6.8%</text><rect x="0" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="84" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">MONTHLY CASH FLOW</text><text x="84" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">$1,240/mo</text><rect x="184" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="268" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">5YR APPRECIATION</text><text x="268" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">+35%</text></g></svg>`)}`
+  },
+  {
+    id: 'creditscore',
+    title: 'Credit Score Gauge',
+    category: 'Finance',
+    origCategory: 'Personal Finance',
+    badge: 'CREDIT',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #121422 0%, #07080f 100%)',
+    description: 'Semi-circle gauge displaying animated credit score meter (300-850) with qualitative rating label.',
+    tags: ['Credit Score', 'Personal Finance', 'FICO', 'Rating', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cs" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121422"/><stop offset="100%" stop-color="#07080f"/></linearGradient><linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="50%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cs)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1.5" text-anchor="middle">CREDIT SCORE GAUGE</text><g transform="translate(200, 145) scale(2.2)"><path d="M -30 0 A 30 30 0 0 1 30 0" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8" stroke-linecap="round"/><path d="M -30 0 A 30 30 0 0 1 30 0" fill="none" stroke="url(#scoreGrad)" stroke-width="8" stroke-linecap="round" stroke-dasharray="72 94.25"/></g><text x="200" y="140" fill="#ffffff" font-family="monospace" font-weight="900" font-size="34" letter-spacing="-1" text-anchor="middle">742</text><text x="200" y="160" fill="rgba(255,255,255,0.6)" font-family="'Inter', sans-serif" font-weight="700" font-size="10" letter-spacing="1.5" text-anchor="middle">EXCELLENT</text><g fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="10"><text x="90" y="185">300</text><text x="160" y="185">500</text><text x="240" y="185">700</text><text x="310" y="185" text-anchor="end">850</text></g></svg>`)}`
+  },
+  {
+    id: 'budget',
+    title: '50/30/20 Budget Breakdown',
+    category: 'Finance',
+    origCategory: 'Personal Finance',
+    badge: 'BUDGETING',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #121324 0%, #080911 100%)',
+    description: 'Needs, Wants, and Savings bars demonstrating the 50/30/20 rule with monthly income distribution.',
+    tags: ['Budget', '50/30/20', 'Personal Finance', 'Savings', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-bgt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#080911"/></linearGradient><linearGradient id="b-needs" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient><linearGradient id="b-wants" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f472b6"/></linearGradient><linearGradient id="b-sav" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-bgt)"/><text x="200" y="35" fill="rgba(255,255,255,0.75)" font-family="'Inter', sans-serif" font-weight="700" font-size="13" letter-spacing="0.5" text-anchor="middle">50/30/20 BUDGET · $5,000/MO</text><g transform="translate(30, 60)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Needs</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="115" height="24" rx="4" fill="url(#b-needs)"/><text x="175" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$2,500</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">50%</text><g transform="translate(0, 42)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Wants</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="69" height="24" rx="4" fill="url(#b-wants)"/><text x="130" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,500</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">30%</text></g><g transform="translate(0, 84)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Savings</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="46" height="24" rx="4" fill="url(#b-sav)"/><text x="108" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,000</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">20%</text></g></g></svg>`)}`
+  },
+  {
+    id: 'crash',
+    title: 'Market Crash Animation',
+    category: 'Finance',
+    origCategory: 'Market Analysis',
+    badge: 'CRASH',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(180deg, #1c0a0a 0%, #0b0404 100%)',
+    description: 'Dramatic red plummet chart line with flashing background pulse and percentage drop for black swan events.',
+    tags: ['Market Crash', 'Drop', 'Volatility', 'Red Line', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0a0a"/><stop offset="100%" stop-color="#0b0404"/></linearGradient><linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.6"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cr)"/><text x="24" y="34" fill="#ffffff" font-family="monospace" font-weight="900" font-size="16">S&amp;P 500</text><text x="24" y="52" fill="#ef4444" font-family="'Inter', sans-serif" font-weight="700" font-size="11">▼ -34%</text><text x="376" y="42" fill="#ef4444" font-family="monospace" font-weight="900" font-size="24" text-anchor="end">2,191</text><g transform="translate(24, 70)"><path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120 L 352 135 L 0 135 Z" fill="url(#redGrad)"/><path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/></g></svg>`)}`
+  },
+  {
+    id: 'dividend',
+    title: 'Dividend Calendar',
+    category: 'Finance',
+    origCategory: 'Market Analysis',
+    badge: 'DIVIDENDS',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #121324 0%, #070810 100%)',
+    description: 'Monthly schedule calendar displaying dividend payment dates and portfolio yield metrics.',
+    tags: ['Dividends', 'Calendar', 'Passive Income', 'Yield', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-div" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#070810"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-div)"/><text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">DIVIDEND CALENDAR</text><text x="376" y="34" fill="#fbbf24" font-family="monospace" font-weight="900" font-size="15" text-anchor="end">4.2% · $350/mo</text><g transform="translate(24, 52)">${[...Array(24)].map((_, i) => { const r = Math.floor(i / 6), c = i % 6, isPay = [4, 11, 17, 22].includes(i); return `<g transform="translate(${c * 60}, ${r * 38})"><rect width="52" height="32" rx="4" fill="${isPay ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.03)'}" stroke="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.06)'}"/><text x="26" y="16" fill="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.5)'}" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">${i + 1}</text>${isPay ? `<text x="26" y="27" fill="#fbbf24" font-family="monospace" font-size="7" font-weight="700" text-anchor="middle">$87</text>` : ''}</g>`; }).join('')}</g></svg>`)}`
+  },
+  {
+    id: 'supplydemand',
+    title: 'Supply & Demand Curves',
+    category: 'Finance',
+    origCategory: 'Economics',
+    badge: 'ECON 101',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, #f4ebd9 0%, #e4d2b2 100%)',
+    description: 'Classic macroeconomic supply and demand curves with animated intersection and equilibrium price calculation.',
+    tags: ['Economics', 'Supply and Demand', 'Equilibrium', 'Price', 'Finance'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f4ebd9"/><stop offset="100%" stop-color="#e4d2b2"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sd)"/><text x="200" y="30" fill="#3a2418" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">HOUSING MARKET CURVES</text><g transform="translate(60, 45)"><line x1="20" y1="120" x2="260" y2="120" stroke="#3a2418" stroke-width="1.5"/><line x1="20" y1="10" x2="20" y2="120" stroke="#3a2418" stroke-width="1.5"/><path d="M 30 110 Q 140 70 250 15" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/><path d="M 30 15 Q 140 70 250 110" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round"/><circle cx="140" cy="70" r="6" fill="#7c3aed"/></g><g transform="translate(50, 195)" font-family="monospace" font-size="10" fill="#3a2418"><circle cx="10" cy="5" r="4" fill="#ef4444"/><text x="20" y="9">Supply</text><circle cx="110" cy="5" r="4" fill="#10b981"/><text x="120" y="9">Demand</text><circle cx="210" cy="5" r="4" fill="#7c3aed"/><text x="220" y="9">Eq: $350K / 1,200 units</text></g></svg>`)}`
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', '★ My Templates', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
+const TEMPLATE_CATEGORIES = ['All', '★ My Templates', 'Finance', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
@@ -23981,7 +24637,7 @@ function renderHomepageTemplates() {
   });
 }
 
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx']);
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand']);
 let hoverBridgeActive = false;
 let hoverExternalT = null;
 function startTemplateHoverVideo(cardEl, tpl, manual) {
@@ -24005,7 +24661,472 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (fxContainer) {
     fxContainer.style.display = 'block';
     // Inject specialized HTML layers based on effect type
-    if (tplId === 'spooner-2-5d-photo-parallax') {
+    if (tplId === 'candle') {
+      fxContainer.innerHTML = `<div class="tpl-candle">
+          <div class="c-head">
+            <div><div class="c-sym">AAPL</div><div class="c-change">+2.34%</div></div>
+            <div class="c-price">$187.44</div>
+          </div>
+          <div class="c-chart">
+            <div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:20%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:40%"></div></div><div class="candle up"><div class="wick top" style="height:25%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle up"><div class="wick top" style="height:35%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:15%"></div><div class="body" style="height:35%"></div><div class="wick bot" style="height:50%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:30%"></div></div><div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:60%"></div><div class="wick bot" style="height:10%"></div></div><div class="candle down"><div class="wick top" style="height:25%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:35%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:25%"></div></div><div class="candle up"><div class="wick top" style="height:15%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:40%"></div></div>
+          </div>
+        </div>`; } else if (tplId === 'balance') {
+      fxContainer.innerHTML = `<div class="tpl-balance">
+          <div class="b-title">Apple Inc. · 2024</div>
+          <div class="b-eq"><span class="hl">Assets</span><span>=</span><span class="hl">Liabilities</span><span>+</span><span class="hl">Equity</span></div>
+          <div class="b-row"><span>Cash & Equivalents</span><span class="val">$29.9B</span></div>
+          <div class="b-row"><span>Marketable Securities</span><span class="val">$61.5B</span></div>
+          <div class="b-row"><span>Accounts Receivable</span><span class="val">$29.5B</span></div>
+          <div class="b-row"><span>Total Current Assets</span><span class="val">$143.5B</span></div>
+          <div class="b-row"><span>Short-term Debt</span><span class="val">$16.2B</span></div>
+          <div class="b-row"><span>Long-term Debt</span><span class="val">$95.7B</span></div>
+          <div class="b-total"><span>Shareholders' Equity</span><span class="val">$62.1B</span></div>
+        </div>`; } else if (tplId === 'compound') {
+      fxContainer.innerHTML = `<div class="tpl-compound">
+          <div class="ci-head">
+            <div><div class="ci-label">Initial Investment</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:rgba(255,255,255,0.8)">$1,000</div></div>
+            <div style="text-align:right"><div class="ci-label">After 40 years</div><div class="ci-amount">$1,000,000</div><div class="ci-mult">1000x</div></div>
+          </div>
+          <div class="ci-chart">
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none">
+              <defs><linearGradient id="greenGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00d68f" stop-opacity="0.6"/><stop offset="100%" stop-color="#00d68f" stop-opacity="0"/></linearGradient></defs>
+              <path class="ci-area" d="M 0 115 Q 50 110 100 100 T 200 60 T 300 5 L 300 120 L 0 120 Z"/>
+              <path class="ci-line" d="M 0 115 Q 50 110 100 100 T 200 60 T 300 5"/>
+            </svg>
+            <div class="ci-axis"><span>Year 0</span><span>Year 10</span><span>Year 20</span><span>Year 30</span><span>Year 40</span></div>
+          </div>
+        </div>`; } else if (tplId === 'wealth') {
+      fxContainer.innerHTML = `<div class="tpl-wealth">
+          <div class="w-title">Net Worth Comparison</div>
+          <div class="w-row"><div class="w-name">Jeff Bezos</div><div class="w-bar-wrap"><div class="w-bar b1" style="--w:100%">$200B</div></div></div>
+          <div class="w-row"><div class="w-name">Elon Musk</div><div class="w-bar-wrap"><div class="w-bar b2" style="--w:90%">$180B</div></div></div>
+          <div class="w-row"><div class="w-name">Avg American</div><div class="w-bar-wrap"><div class="w-bar b3" style="--w:4%">$97K</div></div></div>
+        </div>`; } else if (tplId === 'bloom') {
+      fxContainer.innerHTML = `<div class="tpl-bloom">
+          <div class="b-panel"><div class="b-panel-head"><span>US EQUITIES</span><span class="up">▲</span></div><div class="b-row"><span class="sym">SPX</span><span>4,582 <span style="color:#00d68f">+0.8%</span></span></div><div class="b-row"><span class="sym">NDX</span><span>15,942 <span style="color:#00d68f">+1.2%</span></span></div><div class="b-row"><span class="sym">DJI</span><span>35,281 <span style="color:#ff4757">-0.3%</span></span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>RATES / FX</span><span class="dn">▼</span></div><div class="b-row"><span class="sym">US10Y</span><span>4.32%</span></div><div class="b-row"><span class="sym">EUR/USD</span><span>1.0842</span></div><div class="b-row"><span class="sym">DXY</span><span>105.42</span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>COMMODITIES</span><span class="up">▲</span></div><div class="b-row"><span class="sym">GOLD</span><span>1,987.40</span></div><div class="b-row"><span class="sym">BRENT</span><span>82.50</span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>CRYPTO</span><span class="up">▲</span></div><div class="b-row"><span class="sym">BTC</span><span>$43,280 <span style="color:#00d68f">+3.2%</span></span></div><div class="b-row"><span class="sym">ETH</span><span>$2,280 <span style="color:#00d68f">+2.1%</span></span></div></div>
+        </div>`; } else if (tplId === 'ticker') {
+      fxContainer.innerHTML = `<div class="tpl-ticker">
+          <div class="t-head">LIVE MARKETS</div>
+          <div class="t-track"><div class="t-strip"><div class="t-item"><span class="sym">AAPL</span><span class="price">187.44</span><span class="chg up">+2.34%</span></div><div class="t-item"><span class="sym">MSFT</span><span class="price">415.20</span><span class="chg up">+1.12%</span></div><div class="t-item"><span class="sym">GOOGL</span><span class="price">175.98</span><span class="chg dn">-0.45%</span></div><div class="t-item"><span class="sym">AMZN</span><span class="price">178.32</span><span class="chg up">+3.21%</span></div><div class="t-item"><span class="sym">TSLA</span><span class="price">248.50</span><span class="chg up">+5.67%</span></div><div class="t-item"><span class="sym">NVDA</span><span class="price">487.90</span><span class="chg up">+4.12%</span></div><div class="t-item"><span class="sym">AAPL</span><span class="price">187.44</span><span class="chg up">+2.34%</span></div><div class="t-item"><span class="sym">MSFT</span><span class="price">415.20</span><span class="chg up">+1.12%</span></div><div class="t-item"><span class="sym">GOOGL</span><span class="price">175.98</span><span class="chg dn">-0.45%</span></div><div class="t-item"><span class="sym">AMZN</span><span class="price">178.32</span><span class="chg up">+3.21%</span></div><div class="t-item"><span class="sym">TSLA</span><span class="price">248.50</span><span class="chg up">+5.67%</span></div><div class="t-item"><span class="sym">NVDA</span><span class="price">487.90</span><span class="chg up">+4.12%</span></div></div></div>
+        </div>`; } else if (tplId === 'inflation') {
+      fxContainer.innerHTML = `<div class="tpl-inflation">
+          <div class="inf-wrap">
+            <div class="inf-label">1980 → 2024</div>
+            <div class="bill"></div>
+            <div class="inf-pct">-72%</div>
+            <div class="inf-label" style="color:#ff4757">Purchasing Power Lost</div>
+          </div>
+        </div>`; } else if (tplId === 'snowball') {
+      fxContainer.innerHTML = `<div class="tpl-snowball">
+          <div class="s-title">Debt Payoff Progress</div>
+          <div class="s-row paid" style="--w:100%"><div class="s-check">✓</div><div class="s-name">Credit Card</div><div class="s-bar-wrap"><div class="s-bar" style="--w:0%"></div></div><div class="s-amt">$5,000</div></div>
+          <div class="s-row paid" style="--w:100%"><div class="s-check">✓</div><div class="s-name">Car Loan</div><div class="s-bar-wrap"><div class="s-bar" style="--w:0%"></div></div><div class="s-amt">$12,000</div></div>
+          <div class="s-row"><div class="s-check"></div><div class="s-name">Student Loan</div><div class="s-bar-wrap"><div class="s-bar" style="--w:60%"></div></div><div class="s-amt">$28,000</div></div>
+          <div class="s-row"><div class="s-check"></div><div class="s-name">Mortgage</div><div class="s-bar-wrap"><div class="s-bar" style="--w:85%"></div></div><div class="s-amt">$250,000</div></div>
+        </div>`; } else if (tplId === 'pie') {
+      fxContainer.innerHTML = `<div class="tpl-pie">
+          <div class="p-title">Portfolio Allocation</div>
+          <div class="p-svg">
+            <svg viewBox="0 0 80 80">
+              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#7c5cff" style="--d:113"/>
+              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#ff5c8a" stroke-dashoffset="-113" style="--d:37.7"/>
+              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#5cffdc" stroke-dashoffset="-150.7" style="--d:18.85"/>
+              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#ffd23f" stroke-dashoffset="-169.55" style="--d:9.42"/>
+              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#8a8a95" stroke-dashoffset="-178.97" style="--d:9.42"/>
+            </svg>
+            <div class="p-center"><div class="p-total">$100,000</div></div>
+          </div>
+          <div class="p-legend"><div class="p-leg"><span style="color:#7c5cff">■</span> Stocks 60%</div><div class="p-leg"><span style="color:#ff5c8a">■</span> Bonds 20%</div><div class="p-leg"><span style="color:#5cffdc">■</span> RE 10%</div><div class="p-leg"><span style="color:#ffd23f">■</span> Crypto 5%</div></div>
+        </div>`; } else if (tplId === 'receipt') {
+      fxContainer.innerHTML = `<div class="tpl-receipt">
+          <div class="r-paper">
+            <div class="r-head"><div class="r-store">GROCERY MART</div></div>
+            <div class="r-item"><span class="name">Organic Milk</span><span class="price">$6.99</span></div>
+            <div class="r-item"><span class="name">Avocados (3)</span><span class="price">$4.50</span></div>
+            <div class="r-item"><span class="name">Sourdough Bread</span><span class="price">$7.25</span></div>
+            <div class="r-item"><span class="name">Free Range Eggs</span><span class="price">$8.99</span></div>
+            <div class="r-total"><span>TOTAL</span><span>$27.73</span></div>
+          </div>
+        </div>`; } else if (tplId === 'google') {
+      fxContainer.innerHTML = `<div class="tpl-google">
+          <div class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="e">l</span><span class="r">e</span></div>
+          <div class="search-bar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#9aa0a6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <div class="typed-text">what happened to...</div>
+          </div>
+          <div class="suggestions"><div class="sugg">🔍 what happened to db cooper</div><div class="sugg">🔍 what happened in chernobyl</div><div class="sugg">🔍 what happened last night</div></div>
+        </div>`; } else if (tplId === 'imessage') {
+      fxContainer.innerHTML = `<div class="tpl-imessage">
+          <div class="bubble them">hey, are you up?</div>
+          <div class="bubble me">yeah why</div>
+          <div class="bubble them">you need to see this rn</div>
+          <div class="bubble me">omg what happened</div>
+        </div>`; } else if (tplId === 'subscribe') {
+      fxContainer.innerHTML = `<div class="tpl-subscribe">
+          <div class="sub-wrap">
+            <div class="sub-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6z"/></svg>SUBSCRIBE</div>
+            <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;color:#fff"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+            <div class="counter"><span class="num">1.2M</span> subscribers</div>
+          </div>
+        </div>`; } else if (tplId === 'countdown') {
+      fxContainer.innerHTML = `<div class="tpl-countdown">
+          <div class="big-num">7</div>
+          <div class="sub-label">of 10</div>
+        </div>`; } else if (tplId === 'redcircle') {
+      fxContainer.innerHTML = `<div class="tpl-redcircle">
+          <div class="target-img"></div>
+          <div class="red-circle"></div>
+          <div class="red-arrow"></div>
+          <div class="q-mark">?</div>
+        </div>`; } else if (tplId === 'chart') {
+      fxContainer.innerHTML = `<div class="tpl-chart">
+          <div class="chart-head">
+            <div><div class="ticker-sym">TSLA</div><div class="change">▲ +12.4%</div></div>
+            <div class="price">$248.50</div>
+          </div>
+          <div style="flex:1;position:relative;margin-top:10px;">
+            <svg class="line" viewBox="0 0 300 150" preserveAspectRatio="none" style="width:100%;height:100%;">
+              <path class="chart-line" d="M 0 120 L 30 110 L 60 115 L 90 90 L 120 95 L 150 70 L 180 75 L 210 50 L 240 55 L 270 30 L 300 20"/>
+            </svg>
+          </div>
+        </div>`; } else if (tplId === 'typewriter') {
+      fxContainer.innerHTML = `<div class="tpl-typewriter">
+          <div class="paper-edge"></div>
+          <div class="tw-text">The letter arrived at midnight...</div>
+          <div class="tw-sub">— November 14, 1987</div>
+        </div>`; } else if (tplId === 'notif') {
+      fxContainer.innerHTML = `<div class="tpl-notif">
+          <div class="notif-card"><div class="app-icon insta">📸</div><div class="notif-body"><div class="notif-title">New follower</div><div class="notif-msg">@user started following you</div></div></div>
+          <div class="notif-card"><div class="app-icon pay" style="background:#003087;color:#fff;font-weight:700">P</div><div class="notif-body"><div class="notif-title">Payment received</div><div class="notif-msg">$2,450.00 from Client</div></div></div>
+          <div class="notif-card"><div class="app-icon mail">✉</div><div class="notif-body"><div class="notif-title">Partnership opportunity</div><div class="notif-msg">Hey, loved your last video...</div></div></div>
+        </div>`; } else if (tplId === 'hormozi') {
+      fxContainer.innerHTML = `<div class="tpl-hormozi">
+          <div class="emoji e1">🔥</div>
+          <div class="caption-wrap"><span class="word">This</span> <span class="word">one</span> <span class="word">trick</span> <span class="word">changed</span> <span class="word">everything</span></div>
+          <div class="emoji e2">💰</div>
+        </div>`; } else if (tplId === 'kenburns') {
+      fxContainer.innerHTML = `<div class="tpl-kenburns">
+          <div class="kb-img"></div>
+          <div class="kb-caption">TOKYO · 1987</div>
+        </div>`; } else if (tplId === 'tweet') {
+      fxContainer.innerHTML = `<div class="tpl-tweet">
+          <div class="tweet-card">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:#1da1f2;display:grid;place-items:center;color:#fff;font-weight:700">A</div>
+              <div><strong style="font-size:12px;color:#000;">Alex Hormozi</strong><br><span style="color:#666;font-size:10px;">@alexmormozi</span></div>
+            </div>
+            <div style="font-size:11.5px;color:#222;line-height:1.35;margin-bottom:8px;">The best investment you can make is in yourself.</div>
+            <div style="font-size:10px;color:#777;border-top:1px solid #eee;padding-top:6px;"><strong>12.4K</strong> Likes · <strong>3.2K</strong> Reposts</div>
+          </div>
+        </div>`; } else if (tplId === 'money') {
+      fxContainer.innerHTML = `<div class="tpl-money">
+          <div style="text-align:center"><div class="dollar">$127,450</div><div class="label">Monthly Revenue</div></div>
+        </div>`; } else if (tplId === 'glitch') {
+      fxContainer.innerHTML = `<div class="tpl-glitch">
+          <div class="glitch-text" data-text="THE TRUTH">THE TRUTH</div>
+        </div>`; } else if (tplId === 'map') {
+      fxContainer.innerHTML = `<div class="tpl-map">
+          <div class="location-label">Chernobyl, Ukraine</div>
+          <div class="pin" style="font-size:26px;position:absolute;top:45%;left:50%;transform:translate(-50%,-100%);">📍</div>
+        </div>`; } else if (tplId === 'news') {
+      fxContainer.innerHTML = `<div class="tpl-news">
+          <div class="headline">Tech Giant Announces Layoffs</div>
+          <div class="ticker-wrap"><div class="ticker-red">LIVE</div><div class="ticker-body"><span class="ticker-text">Markets down 3% • CEO resigns</span></div></div>
+        </div>`; } else if (tplId === 'quote') {
+      fxContainer.innerHTML = `<div class="tpl-quote">
+          <div class="quote-mark">“</div>
+          <div class="quote-text">The obstacle is the way.</div>
+          <div class="quote-author">— Marcus Aurelius</div>
+        </div>`; } else if (tplId === 'polaroid') {
+      fxContainer.innerHTML = `<div class="tpl-polaroid">
+          <div class="polaroid"><div class="photo" style="background:linear-gradient(135deg,#ff7a59,#7c5cff)"></div></div>
+          <div class="polaroid"><div class="photo" style="background:linear-gradient(135deg,#5cffdc,#4285F4)"></div></div>
+        </div>`; } else if (tplId === 'comic') {
+      fxContainer.innerHTML = `<div class="tpl-comic">
+          <div class="pow">POW!</div>
+        </div>`; } else if (tplId === 'vhs') {
+      fxContainer.innerHTML = `<div class="tpl-vhs">
+          <div class="rec">REC</div>
+          <div class="vhs-text">SUMMER 89</div>
+        </div>`; } else if (tplId === 'progress') {
+      fxContainer.innerHTML = `<div class="tpl-progress">
+          <div style="font-size:13px;font-weight:700;color:#fff;">Goal Progress</div>
+          <div class="prog-bar"><div class="prog-fill"></div></div>
+          <div class="prog-percent">100%</div>
+        </div>`; } else if (tplId === 'scramble') {
+      fxContainer.innerHTML = `<div class="tpl-scramble">
+          <div class="scramble-text">ACCESS GRANTED</div>
+        </div>`; } else if (tplId === 'newspaper') {
+      fxContainer.innerHTML = `<div class="tpl-newspaper">
+          <div class="paper-name">THE DAILY TIMES</div>
+          <div class="headline">HISTORIC DISCOVERY SHOCKS WORLD</div>
+          <div class="subhead">Experts call it a breakthrough</div>
+        </div>`; } else if (tplId === 'instagram') {
+      fxContainer.innerHTML = `<div class="tpl-instagram">
+          <div class="ig-post">
+            <div class="ig-header"><div class="ig-username">@creator</div></div>
+            <div class="ig-image"><div class="ig-heart">❤️</div></div>
+          </div>
+        </div>`; } else if (tplId === 'checklist') {
+      fxContainer.innerHTML = `<div class="tpl-checklist">
+          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Research topic</div></div>
+          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Write script</div></div>
+          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Record audio</div></div>
+          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Edit video</div></div>
+        </div>`;
+    } else if (tplId === 'parallax') {
+      const figUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl) ? topCustomizerState.primaryUrl : '';
+      const mtnUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl) ? topCustomizerState.secondaryUrl : '';
+      const figStyle = figUrl ? `style="clip-path: none; background: url('${figUrl}') center bottom/contain no-repeat; width: 140px; height: 180px;"` : '';
+      const mtnStyle = mtnUrl ? `style="clip-path: none; background: url('${mtnUrl}') center bottom/cover no-repeat;"` : '';
+      fxContainer.innerHTML = `<div class="tpl-parallax"><div class="layer layer-back"><div class="sun"></div></div><div class="layer layer-mid"><div class="mtn-back" ${mtnStyle}></div></div><div class="layer layer-front"><div class="mtn-front"></div><div class="figure" ${figStyle}></div></div></div>`;
+    } else if (tplId === 'textbehind') {
+      const data = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('textbehind') : { bgText: 'DREAM', textColor: '#ffffff' };
+      const subjUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl) ? topCustomizerState.primaryUrl : '';
+      const bgUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl) ? topCustomizerState.secondaryUrl : '';
+      const isSubjCustom = subjUrl && !subjUrl.includes('data:image/svg');
+      const isBgCustom = bgUrl && !bgUrl.includes('data:image/svg');
+      const subjStyle = isSubjCustom ? `style="clip-path: none; border-radius: 0; background: url('${subjUrl}') center bottom/contain no-repeat; width: 180px; height: 220px;"` : '';
+      const bgStyle = isBgCustom ? `style="background: url('${bgUrl}') center/cover no-repeat;"` : '';
+      const txtColor = data.textColor || '#ffffff';
+      const fontFam = data.fontFamily || "'Space Grotesk', sans-serif";
+      const fontSz = data.fontSize || 80;
+      const fontTrack = data.letterSpacing !== undefined ? data.letterSpacing : -2;
+      const textZ = data.layerOrder === 'front' ? 4 : 1;
+      const subjZ = 2;
+      fxContainer.innerHTML = `
+        <div class="tpl-textbehind" ${bgStyle}>
+          <div class="bigtext" style="color: ${txtColor}; font-family: ${fontFam}; font-size: ${fontSz}px; letter-spacing: ${fontTrack}px; z-index: ${textZ};">${data.bgText || 'DREAM'}</div>
+          <div class="subject" style="z-index: ${subjZ}; cursor: pointer;" ${subjStyle} title="Cutout Subject (Click to bring text in front/behind)"></div>
+          <div id="tb-stage-hover-bar" style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 4px 12px; z-index: 20; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
+            <button type="button" id="btn-stage-toggle-order" style="background: none; border: none; color: #fff; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+              <span>${data.layerOrder === 'front' ? '🔲 Send Text Behind' : '🔲 Bring Text to Front'}</span>
+            </button>
+          </div>
+        </div>`;
+      setTimeout(() => {
+        const toggleBtn = fxContainer.querySelector('#btn-stage-toggle-order');
+        const subjEl = fxContainer.querySelector('.subject');
+        const flipOrder = () => {
+          const curOrder = data.layerOrder === 'front' ? 'behind' : 'front';
+          window.tplSetContextualData('textbehind', { layerOrder: curOrder });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('textbehind');
+        };
+        if (toggleBtn) toggleBtn.onclick = flipOrder;
+        if (subjEl) subjEl.onclick = flipOrder;
+      }, 50);
+    } else if (tplId === 'docheight') {
+      const data = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('docheight') : {};
+      const deskUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl) ? topCustomizerState.secondaryUrl : '';
+      const isDeskCustom = deskUrl && !deskUrl.includes('data:image/svg');
+      const deskStyle = isDeskCustom ? `style="background: url('${deskUrl}') center/cover no-repeat;"` : '';
+      const hlCol = data.hlColor || '#facc15';
+      const docTitle = data.docTitle || 'CONFIDENTIAL AGREEMENT';
+      const l1 = data.line1 || '1. Intellectual property rights reserved.';
+      const l2 = data.line2 || '2. Total liability shall not exceed $10,000,000.';
+      const l3 = data.line3 || '3. Immediate termination upon breach of clause.';
+      const hlIdx = data.hlIndex !== undefined ? data.hlIndex : 2;
+      fxContainer.innerHTML = `
+        <div class="tpl-docheight" ${deskStyle}>
+          <div class="doc" style="position: absolute; top: 10%; left: 14%; right: 14%; bottom: 10%; background: #ffffff; border-radius: 8px; box-shadow: 0 12px 35px rgba(0,0,0,0.35); padding: 18px 24px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; border: 1px solid rgba(0,0,0,0.08);">
+            <div class="doc-header" style="font-size: 11.5px; font-weight: 800; color: #0f172a; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase;">${docTitle}</div>
+            <div class="doc-text-line l1" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
+              <span style="position: relative; z-index: 2;">${l1}</span>
+              ${hlIdx === 1 || hlIdx === 'all' ? `<div class="highlight" style="position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
+            </div>
+            <div class="doc-text-line l2" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
+              <span style="position: relative; z-index: 2;">${l2}</span>
+              ${hlIdx === 2 || hlIdx === 'all' ? `<div class="highlight" style="position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
+            </div>
+            <div class="doc-text-line l3" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
+              <span style="position: relative; z-index: 2;">${l3}</span>
+              ${hlIdx === 3 || hlIdx === 'all' ? `<div class="highlight" style="position: absolute; inset: 0; background: ${hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
+            </div>
+            <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #cbd5e1; padding-top: 6px; font-size: 8.5px; color: #94a3b8; font-family: monospace;">
+              <span>AUTHORIZED SIGNATURE</span>
+              <span>PAGE 1 OF 1</span>
+            </div>
+          </div>
+        </div>`;
+    } else if (tplId === 'kinetic') {
+      fxContainer.innerHTML = `<div class="tpl-kinetic"><div class="kt kt1">CREATE</div><div class="kt kt2">INSPIRE</div><div class="kt kt3">DELIVER</div></div>`;
+    } else if (tplId === 'split') {
+      fxContainer.innerHTML = `<div class="tpl-split"><div class="half half-l"><div class="portrait"></div></div><div class="half half-r"><div class="portrait"></div></div><div class="divider"></div></div>`;
+    } else if (tplId === 'zoom') {
+      fxContainer.innerHTML = `<div class="tpl-zoom"><div class="rays"></div><div class="product"></div></div>`;
+    } else if (tplId === 'fedrate') {
+      const rates = [18,15,12,10,8,6,5,3,2,5];
+      fxContainer.innerHTML = `
+        <div class="tpl-fedrate">
+          <div class="f-head">
+            <div class="f-title">FED FUNDS RATE</div>
+            <div class="f-rate">5.25%</div>
+          </div>
+          <div class="f-chart">
+            ${rates.map(r => `<div class="f-bar" style="height:${r*5}%"></div>`).join('')}
+          </div>
+          <div class="f-axis"><span>1980</span><span>1990</span><span>2000</span><span>2010</span><span>2024</span></div>
+        </div>
+      `;
+    } else if (tplId === 'bearbull') {
+      fxContainer.innerHTML = `
+        <div class="tpl-bearbull">
+          <div class="bb-wrap">
+            <div class="bb-side">
+              <div class="bb-icon bear">🐻</div>
+              <div class="bb-label">Bear</div>
+              <div class="bb-pct down">-20%</div>
+            </div>
+            <div class="bb-vs">VS</div>
+            <div class="bb-side">
+              <div class="bb-icon bull">🐂</div>
+              <div class="bb-label">Bull</div>
+              <div class="bb-pct up">+150%</div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'certificate') {
+      fxContainer.innerHTML = `
+        <div class="tpl-certificate">
+          <div class="cert">
+            <div class="cert-head">
+              <div class="cert-title">Apple Inc.</div>
+              <div class="cert-sub">Shares of Common Stock</div>
+            </div>
+            <div class="cert-body">This certifies that</div>
+            <div class="cert-shares">100 SHARES</div>
+            <div class="cert-body">Dated January 1, 2024</div>
+            <div class="cert-seal">🏆</div>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'cryptowallet') {
+      fxContainer.innerHTML = `
+        <div class="tpl-cryptowallet">
+          <div class="cw-head">
+            <div class="cw-title">Crypto Wallet</div>
+            <div class="cw-total">$47,280</div>
+          </div>
+          <div class="cw-assets">
+            <div class="cw-asset">
+              <div class="cw-icon btc">₿</div>
+              <div class="cw-info"><div class="cw-sym">BTC</div><div class="cw-name">Bitcoin</div></div>
+              <div class="cw-val"><div class="cw-amt">0.5 BTC</div><div class="cw-chg up">+3.2%</div></div>
+            </div>
+            <div class="cw-asset">
+              <div class="cw-icon eth">Ξ</div>
+              <div class="cw-info"><div class="cw-sym">ETH</div><div class="cw-name">Ethereum</div></div>
+              <div class="cw-val"><div class="cw-amt">5 ETH</div><div class="cw-chg up">+2.1%</div></div>
+            </div>
+            <div class="cw-asset">
+              <div class="cw-icon sol">◎</div>
+              <div class="cw-info"><div class="cw-sym">SOL</div><div class="cw-name">Solana</div></div>
+              <div class="cw-val"><div class="cw-amt">100 SOL</div><div class="cw-chg dn">-1.4%</div></div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'realestate') {
+      fxContainer.innerHTML = `
+        <div class="tpl-realestate">
+          <div class="re-head">
+            <div class="re-img">🏠</div>
+            <div class="re-info">
+              <div class="re-addr">123 Main St, Austin TX</div>
+              <div class="re-type">Single Family Home · $450,000</div>
+            </div>
+          </div>
+          <div class="re-stats">
+            <div class="re-stat"><div class="re-stat-label">ROI</div><div class="re-stat-val">12.5%</div></div>
+            <div class="re-stat"><div class="re-stat-label">Cap Rate</div><div class="re-stat-val">6.8%</div></div>
+            <div class="re-stat"><div class="re-stat-label">Cash Flow</div><div class="re-stat-val">$1,240/mo</div></div>
+            <div class="re-stat"><div class="re-stat-label">5yr Appr.</div><div class="re-stat-val">+35%</div></div>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'creditscore') {
+      fxContainer.innerHTML = `
+        <div class="tpl-creditscore">
+          <div class="cs-title">Credit Score</div>
+          <div class="cs-gauge">
+            <svg viewBox="0 0 80 40">
+              <defs><linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ef4444"/><stop offset="50%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#10b981"/></linearGradient></defs>
+              <path class="cs-arc bg" d="M 10 35 A 30 30 0 0 1 70 35"/>
+              <path class="cs-arc fill" d="M 10 35 A 30 30 0 0 1 70 35"/>
+            </svg>
+            <div class="cs-score">
+              <div class="cs-num">742</div>
+              <div class="cs-label">Excellent</div>
+            </div>
+          </div>
+          <div class="cs-range"><span>300</span><span>500</span><span>700</span><span>850</span></div>
+        </div>
+      `;
+    } else if (tplId === 'budget') {
+      fxContainer.innerHTML = `
+        <div class="tpl-budget">
+          <div class="b-title">50/30/20 Budget · $5,000/mo</div>
+          <div class="b-bars">
+            <div class="b-row"><div class="b-label">Needs</div><div class="b-bar-wrap"><div class="b-bar needs" style="--w:50%">$2,500</div></div><div class="b-pct">50%</div></div>
+            <div class="b-row"><div class="b-label">Wants</div><div class="b-bar-wrap"><div class="b-bar wants" style="--w:30%">$1,500</div></div><div class="b-pct">30%</div></div>
+            <div class="b-row"><div class="b-label">Savings</div><div class="b-bar-wrap"><div class="b-bar savings" style="--w:20%">$1,000</div></div><div class="b-pct">20%</div></div>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'crash') {
+      fxContainer.innerHTML = `
+        <div class="tpl-crash">
+          <div class="cr-flash"></div>
+          <div class="cr-head">
+            <div><div class="cr-sym">S&amp;P 500</div><div class="cr-change">▼ -34%</div></div>
+            <div class="cr-price">2,191</div>
+          </div>
+          <div class="cr-chart">
+            <svg viewBox="0 0 300 120" preserveAspectRatio="none">
+              <defs><linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.6"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs>
+              <path class="cr-area" d="M 0 10 Q 50 15 100 20 T 200 80 T 300 115 L 300 120 L 0 120 Z"/>
+              <path class="cr-line" d="M 0 10 Q 50 15 100 20 T 200 80 T 300 115"/>
+            </svg>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'dividend') {
+      const days = Array.from({length:30},(_,i)=>i+1);
+      const payDays = [5,12,18,25];
+      fxContainer.innerHTML = `
+        <div class="tpl-dividend">
+          <div class="d-head">
+            <div class="d-title">Dividend Calendar</div>
+            <div class="d-yield">4.2% · $350/mo</div>
+          </div>
+          <div class="d-grid">
+            ${days.map(day=>`<div class="d-day ${payDays.includes(day)?'pay':''}">${day}${payDays.includes(day)?'<div class="amt">$87</div>':''}</div>`).join('')}
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'supplydemand') {
+      fxContainer.innerHTML = `
+        <div class="tpl-supplydemand">
+          <div class="sd-title">HOUSING MARKET</div>
+          <div class="sd-chart">
+            <svg viewBox="0 0 200 140" preserveAspectRatio="none">
+              <path class="sd-line sd-supply" d="M 20 120 Q 100 80 180 20"/>
+              <path class="sd-line sd-demand" d="M 20 20 Q 100 80 180 120"/>
+              <circle class="sd-eq" cx="100" cy="80" r="6"/>
+            </svg>
+          </div>
+          <div class="sd-labels">
+            <div class="sd-label"><div class="sd-dot" style="background:#ef4444"></div>Supply</div>
+            <div class="sd-label"><div class="sd-dot" style="background:#10b981"></div>Demand</div>
+            <div class="sd-label"><div class="sd-dot" style="background:#7c3aed"></div>Eq: $350K</div>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'spooner-2-5d-photo-parallax') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #000; overflow: hidden;">
           <img id="fx-bg-${tplId}" src="${tpl.secondaryImage}" alt="Inpainted Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(0.8px); transform-origin: 50% 65%;" />
@@ -25986,6 +27107,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const hlProg = Math.min(100, Math.floor(((t * 1.2) % 1.5 / 1.5) * 100));
       const bar = fxContainer?.querySelector(`#fx-anim-hl-bar-${tplId}`);
       if (bar) bar.style.width = `${hlProg}%`;
+    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].includes(tplId)) {
+      // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
       const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
@@ -26959,9 +28082,34 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.primaryUrl = tpl.cutoutImage || 'hiker_cutout.png';
     topCustomizerState.secondaryUrl = tpl.secondaryImage || 'hiker_background_inpainted.png';
   } else {
-    topCustomizerState.primaryUrl = tpl.defaultImage || '';
-    topCustomizerState.secondaryUrl = tpl.secondaryImage || tpl.defaultImage || '';
-    topCustomizerState.originalPhotoUrl = tpl.originalImage || tpl.secondaryImage || tpl.defaultImage || '';
+    if (tpl.id === 'textbehind') {
+      topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20width%3D%22200%22%20height%3D%22200%22%20fill%3D%22transparent%22%2F%3E%3Cpath%20d%3D%22M%2040%20145%20C%2040%2075%2C%20160%2075%2C%20160%20145%20L%20145%20200%20L%2055%20200%20Z%22%20fill%3D%22%231a1024%22%20stroke%3D%22%237c5cff%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%22100%22%20cy%3D%2285%22%20r%3D%2234%22%20fill%3D%22%232a1a3a%22%20stroke%3D%22%23ff5c8a%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
+      topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ff5c8a%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%237c5cff%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23bg)%22%2F%3E%3C%2Fsvg%3E';
+      topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+    } else if (tpl.id === 'docheight') {
+      topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E';
+      topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
+      topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+    } else if (tpl.defaultImage) {
+      topCustomizerState.primaryUrl = tpl.defaultImage;
+      topCustomizerState.secondaryUrl = tpl.secondaryImage || tpl.defaultImage;
+      topCustomizerState.originalPhotoUrl = tpl.originalImage || tpl.secondaryImage || tpl.defaultImage;
+    } else {
+      if (tpl.id === 'parallax') {
+        topCustomizerState.primaryUrl = '/clean_traveler_cutout.png';
+        topCustomizerState.secondaryUrl = '/clean_mountain_backdrop.png';
+      } else if (['wealth', 'candle', 'ticker', 'balance', 'compound', 'fedrate', 'bearbull', 'cryptowallet'].includes(tpl.id)) {
+        topCustomizerState.primaryUrl = '/portrait_cutout_clean.png';
+        topCustomizerState.secondaryUrl = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80';
+      } else if (['docheight', 'newspaper', 'news', 'receipt', 'google'].includes(tpl.id)) {
+        topCustomizerState.primaryUrl = '/forbes_article_hd.svg';
+        topCustomizerState.secondaryUrl = '/clean_mountain_backdrop.png';
+      } else {
+        topCustomizerState.primaryUrl = '/portrait_cutout_clean.png';
+        topCustomizerState.secondaryUrl = 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80';
+      }
+      topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+    }
   }
   topCustomizerState.depth = 65;
   topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
@@ -27012,6 +28160,10 @@ function openTopTemplateCustomizer(tpl) {
   };
   syncPaperModeButtons();
 
+  if (typeof initDocFullscreenToggle === 'function') initDocFullscreenToggle();
+  if (typeof window.tplInitTheaterToggle === 'function') window.tplInitTheaterToggle();
+  if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tpl.id);
+
   // 1. Populate Header info
   const titleEl = document.getElementById('tpl-modal-title');
   if (titleEl) titleEl.textContent = tpl.title.split('(')[0].trim();
@@ -27052,6 +28204,7 @@ function openTopTemplateCustomizer(tpl) {
   // Contextual labels & Text setup
   const labelPrim = document.getElementById('tpl-modal-label-primary');
   const labelSec = document.getElementById('tpl-modal-label-secondary');
+  const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
   const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
   const wrapText = document.getElementById('tpl-modal-wrap-text');
   const labelText = document.getElementById('tpl-modal-label-text');
@@ -27769,13 +28922,46 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.subText = 'THE SECRET ARCHIVES';
     topCustomizerState.textColor = '#facc15';
   } else if (tpl.id === 'gold-frame-spin') {
+    if (wrapPrim) wrapPrim.style.display = 'flex';
     if (labelPrim) labelPrim.textContent = '🖼️ Framed Artwork / Image';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE MASTERPIECE';
     topCustomizerState.subText = 'PRIVATE COLLECTION';
     topCustomizerState.textColor = '#f59e0b';
+  } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].includes(tpl.id)) {
+    if (wrapPrim) wrapPrim.style.display = 'flex';
+    if (wrapSec) wrapSec.style.display = 'flex';
+
+    if (tpl.id === 'parallax') {
+      if (labelPrim) labelPrim.textContent = '👤 Cutout Foreground / Silhouette';
+      if (labelSec) labelSec.textContent = '🌄 Mountain Horizon & Sky Backdrop';
+    } else if (tpl.id === 'wealth') {
+      if (labelPrim) labelPrim.textContent = '📊 Comparison Chart Graphic Layer';
+      if (labelSec) labelSec.textContent = '🏙️ Financial District Backdrop';
+    } else if (tpl.id === 'ticker') {
+      if (labelPrim) labelPrim.textContent = '📈 Market Ticker Data Overlay';
+      if (labelSec) labelSec.textContent = '🌐 Live Trading Floor Backdrop';
+    } else if (tpl.id === 'textbehind') {
+      if (labelPrim) labelPrim.textContent = '👤 Front Cutout Subject';
+      if (labelSec) labelSec.textContent = '🌆 Deep Background Plate';
+    } else if (tpl.id === 'split') {
+      if (labelPrim) labelPrim.textContent = '👤 Left Side Subject Asset';
+      if (labelSec) labelSec.textContent = '👤 Right Side Subject Asset';
+    } else {
+      if (labelPrim) labelPrim.textContent = '🖼️ Primary Graphic / Cutout Layer';
+      if (labelSec) labelSec.textContent = '🎬 Background Scene Asset';
+    }
+
+    if (primaryThumb && topCustomizerState.primaryUrl) primaryThumb.src = topCustomizerState.primaryUrl;
+    if (secondaryThumb && topCustomizerState.secondaryUrl) secondaryThumb.src = topCustomizerState.secondaryUrl;
+
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = tpl.title.split('&')[0].trim();
+    topCustomizerState.subText = 'FINANCE & WEALTH';
+    topCustomizerState.textColor = '#8b5cf6';
   } else {
+    if (wrapPrim) wrapPrim.style.display = 'flex';
     if (labelPrim) labelPrim.textContent = '🖼️ Primary Subject / Asset';
     if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'flex';
@@ -27792,7 +28978,7 @@ function openTopTemplateCustomizer(tpl) {
   if (inputTextMain) inputTextMain.value = topCustomizerState.mainText;
   if (inputTextSub) inputTextSub.value = topCustomizerState.subText;
   if (colorTextMain) colorTextMain.value = topCustomizerState.textColor;
-  if (wrapText) wrapText.style.display = 'flex';
+  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].includes(tpl.id) ? 'none' : 'flex';
 
   const modalKineticInput = document.getElementById('modal-kinetic-text-input');
   const modalKineticColor = document.getElementById('modal-kinetic-text-color');
@@ -28114,12 +29300,13 @@ function syncTopTemplateDocHighlighterUI() {
   const stageBox = document.getElementById('tpl-modal-preview-stage-container');
   const canvasBox = document.getElementById('tpl-modal-preview-canvas-box');
   const is3D = !!topCustomizerState.is3DMode;
+  const isTheater = typeof window.tplIsStageTheater === 'function' && window.tplIsStageTheater();
 
   if (playbackBar) {
-    playbackBar.style.display = is3D ? 'none' : 'flex';
+    playbackBar.style.display = (is3D || isTheater) ? 'none' : 'flex';
   }
   if (storyboardContainer) {
-    storyboardContainer.style.display = is3D ? 'none' : 'flex';
+    storyboardContainer.style.display = (is3D || isTheater) ? 'none' : 'flex';
   }
   if (stageBox) {
     if (is3D) {
@@ -28553,6 +29740,28 @@ function closeTopTemplateCustomizer() {
   hoverExternalT = null;
   if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
   if (window.tpl3DOnClose) window.tpl3DOnClose();
+  const modalBox = document.getElementById('modal-tpl-outer-wrapper');
+  const btnFs = document.getElementById('btn-tpl-modal-fullscreen');
+  if (modalBox && modalBox.getAttribute('data-fullscreen') === 'true') {
+    modalBox.setAttribute('data-fullscreen', 'false');
+    modalBox.style.maxWidth = '1320px';
+    modalBox.style.maxHeight = '94vh';
+    modalBox.style.width = '95vw';
+    modalBox.style.height = '';
+    if (btnFs) {
+      btnFs.innerHTML = '<span>⤢</span> Fullscreen';
+      btnFs.style.borderColor = 'rgba(255,255,255,0.15)';
+      btnFs.style.color = '#cbd5e1';
+    }
+  }
+  if (window.tplToggleStageTheater && window.tplIsStageTheater && window.tplIsStageTheater()) {
+    window.tplToggleStageTheater(false);
+  }
+  const dynamicControls = document.getElementById('tpl-modal-dynamic-controls');
+  if (dynamicControls) {
+    dynamicControls.style.display = 'none';
+    dynamicControls.innerHTML = '';
+  }
 }
 
 let FORBES_DOC_LINES = [
@@ -28605,6 +29814,9 @@ function renderTopTemplatePreviewStage() {
     hoverExternalT = 0;
     const btplView = Object.assign({}, btpl, { defaultImage: prim || btpl.defaultImage, secondaryImage: sec || btpl.secondaryImage || btpl.defaultImage });
     startTemplateHoverVideo(stage, btplView);
+    if (typeof window.tplUpdateStageWithContextualData === 'function' && typeof window.tplGetContextualData === 'function') {
+      window.tplUpdateStageWithContextualData(tplId, window.tplGetContextualData(tplId));
+    }
     if (window.tpl3DAfterVideoStage) window.tpl3DAfterVideoStage(stage, tplId);
     return;
   }
@@ -32292,7 +33504,7 @@ function initDoc3DModeControls() {
 
 function initDocFullscreenToggle() {
   const btnFs = document.getElementById('btn-tpl-modal-fullscreen');
-  const modalBox = document.querySelector('#top-template-customizer-modal .vector-modal-box');
+  const modalBox = document.getElementById('modal-tpl-outer-wrapper') || document.querySelector('#modal-top-template-customizer .vector-modal-box') || document.querySelector('#top-template-customizer-modal .vector-modal-box');
   if (!btnFs || !modalBox) return;
 
   btnFs.onclick = (e) => {
@@ -33320,6 +34532,11 @@ function bindTopTemplateCustomizerEvents() {
       if (input) input.value = url;
       const thumb = document.getElementById('tpl-modal-thumb-secondary');
       if (thumb) thumb.src = url;
+      if (typeof window.tplSetContextualData === 'function' && topCustomizerState.currentTpl) {
+        if (topCustomizerState.currentTpl.id === 'parallax') {
+          window.tplSetContextualData('parallax', { mountainsImg: url });
+        }
+      }
       renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
     }
   });
