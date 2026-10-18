@@ -23651,6 +23651,124 @@ const EFFECT_TEMPLATES_DATA = [
   },
 
   {
+    id: 'empire-timeline',
+    title: 'Empire Rise & Fall Timeline',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'SIGNATURE',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Animated milestone timeline tracing a company or magnate from founding to peak to collapse. The spine visual for every "rise and fall" mini-movie.',
+    tags: ['Business Storytelling', 'Empire Rise & Fall Timeline', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-et" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-et)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="2" text-anchor="middle">THE RISE &amp; FALL · 1976 — 2001</text><line x1="40" y1="120" x2="360" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="2"/><path d="M 40 160 C 120 158 150 60 210 58 C 270 56 300 150 360 170" fill="none" stroke="#ffd23f" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="160" r="6" fill="#00d68f"/><circle cx="210" cy="58" r="7" fill="#ffd23f"/><circle cx="360" cy="170" r="6" fill="#ff4757"/><text x="40" y="192" fill="#fff" font-family="monospace" font-size="9" text-anchor="middle">FOUNDED</text><text x="210" y="40" fill="#ffd23f" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">$1.5B NET WORTH</text><text x="360" y="196" fill="#ff4757" font-family="monospace" font-size="9" text-anchor="middle">BANKRUPTCY</text></svg>`)}`
+  },
+  {
+    id: 'founder-faceoff',
+    title: 'Founder Face-Off (Rival Split)',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'VIRAL',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Two rivals locked in a split-screen duel with VS crack, clashing brand colors, and stat columns. Built for "X vs Y: the war that changed an industry".',
+    tags: ['Business Storytelling', 'Founder Face-Off (Rival Split)', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="fo-l" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0b3a2a"/><stop offset="100%" stop-color="#06130e"/></linearGradient><linearGradient id="fo-r" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#3a0b14"/><stop offset="100%" stop-color="#130609"/></linearGradient></defs><rect width="200" height="225" fill="url(#fo-l)"/><rect x="200" width="200" height="225" fill="url(#fo-r)"/><circle cx="100" cy="85" r="38" fill="#111" stroke="#00d68f" stroke-width="3"/><circle cx="300" cy="85" r="38" fill="#111" stroke="#ff4757" stroke-width="3"/><text x="100" y="150" fill="#00d68f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="16" text-anchor="middle">BEZOS</text><text x="300" y="150" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="16" text-anchor="middle">MUSK</text><g transform="translate(200,112) rotate(-12)"><text y="8" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="30" text-anchor="middle" stroke="#000" stroke-width="6" paint-order="stroke">VS</text></g><text x="100" y="180" fill="rgba(255,255,255,0.75)" font-family="monospace" font-size="10" text-anchor="middle">NET WORTH $200B</text><text x="300" y="180" fill="rgba(255,255,255,0.75)" font-family="monospace" font-size="10" text-anchor="middle">NET WORTH $180B</text></svg>`)}`
+  },
+  {
+    id: 'cash-burn-meter',
+    title: 'Cash Burn Rate Meter',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'THRILLER',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Runway gauge sweeping from green to red while a bank balance drains in real time. The "how they lit $2B on fire" visual.',
+    tags: ['Business Storytelling', 'Cash Burn Rate Meter', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a15"/><text x="200" y="30" fill="rgba(255,255,255,0.7)" font-family="monospace" font-weight="700" font-size="10" letter-spacing="2" text-anchor="middle">MONTHLY BURN RATE</text><g transform="translate(200, 130)"><path d="M -80 0 A 80 80 0 0 1 -56.6 -56.6" stroke="#00d68f" stroke-width="14" fill="none" stroke-linecap="round"/><path d="M -56.6 -56.6 A 80 80 0 0 1 0 -80" stroke="#ffd23f" stroke-width="14" fill="none"/><path d="M 0 -80 A 80 80 0 0 1 56.6 -56.6" stroke="#ff8c42" stroke-width="14" fill="none"/><path d="M 56.6 -56.6 A 80 80 0 0 1 80 0" stroke="#ff4757" stroke-width="14" fill="none" stroke-linecap="round"/><line x1="0" y1="0" x2="52" y2="-46" stroke="#fff" stroke-width="4" stroke-linecap="round"/><circle cx="0" cy="0" r="8" fill="#fff"/></g><text x="200" y="165" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22" text-anchor="middle">-$412M / MO</text><text x="200" y="190" fill="rgba(255,255,255,0.6)" font-family="monospace" font-size="10" text-anchor="middle">RUNWAY: 3 MONTHS LEFT</text></svg>`)}`
+  },
+  {
+    id: 'deal-term-sheet',
+    title: 'Deal Term Sheet Signing',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DOC DRAMA',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Term sheet clauses lighting up line by line, ending in an animated ink signature and deal stamp. For acquisitions, funding rounds, and hostile takeovers.',
+    tags: ['Business Storytelling', 'Deal Term Sheet Signing', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(70, 15)"><rect width="260" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.12)"/><text x="130" y="26" fill="#3a2418" font-family="monospace" font-weight="900" font-size="11" letter-spacing="1" text-anchor="middle">TERM SHEET · SERIES A</text><line x1="20" y1="34" x2="240" y2="34" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g font-family="monospace" font-size="9" fill="#3a2418"><rect x="18" y="44" width="150" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="52">Valuation: $80M pre-money</text><rect x="18" y="64" width="140" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="72">Investment: $12M for 15%</text><text x="20" y="92">Board seats: 2 investor, 3 founder</text><text x="20" y="112">Liquidation pref: 1x non-participating</text></g><path d="M 40 160 C 70 140 90 175 120 152 S 170 165 195 148" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="172" x2="200" y2="172" stroke="#3a2418" stroke-width="1"/><text x="40" y="184" fill="rgba(0,0,0,0.5)" font-family="monospace" font-size="7">CEO SIGNATURE</text></g></svg>`)}`
+  },
+  {
+    id: 'scam-redaction',
+    title: 'Fraud Dossier Redaction',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'TRUE CRIME',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Classified memo with black redaction bars slamming over names and amounts, CONFIDENTIAL stamp, and one highlighted sentence. Made for fraud, SEC, and scandal stories.',
+    tags: ['Business Storytelling', 'Fraud Dossier Redaction', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#e9e2d0"/><g transform="translate(70, 12)"><rect width="260" height="200" rx="2" fill="#fbf8ef" stroke="rgba(0,0,0,0.15)"/><text x="130" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">INTERNAL MEMO · EYES ONLY</text><g font-family="monospace" font-size="9" fill="#3a2418"><text x="16" y="52">To: Board of Directors</text><text x="16" y="70">From:</text><rect x="52" y="61" width="120" height="11" fill="#111"/><text x="16" y="90">Re: Q3 revenue booked via</text><text x="16" y="104">side letters totaling</text><rect x="16" y="112" width="90" height="12" rx="2" fill="#facc15" opacity="0.8"/><text x="20" y="121" font-weight="700">$8.4 BILLION</text><text x="16" y="140">DO NOT DISCLOSE.</text></g><g transform="translate(150, 150) rotate(-14)"><rect x="-52" y="-14" width="104" height="26" fill="none" stroke="#c1121f" stroke-width="2.5" rx="3"/><text y="5" fill="#c1121f" font-family="monospace" font-weight="900" font-size="11" text-anchor="middle" letter-spacing="1">CONFIDENTIAL</text></g></g></svg>`)}`
+  },
+  {
+    id: 'market-cap-race',
+    title: 'Market Cap Race Bars',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DATA DRAMA',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Company bar chart racing up the screen as valuations leapfrog each other year by year. The "watch an empire overtake another" visual.',
+    tags: ['Business Storytelling', 'Market Cap Race Bars', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a15"/><text x="24" y="30" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="1.5">MARKET CAP · 2026</text><text x="376" y="30" fill="#ffd23f" font-family="monospace" font-weight="900" font-size="13" text-anchor="end">Q4</text><g transform="translate(24, 48)" font-family="'Inter', sans-serif" font-weight="700" font-size="10"><g transform="translate(0,0)"><text y="13" fill="#fff">NVDA</text><rect x="60" y="2" width="290" height="15" rx="3" fill="#76b900"/><text x="344" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$3.1T</text></g><g transform="translate(0,26)"><text y="13" fill="#fff">MSFT</text><rect x="60" y="2" width="262" height="15" rx="3" fill="#00a4ef"/><text x="316" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.8T</text></g><g transform="translate(0,52)"><text y="13" fill="#fff">AAPL</text><rect x="60" y="2" width="248" height="15" rx="3" fill="#f5f5f7"/><text x="302" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.6T</text></g><g transform="translate(0,78)"><text y="13" fill="#fff">AMZN</text><rect x="60" y="2" width="180" height="15" rx="3" fill="#ff9900"/><text x="234" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.9T</text></g><g transform="translate(0,104)"><text y="13" fill="#fff">GOOGL</text><rect x="60" y="2" width="160" height="15" rx="3" fill="#ea4335"/><text x="214" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.7T</text></g><g transform="translate(0,130)"><text y="13" fill="#9a9aa5">TSLA</text><rect x="60" y="2" width="84" height="15" rx="3" fill="#cc0000"/><text x="138" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$0.8T</text></g></g></svg>`)}`
+  },
+  {
+    id: 'hostile-takeover',
+    title: 'Hostile Takeover Progress',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'DRAMA',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Shareholder pie devouring slices stake by stake until one logo swallows the whole boardroom. For acquisitions and proxy fights.',
+    tags: ['Business Storytelling', 'Hostile Takeover Progress', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0d0d16"/><text x="200" y="28" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">OWNERSHIP STAKE · 51% CONTROL</text><g transform="translate(130, 40)"><circle cx="70" cy="70" r="48" fill="none" stroke="#ff4757" stroke-width="26" stroke-dasharray="154 301.6"/><circle cx="70" cy="70" r="48" fill="none" stroke="#7c5cff" stroke-width="26" stroke-dasharray="75 301.6" stroke-dashoffset="-154"/><circle cx="70" cy="70" r="48" fill="none" stroke="#8a8a95" stroke-width="26" stroke-dasharray="72.6 301.6" stroke-dashoffset="-229"/><text x="70" y="66" fill="#fff" font-family="monospace" font-weight="900" font-size="15" text-anchor="middle">51%</text><text x="70" y="82" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8" text-anchor="middle">ACQUIRER</text></g><g transform="translate(28, 190)" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.85)"><circle cx="8" cy="-4" r="4" fill="#ff4757"/><text x="16" y="0">Predator Fund 51%</text><circle cx="130" cy="-4" r="4" fill="#7c5cff"/><text x="138" y="0">Founders 25%</text><circle cx="238" cy="-4" r="4" fill="#8a8a95"/><text x="246" y="0">Public Float 24%</text></g></svg>`)}`
+  },
+  {
+    id: 'pyramid-scheme',
+    title: 'Pyramid Scheme Collapse',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'SCANDAL',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Tiered pyramid filling with investors layer by layer, then cracking and collapsing when the money runs out. Built for Ponzi takedowns.',
+    tags: ['Business Storytelling', 'Pyramid Scheme Collapse', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pyr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0f0f"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pyr)"/><text x="200" y="26" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" letter-spacing="2" text-anchor="middle">STRUCTURE UNSUSTAINABLE</text><polygon points="200,42 236,84 164,84" fill="#ffd23f"/><text x="200" y="72" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">FOUNDER</text><polygon points="150,96 250,96 268,128 132,128" fill="#ff8c42"/><text x="200" y="118" fill="#000" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">EARLY INVESTORS · +400%</text><polygon points="120,140 280,140 302,172 98,172" fill="#c1440e"/><text x="200" y="162" fill="#fff" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LATE ADOPTERS · BREAK-EVEN</text><polygon points="88,184 312,184 336,214 64,214" fill="#5a1e1e"/><text x="200" y="204" fill="#ff9d9d" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LAST 90% · TOTAL LOSS</text><path d="M 196 42 L 204 96 L 192 140 L 206 214" stroke="#000" stroke-width="3" fill="none" opacity="0.55"/></svg>`)}`
+  },
+  {
+    id: 'money-trail-map',
+    title: 'Offshore Money Trail Map',
+    category: 'Business Storytelling',
+    origCategory: 'Business Storytelling',
+    badge: 'FORENSIC',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
+    description: 'Dark world map with glowing dotted arcs hopping shell companies between tax havens until cash lands in one account. The follow-the-money sequence.',
+    tags: ['Business Storytelling', 'Offshore Money Trail Map', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#060a14"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 90 80 Q 160 20 230 62" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 230 62 Q 290 40 320 92" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 320 92 Q 260 130 160 158" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><circle cx="90" cy="80" r="6" fill="#00f0ff"/><circle cx="230" cy="62" r="6" fill="#00f0ff"/><circle cx="320" cy="92" r="6" fill="#00f0ff"/><circle cx="160" cy="158" r="8" fill="#ffd23f"/><text x="90" y="66" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">DELIVERY CO.</text><text x="230" y="48" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">CAYMAN SHELL</text><text x="320" y="78" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">TRUST FUND</text><text x="160" y="180" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">PERSONAL ACCOUNT · $47M</text></svg>`)}`
+  },
+  // === Business Storytelling suite (Magnates channel templates) ===
+  {
     id: 'directional-push-split-wipe',
     title: 'Directional Push & Split Wipe (4-Way & Motion Blur)',
     category: 'Transitions',
@@ -24393,7 +24511,7 @@ const EFFECT_TEMPLATES_DATA = [
   }
 ];
 
-const TEMPLATE_CATEGORIES = ['All', '★ My Templates', 'Finance', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
+const TEMPLATE_CATEGORIES = ['All', '★ My Templates', 'Business Storytelling', 'Finance', 'Animations', '3D Spatial', 'Paper / Cutout', 'Transitions', 'Parallax', 'Text & Titles', 'Color & Vibe', 'Sound FX', 'Glitches'];
 
 let currentTemplateCategory = 'All';
 let templateSearchQuery = '';
@@ -24640,9 +24758,88 @@ function renderHomepageTemplates() {
   });
 }
 
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand']);
+// Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
+const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map'];
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 let hoverBridgeActive = false;
 let hoverExternalT = null;
+
+// Live hover-preview markup for Business Storytelling templates (driven by .tpl-biz CSS keyframes)
+function bizStoryHoverMarkup(id) {
+  switch (id) {
+    case 'empire-timeline':
+      return `<div class="bt-head">THE RISE &amp; FALL · 1976 — 2001</div>
+        <svg class="bt-svg" viewBox="0 0 300 150" preserveAspectRatio="none">
+          <line x1="15" y1="95" x2="285" y2="95" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+          <path class="bt-curve" d="M 15 120 C 80 118 105 40 150 38 C 200 36 225 110 285 126"/>
+          <circle class="bt-dot bt-dot-1" cx="15" cy="120" r="5" fill="#00d68f"/>
+          <circle class="bt-dot bt-dot-2" cx="150" cy="38" r="6" fill="#ffd23f"/>
+          <circle class="bt-dot bt-dot-3" cx="285" cy="126" r="5" fill="#ff4757"/>
+        </svg>
+        <div class="bt-labels"><span class="bt-l1">FOUNDED</span><span class="bt-l2">$1.5B NET WORTH</span><span class="bt-l3">BANKRUPTCY</span></div>`;
+    case 'founder-faceoff':
+      return `<div class="fo-side fo-left"><div class="fo-avatar"></div><div class="fo-name">BEZOS</div><div class="fo-stat">NET WORTH $200B</div></div>
+        <div class="fo-side fo-right"><div class="fo-avatar"></div><div class="fo-name">MUSK</div><div class="fo-stat">NET WORTH $180B</div></div>
+        <div class="fo-seam"></div><div class="fo-vs">VS</div>`;
+    case 'cash-burn-meter':
+      return `<div class="bm-title">MONTHLY BURN RATE</div>
+        <svg class="bm-gauge" viewBox="-100 -100 200 110">
+          <path d="M -80 0 A 80 80 0 0 1 -56.6 -56.6" stroke="#00d68f"/><path d="M -56.6 -56.6 A 80 80 0 0 1 0 -80" stroke="#ffd23f"/>
+          <path d="M 0 -80 A 80 80 0 0 1 56.6 -56.6" stroke="#ff8c42"/><path d="M 56.6 -56.6 A 80 80 0 0 1 80 0" stroke="#ff4757"/>
+          <line class="bm-needle" x1="0" y1="0" x2="0" y2="-66"/>
+        </svg>
+        <div class="bm-val">-$412M / MO</div><div class="bm-runway">RUNWAY: <b>3 MONTHS</b> LEFT</div>`;
+    case 'deal-term-sheet':
+      return `<div class="ts-paper">
+        <div class="ts-head">TERM SHEET · SERIES A</div><div class="ts-rule"></div>
+        <div class="ts-line ts-hl"><span>Valuation: $80M pre-money</span></div>
+        <div class="ts-line ts-hl ts-d2"><span>Investment: $12M for 15%</span></div>
+        <div class="ts-line ts-d3"><span>Board seats: 2 investor, 3 founder</span></div>
+        <div class="ts-line ts-d4"><span>Liquidation pref: 1x non-participating</span></div>
+        <svg class="ts-sig" viewBox="0 0 160 40"><path d="M 6 26 C 30 8 44 36 68 20 S 112 30 132 12 L 150 22"/></svg>
+        <div class="ts-stamp">DEAL CLOSED</div></div>`;
+    case 'scam-redaction':
+      return `<div class="rd-paper">
+        <div class="rd-head">INTERNAL MEMO · EYES ONLY</div>
+        <div class="rd-line">To: Board of Directors</div>
+        <div class="rd-line rd-from">From: <span class="rd-bar"></span></div>
+        <div class="rd-line">Re: Q3 revenue booked via side letters totaling</div>
+        <div class="rd-line"><span class="rd-hl">$8.4 BILLION</span></div>
+        <div class="rd-line">DO NOT DISCLOSE.</div>
+        <div class="rd-stamp">CONFIDENTIAL</div></div>`;
+    case 'market-cap-race':
+      return `<div class="mr-head"><span>MARKET CAP · 2026</span><b>Q4</b></div>
+        <div class="mr-row"><span class="mr-name">NVDA</span><div class="mr-track"><div class="mr-bar mr-b1" style="--w:94%;--c:#76b900"></div></div><span class="mr-val">$3.1T</span></div>
+        <div class="mr-row"><span class="mr-name">MSFT</span><div class="mr-track"><div class="mr-bar mr-b2" style="--w:84%;--c:#00a4ef"></div></div><span class="mr-val">$2.8T</span></div>
+        <div class="mr-row"><span class="mr-name">AAPL</span><div class="mr-track"><div class="mr-bar mr-b3" style="--w:76%;--c:#f5f5f7"></div></div><span class="mr-val">$2.6T</span></div>
+        <div class="mr-row"><span class="mr-name">AMZN</span><div class="mr-track"><div class="mr-bar mr-b4" style="--w:58%;--c:#ff9900"></div></div><span class="mr-val">$1.9T</span></div>
+        <div class="mr-row"><span class="mr-name">GOOGL</span><div class="mr-track"><div class="mr-bar mr-b5" style="--w:50%;--c:#ea4335"></div></div><span class="mr-val">$1.7T</span></div>
+        <div class="mr-row"><span class="mr-name">TSLA</span><div class="mr-track"><div class="mr-bar mr-b6" style="--w:26%;--c:#cc0000"></div></div><span class="mr-val">$0.8T</span></div>`;
+    case 'hostile-takeover':
+      return `<div class="ht-title">OWNERSHIP STAKE · 51% CONTROL</div>
+        <div class="ht-pie"><div class="ht-center"><b>51%</b><i>ACQUIRER</i></div></div>
+        <div class="ht-legend"><span><em style="background:#ff4757"></em>Predator Fund 51%</span><span><em style="background:#7c5cff"></em>Founders 25%</span><span><em style="background:#8a8a95"></em>Float 24%</span></div>`;
+    case 'pyramid-scheme':
+      return `<div class="ps-title">STRUCTURE UNSUSTAINABLE</div>
+        <div class="ps-stack">
+          <div class="ps-tier ps-t1">FOUNDER</div>
+          <div class="ps-tier ps-t2">EARLY INVESTORS · +400%</div>
+          <div class="ps-tier ps-t3">LATE ADOPTERS · BREAK-EVEN</div>
+          <div class="ps-tier ps-t4">LAST 90% · TOTAL LOSS</div>
+        </div><div class="ps-crack"></div>`;
+    case 'money-trail-map':
+      return `<div class="mt-grid"></div>
+        <svg class="mt-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
+          <path class="mt-arc mt-a1" d="M 40 55 Q 110 5 180 50"/>
+          <path class="mt-arc mt-a2" d="M 180 50 Q 240 25 268 70"/>
+          <path class="mt-arc mt-a3" d="M 268 70 Q 200 115 90 128"/>
+        </svg>
+        <div class="mt-node mt-n1">DELIVERY CO.</div><div class="mt-node mt-n2">CAYMAN SHELL</div><div class="mt-node mt-n3">TRUST FUND</div><div class="mt-node mt-n4">PERSONAL ACCOUNT · $47M</div>`;
+    default:
+      return '';
+  }
+}
+
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
   const tplId = tpl.id;
@@ -26306,6 +26503,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (BIZ_STORY_IDS.includes(tplId)) {
+      fxContainer.innerHTML = `<div class="tpl-biz tpl-biz-${tplId}">${bizStoryHoverMarkup(tplId)}</div>`;
     } else {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; overflow: hidden;">
@@ -27110,7 +27309,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const hlProg = Math.min(100, Math.floor(((t * 1.2) % 1.5 / 1.5) * 100));
       const bar = fxContainer?.querySelector(`#fx-anim-hl-bar-${tplId}`);
       if (bar) bar.style.width = `${hlProg}%`;
-    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].includes(tplId)) {
+    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -28932,7 +29131,7 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = 'THE MASTERPIECE';
     topCustomizerState.subText = 'PRIVATE COLLECTION';
     topCustomizerState.textColor = '#f59e0b';
-  } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].includes(tpl.id)) {
+  } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].concat(BIZ_STORY_IDS).includes(tpl.id)) {
     if (wrapPrim) wrapPrim.style.display = 'flex';
     if (wrapSec) wrapSec.style.display = 'flex';
 
@@ -28981,7 +29180,7 @@ function openTopTemplateCustomizer(tpl) {
   if (inputTextMain) inputTextMain.value = topCustomizerState.mainText;
   if (inputTextSub) inputTextSub.value = topCustomizerState.subText;
   if (colorTextMain) colorTextMain.value = topCustomizerState.textColor;
-  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].includes(tpl.id) ? 'none' : 'flex';
+  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].concat(BIZ_STORY_IDS).includes(tpl.id) ? 'none' : 'flex';
 
   const modalKineticInput = document.getElementById('modal-kinetic-text-input');
   const modalKineticColor = document.getElementById('modal-kinetic-text-color');
