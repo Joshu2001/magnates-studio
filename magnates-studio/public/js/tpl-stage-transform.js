@@ -94,8 +94,16 @@
 
     // Identify candidate interactive elements on stage
     const tplId = topCustomizerState.currentTpl?.id;
-    const fgCandidate = stage.querySelector('.subject, .figure, .doc, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
-    const textCandidate = stage.querySelector('.bigtext, .doc-header, .w-title, .quote-text, .headline');
+    const mapCtxData = (tplId === 'map' && typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : null;
+    const isMapInteractive3D = !!(mapCtxData && (mapCtxData.is3DMode || mapCtxData.drawOnScreenMode));
+    if (isMapInteractive3D) {
+      box.style.display = 'none';
+      toolbar.style.display = 'none';
+      return;
+    }
+    toolbar.style.display = 'flex';
+    const fgCandidate = stage.querySelector('.subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const textCandidate = stage.querySelector('.bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
     const bgCandidate = stage.querySelector('.tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
 
     // Function to update toolbar contents based on active targetType
@@ -274,21 +282,30 @@
       const fgTf = topCustomizerState.transforms.fg;
       if (fgCandidate && fgTf) {
         if (fgTf.isFullscreen) {
-          fgCandidate.style.position = 'absolute';
-          fgCandidate.style.inset = '0';
-          fgCandidate.style.width = '100%';
-          fgCandidate.style.height = '100%';
-          fgCandidate.style.maxWidth = '100%';
-          fgCandidate.style.maxHeight = '100%';
-          fgCandidate.style.transform = 'none';
+          const sRect = stage.getBoundingClientRect();
+          const naturalW = fgCandidate.offsetWidth || 380;
+          const naturalH = fgCandidate.offsetHeight || 220;
+          const fitScale = Math.min(
+            (sRect.width * 0.88) / Math.max(naturalW, 1),
+            (sRect.height * 0.88) / Math.max(naturalH, 1)
+          );
+          const safeScale = Math.max(1, Math.min(fitScale, 2.4));
+          fgCandidate.style.transformOrigin = 'center center';
+          fgCandidate.style.transform = `translate(0px, 0px) scale(${safeScale.toFixed(3)})`;
         } else {
+          fgCandidate.style.transformOrigin = 'center center';
           fgCandidate.style.transform = `translate(${fgTf.x}px, ${fgTf.y}px) scale(${fgTf.scale || 1})`;
         }
       }
 
       const textTf = topCustomizerState.transforms.text;
       if (textCandidate && textTf) {
-        textCandidate.style.transform = `translate(calc(-50% + ${textTf.x}px), calc(-50% + ${textTf.y}px)) scale(${textTf.scale || 1})`;
+        const isCenteredAbs = getComputedStyle(textCandidate).position === 'absolute' && textCandidate.classList.contains('bigtext');
+        if (isCenteredAbs) {
+          textCandidate.style.transform = `translate(calc(-50% + ${textTf.x}px), calc(-50% + ${textTf.y}px)) scale(${textTf.scale || 1})`;
+        } else {
+          textCandidate.style.transform = `translate(${textTf.x}px, ${textTf.y}px) scale(${textTf.scale || 1})`;
+        }
       }
 
       const bgTf = topCustomizerState.transforms.bg;

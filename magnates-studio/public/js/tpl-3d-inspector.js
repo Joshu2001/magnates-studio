@@ -22,7 +22,11 @@
     'puzzle-piece-reveal',
     '3d-camera-move-rotation',
     'magnates-media-3d-projection',
-    'magnates-media-multi-drop-shadows'
+    'magnates-media-multi-drop-shadows',
+    'parallax',
+    'zoom',
+    'textbehind',
+    'docheight'
   ]);
   const is3DSpatial = (id) => {
     if (!id) return false;

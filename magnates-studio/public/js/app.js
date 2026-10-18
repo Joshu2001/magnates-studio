@@ -25081,49 +25081,103 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="s-row"><div class="s-check"></div><div class="s-name">Student Loan</div><div class="s-bar-wrap"><div class="s-bar" style="--w:60%"></div></div><div class="s-amt">$28,000</div></div>
           <div class="s-row"><div class="s-check"></div><div class="s-name">Mortgage</div><div class="s-bar-wrap"><div class="s-bar" style="--w:85%"></div></div><div class="s-amt">$250,000</div></div>
         </div>`; } else if (tplId === 'pie') {
+      const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('pie') : {};
+      const pTitle = pData.title || 'Portfolio Allocation';
+      const pPreset = pData.presetName || 'Classic Growth';
+      const pTotal = pData.totalValue || '$100,000';
+      const slices = Array.isArray(pData.slices) && pData.slices.length ? pData.slices : [
+        { name: 'S&P 500 Index', pct: '50%', color: '#38bdf8' },
+        { name: 'Real Estate', pct: '25%', color: '#10b981' },
+        { name: 'Bitcoin / Tech', pct: '15%', color: '#f59e0b' },
+        { name: 'Treasury Cash', pct: '10%', color: '#a855f7' }
+      ];
+      const circum = 188.5;
+      let offsetAcc = 0;
+      const circlesHtml = slices.map(s => {
+        const num = Math.max(0, parseFloat(String(s.pct).replace(/[^0-9.]/g, '')) || 0);
+        const dash = (num / 100) * circum;
+        const curOff = -offsetAcc;
+        offsetAcc += dash;
+        return `<circle class="p-slice" cx="40" cy="40" r="30" stroke="${s.color || '#38bdf8'}" stroke-dashoffset="${curOff.toFixed(2)}" style="--d:${dash.toFixed(2)}"/>`;
+      }).join('');
+      const legendHtml = slices.map(s => `
+        <div class="p-leg">
+          <div class="p-leg-left"><span class="p-dot" style="background:${s.color || '#38bdf8'}"></span><span>${s.name}</span></div>
+          <span class="p-pct">${s.pct}</span>
+        </div>
+      `).join('');
       fxContainer.innerHTML = `<div class="tpl-pie">
-          <div class="p-title">Portfolio Allocation</div>
-          <div class="p-svg">
-            <svg viewBox="0 0 80 80">
-              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#7c5cff" style="--d:113"/>
-              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#ff5c8a" stroke-dashoffset="-113" style="--d:37.7"/>
-              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#5cffdc" stroke-dashoffset="-150.7" style="--d:18.85"/>
-              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#ffd23f" stroke-dashoffset="-169.55" style="--d:9.42"/>
-              <circle class="p-slice" cx="40" cy="40" r="30" stroke="#8a8a95" stroke-dashoffset="-178.97" style="--d:9.42"/>
-            </svg>
-            <div class="p-center"><div class="p-total">$100,000</div></div>
+          <div class="p-card">
+            <div class="p-head-row">
+              <div class="p-title">${pTitle}</div>
+              <div class="p-badge">${pPreset}</div>
+            </div>
+            <div class="p-body">
+              <div class="p-svg">
+                <svg viewBox="0 0 80 80">${circlesHtml}</svg>
+                <div class="p-center"><div class="p-total-lbl">NET AUM</div><div class="p-total">${pTotal}</div></div>
+              </div>
+              <div class="p-legend">${legendHtml}</div>
+            </div>
           </div>
-          <div class="p-legend"><div class="p-leg"><span style="color:#7c5cff">■</span> Stocks 60%</div><div class="p-leg"><span style="color:#ff5c8a">■</span> Bonds 20%</div><div class="p-leg"><span style="color:#5cffdc">■</span> RE 10%</div><div class="p-leg"><span style="color:#ffd23f">■</span> Crypto 5%</div></div>
         </div>`; } else if (tplId === 'receipt') {
+      const rData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+      const store = rData.store || 'WHOLE FOODS MARKET';
+      const items = Array.isArray(rData.items) && rData.items.length ? rData.items : [
+        { name: 'Organic Almond Milk', price: '$4.99' },
+        { name: 'Avocado 4-Pack', price: '$6.49' },
+        { name: 'Grass-Fed Ribeye', price: '$22.80' }
+      ];
+      const total = rData.total || '$34.28';
       fxContainer.innerHTML = `<div class="tpl-receipt">
           <div class="r-paper">
-            <div class="r-head"><div class="r-store">GROCERY MART</div></div>
-            <div class="r-item"><span class="name">Organic Milk</span><span class="price">$6.99</span></div>
-            <div class="r-item"><span class="name">Avocados (3)</span><span class="price">$4.50</span></div>
-            <div class="r-item"><span class="name">Sourdough Bread</span><span class="price">$7.25</span></div>
-            <div class="r-item"><span class="name">Free Range Eggs</span><span class="price">$8.99</span></div>
-            <div class="r-total"><span>TOTAL</span><span>$27.73</span></div>
+            <div class="r-head"><div class="r-store">${store}</div><div style="font-size:8px;font-weight:500;color:#64748b;margin-top:2px;">TERM #0491 · AUTH VERIFIED</div></div>
+            <div class="r-items-wrap">
+              ${items.map(it => `<div class="r-item"><span class="name">${it.name}</span><span class="price">${it.price}</span></div>`).join('')}
+            </div>
+            <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
           </div>
         </div>`; } else if (tplId === 'google') {
+      const gData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('google') : {};
+      const query = gData.query || 'how to invest in index funds';
+      const sug1 = gData.suggestion || 'top index funds for passive wealth';
+      const sug2 = gData.suggestion2 || 's&p 500 historical annual return';
+      const sug3 = gData.suggestion3 || 'vanguard vs fidelity index funds';
+      const searchIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:#9aa0a6;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
       fxContainer.innerHTML = `<div class="tpl-google">
-          <div class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="e">l</span><span class="r">e</span></div>
-          <div class="search-bar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:#9aa0a6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <div class="typed-text">what happened to...</div>
+          <div class="google-frame">
+            <div class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="e">l</span><span class="r">e</span></div>
+            <div class="search-bar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;color:#4285F4;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <div class="typed-text g-query">${query}</div>
+            </div>
+            <div class="suggestions">
+              <div class="sugg g-sug">${searchIcon}<span class="g-sug-text">${sug1}</span></div>
+              <div class="sugg g-sug2">${searchIcon}<span class="g-sug-text">${sug2}</span></div>
+              <div class="sugg g-sug3">${searchIcon}<span class="g-sug-text">${sug3}</span></div>
+            </div>
           </div>
-          <div class="suggestions"><div class="sugg">🔍 what happened to db cooper</div><div class="sugg">🔍 what happened in chernobyl</div><div class="sugg">🔍 what happened last night</div></div>
         </div>`; } else if (tplId === 'imessage') {
+      const imData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('imessage') : {};
+      const contact = imData.contact || 'Insider Source';
+      const m1 = imData.msg1 || 'hey, are you up?';
+      const m2 = imData.msg2 || 'look at institutional inflow right now';
+      const m3 = imData.msg3 || 'already positioned before the announcement';
+      const m4 = imData.msg4 || 'send me the filing PDF';
       fxContainer.innerHTML = `<div class="tpl-imessage">
-          <div class="bubble them">hey, are you up?</div>
-          <div class="bubble me">yeah why</div>
-          <div class="bubble them">you need to see this rn</div>
-          <div class="bubble me">omg what happened</div>
+          <div class="imessage-phone">
+            <div class="im-header"><div class="im-avatar">${contact.charAt(0).toUpperCase()}</div><span class="im-contact">${contact}</span></div>
+            <div class="bubble them">${m1}</div>
+            <div class="bubble me">${m2}</div>
+            <div class="bubble them">${m3}</div>
+            <div class="bubble me">${m4}</div>
+          </div>
         </div>`; } else if (tplId === 'subscribe') {
       fxContainer.innerHTML = `<div class="tpl-subscribe">
           <div class="sub-wrap">
             <div class="sub-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6z"/></svg>SUBSCRIBE</div>
             <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;color:#fff"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
-            <div class="counter"><span class="num">1.2M</span> subscribers</div>
+            <div class="counter"><span class="num sub-count">1.42M</span> <span class="sub-ch">Magnates Media</span></div>
           </div>
         </div>`; } else if (tplId === 'countdown') {
       fxContainer.innerHTML = `<div class="tpl-countdown">
@@ -25152,52 +25206,129 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="tw-text">The letter arrived at midnight...</div>
           <div class="tw-sub">— November 14, 1987</div>
         </div>`; } else if (tplId === 'notif') {
+      const nData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('notif') : {};
+      const title1 = nData.title || 'Wire Transfer Confirmed';
+      const body1 = nData.body || '$24,500.00 deposited via SWIFT';
+      const app1 = nData.app || 'Mercury Bank';
       fxContainer.innerHTML = `<div class="tpl-notif">
-          <div class="notif-card"><div class="app-icon insta">📸</div><div class="notif-body"><div class="notif-title">New follower</div><div class="notif-msg">@user started following you</div></div></div>
-          <div class="notif-card"><div class="app-icon pay" style="background:#003087;color:#fff;font-weight:700">P</div><div class="notif-body"><div class="notif-title">Payment received</div><div class="notif-msg">$2,450.00 from Client</div></div></div>
-          <div class="notif-card"><div class="app-icon mail">✉</div><div class="notif-body"><div class="notif-title">Partnership opportunity</div><div class="notif-msg">Hey, loved your last video...</div></div></div>
+          <div class="notif-stack">
+            <div class="notif-card">
+              <div class="app-icon" style="background:linear-gradient(135deg,#0ea5e9,#2563eb);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div class="notif-body" style="flex:1;">
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span class="notif-title">${title1}</span><span class="notif-time" style="font-size:9px;color:#64748b;">${nData.time || 'Now'}</span></div>
+                <div class="notif-msg">${body1}</div>
+              </div>
+            </div>
+            <div class="notif-card">
+              <div class="app-icon" style="background:linear-gradient(135deg,#10b981,#059669);">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+              <div class="notif-body" style="flex:1;">
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span class="notif-title">${app1} Alert</span><span style="font-size:9px;color:#64748b;">2m ago</span></div>
+                <div class="notif-msg">Portfolio crossed +18.4% benchmark</div>
+              </div>
+            </div>
+          </div>
         </div>`; } else if (tplId === 'hormozi') {
-      fxContainer.innerHTML = `<div class="tpl-hormozi">
-          <div class="emoji e1">🔥</div>
-          <div class="caption-wrap"><span class="word">This</span> <span class="word">one</span> <span class="word">trick</span> <span class="word">changed</span> <span class="word">everything</span></div>
-          <div class="emoji e2">💰</div>
+      const hData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('hormozi') : {};
+      const rawCap = hData.caption || 'NEVER TRADE YOUR TIME FOR MONEY';
+      const kw = (hData.keyword || 'TIME').toUpperCase();
+      const kCol = hData.keyColor || '#facc15';
+      const showEmoji = hData.showEmoji === true;
+      const bgMedia = hData.bgMedia || (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl && !topCustomizerState.secondaryUrl.includes('data:image/svg') ? topCustomizerState.secondaryUrl : '');
+      const isVideoBg = bgMedia && (bgMedia.includes('.mp4') || bgMedia.includes('.webm') || hData.bgMediaType === 'video');
+      const wordsHtml = rawCap.split(/\s+/).filter(Boolean).map((w, idx) => {
+        const cleanW = w.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+        const isKw = kw && cleanW === kw;
+        return `<span class="word" style="animation-delay:${(idx * 0.35).toFixed(2)}s; ${isKw ? `color:${kCol};--hl-col:${kCol};` : `--hl-col:${kCol};`}">${w}</span>`;
+      }).join(' ');
+      const bgStyle = (!isVideoBg && bgMedia) ? `style="background: radial-gradient(circle at 50% 40%, rgba(15,23,42,0.5) 0%, rgba(5,8,17,0.85) 100%), url('${bgMedia}') center/cover no-repeat;"` : (hData.transparentBg ? `style="background: rgba(15,23,42,0.25); backdrop-filter: blur(2px);"` : '');
+      fxContainer.innerHTML = `<div class="tpl-hormozi" ${bgStyle}>
+          ${isVideoBg ? `<video class="hormozi-bg-video" src="${bgMedia}" autoplay loop muted playsinline></video>` : ''}
+          <div class="hormozi-vignette"></div>
+          ${showEmoji ? `<div class="emoji e1">${hData.emoji || '🔥'}</div>` : ''}
+          <div class="caption-wrap caption">${wordsHtml}</div>
+          ${showEmoji ? `<div class="emoji e2">${hData.emoji || '⚡'}</div>` : ''}
         </div>`; } else if (tplId === 'kenburns') {
       fxContainer.innerHTML = `<div class="tpl-kenburns">
           <div class="kb-img"></div>
           <div class="kb-caption">TOKYO · 1987</div>
         </div>`; } else if (tplId === 'tweet') {
+      const twData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('tweet') : {};
+      const author = twData.author || 'Alex Hormozi';
+      const handle = twData.handle || '@AlexHormozi';
+      const text = twData.text || 'The best investment you can make is in skills nobody can tax or inflate away.';
+      const likes = twData.likes || '48.2K';
+      const retweets = twData.retweets || '9.4K';
       fxContainer.innerHTML = `<div class="tpl-tweet">
           <div class="tweet-card">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-              <div style="width:32px;height:32px;border-radius:50%;background:#1da1f2;display:grid;place-items:center;color:#fff;font-weight:700">A</div>
-              <div><strong style="font-size:12px;color:#000;">Alex Hormozi</strong><br><span style="color:#666;font-size:10px;">@alexmormozi</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="tw-avatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0f172a,#334155);display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px;">${author.charAt(0).toUpperCase()}</div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:4px;">
+                    <strong class="tw-name" style="font-size:13px;color:#0f172a;font-weight:800;">${author}</strong>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#1d9bf0"><path d="M22.5 12.5c0-1.58-.88-2.95-2.18-3.66.54-1.51.2-3.23-.97-4.4-1.17-1.17-2.89-1.51-4.4-.97C14.24 2.17 12.87 1.29 11.29 1.29s-2.95.88-3.66 2.18c-1.51-.54-3.23-.2-4.4.97-1.17 1.17-1.51 2.89-.97 4.4C.96 9.55.08 10.92.08 12.5s.88 2.95 2.18 3.66c-.54 1.51-.2 3.23.97 4.4 1.17 1.17 2.89 1.51 4.4.97.71 1.3 2.08 2.18 3.66 2.18s2.95-.88 3.66-2.18c1.51.54 3.23.2 4.4-.97 1.17-1.17 1.51-2.89.97-4.4 1.3-.71 2.18-2.08 2.18-3.66zM10.09 16.72l-4.24-4.24 1.41-1.41 2.83 2.83 6.36-6.36 1.41 1.41-7.77 7.77z"/></svg>
+                  </div>
+                  <span class="tw-handle" style="color:#64748b;font-size:11px;font-weight:500;">${handle}</span>
+                </div>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#0f172a"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </div>
-            <div style="font-size:11.5px;color:#222;line-height:1.35;margin-bottom:8px;">The best investment you can make is in yourself.</div>
-            <div style="font-size:10px;color:#777;border-top:1px solid #eee;padding-top:6px;"><strong>12.4K</strong> Likes · <strong>3.2K</strong> Reposts</div>
+            <div class="tw-text" style="font-size:13px;color:#0f172a;line-height:1.42;margin-bottom:10px;font-weight:500;">${text}</div>
+            <div class="tw-meta" style="font-size:11px;color:#64748b;border-top:1px solid #f1f5f9;padding-top:8px;display:flex;gap:16px;">
+              <span><strong class="tw-retweets" style="color:#0f172a;">${retweets}</strong> Reposts</span>
+              <span><strong class="tw-likes" style="color:#0f172a;">${likes}</strong> Likes</span>
+            </div>
           </div>
         </div>`; } else if (tplId === 'money') {
       fxContainer.innerHTML = `<div class="tpl-money">
-          <div style="text-align:center"><div class="dollar">$127,450</div><div class="label">Monthly Revenue</div></div>
+          <div style="text-align:center"><div class="dollar">$127,450</div><div class="label money-label">Monthly Revenue</div></div>
         </div>`; } else if (tplId === 'glitch') {
       fxContainer.innerHTML = `<div class="tpl-glitch">
           <div class="glitch-text" data-text="THE TRUTH">THE TRUTH</div>
         </div>`; } else if (tplId === 'map') {
-      fxContainer.innerHTML = `<div class="tpl-map">
-          <div class="location-label">Chernobyl, Ukraine</div>
-          <div class="pin" style="font-size:26px;position:absolute;top:45%;left:50%;transform:translate(-50%,-100%);">📍</div>
-        </div>`; } else if (tplId === 'news') {
+      const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : {};
+      if (typeof window.tplBuildInvestigativeGlobeHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData);
+      } else {
+        fxContainer.innerHTML = `<div class="tpl-map"><div class="location-label">${mData.location || 'Chernobyl, Ukraine'}</div></div>`;
+      }
+    } else if (tplId === 'news') {
+      const nwData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('news') : {};
+      const ch = nwData.channel || 'WORLD NEWS LIVE';
+      const hl = nwData.headline || 'Tech Giant Announces Unprecedented Layoffs';
+      const sub = nwData.ticker || 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING • FEDERAL REGULATORS OPEN INQUIRY';
+      const bCol = nwData.bannerColor || '#dc2626';
       fxContainer.innerHTML = `<div class="tpl-news">
-          <div class="headline">Tech Giant Announces Layoffs</div>
-          <div class="ticker-wrap"><div class="ticker-red">LIVE</div><div class="ticker-body"><span class="ticker-text">Markets down 3% • CEO resigns</span></div></div>
+          <div class="news-top-bug"><span class="news-live-dot"></span><span>DIRECT FEED // HD</span></div>
+          <div class="chyron-stack">
+            <div class="chyron-upper" style="background:linear-gradient(90deg, ${bCol} 0%, #7f1d1d 100%);">
+              <span class="news-badge" style="background:transparent;padding:0;">${ch}</span>
+              <span>BREAKING REPORT</span>
+            </div>
+            <div class="headline" style="border-left-color:${bCol};">${hl}</div>
+            <div class="ticker-wrap">
+              <div class="ticker-red" style="background:${bCol};">LIVE</div>
+              <div class="ticker-body"><span class="ticker-text">${sub}</span></div>
+            </div>
+          </div>
         </div>`; } else if (tplId === 'quote') {
       fxContainer.innerHTML = `<div class="tpl-quote">
           <div class="quote-mark">“</div>
           <div class="quote-text">The obstacle is the way.</div>
           <div class="quote-author">— Marcus Aurelius</div>
         </div>`; } else if (tplId === 'polaroid') {
+      const polData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('polaroid') : {};
+      const p1 = polData.photo1 || '/hiker_background_inpainted.png';
+      const p2 = polData.photo2 || '/clean_mountain_backdrop.png';
+      const cap1 = polData.caption || 'First Office, 1994';
+      const cap2 = polData.caption2 || 'Archive Exhibit #04';
       fxContainer.innerHTML = `<div class="tpl-polaroid">
-          <div class="polaroid"><div class="photo" style="background:linear-gradient(135deg,#ff7a59,#7c5cff)"></div></div>
-          <div class="polaroid"><div class="photo" style="background:linear-gradient(135deg,#5cffdc,#4285F4)"></div></div>
+          <div class="polaroid"><div class="photo p1-img" style="background-image:url('${p1}')"></div><div class="polaroid-caption p1-cap">${cap1}</div></div>
+          <div class="polaroid"><div class="photo p2-img" style="background-image:url('${p2}')"></div><div class="polaroid-caption p2-cap">${cap2}</div></div>
         </div>`; } else if (tplId === 'comic') {
       fxContainer.innerHTML = `<div class="tpl-comic">
           <div class="pow">POW!</div>
@@ -25207,9 +25338,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="vhs-text">SUMMER 89</div>
         </div>`; } else if (tplId === 'progress') {
       fxContainer.innerHTML = `<div class="tpl-progress">
-          <div style="font-size:13px;font-weight:700;color:#fff;">Goal Progress</div>
-          <div class="prog-bar"><div class="prog-fill"></div></div>
-          <div class="prog-percent">100%</div>
+          <div class="prog-goal" style="font-size:13px;font-weight:700;color:#fff;">Goal Progress</div>
+          <div class="prog-bar"><div class="prog-fill prog-bar-fill"></div></div>
+          <div class="prog-percent prog-pct">100%</div>
         </div>`; } else if (tplId === 'scramble') {
       fxContainer.innerHTML = `<div class="tpl-scramble">
           <div class="scramble-text">ACCESS GRANTED</div>
@@ -25222,7 +25353,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       fxContainer.innerHTML = `<div class="tpl-instagram">
           <div class="ig-post">
             <div class="ig-header"><div class="ig-username">@creator</div></div>
-            <div class="ig-image"><div class="ig-heart">❤️</div></div>
+            <div class="ig-image"><div class="ig-heart"><svg width="42" height="42" viewBox="0 0 24 24" fill="#ef4444"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div></div>
           </div>
         </div>`; } else if (tplId === 'checklist') {
       fxContainer.innerHTML = `<div class="tpl-checklist">
@@ -25232,12 +25363,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="check-item"><div class="check-box">✓</div><div class="check-text">Edit video</div></div>
         </div>`;
     } else if (tplId === 'parallax') {
-      const isCustomFig = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg'));
-      const isCustomMtn = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl && !topCustomizerState.secondaryUrl.includes('data:image/svg'));
-      const figUrl = isCustomFig ? topCustomizerState.primaryUrl : '';
-      const mtnUrl = isCustomMtn ? topCustomizerState.secondaryUrl : '';
-      const figStyle = figUrl ? `style="clip-path: none; background: url('${figUrl}') center bottom/contain no-repeat; width: 140px; height: 180px;"` : '';
-      const mtnStyle = mtnUrl ? `style="clip-path: none; background: url('${mtnUrl}') center bottom/cover no-repeat;"` : '';
+      const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('parallax') : {};
+      const isCustomFig = (pData.figureImg && !pData.figureImg.includes('data:image/svg')) || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg'));
+      const isCustomMtn = (pData.mountainsImg && !pData.mountainsImg.includes('data:image/svg')) || (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl && !topCustomizerState.secondaryUrl.includes('data:image/svg'));
+      const figUrl = pData.figureImg || (isCustomFig ? topCustomizerState.primaryUrl : '/hiker_cutout_clean_final.png');
+      const mtnUrl = pData.mountainsImg || (isCustomMtn ? topCustomizerState.secondaryUrl : '/hiker_background_inpainted.png');
+      const figStyle = `style="clip-path: none; background: url('${figUrl}') center bottom/contain no-repeat; width: 165px; height: 86%;"`;
+      const mtnStyle = `style="clip-path: none; background: url('${mtnUrl}') center/cover no-repeat;"`;
       fxContainer.innerHTML = `<div class="tpl-parallax"><div class="layer layer-back"><div class="sun"></div></div><div class="layer layer-mid"><div class="mtn-back" ${mtnStyle}></div></div><div class="layer layer-front"><div class="mtn-front"></div><div class="figure" ${figStyle}></div></div></div>`;
     } else if (tplId === 'textbehind') {
       const data = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('textbehind') : { bgText: 'DREAM', textColor: '#ffffff' };
@@ -28504,9 +28636,24 @@ function openTopTemplateCustomizer(tpl) {
   const paperModeSwitcher = document.getElementById('paper-rip-mode-switcher');
   const paperModeVideo = document.getElementById('btn-paper-rip-mode-video');
   const paperMode3D = document.getElementById('btn-paper-rip-mode-3d');
-  if (paperModeSwitcher) paperModeSwitcher.style.display = tpl.id === 'paper-rip-shred' ? 'flex' : 'none';
+  const RELEVANT_3D_SWITCH_IDS = new Set([
+    'map', 'paper-rip-shred', 'parallax', 'zoom', 'textbehind', 'docheight',
+    'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
+    'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
+    'doc-highlighter-loupe-suite', 'og-parallax-depth-engine', 'spatial-3d-motion-suite',
+    'camera-rig-3d-orbit', 'z-space-layer-stack', 'extruded-3d-title-forge',
+    'volumetric-light-stage', 'floating-glass-cards-3d', 'isometric-device-showcase',
+    'portal-tunnel-zoom-3d'
+  ]);
+  const showStage3DSwitcher = RELEVANT_3D_SWITCH_IDS.has(tpl.id) || !!tpl.is3D;
+  if (paperModeSwitcher) paperModeSwitcher.style.display = showStage3DSwitcher ? 'flex' : 'none';
   const syncPaperModeButtons = () => {
-    const is3D = topCustomizerState.paperPreviewMode === '3d';
+    let is3D = topCustomizerState.paperPreviewMode === '3d';
+    if (tpl.id === 'map' && typeof window.tplGetContextualData === 'function') {
+      is3D = !!window.tplGetContextualData('map').is3DMode;
+    } else if (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)) {
+      is3D = true;
+    }
     [[paperModeVideo, !is3D], [paperMode3D, is3D]].forEach(([button, active]) => {
       if (!button) return;
       button.style.background = active ? 'rgba(168,85,247,.35)' : 'transparent';
@@ -28516,13 +28663,27 @@ function openTopTemplateCustomizer(tpl) {
   };
   if (paperModeVideo) paperModeVideo.onclick = () => {
     topCustomizerState.paperPreviewMode = 'video';
+    topCustomizerState.is3DMode = false;
+    if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('map', { is3DMode: false, drawOnScreenMode: false });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
+    }
+    const btn3dVid = document.getElementById('btn-3d-mode-video');
+    if (btn3dVid && tpl.id !== 'map') btn3dVid.click();
     syncPaperModeButtons();
-    renderTopTemplatePreviewStage();
+    if (tpl.id !== 'map') renderTopTemplatePreviewStage();
   };
   if (paperMode3D) paperMode3D.onclick = () => {
     topCustomizerState.paperPreviewMode = '3d';
+    topCustomizerState.is3DMode = true;
+    if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('map', { is3DMode: true, drawOnScreenMode: true });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
+    }
+    const btn3dInteractive = document.getElementById('btn-3d-mode-interactive');
+    if (btn3dInteractive && tpl.id !== 'map') btn3dInteractive.click();
     syncPaperModeButtons();
-    renderTopTemplatePreviewStage();
+    if (tpl.id !== 'map') renderTopTemplatePreviewStage();
   };
   syncPaperModeButtons();
 
@@ -28593,18 +28754,18 @@ function openTopTemplateCustomizer(tpl) {
   const pushWrapEl = document.getElementById('tpl-modal-push-controls');
   if (pushWrapEl) pushWrapEl.style.display = 'none';
   const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
-  if (atmosphereWrapEl) atmosphereWrapEl.style.display = 'flex';
+  if (atmosphereWrapEl) atmosphereWrapEl.style.display = tpl.id === 'map' ? 'none' : 'flex';
   const primWrapEl = document.getElementById('tpl-modal-wrap-primary');
-  if (primWrapEl) primWrapEl.style.display = 'flex';
+  if (primWrapEl) primWrapEl.style.display = tpl.id === 'map' ? 'none' : 'flex';
   const secWrapEl = document.getElementById('tpl-modal-wrap-secondary');
-  if (secWrapEl) secWrapEl.style.display = 'flex';
+  if (secWrapEl) secWrapEl.style.display = tpl.id === 'map' ? 'none' : 'flex';
   const txtWrapEl = document.getElementById('tpl-modal-wrap-text');
-  if (txtWrapEl) txtWrapEl.style.display = 'flex';
+  if (txtWrapEl) txtWrapEl.style.display = tpl.id === 'map' ? 'none' : 'flex';
 
-  // 3D Interactive Mode button & floating toolbar: scope to dark-power-sigil, 3D templates, or doc highlighter
+  // 3D Interactive Mode button & floating toolbar: scope to relevant 3D templates
   const btn3DMode = document.getElementById('btn-toggle-3d-interactive-mode');
   if (btn3DMode) {
-    btn3DMode.style.display = (tpl.id === 'dark-power-sigil' || tpl.is3D || tpl.id === 'doc-highlighter-loupe-suite') ? 'inline-flex' : 'none';
+    btn3DMode.style.display = showStage3DSwitcher ? 'inline-flex' : 'none';
   }
   const floatBar = document.getElementById('sigil-floating-layer-toolbar');
   if (floatBar) floatBar.style.display = 'none';
