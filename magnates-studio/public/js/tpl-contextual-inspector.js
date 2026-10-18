@@ -535,27 +535,37 @@
       const p = fxc.querySelector('.tpl-parallax');
       if (p) p.style.background = `linear-gradient(180deg, ${data.skyTop || '#1a1033'} 0%, #3d1f5c 50%, ${data.skyBottom || '#ff7a59'} 100%)`;
       
-      const figUrl = data.figureImg || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl);
-      if (figUrl) {
-        const fig = fxc.querySelector('.figure');
-        if (fig) {
+      const rawFig = data.figureImg || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl);
+      const isCustomFig = rawFig && !rawFig.includes('data:image/svg');
+      const fig = fxc.querySelector('.figure');
+      if (fig) {
+        if (isCustomFig) {
           fig.style.clipPath = 'none';
-          fig.style.background = `url("${figUrl}") center bottom/contain no-repeat`;
+          fig.style.background = `url("${rawFig}") center bottom/contain no-repeat`;
           fig.style.width = '140px';
           fig.style.height = '180px';
+        } else {
+          fig.style.clipPath = '';
+          fig.style.background = '#000';
+          fig.style.width = '40px';
+          fig.style.height = '80px';
         }
       }
-      const mtnUrl = data.mountainsImg || (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl);
-      if (mtnUrl) {
-        const mb = fxc.querySelector('.mtn-back');
-        if (mb) {
+      const rawMtn = data.mountainsImg || (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl);
+      const isCustomMtn = rawMtn && !rawMtn.includes('data:image/svg');
+      const mb = fxc.querySelector('.mtn-back');
+      if (mb) {
+        if (isCustomMtn) {
           mb.style.clipPath = 'none';
-          mb.style.background = `url("${mtnUrl}") center bottom/cover no-repeat`;
+          mb.style.background = `url("${rawMtn}") center bottom/cover no-repeat`;
+        } else {
+          mb.style.clipPath = '';
+          mb.style.background = '#2a1540';
         }
-        const mf = fxc.querySelector('.mtn-front');
-        if (mf && !data.keepFront) {
-          mf.style.opacity = '0.5';
-        }
+      }
+      const mf = fxc.querySelector('.mtn-front');
+      if (mf && !data.keepFront) {
+        mf.style.opacity = isCustomMtn ? '0.5' : '1';
       }
     } else if (tplId === 'wealth') {
       const title = fxc.querySelector('.w-title');

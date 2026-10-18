@@ -24881,8 +24881,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="check-item"><div class="check-box">✓</div><div class="check-text">Edit video</div></div>
         </div>`;
     } else if (tplId === 'parallax') {
-      const figUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl) ? topCustomizerState.primaryUrl : '';
-      const mtnUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl) ? topCustomizerState.secondaryUrl : '';
+      const isCustomFig = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg'));
+      const isCustomMtn = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl && !topCustomizerState.secondaryUrl.includes('data:image/svg'));
+      const figUrl = isCustomFig ? topCustomizerState.primaryUrl : '';
+      const mtnUrl = isCustomMtn ? topCustomizerState.secondaryUrl : '';
       const figStyle = figUrl ? `style="clip-path: none; background: url('${figUrl}') center bottom/contain no-repeat; width: 140px; height: 180px;"` : '';
       const mtnStyle = mtnUrl ? `style="clip-path: none; background: url('${mtnUrl}') center bottom/cover no-repeat;"` : '';
       fxContainer.innerHTML = `<div class="tpl-parallax"><div class="layer layer-back"><div class="sun"></div></div><div class="layer layer-mid"><div class="mtn-back" ${mtnStyle}></div></div><div class="layer layer-front"><div class="mtn-front"></div><div class="figure" ${figStyle}></div></div></div>`;
@@ -28093,6 +28095,14 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+    } else if (tpl.id === 'parallax') {
+      topCustomizerState.primaryUrl = '';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '';
+    } else if (typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(tpl.id)) {
+      topCustomizerState.primaryUrl = '';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '';
     } else if (tpl.defaultImage) {
       topCustomizerState.primaryUrl = tpl.defaultImage;
       topCustomizerState.secondaryUrl = tpl.secondaryImage || tpl.defaultImage;
@@ -28178,12 +28188,13 @@ function openTopTemplateCustomizer(tpl) {
   // 2. Populate Media inputs and thumbs
   const primaryThumb = document.getElementById('tpl-modal-thumb-primary');
   const primaryInput = document.getElementById('tpl-modal-url-primary');
-  if (primaryThumb) primaryThumb.src = topCustomizerState.primaryUrl;
-  if (primaryInput) primaryInput.value = topCustomizerState.primaryUrl;
+  const fallbackThumbP = (tpl.id === 'parallax') ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="%230b0d14"/><polygon points="10,28 16,6 22,28" fill="%2338bdf8"/></svg>' : (tpl.defaultImage || '');
+  if (primaryThumb) primaryThumb.src = topCustomizerState.primaryUrl || fallbackThumbP;
+  if (primaryInput) primaryInput.value = topCustomizerState.primaryUrl || '';
   const primaryFilename = document.getElementById('tpl-modal-filename-primary');
   if (primaryFilename) {
     const rawP = topCustomizerState.primaryUrl || '';
-    let cleanP = 'Subject Cutout';
+    let cleanP = (tpl.id === 'parallax') ? 'Foreground Silhouette' : 'Subject Cutout';
     if (rawP.startsWith('blob:')) cleanP = 'Uploaded Asset';
     else if (tpl.id === 'paper-rip-shred') cleanP = 'Paper Texture';
     else if (tpl.id === 'text-texturing-grunge') cleanP = 'Grunge Backdrop';
@@ -28193,8 +28204,9 @@ function openTopTemplateCustomizer(tpl) {
 
   const secondaryThumb = document.getElementById('tpl-modal-thumb-secondary');
   const secondaryInput = document.getElementById('tpl-modal-url-secondary');
-  if (secondaryThumb) secondaryThumb.src = topCustomizerState.secondaryUrl;
-  if (secondaryInput) secondaryInput.value = topCustomizerState.secondaryUrl;
+  const fallbackThumbS = (tpl.id === 'parallax') ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="%231a1033"/><polygon points="0,32 16,14 32,32" fill="%23c084fc"/></svg>' : (tpl.secondaryImage || tpl.defaultImage || '');
+  if (secondaryThumb) secondaryThumb.src = topCustomizerState.secondaryUrl || fallbackThumbS;
+  if (secondaryInput) secondaryInput.value = topCustomizerState.secondaryUrl || '';
   const secondaryFilename = document.getElementById('tpl-modal-filename-secondary');
   if (secondaryFilename) {
     const rawS = topCustomizerState.secondaryUrl || '';
