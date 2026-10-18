@@ -24982,13 +24982,59 @@ function bizStoryHoverMarkup(id) {
           <div class="sx-note">REROUTED VIA DUBAI · +$14M/YR</div>
         </div>`;
     case 'timeline-scrubber-map':
-      return `<div class="tsm-year"><span class="tsm-y-a">1990</span><span class="tsm-y-b">1999</span><span class="tsm-y-c">2008</span><span class="tsm-y-d">2017</span><span class="tsm-y-e">2026</span></div>
-        <div class="tsm-map">
-          <div class="tsm-land tsm-base"></div>
-          <div class="tsm-empire tsm-e1"></div><div class="tsm-empire tsm-e2"></div><div class="tsm-empire tsm-e3"></div><div class="tsm-empire tsm-e4"></div>
+      return `<div class="tsm-frame">
+        <div class="tsm-head">
+          <div class="tsm-kicker"><i></i><span>TERRITORY CONTROL · 1990—2026</span></div>
+          <div class="tsm-year" aria-hidden="true"><span class="tsm-d tsm-d-th"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>0</i></span><span class="tsm-d tsm-d-h"><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>0</i><i>1</i></span><span class="tsm-d tsm-d-t"><i>9</i><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i></span><span class="tsm-d tsm-d-o"><i>0</i><i>1</i><i>2</i><i>3</i><i>4</i><i>5</i><i>6</i><i>7</i><i>8</i><i>9</i><i>0</i></span></div>
+          <div class="tsm-sub"><b id="tsm-pct">3%</b> OF THE REGION<i>under single holding control</i></div>
         </div>
-        <div class="tsm-bar"><div class="tsm-fill"></div><div class="tsm-handle"></div></div>
-        <div class="tsm-ticks"><span>1990</span><span>2000</span><span>2010</span><span>2026</span></div>`;
+        <svg class="tsm-svg" viewBox="0 0 300 150" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <pattern id="tsmGrid" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M12 0H0V12" fill="none" stroke="rgba(148,163,184,.07)" stroke-width=".6"/></pattern>
+            <radialGradient id="tsmTerr" cx="38%" cy="38%" r="80%"><stop offset="0%" stop-color="#9d7bff"/><stop offset="60%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#4f2fd6"/></radialGradient>
+            <filter id="tsmGlow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#7c5cff" flood-opacity=".55"/></filter>
+          </defs>
+          <rect width="300" height="150" fill="url(#tsmGrid)"/>
+          <g class="tsm-lands" fill="#101d33" stroke="#1e3a5f" stroke-width=".8">
+            <path d="M18 26 L88 18 L104 52 L84 92 L30 84 L12 54 Z"/>
+            <path d="M112 14 L196 20 L210 58 L188 96 L124 90 L106 52 Z"/>
+            <path d="M220 22 L288 30 L282 78 L246 98 L214 74 L208 44 Z"/>
+            <path d="M40 104 L118 100 L136 128 L96 146 L46 138 Z"/>
+            <path d="M152 104 L232 108 L244 134 L196 148 L150 132 Z"/>
+          </g>
+          <path class="tsm-coast" d="M12 96 Q 60 100 100 98 T 210 102 T 292 96" fill="none" stroke="rgba(56,189,248,.14)" stroke-width=".8"/>
+          <path class="tsm-territory" filter="url(#tsmGlow)"
+                d="M150 56 L150 56 L150 56 L150 56 L150 56 L150 56 Z"
+                data-y1990="M150 56 L150 56 L150 56 L150 56 L150 56 L150 56 Z"
+                data-y1998="M146 50 L158 50 L162 58 L156 66 L146 64 L142 57 Z"
+                data-y2006="M132 40 L172 42 L182 58 L168 78 L138 74 L126 57 Z"
+                data-y2014="M104 26 L198 30 L216 58 L192 92 L120 86 L96 56 Z"
+                data-y2020="M60 22 L228 26 L248 60 L212 104 L96 98 L46 60 Z"
+                data-y2026="M22 18 L262 20 L284 58 L240 116 L60 112 L14 62 Z"/>
+          <g class="tsm-pin tsm-pin-1"><circle cx="150" cy="56" r="3.2"/><circle cx="150" cy="56" r="7" class="tsm-ring"/></g>
+          <g class="tsm-pin tsm-pin-2"><circle cx="176" cy="52" r="3.2"/><circle cx="176" cy="52" r="7" class="tsm-ring"/></g>
+          <g class="tsm-pin tsm-pin-3"><circle cx="120" cy="70" r="3.2"/><circle cx="120" cy="70" r="7" class="tsm-ring"/></g>
+          <text class="tsm-callout tsm-co-1" x="158" y="48">HQ</text>
+          <text class="tsm-callout tsm-co-2" x="184" y="44">EXPANSION I</text>
+          <text class="tsm-callout tsm-co-3" x="128" y="84">EXPANSION II</text>
+        </svg>
+        <div class="tsm-vignette"></div>
+        <div class="tsm-scrub">
+          <div class="tsm-track"><div class="tsm-fill"></div><div class="tsm-handle"><b></b></div></div>
+          <div class="tsm-marks">
+            <span style="left:0%"><i></i><em>1990</em></span>
+            <span style="left:31%"><i></i><em>2001</em></span>
+            <span style="left:54%"><i></i><em>2009</em></span>
+            <span style="left:77%"><i></i><em>2017</em></span>
+            <span style="left:100%"><i></i><em>2026</em></span>
+          </div>
+          <div class="tsm-events">
+            <span class="tsm-ev tsm-ev-1">IPO · NEW YORK</span>
+            <span class="tsm-ev tsm-ev-2">ACQUISITION WAR</span>
+            <span class="tsm-ev tsm-ev-3">PEAK EMPIRE</span>
+          </div>
+        </div>
+      </div>`;
     default:
       return '';
   }
@@ -26674,11 +26720,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!manual) {
     activeHoverCardEl = cardEl;
     hoverStartTime = performance.now();
+  } else if (manual.stage3D) {
+    // Biz-3D depth stage: keep the live animation loop running and drive it from real time.
+    manual.startMs = performance.now();
   }
 
   function animateHoverLoop(now) {
     const t = manual
-      ? manual.t * ((manual.fx && manual.fx.speed) || 1)
+      ? (manual.stage3D ? (performance.now() - (manual.startMs || performance.now())) / 1000 * ((manual.fx && manual.fx.speed) || 1) : manual.t * ((manual.fx && manual.fx.speed) || 1))
       : ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
     const _fx = manual ? Object.assign({ pitch: 0, yaw: 0, roll: 0, zoom: 1 }, manual.fx || {}) : ((hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 });
 
@@ -27463,6 +27512,48 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const hlProg = Math.min(100, Math.floor(((t * 1.2) % 1.5 / 1.5) * 100));
       const bar = fxContainer?.querySelector(`#fx-anim-hl-bar-${tplId}`);
       if (bar) bar.style.width = `${hlProg}%`;
+    } else if (tplId === 'timeline-scrubber-map') {
+      // JS-driven scrub: year counter + territory morph in perfect sync, eased like an NLE keyframe ramp
+      const DUR = 6.0;
+      const tt = t % DUR;
+      const p = Math.min(1, tt / (DUR - 0.7));            // reach 2026 slightly before loop end
+      const pe = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; // easeInOutCubic
+      const yearF = 1990 + pe * 36;
+      const yearI = Math.round(yearF);
+      const cont = fxContainer;
+      if (cont) {
+        // odometer digits (thousands digit static during 1990-2026 range)
+        const dH = cont.querySelector('.tsm-d-h'), dT = cont.querySelector('.tsm-d-t'), dO = cont.querySelector('.tsm-d-o');
+        const H = Math.floor(yearI / 100) % 10, T = Math.floor(yearI / 10) % 10, O = yearI % 10;
+        if (dH) dH.style.transform = `translateY(${-H * 10}%)`;
+        if (dT) dT.style.transform = `translateY(${-T * 10}%)`;
+        if (dO) dO.style.transform = `translateY(${-O * 10}%)`;
+        // territory morph between year keyframes
+        const terr = cont.querySelector('.tsm-territory');
+        if (terr) {
+          const keys = [1990, 1998, 2006, 2014, 2020, 2026];
+          let k0 = keys[0], k1 = keys[keys.length - 1];
+          for (let i = 0; i < keys.length - 1; i++) { if (yearF >= keys[i] && yearF <= keys[i + 1]) { k0 = keys[i]; k1 = keys[i + 1]; break; } }
+          const seg = k1 === k0 ? 1 : (yearF - k0) / (k1 - k0);
+          const pa = terr.getAttribute('data-y' + k0), pb = terr.getAttribute('data-y' + k1);
+          if (pa && pb) {
+            const na = pa.match(/-?\d+(\.\d+)?/g).map(Number), nb = pb.match(/-?\d+(\.\d+)?/g).map(Number);
+            let d = 'M';
+            for (let i = 0; i < Math.min(na.length, nb.length); i += 2) {
+              const x = na[i] + (nb[i] - na[i]) * seg, y = na[i + 1] + (nb[i + 1] - na[i + 1]) * seg;
+              d += (i ? ' L' : '') + x.toFixed(1) + ' ' + y.toFixed(1);
+            }
+            terr.setAttribute('d', d + ' Z');
+          }
+        }
+        // stat counter
+        const pctEl = cont.querySelector('#tsm-pct');
+        if (pctEl) pctEl.textContent = Math.round(3 + pe * 94) + '%';
+        // scrub bar fill + handle
+        const fill = cont.querySelector('.tsm-fill'), hnd = cont.querySelector('.tsm-handle');
+        if (fill) fill.style.width = (pe * 100).toFixed(2) + '%';
+        if (hnd) hnd.style.left = (pe * 100).toFixed(2) + '%';
+      }
     } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
@@ -27481,8 +27572,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     if (!manual) activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
   }
 
-  if (manual) return (tt) => { manual.t = tt; animateHoverLoop(0); };
+  if (manual) { if (!manual.stage3D) return (tt) => { manual.t = tt; animateHoverLoop(0); }; }
   activeHoverAnimFrame = requestAnimationFrame(animateHoverLoop);
+  if (manual && manual.stage3D) return (tt) => { /* driven by real time */ };
 }
 
 function stopTemplateHoverVideo(cardEl, tpl) {
