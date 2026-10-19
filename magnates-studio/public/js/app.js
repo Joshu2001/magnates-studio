@@ -23608,7 +23608,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Matrix-style text scramble reveal. Great for tech/cybersecurity content.',
     tags: ['Text & Titles', 'Text Scramble / Hacker', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sc" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sc)"/><text x="200" y="125" fill="#5cff8a" font-family="'Courier New', monospace" font-weight="900" font-size="30" letter-spacing="2" text-anchor="middle">ACCESS GRANTED</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-sc" cx="50%" cy="50%" r="65%"><stop offset="0%" stop-color="#0a2014"/><stop offset="65%" stop-color="#040c07"/><stop offset="100%" stop-color="#010402"/></radialGradient><linearGradient id="sc-hdr" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#021a0f"/><stop offset="100%" stop-color="#08291a"/></linearGradient><filter id="sc-glow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00ff88" flood-opacity="0.75"/></filter><pattern id="sc-lines" width="4" height="4" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="4" y2="0" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></pattern></defs><rect width="400" height="225" fill="url(#bg-sc)"/><rect width="400" height="225" fill="url(#sc-lines)"/><g transform="translate(24, 22)"><rect width="352" height="181" rx="6" fill="rgba(3,8,5,0.92)" stroke="rgba(0,255,136,0.5)" stroke-width="1.2"/><rect width="352" height="22" rx="6" fill="url(#sc-hdr)"/><circle cx="12" cy="11" r="3.2" fill="#ef4444"/><circle cx="21" cy="11" r="3.2" fill="#f59e0b"/><circle cx="30" cy="11" r="3.2" fill="#10b981"/><text x="40" y="14" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700" letter-spacing="0.8">ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]</text><rect x="290" y="4" width="54" height="14" rx="2.5" fill="rgba(0,255,136,0.18)" stroke="rgba(0,255,136,0.4)" stroke-width="0.8"/><text x="317" y="14" fill="#00ff88" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="900" letter-spacing="1" text-anchor="middle">DECRYPT</text><text x="18" y="48" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" letter-spacing="0.5">&gt; EXEC_OVERRIDE // DECRYPT_STREAM:</text><text x="18" y="70" fill="rgba(0,255,136,0.4)" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" letter-spacing="1.5">[ 0x7F | %$#@!*&amp; // CIPHER_CYCLE ]</text><g filter="url(#sc-glow)"><text x="176" y="116" fill="#00ff88" font-family="'JetBrains Mono', 'Courier New', monospace" font-weight="900" font-size="25" letter-spacing="2.5" text-anchor="middle">ACCESS GRANTED</text></g><rect x="306" y="98" width="4" height="20" fill="#00ff88"/><line x1="16" y1="148" x2="336" y2="148" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4, 3"/><text x="18" y="166" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="7.5" letter-spacing="0.4">IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050</text><text x="334" y="166" fill="#00ff88" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="800" text-anchor="end">STATUS: OK</text></g></svg>`)}`
   },
   {
     id: 'newspaper',
@@ -25087,6 +25087,97 @@ window.tplRenderUniversalBgLayer = function (data, fallbackBgStyle) {
   return `<div class="tpl-universal-bg-layer"></div>`;
 };
 
+window.tplBuildScrambleHtml = function (data) {
+  const d = data || {};
+  const targetText = d.text !== undefined ? String(d.text) : 'ACCESS GRANTED';
+  const neonColor = d.color || '#00ff88';
+  const headerTag = d.headerTag || 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]';
+  const subText = d.subText || 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050';
+  const showScanlines = d.showScanlines !== false;
+  const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(d) : '';
+
+  return `
+    <div class="tpl-scramble" style="--scramble-col: ${neonColor}; --scramble-glow: ${neonColor}99; --scramble-dim: ${neonColor}26;">
+      ${bgLayerHtml}
+      ${showScanlines ? '<div class="scramble-scanlines"></div>' : ''}
+      <div class="scramble-vignette"></div>
+      <div class="scramble-terminal">
+        <div class="scramble-header">
+          <div class="scramble-header-left">
+            <div class="scramble-dots">
+              <span class="scramble-dot red"></span>
+              <span class="scramble-dot yellow"></span>
+              <span class="scramble-dot green"></span>
+            </div>
+            <span class="scramble-node-tag">${headerTag}</span>
+          </div>
+          <div class="scramble-header-right">
+            <span class="scramble-live-badge">DECRYPTING</span>
+          </div>
+        </div>
+        <div class="scramble-body">
+          <div class="scramble-prompt-line">
+            <span class="scramble-prompt">&gt; EXEC_OVERRIDE // DECRYPT_STREAM:</span>
+          </div>
+          <div class="scramble-main-text">
+            <span class="scramble-chars" data-target="${targetText.replace(/"/g, '&quot;')}">${targetText}</span><span class="scramble-cursor">_</span>
+          </div>
+          <div class="scramble-telemetry">
+            <span class="scramble-subtext">${subText}</span>
+            <span style="color: var(--scramble-col); font-weight: 700; opacity: 0.85;">STATUS: OK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+window.tplTriggerScrambleAnimation = function (rootEl, data) {
+  if (!rootEl) return;
+  const charsEl = rootEl.querySelector('.scramble-chars');
+  if (!charsEl) return;
+  const targetText = (data && data.text !== undefined) ? String(data.text) : (charsEl.dataset.target || 'ACCESS GRANTED');
+  charsEl.dataset.target = targetText;
+
+  if (charsEl._scrambleTimer) {
+    clearInterval(charsEl._scrambleTimer);
+    charsEl._scrambleTimer = null;
+  }
+
+  const GLYPHS = '!<>-_\\/[]{}—=+*^?#________0123456789ABCDEF!@#$%&*';
+  const speed = (data && data.scrambleSpeed) || 'normal';
+  const intervalMs = speed === 'fast' ? 22 : (speed === 'slow' ? 50 : 32);
+  const totalFrames = speed === 'fast' ? 16 : (speed === 'slow' ? 36 : 24);
+
+  let frame = 0;
+  const len = targetText.length;
+
+  charsEl._scrambleTimer = setInterval(() => {
+    frame++;
+    let output = '';
+    const progress = frame / totalFrames;
+    const resolvedCount = Math.floor(progress * len);
+
+    for (let i = 0; i < len; i++) {
+      if (targetText[i] === ' ') {
+        output += ' ';
+      } else if (i < resolvedCount) {
+        output += targetText[i];
+      } else {
+        output += GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+      }
+    }
+
+    charsEl.textContent = output;
+
+    if (frame >= totalFrames) {
+      clearInterval(charsEl._scrambleTimer);
+      charsEl._scrambleTimer = null;
+      charsEl.textContent = targetText;
+    }
+  }, intervalMs);
+};
+
 const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly']);
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
@@ -25450,9 +25541,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="prog-bar"><div class="prog-fill prog-bar-fill"></div></div>
           <div class="prog-percent prog-pct">100%</div>
         </div>`; } else if (tplId === 'scramble') {
-      fxContainer.innerHTML = `<div class="tpl-scramble">
-          <div class="scramble-text">ACCESS GRANTED</div>
-        </div>`; } else if (tplId === 'newspaper') {
+      const scData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scramble') : {};
+      fxContainer.innerHTML = window.tplBuildScrambleHtml ? window.tplBuildScrambleHtml(scData) : `<div class="tpl-scramble"><div class="scramble-text">ACCESS GRANTED</div></div>`;
+      if (typeof window.tplTriggerScrambleAnimation === 'function') {
+        window.tplTriggerScrambleAnimation(fxContainer, scData);
+      }
+    } else if (tplId === 'newspaper') {
       fxContainer.innerHTML = `<div class="tpl-newspaper">
           <div class="paper-name">THE DAILY TIMES</div>
           <div class="headline">HISTORIC DISCOVERY SHOCKS WORLD</div>

@@ -104,8 +104,8 @@
       return;
     }
     toolbar.style.display = 'flex';
-    const fgCandidate = stage.querySelector('.tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
-    const textCandidate = stage.querySelector('.zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
+    const fgCandidate = stage.querySelector('.scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const textCandidate = stage.querySelector('.scramble-main-text, .zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
     const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
 
     // Direct independent pointer dragging for Polaroid #1 and Polaroid #2 on stage
@@ -166,9 +166,9 @@
 
       if (targetType === 'text') {
         const textData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tplId) : {};
-        const curFont = textData.fontFamily || textData.titleFont || "'Space Grotesk', sans-serif";
-        const curSize = textData.fontSize || textData.titleSize || 32;
-        const curColor = textData.textColor || textData.titleColor || textData.nameColor || '#ffffff';
+        const curFont = textData.fontFamily || textData.titleFont || (tplId === 'scramble' ? "'JetBrains Mono', monospace" : "'Space Grotesk', sans-serif");
+        const curSize = textData.fontSize || textData.titleSize || (tplId === 'scramble' ? 36 : 32);
+        const curColor = textData.color || textData.textColor || textData.titleColor || textData.nameColor || (tplId === 'scramble' ? '#00ff88' : '#ffffff');
         const fonts = [
           { label: 'Space Grotesk', val: "'Space Grotesk', sans-serif" },
           { label: 'Impact', val: 'Impact, sans-serif' },
@@ -219,7 +219,7 @@
           renderToolbar();
         });
         toolbar.querySelector('#stage-tb-color')?.addEventListener('input', (e) => {
-          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { textColor: e.target.value, titleColor: e.target.value, nameColor: e.target.value });
+          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { color: e.target.value, textColor: e.target.value, titleColor: e.target.value, nameColor: e.target.value });
         });
         toolbar.querySelector('#stage-tb-depth')?.addEventListener('click', () => {
           const ord = textData.layerOrder === 'front' ? 'behind' : 'front';

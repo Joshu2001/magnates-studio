@@ -374,7 +374,12 @@
     'scramble': {
       type: 'scramble',
       text: 'ACCESS GRANTED',
-      color: '#00ff88'
+      color: '#00ff88',
+      headerTag: 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]',
+      subText: 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050',
+      scrambleSpeed: 'normal',
+      showScanlines: true,
+      bgPreset: 'default'
     },
 
     // 33. Newspaper Headline
@@ -2069,6 +2074,52 @@
       const g = fxc.querySelector('.prog-goal'); if (g) g.textContent = data.goal;
       const p = fxc.querySelector('.prog-pct'); if (p) p.textContent = data.percent;
       const b = fxc.querySelector('.prog-bar-fill'); if (b) b.style.width = data.percent;
+    } else if (tplId === 'scramble') {
+      let root = fxc.querySelector('.tpl-scramble');
+      if (!root) {
+        fxc.innerHTML = window.tplBuildScrambleHtml ? window.tplBuildScrambleHtml(data) : '';
+        root = fxc.querySelector('.tpl-scramble');
+      }
+      if (root) {
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+        const color = data.color || '#00ff88';
+        root.style.setProperty('--scramble-col', color);
+        root.style.setProperty('--scramble-glow', color + '99');
+        root.style.setProperty('--scramble-dim', color + '26');
+
+        const scan = root.querySelector('.scramble-scanlines');
+        if (scan) {
+          scan.style.display = (data.showScanlines === false) ? 'none' : '';
+        }
+
+        const nodeTag = root.querySelector('.scramble-node-tag');
+        if (nodeTag && data.headerTag !== undefined) nodeTag.textContent = data.headerTag;
+
+        const subTextEl = root.querySelector('.scramble-subtext');
+        if (subTextEl && data.subText !== undefined) subTextEl.textContent = data.subText;
+
+        const mainTextEl = root.querySelector('.scramble-main-text');
+        if (mainTextEl) {
+          if (data.fontFamily) mainTextEl.style.fontFamily = data.fontFamily;
+          if (data.fontSize) mainTextEl.style.fontSize = `${data.fontSize}px`;
+        }
+
+        const charsEl = root.querySelector('.scramble-chars');
+        if (charsEl) {
+          const prevTarget = charsEl.dataset.target;
+          const newTarget = data.text !== undefined ? String(data.text) : (prevTarget || 'ACCESS GRANTED');
+          if (prevTarget !== newTarget) {
+            charsEl.dataset.target = newTarget;
+            if (typeof window.tplTriggerScrambleAnimation === 'function') {
+              window.tplTriggerScrambleAnimation(root, data);
+            } else {
+              charsEl.textContent = newTarget;
+            }
+          }
+        }
+      }
     } else if (tplId === 'creditscore') {
       const sc = fxc.querySelector('.cs-score'); if (sc) sc.textContent = data.score;
       const r = fxc.querySelector('.cs-rating'); if (r) { r.textContent = data.rating; r.style.color = data.color; }
@@ -4511,6 +4562,148 @@
         };
       });
       window.tplWireUniversalBgControls('security-camera', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: TEXT SCRAMBLE / DARK WEB TERMINAL (scramble)
+    // =========================================================================
+    if (tplId === 'scramble') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      const curCol = data.color || '#00ff88';
+      const curSpeed = data.scrambleSpeed || 'normal';
+
+      const CYBER_THEMES = [
+        { label: 'Matrix Green', col: '#00ff88', dot: '#00ff88' },
+        { label: 'Cyber Cyan', col: '#00e5ff', dot: '#00e5ff' },
+        { label: 'Breach Red', col: '#ff3366', dot: '#ff3366' },
+        { label: 'Amber Gold', col: '#ffb700', dot: '#ffb700' }
+      ];
+
+      container.innerHTML = `
+        <div style="background: rgba(4,10,7,0.75); border: 1px solid rgba(0,255,136,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 0 20px rgba(0,255,136,0.08);">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">💻</span>
+              <span style="font-size: 11px; font-weight: 800; color: #00ff88; text-transform: uppercase; letter-spacing: 0.5px;">Hacker Terminal &amp; Text Scramble</span>
+            </div>
+            <span style="font-size: 9px; color: #00ff88; font-weight: 800; background: rgba(0,255,136,0.18); border: 1px solid rgba(0,255,136,0.35); padding: 2px 6px; border-radius: 4px;">TOP PRIORITY</span>
+          </div>
+
+          <!-- Target Decipher Text -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Target Decrypt Text</span>
+              <span style="font-size: 8.5px; color: #64748b; font-family: monospace;">[MAIN STREAM]</span>
+            </div>
+            <input type="text" id="scramble-inp-text" value="${(data.text || 'ACCESS GRANTED').replace(/"/g, '&quot;')}" placeholder="e.g. ACCESS GRANTED" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,255,136,0.4); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,255,136,0.12);" />
+          </div>
+
+          <!-- Terminal Header Tag & Telemetry Subtext -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Terminal Node / Header</span>
+              <input type="text" id="scramble-inp-header" value="${(data.headerTag || 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #94a3b8; font-family: monospace; font-size: 10px;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Sub-Telemetry Readout</span>
+              <input type="text" id="scramble-inp-sub" value="${(data.subText || 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #64748b; font-family: monospace; font-size: 9.5px;" />
+            </div>
+          </div>
+
+          <!-- Color & Cyber Presets -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Cyber Glow Color</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <input type="color" id="scramble-inp-col" value="${curCol}" style="width: 22px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Custom Color" />
+                <span style="font-size: 9.5px; font-family: monospace; color: ${curCol}; font-weight: 800;">${curCol.toUpperCase()}</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+              ${CYBER_THEMES.map(th => {
+                const active = curCol.toLowerCase() === th.col.toLowerCase();
+                return `
+                  <button type="button" class="scramble-col-preset" data-col="${th.col}" style="display: flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 5px; border-radius: 5px; border: 1px solid ${active ? th.col : 'rgba(255,255,255,0.1)'}; background: ${active ? th.col + '22' : 'rgba(0,0,0,0.4)'}; color: ${active ? '#fff' : '#94a3b8'}; font-size: 9px; font-weight: 700; cursor: pointer;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: ${th.dot};"></span>
+                    <span>${th.label.split(' ')[0]}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Speed & Toggles -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px; align-items: center;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Scramble Speed</span>
+              <div style="display: flex; gap: 3px;">
+                ${[
+                  { id: 'fast', label: 'Fast' },
+                  { id: 'normal', label: 'Normal' },
+                  { id: 'slow', label: 'Cinematic' }
+                ].map(s => `
+                  <button type="button" class="scramble-speed-btn" data-speed="${s.id}" style="flex: 1; padding: 4px 2px; border-radius: 4px; border: 1px solid ${curSpeed === s.id ? '#00ff88' : 'rgba(255,255,255,0.1)'}; background: ${curSpeed === s.id ? 'rgba(0,255,136,0.2)' : 'rgba(0,0,0,0.4)'}; color: ${curSpeed === s.id ? '#fff' : '#94a3b8'}; font-size: 9px; font-weight: 700; cursor: pointer;">${s.label}</button>
+                `).join('')}
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; justify-content: flex-end; padding-top: 14px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="scramble-inp-scan" ${data.showScanlines !== false ? 'checked' : ''} style="accent-color: #00ff88;" />
+                CRT Scanlines
+              </label>
+            </div>
+          </div>
+
+          <!-- Re-trigger button -->
+          <button type="button" id="scramble-btn-retrigger" style="display: flex; align-items: center; justify-content: center; gap: 6px; background: linear-gradient(135deg, rgba(0,255,136,0.2), rgba(0,229,255,0.2)); border: 1px solid rgba(0,255,136,0.5); border-radius: 6px; padding: 6px 10px; color: #00ff88; font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em;">
+            <span>⚡ Re-Trigger Decryption Stream</span>
+          </button>
+
+          <!-- Studio Background & Video B-Roll Suite -->
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+
+      // Wire controls
+      container.querySelector('#scramble-inp-text')?.addEventListener('input', e => {
+        window.tplSetContextualData('scramble', { text: e.target.value });
+      });
+      container.querySelector('#scramble-inp-header')?.addEventListener('input', e => {
+        window.tplSetContextualData('scramble', { headerTag: e.target.value });
+      });
+      container.querySelector('#scramble-inp-sub')?.addEventListener('input', e => {
+        window.tplSetContextualData('scramble', { subText: e.target.value });
+      });
+      container.querySelector('#scramble-inp-col')?.addEventListener('input', e => {
+        window.tplSetContextualData('scramble', { color: e.target.value });
+      });
+      container.querySelector('#scramble-inp-col')?.addEventListener('change', () => {
+        window.tplRenderContextualInspector('scramble');
+      });
+      container.querySelectorAll('.scramble-col-preset').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('scramble', { color: btn.dataset.col });
+          window.tplRenderContextualInspector('scramble');
+        };
+      });
+      container.querySelectorAll('.scramble-speed-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('scramble', { scrambleSpeed: btn.dataset.speed });
+          window.tplRenderContextualInspector('scramble');
+        };
+      });
+      container.querySelector('#scramble-inp-scan')?.addEventListener('change', e => {
+        window.tplSetContextualData('scramble', { showScanlines: e.target.checked });
+      });
+      container.querySelector('#scramble-btn-retrigger')?.addEventListener('click', () => {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.tplTriggerScrambleAnimation === 'function') {
+          window.tplTriggerScrambleAnimation(stage, window.tplGetContextualData('scramble'));
+        }
+      });
+      window.tplWireUniversalBgControls('scramble', container);
       return;
     }
 
