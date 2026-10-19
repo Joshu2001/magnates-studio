@@ -1529,10 +1529,12 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
 
       ctx.drawImage(maskCanvas, dx, dy, finalW, finalH);
 
-      // Vox-Style Whiteout: Magnified (1.08x) crisp focal block with realistic drop shadow
-      if (isWhiteout && (targetClip._loadedElement || targetClip.cutoutCanvas) && maxDim > 0.1) {
+      // Vox-Style Whiteout: Option A (1.04x pop + drop shadow + leader line) OR Option B (Flat 1:1 Dim-Only Focus)
+      const popScale = spot.focusScale !== undefined ? spot.focusScale : (targetClip.docFocusScale !== undefined ? targetClip.docFocusScale : 1.0);
+      const hasLeaderLine = spot.leaderLine !== undefined ? spot.leaderLine : (targetClip.docLeaderLine !== false && popScale > 1.01);
+      
+      if (isWhiteout && (targetClip._loadedElement || targetClip.cutoutCanvas) && maxDim > 0.1 && popScale > 1.01) {
         const docElem = targetClip._loadedElement || targetClip.cutoutCanvas;
-        const popScale = spot.focusScale || targetClip.docFocusScale || 1.08;
         const fCenterX = fx + fw / 2;
         const fCenterY = fy + fh / 2;
         
@@ -1544,8 +1546,8 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
 
         // Soft document paper drop shadow
         ctx.shadowColor = 'rgba(15, 23, 42, 0.22)';
-        ctx.shadowBlur = 24 * (finalW / 1280);
-        ctx.shadowOffsetY = 10 * (finalH / 720);
+        ctx.shadowBlur = 20 * (finalW / 1280);
+        ctx.shadowOffsetY = 8 * (finalH / 720);
 
         // Clip to sharp rectangular focal window and draw original document 100% sharp
         ctx.save();
@@ -1556,35 +1558,37 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
         ctx.drawImage(docElem, dx, dy, finalW, finalH);
         ctx.restore();
 
-        // Leader line and metadata callout tag ([EXHIBIT C // PARAGRAPH 4])
-        const calloutTag = spot.calloutTag || targetClip.docCalloutTag || '[EXHIBIT C // PARAGRAPH 4]';
-        const tagX = fx + fw - 20;
-        const tagY = Math.max(dy + 20, fy - 36);
+        if (hasLeaderLine) {
+          // Leader line and metadata callout tag ([EXHIBIT C // PARAGRAPH 4])
+          const calloutTag = spot.calloutTag || targetClip.docCalloutTag || '[EXHIBIT C // PARAGRAPH 4]';
+          const tagX = fx + fw - 20;
+          const tagY = Math.max(dy + 20, fy - 36);
 
-        ctx.shadowColor = 'transparent';
-        ctx.strokeStyle = '#0f172a';
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.moveTo(fx + fw * 0.78, fy);
-        ctx.lineTo(tagX, tagY + 12);
-        ctx.lineTo(tagX + 28, tagY + 12);
-        ctx.stroke();
+          ctx.shadowColor = 'transparent';
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(fx + fw * 0.78, fy);
+          ctx.lineTo(tagX, tagY + 12);
+          ctx.lineTo(tagX + 28, tagY + 12);
+          ctx.stroke();
 
-        ctx.fillStyle = '#0f172a';
-        ctx.beginPath();
-        ctx.arc(fx + fw * 0.78, fy, 2.5, 0, Math.PI * 2);
-        ctx.fill();
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(fx + fw * 0.78, fy, 2.5, 0, Math.PI * 2);
+          ctx.fill();
 
-        ctx.font = '700 10.5px monospace';
-        const tW = ctx.measureText(calloutTag).width;
-        ctx.fillStyle = '#0f172a';
-        if (ctx.roundRect) ctx.roundRect(tagX + 28, tagY, tW + 14, 22, 2);
-        else ctx.rect(tagX + 28, tagY, tW + 14, 22);
-        ctx.fill();
+          ctx.font = '700 10.5px monospace';
+          const tW = ctx.measureText(calloutTag).width;
+          ctx.fillStyle = '#0f172a';
+          if (ctx.roundRect) ctx.roundRect(tagX + 28, tagY, tW + 14, 22, 2);
+          else ctx.rect(tagX + 28, tagY, tW + 14, 22);
+          ctx.fill();
 
-        ctx.fillStyle = '#f8fafc';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(calloutTag, tagX + 35, tagY + 11);
+          ctx.fillStyle = '#f8fafc';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(calloutTag, tagX + 35, tagY + 11);
+        }
 
         ctx.restore();
       }
@@ -24684,14 +24688,27 @@ id: 'map',
   },
   {
     id: 'anim-whiteout-fade',
-    title: 'Whiteout Fade Focus (Document Dimmer)',
+    title: 'Whiteout Fade Focus (Pop & Leader Line)',
     category: 'Animations',
     badge: 'Vox Newspaper Style',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(244, 244, 242, 0.95), rgba(226, 222, 208, 0.7), rgba(15, 23, 42, 0.9))',
-    description: 'Vox-style investigative document whiteout: fades ambient text into high-contrast off-white paper canvas (#F4F4F2) while isolating key quotes at 1.08x scale.',
+    description: 'Vox-style investigative document whiteout: fades ambient text into high-contrast off-white paper canvas (#F4F4F2) while isolating key quotes at 1.08x scale with dynamic leader line callout.',
     tags: ['Whiteout Fade', 'Document Focus', 'Vox Style', 'Redaction', 'Investigative', 'Animation'],
+    defaultImage: '/sec_audit_confidential_document.svg',
+    secondaryImage: '/sec_audit_confidential_document.svg'
+  },
+  {
+    id: 'anim-document-dim-focus',
+    title: 'Document Ambient Dim Focus (Flat 1:1 Isolation)',
+    category: 'Animations',
+    badge: 'Documentary Signature',
+    difficulty: '1-Click',
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(241, 236, 224, 0.95), rgba(213, 205, 185, 0.7), rgba(15, 23, 42, 0.9))',
+    description: 'Pure documentary whiteout/dimming: the non-focused document softly dims out in place while target text stays 100% sharp and flat with zero scale distortion or zoom.',
+    tags: ['Document Dim', 'Whiteout Focus', 'Flat Isolation', 'No Zoom', 'Investigative', 'Animation'],
     defaultImage: '/sec_audit_confidential_document.svg',
     secondaryImage: '/sec_audit_confidential_document.svg'
   },
@@ -25658,7 +25675,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'document-3d-fx-engine']);
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
@@ -26257,8 +26274,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="interview-film-grain"></div>
           <div class="interview-lowerthird-wrap">
             <div class="interview-meta-tab">
-              <span class="interview-meta-slashes" style="color: ${accentColor};">//</span>
-              <span class="interview-meta-text">${metaTag}</span>
+              <div class="interview-meta-slashes">
+                <span class="interview-slash-bar" style="background: linear-gradient(180deg, ${accentColor} 0%, #ff2a2a 100%); box-shadow: 0 0 6px ${accentColor};"></span>
+                <span class="interview-slash-bar" style="background: linear-gradient(180deg, ${accentColor} 0%, #ff2a2a 100%); box-shadow: 0 0 6px ${accentColor};"></span>
+              </div>
+              <span class="interview-meta-text">${(() => {
+                if (typeof metaTag === 'string' && metaTag.includes('/')) {
+                  const parts = metaTag.split('/');
+                  return `${parts[0].trim()}<span class="interview-meta-divider">/</span>${parts.slice(1).join('/').trim()}`;
+                }
+                return metaTag;
+              })()}</span>
             </div>
             <div class="interview-glass-bar">
               <div class="interview-shimmer-edge"></div>
@@ -26595,8 +26621,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           });
         }
       }
-        } else if (tplId === 'newspaper-3d') {
-      const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('newspaper-3d') : {};
+        } else if (tplId === 'newspaper-3d' || tplId === 'document-3d-fx-engine') {
+      const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tplId) : {};
       const stylePreset = npData.stylePreset || 'scandal';
       const masthead = npData.masthead || 'THE DAILY TIMES';
       const headline = npData.headline || 'MAJOR SCANDAL\nEXPOSED';
@@ -28360,28 +28386,39 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>
       </div>
     `;
-  } else if (tplId === 'anim-whiteout-fade') {
+  } else if (tplId === 'anim-whiteout-fade' || tplId === 'anim-document-dim-focus') {
+      const isDimOnly = tplId === 'anim-document-dim-focus';
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #f4f4f2; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 1200px;">
-          <!-- Realistic Document Base Canvas with 3D Orthographic Tilt and Push-In -->
-          <div id="fx-anim-doc-tilt-${tplId}" style="position: absolute; inset: -4%; width: 108%; height: 108%; transform: perspective(1000px) rotateX(4deg) scale(1.02); transform-origin: 40% 40%; transition: transform 0.1s linear;">
+        <div style="position: absolute; inset: 0; background: #f4f4f2; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: ${isDimOnly ? 'none' : '1200px'};">
+          <div id="fx-anim-doc-tilt-${tplId}" style="position: absolute; inset: 0; width: 100%; height: 100%; transform: ${isDimOnly ? 'none' : 'perspective(1000px) rotateX(4deg) scale(1.02)'}; transform-origin: 50% 50%; transition: transform 0.1s linear;">
             <img src="${tpl.defaultImage || '/sec_audit_confidential_document.svg'}" style="width: 100%; height: 100%; object-fit: contain; filter: contrast(1.08) brightness(0.99);" />
             <!-- Organic White Paper Matte Overlay Fading Ambient Document Text to 10% Opacity (#F4F4F2 Canvas) -->
-            <div id="fx-anim-white-overlay-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle 380px at 45% 42%, rgba(244, 244, 242, 0.88) 0%, rgba(244, 244, 242, 0.94) 85%); pointer-events: none; z-index: 2;"></div>
-            <!-- High-Contrast Focal Window: 1.08x Scale Pop, Drop Shadow, Clean Cutout Zero Vector Borders -->
-            <div id="fx-anim-focal-window-${tplId}" style="position: absolute; top: 31.5%; left: 6.5%; width: 87%; height: 26%; overflow: hidden; pointer-events: none; z-index: 4; transform: scale(1.08); transform-origin: center center; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22), 0 2px 6px rgba(15, 23, 42, 0.12); border-radius: 2px;">
-              <img src="${tpl.defaultImage || '/sec_audit_confidential_document.svg'}" style="position: absolute; top: -121%; left: -7.5%; width: 115%; height: 415%; object-fit: contain; filter: contrast(1.12) brightness(1.01);" />
+            <div id="fx-anim-white-overlay-${tplId}" style="position: absolute; inset: 0; pointer-events: none; z-index: 2;
+              background: linear-gradient(to bottom, rgba(244,244,242,0.88) 0%, rgba(244,244,242,0.88) 36.5%, transparent 37%, transparent 61%, rgba(244,244,242,0.88) 61.5%, rgba(244,244,242,0.88) 100%),
+                          linear-gradient(to right, rgba(244,244,242,0.88) 0%, rgba(244,244,242,0.88) 19%, transparent 19.5%, transparent 80.5%, rgba(244,244,242,0.88) 81%, rgba(244,244,242,0.88) 100%);">
             </div>
+            ${!isDimOnly ? `
+            <!-- High-Contrast Focal Window: Matched 1:1 Clean Alignment Pop -->
+            <div id="fx-anim-focal-window-${tplId}" style="position: absolute; top: 37%; left: 19.5%; width: 61%; height: 24%; overflow: hidden; pointer-events: none; z-index: 4; transform: scale(1.04); transform-origin: center center; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.2), 0 2px 6px rgba(15, 23, 42, 0.1); border-radius: 2px;">
+              <img src="${tpl.defaultImage || '/sec_audit_confidential_document.svg'}" style="position: absolute; top: -154%; left: -32%; width: 164%; height: 416%; object-fit: contain; filter: contrast(1.12) brightness(1.01);" />
+            </div>
+            ` : ''}
           </div>
+          ${!isDimOnly ? `
           <!-- Dynamic Leader Line & Subtle Metadata Callout Tag [EXHIBIT C // PARAGRAPH 4] -->
           <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;" viewBox="0 0 400 225">
-            <line x1="285" y1="71" x2="310" y2="40" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="285" y1="83" x2="310" y2="40" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
             <line x1="310" y1="40" x2="330" y2="40" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
-            <circle cx="285" cy="71" r="2" fill="#0f172a"/>
+            <circle cx="285" cy="83" r="2" fill="#0f172a"/>
           </svg>
           <div style="position: absolute; top: 31px; right: 28px; padding: 2px 7px; border-radius: 2px; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.25);">
             [EXHIBIT C // PARAGRAPH 4]
           </div>
+          ` : `
+          <div style="position: absolute; top: 10px; right: 12px; padding: 2px 7px; border-radius: 2px; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; z-index: 20;">
+            FLAT DIM FOCUS
+          </div>
+          `}
         </div>
       `;
     } else if (tplId === 'anim-dark-spotlight') {
@@ -29197,8 +29234,15 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const inner = fxContainer?.querySelector(`#fx-anim-loupe-inner-${tplId}`);
       if (glass) glass.style.transform = `translate(${loupeX.toFixed(1)}px, ${loupeY.toFixed(1)}px)`;
       if (inner) inner.style.transform = `translate(${(-loupeX * 1.5).toFixed(1)}px, ${(-loupeY * 1.5).toFixed(1)}px) scale(1.8)`;
-    } else if (tplId === 'anim-whiteout-fade') {
+    } else if (tplId === 'anim-whiteout-fade' || tplId === 'anim-document-dim-focus') {
+      const isDimOnly = tplId === 'anim-document-dim-focus';
       const pushProg = ((t * 0.4) % 1);
+      const tiltEl = fxContainer?.querySelector(`#fx-anim-doc-tilt-${tplId}`);
+      if (tiltEl && !isDimOnly) {
+        const tiltX = (4 - pushProg * 2).toFixed(2);
+        const curScale = (1.02 + pushProg * 0.06).toFixed(3);
+        tiltEl.style.transform = `perspective(1000px) rotateX(${tiltX}deg) scale(${curScale})`;
+      }
       const tiltEl = fxContainer?.querySelector(`#fx-anim-doc-tilt-${tplId}`);
       if (tiltEl) {
         const tiltX = (4 - pushProg * 2).toFixed(2);
@@ -29785,23 +29829,24 @@ function applySelectedHomepageTemplate(templateId) {
       renderAllTimelineTracks();
       selectClip(loupeClip, 'image');
     }
-  } else if (templateId === 'anim-whiteout-fade') {
+  } else if (templateId === 'anim-whiteout-fade' || templateId === 'anim-document-dim-focus') {
+    const isDimOnly = templateId === 'anim-document-dim-focus';
     const whiteoutClip = {
       id: `img-${Date.now()}`,
-      name: 'Confidential_Audit_Document.svg',
+      name: isDimOnly ? 'Flat_Document_Dim_Focus.svg' : 'Confidential_Audit_Document.svg',
       url: tpl.defaultImage || '/sec_audit_confidential_document.svg',
       start: 0,
       duration: 6,
       scale: 1.0,
       docFocus: true,
       docStyle: 'white',
-      docDimOpacity: 0.90,
-      docFeather: 16,
-      docFocusScale: 1.08,
-      docLeaderLine: true,
-      docCalloutTag: '[EXHIBIT C // PARAGRAPH 4]',
-      docCameraTilt: 5,
-      docFocusRect: { x: 0.06, y: 0.32, w: 0.88, h: 0.25 },
+      docDimOpacity: isDimOnly ? 0.88 : 0.90,
+      docFeather: isDimOnly ? 14 : 16,
+      docFocusScale: isDimOnly ? 1.0 : 1.08,
+      docLeaderLine: !isDimOnly,
+      docCalloutTag: isDimOnly ? '' : '[EXHIBIT C // PARAGRAPH 4]',
+      docCameraTilt: isDimOnly ? 0 : 5,
+      docFocusRect: { x: 0.19, y: 0.37, w: 0.62, h: 0.24 },
       docFocusStartTime: 0.3,
       docFocusDuration: 4.0
     };
@@ -32578,38 +32623,52 @@ function renderTopTemplatePreviewStage() {
         </div>` : ''}
       </div>
     `;
-  } else if (tplId === 'anim-whiteout-fade') {
+  } else if (tplId === 'anim-whiteout-fade' || tplId === 'anim-document-dim-focus') {
+    const isDimOnly = tplId === 'anim-document-dim-focus';
+    const focalRect = { top: '37%', left: '19.5%', width: '61%', height: '24%' };
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4f4f2; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; perspective: 1200px;">
-        <!-- 3D Tilting & Slowly Pushing Document Container -->
-        <div id="customizer-live-whiteout-tilt-container" style="position: absolute; inset: -4%; width: 108%; height: 108%; transform: perspective(1000px) rotateX(4deg) scale(1.02); transform-origin: 40% 40%; transition: transform 0.08s linear;">
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4f4f2; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; perspective: ${isDimOnly ? 'none' : '1200px'};">
+        <!-- Document Container (with optional subtle 3D tilt) -->
+        <div id="customizer-live-whiteout-tilt-container" style="position: absolute; inset: 0; width: 100%; height: 100%; transform: ${isDimOnly ? 'none' : 'perspective(1000px) rotateX(4deg) scale(1.02)'}; transform-origin: 50% 50%; transition: transform 0.08s linear;">
           <!-- Crisp Base Document -->
           <img src="${prim}" alt="Investigative Document" style="width: 100%; height: 100%; object-fit: contain; filter: contrast(1.08) brightness(0.99);" />
           
-          <!-- Organic Paper Matte Overlay: Ambient Text Faded to 10% Opacity Against #F4F4F2 -->
-          <div id="customizer-live-white-overlay" style="position: absolute; inset: 0; background: radial-gradient(circle 520px at 45% 42%, rgba(244, 244, 242, 0.88) 0%, rgba(244, 244, 242, 0.94) 85%); pointer-events: none; z-index: 2;"></div>
-          
-          <!-- High-Contrast Focal Window: Magnified 1.08x, Drop Shadow, Razor-Sharp Original Typography, ZERO Vector Borders -->
-          <div style="position: absolute; top: 31.5%; left: 6.5%; width: 87%; height: 26%; overflow: hidden; pointer-events: none; z-index: 4; transform: scale(1.08); transform-origin: center center; box-shadow: 0 16px 36px rgba(15, 23, 42, 0.25), 0 3px 8px rgba(15, 23, 42, 0.12); border-radius: 2px;">
-            <img src="${prim}" alt="Isolated Focal Text" style="position: absolute; top: -121%; left: -7.5%; width: 115%; height: 415%; object-fit: contain; filter: contrast(1.12) brightness(1.01);" />
+          <!-- Organic Paper Matte Overlay: Ambient non-focused regions softly fade into white/warm paper -->
+          <div id="customizer-live-white-overlay" style="position: absolute; inset: 0; pointer-events: none; z-index: 2;
+            background: linear-gradient(to bottom, rgba(244,244,242,0.88) 0%, rgba(244,244,242,0.88) 36.5%, transparent 37%, transparent 61%, rgba(244,244,242,0.88) 61.5%, rgba(244,244,242,0.88) 100%),
+                        linear-gradient(to right, rgba(244,244,242,0.88) 0%, rgba(244,244,242,0.88) 19%, transparent 19.5%, transparent 80.5%, rgba(244,244,242,0.88) 81%, rgba(244,244,242,0.88) 100%);">
           </div>
+          
+          ${!isDimOnly ? `
+          <!-- High-Contrast Focal Window: Clean 1:1 Matched Document Alignment Pop with Drop Shadow -->
+          <div style="position: absolute; top: ${focalRect.top}; left: ${focalRect.left}; width: ${focalRect.width}; height: ${focalRect.height}; overflow: hidden; pointer-events: none; z-index: 4; transform: scale(1.04); transform-origin: center center; box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22), 0 3px 8px rgba(15, 23, 42, 0.12); border-radius: 2px;">
+            <img src="${prim}" alt="Isolated Focal Text" style="position: absolute; top: -154%; left: -32%; width: 164%; height: 416%; object-fit: contain; filter: contrast(1.12) brightness(1.01);" />
+          </div>
+          ` : ''}
         </div>
 
+        ${!isDimOnly ? `
         <!-- Dynamic Leader Line & Forensic Callout Metadata Tag Connected to Document -->
         <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;" viewBox="0 0 1000 562">
-          <path id="customizer-live-leader-line" d="M 720 185 L 775 110 L 830 110" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="720" cy="185" r="3.5" fill="#0f172a"/>
+          <path id="customizer-live-leader-line" d="M 720 210 L 775 110 L 830 110" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="720" cy="210" r="3.5" fill="#0f172a"/>
         </svg>
 
         <div style="position: absolute; top: 72px; right: 55px; padding: 5px 12px; border-radius: 2px; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);">
           ${topCustomizerState.subText || '[EXHIBIT C // PARAGRAPH 4]'}
         </div>
+        ` : `
+        <!-- Ambient Dim Callout Header Tag -->
+        <div style="position: absolute; top: 22px; right: 28px; padding: 4px 10px; border-radius: 2px; background: rgba(15, 23, 42, 0.9); color: #f8fafc; font-family: monospace; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; z-index: 20; backdrop-filter: blur(4px);">
+          ${topCustomizerState.subText || 'PARAGRAPH 12 // UNDISCLOSED OUTFLOWS'}
+        </div>
+        `}
 
         ${isTextShowing ? `
         <div style="position: absolute; bottom: 22px; left: 32px; pointer-events: none; z-index: 25; text-align: left;">
           <div style="display: inline-block; padding: 4px 10px; background: rgba(15, 23, 42, 0.9); border-radius: 2px; backdrop-filter: blur(4px);">
-            <h2 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 1.5px; text-transform: uppercase; margin: 0;">
-              ${topCustomizerState.mainText || 'CRITICAL EVIDENCE'}
+            <h2 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 800; color: #f8fafc; letter-spacing: 1.5px; text-transform: uppercase; margin: 0;">
+              ${topCustomizerState.mainText || 'FINDINGS OF FACT'}
             </h2>
           </div>
         </div>` : ''}
@@ -34149,25 +34208,26 @@ transition: 'fly_through',
         duration: dur
       });
     }
-  } else if (tpl.id === 'anim-whiteout-fade') {
+  } else if (tpl.id === 'anim-whiteout-fade' || tpl.id === 'anim-document-dim-focus') {
+    const isDimOnly = tpl.id === 'anim-document-dim-focus';
     const docUrl = prim || tpl.defaultImage || '/sec_audit_confidential_document.svg';
     const whiteoutClip = {
       id: `img-doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      name: 'Confidential_Investigative_Document.svg',
+      name: isDimOnly ? 'Document_Ambient_Dim_Focus.svg' : 'Confidential_Investigative_Document.svg',
       url: docUrl,
-      file: { name: 'Confidential_Investigative_Document.svg', url: docUrl, isImage: true },
+      file: { name: isDimOnly ? 'Document_Ambient_Dim_Focus.svg' : 'Confidential_Investigative_Document.svg', url: docUrl, isImage: true },
       start: sceneStart,
       duration: dur,
       scale: 1.05,
       docFocus: true,
       docStyle: 'white',
-      docDimOpacity: 0.90,
-      docFeather: 16,
-      docFocusScale: 1.08,
-      docLeaderLine: true,
-      docCalloutTag: subText || '[EXHIBIT C // PARAGRAPH 4]',
-      docCameraTilt: 5,
-      docFocusRect: { x: 0.06, y: 0.32, w: 0.88, h: 0.25 },
+      docDimOpacity: isDimOnly ? 0.88 : 0.90,
+      docFeather: isDimOnly ? 14 : 16,
+      docFocusScale: isDimOnly ? 1.0 : 1.08,
+      docLeaderLine: !isDimOnly,
+      docCalloutTag: isDimOnly ? '' : (subText || '[EXHIBIT C // PARAGRAPH 4]'),
+      docCameraTilt: isDimOnly ? 0 : 5,
+      docFocusRect: { x: 0.19, y: 0.37, w: 0.62, h: 0.24 },
       docFocusStartTime: 0.3,
       docFocusDuration: dur - 0.5,
       zIndex: 20

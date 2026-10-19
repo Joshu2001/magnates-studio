@@ -19,6 +19,28 @@
     }
   }
 
+    // Reset/migrate headline-fly so broadsheet default matches Image 2 authentic newsprint
+  if (localStore['headline-fly']) {
+    const h = localStore['headline-fly'];
+    if (h.layoutStyle === undefined || h.theme3 === 'obsidian' || h.bgColor3 === '#0f172a' || h.theme4 === 'crimson' || h.bgColor4 === '#18090c') {
+      h.layoutStyle = 'broadsheet';
+      h.theme1 = 'newsprint'; h.bgColor1 = '#ece6d8'; h.textColor1 = '#1a1816'; h.accentColor1 = '#b91c1c'; h.hlColor1 = '#fde047';
+      h.theme2 = 'newsprint'; h.bgColor2 = '#eae4d5'; h.textColor2 = '#1a1816'; h.accentColor2 = '#9a3412'; h.hlColor2 = '#fde047';
+      h.theme3 = 'newsprint'; h.bgColor3 = '#e8e2d2'; h.textColor3 = '#1a1816'; h.accentColor3 = '#0284c7'; h.hlColor3 = '#38bdf8';
+      h.theme4 = 'newsprint'; h.bgColor4 = '#ece6d8'; h.textColor4 = '#1a1816'; h.accentColor4 = '#dc2626'; h.hlColor4 = '#ef4444';
+      h.theme5 = 'newsprint'; h.bgColor5 = '#f6f2e8'; h.textColor5 = '#0a0a0a'; h.accentColor5 = '#b91c1c'; h.hlColor5 = '#facc15';
+      h.font1 = "'Playfair Display', Georgia, serif";
+      h.font2 = "'Playfair Display', Georgia, serif";
+      h.font3 = "'Playfair Display', Georgia, serif";
+      h.font4 = "'Playfair Display', Georgia, serif";
+      h.font5 = "'Playfair Display', Georgia, serif";
+      h.date4 = 'OCT 28, 2026';
+      h.dofBokeh = true;
+      h.dofBlur = 9;
+      h.paperGrain = 42;
+    }
+  }
+
   if (localStore['vhs'] && (!localStore['vhs'].bgMediaUrl || localStore['vhs'].bgMediaUrl === '')) {
     localStore['vhs'].bgMediaUrl = '/vhs_summer_1989_bg.jpg';
     localStore['vhs'].bgMediaType = 'image';
@@ -729,6 +751,44 @@
     // 51. Flying Headlines (3D Cinematic Motion Suite)
     
     // 3D Newspaper Clipping (James Jani / Corridor Digital Cinematic Suite)
+    'document-3d-fx-engine': {
+      type: 'newspaper-3d',
+      stylePreset: 'financial',
+      masthead: 'THE FINANCIAL GAZETTE',
+      headline: 'Uncovered Files Reveal\n$4.2B Secret Algorithm Shift',
+      dateline: 'NEW YORK • SPECIAL INVESTIGATION REPORT',
+      subhead: 'Special Investigation Report • Leaked Internal Dossier',
+      bodyText: 'According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.',
+      dofBokeh: true,
+      dofBlur: 18,
+      cameraPitch: 10,
+      cameraYaw: -7,
+      cameraRoll: 2,
+      perspective: 1100,
+      showDogEar: true,
+      dogEarSize: 58,
+      paperAging: 75,
+      inkBleed: true,
+      inkBleedAmount: 0.6,
+      deckleEdge: true,
+      volumetricRays: true,
+      rayIntensity: 0.95,
+      rimLight: true,
+      warmSpotlight: true,
+      spotIntensity: 1.4,
+      dustMotes: true,
+      dustCount: 32,
+      organicDrift: true,
+      driftSpeed: 1.0,
+      parallaxStrength: 1.5,
+      motionBlur: true,
+      filmGrain: true,
+      filmGrainOpacity: 0.26,
+      enableHighlight: true,
+      highlightColor: '#facc15',
+      highlightPhrase: 'structural vulnerabilities known since Q3'
+    },
+
     'newspaper-3d': {
       type: 'newspaper-3d',
       stylePreset: 'scandal',
@@ -792,8 +852,7 @@
       // Card #1 (Top-Left: Classic Broadsheet Tear-Sheet)
       visible1: true,
       theme1: 'newsprint',
-      bgColor1: '#f6f1e7',
-      textColor1: '#0f172a',
+      bgColor1: '#ece6d8', textColor1: '#1a1816',
       accentColor1: '#b91c1c',
       hlColor1: '#fde047',
       source1: 'THE FINANCIAL CHRONICLE',
@@ -813,9 +872,7 @@
 
       // Card #2 (Top-Right: Financial Times Salmon Pink Press Clipping)
       visible2: true,
-      theme2: 'ft-salmon',
-      bgColor2: '#fcd5b5',
-      textColor2: '#1c1917',
+      theme2: 'newsprint', bgColor2: '#eae4d5', textColor2: '#1a1816',
       accentColor2: '#9a3412',
       hlColor2: '#fef08a',
       source2: 'GLOBAL MARKETS LEDGER',
@@ -835,11 +892,7 @@
 
       // Card #3 (Bottom-Left: Dark Investigative Wire)
       visible3: true,
-      theme3: 'obsidian',
-      bgColor3: '#0f172a',
-      textColor3: '#f8fafc',
-      accentColor3: '#38bdf8',
-      hlColor3: '#0284c7',
+      theme3: 'newsprint', bgColor3: '#e8e2d2', textColor3: '#1a1816', accentColor3: '#0284c7', hlColor3: '#38bdf8',
       source3: 'REUTERS INVESTIGATIVE WIRE',
       kicker3: 'FORENSIC AUDIT',
       date3: 'OCT 26, 2026',
@@ -848,7 +901,7 @@
       subhead3: 'Coordinated dawn raids target shell entities registered in Zurich, Cayman, and Singapore.',
       byline3: 'By Julian Thorne \u00b7 Legal Correspondent',
       exhibit3: 'DOSSIER #409',
-      font3: "'Inter', sans-serif",
+      font3: "'Playfair Display', Georgia, serif",
       fontSize3: 11,
       scale3: 1.0,
       rot3: 1.6,
@@ -857,21 +910,17 @@
 
       // Card #4 (Bottom-Right: Urgent Breaking Alert)
       visible4: true,
-      theme4: 'crimson',
-      bgColor4: '#18090c',
-      textColor4: '#ffffff',
-      accentColor4: '#ef4444',
-      hlColor4: '#b91c1c',
+      theme4: 'newsprint', bgColor4: '#ece6d8', textColor4: '#1a1816', accentColor4: '#dc2626', hlColor4: '#ef4444',
       source4: 'BLOOMBERG TERMINAL ALERT',
       kicker4: 'BREAKING NEWS',
       date3_5: '',
-      date4: 'OCT 27, 2026',
+      date4: 'OCT 28, 2026',
       headline4: 'Mass Protests as $18B in Depositor Assets Frozen Worldwide',
       highlight4: '$18B in Depositor Assets Frozen',
       subhead4: 'Emergency central bank liquidity facility triggered as contagion spreads to European clearinghouses.',
       byline4: 'Wire Dispatch \u00b7 London / NY',
       exhibit4: 'URGENT WIRE',
-      font4: "'Inter', sans-serif",
+      font4: "'Playfair Display', Georgia, serif",
       fontSize4: 11,
       scale4: 1.0,
       rot4: -1.8,
@@ -881,9 +930,7 @@
       // Card #5 (Center Hero Foreground Clipping: High-Contrast Broadsheet Spotlight)
       visible5: true,
       theme5: 'newsprint',
-      bgColor5: '#fdfbf7',
-      textColor5: '#09090b',
-      accentColor5: '#dc2626',
+      bgColor5: '#f6f2e8', textColor5: '#0a0a0a', accentColor5: '#b91c1c',
       hlColor5: '#facc15',
       source5: 'THE WALL STREET INVESTIGATOR',
       kicker5: '',
@@ -3085,7 +3132,14 @@
       const titleEl = fxc.querySelector('.interview-title');
       if (titleEl && data.subjectTitle !== undefined) titleEl.textContent = data.subjectTitle;
       const metaEl = fxc.querySelector('.interview-meta-text');
-      if (metaEl && data.metaTag !== undefined) metaEl.textContent = data.metaTag;
+      if (metaEl && data.metaTag !== undefined) {
+        if (typeof data.metaTag === 'string' && data.metaTag.includes('/')) {
+          const parts = data.metaTag.split('/');
+          metaEl.innerHTML = `${parts[0].trim()}<span class="interview-meta-divider">/</span>${parts.slice(1).join('/').trim()}`;
+        } else {
+          metaEl.textContent = data.metaTag;
+        }
+      }
       const tcEl = fxc.querySelector('.interview-tc-box');
       if (tcEl && data.timecode !== undefined) tcEl.textContent = data.timecode;
       const dotEl = fxc.querySelector('.interview-live-dot');
@@ -3093,8 +3147,13 @@
         dotEl.style.background = data.accentColor;
         dotEl.style.boxShadow = `0 0 8px ${data.accentColor}`;
       }
-      const slashesEl = fxc.querySelector('.interview-meta-slashes');
-      if (slashesEl && data.accentColor) slashesEl.style.color = data.accentColor;
+      const slashBars = fxc.querySelectorAll('.interview-slash-bar');
+      if (slashBars.length && data.accentColor) {
+        slashBars.forEach(b => {
+          b.style.background = `linear-gradient(180deg, ${data.accentColor} 0%, #ff2a2a 100%)`;
+          b.style.boxShadow = `0 0 6px ${data.accentColor}`;
+        });
+      }
     } else if (tplId === 'ceo-portrait') {
       const root = fxc.querySelector('.tpl-ceo-portrait');
       if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
@@ -3252,7 +3311,7 @@
           }
         }
       }
-    } else if (tplId === 'newspaper-3d') {
+    } else if (tplId === 'newspaper-3d' || tplId === 'document-3d-fx-engine') {
       const root = fxc.querySelector('.tpl-newspaper-3d');
       if (root) {
         if (data.cameraPitch !== undefined) root.style.setProperty('--np-camera-pitch', `${data.cameraPitch}deg`);
@@ -3355,7 +3414,19 @@
             card.classList.toggle('is-selected-card', Number(data.activeCardTab || 5) === i);
 
             const theme = data[`theme${i}`] || 'newsprint';
-            card.className = `fly-card fly-card-${i} theme-${theme}${Number(data.activeCardTab || 5) === i ? ' is-selected-card' : ''}`;
+            const curLayout = data.layoutStyle || 'broadsheet';
+            card.className = `fly-card fly-card-${i} theme-${theme} mode-${curLayout}${Number(data.activeCardTab || 5) === i ? ' is-selected-card' : ''}`;
+            root.className = `tpl-headline-fly mode-${curLayout} ${data.motionBlur !== false ? 'has-motion-blur' : ''} ${data.dofBokeh !== false ? 'has-dof-bokeh' : ''} ${data.specularGlare !== false ? 'has-specular-glare' : ''} ${data.organicDrift !== false ? 'has-organic-drift' : ''}`;
+            if (card.querySelector('.fly-card-kicker')) {
+              card.querySelector('.fly-card-kicker').classList.toggle('fly-kicker-editorial', curLayout === 'broadsheet');
+            }
+            if (card.querySelector('.fly-card-stamp')) {
+              card.querySelector('.fly-card-stamp').classList.toggle('fly-stamp-broadsheet', curLayout === 'broadsheet');
+            }
+            const col1El = card.querySelector('.fly-card-col:nth-child(1)');
+            if (col1El && data.bodyCol1 !== undefined) col1El.textContent = data.bodyCol1;
+            const col2El = card.querySelector('.fly-card-col:nth-child(2)');
+            if (col2El && data.bodyCol2 !== undefined) col2El.textContent = data.bodyCol2;
 
             if (data[`bgColor${i}`]) card.style.setProperty('--c-bg', data[`bgColor${i}`]);
             if (data[`textColor${i}`]) {
@@ -6537,7 +6608,7 @@
     // =========================================================================
     // CASE: 3D NEWSPAPER CLIPPING (James Jani / Corridor Digital Production Grade)
     // =========================================================================
-    if (tplId === 'newspaper-3d') {
+    if (tplId === 'newspaper-3d' || tplId === 'document-3d-fx-engine') {
       if (wrapPrim) wrapPrim.style.display = 'none';
       if (wrapSec) {
         wrapSec.style.display = 'flex';
@@ -7274,7 +7345,26 @@
       container.querySelectorAll('.fly-mode-btn').forEach(btn => {
         btn.onclick = () => {
           const nextMode = btn.dataset.mode || 'broadsheet';
-          window.tplSetContextualData('headline-fly', { layoutStyle: nextMode });
+          if (nextMode === 'broadsheet') {
+            window.tplSetContextualData('headline-fly', {
+              layoutStyle: 'broadsheet',
+              theme1: 'newsprint', bgColor1: '#ece6d8', textColor1: '#1a1816', accentColor1: '#b91c1c', hlColor1: '#fde047', font1: "'Playfair Display', Georgia, serif",
+              theme2: 'newsprint', bgColor2: '#eae4d5', textColor2: '#1a1816', accentColor2: '#9a3412', hlColor2: '#fde047', font2: "'Playfair Display', Georgia, serif",
+              theme3: 'newsprint', bgColor3: '#e8e2d2', textColor3: '#1a1816', accentColor3: '#0284c7', hlColor3: '#38bdf8', font3: "'Playfair Display', Georgia, serif",
+              theme4: 'newsprint', bgColor4: '#ece6d8', textColor4: '#1a1816', accentColor4: '#dc2626', hlColor4: '#ef4444', font4: "'Playfair Display', Georgia, serif", date4: 'OCT 28, 2026',
+              theme5: 'newsprint', bgColor5: '#f6f2e8', textColor5: '#0a0a0a', accentColor5: '#b91c1c', hlColor5: '#facc15', font5: "'Playfair Display', Georgia, serif",
+              dofBokeh: true, dofBlur: 9, paperGrain: 42
+            });
+          } else {
+            window.tplSetContextualData('headline-fly', {
+              layoutStyle: 'saas',
+              theme1: 'newsprint', bgColor1: '#f6f1e7', textColor1: '#0f172a', accentColor1: '#b91c1c', hlColor1: '#fde047',
+              theme2: 'ft-salmon', bgColor2: '#fcd5b5', textColor2: '#1c1917', accentColor2: '#9a3412', hlColor2: '#fef08a',
+              theme3: 'obsidian',  bgColor3: '#0f172a', textColor3: '#f8fafc', accentColor3: '#38bdf8', hlColor3: '#0284c7', font3: "'Inter', sans-serif",
+              theme4: 'crimson',   bgColor4: '#18090c', textColor4: '#ffffff', accentColor4: '#ef4444', hlColor4: '#b91c1c', font4: "'Inter', sans-serif", date4: 'OCT 27, 2026',
+              theme5: 'newsprint', bgColor5: '#fdfbf7', textColor5: '#09090b', accentColor5: '#dc2626', hlColor5: '#facc15'
+            });
+          }
           window.tplRenderContextualInspector('headline-fly');
         };
       });

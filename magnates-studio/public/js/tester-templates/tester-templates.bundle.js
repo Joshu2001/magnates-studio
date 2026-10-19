@@ -158,8 +158,15 @@ Error generating stack: `+s.message+`
   i.jsx("div",{className:"interview-film-grain"}),
   i.jsxs("div",{className:"interview-lowerthird-wrap",children:[
     i.jsxs("div",{className:"interview-meta-tab",children:[
-      i.jsx("span",{className:"interview-meta-slashes",children:"//"}),
-      i.jsx("span",{className:"interview-meta-text",children:"INTERVIEW / EXPERT ANALYSIS"})
+      i.jsxs("div",{className:"interview-meta-slashes",children:[
+        i.jsx("span",{className:"interview-slash-bar"}),
+        i.jsx("span",{className:"interview-slash-bar"})
+      ]}),
+      i.jsxs("span",{className:"interview-meta-text",children:[
+        "INTERVIEW",
+        i.jsx("span",{className:"interview-meta-divider",children:"/"}),
+        "EXPERT ANALYSIS"
+      ]})
     ]}),
     i.jsxs("div",{className:"interview-glass-bar",children:[
       i.jsx("div",{className:"interview-shimmer-edge"}),
