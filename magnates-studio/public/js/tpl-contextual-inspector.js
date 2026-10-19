@@ -859,7 +859,10 @@
   };
 
   window.tplRenderUniversalBgLayer = function(data) {
-    const preset = (data && data.bgPreset) || 'default';
+    let preset = (data && data.bgPreset) || (data && data.type === 'scramble' ? 'cyber-3d-grid' : 'default');
+    if (data && data.type === 'scramble' && (!preset || preset === 'default')) {
+      preset = 'cyber-3d-grid';
+    }
     const bgUrl = (data && (data.bgMediaUrl || data.feedUrl)) || '';
     const isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
     const cls = 'tpl-universal-bg-layer' + (!bgUrl && preset !== 'default' ? ` bg-preset-${preset}` : '');
@@ -880,13 +883,17 @@
       bgEl.className = 'tpl-universal-bg-layer';
       rootEl.prepend(bgEl);
     }
-    const preset = (data && data.bgPreset) || 'default';
+    const isScramble = rootEl.classList.contains('tpl-scramble');
+    let preset = (data && data.bgPreset) || (isScramble ? 'cyber-3d-grid' : 'default');
+    if (isScramble && (!preset || preset === 'default')) {
+      preset = 'cyber-3d-grid';
+    }
     let bgUrl = (data && (data.bgMediaUrl || data.feedUrl)) || '';
     let isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
 
-    // Fall back to topCustomizerState ONLY if preset is 'default' and no explicit preset was set,
+    // Fall back to topCustomizerState ONLY if preset is 'default', NEVER for scramble,
     // and never let primaryUrl (subject figure/portrait/robot) pollute the background layer!
-    if (!bgUrl && (!preset || preset === 'default') && typeof topCustomizerState !== 'undefined' && topCustomizerState) {
+    if (!isScramble && !bgUrl && (!preset || preset === 'default') && typeof topCustomizerState !== 'undefined' && topCustomizerState) {
       if (topCustomizerState.secondaryIsVideo && topCustomizerState.secondaryUrl) {
         bgUrl = topCustomizerState.secondaryUrl;
         isVideo = true;
@@ -4697,36 +4704,33 @@
           </div>
 
           ${curMode === 'chat' ? `
-            <!-- Chat Mode: Sender Handle & Message -->
+            <!-- Chat / Console Window Mode -->
             <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,255,136,0.04); border: 1px dashed rgba(0,255,136,0.25); border-radius: 7px; padding: 8px;">
               <div style="display: flex; flex-direction: column; gap: 3px;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span style="font-size: 9px; font-weight: 800; color: #00ff88; text-transform: uppercase;">Anonymous Sender / Tor Handle</span>
-                  <span style="font-size: 8px; color: #64748b; font-family: monospace;">[PGP SIGNED]</span>
-                </div>
-                <input type="text" id="scramble-inp-sender" value="${(data.senderHandle || 'ANON_USER // UNTRACEABLE').replace(/"/g, '&quot;')}" placeholder="e.g. ANON_USER // UNTRACEABLE" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,255,136,0.35); border-radius: 5px; padding: 6px 8px; color: #fff; font-family: monospace; font-size: 10.5px; font-weight: 700; outline: none;" />
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                  <span style="font-size: 9px; font-weight: 800; color: #cbd5e1; text-transform: uppercase;">Encrypted Message (Decryption Stream)</span>
-                  <span style="font-size: 8px; color: #00ff88; font-family: monospace;">[LIVE CIPHER]</span>
+                  <span style="font-size: 9px; font-weight: 800; color: #00ff88; text-transform: uppercase;">Target Decrypt Text</span>
+                  <span style="font-size: 8px; color: #00ff88; font-family: monospace;">[MAIN STREAM]</span>
                 </div>
                 <input type="text" id="scramble-inp-text" value="${(data.text || 'you are a dead man').replace(/"/g, '&quot;')}" placeholder="e.g. you are a dead man" style="background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,136,0.5); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,255,136,0.15);" />
               </div>
               <div style="display: flex; flex-direction: column; gap: 3px;">
-                <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Tor Node / Header Tag</span>
-                <input type="text" id="scramble-inp-header" value="${(data.headerTag || 'TOR_ONION_CHAT v3.4 // [SESSION_ID: 0x9F4B]').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 8px; color: #94a3b8; font-family: monospace; font-size: 9.5px;" />
+                <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Terminal Node / Header</span>
+                <input type="text" id="scramble-inp-header" value="${(data.headerTag || 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 8px; color: #94a3b8; font-family: monospace; font-size: 9.5px;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Sub-Telemetry Readout</span>
+                <input type="text" id="scramble-inp-sub" value="${(data.subText || 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 8px; color: #64748b; font-family: monospace; font-size: 9.5px;" />
               </div>
             </div>
           ` : `
-            <!-- Terminal Mode: Cockpit Decrypt Text & Headers -->
+            <!-- Cockpit Terminal Mode -->
             <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,229,255,0.04); border: 1px dashed rgba(0,229,255,0.25); border-radius: 7px; padding: 8px;">
               <div style="display: flex; flex-direction: column; gap: 3px;">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
                   <span style="font-size: 9px; font-weight: 800; color: #00e5ff; text-transform: uppercase;">Target Decrypt Stream (Center Cockpit)</span>
                   <span style="font-size: 8px; color: #00e5ff; font-family: monospace;">[MAIN STREAM]</span>
                 </div>
-                <input type="text" id="scramble-inp-text" value="${(data.text || 'SYSTEM PRIVILEGES COMPROMISED').replace(/"/g, '&quot;')}" placeholder="e.g. ACCESS GRANTED" style="background: rgba(0,0,0,0.7); border: 1px solid rgba(0,229,255,0.5); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,229,255,0.15);" />
+                <input type="text" id="scramble-inp-text" value="${(data.text || 'SYSTEM PRIVILEGES COMPROMISED').replace(/"/g, '&quot;')}" placeholder="e.g. SYSTEM PRIVILEGES COMPROMISED" style="background: rgba(0,0,0,0.7); border: 1px solid rgba(0,229,255,0.5); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,229,255,0.15);" />
               </div>
               <div style="display: flex; flex-direction: column; gap: 3px;">
                 <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Terminal Node / Header</span>
