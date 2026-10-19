@@ -97,14 +97,14 @@
     const mapCtxData = (tplId === 'map' && typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : null;
     const isMapInteractive3D = !!(mapCtxData && (mapCtxData.is3DMode || mapCtxData.drawOnScreenMode));
     const isDom3DHandOrbit = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode && ['zoom', 'parallax', 'textbehind', 'docheight'].includes(tplId));
-    const isBypassStageTransform = isMapInteractive3D || tplId === 'empire-timeline' || tplId === 'headline-fly' || isDom3DHandOrbit;
+    const isBypassStageTransform = isMapInteractive3D || tplId === 'empire-timeline' || tplId === 'headline-fly' || tplId === 'newspaper-3d' || tplId === 'screen-blur' || isDom3DHandOrbit;
     if (isBypassStageTransform) {
       box.style.display = 'none';
       toolbar.style.display = 'none';
       return;
     }
     toolbar.style.display = 'flex';
-    const fgCandidate = stage.querySelector('.scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const fgCandidate = stage.querySelector('.quote-card, .scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
     const textCandidate = stage.querySelector('.scramble-main-text, .zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
     const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
 
@@ -416,7 +416,7 @@
 
       const labelEl = box.querySelector('#stage-tf-label');
       if (labelEl) {
-        labelEl.textContent = type === 'text' ? 'HEADLINE TEXT' : (type === 'bg' ? 'BACKGROUND SCENE' : 'FOREGROUND SUBJECT');
+        labelEl.textContent = type === 'text' ? (tplId === 'quote' ? 'QUOTE TEXT' : 'HEADLINE TEXT') : (type === 'bg' ? 'BACKGROUND SCENE' : (tplId === 'quote' ? 'QUOTE CARD' : 'FOREGROUND SUBJECT'));
         labelEl.style.background = type === 'text' ? '#a855f7' : (type === 'bg' ? '#d97706' : '#0284c7');
       }
 

@@ -23511,136 +23511,13 @@ const EFFECT_TEMPLATES_DATA = [
     title: 'Map Pin Drop',
     category: 'Animations',
     origCategory: 'Animations',
-    badge: 'STORY',
+    badge: 'MEDIUM',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: '3D Tactical Globe with vector Great-Circle flight arcs & HUD reticles.',
-    tags: ['Animations', 'Map Pin Drop', '3D Tactical Globe', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-      <defs>
-        <radialGradient id="thumbBg" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#08182b"/>
-          <stop offset="100%" stop-color="#020610"/>
-        </radialGradient>
-        <radialGradient id="thumbSphere" cx="35%" cy="30%" r="70%">
-          <stop offset="0%" stop-color="#0e2a4a"/>
-          <stop offset="50%" stop-color="#06162a"/>
-          <stop offset="85%" stop-color="#020813"/>
-          <stop offset="100%" stop-color="#01040a"/>
-        </radialGradient>
-        <radialGradient id="thumbFresnel" cx="50%" cy="50%" r="50%">
-          <stop offset="78%" stop-color="#38bdf8" stop-opacity="0"/>
-          <stop offset="90%" stop-color="#38bdf8" stop-opacity="0.3"/>
-          <stop offset="97%" stop-color="#7dd3fc" stop-opacity="0.8"/>
-          <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
-        </radialGradient>
-        <clipPath id="thumbGlobeClip">
-          <circle cx="200" cy="114" r="98"/>
-        </clipPath>
-        <filter id="thumbGlow">
-          <feGaussianBlur stdDeviation="3"/>
-        </filter>
-      </defs>
-      <rect width="400" height="225" fill="url(#thumbBg)"/>
-      <!-- Outer Space Grid -->
-      <g stroke="rgba(56,189,248,0.15)" stroke-width="0.5">
-        <line x1="0" y1="112" x2="400" y2="112"/><line x1="200" y1="0" x2="200" y2="225"/>
-      </g>
-      <!-- 3D Atmosphere Rim Lighting Halo -->
-      <circle cx="200" cy="114" r="98" fill="none" stroke="#38bdf8" stroke-width="2.5" opacity="0.9" filter="url(#thumbGlow)"/>
-      <circle cx="200" cy="114" r="102" fill="none" stroke="#0ea5e9" stroke-width="5" opacity="0.45" filter="url(#thumbGlow)"/>
-      <circle cx="200" cy="114" r="98" fill="url(#thumbSphere)" stroke="rgba(56,189,248,0.7)" stroke-width="1.2"/>
-      <!-- Globe Body -->
-      <g clip-path="url(#thumbGlobeClip)">
-        <!-- Spherical Graticules -->
-        <g stroke="rgba(56,189,248,0.18)" stroke-width="0.5" fill="none">
-          <ellipse cx="200" cy="62" rx="72" ry="22"/>
-          <ellipse cx="200" cy="78" rx="88" ry="26"/>
-          <ellipse cx="200" cy="95" rx="98" ry="30"/>
-          <ellipse cx="200" cy="114" rx="98" ry="32"/>
-          <line x1="102" y1="114" x2="298" y2="114"/>
-          <ellipse cx="200" cy="133" rx="98" ry="30"/>
-          <ellipse cx="200" cy="150" rx="88" ry="26"/>
-          <ellipse cx="200" cy="114" rx="28" ry="98"/>
-          <ellipse cx="200" cy="114" rx="58" ry="98"/>
-          <ellipse cx="200" cy="114" rx="85" ry="98"/>
-          <line x1="200" y1="16" x2="200" y2="212"/>
-        </g>
-        <!-- Continents & Coastlines -->
-        <g fill="#0a1c33" stroke="#38bdf8" stroke-width="0.65" fill-opacity="0.95">
-          <!-- Europe / Scandinavia / UK -->
-          <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 Z"/>
-          <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 206 45 Z"/>
-          <path d="M 184 63 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 216 64 L 212 68 L 215 74 L 201 66 L 184 70 Z"/>
-          <path d="M 208 72 L 213 71 L 217 76 L 219 82 L 212 77 Z"/>
-          <!-- Ukraine highlighted border -->
-          <path d="M 221 68 L 226 67 L 233 67 L 237 70 L 236 74 L 232 75 L 229 76 L 221 71 Z" fill="rgba(251,191,36,0.18)" stroke="#fbbf24" stroke-width="1.3"/>
-          <!-- Russia / Asia -->
-          <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 364 52 L 346 72 L 328 96 L 288 110 L 258 84 L 238 56 Z"/>
-          <!-- Turkey / Middle East -->
-          <path d="M 226 75 L 238 73 L 245 76 L 244 80 L 228 80 Z"/>
-          <path d="M 234 88 L 248 86 L 258 90 L 264 98 L 244 104 L 236 94 Z"/>
-          <!-- Africa -->
-          <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 209 171 L 199 135 L 179 111 L 177 83 Z"/>
-        </g>
-        <!-- Country Labels -->
-        <g fill="rgba(226,232,240,0.75)" font-family="'JetBrains Mono',monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle">
-          <text x="260" y="35">RUSSIA</text>
-          <text x="189" y="67">UK</text>
-          <text x="198" y="77">FRANCE</text>
-          <text x="209" y="73">GERMANY</text>
-          <text x="219" y="71">POLAND</text>
-          <text x="212" y="81">ITALY</text>
-          <text x="236" y="81">TURKEY</text>
-          <text x="254" y="85">IRAN</text>
-          <text x="248" y="96">SAUDI ARABIA</text>
-          <text x="220" y="93">LIBYA</text>
-          <text x="232" y="93">EGYPT</text>
-          <text x="228" y="105">SUDAN</text>
-          <text x="203" y="112">NIGERIA</text>
-        </g>
-        <!-- 3D Great-Circle Flight Path Arc & Jet -->
-        <path d="M 120 75 Q 165 42 199 69" fill="none" stroke="#38bdf8" stroke-width="4.2" opacity="0.32"/>
-        <path d="M 120 75 Q 165 42 199 69" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
-        <path d="M 120 75 Q 165 42 199 69" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4"/>
-        <path d="M 199 69 Q 214 62 229 71" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="3 2"/>
-        <!-- Aircraft Sprite -->
-        <g transform="translate(165, 52) rotate(18)">
-          <line x1="-8" y1="0" x2="-20" y2="0" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M 10 0 L 2.8 -1.6 L -2.8 -9.8 L -4.8 -9.8 L -2.2 -1.6 L -7.8 -1.4 L -10.2 -4.8 L -11.8 -4.8 L -10.5 0 L -11.8 4.8 L -10.2 4.8 L -7.8 1.4 L -2.2 1.6 L -4.8 9.8 L -2.8 9.8 L 2.8 1.6 Z" fill="#ffffff" stroke="#38bdf8" stroke-width="0.8"/>
-        </g>
-        <!-- London Waypoint HUD -->
-        <circle cx="199" cy="69" r="2.2" fill="#38bdf8" stroke="#ffffff" stroke-width="0.7"/>
-        <circle cx="199" cy="69" r="4.8" fill="none" stroke="#38bdf8" stroke-width="0.6" opacity="0.7"/>
-        <path d="M 199 65 L 199 57 L 214 57" fill="none" stroke="#38bdf8" stroke-width="0.65"/>
-        <text x="216" y="55" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900">LONDON</text>
-        <text x="216" y="59" fill="#38bdf8" font-family="'JetBrains Mono',monospace" font-size="2.8" font-weight="700">51.50°N 0.12°W</text>
-        <!-- Ukraine Tactical Multi-Ring Reticle HUD -->
-        <g transform="translate(229, 71)">
-          <circle cx="0" cy="0" r="15" fill="none" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
-          <circle cx="0" cy="0" r="9.5" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
-          <circle cx="0" cy="0" r="3.2" fill="#fbbf24" stroke="#ffffff" stroke-width="0.8"/>
-          <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
-          <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="#38bdf8" stroke-width="0.75"/>
-          <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">UKRAINE</text>
-          <text x="26" y="-14.5" fill="#38bdf8" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700">48.37°N 31.16°E</text>
-        </g>
-        <!-- Volumetric 3D Fresnel Limb Overlay -->
-        <circle cx="200" cy="114" r="98" fill="url(#thumbFresnel)" pointer-events="none"/>
-      </g>
-      <!-- Bottom-Left Floating Glassmorphic HUD Card -->
-      <g transform="translate(12, 138)">
-        <rect width="176" height="56" rx="10" fill="rgba(8,20,38,0.78)" stroke="rgba(56,189,248,0.35)" stroke-width="1"/>
-        <text x="10" y="16" fill="#38bdf8" font-family="'JetBrains Mono',monospace" font-size="8.5" font-weight="700">[MULTI-VECTOR TRANSIT 01]   [ACTIVE LEGS: 2]</text>
-        <text x="10" y="34" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="800">🇺🇸 USA <tspan fill="#38bdf8">→</tspan> UK</text>
-        <text x="10" y="49" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="800"><tspan fill="#38bdf8">➔</tspan> UK <tspan fill="#38bdf8">→</tspan> UKRAINE</text>
-      </g>
-      <!-- Telemetry Bar -->
-      <line x1="12" y1="212" x2="388" y2="212" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-      <text x="12" y="221" fill="rgba(148,163,184,0.85)" font-family="'JetBrains Mono',monospace" font-size="8">SAT-LOCK // 3D ORTHOGRAPHIC GLOBE</text>
-      <text x="388" y="221" fill="rgba(148,163,184,0.85)" font-family="'JetBrains Mono',monospace" font-size="8" text-anchor="end">2 ROUTES · ZOOM @ 0.8s · 1.9x</text>
-    </svg>`)}`
+    description: 'Cinematic 3D Map Pin Drop with topographic relief, 3D metallic brushed copper pin, shockwave impact dynamics & HUD telemetry.',
+    tags: ['Animations', 'Map Pin Drop', '3D Tactical Globe', 'Motion Template', 'Cinematic Cartography'],
+    defaultImage: '/cinematic_tactical_world_map_kyiv.png'
   },
   {
     id: 'news',
@@ -23705,20 +23582,84 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Vintage VHS tape look with scanlines, tracking, and REC indicator.',
     tags: ['Color & Vibe', 'VHS Retro Overlay', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-vh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-vh)"/><text x="24" y="32" fill="#ff2a2a" font-family="'Courier New', monospace" font-weight="900" font-size="12">\ud83d\udd34 REC</text><text x="376" y="32" fill="#fff" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="end">SP 0:00:18</text><text x="200" y="125" fill="#fff" font-family="'Courier New', monospace" font-weight="900" font-size="34" letter-spacing="3" text-anchor="middle">SUMMER 89</text><text x="200" y="200" fill="rgba(255,255,255,0.7)" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="middle">OCT 18 1989</text></svg>`)}`
+    defaultImage: '/vhs_summer_1989_bg.jpg',
+    secondaryImage: '/vhs_summer_1989_bg.jpg'
   },
   {
     id: 'progress',
-    title: 'Progress Bar',
+    title: 'Cinematic Progress HUD',
     category: 'Animations',
     origCategory: 'Animations',
-    badge: 'GOAL',
+    badge: 'CINEMATIC HUD',
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Animated progress bar filling to 100%. Perfect for goal/challenge videos.',
-    tags: ['Animations', 'Progress Bar', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-prg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient><linearGradient id="p-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-prg)"/><g transform="translate(50, 75)"><text x="0" y="10" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="14">Goal Progress</text><rect x="0" y="24" width="300" height="16" rx="8" fill="rgba(255,255,255,0.1)"/><rect x="0" y="24" width="300" height="16" rx="8" fill="url(#p-bar)"/><text x="150" y="85" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="36" text-anchor="middle">100%</text></g></svg>`)}`
+    previewGradient: 'linear-gradient(135deg, rgba(10, 14, 26, 0.95), rgba(4, 7, 14, 0.95))',
+    description: 'Volumetric 3D glass progress HUD with dynamic leading-edge callout pin, live metric tracking, dual-tone neon liquid fill, and spark emissions.',
+    tags: ['Animations', 'Cinematic Progress HUD', 'Project Funding', 'Motion Template', 'Volumetric Glass'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="hud-bg-grad" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0a1220"/>
+      <stop offset="60%" stop-color="#050811"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </radialGradient>
+    <linearGradient id="hud-neon-fill" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff007f"/>
+      <stop offset="60%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#00e5ff"/>
+    </linearGradient>
+    <filter id="hud-tip-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#00e5ff" flood-opacity="0.9"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#00e5ff" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="400" height="225" fill="url(#hud-bg-grad)"/>
+  
+  <!-- Header Stack -->
+  <g transform="translate(60, 48)">
+    <text x="0" y="0" fill="#f8fafc" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="900" font-size="13" letter-spacing="1.5">PROJECT FUNDING STATUS</text>
+    <text x="0" y="14" fill="#34d399" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="8" letter-spacing="1">[PHASE 2 / 3 ACTIVE]</text>
+  </g>
+
+  <!-- 3D Glass Track Capsule (Centered ~65% width) -->
+  <g transform="translate(60, 86)">
+    <!-- Outer Glass Capsule Bevel -->
+    <rect width="280" height="26" rx="13" fill="rgba(15,23,42,0.6)" stroke="rgba(255,255,255,0.22)" stroke-width="1.2"/>
+    <!-- Inner Dark Frosted Recessed Channel -->
+    <rect x="4" y="4" width="272" height="18" rx="9" fill="rgba(2,6,15,0.85)" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+    <!-- Active Neon Liquid Fill Bar (74%) -->
+    <rect x="4" y="4" width="201" height="18" rx="9" fill="url(#hud-neon-fill)"/>
+    <!-- Liquid Specular Sheen -->
+    <rect x="6" y="6" width="197" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <!-- Leading Edge Tip Glow Node -->
+    <circle cx="205" cy="13" r="5" fill="#ffffff" filter="url(#hud-tip-glow)"/>
+    <!-- Spark Emitter Dots -->
+    <circle cx="209" cy="8" r="1" fill="#fff"/>
+    <circle cx="214" cy="11" r="1.3" fill="#00e5ff"/>
+    <circle cx="212" cy="17" r="0.8" fill="#ff007f"/>
+    <circle cx="218" cy="15" r="1" fill="#38bdf8"/>
+  </g>
+
+  <!-- Tip Callout Anchor at ~74% (x = 265) -->
+  <g transform="translate(265, 86)">
+    <!-- Top Bubble: 74% -->
+    <g transform="translate(-22, -32)">
+      <rect width="44" height="24" rx="5" fill="rgba(15,23,42,0.92)" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+      <path d="M 18,24 L 22,28 L 26,24 Z" fill="rgba(15,23,42,0.92)"/>
+      <text x="22" y="16" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="12" text-anchor="middle">74%</text>
+    </g>
+
+    <!-- Curved Tether Path -->
+    <path d="M 0,13 C 0,32 -18,40 -18,60" fill="none" stroke="#00e5ff" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- Lower Financial Metric Card -->
+    <g transform="translate(-14, 52)">
+      <rect width="98" height="30" rx="5" fill="rgba(11,18,32,0.92)" stroke="rgba(0,229,255,0.35)" stroke-width="0.8"/>
+      <text x="8" y="14" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="7.5">$74,000,000 Raised</text>
+      <text x="8" y="24" fill="#94a3b8" font-family="'Inter', sans-serif" font-weight="600" font-size="6">Target: $100,000,000</text>
+    </g>
+  </g>
+</svg>`)}`
   },
   {
     id: 'scramble',
@@ -25210,6 +25151,158 @@ window.tplRenderUniversalBgLayer = function (data, fallbackBgStyle) {
   return `<div class="tpl-universal-bg-layer"></div>`;
 };
 
+// =========================================================================
+// CINEMATIC PROGRESS HUD: Liquid Glass Track & Leading-Edge Metric Callouts
+// =========================================================================
+window.tplBuildProgressHtml = function (data) {
+  const d = data || {};
+  const title = (d.title !== undefined) ? String(d.title) : (d.goal || 'PROJECT FUNDING STATUS');
+  const subtitle = (d.subtitle !== undefined) ? String(d.subtitle) : '[PHASE 2 / 3 ACTIVE]';
+  const rawPct = (d.percent !== undefined) ? String(d.percent).replace(/[^0-9.]/g, '') : '74';
+  const pctNum = Math.max(0, Math.min(100, parseFloat(rawPct) || 74));
+  const currentAmt = (d.currentAmount !== undefined) ? String(d.currentAmount) : (d.amount || '$74,000,000 Raised');
+  const targetAmt = (d.targetAmount !== undefined) ? String(d.targetAmount) : 'Target: $100,000,000';
+  const gradStart = d.gradientStart || '#ff007f';
+  const gradEnd = d.gradientEnd || '#00e5ff';
+  const barWidth = Math.max(40, Math.min(90, Number(d.barWidthPercent || 68)));
+  const showSparks = d.showSparks !== false;
+  const showShimmer = d.showShimmer !== false;
+  const showGrain = d.showFilmGrain !== false;
+  const bgPreset = d.bgPreset || 'cinematic-dark';
+  const bgData = Object.assign({}, d, { bgPreset });
+  const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(bgData) : `<div class="tpl-universal-bg-layer bg-preset-${bgPreset}"></div>`;
+
+  return `
+    <div class="tpl-progress cinematic-hud-progress has-universal-bg" style="--hud-grad-start: ${gradStart}; --hud-grad-end: ${gradEnd}; --hud-bar-width: ${barWidth}%;">
+      ${bgLayerHtml}
+      ${showGrain ? '<div class="hud-film-grain-overlay"></div>' : ''}
+      <div class="hud-atmosphere-vignette"></div>
+      
+      <!-- Constrained Cinematic Canvas Container (60%–70% width, centered) -->
+      <div class="hud-progress-frame">
+        
+        <!-- Header & Architecture Stack -->
+        <div class="hud-progress-header">
+          <div class="hud-title-row">
+            <h1 class="hud-main-title prog-goal">${title}</h1>
+          </div>
+          <div class="hud-meta-row">
+            <span class="hud-meta-tag prog-subtitle">${subtitle}</span>
+          </div>
+        </div>
+
+        <!-- 3D Volumetric Glass Track Container -->
+        <div class="hud-track-outer-capsule">
+          <div class="hud-glass-refraction-highlight"></div>
+          
+          <!-- Inner Frosted Recessed Channel -->
+          <div class="hud-track-inner-channel prog-bar">
+            <!-- Active Neon Volumetric Fill Bar -->
+            <div class="hud-fill-stream prog-bar-fill" style="width: ${pctNum}%;">
+              <div class="hud-liquid-sheen"></div>
+              ${showShimmer ? '<div class="hud-light-sweep-beam"></div>' : ''}
+              
+              <!-- Glowing Liquid Leading Edge Tip -->
+              <div class="hud-leading-edge-tip">
+                <div class="hud-leading-core-glow"></div>
+                <div class="hud-leading-specular-bead"></div>
+                ${showSparks ? `
+                  <div class="hud-spark-emitter">
+                    <span class="spark sp-1"></span>
+                    <span class="spark sp-2"></span>
+                    <span class="spark sp-3"></span>
+                    <span class="spark sp-4"></span>
+                    <span class="spark sp-5"></span>
+                    <span class="spark sp-6"></span>
+                    <span class="spark sp-7"></span>
+                    <span class="spark sp-8"></span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+
+          <!-- Glass Outer Specular Bevel Border -->
+          <div class="hud-outer-glass-specular-ring"></div>
+        </div>
+
+        <!-- Tip-Anchored Dynamic Floating Callout Nodes -->
+        <div class="hud-dynamic-callout-anchor" style="left: calc((100% - var(--hud-bar-width)) / 2 + (var(--hud-bar-width) * ${pctNum} / 100));">
+          
+          <!-- Top Floating Bubble: Clean Large Percentage -->
+          <div class="hud-tip-bubble-pct">
+            <span class="hud-pct-number prog-percent prog-pct">${pctNum}%</span>
+            <div class="hud-bubble-beak-down"></div>
+          </div>
+
+          <!-- Connecting Curved HUD Vector Line -->
+          <svg class="hud-callout-tether-svg" viewBox="0 0 40 80" fill="none" preserveAspectRatio="none">
+            <path d="M 0,0 C 0,35 -24,45 -24,80" stroke="${gradEnd}" stroke-width="1.8" stroke-linecap="round" opacity="0.95"/>
+            <circle cx="0" cy="0" r="3.2" fill="#ffffff" stroke="${gradEnd}" stroke-width="1.5" filter="drop-shadow(0 0 6px ${gradEnd})"/>
+          </svg>
+
+          <!-- Lower Pinned Financial Metric Card -->
+          <div class="hud-financial-card">
+            <div class="hud-card-glass-sheen"></div>
+            <div class="hud-card-raised-amt prog-amt-raised">${currentAmt}</div>
+            <div class="hud-card-target-amt prog-amt-target">${targetAmt}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  `;
+};
+
+window.tplTriggerProgressAnimation = function (rootEl, data) {
+  if (!rootEl) return;
+  const fillEl = rootEl.querySelector('.prog-bar-fill');
+  const anchorEl = rootEl.querySelector('.hud-dynamic-callout-anchor');
+  const pctEl = rootEl.querySelector('.prog-pct');
+  const d = data || {};
+  const rawPct = (d.percent !== undefined) ? String(d.percent).replace(/[^0-9.]/g, '') : '74';
+  const targetPct = Math.max(0, Math.min(100, parseFloat(rawPct) || 74));
+  const barWidth = Math.max(40, Math.min(90, Number(d.barWidthPercent || 68)));
+
+  if (!fillEl || !anchorEl || !pctEl) return;
+
+  // Keyframed Smooth Reveal Animation from 0% to Target %
+  fillEl.style.transition = 'none';
+  anchorEl.style.transition = 'none';
+  fillEl.style.width = '0%';
+  anchorEl.style.left = `calc((100% - ${barWidth}%) / 2)`;
+  pctEl.textContent = '0%';
+
+  let startT = null;
+  const durationMs = 1800; // 1.8s cinematic deceleration
+
+  function cubicEaseOut(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function frame(timestamp) {
+    if (!startT) startT = timestamp;
+    const elapsed = timestamp - startT;
+    const progress = Math.min(1, elapsed / durationMs);
+    const eased = cubicEaseOut(progress);
+    const currentVal = (targetPct * eased).toFixed(0);
+
+    fillEl.style.width = `${targetPct * eased}%`;
+    anchorEl.style.left = `calc((100% - ${barWidth}%) / 2 + (${barWidth}% * ${targetPct * eased} / 100))`;
+    pctEl.textContent = `${currentVal}%`;
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      fillEl.style.width = `${targetPct}%`;
+      anchorEl.style.left = `calc((100% - ${barWidth}%) / 2 + (${barWidth}% * ${targetPct} / 100))`;
+      pctEl.textContent = `${targetPct}%`;
+    }
+  }
+
+  requestAnimationFrame(frame);
+};
+
 window.tplBuildScrambleHtml = function (data) {
   const d = data || {};
   const layout = d.layoutMode === 'terminal' ? 'terminal' : 'chat';
@@ -25377,7 +25470,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop']);
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
@@ -25688,29 +25781,38 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`; } else if (tplId === 'glitch') {
       fxContainer.innerHTML = `<div class="tpl-glitch">
           <div class="glitch-text" data-text="THE TRUTH">THE TRUTH</div>
-        </div>`; } else if (tplId === 'map') {
+        </div>`; } else if (tplId === 'map' || tplId === 'map-pin-drop') {
       const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : {};
       if (typeof window.tplBuildInvestigativeGlobeHtml === 'function') {
         fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData);
       } else {
-        fxContainer.innerHTML = `<div class="tpl-map"><div class="location-label">${mData.location || 'Chernobyl, Ukraine'}</div></div>`;
+        fxContainer.innerHTML = `<div class="tpl-map"><img src="/cinematic_tactical_world_map_kyiv.png" style="width:100%;height:100%;object-fit:cover;"/></div>`;
       }
     } else if (tplId === 'news') {
       const nwData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('news') : {};
       const ch = nwData.channel || 'WORLD NEWS LIVE';
+      const report = nwData.report || 'BREAKING REPORT';
       const hl = nwData.headline || 'Tech Giant Announces Unprecedented Layoffs';
       const sub = nwData.ticker || 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING \u2022 FEDERAL REGULATORS OPEN INQUIRY';
       const bCol = nwData.bannerColor || '#dc2626';
-      fxContainer.innerHTML = `<div class="tpl-news">
+      const isCustomCol = bCol && bCol !== '#dc2626' && bCol !== '#ef4444';
+      const upperStyle = isCustomCol 
+        ? `background: linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 38%, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0.52) 100%), linear-gradient(90deg, #450407 0%, ${bCol} 30%, #ef1c24 50%, ${bCol} 70%, #450407 100%);`
+        : '';
+      const hlStyle = isCustomCol ? `border-left-color:${bCol}; box-shadow: inset 2px 0 8px ${bCol}66, inset 0 1.5px 0 rgba(255,255,255,0.3), inset 0 -1.5px 1px rgba(0,0,0,0.7);` : '';
+      const trStyle = isCustomCol ? `background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 45%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.5) 100%), ${bCol};` : '';
+      const bgLayerHtml = (typeof window.tplRenderUniversalBgLayer === 'function') ? window.tplRenderUniversalBgLayer(nwData) : '';
+      fxContainer.innerHTML = `<div class="tpl-news ${bgLayerHtml ? 'has-universal-bg' : ''}">
+          ${bgLayerHtml}
           <div class="news-top-bug"><span class="news-live-dot"></span><span>DIRECT FEED // HD</span></div>
           <div class="chyron-stack">
-            <div class="chyron-upper" style="background:linear-gradient(90deg, ${bCol} 0%, #7f1d1d 100%);">
+            <div class="chyron-upper"${upperStyle ? ` style="${upperStyle}"` : ''}>
               <span class="news-badge" style="background:transparent;padding:0;">${ch}</span>
-              <span>BREAKING REPORT</span>
+              <span class="chyron-report">${report}</span>
             </div>
-            <div class="headline" style="border-left-color:${bCol};">${hl}</div>
+            <div class="headline"${hlStyle ? ` style="${hlStyle}"` : ''}>${hl}</div>
             <div class="ticker-wrap">
-              <div class="ticker-red" style="background:${bCol};">LIVE</div>
+              <div class="ticker-red"${trStyle ? ` style="${trStyle}"` : ''}>LIVE</div>
               <div class="ticker-body"><span class="ticker-text">${sub}</span></div>
             </div>
           </div>
@@ -25762,13 +25864,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="rec">${vRec}</div>
           <div class="vhs-hud-tr">PLAY &#9654;</div>
           <div class="vhs-text">${vTag}</div>
-          <div class="vhs-hud-bl">SLP  ${vTag}</div>
         </div>`; } else if (tplId === 'progress') {
-      fxContainer.innerHTML = `<div class="tpl-progress">
-          <div class="prog-goal" style="font-size:13px;font-weight:700;color:#fff;">Goal Progress</div>
-          <div class="prog-bar"><div class="prog-fill prog-bar-fill"></div></div>
-          <div class="prog-percent prog-pct">100%</div>
-        </div>`; } else if (tplId === 'scramble') {
+      const prgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('progress') : {};
+      fxContainer.innerHTML = window.tplBuildProgressHtml ? window.tplBuildProgressHtml(prgData) : `<div class="tpl-progress"><div class="prog-goal">PROJECT FUNDING STATUS</div></div>`;
+      if (typeof window.tplTriggerProgressAnimation === 'function') {
+        window.tplTriggerProgressAnimation(fxContainer, prgData);
+      }
+    } else if (tplId === 'scramble') {
       const scData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scramble') : {};
       fxContainer.innerHTML = window.tplBuildScrambleHtml ? window.tplBuildScrambleHtml(scData) : `<div class="tpl-scramble"><div class="scramble-text">ACCESS GRANTED</div></div>`;
       if (typeof window.tplTriggerScrambleAnimation === 'function') {
@@ -26230,7 +26332,265 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           });
         }
       }
-    } else if (tplId === 'screen-blur') {
+        } else if (tplId === 'newspaper-3d') {
+      const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('newspaper-3d') : {};
+      const stylePreset = npData.stylePreset || 'scandal';
+      const masthead = npData.masthead || 'THE DAILY TIMES';
+      const headline = npData.headline || 'MAJOR SCANDAL\nEXPOSED';
+      const dateline = npData.dateline || 'MONDAY, JANUARY 15, 2024';
+      const dofBlur = npData.dofBlur !== undefined ? npData.dofBlur : 13;
+      const cameraPitch = npData.cameraPitch !== undefined ? npData.cameraPitch : 12;
+      const cameraYaw = npData.cameraYaw !== undefined ? npData.cameraYaw : -9;
+      const cameraRoll = npData.cameraRoll !== undefined ? npData.cameraRoll : 2.5;
+      const perspective = npData.perspective !== undefined ? npData.perspective : 1100;
+      const showDogEar = npData.showDogEar !== false;
+      const dogEarSize = npData.dogEarSize !== undefined ? npData.dogEarSize : 38;
+      const volumetricRays = npData.volumetricRays !== false;
+      const rayIntensity = npData.rayIntensity !== undefined ? npData.rayIntensity : 0.75;
+      const rimLight = npData.rimLight !== false;
+      const warmSpotlight = npData.warmSpotlight !== false;
+      const spotIntensity = npData.spotIntensity !== undefined ? npData.spotIntensity : 0.85;
+      const dustMotes = npData.dustMotes !== false;
+      const organicDrift = npData.organicDrift !== false;
+      const motionBlur = npData.motionBlur !== false;
+      const filmGrain = npData.filmGrain !== false;
+      const filmGrainOpacity = npData.filmGrainOpacity !== undefined ? npData.filmGrainOpacity : 0.26;
+      const inkBleed = npData.inkBleed !== false;
+
+      // Dust motes HTML generator
+      let dustHtml = '';
+      if (dustMotes) {
+        const motesCount = 18;
+        for (let i = 0; i < motesCount; i++) {
+          const top = Math.round(10 + Math.random() * 80);
+          const left = Math.round(5 + Math.random() * 90);
+          const delay = (Math.random() * 6).toFixed(1);
+          const dur = (5 + Math.random() * 5).toFixed(1);
+          const sz = (2 + Math.random() * 2.5).toFixed(1);
+          dustHtml += `<div class="tpl-np-dust-mote" style="top:${top}%;left:${left}%;width:${sz}px;height:${sz}px;animation-delay:${delay}s;animation-duration:${dur}s;"></div>`;
+        }
+      }
+
+      // Generate columns content based on style preset
+      let heroColumnsHtml = '';
+      if (stylePreset === 'victorian') {
+        // Image 3 inspired: Victorian Gazette with woodcut ruins and vintage ads
+        heroColumnsHtml = `
+          <div style="display: flex; gap: 7px; flex: 1; overflow: hidden; margin-top: 4px;">
+            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 4px; font-size: 5px; line-height: 1.35; color: #3b2f21;">
+              <div style="width: 100%; height: 60px; background: #cbb493; border: 1px solid #73593b; overflow: hidden; position: relative;">
+                <svg viewBox="0 0 120 70" width="100%" height="100%" style="opacity: 0.85;">
+                  <path d="M0,50 Q30,25 60,35 T120,45 L120,70 L0,70 Z" fill="#695138"/>
+                  <path d="M15,50 Q45,20 75,30 T120,40 L120,70 L15,70 Z" fill="#523e2b"/>
+                  <rect x="25" y="28" width="12" height="18" fill="#3b2b1d"/>
+                  <rect x="42" y="22" width="16" height="24" fill="#3b2b1d"/>
+                  <rect x="64" y="26" width="14" height="20" fill="#3b2b1d"/>
+                  <circle cx="85" cy="18" r="8" fill="#fef08a" opacity="0.4"/>
+                </svg>
+                <div style="position: absolute; bottom: 2px; left: 4px; font-size: 4px; font-family: monospace; color: #fdf6e2; background: rgba(0,0,0,0.6); padding: 1px 3px;">ANCIENT RUINS CITADEL</div>
+              </div>
+              <div style="text-align: justify;"><span class="tpl-np-dropcap" style="font-family:'Cinzel',serif;">L</span>ost city expedition led by Royal Geographic Society reports massive megalithic architecture situated along Andean mountain ridges. Extensive terrace agricultural works confirmed intact.</div>
+            </div>
+            <div style="flex: 0.9; display: flex; flex-direction: column; gap: 4px; border-left: 0.8px solid #8c6f4a; padding-left: 5px; font-size: 4.8px; line-height: 1.3; color: #3b2f21;">
+              <div style="border: 0.8px solid #73593b; padding: 3px; background: rgba(0,0,0,0.03);">
+                <div style="font-weight: 800; font-size: 6px; text-align: center; font-family: 'Cinzel',serif;">LINIMENT</div>
+                <div style="font-size: 4px; text-align: center;">FOR MAN OR BEAST • 25 CENTS</div>
+              </div>
+              <div style="border: 0.8px solid #73593b; padding: 3px; background: rgba(0,0,0,0.03);">
+                <div style="font-weight: 800; font-size: 6px; text-align: center; font-family: 'Cinzel',serif;">REVOLVERS</div>
+                <div style="font-size: 4px; text-align: center;">$19.99 POSTPAID</div>
+              </div>
+              <div style="border: 0.8px solid #73593b; padding: 3px; background: rgba(0,0,0,0.03);">
+                <div style="font-weight: 800; font-size: 6px; text-align: center; font-family: 'Cinzel',serif;">MASTER LUTHIERS</div>
+                <div style="font-size: 4px; text-align: center;">VIOLINS FROM $2.25</div>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (stylePreset === 'jfk') {
+        // Image 4 inspired: 1963 Mid-Century Historic with Halftone Photo
+        heroColumnsHtml = `
+          <div style="display: flex; gap: 7px; flex: 1; overflow: hidden; margin-top: 4px;">
+            <div style="flex: 1.1; display: flex; flex-direction: column; gap: 4px; font-size: 5px; line-height: 1.35; color: #23211e;">
+              <div style="font-weight: 800; font-size: 7.5px; line-height: 1.15; font-family: Georgia, serif; border-bottom: 0.8px solid #111; padding-bottom: 2px;">LBJ Begins Presidency • Asks God's Help In Guiding Nation</div>
+              <div style="text-align: justify;"><span class="tpl-np-dropcap" style="font-family: Georgia, serif;">W</span>ASHINGTON — Taking oath aboard Air Force One, President Lyndon B. Johnson called for unity as the nation entered three days of official mourning following Friday's tragedy in Dallas.</div>
+              <div style="font-weight: 800; font-size: 6px; border-top: 0.8px solid #111; padding-top: 2px; margin-top: 2px;">TV Cancels Programs</div>
+            </div>
+            <div style="flex: 1.1; display: flex; flex-direction: column; gap: 4px;">
+              <div style="width: 100%; height: 95px; background: #c5beae; border: 1px solid #444; overflow: hidden; position: relative;">
+                <svg viewBox="0 0 100 120" width="100%" height="100%" style="opacity: 0.85;">
+                  <defs>
+                    <pattern id="halftoneDots" width="3" height="3" patternUnits="userSpaceOnUse">
+                      <circle cx="1.5" cy="1.5" r="1.1" fill="#111"/>
+                    </pattern>
+                  </defs>
+                  <rect width="100" height="120" fill="#ded7c6"/>
+                  <path d="M20,120 Q50,40 80,120 Z" fill="#222"/>
+                  <ellipse cx="50" cy="50" rx="22" ry="28" fill="#999"/>
+                  <ellipse cx="50" cy="42" rx="20" ry="18" fill="#111"/>
+                  <rect width="100" height="120" fill="url(#halftoneDots)" opacity="0.45"/>
+                </svg>
+                <div style="position: absolute; bottom: 2px; right: 4px; font-size: 4px; font-family: monospace; background: rgba(0,0,0,0.6); color: #fff; padding: 1px 3px;">ASSOCIATED PRESS WIRE</div>
+              </div>
+              <div style="font-size: 4.5px; color: #444; line-height: 1.25; font-style: italic;">Dallas police custody transfer scheduled under armed guard.</div>
+            </div>
+          </div>
+        `;
+      } else if (stylePreset === 'tribune') {
+        // Image 5 inspired: Sensationalist 1930s Crime / Swindle
+        heroColumnsHtml = `
+          <div style="display: flex; gap: 7px; flex: 1; overflow: hidden; margin-top: 4px;">
+            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 4px; font-size: 5px; line-height: 1.35; color: #1c1a17;">
+              <div style="font-weight: 800; font-size: 7.5px; text-transform: uppercase; font-family: Impact, sans-serif; border-bottom: 1px solid #111; padding-bottom: 2px;">Insull Fraud Case Goes To Jury Today</div>
+              <div style="text-align: justify;"><span class="tpl-np-dropcap" style="font-family: 'Cinzel', serif;">S</span>tate prosecutors rested arguments after twenty-one days of financial testimony detailing utility holding company maneuvers across forty states. Over three hundred witness depositions admitted.</div>
+              <div style="position: relative; margin-top: 4px; padding: 3px 5px; background: rgba(220, 38, 38, 0.12); border-left: 2px solid #b91c1c; font-size: 4.8px; font-weight: 700; color: #991b1b;">GOONS SMASH MEAT PLANT • 4 HELD</div>
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; border-left: 0.8px solid #999; padding-left: 5px;">
+              <div style="width: 100%; height: 75px; background: #cdc5b3; border: 1px solid #333; overflow: hidden; position: relative;">
+                <svg viewBox="0 0 100 80" width="100%" height="100%" style="opacity: 0.9;">
+                  <path d="M10,75 L30,30 L50,60 L70,20 L90,75 Z" stroke="#111" stroke-width="1.5" fill="none"/>
+                  <rect x="25" y="50" width="50" height="25" fill="#333" opacity="0.3"/>
+                  <text x="50" y="45" font-size="7" font-weight="900" text-anchor="middle" fill="#111">COURT EXHIBIT</text>
+                </svg>
+              </div>
+              <div style="font-size: 4.8px; line-height: 1.3; color: #333;">Federal Marshals impound ledger accounts under court injunction.</div>
+            </div>
+          </div>
+        `;
+      } else {
+        // Image 2 Hero Default: The Daily Times "MAJOR SCANDAL EXPOSED"
+        heroColumnsHtml = `
+          <div class="tpl-np-columns">
+            <div class="tpl-np-col">
+              <div><span class="tpl-np-dropcap">A</span>ccording to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight.</div>
+              <div>Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while capital was mobilized.</div>
+            </div>
+            <div class="tpl-np-col">
+              <div>Internal communications reveal that warning signs were systematically flagged yet dismissed by senior leadership.</div>
+              <div>Capital was mobilized across offshore accounts while public statements projected unprecedented stability and triple-digit surplus reserves.</div>
+            </div>
+            <div class="tpl-np-col" style="position: relative;">
+              <div>Federal investigators have seized encrypted server backups. Multiple subpoenas were issued this morning to financial officers and board members.</div>
+              <div>Senate inquiry hearings begin tomorrow under full national broadcast coverage with witness protection.</div>
+              
+              <!-- Yellow Highlighter Wipe Across Critical Line -->
+              <div class="tpl-np-highlight-stroke" style="top: 18px; left: -2px; height: 13px;"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      const headlineLines = headline.split('\n');
+      const headlineFormatted = headlineLines.map((l, i) => `<div>${l}</div>`).join('');
+
+      fxContainer.innerHTML = `
+        <div class="tpl-newspaper-3d theme-${stylePreset} ${motionBlur ? 'has-motion-blur' : ''} ${organicDrift ? 'has-organic-drift' : ''}" style="
+          --np-camera-pitch: ${cameraPitch}deg;
+          --np-camera-yaw: ${cameraYaw}deg;
+          --np-camera-roll: ${cameraRoll}deg;
+          --np-perspective: ${perspective}px;
+          --np-dof-fg-blur: ${dofBlur}px;
+          --np-dof-bg-blur: ${Math.round(dofBlur * 0.55)}px;
+          --np-ray-opacity: ${volumetricRays ? rayIntensity : 0};
+          --np-grain-opacity: ${filmGrain ? filmGrainOpacity : 0};
+          --np-spot-intensity: ${warmSpotlight ? spotIntensity : 0};
+          --np-rim-glow: ${rimLight ? 'rgba(125, 211, 252, 0.35)' : 'none'};
+        ">
+          <div class="tpl-np-backdrop"></div>
+          <div class="tpl-np-godrays"></div>
+          <div class="tpl-np-spotlight"></div>
+          <div class="tpl-np-vignette"></div>
+          <div class="tpl-np-filmgrain"></div>
+
+          ${dustMotes ? `<div class="tpl-np-dust-container">${dustHtml}</div>` : ''}
+
+          <div class="tpl-np-camera-rig">
+            <!-- Deep Background Paper 3 (Top Right in God Rays) -->
+            <div class="tpl-np-clipping is-bg-3">
+              <div class="tpl-np-paper-surface"></div>
+              <div style="padding: 10px; font-size: 5px; color: #3a352f;">
+                <div style="font-weight: 800; font-size: 7px; margin-bottom: 2px;">THE CHRONICLE</div>
+                <div style="font-weight: 900; font-size: 9px; margin-bottom: 4px;">SENATE HEARINGS COMMENCE</div>
+                <div style="line-height: 1.3;">Special committee demands full unredacted records of transactions.</div>
+              </div>
+            </div>
+
+            <!-- Background Paper 1 (Top Left, Heavily Blurred) -->
+            <div class="tpl-np-clipping is-bg-1">
+              <div class="tpl-np-paper-surface"></div>
+              <div style="padding: 10px; font-size: 5px; color: #3a352f;">
+                <div style="font-weight: 800; font-size: 6.5px; margin-bottom: 2px;">GLOBAL GAZETTE</div>
+                <div style="font-weight: 900; font-size: 8px; margin-bottom: 4px;">INTERNAL AUDIT LEAKED</div>
+                <div style="line-height: 1.3;">Discrepancies found across offshore holdings. Regulatory oversight bypassed.</div>
+              </div>
+            </div>
+
+            <!-- Background Paper 2 (Bottom Right, Highlight Marker) -->
+            <div class="tpl-np-clipping is-bg-2">
+              <div class="tpl-np-paper-surface"></div>
+              <div style="padding: 10px; font-size: 5px; color: #3a352f;">
+                <div style="font-weight: 800; font-size: 6.5px; margin-bottom: 2px;">FINANCIAL DISPATCH</div>
+                <div style="font-weight: 900; font-size: 8px; margin-bottom: 4px;">KEY EXECUTIVES RESIGN</div>
+                <div style="position: relative; margin-top: 4px; padding: 2px 4px; background: rgba(250, 204, 21, 0.45); font-weight: 700;">
+                  CONFIDENTIAL MEMORANDUM // SECTION 4
+                </div>
+              </div>
+            </div>
+
+            <!-- CENTER HERO NEWSPAPER CLIPPING (Pixel Perfect to Image 2) -->
+            <div class="tpl-np-clipping is-hero">
+              <div class="tpl-np-paper-surface"></div>
+              <div class="tpl-np-crease-h"></div>
+              
+              <!-- Folded Dog-Eared Corner (Top Right) -->
+              ${showDogEar ? `
+              <div class="tpl-np-dog-ear-wrap" style="width: ${dogEarSize}px; height: ${dogEarSize}px;">
+                <div class="tpl-np-dog-ear-fold" style="border-width: 0 ${dogEarSize}px ${dogEarSize}px 0;"></div>
+                <div class="tpl-np-dog-ear-flap" style="border-width: ${dogEarSize}px 0 0 ${dogEarSize}px;"></div>
+              </div>` : ''}
+
+              <div class="tpl-np-hero-content ${inkBleed ? 'tpl-np-ink' : ''}">
+                <div class="tpl-np-masthead">${masthead}</div>
+                <div class="tpl-np-rule-double"></div>
+                <div class="tpl-np-headline">${headlineFormatted}</div>
+                <div class="tpl-np-dateline">${dateline}</div>
+                ${heroColumnsHtml}
+              </div>
+            </div>
+
+            <!-- Foreground Floating Paper (Bottom Left, Dramatic Shallow DOF Blur) -->
+            <div class="tpl-np-clipping is-foreground">
+              <div class="tpl-np-paper-surface"></div>
+              <div style="padding: 18px 20px; font-size: 7px; color: #22201d; line-height: 1.35;">
+                <div style="font-weight: 900; font-size: 13px; text-transform: uppercase; margin-bottom: 3px; font-family: 'Cinzel', serif;">
+                  ${masthead}
+                </div>
+                <div style="font-weight: 900; font-size: 18px; text-transform: uppercase; margin-bottom: 6px; font-family: 'Cinzel', Impact, serif; line-height: 1.05;">
+                  ${headlineFormatted}
+                </div>
+                <div style="border-top: 1px solid #333; padding-top: 5px; font-size: 6px; letter-spacing: 1px;">
+                  ${dateline}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Manual scrubbing handler
+      if (manual && typeof manual.t === 'number') {
+        const root = fxContainer.querySelector('.tpl-newspaper-3d');
+        if (root) {
+          const t = Math.max(0, Math.min(1, manual.t));
+          const rig = root.querySelector('.tpl-np-camera-rig');
+          if (rig) {
+            const curP = cameraPitch + Math.sin(t * Math.PI * 2) * 2;
+            const curY = cameraYaw + Math.cos(t * Math.PI * 2) * 2.5;
+            rig.style.transform = `rotateX(${curP}deg) rotateY(${curY}deg) rotateZ(${cameraRoll}deg)`;
+          }
+        }
+      }
+} else if (tplId === 'screen-blur') {
       const sData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('screen-blur') : {};
       const urlBar = sData.urlBar || 'https://cloud.internal/admin/api-keys';
       const windowTitle = sData.windowTitle || 'Enterprise Security Console';
@@ -30497,6 +30857,12 @@ function openTopTemplateCustomizer(tpl) {
     } else if (tpl.id === 'split') {
       if (labelPrim) labelPrim.textContent = '\ud83d\udc64 Left Side Subject Asset';
       if (labelSec) labelSec.textContent = '\ud83d\udc64 Right Side Subject Asset';
+    } else if (tpl.id === 'vhs') {
+      if (labelPrim) labelPrim.textContent = '\ud83d\udcf8 Primary Graphic / Cutout Layer';
+      if (labelSec) labelSec.textContent = '\ud83d\udcf9 VHS Retro Footage / Backdrop';
+      topCustomizerState.primaryUrl = topCustomizerState.primaryUrl || '/vhs_summer_1989_bg.jpg';
+      topCustomizerState.secondaryUrl = topCustomizerState.secondaryUrl || '/vhs_summer_1989_bg.jpg';
+      topCustomizerState.secondaryIsVideo = false;
     } else if (tpl.id === 'kenburns') {
       if (labelPrim) labelPrim.textContent = '\ud83c\udfd9\ufe0f Tokyo 1987 Street Asset';
       if (labelSec) labelSec.textContent = '\ud83c\udfac Ken Burns 35mm Plate';
@@ -33512,7 +33878,63 @@ transition: 'fly_through',
     focusClip = bgClip;
     imageClips = [bgClip];
     textClips = generatedTextClips;
-  } else {
+    } else if (tpl.id === 'newspaper-3d') {
+    const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('newspaper-3d') : {};
+    const bgUrl = sec || tpl.secondaryImage || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80';
+    const bgClip = {
+      id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Investigative_Newspaper_3D_Scene.jpg',
+      url: bgUrl,
+      file: { name: 'Investigative_Newspaper_3D_Scene.jpg', url: bgUrl, isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.12,
+      isBackgroundScene: true,
+      parallaxRig: 'bg',
+      parallaxLayer: 'background',
+      parallaxMotion: 'push',
+      parallaxDepth: 40,
+      blur: 2,
+      zIndex: 10,
+      layerOrder: 'back'
+    };
+
+    const mainHl = npData.headline ? npData.headline.replace(/\\n/g, ' ') : 'MAJOR SCANDAL EXPOSED';
+    const mainMh = npData.masthead || 'THE DAILY TIMES';
+    const dateLine = npData.dateline || 'MONDAY, JANUARY 15, 2024';
+
+    const headlineClip = {
+      id: `txt-np-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      text: mainHl,
+      highlight: mainHl.split(' ')[0] || '',
+      highlightColor: npData.highlightColor || '#facc15',
+      anim: 'fly_through',
+      fontSize: 48,
+      fontFamily: "'Cinzel', 'Playfair Display', serif",
+      zIndex: 35,
+      layerOrder: 'front',
+      start: Number(sceneStart.toFixed(2)),
+      duration: Number(dur.toFixed(2)),
+      motionBlur: npData.motionBlur !== false,
+      tilt3D: Number(npData.cameraPitch ?? 12)
+    };
+
+    const mastheadClip = {
+      id: `txt-mh-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      text: `${mainMh} • ${dateLine}`,
+      anim: 'fade',
+      fontSize: 18,
+      fontFamily: "'JetBrains Mono', monospace",
+      zIndex: 36,
+      layerOrder: 'front',
+      start: Number((sceneStart + 0.2).toFixed(2)),
+      duration: Number((dur - 0.2).toFixed(2))
+    };
+
+    focusClip = bgClip;
+    imageClips = [bgClip];
+    textClips = [headlineClip, mastheadClip];
+} else {
     const baseClip = {
       id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: `${tpl.title.replace(/\s+/g, '_')}.jpg`,

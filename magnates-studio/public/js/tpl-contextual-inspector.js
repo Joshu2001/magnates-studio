@@ -19,6 +19,12 @@
     }
   }
 
+  if (localStore['vhs'] && (!localStore['vhs'].bgMediaUrl || localStore['vhs'].bgMediaUrl === '')) {
+    localStore['vhs'].bgMediaUrl = '/vhs_summer_1989_bg.jpg';
+    localStore['vhs'].bgMediaType = 'image';
+    localStore['vhs'].feedUrl = '/vhs_summer_1989_bg.jpg';
+  }
+
   function persistStore() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify(localStore));
@@ -322,17 +328,25 @@
     'news': {
       type: 'news',
       channel: 'WORLD NEWS LIVE',
+      report: 'BREAKING REPORT',
       headline: 'Tech Giant Announces Unprecedented Layoffs',
       ticker: 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING \u2022 FEDERAL REGULATORS OPEN INQUIRY',
-      bannerColor: '#dc2626'
+      bannerColor: '#dc2626',
+      glassBlur: 28
     },
 
     // 27. Cinematic Quote Card
     'quote': {
       type: 'quote',
-      quote: 'Rule No. 1: Never lose money. Rule No. 2: Never forget rule No. 1.',
-      author: 'Warren Buffett',
-      source: 'The Essays of Warren Buffett'
+      quote: 'The obstacle is the way.',
+      author: 'Marcus Aurelius',
+      palette: 'parchment',
+      fontSize: 42,
+      fontFamily: "'Playfair Display', Georgia, serif",
+      textColor: '#3a2418',
+      authorColor: '#8b5a3c',
+      quoteMarkColor: 'rgba(139, 90, 60, 0.16)',
+      bgGradient: 'linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 100%)'
     },
 
     // 28. Polaroid Stack
@@ -369,18 +383,27 @@
       recMode: 'REC \u25cf',
       filter: 'vintage',
       bgPreset: 'default',
-      bgMediaUrl: '',
-      bgMediaType: 'video',
-      feedUrl: ''
+      bgMediaUrl: '/vhs_summer_1989_bg.jpg',
+      bgMediaType: 'image',
+      feedUrl: '/vhs_summer_1989_bg.jpg'
     },
 
-    // 31. Progress Bar
+    // 31. Progress Bar / Cinematic Progress HUD
     'progress': {
       type: 'progress',
-      goal: 'Project Funding',
+      title: 'PROJECT FUNDING STATUS',
+      subtitle: '[PHASE 2 / 3 ACTIVE]',
       percent: '74%',
-      amount: '$74,000 / $100,000',
-      color: '#10b981'
+      currentAmount: '$74,000,000 Raised',
+      targetAmount: 'Target: $100,000,000',
+      gradientStart: '#ff007f', // Vibrant magenta/pink
+      gradientEnd: '#00e5ff',   // Electric cyan/blue
+      barWidthPercent: 68,     // 68% viewport width constraint
+      showSparks: true,
+      showShimmer: true,
+      showFilmGrain: true,
+      glowIntensity: 1.0,
+      bgPreset: 'cinematic-dark'
     },
 
     // 32. Text Scramble / Hacker
@@ -665,7 +688,46 @@
     },
 
     // 51. Flying Headlines (3D Cinematic Motion Suite)
-    'headline-fly': {
+    
+    // 3D Newspaper Clipping (James Jani / Corridor Digital Cinematic Suite)
+    'newspaper-3d': {
+      type: 'newspaper-3d',
+      stylePreset: 'scandal',
+      masthead: 'THE DAILY TIMES',
+      headline: 'MAJOR SCANDAL\nEXPOSED',
+      dateline: 'MONDAY, JANUARY 15, 2024',
+      subhead: 'Special Investigation Report • Leaked Internal Dossier',
+      bodyText: 'According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.',
+      dofBokeh: true,
+      dofBlur: 13,
+      cameraPitch: 12,
+      cameraYaw: -9,
+      cameraRoll: 2.5,
+      perspective: 1100,
+      showDogEar: true,
+      dogEarSize: 38,
+      paperAging: 75,
+      inkBleed: true,
+      inkBleedAmount: 0.6,
+      deckleEdge: true,
+      volumetricRays: true,
+      rayIntensity: 0.75,
+      rimLight: true,
+      warmSpotlight: true,
+      spotIntensity: 0.85,
+      dustMotes: true,
+      dustCount: 20,
+      organicDrift: true,
+      driftSpeed: 1.0,
+      parallaxStrength: 1.5,
+      motionBlur: true,
+      filmGrain: true,
+      filmGrainOpacity: 0.26,
+      enableHighlight: true,
+      highlightColor: '#facc15',
+      highlightPhrase: 'structural vulnerabilities known since Q3'
+    },
+'headline-fly': {
       type: 'headline-fly',
       tiltAngle: 9.5,
       motionBlur: true,
@@ -1246,546 +1308,197 @@
 
   window.tplBuildInvestigativeGlobeHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map') : {});
-    const proj = d.projection || 'globe';
-    const styleKey = d.mapStyle || 'harris-dark';
-    const pinColor = d.pinColor || '#38bdf8';
-    const zoomStart = Math.max(0, parseFloat(d.zoomStart !== undefined ? d.zoomStart : 0.8));
-    const zoomDur = Math.max(0.5, parseFloat(d.zoomDuration !== undefined ? d.zoomDuration : 2.2));
-    const zoomLvl = Math.max(1.1, Math.min(5, parseFloat(d.zoomLevel !== undefined ? d.zoomLevel : 1.9)));
-    const totalCycle = (zoomStart + zoomDur + 3.0).toFixed(2);
-    const showArc = d.showFlightPath !== false;
-    const is3D = !!d.is3DMode;
-    const isDrawing = !!d.drawOnScreenMode;
-    const pitch3D = d.pitch3D !== undefined ? parseFloat(d.pitch3D) : 22;
-    const yaw3D = d.yaw3D !== undefined ? parseFloat(d.yaw3D) : -10;
+    const is3D = d.is3DMode !== false; // Enable subtle cinematic 3D perspective by default
+    const pitch = d.pitch3D !== undefined ? parseFloat(d.pitch3D) : 10;
+    const yaw = d.yaw3D !== undefined ? parseFloat(d.yaw3D) : -3;
+    const pinMat = d.pinMaterial || 'copper';
+    const showDust = d.showImpactDust !== false;
+    const showBorders = d.showBorders !== false;
+    const showLabels = d.showLabels !== false;
+    const showWater = d.showWaterCurrents !== false;
+    const showGrid = d.showGrid !== false;
+    const locTitle = (d.location || 'KYIV, UKRAINE').toUpperCase();
+    const locCoords = d.coords || '50.4501°N 30.5234°E';
+    const locSub = d.telemetry || 'O.SR5911TES     DFX35.EVA';
 
-    const themes = {
-      'harris-dark': {
-        bg: 'radial-gradient(circle at 50% 50%, #061324 0%, #01050d 100%)',
-        ocean: '#051325',
-        oceanLight: '#0d2745',
-        land: '#0a1c33',
-        landStroke: '#38bdf8',
-        landGlow: 'rgba(56, 189, 248, 0.45)',
-        borderStroke: 'rgba(56, 189, 248, 0.32)',
-        highlightCountry: '#fbbf24',
-        highlightGlow: 'rgba(251, 191, 36, 0.65)',
-        labelCol: 'rgba(226, 232, 240, 0.75)',
-        grid: 'rgba(56, 189, 248, 0.16)',
-        atmo: '#38bdf8',
-        atmoOuter: 'rgba(56, 189, 248, 0.55)',
-        fresnelRim: '#7dd3fc'
+    // Metallic Pin Palettes
+    const palettes = {
+      'copper': {
+        stop0: '#fed7aa', stop25: '#f97316', stop55: '#c2410c', stop85: '#7c2d12', stop100: '#431407',
+        stem0: '#ea580c', stem50: '#ffedd5', stem100: '#7c2d12',
+        rim: '#fed7aa', center: '#7c2d12', pulse: '#f59e0b'
       },
-      'satellite': {
-        bg: 'radial-gradient(circle at 50% 50%, #051a2e 0%, #010813 100%)',
-        ocean: '#041527',
-        oceanLight: '#0b2e45',
-        land: '#0e2d22',
-        landStroke: '#52b788',
-        landGlow: 'rgba(82, 183, 136, 0.45)',
-        borderStroke: 'rgba(116, 198, 157, 0.32)',
-        highlightCountry: '#34d399',
-        highlightGlow: 'rgba(52, 211, 153, 0.65)',
-        labelCol: 'rgba(241, 245, 249, 0.82)',
-        grid: 'rgba(82, 183, 136, 0.18)',
-        atmo: '#38bdf8',
-        atmoOuter: 'rgba(56, 189, 248, 0.5)',
-        fresnelRim: '#7dd3fc'
+      'steel': {
+        stop0: '#f8fafc', stop25: '#cbd5e1', stop55: '#64748b', stop85: '#334155', stop100: '#0f172a',
+        stem0: '#94a3b8', stem50: '#ffffff', stem100: '#334155',
+        rim: '#e2e8f0', center: '#1e293b', pulse: '#38bdf8'
       },
-      'vox-archival': {
-        bg: 'radial-gradient(circle at 50% 50%, #201a14 0%, #0a0705 100%)',
-        ocean: '#15110d',
-        oceanLight: '#2b231a',
-        land: '#544633',
-        landStroke: '#f4ecd8',
-        landGlow: 'rgba(244, 236, 216, 0.45)',
-        borderStroke: 'rgba(244, 236, 216, 0.35)',
-        highlightCountry: '#fbbf24',
-        highlightGlow: 'rgba(251, 191, 36, 0.65)',
-        labelCol: 'rgba(254, 243, 199, 0.85)',
-        grid: 'rgba(244, 236, 216, 0.15)',
-        atmo: '#f59e0b',
-        atmoOuter: 'rgba(245, 158, 11, 0.45)',
-        fresnelRim: '#fde68a'
-      },
-      'radar-amber': {
-        bg: 'radial-gradient(circle at 50% 50%, #170d03 0%, #060301 100%)',
-        ocean: '#100802',
-        oceanLight: '#261304',
-        land: '#351804',
-        landStroke: '#f59e0b',
-        landGlow: 'rgba(245, 158, 11, 0.45)',
-        borderStroke: 'rgba(245, 158, 11, 0.35)',
-        highlightCountry: '#ef4444',
-        highlightGlow: 'rgba(239, 68, 68, 0.65)',
-        labelCol: 'rgba(253, 230, 138, 0.82)',
-        grid: 'rgba(245, 158, 11, 0.18)',
-        atmo: '#f59e0b',
-        atmoOuter: 'rgba(245, 158, 11, 0.5)',
-        fresnelRim: '#fde68a'
+      'gold': {
+        stop0: '#fef08a', stop25: '#eab308', stop55: '#ca8a04', stop85: '#854d0e', stop100: '#422006',
+        stem0: '#d97706', stem50: '#fef9c3', stem100: '#78350f',
+        rim: '#fde047', center: '#713f12', pulse: '#eab308'
       }
     };
-    const th = themes[styleKey] || themes['harris-dark'];
-
-    const activeRoutes = Array.isArray(d.routes) && d.routes.length > 0 ? d.routes : [
-      { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
-      { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
-    ];
-    const customRoutes = Array.isArray(d.customTracedRoutes) ? d.customTracedRoutes : [];
-
-    // Target Destination (primary focus) & Origin
-    const lastRoute = activeRoutes[activeRoutes.length - 1];
-    const firstRoute = activeRoutes[0];
-    const targetName = (lastRoute && lastRoute.to) ? lastRoute.to : (d.location ? d.location.split('→').pop().trim() : 'Ukraine');
-    const originName = (firstRoute && firstRoute.from) ? firstRoute.from : 'London';
-
-    const targetLat = lastRoute && lastRoute.toLat !== undefined ? parseFloat(lastRoute.toLat) : (d.lat !== undefined ? parseFloat(d.lat) : 48.37);
-    const targetLng = lastRoute && lastRoute.toLng !== undefined ? parseFloat(lastRoute.toLng) : (d.lng !== undefined ? parseFloat(d.lng) : 31.16);
-    const originLat = firstRoute && firstRoute.fromLat !== undefined ? parseFloat(firstRoute.fromLat) : 51.50;
-    const originLng = firstRoute && firstRoute.fromLng !== undefined ? parseFloat(firstRoute.fromLng) : -0.12;
-
-    const targetProj = window.tplProjectLatLngToMapSvg(targetLat, targetLng);
-    const originProj = window.tplProjectLatLngToMapSvg(originLat, originLng);
-
-    const normX = Math.max(16, Math.min(84, targetProj.normX));
-    const normY = Math.max(18, Math.min(82, targetProj.normY));
-    const panX = ((50 - normX) * 0.28).toFixed(1) + '%';
-    const panY = ((50 - normY) * 0.28).toFixed(1) + '%';
-
-    const targetCoordsStr = `${Math.abs(targetLat).toFixed(2)}°${targetLat >= 0 ? 'N' : 'S'} ${Math.abs(targetLng).toFixed(2)}°${targetLng >= 0 ? 'E' : 'W'}`;
-    const originCoordsStr = `${Math.abs(originLat).toFixed(2)}°${originLat >= 0 ? 'N' : 'S'} ${Math.abs(originLng).toFixed(2)}°${originLng >= 0 ? 'E' : 'W'}`;
-
-    // High-Definition Vector Cartography Engine (Natural Earth 110m Real TopoJSON Geometry)
-    const accurateMapData = (typeof window !== "undefined" && window.ACCURATE_WORLD_MAP) ? window.ACCURATE_WORLD_MAP : null;
-    let highPrecisionWorldVectors = "";
-    if (accurateMapData && accurateMapData.land) {
-      highPrecisionWorldVectors = `
-        <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.55" stroke-linejoin="round" fill-opacity="0.94">
-          <path d="${accurateMapData.land}"/>
-        </g>
-      `;
-    } else {
-      highPrecisionWorldVectors = `
-        <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.65" stroke-linejoin="round" fill-opacity="0.94">
-          <path d="M 32 40 L 42 35 L 56 34 L 72 32 L 86 31 L 98 33 L 112 37 L 126 44 L 136 54 L 128 62 L 134 70 L 124 78 L 116 86 L 112 94 L 108 97 L 105 91 L 96 92 L 91 97 L 95 105 L 104 110 L 98 114 L 90 106 L 82 101 L 75 91 L 72 83 L 68 87 L 65 77 L 62 67 L 55 54 L 42 52 L 32 46 Z"/>
-          <path d="M 94 22 L 114 20 L 124 26 L 118 33 L 98 30 Z"/>
-          <path d="M 128 14 L 158 12 L 166 22 L 156 36 L 138 38 L 130 26 Z"/>
-          <path d="M 106 112 L 118 110 L 130 115 L 142 122 L 152 132 L 148 146 L 140 160 L 130 174 L 122 192 L 116 194 L 114 178 L 112 158 L 105 140 L 102 124 Z"/>
-          <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 L 191 52 Z"/>
-          <path d="M 188 51 L 192 50 L 192 58 L 187 59 L 186 54 Z"/>
-          <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 215 42 L 206 45 L 198 40 Z"/>
-          <path d="M 184 63 L 191 61 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 220 70 L 216 64 L 212 68 L 215 74 L 211 76 L 206 68 L 201 66 L 193 70 L 184 70 Z"/>
-          <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 372 38 L 364 52 L 352 58 L 346 72 L 338 86 L 328 96 L 320 108 L 314 102 L 306 94 L 296 96 L 288 110 L 280 96 L 270 90 L 258 84 L 248 72 L 238 56 Z"/>
-          <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 219 171 L 209 171 L 203 153 L 199 135 L 193 117 L 179 111 L 173 97 L 177 83 Z"/>
-          <path d="M 264 85 L 276 86 L 286 96 L 282 108 L 274 106 L 268 94 Z"/>
-          <path d="M 288 64 L 324 62 L 332 74 L 324 88 L 304 90 L 292 78 Z"/>
-          <path d="M 322 142 L 344 138 L 362 144 L 368 158 L 360 174 L 342 176 L 322 168 L 316 154 Z"/>
-        </g>
-      `;
-    }
-
-    // Dynamic Country Highlighting: lookup exact polygon geometry of the active target country
-    const targetCountrySvgPath = getCountrySvgPath(targetName);
-    const highlightedCountryMarkup = targetCountrySvgPath ? `
-      <g class="tactical-highlight-country">
-        <path d="${targetCountrySvgPath}" fill="rgba(251, 191, 36, 0.16)" stroke="${th.highlightCountry}" stroke-width="1.3" filter="url(#activeCountryGlow)"/>
-      </g>
-    ` : `
-      <g class="tactical-highlight-country">
-        <circle cx="${targetProj.x.toFixed(1)}" cy="${targetProj.y.toFixed(1)}" r="10" fill="rgba(251, 191, 36, 0.12)" stroke="${th.highlightCountry}" stroke-width="1.2" filter="url(#activeCountryGlow)"/>
-      </g>
-    `;
-
-    // Faint Topographic / Bathymetric Depth Contours
-    const bathymetricContoursMarkup = `
-      <g stroke="${th.grid}" stroke-width="0.32" fill="none" opacity="0.45">
-        <path d="M 180 60 C 188 56, 196 52, 204 50 C 216 48, 228 44, 240 44"/>
-        <path d="M 178 72 C 188 70, 200 70, 214 74 C 224 76, 234 74, 246 76"/>
-        <path d="M 180 84 C 196 82, 212 84, 228 86 C 240 88, 252 86, 264 92"/>
-        <path d="M 194 116 C 210 114, 226 122, 242 134"/>
-      </g>
-    `;
-
-    // Dynamic Country Labels with Proximity Occlusion Management
-    const countryLabelsDb = [
-      { name: "RUSSIA", x: 260, y: 35 },
-      { name: "UK", x: 189, y: 67 },
-      { name: "FRANCE", x: 198, y: 77 },
-      { name: "SPAIN", x: 187, y: 83 },
-      { name: "GERMANY", x: 209, y: 73 },
-      { name: "POLAND", x: 219, y: 71 },
-      { name: "ITALY", x: 212, y: 81 },
-      { name: "ROMANIA", x: 222, y: 76 },
-      { name: "TURKEY", x: 236, y: 81 },
-      { name: "SWEDEN", x: 212, y: 52 },
-      { name: "FINLAND", x: 226, y: 50 },
-      { name: "KAZAKHSTAN", x: 264, y: 73 },
-      { name: "IRAN", x: 254, y: 85 },
-      { name: "IRAQ", x: 242, y: 86 },
-      { name: "SYRIA", x: 236, y: 86 },
-      { name: "SAUDI ARABIA", x: 248, y: 96 },
-      { name: "YEMEN", x: 254, y: 104 },
-      { name: "MOROCCO", x: 188, y: 89 },
-      { name: "ALGERIA", x: 202, y: 93 },
-      { name: "LIBYA", x: 220, y: 93 },
-      { name: "EGYPT", x: 232, y: 93 },
-      { name: "SUDAN", x: 228, y: 105 },
-      { name: "CHAD", x: 218, y: 105 },
-      { name: "NIGER", x: 206, y: 104 },
-      { name: "NIGERIA", x: 203, y: 112 },
-      { name: "ETHIOPIA", x: 238, y: 110 },
-      { name: "S. SUDAN", x: 228, y: 113 },
-      { name: "DR CONGO", x: 218, y: 124 },
-      { name: "KENYA", x: 236, y: 121 },
-      { name: "TANZANIA", x: 234, y: 129 },
-      { name: "ANGOLA", x: 213, y: 135 },
-      { name: "ZAMBIA", x: 226, y: 137 },
-      { name: "INDIA", x: 276, y: 98 }
-    ];
-
-    // Build Set of active route locations to eliminate duplicate redundant static labels
-    const activeRouteNames = new Set();
-    activeRoutes.forEach(r => {
-      if (r.from) activeRouteNames.add(r.from.trim().toUpperCase());
-      if (r.to) activeRouteNames.add(r.to.trim().toUpperCase());
-    });
-
-    // Filter country labels based on proximity to target and origin to avoid visual clutter
-    const filteredLabelsHtml = countryLabelsDb.map(lbl => {
-      if (activeRouteNames.has(lbl.name)) return "";
-      const dTarget = Math.hypot(lbl.x - targetProj.x, lbl.y - targetProj.y);
-      const dOrigin = Math.hypot(lbl.x - originProj.x, lbl.y - originProj.y);
-      if (dTarget < 16 || dOrigin < 14) return "";
-      const isSubtle = (dTarget < 26 || dOrigin < 22);
-      return `<text x="${lbl.x}" y="${lbl.y}" fill="${th.labelCol}" opacity="${isSubtle ? 0.35 : 0.82}">${lbl.name}</text>`;
-    }).join("");
-
-    // Decluttered Waypoints Registry: render unique, non-overlapping waypoints and HUD tags
-    const renderedNodes = new Map();
-
-    // Great-Circle Parabolic 3D Arcs + Clean Multi-Route Transit Trails
-    const routeElementsHtml = showArc ? activeRoutes.map((rt, idx) => {
-      const fGeo = (rt.fromLat !== undefined && rt.fromLng !== undefined)
-        ? { lat: rt.fromLat, lng: rt.fromLng }
-        : (window.tplResolveGeoLocation(rt.from) || { lat: 39.8, lng: -98.5 });
-      const tGeo = (rt.toLat !== undefined && rt.toLng !== undefined)
-        ? { lat: rt.toLat, lng: rt.toLng }
-        : (window.tplResolveGeoLocation(rt.to) || { lat: 48.37, lng: 31.16 });
-
-      const p1 = window.tplProjectLatLngToMapSvg(fGeo.lat, fGeo.lng);
-      const p2 = window.tplProjectLatLngToMapSvg(tGeo.lat, tGeo.lng);
-      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-      // High-altitude parabolic 3D flight trajectory curve
-      const arcLift = Math.min(38, Math.max(16, dist * 0.32));
-      const cx = (p1.x + p2.x) / 2;
-      const cy = (p1.y + p2.y) / 2 - arcLift;
-      const pathId = `map-route-path-${idx}`;
-      const col = rt.color || "#38bdf8";
-      const isLastLeg = (idx === activeRoutes.length - 1);
-
-      // Unique node tracking for Waypoint 1 (Origin)
-      const p1Key = `${Math.round(p1.x / 8)}_${Math.round(p1.y / 8)}`;
-      let originNodeHtml = "";
-      if (!renderedNodes.has(p1Key)) {
-        renderedNodes.set(p1Key, true);
-        originNodeHtml = `
-          <!-- Waypoint Origin Node -->
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.4" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
-          ${idx === 0 ? `
-            <g class="map-waypoint-hud" transform="translate(${p1.x.toFixed(1)}, ${p1.y.toFixed(1)})">
-              <path d="M 0 -2.4 L 0 -10 L 16 -10" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
-              <text x="18" y="-13" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900" letter-spacing="0.06em">${(rt.from || "ORIGIN").toUpperCase()}</text>
-              <text x="18" y="-8.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${originCoordsStr}</text>
-            </g>
-          ` : ""}
-        `;
-      }
-
-      // Unique node tracking for Waypoint 2 (Destination or Intermediate Transfer Node)
-      const p2Key = `${Math.round(p2.x / 8)}_${Math.round(p2.y / 8)}`;
-      let destNodeHtml = "";
-      if (isLastLeg) {
-        // Multi-Ring Concentric Tactical HUD Reticle matching Image 2 for the Primary Destination
-        destNodeHtml = `
-          <g class="map-target-reticle" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
-            <!-- Expanding Radar Pulse Ring -->
-            <circle cx="0" cy="0" r="6" fill="none" stroke="${col}" stroke-width="1" class="hud-radar-pulse"/>
-            <!-- Outer Dashed Reticle Ring -->
-            <circle cx="0" cy="0" r="15" fill="none" stroke="${col}" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
-            <!-- Inner Solid Reticle Ring -->
-            <circle cx="0" cy="0" r="9.5" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.95"/>
-            <!-- 4-Corner Crosshair Ticks -->
-            <path d="M -12 -12 L -9 -12 M -12 -12 L -12 -9 M 12 -12 L 9 -12 M 12 -12 L 12 -9 M -12 12 L -9 12 M -12 12 L -12 9 M 12 12 L 9 12 M 12 12 L 12 9" stroke="${col}" stroke-width="0.8" fill="none"/>
-            <!-- Center Glowing Target Node -->
-            <circle cx="0" cy="0" r="3.2" fill="${th.highlightCountry}" stroke="#ffffff" stroke-width="0.8"/>
-            <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
-
-            <!-- Tactical Leader Line + Target HUD Tag -->
-            <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="${col}" stroke-width="0.75" opacity="0.85"/>
-            <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">${targetName.toUpperCase()}</text>
-            <text x="26" y="-14.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700" letter-spacing="0.05em">${targetCoordsStr}</text>
-          </g>
-        `;
-        renderedNodes.set(p2Key, true);
-      } else if (!renderedNodes.has(p2Key)) {
-        renderedNodes.set(p2Key, true);
-        const intermediateName = (rt.to || "").toUpperCase() === "UK" ? "LONDON" : (rt.to || "WAYPOINT").toUpperCase();
-        const intermediateCoords = (rt.to || "").toUpperCase() === "UK" ? "51.50°N 0.12°W" : `${Math.abs(tGeo.lat).toFixed(2)}°${tGeo.lat >= 0 ? "N" : "S"} ${Math.abs(tGeo.lng).toFixed(2)}°${tGeo.lng >= 0 ? "E" : "W"}`;
-        destNodeHtml = `
-          <!-- Intermediate Transfer Node & Waypoint HUD (e.g. London / UK in Image 2) -->
-          <g class="map-intermediate-hud" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
-            <circle cx="0" cy="0" r="2.6" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
-            <circle cx="0" cy="0" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
-            <path d="M 0 -2.6 L 0 -11 L 18 -11" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
-            <text x="20" y="-14" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.4" font-weight="900" letter-spacing="0.06em">${intermediateName}</text>
-            <text x="20" y="-9" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${intermediateCoords}</text>
-          </g>
-        `;
-      } else {
-        destNodeHtml = `
-          <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="2.2" fill="${col}" stroke="#ffffff" stroke-width="0.7" opacity="0.85"/>
-        `;
-      }
-
-      return `
-        <g class="map-route-group" data-route-idx="${idx}">
-          <!-- Glowing Parabolic Under-Stroke -->
-          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="4.8" opacity="0.28" filter="url(#arcGlowFilter)"/>
-          <!-- Core Luminous Arc Path -->
-          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.8" opacity="0.95"/>
-          <!-- Dynamic Animated Dash-Array Motion Trail -->
-          <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4" opacity="0.9"/>
-
-          ${originNodeHtml}
-          ${destNodeHtml}
-
-          <!-- Moving Transit Vehicle (Jet / Train / Ship) along Great-Circle Arc -->
-          ${buildTransitVehicleSvg(rt.mode || "plane", pathId, col, idx)}
-        </g>
-      `;
-    }).join("") : "";
-
-    // Custom on-screen traced routes (for 3D Direct Tracing mode)
-    const customTraceHtml = customRoutes.map((cr, cIdx) => {
-      const pts = Array.isArray(cr.points) ? cr.points : [];
-      if (pts.length < 2) return '';
-      const dStr = pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`).join(' ');
-      const cPathId = `map-custom-trace-${cIdx}`;
-      const col = cr.color || '#2effc6';
-      return `
-        <g class="map-custom-trace-group">
-          <path d="${dStr}" fill="none" stroke="${col}" stroke-width="3" opacity="0.25" stroke-linecap="round" stroke-linejoin="round"/>
-          <path id="${cPathId}" d="${dStr}" fill="none" stroke="${col}" stroke-width="1.6" stroke-dasharray="3 2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="${pts[0].x.toFixed(1)}" cy="${pts[0].y.toFixed(1)}" r="2.6" fill="${col}" stroke="#fff" stroke-width="0.8"/>
-          <circle cx="${pts[pts.length - 1].x.toFixed(1)}" cy="${pts[pts.length - 1].y.toFixed(1)}" r="3" fill="#ef4444" stroke="#fff" stroke-width="0.9"/>
-          ${buildTransitVehicleSvg(cr.mode || 'plane', cPathId, col, cIdx + 3)}
-        </g>
-      `;
-    }).join('');
-
-    const globeShiftX = ((50 - normX) * 0.65).toFixed(1);
-    const globeShiftY = ((50 - normY) * 0.45).toFixed(1);
-
-    const globeSvg = proj === 'globe' ? `
-      <svg class="globe-svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <!-- Volumetric 3D Sphere Shading Shader (Depth & Upper-Left Sun Rim) -->
-          <radialGradient id="globeSphereGrad" cx="35%" cy="30%" r="72%">
-            <stop offset="0%" stop-color="${th.oceanLight}" stop-opacity="1"/>
-            <stop offset="48%" stop-color="${th.ocean}" stop-opacity="1"/>
-            <stop offset="82%" stop-color="#020814" stop-opacity="1"/>
-            <stop offset="100%" stop-color="#01040a" stop-opacity="1"/>
-          </radialGradient>
-
-          <!-- Sci-Fi 3D Fresnel Atmosphere Rim Glow (Authentic Earth Limb Brightening) -->
-          <radialGradient id="globeFresnelGrad" cx="50%" cy="50%" r="50%">
-            <stop offset="78%" stop-color="${th.atmo}" stop-opacity="0"/>
-            <stop offset="89%" stop-color="${th.atmo}" stop-opacity="0.25"/>
-            <stop offset="96%" stop-color="${th.fresnelRim}" stop-opacity="0.7"/>
-            <stop offset="99%" stop-color="#ffffff" stop-opacity="0.95"/>
-            <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
-          </radialGradient>
-
-          <!-- Volumetric Terminator Depth Shadow Overlay -->
-          <radialGradient id="globeDepthShadow" cx="28%" cy="24%" r="80%">
-            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
-            <stop offset="55%" stop-color="#000000" stop-opacity="0"/>
-            <stop offset="85%" stop-color="#010611" stop-opacity="0.6"/>
-            <stop offset="100%" stop-color="#000308" stop-opacity="0.88"/>
-          </radialGradient>
-
-          <clipPath id="globeClipCircle">
-            <circle cx="200" cy="114" r="102"/>
-          </clipPath>
-
-          <filter id="outerAtmoGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4"/>
-          </filter>
-          <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
-          </filter>
-          <filter id="activeCountryGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="${th.highlightCountry}" flood-opacity="0.85"/>
-          </filter>
-          <filter id="mapGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.85"/>
-          </filter>
-        </defs>
-
-        <!-- Outer Space Deep Stars & Telemetry Grid -->
-        <g stroke="${th.grid}" stroke-width="0.45" opacity="0.32">
-          <line x1="0" y1="45" x2="400" y2="45"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="180" x2="400" y2="180"/>
-          <line x1="80" y1="0" x2="80" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="320" y1="0" x2="320" y2="225"/>
-        </g>
-
-        <!-- Multi-Layer 3D Atmosphere Rim Lighting Halo (Fresnel Glow along Earth Curve) -->
-        <circle cx="200" cy="114" r="102" fill="none" stroke="${th.atmo}" stroke-width="2.5" opacity="0.95" filter="url(#outerAtmoGlow)"/>
-        <circle cx="200" cy="114" r="106" fill="none" stroke="#0ea5e9" stroke-width="5" opacity="0.45" filter="url(#outerAtmoGlow)"/>
-        <circle cx="200" cy="114" r="111" fill="none" stroke="${th.atmo}" stroke-width="9" opacity="0.18" filter="url(#outerAtmoGlow)"/>
-
-        <!-- Circumference Telemetry Degree Marks -->
-        <circle cx="200" cy="114" r="102" fill="url(#globeSphereGrad)" stroke="rgba(56,189,248,0.7)" stroke-width="1.2"/>
-
-        <!-- Clipped 3D Orthographic Globe Body -->
-        <g clip-path="url(#globeClipCircle)">
-          <!-- Curved 3D Spherical Graticules (Latitude Parallels & Longitude Meridians) -->
-          <g stroke="${th.grid}" stroke-width="0.55" fill="none" opacity="0.85">
-            <!-- Parallels (Latitudes) -->
-            <ellipse cx="200" cy="62" rx="74" ry="22"/>
-            <ellipse cx="200" cy="78" rx="88" ry="26"/>
-            <ellipse cx="200" cy="95" rx="98" ry="30"/>
-            <ellipse cx="200" cy="105" rx="101" ry="31"/>
-            <ellipse cx="200" cy="114" rx="102" ry="32"/>
-            <line x1="98" y1="114" x2="302" y2="114"/>
-            <ellipse cx="200" cy="123" rx="101" ry="31"/>
-            <ellipse cx="200" cy="133" rx="98" ry="30"/>
-            <ellipse cx="200" cy="150" rx="88" ry="26"/>
-            <ellipse cx="200" cy="166" rx="74" ry="22"/>
-
-            <!-- Meridians (Longitudes) -->
-            <ellipse cx="200" cy="114" rx="28" ry="102"/>
-            <ellipse cx="200" cy="114" rx="58" ry="102"/>
-            <ellipse cx="200" cy="114" rx="85" ry="102"/>
-            <line x1="200" y1="12" x2="200" y2="216"/>
-          </g>
-
-          <!-- Interactive Transformed Coordinate Plane -->
-          <g class="map-interactive-coord-plane" transform="translate(${globeShiftX}, ${globeShiftY})">
-            ${highPrecisionWorldVectors}
-            ${highlightedCountryMarkup}
-            ${bathymetricContoursMarkup}
-            <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
-              ${filteredLabelsHtml}
-            </g>
-            ${routeElementsHtml}
-            ${customTraceHtml}
-          </g>
-
-          <!-- 3D Volumetric Terminator Depth Shadow Overlay -->
-          <circle cx="200" cy="114" r="102" fill="url(#globeDepthShadow)" pointer-events="none"/>
-
-          <!-- 3D Fresnel Limb Rim Glow Overlay (Inner Edge Highlight) -->
-          <circle cx="200" cy="114" r="102" fill="url(#globeFresnelGrad)" pointer-events="none"/>
-        </g>
-      </svg>
-    ` : `
-      <svg class="globe-svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
-          </filter>
-          <filter id="activeCountryGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="${th.highlightCountry}" flood-opacity="0.85"/>
-          </filter>
-          <filter id="mapGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
-            <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.85"/>
-          </filter>
-        </defs>
-        <rect width="400" height="225" fill="${th.ocean}"/>
-        <g stroke="${th.grid}" stroke-width="0.5" fill="none">
-          <line x1="0" y1="38" x2="400" y2="38"/><line x1="0" y1="75" x2="400" y2="75"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="150" x2="400" y2="150"/><line x1="0" y1="188" x2="400" y2="188"/>
-          <line x1="66" y1="0" x2="66" y2="225"/><line x1="133" y1="0" x2="133" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="266" y1="0" x2="266" y2="225"/><line x1="333" y1="0" x2="333" y2="225"/>
-        </g>
-        <g class="map-interactive-coord-plane">
-          ${highPrecisionWorldVectors}
-          ${highlightedCountryMarkup}
-          ${bathymetricContoursMarkup}
-          <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
-            ${filteredLabelsHtml}
-          </g>
-          ${routeElementsHtml}
-          ${customTraceHtml}
-        </g>
-      </svg>
-    `;
+    const pal = palettes[pinMat] || palettes['copper'];
 
     const rig3DStyle = is3D
-      ? `animation: none !important; transform: perspective(1000px) rotateX(${pitch3D}deg) rotateY(${yaw3D}deg) scale(${Math.min(1.35, Math.max(1.0, zoomLvl * 0.65))}); transform-style: preserve-3d; transition: transform 0.15s ease-out;`
-      : '';
-
-    const stage3DControlsHtml = `
-      <div class="map-3d-stage-toolbar" style="position:absolute; top:10px; right:12px; z-index:35; display:flex; align-items:center; gap:6px; background:rgba(7,13,25,0.92); backdrop-filter:blur(10px); border:1px solid rgba(56,189,248,0.45); border-radius:20px; padding:4px 10px; box-shadow:0 8px 24px rgba(0,0,0,0.75); pointer-events:auto;">
-        <button type="button" id="map-stage-btn-toggle-3d" style="background:${is3D ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.08)"}; border:1px solid ${is3D ? "#38bdf8" : "rgba(255,255,255,0.18)"}; color:${is3D ? "#38bdf8" : "#94a3b8"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:800; cursor:pointer;" title="Toggle 3D Orbit / Camera Mode">
-          ${is3D ? "🌐 3D Orbit ON" : "🌐 3D Orbit"}
-        </button>
-        <div style="display:flex; align-items:center; gap:2px; background:rgba(0,0,0,0.5); border-radius:12px; border:1px solid rgba(255,255,255,0.12); padding:1px 4px;">
-          <button type="button" id="map-stage-btn-zoom-in" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom In (+)">+</button>
-          <span id="map-stage-zoom-badge" style="font-family:monospace; font-size:8.5px; color:#e2e8f0; min-width:24px; text-align:center;">${zoomLvl.toFixed(1)}x</span>
-          <button type="button" id="map-stage-btn-zoom-out" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom Out (−)">−</button>
-        </div>
-        <button type="button" id="map-stage-btn-draw" style="background:${isDrawing ? "rgba(46,255,198,0.22)" : "rgba(255,255,255,0.08)"}; border:1px solid ${isDrawing ? "#2effc6" : "rgba(255,255,255,0.18)"}; color:${isDrawing ? "#2effc6" : "#e2e8f0"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:700; cursor:pointer;" title="Direct Route Tracing Mode">
-          ${isDrawing ? "✏️ Tracing Route" : "✏️ Trace"}
-        </button>
-        <select id="map-stage-sel-transit" style="background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:#fff; font-size:9.5px; font-weight:700; padding:2px 5px; cursor:pointer;" title="Transit Mode for On-Screen Trace">
-          <option value="plane" ${(d.activeTraceTransit || "plane") === "plane" ? "selected" : ""}>✈️ Plane</option>
-          <option value="ship" ${d.activeTraceTransit === "ship" ? "selected" : ""}>🚢 Ship</option>
-          <option value="train" ${d.activeTraceTransit === "train" ? "selected" : ""}>🚆 Train</option>
-          <option value="line" ${d.activeTraceTransit === "line" ? "selected" : ""}>⚡ Line</option>
-        </select>
-        <button type="button" id="map-stage-btn-clear-trace" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:10px; padding:2px 7px; font-size:9px; font-weight:700; cursor:pointer;" title="Clear On-Screen Drawn Traces">Clear</button>
-      </div>
-    `;
+      ? `transform: perspective(1200px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(1.02); transform-style: preserve-3d; transition: transform 0.25s ease-out;`
+      : 'transform: none;';
 
     return `
-      <div class="tpl-map globe-viewport ${is3D ? 'is-3d-mode' : ''} ${isDrawing ? 'is-drawing-route' : ''}" style="background:${th.bg}; --focus-x:${normX.toFixed(1)}%; --focus-y:${normY.toFixed(1)}%; --zoom-scale:${zoomLvl}; --zoom-delay:${zoomStart}s; --cam-cycle:${totalCycle}s; --pan-x:${panX}; --pan-y:${panY}; --pin-color:${pinColor}; cursor:${isDrawing ? 'crosshair' : (is3D ? 'grab' : 'default')};">
-        ${stage3DControlsHtml}
-        <div class="globe-camera-rig" style="${rig3DStyle}">
-          ${globeSvg}
-        </div>
+      <div class="tpl-map cinematic-map-pin-suite ${is3D ? 'is-3d-perspective' : ''}" style="background:#020610; width:100%; height:100%; position:relative; overflow:hidden;">
+        <div class="cinematic-map-canvas-container" style="${rig3DStyle}">
+          <!-- 1. BASE WORLD SATELLITE & TOPOGRAPHIC RELIEF LAYER -->
+          <img src="/cinematic_tactical_world_map_kyiv.png" alt="Cinematic Tactical Relief World Map" class="cinematic-map-base-img" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
 
-        <!-- Floating Glassmorphic HUD Route Card matching Image 2 -->
-        <div class="location-hud">
-          <div class="hud-top-meta">
-            <span class="hud-badge-tag">[MULTI-VECTOR TRANSIT 01]</span>
-            <span class="hud-badge-tag">[ACTIVE LEGS: ${activeRoutes.length}]</span>
-          </div>
-          <div class="hud-route-legs">
-            ${activeRoutes.map((rt, i) => {
-              const isLast = (i === activeRoutes.length - 1);
-              const fromFlag = getCountryFlag(rt.from);
-              return `
-                <div class="hud-route-item ${isLast ? 'active-leg' : ''}">
-                  ${i === 0 ? `<span class="hud-flag">${fromFlag}</span>` : `<span class="hud-arrow-down">\u2794</span>`}
-                  <span class="hud-country">${(rt.from || 'ORIGIN').toUpperCase()}</span>
-                  <span class="hud-arrow">\u2192</span>
-                  <span class="hud-country ${isLast ? 'highlight' : ''}">${(rt.to || 'TARGET').toUpperCase()}</span>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
+          <!-- 2. DYNAMIC WATER CURRENTS SHIMMER -->
+          ${showWater ? `
+            <div class="ocean-shimmer-layer" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 42% 64%, rgba(56, 189, 248, 0.08) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none; animation: oceanCurrentShift 9s ease-in-out infinite alternate;"></div>
+          ` : ''}
 
-        <!-- High-Tech Bottom Telemetry Bar -->
-        <div class="telemetry-bar">
-          <span>SAT-LOCK // ${proj === 'globe' ? '3D ORTHOGRAPHIC GLOBE' : '2D GRANULAR WORLD MAP'} ${is3D ? '\u00b7 [3D INTERACTIVE]' : ''}</span>
-          <span>${activeRoutes.length} ROUTE${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ZOOM @ ${zoomStart}s \u00b7 ${zoomLvl}x</span>
+          <!-- 3. VOLUMETRIC ATMOSPHERIC LIMB GLOW & VIGNETTE -->
+          <div class="atmospheric-limb-glow" style="position: absolute; inset: 0; box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85), inset 0 0 100px rgba(2, 8, 20, 0.7); pointer-events: none;"></div>
+
+          <!-- 4. DYNAMIC VECTOR OVERLAY: 3D PIN, SHOCKWAVE, ARCS, HUD LEADER LINE -->
+          <svg class="cinematic-map-svg-overlay" viewBox="0 0 968 410" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+            <defs>
+              <!-- Metallic Pin Gradients -->
+              <radialGradient id="cmpPinHead" cx="35%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="${pal.stop0}"/>
+                <stop offset="25%" stop-color="${pal.stop25}"/>
+                <stop offset="55%" stop-color="${pal.stop55}"/>
+                <stop offset="85%" stop-color="${pal.stop85}"/>
+                <stop offset="100%" stop-color="${pal.stop100}"/>
+              </radialGradient>
+              <radialGradient id="cmpPinGrooves" cx="50%" cy="50%" r="50%">
+                <stop offset="30%" stop-color="${pal.stop85}" stop-opacity="0.8"/>
+                <stop offset="50%" stop-color="${pal.stop0}" stop-opacity="0.9"/>
+                <stop offset="70%" stop-color="${pal.stop55}" stop-opacity="0.8"/>
+                <stop offset="90%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
+                <stop offset="100%" stop-color="${pal.stop100}"/>
+              </radialGradient>
+              <linearGradient id="cmpPinStem" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${pal.stem0}"/>
+                <stop offset="50%" stop-color="${pal.stem50}"/>
+                <stop offset="100%" stop-color="${pal.stem100}"/>
+              </linearGradient>
+
+              <filter id="cmpGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3.5"/>
+              </filter>
+              <filter id="cmpPinShadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="6" dy="14" stdDeviation="8" flood-color="#000000" flood-opacity="0.9"/>
+              </filter>
+            </defs>
+
+            <!-- Flight Trajectory Arcs (connecting Americas -> London -> Kyiv -> Asia) -->
+            <g class="trajectory-flight-arcs">
+              <path d="M 290 220 Q 410 130 540 143" fill="none" stroke="rgba(249, 115, 22, 0.45)" stroke-width="3" stroke-dasharray="6 4" class="animated-flight-dash" />
+              <path d="M 290 220 Q 410 130 540 143" fill="none" stroke="#f97316" stroke-width="1.6" stroke-dasharray="6 4" />
+              <path d="M 540 143 Q 660 120 780 185" fill="none" stroke="rgba(249, 115, 22, 0.4)" stroke-width="2.5" stroke-dasharray="5 4" />
+              <path d="M 540 143 Q 660 120 780 185" fill="none" stroke="#ea580c" stroke-width="1.2" stroke-dasharray="5 4" />
+            </g>
+
+            <!-- Secondary Metallic Network Pins -->
+            <!-- London / UK Pin -->
+            <g class="secondary-pin" transform="translate(485, 132) scale(0.65)" filter="url(#cmpPinShadow)">
+              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
+              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            </g>
+
+            <!-- US West Pin -->
+            <g class="secondary-pin" transform="translate(305, 156) scale(0.65)" filter="url(#cmpPinShadow)">
+              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
+              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            </g>
+
+            <!-- East Asia Pin -->
+            <g class="secondary-pin" transform="translate(775, 185) scale(0.65)" filter="url(#cmpPinShadow)">
+              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
+              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            </g>
+
+            <!-- GROUND IMPACT DYNAMICS AT KYIV -->
+            <g class="ground-impact-group" transform="translate(540, 143)">
+              <ellipse cx="0" cy="0" rx="36" ry="14" fill="none" stroke="${pal.pulse}" stroke-width="1.8" opacity="0.8" class="kyiv-shockwave-1" />
+              <ellipse cx="0" cy="0" rx="64" ry="22" fill="none" stroke="${pal.pulse}" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.45" class="kyiv-shockwave-2" />
+              ${showDust ? `
+                <ellipse cx="0" cy="2" rx="42" ry="18" fill="rgba(180, 83, 9, 0.28)" filter="url(#cmpGlow)" />
+                <ellipse cx="-8" cy="-2" rx="32" ry="14" fill="rgba(217, 119, 6, 0.22)" filter="url(#cmpGlow)" />
+              ` : ''}
+            </g>
+
+            <!-- PRIMARY 3D METALLIC PIN OBJECT -->
+            <g class="primary-3d-pin-object" transform="translate(540, 143)" filter="url(#cmpPinShadow)">
+              <!-- Contact Drop Shadow on Terrain -->
+              <ellipse cx="14" cy="2" rx="22" ry="8" fill="rgba(0,0,0,0.85)" filter="url(#cmpGlow)" />
+
+              <!-- 3D Tapered Conical Stem touching coordinate -->
+              <path d="M 0 0 L -12 -38 L 12 -38 Z" fill="url(#cmpPinStem)" stroke="rgba(0,0,0,0.4)" stroke-width="0.5" />
+              <line x1="0" y1="0" x2="0" y2="-38" stroke="#ffedd5" stroke-width="1" opacity="0.75" />
+
+              <!-- Heavy Beveled Circular Metallic Pin Head -->
+              <g transform="translate(0, -56)">
+                <circle cx="0" cy="0" r="28" fill="#431407" />
+                <circle cx="0" cy="0" r="27" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1.5" />
+                <circle cx="0" cy="0" r="21" fill="url(#cmpPinGrooves)" stroke="rgba(0,0,0,0.35)" stroke-width="1" />
+                <circle cx="0" cy="0" r="15" fill="url(#cmpPinHead)" stroke="rgba(254, 215, 170, 0.6)" stroke-width="0.8" />
+                <circle cx="0" cy="0" r="8" fill="${pal.center}" stroke="${pal.rim}" stroke-width="0.7" />
+                <!-- Specular Gleam -->
+                <path d="M -18 -18 A 25 25 0 0 1 18 -18" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.75" filter="url(#cmpGlow)" />
+                <circle cx="-7" cy="-7" r="3" fill="#ffffff" opacity="0.8" />
+              </g>
+            </g>
+
+            <!-- HIGH-TECH MODULAR DATA HUD & LEADER LINE -->
+            <g class="kyiv-leader-line-callout" transform="translate(540, 143)">
+              <polyline points="20,-72 65,-94 75,-94" fill="none" stroke="#cbd5e1" stroke-width="1.4" opacity="0.85" />
+              <circle cx="20" cy="-72" r="2.2" fill="${pal.stop25}" stroke="#ffffff" stroke-width="0.8" />
+
+              <!-- High-Tech Telemetry Glassmorphic Card -->
+              <g transform="translate(75, -112)">
+                <rect x="0" y="0" width="198" height="34" rx="4" fill="rgba(8, 12, 22, 0.88)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1" />
+                <!-- Tech Corner Ticks -->
+                <line x1="0" y1="0" x2="6" y2="0" stroke="${pal.stop25}" stroke-width="2" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="${pal.stop25}" stroke-width="2" />
+                <line x1="198" y1="34" x2="192" y2="34" stroke="${pal.stop25}" stroke-width="2" />
+                <line x1="198" y1="34" x2="198" y2="28" stroke="${pal.stop25}" stroke-width="2" />
+
+                <!-- Main Bold Coordinate Header Text -->
+                <text x="8" y="15" fill="#ffffff" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="9.5" font-weight="800" letter-spacing="0.04em">
+                  ${locTitle} <tspan fill="rgba(255,255,255,0.4)">|</tspan> ${locCoords}
+                </text>
+
+                <!-- Telemetry Subtext -->
+                <text x="8" y="27" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="600" letter-spacing="0.1em">
+                  ${locSub}
+                </text>
+              </g>
+            </g>
+          </svg>
+
+          <!-- On-Screen Transport Controls (Bottom-Left) matching Image 3 -->
+          <div class="map-on-canvas-transport" style="position: absolute; bottom: 14px; left: 14px; display: flex; align-items: center; gap: 8px; z-index: 40; pointer-events: auto;">
+            <button type="button" class="btn-canvas-pause" onclick="if (typeof window.toggleModalPlayPause === 'function') window.toggleModalPlayPause();" style="padding: 6px 14px; font-size: 11px; font-weight: 700; background: #151824; border: 1px solid rgba(255,255,255,0.14); color: #f8fafc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.6); transition: all 0.15s;" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
+              <span style="font-size: 10px;">❚❚</span>
+              <span>Pause</span>
+            </button>
+            <button type="button" class="btn-canvas-replay" onclick="if (typeof window.resetModalPlayback === 'function') window.resetModalPlayback();" style="padding: 6px 14px; font-size: 11px; font-weight: 600; background: #151824; border: 1px solid rgba(255,255,255,0.14); color: #cbd5e1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.6); transition: all 0.15s;" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
+              <span style="font-size: 11px;">↺</span>
+              <span>Replay</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
   };
 
-  // Interactive 3D Orbit & Direct On-Screen Route Tracing Handler for Map Stage
   window.tplBindInteractiveMapStage = function(stageEl) {
     if (!stageEl) return;
     const viewport = stageEl.querySelector(".tpl-map.globe-viewport");
@@ -2462,16 +2175,53 @@
       const l = fxc.querySelector('.tw-likes'); if (l && data.likes !== undefined) l.textContent = data.likes;
       const rt = fxc.querySelector('.tw-retweets'); if (rt && data.retweets !== undefined) rt.textContent = data.retweets;
     } else if (tplId === 'quote') {
-      const q = fxc.querySelector('.quote-text'); if (q) q.textContent = `\u201c${data.quote}\u201d`;
-      const a = fxc.querySelector('.quote-author'); if (a) a.textContent = `\u2014 ${data.author}`;
+      const q = fxc.querySelector('.quote-text');
+      if (q && data.quote !== undefined) {
+        q.textContent = data.quote;
+      }
+      const a = fxc.querySelector('.quote-author');
+      if (a && data.author !== undefined) {
+        a.textContent = `\u2014 ${data.author}`;
+      }
+      const qm = fxc.querySelector('.quote-mark');
+      const root = fxc.querySelector('.tpl-quote');
+      if (data.textColor && q) q.style.color = data.textColor;
+      if (data.authorColor && a) a.style.color = data.authorColor;
+      if (data.quoteMarkColor && qm) qm.style.color = data.quoteMarkColor;
+      if (data.bgGradient && root) root.style.background = data.bgGradient;
+      if (data.fontFamily && q) q.style.fontFamily = data.fontFamily;
+      if (data.fontSize && q) q.style.fontSize = `${data.fontSize}px`;
     } else if (tplId === 'news') {
+      const root = fxc.querySelector('.tpl-news');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
       const ch = fxc.querySelector('.news-badge'); if (ch && data.channel !== undefined) ch.textContent = data.channel;
+      const rep = fxc.querySelector('.chyron-report'); if (rep && data.report !== undefined) rep.textContent = data.report;
       const hl = fxc.querySelector('.headline'); if (hl && data.headline !== undefined) hl.textContent = data.headline;
       const tk = fxc.querySelector('.ticker-text'); if (tk && data.ticker !== undefined) tk.textContent = data.ticker;
       if (data.bannerColor) {
-        const up = fxc.querySelector('.chyron-upper'); if (up) up.style.background = `linear-gradient(90deg, ${data.bannerColor} 0%, #7f1d1d 100%)`;
-        const tr = fxc.querySelector('.ticker-red'); if (tr) tr.style.background = data.bannerColor;
-        if (hl) hl.style.borderLeftColor = data.bannerColor;
+        const up = fxc.querySelector('.chyron-upper');
+        const tr = fxc.querySelector('.ticker-red');
+        const isCustomCol = data.bannerColor !== '#dc2626' && data.bannerColor !== '#ef4444';
+        if (up) {
+          up.style.background = isCustomCol 
+            ? `linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 38%, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0.52) 100%), linear-gradient(90deg, #450407 0%, ${data.bannerColor} 30%, #ef1c24 50%, ${data.bannerColor} 70%, #450407 100%)`
+            : '';
+        }
+        if (tr) {
+          tr.style.background = isCustomCol
+            ? `linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 45%, rgba(0,0,0,0.2) 55%, rgba(0,0,0,0.5) 100%), ${data.bannerColor}`
+            : '';
+        }
+        if (hl) {
+          hl.style.borderLeftColor = data.bannerColor;
+          hl.style.boxShadow = `inset 2px 0 8px ${data.bannerColor}66, inset 0 1.5px 0 rgba(255,255,255,0.3), inset 0 -1.5px 1px rgba(0,0,0,0.7)`;
+        }
+      }
+      if (data.glassBlur !== undefined && hl) {
+        hl.style.backdropFilter = `blur(${data.glassBlur}px) saturate(180%) contrast(108%)`;
+        hl.style.webkitBackdropFilter = `blur(${data.glassBlur}px) saturate(180%) contrast(108%)`;
       }
     } else if (tplId === 'polaroid') {
       const root = fxc.querySelector('.tpl-polaroid');
@@ -2505,9 +2255,57 @@
       const items = fxc.querySelectorAll('.check-text');
       (data.items || []).forEach((txt, i) => { if (items[i]) items[i].textContent = txt; });
     } else if (tplId === 'progress') {
-      const g = fxc.querySelector('.prog-goal'); if (g) g.textContent = data.goal;
-      const p = fxc.querySelector('.prog-pct'); if (p) p.textContent = data.percent;
-      const b = fxc.querySelector('.prog-bar-fill'); if (b) b.style.width = data.percent;
+      let root = fxc.querySelector('.tpl-progress');
+      if (!root || !root.classList.contains('cinematic-hud-progress')) {
+        fxc.innerHTML = window.tplBuildProgressHtml ? window.tplBuildProgressHtml(data) : '';
+        root = fxc.querySelector('.tpl-progress');
+      }
+      if (root) {
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+        const gradStart = data.gradientStart || '#ff007f';
+        const gradEnd = data.gradientEnd || '#00e5ff';
+        const barWidth = Math.max(40, Math.min(90, Number(data.barWidthPercent || 68)));
+        root.style.setProperty('--hud-grad-start', gradStart);
+        root.style.setProperty('--hud-grad-end', gradEnd);
+        root.style.setProperty('--hud-bar-width', `${barWidth}%`);
+
+        const g = root.querySelector('.prog-goal');
+        if (g && data.title !== undefined) g.textContent = data.title;
+        else if (g && data.goal !== undefined) g.textContent = data.goal;
+
+        const sub = root.querySelector('.prog-subtitle');
+        if (sub && data.subtitle !== undefined) sub.textContent = data.subtitle;
+
+        const rawPct = (data.percent !== undefined) ? String(data.percent).replace(/[^0-9.]/g, '') : '74';
+        const pctNum = Math.max(0, Math.min(100, parseFloat(rawPct) || 74));
+
+        const p = root.querySelector('.prog-pct');
+        if (p) p.textContent = `${pctNum}%`;
+
+        const b = root.querySelector('.prog-bar-fill');
+        if (b) b.style.width = `${pctNum}%`;
+
+        const anchor = root.querySelector('.hud-dynamic-callout-anchor');
+        if (anchor) anchor.style.left = `calc((100% - var(--hud-bar-width)) / 2 + (var(--hud-bar-width) * ${pctNum} / 100))`;
+
+        const rAmt = root.querySelector('.prog-amt-raised');
+        if (rAmt && data.currentAmount !== undefined) rAmt.textContent = data.currentAmount;
+        else if (rAmt && data.amount !== undefined) rAmt.textContent = data.amount;
+
+        const tAmt = root.querySelector('.prog-amt-target');
+        if (tAmt && data.targetAmount !== undefined) tAmt.textContent = data.targetAmount;
+
+        const sparks = root.querySelector('.hud-spark-emitter');
+        if (sparks) sparks.style.display = (data.showSparks === false) ? 'none' : 'block';
+
+        const shimmer = root.querySelector('.hud-light-sweep-beam');
+        if (shimmer) shimmer.style.display = (data.showShimmer === false) ? 'none' : 'block';
+
+        const grain = root.querySelector('.hud-film-grain-overlay');
+        if (grain) grain.style.display = (data.showFilmGrain === false) ? 'none' : 'block';
+      }
     } else if (tplId === 'scramble') {
       let root = fxc.querySelector('.tpl-scramble');
       const activeMode = (data && data.layoutMode) || 'chat';
@@ -2809,6 +2607,58 @@
           }
         }
       }
+    } else if (tplId === 'newspaper-3d') {
+      const root = fxc.querySelector('.tpl-newspaper-3d');
+      if (root) {
+        if (data.cameraPitch !== undefined) root.style.setProperty('--np-camera-pitch', `${data.cameraPitch}deg`);
+        if (data.cameraYaw !== undefined) root.style.setProperty('--np-camera-yaw', `${data.cameraYaw}deg`);
+        if (data.cameraRoll !== undefined) root.style.setProperty('--np-camera-roll', `${data.cameraRoll}deg`);
+        if (data.perspective !== undefined) root.style.setProperty('--np-perspective', `${data.perspective}px`);
+        if (data.dofBlur !== undefined) {
+          root.style.setProperty('--np-dof-fg-blur', `${data.dofBlur}px`);
+          root.style.setProperty('--np-dof-bg-blur', `${Math.round(data.dofBlur * 0.55)}px`);
+        }
+        if (data.volumetricRays !== undefined || data.rayIntensity !== undefined) {
+          const rayOp = data.volumetricRays !== false ? (data.rayIntensity !== undefined ? data.rayIntensity : 0.75) : 0;
+          root.style.setProperty('--np-ray-opacity', `${rayOp}`);
+        }
+        if (data.warmSpotlight !== undefined || data.spotIntensity !== undefined) {
+          const spotOp = data.warmSpotlight !== false ? (data.spotIntensity !== undefined ? data.spotIntensity : 0.85) : 0;
+          root.style.setProperty('--np-spot-intensity', `${spotOp}`);
+        }
+        if (data.rimLight !== undefined) {
+          root.style.setProperty('--np-rim-glow', data.rimLight !== false ? 'rgba(125, 211, 252, 0.35)' : 'transparent');
+        }
+        if (data.filmGrain !== undefined || data.filmGrainOpacity !== undefined) {
+          const grainOp = data.filmGrain !== false ? (data.filmGrainOpacity !== undefined ? data.filmGrainOpacity : 0.26) : 0;
+          root.style.setProperty('--np-grain-opacity', `${grainOp}`);
+        }
+        if (data.motionBlur !== undefined) root.classList.toggle('has-motion-blur', !!data.motionBlur);
+        if (data.organicDrift !== undefined) root.classList.toggle('has-organic-drift', !!data.organicDrift);
+        if (data.stylePreset) {
+          root.className = `tpl-newspaper-3d theme-${data.stylePreset} ${data.motionBlur !== false ? 'has-motion-blur' : ''} ${data.organicDrift !== false ? 'has-organic-drift' : ''}`;
+        }
+        
+        const mastheadEl = root.querySelector('.tpl-np-masthead');
+        if (mastheadEl && data.masthead !== undefined) mastheadEl.textContent = data.masthead;
+        const headlineEl = root.querySelector('.tpl-np-headline');
+        if (headlineEl && data.headline !== undefined) headlineEl.innerHTML = data.headline.replace(/\n/g, '<br/>');
+        const datelineEl = root.querySelector('.tpl-np-dateline');
+        if (datelineEl && data.dateline !== undefined) datelineEl.textContent = data.dateline;
+
+        const dogEarWrap = root.querySelector('.tpl-np-dog-ear-wrap');
+        if (dogEarWrap) {
+          dogEarWrap.style.display = data.showDogEar !== false ? 'block' : 'none';
+          if (data.dogEarSize !== undefined) {
+            dogEarWrap.style.width = `${data.dogEarSize}px`;
+            dogEarWrap.style.height = `${data.dogEarSize}px`;
+            const fold = dogEarWrap.querySelector('.tpl-np-dog-ear-fold');
+            if (fold) fold.style.borderWidth = `0 ${data.dogEarSize}px ${data.dogEarSize}px 0`;
+            const flap = dogEarWrap.querySelector('.tpl-np-dog-ear-flap');
+            if (flap) flap.style.borderWidth = `${data.dogEarSize}px 0 0 ${data.dogEarSize}px`;
+          }
+        }
+      }
     } else if (tplId === 'headline-fly') {
       const root = fxc.querySelector('.tpl-headline-fly');
       if (root) {
@@ -3033,6 +2883,158 @@
     // =========================================================================
     // CASE 1: DEPTH PARALLAX MULTI-LAYER (Image 1)
     // =========================================================================
+    if (tplId === 'quote') {
+      const palettes = [
+        { id: 'parchment', name: 'Warm Parchment', bg: 'linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 100%)', text: '#3a2418', author: '#8b5a3c', mark: 'rgba(139, 90, 60, 0.16)' },
+        { id: 'noir', name: 'Noir Cinema', bg: 'linear-gradient(135deg, #18181b 0%, #09090b 100%)', text: '#f4f4f5', author: '#a1a1aa', mark: 'rgba(255, 255, 255, 0.08)' },
+        { id: 'midnight', name: 'Midnight Gold', bg: 'linear-gradient(135deg, #0f172a 0%, #020617 100%)', text: '#f8fafc', author: '#eab308', mark: 'rgba(234, 179, 8, 0.12)' },
+        { id: 'terracotta', name: 'Terracotta', bg: 'linear-gradient(135deg, #451a03 0%, #1c0a00 100%)', text: '#fef3c7', author: '#f59e0b', mark: 'rgba(245, 158, 11, 0.12)' },
+        { id: 'emerald', name: 'Emerald Vault', bg: 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)', text: '#ecfdf5', author: '#34d399', mark: 'rgba(52, 211, 153, 0.12)' }
+      ];
+
+      const fonts = [
+        { label: 'Playfair Display (Editorial)', val: "'Playfair Display', Georgia, serif" },
+        { label: 'Georgia (Classic Book)', val: "Georgia, serif" },
+        { label: 'Cinzel (Cinematic Epic)', val: "'Cinzel', serif" },
+        { label: 'Garamond (Poetic Novel)', val: "Garamond, serif" },
+        { label: 'Space Grotesk (Modern Bold)', val: "'Space Grotesk', sans-serif" },
+        { label: 'Inter (Clean Tech)', val: "'Inter', sans-serif" }
+      ];
+
+      const curPal = data.palette || 'parchment';
+      const curFont = data.fontFamily || "'Playfair Display', Georgia, serif";
+
+      container.innerHTML = `
+        <div style="background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">\u275d</span>
+              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">Cinematic Quote Studio</span>
+            </div>
+            <span style="font-size: 9px; font-weight: 700; background: rgba(56,189,248,0.2); color: #38bdf8; padding: 2px 6px; border-radius: 4px; font-family: monospace;">RESPONSIVE CARD</span>
+          </div>
+
+          <!-- Quote Text (Textarea) -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Quote Statement</span>
+            <textarea id="quote-inp-text" rows="3" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-family: inherit; line-height: 1.4; outline: none; resize: vertical;">${data.quote || 'The obstacle is the way.'}</textarea>
+          </div>
+
+          <!-- Author Field -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Attribution / Author</span>
+            <input type="text" id="quote-inp-author" value="${data.author || 'Marcus Aurelius'}" style="width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+          </div>
+
+          <!-- Color & Palette Themes -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Aesthetic Color Palette</span>
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
+              ${palettes.map(p => `
+                <button type="button" class="quote-pal-btn" data-pal="${p.id}" title="${p.name}" style="height: 32px; border-radius: 6px; background: ${p.bg}; border: ${curPal === p.id ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)'}; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: ${curPal === p.id ? '0 0 8px rgba(56,189,248,0.5)' : 'none'};">
+                  <span style="font-size: 12px; color: ${p.text}; font-weight: 900; line-height: 1;">\u201c</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Typography Style -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Serif Typography</span>
+            <select id="quote-sel-font" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #f1f5f9; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
+              ${fonts.map(f => `
+                <option value="${f.val}" ${f.val === curFont ? 'selected' : ''}>${f.label}</option>
+              `).join('')}
+            </select>
+          </div>
+
+          <!-- Font Size Slider -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="display: flex; justify-content: space-between; font-size: 9.5px;">
+              <span style="color: #94a3b8; font-weight: 600; text-transform: uppercase;">Scale Font Size</span>
+              <span id="quote-lbl-size" style="color: #38bdf8; font-family: monospace; font-weight: 700;">${data.fontSize || 42}px</span>
+            </div>
+            <input type="range" id="quote-slider-size" min="20" max="64" value="${data.fontSize || 42}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+          </div>
+
+          <!-- Individual Colors -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Text</span>
+              <input type="color" id="quote-col-text" value="${data.textColor || '#3a2418'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9px; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Author</span>
+              <input type="color" id="quote-col-author" value="${data.authorColor || '#8b5a3c'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Wire Quote Studio Controls
+      const qInp = container.querySelector('#quote-inp-text');
+      if (qInp) {
+        qInp.oninput = (e) => {
+          window.tplSetContextualData('quote', { quote: e.target.value });
+        };
+      }
+
+      const aInp = container.querySelector('#quote-inp-author');
+      if (aInp) {
+        aInp.oninput = (e) => {
+          window.tplSetContextualData('quote', { author: e.target.value });
+        };
+      }
+
+      container.querySelectorAll('.quote-pal-btn').forEach(btn => {
+        btn.onclick = () => {
+          const palId = btn.dataset.pal;
+          const chosen = palettes.find(p => p.id === palId);
+          if (chosen) {
+            window.tplSetContextualData('quote', {
+              palette: chosen.id,
+              bgGradient: chosen.bg,
+              textColor: chosen.text,
+              authorColor: chosen.author,
+              quoteMarkColor: chosen.mark
+            });
+            window.tplRenderContextualInspector('quote');
+          }
+        };
+      });
+
+      const fontSel = container.querySelector('#quote-sel-font');
+      if (fontSel) {
+        fontSel.onchange = (e) => {
+          window.tplSetContextualData('quote', { fontFamily: e.target.value });
+        };
+      }
+
+      const szSlider = container.querySelector('#quote-slider-size');
+      const szLbl = container.querySelector('#quote-lbl-size');
+      if (szSlider) {
+        szSlider.oninput = (e) => {
+          const val = parseInt(e.target.value, 10);
+          if (szLbl) szLbl.textContent = `${val}px`;
+          window.tplSetContextualData('quote', { fontSize: val });
+        };
+      }
+
+      const tCol = container.querySelector('#quote-col-text');
+      if (tCol) {
+        tCol.onchange = (e) => {
+          window.tplSetContextualData('quote', { textColor: e.target.value });
+        };
+      }
+
+      const auCol = container.querySelector('#quote-col-author');
+      if (auCol) {
+        auCol.onchange = (e) => {
+          window.tplSetContextualData('quote', { authorColor: e.target.value });
+        };
+      }
+    }
+
     if (tplId === 'parallax') {
       container.innerHTML = `
         <div style="background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
@@ -5100,6 +5102,178 @@
     }
 
     // =========================================================================
+    // SPECIAL HANDLER: CINEMATIC PROGRESS HUD (progress)
+    // =========================================================================
+    if (tplId === 'progress') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+
+      const curTitle = data.title !== undefined ? data.title : (data.goal || 'PROJECT FUNDING STATUS');
+      const curSub = data.subtitle !== undefined ? data.subtitle : '[PHASE 2 / 3 ACTIVE]';
+      const curPct = (data.percent !== undefined) ? String(data.percent).replace(/[^0-9.]/g, '') : '74';
+      const curRaised = data.currentAmount !== undefined ? data.currentAmount : (data.amount || '$74,000,000 Raised');
+      const curTarget = data.targetAmount !== undefined ? data.targetAmount : 'Target: $100,000,000';
+      const gradStart = data.gradientStart || '#ff007f';
+      const gradEnd = data.gradientEnd || '#00e5ff';
+      const barWidth = data.barWidthPercent !== undefined ? Number(data.barWidthPercent) : 68;
+
+      const HUD_GRAD_PRESETS = [
+        { label: 'Cyber Magenta / Cyan', start: '#ff007f', end: '#00e5ff' },
+        { label: 'Gold / Electric Blue', start: '#f59e0b', end: '#38bdf8' },
+        { label: 'Emerald / Mint Glow', start: '#10b981', end: '#34d399' },
+        { label: 'Sunset Red / Amber', start: '#ef4444', end: '#f59e0b' }
+      ];
+
+      container.innerHTML = `
+        <div style="background: rgba(4,8,18,0.85); border: 1px solid rgba(0,229,255,0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 0 25px rgba(0,229,255,0.08);">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">💎</span>
+              <span style="font-size: 11px; font-weight: 800; color: #00e5ff; text-transform: uppercase; letter-spacing: 0.5px;">Cinematic Progress HUD</span>
+            </div>
+            <span style="font-size: 9px; color: #ff007f; font-weight: 800; background: rgba(255,0,127,0.18); border: 1px solid rgba(255,0,127,0.35); padding: 2px 6px; border-radius: 4px;">VOLUMETRIC GLASS</span>
+          </div>
+
+          <!-- Section 1: Typography & Meta Stack -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Header Title</span>
+            <input type="text" id="hud-inp-title" value="${curTitle}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Metadata Tag / Status Badge</span>
+            <input type="text" id="hud-inp-subtitle" value="${curSub}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #34d399; font-family: monospace; font-size: 11px; font-weight: 700; outline: none;" />
+          </div>
+
+          <!-- Section 2: Progress Metrics & Real-time Live Tracking -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 800; color: #94a3b8;">
+                <span>PROGRESS</span>
+                <span id="hud-val-pct" style="color: #00e5ff;">${curPct}%</span>
+              </div>
+              <input type="range" id="hud-inp-pct" min="0" max="100" step="1" value="${curPct}" style="width: 100%; accent-color: #00e5ff; height: 4px; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 800; color: #94a3b8;">
+                <span>CANVAS WIDTH</span>
+                <span id="hud-val-width" style="color: #a855f7;">${barWidth}%</span>
+              </div>
+              <input type="range" id="hud-inp-width" min="45" max="85" step="1" value="${barWidth}" style="width: 100%; accent-color: #a855f7; height: 4px; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Section 3: Financial Callout Card Fields -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Raised Amount Metric</span>
+              <input type="text" id="hud-inp-raised" value="${curRaised}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 700; outline: none;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Target Goal Sub-label</span>
+              <input type="text" id="hud-inp-target" value="${curTarget}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #94a3b8; font-size: 10.5px; font-weight: 600; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Section 4: Dual-Tone Neon Theme Presets -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Neon Fill Gradient</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              ${HUD_GRAD_PRESETS.map(p => `
+                <button type="button" class="hud-grad-preset-btn" data-start="${p.start}" data-end="${p.end}" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid ${gradStart === p.start ? '#00e5ff' : 'rgba(255,255,255,0.08)'}; background: ${gradStart === p.start ? 'rgba(0,229,255,0.15)' : 'rgba(0,0,0,0.4)'}; color: #cbd5e1; font-size: 9.5px; font-weight: 700; cursor: pointer; text-align: left;">
+                  <span style="width: 14px; height: 14px; border-radius: 4px; background: linear-gradient(135deg, ${p.start}, ${p.end}); display: inline-block; flex-shrink: 0;"></span>
+                  <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.label}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 5: Cinematic Polish Toggles -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; font-weight: 700; cursor: pointer;">
+              <input type="checkbox" id="hud-inp-sparks" ${data.showSparks !== false ? 'checked' : ''} style="accent-color: #00e5ff;" />
+              Tip Spark Emissions
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; font-weight: 700; cursor: pointer;">
+              <input type="checkbox" id="hud-inp-shimmer" ${data.showShimmer !== false ? 'checked' : ''} style="accent-color: #00e5ff;" />
+              Light Sweep Shimmer
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; font-weight: 700; cursor: pointer; grid-column: span 2;">
+              <input type="checkbox" id="hud-inp-grain" ${data.showFilmGrain !== false ? 'checked' : ''} style="accent-color: #00e5ff;" />
+              Cinematic Film Grain Overlay
+            </label>
+          </div>
+
+          <!-- Retrigger Animation Action -->
+          <button type="button" id="hud-btn-retrigger" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px; border-radius: 6px; border: 1px solid rgba(0,229,255,0.4); background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(255,0,127,0.2)); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;">
+            <span>▶</span>
+            <span>Replay Cinematic HUD Reveal (0% → ${curPct}%)</span>
+          </button>
+
+          <!-- Studio Background & Video B-Roll Suite -->
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+
+      // Wire controls
+      container.querySelector('#hud-inp-title')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { title: e.target.value, goal: e.target.value });
+      });
+      container.querySelector('#hud-inp-subtitle')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { subtitle: e.target.value });
+      });
+      container.querySelector('#hud-inp-pct')?.addEventListener('input', e => {
+        const val = e.target.value;
+        const valLabel = container.querySelector('#hud-val-pct');
+        if (valLabel) valLabel.textContent = `${val}%`;
+        window.tplSetContextualData('progress', { percent: `${val}%` });
+      });
+      container.querySelector('#hud-inp-width')?.addEventListener('input', e => {
+        const val = e.target.value;
+        const widthLabel = container.querySelector('#hud-val-width');
+        if (widthLabel) widthLabel.textContent = `${val}%`;
+        window.tplSetContextualData('progress', { barWidthPercent: Number(val) });
+      });
+      container.querySelector('#hud-inp-raised')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { currentAmount: e.target.value, amount: e.target.value });
+      });
+      container.querySelector('#hud-inp-target')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { targetAmount: e.target.value });
+      });
+
+      container.querySelectorAll('.hud-grad-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('progress', {
+            gradientStart: btn.dataset.start,
+            gradientEnd: btn.dataset.end
+          });
+          window.tplRenderContextualInspector('progress');
+        };
+      });
+
+      container.querySelector('#hud-inp-sparks')?.addEventListener('change', e => {
+        window.tplSetContextualData('progress', { showSparks: e.target.checked });
+      });
+      container.querySelector('#hud-inp-shimmer')?.addEventListener('change', e => {
+        window.tplSetContextualData('progress', { showShimmer: e.target.checked });
+      });
+      container.querySelector('#hud-inp-grain')?.addEventListener('change', e => {
+        window.tplSetContextualData('progress', { showFilmGrain: e.target.checked });
+      });
+
+      container.querySelector('#hud-btn-retrigger')?.addEventListener('click', () => {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.tplTriggerProgressAnimation === 'function') {
+          window.tplTriggerProgressAnimation(stage, window.tplGetContextualData('progress'));
+        }
+      });
+
+      window.tplWireUniversalBgControls('progress', container);
+      return;
+    }
+
+    // =========================================================================
     // SPECIAL HANDLER: TEXT SCRAMBLE / DARK WEB TERMINAL (scramble)
     // =========================================================================
     if (tplId === 'scramble') {
@@ -5425,6 +5599,368 @@
       container.querySelector('#film-inp-fps')?.addEventListener('input', e => window.tplSetContextualData('film-grain', { fpsText: e.target.value }));
 
       window.tplWireUniversalBgControls('film-grain', container);
+      return;
+    }
+
+    // =========================================================================
+    // CASE: 3D NEWSPAPER CLIPPING (James Jani / Corridor Digital Production Grade)
+    // =========================================================================
+    if (tplId === 'newspaper-3d') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) {
+        wrapSec.style.display = 'flex';
+        const labelSec = document.getElementById('tpl-modal-label-secondary');
+        if (labelSec) labelSec.textContent = 'Atmospheric Backdrop / Dark Room B-Roll';
+      }
+
+      const stylePreset = data.stylePreset || 'scandal';
+      const masthead = data.masthead || 'THE DAILY TIMES';
+      const headline = data.headline || 'MAJOR SCANDAL\nEXPOSED';
+      const dateline = data.dateline || 'MONDAY, JANUARY 15, 2024';
+      const dofBlur = data.dofBlur !== undefined ? data.dofBlur : 13;
+      const cameraPitch = data.cameraPitch !== undefined ? data.cameraPitch : 12;
+      const cameraYaw = data.cameraYaw !== undefined ? data.cameraYaw : -9;
+      const cameraRoll = data.cameraRoll !== undefined ? data.cameraRoll : 2.5;
+      const perspective = data.perspective !== undefined ? data.perspective : 1100;
+      const showDogEar = data.showDogEar !== false;
+      const dogEarSize = data.dogEarSize !== undefined ? data.dogEarSize : 38;
+      const volumetricRays = data.volumetricRays !== false;
+      const rayIntensity = data.rayIntensity !== undefined ? data.rayIntensity : 0.75;
+      const rimLight = data.rimLight !== false;
+      const warmSpotlight = data.warmSpotlight !== false;
+      const spotIntensity = data.spotIntensity !== undefined ? data.spotIntensity : 0.85;
+      const dustMotes = data.dustMotes !== false;
+      const organicDrift = data.organicDrift !== false;
+      const motionBlur = data.motionBlur !== false;
+      const filmGrain = data.filmGrain !== false;
+      const filmGrainOpacity = data.filmGrainOpacity !== undefined ? data.filmGrainOpacity : 0.26;
+      const inkBleed = data.inkBleed !== false;
+
+      const PRESETS = [
+        { id: 'scandal', label: 'The Daily Times (Image 2)', badge: 'HERO', desc: 'Modern investigative scandal broadsheet with dog-eared fold' },
+        { id: 'victorian', label: 'Victorian Gazette (Image 3)', badge: '1884', desc: 'Antique woodcut engravings, gothic masthead & vintage ads' },
+        { id: 'jfk', label: 'Historic Dispatch (Image 4)', badge: '1963', desc: 'Mid-century halftone portrait newsprint & assassination wire' },
+        { id: 'tribune', label: 'Chicago Tribune (Image 5)', badge: 'NOIR', desc: 'Sensationalist 1930s crime swindle plot & political cartoon' },
+        { id: 'financial', label: 'WSJ Financial Dossier', badge: 'WALL ST', desc: 'Wall Street broadsheet layout with leaked offshore balances' }
+      ];
+
+      container.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:12px;width:100%;">
+          <!-- Header Banner -->
+          <div style="display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,rgba(245,158,11,0.14) 0%,rgba(168,85,247,0.12) 100%);border:1px solid rgba(245,158,11,0.3);padding:10px 12px;border-radius:8px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:16px;">📰</span>
+              <div>
+                <div style="font-size:12px;font-weight:700;color:#fef08a;letter-spacing:0.3px;">3D Newspaper Clipping • Production Grade</div>
+                <div style="font-size:10px;color:#cbd5e1;">James Jani / Corridor Digital Depth, God Rays & Shaders</div>
+              </div>
+            </div>
+            <span style="font-size:9px;font-weight:800;background:rgba(245,158,11,0.25);border:1px solid rgba(245,158,11,0.5);color:#fef08a;padding:2px 6px;border-radius:4px;letter-spacing:1px;">PRO FX</span>
+          </div>
+
+          <!-- Newspaper Archetype Styles (Image 2, 3, 4, 5) -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;">Newspaper Style Archetypes</span>
+              <span style="font-size:9.5px;color:#a855f7;font-weight:600;">Image 2 • 3 • 4 • 5</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr;gap:6px;">
+              ${PRESETS.map(p => `
+                <button type="button" class="np-preset-btn" data-preset="${p.id}" style="text-align:left;display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:6px;border:1px solid ${stylePreset === p.id ? 'rgba(245,158,11,0.6)' : 'rgba(255,255,255,0.08)'};background:${stylePreset === p.id ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.03)'};cursor:pointer;transition:all 0.15s;">
+                  <div style="display:flex;flex-direction:column;gap:2px;">
+                    <span style="font-size:11px;font-weight:700;color:${stylePreset === p.id ? '#fef08a' : '#e2e8f0'};">${p.label}</span>
+                    <span style="font-size:9.5px;color:#94a3b8;">${p.desc}</span>
+                  </div>
+                  <span style="font-size:8.5px;font-weight:800;padding:2px 6px;border-radius:4px;background:${stylePreset === p.id ? '#f59e0b' : 'rgba(255,255,255,0.06)'};color:${stylePreset === p.id ? '#000' : '#94a3b8'};letter-spacing:0.8px;">${p.badge}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 1: Cinematic Composition & Shallow DOF -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;">🎥</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Cinematic Composition & Depth of Field</span>
+            </div>
+
+            <!-- DOF Slider -->
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                <span>Shallow Depth of Field (Foreground/Background Bokeh)</span>
+                <span id="np-val-dof" style="color:#facc15;font-family:monospace;">${dofBlur}px</span>
+              </div>
+              <input type="range" id="np-inp-dof" min="0" max="25" step="1" value="${dofBlur}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Central newspaper remains razor sharp while peripheral clippings blur heavily.</div>
+            </div>
+
+            <!-- Camera Dynamic Angle Controls -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                  <span>Camera Pitch (Low Angle)</span>
+                  <span id="np-val-pitch" style="color:#c084fc;font-family:monospace;">${cameraPitch}°</span>
+                </div>
+                <input type="range" id="np-inp-pitch" min="-10" max="35" step="1" value="${cameraPitch}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                  <span>Camera Yaw</span>
+                  <span id="np-val-yaw" style="color:#c084fc;font-family:monospace;">${cameraYaw}°</span>
+                </div>
+                <input type="range" id="np-inp-yaw" min="-30" max="30" step="1" value="${cameraYaw}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                  <span>Camera Roll</span>
+                  <span id="np-val-roll" style="color:#c084fc;font-family:monospace;">${cameraRoll}°</span>
+                </div>
+                <input type="range" id="np-inp-roll" min="-15" max="15" step="0.5" value="${cameraRoll}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                  <span>Perspective Space</span>
+                  <span id="np-val-persp" style="color:#c084fc;font-family:monospace;">${perspective}px</span>
+                </div>
+                <input type="range" id="np-inp-persp" min="600" max="1800" step="50" value="${perspective}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Enhanced Texture & Material Realism -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;">📃</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Paper Texture & Tactile Realism</span>
+            </div>
+
+            <!-- Folded Corner Dog-Ear -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Folded / Dog-Eared Corner (Image 2)</div>
+                <div style="font-size:9px;color:#94a3b8;">Realistic 3D triangular flap with drop shadow on paper</div>
+              </div>
+              <input type="checkbox" id="np-chk-dogear" ${showDogEar ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                <span>Corner Fold Size</span>
+                <span id="np-val-dogsize" style="color:#facc15;font-family:monospace;">${dogEarSize}px</span>
+              </div>
+              <input type="range" id="np-inp-dogsize" min="20" max="55" step="1" value="${dogEarSize}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+            </div>
+
+            <!-- Ink Bleed & Letterpress -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Ink Bleed & Paper Absorption</div>
+                <div style="font-size:9px;color:#94a3b8;">Letterpress diffusion edge instead of sterile digital text</div>
+              </div>
+              <input type="checkbox" id="np-chk-inkbleed" ${inkBleed ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
+            </div>
+          </div>
+
+          <!-- Section 3: Volumetric & Thematic Lighting -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;">✨</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Volumetric & Thematic Lighting</span>
+            </div>
+
+            <!-- God Rays Toggle & Slider -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Volumetric Light Shafts (God Rays)</div>
+                <div style="font-size:9px;color:#94a3b8;">Atmospheric diagonal light beams cutting through depth</div>
+              </div>
+              <input type="checkbox" id="np-chk-rays" ${volumetricRays ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                <span>Ray Shaft Intensity</span>
+                <span id="np-val-rayint" style="color:#facc15;font-family:monospace;">${Math.round(rayIntensity * 100)}%</span>
+              </div>
+              <input type="range" id="np-inp-rayint" min="0" max="1" step="0.05" value="${rayIntensity}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+            </div>
+
+            <!-- Edge Rim Lighting -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Cool Rim Lighting (Backlight)</div>
+                <div style="font-size:9px;color:#94a3b8;">Luminous cool blue outline separating papers from void</div>
+              </div>
+              <input type="checkbox" id="np-chk-rim" ${rimLight ? 'checked' : ''} style="width:16px;height:16px;accent-color:#38bdf8;cursor:pointer;" />
+            </div>
+
+            <!-- Headline Focused Spotlight -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Headline Warm Spotlight Gel</div>
+                <div style="font-size:9px;color:#94a3b8;">Warm focused pool on scandal headline vs cool ambient</div>
+              </div>
+              <input type="checkbox" id="np-chk-spot" ${warmSpotlight ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
+            </div>
+
+            <!-- Floating Golden Dust Motes -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Suspended Dust Motes & Embers</div>
+                <div style="font-size:9px;color:#94a3b8;">Glowing particles drifting through the light rays</div>
+              </div>
+              <input type="checkbox" id="np-chk-dust" ${dustMotes ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
+            </div>
+          </div>
+
+          <!-- Section 4: Kinetic Motion & High-End Polish -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;">🌀</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Kinetic Drift & Motion Polish</span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Organic Air Currents Drift</div>
+                <div style="font-size:9px;color:#94a3b8;">Slow, continuous floating simulation with varied paths</div>
+              </div>
+              <input type="checkbox" id="np-chk-drift" ${organicDrift ? 'checked' : ''} style="width:16px;height:16px;accent-color:#a855f7;cursor:pointer;" />
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Velocity-Based Motion Blur</div>
+                <div style="font-size:9px;color:#94a3b8;">Increases blur dynamically on moving foreground/background</div>
+              </div>
+              <input type="checkbox" id="np-chk-mblur" ${motionBlur ? 'checked' : ''} style="width:16px;height:16px;accent-color:#a855f7;cursor:pointer;" />
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Cinematic 35mm Film Grain</div>
+                <div style="font-size:9px;color:#94a3b8;">Authentic documentary production texture overlay</div>
+              </div>
+              <input type="checkbox" id="np-chk-grain" ${filmGrain ? 'checked' : ''} style="width:16px;height:16px;accent-color:#a855f7;cursor:pointer;" />
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
+                <span>Film Grain Opacity</span>
+                <span id="np-val-grain" style="color:#c084fc;font-family:monospace;">${Math.round(filmGrainOpacity * 100)}%</span>
+              </div>
+              <input type="range" id="np-inp-grain" min="0.05" max="0.6" step="0.01" value="${filmGrainOpacity}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
+            </div>
+          </div>
+
+          <!-- Section 5: Editorial Content & Typography -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;">✍️</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Editorial Content & Typography</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <label style="font-size:9.5px;color:#94a3b8;">Masthead Name</label>
+              <input type="text" id="np-inp-masthead" value="${masthead}" style="background:#161926;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f8fafc;padding:5px 8px;font-size:11px;" />
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <label style="font-size:9.5px;color:#94a3b8;">Main Headline (use newline for second deck)</label>
+              <textarea id="np-inp-headline" rows="2" style="background:#161926;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f8fafc;padding:5px 8px;font-size:11px;resize:vertical;">${headline}</textarea>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <label style="font-size:9.5px;color:#94a3b8;">Dateline / Subtitle Rule</label>
+              <input type="text" id="np-inp-dateline" value="${dateline}" style="background:#161926;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#f8fafc;padding:5px 8px;font-size:11px;" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Wire preset switching
+      container.querySelectorAll('.np-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pid = btn.getAttribute('data-preset');
+          let patch = { stylePreset: pid };
+          if (pid === 'scandal') {
+            patch.masthead = 'THE DAILY TIMES';
+            patch.headline = 'MAJOR SCANDAL\nEXPOSED';
+            patch.dateline = 'MONDAY, JANUARY 15, 2024';
+          } else if (pid === 'victorian') {
+            patch.masthead = 'Daily Newspaper';
+            patch.headline = 'LOST CITY\nDISCOVERED';
+            patch.dateline = 'SUNDAY, NOVEMBER 28, 1884 • PRICE 5 CENTS';
+          } else if (pid === 'jfk') {
+            patch.masthead = 'Delaware County Daily Times';
+            patch.headline = "KENNEDY'S ASSASSIN\nCHARGED";
+            patch.dateline = 'SATURDAY, NOVEMBER 23, 1963';
+          } else if (pid === 'tribune') {
+            patch.masthead = 'Chicago Daily Tribune';
+            patch.headline = 'EXPOSES HUGE\nSWINDLE PLOT';
+            patch.dateline = 'FINAL CITY EDITION • 2 CENTS';
+          } else if (pid === 'financial') {
+            patch.masthead = 'THE WALL STREET JOURNAL';
+            patch.headline = 'U.S. BLAMES ATTACK\nON REBELS';
+            patch.dateline = 'GLOBAL BUSINESS REPORT • CONFIDENTIAL';
+          }
+          window.tplSetContextualData('newspaper-3d', patch);
+          window.tplRenderContextualInspector('newspaper-3d');
+        });
+      });
+
+      // Wire Sliders & Toggles
+      const bindNpSlider = (id, valId, prop, fmt) => {
+        const inp = container.querySelector(id);
+        const valEl = container.querySelector(valId);
+        if (inp) {
+          inp.oninput = (e) => {
+            const num = Number(e.target.value);
+            if (valEl) valEl.textContent = fmt ? fmt(num) : num;
+            window.tplSetContextualData('newspaper-3d', { [prop]: num });
+          };
+        }
+      };
+
+      bindNpSlider('#np-inp-dof', '#np-val-dof', 'dofBlur', v => `${v}px`);
+      bindNpSlider('#np-inp-pitch', '#np-val-pitch', 'cameraPitch', v => `${v}°`);
+      bindNpSlider('#np-inp-yaw', '#np-val-yaw', 'cameraYaw', v => `${v}°`);
+      bindNpSlider('#np-inp-roll', '#np-val-roll', 'cameraRoll', v => `${v}°`);
+      bindNpSlider('#np-inp-persp', '#np-val-persp', 'perspective', v => `${v}px`);
+      bindNpSlider('#np-inp-dogsize', '#np-val-dogsize', 'dogEarSize', v => `${v}px`);
+      bindNpSlider('#np-inp-rayint', '#np-val-rayint', 'rayIntensity', v => `${Math.round(v * 100)}%`);
+      bindNpSlider('#np-inp-grain', '#np-val-grain', 'filmGrainOpacity', v => `${Math.round(v * 100)}%`);
+
+      const bindNpChk = (id, prop) => {
+        container.querySelector(id)?.addEventListener('change', e => {
+          window.tplSetContextualData('newspaper-3d', { [prop]: e.target.checked });
+        });
+      };
+
+      bindNpChk('#np-chk-dogear', 'showDogEar');
+      bindNpChk('#np-chk-inkbleed', 'inkBleed');
+      bindNpChk('#np-chk-rays', 'volumetricRays');
+      bindNpChk('#np-chk-rim', 'rimLight');
+      bindNpChk('#np-chk-spot', 'warmSpotlight');
+      bindNpChk('#np-chk-dust', 'dustMotes');
+      bindNpChk('#np-chk-drift', 'organicDrift');
+      bindNpChk('#np-chk-mblur', 'motionBlur');
+      bindNpChk('#np-chk-grain', 'filmGrain');
+
+      container.querySelector('#np-inp-masthead')?.addEventListener('input', e => {
+        window.tplSetContextualData('newspaper-3d', { masthead: e.target.value });
+      });
+      container.querySelector('#np-inp-headline')?.addEventListener('input', e => {
+        window.tplSetContextualData('newspaper-3d', { headline: e.target.value });
+      });
+      container.querySelector('#np-inp-dateline')?.addEventListener('input', e => {
+        window.tplSetContextualData('newspaper-3d', { dateline: e.target.value });
+      });
+
+      window.tplWireUniversalBgControls('newspaper-3d', container);
       return;
     }
 

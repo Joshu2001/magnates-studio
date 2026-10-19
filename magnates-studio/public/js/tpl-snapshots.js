@@ -1117,7 +1117,70 @@
     'polaroid': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-pol" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#26201b"/><stop offset="100%" stop-color="#0f0c0a"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-pol)"/><g transform="translate(115, 24) rotate(-10)"><rect width="112" height="138" rx="2" fill="#faf8f5"/><rect x="8" y="8" width="96" height="94" fill="#1e293b"/><path d="M 8 82 L 38 54 L 66 76 L 86 60 L 104 82 L 104 102 L 8 102 Z" fill="#334155"/><text x="56" y="122" fill="#334155" font-family="monospace" font-weight="700" font-size="8.5" text-anchor="middle">First Office, 1994</text></g><g transform="translate(175, 36) rotate(7)"><rect width="112" height="138" rx="2" fill="#faf8f5"/><rect x="8" y="8" width="96" height="94" fill="#0f172a"/><circle cx="76" cy="32" r="10" fill="#f59e0b" opacity="0.8"/><path d="M 8 86 L 44 50 L 74 78 L 104 62 L 104 102 L 8 102 Z" fill="#1e3a5f"/><text x="56" y="122" fill="#334155" font-family="monospace" font-weight="700" font-size="8.5" text-anchor="middle">Archive Exhibit #04</text></g></svg>`)}`,
     'comic': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cm" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffd23f"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cm)"/><polygon points="200,30 222,85 285,85 235,120 255,175 200,140 145,175 165,120 115,85 178,85" fill="#fff"/><text x="200" y="132" fill="#fff" stroke="#000" stroke-width="4" paint-order="stroke fill" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="64" text-anchor="middle">POW!</text></svg>`)}`,
     'vhs': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-vh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-vh)"/><text x="24" y="32" fill="#ff2a2a" font-family="'Courier New', monospace" font-weight="900" font-size="12">\ud83d\udd34 REC</text><text x="376" y="32" fill="#fff" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="end">SP 0:00:18</text><text x="200" y="125" fill="#fff" font-family="'Courier New', monospace" font-weight="900" font-size="34" letter-spacing="3" text-anchor="middle">SUMMER 89</text><text x="200" y="200" fill="rgba(255,255,255,0.7)" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="middle">OCT 18 1989</text></svg>`)}`,
-    'progress': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-prg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient><linearGradient id="p-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#7c5cff"/><stop offset="100%" stop-color="#ff5c8a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-prg)"/><g transform="translate(50, 75)"><text x="0" y="10" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="14">Goal Progress</text><rect x="0" y="24" width="300" height="16" rx="8" fill="rgba(255,255,255,0.1)"/><rect x="0" y="24" width="300" height="16" rx="8" fill="url(#p-bar)"/><text x="150" y="85" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="36" text-anchor="middle">100%</text></g></svg>`)}`,
+    'progress': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="hud-bg-grad-snap" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#0a1220"/>
+      <stop offset="60%" stop-color="#050811"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </radialGradient>
+    <linearGradient id="hud-neon-fill-snap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff007f"/>
+      <stop offset="60%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#00e5ff"/>
+    </linearGradient>
+    <filter id="hud-tip-glow-snap" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#00e5ff" flood-opacity="0.9"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#00e5ff" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <rect width="400" height="225" fill="url(#hud-bg-grad-snap)"/>
+  
+  <!-- Header Stack -->
+  <g transform="translate(60, 48)">
+    <text x="0" y="0" fill="#f8fafc" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="900" font-size="13" letter-spacing="1.5">PROJECT FUNDING STATUS</text>
+    <text x="0" y="14" fill="#34d399" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="8" letter-spacing="1">[PHASE 2 / 3 ACTIVE]</text>
+  </g>
+
+  <!-- 3D Glass Track Capsule (Centered ~65% width) -->
+  <g transform="translate(60, 86)">
+    <!-- Outer Glass Capsule Bevel -->
+    <rect width="280" height="26" rx="13" fill="rgba(15,23,42,0.6)" stroke="rgba(255,255,255,0.22)" stroke-width="1.2"/>
+    <!-- Inner Dark Frosted Recessed Channel -->
+    <rect x="4" y="4" width="272" height="18" rx="9" fill="rgba(2,6,15,0.85)" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
+    <!-- Active Neon Liquid Fill Bar (74%) -->
+    <rect x="4" y="4" width="201" height="18" rx="9" fill="url(#hud-neon-fill-snap)"/>
+    <!-- Liquid Specular Sheen -->
+    <rect x="6" y="6" width="197" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <!-- Leading Edge Tip Glow Node -->
+    <circle cx="205" cy="13" r="5" fill="#ffffff" filter="url(#hud-tip-glow-snap)"/>
+    <!-- Spark Emitter Dots -->
+    <circle cx="209" cy="8" r="1" fill="#fff"/>
+    <circle cx="214" cy="11" r="1.3" fill="#00e5ff"/>
+    <circle cx="212" cy="17" r="0.8" fill="#ff007f"/>
+    <circle cx="218" cy="15" r="1" fill="#38bdf8"/>
+  </g>
+
+  <!-- Tip Callout Anchor at ~74% (x = 265) -->
+  <g transform="translate(265, 86)">
+    <!-- Top Bubble: 74% -->
+    <g transform="translate(-22, -32)">
+      <rect width="44" height="24" rx="5" fill="rgba(15,23,42,0.92)" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+      <path d="M 18,24 L 22,28 L 26,24 Z" fill="rgba(15,23,42,0.92)"/>
+      <text x="22" y="16" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="12" text-anchor="middle">74%</text>
+    </g>
+
+    <!-- Curved Tether Path -->
+    <path d="M 0,13 C 0,32 -18,40 -18,60" fill="none" stroke="#00e5ff" stroke-width="1.2" stroke-linecap="round"/>
+
+    <!-- Lower Financial Metric Card -->
+    <g transform="translate(-14, 52)">
+      <rect width="98" height="30" rx="5" fill="rgba(11,18,32,0.92)" stroke="rgba(0,229,255,0.35)" stroke-width="0.8"/>
+      <text x="8" y="14" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="7.5">$74,000,000 Raised</text>
+      <text x="8" y="24" fill="#94a3b8" font-family="'Inter', sans-serif" font-weight="600" font-size="6">Target: $100,000,000</text>
+    </g>
+  </g>
+</svg>`)}`,
     'scramble': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-sc" cx="50%" cy="50%" r="65%"><stop offset="0%" stop-color="#0a2014"/><stop offset="65%" stop-color="#040c07"/><stop offset="100%" stop-color="#010402"/></radialGradient><linearGradient id="sc-hdr" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#021a0f"/><stop offset="100%" stop-color="#08291a"/></linearGradient><filter id="sc-glow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00ff88" flood-opacity="0.75"/></filter><pattern id="sc-lines" width="4" height="4" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="4" y2="0" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></pattern></defs><rect width="400" height="225" fill="url(#bg-sc)"/><rect width="400" height="225" fill="url(#sc-lines)"/><g transform="translate(24, 22)"><rect width="352" height="181" rx="6" fill="rgba(3,8,5,0.92)" stroke="rgba(0,255,136,0.5)" stroke-width="1.2"/><rect width="352" height="22" rx="6" fill="url(#sc-hdr)"/><circle cx="12" cy="11" r="3.2" fill="#ef4444"/><circle cx="21" cy="11" r="3.2" fill="#f59e0b"/><circle cx="30" cy="11" r="3.2" fill="#10b981"/><text x="40" y="14" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700" letter-spacing="0.8">ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]</text><rect x="290" y="4" width="54" height="14" rx="2.5" fill="rgba(0,255,136,0.18)" stroke="rgba(0,255,136,0.4)" stroke-width="0.8"/><text x="317" y="14" fill="#00ff88" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="900" letter-spacing="1" text-anchor="middle">DECRYPT</text><text x="18" y="48" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" letter-spacing="0.5">&gt; EXEC_OVERRIDE // DECRYPT_STREAM:</text><text x="18" y="70" fill="rgba(0,255,136,0.4)" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" letter-spacing="1.5">[ 0x7F | %$#@!*&amp; // CIPHER_CYCLE ]</text><g filter="url(#sc-glow)"><text x="176" y="116" fill="#00ff88" font-family="'JetBrains Mono', 'Courier New', monospace" font-weight="900" font-size="25" letter-spacing="2.5" text-anchor="middle">ACCESS GRANTED</text></g><rect x="306" y="98" width="4" height="20" fill="#00ff88"/><line x1="16" y1="148" x2="336" y2="148" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4, 3"/><text x="18" y="166" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="7.5" letter-spacing="0.4">IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050</text><text x="334" y="166" fill="#00ff88" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="800" text-anchor="end">STATUS: OK</text></g></svg>`)}`,
     'newspaper': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="38" fill="#8b5a3c" font-family="Georgia, serif" font-weight="900" font-size="12" letter-spacing="4" text-anchor="middle">THE DAILY TIMES</text><line x1="40" y1="48" x2="360" y2="48" stroke="#3a2418" stroke-width="2"/><g transform="translate(40, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">HISTORIC DISCOVERY</text><text y="28" fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">SHOCKS THE WORLD</text><text y="58" fill="#5a3a28" font-family="Georgia, serif" font-style="italic" font-size="12" text-anchor="middle" x="160">Experts call it a major breakthrough</text></g></svg>`)}`,
     'instagram': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0f172a"/><g transform="translate(100, 15)"><rect width="200" height="195" rx="10" fill="#fff"/><circle cx="24" cy="20" r="10" fill="#0ea5e9"/><text x="42" y="24" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">@creator</text><rect x="0" y="38" width="200" height="110" fill="#1e293b"/><path d="M 100 112 L 88 100 C 80 92 80 80 88 74 C 94 70 100 76 100 76 C 100 76 106 70 112 74 C 120 80 120 92 112 100 Z" fill="#ef4444"/><text x="12" y="184" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5">12,453 likes</text></g></svg>`)}`,
