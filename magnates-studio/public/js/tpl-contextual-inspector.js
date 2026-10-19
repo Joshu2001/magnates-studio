@@ -34,14 +34,57 @@
       zoomScale: 1.15
     },
 
-    // 2. Wealth Comparison Bars
+    // 2. Wealth Comparison Bars — Cinematic High-End Preset
     'wealth': {
       type: 'bars',
-      title: 'Net Worth Comparison',
+      title: 'NET WORTH COMPARISON',
+      subtitle: 'EXTREME WEALTH DISPARITY',
+      showTitle: true,
+      calloutMode: 'single',
+      activeFocusIdx: 0,
       bars: [
-        { label: 'Jeff Bezos', val: '$200B', pct: 85, color: '#00a8ff' },
-        { label: 'Elon Musk', val: '$180B', pct: 75, color: '#ff5370' },
-        { label: 'Avg American', val: '$97K', pct: 8, color: '#64748b' }
+        {
+          label: 'JEFF BEZOS',
+          role: 'Founder & Chairman',
+          val: '$200B',
+          pct: 88,
+          gradStart: '#a855f7',
+          gradEnd: '#00d2ff',
+          color: '#00d2ff',
+          rate: '+$4,210 / sec',
+          multiplier: '2,151,320x Median Wealth',
+          portrait: 'bezos',
+          anchor: 52,
+          showCallout: true
+        },
+        {
+          label: 'ELON MUSK',
+          role: 'Entrepreneur & Innovator',
+          val: '$180B',
+          pct: 78,
+          gradStart: '#ff0844',
+          gradEnd: '#ff758c',
+          color: '#ff5370',
+          rate: '+$3,150 / sec',
+          multiplier: '1,855,670x Median Wealth',
+          portrait: 'musk',
+          anchor: 65,
+          showCallout: true
+        },
+        {
+          label: 'MARK ZUCKERBERG',
+          role: 'CEO, Meta Platforms',
+          val: '$170B',
+          pct: 74,
+          gradStart: '#3b82f6',
+          gradEnd: '#6366f1',
+          color: '#3b82f6',
+          rate: '+$3,980 / sec',
+          multiplier: '2,012,890x Median Wealth',
+          portrait: 'zuckerberg',
+          anchor: 70,
+          showCallout: true
+        }
       ]
     },
 
@@ -1680,6 +1723,146 @@
     };
   };
 
+  // --- 2C. WEALTH COMPARISON BARS BUILDER (Borderless Floating Cinematic Motion Graphic) ---
+  window.tplBuildWealthHtml = function(mData) {
+    const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('wealth') : {});
+    const title = d.title || 'NET WORTH COMPARISON';
+    const subtitle = d.subtitle || 'EXTREME WEALTH DISPARITY';
+    const showTitle = d.showTitle !== false;
+    const calloutMode = d.calloutMode || 'single'; // 'single' (active focus only), 'all', 'none'
+    const activeFocusIdx = typeof d.activeFocusIdx === 'number' ? d.activeFocusIdx : 0;
+    const portraitsDb = window.WEALTH_DEFAULT_PORTRAITS || {};
+
+    const bars = Array.isArray(d.bars) && d.bars.length ? d.bars : [
+      {
+        label: 'JEFF BEZOS',
+        role: 'Founder & Chairman',
+        val: '$200B',
+        pct: 88,
+        gradStart: '#a855f7',
+        gradEnd: '#00d2ff',
+        color: '#00d2ff',
+        rate: '+$4,210 / sec',
+        multiplier: '2,151,320x Median Wealth',
+        portrait: 'bezos',
+        anchor: 52,
+        showCallout: true
+      },
+      {
+        label: 'ELON MUSK',
+        role: 'Entrepreneur & Innovator',
+        val: '$180B',
+        pct: 78,
+        gradStart: '#ff0844',
+        gradEnd: '#ff758c',
+        color: '#ff5370',
+        rate: '+$3,150 / sec',
+        multiplier: '1,855,670x Median Wealth',
+        portrait: 'musk',
+        anchor: 65,
+        showCallout: true
+      },
+      {
+        label: 'MARK ZUCKERBERG',
+        role: 'CEO, Meta Platforms',
+        val: '$170B',
+        pct: 74,
+        gradStart: '#3b82f6',
+        gradEnd: '#6366f1',
+        color: '#3b82f6',
+        rate: '+$3,980 / sec',
+        multiplier: '2,012,890x Median Wealth',
+        portrait: 'zuckerberg',
+        anchor: 70,
+        showCallout: true
+      }
+    ];
+
+    const rowsHtml = bars.map((b, idx) => {
+      const pctVal = Math.max(1, Math.min(100, parseFloat(b.pct) || 50));
+      const col = b.color || '#00d2ff';
+      const gStart = b.gradStart || col;
+      const gEnd = b.gradEnd || col;
+      const anchorX = Math.max(15, Math.min(92, parseFloat(b.anchor) || 60));
+
+      // Resolve portrait image
+      let portraitSrc = '';
+      if (b.portrait && portraitsDb[b.portrait.toLowerCase()]) {
+        portraitSrc = portraitsDb[b.portrait.toLowerCase()];
+      } else if (b.portraitUrl) {
+        portraitSrc = b.portraitUrl;
+      } else if (b.portrait && (b.portrait.startsWith('data:') || b.portrait.startsWith('http') || b.portrait.startsWith('/'))) {
+        portraitSrc = b.portrait;
+      }
+
+      const monogram = b.label ? b.label.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '#';
+      const portraitTileHtml = portraitSrc
+        ? `<div class="w-portrait-tile"><img class="w-portrait-img" src="${portraitSrc}" alt="${b.label}" /></div>`
+        : `<div class="w-portrait-tile"><div class="w-portrait-fallback" style="color:${col};">${monogram}</div></div>`;
+
+      // Callout visibility
+      let isCalloutVisible = b.showCallout !== false;
+      if (calloutMode === 'single') {
+        isCalloutVisible = (idx === activeFocusIdx);
+      } else if (calloutMode === 'none') {
+        isCalloutVisible = false;
+      }
+
+      const rateText = b.rate || '';
+      const multText = b.multiplier || b.sub || '';
+
+      const calloutHtml = (isCalloutVisible && (rateText || multText)) ? `
+        <div class="w-callout-overlay" style="--anchor-x: ${anchorX}%;">
+          <svg class="w-leader-svg" viewBox="0 0 45 28">
+            <path class="w-leader-path" d="M 3 25 C 16 25, 22 5, 45 5" />
+          </svg>
+          <div class="w-callout-card">
+            ${rateText ? `<div class="w-callout-primary">${rateText}</div>` : ''}
+            ${multText ? `<div class="w-callout-secondary">${multText}</div>` : ''}
+          </div>
+        </div>
+      ` : '';
+
+      return `
+        <div class="w-spatial-row" style="--row-idx: ${idx}; --bar-color: ${col}; --bar-grad-start: ${gStart}; --bar-grad-end: ${gEnd}; --bar-glow: ${col}66; --target-pct: ${pctVal}%; --anchor-x: ${anchorX}%;">
+          ${portraitTileHtml}
+          <div class="w-spatial-body">
+            <div class="w-row-meta">
+              <div class="w-name-block">
+                <span class="w-person-name">${b.label || 'ENTITY'}</span>
+                ${b.role ? `<span class="w-person-role">${b.role}</span>` : ''}
+              </div>
+            </div>
+            <div class="w-bar-line">
+              <div class="w-pill-track">
+                <div class="w-pill-fill" style="--target-pct: ${pctVal}%;">
+                  <div class="w-pill-head"></div>
+                </div>
+                ${isCalloutVisible ? `<div class="w-callout-anchor" style="--anchor-x: ${anchorX}%;"></div>` : ''}
+                ${calloutHtml}
+              </div>
+              <div class="w-terminal-val">${b.val || ''}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="tpl-wealth">
+        ${showTitle ? `
+          <div class="w-floating-header">
+            <div class="w-floating-title">${title}</div>
+            <div class="w-floating-sub">${subtitle}</div>
+          </div>
+        ` : ''}
+        <div class="w-spatial-list">
+          ${rowsHtml}
+        </div>
+      </div>
+    `;
+  };
+
   // --- 2C. EMPIRE RISE & FALL TIMELINE BUILDER (James Jani / Magnates Media Documentary Style) ---
   window.tplBuildEmpireTimelineHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('empire-timeline') : {});
@@ -1970,24 +2153,7 @@
         window.initUniversalStageTransformEngine();
       }
     } else if (tplId === 'wealth') {
-      const title = fxc.querySelector('.w-title');
-      if (title && data.title) title.textContent = data.title;
-      const rows = fxc.querySelectorAll('.w-bar-row');
-      (data.bars || []).forEach((b, idx) => {
-        const row = rows[idx];
-        if (row) {
-          const l = row.querySelector('.w-label');
-          if (l) l.textContent = b.label;
-          const bar = row.querySelector('.w-bar');
-          if (bar) {
-            bar.style.width = `${b.pct}%`;
-            bar.style.background = b.color;
-            bar.style.boxShadow = `0 0 15px ${b.color}66`;
-            const v = bar.querySelector('.w-val');
-            if (v) v.textContent = b.val;
-          }
-        }
-      });
+      fxc.innerHTML = (typeof window.tplBuildWealthHtml === 'function') ? window.tplBuildWealthHtml(data) : '';
     } else if (tplId === 'textbehind') {
       const txt = fxc.querySelector('.bigtext');
       if (txt) {
@@ -2941,38 +3107,98 @@
     // =========================================================================
     if (tplId === 'wealth') {
       const bars = data.bars || [];
+      const calloutMode = data.calloutMode || 'single';
+      const activeFocusIdx = typeof data.activeFocusIdx === 'number' ? data.activeFocusIdx : 0;
+      const showTitle = data.showTitle !== false;
+
       container.innerHTML = `
         <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 6px;">
               <span style="font-size: 13px;">\ud83d\udcca</span>
-              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">Comparison Bars</span>
+              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">Cinematic Wealth Bars</span>
             </div>
             <button type="button" id="wealth-btn-add-bar" style="font-size: 10px; font-weight: 600; color: #38bdf8; cursor: pointer; padding: 2px 7px; border-radius: 4px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.35);">
-              + Add Bar
+              + Add Entity
             </button>
           </div>
 
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Chart Title</span>
-            <input type="text" id="wealth-input-title" value="${data.title || 'Net Worth Comparison'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+          <!-- Title & Callout Mode Section -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 600; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="wealth-chk-title" ${showTitle ? 'checked' : ''} style="cursor: pointer;" />
+                Show Floating Headline
+              </label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Callouts:</span>
+                <select id="wealth-sel-callouts" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #38bdf8; font-size: 10px; font-weight: 600; padding: 2px 4px; outline: none;">
+                  <option value="single" ${calloutMode === 'single' ? 'selected' : ''}>Single Focus</option>
+                  <option value="all" ${calloutMode === 'all' ? 'selected' : ''}>All Active</option>
+                  <option value="none" ${calloutMode === 'none' ? 'selected' : ''}>Hidden</option>
+                </select>
+              </div>
+            </div>
+
+            ${calloutMode === 'single' ? `
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Active Focus Callout:</span>
+                <select id="wealth-sel-focus" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(56,189,248,0.3); border-radius: 4px; color: #38bdf8; font-size: 10px; font-weight: 700; padding: 2px 6px; outline: none;">
+                  ${bars.map((b, i) => `<option value="${i}" ${activeFocusIdx === i ? 'selected' : ''}>#${i+1} ${b.label || 'Entity'}</option>`).join('')}
+                </select>
+              </div>
+            ` : ''}
+
+            ${showTitle ? `
+              <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
+                <input type="text" id="wealth-input-title" value="${data.title || 'NET WORTH COMPARISON'}" placeholder="Main Title" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 700; outline: none;" />
+                <input type="text" id="wealth-input-subtitle" value="${data.subtitle || 'EXTREME WEALTH DISPARITY'}" placeholder="Subtitle / Context" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #94a3b8; font-size: 10px; font-family: monospace; outline: none;" />
+              </div>
+            ` : ''}
           </div>
 
+          <!-- Entities List -->
           <div id="wealth-bars-list" style="display: flex; flex-direction: column; gap: 8px;">
             ${bars.map((b, idx) => `
               <div class="wealth-bar-edit-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+                <!-- Row Header: #, Portrait select, Name, Value, Color, Del -->
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-                  <span style="font-size: 10px; font-weight: 700; color: ${b.color}; font-family: monospace;">#${idx + 1}</span>
-                  <input type="text" class="wealth-item-label" data-idx="${idx}" value="${b.label}" placeholder="Entity Name" style="flex: 1; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 4px; outline: none;" />
-                  <input type="text" class="wealth-item-val" data-idx="${idx}" value="${b.val}" placeholder="Value" style="width: 55px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: ${b.color}; font-size: 11px; font-weight: 700; text-align: right; padding: 2px 4px; outline: none;" />
-                  <input type="color" class="wealth-item-color" data-idx="${idx}" value="${b.color}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Change Bar Color" />
+                  <span style="font-size: 10px; font-weight: 700; color: ${b.color || '#38bdf8'}; font-family: monospace;">#${idx + 1}</span>
+                  
+                  <!-- Portrait switcher -->
+                  <select class="wealth-item-portrait" data-idx="${idx}" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; color: #38bdf8; font-size: 9.5px; font-weight: 600; padding: 2px 4px; outline: none;">
+                    <option value="bezos" ${b.portrait === 'bezos' ? 'selected' : ''}>Bezos</option>
+                    <option value="musk" ${b.portrait === 'musk' ? 'selected' : ''}>Musk</option>
+                    <option value="zuckerberg" ${b.portrait === 'zuckerberg' ? 'selected' : ''}>Zuck</option>
+                    <option value="avatar" ${b.portrait === 'avatar' || !b.portrait ? 'selected' : ''}>Monogram</option>
+                    <option value="custom" ${b.portrait && !['bezos','musk','zuckerberg','avatar'].includes(b.portrait) ? 'selected' : ''}>Custom</option>
+                  </select>
+
+                  <input type="text" class="wealth-item-label" data-idx="${idx}" value="${b.label || ''}" placeholder="Person Name" style="flex: 1; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 4px; outline: none;" />
+                  <input type="text" class="wealth-item-val" data-idx="${idx}" value="${b.val || ''}" placeholder="$200B" style="width: 55px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: ${b.color || '#fff'}; font-size: 11.5px; font-weight: 800; text-align: right; padding: 2px 4px; outline: none;" />
+                  <input type="color" class="wealth-item-color" data-idx="${idx}" value="${b.color || '#00d2ff'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Bar Accent Color" />
                   ${bars.length > 1 ? `<button type="button" class="wealth-item-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Remove this bar">\u2715</button>` : ''}
                 </div>
-                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #64748b;">
+
+                <!-- Role / Title line -->
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 9px; color: #64748b; font-weight: 600; text-transform: uppercase; width: 34px;">Role:</span>
+                  <input type="text" class="wealth-item-role" data-idx="${idx}" value="${b.role || ''}" placeholder="Founder & Chairman" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; color: #cbd5e1; font-size: 10px; padding: 2px 6px; outline: none;" />
+                </div>
+
+                <!-- Callout micro-stats -->
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <span style="font-size: 9px; color: #64748b; font-weight: 600; text-transform: uppercase; width: 34px;">Pin:</span>
+                  <input type="text" class="wealth-item-rate" data-idx="${idx}" value="${b.rate || ''}" placeholder="+$4,210 / sec" title="Rate Callout (e.g. +$4,210 / sec)" style="width: 85px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; color: #38bdf8; font-size: 9.5px; font-family: monospace; font-weight: 700; padding: 2px 5px; outline: none;" />
+                  <input type="text" class="wealth-item-mult" data-idx="${idx}" value="${b.multiplier || b.sub || ''}" placeholder="2,151,320x Median" title="Multiplier Context" style="flex: 1; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; color: #94a3b8; font-size: 9.5px; font-family: monospace; padding: 2px 5px; outline: none;" />
+                </div>
+
+                <!-- Bar Fill Length Slider -->
+                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #64748b; margin-top: 1px;">
                   <span>Bar Fill Length</span>
                   <span>${b.pct}%</span>
                 </div>
-                <input type="range" class="wealth-item-pct" data-idx="${idx}" min="5" max="100" value="${b.pct}" style="accent-color: ${b.color}; height: 3px; cursor: pointer;" />
+                <input type="range" class="wealth-item-pct" data-idx="${idx}" min="3" max="100" value="${b.pct}" style="accent-color: ${b.color || '#38bdf8'}; height: 3px; cursor: pointer;" />
               </div>
             `).join('')}
           </div>
@@ -2980,13 +3206,56 @@
       `;
 
       // Wire Wealth Controls
+      const chkTitle = container.querySelector('#wealth-chk-title');
+      if (chkTitle) {
+        chkTitle.onchange = (e) => {
+          window.tplSetContextualData('wealth', { showTitle: e.target.checked });
+          window.tplRenderContextualInspector('wealth');
+        };
+      }
+
+      const selCallouts = container.querySelector('#wealth-sel-callouts');
+      if (selCallouts) {
+        selCallouts.onchange = (e) => {
+          window.tplSetContextualData('wealth', { calloutMode: e.target.value });
+          window.tplRenderContextualInspector('wealth');
+        };
+      }
+
+      const selFocus = container.querySelector('#wealth-sel-focus');
+      if (selFocus) {
+        selFocus.onchange = (e) => {
+          window.tplSetContextualData('wealth', { activeFocusIdx: parseInt(e.target.value, 10) });
+          window.tplRenderContextualInspector('wealth');
+        };
+      }
+
       const tInput = container.querySelector('#wealth-input-title');
       if (tInput) tInput.oninput = (e) => window.tplSetContextualData('wealth', { title: e.target.value });
+
+      const sInput = container.querySelector('#wealth-input-subtitle');
+      if (sInput) sInput.oninput = (e) => window.tplSetContextualData('wealth', { subtitle: e.target.value });
+
+      container.querySelectorAll('.wealth-item-portrait').forEach(sel => {
+        sel.onchange = (e) => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          bars[i].portrait = e.target.value;
+          window.tplSetContextualData('wealth', { bars: [...bars] });
+        };
+      });
 
       container.querySelectorAll('.wealth-item-label').forEach(inp => {
         inp.oninput = (e) => {
           const i = parseInt(e.target.dataset.idx, 10);
           bars[i].label = e.target.value;
+          window.tplSetContextualData('wealth', { bars: [...bars] });
+        };
+      });
+
+      container.querySelectorAll('.wealth-item-role').forEach(inp => {
+        inp.oninput = (e) => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          bars[i].role = e.target.value;
           window.tplSetContextualData('wealth', { bars: [...bars] });
         };
       });
@@ -2999,10 +3268,28 @@
         };
       });
 
+      container.querySelectorAll('.wealth-item-rate').forEach(inp => {
+        inp.oninput = (e) => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          bars[i].rate = e.target.value;
+          window.tplSetContextualData('wealth', { bars: [...bars] });
+        };
+      });
+
+      container.querySelectorAll('.wealth-item-mult').forEach(inp => {
+        inp.oninput = (e) => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          bars[i].multiplier = e.target.value;
+          bars[i].sub = e.target.value;
+          window.tplSetContextualData('wealth', { bars: [...bars] });
+        };
+      });
+
       container.querySelectorAll('.wealth-item-color').forEach(inp => {
         inp.onchange = (e) => {
           const i = parseInt(e.target.dataset.idx, 10);
           bars[i].color = e.target.value;
+          bars[i].gradEnd = e.target.value;
           window.tplSetContextualData('wealth', { bars: [...bars] });
           window.tplRenderContextualInspector('wealth');
         };
@@ -3035,7 +3322,20 @@
         addBarBtn.onclick = () => {
           const colors = ['#f59e0b', '#10b981', '#a855f7', '#ec4899', '#06b6d4'];
           const rndCol = colors[bars.length % colors.length];
-          bars.push({ label: 'New Entity', val: '$50B', pct: 50, color: rndCol });
+          bars.push({
+            label: 'NEW TITAN',
+            role: 'Investor & Philanthropist',
+            val: '$120B',
+            pct: 60,
+            gradStart: rndCol,
+            gradEnd: rndCol,
+            color: rndCol,
+            rate: '+$2,400 / sec',
+            multiplier: '1,237,113x Median Wealth',
+            portrait: 'avatar',
+            anchor: 55,
+            showCallout: true
+          });
           window.tplSetContextualData('wealth', { bars: [...bars] });
           window.tplRenderContextualInspector('wealth');
         };
