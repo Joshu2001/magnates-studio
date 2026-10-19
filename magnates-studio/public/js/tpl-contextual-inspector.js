@@ -552,6 +552,32 @@
       bgMediaType: 'video'
     },
 
+    // 40F. Cinematic 3D Screen Recording Blur Suite
+    'screen-blur': {
+      type: 'screen-blur',
+      urlBar: 'https://cloud.internal/admin/api-keys',
+      windowTitle: 'Enterprise Security Console',
+      tiltX: 5,
+      tiltY: -7,
+      tiltZ: 1.2,
+      showRedaction: true,
+      redactStyle: 'classified',
+      redactLabel: 'RESTRICTED // API KEY REDACTED',
+      showMagnifier: true,
+      magnifierZoom: 1.5,
+      magnifierTarget: 'SESSION AUTH TOKEN: 0x9F4A...VALID',
+      magnifierSub: 'FOCUS SPOTLIGHT \u00b7 2-FACTOR OK',
+      showGpuHud: true,
+      gpuText: 'REC \u25cf 00:02:14 // 120 FPS \u00b7 GPU ACCEL \u00b7 62\u00b0C',
+      showCursor: true,
+      cursorTrail: true,
+      screenTheme: 'terminal',
+      screenMediaUrl: '',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
+    },
+
     // 41. Fed Rate Timeline
     'fedrate': {
       type: 'fedrate',
@@ -2883,6 +2909,77 @@
               stmp.textContent = data[`exhibit${i}`];
               stmp.style.display = data[`exhibit${i}`] ? 'inline-block' : 'none';
             }
+          }
+        }
+      }
+    } else if (tplId === 'screen-blur') {
+      const root = fxc.querySelector('.tpl-screen-blur');
+      if (root) {
+        if (data.tiltX !== undefined) root.style.setProperty('--tilt-x', `${data.tiltX}deg`);
+        if (data.tiltY !== undefined) root.style.setProperty('--tilt-y', `${data.tiltY}deg`);
+        if (data.tiltZ !== undefined) root.style.setProperty('--tilt-z', `${data.tiltZ}deg`);
+        if (data.magnifierZoom !== undefined) root.style.setProperty('--mag-zoom', `${data.magnifierZoom}`);
+        
+        const urlEl = root.querySelector('.window-url-text');
+        if (urlEl && data.urlBar !== undefined) urlEl.textContent = data.urlBar;
+
+        const titleEl = root.querySelector('.mock-title span:last-child');
+        if (titleEl && data.windowTitle !== undefined) titleEl.textContent = data.windowTitle;
+
+        const redactZone = root.querySelector('.screen-redaction-zone');
+        if (redactZone) {
+          if (data.showRedaction !== undefined) redactZone.style.display = data.showRedaction ? 'flex' : 'none';
+          if (data.redactStyle) {
+            redactZone.classList.remove('style-classified', 'style-glass', 'style-pixel');
+            redactZone.classList.add(`style-${data.redactStyle}`);
+          }
+          const redactLbl = redactZone.querySelector('.redact-stamp-label span:last-child');
+          if (redactLbl && data.redactLabel !== undefined) redactLbl.textContent = data.redactLabel;
+        }
+
+        const dofEl = root.querySelector('.screen-dof-overlay');
+        const magLens = root.querySelector('.screen-magnifier-lens');
+        if (data.showMagnifier !== undefined) {
+          if (dofEl) dofEl.style.display = data.showMagnifier ? 'block' : 'none';
+          if (magLens) magLens.style.display = data.showMagnifier ? 'block' : 'none';
+        }
+        if (magLens) {
+          const magHdr = magLens.querySelector('.magnifier-header span:first-child');
+          if (magHdr && data.magnifierZoom !== undefined) magHdr.textContent = `🔍 ${data.magnifierZoom}X FOCUS LENS`;
+          const magLine = magLens.querySelector('.magnifier-focus-line span:last-child');
+          if (magLine && data.magnifierTarget !== undefined) magLine.textContent = data.magnifierTarget;
+          const magSub = magLens.querySelector('.magnifier-focus-sub');
+          if (magSub && data.magnifierSub !== undefined) magSub.textContent = data.magnifierSub;
+        }
+
+        const cursorGroup = root.querySelector('.screen-cursor-group');
+        if (cursorGroup && data.showCursor !== undefined) cursorGroup.style.display = data.showCursor ? 'block' : 'none';
+
+        const gpuHud = root.querySelector('.screen-gpu-hud');
+        if (gpuHud) {
+          if (data.showGpuHud !== undefined) gpuHud.style.display = data.showGpuHud ? 'flex' : 'none';
+          const gpuTxt = gpuHud.querySelector('.hud-metric-hl');
+          if (gpuTxt && data.gpuText !== undefined) gpuTxt.textContent = data.gpuText;
+        }
+
+        if (data.screenMediaUrl !== undefined) {
+          let customImg = root.querySelector('.screen-custom-media');
+          if (data.screenMediaUrl) {
+            if (!customImg) {
+              const body = root.querySelector('.screen-window-body');
+              if (body) {
+                customImg = document.createElement('img');
+                customImg.className = 'screen-custom-media';
+                body.appendChild(customImg);
+              }
+            }
+            if (customImg) customImg.src = data.screenMediaUrl;
+            const mockup = root.querySelector('.screen-ui-mockup');
+            if (mockup) mockup.style.display = 'none';
+          } else {
+            if (customImg) customImg.remove();
+            const mockup = root.querySelector('.screen-ui-mockup');
+            if (mockup) mockup.style.display = 'flex';
           }
         }
       }
@@ -5777,6 +5874,223 @@
       container.querySelector('#fly-inp-hud')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { showTelemetry: e.target.checked }));
 
       window.tplWireUniversalBgControls('headline-fly', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: CINEMATIC 3D SCREEN RECORDING BLUR (screen-blur)
+    // =========================================================================
+    if (tplId === 'screen-blur') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+
+      const curUrl = data.urlBar || 'https://cloud.internal/admin/api-keys';
+      const curTitle = data.windowTitle || 'Enterprise Security Console';
+      const curTiltX = data.tiltX !== undefined ? data.tiltX : 5;
+      const curRedact = data.showRedaction !== false;
+      const curStyle = data.redactStyle || 'classified';
+      const curLabel = data.redactLabel || 'RESTRICTED // API KEY REDACTED';
+      const curMag = data.showMagnifier !== false;
+      const curZoom = data.magnifierZoom || 1.5;
+      const curTarget = data.magnifierTarget || 'SESSION AUTH TOKEN: 0x9F4A...VALID';
+      const curHud = data.showGpuHud !== false;
+      const curGpu = data.gpuText || 'REC \u25cf 00:02:14 // 120 FPS \u00b7 GPU ACCEL \u00b7 62\u00b0C';
+      const curCursor = data.showCursor !== false;
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Header Banner -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14px;">🖥️</span>
+              <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">Cinematic 3D Screen Spotlight</span>
+            </div>
+            <label style="font-size: 9px; font-weight: 800; color: #020617; background: #38bdf8; padding: 3px 8px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
+              + Swap Screen Media
+              <input type="file" id="sb-up-screen" accept="image/*,video/*" style="display:none;" />
+            </label>
+          </div>
+
+          <!-- Section 1: 3D Window Frame & Perspective Camera Tilt -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">1. 3D Window Frame & Camera Tilt</div>
+            
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:9.5px; color:#cbd5e1; margin-bottom:3px;">
+                <span>3D Camera Tilt Angle</span>
+                <span id="sb-val-tilt" style="color:#38bdf8; font-weight:700;">${curTiltX}°</span>
+              </div>
+              <input type="range" id="sb-inp-tilt" min="0" max="15" step="1" value="${curTiltX}" style="width:100%; accent-color:#38bdf8; cursor:pointer;" />
+            </div>
+
+            <div>
+              <div style="font-size:9px; color:#94a3b8; margin-bottom:3px;">Window URL Bar & Domain Header</div>
+              <input type="text" id="sb-inp-url" value="${curUrl}" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:5px 8px; font-size:10px; color:#38bdf8; font-family:monospace;" placeholder="https://..." />
+            </div>
+
+            <div>
+              <div style="font-size:9px; color:#94a3b8; margin-bottom:3px;">App Header Title</div>
+              <input type="text" id="sb-inp-title" value="${curTitle}" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:5px 8px; font-size:10px; color:#e2e8f0;" placeholder="Console / Dashboard Title" />
+            </div>
+          </div>
+
+          <!-- Section 2: Selective Redaction & Censorship Mask -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">2. Selective Redaction Zone</span>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; color: #cbd5e1;">
+                <input type="checkbox" id="sb-inp-redact-enable" ${curRedact ? 'checked' : ''} style="accent-color: #ef4444;" />
+                <span>Enabled</span>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="font-size:9px; color:#94a3b8; margin-bottom:3px;">Redaction Style</div>
+                <select id="sb-inp-redact-style" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:5px 8px; font-size:10px; color:#e2e8f0;">
+                  <option value="classified" ${curStyle === 'classified' ? 'selected' : ''}>🚨 Classified Bar</option>
+                  <option value="glass" ${curStyle === 'glass' ? 'selected' : ''}>💎 Glassmorphic Blur</option>
+                  <option value="pixel" ${curStyle === 'pixel' ? 'selected' : ''}>⬛ Cyber Pixel Block</option>
+                </select>
+              </div>
+              <div>
+                <div style="font-size:9px; color:#94a3b8; margin-bottom:3px;">Redaction Label</div>
+                <input type="text" id="sb-inp-redact-label" value="${curLabel}" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:5px 8px; font-size:9px; color:#f87171; font-family:monospace;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Focus Spotlight / Magnifier Callout Lens -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3. Magnifier Callout Lens (Focus Zoom)</span>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; color: #cbd5e1;">
+                <input type="checkbox" id="sb-inp-mag-enable" ${curMag ? 'checked' : ''} style="accent-color: #38bdf8;" />
+                <span>Enabled</span>
+              </label>
+            </div>
+
+            <div>
+              <div style="display:flex; justify-content:space-between; font-size:9.5px; color:#cbd5e1; margin-bottom:3px;">
+                <span>Spotlight Zoom Factor</span>
+                <span id="sb-val-zoom" style="color:#38bdf8; font-weight:700;">${curZoom}x</span>
+              </div>
+              <input type="range" id="sb-inp-mag-zoom" min="1.1" max="2.4" step="0.1" value="${curZoom}" style="width:100%; accent-color:#38bdf8; cursor:pointer;" />
+            </div>
+
+            <div>
+              <div style="font-size:9px; color:#94a3b8; margin-bottom:3px;">Magnified Target Focus Text</div>
+              <input type="text" id="sb-inp-mag-target" value="${curTarget}" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:5px 8px; font-size:10px; color:#34d399; font-family:monospace;" />
+            </div>
+          </div>
+
+          <!-- Section 4: Tech & GPU Hardware HUD Overlay -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">4. Tech / GPU Hardware HUD</span>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; color: #cbd5e1;">
+                <input type="checkbox" id="sb-inp-hud-enable" ${curHud ? 'checked' : ''} style="accent-color: #ef4444;" />
+                <span>Show HUD</span>
+              </label>
+            </div>
+
+            <div>
+              <div style="font-size:9px; color:#94a3b8; margin-bottom:3px;">Telemetry & Hardware Metrics</div>
+              <input type="text" id="sb-inp-hud-text" value="${curGpu}" style="width:100%; background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:5px; padding:5px 8px; font-size:9.5px; color:#38bdf8; font-family:monospace;" />
+            </div>
+
+            <!-- Quick Preset Pills for Tech HUD -->
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <button type="button" class="sb-hud-preset" data-text="REC \u25cf 00:02:14 // 120 FPS \u00b7 GPU ACCEL \u00b7 62\u00b0C" style="font-size:8px; padding:2px 6px; border-radius:4px; background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.3); color:#38bdf8; cursor:pointer;">⚡ GPU Benchmark</button>
+              <button type="button" class="sb-hud-preset" data-text="REC \u25cf 00:48:19 // 4K PRORES \u00b7 60 FPS \u00b7 NVENC" style="font-size:8px; padding:2px 6px; border-radius:4px; background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); color:#4ade80; cursor:pointer;">🎥 4K Screen Capture</button>
+              <button type="button" class="sb-hud-preset" data-text="FORENSIC REC // 1080P/24 \u00b7 ENCRYPTED FEED" style="font-size:8px; padding:2px 6px; border-radius:4px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; cursor:pointer;">🔍 Cyber Forensic</button>
+            </div>
+          </div>
+
+          <!-- Section 5: Animated Cursor & Spotlight -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 10px; font-weight: 700; color: #cbd5e1;">5. Interactive Cursor & Motion Trail</span>
+              <span style="font-size: 8.5px; color: #64748b;">Keyframed mouse sweeping across sensitive zone</span>
+            </div>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 10px; color: #cbd5e1;">
+              <input type="checkbox" id="sb-inp-cursor-enable" ${curCursor ? 'checked' : ''} style="accent-color: #38bdf8;" />
+              <span>Visible</span>
+            </label>
+          </div>
+
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+
+      // Event listeners wiring
+      container.querySelector('#sb-inp-tilt')?.addEventListener('input', e => {
+        const v = Number(e.target.value);
+        container.querySelector('#sb-val-tilt').textContent = `${v}°`;
+        window.tplSetContextualData('screen-blur', { tiltX: v });
+      });
+
+      container.querySelector('#sb-inp-url')?.addEventListener('input', e => {
+        window.tplSetContextualData('screen-blur', { urlBar: e.target.value });
+      });
+
+      container.querySelector('#sb-inp-title')?.addEventListener('input', e => {
+        window.tplSetContextualData('screen-blur', { windowTitle: e.target.value });
+      });
+
+      container.querySelector('#sb-inp-redact-enable')?.addEventListener('change', e => {
+        window.tplSetContextualData('screen-blur', { showRedaction: e.target.checked });
+      });
+
+      container.querySelector('#sb-inp-redact-style')?.addEventListener('change', e => {
+        window.tplSetContextualData('screen-blur', { redactStyle: e.target.value });
+      });
+
+      container.querySelector('#sb-inp-redact-label')?.addEventListener('input', e => {
+        window.tplSetContextualData('screen-blur', { redactLabel: e.target.value });
+      });
+
+      container.querySelector('#sb-inp-mag-enable')?.addEventListener('change', e => {
+        window.tplSetContextualData('screen-blur', { showMagnifier: e.target.checked });
+      });
+
+      container.querySelector('#sb-inp-mag-zoom')?.addEventListener('input', e => {
+        const v = Number(e.target.value);
+        container.querySelector('#sb-val-zoom').textContent = `${v}x`;
+        window.tplSetContextualData('screen-blur', { magnifierZoom: v });
+      });
+
+      container.querySelector('#sb-inp-mag-target')?.addEventListener('input', e => {
+        window.tplSetContextualData('screen-blur', { magnifierTarget: e.target.value });
+      });
+
+      container.querySelector('#sb-inp-hud-enable')?.addEventListener('change', e => {
+        window.tplSetContextualData('screen-blur', { showGpuHud: e.target.checked });
+      });
+
+      container.querySelector('#sb-inp-hud-text')?.addEventListener('input', e => {
+        window.tplSetContextualData('screen-blur', { gpuText: e.target.value });
+      });
+
+      container.querySelectorAll('.sb-hud-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const t = btn.dataset.text;
+          const inp = container.querySelector('#sb-inp-hud-text');
+          if (inp) inp.value = t;
+          window.tplSetContextualData('screen-blur', { gpuText: t });
+        });
+      });
+
+      container.querySelector('#sb-inp-cursor-enable')?.addEventListener('change', e => {
+        window.tplSetContextualData('screen-blur', { showCursor: e.target.checked });
+      });
+
+      container.querySelector('#sb-up-screen')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) window.tplSetContextualData('screen-blur', { screenMediaUrl: URL.createObjectURL(f) });
+      });
+
+      window.tplWireUniversalBgControls('screen-blur', container);
       return;
     }
 

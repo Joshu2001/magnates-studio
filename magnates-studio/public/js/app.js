@@ -25715,10 +25715,21 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
           </div>
         </div>`; } else if (tplId === 'quote') {
-      fxContainer.innerHTML = `<div class="tpl-quote">
-          <div class="quote-mark">\u201c</div>
-          <div class="quote-text">The obstacle is the way.</div>
-          <div class="quote-author">\u2014 Marcus Aurelius</div>
+      const qData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('quote') : {};
+      const qText = qData.quote || 'The obstacle is the way.';
+      const aText = qData.author || 'Marcus Aurelius';
+      const bgGrad = qData.bgGradient || 'linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 100%)';
+      const txtCol = qData.textColor ? `color:${qData.textColor};` : '';
+      const authCol = qData.authorColor ? `color:${qData.authorColor};` : '';
+      const qmCol = qData.quoteMarkColor ? `color:${qData.quoteMarkColor};` : '';
+      const fFam = qData.fontFamily ? `font-family:${qData.fontFamily};` : '';
+      const fSize = qData.fontSize ? `font-size:${qData.fontSize}px;` : '';
+      fxContainer.innerHTML = `<div class="tpl-quote" style="background:${bgGrad};">
+          <div class="quote-card">
+            <div class="quote-mark" style="${qmCol}">\u201c</div>
+            <div class="quote-text" style="${txtCol} ${fFam} ${fSize}">${qText}</div>
+            <div class="quote-author" style="${authCol}">\u2014 ${aText}</div>
+          </div>
         </div>`; } else if (tplId === 'polaroid') {
       const polData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('polaroid') : {};
       const p1 = polData.photo1 || '/hiker_background_inpainted.png';
@@ -26219,6 +26230,173 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           });
         }
       }
+    } else if (tplId === 'screen-blur') {
+      const sData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('screen-blur') : {};
+      const urlBar = sData.urlBar || 'https://cloud.internal/admin/api-keys';
+      const windowTitle = sData.windowTitle || 'Enterprise Security Console';
+      const tiltX = sData.tiltX !== undefined ? sData.tiltX : 5;
+      const tiltY = sData.tiltY !== undefined ? sData.tiltY : -7;
+      const tiltZ = sData.tiltZ !== undefined ? sData.tiltZ : 1.2;
+      const showRedaction = sData.showRedaction !== false;
+      const redactStyle = sData.redactStyle || 'classified';
+      const redactLabel = sData.redactLabel || 'RESTRICTED // API KEY REDACTED';
+      const showMagnifier = sData.showMagnifier !== false;
+      const magZoom = sData.magnifierZoom || 1.5;
+      const magTarget = sData.magnifierTarget || 'SESSION AUTH TOKEN: 0x9F4A...VALID';
+      const magSub = sData.magnifierSub || 'FOCUS SPOTLIGHT \u00b7 2-FACTOR OK';
+      const showGpuHud = sData.showGpuHud !== false;
+      const gpuText = sData.gpuText || 'REC \u25cf 00:02:14 // 120 FPS \u00b7 GPU ACCEL \u00b7 62\u00b0C';
+      const showCursor = sData.showCursor !== false;
+      const cursorTrail = sData.cursorTrail !== false;
+      const screenTheme = sData.screenTheme || 'terminal';
+      const customMedia = sData.screenMediaUrl || (typeof topCustomizerState !== 'undefined' && topCustomizerState?.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg') ? topCustomizerState.primaryUrl : '');
+      const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(sData) : '';
+
+      fxContainer.innerHTML = `
+        <div class="tpl-screen-blur theme-${screenTheme}" style="--tilt-x:${tiltX}deg;--tilt-y:${tiltY}deg;--tilt-z:${tiltZ}deg;--mag-zoom:${magZoom};">
+          ${bgLayerHtml}
+          <div class="screen-studio-env"></div>
+          <div class="screen-studio-grid"></div>
+          <div class="screen-studio-vignette"></div>
+
+          <!-- 3D Floating Window Shell -->
+          <div class="screen-window-3d-wrap">
+            <div class="screen-window-shell">
+              <!-- Window Chrome Header -->
+              <div class="screen-window-header">
+                <div class="window-controls-traffic">
+                  <span class="window-dot dot-close"></span>
+                  <span class="window-dot dot-min"></span>
+                  <span class="window-dot dot-max"></span>
+                </div>
+                <div class="window-url-capsule">
+                  <span class="window-url-icon">\ud83d\udd12</span>
+                  <span class="window-url-text">${urlBar}</span>
+                  <span class="window-url-badge">TLS 1.3</span>
+                </div>
+                <div class="window-actions-right">
+                  <span title="Active Session">\u29eb</span>
+                  <span title="Split View">\u25eb</span>
+                  <span title="Options">\u22ef</span>
+                </div>
+              </div>
+
+              <!-- Window Viewport Body -->
+              <div class="screen-window-body">
+                <div class="screen-glass-glare"></div>
+
+                ${customMedia ? `
+                  <img class="screen-custom-media" src="${customMedia}" alt="Screen View" />
+                ` : `
+                  <!-- Realistic Mockup UI: Security Console & API Vault -->
+                  <div class="screen-ui-mockup">
+                    <div class="mock-sidebar">
+                      <div class="mock-nav-item active">\u2630</div>
+                      <div class="mock-nav-item">\ud83d\udd11</div>
+                      <div class="mock-nav-item">\ud83d\udcca</div>
+                      <div class="mock-nav-item">\u2699</div>
+                    </div>
+                    <div class="mock-main">
+                      <div class="mock-header-row">
+                        <div class="mock-title">
+                          <span style="color:#38bdf8;">\u25c6</span>
+                          <span>${windowTitle}</span>
+                        </div>
+                        <div class="mock-status-pill">
+                          <span style="width:5px;height:5px;border-radius:50%;background:#22c55e;"></span>
+                          <span>CLUSTER: NOMINAL</span>
+                        </div>
+                      </div>
+
+                      <div class="mock-grid-cards">
+                        <div class="mock-metric-card">
+                          <span class="mock-metric-label">API REQUESTS</span>
+                          <span class="mock-metric-val">1.48M/s</span>
+                        </div>
+                        <div class="mock-metric-card">
+                          <span class="mock-metric-label">LATENCY</span>
+                          <span class="mock-metric-val" style="color:#34d399;">12ms</span>
+                        </div>
+                        <div class="mock-metric-card">
+                          <span class="mock-metric-label">THREAT SHIELD</span>
+                          <span class="mock-metric-val" style="color:#38bdf8;">ACTIVE</span>
+                        </div>
+                      </div>
+
+                      <div class="mock-table-wrap">
+                        <div class="mock-row">
+                          <span class="mock-row-key">\u25cf IDENTIFIER</span>
+                          <span class="mock-row-val">auth_bearer_v2_prod_9941</span>
+                        </div>
+                        <div class="mock-row">
+                          <span class="mock-row-key">\u25cf ENVIRONMENT</span>
+                          <span class="mock-row-val" style="color:#fbbf24;">US-EAST // RESTRICTED</span>
+                        </div>
+                        <div class="mock-row">
+                          <span class="mock-row-key">\u25cf MASTER SECRET</span>
+                          <span class="mock-row-val" style="font-family:monospace;letter-spacing:1px;color:#f43f5e;">sk_live_9482019485720193857</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `}
+
+                <!-- Selective Redaction Zone -->
+                <div class="screen-redaction-zone style-${redactStyle}" style="display:${showRedaction ? 'flex' : 'none'};">
+                  <span class="redact-stamp-label">
+                    <span>\ud83d\udd12</span>
+                    <span>${redactLabel}</span>
+                  </span>
+                  <span class="redact-badge-right">ENCRYPTED</span>
+                </div>
+
+                <!-- Depth of Field Blur on Viewport when Magnifier is Active -->
+                <div class="screen-dof-overlay" style="display:${showMagnifier ? 'block' : 'none'};"></div>
+
+                <!-- Magnifier Callout Lens / Focus Spotlight -->
+                <div class="screen-magnifier-lens" style="display:${showMagnifier ? 'block' : 'none'};">
+                  <div class="magnifier-reticle-corner tl"></div>
+                  <div class="magnifier-reticle-corner tr"></div>
+                  <div class="magnifier-reticle-corner bl"></div>
+                  <div class="magnifier-reticle-corner br"></div>
+                  <div class="magnifier-header">
+                    <span>\ud83d\udd0d ${magZoom}X FOCUS LENS</span>
+                    <span>HD SPOTLIGHT</span>
+                  </div>
+                  <div class="magnifier-body">
+                    <div class="magnifier-zoom-content">
+                      <div class="magnifier-focus-line">
+                        <span style="color:#22c55e;">\u2713</span>
+                        <span>${magTarget}</span>
+                      </div>
+                      <div class="magnifier-focus-sub">${magSub}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Interactive Animated Cursor & Spotlight Motion Trail -->
+                <div class="screen-cursor-group" style="display:${showCursor ? 'block' : 'none'};">
+                  ${cursorTrail ? '<div class="cursor-spotlight-glow"></div>' : ''}
+                  <svg class="cursor-pointer-svg" viewBox="0 0 24 24" fill="none">
+                    <path d="M4 2L20 10L13.5 13.5L10 20L4 2Z" fill="#f8fafc" stroke="#090d16" stroke-width="2" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Tech / GPU Metric Overlay -->
+          <div class="screen-gpu-hud" style="display:${showGpuHud ? 'flex' : 'none'};">
+            <span class="hud-rec-indicator">
+              <span class="hud-rec-dot"></span>
+              <span>REC</span>
+            </span>
+            <span class="hud-metric-sep">|</span>
+            <span class="hud-metric-hl">${gpuText}</span>
+          </div>
+        </div>
+      `;
     } else if (tplId === 'fedrate') {
       const rates = [18,15,12,10,8,6,5,3,2,5];
       fxContainer.innerHTML = `
@@ -28383,7 +28561,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const ff = String(Math.floor((t % 1) * 24)).padStart(2, '0');
         tcEl.textContent = `${baseDate}  ${hh}:${mm}:${ss}:${ff}`;
       }
-    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS).includes(tplId)) {
+    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -29356,6 +29534,7 @@ function generateCutoutCanvasForUrl(url, callback) {
 function openTopTemplateCustomizer(tpl) {
   if (!tpl) return;
   topCustomizerState.currentTpl = tpl;
+  topCustomizerState.transforms = { fg: { x: 0, y: 0, scale: 1, isFullscreen: false }, bg: { x: 0, y: 0, scale: 1 }, text: { x: 0, y: 0, scale: 1 } };
   if (tpl.id === 'spooner-2-5d-photo-parallax') {
     topCustomizerState.originalPhotoUrl = 'hiker_parallax_reference.png';
     topCustomizerState.primaryUrl = tpl.cutoutImage || 'hiker_cutout.png';
@@ -30283,6 +30462,14 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = 'THE MASTERPIECE';
     topCustomizerState.subText = 'PRIVATE COLLECTION';
     topCustomizerState.textColor = '#f59e0b';
+  } else if (tpl.id === 'screen-blur') {
+    if (wrapPrim) wrapPrim.style.display = 'none';
+    if (wrapSec) wrapSec.style.display = 'none';
+    if (wrapText) wrapText.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'SCREEN RECORDING BLUR';
+    topCustomizerState.subText = 'CINEMATIC 3D SPOTLIGHT';
+    topCustomizerState.textColor = '#38bdf8';
   } else if (tpl.id === 'film-grain') {
     if (wrapPrim) wrapPrim.style.display = 'none';
     if (wrapSec) wrapSec.style.display = 'flex';
