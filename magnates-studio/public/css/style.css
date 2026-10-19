@@ -9086,6 +9086,66 @@ body.tool-slide-active {
   will-change: transform;
 }
 
+/* Balance Sheet Camera Motion & Slant Choreography */
+.tpl-balance .b-scene-3d.anim-slanted-to-straight {
+  animation: balSlantedToStraight 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tpl-balance .b-scene-3d.anim-straight-to-slanted {
+  animation: balStraightToSlanted 3.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tpl-balance .b-scene-3d.anim-cinematic-drift {
+  animation: balCinematicDrift 8s ease-in-out infinite alternate;
+}
+
+.tpl-balance .b-scene-3d.anim-static-straight {
+  transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(var(--zoom-scale, 1));
+}
+
+.tpl-balance .b-scene-3d.anim-static-slanted {
+  transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0) rotateX(20deg) rotateY(-12deg) rotateZ(0deg) scale(var(--zoom-scale, 1.02));
+}
+
+@keyframes balSlantedToStraight {
+  0% {
+    transform: translate3d(var(--pan-x, 0px), calc(var(--pan-y, 0px) + 12px), -20px) rotateX(22deg) rotateY(-15deg) rotateZ(-3deg) scale(calc(var(--zoom-scale, 1) * 1.03));
+  }
+  35% {
+    transform: translate3d(var(--pan-x, 0px), calc(var(--pan-y, 0px) + 8px), -10px) rotateX(17deg) rotateY(-10deg) rotateZ(-2deg) scale(calc(var(--zoom-scale, 1) * 1.02));
+  }
+  75% {
+    transform: translate3d(var(--pan-x, 0px), calc(var(--pan-y, 0px) + 2px), 0px) rotateX(4deg) rotateY(-2deg) rotateZ(0deg) scale(calc(var(--zoom-scale, 1) * 1.005));
+  }
+  100% {
+    transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(var(--zoom-scale, 1));
+  }
+}
+
+@keyframes balStraightToSlanted {
+  0% {
+    transform: translate3d(var(--pan-x, 0px), var(--pan-y, 0px), 0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(var(--zoom-scale, 0.98));
+  }
+  40% {
+    transform: translate3d(var(--pan-x, 0px), calc(var(--pan-y, 0px) + 6px), -10px) rotateX(9deg) rotateY(-5deg) rotateZ(-1deg) scale(var(--zoom-scale, 1));
+  }
+  100% {
+    transform: translate3d(var(--pan-x, 0px), calc(var(--pan-y, 0px) + 14px), -20px) rotateX(20deg) rotateY(-12deg) rotateZ(0deg) scale(calc(var(--zoom-scale, 1) * 1.02));
+  }
+}
+
+@keyframes balCinematicDrift {
+  0% {
+    transform: translate3d(calc(var(--pan-x, 0px) - 8px), calc(var(--pan-y, 0px) + 6px), 0) rotateX(18deg) rotateY(-14deg) rotateZ(-1.5deg) scale(calc(var(--zoom-scale, 1) * 1.02));
+  }
+  50% {
+    transform: translate3d(calc(var(--pan-x, 0px) + 6px), calc(var(--pan-y, 0px) - 4px), 0) rotateX(22deg) rotateY(-9deg) rotateZ(1deg) scale(calc(var(--zoom-scale, 1) * 1.03));
+  }
+  100% {
+    transform: translate3d(calc(var(--pan-x, 0px) - 4px), calc(var(--pan-y, 0px) + 10px), 0) rotateX(19deg) rotateY(-12deg) rotateZ(0deg) scale(calc(var(--zoom-scale, 1) * 1.02));
+  }
+}
+
 /* --- AUTHENTIC PHYSICAL SEC FORM 10-K SHEET ASSET --- */
 .tpl-balance .b-sheet-asset {
   position: relative;

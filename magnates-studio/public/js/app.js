@@ -25222,7 +25222,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <!-- 3D Interactive Mode Pill (Shows on canvas) -->
           <div class="b-3d-mode-pill" id="b-3d-mode-pill" style="display: none;">
             <span class="pill-dot"></span>
-            <span class="pill-text">3D MODE: DRAG TO TILT · SHIFT+DRAG TO MOVE · SCROLL TO ZOOM</span>
+            <span class="pill-text">3D EDIT: DRAG TO TILT · ALT+DRAG TO SLANT/LEVEL · SHIFT+DRAG TO MOVE · SCROLL TO ZOOM</span>
           </div>
 
           <div class="b-scene-3d" id="bal-scene-3d">

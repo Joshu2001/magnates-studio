@@ -77,9 +77,11 @@
       is3DMode: false,
       cameraPitch: 20,
       cameraYaw: -12,
+      cameraRoll: 0,
       panX: 0,
       panY: 0,
       zoomScale: 1.0,
+      animationStyle: 'slanted-to-straight',
       company: 'APPLE INC.',
       period: 'FORM 10-K \u00b7 FISCAL 2024',
       assetsTotal: '$143.5B',
@@ -2115,7 +2117,7 @@
       }
 
       // Interactive 3D Hand Drag-to-Tilt Handling (Matching Image 3)
-      // Interactive 3D Hand Drag-to-Tilt, Move/Pan, and Zoom Handling (Theater Mode)
+      // Interactive 3D Hand Drag-to-Tilt, Roll/Slant, Move/Pan, and Zoom Handling (Theater Mode)
       const stageBal = fxc.querySelector('.tpl-balance');
       const scene3D = fxc.querySelector('.b-scene-3d');
       if (stageBal && scene3D) {
@@ -2127,44 +2129,78 @@
 
         let pitch = Number.isFinite(data.cameraPitch) ? data.cameraPitch : 20;
         let yaw = Number.isFinite(data.cameraYaw) ? data.cameraYaw : -12;
+        let roll = Number.isFinite(data.cameraRoll) ? data.cameraRoll : 0;
         let panX = Number.isFinite(data.panX) ? data.panX : 0;
         let panY = Number.isFinite(data.panY) ? data.panY : 0;
         let scale = Number.isFinite(data.zoomScale) ? data.zoomScale : 1.0;
+        let animStyle = data.animationStyle || 'slanted-to-straight';
 
-        const applyTransform = (p, y, px, py, sc) => {
-          scene3D.style.transform = `translate3d(${px}px, ${py}px, 0) rotateX(${p}deg) rotateY(${y}deg) scale(${sc})`;
+        const applyTransform = (p, y, r, px, py, sc) => {
+          scene3D.style.transform = `translate3d(${px}px, ${py}px, 0) rotateX(${p}deg) rotateY(${y}deg) rotateZ(${r}deg) scale(${sc})`;
           scene3D.style.animation = 'none';
         };
 
+        const animClasses = ['anim-slanted-to-straight', 'anim-straight-to-slanted', 'anim-cinematic-drift', 'anim-static-straight', 'anim-static-slanted'];
+
         if (is3D) {
-          applyTransform(pitch, yaw, panX, panY, scale);
+          animClasses.forEach(c => scene3D.classList.remove(c));
+          applyTransform(pitch, yaw, roll, panX, panY, scale);
         } else {
           scene3D.style.transform = '';
           scene3D.style.animation = '';
+          scene3D.style.setProperty('--pan-x', `${panX}px`);
+          scene3D.style.setProperty('--pan-y', `${panY}px`);
+          scene3D.style.setProperty('--zoom-scale', `${scale}`);
+          animClasses.forEach(c => scene3D.classList.remove(c));
+          if (animStyle === 'slanted-to-straight') {
+            scene3D.classList.add('anim-slanted-to-straight');
+          } else if (animStyle === 'straight-to-slanted') {
+            scene3D.classList.add('anim-straight-to-slanted');
+          } else if (animStyle === 'cinematic-drift') {
+            scene3D.classList.add('anim-cinematic-drift');
+          } else if (animStyle === 'static-straight') {
+            scene3D.classList.add('anim-static-straight');
+          } else if (animStyle === 'static-slanted') {
+            scene3D.classList.add('anim-static-slanted');
+          }
         }
 
         if (!stageBal._balInteractInit) {
           stageBal._balInteractInit = true;
           let isDragging = false;
-          let dragMode = 'tilt'; // 'tilt' or 'pan'
+          let dragMode = 'tilt'; // 'tilt', 'roll', or 'pan'
           let startX = 0, startY = 0;
-          let curPitch = pitch, curYaw = yaw;
+          let curPitch = pitch, curYaw = yaw, curRoll = roll;
           let curPanX = panX, curPanY = panY;
+
+          stageBal.addEventListener('contextmenu', (e) => {
+            const curData = window.tplGetContextualData ? window.tplGetContextualData('balance') : data;
+            if (curData && curData.is3DMode) e.preventDefault();
+          });
 
           stageBal.addEventListener('pointerdown', (e) => {
             const curData = window.tplGetContextualData ? window.tplGetContextualData('balance') : data;
             if (!curData || !curData.is3DMode) return;
-            if (e.target.closest('button') || e.target.closest('input')) return;
+            if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) return;
             isDragging = true;
             startX = e.clientX;
             startY = e.clientY;
             curPitch = Number.isFinite(curData.cameraPitch) ? curData.cameraPitch : pitch;
             curYaw = Number.isFinite(curData.cameraYaw) ? curData.cameraYaw : yaw;
+            curRoll = Number.isFinite(curData.cameraRoll) ? curData.cameraRoll : roll;
             curPanX = Number.isFinite(curData.panX) ? curData.panX : panX;
             curPanY = Number.isFinite(curData.panY) ? curData.panY : panY;
 
-            // Shift key or middle button = pan/move; otherwise = 3D hand tilt
-            dragMode = (e.shiftKey || e.button === 1) ? 'pan' : 'tilt';
+            // Shift key or middle button = pan/move
+            // Alt key or right button = roll / slant angle
+            // Otherwise = 3D orbit tilt (pitch & yaw)
+            if (e.shiftKey || e.button === 1) {
+              dragMode = 'pan';
+            } else if (e.altKey || e.button === 2) {
+              dragMode = 'roll';
+            } else {
+              dragMode = 'tilt';
+            }
             stageBal.classList.add('is-dragging');
             try { stageBal.setPointerCapture(e.pointerId); } catch(err) {}
           });
@@ -2177,16 +2213,22 @@
               panX = Math.round(curPanX + dx);
               panY = Math.round(curPanY + dy);
               const spx = document.querySelector('#bal-slider-panx'); if (spx) spx.value = panX;
+              const vpx = document.querySelector('#bal-panx-val'); if (vpx) vpx.textContent = `${panX}px`;
               const spy = document.querySelector('#bal-slider-pany'); if (spy) spy.value = panY;
+              const vpy = document.querySelector('#bal-pany-val'); if (vpy) vpy.textContent = `${panY}px`;
+            } else if (dragMode === 'roll') {
+              roll = Math.max(-45, Math.min(45, Math.round(curRoll + (dx * 0.25))));
+              const sr = document.querySelector('#bal-slider-roll'); if (sr) sr.value = roll;
+              const vr = document.querySelector('#bal-roll-val'); if (vr) vr.textContent = `${roll}\u00B0`;
             } else {
-              pitch = Math.max(0, Math.min(45, Math.round(curPitch - (dy * 0.22))));
-              yaw = Math.max(-45, Math.min(45, Math.round(curYaw + (dx * 0.22))));
+              pitch = Math.max(-35, Math.min(50, Math.round(curPitch - (dy * 0.25))));
+              yaw = Math.max(-60, Math.min(60, Math.round(curYaw + (dx * 0.25))));
               const sp = document.querySelector('#bal-slider-pitch'); if (sp) sp.value = pitch;
               const vp = document.querySelector('#bal-pitch-val'); if (vp) vp.textContent = `${pitch}\u00B0`;
               const sy = document.querySelector('#bal-slider-yaw'); if (sy) sy.value = yaw;
               const vy = document.querySelector('#bal-yaw-val'); if (vy) vy.textContent = `${yaw}\u00B0`;
             }
-            applyTransform(pitch, yaw, panX, panY, scale);
+            applyTransform(pitch, yaw, roll, panX, panY, scale);
           });
 
           const stopDrag = (e) => {
@@ -2198,6 +2240,7 @@
               window.tplSetContextualData('balance', {
                 cameraPitch: pitch,
                 cameraYaw: yaw,
+                cameraRoll: roll,
                 panX: panX,
                 panY: panY,
                 zoomScale: scale
@@ -2215,7 +2258,7 @@
             e.preventDefault();
             const step = e.deltaY < 0 ? 0.08 : -0.08;
             scale = Math.max(0.5, Math.min(2.5, parseFloat((scale + step).toFixed(2))));
-            applyTransform(pitch, yaw, panX, panY, scale);
+            applyTransform(pitch, yaw, roll, panX, panY, scale);
 
             const sScale = document.querySelector('#bal-slider-zoom'); if (sScale) sScale.value = Math.round(scale * 100);
             const vScale = document.querySelector('#bal-zoom-val'); if (vScale) vScale.textContent = `${Math.round(scale * 100)}%`;
@@ -2224,14 +2267,14 @@
             }
           }, { passive: false });
 
-          // Double click: Reset Camera to default
+          // Double click: Snap straight & level
           stageBal.addEventListener('dblclick', () => {
             const curData = window.tplGetContextualData ? window.tplGetContextualData('balance') : data;
             if (!curData || !curData.is3DMode) return;
-            pitch = 20; yaw = -12; panX = 0; panY = 0; scale = 1.0;
-            applyTransform(pitch, yaw, panX, panY, scale);
+            pitch = 0; yaw = 0; roll = 0; panX = 0; panY = 0; scale = 1.0;
+            applyTransform(pitch, yaw, roll, panX, panY, scale);
             if (window.tplSetContextualData) {
-              window.tplSetContextualData('balance', { cameraPitch: 20, cameraYaw: -12, panX: 0, panY: 0, zoomScale: 1.0 });
+              window.tplSetContextualData('balance', { cameraPitch: 0, cameraYaw: 0, cameraRoll: 0, panX: 0, panY: 0, zoomScale: 1.0 });
               window.tplRenderContextualInspector('balance');
             }
           });
@@ -4320,9 +4363,11 @@
       const is3D = !!data.is3DMode;
       const curPitch = Number.isFinite(data.cameraPitch) ? data.cameraPitch : 20;
       const curYaw = Number.isFinite(data.cameraYaw) ? data.cameraYaw : -12;
+      const curRoll = Number.isFinite(data.cameraRoll) ? data.cameraRoll : 0;
       const curPanX = Number.isFinite(data.panX) ? data.panX : 0;
       const curPanY = Number.isFinite(data.panY) ? data.panY : 0;
       const curZoom = Number.isFinite(data.zoomScale) ? Math.round(data.zoomScale * 100) : 100;
+      const curAnim = data.animationStyle || 'slanted-to-straight';
 
       container.innerHTML = `
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
@@ -4335,12 +4380,39 @@
             <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
           </div>
 
-          <!-- 3D Perspective & Mode Switcher (Matching Article Highlighter in Image 3) -->
+          <!-- Camera Animation & Motion Choreography -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="font-size: 11px;">\u{1F3AC}</span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">CAMERA ANIMATION STYLE</span>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+              <button type="button" class="bal-anim-btn" data-anim="slanted-to-straight" style="padding: 5px 6px; font-size: 8.5px; font-weight: 700; border-radius: 5px; cursor: pointer; border: 1px solid ${curAnim === 'slanted-to-straight' ? '#2effc6' : 'rgba(255,255,255,0.1)'}; background: ${curAnim === 'slanted-to-straight' ? 'rgba(46,255,198,0.18)' : 'rgba(0,0,0,0.3)'}; color: ${curAnim === 'slanted-to-straight' ? '#2effc6' : '#cbd5e1'};">
+                Slant \u2192 Straight
+              </button>
+              <button type="button" class="bal-anim-btn" data-anim="straight-to-slanted" style="padding: 5px 6px; font-size: 8.5px; font-weight: 700; border-radius: 5px; cursor: pointer; border: 1px solid ${curAnim === 'straight-to-slanted' ? '#2effc6' : 'rgba(255,255,255,0.1)'}; background: ${curAnim === 'straight-to-slanted' ? 'rgba(46,255,198,0.18)' : 'rgba(0,0,0,0.3)'}; color: ${curAnim === 'straight-to-slanted' ? '#2effc6' : '#cbd5e1'};">
+                Straight \u2192 Slanted
+              </button>
+              <button type="button" class="bal-anim-btn" data-anim="static-straight" style="padding: 5px 6px; font-size: 8.5px; font-weight: 700; border-radius: 5px; cursor: pointer; border: 1px solid ${curAnim === 'static-straight' ? '#2effc6' : 'rgba(255,255,255,0.1)'}; background: ${curAnim === 'static-straight' ? 'rgba(46,255,198,0.18)' : 'rgba(0,0,0,0.3)'}; color: ${curAnim === 'static-straight' ? '#2effc6' : '#cbd5e1'};">
+                Straight Frontal (2D)
+              </button>
+              <button type="button" class="bal-anim-btn" data-anim="static-slanted" style="padding: 5px 6px; font-size: 8.5px; font-weight: 700; border-radius: 5px; cursor: pointer; border: 1px solid ${curAnim === 'static-slanted' ? '#2effc6' : 'rgba(255,255,255,0.1)'}; background: ${curAnim === 'static-slanted' ? 'rgba(46,255,198,0.18)' : 'rgba(0,0,0,0.3)'}; color: ${curAnim === 'static-slanted' ? '#2effc6' : '#cbd5e1'};">
+                Cinematic Slant (3D)
+              </button>
+            </div>
+            <button type="button" class="bal-anim-btn" data-anim="cinematic-drift" style="padding: 4px 6px; font-size: 8.5px; font-weight: 700; border-radius: 5px; cursor: pointer; border: 1px solid ${curAnim === 'cinematic-drift' ? '#2effc6' : 'rgba(255,255,255,0.1)'}; background: ${curAnim === 'cinematic-drift' ? 'rgba(46,255,198,0.18)' : 'rgba(0,0,0,0.3)'}; color: ${curAnim === 'cinematic-drift' ? '#2effc6' : '#cbd5e1'};">
+              Ambient 3D Floating Drift
+            </button>
+          </div>
+
+          <!-- 3D Perspective & Spatial Controls (Synced Theater View) -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <div style="display: flex; align-items: center; gap: 5px;">
                 <span style="font-size: 11px;">\u{1F4D0}</span>
-                <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">CAMERA / 3D THEATER</span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">3D THEATER / MANUAL DEGREES OF FREEDOM</span>
               </div>
               <div style="display: inline-flex; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 2px;">
                 <button type="button" id="bal-btn-mode-video" style="padding: 3px 8px; font-size: 9.5px; font-weight: 700; border-radius: 4px; cursor: pointer; border: none; background: ${!is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${!is3D ? '#fff' : '#94a3b8'}; transition: all 0.15s;">
@@ -4353,52 +4425,73 @@
             </div>
 
             ${is3D ? `
-              <!-- 3D Tilt Pitch & Yaw Sliders -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <!-- Quick Alignment Actions: Make Straight or Slant -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+                <button type="button" id="bal-btn-straight" style="background: rgba(46,255,198,0.15); border: 1px solid rgba(46,255,198,0.35); border-radius: 4px; padding: 4px 2px; color: #2effc6; font-size: 8.5px; font-weight: 700; cursor: pointer;">\u25A0 Snap Straight</button>
+                <button type="button" id="bal-btn-slant" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">\u2B21 Slant 3D</button>
+                <button type="button" id="bal-btn-level" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">\u{1F4D0} Level Horizon</button>
+              </div>
+
+              <!-- 3D Rotation Sliders (Pitch, Yaw, Roll/Slant) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
                     <span>Tilt Pitch (X)</span>
                     <span id="bal-pitch-val" style="color: #2effc6; font-family: monospace;">${curPitch}\u00B0</span>
                   </div>
-                  <input type="range" id="bal-slider-pitch" min="0" max="45" value="${curPitch}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
+                  <input type="range" id="bal-slider-pitch" min="-35" max="50" value="${curPitch}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
                     <span>Turn Yaw (Y)</span>
                     <span id="bal-yaw-val" style="color: #2effc6; font-family: monospace;">${curYaw}\u00B0</span>
                   </div>
-                  <input type="range" id="bal-slider-yaw" min="-45" max="45" value="${curYaw}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
+                  <input type="range" id="bal-slider-yaw" min="-60" max="60" value="${curYaw}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                    <span>Slant Roll (Z)</span>
+                    <span id="bal-roll-val" style="color: #2effc6; font-family: monospace;">${curRoll}\u00B0</span>
+                  </div>
+                  <input type="range" id="bal-slider-roll" min="-35" max="35" value="${curRoll}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
                 </div>
               </div>
 
               <!-- Zoom & Pan Move Sliders -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
                     <span>Zoom Scale</span>
                     <span id="bal-zoom-val" style="color: #2effc6; font-family: monospace;">${curZoom}%</span>
                   </div>
                   <input type="range" id="bal-slider-zoom" min="50" max="220" value="${curZoom}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
-                    <span>Move Pos (X)</span>
+                  <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                    <span>Move X</span>
                     <span id="bal-panx-val" style="color: #2effc6; font-family: monospace;">${curPanX}px</span>
                   </div>
                   <input type="range" id="bal-slider-panx" min="-250" max="250" value="${curPanX}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                    <span>Move Y</span>
+                    <span id="bal-pany-val" style="color: #2effc6; font-family: monospace;">${curPanY}px</span>
+                  </div>
+                  <input type="range" id="bal-slider-pany" min="-250" max="250" value="${curPanY}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
                 </div>
               </div>
 
               <!-- 3D Camera Presets -->
               <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
-                <button type="button" class="bal-3d-preset-btn" data-p="20" data-y="-12" data-sc="100" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Cinematic</button>
-                <button type="button" class="bal-3d-preset-btn" data-p="28" data-y="-16" data-sc="120" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Dramatic</button>
-                <button type="button" class="bal-3d-preset-btn" data-p="10" data-y="-6" data-sc="95" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Subtle</button>
-                <button type="button" class="bal-3d-preset-btn" data-p="0" data-y="0" data-sc="100" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Reset All</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="0" data-y="0" data-r="0" data-sc="100" data-px="0" data-py="0" style="background: rgba(46,255,198,0.12); border: 1px solid rgba(46,255,198,0.25); border-radius: 4px; padding: 4px 2px; color: #2effc6; font-size: 8px; font-weight: 700; cursor: pointer;">Straight 2D</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="20" data-y="-12" data-r="0" data-sc="100" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8px; font-weight: 600; cursor: pointer;">Cinematic</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="28" data-y="-16" data-r="-3" data-sc="120" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8px; font-weight: 600; cursor: pointer;">Dramatic</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="10" data-y="-6" data-r="0" data-sc="95" data-px="0" data-py="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8px; font-weight: 600; cursor: pointer;">Subtle</button>
               </div>
 
               <div style="font-size: 8px; color: #2effc6; line-height: 1.35; display: flex; align-items: center; gap: 4px;">
-                <span style="font-size: 11px;">\u270B</span> <b>Hand controls:</b> Drag to tilt · Shift+drag to move · Scroll to zoom
+                <span style="font-size: 11px;">\u270B</span> <b>Hand controls:</b> Drag to tilt · Alt+drag to slant/level · Shift+drag to move · Scroll to zoom
               </div>
             ` : ''}
           </div>
@@ -4465,6 +4558,15 @@
 
       if (window.tplWireUniversalBgControls) window.tplWireUniversalBgControls(tplId, container);
 
+      // Event Listeners for Camera Animation Style
+      container.querySelectorAll('.bal-anim-btn').forEach(btn => {
+        btn.onclick = () => {
+          const anim = btn.dataset.anim;
+          window.tplSetContextualData('balance', { animationStyle: anim });
+          window.tplRenderContextualInspector('balance');
+        };
+      });
+
       // Event Listeners for 3D controls (Synced with stage toolbar and theater mode)
       const btnModeVid = container.querySelector('#bal-btn-mode-video');
       if (btnModeVid) {
@@ -4502,6 +4604,44 @@
           window.tplRenderContextualInspector('balance');
         };
       }
+
+      // Quick Alignment Buttons
+      const btnStraight = container.querySelector('#bal-btn-straight');
+      if (btnStraight) {
+        btnStraight.onclick = () => {
+          window.tplSetContextualData('balance', {
+            cameraPitch: 0,
+            cameraYaw: 0,
+            cameraRoll: 0,
+            panX: 0,
+            panY: 0,
+            zoomScale: 1.0
+          });
+          window.tplRenderContextualInspector('balance');
+        };
+      }
+      const btnSlant = container.querySelector('#bal-btn-slant');
+      if (btnSlant) {
+        btnSlant.onclick = () => {
+          window.tplSetContextualData('balance', {
+            cameraPitch: 20,
+            cameraYaw: -12,
+            cameraRoll: 0,
+            panX: 0,
+            panY: 0,
+            zoomScale: 1.02
+          });
+          window.tplRenderContextualInspector('balance');
+        };
+      }
+      const btnLevel = container.querySelector('#bal-btn-level');
+      if (btnLevel) {
+        btnLevel.onclick = () => {
+          window.tplSetContextualData('balance', { cameraRoll: 0 });
+          window.tplRenderContextualInspector('balance');
+        };
+      }
+
       const sPitch = container.querySelector('#bal-slider-pitch');
       if (sPitch) {
         sPitch.oninput = (e) => {
@@ -4518,6 +4658,15 @@
           const vy = container.querySelector('#bal-yaw-val');
           if (vy) vy.textContent = `${y}\u00B0`;
           window.tplSetContextualData('balance', { cameraYaw: y });
+        };
+      }
+      const sRoll = container.querySelector('#bal-slider-roll');
+      if (sRoll) {
+        sRoll.oninput = (e) => {
+          const r = parseInt(e.target.value, 10);
+          const vr = container.querySelector('#bal-roll-val');
+          if (vr) vr.textContent = `${r}\u00B0`;
+          window.tplSetContextualData('balance', { cameraRoll: r });
         };
       }
       const sZoom = container.querySelector('#bal-slider-zoom');
@@ -4538,16 +4687,27 @@
           window.tplSetContextualData('balance', { panX: px });
         };
       }
+      const sPanY = container.querySelector('#bal-slider-pany');
+      if (sPanY) {
+        sPanY.oninput = (e) => {
+          const py = parseInt(e.target.value, 10);
+          const vpy = container.querySelector('#bal-pany-val');
+          if (vpy) vpy.textContent = `${py}px`;
+          window.tplSetContextualData('balance', { panY: py });
+        };
+      }
       container.querySelectorAll('.bal-3d-preset-btn').forEach(btn => {
         btn.onclick = () => {
           const p = parseInt(btn.dataset.p, 10);
           const y = parseInt(btn.dataset.y, 10);
+          const r = parseInt(btn.dataset.r || 0, 10);
           const sc = parseInt(btn.dataset.sc, 10) / 100;
           const px = parseInt(btn.dataset.px, 10);
           const py = parseInt(btn.dataset.py, 10);
           window.tplSetContextualData('balance', {
             cameraPitch: p,
             cameraYaw: y,
+            cameraRoll: r,
             zoomScale: sc,
             panX: px,
             panY: py
