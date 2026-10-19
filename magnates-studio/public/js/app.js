@@ -24610,14 +24610,34 @@ id: 'map',
   },
   {
     id: 'magnates-media-paper-blueprint',
-    title: 'Dynamic Cutouts & Silhouette Motion',
+    title: 'Paper-Based & Blueprint Cutouts (Dynamic Silhouettes & Room Spawn)',
     category: 'Paper / Cutout',
-    badge: 'James Jani & Magnates Edition',
+    origCategory: 'Documentary',
+    badge: 'Magnates & James Jani Edition',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Authentic subject cutouts extracted from backgrounds, glowing phone silhouettes, staggered sequential reveals & exits, center bursts, and camera crawls.',
-    tags: ['Rotoscoped Cutouts', 'Silhouettes', 'Staggered Motion', 'Center Burst', 'James Jani', 'Magnates Media'],
+    description: 'Paper-based & technical blueprint cutouts, rotoscoped subject extraction, glowing phone silhouettes, room plate spawn, staggered sequential reveals & exits, center bursts, and 2.5D paper crawling.',
+    tags: [
+      'Paper-Based & Blueprint Cutouts',
+      'Paper Cutout',
+      'Blueprint',
+      'Blueprint Cutout',
+      'Paper',
+      'Cutout',
+      'Silhouettes',
+      'Silhouette',
+      'Room Spawn',
+      'Empty Room',
+      'Desk Cutout',
+      'Center Burst',
+      'Staggered Motion',
+      'Sequential Exit',
+      'James Jani',
+      'Magnates Media',
+      'Rotoscoped Cutouts',
+      'Phone Silhouette'
+    ],
     defaultImage: '/laptop_guy_cutout.png',
     secondaryImage: '/silhouette_standing_phone.png'
   },
@@ -25050,7 +25070,9 @@ function renderHomepageTemplates() {
       descStr.includes(query) ||
       tagsArr.some(tag => String(tag).toLowerCase().includes(query));
 
-    return matchesCat && matchesSearch;
+    // When the user explicitly types in the search bar, search across all templates globally.
+    // When no search query is typed, respect the active category filter pill.
+    return query ? matchesSearch : (matchesCat && matchesSearch);
   });
 
   if (countEl) countEl.textContent = `${filtered.length}`;
@@ -38296,6 +38318,28 @@ function stopSidebarTemplateHover(cardEl, tpl) {
     fxContainer.style.display = 'none';
     fxContainer.innerHTML = '';
   }
+}
+
+function handleModalTemplateSearch(query) {
+  const container = document.getElementById('modal-tpl-sidebar-cards-list');
+  if (!container) return;
+  const q = (query || '').toLowerCase().trim();
+  const cards = container.querySelectorAll('.customizer-tpl-sidecard');
+  cards.forEach(card => {
+    const tplId = card.getAttribute('data-template-id');
+    const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === tplId);
+    if (!tpl) return;
+    const titleStr = (tpl.title || '').toLowerCase();
+    const descStr = (tpl.description || '').toLowerCase();
+    const badgeStr = (tpl.badge || '').toLowerCase();
+    const tagsArr = Array.isArray(tpl.tags) ? tpl.tags : [];
+    const matches = !q ||
+      titleStr.includes(q) ||
+      descStr.includes(q) ||
+      badgeStr.includes(q) ||
+      tagsArr.some(tag => String(tag).toLowerCase().includes(q));
+    card.style.display = matches ? 'flex' : 'none';
+  });
 }
 
 function populateModalTemplatesSidebar() {
