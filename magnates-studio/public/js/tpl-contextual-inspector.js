@@ -39,8 +39,8 @@
       type: 'bars',
       title: 'NET WORTH COMPARISON',
       subtitle: 'EXTREME WEALTH DISPARITY',
-      showTitle: false,
-      calloutMode: 'all',
+      showTitle: true,
+      calloutMode: 'single',
       activeFocusIdx: 0,
       bars: [
         {
@@ -1703,8 +1703,8 @@
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('wealth') : {});
     const title = d.title || 'NET WORTH COMPARISON';
     const subtitle = d.subtitle || 'EXTREME WEALTH DISPARITY';
-    const showTitle = !!d.showTitle;
-    const calloutMode = d.calloutMode || 'all'; // 'all', 'single', 'none'
+    const showTitle = d.showTitle !== false;
+    const calloutMode = d.calloutMode || 'single'; // 'single' (active focus only), 'all', 'none'
     const activeFocusIdx = typeof d.activeFocusIdx === 'number' ? d.activeFocusIdx : 0;
     const portraitsDb = window.WEALTH_DEFAULT_PORTRAITS || {};
 
@@ -2871,8 +2871,9 @@
     // =========================================================================
     if (tplId === 'wealth') {
       const bars = data.bars || [];
-      const calloutMode = data.calloutMode || 'all';
-      const showTitle = !!data.showTitle;
+      const calloutMode = data.calloutMode || 'single';
+      const activeFocusIdx = typeof data.activeFocusIdx === 'number' ? data.activeFocusIdx : 0;
+      const showTitle = data.showTitle !== false;
 
       container.innerHTML = `
         <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
@@ -2896,12 +2897,21 @@
               <div style="display: flex; align-items: center; gap: 4px;">
                 <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Callouts:</span>
                 <select id="wealth-sel-callouts" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #38bdf8; font-size: 10px; font-weight: 600; padding: 2px 4px; outline: none;">
-                  <option value="all" ${calloutMode === 'all' ? 'selected' : ''}>All Active</option>
                   <option value="single" ${calloutMode === 'single' ? 'selected' : ''}>Single Focus</option>
+                  <option value="all" ${calloutMode === 'all' ? 'selected' : ''}>All Active</option>
                   <option value="none" ${calloutMode === 'none' ? 'selected' : ''}>Hidden</option>
                 </select>
               </div>
             </div>
+
+            ${calloutMode === 'single' ? `
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Active Focus Callout:</span>
+                <select id="wealth-sel-focus" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(56,189,248,0.3); border-radius: 4px; color: #38bdf8; font-size: 10px; font-weight: 700; padding: 2px 6px; outline: none;">
+                  ${bars.map((b, i) => `<option value="${i}" ${activeFocusIdx === i ? 'selected' : ''}>#${i+1} ${b.label || 'Entity'}</option>`).join('')}
+                </select>
+              </div>
+            ` : ''}
 
             ${showTitle ? `
               <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
@@ -2972,6 +2982,15 @@
       if (selCallouts) {
         selCallouts.onchange = (e) => {
           window.tplSetContextualData('wealth', { calloutMode: e.target.value });
+          window.tplRenderContextualInspector('wealth');
+        };
+      }
+
+      const selFocus = container.querySelector('#wealth-sel-focus');
+      if (selFocus) {
+        selFocus.onchange = (e) => {
+          window.tplSetContextualData('wealth', { activeFocusIdx: parseInt(e.target.value, 10) });
+          window.tplRenderContextualInspector('wealth');
         };
       }
 
