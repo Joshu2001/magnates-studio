@@ -25240,12 +25240,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="ci-axis"><span>Year 0</span><span>Year 10</span><span>Year 20</span><span>Year 30</span><span>Year 40</span></div>
           </div>
         </div>`; } else if (tplId === 'wealth') {
-      fxContainer.innerHTML = `<div class="tpl-wealth">
-          <div class="w-title">Net Worth Comparison</div>
-          <div class="w-row"><div class="w-name">Jeff Bezos</div><div class="w-bar-wrap"><div class="w-bar b1" style="--w:100%">$200B</div></div></div>
-          <div class="w-row"><div class="w-name">Elon Musk</div><div class="w-bar-wrap"><div class="w-bar b2" style="--w:90%">$180B</div></div></div>
-          <div class="w-row"><div class="w-name">Avg American</div><div class="w-bar-wrap"><div class="w-bar b3" style="--w:4%">$97K</div></div></div>
-        </div>`; } else if (tplId === 'bloom') {
+      const wData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wealth') : {};
+      fxContainer.innerHTML = (typeof window.tplBuildWealthHtml === 'function') ? window.tplBuildWealthHtml(wData) : `<div class="tpl-wealth"><div class="w-hud-card"><div class="w-title">Net Worth Comparison</div></div></div>`;
+    } else if (tplId === 'bloom') {
       fxContainer.innerHTML = `<div class="tpl-bloom">
           <div class="b-panel"><div class="b-panel-head"><span>US EQUITIES</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">SPX</span><span>4,582 <span style="color:#00d68f">+0.8%</span></span></div><div class="b-row"><span class="sym">NDX</span><span>15,942 <span style="color:#00d68f">+1.2%</span></span></div><div class="b-row"><span class="sym">DJI</span><span>35,281 <span style="color:#ff4757">-0.3%</span></span></div></div>
           <div class="b-panel"><div class="b-panel-head"><span>RATES / FX</span><span class="dn">\u25bc</span></div><div class="b-row"><span class="sym">US10Y</span><span>4.32%</span></div><div class="b-row"><span class="sym">EUR/USD</span><span>1.0842</span></div><div class="b-row"><span class="sym">DXY</span><span>105.42</span></div></div>

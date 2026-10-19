@@ -34,14 +34,17 @@
       zoomScale: 1.15
     },
 
-    // 2. Wealth Comparison Bars
+    // 2. Wealth Comparison Bars — Cinematic High-End Preset
     'wealth': {
       type: 'bars',
       title: 'Net Worth Comparison',
+      subtitle: 'Extreme Wealth Disparity \u00b7 Relative Scale',
+      badge: 'INEQUALITY',
+      telemetry: 'Forensic Data HUD \u00b7 1:1 Scale',
       bars: [
-        { label: 'Jeff Bezos', val: '$200B', pct: 85, color: '#00a8ff' },
-        { label: 'Elon Musk', val: '$180B', pct: 75, color: '#ff5370' },
-        { label: 'Avg American', val: '$97K', pct: 8, color: '#64748b' }
+        { label: 'Jeff Bezos', val: '$200B', pct: 88, color: '#00d2ff', sub: '2,061,855x Median Wealth \u00b7 $3,710/sec', avatar: 'JB' },
+        { label: 'Elon Musk', val: '$180B', pct: 78, color: '#ff5370', sub: '1,855,670x Median Wealth \u00b7 $3,150/sec', avatar: 'EM' },
+        { label: 'Avg American', val: '$97K', pct: 6, color: '#94a3b8', sub: 'Federal Reserve Baseline \u00b7 $0.01/sec', avatar: 'US' }
       ]
     },
 
@@ -1655,6 +1658,70 @@
     };
   };
 
+  // --- 2C. WEALTH COMPARISON BARS BUILDER (James Jani / Magnates Media Inequality HUD) ---
+  window.tplBuildWealthHtml = function(mData) {
+    const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('wealth') : {});
+    const title = d.title || 'NET WORTH COMPARISON';
+    const subtitle = d.subtitle || 'EXTREME WEALTH DISPARITY \u00b7 RELATIVE SCALE';
+    const badge = d.badge || 'INEQUALITY';
+    const telemetry = d.telemetry || 'FORENSIC DATA HUD \u00b7 1:1 SCALE';
+    const bars = Array.isArray(d.bars) && d.bars.length ? d.bars : [
+      { label: 'Jeff Bezos', val: '$200B', pct: 88, color: '#00d2ff', sub: '2,061,855x Median Wealth \u00b7 $3,710/sec', avatar: 'JB' },
+      { label: 'Elon Musk', val: '$180B', pct: 78, color: '#ff5370', sub: '1,855,670x Median Wealth \u00b7 $3,150/sec', avatar: 'EM' },
+      { label: 'Avg American', val: '$97K', pct: 6, color: '#94a3b8', sub: 'Federal Reserve Baseline \u00b7 $0.01/sec', avatar: 'US' }
+    ];
+
+    const rowsHtml = bars.map((b, idx) => {
+      const avatarText = b.avatar || (b.label ? b.label.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '#');
+      const pctVal = Math.max(1, Math.min(100, parseFloat(b.pct) || 50));
+      const col = b.color || '#38bdf8';
+      const subText = b.sub || '';
+
+      return `
+        <div class="w-row" style="--row-idx: ${idx}; --bar-color: ${col}; --bar-glow: ${col}66; --target-pct: ${pctVal}%;">
+          <div class="w-row-top">
+            <div class="w-entity-wrap">
+              <div class="w-avatar" style="--bar-color: ${col};">${avatarText}</div>
+              <span class="w-entity-name">${b.label || 'Entity'}</span>
+            </div>
+            <div class="w-val-badge" style="--bar-color: ${col}; --bar-glow: ${col}66;">${b.val || ''}</div>
+          </div>
+          <div class="w-bar-track">
+            <div class="w-bar-fill" style="--target-pct: ${pctVal}%; --bar-color: ${col}; --bar-glow: ${col}66;">
+              <div class="w-bar-head" style="--bar-color: ${col};"></div>
+            </div>
+          </div>
+          ${subText ? `<div class="w-submetric" style="--bar-color: ${col};">${subText}</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="tpl-wealth">
+        <div class="w-hud-card">
+          <div class="w-top-meta">
+            <div class="w-badge">${badge}</div>
+            <div class="w-telemetry">${telemetry}</div>
+          </div>
+          <div class="w-head-block">
+            <div class="w-title">${title}</div>
+            <div class="w-subtitle">${subtitle}</div>
+          </div>
+          <div class="w-scale-ruler">
+            <span class="w-tick">$0</span>
+            <span class="w-tick">$50B</span>
+            <span class="w-tick">$100B</span>
+            <span class="w-tick">$150B</span>
+            <span class="w-tick">$200B+</span>
+          </div>
+          <div class="w-rows-container">
+            ${rowsHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
   // --- 2C. EMPIRE RISE & FALL TIMELINE BUILDER (James Jani / Magnates Media Documentary Style) ---
   window.tplBuildEmpireTimelineHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('empire-timeline') : {});
@@ -1945,24 +2012,7 @@
         window.initUniversalStageTransformEngine();
       }
     } else if (tplId === 'wealth') {
-      const title = fxc.querySelector('.w-title');
-      if (title && data.title) title.textContent = data.title;
-      const rows = fxc.querySelectorAll('.w-bar-row');
-      (data.bars || []).forEach((b, idx) => {
-        const row = rows[idx];
-        if (row) {
-          const l = row.querySelector('.w-label');
-          if (l) l.textContent = b.label;
-          const bar = row.querySelector('.w-bar');
-          if (bar) {
-            bar.style.width = `${b.pct}%`;
-            bar.style.background = b.color;
-            bar.style.boxShadow = `0 0 15px ${b.color}66`;
-            const v = bar.querySelector('.w-val');
-            if (v) v.textContent = b.val;
-          }
-        }
-      });
+      fxc.innerHTML = (typeof window.tplBuildWealthHtml === 'function') ? window.tplBuildWealthHtml(data) : '';
     } else if (tplId === 'textbehind') {
       const txt = fxc.querySelector('.bigtext');
       if (txt) {
@@ -2717,9 +2767,25 @@
             </button>
           </div>
 
+          <div style="display: flex; gap: 8px;">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Category Badge</span>
+              <input type="text" id="wealth-input-badge" value="${data.badge || 'INEQUALITY'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #c084fc; font-size: 10px; font-weight: 700; outline: none;" />
+            </div>
+            <div style="flex: 2; display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Telemetry Tag</span>
+              <input type="text" id="wealth-input-telemetry" value="${data.telemetry || 'Forensic Data HUD \u00b7 1:1 Scale'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #94a3b8; font-size: 10px; font-family: monospace; outline: none;" />
+            </div>
+          </div>
+
           <div style="display: flex; flex-direction: column; gap: 3px;">
             <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Chart Title</span>
             <input type="text" id="wealth-input-title" value="${data.title || 'Net Worth Comparison'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Subtitle / Context</span>
+            <input type="text" id="wealth-input-subtitle" value="${data.subtitle || 'Extreme Wealth Disparity \u00b7 Relative Scale'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: #cbd5e1; font-size: 10.5px; outline: none;" />
           </div>
 
           <div id="wealth-bars-list" style="display: flex; flex-direction: column; gap: 8px;">
@@ -2727,16 +2793,20 @@
               <div class="wealth-bar-edit-card" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
                   <span style="font-size: 10px; font-weight: 700; color: ${b.color}; font-family: monospace;">#${idx + 1}</span>
+                  <input type="text" class="wealth-item-avatar" data-idx="${idx}" value="${b.avatar || ''}" placeholder="ID" title="Avatar monogram (e.g. JB, EM, US)" style="width: 28px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; color: ${b.color}; font-size: 10px; font-weight: 800; text-align: center; padding: 2px 0; outline: none;" />
                   <input type="text" class="wealth-item-label" data-idx="${idx}" value="${b.label}" placeholder="Entity Name" style="flex: 1; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 4px; outline: none;" />
-                  <input type="text" class="wealth-item-val" data-idx="${idx}" value="${b.val}" placeholder="Value" style="width: 55px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: ${b.color}; font-size: 11px; font-weight: 700; text-align: right; padding: 2px 4px; outline: none;" />
+                  <input type="text" class="wealth-item-val" data-idx="${idx}" value="${b.val}" placeholder="Value" style="width: 58px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: ${b.color}; font-size: 11px; font-weight: 700; text-align: right; padding: 2px 4px; outline: none;" />
                   <input type="color" class="wealth-item-color" data-idx="${idx}" value="${b.color}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Change Bar Color" />
                   ${bars.length > 1 ? `<button type="button" class="wealth-item-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Remove this bar">\u2715</button>` : ''}
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <input type="text" class="wealth-item-sub" data-idx="${idx}" value="${b.sub || ''}" placeholder="Sub-metric: e.g. 2.1M yrs avg wage \u00b7 $3,710/sec" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 4px; color: #94a3b8; font-size: 9.5px; font-family: monospace; padding: 3px 6px; outline: none;" />
                 </div>
                 <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #64748b;">
                   <span>Bar Fill Length</span>
                   <span>${b.pct}%</span>
                 </div>
-                <input type="range" class="wealth-item-pct" data-idx="${idx}" min="5" max="100" value="${b.pct}" style="accent-color: ${b.color}; height: 3px; cursor: pointer;" />
+                <input type="range" class="wealth-item-pct" data-idx="${idx}" min="3" max="100" value="${b.pct}" style="accent-color: ${b.color}; height: 3px; cursor: pointer;" />
               </div>
             `).join('')}
           </div>
@@ -2746,6 +2816,23 @@
       // Wire Wealth Controls
       const tInput = container.querySelector('#wealth-input-title');
       if (tInput) tInput.oninput = (e) => window.tplSetContextualData('wealth', { title: e.target.value });
+
+      const sInput = container.querySelector('#wealth-input-subtitle');
+      if (sInput) sInput.oninput = (e) => window.tplSetContextualData('wealth', { subtitle: e.target.value });
+
+      const bInput = container.querySelector('#wealth-input-badge');
+      if (bInput) bInput.oninput = (e) => window.tplSetContextualData('wealth', { badge: e.target.value });
+
+      const tmInput = container.querySelector('#wealth-input-telemetry');
+      if (tmInput) tmInput.oninput = (e) => window.tplSetContextualData('wealth', { telemetry: e.target.value });
+
+      container.querySelectorAll('.wealth-item-avatar').forEach(inp => {
+        inp.oninput = (e) => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          bars[i].avatar = e.target.value;
+          window.tplSetContextualData('wealth', { bars: [...bars] });
+        };
+      });
 
       container.querySelectorAll('.wealth-item-label').forEach(inp => {
         inp.oninput = (e) => {
@@ -2759,6 +2846,14 @@
         inp.oninput = (e) => {
           const i = parseInt(e.target.dataset.idx, 10);
           bars[i].val = e.target.value;
+          window.tplSetContextualData('wealth', { bars: [...bars] });
+        };
+      });
+
+      container.querySelectorAll('.wealth-item-sub').forEach(inp => {
+        inp.oninput = (e) => {
+          const i = parseInt(e.target.dataset.idx, 10);
+          bars[i].sub = e.target.value;
           window.tplSetContextualData('wealth', { bars: [...bars] });
         };
       });
@@ -2799,7 +2894,7 @@
         addBarBtn.onclick = () => {
           const colors = ['#f59e0b', '#10b981', '#a855f7', '#ec4899', '#06b6d4'];
           const rndCol = colors[bars.length % colors.length];
-          bars.push({ label: 'New Entity', val: '$50B', pct: 50, color: rndCol });
+          bars.push({ label: 'New Titan', val: '$50B', pct: 45, color: rndCol, sub: '515,463x Median Wealth', avatar: 'NT' });
           window.tplSetContextualData('wealth', { bars: [...bars] });
           window.tplRenderContextualInspector('wealth');
         };
