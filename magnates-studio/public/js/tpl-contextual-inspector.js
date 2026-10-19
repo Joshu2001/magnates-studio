@@ -1109,6 +1109,50 @@
     return '📍';
   }
 
+  function getCountrySvgPath(query) {
+    if (!query || typeof window === 'undefined' || !window.ACCURATE_WORLD_MAP || !window.ACCURATE_WORLD_MAP.countries) return null;
+    const rawQ = String(query).trim();
+    const upper = rawQ.toUpperCase();
+    const nameMap = {
+      'USA': 'United States of America',
+      'UNITED STATES': 'United States of America',
+      'AMERICA': 'United States of America',
+      'UK': 'United Kingdom',
+      'UNITED KINGDOM': 'United Kingdom',
+      'GREAT BRITAIN': 'United Kingdom',
+      'BRITAIN': 'United Kingdom',
+      'ENGLAND': 'United Kingdom',
+      'LONDON': 'United Kingdom',
+      'RUSSIA': 'Russia',
+      'MOSCOW': 'Russia',
+      'KOREA': 'South Korea',
+      'S. KOREA': 'South Korea',
+      'N. KOREA': 'North Korea',
+      'DR CONGO': 'Dem. Rep. Congo',
+      'DEM. REP. CONGO': 'Dem. Rep. Congo',
+      'S. SUDAN': 'S. Sudan',
+      'CENTRAL AFRICAN REPUBLIC': 'Central African Rep.',
+      'DOMINICAN REPUBLIC': 'Dominican Rep.',
+      'BOSNIA': 'Bosnia and Herz.',
+      'CZECH REPUBLIC': 'Czechia',
+      'UAE': 'United Arab Emirates'
+    };
+    const directMatch = nameMap[upper];
+    if (directMatch && window.ACCURATE_WORLD_MAP.countries[directMatch]) {
+      return window.ACCURATE_WORLD_MAP.countries[directMatch];
+    }
+    const q = rawQ.toLowerCase();
+    for (const [name, path] of Object.entries(window.ACCURATE_WORLD_MAP.countries)) {
+      const nl = name.toLowerCase();
+      if (nl === q || nl.replace(/[^a-z]/g, '') === q.replace(/[^a-z]/g, '')) return path;
+    }
+    for (const [name, path] of Object.entries(window.ACCURATE_WORLD_MAP.countries)) {
+      const nl = name.toLowerCase();
+      if (nl.includes(q) || q.includes(nl)) return path;
+    }
+    return null;
+  }
+
   function buildTransitVehicleSvg(mode, pathId, color, idx) {
     const dur = (2.8 + (idx % 3) * 0.45).toFixed(2) + 's';
     const col = color || '#38bdf8';
@@ -1285,84 +1329,50 @@
     const targetCoordsStr = `${Math.abs(targetLat).toFixed(2)}°${targetLat >= 0 ? 'N' : 'S'} ${Math.abs(targetLng).toFixed(2)}°${targetLng >= 0 ? 'E' : 'W'}`;
     const originCoordsStr = `${Math.abs(originLat).toFixed(2)}°${originLat >= 0 ? 'N' : 'S'} ${Math.abs(originLng).toFixed(2)}°${originLng >= 0 ? 'E' : 'W'}`;
 
-    // High-Definition Vector Cartography Engine (Natural Earth 10m High Precision)
-    const highPrecisionWorldVectors = `
-      <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.65" stroke-linejoin="round" fill-opacity="0.94">
-        <!-- North America: Alaska, Canada, Hudson Bay, Greenland, Contiguous USA, Florida, Baja, Mexico, Central America -->
-        <path d="M 32 40 L 42 35 L 56 34 L 72 32 L 86 31 L 98 33 L 112 37 L 126 44 L 136 54 L 128 62 L 134 70 L 124 78 L 116 86 L 112 94 L 108 97 L 105 91 L 96 92 L 91 97 L 95 105 L 104 110 L 98 114 L 90 106 L 82 101 L 75 91 L 72 83 L 68 87 L 65 77 L 62 67 L 55 54 L 42 52 L 32 46 Z"/>
-        <path d="M 94 22 L 114 20 L 124 26 L 118 33 L 98 30 Z"/>
-        <path d="M 128 14 L 158 12 L 166 22 L 156 36 L 138 38 L 130 26 Z"/>
-        <!-- Caribbean -->
-        <path d="M 106 99 L 116 99 L 118 102 L 107 101 Z"/>
-        <path d="M 119 101 L 125 101 L 125 104 L 119 103 Z"/>
-        <!-- South America: Colombia, Venezuela, Brazil, Amazon, Patagonia, Chile, Peru -->
-        <path d="M 106 112 L 118 110 L 130 115 L 142 122 L 152 132 L 148 146 L 140 160 L 130 174 L 122 192 L 116 194 L 114 178 L 112 158 L 105 140 L 102 124 Z"/>
-        <!-- British Isles: Great Britain (England, Wales, Scotland, Highlands) & Ireland -->
-        <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 L 191 52 Z"/>
-        <path d="M 188 51 L 192 50 L 192 58 L 187 59 L 186 54 Z"/>
-        <!-- Scandinavia: Norway (Fjords), Sweden, Denmark, Baltic -->
-        <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 215 42 L 206 45 L 198 40 Z"/>
-        <path d="M 207 48 L 210 47 L 210 52 L 207 51 Z"/>
-        <!-- Continental Europe: Iberia, France, Germany, Low Countries, Italy, Balkans, Greece, Poland -->
-        <path d="M 184 63 L 191 61 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 220 70 L 216 64 L 212 68 L 215 74 L 211 76 L 206 68 L 201 66 L 193 70 L 184 70 Z"/>
-        <!-- Italy (Boot + Sicily & Sardinia) -->
-        <path d="M 208 72 L 213 71 L 217 76 L 219 82 L 215 82 L 212 77 L 208 75 Z"/>
-        <path d="M 210 83 L 214 83 L 213 86 L 209 85 Z"/>
-        <path d="M 205 74 L 207 74 L 207 79 L 205 79 Z"/>
-        <!-- Greece & Aegean Islands -->
-        <path d="M 218 78 L 223 77 L 224 83 L 220 84 L 218 80 Z"/>
-        <path d="M 221 86 L 225 86 L 224 88 L 220 87 Z"/>
-        <!-- Ukraine & Black Sea Basin (Danube Delta, Crimea, Azov, Donbas, Carpathians) -->
-        <path d="M 221 68 L 226 67 L 233 67 L 237 70 L 236 74 L 232 75 L 230 73 L 229 76 L 227 75 L 226 71 L 221 71 Z"/>
-        <!-- Eastern Europe & Russia (Urals, Volga, Moscow basin) -->
-        <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 372 38 L 364 52 L 352 58 L 346 72 L 338 86 L 328 96 L 320 108 L 314 102 L 306 94 L 296 96 L 288 110 L 280 96 L 270 90 L 258 84 L 248 72 L 238 56 Z"/>
-        <!-- Anatolia (Turkey) & Levant -->
-        <path d="M 226 75 L 238 73 L 245 76 L 244 80 L 238 81 L 228 80 Z"/>
-        <!-- Arabian Peninsula & Persian Gulf (Saudi Arabia, UAE, Oman, Yemen) -->
-        <path d="M 234 88 L 248 86 L 258 90 L 264 98 L 256 106 L 244 104 L 236 94 Z"/>
-        <!-- Africa: North Africa, Sahara, Horn, West Africa, Congo, Southern Africa, Madagascar -->
-        <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 219 171 L 209 171 L 203 153 L 199 135 L 193 117 L 179 111 L 173 97 L 177 83 Z"/>
-        <path d="M 243 145 L 248 143 L 247 159 L 242 157 Z"/>
-        <!-- India & South Asia -->
-        <path d="M 264 85 L 276 86 L 286 96 L 282 108 L 274 106 L 268 94 Z"/>
-        <path d="M 280 110 L 283 110 L 283 114 L 280 113 Z"/>
-        <!-- East Asia (China, Korea, Japan) -->
-        <path d="M 288 64 L 324 62 L 332 74 L 324 88 L 304 90 L 292 78 Z"/>
-        <path d="M 328 66 L 332 66 L 332 72 L 328 72 Z"/>
-        <path d="M 342 60 L 348 58 L 350 66 L 344 74 L 339 72 Z"/>
-        <!-- Southeast Asia, Indonesia, Philippines -->
-        <path d="M 314 96 L 326 104 L 320 112 L 312 104 Z"/>
-        <path d="M 306 114 L 326 122 L 338 124 L 318 126 Z"/>
-        <path d="M 334 94 L 339 94 L 338 104 L 334 104 Z"/>
-        <!-- Australia & New Zealand -->
-        <path d="M 322 142 L 344 138 L 362 144 L 368 158 L 360 174 L 342 176 L 322 168 L 316 154 Z"/>
-        <path d="M 376 172 L 382 168 L 384 176 L 374 184 Z"/>
-      </g>
+    // High-Definition Vector Cartography Engine (Natural Earth 110m Real TopoJSON Geometry)
+    const accurateMapData = (typeof window !== "undefined" && window.ACCURATE_WORLD_MAP) ? window.ACCURATE_WORLD_MAP : null;
+    let highPrecisionWorldVectors = "";
+    if (accurateMapData && accurateMapData.land) {
+      highPrecisionWorldVectors = `
+        <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.55" stroke-linejoin="round" fill-opacity="0.94">
+          <path d="${accurateMapData.land}"/>
+        </g>
+      `;
+    } else {
+      highPrecisionWorldVectors = `
+        <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.65" stroke-linejoin="round" fill-opacity="0.94">
+          <path d="M 32 40 L 42 35 L 56 34 L 72 32 L 86 31 L 98 33 L 112 37 L 126 44 L 136 54 L 128 62 L 134 70 L 124 78 L 116 86 L 112 94 L 108 97 L 105 91 L 96 92 L 91 97 L 95 105 L 104 110 L 98 114 L 90 106 L 82 101 L 75 91 L 72 83 L 68 87 L 65 77 L 62 67 L 55 54 L 42 52 L 32 46 Z"/>
+          <path d="M 94 22 L 114 20 L 124 26 L 118 33 L 98 30 Z"/>
+          <path d="M 128 14 L 158 12 L 166 22 L 156 36 L 138 38 L 130 26 Z"/>
+          <path d="M 106 112 L 118 110 L 130 115 L 142 122 L 152 132 L 148 146 L 140 160 L 130 174 L 122 192 L 116 194 L 114 178 L 112 158 L 105 140 L 102 124 Z"/>
+          <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 L 191 52 Z"/>
+          <path d="M 188 51 L 192 50 L 192 58 L 187 59 L 186 54 Z"/>
+          <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 215 42 L 206 45 L 198 40 Z"/>
+          <path d="M 184 63 L 191 61 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 220 70 L 216 64 L 212 68 L 215 74 L 211 76 L 206 68 L 201 66 L 193 70 L 184 70 Z"/>
+          <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 372 38 L 364 52 L 352 58 L 346 72 L 338 86 L 328 96 L 320 108 L 314 102 L 306 94 L 296 96 L 288 110 L 280 96 L 270 90 L 258 84 L 248 72 L 238 56 Z"/>
+          <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 219 171 L 209 171 L 203 153 L 199 135 L 193 117 L 179 111 L 173 97 L 177 83 Z"/>
+          <path d="M 264 85 L 276 86 L 286 96 L 282 108 L 274 106 L 268 94 Z"/>
+          <path d="M 288 64 L 324 62 L 332 74 L 324 88 L 304 90 L 292 78 Z"/>
+          <path d="M 322 142 L 344 138 L 362 144 L 368 158 L 360 174 L 342 176 L 322 168 L 316 154 Z"/>
+        </g>
+      `;
+    }
 
-      <!-- Tactical National Boundaries (Crisp High-Precision Vector Subdivisions) -->
-      <g stroke="${th.borderStroke}" stroke-width="0.45" stroke-dasharray="1.2 0.8" fill="none">
-        <!-- European & Eurasian Borders -->
-        <path d="M 194 62 L 198 62 L 202 67 M 202 56 L 202 66 M 212 54 L 212 66 M 222 52 L 222 66"/>
-        <path d="M 221 68 L 225 68 L 228 66 L 234 67 L 237 70"/>
-        <path d="M 218 72 L 224 73 L 228 76 L 232 75"/>
-        <path d="M 240 76 L 244 80 L 248 78 L 254 82"/>
-        <!-- African Subdivisions -->
-        <line x1="178" y1="92" x2="236" y2="92"/>
-        <line x1="204" y1="76" x2="204" y2="114"/>
-        <line x1="218" y1="92" x2="218" y2="146"/>
-        <line x1="204" y1="146" x2="236" y2="146"/>
-        <!-- North American Borders -->
-        <line x1="64" y1="62" x2="124" y2="62"/>
-        <line x1="76" y1="86" x2="98" y2="89"/>
-      </g>
-
-      <!-- Tactical Highlight on Active Target Nation (Ukraine in Image 2 with radiant glowing border) -->
+    // Dynamic Country Highlighting: lookup exact polygon geometry of the active target country
+    const targetCountrySvgPath = getCountrySvgPath(targetName);
+    const highlightedCountryMarkup = targetCountrySvgPath ? `
       <g class="tactical-highlight-country">
-        <path d="M 221 68 L 226 67 L 233 67 L 237 70 L 236 74 L 232 75 L 230 73 L 229 76 L 227 75 L 226 71 L 221 71 Z" fill="rgba(251, 191, 36, 0.12)" stroke="${th.highlightCountry}" stroke-width="1.3" filter="url(#activeCountryGlow)"/>
+        <path d="${targetCountrySvgPath}" fill="rgba(251, 191, 36, 0.16)" stroke="${th.highlightCountry}" stroke-width="1.3" filter="url(#activeCountryGlow)"/>
       </g>
+    ` : `
+      <g class="tactical-highlight-country">
+        <circle cx="${targetProj.x.toFixed(1)}" cy="${targetProj.y.toFixed(1)}" r="10" fill="rgba(251, 191, 36, 0.12)" stroke="${th.highlightCountry}" stroke-width="1.2" filter="url(#activeCountryGlow)"/>
+      </g>
+    `;
 
-      <!-- Faint Topographic / Bathymetric Depth Contours -->
-      <g stroke="${th.grid}" stroke-width="0.35" fill="none" opacity="0.45">
+    // Faint Topographic / Bathymetric Depth Contours
+    const bathymetricContoursMarkup = `
+      <g stroke="${th.grid}" stroke-width="0.32" fill="none" opacity="0.45">
         <path d="M 180 60 C 188 56, 196 52, 204 50 C 216 48, 228 44, 240 44"/>
         <path d="M 178 72 C 188 70, 200 70, 214 74 C 224 76, 234 74, 246 76"/>
         <path d="M 180 84 C 196 82, 212 84, 228 86 C 240 88, 252 86, 264 92"/>
@@ -1372,51 +1382,62 @@
 
     // Dynamic Country Labels with Proximity Occlusion Management
     const countryLabelsDb = [
-      { name: 'RUSSIA', x: 260, y: 35 },
-      { name: 'UK', x: 189, y: 67 },
-      { name: 'FRANCE', x: 198, y: 77 },
-      { name: 'SPAIN', x: 187, y: 83 },
-      { name: 'GERMANY', x: 209, y: 73 },
-      { name: 'POLAND', x: 219, y: 71 },
-      { name: 'ITALY', x: 212, y: 81 },
-      { name: 'ROMANIA', x: 222, y: 76 },
-      { name: 'TURKEY', x: 236, y: 81 },
-      { name: 'SWEDEN', x: 212, y: 52 },
-      { name: 'FINLAND', x: 226, y: 50 },
-      { name: 'KAZAKHSTAN', x: 264, y: 73 },
-      { name: 'IRAN', x: 254, y: 85 },
-      { name: 'IRAQ', x: 242, y: 86 },
-      { name: 'SYRIA', x: 236, y: 86 },
-      { name: 'SAUDI ARABIA', x: 248, y: 96 },
-      { name: 'YEMEN', x: 254, y: 104 },
-      { name: 'MOROCCO', x: 188, y: 89 },
-      { name: 'ALGERIA', x: 202, y: 93 },
-      { name: 'LIBYA', x: 220, y: 93 },
-      { name: 'EGYPT', x: 232, y: 93 },
-      { name: 'SUDAN', x: 228, y: 105 },
-      { name: 'CHAD', x: 218, y: 105 },
-      { name: 'NIGER', x: 206, y: 104 },
-      { name: 'NIGERIA', x: 203, y: 112 },
-      { name: 'ETHIOPIA', x: 238, y: 110 },
-      { name: 'S. SUDAN', x: 228, y: 113 },
-      { name: 'DR CONGO', x: 218, y: 124 },
-      { name: 'KENYA', x: 236, y: 121 },
-      { name: 'TANZANIA', x: 234, y: 129 },
-      { name: 'ANGOLA', x: 213, y: 135 },
-      { name: 'ZAMBIA', x: 226, y: 137 },
-      { name: 'INDIA', x: 276, y: 98 }
+      { name: "RUSSIA", x: 260, y: 35 },
+      { name: "UK", x: 189, y: 67 },
+      { name: "FRANCE", x: 198, y: 77 },
+      { name: "SPAIN", x: 187, y: 83 },
+      { name: "GERMANY", x: 209, y: 73 },
+      { name: "POLAND", x: 219, y: 71 },
+      { name: "ITALY", x: 212, y: 81 },
+      { name: "ROMANIA", x: 222, y: 76 },
+      { name: "TURKEY", x: 236, y: 81 },
+      { name: "SWEDEN", x: 212, y: 52 },
+      { name: "FINLAND", x: 226, y: 50 },
+      { name: "KAZAKHSTAN", x: 264, y: 73 },
+      { name: "IRAN", x: 254, y: 85 },
+      { name: "IRAQ", x: 242, y: 86 },
+      { name: "SYRIA", x: 236, y: 86 },
+      { name: "SAUDI ARABIA", x: 248, y: 96 },
+      { name: "YEMEN", x: 254, y: 104 },
+      { name: "MOROCCO", x: 188, y: 89 },
+      { name: "ALGERIA", x: 202, y: 93 },
+      { name: "LIBYA", x: 220, y: 93 },
+      { name: "EGYPT", x: 232, y: 93 },
+      { name: "SUDAN", x: 228, y: 105 },
+      { name: "CHAD", x: 218, y: 105 },
+      { name: "NIGER", x: 206, y: 104 },
+      { name: "NIGERIA", x: 203, y: 112 },
+      { name: "ETHIOPIA", x: 238, y: 110 },
+      { name: "S. SUDAN", x: 228, y: 113 },
+      { name: "DR CONGO", x: 218, y: 124 },
+      { name: "KENYA", x: 236, y: 121 },
+      { name: "TANZANIA", x: 234, y: 129 },
+      { name: "ANGOLA", x: 213, y: 135 },
+      { name: "ZAMBIA", x: 226, y: 137 },
+      { name: "INDIA", x: 276, y: 98 }
     ];
+
+    // Build Set of active route locations to eliminate duplicate redundant static labels
+    const activeRouteNames = new Set();
+    activeRoutes.forEach(r => {
+      if (r.from) activeRouteNames.add(r.from.trim().toUpperCase());
+      if (r.to) activeRouteNames.add(r.to.trim().toUpperCase());
+    });
 
     // Filter country labels based on proximity to target and origin to avoid visual clutter
     const filteredLabelsHtml = countryLabelsDb.map(lbl => {
+      if (activeRouteNames.has(lbl.name)) return "";
       const dTarget = Math.hypot(lbl.x - targetProj.x, lbl.y - targetProj.y);
       const dOrigin = Math.hypot(lbl.x - originProj.x, lbl.y - originProj.y);
-      if (dTarget < 14 || dOrigin < 12) return ''; // Occlusion culling near HUD markers
-      const isSubtle = (dTarget < 24 || dOrigin < 20);
+      if (dTarget < 16 || dOrigin < 14) return "";
+      const isSubtle = (dTarget < 26 || dOrigin < 22);
       return `<text x="${lbl.x}" y="${lbl.y}" fill="${th.labelCol}" opacity="${isSubtle ? 0.35 : 0.82}">${lbl.name}</text>`;
-    }).join('');
+    }).join("");
 
-    // Great-Circle Parabolic 3D Arcs + HUD Waypoints + Vehicle Trails
+    // Decluttered Waypoints Registry: render unique, non-overlapping waypoints and HUD tags
+    const renderedNodes = new Map();
+
+    // Great-Circle Parabolic 3D Arcs + Clean Multi-Route Transit Trails
     const routeElementsHtml = showArc ? activeRoutes.map((rt, idx) => {
       const fGeo = (rt.fromLat !== undefined && rt.fromLng !== undefined)
         ? { lat: rt.fromLat, lng: rt.fromLng }
@@ -1433,68 +1454,91 @@
       const cx = (p1.x + p2.x) / 2;
       const cy = (p1.y + p2.y) / 2 - arcLift;
       const pathId = `map-route-path-${idx}`;
-      const col = rt.color || '#38bdf8';
+      const col = rt.color || "#38bdf8";
       const isLastLeg = (idx === activeRoutes.length - 1);
+
+      // Unique node tracking for Waypoint 1 (Origin)
+      const p1Key = `${Math.round(p1.x / 8)}_${Math.round(p1.y / 8)}`;
+      let originNodeHtml = "";
+      if (!renderedNodes.has(p1Key)) {
+        renderedNodes.set(p1Key, true);
+        originNodeHtml = `
+          <!-- Waypoint Origin Node -->
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.4" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+          ${idx === 0 ? `
+            <g class="map-waypoint-hud" transform="translate(${p1.x.toFixed(1)}, ${p1.y.toFixed(1)})">
+              <path d="M 0 -2.4 L 0 -10 L 16 -10" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
+              <text x="18" y="-13" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900" letter-spacing="0.06em">${(rt.from || "ORIGIN").toUpperCase()}</text>
+              <text x="18" y="-8.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${originCoordsStr}</text>
+            </g>
+          ` : ""}
+        `;
+      }
+
+      // Unique node tracking for Waypoint 2 (Destination or Intermediate Transfer Node)
+      const p2Key = `${Math.round(p2.x / 8)}_${Math.round(p2.y / 8)}`;
+      let destNodeHtml = "";
+      if (isLastLeg) {
+        // Multi-Ring Concentric Tactical HUD Reticle matching Image 2 for the Primary Destination
+        destNodeHtml = `
+          <g class="map-target-reticle" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
+            <!-- Expanding Radar Pulse Ring -->
+            <circle cx="0" cy="0" r="6" fill="none" stroke="${col}" stroke-width="1" class="hud-radar-pulse"/>
+            <!-- Outer Dashed Reticle Ring -->
+            <circle cx="0" cy="0" r="15" fill="none" stroke="${col}" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
+            <!-- Inner Solid Reticle Ring -->
+            <circle cx="0" cy="0" r="9.5" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.95"/>
+            <!-- 4-Corner Crosshair Ticks -->
+            <path d="M -12 -12 L -9 -12 M -12 -12 L -12 -9 M 12 -12 L 9 -12 M 12 -12 L 12 -9 M -12 12 L -9 12 M -12 12 L -12 9 M 12 12 L 9 12 M 12 12 L 12 9" stroke="${col}" stroke-width="0.8" fill="none"/>
+            <!-- Center Glowing Target Node -->
+            <circle cx="0" cy="0" r="3.2" fill="${th.highlightCountry}" stroke="#ffffff" stroke-width="0.8"/>
+            <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
+
+            <!-- Tactical Leader Line + Target HUD Tag -->
+            <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="${col}" stroke-width="0.75" opacity="0.85"/>
+            <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">${targetName.toUpperCase()}</text>
+            <text x="26" y="-14.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700" letter-spacing="0.05em">${targetCoordsStr}</text>
+          </g>
+        `;
+        renderedNodes.set(p2Key, true);
+      } else if (!renderedNodes.has(p2Key)) {
+        renderedNodes.set(p2Key, true);
+        const intermediateName = (rt.to || "").toUpperCase() === "UK" ? "LONDON" : (rt.to || "WAYPOINT").toUpperCase();
+        const intermediateCoords = (rt.to || "").toUpperCase() === "UK" ? "51.50°N 0.12°W" : `${Math.abs(tGeo.lat).toFixed(2)}°${tGeo.lat >= 0 ? "N" : "S"} ${Math.abs(tGeo.lng).toFixed(2)}°${tGeo.lng >= 0 ? "E" : "W"}`;
+        destNodeHtml = `
+          <!-- Intermediate Transfer Node & Waypoint HUD (e.g. London / UK in Image 2) -->
+          <g class="map-intermediate-hud" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
+            <circle cx="0" cy="0" r="2.6" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
+            <circle cx="0" cy="0" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+            <path d="M 0 -2.6 L 0 -11 L 18 -11" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
+            <text x="20" y="-14" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.4" font-weight="900" letter-spacing="0.06em">${intermediateName}</text>
+            <text x="20" y="-9" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${intermediateCoords}</text>
+          </g>
+        `;
+      } else {
+        destNodeHtml = `
+          <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="2.2" fill="${col}" stroke="#ffffff" stroke-width="0.7" opacity="0.85"/>
+        `;
+      }
 
       return `
         <g class="map-route-group" data-route-idx="${idx}">
           <!-- Glowing Parabolic Under-Stroke -->
-          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="4.8" opacity="0.32" filter="url(#arcGlowFilter)"/>
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="4.8" opacity="0.28" filter="url(#arcGlowFilter)"/>
           <!-- Core Luminous Arc Path -->
           <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.8" opacity="0.95"/>
           <!-- Dynamic Animated Dash-Array Motion Trail -->
           <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4" opacity="0.9"/>
 
-          <!-- Waypoint 1 (Origin) -->
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.4" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
-
-          <!-- Origin Floating HUD Coordinate Tag -->
-          ${idx === 0 ? `
-            <g class="map-waypoint-hud" transform="translate(${p1.x.toFixed(1)}, ${p1.y.toFixed(1)})">
-              <path d="M 0 -2.4 L 0 -10 L 16 -10" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
-              <text x="18" y="-13" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900" letter-spacing="0.06em">${(rt.from || 'ORIGIN').toUpperCase()}</text>
-              <text x="18" y="-8.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${originCoordsStr}</text>
-            </g>
-          ` : ''}
-
-          <!-- Waypoint 2 (Destination or Intermediate Transfer Waypoint) -->
-          ${isLastLeg ? `
-            <!-- Multi-Ring Concentric Tactical HUD Reticle matching Image 2 -->
-            <g class="map-target-reticle" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
-              <!-- Expanding Radar Pulse Ring -->
-              <circle cx="0" cy="0" r="6" fill="none" stroke="${col}" stroke-width="1" class="hud-radar-pulse"/>
-              <!-- Outer Dashed Reticle Ring -->
-              <circle cx="0" cy="0" r="15" fill="none" stroke="${col}" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
-              <!-- Inner Solid Reticle Ring -->
-              <circle cx="0" cy="0" r="9.5" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.95"/>
-              <!-- 4-Corner Crosshair Ticks -->
-              <path d="M -12 -12 L -9 -12 M -12 -12 L -12 -9 M 12 -12 L 9 -12 M 12 -12 L 12 -9 M -12 12 L -9 12 M -12 12 L -12 9 M 12 12 L 9 12 M 12 12 L 12 9" stroke="${col}" stroke-width="0.8" fill="none"/>
-              <!-- Center Glowing Target Node -->
-              <circle cx="0" cy="0" r="3.2" fill="${th.highlightCountry}" stroke="#ffffff" stroke-width="0.8"/>
-              <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
-
-              <!-- Tactical Leader Line + Target HUD Tag -->
-              <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="${col}" stroke-width="0.75" opacity="0.85"/>
-              <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">${targetName.toUpperCase()}</text>
-              <text x="26" y="-14.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700" letter-spacing="0.05em">${targetCoordsStr}</text>
-            </g>
-          ` : `
-            <!-- Intermediate Transfer Node & Waypoint HUD (e.g. London / UK in Image 2) -->
-            <g class="map-intermediate-hud" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
-              <circle cx="0" cy="0" r="2.6" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
-              <circle cx="0" cy="0" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
-              <path d="M 0 -2.6 L 0 -11 L 18 -11" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
-              <text x="20" y="-14" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.4" font-weight="900" letter-spacing="0.06em">${(rt.to || '').toUpperCase() === 'UK' ? 'LONDON' : (rt.to || 'WAYPOINT').toUpperCase()}</text>
-              <text x="20" y="-9" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${(rt.to || '').toUpperCase() === 'UK' ? '51.50°N 0.12°W' : `${Math.abs(tGeo.lat).toFixed(2)}°${tGeo.lat >= 0 ? 'N' : 'S'} ${Math.abs(tGeo.lng).toFixed(2)}°${tGeo.lng >= 0 ? 'E' : 'W'}`}</text>
-            </g>
-          `}
+          ${originNodeHtml}
+          ${destNodeHtml}
 
           <!-- Moving Transit Vehicle (Jet / Train / Ship) along Great-Circle Arc -->
-          ${buildTransitVehicleSvg(rt.mode || 'plane', pathId, col, idx)}
+          ${buildTransitVehicleSvg(rt.mode || "plane", pathId, col, idx)}
         </g>
       `;
-    }).join('') : '';
+    }).join("") : "";
 
     // Custom on-screen traced routes (for 3D Direct Tracing mode)
     const customTraceHtml = customRoutes.map((cr, cIdx) => {
@@ -1603,6 +1647,8 @@
           <!-- Interactive Transformed Coordinate Plane -->
           <g class="map-interactive-coord-plane" transform="translate(${globeShiftX}, ${globeShiftY})">
             ${highPrecisionWorldVectors}
+            ${highlightedCountryMarkup}
+            ${bathymetricContoursMarkup}
             <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
               ${filteredLabelsHtml}
             </g>
@@ -1637,6 +1683,8 @@
         </g>
         <g class="map-interactive-coord-plane">
           ${highPrecisionWorldVectors}
+          ${highlightedCountryMarkup}
+          ${bathymetricContoursMarkup}
           <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
             ${filteredLabelsHtml}
           </g>
@@ -1650,21 +1698,28 @@
       ? `animation: none !important; transform: perspective(1000px) rotateX(${pitch3D}deg) rotateY(${yaw3D}deg) scale(${Math.min(1.35, Math.max(1.0, zoomLvl * 0.65))}); transform-style: preserve-3d; transition: transform 0.15s ease-out;`
       : '';
 
-    const stage3DControlsHtml = (is3D || isDrawing) ? `
+    const stage3DControlsHtml = `
       <div class="map-3d-stage-toolbar" style="position:absolute; top:10px; right:12px; z-index:35; display:flex; align-items:center; gap:6px; background:rgba(7,13,25,0.92); backdrop-filter:blur(10px); border:1px solid rgba(56,189,248,0.45); border-radius:20px; padding:4px 10px; box-shadow:0 8px 24px rgba(0,0,0,0.75); pointer-events:auto;">
-        <span style="font-size:9px; font-weight:800; color:#a855f7; font-family:monospace;">\u2b21 3D MAP</span>
-        <button type="button" id="map-stage-btn-draw" style="background:${isDrawing ? 'rgba(46,255,198,0.22)' : 'rgba(255,255,255,0.08)'}; border:1px solid ${isDrawing ? '#2effc6' : 'rgba(255,255,255,0.18)'}; color:${isDrawing ? '#2effc6' : '#e2e8f0'}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:700; cursor:pointer;">
-          ${isDrawing ? '\u270f\ufe0f Tracing Route (Click/Drag Map)' : '\u270f\ufe0f Trace Route on Screen'}
+        <button type="button" id="map-stage-btn-toggle-3d" style="background:${is3D ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.08)"}; border:1px solid ${is3D ? "#38bdf8" : "rgba(255,255,255,0.18)"}; color:${is3D ? "#38bdf8" : "#94a3b8"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:800; cursor:pointer;" title="Toggle 3D Orbit / Camera Mode">
+          ${is3D ? "🌐 3D Orbit ON" : "🌐 3D Orbit"}
+        </button>
+        <div style="display:flex; align-items:center; gap:2px; background:rgba(0,0,0,0.5); border-radius:12px; border:1px solid rgba(255,255,255,0.12); padding:1px 4px;">
+          <button type="button" id="map-stage-btn-zoom-in" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom In (+)">+</button>
+          <span id="map-stage-zoom-badge" style="font-family:monospace; font-size:8.5px; color:#e2e8f0; min-width:24px; text-align:center;">${zoomLvl.toFixed(1)}x</span>
+          <button type="button" id="map-stage-btn-zoom-out" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom Out (−)">−</button>
+        </div>
+        <button type="button" id="map-stage-btn-draw" style="background:${isDrawing ? "rgba(46,255,198,0.22)" : "rgba(255,255,255,0.08)"}; border:1px solid ${isDrawing ? "#2effc6" : "rgba(255,255,255,0.18)"}; color:${isDrawing ? "#2effc6" : "#e2e8f0"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:700; cursor:pointer;" title="Direct Route Tracing Mode">
+          ${isDrawing ? "✏️ Tracing Route" : "✏️ Trace"}
         </button>
         <select id="map-stage-sel-transit" style="background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:#fff; font-size:9.5px; font-weight:700; padding:2px 5px; cursor:pointer;" title="Transit Mode for On-Screen Trace">
-          <option value="plane" ${(d.activeTraceTransit || 'plane') === 'plane' ? 'selected' : ''}>\u2708\ufe0f Plane</option>
-          <option value="ship" ${d.activeTraceTransit === 'ship' ? 'selected' : ''}>\ud83d\udea2 Ship</option>
-          <option value="train" ${d.activeTraceTransit === 'train' ? 'selected' : ''}>\ud83d\ude86 Train</option>
-          <option value="line" ${d.activeTraceTransit === 'line' ? 'selected' : ''}>\u26a1 Line</option>
+          <option value="plane" ${(d.activeTraceTransit || "plane") === "plane" ? "selected" : ""}>✈️ Plane</option>
+          <option value="ship" ${d.activeTraceTransit === "ship" ? "selected" : ""}>🚢 Ship</option>
+          <option value="train" ${d.activeTraceTransit === "train" ? "selected" : ""}>🚆 Train</option>
+          <option value="line" ${d.activeTraceTransit === "line" ? "selected" : ""}>⚡ Line</option>
         </select>
         <button type="button" id="map-stage-btn-clear-trace" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:10px; padding:2px 7px; font-size:9px; font-weight:700; cursor:pointer;" title="Clear On-Screen Drawn Traces">Clear</button>
       </div>
-    ` : '';
+    `;
 
     return `
       <div class="tpl-map globe-viewport ${is3D ? 'is-3d-mode' : ''} ${isDrawing ? 'is-drawing-route' : ''}" style="background:${th.bg}; --focus-x:${normX.toFixed(1)}%; --focus-y:${normY.toFixed(1)}%; --zoom-scale:${zoomLvl}; --zoom-delay:${zoomStart}s; --cam-cycle:${totalCycle}s; --pan-x:${panX}; --pan-y:${panY}; --pin-color:${pinColor}; cursor:${isDrawing ? 'crosshair' : (is3D ? 'grab' : 'default')};">
@@ -1707,8 +1762,60 @@
   // Interactive 3D Orbit & Direct On-Screen Route Tracing Handler for Map Stage
   window.tplBindInteractiveMapStage = function(stageEl) {
     if (!stageEl) return;
-    const viewport = stageEl.querySelector('.tpl-map.globe-viewport');
+    const viewport = stageEl.querySelector(".tpl-map.globe-viewport");
     if (!viewport) return;
+
+    // Wire up 3D Orbit Toggle
+    const btnToggle3D = viewport.querySelector("#map-stage-btn-toggle-3d");
+    if (btnToggle3D) {
+      btnToggle3D.onclick = (e) => {
+        e.stopPropagation();
+        const cur = window.tplGetContextualData("map");
+        window.tplSetContextualData("map", { is3DMode: !cur.is3DMode });
+        if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+      };
+    }
+
+    // Wire up Zoom In and Zoom Out controls
+    const btnZoomIn = viewport.querySelector("#map-stage-btn-zoom-in");
+    if (btnZoomIn) {
+      btnZoomIn.onclick = (e) => {
+        e.stopPropagation();
+        const cur = window.tplGetContextualData("map");
+        const newZ = Math.min(5, (cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9) + 0.35);
+        window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
+        if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+      };
+    }
+
+    const btnZoomOut = viewport.querySelector("#map-stage-btn-zoom-out");
+    if (btnZoomOut) {
+      btnZoomOut.onclick = (e) => {
+        e.stopPropagation();
+        const cur = window.tplGetContextualData("map");
+        const newZ = Math.max(1.0, (cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9) - 0.35);
+        window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
+        if (typeof window.tplRenderContextualInspector === "function") window.tplRenderContextualInspector("map");
+      };
+    }
+
+    // Wire up Wheel Zoom on viewport
+    viewport.onwheel = (e) => {
+      e.preventDefault();
+      const cur = window.tplGetContextualData("map");
+      const curZ = cur.zoomLevel !== undefined ? parseFloat(cur.zoomLevel) : 1.9;
+      const delta = e.deltaY < 0 ? 0.25 : -0.25;
+      const newZ = Math.max(1.0, Math.min(5.0, curZ + delta));
+      window.tplSetContextualData("map", { zoomLevel: parseFloat(newZ.toFixed(2)), is3DMode: true });
+      const rig = viewport.querySelector(".globe-camera-rig");
+      if (rig) {
+        const pitch = cur.pitch3D !== undefined ? parseFloat(cur.pitch3D) : 22;
+        const yaw = cur.yaw3D !== undefined ? parseFloat(cur.yaw3D) : -10;
+        rig.style.transform = `perspective(1000px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(${newZ.toFixed(2)})`;
+      }
+      const badge = viewport.querySelector("#map-stage-zoom-badge");
+      if (badge) badge.textContent = newZ.toFixed(1) + "x";
+    };
 
     const btnDraw = viewport.querySelector('#map-stage-btn-draw');
     if (btnDraw) {
