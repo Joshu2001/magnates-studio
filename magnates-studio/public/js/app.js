@@ -25092,8 +25092,7 @@ window.tplBuildScrambleHtml = function (data) {
   const layout = d.layoutMode === 'terminal' ? 'terminal' : 'chat';
   const targetText = d.text !== undefined ? String(d.text) : (layout === 'chat' ? 'you are a dead man' : 'SYSTEM PRIVILEGES COMPROMISED');
   const neonColor = d.color || '#00ff88';
-  const senderHandle = d.senderHandle || 'ANON_USER // UNTRACEABLE';
-  const headerTag = d.headerTag || (layout === 'chat' ? 'TOR_ONION_CHAT v3.4 // [SESSION_ID: 0x9F4B]' : 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]');
+  const headerTag = d.headerTag || 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]';
   const subText = d.subText || 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050';
   const showScanlines = d.showScanlines !== false;
   const bgPreset = d.bgPreset || 'cyber-3d-grid';
@@ -25106,8 +25105,7 @@ window.tplBuildScrambleHtml = function (data) {
         ${bgLayerHtml}
         ${showScanlines ? '<div class="scramble-scanlines"></div>' : ''}
         <div class="scramble-vignette"></div>
-        <div class="scramble-chat-window">
-          <!-- Chat Window Header -->
+        <div class="scramble-terminal">
           <div class="scramble-header">
             <div class="scramble-header-left">
               <div class="scramble-dots">
@@ -25115,43 +25113,22 @@ window.tplBuildScrambleHtml = function (data) {
                 <span class="scramble-dot yellow"></span>
                 <span class="scramble-dot green"></span>
               </div>
-              <span class="scramble-chat-onion-icon">🧅</span>
               <span class="scramble-node-tag">${headerTag}</span>
             </div>
             <div class="scramble-header-right">
-              <span class="scramble-pgp-badge">🔒 PGP 4096-BIT</span>
-              <span class="scramble-live-badge"><span class="scramble-pulse-dot"></span>LIVE ONION PEER</span>
+              <span class="scramble-live-badge"><span class="scramble-pulse-dot"></span>DECRYPTING</span>
             </div>
           </div>
-          <!-- Chat Conversation Body -->
-          <div class="scramble-chat-body">
-            <div class="scramble-chat-alert">
-              <span>⚠ DIRECT END-TO-END PEER CONNECTED // ROUTED VIA 7 TOR RELAY NODES // ZERO LOGS</span>
+          <div class="scramble-body">
+            <div class="scramble-prompt-line">
+              <span class="scramble-prompt">&gt; EXEC_OVERRIDE // DECRYPT_STREAM:</span>
             </div>
-            <!-- Message Bubble -->
-            <div class="scramble-message-wrap">
-              <div class="scramble-message-avatar">
-                <span>0x</span>
-              </div>
-              <div class="scramble-message-bubble">
-                <div class="scramble-message-meta">
-                  <span class="scramble-sender-handle">${senderHandle}</span>
-                  <span class="scramble-message-time">03:42:19 UTC</span>
-                </div>
-                <div class="scramble-main-text">
-                  <span class="scramble-chars" data-target="${targetText.replace(/"/g, '&quot;')}">${targetText}</span><span class="scramble-cursor">_</span>
-                </div>
-                <div class="scramble-message-footer">
-                  <span class="scramble-verify-badge">✓✓ PGP SIGNATURE VERIFIED</span>
-                  <span class="scramble-cipher-tag">AES-256-GCM</span>
-                </div>
-              </div>
+            <div class="scramble-main-text">
+              <span class="scramble-chars" data-target="${targetText.replace(/"/g, '&quot;')}">${targetText}</span><span class="scramble-cursor">_</span>
             </div>
-            <!-- Simulated Client Input Line -->
-            <div class="scramble-chat-input-bar">
-              <span class="scramble-input-prompt">&gt;</span>
-              <span class="scramble-input-placeholder">Send encrypted response via Tor onion circuit...</span>
-              <span class="scramble-input-send">TRANSMIT ↵</span>
+            <div class="scramble-telemetry">
+              <span class="scramble-subtext">${subText}</span>
+              <span style="color: var(--scramble-col); font-weight: 700; opacity: 0.85;">STATUS: OK</span>
             </div>
           </div>
         </div>

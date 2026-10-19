@@ -10459,167 +10459,49 @@ body.tool-slide-active {
   margin-left: 2px;
 }
 
-/* SUB-TEMPLATE 1: SIMULATED ENCRYPTED DARK WEB CHAT */
-.tpl-scramble.scramble-mode-chat .scramble-chat-window {
+/* SUB-TEMPLATE 1: SIMULATED ENCRYPTED DARK WEB CHAT / TERMINAL WINDOW */
+.tpl-scramble.scramble-mode-chat .scramble-terminal,
+.tpl-scramble .scramble-terminal {
   position: relative;
   z-index: 6;
-  width: min(90%, 650px);
-  background: rgba(5, 12, 8, 0.88);
+  width: min(88%, 680px);
+  background: rgba(4, 10, 7, 0.88);
   border: 1px solid var(--scramble-glow);
-  box-shadow: 0 0 35px var(--scramble-dim), 0 25px 60px rgba(0,0,0,0.92);
-  border-radius: 10px;
+  box-shadow: 0 0 25px var(--scramble-dim), 0 20px 50px rgba(0,0,0,0.9);
+  border-radius: 8px;
   overflow: hidden;
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
 }
 
-.tpl-scramble .scramble-chat-onion-icon {
-  font-size: 13px;
-  line-height: 1;
-}
-
-.tpl-scramble .scramble-pgp-badge {
-  font-size: 8.5px;
-  font-weight: 800;
-  color: #94a3b8;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  padding: 2px 6px;
-  border-radius: 4px;
-  letter-spacing: 0.08em;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.tpl-scramble .scramble-chat-body {
-  padding: 16px 20px;
+.tpl-scramble .scramble-body {
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.tpl-scramble .scramble-chat-alert {
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.28);
-  border-radius: 6px;
-  padding: 6px 10px;
-  color: #fca5a5;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.tpl-scramble .scramble-message-wrap {
-  display: flex;
-  align-items: flex-start;
   gap: 12px;
 }
 
-.tpl-scramble .scramble-message-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid var(--scramble-glow);
+.tpl-scramble .scramble-prompt-line {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--scramble-col);
-  font-weight: 900;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  flex-shrink: 0;
-  box-shadow: 0 0 12px var(--scramble-dim);
-}
-
-.tpl-scramble .scramble-message-bubble {
-  flex: 1;
-  background: rgba(8, 18, 12, 0.95);
-  border: 1px solid rgba(0, 255, 136, 0.25);
-  border-radius: 8px;
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
   gap: 8px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 0.1em;
 }
 
-.tpl-scramble .scramble-message-meta {
+.tpl-scramble .scramble-telemetry {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding-bottom: 4px;
-}
-
-.tpl-scramble .scramble-sender-handle {
+  padding-top: 10px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
   font-size: 10px;
-  font-weight: 800;
-  color: var(--scramble-col);
+  color: #64748b;
   letter-spacing: 0.06em;
   font-family: 'JetBrains Mono', monospace;
-}
-
-.tpl-scramble .scramble-message-time {
-  font-size: 8.5px;
-  color: #64748b;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.tpl-scramble .scramble-message-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 6px;
-  border-top: 1px dashed rgba(255,255,255,0.08);
-  font-size: 8.5px;
-  color: #64748b;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.tpl-scramble .scramble-verify-badge {
-  color: var(--scramble-col);
-  font-weight: 700;
-}
-
-.tpl-scramble .scramble-cipher-tag {
-  color: #94a3b8;
-  font-weight: 600;
-}
-
-.tpl-scramble .scramble-chat-input-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 9.5px;
-  color: #64748b;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.tpl-scramble .scramble-input-prompt {
-  color: var(--scramble-col);
-  font-weight: 800;
-}
-
-.tpl-scramble .scramble-input-placeholder {
-  flex: 1;
-  color: #475569;
-}
-
-.tpl-scramble .scramble-input-send {
-  color: var(--scramble-col);
-  font-weight: 800;
-  font-size: 9px;
-  background: var(--scramble-dim);
-  border: 1px solid var(--scramble-glow);
-  padding: 2px 6px;
-  border-radius: 3px;
 }
 
 /* SUB-TEMPLATE 2: FULLSCREEN HACKER TERMINAL COCKPIT */
