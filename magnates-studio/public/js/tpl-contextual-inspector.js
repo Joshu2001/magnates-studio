@@ -74,6 +74,9 @@
     'balance': {
       type: 'balance',
       theme: 'archival',
+      is3DMode: true,
+      cameraPitch: 20,
+      cameraYaw: -12,
       company: 'APPLE INC.',
       period: 'FORM 10-K \u00b7 FISCAL 2024',
       assetsTotal: '$143.5B',
@@ -2072,37 +2075,24 @@
 
       fxc.querySelectorAll('.val-assets').forEach(el => { el.textContent = aTot; });
       fxc.querySelectorAll('.val-assets-sub').forEach(el => { el.textContent = aTot; });
+      fxc.querySelectorAll('.val-assets-noncurr').forEach(el => { el.textContent = aTot; });
       fxc.querySelectorAll('.val-liab').forEach(el => { el.textContent = lTot; });
+      fxc.querySelectorAll('.val-liab-curr').forEach(el => { el.textContent = aTot; });
       fxc.querySelectorAll('.val-liab-calc').forEach(el => { el.textContent = lTot; });
+      fxc.querySelectorAll('.val-liab-total').forEach(el => { el.textContent = lTot; });
       fxc.querySelectorAll('.val-equity').forEach(el => { el.textContent = eTot; });
       fxc.querySelectorAll('.val-equity-calc').forEach(el => { el.textContent = eTot; });
-      fxc.querySelectorAll('.val-liab-equity-sum').forEach(el => { el.textContent = aTot; });
-
-      // Color highlights
-      if (data.assetColor) {
-        const el = fxc.querySelector('.b-hud-assets .b-hud-tag');
-        if (el) el.style.color = data.assetColor;
-      }
-      if (data.liabColor) {
-        const el = fxc.querySelector('.b-hud-liab .b-hud-tag');
-        if (el) el.style.color = data.liabColor;
-      }
-      if (data.equityColor) {
-        const el = fxc.querySelector('.b-hud-equity .b-hud-tag');
-        if (el) el.style.color = data.equityColor;
-      }
 
       // Dynamic rows update if provided
       if (Array.isArray(data.assetRows) && data.assetRows.length > 0) {
         const aList = fxc.querySelector('.b-asset-rows');
         if (aList) {
           aList.innerHTML = data.assetRows.map((r, i) => `
-            <div class="b-tbl-row ${i === 0 ? 'sweep-1' : (i === 1 ? 'sweep-2' : '')}">
-              <span class="b-marker-stroke"></span>
+            <div class="b-tbl-row b-row-sub ${i === 0 ? 'sweep-yellow-1' : ''}">
+              <span class="b-marker-stroke ${i === 0 ? 'marker-yellow' : ''}"></span>
               <span class="b-tbl-name">${r.name || ''}</span>
               <span class="b-tbl-leader"></span>
-              <span class="b-tbl-val yr-curr val-asset-${i+1}">${r.val || ''}</span>
-              <span class="b-tbl-val yr-prev">${r.prev || r.val || ''}</span>
+              <span class="b-tbl-val val-asset-${i+1}">${r.val || ''}</span>
             </div>
           `).join('');
         }
@@ -2111,14 +2101,91 @@
         const lList = fxc.querySelector('.b-liab-rows-inner');
         if (lList) {
           lList.innerHTML = data.liabRows.map((r, i) => `
-            <div class="b-tbl-row">
+            <div class="b-tbl-row b-row-sub">
               <span class="b-marker-stroke"></span>
               <span class="b-tbl-name">${r.name || ''}</span>
               <span class="b-tbl-leader"></span>
-              <span class="b-tbl-val yr-curr val-liab-${i+1}">${r.val || ''}</span>
-              <span class="b-tbl-val yr-prev">${r.prev || r.val || ''}</span>
+              <span class="b-tbl-val val-liab-${i+1}">${r.val || ''}</span>
             </div>
           `).join('');
+        }
+      }
+
+      // Interactive 3D Hand Drag-to-Tilt Handling (Matching Image 3)
+      const stageBal = fxc.querySelector('.tpl-balance');
+      const scene3D = fxc.querySelector('.b-scene-3d');
+      if (stageBal && scene3D) {
+        const is3D = data.is3DMode !== false;
+        stageBal.classList.toggle('is-3d-interactive', is3D);
+
+        const pill = stageBal.querySelector('#b-3d-mode-pill');
+        if (pill) pill.style.display = is3D ? 'inline-flex' : 'none';
+
+        let pitch = Number.isFinite(data.cameraPitch) ? data.cameraPitch : 20;
+        let yaw = Number.isFinite(data.cameraYaw) ? data.cameraYaw : -12;
+
+        const applyAngles = (p, y) => {
+          scene3D.style.transform = `rotateX(${p}deg) rotateY(${y}deg) scale(1.02)`;
+          scene3D.style.animation = 'none';
+        };
+
+        if (is3D) {
+          applyAngles(pitch, yaw);
+        } else {
+          scene3D.style.transform = '';
+          scene3D.style.animation = '';
+        }
+
+        if (!stageBal._balDragInit) {
+          stageBal._balDragInit = true;
+          let dragging = false;
+          let startX = 0, startY = 0;
+          let curPitch = pitch, curYaw = yaw;
+
+          stageBal.addEventListener('pointerdown', (e) => {
+            const curData = window.tplGetContextualData ? window.tplGetContextualData('balance') : data;
+            if (curData && curData.is3DMode === false) return;
+            dragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            curPitch = Number.isFinite(curData?.cameraPitch) ? curData.cameraPitch : pitch;
+            curYaw = Number.isFinite(curData?.cameraYaw) ? curData.cameraYaw : yaw;
+            stageBal.classList.add('is-dragging');
+            try { stageBal.setPointerCapture(e.pointerId); } catch(err) {}
+          });
+
+          stageBal.addEventListener('pointermove', (e) => {
+            if (!dragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            const np = Math.max(0, Math.min(45, Math.round(curPitch - (dy * 0.22))));
+            const ny = Math.max(-45, Math.min(45, Math.round(curYaw + (dx * 0.22))));
+            applyAngles(np, ny);
+
+            const sp = document.querySelector('#bal-slider-pitch'); if (sp) sp.value = np;
+            const vp = document.querySelector('#bal-pitch-val'); if (vp) vp.textContent = `${np}°`;
+            const sy = document.querySelector('#bal-slider-yaw'); if (sy) sy.value = ny;
+            const vy = document.querySelector('#bal-yaw-val'); if (vy) vy.textContent = `${ny}°`;
+          });
+
+          const stopDrag = (e) => {
+            if (!dragging) return;
+            dragging = false;
+            stageBal.classList.remove('is-dragging');
+            try { stageBal.releasePointerCapture(e.pointerId); } catch(err) {}
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            const np = Math.max(0, Math.min(45, Math.round(curPitch - (dy * 0.22))));
+            const ny = Math.max(-45, Math.min(45, Math.round(curYaw + (dx * 0.22))));
+            pitch = np;
+            yaw = ny;
+            if (window.tplSetContextualData) {
+              window.tplSetContextualData('balance', { cameraPitch: np, cameraYaw: ny });
+            }
+          };
+
+          stageBal.addEventListener('pointerup', stopDrag);
+          stageBal.addEventListener('pointercancel', stopDrag);
         }
       }
     } else if (tplId === 'compound') {
@@ -4201,6 +4268,9 @@
       ];
 
       const curTheme = data.theme || 'archival';
+      const is3D = data.is3DMode !== false;
+      const curPitch = Number.isFinite(data.cameraPitch) ? data.cameraPitch : 20;
+      const curYaw = Number.isFinite(data.cameraYaw) ? data.cameraYaw : -12;
 
       container.innerHTML = `
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
@@ -4211,6 +4281,56 @@
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">BALANCE SHEET CONTROLS</span>
             </div>
             <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
+          </div>
+
+          <!-- 3D Perspective & Mode Switcher (Matching Image 3) -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="font-size: 11px;">\u{1F4D0}</span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">CAMERA / 3D TILT</span>
+              </div>
+              <div style="display: inline-flex; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 2px;">
+                <button type="button" id="bal-btn-mode-video" style="padding: 3px 8px; font-size: 9.5px; font-weight: 700; border-radius: 4px; cursor: pointer; border: none; background: ${!is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${!is3D ? '#fff' : '#94a3b8'}; transition: all 0.15s;">
+                  \u25B6 Video
+                </button>
+                <button type="button" id="bal-btn-mode-3d" style="padding: 3px 8px; font-size: 9.5px; font-weight: 700; border-radius: 4px; cursor: pointer; border: none; background: ${is3D ? 'rgba(46,255,198,0.25)' : 'transparent'}; color: ${is3D ? '#2effc6' : '#94a3b8'}; transition: all 0.15s;">
+                  \u2B21 3D
+                </button>
+              </div>
+            </div>
+
+            ${is3D ? `
+              <!-- 3D Angles Sliders -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                    <span>Tilt Pitch (X)</span>
+                    <span id="bal-pitch-val" style="color: #2effc6; font-family: monospace;">${curPitch}\u00B0</span>
+                  </div>
+                  <input type="range" id="bal-slider-pitch" min="0" max="45" value="${curPitch}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                    <span>Turn Yaw (Y)</span>
+                    <span id="bal-yaw-val" style="color: #2effc6; font-family: monospace;">${curYaw}\u00B0</span>
+                  </div>
+                  <input type="range" id="bal-slider-yaw" min="-45" max="45" value="${curYaw}" style="width: 100%; accent-color: #2effc6; cursor: pointer;" />
+                </div>
+              </div>
+
+              <!-- 3D Angle Presets -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+                <button type="button" class="bal-3d-preset-btn" data-p="20" data-y="-12" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Cinematic</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="28" data-y="-18" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Dramatic</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="10" data-y="-6" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Subtle</button>
+                <button type="button" class="bal-3d-preset-btn" data-p="0" data-y="0" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 2px; color: #cbd5e1; font-size: 8.5px; font-weight: 600; cursor: pointer;">Flat 2D</button>
+              </div>
+
+              <div style="font-size: 8.5px; color: #2effc6; display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 11px;">\u270B</span> Click &amp; drag canvas with hand cursor to tilt in real time
+              </div>
+            ` : ''}
           </div>
 
           <!-- Presets -->
@@ -4269,29 +4389,55 @@
             </div>
           </div>
 
-          <!-- Color Customizer -->
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.25); border-radius: 6px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.06);">
-            <div style="display: flex; align-items: center; gap: 4px;" title="Asset Accent Color">
-              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Assets:</span>
-              <input type="color" id="bal-col-assets" value="${data.assetColor || '#10b981'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px;" title="Liabilities Accent Color">
-              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Liabilities:</span>
-              <input type="color" id="bal-col-liab" value="${data.liabColor || '#ef4444'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px;" title="Equity Accent Color">
-              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Equity:</span>
-              <input type="color" id="bal-col-equity" value="${data.equityColor || '#6366f1'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
-            </div>
-          </div>
-
           ${window.tplBuildUniversalBgHtml ? window.tplBuildUniversalBgHtml(data) : ''}
         </div>
       `;
 
       if (window.tplWireUniversalBgControls) window.tplWireUniversalBgControls(tplId, container);
 
-      // Event Listeners
+      // Event Listeners for 3D controls
+      const btnModeVid = container.querySelector('#bal-btn-mode-video');
+      if (btnModeVid) {
+        btnModeVid.onclick = () => {
+          window.tplSetContextualData('balance', { is3DMode: false });
+          window.tplRenderContextualInspector('balance');
+        };
+      }
+      const btnMode3D = container.querySelector('#bal-btn-mode-3d');
+      if (btnMode3D) {
+        btnMode3D.onclick = () => {
+          window.tplSetContextualData('balance', { is3DMode: true });
+          window.tplRenderContextualInspector('balance');
+        };
+      }
+      const sPitch = container.querySelector('#bal-slider-pitch');
+      if (sPitch) {
+        sPitch.oninput = (e) => {
+          const p = parseInt(e.target.value, 10);
+          const vp = container.querySelector('#bal-pitch-val');
+          if (vp) vp.textContent = `${p}\u00B0`;
+          window.tplSetContextualData('balance', { cameraPitch: p });
+        };
+      }
+      const sYaw = container.querySelector('#bal-slider-yaw');
+      if (sYaw) {
+        sYaw.oninput = (e) => {
+          const y = parseInt(e.target.value, 10);
+          const vy = container.querySelector('#bal-yaw-val');
+          if (vy) vy.textContent = `${y}\u00B0`;
+          window.tplSetContextualData('balance', { cameraYaw: y });
+        };
+      }
+      container.querySelectorAll('.bal-3d-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          const p = parseInt(btn.dataset.p, 10);
+          const y = parseInt(btn.dataset.y, 10);
+          window.tplSetContextualData('balance', { cameraPitch: p, cameraYaw: y });
+          window.tplRenderContextualInspector('balance');
+        };
+      });
+
+      // Presets & Fields
       const presetSel = container.querySelector('#bal-preset-select');
       if (presetSel) {
         presetSel.onchange = (e) => {
@@ -4341,15 +4487,6 @@
 
       const inpEq = container.querySelector('#bal-inp-equity');
       if (inpEq) inpEq.oninput = (e) => window.tplSetContextualData('balance', { equityTotal: e.target.value, netWorth: e.target.value });
-
-      const colAss = container.querySelector('#bal-col-assets');
-      if (colAss) colAss.oninput = (e) => window.tplSetContextualData('balance', { assetColor: e.target.value });
-
-      const colLiab = container.querySelector('#bal-col-liab');
-      if (colLiab) colLiab.oninput = (e) => window.tplSetContextualData('balance', { liabColor: e.target.value });
-
-      const colEq = container.querySelector('#bal-col-equity');
-      if (colEq) colEq.oninput = (e) => window.tplSetContextualData('balance', { equityColor: e.target.value });
 
       return;
     }
