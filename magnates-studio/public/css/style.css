@@ -9200,11 +9200,305 @@ body.tool-slide-active {
 .tpl-tweet .tweet-card { width: min(88%, 330px); max-width: 330px; background: #ffffff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 22px 55px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.12); animation: tweetPop 3.5s ease-in-out infinite; box-sizing: border-box; }
 @keyframes tweetPop { 0%{transform:translateY(14px) scale(0.96);opacity:0} 12%,90%{transform:translateY(0) scale(1);opacity:1} 100%{transform:translateY(-6px) scale(0.98);opacity:0} }
 
-/* 22. Money */
-.tpl-money { background: linear-gradient(135deg,#0a3d1f 0%,#051a0f 100%); display: grid; place-items: center; }
-.tpl-money .dollar { font-family: 'Space Grotesk', sans-serif; font-size: 64px; font-weight: 700; color: #5cff8a; letter-spacing: -0.03em; text-shadow: 0 0 40px rgba(92,255,138,0.5); animation: moneyCount 2s ease-in-out infinite; }
-.tpl-money .label, .tpl-money .money-label { font-size: 11px; color: rgba(255,255,255,0.6); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 4px; text-align: center; }
-@keyframes moneyCount { 0%,100%{transform:scale(1)} 25%{transform:scale(1.08)} 50%{transform:scale(1.15)} 75%{transform:scale(1.2)} }
+/* 22. Money Counter — Cinematic Overhaul (Lost Hatch / Magnates Media / Hollywood Tier) */
+.tpl-money, .tpl-money-cinematic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  container-type: inline-size;
+  container-name: moneybox;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  background: var(--money-bg, radial-gradient(circle at 50% 45%, #2a080c 0%, #120305 60%, #050102 100%));
+  color: #fff;
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+/* Theme Profiles */
+.tpl-money.theme-catastrophe, .tpl-money-cinematic.theme-catastrophe {
+  --money-bg: radial-gradient(circle at 50% 45%, #340910 0%, #160407 55%, #070102 100%);
+  --money-accent: #ff2a44;
+  --money-glow: rgba(255, 42, 68, 0.85);
+  --money-num-col: #ff334b;
+  --money-border: rgba(255, 42, 68, 0.4);
+  --money-tag-bg: rgba(255, 42, 68, 0.15);
+  --money-tag-text: #ff8090;
+}
+.tpl-money.theme-magnates, .tpl-money-cinematic.theme-magnates {
+  --money-bg: radial-gradient(circle at 50% 45%, #18281e 0%, #0b1510 55%, #030705 100%);
+  --money-accent: #f59e0b;
+  --money-glow: rgba(245, 158, 11, 0.7);
+  --money-num-col: #fbbf24;
+  --money-border: rgba(245, 158, 11, 0.35);
+  --money-tag-bg: rgba(245, 158, 11, 0.16);
+  --money-tag-text: #fde68a;
+}
+.tpl-money.theme-cyber, .tpl-money-cinematic.theme-cyber {
+  --money-bg: radial-gradient(circle at 50% 45%, #08232e 0%, #030f14 55%, #010406 100%);
+  --money-accent: #00f0ff;
+  --money-glow: rgba(0, 240, 255, 0.75);
+  --money-num-col: #38bdf8;
+  --money-border: rgba(0, 240, 255, 0.4);
+  --money-tag-bg: rgba(0, 240, 255, 0.15);
+  --money-tag-text: #a5f3fc;
+}
+.tpl-money.theme-minimal, .tpl-money-cinematic.theme-minimal {
+  --money-bg: radial-gradient(circle at 50% 45%, #1e2430 0%, #0f131a 55%, #060709 100%);
+  --money-accent: #ffffff;
+  --money-glow: rgba(255, 255, 255, 0.5);
+  --money-num-col: #f8fafc;
+  --money-border: rgba(255, 255, 255, 0.22);
+  --money-tag-bg: rgba(255, 255, 255, 0.1);
+  --money-tag-text: #e2e8f0;
+}
+
+/* 3D Camera Rig & Shake Target */
+.tpl-money .money-camera-rig, .tpl-money-cinematic .money-camera-rig {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+/* Background Atmosphere Grid & Watermarks */
+.money-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.money-faint-watermarks {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  place-items: center;
+  opacity: 0.04;
+  font-size: clamp(36px, 12cqw, 140px);
+  font-weight: 900;
+  font-family: 'Space Grotesk', monospace;
+  color: var(--money-accent);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Particles Canvas */
+.money-particles-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Anamorphic Lens Flare Line */
+.money-anamorphic-flare {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--money-accent) 50%, transparent 100%);
+  opacity: 0.45;
+  filter: blur(1.5px);
+  pointer-events: none;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+/* Hero HUD Layout */
+.money-hero-hud {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(12px, 3cqw, 32px);
+  gap: clamp(4px, 1.2cqw, 14px);
+  max-width: 92%;
+}
+
+/* Top Alert Pill */
+.money-header-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--money-tag-bg, rgba(255, 42, 68, 0.15));
+  border: 1px solid var(--money-border, rgba(255, 42, 68, 0.4));
+  border-radius: 9999px;
+  padding: 3px clamp(8px, 1.5cqw, 14px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(9px, 1.6cqw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--money-tag-text, #ff8090);
+  box-shadow: 0 0 16px var(--money-tag-bg);
+}
+.money-pill-beacon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--money-accent);
+  box-shadow: 0 0 8px var(--money-accent);
+  animation: moneyBeaconPulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes moneyBeaconPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+/* Sub-Header Title */
+.money-label-title {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: clamp(11px, 2.2cqw, 18px);
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  margin: 0;
+}
+
+/* Hero Counter Amount (Fluid Container-Relative Sizing) */
+.money-hero-amount {
+  font-family: 'Space Grotesk', 'Impact', sans-serif;
+  font-size: clamp(34px, 10.5cqw, 108px);
+  font-weight: 900;
+  color: var(--money-num-col, #ff334b);
+  letter-spacing: -0.025em;
+  text-shadow: 
+    0 0 clamp(12px, 3cqw, 44px) var(--money-glow),
+    0 4px 20px rgba(0, 0, 0, 0.95);
+  line-height: 1;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  white-space: nowrap;
+  margin: clamp(2px, 0.8cqw, 8px) 0;
+  position: relative;
+}
+
+/* Odometer Tumbler Wheels */
+.money-reel-wrap {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  height: 1.12em;
+  vertical-align: middle;
+}
+.money-reel-col {
+  display: inline-flex;
+  flex-direction: column;
+  transition: transform 0.12s cubic-bezier(0.12, 0.8, 0.32, 1);
+  will-change: transform;
+}
+.money-reel-digit {
+  height: 1.12em;
+  line-height: 1.12em;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Bottom Ticker / Context Readout */
+.money-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.8cqw, 16px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(9px, 1.5cqw, 13px);
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+.money-currency-tag {
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--money-border);
+  padding: 2px clamp(6px, 1.2cqw, 10px);
+  border-radius: 4px;
+  font-weight: 700;
+  color: var(--money-accent);
+}
+.money-delta-badge {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #f87171;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+/* CRT Scanlines Overlay */
+.money-scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.45) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+  opacity: 0.55;
+  z-index: 12;
+}
+
+/* Cinematic Elliptical Vignette */
+.money-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 38%, rgba(0, 0, 0, 0.65) 75%, rgba(0, 0, 0, 0.95) 100%);
+  pointer-events: none;
+  z-index: 14;
+}
+
+/* The Climax "BOOM" Slam & Camera Trauma Shake */
+.money-slam-active .money-camera-rig {
+  animation: moneySlamImpact 0.65s cubic-bezier(0.2, 0.85, 0.3, 1) forwards;
+}
+@keyframes moneySlamImpact {
+  0% { transform: scale(1.08) translate(0, 0); }
+  12% { transform: scale(1.06) translate(-8px, 6px) rotate(-0.8deg); }
+  24% { transform: scale(1.04) translate(7px, -5px) rotate(0.6deg); }
+  40% { transform: scale(1.025) translate(-4px, 3px) rotate(-0.3deg); }
+  60% { transform: scale(1.01) translate(2px, -2px) rotate(0.1deg); }
+  100% { transform: scale(1) translate(0, 0) rotate(0deg); }
+}
+
+/* Anamorphic Bloom / Flash Burst on Lock-in */
+.money-slam-bloom {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.95) 0%, var(--money-glow) 40%, transparent 75%);
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  z-index: 25;
+}
+.money-slam-active .money-slam-bloom {
+  animation: moneyBoomFlash 0.75s ease-out forwards;
+}
+@keyframes moneyBoomFlash {
+  0% { opacity: 0; transform: scale(0.85); }
+  12% { opacity: 0.95; transform: scale(1.15); filter: blur(3px); }
+  35% { opacity: 0.4; transform: scale(1.03); filter: blur(12px); }
+  100% { opacity: 0; transform: scale(1); filter: blur(24px); }
+}
 
 /* 23. Glitch */
 .tpl-glitch { background: #0a0a0f; display: grid; place-items: center; }

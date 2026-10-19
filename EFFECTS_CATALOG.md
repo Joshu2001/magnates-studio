@@ -21,7 +21,7 @@
 | `fx-ai-cutout` | **AI Subject Isolation / Cutout** | Masking & Cutout | ✅ Implemented | Right-click -> *Remove Background* |
 | `fx-vector-sticker`| **Magnates Vector / Paper Cutout** | Stylization | ✅ Implemented | Right-click -> *Magnates Vector / Paper Cutout* |
 | `fx-kinetic-type` | **Kinetic Typography Engine** | Text & Titles | ✅ Implemented | Text Inspector -> Anim Dropdown + Accent color |
-| `fx-rolling-counter`| **Dynamic Rolling Number Counter** | Text & Infographics | ✅ Implemented | Text Inspector -> Anim -> *Dynamic Number Counter* or Charts -> *1,014% Metric* |
+| `fx-rolling-counter`| **Cinematic Money Counter & Lock-in Boom Engine** | Text & Infographics | ✅ Overhauled (Hollywood Tier) | Templates -> Finance -> *Money Counter* or Contextual Inspector |
 | `fx-dynamic-area-chart`| **Progressive Dual-Line & Area Chart** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Dynamic Area Spread* |
 | `fx-staggered-bar` | **Staggered Metric Bar Pop-Up** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Staggered Bar Reveal* |
 | `fx-liquid-pyramid` | **Liquid Wave & Glowing Funnel / Pyramid** | Motion Infographics | 🚀 Added (Template) | Templates -> Infographics -> *Liquid Funnel Tier* |
@@ -547,6 +547,51 @@ This section catalogs high-retention motion charts popularized by Vox, Johnny Ha
       "waveSpeed": 1.2,
       "glowIntensity": 0.85,
       "riseDuration": 1.2
+    }
+  }
+  ```
+
+---
+
+### 4.4 Cinematic Money Counter & Lock-in Boom Engine
+* **System ID:** `money` / `cinematic_money_counter`
+* **Industry & Creator Aliases:** Lost Hatch Countdown, Magnates Billionaire Valuation Counter, Forensic Debt Ticker, Financial Catastrophe Lock-in
+* **Status:** ✅ Overhauled (Hollywood Tier)
+* **Pacing & Energy:** ⚡ Suspenseful Exponential Deceleration $\to$ High-Impact Climax
+* **Visual Description:** 
+  * A full-canvas responsive counter that scales dynamically using container query units (`cqw`), guaranteeing imposing screen presence in both standard preview and 4K fullscreen.
+  * Features multi-layer atmospheric depth: procedural CRT scanlines, elliptical vignette, anamorphic lens flare lines, and high-performance drifting particulate embers/gold dust.
+  * Driven by an exponential deceleration curve ($1 - (1 - p)^4$) creating nail-biting suspense as tumbling reels spin rapidly, decelerate tick-by-tick, and slam into the final digit.
+  * **The Boom:** On final settle, triggers multi-axis camera trauma shake ($\pm 8\text{px}$ decay), a blinding radial bloom/chromatic flash burst, and a synchronized Web Audio API synthesized seismic 808 sub-bass slam.
+* **🎯 Editorial Intent & When to Use:**
+  * **Revealing Catastrophic Losses:** Bankruptcies, corporate embezzlement, inflation spirals, and financial takedowns (*Lost* / *Enron* / *FTX* style).
+  * **Prestige Wealth & Revenue:** Highlighting exponential business scaling or billionaire net worth (*Magnates Media* style).
+  * **Beat Sync & Climax:** Timing the final digit slam directly on an audio drum hit or dramatic script punchline.
+* **Preset Themes:**
+  1. `🚨 Lost Hatch / Catastrophe`: Blood noir, red laser HUD, emergency beacon, seismic sub-bass drop.
+  2. `✨ Magnates Media Prestige`: Rich emerald and 24K gold foil numerals, anamorphic streak flare, floating golden motes.
+  3. `💻 Cyber Vault`: High-contrast cyan/green matrix terminal, digital telemetry brackets, character scramble.
+  4. `🎬 Minimalist Noir`: Cold slate vignette, razor-sharp monochrome typography, stark contrast.
+* **AI Action Signature (Machine-Readable Spec):**
+  ```json
+  {
+    "action": "create_money_counter",
+    "template": "money",
+    "parameters": {
+      "theme": "catastrophe",
+      "headerTag": "CRITICAL AUDIT DISCLOSURE",
+      "label": "TOTAL LOSSES",
+      "subLabel": "CAPITAL DRAIN // RUNWAY EXHAUSTED",
+      "amount": "$69,000,000",
+      "startAmount": "$0",
+      "currencySuffix": "USD",
+      "deltaText": "-94.2%",
+      "counterMode": "odometer",
+      "countDuration": 3.0,
+      "enableBoom": true,
+      "shakeIntensity": 8,
+      "particleType": "cash-ember",
+      "soundProfile": "subbass-boom"
     }
   }
   ```

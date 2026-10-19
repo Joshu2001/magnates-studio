@@ -23482,16 +23482,16 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'money',
-    title: 'Money Counter',
+    title: 'Money Counter (Cinematic Climax)',
     category: 'Finance',
     origCategory: 'Finance',
-    badge: 'FINANCE',
+    badge: 'HOLLYWOOD TIER',
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Animated dollar amount that counts up.',
-    tags: ['Finance', 'Money Counter', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-my" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0a3d1f"/><stop offset="100%" stop-color="#051a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-my)"/><g transform="translate(200, 115)"><text fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="52" letter-spacing="-2" text-anchor="middle">$127,450</text><text y="32" fill="rgba(255,255,255,0.6)" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="3" text-anchor="middle">MONTHLY REVENUE</text></g></svg>`)}`
+    previewGradient: 'linear-gradient(135deg, rgba(52, 9, 16, 0.95), rgba(7, 1, 2, 0.98))',
+    description: 'Dramatic high-stakes financial counter with exponential suspense pacing, anamorphic lens flare, particulate embers, and a violent sub-bass impact boom.',
+    tags: ['Finance', 'Money Counter', 'Motion Template', 'Lost Hatch', 'Magnates Media'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-my" cx="50%" cy="45%" r="65%"><stop offset="0%" stop-color="#340910"/><stop offset="60%" stop-color="#140205"/><stop offset="100%" stop-color="#050102"/></radialGradient><filter id="glow-my" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ff2a44" flood-opacity="0.85"/></filter><linearGradient id="flare-line" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="50%" stop-color="#ff2a44" stop-opacity="0.9"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-my)"/><g opacity="0.04" font-family="'Space Grotesk', monospace" font-size="64" font-weight="900" fill="#ff2a44"><text x="60" y="80">$</text><text x="340" y="70">$</text><text x="80" y="190">$</text><text x="320" y="180">$</text></g><rect y="112" width="400" height="1.5" fill="url(#flare-line)"/><g transform="translate(200, 48)"><rect x="-75" y="-12" width="150" height="20" rx="10" fill="rgba(255,42,68,0.18)" stroke="rgba(255,42,68,0.4)" stroke-width="1"/><circle cx="-62" cy="-2" r="3" fill="#ff2a44"/><text x="6" y="2" fill="#ff8090" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="7.5" letter-spacing="1.5" text-anchor="middle">CRITICAL DISCLOSURE</text></g><g transform="translate(200, 78)"><text fill="rgba(255,255,255,0.85)" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="12" letter-spacing="3" text-anchor="middle">TOTAL LOSSES</text></g><g transform="translate(200, 132)" filter="url(#glow-my)"><text fill="#ff334b" font-family="'Space Grotesk', Impact, sans-serif" font-weight="900" font-size="52" letter-spacing="-1.5" text-anchor="middle">$69,000,000</text></g><g transform="translate(200, 168)"><rect x="-85" y="-10" width="30" height="15" rx="3" fill="rgba(0,0,0,0.6)" stroke="rgba(255,42,68,0.3)"/><text x="-70" y="1" fill="#ff2a44" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="8" text-anchor="middle">USD</text><text x="0" y="1" fill="rgba(255,255,255,0.6)" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="8" letter-spacing="1" text-anchor="middle">CAPITAL RUNWAY DEPLETED</text><rect x="65" y="-10" width="34" height="15" rx="3" fill="rgba(239,68,68,0.2)" stroke="rgba(239,68,68,0.4)"/><text x="82" y="1" fill="#f87171" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="8" text-anchor="middle">-94.2%</text></g><circle cx="65" cy="55" r="2.5" fill="#ff2a44" opacity="0.6"/><circle cx="340" cy="140" r="2" fill="#ff2a44" opacity="0.7"/><circle cx="110" cy="175" r="1.8" fill="#ff8090" opacity="0.5"/><circle cx="295" cy="65" r="2.2" fill="#ff8090" opacity="0.6"/></svg>`)}`
   },
   {
     id: 'glitch',
@@ -25573,9 +25573,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
           </div>
         </div>`; } else if (tplId === 'money') {
-      fxContainer.innerHTML = `<div class="tpl-money">
-          <div style="text-align:center"><div class="dollar">$127,450</div><div class="label money-label">Monthly Revenue</div></div>
-        </div>`; } else if (tplId === 'glitch') {
+      const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money') : {};
+      if (typeof window.tplBuildMoneyHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildMoneyHtml(mData);
+        if (typeof window.tplInitMoneyStage === 'function') window.tplInitMoneyStage(fxContainer, mData);
+      } else {
+        fxContainer.innerHTML = `<div class="tpl-money-cinematic theme-${mData.theme || 'catastrophe'}"><div class="money-hero-amount"><span class="money-amount-val">${mData.amount || '$69,000,000'}</span></div></div>`;
+      }
+    } else if (tplId === 'glitch') {
       fxContainer.innerHTML = `<div class="tpl-glitch">
           <div class="glitch-text" data-text="THE TRUTH">THE TRUTH</div>
         </div>`; } else if (tplId === 'map') {
@@ -28273,7 +28278,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const ff = String(Math.floor((t % 1) * 24)).padStart(2, '0');
         tcEl.textContent = `${baseDate}  ${hh}:${mm}:${ss}:${ff}`;
       }
-    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS).includes(tplId)) {
+    } else if (tplId === 'money') {
+      if (typeof window.tplAnimateMoneyLoop === 'function') {
+        const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money') : {};
+        window.tplAnimateMoneyLoop(fxContainer, t, mData);
+      }
+    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -33210,6 +33220,52 @@ transition: 'fly_through',
     focusClip = bgClip;
     imageClips = [bgClip];
     textClips = generatedTextClips;
+  } else if (tpl.id === 'money') {
+    const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money') : {};
+    const th = mData.theme || 'catastrophe';
+    const bgClip = {
+      id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Money_Counter_Backdrop.jpg',
+      url: sec || tpl.defaultImage,
+      file: { name: 'Money_Counter_Backdrop.jpg', url: sec || tpl.defaultImage, isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.05,
+      isBackgroundScene: true,
+      zIndex: 5,
+      layerOrder: 'back'
+    };
+    const titleClip = {
+      id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      text: mData.label || 'TOTAL LOSSES',
+      fontSize: 32,
+      fontFamily: 'Space Grotesk, sans-serif',
+      color: 'rgba(255,255,255,0.85)',
+      anim: 'fade',
+      zIndex: 15,
+      layerOrder: 'middle',
+      start: sceneStart,
+      duration: dur,
+      y: -65
+    };
+    const counterClip = {
+      id: `txt-counter-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      text: mData.amount || '$69,000,000',
+      fontSize: 84,
+      fontFamily: 'Space Grotesk, sans-serif',
+      color: th === 'magnates' ? '#fbbf24' : (th === 'cyber' ? '#38bdf8' : '#ff334b'),
+      anim: 'counter',
+      counterTarget: mData.amount || '$69,000,000',
+      counterDuration: mData.countDuration || 3.0,
+      zIndex: 20,
+      layerOrder: 'front',
+      start: sceneStart,
+      duration: dur,
+      y: 0
+    };
+    focusClip = counterClip;
+    imageClips = [bgClip];
+    textClips = [titleClip, counterClip];
   } else {
     const baseClip = {
       id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
