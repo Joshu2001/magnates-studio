@@ -275,72 +275,57 @@
       color: '#00f0ff'
     },
 
-    // 25. Investigative Globe & Map Pin Drop (High-End Tactical Cartography Engine - James Jani / Yes Theory standard)
+    // 25. Investigative Globe (Original 3D Interactive Globe - Johnny Harris Style)
     'map': {
       type: 'map',
-      location: 'KYIV, UKRAINE',
-      coords: '50.4501°N 30.5234°E',
-      telemetry: 'O.SR5911TES     DFX35.EVA',
-      lat: 50.4501,
-      lng: 30.5234,
+      location: 'USA \u2192 UK \u2192 UKRAINE',
+      coords: 'MULTI-VECTOR TRANSIT // 2 ACTIVE LEGS',
+      lat: 48.37,
+      lng: 31.16,
       projection: 'globe',
-      mapStyle: 'tactical-dark',
-      pinMaterial: 'copper',
-      showImpactDust: true,
-      showBorders: true,
-      showLabels: true,
-      showWaterCurrents: true,
-      showGrid: true,
+      mapStyle: 'harris-dark',
       zoomStart: 0.8,
       zoomDuration: 2.2,
       zoomLevel: 1.9,
-      pinColor: '#f97316',
+      pinColor: '#38bdf8',
       showFlightPath: true,
       originLabel: 'USA',
-      is3DMode: true,
+      is3DMode: false,
       drawOnScreenMode: false,
       activeTraceTransit: 'plane',
-      pitch3D: 10,
-      yaw3D: -3,
+      pitch3D: 22,
+      yaw3D: -10,
       routes: [
-        { from: 'Americas', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#f97316' },
-        { from: 'UK', to: 'Kyiv', fromLat: 51.50, fromLng: -0.12, toLat: 50.4501, toLng: 30.5234, mode: 'plane', color: '#f97316' },
-        { from: 'Kyiv', to: 'East Asia', fromLat: 50.4501, fromLng: 30.5234, toLat: 35.86, toLng: 104.2, mode: 'plane', color: '#ea580c' }
+        { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
+        { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
       ],
       customTracedRoutes: []
     },
+
+    // 25B. Layered Cinematic 3D Map Pin Drop (Scalable Vector SVG - James Jani / Yes Theory standard)
     'map-pin-drop': {
-      type: 'map',
+      type: 'map-pin-drop',
       location: 'KYIV, UKRAINE',
       coords: '50.4501°N 30.5234°E',
       telemetry: 'O.SR5911TES     DFX35.EVA',
       lat: 50.4501,
       lng: 30.5234,
-      projection: 'globe',
-      mapStyle: 'tactical-dark',
       pinMaterial: 'copper',
       showImpactDust: true,
       showBorders: true,
       showLabels: true,
       showWaterCurrents: true,
       showGrid: true,
-      zoomStart: 0.8,
-      zoomDuration: 2.2,
-      zoomLevel: 1.9,
-      pinColor: '#f97316',
-      showFlightPath: true,
-      originLabel: 'USA',
-      is3DMode: true,
-      drawOnScreenMode: false,
-      activeTraceTransit: 'plane',
       pitch3D: 10,
       yaw3D: -3,
+      pinColor: '#f97316',
+      showFlightPath: true,
+      is3DMode: true,
       routes: [
         { from: 'Americas', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#f97316' },
         { from: 'UK', to: 'Kyiv', fromLat: 51.50, fromLng: -0.12, toLat: 50.4501, toLng: 30.5234, mode: 'plane', color: '#f97316' },
         { from: 'Kyiv', to: 'East Asia', fromLat: 50.4501, fromLng: 30.5234, toLat: 35.86, toLng: 104.2, mode: 'plane', color: '#ea580c' }
-      ],
-      customTracedRoutes: []
+      ]
     },
 
     // 25B. Empire Rise & Fall Timeline (James Jani / Magnates Media Documentary Style)
@@ -1070,8 +1055,7 @@
   // --- 2. GET & SET CONTEXTUAL DATA ---
   window.tplGetContextualData = function(tplId) {
     if (!tplId) return {};
-    if (tplId === 'map-pin-drop') tplId = 'map';
-    const d = DEFAULTS[tplId];
+        const d = DEFAULTS[tplId];
     if (!d) return {};
     const stored = (localStore[tplId] && Object.keys(localStore[tplId]).length > 0) ? localStore[tplId] : {};
     const live = (typeof topCustomizerState !== 'undefined' && topCustomizerState.customData && topCustomizerState.customData[tplId]) ? topCustomizerState.customData[tplId] : {};
@@ -1080,8 +1064,7 @@
 
   window.tplSetContextualData = function(tplId, patch) {
     if (!tplId) return;
-    if (tplId === 'map-pin-drop') tplId = 'map';
-    if (typeof topCustomizerState === 'undefined') window.topCustomizerState = {};
+        if (typeof topCustomizerState === 'undefined') window.topCustomizerState = {};
     if (!topCustomizerState.customData) topCustomizerState.customData = {};
     const cur = window.tplGetContextualData(tplId);
     const updated = Object.assign({}, cur, patch);
@@ -1351,7 +1334,554 @@
 
   window.tplBuildInvestigativeGlobeHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map') : {});
-    const is3D = d.is3DMode !== false; // Enable subtle cinematic 3D perspective by default
+    const proj = d.projection || 'globe';
+    const styleKey = d.mapStyle || 'harris-dark';
+    const pinColor = d.pinColor || '#38bdf8';
+    const zoomStart = Math.max(0, parseFloat(d.zoomStart !== undefined ? d.zoomStart : 0.8));
+    const zoomDur = Math.max(0.5, parseFloat(d.zoomDuration !== undefined ? d.zoomDuration : 2.2));
+    const zoomLvl = Math.max(1.1, Math.min(5, parseFloat(d.zoomLevel !== undefined ? d.zoomLevel : 1.9)));
+    const totalCycle = (zoomStart + zoomDur + 3.0).toFixed(2);
+    const showArc = d.showFlightPath !== false;
+    const is3D = !!d.is3DMode;
+    const isDrawing = !!d.drawOnScreenMode;
+    const pitch3D = d.pitch3D !== undefined ? parseFloat(d.pitch3D) : 22;
+    const yaw3D = d.yaw3D !== undefined ? parseFloat(d.yaw3D) : -10;
+
+    const themes = {
+      'harris-dark': {
+        bg: 'radial-gradient(circle at 50% 50%, #061324 0%, #01050d 100%)',
+        ocean: '#051325',
+        oceanLight: '#0d2745',
+        land: '#0a1c33',
+        landStroke: '#38bdf8',
+        landGlow: 'rgba(56, 189, 248, 0.45)',
+        borderStroke: 'rgba(56, 189, 248, 0.32)',
+        highlightCountry: '#fbbf24',
+        highlightGlow: 'rgba(251, 191, 36, 0.65)',
+        labelCol: 'rgba(226, 232, 240, 0.75)',
+        grid: 'rgba(56, 189, 248, 0.16)',
+        atmo: '#38bdf8',
+        atmoOuter: 'rgba(56, 189, 248, 0.55)',
+        fresnelRim: '#7dd3fc'
+      },
+      'satellite': {
+        bg: 'radial-gradient(circle at 50% 50%, #051a2e 0%, #010813 100%)',
+        ocean: '#041527',
+        oceanLight: '#0b2e45',
+        land: '#0e2d22',
+        landStroke: '#52b788',
+        landGlow: 'rgba(82, 183, 136, 0.45)',
+        borderStroke: 'rgba(116, 198, 157, 0.32)',
+        highlightCountry: '#34d399',
+        highlightGlow: 'rgba(52, 211, 153, 0.65)',
+        labelCol: 'rgba(241, 245, 249, 0.82)',
+        grid: 'rgba(82, 183, 136, 0.18)',
+        atmo: '#38bdf8',
+        atmoOuter: 'rgba(56, 189, 248, 0.5)',
+        fresnelRim: '#7dd3fc'
+      },
+      'vox-archival': {
+        bg: 'radial-gradient(circle at 50% 50%, #201a14 0%, #0a0705 100%)',
+        ocean: '#15110d',
+        oceanLight: '#2b231a',
+        land: '#544633',
+        landStroke: '#f4ecd8',
+        landGlow: 'rgba(244, 236, 216, 0.45)',
+        borderStroke: 'rgba(244, 236, 216, 0.35)',
+        highlightCountry: '#fbbf24',
+        highlightGlow: 'rgba(251, 191, 36, 0.65)',
+        labelCol: 'rgba(254, 243, 199, 0.85)',
+        grid: 'rgba(244, 236, 216, 0.15)',
+        atmo: '#f59e0b',
+        atmoOuter: 'rgba(245, 158, 11, 0.45)',
+        fresnelRim: '#fde68a'
+      },
+      'radar-amber': {
+        bg: 'radial-gradient(circle at 50% 50%, #170d03 0%, #060301 100%)',
+        ocean: '#100802',
+        oceanLight: '#261304',
+        land: '#351804',
+        landStroke: '#f59e0b',
+        landGlow: 'rgba(245, 158, 11, 0.45)',
+        borderStroke: 'rgba(245, 158, 11, 0.35)',
+        highlightCountry: '#ef4444',
+        highlightGlow: 'rgba(239, 68, 68, 0.65)',
+        labelCol: 'rgba(253, 230, 138, 0.82)',
+        grid: 'rgba(245, 158, 11, 0.18)',
+        atmo: '#f59e0b',
+        atmoOuter: 'rgba(245, 158, 11, 0.5)',
+        fresnelRim: '#fde68a'
+      }
+    };
+    const th = themes[styleKey] || themes['harris-dark'];
+
+    const activeRoutes = Array.isArray(d.routes) && d.routes.length > 0 ? d.routes : [
+      { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
+      { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
+    ];
+    const customRoutes = Array.isArray(d.customTracedRoutes) ? d.customTracedRoutes : [];
+
+    // Target Destination (primary focus) & Origin
+    const lastRoute = activeRoutes[activeRoutes.length - 1];
+    const firstRoute = activeRoutes[0];
+    const targetName = (lastRoute && lastRoute.to) ? lastRoute.to : (d.location ? d.location.split('→').pop().trim() : 'Ukraine');
+    const originName = (firstRoute && firstRoute.from) ? firstRoute.from : 'London';
+
+    const targetLat = lastRoute && lastRoute.toLat !== undefined ? parseFloat(lastRoute.toLat) : (d.lat !== undefined ? parseFloat(d.lat) : 48.37);
+    const targetLng = lastRoute && lastRoute.toLng !== undefined ? parseFloat(lastRoute.toLng) : (d.lng !== undefined ? parseFloat(d.lng) : 31.16);
+    const originLat = firstRoute && firstRoute.fromLat !== undefined ? parseFloat(firstRoute.fromLat) : 51.50;
+    const originLng = firstRoute && firstRoute.fromLng !== undefined ? parseFloat(firstRoute.fromLng) : -0.12;
+
+    const targetProj = window.tplProjectLatLngToMapSvg(targetLat, targetLng);
+    const originProj = window.tplProjectLatLngToMapSvg(originLat, originLng);
+
+    const normX = Math.max(16, Math.min(84, targetProj.normX));
+    const normY = Math.max(18, Math.min(82, targetProj.normY));
+    const panX = ((50 - normX) * 0.28).toFixed(1) + '%';
+    const panY = ((50 - normY) * 0.28).toFixed(1) + '%';
+
+    const targetCoordsStr = `${Math.abs(targetLat).toFixed(2)}°${targetLat >= 0 ? 'N' : 'S'} ${Math.abs(targetLng).toFixed(2)}°${targetLng >= 0 ? 'E' : 'W'}`;
+    const originCoordsStr = `${Math.abs(originLat).toFixed(2)}°${originLat >= 0 ? 'N' : 'S'} ${Math.abs(originLng).toFixed(2)}°${originLng >= 0 ? 'E' : 'W'}`;
+
+    // High-Definition Vector Cartography Engine (Natural Earth 110m Real TopoJSON Geometry)
+    const accurateMapData = (typeof window !== "undefined" && window.ACCURATE_WORLD_MAP) ? window.ACCURATE_WORLD_MAP : null;
+    let highPrecisionWorldVectors = "";
+    if (accurateMapData && accurateMapData.land) {
+      highPrecisionWorldVectors = `
+        <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.55" stroke-linejoin="round" fill-opacity="0.94">
+          <path d="${accurateMapData.land}"/>
+        </g>
+      `;
+    } else {
+      highPrecisionWorldVectors = `
+        <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.65" stroke-linejoin="round" fill-opacity="0.94">
+          <path d="M 32 40 L 42 35 L 56 34 L 72 32 L 86 31 L 98 33 L 112 37 L 126 44 L 136 54 L 128 62 L 134 70 L 124 78 L 116 86 L 112 94 L 108 97 L 105 91 L 96 92 L 91 97 L 95 105 L 104 110 L 98 114 L 90 106 L 82 101 L 75 91 L 72 83 L 68 87 L 65 77 L 62 67 L 55 54 L 42 52 L 32 46 Z"/>
+          <path d="M 94 22 L 114 20 L 124 26 L 118 33 L 98 30 Z"/>
+          <path d="M 128 14 L 158 12 L 166 22 L 156 36 L 138 38 L 130 26 Z"/>
+          <path d="M 106 112 L 118 110 L 130 115 L 142 122 L 152 132 L 148 146 L 140 160 L 130 174 L 122 192 L 116 194 L 114 178 L 112 158 L 105 140 L 102 124 Z"/>
+          <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 L 191 52 Z"/>
+          <path d="M 188 51 L 192 50 L 192 58 L 187 59 L 186 54 Z"/>
+          <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 215 42 L 206 45 L 198 40 Z"/>
+          <path d="M 184 63 L 191 61 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 220 70 L 216 64 L 212 68 L 215 74 L 211 76 L 206 68 L 201 66 L 193 70 L 184 70 Z"/>
+          <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 372 38 L 364 52 L 352 58 L 346 72 L 338 86 L 328 96 L 320 108 L 314 102 L 306 94 L 296 96 L 288 110 L 280 96 L 270 90 L 258 84 L 248 72 L 238 56 Z"/>
+          <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 219 171 L 209 171 L 203 153 L 199 135 L 193 117 L 179 111 L 173 97 L 177 83 Z"/>
+          <path d="M 264 85 L 276 86 L 286 96 L 282 108 L 274 106 L 268 94 Z"/>
+          <path d="M 288 64 L 324 62 L 332 74 L 324 88 L 304 90 L 292 78 Z"/>
+          <path d="M 322 142 L 344 138 L 362 144 L 368 158 L 360 174 L 342 176 L 322 168 L 316 154 Z"/>
+        </g>
+      `;
+    }
+
+    // Dynamic Country Highlighting: lookup exact polygon geometry of the active target country
+    const targetCountrySvgPath = getCountrySvgPath(targetName);
+    const highlightedCountryMarkup = targetCountrySvgPath ? `
+      <g class="tactical-highlight-country">
+        <path d="${targetCountrySvgPath}" fill="rgba(251, 191, 36, 0.16)" stroke="${th.highlightCountry}" stroke-width="1.3" filter="url(#activeCountryGlow)"/>
+      </g>
+    ` : `
+      <g class="tactical-highlight-country">
+        <circle cx="${targetProj.x.toFixed(1)}" cy="${targetProj.y.toFixed(1)}" r="10" fill="rgba(251, 191, 36, 0.12)" stroke="${th.highlightCountry}" stroke-width="1.2" filter="url(#activeCountryGlow)"/>
+      </g>
+    `;
+
+    // Faint Topographic / Bathymetric Depth Contours
+    const bathymetricContoursMarkup = `
+      <g stroke="${th.grid}" stroke-width="0.32" fill="none" opacity="0.45">
+        <path d="M 180 60 C 188 56, 196 52, 204 50 C 216 48, 228 44, 240 44"/>
+        <path d="M 178 72 C 188 70, 200 70, 214 74 C 224 76, 234 74, 246 76"/>
+        <path d="M 180 84 C 196 82, 212 84, 228 86 C 240 88, 252 86, 264 92"/>
+        <path d="M 194 116 C 210 114, 226 122, 242 134"/>
+      </g>
+    `;
+
+    // Dynamic Country Labels with Proximity Occlusion Management
+    const countryLabelsDb = [
+      { name: "RUSSIA", x: 260, y: 35 },
+      { name: "UK", x: 189, y: 67 },
+      { name: "FRANCE", x: 198, y: 77 },
+      { name: "SPAIN", x: 187, y: 83 },
+      { name: "GERMANY", x: 209, y: 73 },
+      { name: "POLAND", x: 219, y: 71 },
+      { name: "ITALY", x: 212, y: 81 },
+      { name: "ROMANIA", x: 222, y: 76 },
+      { name: "TURKEY", x: 236, y: 81 },
+      { name: "SWEDEN", x: 212, y: 52 },
+      { name: "FINLAND", x: 226, y: 50 },
+      { name: "KAZAKHSTAN", x: 264, y: 73 },
+      { name: "IRAN", x: 254, y: 85 },
+      { name: "IRAQ", x: 242, y: 86 },
+      { name: "SYRIA", x: 236, y: 86 },
+      { name: "SAUDI ARABIA", x: 248, y: 96 },
+      { name: "YEMEN", x: 254, y: 104 },
+      { name: "MOROCCO", x: 188, y: 89 },
+      { name: "ALGERIA", x: 202, y: 93 },
+      { name: "LIBYA", x: 220, y: 93 },
+      { name: "EGYPT", x: 232, y: 93 },
+      { name: "SUDAN", x: 228, y: 105 },
+      { name: "CHAD", x: 218, y: 105 },
+      { name: "NIGER", x: 206, y: 104 },
+      { name: "NIGERIA", x: 203, y: 112 },
+      { name: "ETHIOPIA", x: 238, y: 110 },
+      { name: "S. SUDAN", x: 228, y: 113 },
+      { name: "DR CONGO", x: 218, y: 124 },
+      { name: "KENYA", x: 236, y: 121 },
+      { name: "TANZANIA", x: 234, y: 129 },
+      { name: "ANGOLA", x: 213, y: 135 },
+      { name: "ZAMBIA", x: 226, y: 137 },
+      { name: "INDIA", x: 276, y: 98 }
+    ];
+
+    // Build Set of active route locations to eliminate duplicate redundant static labels
+    const activeRouteNames = new Set();
+    activeRoutes.forEach(r => {
+      if (r.from) activeRouteNames.add(r.from.trim().toUpperCase());
+      if (r.to) activeRouteNames.add(r.to.trim().toUpperCase());
+    });
+
+    // Filter country labels based on proximity to target and origin to avoid visual clutter
+    const filteredLabelsHtml = countryLabelsDb.map(lbl => {
+      if (activeRouteNames.has(lbl.name)) return "";
+      const dTarget = Math.hypot(lbl.x - targetProj.x, lbl.y - targetProj.y);
+      const dOrigin = Math.hypot(lbl.x - originProj.x, lbl.y - originProj.y);
+      if (dTarget < 16 || dOrigin < 14) return "";
+      const isSubtle = (dTarget < 26 || dOrigin < 22);
+      return `<text x="${lbl.x}" y="${lbl.y}" fill="${th.labelCol}" opacity="${isSubtle ? 0.35 : 0.82}">${lbl.name}</text>`;
+    }).join("");
+
+    // Decluttered Waypoints Registry: render unique, non-overlapping waypoints and HUD tags
+    const renderedNodes = new Map();
+
+    // Great-Circle Parabolic 3D Arcs + Clean Multi-Route Transit Trails
+    const routeElementsHtml = showArc ? activeRoutes.map((rt, idx) => {
+      const fGeo = (rt.fromLat !== undefined && rt.fromLng !== undefined)
+        ? { lat: rt.fromLat, lng: rt.fromLng }
+        : (window.tplResolveGeoLocation(rt.from) || { lat: 39.8, lng: -98.5 });
+      const tGeo = (rt.toLat !== undefined && rt.toLng !== undefined)
+        ? { lat: rt.toLat, lng: rt.toLng }
+        : (window.tplResolveGeoLocation(rt.to) || { lat: 48.37, lng: 31.16 });
+
+      const p1 = window.tplProjectLatLngToMapSvg(fGeo.lat, fGeo.lng);
+      const p2 = window.tplProjectLatLngToMapSvg(tGeo.lat, tGeo.lng);
+      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      // High-altitude parabolic 3D flight trajectory curve
+      const arcLift = Math.min(38, Math.max(16, dist * 0.32));
+      const cx = (p1.x + p2.x) / 2;
+      const cy = (p1.y + p2.y) / 2 - arcLift;
+      const pathId = `map-route-path-${idx}`;
+      const col = rt.color || "#38bdf8";
+      const isLastLeg = (idx === activeRoutes.length - 1);
+
+      // Unique node tracking for Waypoint 1 (Origin)
+      const p1Key = `${Math.round(p1.x / 8)}_${Math.round(p1.y / 8)}`;
+      let originNodeHtml = "";
+      if (!renderedNodes.has(p1Key)) {
+        renderedNodes.set(p1Key, true);
+        originNodeHtml = `
+          <!-- Waypoint Origin Node -->
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.4" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+          ${idx === 0 ? `
+            <g class="map-waypoint-hud" transform="translate(${p1.x.toFixed(1)}, ${p1.y.toFixed(1)})">
+              <path d="M 0 -2.4 L 0 -10 L 16 -10" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
+              <text x="18" y="-13" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900" letter-spacing="0.06em">${(rt.from || "ORIGIN").toUpperCase()}</text>
+              <text x="18" y="-8.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${originCoordsStr}</text>
+            </g>
+          ` : ""}
+        `;
+      }
+
+      // Unique node tracking for Waypoint 2 (Destination or Intermediate Transfer Node)
+      const p2Key = `${Math.round(p2.x / 8)}_${Math.round(p2.y / 8)}`;
+      let destNodeHtml = "";
+      if (isLastLeg) {
+        // Multi-Ring Concentric Tactical HUD Reticle matching Image 2 for the Primary Destination
+        destNodeHtml = `
+          <g class="map-target-reticle" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
+            <!-- Expanding Radar Pulse Ring -->
+            <circle cx="0" cy="0" r="6" fill="none" stroke="${col}" stroke-width="1" class="hud-radar-pulse"/>
+            <!-- Outer Dashed Reticle Ring -->
+            <circle cx="0" cy="0" r="15" fill="none" stroke="${col}" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
+            <!-- Inner Solid Reticle Ring -->
+            <circle cx="0" cy="0" r="9.5" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.95"/>
+            <!-- 4-Corner Crosshair Ticks -->
+            <path d="M -12 -12 L -9 -12 M -12 -12 L -12 -9 M 12 -12 L 9 -12 M 12 -12 L 12 -9 M -12 12 L -9 12 M -12 12 L -12 9 M 12 12 L 9 12 M 12 12 L 12 9" stroke="${col}" stroke-width="0.8" fill="none"/>
+            <!-- Center Glowing Target Node -->
+            <circle cx="0" cy="0" r="3.2" fill="${th.highlightCountry}" stroke="#ffffff" stroke-width="0.8"/>
+            <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
+
+            <!-- Tactical Leader Line + Target HUD Tag -->
+            <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="${col}" stroke-width="0.75" opacity="0.85"/>
+            <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">${targetName.toUpperCase()}</text>
+            <text x="26" y="-14.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700" letter-spacing="0.05em">${targetCoordsStr}</text>
+          </g>
+        `;
+        renderedNodes.set(p2Key, true);
+      } else if (!renderedNodes.has(p2Key)) {
+        renderedNodes.set(p2Key, true);
+        const intermediateName = (rt.to || "").toUpperCase() === "UK" ? "LONDON" : (rt.to || "WAYPOINT").toUpperCase();
+        const intermediateCoords = (rt.to || "").toUpperCase() === "UK" ? "51.50°N 0.12°W" : `${Math.abs(tGeo.lat).toFixed(2)}°${tGeo.lat >= 0 ? "N" : "S"} ${Math.abs(tGeo.lng).toFixed(2)}°${tGeo.lng >= 0 ? "E" : "W"}`;
+        destNodeHtml = `
+          <!-- Intermediate Transfer Node & Waypoint HUD (e.g. London / UK in Image 2) -->
+          <g class="map-intermediate-hud" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
+            <circle cx="0" cy="0" r="2.6" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
+            <circle cx="0" cy="0" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+            <path d="M 0 -2.6 L 0 -11 L 18 -11" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
+            <text x="20" y="-14" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.4" font-weight="900" letter-spacing="0.06em">${intermediateName}</text>
+            <text x="20" y="-9" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${intermediateCoords}</text>
+          </g>
+        `;
+      } else {
+        destNodeHtml = `
+          <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="2.2" fill="${col}" stroke="#ffffff" stroke-width="0.7" opacity="0.85"/>
+        `;
+      }
+
+      return `
+        <g class="map-route-group" data-route-idx="${idx}">
+          <!-- Glowing Parabolic Under-Stroke -->
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="4.8" opacity="0.28" filter="url(#arcGlowFilter)"/>
+          <!-- Core Luminous Arc Path -->
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.8" opacity="0.95"/>
+          <!-- Dynamic Animated Dash-Array Motion Trail -->
+          <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4" opacity="0.9"/>
+
+          ${originNodeHtml}
+          ${destNodeHtml}
+
+          <!-- Moving Transit Vehicle (Jet / Train / Ship) along Great-Circle Arc -->
+          ${buildTransitVehicleSvg(rt.mode || "plane", pathId, col, idx)}
+        </g>
+      `;
+    }).join("") : "";
+
+    // Custom on-screen traced routes (for 3D Direct Tracing mode)
+    const customTraceHtml = customRoutes.map((cr, cIdx) => {
+      const pts = Array.isArray(cr.points) ? cr.points : [];
+      if (pts.length < 2) return '';
+      const dStr = pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)} ${pt.y.toFixed(1)}`).join(' ');
+      const cPathId = `map-custom-trace-${cIdx}`;
+      const col = cr.color || '#2effc6';
+      return `
+        <g class="map-custom-trace-group">
+          <path d="${dStr}" fill="none" stroke="${col}" stroke-width="3" opacity="0.25" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="${cPathId}" d="${dStr}" fill="none" stroke="${col}" stroke-width="1.6" stroke-dasharray="3 2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="${pts[0].x.toFixed(1)}" cy="${pts[0].y.toFixed(1)}" r="2.6" fill="${col}" stroke="#fff" stroke-width="0.8"/>
+          <circle cx="${pts[pts.length - 1].x.toFixed(1)}" cy="${pts[pts.length - 1].y.toFixed(1)}" r="3" fill="#ef4444" stroke="#fff" stroke-width="0.9"/>
+          ${buildTransitVehicleSvg(cr.mode || 'plane', cPathId, col, cIdx + 3)}
+        </g>
+      `;
+    }).join('');
+
+    const globeShiftX = ((50 - normX) * 0.65).toFixed(1);
+    const globeShiftY = ((50 - normY) * 0.45).toFixed(1);
+
+    const globeSvg = proj === 'globe' ? `
+      <svg class="globe-svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <!-- Volumetric 3D Sphere Shading Shader (Depth & Upper-Left Sun Rim) -->
+          <radialGradient id="globeSphereGrad" cx="35%" cy="30%" r="72%">
+            <stop offset="0%" stop-color="${th.oceanLight}" stop-opacity="1"/>
+            <stop offset="48%" stop-color="${th.ocean}" stop-opacity="1"/>
+            <stop offset="82%" stop-color="#020814" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#01040a" stop-opacity="1"/>
+          </radialGradient>
+
+          <!-- Sci-Fi 3D Fresnel Atmosphere Rim Glow (Authentic Earth Limb Brightening) -->
+          <radialGradient id="globeFresnelGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="78%" stop-color="${th.atmo}" stop-opacity="0"/>
+            <stop offset="89%" stop-color="${th.atmo}" stop-opacity="0.25"/>
+            <stop offset="96%" stop-color="${th.fresnelRim}" stop-opacity="0.7"/>
+            <stop offset="99%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+          </radialGradient>
+
+          <!-- Volumetric Terminator Depth Shadow Overlay -->
+          <radialGradient id="globeDepthShadow" cx="28%" cy="24%" r="80%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
+            <stop offset="55%" stop-color="#000000" stop-opacity="0"/>
+            <stop offset="85%" stop-color="#010611" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#000308" stop-opacity="0.88"/>
+          </radialGradient>
+
+          <clipPath id="globeClipCircle">
+            <circle cx="200" cy="114" r="102"/>
+          </clipPath>
+
+          <filter id="outerAtmoGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4"/>
+          </filter>
+          <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
+          <filter id="activeCountryGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="${th.highlightCountry}" flood-opacity="0.85"/>
+          </filter>
+          <filter id="mapGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.85"/>
+          </filter>
+        </defs>
+
+        <!-- Outer Space Deep Stars & Telemetry Grid -->
+        <g stroke="${th.grid}" stroke-width="0.45" opacity="0.32">
+          <line x1="0" y1="45" x2="400" y2="45"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="180" x2="400" y2="180"/>
+          <line x1="80" y1="0" x2="80" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="320" y1="0" x2="320" y2="225"/>
+        </g>
+
+        <!-- Multi-Layer 3D Atmosphere Rim Lighting Halo (Fresnel Glow along Earth Curve) -->
+        <circle cx="200" cy="114" r="102" fill="none" stroke="${th.atmo}" stroke-width="2.5" opacity="0.95" filter="url(#outerAtmoGlow)"/>
+        <circle cx="200" cy="114" r="106" fill="none" stroke="#0ea5e9" stroke-width="5" opacity="0.45" filter="url(#outerAtmoGlow)"/>
+        <circle cx="200" cy="114" r="111" fill="none" stroke="${th.atmo}" stroke-width="9" opacity="0.18" filter="url(#outerAtmoGlow)"/>
+
+        <!-- Circumference Telemetry Degree Marks -->
+        <circle cx="200" cy="114" r="102" fill="url(#globeSphereGrad)" stroke="rgba(56,189,248,0.7)" stroke-width="1.2"/>
+
+        <!-- Clipped 3D Orthographic Globe Body -->
+        <g clip-path="url(#globeClipCircle)">
+          <!-- Curved 3D Spherical Graticules (Latitude Parallels & Longitude Meridians) -->
+          <g stroke="${th.grid}" stroke-width="0.55" fill="none" opacity="0.85">
+            <!-- Parallels (Latitudes) -->
+            <ellipse cx="200" cy="62" rx="74" ry="22"/>
+            <ellipse cx="200" cy="78" rx="88" ry="26"/>
+            <ellipse cx="200" cy="95" rx="98" ry="30"/>
+            <ellipse cx="200" cy="105" rx="101" ry="31"/>
+            <ellipse cx="200" cy="114" rx="102" ry="32"/>
+            <line x1="98" y1="114" x2="302" y2="114"/>
+            <ellipse cx="200" cy="123" rx="101" ry="31"/>
+            <ellipse cx="200" cy="133" rx="98" ry="30"/>
+            <ellipse cx="200" cy="150" rx="88" ry="26"/>
+            <ellipse cx="200" cy="166" rx="74" ry="22"/>
+
+            <!-- Meridians (Longitudes) -->
+            <ellipse cx="200" cy="114" rx="28" ry="102"/>
+            <ellipse cx="200" cy="114" rx="58" ry="102"/>
+            <ellipse cx="200" cy="114" rx="85" ry="102"/>
+            <line x1="200" y1="12" x2="200" y2="216"/>
+          </g>
+
+          <!-- Interactive Transformed Coordinate Plane -->
+          <g class="map-interactive-coord-plane" transform="translate(${globeShiftX}, ${globeShiftY})">
+            ${highPrecisionWorldVectors}
+            ${highlightedCountryMarkup}
+            ${bathymetricContoursMarkup}
+            <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
+              ${filteredLabelsHtml}
+            </g>
+            ${routeElementsHtml}
+            ${customTraceHtml}
+          </g>
+
+          <!-- 3D Volumetric Terminator Depth Shadow Overlay -->
+          <circle cx="200" cy="114" r="102" fill="url(#globeDepthShadow)" pointer-events="none"/>
+
+          <!-- 3D Fresnel Limb Rim Glow Overlay (Inner Edge Highlight) -->
+          <circle cx="200" cy="114" r="102" fill="url(#globeFresnelGrad)" pointer-events="none"/>
+        </g>
+      </svg>
+    ` : `
+      <svg class="globe-svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
+          <filter id="activeCountryGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="${th.highlightCountry}" flood-opacity="0.85"/>
+          </filter>
+          <filter id="mapGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.85"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="${th.ocean}"/>
+        <g stroke="${th.grid}" stroke-width="0.5" fill="none">
+          <line x1="0" y1="38" x2="400" y2="38"/><line x1="0" y1="75" x2="400" y2="75"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="150" x2="400" y2="150"/><line x1="0" y1="188" x2="400" y2="188"/>
+          <line x1="66" y1="0" x2="66" y2="225"/><line x1="133" y1="0" x2="133" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="266" y1="0" x2="266" y2="225"/><line x1="333" y1="0" x2="333" y2="225"/>
+        </g>
+        <g class="map-interactive-coord-plane">
+          ${highPrecisionWorldVectors}
+          ${highlightedCountryMarkup}
+          ${bathymetricContoursMarkup}
+          <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
+            ${filteredLabelsHtml}
+          </g>
+          ${routeElementsHtml}
+          ${customTraceHtml}
+        </g>
+      </svg>
+    `;
+
+    const rig3DStyle = is3D
+      ? `animation: none !important; transform: perspective(1000px) rotateX(${pitch3D}deg) rotateY(${yaw3D}deg) scale(${Math.min(1.35, Math.max(1.0, zoomLvl * 0.65))}); transform-style: preserve-3d; transition: transform 0.15s ease-out;`
+      : '';
+
+    const stage3DControlsHtml = `
+      <div class="map-3d-stage-toolbar" style="position:absolute; top:10px; right:12px; z-index:35; display:flex; align-items:center; gap:6px; background:rgba(7,13,25,0.92); backdrop-filter:blur(10px); border:1px solid rgba(56,189,248,0.45); border-radius:20px; padding:4px 10px; box-shadow:0 8px 24px rgba(0,0,0,0.75); pointer-events:auto;">
+        <button type="button" id="map-stage-btn-toggle-3d" style="background:${is3D ? "rgba(56,189,248,0.25)" : "rgba(255,255,255,0.08)"}; border:1px solid ${is3D ? "#38bdf8" : "rgba(255,255,255,0.18)"}; color:${is3D ? "#38bdf8" : "#94a3b8"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:800; cursor:pointer;" title="Toggle 3D Orbit / Camera Mode">
+          ${is3D ? "🌐 3D Orbit ON" : "🌐 3D Orbit"}
+        </button>
+        <div style="display:flex; align-items:center; gap:2px; background:rgba(0,0,0,0.5); border-radius:12px; border:1px solid rgba(255,255,255,0.12); padding:1px 4px;">
+          <button type="button" id="map-stage-btn-zoom-in" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom In (+)">+</button>
+          <span id="map-stage-zoom-badge" style="font-family:monospace; font-size:8.5px; color:#e2e8f0; min-width:24px; text-align:center;">${zoomLvl.toFixed(1)}x</span>
+          <button type="button" id="map-stage-btn-zoom-out" style="background:none; border:none; color:#38bdf8; font-weight:900; font-size:11px; cursor:pointer; padding:0 4px;" title="Zoom Out (−)">−</button>
+        </div>
+        <button type="button" id="map-stage-btn-draw" style="background:${isDrawing ? "rgba(46,255,198,0.22)" : "rgba(255,255,255,0.08)"}; border:1px solid ${isDrawing ? "#2effc6" : "rgba(255,255,255,0.18)"}; color:${isDrawing ? "#2effc6" : "#e2e8f0"}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:700; cursor:pointer;" title="Direct Route Tracing Mode">
+          ${isDrawing ? "✏️ Tracing Route" : "✏️ Trace"}
+        </button>
+        <select id="map-stage-sel-transit" style="background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:#fff; font-size:9.5px; font-weight:700; padding:2px 5px; cursor:pointer;" title="Transit Mode for On-Screen Trace">
+          <option value="plane" ${(d.activeTraceTransit || "plane") === "plane" ? "selected" : ""}>✈️ Plane</option>
+          <option value="ship" ${d.activeTraceTransit === "ship" ? "selected" : ""}>🚢 Ship</option>
+          <option value="train" ${d.activeTraceTransit === "train" ? "selected" : ""}>🚆 Train</option>
+          <option value="line" ${d.activeTraceTransit === "line" ? "selected" : ""}>⚡ Line</option>
+        </select>
+        <button type="button" id="map-stage-btn-clear-trace" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:10px; padding:2px 7px; font-size:9px; font-weight:700; cursor:pointer;" title="Clear On-Screen Drawn Traces">Clear</button>
+      </div>
+    `;
+
+    return `
+      <div class="tpl-map globe-viewport ${is3D ? 'is-3d-mode' : ''} ${isDrawing ? 'is-drawing-route' : ''}" style="background:${th.bg}; --focus-x:${normX.toFixed(1)}%; --focus-y:${normY.toFixed(1)}%; --zoom-scale:${zoomLvl}; --zoom-delay:${zoomStart}s; --cam-cycle:${totalCycle}s; --pan-x:${panX}; --pan-y:${panY}; --pin-color:${pinColor}; cursor:${isDrawing ? 'crosshair' : (is3D ? 'grab' : 'default')};">
+        ${stage3DControlsHtml}
+        <div class="globe-camera-rig" style="${rig3DStyle}">
+          ${globeSvg}
+        </div>
+
+        <!-- Floating Glassmorphic HUD Route Card matching Image 2 -->
+        <div class="location-hud">
+          <div class="hud-top-meta">
+            <span class="hud-badge-tag">[MULTI-VECTOR TRANSIT 01]</span>
+            <span class="hud-badge-tag">[ACTIVE LEGS: ${activeRoutes.length}]</span>
+          </div>
+          <div class="hud-route-legs">
+            ${activeRoutes.map((rt, i) => {
+              const isLast = (i === activeRoutes.length - 1);
+              const fromFlag = getCountryFlag(rt.from);
+              return `
+                <div class="hud-route-item ${isLast ? 'active-leg' : ''}">
+                  ${i === 0 ? `<span class="hud-flag">${fromFlag}</span>` : `<span class="hud-arrow-down">\u2794</span>`}
+                  <span class="hud-country">${(rt.from || 'ORIGIN').toUpperCase()}</span>
+                  <span class="hud-arrow">\u2192</span>
+                  <span class="hud-country ${isLast ? 'highlight' : ''}">${(rt.to || 'TARGET').toUpperCase()}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- High-Tech Bottom Telemetry Bar -->
+        <div class="telemetry-bar">
+          <span>SAT-LOCK // ${proj === 'globe' ? '3D ORTHOGRAPHIC GLOBE' : '2D GRANULAR WORLD MAP'} ${is3D ? '\u00b7 [3D INTERACTIVE]' : ''}</span>
+          <span>${activeRoutes.length} ROUTE${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ZOOM @ ${zoomStart}s \u00b7 ${zoomLvl}x</span>
+        </div>
+      </div>
+    `;
+  };
+
+  // Interactive 3D Orbit & Direct On-Screen Route Tracing Handler for Map Stage
+
+// =========================================================================
+  // 25B. HIGH-RESOLUTION VECTOR 3D MAP PIN DROP ENGINE (map-pin-drop)
+  // Scalable Vector SVG Cartography: Razor-sharp on Fullscreen 4K Displays
+  // =========================================================================
+  window.tplBuildTacticalMapPinDropHtml = function(mData) {
+    const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map-pin-drop') : {});
+    const is3D = d.is3DMode !== false;
     const pitch = d.pitch3D !== undefined ? parseFloat(d.pitch3D) : 10;
     const yaw = d.yaw3D !== undefined ? parseFloat(d.yaw3D) : -3;
     const pinMat = d.pinMaterial || 'copper';
@@ -1364,154 +1894,267 @@
     const locCoords = d.coords || '50.4501°N 30.5234°E';
     const locSub = d.telemetry || 'O.SR5911TES     DFX35.EVA';
 
-    // Metallic Pin Palettes
+    // Metallic Pin Palettes with Lathe Groove Specular Reflection
     const palettes = {
       'copper': {
         stop0: '#fed7aa', stop25: '#f97316', stop55: '#c2410c', stop85: '#7c2d12', stop100: '#431407',
         stem0: '#ea580c', stem50: '#ffedd5', stem100: '#7c2d12',
-        rim: '#fed7aa', center: '#7c2d12', pulse: '#f59e0b'
+        rim: '#fed7aa', center: '#7c2d12', pulse: '#f59e0b', glow: 'rgba(249, 115, 22, 0.45)'
       },
       'steel': {
         stop0: '#f8fafc', stop25: '#cbd5e1', stop55: '#64748b', stop85: '#334155', stop100: '#0f172a',
         stem0: '#94a3b8', stem50: '#ffffff', stem100: '#334155',
-        rim: '#e2e8f0', center: '#1e293b', pulse: '#38bdf8'
+        rim: '#e2e8f0', center: '#1e293b', pulse: '#38bdf8', glow: 'rgba(56, 189, 248, 0.45)'
       },
       'gold': {
         stop0: '#fef08a', stop25: '#eab308', stop55: '#ca8a04', stop85: '#854d0e', stop100: '#422006',
         stem0: '#d97706', stem50: '#fef9c3', stem100: '#78350f',
-        rim: '#fde047', center: '#713f12', pulse: '#eab308'
+        rim: '#fde047', center: '#713f12', pulse: '#eab308', glow: 'rgba(234, 179, 8, 0.45)'
       }
     };
     const pal = palettes[pinMat] || palettes['copper'];
 
     const rig3DStyle = is3D
-      ? `transform: perspective(1200px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(1.02); transform-style: preserve-3d; transition: transform 0.25s ease-out;`
+      ? `transform: perspective(1400px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(1.02); transform-style: preserve-3d; transition: transform 0.25s ease-out;`
       : 'transform: none;';
 
+    // Natural Earth Vector Landmasses
+    const worldLand = (typeof window !== 'undefined' && window.ACCURATE_WORLD_MAP && window.ACCURATE_WORLD_MAP.land)
+      ? window.ACCURATE_WORLD_MAP.land
+      : '';
+
     return `
-      <div class="tpl-map cinematic-map-pin-suite ${is3D ? 'is-3d-perspective' : ''}" style="background:#020610; width:100%; height:100%; position:relative; overflow:hidden;">
-        <div class="cinematic-map-canvas-container" style="${rig3DStyle}">
-          <!-- 1. BASE WORLD SATELLITE & TOPOGRAPHIC RELIEF LAYER -->
-          <img src="/cinematic_tactical_world_map_kyiv.png" alt="Cinematic Tactical Relief World Map" class="cinematic-map-base-img" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
-
-          <!-- 2. DYNAMIC WATER CURRENTS SHIMMER -->
-          ${showWater ? `
-            <div class="ocean-shimmer-layer" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 42% 64%, rgba(56, 189, 248, 0.08) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none; animation: oceanCurrentShift 9s ease-in-out infinite alternate;"></div>
-          ` : ''}
-
-          <!-- 3. VOLUMETRIC ATMOSPHERIC LIMB GLOW & VIGNETTE -->
-          <div class="atmospheric-limb-glow" style="position: absolute; inset: 0; box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85), inset 0 0 100px rgba(2, 8, 20, 0.7); pointer-events: none;"></div>
-
-          <!-- 4. DYNAMIC VECTOR OVERLAY: 3D PIN, SHOCKWAVE, ARCS, HUD LEADER LINE -->
-          <svg class="cinematic-map-svg-overlay" viewBox="0 0 968 410" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+      <div class="tpl-map cinematic-map-pin-suite ${is3D ? 'is-3d-perspective' : ''}" style="background:#020610; width:100%; height:100%; position:relative; overflow:hidden; user-select:none;">
+        <div class="cinematic-map-canvas-container" style="${rig3DStyle} width:100%; height:100%; position:relative;">
+          
+          <!-- PURE SCALABLE VECTOR SVG CARTOGRAPHY (INFINITE RESOLUTION ON FULLSCREEN) -->
+          <svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" style="width:100%; height:100%; display:block; position:absolute; inset:0;">
             <defs>
-              <!-- Metallic Pin Gradients -->
-              <radialGradient id="cmpPinHead" cx="35%" cy="30%" r="70%">
+              <!-- Deep Tactical Ocean Gradient -->
+              <radialGradient id="vtrOcean" cx="50%" cy="52%" r="65%">
+                <stop offset="0%" stop-color="#07192f"/>
+                <stop offset="45%" stop-color="#04101e"/>
+                <stop offset="85%" stop-color="#02070f"/>
+                <stop offset="100%" stop-color="#01040a"/>
+              </radialGradient>
+
+              <!-- Land Topographic Relief Gradient -->
+              <linearGradient id="vtrLandRelief" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#2c221a"/>
+                <stop offset="40%" stop-color="#231b15"/>
+                <stop offset="80%" stop-color="#19130f"/>
+                <stop offset="100%" stop-color="#120e0b"/>
+              </linearGradient>
+
+              <!-- Shaded Mountain Ridge Highlight -->
+              <linearGradient id="vtrRidgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#8c6b4e" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#3d2f23" stop-opacity="0.3"/>
+              </linearGradient>
+
+              <!-- Metallic Pin Head Gradients -->
+              <radialGradient id="vtrPinHead" cx="35%" cy="30%" r="70%">
                 <stop offset="0%" stop-color="${pal.stop0}"/>
                 <stop offset="25%" stop-color="${pal.stop25}"/>
                 <stop offset="55%" stop-color="${pal.stop55}"/>
                 <stop offset="85%" stop-color="${pal.stop85}"/>
                 <stop offset="100%" stop-color="${pal.stop100}"/>
               </radialGradient>
-              <radialGradient id="cmpPinGrooves" cx="50%" cy="50%" r="50%">
-                <stop offset="30%" stop-color="${pal.stop85}" stop-opacity="0.8"/>
-                <stop offset="50%" stop-color="${pal.stop0}" stop-opacity="0.9"/>
-                <stop offset="70%" stop-color="${pal.stop55}" stop-opacity="0.8"/>
-                <stop offset="90%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
+
+              <!-- Concentric Lathe Grooves -->
+              <radialGradient id="vtrPinGrooves" cx="50%" cy="50%" r="50%">
+                <stop offset="28%" stop-color="${pal.stop85}" stop-opacity="0.8"/>
+                <stop offset="48%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
+                <stop offset="68%" stop-color="${pal.stop55}" stop-opacity="0.85"/>
+                <stop offset="88%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
                 <stop offset="100%" stop-color="${pal.stop100}"/>
               </radialGradient>
-              <linearGradient id="cmpPinStem" x1="0%" y1="0%" x2="100%" y2="100%">
+
+              <!-- Tapered Conical 3D Stem -->
+              <linearGradient id="vtrPinStem" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stop-color="${pal.stem0}"/>
                 <stop offset="50%" stop-color="${pal.stem50}"/>
                 <stop offset="100%" stop-color="${pal.stem100}"/>
               </linearGradient>
 
-              <filter id="cmpGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="3.5"/>
+              <!-- Glow & Shadow Filters -->
+              <filter id="vtrGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
               </filter>
-              <filter id="cmpPinShadow" x="-30%" y="-30%" width="160%" height="160%">
-                <feDropShadow dx="6" dy="14" stdDeviation="8" flood-color="#000000" flood-opacity="0.9"/>
+              <filter id="vtrPinShadow" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="6" dy="16" stdDeviation="10" flood-color="#000000" flood-opacity="0.95"/>
+              </filter>
+              <filter id="vtrDustHaze" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="8"/>
               </filter>
             </defs>
 
-            <!-- Flight Trajectory Arcs (connecting Americas -> London -> Kyiv -> Asia) -->
-            <g class="trajectory-flight-arcs">
-              <path d="M 290 220 Q 410 130 540 143" fill="none" stroke="rgba(249, 115, 22, 0.45)" stroke-width="3" stroke-dasharray="6 4" class="animated-flight-dash" />
-              <path d="M 290 220 Q 410 130 540 143" fill="none" stroke="#f97316" stroke-width="1.6" stroke-dasharray="6 4" />
-              <path d="M 540 143 Q 660 120 780 185" fill="none" stroke="rgba(249, 115, 22, 0.4)" stroke-width="2.5" stroke-dasharray="5 4" />
-              <path d="M 540 143 Q 660 120 780 185" fill="none" stroke="#ea580c" stroke-width="1.2" stroke-dasharray="5 4" />
+            <!-- 1. BASE OCEAN LAYER -->
+            <rect width="960" height="540" fill="url(#vtrOcean)"/>
+
+            <!-- 2. TECHNICAL LAT/LONG GRATICULES -->
+            ${showGrid ? `
+              <g class="vtr-graticules" stroke="rgba(56, 189, 248, 0.11)" stroke-width="0.55" stroke-dasharray="3, 7" fill="none">
+                <!-- Parallels -->
+                <line x1="0" y1="90" x2="960" y2="90"/>
+                <line x1="0" y1="180" x2="960" y2="180"/>
+                <line x1="0" y1="270" x2="960" y2="270" stroke="rgba(56, 189, 248, 0.18)" stroke-dasharray="none"/>
+                <line x1="0" y1="360" x2="960" y2="360"/>
+                <line x1="0" y1="450" x2="960" y2="450"/>
+                <!-- Meridians -->
+                <line x1="160" y1="0" x2="160" y2="540"/>
+                <line x1="320" y1="0" x2="320" y2="540"/>
+                <line x1="480" y1="0" x2="480" y2="540" stroke="rgba(56, 189, 248, 0.18)" stroke-dasharray="none"/>
+                <line x1="640" y1="0" x2="640" y2="540"/>
+                <line x1="800" y1="0" x2="800" y2="540"/>
+              </g>
+            ` : ''}
+
+            <!-- 3. DYNAMIC WATER CURRENTS SHIMMER -->
+            ${showWater ? `
+              <g class="vtr-ocean-currents" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1.2" fill="none" stroke-dasharray="8 12">
+                <path d="M 240 220 C 340 180, 420 210, 490 200" opacity="0.6">
+                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="6s" repeatCount="indefinite"/>
+                </path>
+                <path d="M 330 380 C 420 360, 520 400, 620 370" opacity="0.5">
+                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="8s" repeatCount="indefinite"/>
+                </path>
+                <path d="M 640 290 C 720 270, 810 300, 900 280" opacity="0.5">
+                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="7s" repeatCount="indefinite"/>
+                </path>
+              </g>
+            ` : ''}
+
+            <!-- 4. ACCURATE NATURAL EARTH VECTOR LANDMASSES -->
+            <g class="vtr-continents" transform="scale(2.4)" fill="url(#vtrLandRelief)" stroke="${showBorders ? 'rgba(249, 115, 22, 0.42)' : 'none'}" stroke-width="0.45" stroke-linejoin="round">
+              ${worldLand ? `<path d="${worldLand}"/>` : ''}
             </g>
 
-            <!-- Secondary Metallic Network Pins -->
-            <!-- London / UK Pin -->
-            <g class="secondary-pin" transform="translate(485, 132) scale(0.65)" filter="url(#cmpPinShadow)">
-              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
-              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
-              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
-              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            <!-- 5. SHADED TOPOGRAPHIC MOUNTAIN RELIEF SYSTEM -->
+            <g class="vtr-topography-relief" stroke="url(#vtrRidgeGrad)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.85">
+              <!-- European Alps & Carpathians -->
+              <path d="M 470 178 Q 485 174 505 175 T 530 172"/>
+              <path d="M 482 176 L 488 171 L 496 177 L 504 172 L 512 176"/>
+              <!-- Urals & Caucasus -->
+              <path d="M 545 185 Q 565 180 585 182"/>
+              <path d="M 590 120 L 594 140 L 592 165 L 596 185"/>
+              <!-- Himalayas & Tibetan Plateau -->
+              <path d="M 660 212 Q 710 205 760 220" stroke-width="2"/>
+              <path d="M 670 208 Q 720 198 770 216" stroke-width="1.5"/>
+              <path d="M 680 215 L 690 206 L 705 214 L 720 204 L 735 215 L 750 208"/>
+              <!-- North American Rockies -->
+              <path d="M 230 130 Q 250 165 270 210" stroke-width="1.8"/>
+              <path d="M 235 140 L 242 135 L 248 152 L 256 160 L 262 178 L 268 198"/>
+              <!-- South American Andes -->
+              <path d="M 315 260 Q 325 330 338 410" stroke-width="1.8"/>
+              <path d="M 318 275 L 324 285 L 322 320 L 328 355 L 332 390 L 336 425"/>
             </g>
 
-            <!-- US West Pin -->
-            <g class="secondary-pin" transform="translate(305, 156) scale(0.65)" filter="url(#cmpPinShadow)">
-              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
-              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
-              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
-              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
-            </g>
+            <!-- 6. CRISP VECTOR GEOGRAPHIC LABELS -->
+            ${showLabels ? `
+              <g class="vtr-map-labels" fill="rgba(241, 245, 249, 0.72)" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="700" letter-spacing="0.12em" text-anchor="middle" font-size="7.5">
+                <text x="245" y="195">UNITED STATES</text>
+                <text x="225" y="145" font-size="6.5">CANADA</text>
+                <text x="350" y="325">BRAZIL</text>
+                <text x="475" y="160" font-size="6.5" fill="#38bdf8">UK</text>
+                <text x="548" y="148" font-size="8" font-weight="900" fill="#f97316">KYIV</text>
+                <text x="735" y="210">CHINA</text>
+                <text x="690" y="250">INDIA</text>
+                <text x="815" y="380">AUSTRALIA</text>
+                <text x="555" y="300" font-size="7">AFRICA</text>
+                <!-- Ocean Monospace Labels -->
+                <g fill="rgba(56, 189, 248, 0.38)" font-family="'JetBrains Mono', monospace" font-size="6" font-weight="600" letter-spacing="0.2em">
+                  <text x="390" y="225">NORTH ATLANTIC OCEAN</text>
+                  <text x="440" y="390">SOUTH ATLANTIC OCEAN</text>
+                  <text x="130" y="230">NORTH PACIFIC OCEAN</text>
+                  <text x="740" y="350">INDIAN OCEAN</text>
+                </g>
+              </g>
+            ` : ''}
 
+            <!-- 7. FLIGHT TRAJECTORY ARCS (Americas -> London -> Kyiv -> Asia) -->
+            ${showFlightPath ? `
+              <g class="vtr-flight-arcs" fill="none">
+                <!-- Americas to London -->
+                <path d="M 290 220 Q 400 135 480 162" stroke="rgba(249, 115, 22, 0.35)" stroke-width="3" stroke-dasharray="6 4" class="animated-flight-dash" />
+                <path d="M 290 220 Q 400 135 480 162" stroke="#f97316" stroke-width="1.6" stroke-dasharray="6 4" />
+                <!-- London to Kyiv -->
+                <path d="M 480 162 Q 515 152 548 168" stroke="rgba(249, 115, 22, 0.45)" stroke-width="3" stroke-dasharray="5 3" class="animated-flight-dash" />
+                <path d="M 480 162 Q 515 152 548 168" stroke="#fdba74" stroke-width="1.8" stroke-dasharray="5 3" />
+                <!-- Kyiv to East Asia -->
+                <path d="M 548 168 Q 660 145 775 210" stroke="rgba(249, 115, 22, 0.35)" stroke-width="2.5" stroke-dasharray="6 4" class="animated-flight-dash" />
+                <path d="M 548 168 Q 660 145 775 210" stroke="#ea580c" stroke-width="1.3" stroke-dasharray="6 4" />
+              </g>
+            ` : ''}
+
+            <!-- 8. SECONDARY METALLIC NETWORK NODE PINS -->
+            <!-- London Pin -->
+            <g class="vtr-node-pin" transform="translate(480, 162) scale(0.65)" filter="url(#vtrPinShadow)">
+              <ellipse cx="0" cy="18" rx="6" ry="2.5" fill="rgba(0,0,0,0.7)"/>
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#vtrPinStem)"/>
+              <circle cx="0" cy="0" r="10" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1"/>
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            </g>
+            <!-- US Pin -->
+            <g class="vtr-node-pin" transform="translate(290, 220) scale(0.65)" filter="url(#vtrPinShadow)">
+              <ellipse cx="0" cy="18" rx="6" ry="2.5" fill="rgba(0,0,0,0.7)"/>
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#vtrPinStem)"/>
+              <circle cx="0" cy="0" r="10" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1"/>
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            </g>
             <!-- East Asia Pin -->
-            <g class="secondary-pin" transform="translate(775, 185) scale(0.65)" filter="url(#cmpPinShadow)">
-              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
-              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
-              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
-              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            <g class="vtr-node-pin" transform="translate(775, 210) scale(0.65)" filter="url(#vtrPinShadow)">
+              <ellipse cx="0" cy="18" rx="6" ry="2.5" fill="rgba(0,0,0,0.7)"/>
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#vtrPinStem)"/>
+              <circle cx="0" cy="0" r="10" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1"/>
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
             </g>
 
-            <!-- GROUND IMPACT DYNAMICS AT KYIV -->
-            <g class="ground-impact-group" transform="translate(540, 143)">
-              <ellipse cx="0" cy="0" rx="36" ry="14" fill="none" stroke="${pal.pulse}" stroke-width="1.8" opacity="0.8" class="kyiv-shockwave-1" />
-              <ellipse cx="0" cy="0" rx="64" ry="22" fill="none" stroke="${pal.pulse}" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.45" class="kyiv-shockwave-2" />
+            <!-- 9. GROUND IMPACT DYNAMICS AT KYIV (548, 168) -->
+            <g class="vtr-ground-impact" transform="translate(548, 168)">
+              <ellipse cx="0" cy="0" rx="38" ry="15" fill="none" stroke="${pal.pulse}" stroke-width="1.8" opacity="0.8" class="kyiv-shockwave-1"/>
+              <ellipse cx="0" cy="0" rx="68" ry="24" fill="none" stroke="${pal.pulse}" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.45" class="kyiv-shockwave-2"/>
               ${showDust ? `
-                <ellipse cx="0" cy="2" rx="42" ry="18" fill="rgba(180, 83, 9, 0.28)" filter="url(#cmpGlow)" />
-                <ellipse cx="-8" cy="-2" rx="32" ry="14" fill="rgba(217, 119, 6, 0.22)" filter="url(#cmpGlow)" />
+                <ellipse cx="0" cy="2" rx="46" ry="20" fill="rgba(180, 83, 9, 0.32)" filter="url(#vtrDustHaze)"/>
+                <ellipse cx="-10" cy="-2" rx="36" ry="16" fill="rgba(217, 119, 6, 0.25)" filter="url(#vtrDustHaze)"/>
               ` : ''}
             </g>
 
-            <!-- PRIMARY 3D METALLIC PIN OBJECT -->
-            <g class="primary-3d-pin-object" transform="translate(540, 143)" filter="url(#cmpPinShadow)">
-              <!-- Contact Drop Shadow on Terrain -->
-              <ellipse cx="14" cy="2" rx="22" ry="8" fill="rgba(0,0,0,0.85)" filter="url(#cmpGlow)" />
+            <!-- 10. PRIMARY 3D METALLIC PIN OBJECT AT KYIV -->
+            <g class="vtr-primary-pin" transform="translate(548, 168)" filter="url(#vtrPinShadow)">
+              <!-- Ground Contact Occlusion Shadow -->
+              <ellipse cx="14" cy="2" rx="24" ry="8" fill="rgba(0,0,0,0.92)" filter="url(#vtrGlow)"/>
 
-              <!-- 3D Tapered Conical Stem touching coordinate -->
-              <path d="M 0 0 L -12 -38 L 12 -38 Z" fill="url(#cmpPinStem)" stroke="rgba(0,0,0,0.4)" stroke-width="0.5" />
-              <line x1="0" y1="0" x2="0" y2="-38" stroke="#ffedd5" stroke-width="1" opacity="0.75" />
+              <!-- 3D Tapered Conical Stem -->
+              <path d="M 0 0 L -12 -38 L 12 -38 Z" fill="url(#vtrPinStem)" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>
+              <line x1="0" y1="0" x2="0" y2="-38" stroke="#ffedd5" stroke-width="1.2" opacity="0.8"/>
 
-              <!-- Heavy Beveled Circular Metallic Pin Head -->
+              <!-- Concentric Lathe Grooved Beveled Metallic Pin Head -->
               <g transform="translate(0, -56)">
-                <circle cx="0" cy="0" r="28" fill="#431407" />
-                <circle cx="0" cy="0" r="27" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1.5" />
-                <circle cx="0" cy="0" r="21" fill="url(#cmpPinGrooves)" stroke="rgba(0,0,0,0.35)" stroke-width="1" />
-                <circle cx="0" cy="0" r="15" fill="url(#cmpPinHead)" stroke="rgba(254, 215, 170, 0.6)" stroke-width="0.8" />
-                <circle cx="0" cy="0" r="8" fill="${pal.center}" stroke="${pal.rim}" stroke-width="0.7" />
-                <!-- Specular Gleam -->
-                <path d="M -18 -18 A 25 25 0 0 1 18 -18" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.75" filter="url(#cmpGlow)" />
-                <circle cx="-7" cy="-7" r="3" fill="#ffffff" opacity="0.8" />
+                <circle cx="0" cy="0" r="28" fill="#301005"/>
+                <circle cx="0" cy="0" r="27" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1.6"/>
+                <circle cx="0" cy="0" r="21" fill="url(#vtrPinGrooves)" stroke="rgba(0,0,0,0.35)" stroke-width="1"/>
+                <circle cx="0" cy="0" r="15" fill="url(#vtrPinHead)" stroke="rgba(254, 215, 170, 0.65)" stroke-width="0.8"/>
+                <circle cx="0" cy="0" r="8" fill="${pal.center}" stroke="${pal.rim}" stroke-width="0.8"/>
+                <!-- Specular Highlight Arc -->
+                <path d="M -18 -18 A 25 25 0 0 1 18 -18" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.8" filter="url(#vtrGlow)"/>
+                <circle cx="-7" cy="-7" r="3.2" fill="#ffffff" opacity="0.85"/>
               </g>
             </g>
 
-            <!-- HIGH-TECH MODULAR DATA HUD & LEADER LINE -->
-            <g class="kyiv-leader-line-callout" transform="translate(540, 143)">
-              <polyline points="20,-72 65,-94 75,-94" fill="none" stroke="#cbd5e1" stroke-width="1.4" opacity="0.85" />
-              <circle cx="20" cy="-72" r="2.2" fill="${pal.stop25}" stroke="#ffffff" stroke-width="0.8" />
+            <!-- 11. HIGH-TECH DATA HUD & LEADER LINE -->
+            <g class="vtr-leader-hud" transform="translate(548, 168)">
+              <polyline points="20,-72 65,-94 75,-94" fill="none" stroke="#cbd5e1" stroke-width="1.5" opacity="0.9"/>
+              <circle cx="20" cy="-72" r="2.4" fill="${pal.stop25}" stroke="#ffffff" stroke-width="0.8"/>
 
-              <!-- High-Tech Telemetry Glassmorphic Card -->
+              <!-- Glassmorphic Card -->
               <g transform="translate(75, -112)">
-                <rect x="0" y="0" width="198" height="34" rx="4" fill="rgba(8, 12, 22, 0.88)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1" />
-                <!-- Tech Corner Ticks -->
-                <line x1="0" y1="0" x2="6" y2="0" stroke="${pal.stop25}" stroke-width="2" />
-                <line x1="0" y1="0" x2="0" y2="6" stroke="${pal.stop25}" stroke-width="2" />
-                <line x1="198" y1="34" x2="192" y2="34" stroke="${pal.stop25}" stroke-width="2" />
-                <line x1="198" y1="34" x2="198" y2="28" stroke="${pal.stop25}" stroke-width="2" />
+                <rect x="0" y="0" width="198" height="34" rx="4" fill="rgba(8, 12, 22, 0.9)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1"/>
+                <!-- Tech Corner Accent Ticks -->
+                <line x1="0" y1="0" x2="6" y2="0" stroke="${pal.stop25}" stroke-width="2"/>
+                <line x1="0" y1="0" x2="0" y2="6" stroke="${pal.stop25}" stroke-width="2"/>
+                <line x1="198" y1="34" x2="192" y2="34" stroke="${pal.stop25}" stroke-width="2"/>
+                <line x1="198" y1="34" x2="198" y2="28" stroke="${pal.stop25}" stroke-width="2"/>
 
                 <!-- Main Bold Coordinate Header Text -->
                 <text x="8" y="15" fill="#ffffff" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="9.5" font-weight="800" letter-spacing="0.04em">
@@ -1524,6 +2167,9 @@
                 </text>
               </g>
             </g>
+
+            <!-- 12. VOLUMETRIC ATMOSPHERIC LIMB VIGNETTE -->
+            <rect width="960" height="540" fill="none" stroke="rgba(2, 6, 16, 0.85)" stroke-width="20" opacity="0.75" pointer-events="none"/>
           </svg>
 
           <!-- On-Screen Transport Controls (Bottom-Left) matching Image 3 -->
@@ -2078,6 +2724,11 @@
       if (typeof window.tplBindInteractiveMapStage === 'function') {
         window.tplBindInteractiveMapStage(stage);
       }
+      if (typeof window.initUniversalStageTransformEngine === 'function') {
+        window.initUniversalStageTransformEngine();
+      }
+    } else if (tplId === 'map-pin-drop') {
+      fxc.innerHTML = window.tplBuildTacticalMapPinDropHtml(data);
       if (typeof window.initUniversalStageTransformEngine === 'function') {
         window.initUniversalStageTransformEngine();
       }
@@ -2900,8 +3551,7 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
-    if (tplId === 'map-pin-drop') tplId = 'map';
-    const container = document.getElementById('tpl-modal-dynamic-controls');
+        const container = document.getElementById('tpl-modal-dynamic-controls');
     const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
     const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
     const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
@@ -4170,9 +4820,396 @@
 
     // =========================================================================
     // SPECIAL HANDLER: INVESTIGATIVE GLOBE & TACTICAL MAP (map)
-    // High-End Cinematic World Map & 3D Pin Drop Rig (James Jani / Yes Theory standard)
+    // Granular World Map + Multi-Route Country-to-Country Transit + 3D Video Switch + Direct On-Screen Tracing
     // =========================================================================
-    if (tplId === 'map' || tplId === 'map-pin-drop') {
+    if (tplId === 'map') {
+      // Hide irrelevant generic Subject Cutout / AI Parallax sections so Cartography & Routes sit right at the top
+      if (stdLayers) stdLayers.style.display = 'none';
+      const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
+      if (aiWrapEl) aiWrapEl.style.display = 'none';
+      const atmoWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
+      if (atmoWrapEl) atmoWrapEl.style.display = 'none';
+
+      const routePresets = [
+        {
+          label: '\ud83c\uddfa\ud83c\uddf8 USA \u2192 \ud83c\udde8\ud83c\udde6 Canada (Cross-Border Flight)',
+          routes: [
+            { from: 'USA', to: 'Canada', fromLat: 39.8, fromLng: -98.5, toLat: 56.13, toLng: -106.35, mode: 'plane', color: '#38bdf8' }
+          ]
+        },
+        {
+          label: '\ud83c\uddfa\ud83c\uddf8 USA \u2192 \ud83c\uddec\ud83c\udde7 UK \u2192 \ud83c\uddfa\ud83c\udde6 Ukraine (Multi-Vector Transit)',
+          routes: [
+            { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
+            { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
+          ]
+        },
+        {
+          label: '\ud83c\udde8\ud83c\uddf3 China \u2192 \ud83c\uddf8\ud83c\uddec Singapore \u2192 \ud83c\udde6\ud83c\uddea UAE \u2192 \ud83c\uddea\ud83c\uddec Egypt (Maritime Trade)',
+          routes: [
+            { from: 'China', to: 'Singapore', fromLat: 35.86, fromLng: 104.2, toLat: 1.35, toLng: 103.82, mode: 'ship', color: '#2effc6' },
+            { from: 'Singapore', to: 'UAE', fromLat: 1.35, fromLng: 103.82, toLat: 23.42, toLng: 53.85, mode: 'ship', color: '#38bdf8' },
+            { from: 'UAE', to: 'Egypt', fromLat: 23.42, fromLng: 53.85, toLat: 26.82, toLng: 30.80, mode: 'ship', color: '#f59e0b' }
+          ]
+        },
+        {
+          label: '\ud83c\uddef\ud83c\uddf5 Japan \u2192 \ud83c\uddf0\ud83c\uddf7 South Korea \u2192 \ud83c\uddf8\ud83c\uddec Singapore \u2192 \ud83c\udde6\ud83c\uddfa Australia',
+          routes: [
+            { from: 'Japan', to: 'South Korea', fromLat: 36.2, fromLng: 138.25, toLat: 35.91, toLng: 127.77, mode: 'plane', color: '#38bdf8' },
+            { from: 'South Korea', to: 'Singapore', fromLat: 35.91, fromLng: 127.77, toLat: 1.35, toLng: 103.82, mode: 'plane', color: '#a855f7' },
+            { from: 'Singapore', to: 'Australia', fromLat: 1.35, fromLng: 103.82, toLat: -25.27, toLng: 133.78, mode: 'plane', color: '#2effc6' }
+          ]
+        },
+        {
+          label: '\ud83c\uddec\ud83c\udde7 UK \u2192 \ud83c\uddeb\ud83c\uddf7 France \u2192 \ud83c\udde8\ud83c\udded Switzerland \u2192 \ud83c\uddee\ud83c\uddf9 Italy (Euro High-Speed Rail)',
+          routes: [
+            { from: 'UK', to: 'France', fromLat: 54.0, fromLng: -2.0, toLat: 46.23, toLng: 2.21, mode: 'train', color: '#38bdf8' },
+            { from: 'France', to: 'Switzerland', fromLat: 46.23, fromLng: 2.21, toLat: 46.82, toLng: 8.23, mode: 'train', color: '#2effc6' },
+            { from: 'Switzerland', to: 'Italy', fromLat: 46.82, fromLng: 8.23, toLat: 41.87, toLng: 12.57, mode: 'train', color: '#f59e0b' }
+          ]
+        }
+      ];
+
+      const mapStyles = [
+        { id: 'harris-dark', label: 'Johnny Harris Dark' },
+        { id: 'satellite', label: 'Satellite Blue' },
+        { id: 'vox-archival', label: 'Vox Archival Paper' },
+        { id: 'radar-amber', label: 'Pentagon Radar' }
+      ];
+
+      const activeRoutes = Array.isArray(data.routes) && data.routes.length > 0 ? data.routes : [
+        { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 54.0, toLng: -2.0, mode: 'plane', color: '#38bdf8' }
+      ];
+      const is3D = !!data.is3DMode;
+      const isDraw = !!data.drawOnScreenMode;
+
+      container.innerHTML = `
+        <datalist id="map-geo-datalist">
+          ${WORLD_GEO_DB.map(g => `<option value="${g.name}"></option>`).join('')}
+        </datalist>
+
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.32); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px;">\ud83c\udf0d Multi-Route Globe & Transit Rig</span>
+            <span style="font-size: 9px; color: #2effc6; font-weight: 800; background: rgba(46,255,198,0.14); border: 1px solid rgba(46,255,198,0.35); padding: 2px 6px; border-radius: 4px;">${WORLD_GEO_DB.length}+ COUNTRIES</span>
+          </div>
+
+          <!-- \u25b6 VIDEO vs \u2b21 3D INTERACTIVE SWITCH + DIRECT ON-SCREEN TRACE -->
+          <div style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">Stage Mode (Video / 3D Interactive)</span>
+              <span style="font-size: 8.5px; font-family: monospace; color: ${is3D ? '#2effc6' : '#38bdf8'}; font-weight: 700;">${is3D ? '\u2b21 3D ACTIVE' : '\u25b6 AUTO VIDEO'}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" id="map-btn-mode-video" style="padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; border: 1px solid ${!is3D ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${!is3D ? 'rgba(56,189,248,0.25)' : 'rgba(0,0,0,0.4)'}; color: #fff;">\u25b6 Video Mode</button>
+              <button type="button" id="map-btn-mode-3d" style="padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; border: 1px solid ${is3D ? '#a855f7' : 'rgba(255,255,245,0.12)'}; background: ${is3D ? 'rgba(168,85,247,0.32)' : 'rgba(0,0,0,0.4)'}; color: #fff;">\u2b21 3D Interactive</button>
+            </div>
+            <button type="button" id="map-btn-draw-screen" style="width: 100%; padding: 6px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; border: 1px solid ${isDraw ? '#2effc6' : 'rgba(46,255,198,0.35)'}; background: ${isDraw ? 'rgba(46,255,198,0.24)' : 'rgba(46,255,198,0.08)'}; color: ${isDraw ? '#2effc6' : '#cbd5e1'}; display: flex; align-items: center; justify-content: center; gap: 6px;">
+              <span>\u270f\ufe0f</span> ${isDraw ? 'Tracing on Screen Active (Click or Drag on Map!)' : 'Trace Route Directly on Screen (3D Draw)'}
+            </button>
+          </div>
+
+          <!-- Projection Mode Toggle: 3D Globe vs 2D Granular World Map -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <button type="button" class="map-proj-btn" data-proj="globe" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${(data.projection || 'globe') === 'globe' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${(data.projection || 'globe') === 'globe' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">\ud83c\udf10 3D Globe</button>
+            <button type="button" class="map-proj-btn" data-proj="flat" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${data.projection === 'flat' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${data.projection === 'flat' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">\ud83d\uddfa\ufe0f 2D Granular Map</button>
+          </div>
+
+          <!-- MULTI-ROUTE COUNTRY-TO-COUNTRY BUILDER -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 9px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">\u2708\ufe0f\ud83d\udea2\ud83d\ude86 Country-to-Country Routes</span>
+              <button type="button" id="map-btn-add-route" style="background: rgba(46,255,198,0.16); border: 1px solid rgba(46,255,198,0.45); color: #2effc6; border-radius: 5px; padding: 2px 8px; font-size: 9.5px; font-weight: 800; cursor: pointer;">+ Add Route Leg</button>
+            </div>
+            <div style="font-size: 9px; color: #94a3b8; line-height: 1.35;">Type any country or city (e.g. <strong>USA</strong> to <strong>Canada</strong>, <strong>UK</strong> to <strong>Japan</strong>) and pick a transit vehicle.</div>
+
+            <!-- Quick Multi-Route Presets -->
+            <select id="map-route-preset-select" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; font-weight: 600; outline: none; cursor: pointer;">
+              <option value="">\u26a1 Load Multi-Route Preset...</option>
+              ${routePresets.map((rp, i) => `<option value="${i}">${rp.label}</option>`).join('')}
+            </select>
+
+            <!-- Dynamic Route Legs List -->
+            <div id="map-routes-list" style="display: flex; flex-direction: column; gap: 7px; max-height: 230px; overflow-y: auto; padding-right: 2px;">
+              ${activeRoutes.map((rt, idx) => `
+                <div class="map-route-row" data-idx="${idx}" style="background: rgba(15,23,42,0.75); border: 1px solid rgba(255,255,255,0.1); border-left: 3px solid ${rt.color || '#38bdf8'}; border-radius: 6px; padding: 7px; display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 9px; font-weight: 800; color: #94a3b8; font-family: monospace;">ROUTE LEG #${idx + 1}</span>
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                      <select class="map-rt-mode" data-idx="${idx}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 4px; cursor: pointer;">
+                        <option value="plane" ${(rt.mode || 'plane') === 'plane' ? 'selected' : ''}>\u2708\ufe0f Plane</option>
+                        <option value="ship" ${rt.mode === 'ship' ? 'selected' : ''}>\ud83d\udea2 Ship</option>
+                        <option value="train" ${rt.mode === 'train' ? 'selected' : ''}>\ud83d\ude86 Train</option>
+                        <option value="line" ${rt.mode === 'line' ? 'selected' : ''}>\u26a1 Line</option>
+                      </select>
+                      <input type="color" class="map-rt-color" data-idx="${idx}" value="${rt.color || '#38bdf8'}" style="width: 18px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Route Arc Color"/>
+                      ${activeRoutes.length > 1 ? `<button type="button" class="map-rt-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer; padding: 0 3px;" title="Remove Route">\u2715</button>` : ''}
+                    </div>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 5px;">
+                    <input type="text" list="map-geo-datalist" class="map-rt-from" data-idx="${idx}" value="${rt.from || 'USA'}" placeholder="From Country..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.14); border-radius: 5px; padding: 4px 6px; color: #fff; font-size: 10.5px; font-weight: 700; outline: none;" />
+                    <span style="color: #38bdf8; font-size: 11px; font-weight: 900;">\u2192</span>
+                    <input type="text" list="map-geo-datalist" class="map-rt-to" data-idx="${idx}" value="${rt.to || 'Canada'}" placeholder="To Country..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.14); border-radius: 5px; padding: 4px 6px; color: #2effc6; font-size: 10.5px; font-weight: 700; outline: none;" />
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Custom HUD Banner Label & Sub-Telemetry -->
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">HUD Title</span>
+              <input type="text" id="map-inp-loc" value="${data.location || 'USA \u2192 UK \u2192 Ukraine'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 7px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">HUD Telemetry</span>
+              <input type="text" id="map-inp-coords" value="${data.coords || 'MULTI-VECTOR TRANSIT'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 7px; color: #38bdf8; font-family: monospace; font-size: 10px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Cartography Theme Selector -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Cartography Theme</span>
+            <select id="map-style-select" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;">
+              ${mapStyles.map(s => `<option value="${s.id}" ${data.mapStyle === s.id ? 'selected' : ''} style="background:#0f172a;color:#fff;">${s.label}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- CAMERA ZOOM KEYFRAME TIMING ("When to zoom and stuff") -->
+          <div style="background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.22); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">\ud83c\udfa5 Camera Zoom & 3D Orbit</div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#e2e8f0;"><span>When to Start Zoom</span><strong id="map-zstart-lbl">${data.zoomStart ?? 0.8}s</strong></div>
+              <input type="range" id="map-inp-zstart" min="0" max="4" step="0.2" value="${data.zoomStart ?? 0.8}" style="accent-color:#38bdf8;cursor:pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#e2e8f0;"><span>Zoom Duration (Speed)</span><strong id="map-zdur-lbl">${data.zoomDuration ?? 2.2}s</strong></div>
+              <input type="range" id="map-inp-zdur" min="0.6" max="5" step="0.2" value="${data.zoomDuration ?? 2.2}" style="accent-color:#38bdf8;cursor:pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#e2e8f0;"><span>Target Zoom Level</span><strong id="map-zlvl-lbl">${data.zoomLevel ?? 1.9}x</strong></div>
+              <input type="range" id="map-inp-zlvl" min="1.1" max="4.5" step="0.1" value="${data.zoomLevel ?? 1.9}" style="accent-color:#38bdf8;cursor:pointer;" />
+            </div>
+          </div>
+
+          <!-- Pin Color & Flight Path Toggle -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#cbd5e1;cursor:pointer;">
+              <input type="checkbox" id="map-inp-arc" ${data.showFlightPath !== false ? 'checked' : ''} style="accent-color:#ef4444;" />
+              Show Transit Routes
+            </label>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <span style="font-size:9.5px;color:#94a3b8;">Pin Color</span>
+              <input type="color" id="map-inp-color" value="${data.pinColor || '#ef4444'}" style="width:24px;height:20px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Sync stage top-left Video / 3D buttons as well
+      const syncTopBarMode = (mode3d) => {
+        const pVid = document.getElementById('btn-paper-rip-mode-video');
+        const p3D = document.getElementById('btn-paper-rip-mode-3d');
+        if (pVid && p3D) {
+          pVid.style.background = !mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          pVid.style.color = !mode3d ? '#fff' : '#94a3b8';
+          p3D.style.background = mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          p3D.style.color = mode3d ? '#fff' : '#94a3b8';
+        }
+      };
+
+      const btnVid = container.querySelector('#map-btn-mode-video');
+      if (btnVid) {
+        btnVid.onclick = () => {
+          window.tplSetContextualData('map', { is3DMode: false, drawOnScreenMode: false });
+          syncTopBarMode(false);
+          window.tplRenderContextualInspector('map');
+        };
+      }
+      const btn3D = container.querySelector('#map-btn-mode-3d');
+      if (btn3D) {
+        btn3D.onclick = () => {
+          window.tplSetContextualData('map', { is3DMode: true });
+          syncTopBarMode(true);
+          window.tplRenderContextualInspector('map');
+        };
+      }
+      const btnDrawScreen = container.querySelector('#map-btn-draw-screen');
+      if (btnDrawScreen) {
+        btnDrawScreen.onclick = () => {
+          const nextDraw = !data.drawOnScreenMode;
+          window.tplSetContextualData('map', { is3DMode: true, drawOnScreenMode: nextDraw });
+          syncTopBarMode(true);
+          window.tplRenderContextualInspector('map');
+        };
+      }
+
+      container.querySelectorAll('.map-proj-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('map', { projection: btn.dataset.proj });
+          window.tplRenderContextualInspector('map');
+        };
+      });
+
+      // Route Preset Loader
+      const routePresetSel = container.querySelector('#map-route-preset-select');
+      if (routePresetSel) {
+        routePresetSel.onchange = (e) => {
+          const rp = routePresets[parseInt(e.target.value, 10)];
+          if (rp) {
+            const cloned = rp.routes.map(r => Object.assign({}, r));
+            const last = cloned[cloned.length - 1];
+            const locLabel = cloned.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
+            window.tplSetContextualData('map', {
+              routes: cloned,
+              location: locLabel,
+              coords: `MULTI-VECTOR TRANSIT // ${cloned.length} LEG${cloned.length > 1 ? 'S' : ''}`,
+              lat: last.toLat,
+              lng: last.toLng
+            });
+            window.tplRenderContextualInspector('map');
+          }
+        };
+      }
+
+      // Add Route Leg button
+      const btnAddRoute = container.querySelector('#map-btn-add-route');
+      if (btnAddRoute) {
+        btnAddRoute.onclick = () => {
+          const routes = activeRoutes.map(r => Object.assign({}, r));
+          const prev = routes[routes.length - 1] || { to: 'USA', toLat: 39.8, toLng: -98.5 };
+          const defaultNext = prev.to === 'Canada' ? 'UK' : (prev.to === 'UK' ? 'Japan' : 'Canada');
+          const nextGeo = window.tplResolveGeoLocation(defaultNext) || { name: 'Canada', lat: 56.13, lng: -106.35 };
+          const palette = ['#38bdf8', '#f59e0b', '#2effc6', '#a855f7', '#f43f5e'];
+          routes.push({
+            from: prev.to || 'USA',
+            to: nextGeo.name,
+            fromLat: prev.toLat ?? 39.8,
+            fromLng: prev.toLng ?? -98.5,
+            toLat: nextGeo.lat,
+            toLng: nextGeo.lng,
+            mode: 'plane',
+            color: palette[routes.length % palette.length]
+          });
+          const locLabel = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
+          window.tplSetContextualData('map', {
+            routes,
+            location: locLabel,
+            coords: `MULTI-VECTOR TRANSIT // ${routes.length} LEGS`,
+            lat: nextGeo.lat,
+            lng: nextGeo.lng
+          });
+          window.tplRenderContextualInspector('map');
+        };
+      }
+
+      // Wire individual route rows (From Country, To Country, Transit Mode, Color, Delete)
+      const syncRouteChange = (idx, field, val) => {
+        const routes = activeRoutes.map(r => Object.assign({}, r));
+        if (!routes[idx]) return;
+        routes[idx][field] = val;
+        if (field === 'from') {
+          const g = window.tplResolveGeoLocation(val);
+          if (g) {
+            routes[idx].fromLat = g.lat;
+            routes[idx].fromLng = g.lng;
+          }
+        } else if (field === 'to') {
+          const g = window.tplResolveGeoLocation(val);
+          if (g) {
+            routes[idx].toLat = g.lat;
+            routes[idx].toLng = g.lng;
+            // Also chain to next leg's origin if next leg exists!
+            if (routes[idx + 1]) {
+              routes[idx + 1].from = val;
+              routes[idx + 1].fromLat = g.lat;
+              routes[idx + 1].fromLng = g.lng;
+            }
+          }
+        }
+        const last = routes[routes.length - 1];
+        const locLabel = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
+        const locInpEl = container.querySelector('#map-inp-loc');
+        if (locInpEl) locInpEl.value = locLabel;
+        window.tplSetContextualData('map', {
+          routes,
+          location: locLabel,
+          lat: last.toLat ?? data.lat,
+          lng: last.toLng ?? data.lng
+        });
+      };
+
+      container.querySelectorAll('.map-rt-from').forEach(inp => {
+        inp.oninput = (e) => syncRouteChange(parseInt(inp.dataset.idx, 10), 'from', e.target.value);
+      });
+      container.querySelectorAll('.map-rt-to').forEach(inp => {
+        inp.oninput = (e) => syncRouteChange(parseInt(inp.dataset.idx, 10), 'to', e.target.value);
+      });
+      container.querySelectorAll('.map-rt-mode').forEach(sel => {
+        sel.onchange = (e) => syncRouteChange(parseInt(sel.dataset.idx, 10), 'mode', e.target.value);
+      });
+      container.querySelectorAll('.map-rt-color').forEach(col => {
+        col.oninput = (e) => syncRouteChange(parseInt(col.dataset.idx, 10), 'color', e.target.value);
+      });
+      container.querySelectorAll('.map-rt-del').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.dataset.idx, 10);
+          const routes = activeRoutes.filter((_, i) => i !== idx);
+          const locLabel = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
+          window.tplSetContextualData('map', { routes, location: locLabel });
+          window.tplRenderContextualInspector('map');
+        };
+      });
+
+      const styleSel = container.querySelector('#map-style-select');
+      if (styleSel) styleSel.onchange = (e) => window.tplSetContextualData('map', { mapStyle: e.target.value });
+
+      const locInp = container.querySelector('#map-inp-loc');
+      if (locInp) locInp.oninput = (e) => window.tplSetContextualData('map', { location: e.target.value });
+      const coordsInp = container.querySelector('#map-inp-coords');
+      if (coordsInp) coordsInp.oninput = (e) => window.tplSetContextualData('map', { coords: e.target.value });
+
+      const zsInp = container.querySelector('#map-inp-zstart');
+      if (zsInp) zsInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const l = container.querySelector('#map-zstart-lbl'); if (l) l.textContent = `${v}s`;
+        window.tplSetContextualData('map', { zoomStart: v });
+      };
+      const zdInp = container.querySelector('#map-inp-zdur');
+      if (zdInp) zdInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const l = container.querySelector('#map-zdur-lbl'); if (l) l.textContent = `${v}s`;
+        window.tplSetContextualData('map', { zoomDuration: v });
+      };
+      const zlInp = container.querySelector('#map-inp-zlvl');
+      if (zlInp) zlInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const l = container.querySelector('#map-zlvl-lbl'); if (l) l.textContent = `${v}x`;
+        window.tplSetContextualData('map', { zoomLevel: v });
+      };
+      const arcInp = container.querySelector('#map-inp-arc');
+      if (arcInp) arcInp.onchange = (e) => window.tplSetContextualData('map', { showFlightPath: e.target.checked });
+      const colInp = container.querySelector('#map-inp-color');
+      if (colInp) colInp.oninput = (e) => window.tplSetContextualData('map', { pinColor: e.target.value });
+
+      // Ensure interactive stage bindings are active on initial open
+      setTimeout(() => {
+        const stageEl = document.getElementById('tpl-modal-preview-stage');
+        if (stageEl && typeof window.tplBindInteractiveMapStage === 'function') {
+          window.tplBindInteractiveMapStage(stageEl);
+        }
+      }, 60);
+      return;
+    }
+
+    // =========================================================================
+    //
+
+    // SPECIAL HANDLER: LAYERED CINEMATIC 3D MAP PIN DROP (map-pin-drop)
+    // High-Resolution Scalable Vector System - James Jani / Yes Theory standard
+    // =========================================================================
+    if (tplId === 'map-pin-drop') {
       if (stdLayers) stdLayers.style.display = 'none';
       const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
       if (aiWrapEl) aiWrapEl.style.display = 'none';
@@ -4194,151 +5231,124 @@
             { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
             { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 50.4501, toLng: 30.5234, mode: 'plane', color: '#38bdf8' }
           ]
-        },
-        {
-          label: '🇨🇳 China → 🇸🇬 Singapore → 🇦🇪 UAE → 🇪🇬 Egypt (Maritime Route)',
-          routes: [
-            { from: 'China', to: 'Singapore', fromLat: 35.86, fromLng: 104.2, toLat: 1.35, toLng: 103.82, mode: 'ship', color: '#2effc6' },
-            { from: 'Singapore', to: 'UAE', fromLat: 1.35, fromLng: 103.82, toLat: 23.42, toLng: 53.85, mode: 'ship', color: '#38bdf8' },
-            { from: 'UAE', to: 'Egypt', fromLat: 23.42, fromLng: 53.85, toLat: 26.82, toLng: 30.80, mode: 'ship', color: '#f59e0b' }
-          ]
         }
       ];
 
-      const activeRoutes = Array.isArray(data.routes) && data.routes.length > 0 ? data.routes : [
-        { from: 'Americas', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#f97316' },
-        { from: 'UK', to: 'Kyiv', fromLat: 51.50, fromLng: -0.12, toLat: 50.4501, toLng: 30.5234, mode: 'plane', color: '#f97316' }
-      ];
       const is3D = data.is3DMode !== false;
       const curMaterial = data.pinMaterial || 'copper';
 
       container.innerHTML = `
-        <datalist id="map-geo-datalist">
-          ${WORLD_GEO_DB.map(g => `<option value="${g.name}"></option>`).join('')}
-        </datalist>
-
         <div style="background: rgba(15,23,42,0.7); border: 1px solid rgba(249,115,22,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px;">
-          <!-- Header Bar -->
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
             <div style="display: flex; align-items: center; gap: 7px;">
               <span style="font-size: 14px;">📍</span>
-              <span style="font-size: 11px; font-weight: 800; color: #fed7aa; text-transform: uppercase; letter-spacing: 0.6px;">3D Map Pin Drop Rig</span>
+              <span style="font-size: 11px; font-weight: 800; color: #fed7aa; text-transform: uppercase; letter-spacing: 0.6px;">Layered Vector 3D Pin Drop</span>
             </div>
-            <span style="font-size: 8.5px; color: #f97316; font-weight: 800; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.4); padding: 2px 7px; border-radius: 12px; font-family: monospace;">JAMES JANI / YES THEORY</span>
+            <span style="font-size: 8.5px; color: #f97316; font-weight: 800; background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.4); padding: 2px 7px; border-radius: 12px; font-family: monospace;">SCALABLE VECTOR</span>
           </div>
 
-          <!-- Section 1: Target Drop Location & Telemetry HUD -->
+          <!-- Section 1: Target Coordinates & HUD -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase; letter-spacing: 0.5px;">📍 Target Coordinate Drop & Leader HUD</span>
+            <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase;">📍 Target Coordinate Drop & Leader HUD</span>
             
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Location Title</span>
-              <input type="text" id="map-inp-loc" value="${data.location || 'KYIV, UKRAINE'}" placeholder="e.g. KYIV, UKRAINE" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
+              <input type="text" id="vtr-inp-loc" value="${data.location || 'KYIV, UKRAINE'}" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
               <div style="display: flex; flex-direction: column; gap: 3px;">
-                <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">GPS Coordinates</span>
-                <input type="text" id="map-inp-coords" value="${data.coords || '50.4501°N 30.5234°E'}" placeholder="e.g. 50.4501°N 30.5234°E" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #fdba74; font-family: monospace; font-size: 10px; font-weight: 600; outline: none;" />
+                <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Coordinates</span>
+                <input type="text" id="vtr-inp-coords" value="${data.coords || '50.4501°N 30.5234°E'}" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #fdba74; font-family: monospace; font-size: 10px; font-weight: 600; outline: none;" />
               </div>
               <div style="display: flex; flex-direction: column; gap: 3px;">
                 <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Telemetry Code</span>
-                <input type="text" id="map-inp-telemetry" value="${data.telemetry || 'O.SR5911TES     DFX35.EVA'}" placeholder="e.g. O.SR5911TES DFX35.EVA" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #94a3b8; font-family: monospace; font-size: 10px; font-weight: 600; outline: none;" />
+                <input type="text" id="vtr-inp-telemetry" value="${data.telemetry || 'O.SR5911TES     DFX35.EVA'}" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #94a3b8; font-family: monospace; font-size: 10px; font-weight: 600; outline: none;" />
               </div>
             </div>
           </div>
 
           <!-- Section 2: 3D Metallic Pin Material -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase; letter-spacing: 0.5px;">⚙️ 3D Metallic Pin Material</span>
-              <span style="font-size: 8.5px; color: #cbd5e1; font-family: monospace;">LATHE BEVEL</span>
-            </div>
+            <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase;">⚙️ 3D Metallic Pin Material</span>
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
-              <button type="button" class="map-btn-mat ${curMaterial === 'copper' ? 'active' : ''}" data-mat="copper" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curMaterial === 'copper' ? '#f97316' : 'rgba(255,255,255,0.12)'}; background: ${curMaterial === 'copper' ? 'rgba(249,115,22,0.25)' : '#0f172a'}; color: ${curMaterial === 'copper' ? '#fed7aa' : '#94a3b8'}; transition: all 0.15s;">
+              <button type="button" class="vtr-btn-mat ${curMaterial === 'copper' ? 'active' : ''}" data-mat="copper" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curMaterial === 'copper' ? '#f97316' : 'rgba(255,255,255,0.12)'}; background: ${curMaterial === 'copper' ? 'rgba(249,115,22,0.25)' : '#0f172a'}; color: ${curMaterial === 'copper' ? '#fed7aa' : '#94a3b8'};">
                 Brushed Copper
               </button>
-              <button type="button" class="map-btn-mat ${curMaterial === 'steel' ? 'active' : ''}" data-mat="steel" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curMaterial === 'steel' ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${curMaterial === 'steel' ? 'rgba(56,189,248,0.22)' : '#0f172a'}; color: ${curMaterial === 'steel' ? '#ffffff' : '#94a3b8'}; transition: all 0.15s;">
+              <button type="button" class="vtr-btn-mat ${curMaterial === 'steel' ? 'active' : ''}" data-mat="steel" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curMaterial === 'steel' ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${curMaterial === 'steel' ? 'rgba(56,189,248,0.22)' : '#0f172a'}; color: ${curMaterial === 'steel' ? '#ffffff' : '#94a3b8'};">
                 Brushed Steel
               </button>
-              <button type="button" class="map-btn-mat ${curMaterial === 'gold' ? 'active' : ''}" data-mat="gold" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curMaterial === 'gold' ? '#eab308' : 'rgba(255,255,255,0.12)'}; background: ${curMaterial === 'gold' ? 'rgba(234,179,8,0.25)' : '#0f172a'}; color: ${curMaterial === 'gold' ? '#fef08a' : '#94a3b8'}; transition: all 0.15s;">
+              <button type="button" class="vtr-btn-mat ${curMaterial === 'gold' ? 'active' : ''}" data-mat="gold" style="padding: 7px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curMaterial === 'gold' ? '#eab308' : 'rgba(255,255,255,0.12)'}; background: ${curMaterial === 'gold' ? 'rgba(234,179,8,0.25)' : '#0f172a'}; color: ${curMaterial === 'gold' ? '#fef08a' : '#94a3b8'};">
                 24K Gold
               </button>
             </div>
           </div>
 
-          <!-- Section 3: Modular Layer Engine (Overlays) -->
+          <!-- Section 3: Modular Vector Layers -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase; letter-spacing: 0.5px;">🗺️ Modular Map Layers</span>
-              <span style="font-size: 8.5px; color: #cbd5e1; font-family: monospace;">5 LAYERS</span>
-            </div>
+            <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase;">🗺️ Modular Vector Layers (Infinite Resolution)</span>
             <div style="display: flex; flex-direction: column; gap: 6px;">
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #e2e8f0; cursor: pointer;">
-                <span>Shaded Topography & Relief</span>
-                <input type="checkbox" id="map-toggle-topo" checked style="accent-color: #f97316; cursor: pointer;" />
+                <span>Shaded Topographic Relief</span>
+                <input type="checkbox" id="vtr-toggle-topo" checked style="accent-color: #f97316; cursor: pointer;" />
               </label>
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #e2e8f0; cursor: pointer;">
                 <span>Country Borders & Coastlines</span>
-                <input type="checkbox" id="map-toggle-borders" ${data.showBorders !== false ? 'checked' : ''} style="accent-color: #f97316; cursor: pointer;" />
+                <input type="checkbox" id="vtr-toggle-borders" ${data.showBorders !== false ? 'checked' : ''} style="accent-color: #f97316; cursor: pointer;" />
               </label>
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #e2e8f0; cursor: pointer;">
-                <span>City & Geographic Labels</span>
-                <input type="checkbox" id="map-toggle-labels" ${data.showLabels !== false ? 'checked' : ''} style="accent-color: #f97316; cursor: pointer;" />
+                <span>Geographic Vector Labels</span>
+                <input type="checkbox" id="vtr-toggle-labels" ${data.showLabels !== false ? 'checked' : ''} style="accent-color: #f97316; cursor: pointer;" />
               </label>
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #e2e8f0; cursor: pointer;">
-                <span>Ground Impact Dust Plume & Shockwave</span>
-                <input type="checkbox" id="map-toggle-dust" ${data.showImpactDust !== false ? 'checked' : ''} style="accent-color: #f97316; cursor: pointer;" />
+                <span>Ground Impact Dust Plume</span>
+                <input type="checkbox" id="vtr-toggle-dust" ${data.showImpactDust !== false ? 'checked' : ''} style="accent-color: #f97316; cursor: pointer;" />
               </label>
               <label style="display: flex; align-items: center; justify-content: space-between; font-size: 10px; color: #e2e8f0; cursor: pointer;">
                 <span>Dynamic Ocean Water Currents</span>
-                <input type="checkbox" id="map-toggle-water" ${data.showWaterCurrents !== false ? 'checked' : ''} style="accent-color: #38bdf8; cursor: pointer;" />
+                <input type="checkbox" id="vtr-toggle-water" ${data.showWaterCurrents !== false ? 'checked' : ''} style="accent-color: #38bdf8; cursor: pointer;" />
               </label>
             </div>
           </div>
 
-          <!-- Section 4: Cinematic 3D Camera & Parallax Perspective -->
+          <!-- Section 4: Cinematic 3D Camera -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase; letter-spacing: 0.5px;">🎥 Cinematic 3D Camera & Tilt</span>
+              <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase;">🎥 3D Camera Tilt (Parallax Perspective)</span>
               <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #2effc6; cursor: pointer;">
-                <input type="checkbox" id="map-toggle-3d" ${is3D ? 'checked' : ''} style="accent-color: #2effc6;" />
+                <input type="checkbox" id="vtr-toggle-3d" ${is3D ? 'checked' : ''} style="accent-color: #2effc6;" />
                 <span>3D Tilt Active</span>
               </label>
             </div>
-            
             <div style="display: flex; flex-direction: column; gap: 4px;">
               <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #cbd5e1;">
                 <span>Camera Pitch (Tilt X)</span>
-                <strong id="map-pitch-lbl" style="color: #fed7aa; font-family: monospace;">${data.pitch3D !== undefined ? data.pitch3D : 10}°</strong>
+                <strong id="vtr-pitch-lbl" style="color: #fed7aa; font-family: monospace;">${data.pitch3D !== undefined ? data.pitch3D : 10}°</strong>
               </div>
-              <input type="range" id="map-inp-pitch" min="-25" max="35" step="1" value="${data.pitch3D !== undefined ? data.pitch3D : 10}" style="accent-color: #f97316; cursor: pointer; height: 3px;" />
+              <input type="range" id="vtr-inp-pitch" min="-25" max="35" step="1" value="${data.pitch3D !== undefined ? data.pitch3D : 10}" style="accent-color: #f97316; cursor: pointer; height: 3px;" />
             </div>
-
             <div style="display: flex; flex-direction: column; gap: 4px;">
               <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #cbd5e1;">
                 <span>Camera Yaw (Pan Y)</span>
-                <strong id="map-yaw-lbl" style="color: #fed7aa; font-family: monospace;">${data.yaw3D !== undefined ? data.yaw3D : -3}°</strong>
+                <strong id="vtr-yaw-lbl" style="color: #fed7aa; font-family: monospace;">${data.yaw3D !== undefined ? data.yaw3D : -3}°</strong>
               </div>
-              <input type="range" id="map-inp-yaw" min="-25" max="25" step="1" value="${data.yaw3D !== undefined ? data.yaw3D : -3}" style="accent-color: #f97316; cursor: pointer; height: 3px;" />
+              <input type="range" id="vtr-inp-yaw" min="-25" max="25" step="1" value="${data.yaw3D !== undefined ? data.yaw3D : -3}" style="accent-color: #f97316; cursor: pointer; height: 3px;" />
             </div>
           </div>
 
-          <!-- Section 5: Transit Arcs & Flight Routes -->
+          <!-- Section 5: Transit Arcs -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase; letter-spacing: 0.5px;">✈️ Flight Paths & Route Arcs</span>
+              <span style="font-size: 9.5px; font-weight: 800; color: #fdba74; text-transform: uppercase;">✈️ Flight Paths & Route Arcs</span>
               <div style="display: flex; align-items: center; gap: 6px;">
-                <input type="color" id="map-inp-color" value="${data.pinColor || '#f97316'}" style="width: 20px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Arc & Accent Color" />
+                <input type="color" id="vtr-inp-color" value="${data.pinColor || '#f97316'}" style="width: 20px; height: 20px; border: none; background: transparent; cursor: pointer;" />
                 <label style="display: flex; align-items: center; gap: 4px; font-size: 9.5px; color: #cbd5e1; cursor: pointer;">
-                  <input type="checkbox" id="map-inp-arc" ${data.showFlightPath !== false ? 'checked' : ''} style="accent-color: #f97316;" />
+                  <input type="checkbox" id="vtr-inp-arc" ${data.showFlightPath !== false ? 'checked' : ''} style="accent-color: #f97316;" />
                   <span>Show</span>
                 </label>
               </div>
             </div>
-
-            <!-- Route Presets Dropdown -->
-            <select id="map-route-preset-select" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; font-weight: 600; outline: none; cursor: pointer;">
+            <select id="vtr-route-preset-select" style="background: #080c16; border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; font-weight: 600; outline: none; cursor: pointer;">
               <option value="">⚡ Load Transit Arcs Preset...</option>
               ${routePresets.map((rp, i) => `<option value="${i}">${rp.label}</option>`).join('')}
             </select>
@@ -4346,80 +5356,75 @@
         </div>
       `;
 
-      // Event Bindings
-      // 1. Location and Telemetry
-      const locInp = container.querySelector('#map-inp-loc');
-      if (locInp) locInp.oninput = (e) => window.tplSetContextualData('map', { location: e.target.value });
+      // Event Listeners for map-pin-drop
+      const locInp = container.querySelector('#vtr-inp-loc');
+      if (locInp) locInp.oninput = (e) => window.tplSetContextualData('map-pin-drop', { location: e.target.value });
 
-      const coordsInp = container.querySelector('#map-inp-coords');
-      if (coordsInp) coordsInp.oninput = (e) => window.tplSetContextualData('map', { coords: e.target.value });
+      const coordsInp = container.querySelector('#vtr-inp-coords');
+      if (coordsInp) coordsInp.oninput = (e) => window.tplSetContextualData('map-pin-drop', { coords: e.target.value });
 
-      const telInp = container.querySelector('#map-inp-telemetry');
-      if (telInp) telInp.oninput = (e) => window.tplSetContextualData('map', { telemetry: e.target.value });
+      const telInp = container.querySelector('#vtr-inp-telemetry');
+      if (telInp) telInp.oninput = (e) => window.tplSetContextualData('map-pin-drop', { telemetry: e.target.value });
 
-      // 2. Pin Material
-      container.querySelectorAll('.map-btn-mat').forEach(btn => {
+      container.querySelectorAll('.vtr-btn-mat').forEach(btn => {
         btn.onclick = () => {
-          const mat = btn.dataset.mat;
-          window.tplSetContextualData('map', { pinMaterial: mat });
-          window.tplRenderContextualInspector('map');
+          window.tplSetContextualData('map-pin-drop', { pinMaterial: btn.dataset.mat });
+          window.tplRenderContextualInspector('map-pin-drop');
         };
       });
 
-      // 3. Layer Toggles
-      const tBorders = container.querySelector('#map-toggle-borders');
-      if (tBorders) tBorders.onchange = (e) => window.tplSetContextualData('map', { showBorders: e.target.checked });
+      const tBorders = container.querySelector('#vtr-toggle-borders');
+      if (tBorders) tBorders.onchange = (e) => window.tplSetContextualData('map-pin-drop', { showBorders: e.target.checked });
 
-      const tLabels = container.querySelector('#map-toggle-labels');
-      if (tLabels) tLabels.onchange = (e) => window.tplSetContextualData('map', { showLabels: e.target.checked });
+      const tLabels = container.querySelector('#vtr-toggle-labels');
+      if (tLabels) tLabels.onchange = (e) => window.tplSetContextualData('map-pin-drop', { showLabels: e.target.checked });
 
-      const tDust = container.querySelector('#map-toggle-dust');
-      if (tDust) tDust.onchange = (e) => window.tplSetContextualData('map', { showImpactDust: e.target.checked });
+      const tDust = container.querySelector('#vtr-toggle-dust');
+      if (tDust) tDust.onchange = (e) => window.tplSetContextualData('map-pin-drop', { showImpactDust: e.target.checked });
 
-      const tWater = container.querySelector('#map-toggle-water');
-      if (tWater) tWater.onchange = (e) => window.tplSetContextualData('map', { showWaterCurrents: e.target.checked });
+      const tWater = container.querySelector('#vtr-toggle-water');
+      if (tWater) tWater.onchange = (e) => window.tplSetContextualData('map-pin-drop', { showWaterCurrents: e.target.checked });
 
-      // 4. 3D Camera Controls
-      const t3D = container.querySelector('#map-toggle-3d');
+      const t3D = container.querySelector('#vtr-toggle-3d');
       if (t3D) t3D.onchange = (e) => {
-        window.tplSetContextualData('map', { is3DMode: e.target.checked });
-        window.tplRenderContextualInspector('map');
+        window.tplSetContextualData('map-pin-drop', { is3DMode: e.target.checked });
+        window.tplRenderContextualInspector('map-pin-drop');
       };
 
-      const pInp = container.querySelector('#map-inp-pitch');
+      const pInp = container.querySelector('#vtr-inp-pitch');
       if (pInp) pInp.oninput = (e) => {
         const v = parseFloat(e.target.value);
-        const l = container.querySelector('#map-pitch-lbl'); if (l) l.textContent = `${v}°`;
-        window.tplSetContextualData('map', { pitch3D: v });
+        const l = container.querySelector('#vtr-pitch-lbl'); if (l) l.textContent = `${v}°`;
+        window.tplSetContextualData('map-pin-drop', { pitch3D: v });
       };
 
-      const yInp = container.querySelector('#map-inp-yaw');
+      const yInp = container.querySelector('#vtr-inp-yaw');
       if (yInp) yInp.oninput = (e) => {
         const v = parseFloat(e.target.value);
-        const l = container.querySelector('#map-yaw-lbl'); if (l) l.textContent = `${v}°`;
-        window.tplSetContextualData('map', { yaw3D: v });
+        const l = container.querySelector('#vtr-yaw-lbl'); if (l) l.textContent = `${v}°`;
+        window.tplSetContextualData('map-pin-drop', { yaw3D: v });
       };
 
-      // 5. Arcs and Color
-      const arcInp = container.querySelector('#map-inp-arc');
-      if (arcInp) arcInp.onchange = (e) => window.tplSetContextualData('map', { showFlightPath: e.target.checked });
+      const arcInp = container.querySelector('#vtr-inp-arc');
+      if (arcInp) arcInp.onchange = (e) => window.tplSetContextualData('map-pin-drop', { showFlightPath: e.target.checked });
 
-      const colInp = container.querySelector('#map-inp-color');
-      if (colInp) colInp.oninput = (e) => window.tplSetContextualData('map', { pinColor: e.target.value });
+      const colInp = container.querySelector('#vtr-inp-color');
+      if (colInp) colInp.oninput = (e) => window.tplSetContextualData('map-pin-drop', { pinColor: e.target.value });
 
-      const routePresetSel = container.querySelector('#map-route-preset-select');
+      const routePresetSel = container.querySelector('#vtr-route-preset-select');
       if (routePresetSel) {
         routePresetSel.onchange = (e) => {
           const rp = routePresets[parseInt(e.target.value, 10)];
           if (rp) {
-            window.tplSetContextualData('map', { routes: rp.routes });
-            window.tplRenderContextualInspector('map');
+            window.tplSetContextualData('map-pin-drop', { routes: rp.routes });
+            window.tplRenderContextualInspector('map-pin-drop');
           }
         };
       }
 
       return;
     }
+
 
     // SPECIAL HANDLER: PORTFOLIO ALLOCATION PIE (pie)
     // Allows selecting different portfolio types + customizing slices & percentages

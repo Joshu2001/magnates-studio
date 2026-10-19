@@ -23507,17 +23507,140 @@ const EFFECT_TEMPLATES_DATA = [
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="203" y="127" fill="#ff006e" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><text x="197" y="123" fill="#00f5d4" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><text x="200" y="125" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="48" text-anchor="middle">THE TRUTH</text><line x1="0" y1="120" x2="400" y2="120" stroke="#fff" stroke-width="1.5" opacity="0.6"/></svg>`)}`
   },
   {
-    id: 'map',
+id: 'map',
     title: 'Map Pin Drop',
     category: 'Animations',
     origCategory: 'Animations',
-    badge: 'MEDIUM',
+    badge: 'STORY',
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Cinematic 3D Map Pin Drop with topographic relief, 3D metallic brushed copper pin, shockwave impact dynamics & HUD telemetry.',
-    tags: ['Animations', 'Map Pin Drop', '3D Tactical Globe', 'Motion Template', 'Cinematic Cartography'],
-    defaultImage: '/cinematic_tactical_world_map_kyiv.png'
+    description: '3D Tactical Globe with vector Great-Circle flight arcs & HUD reticles.',
+    tags: ['Animations', 'Map Pin Drop', '3D Tactical Globe', 'Motion Template'],
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+      <defs>
+        <radialGradient id="thumbBg" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#08182b"/>
+          <stop offset="100%" stop-color="#020610"/>
+        </radialGradient>
+        <radialGradient id="thumbSphere" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#0e2a4a"/>
+          <stop offset="50%" stop-color="#06162a"/>
+          <stop offset="85%" stop-color="#020813"/>
+          <stop offset="100%" stop-color="#01040a"/>
+        </radialGradient>
+        <radialGradient id="thumbFresnel" cx="50%" cy="50%" r="50%">
+          <stop offset="78%" stop-color="#38bdf8" stop-opacity="0"/>
+          <stop offset="90%" stop-color="#38bdf8" stop-opacity="0.3"/>
+          <stop offset="97%" stop-color="#7dd3fc" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+        </radialGradient>
+        <clipPath id="thumbGlobeClip">
+          <circle cx="200" cy="114" r="98"/>
+        </clipPath>
+        <filter id="thumbGlow">
+          <feGaussianBlur stdDeviation="3"/>
+        </filter>
+      </defs>
+      <rect width="400" height="225" fill="url(#thumbBg)"/>
+      <!-- Outer Space Grid -->
+      <g stroke="rgba(56,189,248,0.15)" stroke-width="0.5">
+        <line x1="0" y1="112" x2="400" y2="112"/><line x1="200" y1="0" x2="200" y2="225"/>
+      </g>
+      <!-- 3D Atmosphere Rim Lighting Halo -->
+      <circle cx="200" cy="114" r="98" fill="none" stroke="#38bdf8" stroke-width="2.5" opacity="0.9" filter="url(#thumbGlow)"/>
+      <circle cx="200" cy="114" r="102" fill="none" stroke="#0ea5e9" stroke-width="5" opacity="0.45" filter="url(#thumbGlow)"/>
+      <circle cx="200" cy="114" r="98" fill="url(#thumbSphere)" stroke="rgba(56,189,248,0.7)" stroke-width="1.2"/>
+      <!-- Globe Body -->
+      <g clip-path="url(#thumbGlobeClip)">
+        <!-- Spherical Graticules -->
+        <g stroke="rgba(56,189,248,0.18)" stroke-width="0.5" fill="none">
+          <ellipse cx="200" cy="62" rx="72" ry="22"/>
+          <ellipse cx="200" cy="78" rx="88" ry="26"/>
+          <ellipse cx="200" cy="95" rx="98" ry="30"/>
+          <ellipse cx="200" cy="114" rx="98" ry="32"/>
+          <line x1="102" y1="114" x2="298" y2="114"/>
+          <ellipse cx="200" cy="133" rx="98" ry="30"/>
+          <ellipse cx="200" cy="150" rx="88" ry="26"/>
+          <ellipse cx="200" cy="114" rx="28" ry="98"/>
+          <ellipse cx="200" cy="114" rx="58" ry="98"/>
+          <ellipse cx="200" cy="114" rx="85" ry="98"/>
+          <line x1="200" y1="16" x2="200" y2="212"/>
+        </g>
+        <!-- Continents & Coastlines -->
+        <g fill="#0a1c33" stroke="#38bdf8" stroke-width="0.65" fill-opacity="0.95">
+          <!-- Europe / Scandinavia / UK -->
+          <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 Z"/>
+          <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 206 45 Z"/>
+          <path d="M 184 63 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 216 64 L 212 68 L 215 74 L 201 66 L 184 70 Z"/>
+          <path d="M 208 72 L 213 71 L 217 76 L 219 82 L 212 77 Z"/>
+          <!-- Ukraine highlighted border -->
+          <path d="M 221 68 L 226 67 L 233 67 L 237 70 L 236 74 L 232 75 L 229 76 L 221 71 Z" fill="rgba(251,191,36,0.18)" stroke="#fbbf24" stroke-width="1.3"/>
+          <!-- Russia / Asia -->
+          <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 364 52 L 346 72 L 328 96 L 288 110 L 258 84 L 238 56 Z"/>
+          <!-- Turkey / Middle East -->
+          <path d="M 226 75 L 238 73 L 245 76 L 244 80 L 228 80 Z"/>
+          <path d="M 234 88 L 248 86 L 258 90 L 264 98 L 244 104 L 236 94 Z"/>
+          <!-- Africa -->
+          <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 209 171 L 199 135 L 179 111 L 177 83 Z"/>
+        </g>
+        <!-- Country Labels -->
+        <g fill="rgba(226,232,240,0.75)" font-family="'JetBrains Mono',monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle">
+          <text x="260" y="35">RUSSIA</text>
+          <text x="189" y="67">UK</text>
+          <text x="198" y="77">FRANCE</text>
+          <text x="209" y="73">GERMANY</text>
+          <text x="219" y="71">POLAND</text>
+          <text x="212" y="81">ITALY</text>
+          <text x="236" y="81">TURKEY</text>
+          <text x="254" y="85">IRAN</text>
+          <text x="248" y="96">SAUDI ARABIA</text>
+          <text x="220" y="93">LIBYA</text>
+          <text x="232" y="93">EGYPT</text>
+          <text x="228" y="105">SUDAN</text>
+          <text x="203" y="112">NIGERIA</text>
+        </g>
+        <!-- 3D Great-Circle Flight Path Arc & Jet -->
+        <path d="M 120 75 Q 165 42 199 69" fill="none" stroke="#38bdf8" stroke-width="4.2" opacity="0.32"/>
+        <path d="M 120 75 Q 165 42 199 69" fill="none" stroke="#38bdf8" stroke-width="1.8"/>
+        <path d="M 120 75 Q 165 42 199 69" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4"/>
+        <path d="M 199 69 Q 214 62 229 71" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="3 2"/>
+        <!-- Aircraft Sprite -->
+        <g transform="translate(165, 52) rotate(18)">
+          <line x1="-8" y1="0" x2="-20" y2="0" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M 10 0 L 2.8 -1.6 L -2.8 -9.8 L -4.8 -9.8 L -2.2 -1.6 L -7.8 -1.4 L -10.2 -4.8 L -11.8 -4.8 L -10.5 0 L -11.8 4.8 L -10.2 4.8 L -7.8 1.4 L -2.2 1.6 L -4.8 9.8 L -2.8 9.8 L 2.8 1.6 Z" fill="#ffffff" stroke="#38bdf8" stroke-width="0.8"/>
+        </g>
+        <!-- London Waypoint HUD -->
+        <circle cx="199" cy="69" r="2.2" fill="#38bdf8" stroke="#ffffff" stroke-width="0.7"/>
+        <circle cx="199" cy="69" r="4.8" fill="none" stroke="#38bdf8" stroke-width="0.6" opacity="0.7"/>
+        <path d="M 199 65 L 199 57 L 214 57" fill="none" stroke="#38bdf8" stroke-width="0.65"/>
+        <text x="216" y="55" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900">LONDON</text>
+        <text x="216" y="59" fill="#38bdf8" font-family="'JetBrains Mono',monospace" font-size="2.8" font-weight="700">51.50°N 0.12°W</text>
+        <!-- Ukraine Tactical Multi-Ring Reticle HUD -->
+        <g transform="translate(229, 71)">
+          <circle cx="0" cy="0" r="15" fill="none" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
+          <circle cx="0" cy="0" r="9.5" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.95"/>
+          <circle cx="0" cy="0" r="3.2" fill="#fbbf24" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
+          <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="#38bdf8" stroke-width="0.75"/>
+          <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">UKRAINE</text>
+          <text x="26" y="-14.5" fill="#38bdf8" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700">48.37°N 31.16°E</text>
+        </g>
+        <!-- Volumetric 3D Fresnel Limb Overlay -->
+        <circle cx="200" cy="114" r="98" fill="url(#thumbFresnel)" pointer-events="none"/>
+      </g>
+      <!-- Bottom-Left Floating Glassmorphic HUD Card -->
+      <g transform="translate(12, 138)">
+        <rect width="176" height="56" rx="10" fill="rgba(8,20,38,0.78)" stroke="rgba(56,189,248,0.35)" stroke-width="1"/>
+        <text x="10" y="16" fill="#38bdf8" font-family="'JetBrains Mono',monospace" font-size="8.5" font-weight="700">[MULTI-VECTOR TRANSIT 01]   [ACTIVE LEGS: 2]</text>
+        <text x="10" y="34" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="800">🇺🇸 USA <tspan fill="#38bdf8">→</tspan> UK</text>
+        <text x="10" y="49" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="13" font-weight="800"><tspan fill="#38bdf8">➔</tspan> UK <tspan fill="#38bdf8">→</tspan> UKRAINE</text>
+      </g>
+      <!-- Telemetry Bar -->
+      <line x1="12" y1="212" x2="388" y2="212" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <text x="12" y="221" fill="rgba(148,163,184,0.85)" font-family="'JetBrains Mono',monospace" font-size="8">SAT-LOCK // 3D ORTHOGRAPHIC GLOBE</text>
+      <text x="388" y="221" fill="rgba(148,163,184,0.85)" font-family="'JetBrains Mono',monospace" font-size="8" text-anchor="end">2 ROUTES · ZOOM @ 0.8s · 1.9x</text>
+    </svg>`)}`
   },
   {
     id: 'news',
@@ -25781,12 +25904,19 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`; } else if (tplId === 'glitch') {
       fxContainer.innerHTML = `<div class="tpl-glitch">
           <div class="glitch-text" data-text="THE TRUTH">THE TRUTH</div>
-        </div>`; } else if (tplId === 'map' || tplId === 'map-pin-drop') {
+        </div>`; } else if (tplId === 'map') {
       const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : {};
       if (typeof window.tplBuildInvestigativeGlobeHtml === 'function') {
         fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData);
       } else {
-        fxContainer.innerHTML = `<div class="tpl-map"><img src="/cinematic_tactical_world_map_kyiv.png" style="width:100%;height:100%;object-fit:cover;"/></div>`;
+        fxContainer.innerHTML = `<div class="tpl-map"></div>`;
+      }
+    } else if (tplId === 'map-pin-drop') {
+      const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map-pin-drop') : {};
+      if (typeof window.tplBuildTacticalMapPinDropHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildTacticalMapPinDropHtml(mData);
+      } else if (typeof window.tplBuildInvestigativeGlobeHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData);
       }
     } else if (tplId === 'news') {
       const nwData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('news') : {};
