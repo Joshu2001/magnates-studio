@@ -751,44 +751,6 @@
     // 51. Flying Headlines (3D Cinematic Motion Suite)
     
     // 3D Newspaper Clipping (James Jani / Corridor Digital Cinematic Suite)
-    'document-3d-fx-engine': {
-      type: 'newspaper-3d',
-      stylePreset: 'financial',
-      masthead: 'THE FINANCIAL GAZETTE',
-      headline: 'Uncovered Files Reveal\n$4.2B Secret Algorithm Shift',
-      dateline: 'NEW YORK • SPECIAL INVESTIGATION REPORT',
-      subhead: 'Special Investigation Report • Leaked Internal Dossier',
-      bodyText: 'According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.',
-      dofBokeh: true,
-      dofBlur: 18,
-      cameraPitch: 10,
-      cameraYaw: -7,
-      cameraRoll: 2,
-      perspective: 1100,
-      showDogEar: true,
-      dogEarSize: 58,
-      paperAging: 75,
-      inkBleed: true,
-      inkBleedAmount: 0.6,
-      deckleEdge: true,
-      volumetricRays: true,
-      rayIntensity: 0.95,
-      rimLight: true,
-      warmSpotlight: true,
-      spotIntensity: 1.4,
-      dustMotes: true,
-      dustCount: 32,
-      organicDrift: true,
-      driftSpeed: 1.0,
-      parallaxStrength: 1.5,
-      motionBlur: true,
-      filmGrain: true,
-      filmGrainOpacity: 0.26,
-      enableHighlight: true,
-      highlightColor: '#facc15',
-      highlightPhrase: 'structural vulnerabilities known since Q3'
-    },
-
     'newspaper-3d': {
       type: 'newspaper-3d',
       stylePreset: 'scandal',
@@ -798,30 +760,30 @@
       subhead: 'Special Investigation Report • Leaked Internal Dossier',
       bodyText: 'According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.',
       dofBokeh: true,
-      dofBlur: 18,
-      cameraPitch: 10,
-      cameraYaw: -7,
-      cameraRoll: 2,
+      dofBlur: 14,
+      cameraPitch: 12,
+      cameraYaw: -9,
+      cameraRoll: 2.5,
       perspective: 1100,
       showDogEar: true,
-      dogEarSize: 58,
+      dogEarSize: 54,
       paperAging: 75,
       inkBleed: true,
       inkBleedAmount: 0.6,
       deckleEdge: true,
       volumetricRays: true,
-      rayIntensity: 0.95,
+      rayIntensity: 0.45,
       rimLight: true,
       warmSpotlight: true,
-      spotIntensity: 1.4,
+      spotIntensity: 0.5,
       dustMotes: true,
-      dustCount: 32,
+      dustCount: 20,
       organicDrift: true,
       driftSpeed: 1.0,
       parallaxStrength: 1.5,
       motionBlur: true,
       filmGrain: true,
-      filmGrainOpacity: 0.26,
+      filmGrainOpacity: 0.22,
       enableHighlight: true,
       highlightColor: '#facc15',
       highlightPhrase: 'structural vulnerabilities known since Q3'
@@ -3311,7 +3273,7 @@
           }
         }
       }
-    } else if (tplId === 'newspaper-3d' || tplId === 'document-3d-fx-engine') {
+    } else if (tplId === 'newspaper-3d') {
       const root = fxc.querySelector('.tpl-newspaper-3d');
       if (root) {
         if (data.cameraPitch !== undefined) root.style.setProperty('--np-camera-pitch', `${data.cameraPitch}deg`);
@@ -6608,7 +6570,7 @@
     // =========================================================================
     // CASE: 3D NEWSPAPER CLIPPING (James Jani / Corridor Digital Production Grade)
     // =========================================================================
-    if (tplId === 'newspaper-3d' || tplId === 'document-3d-fx-engine') {
+    if (tplId === 'newspaper-3d') {
       if (wrapPrim) wrapPrim.style.display = 'none';
       if (wrapSec) {
         wrapSec.style.display = 'flex';

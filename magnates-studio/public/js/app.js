@@ -25697,7 +25697,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'document-3d-fx-engine']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin']);
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
@@ -26643,7 +26643,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           });
         }
       }
-        } else if (tplId === 'newspaper-3d' || tplId === 'document-3d-fx-engine') {
+        } else if (tplId === 'newspaper-3d') {
       const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tplId) : {};
       const stylePreset = npData.stylePreset || 'scandal';
       const masthead = npData.masthead || 'THE DAILY TIMES';
@@ -26801,11 +26801,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           --np-camera-roll: ${cameraRoll}deg;
           --np-perspective: ${perspective}px;
           --np-dof-fg-blur: ${dofBlur}px;
-          --np-dof-bg-blur: ${Math.round(dofBlur * 0.48)}px;
+          --np-dof-bg-blur: ${Math.round(dofBlur * 0.5)}px;
           --np-ray-opacity: ${volumetricRays ? rayIntensity : 0};
           --np-grain-opacity: ${filmGrain ? filmGrainOpacity : 0};
           --np-spot-intensity: ${warmSpotlight ? spotIntensity : 0};
-          --np-rim-glow: ${rimLight ? 'rgba(186, 230, 253, 0.55)' : 'none'};
+          --np-rim-glow: ${rimLight ? 'rgba(125, 211, 252, 0.35)' : 'none'};
         ">
           <!-- Deep Void Backdrop -->
           <div class="tpl-np-backdrop"></div>
@@ -26813,7 +26813,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <!-- Volumetric Light Shafts (God Rays) -->
           <div class="tpl-np-godrays"></div>
 
-          <!-- Key Light: 1.4x Warm Directional Spotlight Centered on Headline -->
+          <!-- Key Light: Gentle Warm Directional Spotlight Centered on Headline -->
           <div class="tpl-np-spotlight"></div>
 
           <!-- Moody Vignette -->
@@ -26827,8 +26827,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- 3D Camera Rig -->
           <div class="tpl-np-camera-rig">
-            <!-- BACKGROUND PLANE (Z = -400): Archival Pages Drifting on Sine Waves -->
-            <!-- Background Archival Page 3 (Top Right in Light Beam, Z = -380) -->
+            <!-- Background Archival Page 3 (Top Right in Light Beam, Z = -280) -->
             <div class="tpl-np-clipping is-bg-3">
               <div class="tpl-np-paper-surface"></div>
               <div style="padding: 16px; font-size: 8px; color: #2e2a24;">
@@ -26838,7 +26837,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               </div>
             </div>
 
-            <!-- Background Archival Page 1 (Top Left, Z = -400) -->
+            <!-- Background Archival Page 1 (Top Left, Z = -200) -->
             <div class="tpl-np-clipping is-bg-1">
               <div class="tpl-np-paper-surface"></div>
               <div style="padding: 16px; font-size: 8px; color: #2e2a24;">
@@ -26848,7 +26847,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               </div>
             </div>
 
-            <!-- Background Archival Page 2 (Bottom Right, Z = -440) -->
+            <!-- Background Archival Page 2 (Bottom Right, Z = -230) -->
             <div class="tpl-np-clipping is-bg-2">
               <div class="tpl-np-paper-surface"></div>
               <div style="padding: 16px; font-size: 8px; color: #2e2a24;">
@@ -26860,7 +26859,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               </div>
             </div>
 
-            <!-- FOCUS PLANE (Z = 0): 1.8x PRIMARY HERO CLIPPING (~48% Frame Height) -->
+            <!-- FOCUS PLANE (Z = 0): PRIMARY HERO CLIPPING (~48-52% Frame Height) -->
             <div class="tpl-np-clipping is-hero">
               <div class="tpl-np-paper-surface"></div>
               <div class="tpl-np-crease-h"></div>
@@ -26883,9 +26882,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               </div>
             </div>
 
-            <!-- FOREGROUND PLANE (Z = +300): HEAVILY BLURRED OUT-OF-FOCUS CUTOUTS FRAMING EDGES -->
-            <!-- Foreground Left Cutout (Z = +320, Bottom-Left Frame) -->
-            <div class="tpl-np-clipping is-fg-left">
+            <!-- FOREGROUND PLANE (Z = +190): HEAVILY BLURRED OUT-OF-FOCUS CUTOUT (BOTTOM-LEFT) -->
+            <div class="tpl-np-clipping is-foreground is-fg-left">
               <div class="tpl-np-paper-surface"></div>
               <div style="padding: 26px 28px; font-size: 10px; color: #1a1714; line-height: 1.35;">
                 <div style="font-weight: 900; font-size: 18px; text-transform: uppercase; margin-bottom: 5px; font-family: 'Cinzel', serif;">
@@ -26896,19 +26894,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                 </div>
                 <div style="border-top: 1.5px solid #222; padding-top: 6px; font-size: 8.5px; letter-spacing: 1.5px; font-family: monospace;">
                   ${dateline}
-                </div>
-              </div>
-            </div>
-
-            <!-- Foreground Right Cutout (Z = +310, Top-Right Frame) -->
-            <div class="tpl-np-clipping is-fg-right">
-              <div class="tpl-np-paper-surface"></div>
-              <div style="padding: 24px 26px; font-size: 10px; color: #1a1714; line-height: 1.35;">
-                <div style="font-weight: 900; font-size: 16px; text-transform: uppercase; margin-bottom: 4px; font-family: 'Cinzel', serif;">
-                  ${masthead}
-                </div>
-                <div style="font-weight: 900; font-size: 24px; text-transform: uppercase; margin-bottom: 8px; font-family: 'Cinzel', Impact, serif; line-height: 1.05;">
-                  ${headlineFormatted}
                 </div>
               </div>
             </div>
@@ -34337,7 +34322,7 @@ transition: 'fly_through',
     focusClip = bgClip;
     imageClips = [bgClip];
     textClips = generatedTextClips;
-    } else if (tpl.id === 'newspaper-3d' || tpl.id === 'document-3d-fx-engine') {
+    } else if (tpl.id === 'newspaper-3d') {
     const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('newspaper-3d') : {};
     const bgUrl = sec || tpl.secondaryImage || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80';
     const bgClip = {
