@@ -287,6 +287,28 @@
       customTracedRoutes: []
     },
 
+    // 25B. Empire Rise & Fall Timeline (James Jani / Magnates Media Documentary Style)
+    'empire-timeline': {
+      type: 'empire-timeline',
+      title: 'THE RISE & FALL OF ENRON',
+      subtitle: 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001',
+      theme: 'james-jani',
+      hairline: 1.2,
+      showGrid: true,
+      showAreaFill: true,
+      is3DMode: false,
+      cameraPitch: 26,
+      cameraYaw: -14,
+      peakValuation: '$1.5B',
+      milestones: [
+        { label: 'FOUNDED', date: '1985', value: '$10M', desc: 'Houston Merger', color: '#10b981', x: 80, y: 315 },
+        { label: 'WALL ST DARLING', date: '1995', value: '$320M', desc: 'Mark-to-Market Model', color: '#38bdf8', x: 230, y: 225 },
+        { label: 'PEAK EMPIRE', date: '2000', value: '$1.5B', desc: 'Fortune #1 Innovator', color: '#f59e0b', x: 380, y: 95 },
+        { label: 'WHISTLEBLOWER', date: 'AUG 2001', value: '$480M', desc: 'SEC Inquiry & Debt', color: '#fb923c', x: 525, y: 235 },
+        { label: 'BANKRUPTCY', date: 'DEC 2001', value: '$0', desc: 'Chapter 11 Liquidation', color: '#ef4444', x: 645, y: 340 }
+      ]
+    },
+
     // 26. Breaking News Banner
     'news': {
       type: 'news',
@@ -310,7 +332,17 @@
       caption: 'First Office, 1994',
       caption2: 'Archive Exhibit #04',
       photo1: '/hiker_background_inpainted.png',
-      photo2: '/clean_mountain_backdrop.png'
+      photo2: '/clean_mountain_backdrop.png',
+      polaroidScale: 1.0,
+      p1Rot: -11,
+      p2Rot: 7,
+      p1X: -78,
+      p1Y: -6,
+      p2X: 72,
+      p2Y: 10,
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
     },
 
     // 29. Comic POW!
@@ -410,10 +442,10 @@
     // 39. Split Reveal Before / After
     'split': {
       type: 'split',
-      leftLabel: 'BEFORE',
-      rightLabel: 'AFTER',
-      leftImg: '',
-      rightImg: '',
+      leftLabel: 'RAW // S-LOG3',
+      rightLabel: '4K MASTER GRADE',
+      leftImg: '/cinematic_split_scene.jpg',
+      rightImg: '/cinematic_split_scene.jpg',
       leftColor: '#3a2a4a',
       rightColor: '#ff7a59'
     },
@@ -421,10 +453,65 @@
     // 40. 3D Product Zoom & Spin
     'zoom': {
       type: 'zoom',
-      productName: 'Limited Edition Watch',
-      glowColor: '#ffd27a',
+      productName: 'TITAN VELOX X1',
+      productSub: 'GRADE-5 TITANIUM',
+      titleFont: "'Space Grotesk', sans-serif",
+      titleSize: 26,
+      titleColor: '#f8fafc',
+      subColor: '#fbbf24',
+      glowColor: '#38bdf8',
       spinSpeed: 1.0,
-      productImg: ''
+      productImg: '/product_scan_3d.jpg',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
+    },
+
+    // 40B. CEO Portrait Reveal
+    'ceo-portrait': {
+      type: 'ceo-portrait',
+      ceoName: 'ALEXANDER VANCE',
+      ceoRole: 'CHIEF EXECUTIVE OFFICER · VANGUARD GLOBAL',
+      ceoBadge: 'EXECUTIVE DOSSIER // VERIFIED',
+      fontFamily: "'Space Grotesk', sans-serif",
+      fontSize: 32,
+      nameColor: '#ffffff',
+      accentColor: '#fbbf24',
+      cutoutUrl: '/ceo_portrait_cutout.jpg',
+      portraitScale: 1.0,
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
+    },
+
+    // 40C. Boardroom Zoom
+    'boardroom-zoom': {
+      type: 'boardroom-zoom',
+      headline: 'EMERGENCY BOARDROOM SUMMIT',
+      subline: '42ND FLOOR · MANHATTAN HQ // $14.8B MERGER VOTE',
+      fontFamily: "'Space Grotesk', sans-serif",
+      textColor: '#f8fafc',
+      accentColor: '#fbbf24',
+      sceneUrl: '/boardroom_scene_hd.jpg',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
+    },
+
+    // 40D. Security Camera Overlay
+    'security-camera': {
+      type: 'security-camera',
+      camId: 'CAM 04 // NORTH VAULT CORRIDOR',
+      recText: 'REC',
+      datePrefix: '2026-10-19',
+      timecode: '2026-10-19  03:14:28:09',
+      statusText: 'ISO 3200 · IR NIGHT VISION · 1080P/24',
+      colorMode: 'night',
+      showScanlines: true,
+      feedUrl: '/cctv_surveillance_scene.jpg',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
     },
 
     // 41. Fed Rate Timeline
@@ -515,6 +602,107 @@
   };
 
   window.TPL_CONTEXTUAL_DEFAULTS = DEFAULTS;
+
+  const UNIVERSAL_BG_PRESETS = [
+    { id: 'default', label: 'Default Scene', dot: '#64748b' },
+    { id: 'cyber-grid', label: 'Cyber Set Grid', dot: '#38bdf8' },
+    { id: 'cyber-3d-grid', label: '3D Cyber Grid', dot: '#c084fc' },
+    { id: 'solid-black', label: 'Solid Black', dot: '#020617' },
+    { id: 'transparent', label: 'No Background', dot: '#94a3b8' },
+    { id: 'vox-doc', label: 'Vox Document', dot: '#d97706' },
+    { id: 'embers', label: 'Floating Embers', dot: '#f97316' },
+    { id: 'dawn', label: 'Dawn Horizon', dot: '#fbbf24' }
+  ];
+  window.UNIVERSAL_BG_PRESETS = UNIVERSAL_BG_PRESETS;
+
+  window.tplBuildUniversalBgHtml = function(data) {
+    const curPreset = (data && data.bgPreset) || 'default';
+    const hasCustomMedia = !!(data && data.bgMediaUrl);
+    return `
+      <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 9px 10px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">🌌 Studio Background &amp; Video B-Roll</span>
+          ${hasCustomMedia ? `<button type="button" class="ubg-clear-media" style="background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;cursor:pointer;">Clear Media</button>` : ''}
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
+          ${UNIVERSAL_BG_PRESETS.map(p => {
+            const active = !hasCustomMedia && curPreset === p.id;
+            return `<button type="button" class="ubg-preset-btn" data-bg-preset="${p.id}" style="display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:5px;border:1px solid ${active ? '#38bdf8' : 'rgba(255,255,255,0.09)'};background:${active ? 'rgba(56,189,248,0.2)' : 'rgba(15,23,42,0.65)'};color:${active ? '#ffffff' : '#cbd5e1'};font-size:9.5px;font-weight:700;cursor:pointer;text-align:left;">
+              <span style="width:8px;height:8px;border-radius:50%;background:${p.dot};border:1px solid rgba(255,255,255,0.35);flex-shrink:0;"></span>
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.label}</span>
+            </button>`;
+          }).join('')}
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+          <span style="font-size: 9px; color: #94a3b8;">${hasCustomMedia ? (data.bgMediaType === 'video' ? '🎬 Custom Video BG Active' : '🖼️ Custom Image BG Active') : 'Upload custom video (.mp4/.webm) or image'}</span>
+          <label style="font-size: 9.5px; font-weight: 800; color: #0f172a; background: linear-gradient(135deg, #38bdf8, #818cf8); padding: 4px 9px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
+            + Video / Image BG
+            <input type="file" class="ubg-file-input" accept="video/*,image/*" style="display: none;" />
+          </label>
+        </div>
+      </div>
+    `;
+  };
+
+  window.tplWireUniversalBgControls = function(tplId, container) {
+    if (!container) return;
+    container.querySelectorAll('.ubg-preset-btn').forEach(btn => {
+      btn.onclick = () => {
+        const p = btn.dataset.bgPreset || 'default';
+        window.tplSetContextualData(tplId, { bgPreset: p, bgMediaUrl: '', bgMediaType: 'image' });
+        window.tplRenderContextualInspector(tplId);
+      };
+    });
+    const clearBtn = container.querySelector('.ubg-clear-media');
+    if (clearBtn) {
+      clearBtn.onclick = () => {
+        window.tplSetContextualData(tplId, { bgMediaUrl: '', bgMediaType: 'image' });
+        window.tplRenderContextualInspector(tplId);
+      };
+    }
+    const fileInp = container.querySelector('.ubg-file-input');
+    if (fileInp) {
+      fileInp.onchange = (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        const isVid = f.type.startsWith('video/');
+        window.tplSetContextualData(tplId, { bgMediaUrl: url, bgMediaType: isVid ? 'video' : 'image' });
+        window.tplRenderContextualInspector(tplId);
+      };
+    }
+  };
+
+  window.tplSyncUniversalBgStageLayer = function(rootEl, data) {
+    if (!rootEl) return;
+    let bgEl = rootEl.querySelector('.tpl-universal-bg-layer');
+    if (!bgEl) {
+      bgEl = document.createElement('div');
+      bgEl.className = 'tpl-universal-bg-layer';
+      rootEl.prepend(bgEl);
+    }
+    const preset = (data && data.bgPreset) || 'default';
+    const bgUrl = (data && data.bgMediaUrl) || '';
+    const isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
+    bgEl.className = 'tpl-universal-bg-layer' + (!bgUrl && preset !== 'default' ? ` bg-preset-${preset}` : '');
+    if (bgUrl) {
+      if (isVideo) {
+        bgEl.style.background = '';
+        let v = bgEl.querySelector('video');
+        if (!v) {
+          bgEl.innerHTML = `<video class="tpl-universal-bg-video" autoplay loop muted playsinline></video>`;
+          v = bgEl.querySelector('video');
+        }
+        if (v && v.src !== bgUrl) v.src = bgUrl;
+      } else {
+        bgEl.innerHTML = '';
+        bgEl.style.background = `url("${bgUrl}") center/cover no-repeat`;
+      }
+    } else {
+      bgEl.innerHTML = '';
+      bgEl.style.background = '';
+    }
+  };
 
   // --- 2. GET & SET CONTEXTUAL DATA ---
   window.tplGetContextualData = function(tplId) {
@@ -1258,14 +1446,228 @@
     };
   };
 
+  // --- 2C. EMPIRE RISE & FALL TIMELINE BUILDER (James Jani / Magnates Media Documentary Style) ---
+  window.tplBuildEmpireTimelineHtml = function(mData) {
+    const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('empire-timeline') : {});
+    const title = d.title || 'THE RISE & FALL OF ENRON';
+    const subtitle = d.subtitle || 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001';
+    const themeKey = d.theme || 'james-jani';
+    const hairline = Math.max(0.7, Math.min(3.0, parseFloat(d.hairline || 1.2)));
+    const showGrid = d.showGrid !== false;
+    const showAreaFill = d.showAreaFill !== false;
+    const is3D = !!d.is3DMode;
+    const cameraPitch = typeof d.cameraPitch === 'number' ? d.cameraPitch : 26;
+    const cameraYaw = typeof d.cameraYaw === 'number' ? d.cameraYaw : -14;
+
+    const themes = {
+      'james-jani': {
+        bg: 'radial-gradient(ellipse at 50% 35%, #0f172a 0%, #030712 100%)',
+        gridLine: 'rgba(56, 189, 248, 0.08)',
+        axisText: 'rgba(148, 163, 184, 0.65)',
+        baseline: 'rgba(239, 68, 68, 0.35)',
+        accent: '#38bdf8',
+        cardBg: 'rgba(7, 13, 25, 0.88)',
+        gradStart: '#10b981',
+        gradMid: '#f59e0b',
+        gradEnd: '#ef4444'
+      },
+      'magnates-gold': {
+        bg: 'radial-gradient(ellipse at 50% 35%, #1c1407 0%, #060401 100%)',
+        gridLine: 'rgba(245, 158, 11, 0.08)',
+        axisText: 'rgba(217, 119, 6, 0.7)',
+        baseline: 'rgba(245, 158, 11, 0.35)',
+        accent: '#f59e0b',
+        cardBg: 'rgba(20, 14, 4, 0.9)',
+        gradStart: '#fde047',
+        gradMid: '#f59e0b',
+        gradEnd: '#b45309'
+      },
+      'bloomberg-cyan': {
+        bg: 'radial-gradient(ellipse at 50% 35%, #061e24 0%, #02090c 100%)',
+        gridLine: 'rgba(46, 255, 198, 0.08)',
+        axisText: 'rgba(46, 255, 198, 0.65)',
+        baseline: 'rgba(46, 255, 198, 0.35)',
+        accent: '#2effc6',
+        cardBg: 'rgba(3, 16, 20, 0.9)',
+        gradStart: '#38bdf8',
+        gradMid: '#2effc6',
+        gradEnd: '#06b6d4'
+      },
+      'crimson-noir': {
+        bg: 'radial-gradient(ellipse at 50% 35%, #240b0f 0%, #080203 100%)',
+        gridLine: 'rgba(244, 63, 94, 0.08)',
+        axisText: 'rgba(251, 113, 133, 0.7)',
+        baseline: 'rgba(239, 68, 68, 0.4)',
+        accent: '#f43f5e',
+        cardBg: 'rgba(20, 5, 8, 0.92)',
+        gradStart: '#fb7185',
+        gradMid: '#f43f5e',
+        gradEnd: '#9f1239'
+      }
+    };
+    const th = themes[themeKey] || themes['james-jani'];
+
+    const milestones = Array.isArray(d.milestones) && d.milestones.length > 0 ? d.milestones : [
+      { label: 'FOUNDED', date: '1985', value: '$10M', desc: 'Houston Merger', color: '#10b981', x: 80, y: 315 },
+      { label: 'WALL ST DARLING', date: '1995', value: '$320M', desc: 'Mark-to-Market Model', color: '#38bdf8', x: 230, y: 225 },
+      { label: 'PEAK EMPIRE', date: '2000', value: '$1.5B', desc: 'Fortune #1 Innovator', color: '#f59e0b', x: 380, y: 95 },
+      { label: 'WHISTLEBLOWER', date: 'AUG 2001', value: '$480M', desc: 'SEC Inquiry & Debt', color: '#fb923c', x: 525, y: 235 },
+      { label: 'BANKRUPTCY', date: 'DEC 2001', value: '$0', desc: 'Chapter 11 Liquidation', color: '#ef4444', x: 645, y: 340 }
+    ];
+
+    // Build smooth cubic bezier curve through all milestones
+    let curvePathD = '';
+    if (milestones.length === 1) {
+      curvePathD = `M ${milestones[0].x} ${milestones[0].y} L 640 ${milestones[0].y}`;
+    } else {
+      curvePathD = `M ${milestones[0].x} ${milestones[0].y}`;
+      for (let i = 0; i < milestones.length - 1; i++) {
+        const p0 = milestones[i === 0 ? 0 : i - 1];
+        const p1 = milestones[i];
+        const p2 = milestones[i + 1];
+        const p3 = milestones[i + 2 < milestones.length ? i + 2 : i + 1];
+
+        const cp1x = p1.x + (p2.x - p0.x) / 6;
+        const cp1y = p1.y + (p2.y - p0.y) / 6;
+        const cp2x = p2.x - (p3.x - p1.x) / 6;
+        const cp2y = p2.y - (p3.y - p1.y) / 6;
+        curvePathD += ` C ${cp1x.toFixed(1)} ${cp1y.toFixed(1)}, ${cp2x.toFixed(1)} ${cp2y.toFixed(1)}, ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+      }
+    }
+
+    const firstPt = milestones[0];
+    const lastPt = milestones[milestones.length - 1];
+    const areaPathD = `${curvePathD} L ${lastPt.x.toFixed(1)} 350 L ${firstPt.x.toFixed(1)} 350 Z`;
+
+    const gridLinesHtml = showGrid ? `
+      <g stroke="${th.gridLine}" stroke-width="0.8" stroke-dasharray="3 3">
+        <line x1="60" y1="95" x2="665" y2="95"/>
+        <line x1="60" y1="165" x2="665" y2="165"/>
+        <line x1="60" y1="235" x2="665" y2="235"/>
+        <line x1="60" y1="305" x2="665" y2="305"/>
+      </g>
+      <line x1="50" y1="350" x2="670" y2="350" stroke="${th.baseline}" stroke-width="1.2"/>
+      
+      <g fill="${th.axisText}" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="600" text-anchor="end">
+        <text x="54" y="98">${d.peakValuation || '$1.5B'}</text>
+        <text x="54" y="168">$1.0B</text>
+        <text x="54" y="238">$500M</text>
+        <text x="54" y="308">$100M</text>
+        <text x="54" y="353">$0</text>
+      </g>
+
+      <g stroke="${th.gridLine}" stroke-width="0.7" stroke-dasharray="2 4">
+        ${milestones.map(m => `<line x1="${m.x}" y1="75" x2="${m.x}" y2="350"/>`).join('')}
+      </g>
+    ` : '';
+
+    const nodesHtml = milestones.map((m, idx) => {
+      const col = m.color || '#38bdf8';
+      const isTop = m.y > 185;
+      const cardY = isTop ? m.y - 48 : m.y + 14;
+      const leaderY1 = isTop ? m.y - 4 : m.y + 4;
+      const leaderY2 = isTop ? m.y - 12 : m.y + 12;
+
+      return `
+        <g class="tm-node-group" data-idx="${idx}">
+          <circle cx="${m.x}" cy="${m.y}" r="14" fill="none" stroke="${col}" stroke-width="0.8" opacity="0.4" class="tm-pulse"/>
+          <circle cx="${m.x}" cy="${m.y}" r="8" fill="${col}" fill-opacity="0.15"/>
+          <circle cx="${m.x}" cy="${m.y}" r="3.8" fill="${col}" stroke="#ffffff" stroke-width="1.3"/>
+          <line x1="${m.x}" y1="${leaderY1}" x2="${m.x}" y2="${leaderY2}" stroke="${col}" stroke-width="0.9" stroke-dasharray="1.5 1"/>
+          <g transform="translate(${m.x}, ${cardY})">
+            <rect x="-56" y="0" width="112" height="34" rx="5" fill="${th.cardBg}" stroke="${col}" stroke-width="0.8" filter="url(#tmCardShadow)"/>
+            <rect x="-52" y="4" width="34" height="9" rx="2" fill="rgba(255,255,255,0.08)"/>
+            <text x="-35" y="11" fill="#cbd5e1" font-family="'JetBrains Mono',monospace" font-size="6" font-weight="700" text-anchor="middle">${m.date}</text>
+            <text x="50" y="11.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="7.5" font-weight="800" text-anchor="end">${m.value}</text>
+            <text x="-51" y="22.5" fill="#f8fafc" font-family="'Space Grotesk',sans-serif" font-size="7" font-weight="800" text-anchor="start">${m.label.length > 18 ? m.label.slice(0, 16) + '..' : m.label}</text>
+            <text x="-51" y="30" fill="rgba(148,163,184,0.75)" font-family="'Inter',sans-serif" font-size="5.5" text-anchor="start">${(m.desc || '').slice(0, 24)}</text>
+          </g>
+        </g>
+      `;
+    }).join('');
+
+    return `
+      <div class="tpl-empire-timeline timeline-viewport ${is3D ? 'is-3d-active' : ''}" style="background:${th.bg}; width:100%; height:100%; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; overflow:hidden; user-select:none; perspective:1200px; perspective-origin:50% 45%;">
+        <div style="position:absolute; inset:0; opacity:0.25; background-image:radial-gradient(rgba(255,255,255,0.1) 1px, transparent 0); background-size:3px 3px; pointer-events:none;"></div>
+        
+        <div class="timeline-hud-header" style="position:absolute; top:48px; left:20px; max-width:280px; z-index:10; pointer-events:none; display:flex; flex-direction:column; gap:3px;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:12.5px; font-weight:900; color:#f8fafc; letter-spacing:0.12em; text-transform:uppercase; text-shadow:0 2px 10px rgba(0,0,0,0.85); line-height:1.2;">${title}</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:8px; font-weight:600; color:${th.accent}; letter-spacing:0.08em; text-transform:uppercase; opacity:0.9;">${subtitle}</div>
+        </div>
+        
+        <div style="position:absolute; bottom:12px; right:18px; z-index:10; pointer-events:none; background:rgba(4,9,17,0.75); border:1px solid rgba(255,255,255,0.12); padding:3px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:7.5px; color:#94a3b8; letter-spacing:0.06em; backdrop-filter:blur(4px);">
+          ${is3D ? `⬡ 3D DEPTH // PITCH: ${cameraPitch}° YAW: ${cameraYaw}°` : `VALUATION TRAJECTORY // HAIRLINE: ${hairline.toFixed(1)}px`}
+        </div>
+
+        <div id="tm-3d-stage-plane" style="width:100%; height:100%; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform-style:preserve-3d; transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); ${is3D ? `transform: rotateX(${cameraPitch}deg) rotateY(${cameraYaw}deg) scale(0.92); box-shadow: 0 35px 70px rgba(0,0,0,0.85);` : ''}">
+          ${is3D ? `<div style="position:absolute; bottom:-12px; width:85%; height:45px; background:radial-gradient(ellipse at 50% 50%, ${th.accent} 0%, transparent 75%); opacity:0.18; filter:blur(18px); transform:rotateX(90deg) translateZ(-40px); pointer-events:none;"></div>` : ''}
+
+          <svg class="timeline-svg" viewBox="0 0 720 405" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%; display:block; ${is3D ? 'filter: drop-shadow(0 20px 30px rgba(0,0,0,0.7));' : ''}">
+            <defs>
+              <linearGradient id="timelineStrokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="${th.gradStart}"/>
+                <stop offset="50%" stop-color="${th.gradMid}"/>
+                <stop offset="100%" stop-color="${th.gradEnd}"/>
+              </linearGradient>
+              <linearGradient id="timelineAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="${th.accent}" stop-opacity="0.22"/>
+                <stop offset="60%" stop-color="${th.accent}" stop-opacity="0.06"/>
+                <stop offset="100%" stop-color="${th.accent}" stop-opacity="0.0"/>
+              </linearGradient>
+              <filter id="tmGlowFilter" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="${th.accent}" flood-opacity="0.65"/>
+              </filter>
+              <filter id="tmCardShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.85"/>
+              </filter>
+            </defs>
+
+            ${gridLinesHtml}
+
+            <!-- Under-curve Luminous Area Fill -->
+            ${showAreaFill ? `<path d="${areaPathD}" fill="url(#timelineAreaGrad)"/>` : ''}
+
+            <!-- Ambient soft under-glow -->
+            <path d="${curvePathD}" fill="none" stroke="${th.accent}" stroke-width="${(hairline * 2.8).toFixed(1)}" opacity="0.22" stroke-linecap="round"/>
+
+            <!-- High-Precision Fine Hairline Curve -->
+            <path id="empireTimelinePath" d="${curvePathD}" fill="none" stroke="url(#timelineStrokeGrad)" stroke-width="${hairline.toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" filter="url(#tmGlowFilter)"/>
+
+            <!-- Glowing Tracer Particle -->
+            <circle r="3.2" fill="#ffffff" stroke="${th.accent}" stroke-width="1.2" filter="url(#tmGlowFilter)">
+              <animateMotion dur="4.8s" repeatCount="indefinite">
+                <mpath href="#empireTimelinePath"/>
+              </animateMotion>
+            </circle>
+
+            <!-- Milestone Nodes & Callout Cards -->
+            ${nodesHtml}
+          </svg>
+        </div>
+      </div>
+    `;
+  };
+
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
     const stage = document.getElementById('tpl-modal-preview-stage');
     if (!stage) return;
-    const fxc = stage.querySelector(`#fx-container-${tplId}`);
+    let fxc = stage.querySelector(`#fx-container-${tplId}`);
+    if (!fxc) {
+      stage.innerHTML = `
+        <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+          <div id="fx-container-${tplId}" style="position: absolute; inset: 0; display: block;"></div>
+        </div>`;
+      fxc = stage.querySelector(`#fx-container-${tplId}`);
+    }
     if (!fxc) return;
 
-    if (tplId === 'parallax') {
+    if (tplId === 'empire-timeline') {
+      fxc.innerHTML = window.tplBuildEmpireTimelineHtml(data);
+      fxc.style.display = 'block';
+      const defImg = stage.querySelector(`#default-img-${tplId}`);
+      if (defImg) defImg.style.display = 'none';
+    } else if (tplId === 'parallax') {
       const sun = fxc.querySelector('.sun');
       if (sun) {
         if (data.sunColor) sun.style.background = `radial-gradient(circle at center, #fff 0%, ${data.sunColor} 40%, rgba(255,122,89,0) 70%)`;
@@ -1482,10 +1884,30 @@
         if (hl) hl.style.borderLeftColor = data.bannerColor;
       }
     } else if (tplId === 'polaroid') {
+      const root = fxc.querySelector('.tpl-polaroid');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
       const c1 = fxc.querySelector('.p1-cap'); if (c1 && data.caption !== undefined) c1.textContent = data.caption;
       const c2 = fxc.querySelector('.p2-cap'); if (c2 && data.caption2 !== undefined) c2.textContent = data.caption2;
       const img1 = fxc.querySelector('.p1-img'); if (img1 && data.photo1) img1.style.backgroundImage = `url("${data.photo1}")`;
       const img2 = fxc.querySelector('.p2-img'); if (img2 && data.photo2) img2.style.backgroundImage = `url("${data.photo2}")`;
+      const pCards = fxc.querySelectorAll('.polaroid');
+      const sc = data.polaroidScale !== undefined ? Number(data.polaroidScale) : 1;
+      if (pCards[0]) {
+        const x1 = data.p1X !== undefined ? Number(data.p1X) : -78;
+        const y1 = data.p1Y !== undefined ? Number(data.p1Y) : -6;
+        const r1 = data.p1Rot !== undefined ? Number(data.p1Rot) : -11;
+        pCards[0].classList.add('is-user-transformed');
+        pCards[0].style.transform = `translate(${x1}px, ${y1}px) rotate(${r1}deg) scale(${sc})`;
+      }
+      if (pCards[1]) {
+        const x2 = data.p2X !== undefined ? Number(data.p2X) : 72;
+        const y2 = data.p2Y !== undefined ? Number(data.p2Y) : 10;
+        const r2 = data.p2Rot !== undefined ? Number(data.p2Rot) : 7;
+        pCards[1].classList.add('is-user-transformed');
+        pCards[1].style.transform = `translate(${x2}px, ${y2}px) rotate(${r2}deg) scale(${sc})`;
+      }
     } else if (tplId === 'money') {
       const d = fxc.querySelector('.dollar'); if (d) d.textContent = data.amount;
       const l = fxc.querySelector('.money-label, .label'); if (l) l.textContent = data.label;
@@ -1553,16 +1975,136 @@
         }
       }
     } else if (tplId === 'split') {
-      const l1 = fxc.querySelector('.split-label-left'); if (l1) l1.textContent = data.leftLabel;
-      const l2 = fxc.querySelector('.split-label-right'); if (l2) l2.textContent = data.rightLabel;
+      const l1 = fxc.querySelector('.split-label-left'); if (l1 && data.leftLabel) l1.textContent = data.leftLabel;
+      const l2 = fxc.querySelector('.split-label-right'); if (l2 && data.rightLabel) l2.textContent = data.rightLabel;
       if (data.leftImg) {
         const hl = fxc.querySelector('.half-l');
-        if (hl) hl.style.background = `url("${data.leftImg}") center/cover no-repeat`;
+        if (hl) hl.style.backgroundImage = `url("${data.leftImg}")`;
       }
       if (data.rightImg) {
         const hr = fxc.querySelector('.half-r');
-        if (hr) hr.style.background = `url("${data.rightImg}") center/cover no-repeat`;
+        if (hr) hr.style.backgroundImage = `url("${data.rightImg}")`;
       }
+    } else if (tplId === 'zoom') {
+      const root = fxc.querySelector('.tpl-zoom');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
+      const pt = fxc.querySelector('.zoom-prod-title');
+      if (pt) {
+        if (data.productName !== undefined) pt.textContent = data.productName;
+        if (data.titleFont) pt.style.fontFamily = data.titleFont;
+        if (data.titleSize) pt.style.fontSize = `${data.titleSize}px`;
+        if (data.titleColor) pt.style.color = data.titleColor;
+      }
+      const ps = fxc.querySelector('.zoom-prod-sub');
+      if (ps) {
+        if (data.productSub !== undefined) ps.textContent = data.productSub;
+        if (data.subColor) ps.style.color = data.subColor;
+      }
+      if (data.productImg) {
+        const prod = fxc.querySelector('.product');
+        if (prod) prod.style.backgroundImage = `url("${data.productImg}")`;
+      }
+    } else if (tplId === 'ceo-portrait') {
+      const root = fxc.querySelector('.tpl-ceo-portrait');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
+      const img = fxc.querySelector('.ceo-cutout-img');
+      if (img && data.cutoutUrl) img.src = data.cutoutUrl;
+      const wrap = fxc.querySelector('.ceo-cutout-wrap');
+      if (wrap && data.portraitScale !== undefined) {
+        const sc = Number(data.portraitScale);
+        if (sc !== 1) {
+          wrap.style.animation = 'none';
+          wrap.style.transform = `scale(${sc})`;
+        } else {
+          wrap.style.animation = '';
+          wrap.style.transform = '';
+        }
+      }
+      const nm = fxc.querySelector('.ceo-name-title');
+      if (nm) {
+        if (data.ceoName !== undefined) nm.textContent = data.ceoName;
+        if (data.fontFamily) nm.style.fontFamily = data.fontFamily;
+        if (data.fontSize) nm.style.fontSize = `${data.fontSize}px`;
+        if (data.nameColor) nm.style.color = data.nameColor;
+      }
+      const rl = fxc.querySelector('.ceo-role-sub');
+      if (rl && data.ceoRole !== undefined) rl.textContent = data.ceoRole;
+      const bg = fxc.querySelector('.ceo-badge-tag');
+      if (bg) {
+        if (data.ceoBadge !== undefined) bg.textContent = data.ceoBadge;
+        if (data.accentColor) bg.style.color = data.accentColor;
+      }
+      const card = fxc.querySelector('.ceo-info-card');
+      if (card && data.accentColor) card.style.borderLeftColor = data.accentColor;
+    } else if (tplId === 'boardroom-zoom') {
+      const root = fxc.querySelector('.tpl-boardroom-zoom');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
+      const sc = fxc.querySelector('.boardroom-scene-wrap');
+      if (sc && data.sceneUrl) sc.style.backgroundImage = `url("${data.sceneUrl}")`;
+      const hl = fxc.querySelector('.boardroom-headline');
+      if (hl) {
+        if (data.headline !== undefined) hl.textContent = data.headline;
+        if (data.fontFamily) hl.style.fontFamily = data.fontFamily;
+        if (data.textColor) hl.style.color = data.textColor;
+      }
+      const sb = fxc.querySelector('.boardroom-sub');
+      if (sb) {
+        if (data.subline !== undefined) sb.textContent = data.subline;
+        if (data.accentColor) sb.style.color = data.accentColor;
+      }
+    } else if (tplId === 'security-camera') {
+      const root = fxc.querySelector('.tpl-security-camera');
+      if (root) {
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+        const mode = data.colorMode || 'night';
+        root.className = `tpl-security-camera cctv-mode-${mode}`;
+        const scan = root.querySelector('.cctv-scanlines');
+        if (data.showScanlines === false && scan) scan.style.display = 'none';
+        else if (scan) scan.style.display = '';
+        const feedUrl = data.bgMediaUrl || data.feedUrl || '/cctv_surveillance_scene.jpg';
+        const isVideo = data.bgMediaType === 'video' || /\.(mp4|webm|mov)(\?|$)/i.test(feedUrl);
+        let feedEl = root.querySelector('.cctv-feed-layer');
+        if (data.bgPreset === 'transparent') {
+          if (feedEl) feedEl.style.display = 'none';
+        } else {
+          if (feedEl) feedEl.style.display = '';
+          if (isVideo) {
+            if (!feedEl || feedEl.tagName !== 'VIDEO') {
+              if (feedEl) feedEl.remove();
+              const v = document.createElement('video');
+              v.className = 'cctv-feed-layer';
+              v.src = feedUrl;
+              v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+              v.style.objectFit = 'cover';
+              root.prepend(v);
+            } else if (feedEl.src !== feedUrl) {
+              feedEl.src = feedUrl;
+            }
+          } else {
+            if (!feedEl || feedEl.tagName === 'VIDEO') {
+              if (feedEl) feedEl.remove();
+              const d = document.createElement('div');
+              d.className = 'cctv-feed-layer';
+              d.style.backgroundImage = `url("${feedUrl}")`;
+              root.prepend(d);
+            } else {
+              feedEl.style.backgroundImage = `url("${feedUrl}")`;
+            }
+          }
+        }
+      }
+      const cid = fxc.querySelector('.cctv-cam-id'); if (cid && data.camId !== undefined) cid.textContent = data.camId;
+      const rl = fxc.querySelector('.cctv-rec-label'); if (rl && data.recText !== undefined) rl.textContent = data.recText;
+      const st = fxc.querySelector('.cctv-status-text'); if (st && data.statusText !== undefined) st.textContent = data.statusText;
+      const tc = fxc.querySelector('.cctv-timecode'); if (tc && data.timecode !== undefined) tc.textContent = data.timecode;
     }
   };
 
@@ -2229,6 +2771,461 @@
     }
 
     // =========================================================================
+    // SPECIAL HANDLER: EMPIRE RISE & FALL TIMELINE (empire-timeline)
+    // James Jani / Magnates Media Documentary Visuals, Hairline, Milestones
+    // =========================================================================
+    if (tplId === 'empire-timeline') {
+      if (stdLayers) stdLayers.style.display = 'none';
+      const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
+      if (aiWrapEl) aiWrapEl.style.display = 'none';
+      const atmoWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
+      if (atmoWrapEl) atmoWrapEl.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+
+      const presets = [
+        {
+          label: '⚡ Enron: The Smartest Guys in the Room (1985 — 2001)',
+          title: 'THE RISE & FALL OF ENRON',
+          subtitle: 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001',
+          theme: 'james-jani',
+          peakValuation: '$1.5B',
+          milestones: [
+            { label: 'FOUNDED', date: '1985', value: '$10M', desc: 'Houston Natural Gas Merger', color: '#10b981', x: 80, y: 315 },
+            { label: 'WALL ST DARLING', date: '1995', value: '$320M', desc: 'Mark-to-Market Model', color: '#38bdf8', x: 230, y: 225 },
+            { label: 'PEAK EMPIRE', date: '2000', value: '$1.5B', desc: 'Fortune #1 Innovator', color: '#f59e0b', x: 380, y: 95 },
+            { label: 'WHISTLEBLOWER', date: 'AUG 2001', value: '$480M', desc: 'SEC Inquiry & Debt', color: '#fb923c', x: 525, y: 235 },
+            { label: 'BANKRUPTCY', date: 'DEC 2001', value: '$0', desc: 'Chapter 11 Liquidation', color: '#ef4444', x: 645, y: 340 }
+          ]
+        },
+        {
+          label: '🏢 WeWork: The $47 Billion Mirage (2010 — 2023)',
+          title: 'WEWORK: RISE & COLLAPSE',
+          subtitle: 'SOFTBANK HYPER-VALUATION TO PENNY STOCK · 2010 — 2023',
+          theme: 'magnates-gold',
+          peakValuation: '$47B',
+          milestones: [
+            { label: 'FIRST LOCATION', date: '2010', value: '$1M', desc: 'SoHo NYC Launch', color: '#10b981', x: 80, y: 320 },
+            { label: 'SOFTBANK VISION', date: '2017', value: '$20B', desc: 'Global Expansion Blitz', color: '#38bdf8', x: 225, y: 200 },
+            { label: 'PEAK EVALUATION', date: 'JAN 2019', value: '$47B', desc: 'The World’s #1 Unicorn', color: '#f59e0b', x: 380, y: 90 },
+            { label: 'PULLED S-1 IPO', date: 'SEP 2019', value: '$8B', desc: 'Neumann Ouster', color: '#fb923c', x: 525, y: 240 },
+            { label: 'CHAPTER 11', date: 'NOV 2023', value: '$45M', desc: 'Unprofitable Leases', color: '#ef4444', x: 645, y: 345 }
+          ]
+        },
+        {
+          label: '🩸 Theranos: The Silicon Valley Lie (2003 — 2018)',
+          title: 'THE THERANOS DECEPTION',
+          subtitle: 'EDISON MACHINE MIRAGE TO WIRE FRAUD · 2003 — 2018',
+          theme: 'crimson-noir',
+          peakValuation: '$9.0B',
+          milestones: [
+            { label: 'STANFORD DROPOUT', date: '2003', value: '$5M', desc: 'Micro-fluidics Dream', color: '#10b981', x: 80, y: 320 },
+            { label: 'WALGREENS DEAL', date: '2013', value: '$1.0B', desc: 'Wellness Center Clinics', color: '#38bdf8', x: 230, y: 210 },
+            { label: 'PEAK VALUATION', date: '2014', value: '$9.0B', desc: 'Cover of Forbes & Fortune', color: '#f59e0b', x: 380, y: 95 },
+            { label: 'WSJ EXPOSÉ', date: 'OCT 2015', value: '$800M', desc: 'John Carreyrou Bombshell', color: '#fb923c', x: 525, y: 240 },
+            { label: 'CRIMINAL CHARGES', date: '2018', value: '$0', desc: 'Company Dissolved', color: '#ef4444', x: 645, y: 345 }
+          ]
+        },
+        {
+          label: '📉 Dot-Com Crash: Pets.com (1998 — 2000)',
+          title: 'PETS.COM: SUPER BOWL TO BUST',
+          subtitle: 'NASDAQ SPECULATION TO 268-DAY COLLAPSE · 1998 — 2000',
+          theme: 'bloomberg-cyan',
+          peakValuation: '$300M',
+          milestones: [
+            { label: 'INCEPTION', date: 'AUG 1998', value: '$500K', desc: 'Domain Registered', color: '#10b981', x: 80, y: 315 },
+            { label: 'SUPER BOWL AD', date: 'JAN 2000', value: '$82M', desc: '$11M Marketing Blitz', color: '#38bdf8', x: 230, y: 215 },
+            { label: 'NASDAQ IPO', date: 'FEB 2000', value: '$300M', desc: 'Priced at $11/Share', color: '#2effc6', x: 380, y: 100 },
+            { label: 'CASH RUNWAY LOW', date: 'JUL 2000', value: '$45M', desc: 'High Customer Burn', color: '#fb923c', x: 525, y: 250 },
+            { label: 'LIQUIDATION', date: 'NOV 2000', value: '$0.19', desc: '268 Days After IPO', color: '#ef4444', x: 645, y: 345 }
+          ]
+        }
+      ];
+
+      const themesList = [
+        { id: 'james-jani', label: 'James Jani Noir (Emerald → Gold → Crimson)' },
+        { id: 'magnates-gold', label: 'Magnates Media Gold (Obsidian & Amber)' },
+        { id: 'bloomberg-cyan', label: 'Bloomberg Terminal (Cyan & Mint)' },
+        { id: 'crimson-noir', label: 'Crimson Noir (Rose & Blood Red)' }
+      ];
+
+      const is3D = !!data.is3DMode;
+      const cameraPitch = typeof data.cameraPitch === 'number' ? data.cameraPitch : 26;
+      const cameraYaw = typeof data.cameraYaw === 'number' ? data.cameraYaw : -14;
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.32); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <!-- Header with Video / 3D Segmented Switcher (Matching Article & Document Highlighter) -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 10.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 4px;">
+                <span>📉</span> Timeline Engine
+              </span>
+              <!-- Video / 3D Mode Switcher -->
+              <div id="tm-mode-switcher-wrap" style="display: flex; gap: 2px; background: rgba(18,19,28,0.9); padding: 2px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);">
+                <button type="button" id="btn-tm-mode-video" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${!is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${!is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Flat Video Playback View">▶ Video</button>
+                <button type="button" id="btn-tm-mode-3d" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Cinematic 3D Depth & Orbit View">⬡ 3D</button>
+              </div>
+            </div>
+            <span style="font-size: 9px; color: ${is3D ? '#2effc6' : '#f59e0b'}; font-weight: 800; background: ${is3D ? 'rgba(46,255,198,0.15)' : 'rgba(245,158,11,0.15)'}; border: 1px solid ${is3D ? 'rgba(46,255,198,0.35)' : 'rgba(245,158,11,0.35)'}; padding: 2px 6px; border-radius: 4px;">
+              ${is3D ? '⬡ 3D ACTIVE' : 'JAMES JANI'}
+            </span>
+          </div>
+
+          <!-- 3D Camera Controls (Shown in 3D Mode) -->
+          ${is3D ? `
+          <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.32); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">🎥 3D Camera & Orbit Angle</span>
+              <span style="font-size: 8.5px; font-family: monospace; color: #2effc6; font-weight: 700;">DRAG CANVAS TO TILT</span>
+            </div>
+
+            <!-- 3D Angle Presets -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+              <button type="button" class="tm-3d-preset-btn" data-pitch="26" data-yaw="-14" style="padding: 4px 5px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.4); color: #cbd5e1; cursor: pointer;">Cinematic</button>
+              <button type="button" class="tm-3d-preset-btn" data-pitch="38" data-yaw="-24" style="padding: 4px 5px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.4); color: #cbd5e1; cursor: pointer;">Isometric</button>
+              <button type="button" class="tm-3d-preset-btn" data-pitch="45" data-yaw="-8" style="padding: 4px 5px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.4); color: #cbd5e1; cursor: pointer;">Dramatic</button>
+            </div>
+
+            <!-- Pitch / Tilt Slider -->
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                <span>TILT PITCH</span>
+                <span id="tm-val-pitch" style="font-family: monospace; color: #2effc6; font-weight: 700;">${cameraPitch}°</span>
+              </div>
+              <input type="range" id="tm-slider-pitch" min="0" max="60" value="${cameraPitch}" style="accent-color: #a855f7; height: 3px; cursor: pointer;" />
+            </div>
+
+            <!-- Yaw / Angle Slider -->
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                <span>ROTATION YAW</span>
+                <span id="tm-val-yaw" style="font-family: monospace; color: #2effc6; font-weight: 700;">${cameraYaw}°</span>
+              </div>
+              <input type="range" id="tm-slider-yaw" min="-45" max="45" value="${cameraYaw}" style="accent-color: #a855f7; height: 3px; cursor: pointer;" />
+            </div>
+          </div>
+          ` : ''}
+
+          <!-- Quick Documentary Presets -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Documentary Preset</span>
+            <select id="tm-preset-select" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
+              <option value="" style="background:#0f172a;color:#94a3b8;">— Select Mini-Doc Story Preset —</option>
+              ${presets.map((p, i) => `<option value="${i}" style="background:#0f172a;color:#fff;">${p.label}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- Title & Subtitle Inputs -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Header Title</span>
+              <input type="text" id="tm-inp-title" value="${data.title || 'THE RISE & FALL OF ENRON'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Subtitle Telemetry</span>
+              <input type="text" id="tm-inp-sub" value="${data.subtitle || 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #38bdf8; font-family: monospace; font-size: 10px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Visual Theme Selector -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Documentary Palette</span>
+            <select id="tm-theme-select" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;">
+              ${themesList.map(t => `<option value="${t.id}" ${data.theme === t.id ? 'selected' : ''} style="background:#0f172a;color:#fff;">${t.label}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- Hairline Stroke Precision & Area Glow -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase;">Curve Hairline Thickness</span>
+              <span id="tm-lbl-hairline" style="font-size: 9.5px; font-family: monospace; color: #38bdf8; font-weight: 700;">${data.hairline || 1.2}px</span>
+            </div>
+            <input type="range" id="tm-slider-hairline" min="0.7" max="2.8" step="0.1" value="${data.hairline || 1.2}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="tm-chk-grid" ${data.showGrid !== false ? 'checked' : ''} style="accent-color: #38bdf8;" />
+                <span>Coordinate Grid</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="tm-chk-fill" ${data.showAreaFill !== false ? 'checked' : ''} style="accent-color: #38bdf8;" />
+                <span>Under-Curve Glow Fill</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Milestones Builder -->
+          <div style="display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Milestones &amp; Narrative Arcs</span>
+              <button type="button" id="tm-btn-add-node" style="background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; border-radius: 4px; padding: 2px 7px; font-size: 9.5px; font-weight: 700; cursor: pointer;">+ Add Node</button>
+            </div>
+
+            <div id="tm-milestones-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 250px; overflow-y: auto; padding-right: 2px;">
+              ${milestones.map((m, idx) => `
+                <div class="tm-milestone-row" data-idx="${idx}" style="background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-left: 3px solid ${m.color || '#38bdf8'}; border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; gap: 5px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: #94a3b8;">NODE #${idx + 1}</span>
+                      <input type="color" class="tm-node-color" data-idx="${idx}" value="${m.color || '#38bdf8'}" style="width: 18px; height: 16px; border: none; background: transparent; cursor: pointer;" title="Milestone Color" />
+                    </div>
+                    ${milestones.length > 2 ? `<button type="button" class="tm-node-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer;">✕</button>` : ''}
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                    <input type="text" class="tm-node-label" data-idx="${idx}" value="${m.label}" placeholder="Milestone Name" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #fff; font-size: 10px; font-weight: 700; outline: none;" />
+                    <input type="text" class="tm-node-val" data-idx="${idx}" value="${m.value}" placeholder="Valuation ($)" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: ${m.color || '#38bdf8'}; font-family: monospace; font-size: 10px; font-weight: 700; outline: none;" />
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 4px;">
+                    <input type="text" class="tm-node-date" data-idx="${idx}" value="${m.date}" placeholder="Year / Date" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #cbd5e1; font-family: monospace; font-size: 9.5px; outline: none;" />
+                    <input type="text" class="tm-node-desc" data-idx="${idx}" value="${m.desc || ''}" placeholder="Narrative note..." style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #94a3b8; font-size: 9.5px; outline: none;" />
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Sync stage top-left Video / 3D buttons as well
+      const syncStage3DMode = (mode3d) => {
+        const pVid = document.getElementById('btn-paper-rip-mode-video');
+        const p3D = document.getElementById('btn-paper-rip-mode-3d');
+        if (pVid && p3D) {
+          pVid.style.background = !mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          pVid.style.color = !mode3d ? '#fff' : '#94a3b8';
+          p3D.style.background = mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          p3D.style.color = mode3d ? '#fff' : '#94a3b8';
+        }
+        if (typeof topCustomizerState !== 'undefined') {
+          topCustomizerState.is3DMode = mode3d;
+          topCustomizerState.paperPreviewMode = mode3d ? '3d' : 'video';
+          const btnToggle3D = document.getElementById('btn-toggle-3d-interactive-mode');
+          if (btnToggle3D) {
+            btnToggle3D.style.background = mode3d ? 'rgba(46,255,198,0.25)' : 'rgba(168,85,247,0.15)';
+            btnToggle3D.style.borderColor = mode3d ? '#2effc6' : 'rgba(168,85,247,0.5)';
+            btnToggle3D.style.color = mode3d ? '#2effc6' : '#c084fc';
+            const dot = document.getElementById('pill-3d-dot');
+            if (dot) {
+              dot.style.background = mode3d ? '#2effc6' : '#a855f7';
+              dot.style.boxShadow = mode3d ? '0 0 10px #2effc6' : '0 0 8px #a855f7';
+            }
+            const lbl = document.getElementById('label-3d-mode');
+            if (lbl) lbl.textContent = mode3d ? '3D MODE: ON (CLICK TO SELECT)' : '3D EDIT MODE';
+          }
+        }
+      };
+
+      const btnModeVid = container.querySelector('#btn-tm-mode-video');
+      if (btnModeVid) {
+        btnModeVid.onclick = () => {
+          window.tplSetContextualData('empire-timeline', { is3DMode: false });
+          syncStage3DMode(false);
+          window.tplRenderContextualInspector('empire-timeline');
+        };
+      }
+      const btnMode3D = container.querySelector('#btn-tm-mode-3d');
+      if (btnMode3D) {
+        btnMode3D.onclick = () => {
+          window.tplSetContextualData('empire-timeline', { is3DMode: true });
+          syncStage3DMode(true);
+          window.tplRenderContextualInspector('empire-timeline');
+        };
+      }
+
+      // 3D Angle Presets and Sliders
+      container.querySelectorAll('.tm-3d-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          const p = parseInt(btn.dataset.pitch, 10);
+          const y = parseInt(btn.dataset.yaw, 10);
+          window.tplSetContextualData('empire-timeline', { cameraPitch: p, cameraYaw: y });
+          window.tplRenderContextualInspector('empire-timeline');
+        };
+      });
+
+      const sPitch = container.querySelector('#tm-slider-pitch');
+      if (sPitch) {
+        sPitch.oninput = (e) => {
+          const v = parseInt(e.target.value, 10);
+          const valEl = container.querySelector('#tm-val-pitch');
+          if (valEl) valEl.textContent = `${v}°`;
+          const plane = document.getElementById('tm-3d-stage-plane');
+          const yaw = data.cameraYaw ?? -14;
+          if (plane) plane.style.transform = `rotateX(${v}deg) rotateY(${yaw}deg) scale(0.92)`;
+          window.tplSetContextualData('empire-timeline', { cameraPitch: v });
+        };
+      }
+      const sYaw = container.querySelector('#tm-slider-yaw');
+      if (sYaw) {
+        sYaw.oninput = (e) => {
+          const v = parseInt(e.target.value, 10);
+          const valEl = container.querySelector('#tm-val-yaw');
+          if (valEl) valEl.textContent = `${v}°`;
+          const plane = document.getElementById('tm-3d-stage-plane');
+          const pitch = data.cameraPitch ?? 26;
+          if (plane) plane.style.transform = `rotateX(${pitch}deg) rotateY(${v}deg) scale(0.92)`;
+          window.tplSetContextualData('empire-timeline', { cameraYaw: v });
+        };
+      }
+
+      // Stage interactive 3D drag-to-orbit
+      const viewport = document.querySelector('.tpl-empire-timeline.timeline-viewport');
+      if (viewport && is3D) {
+        let isOrbiting = false;
+        let startX = 0;
+        let startY = 0;
+        let initPitch = data.cameraPitch ?? 26;
+        let initYaw = data.cameraYaw ?? -14;
+
+        viewport.onpointerdown = (e) => {
+          if (e.target.closest('button, input, select, a')) return;
+          isOrbiting = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          initPitch = data.cameraPitch ?? 26;
+          initYaw = data.cameraYaw ?? -14;
+          viewport.setPointerCapture(e.pointerId);
+          viewport.style.cursor = 'grabbing';
+        };
+
+        viewport.onpointermove = (e) => {
+          if (!isOrbiting) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          const newPitch = Math.max(0, Math.min(65, Math.round(initPitch - dy * 0.25)));
+          const newYaw = Math.max(-50, Math.min(50, Math.round(initYaw + dx * 0.25)));
+          const plane = document.getElementById('tm-3d-stage-plane');
+          if (plane) plane.style.transform = `rotateX(${newPitch}deg) rotateY(${newYaw}deg) scale(0.92)`;
+          const vp = container.querySelector('#tm-val-pitch');
+          const vy = container.querySelector('#tm-val-yaw');
+          if (vp) vp.textContent = `${newPitch}°`;
+          if (vy) vy.textContent = `${newYaw}°`;
+          const sp = container.querySelector('#tm-slider-pitch');
+          const sy = container.querySelector('#tm-slider-yaw');
+          if (sp) sp.value = newPitch;
+          if (sy) sy.value = newYaw;
+          data.cameraPitch = newPitch;
+          data.cameraYaw = newYaw;
+        };
+
+        const stopOrbit = (e) => {
+          if (!isOrbiting) return;
+          isOrbiting = false;
+          viewport.style.cursor = 'default';
+          try { viewport.releasePointerCapture(e.pointerId); } catch (_) {}
+          window.tplSetContextualData('empire-timeline', { cameraPitch: data.cameraPitch, cameraYaw: data.cameraYaw });
+        };
+        viewport.onpointerup = stopOrbit;
+        viewport.onpointercancel = stopOrbit;
+      }
+
+      // Wire preset select
+      const presetSel = container.querySelector('#tm-preset-select');
+      if (presetSel) {
+        presetSel.onchange = (e) => {
+          const p = presets[parseInt(e.target.value, 10)];
+          if (p) {
+            window.tplSetContextualData('empire-timeline', {
+              title: p.title,
+              subtitle: p.subtitle,
+              theme: p.theme,
+              peakValuation: p.peakValuation,
+              milestones: p.milestones.map(m => Object.assign({}, m))
+            });
+            window.tplRenderContextualInspector('empire-timeline');
+          }
+        };
+      }
+
+      const inpTitle = container.querySelector('#tm-inp-title');
+      if (inpTitle) inpTitle.oninput = (e) => window.tplSetContextualData('empire-timeline', { title: e.target.value });
+      const inpSub = container.querySelector('#tm-inp-sub');
+      if (inpSub) inpSub.oninput = (e) => window.tplSetContextualData('empire-timeline', { subtitle: e.target.value });
+
+      const themeSel = container.querySelector('#tm-theme-select');
+      if (themeSel) themeSel.onchange = (e) => window.tplSetContextualData('empire-timeline', { theme: e.target.value });
+
+      const sliderHairline = container.querySelector('#tm-slider-hairline');
+      const lblHairline = container.querySelector('#tm-lbl-hairline');
+      if (sliderHairline) {
+        sliderHairline.oninput = (e) => {
+          const v = parseFloat(e.target.value);
+          if (lblHairline) lblHairline.textContent = `${v.toFixed(1)}px`;
+          window.tplSetContextualData('empire-timeline', { hairline: v });
+        };
+      }
+
+      const chkGrid = container.querySelector('#tm-chk-grid');
+      if (chkGrid) chkGrid.onchange = (e) => window.tplSetContextualData('empire-timeline', { showGrid: e.target.checked });
+      const chkFill = container.querySelector('#tm-chk-fill');
+      if (chkFill) chkFill.onchange = (e) => window.tplSetContextualData('empire-timeline', { showAreaFill: e.target.checked });
+
+      const syncNodeChange = (idx, field, val) => {
+        const ms = milestones.map(m => Object.assign({}, m));
+        if (!ms[idx]) return;
+        ms[idx][field] = val;
+        window.tplSetContextualData('empire-timeline', { milestones: ms });
+      };
+
+      container.querySelectorAll('.tm-node-label').forEach(inp => {
+        inp.oninput = (e) => syncNodeChange(parseInt(inp.dataset.idx, 10), 'label', e.target.value);
+      });
+      container.querySelectorAll('.tm-node-val').forEach(inp => {
+        inp.oninput = (e) => syncNodeChange(parseInt(inp.dataset.idx, 10), 'value', e.target.value);
+      });
+      container.querySelectorAll('.tm-node-date').forEach(inp => {
+        inp.oninput = (e) => syncNodeChange(parseInt(inp.dataset.idx, 10), 'date', e.target.value);
+      });
+      container.querySelectorAll('.tm-node-desc').forEach(inp => {
+        inp.oninput = (e) => syncNodeChange(parseInt(inp.dataset.idx, 10), 'desc', e.target.value);
+      });
+      container.querySelectorAll('.tm-node-color').forEach(inp => {
+        inp.oninput = (e) => {
+          syncNodeChange(parseInt(inp.dataset.idx, 10), 'color', e.target.value);
+          window.tplRenderContextualInspector('empire-timeline');
+        };
+      });
+      container.querySelectorAll('.tm-node-del').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.dataset.idx, 10);
+          const ms = milestones.filter((_, i) => i !== idx);
+          const count = ms.length;
+          ms.forEach((m, i) => {
+            m.x = Math.round(80 + (i / Math.max(1, count - 1)) * 565);
+          });
+          window.tplSetContextualData('empire-timeline', { milestones: ms });
+          window.tplRenderContextualInspector('empire-timeline');
+        };
+      });
+
+      const btnAdd = container.querySelector('#tm-btn-add-node');
+      if (btnAdd) {
+        btnAdd.onclick = () => {
+          const ms = milestones.map(m => Object.assign({}, m));
+          const newIdx = ms.length;
+          ms.push({
+            label: `NEW MILESTONE`,
+            date: `YEAR ${newIdx + 1}`,
+            value: `$500M`,
+            desc: `Key turning point`,
+            color: '#38bdf8',
+            x: 500,
+            y: 200
+          });
+          const count = ms.length;
+          ms.forEach((m, i) => {
+            m.x = Math.round(80 + (i / Math.max(1, count - 1)) * 565);
+          });
+          window.tplSetContextualData('empire-timeline', { milestones: ms });
+          window.tplRenderContextualInspector('empire-timeline');
+        };
+      }
+      return;
+    }
+
+    // =========================================================================
     // SPECIAL HANDLER: INVESTIGATIVE GLOBE & TACTICAL MAP (map)
     // Granular World Map + Multi-Route Country-to-Country Transit + 3D Video Switch + Direct On-Screen Tracing
     // =========================================================================
@@ -2831,11 +3828,385 @@
       return;
     }
 
+    const fontOptionsHtml = (selectedFont) => [
+      { label: 'Space Grotesk', val: "'Space Grotesk', sans-serif" },
+      { label: 'Cinzel Serif', val: "'Cinzel', Georgia, serif" },
+      { label: 'Impact Bold', val: 'Impact, sans-serif' },
+      { label: 'Montserrat', val: "'Montserrat', sans-serif" },
+      { label: 'JetBrains Mono', val: "'JetBrains Mono', monospace" },
+      { label: 'Inter', val: "'Inter', sans-serif" },
+      { label: 'Playfair Display', val: "'Playfair Display', serif" }
+    ].map(f => `<option value="${f.val}" ${f.val === selectedFont ? 'selected' : ''} style="background:#0f172a;color:#fff;">${f.label}</option>`).join('');
+
     // =========================================================================
-    // GENERAL HANDLER: FOR ALL OTHER 45 EXTRACTED TEMPLATES
+    // SPECIAL HANDLER: 3D PRODUCT ZOOM & SPIN (zoom)
+    // =========================================================================
+    if (tplId === 'zoom') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(56,189,248,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">⬡ 3D Product Studio &amp; Typography</span>
+            <span style="font-size: 9px; color: #c084fc; font-weight: 700; background: rgba(168,85,247,0.18); padding: 2px 6px; border-radius: 4px;">DRAGGABLE HUD</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Product Headline</span>
+              <input type="text" id="zm-inp-name" value="${data.productName || 'TITAN VELOX X1'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Spec Badge / Subtitle</span>
+              <input type="text" id="zm-inp-sub" value="${data.productSub || 'GRADE-5 TITANIUM'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fbbf24; font-size: 11px; font-weight: 700; outline: none;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr auto auto; gap: 6px; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Font Family</span>
+              <select id="zm-inp-font" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 6px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;">
+                ${fontOptionsHtml(data.titleFont || "'Space Grotesk', sans-serif")}
+              </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Size: <b id="zm-lbl-sz" style="color:#38bdf8;">${data.titleSize || 26}px</b></span>
+              <input type="range" id="zm-inp-size" min="14" max="54" step="1" value="${data.titleSize || 26}" style="width:100%; accent-color:#38bdf8;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Title</span>
+              <input type="color" id="zm-inp-tcol" value="${data.titleColor || '#f8fafc'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Spec</span>
+              <input type="color" id="zm-inp-scol" value="${data.subColor || '#fbbf24'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 7px 10px;">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 10px; font-weight: 700; color: #fff;">3D Product Render Asset</span>
+              <span style="font-size: 8.5px; color: #94a3b8;">Drag title or product directly on stage</span>
+            </div>
+            <label style="font-size: 9.5px; font-weight: 700; color: #fff; background: rgba(168,85,247,0.28); border: 1px solid #c084fc; padding: 4px 10px; border-radius: 5px; cursor: pointer;">
+              Swap Product
+              <input type="file" id="zm-inp-img" accept="image/*" style="display:none;" />
+            </label>
+          </div>
+
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+      container.querySelector('#zm-inp-name')?.addEventListener('input', e => window.tplSetContextualData('zoom', { productName: e.target.value }));
+      container.querySelector('#zm-inp-sub')?.addEventListener('input', e => window.tplSetContextualData('zoom', { productSub: e.target.value }));
+      container.querySelector('#zm-inp-font')?.addEventListener('change', e => window.tplSetContextualData('zoom', { titleFont: e.target.value }));
+      container.querySelector('#zm-inp-size')?.addEventListener('input', e => {
+        const v = parseInt(e.target.value, 10);
+        const l = container.querySelector('#zm-lbl-sz'); if (l) l.textContent = v + 'px';
+        window.tplSetContextualData('zoom', { titleSize: v });
+      });
+      container.querySelector('#zm-inp-tcol')?.addEventListener('input', e => window.tplSetContextualData('zoom', { titleColor: e.target.value }));
+      container.querySelector('#zm-inp-scol')?.addEventListener('input', e => window.tplSetContextualData('zoom', { subColor: e.target.value }));
+      container.querySelector('#zm-inp-img')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) window.tplSetContextualData('zoom', { productImg: URL.createObjectURL(f) });
+      });
+      window.tplWireUniversalBgControls('zoom', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: POLAROID STACK (polaroid)
+    // =========================================================================
+    if (tplId === 'polaroid') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">📸 Polaroid Stack &amp; Stage Freedom</span>
+            <button type="button" id="pol-btn-reset" style="font-size: 9px; color: #cbd5e1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 2px 7px; border-radius: 4px; cursor: pointer;">↺ Reset Layout</button>
+          </div>
+
+          <div style="font-size: 9.5px; color: #cbd5e1; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); padding: 6px 8px; border-radius: 6px;">
+            💡 <b>Full-Screen Interactive:</b> Drag either Polaroid directly on the preview stage to reposition, or use the scale &amp; tilt sliders below.
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.07); border-radius: 7px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:9.5px;font-weight:800;color:#f8fafc;">POLAROID #1 (LEFT)</span>
+                <label style="font-size:9px;font-weight:700;color:#38bdf8;cursor:pointer;">+ Photo<input type="file" id="pol-up-1" accept="image/*" style="display:none;"/></label>
+              </div>
+              <input type="text" id="pol-cap-1" value="${data.caption || 'First Office, 1994'}" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:4px 6px;color:#fff;font-size:10.5px;" />
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;"><span>Tilt Angle</span><b id="pol-rot1-lbl" style="color:#fbbf24;">${data.p1Rot != null ? data.p1Rot : -11}°</b></div>
+              <input type="range" id="pol-rot-1" min="-35" max="35" step="1" value="${data.p1Rot != null ? data.p1Rot : -11}" style="width:100%;accent-color:#fbbf24;" />
+            </div>
+
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.07); border-radius: 7px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:9.5px;font-weight:800;color:#f8fafc;">POLAROID #2 (RIGHT)</span>
+                <label style="font-size:9px;font-weight:700;color:#38bdf8;cursor:pointer;">+ Photo<input type="file" id="pol-up-2" accept="image/*" style="display:none;"/></label>
+              </div>
+              <input type="text" id="pol-cap-2" value="${data.caption2 || 'Archive Exhibit #04'}" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:4px 6px;color:#fff;font-size:10.5px;" />
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;"><span>Tilt Angle</span><b id="pol-rot2-lbl" style="color:#fbbf24;">${data.p2Rot != null ? data.p2Rot : 7}°</b></div>
+              <input type="range" id="pol-rot-2" min="-35" max="35" step="1" value="${data.p2Rot != null ? data.p2Rot : 7}" style="width:100%;accent-color:#fbbf24;" />
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#cbd5e1;"><span>Polaroid Frame Scale (Full-Screen Size)</span><b id="pol-scale-lbl" style="color:#38bdf8;">${Math.round((data.polaroidScale || 1) * 100)}%</b></div>
+            <input type="range" id="pol-inp-scale" min="0.6" max="1.8" step="0.05" value="${data.polaroidScale || 1}" style="width:100%;accent-color:#38bdf8;" />
+          </div>
+
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+      container.querySelector('#pol-cap-1')?.addEventListener('input', e => window.tplSetContextualData('polaroid', { caption: e.target.value }));
+      container.querySelector('#pol-cap-2')?.addEventListener('input', e => window.tplSetContextualData('polaroid', { caption2: e.target.value }));
+      container.querySelector('#pol-rot-1')?.addEventListener('input', e => {
+        const v = parseInt(e.target.value, 10);
+        const l = container.querySelector('#pol-rot1-lbl'); if (l) l.textContent = v + '°';
+        window.tplSetContextualData('polaroid', { p1Rot: v });
+      });
+      container.querySelector('#pol-rot-2')?.addEventListener('input', e => {
+        const v = parseInt(e.target.value, 10);
+        const l = container.querySelector('#pol-rot2-lbl'); if (l) l.textContent = v + '°';
+        window.tplSetContextualData('polaroid', { p2Rot: v });
+      });
+      container.querySelector('#pol-inp-scale')?.addEventListener('input', e => {
+        const v = parseFloat(e.target.value);
+        const l = container.querySelector('#pol-scale-lbl'); if (l) l.textContent = Math.round(v * 100) + '%';
+        window.tplSetContextualData('polaroid', { polaroidScale: v });
+      });
+      container.querySelector('#pol-up-1')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) window.tplSetContextualData('polaroid', { photo1: URL.createObjectURL(f) });
+      });
+      container.querySelector('#pol-up-2')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) window.tplSetContextualData('polaroid', { photo2: URL.createObjectURL(f) });
+      });
+      container.querySelector('#pol-btn-reset')?.addEventListener('click', () => {
+        window.tplSetContextualData('polaroid', { polaroidScale: 1.0, p1Rot: -11, p2Rot: 7, p1X: -78, p1Y: -6, p2X: 72, p2Y: 10 });
+        window.tplRenderContextualInspector('polaroid');
+      });
+      window.tplWireUniversalBgControls('polaroid', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: CEO PORTRAIT REVEAL (ceo-portrait)
+    // =========================================================================
+    if (tplId === 'ceo-portrait') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">👔 CEO Cutout Reveal &amp; Executive Dossier</span>
+            <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 4px;">AI CUTOUT READY</span>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(251,191,36,0.28); border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 10px; font-weight: 800; color: #fff;">CEO Portrait Photo / Cutout</span>
+              <span style="font-size: 8.5px; color: #94a3b8;">Upload any portrait — auto-cutout removes background</span>
+            </div>
+            <div style="display: flex; gap: 5px;">
+              <label style="font-size: 9.5px; font-weight: 800; color: #0f172a; background: #fbbf24; padding: 5px 9px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
+                + Upload Photo
+                <input type="file" id="ceo-up-photo" accept="image/*" style="display:none;" />
+              </label>
+              <button type="button" id="ceo-btn-cutout" style="font-size: 9.5px; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); padding: 5px 8px; border-radius: 5px; cursor: pointer; white-space: nowrap;" title="Run Subject Cutout Isolation">✂️ Auto-Cutout</button>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Executive Name</span>
+            <input type="text" id="ceo-inp-name" value="${data.ceoName || 'ALEXANDER VANCE'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700;" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Role / Company</span>
+              <input type="text" id="ceo-inp-role" value="${data.ceoRole || 'CHIEF EXECUTIVE OFFICER · VANGUARD GLOBAL'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-size: 10px; font-weight: 600;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Dossier Header Tag</span>
+              <input type="text" id="ceo-inp-badge" value="${data.ceoBadge || 'EXECUTIVE DOSSIER // VERIFIED'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fbbf24; font-size: 10px; font-weight: 700;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr auto auto; gap: 6px; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Font</span>
+              <select id="ceo-inp-font" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 6px; color: #fff; font-size: 10.5px;">
+                ${fontOptionsHtml(data.fontFamily || "'Space Grotesk', sans-serif")}
+              </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Portrait Scale: <b id="ceo-sc-lbl" style="color:#fbbf24;">${Math.round((data.portraitScale || 1) * 100)}%</b></span>
+              <input type="range" id="ceo-inp-scale" min="0.7" max="1.6" step="0.05" value="${data.portraitScale || 1}" style="width:100%;accent-color:#fbbf24;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Name</span>
+              <input type="color" id="ceo-inp-ncol" value="${data.nameColor || '#ffffff'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Accent</span>
+              <input type="color" id="ceo-inp-acol" value="${data.accentColor || '#fbbf24'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+          </div>
+
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+      container.querySelector('#ceo-inp-name')?.addEventListener('input', e => window.tplSetContextualData('ceo-portrait', { ceoName: e.target.value }));
+      container.querySelector('#ceo-inp-role')?.addEventListener('input', e => window.tplSetContextualData('ceo-portrait', { ceoRole: e.target.value }));
+      container.querySelector('#ceo-inp-badge')?.addEventListener('input', e => window.tplSetContextualData('ceo-portrait', { ceoBadge: e.target.value }));
+      container.querySelector('#ceo-inp-font')?.addEventListener('change', e => window.tplSetContextualData('ceo-portrait', { fontFamily: e.target.value }));
+      container.querySelector('#ceo-inp-scale')?.addEventListener('input', e => {
+        const v = parseFloat(e.target.value);
+        const l = container.querySelector('#ceo-sc-lbl'); if (l) l.textContent = Math.round(v * 100) + '%';
+        window.tplSetContextualData('ceo-portrait', { portraitScale: v });
+      });
+      container.querySelector('#ceo-inp-ncol')?.addEventListener('input', e => window.tplSetContextualData('ceo-portrait', { nameColor: e.target.value }));
+      container.querySelector('#ceo-inp-acol')?.addEventListener('input', e => window.tplSetContextualData('ceo-portrait', { accentColor: e.target.value }));
+      container.querySelector('#ceo-up-photo')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) {
+          const url = URL.createObjectURL(f);
+          window.tplSetContextualData('ceo-portrait', { cutoutUrl: url });
+        }
+      });
+      container.querySelector('#ceo-btn-cutout')?.addEventListener('click', () => {
+        const curUrl = (window.tplGetContextualData('ceo-portrait').cutoutUrl) || '/ceo_portrait_cutout.jpg';
+        if (typeof generateCutoutCanvasForUrl === 'function') {
+          generateCutoutCanvasForUrl(curUrl, (c) => {
+            if (c) window.tplSetContextualData('ceo-portrait', { cutoutUrl: c.toDataURL() });
+          });
+        }
+      });
+      window.tplWireUniversalBgControls('ceo-portrait', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: BOARDROOM ZOOM (boardroom-zoom)
+    // =========================================================================
+    if (tplId === 'boardroom-zoom') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">🏢 Corporate Boardroom Zoom &amp; Lower-Third</span>
+            <label style="font-size: 9px; font-weight: 800; color: #0f172a; background: #fbbf24; padding: 3px 8px; border-radius: 4px; cursor: pointer;">
+              + Swap Boardroom Photo
+              <input type="file" id="br-up-scene" accept="image/*" style="display:none;" />
+            </label>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Summit Headline</span>
+            <input type="text" id="br-inp-hl" value="${data.headline || 'EMERGENCY BOARDROOM SUMMIT'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700;" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: end;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Location / Deal Subline</span>
+              <input type="text" id="br-inp-sub" value="${data.subline || '42ND FLOOR · MANHATTAN HQ // $14.8B MERGER VOTE'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fbbf24; font-size: 10px; font-weight: 700;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Text</span>
+              <input type="color" id="br-inp-tcol" value="${data.textColor || '#f8fafc'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Accent</span>
+              <input type="color" id="br-inp-acol" value="${data.accentColor || '#fbbf24'}" style="width:24px;height:24px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+          </div>
+
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+      container.querySelector('#br-inp-hl')?.addEventListener('input', e => window.tplSetContextualData('boardroom-zoom', { headline: e.target.value }));
+      container.querySelector('#br-inp-sub')?.addEventListener('input', e => window.tplSetContextualData('boardroom-zoom', { subline: e.target.value }));
+      container.querySelector('#br-inp-tcol')?.addEventListener('input', e => window.tplSetContextualData('boardroom-zoom', { textColor: e.target.value }));
+      container.querySelector('#br-inp-acol')?.addEventListener('input', e => window.tplSetContextualData('boardroom-zoom', { accentColor: e.target.value }));
+      container.querySelector('#br-up-scene')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) window.tplSetContextualData('boardroom-zoom', { sceneUrl: URL.createObjectURL(f) });
+      });
+      window.tplWireUniversalBgControls('boardroom-zoom', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: SECURITY CAMERA OVERLAY (security-camera)
+    // =========================================================================
+    if (tplId === 'security-camera') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      const curMode = data.colorMode || 'night';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(16,185,129,0.32); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase;">📹 CCTV Surveillance HUD &amp; Footage Feed</span>
+            <span style="font-size: 9px; color: #ef4444; font-weight: 800; background: rgba(239,68,68,0.18); padding: 2px 6px; border-radius: 4px;">● LIVE OVERLAY</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Camera ID / Sector</span>
+              <input type="text" id="cctv-inp-cam" value="${data.camId || 'CAM 04 // NORTH VAULT CORRIDOR'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-family: monospace; font-size: 10.5px; font-weight: 700;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Date Stamp</span>
+              <input type="text" id="cctv-inp-date" value="${data.datePrefix || '2026-10-19'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #10b981; font-family: monospace; font-size: 10.5px; font-weight: 700;" />
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Optical Telemetry Footer</span>
+            <input type="text" id="cctv-inp-status" value="${data.statusText || 'ISO 3200 · IR NIGHT VISION · 1080P/24'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-family: monospace; font-size: 10px;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Surveillance Sensor Grading</span>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+              ${[
+                { id: 'night', label: 'IR Night' },
+                { id: 'bw', label: 'Mono B&W' },
+                { id: 'color', label: 'Raw CCTV' },
+                { id: 'thermal', label: 'Thermal' }
+              ].map(m => `<button type="button" class="cctv-mode-btn" data-mode="${m.id}" style="padding:5px 4px;border-radius:5px;border:1px solid ${curMode === m.id ? '#10b981' : 'rgba(255,255,255,0.1)'};background:${curMode === m.id ? 'rgba(16,185,129,0.22)' : 'rgba(0,0,0,0.4)'};color:${curMode === m.id ? '#fff' : '#94a3b8'};font-size:9.5px;font-weight:700;cursor:pointer;">${m.label}</button>`).join('')}
+            </div>
+          </div>
+
+          <label style="display:flex;align-items:center;gap:6px;font-size:10px;color:#cbd5e1;cursor:pointer;">
+            <input type="checkbox" id="cctv-inp-scan" ${data.showScanlines !== false ? 'checked' : ''} style="accent-color:#10b981;" />
+            Enable CRT Scanlines &amp; Viewfinder Grid
+          </label>
+
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+      container.querySelector('#cctv-inp-cam')?.addEventListener('input', e => window.tplSetContextualData('security-camera', { camId: e.target.value }));
+      container.querySelector('#cctv-inp-date')?.addEventListener('input', e => window.tplSetContextualData('security-camera', { datePrefix: e.target.value }));
+      container.querySelector('#cctv-inp-status')?.addEventListener('input', e => window.tplSetContextualData('security-camera', { statusText: e.target.value }));
+      container.querySelector('#cctv-inp-scan')?.addEventListener('change', e => window.tplSetContextualData('security-camera', { showScanlines: e.target.checked }));
+      container.querySelectorAll('.cctv-mode-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('security-camera', { colorMode: btn.dataset.mode });
+          window.tplRenderContextualInspector('security-camera');
+        };
+      });
+      window.tplWireUniversalBgControls('security-camera', container);
+      return;
+    }
+
+    // =========================================================================
+    // GENERAL HANDLER: FOR ALL OTHER EXTRACTED TEMPLATES
     // Provides tailored, highly relevant controls specific to each template's fields
     // =========================================================================
-    const keys = Object.keys(data).filter(k => k !== 'type');
+    const keys = Object.keys(data).filter(k => !['type', 'bgPreset', 'bgMediaUrl', 'bgMediaType'].includes(k));
     const typeLabel = tplId.replace(/[-_]/g, ' ').toUpperCase();
 
     let fieldsHtml = '';
@@ -2896,8 +4267,10 @@
           <span style="font-size: 9px; color: #a855f7; font-weight: 700; background: rgba(168,85,247,0.15); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
         </div>
         ${fieldsHtml}
+        ${window.tplBuildUniversalBgHtml ? window.tplBuildUniversalBgHtml(data) : ''}
       </div>
     `;
+    if (window.tplWireUniversalBgControls) window.tplWireUniversalBgControls(tplId, container);
 
     // Wire general controls
     container.querySelectorAll('input[data-key]').forEach(inp => {

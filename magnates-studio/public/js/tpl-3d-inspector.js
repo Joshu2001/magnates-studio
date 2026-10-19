@@ -37,8 +37,8 @@
     }
     return false;
   };
-  const kindOf = (id) => id === 'document-3d-fx-engine' ? 'doc' : (is3DSpatial(id) ? 'spatial' : (isBridged(id) ? 'generic' : null));
-  const has3D = (k, id) => k === 'spatial' || k === 'doc' || is3DSpatial(id);
+  const kindOf = (id) => id === 'document-3d-fx-engine' ? 'doc' : (id === 'spatial-3d-motion-suite' ? 'spatial' : (is3DSpatial(id) ? 'dom3d' : (isBridged(id) ? 'generic' : null)));
+  const has3D = (k, id) => k === 'spatial' || k === 'doc' || k === 'dom3d' || is3DSpatial(id);
   const stOf = (k) => k === 'spatial' ? spatial3DState : document3DFXState;
 
   // ---------------------------------------------------------------- store
@@ -335,14 +335,23 @@
       return txt('tx-' + i, sl.label, v);
     }).join('');
 
-    if (mode === 'video') {
-      html += section('Motion', [
+    if (mode === 'video' || k === 'dom3d') {
+      if (mode === '3d' && k === 'dom3d') {
+        html += `<div style="background:linear-gradient(135deg, rgba(168,85,247,0.18), rgba(56,189,248,0.12));border:1px solid rgba(192,132,252,0.45);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:15px;">🖐️</span>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:10.5px;font-weight:800;color:#f3e8ff;letter-spacing:0.04em;">INTERACTIVE 3D HAND ORBIT ACTIVE</span>
+            <span style="font-size:9.5px;color:#cbd5e1;">Grab &amp; drag the stage to tilt/rotate in 3D • Scroll wheel to zoom</span>
+          </div>
+        </div>`;
+      }
+      html += section(mode === '3d' ? '3D Camera Rig & Orbit' : 'Motion', [
         row('v-speed', 'Playback Speed', -3.0, 3.0, 0.1, fx.speed, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
-        row('v-pitch', 'Tilt Pitch (X)', -40, 40, 1, fx.pitch, v => v + '°'),
-        row('v-yaw', 'Rotation Yaw (Y)', -40, 40, 1, fx.yaw, v => v + '°'),
+        row('v-pitch', 'Tilt Pitch (X)', -45, 45, 1, fx.pitch, v => v + '°'),
+        row('v-yaw', 'Rotation Yaw (Y)', -45, 45, 1, fx.yaw, v => v + '°'),
         row('v-roll', 'Roll (Z)', -30, 30, 1, fx.roll, v => v + '°'),
-        row('v-zoom', 'Zoom / Depth', 0.6, 1.6, 0.05, fx.zoom, v => v.toFixed(2) + 'x'),
-        `<button type="button" data-act="v-reset" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cbd5e1;cursor:pointer;">Reset Motion</button>`
+        row('v-zoom', 'Zoom / Depth', 0.6, 2.2, 0.05, fx.zoom, v => v.toFixed(2) + 'x'),
+        `<button type="button" data-act="v-reset" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cbd5e1;cursor:pointer;">Reset 3D Camera</button>`
       ].join(''));
 
       if (tplId === 'jani-puzzle-narrative-suite') {
@@ -567,7 +576,13 @@
     }
     if (act === 'mode-video' || act === 'mode-3d') {
       capture(tplId);
-      e.mode = act === 'mode-3d' ? '3d' : 'video'; persist(); lastKey = '';
+      const is3D = act === 'mode-3d';
+      e.mode = is3D ? '3d' : 'video';
+      stageTheaterActive = is3D;
+      if (typeof topCustomizerState !== 'undefined') topCustomizerState.is3DMode = is3D;
+      updateTheaterButtonUI();
+      applyModeLayout(is3D);
+      persist(); lastKey = '';
       renderTopTemplatePreviewStage();
       return;
     }
@@ -614,7 +629,83 @@
   }
 
   // ---------------------------------------------------------------- customizer stage hooks
+  function attachDom3DInteractiveRig(stage, tplId) {
+    const inner = stage.querySelector('#customizer-stage-inner') || stage;
+    const e = entry(tplId);
+    const is3D = e.mode === '3d';
+    const existingPill = stage.querySelector('#dom3d-orbit-pill');
+    if (existingPill) existingPill.remove();
+    if (!is3D) {
+      inner.style.cursor = '';
+      return;
+    }
+    inner.style.cursor = 'grab';
+    inner.style.perspective = '1100px';
+    const pill = document.createElement('div');
+    pill.id = 'dom3d-orbit-pill';
+    pill.style.cssText = 'position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:85;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(15,23,42,0.88);backdrop-filter:blur(10px);border:1px solid rgba(192,132,252,0.55);color:#f3e8ff;font-size:11px;font-weight:800;letter-spacing:0.05em;box-shadow:0 8px 24px rgba(0,0,0,0.65);pointer-events:none;white-space:nowrap;';
+    pill.innerHTML = `<span style="font-size:14px;">🖐️</span><span>3D INTERACTIVE MODE — DRAG TO TILT &amp; ROTATE • SCROLL TO ZOOM</span>`;
+    inner.appendChild(pill);
+
+    if (inner.dataset.dom3dBound === tplId) return;
+    inner.dataset.dom3dBound = tplId;
+
+    let dragging = false, startX = 0, startY = 0, startYaw = 0, startPitch = 0;
+    const syncSliderUI = () => {
+      const h = host(); if (!h) return;
+      const pIn = h.querySelector('[data-k="v-pitch"]'); if (pIn) pIn.value = e.fx.pitch;
+      const yIn = h.querySelector('[data-k="v-yaw"]'); if (yIn) yIn.value = e.fx.yaw;
+      const zIn = h.querySelector('[data-k="v-zoom"]'); if (zIn) zIn.value = e.fx.zoom;
+      setLabel('v-pitch', Math.round(e.fx.pitch) + '°');
+      setLabel('v-yaw', Math.round(e.fx.yaw) + '°');
+      setLabel('v-zoom', Number(e.fx.zoom).toFixed(2) + 'x');
+    };
+
+    inner.addEventListener('pointerdown', (ev) => {
+      if (entry(tplId).mode !== '3d') return;
+      if (ev.target.closest('.zoom-hud-bottom, #tpl-universal-stage-toolbar, button, input, select')) return;
+      dragging = true;
+      startX = ev.clientX;
+      startY = ev.clientY;
+      startYaw = e.fx.yaw || 0;
+      startPitch = e.fx.pitch || 0;
+      inner.style.cursor = 'grabbing';
+      try { inner.setPointerCapture(ev.pointerId); } catch (_) {}
+    });
+
+    inner.addEventListener('pointermove', (ev) => {
+      if (!dragging || entry(tplId).mode !== '3d') return;
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
+      e.fx.yaw = Math.max(-45, Math.min(45, Math.round(startYaw + dx * 0.25)));
+      e.fx.pitch = Math.max(-45, Math.min(45, Math.round(startPitch - dy * 0.25)));
+      window.tpl3DFx = e.fx;
+      syncSliderUI();
+    });
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      if (entry(tplId).mode === '3d') inner.style.cursor = 'grab';
+      persist();
+    };
+    inner.addEventListener('pointerup', endDrag);
+    inner.addEventListener('pointercancel', endDrag);
+
+    inner.addEventListener('wheel', (ev) => {
+      if (entry(tplId).mode !== '3d') return;
+      ev.preventDefault();
+      const delta = ev.deltaY < 0 ? 0.06 : -0.06;
+      e.fx.zoom = Math.max(0.6, Math.min(2.2, Number(((e.fx.zoom || 1) + delta).toFixed(2))));
+      window.tpl3DFx = e.fx;
+      syncSliderUI();
+      persist();
+    }, { passive: false });
+  }
+
   function mount3D(stage, tplId) {
+    stageTheaterActive = true;
+    updateTheaterButtonUI();
     applyModeLayout(true);
     const k = kindOf(tplId), cid = k === 'spatial' ? 'spatial-threejs-container' : 'doc-threejs-container';
     stage.innerHTML = `<div id="customizer-stage-inner" style="position:absolute;inset:0;overflow:hidden;background:#07090e;"><div data-3d-stage="1" style="position:absolute;inset:0;cursor:grab;"></div></div>`;
@@ -718,21 +809,12 @@
     const aspectBtn = document.getElementById('tpl-modal-btn-aspect');
     const timerBadge = document.getElementById('tpl-modal-timer-badge');
 
-    const isTheater = typeof stageTheaterActive !== 'undefined' && !!stageTheaterActive;
-    const isExpanded = is3D || isTheater;
+    const isTheater = (typeof stageTheaterActive !== 'undefined' && !!stageTheaterActive) || !!is3D;
 
-    if (isExpanded) {
+    if (isTheater) {
       if (sb) sb.style.display = 'none';
       if (pb) pb.style.display = 'none';
-      if (is3D) {
-        if (hud) hud.style.display = 'none';
-        if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = 'none';
-        if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = 'none';
-      } else {
-        if (hud) hud.style.display = '';
-        if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = '';
-        if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = '';
-      }
+      if (hud) hud.style.display = 'none';
       if (box) {
         box.style.padding = '0';
         box.style.border = 'none';
@@ -755,8 +837,6 @@
       if (sb) sb.style.display = '';
       if (pb) pb.style.display = '';
       if (hud) hud.style.display = '';
-      if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = '';
-      if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = '';
       if (box) {
         box.style.padding = '';
         box.style.border = '';
@@ -776,14 +856,27 @@
         stageCont.style.overflow = 'visible';
       }
     }
+    // Always preserve top controls (format switcher, [ ▶ Video ] [ ⬡ 3D ] mode toggle, 3D edit mode pill)
+    if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = '';
+    if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = '';
     updateTheaterButtonUI();
   }
 
-  window.tpl3DUse3D = (id) => has3D(kindOf(id), id) && entry(id).mode === '3d';
+  window.tpl3DUse3D = (id) => {
+    const k = kindOf(id);
+    return (k === 'spatial' || k === 'doc') && entry(id).mode === '3d';
+  };
   window.tpl3DMountStage = mount3D;
   window.tpl3DAfterVideoStage = function (stage, tplId) {
-    if (!kindOf(tplId)) return;
-    applyModeLayout(false);
+    const k = kindOf(tplId);
+    if (!k) return;
+    const isDom3DActive = (k === 'dom3d' && entry(tplId).mode === '3d');
+    if (isDom3DActive) {
+      stageTheaterActive = true;
+      updateTheaterButtonUI();
+    }
+    applyModeLayout(isDom3DActive);
+    if (k === 'dom3d') attachDom3DInteractiveRig(stage, tplId);
     const before = Object.keys(videoNodes[tplId] || {}).length;
     collectVideoNodes(stage, tplId);
     if (before !== Object.keys(videoNodes[tplId]).length || !(host() && host().innerHTML)) { lastKey = ''; window.tpl3DSync(tplId); }
@@ -940,7 +1033,7 @@
     const cw = cv.width, ch = cv.height;
     c.save();
     try {
-      if (has3D(k, sc.tplId) && sc.entry.mode === '3d' && typeof THREE !== 'undefined') {
+      if ((k === 'spatial' || k === 'doc') && sc.entry.mode === '3d' && typeof THREE !== 'undefined') {
         draw3DClip(c, clip, t, cw, ch);
       } else {
         let r = rast[clip.id];

@@ -96,15 +96,68 @@
     const tplId = topCustomizerState.currentTpl?.id;
     const mapCtxData = (tplId === 'map' && typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : null;
     const isMapInteractive3D = !!(mapCtxData && (mapCtxData.is3DMode || mapCtxData.drawOnScreenMode));
-    if (isMapInteractive3D) {
+    const isDom3DHandOrbit = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode && ['zoom', 'parallax', 'textbehind', 'docheight'].includes(tplId));
+    const isBypassStageTransform = isMapInteractive3D || tplId === 'empire-timeline' || isDom3DHandOrbit;
+    if (isBypassStageTransform) {
       box.style.display = 'none';
       toolbar.style.display = 'none';
       return;
     }
     toolbar.style.display = 'flex';
-    const fgCandidate = stage.querySelector('.subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
-    const textCandidate = stage.querySelector('.bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
-    const bgCandidate = stage.querySelector('.tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
+    const fgCandidate = stage.querySelector('.tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const textCandidate = stage.querySelector('.zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
+    const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
+
+    // Direct independent pointer dragging for Polaroid #1 and Polaroid #2 on stage
+    if (tplId === 'polaroid') {
+      const polCards = stage.querySelectorAll('.tpl-polaroid .polaroid');
+      polCards.forEach((pCard, idx) => {
+        if (pCard.dataset.polDragBound === '1') return;
+        pCard.dataset.polDragBound = '1';
+        let pDragging = false, pStartX = 0, pStartY = 0, origX = 0, origY = 0;
+        pCard.addEventListener('pointerdown', (ev) => {
+          if (ev.target.closest('button, input, select')) return;
+          ev.stopPropagation();
+          pDragging = true;
+          pStartX = ev.clientX;
+          pStartY = ev.clientY;
+          const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('polaroid') : {};
+          origX = idx === 0 ? (pData.p1X != null ? Number(pData.p1X) : -78) : (pData.p2X != null ? Number(pData.p2X) : 72);
+          origY = idx === 0 ? (pData.p1Y != null ? Number(pData.p1Y) : -6) : (pData.p2Y != null ? Number(pData.p2Y) : 10);
+          pCard.style.cursor = 'grabbing';
+          pCard.style.zIndex = '15';
+          if (polCards[1 - idx]) polCards[1 - idx].style.zIndex = '5';
+          try { pCard.setPointerCapture(ev.pointerId); } catch (_) {}
+        });
+        pCard.addEventListener('pointermove', (ev) => {
+          if (!pDragging) return;
+          const dx = ev.clientX - pStartX;
+          const dy = ev.clientY - pStartY;
+          const nx = Math.round(origX + dx);
+          const ny = Math.round(origY + dy);
+          if (typeof window.tplSetContextualData === 'function') {
+            window.tplSetContextualData('polaroid', idx === 0 ? { p1X: nx, p1Y: ny } : { p2X: nx, p2Y: ny });
+          }
+        });
+        const endPolDrag = () => {
+          if (!pDragging) return;
+          pDragging = false;
+          pCard.style.cursor = 'grab';
+        };
+        pCard.addEventListener('pointerup', endPolDrag);
+        pCard.addEventListener('pointercancel', endPolDrag);
+        pCard.addEventListener('wheel', (ev) => {
+          ev.preventDefault();
+          const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('polaroid') : {};
+          const curSc = pData.polaroidScale != null ? Number(pData.polaroidScale) : 1.0;
+          const nextSc = Math.max(0.6, Math.min(1.8, Number((curSc + (ev.deltaY < 0 ? 0.05 : -0.05)).toFixed(2))));
+          if (typeof window.tplSetContextualData === 'function') {
+            window.tplSetContextualData('polaroid', { polaroidScale: nextSc });
+            if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('polaroid');
+          }
+        }, { passive: false });
+      });
+    }
 
     // Function to update toolbar contents based on active targetType
     const renderToolbar = () => {
@@ -113,12 +166,15 @@
 
       if (targetType === 'text') {
         const textData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tplId) : {};
+        const curFont = textData.fontFamily || textData.titleFont || "'Space Grotesk', sans-serif";
+        const curSize = textData.fontSize || textData.titleSize || 32;
+        const curColor = textData.textColor || textData.titleColor || textData.nameColor || '#ffffff';
         const fonts = [
           { label: 'Space Grotesk', val: "'Space Grotesk', sans-serif" },
           { label: 'Impact', val: 'Impact, sans-serif' },
           { label: 'Montserrat', val: "'Montserrat', sans-serif" },
-          { label: 'Bebas Neue', val: "'Bebas Neue', sans-serif" },
-          { label: 'Arial Black', val: "'Arial Black', sans-serif" },
+          { label: 'Cinzel', val: "'Cinzel', Georgia, serif" },
+          { label: 'JetBrains Mono', val: "'JetBrains Mono', monospace" },
           { label: 'Inter', val: "'Inter', sans-serif" },
           { label: 'Georgia', val: "'Georgia', serif" }
         ];
@@ -128,16 +184,16 @@
           </div>
           <!-- Font Dropdown -->
           <select id="stage-tb-font" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; color: #fff; font-size: 10px; font-weight: 600; padding: 2px 4px; outline: none; cursor: pointer;">
-            ${fonts.map(f => `<option value="${f.val}" ${f.val === textData.fontFamily ? 'selected' : ''}>${f.label}</option>`).join('')}
+            ${fonts.map(f => `<option value="${f.val}" ${f.val === curFont ? 'selected' : ''}>${f.label}</option>`).join('')}
           </select>
           <!-- Size Steppers -->
           <div style="display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 4px;">
             <button type="button" id="stage-tb-size-dec" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 3px;">-</button>
-            <span id="stage-tb-size-val" style="font-size: 10px; font-family: monospace; color: #38bdf8; font-weight: 700; min-width: 32px; text-align: center;">${textData.fontSize || 80}px</span>
+            <span id="stage-tb-size-val" style="font-size: 10px; font-family: monospace; color: #38bdf8; font-weight: 700; min-width: 32px; text-align: center;">${curSize}px</span>
             <button type="button" id="stage-tb-size-inc" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 3px;">+</button>
           </div>
           <!-- Color Picker -->
-          <input type="color" id="stage-tb-color" value="${textData.textColor || '#ffffff'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Text Color" />
+          <input type="color" id="stage-tb-color" value="${curColor}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Text Color" />
           <!-- Layer Depth Switch -->
           <button type="button" id="stage-tb-depth" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 6px; cursor: pointer;" title="Bring to Front or Send Behind">
             ${textData.layerOrder === 'front' ? '🔲 Send Behind' : '🔲 Bring Front'}
@@ -147,21 +203,23 @@
         `;
         // Wire text toolbar
         toolbar.querySelector('#stage-tb-font')?.addEventListener('change', (e) => {
-          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { fontFamily: e.target.value });
+          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { fontFamily: e.target.value, titleFont: e.target.value });
           if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
         });
         toolbar.querySelector('#stage-tb-size-dec')?.addEventListener('click', () => {
-          const sz = Math.max(24, (textData.fontSize || 80) - 6);
-          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { fontSize: sz });
+          const sz = Math.max(12, curSize - 3);
+          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { fontSize: sz, titleSize: sz });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
           renderToolbar();
         });
         toolbar.querySelector('#stage-tb-size-inc')?.addEventListener('click', () => {
-          const sz = Math.min(180, (textData.fontSize || 80) + 6);
-          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { fontSize: sz });
+          const sz = Math.min(180, curSize + 3);
+          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { fontSize: sz, titleSize: sz });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
           renderToolbar();
         });
         toolbar.querySelector('#stage-tb-color')?.addEventListener('input', (e) => {
-          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { textColor: e.target.value });
+          if (typeof window.tplSetContextualData === 'function') window.tplSetContextualData(tplId, { textColor: e.target.value, titleColor: e.target.value, nameColor: e.target.value });
         });
         toolbar.querySelector('#stage-tb-depth')?.addEventListener('click', () => {
           const ord = textData.layerOrder === 'front' ? 'behind' : 'front';
@@ -235,25 +293,57 @@
           selectTarget('text');
         });
       } else if (targetType === 'bg') {
+        const bgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tplId) : {};
+        const curPreset = bgData.bgPreset || 'default';
+        const presets = window.UNIVERSAL_BG_PRESETS || [
+          { id: 'default', label: 'Default Scene' },
+          { id: 'cyber-grid', label: 'Cyber Set Grid' },
+          { id: 'cyber-3d-grid', label: '3D Cyber Grid' },
+          { id: 'solid-black', label: 'Solid Black' },
+          { id: 'transparent', label: 'No Background' },
+          { id: 'vox-doc', label: 'Vox Document' },
+          { id: 'embers', label: 'Floating Embers' },
+          { id: 'dawn', label: 'Dawn Horizon' }
+        ];
         toolbar.innerHTML = `
           <div style="display: flex; align-items: center; gap: 4px; border-right: 1px solid rgba(255,255,255,0.15); padding-right: 6px;">
-            <span style="font-size: 9.5px; font-weight: 800; color: #f59e0b; font-family: monospace;">BACKGROUND SCENE</span>
+            <span style="font-size: 9.5px; font-weight: 800; color: #f59e0b; font-family: monospace;">BACKGROUND</span>
           </div>
+          <!-- Universal Backdrop Preset Selector -->
+          <select id="stage-tb-bg-preset" style="background: rgba(0,0,0,0.65); border: 1px solid rgba(245,158,11,0.45); border-radius: 4px; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; outline: none; cursor: pointer;">
+            ${presets.map(p => `<option value="${p.id}" ${p.id === curPreset ? 'selected' : ''} style="background:#0f172a;color:#fff;">${p.label}</option>`).join('')}
+          </select>
+          <!-- Upload Custom Video / Image BG -->
+          <label style="background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.5); border-radius: 4px; color: #38bdf8; font-size: 9.5px; font-weight: 700; padding: 2px 7px; cursor: pointer; white-space: nowrap;">
+            + Video / Img
+            <input type="file" id="stage-tb-bg-file" accept="video/*,image/*" style="display: none;" />
+          </label>
           <!-- Scale Zoom Steppers -->
           <div style="display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 4px;">
             <button type="button" id="stage-tb-bg-dec" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 3px;">-</button>
             <span id="stage-tb-bg-val" style="font-size: 10px; font-family: monospace; color: #f59e0b; font-weight: 700; min-width: 32px; text-align: center;">${Math.round((tf.scale || 1) * 100)}%</span>
             <button type="button" id="stage-tb-bg-inc" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 3px;">+</button>
           </div>
-          <!-- Reset BG -->
-          <button type="button" id="stage-tb-bg-reset" style="background: none; border: none; color: #94a3b8; font-size: 9.5px; cursor: pointer;" title="Reset Background Pan & Scale">
-            ↺ Reset
-          </button>
           <!-- Switch back to Foreground -->
           <button type="button" id="stage-tb-switch-fg2" style="background: rgba(46,255,198,0.15); border: 1px solid rgba(46,255,198,0.4); border-radius: 4px; color: #2effc6; font-size: 9.5px; font-weight: 700; padding: 2px 7px; cursor: pointer;" title="Switch back to Subject">
             Subject ▴
           </button>
         `;
+        toolbar.querySelector('#stage-tb-bg-preset')?.addEventListener('change', (e) => {
+          if (typeof window.tplSetContextualData === 'function') {
+            window.tplSetContextualData(tplId, { bgPreset: e.target.value, bgMediaUrl: '', bgMediaType: 'image' });
+            if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
+          }
+        });
+        toolbar.querySelector('#stage-tb-bg-file')?.addEventListener('change', (e) => {
+          const f = e.target.files && e.target.files[0];
+          if (f && typeof window.tplSetContextualData === 'function') {
+            const url = URL.createObjectURL(f);
+            const isVid = f.type.startsWith('video/');
+            window.tplSetContextualData(tplId, { bgMediaUrl: url, bgMediaType: isVid ? 'video' : 'image' });
+            if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
+          }
+        });
         toolbar.querySelector('#stage-tb-bg-dec')?.addEventListener('click', () => {
           tf.scale = Math.max(0.5, (tf.scale || 1) - 0.08);
           applyTransforms();
@@ -261,13 +351,6 @@
         });
         toolbar.querySelector('#stage-tb-bg-inc')?.addEventListener('click', () => {
           tf.scale = Math.min(2.5, (tf.scale || 1) + 0.08);
-          applyTransforms();
-          renderToolbar();
-        });
-        toolbar.querySelector('#stage-tb-bg-reset')?.addEventListener('click', () => {
-          tf.x = 0;
-          tf.y = 0;
-          tf.scale = 1;
           applyTransforms();
           renderToolbar();
         });
@@ -280,7 +363,8 @@
     // Apply active CSS transform rules to stage elements
     const applyTransforms = () => {
       const fgTf = topCustomizerState.transforms.fg;
-      if (fgCandidate && fgTf) {
+      if (fgCandidate && fgTf && tplId !== 'polaroid') {
+        const isZoomProduct = fgCandidate.classList.contains('product');
         if (fgTf.isFullscreen) {
           const sRect = stage.getBoundingClientRect();
           const naturalW = fgCandidate.offsetWidth || 380;
@@ -291,25 +375,32 @@
           );
           const safeScale = Math.max(1, Math.min(fitScale, 2.4));
           fgCandidate.style.transformOrigin = 'center center';
-          fgCandidate.style.transform = `translate(0px, 0px) scale(${safeScale.toFixed(3)})`;
-        } else {
+          fgCandidate.style.transform = isZoomProduct
+            ? `translate(-50%, -50%) scale(${safeScale.toFixed(3)})`
+            : `translate(0px, 0px) scale(${safeScale.toFixed(3)})`;
+        } else if (fgTf.x || fgTf.y || (fgTf.scale && fgTf.scale !== 1)) {
           fgCandidate.style.transformOrigin = 'center center';
-          fgCandidate.style.transform = `translate(${fgTf.x}px, ${fgTf.y}px) scale(${fgTf.scale || 1})`;
+          if (isZoomProduct) {
+            fgCandidate.style.animation = 'none';
+            fgCandidate.style.transform = `translate(calc(-50% + ${fgTf.x}px), calc(-50% + ${fgTf.y}px)) scale(${fgTf.scale || 1})`;
+          } else {
+            fgCandidate.style.transform = `translate(${fgTf.x}px, ${fgTf.y}px) scale(${fgTf.scale || 1})`;
+          }
         }
       }
 
       const textTf = topCustomizerState.transforms.text;
-      if (textCandidate && textTf) {
-        const isCenteredAbs = getComputedStyle(textCandidate).position === 'absolute' && textCandidate.classList.contains('bigtext');
+      if (textCandidate && textTf && (textTf.x || textTf.y || (textTf.scale && textTf.scale !== 1))) {
+        const isCenteredAbs = getComputedStyle(textCandidate).position === 'absolute' && (textCandidate.classList.contains('bigtext') || textCandidate.classList.contains('zoom-hud-bottom'));
         if (isCenteredAbs) {
-          textCandidate.style.transform = `translate(calc(-50% + ${textTf.x}px), calc(-50% + ${textTf.y}px)) scale(${textTf.scale || 1})`;
+          textCandidate.style.transform = `translate(calc(-50% + ${textTf.x}px), ${textTf.y}px) scale(${textTf.scale || 1})`;
         } else {
           textCandidate.style.transform = `translate(${textTf.x}px, ${textTf.y}px) scale(${textTf.scale || 1})`;
         }
       }
 
       const bgTf = topCustomizerState.transforms.bg;
-      if (bgCandidate && bgTf) {
+      if (bgCandidate && bgTf && (bgTf.x || bgTf.y || (bgTf.scale && bgTf.scale !== 1))) {
         bgCandidate.style.transform = `translate(${bgTf.x}px, ${bgTf.y}px) scale(${bgTf.scale || 1})`;
       }
 
@@ -356,7 +447,7 @@
 
     // Attach click & drag to elements on stage
     const setupDraggable = (el, type) => {
-      if (!el) return;
+      if (!el || (tplId === 'polaroid' && type === 'fg')) return;
       el.style.cursor = 'grab';
       el.addEventListener('pointerdown', (e) => {
         // If clicking inside toolbar or controls, ignore
