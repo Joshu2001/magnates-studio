@@ -537,6 +537,19 @@
     },
 
     // 40B. CEO Portrait Reveal
+    'interview-cutin': {
+      type: 'interview-cutin',
+      subjectName: 'JOHN DOE',
+      subjectTitle: 'FORMER CEO, COMPANY INC.',
+      metaTag: 'INTERVIEW / EXPERT ANALYSIS',
+      timecode: 'TC: 01:24:03',
+      accentColor: '#ef4444',
+      interviewBg: '/interview_cutin_cinematic.jpg',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
+    },
+
     'ceo-portrait': {
       type: 'ceo-portrait',
       ceoName: 'ALEXANDER VANCE',
@@ -3060,6 +3073,28 @@
         const prod = fxc.querySelector('.product');
         if (prod) prod.style.backgroundImage = `url("${data.productImg}")`;
       }
+    } else if (tplId === 'interview-cutin') {
+      const root = fxc.querySelector('.tpl-interview-cutin');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
+      const bg = fxc.querySelector('.interview-bg-wrap');
+      if (bg && data.interviewBg) bg.style.backgroundImage = `url("${data.interviewBg}")`;
+      const nameEl = fxc.querySelector('.interview-name');
+      if (nameEl && data.subjectName !== undefined) nameEl.textContent = data.subjectName;
+      const titleEl = fxc.querySelector('.interview-title');
+      if (titleEl && data.subjectTitle !== undefined) titleEl.textContent = data.subjectTitle;
+      const metaEl = fxc.querySelector('.interview-meta-text');
+      if (metaEl && data.metaTag !== undefined) metaEl.textContent = data.metaTag;
+      const tcEl = fxc.querySelector('.interview-tc-box');
+      if (tcEl && data.timecode !== undefined) tcEl.textContent = data.timecode;
+      const dotEl = fxc.querySelector('.interview-live-dot');
+      if (dotEl && data.accentColor) {
+        dotEl.style.background = data.accentColor;
+        dotEl.style.boxShadow = `0 0 8px ${data.accentColor}`;
+      }
+      const slashesEl = fxc.querySelector('.interview-meta-slashes');
+      if (slashesEl && data.accentColor) slashesEl.style.color = data.accentColor;
     } else if (tplId === 'ceo-portrait') {
       const root = fxc.querySelector('.tpl-ceo-portrait');
       if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
@@ -5725,6 +5760,71 @@
     }
 
     // =========================================================================
+    // =========================================================================
+    // SPECIAL HANDLER: INTERVIEW CUT-IN CINEMATIC OVERLAY (interview-cutin)
+    // =========================================================================
+    if (tplId === 'interview-cutin') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #f87171; text-transform: uppercase;">🎙️ Interview Cut-In &amp; Glass Lower-Third</span>
+            <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 4px;">BROADCAST READY</span>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 10px; font-weight: 700; color: #cbd5e1;">Interview Footage / Photo</span>
+            <div style="display: flex; gap: 5px;">
+              <label style="font-size: 9.5px; font-weight: 800; color: #ffffff; background: #ef4444; padding: 5px 9px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
+                + Upload Footage
+                <input type="file" id="interview-up-photo" accept="image/*,video/*" style="display:none;" />
+              </label>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Subject Name</span>
+            <input type="text" id="interview-inp-name" value="${data.subjectName || 'JOHN DOE'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 11px; font-weight: 700;" placeholder="JOHN DOE" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Title / Affiliation Subtitle</span>
+            <input type="text" id="interview-inp-title" value="${data.subjectTitle || 'FORMER CEO, COMPANY INC.'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 11px;" placeholder="FORMER CEO, COMPANY INC." />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Category / Meta Tag</span>
+              <input type="text" id="interview-inp-meta" value="${data.metaTag || 'INTERVIEW / EXPERT ANALYSIS'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10px;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Broadcast Timecode</span>
+              <input type="text" id="interview-inp-tc" value="${data.timecode || 'TC: 01:24:03'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10px;" />
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Micro-UI Accent Color</span>
+            <input type="color" id="interview-inp-acol" value="${data.accentColor || '#ef4444'}" style="width: 28px; height: 24px; border: none; border-radius: 4px; background: transparent; cursor: pointer;" />
+          </div>
+        </div>
+      `;
+      container.querySelector('#interview-inp-name')?.addEventListener('input', e => window.tplSetContextualData('interview-cutin', { subjectName: e.target.value }));
+      container.querySelector('#interview-inp-title')?.addEventListener('input', e => window.tplSetContextualData('interview-cutin', { subjectTitle: e.target.value }));
+      container.querySelector('#interview-inp-meta')?.addEventListener('input', e => window.tplSetContextualData('interview-cutin', { metaTag: e.target.value }));
+      container.querySelector('#interview-inp-tc')?.addEventListener('input', e => window.tplSetContextualData('interview-cutin', { timecode: e.target.value }));
+      container.querySelector('#interview-inp-acol')?.addEventListener('input', e => window.tplSetContextualData('interview-cutin', { accentColor: e.target.value }));
+      container.querySelector('#interview-up-photo')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) {
+          const url = URL.createObjectURL(f);
+          window.tplSetContextualData('interview-cutin', { interviewBg: url });
+        }
+      });
+      window.tplWireUniversalBgControls('interview-cutin', container);
+      return;
+    }
+
     // SPECIAL HANDLER: CEO PORTRAIT REVEAL (ceo-portrait)
     // =========================================================================
     if (tplId === 'ceo-portrait') {

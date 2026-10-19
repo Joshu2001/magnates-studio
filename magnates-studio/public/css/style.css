@@ -11408,12 +11408,11 @@ body.tool-slide-active {
 }
 .tpl-headline-fly .fly-bg-grid {
   position: absolute; inset: 0;
-  background-image:
-    radial-gradient(circle at 50% 45%, rgba(245, 158, 11, 0.08) 0%, transparent 65%),
-    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-  background-size: 100% 100%, 36px 36px, 36px 36px;
-  opacity: 0.75;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(51, 65, 85, 0.32) 0%, rgba(15, 23, 42, 0.8) 60%, #03050a 100%),
+    radial-gradient(rgba(255,255,255,0.06) 0.8px, transparent 0.8px);
+  background-size: 100% 100%, 28px 28px;
+  opacity: 0.85;
   pointer-events: none;
 }
 .tpl-headline-fly .fly-hud-telemetry {
@@ -11440,7 +11439,8 @@ body.tool-slide-active {
   width: 41%;
   box-sizing: border-box;
   padding: 10px 13px 9px 13px;
-  border-radius: 4px;
+  border-radius: 1px;
+  isolation: isolate;
   overflow: hidden;
   transform-style: preserve-3d;
   will-change: transform, filter, opacity;
@@ -11464,9 +11464,9 @@ body.tool-slide-active {
   border: 1px solid var(--c-border);
   border-top: 3px solid var(--c-accent);
   box-shadow:
-    0 2px 0 rgba(255,255,255,0.08) inset,
-    0 calc(var(--card-shadow-radius) * 0.22) calc(var(--card-shadow-radius) * 0.55) rgba(0,0,0,calc(var(--card-shadow-alpha) * 0.65)),
-    0 calc(var(--card-shadow-radius) * 0.48) var(--card-shadow-radius) rgba(0,0,0,var(--card-shadow-alpha));
+    0 1px 2px rgba(0,0,0,0.35),
+    0 8px 24px rgba(0,0,0,0.5),
+    0 20px 52px rgba(0,0,0,0.48);
   opacity: 0;
   animation:
     flyCardIn var(--c-dur) cubic-bezier(0.16, 1, 0.3, 1) var(--c-delay) forwards,
@@ -11479,8 +11479,11 @@ body.tool-slide-active {
   cursor: grabbing;
 }
 .tpl-headline-fly .fly-card.is-selected-card {
-  outline: 2px solid #f59e0b;
-  outline-offset: 2px;
+  box-shadow:
+    0 0 0 1.5px rgba(245, 158, 11, 0.65),
+    0 1px 2px rgba(0,0,0,0.35),
+    0 8px 24px rgba(0,0,0,0.5),
+    0 20px 52px rgba(0,0,0,0.48);
 }
 
 /* Subtle tactile newsprint / paper grain overlay inside each clipping */
@@ -11504,9 +11507,14 @@ body.tool-slide-active {
 .tpl-headline-fly .fly-card-4 { left: 54%; top: 55%; --sx: 410px;  --sy: 230px;  --sz: 340px; --c-rot: -1.8deg; --c-z: 25px;  --c-delay: calc(var(--fly-stagger) * 3); z-index: 7; }
 .tpl-headline-fly .fly-card-5 { left: 27%; top: 28%; width: 46%; --sx: 0px; --sy: 320px; --sz: 520px; --c-rot: -0.6deg; --c-z: 75px; --c-scale: 1.06; --c-delay: calc(var(--fly-stagger) * 4); z-index: 12; }
 
-/* Spotlight / Depth-of-Field dim on background cards so hero card #5 pops */
-.tpl-headline-fly.has-dof-bokeh .fly-card:not(.fly-card-5):not(:hover) {
-  filter: brightness(var(--fly-dim-bg, 0.88));
+/* Cinematic Photographic Depth-of-Field Blur on Background Articles */
+.tpl-headline-fly.has-dof-bokeh .fly-card:not(.fly-card-5) {
+  filter: blur(calc(var(--dof-blur-px, 7px))) brightness(var(--fly-dim-bg, 0.82)) contrast(0.94);
+  transition: filter 0.28s ease-out;
+}
+.tpl-headline-fly.has-dof-bokeh .fly-card:not(.fly-card-5):hover,
+.tpl-headline-fly.has-dof-bokeh .fly-card:not(.fly-card-5).is-selected-card {
+  filter: blur(0px) brightness(1) contrast(1);
 }
 
 @keyframes flyCardIn {
@@ -11613,23 +11621,104 @@ body.tool-slide-active {
   margin-bottom: 4px;
 }
 
-/* Animated Highlighter Marker Stroke on Key Phrase */
+/* Photorealistic Marker / Highlighter Shader with Multiply Blend Mode */
 .tpl-headline-fly .fly-hl-mark {
   position: relative;
-  display: inline;
-  background-image: linear-gradient(100deg, var(--c-hl) 0%, var(--c-hl) 100%);
-  background-repeat: no-repeat;
-  background-position: 0 85%;
-  background-size: 100% 88%;
-  padding: 0 3px;
-  border-radius: 2px;
+  display: inline-block;
+  white-space: pre-wrap;
+  padding: 0 4px;
+  margin: 0 -2px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-  animation: flyHighlightSweep 0.65s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--c-delay) + 0.55s) both;
 }
-@keyframes flyHighlightSweep {
-  0%   { background-size: 0% 88%; }
-  100% { background-size: 100% 88%; }
+.tpl-headline-fly .fly-hl-ink {
+  position: absolute;
+  inset: -1px -6px -2px -6px;
+  background: var(--c-hl, #facc15);
+  mix-blend-mode: multiply;
+  filter: url(#fly-marker-filter);
+  opacity: 0.88;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 1;
+  clip-path: inset(0 100% 0 0);
+  animation: flyMarkerDraw 0.68s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--c-delay) + 0.48s) forwards;
+}
+.tpl-headline-fly .fly-hl-text {
+  position: relative;
+  z-index: 2;
+  color: var(--c-text);
+}
+@keyframes flyMarkerDraw {
+  0%   { clip-path: inset(0 100% 0 0); opacity: 0; }
+  15%  { opacity: 0.88; }
+  100% { clip-path: inset(0 0 0 0); opacity: 0.88; }
+}
+
+/* Authentic Broadsheet Editorial Body & Article Column Blocks (Image 1 Standard) */
+.tpl-headline-fly .fly-card-editorial-body {
+  position: relative; z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 5px;
+  margin-top: 4px;
+  border-top: 1px solid var(--c-rule);
+}
+.tpl-headline-fly .fly-card-byline-lead {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--c-text);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.tpl-headline-fly .fly-card-article-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  flex-grow: 1;
+}
+.tpl-headline-fly .fly-card-col {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 5.5px;
+  line-height: 1.35;
+  color: var(--c-sub);
+  opacity: 0.85;
+  text-align: justify;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Unboxed Broadsheet Editorial Kickers (Image 1 standard) */
+.tpl-headline-fly .fly-card-kicker.fly-kicker-editorial {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-family: 'Playfair Display', 'Cinzel', Georgia, serif;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: var(--c-accent);
+  text-transform: uppercase;
+}
+
+/* Clean Broadsheet Archival Stamps */
+.tpl-headline-fly .fly-card-stamp.fly-stamp-broadsheet {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 6px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 1px;
+  border: 1px solid var(--c-rule);
+  color: var(--c-sub);
+  transform: rotate(-1deg);
 }
 
 /* Sub-headline / Lead Excerpt & Skeleton Newspaper Column Lines */
@@ -13081,4 +13170,253 @@ body.tool-slide-active {
   gap: 8px;
   z-index: 40;
   pointer-events: auto;
+}
+
+
+/* === INTERVIEW CUT-IN CINEMATIC OVERLAY (.tpl-interview-cutin) === */
+.tpl-interview-cutin {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0d0f14;
+  font-family: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+  user-select: none;
+}
+.tpl-interview-cutin .interview-bg-wrap {
+  position: absolute;
+  inset: -6%;
+  width: 112%;
+  height: 112%;
+  z-index: 1;
+  background-position: center 30%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: contrast(1.08) brightness(0.96) saturate(1.04);
+  transform-origin: 58% 38%;
+  animation: interviewSlowPush 8s ease-in-out infinite alternate;
+}
+.tpl-interview-cutin .interview-bokeh-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(circle at 62% 40%, transparent 20%, rgba(10, 12, 18, 0.45) 75%, rgba(6, 7, 12, 0.88) 100%),
+              radial-gradient(circle at 20% 48%, rgba(245, 158, 11, 0.12) 0%, transparent 45%);
+}
+.tpl-interview-cutin .interview-grid-framing {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 33.333% 33.333%;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.tpl-interview-cutin .interview-film-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.14;
+  background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 0);
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+}
+.tpl-interview-cutin .interview-lowerthird-wrap {
+  position: absolute;
+  left: 3.5%;
+  right: 3.5%;
+  bottom: 8%;
+  z-index: 6;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: interviewL3FadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.tpl-interview-cutin .interview-meta-tab {
+  background: rgba(18, 22, 32, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  padding: 3px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(1px);
+}
+.tpl-interview-cutin .interview-meta-slashes {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  font-weight: 800;
+  color: #ef4444;
+  letter-spacing: 0.05em;
+}
+.tpl-interview-cutin .interview-meta-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tpl-interview-cutin .interview-glass-bar {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(16, 20, 30, 0.75) 0%, rgba(8, 11, 18, 0.88) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  border-top-left-radius: 0;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.35),
+              inset 0 -1px 0 rgba(0, 0, 0, 0.6);
+  padding: 8px 14px 8px 12px;
+  overflow: hidden;
+}
+.tpl-interview-cutin .interview-shimmer-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.85) 30%, rgba(245,158,11,0.9) 50%, rgba(255,255,255,0.85) 70%, transparent 100%);
+  background-size: 200% 100%;
+  animation: interviewSpecularShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+.tpl-interview-cutin .interview-accent-pillar {
+  width: 3.5px;
+  align-self: stretch;
+  background: linear-gradient(180deg, #ef4444 0%, #f59e0b 100%);
+  border-radius: 2px;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.tpl-interview-cutin .interview-live-dot {
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 7.5px;
+  height: 7.5px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444, 0 0 16px rgba(239,68,68,0.8);
+  animation: interviewDotPulse 1.8s ease-in-out infinite alternate;
+}
+.tpl-interview-cutin .interview-name-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+.tpl-interview-cutin .interview-name {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+.tpl-interview-cutin .interview-title {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 7.5px;
+  font-weight: 600;
+  color: #94a3b8;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+.tpl-interview-cutin .interview-tc-box {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.08em;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+/* Modal Stage Scale Overrides */
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-lowerthird-wrap {
+  left: 6%;
+  right: 6%;
+  bottom: 9%;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-meta-tab {
+  padding: 6px 18px;
+  border-radius: 6px 6px 0 0;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-meta-slashes {
+  font-size: 13px;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-meta-text {
+  font-size: 12px;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-glass-bar {
+  padding: 14px 22px 14px 18px;
+  border-radius: 10px;
+  border-top-left-radius: 0;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-accent-pillar {
+  width: 5px;
+  margin-right: 18px;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-live-dot {
+  width: 11px;
+  height: 11px;
+  left: -3px;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-name {
+  font-size: 26px;
+  letter-spacing: 0.09em;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-title {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  margin-top: 4px;
+}
+#tpl-modal-preview-stage .tpl-interview-cutin .interview-tc-box {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 5px;
+}
+
+@keyframes interviewSlowPush {
+  0% { transform: scale(1.0) translate(0px, 0px); }
+  100% { transform: scale(1.07) translate(-6px, -4px); }
+}
+@keyframes interviewSpecularShimmer {
+  0% { background-position: -200% 0; }
+  50% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes interviewDotPulse {
+  0% { transform: translateY(-50%) scale(0.9); opacity: 0.7; box-shadow: 0 0 6px #ef4444; }
+  100% { transform: translateY(-50%) scale(1.25); opacity: 1; box-shadow: 0 0 14px #ef4444, 0 0 24px rgba(239,68,68,0.9); }
+}
+@keyframes interviewL3FadeIn {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
 }

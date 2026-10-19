@@ -25658,7 +25658,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin']);
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
@@ -26239,6 +26239,40 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="ceo-role-sub">${ceoRole}</div>
           </div>
         </div>`;
+    } else if (tplId === 'interview-cutin') {
+      const iData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('interview-cutin') : {};
+      const interviewBg = iData.interviewBg || ((typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : '/interview_cutin_cinematic.jpg');
+      const subjectName = iData.subjectName || 'JOHN DOE';
+      const subjectTitle = iData.subjectTitle || 'FORMER CEO, COMPANY INC.';
+      const metaTag = iData.metaTag || 'INTERVIEW / EXPERT ANALYSIS';
+      const timecode = iData.timecode || 'TC: 01:24:03';
+      const accentColor = iData.accentColor || '#ef4444';
+      const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(iData) : '';
+      fxContainer.innerHTML = `
+        <div class="tpl-interview-cutin">
+          ${bgLayerHtml}
+          <div class="interview-bg-wrap" style="background-image: url('${interviewBg}');"></div>
+          <div class="interview-bokeh-overlay"></div>
+          <div class="interview-grid-framing"></div>
+          <div class="interview-film-grain"></div>
+          <div class="interview-lowerthird-wrap">
+            <div class="interview-meta-tab">
+              <span class="interview-meta-slashes" style="color: ${accentColor};">//</span>
+              <span class="interview-meta-text">${metaTag}</span>
+            </div>
+            <div class="interview-glass-bar">
+              <div class="interview-shimmer-edge"></div>
+              <div class="interview-accent-pillar" style="background: linear-gradient(180deg, ${accentColor} 0%, #f59e0b 100%);">
+                <div class="interview-live-dot" style="background: ${accentColor}; box-shadow: 0 0 8px ${accentColor};"></div>
+              </div>
+              <div class="interview-name-col">
+                <div class="interview-name">${subjectName}</div>
+                <div class="interview-title">${subjectTitle}</div>
+              </div>
+              <div class="interview-tc-box">${timecode}</div>
+            </div>
+          </div>
+        </div>`;
     } else if (tplId === 'boardroom-zoom') {
       const bData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('boardroom-zoom') : {};
       const sceneImg = bData.sceneUrl || ((typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : '/boardroom_scene_hd.jpg');
@@ -26553,7 +26587,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               const curRotZ = cInfo.rot * (1 + (1 - ease));
               const curScale = cInfo.scale * (0.78 + 0.22 * ease);
               cEl.style.transform = `translate3d(${curX}px, ${curY}px, ${curZ}px) rotateX(${curRotX}deg) rotateY(${curRotY}deg) rotateZ(${curRotZ}deg) scale(${curScale})`;
-              cEl.style.filter = motionBlur ? `blur(${(1 - ease) * blurPx}px)` : 'none';
+              const bgDof = (cNum !== 5 && dofBokeh) ? dofPx : 0;
+              const currentBlur = Math.max(bgDof, motionBlur ? (1 - ease) * blurPx : 0);
+              const dimFactor = (cNum !== 5 && dofBokeh) ? (0.84 + 0.16 * (1 - ease)) : 1;
+              cEl.style.filter = currentBlur > 0 ? `blur(${currentBlur.toFixed(1)}px) brightness(${dimFactor.toFixed(2)})` : 'none';
             }
           });
         }
@@ -29194,7 +29231,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const ff = String(Math.floor((t % 1) * 24)).padStart(2, '0');
         tcEl.textContent = `${baseDate}  ${hh}:${mm}:${ss}:${ff}`;
       }
-    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur'].concat(BIZ_STORY_IDS).includes(tplId)) {
+    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur','interview-cutin'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -29271,7 +29308,6 @@ function applySelectedHomepageTemplate(templateId) {
 
     'og-parallax-depth-engine': openOGParallaxSuite,
     'spatial-3d-motion-suite': openSpatial3DMotionSuite,
-    'document-3d-fx-engine': openDocument3DFXSuite,
     'jani-puzzle-narrative-suite': openJaniSuite,
     'jani-countdown-panic-suite': openCountdownSuite,
     'nonlinear-time-flash': openFlashbackSuite,
@@ -29615,8 +29651,7 @@ function applySelectedHomepageTemplate(templateId) {
     openSpatial3DMotionSuite();
     return;
   } else if (templateId === 'document-3d-fx-engine') {
-    // Launch full Three.js James Jani 3D Document FX Studio
-    openDocument3DFXSuite();
+    openTopTemplateCustomizer(tpl);
     return;
   } else if (templateId === 'jani-puzzle-narrative-suite') {
     // Launch James Jani Puzzle Reconstruction & Alpha Matte Suite
@@ -34224,7 +34259,7 @@ transition: 'fly_through',
     focusClip = bgClip;
     imageClips = [bgClip];
     textClips = generatedTextClips;
-    } else if (tpl.id === 'newspaper-3d') {
+    } else if (tpl.id === 'newspaper-3d' || tpl.id === 'document-3d-fx-engine') {
     const npData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('newspaper-3d') : {};
     const bgUrl = sec || tpl.secondaryImage || 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80';
     const bgClip = {

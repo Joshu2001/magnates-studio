@@ -252,14 +252,14 @@
   },
   {
     "id": "headline-fly",
-    "title": "Headlines Flying In",
+    "title": "Flying Broadsheets in 3D",
     "category": "Documentary",
     "origCategory": "Documentary",
     "badge": "FEATURED",
     "difficulty": "Medium",
     "timeToApply": "3-4s",
     "previewGradient": "linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))",
-    "description": "News headlines and article clippings fly in from multiple angles building a wall of evidence. Perfect for investigative storytelling.",
+    "description": "Photorealistic broadsheets and investigative press clippings fly into a 3D wall of evidence with authentic newsprint multiply highlighters, body article columns, and cinematic depth-of-field bokeh.",
     "tags": [
       "headlines",
       "news",
