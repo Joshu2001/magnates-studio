@@ -1890,6 +1890,7 @@
     const showLabels = d.showLabels !== false;
     const showWater = d.showWaterCurrents !== false;
     const showGrid = d.showGrid !== false;
+    const showFlightPath = d.showFlightPath !== false;
     const locTitle = (d.location || 'KYIV, UKRAINE').toUpperCase();
     const locCoords = d.coords || '50.4501°N 30.5234°E';
     const locSub = d.telemetry || 'O.SR5911TES     DFX35.EVA';
