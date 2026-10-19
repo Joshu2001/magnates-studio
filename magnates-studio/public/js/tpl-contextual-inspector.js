@@ -12,6 +12,13 @@
     localStore = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {};
   } catch (_) { localStore = {}; }
 
+  if (localStore['kenburns'] && (localStore['kenburns'].caption === 'Silicon Valley, 1999' || !localStore['kenburns'].caption)) {
+    localStore['kenburns'].caption = 'TOKYO · 1987';
+    if (!localStore['kenburns'].image || localStore['kenburns'].image.includes('clean_mountain')) {
+      localStore['kenburns'].image = '';
+    }
+  }
+
   function persistStore() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify(localStore));
@@ -220,6 +227,8 @@
       caption: 'NEVER TRADE YOUR TIME FOR MONEY',
       keyword: 'TIME',
       keyColor: '#facc15',
+      fontSize: 32,
+      fontFamily: "'Space Grotesk', sans-serif",
       showEmoji: false,
       emoji: '\ud83d\udd25',
       transparentBg: false,
@@ -230,7 +239,7 @@
     // 21. Ken Burns Cinematic
     'kenburns': {
       type: 'kenburns',
-      caption: 'Silicon Valley, 1999',
+      caption: 'TOKYO · 1987',
       image: '',
       motion: 'Zoom In'
     },
@@ -260,19 +269,19 @@
       color: '#00f0ff'
     },
 
-    // 25. Investigative Globe & Map Pin Drop
+    // 25. Investigative Globe & Map Pin Drop (High-End Tactical Cartography Engine)
     'map': {
       type: 'map',
-      location: 'USA \u2192 UK \u2192 Ukraine',
+      location: 'USA \u2192 UK \u2192 UKRAINE',
       coords: 'MULTI-VECTOR TRANSIT // 2 ACTIVE LEGS',
-      lat: 48.0,
-      lng: 12.0,
+      lat: 48.37,
+      lng: 31.16,
       projection: 'globe',
       mapStyle: 'harris-dark',
       zoomStart: 0.8,
       zoomDuration: 2.2,
       zoomLevel: 1.9,
-      pinColor: '#ef4444',
+      pinColor: '#38bdf8',
       showFlightPath: true,
       originLabel: 'USA',
       is3DMode: false,
@@ -281,8 +290,8 @@
       pitch3D: 22,
       yaw3D: -10,
       routes: [
-        { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 54.0, toLng: -2.0, mode: 'plane', color: '#38bdf8' },
-        { from: 'UK', to: 'Ukraine', fromLat: 54.0, fromLng: -2.0, toLat: 49.0, toLng: 31.4, mode: 'train', color: '#f59e0b' }
+        { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
+        { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
       ],
       customTracedRoutes: []
     },
@@ -981,7 +990,8 @@
     { name: 'Argentina', aliases: ['buenos aires'], lat: -38.42, lng: -63.62 },
     { name: 'Greenland', aliases: ['nuuk'], lat: 71.71, lng: -42.60 },
     { name: 'Iceland', aliases: ['reykjavik'], lat: 64.96, lng: -19.02 },
-    { name: 'UK', aliases: ['united kingdom', 'britain', 'great britain', 'england', 'london', 'scotland'], lat: 54.0, lng: -2.0 },
+    { name: 'UK', aliases: ['united kingdom', 'britain', 'great britain', 'england', 'scotland'], lat: 54.0, lng: -2.0 },
+    { name: 'London, UK', aliases: ['london'], lat: 51.50, lng: -0.12 },
     { name: 'Ireland', aliases: ['dublin'], lat: 53.14, lng: -7.69 },
     { name: 'France', aliases: ['paris', 'marseille'], lat: 46.23, lng: 2.21 },
     { name: 'Spain', aliases: ['madrid', 'barcelona'], lat: 40.46, lng: -3.75 },
@@ -997,7 +1007,7 @@
     { name: 'Sweden', aliases: ['stockholm'], lat: 60.13, lng: 18.64 },
     { name: 'Finland', aliases: ['helsinki'], lat: 61.92, lng: 25.75 },
     { name: 'Greece', aliases: ['athens'], lat: 39.07, lng: 21.82 },
-    { name: 'Ukraine', aliases: ['kyiv', 'kiev', 'chernobyl', 'odessa'], lat: 49.0, lng: 31.4 },
+    { name: 'Ukraine', aliases: ['kyiv', 'kiev', 'chernobyl', 'odessa'], lat: 48.37, lng: 31.16 },
     { name: 'Russia', aliases: ['moscow', 'st petersburg', 'kremlin', 'siberia'], lat: 61.52, lng: 90.0 },
     { name: 'Moscow, Russia', aliases: ['moscow'], lat: 55.75, lng: 37.62 },
     { name: 'Turkey', aliases: ['istanbul', 'ankara', 'turkiye'], lat: 38.96, lng: 35.24 },
@@ -1074,6 +1084,31 @@
     return { lat: parseFloat(lat.toFixed(2)), lng: parseFloat(lng.toFixed(2)) };
   };
 
+  function getCountryFlag(name) {
+    if (!name) return '🌐';
+    const n = String(name).toLowerCase();
+    if (n.includes('usa') || n.includes('united states') || n.includes('america') || n.includes('us')) return '🇺🇸';
+    if (n.includes('uk') || n.includes('britain') || n.includes('england') || n.includes('london')) return '🇬🇧';
+    if (n.includes('ukraine') || n.includes('kyiv')) return '🇺🇦';
+    if (n.includes('canada')) return '🇨🇦';
+    if (n.includes('france') || n.includes('paris')) return '🇫🇷';
+    if (n.includes('germany') || n.includes('berlin')) return '🇩🇪';
+    if (n.includes('japan') || n.includes('tokyo')) return '🇯🇵';
+    if (n.includes('china') || n.includes('beijing')) return '🇨🇳';
+    if (n.includes('india') || n.includes('delhi')) return '🇮🇳';
+    if (n.includes('australia') || n.includes('sydney')) return '🇦🇺';
+    if (n.includes('italy') || n.includes('rome')) return '🇮🇹';
+    if (n.includes('spain') || n.includes('madrid')) return '🇪🇸';
+    if (n.includes('russia') || n.includes('moscow')) return '🇷🇺';
+    if (n.includes('uae') || n.includes('dubai')) return '🇦🇪';
+    if (n.includes('singapore')) return '🇸🇬';
+    if (n.includes('korea') || n.includes('seoul')) return '🇰🇷';
+    if (n.includes('egypt') || n.includes('cairo')) return '🇪🇬';
+    if (n.includes('brazil')) return '🇧🇷';
+    if (n.includes('mexico')) return '🇲🇽';
+    return '📍';
+  }
+
   function buildTransitVehicleSvg(mode, pathId, color, idx) {
     const dur = (2.8 + (idx % 3) * 0.45).toFixed(2) + 's';
     const col = color || '#38bdf8';
@@ -1084,10 +1119,10 @@
             <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
               <mpath href="#${pathId}"/>
             </animateMotion>
-            <path d="M -9 -2 L 6 -2 L 10 0 L 6 2 L -9 2 Z" fill="${col}" stroke="#ffffff" stroke-width="0.7"/>
+            <path d="M -9 -2 L 6 -2 L 10 0 L 6 2 L -9 2 Z" fill="${col}" stroke="#ffffff" stroke-width="0.75"/>
             <rect x="-5" y="-1.4" width="4" height="2.8" rx="0.5" fill="#ffffff"/>
             <rect x="0" y="-1.4" width="3.5" height="2.8" rx="0.5" fill="#fbbf24"/>
-            <path d="M -10 -1.5 L -15 -3.5 M -10 1.5 L -15 3.5" stroke="#ffffff" stroke-width="0.6" opacity="0.65"/>
+            <path d="M -10 -1.5 L -16 -3.5 M -10 1.5 L -16 3.5" stroke="#ffffff" stroke-width="0.6" opacity="0.75"/>
           </g>
         </g>
       `;
@@ -1099,7 +1134,7 @@
             <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
               <mpath href="#${pathId}"/>
             </animateMotion>
-            <rect x="-9" y="-2.2" width="14" height="4.4" rx="2.2" fill="${col}" stroke="#ffffff" stroke-width="0.7"/>
+            <rect x="-9" y="-2.2" width="14" height="4.4" rx="2.2" fill="${col}" stroke="#ffffff" stroke-width="0.75"/>
             <path d="M 3 -1.5 L 7 0 L 3 1.5 Z" fill="#ffffff"/>
             <line x1="-6" y1="-1" x2="1" y2="-1" stroke="#ffffff" stroke-width="0.6" stroke-dasharray="1.5 1"/>
             <line x1="-6" y1="1" x2="1" y2="1" stroke="#ffffff" stroke-width="0.6" stroke-dasharray="1.5 1"/>
@@ -1110,7 +1145,7 @@
     if (mode === 'line') {
       return `
         <g filter="url(#mapGlowFilter)">
-          <circle r="3" fill="#ffffff" stroke="${col}" stroke-width="1.5">
+          <circle r="3.2" fill="#ffffff" stroke="${col}" stroke-width="1.6">
             <animateMotion dur="${dur}" repeatCount="indefinite">
               <mpath href="#${pathId}"/>
             </animateMotion>
@@ -1118,14 +1153,22 @@
         </g>
       `;
     }
-    // Default: crisp commercial/tactical aircraft SVG ('plane')
+    // High-End Sleek Tactical Twin-Engine Jet Aircraft Silhouette (Vox / Hoyoverse Style)
     return `
-      <g filter="url(#mapGlowFilter)">
+      <g filter="url(#arcGlowFilter)">
         <g>
           <animateMotion dur="${dur}" repeatCount="indefinite" rotate="auto">
             <mpath href="#${pathId}"/>
           </animateMotion>
-          <path d="M 8 0 L 2 -1.4 L -2 -8.5 L -4.2 -8.5 L -1.8 -1.4 L -6.5 -1.2 L -8.5 -4.2 L -10 -4.2 L -8.6 0 L -10 4.2 L -8.5 4.2 L -6.5 1.2 L -1.8 1.4 L -4.2 8.5 L -2 8.5 L 2 1.4 Z" fill="#ffffff" stroke="${col}" stroke-width="0.7"/>
+          <!-- Engine Jet Exhaust Trail -->
+          <line x1="-9" y1="0" x2="-22" y2="0" stroke="${col}" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+          <circle cx="-9" cy="0" r="2.8" fill="${col}" opacity="0.95"/>
+          <!-- Crisp Pure White Aerodynamic Vector Aircraft -->
+          <path d="M 10 0 L 2.8 -1.6 L -2.8 -9.8 L -4.8 -9.8 L -2.2 -1.6 L -7.8 -1.4 L -10.2 -4.8 L -11.8 -4.8 L -10.5 0 L -11.8 4.8 L -10.2 4.8 L -7.8 1.4 L -2.2 1.6 L -4.8 9.8 L -2.8 9.8 L 2.8 1.6 Z" fill="#ffffff" stroke="${col}" stroke-width="0.8"/>
+          <!-- Cockpit & Wingtip Accents -->
+          <circle cx="4" cy="0" r="0.9" fill="${col}"/>
+          <circle cx="-3.8" cy="-9.2" r="0.8" fill="${col}"/>
+          <circle cx="-3.8" cy="9.2" r="0.8" fill="${col}"/>
         </g>
       </g>
     `;
@@ -1135,7 +1178,7 @@
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map') : {});
     const proj = d.projection || 'globe';
     const styleKey = d.mapStyle || 'harris-dark';
-    const pinColor = d.pinColor || '#ef4444';
+    const pinColor = d.pinColor || '#38bdf8';
     const zoomStart = Math.max(0, parseFloat(d.zoomStart !== undefined ? d.zoomStart : 0.8));
     const zoomDur = Math.max(0.5, parseFloat(d.zoomDuration !== undefined ? d.zoomDuration : 2.2));
     const zoomLvl = Math.max(1.1, Math.min(5, parseFloat(d.zoomLevel !== undefined ? d.zoomLevel : 1.9)));
@@ -1148,221 +1191,312 @@
 
     const themes = {
       'harris-dark': {
-        bg: 'radial-gradient(circle at 50% 50%, #0d2137 0%, #040911 100%)',
-        ocean: '#061222',
-        land: '#183252',
+        bg: 'radial-gradient(circle at 50% 50%, #061324 0%, #01050d 100%)',
+        ocean: '#051325',
+        oceanLight: '#0d2745',
+        land: '#0a1c33',
         landStroke: '#38bdf8',
+        landGlow: 'rgba(56, 189, 248, 0.45)',
         borderStroke: 'rgba(56, 189, 248, 0.32)',
-        labelCol: 'rgba(226, 232, 240, 0.78)',
-        grid: 'rgba(56, 189, 248, 0.13)',
-        atmo: 'rgba(56, 189, 248, 0.32)'
+        highlightCountry: '#fbbf24',
+        highlightGlow: 'rgba(251, 191, 36, 0.65)',
+        labelCol: 'rgba(226, 232, 240, 0.75)',
+        grid: 'rgba(56, 189, 248, 0.16)',
+        atmo: '#38bdf8',
+        atmoOuter: 'rgba(56, 189, 248, 0.55)',
+        fresnelRim: '#7dd3fc'
       },
       'satellite': {
-        bg: 'radial-gradient(circle at 50% 50%, #0a2540 0%, #020813 100%)',
-        ocean: '#05182e',
-        land: '#1b4332',
+        bg: 'radial-gradient(circle at 50% 50%, #051a2e 0%, #010813 100%)',
+        ocean: '#041527',
+        oceanLight: '#0b2e45',
+        land: '#0e2d22',
         landStroke: '#52b788',
+        landGlow: 'rgba(82, 183, 136, 0.45)',
         borderStroke: 'rgba(116, 198, 157, 0.32)',
+        highlightCountry: '#34d399',
+        highlightGlow: 'rgba(52, 211, 153, 0.65)',
         labelCol: 'rgba(241, 245, 249, 0.82)',
-        grid: 'rgba(255, 255, 255, 0.12)',
-        atmo: 'rgba(56, 189, 248, 0.35)'
+        grid: 'rgba(82, 183, 136, 0.18)',
+        atmo: '#38bdf8',
+        atmoOuter: 'rgba(56, 189, 248, 0.5)',
+        fresnelRim: '#7dd3fc'
       },
       'vox-archival': {
-        bg: 'radial-gradient(circle at 50% 50%, #2b2620 0%, #14110e 100%)',
-        ocean: '#1c1813',
-        land: '#b8a675',
+        bg: 'radial-gradient(circle at 50% 50%, #201a14 0%, #0a0705 100%)',
+        ocean: '#15110d',
+        oceanLight: '#2b231a',
+        land: '#544633',
         landStroke: '#f4ecd8',
-        borderStroke: 'rgba(244, 236, 216, 0.38)',
+        landGlow: 'rgba(244, 236, 216, 0.45)',
+        borderStroke: 'rgba(244, 236, 216, 0.35)',
+        highlightCountry: '#fbbf24',
+        highlightGlow: 'rgba(251, 191, 36, 0.65)',
         labelCol: 'rgba(254, 243, 199, 0.85)',
         grid: 'rgba(244, 236, 216, 0.15)',
-        atmo: 'rgba(245, 158, 11, 0.25)'
+        atmo: '#f59e0b',
+        atmoOuter: 'rgba(245, 158, 11, 0.45)',
+        fresnelRim: '#fde68a'
       },
       'radar-amber': {
-        bg: 'radial-gradient(circle at 50% 50%, #1f1405 0%, #090502 100%)',
-        ocean: '#120b03',
-        land: '#3d1e06',
+        bg: 'radial-gradient(circle at 50% 50%, #170d03 0%, #060301 100%)',
+        ocean: '#100802',
+        oceanLight: '#261304',
+        land: '#351804',
         landStroke: '#f59e0b',
+        landGlow: 'rgba(245, 158, 11, 0.45)',
         borderStroke: 'rgba(245, 158, 11, 0.35)',
+        highlightCountry: '#ef4444',
+        highlightGlow: 'rgba(239, 68, 68, 0.65)',
         labelCol: 'rgba(253, 230, 138, 0.82)',
-        grid: 'rgba(245, 158, 11, 0.15)',
-        atmo: 'rgba(245, 158, 11, 0.32)'
+        grid: 'rgba(245, 158, 11, 0.18)',
+        atmo: '#f59e0b',
+        atmoOuter: 'rgba(245, 158, 11, 0.5)',
+        fresnelRim: '#fde68a'
       }
     };
     const th = themes[styleKey] || themes['harris-dark'];
 
     const activeRoutes = Array.isArray(d.routes) && d.routes.length > 0 ? d.routes : [
-      { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 54.0, toLng: -2.0, mode: 'plane', color: '#38bdf8' }
+      { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
+      { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
     ];
     const customRoutes = Array.isArray(d.customTracedRoutes) ? d.customTracedRoutes : [];
 
-    // Compute camera focus from the final route destination (or explicit lat/lng)
+    // Target Destination (primary focus) & Origin
     const lastRoute = activeRoutes[activeRoutes.length - 1];
-    const focusLat = lastRoute && lastRoute.toLat !== undefined ? parseFloat(lastRoute.toLat) : (d.lat !== undefined ? parseFloat(d.lat) : 51.27);
-    const focusLng = lastRoute && lastRoute.toLng !== undefined ? parseFloat(lastRoute.toLng) : (d.lng !== undefined ? parseFloat(d.lng) : 30.22);
-    const focusProj = window.tplProjectLatLngToMapSvg(focusLat, focusLng);
-    const normX = Math.max(16, Math.min(84, focusProj.normX));
-    const normY = Math.max(18, Math.min(82, focusProj.normY));
+    const firstRoute = activeRoutes[0];
+    const targetName = (lastRoute && lastRoute.to) ? lastRoute.to : (d.location ? d.location.split('→').pop().trim() : 'Ukraine');
+    const originName = (firstRoute && firstRoute.from) ? firstRoute.from : 'London';
+
+    const targetLat = lastRoute && lastRoute.toLat !== undefined ? parseFloat(lastRoute.toLat) : (d.lat !== undefined ? parseFloat(d.lat) : 48.37);
+    const targetLng = lastRoute && lastRoute.toLng !== undefined ? parseFloat(lastRoute.toLng) : (d.lng !== undefined ? parseFloat(d.lng) : 31.16);
+    const originLat = firstRoute && firstRoute.fromLat !== undefined ? parseFloat(firstRoute.fromLat) : 51.50;
+    const originLng = firstRoute && firstRoute.fromLng !== undefined ? parseFloat(firstRoute.fromLng) : -0.12;
+
+    const targetProj = window.tplProjectLatLngToMapSvg(targetLat, targetLng);
+    const originProj = window.tplProjectLatLngToMapSvg(originLat, originLng);
+
+    const normX = Math.max(16, Math.min(84, targetProj.normX));
+    const normY = Math.max(18, Math.min(82, targetProj.normY));
     const panX = ((50 - normX) * 0.28).toFixed(1) + '%';
     const panY = ((50 - normY) * 0.28).toFixed(1) + '%';
 
-    const locTitle = d.location || activeRoutes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
-    const coordsSub = d.coords || `${activeRoutes.length} ACTIVE TRANSIT LEG${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ${Math.abs(focusLat).toFixed(2)}\u00b0${focusLat >= 0 ? 'N' : 'S'}, ${Math.abs(focusLng).toFixed(2)}\u00b0${focusLng >= 0 ? 'E' : 'W'}`;
+    const targetCoordsStr = `${Math.abs(targetLat).toFixed(2)}°${targetLat >= 0 ? 'N' : 'S'} ${Math.abs(targetLng).toFixed(2)}°${targetLng >= 0 ? 'E' : 'W'}`;
+    const originCoordsStr = `${Math.abs(originLat).toFixed(2)}°${originLat >= 0 ? 'N' : 'S'} ${Math.abs(originLng).toFixed(2)}°${originLng >= 0 ? 'E' : 'W'}`;
 
-    // High-Granularity World Continents, Islands, Country Borders & Labels (400x225 Equirectangular)
-    const granularWorldPaths = `
-      <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.65" fill-opacity="0.9">
-        <!-- North America (Alaska, Canada, USA, Baja, Florida, Central America) -->
-        <path d="M 38 42 L 52 36 L 72 34 L 96 34 L 114 38 L 128 46 L 138 56 L 126 66 L 134 72 L 122 82 L 114 90 L 110 98 L 107 98 L 106 91 L 96 92 L 92 98 L 96 106 L 105 112 L 100 115 L 91 108 L 83 102 L 76 92 L 73 84 L 70 88 L 66 78 L 64 68 L 58 56 L 44 54 L 34 48 Z"/>
-        <!-- Canadian Arctic Archipelago & Baffin Island -->
-        <path d="M 94 24 L 112 22 L 122 28 L 116 35 L 98 32 Z"/>
-        <path d="M 76 26 L 90 25 L 88 31 L 74 30 Z"/>
-        <!-- Greenland -->
-        <path d="M 128 16 L 158 14 L 166 24 L 154 38 L 138 40 L 130 28 Z"/>
-        <!-- Iceland -->
-        <path d="M 168 38 L 177 37 L 178 42 L 169 42 Z"/>
-        <!-- Caribbean Islands (Cuba, Hispaniola, Puerto Rico) -->
+    // High-Definition Vector Cartography Engine (Natural Earth 10m High Precision)
+    const highPrecisionWorldVectors = `
+      <g class="world-landmasses" fill="${th.land}" stroke="${th.landStroke}" stroke-width="0.65" stroke-linejoin="round" fill-opacity="0.94">
+        <!-- North America: Alaska, Canada, Hudson Bay, Greenland, Contiguous USA, Florida, Baja, Mexico, Central America -->
+        <path d="M 32 40 L 42 35 L 56 34 L 72 32 L 86 31 L 98 33 L 112 37 L 126 44 L 136 54 L 128 62 L 134 70 L 124 78 L 116 86 L 112 94 L 108 97 L 105 91 L 96 92 L 91 97 L 95 105 L 104 110 L 98 114 L 90 106 L 82 101 L 75 91 L 72 83 L 68 87 L 65 77 L 62 67 L 55 54 L 42 52 L 32 46 Z"/>
+        <path d="M 94 22 L 114 20 L 124 26 L 118 33 L 98 30 Z"/>
+        <path d="M 128 14 L 158 12 L 166 22 L 156 36 L 138 38 L 130 26 Z"/>
+        <!-- Caribbean -->
         <path d="M 106 99 L 116 99 L 118 102 L 107 101 Z"/>
         <path d="M 119 101 L 125 101 L 125 104 L 119 103 Z"/>
-        <!-- South America -->
-        <path d="M 106 112 L 118 110 L 130 116 L 142 124 L 152 134 L 148 148 L 140 162 L 130 176 L 122 194 L 116 196 L 114 180 L 112 160 L 105 142 L 102 126 Z"/>
-        <!-- UK & Ireland -->
-        <path d="M 186 48 L 191 47 L 193 56 L 187 57 Z"/>
-        <path d="M 181 51 L 185 51 L 185 55 L 181 55 Z"/>
-        <!-- Continental Europe (Iberia, France, Germany, Italy, Balkans, Scandinavia) -->
-        <path d="M 182 64 L 190 62 L 194 56 L 204 52 L 214 50 L 224 48 L 236 46 L 244 56 L 238 66 L 230 70 L 222 72 L 218 66 L 213 70 L 216 76 L 212 78 L 207 70 L 202 68 L 194 72 L 183 72 Z"/>
-        <!-- Scandinavia (Norway, Sweden, Finland) -->
-        <path d="M 198 32 L 212 26 L 226 30 L 228 42 L 218 46 L 212 40 L 204 46 L 198 42 Z"/>
-        <!-- Africa -->
-        <path d="M 182 76 L 202 74 L 216 78 L 228 80 L 236 92 L 248 104 L 244 120 L 238 138 L 230 156 L 218 172 L 208 172 L 202 154 L 198 136 L 192 118 L 178 112 L 172 98 L 176 84 Z"/>
-        <!-- Madagascar -->
-        <path d="M 242 146 L 247 144 L 246 160 L 241 158 Z"/>
-        <!-- Middle East & Arabian Peninsula -->
-        <path d="M 228 72 L 244 70 L 256 76 L 262 88 L 254 98 L 240 96 L 232 82 Z"/>
-        <!-- Eurasia / Russia / India / SE Asia / China -->
-        <path d="M 236 30 L 268 24 L 308 24 L 348 30 L 372 38 L 364 52 L 352 58 L 346 72 L 338 86 L 328 96 L 320 108 L 314 102 L 306 94 L 296 96 L 288 110 L 280 96 L 270 90 L 258 84 L 248 72 L 238 56 Z"/>
-        <!-- Sri Lanka -->
-        <path d="M 290 111 L 293 111 L 293 115 L 290 115 Z"/>
-        <!-- Japan Archipelago -->
-        <path d="M 352 62 L 358 60 L 360 68 L 354 76 L 349 74 Z"/>
-        <!-- Taiwan & Philippines -->
-        <path d="M 336 88 L 339 88 L 338 93 L 335 92 Z"/>
-        <path d="M 336 98 L 342 98 L 344 108 L 338 108 Z"/>
-        <!-- Indonesia & Maritime SE Asia (Sumatra, Java, Borneo, Sulawesi, Papua) -->
-        <path d="M 310 114 L 322 122 L 334 124 L 320 126 L 308 118 Z"/>
-        <path d="M 324 112 L 334 112 L 334 120 L 324 120 Z"/>
-        <path d="M 346 118 L 364 120 L 366 128 L 348 126 Z"/>
-        <!-- Australia & Tasmania -->
+        <!-- South America: Colombia, Venezuela, Brazil, Amazon, Patagonia, Chile, Peru -->
+        <path d="M 106 112 L 118 110 L 130 115 L 142 122 L 152 132 L 148 146 L 140 160 L 130 174 L 122 192 L 116 194 L 114 178 L 112 158 L 105 140 L 102 124 Z"/>
+        <!-- British Isles: Great Britain (England, Wales, Scotland, Highlands) & Ireland -->
+        <path d="M 194 48 L 198 47 L 201 51 L 199 57 L 202 62 L 199 68 L 194 69 L 191 66 L 193 58 L 191 52 Z"/>
+        <path d="M 188 51 L 192 50 L 192 58 L 187 59 L 186 54 Z"/>
+        <!-- Scandinavia: Norway (Fjords), Sweden, Denmark, Baltic -->
+        <path d="M 197 32 L 210 26 L 224 28 L 228 38 L 222 45 L 215 42 L 206 45 L 198 40 Z"/>
+        <path d="M 207 48 L 210 47 L 210 52 L 207 51 Z"/>
+        <!-- Continental Europe: Iberia, France, Germany, Low Countries, Italy, Balkans, Greece, Poland -->
+        <path d="M 184 63 L 191 61 L 195 56 L 203 52 L 213 50 L 223 48 L 234 46 L 242 54 L 236 64 L 228 68 L 220 70 L 216 64 L 212 68 L 215 74 L 211 76 L 206 68 L 201 66 L 193 70 L 184 70 Z"/>
+        <!-- Italy (Boot + Sicily & Sardinia) -->
+        <path d="M 208 72 L 213 71 L 217 76 L 219 82 L 215 82 L 212 77 L 208 75 Z"/>
+        <path d="M 210 83 L 214 83 L 213 86 L 209 85 Z"/>
+        <path d="M 205 74 L 207 74 L 207 79 L 205 79 Z"/>
+        <!-- Greece & Aegean Islands -->
+        <path d="M 218 78 L 223 77 L 224 83 L 220 84 L 218 80 Z"/>
+        <path d="M 221 86 L 225 86 L 224 88 L 220 87 Z"/>
+        <!-- Ukraine & Black Sea Basin (Danube Delta, Crimea, Azov, Donbas, Carpathians) -->
+        <path d="M 221 68 L 226 67 L 233 67 L 237 70 L 236 74 L 232 75 L 230 73 L 229 76 L 227 75 L 226 71 L 221 71 Z"/>
+        <!-- Eastern Europe & Russia (Urals, Volga, Moscow basin) -->
+        <path d="M 235 30 L 268 24 L 308 24 L 348 30 L 372 38 L 364 52 L 352 58 L 346 72 L 338 86 L 328 96 L 320 108 L 314 102 L 306 94 L 296 96 L 288 110 L 280 96 L 270 90 L 258 84 L 248 72 L 238 56 Z"/>
+        <!-- Anatolia (Turkey) & Levant -->
+        <path d="M 226 75 L 238 73 L 245 76 L 244 80 L 238 81 L 228 80 Z"/>
+        <!-- Arabian Peninsula & Persian Gulf (Saudi Arabia, UAE, Oman, Yemen) -->
+        <path d="M 234 88 L 248 86 L 258 90 L 264 98 L 256 106 L 244 104 L 236 94 Z"/>
+        <!-- Africa: North Africa, Sahara, Horn, West Africa, Congo, Southern Africa, Madagascar -->
+        <path d="M 183 75 L 203 73 L 217 77 L 229 79 L 237 91 L 249 103 L 245 119 L 239 137 L 231 155 L 219 171 L 209 171 L 203 153 L 199 135 L 193 117 L 179 111 L 173 97 L 177 83 Z"/>
+        <path d="M 243 145 L 248 143 L 247 159 L 242 157 Z"/>
+        <!-- India & South Asia -->
+        <path d="M 264 85 L 276 86 L 286 96 L 282 108 L 274 106 L 268 94 Z"/>
+        <path d="M 280 110 L 283 110 L 283 114 L 280 113 Z"/>
+        <!-- East Asia (China, Korea, Japan) -->
+        <path d="M 288 64 L 324 62 L 332 74 L 324 88 L 304 90 L 292 78 Z"/>
+        <path d="M 328 66 L 332 66 L 332 72 L 328 72 Z"/>
+        <path d="M 342 60 L 348 58 L 350 66 L 344 74 L 339 72 Z"/>
+        <!-- Southeast Asia, Indonesia, Philippines -->
+        <path d="M 314 96 L 326 104 L 320 112 L 312 104 Z"/>
+        <path d="M 306 114 L 326 122 L 338 124 L 318 126 Z"/>
+        <path d="M 334 94 L 339 94 L 338 104 L 334 104 Z"/>
+        <!-- Australia & New Zealand -->
         <path d="M 322 142 L 344 138 L 362 144 L 368 158 L 360 174 L 342 176 L 322 168 L 316 154 Z"/>
-        <path d="M 350 180 L 355 180 L 354 184 L 350 183 Z"/>
-        <!-- New Zealand -->
-        <path d="M 380 172 L 386 168 L 388 176 L 378 184 L 374 182 Z"/>
+        <path d="M 376 172 L 382 168 L 384 176 L 374 184 Z"/>
       </g>
 
-      <!-- Granular Country Subdivision Borders -->
-      <g stroke="${th.borderStroke}" stroke-width="0.45" stroke-dasharray="1.5 1" fill="none">
-        <!-- US / Canada border & US / Mexico border -->
+      <!-- Tactical National Boundaries (Crisp High-Precision Vector Subdivisions) -->
+      <g stroke="${th.borderStroke}" stroke-width="0.45" stroke-dasharray="1.2 0.8" fill="none">
+        <!-- European & Eurasian Borders -->
+        <path d="M 194 62 L 198 62 L 202 67 M 202 56 L 202 66 M 212 54 L 212 66 M 222 52 L 222 66"/>
+        <path d="M 221 68 L 225 68 L 228 66 L 234 67 L 237 70"/>
+        <path d="M 218 72 L 224 73 L 228 76 L 232 75"/>
+        <path d="M 240 76 L 244 80 L 248 78 L 254 82"/>
+        <!-- African Subdivisions -->
+        <line x1="178" y1="92" x2="236" y2="92"/>
+        <line x1="204" y1="76" x2="204" y2="114"/>
+        <line x1="218" y1="92" x2="218" y2="146"/>
+        <line x1="204" y1="146" x2="236" y2="146"/>
+        <!-- North American Borders -->
         <line x1="64" y1="62" x2="124" y2="62"/>
         <line x1="76" y1="86" x2="98" y2="89"/>
-        <!-- South America borders (Brazil / Argentina / Peru / Colombia) -->
-        <path d="M 112 124 L 128 128 L 132 148 L 122 162"/>
-        <line x1="115" y1="160" x2="132" y2="162"/>
-        <!-- Europe borders (France/Germany/Poland/Ukraine/Russia) -->
-        <line x1="198" y1="54" x2="198" y2="66"/>
-        <line x1="208" y1="52" x2="208" y2="66"/>
-        <line x1="218" y1="50" x2="218" y2="65"/>
-        <line x1="229" y1="48" x2="229" y2="66"/>
-        <!-- Africa borders -->
-        <line x1="176" y1="92" x2="234" y2="92"/>
-        <line x1="204" y1="75" x2="204" y2="112"/>
-        <line x1="218" y1="92" x2="218" y2="145"/>
-        <line x1="204" y1="145" x2="234" y2="145"/>
-        <!-- Asia borders (Russia/China/India/Kazakhstan) -->
-        <path d="M 256 56 L 292 58 L 336 56"/>
-        <path d="M 276 76 L 298 78 L 312 92"/>
       </g>
 
-      <!-- Country & Regional Map Labels -->
-      <g fill="${th.labelCol}" font-family="'Space Grotesk', 'Inter', sans-serif" font-size="3.9" font-weight="700" letter-spacing="0.06em" text-anchor="middle" style="pointer-events:none; user-select:none;">
-        <text x="90" y="52">CANADA</text>
-        <text x="92" y="75">USA</text>
-        <text x="88" y="96">MEXICO</text>
-        <text x="145" y="28" opacity="0.7">GREENLAND</text>
-        <text x="115" y="120">COLOMBIA</text>
-        <text x="134" y="142">BRAZIL</text>
-        <text x="122" y="176">ARGENTINA</text>
-        <text x="186" y="52">UK</text>
-        <text x="195" y="63">FRANCE</text>
-        <text x="206" y="58">GERMANY</text>
-        <text x="186" y="70">SPAIN</text>
-        <text x="210" y="69">ITALY</text>
-        <text x="212" y="38">SWEDEN</text>
-        <text x="226" y="58">UKRAINE</text>
-        <text x="285" y="42">RUSSIA</text>
-        <text x="233" y="71">TURKEY</text>
-        <text x="223" y="86">EGYPT</text>
-        <text x="188" y="86">MOROCCO</text>
-        <text x="198" y="110">NIGERIA</text>
-        <text x="232" y="118">KENYA</text>
-        <text x="216" y="168">S. AFRICA</text>
-        <text x="246" y="88">SAUDI ARABIA</text>
-        <text x="258" y="89">UAE</text>
-        <text x="256" y="76">IRAN</text>
-        <text x="288" y="96">INDIA</text>
-        <text x="316" y="74">CHINA</text>
-        <text x="342" y="69">S. KOREA</text>
-        <text x="360" y="68">JAPAN</text>
-        <text x="316" y="116">SINGAPORE</text>
-        <text x="330" y="125">INDONESIA</text>
-        <text x="344" y="158">AUSTRALIA</text>
-        <text x="382" y="180">N.Z.</text>
+      <!-- Tactical Highlight on Active Target Nation (Ukraine in Image 2 with radiant glowing border) -->
+      <g class="tactical-highlight-country">
+        <path d="M 221 68 L 226 67 L 233 67 L 237 70 L 236 74 L 232 75 L 230 73 L 229 76 L 227 75 L 226 71 L 221 71 Z" fill="rgba(251, 191, 36, 0.12)" stroke="${th.highlightCountry}" stroke-width="1.3" filter="url(#activeCountryGlow)"/>
+      </g>
+
+      <!-- Faint Topographic / Bathymetric Depth Contours -->
+      <g stroke="${th.grid}" stroke-width="0.35" fill="none" opacity="0.45">
+        <path d="M 180 60 C 188 56, 196 52, 204 50 C 216 48, 228 44, 240 44"/>
+        <path d="M 178 72 C 188 70, 200 70, 214 74 C 224 76, 234 74, 246 76"/>
+        <path d="M 180 84 C 196 82, 212 84, 228 86 C 240 88, 252 86, 264 92"/>
+        <path d="M 194 116 C 210 114, 226 122, 242 134"/>
       </g>
     `;
 
-    // Build SVG paths + animated transit vehicles for all active routes
+    // Dynamic Country Labels with Proximity Occlusion Management
+    const countryLabelsDb = [
+      { name: 'RUSSIA', x: 260, y: 35 },
+      { name: 'UK', x: 189, y: 67 },
+      { name: 'FRANCE', x: 198, y: 77 },
+      { name: 'SPAIN', x: 187, y: 83 },
+      { name: 'GERMANY', x: 209, y: 73 },
+      { name: 'POLAND', x: 219, y: 71 },
+      { name: 'ITALY', x: 212, y: 81 },
+      { name: 'ROMANIA', x: 222, y: 76 },
+      { name: 'TURKEY', x: 236, y: 81 },
+      { name: 'SWEDEN', x: 212, y: 52 },
+      { name: 'FINLAND', x: 226, y: 50 },
+      { name: 'KAZAKHSTAN', x: 264, y: 73 },
+      { name: 'IRAN', x: 254, y: 85 },
+      { name: 'IRAQ', x: 242, y: 86 },
+      { name: 'SYRIA', x: 236, y: 86 },
+      { name: 'SAUDI ARABIA', x: 248, y: 96 },
+      { name: 'YEMEN', x: 254, y: 104 },
+      { name: 'MOROCCO', x: 188, y: 89 },
+      { name: 'ALGERIA', x: 202, y: 93 },
+      { name: 'LIBYA', x: 220, y: 93 },
+      { name: 'EGYPT', x: 232, y: 93 },
+      { name: 'SUDAN', x: 228, y: 105 },
+      { name: 'CHAD', x: 218, y: 105 },
+      { name: 'NIGER', x: 206, y: 104 },
+      { name: 'NIGERIA', x: 203, y: 112 },
+      { name: 'ETHIOPIA', x: 238, y: 110 },
+      { name: 'S. SUDAN', x: 228, y: 113 },
+      { name: 'DR CONGO', x: 218, y: 124 },
+      { name: 'KENYA', x: 236, y: 121 },
+      { name: 'TANZANIA', x: 234, y: 129 },
+      { name: 'ANGOLA', x: 213, y: 135 },
+      { name: 'ZAMBIA', x: 226, y: 137 },
+      { name: 'INDIA', x: 276, y: 98 }
+    ];
+
+    // Filter country labels based on proximity to target and origin to avoid visual clutter
+    const filteredLabelsHtml = countryLabelsDb.map(lbl => {
+      const dTarget = Math.hypot(lbl.x - targetProj.x, lbl.y - targetProj.y);
+      const dOrigin = Math.hypot(lbl.x - originProj.x, lbl.y - originProj.y);
+      if (dTarget < 14 || dOrigin < 12) return ''; // Occlusion culling near HUD markers
+      const isSubtle = (dTarget < 24 || dOrigin < 20);
+      return `<text x="${lbl.x}" y="${lbl.y}" fill="${th.labelCol}" opacity="${isSubtle ? 0.35 : 0.82}">${lbl.name}</text>`;
+    }).join('');
+
+    // Great-Circle Parabolic 3D Arcs + HUD Waypoints + Vehicle Trails
     const routeElementsHtml = showArc ? activeRoutes.map((rt, idx) => {
       const fGeo = (rt.fromLat !== undefined && rt.fromLng !== undefined)
         ? { lat: rt.fromLat, lng: rt.fromLng }
         : (window.tplResolveGeoLocation(rt.from) || { lat: 39.8, lng: -98.5 });
       const tGeo = (rt.toLat !== undefined && rt.toLng !== undefined)
         ? { lat: rt.toLat, lng: rt.toLng }
-        : (window.tplResolveGeoLocation(rt.to) || { lat: 54.0, lng: -2.0 });
+        : (window.tplResolveGeoLocation(rt.to) || { lat: 48.37, lng: 31.16 });
 
       const p1 = window.tplProjectLatLngToMapSvg(fGeo.lat, fGeo.lng);
       const p2 = window.tplProjectLatLngToMapSvg(tGeo.lat, tGeo.lng);
       const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-      const arcLift = rt.mode === 'train' ? Math.min(10, dist * 0.08) : (rt.mode === 'ship' ? -Math.min(14, dist * 0.1) : Math.min(42, Math.max(14, dist * 0.28)));
+      // High-altitude parabolic 3D flight trajectory curve
+      const arcLift = Math.min(38, Math.max(16, dist * 0.32));
       const cx = (p1.x + p2.x) / 2;
       const cy = (p1.y + p2.y) / 2 - arcLift;
       const pathId = `map-route-path-${idx}`;
-      const col = rt.color || (idx === 0 ? '#38bdf8' : (idx === 1 ? '#f59e0b' : '#2effc6'));
-      const dash = rt.mode === 'train' ? '3 1.5' : (rt.mode === 'ship' ? '2 2.5' : '4 2.5');
-      const modeBadge = rt.mode === 'ship' ? '\ud83d\udea2' : (rt.mode === 'train' ? '\ud83d\ude86' : (rt.mode === 'line' ? '\u26a1' : '\u2708\ufe0f'));
+      const col = rt.color || '#38bdf8';
+      const isLastLeg = (idx === activeRoutes.length - 1);
 
       return `
         <g class="map-route-group" data-route-idx="${idx}">
-          <!-- Glow under-stroke -->
-          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="3.2" opacity="0.24"/>
-          <!-- Primary animated route path -->
-          <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.5" stroke-dasharray="${dash}" opacity="0.95"/>
-          <!-- Origin & Destination Waypoint Pins -->
-          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.8" fill="${col}" stroke="#ffffff" stroke-width="0.9"/>
-          <circle cx="${p2.x.toFixed(1)}" cy="${p2.y.toFixed(1)}" r="3.2" fill="${pinColor}" stroke="#ffffff" stroke-width="1"/>
-          <!-- Endpoint Callout Badges -->
-          <g transform="translate(${p1.x.toFixed(1)}, ${(p1.y - 5.5).toFixed(1)})">
-            <rect x="-18" y="-5" width="36" height="6.8" rx="2" fill="rgba(4,9,17,0.86)" stroke="${col}" stroke-width="0.45"/>
-            <text x="0" y="-0.4" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="3.7" font-weight="800" text-anchor="middle">${(rt.from || 'ORIGIN').toUpperCase().slice(0, 10)}</text>
-          </g>
-          <g transform="translate(${p2.x.toFixed(1)}, ${(p2.y - 6).toFixed(1)})">
-            <rect x="-20" y="-5.2" width="40" height="7" rx="2" fill="rgba(4,9,17,0.9)" stroke="${pinColor}" stroke-width="0.55"/>
-            <text x="0" y="-0.4" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="3.8" font-weight="800" text-anchor="middle">${modeBadge} ${(rt.to || 'TARGET').toUpperCase().slice(0, 9)}</text>
-          </g>
-          <!-- Moving Transit Vehicle Icon -->
+          <!-- Glowing Parabolic Under-Stroke -->
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="4.8" opacity="0.32" filter="url(#arcGlowFilter)"/>
+          <!-- Core Luminous Arc Path -->
+          <path d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="${col}" stroke-width="1.8" opacity="0.95"/>
+          <!-- Dynamic Animated Dash-Array Motion Trail -->
+          <path id="${pathId}" class="map-animated-arc" d="M ${p1.x.toFixed(1)} ${p1.y.toFixed(1)} Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-dasharray="8 4 2 4" opacity="0.9"/>
+
+          <!-- Waypoint 1 (Origin) -->
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="2.4" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
+          <circle cx="${p1.x.toFixed(1)}" cy="${p1.y.toFixed(1)}" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+
+          <!-- Origin Floating HUD Coordinate Tag -->
+          ${idx === 0 ? `
+            <g class="map-waypoint-hud" transform="translate(${p1.x.toFixed(1)}, ${p1.y.toFixed(1)})">
+              <path d="M 0 -2.4 L 0 -10 L 16 -10" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
+              <text x="18" y="-13" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.2" font-weight="900" letter-spacing="0.06em">${(rt.from || 'ORIGIN').toUpperCase()}</text>
+              <text x="18" y="-8.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${originCoordsStr}</text>
+            </g>
+          ` : ''}
+
+          <!-- Waypoint 2 (Destination or Intermediate Transfer Waypoint) -->
+          ${isLastLeg ? `
+            <!-- Multi-Ring Concentric Tactical HUD Reticle matching Image 2 -->
+            <g class="map-target-reticle" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
+              <!-- Expanding Radar Pulse Ring -->
+              <circle cx="0" cy="0" r="6" fill="none" stroke="${col}" stroke-width="1" class="hud-radar-pulse"/>
+              <!-- Outer Dashed Reticle Ring -->
+              <circle cx="0" cy="0" r="15" fill="none" stroke="${col}" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.85"/>
+              <!-- Inner Solid Reticle Ring -->
+              <circle cx="0" cy="0" r="9.5" fill="none" stroke="${col}" stroke-width="1.2" opacity="0.95"/>
+              <!-- 4-Corner Crosshair Ticks -->
+              <path d="M -12 -12 L -9 -12 M -12 -12 L -12 -9 M 12 -12 L 9 -12 M 12 -12 L 12 -9 M -12 12 L -9 12 M -12 12 L -12 9 M 12 12 L 9 12 M 12 12 L 12 9" stroke="${col}" stroke-width="0.8" fill="none"/>
+              <!-- Center Glowing Target Node -->
+              <circle cx="0" cy="0" r="3.2" fill="${th.highlightCountry}" stroke="#ffffff" stroke-width="0.8"/>
+              <circle cx="0" cy="0" r="1.2" fill="#ffffff"/>
+
+              <!-- Tactical Leader Line + Target HUD Tag -->
+              <path d="M 0 -9.5 L 0 -17 L 24 -17" fill="none" stroke="${col}" stroke-width="0.75" opacity="0.85"/>
+              <text x="26" y="-20" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="5" font-weight="900" letter-spacing="0.08em">${targetName.toUpperCase()}</text>
+              <text x="26" y="-14.5" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="3.3" font-weight="700" letter-spacing="0.05em">${targetCoordsStr}</text>
+            </g>
+          ` : `
+            <!-- Intermediate Transfer Node & Waypoint HUD (e.g. London / UK in Image 2) -->
+            <g class="map-intermediate-hud" transform="translate(${p2.x.toFixed(1)}, ${p2.y.toFixed(1)})">
+              <circle cx="0" cy="0" r="2.6" fill="${col}" stroke="#ffffff" stroke-width="0.8"/>
+              <circle cx="0" cy="0" r="5.2" fill="none" stroke="${col}" stroke-width="0.6" opacity="0.7"/>
+              <path d="M 0 -2.6 L 0 -11 L 18 -11" fill="none" stroke="${col}" stroke-width="0.65" opacity="0.85"/>
+              <text x="20" y="-14" fill="#ffffff" font-family="'Space Grotesk',sans-serif" font-size="4.4" font-weight="900" letter-spacing="0.06em">${(rt.to || '').toUpperCase() === 'UK' ? 'LONDON' : (rt.to || 'WAYPOINT').toUpperCase()}</text>
+              <text x="20" y="-9" fill="${col}" font-family="'JetBrains Mono',monospace" font-size="2.9" font-weight="700" letter-spacing="0.04em">${(rt.to || '').toUpperCase() === 'UK' ? '51.50°N 0.12°W' : `${Math.abs(tGeo.lat).toFixed(2)}°${tGeo.lat >= 0 ? 'N' : 'S'} ${Math.abs(tGeo.lng).toFixed(2)}°${tGeo.lng >= 0 ? 'E' : 'W'}`}</text>
+            </g>
+          `}
+
+          <!-- Moving Transit Vehicle (Jet / Train / Ship) along Great-Circle Arc -->
           ${buildTransitVehicleSvg(rt.mode || 'plane', pathId, col, idx)}
         </g>
       `;
     }).join('') : '';
 
-    // Build custom on-screen traced routes (drawn directly in 3D/Trace mode)
+    // Custom on-screen traced routes (for 3D Direct Tracing mode)
     const customTraceHtml = customRoutes.map((cr, cIdx) => {
       const pts = Array.isArray(cr.points) ? cr.points : [];
       if (pts.length < 2) return '';
@@ -1386,46 +1520,112 @@
     const globeSvg = proj === 'globe' ? `
       <svg class="globe-svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet">
         <defs>
-          <radialGradient id="globeSphereGrad" cx="42%" cy="38%" r="58%">
-            <stop offset="0%" stop-color="${th.ocean}" stop-opacity="1"/>
-            <stop offset="78%" stop-color="#030712" stop-opacity="1"/>
-            <stop offset="100%" stop-color="${th.atmo}" stop-opacity="0.9"/>
+          <!-- Volumetric 3D Sphere Shading Shader (Depth & Upper-Left Sun Rim) -->
+          <radialGradient id="globeSphereGrad" cx="35%" cy="30%" r="72%">
+            <stop offset="0%" stop-color="${th.oceanLight}" stop-opacity="1"/>
+            <stop offset="48%" stop-color="${th.ocean}" stop-opacity="1"/>
+            <stop offset="82%" stop-color="#020814" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#01040a" stop-opacity="1"/>
           </radialGradient>
+
+          <!-- Sci-Fi 3D Fresnel Atmosphere Rim Glow (Authentic Earth Limb Brightening) -->
+          <radialGradient id="globeFresnelGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="78%" stop-color="${th.atmo}" stop-opacity="0"/>
+            <stop offset="89%" stop-color="${th.atmo}" stop-opacity="0.25"/>
+            <stop offset="96%" stop-color="${th.fresnelRim}" stop-opacity="0.7"/>
+            <stop offset="99%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="100%" stop-color="#ffffff" stop-opacity="1"/>
+          </radialGradient>
+
+          <!-- Volumetric Terminator Depth Shadow Overlay -->
+          <radialGradient id="globeDepthShadow" cx="28%" cy="24%" r="80%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.08"/>
+            <stop offset="55%" stop-color="#000000" stop-opacity="0"/>
+            <stop offset="85%" stop-color="#010611" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#000308" stop-opacity="0.88"/>
+          </radialGradient>
+
           <clipPath id="globeClipCircle">
-            <circle cx="200" cy="114" r="98"/>
+            <circle cx="200" cy="114" r="102"/>
           </clipPath>
+
+          <filter id="outerAtmoGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4"/>
+          </filter>
+          <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
+          <filter id="activeCountryGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="${th.highlightCountry}" flood-opacity="0.85"/>
+          </filter>
           <filter id="mapGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
             <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.85"/>
           </filter>
         </defs>
-        <!-- Outer Space / Telemetry Grid -->
-        <g stroke="${th.grid}" stroke-width="0.45" opacity="0.4">
+
+        <!-- Outer Space Deep Stars & Telemetry Grid -->
+        <g stroke="${th.grid}" stroke-width="0.45" opacity="0.32">
           <line x1="0" y1="45" x2="400" y2="45"/><line x1="0" y1="112" x2="400" y2="112"/><line x1="0" y1="180" x2="400" y2="180"/>
           <line x1="80" y1="0" x2="80" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="320" y1="0" x2="320" y2="225"/>
         </g>
-        <!-- Atmosphere Halo -->
-        <circle cx="200" cy="114" r="102" fill="none" stroke="${th.atmo}" stroke-width="3.5" opacity="0.65"/>
-        <circle cx="200" cy="114" r="98" fill="url(#globeSphereGrad)" stroke="${th.landStroke}" stroke-width="1.1" stroke-opacity="0.65"/>
-        <!-- Clipped Orthographic Globe Contents -->
+
+        <!-- Multi-Layer 3D Atmosphere Rim Lighting Halo (Fresnel Glow along Earth Curve) -->
+        <circle cx="200" cy="114" r="102" fill="none" stroke="${th.atmo}" stroke-width="2.5" opacity="0.95" filter="url(#outerAtmoGlow)"/>
+        <circle cx="200" cy="114" r="106" fill="none" stroke="#0ea5e9" stroke-width="5" opacity="0.45" filter="url(#outerAtmoGlow)"/>
+        <circle cx="200" cy="114" r="111" fill="none" stroke="${th.atmo}" stroke-width="9" opacity="0.18" filter="url(#outerAtmoGlow)"/>
+
+        <!-- Circumference Telemetry Degree Marks -->
+        <circle cx="200" cy="114" r="102" fill="url(#globeSphereGrad)" stroke="rgba(56,189,248,0.7)" stroke-width="1.2"/>
+
+        <!-- Clipped 3D Orthographic Globe Body -->
         <g clip-path="url(#globeClipCircle)">
-          <g stroke="${th.grid}" stroke-width="0.55" fill="none">
-            <ellipse cx="200" cy="114" rx="98" ry="32"/>
-            <ellipse cx="200" cy="114" rx="98" ry="66"/>
-            <line x1="102" y1="114" x2="298" y2="114"/>
-            <ellipse cx="200" cy="114" rx="32" ry="98"/>
-            <ellipse cx="200" cy="114" rx="66" ry="98"/>
-            <line x1="200" y1="16" x2="200" y2="212"/>
+          <!-- Curved 3D Spherical Graticules (Latitude Parallels & Longitude Meridians) -->
+          <g stroke="${th.grid}" stroke-width="0.55" fill="none" opacity="0.85">
+            <!-- Parallels (Latitudes) -->
+            <ellipse cx="200" cy="62" rx="74" ry="22"/>
+            <ellipse cx="200" cy="78" rx="88" ry="26"/>
+            <ellipse cx="200" cy="95" rx="98" ry="30"/>
+            <ellipse cx="200" cy="105" rx="101" ry="31"/>
+            <ellipse cx="200" cy="114" rx="102" ry="32"/>
+            <line x1="98" y1="114" x2="302" y2="114"/>
+            <ellipse cx="200" cy="123" rx="101" ry="31"/>
+            <ellipse cx="200" cy="133" rx="98" ry="30"/>
+            <ellipse cx="200" cy="150" rx="88" ry="26"/>
+            <ellipse cx="200" cy="166" rx="74" ry="22"/>
+
+            <!-- Meridians (Longitudes) -->
+            <ellipse cx="200" cy="114" rx="28" ry="102"/>
+            <ellipse cx="200" cy="114" rx="58" ry="102"/>
+            <ellipse cx="200" cy="114" rx="85" ry="102"/>
+            <line x1="200" y1="12" x2="200" y2="216"/>
           </g>
+
+          <!-- Interactive Transformed Coordinate Plane -->
           <g class="map-interactive-coord-plane" transform="translate(${globeShiftX}, ${globeShiftY})">
-            ${granularWorldPaths}
+            ${highPrecisionWorldVectors}
+            <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
+              ${filteredLabelsHtml}
+            </g>
             ${routeElementsHtml}
             ${customTraceHtml}
           </g>
+
+          <!-- 3D Volumetric Terminator Depth Shadow Overlay -->
+          <circle cx="200" cy="114" r="102" fill="url(#globeDepthShadow)" pointer-events="none"/>
+
+          <!-- 3D Fresnel Limb Rim Glow Overlay (Inner Edge Highlight) -->
+          <circle cx="200" cy="114" r="102" fill="url(#globeFresnelGrad)" pointer-events="none"/>
         </g>
       </svg>
     ` : `
       <svg class="globe-svg" viewBox="0 0 400 225" preserveAspectRatio="xMidYMid meet">
         <defs>
+          <filter id="arcGlowFilter" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5"/>
+          </filter>
+          <filter id="activeCountryGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="2" flood-color="${th.highlightCountry}" flood-opacity="0.85"/>
+          </filter>
           <filter id="mapGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
             <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.85"/>
           </filter>
@@ -1436,7 +1636,10 @@
           <line x1="66" y1="0" x2="66" y2="225"/><line x1="133" y1="0" x2="133" y2="225"/><line x1="200" y1="0" x2="200" y2="225"/><line x1="266" y1="0" x2="266" y2="225"/><line x1="333" y1="0" x2="333" y2="225"/>
         </g>
         <g class="map-interactive-coord-plane">
-          ${granularWorldPaths}
+          ${highPrecisionWorldVectors}
+          <g font-family="'JetBrains Mono', 'Space Grotesk', monospace" font-size="3.2" font-weight="700" letter-spacing="0.08em" text-anchor="middle" style="pointer-events:none; user-select:none;">
+            ${filteredLabelsHtml}
+          </g>
           ${routeElementsHtml}
           ${customTraceHtml}
         </g>
@@ -1468,21 +1671,31 @@
         ${stage3DControlsHtml}
         <div class="globe-camera-rig" style="${rig3DStyle}">
           ${globeSvg}
-          <div class="globe-pin-group" style="${proj === 'globe' ? `left:calc(${normX.toFixed(1)}% + ${globeShiftX}px * 0.25); top:calc(${normY.toFixed(1)}% + ${globeShiftY}px * 0.25);` : ''}">
-            <div class="radar-ring r1"></div>
-            <div class="radar-ring r2"></div>
-            <div class="tactical-pin">
-              <svg width="22" height="30" viewBox="0 0 24 32" fill="none">
-                <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 20 12 20s12-11 12-20c0-6.63-5.37-12-12-12z" fill="${pinColor}"/>
-                <circle cx="12" cy="12" r="4.5" fill="#ffffff"/>
-              </svg>
-            </div>
+        </div>
+
+        <!-- Floating Glassmorphic HUD Route Card matching Image 2 -->
+        <div class="location-hud">
+          <div class="hud-top-meta">
+            <span class="hud-badge-tag">[MULTI-VECTOR TRANSIT 01]</span>
+            <span class="hud-badge-tag">[ACTIVE LEGS: ${activeRoutes.length}]</span>
+          </div>
+          <div class="hud-route-legs">
+            ${activeRoutes.map((rt, i) => {
+              const isLast = (i === activeRoutes.length - 1);
+              const fromFlag = getCountryFlag(rt.from);
+              return `
+                <div class="hud-route-item ${isLast ? 'active-leg' : ''}">
+                  ${i === 0 ? `<span class="hud-flag">${fromFlag}</span>` : `<span class="hud-arrow-down">\u2794</span>`}
+                  <span class="hud-country">${(rt.from || 'ORIGIN').toUpperCase()}</span>
+                  <span class="hud-arrow">\u2192</span>
+                  <span class="hud-country ${isLast ? 'highlight' : ''}">${(rt.to || 'TARGET').toUpperCase()}</span>
+                </div>
+              `;
+            }).join('')}
           </div>
         </div>
-        <div class="location-hud" style="border-color:${pinColor}88;">
-          <div class="location-label">${locTitle}</div>
-          <div class="location-coords">${coordsSub}</div>
-        </div>
+
+        <!-- High-Tech Bottom Telemetry Bar -->
         <div class="telemetry-bar">
           <span>SAT-LOCK // ${proj === 'globe' ? '3D ORTHOGRAPHIC GLOBE' : '2D GRANULAR WORLD MAP'} ${is3D ? '\u00b7 [3D INTERACTIVE]' : ''}</span>
           <span>${activeRoutes.length} ROUTE${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ZOOM @ ${zoomStart}s \u00b7 ${zoomLvl}x</span>
@@ -1892,6 +2105,25 @@
       fxc.style.display = 'block';
       const defImg = stage.querySelector(`#default-img-${tplId}`);
       if (defImg) defImg.style.display = 'none';
+    } else if (tplId === 'kenburns') {
+      const kbImg = fxc.querySelector('.kb-img');
+      const kbCap = fxc.querySelector('.kb-caption');
+      if (kbCap) {
+        kbCap.textContent = data.caption || 'TOKYO · 1987';
+      }
+      if (kbImg) {
+        const useImg = (data.image && !data.image.includes('data:image/svg')) ? data.image : '/tokyo_1987_cinematic.jpg';
+        kbImg.style.backgroundImage = `url("${useImg}")`;
+        if (data.motion === 'Zoom Out') {
+          kbImg.style.animation = 'kenBurnsOut 6s ease-in-out infinite';
+        } else if (data.motion === 'Pan Right') {
+          kbImg.style.animation = 'kenBurnsPanRight 6s ease-in-out infinite';
+        } else if (data.motion === 'Pan Left') {
+          kbImg.style.animation = 'kenBurnsPanLeft 6s ease-in-out infinite';
+        } else {
+          kbImg.style.animation = 'kenBurns 6s ease-in-out infinite';
+        }
+      }
     } else if (tplId === 'parallax') {
       const sun = fxc.querySelector('.sun');
       if (sun) {
@@ -2214,11 +2446,16 @@
       const kw = (data.keyword || '').toUpperCase();
       const kCol = data.keyColor || '#facc15';
       if (cap) {
+        if (data.fontSize) cap.style.fontSize = `${data.fontSize}px`;
+        if (data.fontFamily) cap.style.fontFamily = data.fontFamily;
+        if (data.color || data.textColor) cap.style.color = data.color || data.textColor;
+        cap.style.whiteSpace = 'nowrap';
         cap.innerHTML = rawCap.split(/\s+/).filter(Boolean).map((w, idx) => {
           const cleanW = w.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
           const isKw = kw && cleanW === kw;
           return `<span class="word" style="animation-delay:${(idx * 0.35).toFixed(2)}s; ${isKw ? `color:${kCol};--hl-col:${kCol};` : `--hl-col:${kCol};`}">${w}</span>`;
         }).join(' ');
+        if (typeof window.tplUpdateTransformBox === 'function') window.tplUpdateTransformBox();
       }
       if (root) {
         const existingVid = root.querySelector('.hormozi-bg-video');
@@ -3701,10 +3938,10 @@
           ]
         },
         {
-          label: '\ud83c\uddfa\ud83c\uddf8 USA \u2192 \ud83c\uddec\ud83c\udde7 UK \u2192 \ud83c\uddfa\ud83c\udde6 Ukraine (Transatlantic + Rail)',
+          label: '\ud83c\uddfa\ud83c\uddf8 USA \u2192 \ud83c\uddec\ud83c\udde7 UK \u2192 \ud83c\uddfa\ud83c\udde6 Ukraine (Multi-Vector Transit)',
           routes: [
-            { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 54.0, toLng: -2.0, mode: 'plane', color: '#38bdf8' },
-            { from: 'UK', to: 'Ukraine', fromLat: 54.0, fromLng: -2.0, toLat: 49.0, toLng: 31.4, mode: 'train', color: '#f59e0b' }
+            { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 51.50, toLng: -0.12, mode: 'plane', color: '#38bdf8' },
+            { from: 'UK', to: 'Ukraine', fromLat: 51.50, fromLng: -0.12, toLat: 48.37, toLng: 31.16, mode: 'plane', color: '#38bdf8' }
           ]
         },
         {

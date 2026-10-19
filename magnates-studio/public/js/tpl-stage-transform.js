@@ -439,6 +439,7 @@
       box.style.width = `${elRect.width}px`;
       box.style.height = `${elRect.height}px`;
     };
+    window.tplUpdateTransformBox = updateBox;
 
     // Default select foreground if available, else text
     if (fgCandidate) selectTarget('fg');
