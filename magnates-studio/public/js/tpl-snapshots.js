@@ -745,16 +745,53 @@
       </svg>
     `)}`,
 
-    // 40. Whiteout Fade Focus (Document Dimmer)
+    // 40. Whiteout Fade Focus (Document Dimmer) - Vox Documentary Style
     'anim-whiteout-fade': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-        <rect width="400" height="225" fill="#f8fafc"/>
-        <g transform="translate(40, 70)">
-          <rect width="320" height="85" rx="6" fill="#ffffff" stroke="#38bdf8" stroke-width="2"/>
-          <text x="160" y="38" fill="#0284c7" font-family="'Inter', sans-serif" font-weight="900" font-size="15" text-anchor="middle">FOCUSED KEY EVIDENCE</text>
-          <text x="160" y="58" fill="#64748b" font-family="Georgia, serif" font-size="10" font-style="italic" text-anchor="middle">"Surrounding article text fades into whiteout focus..."</text>
+        <defs>
+          <radialGradient id="wo-bg-dim" cx="50%" cy="50%" r="70%">
+            <stop offset="30%" stop-color="#f8f8f6"/>
+            <stop offset="100%" stop-color="#eceae4"/>
+          </radialGradient>
+          <filter id="wo-shadow" x="-8%" y="-15%" width="120%" height="150%">
+            <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.18"/>
+          </filter>
+        </defs>
+        <!-- Faded Ambient Document Canvas -->
+        <rect width="400" height="225" fill="#f4f4f2"/>
+        <!-- Faded ambient text lines (10% opacity) -->
+        <g opacity="0.12" fill="#0f172a">
+          <rect x="36" y="22" width="130" height="7" rx="1"/>
+          <rect x="36" y="36" width="328" height="4" rx="1"/>
+          <rect x="36" y="45" width="310" height="4" rx="1"/>
+          <rect x="36" y="54" width="320" height="4" rx="1"/>
+          <rect x="36" y="63" width="290" height="4" rx="1"/>
+          <rect x="36" y="160" width="328" height="4" rx="1"/>
+          <rect x="36" y="169" width="315" height="4" rx="1"/>
+          <rect x="36" y="178" width="325" height="4" rx="1"/>
+          <rect x="36" y="187" width="280" height="4" rx="1"/>
+          <rect x="36" y="200" width="180" height="5" rx="1"/>
         </g>
-        
+        <!-- Soft Vignette Mask Overlay -->
+        <rect width="400" height="225" fill="rgba(244, 244, 242, 0.88)"/>
+        <!-- Isolated Focal Sentence Block (Magnified 1.08x, Drop Shadow, Razor-Sharp) -->
+        <g transform="translate(30, 80)" filter="url(#wo-shadow)">
+          <rect width="340" height="66" fill="#faf6ec" rx="2"/>
+          <rect width="340" height="66" fill="none" stroke="#e2ded0" stroke-width="1"/>
+          <text x="16" y="24" font-family="'Times New Roman', Georgia, serif" font-weight="700" font-size="12" fill="#0f172a" letter-spacing="0.2">
+            "14 consecutive unrecorded wire transfers totaling $482,000,000"
+          </text>
+          <text x="16" y="44" font-family="'Times New Roman', Georgia, serif" font-weight="700" font-size="11.5" fill="#0f172a" letter-spacing="0.2">
+            "were routed through unregistered entity Apex Holdings without disclosure."
+          </text>
+        </g>
+        <!-- Dynamic Leader Line & Metadata Tag -->
+        <path d="M 320 80 L 320 42 L 350 42" fill="none" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="320" cy="80" r="2.5" fill="#0f172a"/>
+        <g transform="translate(230, 24)">
+          <rect width="134" height="16" rx="2" fill="#0f172a"/>
+          <text x="67" y="11.5" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="7.5" font-weight="800" fill="#f8fafc" letter-spacing="1" text-anchor="middle">[EXHIBIT C // PARAGRAPH 4]</text>
+        </g>
       </svg>
     `)}`,
 

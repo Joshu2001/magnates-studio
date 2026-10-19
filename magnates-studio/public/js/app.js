@@ -1507,18 +1507,19 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
       maskCtx.clearRect(0, 0, maskW, maskH);
 
       if (isWhiteout) {
-        maskCtx.fillStyle = `rgba(255, 255, 255, ${maxDim})`;
+        // High-contrast off-white paper canvas matte (#F4F4F2) fading ambient text to 10% opacity
+        maskCtx.fillStyle = `rgba(244, 244, 242, ${maxDim})`;
       } else {
         maskCtx.fillStyle = `rgba(10, 12, 16, ${maxDim})`;
       }
       maskCtx.fillRect(0, 0, maskW, maskH);
 
-      // Cutout spotlight
+      // Cutout spotlight (zero vector borders)
       maskCtx.save();
       maskCtx.globalCompositeOperation = 'destination-out';
       maskCtx.filter = `blur(${feather}px)`;
       maskCtx.fillStyle = '#000000';
-      const pad = isWhiteout ? 6 : 4;
+      const pad = isWhiteout ? 4 : 4;
       const lx = maskW * r.x;
       const ly = maskH * r.y;
       const lw = Math.max(10, maskW * r.w);
@@ -1527,6 +1528,66 @@ function renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, final
       maskCtx.restore();
 
       ctx.drawImage(maskCanvas, dx, dy, finalW, finalH);
+
+      // Vox-Style Whiteout: Magnified (1.08x) crisp focal block with realistic drop shadow
+      if (isWhiteout && (targetClip._loadedElement || targetClip.cutoutCanvas) && maxDim > 0.1) {
+        const docElem = targetClip._loadedElement || targetClip.cutoutCanvas;
+        const popScale = spot.focusScale || targetClip.docFocusScale || 1.08;
+        const fCenterX = fx + fw / 2;
+        const fCenterY = fy + fh / 2;
+        
+        ctx.save();
+        ctx.globalAlpha = Math.min(1.0, ease * 1.05);
+        ctx.translate(fCenterX, fCenterY);
+        ctx.scale(popScale, popScale);
+        ctx.translate(-fCenterX, -fCenterY);
+
+        // Soft document paper drop shadow
+        ctx.shadowColor = 'rgba(15, 23, 42, 0.22)';
+        ctx.shadowBlur = 24 * (finalW / 1280);
+        ctx.shadowOffsetY = 10 * (finalH / 720);
+
+        // Clip to sharp rectangular focal window and draw original document 100% sharp
+        ctx.save();
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(fx, fy, fw, fh, 2);
+        else ctx.rect(fx, fy, fw, fh);
+        ctx.clip();
+        ctx.drawImage(docElem, dx, dy, finalW, finalH);
+        ctx.restore();
+
+        // Leader line and metadata callout tag ([EXHIBIT C // PARAGRAPH 4])
+        const calloutTag = spot.calloutTag || targetClip.docCalloutTag || '[EXHIBIT C // PARAGRAPH 4]';
+        const tagX = fx + fw - 20;
+        const tagY = Math.max(dy + 20, fy - 36);
+
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(fx + fw * 0.78, fy);
+        ctx.lineTo(tagX, tagY + 12);
+        ctx.lineTo(tagX + 28, tagY + 12);
+        ctx.stroke();
+
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(fx + fw * 0.78, fy, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = '700 10.5px monospace';
+        const tW = ctx.measureText(calloutTag).width;
+        ctx.fillStyle = '#0f172a';
+        if (ctx.roundRect) ctx.roundRect(tagX + 28, tagY, tW + 14, 22, 2);
+        else ctx.rect(tagX + 28, tagY, tW + 14, 22);
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(calloutTag, tagX + 35, tagY + 11);
+
+        ctx.restore();
+      }
 
       const screenFx = pScale > 1.001 ? punch.originX + (fx - punch.originX) * pScale : fx;
       const screenFy = pScale > 1.001 ? punch.originY + (fy - punch.originY) * pScale : fy;
@@ -2469,7 +2530,11 @@ function drawMediaLayer(specificClip) {
           ctx.restore();
         }
       } else if (renderSource) {
+        targetClip._loadedElement = renderSource;
         ctx.drawImage(renderSource, dx, dy, finalW, finalH);
+        if (targetClip && (targetClip.docFocus || (targetClip.highlights && targetClip.highlights.length > 0))) {
+          renderDocFocusAndHighlights(ctx, targetClip, currentTime, dx, dy, finalW, finalH);
+        }
       }
 
       // Subtle selection border if selected, or if vector effect is active
@@ -24623,12 +24688,12 @@ id: 'map',
     category: 'Animations',
     badge: 'Vox Newspaper Style',
     difficulty: '1-Click',
-    timeToApply: '2 sec',
-    previewGradient: 'linear-gradient(to top, rgba(56, 189, 248, 0.7), rgba(14, 165, 233, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Fades surrounding background article text into soft white, making the selected paragraph or quote crystal clear.',
-    tags: ['Whiteout Fade', 'Document Focus', 'Newspaper Focus', 'Vox Style', 'Animation'],
-    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
-    secondaryImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80'
+    timeToApply: '3 sec',
+    previewGradient: 'linear-gradient(to top, rgba(244, 244, 242, 0.95), rgba(226, 222, 208, 0.7), rgba(15, 23, 42, 0.9))',
+    description: 'Vox-style investigative document whiteout: fades ambient text into high-contrast off-white paper canvas (#F4F4F2) while isolating key quotes at 1.08x scale.',
+    tags: ['Whiteout Fade', 'Document Focus', 'Vox Style', 'Redaction', 'Investigative', 'Animation'],
+    defaultImage: '/sec_audit_confidential_document.svg',
+    secondaryImage: '/sec_audit_confidential_document.svg'
   },
   {
     id: 'anim-dark-spotlight',
@@ -26277,9 +26342,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const flySpeed = hData.flySpeed !== undefined ? hData.flySpeed : 1.0;
       const staggerDelay = hData.staggerDelay !== undefined ? hData.staggerDelay : 0.28;
       const paperGrain = hData.paperGrain !== undefined ? (Number(hData.paperGrain) / 100).toFixed(2) : '0.35';
-      const showTelemetry = hData.showTelemetry !== false;
+      const showTelemetry = hData.showTelemetry === true;
       const activeCardTab = Number(hData.activeCardTab || 5);
       const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(hData) : '';
+      const layoutStyle = hData.layoutStyle || 'broadsheet';
+      const bodyCol1 = hData.bodyCol1 || 'Lorem ipsum dolor sit amet, consectetur cuised the largerst corporate insolven- evovencs in modern histroy.';
+      const bodyCol2 = hData.bodyCol2 || 'onablewead of the oxourancy and alentarih rough hanning inkia lioso, with mauitty-draw nes, and comhlicste distribution';
 
       const formatHl = (text, hlPhrase) => {
         const raw = String(text || '');
@@ -26291,19 +26359,19 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const before = raw.slice(0, idx);
         const match = raw.slice(idx, idx + hl.length);
         const after = raw.slice(idx + hl.length);
-        return `${esc(before)}<span class="fly-hl-mark">${esc(match)}</span>${esc(after)}`;
+        return `${esc(before)}<span class="fly-hl-mark"><span class="fly-hl-ink"></span><span class="fly-hl-text">${esc(match)}</span></span>${esc(after)}`;
       };
 
       const cards = [1, 2, 3, 4, 5].map(num => {
-        const bgCol = hData[`bgColor${num}`] || (num === 2 ? '#fcd5b5' : (num === 3 ? '#0f172a' : (num === 4 ? '#18090c' : '#f6f1e7')));
+        const bgCol = hData[`bgColor${num}`] || (num === 2 ? '#fcd5b5' : (num === 3 ? '#0f172a' : (num === 4 ? '#18090c' : (num === 5 ? '#fdfbf7' : '#f6f1e7'))));
         const txtCol = hData[`textColor${num}`] || (num === 3 || num === 4 ? '#f8fafc' : '#0f172a');
-        const accCol = hData[`accentColor${num}`] || (num === 2 ? '#9a3412' : (num === 3 ? '#38bdf8' : (num === 4 ? '#ef4444' : '#b91c1c')));
-        const hlCol = hData[`hlColor${num}`] || (num === 3 ? '#0284c7' : (num === 4 ? '#b91c1c' : '#fde047'));
+        const accCol = hData[`accentColor${num}`] || (num === 2 ? '#9a3412' : (num === 3 ? '#38bdf8' : (num === 4 ? '#ef4444' : (num === 5 ? '#dc2626' : '#b91c1c'))));
+        const hlCol = hData[`hlColor${num}`] || (num === 3 ? '#0284c7' : (num === 4 ? '#b91c1c' : (num === 5 ? '#facc15' : '#fde047')));
         const isLight = /^#(f|e|d|c)/i.test(bgCol);
         const subCol = isLight ? '#475569' : '#94a3b8';
         const ruleCol = isLight ? 'rgba(15,23,42,0.16)' : 'rgba(255,255,255,0.14)';
         const borderCol = isLight ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.22)';
-        const src = hData[`source${num}`] || 'THE FINANCIAL CHRONICLE';
+        const src = hData[`source${num}`] || (num === 5 ? 'THE WALL STREET INVESTIGATOR' : 'THE FINANCIAL CHRONICLE');
         const pubInit = String(src).replace(/^THE\s+/i, '').trim().charAt(0).toUpperCase() || 'N';
         return {
           num,
@@ -26312,12 +26380,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           bgCol, txtCol, accCol, hlCol, subCol, ruleCol, borderCol,
           pubInit,
           source: src,
-          kicker: hData[`kicker${num}`] !== undefined ? hData[`kicker${num}`] : 'INVESTIGATIVE REPORT',
-          date: hData[`date${num}`] !== undefined ? hData[`date${num}`] : 'OCT 2026',
+          kicker: hData[`kicker${num}`] !== undefined ? hData[`kicker${num}`] : (num === 5 ? '' : 'SPECIAL DISCLOSURE'),
+          date: hData[`date${num}`] !== undefined ? hData[`date${num}`] : (num === 5 ? 'OCT 28, 2026' : 'OCT 24, 2026'),
           headlineHtml: formatHl(hData[`headline${num}`] || '', hData[`highlight${num}`] || ''),
           subhead: hData[`subhead${num}`] !== undefined ? hData[`subhead${num}`] : '',
-          byline: hData[`byline${num}`] !== undefined ? hData[`byline${num}`] : `Evidence Item #0${num}`,
-          exhibit: hData[`exhibit${num}`] !== undefined ? hData[`exhibit${num}`] : `EXHIBIT A-0${num}`,
+          byline: hData[`byline${num}`] !== undefined ? hData[`byline${num}`] : (num === 5 ? 'By Investigative Unit \u00b7 Special Report' : `Evidence Item #0${num}`),
+          exhibit: hData[`exhibit${num}`] !== undefined ? hData[`exhibit${num}`] : (num === 5 ? '' : `EXHIBIT A-0${num}`),
           font: hData[`font${num}`] || "'Playfair Display', Georgia, serif",
           fontSize: hData[`fontSize${num}`] !== undefined ? hData[`fontSize${num}`] : (num === 5 ? 13 : 11.5),
           scale: hData[`scale${num}`] !== undefined ? hData[`scale${num}`] : (num === 5 ? 1.06 : 1.0),
@@ -26327,8 +26395,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         };
       });
 
-      const cardsHtml = cards.map(c => `
-        <div class="fly-card fly-card-${c.num} theme-${c.theme}${c.num === activeCardTab ? ' is-selected-card' : ''}" data-fly-card="${c.num}" style="display:${c.visible ? 'block' : 'none'};--c-bg:${c.bgCol};--c-text:${c.txtCol};--c-accent:${c.accCol};--c-hl:${c.hlCol};--c-sub:${c.subCol};--c-rule:${c.ruleCol};--c-border:${c.borderCol};--c-font:${c.font};--c-title-size:${c.fontSize}px;--c-scale:${c.scale};--c-rot:${c.rot}deg;--c-x:${c.x}px;--c-y:${c.y}px;">
+      const cardsHtml = cards.map(c => {
+        const isHero = c.num === 5;
+        const isBroadsheet = layoutStyle === 'broadsheet';
+        const showKicker = !!c.kicker && (!isHero || !isBroadsheet);
+        const showStamp = !!c.exhibit && (!isHero || !isBroadsheet);
+
+        return `
+        <div class="fly-card fly-card-${c.num} theme-${c.theme} mode-${layoutStyle}${c.num === activeCardTab ? ' is-selected-card' : ''}" data-fly-card="${c.num}" style="display:${c.visible ? 'block' : 'none'};--c-bg:${c.bgCol};--c-text:${c.txtCol};--c-accent:${c.accCol};--c-hl:${c.hlCol};--c-sub:${c.subCol};--c-rule:${c.ruleCol};--c-border:${c.borderCol};--c-font:${c.font};--c-title-size:${c.fontSize}px;--c-scale:${c.scale};--c-rot:${c.rot}deg;--c-x:${c.x}px;--c-y:${c.y}px;">
           <div class="fly-card-paper-grain"></div>
           <div class="fly-card-masthead-row">
             <div class="fly-card-pub-wrap">
@@ -26337,21 +26411,43 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
             <span class="fly-card-date">${c.date}</span>
           </div>
-          <div class="fly-card-kicker-row" style="${c.kicker ? '' : 'display:none;'}">
-            <span class="fly-card-kicker">${c.kicker}</span>
-          </div>
+          ${showKicker ? `
+          <div class="fly-card-kicker-row">
+            <span class="fly-card-kicker ${isBroadsheet ? 'fly-kicker-editorial' : ''}">${c.kicker}</span>
+          </div>` : ''}
           <div class="fly-card-headline">${c.headlineHtml}</div>
           <div class="fly-card-subdeck" style="${c.subhead ? '' : 'display:none;'}">${c.subhead}</div>
+          
+          ${isHero && isBroadsheet ? `
+          <!-- Authentic Broadsheet Editorial Body & Multi-Column Excerpt (Image 1 Standard) -->
+          <div class="fly-card-editorial-body">
+            <div class="fly-card-byline-lead">${c.byline}</div>
+            <div class="fly-card-article-cols">
+              <div class="fly-card-col">${bodyCol1}</div>
+              <div class="fly-card-col">${bodyCol2}</div>
+            </div>
+          </div>
+          ` : `
           <div class="fly-card-meta">
             <span class="fly-card-byline">${c.byline}</span>
-            <span class="fly-card-stamp" style="${c.exhibit ? '' : 'display:none;'}">${c.exhibit}</span>
+            <span class="fly-card-stamp ${isBroadsheet ? 'fly-stamp-broadsheet' : ''}" style="${showStamp ? '' : 'display:none;'}" >${c.exhibit}</span>
           </div>
+          `}
           <div class="fly-card-glare"></div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       fxContainer.innerHTML = `
-        <div class="tpl-headline-fly ${motionBlur ? 'has-motion-blur' : ''} ${dofBokeh ? 'has-dof-bokeh' : ''} ${specular ? 'has-specular-glare' : ''} ${drift ? 'has-organic-drift' : ''}" style="--fly-tilt:${tilt}deg;--motion-blur-px:${blurPx}px;--dof-blur-px:${dofPx}px;--card-shadow-radius:${shadowRad}px;--card-shadow-alpha:${shadowAlpha};--fly-speed:${flySpeed};--fly-stagger:${staggerDelay}s;--fly-paper-grain:${paperGrain};">
+        <div class="tpl-headline-fly mode-${layoutStyle} ${motionBlur ? 'has-motion-blur' : ''} ${dofBokeh ? 'has-dof-bokeh' : ''} ${specular ? 'has-specular-glare' : ''} ${drift ? 'has-organic-drift' : ''}" style="--fly-tilt:${tilt}deg;--motion-blur-px:${blurPx}px;--dof-blur-px:${dofPx}px;--card-shadow-radius:${shadowRad}px;--card-shadow-alpha:${shadowAlpha};--fly-speed:${flySpeed};--fly-stagger:${staggerDelay}s;--fly-paper-grain:${paperGrain};">
+          <svg width="0" height="0" style="position:absolute;pointer-events:none;" aria-hidden="true">
+            <defs>
+              <filter id="fly-marker-filter" x="-10%" y="-20%" width="120%" height="140%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.04 0.22" numOctaves="3" result="roughNoise" />
+                <feDisplacementMap in="SourceGraphic" in2="roughNoise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+          </svg>
           ${bgLayerHtml}
           <div class="fly-stage-3d">
             <div class="fly-bg-grid"></div>
@@ -28229,14 +28325,25 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     `;
   } else if (tplId === 'anim-whiteout-fade') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
-          <div id="fx-anim-white-overlay-${tplId}" style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.75); pointer-events: none;"></div>
-          <div style="position: absolute; top: 32%; left: 10%; right: 10%; height: 36%; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(255,255,255,0.7); border: 2px solid #38bdf8; overflow: hidden; pointer-events: none;">
-            <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; margin-top: -12%;" />
+        <div style="position: absolute; inset: 0; background: #f4f4f2; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 1200px;">
+          <!-- Realistic Document Base Canvas with 3D Orthographic Tilt and Push-In -->
+          <div id="fx-anim-doc-tilt-${tplId}" style="position: absolute; inset: -4%; width: 108%; height: 108%; transform: perspective(1000px) rotateX(4deg) scale(1.02); transform-origin: 40% 40%; transition: transform 0.1s linear;">
+            <img src="${tpl.defaultImage || '/sec_audit_confidential_document.svg'}" style="width: 100%; height: 100%; object-fit: contain; filter: contrast(1.08) brightness(0.99);" />
+            <!-- Organic White Paper Matte Overlay Fading Ambient Document Text to 10% Opacity (#F4F4F2 Canvas) -->
+            <div id="fx-anim-white-overlay-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle 380px at 45% 42%, rgba(244, 244, 242, 0.88) 0%, rgba(244, 244, 242, 0.94) 85%); pointer-events: none; z-index: 2;"></div>
+            <!-- High-Contrast Focal Window: 1.08x Scale Pop, Drop Shadow, Clean Cutout Zero Vector Borders -->
+            <div id="fx-anim-focal-window-${tplId}" style="position: absolute; top: 31.5%; left: 6.5%; width: 87%; height: 26%; overflow: hidden; pointer-events: none; z-index: 4; transform: scale(1.08); transform-origin: center center; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22), 0 2px 6px rgba(15, 23, 42, 0.12); border-radius: 2px;">
+              <img src="${tpl.defaultImage || '/sec_audit_confidential_document.svg'}" style="position: absolute; top: -121%; left: -7.5%; width: 115%; height: 415%; object-fit: contain; filter: contrast(1.12) brightness(1.01);" />
+            </div>
           </div>
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #0284c7; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
-            \u2b1c WHITEOUT FOCUS
+          <!-- Dynamic Leader Line & Subtle Metadata Callout Tag [EXHIBIT C // PARAGRAPH 4] -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;" viewBox="0 0 400 225">
+            <line x1="285" y1="71" x2="310" y2="40" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="310" y1="40" x2="330" y2="40" stroke="#0f172a" stroke-width="1.2" stroke-linecap="round"/>
+            <circle cx="285" cy="71" r="2" fill="#0f172a"/>
+          </svg>
+          <div style="position: absolute; top: 31px; right: 28px; padding: 2px 7px; border-radius: 2px; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 8px; font-weight: 700; letter-spacing: 0.08em; z-index: 20; box-shadow: 0 2px 5px rgba(0,0,0,0.25);">
+            [EXHIBIT C // PARAGRAPH 4]
           </div>
         </div>
       `;
@@ -29054,7 +29161,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       if (glass) glass.style.transform = `translate(${loupeX.toFixed(1)}px, ${loupeY.toFixed(1)}px)`;
       if (inner) inner.style.transform = `translate(${(-loupeX * 1.5).toFixed(1)}px, ${(-loupeY * 1.5).toFixed(1)}px) scale(1.8)`;
     } else if (tplId === 'anim-whiteout-fade') {
-      const fadeOp = 0.5 + Math.sin(t * 2) * 0.35;
+      const pushProg = ((t * 0.4) % 1);
+      const tiltEl = fxContainer?.querySelector(`#fx-anim-doc-tilt-${tplId}`);
+      if (tiltEl) {
+        const tiltX = (4 - pushProg * 2).toFixed(2);
+        const curScale = (1.02 + pushProg * 0.06).toFixed(3);
+        tiltEl.style.transform = `perspective(1000px) rotateX(${tiltX}deg) scale(${curScale})`;
+      }
+      const fadeOp = 0.88 + Math.sin(t * 2.5) * 0.06;
       const overlay = fxContainer?.querySelector(`#fx-anim-white-overlay-${tplId}`);
       if (overlay) overlay.style.opacity = fadeOp.toFixed(2);
     } else if (tplId === 'anim-dark-spotlight') {
@@ -29639,18 +29753,22 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'anim-whiteout-fade') {
     const whiteoutClip = {
       id: `img-${Date.now()}`,
-      name: 'Newspaper_Paragraph.jpg',
-      url: tpl.defaultImage,
+      name: 'Confidential_Audit_Document.svg',
+      url: tpl.defaultImage || '/sec_audit_confidential_document.svg',
       start: 0,
       duration: 6,
       scale: 1.0,
       docFocus: true,
       docStyle: 'white',
-      docDimOpacity: 0.65,
-      docFeather: 18,
-      docFocusRect: { x: 0.12, y: 0.25, w: 0.76, h: 0.25 },
-      docFocusStartTime: 0.4,
-      docFocusDuration: 3.5
+      docDimOpacity: 0.90,
+      docFeather: 16,
+      docFocusScale: 1.08,
+      docLeaderLine: true,
+      docCalloutTag: '[EXHIBIT C // PARAGRAPH 4]',
+      docCameraTilt: 5,
+      docFocusRect: { x: 0.06, y: 0.32, w: 0.88, h: 0.25 },
+      docFocusStartTime: 0.3,
+      docFocusDuration: 4.0
     };
     if (timelineClips && timelineClips.image) {
       timelineClips.image = [whiteoutClip];
@@ -30901,12 +31019,15 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.subText = 'MAGNIFIED EVIDENCE LOUPE';
     topCustomizerState.textColor = '#00f0ff';
   } else if (tpl.id === 'anim-whiteout-fade') {
-    if (labelPrim) labelPrim.textContent = '\ud83d\udcc4 Newspaper / Article Scan';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcc4 Document / Court Exhibit Scan';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
-    topCustomizerState.mainText = 'THE CONTRADICTION';
-    topCustomizerState.subText = 'WHITEOUT FADE ISOLATION';
-    topCustomizerState.textColor = '#0284c7';
+    topCustomizerState.mainText = 'CRITICAL EVIDENCE';
+    topCustomizerState.subText = '[EXHIBIT C // PARAGRAPH 4]';
+    topCustomizerState.textColor = '#0f172a';
+    topCustomizerState.docWhiteout = true;
+    topCustomizerState.docDarkout = false;
+    topCustomizerState.enable3DCameraTilt = true;
   } else if (tpl.id === 'anim-dark-spotlight') {
     if (labelPrim) labelPrim.textContent = '\ud83d\udd26 Subject Image / Scene';
     if (wrapSec) wrapSec.style.display = 'none';
@@ -32424,20 +32545,38 @@ function renderTopTemplatePreviewStage() {
     `;
   } else if (tplId === 'anim-whiteout-fade') {
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #fff; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
-        <img src="${prim}" alt="Article Scan" style="width: 100%; height: 100%; object-fit: cover;" />
-        <div id="customizer-live-white-overlay" style="position: absolute; inset: 0; background: rgba(255, 255, 255, 0.75); pointer-events: none; z-index: 2;"></div>
-        <div style="position: absolute; top: 32%; left: 10%; right: 10%; height: 36%; border-radius: 6px; box-shadow: 0 0 0 9999px rgba(255,255,255,0.75); border: 2px solid #38bdf8; overflow: hidden; pointer-events: none; z-index: 3;">
-          <img src="${prim}" alt="Focal Block" style="width: 100%; height: 100%; object-fit: cover; margin-top: -12%;" />
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4f4f2; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; perspective: 1200px;">
+        <!-- 3D Tilting & Slowly Pushing Document Container -->
+        <div id="customizer-live-whiteout-tilt-container" style="position: absolute; inset: -4%; width: 108%; height: 108%; transform: perspective(1000px) rotateX(4deg) scale(1.02); transform-origin: 40% 40%; transition: transform 0.08s linear;">
+          <!-- Crisp Base Document -->
+          <img src="${prim}" alt="Investigative Document" style="width: 100%; height: 100%; object-fit: contain; filter: contrast(1.08) brightness(0.99);" />
+          
+          <!-- Organic Paper Matte Overlay: Ambient Text Faded to 10% Opacity Against #F4F4F2 -->
+          <div id="customizer-live-white-overlay" style="position: absolute; inset: 0; background: radial-gradient(circle 520px at 45% 42%, rgba(244, 244, 242, 0.88) 0%, rgba(244, 244, 242, 0.94) 85%); pointer-events: none; z-index: 2;"></div>
+          
+          <!-- High-Contrast Focal Window: Magnified 1.08x, Drop Shadow, Razor-Sharp Original Typography, ZERO Vector Borders -->
+          <div style="position: absolute; top: 31.5%; left: 6.5%; width: 87%; height: 26%; overflow: hidden; pointer-events: none; z-index: 4; transform: scale(1.08); transform-origin: center center; box-shadow: 0 16px 36px rgba(15, 23, 42, 0.25), 0 3px 8px rgba(15, 23, 42, 0.12); border-radius: 2px;">
+            <img src="${prim}" alt="Isolated Focal Text" style="position: absolute; top: -121%; left: -7.5%; width: 115%; height: 415%; object-fit: contain; filter: contrast(1.12) brightness(1.01);" />
+          </div>
         </div>
+
+        <!-- Dynamic Leader Line & Forensic Callout Metadata Tag Connected to Document -->
+        <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;" viewBox="0 0 1000 562">
+          <path id="customizer-live-leader-line" d="M 720 185 L 775 110 L 830 110" fill="none" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="720" cy="185" r="3.5" fill="#0f172a"/>
+        </svg>
+
+        <div style="position: absolute; top: 72px; right: 55px; padding: 5px 12px; border-radius: 2px; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; z-index: 20; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15);">
+          ${topCustomizerState.subText || '[EXHIBIT C // PARAGRAPH 4]'}
+        </div>
+
         ${isTextShowing ? `
-        <div style="position: absolute; bottom: 20px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 5;">
-          <h2 style="font-family: Impact, sans-serif; font-size: 26px; color: #0f172a; letter-spacing: 2px; text-transform: uppercase; margin: 0;">
-            ${topCustomizerState.mainText || 'THE CONTRADICTION'}
-          </h2>
-          <span style="font-family: monospace; font-size: 10px; color: #0284c7; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; display: block;">
-            ${topCustomizerState.subText || 'WHITEOUT FADE ISOLATION'}
-          </span>
+        <div style="position: absolute; bottom: 22px; left: 32px; pointer-events: none; z-index: 25; text-align: left;">
+          <div style="display: inline-block; padding: 4px 10px; background: rgba(15, 23, 42, 0.9); border-radius: 2px; backdrop-filter: blur(4px);">
+            <h2 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 15px; font-weight: 800; color: #f8fafc; letter-spacing: 1.5px; text-transform: uppercase; margin: 0;">
+              ${topCustomizerState.mainText || 'CRITICAL EVIDENCE'}
+            </h2>
+          </div>
         </div>` : ''}
       </div>
     `;
@@ -33445,7 +33584,15 @@ function updateTopCustomizerFrame(seqTime, now) {
     if (glass) glass.style.transform = `translate(${loupeX.toFixed(1)}px, ${loupeY.toFixed(1)}px)`;
     if (inner) inner.style.transform = `translate(${(-loupeX * 1.5).toFixed(1)}px, ${(-loupeY * 1.5).toFixed(1)}px) scale(1.8)`;
   } else if (tplId === 'anim-whiteout-fade') {
-    const fadeOp = 0.5 + Math.sin(localSceneT * 2) * 0.38;
+    const dur = topCustomizerState.duration || 3;
+    const progress = Math.min(1.0, (localSceneT % dur) / dur);
+    const tiltContainer = document.getElementById('customizer-live-whiteout-tilt-container');
+    if (tiltContainer) {
+      const tiltX = (5.0 - progress * 2.5).toFixed(2);
+      const pushScale = (1.02 + progress * 0.07).toFixed(3);
+      tiltContainer.style.transform = `perspective(1000px) rotateX(${tiltX}deg) scale(${pushScale})`;
+    }
+    const fadeOp = 0.88 + Math.sin(localSceneT * 2.5) * 0.05;
     const overlay = document.getElementById('customizer-live-white-overlay');
     if (overlay) overlay.style.opacity = fadeOp.toFixed(2);
   } else if (tplId === 'anim-dark-spotlight' || tplId === 'spotlight-lens-sweep') {
@@ -33967,7 +34114,47 @@ transition: 'fly_through',
         duration: dur
       });
     }
-  } else if (tpl.id === 'headline-fly') {
+  } else if (tpl.id === 'anim-whiteout-fade') {
+    const docUrl = prim || tpl.defaultImage || '/sec_audit_confidential_document.svg';
+    const whiteoutClip = {
+      id: `img-doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Confidential_Investigative_Document.svg',
+      url: docUrl,
+      file: { name: 'Confidential_Investigative_Document.svg', url: docUrl, isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.05,
+      docFocus: true,
+      docStyle: 'white',
+      docDimOpacity: 0.90,
+      docFeather: 16,
+      docFocusScale: 1.08,
+      docLeaderLine: true,
+      docCalloutTag: subText || '[EXHIBIT C // PARAGRAPH 4]',
+      docCameraTilt: 5,
+      docFocusRect: { x: 0.06, y: 0.32, w: 0.88, h: 0.25 },
+      docFocusStartTime: 0.3,
+      docFocusDuration: dur - 0.5,
+      zIndex: 20
+    };
+    focusClip = whiteoutClip;
+    imageClips = [whiteoutClip];
+    if (hasTextBehind && (mainText || textBehindContent)) {
+      textClips.push({
+        id: `txt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: mainText || textBehindContent || 'EXPOSED BY AUDIT',
+        highlight: (mainText || textBehindContent || '').split(' ')[0] || '',
+        highlightColor: textColor || '#facc15',
+        anim: 'pop',
+        fontSize: 54,
+        fontFamily: 'Inter, sans-serif',
+        zIndex: 25,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur
+      });
+    }
+} else if (tpl.id === 'headline-fly') {
     const hData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('headline-fly') : {};
     const bgUrl = sec || tpl.secondaryImage || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80';
     const bgClip = {

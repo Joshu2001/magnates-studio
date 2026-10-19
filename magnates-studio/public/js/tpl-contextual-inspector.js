@@ -6860,6 +6860,9 @@
       const cY = data[`y${activeCard}`] !== undefined ? data[`y${activeCard}`] : 0;
 
       const escAttr = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const curLayoutStyle = data.layoutStyle || 'broadsheet';
+      const bodyCol1 = data.bodyCol1 || 'Lorem ipsum dolor sit amet, consectetur cuised the largerst corporate insolven- evovencs in modern histroy.';
+      const bodyCol2 = data.bodyCol2 || 'onablewead of the oxourancy and alentarih rough hanning inkia lioso, with mauitty-draw nes, and comhlicste distribution';
 
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(245,158,11,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
@@ -6870,6 +6873,24 @@
               <span style="font-size: 10.5px; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">PRESS CLIPPINGS // 3D EDITORIAL SUITE</span>
             </div>
             <span style="font-size: 8.5px; color: #f59e0b; font-weight: 800; background: rgba(245,158,11,0.16); border: 1px solid rgba(245,158,11,0.3); padding: 2px 6px; border-radius: 4px;">PRO DOC</span>
+          </div>
+
+          <!-- PRESENTATION MODE: Broadsheet Journalism (Image 1) vs SaaS UI Cards -->
+          <div style="display: flex; flex-direction: column; gap: 4px; background: rgba(2,6,23,0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 8.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">Documentary Editorial Presentation</span>
+              <span style="font-size: 8px; color: #94a3b8;">Image 1 Default</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <button type="button" class="fly-mode-btn" data-mode="broadsheet" style="padding: 6px 7px; border-radius: 5px; font-size: 8.5px; font-weight: 800; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 5px; border: 1px solid ${curLayoutStyle !== 'saas' ? '#38bdf8' : 'rgba(255,255,255,0.08)'}; background: ${curLayoutStyle !== 'saas' ? 'rgba(56,189,248,0.2)' : 'rgba(15,23,42,0.6)'}; color: ${curLayoutStyle !== 'saas' ? '#ffffff' : '#94a3b8'};">
+                <span style="font-size: 11px;">📰</span>
+                <span>Broadsheet (Image 1)</span>
+              </button>
+              <button type="button" class="fly-mode-btn" data-mode="saas" style="padding: 6px 7px; border-radius: 5px; font-size: 8.5px; font-weight: 700; cursor: pointer; text-align: left; display: flex; align-items: center; gap: 5px; border: 1px solid ${curLayoutStyle === 'saas' ? '#f59e0b' : 'rgba(255,255,255,0.08)'}; background: ${curLayoutStyle === 'saas' ? 'rgba(245,158,11,0.2)' : 'rgba(15,23,42,0.6)'}; color: ${curLayoutStyle === 'saas' ? '#ffffff' : '#94a3b8'};">
+                <span style="font-size: 11px;">🏷️</span>
+                <span>SaaS Cards (Legacy)</span>
+              </button>
+            </div>
           </div>
 
           <!-- SECTION 1: GRANULAR PER-CARD SELECTOR TABS (CARDS 1 TO 5) -->
@@ -6985,6 +7006,20 @@
                   <input type="text" id="fly-card-exhibit" value="${escAttr(cExhibit)}" placeholder="EXHIBIT A-01" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3px 5px;color:#fca5a5;font-size:8.5px;font-weight:700;outline:none;" />
                 </div>
               </div>
+
+              ${activeCard === 5 ? `
+              <!-- Broadsheet Dual-Column Body Excerpts (Matches Image 1) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 3px; padding-top: 5px; border-top: 1px dashed rgba(255,255,255,0.08);">
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#38bdf8;font-weight:700;">BROADSHEET COL 1 EXCERPT</span>
+                  <input type="text" id="fly-body-col1" value="${escAttr(bodyCol1)}" placeholder="Column 1 text..." style="background:rgba(0,0,0,0.45);border:1px solid rgba(56,189,248,0.25);border-radius:4px;padding:3px 5px;color:#cbd5e1;font-size:8px;outline:none;" />
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#38bdf8;font-weight:700;">BROADSHEET COL 2 EXCERPT</span>
+                  <input type="text" id="fly-body-col2" value="${escAttr(bodyCol2)}" placeholder="Column 2 text..." style="background:rgba(0,0,0,0.45);border:1px solid rgba(56,189,248,0.25);border-radius:4px;padding:3px 5px;color:#cbd5e1;font-size:8px;outline:none;" />
+                </div>
+              </div>
+              ` : ''}
             </div>
 
             <!-- Per-Card Typography & Spatial Transform Controls -->
@@ -7096,6 +7131,15 @@
               </div>
             </div>
 
+            <!-- Cinematic Focal Depth-of-Field Bokeh Slider -->
+            <div style="display: flex; flex-direction: column; gap: 2px; padding: 4px 0;">
+              <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #38bdf8;">
+                <span>BACKGROUND DOF BOKEH BLUR</span>
+                <span id="fly-val-dofblur" style="color: #38bdf8;">${dofPx}px</span>
+              </div>
+              <input type="range" id="fly-inp-dofblur" min="0" max="20" step="0.5" value="${dofPx}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+            </div>
+
             <!-- Optical Toggles -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.06);">
               <label style="display:flex;align-items:center;gap:5px;font-size:9px;color:#cbd5e1;cursor:pointer;">
@@ -7125,6 +7169,15 @@
           ${window.tplBuildUniversalBgHtml(data)}
         </div>
       `;
+
+      // Wire Presentation Mode Switcher (Broadsheet vs SaaS)
+      container.querySelectorAll('.fly-mode-btn').forEach(btn => {
+        btn.onclick = () => {
+          const nextMode = btn.dataset.mode || 'broadsheet';
+          window.tplSetContextualData('headline-fly', { layoutStyle: nextMode });
+          window.tplRenderContextualInspector('headline-fly');
+        };
+      });
 
       // Wire Card Tab Selector Buttons
       container.querySelectorAll('.fly-card-tab-btn').forEach(btn => {
@@ -7195,6 +7248,14 @@
       bindCardText('#fly-card-date', 'date');
       bindCardText('#fly-card-exhibit', 'exhibit');
 
+      // Wire Broadsheet Body Column Inputs for Card 5
+      container.querySelector('#fly-body-col1')?.addEventListener('input', e => {
+        window.tplSetContextualData('headline-fly', { bodyCol1: e.target.value });
+      });
+      container.querySelector('#fly-body-col2')?.addEventListener('input', e => {
+        window.tplSetContextualData('headline-fly', { bodyCol2: e.target.value });
+      });
+
       // Wire Font & Spatial Transform Sliders for Active Card
       container.querySelector('#fly-card-font')?.addEventListener('change', e => {
         window.tplSetContextualData('headline-fly', { [`font${activeCard}`]: e.target.value });
@@ -7234,6 +7295,7 @@
       bindGlobalSlider('#fly-inp-stagger', '#fly-val-stagger', 'staggerDelay', v => `${v.toFixed(2)}s`);
       bindGlobalSlider('#fly-inp-grain', '#fly-val-grain', 'paperGrain', v => `${v}%`);
       bindGlobalSlider('#fly-inp-shadow', '#fly-val-shadow', 'shadowRadius', v => `${v}px`);
+      bindGlobalSlider('#fly-inp-dofblur', '#fly-val-dofblur', 'dofBlur', v => `${v}px`);
 
       container.querySelector('#fly-inp-mblur')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { motionBlur: e.target.checked }));
       container.querySelector('#fly-inp-dofbokeh')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { dofBokeh: e.target.checked }));
