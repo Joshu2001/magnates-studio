@@ -24610,16 +24610,16 @@ id: 'map',
   },
   {
     id: 'magnates-media-paper-blueprint',
-    title: 'Paper-Based & Blueprint Cutouts',
+    title: 'Dynamic Cutouts & Silhouette Motion',
     category: 'Paper / Cutout',
-    badge: 'Magnates Media Signature',
+    badge: 'James Jani & Magnates Edition',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: '2D paper-style layers, floating cutout portraits, moving hands pinning evidence, and technical paper blueprint architectural grids.',
-    tags: ['Paper Cutout', 'Blueprint Grid', 'Floating Portraits', 'Moving Hands', 'Magnates Media'],
-    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
-    secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
+    description: 'Authentic subject cutouts extracted from backgrounds, glowing phone silhouettes, staggered sequential reveals & exits, center bursts, and camera crawls.',
+    tags: ['Rotoscoped Cutouts', 'Silhouettes', 'Staggered Motion', 'Center Burst', 'James Jani', 'Magnates Media'],
+    defaultImage: '/laptop_guy_cutout.png',
+    secondaryImage: '/silhouette_standing_phone.png'
   },
   {
     id: 'magnates-media-ink-reveal',
@@ -47129,62 +47129,325 @@ function bindMagnatesBlendModesSuiteModalControls() {
 }
 
 /* =========================================================
-   5. MAGNATES MEDIA PAPER-BASED & BLUEPRINT CUTOUTS SUITE CONTROLLER
-   (2D paper layers, floating portraits, moving hands, paper blueprint textures)
+   5. MAGNATES MEDIA & JAMES JANI DYNAMIC CUTOUT MOTION SUITE CONTROLLER
+   (True transparent silhouettes, room plate spawn, staggered sequential reveals & exits,
+    center bursts, stop-motion cadence, realistic drop shadows, and parallax crawl)
    ========================================================= */
 let magnatesBPState = {
   isPlaying: true,
   playhead: 0,
   duration: 5.0,
-  paperAngle: 6, // 0 to 15 deg
-  showMovingHand: true,
-  showBlueprintGrid: true,
-  headline: "SCHEMATIC EVIDENCE",
-  subcaption: "TECHNICAL BLUEPRINT // 2D PAPER CUTOUT",
-  portraitUrl: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80",
+  preset: "room_spawn", // 'room_spawn', 'dual_silhouette', 'center_burst', 'blueprint_dossier'
+  choreography: "staggered_sequential", // 'staggered_sequential', 'simultaneous_staggered_exit', 'from_the_heart', 'camera_crawl', 'pop_in_place'
+  paperAngle: 4,
+  showGlow: true,
+  showShadow: true,
+  showBlueprintGrid: false,
+  enableJitter: true,
+  headline: "$999,970",
+  subcaption: "ADVERTISING THOSE PRODUCTS.",
+  primaryCutoutUrl: "/laptop_guy_cutout.png",
+  secondaryCutoutUrl: "/silhouette_standing_phone.png",
+  bgPlateUrl: "/room_empty_plate.png",
   animFrameId: null,
   lastTimestamp: null
+};
+
+const MAGNATES_BP_PRESETS = {
+  room_spawn: {
+    bgPlateUrl: "/room_empty_plate.png",
+    primaryCutoutUrl: "/laptop_guy_cutout.png",
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    headline: "$999,970",
+    subcaption: "ADVERTISING THOSE PRODUCTS.",
+    choreography: "pop_in_place",
+    showBlueprintGrid: false,
+    showGlow: false,
+    showShadow: true,
+    hudPreset: "PRESET: POP-IN ROOM CUTOUT (JAMES JANI)",
+    hudAnim: "CHOREOGRAPHY: SUDDEN DESK SPAWN"
+  },
+  dual_silhouette: {
+    bgPlateUrl: "",
+    primaryCutoutUrl: "/silhouette_sitting_phone.png",
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    headline: "$999,970",
+    subcaption: "ADVERTISING THOSE PRODUCTS.",
+    choreography: "simultaneous_staggered_exit",
+    showBlueprintGrid: false,
+    showGlow: true,
+    showShadow: false,
+    hudPreset: "PRESET: DUAL SILHOUETTES (IMAGE 2)",
+    hudAnim: "CHOREOGRAPHY: STAGGERED GLOWING EXITS"
+  },
+  center_burst: {
+    bgPlateUrl: "",
+    primaryCutoutUrl: "/portrait_cutout_clean.png",
+    secondaryCutoutUrl: "/clean_traveler_cutout.png",
+    headline: "EXPONENTIAL LEVERAGE",
+    subcaption: "THE INNER CIRCLE // CORE EMERGENCE",
+    choreography: "from_the_heart",
+    showBlueprintGrid: false,
+    showGlow: true,
+    showShadow: true,
+    hudPreset: "PRESET: CENTER BURST FROM CORE",
+    hudAnim: "CHOREOGRAPHY: EMERGE FROM THE HEART"
+  },
+  blueprint_dossier: {
+    bgPlateUrl: "",
+    primaryCutoutUrl: "/portrait_cutout_clean.png",
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    headline: "DOSSIER ARCHIVE",
+    subcaption: "TECHNICAL BLUEPRINT // 2D SCHEMATIC CUTOUT",
+    choreography: "staggered_sequential",
+    showBlueprintGrid: true,
+    showGlow: false,
+    showShadow: true,
+    hudPreset: "PRESET: TECHNICAL BLUEPRINT DOSSIER",
+    hudAnim: "CHOREOGRAPHY: SEQUENTIAL STAMP & PIN"
+  }
 };
 
 function updateMagnatesBPVisualStyles() {
   const headlineEl = document.getElementById('magnates-bp-headline');
   const subcaptionEl = document.getElementById('magnates-bp-subcaption');
-  const portraitImg = document.getElementById('magnates-bp-portrait-img');
-  const portraitCard = document.getElementById('magnates-bp-portrait-card');
-  const docCard = document.getElementById('magnates-bp-doc-card');
-  const handWrap = document.getElementById('magnates-bp-hand-wrap');
+  const primaryImg = document.getElementById('magnates-bp-img-primary');
+  const secondaryImg = document.getElementById('magnates-bp-img-secondary');
+  const bgPlateImg = document.getElementById('magnates-bp-bg-plate');
+  const primaryLayer = document.getElementById('magnates-bp-layer-primary');
+  const secondaryLayer = document.getElementById('magnates-bp-layer-secondary');
   const gridLayer = document.getElementById('magnates-bp-grid-layer');
+  const schematicSvg = document.getElementById('magnates-bp-schematic-svg');
+  const groundShadow = document.getElementById('magnates-bp-ground-shadow');
+  const handWrap = document.getElementById('magnates-bp-hand-wrap');
+  const textWrap = document.getElementById('magnates-bp-text-wrap');
   const timerEl = document.getElementById('magnates-bp-timer-display');
-  const hudHand = document.getElementById('magnates-bp-hud-hand');
-  const hudGrid = document.getElementById('magnates-bp-hud-grid');
+  const hudPreset = document.getElementById('magnates-bp-hud-preset');
+  const hudAnim = document.getElementById('magnates-bp-hud-anim');
 
   if (headlineEl) headlineEl.textContent = magnatesBPState.headline;
   if (subcaptionEl) subcaptionEl.textContent = magnatesBPState.subcaption;
-  if (portraitImg && portraitImg.src !== magnatesBPState.portraitUrl) portraitImg.src = magnatesBPState.portraitUrl;
+  
+  if (primaryImg && primaryImg.getAttribute('src') !== magnatesBPState.primaryCutoutUrl) {
+    primaryImg.src = magnatesBPState.primaryCutoutUrl;
+  }
+  if (secondaryImg && secondaryImg.getAttribute('src') !== magnatesBPState.secondaryCutoutUrl) {
+    secondaryImg.src = magnatesBPState.secondaryCutoutUrl;
+  }
 
   const p = magnatesBPState.playhead;
   const dur = magnatesBPState.duration;
   if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
 
-  const ang = magnatesBPState.paperAngle;
-  if (docCard) {
-    const floatY = Math.sin(p * 2.2) * 5;
-    docCard.style.transform = `rotate(${-ang}deg) translateY(${floatY.toFixed(1)}px)`;
+  // Stop-motion quantization (12 fps feel common in documentary cutouts)
+  const quantizedP = magnatesBPState.enableJitter ? Math.floor(p * 12) / 12 : p;
+  const jitterX = magnatesBPState.enableJitter ? (Math.sin(quantizedP * 37) * 1.5) : 0;
+  const jitterY = magnatesBPState.enableJitter ? (Math.cos(quantizedP * 43) * 1.5) : 0;
+  const jitterRot = magnatesBPState.enableJitter ? (Math.sin(quantizedP * 29) * 0.4) : 0;
+
+  // Background Plate vs Blueprint Grid
+  if (bgPlateImg) {
+    if (magnatesBPState.bgPlateUrl) {
+      bgPlateImg.style.display = 'block';
+      if (bgPlateImg.getAttribute('src') !== magnatesBPState.bgPlateUrl) {
+        bgPlateImg.src = magnatesBPState.bgPlateUrl;
+      }
+      bgPlateImg.style.opacity = '1';
+    } else {
+      bgPlateImg.style.display = 'none';
+    }
   }
-  if (portraitCard) {
-    const floatY2 = -Math.sin(p * 2.5) * 6;
-    portraitCard.style.transform = `rotate(${ang * 0.8}deg) translateY(${floatY2.toFixed(1)}px)`;
-  }
-  if (handWrap) {
-    handWrap.style.display = magnatesBPState.showMovingHand ? 'block' : 'none';
-    const handJitter = Math.sin(p * 3) * 14;
-    handWrap.style.transform = `translate(${handJitter.toFixed(1)}px, ${(-Math.abs(handJitter * 0.6)).toFixed(1)}px)`;
-  }
+
   if (gridLayer) {
-    gridLayer.style.display = magnatesBPState.showBlueprintGrid ? 'block' : 'none';
+    gridLayer.style.opacity = magnatesBPState.showBlueprintGrid ? '0.85' : '0';
   }
-  if (hudHand) hudHand.textContent = magnatesBPState.showMovingHand ? 'MOVING HAND: PINNED' : 'MOVING HAND: OFF';
-  if (hudGrid) hudGrid.textContent = magnatesBPState.showBlueprintGrid ? 'BLUEPRINT: ACTIVE' : 'BLUEPRINT: OFF';
+  if (schematicSvg) {
+    schematicSvg.style.opacity = magnatesBPState.showBlueprintGrid ? '0.8' : '0';
+  }
+
+  // Filter styles (glow vs shadow)
+  if (primaryImg) {
+    let filterStr = '';
+    if (magnatesBPState.showGlow) {
+      filterStr += ' drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 35px rgba(239, 68, 68, 0.6))';
+    } else {
+      filterStr += ' drop-shadow(0 18px 30px rgba(0, 0, 0, 0.75))';
+    }
+    primaryImg.style.filter = filterStr;
+  }
+
+  if (secondaryImg) {
+    let filterStr = '';
+    if (magnatesBPState.showGlow) {
+      filterStr += ' drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 35px rgba(239, 68, 68, 0.6))';
+    } else {
+      filterStr += ' drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8))';
+    }
+    secondaryImg.style.filter = filterStr;
+  }
+
+  if (groundShadow) {
+    groundShadow.style.display = magnatesBPState.showShadow ? 'block' : 'none';
+  }
+
+  // CHOREOGRAPHY ANIMATION ENGINE
+  const mode = magnatesBPState.choreography;
+
+  if (mode === 'pop_in_place') {
+    // Exact Image 3 -> Image 4 James Jani transition:
+    // Empty scene plate for first 1.0s, then BAM! The cutout pops onto the desk with slight overshoot
+    const spawnTime = 1.0;
+    if (p < spawnTime) {
+      if (primaryLayer) {
+        primaryLayer.style.opacity = '0';
+        primaryLayer.style.transform = 'translate(0px, 40px) scale(0.95)';
+      }
+      if (secondaryLayer) secondaryLayer.style.opacity = '0';
+      if (handWrap) handWrap.style.opacity = '0';
+      if (textWrap) {
+        textWrap.style.opacity = '0';
+        textWrap.style.transform = 'translateY(15px)';
+      }
+    } else {
+      const enterProgress = Math.min(1.0, (p - spawnTime) / 0.35);
+      // Overshoot spring curve: 0 -> 1.06 -> 1.0
+      const overshoot = enterProgress < 1.0 
+        ? Math.sin(enterProgress * Math.PI * 0.75) * 1.08 
+        : 1.0 + Math.sin((p - spawnTime) * 1.5) * 0.01;
+      
+      if (primaryLayer) {
+        primaryLayer.style.opacity = '1';
+        primaryLayer.style.transform = `translate(${jitterX}px, ${jitterY}px) scale(${overshoot})`;
+      }
+      if (secondaryLayer) secondaryLayer.style.opacity = '0';
+      if (handWrap) {
+        handWrap.style.opacity = '1';
+        handWrap.style.right = '40px';
+        handWrap.style.top = '40px';
+      }
+      if (textWrap) {
+        const textProg = Math.min(1.0, (p - (spawnTime + 0.2)) / 0.4);
+        textWrap.style.opacity = `${Math.max(0, textProg)}`;
+        textWrap.style.transform = `translateY(${((1 - Math.max(0, textProg)) * 20).toFixed(1)}px)`;
+      }
+    }
+
+  } else if (mode === 'simultaneous_staggered_exit') {
+    // Image 2 style: Both silhouettes present, then exit one by one
+    // Entrance: Staggered or together in first 0.8s
+    const enterProg1 = Math.min(1.0, p / 0.6);
+    const enterProg2 = Math.min(1.0, p / 0.8);
+
+    // Exits: Element 1 exits at 3.0s, Element 2 exits at 4.2s
+    let exit1 = 0;
+    if (p > 3.0) {
+      exit1 = Math.min(1.0, (p - 3.0) / 0.5); // slides off top-left
+    }
+    let exit2 = 0;
+    if (p > 4.0) {
+      exit2 = Math.min(1.0, (p - 4.0) / 0.5); // slides off bottom-right
+    }
+
+    if (secondaryLayer) {
+      // Standing person (Left)
+      secondaryLayer.style.opacity = `${(enterProg1 * (1 - exit1)).toFixed(2)}`;
+      const posX = -190 - (exit1 * 120) + jitterX;
+      const posY = 15 - (exit1 * 80) + jitterY;
+      secondaryLayer.style.transform = `translate(${posX.toFixed(1)}px, ${posY.toFixed(1)}px) rotate(${jitterRot}deg)`;
+    }
+
+    if (primaryLayer) {
+      // Sitting person (Right)
+      primaryLayer.style.opacity = `${(enterProg2 * (1 - exit2)).toFixed(2)}`;
+      const posX = 160 + (exit2 * 120) + jitterX;
+      const posY = 35 + (exit2 * 60) + jitterY;
+      primaryLayer.style.transform = `translate(${posX.toFixed(1)}px, ${posY.toFixed(1)}px) rotate(${jitterRot}deg)`;
+    }
+
+    if (textWrap) {
+      const textProg = Math.min(1.0, p / 0.5);
+      textWrap.style.opacity = `${textProg.toFixed(2)}`;
+      textWrap.style.transform = `scale(${(0.95 + textProg * 0.05).toFixed(2)})`;
+    }
+    if (handWrap) handWrap.style.opacity = '0';
+
+  } else if (mode === 'from_the_heart') {
+    // Cutout 2 emerges from the center / heart of Cutout 1
+    const p1Prog = Math.min(1.0, p / 0.7);
+    const emergeProg = Math.max(0, Math.min(1.0, (p - 1.2) / 0.9));
+
+    if (secondaryLayer) {
+      // Base subject (Center-back)
+      secondaryLayer.style.opacity = `${p1Prog.toFixed(2)}`;
+      const scale1 = 1.0 - (emergeProg * 0.2); // shifts back slightly
+      const shiftX = - (emergeProg * 110) + jitterX;
+      secondaryLayer.style.transform = `translate(${shiftX.toFixed(1)}px, ${jitterY}px) scale(${scale1.toFixed(2)})`;
+    }
+
+    if (primaryLayer) {
+      // Emerging subject burst from heart/center
+      primaryLayer.style.opacity = `${emergeProg.toFixed(2)}`;
+      const burstScale = 0.2 + (emergeProg * 0.9);
+      const shiftX = (emergeProg * 110) + jitterX;
+      primaryLayer.style.transform = `translate(${shiftX.toFixed(1)}px, ${jitterY}px) scale(${burstScale.toFixed(2)}) rotate(${jitterRot}deg)`;
+    }
+
+    if (textWrap) {
+      textWrap.style.opacity = `${emergeProg.toFixed(2)}`;
+      textWrap.style.transform = `translateY(${((1 - emergeProg) * 20).toFixed(1)}px)`;
+    }
+    if (handWrap) handWrap.style.opacity = '0';
+
+  } else if (mode === 'camera_crawl') {
+    // Smooth documentary camera crawl / pan with parallax layers
+    const crawlX = (p / dur) * 80;
+    if (secondaryLayer) {
+      secondaryLayer.style.opacity = '1';
+      // Moves slower (background parallax)
+      secondaryLayer.style.transform = `translate(${(-140 + crawlX * 0.6 + jitterX).toFixed(1)}px, ${jitterY}px) scale(0.9)`;
+    }
+    if (primaryLayer) {
+      primaryLayer.style.opacity = '1';
+      // Moves faster (foreground parallax)
+      primaryLayer.style.transform = `translate(${(120 + crawlX * 1.2 + jitterX).toFixed(1)}px, ${jitterY}px) scale(1.05)`;
+    }
+    if (textWrap) {
+      textWrap.style.opacity = '1';
+      textWrap.style.transform = `translate(${(crawlX * 0.3).toFixed(1)}px, 0px)`;
+    }
+    if (handWrap) handWrap.style.opacity = '0';
+
+  } else {
+    // Staggered sequential (Default blueprint dossier style)
+    const prog1 = Math.min(1.0, p / 0.6);
+    const prog2 = Math.max(0, Math.min(1.0, (p - 0.7) / 0.6));
+    const progPin = Math.max(0, Math.min(1.0, (p - 1.4) / 0.4));
+
+    if (secondaryLayer) {
+      secondaryLayer.style.opacity = `${prog1.toFixed(2)}`;
+      const ang = magnatesBPState.paperAngle;
+      secondaryLayer.style.transform = `translate(${(-110 + jitterX).toFixed(1)}px, ${jitterY}px) rotate(${-ang}deg)`;
+    }
+    if (primaryLayer) {
+      primaryLayer.style.opacity = `${prog2.toFixed(2)}`;
+      const ang = magnatesBPState.paperAngle;
+      primaryLayer.style.transform = `translate(${(90 + jitterX).toFixed(1)}px, ${jitterY}px) rotate(${ang}deg)`;
+    }
+    if (handWrap) {
+      handWrap.style.opacity = `${progPin.toFixed(2)}`;
+      handWrap.style.right = '45px';
+      handWrap.style.top = '40px';
+      handWrap.style.transform = `translate(${jitterX}px, ${jitterY}px) scale(${(1.2 - progPin * 0.2).toFixed(2)})`;
+    }
+    if (textWrap) {
+      textWrap.style.opacity = `${prog2.toFixed(2)}`;
+    }
+  }
+
+  // Update HUD text
+  const currentPresetDef = MAGNATES_BP_PRESETS[magnatesBPState.preset];
+  if (hudPreset && currentPresetDef) hudPreset.textContent = currentPresetDef.hudPreset;
+  if (hudAnim) hudAnim.textContent = `MODE: ${magnatesBPState.choreography.toUpperCase().replace(/_/g, ' ')}`;
 }
 
 function renderMagnatesBPLoop(timestamp) {
@@ -47214,6 +47477,7 @@ function openMagnatesPaperBlueprintSuite() {
 
   const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
   if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
+  updateMagnatesBPVisualStyles();
 }
 
 function closeMagnatesPaperBlueprintSuite() {
@@ -47249,6 +47513,52 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
+  // Preset Selector
+  document.getElementById('magnates-bp-select-preset')?.addEventListener('change', (e) => {
+    const pKey = e.target.value;
+    magnatesBPState.preset = pKey;
+    const pData = MAGNATES_BP_PRESETS[pKey];
+    if (pData) {
+      magnatesBPState.bgPlateUrl = pData.bgPlateUrl;
+      magnatesBPState.primaryCutoutUrl = pData.primaryCutoutUrl;
+      magnatesBPState.secondaryCutoutUrl = pData.secondaryCutoutUrl;
+      magnatesBPState.headline = pData.headline;
+      magnatesBPState.subcaption = pData.subcaption;
+      magnatesBPState.choreography = pData.choreography;
+      magnatesBPState.showBlueprintGrid = pData.showBlueprintGrid;
+      magnatesBPState.showGlow = pData.showGlow;
+      magnatesBPState.showShadow = pData.showShadow;
+
+      // Sync form inputs
+      const selChoreo = document.getElementById('magnates-bp-select-choreography');
+      if (selChoreo) selChoreo.value = pData.choreography;
+      const inHead = document.getElementById('magnates-bp-input-headline');
+      if (inHead) inHead.value = pData.headline;
+      const inSub = document.getElementById('magnates-bp-input-subcaption');
+      if (inSub) inSub.value = pData.subcaption;
+      const inP1 = document.getElementById('magnates-bp-input-portrait');
+      if (inP1) inP1.value = pData.primaryCutoutUrl;
+      const inP2 = document.getElementById('magnates-bp-input-secondary');
+      if (inP2) inP2.value = pData.secondaryCutoutUrl;
+      const chkGlow = document.getElementById('magnates-bp-toggle-glow');
+      if (chkGlow) chkGlow.checked = pData.showGlow;
+      const chkShadow = document.getElementById('magnates-bp-toggle-shadow');
+      if (chkShadow) chkShadow.checked = pData.showShadow;
+      const chkGrid = document.getElementById('magnates-bp-toggle-grid');
+      if (chkGrid) chkGrid.checked = pData.showBlueprintGrid;
+    }
+    magnatesBPState.playhead = 0;
+    updateMagnatesBPVisualStyles();
+  });
+
+  // Choreography selector
+  document.getElementById('magnates-bp-select-choreography')?.addEventListener('change', (e) => {
+    magnatesBPState.choreography = e.target.value;
+    magnatesBPState.playhead = 0;
+    updateMagnatesBPVisualStyles();
+  });
+
+  // Sliders and toggles
   document.getElementById('magnates-bp-slider-angle')?.addEventListener('input', (e) => {
     magnatesBPState.paperAngle = parseInt(e.target.value, 10);
     const label = document.getElementById('magnates-bp-val-angle');
@@ -47256,8 +47566,18 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
-  document.getElementById('magnates-bp-toggle-hand')?.addEventListener('change', (e) => {
-    magnatesBPState.showMovingHand = e.target.checked;
+  document.getElementById('magnates-bp-toggle-jitter')?.addEventListener('change', (e) => {
+    magnatesBPState.enableJitter = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-toggle-glow')?.addEventListener('change', (e) => {
+    magnatesBPState.showGlow = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('magnates-bp-toggle-shadow')?.addEventListener('change', (e) => {
+    magnatesBPState.showShadow = e.target.checked;
     updateMagnatesBPVisualStyles();
   });
 
@@ -47276,86 +47596,102 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
-  const stockPortraits = [
-    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&auto=format&fit=crop&q=80'
-  ];
-  let pIdx = 0;
-  document.getElementById('btn-magnates-bp-shuffle-portrait')?.addEventListener('click', () => {
-    pIdx = (pIdx + 1) % stockPortraits.length;
-    magnatesBPState.portraitUrl = stockPortraits[pIdx];
-    const inputP = document.getElementById('magnates-bp-input-portrait');
-    if (inputP) inputP.value = magnatesBPState.portraitUrl;
+  document.getElementById('magnates-bp-input-portrait')?.addEventListener('input', (e) => {
+    magnatesBPState.primaryCutoutUrl = e.target.value;
     updateMagnatesBPVisualStyles();
   });
 
-  document.getElementById('magnates-bp-input-portrait')?.addEventListener('input', (e) => {
-    magnatesBPState.portraitUrl = e.target.value;
+  document.getElementById('magnates-bp-input-secondary')?.addEventListener('input', (e) => {
+    magnatesBPState.secondaryCutoutUrl = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+
+  const stockCutouts = [
+    '/laptop_guy_cutout.png',
+    '/silhouette_standing_phone.png',
+    '/silhouette_sitting_phone.png',
+    '/portrait_cutout_clean.png',
+    '/clean_traveler_cutout.png'
+  ];
+  let pIdx = 0;
+  document.getElementById('btn-magnates-bp-shuffle-portrait')?.addEventListener('click', () => {
+    pIdx = (pIdx + 1) % stockCutouts.length;
+    magnatesBPState.primaryCutoutUrl = stockCutouts[pIdx];
+    const inputP = document.getElementById('magnates-bp-input-portrait');
+    if (inputP) inputP.value = magnatesBPState.primaryCutoutUrl;
     updateMagnatesBPVisualStyles();
   });
 
   document.getElementById('btn-apply-magnates-bp-suite')?.addEventListener('click', () => {
     closeMagnatesPaperBlueprintSuite();
 
-    const blueprintClip = {
+    const bgClip = {
       id: `img-bp-bg-${Date.now()}`,
-      url: '/magnates_paper_blueprint_thumbnail.svg',
+      url: magnatesBPState.bgPlateUrl || '/room_empty_plate.png',
       start: 0,
       duration: magnatesBPState.duration,
-      scale: 1.1,
-      zoomEffect: 'snap',
-      zoomScale: 1.15,
+      scale: 1.05,
+      zoomEffect: 'kenburns',
+      zoomScale: 1.12,
       transition: 'crossfade',
       transitionDuration: 0.8
     };
 
-    const paperPortraitClip = {
-      id: `img-bp-portrait-${Date.now() + 1}`,
-      url: magnatesBPState.portraitUrl,
-      start: 0,
-      duration: magnatesBPState.duration,
-      scale: 1.05,
+    const primaryCutoutClip = {
+      id: `img-bp-cutout-1-${Date.now() + 1}`,
+      url: magnatesBPState.primaryCutoutUrl,
+      start: magnatesBPState.choreography === 'pop_in_place' ? 1.0 : 0.2,
+      duration: magnatesBPState.duration - (magnatesBPState.choreography === 'pop_in_place' ? 1.0 : 0.2),
+      scale: 1.0,
       rotation: magnatesBPState.paperAngle,
-      stickerBorder: true,
-      shadowElevation: 35,
-      transition: 'fly_through',
-      transitionDuration: 0.6
+      stickerBorder: false,
+      shadowElevation: magnatesBPState.showShadow ? 35 : 0,
+      transition: 'pop',
+      transitionDuration: 0.4
+    };
+
+    const secondaryCutoutClip = {
+      id: `img-bp-cutout-2-${Date.now() + 2}`,
+      url: magnatesBPState.secondaryCutoutUrl,
+      start: 0,
+      duration: magnatesBPState.choreography === 'simultaneous_staggered_exit' ? 3.0 : magnatesBPState.duration,
+      scale: 0.95,
+      transition: 'fade',
+      transitionDuration: 0.5
     };
 
     const headlineClip = {
-      id: `txt-bp-head-${Date.now() + 2}`,
+      id: `txt-bp-head-${Date.now() + 3}`,
       text: magnatesBPState.headline,
       highlight: magnatesBPState.headline.split(' ')[0] || '',
-      highlightColor: '#00f0ff',
+      highlightColor: '#ef4444',
       anim: 'pop',
-      fontSize: 50,
-      fontFamily: 'Inter, sans-serif',
-      start: 0,
-      duration: magnatesBPState.duration
+      fontSize: 54,
+      fontFamily: 'Impact, sans-serif',
+      start: 0.8,
+      duration: magnatesBPState.duration - 0.8
     };
 
-    const bpMetaClip = {
-      id: `txt-bp-meta-${Date.now() + 3}`,
-      text: `BLUEPRINT SEC_08 // PAPER STICKER CUTOUT (${magnatesBPState.paperAngle}\u00b0)`,
-      highlight: 'BLUEPRINT',
-      highlightColor: '#0284c7',
+    const subtitleClip = {
+      id: `txt-bp-sub-${Date.now() + 4}`,
+      text: magnatesBPState.subcaption,
+      highlight: magnatesBPState.subcaption.split(' ')[0] || '',
+      highlightColor: '#f87171',
       anim: 'fade',
       fontSize: 20,
-      fontFamily: 'monospace',
-      start: 0,
-      duration: magnatesBPState.duration
+      fontFamily: 'Inter, sans-serif',
+      start: 1.0,
+      duration: magnatesBPState.duration - 1.0
     };
 
     if (timelineClips && timelineClips.image && timelineClips.text) {
-      timelineClips.image = [blueprintClip, paperPortraitClip];
-      timelineClips.text = [headlineClip, bpMetaClip];
+      timelineClips.image = [bgClip, secondaryCutoutClip, primaryCutoutClip];
+      timelineClips.text = [headlineClip, subtitleClip];
       renderAllTimelineTracks();
-      selectClip(paperPortraitClip, 'image');
+      selectClip(primaryCutoutClip, 'image');
     }
 
-    showTextTimingAlert(`Applied Magnates Media Paper & Blueprint Cutouts to timeline!`, 'success');
+    showTextTimingAlert(`Applied High-End Cutout & Motion Scene to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }

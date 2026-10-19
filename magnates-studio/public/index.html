@@ -8934,9 +8934,9 @@
       <!-- Minimalist Header Bar -->
       <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; width: 100%;">
         <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-          <h3 style="margin: 0; font-size: 15px; font-weight: 600; color: #f8fafc; letter-spacing: -0.2px; white-space: nowrap;">Paper-Based &amp; Blueprint Cutouts</h3>
+          <h3 style="margin: 0; font-size: 15px; font-weight: 600; color: #f8fafc; letter-spacing: -0.2px; white-space: nowrap;">Dynamic Cutout &amp; Blueprint Motion Suite</h3>
           <span style="color: #475569; font-size: 12px;">&#x2022;</span>
-          <span style="font-size: 10px; padding: 2px 8px; border-radius: 20px; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.25); color: #c084fc; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Magnates Media</span>
+          <span style="font-size: 10px; padding: 2px 8px; border-radius: 20px; background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.25); color: #c084fc; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Magnates &bull; James Jani Edition</span>
         </div>
 
         <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
@@ -8957,62 +8957,64 @@
 
         <!-- Left Column: Stage & Visualizer -->
         <div style="flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
-          <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #040d1a; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 30px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center;">
+          <div id="magnates-bp-stage" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #040d1a; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 40px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center;">
+            
+            <!-- Stage Background Plate (Empty Plate or Dark Blueprint) -->
+            <img id="magnates-bp-bg-plate" src="/room_empty_plate.png" alt="Scene Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 1; transition: opacity 0.3s ease;" />
+
             <!-- Blueprint Technical Grid Overlay -->
-            <div id="magnates-bp-grid-layer" style="position: absolute; inset: 0; background-size: 28px 28px; background-image: linear-gradient(to right, rgba(168,85,247,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(168,85,247,0.15) 1px, transparent 1px); opacity: 0.85; pointer-events: none;"></div>
+            <div id="magnates-bp-grid-layer" style="position: absolute; inset: 0; background-size: 28px 28px; background-image: linear-gradient(to right, rgba(168,85,247,0.15) 1px, transparent 1px), linear-gradient(to bottom, rgba(168,85,247,0.15) 1px, transparent 1px); opacity: 0; pointer-events: none; transition: opacity 0.3s ease;"></div>
 
             <!-- Schematic Rings -->
-            <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 500 280">
+            <svg id="magnates-bp-schematic-svg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 0.3s ease;" viewBox="0 0 500 280">
               <circle cx="250" cy="140" r="95" fill="none" stroke="#a855f7" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.4"/>
               <line x1="50" y1="140" x2="450" y2="140" stroke="#a855f7" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.3"/>
               <line x1="250" y1="20" x2="250" y2="260" stroke="#a855f7" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.3"/>
             </svg>
 
-            <!-- Floating Angled Blueprint Paper Layer -->
-            <div id="magnates-bp-doc-card" style="position: absolute; width: 180px; height: 140px; background: #0a213e; border: 1.5px solid #a855f7; border-radius: 6px; box-shadow: 0 18px 35px rgba(0,0,0,0.9); transform: rotate(-6deg); padding: 10px; transition: transform 0.08s ease;">
-              <div style="font-family: monospace; font-size: 8px; color: #c084fc; font-weight: 800; border-bottom: 1px dashed rgba(168,85,247,0.5); padding-bottom: 3px;">
-                BLUEPRINT // DOSSIER 1929
-              </div>
-              <div style="margin-top: 8px; width: 100%; height: 60px; background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.25); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <span style="font-family: monospace; font-size: 8px; color: #c084fc; font-weight: 700;">FIG 4A: FINANCIAL SCHEMATIC</span>
-                <span style="font-family: monospace; font-size: 7px; color: #94a3b8; margin-top: 2px;">TECHNICAL SPECIFICATION</span>
-              </div>
+            <!-- Vintage Paper / Noise Overlay -->
+            <div id="magnates-bp-paper-texture" style="position: absolute; inset: 0; background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.6) 100%), linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); pointer-events: none; mix-blend-mode: overlay; z-index: 5;"></div>
+
+            <!-- Cutout Layer 1: Left / Background Cutout or Dossier Document -->
+            <div id="magnates-bp-layer-secondary" style="position: absolute; z-index: 8; transition: transform 0.05s ease, opacity 0.1s ease; pointer-events: none;">
+              <img id="magnates-bp-img-secondary" src="/silhouette_standing_phone.png" alt="Secondary Subject" style="max-height: 230px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(255,255,255,0.85)) drop-shadow(0 15px 25px rgba(0,0,0,0.8));" />
             </div>
 
-            <!-- Foreground Floating Cutout Portrait (Paper Sticker Outline) -->
-            <div id="magnates-bp-portrait-card" style="position: relative; z-index: 10; width: 130px; height: 165px; border-radius: 12px; background: #ffffff; padding: 4px; box-shadow: 0 25px 50px rgba(0,0,0,0.95); transform: rotate(5deg); transition: transform 0.08s ease;">
-              <div style="width: 100%; height: 100%; border-radius: 8px; overflow: hidden; background: #0b1324;">
-                <img id="magnates-bp-portrait-img" src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" alt="Cutout" style="width: 100%; height: 100%; object-fit: cover;" />
-              </div>
+            <!-- Cutout Layer 2: Primary Foreground Subject Cutout (Person / Object) -->
+            <div id="magnates-bp-layer-primary" style="position: absolute; z-index: 12; transition: transform 0.05s ease, opacity 0.1s ease; pointer-events: none;">
+              <!-- Contact Floor / Table Drop Shadow -->
+              <div id="magnates-bp-ground-shadow" style="position: absolute; bottom: -8px; left: 10%; right: 10%; height: 22px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, transparent 75%); border-radius: 50%; z-index: -1;"></div>
+              
+              <img id="magnates-bp-img-primary" src="/laptop_guy_cutout.png" alt="Primary Subject Cutout" style="max-height: 250px; object-fit: contain; filter: drop-shadow(0 18px 30px rgba(0,0,0,0.75));" />
             </div>
 
-            <!-- Moving Hand Cutout Placing Evidence -->
-            <div id="magnates-bp-hand-wrap" style="position: absolute; bottom: -15px; right: 30px; z-index: 20; pointer-events: none; transition: transform 0.08s ease; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.95));">
-              <svg width="150" height="120" viewBox="0 0 100 80">
-                <path d="M 60 70 L 40 25 L 65 15 L 90 55 Z" fill="#1e293b" stroke="#ffffff" stroke-width="2"/>
-                <path d="M 38 27 L 63 17 L 66 22 L 41 32 Z" fill="#ffffff"/>
-                <path d="M 40 30 C 30 38 18 45 10 40 C 4 36 6 28 15 22 L 45 8 C 50 5 60 8 62 14 Z" fill="#fbcfe8" stroke="#ffffff" stroke-width="2"/>
-                <circle cx="8" cy="22" r="5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/>
+            <!-- Authentic Evidence Pin / Stamp / Pointer Element -->
+            <div id="magnates-bp-hand-wrap" style="position: absolute; z-index: 20; pointer-events: none; transition: transform 0.05s ease, opacity 0.1s ease; filter: drop-shadow(0 14px 20px rgba(0,0,0,0.8));">
+              <svg width="48" height="48" viewBox="0 0 32 32">
+                <circle cx="16" cy="16" r="14" fill="#ef4444" stroke="#ffffff" stroke-width="2.5" />
+                <circle cx="16" cy="16" r="6" fill="#ffffff" />
+                <line x1="16" y1="2" x2="16" y2="30" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" />
+                <line x1="2" y1="16" x2="30" y2="16" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" />
               </svg>
             </div>
 
-            <!-- In-Stage Typography -->
-            <div style="position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 25; padding: 0 20px;">
-              <span id="magnates-bp-subcaption" style="font-family: monospace; font-size: 9px; font-weight: 800; color: #c084fc; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">
-                TECHNICAL BLUEPRINT // 2D PAPER CUTOUT
+            <!-- In-Stage Dynamic Typography / Statistic / Headline -->
+            <div id="magnates-bp-text-wrap" style="position: absolute; bottom: 18px; left: 0; right: 0; text-align: center; pointer-events: none; z-index: 25; padding: 0 20px; transition: transform 0.1s ease, opacity 0.1s ease;">
+              <span id="magnates-bp-subcaption" style="font-family: 'Inter', monospace; font-size: 11px; font-weight: 700; color: #ef4444; letter-spacing: 2.5px; text-transform: uppercase; display: block; margin-bottom: 2px; text-shadow: 0 2px 8px rgba(0,0,0,0.95);">
+                ADVERTISING THOSE PRODUCTS
               </span>
-              <h2 id="magnates-bp-headline" style="font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: #ffffff; letter-spacing: 1.5px; margin: 0; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.95);">
-                SCHEMATIC EVIDENCE
+              <h2 id="magnates-bp-headline" style="font-family: 'Impact', 'Montserrat', sans-serif; font-size: 34px; font-weight: 900; color: #ef4444; letter-spacing: 1px; margin: 0; text-transform: uppercase; text-shadow: 0 4px 18px rgba(0,0,0,0.95), 0 0 30px rgba(239,68,68,0.4);">
+                $999,970
               </h2>
             </div>
 
             <!-- HUD Badges -->
             <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px; z-index: 20;">
-              <span id="magnates-bp-hud-grid" style="font-size: 10px; font-family: monospace; background: rgba(5,13,30,0.9); border: 1px solid #a855f7; color: #c084fc; padding: 3px 8px; border-radius: 4px; font-weight: 700;">BLUEPRINT: ACTIVE</span>
-              <span id="magnates-bp-hud-hand" style="font-size: 10px; font-family: monospace; background: rgba(5,13,30,0.9); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">MOVING HAND: PINNED</span>
+              <span id="magnates-bp-hud-preset" style="font-size: 10px; font-family: monospace; background: rgba(5,13,30,0.85); border: 1px solid #a855f7; color: #c084fc; padding: 3px 8px; border-radius: 4px; font-weight: 700;">PRESET: POP-IN ROOM CUTOUT</span>
+              <span id="magnates-bp-hud-anim" style="font-size: 10px; font-family: monospace; background: rgba(5,13,30,0.85); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; padding: 3px 8px; border-radius: 4px;">CHOREOGRAPHY: STAGGERED</span>
             </div>
             <div style="position: absolute; top: 12px; right: 12px; z-index: 20;">
-              <span id="magnates-bp-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(5,13,30,0.9); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 5.0s</span>
+              <span id="magnates-bp-timer-display" style="font-size: 10px; font-family: monospace; background: rgba(5,13,30,0.85); border: 1px solid rgba(255,255,255,0.15); color: #ffffff; padding: 3px 8px; border-radius: 4px;">0.00s / 5.0s</span>
             </div>
           </div>
 
@@ -9022,53 +9024,85 @@
               <button type="button" id="btn-magnates-bp-play-pause" style="padding: 6px 16px; font-size: 11.5px; font-weight: 600; background: #151824; border: 1px solid rgba(255,255,255,0.1); color: #f8fafc; border-radius: 8px; cursor: pointer;">&#x23F8; Pause</button>
               <button type="button" id="btn-magnates-bp-reset" style="padding: 6px 14px; font-size: 11.5px; font-weight: 500; background: #151824; border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 8px; cursor: pointer;">&#x21BA; Replay</button>
             </div>
-            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px;">
-              <span style="color: #94a3b8; font-family: monospace;">PAPER CUTOUT</span>
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 11px;">
+              <span style="color: #94a3b8; font-family: monospace;">STOP-MOTION JITTER (12 FPS)</span>
+              <input type="checkbox" id="magnates-bp-toggle-jitter" checked style="accent-color: #a855f7; cursor: pointer;" />
               <span style="color: #64748b;">|</span>
-              <span style="color: #c084fc; font-weight: 600; font-family: monospace;">MOVING HAND ASSETS</span>
+              <span style="color: #c084fc; font-weight: 600; font-family: monospace;">HIGH-END PRODUCTION CUTOUTS</span>
             </div>
           </div>
         </div>
 
         <!-- Right Column Inspector -->
         <div style="width: 320px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; overflow-y: auto;">
-          <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 2px;">Inspector &bull; Paper &amp; Blueprint</div>
+          <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 2px;">Inspector &bull; Magnates &amp; James Jani Cutouts</div>
 
-          <!-- Card 1: Typography -->
+          <!-- Production Presets -->
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Text &amp; Schematic Title</div>
-            <input type="text" id="magnates-bp-input-headline" value="SCHEMATIC EVIDENCE" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
-            <input type="text" id="magnates-bp-input-subcaption" value="TECHNICAL BLUEPRINT // 2D PAPER CUTOUT" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; font-family: monospace;" />
+            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Production Scene Preset</div>
+            <select id="magnates-bp-select-preset" style="width: 100%; background: #08090d; border: 1px solid rgba(168,85,247,0.4); border-radius: 6px; padding: 7px 10px; color: #f8fafc; font-size: 11px; outline: none; cursor: pointer;">
+              <option value="room_spawn">Empty Room &rarr; Subject Spawns On Desk (James Jani)</option>
+              <option value="dual_silhouette">Dual Silhouettes &bull; Staggered Glowing Exit (Image 2)</option>
+              <option value="center_burst">Center Burst: Emerge From Core &bull; Paper Crawl</option>
+              <option value="blueprint_dossier">Technical Blueprint &bull; Rotoscoped CEO Cutout</option>
+            </select>
           </div>
 
-          <!-- Card 2: Cutout Image URL -->
+          <!-- Animation Choreography -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Choreography &amp; Sequence</div>
+            <select id="magnates-bp-select-choreography" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none; cursor: pointer;">
+              <option value="staggered_sequential">Enter One After Another &rarr; Exit In Sequence</option>
+              <option value="simultaneous_staggered_exit">Enter Simultaneously &rarr; Exit One By One</option>
+              <option value="from_the_heart">Emerge From Center / Heart Of The Other</option>
+              <option value="camera_crawl">Camera Crawl &bull; Side-by-Side Layer Stacking</option>
+              <option value="pop_in_place">Stamp / Pop Straight Into Scene Plate</option>
+            </select>
+          </div>
+
+          <!-- Typography & Graphic -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Headline &amp; Subtitle</div>
+            <input type="text" id="magnates-bp-input-headline" value="$999,970" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+            <input type="text" id="magnates-bp-input-subcaption" value="ADVERTISING THOSE PRODUCTS." style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 10px; color: #ffffff; font-size: 11px; outline: none;" />
+          </div>
+
+          <!-- Cutout Assets Configuration -->
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
             <div style="font-size: 11px; font-weight: 600; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between;">
-              <span>Floating Cutout Portrait</span>
-              <button type="button" id="btn-magnates-bp-shuffle-portrait" style="padding: 2px 8px; font-size: 9.5px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">Stock</button>
+              <span>Cutout Subject 1 (Primary)</span>
+              <button type="button" id="btn-magnates-bp-shuffle-portrait" style="padding: 2px 8px; font-size: 9.5px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">Preset</button>
             </div>
-            <input type="text" id="magnates-bp-input-portrait" value="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=600&auto=format&fit=crop&q=80" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+            <input type="text" id="magnates-bp-input-portrait" value="/laptop_guy_cutout.png" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+
+            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1; margin-top: 4px;">Cutout Subject 2 (Secondary / Silhouette)</div>
+            <input type="text" id="magnates-bp-input-secondary" value="/silhouette_standing_phone.png" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
           </div>
 
-          <!-- Card 3: Layer Controls -->
+          <!-- Styling & Shading -->
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Asset Configuration</div>
+            <div style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Lighting &amp; Depth Effects</div>
 
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 10.5px; color: #cbd5e1;">Moving Hand Evidence Pin</span>
-              <input type="checkbox" id="magnates-bp-toggle-hand" checked style="accent-color: #a855f7; cursor: pointer;" />
+              <span style="font-size: 10.5px; color: #cbd5e1;">Silhouette Glow Effect</span>
+              <input type="checkbox" id="magnates-bp-toggle-glow" checked style="accent-color: #a855f7; cursor: pointer;" />
             </div>
 
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
-              <span style="font-size: 10.5px; color: #cbd5e1;">Blueprint Grid Overlay</span>
-              <input type="checkbox" id="magnates-bp-toggle-grid" checked style="accent-color: #a855f7; cursor: pointer;" />
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px;">
+              <span style="font-size: 10.5px; color: #cbd5e1;">Realistic Ground Drop Shadow</span>
+              <input type="checkbox" id="magnates-bp-toggle-shadow" checked style="accent-color: #a855f7; cursor: pointer;" />
             </div>
 
-            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 6px;">
-              <span style="color: #94a3b8;">Paper Float Angle</span>
-              <span id="magnates-bp-val-angle" style="font-family: monospace; color: #c084fc;">6&#xB0;</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px;">
+              <span style="font-size: 10.5px; color: #cbd5e1;">Technical Blueprint Overlay</span>
+              <input type="checkbox" id="magnates-bp-toggle-grid" style="accent-color: #a855f7; cursor: pointer;" />
             </div>
-            <input type="range" id="magnates-bp-slider-angle" min="0" max="15" value="6" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #94a3b8;">Parallax &amp; Paper Float</span>
+              <span id="magnates-bp-val-angle" style="font-family: monospace; color: #c084fc;">4&deg;</span>
+            </div>
+            <input type="range" id="magnates-bp-slider-angle" min="0" max="15" value="4" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
           </div>
         </div>
 
