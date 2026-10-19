@@ -725,24 +725,24 @@
       subhead: 'Special Investigation Report • Leaked Internal Dossier',
       bodyText: 'According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.',
       dofBokeh: true,
-      dofBlur: 13,
-      cameraPitch: 12,
-      cameraYaw: -9,
-      cameraRoll: 2.5,
+      dofBlur: 18,
+      cameraPitch: 10,
+      cameraYaw: -7,
+      cameraRoll: 2,
       perspective: 1100,
       showDogEar: true,
-      dogEarSize: 38,
+      dogEarSize: 58,
       paperAging: 75,
       inkBleed: true,
       inkBleedAmount: 0.6,
       deckleEdge: true,
       volumetricRays: true,
-      rayIntensity: 0.75,
+      rayIntensity: 0.95,
       rimLight: true,
       warmSpotlight: true,
-      spotIntensity: 0.85,
+      spotIntensity: 1.4,
       dustMotes: true,
-      dustCount: 20,
+      dustCount: 32,
       organicDrift: true,
       driftSpeed: 1.0,
       parallaxStrength: 1.5,
@@ -755,11 +755,12 @@
     },
 'headline-fly': {
       type: 'headline-fly',
+      layoutStyle: 'broadsheet', // 'broadsheet' (default, authentic journalism like Image 1) vs 'saas' (legacy UI cards)
       tiltAngle: 9.5,
       motionBlur: true,
       blurIntensity: 32,
       dofBokeh: true,
-      dofBlur: 8,
+      dofBlur: 7,
       specularGlare: true,
       shadowRadius: 48,
       shadowAlpha: 0.55,
@@ -768,10 +769,12 @@
       flySpeed: 1.0,
       staggerDelay: 0.28,
       paperGrain: 35,
-      showTelemetry: true,
+      showTelemetry: false,
       hudLeft: 'INVESTIGATIVE PRESS ARCHIVE // RECONSTRUCTION 3D',
       hudRight: 'OPTICAL LENS: 35MM ANAMORPHIC',
       activeCardTab: 5,
+      bodyCol1: 'Lorem ipsum dolor sit amet, consectetur cuised the largerst corporate insolven- evovencs in modern histroy.',
+      bodyCol2: 'onablewead of the oxourancy and alentarih rough hanning inkia lioso, with mauitty-draw nes, and comhlicste distribution',
 
       // Card #1 (Top-Left: Classic Broadsheet Tear-Sheet)
       visible1: true,
@@ -870,13 +873,13 @@
       accentColor5: '#dc2626',
       hlColor5: '#facc15',
       source5: 'THE WALL STREET INVESTIGATOR',
-      kicker5: 'EXCLUSIVE EXPOSE',
+      kicker5: '',
       date5: 'OCT 28, 2026',
       headline5: 'The $40B Accounting Black Hole Exposed',
       highlight5: '$40B Accounting Black Hole',
       subhead5: 'How a decade of synthetic shadow loans disguised the largest corporate insolvency in modern history.',
       byline5: 'By Investigative Unit \u00b7 Special Report',
-      exhibit5: 'KEY EVIDENCE #01',
+      exhibit5: '',
       font5: "'Playfair Display', Georgia, serif",
       fontSize5: 13,
       scale5: 1.06,
@@ -1876,8 +1879,9 @@
   // Interactive 3D Orbit & Direct On-Screen Route Tracing Handler for Map Stage
 
 // =========================================================================
-  // 25B. HIGH-RESOLUTION VECTOR 3D MAP PIN DROP ENGINE (map-pin-drop)
-  // Scalable Vector SVG Cartography: Razor-sharp on Fullscreen 4K Displays
+  // =========================================================================
+  // 25B. HIGH-RESOLUTION CINEMATIC 3D MAP PIN DROP ENGINE (map-pin-drop)
+  // Matching Image 3 Visual Standard (James Jani / Yes Theory standard)
   // =========================================================================
   window.tplBuildTacticalMapPinDropHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('map-pin-drop') : {});
@@ -1895,66 +1899,54 @@
     const locCoords = d.coords || '50.4501°N 30.5234°E';
     const locSub = d.telemetry || 'O.SR5911TES     DFX35.EVA';
 
-    // Metallic Pin Palettes with Lathe Groove Specular Reflection
+    // Metallic Pin Palettes
     const palettes = {
       'copper': {
         stop0: '#fed7aa', stop25: '#f97316', stop55: '#c2410c', stop85: '#7c2d12', stop100: '#431407',
         stem0: '#ea580c', stem50: '#ffedd5', stem100: '#7c2d12',
-        rim: '#fed7aa', center: '#7c2d12', pulse: '#f59e0b', glow: 'rgba(249, 115, 22, 0.45)'
+        rim: '#fed7aa', center: '#7c2d12', pulse: '#f59e0b'
       },
       'steel': {
         stop0: '#f8fafc', stop25: '#cbd5e1', stop55: '#64748b', stop85: '#334155', stop100: '#0f172a',
         stem0: '#94a3b8', stem50: '#ffffff', stem100: '#334155',
-        rim: '#e2e8f0', center: '#1e293b', pulse: '#38bdf8', glow: 'rgba(56, 189, 248, 0.45)'
+        rim: '#e2e8f0', center: '#1e293b', pulse: '#38bdf8'
       },
       'gold': {
         stop0: '#fef08a', stop25: '#eab308', stop55: '#ca8a04', stop85: '#854d0e', stop100: '#422006',
         stem0: '#d97706', stem50: '#fef9c3', stem100: '#78350f',
-        rim: '#fde047', center: '#713f12', pulse: '#eab308', glow: 'rgba(234, 179, 8, 0.45)'
+        rim: '#fde047', center: '#713f12', pulse: '#eab308'
       }
     };
     const pal = palettes[pinMat] || palettes['copper'];
 
     const rig3DStyle = is3D
-      ? `transform: perspective(1400px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(1.02); transform-style: preserve-3d; transition: transform 0.25s ease-out;`
+      ? `transform: perspective(1200px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(1.02); transform-style: preserve-3d; transition: transform 0.25s ease-out;`
       : 'transform: none;';
-
-    // Natural Earth Vector Landmasses
-    const worldLand = (typeof window !== 'undefined' && window.ACCURATE_WORLD_MAP && window.ACCURATE_WORLD_MAP.land)
-      ? window.ACCURATE_WORLD_MAP.land
-      : '';
 
     return `
       <div class="tpl-map cinematic-map-pin-suite ${is3D ? 'is-3d-perspective' : ''}" style="background:#020610; width:100%; height:100%; position:relative; overflow:hidden; user-select:none;">
         <div class="cinematic-map-canvas-container" style="${rig3DStyle} width:100%; height:100%; position:relative;">
-          
-          <!-- PURE SCALABLE VECTOR SVG CARTOGRAPHY (INFINITE RESOLUTION ON FULLSCREEN) -->
-          <svg viewBox="0 0 960 540" preserveAspectRatio="xMidYMid slice" style="width:100%; height:100%; display:block; position:absolute; inset:0;">
+          <!-- 1. BASE WORLD SATELLITE & TOPOGRAPHIC RELIEF LAYER (Photorealistic Image 3) -->
+          <img src="/cinematic_tactical_world_map_kyiv.png" alt="Cinematic Tactical Relief World Map" class="cinematic-map-base-img" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; user-select: none; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; filter: contrast(1.06) brightness(1.02);" />
+
+          <!-- 2. DYNAMIC WATER CURRENTS SHIMMER -->
+          ${showWater ? `
+            <div class="ocean-shimmer-layer" style="position: absolute; inset: 0; background: radial-gradient(ellipse at 42% 64%, rgba(56, 189, 248, 0.08) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none; animation: oceanCurrentShift 9s ease-in-out infinite alternate;"></div>
+          ` : ''}
+
+          <!-- 3. VOLUMETRIC ATMOSPHERIC LIMB GLOW & VIGNETTE -->
+          <div class="atmospheric-limb-glow" style="position: absolute; inset: 0; box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.85), inset 0 0 100px rgba(2, 8, 20, 0.7); pointer-events: none;"></div>
+
+          <!-- 4. DYNAMIC VECTOR OVERLAY: 3D PIN, SHOCKWAVE, ARCS, HUD LEADER LINE (viewBox 0 0 968 410) -->
+          <svg class="cinematic-map-svg-overlay" viewBox="0 0 968 410" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
             <defs>
-              <!-- Deep Tactical Ocean Gradient -->
-              <radialGradient id="vtrOcean" cx="50%" cy="52%" r="65%">
-                <stop offset="0%" stop-color="#07192f"/>
-                <stop offset="45%" stop-color="#04101e"/>
-                <stop offset="85%" stop-color="#02070f"/>
-                <stop offset="100%" stop-color="#01040a"/>
-              </radialGradient>
+              <!-- Lat/Long Graticule Filter -->
+              <pattern id="cmpGridPattern" width="60" height="60" patternUnits="userSpaceOnUse">
+                <path d="M 60 0 L 0 0 0 60" fill="none" stroke="rgba(56, 189, 248, 0.07)" stroke-width="0.6" stroke-dasharray="2, 4" />
+              </pattern>
 
-              <!-- Land Topographic Relief Gradient -->
-              <linearGradient id="vtrLandRelief" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#2c221a"/>
-                <stop offset="40%" stop-color="#231b15"/>
-                <stop offset="80%" stop-color="#19130f"/>
-                <stop offset="100%" stop-color="#120e0b"/>
-              </linearGradient>
-
-              <!-- Shaded Mountain Ridge Highlight -->
-              <linearGradient id="vtrRidgeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#8c6b4e" stop-opacity="0.9"/>
-                <stop offset="100%" stop-color="#3d2f23" stop-opacity="0.3"/>
-              </linearGradient>
-
-              <!-- Metallic Pin Head Gradients -->
-              <radialGradient id="vtrPinHead" cx="35%" cy="30%" r="70%">
+              <!-- Radial Pin Head Metallic Gradient -->
+              <radialGradient id="cmpPinHead" cx="35%" cy="30%" r="70%">
                 <stop offset="0%" stop-color="${pal.stop0}"/>
                 <stop offset="25%" stop-color="${pal.stop25}"/>
                 <stop offset="55%" stop-color="${pal.stop55}"/>
@@ -1963,199 +1955,125 @@
               </radialGradient>
 
               <!-- Concentric Lathe Grooves -->
-              <radialGradient id="vtrPinGrooves" cx="50%" cy="50%" r="50%">
-                <stop offset="28%" stop-color="${pal.stop85}" stop-opacity="0.8"/>
-                <stop offset="48%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
-                <stop offset="68%" stop-color="${pal.stop55}" stop-opacity="0.85"/>
-                <stop offset="88%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
+              <radialGradient id="cmpPinGrooves" cx="50%" cy="50%" r="50%">
+                <stop offset="25%" stop-color="${pal.stop85}" stop-opacity="0.7"/>
+                <stop offset="45%" stop-color="${pal.stop0}" stop-opacity="0.9"/>
+                <stop offset="65%" stop-color="${pal.stop55}" stop-opacity="0.8"/>
+                <stop offset="85%" stop-color="${pal.stop0}" stop-opacity="0.95"/>
                 <stop offset="100%" stop-color="${pal.stop100}"/>
               </radialGradient>
 
-              <!-- Tapered Conical 3D Stem -->
-              <linearGradient id="vtrPinStem" x1="0%" y1="0%" x2="100%" y2="100%">
+              <!-- 3D Conical Stem Gradient -->
+              <linearGradient id="cmpPinStem" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="${pal.stem0}"/>
-                <stop offset="50%" stop-color="${pal.stem50}"/>
+                <stop offset="45%" stop-color="${pal.stem50}"/>
+                <stop offset="70%" stop-color="${pal.stem0}"/>
                 <stop offset="100%" stop-color="${pal.stem100}"/>
               </linearGradient>
 
-              <!-- Glow & Shadow Filters -->
-              <filter id="vtrGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <!-- Glow and Shadow Filters -->
+              <filter id="cmpGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
               </filter>
-              <filter id="vtrPinShadow" x="-40%" y="-40%" width="180%" height="180%">
-                <feDropShadow dx="6" dy="16" stdDeviation="10" flood-color="#000000" flood-opacity="0.95"/>
-              </filter>
-              <filter id="vtrDustHaze" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="8"/>
+              <filter id="cmpPinShadow" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="6" dy="14" stdDeviation="8" flood-color="#000000" flood-opacity="0.9"/>
               </filter>
             </defs>
 
-            <!-- 1. BASE OCEAN LAYER -->
-            <rect width="960" height="540" fill="url(#vtrOcean)"/>
-
-            <!-- 2. TECHNICAL LAT/LONG GRATICULES -->
+            <!-- Technical Lat/Long Graticule Grid Overlay -->
             ${showGrid ? `
-              <g class="vtr-graticules" stroke="rgba(56, 189, 248, 0.11)" stroke-width="0.55" stroke-dasharray="3, 7" fill="none">
-                <!-- Parallels -->
-                <line x1="0" y1="90" x2="960" y2="90"/>
-                <line x1="0" y1="180" x2="960" y2="180"/>
-                <line x1="0" y1="270" x2="960" y2="270" stroke="rgba(56, 189, 248, 0.18)" stroke-dasharray="none"/>
-                <line x1="0" y1="360" x2="960" y2="360"/>
-                <line x1="0" y1="450" x2="960" y2="450"/>
-                <!-- Meridians -->
-                <line x1="160" y1="0" x2="160" y2="540"/>
-                <line x1="320" y1="0" x2="320" y2="540"/>
-                <line x1="480" y1="0" x2="480" y2="540" stroke="rgba(56, 189, 248, 0.18)" stroke-dasharray="none"/>
-                <line x1="640" y1="0" x2="640" y2="540"/>
-                <line x1="800" y1="0" x2="800" y2="540"/>
+              <rect width="968" height="410" fill="url(#cmpGridPattern)" opacity="0.8" />
+            ` : ''}
+
+            <!-- Shaded Relief & Glowing Country Borders Overlay -->
+            ${showBorders ? `
+              <g class="glowing-borders" stroke="rgba(249, 115, 22, 0.35)" stroke-width="0.75" fill="none" opacity="0.65">
+                <path d="M 440 115 Q 465 105 490 120 T 520 135 T 555 140 T 575 160" />
+                <path d="M 465 130 Q 480 150 495 155 T 515 170" />
+                <path d="M 525 135 Q 545 138 560 148 T 570 175" />
               </g>
             ` : ''}
 
-            <!-- 3. DYNAMIC WATER CURRENTS SHIMMER -->
-            ${showWater ? `
-              <g class="vtr-ocean-currents" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1.2" fill="none" stroke-dasharray="8 12">
-                <path d="M 240 220 C 340 180, 420 210, 490 200" opacity="0.6">
-                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="6s" repeatCount="indefinite"/>
-                </path>
-                <path d="M 330 380 C 420 360, 520 400, 620 370" opacity="0.5">
-                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="8s" repeatCount="indefinite"/>
-                </path>
-                <path d="M 640 290 C 720 270, 810 300, 900 280" opacity="0.5">
-                  <animate attributeName="stroke-dashoffset" values="0;-40" dur="7s" repeatCount="indefinite"/>
-                </path>
-              </g>
-            ` : ''}
-
-            <!-- 4. ACCURATE NATURAL EARTH VECTOR LANDMASSES -->
-            <g class="vtr-continents" transform="scale(2.4)" fill="url(#vtrLandRelief)" stroke="${showBorders ? 'rgba(249, 115, 22, 0.42)' : 'none'}" stroke-width="0.45" stroke-linejoin="round">
-              ${worldLand ? `<path d="${worldLand}"/>` : ''}
-            </g>
-
-            <!-- 5. SHADED TOPOGRAPHIC MOUNTAIN RELIEF SYSTEM -->
-            <g class="vtr-topography-relief" stroke="url(#vtrRidgeGrad)" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.85">
-              <!-- European Alps & Carpathians -->
-              <path d="M 470 178 Q 485 174 505 175 T 530 172"/>
-              <path d="M 482 176 L 488 171 L 496 177 L 504 172 L 512 176"/>
-              <!-- Urals & Caucasus -->
-              <path d="M 545 185 Q 565 180 585 182"/>
-              <path d="M 590 120 L 594 140 L 592 165 L 596 185"/>
-              <!-- Himalayas & Tibetan Plateau -->
-              <path d="M 660 212 Q 710 205 760 220" stroke-width="2"/>
-              <path d="M 670 208 Q 720 198 770 216" stroke-width="1.5"/>
-              <path d="M 680 215 L 690 206 L 705 214 L 720 204 L 735 215 L 750 208"/>
-              <!-- North American Rockies -->
-              <path d="M 230 130 Q 250 165 270 210" stroke-width="1.8"/>
-              <path d="M 235 140 L 242 135 L 248 152 L 256 160 L 262 178 L 268 198"/>
-              <!-- South American Andes -->
-              <path d="M 315 260 Q 325 330 338 410" stroke-width="1.8"/>
-              <path d="M 318 275 L 324 285 L 322 320 L 328 355 L 332 390 L 336 425"/>
-            </g>
-
-            <!-- 6. CRISP VECTOR GEOGRAPHIC LABELS -->
-            ${showLabels ? `
-              <g class="vtr-map-labels" fill="rgba(241, 245, 249, 0.72)" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="700" letter-spacing="0.12em" text-anchor="middle" font-size="7.5">
-                <text x="245" y="195">UNITED STATES</text>
-                <text x="225" y="145" font-size="6.5">CANADA</text>
-                <text x="350" y="325">BRAZIL</text>
-                <text x="475" y="160" font-size="6.5" fill="#38bdf8">UK</text>
-                <text x="548" y="148" font-size="8" font-weight="900" fill="#f97316">KYIV</text>
-                <text x="735" y="210">CHINA</text>
-                <text x="690" y="250">INDIA</text>
-                <text x="815" y="380">AUSTRALIA</text>
-                <text x="555" y="300" font-size="7">AFRICA</text>
-                <!-- Ocean Monospace Labels -->
-                <g fill="rgba(56, 189, 248, 0.38)" font-family="'JetBrains Mono', monospace" font-size="6" font-weight="600" letter-spacing="0.2em">
-                  <text x="390" y="225">NORTH ATLANTIC OCEAN</text>
-                  <text x="440" y="390">SOUTH ATLANTIC OCEAN</text>
-                  <text x="130" y="230">NORTH PACIFIC OCEAN</text>
-                  <text x="740" y="350">INDIAN OCEAN</text>
-                </g>
-              </g>
-            ` : ''}
-
-            <!-- 7. FLIGHT TRAJECTORY ARCS (Americas -> London -> Kyiv -> Asia) -->
+            <!-- Flight Trajectory Arcs (Americas -> London -> Kyiv -> Asia) -->
             ${showFlightPath ? `
-              <g class="vtr-flight-arcs" fill="none">
-                <!-- Americas to London -->
-                <path d="M 290 220 Q 400 135 480 162" stroke="rgba(249, 115, 22, 0.35)" stroke-width="3" stroke-dasharray="6 4" class="animated-flight-dash" />
-                <path d="M 290 220 Q 400 135 480 162" stroke="#f97316" stroke-width="1.6" stroke-dasharray="6 4" />
-                <!-- London to Kyiv -->
-                <path d="M 480 162 Q 515 152 548 168" stroke="rgba(249, 115, 22, 0.45)" stroke-width="3" stroke-dasharray="5 3" class="animated-flight-dash" />
-                <path d="M 480 162 Q 515 152 548 168" stroke="#fdba74" stroke-width="1.8" stroke-dasharray="5 3" />
-                <!-- Kyiv to East Asia -->
-                <path d="M 548 168 Q 660 145 775 210" stroke="rgba(249, 115, 22, 0.35)" stroke-width="2.5" stroke-dasharray="6 4" class="animated-flight-dash" />
-                <path d="M 548 168 Q 660 145 775 210" stroke="#ea580c" stroke-width="1.3" stroke-dasharray="6 4" />
+              <g class="trajectory-flight-arcs">
+                <path d="M 290 220 Q 410 130 540 143" fill="none" stroke="rgba(249, 115, 22, 0.45)" stroke-width="3" stroke-dasharray="6 4" class="animated-flight-dash" />
+                <path d="M 290 220 Q 410 130 540 143" fill="none" stroke="#f97316" stroke-width="1.6" stroke-dasharray="6 4" />
+                <path d="M 540 143 Q 660 120 780 185" fill="none" stroke="rgba(249, 115, 22, 0.4)" stroke-width="2.5" stroke-dasharray="5 4" />
+                <path d="M 540 143 Q 660 120 780 185" fill="none" stroke="#ea580c" stroke-width="1.2" stroke-dasharray="5 4" />
               </g>
             ` : ''}
 
-            <!-- 8. SECONDARY METALLIC NETWORK NODE PINS -->
-            <!-- London Pin -->
-            <g class="vtr-node-pin" transform="translate(480, 162) scale(0.65)" filter="url(#vtrPinShadow)">
-              <ellipse cx="0" cy="18" rx="6" ry="2.5" fill="rgba(0,0,0,0.7)"/>
-              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#vtrPinStem)"/>
-              <circle cx="0" cy="0" r="10" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1"/>
-              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-            </g>
-            <!-- US Pin -->
-            <g class="vtr-node-pin" transform="translate(290, 220) scale(0.65)" filter="url(#vtrPinShadow)">
-              <ellipse cx="0" cy="18" rx="6" ry="2.5" fill="rgba(0,0,0,0.7)"/>
-              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#vtrPinStem)"/>
-              <circle cx="0" cy="0" r="10" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1"/>
-              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
-            </g>
-            <!-- East Asia Pin -->
-            <g class="vtr-node-pin" transform="translate(775, 210) scale(0.65)" filter="url(#vtrPinShadow)">
-              <ellipse cx="0" cy="18" rx="6" ry="2.5" fill="rgba(0,0,0,0.7)"/>
-              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#vtrPinStem)"/>
-              <circle cx="0" cy="0" r="10" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1"/>
-              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8"/>
+            <!-- Secondary Metallic Network Pins -->
+            <!-- London / UK Pin -->
+            <g class="secondary-pin" transform="translate(485, 132) scale(0.65)" filter="url(#cmpPinShadow)">
+              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
+              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
             </g>
 
-            <!-- 9. GROUND IMPACT DYNAMICS AT KYIV (548, 168) -->
-            <g class="vtr-ground-impact" transform="translate(548, 168)">
-              <ellipse cx="0" cy="0" rx="38" ry="15" fill="none" stroke="${pal.pulse}" stroke-width="1.8" opacity="0.8" class="kyiv-shockwave-1"/>
-              <ellipse cx="0" cy="0" rx="68" ry="24" fill="none" stroke="${pal.pulse}" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.45" class="kyiv-shockwave-2"/>
+            <!-- US West Pin -->
+            <g class="secondary-pin" transform="translate(305, 156) scale(0.65)" filter="url(#cmpPinShadow)">
+              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
+              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            </g>
+
+            <!-- East Asia Pin -->
+            <g class="secondary-pin" transform="translate(775, 185) scale(0.65)" filter="url(#cmpPinShadow)">
+              <ellipse cx="0" cy="18" rx="7" ry="2.5" fill="rgba(0,0,0,0.6)" />
+              <path d="M 0 16 L -5 3 L 5 3 Z" fill="url(#cmpPinStem)" />
+              <circle cx="0" cy="0" r="10" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1" />
+              <circle cx="0" cy="0" r="6" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" />
+            </g>
+
+            <!-- GROUND IMPACT DYNAMICS AT KYIV -->
+            <g class="ground-impact-group" transform="translate(540, 143)">
+              <ellipse cx="0" cy="0" rx="36" ry="14" fill="none" stroke="${pal.pulse}" stroke-width="1.8" opacity="0.8" class="kyiv-shockwave-1" />
+              <ellipse cx="0" cy="0" rx="64" ry="22" fill="none" stroke="${pal.pulse}" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.45" class="kyiv-shockwave-2" />
               ${showDust ? `
-                <ellipse cx="0" cy="2" rx="46" ry="20" fill="rgba(180, 83, 9, 0.32)" filter="url(#vtrDustHaze)"/>
-                <ellipse cx="-10" cy="-2" rx="36" ry="16" fill="rgba(217, 119, 6, 0.25)" filter="url(#vtrDustHaze)"/>
+                <ellipse cx="0" cy="2" rx="42" ry="18" fill="rgba(180, 83, 9, 0.28)" filter="url(#cmpGlow)" />
+                <ellipse cx="-8" cy="-2" rx="32" ry="14" fill="rgba(217, 119, 6, 0.22)" filter="url(#cmpGlow)" />
               ` : ''}
             </g>
 
-            <!-- 10. PRIMARY 3D METALLIC PIN OBJECT AT KYIV -->
-            <g class="vtr-primary-pin" transform="translate(548, 168)" filter="url(#vtrPinShadow)">
-              <!-- Ground Contact Occlusion Shadow -->
-              <ellipse cx="14" cy="2" rx="24" ry="8" fill="rgba(0,0,0,0.92)" filter="url(#vtrGlow)"/>
+            <!-- PRIMARY 3D METALLIC PIN OBJECT AT KYIV -->
+            <g class="primary-3d-pin-object" transform="translate(540, 143)" filter="url(#cmpPinShadow)">
+              <!-- Contact Drop Shadow on Terrain -->
+              <ellipse cx="14" cy="2" rx="22" ry="8" fill="rgba(0,0,0,0.85)" filter="url(#cmpGlow)" />
 
-              <!-- 3D Tapered Conical Stem -->
-              <path d="M 0 0 L -12 -38 L 12 -38 Z" fill="url(#vtrPinStem)" stroke="rgba(0,0,0,0.4)" stroke-width="0.5"/>
-              <line x1="0" y1="0" x2="0" y2="-38" stroke="#ffedd5" stroke-width="1.2" opacity="0.8"/>
+              <!-- 3D Tapered Conical Stem touching coordinate -->
+              <path d="M 0 0 L -12 -38 L 12 -38 Z" fill="url(#cmpPinStem)" stroke="rgba(0,0,0,0.4)" stroke-width="0.5" />
+              <line x1="0" y1="0" x2="0" y2="-38" stroke="#ffedd5" stroke-width="1" opacity="0.75" />
 
-              <!-- Concentric Lathe Grooved Beveled Metallic Pin Head -->
+              <!-- Heavy Beveled Circular Metallic Pin Head with Concentric Lathe Grooves -->
               <g transform="translate(0, -56)">
-                <circle cx="0" cy="0" r="28" fill="#301005"/>
-                <circle cx="0" cy="0" r="27" fill="url(#vtrPinHead)" stroke="${pal.rim}" stroke-width="1.6"/>
-                <circle cx="0" cy="0" r="21" fill="url(#vtrPinGrooves)" stroke="rgba(0,0,0,0.35)" stroke-width="1"/>
-                <circle cx="0" cy="0" r="15" fill="url(#vtrPinHead)" stroke="rgba(254, 215, 170, 0.65)" stroke-width="0.8"/>
-                <circle cx="0" cy="0" r="8" fill="${pal.center}" stroke="${pal.rim}" stroke-width="0.8"/>
-                <!-- Specular Highlight Arc -->
-                <path d="M -18 -18 A 25 25 0 0 1 18 -18" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.8" filter="url(#vtrGlow)"/>
-                <circle cx="-7" cy="-7" r="3.2" fill="#ffffff" opacity="0.85"/>
+                <circle cx="0" cy="0" r="28" fill="#431407" />
+                <circle cx="0" cy="0" r="27" fill="url(#cmpPinHead)" stroke="${pal.rim}" stroke-width="1.5" />
+                <circle cx="0" cy="0" r="21" fill="url(#cmpPinGrooves)" stroke="rgba(0,0,0,0.35)" stroke-width="1" />
+                <circle cx="0" cy="0" r="15" fill="url(#cmpPinHead)" stroke="rgba(254, 215, 170, 0.6)" stroke-width="0.8" />
+                <circle cx="0" cy="0" r="8" fill="${pal.center}" stroke="${pal.rim}" stroke-width="0.7" />
+                <!-- Specular Gleam Arc -->
+                <path d="M -18 -18 A 25 25 0 0 1 18 -18" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.75" filter="url(#cmpGlow)" />
+                <circle cx="-7" cy="-7" r="3" fill="#ffffff" opacity="0.8" />
               </g>
             </g>
 
-            <!-- 11. HIGH-TECH DATA HUD & LEADER LINE -->
-            <g class="vtr-leader-hud" transform="translate(548, 168)">
-              <polyline points="20,-72 65,-94 75,-94" fill="none" stroke="#cbd5e1" stroke-width="1.5" opacity="0.9"/>
-              <circle cx="20" cy="-72" r="2.4" fill="${pal.stop25}" stroke="#ffffff" stroke-width="0.8"/>
+            <!-- HIGH-TECH MODULAR DATA HUD & LEADER LINE (Image 3 Precision) -->
+            <g class="kyiv-leader-line-callout" transform="translate(540, 143)">
+              <polyline points="20,-72 65,-94 75,-94" fill="none" stroke="#cbd5e1" stroke-width="1.4" opacity="0.85" />
+              <circle cx="20" cy="-72" r="2.2" fill="${pal.stop25}" stroke="#ffffff" stroke-width="0.8" />
 
-              <!-- Glassmorphic Card -->
+              <!-- High-Tech Telemetry Glassmorphic Card -->
               <g transform="translate(75, -112)">
-                <rect x="0" y="0" width="198" height="34" rx="4" fill="rgba(8, 12, 22, 0.9)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1"/>
-                <!-- Tech Corner Accent Ticks -->
-                <line x1="0" y1="0" x2="6" y2="0" stroke="${pal.stop25}" stroke-width="2"/>
-                <line x1="0" y1="0" x2="0" y2="6" stroke="${pal.stop25}" stroke-width="2"/>
-                <line x1="198" y1="34" x2="192" y2="34" stroke="${pal.stop25}" stroke-width="2"/>
-                <line x1="198" y1="34" x2="198" y2="28" stroke="${pal.stop25}" stroke-width="2"/>
+                <rect x="0" y="0" width="198" height="34" rx="4" fill="rgba(8, 12, 22, 0.88)" stroke="rgba(255, 255, 255, 0.22)" stroke-width="1" />
+                <!-- Tech Corner Ticks -->
+                <line x1="0" y1="0" x2="6" y2="0" stroke="${pal.stop25}" stroke-width="2" />
+                <line x1="0" y1="0" x2="0" y2="6" stroke="${pal.stop25}" stroke-width="2" />
+                <line x1="198" y1="34" x2="192" y2="34" stroke="${pal.stop25}" stroke-width="2" />
+                <line x1="198" y1="34" x2="198" y2="28" stroke="${pal.stop25}" stroke-width="2" />
 
                 <!-- Main Bold Coordinate Header Text -->
                 <text x="8" y="15" fill="#ffffff" font-family="'Space Grotesk', -apple-system, sans-serif" font-size="9.5" font-weight="800" letter-spacing="0.04em">
@@ -2168,9 +2086,6 @@
                 </text>
               </g>
             </g>
-
-            <!-- 12. VOLUMETRIC ATMOSPHERIC LIMB VIGNETTE -->
-            <rect width="960" height="540" fill="none" stroke="rgba(2, 6, 16, 0.85)" stroke-width="20" opacity="0.75" pointer-events="none"/>
           </svg>
 
           <!-- On-Screen Transport Controls (Bottom-Left) matching Image 3 -->
@@ -3314,15 +3229,15 @@
           root.style.setProperty('--np-dof-bg-blur', `${Math.round(data.dofBlur * 0.55)}px`);
         }
         if (data.volumetricRays !== undefined || data.rayIntensity !== undefined) {
-          const rayOp = data.volumetricRays !== false ? (data.rayIntensity !== undefined ? data.rayIntensity : 0.75) : 0;
+          const rayOp = data.volumetricRays !== false ? (data.rayIntensity !== undefined ? data.rayIntensity : 0.95) : 0;
           root.style.setProperty('--np-ray-opacity', `${rayOp}`);
         }
         if (data.warmSpotlight !== undefined || data.spotIntensity !== undefined) {
-          const spotOp = data.warmSpotlight !== false ? (data.spotIntensity !== undefined ? data.spotIntensity : 0.85) : 0;
+          const spotOp = data.warmSpotlight !== false ? (data.spotIntensity !== undefined ? data.spotIntensity : 1.4) : 0;
           root.style.setProperty('--np-spot-intensity', `${spotOp}`);
         }
         if (data.rimLight !== undefined) {
-          root.style.setProperty('--np-rim-glow', data.rimLight !== false ? 'rgba(125, 211, 252, 0.35)' : 'transparent');
+          root.style.setProperty('--np-rim-glow', data.rimLight !== false ? 'rgba(186, 230, 253, 0.55)' : 'transparent');
         }
         if (data.filmGrain !== undefined || data.filmGrainOpacity !== undefined) {
           const grainOp = data.filmGrain !== false ? (data.filmGrainOpacity !== undefined ? data.filmGrainOpacity : 0.26) : 0;
@@ -6534,18 +6449,18 @@
       const masthead = data.masthead || 'THE DAILY TIMES';
       const headline = data.headline || 'MAJOR SCANDAL\nEXPOSED';
       const dateline = data.dateline || 'MONDAY, JANUARY 15, 2024';
-      const dofBlur = data.dofBlur !== undefined ? data.dofBlur : 13;
-      const cameraPitch = data.cameraPitch !== undefined ? data.cameraPitch : 12;
-      const cameraYaw = data.cameraYaw !== undefined ? data.cameraYaw : -9;
-      const cameraRoll = data.cameraRoll !== undefined ? data.cameraRoll : 2.5;
+      const dofBlur = data.dofBlur !== undefined ? data.dofBlur : 18;
+      const cameraPitch = data.cameraPitch !== undefined ? data.cameraPitch : 10;
+      const cameraYaw = data.cameraYaw !== undefined ? data.cameraYaw : -7;
+      const cameraRoll = data.cameraRoll !== undefined ? data.cameraRoll : 2;
       const perspective = data.perspective !== undefined ? data.perspective : 1100;
       const showDogEar = data.showDogEar !== false;
-      const dogEarSize = data.dogEarSize !== undefined ? data.dogEarSize : 38;
+      const dogEarSize = data.dogEarSize !== undefined ? data.dogEarSize : 58;
       const volumetricRays = data.volumetricRays !== false;
-      const rayIntensity = data.rayIntensity !== undefined ? data.rayIntensity : 0.75;
+      const rayIntensity = data.rayIntensity !== undefined ? data.rayIntensity : 0.95;
       const rimLight = data.rimLight !== false;
       const warmSpotlight = data.warmSpotlight !== false;
-      const spotIntensity = data.spotIntensity !== undefined ? data.spotIntensity : 0.85;
+      const spotIntensity = data.spotIntensity !== undefined ? data.spotIntensity : 1.4;
       const dustMotes = data.dustMotes !== false;
       const organicDrift = data.organicDrift !== false;
       const motionBlur = data.motionBlur !== false;
@@ -6607,7 +6522,7 @@
                 <span>Shallow Depth of Field (Foreground/Background Bokeh)</span>
                 <span id="np-val-dof" style="color:#facc15;font-family:monospace;">${dofBlur}px</span>
               </div>
-              <input type="range" id="np-inp-dof" min="0" max="25" step="1" value="${dofBlur}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <input type="range" id="np-inp-dof" min="0" max="35" step="1" value="${dofBlur}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
               <div style="font-size:9px;color:#64748b;">Central newspaper remains razor sharp while peripheral clippings blur heavily.</div>
             </div>
 
@@ -6668,7 +6583,7 @@
                 <span>Corner Fold Size</span>
                 <span id="np-val-dogsize" style="color:#facc15;font-family:monospace;">${dogEarSize}px</span>
               </div>
-              <input type="range" id="np-inp-dogsize" min="20" max="55" step="1" value="${dogEarSize}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+              <input type="range" id="np-inp-dogsize" min="25" max="85" step="1" value="${dogEarSize}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
             </div>
 
             <!-- Ink Bleed & Letterpress -->
@@ -6702,7 +6617,7 @@
                 <span>Ray Shaft Intensity</span>
                 <span id="np-val-rayint" style="color:#facc15;font-family:monospace;">${Math.round(rayIntensity * 100)}%</span>
               </div>
-              <input type="range" id="np-inp-rayint" min="0" max="1" step="0.05" value="${rayIntensity}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+              <input type="range" id="np-inp-rayint" min="0" max="1.5" step="0.05" value="${rayIntensity}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
             </div>
 
             <!-- Edge Rim Lighting -->

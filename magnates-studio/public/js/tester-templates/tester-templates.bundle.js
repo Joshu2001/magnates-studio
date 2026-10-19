@@ -61,13 +61,22 @@ Error generating stack: `+s.message+`
           className: "tpl-np-camera-rig",
           children: [
             i.jsxs("div", {
+              className: "tpl-np-clipping is-bg-3",
+              children: [
+                i.jsx("div", { className: "tpl-np-paper-surface" }),
+                i.jsxs("div", { style: { padding: "16px", fontSize: "8px", color: "#2e2a24" }, children: [
+                  i.jsx("div", { style: { fontWeight: "800", fontSize: "11px" }, children: "THE CHRONICLE" }),
+                  i.jsx("div", { style: { fontWeight: "900", fontSize: "13px" }, children: "SENATE HEARINGS COMMENCE" })
+                ]})
+              ]
+            }),
+            i.jsxs("div", {
               className: "tpl-np-clipping is-bg-1",
               children: [
                 i.jsx("div", { className: "tpl-np-paper-surface" }),
-                i.jsxs("div", { style: { padding: "10px", fontSize: "5px", color: "#3a352f" }, children: [
-                  i.jsx("div", { style: { fontWeight: "800", fontSize: "6.5px" }, children: "GLOBAL GAZETTE" }),
-                  i.jsx("div", { style: { fontWeight: "900", fontSize: "8px" }, children: "INTERNAL AUDIT LEAKED" }),
-                  i.jsx("div", { style: { lineHeight: "1.3" }, children: "Discrepancies found across offshore holdings." })
+                i.jsxs("div", { style: { padding: "16px", fontSize: "8px", color: "#2e2a24" }, children: [
+                  i.jsx("div", { style: { fontWeight: "800", fontSize: "10px" }, children: "GLOBAL GAZETTE" }),
+                  i.jsx("div", { style: { fontWeight: "900", fontSize: "12px" }, children: "INTERNAL AUDIT LEAKED" })
                 ]})
               ]
             }),
@@ -75,10 +84,9 @@ Error generating stack: `+s.message+`
               className: "tpl-np-clipping is-bg-2",
               children: [
                 i.jsx("div", { className: "tpl-np-paper-surface" }),
-                i.jsxs("div", { style: { padding: "10px", fontSize: "5px", color: "#3a352f" }, children: [
-                  i.jsx("div", { style: { fontWeight: "800", fontSize: "6.5px" }, children: "FINANCIAL DISPATCH" }),
-                  i.jsx("div", { style: { fontWeight: "900", fontSize: "8px" }, children: "KEY EXECUTIVES RESIGN" }),
-                  i.jsx("div", { style: { background: "rgba(250,204,21,0.45)", padding: "2px" }, children: "CONFIDENTIAL MEMORANDUM" })
+                i.jsxs("div", { style: { padding: "16px", fontSize: "8px", color: "#2e2a24" }, children: [
+                  i.jsx("div", { style: { fontWeight: "800", fontSize: "10px" }, children: "FINANCIAL DISPATCH" }),
+                  i.jsx("div", { style: { background: "rgba(250,204,21,0.48)", padding: "3px 6px", fontWeight: "700" }, children: "CONFIDENTIAL MEMORANDUM" })
                 ]})
               ]
             }),
@@ -87,6 +95,7 @@ Error generating stack: `+s.message+`
               children: [
                 i.jsx("div", { className: "tpl-np-paper-surface" }),
                 i.jsx("div", { className: "tpl-np-crease-h" }),
+                i.jsx("div", { className: "tpl-np-crease-v" }),
                 i.jsxs("div", { className: "tpl-np-dog-ear-wrap", children: [
                   i.jsx("div", { className: "tpl-np-dog-ear-fold" }),
                   i.jsx("div", { className: "tpl-np-dog-ear-flap" })
@@ -109,7 +118,7 @@ Error generating stack: `+s.message+`
                       ]}),
                       i.jsxs("div", { className: "tpl-np-col", style: { position: "relative" }, children: [
                         i.jsx("div", { children: "Federal investigators have seized encrypted backups. Multiple subpoenas were issued this morning." }),
-                        i.jsx("div", { className: "tpl-np-highlight-stroke", style: { top: "18px", left: "-2px", height: "13px" } })
+                        i.jsx("div", { className: "tpl-np-highlight-stroke", style: { top: "26px", left: "-2px", height: "19px" } })
                       ]})
                     ]})
                   ]
@@ -117,13 +126,23 @@ Error generating stack: `+s.message+`
               ]
             }),
             i.jsxs("div", {
-              className: "tpl-np-clipping is-foreground",
+              className: "tpl-np-clipping is-fg-left",
               children: [
                 i.jsx("div", { className: "tpl-np-paper-surface" }),
-                i.jsxs("div", { style: { padding: "18px 20px", fontSize: "7px", color: "#22201d", lineHeight: "1.35" }, children: [
-                  i.jsx("div", { style: { fontWeight: "900", fontSize: "13px", textTransform: "uppercase", marginBottom: "3px" }, children: "THE DAILY TIMES" }),
-                  i.jsxs("div", { style: { fontWeight: "900", fontSize: "18px", textTransform: "uppercase", lineHeight: "1.05" }, children: ["MAJOR SCANDAL", i.jsx("br", {}), "EXPOSED"] }),
-                  i.jsx("div", { style: { borderTop: "1px solid #333", paddingTop: "5px", fontSize: "6px" }, children: "MONDAY, JANUARY 15, 2024" })
+                i.jsxs("div", { style: { padding: "26px 28px", fontSize: "10px", color: "#1a1714", lineHeight: "1.35" }, children: [
+                  i.jsx("div", { style: { fontWeight: "900", fontSize: "18px", textTransform: "uppercase", marginBottom: "5px" }, children: "THE DAILY TIMES" }),
+                  i.jsxs("div", { style: { fontWeight: "900", fontSize: "26px", textTransform: "uppercase", lineHeight: "1.05" }, children: ["MAJOR SCANDAL", i.jsx("br", {}), "EXPOSED"] }),
+                  i.jsx("div", { style: { borderTop: "1.5px solid #222", paddingTop: "6px", fontSize: "8.5px" }, children: "MONDAY, JANUARY 15, 2024" })
+                ]})
+              ]
+            }),
+            i.jsxs("div", {
+              className: "tpl-np-clipping is-fg-right",
+              children: [
+                i.jsx("div", { className: "tpl-np-paper-surface" }),
+                i.jsxs("div", { style: { padding: "24px 26px", fontSize: "10px", color: "#1a1714", lineHeight: "1.35" }, children: [
+                  i.jsx("div", { style: { fontWeight: "900", fontSize: "16px", textTransform: "uppercase", marginBottom: "4px" }, children: "THE DAILY TIMES" }),
+                  i.jsxs("div", { style: { fontWeight: "900", fontSize: "24px", textTransform: "uppercase", lineHeight: "1.05" }, children: ["MAJOR SCANDAL", i.jsx("br", {}), "EXPOSED"] })
                 ]})
               ]
             })

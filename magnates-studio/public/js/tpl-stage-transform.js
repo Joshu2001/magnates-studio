@@ -97,7 +97,7 @@
     const mapCtxData = (tplId === 'map' && typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : null;
     const isMapInteractive3D = !!(mapCtxData && (mapCtxData.is3DMode || mapCtxData.drawOnScreenMode));
     const isDom3DHandOrbit = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode && ['zoom', 'parallax', 'textbehind', 'docheight'].includes(tplId));
-    const isBypassStageTransform = isMapInteractive3D || tplId === 'empire-timeline' || tplId === 'headline-fly' || tplId === 'newspaper-3d' || tplId === 'screen-blur' || isDom3DHandOrbit;
+    const isBypassStageTransform = isMapInteractive3D || tplId === 'map-pin-drop' || tplId === 'map' || tplId === 'empire-timeline' || tplId === 'headline-fly' || tplId === 'newspaper-3d' || tplId === 'screen-blur' || isDom3DHandOrbit;
     if (isBypassStageTransform) {
       box.style.display = 'none';
       toolbar.style.display = 'none';

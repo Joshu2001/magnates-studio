@@ -26468,71 +26468,71 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const masthead = npData.masthead || 'THE DAILY TIMES';
       const headline = npData.headline || 'MAJOR SCANDAL\nEXPOSED';
       const dateline = npData.dateline || 'MONDAY, JANUARY 15, 2024';
-      const dofBlur = npData.dofBlur !== undefined ? npData.dofBlur : 13;
-      const cameraPitch = npData.cameraPitch !== undefined ? npData.cameraPitch : 12;
-      const cameraYaw = npData.cameraYaw !== undefined ? npData.cameraYaw : -9;
-      const cameraRoll = npData.cameraRoll !== undefined ? npData.cameraRoll : 2.5;
+      const dofBlur = npData.dofBlur !== undefined ? npData.dofBlur : 18;
+      const cameraPitch = npData.cameraPitch !== undefined ? npData.cameraPitch : 10;
+      const cameraYaw = npData.cameraYaw !== undefined ? npData.cameraYaw : -7;
+      const cameraRoll = npData.cameraRoll !== undefined ? npData.cameraRoll : 2;
       const perspective = npData.perspective !== undefined ? npData.perspective : 1100;
       const showDogEar = npData.showDogEar !== false;
-      const dogEarSize = npData.dogEarSize !== undefined ? npData.dogEarSize : 38;
+      const dogEarSize = npData.dogEarSize !== undefined ? npData.dogEarSize : 58;
       const volumetricRays = npData.volumetricRays !== false;
-      const rayIntensity = npData.rayIntensity !== undefined ? npData.rayIntensity : 0.75;
+      const rayIntensity = npData.rayIntensity !== undefined ? npData.rayIntensity : 0.95;
       const rimLight = npData.rimLight !== false;
       const warmSpotlight = npData.warmSpotlight !== false;
-      const spotIntensity = npData.spotIntensity !== undefined ? npData.spotIntensity : 0.85;
+      const spotIntensity = npData.spotIntensity !== undefined ? npData.spotIntensity : 1.4;
       const dustMotes = npData.dustMotes !== false;
       const organicDrift = npData.organicDrift !== false;
       const motionBlur = npData.motionBlur !== false;
       const filmGrain = npData.filmGrain !== false;
-      const filmGrainOpacity = npData.filmGrainOpacity !== undefined ? npData.filmGrainOpacity : 0.26;
+      const filmGrainOpacity = npData.filmGrainOpacity !== undefined ? npData.filmGrainOpacity : 0.24;
       const inkBleed = npData.inkBleed !== false;
 
-      // Dust motes HTML generator
+      // Suspended Golden Dust Particles & Embers (32 motes across 3D depth)
       let dustHtml = '';
       if (dustMotes) {
-        const motesCount = 18;
+        const motesCount = 32;
         for (let i = 0; i < motesCount; i++) {
-          const top = Math.round(10 + Math.random() * 80);
-          const left = Math.round(5 + Math.random() * 90);
-          const delay = (Math.random() * 6).toFixed(1);
-          const dur = (5 + Math.random() * 5).toFixed(1);
-          const sz = (2 + Math.random() * 2.5).toFixed(1);
+          const top = Math.round(5 + Math.random() * 88);
+          const left = Math.round(4 + Math.random() * 92);
+          const delay = (Math.random() * 7).toFixed(1);
+          const dur = (4.5 + Math.random() * 6).toFixed(1);
+          const sz = (2.2 + Math.random() * 3.2).toFixed(1);
           dustHtml += `<div class="tpl-np-dust-mote" style="top:${top}%;left:${left}%;width:${sz}px;height:${sz}px;animation-delay:${delay}s;animation-duration:${dur}s;"></div>`;
         }
       }
 
-      // Generate columns content based on style preset
+      // Multi-column body text scaled for 1.8x hero box
       let heroColumnsHtml = '';
       if (stylePreset === 'victorian') {
         // Image 3 inspired: Victorian Gazette with woodcut ruins and vintage ads
         heroColumnsHtml = `
-          <div style="display: flex; gap: 7px; flex: 1; overflow: hidden; margin-top: 4px;">
-            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 4px; font-size: 5px; line-height: 1.35; color: #3b2f21;">
-              <div style="width: 100%; height: 60px; background: #cbb493; border: 1px solid #73593b; overflow: hidden; position: relative;">
-                <svg viewBox="0 0 120 70" width="100%" height="100%" style="opacity: 0.85;">
+          <div style="display: flex; gap: 12px; flex: 1; overflow: hidden; margin-top: 6px;">
+            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 6px; font-size: 8.5px; line-height: 1.38; color: #2e2417;">
+              <div style="width: 100%; height: 110px; background: #cbb493; border: 1.5px solid #6b5133; overflow: hidden; position: relative;">
+                <svg viewBox="0 0 120 70" width="100%" height="100%" style="opacity: 0.9;">
                   <path d="M0,50 Q30,25 60,35 T120,45 L120,70 L0,70 Z" fill="#695138"/>
                   <path d="M15,50 Q45,20 75,30 T120,40 L120,70 L15,70 Z" fill="#523e2b"/>
                   <rect x="25" y="28" width="12" height="18" fill="#3b2b1d"/>
                   <rect x="42" y="22" width="16" height="24" fill="#3b2b1d"/>
                   <rect x="64" y="26" width="14" height="20" fill="#3b2b1d"/>
-                  <circle cx="85" cy="18" r="8" fill="#fef08a" opacity="0.4"/>
+                  <circle cx="85" cy="18" r="8" fill="#fef08a" opacity="0.45"/>
                 </svg>
-                <div style="position: absolute; bottom: 2px; left: 4px; font-size: 4px; font-family: monospace; color: #fdf6e2; background: rgba(0,0,0,0.6); padding: 1px 3px;">ANCIENT RUINS CITADEL</div>
+                <div style="position: absolute; bottom: 3px; left: 6px; font-size: 7px; font-family: monospace; color: #fdf6e2; background: rgba(0,0,0,0.65); padding: 1px 4px; font-weight: 700;">ANCIENT RUINS CITADEL</div>
               </div>
               <div style="text-align: justify;"><span class="tpl-np-dropcap" style="font-family:'Cinzel',serif;">L</span>ost city expedition led by Royal Geographic Society reports massive megalithic architecture situated along Andean mountain ridges. Extensive terrace agricultural works confirmed intact.</div>
             </div>
-            <div style="flex: 0.9; display: flex; flex-direction: column; gap: 4px; border-left: 0.8px solid #8c6f4a; padding-left: 5px; font-size: 4.8px; line-height: 1.3; color: #3b2f21;">
-              <div style="border: 0.8px solid #73593b; padding: 3px; background: rgba(0,0,0,0.03);">
-                <div style="font-weight: 800; font-size: 6px; text-align: center; font-family: 'Cinzel',serif;">LINIMENT</div>
-                <div style="font-size: 4px; text-align: center;">FOR MAN OR BEAST • 25 CENTS</div>
+            <div style="flex: 0.9; display: flex; flex-direction: column; gap: 6px; border-left: 1.2px solid #8c6f4a; padding-left: 10px; font-size: 8px; line-height: 1.32; color: #2e2417;">
+              <div style="border: 1px solid #73593b; padding: 5px; background: rgba(0,0,0,0.03);">
+                <div style="font-weight: 800; font-size: 9.5px; text-align: center; font-family: 'Cinzel',serif;">LINIMENT</div>
+                <div style="font-size: 6.5px; text-align: center;">FOR MAN OR BEAST • 25 CENTS</div>
               </div>
-              <div style="border: 0.8px solid #73593b; padding: 3px; background: rgba(0,0,0,0.03);">
-                <div style="font-weight: 800; font-size: 6px; text-align: center; font-family: 'Cinzel',serif;">REVOLVERS</div>
-                <div style="font-size: 4px; text-align: center;">$19.99 POSTPAID</div>
+              <div style="border: 1px solid #73593b; padding: 5px; background: rgba(0,0,0,0.03);">
+                <div style="font-weight: 800; font-size: 9.5px; text-align: center; font-family: 'Cinzel',serif;">REVOLVERS</div>
+                <div style="font-size: 6.5px; text-align: center;">$19.99 POSTPAID</div>
               </div>
-              <div style="border: 0.8px solid #73593b; padding: 3px; background: rgba(0,0,0,0.03);">
-                <div style="font-weight: 800; font-size: 6px; text-align: center; font-family: 'Cinzel',serif;">MASTER LUTHIERS</div>
-                <div style="font-size: 4px; text-align: center;">VIOLINS FROM $2.25</div>
+              <div style="border: 1px solid #73593b; padding: 5px; background: rgba(0,0,0,0.03);">
+                <div style="font-weight: 800; font-size: 9.5px; text-align: center; font-family: 'Cinzel',serif;">MASTER LUTHIERS</div>
+                <div style="font-size: 6.5px; text-align: center;">VIOLINS FROM $2.25</div>
               </div>
             </div>
           </div>
@@ -26540,50 +26540,50 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       } else if (stylePreset === 'jfk') {
         // Image 4 inspired: 1963 Mid-Century Historic with Halftone Photo
         heroColumnsHtml = `
-          <div style="display: flex; gap: 7px; flex: 1; overflow: hidden; margin-top: 4px;">
-            <div style="flex: 1.1; display: flex; flex-direction: column; gap: 4px; font-size: 5px; line-height: 1.35; color: #23211e;">
-              <div style="font-weight: 800; font-size: 7.5px; line-height: 1.15; font-family: Georgia, serif; border-bottom: 0.8px solid #111; padding-bottom: 2px;">LBJ Begins Presidency • Asks God's Help In Guiding Nation</div>
+          <div style="display: flex; gap: 12px; flex: 1; overflow: hidden; margin-top: 6px;">
+            <div style="flex: 1.1; display: flex; flex-direction: column; gap: 6px; font-size: 8.5px; line-height: 1.38; color: #1c1916;">
+              <div style="font-weight: 800; font-size: 12px; line-height: 1.15; font-family: Georgia, serif; border-bottom: 1.2px solid #111; padding-bottom: 3px;">LBJ Begins Presidency • Asks God's Help In Guiding Nation</div>
               <div style="text-align: justify;"><span class="tpl-np-dropcap" style="font-family: Georgia, serif;">W</span>ASHINGTON — Taking oath aboard Air Force One, President Lyndon B. Johnson called for unity as the nation entered three days of official mourning following Friday's tragedy in Dallas.</div>
-              <div style="font-weight: 800; font-size: 6px; border-top: 0.8px solid #111; padding-top: 2px; margin-top: 2px;">TV Cancels Programs</div>
+              <div style="font-weight: 800; font-size: 9px; border-top: 1px solid #111; padding-top: 3px; margin-top: 2px;">TV Cancels Programs</div>
             </div>
-            <div style="flex: 1.1; display: flex; flex-direction: column; gap: 4px;">
-              <div style="width: 100%; height: 95px; background: #c5beae; border: 1px solid #444; overflow: hidden; position: relative;">
-                <svg viewBox="0 0 100 120" width="100%" height="100%" style="opacity: 0.85;">
+            <div style="flex: 1.1; display: flex; flex-direction: column; gap: 6px;">
+              <div style="width: 100%; height: 160px; background: #c5beae; border: 1.5px solid #222; overflow: hidden; position: relative;">
+                <svg viewBox="0 0 100 120" width="100%" height="100%" style="opacity: 0.9;">
                   <defs>
-                    <pattern id="halftoneDots" width="3" height="3" patternUnits="userSpaceOnUse">
-                      <circle cx="1.5" cy="1.5" r="1.1" fill="#111"/>
+                    <pattern id="halftoneDotsOverhaul" width="3" height="3" patternUnits="userSpaceOnUse">
+                      <circle cx="1.5" cy="1.5" r="1.15" fill="#111"/>
                     </pattern>
                   </defs>
                   <rect width="100" height="120" fill="#ded7c6"/>
                   <path d="M20,120 Q50,40 80,120 Z" fill="#222"/>
-                  <ellipse cx="50" cy="50" rx="22" ry="28" fill="#999"/>
+                  <ellipse cx="50" cy="50" rx="22" ry="28" fill="#888"/>
                   <ellipse cx="50" cy="42" rx="20" ry="18" fill="#111"/>
-                  <rect width="100" height="120" fill="url(#halftoneDots)" opacity="0.45"/>
+                  <rect width="100" height="120" fill="url(#halftoneDotsOverhaul)" opacity="0.5"/>
                 </svg>
-                <div style="position: absolute; bottom: 2px; right: 4px; font-size: 4px; font-family: monospace; background: rgba(0,0,0,0.6); color: #fff; padding: 1px 3px;">ASSOCIATED PRESS WIRE</div>
+                <div style="position: absolute; bottom: 3px; right: 5px; font-size: 6px; font-family: monospace; background: rgba(0,0,0,0.65); color: #fff; padding: 1px 4px; font-weight: 700;">ASSOCIATED PRESS WIRE</div>
               </div>
-              <div style="font-size: 4.5px; color: #444; line-height: 1.25; font-style: italic;">Dallas police custody transfer scheduled under armed guard.</div>
+              <div style="font-size: 7.5px; color: #333; line-height: 1.25; font-style: italic;">Dallas police custody transfer scheduled under armed guard.</div>
             </div>
           </div>
         `;
       } else if (stylePreset === 'tribune') {
         // Image 5 inspired: Sensationalist 1930s Crime / Swindle
         heroColumnsHtml = `
-          <div style="display: flex; gap: 7px; flex: 1; overflow: hidden; margin-top: 4px;">
-            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 4px; font-size: 5px; line-height: 1.35; color: #1c1a17;">
-              <div style="font-weight: 800; font-size: 7.5px; text-transform: uppercase; font-family: Impact, sans-serif; border-bottom: 1px solid #111; padding-bottom: 2px;">Insull Fraud Case Goes To Jury Today</div>
+          <div style="display: flex; gap: 12px; flex: 1; overflow: hidden; margin-top: 6px;">
+            <div style="flex: 1.2; display: flex; flex-direction: column; gap: 6px; font-size: 8.5px; line-height: 1.38; color: #141210;">
+              <div style="font-weight: 800; font-size: 12px; text-transform: uppercase; font-family: Impact, sans-serif; border-bottom: 1.5px solid #111; padding-bottom: 3px;">Insull Fraud Case Goes To Jury Today</div>
               <div style="text-align: justify;"><span class="tpl-np-dropcap" style="font-family: 'Cinzel', serif;">S</span>tate prosecutors rested arguments after twenty-one days of financial testimony detailing utility holding company maneuvers across forty states. Over three hundred witness depositions admitted.</div>
-              <div style="position: relative; margin-top: 4px; padding: 3px 5px; background: rgba(220, 38, 38, 0.12); border-left: 2px solid #b91c1c; font-size: 4.8px; font-weight: 700; color: #991b1b;">GOONS SMASH MEAT PLANT • 4 HELD</div>
+              <div style="position: relative; margin-top: 5px; padding: 4px 6px; background: rgba(220, 38, 38, 0.12); border-left: 3px solid #b91c1c; font-size: 7.5px; font-weight: 700; color: #991b1b;">GOONS SMASH MEAT PLANT • 4 HELD</div>
             </div>
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 4px; border-left: 0.8px solid #999; padding-left: 5px;">
-              <div style="width: 100%; height: 75px; background: #cdc5b3; border: 1px solid #333; overflow: hidden; position: relative;">
-                <svg viewBox="0 0 100 80" width="100%" height="100%" style="opacity: 0.9;">
-                  <path d="M10,75 L30,30 L50,60 L70,20 L90,75 Z" stroke="#111" stroke-width="1.5" fill="none"/>
-                  <rect x="25" y="50" width="50" height="25" fill="#333" opacity="0.3"/>
-                  <text x="50" y="45" font-size="7" font-weight="900" text-anchor="middle" fill="#111">COURT EXHIBIT</text>
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; border-left: 1.2px solid #888; padding-left: 8px;">
+              <div style="width: 100%; height: 130px; background: #cdc5b3; border: 1.5px solid #222; overflow: hidden; position: relative;">
+                <svg viewBox="0 0 100 80" width="100%" height="100%" style="opacity: 0.95;">
+                  <path d="M10,75 L30,30 L50,60 L70,20 L90,75 Z" stroke="#111" stroke-width="1.8" fill="none"/>
+                  <rect x="25" y="48" width="50" height="26" fill="#222" opacity="0.35"/>
+                  <text x="50" y="42" font-size="9" font-weight="900" text-anchor="middle" fill="#111">COURT EXHIBIT</text>
                 </svg>
               </div>
-              <div style="font-size: 4.8px; line-height: 1.3; color: #333;">Federal Marshals impound ledger accounts under court injunction.</div>
+              <div style="font-size: 7.5px; line-height: 1.3; color: #222;">Federal Marshals impound ledger accounts under court injunction.</div>
             </div>
           </div>
         `;
@@ -26604,7 +26604,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               <div>Senate inquiry hearings begin tomorrow under full national broadcast coverage with witness protection.</div>
               
               <!-- Yellow Highlighter Wipe Across Critical Line -->
-              <div class="tpl-np-highlight-stroke" style="top: 18px; left: -2px; height: 13px;"></div>
+              <div class="tpl-np-highlight-stroke" style="top: 26px; left: -2px; height: 19px;"></div>
             </div>
           </div>
         `;
@@ -26620,65 +26620,79 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           --np-camera-roll: ${cameraRoll}deg;
           --np-perspective: ${perspective}px;
           --np-dof-fg-blur: ${dofBlur}px;
-          --np-dof-bg-blur: ${Math.round(dofBlur * 0.55)}px;
+          --np-dof-bg-blur: ${Math.round(dofBlur * 0.48)}px;
           --np-ray-opacity: ${volumetricRays ? rayIntensity : 0};
           --np-grain-opacity: ${filmGrain ? filmGrainOpacity : 0};
           --np-spot-intensity: ${warmSpotlight ? spotIntensity : 0};
-          --np-rim-glow: ${rimLight ? 'rgba(125, 211, 252, 0.35)' : 'none'};
+          --np-rim-glow: ${rimLight ? 'rgba(186, 230, 253, 0.55)' : 'none'};
         ">
+          <!-- Deep Void Backdrop -->
           <div class="tpl-np-backdrop"></div>
+
+          <!-- Volumetric Light Shafts (God Rays) -->
           <div class="tpl-np-godrays"></div>
+
+          <!-- Key Light: 1.4x Warm Directional Spotlight Centered on Headline -->
           <div class="tpl-np-spotlight"></div>
+
+          <!-- Moody Vignette -->
           <div class="tpl-np-vignette"></div>
+
+          <!-- 35mm Film Grain Overlay -->
           <div class="tpl-np-filmgrain"></div>
 
+          <!-- Floating Golden Dust Particles / Embers -->
           ${dustMotes ? `<div class="tpl-np-dust-container">${dustHtml}</div>` : ''}
 
+          <!-- 3D Camera Rig -->
           <div class="tpl-np-camera-rig">
-            <!-- Deep Background Paper 3 (Top Right in God Rays) -->
+            <!-- BACKGROUND PLANE (Z = -400): Archival Pages Drifting on Sine Waves -->
+            <!-- Background Archival Page 3 (Top Right in Light Beam, Z = -380) -->
             <div class="tpl-np-clipping is-bg-3">
               <div class="tpl-np-paper-surface"></div>
-              <div style="padding: 10px; font-size: 5px; color: #3a352f;">
-                <div style="font-weight: 800; font-size: 7px; margin-bottom: 2px;">THE CHRONICLE</div>
-                <div style="font-weight: 900; font-size: 9px; margin-bottom: 4px;">SENATE HEARINGS COMMENCE</div>
-                <div style="line-height: 1.3;">Special committee demands full unredacted records of transactions.</div>
+              <div style="padding: 16px; font-size: 8px; color: #2e2a24;">
+                <div style="font-weight: 800; font-size: 11px; margin-bottom: 3px; font-family: 'Cinzel', serif;">THE CHRONICLE</div>
+                <div style="font-weight: 900; font-size: 13px; margin-bottom: 5px; font-family: 'Cinzel', serif;">SENATE HEARINGS COMMENCE</div>
+                <div style="line-height: 1.35;">Special committee demands full unredacted records of transactions.</div>
               </div>
             </div>
 
-            <!-- Background Paper 1 (Top Left, Heavily Blurred) -->
+            <!-- Background Archival Page 1 (Top Left, Z = -400) -->
             <div class="tpl-np-clipping is-bg-1">
               <div class="tpl-np-paper-surface"></div>
-              <div style="padding: 10px; font-size: 5px; color: #3a352f;">
-                <div style="font-weight: 800; font-size: 6.5px; margin-bottom: 2px;">GLOBAL GAZETTE</div>
-                <div style="font-weight: 900; font-size: 8px; margin-bottom: 4px;">INTERNAL AUDIT LEAKED</div>
-                <div style="line-height: 1.3;">Discrepancies found across offshore holdings. Regulatory oversight bypassed.</div>
+              <div style="padding: 16px; font-size: 8px; color: #2e2a24;">
+                <div style="font-weight: 800; font-size: 10px; margin-bottom: 3px; font-family: 'Cinzel', serif;">GLOBAL GAZETTE</div>
+                <div style="font-weight: 900; font-size: 12px; margin-bottom: 5px; font-family: 'Cinzel', serif;">INTERNAL AUDIT LEAKED</div>
+                <div style="line-height: 1.35;">Discrepancies found across offshore holdings. Regulatory oversight bypassed.</div>
               </div>
             </div>
 
-            <!-- Background Paper 2 (Bottom Right, Highlight Marker) -->
+            <!-- Background Archival Page 2 (Bottom Right, Z = -440) -->
             <div class="tpl-np-clipping is-bg-2">
               <div class="tpl-np-paper-surface"></div>
-              <div style="padding: 10px; font-size: 5px; color: #3a352f;">
-                <div style="font-weight: 800; font-size: 6.5px; margin-bottom: 2px;">FINANCIAL DISPATCH</div>
-                <div style="font-weight: 900; font-size: 8px; margin-bottom: 4px;">KEY EXECUTIVES RESIGN</div>
-                <div style="position: relative; margin-top: 4px; padding: 2px 4px; background: rgba(250, 204, 21, 0.45); font-weight: 700;">
+              <div style="padding: 16px; font-size: 8px; color: #2e2a24;">
+                <div style="font-weight: 800; font-size: 10px; margin-bottom: 3px; font-family: 'Cinzel', serif;">FINANCIAL DISPATCH</div>
+                <div style="font-weight: 900; font-size: 12px; margin-bottom: 5px; font-family: 'Cinzel', serif;">KEY EXECUTIVES RESIGN</div>
+                <div style="position: relative; margin-top: 6px; padding: 3px 6px; background: rgba(250, 204, 21, 0.48); font-weight: 700; font-size: 7.5px;">
                   CONFIDENTIAL MEMORANDUM // SECTION 4
                 </div>
               </div>
             </div>
 
-            <!-- CENTER HERO NEWSPAPER CLIPPING (Pixel Perfect to Image 2) -->
+            <!-- FOCUS PLANE (Z = 0): 1.8x PRIMARY HERO CLIPPING (~48% Frame Height) -->
             <div class="tpl-np-clipping is-hero">
               <div class="tpl-np-paper-surface"></div>
               <div class="tpl-np-crease-h"></div>
+              <div class="tpl-np-crease-v"></div>
               
-              <!-- Folded Dog-Eared Corner (Top Right) -->
+              <!-- Folded / Dog-Eared Corner (Top Right) -->
               ${showDogEar ? `
               <div class="tpl-np-dog-ear-wrap" style="width: ${dogEarSize}px; height: ${dogEarSize}px;">
                 <div class="tpl-np-dog-ear-fold" style="border-width: 0 ${dogEarSize}px ${dogEarSize}px 0;"></div>
                 <div class="tpl-np-dog-ear-flap" style="border-width: ${dogEarSize}px 0 0 ${dogEarSize}px;"></div>
               </div>` : ''}
 
+              <!-- Content with Subpixel Ink Bleed -->
               <div class="tpl-np-hero-content ${inkBleed ? 'tpl-np-ink' : ''}">
                 <div class="tpl-np-masthead">${masthead}</div>
                 <div class="tpl-np-rule-double"></div>
@@ -26688,18 +26702,32 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               </div>
             </div>
 
-            <!-- Foreground Floating Paper (Bottom Left, Dramatic Shallow DOF Blur) -->
-            <div class="tpl-np-clipping is-foreground">
+            <!-- FOREGROUND PLANE (Z = +300): HEAVILY BLURRED OUT-OF-FOCUS CUTOUTS FRAMING EDGES -->
+            <!-- Foreground Left Cutout (Z = +320, Bottom-Left Frame) -->
+            <div class="tpl-np-clipping is-fg-left">
               <div class="tpl-np-paper-surface"></div>
-              <div style="padding: 18px 20px; font-size: 7px; color: #22201d; line-height: 1.35;">
-                <div style="font-weight: 900; font-size: 13px; text-transform: uppercase; margin-bottom: 3px; font-family: 'Cinzel', serif;">
+              <div style="padding: 26px 28px; font-size: 10px; color: #1a1714; line-height: 1.35;">
+                <div style="font-weight: 900; font-size: 18px; text-transform: uppercase; margin-bottom: 5px; font-family: 'Cinzel', serif;">
                   ${masthead}
                 </div>
-                <div style="font-weight: 900; font-size: 18px; text-transform: uppercase; margin-bottom: 6px; font-family: 'Cinzel', Impact, serif; line-height: 1.05;">
+                <div style="font-weight: 900; font-size: 26px; text-transform: uppercase; margin-bottom: 8px; font-family: 'Cinzel', Impact, serif; line-height: 1.05;">
                   ${headlineFormatted}
                 </div>
-                <div style="border-top: 1px solid #333; padding-top: 5px; font-size: 6px; letter-spacing: 1px;">
+                <div style="border-top: 1.5px solid #222; padding-top: 6px; font-size: 8.5px; letter-spacing: 1.5px; font-family: monospace;">
                   ${dateline}
+                </div>
+              </div>
+            </div>
+
+            <!-- Foreground Right Cutout (Z = +310, Top-Right Frame) -->
+            <div class="tpl-np-clipping is-fg-right">
+              <div class="tpl-np-paper-surface"></div>
+              <div style="padding: 24px 26px; font-size: 10px; color: #1a1714; line-height: 1.35;">
+                <div style="font-weight: 900; font-size: 16px; text-transform: uppercase; margin-bottom: 4px; font-family: 'Cinzel', serif;">
+                  ${masthead}
+                </div>
+                <div style="font-weight: 900; font-size: 24px; text-transform: uppercase; margin-bottom: 8px; font-family: 'Cinzel', Impact, serif; line-height: 1.05;">
+                  ${headlineFormatted}
                 </div>
               </div>
             </div>
@@ -26714,13 +26742,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           const t = Math.max(0, Math.min(1, manual.t));
           const rig = root.querySelector('.tpl-np-camera-rig');
           if (rig) {
-            const curP = cameraPitch + Math.sin(t * Math.PI * 2) * 2;
-            const curY = cameraYaw + Math.cos(t * Math.PI * 2) * 2.5;
+            const curP = cameraPitch + Math.sin(t * Math.PI * 2) * 2.5;
+            const curY = cameraYaw + Math.cos(t * Math.PI * 2) * 3.0;
             rig.style.transform = `rotateX(${curP}deg) rotateY(${curY}deg) rotateZ(${cameraRoll}deg)`;
           }
         }
       }
-} else if (tplId === 'screen-blur') {
+
+    } else if (tplId === 'screen-blur') {
       const sData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('screen-blur') : {};
       const urlBar = sData.urlBar || 'https://cloud.internal/admin/api-keys';
       const windowTitle = sData.windowTitle || 'Enterprise Security Console';
