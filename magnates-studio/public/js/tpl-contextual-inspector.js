@@ -514,6 +514,24 @@
       bgMediaType: 'image'
     },
 
+    // 40E. Film Grain & Camera Overlay Suite
+    'film-grain': {
+      type: 'film-grain',
+      feedUrl: '/cinematic_footage_loop.mp4',
+      filmStyle: 'kodak35',
+      grainIntensity: 65,
+      vignetteIntensity: 60,
+      showScanlines: true,
+      showDust: true,
+      filmFlicker: true,
+      showHud: true,
+      stockName: 'KODAK 5219 // 35MM',
+      fpsText: '24.000 FPS',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'video'
+    },
+
     // 41. Fed Rate Timeline
     'fedrate': {
       type: 'fedrate',
@@ -2105,6 +2123,64 @@
       const rl = fxc.querySelector('.cctv-rec-label'); if (rl && data.recText !== undefined) rl.textContent = data.recText;
       const st = fxc.querySelector('.cctv-status-text'); if (st && data.statusText !== undefined) st.textContent = data.statusText;
       const tc = fxc.querySelector('.cctv-timecode'); if (tc && data.timecode !== undefined) tc.textContent = data.timecode;
+    } else if (tplId === 'film-grain') {
+      const root = fxc.querySelector('.tpl-film-grain');
+      if (root) {
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+        const style = data.filmStyle || 'kodak35';
+        root.className = `tpl-film-grain film-style-${style}${data.filmFlicker !== false ? ' has-flicker' : ''}${style === 'super8' ? ' has-gate-weave' : ''}`;
+        root.style.setProperty('--grain-alpha', ((data.grainIntensity !== undefined ? data.grainIntensity : 65) / 100).toFixed(2));
+        root.style.setProperty('--vignette-alpha', ((data.vignetteIntensity !== undefined ? data.vignetteIntensity : 60) / 100).toFixed(2));
+
+        const scan = root.querySelector('.film-scanlines');
+        if (scan) scan.style.display = data.showScanlines === false ? 'none' : '';
+        const dust = root.querySelector('.film-dust-overlay');
+        if (dust) dust.style.display = data.showDust === false ? 'none' : '';
+        const scratch = root.querySelector('.film-dust-scratch');
+        if (scratch) scratch.style.display = data.showDust === false ? 'none' : '';
+        const leak = root.querySelector('.film-light-leak');
+        if (leak) leak.style.display = style === 'lightleak' ? '' : 'none';
+
+        const hud = root.querySelector('.film-hud-badge');
+        if (hud) hud.style.display = data.showHud === false ? 'none' : 'flex';
+        const fps = root.querySelector('.hud-fps');
+        if (fps && data.fpsText !== undefined) fps.textContent = data.fpsText;
+        const stock = root.querySelector('.hud-stock');
+        if (stock && data.stockName !== undefined) stock.textContent = data.stockName;
+
+        const feedUrl = data.bgMediaUrl || data.feedUrl || '/cinematic_footage_loop.mp4';
+        const isVideo = data.bgMediaType === 'video' || /\.(mp4|webm|mov)(\?|$)/i.test(feedUrl);
+        let mediaEl = root.querySelector('.film-media-layer');
+        if (data.bgPreset === 'transparent') {
+          if (mediaEl) mediaEl.style.display = 'none';
+        } else {
+          if (mediaEl) mediaEl.style.display = '';
+          if (isVideo) {
+            if (!mediaEl || mediaEl.tagName !== 'VIDEO') {
+              if (mediaEl) mediaEl.remove();
+              const v = document.createElement('video');
+              v.className = 'film-media-layer';
+              v.src = feedUrl;
+              v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+              root.prepend(v);
+            } else if (mediaEl.src !== feedUrl) {
+              mediaEl.src = feedUrl;
+            }
+          } else {
+            if (!mediaEl || mediaEl.tagName === 'VIDEO') {
+              if (mediaEl) mediaEl.remove();
+              const img = document.createElement('img');
+              img.className = 'film-media-layer';
+              img.src = feedUrl;
+              root.prepend(img);
+            } else if (mediaEl.src !== feedUrl) {
+              mediaEl.src = feedUrl;
+            }
+          }
+        }
+      }
     }
   };
 
@@ -4199,6 +4275,145 @@
         };
       });
       window.tplWireUniversalBgControls('security-camera', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: FILM GRAIN & CAMERA OVERLAY SUITE (film-grain)
+    // =========================================================================
+    if (tplId === 'film-grain') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) {
+        wrapSec.style.display = 'flex';
+        const labelSec = document.getElementById('tpl-modal-label-secondary');
+        if (labelSec) labelSec.textContent = '🎬 Base Footage / Scene Asset';
+      }
+      const curStyle = data.filmStyle || 'kodak35';
+      const grainVal = data.grainIntensity !== undefined ? data.grainIntensity : 65;
+      const vigVal = data.vignetteIntensity !== undefined ? data.vignetteIntensity : 60;
+      
+      const FILM_STYLES = [
+        { id: 'kodak35', label: '🎞️ Kodak 35mm', desc: 'Warm organic grain & micro-contrast' },
+        { id: 'doc16mm', label: '🎥 16mm Doc', desc: 'High-contrast gritty documentary' },
+        { id: 'super8', label: '📼 Super 8', desc: 'Vintage warm color fade & gate weave' },
+        { id: 'vhs', label: '📹 VHS Tape', desc: 'Retro tape texture & scan lines' },
+        { id: 'silent', label: '📽️ 1920s Silent', desc: 'Sepia monochrome & high shutter flicker' },
+        { id: 'lightleak', label: '☀️ Light Leak', desc: 'Warm amber-orange lens burn' }
+      ];
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">🎬</span>
+              <span style="font-size: 11px; font-weight: 800; color: #c084fc; text-transform: uppercase; letter-spacing: 0.5px;">35MM / 16MM FILM CAMERA OVERLAY</span>
+            </div>
+            <span style="font-size: 9px; color: #a855f7; font-weight: 800; background: rgba(168,85,247,0.18); padding: 2px 6px; border-radius: 4px;">● MASTER FX</span>
+          </div>
+
+          <!-- Camera Style Profile Grid -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Film Camera Style &amp; Emulsion Profile</span>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
+              ${FILM_STYLES.map(s => {
+                const active = curStyle === s.id;
+                return `<button type="button" class="film-style-btn" data-style="${s.id}" style="padding:6px 8px;border-radius:6px;border:1px solid ${active ? '#c084fc' : 'rgba(255,255,255,0.1)'};background:${active ? 'rgba(168,85,247,0.24)' : 'rgba(0,0,0,0.4)'};color:${active ? '#ffffff' : '#cbd5e1'};font-size:10px;font-weight:700;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:1px;">
+                  <span>${s.label}</span>
+                  <span style="font-size:8px;font-weight:400;color:${active ? '#e9d5ff' : '#64748b'};">${s.desc}</span>
+                </button>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Sliders: Grain Intensity & Vignette -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+                <span>Grain Density</span>
+                <span id="film-val-grain" style="color: #c084fc;">${grainVal}%</span>
+              </div>
+              <input type="range" id="film-inp-grain" min="0" max="100" value="${grainVal}" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">
+                <span>Lens Vignette</span>
+                <span id="film-val-vig" style="color: #c084fc;">${vigVal}%</span>
+              </div>
+              <input type="range" id="film-inp-vig" min="0" max="100" value="${vigVal}" style="width: 100%; accent-color: #c084fc; height: 3px; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Checkbox Toggles -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px 0; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+            <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:#cbd5e1;cursor:pointer;">
+              <input type="checkbox" id="film-inp-scan" ${data.showScanlines !== false ? 'checked' : ''} style="accent-color:#c084fc;" />
+              TV Scanlines
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:#cbd5e1;cursor:pointer;">
+              <input type="checkbox" id="film-inp-dust" ${data.showDust !== false ? 'checked' : ''} style="accent-color:#c084fc;" />
+              Dust &amp; Scratches
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:#cbd5e1;cursor:pointer;">
+              <input type="checkbox" id="film-inp-flicker" ${data.filmFlicker !== false ? 'checked' : ''} style="accent-color:#c084fc;" />
+              Shutter Flicker
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;color:#cbd5e1;cursor:pointer;">
+              <input type="checkbox" id="film-inp-hud" ${data.showHud !== false ? 'checked' : ''} style="accent-color:#c084fc;" />
+              Telemetry HUD
+            </label>
+          </div>
+
+          <!-- Film Stock & Shutter Telemetry -->
+          <div style="display: grid; grid-template-columns: 1.3fr 0.8fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Stock Emulsion Badge</span>
+              <input type="text" id="film-inp-stock" value="${data.stockName || 'KODAK 5219 // 35MM'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 4px 7px; color: #fff; font-family: monospace; font-size: 10px; font-weight: 700;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Shutter / FPS</span>
+              <input type="text" id="film-inp-fps" value="${data.fpsText || '24.000 FPS'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 4px 7px; color: #fbbf24; font-family: monospace; font-size: 10px; font-weight: 700;" />
+            </div>
+          </div>
+
+          <!-- Studio Backdrop & Video B-Roll Picker -->
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+
+      // Wire controls
+      container.querySelectorAll('.film-style-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('film-grain', { filmStyle: btn.dataset.style });
+          window.tplRenderContextualInspector('film-grain');
+        };
+      });
+
+      const inpGrain = container.querySelector('#film-inp-grain');
+      const valGrain = container.querySelector('#film-val-grain');
+      if (inpGrain) {
+        inpGrain.oninput = (e) => {
+          if (valGrain) valGrain.textContent = `${e.target.value}%`;
+          window.tplSetContextualData('film-grain', { grainIntensity: Number(e.target.value) });
+        };
+      }
+
+      const inpVig = container.querySelector('#film-inp-vig');
+      const valVig = container.querySelector('#film-val-vig');
+      if (inpVig) {
+        inpVig.oninput = (e) => {
+          if (valVig) valVig.textContent = `${e.target.value}%`;
+          window.tplSetContextualData('film-grain', { vignetteIntensity: Number(e.target.value) });
+        };
+      }
+
+      container.querySelector('#film-inp-scan')?.addEventListener('change', e => window.tplSetContextualData('film-grain', { showScanlines: e.target.checked }));
+      container.querySelector('#film-inp-dust')?.addEventListener('change', e => window.tplSetContextualData('film-grain', { showDust: e.target.checked }));
+      container.querySelector('#film-inp-flicker')?.addEventListener('change', e => window.tplSetContextualData('film-grain', { filmFlicker: e.target.checked }));
+      container.querySelector('#film-inp-hud')?.addEventListener('change', e => window.tplSetContextualData('film-grain', { showHud: e.target.checked }));
+      container.querySelector('#film-inp-stock')?.addEventListener('input', e => window.tplSetContextualData('film-grain', { stockName: e.target.value }));
+      container.querySelector('#film-inp-fps')?.addEventListener('input', e => window.tplSetContextualData('film-grain', { fpsText: e.target.value }));
+
+      window.tplWireUniversalBgControls('film-grain', container);
       return;
     }
 
