@@ -25215,14 +25215,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:20%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:40%"></div></div><div class="candle up"><div class="wick top" style="height:25%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle up"><div class="wick top" style="height:35%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:15%"></div><div class="body" style="height:35%"></div><div class="wick bot" style="height:50%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:30%"></div></div><div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:60%"></div><div class="wick bot" style="height:10%"></div></div><div class="candle down"><div class="wick top" style="height:25%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:35%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:25%"></div></div><div class="candle up"><div class="wick top" style="height:15%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:40%"></div></div>
           </div>
         </div>`; } else if (tplId === 'balance') {
-      fxContainer.innerHTML = `<div class="tpl-balance theme-archival is-3d-interactive">
+      fxContainer.innerHTML = `<div class="tpl-balance theme-archival">
           <div class="b-film-grain"></div>
           <div class="b-spotlight"></div>
 
           <!-- 3D Interactive Mode Pill (Shows on canvas) -->
-          <div class="b-3d-mode-pill" id="b-3d-mode-pill">
+          <div class="b-3d-mode-pill" id="b-3d-mode-pill" style="display: none;">
             <span class="pill-dot"></span>
-            <span class="pill-text">3D EDIT MODE: DRAG TO TILT</span>
+            <span class="pill-text">3D MODE: DRAG TO TILT · SHIFT+DRAG TO MOVE · SCROLL TO ZOOM</span>
           </div>
 
           <div class="b-scene-3d" id="bal-scene-3d">
@@ -29340,7 +29340,7 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'empire-timeline'
+    'doc-highlighter-loupe-suite', 'empire-timeline', 'balance'
   ]);
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
@@ -29351,6 +29351,8 @@ function openTopTemplateCustomizer(tpl) {
       is3D = !!window.tplGetContextualData('map').is3DMode;
     } else if (tpl.id === 'empire-timeline' && typeof window.tplGetContextualData === 'function') {
       is3D = !!window.tplGetContextualData('empire-timeline').is3DMode;
+    } else if (tpl.id === 'balance' && typeof window.tplGetContextualData === 'function') {
+      is3D = !!window.tplGetContextualData('balance').is3DMode;
     } else if (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)) {
       is3D = true;
     }
@@ -29372,10 +29374,15 @@ function openTopTemplateCustomizer(tpl) {
       window.tplSetContextualData('empire-timeline', { is3DMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
     }
+    if (tpl.id === 'balance' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('balance', { is3DMode: false });
+      if (typeof window.tplToggleStageTheater === 'function') window.tplToggleStageTheater(false);
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('balance');
+    }
     const btn3dVid = document.getElementById('btn-3d-mode-video');
-    if (btn3dVid && tpl.id !== 'map' && tpl.id !== 'empire-timeline') btn3dVid.click();
+    if (btn3dVid && tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'balance') btn3dVid.click();
     syncPaperModeButtons();
-    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline') renderTopTemplatePreviewStage();
+    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'balance') renderTopTemplatePreviewStage();
   };
   if (paperMode3D) paperMode3D.onclick = () => {
     topCustomizerState.paperPreviewMode = '3d';
@@ -29388,10 +29395,15 @@ function openTopTemplateCustomizer(tpl) {
       window.tplSetContextualData('empire-timeline', { is3DMode: true });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
     }
+    if (tpl.id === 'balance' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('balance', { is3DMode: true });
+      if (typeof window.tplToggleStageTheater === 'function') window.tplToggleStageTheater(true);
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('balance');
+    }
     const btn3dInteractive = document.getElementById('btn-3d-mode-interactive');
-    if (btn3dInteractive && tpl.id !== 'map' && tpl.id !== 'empire-timeline') btn3dInteractive.click();
+    if (btn3dInteractive && tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'balance') btn3dInteractive.click();
     syncPaperModeButtons();
-    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline') renderTopTemplatePreviewStage();
+    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'balance') renderTopTemplatePreviewStage();
   };
   syncPaperModeButtons();
 
