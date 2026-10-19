@@ -25216,7 +25216,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>`; } else if (tplId === 'balance') {
       fxContainer.innerHTML = `<div class="tpl-balance theme-archival">
+          <div class="b-film-grain"></div>
+          <div class="b-spotlight"></div>
           <div class="b-card">
+            <!-- Official Rubber Stamp -->
+            <div class="b-rubber-stamp">
+              <div class="b-stamp-box">
+                <span class="stamp-txt-top">SEC AUDITED</span>
+                <span class="stamp-txt-main">VERIFIED</span>
+                <span class="stamp-txt-sub">GAAP 2024</span>
+              </div>
+            </div>
+
             <div class="b-header">
               <div class="b-brand-row">
                 <span class="b-seal">SEC FORM 10-K</span>
@@ -25254,10 +25265,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                   <span class="b-col-total val-assets-sub">$143.5B</span>
                 </div>
                 <div class="b-rows-list b-asset-rows">
-                  <div class="b-row active"><span class="b-lbl">Cash &amp; Equivalents</span><span class="b-dots"></span><span class="val">$29.9B</span></div>
-                  <div class="b-row"><span class="b-lbl">Marketable Securities</span><span class="b-dots"></span><span class="val">$61.5B</span></div>
-                  <div class="b-row"><span class="b-lbl">Accounts Receivable</span><span class="b-dots"></span><span class="val">$29.5B</span></div>
-                  <div class="b-row"><span class="b-lbl">Inventories &amp; Other</span><span class="b-dots"></span><span class="val">$22.6B</span></div>
+                  <div class="b-row sweep-1"><span class="b-marker-stroke"></span><span class="b-lbl">Cash &amp; Equivalents</span><span class="b-dots"></span><span class="val">$29.9B</span></div>
+                  <div class="b-row sweep-2"><span class="b-marker-stroke"></span><span class="b-lbl">Marketable Securities</span><span class="b-dots"></span><span class="val">$61.5B</span></div>
+                  <div class="b-row"><span class="b-marker-stroke"></span><span class="b-lbl">Accounts Receivable</span><span class="b-dots"></span><span class="val">$29.5B</span></div>
+                  <div class="b-row"><span class="b-marker-stroke"></span><span class="b-lbl">Inventories &amp; Other</span><span class="b-dots"></span><span class="val">$22.6B</span></div>
                 </div>
               </div>
 
@@ -25269,12 +25280,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                 </div>
                 <div class="b-rows-list b-liab-rows">
                   <div class="b-liab-rows-inner">
-                    <div class="b-row"><span class="b-lbl">Short-term Debt &amp; Payables</span><span class="b-dots"></span><span class="val">$16.2B</span></div>
-                    <div class="b-row"><span class="b-lbl">Long-term Debt Obligations</span><span class="b-dots"></span><span class="val">$65.2B</span></div>
+                    <div class="b-row"><span class="b-marker-stroke"></span><span class="b-lbl">Short-term Debt &amp; Payables</span><span class="b-dots"></span><span class="val">$16.2B</span></div>
+                    <div class="b-row"><span class="b-marker-stroke"></span><span class="b-lbl">Long-term Debt Obligations</span><span class="b-dots"></span><span class="val">$65.2B</span></div>
                   </div>
                   <div class="b-subtotal-row"><span class="b-lbl">Total Liabilities</span><span class="b-dots"></span><span class="val val-liab-calc">$81.4B</span></div>
                   <div class="b-equity-highlight">
-                    <div class="b-row b-row-equity"><span class="b-lbl">Shareholders' Equity</span><span class="b-dots"></span><span class="val val-equity-calc">$62.1B</span></div>
+                    <div class="b-row b-row-equity sweep-equity"><span class="b-marker-stroke"></span><span class="b-lbl">Shareholders' Equity</span><span class="b-dots"></span><span class="val val-equity-calc">$62.1B</span></div>
                   </div>
                 </div>
               </div>

@@ -2096,7 +2096,7 @@
         const aList = fxc.querySelector('.b-asset-rows');
         if (aList) {
           aList.innerHTML = data.assetRows.map((r, i) => `
-            <div class="b-row ${i === 0 ? 'active' : ''}"><span class="b-lbl">${r.name || ''}</span><span class="b-dots"></span><span class="val">${r.val || ''}</span></div>
+            <div class="b-row ${i === 0 ? 'sweep-1' : (i === 1 ? 'sweep-2' : '')}"><span class="b-marker-stroke"></span><span class="b-lbl">${r.name || ''}</span><span class="b-dots"></span><span class="val">${r.val || ''}</span></div>
           `).join('');
         }
       }
@@ -2104,7 +2104,7 @@
         const lList = fxc.querySelector('.b-liab-rows-inner');
         if (lList) {
           lList.innerHTML = data.liabRows.map(r => `
-            <div class="b-row"><span class="b-lbl">${r.name || ''}</span><span class="b-dots"></span><span class="val">${r.val || ''}</span></div>
+            <div class="b-row"><span class="b-marker-stroke"></span><span class="b-lbl">${r.name || ''}</span><span class="b-dots"></span><span class="val">${r.val || ''}</span></div>
           `).join('');
         }
       }
