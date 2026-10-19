@@ -2070,24 +2070,25 @@
       const lTot = data.liabilitiesTotal || data.liabilities || '$81.4B';
       const eTot = data.equityTotal || data.netWorth || '$62.1B';
 
-      const elAss = fxc.querySelector('.val-assets'); if (elAss) elAss.textContent = aTot;
-      const elAssSub = fxc.querySelector('.val-assets-sub'); if (elAssSub) elAssSub.textContent = aTot;
-      const elLiab = fxc.querySelector('.val-liab'); if (elLiab) elLiab.textContent = lTot;
-      const elLiabCalc = fxc.querySelector('.val-liab-calc'); if (elLiabCalc) elLiabCalc.textContent = lTot;
-      const elEq = fxc.querySelector('.val-equity'); if (elEq) elEq.textContent = eTot;
-      const elEqCalc = fxc.querySelector('.val-equity-calc'); if (elEqCalc) elEqCalc.textContent = eTot;
+      fxc.querySelectorAll('.val-assets').forEach(el => { el.textContent = aTot; });
+      fxc.querySelectorAll('.val-assets-sub').forEach(el => { el.textContent = aTot; });
+      fxc.querySelectorAll('.val-liab').forEach(el => { el.textContent = lTot; });
+      fxc.querySelectorAll('.val-liab-calc').forEach(el => { el.textContent = lTot; });
+      fxc.querySelectorAll('.val-equity').forEach(el => { el.textContent = eTot; });
+      fxc.querySelectorAll('.val-equity-calc').forEach(el => { el.textContent = eTot; });
+      fxc.querySelectorAll('.val-liab-equity-sum').forEach(el => { el.textContent = aTot; });
 
       // Color highlights
       if (data.assetColor) {
-        const el = fxc.querySelector('.b-eq-assets .b-eq-tag');
+        const el = fxc.querySelector('.b-hud-assets .b-hud-tag');
         if (el) el.style.color = data.assetColor;
       }
       if (data.liabColor) {
-        const el = fxc.querySelector('.b-eq-liab .b-eq-tag');
+        const el = fxc.querySelector('.b-hud-liab .b-hud-tag');
         if (el) el.style.color = data.liabColor;
       }
       if (data.equityColor) {
-        const el = fxc.querySelector('.b-eq-equity .b-eq-tag');
+        const el = fxc.querySelector('.b-hud-equity .b-hud-tag');
         if (el) el.style.color = data.equityColor;
       }
 
@@ -2096,15 +2097,27 @@
         const aList = fxc.querySelector('.b-asset-rows');
         if (aList) {
           aList.innerHTML = data.assetRows.map((r, i) => `
-            <div class="b-row ${i === 0 ? 'sweep-1' : (i === 1 ? 'sweep-2' : '')}"><span class="b-marker-stroke"></span><span class="b-lbl">${r.name || ''}</span><span class="b-dots"></span><span class="val">${r.val || ''}</span></div>
+            <div class="b-tbl-row ${i === 0 ? 'sweep-1' : (i === 1 ? 'sweep-2' : '')}">
+              <span class="b-marker-stroke"></span>
+              <span class="b-tbl-name">${r.name || ''}</span>
+              <span class="b-tbl-leader"></span>
+              <span class="b-tbl-val yr-curr val-asset-${i+1}">${r.val || ''}</span>
+              <span class="b-tbl-val yr-prev">${r.prev || r.val || ''}</span>
+            </div>
           `).join('');
         }
       }
       if (Array.isArray(data.liabRows) && data.liabRows.length > 0) {
         const lList = fxc.querySelector('.b-liab-rows-inner');
         if (lList) {
-          lList.innerHTML = data.liabRows.map(r => `
-            <div class="b-row"><span class="b-marker-stroke"></span><span class="b-lbl">${r.name || ''}</span><span class="b-dots"></span><span class="val">${r.val || ''}</span></div>
+          lList.innerHTML = data.liabRows.map((r, i) => `
+            <div class="b-tbl-row">
+              <span class="b-marker-stroke"></span>
+              <span class="b-tbl-name">${r.name || ''}</span>
+              <span class="b-tbl-leader"></span>
+              <span class="b-tbl-val yr-curr val-liab-${i+1}">${r.val || ''}</span>
+              <span class="b-tbl-val yr-prev">${r.prev || r.val || ''}</span>
+            </div>
           `).join('');
         }
       }
