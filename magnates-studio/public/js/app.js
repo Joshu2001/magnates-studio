@@ -25532,9 +25532,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       fxContainer.innerHTML = `<div class="tpl-comic">
           <div class="pow">POW!</div>
         </div>`; } else if (tplId === 'vhs') {
-      fxContainer.innerHTML = `<div class="tpl-vhs">
-          <div class="rec">REC</div>
-          <div class="vhs-text">SUMMER 89</div>
+      const vd = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('vhs') : {};
+      const vBgLayer = (typeof window.tplRenderUniversalBgLayer === 'function') ? window.tplRenderUniversalBgLayer(vd) : '<div class="tpl-universal-bg-layer"></div>';
+      const vRec = vd.recMode || 'REC ●';
+      const vTag = vd.tag || 'SUMMER 89';
+      const vFilter = vd.filter || 'vintage';
+      fxContainer.innerHTML = `<div class="tpl-vhs vhs-filter-${vFilter}">
+          ${vBgLayer}
+          <div class="rec">${vRec}</div>
+          <div class="vhs-hud-tr">PLAY &#9654;</div>
+          <div class="vhs-text">${vTag}</div>
+          <div class="vhs-hud-bl">SLP  ${vTag}</div>
         </div>`; } else if (tplId === 'progress') {
       fxContainer.innerHTML = `<div class="tpl-progress">
           <div class="prog-goal" style="font-size:13px;font-weight:700;color:#fff;">Goal Progress</div>
@@ -31568,9 +31576,33 @@ function renderTopTemplatePreviewStage() {
     `;
   }
 
-  // Attach right-click context menu listener on the preview stage
+  // Attach right-click context menu listener on the preview stage and upgrade any <img> pointing to a video URL into a playing <video>
   const innerStage = document.getElementById('customizer-stage-inner');
   if (innerStage) {
+    const primIsVid = Boolean(topCustomizerState.primaryIsVideo || (prim && /\.(mp4|webm|mov)(\?|$)/i.test(prim)));
+    const secIsVid = Boolean(topCustomizerState.secondaryIsVideo || (sec && /\.(mp4|webm|mov)(\?|$)/i.test(sec)));
+    if (primIsVid || secIsVid) {
+      innerStage.querySelectorAll('img').forEach((imgEl) => {
+        const s = imgEl.getAttribute('src') || '';
+        if ((primIsVid && s === prim) || (secIsVid && s === sec) || /\.(mp4|webm|mov)(\?|$)/i.test(s)) {
+          const vidEl = document.createElement('video');
+          if (imgEl.id) vidEl.id = imgEl.id;
+          if (imgEl.className) vidEl.className = imgEl.className;
+          vidEl.style.cssText = imgEl.style.cssText;
+          vidEl.src = s;
+          vidEl.autoplay = true;
+          vidEl.loop = true;
+          vidEl.muted = true;
+          vidEl.playsInline = true;
+          vidEl.setAttribute('autoplay', '');
+          vidEl.setAttribute('loop', '');
+          vidEl.setAttribute('muted', '');
+          vidEl.setAttribute('playsinline', '');
+          imgEl.replaceWith(vidEl);
+          vidEl.play().catch(() => {});
+        }
+      });
+    }
     innerStage.addEventListener('contextmenu', (e) => {
       e.preventDefault();
       showModalStageContextMenu(e.clientX, e.clientY);
@@ -35675,13 +35707,15 @@ function bindTopTemplateCustomizerEvents() {
     renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
-  // File Upload Handlers (Local Image Select)
+  // File Upload Handlers (Local Image / Video Select)
   document.getElementById('tpl-modal-upload-primary')?.addEventListener('change', (e) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
       const url = URL.createObjectURL(file);
+      const isVideo = file.type.startsWith('video/') || /\.(mp4|webm|mov)(\?|$)/i.test(file.name);
       topCustomizerState.originalPhotoUrl = url; // Remember genuine source photo!
       topCustomizerState.primaryUrl = url;
+      topCustomizerState.primaryIsVideo = isVideo;
       topCustomizerState.cutoutCanvas = null; // Invalidate cached cutout so new image gets processed!
       if (projectScenes && projectScenes[activeStoryboardSceneIndex]) {
         projectScenes[activeStoryboardSceneIndex].prim = url;
@@ -35692,10 +35726,15 @@ function bindTopTemplateCustomizerEvents() {
       const input = document.getElementById('tpl-modal-url-primary');
       if (input) input.value = url;
       const thumb = document.getElementById('tpl-modal-thumb-primary');
-      if (thumb) thumb.src = url;
+      if (thumb && !isVideo) thumb.src = url;
       const fnP = document.getElementById('tpl-modal-filename-primary');
       if (fnP) fnP.textContent = file.name;
-      if (topCustomizerState.bgRemoved) {
+      if (isVideo && typeof window.tplSetContextualData === 'function' && topCustomizerState.currentTpl) {
+        const curId = topCustomizerState.currentTpl.id;
+        window.tplSetContextualData(curId, { bgMediaUrl: url, feedUrl: url, bgMediaType: 'video', bgPreset: 'default' });
+        if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(curId);
+      }
+      if (topCustomizerState.bgRemoved && !isVideo) {
         showTextTimingAlert('Extracting cutout and synthesizing clean background...', 'info');
         generateCutoutCanvasForUrl(url, (c) => {
           topCustomizerState.cutoutCanvas = c;
@@ -35776,11 +35815,19 @@ function bindTopTemplateCustomizerEvents() {
         fnEl.textContent = file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name;
       }
       if (typeof window.tplSetContextualData === 'function' && topCustomizerState.currentTpl) {
-        if (topCustomizerState.currentTpl.id === 'parallax') {
-          window.tplSetContextualData('parallax', { mountainsImg: url });
-        } else if (topCustomizerState.currentTpl.id === 'film-grain') {
-          window.tplSetContextualData('film-grain', { feedUrl: url, bgMediaType: isVideo ? 'video' : 'image', bgPreset: 'default' });
-          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('film-grain');
+        const curTplId = topCustomizerState.currentTpl.id;
+        const patch = {
+          bgMediaUrl: url,
+          feedUrl: url,
+          bgMediaType: isVideo ? 'video' : 'image',
+          bgPreset: 'default'
+        };
+        if (curTplId === 'parallax' && !isVideo) {
+          patch.mountainsImg = url;
+        }
+        window.tplSetContextualData(curTplId, patch);
+        if (typeof window.tplRenderContextualInspector === 'function') {
+          window.tplRenderContextualInspector(curTplId);
         }
       }
       renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();

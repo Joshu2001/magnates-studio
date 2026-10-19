@@ -358,7 +358,11 @@
       type: 'vhs',
       tag: 'SUMMER 89',
       recMode: 'REC \u25cf',
-      filter: 'vintage'
+      filter: 'vintage',
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'video',
+      feedUrl: ''
     },
 
     // 31. Progress Bar
@@ -822,11 +826,40 @@
         const f = e.target.files && e.target.files[0];
         if (!f) return;
         const url = URL.createObjectURL(f);
-        const isVid = f.type.startsWith('video/');
-        window.tplSetContextualData(tplId, { bgMediaUrl: url, bgMediaType: isVid ? 'video' : 'image' });
+        const isVid = f.type.startsWith('video/') || /\.(mp4|webm|mov)(\?|$)/i.test(f.name);
+        if (typeof topCustomizerState !== 'undefined' && topCustomizerState) {
+          topCustomizerState.secondaryUrl = url;
+          topCustomizerState.secondaryIsVideo = isVid;
+          const thumbImg = document.getElementById('tpl-modal-thumb-secondary');
+          const thumbVid = document.getElementById('tpl-modal-thumb-secondary-video');
+          if (isVid) {
+            if (thumbImg) thumbImg.style.display = 'none';
+            if (thumbVid) { thumbVid.style.display = 'block'; thumbVid.src = url; }
+          } else {
+            if (thumbVid) thumbVid.style.display = 'none';
+            if (thumbImg) { thumbImg.style.display = 'block'; thumbImg.src = url; }
+          }
+          const fnEl = document.getElementById('tpl-modal-filename-secondary');
+          if (fnEl) fnEl.textContent = f.name.length > 22 ? f.name.substring(0, 20) + '...' : f.name;
+        }
+        window.tplSetContextualData(tplId, { bgMediaUrl: url, feedUrl: url, bgMediaType: isVid ? 'video' : 'image', bgPreset: 'default' });
         window.tplRenderContextualInspector(tplId);
       };
     }
+  };
+
+  window.tplRenderUniversalBgLayer = function(data) {
+    const preset = (data && data.bgPreset) || 'default';
+    const bgUrl = (data && (data.bgMediaUrl || data.feedUrl)) || '';
+    const isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
+    const cls = 'tpl-universal-bg-layer' + (!bgUrl && preset !== 'default' ? ` bg-preset-${preset}` : '');
+    if (bgUrl) {
+      if (isVideo) {
+        return `<div class="${cls}"><video class="tpl-universal-bg-video" src="${bgUrl}" autoplay loop muted playsinline></video></div>`;
+      }
+      return `<div class="${cls}" style="background:url('${bgUrl}') center/cover no-repeat;"></div>`;
+    }
+    return `<div class="${cls}"></div>`;
   };
 
   window.tplSyncUniversalBgStageLayer = function(rootEl, data) {
@@ -838,8 +871,24 @@
       rootEl.prepend(bgEl);
     }
     const preset = (data && data.bgPreset) || 'default';
-    const bgUrl = (data && data.bgMediaUrl) || '';
-    const isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
+    let bgUrl = (data && (data.bgMediaUrl || data.feedUrl)) || '';
+    let isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
+
+    if (!bgUrl && typeof topCustomizerState !== 'undefined' && topCustomizerState) {
+      if (topCustomizerState.secondaryIsVideo && topCustomizerState.secondaryUrl) {
+        bgUrl = topCustomizerState.secondaryUrl;
+        isVideo = true;
+      } else if (topCustomizerState.primaryIsVideo && topCustomizerState.primaryUrl) {
+        bgUrl = topCustomizerState.primaryUrl;
+        isVideo = true;
+      } else if (topCustomizerState.secondaryUrl && /^(blob:|data:)/i.test(topCustomizerState.secondaryUrl)) {
+        bgUrl = topCustomizerState.secondaryUrl;
+        isVideo = Boolean(topCustomizerState.secondaryIsVideo);
+      }
+    }
+
+    const hasActiveBg = Boolean(bgUrl || (preset && preset !== 'default'));
+    rootEl.classList.toggle('has-universal-bg', hasActiveBg);
     bgEl.className = 'tpl-universal-bg-layer' + (!bgUrl && preset !== 'default' ? ` bg-preset-${preset}` : '');
     if (bgUrl) {
       if (isVideo) {
@@ -849,7 +898,11 @@
           bgEl.innerHTML = `<video class="tpl-universal-bg-video" autoplay loop muted playsinline></video>`;
           v = bgEl.querySelector('video');
         }
-        if (v && v.src !== bgUrl) v.src = bgUrl;
+        if (v && v.getAttribute('src') !== bgUrl) {
+          v.setAttribute('src', bgUrl);
+          v.src = bgUrl;
+          v.play().catch(() => {});
+        }
       } else {
         bgEl.innerHTML = '';
         bgEl.style.background = `url("${bgUrl}") center/cover no-repeat`;
@@ -2468,6 +2521,25 @@
           }
         }
       }
+    } else if (tplId === 'vhs') {
+      const root = fxc.querySelector('.tpl-vhs');
+      if (root) {
+        const filterMode = data.filter || 'vintage';
+        root.classList.remove('vhs-filter-vintage', 'vhs-filter-glitch', 'vhs-filter-bw', 'vhs-filter-clean');
+        root.classList.add(`vhs-filter-${filterMode}`);
+        const recEl = root.querySelector('.rec');
+        if (recEl && data.recMode !== undefined) recEl.textContent = data.recMode;
+        const txtEl = root.querySelector('.vhs-text');
+        if (txtEl && data.tag !== undefined) txtEl.textContent = data.tag;
+        const blEl = root.querySelector('.vhs-hud-bl');
+        if (blEl && data.tag !== undefined) blEl.textContent = `SLP  ${data.tag}`;
+      }
+    }
+
+    // Universal Background Video / Image / Preset Stage Sync across ALL templates
+    const anyStageRoot = fxc.firstElementChild;
+    if (anyStageRoot && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+      window.tplSyncUniversalBgStageLayer(anyStageRoot, data);
     }
   };
 
