@@ -9026,13 +9026,637 @@ body.tool-slide-active {
 .tpl-wealth .w-bar.b3 { background: linear-gradient(90deg,#8a8a95,#5a5a65); animation-delay: 0.6s; }
 @keyframes wBarFill { 0%{width:0%} 30%,85%{width:var(--w,50%)} 100%{width:var(--w,50%)} }
 
-/* 5. Bloomberg Terminal */
-.tpl-bloom { background: #000; padding: 8px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 4px; font-family: 'JetBrains Mono', monospace; }
-.tpl-bloom .b-panel { background: #0a1a0f; border: 1px solid #0f2a1a; border-radius: 2px; padding: 6px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; animation: bloomFlicker 3s ease-in-out infinite; }
-.tpl-bloom .b-panel:nth-child(1){animation-delay:0s}.tpl-bloom .b-panel:nth-child(2){animation-delay:0.3s}.tpl-bloom .b-panel:nth-child(3){animation-delay:0.6s}.tpl-bloom .b-panel:nth-child(4){animation-delay:0.9s}
-.tpl-bloom .b-panel-head { font-size: 8px; color: #00d68f; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; border-bottom: 1px solid #0f2a1a; padding-bottom: 2px; display: flex; justify-content: space-between; }
-.tpl-bloom .b-row { display: flex; justify-content: space-between; font-size: 8px; color: rgba(255,255,255,0.7); }
-@keyframes bloomFlicker { 0%,100%{border-color:#0f2a1a} 50%{border-color:#00d68f;box-shadow:0 0 8px rgba(0,214,143,0.2)} }
+/* 5. Bloomberg Terminal (Authentic High-Density Professional Interface & TV Simulation) */
+.tpl-bloom {
+  background: #000000;
+  color: #ffffff;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  user-select: none;
+}
+
+.tpl-bloom * {
+  box-sizing: border-box;
+}
+
+/* Master Stage Wrapper */
+.tpl-bloom .bloom-stage-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, #080d16 0%, #020306 100%);
+}
+
+.tpl-bloom.bloom-has-motion .bloom-stage-wrap {
+  animation: bloomCameraDrift 8s ease-in-out infinite alternate;
+}
+
+@keyframes bloomCameraDrift {
+  0% { transform: scale(1.0) translateY(0); }
+  100% { transform: scale(1.03) translateY(-3px); }
+}
+
+/* ==========================================================================
+   AUTHENTIC BLOOMBERG TERMINAL SCREEN CONTENT
+   ========================================================================== */
+.bloom-terminal-content {
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  color: #ffffff;
+}
+
+/* Amber Command Bar */
+.bloom-terminal-content .b-cmd-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0d1218;
+  border-bottom: 1px solid #1f2937;
+  padding: 3px 6px;
+  font-size: 8px;
+  line-height: 1.2;
+}
+.bloom-terminal-content .b-cmd-left {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.bloom-terminal-content .b-amber-cmd {
+  background: #ff9600;
+  color: #000000;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.bloom-terminal-content .b-cmd-fn {
+  color: #94a3b8;
+  font-size: 7.5px;
+}
+.bloom-terminal-content .b-cmd-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff9600;
+  font-weight: 700;
+  font-size: 7.5px;
+}
+
+/* Real-Time Quote Bar */
+.bloom-terminal-content .b-quote-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #06090e;
+  border-bottom: 1px solid #16202c;
+  padding: 2px 6px;
+  font-size: 8px;
+  gap: 6px;
+}
+.bloom-terminal-content .b-quote-id {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 800;
+}
+.bloom-terminal-content .b-quote-ticker {
+  color: #ffffff;
+}
+.bloom-terminal-content .b-quote-price {
+  font-size: 9.5px;
+  font-weight: 800;
+}
+.bloom-terminal-content .b-quote-chg.b-up { color: #00d68f; }
+.bloom-terminal-content .b-quote-chg.b-dn { color: #ff4757; }
+.bloom-terminal-content .b-quote-spark {
+  width: 52px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+}
+.bloom-terminal-content .b-quote-spark svg {
+  width: 100%;
+  height: 100%;
+}
+.bloom-terminal-content .b-quote-metrics {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #94a3b8;
+  font-size: 7.5px;
+}
+.bloom-terminal-content .b-quote-metrics span strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Action Banner */
+.bloom-terminal-content .b-action-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ff9600;
+  color: #000000;
+  padding: 2px 6px;
+  font-weight: 800;
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+.bloom-terminal-content .b-action-banner .b-act-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bloom-terminal-content .b-action-banner .b-act-btn {
+  background: #000000;
+  color: #ff9600;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 800;
+  font-size: 7.5px;
+}
+.bloom-terminal-content .b-action-banner .b-act-title {
+  color: #000000;
+  text-transform: uppercase;
+}
+
+/* Tab Strip */
+.bloom-terminal-content .b-tab-strip {
+  display: flex;
+  align-items: center;
+  background: #111822;
+  border-bottom: 1px solid #1e293b;
+  padding: 1px 4px;
+  gap: 3px;
+  font-size: 7.5px;
+}
+.bloom-terminal-content .b-tab-strip .b-tab-item {
+  color: #94a3b8;
+  padding: 2px 5px;
+  border-radius: 2px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.bloom-terminal-content .b-tab-strip .b-tab-item.active {
+  background: #1e3a8a;
+  color: #ffffff;
+  font-weight: 800;
+  border-bottom: 2px solid #38bdf8;
+}
+.bloom-terminal-content .b-tab-right {
+  margin-left: auto;
+  color: #ff9600;
+  font-weight: 700;
+  font-size: 7px;
+}
+
+/* Main Financial Table Matrix */
+.bloom-terminal-content .b-matrix-scroll {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: #000000;
+}
+.bloom-terminal-content .b-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7.5px;
+  line-height: 1.25;
+}
+.bloom-terminal-content .b-data-table th {
+  background: #0a0f16;
+  color: #94a3b8;
+  text-align: right;
+  padding: 2px 4px;
+  font-weight: 700;
+  border-bottom: 1px solid #1f2937;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  white-space: nowrap;
+}
+.bloom-terminal-content .b-data-table th:first-child {
+  text-align: left;
+  color: #38bdf8;
+}
+.bloom-terminal-content .b-data-table td {
+  padding: 2px 4px;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid #0c1219;
+  color: #ffffff;
+}
+.bloom-terminal-content .b-data-table td:first-child {
+  text-align: left;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+.bloom-terminal-content .b-data-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+.bloom-terminal-content .b-data-table tr.hl-row {
+  background: rgba(255, 150, 0, 0.12);
+}
+.bloom-terminal-content .b-data-table tr.hl-row td {
+  color: #ff9600;
+  font-weight: 800;
+}
+.bloom-terminal-content .b-data-table tr.hl-green td {
+  color: #00d68f;
+  font-weight: 800;
+  background: rgba(0, 214, 143, 0.08);
+}
+.bloom-terminal-content .b-data-table td.pct-val {
+  color: #00e5ff;
+}
+
+/* Bottom News Ticker Wire */
+.bloom-terminal-content .b-news-footer {
+  background: #080d14;
+  border-top: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+}
+.bloom-terminal-content .b-wire-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1.5px 6px;
+  font-size: 7.5px;
+  color: #ff9600;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.bloom-terminal-content .b-wire-id {
+  font-weight: 800;
+  color: #ff9600;
+  flex-shrink: 0;
+}
+.bloom-terminal-content .b-wire-tag {
+  background: #ff9600;
+  color: #000000;
+  font-weight: 800;
+  padding: 0 3px;
+  border-radius: 2px;
+  font-size: 6.5px;
+  flex-shrink: 0;
+}
+.bloom-terminal-content .b-wire-time {
+  color: #cbd5e1;
+  font-size: 7px;
+  flex-shrink: 0;
+}
+.bloom-terminal-content .b-wire-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ff9600;
+  font-weight: 700;
+}
+.bloom-terminal-content .b-wire-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(90deg, #0d3880 0%, #0369a1 100%);
+  color: #ffffff;
+  padding: 2px 6px;
+  font-size: 7.5px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+/* CRT Scanlines Overlay */
+.bloom-crt-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+              linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+  background-size: 100% 3px, 6px 100%;
+  opacity: 0.75;
+}
+
+/* Glass Screen Glare Overlay */
+.bloom-glass-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 11;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 25%, transparent 55%, rgba(0, 0, 0, 0.4) 100%);
+}
+
+/* ==========================================================================
+   MODE 1: SINGLE BROADCAST STUDIO TV
+   ========================================================================== */
+.bloom-tv-chassis {
+  width: 90%;
+  height: 88%;
+  background: linear-gradient(145deg, #1e2633 0%, #0a0e14 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 8px 8px 16px 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85),
+              0 0 0 1px rgba(0, 0, 0, 0.9),
+              0 0 40px rgba(0, 214, 143, 0.08);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transform: perspective(1000px) rotateX(1.5deg);
+}
+
+.bloom-tv-inner-bezel {
+  flex: 1;
+  background: #000000;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid #141b24;
+  box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.9);
+}
+
+.bloom-tv-chin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 0 8px;
+}
+.bloom-tv-brand {
+  font-size: 6.5px;
+  letter-spacing: 0.18em;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+.bloom-tv-power-led {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00d68f;
+  box-shadow: 0 0 6px #00d68f;
+}
+
+/* ==========================================================================
+   MODE 2: MULTI-SCREEN VIDEO WALL (TRADING FLOOR)
+   ========================================================================== */
+.bloom-videowall-grid {
+  width: 94%;
+  height: 92%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5px;
+  padding: 6px;
+  background: #06090e;
+  border: 2px solid #1f2937;
+  border-radius: 10px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9),
+              inset 0 0 20px rgba(0, 0, 0, 0.8);
+  position: relative;
+}
+
+.bloom-vw-screen {
+  background: #000000;
+  border: 1px solid #1e293b;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.bloom-vw-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0d131a;
+  border-bottom: 1px solid #1f2a38;
+  padding: 2px 5px;
+  font-size: 7px;
+  font-weight: 700;
+}
+.bloom-vw-title {
+  color: #ff9600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.bloom-vw-live-tag {
+  background: rgba(0, 214, 143, 0.2);
+  color: #00d68f;
+  padding: 0 3px;
+  border-radius: 2px;
+  font-size: 6px;
+}
+.bloom-vw-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Candlestick Chart Window (Screen 2) */
+.bloom-chart-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #04070a;
+}
+.bloom-chart-stats {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 6px;
+  font-size: 7.5px;
+  background: #080d14;
+  border-bottom: 1px solid #151d27;
+}
+.bloom-chart-svg {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Macro Rates Window (Screen 3) */
+.bloom-rates-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7px;
+}
+.bloom-rates-table th {
+  background: #0b1017;
+  color: #64748b;
+  padding: 2px 4px;
+  text-align: right;
+  border-bottom: 1px solid #1a2330;
+}
+.bloom-rates-table th:first-child { text-align: left; }
+.bloom-rates-table td {
+  padding: 2px 4px;
+  text-align: right;
+  border-bottom: 1px solid #0d1219;
+  color: #ffffff;
+}
+.bloom-rates-table td:first-child {
+  text-align: left;
+  font-weight: 700;
+  color: #ff9600;
+}
+.bloom-rates-table td.up { color: #00d68f; }
+.bloom-rates-table td.dn { color: #ff4757; }
+
+/* Order Book Window (Screen 4) */
+.bloom-order-book {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #020406;
+}
+.bloom-depth-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5px;
+  padding: 3px;
+  flex: 1;
+}
+.bloom-depth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 6.5px;
+  position: relative;
+  height: 12px;
+  padding: 0 4px;
+}
+.bloom-depth-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  opacity: 0.25;
+}
+.bloom-depth-row.bid .bloom-depth-fill {
+  right: 0;
+  background: #00d68f;
+}
+.bloom-depth-row.ask .bloom-depth-fill {
+  left: 0;
+  background: #ff4757;
+}
+.bloom-depth-row span {
+  position: relative;
+  z-index: 2;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   MODAL PREVIEW STAGE SCALING (FULLSCREEN HIGH-DENSITY LEAP)
+   ========================================================================== */
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-cmd-bar {
+  font-size: 11.5px;
+  padding: 5px 12px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-amber-cmd {
+  padding: 2px 8px;
+  font-size: 11.5px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-cmd-fn,
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-cmd-right {
+  font-size: 11px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-quote-bar {
+  font-size: 12px;
+  padding: 5px 12px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-quote-price {
+  font-size: 15px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-quote-metrics {
+  font-size: 11px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-quote-spark {
+  width: 90px;
+  height: 20px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-action-banner {
+  font-size: 12px;
+  padding: 4px 12px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-action-banner .b-act-btn {
+  font-size: 11px;
+  padding: 2px 7px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-tab-strip {
+  font-size: 11px;
+  padding: 3px 8px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-data-table {
+  font-size: 11px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-data-table th,
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-data-table td {
+  padding: 3.5px 7px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-wire-row {
+  font-size: 11px;
+  padding: 3px 10px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-wire-tag {
+  font-size: 9.5px;
+  padding: 1px 5px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-terminal-content .b-wire-bottom {
+  font-size: 11px;
+  padding: 3px 10px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-tv-chassis {
+  padding: 12px 12px 22px 12px;
+  border-radius: 16px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-tv-brand {
+  font-size: 9px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-tv-power-led {
+  width: 6px;
+  height: 6px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-videowall-grid {
+  gap: 8px;
+  padding: 8px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-vw-header {
+  font-size: 10px;
+  padding: 4px 8px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-rates-table {
+  font-size: 10px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-rates-table th,
+#tpl-modal-preview-stage .tpl-bloom .bloom-rates-table td {
+  padding: 3px 6px;
+}
+#tpl-modal-preview-stage .tpl-bloom .bloom-depth-row {
+  font-size: 9.5px;
+  height: 18px;
+}
+
 
 /* 6. Stock Ticker Tape */
 .tpl-ticker { background: linear-gradient(180deg,#1a1a2e 0%,#0a0a15 100%); flex-direction: column; justify-content: center; gap: 12px; padding: 20px; }

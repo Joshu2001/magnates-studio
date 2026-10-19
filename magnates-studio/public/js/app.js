@@ -23270,7 +23270,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Multi-panel terminal look with flickering data. The signature aesthetic of serious market analysis.',
     tags: ['Finance', 'Bloomberg Terminal', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#000"/><g transform="translate(10, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">US EQUITIES \u25b2</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">SPX 4,582 <tspan fill="#00d68f">+0.8%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">NDX 15,942 <tspan fill="#00d68f">+1.2%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DJI 35,281 <tspan fill="#ff4757">-0.3%</tspan></text></g><g transform="translate(205, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#ff4757" font-family="monospace" font-weight="900" font-size="8.5">RATES / FX \u25bc</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">US10Y 4.32%</text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">EUR/USD 1.0842</text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DXY 105.42</text></g><g transform="translate(10, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">COMMODITIES \u25b2</text><text x="8" y="45" fill="#fff" font-family="monospace" font-size="9">GOLD 1,987.40</text><text x="8" y="65" fill="#fff" font-family="monospace" font-size="9">BRENT 82.50</text></g><g transform="translate(205, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">CRYPTO \u25b2</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">BTC $43,280 <tspan fill="#00d68f">+3.2%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">ETH $2,280 <tspan fill="#00d68f">+2.1%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">SOL $42.10 <tspan fill="#ff4757">-1.4%</tspan></text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#040608"/><rect x="0" y="0" width="400" height="15" fill="#0c1117"/><rect x="4" y="2" width="135" height="11" rx="2" fill="#ff9600"/><text x="8" y="10.5" fill="#000" font-family="monospace" font-weight="900" font-size="7.5">MCD US Equity FA &lt;GO&gt;</text><text x="394" y="10.5" fill="#ff9600" font-family="monospace" font-weight="700" font-size="7" text-anchor="end">Related Functions Menu</text><rect x="0" y="16" width="400" height="15" fill="#080c12"/><text x="6" y="27" fill="#fff" font-family="monospace" font-weight="900" font-size="8.5">MCD US</text><text x="50" y="27" fill="#ff9600" font-family="monospace" font-weight="900" font-size="9">113.56</text><text x="88" y="27" fill="#ff4757" font-family="monospace" font-weight="700" font-size="8">-1.08</text><path d="M 120 25 Q 130 20 140 28 T 155 22 T 170 26" fill="none" stroke="#ff9600" stroke-width="1.2"/><text x="180" y="27" fill="#64748b" font-family="monospace" font-size="7">B 113.55/113.56T  Vol 3.28M</text><text x="394" y="27" fill="#38bdf8" font-family="monospace" font-weight="700" font-size="7" text-anchor="end">USD</text><rect x="0" y="32" width="400" height="13" fill="#ff9600"/><text x="6" y="41.5" fill="#000" font-family="monospace" font-weight="900" font-size="8">MCD US Equity</text><rect x="80" y="33.5" width="48" height="10" rx="1.5" fill="#000"/><text x="83" y="41" fill="#ff9600" font-family="monospace" font-weight="800" font-size="6.5">96) Actions</text><rect x="132" y="33.5" width="45" height="10" rx="1.5" fill="#000"/><text x="135" y="41" fill="#ff9600" font-family="monospace" font-weight="800" font-size="6.5">97) Output</text><text x="394" y="41.5" fill="#000" font-family="monospace" font-weight="900" font-size="7.5" text-anchor="end">Financial Analysis</text><rect x="0" y="46" width="400" height="12" fill="#0f172a"/><rect x="4" y="47" width="55" height="10" rx="1.5" fill="#1e3a8a"/><text x="8" y="54.5" fill="#fff" font-family="monospace" font-weight="800" font-size="6.5">11) Adj Highlights</text><text x="68" y="54.5" fill="#64748b" font-family="monospace" font-size="6.5">1) Key Stats  2) I/S  3) B/S  4) C/F</text><rect x="0" y="59" width="400" height="11" fill="#0b1017"/><text x="6" y="67" fill="#38bdf8" font-family="monospace" font-weight="800" font-size="6.5">In Millions of USD</text><text x="175" y="67" fill="#64748b" font-family="monospace" font-weight="700" font-size="6.5" text-anchor="end">FY 2021</text><text x="220" y="67" fill="#64748b" font-family="monospace" font-weight="700" font-size="6.5" text-anchor="end">FY 2022</text><text x="265" y="67" fill="#64748b" font-family="monospace" font-weight="700" font-size="6.5" text-anchor="end">FY 2023</text><text x="310" y="67" fill="#64748b" font-family="monospace" font-weight="700" font-size="6.5" text-anchor="end">FY 2024</text><text x="355" y="67" fill="#ff9600" font-family="monospace" font-weight="800" font-size="6.5" text-anchor="end">Current/LTM</text><text x="394" y="67" fill="#38bdf8" font-family="monospace" font-weight="700" font-size="6.5" text-anchor="end">FY 2025E</text><g font-family="monospace" font-size="6.5"><text x="6" y="80" fill="#cbd5e1">Market Capitalization</text><text x="175" y="80" fill="#fff" text-anchor="end">102,477</text><text x="220" y="80" fill="#fff" text-anchor="end">88,448</text><text x="265" y="80" fill="#fff" text-anchor="end">96,098</text><text x="310" y="80" fill="#fff" text-anchor="end">90,223</text><text x="355" y="80" fill="#ff9600" font-weight="800" text-anchor="end">96,843</text><text x="394" y="80" fill="#38bdf8" text-anchor="end">104,200</text><text x="6" y="91" fill="#94a3b8">+ Total Debt</text><text x="175" y="91" fill="#fff" text-anchor="end">12,500</text><text x="220" y="91" fill="#fff" text-anchor="end">13,632</text><text x="265" y="91" fill="#fff" text-anchor="end">14,129</text><text x="310" y="91" fill="#fff" text-anchor="end">14,935</text><text x="355" y="91" fill="#ff9600" font-weight="800" text-anchor="end">26,010</text><text x="394" y="91" fill="#38bdf8" text-anchor="end">25,500</text><rect x="0" y="94" width="400" height="11" fill="rgba(255,150,0,0.1)"/><text x="6" y="102" fill="#ff9600" font-weight="800">Enterprise Value</text><text x="175" y="102" fill="#ff9600" font-weight="800" text-anchor="end">112,641</text><text x="220" y="102" fill="#ff9600" font-weight="800" text-anchor="end">99,744</text><text x="265" y="102" fill="#ff9600" font-weight="800" text-anchor="end">107,429</text><text x="310" y="102" fill="#ff9600" font-weight="800" text-anchor="end">103,081</text><text x="355" y="102" fill="#ff9600" font-weight="900" text-anchor="end">119,725</text><text x="394" y="102" fill="#ff9600" font-weight="800" text-anchor="end">126,300</text><text x="6" y="113" fill="#fff" font-weight="800">Revenue, Adj</text><text x="175" y="113" fill="#fff" font-weight="700" text-anchor="end">27,006</text><text x="220" y="113" fill="#fff" font-weight="700" text-anchor="end">27,567</text><text x="265" y="113" fill="#fff" font-weight="700" text-anchor="end">28,105</text><text x="310" y="113" fill="#fff" font-weight="700" text-anchor="end">27,441</text><text x="355" y="113" fill="#ff9600" font-weight="900" text-anchor="end">25,125</text><text x="394" y="113" fill="#38bdf8" text-anchor="end">26,200</text><text x="14" y="123" fill="#00e5ff">Growth %, YoY</text><text x="175" y="123" fill="#00d68f" text-anchor="end">+12.2%</text><text x="220" y="123" fill="#00d68f" text-anchor="end">+2.1%</text><text x="265" y="123" fill="#00d68f" text-anchor="end">+2.0%</text><text x="310" y="123" fill="#ff4757" text-anchor="end">-2.4%</text><text x="355" y="123" fill="#ff4757" text-anchor="end">-3.4%</text><text x="394" y="123" fill="#00d68f" text-anchor="end">+4.3%</text><text x="6" y="134" fill="#cbd5e1">Gross Profit, Adj</text><text x="175" y="134" fill="#fff" text-anchor="end">10,686</text><text x="220" y="134" fill="#fff" text-anchor="end">10,816</text><text x="265" y="134" fill="#fff" text-anchor="end">10,902</text><text x="310" y="134" fill="#fff" text-anchor="end">10,455</text><text x="355" y="134" fill="#ff9600" font-weight="800" text-anchor="end">9,997</text><text x="394" y="134" fill="#38bdf8" text-anchor="end">10,500</text><text x="6" y="145" fill="#ff9600" font-weight="800">EBITDA, Adj</text><text x="175" y="145" fill="#ff9600" text-anchor="end">9,940</text><text x="220" y="145" fill="#ff9600" text-anchor="end">10,101</text><text x="265" y="145" fill="#ff9600" text-anchor="end">10,349</text><text x="310" y="145" fill="#ff9600" text-anchor="end">9,593</text><text x="355" y="145" fill="#ff9600" font-weight="900" text-anchor="end">9,398</text><text x="394" y="145" fill="#ff9600" text-anchor="end">9,850</text><text x="6" y="156" fill="#cbd5e1">Net Income, Adj</text><text x="175" y="156" fill="#fff" text-anchor="end">5,500</text><text x="220" y="156" fill="#fff" text-anchor="end">5,470</text><text x="265" y="156" fill="#fff" text-anchor="end">5,585</text><text x="310" y="156" fill="#fff" text-anchor="end">4,757</text><text x="355" y="156" fill="#ff9600" font-weight="800" text-anchor="end">4,930</text><text x="394" y="156" fill="#38bdf8" text-anchor="end">5,200</text><text x="6" y="167" fill="#cbd5e1">EPS, Adj</text><text x="175" y="167" fill="#fff" text-anchor="end">5.27</text><text x="220" y="167" fill="#fff" text-anchor="end">5.37</text><text x="265" y="167" fill="#fff" text-anchor="end">5.55</text><text x="310" y="167" fill="#fff" text-anchor="end">4.82</text><text x="355" y="167" fill="#ff9600" font-weight="800" text-anchor="end">5.44</text><text x="394" y="167" fill="#38bdf8" text-anchor="end">5.82</text><rect x="0" y="170" width="400" height="11" fill="rgba(0,214,143,0.1)"/><text x="6" y="178" fill="#00d68f" font-weight="800">Free Cash Flow</text><text x="175" y="178" fill="#00d68f" font-weight="800" text-anchor="end">4,420</text><text x="220" y="178" fill="#00d68f" font-weight="800" text-anchor="end">3,916</text><text x="265" y="178" fill="#00d68f" font-weight="800" text-anchor="end">4,296</text><text x="310" y="178" fill="#00d68f" font-weight="800" text-anchor="end">4,146</text><text x="355" y="178" fill="#00d68f" font-weight="900" text-anchor="end">4,543</text><text x="394" y="178" fill="#00d68f" font-weight="800" text-anchor="end">4,950</text></g><rect x="0" y="186" width="400" height="23" fill="#080c14"/><line x1="0" y1="186" x2="400" y2="186" stroke="#1f2937" stroke-width="0.8"/><text x="6" y="196" fill="#ff9600" font-family="monospace" font-weight="800" font-size="6.5">407 BN 15:44 Google Aims to Spread Virtual Reality With $79 Headset (Correct)</text><text x="6" y="206" fill="#ff9600" font-family="monospace" font-weight="800" font-size="6.5">406 BFW 15:44 *FED REITERATES STABLE RATE GUIDANCE AS EARNINGS EXPAND</text><rect x="0" y="210" width="400" height="15" fill="#0c4a6e"/><text x="6" y="220.5" fill="#fff" font-family="monospace" font-weight="900" font-size="7">BLOOMBERG INTELLIGENCE  Timely Research Primers on Industries &amp; Companies  BIP</text></svg>`)}`
   },
   {
     id: 'ticker',
@@ -25246,12 +25246,396 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="w-row"><div class="w-name">Elon Musk</div><div class="w-bar-wrap"><div class="w-bar b2" style="--w:90%">$180B</div></div></div>
           <div class="w-row"><div class="w-name">Avg American</div><div class="w-bar-wrap"><div class="w-bar b3" style="--w:4%">$97K</div></div></div>
         </div>`; } else if (tplId === 'bloom') {
-      fxContainer.innerHTML = `<div class="tpl-bloom">
-          <div class="b-panel"><div class="b-panel-head"><span>US EQUITIES</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">SPX</span><span>4,582 <span style="color:#00d68f">+0.8%</span></span></div><div class="b-row"><span class="sym">NDX</span><span>15,942 <span style="color:#00d68f">+1.2%</span></span></div><div class="b-row"><span class="sym">DJI</span><span>35,281 <span style="color:#ff4757">-0.3%</span></span></div></div>
-          <div class="b-panel"><div class="b-panel-head"><span>RATES / FX</span><span class="dn">\u25bc</span></div><div class="b-row"><span class="sym">US10Y</span><span>4.32%</span></div><div class="b-row"><span class="sym">EUR/USD</span><span>1.0842</span></div><div class="b-row"><span class="sym">DXY</span><span>105.42</span></div></div>
-          <div class="b-panel"><div class="b-panel-head"><span>COMMODITIES</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">GOLD</span><span>1,987.40</span></div><div class="b-row"><span class="sym">BRENT</span><span>82.50</span></div></div>
-          <div class="b-panel"><div class="b-panel-head"><span>CRYPTO</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">BTC</span><span>$43,280 <span style="color:#00d68f">+3.2%</span></span></div><div class="b-row"><span class="sym">ETH</span><span>$2,280 <span style="color:#00d68f">+2.1%</span></span></div></div>
-        </div>`; } else if (tplId === 'ticker') {
+      const bData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('bloom') : {};
+      const mode = bData.displayMode || 'fullscreen';
+      const ticker = (bData.ticker || 'MCD').toUpperCase();
+      const showGlare = bData.showGlassGlare !== false;
+      const showScanlines = bData.showScanlines !== false;
+      const hasMotion = bData.cameraMotion !== false;
+      const headline = bData.headline || 'FED HOLDS RATES CONSTANT \u00b7 TECH SURGES \u00b7 GLOBAL ASSETS RALLY';
+
+      const PRESETS = {
+        'MCD': {
+          name: "McDonald's Corp",
+          price: "113.56",
+          chg: "-1.08 (-0.94%)",
+          isUp: false,
+          bidAsk: "113.55 / 113.56",
+          vol: "3,279,449",
+          val: "374.72M",
+          cols: ['FY 2021', 'FY 2022', 'FY 2023', 'FY 2024', 'FY 2025', 'Current/LTM', 'FY 2026E'],
+          rows: [
+            { name: "Market Capitalization", vals: ["102,477.1", "88,448.2", "96,098.5", "90,223.7", "107,129.4", "96,843.8", "104,200.0"], type: "stat" },
+            { name: "+ Cash & Equivalents", vals: ["2,335.7", "2,336.1", "2,798.7", "2,077.9", "7,685.5", "3,128.0", "3,400.0"], type: "sub" },
+            { name: "+ Total Debt", vals: ["12,500.4", "13,632.5", "14,129.8", "14,935.7", "24,122.1", "26,010.0", "25,500.0"], type: "sub" },
+            { name: "Enterprise Value", vals: ["112,641.8", "99,744.6", "107,429.6", "103,081.5", "123,566.0", "119,725.8", "126,300.0"], type: "hl" },
+            { name: "Revenue, Adj", vals: ["27,006.0", "27,567.0", "28,105.7", "27,441.3", "25,413.0", "25,125.3", "26,200.0"], type: "hl" },
+            { name: "  YoY Growth %", vals: ["+12.2%", "+2.1%", "+2.0%", "-2.4%", "-7.4%", "-3.4%", "+4.3%"], type: "pct" },
+            { name: "Gross Profit, Adj", vals: ["10,686.6", "10,816.3", "10,902.7", "10,455.7", "9,789.2", "9,997.3", "10,500.0"], type: "row" },
+            { name: "  Gross Margin %", vals: ["39.6%", "39.2%", "38.8%", "38.1%", "38.5%", "39.8%", "40.1%"], type: "pct" },
+            { name: "EBITDA, Adj", vals: ["9,940.8", "10,101.1", "10,349.4", "9,593.7", "8,936.3", "9,398.4", "9,850.0"], type: "hl" },
+            { name: "  EBITDA Margin %", vals: ["36.8%", "36.6%", "36.8%", "35.0%", "35.2%", "37.4%", "37.6%"], type: "pct" },
+            { name: "Net Income, Adj", vals: ["5,500.6", "5,470.0", "5,585.9", "4,757.8", "4,682.1", "4,930.0", "5,200.0"], type: "row" },
+            { name: "EPS, Adj", vals: ["5.27", "5.37", "5.55", "4.82", "4.96", "5.44", "5.82"], type: "row" },
+            { name: "Cash from Operations", vals: ["7,150.1", "6,966.1", "7,120.7", "6,730.3", "6,539.1", "6,293.6", "6,900.0"], type: "row" },
+            { name: "Free Cash Flow", vals: ["4,420.3", "3,916.9", "4,296.0", "4,146.9", "4,725.2", "4,543.9", "4,950.0"], type: "hl-green" }
+          ]
+        },
+        'AAPL': {
+          name: "Apple Inc",
+          price: "187.44",
+          chg: "+2.34 (+1.26%)",
+          isUp: true,
+          bidAsk: "187.42 / 187.45",
+          vol: "54,210,800",
+          val: "10.16B",
+          cols: ['FY 2021', 'FY 2022', 'FY 2023', 'FY 2024', 'FY 2025', 'Current/LTM', 'FY 2026E'],
+          rows: [
+            { name: "Market Capitalization", vals: ["2,410,200", "2,280,400", "2,650,900", "2,980,100", "2,890,400", "2,920,500", "3,150,000"], type: "stat" },
+            { name: "+ Cash & Equivalents", vals: ["34,940", "23,646", "29,965", "30,737", "31,850", "32,100", "35,000"], type: "sub" },
+            { name: "+ Total Debt", vals: ["124,719", "120,069", "111,088", "106,629", "101,200", "98,400", "95,000"], type: "sub" },
+            { name: "Enterprise Value", vals: ["2,499,979", "2,376,823", "2,732,023", "3,056,000", "2,959,750", "2,986,800", "3,210,000"], type: "hl" },
+            { name: "Revenue, Adj", vals: ["365,817", "394,328", "383,285", "391,035", "415,200", "422,100", "445,000"], type: "hl" },
+            { name: "  YoY Growth %", vals: ["+33.3%", "+7.8%", "-2.8%", "+2.0%", "+6.2%", "+5.8%", "+8.2%"], type: "pct" },
+            { name: "Gross Profit, Adj", vals: ["152,836", "170,782", "169,148", "180,683", "195,140", "199,400", "215,000"], type: "row" },
+            { name: "  Gross Margin %", vals: ["41.8%", "43.3%", "44.1%", "46.2%", "47.0%", "47.2%", "48.3%"], type: "pct" },
+            { name: "EBITDA, Adj", vals: ["120,233", "130,541", "125,820", "133,120", "144,800", "148,200", "160,000"], type: "hl" },
+            { name: "  EBITDA Margin %", vals: ["32.9%", "33.1%", "32.8%", "34.0%", "34.9%", "35.1%", "36.0%"], type: "pct" },
+            { name: "Net Income, Adj", vals: ["94,680", "99,803", "96,995", "101,450", "112,000", "115,200", "125,000"], type: "row" },
+            { name: "EPS, Adj", vals: ["5.61", "6.11", "6.13", "6.57", "7.34", "7.58", "8.25"], type: "row" },
+            { name: "Cash from Operations", vals: ["104,038", "122,151", "110,543", "118,250", "126,400", "129,500", "140,000"], type: "row" },
+            { name: "Free Cash Flow", vals: ["92,953", "111,443", "99,584", "108,810", "116,200", "119,000", "128,500"], type: "hl-green" }
+          ]
+        },
+        'NVDA': {
+          name: "NVIDIA Corp",
+          price: "487.90",
+          chg: "+19.30 (+4.12%)",
+          isUp: true,
+          bidAsk: "487.85 / 487.95",
+          vol: "68,490,200",
+          val: "33.42B",
+          cols: ['FY 2021', 'FY 2022', 'FY 2023', 'FY 2024', 'FY 2025', 'Current/LTM', 'FY 2026E'],
+          rows: [
+            { name: "Market Capitalization", vals: ["324,500", "735,200", "364,100", "1,220,500", "2,650,000", "2,840,000", "3,400,000"], type: "stat" },
+            { name: "+ Cash & Equivalents", vals: ["11,561", "10,908", "13,296", "25,984", "34,800", "38,500", "52,000"], type: "sub" },
+            { name: "+ Total Debt", vals: ["6,963", "10,946", "11,034", "9,706", "8,500", "8,400", "7,500"], type: "sub" },
+            { name: "Enterprise Value", vals: ["319,902", "735,238", "361,838", "1,204,222", "2,623,700", "2,809,900", "3,355,500"], type: "hl" },
+            { name: "Revenue, Adj", vals: ["16,675", "26,914", "26,974", "60,922", "126,050", "134,800", "175,000"], type: "hl" },
+            { name: "  YoY Growth %", vals: ["+52.7%", "+61.4%", "+0.2%", "+125.9%", "+106.9%", "+98.4%", "+35.2%"], type: "pct" },
+            { name: "Gross Profit, Adj", vals: ["10,557", "17,475", "15,356", "44,301", "95,800", "102,400", "136,500"], type: "row" },
+            { name: "  Gross Margin %", vals: ["63.3%", "64.9%", "56.9%", "72.7%", "76.0%", "76.0%", "78.0%"], type: "pct" },
+            { name: "EBITDA, Adj", vals: ["5,700", "11,220", "7,180", "34,480", "82,500", "88,200", "119,000"], type: "hl" },
+            { name: "  EBITDA Margin %", vals: ["34.2%", "41.7%", "26.6%", "56.6%", "65.5%", "65.4%", "68.0%"], type: "pct" },
+            { name: "Net Income, Adj", vals: ["4,332", "9,752", "4,368", "29,760", "68,200", "72,800", "98,000"], type: "row" },
+            { name: "EPS, Adj", vals: ["1.73", "3.85", "1.74", "11.93", "27.50", "29.20", "39.40"], type: "row" },
+            { name: "Cash from Operations", vals: ["5,822", "9,108", "5,641", "28,090", "64,200", "68,900", "92,000"], type: "row" },
+            { name: "Free Cash Flow", vals: ["4,694", "8,132", "3,808", "26,947", "60,800", "65,400", "87,500"], type: "hl-green" }
+          ]
+        },
+        'TSLA': {
+          name: "Tesla Inc",
+          price: "248.50",
+          chg: "+13.30 (+5.67%)",
+          isUp: true,
+          bidAsk: "248.45 / 248.55",
+          vol: "112,400,000",
+          val: "27.93B",
+          cols: ['FY 2021', 'FY 2022', 'FY 2023', 'FY 2024', 'FY 2025', 'Current/LTM', 'FY 2026E'],
+          rows: [
+            { name: "Market Capitalization", vals: ["670,200", "388,500", "789,200", "680,100", "810,000", "825,000", "950,000"], type: "stat" },
+            { name: "+ Cash & Equivalents", vals: ["17,576", "22,185", "29,094", "33,648", "36,200", "37,800", "44,000"], type: "sub" },
+            { name: "+ Total Debt", vals: ["6,833", "3,099", "5,748", "7,180", "6,500", "6,200", "5,500"], type: "sub" },
+            { name: "Enterprise Value", vals: ["659,457", "369,414", "765,854", "653,632", "780,300", "793,400", "911,500"], type: "hl" },
+            { name: "Revenue, Adj", vals: ["53,823", "81,462", "96,773", "97,850", "112,400", "116,200", "138,000"], type: "hl" },
+            { name: "  YoY Growth %", vals: ["+70.7%", "+51.4%", "+18.8%", "+1.1%", "+14.9%", "+13.8%", "+21.0%"], type: "pct" },
+            { name: "Gross Profit, Adj", vals: ["13,606", "20,853", "17,660", "18,200", "22,500", "23,600", "29,800"], type: "row" },
+            { name: "  Gross Margin %", vals: ["25.3%", "25.6%", "18.2%", "18.6%", "20.0%", "20.3%", "21.6%"], type: "pct" },
+            { name: "EBITDA, Adj", vals: ["9,598", "17,660", "14,797", "15,200", "19,800", "20,900", "26,500"], type: "hl" },
+            { name: "  EBITDA Margin %", vals: ["17.8%", "21.7%", "15.3%", "15.5%", "17.6%", "18.0%", "19.2%"], type: "pct" },
+            { name: "Net Income, Adj", vals: ["5,519", "12,583", "14,997", "9,800", "13,200", "14,100", "18,500"], type: "row" },
+            { name: "EPS, Adj", vals: ["1.63", "3.62", "4.30", "2.85", "3.80", "4.05", "5.28"], type: "row" },
+            { name: "Cash from Operations", vals: ["11,497", "14,724", "13,256", "13,900", "17,400", "18,200", "23,000"], type: "row" },
+            { name: "Free Cash Flow", vals: ["5,015", "7,566", "4,358", "4,800", "8,200", "8,900", "12,400"], type: "hl-green" }
+          ]
+        }
+      };
+
+      const preset = PRESETS[ticker] || PRESETS['MCD'];
+
+      // Build Table Matrix HTML
+      const tableHeadersHtml = `<tr>
+        <th>In Millions of USD</th>
+        ${preset.cols.map(c => `<th>${c}</th>`).join('')}
+      </tr>`;
+
+      const tableRowsHtml = preset.rows.map(r => {
+        const rowClass = r.type === 'hl' ? 'hl-row' : (r.type === 'hl-green' ? 'hl-green' : '');
+        const valTds = r.vals.map(v => {
+          const isPct = r.type === 'pct';
+          return `<td class="${isPct ? 'pct-val' : ''}">${v}</td>`;
+        }).join('');
+        return `<tr class="${rowClass}"><td>${r.name}</td>${valTds}</tr>`;
+      }).join('');
+
+      // Build Primary Terminal Screen HTML
+      const terminalScreenHtml = `
+        <div class="bloom-terminal-content">
+          <!-- Amber Command Prompt Bar -->
+          <div class="b-cmd-bar">
+            <div class="b-cmd-left">
+              <span class="b-amber-cmd">${ticker} US Equity FA &lt;GO&gt;</span>
+              <span class="b-cmd-fn">Related Functions Menu</span>
+            </div>
+            <div class="b-cmd-right">
+              <span>Message</span>
+              <span>\u2605</span>
+              <span>\u2699</span>
+            </div>
+          </div>
+
+          <!-- Real-Time Quote Header Bar -->
+          <div class="b-quote-bar">
+            <div class="b-quote-id">
+              <span class="b-quote-ticker">${ticker} US</span>
+              <span class="b-quote-price" style="color:${preset.isUp ? '#00d68f' : '#ff4757'}">${preset.price}</span>
+              <span class="b-quote-chg ${preset.isUp ? 'b-up' : 'b-dn'}">${preset.chg}</span>
+            </div>
+            <div class="b-quote-spark">
+              <svg viewBox="0 0 100 24">
+                <path d="${preset.isUp ? 'M 0 18 Q 20 14 40 16 T 70 8 T 100 3' : 'M 0 5 Q 25 12 50 10 T 75 18 T 100 22'}" fill="none" stroke="${preset.isUp ? '#00d68f' : '#ff4757'}" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="b-quote-metrics">
+              <span>B <strong>${preset.bidAsk}</strong></span>
+              <span>Vol <strong>${preset.vol}</strong></span>
+              <span>Val <strong>${preset.val}</strong></span>
+              <span style="color:#38bdf8; font-weight:800;">USD</span>
+            </div>
+          </div>
+
+          <!-- Action & Settings Amber Banner -->
+          <div class="b-action-banner">
+            <div class="b-act-left">
+              <span class="b-act-title">${ticker} US Equity</span>
+              <span class="b-act-btn">96) Actions</span>
+              <span class="b-act-btn">97) Output</span>
+              <span class="b-act-btn">98) Settings</span>
+            </div>
+            <div>Financial Analysis</div>
+          </div>
+
+          <!-- Tab Navigation Strip -->
+          <div class="b-tab-strip">
+            <div class="b-tab-item active">11) Adj Highlights</div>
+            <div class="b-tab-item">1) Key Stats</div>
+            <div class="b-tab-item">2) Income Statement</div>
+            <div class="b-tab-item">3) Balance Sheet</div>
+            <div class="b-tab-item">4) Cash Flow</div>
+            <div class="b-tab-item">9) Custom</div>
+            <div class="b-tab-right">Period: Annuals</div>
+          </div>
+
+          <!-- Main Financial Analysis Matrix Table -->
+          <div class="b-matrix-scroll">
+            <table class="b-data-table">
+              <thead>${tableHeadersHtml}</thead>
+              <tbody>${tableRowsHtml}</tbody>
+            </table>
+          </div>
+
+          <!-- Real-Time Bloomberg Wire & Intelligence Footer -->
+          <div class="b-news-footer">
+            <div class="b-wire-row">
+              <span class="b-wire-id">407</span>
+              <span class="b-wire-tag">BN</span>
+              <span class="b-wire-time">15:44</span>
+              <span class="b-wire-text">${headline}</span>
+            </div>
+            <div class="b-wire-row">
+              <span class="b-wire-id">406</span>
+              <span class="b-wire-tag">BFW</span>
+              <span class="b-wire-time">15:44</span>
+              <span class="b-wire-text">*FED REITERATES STABLE RATE GUIDANCE AS EARNINGS EXPAND: AP</span>
+            </div>
+            <div class="b-wire-bottom">
+              <span>BLOOMBERG INTELLIGENCE \u00b7 Timely Primers on Industries &amp; Companies</span>
+              <span style="color:#38bdf8; font-weight:900;">BIP &lt;GO&gt;</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Build Multi-Screen Video Wall HTML (2x2 Multi-TV Setup)
+      const multiTvWallHtml = `
+        <div class="bloom-videowall-grid">
+          <!-- Screen 1: Financial Analysis Matrix -->
+          <div class="bloom-vw-screen">
+            <div class="bloom-vw-header">
+              <span class="bloom-vw-title"><span>SCREEN 01 //</span> ${ticker} FINANCIAL MATRIX</span>
+              <span class="bloom-vw-live-tag">FA &lt;GO&gt;</span>
+            </div>
+            <div class="bloom-vw-body">
+              ${terminalScreenHtml}
+            </div>
+          </div>
+
+          <!-- Screen 2: Real-Time Candlestick Chart (GP) -->
+          <div class="bloom-vw-screen">
+            <div class="bloom-vw-header">
+              <span class="bloom-vw-title"><span>SCREEN 02 //</span> ${ticker} CANDLESTICK &amp; VOLUME</span>
+              <span class="bloom-vw-live-tag">GP &lt;GO&gt;</span>
+            </div>
+            <div class="bloom-vw-body">
+              <div class="bloom-chart-wrap">
+                <div class="bloom-chart-stats">
+                  <span style="color:#fff; font-weight:800;">${ticker} INTRADAY</span>
+                  <span style="color:${preset.isUp ? '#00d68f' : '#ff4757'}; font-weight:800;">${preset.price} (${preset.chg})</span>
+                  <span style="color:#94a3b8;">EMA 20/50/200</span>
+                </div>
+                <div class="bloom-chart-svg">
+                  <svg viewBox="0 0 300 150" style="width:100%; height:100%;">
+                    <!-- Horizontal Gridlines -->
+                    <line x1="0" y1="30" x2="300" y2="30" stroke="#151e28" stroke-width="0.8"/>
+                    <line x1="0" y1="70" x2="300" y2="70" stroke="#151e28" stroke-width="0.8"/>
+                    <line x1="0" y1="110" x2="300" y2="110" stroke="#151e28" stroke-width="0.8"/>
+                    <!-- Candlesticks -->
+                    <g transform="translate(10, 0)">
+                      <line x1="15" y1="45" x2="15" y2="95" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="9" y="55" width="12" height="30" fill="#00d68f"/>
+                      <line x1="40" y1="40" x2="40" y2="85" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="34" y="48" width="12" height="28" fill="#00d68f"/>
+                      <line x1="65" y1="35" x2="65" y2="90" stroke="#ff4757" stroke-width="1.2"/>
+                      <rect x="59" y="42" width="12" height="36" fill="#ff4757"/>
+                      <line x1="90" y1="30" x2="90" y2="80" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="84" y="38" width="12" height="32" fill="#00d68f"/>
+                      <line x1="115" y1="25" x2="115" y2="75" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="109" y="30" width="12" height="35" fill="#00d68f"/>
+                      <line x1="140" y1="20" x2="140" y2="70" stroke="#ff4757" stroke-width="1.2"/>
+                      <rect x="134" y="26" width="12" height="32" fill="#ff4757"/>
+                      <line x1="165" y1="15" x2="165" y2="65" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="159" y="20" width="12" height="36" fill="#00d68f"/>
+                      <line x1="190" y1="25" x2="190" y2="80" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="184" y="30" width="12" height="38" fill="#00d68f"/>
+                      <line x1="215" y1="20" x2="215" y2="65" stroke="#ff4757" stroke-width="1.2"/>
+                      <rect x="209" y="25" width="12" height="28" fill="#ff4757"/>
+                      <line x1="240" y1="10" x2="240" y2="55" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="234" y="15" width="12" height="32" fill="#00d68f"/>
+                      <line x1="265" y1="8" x2="265" y2="50" stroke="#00d68f" stroke-width="1.2"/>
+                      <rect x="259" y="12" width="12" height="30" fill="#00d68f"/>
+                    </g>
+                    <!-- Moving Average Curve -->
+                    <path d="M 10 90 Q 70 70 140 45 T 280 20" fill="none" stroke="#ff9600" stroke-width="1.8"/>
+                    <path d="M 10 100 Q 70 85 140 60 T 280 35" fill="none" stroke="#38bdf8" stroke-width="1.4" stroke-dasharray="3 2"/>
+                    <!-- Volume Histogram -->
+                    <g transform="translate(10, 115)">
+                      <rect x="9" y="18" width="12" height="15" fill="rgba(0,214,143,0.3)"/>
+                      <rect x="34" y="12" width="12" height="21" fill="rgba(0,214,143,0.3)"/>
+                      <rect x="59" y="8" width="12" height="25" fill="rgba(255,71,87,0.3)"/>
+                      <rect x="84" y="15" width="12" height="18" fill="rgba(0,214,143,0.3)"/>
+                      <rect x="109" y="6" width="12" height="27" fill="rgba(0,214,143,0.3)"/>
+                      <rect x="134" y="14" width="12" height="19" fill="rgba(255,71,87,0.3)"/>
+                      <rect x="159" y="4" width="12" height="29" fill="rgba(0,214,143,0.3)"/>
+                      <rect x="184" y="10" width="12" height="23" fill="rgba(0,214,143,0.3)"/>
+                      <rect x="209" y="16" width="12" height="17" fill="rgba(255,71,87,0.3)"/>
+                      <rect x="234" y="2" width="12" height="31" fill="rgba(0,214,143,0.4)"/>
+                      <rect x="259" y="5" width="12" height="28" fill="rgba(0,214,143,0.4)"/>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Screen 3: Global Macro FX, Rates & Commodities -->
+          <div class="bloom-vw-screen">
+            <div class="bloom-vw-header">
+              <span class="bloom-vw-title"><span>SCREEN 03 //</span> GLOBAL RATES &amp; MACRO FX</span>
+              <span class="bloom-vw-live-tag">WBF &lt;GO&gt;</span>
+            </div>
+            <div class="bloom-vw-body" style="padding:4px; overflow:auto;">
+              <table class="bloom-rates-table">
+                <thead>
+                  <tr><th>Security / Asset</th><th>Last Price</th><th>Net Chg</th><th>% Change</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>US 10-Yr Treasury</td><td>4.328%</td><td>+0.045</td><td class="up">+1.05%</td></tr>
+                  <tr><td>US 2-Yr Treasury</td><td>4.682%</td><td>+0.018</td><td class="up">+0.39%</td></tr>
+                  <tr><td>EUR / USD</td><td>1.0842</td><td>-0.0024</td><td class="dn">-0.22%</td></tr>
+                  <tr><td>USD / JPY</td><td>154.20</td><td>+0.420</td><td class="up">+0.27%</td></tr>
+                  <tr><td>Gold Spot ($/oz)</td><td>2,384.50</td><td>+18.40</td><td class="up">+0.78%</td></tr>
+                  <tr><td>Brent Crude ($/bbl)</td><td>84.20</td><td>-0.65</td><td class="dn">-0.77%</td></tr>
+                  <tr><td>Bitcoin (BTC)</td><td>$64,820</td><td>+2,140</td><td class="up">+3.41%</td></tr>
+                  <tr><td>Ethereum (ETH)</td><td>$3,480</td><td>+85.00</td><td class="up">+2.50%</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Screen 4: Real-time Order Depth Book Ladder -->
+          <div class="bloom-vw-screen">
+            <div class="bloom-vw-header">
+              <span class="bloom-vw-title"><span>SCREEN 04 //</span> ORDER BOOK DEPTH &amp; WIRE</span>
+              <span class="bloom-vw-live-tag">L2 &lt;GO&gt;</span>
+            </div>
+            <div class="bloom-vw-body">
+              <div class="bloom-order-book">
+                <div class="bloom-depth-bars">
+                  <div class="bloom-depth-row ask"><div class="bloom-depth-fill" style="width:75%"></div><span style="color:#ff4757">ASK 113.62</span><span>18,400</span><span>NYSE</span></div>
+                  <div class="bloom-depth-row ask"><div class="bloom-depth-fill" style="width:55%"></div><span style="color:#ff4757">ASK 113.60</span><span>12,200</span><span>ARCA</span></div>
+                  <div class="bloom-depth-row ask"><div class="bloom-depth-fill" style="width:85%"></div><span style="color:#ff4757">ASK 113.58</span><span>24,800</span><span>BATS</span></div>
+                  <div class="bloom-depth-row ask"><div class="bloom-depth-fill" style="width:40%"></div><span style="color:#ff4757">ASK 113.57</span><span>8,600</span><span>NSDQ</span></div>
+                  <div style="height:1px; background:#ff9600; margin:1px 0;"></div>
+                  <div class="bloom-depth-row bid"><div class="bloom-depth-fill" style="width:60%"></div><span style="color:#00d68f">BID 113.55</span><span>15,300</span><span>NSDQ</span></div>
+                  <div class="bloom-depth-row bid"><div class="bloom-depth-fill" style="width:90%"></div><span style="color:#00d68f">BID 113.54</span><span>28,900</span><span>BATS</span></div>
+                  <div class="bloom-depth-row bid"><div class="bloom-depth-fill" style="width:45%"></div><span style="color:#00d68f">BID 113.52</span><span>9,100</span><span>ARCA</span></div>
+                  <div class="bloom-depth-row bid"><div class="bloom-depth-fill" style="width:70%"></div><span style="color:#00d68f">BID 113.50</span><span>19,500</span><span>NYSE</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Compose Final Mode Output
+      let innerBodyHtml = '';
+      if (mode === 'single-tv') {
+        innerBodyHtml = `
+          <div class="bloom-tv-chassis">
+            <div class="bloom-tv-inner-bezel">
+              ${terminalScreenHtml}
+              ${showGlare ? '<div class="bloom-glass-glare"></div>' : ''}
+              ${showScanlines ? '<div class="bloom-crt-scanlines"></div>' : ''}
+            </div>
+            <div class="bloom-tv-chin">
+              <span class="bloom-tv-brand">BLOOMBERG PROFESSIONAL // STUDIO TV MONITOR</span>
+              <div class="bloom-tv-power-led"></div>
+            </div>
+          </div>
+        `;
+      } else if (mode === 'multi-tv') {
+        innerBodyHtml = `
+          ${multiTvWallHtml}
+          ${showGlare ? '<div class="bloom-glass-glare"></div>' : ''}
+          ${showScanlines ? '<div class="bloom-crt-scanlines"></div>' : ''}
+        `;
+      } else {
+        // Fullscreen Direct Terminal Display
+        innerBodyHtml = `
+          ${terminalScreenHtml}
+          ${showGlare ? '<div class="bloom-glass-glare"></div>' : ''}
+          ${showScanlines ? '<div class="bloom-crt-scanlines"></div>' : ''}
+        `;
+      }
+
+      fxContainer.innerHTML = `
+        <div class="tpl-bloom bloom-mode-${mode} ${hasMotion ? 'bloom-has-motion' : ''}">
+          <div class="bloom-stage-wrap">
+            ${innerBodyHtml}
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'ticker') {
       fxContainer.innerHTML = `<div class="tpl-ticker">
           <div class="t-head">LIVE MARKETS</div>
           <div class="t-track"><div class="t-strip"><div class="t-item"><span class="sym">AAPL</span><span class="price">187.44</span><span class="chg up">+2.34%</span></div><div class="t-item"><span class="sym">MSFT</span><span class="price">415.20</span><span class="chg up">+1.12%</span></div><div class="t-item"><span class="sym">GOOGL</span><span class="price">175.98</span><span class="chg dn">-0.45%</span></div><div class="t-item"><span class="sym">AMZN</span><span class="price">178.32</span><span class="chg up">+3.21%</span></div><div class="t-item"><span class="sym">TSLA</span><span class="price">248.50</span><span class="chg up">+5.67%</span></div><div class="t-item"><span class="sym">NVDA</span><span class="price">487.90</span><span class="chg up">+4.12%</span></div><div class="t-item"><span class="sym">AAPL</span><span class="price">187.44</span><span class="chg up">+2.34%</span></div><div class="t-item"><span class="sym">MSFT</span><span class="price">415.20</span><span class="chg up">+1.12%</span></div><div class="t-item"><span class="sym">GOOGL</span><span class="price">175.98</span><span class="chg dn">-0.45%</span></div><div class="t-item"><span class="sym">AMZN</span><span class="price">178.32</span><span class="chg up">+3.21%</span></div><div class="t-item"><span class="sym">TSLA</span><span class="price">248.50</span><span class="chg up">+5.67%</span></div><div class="t-item"><span class="sym">NVDA</span><span class="price">487.90</span><span class="chg up">+4.12%</span></div></div></div>
@@ -30984,6 +31368,18 @@ function renderTopTemplatePreviewStage() {
   }
   hoverBridgeActive = false;
   hoverExternalT = null;
+
+  window.tplReRenderHoverTemplate = function(targetTplId) {
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    if (!stage) return;
+    const tplId = targetTplId || (topCustomizerState && topCustomizerState.currentTpl && topCustomizerState.currentTpl.id);
+    if (!tplId) return;
+    const btpl = (topCustomizerState && topCustomizerState.currentTpl) || { id: tplId };
+    const prim = topCustomizerState ? topCustomizerState.primaryUrl : '';
+    const sec = topCustomizerState ? topCustomizerState.secondaryUrl : '';
+    const btplView = Object.assign({}, btpl, { id: tplId, defaultImage: prim || btpl.defaultImage, secondaryImage: sec || btpl.secondaryImage || btpl.defaultImage });
+    startTemplateHoverVideo(stage, btplView);
+  };
 
   const currentOpacity = (topCustomizerState.opacity !== undefined ? topCustomizerState.opacity : 100) / 100;
   const subjectFilter = topCustomizerState.bgRemoved

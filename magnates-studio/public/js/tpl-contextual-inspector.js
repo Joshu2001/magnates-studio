@@ -90,12 +90,16 @@
       curveColor: '#00d68f'
     },
 
-    // 7. Bloomberg Terminal
+    // 7. Bloomberg Terminal & TV Simulation
     'bloom': {
       type: 'bloom',
-      panelTitle: 'US EQUITIES',
-      headline: 'FED SIGNALS RATE HOLD \u00b7 TECH SURGES',
-      accentColor: '#f59e0b'
+      displayMode: 'fullscreen', // 'fullscreen', 'single-tv', 'multi-tv'
+      ticker: 'MCD',
+      headline: 'FED SIGNALS RATE HOLD \u00b7 TECH SURGES \u00b7 GLOBAL ASSETS RALLY',
+      showGlassGlare: true,
+      showScanlines: true,
+      cameraMotion: true,
+      accentColor: '#ff9600'
     },
 
     // 8. Inflation Shrink
@@ -1936,6 +1940,10 @@
           </div>
         `).join('');
       }
+    } else if (tplId === 'bloom') {
+      if (typeof window.tplReRenderHoverTemplate === 'function') {
+        window.tplReRenderHoverTemplate('bloom');
+      }
     } else if (tplId === 'map') {
       fxc.innerHTML = window.tplBuildInvestigativeGlobeHtml(data);
       if (typeof window.tplBindInteractiveMapStage === 'function') {
@@ -2804,6 +2812,135 @@
           window.tplRenderContextualInspector('wealth');
         };
       }
+      return;
+    }
+
+    // =========================================================================
+    // CASE: BLOOMBERG TERMINAL & TV SIMULATION
+    // =========================================================================
+    if (tplId === 'bloom') {
+      const mode = data.displayMode || 'fullscreen';
+      const ticker = (data.ticker || 'MCD').toUpperCase();
+      const showGlare = data.showGlassGlare !== false;
+      const showScanlines = data.showScanlines !== false;
+      const hasMotion = data.cameraMotion !== false;
+      const headline = data.headline || 'FED SIGNALS RATE HOLD \u00b7 TECH SURGES \u00b7 GLOBAL ASSETS RALLY';
+
+      container.innerHTML = `
+        <div style="background: rgba(255,150,0,0.06); border: 1px solid rgba(255,150,0,0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 14px;">\ud83d\udcfa</span>
+              <span style="font-size: 11px; font-weight: 800; color: #ff9600; text-transform: uppercase; letter-spacing: 0.5px;">Bloomberg Terminal PRO</span>
+            </div>
+            <span style="font-size: 9px; color: #000; font-weight: 800; background: #ff9600; padding: 1px 6px; border-radius: 4px;">AUTHENTIC UI</span>
+          </div>
+
+          <!-- Display & Animation Mode Switcher -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Simulation / Display Mode</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+              <button type="button" class="bloom-mode-btn ${mode === 'fullscreen' ? 'active' : ''}" data-mode="fullscreen" style="padding: 6px 4px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; border: 1px solid ${mode === 'fullscreen' ? '#ff9600' : 'rgba(255,255,255,0.1)'}; background: ${mode === 'fullscreen' ? 'rgba(255,150,0,0.2)' : 'rgba(0,0,0,0.4)'}; color: ${mode === 'fullscreen' ? '#ff9600' : '#fff'};">
+                \ud83d\udda5\ufe0f Fullscreen
+              </button>
+              <button type="button" class="bloom-mode-btn ${mode === 'single-tv' ? 'active' : ''}" data-mode="single-tv" style="padding: 6px 4px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; border: 1px solid ${mode === 'single-tv' ? '#ff9600' : 'rgba(255,255,255,0.1)'}; background: ${mode === 'single-tv' ? 'rgba(255,150,0,0.2)' : 'rgba(0,0,0,0.4)'}; color: ${mode === 'single-tv' ? '#ff9600' : '#fff'};">
+                \ud83d\udcfa Studio TV
+              </button>
+              <button type="button" class="bloom-mode-btn ${mode === 'multi-tv' ? 'active' : ''}" data-mode="multi-tv" style="padding: 6px 4px; border-radius: 6px; font-size: 10px; font-weight: 700; cursor: pointer; text-align: center; border: 1px solid ${mode === 'multi-tv' ? '#ff9600' : 'rgba(255,255,255,0.1)'}; background: ${mode === 'multi-tv' ? 'rgba(255,150,0,0.2)' : 'rgba(0,0,0,0.4)'}; color: ${mode === 'multi-tv' ? '#ff9600' : '#fff'};">
+                \ud83c\udf9b\ufe0f Video Wall
+              </button>
+            </div>
+          </div>
+
+          <!-- Company / Ticker Preset -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Financial Statement Preset</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              ${['MCD', 'AAPL', 'NVDA', 'TSLA'].map(t => `
+                <button type="button" class="bloom-ticker-btn ${ticker === t ? 'active' : ''}" data-ticker="${t}" style="flex: 1; min-width: 55px; padding: 4px 6px; border-radius: 6px; font-size: 10.5px; font-weight: 800; font-family: monospace; cursor: pointer; text-align: center; border: 1px solid ${ticker === t ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${ticker === t ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.4)'}; color: ${ticker === t ? '#38bdf8' : '#cbd5e1'};">
+                  ${t}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Headline News Ticker Text -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Live Wire Headline</span>
+            <input type="text" id="bloom-input-headline" value="${headline}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 8px; color: #ff9600; font-size: 11px; font-weight: 700; outline: none; font-family: monospace;" />
+          </div>
+
+          <!-- TV / Screen Realism Effects -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
+            <span style="font-size: 9px; font-weight: 800; color: #64748b; text-transform: uppercase;">Screen Post-Processing &amp; FX</span>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Glass Reflection &amp; Glare</span>
+              <input type="checkbox" id="bloom-chk-glare" ${showGlare ? 'checked' : ''} style="cursor: pointer; accent-color: #ff9600;" />
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">CRT Scanlines &amp; Phosphor Grid</span>
+              <input type="checkbox" id="bloom-chk-scanlines" ${showScanlines ? 'checked' : ''} style="cursor: pointer; accent-color: #ff9600;" />
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Slow Cinematic Studio Drift</span>
+              <input type="checkbox" id="bloom-chk-motion" ${hasMotion ? 'checked' : ''} style="cursor: pointer; accent-color: #ff9600;" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Wire bloom controls
+      container.querySelectorAll('.bloom-mode-btn').forEach(b => {
+        b.onclick = () => {
+          const m = b.dataset.mode;
+          window.tplSetContextualData('bloom', { displayMode: m });
+          window.tplRenderContextualInspector('bloom');
+          if (typeof window.tplReRenderHoverTemplate === 'function') window.tplReRenderHoverTemplate('bloom');
+        };
+      });
+
+      container.querySelectorAll('.bloom-ticker-btn').forEach(b => {
+        b.onclick = () => {
+          const t = b.dataset.ticker;
+          window.tplSetContextualData('bloom', { ticker: t });
+          window.tplRenderContextualInspector('bloom');
+          if (typeof window.tplReRenderHoverTemplate === 'function') window.tplReRenderHoverTemplate('bloom');
+        };
+      });
+
+      const hlInput = container.querySelector('#bloom-input-headline');
+      if (hlInput) {
+        hlInput.oninput = (e) => {
+          window.tplSetContextualData('bloom', { headline: e.target.value });
+          if (typeof window.tplReRenderHoverTemplate === 'function') window.tplReRenderHoverTemplate('bloom');
+        };
+      }
+
+      const glareChk = container.querySelector('#bloom-chk-glare');
+      if (glareChk) {
+        glareChk.onchange = (e) => {
+          window.tplSetContextualData('bloom', { showGlassGlare: e.target.checked });
+          if (typeof window.tplReRenderHoverTemplate === 'function') window.tplReRenderHoverTemplate('bloom');
+        };
+      }
+
+      const scanChk = container.querySelector('#bloom-chk-scanlines');
+      if (scanChk) {
+        scanChk.onchange = (e) => {
+          window.tplSetContextualData('bloom', { showScanlines: e.target.checked });
+          if (typeof window.tplReRenderHoverTemplate === 'function') window.tplReRenderHoverTemplate('bloom');
+        };
+      }
+
+      const motionChk = container.querySelector('#bloom-chk-motion');
+      if (motionChk) {
+        motionChk.onchange = (e) => {
+          window.tplSetContextualData('bloom', { cameraMotion: e.target.checked });
+          if (typeof window.tplReRenderHoverTemplate === 'function') window.tplReRenderHoverTemplate('bloom');
+        };
+      }
+
       return;
     }
 
