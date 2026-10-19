@@ -313,12 +313,31 @@
       retweets: '9.4K'
     },
 
-    // 23. Money Counter
+    // 23. Money Counter (Cinematic Overhaul: Lost Hatch / Magnates Media / Hollywood Tier)
     'money': {
       type: 'money',
-      amount: '$127,450',
-      label: 'NET PROFIT (Q3)',
-      color: '#10b981'
+      theme: 'catastrophe', // 'catastrophe' | 'magnates' | 'cyber' | 'minimal'
+      headerTag: 'CRITICAL AUDIT DISCLOSURE',
+      label: 'TOTAL LOSSES',
+      subLabel: 'CAPITAL DRAIN // RUNWAY EXHAUSTED',
+      amount: '$69,000,000',
+      startAmount: '$0',
+      currencySymbol: '$',
+      currencySuffix: 'USD',
+      deltaText: '-94.2%',
+      counterMode: 'odometer', // 'odometer' | 'scramble' | 'countup'
+      countDuration: 3.0,
+      easing: 'exponential', // 'exponential' | 'linear' | 'elastic'
+      scaleSize: 100,
+      enableBoom: true,
+      shakeIntensity: 8,
+      flareIntensity: 85,
+      particleType: 'cash-ember', // 'cash-ember' | 'gold-dust' | 'cyber-motes' | 'none'
+      particleDensity: 35,
+      showVignette: true,
+      showScanlines: true,
+      soundProfile: 'subbass-boom', // 'subbass-boom' | 'mechanical-ticker' | 'none'
+      color: '#ff334b'
     },
 
     // 24. Glitch Reveal
@@ -445,13 +464,15 @@
     // 32. Text Scramble / Hacker
     'scramble': {
       type: 'scramble',
-      text: 'ACCESS GRANTED',
+      layoutMode: 'chat',
+      text: 'you are a dead man',
       color: '#00ff88',
+      senderHandle: 'ANON_USER // UNTRACEABLE',
       headerTag: 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]',
       subText: 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050',
       scrambleSpeed: 'normal',
       showScanlines: true,
-      bgPreset: 'default'
+      bgPreset: 'cyber-3d-grid'
     },
 
     // 33. Newspaper Headline
@@ -877,14 +898,22 @@
     container.querySelectorAll('.ubg-preset-btn').forEach(btn => {
       btn.onclick = () => {
         const p = btn.dataset.bgPreset || 'default';
-        window.tplSetContextualData(tplId, { bgPreset: p, bgMediaUrl: '', bgMediaType: 'image' });
+        if (typeof topCustomizerState !== 'undefined' && topCustomizerState) {
+          topCustomizerState.secondaryUrl = '';
+          topCustomizerState.secondaryIsVideo = false;
+        }
+        window.tplSetContextualData(tplId, { bgPreset: p, bgMediaUrl: '', feedUrl: '', bgMediaType: 'image' });
         window.tplRenderContextualInspector(tplId);
       };
     });
     const clearBtn = container.querySelector('.ubg-clear-media');
     if (clearBtn) {
       clearBtn.onclick = () => {
-        window.tplSetContextualData(tplId, { bgMediaUrl: '', bgMediaType: 'image' });
+        if (typeof topCustomizerState !== 'undefined' && topCustomizerState) {
+          topCustomizerState.secondaryUrl = '';
+          topCustomizerState.secondaryIsVideo = false;
+        }
+        window.tplSetContextualData(tplId, { bgMediaUrl: '', feedUrl: '', bgMediaType: 'image' });
         window.tplRenderContextualInspector(tplId);
       };
     }
@@ -942,12 +971,11 @@
     let bgUrl = (data && (data.bgMediaUrl || data.feedUrl)) || '';
     let isVideo = (data && data.bgMediaType === 'video') || (bgUrl && /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl));
 
-    if (!bgUrl && typeof topCustomizerState !== 'undefined' && topCustomizerState) {
+    // Fall back to topCustomizerState ONLY if preset is 'default' and no explicit preset was set,
+    // and never let primaryUrl (subject figure/portrait/robot) pollute the background layer!
+    if (!bgUrl && (!preset || preset === 'default') && typeof topCustomizerState !== 'undefined' && topCustomizerState) {
       if (topCustomizerState.secondaryIsVideo && topCustomizerState.secondaryUrl) {
         bgUrl = topCustomizerState.secondaryUrl;
-        isVideo = true;
-      } else if (topCustomizerState.primaryIsVideo && topCustomizerState.primaryUrl) {
-        bgUrl = topCustomizerState.primaryUrl;
         isVideo = true;
       } else if (topCustomizerState.secondaryUrl && /^(blob:|data:)/i.test(topCustomizerState.secondaryUrl)) {
         bgUrl = topCustomizerState.secondaryUrl;
@@ -2065,6 +2093,334 @@
     `;
   };
 
+  // --- 2D. MONEY COUNTER CINEMATIC ENGINE (Lost Hatch / Magnates Media / Hollywood Tier) ---
+  window.tplBuildMoneyHtml = function(mData) {
+    const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('money') : {});
+    const theme = d.theme || 'catastrophe';
+    const label = d.label || 'TOTAL LOSSES';
+    const headerTag = d.headerTag || 'CRITICAL AUDIT DISCLOSURE';
+    const subLabel = d.subLabel || 'CAPITAL DRAIN // RUNWAY EXHAUSTED';
+    const amount = d.amount || '$69,000,000';
+    const currSuffix = d.currencySuffix !== undefined ? d.currencySuffix : 'USD';
+    const deltaText = d.deltaText || '-94.2%';
+    const showScan = d.showScanlines !== false;
+    const showVig = d.showVignette !== false;
+
+    return `
+      <div class="tpl-money-cinematic theme-${theme}" id="money-stage-root" style="width:100%;height:100%;">
+        ${typeof window.tplBuildUniversalBgStageLayer === 'function' ? window.tplBuildUniversalBgStageLayer(d) : ''}
+        <div class="money-bg-grid"></div>
+        <div class="money-faint-watermarks">
+          <span>$</span><span>$</span><span>$</span><span>$</span>
+        </div>
+        <canvas class="money-particles-canvas" id="money-canvas-particles"></canvas>
+        <div class="money-anamorphic-flare"></div>
+        
+        <div class="money-camera-rig" id="money-camera-rig">
+          <div class="money-hero-hud">
+            <div class="money-header-pill">
+              <span class="money-pill-beacon"></span>
+              <span class="money-pill-text">${headerTag}</span>
+            </div>
+            
+            <h2 class="money-label-title">${label}</h2>
+            
+            <div class="money-hero-amount" id="money-hero-amount">
+              <span class="money-amount-val">${amount}</span>
+            </div>
+            
+            <div class="money-bottom-bar">
+              <span class="money-currency-tag">${currSuffix}</span>
+              <span class="money-sublabel">${subLabel}</span>
+              ${deltaText ? `<span class="money-delta-badge">${deltaText}</span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        ${showScan ? '<div class="money-scanlines"></div>' : ''}
+        ${showVig ? '<div class="money-vignette"></div>' : ''}
+        <div class="money-slam-bloom" id="money-slam-bloom"></div>
+      </div>
+    `;
+  };
+
+  // Money Audio Synthesizer (Sub-bass impact boom & mechanical relay click)
+  window.tplPlayMoneyAudio = function(profile, isBoom) {
+    if (!profile || profile === 'none') return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!window._moneyAudioCtx) window._moneyAudioCtx = new AudioCtx();
+      const ctx = window._moneyAudioCtx;
+      if (ctx.state === 'suspended') ctx.resume();
+      const now = ctx.currentTime;
+
+      if (isBoom) {
+        // --- 1. SEISMIC 808 SUB-BASS DROP ---
+        const subOsc = ctx.createOscillator();
+        const subGain = ctx.createGain();
+        subOsc.type = 'sine';
+        subOsc.frequency.setValueAtTime(145, now);
+        subOsc.frequency.exponentialRampToValueAtTime(32, now + 0.45);
+        subGain.gain.setValueAtTime(0.95, now);
+        subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+        subOsc.connect(subGain);
+        subGain.connect(ctx.destination);
+        subOsc.start(now);
+        subOsc.stop(now + 0.7);
+
+        // --- 2. IMPACT TRANSIENT PUNCH (White noise transient) ---
+        const bufLen = Math.floor(ctx.sampleRate * 0.12);
+        const nBuf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+        const nData = nBuf.getChannelData(0);
+        for (let i = 0; i < bufLen; i++) nData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.03));
+        const noise = ctx.createBufferSource();
+        noise.buffer = nBuf;
+        const nFilter = ctx.createBiquadFilter();
+        nFilter.type = 'lowpass';
+        nFilter.frequency.setValueAtTime(800, now);
+        const nGain = ctx.createGain();
+        nGain.gain.setValueAtTime(0.7, now);
+        nGain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+        noise.connect(nFilter);
+        nFilter.connect(nGain);
+        nGain.connect(ctx.destination);
+        noise.start(now);
+
+        // --- 3. HIGH SHIMMER METALLIC TAIL ---
+        const shimOsc = ctx.createOscillator();
+        const shimGain = ctx.createGain();
+        shimOsc.type = 'triangle';
+        shimOsc.frequency.setValueAtTime(1600, now);
+        shimOsc.frequency.exponentialRampToValueAtTime(540, now + 0.35);
+        shimGain.gain.setValueAtTime(0.25, now);
+        shimGain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+        shimOsc.connect(shimGain);
+        shimGain.connect(ctx.destination);
+        shimOsc.start(now);
+        shimOsc.stop(now + 0.4);
+      } else if (profile === 'mechanical-ticker' || profile === 'subbass-boom') {
+        // High-precision mechanical relay micro-click
+        const clickOsc = ctx.createOscillator();
+        const clickGain = ctx.createGain();
+        clickOsc.type = 'triangle';
+        clickOsc.frequency.setValueAtTime(1400 + Math.random() * 200, now);
+        clickOsc.frequency.exponentialRampToValueAtTime(300, now + 0.015);
+        clickGain.gain.setValueAtTime(0.22, now);
+        clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.016);
+        clickOsc.connect(clickGain);
+        clickGain.connect(ctx.destination);
+        clickOsc.start(now);
+        clickOsc.stop(now + 0.02);
+      }
+    } catch (_) {}
+  };
+
+  // Trigger the dramatic "Boom" Climax
+  window.tplTriggerMoneyBoom = function(stageEl, mData) {
+    if (!stageEl) return;
+    const root = stageEl.querySelector('.tpl-money-cinematic') || stageEl;
+    root.classList.remove('money-slam-active');
+    // Force DOM reflow to re-trigger keyframe animation cleanly
+    void root.offsetWidth;
+    root.classList.add('money-slam-active');
+
+    const soundProf = mData?.soundProfile || 'subbass-boom';
+    window.tplPlayMoneyAudio(soundProf, true);
+
+    if (root._boomTimer) clearTimeout(root._boomTimer);
+    root._boomTimer = setTimeout(() => {
+      root.classList.remove('money-slam-active');
+    }, 750);
+  };
+
+  // Stage Initializer (Particle System & Canvas Setup)
+  window.tplInitMoneyStage = function(containerEl, mData) {
+    if (!containerEl) return;
+    const canvas = containerEl.querySelector('#money-canvas-particles');
+    if (!canvas) return;
+
+    const density = (mData && mData.particleDensity) ? Number(mData.particleDensity) : 35;
+    const type = (mData && mData.particleType) || 'cash-ember';
+
+    const particles = [];
+    for (let i = 0; i < density; i++) {
+      particles.push({
+        x: Math.random(),
+        y: Math.random(),
+        vx: (Math.random() - 0.5) * 0.0008,
+        vy: type === 'cash-ember' ? -(0.001 + Math.random() * 0.002) : (Math.random() - 0.5) * 0.0006,
+        size: Math.random() * 3 + 1.5,
+        opacity: Math.random() * 0.7 + 0.2,
+        rot: Math.random() * Math.PI * 2,
+        vRot: (Math.random() - 0.5) * 0.04,
+        hueOffset: Math.random() * 30 - 15
+      });
+    }
+    containerEl._moneyParticles = { canvas, particles, type };
+  };
+
+  // Stage Synchronizer (Updates labels & themes live from Inspector)
+  window.tplSyncMoneyStageData = function(rootEl, d) {
+    if (!rootEl || !d) return;
+    const theme = d.theme || 'catastrophe';
+    rootEl.className = `tpl-money-cinematic theme-${theme}`;
+    
+    if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+      window.tplSyncUniversalBgStageLayer(rootEl, d);
+    }
+
+    const pill = rootEl.querySelector('.money-pill-text');
+    if (pill && d.headerTag !== undefined) pill.textContent = d.headerTag;
+
+    const label = rootEl.querySelector('.money-label-title');
+    if (label && d.label !== undefined) label.textContent = d.label;
+
+    const amount = rootEl.querySelector('.money-amount-val');
+    if (amount && d.amount !== undefined) amount.textContent = d.amount;
+
+    const sub = rootEl.querySelector('.money-sublabel');
+    if (sub && d.subLabel !== undefined) sub.textContent = d.subLabel;
+
+    const cur = rootEl.querySelector('.money-currency-tag');
+    if (cur && d.currencySuffix !== undefined) cur.textContent = d.currencySuffix;
+
+    const delta = rootEl.querySelector('.money-delta-badge');
+    if (delta && d.deltaText !== undefined) {
+      delta.textContent = d.deltaText;
+      delta.style.display = d.deltaText ? '' : 'none';
+    }
+
+    const scan = rootEl.querySelector('.money-scanlines');
+    if (scan) scan.style.display = (d.showScanlines === false) ? 'none' : '';
+
+    const vig = rootEl.querySelector('.money-vignette');
+    if (vig) vig.style.display = (d.showVignette === false) ? 'none' : '';
+  };
+
+  // Helper to parse target numeric value from formatted strings like "$69,000,000" or "69M"
+  function parseNumericAmount(str) {
+    if (typeof str === 'number') return str;
+    if (!str) return 69000000;
+    const clean = str.replace(/[$,\s]/g, '');
+    if (/m$/i.test(clean)) return parseFloat(clean) * 1000000;
+    if (/b$/i.test(clean)) return parseFloat(clean) * 1000000000;
+    if (/k$/i.test(clean)) return parseFloat(clean) * 1000;
+    const n = parseFloat(clean);
+    return isNaN(n) ? 69000000 : n;
+  }
+
+  // Animation Loop Driver (Tick-accurate 60 FPS countup, odometer roll & boom climax)
+  window.tplAnimateMoneyLoop = function(containerEl, t, mData) {
+    if (!containerEl) return;
+    const root = containerEl.querySelector('.tpl-money-cinematic');
+    if (!root) return;
+
+    const dur = Math.max(1.0, parseFloat(mData?.countDuration || 3.0));
+    const cycle = dur + 1.4; // 1.4s dramatic pause on locked value before next reveal
+    const localT = t % cycle;
+    const progress = Math.min(1.0, localT / dur);
+
+    // Easing: Exponential deceleration (Lost suspense: fast rush -> slow roll -> hard slam)
+    const easedProgress = 1.0 - Math.pow(1.0 - progress, 4);
+
+    const targetNum = parseNumericAmount(mData?.amount || '$69,000,000');
+    const startNum = parseNumericAmount(mData?.startAmount || '0');
+    const currentNum = Math.round(startNum + (targetNum - startNum) * easedProgress);
+
+    // Format current number with commas and currency prefix
+    const sym = mData?.currencySymbol || '$';
+    const numFormatted = sym + currentNum.toLocaleString('en-US');
+
+    const amtEl = root.querySelector('.money-amount-val');
+    const mode = mData?.counterMode || 'odometer';
+
+    if (amtEl) {
+      if (progress >= 1.0) {
+        amtEl.textContent = mData?.amount || numFormatted;
+      } else if (mode === 'scramble') {
+        // Digital Scramble Mode
+        const targetStr = mData?.amount || numFormatted;
+        const revealIdx = Math.floor(targetStr.length * progress);
+        let scr = '';
+        for (let i = 0; i < targetStr.length; i++) {
+          if (i <= revealIdx || targetStr[i] === '$' || targetStr[i] === ',') {
+            scr += targetStr[i];
+          } else {
+            scr += Math.floor(Math.random() * 10);
+          }
+        }
+        amtEl.textContent = scr;
+      } else {
+        amtEl.textContent = numFormatted;
+      }
+    }
+
+    // Audio clicks on number rollover
+    if (progress < 1.0) {
+      const clickRate = Math.max(0.04, 0.04 + Math.pow(progress, 2) * 0.25);
+      if (!root._lastClickTime || (t - root._lastClickTime) > clickRate) {
+        root._lastClickTime = t;
+        window.tplPlayMoneyAudio(mData?.soundProfile || 'subbass-boom', false);
+      }
+    }
+
+    // Boom Trigger at p = 1.0
+    const boomCycleId = Math.floor(t / cycle);
+    if (progress >= 1.0 && root._lastBoomCycle !== boomCycleId) {
+      root._lastBoomCycle = boomCycleId;
+      if (mData?.enableBoom !== false) {
+        window.tplTriggerMoneyBoom(containerEl, mData);
+      }
+    }
+
+    // Canvas Particles Simulation
+    if (containerEl._moneyParticles) {
+      const { canvas, particles, type } = containerEl._moneyParticles;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const w = (canvas.width = canvas.clientWidth || 640);
+        const h = (canvas.height = canvas.clientHeight || 360);
+        ctx.clearRect(0, 0, w, h);
+
+        const th = mData?.theme || 'catastrophe';
+        const pColor = th === 'magnates' ? '#f59e0b' : (th === 'cyber' ? '#00f0ff' : '#ff334b');
+
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rot += p.vRot;
+          if (p.y < -0.05) p.y = 1.05;
+          if (p.y > 1.05) p.y = -0.05;
+          if (p.x < -0.05) p.x = 1.05;
+          if (p.x > 1.05) p.x = -0.05;
+
+          ctx.save();
+          ctx.translate(p.x * w, p.y * h);
+          ctx.rotate(p.rot);
+          ctx.globalAlpha = p.opacity;
+
+          if (type === 'cash-ember') {
+            // Rectangular tumbling cash/ember flake
+            ctx.fillStyle = pColor;
+            ctx.shadowColor = pColor;
+            ctx.shadowBlur = 6;
+            ctx.fillRect(-p.size * 1.5, -p.size, p.size * 3, p.size * 1.5);
+          } else {
+            // Glowing circular dust mote
+            ctx.fillStyle = pColor;
+            ctx.shadowColor = pColor;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        });
+      }
+    }
+  };
+
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
     const stage = document.getElementById('tpl-modal-preview-stage');
@@ -2520,8 +2876,15 @@
         pCards[1].style.transform = `translate(${x2}px, ${y2}px) rotate(${r2}deg) scale(${sc})`;
       }
     } else if (tplId === 'money') {
-      const d = fxc.querySelector('.dollar'); if (d) d.textContent = data.amount;
-      const l = fxc.querySelector('.money-label, .label'); if (l) l.textContent = data.label;
+      let root = fxc.querySelector('.tpl-money-cinematic');
+      if (!root) {
+        fxc.innerHTML = window.tplBuildMoneyHtml ? window.tplBuildMoneyHtml(data) : '';
+        root = fxc.querySelector('.tpl-money-cinematic');
+        if (typeof window.tplInitMoneyStage === 'function') window.tplInitMoneyStage(fxc, data);
+      }
+      if (root && typeof window.tplSyncMoneyStageData === 'function') {
+        window.tplSyncMoneyStageData(root, data);
+      }
     } else if (tplId === 'checklist') {
       const items = fxc.querySelectorAll('.check-text');
       (data.items || []).forEach((txt, i) => { if (items[i]) items[i].textContent = txt; });
@@ -2531,7 +2894,9 @@
       const b = fxc.querySelector('.prog-bar-fill'); if (b) b.style.width = data.percent;
     } else if (tplId === 'scramble') {
       let root = fxc.querySelector('.tpl-scramble');
-      if (!root) {
+      const activeMode = (data && data.layoutMode) || 'chat';
+      const currentMode = root ? (root.classList.contains('scramble-mode-terminal') ? 'terminal' : 'chat') : null;
+      if (!root || currentMode !== activeMode) {
         fxc.innerHTML = window.tplBuildScrambleHtml ? window.tplBuildScrambleHtml(data) : '';
         root = fxc.querySelector('.tpl-scramble');
       }
@@ -2552,6 +2917,9 @@
         const nodeTag = root.querySelector('.scramble-node-tag');
         if (nodeTag && data.headerTag !== undefined) nodeTag.textContent = data.headerTag;
 
+        const senderHandle = root.querySelector('.scramble-sender-handle');
+        if (senderHandle && data.senderHandle !== undefined) senderHandle.textContent = data.senderHandle;
+
         const subTextEl = root.querySelector('.scramble-subtext');
         if (subTextEl && data.subText !== undefined) subTextEl.textContent = data.subText;
 
@@ -2564,7 +2932,7 @@
         const charsEl = root.querySelector('.scramble-chars');
         if (charsEl) {
           const prevTarget = charsEl.dataset.target;
-          const newTarget = data.text !== undefined ? String(data.text) : (prevTarget || 'ACCESS GRANTED');
+          const newTarget = data.text !== undefined ? String(data.text) : (prevTarget || 'you are a dead man');
           if (prevTarget !== newTarget) {
             charsEl.dataset.target = newTarget;
             if (typeof window.tplTriggerScrambleAnimation === 'function') {
@@ -5663,6 +6031,275 @@
     }
 
     // =========================================================================
+    // SPECIAL HANDLER: MONEY COUNTER (Lost Hatch / Magnates Media / Hollywood Tier)
+    // =========================================================================
+    if (tplId === 'money') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+
+      const curTheme = data.theme || 'catastrophe';
+      const curMode = data.counterMode || 'odometer';
+      const curSound = data.soundProfile || 'subbass-boom';
+      const curParticles = data.particleType || 'cash-ember';
+
+      const THEMES = [
+        { id: 'catastrophe', label: '🚨 Lost Hatch', desc: 'Blood Noir, Red Laser HUD, Seismic Sub-Bass Slam', color: '#ff2a44' },
+        { id: 'magnates', label: '✨ Magnates Gold', desc: 'Prestige Emerald, 24K Gold Foil, Gold Embers', color: '#f59e0b' },
+        { id: 'cyber', label: '💻 Cyber Vault', desc: 'Matrix Cyan & Phosphor Green, Digital Scramble', color: '#00f0ff' },
+        { id: 'minimal', label: '🎬 Minimal Noir', desc: 'Stark Monochrome, Deep Slate Vignette', color: '#ffffff' }
+      ];
+
+      container.innerHTML = `
+        <div style="background: rgba(255, 42, 68, 0.05); border: 1px solid rgba(255, 42, 68, 0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Header Banner -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 14px;">⚡</span>
+              <span style="font-size: 11px; font-weight: 800; color: #f8fafc; letter-spacing: 0.5px; text-transform: uppercase;">MONEY COUNTER • CINEMATIC ENGINE</span>
+            </div>
+            <span style="font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 4px; background: rgba(255,42,68,0.2); color: #ff8090; border: 1px solid rgba(255,42,68,0.4); text-transform: uppercase;">HOLLYWOOD TIER</span>
+          </div>
+
+          <!-- 1-Click Cinematic Theme Presets -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">1-Click Style Preset</span>
+              <span style="font-size: 9.5px; color: #cbd5e1; font-weight: 600;">Instant Dramatic Atmosphere</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              ${THEMES.map(th => `
+                <button type="button" class="money-theme-btn" data-theme="${th.id}" style="padding: 7px 8px; border-radius: 6px; border: 1px solid ${curTheme === th.id ? th.color : 'rgba(255,255,255,0.1)'}; background: ${curTheme === th.id ? th.color + '22' : 'rgba(0,0,0,0.35)'}; color: ${curTheme === th.id ? '#fff' : '#94a3b8'}; text-align: left; cursor: pointer; transition: all 0.15s; display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-size: 10.5px; font-weight: 700; color: ${curTheme === th.id ? th.color : '#e2e8f0'}; display: flex; align-items: center; justify-content: space-between;">
+                    ${th.label}
+                    ${curTheme === th.id ? '✓' : ''}
+                  </span>
+                  <span style="font-size: 8px; opacity: 0.75; line-height: 1.1;">${th.desc.split(',')[0]}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Numbers & Values -->
+          <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Data &amp; Typography</span>
+              <span style="font-size: 9px; color: #64748b;">Fluid Screen Scaling</span>
+            </div>
+
+            <!-- Target Amount (Hero Number) -->
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Hero Target Amount</span>
+              <input type="text" id="money-inp-amount" value="${data.amount || '$69,000,000'}" placeholder="$69,000,000" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 10px; color: #fff; font-size: 13px; font-weight: 800; font-family: 'Space Grotesk', monospace; outline: none;" />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <!-- Primary Title -->
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Category Label</span>
+                <input type="text" id="money-inp-label" value="${data.label || 'TOTAL LOSSES'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+              </div>
+              <!-- Header Tag -->
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Top Alert Pill</span>
+                <input type="text" id="money-inp-headertag" value="${data.headerTag || 'CRITICAL AUDIT DISCLOSURE'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <!-- Currency Tag -->
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Currency Suffix</span>
+                <input type="text" id="money-inp-currency" value="${data.currencySuffix !== undefined ? data.currencySuffix : 'USD'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+              </div>
+              <!-- Delta / Status -->
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Delta Readout</span>
+                <input type="text" id="money-inp-delta" value="${data.deltaText || '-94.2%'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+              </div>
+            </div>
+
+            <!-- Sub-label description -->
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Sub-Status Monologue</span>
+              <input type="text" id="money-inp-sublabel" value="${data.subLabel || 'CAPITAL DRAIN // RUNWAY EXHAUSTED'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-size: 10.5px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Kinetic Engine & Physics -->
+          <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Kinetic Mechanics &amp; Timing</span>
+              <span style="font-size: 9.5px; color: #a855f7; font-weight: 700;">${(data.countDuration || 3.0)}s Count</span>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.4); padding: 3px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+              ${[
+                { id: 'odometer', label: '🎡 Odometer Tumbler' },
+                { id: 'scramble', label: '👾 Digital Scramble' },
+                { id: 'countup', label: '📈 Smooth Count' }
+              ].map(m => `
+                <button type="button" class="money-mode-btn" data-mode="${m.id}" style="flex: 1; padding: 5px 4px; border-radius: 4px; border: none; background: ${curMode === m.id ? '#8b5cf6' : 'transparent'}; color: ${curMode === m.id ? '#fff' : '#94a3b8'}; font-size: 9px; font-weight: 700; cursor: pointer; transition: all 0.15s;">${m.label}</button>
+              `).join('')}
+            </div>
+
+            <!-- Count Duration Slider -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                <span>Counting Duration</span>
+                <span id="money-val-duration">${(data.countDuration || 3.0)}s</span>
+              </div>
+              <input type="range" id="money-inp-duration" min="10" max="60" value="${Math.round((data.countDuration || 3.0) * 10)}" style="accent-color: #8b5cf6; height: 3px; cursor: pointer;" />
+            </div>
+
+            <!-- Action Button: Trigger Boom -->
+            <button type="button" id="money-btn-boom-test" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(168, 85, 247, 0.3)); border: 1px solid rgba(239, 68, 68, 0.5); border-radius: 6px; padding: 8px 12px; color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.15s; margin-top: 2px;">
+              <span>💥 Test "The Boom" Climax (Screen Shake + Sub-Bass Hit)</span>
+            </button>
+          </div>
+
+          <!-- Special FX & Atmosphere ("The Boom" Suite) -->
+          <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Cinematic Special Effects</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <!-- Particles Type -->
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Particles Style</span>
+                <select id="money-sel-particles" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 6px; color: #fff; font-size: 10px; outline: none; cursor: pointer;">
+                  <option value="cash-ember" ${curParticles === 'cash-ember' ? 'selected' : ''}>💸 Floating Cash Embers</option>
+                  <option value="gold-dust" ${curParticles === 'gold-dust' ? 'selected' : ''}>✨ Golden Flakes &amp; Dust</option>
+                  <option value="cyber-motes" ${curParticles === 'cyber-motes' ? 'selected' : ''}>💠 Cyber Grid Motes</option>
+                  <option value="none" ${curParticles === 'none' ? 'selected' : ''}>🚫 Off (Clean)</option>
+                </select>
+              </div>
+
+              <!-- Sound Design Profile -->
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Audio Experience</span>
+                <select id="money-sel-sound" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 6px; color: #fff; font-size: 10px; outline: none; cursor: pointer;">
+                  <option value="subbass-boom" ${curSound === 'subbass-boom' ? 'selected' : ''}>🔊 Sub-Bass 808 Slam + Ticker</option>
+                  <option value="mechanical-ticker" ${curSound === 'mechanical-ticker' ? 'selected' : ''}>⏱️ Vault Tumbler Clicks Only</option>
+                  <option value="none" ${curSound === 'none' ? 'selected' : ''}>🔇 Silent</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Toggles for CRT Scanlines & Vignette -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="money-chk-scanlines" ${data.showScanlines !== false ? 'checked' : ''} style="accent-color: #ff2a44;" />
+                CRT Scanlines
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="money-chk-vignette" ${data.showVignette !== false ? 'checked' : ''} style="accent-color: #ff2a44;" />
+                Cinematic Vignette
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="money-chk-boom" ${data.enableBoom !== false ? 'checked' : ''} style="accent-color: #ff2a44;" />
+                Lock-in Boom
+              </label>
+            </div>
+          </div>
+
+          <!-- Studio Background Suite Integration -->
+          ${typeof window.tplBuildUniversalBgHtml === 'function' ? window.tplBuildUniversalBgHtml(data) : ''}
+        </div>
+      `;
+
+      // Wire Theme Buttons
+      container.querySelectorAll('.money-theme-btn').forEach(btn => {
+        btn.onclick = () => {
+          const t = btn.dataset.theme;
+          const themeDefaults = {
+            'catastrophe': { theme: 'catastrophe', headerTag: 'CRITICAL AUDIT DISCLOSURE', label: 'TOTAL LOSSES', subLabel: 'CAPITAL DRAIN // RUNWAY EXHAUSTED', particleType: 'cash-ember', color: '#ff334b', deltaText: '-94.2%' },
+            'magnates': { theme: 'magnates', headerTag: 'FORBES WEALTH VALUATION', label: 'NET WORTH', subLabel: 'Q4 RECORD CAPITAL ACCUMULATION', particleType: 'gold-dust', color: '#fbbf24', deltaText: '+248.5%' },
+            'cyber': { theme: 'cyber', headerTag: 'BLOOMBERG TERMINAL FEED', label: 'TREASURY BALANCE', subLabel: 'TRANSACTION TELEMETRY VERIFIED', particleType: 'cyber-motes', color: '#00f0ff', deltaText: '+12.4%' },
+            'minimal': { theme: 'minimal', headerTag: 'OFFICIAL RECORD', label: 'ANNUAL REVENUE', subLabel: 'CONSOLIDATED STATEMENT OF INCOME', particleType: 'none', color: '#ffffff', deltaText: '' }
+          };
+          window.tplSetContextualData('money', Object.assign({}, themeDefaults[t] || { theme: t }));
+          window.tplRenderContextualInspector('money');
+        };
+      });
+
+      // Wire Inputs
+      container.querySelector('#money-inp-amount')?.addEventListener('input', e => {
+        window.tplSetContextualData('money', { amount: e.target.value });
+      });
+      container.querySelector('#money-inp-label')?.addEventListener('input', e => {
+        window.tplSetContextualData('money', { label: e.target.value });
+      });
+      container.querySelector('#money-inp-headertag')?.addEventListener('input', e => {
+        window.tplSetContextualData('money', { headerTag: e.target.value });
+      });
+      container.querySelector('#money-inp-currency')?.addEventListener('input', e => {
+        window.tplSetContextualData('money', { currencySuffix: e.target.value });
+      });
+      container.querySelector('#money-inp-delta')?.addEventListener('input', e => {
+        window.tplSetContextualData('money', { deltaText: e.target.value });
+      });
+      container.querySelector('#money-inp-sublabel')?.addEventListener('input', e => {
+        window.tplSetContextualData('money', { subLabel: e.target.value });
+      });
+
+      // Wire Mode buttons
+      container.querySelectorAll('.money-mode-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('money', { counterMode: btn.dataset.mode });
+          window.tplRenderContextualInspector('money');
+        };
+      });
+
+      // Wire Duration slider
+      const inpDur = container.querySelector('#money-inp-duration');
+      const valDur = container.querySelector('#money-val-duration');
+      if (inpDur) {
+        inpDur.oninput = (e) => {
+          const s = (Number(e.target.value) / 10).toFixed(1);
+          if (valDur) valDur.textContent = `${s}s`;
+          window.tplSetContextualData('money', { countDuration: parseFloat(s) });
+        };
+      }
+
+      // Wire Boom Climax Test button
+      container.querySelector('#money-btn-boom-test')?.addEventListener('click', () => {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.tplTriggerMoneyBoom === 'function') {
+          window.tplTriggerMoneyBoom(stage, window.tplGetContextualData('money'));
+        }
+      });
+
+      // Wire Selects & Checkboxes
+      container.querySelector('#money-sel-particles')?.addEventListener('change', e => {
+        window.tplSetContextualData('money', { particleType: e.target.value });
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.tplInitMoneyStage === 'function') {
+          window.tplInitMoneyStage(stage, window.tplGetContextualData('money'));
+        }
+      });
+      container.querySelector('#money-sel-sound')?.addEventListener('change', e => {
+        window.tplSetContextualData('money', { soundProfile: e.target.value });
+      });
+      container.querySelector('#money-chk-scanlines')?.addEventListener('change', e => {
+        window.tplSetContextualData('money', { showScanlines: e.target.checked });
+      });
+      container.querySelector('#money-chk-vignette')?.addEventListener('change', e => {
+        window.tplSetContextualData('money', { showVignette: e.target.checked });
+      });
+      container.querySelector('#money-chk-boom')?.addEventListener('change', e => {
+        window.tplSetContextualData('money', { enableBoom: e.target.checked });
+      });
+
+      if (typeof window.tplWireUniversalBgControls === 'function') {
+        window.tplWireUniversalBgControls('money', container);
+      }
+      return;
+    }
+
+    // =========================================================================
     // SPECIAL HANDLER: TEXT SCRAMBLE / DARK WEB TERMINAL (scramble)
     // =========================================================================
     if (tplId === 'scramble') {
@@ -5670,6 +6307,7 @@
       if (wrapSec) wrapSec.style.display = 'none';
       const curCol = data.color || '#00ff88';
       const curSpeed = data.scrambleSpeed || 'normal';
+      const curMode = data.layoutMode === 'terminal' ? 'terminal' : 'chat';
 
       const CYBER_THEMES = [
         { label: 'Matrix Green', col: '#00ff88', dot: '#00ff88' },
@@ -5688,26 +6326,66 @@
             <span style="font-size: 9px; color: #00ff88; font-weight: 800; background: rgba(0,255,136,0.18); border: 1px solid rgba(0,255,136,0.35); padding: 2px 6px; border-radius: 4px;">TOP PRIORITY</span>
           </div>
 
-          <!-- Target Decipher Text -->
-          <div style="display: flex; flex-direction: column; gap: 3px;">
+          <!-- Sub-Template Layout Switcher -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Target Decrypt Text</span>
-              <span style="font-size: 8.5px; color: #64748b; font-family: monospace;">[MAIN STREAM]</span>
+              <span style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">Interface Sub-Template</span>
+              <span style="font-size: 8.5px; color: #64748b; font-family: monospace;">[MODE]</span>
             </div>
-            <input type="text" id="scramble-inp-text" value="${(data.text || 'ACCESS GRANTED').replace(/"/g, '&quot;')}" placeholder="e.g. ACCESS GRANTED" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,255,136,0.4); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,255,136,0.12);" />
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" class="scramble-mode-toggle" data-mode="chat" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border-radius: 6px; border: 1px solid ${curMode === 'chat' ? '#00ff88' : 'rgba(255,255,255,0.1)'}; background: ${curMode === 'chat' ? 'rgba(0,255,136,0.18)' : 'rgba(0,0,0,0.45)'}; color: ${curMode === 'chat' ? '#ffffff' : '#94a3b8'}; font-size: 10px; font-weight: 800; cursor: pointer; box-shadow: ${curMode === 'chat' ? '0 0 12px rgba(0,255,136,0.22)' : 'none'}; transition: all 0.15s ease;">
+                <span>💬</span>
+                <span>Dark Web Chat</span>
+              </button>
+              <button type="button" class="scramble-mode-toggle" data-mode="terminal" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 8px; border-radius: 6px; border: 1px solid ${curMode === 'terminal' ? '#00e5ff' : 'rgba(255,255,255,0.1)'}; background: ${curMode === 'terminal' ? 'rgba(0,229,255,0.18)' : 'rgba(0,0,0,0.45)'}; color: ${curMode === 'terminal' ? '#ffffff' : '#94a3b8'}; font-size: 10px; font-weight: 800; cursor: pointer; box-shadow: ${curMode === 'terminal' ? '0 0 12px rgba(0,229,255,0.22)' : 'none'}; transition: all 0.15s ease;">
+                <span>🖥️</span>
+                <span>Full Terminal</span>
+              </button>
+            </div>
           </div>
 
-          <!-- Terminal Header Tag & Telemetry Subtext -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Terminal Node / Header</span>
-              <input type="text" id="scramble-inp-header" value="${(data.headerTag || 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #94a3b8; font-family: monospace; font-size: 10px;" />
+          ${curMode === 'chat' ? `
+            <!-- Chat Mode: Sender Handle & Message -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,255,136,0.04); border: 1px dashed rgba(0,255,136,0.25); border-radius: 7px; padding: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 9px; font-weight: 800; color: #00ff88; text-transform: uppercase;">Anonymous Sender / Tor Handle</span>
+                  <span style="font-size: 8px; color: #64748b; font-family: monospace;">[PGP SIGNED]</span>
+                </div>
+                <input type="text" id="scramble-inp-sender" value="${(data.senderHandle || 'ANON_USER // UNTRACEABLE').replace(/"/g, '&quot;')}" placeholder="e.g. ANON_USER // UNTRACEABLE" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(0,255,136,0.35); border-radius: 5px; padding: 6px 8px; color: #fff; font-family: monospace; font-size: 10.5px; font-weight: 700; outline: none;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 9px; font-weight: 800; color: #cbd5e1; text-transform: uppercase;">Encrypted Message (Decryption Stream)</span>
+                  <span style="font-size: 8px; color: #00ff88; font-family: monospace;">[LIVE CIPHER]</span>
+                </div>
+                <input type="text" id="scramble-inp-text" value="${(data.text || 'you are a dead man').replace(/"/g, '&quot;')}" placeholder="e.g. you are a dead man" style="background: rgba(0,0,0,0.7); border: 1px solid rgba(0,255,136,0.5); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,255,136,0.15);" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Tor Node / Header Tag</span>
+                <input type="text" id="scramble-inp-header" value="${(data.headerTag || 'TOR_ONION_CHAT v3.4 // [SESSION_ID: 0x9F4B]').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 8px; color: #94a3b8; font-family: monospace; font-size: 9.5px;" />
+              </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Sub-Telemetry Readout</span>
-              <input type="text" id="scramble-inp-sub" value="${(data.subText || 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #64748b; font-family: monospace; font-size: 9.5px;" />
+          ` : `
+            <!-- Terminal Mode: Cockpit Decrypt Text & Headers -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(0,229,255,0.04); border: 1px dashed rgba(0,229,255,0.25); border-radius: 7px; padding: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 9px; font-weight: 800; color: #00e5ff; text-transform: uppercase;">Target Decrypt Stream (Center Cockpit)</span>
+                  <span style="font-size: 8px; color: #00e5ff; font-family: monospace;">[MAIN STREAM]</span>
+                </div>
+                <input type="text" id="scramble-inp-text" value="${(data.text || 'SYSTEM PRIVILEGES COMPROMISED').replace(/"/g, '&quot;')}" placeholder="e.g. ACCESS GRANTED" style="background: rgba(0,0,0,0.7); border: 1px solid rgba(0,229,255,0.5); border-radius: 6px; padding: 7px 10px; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 800; outline: none; box-shadow: 0 0 10px rgba(0,229,255,0.15);" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Terminal Node / Header</span>
+                <input type="text" id="scramble-inp-header" value="${(data.headerTag || 'ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 8px; color: #94a3b8; font-family: monospace; font-size: 9.5px;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Sub-Telemetry Readout</span>
+                <input type="text" id="scramble-inp-sub" value="${(data.subText || 'IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050').replace(/"/g, '&quot;')}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 8px; color: #64748b; font-family: monospace; font-size: 9.5px;" />
+              </div>
             </div>
-          </div>
+          `}
 
           <!-- Color & Cyber Presets -->
           <div style="display: flex; flex-direction: column; gap: 5px;">
@@ -5764,6 +6442,16 @@
       `;
 
       // Wire controls
+      container.querySelectorAll('.scramble-mode-toggle').forEach(btn => {
+        btn.onclick = () => {
+          const m = btn.dataset.mode;
+          window.tplSetContextualData('scramble', { layoutMode: m });
+          window.tplRenderContextualInspector('scramble');
+        };
+      });
+      container.querySelector('#scramble-inp-sender')?.addEventListener('input', e => {
+        window.tplSetContextualData('scramble', { senderHandle: e.target.value });
+      });
       container.querySelector('#scramble-inp-text')?.addEventListener('input', e => {
         window.tplSetContextualData('scramble', { text: e.target.value });
       });
