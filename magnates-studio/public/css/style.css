@@ -13461,3 +13461,76 @@ body.tool-slide-active {
   0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+
+
+/* Physical Broadsheet Crease, Header Accent Bar & Deckle Edges (Image 2 Standard) */
+.tpl-headline-fly .fly-card-crease {
+  position: absolute;
+  top: 0; bottom: 0; left: 0; right: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0.08) 0%, 
+    rgba(0,0,0,0.04) 22%, 
+    transparent 45%, 
+    rgba(255,255,255,0.05) 50%, 
+    rgba(0,0,0,0.07) 53%, 
+    transparent 75%, 
+    rgba(0,0,0,0.09) 100%);
+  opacity: 0.85;
+}
+.tpl-headline-fly .fly-card-top-rule {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2.5px;
+  background: var(--c-accent, #b91c1c);
+  z-index: 3;
+}
+.tpl-headline-fly.mode-broadsheet .fly-card {
+  border-radius: 1px;
+  border: 1px solid rgba(15, 23, 42, 0.28);
+  border-top: none;
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.45),
+    0 12px 36px rgba(0,0,0,0.65),
+    0 24px 64px rgba(0,0,0,0.72);
+}
+.tpl-headline-fly.mode-broadsheet .fly-card-5 {
+  width: 54%;
+  left: 23%;
+  border-radius: 1px;
+  box-shadow:
+    0 2px 5px rgba(0,0,0,0.5),
+    0 18px 48px rgba(0,0,0,0.78),
+    0 36px 85px rgba(0,0,0,0.88);
+}
+/* In broadsheet mode, every card gets authentic newsprint typography */
+.tpl-headline-fly.mode-broadsheet .fly-card .fly-card-kicker {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-family: 'Playfair Display', 'Cinzel', Georgia, serif !important;
+  font-size: 7.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+  color: var(--c-accent) !important;
+  text-transform: uppercase !important;
+}
+.tpl-headline-fly.mode-broadsheet .fly-card .fly-card-stamp {
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 6px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  padding: 1px 4px !important;
+  border-radius: 1px !important;
+  border: 1px solid var(--c-rule) !important;
+  color: var(--c-sub) !important;
+  background: transparent !important;
+  transform: rotate(-0.5deg) !important;
+}
+.tpl-headline-fly.mode-broadsheet .fly-card .fly-card-headline {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-weight: 800 !important;
+  color: #111111 !important;
+}

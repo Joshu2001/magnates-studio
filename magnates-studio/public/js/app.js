@@ -29243,12 +29243,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const curScale = (1.02 + pushProg * 0.06).toFixed(3);
         tiltEl.style.transform = `perspective(1000px) rotateX(${tiltX}deg) scale(${curScale})`;
       }
-      const tiltEl = fxContainer?.querySelector(`#fx-anim-doc-tilt-${tplId}`);
-      if (tiltEl) {
-        const tiltX = (4 - pushProg * 2).toFixed(2);
-        const curScale = (1.02 + pushProg * 0.06).toFixed(3);
-        tiltEl.style.transform = `perspective(1000px) rotateX(${tiltX}deg) scale(${curScale})`;
-      }
       const fadeOp = 0.88 + Math.sin(t * 2.5) * 0.06;
       const overlay = fxContainer?.querySelector(`#fx-anim-white-overlay-${tplId}`);
       if (overlay) overlay.style.opacity = fadeOp.toFixed(2);
@@ -31098,16 +31092,18 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = 'FORENSIC CALLOUT';
     topCustomizerState.subText = 'MAGNIFIED EVIDENCE LOUPE';
     topCustomizerState.textColor = '#00f0ff';
-  } else if (tpl.id === 'anim-whiteout-fade') {
+  } else if (tpl.id === 'anim-whiteout-fade' || tpl.id === 'anim-document-dim-focus') {
     if (labelPrim) labelPrim.textContent = '\ud83d\udcc4 Document / Court Exhibit Scan';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
-    topCustomizerState.mainText = 'CRITICAL EVIDENCE';
-    topCustomizerState.subText = '[EXHIBIT C // PARAGRAPH 4]';
+    topCustomizerState.mainText = tpl.id === 'anim-document-dim-focus' ? 'FINDINGS OF FACT' : 'CRITICAL EVIDENCE';
+    topCustomizerState.subText = tpl.id === 'anim-document-dim-focus' ? 'PARAGRAPH 12 // UNDISCLOSED OUTFLOWS' : '[EXHIBIT C // PARAGRAPH 4]';
     topCustomizerState.textColor = '#0f172a';
     topCustomizerState.docWhiteout = true;
     topCustomizerState.docDarkout = false;
-    topCustomizerState.enable3DCameraTilt = true;
+    topCustomizerState.enable3DCameraTilt = (tpl.id === 'anim-whiteout-fade');
+    topCustomizerState.docPopScale = (tpl.id === 'anim-document-dim-focus') ? 1.0 : 1.08;
+    topCustomizerState.docDimOnly = (tpl.id === 'anim-document-dim-focus');
   } else if (tpl.id === 'anim-dark-spotlight') {
     if (labelPrim) labelPrim.textContent = '\ud83d\udd26 Subject Image / Scene';
     if (wrapSec) wrapSec.style.display = 'none';

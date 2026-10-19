@@ -795,6 +795,46 @@
       </svg>
     `)}`,
 
+    // 40b. Document Ambient Dim Focus (Flat 1:1 In-Place Isolation)
+    'anim-document-dim-focus': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <!-- Ambient Document Base -->
+        <rect width="400" height="225" fill="#f4f4f2"/>
+        <!-- Background lines dimmed to 10% -->
+        <g opacity="0.10" fill="#0f172a">
+          <rect x="36" y="24" width="140" height="6" rx="1"/>
+          <rect x="36" y="38" width="328" height="4" rx="1"/>
+          <rect x="36" y="47" width="310" height="4" rx="1"/>
+          <rect x="36" y="56" width="320" height="4" rx="1"/>
+          <rect x="36" y="156" width="328" height="4" rx="1"/>
+          <rect x="36" y="165" width="315" height="4" rx="1"/>
+          <rect x="36" y="174" width="325" height="4" rx="1"/>
+          <rect x="36" y="183" width="280" height="4" rx="1"/>
+          <rect x="36" y="196" width="160" height="5" rx="1"/>
+        </g>
+        <!-- Soft Ambient Document Dimming Matte -->
+        <rect width="400" height="225" fill="rgba(244, 244, 242, 0.88)"/>
+        <!-- 1:1 Flat Crisp Cutout in Natural Alignment (No Zoom, Zero Scale Shift) -->
+        <g transform="translate(36, 75)">
+          <rect width="328" height="68" fill="#faf6ec" rx="1"/>
+          <text x="14" y="22" font-family="'Courier New', monospace" font-weight="700" font-size="10.5" fill="#0f172a">
+            12. Between November 14 and December 02, SWIFT clearing
+          </text>
+          <text x="14" y="39" font-family="'Courier New', monospace" font-weight="800" font-size="11" fill="#0f172a">
+            routing archives revealed 14 unrecorded wire transfers
+          </text>
+          <text x="14" y="56" font-family="'Courier New', monospace" font-weight="700" font-size="10.5" fill="#0f172a">
+            totaling $482,000,000 through unregistered Apex entities.
+          </text>
+        </g>
+        <!-- Clean Forensic Header Badge -->
+        <g transform="translate(245, 16)">
+          <rect width="124" height="15" rx="2" fill="rgba(15, 23, 42, 0.9)"/>
+          <text x="62" y="11" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700" fill="#f8fafc" letter-spacing="0.5" text-anchor="middle">FLAT AMBIENT DIM</text>
+        </g>
+      </svg>
+    `)}`,
+
     // 41. Dark Spotlight Focus (Cinematic Dimming)
     'anim-dark-spotlight': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
