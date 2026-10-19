@@ -321,8 +321,8 @@
     let html = `<div style="display:flex;align-items:center;justify-content:space-between;"><span style="${lbl}">Effect Controls</span>`;
     if (has3D(k, tplId)) {
       html += `<div style="display:flex;gap:3px;background:rgba(18,19,28,.9);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,.08);">
-        <button type="button" data-act="mode-video" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === 'video' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === 'video' ? '#fff' : '#94a3b8'};">▶ Video</button>
-        <button type="button" data-act="mode-3d" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === '3d' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === '3d' ? '#fff' : '#94a3b8'};">⬡ 3D</button></div>`;
+        <button type="button" data-act="mode-video" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === 'video' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === 'video' ? '#fff' : '#94a3b8'};">\u25b6 Video</button>
+        <button type="button" data-act="mode-3d" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === '3d' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === '3d' ? '#fff' : '#94a3b8'};">\u2b21 3D</button></div>`;
     }
     html += `</div>`;
 
@@ -338,18 +338,18 @@
     if (mode === 'video' || k === 'dom3d') {
       if (mode === '3d' && k === 'dom3d') {
         html += `<div style="background:linear-gradient(135deg, rgba(168,85,247,0.18), rgba(56,189,248,0.12));border:1px solid rgba(192,132,252,0.45);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-          <span style="font-size:15px;">🖐️</span>
+          <span style="font-size:15px;">\ud83d\udd90\ufe0f</span>
           <div style="display:flex;flex-direction:column;gap:1px;">
             <span style="font-size:10.5px;font-weight:800;color:#f3e8ff;letter-spacing:0.04em;">INTERACTIVE 3D HAND ORBIT ACTIVE</span>
-            <span style="font-size:9.5px;color:#cbd5e1;">Grab &amp; drag the stage to tilt/rotate in 3D • Scroll wheel to zoom</span>
+            <span style="font-size:9.5px;color:#cbd5e1;">Grab &amp; drag the stage to tilt/rotate in 3D \u2022 Scroll wheel to zoom</span>
           </div>
         </div>`;
       }
       html += section(mode === '3d' ? '3D Camera Rig & Orbit' : 'Motion', [
         row('v-speed', 'Playback Speed', -3.0, 3.0, 0.1, fx.speed, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
-        row('v-pitch', 'Tilt Pitch (X)', -45, 45, 1, fx.pitch, v => v + '°'),
-        row('v-yaw', 'Rotation Yaw (Y)', -45, 45, 1, fx.yaw, v => v + '°'),
-        row('v-roll', 'Roll (Z)', -30, 30, 1, fx.roll, v => v + '°'),
+        row('v-pitch', 'Tilt Pitch (X)', -45, 45, 1, fx.pitch, v => v + '\u00b0'),
+        row('v-yaw', 'Rotation Yaw (Y)', -45, 45, 1, fx.yaw, v => v + '\u00b0'),
+        row('v-roll', 'Roll (Z)', -30, 30, 1, fx.roll, v => v + '\u00b0'),
         row('v-zoom', 'Zoom / Depth', 0.6, 2.2, 0.05, fx.zoom, v => v.toFixed(2) + 'x'),
         `<button type="button" data-act="v-reset" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cbd5e1;cursor:pointer;">Reset 3D Camera</button>`
       ].join(''));
@@ -407,17 +407,17 @@
       const s = spatial3DState;
       html += section('Text', textHtml);
       html += section('Camera Rig', [
-        `<select data-k="flight" style="${selectCss}">${['zoomthrough:Zoom-Through', 'pullback:Pullback Reveal', 'orbit:360° Orbit'].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${s.flightMode === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>`,
+        `<select data-k="flight" style="${selectCss}">${['zoomthrough:Zoom-Through', 'pullback:Pullback Reveal', 'orbit:360\u00b0 Orbit'].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${s.flightMode === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>`,
         row('s-speed', 'Zoom Speed (Z-Velocity)', 0.2, 4, 0.1, s.camSpeed, v => v.toFixed(1) + 'x'),
         row('s-drift', 'X/Y Motion Drift', 0, 100, 1, s.camDrift, v => v + '%'),
-        row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '°'),
-        row('s-pitch', 'Tilt Pitch (X)', -30, 30, 1, s.camPitch, v => v + '°'),
-        row('s-yaw', 'Rotation Yaw (Y)', -30, 30, 1, s.camYaw, v => v + '°')
+        row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '\u00b0'),
+        row('s-pitch', 'Tilt Pitch (X)', -30, 30, 1, s.camPitch, v => v + '\u00b0'),
+        row('s-yaw', 'Rotation Yaw (Y)', -30, 30, 1, s.camYaw, v => v + '\u00b0')
       ].join(''));
       html += section('Atmosphere', [
         row('s-fog', 'Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
         row('s-light', 'Ambient Glow', 20, 200, 1, s.lightIntensity, v => v + '%'),
-        `<div style="display:flex;gap:6px;">${btn('s-grid', '⊞ Floor Grid', s.gridVisible)}${btn('s-dust', '✦ Dust', s.dustVisible)}</div>`
+        `<div style="display:flex;gap:6px;">${btn('s-grid', '\u229e Floor Grid', s.gridVisible)}${btn('s-dust', '\u2726 Dust', s.dustVisible)}</div>`
       ].join(''));
       html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${['docu-essay:Docu-Essay', 'cyber-matrix:Cyber Matrix', 'philosophy:Philosophy'].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
       html += section('3D Layers', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><button type="button" data-act="s-add" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ Add Text Plane</button>`);
@@ -425,9 +425,9 @@
       const p = ensureDoc(e);
       html += section('Text', textHtml);
       html += section('Camera', [
-        row('d-pitch', 'Tilt Pitch (X)', 0, 75, 1, Math.round(p.pitch), v => v + '°'),
-        row('d-yaw', 'Rotation Yaw (Y)', -60, 60, 1, Math.round(p.yaw), v => v + '°'),
-        row('d-roll', 'Roll (Z)', -45, 45, 1, Math.round(p.roll), v => v + '°'),
+        row('d-pitch', 'Tilt Pitch (X)', 0, 75, 1, Math.round(p.pitch), v => v + '\u00b0'),
+        row('d-yaw', 'Rotation Yaw (Y)', -60, 60, 1, Math.round(p.yaw), v => v + '\u00b0'),
+        row('d-roll', 'Roll (Z)', -45, 45, 1, Math.round(p.roll), v => v + '\u00b0'),
         row('d-dist', 'Camera Distance', 20, 110, 1, Math.round(p.dist), v => v),
         row('d-parallax', 'Parallax Strength', 0, 4, 0.1, p.parallax, v => v.toFixed(1) + 'x')
       ].join(''));
@@ -464,7 +464,7 @@
             <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
             <span style="font-size:11px;font-weight:700;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(u.title)}</span>
             <span style="font-size:9.5px;color:#64748b;font-family:monospace;">Z:${Math.round(m.position.z)}</span></div>
-          <button type="button" data-act="l-del-${i}" style="background:transparent;border:none;color:#f43f5e;cursor:pointer;font-size:12px;">✕</button></div>${editor}</div>`;
+          <button type="button" data-act="l-del-${i}" style="background:transparent;border:none;color:#f43f5e;cursor:pointer;font-size:12px;">\u2715</button></div>${editor}</div>`;
     }).join('') || '<span style="font-size:10.5px;color:#64748b;">No planes.</span>';
   }
 
@@ -495,16 +495,16 @@
 
     if (key.startsWith('tx-')) { setText(tplId, slotsFor(tplId)[parseInt(key.slice(3), 10)], v); }
     else if (key === 'v-speed') { fx.speed = v; lab((v >= 0 ? '+' : '') + v.toFixed(1) + 'x'); }
-    else if (key === 'v-pitch') { fx.pitch = v; lab(v + '°'); }
-    else if (key === 'v-yaw') { fx.yaw = v; lab(v + '°'); }
-    else if (key === 'v-roll') { fx.roll = v; lab(v + '°'); }
+    else if (key === 'v-pitch') { fx.pitch = v; lab(v + '\u00b0'); }
+    else if (key === 'v-yaw') { fx.yaw = v; lab(v + '\u00b0'); }
+    else if (key === 'v-roll') { fx.roll = v; lab(v + '\u00b0'); }
     else if (key === 'v-zoom') { fx.zoom = v; lab(v.toFixed(2) + 'x'); }
     else if (key === 'flight') { s.flightMode = v; }
     else if (key === 's-speed') { s.camSpeed = v; lab(v.toFixed(1) + 'x'); }
     else if (key === 's-drift') { s.camDrift = v; lab(v + '%'); }
-    else if (key === 's-fov') { s.fovWarp = v; lab(v + '°'); if (s.camera) { s.camera.fov = v; s.camera.updateProjectionMatrix(); } }
-    else if (key === 's-pitch') { s.camPitch = v; lab(v + '°'); }
-    else if (key === 's-yaw') { s.camYaw = v; lab(v + '°'); }
+    else if (key === 's-fov') { s.fovWarp = v; lab(v + '\u00b0'); if (s.camera) { s.camera.fov = v; s.camera.updateProjectionMatrix(); } }
+    else if (key === 's-pitch') { s.camPitch = v; lab(v + '\u00b0'); }
+    else if (key === 's-yaw') { s.camYaw = v; lab(v + '\u00b0'); }
     else if (key === 's-fog') { s.fogDensity = v; lab(v + '%'); if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (v / 100) * 0.0008; }
     else if (key === 's-light') { s.lightIntensity = v; lab(v + '%'); if (s.ambientLight) s.ambientLight.intensity = (v / 100) * 0.95; }
     else if (key.startsWith('l-')) {
@@ -522,9 +522,9 @@
         }
       }
     }
-    else if (key === 'd-pitch') { ensureDoc(e).pitch = v; lab(v + '°'); }
-    else if (key === 'd-yaw') { ensureDoc(e).yaw = v; lab(v + '°'); }
-    else if (key === 'd-roll') { ensureDoc(e).roll = v; lab(v + '°'); }
+    else if (key === 'd-pitch') { ensureDoc(e).pitch = v; lab(v + '\u00b0'); }
+    else if (key === 'd-yaw') { ensureDoc(e).yaw = v; lab(v + '\u00b0'); }
+    else if (key === 'd-roll') { ensureDoc(e).roll = v; lab(v + '\u00b0'); }
     else if (key === 'd-dist') { ensureDoc(e).dist = v; lab(String(v)); }
     else if (key === 'd-parallax') { ensureDoc(e).parallax = v; d.parallax = v; lab(v.toFixed(1) + 'x'); }
     else if (key === 'd-paper') { ensureDoc(e).paperStyle = v; d.paperStyle = v; d._texDirty = true; }
@@ -644,7 +644,7 @@
     const pill = document.createElement('div');
     pill.id = 'dom3d-orbit-pill';
     pill.style.cssText = 'position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:85;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(15,23,42,0.88);backdrop-filter:blur(10px);border:1px solid rgba(192,132,252,0.55);color:#f3e8ff;font-size:11px;font-weight:800;letter-spacing:0.05em;box-shadow:0 8px 24px rgba(0,0,0,0.65);pointer-events:none;white-space:nowrap;';
-    pill.innerHTML = `<span style="font-size:14px;">🖐️</span><span>3D INTERACTIVE MODE — DRAG TO TILT &amp; ROTATE • SCROLL TO ZOOM</span>`;
+    pill.innerHTML = `<span style="font-size:14px;">\ud83d\udd90\ufe0f</span><span>3D INTERACTIVE MODE \u2014 DRAG TO TILT &amp; ROTATE \u2022 SCROLL TO ZOOM</span>`;
     inner.appendChild(pill);
 
     if (inner.dataset.dom3dBound === tplId) return;
@@ -656,8 +656,8 @@
       const pIn = h.querySelector('[data-k="v-pitch"]'); if (pIn) pIn.value = e.fx.pitch;
       const yIn = h.querySelector('[data-k="v-yaw"]'); if (yIn) yIn.value = e.fx.yaw;
       const zIn = h.querySelector('[data-k="v-zoom"]'); if (zIn) zIn.value = e.fx.zoom;
-      setLabel('v-pitch', Math.round(e.fx.pitch) + '°');
-      setLabel('v-yaw', Math.round(e.fx.yaw) + '°');
+      setLabel('v-pitch', Math.round(e.fx.pitch) + '\u00b0');
+      setLabel('v-yaw', Math.round(e.fx.yaw) + '\u00b0');
       setLabel('v-zoom', Number(e.fx.zoom).toFixed(2) + 'x');
     };
 
@@ -760,7 +760,7 @@
       btn.style.borderColor = '#c084fc';
       btn.style.color = '#ffffff';
       btn.style.boxShadow = '0 0 14px rgba(168,85,247,0.4)';
-      if (icon) icon.textContent = '⤡';
+      if (icon) icon.textContent = '\u2921';
       if (label) label.textContent = 'Exit Theater';
       btn.setAttribute('aria-pressed', 'true');
       btn.title = 'Exit Theater / Standard Stage View';
@@ -769,7 +769,7 @@
       btn.style.borderColor = 'rgba(255,255,255,0.18)';
       btn.style.color = '#cbd5e1';
       btn.style.boxShadow = 'none';
-      if (icon) icon.textContent = '⛶';
+      if (icon) icon.textContent = '\u26f6';
       if (label) label.textContent = 'Theater View';
       btn.setAttribute('aria-pressed', 'false');
       btn.title = 'Toggle Theater / Expanded Stage View (Takes full vertical space)';
@@ -856,7 +856,7 @@
         stageCont.style.overflow = 'visible';
       }
     }
-    // Always preserve top controls (format switcher, [ ▶ Video ] [ ⬡ 3D ] mode toggle, 3D edit mode pill)
+    // Always preserve top controls (format switcher, [ \u25b6 Video ] [ \u2b21 3D ] mode toggle, 3D edit mode pill)
     if (aspectBtn && aspectBtn.parentElement) aspectBtn.parentElement.style.display = '';
     if (timerBadge && timerBadge.parentElement) timerBadge.parentElement.style.display = '';
     updateTheaterButtonUI();

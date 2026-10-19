@@ -97,7 +97,7 @@
     const mapCtxData = (tplId === 'map' && typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : null;
     const isMapInteractive3D = !!(mapCtxData && (mapCtxData.is3DMode || mapCtxData.drawOnScreenMode));
     const isDom3DHandOrbit = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode && ['zoom', 'parallax', 'textbehind', 'docheight'].includes(tplId));
-    const isBypassStageTransform = isMapInteractive3D || tplId === 'empire-timeline' || isDom3DHandOrbit;
+    const isBypassStageTransform = isMapInteractive3D || tplId === 'empire-timeline' || tplId === 'headline-fly' || isDom3DHandOrbit;
     if (isBypassStageTransform) {
       box.style.display = 'none';
       toolbar.style.display = 'none';
@@ -196,7 +196,7 @@
           <input type="color" id="stage-tb-color" value="${curColor}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Text Color" />
           <!-- Layer Depth Switch -->
           <button type="button" id="stage-tb-depth" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 6px; cursor: pointer;" title="Bring to Front or Send Behind">
-            ${textData.layerOrder === 'front' ? '🔲 Send Behind' : '🔲 Bring Front'}
+            ${textData.layerOrder === 'front' ? '\ud83d\udd32 Send Behind' : '\ud83d\udd32 Bring Front'}
           </button>
           <!-- Switch to Layer -->
           <button type="button" id="stage-tb-switch-fg" style="background: none; border: none; color: #94a3b8; font-size: 9.5px; cursor: pointer; text-decoration: underline;">Subject</button>
@@ -237,7 +237,7 @@
           </div>
           <!-- Fullscreen / Fit Toggle -->
           <button type="button" id="stage-tb-fullscreen" style="background: ${tf.isFullscreen ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.08)'}; border: 1px solid ${tf.isFullscreen ? '#38bdf8' : 'rgba(255,255,255,0.2)'}; border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 7px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Toggle Full Screen Stage Coverage">
-            <span>⛶</span> ${tf.isFullscreen ? 'Fit Mode' : 'Fullscreen'}
+            <span>\u26f6</span> ${tf.isFullscreen ? 'Fit Mode' : 'Fullscreen'}
           </button>
           <!-- Scale Zoom Steppers -->
           <div style="display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 4px;">
@@ -247,11 +247,11 @@
           </div>
           <!-- Reset Transform -->
           <button type="button" id="stage-tb-reset" style="background: none; border: none; color: #94a3b8; font-size: 9.5px; cursor: pointer;" title="Reset Position & Scale">
-            ↺ Reset
+            \u21ba Reset
           </button>
           <!-- Switch to Background -->
           <button type="button" id="stage-tb-switch-bg" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #cbd5e1; font-size: 9.5px; font-weight: 600; padding: 2px 6px; cursor: pointer;" title="Select and adjust Background Scene">
-            Backdrop ▾
+            Backdrop \u25be
           </button>
           ${textCandidate ? `<button type="button" id="stage-tb-switch-txt" style="background: none; border: none; color: #38bdf8; font-size: 9.5px; cursor: pointer; text-decoration: underline;">Edit Text</button>` : ''}
         `;
@@ -326,7 +326,7 @@
           </div>
           <!-- Switch back to Foreground -->
           <button type="button" id="stage-tb-switch-fg2" style="background: rgba(46,255,198,0.15); border: 1px solid rgba(46,255,198,0.4); border-radius: 4px; color: #2effc6; font-size: 9.5px; font-weight: 700; padding: 2px 7px; cursor: pointer;" title="Switch back to Subject">
-            Subject ▴
+            Subject \u25b4
           </button>
         `;
         toolbar.querySelector('#stage-tb-bg-preset')?.addEventListener('change', (e) => {

@@ -94,7 +94,7 @@
     'bloom': {
       type: 'bloom',
       panelTitle: 'US EQUITIES',
-      headline: 'FED SIGNALS RATE HOLD · TECH SURGES',
+      headline: 'FED SIGNALS RATE HOLD \u00b7 TECH SURGES',
       accentColor: '#f59e0b'
     },
 
@@ -221,7 +221,7 @@
       keyword: 'TIME',
       keyColor: '#facc15',
       showEmoji: false,
-      emoji: '🔥',
+      emoji: '\ud83d\udd25',
       transparentBg: false,
       bgMedia: '',
       bgMediaType: 'image'
@@ -263,7 +263,7 @@
     // 25. Investigative Globe & Map Pin Drop
     'map': {
       type: 'map',
-      location: 'USA → UK → Ukraine',
+      location: 'USA \u2192 UK \u2192 Ukraine',
       coords: 'MULTI-VECTOR TRANSIT // 2 ACTIVE LEGS',
       lat: 48.0,
       lng: 12.0,
@@ -291,7 +291,7 @@
     'empire-timeline': {
       type: 'empire-timeline',
       title: 'THE RISE & FALL OF ENRON',
-      subtitle: 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001',
+      subtitle: 'CORPORATE VALUATION & LIQUIDITY CRASH \u00b7 1985 \u2014 2001',
       theme: 'james-jani',
       hairline: 1.2,
       showGrid: true,
@@ -314,7 +314,7 @@
       type: 'news',
       channel: 'WORLD NEWS LIVE',
       headline: 'Tech Giant Announces Unprecedented Layoffs',
-      ticker: 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING • FEDERAL REGULATORS OPEN INQUIRY',
+      ticker: 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING \u2022 FEDERAL REGULATORS OPEN INQUIRY',
       bannerColor: '#dc2626'
     },
 
@@ -357,7 +357,7 @@
     'vhs': {
       type: 'vhs',
       tag: 'SUMMER 89',
-      recMode: 'REC ●',
+      recMode: 'REC \u25cf',
       filter: 'vintage'
     },
 
@@ -471,7 +471,7 @@
     'ceo-portrait': {
       type: 'ceo-portrait',
       ceoName: 'ALEXANDER VANCE',
-      ceoRole: 'CHIEF EXECUTIVE OFFICER · VANGUARD GLOBAL',
+      ceoRole: 'CHIEF EXECUTIVE OFFICER \u00b7 VANGUARD GLOBAL',
       ceoBadge: 'EXECUTIVE DOSSIER // VERIFIED',
       fontFamily: "'Space Grotesk', sans-serif",
       fontSize: 32,
@@ -488,7 +488,7 @@
     'boardroom-zoom': {
       type: 'boardroom-zoom',
       headline: 'EMERGENCY BOARDROOM SUMMIT',
-      subline: '42ND FLOOR · MANHATTAN HQ // $14.8B MERGER VOTE',
+      subline: '42ND FLOOR \u00b7 MANHATTAN HQ // $14.8B MERGER VOTE',
       fontFamily: "'Space Grotesk', sans-serif",
       textColor: '#f8fafc',
       accentColor: '#fbbf24',
@@ -505,7 +505,7 @@
       recText: 'REC',
       datePrefix: '2026-10-19',
       timecode: '2026-10-19  03:14:28:09',
-      statusText: 'ISO 3200 · IR NIGHT VISION · 1080P/24',
+      statusText: 'ISO 3200 \u00b7 IR NIGHT VISION \u00b7 1080P/24',
       colorMode: 'night',
       showScanlines: true,
       feedUrl: '/cctv_surveillance_scene.jpg',
@@ -605,7 +605,7 @@
     'dividend': {
       type: 'dividend',
       title: 'Dividend Calendar',
-      yield: '4.2% · $350/mo',
+      yield: '4.2% \u00b7 $350/mo',
       perShare: '$87'
     },
 
@@ -616,6 +616,139 @@
       eq: 'Eq: $350K',
       supplyColor: '#ef4444',
       demandColor: '#10b981'
+    },
+
+    // 51. Flying Headlines (3D Cinematic Motion Suite)
+    'headline-fly': {
+      type: 'headline-fly',
+      tiltAngle: 9.5,
+      motionBlur: true,
+      blurIntensity: 32,
+      dofBokeh: true,
+      dofBlur: 8,
+      specularGlare: true,
+      shadowRadius: 48,
+      shadowAlpha: 0.55,
+      easingMode: 'cinematic',
+      organicDrift: true,
+      flySpeed: 1.0,
+      staggerDelay: 0.28,
+      paperGrain: 35,
+      showTelemetry: true,
+      hudLeft: 'INVESTIGATIVE PRESS ARCHIVE // RECONSTRUCTION 3D',
+      hudRight: 'OPTICAL LENS: 35MM ANAMORPHIC',
+      activeCardTab: 5,
+
+      // Card #1 (Top-Left: Classic Broadsheet Tear-Sheet)
+      visible1: true,
+      theme1: 'newsprint',
+      bgColor1: '#f6f1e7',
+      textColor1: '#0f172a',
+      accentColor1: '#b91c1c',
+      hlColor1: '#fde047',
+      source1: 'THE FINANCIAL CHRONICLE',
+      kicker1: 'SPECIAL DISCLOSURE',
+      date1: 'OCT 24, 2026',
+      headline1: 'Tech Giant Collapse: Internal Memos Reveal Chaos',
+      highlight1: 'Internal Memos Reveal Chaos',
+      subhead1: 'Leaked board minutes show executives knew of liquidity shortfall six months prior to freeze.',
+      byline1: 'By Marcus Vance \u00b7 Markets Desk',
+      exhibit1: 'EXHIBIT A-01',
+      font1: "'Playfair Display', Georgia, serif",
+      fontSize1: 11.5,
+      scale1: 1.0,
+      rot1: -2.2,
+      x1: 0,
+      y1: 0,
+
+      // Card #2 (Top-Right: Financial Times Salmon Pink Press Clipping)
+      visible2: true,
+      theme2: 'ft-salmon',
+      bgColor2: '#fcd5b5',
+      textColor2: '#1c1917',
+      accentColor2: '#9a3412',
+      hlColor2: '#fef08a',
+      source2: 'GLOBAL MARKETS LEDGER',
+      kicker2: 'SENATE SUBCOMMITTEE',
+      date2: 'OCT 25, 2026',
+      headline2: 'Whistleblower Testifies Before Senate Hearing',
+      highlight2: 'Whistleblower Testifies',
+      subhead2: 'Former chief risk officer hands over 4,200 pages of unredacted offshore wire transfers.',
+      byline2: 'By Elena Rostova \u00b7 Washington',
+      exhibit2: 'EXHIBIT B-14',
+      font2: "'Playfair Display', Georgia, serif",
+      fontSize2: 11.5,
+      scale2: 1.0,
+      rot2: 2.4,
+      x2: 0,
+      y2: 0,
+
+      // Card #3 (Bottom-Left: Dark Investigative Wire)
+      visible3: true,
+      theme3: 'obsidian',
+      bgColor3: '#0f172a',
+      textColor3: '#f8fafc',
+      accentColor3: '#38bdf8',
+      hlColor3: '#0284c7',
+      source3: 'REUTERS INVESTIGATIVE WIRE',
+      kicker3: 'FORENSIC AUDIT',
+      date3: 'OCT 26, 2026',
+      headline3: 'Federal Prosecutors Unseal Indictments Across 4 Districts',
+      highlight3: 'Unseal Indictments',
+      subhead3: 'Coordinated dawn raids target shell entities registered in Zurich, Cayman, and Singapore.',
+      byline3: 'By Julian Thorne \u00b7 Legal Correspondent',
+      exhibit3: 'DOSSIER #409',
+      font3: "'Inter', sans-serif",
+      fontSize3: 11,
+      scale3: 1.0,
+      rot3: 1.6,
+      x3: 0,
+      y3: 0,
+
+      // Card #4 (Bottom-Right: Urgent Breaking Alert)
+      visible4: true,
+      theme4: 'crimson',
+      bgColor4: '#18090c',
+      textColor4: '#ffffff',
+      accentColor4: '#ef4444',
+      hlColor4: '#b91c1c',
+      source4: 'BLOOMBERG TERMINAL ALERT',
+      kicker4: 'BREAKING NEWS',
+      date3_5: '',
+      date4: 'OCT 27, 2026',
+      headline4: 'Mass Protests as $18B in Depositor Assets Frozen Worldwide',
+      highlight4: '$18B in Depositor Assets Frozen',
+      subhead4: 'Emergency central bank liquidity facility triggered as contagion spreads to European clearinghouses.',
+      byline4: 'Wire Dispatch \u00b7 London / NY',
+      exhibit4: 'URGENT WIRE',
+      font4: "'Inter', sans-serif",
+      fontSize4: 11,
+      scale4: 1.0,
+      rot4: -1.8,
+      x4: 0,
+      y4: 0,
+
+      // Card #5 (Center Hero Foreground Clipping: High-Contrast Broadsheet Spotlight)
+      visible5: true,
+      theme5: 'newsprint',
+      bgColor5: '#fdfbf7',
+      textColor5: '#09090b',
+      accentColor5: '#dc2626',
+      hlColor5: '#facc15',
+      source5: 'THE WALL STREET INVESTIGATOR',
+      kicker5: 'EXCLUSIVE EXPOSE',
+      date5: 'OCT 28, 2026',
+      headline5: 'The $40B Accounting Black Hole Exposed',
+      highlight5: '$40B Accounting Black Hole',
+      subhead5: 'How a decade of synthetic shadow loans disguised the largest corporate insolvency in modern history.',
+      byline5: 'By Investigative Unit \u00b7 Special Report',
+      exhibit5: 'KEY EVIDENCE #01',
+      font5: "'Playfair Display', Georgia, serif",
+      fontSize5: 13,
+      scale5: 1.06,
+      rot5: -0.6,
+      x5: 0,
+      y5: 0
     }
   };
 
@@ -639,7 +772,7 @@
     return `
       <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 9px 10px; display: flex; flex-direction: column; gap: 8px;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-          <span style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">🌌 Studio Background &amp; Video B-Roll</span>
+          <span style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">\ud83c\udf0c Studio Background &amp; Video B-Roll</span>
           ${hasCustomMedia ? `<button type="button" class="ubg-clear-media" style="background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;cursor:pointer;">Clear Media</button>` : ''}
         </div>
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px;">
@@ -652,7 +785,7 @@
           }).join('')}
         </div>
         <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
-          <span style="font-size: 9px; color: #94a3b8;">${hasCustomMedia ? (data.bgMediaType === 'video' ? '🎬 Custom Video BG Active' : '🖼️ Custom Image BG Active') : 'Upload custom video (.mp4/.webm) or image'}</span>
+          <span style="font-size: 9px; color: #94a3b8;">${hasCustomMedia ? (data.bgMediaType === 'video' ? '\ud83c\udfac Custom Video BG Active' : '\ud83d\uddbc\ufe0f Custom Image BG Active') : 'Upload custom video (.mp4/.webm) or image'}</span>
           <label style="font-size: 9.5px; font-weight: 800; color: #0f172a; background: linear-gradient(135deg, #38bdf8, #818cf8); padding: 4px 9px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
             + Video / Image BG
             <input type="file" class="ubg-file-input" accept="video/*,image/*" style="display: none;" />
@@ -998,8 +1131,8 @@
     const panX = ((50 - normX) * 0.28).toFixed(1) + '%';
     const panY = ((50 - normY) * 0.28).toFixed(1) + '%';
 
-    const locTitle = d.location || activeRoutes.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
-    const coordsSub = d.coords || `${activeRoutes.length} ACTIVE TRANSIT LEG${activeRoutes.length > 1 ? 'S' : ''} · ${Math.abs(focusLat).toFixed(2)}°${focusLat >= 0 ? 'N' : 'S'}, ${Math.abs(focusLng).toFixed(2)}°${focusLng >= 0 ? 'E' : 'W'}`;
+    const locTitle = d.location || activeRoutes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
+    const coordsSub = d.coords || `${activeRoutes.length} ACTIVE TRANSIT LEG${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ${Math.abs(focusLat).toFixed(2)}\u00b0${focusLat >= 0 ? 'N' : 'S'}, ${Math.abs(focusLng).toFixed(2)}\u00b0${focusLng >= 0 ? 'E' : 'W'}`;
 
     // High-Granularity World Continents, Islands, Country Borders & Labels (400x225 Equirectangular)
     const granularWorldPaths = `
@@ -1129,7 +1262,7 @@
       const pathId = `map-route-path-${idx}`;
       const col = rt.color || (idx === 0 ? '#38bdf8' : (idx === 1 ? '#f59e0b' : '#2effc6'));
       const dash = rt.mode === 'train' ? '3 1.5' : (rt.mode === 'ship' ? '2 2.5' : '4 2.5');
-      const modeBadge = rt.mode === 'ship' ? '🚢' : (rt.mode === 'train' ? '🚆' : (rt.mode === 'line' ? '⚡' : '✈️'));
+      const modeBadge = rt.mode === 'ship' ? '\ud83d\udea2' : (rt.mode === 'train' ? '\ud83d\ude86' : (rt.mode === 'line' ? '\u26a1' : '\u2708\ufe0f'));
 
       return `
         <g class="map-route-group" data-route-idx="${idx}">
@@ -1242,15 +1375,15 @@
 
     const stage3DControlsHtml = (is3D || isDrawing) ? `
       <div class="map-3d-stage-toolbar" style="position:absolute; top:10px; right:12px; z-index:35; display:flex; align-items:center; gap:6px; background:rgba(7,13,25,0.92); backdrop-filter:blur(10px); border:1px solid rgba(56,189,248,0.45); border-radius:20px; padding:4px 10px; box-shadow:0 8px 24px rgba(0,0,0,0.75); pointer-events:auto;">
-        <span style="font-size:9px; font-weight:800; color:#a855f7; font-family:monospace;">⬡ 3D MAP</span>
+        <span style="font-size:9px; font-weight:800; color:#a855f7; font-family:monospace;">\u2b21 3D MAP</span>
         <button type="button" id="map-stage-btn-draw" style="background:${isDrawing ? 'rgba(46,255,198,0.22)' : 'rgba(255,255,255,0.08)'}; border:1px solid ${isDrawing ? '#2effc6' : 'rgba(255,255,255,0.18)'}; color:${isDrawing ? '#2effc6' : '#e2e8f0'}; border-radius:12px; padding:2px 8px; font-size:9.5px; font-weight:700; cursor:pointer;">
-          ${isDrawing ? '✏️ Tracing Route (Click/Drag Map)' : '✏️ Trace Route on Screen'}
+          ${isDrawing ? '\u270f\ufe0f Tracing Route (Click/Drag Map)' : '\u270f\ufe0f Trace Route on Screen'}
         </button>
         <select id="map-stage-sel-transit" style="background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:#fff; font-size:9.5px; font-weight:700; padding:2px 5px; cursor:pointer;" title="Transit Mode for On-Screen Trace">
-          <option value="plane" ${(d.activeTraceTransit || 'plane') === 'plane' ? 'selected' : ''}>✈️ Plane</option>
-          <option value="ship" ${d.activeTraceTransit === 'ship' ? 'selected' : ''}>🚢 Ship</option>
-          <option value="train" ${d.activeTraceTransit === 'train' ? 'selected' : ''}>🚆 Train</option>
-          <option value="line" ${d.activeTraceTransit === 'line' ? 'selected' : ''}>⚡ Line</option>
+          <option value="plane" ${(d.activeTraceTransit || 'plane') === 'plane' ? 'selected' : ''}>\u2708\ufe0f Plane</option>
+          <option value="ship" ${d.activeTraceTransit === 'ship' ? 'selected' : ''}>\ud83d\udea2 Ship</option>
+          <option value="train" ${d.activeTraceTransit === 'train' ? 'selected' : ''}>\ud83d\ude86 Train</option>
+          <option value="line" ${d.activeTraceTransit === 'line' ? 'selected' : ''}>\u26a1 Line</option>
         </select>
         <button type="button" id="map-stage-btn-clear-trace" style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); color:#fca5a5; border-radius:10px; padding:2px 7px; font-size:9px; font-weight:700; cursor:pointer;" title="Clear On-Screen Drawn Traces">Clear</button>
       </div>
@@ -1277,8 +1410,8 @@
           <div class="location-coords">${coordsSub}</div>
         </div>
         <div class="telemetry-bar">
-          <span>SAT-LOCK // ${proj === 'globe' ? '3D ORTHOGRAPHIC GLOBE' : '2D GRANULAR WORLD MAP'} ${is3D ? '· [3D INTERACTIVE]' : ''}</span>
-          <span>${activeRoutes.length} ROUTE${activeRoutes.length > 1 ? 'S' : ''} · ZOOM @ ${zoomStart}s · ${zoomLvl}x</span>
+          <span>SAT-LOCK // ${proj === 'globe' ? '3D ORTHOGRAPHIC GLOBE' : '2D GRANULAR WORLD MAP'} ${is3D ? '\u00b7 [3D INTERACTIVE]' : ''}</span>
+          <span>${activeRoutes.length} ROUTE${activeRoutes.length > 1 ? 'S' : ''} \u00b7 ZOOM @ ${zoomStart}s \u00b7 ${zoomLvl}x</span>
         </div>
       </div>
     `;
@@ -1409,7 +1542,7 @@
               mode: d.activeTraceTransit || 'plane',
               color: routes.length % 2 === 0 ? '#38bdf8' : '#2effc6'
             });
-            const locStr = routes.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
+            const locStr = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
             window.tplSetContextualData('map', {
               routes,
               location: locStr,
@@ -1445,7 +1578,7 @@
               color: '#2effc6'
             });
           }
-          const locStr = routes.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
+          const locStr = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
           window.tplSetContextualData('map', {
             customTracedRoutes: customList,
             routes,
@@ -1468,7 +1601,7 @@
   window.tplBuildEmpireTimelineHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('empire-timeline') : {});
     const title = d.title || 'THE RISE & FALL OF ENRON';
-    const subtitle = d.subtitle || 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001';
+    const subtitle = d.subtitle || 'CORPORATE VALUATION & LIQUIDITY CRASH \u00b7 1985 \u2014 2001';
     const themeKey = d.theme || 'james-jani';
     const hairline = Math.max(0.7, Math.min(3.0, parseFloat(d.hairline || 1.2)));
     const showGrid = d.showGrid !== false;
@@ -1614,7 +1747,7 @@
         </div>
         
         <div style="position:absolute; bottom:12px; right:18px; z-index:10; pointer-events:none; background:rgba(4,9,17,0.75); border:1px solid rgba(255,255,255,0.12); padding:3px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:7.5px; color:#94a3b8; letter-spacing:0.06em; backdrop-filter:blur(4px);">
-          ${is3D ? `⬡ 3D DEPTH // PITCH: ${cameraPitch}° YAW: ${cameraYaw}°` : `VALUATION TRAJECTORY // HAIRLINE: ${hairline.toFixed(1)}px`}
+          ${is3D ? `\u2b21 3D DEPTH // PITCH: ${cameraPitch}\u00b0 YAW: ${cameraYaw}\u00b0` : `VALUATION TRAJECTORY // HAIRLINE: ${hairline.toFixed(1)}px`}
         </div>
 
         <div id="tm-3d-stage-plane" style="width:100%; height:100%; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform-style:preserve-3d; transition:transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); ${is3D ? `transform: rotateX(${cameraPitch}deg) rotateY(${cameraYaw}deg) scale(0.92); box-shadow: 0 35px 70px rgba(0,0,0,0.85);` : ''}">
@@ -1805,7 +1938,7 @@
       }
       const hoverBtn = fxc.querySelector('#btn-stage-toggle-order span');
       if (hoverBtn) {
-        hoverBtn.textContent = data.layerOrder === 'front' ? '🔲 Send Text Behind' : '🔲 Bring Text to Front';
+        hoverBtn.textContent = data.layerOrder === 'front' ? '\ud83d\udd32 Send Text Behind' : '\ud83d\udd32 Bring Text to Front';
       }
     } else if (tplId === 'docheight') {
       const head = fxc.querySelector('.doc-header');
@@ -1890,8 +2023,8 @@
       const l = fxc.querySelector('.tw-likes'); if (l && data.likes !== undefined) l.textContent = data.likes;
       const rt = fxc.querySelector('.tw-retweets'); if (rt && data.retweets !== undefined) rt.textContent = data.retweets;
     } else if (tplId === 'quote') {
-      const q = fxc.querySelector('.quote-text'); if (q) q.textContent = `“${data.quote}”`;
-      const a = fxc.querySelector('.quote-author'); if (a) a.textContent = `— ${data.author}`;
+      const q = fxc.querySelector('.quote-text'); if (q) q.textContent = `\u201c${data.quote}\u201d`;
+      const a = fxc.querySelector('.quote-author'); if (a) a.textContent = `\u2014 ${data.author}`;
     } else if (tplId === 'news') {
       const ch = fxc.querySelector('.news-badge'); if (ch && data.channel !== undefined) ch.textContent = data.channel;
       const hl = fxc.querySelector('.headline'); if (hl && data.headline !== undefined) hl.textContent = data.headline;
@@ -1940,7 +2073,7 @@
       const sc = fxc.querySelector('.cs-score'); if (sc) sc.textContent = data.score;
       const r = fxc.querySelector('.cs-rating'); if (r) { r.textContent = data.rating; r.style.color = data.color; }
     } else if (tplId === 'budget') {
-      const t = fxc.querySelector('.b-title'); if (t) t.textContent = `50/30/20 Budget · ${data.income}`;
+      const t = fxc.querySelector('.b-title'); if (t) t.textContent = `50/30/20 Budget \u00b7 ${data.income}`;
     } else if (tplId === 'subscribe') {
       const c = fxc.querySelector('.sub-ch'); if (c) c.textContent = data.channel;
       const s = fxc.querySelector('.sub-count'); if (s) s.textContent = data.subs;
@@ -1988,7 +2121,7 @@
         if (data.showEmoji) {
           const e1 = document.createElement('div');
           e1.className = 'emoji e1';
-          e1.textContent = data.emoji || '🔥';
+          e1.textContent = data.emoji || '\ud83d\udd25';
           root.appendChild(e1);
         }
       }
@@ -2181,6 +2314,109 @@
           }
         }
       }
+    } else if (tplId === 'headline-fly') {
+      const root = fxc.querySelector('.tpl-headline-fly');
+      if (root) {
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+        if (data.tiltAngle !== undefined) root.style.setProperty('--fly-tilt', `${data.tiltAngle}deg`);
+        if (data.motionBlur !== undefined) root.classList.toggle('has-motion-blur', !!data.motionBlur);
+        if (data.blurIntensity !== undefined) root.style.setProperty('--motion-blur-px', `${data.blurIntensity}px`);
+        if (data.dofBokeh !== undefined) root.classList.toggle('has-dof-bokeh', !!data.dofBokeh);
+        if (data.dofBlur !== undefined) root.style.setProperty('--dof-blur-px', `${data.dofBlur}px`);
+        if (data.specularGlare !== undefined) root.classList.toggle('has-specular-glare', !!data.specularGlare);
+        if (data.organicDrift !== undefined) root.classList.toggle('has-organic-drift', !!data.organicDrift);
+        if (data.shadowRadius !== undefined) root.style.setProperty('--card-shadow-radius', `${data.shadowRadius}px`);
+        if (data.shadowAlpha !== undefined) root.style.setProperty('--card-shadow-alpha', `${data.shadowAlpha}`);
+        if (data.flySpeed !== undefined) root.style.setProperty('--fly-speed', `${data.flySpeed}`);
+        if (data.staggerDelay !== undefined) root.style.setProperty('--fly-stagger', `${data.staggerDelay}s`);
+        if (data.paperGrain !== undefined) root.style.setProperty('--fly-paper-grain', `${(Number(data.paperGrain) / 100).toFixed(2)}`);
+
+        const hudEl = root.querySelector('.fly-hud-telemetry');
+        if (hudEl) {
+          hudEl.style.display = data.showTelemetry === false ? 'none' : 'flex';
+          const hudSpans = hudEl.querySelectorAll('span');
+          if (hudSpans[0] && data.hudLeft !== undefined) hudSpans[0].textContent = data.hudLeft;
+          if (hudSpans[1]) {
+            const rightTxt = data.hudRight !== undefined ? data.hudRight : `CAM PERSPECTIVE: 1200PX // YAW-TILT: ${data.tiltAngle ?? 9.5}\u00b0`;
+            hudSpans[1].textContent = rightTxt;
+          }
+        }
+
+        const formatHeadlineHtml = (text, hlPhrase) => {
+          const raw = String(text || '');
+          const hl = String(hlPhrase || '').trim();
+          const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          if (!hl) return esc(raw);
+          const idx = raw.toLowerCase().indexOf(hl.toLowerCase());
+          if (idx === -1) return esc(raw);
+          const before = raw.slice(0, idx);
+          const match = raw.slice(idx, idx + hl.length);
+          const after = raw.slice(idx + hl.length);
+          return `${esc(before)}<span class="fly-hl-mark">${esc(match)}</span>${esc(after)}`;
+        };
+
+        for (let i = 1; i <= 5; i++) {
+          const card = root.querySelector(`.fly-card-${i}`);
+          if (card) {
+            const vis = data[`visible${i}`] !== false;
+            card.style.display = vis ? 'block' : 'none';
+            card.classList.toggle('is-selected-card', Number(data.activeCardTab || 5) === i);
+
+            const theme = data[`theme${i}`] || 'newsprint';
+            card.className = `fly-card fly-card-${i} theme-${theme}${Number(data.activeCardTab || 5) === i ? ' is-selected-card' : ''}`;
+
+            if (data[`bgColor${i}`]) card.style.setProperty('--c-bg', data[`bgColor${i}`]);
+            if (data[`textColor${i}`]) {
+              card.style.setProperty('--c-text', data[`textColor${i}`]);
+              const isLight = /^#(f|e|d|c)/i.test(data[`bgColor${i}`] || '');
+              card.style.setProperty('--c-sub', isLight ? '#475569' : '#94a3b8');
+              card.style.setProperty('--c-rule', isLight ? 'rgba(15,23,42,0.16)' : 'rgba(255,255,255,0.14)');
+              card.style.setProperty('--c-border', isLight ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.22)');
+            }
+            if (data[`accentColor${i}`]) card.style.setProperty('--c-accent', data[`accentColor${i}`]);
+            if (data[`hlColor${i}`]) card.style.setProperty('--c-hl', data[`hlColor${i}`]);
+            if (data[`font${i}`]) card.style.setProperty('--c-font', data[`font${i}`]);
+            if (data[`fontSize${i}`] !== undefined) card.style.setProperty('--c-title-size', `${data[`fontSize${i}`]}px`);
+            if (data[`scale${i}`] !== undefined) card.style.setProperty('--c-scale', `${data[`scale${i}`]}`);
+            if (data[`rot${i}`] !== undefined) card.style.setProperty('--c-rot', `${data[`rot${i}`]}deg`);
+            if (data[`x${i}`] !== undefined) card.style.setProperty('--c-x', `${data[`x${i}`]}px`);
+            if (data[`y${i}`] !== undefined) card.style.setProperty('--c-y', `${data[`y${i}`]}px`);
+
+            const s = card.querySelector('.fly-card-source');
+            if (s && data[`source${i}`] !== undefined) s.textContent = data[`source${i}`];
+            const pIcon = card.querySelector('.fly-card-pub-icon');
+            if (pIcon && data[`source${i}`] !== undefined) {
+              const cleanInit = String(data[`source${i}`] || 'N').replace(/^THE\s+/i, '').trim().charAt(0).toUpperCase() || 'N';
+              pIcon.textContent = cleanInit;
+            }
+            const k = card.querySelector('.fly-card-kicker');
+            if (k && data[`kicker${i}`] !== undefined) {
+              k.textContent = data[`kicker${i}`];
+              k.style.display = data[`kicker${i}`] ? 'inline-block' : 'none';
+            }
+            const d = card.querySelector('.fly-card-date');
+            if (d && data[`date${i}`] !== undefined) d.textContent = data[`date${i}`];
+            const h = card.querySelector('.fly-card-headline');
+            if (h && (data[`headline${i}`] !== undefined || data[`highlight${i}`] !== undefined)) {
+              h.innerHTML = formatHeadlineHtml(data[`headline${i}`], data[`highlight${i}`]);
+            }
+            const sub = card.querySelector('.fly-card-subdeck');
+            if (sub && data[`subhead${i}`] !== undefined) {
+              sub.textContent = data[`subhead${i}`];
+              sub.style.display = data[`subhead${i}`] ? '-webkit-box' : 'none';
+            }
+            const byl = card.querySelector('.fly-card-byline');
+            if (byl && data[`byline${i}`] !== undefined) byl.textContent = data[`byline${i}`];
+            const stmp = card.querySelector('.fly-card-stamp');
+            if (stmp && data[`exhibit${i}`] !== undefined) {
+              stmp.textContent = data[`exhibit${i}`];
+              stmp.style.display = data[`exhibit${i}`] ? 'inline-block' : 'none';
+            }
+          }
+        }
+      }
     }
   };
 
@@ -2217,7 +2453,7 @@
         <div style="background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">🌄</span>
+              <span style="font-size: 13px;">\ud83c\udf04</span>
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">Depth Layer Stack</span>
             </div>
             <label for="parallax-add-custom-layer" style="font-size: 10px; font-weight: 600; color: #c084fc; cursor: pointer; padding: 2px 6px; border-radius: 4px; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3);">
@@ -2283,7 +2519,7 @@
             </div>
             <div style="display: flex; align-items: center; gap: 6px;">
               <input type="color" id="parallax-input-sky-top" value="${data.skyTop || '#1a1033'}" style="width: 20px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Sky Top Color" />
-              <span style="color: #64748b; font-size: 10px;">→</span>
+              <span style="color: #64748b; font-size: 10px;">\u2192</span>
               <input type="color" id="parallax-input-sky-bot" value="${data.skyBottom || '#ff7a59'}" style="width: 20px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Sky Horizon Glow" />
             </div>
           </div>
@@ -2350,7 +2586,7 @@
         <div style="background: rgba(56,189,248,0.06); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">📊</span>
+              <span style="font-size: 13px;">\ud83d\udcca</span>
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">Comparison Bars</span>
             </div>
             <button type="button" id="wealth-btn-add-bar" style="font-size: 10px; font-weight: 600; color: #38bdf8; cursor: pointer; padding: 2px 7px; border-radius: 4px; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.35);">
@@ -2371,7 +2607,7 @@
                   <input type="text" class="wealth-item-label" data-idx="${idx}" value="${b.label}" placeholder="Entity Name" style="flex: 1; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 11px; font-weight: 600; padding: 2px 4px; outline: none;" />
                   <input type="text" class="wealth-item-val" data-idx="${idx}" value="${b.val}" placeholder="Value" style="width: 55px; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.15); color: ${b.color}; font-size: 11px; font-weight: 700; text-align: right; padding: 2px 4px; outline: none;" />
                   <input type="color" class="wealth-item-color" data-idx="${idx}" value="${b.color}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Change Bar Color" />
-                  ${bars.length > 1 ? `<button type="button" class="wealth-item-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Remove this bar">✕</button>` : ''}
+                  ${bars.length > 1 ? `<button type="button" class="wealth-item-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Remove this bar">\u2715</button>` : ''}
                 </div>
                 <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #64748b;">
                   <span>Bar Fill Length</span>
@@ -2457,7 +2693,7 @@
         <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">📈</span>
+              <span style="font-size: 13px;">\ud83d\udcc8</span>
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">Ticker Feed & Feeds</span>
             </div>
             <button type="button" id="ticker-btn-add-item" style="font-size: 10px; font-weight: 600; color: #10b981; cursor: pointer; padding: 2px 7px; border-radius: 4px; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.35);">
@@ -2477,9 +2713,9 @@
                 <input type="text" class="ticker-item-price" data-idx="${idx}" value="${it.price}" placeholder="Price" style="flex: 1; background: transparent; border: none; color: #cbd5e1; font-size: 10.5px; font-weight: 600; outline: none;" />
                 <input type="text" class="ticker-item-change" data-idx="${idx}" value="${it.change}" placeholder="+0.0%" style="width: 50px; background: transparent; border: none; color: ${it.isUp ? '#10b981' : '#ef4444'}; font-size: 10.5px; font-weight: 700; text-align: right; outline: none;" />
                 <button type="button" class="ticker-item-toggle" data-idx="${idx}" style="padding: 2px 5px; font-size: 9px; font-weight: 700; border-radius: 4px; background: ${it.isUp ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${it.isUp ? '#10b981' : '#ef4444'}; border: 1px solid ${it.isUp ? '#10b981' : '#ef4444'}; cursor: pointer;">
-                  ${it.isUp ? '▲' : '▼'}
+                  ${it.isUp ? '\u25b2' : '\u25bc'}
                 </button>
-                <button type="button" class="ticker-item-del" data-idx="${idx}" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 0 2px;">✕</button>
+                <button type="button" class="ticker-item-del" data-idx="${idx}" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 0 2px;">\u2715</button>
               </div>
             `).join('')}
           </div>
@@ -2565,7 +2801,7 @@
         <div style="background: rgba(168,85,247,0.06); border: 1px solid rgba(168,85,247,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">🔤</span>
+              <span style="font-size: 13px;">\ud83d\udd24</span>
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">TEXT BEHIND CONTROLS</span>
             </div>
             <span style="font-size: 9px; color: #c084fc; font-weight: 700; background: rgba(168,85,247,0.15); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
@@ -2630,10 +2866,10 @@
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 2px;">
               <button type="button" id="btn-tb-order-behind" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; ${curOrder === 'behind' ? 'background: rgba(56,189,248,0.2); border: 1px solid #38bdf8; color: #fff;' : 'background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8;'}">
-                <span>🔲</span> Behind Subject
+                <span>\ud83d\udd32</span> Behind Subject
               </button>
               <button type="button" id="btn-tb-order-front" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; ${curOrder === 'front' ? 'background: rgba(168,85,247,0.2); border: 1px solid #a855f7; color: #fff;' : 'background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8;'}">
-                <span>🔲</span> Bring to Front
+                <span>\ud83d\udd32</span> Bring to Front
               </button>
             </div>
           </div>
@@ -2736,7 +2972,7 @@
         <div style="background: rgba(250,204,21,0.06); border: 1px solid rgba(250,204,21,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">📄</span>
+              <span style="font-size: 13px;">\ud83d\udcc4</span>
               <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">DOCUMENT HIGHLIGHT CONTROLS</span>
             </div>
             <button type="button" id="dh-btn-add-line" style="font-size: 9.5px; font-weight: 700; color: #facc15; cursor: pointer; padding: 2px 7px; border-radius: 4px; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.35);">
@@ -2760,9 +2996,9 @@
                     <span style="font-size: 9.5px; font-weight: 800; font-family: monospace; color: #94a3b8;">LINE ${idx + 1}</span>
                     <div style="display: flex; align-items: center; gap: 6px;">
                       <button type="button" class="dh-line-toggle-hl" data-idx="${idx}" style="font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 3px; ${ln.highlighted ? `background: rgba(250,204,21,0.22); border: 1px solid ${data.hlColor || '#facc15'}; color: #fff;` : 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #64748b;'}">
-                        <span>${ln.highlighted ? '🖍️ Highlighted' : '○ Normal'}</span>
+                        <span>${ln.highlighted ? '\ud83d\udd8d\ufe0f Highlighted' : '\u25cb Normal'}</span>
                       </button>
-                      ${lines.length > 1 ? `<button type="button" class="dh-line-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Delete this line">✕</button>` : ''}
+                      ${lines.length > 1 ? `<button type="button" class="dh-line-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Delete this line">\u2715</button>` : ''}
                     </div>
                   </div>
                   <input type="text" class="dh-line-input-text" data-idx="${idx}" value="${ln.text}" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10.5px; font-family: 'Georgia', serif; outline: none;" placeholder="Sentence clause..." />
@@ -2862,9 +3098,9 @@
 
       const presets = [
         {
-          label: '⚡ Enron: The Smartest Guys in the Room (1985 — 2001)',
+          label: '\u26a1 Enron: The Smartest Guys in the Room (1985 \u2014 2001)',
           title: 'THE RISE & FALL OF ENRON',
-          subtitle: 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001',
+          subtitle: 'CORPORATE VALUATION & LIQUIDITY CRASH \u00b7 1985 \u2014 2001',
           theme: 'james-jani',
           peakValuation: '$1.5B',
           milestones: [
@@ -2876,37 +3112,37 @@
           ]
         },
         {
-          label: '🏢 WeWork: The $47 Billion Mirage (2010 — 2023)',
+          label: '\ud83c\udfe2 WeWork: The $47 Billion Mirage (2010 \u2014 2023)',
           title: 'WEWORK: RISE & COLLAPSE',
-          subtitle: 'SOFTBANK HYPER-VALUATION TO PENNY STOCK · 2010 — 2023',
+          subtitle: 'SOFTBANK HYPER-VALUATION TO PENNY STOCK \u00b7 2010 \u2014 2023',
           theme: 'magnates-gold',
           peakValuation: '$47B',
           milestones: [
             { label: 'FIRST LOCATION', date: '2010', value: '$1M', desc: 'SoHo NYC Launch', color: '#10b981', x: 80, y: 320 },
             { label: 'SOFTBANK VISION', date: '2017', value: '$20B', desc: 'Global Expansion Blitz', color: '#38bdf8', x: 225, y: 200 },
-            { label: 'PEAK EVALUATION', date: 'JAN 2019', value: '$47B', desc: 'The World’s #1 Unicorn', color: '#f59e0b', x: 380, y: 90 },
+            { label: 'PEAK EVALUATION', date: 'JAN 2019', value: '$47B', desc: 'The World\u2019s #1 Unicorn', color: '#f59e0b', x: 380, y: 90 },
             { label: 'PULLED S-1 IPO', date: 'SEP 2019', value: '$8B', desc: 'Neumann Ouster', color: '#fb923c', x: 525, y: 240 },
             { label: 'CHAPTER 11', date: 'NOV 2023', value: '$45M', desc: 'Unprofitable Leases', color: '#ef4444', x: 645, y: 345 }
           ]
         },
         {
-          label: '🩸 Theranos: The Silicon Valley Lie (2003 — 2018)',
+          label: '\ud83e\ude78 Theranos: The Silicon Valley Lie (2003 \u2014 2018)',
           title: 'THE THERANOS DECEPTION',
-          subtitle: 'EDISON MACHINE MIRAGE TO WIRE FRAUD · 2003 — 2018',
+          subtitle: 'EDISON MACHINE MIRAGE TO WIRE FRAUD \u00b7 2003 \u2014 2018',
           theme: 'crimson-noir',
           peakValuation: '$9.0B',
           milestones: [
             { label: 'STANFORD DROPOUT', date: '2003', value: '$5M', desc: 'Micro-fluidics Dream', color: '#10b981', x: 80, y: 320 },
             { label: 'WALGREENS DEAL', date: '2013', value: '$1.0B', desc: 'Wellness Center Clinics', color: '#38bdf8', x: 230, y: 210 },
             { label: 'PEAK VALUATION', date: '2014', value: '$9.0B', desc: 'Cover of Forbes & Fortune', color: '#f59e0b', x: 380, y: 95 },
-            { label: 'WSJ EXPOSÉ', date: 'OCT 2015', value: '$800M', desc: 'John Carreyrou Bombshell', color: '#fb923c', x: 525, y: 240 },
+            { label: 'WSJ EXPOS\u00c9', date: 'OCT 2015', value: '$800M', desc: 'John Carreyrou Bombshell', color: '#fb923c', x: 525, y: 240 },
             { label: 'CRIMINAL CHARGES', date: '2018', value: '$0', desc: 'Company Dissolved', color: '#ef4444', x: 645, y: 345 }
           ]
         },
         {
-          label: '📉 Dot-Com Crash: Pets.com (1998 — 2000)',
+          label: '\ud83d\udcc9 Dot-Com Crash: Pets.com (1998 \u2014 2000)',
           title: 'PETS.COM: SUPER BOWL TO BUST',
-          subtitle: 'NASDAQ SPECULATION TO 268-DAY COLLAPSE · 1998 — 2000',
+          subtitle: 'NASDAQ SPECULATION TO 268-DAY COLLAPSE \u00b7 1998 \u2014 2000',
           theme: 'bloomberg-cyan',
           peakValuation: '$300M',
           milestones: [
@@ -2920,7 +3156,7 @@
       ];
 
       const themesList = [
-        { id: 'james-jani', label: 'James Jani Noir (Emerald → Gold → Crimson)' },
+        { id: 'james-jani', label: 'James Jani Noir (Emerald \u2192 Gold \u2192 Crimson)' },
         { id: 'magnates-gold', label: 'Magnates Media Gold (Obsidian & Amber)' },
         { id: 'bloomberg-cyan', label: 'Bloomberg Terminal (Cyan & Mint)' },
         { id: 'crimson-noir', label: 'Crimson Noir (Rose & Blood Red)' }
@@ -2936,16 +3172,16 @@
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
             <div style="display: flex; align-items: center; gap: 8px;">
               <span style="font-size: 10.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 4px;">
-                <span>📉</span> Timeline Engine
+                <span>\ud83d\udcc9</span> Timeline Engine
               </span>
               <!-- Video / 3D Mode Switcher -->
               <div id="tm-mode-switcher-wrap" style="display: flex; gap: 2px; background: rgba(18,19,28,0.9); padding: 2px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);">
-                <button type="button" id="btn-tm-mode-video" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${!is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${!is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Flat Video Playback View">▶ Video</button>
-                <button type="button" id="btn-tm-mode-3d" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Cinematic 3D Depth & Orbit View">⬡ 3D</button>
+                <button type="button" id="btn-tm-mode-video" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${!is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${!is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Flat Video Playback View">\u25b6 Video</button>
+                <button type="button" id="btn-tm-mode-3d" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Cinematic 3D Depth & Orbit View">\u2b21 3D</button>
               </div>
             </div>
             <span style="font-size: 9px; color: ${is3D ? '#2effc6' : '#f59e0b'}; font-weight: 800; background: ${is3D ? 'rgba(46,255,198,0.15)' : 'rgba(245,158,11,0.15)'}; border: 1px solid ${is3D ? 'rgba(46,255,198,0.35)' : 'rgba(245,158,11,0.35)'}; padding: 2px 6px; border-radius: 4px;">
-              ${is3D ? '⬡ 3D ACTIVE' : 'JAMES JANI'}
+              ${is3D ? '\u2b21 3D ACTIVE' : 'JAMES JANI'}
             </span>
           </div>
 
@@ -2953,7 +3189,7 @@
           ${is3D ? `
           <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.32); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">🎥 3D Camera & Orbit Angle</span>
+              <span style="font-size: 9.5px; font-weight: 800; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">\ud83c\udfa5 3D Camera & Orbit Angle</span>
               <span style="font-size: 8.5px; font-family: monospace; color: #2effc6; font-weight: 700;">DRAG CANVAS TO TILT</span>
             </div>
 
@@ -2968,7 +3204,7 @@
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
                 <span>TILT PITCH</span>
-                <span id="tm-val-pitch" style="font-family: monospace; color: #2effc6; font-weight: 700;">${cameraPitch}°</span>
+                <span id="tm-val-pitch" style="font-family: monospace; color: #2effc6; font-weight: 700;">${cameraPitch}\u00b0</span>
               </div>
               <input type="range" id="tm-slider-pitch" min="0" max="60" value="${cameraPitch}" style="accent-color: #a855f7; height: 3px; cursor: pointer;" />
             </div>
@@ -2977,7 +3213,7 @@
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
                 <span>ROTATION YAW</span>
-                <span id="tm-val-yaw" style="font-family: monospace; color: #2effc6; font-weight: 700;">${cameraYaw}°</span>
+                <span id="tm-val-yaw" style="font-family: monospace; color: #2effc6; font-weight: 700;">${cameraYaw}\u00b0</span>
               </div>
               <input type="range" id="tm-slider-yaw" min="-45" max="45" value="${cameraYaw}" style="accent-color: #a855f7; height: 3px; cursor: pointer;" />
             </div>
@@ -2988,7 +3224,7 @@
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Documentary Preset</span>
             <select id="tm-preset-select" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
-              <option value="" style="background:#0f172a;color:#94a3b8;">— Select Mini-Doc Story Preset —</option>
+              <option value="" style="background:#0f172a;color:#94a3b8;">\u2014 Select Mini-Doc Story Preset \u2014</option>
               ${presets.map((p, i) => `<option value="${i}" style="background:#0f172a;color:#fff;">${p.label}</option>`).join('')}
             </select>
           </div>
@@ -3001,7 +3237,7 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Subtitle Telemetry</span>
-              <input type="text" id="tm-inp-sub" value="${data.subtitle || 'CORPORATE VALUATION & LIQUIDITY CRASH · 1985 — 2001'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #38bdf8; font-family: monospace; font-size: 10px; outline: none;" />
+              <input type="text" id="tm-inp-sub" value="${data.subtitle || 'CORPORATE VALUATION & LIQUIDITY CRASH \u00b7 1985 \u2014 2001'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #38bdf8; font-family: monospace; font-size: 10px; outline: none;" />
             </div>
           </div>
 
@@ -3048,7 +3284,7 @@
                       <span style="font-size: 9px; font-family: monospace; font-weight: 800; color: #94a3b8;">NODE #${idx + 1}</span>
                       <input type="color" class="tm-node-color" data-idx="${idx}" value="${m.color || '#38bdf8'}" style="width: 18px; height: 16px; border: none; background: transparent; cursor: pointer;" title="Milestone Color" />
                     </div>
-                    ${milestones.length > 2 ? `<button type="button" class="tm-node-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer;">✕</button>` : ''}
+                    ${milestones.length > 2 ? `<button type="button" class="tm-node-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer;">\u2715</button>` : ''}
                   </div>
                   <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
                     <input type="text" class="tm-node-label" data-idx="${idx}" value="${m.label}" placeholder="Milestone Name" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #fff; font-size: 10px; font-weight: 700; outline: none;" />
@@ -3126,7 +3362,7 @@
         sPitch.oninput = (e) => {
           const v = parseInt(e.target.value, 10);
           const valEl = container.querySelector('#tm-val-pitch');
-          if (valEl) valEl.textContent = `${v}°`;
+          if (valEl) valEl.textContent = `${v}\u00b0`;
           const plane = document.getElementById('tm-3d-stage-plane');
           const yaw = data.cameraYaw ?? -14;
           if (plane) plane.style.transform = `rotateX(${v}deg) rotateY(${yaw}deg) scale(0.92)`;
@@ -3138,7 +3374,7 @@
         sYaw.oninput = (e) => {
           const v = parseInt(e.target.value, 10);
           const valEl = container.querySelector('#tm-val-yaw');
-          if (valEl) valEl.textContent = `${v}°`;
+          if (valEl) valEl.textContent = `${v}\u00b0`;
           const plane = document.getElementById('tm-3d-stage-plane');
           const pitch = data.cameraPitch ?? 26;
           if (plane) plane.style.transform = `rotateX(${pitch}deg) rotateY(${v}deg) scale(0.92)`;
@@ -3176,8 +3412,8 @@
           if (plane) plane.style.transform = `rotateX(${newPitch}deg) rotateY(${newYaw}deg) scale(0.92)`;
           const vp = container.querySelector('#tm-val-pitch');
           const vy = container.querySelector('#tm-val-yaw');
-          if (vp) vp.textContent = `${newPitch}°`;
-          if (vy) vy.textContent = `${newYaw}°`;
+          if (vp) vp.textContent = `${newPitch}\u00b0`;
+          if (vy) vy.textContent = `${newYaw}\u00b0`;
           const sp = container.querySelector('#tm-slider-pitch');
           const sy = container.querySelector('#tm-slider-yaw');
           if (sp) sp.value = newPitch;
@@ -3315,20 +3551,20 @@
 
       const routePresets = [
         {
-          label: '🇺🇸 USA → 🇨🇦 Canada (Cross-Border Flight)',
+          label: '\ud83c\uddfa\ud83c\uddf8 USA \u2192 \ud83c\udde8\ud83c\udde6 Canada (Cross-Border Flight)',
           routes: [
             { from: 'USA', to: 'Canada', fromLat: 39.8, fromLng: -98.5, toLat: 56.13, toLng: -106.35, mode: 'plane', color: '#38bdf8' }
           ]
         },
         {
-          label: '🇺🇸 USA → 🇬🇧 UK → 🇺🇦 Ukraine (Transatlantic + Rail)',
+          label: '\ud83c\uddfa\ud83c\uddf8 USA \u2192 \ud83c\uddec\ud83c\udde7 UK \u2192 \ud83c\uddfa\ud83c\udde6 Ukraine (Transatlantic + Rail)',
           routes: [
             { from: 'USA', to: 'UK', fromLat: 39.8, fromLng: -98.5, toLat: 54.0, toLng: -2.0, mode: 'plane', color: '#38bdf8' },
             { from: 'UK', to: 'Ukraine', fromLat: 54.0, fromLng: -2.0, toLat: 49.0, toLng: 31.4, mode: 'train', color: '#f59e0b' }
           ]
         },
         {
-          label: '🇨🇳 China → 🇸🇬 Singapore → 🇦🇪 UAE → 🇪🇬 Egypt (Maritime Trade)',
+          label: '\ud83c\udde8\ud83c\uddf3 China \u2192 \ud83c\uddf8\ud83c\uddec Singapore \u2192 \ud83c\udde6\ud83c\uddea UAE \u2192 \ud83c\uddea\ud83c\uddec Egypt (Maritime Trade)',
           routes: [
             { from: 'China', to: 'Singapore', fromLat: 35.86, fromLng: 104.2, toLat: 1.35, toLng: 103.82, mode: 'ship', color: '#2effc6' },
             { from: 'Singapore', to: 'UAE', fromLat: 1.35, fromLng: 103.82, toLat: 23.42, toLng: 53.85, mode: 'ship', color: '#38bdf8' },
@@ -3336,7 +3572,7 @@
           ]
         },
         {
-          label: '🇯🇵 Japan → 🇰🇷 South Korea → 🇸🇬 Singapore → 🇦🇺 Australia',
+          label: '\ud83c\uddef\ud83c\uddf5 Japan \u2192 \ud83c\uddf0\ud83c\uddf7 South Korea \u2192 \ud83c\uddf8\ud83c\uddec Singapore \u2192 \ud83c\udde6\ud83c\uddfa Australia',
           routes: [
             { from: 'Japan', to: 'South Korea', fromLat: 36.2, fromLng: 138.25, toLat: 35.91, toLng: 127.77, mode: 'plane', color: '#38bdf8' },
             { from: 'South Korea', to: 'Singapore', fromLat: 35.91, fromLng: 127.77, toLat: 1.35, toLng: 103.82, mode: 'plane', color: '#a855f7' },
@@ -3344,7 +3580,7 @@
           ]
         },
         {
-          label: '🇬🇧 UK → 🇫🇷 France → 🇨🇭 Switzerland → 🇮🇹 Italy (Euro High-Speed Rail)',
+          label: '\ud83c\uddec\ud83c\udde7 UK \u2192 \ud83c\uddeb\ud83c\uddf7 France \u2192 \ud83c\udde8\ud83c\udded Switzerland \u2192 \ud83c\uddee\ud83c\uddf9 Italy (Euro High-Speed Rail)',
           routes: [
             { from: 'UK', to: 'France', fromLat: 54.0, fromLng: -2.0, toLat: 46.23, toLng: 2.21, mode: 'train', color: '#38bdf8' },
             { from: 'France', to: 'Switzerland', fromLat: 46.23, fromLng: 2.21, toLat: 46.82, toLng: 8.23, mode: 'train', color: '#2effc6' },
@@ -3373,42 +3609,42 @@
 
         <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.32); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px;">🌍 Multi-Route Globe & Transit Rig</span>
+            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px;">\ud83c\udf0d Multi-Route Globe & Transit Rig</span>
             <span style="font-size: 9px; color: #2effc6; font-weight: 800; background: rgba(46,255,198,0.14); border: 1px solid rgba(46,255,198,0.35); padding: 2px 6px; border-radius: 4px;">${WORLD_GEO_DB.length}+ COUNTRIES</span>
           </div>
 
-          <!-- ▶ VIDEO vs ⬡ 3D INTERACTIVE SWITCH + DIRECT ON-SCREEN TRACE -->
+          <!-- \u25b6 VIDEO vs \u2b21 3D INTERACTIVE SWITCH + DIRECT ON-SCREEN TRACE -->
           <div style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <span style="font-size: 9.5px; font-weight: 800; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">Stage Mode (Video / 3D Interactive)</span>
-              <span style="font-size: 8.5px; font-family: monospace; color: ${is3D ? '#2effc6' : '#38bdf8'}; font-weight: 700;">${is3D ? '⬡ 3D ACTIVE' : '▶ AUTO VIDEO'}</span>
+              <span style="font-size: 8.5px; font-family: monospace; color: ${is3D ? '#2effc6' : '#38bdf8'}; font-weight: 700;">${is3D ? '\u2b21 3D ACTIVE' : '\u25b6 AUTO VIDEO'}</span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-              <button type="button" id="map-btn-mode-video" style="padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; border: 1px solid ${!is3D ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${!is3D ? 'rgba(56,189,248,0.25)' : 'rgba(0,0,0,0.4)'}; color: #fff;">▶ Video Mode</button>
-              <button type="button" id="map-btn-mode-3d" style="padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; border: 1px solid ${is3D ? '#a855f7' : 'rgba(255,255,245,0.12)'}; background: ${is3D ? 'rgba(168,85,247,0.32)' : 'rgba(0,0,0,0.4)'}; color: #fff;">⬡ 3D Interactive</button>
+              <button type="button" id="map-btn-mode-video" style="padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; border: 1px solid ${!is3D ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${!is3D ? 'rgba(56,189,248,0.25)' : 'rgba(0,0,0,0.4)'}; color: #fff;">\u25b6 Video Mode</button>
+              <button type="button" id="map-btn-mode-3d" style="padding: 6px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 800; cursor: pointer; border: 1px solid ${is3D ? '#a855f7' : 'rgba(255,255,245,0.12)'}; background: ${is3D ? 'rgba(168,85,247,0.32)' : 'rgba(0,0,0,0.4)'}; color: #fff;">\u2b21 3D Interactive</button>
             </div>
             <button type="button" id="map-btn-draw-screen" style="width: 100%; padding: 6px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; cursor: pointer; border: 1px solid ${isDraw ? '#2effc6' : 'rgba(46,255,198,0.35)'}; background: ${isDraw ? 'rgba(46,255,198,0.24)' : 'rgba(46,255,198,0.08)'}; color: ${isDraw ? '#2effc6' : '#cbd5e1'}; display: flex; align-items: center; justify-content: center; gap: 6px;">
-              <span>✏️</span> ${isDraw ? 'Tracing on Screen Active (Click or Drag on Map!)' : 'Trace Route Directly on Screen (3D Draw)'}
+              <span>\u270f\ufe0f</span> ${isDraw ? 'Tracing on Screen Active (Click or Drag on Map!)' : 'Trace Route Directly on Screen (3D Draw)'}
             </button>
           </div>
 
           <!-- Projection Mode Toggle: 3D Globe vs 2D Granular World Map -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-            <button type="button" class="map-proj-btn" data-proj="globe" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${(data.projection || 'globe') === 'globe' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${(data.projection || 'globe') === 'globe' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">🌐 3D Globe</button>
-            <button type="button" class="map-proj-btn" data-proj="flat" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${data.projection === 'flat' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${data.projection === 'flat' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">🗺️ 2D Granular Map</button>
+            <button type="button" class="map-proj-btn" data-proj="globe" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${(data.projection || 'globe') === 'globe' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${(data.projection || 'globe') === 'globe' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">\ud83c\udf10 3D Globe</button>
+            <button type="button" class="map-proj-btn" data-proj="flat" style="padding: 6px; border-radius: 6px; font-size: 10.5px; font-weight: 700; cursor: pointer; border: 1px solid ${data.projection === 'flat' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${data.projection === 'flat' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: #fff;">\ud83d\uddfa\ufe0f 2D Granular Map</button>
           </div>
 
           <!-- MULTI-ROUTE COUNTRY-TO-COUNTRY BUILDER -->
           <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 9px; display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">✈️🚢🚆 Country-to-Country Routes</span>
+              <span style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">\u2708\ufe0f\ud83d\udea2\ud83d\ude86 Country-to-Country Routes</span>
               <button type="button" id="map-btn-add-route" style="background: rgba(46,255,198,0.16); border: 1px solid rgba(46,255,198,0.45); color: #2effc6; border-radius: 5px; padding: 2px 8px; font-size: 9.5px; font-weight: 800; cursor: pointer;">+ Add Route Leg</button>
             </div>
             <div style="font-size: 9px; color: #94a3b8; line-height: 1.35;">Type any country or city (e.g. <strong>USA</strong> to <strong>Canada</strong>, <strong>UK</strong> to <strong>Japan</strong>) and pick a transit vehicle.</div>
 
             <!-- Quick Multi-Route Presets -->
             <select id="map-route-preset-select" style="background: rgba(15,23,42,0.85); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; font-weight: 600; outline: none; cursor: pointer;">
-              <option value="">⚡ Load Multi-Route Preset...</option>
+              <option value="">\u26a1 Load Multi-Route Preset...</option>
               ${routePresets.map((rp, i) => `<option value="${i}">${rp.label}</option>`).join('')}
             </select>
 
@@ -3420,18 +3656,18 @@
                     <span style="font-size: 9px; font-weight: 800; color: #94a3b8; font-family: monospace;">ROUTE LEG #${idx + 1}</span>
                     <div style="display: flex; align-items: center; gap: 5px;">
                       <select class="map-rt-mode" data-idx="${idx}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.18); border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 4px; cursor: pointer;">
-                        <option value="plane" ${(rt.mode || 'plane') === 'plane' ? 'selected' : ''}>✈️ Plane</option>
-                        <option value="ship" ${rt.mode === 'ship' ? 'selected' : ''}>🚢 Ship</option>
-                        <option value="train" ${rt.mode === 'train' ? 'selected' : ''}>🚆 Train</option>
-                        <option value="line" ${rt.mode === 'line' ? 'selected' : ''}>⚡ Line</option>
+                        <option value="plane" ${(rt.mode || 'plane') === 'plane' ? 'selected' : ''}>\u2708\ufe0f Plane</option>
+                        <option value="ship" ${rt.mode === 'ship' ? 'selected' : ''}>\ud83d\udea2 Ship</option>
+                        <option value="train" ${rt.mode === 'train' ? 'selected' : ''}>\ud83d\ude86 Train</option>
+                        <option value="line" ${rt.mode === 'line' ? 'selected' : ''}>\u26a1 Line</option>
                       </select>
                       <input type="color" class="map-rt-color" data-idx="${idx}" value="${rt.color || '#38bdf8'}" style="width: 18px; height: 18px; border: none; background: transparent; cursor: pointer;" title="Route Arc Color"/>
-                      ${activeRoutes.length > 1 ? `<button type="button" class="map-rt-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer; padding: 0 3px;" title="Remove Route">✕</button>` : ''}
+                      ${activeRoutes.length > 1 ? `<button type="button" class="map-rt-del" data-idx="${idx}" style="background: none; border: none; color: #f87171; font-size: 11px; font-weight: 800; cursor: pointer; padding: 0 3px;" title="Remove Route">\u2715</button>` : ''}
                     </div>
                   </div>
                   <div style="display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 5px;">
                     <input type="text" list="map-geo-datalist" class="map-rt-from" data-idx="${idx}" value="${rt.from || 'USA'}" placeholder="From Country..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.14); border-radius: 5px; padding: 4px 6px; color: #fff; font-size: 10.5px; font-weight: 700; outline: none;" />
-                    <span style="color: #38bdf8; font-size: 11px; font-weight: 900;">→</span>
+                    <span style="color: #38bdf8; font-size: 11px; font-weight: 900;">\u2192</span>
                     <input type="text" list="map-geo-datalist" class="map-rt-to" data-idx="${idx}" value="${rt.to || 'Canada'}" placeholder="To Country..." style="width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.14); border-radius: 5px; padding: 4px 6px; color: #2effc6; font-size: 10.5px; font-weight: 700; outline: none;" />
                   </div>
                 </div>
@@ -3443,7 +3679,7 @@
           <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">HUD Title</span>
-              <input type="text" id="map-inp-loc" value="${data.location || 'USA → UK → Ukraine'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 7px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+              <input type="text" id="map-inp-loc" value="${data.location || 'USA \u2192 UK \u2192 Ukraine'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 7px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
             </div>
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">HUD Telemetry</span>
@@ -3461,7 +3697,7 @@
 
           <!-- CAMERA ZOOM KEYFRAME TIMING ("When to zoom and stuff") -->
           <div style="background: rgba(56,189,248,0.07); border: 1px solid rgba(56,189,248,0.22); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px;">
-            <div style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">🎥 Camera Zoom & 3D Orbit</div>
+            <div style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">\ud83c\udfa5 Camera Zoom & 3D Orbit</div>
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#e2e8f0;"><span>When to Start Zoom</span><strong id="map-zstart-lbl">${data.zoomStart ?? 0.8}s</strong></div>
               <input type="range" id="map-inp-zstart" min="0" max="4" step="0.2" value="${data.zoomStart ?? 0.8}" style="accent-color:#38bdf8;cursor:pointer;" />
@@ -3543,7 +3779,7 @@
           if (rp) {
             const cloned = rp.routes.map(r => Object.assign({}, r));
             const last = cloned[cloned.length - 1];
-            const locLabel = cloned.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
+            const locLabel = cloned.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
             window.tplSetContextualData('map', {
               routes: cloned,
               location: locLabel,
@@ -3575,7 +3811,7 @@
             mode: 'plane',
             color: palette[routes.length % palette.length]
           });
-          const locLabel = routes.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
+          const locLabel = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
           window.tplSetContextualData('map', {
             routes,
             location: locLabel,
@@ -3612,7 +3848,7 @@
           }
         }
         const last = routes[routes.length - 1];
-        const locLabel = routes.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
+        const locLabel = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
         const locInpEl = container.querySelector('#map-inp-loc');
         if (locInpEl) locInpEl.value = locLabel;
         window.tplSetContextualData('map', {
@@ -3639,7 +3875,7 @@
         btn.onclick = () => {
           const idx = parseInt(btn.dataset.idx, 10);
           const routes = activeRoutes.filter((_, i) => i !== idx);
-          const locLabel = routes.map((r, i) => i === 0 ? `${r.from} → ${r.to}` : r.to).join(' → ');
+          const locLabel = routes.map((r, i) => i === 0 ? `${r.from} \u2192 ${r.to}` : r.to).join(' \u2192 ');
           window.tplSetContextualData('map', { routes, location: locLabel });
           window.tplRenderContextualInspector('map');
         };
@@ -3751,7 +3987,7 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(56,189,248,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">📊 Portfolio Strategy & Slices</span>
+            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">\ud83d\udcca Portfolio Strategy & Slices</span>
             <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 4px;">LIVE DONUT</span>
           </div>
 
@@ -3759,7 +3995,7 @@
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <span style="font-size: 9.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Select Portfolio Type</span>
             <select id="pie-preset-select" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(56,189,248,0.35); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none; cursor: pointer;">
-              ${portfolioPresets.map((p, i) => `<option value="${i}" ${data.presetName === p.presetName ? 'selected' : ''} style="background:#0f172a;color:#fff;">${p.presetName} — ${p.title}</option>`).join('')}
+              ${portfolioPresets.map((p, i) => `<option value="${i}" ${data.presetName === p.presetName ? 'selected' : ''} style="background:#0f172a;color:#fff;">${p.presetName} \u2014 ${p.title}</option>`).join('')}
             </select>
           </div>
 
@@ -3833,7 +4069,7 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(250,204,21,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #facc15; text-transform: uppercase;">⚡ Dynamic Captions & Video B-Roll</span>
+            <span style="font-size: 11px; font-weight: 800; color: #facc15; text-transform: uppercase;">\u26a1 Dynamic Captions & Video B-Roll</span>
             <span style="font-size: 9px; color: #facc15; font-weight: 700; background: rgba(250,204,21,0.15); padding: 2px 6px; border-radius: 4px;">OVERLAY READY</span>
           </div>
 
@@ -3922,7 +4158,7 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(56,189,248,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">⬡ 3D Product Studio &amp; Typography</span>
+            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">\u2b21 3D Product Studio &amp; Typography</span>
             <span style="font-size: 9px; color: #c084fc; font-weight: 700; background: rgba(168,85,247,0.18); padding: 2px 6px; border-radius: 4px;">DRAGGABLE HUD</span>
           </div>
 
@@ -3998,12 +4234,12 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">📸 Polaroid Stack &amp; Stage Freedom</span>
-            <button type="button" id="pol-btn-reset" style="font-size: 9px; color: #cbd5e1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 2px 7px; border-radius: 4px; cursor: pointer;">↺ Reset Layout</button>
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">\ud83d\udcf8 Polaroid Stack &amp; Stage Freedom</span>
+            <button type="button" id="pol-btn-reset" style="font-size: 9px; color: #cbd5e1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 2px 7px; border-radius: 4px; cursor: pointer;">\u21ba Reset Layout</button>
           </div>
 
           <div style="font-size: 9.5px; color: #cbd5e1; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.25); padding: 6px 8px; border-radius: 6px;">
-            💡 <b>Full-Screen Interactive:</b> Drag either Polaroid directly on the preview stage to reposition, or use the scale &amp; tilt sliders below.
+            \ud83d\udca1 <b>Full-Screen Interactive:</b> Drag either Polaroid directly on the preview stage to reposition, or use the scale &amp; tilt sliders below.
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -4013,7 +4249,7 @@
                 <label style="font-size:9px;font-weight:700;color:#38bdf8;cursor:pointer;">+ Photo<input type="file" id="pol-up-1" accept="image/*" style="display:none;"/></label>
               </div>
               <input type="text" id="pol-cap-1" value="${data.caption || 'First Office, 1994'}" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:4px 6px;color:#fff;font-size:10.5px;" />
-              <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;"><span>Tilt Angle</span><b id="pol-rot1-lbl" style="color:#fbbf24;">${data.p1Rot != null ? data.p1Rot : -11}°</b></div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;"><span>Tilt Angle</span><b id="pol-rot1-lbl" style="color:#fbbf24;">${data.p1Rot != null ? data.p1Rot : -11}\u00b0</b></div>
               <input type="range" id="pol-rot-1" min="-35" max="35" step="1" value="${data.p1Rot != null ? data.p1Rot : -11}" style="width:100%;accent-color:#fbbf24;" />
             </div>
 
@@ -4023,7 +4259,7 @@
                 <label style="font-size:9px;font-weight:700;color:#38bdf8;cursor:pointer;">+ Photo<input type="file" id="pol-up-2" accept="image/*" style="display:none;"/></label>
               </div>
               <input type="text" id="pol-cap-2" value="${data.caption2 || 'Archive Exhibit #04'}" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:4px 6px;color:#fff;font-size:10.5px;" />
-              <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;"><span>Tilt Angle</span><b id="pol-rot2-lbl" style="color:#fbbf24;">${data.p2Rot != null ? data.p2Rot : 7}°</b></div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;"><span>Tilt Angle</span><b id="pol-rot2-lbl" style="color:#fbbf24;">${data.p2Rot != null ? data.p2Rot : 7}\u00b0</b></div>
               <input type="range" id="pol-rot-2" min="-35" max="35" step="1" value="${data.p2Rot != null ? data.p2Rot : 7}" style="width:100%;accent-color:#fbbf24;" />
             </div>
           </div>
@@ -4040,12 +4276,12 @@
       container.querySelector('#pol-cap-2')?.addEventListener('input', e => window.tplSetContextualData('polaroid', { caption2: e.target.value }));
       container.querySelector('#pol-rot-1')?.addEventListener('input', e => {
         const v = parseInt(e.target.value, 10);
-        const l = container.querySelector('#pol-rot1-lbl'); if (l) l.textContent = v + '°';
+        const l = container.querySelector('#pol-rot1-lbl'); if (l) l.textContent = v + '\u00b0';
         window.tplSetContextualData('polaroid', { p1Rot: v });
       });
       container.querySelector('#pol-rot-2')?.addEventListener('input', e => {
         const v = parseInt(e.target.value, 10);
-        const l = container.querySelector('#pol-rot2-lbl'); if (l) l.textContent = v + '°';
+        const l = container.querySelector('#pol-rot2-lbl'); if (l) l.textContent = v + '\u00b0';
         window.tplSetContextualData('polaroid', { p2Rot: v });
       });
       container.querySelector('#pol-inp-scale')?.addEventListener('input', e => {
@@ -4077,21 +4313,21 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">👔 CEO Cutout Reveal &amp; Executive Dossier</span>
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">\ud83d\udc54 CEO Cutout Reveal &amp; Executive Dossier</span>
             <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); padding: 2px 6px; border-radius: 4px;">AI CUTOUT READY</span>
           </div>
 
           <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(251,191,36,0.28); border-radius: 8px; padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
             <div style="display: flex; flex-direction: column; gap: 2px;">
               <span style="font-size: 10px; font-weight: 800; color: #fff;">CEO Portrait Photo / Cutout</span>
-              <span style="font-size: 8.5px; color: #94a3b8;">Upload any portrait — auto-cutout removes background</span>
+              <span style="font-size: 8.5px; color: #94a3b8;">Upload any portrait \u2014 auto-cutout removes background</span>
             </div>
             <div style="display: flex; gap: 5px;">
               <label style="font-size: 9.5px; font-weight: 800; color: #0f172a; background: #fbbf24; padding: 5px 9px; border-radius: 5px; cursor: pointer; white-space: nowrap;">
                 + Upload Photo
                 <input type="file" id="ceo-up-photo" accept="image/*" style="display:none;" />
               </label>
-              <button type="button" id="ceo-btn-cutout" style="font-size: 9.5px; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); padding: 5px 8px; border-radius: 5px; cursor: pointer; white-space: nowrap;" title="Run Subject Cutout Isolation">✂️ Auto-Cutout</button>
+              <button type="button" id="ceo-btn-cutout" style="font-size: 9.5px; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); padding: 5px 8px; border-radius: 5px; cursor: pointer; white-space: nowrap;" title="Run Subject Cutout Isolation">\u2702\ufe0f Auto-Cutout</button>
             </div>
           </div>
 
@@ -4103,7 +4339,7 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Role / Company</span>
-              <input type="text" id="ceo-inp-role" value="${data.ceoRole || 'CHIEF EXECUTIVE OFFICER · VANGUARD GLOBAL'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-size: 10px; font-weight: 600;" />
+              <input type="text" id="ceo-inp-role" value="${data.ceoRole || 'CHIEF EXECUTIVE OFFICER \u00b7 VANGUARD GLOBAL'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-size: 10px; font-weight: 600;" />
             </div>
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Dossier Header Tag</span>
@@ -4173,7 +4409,7 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">🏢 Corporate Boardroom Zoom &amp; Lower-Third</span>
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">\ud83c\udfe2 Corporate Boardroom Zoom &amp; Lower-Third</span>
             <label style="font-size: 9px; font-weight: 800; color: #0f172a; background: #fbbf24; padding: 3px 8px; border-radius: 4px; cursor: pointer;">
               + Swap Boardroom Photo
               <input type="file" id="br-up-scene" accept="image/*" style="display:none;" />
@@ -4188,7 +4424,7 @@
           <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 6px; align-items: end;">
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Location / Deal Subline</span>
-              <input type="text" id="br-inp-sub" value="${data.subline || '42ND FLOOR · MANHATTAN HQ // $14.8B MERGER VOTE'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fbbf24; font-size: 10px; font-weight: 700;" />
+              <input type="text" id="br-inp-sub" value="${data.subline || '42ND FLOOR \u00b7 MANHATTAN HQ // $14.8B MERGER VOTE'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fbbf24; font-size: 10px; font-weight: 700;" />
             </div>
             <div style="display: flex; flex-direction: column; gap: 2px; align-items: center;">
               <span style="font-size: 8.5px; color: #94a3b8;">Text</span>
@@ -4224,8 +4460,8 @@
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(16,185,129,0.32); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase;">📹 CCTV Surveillance HUD &amp; Footage Feed</span>
-            <span style="font-size: 9px; color: #ef4444; font-weight: 800; background: rgba(239,68,68,0.18); padding: 2px 6px; border-radius: 4px;">● LIVE OVERLAY</span>
+            <span style="font-size: 11px; font-weight: 800; color: #10b981; text-transform: uppercase;">\ud83d\udcf9 CCTV Surveillance HUD &amp; Footage Feed</span>
+            <span style="font-size: 9px; color: #ef4444; font-weight: 800; background: rgba(239,68,68,0.18); padding: 2px 6px; border-radius: 4px;">\u25cf LIVE OVERLAY</span>
           </div>
 
           <div style="display: grid; grid-template-columns: 1.4fr 0.8fr; gap: 6px;">
@@ -4241,7 +4477,7 @@
 
           <div style="display: flex; flex-direction: column; gap: 3px;">
             <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Optical Telemetry Footer</span>
-            <input type="text" id="cctv-inp-status" value="${data.statusText || 'ISO 3200 · IR NIGHT VISION · 1080P/24'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-family: monospace; font-size: 10px;" />
+            <input type="text" id="cctv-inp-status" value="${data.statusText || 'ISO 3200 \u00b7 IR NIGHT VISION \u00b7 1080P/24'}" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #cbd5e1; font-family: monospace; font-size: 10px;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 4px;">
@@ -4286,29 +4522,29 @@
       if (wrapSec) {
         wrapSec.style.display = 'flex';
         const labelSec = document.getElementById('tpl-modal-label-secondary');
-        if (labelSec) labelSec.textContent = '🎬 Base Footage / Scene Asset';
+        if (labelSec) labelSec.textContent = '\ud83c\udfac Base Footage / Scene Asset';
       }
       const curStyle = data.filmStyle || 'kodak35';
       const grainVal = data.grainIntensity !== undefined ? data.grainIntensity : 65;
       const vigVal = data.vignetteIntensity !== undefined ? data.vignetteIntensity : 60;
       
       const FILM_STYLES = [
-        { id: 'kodak35', label: '🎞️ Kodak 35mm', desc: 'Warm organic grain & micro-contrast' },
-        { id: 'doc16mm', label: '🎥 16mm Doc', desc: 'High-contrast gritty documentary' },
-        { id: 'super8', label: '📼 Super 8', desc: 'Vintage warm color fade & gate weave' },
-        { id: 'vhs', label: '📹 VHS Tape', desc: 'Retro tape texture & scan lines' },
-        { id: 'silent', label: '📽️ 1920s Silent', desc: 'Sepia monochrome & high shutter flicker' },
-        { id: 'lightleak', label: '☀️ Light Leak', desc: 'Warm amber-orange lens burn' }
+        { id: 'kodak35', label: '\ud83c\udf9e\ufe0f Kodak 35mm', desc: 'Warm organic grain & micro-contrast' },
+        { id: 'doc16mm', label: '\ud83c\udfa5 16mm Doc', desc: 'High-contrast gritty documentary' },
+        { id: 'super8', label: '\ud83d\udcfc Super 8', desc: 'Vintage warm color fade & gate weave' },
+        { id: 'vhs', label: '\ud83d\udcf9 VHS Tape', desc: 'Retro tape texture & scan lines' },
+        { id: 'silent', label: '\ud83d\udcfd\ufe0f 1920s Silent', desc: 'Sepia monochrome & high shutter flicker' },
+        { id: 'lightleak', label: '\u2600\ufe0f Light Leak', desc: 'Warm amber-orange lens burn' }
       ];
 
       container.innerHTML = `
         <div style="background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">🎬</span>
+              <span style="font-size: 13px;">\ud83c\udfac</span>
               <span style="font-size: 11px; font-weight: 800; color: #c084fc; text-transform: uppercase; letter-spacing: 0.5px;">35MM / 16MM FILM CAMERA OVERLAY</span>
             </div>
-            <span style="font-size: 9px; color: #a855f7; font-weight: 800; background: rgba(168,85,247,0.18); padding: 2px 6px; border-radius: 4px;">● MASTER FX</span>
+            <span style="font-size: 9px; color: #a855f7; font-weight: 800; background: rgba(168,85,247,0.18); padding: 2px 6px; border-radius: 4px;">\u25cf MASTER FX</span>
           </div>
 
           <!-- Camera Style Profile Grid -->
@@ -4418,6 +4654,455 @@
     }
 
     // =========================================================================
+    // SPECIAL HANDLER: FLYING HEADLINES 3D CINEMATIC SUITE (headline-fly)
+    // =========================================================================
+    if (tplId === 'headline-fly') {
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) {
+        wrapSec.style.display = 'flex';
+        const labelSec = document.getElementById('tpl-modal-label-secondary');
+        if (labelSec) labelSec.textContent = 'Background Ambient / Video B-Roll';
+      }
+
+      const tilt = data.tiltAngle !== undefined ? data.tiltAngle : 9.5;
+      const motionBlur = data.motionBlur !== false;
+      const blurPx = data.blurIntensity !== undefined ? data.blurIntensity : 32;
+      const dofBokeh = data.dofBokeh !== false;
+      const dofPx = data.dofBlur !== undefined ? data.dofBlur : 8;
+      const specular = data.specularGlare !== false;
+      const shadowRad = data.shadowRadius !== undefined ? data.shadowRadius : 48;
+      const drift = data.organicDrift !== false;
+      const flySpeed = data.flySpeed !== undefined ? data.flySpeed : 1.0;
+      const staggerDelay = data.staggerDelay !== undefined ? data.staggerDelay : 0.28;
+      const paperGrain = data.paperGrain !== undefined ? data.paperGrain : 35;
+      const showTelemetry = data.showTelemetry !== false;
+      const activeCard = Number(data.activeCardTab || 5);
+
+      const CARD_THEME_PRESETS = [
+        { id: 'newsprint', label: 'Broadsheet Cream', bg: '#f6f1e7', text: '#0f172a', accent: '#b91c1c', hl: '#fde047' },
+        { id: 'ft-salmon', label: 'Financial Salmon', bg: '#fcd5b5', text: '#1c1917', accent: '#9a3412', hl: '#fef08a' },
+        { id: 'obsidian',  label: 'Dark Wire',        bg: '#0f172a', text: '#f8fafc', accent: '#38bdf8', hl: '#0284c7' },
+        { id: 'crimson',   label: 'Breaking Red',     bg: '#18090c', text: '#ffffff', accent: '#ef4444', hl: '#b91c1c' },
+        { id: 'amber',     label: 'Audit Gold',       bg: '#171207', text: '#fefce8', accent: '#f59e0b', hl: '#d97706' },
+        { id: 'classified',label: 'Dossier Noir',     bg: '#11131a', text: '#f1f5f9', accent: '#a855f7', hl: '#7e22ce' }
+      ];
+
+      const CARD_FONTS = [
+        { label: 'Playfair Serif (NYT / Editorial)', val: "'Playfair Display', Georgia, serif" },
+        { label: 'Cinzel Classic (WSJ / Institutional)', val: "'Cinzel', Georgia, serif" },
+        { label: 'Oswald Condensed (Tabloid / Impact)', val: "'Oswald', sans-serif" },
+        { label: 'Inter Sans (Modern Digital Wire)', val: "'Inter', sans-serif" },
+        { label: 'JetBrains Mono (Forensic Report)', val: "'JetBrains Mono', monospace" }
+      ];
+
+      const cVis = data[`visible${activeCard}`] !== false;
+      const cTheme = data[`theme${activeCard}`] || 'newsprint';
+      const cBg = data[`bgColor${activeCard}`] || '#f6f1e7';
+      const cText = data[`textColor${activeCard}`] || '#0f172a';
+      const cAccent = data[`accentColor${activeCard}`] || '#b91c1c';
+      const cHl = data[`hlColor${activeCard}`] || '#fde047';
+      const cSource = data[`source${activeCard}`] || '';
+      const cKicker = data[`kicker${activeCard}`] || '';
+      const cDate = data[`date${activeCard}`] || '';
+      const cHeadline = data[`headline${activeCard}`] || '';
+      const cHighlight = data[`highlight${activeCard}`] || '';
+      const cSubhead = data[`subhead${activeCard}`] || '';
+      const cByline = data[`byline${activeCard}`] || '';
+      const cExhibit = data[`exhibit${activeCard}`] || '';
+      const cFont = data[`font${activeCard}`] || "'Playfair Display', Georgia, serif";
+      const cFontSize = data[`fontSize${activeCard}`] !== undefined ? data[`fontSize${activeCard}`] : 11.5;
+      const cScale = data[`scale${activeCard}`] !== undefined ? data[`scale${activeCard}`] : 1.0;
+      const cRot = data[`rot${activeCard}`] !== undefined ? data[`rot${activeCard}`] : 0;
+      const cX = data[`x${activeCard}`] !== undefined ? data[`x${activeCard}`] : 0;
+      const cY = data[`y${activeCard}`] !== undefined ? data[`y${activeCard}`] : 0;
+
+      const escAttr = (s) => String(s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(245,158,11,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
+          <!-- Suite Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 7px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: #fbbf24; stroke-width: 2;"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+              <span style="font-size: 10.5px; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">PRESS CLIPPINGS // 3D EDITORIAL SUITE</span>
+            </div>
+            <span style="font-size: 8.5px; color: #f59e0b; font-weight: 800; background: rgba(245,158,11,0.16); border: 1px solid rgba(245,158,11,0.3); padding: 2px 6px; border-radius: 4px;">PRO DOC</span>
+          </div>
+
+          <!-- SECTION 1: GRANULAR PER-CARD SELECTOR TABS (CARDS 1 TO 5) -->
+          <div style="display: flex; flex-direction: column; gap: 7px; background: rgba(2,6,23,0.55); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 9px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9px; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px;">Select Clipping Card to Customize</span>
+              <span style="font-size: 8.5px; color: #94a3b8;">Tip: Drag any card on stage</span>
+            </div>
+
+            <!-- 5 Card Pill Tabs -->
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;">
+              ${[1, 2, 3, 4, 5].map(idx => {
+                const isAct = idx === activeCard;
+                const isVis = data[`visible${idx}`] !== false;
+                const dotCol = data[`accentColor${idx}`] || '#f59e0b';
+                return `
+                  <button type="button" class="fly-card-tab-btn" data-card-idx="${idx}" style="display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border-radius:6px;border:1px solid ${isAct ? '#f59e0b' : 'rgba(255,255,255,0.1)'};background:${isAct ? 'rgba(245,158,11,0.22)' : 'rgba(15,23,42,0.7)'};color:${isAct ? '#fff' : '#cbd5e1'};cursor:pointer;opacity:${isVis ? '1' : '0.45'};transition:all 0.15s;">
+                    <div style="display:flex;align-items:center;gap:3px;">
+                      <span style="width:6px;height:6px;border-radius:50%;background:${dotCol};"></span>
+                      <span style="font-size:9.5px;font-weight:800;">#${idx}${idx === 5 ? '\u2605' : ''}</span>
+                    </div>
+                    <span style="font-size:7.5px;color:${isAct ? '#fde68a' : '#64748b'};font-weight:600;">${idx === 5 ? 'Hero' : `Clip ${idx}`}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+
+            <!-- Active Card Header + Visibility + Reset Position -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <label style="display:flex;align-items:center;gap:6px;font-size:9.5px;font-weight:700;color:#f8fafc;cursor:pointer;">
+                <input type="checkbox" id="fly-card-vis" ${cVis ? 'checked' : ''} style="accent-color:#f59e0b;cursor:pointer;" />
+                <span>Show Card #${activeCard} ${activeCard === 5 ? '(Center Hero Spotlight)' : ''}</span>
+              </label>
+              <button type="button" id="fly-card-reset-tf" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#cbd5e1;font-size:8.5px;font-weight:600;padding:2px 7px;border-radius:4px;cursor:pointer;" title="Reset this card's position, rotation, and scale">Reset Pos</button>
+            </div>
+
+            <!-- Theme Quick Presets for Active Card -->
+            <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
+              <span style="font-size: 8.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Paper &amp; Editorial Theme Preset</span>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+                ${CARD_THEME_PRESETS.map(p => {
+                  const active = cTheme === p.id;
+                  return `<button type="button" class="fly-theme-preset-btn" data-theme-id="${p.id}" data-bg="${p.bg}" data-text="${p.text}" data-accent="${p.accent}" data-hl="${p.hl}" style="display:flex;align-items:center;gap:5px;padding:4px 6px;border-radius:5px;border:1px solid ${active ? '#f59e0b' : 'rgba(255,255,255,0.08)'};background:${active ? 'rgba(245,158,11,0.18)' : 'rgba(15,23,42,0.6)'};color:${active ? '#fff' : '#cbd5e1'};font-size:8.5px;font-weight:700;cursor:pointer;text-align:left;">
+                    <span style="width:10px;height:10px;border-radius:2px;background:${p.bg};border:1.5px solid ${p.accent};flex-shrink:0;"></span>
+                    <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.label}</span>
+                  </button>`;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- 4 Granular Color Pickers for Active Card -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 2px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,0.35);padding:4px;border-radius:5px;border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">PAPER BG</span>
+                <input type="color" id="fly-col-bg" value="${cBg}" style="width:100%;height:20px;border:none;background:transparent;cursor:pointer;" />
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,0.35);padding:4px;border-radius:5px;border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">INK / TEXT</span>
+                <input type="color" id="fly-col-text" value="${cText}" style="width:100%;height:20px;border:none;background:transparent;cursor:pointer;" />
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,0.35);padding:4px;border-radius:5px;border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">ACCENT</span>
+                <input type="color" id="fly-col-accent" value="${cAccent}" style="width:100%;height:20px;border:none;background:transparent;cursor:pointer;" />
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(0,0,0,0.35);padding:4px;border-radius:5px;border:1px solid rgba(255,255,255,0.06);">
+                <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">MARKER HL</span>
+                <input type="color" id="fly-col-hl" value="${cHl}" style="width:100%;height:20px;border:none;background:transparent;cursor:pointer;" />
+              </div>
+            </div>
+
+            <!-- Editorial Copy Inputs for Active Card -->
+            <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 3px;">
+              <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 5px;">
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">PUBLICATION MASTHEAD</span>
+                  <input type="text" id="fly-card-source" value="${escAttr(cSource)}" placeholder="e.g. THE FINANCIAL CHRONICLE" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:4px;padding:4px 6px;color:#f8fafc;font-size:9.5px;font-weight:700;outline:none;" />
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">CATEGORY KICKER</span>
+                  <input type="text" id="fly-card-kicker" value="${escAttr(cKicker)}" placeholder="e.g. EXCLUSIVE EXPOSE" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.12);border-radius:4px;padding:4px 6px;color:#fbbf24;font-size:9.5px;font-weight:700;outline:none;" />
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">MAIN HEADLINE</span>
+                <input type="text" id="fly-card-headline" value="${escAttr(cHeadline)}" placeholder="Main Headline Text" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.14);border-radius:4px;padding:5px 7px;color:#ffffff;font-size:10.5px;font-weight:700;outline:none;" />
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="display:flex;justify-content:space-between;">
+                  <span style="font-size:7.5px;color:#fde047;font-weight:700;">HIGHLIGHTED PHRASE (ANIMATED MARKER SWEEP)</span>
+                  <span style="font-size:7.5px;color:#64748b;">Matches words in headline</span>
+                </div>
+                <input type="text" id="fly-card-highlight" value="${escAttr(cHighlight)}" placeholder="Exact words from headline to highlight..." style="background:rgba(250,204,21,0.08);border:1px solid rgba(250,204,21,0.3);border-radius:4px;padding:4px 6px;color:#fef08a;font-size:9.5px;font-weight:600;outline:none;" />
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">SUB-HEADLINE / ARTICLE LEAD EXCERPT</span>
+                <input type="text" id="fly-card-subhead" value="${escAttr(cSubhead)}" placeholder="Secondary investigative deck or excerpt..." style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:4px 6px;color:#cbd5e1;font-size:9px;outline:none;" />
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 0.8fr 0.8fr; gap: 5px;">
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">AUTHOR BYLINE</span>
+                  <input type="text" id="fly-card-byline" value="${escAttr(cByline)}" placeholder="By Reporter" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3px 5px;color:#cbd5e1;font-size:8.5px;outline:none;" />
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">DATE</span>
+                  <input type="text" id="fly-card-date" value="${escAttr(cDate)}" placeholder="OCT 28, 2026" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3px 5px;color:#cbd5e1;font-size:8.5px;outline:none;" />
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">STAMP / EXHIBIT</span>
+                  <input type="text" id="fly-card-exhibit" value="${escAttr(cExhibit)}" placeholder="EXHIBIT A-01" style="background:rgba(0,0,0,0.45);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:3px 5px;color:#fca5a5;font-size:8.5px;font-weight:700;outline:none;" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Per-Card Typography & Spatial Transform Controls -->
+            <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 3px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08);">
+              <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 6px; align-items: center;">
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:7.5px;color:#94a3b8;font-weight:700;">HEADLINE TYPOGRAPHY</span>
+                  <select id="fly-card-font" style="background:#0f172a;border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#fff;font-size:9px;padding:3px 5px;outline:none;cursor:pointer;">
+                    ${CARD_FONTS.map(f => `<option value="${escAttr(f.val)}" ${f.val === cFont ? 'selected' : ''}>${f.label}</option>`).join('')}
+                  </select>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#94a3b8;font-weight:700;">
+                    <span>TEXT SIZE</span>
+                    <span id="fly-val-csize" style="color:#fbbf24;">${cFontSize}px</span>
+                  </div>
+                  <input type="range" id="fly-card-fontsize" min="8.5" max="17" step="0.5" value="${cFontSize}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#94a3b8;font-weight:700;">
+                    <span>CARD SCALE</span>
+                    <span id="fly-val-cscale" style="color:#fbbf24;">${Math.round(cScale * 100)}%</span>
+                  </div>
+                  <input type="range" id="fly-card-scale" min="0.65" max="1.45" step="0.02" value="${cScale}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#94a3b8;font-weight:700;">
+                    <span>Z-TILT ANGLE</span>
+                    <span id="fly-val-crot" style="color:#fbbf24;">${cRot}\u00b0</span>
+                  </div>
+                  <input type="range" id="fly-card-rot" min="-15" max="15" step="0.2" value="${cRot}" style="width:100%;accent-color:#f59e0b;height:3px;cursor:pointer;" />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#94a3b8;font-weight:700;">
+                    <span>X OFFSET</span>
+                    <span id="fly-val-cx" style="color:#38bdf8;">${cX}px</span>
+                  </div>
+                  <input type="range" id="fly-card-x" min="-220" max="220" step="1" value="${cX}" style="width:100%;accent-color:#38bdf8;height:3px;cursor:pointer;" />
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <div style="display:flex;justify-content:space-between;font-size:7.5px;color:#94a3b8;font-weight:700;">
+                    <span>Y OFFSET</span>
+                    <span id="fly-val-cy" style="color:#38bdf8;">${cY}px</span>
+                  </div>
+                  <input type="range" id="fly-card-y" min="-160" max="160" step="1" value="${cY}" style="width:100%;accent-color:#38bdf8;height:3px;cursor:pointer;" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: 3D CAMERA RIG, MOTION BLUR & CHOREOGRAPHY -->
+          <div style="display: flex; flex-direction: column; gap: 7px; background: rgba(2,6,23,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 9px;">
+            <span style="font-size: 8.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3D Camera Optics &amp; Entry Choreography</span>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #94a3b8;">
+                  <span>3D CAMERA TILT</span>
+                  <span id="fly-val-tilt" style="color: #fbbf24;">${tilt}\u00b0</span>
+                </div>
+                <input type="range" id="fly-inp-tilt" min="0" max="25" step="0.5" value="${tilt}" style="width: 100%; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #94a3b8;">
+                  <span>VELOCITY BLUR</span>
+                  <span id="fly-val-blur" style="color: #fbbf24;">${blurPx}px</span>
+                </div>
+                <input type="range" id="fly-inp-blur" min="0" max="64" value="${blurPx}" style="width: 100%; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #94a3b8;">
+                  <span>FLY-IN SPEED</span>
+                  <span id="fly-val-speed" style="color: #fbbf24;">${Number(flySpeed).toFixed(1)}x</span>
+                </div>
+                <input type="range" id="fly-inp-speed" min="0.4" max="2.5" step="0.1" value="${flySpeed}" style="width: 100%; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #94a3b8;">
+                  <span>CARD STAGGER</span>
+                  <span id="fly-val-stagger" style="color: #fbbf24;">${Number(staggerDelay).toFixed(2)}s</span>
+                </div>
+                <input type="range" id="fly-inp-stagger" min="0.05" max="0.65" step="0.03" value="${staggerDelay}" style="width: 100%; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #94a3b8;">
+                  <span>PAPER TEXTURE</span>
+                  <span id="fly-val-grain" style="color: #fbbf24;">${paperGrain}%</span>
+                </div>
+                <input type="range" id="fly-inp-grain" min="0" max="100" value="${paperGrain}" style="width: 100%; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 700; color: #94a3b8;">
+                  <span>DROP SHADOW</span>
+                  <span id="fly-val-shadow" style="color: #fbbf24;">${shadowRad}px</span>
+                </div>
+                <input type="range" id="fly-inp-shadow" min="10" max="80" value="${shadowRad}" style="width: 100%; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Optical Toggles -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <label style="display:flex;align-items:center;gap:5px;font-size:9px;color:#cbd5e1;cursor:pointer;">
+                <input type="checkbox" id="fly-inp-mblur" ${motionBlur ? 'checked' : ''} style="accent-color:#f59e0b;" />
+                Velocity Blur Vector
+              </label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:9px;color:#cbd5e1;cursor:pointer;">
+                <input type="checkbox" id="fly-inp-dofbokeh" ${dofBokeh ? 'checked' : ''} style="accent-color:#f59e0b;" />
+                Spotlight Hero Focus
+              </label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:9px;color:#cbd5e1;cursor:pointer;">
+                <input type="checkbox" id="fly-inp-specular" ${specular ? 'checked' : ''} style="accent-color:#f59e0b;" />
+                Specular Glare Sweep
+              </label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:9px;color:#cbd5e1;cursor:pointer;">
+                <input type="checkbox" id="fly-inp-drift" ${drift ? 'checked' : ''} style="accent-color:#f59e0b;" />
+                Organic Resting Drift
+              </label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:9px;color:#cbd5e1;cursor:pointer;grid-column:span 2;">
+                <input type="checkbox" id="fly-inp-hud" ${showTelemetry ? 'checked' : ''} style="accent-color:#f59e0b;" />
+                Show Top Archive Telemetry HUD
+              </label>
+            </div>
+          </div>
+
+          <!-- Studio Backdrop & Video B-Roll Picker -->
+          ${window.tplBuildUniversalBgHtml(data)}
+        </div>
+      `;
+
+      // Wire Card Tab Selector Buttons
+      container.querySelectorAll('.fly-card-tab-btn').forEach(btn => {
+        btn.onclick = () => {
+          const nextIdx = Number(btn.dataset.cardIdx || 5);
+          window.tplSetContextualData('headline-fly', { activeCardTab: nextIdx });
+          window.tplRenderContextualInspector('headline-fly');
+        };
+      });
+
+      // Wire Visibility & Reset Position for Active Card
+      container.querySelector('#fly-card-vis')?.addEventListener('change', e => {
+        window.tplSetContextualData('headline-fly', { [`visible${activeCard}`]: e.target.checked });
+        window.tplRenderContextualInspector('headline-fly');
+      });
+      container.querySelector('#fly-card-reset-tf')?.addEventListener('click', () => {
+        const defRots = { 1: -2.2, 2: 2.4, 3: 1.6, 4: -1.8, 5: -0.6 };
+        const defScales = { 1: 1.0, 2: 1.0, 3: 1.0, 4: 1.0, 5: 1.06 };
+        window.tplSetContextualData('headline-fly', {
+          [`x${activeCard}`]: 0,
+          [`y${activeCard}`]: 0,
+          [`rot${activeCard}`]: defRots[activeCard] || 0,
+          [`scale${activeCard}`]: defScales[activeCard] || 1.0
+        });
+        window.tplRenderContextualInspector('headline-fly');
+      });
+
+      // Wire Theme Preset Buttons for Active Card
+      container.querySelectorAll('.fly-theme-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          window.tplSetContextualData('headline-fly', {
+            [`theme${activeCard}`]: btn.dataset.themeId,
+            [`bgColor${activeCard}`]: btn.dataset.bg,
+            [`textColor${activeCard}`]: btn.dataset.text,
+            [`accentColor${activeCard}`]: btn.dataset.accent,
+            [`hlColor${activeCard}`]: btn.dataset.hl
+          });
+          window.tplRenderContextualInspector('headline-fly');
+        };
+      });
+
+      // Wire 4 Color Pickers for Active Card
+      container.querySelector('#fly-col-bg')?.addEventListener('input', e => {
+        window.tplSetContextualData('headline-fly', { [`bgColor${activeCard}`]: e.target.value });
+      });
+      container.querySelector('#fly-col-text')?.addEventListener('input', e => {
+        window.tplSetContextualData('headline-fly', { [`textColor${activeCard}`]: e.target.value });
+      });
+      container.querySelector('#fly-col-accent')?.addEventListener('input', e => {
+        window.tplSetContextualData('headline-fly', { [`accentColor${activeCard}`]: e.target.value });
+      });
+      container.querySelector('#fly-col-hl')?.addEventListener('input', e => {
+        window.tplSetContextualData('headline-fly', { [`hlColor${activeCard}`]: e.target.value });
+      });
+
+      // Wire Editorial Copy Inputs for Active Card
+      const bindCardText = (sel, propKey) => {
+        container.querySelector(sel)?.addEventListener('input', e => {
+          window.tplSetContextualData('headline-fly', { [`${propKey}${activeCard}`]: e.target.value });
+        });
+      };
+      bindCardText('#fly-card-source', 'source');
+      bindCardText('#fly-card-kicker', 'kicker');
+      bindCardText('#fly-card-headline', 'headline');
+      bindCardText('#fly-card-highlight', 'highlight');
+      bindCardText('#fly-card-subhead', 'subhead');
+      bindCardText('#fly-card-byline', 'byline');
+      bindCardText('#fly-card-date', 'date');
+      bindCardText('#fly-card-exhibit', 'exhibit');
+
+      // Wire Font & Spatial Transform Sliders for Active Card
+      container.querySelector('#fly-card-font')?.addEventListener('change', e => {
+        window.tplSetContextualData('headline-fly', { [`font${activeCard}`]: e.target.value });
+      });
+      const bindCardSlider = (sel, valSel, propKey, fmt) => {
+        const inp = container.querySelector(sel);
+        const valEl = container.querySelector(valSel);
+        if (inp) {
+          inp.oninput = (e) => {
+            const num = Number(e.target.value);
+            if (valEl) valEl.textContent = fmt(num);
+            window.tplSetContextualData('headline-fly', { [`${propKey}${activeCard}`]: num });
+          };
+        }
+      };
+      bindCardSlider('#fly-card-fontsize', '#fly-val-csize', 'fontSize', v => `${v}px`);
+      bindCardSlider('#fly-card-scale', '#fly-val-cscale', 'scale', v => `${Math.round(v * 100)}%`);
+      bindCardSlider('#fly-card-rot', '#fly-val-crot', 'rot', v => `${v}\u00b0`);
+      bindCardSlider('#fly-card-x', '#fly-val-cx', 'x', v => `${v}px`);
+      bindCardSlider('#fly-card-y', '#fly-val-cy', 'y', v => `${v}px`);
+
+      // Wire Global 3D Camera & Choreography Sliders
+      const bindGlobalSlider = (sel, valSel, propKey, fmt) => {
+        const inp = container.querySelector(sel);
+        const valEl = container.querySelector(valSel);
+        if (inp) {
+          inp.oninput = (e) => {
+            const num = Number(e.target.value);
+            if (valEl) valEl.textContent = fmt(num);
+            window.tplSetContextualData('headline-fly', { [propKey]: num });
+          };
+        }
+      };
+      bindGlobalSlider('#fly-inp-tilt', '#fly-val-tilt', 'tiltAngle', v => `${v}\u00b0`);
+      bindGlobalSlider('#fly-inp-blur', '#fly-val-blur', 'blurIntensity', v => `${v}px`);
+      bindGlobalSlider('#fly-inp-speed', '#fly-val-speed', 'flySpeed', v => `${v.toFixed(1)}x`);
+      bindGlobalSlider('#fly-inp-stagger', '#fly-val-stagger', 'staggerDelay', v => `${v.toFixed(2)}s`);
+      bindGlobalSlider('#fly-inp-grain', '#fly-val-grain', 'paperGrain', v => `${v}%`);
+      bindGlobalSlider('#fly-inp-shadow', '#fly-val-shadow', 'shadowRadius', v => `${v}px`);
+
+      container.querySelector('#fly-inp-mblur')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { motionBlur: e.target.checked }));
+      container.querySelector('#fly-inp-dofbokeh')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { dofBokeh: e.target.checked }));
+      container.querySelector('#fly-inp-specular')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { specularGlare: e.target.checked }));
+      container.querySelector('#fly-inp-drift')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { organicDrift: e.target.checked }));
+      container.querySelector('#fly-inp-hud')?.addEventListener('change', e => window.tplSetContextualData('headline-fly', { showTelemetry: e.target.checked }));
+
+      window.tplWireUniversalBgControls('headline-fly', container);
+      return;
+    }
+
+    // =========================================================================
     // GENERAL HANDLER: FOR ALL OTHER EXTRACTED TEMPLATES
     // Provides tailored, highly relevant controls specific to each template's fields
     // =========================================================================
@@ -4476,7 +5161,7 @@
       <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
         <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 13px;">⚙</span>
+            <span style="font-size: 13px;">\u2699</span>
             <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">${typeLabel} CONTROLS</span>
           </div>
           <span style="font-size: 9px; color: #a855f7; font-weight: 700; background: rgba(168,85,247,0.15); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>

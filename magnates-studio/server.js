@@ -45,12 +45,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(express.json({ limit: '100mb' }));
-// Never cache JS/CSS/HTML — prevents stale bundles hiding newly added templates
+// Never cache JS/CSS/HTML and always enforce explicit UTF-8 charset to prevent multi-byte codepage corruption
 app.use((req, res, next) => {
   if (/\.(js|css|html)(\?|$)/.test(req.path)) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+    if (/\.html(\?|$)/.test(req.path)) res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    else if (/\.js(\?|$)/.test(req.path)) res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    else if (/\.css(\?|$)/.test(req.path)) res.setHeader('Content-Type', 'text/css; charset=utf-8');
+  } else if (req.path === '/' || req.path === '') {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
   }
   next();
 });

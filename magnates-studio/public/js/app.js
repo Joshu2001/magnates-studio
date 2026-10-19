@@ -2957,7 +2957,7 @@ function drawTransformHandles(x, y, w, h) {
     ctx.setLineDash([]);
 
     // Sleek Canva-style Crop Framing Pill above the clip
-    const badgeText = `✂ ${studioAspectState.ratio} Crop • Drag to Frame`;
+    const badgeText = `\u2702 ${studioAspectState.ratio} Crop \u2022 Drag to Frame`;
     ctx.font = '600 11px Inter, sans-serif';
     const bW = ctx.measureText(badgeText).width + 18;
     const bH = 22;
@@ -4654,16 +4654,16 @@ function selectClip(clip, trackType) {
     if (miniThumb) {
       if (clip.drawingStrokes) {
         miniThumb.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" style="width:20px;height:20px;fill:#ff334b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
-        if (miniSub) miniSub.textContent = `Drawing • ${clip.drawMode === 'live' ? 'Speed-Draw Active' : 'Static'} • ${clip.staggerParts ? 'Staggered' : 'All Strokes'}`;
+        if (miniSub) miniSub.textContent = `Drawing \u2022 ${clip.drawMode === 'live' ? 'Speed-Draw Active' : 'Static'} \u2022 ${clip.staggerParts ? 'Staggered' : 'All Strokes'}`;
       } else if (trackType === 'image' && clip.file?.url) {
         miniThumb.innerHTML = `<img src="${clip.file.url}" style="width:100%; height:100%; object-fit:cover;">`;
-        if (miniSub) miniSub.textContent = `Image • ${((clip.scale || 1) * 100).toFixed(0)}% zoom • Drag on canvas to edit`;
+        if (miniSub) miniSub.textContent = `Image \u2022 ${((clip.scale || 1) * 100).toFixed(0)}% zoom \u2022 Drag on canvas to edit`;
       } else if (trackType === 'video' && clip.file?.url) {
         miniThumb.innerHTML = `<video src="${clip.file.url}" style="width:100%; height:100%; object-fit:cover;" muted></video>`;
-        if (miniSub) miniSub.textContent = `Video • ${clip.soundEnabled ? 'Audio On' : 'Muted'} • ${clip.duration.toFixed(1)}s`;
+        if (miniSub) miniSub.textContent = `Video \u2022 ${clip.soundEnabled ? 'Audio On' : 'Muted'} \u2022 ${clip.duration.toFixed(1)}s`;
       } else if (trackType === 'voiceover' || trackType === 'music') {
         miniThumb.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--accent-red);"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`;
-        if (miniSub) miniSub.textContent = `${trackType.toUpperCase()} • ${clip.duration.toFixed(1)}s`;
+        if (miniSub) miniSub.textContent = `${trackType.toUpperCase()} \u2022 ${clip.duration.toFixed(1)}s`;
       }
     }
 
@@ -4708,7 +4708,7 @@ function selectClip(clip, trackType) {
         const rotSlider = document.getElementById('inspector-rotate-slider');
         const rotVal = document.getElementById('inspector-rotate-val');
         if (rotSlider) rotSlider.value = curRot;
-        if (rotVal) rotVal.textContent = `${curRot}°`;
+        if (rotVal) rotVal.textContent = `${curRot}\u00b0`;
 
         const xSlider = document.getElementById('inspector-posx-slider');
         const xVal = document.getElementById('inspector-posx-val');
@@ -4969,11 +4969,11 @@ function selectClip(clip, trackType) {
         if (transDurSlider) transDurSlider.value = Math.round(curDur * 10);
         if (transDurVal) transDurVal.textContent = curDur.toFixed(2) + 's';
         if (transDurInput) transDurInput.value = curDur.toFixed(2);
-        if (transDirBadge) transDirBadge.textContent = curDir === 'custom' ? `CUSTOM (${curAngle}°)` : curDir.toUpperCase();
+        if (transDirBadge) transDirBadge.textContent = curDir === 'custom' ? `CUSTOM (${curAngle}\u00b0)` : curDir.toUpperCase();
 
         if (customDirPanel) customDirPanel.style.display = curDir === 'custom' ? 'block' : 'none';
         if (angleSlider) angleSlider.value = curAngle;
-        if (angleVal) angleVal.textContent = `${curAngle}°`;
+        if (angleVal) angleVal.textContent = `${curAngle}\u00b0`;
         if (durDropdown) durDropdown.value = '';
 
         // Toggle direction buttons
@@ -5092,7 +5092,7 @@ function selectClip(clip, trackType) {
                       Line #${idx + 1}
                     </span>
                     <button type="button" class="btn-sidebar-del-hl" data-index="${idx}" style="background: none; border: none; color: #ff334b; font-size: 10px; cursor: pointer; padding: 1px 4px; font-weight: 600;" title="Delete this highlight line">
-                      🗑 Delete
+                      \ud83d\uddd1 Delete
                     </button>
                   </div>
                   <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
@@ -7161,7 +7161,7 @@ document.getElementById('stage-fx-select')?.addEventListener('change', (e) => {
   recordState('Change Stage Overlay Effect');
 });
 
-// Background segment picker popover — lets user pick a bg style for a new segment
+// Background segment picker popover \u2014 lets user pick a bg style for a new segment
 function openBackgroundSegmentPicker(atTimeSec, triggerEl) {
   document.querySelectorAll('.bg-segment-picker-popover').forEach(p => p.remove());
 
@@ -7539,7 +7539,7 @@ document.getElementById('inspector-scale-slider')?.addEventListener('input', (e)
 
 document.getElementById('inspector-rotate-slider')?.addEventListener('input', (e) => {
   const val = parseInt(e.target.value);
-  document.getElementById('inspector-rotate-val').textContent = `${val}°`;
+  document.getElementById('inspector-rotate-val').textContent = `${val}\u00b0`;
   if (selectedClip && selectedClip.clip) {
     selectedClip.clip.rotation = val;
     renderCanvas();
@@ -7770,7 +7770,7 @@ function renderFilterPresetsUI() {
 
           // Flash confirmation banner inside the modal
           showModalFeedbackBanner(`Applied ${preset.name} look`);
-          showFloatingToast(`Filter: ${preset.name}`, '✓');
+          showFloatingToast(`Filter: ${preset.name}`, '\u2713');
 
           // Update Top Contextual Bar Filter button status
           if (typeof updateCanvaContextBar === 'function') {
@@ -7869,7 +7869,7 @@ document.getElementById('fmodal-intensity-slider')?.addEventListener('input', (e
 });
 
 // Floating Confirmation Toast for Filter and Action confirmation
-function showFloatingToast(msg, icon = '✓') {
+function showFloatingToast(msg, icon = '\u2713') {
   let toast = document.getElementById('studio-floating-toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -7979,7 +7979,7 @@ window.executeApplyFilterScope = function() {
       recordState(`Apply Filter to Clip`);
       renderCanvas();
     }
-    showFloatingToast(`Filter applied to current clip (${filterName})`, '✓');
+    showFloatingToast(`Filter applied to current clip (${filterName})`, '\u2713');
     showModalFeedbackBanner(`Applied to current clip (${filterName})`);
   } else if (activeFilterScope === 'track') {
     const curTrack = (target && target.trackType) ? target.trackType : 'image';
@@ -8005,7 +8005,7 @@ window.executeApplyFilterScope = function() {
     }
     recordState(`Apply Filter to ${curTrack} layer (${count} clips)`);
     renderCanvas();
-    showFloatingToast(`Applied ${filterName} to ${count} clips on ${curTrack} layer!`, '✓');
+    showFloatingToast(`Applied ${filterName} to ${count} clips on ${curTrack} layer!`, '\u2713');
     showModalFeedbackBanner(`Applied to ${count} clips on ${curTrack} layer`);
   } else if (activeFilterScope === 'all') {
     const targetTracks = ['image', 'video', 'chart', 'background'];
@@ -8035,13 +8035,13 @@ window.executeApplyFilterScope = function() {
 
     recordState(`Apply Filter to All (${count} clips)`);
     renderCanvas();
-    showFloatingToast(`Applied ${filterName} across all ${count} clips!`, '✓');
+    showFloatingToast(`Applied ${filterName} across all ${count} clips!`, '\u2713');
     showModalFeedbackBanner(`Applied across all ${count} project clips`);
   }
 
   // Visual button confirmation checkmark pulse
   if (btn) {
-    btn.textContent = '✓ Applied!';
+    btn.textContent = '\u2713 Applied!';
     btn.style.background = 'rgba(34, 197, 94, 0.2)';
     btn.style.borderColor = 'rgba(34, 197, 94, 0.5)';
     btn.style.color = '#4ade80';
@@ -8058,7 +8058,7 @@ window.executeApplyFilterScope = function() {
     updateCanvaContextBar(selectedClip?.clip, selectedClip?.trackType);
   }
 
-  // Auto-close modal after confirmation so user can see '✓ Applied!' clearly
+  // Auto-close modal after confirmation so user can see '\u2713 Applied!' clearly
   setTimeout(() => {
     const fModal = document.getElementById('cbar-filter-modal');
     if (fModal) fModal.style.display = 'none';
@@ -8100,7 +8100,7 @@ window.resetFilterModal = function() {
   highlightActiveFilterCard('none');
   recordState('Reset Filter to Original');
   renderCanvas();
-  showFloatingToast('Reset filter to original', '✓');
+  showFloatingToast('Reset filter to original', '\u2713');
   showModalFeedbackBanner('Reset to original');
   if (typeof updateCanvaContextBar === 'function') {
     updateCanvaContextBar(selectedClip?.clip, selectedClip?.trackType);
@@ -8417,7 +8417,7 @@ if (btnToggleProxy) {
     updateProxyBtnUI();
     mediaElementCache.clear(); // Clear so elements re-instantiate with proxy or original
     renderCanvas();
-    showTextTimingAlert(isProxyModeEnabled ? '⚡ Smart Proxy Mode: ON (Zero-Lag Scrubbing)' : 'Full-Resolution Master Playback Active', 'info');
+    showTextTimingAlert(isProxyModeEnabled ? '\u26a1 Smart Proxy Mode: ON (Zero-Lag Scrubbing)' : 'Full-Resolution Master Playback Active', 'info');
     setTimeout(() => showTextTimingAlert(''), 2200);
   });
 }
@@ -8437,7 +8437,7 @@ const NLE_PRESETS = {
       { action: 'Ripple Trim Head to Playhead', key: 'Q' },
       { action: 'Ripple Trim Tail to Playhead', key: 'W' },
       { action: 'Shuttle Reverse / Pause / Forward', key: 'J / K / L' },
-      { action: 'Frame-Accurate Stepping', key: '← / → (Shift: 10 frames)' },
+      { action: 'Frame-Accurate Stepping', key: '\u2190 / \u2192 (Shift: 10 frames)' },
       { action: 'Cut / Copy / Paste Clip', key: 'Cmd/Ctrl + X / C / V' },
       { action: 'Undo / Redo Atomic State', key: 'Cmd/Ctrl + Z / Y' },
       { action: 'Delete Selected Clip', key: 'Del / Backspace' },
@@ -8457,7 +8457,7 @@ const NLE_PRESETS = {
       { action: 'Ripple Trim Previous Edit', key: 'Q' },
       { action: 'Ripple Trim Next Edit', key: 'W' },
       { action: 'Shuttle Reverse / Stop / Forward', key: 'J / K / L' },
-      { action: 'Step 1 Frame', key: '← / →' },
+      { action: 'Step 1 Frame', key: '\u2190 / \u2192' },
       { action: 'Ripple Delete', key: 'Shift + Del' }
     ]
   },
@@ -8471,7 +8471,7 @@ const NLE_PRESETS = {
       { action: 'Trim Start to Playhead', key: 'Option + [' },
       { action: 'Trim End to Playhead', key: 'Option + ]' },
       { action: 'Shuttle Left / Stop / Right', key: 'J / K / L' },
-      { action: 'Step 1 Frame', key: '← / →' }
+      { action: 'Step 1 Frame', key: '\u2190 / \u2192' }
     ]
   },
   davinci: {
@@ -8788,9 +8788,9 @@ if (transAngleSlider) {
     const angle = parseInt(e.target.value, 10);
     selectedClip.clip.transitionAngle = angle;
     selectedClip.clip.transitionDirection = 'custom';
-    if (transAngleVal) transAngleVal.textContent = `${angle}°`;
+    if (transAngleVal) transAngleVal.textContent = `${angle}\u00b0`;
     const badge = document.getElementById('inspector-trans-dir-badge');
-    if (badge) badge.textContent = `CUSTOM (${angle}°)`;
+    if (badge) badge.textContent = `CUSTOM (${angle}\u00b0)`;
   });
   transAngleSlider.addEventListener('change', () => {
     recordState('Set Custom Angle');
@@ -8807,12 +8807,12 @@ document.querySelectorAll('.trans-quick-angle-btn').forEach(btn => {
     selectedClip.clip.transitionDirection = 'custom';
     selectedClip.clip.transitionAngle = angle;
     if (transAngleSlider) transAngleSlider.value = angle;
-    if (transAngleVal) transAngleVal.textContent = `${angle}°`;
+    if (transAngleVal) transAngleVal.textContent = `${angle}\u00b0`;
     const badge = document.getElementById('inspector-trans-dir-badge');
-    if (badge) badge.textContent = `CUSTOM (${angle}°)`;
+    if (badge) badge.textContent = `CUSTOM (${angle}\u00b0)`;
     recordState('Set Quick Angle');
     saveProjectState(false);
-    showTextTimingAlert(`Direction: ${angle}°`, 'info');
+    showTextTimingAlert(`Direction: ${angle}\u00b0`, 'info');
     setTimeout(() => showTextTimingAlert(''), 1200);
   });
 });
@@ -10615,7 +10615,7 @@ function initCanvasTransformInteraction() {
         const newScale = Math.max(0.2, Math.min(3.5, currentScale + (zoomIn ? 0.05 : -0.05)));
         clip.scale = newScale;
         const miniSub = document.getElementById('inspector-clip-sub');
-        if (miniSub) miniSub.textContent = `Image • ${(clip.scale * 100).toFixed(0)}% zoom • Drag on canvas to edit`;
+        if (miniSub) miniSub.textContent = `Image \u2022 ${(clip.scale * 100).toFixed(0)}% zoom \u2022 Drag on canvas to edit`;
       }
     }
   }, { passive: false });
@@ -10855,7 +10855,7 @@ function initCanvasTransformInteraction() {
         const scaleDelta = (delta / 400);
         clip.scale = Math.max(0.2, Math.min(3.5, transformInitialClip.scale + scaleDelta));
         const miniSub = document.getElementById('inspector-clip-sub');
-        if (miniSub) miniSub.textContent = `Image • ${(clip.scale * 100).toFixed(0)}% zoom • Drag on canvas to edit`;
+        if (miniSub) miniSub.textContent = `Image \u2022 ${(clip.scale * 100).toFixed(0)}% zoom \u2022 Drag on canvas to edit`;
       }
     }
   });
@@ -12236,7 +12236,7 @@ function getExportDimensions(ratio, res) {
 function updateExportTelemetry() {
   const { width, height } = getExportDimensions(exportStudioConfig.aspectRatio, exportStudioConfig.resolution);
   const dimEl = document.getElementById('summary-dim');
-  if (dimEl) dimEl.textContent = `${width} × ${height}`;
+  if (dimEl) dimEl.textContent = `${width} \u00d7 ${height}`;
 
   const totalDur = Math.min(duration || 30, Math.max(3, getTimelineMaxEndTime()));
   const durEl = document.getElementById('summary-dur');
@@ -12663,7 +12663,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
       <!-- Stroke-by-Stroke Timing / Staggered Part Reveal -->
       <div class="context-menu-item ${isStaggered ? 'active-fx' : ''}" id="ctx-action-draw-stagger">
         <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-        <span>${isStaggered ? 'Stagger Parts: Head → Body' : 'Stagger Stroke Timing'}</span>
+        <span>${isStaggered ? 'Stagger Parts: Head \u2192 Body' : 'Stagger Stroke Timing'}</span>
         <span class="context-badge">${isStaggered ? 'Sequential' : 'Instant'}</span>
       </div>
 
@@ -12752,7 +12752,7 @@ function showStudioContextMenu(x, y, clip, trackType) {
       <!-- 2.5D Parallax Photo Effect (Chris Spooner Pipeline) -->
       <div class="context-menu-item ${clip.zoomEffect === 'parallax_25d' ? 'active-fx' : ''}" id="ctx-action-parallax-25d">
         <svg viewBox="0 0 24 24" style="color: #38bdf8;"><path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14zm-10-7h9v6h-9z" fill="currentColor"/></svg>
-        <span>${clip.zoomEffect === 'parallax_25d' ? 'Configure 2.5D Parallax' : '⚡ 2.5D Parallax Photo'}</span>
+        <span>${clip.zoomEffect === 'parallax_25d' ? 'Configure 2.5D Parallax' : '\u26a1 2.5D Parallax Photo'}</span>
         <span class="context-badge" style="color: #38bdf8;">${clip.zoomEffect === 'parallax_25d' ? 'Active' : '2.5D Parallax'}</span>
       </div>
 
@@ -14602,7 +14602,7 @@ function renderLayersPanel() {
     layers.push({
       id: tClip.id,
       name: tClip.text ? `"${tClip.text.slice(0, 18)}..."` : `Text #${idx + 1}`,
-      desc: `${tClip.animStyle || 'pop'} · ${tClip.duration}s`,
+      desc: `${tClip.animStyle || 'pop'} \u00b7 ${tClip.duration}s`,
       type: 'text',
       clip: tClip,
       icon: `<svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4H5z"/></svg>`,
@@ -14623,7 +14623,7 @@ function renderLayersPanel() {
     layers.push({
       id: qClip.id,
       name: qClip.speakerTitle ? `Quote: ${qClip.speakerTitle}` : `Quote Card #${idx + 1}`,
-      desc: `${qClip.quoteEffect || 'Typewriter'} · ${qClip.duration}s`,
+      desc: `${qClip.quoteEffect || 'Typewriter'} \u00b7 ${qClip.duration}s`,
       type: 'quote',
       clip: qClip,
       icon: `<svg viewBox="0 0 24 24" style="color: #ff334b;"><path fill="currentColor" d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>`,
@@ -14644,7 +14644,7 @@ function renderLayersPanel() {
     let layerDesc = 'Media Layer';
     let layerIcon = `<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>`;
     if (imgClip.chartConfig) {
-      layerDesc = `Infographic · ${imgClip.chartConfig.type === 'pyramid' ? 'Liquid Funnel' : (imgClip.chartConfig.type === 'bar' ? 'Staggered Bar' : 'Area Spread')}`;
+      layerDesc = `Infographic \u00b7 ${imgClip.chartConfig.type === 'pyramid' ? 'Liquid Funnel' : (imgClip.chartConfig.type === 'bar' ? 'Staggered Bar' : 'Area Spread')}`;
       layerIcon = `<svg viewBox="0 0 24 24" style="color:#00f0ff;"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>`;
     } else if (imgClip.isIconSticker) {
       layerDesc = 'Vector Icon Sticker';
@@ -14881,7 +14881,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ====================================================================================
-// 📊 MOTION GRAPHIC INFOGRAPHICS & ANIMATED CHARTS ENGINE (Alex Hormozi / Vox Style)
+// \ud83d\udcca MOTION GRAPHIC INFOGRAPHICS & ANIMATED CHARTS ENGINE (Alex Hormozi / Vox Style)
 // ====================================================================================
 
 const PREBUILT_CHART_TEMPLATES = [
@@ -16379,7 +16379,7 @@ function startModalPreviewLoop() {
     pCtx.save();
     pCtx.font = '600 10px "Inter", sans-serif';
     pCtx.fillStyle = 'rgba(0, 240, 255, 0.65)';
-    pCtx.fillText('✎ edit', 24 + titleWidth + 8, titleY - 1);
+    pCtx.fillText('\u270e edit', 24 + titleWidth + 8, titleY - 1);
     pCtx.restore();
 
     pCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
@@ -16888,7 +16888,7 @@ function initChartsAndInfographicsEngine() {
 }
 
 // ====================================================================================
-// ⭐ VECTOR ICONS & BADGES ENGINE
+// \u2b50 VECTOR ICONS & BADGES ENGINE
 // ====================================================================================
 
 const VECTOR_ICONS_LIBRARY = [
@@ -17548,7 +17548,7 @@ function renderProjectsPanel() {
           </div>
           <div class="apple-proj-meta">
             <span>${savedDate}</span>
-            <span class="apple-proj-dot-sep">•</span>
+            <span class="apple-proj-dot-sep">\u2022</span>
             <span>${clipCount} item${clipCount !== 1 ? 's' : ''}</span>
           </div>
         </div>
@@ -20245,7 +20245,7 @@ function drawQuoteCardLayer(clip) {
     ctx.fillStyle = markColor;
     ctx.shadowColor = markColor;
     ctx.shadowBlur = 12;
-    ctx.fillText('“', quoteStartX, quoteStartY - 10);
+    ctx.fillText('\u201c', quoteStartX, quoteStartY - 10);
     ctx.restore();
   } else if (isChatBubble) {
     // Dynamic Bubble Sizing based on text content width & lines count
@@ -20447,7 +20447,7 @@ function drawQuoteCardLayer(clip) {
     ctx.fillStyle = markColor;
     ctx.shadowColor = markColor;
     ctx.shadowBlur = 12;
-    ctx.fillText('”', closingX, lastLineY - 10);
+    ctx.fillText('\u201d', closingX, lastLineY - 10);
     ctx.restore();
   }
 
@@ -21795,16 +21795,16 @@ const BUILTIN_TEMPLATES = [
     slots: [
       { id: 'slot-1', type: 'video', label: 'Hook Video Clip', duration: 3.5, hint: 'High-energy opener (first 3s)' },
       { id: 'slot-2', type: 'video', label: 'Main Showcase Video', duration: 6.0, hint: 'Core action or product demo' },
-      { id: 'slot-3', type: 'text', label: 'Punchy Call-To-Action', duration: 2.5, text: 'FOLLOW FOR MORE 🚀' }
+      { id: 'slot-3', type: 'text', label: 'Punchy Call-To-Action', duration: 2.5, text: 'FOLLOW FOR MORE \ud83d\ude80' }
     ],
     previewBg: 'linear-gradient(135deg, #ff334b, #7928ca)',
     state: {
       duration: 12,
       background: [{ id: 'bg-1', start: 0, duration: 12, bgType: 'cyber_grid', bgColor: '#0a0b0e' }],
       text: [
-        { id: 'txt-1', start: 0, duration: 3.5, text: 'STOP SCROLLING ⚠️', highlight: 'STOP', fontSize: 58, textColor: '#ffffff', highlightColor: '#ff334b', anim: 'pop', sfx: 'whoosh', position: 'top' },
+        { id: 'txt-1', start: 0, duration: 3.5, text: 'STOP SCROLLING \u26a0\ufe0f', highlight: 'STOP', fontSize: 58, textColor: '#ffffff', highlightColor: '#ff334b', anim: 'pop', sfx: 'whoosh', position: 'top' },
         { id: 'txt-2', start: 3.5, duration: 6.0, text: 'Watch What Happens Next', highlight: 'Happens', fontSize: 44, textColor: '#ffffff', highlightColor: '#00f0ff', anim: 'slide', sfx: 'click', position: 'bottom' },
-        { id: 'txt-3', start: 9.5, duration: 2.5, text: 'Follow For Part 2 🚀', highlight: 'Part 2', fontSize: 50, textColor: '#ffffff', highlightColor: '#ffd000', anim: 'pop', sfx: 'whoosh', position: 'center' }
+        { id: 'txt-3', start: 9.5, duration: 2.5, text: 'Follow For Part 2 \ud83d\ude80', highlight: 'Part 2', fontSize: 50, textColor: '#ffffff', highlightColor: '#ffd000', anim: 'pop', sfx: 'whoosh', position: 'center' }
       ],
       chart: [],
       quote: []
@@ -21884,7 +21884,7 @@ const BUILTIN_TEMPLATES = [
       duration: 10,
       background: [{ id: 'bg-1', start: 0, duration: 10, bgType: 'vox_cream', bgColor: '#f4eedb' }],
       text: [
-        { id: 'txt-1', start: 0, duration: 6.0, text: '“Success is not final, failure is not fatal.”', highlight: 'Success', fontSize: 48, textColor: '#111827', highlightColor: '#ff334b', anim: 'typewriter', sfx: 'click', position: 'center' }
+        { id: 'txt-1', start: 0, duration: 6.0, text: '\u201cSuccess is not final, failure is not fatal.\u201d', highlight: 'Success', fontSize: 48, textColor: '#111827', highlightColor: '#ff334b', anim: 'typewriter', sfx: 'click', position: 'center' }
       ],
       quote: [
         { id: 'quote-1', start: 6.0, duration: 4.0, quoteText: 'It is the courage to continue that counts.', authorName: 'Winston Churchill', sourceTag: 'Daily Wisdom', bgMode: 'cream', anim: 'fade' }
@@ -22312,7 +22312,7 @@ async function handleConfirmSaveAsTemplate() {
     name: title,
     category: chosenCategory,
     origCategory: chosenCategory,
-    badge: '★ My Template',
+    badge: '\u2605 My Template',
     aspectRatio: '16:9',
     duration: customDuration || 15,
     description: description,
@@ -22356,9 +22356,9 @@ async function handleConfirmSaveAsTemplate() {
     }
   }
 
-  // Switch category to "★ My Templates" or the user's selected category to immediately show the template
+  // Switch category to "\u2605 My Templates" or the user's selected category to immediately show the template
   if (chosenCategory === 'My Templates') {
-    currentTemplateCategory = '★ My Templates';
+    currentTemplateCategory = '\u2605 My Templates';
   } else {
     currentTemplateCategory = chosenCategory;
   }
@@ -22367,7 +22367,7 @@ async function handleConfirmSaveAsTemplate() {
 
   // Surface a sleek, high-visibility floating toast
   const toastMsg = `Template "${title}" saved! Available in ${currentTemplateCategory} & All templates.`;
-  showFloatingToast(toastMsg, '★');
+  showFloatingToast(toastMsg, '\u2605');
   showTextTimingAlert(toastMsg, 'success');
   setTimeout(() => showTextTimingAlert(''), 3500);
 
@@ -22454,7 +22454,7 @@ function renderTemplatesHub() {
       <div class="template-card-preview" style="background: ${tpl.previewBg || '#1e2436'};">
         <span class="template-card-badge">${tpl.badge || 'Template'}</span>
         <span class="template-card-duration">${formatTime(tpl.duration || 10)}</span>
-        <div style="font-size: 26px; opacity: 0.85;">✨</div>
+        <div style="font-size: 26px; opacity: 0.85;">\u2728</div>
       </div>
       <div>
         <h4 class="template-card-title">${tpl.name}</h4>
@@ -22466,7 +22466,7 @@ function renderTemplatesHub() {
           <span>${slotsCount} Smart Slots</span>
         </div>
         <div style="display: flex; gap: 6px;">
-          ${isCustom ? `<button type="button" class="btn-micro-del tpl-del-btn" title="Delete Template" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:11px;">🗑️</button>` : ''}
+          ${isCustom ? `<button type="button" class="btn-micro-del tpl-del-btn" title="Delete Template" style="background:none; border:none; color:#ef4444; cursor:pointer; font-size:11px;">\ud83d\uddd1\ufe0f</button>` : ''}
           <button type="button" class="btn btn-secondary btn-sm tpl-use-btn" style="padding: 3px 8px; font-size: 10px; background: rgba(0,240,255,0.15); border-color:#00f0ff; color:#00f0ff; font-weight:700;">Use Template</button>
         </div>
       </div>
@@ -22560,7 +22560,7 @@ function renderOnboardingRecommendations() {
     card.innerHTML = `
       <div style="height: 60px; border-radius: 4px; background: ${tpl.previewBg || '#23293e'}; display: flex; align-items: center; justify-content: center; position: relative;">
         <span style="position: absolute; top: 4px; left: 4px; font-size: 8px; font-weight: 700; background: rgba(0,0,0,0.7); padding: 1px 4px; border-radius: 3px; color: #00f0ff;">${tpl.badge || 'Template'}</span>
-        <span style="font-size: 20px;">🎬</span>
+        <span style="font-size: 20px;">\ud83c\udfac</span>
       </div>
       <div style="font-size: 11.5px; font-weight: 700; color: #fff; line-height: 1.2;">${tpl.name}</div>
       <div style="font-size: 10px; color: #94a3b8; line-height: 1.3;">${tpl.slots?.length || 2} Replaceable Slots</div>
@@ -23231,7 +23231,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Assets = Liabilities + Equity formula with line-by-line highlighting. Perfect for accounting explainers.',
     tags: ['Finance', 'Balance Sheet Breakdown', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="30" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">APPLE INC. · BALANCE SHEET</text><rect x="40" y="42" width="320" height="30" rx="4" fill="rgba(139,90,60,0.12)"/><text x="200" y="62" fill="#3a2418" font-family="monospace" font-weight="800" font-size="13" text-anchor="middle">ASSETS = LIABILITIES + EQUITY</text><g transform="translate(40, 85)" font-family="monospace" font-size="10" fill="#3a2418"><text x="10" y="15">Cash &amp; Equivalents</text><text x="310" y="15" text-anchor="end" font-weight="700">$29.9B</text><text x="10" y="35">Marketable Securities</text><text x="310" y="35" text-anchor="end" font-weight="700">$61.5B</text><line x1="10" y1="46" x2="310" y2="46" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><text x="10" y="62">Short-term Debt</text><text x="310" y="62" text-anchor="end" font-weight="700">$16.2B</text><text x="10" y="80">Long-term Debt</text><text x="310" y="80" text-anchor="end" font-weight="700">$95.7B</text><line x1="10" y1="92" x2="310" y2="92" stroke="#8b5a3c" stroke-width="1.5"/><text x="10" y="110" font-weight="900" fill="#7c5cff">Shareholders' Equity</text><text x="310" y="110" text-anchor="end" font-weight="900" fill="#7c5cff">$62.1B</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="30" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">APPLE INC. \u00b7 BALANCE SHEET</text><rect x="40" y="42" width="320" height="30" rx="4" fill="rgba(139,90,60,0.12)"/><text x="200" y="62" fill="#3a2418" font-family="monospace" font-weight="800" font-size="13" text-anchor="middle">ASSETS = LIABILITIES + EQUITY</text><g transform="translate(40, 85)" font-family="monospace" font-size="10" fill="#3a2418"><text x="10" y="15">Cash &amp; Equivalents</text><text x="310" y="15" text-anchor="end" font-weight="700">$29.9B</text><text x="10" y="35">Marketable Securities</text><text x="310" y="35" text-anchor="end" font-weight="700">$61.5B</text><line x1="10" y1="46" x2="310" y2="46" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><text x="10" y="62">Short-term Debt</text><text x="310" y="62" text-anchor="end" font-weight="700">$16.2B</text><text x="10" y="80">Long-term Debt</text><text x="310" y="80" text-anchor="end" font-weight="700">$95.7B</text><line x1="10" y1="92" x2="310" y2="92" stroke="#8b5a3c" stroke-width="1.5"/><text x="10" y="110" font-weight="900" fill="#7c5cff">Shareholders' Equity</text><text x="310" y="110" text-anchor="end" font-weight="900" fill="#7c5cff">$62.1B</text></g></svg>`)}`
   },
   {
     id: 'compound',
@@ -23270,7 +23270,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Multi-panel terminal look with flickering data. The signature aesthetic of serious market analysis.',
     tags: ['Finance', 'Bloomberg Terminal', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#000"/><g transform="translate(10, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">US EQUITIES ▲</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">SPX 4,582 <tspan fill="#00d68f">+0.8%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">NDX 15,942 <tspan fill="#00d68f">+1.2%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DJI 35,281 <tspan fill="#ff4757">-0.3%</tspan></text></g><g transform="translate(205, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#ff4757" font-family="monospace" font-weight="900" font-size="8.5">RATES / FX ▼</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">US10Y 4.32%</text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">EUR/USD 1.0842</text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DXY 105.42</text></g><g transform="translate(10, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">COMMODITIES ▲</text><text x="8" y="45" fill="#fff" font-family="monospace" font-size="9">GOLD 1,987.40</text><text x="8" y="65" fill="#fff" font-family="monospace" font-size="9">BRENT 82.50</text></g><g transform="translate(205, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">CRYPTO ▲</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">BTC $43,280 <tspan fill="#00d68f">+3.2%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">ETH $2,280 <tspan fill="#00d68f">+2.1%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">SOL $42.10 <tspan fill="#ff4757">-1.4%</tspan></text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#000"/><g transform="translate(10, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">US EQUITIES \u25b2</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">SPX 4,582 <tspan fill="#00d68f">+0.8%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">NDX 15,942 <tspan fill="#00d68f">+1.2%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DJI 35,281 <tspan fill="#ff4757">-0.3%</tspan></text></g><g transform="translate(205, 10)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#ff4757" font-family="monospace" font-weight="900" font-size="8.5">RATES / FX \u25bc</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">US10Y 4.32%</text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">EUR/USD 1.0842</text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">DXY 105.42</text></g><g transform="translate(10, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">COMMODITIES \u25b2</text><text x="8" y="45" fill="#fff" font-family="monospace" font-size="9">GOLD 1,987.40</text><text x="8" y="65" fill="#fff" font-family="monospace" font-size="9">BRENT 82.50</text></g><g transform="translate(205, 118)"><rect width="185" height="98" fill="#0a1a0f" stroke="#0f2a1a"/><text x="8" y="16" fill="#00d68f" font-family="monospace" font-weight="900" font-size="8.5">CRYPTO \u25b2</text><text x="8" y="35" fill="#fff" font-family="monospace" font-size="8">BTC $43,280 <tspan fill="#00d68f">+3.2%</tspan></text><text x="8" y="55" fill="#fff" font-family="monospace" font-size="8">ETH $2,280 <tspan fill="#00d68f">+2.1%</tspan></text><text x="8" y="75" fill="#fff" font-family="monospace" font-size="8">SOL $42.10 <tspan fill="#ff4757">-1.4%</tspan></text></g></svg>`)}`
   },
   {
     id: 'ticker',
@@ -23296,7 +23296,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Dollar bill shrinking to show purchasing power loss. The perfect visual for "what $100 bought then vs now".',
     tags: ['Finance', 'Inflation Shrink', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-inf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a0a0a"/><stop offset="100%" stop-color="#100505"/></linearGradient><linearGradient id="bill-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#85bb65"/><stop offset="100%" stop-color="#5a8a3f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-inf)"/><text x="200" y="38" fill="rgba(255,255,255,0.7)" font-family="monospace" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">1980 → 2024 PURCHASING POWER</text><g transform="translate(130, 60)"><rect width="140" height="70" rx="6" fill="url(#bill-g)" stroke="rgba(255,255,255,0.3)"/><text x="70" y="44" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="24" text-anchor="middle">$100</text></g><text x="200" y="165" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" text-anchor="middle">-72%</text><text x="200" y="185" fill="#ff4757" font-family="monospace" font-weight="700" font-size="10" letter-spacing="1" text-anchor="middle">PURCHASING POWER LOST</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-inf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a0a0a"/><stop offset="100%" stop-color="#100505"/></linearGradient><linearGradient id="bill-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#85bb65"/><stop offset="100%" stop-color="#5a8a3f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-inf)"/><text x="200" y="38" fill="rgba(255,255,255,0.7)" font-family="monospace" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">1980 \u2192 2024 PURCHASING POWER</text><g transform="translate(130, 60)"><rect width="140" height="70" rx="6" fill="url(#bill-g)" stroke="rgba(255,255,255,0.3)"/><text x="70" y="44" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="24" text-anchor="middle">$100</text></g><text x="200" y="165" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" text-anchor="middle">-72%</text><text x="200" y="185" fill="#ff4757" font-family="monospace" font-weight="700" font-size="10" letter-spacing="1" text-anchor="middle">PURCHASING POWER LOST</text></svg>`)}`
   },
   {
     id: 'snowball',
@@ -23309,7 +23309,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Debts paying off one by one with checkmarks. The Dave Ramsey method visualized.',
     tags: ['Finance', 'Debt Snowball', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sno" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sno)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">DEBT SNOWBALL PAYOFF</text><g transform="translate(25, 52)"><g transform="translate(0,0)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">✓</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Credit Card</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$5,000</text></g><g transform="translate(0,34)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">✓</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Car Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$12,000</text></g><g transform="translate(0,68)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Student Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="110" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$28,000</text></g><g transform="translate(0,102)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Mortgage</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="150" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$250,000</text></g></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sno" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sno)"/><text x="200" y="32" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="12" letter-spacing="1" text-anchor="middle">DEBT SNOWBALL PAYOFF</text><g transform="translate(25, 52)"><g transform="translate(0,0)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">\u2713</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Credit Card</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$5,000</text></g><g transform="translate(0,34)"><circle cx="10" cy="11" r="7" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="10" text-anchor="middle">\u2713</text><text x="28" y="15" fill="#00d68f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Car Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="#00d68f" opacity="0.3"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$12,000</text></g><g transform="translate(0,68)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Student Loan</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="110" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$28,000</text></g><g transform="translate(0,102)"><circle cx="10" cy="11" r="7" fill="none" stroke="rgba(255,255,255,0.3)"/><text x="28" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="600" font-size="11">Mortgage</text><rect x="110" y="3" width="180" height="16" rx="3" fill="rgba(255,255,255,0.06)"/><rect x="110" y="3" width="150" height="16" rx="3" fill="#ff4757"/><text x="345" y="15" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="10" text-anchor="end">$250,000</text></g></g></svg>`)}`
   },
   {
     id: 'pie',
@@ -23333,7 +23333,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Itemized receipt with running total. Perfect for "how much I spent on…" or expense breakdown content.',
+    description: 'Itemized receipt with running total. Perfect for "how much I spent on\u2026" or expense breakdown content.',
     tags: ['Finance', 'Receipt / Invoice', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(90, 15)"><rect width="220" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.1)"/><text x="110" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="12" letter-spacing="1" text-anchor="middle">GROCERY MART</text><line x1="20" y1="32" x2="200" y2="32" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g transform="translate(20, 48)" font-family="monospace" font-size="9.5" fill="#3a2418"><text x="0" y="0">Organic Milk</text><text x="180" y="0" text-anchor="end" font-weight="700">$6.99</text><text x="0" y="20">Avocados (3)</text><text x="180" y="20" text-anchor="end" font-weight="700">$4.50</text><text x="0" y="40">Sourdough Bread</text><text x="180" y="40" text-anchor="end" font-weight="700">$7.25</text><text x="0" y="60">Free Range Eggs</text><text x="180" y="60" text-anchor="end" font-weight="700">$8.99</text><line x1="0" y1="75" x2="180" y2="75" stroke="#3a2418" stroke-width="1.5"/><text x="0" y="95" font-weight="900" font-size="12">TOTAL</text><text x="180" y="95" text-anchor="end" font-weight="900" font-size="12" fill="#7c5cff">$27.73</text></g></g></svg>`)}`
   },
@@ -23348,7 +23348,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Animated Google search with typing cursor and auto-suggestions. The signature look of every documentary channel.',
     tags: ['Animations', 'Google Search Typing', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#fff"/><g transform="translate(200, 42)"><text font-family="'Space Grotesk', sans-serif" font-size="34" font-weight="700" text-anchor="middle"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC05">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan></text></g><g transform="translate(50, 68)"><rect width="300" height="36" rx="18" fill="#fff" stroke="#dfe1e5" stroke-width="1.2"/><circle cx="20" cy="18" r="6" fill="none" stroke="#9aa0a6" stroke-width="1.8"/><line x1="24" y1="22" x2="29" y2="27" stroke="#9aa0a6" stroke-width="1.8"/><text x="36" y="23" fill="#202124" font-family="'Inter', sans-serif" font-size="12">what happened to...</text><line x1="165" y1="10" x2="165" y2="26" stroke="#202124" stroke-width="1.5"/></g><g transform="translate(65, 120)" font-family="'Inter', sans-serif" font-size="11" fill="#202124"><text x="0" y="0">🔍 what happened to db cooper</text><text x="0" y="24">🔍 what happened in chernobyl</text><text x="0" y="48">🔍 what happened last night</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#fff"/><g transform="translate(200, 42)"><text font-family="'Space Grotesk', sans-serif" font-size="34" font-weight="700" text-anchor="middle"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC05">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan></text></g><g transform="translate(50, 68)"><rect width="300" height="36" rx="18" fill="#fff" stroke="#dfe1e5" stroke-width="1.2"/><circle cx="20" cy="18" r="6" fill="none" stroke="#9aa0a6" stroke-width="1.8"/><line x1="24" y1="22" x2="29" y2="27" stroke="#9aa0a6" stroke-width="1.8"/><text x="36" y="23" fill="#202124" font-family="'Inter', sans-serif" font-size="12">what happened to...</text><line x1="165" y1="10" x2="165" y2="26" stroke="#202124" stroke-width="1.5"/></g><g transform="translate(65, 120)" font-family="'Inter', sans-serif" font-size="11" fill="#202124"><text x="0" y="0">\ud83d\udd0d what happened to db cooper</text><text x="0" y="24">\ud83d\udd0d what happened in chernobyl</text><text x="0" y="48">\ud83d\udd0d what happened last night</text></g></svg>`)}`
   },
   {
     id: 'imessage',
@@ -23374,7 +23374,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Animated subscribe button with click, bell ring, and counter. Drop this in every video for more subs.',
     tags: ['Animations', 'Subscribe Button CTA', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a24"/><stop offset="100%" stop-color="#0a0a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sub)"/><g transform="translate(200, 95)"><rect x="-90" y="-24" width="180" height="48" rx="8" fill="#cc0000"/><text x="-15" y="6" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="15" text-anchor="middle">SUBSCRIBE</text><circle cx="60" cy="0" r="14" fill="rgba(255,255,255,0.2)"/><text x="60" y="5" font-size="14" text-anchor="middle">🔔</text></g><text x="200" y="160" fill="rgba(255,255,255,0.8)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="13" text-anchor="middle"><tspan fill="#fff" font-size="16">1.2M</tspan> subscribers</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-sub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a24"/><stop offset="100%" stop-color="#0a0a0f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-sub)"/><g transform="translate(200, 95)"><rect x="-90" y="-24" width="180" height="48" rx="8" fill="#cc0000"/><text x="-15" y="6" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="15" text-anchor="middle">SUBSCRIBE</text><circle cx="60" cy="0" r="14" fill="rgba(255,255,255,0.2)"/><text x="60" y="5" font-size="14" text-anchor="middle">\ud83d\udd14</text></g><text x="200" y="160" fill="rgba(255,255,255,0.8)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="13" text-anchor="middle"><tspan fill="#fff" font-size="16">1.2M</tspan> subscribers</text></svg>`)}`
   },
   {
     id: 'countdown',
@@ -23413,7 +23413,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Animated line chart drawing itself with glowing green line. Finance, crypto, and business channels love this.',
     tags: ['Finance', 'Stock Chart Drawing', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-ch" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient><linearGradient id="ch-grd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5cff8a" stop-opacity="0.5"/><stop offset="100%" stop-color="#5cff8a" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-ch)"/><text x="24" y="32" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="16">TSLA</text><text x="24" y="48" fill="#5cff8a" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">▲ +12.4%</text><text x="376" y="38" fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="22" text-anchor="end">$248.50</text><g transform="translate(24, 70)"><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10 L 352 120 L 0 120 Z" fill="url(#ch-grd)"/><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10" fill="none" stroke="#5cff8a" stroke-width="2.5" stroke-linecap="round"/></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-ch" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a0f"/><stop offset="100%" stop-color="#05100a"/></linearGradient><linearGradient id="ch-grd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5cff8a" stop-opacity="0.5"/><stop offset="100%" stop-color="#5cff8a" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-ch)"/><text x="24" y="32" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="16">TSLA</text><text x="24" y="48" fill="#5cff8a" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">\u25b2 +12.4%</text><text x="376" y="38" fill="#5cff8a" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="22" text-anchor="end">$248.50</text><g transform="translate(24, 70)"><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10 L 352 120 L 0 120 Z" fill="url(#ch-grd)"/><path d="M 0 100 L 40 90 L 80 95 L 120 70 L 160 75 L 200 50 L 240 55 L 280 30 L 320 20 L 352 10" fill="none" stroke="#5cff8a" stroke-width="2.5" stroke-linecap="round"/></g></svg>`)}`
   },
   {
     id: 'typewriter',
@@ -23426,7 +23426,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Vintage typewriter effect on aged paper. Perfect for true crime, history, and dramatic storytelling.',
     tags: ['Text & Titles', 'Typewriter Reveal', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><line x1="45" y1="0" x2="45" y2="225" stroke="rgba(220,80,80,0.4)" stroke-width="1.5"/><g transform="translate(65, 95)"><text fill="#2a1a10" font-family="'Courier New', monospace" font-weight="700" font-size="16">The letter arrived at midnight...</text><text y="30" fill="rgba(42,26,16,0.6)" font-family="'Courier New', monospace" font-size="11">— November 14, 1987</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><line x1="45" y1="0" x2="45" y2="225" stroke="rgba(220,80,80,0.4)" stroke-width="1.5"/><g transform="translate(65, 95)"><text fill="#2a1a10" font-family="'Courier New', monospace" font-weight="700" font-size="16">The letter arrived at midnight...</text><text y="30" fill="rgba(42,26,16,0.6)" font-family="'Courier New', monospace" font-size="11">\u2014 November 14, 1987</text></g></svg>`)}`
   },
   {
     id: 'notif',
@@ -23439,7 +23439,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Stacked phone notifications sliding in (Instagram, PayPal, Email). Great for "day in the life" and business content.',
     tags: ['Animations', 'Phone Notification Stack', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-nf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-nf)"/><g transform="translate(45, 30)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="20">📸</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">New follower</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">@creator started following you</text></g><g transform="translate(45, 90)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><rect x="16" y="10" width="28" height="28" rx="6" fill="#003087"/><text x="30" y="29" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">P</text><text x="54" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Payment received</text><text x="54" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">$2,450.00 from Client</text></g><g transform="translate(45, 150)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="18">✉️</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Partnership opportunity</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">Hey, loved your last video...</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-nf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-nf)"/><g transform="translate(45, 30)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="20">\ud83d\udcf8</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">New follower</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">@creator started following you</text></g><g transform="translate(45, 90)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><rect x="16" y="10" width="28" height="28" rx="6" fill="#003087"/><text x="30" y="29" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">P</text><text x="54" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Payment received</text><text x="54" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">$2,450.00 from Client</text></g><g transform="translate(45, 150)"><rect width="310" height="48" rx="14" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.12)"/><text x="18" y="30" font-size="18">\u2709\ufe0f</text><text x="50" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Partnership opportunity</text><text x="50" y="38" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-size="10.5">Hey, loved your last video...</text></g></svg>`)}`
   },
   {
     id: 'hormozi',
@@ -23452,7 +23452,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Word-by-word animated captions with color highlights and emoji pops.',
     tags: ['Text & Titles', 'Hormozi Captions', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-hz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-hz)"/><text x="60" y="60" font-size="34">🔥</text><text x="340" y="180" font-size="34" text-anchor="end">💰</text><text x="200" y="125" fill="#ffd23f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" letter-spacing="-1" text-anchor="middle">THIS ONE TRICK</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-hz" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-hz)"/><text x="60" y="60" font-size="34">\ud83d\udd25</text><text x="340" y="180" font-size="34" text-anchor="end">\ud83d\udcb0</text><text x="200" y="125" fill="#ffd23f" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="28" letter-spacing="-1" text-anchor="middle">THIS ONE TRICK</text></svg>`)}`
   },
   {
     id: 'kenburns',
@@ -23465,7 +23465,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Slow cinematic zoom + pan on any photo. Perfect for storytelling B-roll.',
     tags: ['Parallax', 'Ken Burns Cinematic', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-kb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2c1810"/><stop offset="50%" stop-color="#5a3a28"/><stop offset="100%" stop-color="#8b5a3c"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-kb)"/><rect width="400" height="225" fill="black" opacity="0.25"/><text x="200" y="190" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="18" letter-spacing="4" text-anchor="middle">TOKYO · 1987</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-kb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2c1810"/><stop offset="50%" stop-color="#5a3a28"/><stop offset="100%" stop-color="#8b5a3c"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-kb)"/><rect width="400" height="225" fill="black" opacity="0.25"/><text x="200" y="190" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="18" letter-spacing="4" text-anchor="middle">TOKYO \u00b7 1987</text></svg>`)}`
   },
   {
     id: 'tweet',
@@ -23478,7 +23478,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Animated tweet popup with verified badge and engagement stats.',
     tags: ['Animations', 'Tweet / Social Proof', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tw)"/><g transform="translate(45, 38)"><rect width="310" height="150" rx="14" fill="#fff"/><circle cx="28" cy="28" r="16" fill="#1da1f2"/><text x="28" y="33" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">A</text><text x="54" y="24" fill="#0f1419" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Alex Hormozi <tspan fill="#1da1f2">✓</tspan></text><text x="54" y="38" fill="#536471" font-family="'Inter', sans-serif" font-size="10">@alexmormozi</text><text x="20" y="75" fill="#0f1419" font-family="'Inter', sans-serif" font-size="11.5">The best investment you can make is in yourself.</text><line x1="20" y1="108" x2="290" y2="108" stroke="#eff3f4" stroke-width="1"/><text x="20" y="128" fill="#536471" font-family="'Inter', sans-serif" font-size="10"><tspan fill="#0f1419" font-weight="700">12.4K</tspan> Likes   <tspan fill="#0f1419" font-weight="700">3.2K</tspan> Reposts</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-tw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0f0f1a"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-tw)"/><g transform="translate(45, 38)"><rect width="310" height="150" rx="14" fill="#fff"/><circle cx="28" cy="28" r="16" fill="#1da1f2"/><text x="28" y="33" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="14" text-anchor="middle">A</text><text x="54" y="24" fill="#0f1419" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Alex Hormozi <tspan fill="#1da1f2">\u2713</tspan></text><text x="54" y="38" fill="#536471" font-family="'Inter', sans-serif" font-size="10">@alexmormozi</text><text x="20" y="75" fill="#0f1419" font-family="'Inter', sans-serif" font-size="11.5">The best investment you can make is in yourself.</text><line x1="20" y1="108" x2="290" y2="108" stroke="#eff3f4" stroke-width="1"/><text x="20" y="128" fill="#536471" font-family="'Inter', sans-serif" font-size="10"><tspan fill="#0f1419" font-weight="700">12.4K</tspan> Likes   <tspan fill="#0f1419" font-weight="700">3.2K</tspan> Reposts</text></g></svg>`)}`
   },
   {
     id: 'money',
@@ -23517,7 +23517,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Animated location pin with ripple effect.',
     tags: ['Animations', 'Map Pin Drop', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-mp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a3a5c"/><stop offset="100%" stop-color="#0f2540"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-mp)"/><ellipse cx="200" cy="115" rx="100" ry="50" fill="rgba(92,255,220,0.15)" stroke="rgba(92,255,220,0.3)"/><circle cx="200" cy="115" r="30" fill="none" stroke="#ff5c8a" opacity="0.5"/><text x="200" y="112" font-size="28" text-anchor="middle">📍</text><rect x="130" y="45" width="140" height="28" rx="14" fill="rgba(0,0,0,0.6)"/><text x="200" y="63" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5" text-anchor="middle">Chernobyl, Ukraine</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-mp" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a3a5c"/><stop offset="100%" stop-color="#0f2540"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-mp)"/><ellipse cx="200" cy="115" rx="100" ry="50" fill="rgba(92,255,220,0.15)" stroke="rgba(92,255,220,0.3)"/><circle cx="200" cy="115" r="30" fill="none" stroke="#ff5c8a" opacity="0.5"/><text x="200" y="112" font-size="28" text-anchor="middle">\ud83d\udccd</text><rect x="130" y="45" width="140" height="28" rx="14" fill="rgba(0,0,0,0.6)"/><text x="200" y="63" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5" text-anchor="middle">Chernobyl, Ukraine</text></svg>`)}`
   },
   {
     id: 'news',
@@ -23530,7 +23530,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'CNN-style breaking news lower third with scrolling ticker.',
     tags: ['Animations', 'Breaking News Banner', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="24" y="130" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22">Tech Giant Announces Layoffs</text><g transform="translate(24, 150)"><rect width="80" height="32" fill="#e63946"/><text x="40" y="20" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" text-anchor="middle">🔴 LIVE</text><rect x="80" y="0" width="272" height="32" fill="#fff"/><text x="92" y="20" fill="#0a0a0f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Markets down 3% • CEO resigns</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a0f"/><text x="24" y="130" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="22">Tech Giant Announces Layoffs</text><g transform="translate(24, 150)"><rect width="80" height="32" fill="#e63946"/><text x="40" y="20" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" text-anchor="middle">\ud83d\udd34 LIVE</text><rect x="80" y="0" width="272" height="32" fill="#fff"/><text x="92" y="20" fill="#0a0a0f" font-family="'Inter', sans-serif" font-weight="700" font-size="11">Markets down 3% \u2022 CEO resigns</text></g></svg>`)}`
   },
   {
     id: 'quote',
@@ -23543,7 +23543,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Elegant animated quote with author reveal.',
     tags: ['Text & Titles', 'Cinematic Quote Card', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-qt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8d5b7"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-qt)"/><text x="40" y="90" fill="rgba(139,90,60,0.15)" font-family="Georgia, serif" font-size="100" font-weight="900">“</text><g transform="translate(60, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-style="italic" font-size="18">The obstacle is the way.</text><text y="38" fill="#8b5a3c" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="2">— MARCUS AURELIUS</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-qt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f5e6d3"/><stop offset="100%" stop-color="#e8d5b7"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-qt)"/><text x="40" y="90" fill="rgba(139,90,60,0.15)" font-family="Georgia, serif" font-size="100" font-weight="900">\u201c</text><g transform="translate(60, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-style="italic" font-size="18">The obstacle is the way.</text><text y="38" fill="#8b5a3c" font-family="'Inter', sans-serif" font-weight="700" font-size="11" letter-spacing="2">\u2014 MARCUS AURELIUS</text></g></svg>`)}`
   },
   {
     id: 'polaroid',
@@ -23582,7 +23582,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Vintage VHS tape look with scanlines, tracking, and REC indicator.',
     tags: ['Color & Vibe', 'VHS Retro Overlay', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-vh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-vh)"/><text x="24" y="32" fill="#ff2a2a" font-family="'Courier New', monospace" font-weight="900" font-size="12">🔴 REC</text><text x="376" y="32" fill="#fff" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="end">SP 0:00:18</text><text x="200" y="125" fill="#fff" font-family="'Courier New', monospace" font-weight="900" font-size="34" letter-spacing="3" text-anchor="middle">SUMMER 89</text><text x="200" y="200" fill="rgba(255,255,255,0.7)" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="middle">OCT 18 1989</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-vh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-vh)"/><text x="24" y="32" fill="#ff2a2a" font-family="'Courier New', monospace" font-weight="900" font-size="12">\ud83d\udd34 REC</text><text x="376" y="32" fill="#fff" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="end">SP 0:00:18</text><text x="200" y="125" fill="#fff" font-family="'Courier New', monospace" font-weight="900" font-size="34" letter-spacing="3" text-anchor="middle">SUMMER 89</text><text x="200" y="200" fill="rgba(255,255,255,0.7)" font-family="'Courier New', monospace" font-weight="700" font-size="12" text-anchor="middle">OCT 18 1989</text></svg>`)}`
   },
   {
     id: 'progress',
@@ -23634,7 +23634,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Instagram post with double-tap heart animation. Perfect for social media content.',
     tags: ['Animations', 'Instagram Post', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f0f2f5"/><g transform="translate(100, 15)"><rect width="200" height="195" rx="10" fill="#fff"/><circle cx="24" cy="20" r="10" fill="#ff7a59"/><text x="42" y="24" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">@creator</text><rect x="0" y="38" width="200" height="110" fill="#7c5cff"/><text x="100" y="105" font-size="38" text-anchor="middle">❤️</text><text x="12" y="168" font-size="12">❤️ 💬 📤</text><text x="12" y="184" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5">12,453 likes</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f0f2f5"/><g transform="translate(100, 15)"><rect width="200" height="195" rx="10" fill="#fff"/><circle cx="24" cy="20" r="10" fill="#ff7a59"/><text x="42" y="24" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">@creator</text><rect x="0" y="38" width="200" height="110" fill="#7c5cff"/><text x="100" y="105" font-size="38" text-anchor="middle">\u2764\ufe0f</text><text x="12" y="168" font-size="12">\u2764\ufe0f \ud83d\udcac \ud83d\udce4</text><text x="12" y="184" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5">12,453 likes</text></g></svg>`)}`
   },
   {
     id: 'checklist',
@@ -23647,7 +23647,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Checklist items appearing and checking off. Perfect for "how to" and productivity content.',
     tags: ['Animations', 'Animated Checklist', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">✓</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`
   },
 
   {
@@ -23662,7 +23662,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(4, 7, 17, 0.98), rgba(14, 23, 42, 0.95))',
     description: 'James Jani & Magnates Media style cinematic 3D milestone timeline tracing empire founding, peak valuation, and crash trajectory.',
     tags: ['Business Storytelling', 'Empire Rise & Fall Timeline', '3D Spatial', 'James Jani'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-et-jani" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#040711"/><stop offset="100%" stop-color="#090e1a"/></linearGradient><linearGradient id="curve-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient><linearGradient id="area-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/></linearGradient><filter id="glow-p" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#38bdf8" flood-opacity="0.75"/></filter></defs><rect width="400" height="225" fill="url(#bg-et-jani)"/><g opacity="0.15"><line x1="30" y1="50" x2="370" y2="50" stroke="#fff" stroke-width="0.5"/><line x1="30" y1="110" x2="370" y2="110" stroke="#fff" stroke-width="0.5"/><line x1="30" y1="170" x2="370" y2="170" stroke="#fff" stroke-width="0.5"/></g><text x="28" y="28" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10" letter-spacing="1.2">THE RISE &amp; FALL // 1985 — 2001</text><text x="28" y="40" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="7.5" opacity="0.9">VALUATION &amp; LIQUIDITY CRASH</text><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175 L 365 185 L 40 185 Z" fill="url(#area-grad)"/><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175" fill="none" stroke="#38bdf8" stroke-width="2.8" opacity="0.25" stroke-linecap="round"/><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175" fill="none" stroke="url(#curve-grad)" stroke-width="1.2" stroke-linecap="round" filter="url(#glow-p)"/><circle cx="40" cy="170" r="3.5" fill="#10b981" stroke="#ffffff" stroke-width="1"/><circle cx="210" cy="60" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" filter="url(#glow-p)"/><circle cx="365" cy="175" r="3.5" fill="#ef4444" stroke="#ffffff" stroke-width="1"/><text x="40" y="196" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" text-anchor="middle">FOUNDED</text><rect x="175" y="32" width="70" height="15" rx="3" fill="rgba(8,12,20,0.85)" stroke="#f59e0b" stroke-width="0.8"/><text x="210" y="42.5" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="800" text-anchor="middle">$1.5B PEAK</text><text x="365" y="196" fill="#ef4444" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" text-anchor="middle">BANKRUPTCY</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-et-jani" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#040711"/><stop offset="100%" stop-color="#090e1a"/></linearGradient><linearGradient id="curve-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#10b981"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient><linearGradient id="area-grad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#38bdf8" stop-opacity="0.22"/><stop offset="100%" stop-color="#38bdf8" stop-opacity="0.0"/></linearGradient><filter id="glow-p" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="#38bdf8" flood-opacity="0.75"/></filter></defs><rect width="400" height="225" fill="url(#bg-et-jani)"/><g opacity="0.15"><line x1="30" y1="50" x2="370" y2="50" stroke="#fff" stroke-width="0.5"/><line x1="30" y1="110" x2="370" y2="110" stroke="#fff" stroke-width="0.5"/><line x1="30" y1="170" x2="370" y2="170" stroke="#fff" stroke-width="0.5"/></g><text x="28" y="28" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10" letter-spacing="1.2">THE RISE &amp; FALL // 1985 \u2014 2001</text><text x="28" y="40" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-weight="600" font-size="7.5" opacity="0.9">VALUATION &amp; LIQUIDITY CRASH</text><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175 L 365 185 L 40 185 Z" fill="url(#area-grad)"/><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175" fill="none" stroke="#38bdf8" stroke-width="2.8" opacity="0.25" stroke-linecap="round"/><path d="M 40 170 C 110 168 150 65 210 60 C 270 56 310 155 365 175" fill="none" stroke="url(#curve-grad)" stroke-width="1.2" stroke-linecap="round" filter="url(#glow-p)"/><circle cx="40" cy="170" r="3.5" fill="#10b981" stroke="#ffffff" stroke-width="1"/><circle cx="210" cy="60" r="4.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.2" filter="url(#glow-p)"/><circle cx="365" cy="175" r="3.5" fill="#ef4444" stroke="#ffffff" stroke-width="1"/><text x="40" y="196" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" text-anchor="middle">FOUNDED</text><rect x="175" y="32" width="70" height="15" rx="3" fill="rgba(8,12,20,0.85)" stroke="#f59e0b" stroke-width="0.8"/><text x="210" y="42.5" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="800" text-anchor="middle">$1.5B PEAK</text><text x="365" y="196" fill="#ef4444" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700" text-anchor="middle">BANKRUPTCY</text></svg>`)}`
   },
   {
     id: 'founder-faceoff',
@@ -23701,7 +23701,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Term sheet clauses lighting up line by line, ending in an animated ink signature and deal stamp. For acquisitions, funding rounds, and hostile takeovers.',
     tags: ['Business Storytelling', 'Deal Term Sheet Signing', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(70, 15)"><rect width="260" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.12)"/><text x="130" y="26" fill="#3a2418" font-family="monospace" font-weight="900" font-size="11" letter-spacing="1" text-anchor="middle">TERM SHEET · SERIES A</text><line x1="20" y1="34" x2="240" y2="34" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g font-family="monospace" font-size="9" fill="#3a2418"><rect x="18" y="44" width="150" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="52">Valuation: $80M pre-money</text><rect x="18" y="64" width="140" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="72">Investment: $12M for 15%</text><text x="20" y="92">Board seats: 2 investor, 3 founder</text><text x="20" y="112">Liquidation pref: 1x non-participating</text></g><path d="M 40 160 C 70 140 90 175 120 152 S 170 165 195 148" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="172" x2="200" y2="172" stroke="#3a2418" stroke-width="1"/><text x="40" y="184" fill="rgba(0,0,0,0.5)" font-family="monospace" font-size="7">CEO SIGNATURE</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><g transform="translate(70, 15)"><rect width="260" height="195" rx="3" fill="#fff" stroke="rgba(0,0,0,0.12)"/><text x="130" y="26" fill="#3a2418" font-family="monospace" font-weight="900" font-size="11" letter-spacing="1" text-anchor="middle">TERM SHEET \u00b7 SERIES A</text><line x1="20" y1="34" x2="240" y2="34" stroke="#3a2418" stroke-dasharray="3 2" stroke-width="0.8"/><g font-family="monospace" font-size="9" fill="#3a2418"><rect x="18" y="44" width="150" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="52">Valuation: $80M pre-money</text><rect x="18" y="64" width="140" height="10" rx="2" fill="#facc15" opacity="0.75"/><text x="20" y="72">Investment: $12M for 15%</text><text x="20" y="92">Board seats: 2 investor, 3 founder</text><text x="20" y="112">Liquidation pref: 1x non-participating</text></g><path d="M 40 160 C 70 140 90 175 120 152 S 170 165 195 148" fill="none" stroke="#1e3a8a" stroke-width="2.5" stroke-linecap="round"/><line x1="40" y1="172" x2="200" y2="172" stroke="#3a2418" stroke-width="1"/><text x="40" y="184" fill="rgba(0,0,0,0.5)" font-family="monospace" font-size="7">CEO SIGNATURE</text></g></svg>`)}`
   },
   {
     id: 'scam-redaction',
@@ -23714,7 +23714,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Classified memo with black redaction bars slamming over names and amounts, CONFIDENTIAL stamp, and one highlighted sentence. Made for fraud, SEC, and scandal stories.',
     tags: ['Business Storytelling', 'Fraud Dossier Redaction', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#e9e2d0"/><g transform="translate(70, 12)"><rect width="260" height="200" rx="2" fill="#fbf8ef" stroke="rgba(0,0,0,0.15)"/><text x="130" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">INTERNAL MEMO · EYES ONLY</text><g font-family="monospace" font-size="9" fill="#3a2418"><text x="16" y="52">To: Board of Directors</text><text x="16" y="70">From:</text><rect x="52" y="61" width="120" height="11" fill="#111"/><text x="16" y="90">Re: Q3 revenue booked via</text><text x="16" y="104">side letters totaling</text><rect x="16" y="112" width="90" height="12" rx="2" fill="#facc15" opacity="0.8"/><text x="20" y="121" font-weight="700">$8.4 BILLION</text><text x="16" y="140">DO NOT DISCLOSE.</text></g><g transform="translate(150, 150) rotate(-14)"><rect x="-52" y="-14" width="104" height="26" fill="none" stroke="#c1121f" stroke-width="2.5" rx="3"/><text y="5" fill="#c1121f" font-family="monospace" font-weight="900" font-size="11" text-anchor="middle" letter-spacing="1">CONFIDENTIAL</text></g></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#e9e2d0"/><g transform="translate(70, 12)"><rect width="260" height="200" rx="2" fill="#fbf8ef" stroke="rgba(0,0,0,0.15)"/><text x="130" y="24" fill="#3a2418" font-family="monospace" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">INTERNAL MEMO \u00b7 EYES ONLY</text><g font-family="monospace" font-size="9" fill="#3a2418"><text x="16" y="52">To: Board of Directors</text><text x="16" y="70">From:</text><rect x="52" y="61" width="120" height="11" fill="#111"/><text x="16" y="90">Re: Q3 revenue booked via</text><text x="16" y="104">side letters totaling</text><rect x="16" y="112" width="90" height="12" rx="2" fill="#facc15" opacity="0.8"/><text x="20" y="121" font-weight="700">$8.4 BILLION</text><text x="16" y="140">DO NOT DISCLOSE.</text></g><g transform="translate(150, 150) rotate(-14)"><rect x="-52" y="-14" width="104" height="26" fill="none" stroke="#c1121f" stroke-width="2.5" rx="3"/><text y="5" fill="#c1121f" font-family="monospace" font-weight="900" font-size="11" text-anchor="middle" letter-spacing="1">CONFIDENTIAL</text></g></g></svg>`)}`
   },
   {
     id: 'market-cap-race',
@@ -23727,7 +23727,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Company bar chart racing up the screen as valuations leapfrog each other year by year. The "watch an empire overtake another" visual.',
     tags: ['Business Storytelling', 'Market Cap Race Bars', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a15"/><text x="24" y="30" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="1.5">MARKET CAP · 2026</text><text x="376" y="30" fill="#ffd23f" font-family="monospace" font-weight="900" font-size="13" text-anchor="end">Q4</text><g transform="translate(24, 48)" font-family="'Inter', sans-serif" font-weight="700" font-size="10"><g transform="translate(0,0)"><text y="13" fill="#fff">NVDA</text><rect x="60" y="2" width="290" height="15" rx="3" fill="#76b900"/><text x="344" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$3.1T</text></g><g transform="translate(0,26)"><text y="13" fill="#fff">MSFT</text><rect x="60" y="2" width="262" height="15" rx="3" fill="#00a4ef"/><text x="316" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.8T</text></g><g transform="translate(0,52)"><text y="13" fill="#fff">AAPL</text><rect x="60" y="2" width="248" height="15" rx="3" fill="#f5f5f7"/><text x="302" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.6T</text></g><g transform="translate(0,78)"><text y="13" fill="#fff">AMZN</text><rect x="60" y="2" width="180" height="15" rx="3" fill="#ff9900"/><text x="234" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.9T</text></g><g transform="translate(0,104)"><text y="13" fill="#fff">GOOGL</text><rect x="60" y="2" width="160" height="15" rx="3" fill="#ea4335"/><text x="214" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.7T</text></g><g transform="translate(0,130)"><text y="13" fill="#9a9aa5">TSLA</text><rect x="60" y="2" width="84" height="15" rx="3" fill="#cc0000"/><text x="138" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$0.8T</text></g></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0a0a15"/><text x="24" y="30" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="1.5">MARKET CAP \u00b7 2026</text><text x="376" y="30" fill="#ffd23f" font-family="monospace" font-weight="900" font-size="13" text-anchor="end">Q4</text><g transform="translate(24, 48)" font-family="'Inter', sans-serif" font-weight="700" font-size="10"><g transform="translate(0,0)"><text y="13" fill="#fff">NVDA</text><rect x="60" y="2" width="290" height="15" rx="3" fill="#76b900"/><text x="344" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$3.1T</text></g><g transform="translate(0,26)"><text y="13" fill="#fff">MSFT</text><rect x="60" y="2" width="262" height="15" rx="3" fill="#00a4ef"/><text x="316" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.8T</text></g><g transform="translate(0,52)"><text y="13" fill="#fff">AAPL</text><rect x="60" y="2" width="248" height="15" rx="3" fill="#f5f5f7"/><text x="302" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$2.6T</text></g><g transform="translate(0,78)"><text y="13" fill="#fff">AMZN</text><rect x="60" y="2" width="180" height="15" rx="3" fill="#ff9900"/><text x="234" y="14" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.9T</text></g><g transform="translate(0,104)"><text y="13" fill="#fff">GOOGL</text><rect x="60" y="2" width="160" height="15" rx="3" fill="#ea4335"/><text x="214" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$1.7T</text></g><g transform="translate(0,130)"><text y="13" fill="#9a9aa5">TSLA</text><rect x="60" y="2" width="84" height="15" rx="3" fill="#cc0000"/><text x="138" y="14" fill="#fff" font-family="monospace" font-weight="900" font-size="9" text-anchor="end">$0.8T</text></g></g></svg>`)}`
   },
   {
     id: 'hostile-takeover',
@@ -23740,7 +23740,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Shareholder pie devouring slices stake by stake until one logo swallows the whole boardroom. For acquisitions and proxy fights.',
     tags: ['Business Storytelling', 'Hostile Takeover Progress', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0d0d16"/><text x="200" y="28" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">OWNERSHIP STAKE · 51% CONTROL</text><g transform="translate(130, 40)"><circle cx="70" cy="70" r="48" fill="none" stroke="#ff4757" stroke-width="26" stroke-dasharray="154 301.6"/><circle cx="70" cy="70" r="48" fill="none" stroke="#7c5cff" stroke-width="26" stroke-dasharray="75 301.6" stroke-dashoffset="-154"/><circle cx="70" cy="70" r="48" fill="none" stroke="#8a8a95" stroke-width="26" stroke-dasharray="72.6 301.6" stroke-dashoffset="-229"/><text x="70" y="66" fill="#fff" font-family="monospace" font-weight="900" font-size="15" text-anchor="middle">51%</text><text x="70" y="82" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8" text-anchor="middle">ACQUIRER</text></g><g transform="translate(28, 190)" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.85)"><circle cx="8" cy="-4" r="4" fill="#ff4757"/><text x="16" y="0">Predator Fund 51%</text><circle cx="130" cy="-4" r="4" fill="#7c5cff"/><text x="138" y="0">Founders 25%</text><circle cx="238" cy="-4" r="4" fill="#8a8a95"/><text x="246" y="0">Public Float 24%</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0d0d16"/><text x="200" y="28" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">OWNERSHIP STAKE \u00b7 51% CONTROL</text><g transform="translate(130, 40)"><circle cx="70" cy="70" r="48" fill="none" stroke="#ff4757" stroke-width="26" stroke-dasharray="154 301.6"/><circle cx="70" cy="70" r="48" fill="none" stroke="#7c5cff" stroke-width="26" stroke-dasharray="75 301.6" stroke-dashoffset="-154"/><circle cx="70" cy="70" r="48" fill="none" stroke="#8a8a95" stroke-width="26" stroke-dasharray="72.6 301.6" stroke-dashoffset="-229"/><text x="70" y="66" fill="#fff" font-family="monospace" font-weight="900" font-size="15" text-anchor="middle">51%</text><text x="70" y="82" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8" text-anchor="middle">ACQUIRER</text></g><g transform="translate(28, 190)" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.85)"><circle cx="8" cy="-4" r="4" fill="#ff4757"/><text x="16" y="0">Predator Fund 51%</text><circle cx="130" cy="-4" r="4" fill="#7c5cff"/><text x="138" y="0">Founders 25%</text><circle cx="238" cy="-4" r="4" fill="#8a8a95"/><text x="246" y="0">Public Float 24%</text></g></svg>`)}`
   },
   {
     id: 'pyramid-scheme',
@@ -23753,7 +23753,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Tiered pyramid filling with investors layer by layer, then cracking and collapsing when the money runs out. Built for Ponzi takedowns.',
     tags: ['Business Storytelling', 'Pyramid Scheme Collapse', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pyr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0f0f"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pyr)"/><text x="200" y="26" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" letter-spacing="2" text-anchor="middle">STRUCTURE UNSUSTAINABLE</text><polygon points="200,42 236,84 164,84" fill="#ffd23f"/><text x="200" y="72" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">FOUNDER</text><polygon points="150,96 250,96 268,128 132,128" fill="#ff8c42"/><text x="200" y="118" fill="#000" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">EARLY INVESTORS · +400%</text><polygon points="120,140 280,140 302,172 98,172" fill="#c1440e"/><text x="200" y="162" fill="#fff" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LATE ADOPTERS · BREAK-EVEN</text><polygon points="88,184 312,184 336,214 64,214" fill="#5a1e1e"/><text x="200" y="204" fill="#ff9d9d" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LAST 90% · TOTAL LOSS</text><path d="M 196 42 L 204 96 L 192 140 L 206 214" stroke="#000" stroke-width="3" fill="none" opacity="0.55"/></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pyr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0f0f"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pyr)"/><text x="200" y="26" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" letter-spacing="2" text-anchor="middle">STRUCTURE UNSUSTAINABLE</text><polygon points="200,42 236,84 164,84" fill="#ffd23f"/><text x="200" y="72" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">FOUNDER</text><polygon points="150,96 250,96 268,128 132,128" fill="#ff8c42"/><text x="200" y="118" fill="#000" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">EARLY INVESTORS \u00b7 +400%</text><polygon points="120,140 280,140 302,172 98,172" fill="#c1440e"/><text x="200" y="162" fill="#fff" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LATE ADOPTERS \u00b7 BREAK-EVEN</text><polygon points="88,184 312,184 336,214 64,214" fill="#5a1e1e"/><text x="200" y="204" fill="#ff9d9d" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LAST 90% \u00b7 TOTAL LOSS</text><path d="M 196 42 L 204 96 L 192 140 L 206 214" stroke="#000" stroke-width="3" fill="none" opacity="0.55"/></svg>`)}`
   },
   {
     id: 'investigate-globe',
@@ -23764,9 +23764,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Slowly rotating wireframe globe that zooms into a hotspot, drops a red pin and stamps a location label — the signature Johnny Harris "but here\'s where it gets crazy" map move.',
+    description: 'Slowly rotating wireframe globe that zooms into a hotspot, drops a red pin and stamps a location label \u2014 the signature Johnny Harris "but here\'s where it gets crazy" map move.',
     tags: ['Business Storytelling', 'Investigative Globe (Johnny Harris Zoom)', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#04070f"/><circle cx="170" cy="115" r="80" fill="#0a1226" stroke="#1e3a6e" stroke-width="1.5"/><g stroke="#1e3a6e" stroke-width="1" fill="none" opacity="0.8"><ellipse cx="170" cy="115" rx="80" ry="26"/><ellipse cx="170" cy="115" rx="80" ry="55"/><ellipse cx="170" cy="115" rx="28" ry="80"/><line x1="90" y1="115" x2="250" y2="115"/></g><path d="M 130 80 q 20 -12 40 -4 t 30 10 q -14 10 -34 6 t -36 -12z" fill="#16325c" opacity="0.9"/><path d="M 150 140 q 26 -8 44 4 t -10 20 q -26 4 -44 -8 z" fill="#16325c" opacity="0.9"/><circle cx="205" cy="98" r="4" fill="#ff4757"/><circle cx="205" cy="98" r="10" fill="none" stroke="#ff4757" stroke-width="1.5" opacity="0.6"/><text x="218" y="88" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="11">DUBAI</text><text x="218" y="101" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8">THE MONEY LANDS HERE →</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#04070f"/><circle cx="170" cy="115" r="80" fill="#0a1226" stroke="#1e3a6e" stroke-width="1.5"/><g stroke="#1e3a6e" stroke-width="1" fill="none" opacity="0.8"><ellipse cx="170" cy="115" rx="80" ry="26"/><ellipse cx="170" cy="115" rx="80" ry="55"/><ellipse cx="170" cy="115" rx="28" ry="80"/><line x1="90" y1="115" x2="250" y2="115"/></g><path d="M 130 80 q 20 -12 40 -4 t 30 10 q -14 10 -34 6 t -36 -12z" fill="#16325c" opacity="0.9"/><path d="M 150 140 q 26 -8 44 4 t -10 20 q -26 4 -44 -8 z" fill="#16325c" opacity="0.9"/><circle cx="205" cy="98" r="4" fill="#ff4757"/><circle cx="205" cy="98" r="10" fill="none" stroke="#ff4757" stroke-width="1.5" opacity="0.6"/><text x="218" y="88" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="11">DUBAI</text><text x="218" y="101" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8">THE MONEY LANDS HERE \u2192</text></svg>`)}`
   },
   {
     id: 'world-map-flyover',
@@ -23777,9 +23777,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Flat dark world map where city dots light up one by one and great-circle arcs draw themselves between them — supply chains, trade routes, empire expansion.',
+    description: 'Flat dark world map where city dots light up one by one and great-circle arcs draw themselves between them \u2014 supply chains, trade routes, empire expansion.',
     tags: ['Business Storytelling', 'World Map Connection Flyover', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 95 75 Q 150 20 215 55" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 215 55 Q 270 30 315 72" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 315 72 Q 250 120 155 152" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><circle cx="95" cy="75" r="5" fill="#ffd23f"/><circle cx="215" cy="55" r="5" fill="#ffd23f"/><circle cx="315" cy="72" r="5" fill="#ffd23f"/><circle cx="155" cy="152" r="6" fill="#00f0ff"/><text x="155" y="172" fill="#00f0ff" font-family="monospace" font-size="8" text-anchor="middle">SINGAPORE · FINAL ASSEMBLY</text><text x="200" y="20" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="10" letter-spacing="2" text-anchor="middle">GLOBAL SUPPLY CHAIN · 2026</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 95 75 Q 150 20 215 55" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 215 55 Q 270 30 315 72" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><path d="M 315 72 Q 250 120 155 152" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><circle cx="95" cy="75" r="5" fill="#ffd23f"/><circle cx="215" cy="55" r="5" fill="#ffd23f"/><circle cx="315" cy="72" r="5" fill="#ffd23f"/><circle cx="155" cy="152" r="6" fill="#00f0ff"/><text x="155" y="172" fill="#00f0ff" font-family="monospace" font-size="8" text-anchor="middle">SINGAPORE \u00b7 FINAL ASSEMBLY</text><text x="200" y="20" fill="rgba(255,255,255,0.7)" font-family="'Space Grotesk', sans-serif" font-weight="700" font-size="10" letter-spacing="2" text-anchor="middle">GLOBAL SUPPLY CHAIN \u00b7 2026</text></svg>`)}`
   },
   {
     id: 'money-trail-map',
@@ -23792,7 +23792,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Dark world map with glowing dotted arcs hopping shell companies between tax havens until cash lands in one account. The follow-the-money sequence.',
     tags: ['Business Storytelling', 'Offshore Money Trail Map', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#060a14"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 90 80 Q 160 20 230 62" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 230 62 Q 290 40 320 92" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 320 92 Q 260 130 160 158" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><circle cx="90" cy="80" r="6" fill="#00f0ff"/><circle cx="230" cy="62" r="6" fill="#00f0ff"/><circle cx="320" cy="92" r="6" fill="#00f0ff"/><circle cx="160" cy="158" r="8" fill="#ffd23f"/><text x="90" y="66" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">DELIVERY CO.</text><text x="230" y="48" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">CAYMAN SHELL</text><text x="320" y="78" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">TRUST FUND</text><text x="160" y="180" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">PERSONAL ACCOUNT · $47M</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#060a14"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><path d="M 90 80 Q 160 20 230 62" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 230 62 Q 290 40 320 92" fill="none" stroke="#00f0ff" stroke-width="2" stroke-dasharray="5 4"/><path d="M 320 92 Q 260 130 160 158" fill="none" stroke="#ffd23f" stroke-width="2" stroke-dasharray="5 4"/><circle cx="90" cy="80" r="6" fill="#00f0ff"/><circle cx="230" cy="62" r="6" fill="#00f0ff"/><circle cx="320" cy="92" r="6" fill="#00f0ff"/><circle cx="160" cy="158" r="8" fill="#ffd23f"/><text x="90" y="66" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">DELIVERY CO.</text><text x="230" y="48" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">CAYMAN SHELL</text><text x="320" y="78" fill="rgba(255,255,255,0.8)" font-family="monospace" font-size="8" text-anchor="middle">TRUST FUND</text><text x="160" y="180" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">PERSONAL ACCOUNT \u00b7 $47M</text></svg>`)}`
   },
   {
     id: 'country-morph-highlight',
@@ -23803,9 +23803,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Flat dot-map where one country floods red, detaches and lifts off the map with a drop shadow while everything else dims — the "this one place is the whole story" reveal.',
+    description: 'Flat dot-map where one country floods red, detaches and lifts off the map with a drop shadow while everything else dims \u2014 the "this one place is the whole story" reveal.',
     tags: ['Business Storytelling', 'Country Morph Highlight', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="245" cy="90" r="16"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757"/><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757" transform="translate(6,-14)" opacity="0.95"/><text x="215" y="150" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="13" text-anchor="middle">PANAMA</text><text x="215" y="166" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8" text-anchor="middle">0.1% OF LAND · 5% OF TRADE</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="245" cy="90" r="16"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757"/><polygon points="182,52 226,44 248,66 240,98 208,110 184,92" fill="#ff4757" transform="translate(6,-14)" opacity="0.95"/><text x="215" y="150" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="13" text-anchor="middle">PANAMA</text><text x="215" y="166" fill="rgba(255,255,255,0.55)" font-family="monospace" font-size="8" text-anchor="middle">0.1% OF LAND \u00b7 5% OF TRADE</text></svg>`)}`
   },
   {
     id: 'zoomout-context-card',
@@ -23842,9 +23842,9 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'A direct trade route gets drawn in, slammed with a red BLOCKED ✕ stamp, then a longer smuggling reroute draws itself around the blockade. Sanctions-evasion storytelling.',
+    description: 'A direct trade route gets drawn in, slammed with a red BLOCKED \u2715 stamp, then a longer smuggling reroute draws itself around the blockade. Sanctions-evasion storytelling.',
     tags: ['Business Storytelling', 'Sanctions Embargo Arrows', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="110" r="26"/><circle cx="320" cy="110" r="26"/><circle cx="200" cy="60" r="18"/></g><path d="M 106 110 L 292 110" stroke="#00f0ff" stroke-width="3" stroke-dasharray="6 5" fill="none"/><g stroke="#ff4757" stroke-width="7" stroke-linecap="round"><line x1="186" y1="92" x2="214" y2="128"/><line x1="214" y1="92" x2="186" y2="128"/></g><text x="200" y="150" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">BLOCKED</text><path d="M 96 92 Q 150 30 210 44 T 306 90" stroke="#ffd23f" stroke-width="3" fill="none" marker-end="url(#arr-sx)"/><defs><marker id="arr-sx" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ffd23f"/></marker></defs><text x="200" y="24" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">REROUTED VIA DUBAI · +$14M/YR</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="110" r="26"/><circle cx="320" cy="110" r="26"/><circle cx="200" cy="60" r="18"/></g><path d="M 106 110 L 292 110" stroke="#00f0ff" stroke-width="3" stroke-dasharray="6 5" fill="none"/><g stroke="#ff4757" stroke-width="7" stroke-linecap="round"><line x1="186" y1="92" x2="214" y2="128"/><line x1="214" y1="92" x2="186" y2="128"/></g><text x="200" y="150" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">BLOCKED</text><path d="M 96 92 Q 150 30 210 44 T 306 90" stroke="#ffd23f" stroke-width="3" fill="none" marker-end="url(#arr-sx)"/><defs><marker id="arr-sx" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#ffd23f"/></marker></defs><text x="200" y="24" fill="#ffd23f" font-family="monospace" font-size="8" font-weight="700" text-anchor="middle">REROUTED VIA DUBAI \u00b7 +$14M/YR</text></svg>`)}`
   },
   {
     id: 'timeline-scrubber-map',
@@ -23855,7 +23855,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: '1-Click',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Empire territory spreads across a map as a big year counter scrubs forward (1990 → 2026) with an animated timeline handle — expansion, collapse or acquisition over time.',
+    description: 'Empire territory spreads across a map as a big year counter scrubs forward (1990 \u2192 2026) with an animated timeline handle \u2014 expansion, collapse or acquisition over time.',
     tags: ['Business Storytelling', 'Timeline Scrubber Map', 'Motion Template'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#05080f"/><g fill="#12203a"><circle cx="80" cy="70" r="26"/><circle cx="120" cy="95" r="20"/><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="310" cy="80" r="22"/><circle cx="330" cy="120" r="14"/><circle cx="150" cy="160" r="18"/><circle cx="260" cy="165" r="20"/></g><g fill="#7c5cff" opacity="0.85"><circle cx="210" cy="60" r="24"/><circle cx="245" cy="90" r="16"/><circle cx="240" cy="60" r="18"/><circle cx="222" cy="78" r="14"/></g><text x="26" y="42" fill="#fff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="30">2018</text><text x="26" y="58" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="8">PEAK EXPANSION</text><line x1="30" y1="200" x2="370" y2="200" stroke="rgba(255,255,255,0.2)" stroke-width="3"/><line x1="30" y1="200" x2="240" y2="200" stroke="#7c5cff" stroke-width="3"/><circle cx="240" cy="200" r="7" fill="#7c5cff" stroke="#fff" stroke-width="2"/><text x="30" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">1990</text><text x="345" y="216" fill="rgba(255,255,255,0.4)" font-family="monospace" font-size="8">2026</text></svg>`)}`
   },
@@ -24125,7 +24125,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Instant',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45° motion blur sweeps, memory tint color grades, and archival headlines.',
+    description: 'Sudden, stylized temporal jumps with high-contrast exposure flashes, 45\u00b0 motion blur sweeps, memory tint color grades, and archival headlines.',
     tags: ['Flashback', 'Flashforward', 'Time Jump', 'White Flash', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
@@ -24138,7 +24138,7 @@ const EFFECT_TEMPLATES_DATA = [
     difficulty: 'Pro FX',
     timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Jani’s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
+    description: 'Jani\u2019s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
     defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
@@ -24495,7 +24495,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, #121324 0%, #090a12 100%)',
     description: 'Bear vs Bull icon comparison with dynamic percentage change cards. The classic market sentiment visual.',
     tags: ['Bear Market', 'Bull Market', 'Stocks', 'Finance', 'Sentiment'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-bb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#090a12"/></linearGradient><linearGradient id="bear-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient><linearGradient id="bull-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-bb)"/><circle cx="110" cy="95" r="38" fill="url(#bear-g)"/><text x="110" y="105" font-size="34" text-anchor="middle">🐻</text><text x="110" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BEAR</text><text x="110" y="176" fill="#ef4444" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">-20%</text><text x="200" y="104" fill="rgba(255,255,255,0.3)" font-family="'Inter', sans-serif" font-weight="900" font-size="22" letter-spacing="2" text-anchor="middle">VS</text><circle cx="290" cy="95" r="38" fill="url(#bull-g)"/><text x="290" y="105" font-size="34" text-anchor="middle">🐂</text><text x="290" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BULL</text><text x="290" y="176" fill="#10b981" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">+150%</text></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-bb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#090a12"/></linearGradient><linearGradient id="bear-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ef4444"/><stop offset="100%" stop-color="#ff7a59"/></linearGradient><linearGradient id="bull-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-bb)"/><circle cx="110" cy="95" r="38" fill="url(#bear-g)"/><text x="110" y="105" font-size="34" text-anchor="middle">\ud83d\udc3b</text><text x="110" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BEAR</text><text x="110" y="176" fill="#ef4444" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">-20%</text><text x="200" y="104" fill="rgba(255,255,255,0.3)" font-family="'Inter', sans-serif" font-weight="900" font-size="22" letter-spacing="2" text-anchor="middle">VS</text><circle cx="290" cy="95" r="38" fill="url(#bull-g)"/><text x="290" y="105" font-size="34" text-anchor="middle">\ud83d\udc02</text><text x="290" y="152" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="800" font-size="14" letter-spacing="1" text-anchor="middle">BULL</text><text x="290" y="176" fill="#10b981" font-family="monospace" font-weight="900" font-size="18" text-anchor="middle">+150%</text></svg>`)}`
   },
   {
     id: 'certificate',
@@ -24508,7 +24508,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, #1f130a 0%, #0d0703 100%)',
     description: 'Vintage stock certificate with gold seal. Perfect for value investing and company history content.',
     tags: ['Stock Certificate', 'Apple', 'Shares', 'Vintage', 'Finance'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cert" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1f130a"/><stop offset="100%" stop-color="#0d0703"/></linearGradient><linearGradient id="cert-paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8f2e4"/><stop offset="100%" stop-color="#eddcc2"/></linearGradient><radialGradient id="gold-seal" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#b45309"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-cert)"/><g transform="translate(60, 20)"><rect width="280" height="185" rx="5" fill="url(#cert-paper)" stroke="#8b5a3c" stroke-width="2.5"/><rect x="6" y="6" width="268" height="173" rx="3" fill="none" stroke="#8b5a3c" stroke-width="1" stroke-dasharray="4,2"/><text x="140" y="38" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-weight="700" font-size="17" text-anchor="middle">Apple Inc.</text><text x="140" y="52" fill="#8b5a3c" font-family="monospace" font-size="7.5" font-weight="700" letter-spacing="2" text-anchor="middle">SHARES OF COMMON STOCK</text><line x1="40" y1="60" x2="240" y2="60" stroke="#8b5a3c" stroke-width="0.8"/><text x="140" y="80" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="11" text-anchor="middle">This certifies that holder owns</text><text x="140" y="112" fill="#7c3aed" font-family="monospace" font-weight="900" font-size="24" text-anchor="middle">100 SHARES</text><text x="140" y="138" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="10.5" text-anchor="middle">Dated January 1, 2024</text><circle cx="242" cy="150" r="18" fill="url(#gold-seal)"/><text x="242" y="156" font-size="14" text-anchor="middle">🏆</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cert" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1f130a"/><stop offset="100%" stop-color="#0d0703"/></linearGradient><linearGradient id="cert-paper" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8f2e4"/><stop offset="100%" stop-color="#eddcc2"/></linearGradient><radialGradient id="gold-seal" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#b45309"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-cert)"/><g transform="translate(60, 20)"><rect width="280" height="185" rx="5" fill="url(#cert-paper)" stroke="#8b5a3c" stroke-width="2.5"/><rect x="6" y="6" width="268" height="173" rx="3" fill="none" stroke="#8b5a3c" stroke-width="1" stroke-dasharray="4,2"/><text x="140" y="38" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-weight="700" font-size="17" text-anchor="middle">Apple Inc.</text><text x="140" y="52" fill="#8b5a3c" font-family="monospace" font-size="7.5" font-weight="700" letter-spacing="2" text-anchor="middle">SHARES OF COMMON STOCK</text><line x1="40" y1="60" x2="240" y2="60" stroke="#8b5a3c" stroke-width="0.8"/><text x="140" y="80" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="11" text-anchor="middle">This certifies that holder owns</text><text x="140" y="112" fill="#7c3aed" font-family="monospace" font-weight="900" font-size="24" text-anchor="middle">100 SHARES</text><text x="140" y="138" fill="#3a2418" font-family="'Playfair Display', Georgia, serif" font-size="10.5" text-anchor="middle">Dated January 1, 2024</text><circle cx="242" cy="150" r="18" fill="url(#gold-seal)"/><text x="242" y="156" font-size="14" text-anchor="middle">\ud83c\udfc6</text></g></svg>`)}`
   },
   {
     id: 'cryptowallet',
@@ -24521,7 +24521,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, #10121e 0%, #07080f 100%)',
     description: 'Multi-asset crypto wallet with BTC, ETH, and SOL holding breakdowns and realtime percentage indicators.',
     tags: ['Crypto', 'Bitcoin', 'Ethereum', 'Solana', 'Wallet', 'Finance'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10121e"/><stop offset="100%" stop-color="#07080f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cw)"/><text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">CRYPTO WALLET</text><text x="376" y="36" fill="#ffffff" font-family="monospace" font-weight="900" font-size="20" text-anchor="end">$47,280</text><g transform="translate(24, 52)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#f7931a"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">₿</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">BTC</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Bitcoin</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">0.5 BTC</text><text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+3.2%</text><g transform="translate(0, 54)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#627eea"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">Ξ</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">ETH</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Ethereum</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">5 ETH</text><text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+2.1%</text></g><g transform="translate(0, 108)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#9945ff"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">◎</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">SOL</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Solana</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">100 SOL</text><text x="336" y="34" fill="#ef4444" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">-1.4%</text></g></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cw" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#10121e"/><stop offset="100%" stop-color="#07080f"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cw)"/><text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">CRYPTO WALLET</text><text x="376" y="36" fill="#ffffff" font-family="monospace" font-weight="900" font-size="20" text-anchor="end">$47,280</text><g transform="translate(24, 52)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#f7931a"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">\u20bf</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">BTC</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Bitcoin</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">0.5 BTC</text><text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+3.2%</text><g transform="translate(0, 54)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#627eea"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">\u039e</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">ETH</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Ethereum</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">5 ETH</text><text x="336" y="34" fill="#10b981" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">+2.1%</text></g><g transform="translate(0, 108)"><rect width="352" height="46" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" stroke-width="1"/><circle cx="24" cy="23" r="14" fill="#9945ff"/><text x="24" y="28" fill="#fff" font-family="'Inter', sans-serif" font-weight="900" font-size="13" text-anchor="middle">\u25ce</text><text x="48" y="20" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">SOL</text><text x="48" y="34" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="9.5">Solana</text><text x="336" y="20" fill="#fff" font-family="monospace" font-weight="700" font-size="12" text-anchor="end">100 SOL</text><text x="336" y="34" fill="#ef4444" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">-1.4%</text></g></g></svg>`)}`
   },
   {
     id: 'realestate',
@@ -24534,7 +24534,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, #111c13 0%, #070d08 100%)',
     description: 'Property card with ROI, cap rate, monthly cash flow, and 5-year appreciation metrics.',
     tags: ['Real Estate', 'ROI', 'Cap Rate', 'Cash Flow', 'Property', 'Finance'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-re" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#111c13"/><stop offset="100%" stop-color="#070d08"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-re)"/><g transform="translate(24, 20)"><rect width="64" height="54" rx="8" fill="#8b5a3c"/><text x="32" y="36" font-size="28" text-anchor="middle">🏠</text><text x="78" y="26" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">123 Main St, Austin TX</text><text x="78" y="44" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="10">Single Family Home · $450,000</text></g><g transform="translate(24, 90)"><rect x="0" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="84" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">ROI</text><text x="84" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">12.5%</text><rect x="184" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="268" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">CAP RATE</text><text x="268" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">6.8%</text><rect x="0" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="84" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">MONTHLY CASH FLOW</text><text x="84" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">$1,240/mo</text><rect x="184" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="268" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">5YR APPRECIATION</text><text x="268" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">+35%</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-re" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#111c13"/><stop offset="100%" stop-color="#070d08"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-re)"/><g transform="translate(24, 20)"><rect width="64" height="54" rx="8" fill="#8b5a3c"/><text x="32" y="36" font-size="28" text-anchor="middle">\ud83c\udfe0</text><text x="78" y="26" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">123 Main St, Austin TX</text><text x="78" y="44" fill="rgba(255,255,255,0.5)" font-family="'Inter', sans-serif" font-size="10">Single Family Home \u00b7 $450,000</text></g><g transform="translate(24, 90)"><rect x="0" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="84" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">ROI</text><text x="84" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">12.5%</text><rect x="184" y="0" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="268" y="20" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">CAP RATE</text><text x="268" y="40" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">6.8%</text><rect x="0" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="84" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">MONTHLY CASH FLOW</text><text x="84" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">$1,240/mo</text><rect x="184" y="60" width="168" height="50" rx="8" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)"/><text x="268" y="80" fill="rgba(255,255,255,0.5)" font-family="monospace" font-size="9" text-anchor="middle">5YR APPRECIATION</text><text x="268" y="100" fill="#10b981" font-family="monospace" font-weight="900" font-size="16" text-anchor="middle">+35%</text></g></svg>`)}`
   },
   {
     id: 'creditscore',
@@ -24560,7 +24560,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, #121324 0%, #080911 100%)',
     description: 'Needs, Wants, and Savings bars demonstrating the 50/30/20 rule with monthly income distribution.',
     tags: ['Budget', '50/30/20', 'Personal Finance', 'Savings', 'Finance'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-bgt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#080911"/></linearGradient><linearGradient id="b-needs" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient><linearGradient id="b-wants" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f472b6"/></linearGradient><linearGradient id="b-sav" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-bgt)"/><text x="200" y="35" fill="rgba(255,255,255,0.75)" font-family="'Inter', sans-serif" font-weight="700" font-size="13" letter-spacing="0.5" text-anchor="middle">50/30/20 BUDGET · $5,000/MO</text><g transform="translate(30, 60)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Needs</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="115" height="24" rx="4" fill="url(#b-needs)"/><text x="175" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$2,500</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">50%</text><g transform="translate(0, 42)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Wants</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="69" height="24" rx="4" fill="url(#b-wants)"/><text x="130" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,500</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">30%</text></g><g transform="translate(0, 84)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Savings</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="46" height="24" rx="4" fill="url(#b-sav)"/><text x="108" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,000</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">20%</text></g></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-bgt" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#080911"/></linearGradient><linearGradient id="b-needs" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#a855f7"/></linearGradient><linearGradient id="b-wants" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#f472b6"/></linearGradient><linearGradient id="b-sav" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-bgt)"/><text x="200" y="35" fill="rgba(255,255,255,0.75)" font-family="'Inter', sans-serif" font-weight="700" font-size="13" letter-spacing="0.5" text-anchor="middle">50/30/20 BUDGET \u00b7 $5,000/MO</text><g transform="translate(30, 60)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Needs</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="115" height="24" rx="4" fill="url(#b-needs)"/><text x="175" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$2,500</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">50%</text><g transform="translate(0, 42)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Wants</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="69" height="24" rx="4" fill="url(#b-wants)"/><text x="130" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,500</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">30%</text></g><g transform="translate(0, 84)"><text x="0" y="22" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="12">Savings</text><rect x="70" y="6" width="230" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><rect x="70" y="6" width="46" height="24" rx="4" fill="url(#b-sav)"/><text x="108" y="22" fill="#fff" font-family="monospace" font-weight="700" font-size="10" text-anchor="end">$1,000</text><text x="330" y="22" fill="#fff" font-family="monospace" font-weight="900" font-size="12">20%</text></g></g></svg>`)}`
   },
   {
     id: 'crash',
@@ -24573,7 +24573,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(180deg, #1c0a0a 0%, #0b0404 100%)',
     description: 'Dramatic red plummet chart line with flashing background pulse and percentage drop for black swan events.',
     tags: ['Market Crash', 'Drop', 'Volatility', 'Red Line', 'Finance'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0a0a"/><stop offset="100%" stop-color="#0b0404"/></linearGradient><linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.6"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cr)"/><text x="24" y="34" fill="#ffffff" font-family="monospace" font-weight="900" font-size="16">S&amp;P 500</text><text x="24" y="52" fill="#ef4444" font-family="'Inter', sans-serif" font-weight="700" font-size="11">▼ -34%</text><text x="376" y="42" fill="#ef4444" font-family="monospace" font-weight="900" font-size="24" text-anchor="end">2,191</text><g transform="translate(24, 70)"><path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120 L 352 135 L 0 135 Z" fill="url(#redGrad)"/><path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0a0a"/><stop offset="100%" stop-color="#0b0404"/></linearGradient><linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ef4444" stop-opacity="0.6"/><stop offset="100%" stop-color="#ef4444" stop-opacity="0"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cr)"/><text x="24" y="34" fill="#ffffff" font-family="monospace" font-weight="900" font-size="16">S&amp;P 500</text><text x="24" y="52" fill="#ef4444" font-family="'Inter', sans-serif" font-weight="700" font-size="11">\u25bc -34%</text><text x="376" y="42" fill="#ef4444" font-family="monospace" font-weight="900" font-size="24" text-anchor="end">2,191</text><g transform="translate(24, 70)"><path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120 L 352 135 L 0 135 Z" fill="url(#redGrad)"/><path d="M 0 10 Q 60 15 120 25 T 240 85 T 352 120" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/></g></svg>`)}`
   },
   {
     id: 'dividend',
@@ -24586,7 +24586,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, #121324 0%, #070810 100%)',
     description: 'Monthly schedule calendar displaying dividend payment dates and portfolio yield metrics.',
     tags: ['Dividends', 'Calendar', 'Passive Income', 'Yield', 'Finance'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-div" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#070810"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-div)"/><text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">DIVIDEND CALENDAR</text><text x="376" y="34" fill="#fbbf24" font-family="monospace" font-weight="900" font-size="15" text-anchor="end">4.2% · $350/mo</text><g transform="translate(24, 52)">${[...Array(24)].map((_, i) => { const r = Math.floor(i / 6), c = i % 6, isPay = [4, 11, 17, 22].includes(i); return `<g transform="translate(${c * 60}, ${r * 38})"><rect width="52" height="32" rx="4" fill="${isPay ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.03)'}" stroke="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.06)'}"/><text x="26" y="16" fill="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.5)'}" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">${i + 1}</text>${isPay ? `<text x="26" y="27" fill="#fbbf24" font-family="monospace" font-size="7" font-weight="700" text-anchor="middle">$87</text>` : ''}</g>`; }).join('')}</g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-div" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#121324"/><stop offset="100%" stop-color="#070810"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-div)"/><text x="24" y="34" fill="rgba(255,255,255,0.7)" font-family="'Inter', sans-serif" font-weight="700" font-size="12" letter-spacing="1">DIVIDEND CALENDAR</text><text x="376" y="34" fill="#fbbf24" font-family="monospace" font-weight="900" font-size="15" text-anchor="end">4.2% \u00b7 $350/mo</text><g transform="translate(24, 52)">${[...Array(24)].map((_, i) => { const r = Math.floor(i / 6), c = i % 6, isPay = [4, 11, 17, 22].includes(i); return `<g transform="translate(${c * 60}, ${r * 38})"><rect width="52" height="32" rx="4" fill="${isPay ? 'rgba(251,191,36,0.18)' : 'rgba(255,255,255,0.03)'}" stroke="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.06)'}"/><text x="26" y="16" fill="${isPay ? '#fbbf24' : 'rgba(255,255,255,0.5)'}" font-family="monospace" font-size="9" font-weight="700" text-anchor="middle">${i + 1}</text>${isPay ? `<text x="26" y="27" fill="#fbbf24" font-family="monospace" font-size="7" font-weight="700" text-anchor="middle">$87</text>` : ''}</g>`; }).join('')}</g></svg>`)}`
   },
   {
     id: 'supplydemand',
@@ -24613,7 +24613,7 @@ if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES))
 
 const TEMPLATE_CATEGORIES = [
   'All',
-  '★ My Templates',
+  '\u2605 My Templates',
   'Documentary',
   'Business Storytelling',
   'Motion & FX',
@@ -24720,8 +24720,8 @@ function renderHomepageCategories() {
 
   container.innerHTML = TEMPLATE_CATEGORIES.map(cat => {
     const isActive = cat === currentTemplateCategory;
-    const isCustomCat = cat === '★ My Templates';
-    const label = isCustomCat ? `★ My Templates (${customCount})` : cat;
+    const isCustomCat = cat === '\u2605 My Templates';
+    const label = isCustomCat ? `\u2605 My Templates (${customCount})` : cat;
     const specialClass = isCustomCat ? 'is-my-templates-pill' : '';
 
     return `
@@ -24754,7 +24754,7 @@ function renderHomepageTemplates() {
     let matchesCat = false;
     if (currentTemplateCategory === 'All') {
       matchesCat = true;
-    } else if (currentTemplateCategory === '★ My Templates') {
+    } else if (currentTemplateCategory === '\u2605 My Templates') {
       matchesCat = !!t.isCustom || t.category === 'My Templates';
     } else if (currentTemplateCategory === 'Documentary') {
       matchesCat = t.category === 'Documentary' || t.origCategory === 'Documentary';
@@ -24788,7 +24788,7 @@ function renderHomepageTemplates() {
   if (headingEl) {
     headingEl.textContent = currentTemplateCategory === 'All'
       ? 'Inspired By Your Creative Workflow'
-      : currentTemplateCategory === '★ My Templates'
+      : currentTemplateCategory === '\u2605 My Templates'
         ? 'My Created Templates & Custom Layouts'
         : `${currentTemplateCategory} Templates`;
   }
@@ -24822,7 +24822,7 @@ function renderHomepageTemplates() {
           <div class="home-tpl-fx-container" id="fx-container-${t.id}" style="position: absolute; inset: 0; overflow: hidden; pointer-events: none; display: none;"></div>
 
           <div class="home-tpl-badge" id="badge-${t.id}">${t.badge}</div>
-          ${is3D ? `<div class="home-tpl-3d-badge">⬡ 3D VIDEO</div>` : ''}
+          ${is3D ? `<div class="home-tpl-3d-badge">\u2b21 3D VIDEO</div>` : ''}
           <div class="home-tpl-time">${t.timeToApply}</div>
 
           <div class="home-tpl-play-hover" id="play-hover-${t.id}">
@@ -24903,10 +24903,10 @@ function bizStoryHoverMarkup(id) {
           <div style="position: absolute; inset: 0; opacity: 0.22; background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 0); background-size: 14px 14px; pointer-events: none;"></div>
           <div style="position: absolute; top: 10px; left: 12px; display: flex; flex-direction: column; gap: 2px; z-index: 10; pointer-events: none;">
             <span style="font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 800; color: #f8fafc; letter-spacing: 0.1em; text-transform: uppercase;">THE RISE &amp; FALL</span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #38bdf8; font-weight: 600; opacity: 0.9;">1985 — 2001 // ENRON CRASH</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #38bdf8; font-weight: 600; opacity: 0.9;">1985 \u2014 2001 // ENRON CRASH</span>
           </div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2.5px 7.5px; border-radius: 5px; background: linear-gradient(135deg, #0ea5e9, #8b5cf6); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(14,165,233,0.5); display: flex; align-items: center; gap: 3.5px;">
-            ⬡ 3D TIMELINE
+            \u2b21 3D TIMELINE
           </div>
           <div style="width: 100%; height: 100%; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transform: rotateX(20deg) rotateY(-12deg) scale(0.92); transform-style: preserve-3d; filter: drop-shadow(0 14px 25px rgba(0,0,0,0.85));">
             <svg viewBox="0 0 400 225" style="width: 100%; height: 100%; display: block;" preserveAspectRatio="none">
@@ -24955,7 +24955,7 @@ function bizStoryHoverMarkup(id) {
         <div class="bm-val">-$412M / MO</div><div class="bm-runway">RUNWAY: <b>3 MONTHS</b> LEFT</div>`;
     case 'deal-term-sheet':
       return `<div class="ts-paper">
-        <div class="ts-head">TERM SHEET · SERIES A</div><div class="ts-rule"></div>
+        <div class="ts-head">TERM SHEET \u00b7 SERIES A</div><div class="ts-rule"></div>
         <div class="ts-line ts-hl"><span>Valuation: $80M pre-money</span></div>
         <div class="ts-line ts-hl ts-d2"><span>Investment: $12M for 15%</span></div>
         <div class="ts-line ts-d3"><span>Board seats: 2 investor, 3 founder</span></div>
@@ -24964,7 +24964,7 @@ function bizStoryHoverMarkup(id) {
         <div class="ts-stamp">DEAL CLOSED</div></div>`;
     case 'scam-redaction':
       return `<div class="rd-paper">
-        <div class="rd-head">INTERNAL MEMO · EYES ONLY</div>
+        <div class="rd-head">INTERNAL MEMO \u00b7 EYES ONLY</div>
         <div class="rd-line">To: Board of Directors</div>
         <div class="rd-line rd-from">From: <span class="rd-bar"></span></div>
         <div class="rd-line">Re: Q3 revenue booked via side letters totaling</div>
@@ -24972,7 +24972,7 @@ function bizStoryHoverMarkup(id) {
         <div class="rd-line">DO NOT DISCLOSE.</div>
         <div class="rd-stamp">CONFIDENTIAL</div></div>`;
     case 'market-cap-race':
-      return `<div class="mr-head"><span>MARKET CAP · 2026</span><b>Q4</b></div>
+      return `<div class="mr-head"><span>MARKET CAP \u00b7 2026</span><b>Q4</b></div>
         <div class="mr-row"><span class="mr-name">NVDA</span><div class="mr-track"><div class="mr-bar mr-b1" style="--w:94%;--c:#76b900"></div></div><span class="mr-val">$3.1T</span></div>
         <div class="mr-row"><span class="mr-name">MSFT</span><div class="mr-track"><div class="mr-bar mr-b2" style="--w:84%;--c:#00a4ef"></div></div><span class="mr-val">$2.8T</span></div>
         <div class="mr-row"><span class="mr-name">AAPL</span><div class="mr-track"><div class="mr-bar mr-b3" style="--w:76%;--c:#f5f5f7"></div></div><span class="mr-val">$2.6T</span></div>
@@ -24980,16 +24980,16 @@ function bizStoryHoverMarkup(id) {
         <div class="mr-row"><span class="mr-name">GOOGL</span><div class="mr-track"><div class="mr-bar mr-b5" style="--w:50%;--c:#ea4335"></div></div><span class="mr-val">$1.7T</span></div>
         <div class="mr-row"><span class="mr-name">TSLA</span><div class="mr-track"><div class="mr-bar mr-b6" style="--w:26%;--c:#cc0000"></div></div><span class="mr-val">$0.8T</span></div>`;
     case 'hostile-takeover':
-      return `<div class="ht-title">OWNERSHIP STAKE · 51% CONTROL</div>
+      return `<div class="ht-title">OWNERSHIP STAKE \u00b7 51% CONTROL</div>
         <div class="ht-pie"><div class="ht-center"><b>51%</b><i>ACQUIRER</i></div></div>
         <div class="ht-legend"><span><em style="background:#ff4757"></em>Predator Fund 51%</span><span><em style="background:#7c5cff"></em>Founders 25%</span><span><em style="background:#8a8a95"></em>Float 24%</span></div>`;
     case 'pyramid-scheme':
       return `<div class="ps-title">STRUCTURE UNSUSTAINABLE</div>
         <div class="ps-stack">
           <div class="ps-tier ps-t1">FOUNDER</div>
-          <div class="ps-tier ps-t2">EARLY INVESTORS · +400%</div>
-          <div class="ps-tier ps-t3">LATE ADOPTERS · BREAK-EVEN</div>
-          <div class="ps-tier ps-t4">LAST 90% · TOTAL LOSS</div>
+          <div class="ps-tier ps-t2">EARLY INVESTORS \u00b7 +400%</div>
+          <div class="ps-tier ps-t3">LATE ADOPTERS \u00b7 BREAK-EVEN</div>
+          <div class="ps-tier ps-t4">LAST 90% \u00b7 TOTAL LOSS</div>
         </div><div class="ps-crack"></div>`;
     case 'money-trail-map':
       return `<div class="mt-grid"></div>
@@ -24998,7 +24998,7 @@ function bizStoryHoverMarkup(id) {
           <path class="mt-arc mt-a2" d="M 180 50 Q 240 25 268 70"/>
           <path class="mt-arc mt-a3" d="M 268 70 Q 200 115 90 128"/>
         </svg>
-        <div class="mt-node mt-n1">DELIVERY CO.</div><div class="mt-node mt-n2">CAYMAN SHELL</div><div class="mt-node mt-n3">TRUST FUND</div><div class="mt-node mt-n4">PERSONAL ACCOUNT · $47M</div>`;
+        <div class="mt-node mt-n1">DELIVERY CO.</div><div class="mt-node mt-n2">CAYMAN SHELL</div><div class="mt-node mt-n3">TRUST FUND</div><div class="mt-node mt-n4">PERSONAL ACCOUNT \u00b7 $47M</div>`;
     case 'investigate-globe':
       return `<div class="jg-space"></div>
         <div class="jg-stage"><div class="jg-globe">
@@ -25010,7 +25010,7 @@ function bizStoryHoverMarkup(id) {
         </div></div>
         <div class="jg-callout"><b>DUBAI</b><i>where the money actually lands</i></div>`;
     case 'world-map-flyover':
-      return `<div class="wm-head">GLOBAL SUPPLY CHAIN · 2026</div>
+      return `<div class="wm-head">GLOBAL SUPPLY CHAIN \u00b7 2026</div>
         <div class="wm-map">
           <svg class="wm-svg" viewBox="0 0 300 160" preserveAspectRatio="none">
             <path class="wm-arc wm-w1" d="M 45 55 Q 110 8 178 48"/>
@@ -25025,7 +25025,7 @@ function bizStoryHoverMarkup(id) {
             <g fill="#12203a"><circle cx="55" cy="50" r="18"/><circle cx="90" cy="70" r="13"/><circle cx="205" cy="95" r="11"/><circle cx="255" cy="80" r="14"/><circle cx="120" cy="125" r="12"/></g>
             <polygon class="cm-country" points="138,38 172,32 188,52 182,78 158,88 138,72"/>
           </svg></div>
-        <div class="cm-label"><b>PANAMA</b><i>0.1% of land · 5% of global trade</i></div>`;
+        <div class="cm-label"><b>PANAMA</b><i>0.1% of land \u00b7 5% of global trade</i></div>`;
     case 'zoomout-context-card':
       return `<div class="zc-window"><div class="zc-map">
           <div class="zc-blob zc-b1"></div><div class="zc-blob zc-b2"></div><div class="zc-blob zc-b3"></div><div class="zc-blob zc-b4"></div>
@@ -25052,7 +25052,7 @@ function bizStoryHoverMarkup(id) {
           </svg>
           <div class="sx-x"><span></span><span></span></div>
           <div class="sx-stamp">BLOCKED</div>
-          <div class="sx-note">REROUTED VIA DUBAI · +$14M/YR</div>
+          <div class="sx-note">REROUTED VIA DUBAI \u00b7 +$14M/YR</div>
         </div>`;
     case 'timeline-scrubber-map':
       return `<div class="tsm-year"><span class="tsm-y-a">1990</span><span class="tsm-y-b">1999</span><span class="tsm-y-c">2008</span><span class="tsm-y-d">2017</span><span class="tsm-y-e">2026</span></div>
@@ -25087,7 +25087,7 @@ window.tplRenderUniversalBgLayer = function (data, fallbackBgStyle) {
   return `<div class="tpl-universal-bg-layer"></div>`;
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly']);
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
@@ -25125,7 +25125,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>`; } else if (tplId === 'balance') {
       fxContainer.innerHTML = `<div class="tpl-balance">
-          <div class="b-title">Apple Inc. · 2024</div>
+          <div class="b-title">Apple Inc. \u00b7 2024</div>
           <div class="b-eq"><span class="hl">Assets</span><span>=</span><span class="hl">Liabilities</span><span>+</span><span class="hl">Equity</span></div>
           <div class="b-row"><span>Cash & Equivalents</span><span class="val">$29.9B</span></div>
           <div class="b-row"><span>Marketable Securities</span><span class="val">$61.5B</span></div>
@@ -25156,10 +25156,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="w-row"><div class="w-name">Avg American</div><div class="w-bar-wrap"><div class="w-bar b3" style="--w:4%">$97K</div></div></div>
         </div>`; } else if (tplId === 'bloom') {
       fxContainer.innerHTML = `<div class="tpl-bloom">
-          <div class="b-panel"><div class="b-panel-head"><span>US EQUITIES</span><span class="up">▲</span></div><div class="b-row"><span class="sym">SPX</span><span>4,582 <span style="color:#00d68f">+0.8%</span></span></div><div class="b-row"><span class="sym">NDX</span><span>15,942 <span style="color:#00d68f">+1.2%</span></span></div><div class="b-row"><span class="sym">DJI</span><span>35,281 <span style="color:#ff4757">-0.3%</span></span></div></div>
-          <div class="b-panel"><div class="b-panel-head"><span>RATES / FX</span><span class="dn">▼</span></div><div class="b-row"><span class="sym">US10Y</span><span>4.32%</span></div><div class="b-row"><span class="sym">EUR/USD</span><span>1.0842</span></div><div class="b-row"><span class="sym">DXY</span><span>105.42</span></div></div>
-          <div class="b-panel"><div class="b-panel-head"><span>COMMODITIES</span><span class="up">▲</span></div><div class="b-row"><span class="sym">GOLD</span><span>1,987.40</span></div><div class="b-row"><span class="sym">BRENT</span><span>82.50</span></div></div>
-          <div class="b-panel"><div class="b-panel-head"><span>CRYPTO</span><span class="up">▲</span></div><div class="b-row"><span class="sym">BTC</span><span>$43,280 <span style="color:#00d68f">+3.2%</span></span></div><div class="b-row"><span class="sym">ETH</span><span>$2,280 <span style="color:#00d68f">+2.1%</span></span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>US EQUITIES</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">SPX</span><span>4,582 <span style="color:#00d68f">+0.8%</span></span></div><div class="b-row"><span class="sym">NDX</span><span>15,942 <span style="color:#00d68f">+1.2%</span></span></div><div class="b-row"><span class="sym">DJI</span><span>35,281 <span style="color:#ff4757">-0.3%</span></span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>RATES / FX</span><span class="dn">\u25bc</span></div><div class="b-row"><span class="sym">US10Y</span><span>4.32%</span></div><div class="b-row"><span class="sym">EUR/USD</span><span>1.0842</span></div><div class="b-row"><span class="sym">DXY</span><span>105.42</span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>COMMODITIES</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">GOLD</span><span>1,987.40</span></div><div class="b-row"><span class="sym">BRENT</span><span>82.50</span></div></div>
+          <div class="b-panel"><div class="b-panel-head"><span>CRYPTO</span><span class="up">\u25b2</span></div><div class="b-row"><span class="sym">BTC</span><span>$43,280 <span style="color:#00d68f">+3.2%</span></span></div><div class="b-row"><span class="sym">ETH</span><span>$2,280 <span style="color:#00d68f">+2.1%</span></span></div></div>
         </div>`; } else if (tplId === 'ticker') {
       fxContainer.innerHTML = `<div class="tpl-ticker">
           <div class="t-head">LIVE MARKETS</div>
@@ -25167,7 +25167,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`; } else if (tplId === 'inflation') {
       fxContainer.innerHTML = `<div class="tpl-inflation">
           <div class="inf-wrap">
-            <div class="inf-label">1980 → 2024</div>
+            <div class="inf-label">1980 \u2192 2024</div>
             <div class="bill"></div>
             <div class="inf-pct">-72%</div>
             <div class="inf-label" style="color:#ff4757">Purchasing Power Lost</div>
@@ -25175,8 +25175,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`; } else if (tplId === 'snowball') {
       fxContainer.innerHTML = `<div class="tpl-snowball">
           <div class="s-title">Debt Payoff Progress</div>
-          <div class="s-row paid" style="--w:100%"><div class="s-check">✓</div><div class="s-name">Credit Card</div><div class="s-bar-wrap"><div class="s-bar" style="--w:0%"></div></div><div class="s-amt">$5,000</div></div>
-          <div class="s-row paid" style="--w:100%"><div class="s-check">✓</div><div class="s-name">Car Loan</div><div class="s-bar-wrap"><div class="s-bar" style="--w:0%"></div></div><div class="s-amt">$12,000</div></div>
+          <div class="s-row paid" style="--w:100%"><div class="s-check">\u2713</div><div class="s-name">Credit Card</div><div class="s-bar-wrap"><div class="s-bar" style="--w:0%"></div></div><div class="s-amt">$5,000</div></div>
+          <div class="s-row paid" style="--w:100%"><div class="s-check">\u2713</div><div class="s-name">Car Loan</div><div class="s-bar-wrap"><div class="s-bar" style="--w:0%"></div></div><div class="s-amt">$12,000</div></div>
           <div class="s-row"><div class="s-check"></div><div class="s-name">Student Loan</div><div class="s-bar-wrap"><div class="s-bar" style="--w:60%"></div></div><div class="s-amt">$28,000</div></div>
           <div class="s-row"><div class="s-check"></div><div class="s-name">Mortgage</div><div class="s-bar-wrap"><div class="s-bar" style="--w:85%"></div></div><div class="s-amt">$250,000</div></div>
         </div>`; } else if (tplId === 'pie') {
@@ -25230,7 +25230,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const total = rData.total || '$34.28';
       fxContainer.innerHTML = `<div class="tpl-receipt">
           <div class="r-paper">
-            <div class="r-head"><div class="r-store">${store}</div><div style="font-size:8px;font-weight:500;color:#64748b;margin-top:2px;">TERM #0491 · AUTH VERIFIED</div></div>
+            <div class="r-head"><div class="r-store">${store}</div><div style="font-size:8px;font-weight:500;color:#64748b;margin-top:2px;">TERM #0491 \u00b7 AUTH VERIFIED</div></div>
             <div class="r-items-wrap">
               ${items.map(it => `<div class="r-item"><span class="name">${it.name}</span><span class="price">${it.price}</span></div>`).join('')}
             </div>
@@ -25291,7 +25291,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`; } else if (tplId === 'chart') {
       fxContainer.innerHTML = `<div class="tpl-chart">
           <div class="chart-head">
-            <div><div class="ticker-sym">TSLA</div><div class="change">▲ +12.4%</div></div>
+            <div><div class="ticker-sym">TSLA</div><div class="change">\u25b2 +12.4%</div></div>
             <div class="price">$248.50</div>
           </div>
           <div style="flex:1;position:relative;margin-top:10px;">
@@ -25303,7 +25303,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       fxContainer.innerHTML = `<div class="tpl-typewriter">
           <div class="paper-edge"></div>
           <div class="tw-text">The letter arrived at midnight...</div>
-          <div class="tw-sub">— November 14, 1987</div>
+          <div class="tw-sub">\u2014 November 14, 1987</div>
         </div>`; } else if (tplId === 'notif') {
       const nData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('notif') : {};
       const title1 = nData.title || 'Wire Transfer Confirmed';
@@ -25347,13 +25347,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       fxContainer.innerHTML = `<div class="tpl-hormozi" ${bgStyle}>
           ${isVideoBg ? `<video class="hormozi-bg-video" src="${bgMedia}" autoplay loop muted playsinline></video>` : ''}
           <div class="hormozi-vignette"></div>
-          ${showEmoji ? `<div class="emoji e1">${hData.emoji || '🔥'}</div>` : ''}
+          ${showEmoji ? `<div class="emoji e1">${hData.emoji || '\ud83d\udd25'}</div>` : ''}
           <div class="caption-wrap caption">${wordsHtml}</div>
-          ${showEmoji ? `<div class="emoji e2">${hData.emoji || '⚡'}</div>` : ''}
+          ${showEmoji ? `<div class="emoji e2">${hData.emoji || '\u26a1'}</div>` : ''}
         </div>`; } else if (tplId === 'kenburns') {
       fxContainer.innerHTML = `<div class="tpl-kenburns">
           <div class="kb-img"></div>
-          <div class="kb-caption">TOKYO · 1987</div>
+          <div class="kb-caption">TOKYO \u00b7 1987</div>
         </div>`; } else if (tplId === 'tweet') {
       const twData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('tweet') : {};
       const author = twData.author || 'Alex Hormozi';
@@ -25399,7 +25399,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const nwData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('news') : {};
       const ch = nwData.channel || 'WORLD NEWS LIVE';
       const hl = nwData.headline || 'Tech Giant Announces Unprecedented Layoffs';
-      const sub = nwData.ticker || 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING • FEDERAL REGULATORS OPEN INQUIRY';
+      const sub = nwData.ticker || 'MARKETS REACT: NASDAQ FUTURES SLIDE 3.2% IN AFTER-HOURS TRADING \u2022 FEDERAL REGULATORS OPEN INQUIRY';
       const bCol = nwData.bannerColor || '#dc2626';
       fxContainer.innerHTML = `<div class="tpl-news">
           <div class="news-top-bug"><span class="news-live-dot"></span><span>DIRECT FEED // HD</span></div>
@@ -25416,9 +25416,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>`; } else if (tplId === 'quote') {
       fxContainer.innerHTML = `<div class="tpl-quote">
-          <div class="quote-mark">“</div>
+          <div class="quote-mark">\u201c</div>
           <div class="quote-text">The obstacle is the way.</div>
-          <div class="quote-author">— Marcus Aurelius</div>
+          <div class="quote-author">\u2014 Marcus Aurelius</div>
         </div>`; } else if (tplId === 'polaroid') {
       const polData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('polaroid') : {};
       const p1 = polData.photo1 || '/hiker_background_inpainted.png';
@@ -25465,10 +25465,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>`; } else if (tplId === 'checklist') {
       fxContainer.innerHTML = `<div class="tpl-checklist">
-          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Research topic</div></div>
-          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Write script</div></div>
-          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Record audio</div></div>
-          <div class="check-item"><div class="check-box">✓</div><div class="check-text">Edit video</div></div>
+          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Research topic</div></div>
+          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Write script</div></div>
+          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Record audio</div></div>
+          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Edit video</div></div>
         </div>`;
     } else if (tplId === 'parallax') {
       const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('parallax') : {};
@@ -25499,7 +25499,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="subject" style="z-index: ${subjZ}; cursor: pointer;" ${subjStyle} title="Cutout Subject (Click to bring text in front/behind)"></div>
           <div id="tb-stage-hover-bar" style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; background: rgba(15,23,42,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.18); border-radius: 20px; padding: 4px 12px; z-index: 20; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
             <button type="button" id="btn-stage-toggle-order" style="background: none; border: none; color: #fff; font-size: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-              <span>${data.layerOrder === 'front' ? '🔲 Send Text Behind' : '🔲 Bring Text to Front'}</span>
+              <span>${data.layerOrder === 'front' ? '\ud83d\udd32 Send Text Behind' : '\ud83d\udd32 Bring Text to Front'}</span>
             </button>
           </div>
         </div>`;
@@ -25592,14 +25592,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="product-specular-sheen"></div>
             <div class="product-lidar-beam"></div>
           </div>
-          <div class="zoom-hud-top">⬡ 3D OPTICAL SCAN // 120FPS</div>
+          <div class="zoom-hud-top">\u2b21 3D OPTICAL SCAN // 120FPS</div>
           <div class="zoom-hud-bottom"><span class="zoom-prod-title" style="font-family:${titleFont};color:${titleColor};${titleSizeStyle}">${prodName}</span><span class="zoom-prod-sub" style="color:${subColor};">${prodSub}</span></div>
         </div>`;
     } else if (tplId === 'ceo-portrait') {
       const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('ceo-portrait') : {};
       const customCutout = cData.cutoutUrl || ((typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : '/ceo_portrait_cutout.jpg');
       const ceoName = cData.ceoName || 'ALEXANDER VANCE';
-      const ceoRole = cData.ceoRole || 'CHIEF EXECUTIVE OFFICER · VANGUARD GLOBAL';
+      const ceoRole = cData.ceoRole || 'CHIEF EXECUTIVE OFFICER \u00b7 VANGUARD GLOBAL';
       const ceoBadge = cData.ceoBadge || 'EXECUTIVE DOSSIER // VERIFIED';
       const nameFont = cData.fontFamily || "'Space Grotesk', sans-serif";
       const nameColor = cData.nameColor || '#ffffff';
@@ -25624,7 +25624,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const bData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('boardroom-zoom') : {};
       const sceneImg = bData.sceneUrl || ((typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : '/boardroom_scene_hd.jpg');
       const headline = bData.headline || 'EMERGENCY BOARDROOM SUMMIT';
-      const subline = bData.subline || '42ND FLOOR · MANHATTAN HQ // $14.8B MERGER VOTE';
+      const subline = bData.subline || '42ND FLOOR \u00b7 MANHATTAN HQ // $14.8B MERGER VOTE';
       const accentColor = bData.accentColor || '#fbbf24';
       const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(bData) : '';
       const isCustomBg = (bData.bgPreset && bData.bgPreset !== 'default') || !!bData.bgMediaUrl;
@@ -25646,7 +25646,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const camId = scData.camId || 'CAM 04 // NORTH VAULT CORRIDOR';
       const recText = scData.recText || 'REC';
       const timecode = scData.timecode || '2026-10-19  03:14:28:09';
-      const statusText = scData.statusText || 'ISO 3200 · IR NIGHT VISION · 1080P/24';
+      const statusText = scData.statusText || 'ISO 3200 \u00b7 IR NIGHT VISION \u00b7 1080P/24';
       const colorMode = scData.colorMode || 'night';
       const showScanlines = scData.showScanlines !== false;
       const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(scData) : '';
@@ -25709,6 +25709,205 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
           ` : ''}
         </div>`;
+    } else if (tplId === 'headline-fly') {
+      const hData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('headline-fly') : {};
+      const tilt = hData.tiltAngle !== undefined ? hData.tiltAngle : 9.5;
+      const motionBlur = hData.motionBlur !== false;
+      const blurPx = hData.blurIntensity !== undefined ? hData.blurIntensity : 32;
+      const dofBokeh = hData.dofBokeh !== false;
+      const dofPx = hData.dofBlur !== undefined ? hData.dofBlur : 8;
+      const specular = hData.specularGlare !== false;
+      const drift = hData.organicDrift !== false;
+      const shadowRad = hData.shadowRadius !== undefined ? hData.shadowRadius : 48;
+      const shadowAlpha = hData.shadowAlpha !== undefined ? hData.shadowAlpha : 0.55;
+      const flySpeed = hData.flySpeed !== undefined ? hData.flySpeed : 1.0;
+      const staggerDelay = hData.staggerDelay !== undefined ? hData.staggerDelay : 0.28;
+      const paperGrain = hData.paperGrain !== undefined ? (Number(hData.paperGrain) / 100).toFixed(2) : '0.35';
+      const showTelemetry = hData.showTelemetry !== false;
+      const activeCardTab = Number(hData.activeCardTab || 5);
+      const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(hData) : '';
+
+      const formatHl = (text, hlPhrase) => {
+        const raw = String(text || '');
+        const hl = String(hlPhrase || '').trim();
+        const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        if (!hl) return esc(raw);
+        const idx = raw.toLowerCase().indexOf(hl.toLowerCase());
+        if (idx === -1) return esc(raw);
+        const before = raw.slice(0, idx);
+        const match = raw.slice(idx, idx + hl.length);
+        const after = raw.slice(idx + hl.length);
+        return `${esc(before)}<span class="fly-hl-mark">${esc(match)}</span>${esc(after)}`;
+      };
+
+      const cards = [1, 2, 3, 4, 5].map(num => {
+        const bgCol = hData[`bgColor${num}`] || (num === 2 ? '#fcd5b5' : (num === 3 ? '#0f172a' : (num === 4 ? '#18090c' : '#f6f1e7')));
+        const txtCol = hData[`textColor${num}`] || (num === 3 || num === 4 ? '#f8fafc' : '#0f172a');
+        const accCol = hData[`accentColor${num}`] || (num === 2 ? '#9a3412' : (num === 3 ? '#38bdf8' : (num === 4 ? '#ef4444' : '#b91c1c')));
+        const hlCol = hData[`hlColor${num}`] || (num === 3 ? '#0284c7' : (num === 4 ? '#b91c1c' : '#fde047'));
+        const isLight = /^#(f|e|d|c)/i.test(bgCol);
+        const subCol = isLight ? '#475569' : '#94a3b8';
+        const ruleCol = isLight ? 'rgba(15,23,42,0.16)' : 'rgba(255,255,255,0.14)';
+        const borderCol = isLight ? 'rgba(15,23,42,0.22)' : 'rgba(255,255,255,0.22)';
+        const src = hData[`source${num}`] || 'THE FINANCIAL CHRONICLE';
+        const pubInit = String(src).replace(/^THE\s+/i, '').trim().charAt(0).toUpperCase() || 'N';
+        return {
+          num,
+          visible: hData[`visible${num}`] !== false,
+          theme: hData[`theme${num}`] || 'newsprint',
+          bgCol, txtCol, accCol, hlCol, subCol, ruleCol, borderCol,
+          pubInit,
+          source: src,
+          kicker: hData[`kicker${num}`] !== undefined ? hData[`kicker${num}`] : 'INVESTIGATIVE REPORT',
+          date: hData[`date${num}`] !== undefined ? hData[`date${num}`] : 'OCT 2026',
+          headlineHtml: formatHl(hData[`headline${num}`] || '', hData[`highlight${num}`] || ''),
+          subhead: hData[`subhead${num}`] !== undefined ? hData[`subhead${num}`] : '',
+          byline: hData[`byline${num}`] !== undefined ? hData[`byline${num}`] : `Evidence Item #0${num}`,
+          exhibit: hData[`exhibit${num}`] !== undefined ? hData[`exhibit${num}`] : `EXHIBIT A-0${num}`,
+          font: hData[`font${num}`] || "'Playfair Display', Georgia, serif",
+          fontSize: hData[`fontSize${num}`] !== undefined ? hData[`fontSize${num}`] : (num === 5 ? 13 : 11.5),
+          scale: hData[`scale${num}`] !== undefined ? hData[`scale${num}`] : (num === 5 ? 1.06 : 1.0),
+          rot: hData[`rot${num}`] !== undefined ? hData[`rot${num}`] : (num === 1 ? -2.2 : (num === 2 ? 2.4 : (num === 3 ? 1.6 : (num === 4 ? -1.8 : -0.6)))),
+          x: hData[`x${num}`] !== undefined ? hData[`x${num}`] : 0,
+          y: hData[`y${num}`] !== undefined ? hData[`y${num}`] : 0
+        };
+      });
+
+      const cardsHtml = cards.map(c => `
+        <div class="fly-card fly-card-${c.num} theme-${c.theme}${c.num === activeCardTab ? ' is-selected-card' : ''}" data-fly-card="${c.num}" style="display:${c.visible ? 'block' : 'none'};--c-bg:${c.bgCol};--c-text:${c.txtCol};--c-accent:${c.accCol};--c-hl:${c.hlCol};--c-sub:${c.subCol};--c-rule:${c.ruleCol};--c-border:${c.borderCol};--c-font:${c.font};--c-title-size:${c.fontSize}px;--c-scale:${c.scale};--c-rot:${c.rot}deg;--c-x:${c.x}px;--c-y:${c.y}px;">
+          <div class="fly-card-paper-grain"></div>
+          <div class="fly-card-masthead-row">
+            <div class="fly-card-pub-wrap">
+              <span class="fly-card-pub-icon">${c.pubInit}</span>
+              <span class="fly-card-source">${c.source}</span>
+            </div>
+            <span class="fly-card-date">${c.date}</span>
+          </div>
+          <div class="fly-card-kicker-row" style="${c.kicker ? '' : 'display:none;'}">
+            <span class="fly-card-kicker">${c.kicker}</span>
+          </div>
+          <div class="fly-card-headline">${c.headlineHtml}</div>
+          <div class="fly-card-subdeck" style="${c.subhead ? '' : 'display:none;'}">${c.subhead}</div>
+          <div class="fly-card-meta">
+            <span class="fly-card-byline">${c.byline}</span>
+            <span class="fly-card-stamp" style="${c.exhibit ? '' : 'display:none;'}">${c.exhibit}</span>
+          </div>
+          <div class="fly-card-glare"></div>
+        </div>
+      `).join('');
+
+      fxContainer.innerHTML = `
+        <div class="tpl-headline-fly ${motionBlur ? 'has-motion-blur' : ''} ${dofBokeh ? 'has-dof-bokeh' : ''} ${specular ? 'has-specular-glare' : ''} ${drift ? 'has-organic-drift' : ''}" style="--fly-tilt:${tilt}deg;--motion-blur-px:${blurPx}px;--dof-blur-px:${dofPx}px;--card-shadow-radius:${shadowRad}px;--card-shadow-alpha:${shadowAlpha};--fly-speed:${flySpeed};--fly-stagger:${staggerDelay}s;--fly-paper-grain:${paperGrain};">
+          ${bgLayerHtml}
+          <div class="fly-stage-3d">
+            <div class="fly-bg-grid"></div>
+            <div class="fly-hud-telemetry" style="display:${showTelemetry ? 'flex' : 'none'};">
+              <span>${hData.hudLeft || 'INVESTIGATIVE PRESS ARCHIVE // RECONSTRUCTION 3D'}</span>
+              <span>${hData.hudRight || `CAM PERSPECTIVE: 1200PX // YAW-TILT: ${tilt}\u00b0`}</span>
+            </div>
+            <div class="fly-cards-cluster">
+              ${cardsHtml}
+            </div>
+          </div>
+          <div class="fly-vignette"></div>
+        </div>
+      `;
+
+      // Bind direct on-canvas pointer click-to-select & drag-to-position for each card
+      const rootEl = fxContainer.querySelector('.tpl-headline-fly');
+      if (rootEl) {
+        rootEl.querySelectorAll('.fly-card').forEach(cardEl => {
+          const cardIdx = Number(cardEl.getAttribute('data-fly-card') || 1);
+          let cDragging = false, startX = 0, startY = 0, origX = 0, origY = 0, moved = false;
+          cardEl.addEventListener('pointerdown', (ev) => {
+            if (ev.target.closest('button, input, select')) return;
+            ev.stopPropagation();
+            cDragging = true;
+            moved = false;
+            startX = ev.clientX;
+            startY = ev.clientY;
+            const curD = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('headline-fly') : {};
+            origX = Number(curD[`x${cardIdx}`] || 0);
+            origY = Number(curD[`y${cardIdx}`] || 0);
+            rootEl.querySelectorAll('.fly-card').forEach(el => el.classList.toggle('is-selected-card', el === cardEl));
+            try { cardEl.setPointerCapture(ev.pointerId); } catch (_) {}
+          });
+          cardEl.addEventListener('pointermove', (ev) => {
+            if (!cDragging) return;
+            const dx = ev.clientX - startX;
+            const dy = ev.clientY - startY;
+            if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+            const nx = Math.round(origX + dx);
+            const ny = Math.round(origY + dy);
+            if (typeof window.tplSetContextualData === 'function') {
+              window.tplSetContextualData('headline-fly', { [`x${cardIdx}`]: nx, [`y${cardIdx}`]: ny, activeCardTab: cardIdx });
+            }
+          });
+          const endCardDrag = () => {
+            if (!cDragging) return;
+            cDragging = false;
+            if (typeof window.tplSetContextualData === 'function') {
+              window.tplSetContextualData('headline-fly', { activeCardTab: cardIdx });
+              if (typeof window.tplRenderContextualInspector === 'function') {
+                window.tplRenderContextualInspector('headline-fly');
+              }
+            }
+          };
+          cardEl.addEventListener('pointerup', endCardDrag);
+          cardEl.addEventListener('pointercancel', endCardDrag);
+          cardEl.addEventListener('wheel', (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            const curD = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('headline-fly') : {};
+            const curSc = Number(curD[`scale${cardIdx}`] || 1.0);
+            const nextSc = Math.max(0.65, Math.min(1.45, Number((curSc + (ev.deltaY < 0 ? 0.04 : -0.04)).toFixed(2))));
+            if (typeof window.tplSetContextualData === 'function') {
+              window.tplSetContextualData('headline-fly', { [`scale${cardIdx}`]: nextSc, activeCardTab: cardIdx });
+              if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('headline-fly');
+            }
+          }, { passive: false });
+        });
+      }
+
+      if (manual && typeof manual.t === 'number') {
+        const root = fxContainer.querySelector('.tpl-headline-fly');
+        if (root) {
+          const cardsEl = root.querySelectorAll('.fly-card');
+          const t = Math.max(0, Math.min(1, manual.t));
+          cardsEl.forEach((cEl, idx) => {
+            const cNum = idx + 1;
+            const cInfo = cards[idx];
+            if (!cInfo || !cInfo.visible) {
+              cEl.style.display = 'none';
+              return;
+            }
+            cEl.style.animation = 'none';
+            const startFraction = (idx * staggerDelay) / 3.2;
+            const durFraction = (1.1 / flySpeed) / 3.2;
+            if (t < startFraction) {
+              cEl.style.opacity = '0';
+              cEl.style.transform = `translate3d(${cInfo.x - 200}px, ${cInfo.y + 260}px, 350px) rotateX(14deg) rotateY(-20deg) rotateZ(${cInfo.rot * 2}deg) scale(${cInfo.scale * 0.75})`;
+              cEl.style.filter = `blur(${blurPx}px)`;
+            } else {
+              const progress = Math.min(1, (t - startFraction) / Math.max(0.05, durFraction));
+              const ease = 1 - Math.pow(1 - progress, 3.2);
+              cEl.style.opacity = (progress > 0.05 ? 1 : progress * 20).toString();
+              const startX = (idx % 2 === 0 ? -220 : 220);
+              const startY = (idx < 2 ? -180 : 220);
+              const startZ = cNum === 5 ? 420 : 280;
+              const curX = cInfo.x + startX * (1 - ease);
+              const curY = cInfo.y + startY * (1 - ease);
+              const curZ = (cNum === 5 ? 75 : 15) + startZ * (1 - ease);
+              const curRotX = 14 * (1 - ease);
+              const curRotY = -18 * (1 - ease);
+              const curRotZ = cInfo.rot * (1 + (1 - ease));
+              const curScale = cInfo.scale * (0.78 + 0.22 * ease);
+              cEl.style.transform = `translate3d(${curX}px, ${curY}px, ${curZ}px) rotateX(${curRotX}deg) rotateY(${curRotY}deg) rotateZ(${curRotZ}deg) scale(${curScale})`;
+              cEl.style.filter = motionBlur ? `blur(${(1 - ease) * blurPx}px)` : 'none';
+            }
+          });
+        }
+      }
     } else if (tplId === 'fedrate') {
       const rates = [18,15,12,10,8,6,5,3,2,5];
       fxContainer.innerHTML = `
@@ -25728,13 +25927,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         <div class="tpl-bearbull">
           <div class="bb-wrap">
             <div class="bb-side">
-              <div class="bb-icon bear">🐻</div>
+              <div class="bb-icon bear">\ud83d\udc3b</div>
               <div class="bb-label">Bear</div>
               <div class="bb-pct down">-20%</div>
             </div>
             <div class="bb-vs">VS</div>
             <div class="bb-side">
-              <div class="bb-icon bull">🐂</div>
+              <div class="bb-icon bull">\ud83d\udc02</div>
               <div class="bb-label">Bull</div>
               <div class="bb-pct up">+150%</div>
             </div>
@@ -25752,7 +25951,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="cert-body">This certifies that</div>
             <div class="cert-shares">100 SHARES</div>
             <div class="cert-body">Dated January 1, 2024</div>
-            <div class="cert-seal">🏆</div>
+            <div class="cert-seal">\ud83c\udfc6</div>
           </div>
         </div>
       `;
@@ -25765,17 +25964,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
           <div class="cw-assets">
             <div class="cw-asset">
-              <div class="cw-icon btc">₿</div>
+              <div class="cw-icon btc">\u20bf</div>
               <div class="cw-info"><div class="cw-sym">BTC</div><div class="cw-name">Bitcoin</div></div>
               <div class="cw-val"><div class="cw-amt">0.5 BTC</div><div class="cw-chg up">+3.2%</div></div>
             </div>
             <div class="cw-asset">
-              <div class="cw-icon eth">Ξ</div>
+              <div class="cw-icon eth">\u039e</div>
               <div class="cw-info"><div class="cw-sym">ETH</div><div class="cw-name">Ethereum</div></div>
               <div class="cw-val"><div class="cw-amt">5 ETH</div><div class="cw-chg up">+2.1%</div></div>
             </div>
             <div class="cw-asset">
-              <div class="cw-icon sol">◎</div>
+              <div class="cw-icon sol">\u25ce</div>
               <div class="cw-info"><div class="cw-sym">SOL</div><div class="cw-name">Solana</div></div>
               <div class="cw-val"><div class="cw-amt">100 SOL</div><div class="cw-chg dn">-1.4%</div></div>
             </div>
@@ -25786,10 +25985,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       fxContainer.innerHTML = `
         <div class="tpl-realestate">
           <div class="re-head">
-            <div class="re-img">🏠</div>
+            <div class="re-img">\ud83c\udfe0</div>
             <div class="re-info">
               <div class="re-addr">123 Main St, Austin TX</div>
-              <div class="re-type">Single Family Home · $450,000</div>
+              <div class="re-type">Single Family Home \u00b7 $450,000</div>
             </div>
           </div>
           <div class="re-stats">
@@ -25821,7 +26020,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     } else if (tplId === 'budget') {
       fxContainer.innerHTML = `
         <div class="tpl-budget">
-          <div class="b-title">50/30/20 Budget · $5,000/mo</div>
+          <div class="b-title">50/30/20 Budget \u00b7 $5,000/mo</div>
           <div class="b-bars">
             <div class="b-row"><div class="b-label">Needs</div><div class="b-bar-wrap"><div class="b-bar needs" style="--w:50%">$2,500</div></div><div class="b-pct">50%</div></div>
             <div class="b-row"><div class="b-label">Wants</div><div class="b-bar-wrap"><div class="b-bar wants" style="--w:30%">$1,500</div></div><div class="b-pct">30%</div></div>
@@ -25834,7 +26033,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         <div class="tpl-crash">
           <div class="cr-flash"></div>
           <div class="cr-head">
-            <div><div class="cr-sym">S&amp;P 500</div><div class="cr-change">▼ -34%</div></div>
+            <div><div class="cr-sym">S&amp;P 500</div><div class="cr-change">\u25bc -34%</div></div>
             <div class="cr-price">2,191</div>
           </div>
           <div class="cr-chart">
@@ -25853,7 +26052,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         <div class="tpl-dividend">
           <div class="d-head">
             <div class="d-title">Dividend Calendar</div>
-            <div class="d-yield">4.2% · $350/mo</div>
+            <div class="d-yield">4.2% \u00b7 $350/mo</div>
           </div>
           <div class="d-grid">
             ${days.map(day=>`<div class="d-day ${payDays.includes(day)?'pay':''}">${day}${payDays.includes(day)?'<div class="amt">$87</div>':''}</div>`).join('')}
@@ -25944,7 +26143,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
           </div>
           <div style="position: absolute; top: 12px; right: 12px; padding: 2px 8px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 9px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.6); border: 1px solid rgba(192, 132, 252, 0.5);">
-            ✂️ BG REMOVED
+            \u2702\ufe0f BG REMOVED
           </div>
         </div>
       `;
@@ -25960,7 +26159,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; bottom: 8px; left: 8px; padding: 2px 7px; border-radius: 4px; background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(255,255,255,0.18); color: #f8fafc; font-size: 8px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; font-family: monospace;">
-            NLE PUSH • -Z DEPTH PULL
+            NLE PUSH \u2022 -Z DEPTH PULL
           </div>
         </div>
       `;
@@ -26005,7 +26204,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <!-- Color burn vignette -->
           <div style="position: absolute; inset: 0; background: rgba(88, 28, 135, 0.2); mix-blend-mode: color-burn; pointer-events: none;"></div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            📜 GRUNGE PAPER
+            \ud83d\udcdc GRUNGE PAPER
           </div>
         </div>
       `;
@@ -26026,7 +26225,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(88, 28, 135, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            ⚡ TENSION DECODE
+            \u26a1 TENSION DECODE
           </div>
         </div>
       `;
@@ -26055,7 +26254,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(239, 68, 68, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            ✂️ STICKER + TEXT BEHIND
+            \u2702\ufe0f STICKER + TEXT BEHIND
           </div>
         </div>
       `;
@@ -26079,7 +26278,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Vox Style Badge -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(217, 119, 6, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-            📜 VOX CREAM PAPER
+            \ud83d\udcdc VOX CREAM PAPER
           </div>
         </div>
       `;
@@ -26089,7 +26288,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <img src="${tpl.defaultImage}" alt="Film Burn Cut" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.4) contrast(1.25);" />
           <div id="fx-burn-flash-${tplId}" style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(225,29,72,0.85), rgba(253,224,71,0.7)); mix-blend-mode: screen; opacity: 0; pointer-events: none;"></div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(225, 29, 72, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            🔥 FILM BURN
+            \ud83d\udd25 FILM BURN
           </div>
         </div>
       `;
@@ -26101,7 +26300,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <img id="fx-fg-${tplId}" src="${tpl.defaultImage}" style="width: 80%; height: 80%; object-fit: cover; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.95); border: 1px solid rgba(255,255,255,0.25);" />
           </div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            📐 3D PARALLAX
+            \ud83d\udcd0 3D PARALLAX
           </div>
         </div>
       `;
@@ -26111,7 +26310,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <img id="fx-glitch-cyan-${tplId}" src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; mix-blend-mode: screen; filter: drop-shadow(-4px 0px 0px rgba(6,182,212,0.9)) hue-rotate(90deg);" />
           <img id="fx-glitch-red-${tplId}" src="${tpl.defaultImage}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; mix-blend-mode: screen; filter: drop-shadow(4px 0px 0px rgba(239,68,68,0.9)) hue-rotate(270deg);" />
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(6, 182, 212, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            ⚡ RGB GLITCH
+            \u26a1 RGB GLITCH
           </div>
         </div>
       `;
@@ -26204,14 +26403,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
             <!-- 3D Pop-Out Headline Badge Card -->
             <div id="fx-doc-popout-${tplId}" style="position: absolute; right: -8px; bottom: 12px; width: 55%; background: rgba(15,23,42,0.95); border: 1.5px solid #a855f7; border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); transform: translateZ(25px);">
-              <div style="font-size: 6px; font-weight: 800; color: #c084fc; font-family: monospace;">● 3D POP-OUT LAYER</div>
+              <div style="font-size: 6px; font-weight: 800; color: #c084fc; font-family: monospace;">\u25cf 3D POP-OUT LAYER</div>
               <div style="font-size: 8px; font-weight: 900; color: #ffffff; font-family: 'Cinzel', serif; margin-top: 2px;">THE ARCHITECT</div>
             </div>
           </div>
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #7e22ce, #a855f7); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
-            📰 3D DOCUMENT FX
+            \ud83d\udcf0 3D DOCUMENT FX
           </div>
         </div>
       `;
@@ -26331,13 +26530,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <!-- Bottom Live Ticker -->
           <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(9,9,11,0.95); border-top: 1px solid rgba(239,68,68,0.5); padding: 3px 8px; overflow: hidden; white-space: nowrap;">
             <span id="fx-countdown-ticker-${tplId}" style="font-family: monospace; font-size: 8px; color: #f87171; display: inline-block;">
-              $FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED
+              $FTT -94.2%  \u2022  $BTC $15,820 (-22.4%)  \u2022  BINANCE WITHDRAWALS PAUSED
             </span>
           </div>
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(239,68,68,0.5);">
-            ⏱️ COUNTDOWN FX
+            \u23f1\ufe0f COUNTDOWN FX
           </div>
         </div>
       `;
@@ -26368,7 +26567,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #a855f7); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            ⚡ FLASHBACK CUT
+            \u26a1 FLASHBACK CUT
           </div>
         </div>
       `;
@@ -26422,7 +26621,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #ec4899); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            ☀️ LENS LEAK &amp; RAYS
+            \u2600\ufe0f LENS LEAK &amp; RAYS
           </div>
         </div>
       `;
@@ -26442,7 +26641,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #1e293b); color: #38bdf8; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; border: 1px solid rgba(56,189,248,0.4); box-shadow: 0 4px 12px rgba(0,0,0,0.8);">
-            🎬 DEEP MONOCHROME
+            \ud83c\udfac DEEP MONOCHROME
           </div>
         </div>
       `;
@@ -26463,7 +26662,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #78350f); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            👁️ THRILLER VIGNETTE
+            \ud83d\udc41\ufe0f THRILLER VIGNETTE
           </div>
         </div>
       `;
@@ -26484,7 +26683,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #10b981, #064e3b); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);">
-            ⚡ TEXT DECODE FX
+            \u26a1 TEXT DECODE FX
           </div>
         </div>
       `;
@@ -26513,7 +26712,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #a855f7, #6b21a8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
-            ✨ DUAL GLOW FX
+            \u2728 DUAL GLOW FX
           </div>
         </div>
       `;
@@ -26543,7 +26742,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #6366f1, #3730a3); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(99,102,241,0.5);">
-            🎥 3D CAMERA TRACK
+            \ud83c\udfa5 3D CAMERA TRACK
           </div>
         </div>
       `;
@@ -26571,7 +26770,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                     J-CUT VOICEOVER PRE-LAP (-1.4s)
                   </span>
                   <span id="fx-jl-wave-${tplId}" style="color: #22d3ee; font-size: 11px; letter-spacing: 2px; filter: drop-shadow(0 0 6px #06b6d4);">
-                     ▂▃▅▆▇▆▅▃ 
+                     \u2582\u2583\u2585\u2586\u2587\u2586\u2585\u2583 
                   </span>
                 </div>
               </div>
@@ -26588,7 +26787,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #06b6d4, #0e7490); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(6,182,212,0.5);">
-            🎧 J-CUT &amp; L-CUT PACING
+            \ud83c\udfa7 J-CUT &amp; L-CUT PACING
           </div>
         </div>
       `;
@@ -26606,7 +26805,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <!-- Oscilloscope Frequency Arc -->
           <div style="position: relative; z-index: 10; text-align: center; padding: 12px;">
             <div id="fx-subbass-pitch-meter-${tplId}" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #fb7185; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">
-              PITCH RISER: 1.2 kHz ▲
+              PITCH RISER: 1.2 kHz \u25b2
             </div>
             <div id="fx-subbass-title-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 15px rgba(244,63,94,0.6);">
               ATTENTION RESET
@@ -26620,7 +26819,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f43f5e, #be123c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(244,63,94,0.5);">
-            🔊 SUB-BASS DROP
+            \ud83d\udd0a SUB-BASS DROP
           </div>
         </div>
       `;
@@ -26653,7 +26852,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(217,119,6,0.9)); border: 1px solid #fde68a; color: #fff; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.4);">
-            ✨ OG PARALLAX
+            \u2728 OG PARALLAX
           </div>
         </div>
       `;
@@ -26715,7 +26914,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
           <!-- Badge tag -->
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
-            🎯 CC VIGNETTE + DOF
+            \ud83c\udfaf CC VIGNETTE + DOF
           </div>
         </div>
       `;
@@ -26739,7 +26938,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 8.5px; font-weight: 900; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            ✨ GLOW &amp; POP
+            \u2728 GLOW &amp; POP
           </div>
         </div>
       `;
@@ -26788,7 +26987,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #e11d48, #9f1239); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(225,29,72,0.5);">
-            👤 NOIR SILHOUETTE
+            \ud83d\udc64 NOIR SILHOUETTE
           </div>
         </div>
       `;
@@ -26821,7 +27020,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #818cf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
-            🔮 BLEND MODES
+            \ud83d\udd2e BLEND MODES
           </div>
         </div>
       `;
@@ -26866,7 +27065,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(2,132,199,0.5);">
-            📐 BLUEPRINT &amp; PAPER
+            \ud83d\udcd0 BLUEPRINT &amp; PAPER
           </div>
         </div>
       `;
@@ -26893,7 +27092,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #9333ea, #7c3aed); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(147,51,234,0.5);">
-            ✒️ INK REVEAL
+            \u2712\ufe0f INK REVEAL
           </div>
         </div>
       `;
@@ -26941,7 +27140,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #d97706, #b45309); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(217,119,6,0.5);">
-            📰 TEXT HIGHLIGHT
+            \ud83d\udcf0 TEXT HIGHLIGHT
           </div>
         </div>
       `;
@@ -26975,13 +27174,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
             <div style="margin-top: 4px;">
               <span id="fx-vfx-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #fda4af;">
-                DUST • FLARE • FIRE • GRAIN
+                DUST \u2022 FLARE \u2022 FIRE \u2022 GRAIN
               </span>
             </div>
           </div>
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #e11d48, #be123c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(225,29,72,0.5);">
-            🔥 PARTICLE &amp; VFX
+            \ud83d\udd25 PARTICLE &amp; VFX
           </div>
         </div>
       `;
@@ -26991,7 +27190,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <img id="fx-anim-zoom-img-${tplId}" src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.08s ease; transform-origin: 50% 35%;" />
           <div style="position: absolute; inset: 0; border: 2px solid rgba(168,85,247,0.5); pointer-events: none;"></div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #8b5cf6; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(139,92,246,0.6);">
-            🔍 PUNCH ZOOM 2.2X
+            \ud83d\udd0d PUNCH ZOOM 2.2X
           </div>
         </div>
       `;
@@ -27003,7 +27202,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <img id="fx-anim-loupe-inner-${tplId}" src="${tpl.defaultImage}" style="width: 240%; height: 240%; object-fit: cover; position: absolute; transform: scale(1.8);" />
           </div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #06b6d4; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(6,182,212,0.6);">
-            🔎 LOUPE CALLOUT
+            \ud83d\udd0e LOUPE CALLOUT
           </div>
         </div>
       `;
@@ -27029,7 +27228,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover; margin-top: -12%;" />
           </div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #0284c7; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
-            ⬜ WHITEOUT FOCUS
+            \u2b1c WHITEOUT FOCUS
           </div>
         </div>
       `;
@@ -27039,7 +27238,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <img src="${tpl.defaultImage}" style="width: 100%; height: 100%; object-fit: cover;" />
           <div id="fx-anim-spotlight-${tplId}" style="position: absolute; width: 130px; height: 130px; border-radius: 50%; box-shadow: 0 0 0 9999px rgba(0,0,0,0.85); pointer-events: none; border: 1px solid rgba(168,85,247,0.6);"></div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #9333ea; color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
-            🔦 DARK SPOTLIGHT
+            \ud83d\udd26 DARK SPOTLIGHT
           </div>
         </div>
       `;
@@ -27051,7 +27250,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div id="fx-anim-hl-bar-${tplId}" style="height: 100%; background: rgba(254, 240, 138, 0.9); mix-blend-mode: multiply; border-radius: 4px; width: 0%; box-shadow: 0 0 10px rgba(254, 240, 138, 0.8);"></div>
           </div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: #eab308; color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30;">
-            🖍️ HIGHLIGHTER SWEEP
+            \ud83d\udd8d\ufe0f HIGHLIGHTER SWEEP
           </div>
         </div>
       `;
@@ -27639,7 +27838,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         rigEl.style.transform = `translateZ(${trackZ}px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
       }
     } else if (tplId === 'audio-visual-jl-cuts') {
-      const waves = [' ▂▃▅▆▇▆▅▃ ', '▂▃▅▇█▇▅▃▂ ', '▃▅▇███▇▅▃ ', '▅▇█████▇▅ ', '▃▅▇███▇▅▃ '];
+      const waves = [' \u2582\u2583\u2585\u2586\u2587\u2586\u2585\u2583 ', '\u2582\u2583\u2585\u2587\u2588\u2587\u2585\u2583\u2582 ', '\u2583\u2585\u2587\u2588\u2588\u2588\u2587\u2585\u2583 ', '\u2585\u2587\u2588\u2588\u2588\u2588\u2588\u2587\u2585 ', '\u2583\u2585\u2587\u2588\u2588\u2588\u2587\u2585\u2583 '];
       const waveIndex = Math.floor((t * 8) % waves.length);
       const waveEl = fxContainer?.querySelector(`#fx-jl-wave-${tplId}`);
       if (waveEl) {
@@ -27657,7 +27856,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         // Riser build-up phase (0.0s to 2.2s)
         const progress = cycleTime / 2.2;
         const currentHz = Math.floor(120 + progress * 1080);
-        if (pitchEl) pitchEl.textContent = `PITCH RISER: ${currentHz} Hz ▲`;
+        if (pitchEl) pitchEl.textContent = `PITCH RISER: ${currentHz} Hz \u25b2`;
         if (flashEl) flashEl.style.opacity = '0';
         if (shockwave) {
           shockwave.style.opacity = '0';
@@ -27668,7 +27867,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       } else {
         // Sub-bass impact & camera cut reset phase (2.2s to 3.0s)
         const impactProg = (cycleTime - 2.2) / 0.8;
-        if (pitchEl) pitchEl.textContent = `28 Hz SUB IMPACT ▼`;
+        if (pitchEl) pitchEl.textContent = `28 Hz SUB IMPACT \u25bc`;
         if (flashEl) flashEl.style.opacity = impactProg < 0.25 ? '0.85' : '0';
         if (shockwave) {
           shockwave.style.opacity = (1 - impactProg).toFixed(2);
@@ -28648,7 +28847,7 @@ function syncTopTemplateTypographyUI() {
 }
 
 // Reusable Matrix Digital Rain Frame Renderer for both preview modal and main studio canvas
-const MATRIX_GLYPHS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ日10ｦｱｳｴｵｶｷｹｺｻｼｽｾｿﾀﾂﾃﾅﾆﾇﾈﾊﾋﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾜ";
+const MATRIX_GLYPHS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ\uff8a\uff90\uff8b\uff70\uff73\uff7c\uff85\uff93\uff86\uff7b\uff9c\uff82\uff75\uff98\uff71\uff8e\uff83\uff8f\uff79\uff92\uff74\uff76\uff77\uff91\uff95\uff97\uff7e\uff88\uff7d\uff80\uff87\uff8d\u65e510\uff66\uff71\uff73\uff74\uff75\uff76\uff77\uff79\uff7a\uff7b\uff7c\uff7d\uff7e\uff7f\uff80\uff82\uff83\uff85\uff86\uff87\uff88\uff8a\uff8b\uff8e\uff8f\uff90\uff91\uff92\uff93\uff94\uff95\uff97\uff98\uff9c";
 function renderMatrixRainCanvasFrame(ctx, width, height, state, dt) {
   if (!ctx || !width || !height) return;
   const fontSize = Math.max(10, state.matrixRainDensity || 16);
@@ -29083,13 +29282,13 @@ function openTopTemplateCustomizer(tpl) {
   const btnTrace = document.getElementById('btn-tpl-modal-edit-cutout');
   if (btnTrace) {
     if (tpl.id === 'doc-highlighter-loupe-suite') {
-      btnTrace.innerHTML = '<span>🖍️</span> Select Text';
+      btnTrace.innerHTML = '<span>\ud83d\udd8d\ufe0f</span> Select Text';
       btnTrace.title = 'Draw or click to select text sentence on the document';
       btnTrace.style.background = 'rgba(250, 204, 21, 0.15)';
       btnTrace.style.borderColor = 'rgba(250, 204, 21, 0.4)';
       btnTrace.style.color = '#fef08a';
     } else {
-      btnTrace.innerHTML = '<span>✂</span> Trace';
+      btnTrace.innerHTML = '<span>\u2702</span> Trace';
       btnTrace.title = 'Interactive Cutout & Silhouette Tracer';
       btnTrace.style.background = 'rgba(56, 189, 248, 0.12)';
       btnTrace.style.borderColor = 'rgba(56, 189, 248, 0.35)';
@@ -29188,7 +29387,7 @@ function openTopTemplateCustomizer(tpl) {
     const slPara = document.getElementById('sigil-slider-parallax');
     const valPara = document.getElementById('sigil-val-parallax');
     if (slPara) slPara.value = topCustomizerState.sigilParallax !== undefined ? topCustomizerState.sigilParallax : 18;
-    if (valPara) valPara.textContent = `±${slPara ? slPara.value : 18} px`;
+    if (valPara) valPara.textContent = `\u00b1${slPara ? slPara.value : 18} px`;
 
     const slPulse = document.getElementById('sigil-slider-pulse');
     const valPulse = document.getElementById('sigil-val-pulse');
@@ -29255,7 +29454,7 @@ function openTopTemplateCustomizer(tpl) {
 
       slPara?.addEventListener('input', (e) => {
         topCustomizerState.sigilParallax = parseInt(e.target.value);
-        if (valPara) valPara.textContent = `±${e.target.value} px`;
+        if (valPara) valPara.textContent = `\u00b1${e.target.value} px`;
       });
 
       slPulse?.addEventListener('input', (e) => {
@@ -29349,7 +29548,7 @@ function openTopTemplateCustomizer(tpl) {
             if (liveEl && liveEl.tagName === 'IMG') liveEl.src = transparentDataUrl;
 
             renderTopTemplatePreviewStage();
-            showTextTimingAlert(`✂ Background removed from ${layerName}!`, 'success');
+            showTextTimingAlert(`\u2702 Background removed from ${layerName}!`, 'success');
             setTimeout(() => showTextTimingAlert(''), 2500);
           } catch (err) {
             console.error('Key BG error:', err);
@@ -29571,30 +29770,30 @@ function openTopTemplateCustomizer(tpl) {
     if (colorTitle) colorTitle.value = topCustomizerState.titleColor;
     topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'magnates-paper-vector-cutout') {
-    if (labelPrim) labelPrim.textContent = '👤 Isolated Cutout / Sticker Subject';
-    if (labelSec) labelSec.textContent = '🌆 Background Atmosphere Scene';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udc64 Isolated Cutout / Sticker Subject';
+    if (labelSec) labelSec.textContent = '\ud83c\udf06 Background Atmosphere Scene';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.mainText = 'MAGNATES';
     topCustomizerState.subText = 'SCANDAL';
     topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'text-texturing-grunge') {
-    if (labelPrim) labelPrim.textContent = '📜 Vintage Paper / Grunge Texture Backdrop';
-    if (labelSec) labelSec.textContent = '🎬 Secondary Accent / Overlay';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcdc Vintage Paper / Grunge Texture Backdrop';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Accent / Overlay';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'POWER & GREED';
     topCustomizerState.subText = 'CHAPTER IV: THE MANIPULATION';
     topCustomizerState.textColor = '#c084fc';
   } else if (tpl.id === 'kinetic-decode-typewriter') {
-    if (labelPrim) labelPrim.textContent = '💻 Matrix Code / Cyber Grid Texture';
-    if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcbb Matrix Code / Cyber Grid Texture';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE ILLUSION OF CHOICE';
     topCustomizerState.subText = '[ HIGH TENSION REVEAL ]';
     topCustomizerState.textColor = '#00f0ff';
   } else if (tpl.id === 'doc-highlighter-loupe-suite') {
-    if (labelPrim) labelPrim.textContent = '📄 Forbes Article Document (HD Vector)';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcc4 Forbes Article Document (HD Vector)';
     if (wrapSec) wrapSec.style.display = 'none';
     const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
     if (aiEngineWrap) aiEngineWrap.style.display = 'none';
@@ -29649,94 +29848,94 @@ function openTopTemplateCustomizer(tpl) {
       }
     ];
   } else if (tpl.id === 'vox-newspaper-cream-dossier') {
-    if (labelPrim) labelPrim.textContent = '📰 Archival Document / Newspaper Asset';
-    if (labelSec) labelSec.textContent = '🎬 Supporting Background Footage';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcf0 Archival Document / Newspaper Asset';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Supporting Background Footage';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'CONFIDENTIAL DOSSIER';
     topCustomizerState.subText = 'CLASSIFIED INTELLIGENCE REPORT';
     topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'vintage-film-burn') {
-    if (labelPrim) labelPrim.textContent = '🎬 Vintage Scene Clip';
+    if (labelPrim) labelPrim.textContent = '\ud83c\udfac Vintage Scene Clip';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE GATE FLASH';
     topCustomizerState.subText = 'ANALOG FILM TRANSITION';
     topCustomizerState.textColor = '#f59e0b';
   } else if (tpl.id === 'parallax-zoom') {
-    if (labelPrim) labelPrim.textContent = '👤 Floating Foreground Plate';
-    if (labelSec) labelSec.textContent = '🌆 Deep Parallax Background';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udc64 Floating Foreground Plate';
+    if (labelSec) labelSec.textContent = '\ud83c\udf06 Deep Parallax Background';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'BEYOND HORIZONS';
     topCustomizerState.subText = '3D DEPTH PERSPECTIVE';
     topCustomizerState.textColor = '#c084fc';
   } else if (tpl.id === 'cyber-glitch-pass') {
-    if (labelPrim) labelPrim.textContent = '⚡ Target Footage Clip';
+    if (labelPrim) labelPrim.textContent = '\u26a1 Target Footage Clip';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'SIGNAL OVERRIDE';
     topCustomizerState.subText = 'RGB CHROMATIC ABERRATION';
     topCustomizerState.textColor = '#00f0ff';
   } else if (tpl.id === 'anim-punch-zoom') {
-    if (labelPrim) labelPrim.textContent = '🔍 Target Focus Image / Document';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udd0d Target Focus Image / Document';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'SMOKING GUN';
     topCustomizerState.subText = 'DYNAMIC PUNCH ZOOM 2.2X';
     topCustomizerState.textColor = '#c084fc';
   } else if (tpl.id === 'anim-loupe-callout') {
-    if (labelPrim) labelPrim.textContent = '🔎 Document / Evidence Asset';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udd0e Document / Evidence Asset';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'FORENSIC CALLOUT';
     topCustomizerState.subText = 'MAGNIFIED EVIDENCE LOUPE';
     topCustomizerState.textColor = '#00f0ff';
   } else if (tpl.id === 'anim-whiteout-fade') {
-    if (labelPrim) labelPrim.textContent = '📄 Newspaper / Article Scan';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcc4 Newspaper / Article Scan';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE CONTRADICTION';
     topCustomizerState.subText = 'WHITEOUT FADE ISOLATION';
     topCustomizerState.textColor = '#0284c7';
   } else if (tpl.id === 'anim-dark-spotlight') {
-    if (labelPrim) labelPrim.textContent = '🔦 Subject Image / Scene';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udd26 Subject Image / Scene';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'FOCAL TARGET';
     topCustomizerState.subText = 'CINEMATIC DARK SPOTLIGHT';
     topCustomizerState.textColor = '#c084fc';
   } else if (tpl.id === 'anim-animated-highlighter') {
-    if (labelPrim) labelPrim.textContent = '📜 Document Text Scan';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcdc Document Text Scan';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'VITAL EVIDENCE';
     topCustomizerState.subText = 'ANIMATED MARKER SWEEP';
     topCustomizerState.textColor = '#facc15';
   } else if (tpl.id === 'spotlight-lens-sweep') {
-    if (labelPrim) labelPrim.textContent = '🔦 Target Portrait / Asset';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udd26 Target Portrait / Asset';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE INQUISITION';
     topCustomizerState.subText = 'WARM SPOTLIGHT SWEEP';
     topCustomizerState.textColor = '#f59e0b';
   } else if (tpl.id === 'financial-graph-wipe') {
-    if (labelPrim) labelPrim.textContent = '📈 Market Footage Asset';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcc8 Market Footage Asset';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'MARKET CRASH';
     topCustomizerState.subText = 'GROWTH GRAPH WIPE';
     topCustomizerState.textColor = '#00ff41';
   } else if (tpl.id === 'archival-ink-highlight') {
-    if (labelPrim) labelPrim.textContent = '📰 Historic Paper Article';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcf0 Historic Paper Article';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'EXPOSED BY AUDIT';
     topCustomizerState.subText = 'ARCHIVAL INK HIGHLIGHT';
     topCustomizerState.textColor = '#fbbf24';
   } else if (tpl.id === 'directional-push-split-wipe') {
-    if (labelPrim) labelPrim.textContent = '🎬 Outgoing Scene (Clip A: Pushed Out)';
-    if (labelSec) labelSec.textContent = '🎬 Incoming Scene (Clip B: Pulled from -Z)';
+    if (labelPrim) labelPrim.textContent = '\ud83c\udfac Outgoing Scene (Clip A: Pushed Out)';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Incoming Scene (Clip B: Pulled from -Z)';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'NEXT CHAPTER';
@@ -29758,8 +29957,8 @@ function openTopTemplateCustomizer(tpl) {
     if (topCustomizerState.pushSfxStretch === undefined) topCustomizerState.pushSfxStretch = 135;
     if (topCustomizerState.pushSfxVol === undefined) topCustomizerState.pushSfxVol = 80;
   } else if (tpl.id === 'paper-rip-shred') {
-    if (labelPrim) labelPrim.textContent = '📰 Top Paper Tear Layer';
-    if (labelSec) labelSec.textContent = '🎬 Revealed Clip / Footage';
+    if (labelPrim) labelPrim.textContent = '\ud83d\udcf0 Top Paper Tear Layer';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Revealed Clip / Footage';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'BREAKING REVEAL';
@@ -29767,7 +29966,7 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.textColor = '#facc15';
   } else if (tpl.id === 'gold-frame-spin') {
     if (wrapPrim) wrapPrim.style.display = 'flex';
-    if (labelPrim) labelPrim.textContent = '🖼️ Framed Artwork / Image';
+    if (labelPrim) labelPrim.textContent = '\ud83d\uddbc\ufe0f Framed Artwork / Image';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE MASTERPIECE';
@@ -29776,7 +29975,7 @@ function openTopTemplateCustomizer(tpl) {
   } else if (tpl.id === 'film-grain') {
     if (wrapPrim) wrapPrim.style.display = 'none';
     if (wrapSec) wrapSec.style.display = 'flex';
-    if (labelSec) labelSec.textContent = '🎬 Base Footage / Scene Asset';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Base Footage / Scene Asset';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = '35MM FILM OVERLAY';
     topCustomizerState.subText = 'CINEMATIC TEXTURE';
@@ -29786,23 +29985,23 @@ function openTopTemplateCustomizer(tpl) {
     if (wrapSec) wrapSec.style.display = 'flex';
 
     if (tpl.id === 'parallax') {
-      if (labelPrim) labelPrim.textContent = '👤 Cutout Foreground / Silhouette';
-      if (labelSec) labelSec.textContent = '🌄 Mountain Horizon & Sky Backdrop';
+      if (labelPrim) labelPrim.textContent = '\ud83d\udc64 Cutout Foreground / Silhouette';
+      if (labelSec) labelSec.textContent = '\ud83c\udf04 Mountain Horizon & Sky Backdrop';
     } else if (tpl.id === 'wealth') {
-      if (labelPrim) labelPrim.textContent = '📊 Comparison Chart Graphic Layer';
-      if (labelSec) labelSec.textContent = '🏙️ Financial District Backdrop';
+      if (labelPrim) labelPrim.textContent = '\ud83d\udcca Comparison Chart Graphic Layer';
+      if (labelSec) labelSec.textContent = '\ud83c\udfd9\ufe0f Financial District Backdrop';
     } else if (tpl.id === 'ticker') {
-      if (labelPrim) labelPrim.textContent = '📈 Market Ticker Data Overlay';
-      if (labelSec) labelSec.textContent = '🌐 Live Trading Floor Backdrop';
+      if (labelPrim) labelPrim.textContent = '\ud83d\udcc8 Market Ticker Data Overlay';
+      if (labelSec) labelSec.textContent = '\ud83c\udf10 Live Trading Floor Backdrop';
     } else if (tpl.id === 'textbehind') {
-      if (labelPrim) labelPrim.textContent = '👤 Front Cutout Subject';
-      if (labelSec) labelSec.textContent = '🌆 Deep Background Plate';
+      if (labelPrim) labelPrim.textContent = '\ud83d\udc64 Front Cutout Subject';
+      if (labelSec) labelSec.textContent = '\ud83c\udf06 Deep Background Plate';
     } else if (tpl.id === 'split') {
-      if (labelPrim) labelPrim.textContent = '👤 Left Side Subject Asset';
-      if (labelSec) labelSec.textContent = '👤 Right Side Subject Asset';
+      if (labelPrim) labelPrim.textContent = '\ud83d\udc64 Left Side Subject Asset';
+      if (labelSec) labelSec.textContent = '\ud83d\udc64 Right Side Subject Asset';
     } else {
-      if (labelPrim) labelPrim.textContent = '🖼️ Primary Graphic / Cutout Layer';
-      if (labelSec) labelSec.textContent = '🎬 Background Scene Asset';
+      if (labelPrim) labelPrim.textContent = '\ud83d\uddbc\ufe0f Primary Graphic / Cutout Layer';
+      if (labelSec) labelSec.textContent = '\ud83c\udfac Background Scene Asset';
     }
 
     if (primaryThumb && topCustomizerState.primaryUrl) primaryThumb.src = topCustomizerState.primaryUrl;
@@ -29814,8 +30013,8 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.textColor = '#8b5cf6';
   } else {
     if (wrapPrim) wrapPrim.style.display = 'flex';
-    if (labelPrim) labelPrim.textContent = '🖼️ Primary Subject / Asset';
-    if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
+    if (labelPrim) labelPrim.textContent = '\ud83d\uddbc\ufe0f Primary Subject / Asset';
+    if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = tpl.title.split('&')[0].trim();
@@ -29880,18 +30079,18 @@ function openTopTemplateCustomizer(tpl) {
       const vFg = document.getElementById('tpl-modal-val-spooner-fg-zoom');
       if (sFg) sFg.value = Math.round((topCustomizerState.spoonerFgZoom || 1.20) * 100);
       const fgDirNow = topCustomizerState.spoonerFgDir || 'push';
-      if (vFg) vFg.textContent = fgDirNow === 'push' ? `100% → ${sFg ? sFg.value : 120}%` : fgDirNow === 'pull' ? `${sFg ? sFg.value : 120}% → 100%` : `Drift (100%)`;
+      if (vFg) vFg.textContent = fgDirNow === 'push' ? `100% \u2192 ${sFg ? sFg.value : 120}%` : fgDirNow === 'pull' ? `${sFg ? sFg.value : 120}% \u2192 100%` : `Drift (100%)`;
 
       const sBg = document.getElementById('tpl-modal-slider-spooner-bg-zoom');
       const vBg = document.getElementById('tpl-modal-val-spooner-bg-zoom');
       if (sBg) sBg.value = Math.round((topCustomizerState.spoonerBgZoom || 1.06) * 100);
       const bgDirNow = topCustomizerState.spoonerBgDir || 'pull';
-      if (vBg) vBg.textContent = bgDirNow === 'push' ? `100% → ${sBg ? sBg.value : 106}%` : bgDirNow === 'pull' ? `${sBg ? sBg.value : 106}% → 100%` : `Drift (100%)`;
+      if (vBg) vBg.textContent = bgDirNow === 'push' ? `100% \u2192 ${sBg ? sBg.value : 106}%` : bgDirNow === 'pull' ? `${sBg ? sBg.value : 106}% \u2192 100%` : `Drift (100%)`;
 
       const sPan = document.getElementById('tpl-modal-slider-spooner-pan');
       const vPan = document.getElementById('tpl-modal-val-spooner-pan');
       if (sPan) sPan.value = topCustomizerState.spoonerPan ?? 14;
-      if (vPan) vPan.textContent = `±${topCustomizerState.spoonerPan ?? 14} px`;
+      if (vPan) vPan.textContent = `\u00b1${topCustomizerState.spoonerPan ?? 14} px`;
 
       const sBlur = document.getElementById('tpl-modal-slider-spooner-blur');
       const vBlur = document.getElementById('tpl-modal-val-spooner-blur');
@@ -29944,7 +30143,7 @@ function openTopTemplateCustomizer(tpl) {
       const vZDepth = document.getElementById('tpl-modal-val-push-zdepth');
       const zVal = topCustomizerState.pushZDepth ?? 18;
       if (sZDepth) sZDepth.value = zVal;
-      if (vZDepth) vZDepth.textContent = zVal === 0 ? '0 Z (Flat 2D)' : `-${Math.round(zVal * 12)} Z (${100 - zVal}% → 100%)`;
+      if (vZDepth) vZDepth.textContent = zVal === 0 ? '0 Z (Flat 2D)' : `-${Math.round(zVal * 12)} Z (${100 - zVal}% \u2192 100%)`;
 
       const sShadow = document.getElementById('tpl-modal-slider-push-shadow');
       const vShadow = document.getElementById('tpl-modal-val-push-shadow');
@@ -30045,7 +30244,7 @@ function openTopTemplateCustomizer(tpl) {
       const sliderAngle = document.getElementById('tpl-modal-slider-tear-angle');
       const valAngle = document.getElementById('tpl-modal-val-tear-angle');
       if (sliderAngle) sliderAngle.value = topCustomizerState.tearAngle ?? 135;
-      if (valAngle) valAngle.textContent = `${topCustomizerState.tearAngle ?? 135}° (${(topCustomizerState.tearAngle ?? 135) === 135 ? 'Diagonal' : (topCustomizerState.tearAngle ?? 135) === 90 ? 'Vertical' : (topCustomizerState.tearAngle ?? 135) === 0 ? 'Horizontal' : 'Custom'})`;
+      if (valAngle) valAngle.textContent = `${topCustomizerState.tearAngle ?? 135}\u00b0 (${(topCustomizerState.tearAngle ?? 135) === 135 ? 'Diagonal' : (topCustomizerState.tearAngle ?? 135) === 90 ? 'Vertical' : (topCustomizerState.tearAngle ?? 135) === 0 ? 'Horizontal' : 'Custom'})`;
 
       const sliderRoughness = document.getElementById('tpl-modal-slider-tear-roughness');
       const valRoughness = document.getElementById('tpl-modal-val-tear-roughness');
@@ -30199,7 +30398,7 @@ function syncTopTemplateDocHighlighterUI() {
                 `).join('')}
               </div>
             </div>
-            <button type="button" class="btn-tpl-modal-hl-del" data-index="${idx}" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px 4px;" title="Delete this highlight line">🗑</button>
+            <button type="button" class="btn-tpl-modal-hl-del" data-index="${idx}" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 11px; padding: 2px 4px;" title="Delete this highlight line">\ud83d\uddd1</button>
           </div>
         `;
       }).join('');
@@ -30377,7 +30576,7 @@ function syncTopTemplateDocHighlighterUI() {
   const slRot = document.getElementById('tpl-modal-slider-doc-rot');
   const valRot = document.getElementById('tpl-modal-val-doc-rot');
   if (slRot) slRot.value = Math.round(topCustomizerState.docRot || 0);
-  if (valRot) valRot.textContent = `${Math.round(topCustomizerState.docRot || 0)}°`;
+  if (valRot) valRot.textContent = `${Math.round(topCustomizerState.docRot || 0)}\u00b0`;
 
   const selEasing = document.getElementById('tpl-modal-select-doc-easing');
   if (selEasing) selEasing.value = topCustomizerState.docEasing || 'cubic';
@@ -30392,7 +30591,7 @@ function updateExtraCutoutsListUI() {
         <img src="${(topCustomizerState.bgRemoved && img.cutoutCanvas) ? img.cutoutCanvas.toDataURL() : img.url}" style="width: 24px; height: 24px; object-fit: contain; border-radius: 3px;" />
         <span style="color: #e0f2fe; font-weight: 600;">Cutout Layer #${idx + 2}</span>
       </div>
-      <button type="button" onclick="removeTopTemplateExtraCutout(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
+      <button type="button" onclick="removeTopTemplateExtraCutout(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">\u2715</button>
     </div>
   `).join('');
   initTplLayersContextMenu();
@@ -30514,7 +30713,7 @@ function updateExtraTextsListUI() {
     <div style="display: flex; align-items: center; gap: 6px; background: rgba(244,114,182,0.1); border: 1px solid rgba(244,114,182,0.3); border-radius: 6px; padding: 4px 8px;">
       <input type="text" value="${t.text}" oninput="updateTopTemplateExtraText(${idx}, this.value)" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 10px; font-weight: bold; outline: none;" />
       <input type="color" value="${t.color || '#38bdf8'}" onchange="updateTopTemplateExtraTextColor(${idx}, this.value)" style="width: 24px; height: 20px; background: transparent; border: none; cursor: pointer;" />
-      <button type="button" onclick="removeTopTemplateExtraText(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">✕</button>
+      <button type="button" onclick="removeTopTemplateExtraText(${idx})" style="background: none; border: none; color: #f87171; cursor: pointer; font-size: 12px; font-weight: bold;">\u2715</button>
     </div>
   `).join('');
 }
@@ -30607,7 +30806,7 @@ function closeTopTemplateCustomizer() {
     modalBox.style.width = '95vw';
     modalBox.style.height = '';
     if (btnFs) {
-      btnFs.innerHTML = '<span>⤢</span> Fullscreen';
+      btnFs.innerHTML = '<span>\u2922</span> Fullscreen';
       btnFs.style.borderColor = 'rgba(255,255,255,0.15)';
       btnFs.style.color = '#cbd5e1';
     }
@@ -30796,7 +30995,7 @@ function renderTopTemplatePreviewStage() {
                   <text x="720" y="58" text-anchor="middle" font-family="'Chomsky', 'Times New Roman', serif" font-size="64" font-weight="900" fill="#121212" letter-spacing="1">${topCustomizerState.customDocTitle || 'The New York Times'}</text>
                   <line x1="0" y1="80" x2="1440" y2="80" stroke="#121212" stroke-width="1.8" />
                   <line x1="0" y1="84" x2="1440" y2="84" stroke="#121212" stroke-width="0.8" />
-                  <text x="0" y="106" font-family="'Times New Roman', serif" font-size="15" fill="#555" font-style="italic">Late Edition • Vol. CLXXIV No. 60,320</text>
+                  <text x="0" y="106" font-family="'Times New Roman', serif" font-size="15" fill="#555" font-style="italic">Late Edition \u2022 Vol. CLXXIV No. 60,320</text>
                   <text x="720" y="106" text-anchor="middle" font-family="'Times New Roman', serif" font-size="15" fill="#333" font-weight="700">INVESTIGATIVE SPECIAL REPORT</text>
                   <text x="1440" y="106" text-anchor="end" font-family="'Times New Roman', serif" font-size="15" fill="#555">$3.00</text>
                   <line x1="0" y1="116" x2="1440" y2="116" stroke="#121212" stroke-width="1.8" />
@@ -30806,7 +31005,7 @@ function renderTopTemplatePreviewStage() {
                 <g transform="translate(240, 55)">
                   <text x="720" y="58" text-anchor="middle" font-family="'Times New Roman', 'Baskerville', serif" font-size="58" font-weight="900" fill="#0f172a" letter-spacing="3">${(topCustomizerState.customDocTitle || 'THE WALL STREET JOURNAL').toUpperCase()}</text>
                   <line x1="0" y1="78" x2="1440" y2="78" stroke="#0f172a" stroke-width="3" />
-                  <text x="0" y="104" font-family="'Inter', sans-serif" font-size="13" fill="#64748b" font-weight="700">BUSINESS & FINANCE • MARKETS</text>
+                  <text x="0" y="104" font-family="'Inter', sans-serif" font-size="13" fill="#64748b" font-weight="700">BUSINESS & FINANCE \u2022 MARKETS</text>
                   <text x="1440" y="104" text-anchor="end" font-family="'Inter', sans-serif" font-size="13" fill="#64748b">GLOBAL ARCHIVE</text>
                   <line x1="0" y1="115" x2="1440" y2="115" stroke="#cbd5e1" stroke-width="1.2" />
                 </g>
@@ -30988,7 +31187,7 @@ function renderTopTemplatePreviewStage() {
         </div>
         <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; display: flex; align-items: center; gap: 8px; z-index: 50;">
           <span style="font-size: 9.5px; font-weight: 700; color: #f8fafc; background: rgba(9,13,22,0.85); border: 1px solid rgba(255,255,255,0.18); padding: 3px 8px; border-radius: 4px; font-family: monospace; letter-spacing: 0.04em;">
-            NLE PUSH • -Z DEPTH PULL • SUB-DOOR SHADOW
+            NLE PUSH \u2022 -Z DEPTH PULL \u2022 SUB-DOOR SHADOW
           </span>
           <span id="push-hud-phase" style="font-size: 9.5px; color: #cbd5e1; background: rgba(9,13,22,0.75); border: 1px solid rgba(255,255,255,0.1); padding: 3px 7px; border-radius: 4px; font-family: monospace;">
             HOLD A
@@ -31522,7 +31721,7 @@ function updateTopCustomizerFrame(seqTime, now) {
       if (hudPhase) {
         const zCurrent = Math.round(-(1 - Math.min(1, progress)) * (topCustomizerState.pushZDepth ?? 18) * 12);
         const phaseLabel = rawCycle === 0 ? 'HOLD A' : rawCycle === 1 ? 'HOLD B' : `${Math.round(progress * 100)}% WIPE`;
-        hudPhase.textContent = `${phaseLabel} | ${zCurrent}Z → 0Z`;
+        hudPhase.textContent = `${phaseLabel} | ${zCurrent}Z \u2192 0Z`;
       }
       
       if (topCustomizerState.pushSfxEnabled !== false && topCustomizerState.isPlaying) {
@@ -32716,6 +32915,76 @@ transition: 'fly_through',
         duration: dur
       });
     }
+  } else if (tpl.id === 'headline-fly') {
+    const hData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('headline-fly') : {};
+    const bgUrl = sec || tpl.secondaryImage || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80';
+    const bgClip = {
+      id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Forensic_Investigation_Backdrop.jpg',
+      url: bgUrl,
+      file: { name: 'Forensic_Investigation_Backdrop.jpg', url: bgUrl, isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.15,
+      isBackgroundScene: true,
+      parallaxRig: 'bg',
+      parallaxLayer: 'background',
+      parallaxMotion: 'push',
+      parallaxDepth: 45,
+      blur: blur || 2,
+      zIndex: 10,
+      layerOrder: 'back'
+    };
+
+    const visibleIndices = [1, 2, 3, 4, 5].filter(i => hData[`card${i}Visible`] !== false);
+    const activeCards = visibleIndices.length ? visibleIndices : [5];
+    const generatedTextClips = [];
+    const staggerStep = Math.min(0.45, Math.max(0.18, ((Number(hData.staggerMs) || 260) / 1000)));
+
+    activeCards.forEach((idx, orderIdx) => {
+      const cStart = sceneStart + Math.min(dur * 0.65, orderIdx * staggerStep);
+      const cDur = Math.max(0.8, dur - (cStart - sceneStart));
+      const hlText = hData[`headline${idx}`] || (idx === 5 ? (mainText || 'TECH GIANT COLLAPSE: INTERNAL MEMOS REVEAL CHAOS') : `PRESS EXHIBIT #${idx}`);
+      const hlPhrase = hData[`highlight${idx}`] || (hlText.split(':')[0] || '');
+      const hlColor = hData[`hlColor${idx}`] || hData[`accentColor${idx}`] || '#fde047';
+      const srcLine = [hData[`source${idx}`], hData[`kicker${idx}`], hData[`date${idx}`]].filter(Boolean).join(' // ');
+
+      generatedTextClips.push({
+        id: `txt-hl-${idx}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        text: hlText,
+        highlight: hlPhrase,
+        highlightColor: hlColor,
+        anim: 'fly_through',
+        fontSize: idx === 5 ? 46 : 34,
+        fontFamily: hData[`fontFamily${idx}`] || "'Playfair Display', Georgia, serif",
+        zIndex: 25 + orderIdx * 2,
+        layerOrder: idx === 5 ? 'front' : 'middle',
+        start: Number(cStart.toFixed(2)),
+        duration: Number(cDur.toFixed(2)),
+        motionBlur: hData.motionBlur !== false,
+        tilt3D: Number(hData.tilt3d ?? 12)
+      });
+
+      if (idx === 5 && srcLine) {
+        generatedTextClips.push({
+          id: `txt-sub-${idx}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+          text: srcLine,
+          highlight: hData[`stamp${idx}`] || '',
+          highlightColor: hData[`accentColor${idx}`] || '#dc2626',
+          anim: 'fade',
+          fontSize: 19,
+          fontFamily: "'JetBrains Mono', monospace",
+          zIndex: 38,
+          layerOrder: 'front',
+          start: Number(Math.min(sceneStart + dur - 0.5, cStart + 0.15).toFixed(2)),
+          duration: Number(Math.max(0.6, cDur - 0.15).toFixed(2))
+        });
+      }
+    });
+
+    focusClip = bgClip;
+    imageClips = [bgClip];
+    textClips = generatedTextClips;
   } else {
     const baseClip = {
       id: `img-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -32965,7 +33234,7 @@ function setupModalCustomizerAudio() {
       window._customizerAudioTrack = { url, name: file.name, file };
       if (label) {
         const shortAudio = file.name.length > 16 ? file.name.substring(0, 14) + '...' : file.name;
-        label.textContent = `🎵 ${shortAudio}`;
+        label.textContent = `\ud83c\udfb5 ${shortAudio}`;
       }
       if (removeBtn) removeBtn.style.display = 'inline-block';
       showTextTimingAlert(`Attached audio: ${file.name}`, 'success');
@@ -33537,7 +33806,7 @@ function initDocDirectCanvasEditing() {
       tfBox.style.boxShadow = '0 0 14px rgba(239, 68, 68, 0.6)';
 
       if (badge) {
-        badge.textContent = `⬛ FORENSIC REDACTION (${(rw * 100).toFixed(0)}% COVERAGE)`;
+        badge.textContent = `\u2b1b FORENSIC REDACTION (${(rw * 100).toFixed(0)}% COVERAGE)`;
         badge.style.background = '#09090b';
         badge.style.color = '#ef4444';
         badge.style.border = '1px solid #ef4444';
@@ -33549,11 +33818,11 @@ function initDocDirectCanvasEditing() {
         toolbar.style.top = `${(ry * 100).toFixed(2)}%`;
         toolbar.style.borderColor = '#ef4444';
         if (lbl) {
-          lbl.textContent = `⬛ REDACT STRIP`;
+          lbl.textContent = `\u2b1b REDACT STRIP`;
           lbl.style.color = '#f87171';
         }
         if (btnRedact) {
-          btnRedact.textContent = `✨ Unredact`;
+          btnRedact.textContent = `\u2728 Unredact`;
           btnRedact.title = 'Convert censor strip back to editable highlight text';
           btnRedact.style.background = 'rgba(56, 189, 248, 0.2)';
           btnRedact.style.borderColor = '#38bdf8';
@@ -33568,7 +33837,7 @@ function initDocDirectCanvasEditing() {
     tfBox.style.boxShadow = '0 0 14px rgba(250,204,21,0.5)';
     if (toolbar) toolbar.style.borderColor = '#facc15';
     if (btnRedact) {
-      btnRedact.textContent = `⬛ Redact`;
+      btnRedact.textContent = `\u2b1b Redact`;
       btnRedact.title = 'Toggle between Highlight and Redact Bar';
       btnRedact.style.background = '#09090b';
       btnRedact.style.borderColor = 'rgba(255,255,255,0.25)';
@@ -33747,7 +34016,7 @@ function initDocDirectCanvasEditing() {
           if (toolbar) toolbar.style.left = `${((rx + newW / 2) * 100).toFixed(2)}%`;
 
           const badge = document.getElementById('doc-tf-badge');
-          if (badge) badge.textContent = `⬛ FORENSIC REDACTION (${(newW * 100).toFixed(0)}% COVERAGE)`;
+          if (badge) badge.textContent = `\u2b1b FORENSIC REDACTION (${(newW * 100).toFixed(0)}% COVERAGE)`;
         };
 
         const onPointerUpRRedact = () => {
@@ -34377,7 +34646,7 @@ function initDocFullscreenToggle() {
       modalBox.style.maxHeight = '98vh';
       modalBox.style.width = '99vw';
       modalBox.style.height = '98vh';
-      btnFs.innerHTML = '<span>⤡</span> Exit Fullscreen';
+      btnFs.innerHTML = '<span>\u2921</span> Exit Fullscreen';
       btnFs.style.borderColor = '#2effc6';
       btnFs.style.color = '#2effc6';
     } else {
@@ -34386,7 +34655,7 @@ function initDocFullscreenToggle() {
       modalBox.style.maxHeight = '94vh';
       modalBox.style.width = '95vw';
       modalBox.style.height = '';
-      btnFs.innerHTML = '<span>⤢</span> Fullscreen';
+      btnFs.innerHTML = '<span>\u2922</span> Fullscreen';
       btnFs.style.borderColor = 'rgba(255,255,255,0.15)';
       btnFs.style.color = '#cbd5e1';
     }
@@ -34652,7 +34921,7 @@ function initDocOcrVectorizeEvents() {
 
     showTextTimingAlert('Analyzing screenshot text geometry & converting to vector lines...', 'info');
     btnOcr.disabled = true;
-    btnOcr.textContent = '⏳ Processing OCR Geometry...';
+    btnOcr.textContent = '\u23f3 Processing OCR Geometry...';
 
     // Fast Canvas Horizontal Contrast-Scan to detect text line baselines
     const img = new Image();
@@ -34678,7 +34947,7 @@ function initDocOcrVectorizeEvents() {
 
       topCustomizerState.customDocLines = detectedLines;
       btnOcr.disabled = false;
-      btnOcr.textContent = '✓ 4K Vector Snapping Active';
+      btnOcr.textContent = '\u2713 4K Vector Snapping Active';
       btnOcr.style.background = '#15803d';
 
       const pill = document.getElementById('doc-ocr-status-pill');
@@ -34836,11 +35105,11 @@ function bindTopTemplateCustomizerEvents() {
       punchToolActive = !punchToolActive;
       if (punchToolActive) {
         punchBtn.className = 'w-full py-1.5 px-3 rounded text-[11px] font-semibold bg-rose-500/30 text-rose-300 border border-rose-500/50 hover:bg-rose-500/40 flex items-center justify-center gap-1.5 transition animate-pulse cursor-crosshair';
-        punchBtn.innerHTML = '<span>🎯</span><span>Tap Point on Stage to Punch Hole</span>';
+        punchBtn.innerHTML = '<span>\ud83c\udfaf</span><span>Tap Point on Stage to Punch Hole</span>';
         if (typeof showTextTimingAlert === 'function') showTextTimingAlert('Tap anywhere on the hiker cutout to punch out unmasked gaps', 'info');
       } else {
         punchBtn.className = 'w-full py-1.5 px-3 rounded text-[11px] font-semibold bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-slate-700/80 hover:border-cyan-500/40 flex items-center justify-center gap-1.5 transition';
-        punchBtn.innerHTML = '<span>🎯</span><span>Punch Gap / Tap Hole Tool</span>';
+        punchBtn.innerHTML = '<span>\ud83c\udfaf</span><span>Punch Gap / Tap Hole Tool</span>';
       }
     });
   }
@@ -35089,7 +35358,7 @@ function bindTopTemplateCustomizerEvents() {
     }
     topCustomizerState.isPlaying = play;
     const playBtn = document.getElementById('btn-tpl-modal-play-toggle');
-    if (playBtn) playBtn.textContent = topCustomizerState.isPlaying ? '❚❚ Pause' : '▶ Play';
+    if (playBtn) playBtn.textContent = topCustomizerState.isPlaying ? '\u275a\u275a Pause' : '\u25b6 Play';
 
     const iconPlay = document.getElementById('tpl-hud-icon-play');
     const iconPause = document.getElementById('tpl-hud-icon-pause');
@@ -35264,7 +35533,7 @@ function bindTopTemplateCustomizerEvents() {
     const label = document.getElementById('tpl-modal-label-text-visibility');
     const btn = document.getElementById('tpl-modal-btn-toggle-text-visibility');
     if (topCustomizerState.textVisible) {
-      if (icon) icon.textContent = '👁️';
+      if (icon) icon.textContent = '\ud83d\udc41\ufe0f';
       if (label) label.textContent = 'Visible';
       if (btn) {
         btn.style.background = 'rgba(255,255,255,0.06)';
@@ -35273,7 +35542,7 @@ function bindTopTemplateCustomizerEvents() {
       }
       showTextTimingAlert('Text visible on canvas', 'info');
     } else {
-      if (icon) icon.textContent = '🙈';
+      if (icon) icon.textContent = '\ud83d\ude48';
       if (label) label.textContent = 'Hidden';
       if (btn) {
         btn.style.background = 'rgba(239,68,68,0.14)';
@@ -35691,7 +35960,7 @@ function bindTopTemplateCustomizerEvents() {
     const val = parseInt(e.target.value, 10);
     topCustomizerState.pushZDepth = val;
     const lbl = document.getElementById('tpl-modal-val-push-zdepth');
-    if (lbl) lbl.textContent = val === 0 ? '0 Z (Flat 2D)' : `-${Math.round(val * 12)} Z (${100 - val}% → 100%)`;
+    if (lbl) lbl.textContent = val === 0 ? '0 Z (Flat 2D)' : `-${Math.round(val * 12)} Z (${100 - val}% \u2192 100%)`;
   });
 
   document.getElementById('tpl-modal-slider-push-shadow')?.addEventListener('input', (e) => {
@@ -35871,12 +36140,12 @@ function bindTopTemplateCustomizerEvents() {
     const sFg = document.getElementById('tpl-modal-slider-spooner-fg-zoom');
     const vFg = document.getElementById('tpl-modal-val-spooner-fg-zoom');
     const fgVal = sFg ? sFg.value : 120;
-    if (vFg) vFg.textContent = fgDir === 'push' ? `100% → ${fgVal}%` : fgDir === 'pull' ? `${fgVal}% → 100%` : `Drift (100%)`;
+    if (vFg) vFg.textContent = fgDir === 'push' ? `100% \u2192 ${fgVal}%` : fgDir === 'pull' ? `${fgVal}% \u2192 100%` : `Drift (100%)`;
 
     const sBg = document.getElementById('tpl-modal-slider-spooner-bg-zoom');
     const vBg = document.getElementById('tpl-modal-val-spooner-bg-zoom');
     const bgVal = sBg ? sBg.value : 106;
-    if (vBg) vBg.textContent = bgDir === 'push' ? `100% → ${bgVal}%` : bgDir === 'pull' ? `${bgVal}% → 100%` : `Drift (100%)`;
+    if (vBg) vBg.textContent = bgDir === 'push' ? `100% \u2192 ${bgVal}%` : bgDir === 'pull' ? `${bgVal}% \u2192 100%` : `Drift (100%)`;
   };
 
   // Wire up Foreground Individual Direction Buttons
@@ -35932,7 +36201,7 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.spoonerFgZoom = val / 100;
     const vFg = document.getElementById('tpl-modal-val-spooner-fg-zoom');
     const isPush = (topCustomizerState.spoonerDir !== 'pull');
-    if (vFg) vFg.textContent = isPush ? `100% → ${val}%` : `${val}% → 100%`;
+    if (vFg) vFg.textContent = isPush ? `100% \u2192 ${val}%` : `${val}% \u2192 100%`;
   });
 
   document.getElementById('tpl-modal-slider-spooner-bg-zoom')?.addEventListener('input', (e) => {
@@ -35940,14 +36209,14 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.spoonerBgZoom = val / 100;
     const vBg = document.getElementById('tpl-modal-val-spooner-bg-zoom');
     const isPush = (topCustomizerState.spoonerDir !== 'pull');
-    if (vBg) vBg.textContent = isPush ? `${val}% → 100%` : `100% → ${val}%`;
+    if (vBg) vBg.textContent = isPush ? `${val}% \u2192 100%` : `100% \u2192 ${val}%`;
   });
 
   document.getElementById('tpl-modal-slider-spooner-pan')?.addEventListener('input', (e) => {
     const val = parseInt(e.target.value) || 0;
     topCustomizerState.spoonerPan = val;
     const vPan = document.getElementById('tpl-modal-val-spooner-pan');
-    if (vPan) vPan.textContent = `±${val} px`;
+    if (vPan) vPan.textContent = `\u00b1${val} px`;
   });
 
   document.getElementById('tpl-modal-slider-spooner-blur')?.addEventListener('input', (e) => {
@@ -36283,7 +36552,7 @@ function bindTopTemplateCustomizerEvents() {
     const slAngle = document.getElementById('tpl-modal-slider-tear-angle');
     const valAngle = document.getElementById('tpl-modal-val-tear-angle');
     if (slAngle) slAngle.value = p.angle;
-    if (valAngle) valAngle.textContent = `${p.angle}° (${p.angle === 135 ? 'Diagonal' : p.angle === 90 ? 'Vertical' : p.angle === 0 ? 'Horizontal' : 'Custom'})`;
+    if (valAngle) valAngle.textContent = `${p.angle}\u00b0 (${p.angle === 135 ? 'Diagonal' : p.angle === 90 ? 'Vertical' : p.angle === 0 ? 'Horizontal' : 'Custom'})`;
 
     const slRoughness = document.getElementById('tpl-modal-slider-tear-roughness');
     const valRoughness = document.getElementById('tpl-modal-val-tear-roughness');
@@ -36320,9 +36589,9 @@ function bindTopTemplateCustomizerEvents() {
     topCustomizerState.tearAngle = val;
     topCustomizerState.tearPreset = 'custom';
     const badge = document.getElementById('tpl-modal-tear-style-badge');
-    if (badge) badge.textContent = `Custom (${val}°)`;
+    if (badge) badge.textContent = `Custom (${val}\u00b0)`;
     const lbl = document.getElementById('tpl-modal-val-tear-angle');
-    if (lbl) lbl.textContent = `${val}°`;
+    if (lbl) lbl.textContent = `${val}\u00b0`;
   });
 
   document.getElementById('tpl-modal-slider-tear-roughness')?.addEventListener('input', (e) => {
@@ -36661,7 +36930,7 @@ function populateModalTemplatesSidebar() {
           ${isSelected ? `
             <!-- Purple check badge matching active pills on homepage -->
             <div style="position: absolute; top: 6px; right: 6px; width: 18px; height: 18px; border-radius: 50%; background: #8b5cf6; color: #fff; font-size: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(139, 92, 246, 0.8); z-index: 5;">
-              ✓
+              \u2713
             </div>
           ` : ''}
         </div>
@@ -36802,7 +37071,7 @@ function populateModalScenesStoryboard() {
           <div style="font-size: 10px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;">${sceneTpl ? (sceneTpl.title.split('(')[0].trim()) : 'Parallax'}</div>
         </div>
         ${projectScenes.length > 1 ? `
-          <button type="button" onclick="event.stopPropagation(); modalRemoveStoryboardScene(${idx})" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 4px; position: absolute; top: 2px; right: 3px; line-height: 1;" title="Remove Scene" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#64748b';">✕</button>
+          <button type="button" onclick="event.stopPropagation(); modalRemoveStoryboardScene(${idx})" style="background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; padding: 2px 4px; border-radius: 4px; position: absolute; top: 2px; right: 3px; line-height: 1;" title="Remove Scene" onmouseover="this.style.color='#ef4444';" onmouseout="this.style.color='#64748b';">\u2715</button>
         ` : ''}
       </div>
     `;
@@ -37209,7 +37478,7 @@ function renderSpatialLayerList() {
       <div style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8;">
         <span style="color: #c084fc; font-weight: 700;">Z: ${Math.round(mesh.position.z)}</span>
         <button type="button" class="btn-edit-spatial-layer" data-index="${index}" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #e9d5ff; border-radius: 5px; cursor: pointer; padding: 2px 7px; font-size: 10px; font-weight: 600;" title="Edit coordinates, text & color">Edit</button>
-        <button type="button" class="btn-remove-spatial-layer" data-index="${index}" style="background: transparent; border: none; color: #f43f5e; cursor: pointer; padding: 2px 5px; font-size: 12px;" title="Delete plane">✕</button>
+        <button type="button" class="btn-remove-spatial-layer" data-index="${index}" style="background: transparent; border: none; color: #f43f5e; cursor: pointer; padding: 2px 5px; font-size: 12px;" title="Delete plane">\u2715</button>
       </div>
     `;
     container.appendChild(div);
@@ -37386,7 +37655,7 @@ function updateSpatialHUDTelemetry() {
   if (hudY) hudY.textContent = camera.position.y.toFixed(1);
   if (hudZ) hudZ.textContent = camera.position.z.toFixed(1);
   if (hudVel) hudVel.textContent = `${camSpeed.toFixed(1)}x`;
-  if (hudFov) hudFov.textContent = `${Math.round(camera.fov)}°`;
+  if (hudFov) hudFov.textContent = `${Math.round(camera.fov)}\u00b0`;
 
   const telem = document.getElementById('spatial-cam-telemetry');
   if (telem) {
@@ -37626,7 +37895,7 @@ function bindSpatial3DModalControls() {
   document.getElementById('spatial-range-fovwarp')?.addEventListener('input', (e) => {
     spatial3DState.fovWarp = parseFloat(e.target.value);
     const lbl = document.getElementById('spatial-val-fovwarp');
-    if (lbl) lbl.textContent = `${spatial3DState.fovWarp}°`;
+    if (lbl) lbl.textContent = `${spatial3DState.fovWarp}\u00b0`;
     if (spatial3DState.camera) {
       spatial3DState.camera.fov = spatial3DState.fovWarp;
       spatial3DState.camera.updateProjectionMatrix();
@@ -37637,13 +37906,13 @@ function bindSpatial3DModalControls() {
   document.getElementById('spatial-range-pitch')?.addEventListener('input', (e) => {
     spatial3DState.camPitch = parseFloat(e.target.value);
     const lbl = document.getElementById('spatial-val-pitch');
-    if (lbl) lbl.textContent = `${spatial3DState.camPitch}°`;
+    if (lbl) lbl.textContent = `${spatial3DState.camPitch}\u00b0`;
   });
 
   document.getElementById('spatial-range-yaw')?.addEventListener('input', (e) => {
     spatial3DState.camYaw = parseFloat(e.target.value);
     const lbl = document.getElementById('spatial-val-yaw');
-    if (lbl) lbl.textContent = `${spatial3DState.camYaw}°`;
+    if (lbl) lbl.textContent = `${spatial3DState.camYaw}\u00b0`;
   });
 
   // Post FX Sliders
@@ -37695,11 +37964,11 @@ function bindSpatial3DModalControls() {
     const icon = document.getElementById('spatial-sfx-icon');
     const text = document.getElementById('spatial-sfx-text');
     if (spatial3DState.audioEnabled) {
-      if (icon) icon.textContent = '🔊';
+      if (icon) icon.textContent = '\ud83d\udd0a';
       if (text) text.textContent = 'SFX ON';
       triggerSpatialWhooshSound(); // Test feedback
     } else {
-      if (icon) icon.textContent = '🔈';
+      if (icon) icon.textContent = '\ud83d\udd08';
       if (text) text.textContent = 'SFX OFF';
     }
   });
@@ -37708,7 +37977,7 @@ function bindSpatial3DModalControls() {
   document.getElementById('btn-spatial-toggle-play')?.addEventListener('click', () => {
     spatial3DState.isPlaying = !spatial3DState.isPlaying;
     const btn = document.getElementById('btn-spatial-toggle-play');
-    if (btn) btn.textContent = spatial3DState.isPlaying ? '❚❚' : '▶';
+    if (btn) btn.textContent = spatial3DState.isPlaying ? '\u275a\u275a' : '\u25b6';
   });
 
   document.getElementById('btn-spatial-reset-path')?.addEventListener('click', () => {
@@ -37771,7 +38040,7 @@ function bindSpatial3DModalControls() {
     if (!nerdPanel) return;
     const isHidden = nerdPanel.style.display === 'none' || !nerdPanel.style.display;
     nerdPanel.style.display = isHidden ? 'flex' : 'none';
-    if (nerdChevron) nerdChevron.textContent = isHidden ? '▲' : '▼';
+    if (nerdChevron) nerdChevron.textContent = isHidden ? '\u25b2' : '\u25bc';
   });
 
   // Add Layer Modal open/close
@@ -37902,7 +38171,7 @@ let document3DFXState = {
   dragStartYaw: -20,
   header: "THE GLOBAL FINANCIAL GAZETTE",
   headline: "Uncovered Internal Files Reveal $4.2B Secret Market Algorithm Shift",
-  dateline: "NEW YORK — SPECIAL INVESTIGATION REPORT — OCT 8, 2026",
+  dateline: "NEW YORK \u2014 SPECIAL INVESTIGATION REPORT \u2014 OCT 8, 2026",
   body: "According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of the structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.",
   paperStyle: 'aged',
   highlightColor: '#facc15',
@@ -38336,7 +38605,7 @@ function startDocFXTimelineProgress(duration) {
     onComplete: () => {
       document3DFXState.isPlaying = false;
       const playIcon = document.getElementById('doc-play-icon');
-      if (playIcon) playIcon.textContent = '▶';
+      if (playIcon) playIcon.textContent = '\u25b6';
     }
   });
 }
@@ -38346,13 +38615,13 @@ function toggleDocFXTimelinePlay() {
   const playIcon = document.getElementById('doc-play-icon');
   
   if (document3DFXState.isPlaying) {
-    if (playIcon) playIcon.textContent = '❚❚';
+    if (playIcon) playIcon.textContent = '\u275a\u275a';
     if (document3DFXState.timelineProgress >= 1.0) {
       document3DFXState.timelineProgress = 0;
     }
     triggerDocFXPresetAnimation('janiFlyby');
   } else {
-    if (playIcon) playIcon.textContent = '▶';
+    if (playIcon) playIcon.textContent = '\u25b6';
     if (document3DFXState.animTween) {
       document3DFXState.animTween.pause();
     }
@@ -38366,7 +38635,7 @@ function resetDocFXTimeline() {
   document3DFXState.isPlaying = false;
   document3DFXState.timelineProgress = 0;
   const playIcon = document.getElementById('doc-play-icon');
-  if (playIcon) playIcon.textContent = '▶';
+  if (playIcon) playIcon.textContent = '\u25b6';
   updateDocFXTimelineUI();
 
   document3DFXState.pitch = 45;
@@ -38402,7 +38671,7 @@ function triggerDocFXPresetAnimation(presetType) {
   if (document3DFXState.animTween) document3DFXState.animTween.kill();
 
   const playIcon = document.getElementById('doc-play-icon');
-  if (playIcon) playIcon.textContent = '❚❚';
+  if (playIcon) playIcon.textContent = '\u275a\u275a';
   document3DFXState.isPlaying = true;
   document3DFXState.timelineProgress = 0;
   updateDocFXTimelineUI();
@@ -38535,9 +38804,9 @@ function syncDocFXInputs() {
   const dVal = document.getElementById('doc-val-dist');
   const parVal = document.getElementById('doc-val-parallax');
 
-  if (pVal) pVal.textContent = `${Math.round(document3DFXState.pitch)}°`;
-  if (yVal) yVal.textContent = `${Math.round(document3DFXState.yaw)}°`;
-  if (rVal) rVal.textContent = `${Math.round(document3DFXState.roll)}°`;
+  if (pVal) pVal.textContent = `${Math.round(document3DFXState.pitch)}\u00b0`;
+  if (yVal) yVal.textContent = `${Math.round(document3DFXState.yaw)}\u00b0`;
+  if (rVal) rVal.textContent = `${Math.round(document3DFXState.roll)}\u00b0`;
   if (dVal) dVal.textContent = Math.round(document3DFXState.dist);
   if (parVal) parVal.textContent = `${document3DFXState.parallax.toFixed(1)}x`;
 }
@@ -38559,13 +38828,13 @@ function loadDocFXArchetype(archKey) {
   if (archKey === 'wsj') {
     document3DFXState.header = "THE WALL STREET CHRONICLE";
     document3DFXState.headline = "Federal Oversight Panel Launches Inquiry Into Autonomous Trading Signals";
-    document3DFXState.dateline = "WASHINGTON — FINANCIAL REGULATION DESK — OCT 8, 2026";
+    document3DFXState.dateline = "WASHINGTON \u2014 FINANCIAL REGULATION DESK \u2014 OCT 8, 2026";
     document3DFXState.body = "Subcommittee members requested unredacted internal communications regarding algorithmic risk thresholds following an unusual concentration of market orders executed during non-standard hours.";
     document3DFXState.paperStyle = 'aged';
   } else if (archKey === 'cia') {
     document3DFXState.header = "TOP SECRET // CLASSIFIED INTELLIGENCE BRIEF";
     document3DFXState.headline = "SPECIAL AFFIDAVIT CONCERNING PROJECT AEGIS MEMORANDA";
-    document3DFXState.dateline = "LOCATION UNDISCLOSED — LEVEL 5 CLEARANCE REQUIRED";
+    document3DFXState.dateline = "LOCATION UNDISCLOSED \u2014 LEVEL 5 CLEARANCE REQUIRED";
     document3DFXState.body = "Witness testimony indicates that critical sensor logs were scrubbed prior to official archival submission. Surrounding personnel were instructed not to discuss anomalous telemetric readings recorded on June 14.";
     document3DFXState.paperStyle = 'stark';
     document3DFXState.enableRedaction = true;
@@ -38574,13 +38843,13 @@ function loadDocFXArchetype(archKey) {
   } else if (archKey === 'tech') {
     document3DFXState.header = "TECHCRUNCH DIGEST";
     document3DFXState.headline = "How Neural Renderer Engines Transformed Documentary Motion Graphics";
-    document3DFXState.dateline = "SAN FRANCISCO — MEDIA TECH — 2026 EDITION";
+    document3DFXState.dateline = "SAN FRANCISCO \u2014 MEDIA TECH \u2014 2026 EDITION";
     document3DFXState.body = "By projecting flat high-resolution document canvases onto real-time 3D web camera planes, video creators can synthesize cinematic Vox-style article flyovers directly inside web browsers.";
     document3DFXState.paperStyle = 'darkmode';
   } else if (archKey === 'legal') {
     document3DFXState.header = "IN THE UNITED STATES DISTRICT COURT";
     document3DFXState.headline = "PLAINTIFF'S MOTION FOR EMERGENCY INJUNCTIVE RELIEF";
-    document3DFXState.dateline = "CASE NO. 26-CV-8912 — EVIDENCE EXHIBIT B";
+    document3DFXState.dateline = "CASE NO. 26-CV-8912 \u2014 EVIDENCE EXHIBIT B";
     document3DFXState.body = "COMES NOW the Plaintiff, by and through counsel, and hereby submits this certified declaration setting forth irreparable harm arising from unauthorized intellectual property distribution.";
     document3DFXState.paperStyle = 'manuscript';
   }
@@ -38658,19 +38927,19 @@ function bindDocument3DFXModalControls() {
   document.getElementById('doc-range-pitch')?.addEventListener('input', (e) => {
     document3DFXState.pitch = parseFloat(e.target.value);
     const lbl = document.getElementById('doc-val-pitch');
-    if (lbl) lbl.textContent = `${Math.round(document3DFXState.pitch)}°`;
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.pitch)}\u00b0`;
     updateDocFXCameraTransform();
   });
   document.getElementById('doc-range-yaw')?.addEventListener('input', (e) => {
     document3DFXState.yaw = parseFloat(e.target.value);
     const lbl = document.getElementById('doc-val-yaw');
-    if (lbl) lbl.textContent = `${Math.round(document3DFXState.yaw)}°`;
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.yaw)}\u00b0`;
     updateDocFXCameraTransform();
   });
   document.getElementById('doc-range-roll')?.addEventListener('input', (e) => {
     document3DFXState.roll = parseFloat(e.target.value);
     const lbl = document.getElementById('doc-val-roll');
-    if (lbl) lbl.textContent = `${Math.round(document3DFXState.roll)}°`;
+    if (lbl) lbl.textContent = `${Math.round(document3DFXState.roll)}\u00b0`;
     updateDocFXCameraTransform();
   });
   document.getElementById('doc-range-dist')?.addEventListener('input', (e) => {
@@ -39143,7 +39412,7 @@ function renderJaniPuzzleGrid() {
           #0${i + 1}
         </div>
         <div style="position: relative; z-index: 10; text-align: center; padding: 2px;">
-          <div style="font-size: 14px; filter: drop-shadow(0 0 8px rgba(0,242,254,0.8));">🧩</div>
+          <div style="font-size: 14px; filter: drop-shadow(0 0 8px rgba(0,242,254,0.8));">\ud83e\udde9</div>
           <div style="font-size: 8.5px; font-family: 'JetBrains Mono', monospace; font-weight: 800; color: #f8fafc; text-transform: uppercase; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;">
             ${thumb.title}
           </div>
@@ -39152,7 +39421,7 @@ function renderJaniPuzzleGrid() {
     } else {
       piece.innerHTML = `
         <div style="position: absolute; top: 4px; left: 6px; font-size: 8.5px; font-family: monospace; color: rgba(0,242,254,0.8);">#0${i + 1}</div>
-        <div style="font-size: 20px; color: #00f2fe;">🧩</div>
+        <div style="font-size: 20px; color: #00f2fe;">\ud83e\udde9</div>
         <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; margin-top: 4px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px;">${thumb.title || 'NODE_' + (i + 1)}</span>
       `;
     }
@@ -39319,7 +39588,7 @@ function toggleJaniPlayback() {
   playJaniSFX('click');
   const icon = document.getElementById('jani-play-icon');
   if (janiSuiteState.isPlaying) {
-    if (icon) icon.textContent = '❚❚';
+    if (icon) icon.textContent = '\u275a\u275a';
     updateJaniHudUI();
     if (!janiSuiteState.timerInterval) {
       janiSuiteState.timerInterval = setInterval(() => {
@@ -39333,7 +39602,7 @@ function toggleJaniPlayback() {
       }, 1000);
     }
   } else {
-    if (icon) icon.textContent = '▶';
+    if (icon) icon.textContent = '\u25b6';
     updateJaniHudUI();
     if (janiSuiteState.timerInterval) {
       clearInterval(janiSuiteState.timerInterval);
@@ -39367,7 +39636,7 @@ function closeJaniSuite() {
   modal.style.display = 'none';
   janiSuiteState.isPlaying = false;
   const icon = document.getElementById('jani-play-icon');
-  if (icon) icon.textContent = '▶';
+  if (icon) icon.textContent = '\u25b6';
   updateJaniHudUI();
   if (janiSuiteState.timerInterval) {
     clearInterval(janiSuiteState.timerInterval);
@@ -39470,11 +39739,11 @@ function bindJaniSuiteModalControls() {
     const icn = document.getElementById('jani-sfx-icon');
     if (janiSuiteState.audioEnabled) {
       if (txt) txt.textContent = 'SFX: ON';
-      if (icn) icn.textContent = '🔊';
+      if (icn) icn.textContent = '\ud83d\udd0a';
       playJaniSFX('click');
     } else {
       if (txt) txt.textContent = 'SFX: OFF';
-      if (icn) icn.textContent = '🔇';
+      if (icn) icn.textContent = '\ud83d\udd07';
     }
   });
 
@@ -39663,7 +39932,7 @@ let countdownSuiteState = {
   // Custom user content
   title: "FTX LIQUIDITY CRASH",
   quote: '"And in less than 48 hours... $32 Billion vanished into thin air."',
-  tickerText: "$FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED  •  $ETH $1,080 (-28.9%)  •  ALAMEDA RESEARCH BANKRUPT",
+  tickerText: "$FTT -94.2%  \u2022  $BTC $15,820 (-22.4%)  \u2022  BINANCE WITHDRAWALS PAUSED  \u2022  $ETH $1,080 (-28.9%)  \u2022  ALAMEDA RESEARCH BANKRUPT",
   tickerEnabled: true,
   tickerOffset: 0,
   vignetteIntensity: 0.8,
@@ -39678,28 +39947,28 @@ const COUNTDOWN_PRESETS = {
   ftx: {
     title: "FTX LIQUIDITY CRASH",
     duration: 10,
-    ticker: "$FTT -94.2%  •  $BTC $15,820 (-22.4%)  •  BINANCE WITHDRAWALS PAUSED  •  $ETH $1,080 (-28.9%)  •  ALAMEDA RESEARCH BANKRUPT",
+    ticker: "$FTT -94.2%  \u2022  $BTC $15,820 (-22.4%)  \u2022  BINANCE WITHDRAWALS PAUSED  \u2022  $ETH $1,080 (-28.9%)  \u2022  ALAMEDA RESEARCH BANKRUPT",
     quote: '"And in less than 48 hours... $32 Billion vanished into thin air."',
     style: "neon-red"
   },
   theranos: {
     title: "THERANOS FRAUD CLIMAX",
     duration: 12,
-    ticker: "SEC INVESTIGATION DEEPENS  •  EDISON DEVICE VOIDED  •  FDA INJUNCTION ISSUED  •  VALUATION $9B -> $0",
-    quote: '"First they think you’re crazy, then they fight you, then you lose everything."',
+    ticker: "SEC INVESTIGATION DEEPENS  \u2022  EDISON DEVICE VOIDED  \u2022  FDA INJUNCTION ISSUED  \u2022  VALUATION $9B -> $0",
+    quote: '"First they think you\u2019re crazy, then they fight you, then you lose everything."',
     style: "stark"
   },
   blackmonday: {
     title: "OCTOBER 19, 1987 - BLACK MONDAY",
     duration: 15,
-    ticker: "DOW JONES -22.6%  •  S&P 500 PANIC SELLING  •  LONDON STOCK EXCHANGE CRASHES  •  PROGRAMMED SELLING OVERWHELMED",
+    ticker: "DOW JONES -22.6%  \u2022  S&P 500 PANIC SELLING  \u2022  LONDON STOCK EXCHANGE CRASHES  \u2022  PROGRAMMED SELLING OVERWHELMED",
     quote: '"The fastest single-day stock collapse in financial history."',
     style: "matrix"
   },
   dotcom: {
     title: "THE DOT-COM IMPLOSION",
     duration: 8,
-    ticker: "NASDAQ -78%  •  PETS.COM LIQUIDATED  •  WEBVAN BANKRUPTCY  •  VENTURE CAPITAL DRY UP",
+    ticker: "NASDAQ -78%  \u2022  PETS.COM LIQUIDATED  \u2022  WEBVAN BANKRUPTCY  \u2022  VENTURE CAPITAL DRY UP",
     quote: '"Euphoria turned into an unprecedented digital carnage."',
     style: "dramatic"
   }
@@ -39773,7 +40042,7 @@ function triggerCountdownClimaxImpact() {
     }
   }
 
-  showCountdownToast("⚠️ SYSTEMIC COLLAPSE CLIMAX TRIGGERED!");
+  showCountdownToast("\u26a0\ufe0f SYSTEMIC COLLAPSE CLIMAX TRIGGERED!");
 }
 
 function showCountdownToast(msg) {
@@ -39916,7 +40185,7 @@ function drawCountdownEffect(ctx, w, h, remainingSec) {
     const pulseOpacity = (Math.sin(performance.now() * 0.02) + 1) / 2;
     ctx.fillStyle = `rgba(239, 68, 68, ${pulseOpacity})`;
     ctx.font = `700 16px 'Chakra Petch', sans-serif`;
-    ctx.fillText("⚠️ IMMINENT SYSTEMIC COLLAPSE", w / 2, h / 2 + 85);
+    ctx.fillText("\u26a0\ufe0f IMMINENT SYSTEMIC COLLAPSE", w / 2, h / 2 + 85);
   }
 
   ctx.restore();
@@ -39992,7 +40261,7 @@ function renderCountdownLoop(now) {
       countdownSuiteState.currentTime = 0;
       countdownSuiteState.isPlaying = false;
       const icon = document.getElementById('countdown-play-icon');
-      if (icon) icon.textContent = '▶';
+      if (icon) icon.textContent = '\u25b6';
       if (!countdownSuiteState.climaxTriggered) {
         triggerCountdownClimaxImpact();
       }
@@ -40080,7 +40349,7 @@ function openCountdownSuite() {
   countdownSuiteState.isPlaying = true;
   countdownSuiteState.lastFrameTime = performance.now();
   const icon = document.getElementById('countdown-play-icon');
-  if (icon) icon.textContent = '❚❚';
+  if (icon) icon.textContent = '\u275a\u275a';
   if (!countdownSuiteState.animFrameId) {
     countdownSuiteState.animFrameId = requestAnimationFrame(renderCountdownLoop);
   }
@@ -40092,7 +40361,7 @@ function closeCountdownSuite() {
   modal.style.display = 'none';
   countdownSuiteState.isPlaying = false;
   const icon = document.getElementById('countdown-play-icon');
-  if (icon) icon.textContent = '▶';
+  if (icon) icon.textContent = '\u25b6';
   if (countdownSuiteState.animFrameId) {
     cancelAnimationFrame(countdownSuiteState.animFrameId);
     countdownSuiteState.animFrameId = null;
@@ -40106,7 +40375,7 @@ function bindCountdownSuiteModalControls() {
     initCountdownAudio();
     countdownSuiteState.isPlaying = !countdownSuiteState.isPlaying;
     const icon = document.getElementById('countdown-play-icon');
-    if (icon) icon.textContent = countdownSuiteState.isPlaying ? '❚❚' : '▶';
+    if (icon) icon.textContent = countdownSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
     if (countdownSuiteState.currentTime <= 0) {
       countdownSuiteState.currentTime = countdownSuiteState.totalDuration;
       countdownSuiteState.climaxTriggered = false;
@@ -40125,7 +40394,7 @@ function bindCountdownSuiteModalControls() {
     countdownSuiteState.climaxTriggered = false;
     countdownSuiteState.isPlaying = true;
     const icon = document.getElementById('countdown-play-icon');
-    if (icon) icon.textContent = '❚❚';
+    if (icon) icon.textContent = '\u275a\u275a';
   };
 
   // Restart / Replay (Bottom bar & Floating HUD)
@@ -40171,11 +40440,11 @@ function bindCountdownSuiteModalControls() {
     const icn = document.getElementById('countdown-audio-icon');
     if (countdownSuiteState.audioEnabled) {
       if (txt) txt.textContent = 'Audio FX On';
-      if (icn) icn.textContent = '🔊';
+      if (icn) icn.textContent = '\ud83d\udd0a';
       playCountdownTick(false);
     } else {
       if (txt) txt.textContent = 'Audio FX Muted';
-      if (icn) icn.textContent = '🔇';
+      if (icn) icn.textContent = '\ud83d\udd07';
     }
   });
 
@@ -40447,7 +40716,7 @@ function triggerTemporalShift(mode) {
   const hudStatus = document.getElementById('flashback-hud-status');
 
   if (flashTag) {
-    flashTag.textContent = mode === 'flashback' ? '⚡ TIME SHIFT: FLASHBACK (-10Y)' : '⚡ TIME SHIFT: FLASHFORWARD (+5Y)';
+    flashTag.textContent = mode === 'flashback' ? '\u26a1 TIME SHIFT: FLASHBACK (-10Y)' : '\u26a1 TIME SHIFT: FLASHFORWARD (+5Y)';
   }
 
   if (flashEl) {
@@ -40466,7 +40735,7 @@ function triggerTemporalShift(mode) {
     flashbackSuiteState.isFlashing = false;
   }, flashbackSuiteState.flashDuration);
 
-  showTextTimingAlert(mode === 'flashback' ? '⚡ Triggered Flashback (-10 Years)' : '⚡ Triggered Flashforward (+5 Years)', 'info');
+  showTextTimingAlert(mode === 'flashback' ? '\u26a1 Triggered Flashback (-10 Years)' : '\u26a1 Triggered Flashforward (+5 Years)', 'info');
   setTimeout(() => showTextTimingAlert(''), 2000);
 }
 
@@ -40536,7 +40805,7 @@ function openFlashbackSuite() {
   flashbackSuiteState.isPlaying = true;
   flashbackSuiteState.lastTime = performance.now();
   const icon = document.getElementById('flashback-play-icon');
-  if (icon) icon.textContent = '❚❚';
+  if (icon) icon.textContent = '\u275a\u275a';
   updateFlashbackVisualStyles();
   if (!flashbackSuiteState.animFrameId) {
     flashbackSuiteState.animFrameId = requestAnimationFrame(renderFlashbackLoop);
@@ -40549,7 +40818,7 @@ function closeFlashbackSuite() {
   modal.style.display = 'none';
   flashbackSuiteState.isPlaying = false;
   const icon = document.getElementById('flashback-play-icon');
-  if (icon) icon.textContent = '▶';
+  if (icon) icon.textContent = '\u25b6';
   if (flashbackSuiteState.animFrameId) {
     cancelAnimationFrame(flashbackSuiteState.animFrameId);
     flashbackSuiteState.animFrameId = null;
@@ -40563,7 +40832,7 @@ function bindFlashbackSuiteModalControls() {
   document.getElementById('btn-flashback-play')?.addEventListener('click', () => {
     flashbackSuiteState.isPlaying = !flashbackSuiteState.isPlaying;
     const icon = document.getElementById('flashback-play-icon');
-    if (icon) icon.textContent = flashbackSuiteState.isPlaying ? '❚❚' : '▶';
+    if (icon) icon.textContent = flashbackSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
   });
 
   // Jump triggers
@@ -40855,7 +41124,7 @@ function openPuzzleRevealSuite() {
   puzzleRevealSuiteState.isPlaying = true;
   puzzleRevealSuiteState.lastTime = performance.now();
   const icon = document.getElementById('puzzle-reveal-play-icon');
-  if (icon) icon.textContent = '❚❚';
+  if (icon) icon.textContent = '\u275a\u275a';
   updatePuzzleRevealDOM();
   if (!puzzleRevealSuiteState.animFrameId) {
     puzzleRevealSuiteState.animFrameId = requestAnimationFrame(renderPuzzleRevealLoop);
@@ -40868,7 +41137,7 @@ function closePuzzleRevealSuite() {
   modal.style.display = 'none';
   puzzleRevealSuiteState.isPlaying = false;
   const icon = document.getElementById('puzzle-reveal-play-icon');
-  if (icon) icon.textContent = '▶';
+  if (icon) icon.textContent = '\u25b6';
   if (puzzleRevealSuiteState.animFrameId) {
     cancelAnimationFrame(puzzleRevealSuiteState.animFrameId);
     puzzleRevealSuiteState.animFrameId = null;
@@ -40882,7 +41151,7 @@ function bindPuzzleRevealSuiteModalControls() {
   document.getElementById('btn-puzzle-reveal-play')?.addEventListener('click', () => {
     puzzleRevealSuiteState.isPlaying = !puzzleRevealSuiteState.isPlaying;
     const icon = document.getElementById('puzzle-reveal-play-icon');
-    if (icon) icon.textContent = puzzleRevealSuiteState.isPlaying ? '❚❚' : '▶';
+    if (icon) icon.textContent = puzzleRevealSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
   });
 
   // Snap All Arcs
@@ -41181,7 +41450,7 @@ function openLightRaysSuite() {
   lightRaysSuiteState.isPlaying = true;
   lightRaysSuiteState.lastTime = performance.now();
   const icon = document.getElementById('light-rays-play-icon');
-  if (icon) icon.textContent = '❚❚';
+  if (icon) icon.textContent = '\u275a\u275a';
   updateLightRaysVisualStyles();
   if (!lightRaysSuiteState.animFrameId) {
     lightRaysSuiteState.animFrameId = requestAnimationFrame(renderLightRaysLoop);
@@ -41194,7 +41463,7 @@ function closeLightRaysSuite() {
   modal.style.display = 'none';
   lightRaysSuiteState.isPlaying = false;
   const icon = document.getElementById('light-rays-play-icon');
-  if (icon) icon.textContent = '▶';
+  if (icon) icon.textContent = '\u25b6';
   if (lightRaysSuiteState.animFrameId) {
     cancelAnimationFrame(lightRaysSuiteState.animFrameId);
     lightRaysSuiteState.animFrameId = null;
@@ -41208,7 +41477,7 @@ function bindLightRaysSuiteModalControls() {
   document.getElementById('btn-light-rays-play')?.addEventListener('click', () => {
     lightRaysSuiteState.isPlaying = !lightRaysSuiteState.isPlaying;
     const icon = document.getElementById('light-rays-play-icon');
-    if (icon) icon.textContent = lightRaysSuiteState.isPlaying ? '❚❚' : '▶';
+    if (icon) icon.textContent = lightRaysSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
   });
 
   // Toggle Leak
@@ -41288,7 +41557,7 @@ function bindLightRaysSuiteModalControls() {
   document.getElementById('light-rays-slider-angle')?.addEventListener('input', (e) => {
     lightRaysSuiteState.beamAngle = parseInt(e.target.value) || 135;
     const lbl = document.getElementById('light-rays-val-angle');
-    if (lbl) lbl.textContent = `${lightRaysSuiteState.beamAngle}°`;
+    if (lbl) lbl.textContent = `${lightRaysSuiteState.beamAngle}\u00b0`;
     updateLightRaysVisualStyles();
   });
 
@@ -41484,7 +41753,7 @@ function openMonochromeSuite() {
   monochromeSuiteState.isPlaying = true;
   monochromeSuiteState.lastTime = performance.now();
   const icon = document.getElementById('monochrome-play-icon');
-  if (icon) icon.textContent = '❚❚';
+  if (icon) icon.textContent = '\u275a\u275a';
   updateMonochromeVisualStyles();
   if (!monochromeSuiteState.animFrameId) {
     monochromeSuiteState.animFrameId = requestAnimationFrame(renderMonochromeLoop);
@@ -41497,7 +41766,7 @@ function closeMonochromeSuite() {
   modal.style.display = 'none';
   monochromeSuiteState.isPlaying = false;
   const icon = document.getElementById('monochrome-play-icon');
-  if (icon) icon.textContent = '▶';
+  if (icon) icon.textContent = '\u25b6';
   if (monochromeSuiteState.animFrameId) {
     cancelAnimationFrame(monochromeSuiteState.animFrameId);
     monochromeSuiteState.animFrameId = null;
@@ -41511,7 +41780,7 @@ function bindMonochromeSuiteModalControls() {
   document.getElementById('btn-monochrome-play')?.addEventListener('click', () => {
     monochromeSuiteState.isPlaying = !monochromeSuiteState.isPlaying;
     const icon = document.getElementById('monochrome-play-icon');
-    if (icon) icon.textContent = monochromeSuiteState.isPlaying ? '❚❚' : '▶';
+    if (icon) icon.textContent = monochromeSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
   });
 
   // Toggle Grade
@@ -41769,7 +42038,7 @@ function openHeavyVignetteSuite() {
   modal.style.display = 'flex';
   heavyVignetteSuiteState.isPlaying = true;
   const playIcon = document.getElementById('vignette-play-icon');
-  if (playIcon) playIcon.textContent = '❚❚';
+  if (playIcon) playIcon.textContent = '\u275a\u275a';
   updateHeavyVignetteVisualStyles();
   if (!heavyVignetteSuiteState.animFrameId) {
     heavyVignetteSuiteState.animFrameId = requestAnimationFrame(renderHeavyVignetteLoop);
@@ -41795,7 +42064,7 @@ function bindHeavyVignetteSuiteModalControls() {
     heavyVignetteSuiteState.isPlaying = !heavyVignetteSuiteState.isPlaying;
     const playIcon = document.getElementById('vignette-play-icon');
     if (playIcon) {
-      playIcon.textContent = heavyVignetteSuiteState.isPlaying ? '❚❚' : '▶';
+      playIcon.textContent = heavyVignetteSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
     }
   });
 
@@ -42049,7 +42318,7 @@ function openTextRevealSuite() {
   modal.style.display = 'flex';
   textRevealSuiteState.isPlaying = true;
   const playIcon = document.getElementById('text-decode-play-icon');
-  if (playIcon) playIcon.textContent = '❚❚';
+  if (playIcon) playIcon.textContent = '\u275a\u275a';
   updateTextRevealVisualStyles();
   if (!textRevealSuiteState.animFrameId) {
     textRevealSuiteState.animFrameId = requestAnimationFrame(renderTextRevealLoop);
@@ -42075,7 +42344,7 @@ function bindTextRevealSuiteModalControls() {
     textRevealSuiteState.isPlaying = !textRevealSuiteState.isPlaying;
     const playIcon = document.getElementById('text-decode-play-icon');
     if (playIcon) {
-      playIcon.textContent = textRevealSuiteState.isPlaying ? '❚❚' : '▶';
+      playIcon.textContent = textRevealSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
     }
   });
 
@@ -42333,7 +42602,7 @@ function openGlowShadowsSuite() {
   modal.style.display = 'flex';
   glowShadowsSuiteState.isPlaying = true;
   const playIcon = document.getElementById('glow-shadows-play-icon');
-  if (playIcon) playIcon.textContent = '❚❚';
+  if (playIcon) playIcon.textContent = '\u275a\u275a';
   updateGlowShadowsVisualStyles();
   if (!glowShadowsSuiteState.animFrameId) {
     glowShadowsSuiteState.animFrameId = requestAnimationFrame(renderGlowShadowsLoop);
@@ -42359,7 +42628,7 @@ function bindGlowShadowsSuiteModalControls() {
     glowShadowsSuiteState.isPlaying = !glowShadowsSuiteState.isPlaying;
     const playIcon = document.getElementById('glow-shadows-play-icon');
     if (playIcon) {
-      playIcon.textContent = glowShadowsSuiteState.isPlaying ? '❚❚' : '▶';
+      playIcon.textContent = glowShadowsSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
     }
   });
 
@@ -42555,7 +42824,7 @@ function updateCamera3DVisualStyles() {
   if (cardZReadout) cardZReadout.textContent = `-${Math.round(depth * 0.15)}PX`;
 
   if (camera3DSuiteState.trackingActive) {
-    if (hudStatus) hudStatus.textContent = `CAMERA ROT: ±${rot}° // Z-PULLBACK: ${depth}PX`;
+    if (hudStatus) hudStatus.textContent = `CAMERA ROT: \u00b1${rot}\u00b0 // Z-PULLBACK: ${depth}PX`;
     if (hudTrackingState) hudTrackingState.textContent = 'TRACKING';
   } else {
     if (hudStatus) hudStatus.textContent = '3D CAMERA RIG: LOCKED';
@@ -42624,7 +42893,7 @@ function openCamera3DMoveSuite() {
   modal.style.display = 'flex';
   camera3DSuiteState.isPlaying = true;
   const playIcon = document.getElementById('camera-3d-play-icon');
-  if (playIcon) playIcon.textContent = '❚❚';
+  if (playIcon) playIcon.textContent = '\u275a\u275a';
   updateCamera3DVisualStyles();
   if (!camera3DSuiteState.animFrameId) {
     camera3DSuiteState.animFrameId = requestAnimationFrame(renderCamera3DLoop);
@@ -42650,7 +42919,7 @@ function bindCamera3DMoveSuiteModalControls() {
     camera3DSuiteState.isPlaying = !camera3DSuiteState.isPlaying;
     const playIcon = document.getElementById('camera-3d-play-icon');
     if (playIcon) {
-      playIcon.textContent = camera3DSuiteState.isPlaying ? '❚❚' : '▶';
+      playIcon.textContent = camera3DSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
     }
   });
 
@@ -42719,7 +42988,7 @@ function bindCamera3DMoveSuiteModalControls() {
   document.getElementById('camera-3d-slider-rotation')?.addEventListener('input', (e) => {
     camera3DSuiteState.rotationSensitivity = parseInt(e.target.value) || 14;
     const lbl = document.getElementById('camera-3d-val-rotation');
-    if (lbl) lbl.textContent = `${camera3DSuiteState.rotationSensitivity}°`;
+    if (lbl) lbl.textContent = `${camera3DSuiteState.rotationSensitivity}\u00b0`;
     updateCamera3DVisualStyles();
   });
 
@@ -42989,8 +43258,8 @@ function renderJLCutsLoop(now) {
       bridgeBox.style.boxShadow = '0 0 15px rgba(0,240,255,0.4)';
       if (bridgeStatusEl) {
         bridgeStatusEl.textContent = isJ 
-          ? `⚡ J-CUT PRE-LAP ACTIVE: HEAR SCENE B BEFORE SEEING IT!`
-          : `⚡ L-CUT LINGER ACTIVE: AUDIO A PERSISTS ACROSS CUT!`;
+          ? `\u26a1 J-CUT PRE-LAP ACTIVE: HEAR SCENE B BEFORE SEEING IT!`
+          : `\u26a1 L-CUT LINGER ACTIVE: AUDIO A PERSISTS ACROSS CUT!`;
       }
     } else {
       bridgeBox.style.background = 'rgba(8,51,68,0.7)';
@@ -43006,7 +43275,7 @@ function renderJLCutsLoop(now) {
 
   // Live waveform animation
   if (stageWave) {
-    const waves = [' ▂▃▅▆▇▆▅▃ ', '▂▃▅▇█▇▅▃▂ ', '▃▅▇███▇▅▃ ', '▅▇█████▇▅ ', '▃▅▇███▇▅▃ '];
+    const waves = [' \u2582\u2583\u2585\u2586\u2587\u2586\u2585\u2583 ', '\u2582\u2583\u2585\u2587\u2588\u2587\u2585\u2583\u2582 ', '\u2583\u2585\u2587\u2588\u2588\u2588\u2587\u2585\u2583 ', '\u2585\u2587\u2588\u2588\u2588\u2588\u2588\u2587\u2585 ', '\u2583\u2585\u2587\u2588\u2588\u2588\u2587\u2585\u2583 '];
     const waveIndex = Math.floor((t * 8) % waves.length);
     stageWave.textContent = waves[waveIndex];
   }
@@ -43020,7 +43289,7 @@ function openJLCutsSuite() {
   modal.style.display = 'flex';
   jlCutsSuiteState.isPlaying = true;
   const playIcon = document.getElementById('jl-cuts-play-icon');
-  if (playIcon) playIcon.textContent = '❚❚';
+  if (playIcon) playIcon.textContent = '\u275a\u275a';
   updateJLCutsVisualStyles();
   if (!jlCutsSuiteState.animFrameId) {
     jlCutsSuiteState.animFrameId = requestAnimationFrame(renderJLCutsLoop);
@@ -43046,7 +43315,7 @@ function bindJLCutsSuiteModalControls() {
     jlCutsSuiteState.isPlaying = !jlCutsSuiteState.isPlaying;
     const playIcon = document.getElementById('jl-cuts-play-icon');
     if (playIcon) {
-      playIcon.textContent = jlCutsSuiteState.isPlaying ? '❚❚' : '▶';
+      playIcon.textContent = jlCutsSuiteState.isPlaying ? '\u275a\u275a' : '\u25b6';
     }
   });
 
@@ -43349,7 +43618,7 @@ function openSubbassSuite() {
   subbassSuiteState.animFrameId = requestAnimationFrame(renderSubbassLoop);
 
   const btnPlay = document.getElementById('btn-subbass-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeSubbassSuite() {
@@ -43373,11 +43642,11 @@ function bindSubbassSuiteModalControls() {
     subbassSuiteState.isPlaying = !subbassSuiteState.isPlaying;
     const btnPlay = document.getElementById('btn-subbass-play-pause');
     if (subbassSuiteState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       subbassSuiteState.lastTimestamp = null;
       subbassSuiteState.animFrameId = requestAnimationFrame(renderSubbassLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (subbassSuiteState.animFrameId) cancelAnimationFrame(subbassSuiteState.animFrameId);
     }
   });
@@ -43582,7 +43851,7 @@ function updateOGParallaxVisualStyles() {
     badgeZ.textContent = `Z-SEP: ${ogParallaxSuiteState.zSeparation}px`;
   }
   if (badgeSpeeds) {
-    badgeSpeeds.textContent = `SPEEDS: FG ${ogParallaxSuiteState.speedFg.toFixed(1)}x • MID ${ogParallaxSuiteState.speedMid.toFixed(1)}x • BG ${ogParallaxSuiteState.speedBg.toFixed(2)}x`;
+    badgeSpeeds.textContent = `SPEEDS: FG ${ogParallaxSuiteState.speedFg.toFixed(1)}x \u2022 MID ${ogParallaxSuiteState.speedMid.toFixed(1)}x \u2022 BG ${ogParallaxSuiteState.speedBg.toFixed(2)}x`;
   }
 
   // Camera Orbit dynamics linked to time
@@ -43647,7 +43916,7 @@ function openOGParallaxSuite() {
   ogParallaxSuiteState.animFrameId = requestAnimationFrame(renderOGParallaxLoop);
 
   const btnPlay = document.getElementById('btn-og-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
   updateOGParallaxVisualStyles();
 }
 
@@ -43672,11 +43941,11 @@ function bindOGParallaxSuiteModalControls() {
     ogParallaxSuiteState.isPlaying = !ogParallaxSuiteState.isPlaying;
     const btnPlay = document.getElementById('btn-og-play-pause');
     if (ogParallaxSuiteState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       ogParallaxSuiteState.lastTimestamp = null;
       ogParallaxSuiteState.animFrameId = requestAnimationFrame(renderOGParallaxLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (ogParallaxSuiteState.animFrameId) cancelAnimationFrame(ogParallaxSuiteState.animFrameId);
     }
   });
@@ -43832,7 +44101,7 @@ function bindOGParallaxSuiteModalControls() {
     // 4. Parallax Metadata Info Track
     const metaClip = {
       id: `txt-og-meta-${Date.now() + 3}`,
-      text: `OG PARALLAX ENGINE // FG ${ogParallaxSuiteState.speedFg}x • MID ${ogParallaxSuiteState.speedMid}x • BG ${ogParallaxSuiteState.speedBg}x`,
+      text: `OG PARALLAX ENGINE // FG ${ogParallaxSuiteState.speedFg}x \u2022 MID ${ogParallaxSuiteState.speedMid}x \u2022 BG ${ogParallaxSuiteState.speedBg}x`,
       highlight: 'OG PARALLAX',
       highlightColor: '#fbbf24',
       anim: 'fade',
@@ -43978,7 +44247,7 @@ function openMagnates3DProjectionSuite() {
   magnates3DSuiteState.animFrameId = requestAnimationFrame(renderMagnates3DLoop);
 
   const btnPlay = document.getElementById('btn-magnates-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnates3DProjectionSuite() {
@@ -44002,11 +44271,11 @@ function bindMagnates3DProjectionSuiteModalControls() {
     magnates3DSuiteState.isPlaying = !magnates3DSuiteState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-play-pause');
     if (magnates3DSuiteState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnates3DSuiteState.lastTimestamp = null;
       magnates3DSuiteState.animFrameId = requestAnimationFrame(renderMagnates3DLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnates3DSuiteState.animFrameId) cancelAnimationFrame(magnates3DSuiteState.animFrameId);
     }
   });
@@ -44277,7 +44546,7 @@ function openMagnatesCCVignetteSuite() {
   magnatesCCVignetteState.animFrameId = requestAnimationFrame(renderMagnatesCCVignetteLoop);
 
   const btnPlay = document.getElementById('btn-magnates-vignette-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesCCVignetteSuite() {
@@ -44301,11 +44570,11 @@ function bindMagnatesCCVignetteSuiteModalControls() {
     magnatesCCVignetteState.isPlaying = !magnatesCCVignetteState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-vignette-play-pause');
     if (magnatesCCVignetteState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesCCVignetteState.lastTimestamp = null;
       magnatesCCVignetteState.animFrameId = requestAnimationFrame(renderMagnatesCCVignetteLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesCCVignetteState.animFrameId) cancelAnimationFrame(magnatesCCVignetteState.animFrameId);
     }
   });
@@ -44337,7 +44606,7 @@ function bindMagnatesCCVignetteSuiteModalControls() {
   sliderAngle?.addEventListener('input', (e) => {
     magnatesCCVignetteState.vignetteAngle = parseInt(e.target.value, 10);
     const label = document.getElementById('magnates-vignette-val-angle');
-    if (label) label.textContent = `${magnatesCCVignetteState.vignetteAngle}°`;
+    if (label) label.textContent = `${magnatesCCVignetteState.vignetteAngle}\u00b0`;
     updateMagnatesCCVignetteVisualStyles();
   });
 
@@ -44541,7 +44810,7 @@ function openMagnatesBrightnessGlowSuite() {
   magnatesGlowState.animFrameId = requestAnimationFrame(renderMagnatesGlowLoop);
 
   const btnPlay = document.getElementById('btn-magnates-glow-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesBrightnessGlowSuite() {
@@ -44563,11 +44832,11 @@ function bindMagnatesBrightnessGlowSuiteModalControls() {
     magnatesGlowState.isPlaying = !magnatesGlowState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-glow-play-pause');
     if (magnatesGlowState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesGlowState.lastTimestamp = null;
       magnatesGlowState.animFrameId = requestAnimationFrame(renderMagnatesGlowLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesGlowState.animFrameId) cancelAnimationFrame(magnatesGlowState.animFrameId);
     }
   });
@@ -44742,7 +45011,7 @@ function updateMagnatesShadowsVisualStyles() {
   const ang = magnatesShadowsState.shadowAngle;
   const blur = magnatesShadowsState.blurSoftness;
 
-  if (hudAngle) hudAngle.textContent = `ANGLE: ${ang}°`;
+  if (hudAngle) hudAngle.textContent = `ANGLE: ${ang}\u00b0`;
   if (hudElevation) hudElevation.textContent = `ELEVATION: ${elev}px`;
 
   const rad = (ang * Math.PI) / 180;
@@ -44794,7 +45063,7 @@ function openMagnatesDropShadowsSuite() {
   magnatesShadowsState.animFrameId = requestAnimationFrame(renderMagnatesShadowsLoop);
 
   const btnPlay = document.getElementById('btn-magnates-shadows-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesDropShadowsSuite() {
@@ -44816,11 +45085,11 @@ function bindMagnatesDropShadowsSuiteModalControls() {
     magnatesShadowsState.isPlaying = !magnatesShadowsState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-shadows-play-pause');
     if (magnatesShadowsState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesShadowsState.lastTimestamp = null;
       magnatesShadowsState.animFrameId = requestAnimationFrame(renderMagnatesShadowsLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesShadowsState.animFrameId) cancelAnimationFrame(magnatesShadowsState.animFrameId);
     }
   });
@@ -44833,7 +45102,7 @@ function bindMagnatesDropShadowsSuiteModalControls() {
   document.getElementById('magnates-shadows-slider-angle')?.addEventListener('input', (e) => {
     magnatesShadowsState.shadowAngle = parseInt(e.target.value, 10);
     const label = document.getElementById('magnates-shadows-val-angle');
-    if (label) label.textContent = `${magnatesShadowsState.shadowAngle}°`;
+    if (label) label.textContent = `${magnatesShadowsState.shadowAngle}\u00b0`;
     updateMagnatesShadowsVisualStyles();
   });
 
@@ -44930,7 +45199,7 @@ function bindMagnatesDropShadowsSuiteModalControls() {
 
     const shadowMetaClip = {
       id: `txt-shd-meta-${Date.now() + 3}`,
-      text: `MULTI-LAYER DROP SHADOWS // ${magnatesShadowsState.shadowAngle}° ELEVATION ${magnatesShadowsState.elevation}px`,
+      text: `MULTI-LAYER DROP SHADOWS // ${magnatesShadowsState.shadowAngle}\u00b0 ELEVATION ${magnatesShadowsState.elevation}px`,
       highlight: `${magnatesShadowsState.elevation}px`,
       highlightColor: '#0284c7',
       anim: 'fade',
@@ -45047,7 +45316,7 @@ function openMagnatesShadowizationSuite() {
   magnatesShadowizeState.animFrameId = requestAnimationFrame(renderMagnatesShadowizeLoop);
 
   const btnPlay = document.getElementById('btn-magnates-shadowize-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesShadowizationSuite() {
@@ -45069,11 +45338,11 @@ function bindMagnatesShadowizationSuiteModalControls() {
     magnatesShadowizeState.isPlaying = !magnatesShadowizeState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-shadowize-play-pause');
     if (magnatesShadowizeState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesShadowizeState.lastTimestamp = null;
       magnatesShadowizeState.animFrameId = requestAnimationFrame(renderMagnatesShadowizeLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesShadowizeState.animFrameId) cancelAnimationFrame(magnatesShadowizeState.animFrameId);
     }
   });
@@ -45309,7 +45578,7 @@ function openMagnatesBlendModesSuite() {
   magnatesBlendState.animFrameId = requestAnimationFrame(renderMagnatesBlendLoop);
 
   const btnPlay = document.getElementById('btn-magnates-blend-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesBlendModesSuite() {
@@ -45331,11 +45600,11 @@ function bindMagnatesBlendModesSuiteModalControls() {
     magnatesBlendState.isPlaying = !magnatesBlendState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-blend-play-pause');
     if (magnatesBlendState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesBlendState.lastTimestamp = null;
       magnatesBlendState.animFrameId = requestAnimationFrame(renderMagnatesBlendLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesBlendState.animFrameId) cancelAnimationFrame(magnatesBlendState.animFrameId);
     }
   });
@@ -45543,7 +45812,7 @@ function openMagnatesPaperBlueprintSuite() {
   magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
 
   const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesPaperBlueprintSuite() {
@@ -45565,11 +45834,11 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     magnatesBPState.isPlaying = !magnatesBPState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
     if (magnatesBPState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesBPState.lastTimestamp = null;
       magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesBPState.animFrameId) cancelAnimationFrame(magnatesBPState.animFrameId);
     }
   });
@@ -45582,7 +45851,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   document.getElementById('magnates-bp-slider-angle')?.addEventListener('input', (e) => {
     magnatesBPState.paperAngle = parseInt(e.target.value, 10);
     const label = document.getElementById('magnates-bp-val-angle');
-    if (label) label.textContent = `${magnatesBPState.paperAngle}°`;
+    if (label) label.textContent = `${magnatesBPState.paperAngle}\u00b0`;
     updateMagnatesBPVisualStyles();
   });
 
@@ -45668,7 +45937,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
 
     const bpMetaClip = {
       id: `txt-bp-meta-${Date.now() + 3}`,
-      text: `BLUEPRINT SEC_08 // PAPER STICKER CUTOUT (${magnatesBPState.paperAngle}°)`,
+      text: `BLUEPRINT SEC_08 // PAPER STICKER CUTOUT (${magnatesBPState.paperAngle}\u00b0)`,
       highlight: 'BLUEPRINT',
       highlightColor: '#0284c7',
       anim: 'fade',
@@ -45701,7 +45970,7 @@ let magnatesInkState = {
   bleedSpread: 85, // 30 to 150%
   stretchMultiplier: 1.15, // 1.0 to 1.5x
   title: "THE INHERITANCE",
-  chapter: "CHAPTER IV • DISCLOSURE",
+  chapter: "CHAPTER IV \u2022 DISCLOSURE",
   dateText: "OCTOBER 24, 1929 // WALL STREET CRASH",
   animFrameId: null,
   lastTimestamp: null
@@ -45772,7 +46041,7 @@ function openMagnatesInkRevealSuite() {
   magnatesInkState.animFrameId = requestAnimationFrame(renderMagnatesInkLoop);
 
   const btnPlay = document.getElementById('btn-magnates-ink-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesInkRevealSuite() {
@@ -45794,11 +46063,11 @@ function bindMagnatesInkRevealSuiteModalControls() {
     magnatesInkState.isPlaying = !magnatesInkState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-ink-play-pause');
     if (magnatesInkState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesInkState.lastTimestamp = null;
       magnatesInkState.animFrameId = requestAnimationFrame(renderMagnatesInkLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesInkState.animFrameId) cancelAnimationFrame(magnatesInkState.animFrameId);
     }
   });
@@ -45984,7 +46253,7 @@ function openMagnatesArticleHighlightSuite() {
   magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
 
   const btnPlay = document.getElementById('btn-magnates-art-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesArticleHighlightSuite() {
@@ -46006,11 +46275,11 @@ function bindMagnatesArticleHighlightSuiteModalControls() {
     magnatesArticleState.isPlaying = !magnatesArticleState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-art-play-pause');
     if (magnatesArticleState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesArticleState.lastTimestamp = null;
       magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesArticleState.animFrameId) cancelAnimationFrame(magnatesArticleState.animFrameId);
     }
   });
@@ -46210,7 +46479,7 @@ function openMagnatesParticleVFXSuite() {
   magnatesVFXState.animFrameId = requestAnimationFrame(renderMagnatesVFXLoop);
 
   const btnPlay = document.getElementById('btn-magnates-vfx-play-pause');
-  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
 }
 
 function closeMagnatesParticleVFXSuite() {
@@ -46232,11 +46501,11 @@ function bindMagnatesParticleVFXSuiteModalControls() {
     magnatesVFXState.isPlaying = !magnatesVFXState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-vfx-play-pause');
     if (magnatesVFXState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesVFXState.lastTimestamp = null;
       magnatesVFXState.animFrameId = requestAnimationFrame(renderMagnatesVFXLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesVFXState.animFrameId) cancelAnimationFrame(magnatesVFXState.animFrameId);
     }
   });
@@ -47067,7 +47336,7 @@ function updateSpoonerParallaxVisuals() {
   if (vignette) vignette.style.display = spoonerParallaxState.enableVignette ? 'block' : 'none';
 
   if (hudDepth) {
-    hudDepth.textContent = `FG ZOOM: ${spoonerParallaxState.zoomFg.toFixed(2)}x • BG ZOOM: ${spoonerParallaxState.zoomBg.toFixed(2)}x • Z-SEP: ${spoonerParallaxState.zSeparation}px`;
+    hudDepth.textContent = `FG ZOOM: ${spoonerParallaxState.zoomFg.toFixed(2)}x \u2022 BG ZOOM: ${spoonerParallaxState.zoomBg.toFixed(2)}x \u2022 Z-SEP: ${spoonerParallaxState.zSeparation}px`;
   }
 
   // Camera Orbit / Tilt Drift based on progress (smooth sine cycle)
@@ -47209,7 +47478,7 @@ function initSpoonerSuiteControlsOnce() {
   const playPauseBtn = document.getElementById('btn-spooner-play-pause');
   playPauseBtn?.addEventListener('click', () => {
     spoonerParallaxState.isPlaying = !spoonerParallaxState.isPlaying;
-    playPauseBtn.textContent = spoonerParallaxState.isPlaying ? '⏸ Pause' : '▶ Play';
+    playPauseBtn.textContent = spoonerParallaxState.isPlaying ? '\u23f8 Pause' : '\u25b6 Play';
     if (spoonerParallaxState.isPlaying) {
       spoonerParallaxState.lastTimestamp = null;
       spoonerParallaxState.animFrameId = requestAnimationFrame(renderSpoonerParallaxLoop);
@@ -47685,7 +47954,7 @@ function loadCutoutImage(url) {
     // Update Dimensions status
     const dimsEl = document.getElementById('cutout-status-dims');
     if (dimsEl) {
-      dimsEl.textContent = `${cutoutEditorState.naturalWidth} × ${cutoutEditorState.naturalHeight} px`;
+      dimsEl.textContent = `${cutoutEditorState.naturalWidth} \u00d7 ${cutoutEditorState.naturalHeight} px`;
     }
 
     // Auto-fit initial zoom
@@ -47808,7 +48077,7 @@ function redrawCutoutCanvas() {
   // Update status count
   const ptsCountEl = document.getElementById('cutout-status-points');
   if (ptsCountEl) {
-    ptsCountEl.textContent = `${pts.length} Points ${cutoutEditorState.isClosed ? '✓ (Closed Subject)' : '(Tracing Active...)'}`;
+    ptsCountEl.textContent = `${pts.length} Points ${cutoutEditorState.isClosed ? '\u2713 (Closed Subject)' : '(Tracing Active...)'}`;
   }
 }
 
@@ -48279,7 +48548,7 @@ function initCutoutEditorListenersOnce() {
     updateCutoutLivePreviews();
   });
 
-  // ⚡ AUTO AI CUTOUT ENGINE (Instant Edge-Matting & Boundary Extraction)
+  // \u26a1 AUTO AI CUTOUT ENGINE (Instant Edge-Matting & Boundary Extraction)
   document.getElementById('btn-cutout-ai-auto')?.addEventListener('click', () => {
     if (!cutoutEditorState.originalImg || !cutoutEditorState.naturalWidth) return;
     showTextTimingAlert('AI Neural boundary extraction running...', 'info');
@@ -48471,7 +48740,7 @@ function initCutoutEditorListenersOnce() {
   });
 }
 
-// Hook up "✂️ Trace" buttons in UI
+// Hook up "\u2702\ufe0f Trace" buttons in UI
 document.addEventListener('DOMContentLoaded', () => {
   attachCutoutEditorTriggers();
 });
@@ -48601,7 +48870,7 @@ function attachModalDocHighlighterListeners() {
     const val = parseInt(e.target.value, 10);
     topCustomizerState.docRot = val;
     const vRot = document.getElementById('tpl-modal-val-doc-rot');
-    if (vRot) vRot.textContent = `${val}°`;
+    if (vRot) vRot.textContent = `${val}\u00b0`;
     const zoomWrap = document.getElementById('customizer-doc-zoom-wrap');
     if (zoomWrap) zoomWrap.style.transform = `scale(${((topCustomizerState.docScale || 1.0) * (topCustomizerState.docPunchZoom ? 1.28 : 1.0)).toFixed(3)}) rotate(${val.toFixed(1)}deg)`;
   });
