@@ -23231,7 +23231,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Assets = Liabilities + Equity formula with line-by-line highlighting. Perfect for accounting explainers.',
     tags: ['Finance', 'Balance Sheet Breakdown', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="30" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">APPLE INC. \u00b7 BALANCE SHEET</text><rect x="40" y="42" width="320" height="30" rx="4" fill="rgba(139,90,60,0.12)"/><text x="200" y="62" fill="#3a2418" font-family="monospace" font-weight="800" font-size="13" text-anchor="middle">ASSETS = LIABILITIES + EQUITY</text><g transform="translate(40, 85)" font-family="monospace" font-size="10" fill="#3a2418"><text x="10" y="15">Cash &amp; Equivalents</text><text x="310" y="15" text-anchor="end" font-weight="700">$29.9B</text><text x="10" y="35">Marketable Securities</text><text x="310" y="35" text-anchor="end" font-weight="700">$61.5B</text><line x1="10" y1="46" x2="310" y2="46" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><text x="10" y="62">Short-term Debt</text><text x="310" y="62" text-anchor="end" font-weight="700">$16.2B</text><text x="10" y="80">Long-term Debt</text><text x="310" y="80" text-anchor="end" font-weight="700">$95.7B</text><line x1="10" y1="92" x2="310" y2="92" stroke="#8b5a3c" stroke-width="1.5"/><text x="10" y="110" font-weight="900" fill="#7c5cff">Shareholders' Equity</text><text x="310" y="110" text-anchor="end" font-weight="900" fill="#7c5cff">$62.1B</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-bal" cx="50%" cy="40%" r="80%"><stop offset="0%" stop-color="#1e2430"/><stop offset="100%" stop-color="#0a0d14"/></radialGradient><linearGradient id="paper-bal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fdfbf7"/><stop offset="100%" stop-color="#f4ede0"/></linearGradient><filter id="shadow-bal" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.5"/></filter></defs><rect width="400" height="225" fill="url(#bg-bal)"/><g filter="url(#shadow-bal)"><rect x="24" y="16" width="352" height="193" rx="8" fill="url(#paper-bal)" stroke="rgba(139,90,60,0.3)" stroke-width="1.2"/></g><text x="38" y="34" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="8" letter-spacing="1.5">SEC FORM 10-K \u00b7 APPLE INC.</text><text x="362" y="34" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="8" text-anchor="end">FY 2024</text><text x="200" y="48" fill="#1e293b" font-family="sans-serif" font-weight="900" font-size="10" letter-spacing="1" text-anchor="middle">CONSOLIDATED BALANCE SHEET</text><rect x="38" y="55" width="324" height="22" rx="4" fill="rgba(139,90,60,0.08)" stroke="rgba(139,90,60,0.2)" stroke-width="0.8"/><rect x="42" y="58" width="94" height="16" rx="3" fill="#fff"/><text x="47" y="69" fill="#047857" font-family="sans-serif" font-weight="800" font-size="7.5">ASSETS</text><text x="132" y="70" fill="#0f172a" font-family="monospace" font-weight="800" font-size="8.5" text-anchor="end">$143.5B</text><text x="144" y="70" fill="#64748b" font-family="sans-serif" font-weight="900" font-size="10">=</text><rect x="154" y="58" width="92" height="16" rx="3" fill="#fff"/><text x="159" y="69" fill="#b91c1c" font-family="sans-serif" font-weight="800" font-size="7.5">LIAB</text><text x="242" y="70" fill="#0f172a" font-family="monospace" font-weight="800" font-size="8.5" text-anchor="end">$81.4B</text><text x="253" y="70" fill="#64748b" font-family="sans-serif" font-weight="900" font-size="10">+</text><rect x="263" y="58" width="94" height="16" rx="3" fill="#fff"/><text x="268" y="69" fill="#4338ca" font-family="sans-serif" font-weight="800" font-size="7.5">EQUITY</text><text x="353" y="70" fill="#0f172a" font-family="monospace" font-weight="800" font-size="8.5" text-anchor="end">$62.1B</text><rect x="38" y="83" width="158" height="106" rx="5" fill="rgba(255,255,255,0.7)" stroke="rgba(139,90,60,0.18)" stroke-width="0.8"/><text x="46" y="96" fill="#8b5a3c" font-family="monospace" font-weight="800" font-size="8">CURRENT ASSETS</text><text x="188" y="96" fill="#0f172a" font-family="monospace" font-weight="800" font-size="8" text-anchor="end">$143.5B</text><line x1="46" y1="100" x2="188" y2="100" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><g font-family="monospace" font-size="7.5" fill="#334155"><text x="46" y="113">Cash &amp; Equivalents</text><text x="188" y="113" text-anchor="end" font-weight="700" fill="#0f172a">$29.9B</text><text x="46" y="129">Marketable Securities</text><text x="188" y="129" text-anchor="end" font-weight="700" fill="#0f172a">$61.5B</text><text x="46" y="145">Accounts Receivable</text><text x="188" y="145" text-anchor="end" font-weight="700" fill="#0f172a">$29.5B</text><text x="46" y="161">Inventories &amp; Other</text><text x="188" y="161" text-anchor="end" font-weight="700" fill="#0f172a">$22.6B</text></g><rect x="204" y="83" width="158" height="106" rx="5" fill="rgba(255,255,255,0.7)" stroke="rgba(139,90,60,0.18)" stroke-width="0.8"/><text x="212" y="96" fill="#8b5a3c" font-family="monospace" font-weight="800" font-size="8">LIABILITIES &amp; EQUITY</text><text x="354" y="96" fill="#0f172a" font-family="monospace" font-weight="800" font-size="8" text-anchor="end">$143.5B</text><line x1="212" y1="100" x2="354" y2="100" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><g font-family="monospace" font-size="7.5" fill="#334155"><text x="212" y="113">Short-term Debt</text><text x="354" y="113" text-anchor="end" font-weight="700" fill="#0f172a">$16.2B</text><text x="212" y="129">Long-term Debt</text><text x="354" y="129" text-anchor="end" font-weight="700" fill="#0f172a">$65.2B</text><line x1="212" y1="135" x2="354" y2="135" stroke="#8b5a3c" stroke-width="0.6" opacity="0.3"/><text x="212" y="146" font-weight="700" fill="#64748b">Total Liabilities</text><text x="354" y="146" text-anchor="end" font-weight="700" fill="#64748b">$81.4B</text><rect x="208" y="152" width="150" height="18" rx="3" fill="rgba(16,185,129,0.12)" stroke="rgba(16,185,129,0.3)" stroke-width="0.7"/><text x="212" y="164" font-weight="800" fill="#047857">Shareholders' Equity</text><text x="354" y="164" text-anchor="end" font-weight="800" fill="#047857">$62.1B</text></g><text x="200" y="200" fill="#64748b" font-family="monospace" font-weight="600" font-size="7" letter-spacing="1" text-anchor="middle">GAAP AUDITED \u00b7 TOTAL ASSETS = LIABILITIES + EQUITY</text></svg>`)}`
   },
   {
     id: 'compound',
@@ -25215,16 +25215,77 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:20%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:40%"></div></div><div class="candle up"><div class="wick top" style="height:25%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle up"><div class="wick top" style="height:35%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:15%"></div><div class="body" style="height:35%"></div><div class="wick bot" style="height:50%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:30%"></div></div><div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:60%"></div><div class="wick bot" style="height:10%"></div></div><div class="candle down"><div class="wick top" style="height:25%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:35%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:25%"></div></div><div class="candle up"><div class="wick top" style="height:15%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:40%"></div></div>
           </div>
         </div>`; } else if (tplId === 'balance') {
-      fxContainer.innerHTML = `<div class="tpl-balance">
-          <div class="b-title">Apple Inc. \u00b7 2024</div>
-          <div class="b-eq"><span class="hl">Assets</span><span>=</span><span class="hl">Liabilities</span><span>+</span><span class="hl">Equity</span></div>
-          <div class="b-row"><span>Cash & Equivalents</span><span class="val">$29.9B</span></div>
-          <div class="b-row"><span>Marketable Securities</span><span class="val">$61.5B</span></div>
-          <div class="b-row"><span>Accounts Receivable</span><span class="val">$29.5B</span></div>
-          <div class="b-row"><span>Total Current Assets</span><span class="val">$143.5B</span></div>
-          <div class="b-row"><span>Short-term Debt</span><span class="val">$16.2B</span></div>
-          <div class="b-row"><span>Long-term Debt</span><span class="val">$95.7B</span></div>
-          <div class="b-total"><span>Shareholders' Equity</span><span class="val">$62.1B</span></div>
+      fxContainer.innerHTML = `<div class="tpl-balance theme-archival">
+          <div class="b-card">
+            <div class="b-header">
+              <div class="b-brand-row">
+                <span class="b-seal">SEC FORM 10-K</span>
+                <span class="b-company">APPLE INC.</span>
+                <span class="b-period">FISCAL 2024</span>
+              </div>
+              <div class="b-doc-title">CONSOLIDATED STATEMENT OF FINANCIAL POSITION</div>
+            </div>
+
+            <!-- Formula Equation Bar -->
+            <div class="b-eq-bar">
+              <div class="b-eq-cell b-eq-assets">
+                <span class="b-eq-tag">ASSETS</span>
+                <span class="b-eq-num val-assets">$143.5B</span>
+              </div>
+              <span class="b-eq-op">=</span>
+              <div class="b-eq-cell b-eq-liab">
+                <span class="b-eq-tag">LIABILITIES</span>
+                <span class="b-eq-num val-liab">$81.4B</span>
+              </div>
+              <span class="b-eq-op">+</span>
+              <div class="b-eq-cell b-eq-equity">
+                <span class="b-eq-tag">EQUITY</span>
+                <span class="b-eq-num val-equity">$62.1B</span>
+              </div>
+              <div class="b-balanced-badge"><span class="badge-dot">&#x25CF;</span> BALANCED</div>
+            </div>
+
+            <!-- Dual Columns (T-Account Balance Sheet) -->
+            <div class="b-grid">
+              <!-- Left: Assets -->
+              <div class="b-col b-col-assets">
+                <div class="b-col-header">
+                  <span class="b-col-title">CURRENT ASSETS</span>
+                  <span class="b-col-total val-assets-sub">$143.5B</span>
+                </div>
+                <div class="b-rows-list b-asset-rows">
+                  <div class="b-row active"><span class="b-lbl">Cash &amp; Equivalents</span><span class="b-dots"></span><span class="val">$29.9B</span></div>
+                  <div class="b-row"><span class="b-lbl">Marketable Securities</span><span class="b-dots"></span><span class="val">$61.5B</span></div>
+                  <div class="b-row"><span class="b-lbl">Accounts Receivable</span><span class="b-dots"></span><span class="val">$29.5B</span></div>
+                  <div class="b-row"><span class="b-lbl">Inventories &amp; Other</span><span class="b-dots"></span><span class="val">$22.6B</span></div>
+                </div>
+              </div>
+
+              <!-- Right: Liabilities & Equity -->
+              <div class="b-col b-col-liab-equity">
+                <div class="b-col-header">
+                  <span class="b-col-title">LIABILITIES &amp; EQUITY</span>
+                  <span class="b-col-total val-liab-sub">$143.5B</span>
+                </div>
+                <div class="b-rows-list b-liab-rows">
+                  <div class="b-liab-rows-inner">
+                    <div class="b-row"><span class="b-lbl">Short-term Debt &amp; Payables</span><span class="b-dots"></span><span class="val">$16.2B</span></div>
+                    <div class="b-row"><span class="b-lbl">Long-term Debt Obligations</span><span class="b-dots"></span><span class="val">$65.2B</span></div>
+                  </div>
+                  <div class="b-subtotal-row"><span class="b-lbl">Total Liabilities</span><span class="b-dots"></span><span class="val val-liab-calc">$81.4B</span></div>
+                  <div class="b-equity-highlight">
+                    <div class="b-row b-row-equity"><span class="b-lbl">Shareholders' Equity</span><span class="b-dots"></span><span class="val val-equity-calc">$62.1B</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Verification Footer -->
+            <div class="b-footer">
+              <div class="b-footer-audit">INDEPENDENT AUDITOR REPORT &#x2022; GAAP AUDITED</div>
+              <div class="b-footer-totals">TOTAL ASSETS = TOTAL LIABILITIES &amp; EQUITY</div>
+            </div>
+          </div>
         </div>`; } else if (tplId === 'compound') {
       fxContainer.innerHTML = `<div class="tpl-compound">
           <div class="ci-head">
