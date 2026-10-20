@@ -12030,6 +12030,120 @@ body.tool-slide-active {
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); }
 }
 
+/* === POWER MEETING CINEMATIC ENGINE (.tpl-power-meeting) === */
+.tpl-power-meeting {
+  position: absolute; inset: 0; overflow: hidden; background: #000;
+  font-family: 'Space Grotesk', 'Inter', -apple-system, sans-serif;
+}
+.tpl-power-meeting .pm-scene-wrap {
+  position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;
+  background-position: center 25%; background-size: cover; background-repeat: no-repeat;
+  transform-origin: 50% 35%;
+  animation: pmCameraDolly 8s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+}
+@keyframes pmCameraDolly {
+  0% {
+    transform: scale(1.0) translateY(0);
+    filter: brightness(0.98) contrast(1.03);
+  }
+  100% {
+    transform: scale(1.06) translateY(-1.2%);
+    filter: brightness(1.05) contrast(1.08);
+  }
+}
+
+/* 1. Dramatic Keyframable Overhead Directional Spotlight */
+.tpl-power-meeting .pm-spotlight-cone {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: radial-gradient(ellipse 52% 62% at 50% 8%, rgba(254, 240, 138, 0.28) 0%, rgba(217, 119, 6, 0.14) 42%, transparent 75%);
+  mix-blend-mode: screen;
+  animation: pmSpotlightBreath 5s ease-in-out infinite alternate;
+}
+@keyframes pmSpotlightBreath {
+  0% { opacity: 0.85; transform: scale(0.98); }
+  100% { opacity: 1.15; transform: scale(1.02); }
+}
+
+/* 2. Specular Rim Lighting & Polished Mahogany Table Glint */
+.tpl-power-meeting .pm-rim-lighting {
+  position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background: radial-gradient(ellipse 65% 35% at 50% 68%, rgba(251, 191, 36, 0.20) 0%, rgba(180, 83, 9, 0.09) 50%, transparent 80%);
+  mix-blend-mode: color-dodge;
+  animation: pmRimPulse 6s ease-in-out infinite alternate;
+}
+@keyframes pmRimPulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 1.2; }
+}
+
+/* 3. Depth of Field Lens Blur Pass (f/2.8 Simulation) */
+.tpl-power-meeting .pm-dof-overlay {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  background: radial-gradient(ellipse 85% 65% at 50% 68%, transparent 45%, rgba(0,0,0,0.45) 75%, rgba(0,0,0,0.92) 100%);
+}
+
+/* 4. Multi-pass Atmospheric Fog / Smoke Drift */
+.tpl-power-meeting .pm-fog-layer {
+  position: absolute; inset: -20px; z-index: 5; pointer-events: none;
+  mix-blend-mode: screen;
+}
+.tpl-power-meeting .pm-fog-1 {
+  background: radial-gradient(ellipse 50% 30% at 50% 25%, rgba(214, 211, 209, 0.14) 0%, rgba(120, 113, 108, 0.05) 50%, transparent 80%);
+  animation: pmFogDrift1 9s ease-in-out infinite alternate;
+}
+.tpl-power-meeting .pm-fog-2 {
+  background: radial-gradient(ellipse 40% 25% at 48% 30%, rgba(253, 230, 138, 0.11) 0%, rgba(180, 83, 9, 0.04) 45%, transparent 75%);
+  animation: pmFogDrift2 13s ease-in-out infinite alternate-reverse;
+}
+@keyframes pmFogDrift1 {
+  0% { transform: translate(-3%, -1%) scale(0.98); opacity: 0.7; }
+  100% { transform: translate(3%, 2%) scale(1.03); opacity: 1.0; }
+}
+@keyframes pmFogDrift2 {
+  0% { transform: translate(2%, 1%) scale(1.02); opacity: 0.9; }
+  100% { transform: translate(-2%, -2%) scale(0.97); opacity: 0.6; }
+}
+
+/* 5. Volumetric Floating Dust Motes VFX */
+.tpl-power-meeting .pm-dust-field {
+  position: absolute; inset: 0; z-index: 6; pointer-events: none; overflow: hidden;
+}
+.tpl-power-meeting .pm-mote {
+  position: absolute; border-radius: 50%;
+  background: rgba(254, 240, 138, 0.85);
+  box-shadow: 0 0 3px rgba(251, 191, 36, 0.85);
+  pointer-events: none;
+  animation: pmMoteDrift linear infinite;
+}
+@keyframes pmMoteDrift {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  15% { opacity: 0.85; }
+  85% { opacity: 0.85; }
+  100% { transform: translateY(-55px) translateX(14px); opacity: 0; }
+}
+
+/* 6. Confidential Briefing HUD Card (Stage / Modal) */
+.tpl-power-meeting .pm-hud-card {
+  position: absolute; bottom: 12px; left: 14px; right: 14px; z-index: 7;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 12px; border-radius: 6px;
+  background: rgba(8, 10, 16, 0.82); border: 1px solid rgba(251, 191, 36, 0.32);
+  backdrop-filter: blur(8px);
+}
+.tpl-power-meeting .pm-headline {
+  font-size: 10.5px; font-weight: 800; color: #f8fafc; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.tpl-power-meeting .pm-sub {
+  font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 700; color: #fbbf24; letter-spacing: 0.06em;
+}
+#tpl-modal-preview-stage .tpl-power-meeting .pm-hud-card {
+  bottom: 26px; left: 30px; right: 30px; padding: 14px 24px; border-radius: 10px;
+  cursor: grab; pointer-events: auto; user-select: none;
+}
+#tpl-modal-preview-stage .tpl-power-meeting .pm-headline { font-size: 22px; }
+#tpl-modal-preview-stage .tpl-power-meeting .pm-sub { font-size: 13px; }
+
+
 /* === BOARDROOM ZOOM (.tpl-boardroom-zoom) === */
 .tpl-boardroom-zoom {
   position: absolute; inset: 0; overflow: hidden; background: #05070d;
@@ -15029,4 +15143,10 @@ body.tool-slide-active {
   background: radial-gradient(circle at 45% 48%, transparent 40%, rgba(4, 5, 8, 0.8) 85%, rgba(0, 0, 0, 0.98) 100%);
   pointer-events: none;
   z-index: 5;
+}
+
+
+@keyframes moneyMacroDrift {
+  0% { transform: scale(1.02) translate(0px, 0px); }
+  100% { transform: scale(1.08) translate(-4px, -2px); }
 }

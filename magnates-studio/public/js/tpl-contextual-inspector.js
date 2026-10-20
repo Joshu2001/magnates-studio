@@ -55,6 +55,42 @@
 
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
+    // Photorealistic 3D Paper Currency Stack ($100 US Dollars with Kraft Bands)
+    'money-stack': Object.assign({}, (typeof window !== 'undefined' && window.MONEY_STACK_CONFIG) || {
+      type: 'money-stack',
+      stackCount: 3,
+      denomination: '100',
+      currencyStyle: 'usd_100',
+      bandStamp: 'TEN THOUSAND',
+      bandColor: '#cfb284',
+      agedPaperTone: '#eae5d4',
+      bundleThickness: 12.0,
+      billLayerDetail: 95,
+      animMode: 'drop_settle',
+      dropSpeed: 1.15,
+      bounceStrength: 1.25,
+      settleOrganicTilt: true,
+      macroDriftEnabled: true,
+      billFlutterEnabled: true,
+      cameraPreset: 'macro_35',
+      cameraPitch: 32.0,
+      cameraYaw: -28.0,
+      cameraDistance: 310,
+      dofBlur: 0.85,
+      fov: 34,
+      surfaceType: 'vault_steel',
+      spotlightIntensity: 1.85,
+      spotlightColor: '#fff8eb',
+      rimLightIntensity: 1.35,
+      rimLightColor: '#7dd3fc',
+      warmRimIntensity: 0.85,
+      warmRimColor: '#fdba74',
+      enableDustMotes: true,
+      dustMoteCount: 140,
+      dustSpeed: 1.0,
+      vignetteDepth: 0.72,
+      duration: 5.0
+    }),
     // James Jani Forbes 3D Cover (The Fake Genius $30 Billion Fraud)
     'jani-forbes-fraud-reveal': Object.assign({}, (typeof window !== 'undefined' && window.JANI_FORBES_CONFIG) || {
       type: 'jani-forbes',
@@ -435,6 +471,59 @@
     },
 
     // 25B. Empire Rise & Fall Timeline (James Jani / Magnates Media Documentary Style)
+    'empire-map': {
+      type: 'empire-map',
+      title: 'Empire Expansion Map',
+      mapStyle: 'tactical-dark', // 'tactical-dark' (Image 2 standard) or 'vintage-cartography' (Vox Cartography)
+      preset: 'corporate-dominance',
+      is3DMode: true,
+      pitch3D: 28,
+      yaw3D: -3,
+      zoomLevel: 1.08,
+      panX: 0,
+      panY: 0,
+      cameraGlide: true,
+      depthOfField: true,
+      dofBlur: 2.5,
+      arcColor: '#fbbf24',
+      arcGlowColor: 'rgba(245, 158, 11, 0.45)',
+      arcCurvature: 1.0,
+      arcMultiStrand: true,
+      arcSpeed: 3.5,
+      highlightTerritory: 'India',
+      highlightColor: '#2dd4bf',
+      highlightOpacity: 0.28,
+      pinStyle: 'beacon',
+      showShockwaves: true,
+      showCountryBorders: true,
+      showGrid: true,
+      showDotMatrix: true,
+      showLabels: true,
+      hubs: [
+        { id: 'sf', name: 'Silicon Valley', code: 'SFO', x: 85.8, y: 81.9, active: true },
+        { id: 'ny', name: 'New York', code: 'NYC', x: 130.9, y: 79.1, active: true },
+        { id: 'sp', name: 'São Paulo', code: 'SAO', x: 156.5, y: 140.5, active: true },
+        { id: 'lon', name: 'London', code: 'LON', x: 199.9, y: 68.8, active: true },
+        { id: 'fra', name: 'Frankfurt', code: 'FRA', x: 208.1, y: 70.1, active: true },
+        { id: 'jnb', name: 'Johannesburg', code: 'JNB', x: 226.2, y: 143.0, active: true },
+        { id: 'del', name: 'India', code: 'IND', x: 272.1, y: 95.0, active: true },
+        { id: 'hkg', name: 'East Asia', code: 'HKG', x: 306.5, y: 96.7, active: true },
+        { id: 'tyo', name: 'Tokyo', code: 'TYO', x: 330.3, y: 83.9, active: true },
+        { id: 'syd', name: 'Sydney', code: 'SYD', x: 341.1, y: 150.4, active: true }
+      ],
+      routes: [
+        { from: 'sf', to: 'ny', curv: 0.65, delay: 0 },
+        { from: 'ny', to: 'lon', curv: 0.95, delay: 0.4 },
+        { from: 'sp', to: 'ny', curv: 0.70, delay: 0.7 },
+        { from: 'lon', to: 'fra', curv: 0.50, delay: 0.9 },
+        { from: 'lon', to: 'jnb', curv: 0.75, delay: 1.1 },
+        { from: 'lon', to: 'del', curv: 1.15, delay: 1.3 },
+        { from: 'fra', to: 'del', curv: 1.05, delay: 1.5 },
+        { from: 'del', to: 'hkg', curv: 0.65, delay: 1.8 },
+        { from: 'hkg', to: 'tyo', curv: 0.55, delay: 2.1 },
+        { from: 'hkg', to: 'syd', curv: 0.75, delay: 2.4 }
+      ]
+    },
     'empire-timeline': {
       type: 'empire-timeline',
       title: 'THE RISE & FALL OF ENRON',
@@ -707,6 +796,24 @@
       accentColor: '#fbbf24',
       cutoutUrl: '/ceo_portrait_cutout.jpg',
       portraitScale: 1.0,
+      bgPreset: 'default',
+      bgMediaUrl: '',
+      bgMediaType: 'image'
+    },
+
+        // 40B-2. Power Meeting Cinematic Engine
+    'power-meeting': {
+      type: 'power-meeting',
+      headline: 'POWER MEETING',
+      subline: 'SILHOUETTES · HIGH-STAKES NEGOTIATION',
+      fontFamily: "'Space Grotesk', sans-serif",
+      textColor: '#f8fafc',
+      accentColor: '#fbbf24',
+      meetingBg: '/power_meeting_cinematic_plate.jpg',
+      spotlightWarmth: 85,
+      fogDensity: 75,
+      dofIntensity: 80,
+      showHud: false,
       bgPreset: 'default',
       bgMediaUrl: '',
       bgMediaType: 'image'
@@ -2500,6 +2607,312 @@
   };
 
   // --- 2C. EMPIRE RISE & FALL TIMELINE BUILDER (James Jani / Magnates Media Documentary Style) ---
+  // --- 2D. EMPIRE EXPANSION MAP 3D ENGINE (Vox / Johnny Harris / Magnates Media Photorealistic Engine) ---
+  window.tplBuildEmpireMapHtml = function(mData) {
+    const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('empire-map') : {});
+    const mapStyle = d.mapStyle || 'tactical-dark';
+    const isVintage = mapStyle === 'vintage-cartography';
+    const is3D = d.is3DMode !== false;
+    const pitch = parseFloat(d.pitch3D !== undefined ? d.pitch3D : 28);
+    const yaw = parseFloat(d.yaw3D !== undefined ? d.yaw3D : -3);
+    const zoom = parseFloat(d.zoomLevel !== undefined ? d.zoomLevel : 1.08);
+    const panX = parseFloat(d.panX || 0);
+    const panY = parseFloat(d.panY || 0);
+    const cameraGlide = d.cameraGlide !== false;
+    const dof = d.depthOfField !== false;
+    const dofBlur = parseFloat(d.dofBlur || 2.5);
+    const arcColor = d.arcColor || (isVintage ? '#ef4444' : '#fbbf24');
+    const arcGlow = d.arcGlowColor || (isVintage ? 'rgba(239, 68, 68, 0.45)' : 'rgba(245, 158, 11, 0.45)');
+    const arcCurv = parseFloat(d.arcCurvature || 1.0);
+    const multiStrand = d.arcMultiStrand !== false;
+    const arcSpeed = parseFloat(d.arcSpeed || 3.5);
+    const highlightTerritory = d.highlightTerritory !== undefined ? d.highlightTerritory : 'India';
+    const highlightColor = d.highlightColor || (isVintage ? '#dc2626' : '#2dd4bf');
+    const highlightOpacity = parseFloat(d.highlightOpacity !== undefined ? d.highlightOpacity : (isVintage ? 0.32 : 0.28));
+    const showShockwaves = d.showShockwaves !== false;
+    const showBorders = d.showCountryBorders !== false;
+    const showGrid = d.showGrid !== false;
+    const showDotMatrix = d.showDotMatrix !== false;
+    const showLabels = d.showLabels !== false;
+
+    // High-Resolution Cartography Geometry
+    const accurateMapData = (typeof window !== "undefined" && window.ACCURATE_WORLD_MAP) ? window.ACCURATE_WORLD_MAP : null;
+    const landPath = (accurateMapData && accurateMapData.land) ? accurateMapData.land : "M 32 40 L 42 35 L 56 34 L 72 32 L 86 31 L 98 33 L 112 37 L 126 44 L 136 54 L 128 62 L 134 70 L 124 78 L 116 86 L 112 94 L 108 97 L 105 91 L 96 92 L 91 97 L 95 105 L 104 110 L 98 114 L 90 106 L 82 101 L 75 91 L 72 83 L 68 87 L 65 77 L 62 67 L 55 54 L 42 52 L 32 46 Z";
+
+    // Theme Palettes: Tactical Dark (Image 2) vs Aged Vintage Cartography
+    const th = isVintage ? {
+      bg: 'radial-gradient(ellipse at 50% 50%, #201a14 0%, #15110d 60%, #0a0806 100%)',
+      grid: 'rgba(212, 196, 168, 0.12)',
+      gridSub: 'rgba(212, 196, 168, 0.05)',
+      landFill: '#382f25',
+      landStroke: '#c2b195',
+      dotCol: '#d4c4a8',
+      dotOpacity: 0.35,
+      borderCol: 'rgba(212, 196, 168, 0.30)',
+      atmoLimb: 'rgba(212, 196, 168, 0.15)',
+      vignette: 'radial-gradient(ellipse at 50% 50%, transparent 35%, rgba(18, 14, 10, 0.72) 75%, rgba(10, 8, 6, 0.96) 100%)',
+      pinStem0: '#78350f',
+      pinStem1: '#d4c4a8',
+      pinHeadRim: '#b45309',
+      pinHeadCenter: '#451a03',
+      pinHeadCore: '#fef3c7',
+      pulseRingCol: 'rgba(239, 68, 68, 0.55)',
+      paperGrain: 'opacity(0.18) contrast(1.2)'
+    } : {
+      // Tactical Dark Blueprint Grid (Image 2 Standard)
+      bg: 'radial-gradient(ellipse at 50% 55%, #041624 0%, #020b16 52%, #01040a 100%)',
+      grid: 'rgba(45, 212, 191, 0.12)',
+      gridSub: 'rgba(45, 212, 191, 0.05)',
+      landFill: '#07192a',
+      landStroke: 'rgba(45, 212, 191, 0.42)',
+      dotCol: '#38bdf8',
+      dotOpacity: 0.75,
+      borderCol: 'rgba(45, 212, 191, 0.22)',
+      atmoLimb: 'rgba(56, 189, 248, 0.25)',
+      vignette: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(2, 6, 16, 0.68) 75%, rgba(1, 3, 8, 0.94) 100%)',
+      pinStem0: '#ea580c',
+      pinStem1: '#fef08a',
+      pinHeadRim: '#f59e0b',
+      pinHeadCenter: '#78350f',
+      pinHeadCore: '#fffbeb',
+      pulseRingCol: 'rgba(251, 191, 36, 0.65)',
+      paperGrain: 'none'
+    };
+
+    // Global Expansion Hubs matching Image 2
+    const hubs = [
+      { id: 'sf', name: 'Silicon Valley', code: 'SFO', x: 85.8, y: 81.9, active: true },
+      { id: 'ny', name: 'New York', code: 'NYC', x: 130.9, y: 79.1, active: true },
+      { id: 'sp', name: 'São Paulo', code: 'SAO', x: 156.5, y: 140.5, active: true },
+      { id: 'lon', name: 'London', code: 'LON', x: 199.9, y: 68.8, active: true },
+      { id: 'fra', name: 'Frankfurt', code: 'FRA', x: 208.1, y: 70.1, active: true },
+      { id: 'jnb', name: 'Johannesburg', code: 'JNB', x: 226.2, y: 143.0, active: true },
+      { id: 'del', name: 'India', code: 'IND', x: 272.1, y: 95.0, active: true },
+      { id: 'hkg', name: 'East Asia', code: 'HKG', x: 306.5, y: 96.7, active: true },
+      { id: 'tyo', name: 'Tokyo', code: 'TYO', x: 330.3, y: 83.9, active: true },
+      { id: 'syd', name: 'Sydney', code: 'SYD', x: 341.1, y: 150.4, active: true }
+    ];
+
+    // Expansion Routes matching Image 2
+    const routes = [
+      { from: 'sf', to: 'ny', curv: 0.65, delay: 0 },
+      { from: 'ny', to: 'lon', curv: 0.95, delay: 0.4 },
+      { from: 'sp', to: 'ny', curv: 0.70, delay: 0.7 },
+      { from: 'lon', to: 'fra', curv: 0.50, delay: 0.9 },
+      { from: 'lon', to: 'jnb', curv: 0.75, delay: 1.1 },
+      { from: 'lon', to: 'del', curv: 1.15, delay: 1.3 },
+      { from: 'fra', to: 'del', curv: 1.05, delay: 1.5 },
+      { from: 'del', to: 'hkg', curv: 0.65, delay: 1.8 },
+      { from: 'hkg', to: 'tyo', curv: 0.55, delay: 2.1 },
+      { from: 'hkg', to: 'syd', curv: 0.75, delay: 2.4 }
+    ];
+
+    const hubMap = {};
+    hubs.forEach(h => hubMap[h.id] = h);
+
+    // Build Parabolic 3D Light Arcs
+    const arcsMarkup = routes.map((r, i) => {
+      const h1 = hubMap[r.from];
+      const h2 = hubMap[r.to];
+      if (!h1 || !h2) return '';
+      const x1 = h1.x, y1 = h1.y, x2 = h2.x, y2 = h2.y;
+      const mx = (x1 + x2) / 2;
+      const dx = Math.abs(x2 - x1);
+      const dy = Math.abs(y2 - y1);
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const arcH = Math.min(85, Math.max(22, dist * 0.48 * arcCurv * r.curv));
+      const my = Math.min(y1, y2) - arcH;
+
+      const mainD = `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+      const subD1 = `M ${x1} ${y1} Q ${mx} ${my - 2.5} ${x2} ${y2}`;
+      const subD2 = `M ${x1} ${y1} Q ${mx} ${my + 2.0} ${x2} ${y2}`;
+
+      return `
+        <g class="empire-arc-group" data-from="${r.from}" data-to="${r.to}">
+          <!-- Outer luminous bloom glow -->
+          <path d="${mainD}" fill="none" stroke="${arcGlow}" stroke-width="5.5" filter="url(#empGlowBlur)" stroke-linecap="round"/>
+          <!-- Radiant amber/gold beam body -->
+          <path d="${mainD}" fill="none" stroke="${arcColor}" stroke-width="2.2" filter="url(#empArcGlow)" stroke-linecap="round"/>
+          <!-- Hot white-gold central filament -->
+          <path d="${mainD}" fill="none" stroke="#ffffff" stroke-width="0.9" stroke-linecap="round"/>
+          ${multiStrand ? `
+            <!-- Secondary multi-fiber satellite filaments -->
+            <path d="${subD1}" fill="none" stroke="${arcColor}" stroke-opacity="0.65" stroke-width="0.75" stroke-dasharray="4, 3" stroke-linecap="round"/>
+            <path d="${subD2}" fill="none" stroke="${arcColor}" stroke-opacity="0.45" stroke-width="0.65" stroke-dasharray="2, 4" stroke-linecap="round"/>
+          ` : ''}
+          <!-- Animated traveling energy pulse / comet head -->
+          <path class="empire-arc-pulse-line" d="${mainD}" fill="none" stroke="#ffffff" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="14 200" style="animation: empireArcFlow ${arcSpeed}s linear infinite ${r.delay}s;"/>
+        </g>
+      `;
+    }).join('');
+
+    // Build 3D Beacon Pins & Ground Ripples
+    const pinsMarkup = hubs.map((h, i) => {
+      const hx = h.x, hy = h.y;
+      return `
+        <g class="empire-hub-node" data-hub="${h.id}">
+          ${showShockwaves ? `
+            <!-- Concentric ground shockwaves on tilted plane -->
+            <ellipse cx="${hx}" cy="${hy}" rx="14" ry="7" fill="none" stroke="${th.pulseRingCol}" stroke-width="0.85" style="animation: empireShockwave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite ${i * 0.28}s; transform-origin: ${hx}px ${hy}px;"/>
+            <ellipse cx="${hx}" cy="${hy}" rx="7" ry="3.5" fill="none" stroke="${th.pulseRingCol}" stroke-width="0.75" style="animation: empireShockwave 2.8s cubic-bezier(0.2, 0.8, 0.4, 1) infinite ${i * 0.28 + 0.55}s; transform-origin: ${hx}px ${hy}px;"/>
+          ` : ''}
+          <!-- Ground contact anchor glow -->
+          <ellipse cx="${hx}" cy="${hy}" rx="3.2" ry="1.6" fill="${th.pulseRingCol}" opacity="0.85"/>
+          <circle cx="${hx}" cy="${hy}" r="1.1" fill="#fff"/>
+          <!-- Vertical 3D Pin Needle Stem -->
+          <line x1="${hx}" y1="${hy - 11}" x2="${hx}" y2="${hy}" stroke="url(#empPinStemGrad)" stroke-width="1.3" stroke-linecap="round"/>
+          <!-- 3D Beacon Pin Head with concentric metallic rim and luminous center -->
+          <circle cx="${hx}" cy="${hy - 11}" r="3.6" fill="${th.pinHeadCenter}" stroke="${th.pinHeadRim}" stroke-width="0.9" filter="url(#empBeaconGlow)"/>
+          <circle cx="${hx}" cy="${hy - 11}" r="1.8" fill="${th.pinHeadCore}"/>
+          ${showLabels ? `
+            <text x="${hx}" y="${hy - 16}" fill="rgba(255,255,255,0.85)" font-family="'JetBrains Mono', monospace" font-size="4.2" font-weight="700" text-anchor="middle" letter-spacing="0.5">${h.code}</text>
+          ` : ''}
+        </g>
+      `;
+    }).join('');
+
+    // Country Boundary Outlines from Natural Earth Real Cartography
+    let countryBordersSvg = '';
+    if (showBorders && accurateMapData && accurateMapData.countries) {
+      const paths = Object.values(accurateMapData.countries).slice(0, 150);
+      countryBordersSvg = `
+        <g class="empire-country-boundaries" fill="none" stroke="${th.borderCol}" stroke-width="0.38" stroke-linejoin="round" opacity="0.85">
+          ${paths.map(p => `<path d="${p}"/>`).join('')}
+        </g>
+      `;
+    }
+
+    // Territory Highlight Layer (India standard in Image 2)
+    let territoryHighlightSvg = '';
+    if (highlightTerritory && highlightTerritory !== 'None') {
+      const terrPath = typeof getCountrySvgPath === 'function' ? getCountrySvgPath(highlightTerritory) : (accurateMapData && accurateMapData.countries ? accurateMapData.countries[highlightTerritory] : null);
+      if (terrPath) {
+        territoryHighlightSvg = `
+          <g class="empire-highlight-layer" style="animation: empireTerritoryBreathe 4s ease-in-out infinite alternate;">
+            <path d="${terrPath}" fill="${highlightColor}" fill-opacity="${highlightOpacity}" stroke="${highlightColor}" stroke-width="1.3" filter="url(#empTerrGlow)"/>
+          </g>
+        `;
+      }
+    }
+
+    // 3D Camera Rig Styles
+    const rigTransform = is3D
+      ? `transform: perspective(1100px) rotateX(${pitch}deg) rotateY(${yaw}deg) scale(${zoom}) translate(${panX}px, ${panY}px);`
+      : 'transform: none;';
+
+    return `
+      <div class="tpl-empire-map ${is3D ? 'is-3d-rig' : ''} ${isVintage ? 'is-vintage-style' : 'is-tactical-style'}" style="background: ${th.bg}; width: 100%; height: 100%; position: relative; overflow: hidden; user-select: none;">
+        <style>
+          @keyframes empireShockwave {
+            0% { transform: scale(0.2); opacity: 0.95; }
+            50% { opacity: 0.6; }
+            100% { transform: scale(1.6); opacity: 0; }
+          }
+          @keyframes empireArcFlow {
+            0% { stroke-dashoffset: 220; }
+            100% { stroke-dashoffset: -20; }
+          }
+          @keyframes empireTerritoryBreathe {
+            0% { fill-opacity: ${highlightOpacity * 0.85}; filter: drop-shadow(0 0 4px ${highlightColor}); }
+            100% { fill-opacity: ${highlightOpacity * 1.35}; filter: drop-shadow(0 0 10px ${highlightColor}); }
+          }
+          @keyframes empireCameraGlideAnim {
+            0% { transform: perspective(1100px) rotateX(${pitch}deg) rotateY(${yaw - 1.5}deg) scale(${zoom}) translate(${panX - 8}px, ${panY}px); }
+            50% { transform: perspective(1100px) rotateX(${pitch + 2}deg) rotateY(${yaw + 1.5}deg) scale(${zoom * 1.02}) translate(${panX + 8}px, ${panY - 4}px); }
+            100% { transform: perspective(1100px) rotateX(${pitch}deg) rotateY(${yaw - 1.5}deg) scale(${zoom}) translate(${panX - 8}px, ${panY}px); }
+          }
+          .empire-3d-canvas-wrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            ${rigTransform}
+            ${cameraGlide ? 'animation: empireCameraGlideAnim 10s ease-in-out infinite alternate;' : ''}
+            transition: transform 0.25s ease-out;
+          }
+        </style>
+
+        <!-- 3D Spatial Canvas Rig Container -->
+        <div class="empire-3d-canvas-wrap">
+          <svg class="empire-map-svg" viewBox="0 0 400 225" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+            <defs>
+              <filter id="empGlowBlur" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3.5"/>
+              </filter>
+              <filter id="empArcGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="${arcColor}"/>
+              </filter>
+              <filter id="empBeaconGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="${th.pinHeadRim}"/>
+              </filter>
+              <filter id="empTerrGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="0" stdDeviation="4.5" flood-color="${highlightColor}"/>
+              </filter>
+              <pattern id="empCoordGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="${th.grid}" stroke-width="0.5"/>
+              </pattern>
+              <pattern id="empDotMatrixPattern" width="2.4" height="2.4" patternUnits="userSpaceOnUse">
+                <circle cx="1.2" cy="1.2" r="0.48" fill="${th.dotCol}" opacity="${th.dotOpacity}"/>
+              </pattern>
+              <linearGradient id="empPinStemGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="${th.pinStem0}"/>
+                <stop offset="100%" stop-color="${th.pinStem1}"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 1. Coordinate Blueprint Ground Mesh -->
+            ${showGrid ? `<rect width="400" height="225" fill="url(#empCoordGrid)"/>` : ''}
+
+            <!-- 2. Continents Cartography Layer -->
+            <g class="empire-landmasses">
+              <!-- Base Continent Shapes -->
+              <path d="${landPath}" fill="${th.landFill}" stroke="${th.landStroke}" stroke-width="0.55" stroke-linejoin="round"/>
+              <!-- Tactical Dot Matrix Texture (Image 2 standard) -->
+              ${showDotMatrix ? `<path d="${landPath}" fill="url(#empDotMatrixPattern)"/>` : ''}
+              <!-- High-precision country boundaries -->
+              ${countryBordersSvg}
+            </g>
+
+            <!-- 3. Captured Territory Highlight (India in Image 2) -->
+            ${territoryHighlightSvg}
+
+            <!-- 4. Parabolic 3D Light Arcs -->
+            <g class="empire-arcs-layer">
+              ${arcsMarkup}
+            </g>
+
+            <!-- 5. 3D Beacon Pins & Shockwaves -->
+            <g class="empire-pins-layer">
+              ${pinsMarkup}
+            </g>
+          </svg>
+        </div>
+
+        <!-- Atmospheric Vignette & Depth of Field (f/2.8 Lens Bokeh) -->
+        ${dof ? `
+          <!-- Top horizon lens bokeh progressive blur -->
+          <div class="empire-dof-horizon" style="position: absolute; top: 0; left: 0; right: 0; height: 32%; pointer-events: none; backdrop-filter: blur(${dofBlur}px); -webkit-backdrop-filter: blur(${dofBlur}px); mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 55%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 55%, transparent 100%); z-index: 6;"></div>
+          <!-- Bottom foreground lens bokeh soft focus -->
+          <div class="empire-dof-foreground" style="position: absolute; bottom: 0; left: 0; right: 0; height: 20%; pointer-events: none; backdrop-filter: blur(${dofBlur * 0.65}px); -webkit-backdrop-filter: blur(${dofBlur * 0.65}px); mask-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%); z-index: 6;"></div>
+        ` : ''}
+
+        <!-- Volumetric Vignette & Atmospheric Limb Glow -->
+        <div class="empire-atmospheric-vignette" style="position: absolute; inset: 0; background: ${th.vignette}; box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.85); pointer-events: none; z-index: 7;"></div>
+
+        <!-- Telemetry HUD & Status Overlay -->
+        <div class="empire-telemetry-hud" style="position: absolute; top: 12px; left: 14px; pointer-events: none; z-index: 8; display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 8.5px; font-weight: 800; color: ${highlightColor}; letter-spacing: 1.2px; text-shadow: 0 0 8px ${highlightColor}; display: flex; align-items: center; gap: 6px;">
+            <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: ${highlightColor}; box-shadow: 0 0 6px ${highlightColor}; animation: pulse 1.5s infinite;"></span>
+            GLOBAL EMPIRE EXPANSION // MATRIX ACTIVE
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 7px; color: rgba(255,255,255,0.55); letter-spacing: 0.8px;">
+            HUBS: 10 ACTIVE | CORRIDORS: 10 | PROJ: 3D CYLINDRICAL ${is3D ? `| PITCH: ${pitch}°` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
   window.tplBuildEmpireTimelineHtml = function(mData) {
     const d = mData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('empire-timeline') : {});
     const title = d.title || 'THE RISE & FALL OF ENRON';
@@ -2703,6 +3116,22 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'money-stack') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const vp = stage.querySelector('#money-stack-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountMoneyStack3DStage === 'function') {
+            window.tplMountMoneyStack3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initMoneyStack3DScene === 'function') {
+            window.initMoneyStack3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
     if (tplId === 'jani-forbes-fraud-reveal') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -2751,7 +3180,15 @@
     }
     if (!fxc) return;
 
-    if (tplId === 'empire-timeline') {
+    if (tplId === 'empire-map') {
+      fxc.innerHTML = window.tplBuildEmpireMapHtml(data);
+      fxc.style.display = 'block';
+      const defImg = stage.querySelector(`#default-img-${tplId}`);
+      if (defImg) defImg.style.display = 'none';
+      if (typeof window.initUniversalStageTransformEngine === 'function') {
+        window.initUniversalStageTransformEngine();
+      }
+    } else if (tplId === 'empire-timeline') {
       fxc.innerHTML = window.tplBuildEmpireTimelineHtml(data);
       fxc.style.display = 'block';
       const defImg = stage.querySelector(`#default-img-${tplId}`);
@@ -2843,7 +3280,225 @@
       if (typeof window.initUniversalStageTransformEngine === 'function') {
         window.initUniversalStageTransformEngine();
       }
-    } else if (tplId === 'map-pin-drop') {
+    } else if (tplId === 'empire-map') {
+      if (stdLayers) stdLayers.style.display = 'none';
+      const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
+      if (aiWrapEl) aiWrapEl.style.display = 'none';
+      const atmoWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
+      if (atmoWrapEl) atmoWrapEl.style.display = 'flex';
+
+      const is3D = data.is3DMode !== false;
+      const curStyle = data.mapStyle || 'tactical-dark';
+      const curTerritory = data.highlightTerritory || 'India';
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(45,212,191,0.35); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <!-- Header & Quick Preset Selector -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px;">🌐</span>
+              <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #2dd4bf; text-transform: uppercase;">Empire Expansion Map • Vox / Harris Standard</span>
+            </div>
+            <span style="font-size: 9px; font-weight: 700; background: rgba(45,212,191,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.3); border-radius: 4px; padding: 2px 7px;">PRO 3D CARTOGRAPHY</span>
+          </div>
+
+          <!-- Preset Switcher -->
+          <div>
+            <label style="display: block; font-size: 9.5px; font-weight: 700; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Documentary Style Preset</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" class="emp-preset-btn ${curStyle === 'tactical-dark' ? 'active' : ''}" data-preset="tactical-dark" style="padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curStyle === 'tactical-dark' ? '#2dd4bf' : 'rgba(255,255,255,0.1)'}; background: ${curStyle === 'tactical-dark' ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.04)'}; color: ${curStyle === 'tactical-dark' ? '#2dd4bf' : '#cbd5e1'}; text-align: left;">
+                🛰️ Tactical Dark Grid (Image 2)
+              </button>
+              <button type="button" class="emp-preset-btn ${curStyle === 'vintage-cartography' ? 'active' : ''}" data-preset="vintage-cartography" style="padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curStyle === 'vintage-cartography' ? '#f59e0b' : 'rgba(255,255,255,0.1)'}; background: ${curStyle === 'vintage-cartography' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)'}; color: ${curStyle === 'vintage-cartography' ? '#f59e0b' : '#cbd5e1'}; text-align: left;">
+                📜 Vintage Paper (Vox Style)
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 1: 3D Spatial Camera & Lens Optics -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+              <span>🎥 3D Camera Rig & Lens Optics (f/2.8 Bokeh)</span>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #94a3b8; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-3d" ${is3D ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                3D Perspective
+              </label>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
+                  <span>Camera Pitch</span>
+                  <span id="emp-val-pitch">${data.pitch3D !== undefined ? data.pitch3D : 28}°</span>
+                </div>
+                <input type="range" id="emp-inp-pitch" min="15" max="42" step="1" value="${data.pitch3D !== undefined ? data.pitch3D : 28}" style="width: 100%; cursor: pointer; accent-color: #2dd4bf;"/>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
+                  <span>Camera Yaw</span>
+                  <span id="emp-val-yaw">${data.yaw3D !== undefined ? data.yaw3D : -3}°</span>
+                </div>
+                <input type="range" id="emp-inp-yaw" min="-25" max="25" step="1" value="${data.yaw3D !== undefined ? data.yaw3D : -3}" style="width: 100%; cursor: pointer; accent-color: #2dd4bf;"/>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-glide" ${data.cameraGlide !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                3D Sweeping Camera Glide
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-dof" ${data.depthOfField !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                f/2.8 Lens Bokeh (Horizon Blur)
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 2: Parabolic 3D Light-Arcs & Expansion Routes -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9;">
+              ⚡ Parabolic 3D Light-Arcs & Trajectories
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Arc Glow Color</label>
+                <input type="color" id="emp-inp-arc-col" value="${data.arcColor || '#fbbf24'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; cursor: pointer; background: transparent;"/>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
+                  <span>Arc Height / Curvature</span>
+                  <span id="emp-val-curv">${data.arcCurvature !== undefined ? data.arcCurvature : '1.0'}x</span>
+                </div>
+                <input type="range" id="emp-inp-curv" min="0.5" max="1.8" step="0.1" value="${data.arcCurvature !== undefined ? data.arcCurvature : 1.0}" style="width: 100%; cursor: pointer; accent-color: #fbbf24;"/>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-multistrand" ${data.arcMultiStrand !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #fbbf24;"/>
+                Multi-Strand Fiber-Optic Bundles
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 3: Captured Territory Highlight & Hub Pins -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9;">
+              📍 Expansion Hubs & Captured Territory Fill
+            </div>
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px;">
+              <div>
+                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Captured Territory</label>
+                <select id="emp-sel-territory" style="width: 100%; padding: 5px 8px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; color: #f8fafc; font-size: 10px; cursor: pointer;">
+                  <option value="India" ${curTerritory === 'India' ? 'selected' : ''}>🇮🇳 India (Image 2 Standard)</option>
+                  <option value="United States of America" ${curTerritory === 'United States of America' ? 'selected' : ''}>🇺🇸 United States</option>
+                  <option value="United Kingdom" ${curTerritory === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom</option>
+                  <option value="Germany" ${curTerritory === 'Germany' ? 'selected' : ''}>🇩🇪 Germany</option>
+                  <option value="China" ${curTerritory === 'China' ? 'selected' : ''}>🇨🇳 China</option>
+                  <option value="None" ${curTerritory === 'None' ? 'selected' : ''}>None (Routes Only)</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Territory Glow</label>
+                <input type="color" id="emp-inp-terr-col" value="${data.highlightColor || '#2dd4bf'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; cursor: pointer; background: transparent;"/>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-shockwaves" ${data.showShockwaves !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                Pulsing Ground Shockwaves
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-borders" ${data.showCountryBorders !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                Country Boundary Outlines
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-dotmatrix" ${data.showDotMatrix !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                Dot-Matrix Mesh
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners for Inspector Controls
+      container.querySelectorAll('.emp-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          const p = btn.dataset.preset;
+          const updates = p === 'vintage-cartography' ? {
+            mapStyle: 'vintage-cartography',
+            arcColor: '#ef4444',
+            arcGlowColor: 'rgba(239, 68, 68, 0.45)',
+            highlightColor: '#dc2626'
+          } : {
+            mapStyle: 'tactical-dark',
+            arcColor: '#fbbf24',
+            arcGlowColor: 'rgba(245, 158, 11, 0.45)',
+            highlightColor: '#2dd4bf'
+          };
+          window.tplSetContextualData('empire-map', updates);
+          window.tplRenderContextualInspector('empire-map');
+        };
+      });
+
+      const t3D = container.querySelector('#emp-toggle-3d');
+      if (t3D) t3D.onchange = (e) => {
+        window.tplSetContextualData('empire-map', { is3DMode: e.target.checked });
+        window.tplRenderContextualInspector('empire-map');
+      };
+
+      const pInp = container.querySelector('#emp-inp-pitch');
+      if (pInp) pInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const lbl = container.querySelector('#emp-val-pitch');
+        if (lbl) lbl.textContent = `${v}°`;
+        window.tplSetContextualData('empire-map', { pitch3D: v });
+      };
+
+      const yInp = container.querySelector('#emp-inp-yaw');
+      if (yInp) yInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const lbl = container.querySelector('#emp-val-yaw');
+        if (lbl) lbl.textContent = `${v}°`;
+        window.tplSetContextualData('empire-map', { yaw3D: v });
+      };
+
+      const tGlide = container.querySelector('#emp-toggle-glide');
+      if (tGlide) tGlide.onchange = (e) => window.tplSetContextualData('empire-map', { cameraGlide: e.target.checked });
+
+      const tDof = container.querySelector('#emp-toggle-dof');
+      if (tDof) tDof.onchange = (e) => window.tplSetContextualData('empire-map', { depthOfField: e.target.checked });
+
+      const arcColInp = container.querySelector('#emp-inp-arc-col');
+      if (arcColInp) arcColInp.oninput = (e) => window.tplSetContextualData('empire-map', { arcColor: e.target.value, arcGlowColor: e.target.value + '73' });
+
+      const curvInp = container.querySelector('#emp-inp-curv');
+      if (curvInp) curvInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const lbl = container.querySelector('#emp-val-curv');
+        if (lbl) lbl.textContent = `${v.toFixed(1)}x`;
+        window.tplSetContextualData('empire-map', { arcCurvature: v });
+      };
+
+      const tStrand = container.querySelector('#emp-toggle-multistrand');
+      if (tStrand) tStrand.onchange = (e) => window.tplSetContextualData('empire-map', { arcMultiStrand: e.target.checked });
+
+      const terrSel = container.querySelector('#emp-sel-territory');
+      if (terrSel) terrSel.onchange = (e) => window.tplSetContextualData('empire-map', { highlightTerritory: e.target.value });
+
+      const terrColInp = container.querySelector('#emp-inp-terr-col');
+      if (terrColInp) terrColInp.oninput = (e) => window.tplSetContextualData('empire-map', { highlightColor: e.target.value });
+
+      const tShock = container.querySelector('#emp-toggle-shockwaves');
+      if (tShock) tShock.onchange = (e) => window.tplSetContextualData('empire-map', { showShockwaves: e.target.checked });
+
+      const tBorders = container.querySelector('#emp-toggle-borders');
+      if (tBorders) tBorders.onchange = (e) => window.tplSetContextualData('empire-map', { showCountryBorders: e.target.checked });
+
+      const tDots = container.querySelector('#emp-toggle-dotmatrix');
+      if (tDots) tDots.onchange = (e) => window.tplSetContextualData('empire-map', { showDotMatrix: e.target.checked });
+
+      return;
+    }
+
+    if (tplId === 'map-pin-drop') {
       fxc.innerHTML = window.tplBuildTacticalMapPinDropHtml(data);
       if (typeof window.initUniversalStageTransformEngine === 'function') {
         window.initUniversalStageTransformEngine();
@@ -3615,6 +4270,39 @@
       }
       const card = fxc.querySelector('.ceo-info-card');
       if (card && data.accentColor) card.style.borderLeftColor = data.accentColor;
+    } else if (tplId === 'power-meeting') {
+      const root = fxc.querySelector('.tpl-power-meeting');
+      if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
+        window.tplSyncUniversalBgStageLayer(root, data);
+      }
+      const sc = fxc.querySelector('.pm-scene-wrap');
+      if (sc && data.meetingBg) sc.style.backgroundImage = `url("${data.meetingBg}")`;
+      const spot = fxc.querySelector('.pm-spotlight-cone');
+      if (spot && data.spotlightWarmth !== undefined) {
+        spot.style.opacity = (data.spotlightWarmth / 100).toString();
+      }
+      const fog1 = fxc.querySelector('.pm-fog-1');
+      const fog2 = fxc.querySelector('.pm-fog-2');
+      if (data.fogDensity !== undefined) {
+        const fd = data.fogDensity / 100;
+        if (fog1) fog1.style.opacity = (0.7 * fd).toString();
+        if (fog2) fog2.style.opacity = (0.8 * fd).toString();
+      }
+      const dof = fxc.querySelector('.pm-dof-overlay');
+      if (dof && data.dofIntensity !== undefined) {
+        dof.style.opacity = (data.dofIntensity / 100).toString();
+      }
+      const hl = fxc.querySelector('.pm-headline');
+      if (hl) {
+        if (data.headline !== undefined) hl.textContent = data.headline;
+        if (data.fontFamily) hl.style.fontFamily = data.fontFamily;
+        if (data.textColor) hl.style.color = data.textColor;
+      }
+      const sb = fxc.querySelector('.pm-sub');
+      if (sb) {
+        if (data.subline !== undefined) sb.textContent = data.subline;
+        if (data.accentColor) sb.style.color = data.accentColor;
+      }
     } else if (tplId === 'boardroom-zoom') {
       const root = fxc.querySelector('.tpl-boardroom-zoom');
       if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
@@ -4021,6 +4709,17 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'money-stack') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildMoneyStackInspector === 'function') {
+          window.tplBuildMoneyStackInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'jani-forbes-fraud-reveal') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
@@ -5604,7 +6303,15 @@
     // SPECIAL HANDLER: EMPIRE RISE & FALL TIMELINE (empire-timeline)
     // James Jani / Magnates Media Documentary Visuals, Hairline, Milestones
     // =========================================================================
-    if (tplId === 'empire-timeline') {
+    if (tplId === 'empire-map') {
+      fxc.innerHTML = window.tplBuildEmpireMapHtml(data);
+      fxc.style.display = 'block';
+      const defImg = stage.querySelector(`#default-img-${tplId}`);
+      if (defImg) defImg.style.display = 'none';
+      if (typeof window.initUniversalStageTransformEngine === 'function') {
+        window.initUniversalStageTransformEngine();
+      }
+    } else if (tplId === 'empire-timeline') {
       if (stdLayers) stdLayers.style.display = 'none';
       const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
       if (aiWrapEl) aiWrapEl.style.display = 'none';
@@ -6446,6 +7153,224 @@
     // SPECIAL HANDLER: LAYERED CINEMATIC 3D MAP PIN DROP (map-pin-drop)
     // High-Resolution Scalable Vector System - James Jani / Yes Theory standard
     // =========================================================================
+    if (tplId === 'empire-map') {
+      if (stdLayers) stdLayers.style.display = 'none';
+      const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
+      if (aiWrapEl) aiWrapEl.style.display = 'none';
+      const atmoWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
+      if (atmoWrapEl) atmoWrapEl.style.display = 'flex';
+
+      const is3D = data.is3DMode !== false;
+      const curStyle = data.mapStyle || 'tactical-dark';
+      const curTerritory = data.highlightTerritory || 'India';
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(45,212,191,0.35); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+          <!-- Header & Quick Preset Selector -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px;">🌐</span>
+              <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #2dd4bf; text-transform: uppercase;">Empire Expansion Map • Vox / Harris Standard</span>
+            </div>
+            <span style="font-size: 9px; font-weight: 700; background: rgba(45,212,191,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.3); border-radius: 4px; padding: 2px 7px;">PRO 3D CARTOGRAPHY</span>
+          </div>
+
+          <!-- Preset Switcher -->
+          <div>
+            <label style="display: block; font-size: 9.5px; font-weight: 700; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Documentary Style Preset</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" class="emp-preset-btn ${curStyle === 'tactical-dark' ? 'active' : ''}" data-preset="tactical-dark" style="padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curStyle === 'tactical-dark' ? '#2dd4bf' : 'rgba(255,255,255,0.1)'}; background: ${curStyle === 'tactical-dark' ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.04)'}; color: ${curStyle === 'tactical-dark' ? '#2dd4bf' : '#cbd5e1'}; text-align: left;">
+                🛰️ Tactical Dark Grid (Image 2)
+              </button>
+              <button type="button" class="emp-preset-btn ${curStyle === 'vintage-cartography' ? 'active' : ''}" data-preset="vintage-cartography" style="padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curStyle === 'vintage-cartography' ? '#f59e0b' : 'rgba(255,255,255,0.1)'}; background: ${curStyle === 'vintage-cartography' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)'}; color: ${curStyle === 'vintage-cartography' ? '#f59e0b' : '#cbd5e1'}; text-align: left;">
+                📜 Vintage Paper (Vox Style)
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 1: 3D Spatial Camera & Lens Optics -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+              <span>🎥 3D Camera Rig & Lens Optics (f/2.8 Bokeh)</span>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #94a3b8; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-3d" ${is3D ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                3D Perspective
+              </label>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
+                  <span>Camera Pitch</span>
+                  <span id="emp-val-pitch">${data.pitch3D !== undefined ? data.pitch3D : 28}°</span>
+                </div>
+                <input type="range" id="emp-inp-pitch" min="15" max="42" step="1" value="${data.pitch3D !== undefined ? data.pitch3D : 28}" style="width: 100%; cursor: pointer; accent-color: #2dd4bf;"/>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
+                  <span>Camera Yaw</span>
+                  <span id="emp-val-yaw">${data.yaw3D !== undefined ? data.yaw3D : -3}°</span>
+                </div>
+                <input type="range" id="emp-inp-yaw" min="-25" max="25" step="1" value="${data.yaw3D !== undefined ? data.yaw3D : -3}" style="width: 100%; cursor: pointer; accent-color: #2dd4bf;"/>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-glide" ${data.cameraGlide !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                3D Sweeping Camera Glide
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-dof" ${data.depthOfField !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                f/2.8 Lens Bokeh (Horizon Blur)
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 2: Parabolic 3D Light-Arcs & Expansion Routes -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9;">
+              ⚡ Parabolic 3D Light-Arcs & Trajectories
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div>
+                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Arc Glow Color</label>
+                <input type="color" id="emp-inp-arc-col" value="${data.arcColor || '#fbbf24'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; cursor: pointer; background: transparent;"/>
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
+                  <span>Arc Height / Curvature</span>
+                  <span id="emp-val-curv">${data.arcCurvature !== undefined ? data.arcCurvature : '1.0'}x</span>
+                </div>
+                <input type="range" id="emp-inp-curv" min="0.5" max="1.8" step="0.1" value="${data.arcCurvature !== undefined ? data.arcCurvature : 1.0}" style="width: 100%; cursor: pointer; accent-color: #fbbf24;"/>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-multistrand" ${data.arcMultiStrand !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #fbbf24;"/>
+                Multi-Strand Fiber-Optic Bundles
+              </label>
+            </div>
+          </div>
+
+          <!-- Section 3: Captured Territory Highlight & Hub Pins -->
+          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9;">
+              📍 Expansion Hubs & Captured Territory Fill
+            </div>
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px;">
+              <div>
+                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Captured Territory</label>
+                <select id="emp-sel-territory" style="width: 100%; padding: 5px 8px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; color: #f8fafc; font-size: 10px; cursor: pointer;">
+                  <option value="India" ${curTerritory === 'India' ? 'selected' : ''}>🇮🇳 India (Image 2 Standard)</option>
+                  <option value="United States of America" ${curTerritory === 'United States of America' ? 'selected' : ''}>🇺🇸 United States</option>
+                  <option value="United Kingdom" ${curTerritory === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom</option>
+                  <option value="Germany" ${curTerritory === 'Germany' ? 'selected' : ''}>🇩🇪 Germany</option>
+                  <option value="China" ${curTerritory === 'China' ? 'selected' : ''}>🇨🇳 China</option>
+                  <option value="None" ${curTerritory === 'None' ? 'selected' : ''}>None (Routes Only)</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Territory Glow</label>
+                <input type="color" id="emp-inp-terr-col" value="${data.highlightColor || '#2dd4bf'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; cursor: pointer; background: transparent;"/>
+              </div>
+            </div>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-shockwaves" ${data.showShockwaves !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                Pulsing Ground Shockwaves
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-borders" ${data.showCountryBorders !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                Country Boundary Outlines
+              </label>
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="emp-toggle-dotmatrix" ${data.showDotMatrix !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
+                Dot-Matrix Mesh
+              </label>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners for Inspector Controls
+      container.querySelectorAll('.emp-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          const p = btn.dataset.preset;
+          const updates = p === 'vintage-cartography' ? {
+            mapStyle: 'vintage-cartography',
+            arcColor: '#ef4444',
+            arcGlowColor: 'rgba(239, 68, 68, 0.45)',
+            highlightColor: '#dc2626'
+          } : {
+            mapStyle: 'tactical-dark',
+            arcColor: '#fbbf24',
+            arcGlowColor: 'rgba(245, 158, 11, 0.45)',
+            highlightColor: '#2dd4bf'
+          };
+          window.tplSetContextualData('empire-map', updates);
+          window.tplRenderContextualInspector('empire-map');
+        };
+      });
+
+      const t3D = container.querySelector('#emp-toggle-3d');
+      if (t3D) t3D.onchange = (e) => {
+        window.tplSetContextualData('empire-map', { is3DMode: e.target.checked });
+        window.tplRenderContextualInspector('empire-map');
+      };
+
+      const pInp = container.querySelector('#emp-inp-pitch');
+      if (pInp) pInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const lbl = container.querySelector('#emp-val-pitch');
+        if (lbl) lbl.textContent = `${v}°`;
+        window.tplSetContextualData('empire-map', { pitch3D: v });
+      };
+
+      const yInp = container.querySelector('#emp-inp-yaw');
+      if (yInp) yInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const lbl = container.querySelector('#emp-val-yaw');
+        if (lbl) lbl.textContent = `${v}°`;
+        window.tplSetContextualData('empire-map', { yaw3D: v });
+      };
+
+      const tGlide = container.querySelector('#emp-toggle-glide');
+      if (tGlide) tGlide.onchange = (e) => window.tplSetContextualData('empire-map', { cameraGlide: e.target.checked });
+
+      const tDof = container.querySelector('#emp-toggle-dof');
+      if (tDof) tDof.onchange = (e) => window.tplSetContextualData('empire-map', { depthOfField: e.target.checked });
+
+      const arcColInp = container.querySelector('#emp-inp-arc-col');
+      if (arcColInp) arcColInp.oninput = (e) => window.tplSetContextualData('empire-map', { arcColor: e.target.value, arcGlowColor: e.target.value + '73' });
+
+      const curvInp = container.querySelector('#emp-inp-curv');
+      if (curvInp) curvInp.oninput = (e) => {
+        const v = parseFloat(e.target.value);
+        const lbl = container.querySelector('#emp-val-curv');
+        if (lbl) lbl.textContent = `${v.toFixed(1)}x`;
+        window.tplSetContextualData('empire-map', { arcCurvature: v });
+      };
+
+      const tStrand = container.querySelector('#emp-toggle-multistrand');
+      if (tStrand) tStrand.onchange = (e) => window.tplSetContextualData('empire-map', { arcMultiStrand: e.target.checked });
+
+      const terrSel = container.querySelector('#emp-sel-territory');
+      if (terrSel) terrSel.onchange = (e) => window.tplSetContextualData('empire-map', { highlightTerritory: e.target.value });
+
+      const terrColInp = container.querySelector('#emp-inp-terr-col');
+      if (terrColInp) terrColInp.oninput = (e) => window.tplSetContextualData('empire-map', { highlightColor: e.target.value });
+
+      const tShock = container.querySelector('#emp-toggle-shockwaves');
+      if (tShock) tShock.onchange = (e) => window.tplSetContextualData('empire-map', { showShockwaves: e.target.checked });
+
+      const tBorders = container.querySelector('#emp-toggle-borders');
+      if (tBorders) tBorders.onchange = (e) => window.tplSetContextualData('empire-map', { showCountryBorders: e.target.checked });
+
+      const tDots = container.querySelector('#emp-toggle-dotmatrix');
+      if (tDots) tDots.onchange = (e) => window.tplSetContextualData('empire-map', { showDotMatrix: e.target.checked });
+
+      return;
+    }
+
     if (tplId === 'map-pin-drop') {
       if (stdLayers) stdLayers.style.display = 'none';
       const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
@@ -7436,6 +8361,69 @@
         }
       });
       window.tplWireUniversalBgControls('ceo-portrait', container);
+      return;
+    }
+
+    // =========================================================================
+    // SPECIAL HANDLER: POWER MEETING CINEMATIC ENGINE (power-meeting)
+    // =========================================================================
+    if (tplId === 'power-meeting') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.55); border: 1px solid rgba(251,191,36,0.28); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase;">💼 Power Meeting Cinematic Engine</span>
+            <label style="font-size: 9px; font-weight: 800; color: #0f172a; background: #fbbf24; padding: 3px 8px; border-radius: 4px; cursor: pointer;">
+              + Swap Scene Plate
+              <input type="file" id="pm-up-scene" accept="image/*" style="display:none;" />
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Overhead Spotlight Warmth</span>
+              <input type="range" id="pm-rng-spot" min="20" max="150" value="${data.spotlightWarmth || 85}" style="accent-color: #fbbf24;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Atmospheric Fog Density</span>
+              <input type="range" id="pm-rng-fog" min="10" max="150" value="${data.fogDensity || 75}" style="accent-color: #fbbf24;" />
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Depth of Field Blur (f/2.8)</span>
+              <input type="range" id="pm-rng-dof" min="0" max="150" value="${data.dofIntensity || 80}" style="accent-color: #fbbf24;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Accent Gold Tint</span>
+              <input type="color" id="pm-inp-acol" value="${data.accentColor || '#fbbf24'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; background: transparent; cursor: pointer;" />
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Summit Briefing Title</span>
+            <input type="text" id="pm-inp-hl" value="${data.headline || 'POWER MEETING'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Negotiation Subline</span>
+            <input type="text" id="pm-inp-sub" value="${data.subline || 'SILHOUETTES · HIGH-STAKES NEGOTIATION'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px;" />
+          </div>
+        </div>
+      `;
+
+      container.querySelector('#pm-rng-spot')?.addEventListener('input', e => window.tplSetContextualData('power-meeting', { spotlightWarmth: parseInt(e.target.value, 10) }));
+      container.querySelector('#pm-rng-fog')?.addEventListener('input', e => window.tplSetContextualData('power-meeting', { fogDensity: parseInt(e.target.value, 10) }));
+      container.querySelector('#pm-rng-dof')?.addEventListener('input', e => window.tplSetContextualData('power-meeting', { dofIntensity: parseInt(e.target.value, 10) }));
+      container.querySelector('#pm-inp-hl')?.addEventListener('input', e => window.tplSetContextualData('power-meeting', { headline: e.target.value }));
+      container.querySelector('#pm-inp-sub')?.addEventListener('input', e => window.tplSetContextualData('power-meeting', { subline: e.target.value }));
+      container.querySelector('#pm-inp-acol')?.addEventListener('input', e => window.tplSetContextualData('power-meeting', { accentColor: e.target.value }));
+      container.querySelector('#pm-up-scene')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) window.tplSetContextualData('power-meeting', { meetingBg: URL.createObjectURL(f) });
+      });
+      window.tplWireUniversalBgControls('power-meeting', container);
       return;
     }
 

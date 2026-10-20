@@ -25388,7 +25388,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['money-stack', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -25907,7 +25907,45 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['money-stack', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
+
+
+window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
+  const data = pmData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('power-meeting') : {}) || {};
+  const bgImg = data.meetingBg || ((typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : '/power_meeting_cinematic_plate.jpg');
+  const headline = data.headline || 'POWER MEETING';
+  const subtitle = data.subline || 'SILHOUETTES · HIGH-STAKES NEGOTIATION';
+  const showHud = isCustomizer || !!data.showHud;
+  const isCustomBg = !!(data.bgPreset && data.bgPreset !== 'default' && data.bgPreset !== 'none');
+  const bgLayerHtml = typeof window.tplBuildUniversalBgHtml === 'function' ? window.tplBuildUniversalBgHtml(data) : '';
+
+  return `
+    <div class="tpl-power-meeting">
+      ${bgLayerHtml}
+      <div class="pm-scene-wrap" style="background-image: url('${bgImg}');${isCustomBg ? 'mix-blend-mode:lighten;opacity:0.88;' : ''}"></div>
+      <div class="pm-spotlight-cone"></div>
+      <div class="pm-rim-lighting"></div>
+      <div class="pm-dof-overlay"></div>
+      <div class="pm-fog-layer pm-fog-1"></div>
+      <div class="pm-fog-layer pm-fog-2"></div>
+      <div class="pm-dust-field">
+        <div class="pm-mote" style="top: 35%; left: 45%; width: 2px; height: 2px; animation-duration: 4.5s; animation-delay: 0.2s;"></div>
+        <div class="pm-mote" style="top: 48%; left: 52%; width: 2.5px; height: 2.5px; animation-duration: 5.2s; animation-delay: 1.1s;"></div>
+        <div class="pm-mote" style="top: 30%; left: 48%; width: 1.5px; height: 1.5px; animation-duration: 3.8s; animation-delay: 0.7s;"></div>
+        <div class="pm-mote" style="top: 42%; left: 40%; width: 2px; height: 2px; animation-duration: 6.0s; animation-delay: 2.3s;"></div>
+        <div class="pm-mote" style="top: 55%; left: 56%; width: 2.5px; height: 2.5px; animation-duration: 4.8s; animation-delay: 1.8s;"></div>
+        <div class="pm-mote" style="top: 25%; left: 51%; width: 1.5px; height: 1.5px; animation-duration: 5.5s; animation-delay: 3.1s;"></div>
+        <div class="pm-mote" style="top: 60%; left: 47%; width: 2px; height: 2px; animation-duration: 4.2s; animation-delay: 0.9s;"></div>
+        <div class="pm-mote" style="top: 38%; left: 58%; width: 2px; height: 2px; animation-duration: 5.8s; animation-delay: 2.7s;"></div>
+      </div>
+      ${showHud ? `
+      <div class="pm-hud-card" style="border-color: ${data.accentColor || '#fbbf24'};">
+        <div class="pm-headline" style="color: ${data.textColor || '#f8fafc'}; font-family: ${data.fontFamily || "'Space Grotesk', sans-serif"};">${headline}</div>
+        <div class="pm-sub" style="color: ${data.accentColor || '#fbbf24'};">${subtitle}</div>
+      </div>` : ''}
+    </div>
+  `;
+};
 
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
@@ -26219,7 +26257,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
             <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
           </div>
-        </div>`; } else if (tplId === 'google') {
+        </div>`; } else if (tplId === 'money-stack') {
+    const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountMoneyStack3DStage === 'function') {
+      window.tplMountMoneyStack3DStage(stage, mData);
+    }
+    return;
+  }
+
+  if (tplId === 'google') {
       const gData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('google') : {};
       const query = gData.query || 'how to invest in index funds';
       const sug1 = gData.suggestion || 'top index funds for passive wealth';
@@ -26396,7 +26445,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`; } else if (tplId === 'glitch') {
       fxContainer.innerHTML = `<div class="tpl-glitch">
           <div class="glitch-text" data-text="THE TRUTH">THE TRUTH</div>
-        </div>`; } else if (tplId === 'map') {
+        </div>`; } else if (tplId === 'empire-map') {
+      const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('empire-map') : {};
+      if (typeof window.tplBuildEmpireMapHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildEmpireMapHtml(mData);
+      } else {
+        fxContainer.innerHTML = `<div class="tpl-empire-map"></div>`;
+      }
+    } else if (tplId === 'map') {
       const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : {};
       if (typeof window.tplBuildInvestigativeGlobeHtml === 'function') {
         fxContainer.innerHTML = window.tplBuildInvestigativeGlobeHtml(mData);
@@ -26709,6 +26765,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
           </div>
         </div>`;
+        } else if (tplId === 'power-meeting') {
+      const pmData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('power-meeting') : {};
+      fxContainer.innerHTML = window.tplBuildPowerMeetingHtml(pmData, false);
     } else if (tplId === 'boardroom-zoom') {
       const bData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('boardroom-zoom') : {};
       const sceneImg = bData.sceneUrl || ((typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : '/boardroom_scene_hd.jpg');
@@ -28486,7 +28545,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-        } else if (tplId === 'jani-forbes-fraud-reveal') {
+        } else if (tplId === 'money-stack') {
+      if (typeof window.stepMoneyStackAnimation === 'function') {
+        const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
+        window.stepMoneyStackAnimation(fxContainer, tplId, t, mData);
+      }
+    } else if (tplId === 'jani-forbes-fraud-reveal') {
       const jData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-forbes-fraud-reveal') : (window.JANI_FORBES_CONFIG || {});
       if (typeof window.buildForbesHtml === 'function') {
         fxContainer.innerHTML = window.buildForbesHtml(tplId, jData);
@@ -30096,7 +30160,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const ff = String(Math.floor((t % 1) * 24)).padStart(2, '0');
         tcEl.textContent = `${baseDate}  ${hh}:${mm}:${ss}:${ff}`;
       }
-    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur','interview-cutin'].concat(BIZ_STORY_IDS).includes(tplId)) {
+    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur','interview-cutin','power-meeting'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -31195,7 +31259,7 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google'
+    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map'
   ]);
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
@@ -31208,6 +31272,9 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.is3DMode = true;
     if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('map', { is3DMode: true, drawOnScreenMode: true });
+    }
+    if (tpl.id === 'empire-map' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('empire-map', { is3DMode: true });
     }
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: true });
@@ -31242,6 +31309,9 @@ function openTopTemplateCustomizer(tpl) {
       window.tplSetContextualData('map', { is3DMode: false, drawOnScreenMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
     }
+    if (tpl.id === 'empire-map' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('empire-map', { is3DMode: true });
+    }
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
@@ -31261,6 +31331,9 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('map', { is3DMode: true, drawOnScreenMode: true });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
+    }
+    if (tpl.id === 'empire-map' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('empire-map', { is3DMode: true });
     }
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: true });
