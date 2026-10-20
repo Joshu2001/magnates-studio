@@ -9187,20 +9187,30 @@
                 <div id="magnates-bp-wavy-line2" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(12px, 1.72vw, 23px); font-weight: 900; color: #e11d1d; letter-spacing: 0.55px; text-transform: uppercase; line-height: 1.18; text-shadow: 0 0 20px rgba(225,29,29,0.55), 0 3px 10px rgba(0,0,0,0.9); white-space: nowrap;"></div>
               </div>
 
-              <!-- Z=6 Left Product Showcase Card + Price Tag (Unfurls Top&Bottom from middle, then Price Tag unfurls Left&Right from middle) -->
+              <!-- Z=6 Left Product Showcase Card (Outer Shape 1 + Inner Concentric Shape 2 + Pure Cutout + Veil Overlay) + Price Tag -->
               <div id="magnates-bp-layer-prod1" data-bp-layer="z6" style="position: absolute; left: 4.8%; top: 15.5%; width: 25.2%; height: 73%; z-index: 14; pointer-events: auto; cursor: pointer; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2.5%;">
-                <div id="magnates-bp-prod1-card" style="width: 100%; height: 83%; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 12px 28px rgba(0,0,0,0.75)); will-change: clip-path, transform, opacity;">
-                  <img id="magnates-bp-img-prod1" src="/temu_product_left.png" alt="Left Product Cutout" style="width: 100%; height: 100%; object-fit: contain;" />
+                <div id="magnates-bp-prod1-card" style="position: relative; width: 100%; height: 83%; border-radius: 22px; background: #5a0001; padding: 7%; box-sizing: border-box; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 28px rgba(0,0,0,0.75); will-change: clip-path, transform, opacity;">
+                  <!-- Concentric Inner Shape 2 -->
+                  <div id="magnates-bp-prod1-inner-shape" style="position: relative; width: 100%; height: 100%; border-radius: 17px; background: #800001; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6%; box-sizing: border-box;">
+                    <img id="magnates-bp-img-prod1" src="/temu_product_left.png" alt="Left Product Cutout" style="width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;" />
+                    <!-- Optional Top Tint / Veil Layer (Covers/blends the left iPhone into the red palette like the original) -->
+                    <div id="magnates-bp-prod1-veil" style="position: absolute; inset: 0; background: #990000; opacity: 0.32; mix-blend-mode: multiply; pointer-events: none; z-index: 3;"></div>
+                  </div>
                 </div>
                 <div id="magnates-bp-prod1-price-pill" style="padding: 3px 18px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1.5px solid rgba(239, 68, 68, 0.38); box-shadow: 0 0 18px rgba(220, 38, 38, 0.45), inset 0 0 10px rgba(255, 30, 30, 0.25); display: flex; align-items: center; justify-content: center; will-change: clip-path, transform, opacity;">
                   <span id="magnates-bp-prod1-price-text" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(13px, 1.85vw, 24px); font-weight: 900; color: #ff1e1e; letter-spacing: 0.5px; text-shadow: 0 0 12px rgba(255,30,30,0.65); white-space: nowrap;">$2.00</span>
                 </div>
               </div>
 
-              <!-- Z=7 Right Product Showcase Card + Price Tag (Unfurls Top&Bottom from middle, then Price Tag unfurls Left&Right from middle) -->
+              <!-- Z=7 Right Product Showcase Card (Outer Shape 1 + Inner Concentric Shape 2 + Pure Cutout + Veil Overlay) + Price Tag -->
               <div id="magnates-bp-layer-prod2" data-bp-layer="z7" style="position: absolute; right: 4.8%; top: 15.5%; width: 25.2%; height: 73%; z-index: 14; pointer-events: auto; cursor: pointer; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2.5%;">
-                <div id="magnates-bp-prod2-card" style="width: 100%; height: 83%; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 12px 28px rgba(0,0,0,0.75)); will-change: clip-path, transform, opacity;">
-                  <img id="magnates-bp-img-prod2" src="/temu_product_right.png" alt="Right Product Cutout" style="width: 100%; height: 100%; object-fit: contain;" />
+                <div id="magnates-bp-prod2-card" style="position: relative; width: 100%; height: 83%; border-radius: 22px; background: #5a0001; padding: 7%; box-sizing: border-box; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 12px 28px rgba(0,0,0,0.75); will-change: clip-path, transform, opacity;">
+                  <!-- Concentric Inner Shape 2 -->
+                  <div id="magnates-bp-prod2-inner-shape" style="position: relative; width: 100%; height: 100%; border-radius: 17px; background: #800001; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 6%; box-sizing: border-box;">
+                    <img id="magnates-bp-img-prod2" src="/temu_product_right.png" alt="Right Product Cutout" style="width: 100%; height: 100%; object-fit: contain; position: relative; z-index: 2;" />
+                    <!-- Optional Top Tint / Veil Layer (0% on right Air Fryer by default so its brightness pops untouched) -->
+                    <div id="magnates-bp-prod2-veil" style="position: absolute; inset: 0; background: #990000; opacity: 0; mix-blend-mode: multiply; pointer-events: none; z-index: 3;"></div>
+                  </div>
                 </div>
                 <div id="magnates-bp-prod2-price-pill" style="padding: 3px 18px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1.5px solid rgba(239, 68, 68, 0.38); box-shadow: 0 0 18px rgba(220, 38, 38, 0.45), inset 0 0 10px rgba(255, 30, 30, 0.25); display: flex; align-items: center; justify-content: center; will-change: clip-path, transform, opacity;">
                   <span id="magnates-bp-prod2-price-text" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(13px, 1.85vw, 24px); font-weight: 900; color: #ff1e1e; letter-spacing: 0.5px; text-shadow: 0 0 12px rgba(255,30,30,0.65); white-space: nowrap;">$5.00</span>
@@ -9556,13 +9566,96 @@
             </div>
           </div>
 
-          <!-- Scene A2: Center-Out Product Cards & Price Tags Unfurl Controls (Z=6 & Z=7) -->
-          <div id="magnates-bp-card-products-controls" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px;">
+          <!-- Scene A2: Concentric Backing Shapes, Product Brightness/Veil & Price Tags Unfurl Controls (Z=6 & Z=7) -->
+          <div id="magnates-bp-card-products-controls" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-              <span style="font-size: 10.5px; font-weight: 700; color: #fb7185;">Product Cards &amp; Price Unfurl</span>
+              <span style="font-size: 10.5px; font-weight: 700; color: #fb7185;">Concentric Shapes &amp; Price Unfurl</span>
               <div style="display: flex; align-items: center; gap: 6px;">
                 <span style="font-size: 9px; font-family: monospace; color: #94a3b8;">Z=6 &amp; Z=7</span>
                 <input type="checkbox" id="magnates-bp-toggle-products" checked style="accent-color: #fb7185; cursor: pointer;" title="Enable Logo Shift Right + Product & Price Unfurl Sequence" />
+              </div>
+            </div>
+
+            <!-- Concentric Backing Shapes (Shape 1 Outer Frame + Shape 2 Inner Plate + Rim Border + Glow) -->
+            <div style="background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 7px 9px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 9.5px; font-weight: 700; color: #fda4af;">Concentric Backing Shapes</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <label style="font-size: 9px; color: #cbd5e1; display: flex; align-items: center; gap: 3px; cursor: pointer;" title="Toggle Outer Shape 1">
+                    <input type="checkbox" id="magnates-bp-toggle-shape-outer" checked style="accent-color: #fb7185;" /> Shape 1
+                  </label>
+                  <label style="font-size: 9px; color: #cbd5e1; display: flex; align-items: center; gap: 3px; cursor: pointer;" title="Toggle Inner Concentric Shape 2">
+                    <input type="checkbox" id="magnates-bp-toggle-shape-inner" checked style="accent-color: #fb7185;" /> Shape 2
+                  </label>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 4px 7px; border-radius: 6px;">
+                  <span style="font-size: 9px; color: #94a3b8;">1. Outer Frame</span>
+                  <input type="color" id="magnates-bp-prod-outer-color" value="#5a0001" style="width: 22px; height: 20px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 0; background: none; cursor: pointer;" title="Outer Shape 1 Color" />
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 4px 7px; border-radius: 6px;">
+                  <span style="font-size: 9px; color: #94a3b8;">2. Inner Plate</span>
+                  <input type="color" id="magnates-bp-prod-inner-color" value="#800001" style="width: 22px; height: 20px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 0; background: none; cursor: pointer;" title="Inner Concentric Shape 2 Color" />
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>Ring Gap / Inset</span>
+                    <span id="magnates-bp-val-shape-inset" style="font-family: monospace; color: #fb7185;">7%</span>
+                  </div>
+                  <input type="range" id="magnates-bp-shape-inset" min="0" max="16" step="1" value="7" style="width: 100%; accent-color: #fb7185; cursor: pointer;" />
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>Card Glow / Rim</span>
+                    <span id="magnates-bp-val-prod-glow" style="font-family: monospace; color: #fb7185;">45%</span>
+                  </div>
+                  <input type="range" id="magnates-bp-prod-card-glow" min="0" max="100" step="5" value="45" style="width: 100%; accent-color: #fb7185; cursor: pointer;" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Granular Per-Item Brightness & Top Color Veil Overlay (Left Dimmed vs Right Untouched) -->
+            <div style="background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 7px 9px; display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 9.5px; font-weight: 700; color: #fda4af;">Object Brightness &amp; Top Veil Layer</span>
+                <input type="color" id="magnates-bp-prod-veil-color" value="#990000" style="width: 18px; height: 18px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 0; background: none; cursor: pointer;" title="Top Veil Tint Color" />
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>Left Veil (Cover)</span>
+                    <span id="magnates-bp-val-prod1-veil" style="font-family: monospace; color: #fb7185;">32%</span>
+                  </div>
+                  <input type="range" id="magnates-bp-prod1-veil-op" min="0" max="85" step="2" value="32" style="width: 100%; accent-color: #fb7185; cursor: pointer;" title="Covers/tints the left object so it blends into the red card like the original" />
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>Right Veil (Cover)</span>
+                    <span id="magnates-bp-val-prod2-veil" style="font-family: monospace; color: #fb7185;">0%</span>
+                  </div>
+                  <input type="range" id="magnates-bp-prod2-veil-op" min="0" max="85" step="2" value="0" style="width: 100%; accent-color: #fb7185; cursor: pointer;" title="0% keeps the right object brightness completely untouched" />
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>Left Brightness</span>
+                    <span id="magnates-bp-val-prod1-bright" style="font-family: monospace; color: #fb7185;">88%</span>
+                  </div>
+                  <input type="range" id="magnates-bp-prod1-bright" min="40" max="140" step="2" value="88" style="width: 100%; accent-color: #fb7185; cursor: pointer;" />
+                </div>
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                    <span>Right Brightness</span>
+                    <span id="magnates-bp-val-prod2-bright" style="font-family: monospace; color: #fb7185;">105%</span>
+                  </div>
+                  <input type="range" id="magnates-bp-prod2-bright" min="40" max="140" step="2" value="105" style="width: 100%; accent-color: #fb7185; cursor: pointer;" />
+                </div>
               </div>
             </div>
 

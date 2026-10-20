@@ -28431,13 +28431,22 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div id="fx-bp-wavy2-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; margin-top: 2px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line2Txt}</div>
           </div>
 
-          <!-- Scene A2: Left & Right Product Cards (Top/Bottom Unfurl) & Price Tags (Left/Right Unfurl) -->
+          <!-- Scene A2: Left & Right Concentric Backing Shapes (Shape 1 + Shape 2) + Pure Product Cutout + Veil + Price Tags -->
           <div id="fx-bp-prod1-${tplId}" style="position: absolute; left: 5%; top: 15%; width: 25%; height: 73%; z-index: 12; display: flex; flex-direction: column; align-items: center; gap: 3%; pointer-events: none; opacity: 0;">
-            <img id="fx-bp-prod1-img-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod1Url) ? magnatesBPState.prod1Url : '/temu_product_left.png'}" style="width: 100%; height: 82%; object-fit: contain; border-radius: 8px;" />
+            <div id="fx-bp-prod1-img-${tplId}" style="width: 100%; height: 82%; border-radius: 10px; background: ${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prodOuterColor) ? magnatesBPState.prodOuterColor : '#5a0001'}; padding: 7%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+              <div style="position: relative; width: 100%; height: 100%; border-radius: 8px; background: ${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prodInnerColor) ? magnatesBPState.prodInnerColor : '#800001'}; padding: 6%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod1Url) ? magnatesBPState.prod1Url : '/temu_product_left.png'}" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(0.88); opacity: 0.9;" />
+                <div style="position: absolute; inset: 0; background: #990000; opacity: 0.32; mix-blend-mode: multiply;"></div>
+              </div>
+            </div>
             <div id="fx-bp-prod1-pill-${tplId}" style="padding: 1px 8px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1px solid rgba(239, 68, 68, 0.4); font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 900; color: #ff1e1e;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod1Price) ? magnatesBPState.prod1Price : '$2.00'}</div>
           </div>
           <div id="fx-bp-prod2-${tplId}" style="position: absolute; right: 5%; top: 15%; width: 25%; height: 73%; z-index: 12; display: flex; flex-direction: column; align-items: center; gap: 3%; pointer-events: none; opacity: 0;">
-            <img id="fx-bp-prod2-img-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod2Url) ? magnatesBPState.prod2Url : '/temu_product_right.png'}" style="width: 100%; height: 82%; object-fit: contain; border-radius: 8px;" />
+            <div id="fx-bp-prod2-img-${tplId}" style="width: 100%; height: 82%; border-radius: 10px; background: ${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prodOuterColor) ? magnatesBPState.prodOuterColor : '#5a0001'}; padding: 7%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+              <div style="position: relative; width: 100%; height: 100%; border-radius: 8px; background: ${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prodInnerColor) ? magnatesBPState.prodInnerColor : '#800001'}; padding: 6%; box-sizing: border-box; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod2Url) ? magnatesBPState.prod2Url : '/temu_product_right.png'}" style="width: 100%; height: 100%; object-fit: contain; filter: brightness(1.05);" />
+              </div>
+            </div>
             <div id="fx-bp-prod2-pill-${tplId}" style="padding: 1px 8px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1px solid rgba(239, 68, 68, 0.4); font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 900; color: #ff1e1e;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod2Price) ? magnatesBPState.prod2Price : '$5.00'}</div>
           </div>
 
@@ -48269,10 +48278,21 @@ let magnatesBPState = {
   wavyTextEnabled: true,
   wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
   wavyLine2: "ON THE INTERNET.",
-  // Scene A2: Logo Shift Right to Center + Product Cards (Top/Bottom Unfurl) & Price Tags (Left/Right Unfurl)
+  // Scene A2: Logo Shift Right to Center + Concentric Backing Shapes (Shape 1 Outer + Shape 2 Inner) + Pure Cutout Products + Top Veil & Brightness + Price Tags
   productsEnabled: true,
   logoShiftRightTime: 3.10,
   unfurlSpeed: 0.45,
+  prodShapeOuterEnabled: true,
+  prodShapeInnerEnabled: true,
+  prodOuterColor: "#5a0001",
+  prodInnerColor: "#800001",
+  prodShapeInset: 7,
+  prodCardGlow: 45,
+  prodVeilColor: "#990000",
+  prod1VeilOp: 32,
+  prod2VeilOp: 0,
+  prod1Bright: 88,
+  prod2Bright: 105,
   prod1Url: "/temu_product_left.png",
   prod1Price: "$2.00",
   prod1GlowColor: "#dc2626",
@@ -48849,15 +48869,19 @@ function updateMagnatesBPVisualStyles() {
     }
   }
 
-  // Render Z=6 (Left Product + $2.00 Tag) & Z=7 (Right Product + $5.00 Tag) Center-Out Unfurl Sequence
+  // Render Z=6 (Left Product + Concentric Shapes + Veil + $2.00 Tag) & Z=7 (Right Product + Concentric Shapes + Veil + $5.00 Tag)
   const prod1Layer = document.getElementById('magnates-bp-layer-prod1');
   const prod1Card = document.getElementById('magnates-bp-prod1-card');
+  const prod1Inner = document.getElementById('magnates-bp-prod1-inner-shape');
+  const prod1Veil = document.getElementById('magnates-bp-prod1-veil');
   const prod1Img = document.getElementById('magnates-bp-img-prod1');
   const prod1Pill = document.getElementById('magnates-bp-prod1-price-pill');
   const prod1Txt = document.getElementById('magnates-bp-prod1-price-text');
 
   const prod2Layer = document.getElementById('magnates-bp-layer-prod2');
   const prod2Card = document.getElementById('magnates-bp-prod2-card');
+  const prod2Inner = document.getElementById('magnates-bp-prod2-inner-shape');
+  const prod2Veil = document.getElementById('magnates-bp-prod2-veil');
   const prod2Img = document.getElementById('magnates-bp-img-prod2');
   const prod2Pill = document.getElementById('magnates-bp-prod2-price-pill');
   const prod2Txt = document.getElementById('magnates-bp-prod2-price-text');
@@ -48870,6 +48894,57 @@ function updateMagnatesBPVisualStyles() {
   if (thumbZ7 && thumbZ7.getAttribute('src') !== magnatesBPState.prod2Url) thumbZ7.src = magnatesBPState.prod2Url;
   if (prod1Txt) prod1Txt.textContent = magnatesBPState.prod1Price || '$2.00';
   if (prod2Txt) prod2Txt.textContent = magnatesBPState.prod2Price || '$5.00';
+
+  // Apply Concentric Backing Shapes (Shape 1 Outer Frame + Shape 2 Inner Plate + Rim Glow)
+  const hasOuterShape = magnatesBPState.prodShapeOuterEnabled !== false;
+  const hasInnerShape = magnatesBPState.prodShapeInnerEnabled !== false;
+  const outerCol = magnatesBPState.prodOuterColor || '#5a0001';
+  const innerCol = magnatesBPState.prodInnerColor || '#800001';
+  const shapeInset = magnatesBPState.prodShapeInset ?? 7;
+  const cardGlowVal = magnatesBPState.prodCardGlow ?? 45;
+  const glowRadius = Math.round((cardGlowVal / 100) * 32);
+  const glowAlpha = ((cardGlowVal / 100) * 0.55).toFixed(2);
+  const cardShadow = cardGlowVal > 0
+    ? `0 12px 28px rgba(0,0,0,0.8), 0 0 ${glowRadius}px ${bpHexToRgba(innerCol, parseFloat(glowAlpha))}, inset 0 0 1px 1px rgba(255, 60, 60, 0.18)`
+    : '0 12px 28px rgba(0,0,0,0.8)';
+
+  [prod1Card, prod2Card].forEach((cEl) => {
+    if (cEl) {
+      cEl.style.background = hasOuterShape ? outerCol : 'transparent';
+      cEl.style.padding = `${shapeInset}%`;
+      cEl.style.boxShadow = hasOuterShape ? cardShadow : 'none';
+    }
+  });
+  [prod1Inner, prod2Inner].forEach((inEl) => {
+    if (inEl) {
+      inEl.style.background = hasInnerShape ? innerCol : 'transparent';
+      inEl.style.boxShadow = hasInnerShape ? 'inset 0 0 18px rgba(0,0,0,0.35)' : 'none';
+    }
+  });
+
+  // Apply Per-Item Brightness & Top Color Veil Layer (Left iPhone veiled/blended vs Right Air Fryer untouched)
+  const veilCol = magnatesBPState.prodVeilColor || '#990000';
+  const veil1Op = (magnatesBPState.prod1VeilOp ?? 32) / 100;
+  const veil2Op = (magnatesBPState.prod2VeilOp ?? 0) / 100;
+  const b1 = (magnatesBPState.prod1Bright ?? 88) / 100;
+  const b2 = (magnatesBPState.prod2Bright ?? 105) / 100;
+  if (prod1Veil) {
+    prod1Veil.style.background = veilCol;
+    prod1Veil.style.opacity = veil1Op.toFixed(2);
+  }
+  if (prod2Veil) {
+    prod2Veil.style.background = veilCol;
+    prod2Veil.style.opacity = veil2Op.toFixed(2);
+  }
+  if (prod1Img) {
+    // Also apply subtle sepia/red tint when veil1Op > 0 so the left object blends seamlessly into the crimson card like Screenshot 3
+    prod1Img.style.filter = `brightness(${b1.toFixed(2)}) contrast(1.06) drop-shadow(0 8px 18px rgba(0,0,0,0.55))`;
+    prod1Img.style.opacity = (1.0 - veil1Op * 0.28).toFixed(2);
+  }
+  if (prod2Img) {
+    prod2Img.style.filter = `brightness(${b2.toFixed(2)}) contrast(1.06) drop-shadow(0 8px 18px rgba(0,0,0,0.55))`;
+    prod2Img.style.opacity = (1.0 - veil2Op * 0.28).toFixed(2);
+  }
 
   const showProducts = showSceneA && hasProductsPhase && p >= (tShiftRight + 0.35) && p < (tOut + 0.45);
   const prodExitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.40) : 0;
@@ -49167,6 +49242,8 @@ const MAGNATES_BP_SYNC_FIELDS = [
   'logoCutoutUrl', 'logoInTime', 'logoShiftTime', 'logoOutTime', 'logoGlowColor', 'logoGlowIntensity',
   'wavyLine1', 'wavyLine2',
   'productsEnabled', 'logoShiftRightTime', 'unfurlSpeed',
+  'prodShapeOuterEnabled', 'prodShapeInnerEnabled', 'prodOuterColor', 'prodInnerColor', 'prodShapeInset', 'prodCardGlow',
+  'prodVeilColor', 'prod1VeilOp', 'prod2VeilOp', 'prod1Bright', 'prod2Bright',
   'prod1Url', 'prod1Price', 'prod1GlowColor', 'prod1GlowIntensity',
   'prod2Url', 'prod2Price', 'prod2GlowColor', 'prod2GlowIntensity',
   'headline', 'subcaption',
@@ -49250,9 +49327,28 @@ function syncMagnatesBPInspectorControlsFromState() {
   const chkWavy = document.getElementById('magnates-bp-toggle-wavy-text');
   if (chkWavy) chkWavy.checked = magnatesBPState.wavyTextEnabled;
 
-  // Sync Scene A2 Product & Price Unfurl Controls
+  // Sync Scene A2 Concentric Backing Shapes, Veil, Brightness & Price Unfurl Controls
   const chkProds = document.getElementById('magnates-bp-toggle-products');
   if (chkProds) chkProds.checked = magnatesBPState.productsEnabled ?? true;
+  const chkShapeOuter = document.getElementById('magnates-bp-toggle-shape-outer');
+  if (chkShapeOuter) chkShapeOuter.checked = magnatesBPState.prodShapeOuterEnabled !== false;
+  const chkShapeInner = document.getElementById('magnates-bp-toggle-shape-inner');
+  if (chkShapeInner) chkShapeInner.checked = magnatesBPState.prodShapeInnerEnabled !== false;
+  setVal('magnates-bp-prod-outer-color', magnatesBPState.prodOuterColor || '#5a0001');
+  setVal('magnates-bp-prod-inner-color', magnatesBPState.prodInnerColor || '#800001');
+  setVal('magnates-bp-shape-inset', magnatesBPState.prodShapeInset ?? 7);
+  setTxt('magnates-bp-val-shape-inset', `${magnatesBPState.prodShapeInset ?? 7}%`);
+  setVal('magnates-bp-prod-card-glow', magnatesBPState.prodCardGlow ?? 45);
+  setTxt('magnates-bp-val-prod-glow', `${magnatesBPState.prodCardGlow ?? 45}%`);
+  setVal('magnates-bp-prod-veil-color', magnatesBPState.prodVeilColor || '#990000');
+  setVal('magnates-bp-prod1-veil-op', magnatesBPState.prod1VeilOp ?? 32);
+  setTxt('magnates-bp-val-prod1-veil', `${magnatesBPState.prod1VeilOp ?? 32}%`);
+  setVal('magnates-bp-prod2-veil-op', magnatesBPState.prod2VeilOp ?? 0);
+  setTxt('magnates-bp-val-prod2-veil', `${magnatesBPState.prod2VeilOp ?? 0}%`);
+  setVal('magnates-bp-prod1-bright', magnatesBPState.prod1Bright ?? 88);
+  setTxt('magnates-bp-val-prod1-bright', `${magnatesBPState.prod1Bright ?? 88}%`);
+  setVal('magnates-bp-prod2-bright', magnatesBPState.prod2Bright ?? 105);
+  setTxt('magnates-bp-val-prod2-bright', `${magnatesBPState.prod2Bright ?? 105}%`);
   setVal('magnates-bp-input-prod1-price', magnatesBPState.prod1Price || '$2.00');
   setVal('magnates-bp-input-prod2-price', magnatesBPState.prod2Price || '$5.00');
   setVal('magnates-bp-logo-center-time', magnatesBPState.logoShiftRightTime ?? 3.10);
@@ -49732,9 +49828,82 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
-  // Scene A2 Product Cards & Price Unfurl Controls (Z=6 & Z=7)
+  // Scene A2 Concentric Backing Shapes, Veil, Brightness & Price Unfurl Controls (Z=6 & Z=7)
+  const ensurePlayheadInProducts = () => {
+    const tShiftR = magnatesBPState.preset === 'products_unfurl' ? 0.35 : (magnatesBPState.logoShiftRightTime ?? 3.10);
+    if (magnatesBPState.playhead < tShiftR + 1.2 || magnatesBPState.playhead > tShiftR + 3.4) {
+      magnatesBPState.playhead = tShiftR + 2.2;
+    }
+  };
   document.getElementById('magnates-bp-toggle-products')?.addEventListener('change', (e) => {
     magnatesBPState.productsEnabled = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-toggle-shape-outer')?.addEventListener('change', (e) => {
+    magnatesBPState.prodShapeOuterEnabled = e.target.checked;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-toggle-shape-inner')?.addEventListener('change', (e) => {
+    magnatesBPState.prodShapeInnerEnabled = e.target.checked;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod-outer-color')?.addEventListener('input', (e) => {
+    magnatesBPState.prodOuterColor = e.target.value;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod-inner-color')?.addEventListener('input', (e) => {
+    magnatesBPState.prodInnerColor = e.target.value;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-shape-inset')?.addEventListener('input', (e) => {
+    magnatesBPState.prodShapeInset = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-shape-inset');
+    if (lbl) lbl.textContent = `${magnatesBPState.prodShapeInset}%`;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod-card-glow')?.addEventListener('input', (e) => {
+    magnatesBPState.prodCardGlow = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-prod-glow');
+    if (lbl) lbl.textContent = `${magnatesBPState.prodCardGlow}%`;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod-veil-color')?.addEventListener('input', (e) => {
+    magnatesBPState.prodVeilColor = e.target.value;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod1-veil-op')?.addEventListener('input', (e) => {
+    magnatesBPState.prod1VeilOp = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-prod1-veil');
+    if (lbl) lbl.textContent = `${magnatesBPState.prod1VeilOp}%`;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod2-veil-op')?.addEventListener('input', (e) => {
+    magnatesBPState.prod2VeilOp = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-prod2-veil');
+    if (lbl) lbl.textContent = `${magnatesBPState.prod2VeilOp}%`;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod1-bright')?.addEventListener('input', (e) => {
+    magnatesBPState.prod1Bright = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-prod1-bright');
+    if (lbl) lbl.textContent = `${magnatesBPState.prod1Bright}%`;
+    ensurePlayheadInProducts();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-prod2-bright')?.addEventListener('input', (e) => {
+    magnatesBPState.prod2Bright = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-prod2-bright');
+    if (lbl) lbl.textContent = `${magnatesBPState.prod2Bright}%`;
+    ensurePlayheadInProducts();
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-input-prod1-price')?.addEventListener('input', (e) => {
