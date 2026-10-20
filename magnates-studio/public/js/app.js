@@ -49768,16 +49768,75 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     });
   });
 
-  // Top-Right Theater View & Fullscreen Toggles
-  document.getElementById('btn-magnates-bp-theater')?.addEventListener('click', () => {
+  // Top-Right Theater View & Fullscreen Toggles (Matches Image 3)
+  const toggleMagnatesBPTheater = () => {
     magnatesBPState.theaterMode = !magnatesBPState.theaterMode;
-    const inspCol = document.getElementById('magnates-bp-inspector-col');
+    const isTh = magnatesBPState.theaterMode;
+    const btn = document.getElementById('btn-magnates-bp-theater');
     const lbl = document.getElementById('magnates-bp-theater-label');
-    if (inspCol) inspCol.style.display = magnatesBPState.theaterMode ? 'none' : 'flex';
-    if (lbl) lbl.textContent = magnatesBPState.theaterMode ? 'Exit Theater' : 'Theater View';
-  });
+    const canvasBox = document.getElementById('magnates-bp-canvas-box');
+    const stageEl = document.getElementById('magnates-bp-stage');
+    const storyboardBar = document.getElementById('magnates-bp-storyboard-container');
+    const playbackBar = document.querySelector('#magnates-bp-canvas-box > div:last-child');
+    const hud = document.getElementById('magnates-bp-player-hud');
 
-  document.getElementById('btn-magnates-bp-fullscreen')?.addEventListener('click', () => {
+    if (btn) {
+      btn.style.background = isTh ? 'rgba(168,85,247,0.28)' : 'rgba(15,17,26,0.85)';
+      btn.style.borderColor = isTh ? '#c084fc' : 'rgba(255,255,255,0.18)';
+      btn.style.color = isTh ? '#ffffff' : '#cbd5e1';
+      btn.style.boxShadow = isTh ? '0 0 14px rgba(168,85,247,0.4)' : 'none';
+    }
+    if (lbl) lbl.textContent = isTh ? 'Exit Theater' : 'Theater View';
+
+    if (storyboardBar) storyboardBar.style.display = isTh ? 'none' : 'flex';
+    if (playbackBar) playbackBar.style.display = isTh ? 'none' : 'flex';
+    if (hud) hud.style.display = isTh ? 'none' : '';
+
+    if (canvasBox) {
+      if (isTh) {
+        canvasBox.style.padding = '0';
+        canvasBox.style.border = 'none';
+        canvasBox.style.background = 'transparent';
+        canvasBox.style.gap = '0';
+        canvasBox.style.flex = '1';
+        canvasBox.style.height = '100%';
+        canvasBox.style.minHeight = '0';
+      } else {
+        canvasBox.style.padding = '';
+        canvasBox.style.border = '';
+        canvasBox.style.background = '';
+        canvasBox.style.gap = '';
+        canvasBox.style.flex = '1';
+        canvasBox.style.height = '';
+        canvasBox.style.minHeight = '';
+      }
+    }
+
+    if (stageEl) {
+      if (isTh) {
+        stageEl.style.maxHeight = 'calc(86vh - 60px)';
+        stageEl.style.height = '100%';
+        stageEl.style.minHeight = '480px';
+        stageEl.style.flex = '1';
+        stageEl.style.borderRadius = '14px';
+        stageEl.style.border = '1px solid rgba(255,255,255,0.08)';
+        stageEl.style.overflow = 'hidden';
+      } else {
+        stageEl.style.maxHeight = '460px';
+        stageEl.style.height = '';
+        stageEl.style.minHeight = '';
+        stageEl.style.flex = '';
+        stageEl.style.borderRadius = '10px';
+        stageEl.style.border = '1px solid rgba(255,255,255,0.08)';
+        stageEl.style.overflow = 'hidden';
+      }
+    }
+    updateMagnatesBPVisualStyles();
+  };
+
+  document.getElementById('btn-magnates-bp-theater')?.addEventListener('click', toggleMagnatesBPTheater);
+
+  const toggleMagnatesBPFullscreen = () => {
     const stageEl = document.getElementById('magnates-bp-stage');
     if (!stageEl) return;
     if (!document.fullscreenElement) {
@@ -49785,7 +49844,10 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     } else {
       document.exitFullscreen?.().catch(() => {});
     }
-  });
+  };
+
+  document.getElementById('btn-magnates-bp-fullscreen')?.addEventListener('click', toggleMagnatesBPFullscreen);
+  document.getElementById('btn-magnates-bp-hud-expand')?.addEventListener('click', toggleMagnatesBPFullscreen);
 
   // Bottom Sequence Storyboard Scene Cards & + Add Scene & Add Audio
   document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
