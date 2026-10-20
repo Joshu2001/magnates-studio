@@ -47289,6 +47289,14 @@ function updateMagnatesBlendVisualStyles() {
   if (textWrapEl) {
     textWrapEl.style.transform = `translate(${magnatesBlendState.textX || 0}px, ${magnatesBlendState.textY || 0}px)`;
   }
+  const sliderFontSize = document.getElementById('magnates-blend-slider-fontsize');
+  const labelFontSize = document.getElementById('magnates-blend-val-fontsize');
+  if (sliderFontSize && document.activeElement !== sliderFontSize) {
+    sliderFontSize.value = magnatesBlendState.fontSize || 20;
+  }
+  if (labelFontSize) {
+    labelFontSize.textContent = `${magnatesBlendState.fontSize || 20}px`;
+  }
   if (bgImg && bgImg.src !== magnatesBlendState.bgUrl) bgImg.src = magnatesBlendState.bgUrl;
 
   const p = magnatesBlendState.playhead;
@@ -47441,7 +47449,8 @@ function bindMagnatesBlendModesSuiteModalControls() {
   document.getElementById('btn-close-magnates-blend-suite')?.addEventListener('click', closeMagnatesBlendModesSuite);
   document.getElementById('btn-cancel-magnates-blend-suite')?.addEventListener('click', closeMagnatesBlendModesSuite);
 
-  document.getElementById('btn-magnates-blend-play-pause')?.addEventListener('click', () => {
+  // Play / Pause unified toggle
+  const toggleBlendPlay = () => {
     magnatesBlendState.isPlaying = !magnatesBlendState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-blend-play-pause');
     if (magnatesBlendState.isPlaying) {
@@ -47452,11 +47461,219 @@ function bindMagnatesBlendModesSuiteModalControls() {
       if (btnPlay) btnPlay.textContent = '\u25b6 Play';
       if (magnatesBlendState.animFrameId) cancelAnimationFrame(magnatesBlendState.animFrameId);
     }
-  });
+    updateMagnatesBlendVisualStyles();
+  };
 
-  document.getElementById('btn-magnates-blend-reset')?.addEventListener('click', () => {
+  document.getElementById('btn-magnates-blend-play-pause')?.addEventListener('click', toggleBlendPlay);
+  document.getElementById('btn-magnates-blend-hud-play')?.addEventListener('click', toggleBlendPlay);
+
+  // Reset / Replay unified action
+  const resetBlendPlay = () => {
     magnatesBlendState.playhead = 0;
     updateMagnatesBlendVisualStyles();
+  };
+
+  document.getElementById('btn-magnates-blend-reset')?.addEventListener('click', resetBlendPlay);
+  document.getElementById('btn-magnates-blend-hud-replay')?.addEventListener('click', resetBlendPlay);
+
+  // YouTube-style Floating Player HUD Scrubber seeking
+  const blendScrubberWrap = document.getElementById('magnates-blend-hud-scrubber-wrap');
+  const blendTooltip = document.getElementById('magnates-blend-hud-preview-tooltip');
+  const blendTooltipTime = document.getElementById('magnates-blend-hud-tooltip-time');
+
+  if (blendScrubberWrap) {
+    let isBlendScrubbing = false;
+
+    const handleBlendScrub = (ev) => {
+      const rect = blendScrubberWrap.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(ev.clientX - rect.left, rect.width));
+      const pct = rect.width > 0 ? (clickX / rect.width) : 0;
+      magnatesBlendState.playhead = pct * (magnatesBlendState.duration || 6);
+      updateMagnatesBlendVisualStyles();
+    };
+
+    const updateTooltip = (clientX) => {
+      if (!blendTooltip || !blendTooltipTime) return;
+      const rect = blendScrubberWrap.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(clientX - rect.left, rect.width));
+      const pct = rect.width > 0 ? (clickX / rect.width) : 0;
+      const hoverTime = pct * (magnatesBlendState.duration || 6);
+      const m = Math.floor(hoverTime / 60);
+      const s = Math.floor(hoverTime % 60);
+      blendTooltipTime.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+      blendTooltip.style.left = `${clickX}px`;
+    };
+
+    blendScrubberWrap.addEventListener('pointerdown', (ev) => {
+      isBlendScrubbing = true;
+      handleBlendScrub(ev);
+      updateTooltip(ev.clientX);
+      if (blendTooltip) blendTooltip.style.display = 'block';
+    });
+
+    window.addEventListener('pointermove', (ev) => {
+      if (isBlendScrubbing) {
+        handleBlendScrub(ev);
+        updateTooltip(ev.clientX);
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (isBlendScrubbing) {
+        isBlendScrubbing = false;
+      }
+    });
+
+    blendScrubberWrap.addEventListener('mousemove', (ev) => {
+      updateTooltip(ev.clientX);
+      if (blendTooltip) blendTooltip.style.display = 'block';
+    });
+
+    blendScrubberWrap.addEventListener('mouseleave', () => {
+      if (!isBlendScrubbing && blendTooltip) {
+        blendTooltip.style.display = 'none';
+      }
+    });
+  }
+
+  // Draggable & Resizable Typography on Canvas
+  const textContainer = document.getElementById('magnates-blend-text-container');
+  const textResizeHandle = document.getElementById('magnates-blend-text-resize-handle');
+
+  if (textContainer) {
+    let isDraggingText = false;
+    let isResizingText = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let initialTextX = 0;
+    let initialTextY = 0;
+    let resizeStartX = 0;
+    let initialFontSize = 20;
+
+    textContainer.addEventListener('mouseenter', () => {
+      textContainer.style.borderColor = 'rgba(168,85,247,0.6)';
+      textContainer.style.background = 'rgba(168,85,247,0.06)';
+      if (textResizeHandle) textResizeHandle.style.display = 'block';
+    });
+
+    textContainer.addEventListener('mouseleave', () => {
+      if (!isDraggingText && !isResizingText) {
+        textContainer.style.borderColor = 'transparent';
+        textContainer.style.background = 'transparent';
+        if (textResizeHandle) textResizeHandle.style.display = 'none';
+      }
+    });
+
+    if (textResizeHandle) {
+      textResizeHandle.addEventListener('pointerdown', (e) => {
+        e.stopPropagation();
+        isResizingText = true;
+        resizeStartX = e.clientX;
+        initialFontSize = magnatesBlendState.fontSize || 20;
+      });
+    }
+
+    textContainer.addEventListener('pointerdown', (e) => {
+      if (e.target === textResizeHandle) return;
+      isDraggingText = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      initialTextX = magnatesBlendState.textX || 0;
+      initialTextY = magnatesBlendState.textY || 0;
+      textContainer.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (isDraggingText) {
+        magnatesBlendState.textX = Math.round(initialTextX + (e.clientX - dragStartX));
+        magnatesBlendState.textY = Math.round(initialTextY + (e.clientY - dragStartY));
+        updateMagnatesBlendVisualStyles();
+      } else if (isResizingText) {
+        const deltaX = e.clientX - resizeStartX;
+        const newSize = Math.max(12, Math.min(60, Math.round(initialFontSize + deltaX * 0.25)));
+        magnatesBlendState.fontSize = newSize;
+        updateMagnatesBlendVisualStyles();
+      }
+    });
+
+    window.addEventListener('pointerup', () => {
+      if (isDraggingText || isResizingText) {
+        isDraggingText = false;
+        isResizingText = false;
+        if (textContainer) {
+          textContainer.style.cursor = 'grab';
+          textContainer.style.borderColor = 'transparent';
+          textContainer.style.background = 'transparent';
+        }
+        if (textResizeHandle) textResizeHandle.style.display = 'none';
+      }
+    });
+
+    // Mouse wheel resize on canvas container
+    textContainer.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const step = e.deltaY < 0 ? 1 : -1;
+      magnatesBlendState.fontSize = Math.max(12, Math.min(60, (magnatesBlendState.fontSize || 20) + step));
+      updateMagnatesBlendVisualStyles();
+    }, { passive: false });
+  }
+
+  // Inspector font size slider & reset position button
+  document.getElementById('magnates-blend-slider-fontsize')?.addEventListener('input', (e) => {
+    magnatesBlendState.fontSize = parseInt(e.target.value, 10);
+    updateMagnatesBlendVisualStyles();
+  });
+
+  document.getElementById('btn-magnates-blend-reset-text-pos')?.addEventListener('click', () => {
+    magnatesBlendState.textX = 0;
+    magnatesBlendState.textY = 0;
+    magnatesBlendState.fontSize = 20;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  // Scene Layers List selection & synchronization
+  const layerRows = document.querySelectorAll('.magnates-blend-layer-item');
+  layerRows.forEach(row => {
+    row.addEventListener('click', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+      layerRows.forEach(r => {
+        r.classList.remove('active');
+        r.style.background = 'rgba(255,255,255,0.03)';
+        r.style.borderColor = 'rgba(255,255,255,0.06)';
+      });
+      row.classList.add('active');
+      row.style.background = 'rgba(168,85,247,0.12)';
+      row.style.borderColor = 'rgba(168,85,247,0.3)';
+
+      if (row.id === 'magnates-blend-layer-row-text') {
+        document.getElementById('magnates-blend-input-headline')?.focus();
+      }
+    });
+  });
+
+  // Layer Clock Checkbox sync
+  document.getElementById('magnates-blend-layer-clock-chk')?.addEventListener('change', (e) => {
+    magnatesBlendState.showClock = e.target.checked;
+    const toggleClock = document.getElementById('magnates-blend-toggle-clock');
+    if (toggleClock) toggleClock.checked = e.target.checked;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  // Custom Backdrop Upload
+  document.getElementById('magnates-blend-upload-bg')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (loadEv) => {
+        magnatesBlendState.bgUrl = loadEv.target.result;
+        const bgImg = document.getElementById('magnates-blend-bg-img');
+        if (bgImg) bgImg.src = loadEv.target.result;
+        const thumb = document.getElementById('magnates-blend-layer-bg-thumb');
+        if (thumb) thumb.src = loadEv.target.result;
+        updateMagnatesBlendVisualStyles();
+      };
+      reader.readAsDataURL(file);
+    }
   });
 
   const blendDescs = {
@@ -47526,6 +47743,8 @@ function bindMagnatesBlendModesSuiteModalControls() {
 
   document.getElementById('magnates-blend-toggle-clock')?.addEventListener('change', (e) => {
     magnatesBlendState.showClock = e.target.checked;
+    const layerClockChk = document.getElementById('magnates-blend-layer-clock-chk');
+    if (layerClockChk) layerClockChk.checked = e.target.checked;
     updateMagnatesBlendVisualStyles();
   });
 
