@@ -23248,7 +23248,7 @@ const EFFECT_TEMPLATES_DATA = [
     secondaryImage: '/portrait_cutout_clean.png'
   },
   {
-    id: 'creator-cinematic-backdrop-suite',
+    id: 'creator-cinematic-studio',
     title: 'Cinematic Creator Studio: Calibratable DOF, Lighting & Face-Lock',
     category: 'Vlog & Story',
     origCategory: 'Vlog & Story',
@@ -25349,7 +25349,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['jani-forbes-fraud-reveal','creator-cinematic-backdrop-suite','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -28564,8 +28564,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <!-- Scene 5 Hover Elements -->
-          <img id="fx-bp-office-${tplId}" src="/temu_boardroom_office.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; opacity: 0; transform-origin: 34% 28%; pointer-events: none;" />
-          <div id="fx-bp-article-${tplId}" style="position: absolute; left: 8%; right: 8%; top: 12%; z-index: 11; opacity: 0; pointer-events: none; font-family: Georgia, serif;">
+          <img id="fx-bp-office-${tplId}" src="/temu_boardroom_office.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; opacity: 0; transform-origin: 29.5% 15.5%; pointer-events: none;" />
+          <div id="fx-bp-article-${tplId}" style="position: absolute; left: 50%; transform: translateX(-50%); width: 66%; top: 6%; z-index: 11; opacity: 0; pointer-events: none; font-family: Georgia, serif;">
             <div style="font-size: 8px; color: #9ca3af;">Global Business</div>
             <div style="font-size: 11px; font-weight: 700; color: #fff; line-height: 1.2;">
               Temu Emerges as the Biggest<br />
@@ -29704,7 +29704,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           const zProg = easeInOut((c - tCut) / 1.5);
           if (officeEl) {
             officeEl.style.opacity = '1';
-            const sc = 2.2 - zProg * 1.2;
+            const sc = 3.15 - zProg * 2.15;
             officeEl.style.transform = `scale(${sc.toFixed(3)})`;
           }
           if (capEl) {
@@ -30895,6 +30895,28 @@ function openTopTemplateCustomizer(tpl) {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountForbes3DStage(stage, cData);
       }
+    } else if (tpl.id === 'creator-cinematic-backdrop-suite') {
+      topCustomizerState.primaryUrl = '/creator_portrait_cutout.png';
+      topCustomizerState.secondaryUrl = '/creator_background_plate.png';
+      topCustomizerState.originalPhotoUrl = '/creator_cinematic_portrait_ref.png';
+      topCustomizerState.bgRemoved = true;
+      topCustomizerState.hasTextBehind = true;
+      topCustomizerState.creatorMode = topCustomizerState.creatorMode || 'original';
+      topCustomizerState.creatorVirtualPreset = topCustomizerState.creatorVirtualPreset || 'studio';
+      topCustomizerState.creatorBlur = topCustomizerState.creatorBlur !== undefined ? topCustomizerState.creatorBlur : 28;
+      topCustomizerState.creatorSoftness = topCustomizerState.creatorSoftness !== undefined ? topCustomizerState.creatorSoftness : 28;
+      topCustomizerState.creatorBrightness = topCustomizerState.creatorBrightness !== undefined ? topCustomizerState.creatorBrightness : 65;
+      topCustomizerState.creatorTint = topCustomizerState.creatorTint !== undefined ? topCustomizerState.creatorTint : 45;
+      topCustomizerState.creatorWarmBokeh = topCustomizerState.creatorWarmBokeh !== undefined ? topCustomizerState.creatorWarmBokeh : true;
+      topCustomizerState.creatorRim = topCustomizerState.creatorRim !== undefined ? topCustomizerState.creatorRim : 75;
+      topCustomizerState.creatorFaceTrack = topCustomizerState.creatorFaceTrack !== undefined ? topCustomizerState.creatorFaceTrack : true;
+      topCustomizerState.creatorSensitivity = topCustomizerState.creatorSensitivity !== undefined ? topCustomizerState.creatorSensitivity : 94;
+      topCustomizerState.creatorBrushSize = topCustomizerState.creatorBrushSize || 35;
+      topCustomizerState.creatorTextLeft = topCustomizerState.creatorTextLeft || 'this AI company';
+      topCustomizerState.creatorTextRight = topCustomizerState.creatorTextRight || 'VOICE';
+      topCustomizerState.creatorBrushStrokes = topCustomizerState.creatorBrushStrokes || [];
+      topCustomizerState.creatorSmoothedX = 0;
+      topCustomizerState.creatorSmoothedY = 0;
     } else if (tpl.id === 'magnates-media-article-highlight') {
       topCustomizerState.primaryUrl = '/magnates_article_highlight_thumbnail.svg';
       topCustomizerState.secondaryUrl = '';
@@ -31135,6 +31157,8 @@ function openTopTemplateCustomizer(tpl) {
   const wrapSub = document.getElementById('tpl-modal-wrap-subtitle');
 
   // Universal Template Isolation Reset: hide all template-specific panels by default
+  const creatorWrapEl = document.getElementById('tpl-modal-wrap-creator-calibration');
+  if (creatorWrapEl) creatorWrapEl.style.display = 'none';
   const sigilWrapEl = document.getElementById('tpl-modal-wrap-sigil-fx');
   if (sigilWrapEl) sigilWrapEl.style.display = 'none';
   const spoonerWrapEl = document.getElementById('tpl-modal-spooner-controls');
@@ -31182,7 +31206,16 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
 
-  if (tpl.id === 'spooner-2-5d-photo-parallax') {
+  if (tpl.id === 'creator-cinematic-backdrop-suite') {
+    if (labelPrim) labelPrim.textContent = '👤 Cutout Speaker (Foreground Face/Torso)';
+    if (labelSec) labelSec.textContent = '🌆 Calibrated Background Plate / Studio';
+    if (wrapPrim) wrapPrim.style.display = 'flex';
+    if (wrapSec) wrapSec.style.display = 'flex';
+    if (wrapText) wrapText.style.display = 'none';
+    if (creatorWrapEl) creatorWrapEl.style.display = 'flex';
+
+    syncCreatorCalibrationUI();
+  } else if (tpl.id === 'spooner-2-5d-photo-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground (1:1 Registered)';
     if (labelSec) labelSec.textContent = 'Inpainted Scene Backdrop (1:1 Registered)';
     if (wrapSec) wrapSec.style.display = 'flex';
@@ -34619,7 +34652,98 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
   let textClips = [];
   let focusClip = null;
 
-  if (tpl.id === 'subject-25d-parallax') {
+  if (tpl.id === 'creator-cinematic-backdrop-suite') {
+    const cState = topCustomizerState;
+    const mode = cState.creatorMode || 'original';
+    const preset = cState.creatorVirtualPreset || 'studio';
+    let bgUrl = sec || '/creator_background_plate.png';
+    if (mode === 'virtual') {
+      if (preset === 'cyber') bgUrl = '/creator_cyber_bokeh_preset.png';
+      else if (preset === 'boardroom') bgUrl = '/creator_studio_bokeh_preset.png';
+      else bgUrl = '/creator_studio_bokeh_preset.png';
+    }
+    const bgClip = {
+      id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Calibrated_Background.png',
+      url: bgUrl,
+      file: { name: 'Calibrated_Background.png', url: bgUrl, isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.05,
+      isBackgroundScene: true,
+      creatorCalibration: {
+        mode: mode,
+        blur: cState.creatorBlur !== undefined ? cState.creatorBlur : 28,
+        softness: cState.creatorSoftness !== undefined ? cState.creatorSoftness : 28,
+        brightness: cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65,
+        tint: cState.creatorTint !== undefined ? cState.creatorTint : 45,
+        warmBokeh: cState.creatorWarmBokeh !== false,
+        rim: cState.creatorRim !== undefined ? cState.creatorRim : 75
+      },
+      blur: cState.creatorBlur !== undefined ? cState.creatorBlur : 28,
+      zIndex: 10,
+      layerOrder: 'back'
+    };
+
+    const fgClip = {
+      id: `img-fg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: 'Speaker_Cutout.png',
+      url: prim || '/creator_portrait_cutout.png',
+      file: { name: 'Speaker_Cutout.png', url: prim || '/creator_portrait_cutout.png', isImage: true },
+      start: sceneStart,
+      duration: dur,
+      scale: 1.0,
+      faceTracking: {
+        enabled: cState.creatorFaceTrack !== false,
+        sensitivity: cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94,
+        jitterFreeSmoothing: true,
+        temporalLowPass: 0.92
+      },
+      holdoutBrushStrokes: cState.creatorBrushStrokes || [],
+      opacity: opacityVal,
+      zIndex: 40,
+      layerOrder: 'front'
+    };
+
+    focusClip = fgClip;
+    imageClips = [bgClip, fgClip];
+
+    // Left subtitle kinetic text
+    const textLeft = cState.creatorTextLeft || 'this AI company';
+    textClips.push({
+      id: `txt-left-${Date.now()}`,
+      text: textLeft,
+      highlight: '',
+      highlightColor: '#38bdf8',
+      anim: 'fade',
+      fontSize: 32,
+      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      zIndex: 22,
+      layerOrder: 'middle',
+      start: sceneStart,
+      duration: dur,
+      x: 240,
+      y: 420
+    });
+
+    // Right headline bold kinetic text
+    const textRight = cState.creatorTextRight || 'VOICE';
+    textClips.push({
+      id: `txt-right-${Date.now()}`,
+      text: textRight,
+      highlight: textRight,
+      highlightColor: '#ffffff',
+      anim: 'pop',
+      fontSize: 96,
+      fontFamily: 'Impact, sans-serif',
+      zIndex: 24,
+      layerOrder: 'middle',
+      start: sceneStart,
+      duration: dur,
+      x: 960,
+      y: 450
+    });
+  } else if (tpl.id === 'subject-25d-parallax') {
     const bgClip = {
       id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: 'Custom_Environment.jpg',
@@ -48523,16 +48647,22 @@ let magnatesBPState = {
   prod2GlowIntensity: 45,
   // Scene 5: Transparent Article Headline, Red Marker Highlight, Capitol Rise & Office Zoom-Out
   scene5Enabled: true,
+  articleMode: "live", // 'live' | 'screenshot'
+  articleKicker: "Global Business",
   articleLine1: "Temu Emerges as the Biggest",
   articleLine2: "Shopping App in the U.S.",
-  articleHighlightSpeed: 0.75,
+  articleSub: "Affordable prices, a vast product range and a seamless shopping experience helped Temu rise to the top of the U.S. shopping app market.",
+  articleBody: "Temu, the Chinese e-commerce platform, has quickly become the most popular shopping app in the United States, surpassing long-established rivals with its combination of low prices, a massive product selection and a smooth, app-first shopping experience. What began as a relatively unknown platform has, in just a few years, grown into a household name for millions of American consumers looking for value and convenience.",
+  articleFontScale: 100,
+  articleHighlightSpeed: 0.85,
   articleHighlightColor: "#b91c1c",
   articleHighlightOpacity: 88,
   articleRemoveBg: true,
+  customScreenshotRawUrl: "",
   customScreenshotUrl: "",
-  capitolApexY: 52,
-  capitolRiseDur: 0.85,
-  officeZoomOutDur: 1.40,
+  capitolApexY: 82,
+  capitolRiseDur: 0.90,
+  officeZoomOutDur: 1.45,
   officePhotoUrl: "/temu_boardroom_office.png",
   capitolCutoutUrl: "/capitol_dome_cutout.png",
   // Scene 3: Spinning Earth Globe & Wavy-to-Flat Headline ("FOR ALMOST NOTHING.")
@@ -49185,8 +49315,15 @@ function updateMagnatesBPVisualStyles() {
   }
 
   let bgOpacity = 1;
-  if (p >= effectiveBgFadeTime) {
-    const fadeQ = bpEaseInCubic((p - effectiveBgFadeTime) / 0.55);
+  const hasScene5Active = (isFullFlow || isScene5Only) && magnatesBPState.scene5Enabled !== false;
+  if (isScene5Only) {
+    bgOpacity = 1;
+  } else if (hasScene5Active && p >= tScene5Start) {
+    // Scene 5 Phase 1 restores the signature Crimson Radial Atmosphere right after Scene 4's brief dip
+    const restoreP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - tScene5Start) / 0.30)));
+    bgOpacity = restoreP;
+  } else if (p >= effectiveBgFadeTime) {
+    const fadeQ = bpEaseInCubic((p - effectiveBgFadeTime) / 0.45);
     bgOpacity = Math.max(0, 1 - fadeQ);
   }
   if (bgWrap) bgWrap.style.opacity = bgOpacity.toFixed(3);
@@ -49450,15 +49587,21 @@ function updateMagnatesBPVisualStyles() {
   }
 
   // =========================================================
-    // =========================================================
-  // SCENE 5 RENDER: Transparent Article, Highlight, Capitol Rise & Office Zoom-Out (Z=10, Z=11, Z=12)
+  // SCENE 5 RENDER: Centered Transparent Article, Red Highlight, Pristine Capitol Rise & Office Zoom-Out (Z=10, Z=11, Z=12)
   // =========================================================
   const officeLayer = document.getElementById('magnates-bp-layer-office');
   const officeImg = document.getElementById('magnates-bp-img-office');
   const articleLayer = document.getElementById('magnates-bp-layer-article');
+  const articleLiveWrap = document.getElementById('magnates-bp-article-live-wrap');
+  const articleShotWrap = document.getElementById('magnates-bp-article-screenshot-wrap');
+  const articleShotImg = document.getElementById('magnates-bp-article-screenshot-img');
+  const articleShotHl = document.getElementById('magnates-bp-article-screenshot-hl');
   const articleHl = document.getElementById('magnates-bp-article-highlight');
+  const articleKickerEl = document.getElementById('magnates-bp-article-kicker');
   const articleLine1 = document.getElementById('magnates-bp-article-line1');
   const articleLine2 = document.getElementById('magnates-bp-article-line2');
+  const articleSubEl = document.getElementById('magnates-bp-article-sub');
+  const articleBodyEl = document.getElementById('magnates-bp-article-body');
   const capitolLayer = document.getElementById('magnates-bp-layer-capitol');
   const capitolImg = document.getElementById('magnates-bp-img-capitol');
 
@@ -49476,69 +49619,106 @@ function updateMagnatesBPVisualStyles() {
   if (thumbZ11 && thumbZ11.getAttribute('src') !== (magnatesBPState.capitolCutoutUrl || '/capitol_dome_cutout.png')) {
     thumbZ11.src = magnatesBPState.capitolCutoutUrl || '/capitol_dome_cutout.png';
   }
-  if (articleLine1) articleLine1.textContent = magnatesBPState.articleLine1 || 'Temu Emerges as the Biggest';
-  if (articleLine2) articleLine2.textContent = magnatesBPState.articleLine2 || 'Shopping App in the U.S.';
 
-  const showScene5 = (isFullFlow || isScene5Only) && magnatesBPState.scene5Enabled !== false && p >= (tScene5Start - 0.1);
+  // Sync live editable text elements unless the user is actively typing inside them on stage
+  if (articleKickerEl && document.activeElement !== articleKickerEl) {
+    articleKickerEl.textContent = magnatesBPState.articleKicker ?? 'Global Business';
+  }
+  if (articleLine1 && document.activeElement !== articleLine1) {
+    articleLine1.textContent = magnatesBPState.articleLine1 ?? 'Temu Emerges as the Biggest';
+  }
+  if (articleLine2 && document.activeElement !== articleLine2) {
+    articleLine2.textContent = magnatesBPState.articleLine2 ?? 'Shopping App in the U.S.';
+  }
+  if (articleSubEl && document.activeElement !== articleSubEl) {
+    articleSubEl.textContent = magnatesBPState.articleSub ?? 'Affordable prices, a vast product range and a seamless shopping experience helped Temu rise to the top of the U.S. shopping app market.';
+  }
+  if (articleBodyEl && document.activeElement !== articleBodyEl) {
+    articleBodyEl.textContent = magnatesBPState.articleBody ?? 'Temu, the Chinese e-commerce platform, has quickly become the most popular shopping app in the United States, surpassing long-established rivals with its combination of low prices, a massive product selection and a smooth, app-first shopping experience. What began as a relatively unknown platform has, in just a few years, grown into a household name for millions of American consumers looking for value and convenience.';
+  }
+
+  const showScene5 = (isFullFlow || isScene5Only) && magnatesBPState.scene5Enabled !== false && p >= tScene5Start;
 
   if (!showScene5) {
     if (officeLayer) officeLayer.style.display = 'none';
     if (articleLayer) articleLayer.style.display = 'none';
     if (capitolLayer) capitolLayer.style.display = 'none';
   } else {
-    // Phase 1 vs Phase 2: Instant hard cut at tInstantCut!
+    // Phase 1 vs Phase 2: Instant hard cut at tInstantCut (no crossfade!)
     const isPhase1 = p < tInstantCut;
+    const hlSpeed = magnatesBPState.articleHighlightSpeed ?? 0.85;
+    const hlCol = magnatesBPState.articleHighlightColor || '#b91c1c';
+    const hlOp = (magnatesBPState.articleHighlightOpacity ?? 88) / 100;
+    const hlBg = bpHexToRgba(hlCol, hlOp);
+    // Highlight starts sweeping at tScene5Start + 0.12s and completes right after Capitol reaches its peak!
+    const hlProg = bpEaseInOutCubic(Math.max(0, Math.min(1, (p - (tScene5Start + 0.12)) / hlSpeed)));
 
-    // 1. Article Headline & Kinetic Red Marker Highlight (Phase 1 Only)
-    if (articleLayer && articleHl) {
+    // 1. Centered Transparent Article Headline & Kinetic Red Marker Highlight (Phase 1 Only)
+    if (articleLayer) {
       if (!isPhase1) {
         articleLayer.style.display = 'none';
       } else {
         articleLayer.style.display = 'flex';
-        const hlSpeed = magnatesBPState.articleHighlightSpeed ?? 0.75;
-        const hlProg = Math.max(0, Math.min(1, (p - (tScene5Start + 0.15)) / hlSpeed));
-        articleHl.style.width = `${(hlProg * 102).toFixed(1)}%`;
-        const hlCol = magnatesBPState.articleHighlightColor || '#b91c1c';
-        const hlOp = (magnatesBPState.articleHighlightOpacity ?? 88) / 100;
-        articleHl.style.background = bpHexToRgba(hlCol, hlOp);
-        // Fade in smoothly at start of Scene 5
-        const artInP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - tScene5Start) / 0.35)));
-        articleLayer.style.opacity = artInP.toFixed(2);
+        const fontScale = (magnatesBPState.articleFontScale ?? 100) / 100;
+        const artInP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - tScene5Start) / 0.28)));
+        articleLayer.style.opacity = artInP.toFixed(3);
+        articleLayer.style.transform = `translate3d(-50%, 0, 0) scale(${fontScale.toFixed(3)})`;
+        articleLayer.style.transformOrigin = 'top center';
+
+        const useScreenshotMode = magnatesBPState.articleMode === 'screenshot' && Boolean(magnatesBPState.customScreenshotUrl);
+        if (articleLiveWrap) articleLiveWrap.style.display = useScreenshotMode ? 'none' : 'flex';
+        if (articleShotWrap) {
+          articleShotWrap.style.display = useScreenshotMode ? 'flex' : 'none';
+          if (useScreenshotMode && articleShotImg && articleShotImg.getAttribute('src') !== magnatesBPState.customScreenshotUrl) {
+            articleShotImg.src = magnatesBPState.customScreenshotUrl;
+          }
+          if (articleShotHl) {
+            articleShotHl.style.width = `${(hlProg * 92).toFixed(1)}%`;
+            articleShotHl.style.background = hlBg;
+          }
+        }
+        if (articleHl) {
+          articleHl.style.width = `${(hlProg * 102).toFixed(1)}%`;
+          articleHl.style.background = hlBg;
+        }
       }
     }
 
-    // 2. Office Photo: Appears INSTANTLY at tInstantCut, starts zoomed in (scale 2.2x), zooms out to 1.0x
+    // 2. Office Photo: Appears INSTANTLY at tInstantCut, starts tightly zoomed in on presenter's face/glasses (scale 3.15x, origin 29.5% 15.5% matching Image 3), tracks back to 1.0x wide angle (Image 4)
     if (officeLayer && officeImg) {
       if (isPhase1) {
         officeLayer.style.display = 'none';
       } else {
         officeLayer.style.display = 'block';
-        const zoomDur = magnatesBPState.officeZoomOutDur ?? 1.40;
+        const zoomDur = magnatesBPState.officeZoomOutDur ?? 1.45;
         const zProg = bpEaseInOutCubic(Math.min(1, Math.max(0, (p - tInstantCut) / zoomDur)));
-        const currentScale = 2.20 - zProg * 1.20; // 2.20 -> 1.00
+        const currentScale = 3.15 - zProg * 2.15; // 3.15 -> 1.00
+        officeImg.style.transformOrigin = '29.5% 15.5%';
         officeImg.style.transform = `scale(${currentScale.toFixed(4)})`;
       }
     }
 
-    // 3. Capitol Building: Rises up during Phase 1 to apex, HOLDS through instant cut, then glides down during Phase 2
+    // 3. Pristine Capitol Building Cutout:
+    // Rises from bottom->up during Phase 1 slightly before the highlight finishes so its statue tip reaches between "in" and "the" on Line 2 (Image 2),
+    // then the highlight finishes passing over the dot ".",
+    // then on the instant cut (Phase 2) the Capitol stays at its exact peak and simultaneously glides down out of the frame while the office zooms out!
     if (capitolLayer) {
       capitolLayer.style.display = 'flex';
-      const apexPct = magnatesBPState.capitolApexY ?? 52;
-      // Apex height determines resting translateY
-      // height: 62%, so resting at bottom: 0 gives top at 38%
+      const apexPct = magnatesBPState.capitolApexY ?? 82;
+      capitolLayer.style.height = `${apexPct}%`;
       if (isPhase1) {
-        const riseSpeed = magnatesBPState.capitolRiseDur ?? 0.85;
-        const riseP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - (tScene5Start + 0.08)) / riseSpeed)));
-        const ty = (1 - riseP) * 110;
+        // Capitol reaches peak slightly before highlight finishes (hlSpeed * 0.82)
+        const riseDur = Math.max(0.35, hlSpeed * 0.82);
+        const riseP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - (tScene5Start + 0.08)) / riseDur)));
+        const ty = (1 - riseP) * 108;
         capitolLayer.style.transform = `translate3d(0, ${ty.toFixed(2)}%, 0)`;
-        capitolLayer.style.opacity = Math.min(1, riseP * 1.5).toFixed(2);
+        capitolLayer.style.opacity = Math.min(1, riseP * 1.6).toFixed(3);
       } else {
-        // Phase 2: simultaneously building descends from its location to down
-        const exitSpeed = magnatesBPState.officeZoomOutDur ?? 1.40;
-        const exitP = bpEaseInCubic(Math.min(1, Math.max(0, (p - tInstantCut) / exitSpeed)));
+        const exitDur = magnatesBPState.officeZoomOutDur ?? 1.45;
+        const exitP = bpEaseInOutCubic(Math.min(1, Math.max(0, (p - tInstantCut) / (exitDur * 0.92))));
         const ty = exitP * 112;
         capitolLayer.style.transform = `translate3d(0, ${ty.toFixed(2)}%, 0)`;
-        capitolLayer.style.opacity = (Math.max(0, 1 - exitP * 0.7)).toFixed(2);
+        capitolLayer.style.opacity = (exitP >= 0.98 ? 0 : 1).toFixed(3);
       }
     }
   }
@@ -49546,7 +49726,7 @@ function updateMagnatesBPVisualStyles() {
   // SCENE B / C RENDER: $1,000,000 Counter (Z=1) & Cutouts (Z=2, Z=3)
   // =========================================================
   const localPB = p - sceneBOffset;
-  const inSceneBWindow = !isBrandOnly && !isProductsOnly && !isGlobeOnly && (!isFullFlow || localPB >= 0);
+  const inSceneBWindow = !isBrandOnly && !isProductsOnly && !isGlobeOnly && !isScene5Only && (!isFullFlow || (localPB >= 0 && p < tScene5Start));
 
   if (textWrap) {
     if (!magnatesBPState.showCounter || !inSceneBWindow) {
@@ -49685,7 +49865,8 @@ function updateMagnatesBPVisualStyles() {
       if (cType === 'brand_wavy_intro') isCardActive = p < tShiftRight;
       else if (cType === 'products_unfurl') isCardActive = p >= tShiftRight && p < tGlobeStart;
       else if (cType === 'globe_wavy_nothing') isCardActive = p >= tGlobeStart && p < sceneBOffset;
-      else if (cType === 'dual_silhouette') isCardActive = p >= sceneBOffset;
+      else if (cType === 'dual_silhouette') isCardActive = p >= sceneBOffset && p < tScene5Start;
+      else if (cType === 'article_capitol_zoom') isCardActive = p >= tScene5Start;
     } else if (magnatesBPState.preset === 'brand_wavy_intro') {
       if (cType === 'brand_wavy_intro') isCardActive = p < tShiftRight;
       else if (cType === 'products_unfurl') isCardActive = p >= tShiftRight;
@@ -49719,6 +49900,12 @@ function updateMagnatesBPVisualStyles() {
       phaseText = "SCENE 2 // 2. LEFT PRODUCT & $2.00 UNFURL";
     } else {
       phaseText = "SCENE 2 // 3. RIGHT PRODUCT & $5.00 UNFURL";
+    }
+  } else if (showScene5) {
+    if (p < tInstantCut) {
+      phaseText = "SCENE 5 // 1. TRANSPARENT ARTICLE HIGHLIGHT & CAPITOL RISE";
+    } else {
+      phaseText = "SCENE 5 // 2. INSTANT CUT → TEMU OFFICE ZOOM-OUT & CAPITOL DESCENT";
     }
   } else if (showGlobeScene) {
     if (p < tGlobeStart + 0.58) {
@@ -49803,6 +49990,8 @@ const MAGNATES_BP_SYNC_FIELDS = [
   'prod1Url', 'prod1Price', 'prod1GlowColor', 'prod1GlowIntensity',
   'prod2Url', 'prod2Price', 'prod2GlowColor', 'prod2GlowIntensity',
   'globeEnabled', 'globeUrl', 'globeHeadline', 'globeSpinSpeed', 'globeSpinDir',
+  'scene5Enabled', 'articleMode', 'articleKicker', 'articleLine1', 'articleLine2', 'articleSub', 'articleBody', 'articleFontScale',
+  'articleHighlightSpeed', 'articleHighlightColor', 'articleHighlightOpacity', 'articleRemoveBg', 'capitolApexY', 'officeZoomOutDur',
   'headline', 'subcaption',
   'l1InAnim', 'l1OutAnim', 'l1InTime', 'l1OutTime', 'l1GlowColor', 'l1GlowIntensity',
   'l2InAnim', 'l2OutAnim', 'l2InTime', 'l2OutTime', 'l2GlowColor', 'l2GlowIntensity',
@@ -49921,16 +50110,22 @@ function syncMagnatesBPInspectorControlsFromState() {
   if (chkS5) chkS5.checked = magnatesBPState.scene5Enabled !== false;
   const chkS5Active = document.getElementById('magnates-bp-toggle-s5-active');
   if (chkS5Active) chkS5Active.checked = magnatesBPState.scene5Enabled !== false;
-  setVal('magnates-bp-input-article-line1', magnatesBPState.articleLine1 || 'Temu Emerges as the Biggest');
-  setVal('magnates-bp-input-article-line2', magnatesBPState.articleLine2 || 'Shopping App in the U.S.');
-  setVal('magnates-bp-slider-highlight-speed', magnatesBPState.articleHighlightSpeed ?? 0.75);
-  setTxt('magnates-bp-val-highlight-speed', `${(magnatesBPState.articleHighlightSpeed ?? 0.75).toFixed(2)}s`);
+  setVal('magnates-bp-select-article-mode', magnatesBPState.articleMode || 'live');
+  setVal('magnates-bp-input-article-kicker', magnatesBPState.articleKicker ?? 'Global Business');
+  setVal('magnates-bp-input-article-line1', magnatesBPState.articleLine1 ?? 'Temu Emerges as the Biggest');
+  setVal('magnates-bp-input-article-line2', magnatesBPState.articleLine2 ?? 'Shopping App in the U.S.');
+  setVal('magnates-bp-input-article-sub', magnatesBPState.articleSub ?? 'Affordable prices, a vast product range and a seamless shopping experience helped Temu rise to the top of the U.S. shopping app market.');
+  setVal('magnates-bp-input-article-body', magnatesBPState.articleBody ?? 'Temu, the Chinese e-commerce platform, has quickly become the most popular shopping app in the United States, surpassing long-established rivals with its combination of low prices, a massive product selection and a smooth, app-first shopping experience. What began as a relatively unknown platform has, in just a few years, grown into a household name for millions of American consumers looking for value and convenience.');
+  setVal('magnates-bp-slider-article-scale', magnatesBPState.articleFontScale ?? 100);
+  setTxt('magnates-bp-val-article-scale', `${magnatesBPState.articleFontScale ?? 100}%`);
+  setVal('magnates-bp-slider-highlight-speed', magnatesBPState.articleHighlightSpeed ?? 0.85);
+  setTxt('magnates-bp-val-highlight-speed', `${(magnatesBPState.articleHighlightSpeed ?? 0.85).toFixed(2)}s`);
   setVal('magnates-bp-color-highlight', magnatesBPState.articleHighlightColor || '#b91c1c');
   setVal('magnates-bp-slider-highlight-op', magnatesBPState.articleHighlightOpacity ?? 88);
-  setVal('magnates-bp-slider-capitol-apex', magnatesBPState.capitolApexY ?? 52);
-  setTxt('magnates-bp-val-capitol-apex', `${magnatesBPState.capitolApexY ?? 52}%`);
-  setVal('magnates-bp-slider-zoomout-dur', magnatesBPState.officeZoomOutDur ?? 1.40);
-  setTxt('magnates-bp-val-zoomout-dur', `${(magnatesBPState.officeZoomOutDur ?? 1.40).toFixed(2)}s`);
+  setVal('magnates-bp-slider-capitol-apex', magnatesBPState.capitolApexY ?? 82);
+  setTxt('magnates-bp-val-capitol-apex', `${magnatesBPState.capitolApexY ?? 82}%`);
+  setVal('magnates-bp-slider-zoomout-dur', magnatesBPState.officeZoomOutDur ?? 1.45);
+  setTxt('magnates-bp-val-zoomout-dur', `${(magnatesBPState.officeZoomOutDur ?? 1.45).toFixed(2)}s`);
   const chkRemBg = document.getElementById('magnates-bp-check-remove-bg');
   if (chkRemBg) chkRemBg.checked = magnatesBPState.articleRemoveBg !== false;
 
@@ -50048,6 +50243,17 @@ function applyMagnatesBPPresetToState(pKey) {
     magnatesBPState.l1Enabled = false;
     magnatesBPState.l2Enabled = false;
     magnatesBPState.showCounter = false;
+    magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'article_capitol_zoom') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = false;
+    magnatesBPState.wavyTextEnabled = false;
+    magnatesBPState.productsEnabled = false;
+    magnatesBPState.globeEnabled = false;
+    magnatesBPState.l1Enabled = false;
+    magnatesBPState.l2Enabled = false;
+    magnatesBPState.showCounter = false;
+    magnatesBPState.scene5Enabled = true;
     magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
   } else if (pKey === 'dual_silhouette') {
     magnatesBPState.bgPlateUrl = "";
@@ -50221,12 +50427,13 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
   const cardLogo = document.getElementById('magnates-bp-card-logo-controls');
   const cardProds = document.getElementById('magnates-bp-card-products-controls');
   const cardGlobe = document.getElementById('magnates-bp-card-globe-controls');
+  const cardScene5 = document.getElementById('magnates-bp-card-scene5-controls');
   const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
   const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
   const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
   const cardExtra = document.getElementById('magnates-bp-card-extra-controls');
 
-  [cardLogo, cardProds, cardGlobe, cardL1, cardL2, cardZ0].forEach((c) => {
+  [cardLogo, cardProds, cardGlobe, cardScene5, cardL1, cardL2, cardZ0].forEach((c) => {
     if (c) {
       c.style.borderColor = 'rgba(255,255,255,0.06)';
       c.style.background = 'rgba(255,255,255,0.02)';
@@ -50250,6 +50457,11 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
     cardGlobe.style.background = 'rgba(52, 211, 153, 0.06)';
     cardGlobe.style.boxShadow = '0 0 16px rgba(52, 211, 153, 0.15)';
     cardGlobe.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if ((layerId === 'z10' || layerId === 'z11' || layerId === 'z12') && cardScene5) {
+    cardScene5.style.borderColor = 'rgba(244, 63, 94, 0.65)';
+    cardScene5.style.background = 'rgba(244, 63, 94, 0.06)';
+    cardScene5.style.boxShadow = '0 0 16px rgba(244, 63, 94, 0.15)';
+    cardScene5.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } else if (layerId === 'z2' && cardL1) {
     cardL1.style.borderColor = 'rgba(56, 189, 248, 0.65)';
     cardL1.style.background = 'rgba(56, 189, 248, 0.06)';
@@ -50555,60 +50767,186 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   });
 
   // Scene 5 Article Highlight, Capitol Rise & Office Zoom-Out Listeners (Z=10, Z=11, Z=12)
-  const ensurePlayheadInScene5 = () => {
-    const tS5 = magnatesBPState.preset === 'article_capitol_zoom' ? 0.2 : 14.80;
-    if (magnatesBPState.playhead < tS5 || magnatesBPState.playhead > tS5 + 3.8) {
-      magnatesBPState.playhead = tS5 + 0.5;
+  const ensurePlayheadInScene5 = (phase2 = false) => {
+    const tS5 = magnatesBPState.preset === 'article_capitol_zoom' ? 0.0 : 14.60;
+    const tCut = tS5 + (magnatesBPState.articleHighlightSpeed ?? 0.85) + 0.35;
+    if (phase2) {
+      if (magnatesBPState.playhead < tCut || magnatesBPState.playhead > tCut + 2.0) {
+        magnatesBPState.playhead = tCut + 0.15;
+      }
+    } else {
+      if (magnatesBPState.playhead < tS5 || magnatesBPState.playhead >= tCut) {
+        magnatesBPState.playhead = tS5 + Math.min(0.95, (magnatesBPState.articleHighlightSpeed ?? 0.85) + 0.15);
+      }
     }
+  };
+
+  const processCustomScreenshotBg = (rawUrl) => {
+    if (!rawUrl) return;
+    if (magnatesBPState.articleRemoveBg === false) {
+      magnatesBPState.customScreenshotUrl = rawUrl;
+      updateMagnatesBPVisualStyles();
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.width;
+      c.height = img.height;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imgData = ctx.getImageData(0, 0, c.width, c.height);
+      const data = imgData.data;
+      // Detect corner background luminance (supports both white paper screenshots and dark-mode screenshots!)
+      const cornerLum = (data[0] + data[1] + data[2]) / 3;
+      const isLightBg = cornerLum > 128;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        const lum = (r + g + b) / 3;
+        if (isLightBg) {
+          // Strip white/light paper background and invert dark text to crisp white so it pops on the crimson backdrop!
+          if (lum > 210) {
+            data[i + 3] = 0;
+          } else {
+            const textAlpha = Math.min(1, (220 - lum) / 140);
+            data[i] = 245;
+            data[i + 1] = 245;
+            data[i + 2] = 248;
+            data[i + 3] = Math.round(textAlpha * 255);
+          }
+        } else {
+          // Dark screenshot background: strip dark pixels so only light text remains
+          if (lum < 45) {
+            data[i + 3] = 0;
+          } else if (lum < 95) {
+            data[i + 3] = Math.round(((lum - 45) / 50) * 255);
+          }
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+      magnatesBPState.customScreenshotUrl = c.toDataURL('image/png');
+      updateMagnatesBPVisualStyles();
+    };
+    img.src = rawUrl;
   };
 
   document.getElementById('magnates-bp-toggle-scene5')?.addEventListener('change', (e) => {
     magnatesBPState.scene5Enabled = e.target.checked;
+    const chk2 = document.getElementById('magnates-bp-toggle-s5-active');
+    if (chk2) chk2.checked = e.target.checked;
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-toggle-s5-active')?.addEventListener('change', (e) => {
     magnatesBPState.scene5Enabled = e.target.checked;
+    const chk1 = document.getElementById('magnates-bp-toggle-scene5');
+    if (chk1) chk1.checked = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-select-article-mode')?.addEventListener('change', (e) => {
+    magnatesBPState.articleMode = e.target.value;
+    ensurePlayheadInScene5(false);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-btn-clear-screenshot')?.addEventListener('click', () => {
+    magnatesBPState.articleMode = 'live';
+    const sel = document.getElementById('magnates-bp-select-article-mode');
+    if (sel) sel.value = 'live';
+    ensurePlayheadInScene5(false);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-check-remove-bg')?.addEventListener('change', (e) => {
+    magnatesBPState.articleRemoveBg = e.target.checked;
+    if (magnatesBPState.customScreenshotRawUrl) {
+      processCustomScreenshotBg(magnatesBPState.customScreenshotRawUrl);
+    }
+    ensurePlayheadInScene5(false);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-slider-article-scale')?.addEventListener('input', (e) => {
+    magnatesBPState.articleFontScale = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-article-scale');
+    if (lbl) lbl.textContent = `${magnatesBPState.articleFontScale}%`;
+    ensurePlayheadInScene5(false);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-article-kicker')?.addEventListener('input', (e) => {
+    magnatesBPState.articleKicker = e.target.value;
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-input-article-line1')?.addEventListener('input', (e) => {
     magnatesBPState.articleLine1 = e.target.value;
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-input-article-line2')?.addEventListener('input', (e) => {
     magnatesBPState.articleLine2 = e.target.value;
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
+  document.getElementById('magnates-bp-input-article-sub')?.addEventListener('input', (e) => {
+    magnatesBPState.articleSub = e.target.value;
+    ensurePlayheadInScene5(false);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-article-body')?.addEventListener('input', (e) => {
+    magnatesBPState.articleBody = e.target.value;
+    ensurePlayheadInScene5(false);
+    updateMagnatesBPVisualStyles();
+  });
+
+  // Bidirectional sync when user clicks and edits text directly on the stage (contenteditable)
+  const bindStageEditable = (stageId, stateKey, inputId) => {
+    const el = document.getElementById(stageId);
+    if (!el) return;
+    el.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      magnatesBPState.isPlaying = false;
+      syncMagnatesBPPlayButtons();
+      selectMagnatesBPLayer('z10');
+    });
+    el.addEventListener('input', () => {
+      magnatesBPState[stateKey] = el.textContent;
+      const inp = document.getElementById(inputId);
+      if (inp) inp.value = el.textContent;
+      saveMagnatesBPSharedSyncState();
+    });
+  };
+  bindStageEditable('magnates-bp-article-kicker', 'articleKicker', 'magnates-bp-input-article-kicker');
+  bindStageEditable('magnates-bp-article-line1', 'articleLine1', 'magnates-bp-input-article-line1');
+  bindStageEditable('magnates-bp-article-line2', 'articleLine2', 'magnates-bp-input-article-line2');
+  bindStageEditable('magnates-bp-article-sub', 'articleSub', 'magnates-bp-input-article-sub');
+  bindStageEditable('magnates-bp-article-body', 'articleBody', 'magnates-bp-input-article-body');
+
   document.getElementById('magnates-bp-slider-highlight-speed')?.addEventListener('input', (e) => {
     magnatesBPState.articleHighlightSpeed = parseFloat(e.target.value);
     const lbl = document.getElementById('magnates-bp-val-highlight-speed');
     if (lbl) lbl.textContent = `${magnatesBPState.articleHighlightSpeed.toFixed(2)}s`;
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-color-highlight')?.addEventListener('input', (e) => {
     magnatesBPState.articleHighlightColor = e.target.value;
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-slider-highlight-op')?.addEventListener('input', (e) => {
     magnatesBPState.articleHighlightOpacity = parseInt(e.target.value, 10);
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-slider-capitol-apex')?.addEventListener('input', (e) => {
     magnatesBPState.capitolApexY = parseInt(e.target.value, 10);
     const lbl = document.getElementById('magnates-bp-val-capitol-apex');
     if (lbl) lbl.textContent = `${magnatesBPState.capitolApexY}%`;
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(false);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-slider-zoomout-dur')?.addEventListener('input', (e) => {
     magnatesBPState.officeZoomOutDur = parseFloat(e.target.value);
     const lbl = document.getElementById('magnates-bp-val-zoomout-dur');
     if (lbl) lbl.textContent = `${magnatesBPState.officeZoomOutDur.toFixed(2)}s`;
-    ensurePlayheadInScene5();
+    ensurePlayheadInScene5(true);
     updateMagnatesBPVisualStyles();
   });
 
@@ -50619,35 +50957,12 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     const reader = new FileReader();
     reader.onload = (loadEv) => {
       const srcUrl = loadEv.target.result;
-      magnatesBPState.customScreenshotUrl = srcUrl;
-      // Strip background on canvas if removeBg is checked
-      const img = new Image();
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        c.width = img.width;
-        c.height = img.height;
-        const ctx = c.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        if (magnatesBPState.articleRemoveBg !== false) {
-          const imgData = ctx.getImageData(0, 0, c.width, c.height);
-          const data = imgData.data;
-          // Luma / chroma key: if pixel is white/light gray (paper bg), make it transparent
-          for (let i = 0; i < data.length; i += 4) {
-            const r = data[i], g = data[i+1], b = data[i+2];
-            const lum = (r + g + b) / 3;
-            if (lum > 215) {
-              data[i+3] = 0;
-            } else if (lum > 170) {
-              data[i+3] = Math.floor(((215 - lum) / 45) * 255);
-            }
-          }
-          ctx.putImageData(imgData, 0, 0);
-        }
-        magnatesBPState.customScreenshotUrl = c.toDataURL('image/png');
-        ensurePlayheadInScene5();
-        updateMagnatesBPVisualStyles();
-      };
-      img.src = srcUrl;
+      magnatesBPState.customScreenshotRawUrl = srcUrl;
+      magnatesBPState.articleMode = 'screenshot';
+      const sel = document.getElementById('magnates-bp-select-article-mode');
+      if (sel) sel.value = 'screenshot';
+      processCustomScreenshotBg(srcUrl);
+      ensurePlayheadInScene5(false);
     };
     reader.readAsDataURL(file);
   });
@@ -50659,7 +50974,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       magnatesBPState.officePhotoUrl = ev.target.result;
-      ensurePlayheadInScene5();
+      ensurePlayheadInScene5(true);
       updateMagnatesBPVisualStyles();
     };
     reader.readAsDataURL(file);
@@ -50670,13 +50985,13 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     const reader = new FileReader();
     reader.onload = (ev) => {
       magnatesBPState.capitolCutoutUrl = ev.target.result;
-      ensurePlayheadInScene5();
+      ensurePlayheadInScene5(false);
       updateMagnatesBPVisualStyles();
     };
     reader.readAsDataURL(file);
   });
 
-  // Scene 3 Spinning Earth Globe & Wavy-to-Flat Headline Listeners (Z=8 & Z=9)
+    // Scene 3 Spinning Earth Globe & Wavy-to-Flat Headline Listeners (Z=8 & Z=9)
   const ensurePlayheadInGlobe = () => {
     const tG = magnatesBPState.preset === 'globe_wavy_nothing' ? 0.15 : 6.45;
     if (magnatesBPState.playhead < tG + 0.6 || magnatesBPState.playhead > tG + 3.1) {
@@ -54776,4 +55091,265 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     attachCutoutEditorTriggers();
     attachModalDocHighlighterListeners();
   });
+}
+
+
+function syncCreatorCalibrationUI() {
+  const cState = topCustomizerState;
+  const slBlur = document.getElementById('std-creator-slider-blur');
+  const vBlur = document.getElementById('std-creator-val-blur');
+  if (slBlur) slBlur.value = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
+  if (vBlur) vBlur.textContent = `${cState.creatorBlur !== undefined ? cState.creatorBlur : 28} px`;
+
+  const slSoft = document.getElementById('std-creator-slider-softness');
+  const vSoft = document.getElementById('std-creator-val-softness');
+  if (slSoft) slSoft.value = cState.creatorSoftness !== undefined ? cState.creatorSoftness : 28;
+  if (vSoft) vSoft.textContent = `${cState.creatorSoftness !== undefined ? cState.creatorSoftness : 28} px`;
+
+  const slBright = document.getElementById('std-creator-slider-brightness');
+  const vBright = document.getElementById('std-creator-val-brightness');
+  if (slBright) slBright.value = cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65;
+  if (vBright) vBright.textContent = `${cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65}%`;
+
+  const slTint = document.getElementById('std-creator-slider-tint');
+  const vTint = document.getElementById('std-creator-val-tint');
+  if (slTint) slTint.value = cState.creatorTint !== undefined ? cState.creatorTint : 45;
+  if (vTint) vTint.textContent = `${cState.creatorTint !== undefined ? cState.creatorTint : 45}%`;
+
+  const chkWarm = document.getElementById('std-creator-toggle-warm-bokeh');
+  if (chkWarm) chkWarm.checked = cState.creatorWarmBokeh !== false;
+
+  const slRim = document.getElementById('std-creator-slider-rim');
+  const vRim = document.getElementById('std-creator-val-rim');
+  if (slRim) slRim.value = cState.creatorRim !== undefined ? cState.creatorRim : 75;
+  if (vRim) vRim.textContent = `${cState.creatorRim !== undefined ? cState.creatorRim : 75}%`;
+
+  const chkFace = document.getElementById('std-creator-toggle-face-track');
+  if (chkFace) chkFace.checked = cState.creatorFaceTrack !== false;
+
+  const slSens = document.getElementById('std-creator-slider-sensitivity');
+  const vSens = document.getElementById('std-creator-val-sensitivity');
+  if (slSens) slSens.value = cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94;
+  if (vSens) vSens.textContent = `${cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94}%`;
+
+  const slBrush = document.getElementById('std-creator-slider-brush-size');
+  const vBrush = document.getElementById('std-creator-val-brush-size');
+  if (slBrush) slBrush.value = cState.creatorBrushSize || 35;
+  if (vBrush) vBrush.textContent = `${cState.creatorBrushSize || 35}px`;
+
+  const inLeft = document.getElementById('std-creator-input-text-left');
+  if (inLeft) inLeft.value = cState.creatorTextLeft || 'this AI company';
+
+  const inRight = document.getElementById('std-creator-input-text-right');
+  if (inRight) inRight.value = cState.creatorTextRight || 'VOICE';
+
+  const updateModeButtons = () => {
+    const isVirt = cState.creatorMode === 'virtual';
+    const btnOrig = document.getElementById('btn-creator-mode-orig');
+    const btnVirt = document.getElementById('btn-creator-mode-virtual');
+    const rowVirt = document.getElementById('creator-virtual-preset-row');
+    if (btnOrig) {
+      btnOrig.style.border = !isVirt ? '1px solid rgba(168, 85, 247, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)';
+      btnOrig.style.background = !isVirt ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.04)';
+      btnOrig.style.color = !isVirt ? '#fff' : '#94a3b8';
+    }
+    if (btnVirt) {
+      btnVirt.style.border = isVirt ? '1px solid rgba(168, 85, 247, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)';
+      btnVirt.style.background = isVirt ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.04)';
+      btnVirt.style.color = isVirt ? '#fff' : '#94a3b8';
+    }
+    if (rowVirt) rowVirt.style.display = isVirt ? 'grid' : 'none';
+
+    ['studio', 'cyber', 'boardroom'].forEach(pId => {
+      const bPreset = document.getElementById('btn-creator-preset-' + pId);
+      if (bPreset) {
+        const isAct = (cState.creatorVirtualPreset || 'studio') === pId;
+        bPreset.style.border = isAct ? '1px solid rgba(168, 85, 247, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)';
+        bPreset.style.background = isAct ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.04)';
+        bPreset.style.color = isAct ? '#d8b4fe' : '#94a3b8';
+      }
+    });
+  };
+
+  updateModeButtons();
+
+  if (!window._creatorCalibrationListenersAttached) {
+    window._creatorCalibrationListenersAttached = true;
+
+    slBlur?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorBlur = val;
+      if (vBlur) vBlur.textContent = `${val} px`;
+      const bgImg = document.getElementById('creator-live-bg');
+      if (bgImg) bgImg.style.filter = `blur(${val}px) brightness(${((cState.creatorBrightness || 65) / 100).toFixed(2)}) contrast(1.1)`;
+    });
+
+    slSoft?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorSoftness = val;
+      if (vSoft) vSoft.textContent = `${val} px`;
+    });
+
+    slBright?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorBrightness = val;
+      if (vBright) vBright.textContent = `${val}%`;
+      const bgImg = document.getElementById('creator-live-bg');
+      if (bgImg) bgImg.style.filter = `blur(${cState.creatorBlur || 28}px) brightness(${(val / 100).toFixed(2)}) contrast(1.1)`;
+    });
+
+    slTint?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorTint = val;
+      if (vTint) vTint.textContent = `${val}%`;
+      const lightOverlay = document.getElementById('creator-live-lighting');
+      if (lightOverlay) lightOverlay.style.background = `radial-gradient(circle at 50% 30%, rgba(6, 182, 212, ${(val / 150).toFixed(2)}) 0%, rgba(15, 23, 42, 0.4) 60%, rgba(2, 6, 23, 0.8) 100%)`;
+    });
+
+    chkWarm?.addEventListener('change', (e) => {
+      cState.creatorWarmBokeh = e.target.checked;
+      const bWrap = document.getElementById('creator-live-bokeh-wrap');
+      if (bWrap) bWrap.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    slRim?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorRim = val;
+      if (vRim) vRim.textContent = `${val}%`;
+      const fgImg = document.getElementById('creator-live-fg-img');
+      if (fgImg) fgImg.style.filter = `drop-shadow(0 0 ${Math.round(val * 0.2)}px rgba(6, 182, 212, ${(val / 100).toFixed(2)})) drop-shadow(0 20px 35px rgba(0,0,0,0.9))`;
+    });
+
+    chkFace?.addEventListener('change', (e) => {
+      cState.creatorFaceTrack = e.target.checked;
+      const reticle = document.getElementById('creator-live-reticle');
+      if (reticle) reticle.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    slSens?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorSensitivity = val;
+      if (vSens) vSens.textContent = `${val}%`;
+    });
+
+    slBrush?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      cState.creatorBrushSize = val;
+      if (vBrush) vBrush.textContent = `${val}px`;
+    });
+
+    inLeft?.addEventListener('input', (e) => {
+      cState.creatorTextLeft = e.target.value;
+      const tLeft = document.getElementById('creator-live-txt-left');
+      if (tLeft) tLeft.textContent = e.target.value;
+    });
+
+    inRight?.addEventListener('input', (e) => {
+      cState.creatorTextRight = e.target.value;
+      const tRight = document.getElementById('creator-live-txt-right');
+      if (tRight) tRight.textContent = e.target.value;
+    });
+
+    document.getElementById('btn-creator-mode-orig')?.addEventListener('click', () => {
+      cState.creatorMode = 'original';
+      updateModeButtons();
+      renderTopTemplatePreviewStage();
+    });
+
+    document.getElementById('btn-creator-mode-virtual')?.addEventListener('click', () => {
+      cState.creatorMode = 'virtual';
+      updateModeButtons();
+      renderTopTemplatePreviewStage();
+    });
+
+    ['studio', 'cyber', 'boardroom'].forEach(pId => {
+      document.getElementById('btn-creator-preset-' + pId)?.addEventListener('click', () => {
+        cState.creatorVirtualPreset = pId;
+        updateModeButtons();
+        renderTopTemplatePreviewStage();
+      });
+    });
+
+    document.getElementById('btn-creator-brush-toggle')?.addEventListener('click', () => {
+      cState.creatorBrushActive = !cState.creatorBrushActive;
+      const lbl = document.getElementById('label-creator-brush-mode');
+      const btn = document.getElementById('btn-creator-brush-toggle');
+      if (lbl) lbl.textContent = cState.creatorBrushActive ? 'Hold Brush: PAINTING' : 'Hold Brush: OFF';
+      if (btn) {
+        btn.style.background = cState.creatorBrushActive ? 'rgba(56, 189, 248, 0.3)' : 'rgba(168, 85, 247, 0.2)';
+        btn.style.borderColor = cState.creatorBrushActive ? '#38bdf8' : 'rgba(168, 85, 247, 0.5)';
+        btn.style.color = cState.creatorBrushActive ? '#38bdf8' : '#d8b4fe';
+      }
+      const bCanvas = document.getElementById('creator-live-brush-canvas');
+      if (bCanvas) bCanvas.style.pointerEvents = cState.creatorBrushActive ? 'auto' : 'none';
+    });
+
+    document.getElementById('btn-creator-clear-brush')?.addEventListener('click', () => {
+      cState.creatorBrushStrokes = [];
+      const bCanvas = document.getElementById('creator-live-brush-canvas');
+      if (bCanvas) {
+        const ctx = bCanvas.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, bCanvas.width, bCanvas.height);
+      }
+      showTextTimingAlert('Hold-out protection mask cleared', 'info');
+      setTimeout(() => showTextTimingAlert(''), 2000);
+    });
+  }
+}
+
+function initCreatorBrushInteraction() {
+  const canvas = document.getElementById('creator-live-brush-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  // Re-draw any existing strokes
+  const cState = topCustomizerState;
+  if (Array.isArray(cState.creatorBrushStrokes) && cState.creatorBrushStrokes.length > 0) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    cState.creatorBrushStrokes.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 12;
+      ctx.fill();
+    });
+  }
+
+  let isPainting = false;
+
+  const paintAt = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
+    const r = (cState.creatorBrushSize || 35);
+
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
+    ctx.shadowColor = '#38bdf8';
+    ctx.shadowBlur = 12;
+    ctx.fill();
+
+    if (!Array.isArray(cState.creatorBrushStrokes)) cState.creatorBrushStrokes = [];
+    cState.creatorBrushStrokes.push({ x, y, radius: r });
+  };
+
+  canvas.onpointerdown = (e) => {
+    if (!cState.creatorBrushActive) return;
+    isPainting = true;
+    paintAt(e);
+  };
+
+  canvas.onpointermove = (e) => {
+    if (isPainting && cState.creatorBrushActive) {
+      paintAt(e);
+    }
+  };
+
+  canvas.onpointerup = () => { isPainting = false; };
+  canvas.onpointercancel = () => { isPainting = false; };
 }
