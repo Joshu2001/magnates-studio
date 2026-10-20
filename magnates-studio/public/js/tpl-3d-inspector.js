@@ -55,7 +55,7 @@
     }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { mode: 'video', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (!store[id]) store[id] = { mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
     return store[id];
   }
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };

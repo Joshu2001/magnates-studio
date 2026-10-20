@@ -30442,7 +30442,7 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = '';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '';
-    } else if (typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(tpl.id)) {
+    } else if (typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(tpl.id) && tpl.id !== 'magnates-media-article-highlight') {
       topCustomizerState.primaryUrl = '';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '';
@@ -30503,6 +30503,20 @@ function openTopTemplateCustomizer(tpl) {
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
   if (paperModeSwitcher) paperModeSwitcher.style.display = showStage3DSwitcher ? 'flex' : 'none';
+
+  // Automatically activate 3D Mode by default for any 3D capable template!
+  const has3DCapability = RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id)) || (tpl.category === '3D / Spatial') || (tpl.origCategory === '3D / Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id));
+  if (has3DCapability) {
+    topCustomizerState.paperPreviewMode = '3d';
+    topCustomizerState.is3DMode = true;
+    if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('map', { is3DMode: true, drawOnScreenMode: true });
+    }
+    if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('empire-timeline', { is3DMode: true });
+    }
+  }
+
   const syncPaperModeButtons = () => {
     let is3D = topCustomizerState.paperPreviewMode === '3d';
     if (tpl.id === 'map' && typeof window.tplGetContextualData === 'function') {
@@ -30568,14 +30582,25 @@ function openTopTemplateCustomizer(tpl) {
   // 2. Populate Media inputs and thumbs
   const primaryThumb = document.getElementById('tpl-modal-thumb-primary');
   const primaryInput = document.getElementById('tpl-modal-url-primary');
-  const fallbackThumbP = (tpl.id === 'parallax') ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="%230b0d14"/><polygon points="10,28 16,6 22,28" fill="%2338bdf8"/></svg>' : (tpl.defaultImage || '');
-  if (primaryThumb) primaryThumb.src = topCustomizerState.primaryUrl || fallbackThumbP;
+  const fallbackThumbP = (tpl.id === 'parallax')
+    ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="%230b0d14"/><polygon points="10,28 16,6 22,28" fill="%2338bdf8"/></svg>'
+    : (tpl.id === 'magnates-media-article-highlight' ? '/magnates_article_highlight_thumbnail.svg' : (tpl.id === 'doc-highlighter-loupe-suite' ? '/forbes_article_hd.svg' : (tpl.defaultImage || '')));
+  const finalPrimarySrc = topCustomizerState.primaryUrl || fallbackThumbP;
+  if (primaryThumb) {
+    primaryThumb.onerror = () => {
+      primaryThumb.onerror = null;
+      primaryThumb.src = fallbackThumbP || '/magnates_article_highlight_thumbnail.svg';
+    };
+    primaryThumb.src = finalPrimarySrc;
+  }
   if (primaryInput) primaryInput.value = topCustomizerState.primaryUrl || '';
   const primaryFilename = document.getElementById('tpl-modal-filename-primary');
   if (primaryFilename) {
     const rawP = topCustomizerState.primaryUrl || '';
     let cleanP = (tpl.id === 'parallax') ? 'Foreground Silhouette' : 'Subject Cutout';
     if (rawP.startsWith('blob:')) cleanP = 'Uploaded Asset';
+    else if (tpl.id === 'magnates-media-article-highlight') cleanP = 'broadsheet_financial.svg';
+    else if (tpl.id === 'doc-highlighter-loupe-suite') cleanP = 'forbes_article_hd.svg';
     else if (tpl.id === 'paper-rip-shred') cleanP = 'Primary Subject';
     else if (tpl.id === 'text-texturing-grunge') cleanP = 'Grunge Backdrop';
     else if (tpl.id === 'kinetic-decode-typewriter') cleanP = 'Matrix Grid';
@@ -30618,6 +30643,13 @@ function openTopTemplateCustomizer(tpl) {
 
   // Contextual labels & Text setup
   const labelPrim = document.getElementById('tpl-modal-label-primary');
+  if (labelPrim) {
+    if (tpl.id === 'magnates-media-article-highlight') {
+      labelPrim.textContent = '📄 Archival Broadsheet (HD Vector)';
+    } else if (tpl.id === 'doc-highlighter-loupe-suite') {
+      labelPrim.textContent = '📄 Forbes Article Document (HD Vector)';
+    }
+  }
   const labelSec = document.getElementById('tpl-modal-label-secondary');
   const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
   const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
@@ -30950,7 +30982,7 @@ function openTopTemplateCustomizer(tpl) {
       });
 
       // 3D Interactive Mode & Layer Dragging
-      topCustomizerState.is3DMode = false;
+      topCustomizerState.is3DMode = true;
       topCustomizerState.selectedSigilLayer = null;
       topCustomizerState.sigilOffsets = topCustomizerState.sigilOffsets || {
         z3l: { x: 0, y: 0 },
@@ -31200,7 +31232,7 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.dustDensity = topCustomizerState.dustDensity || 30;
     topCustomizerState.selectedDocHlIdx = 0;
     topCustomizerState.selectedDocTarget = 'highlight';
-    topCustomizerState.is3DMode = false;
+    topCustomizerState.is3DMode = true;
     topCustomizerState.docRedactW = 0.510;
     topCustomizerState.docRedactX = 0.125;
     topCustomizerState.docRedactY = 0.354;
@@ -31257,7 +31289,7 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.dustDensity = topCustomizerState.dustDensity || 30;
     topCustomizerState.selectedDocHlIdx = 0;
     topCustomizerState.selectedDocTarget = 'highlight';
-    topCustomizerState.is3DMode = false;
+    topCustomizerState.is3DMode = true;
     topCustomizerState.docHighlights = [
       {
         x: 0.230,
