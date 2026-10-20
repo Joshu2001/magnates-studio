@@ -48036,6 +48036,8 @@ let magnatesBPState = {
   l1OutAnim: "right_to_left",
   l1InTime: 0.85,
   l1OutTime: 3.80,
+  l1GlowColor: "#ffffff",
+  l1GlowIntensity: 85,
   // Z=3 (Cutout 2: Right sitting silhouette)
   primaryCutoutUrl: "/silhouette_sitting_phone.png",
   l2Enabled: true,
@@ -48043,6 +48045,8 @@ let magnatesBPState = {
   l2OutAnim: "left_to_right",
   l2InTime: 0.95,
   l2OutTime: 4.05,
+  l2GlowColor: "#ffffff",
+  l2GlowIntensity: 85,
   // Z=0 Background plate & fade out timing
   bgPlateUrl: "",
   bgFadeTime: 4.45,
@@ -48063,10 +48067,14 @@ const MAGNATES_BP_PRESETS = {
     l1OutAnim: "right_to_left",
     l1InTime: 0.85,
     l1OutTime: 3.80,
+    l1GlowColor: "#ffffff",
+    l1GlowIntensity: 85,
     l2InAnim: "bottom_to_up",
     l2OutAnim: "left_to_right",
     l2InTime: 0.95,
     l2OutTime: 4.05,
+    l2GlowColor: "#ffffff",
+    l2GlowIntensity: 85,
     bgFadeTime: 4.45,
     hudPreset: "SCENE: $1M DUAL SILHOUETTES",
     l1Label: "Left Silhouette Cutout",
@@ -48085,10 +48093,14 @@ const MAGNATES_BP_PRESETS = {
     l1OutAnim: "top_to_down",
     l1InTime: 0.80,
     l1OutTime: 4.10,
+    l1GlowColor: "#ffffff",
+    l1GlowIntensity: 0,
     l2InAnim: "bottom_to_up",
     l2OutAnim: "right_to_left",
     l2InTime: 1.00,
     l2OutTime: 4.25,
+    l2GlowColor: "#ffffff",
+    l2GlowIntensity: 85,
     bgFadeTime: 4.65,
     hudPreset: "SCENE: OFFICE DESK CUTOUT GLIDE",
     l1Label: "Office Desk Guy Cutout",
@@ -48105,6 +48117,35 @@ function bpEaseOutCubic(x) {
 function bpEaseInCubic(x) {
   const c = Math.max(0, Math.min(1, x));
   return c * c * c;
+}
+
+function bpHexToRgba(hex, alpha) {
+  let c = hex.replace('#', '');
+  if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+  const num = parseInt(c, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha.toFixed(2)})`;
+}
+
+function bpComputeCutoutGlowFilter(colorHex, intensityPercent, isDeskCutout) {
+  if (isDeskCutout) {
+    if (intensityPercent <= 0) return 'drop-shadow(0 14px 28px rgba(0,0,0,0.65))';
+    const a1 = (intensityPercent / 100) * 0.9;
+    const a2 = (intensityPercent / 100) * 0.55;
+    const r1 = Math.round(12 * (intensityPercent / 100));
+    const r2 = Math.round(28 * (intensityPercent / 100));
+    return `drop-shadow(0 0 ${r1}px ${bpHexToRgba(colorHex, a1)}) drop-shadow(0 0 ${r2}px ${bpHexToRgba(colorHex, a2)}) drop-shadow(0 14px 28px rgba(0,0,0,0.65))`;
+  }
+  if (intensityPercent <= 0) {
+    return 'drop-shadow(0 8px 16px rgba(0,0,0,0.5))';
+  }
+  const a1 = Math.min(1, (intensityPercent / 100) * 1.1);
+  const a2 = (intensityPercent / 100) * 0.65;
+  const r1 = Math.round(14 * (intensityPercent / 100));
+  const r2 = Math.round(36 * (intensityPercent / 100));
+  return `drop-shadow(0 0 ${r1}px ${bpHexToRgba(colorHex, a1)}) drop-shadow(0 0 ${r2}px ${bpHexToRgba(colorHex, a2)})`;
 }
 
 function bpFormatAnimLabel(inAnim, outAnim) {
@@ -48268,7 +48309,7 @@ function updateMagnatesBPVisualStyles() {
       secondaryImg.style.width = '100%';
       secondaryImg.style.height = '100%';
       secondaryImg.style.objectFit = 'cover';
-      secondaryImg.style.filter = 'drop-shadow(0 14px 28px rgba(0,0,0,0.65))';
+      secondaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 0, true);
     } else {
       // Large Left Standing Silhouette (83% stage height, matching Image 3)
       secondaryLayer.style.inset = 'auto';
@@ -48279,7 +48320,7 @@ function updateMagnatesBPVisualStyles() {
       secondaryImg.style.width = 'auto';
       secondaryImg.style.height = '100%';
       secondaryImg.style.objectFit = 'contain';
-      secondaryImg.style.filter = 'drop-shadow(0 0 14px rgba(255,255,255,0.95)) drop-shadow(0 0 32px rgba(255,255,255,0.55))';
+      secondaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 85, false);
     }
 
     const m1 = computeGranularCutoutTransform(
@@ -48302,7 +48343,7 @@ function updateMagnatesBPVisualStyles() {
       primaryLayer.style.right = '0%';
       primaryLayer.style.bottom = '0%';
       primaryLayer.style.height = '61%';
-      primaryImg.style.filter = 'drop-shadow(0 0 14px rgba(255,255,255,0.95)) drop-shadow(0 0 32px rgba(255,255,255,0.55))';
+      primaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l2GlowColor || '#ffffff', magnatesBPState.l2GlowIntensity ?? 85, false);
 
       const m2 = computeGranularCutoutTransform(
         p,
@@ -48391,10 +48432,14 @@ function applyMagnatesBPPresetToState(pKey) {
   magnatesBPState.l1OutAnim = pData.l1OutAnim;
   magnatesBPState.l1InTime = pData.l1InTime;
   magnatesBPState.l1OutTime = pData.l1OutTime;
+  magnatesBPState.l1GlowColor = pData.l1GlowColor ?? "#ffffff";
+  magnatesBPState.l1GlowIntensity = pData.l1GlowIntensity ?? 85;
   magnatesBPState.l2InAnim = pData.l2InAnim;
   magnatesBPState.l2OutAnim = pData.l2OutAnim;
   magnatesBPState.l2InTime = pData.l2InTime;
   magnatesBPState.l2OutTime = pData.l2OutTime;
+  magnatesBPState.l2GlowColor = pData.l2GlowColor ?? "#ffffff";
+  magnatesBPState.l2GlowIntensity = pData.l2GlowIntensity ?? 85;
   magnatesBPState.bgFadeTime = pData.bgFadeTime;
 
   // Sync Inspector UI Controls
@@ -48413,6 +48458,9 @@ function applyMagnatesBPPresetToState(pKey) {
   setVal('magnates-bp-l1-out-time', pData.l1OutTime);
   setTxt('magnates-bp-val-l1-in', `${pData.l1InTime.toFixed(2)}s`);
   setTxt('magnates-bp-val-l1-out', `${pData.l1OutTime.toFixed(2)}s`);
+  setVal('magnates-bp-l1-glow-color', magnatesBPState.l1GlowColor);
+  setVal('magnates-bp-l1-glow-intensity', magnatesBPState.l1GlowIntensity);
+  setTxt('magnates-bp-val-l1-glow', `${magnatesBPState.l1GlowIntensity}%`);
 
   setVal('magnates-bp-l2-in-anim', pData.l2InAnim);
   setVal('magnates-bp-l2-out-anim', pData.l2OutAnim);
@@ -48420,6 +48468,9 @@ function applyMagnatesBPPresetToState(pKey) {
   setVal('magnates-bp-l2-out-time', pData.l2OutTime);
   setTxt('magnates-bp-val-l2-in', `${pData.l2InTime.toFixed(2)}s`);
   setTxt('magnates-bp-val-l2-out', `${pData.l2OutTime.toFixed(2)}s`);
+  setVal('magnates-bp-l2-glow-color', magnatesBPState.l2GlowColor);
+  setVal('magnates-bp-l2-glow-intensity', magnatesBPState.l2GlowIntensity);
+  setTxt('magnates-bp-val-l2-glow', `${magnatesBPState.l2GlowIntensity}%`);
 
   setVal('magnates-bp-input-headline', pData.headline);
   setVal('magnates-bp-input-subcaption', pData.subcaption);
@@ -48620,6 +48671,30 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
+  // Cutout 1 Glow Aura Listeners
+  document.getElementById('magnates-bp-l1-glow-color')?.addEventListener('input', (e) => {
+    magnatesBPState.l1GlowColor = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l1-glow-intensity')?.addEventListener('input', (e) => {
+    magnatesBPState.l1GlowIntensity = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-l1-glow');
+    if (lbl) lbl.textContent = `${magnatesBPState.l1GlowIntensity}%`;
+    updateMagnatesBPVisualStyles();
+  });
+
+  // Cutout 2 Glow Aura Listeners
+  document.getElementById('magnates-bp-l2-glow-color')?.addEventListener('input', (e) => {
+    magnatesBPState.l2GlowColor = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l2-glow-intensity')?.addEventListener('input', (e) => {
+    magnatesBPState.l2GlowIntensity = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-l2-glow');
+    if (lbl) lbl.textContent = `${magnatesBPState.l2GlowIntensity}%`;
+    updateMagnatesBPVisualStyles();
+  });
+
   // Counter & Background Fade Controls
   document.getElementById('magnates-bp-toggle-counter')?.addEventListener('change', (e) => {
     magnatesBPState.showCounter = e.target.checked;
@@ -48707,6 +48782,8 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
       start: magnatesBPState.l1InTime,
       duration: Math.max(0.5, magnatesBPState.l1OutTime - magnatesBPState.l1InTime),
       scale: 1.0,
+      glowColor: magnatesBPState.l1GlowColor,
+      glowIntensity: magnatesBPState.l1GlowIntensity,
       transition: 'slide',
       transitionDuration: 0.45
     });
@@ -48718,6 +48795,8 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
         start: magnatesBPState.l2InTime,
         duration: Math.max(0.5, magnatesBPState.l2OutTime - magnatesBPState.l2InTime),
         scale: 1.0,
+        glowColor: magnatesBPState.l2GlowColor,
+        glowIntensity: magnatesBPState.l2GlowIntensity,
         transition: 'slide',
         transitionDuration: 0.45
       });
