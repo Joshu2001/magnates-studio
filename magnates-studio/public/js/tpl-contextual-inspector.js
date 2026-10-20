@@ -7460,6 +7460,176 @@
     }
 
     // =========================================================================
+    // SPECIAL HANDLER: PAPER TEAR TRANSITION (paper-rip-shred)
+    // =========================================================================
+    if (tplId === 'paper-rip-shred') {
+      if (wrapPrim) wrapPrim.style.display = 'flex';
+      if (wrapSec) wrapSec.style.display = 'flex';
+
+      const curPreset = topCustomizerState.tearPreset || 'gold-standard';
+      const curFps = topCustomizerState.tearFps || 12;
+      const isStopMotion = topCustomizerState.tearStopMotion !== false;
+      const curCurl = topCustomizerState.tearCurl ?? 60;
+      const curShadow = topCustomizerState.tearShadowDepth ?? 32;
+      const curRoughness = topCustomizerState.tearRoughness ?? 85;
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(168,85,247,0.35); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+          <!-- Header Banner -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 14px;">📜</span>
+              <span style="font-size: 11px; font-weight: 800; color: #c084fc; text-transform: uppercase; letter-spacing: 0.5px;">Tactile Paper Tear Engine</span>
+            </div>
+            <span style="font-size: 9px; font-weight: 700; color: #a855f7; background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.3); padding: 2px 7px; border-radius: 4px;">VOX &amp; JOHNNY HARRIS</span>
+          </div>
+
+          <!-- Section 1: Preset Styles -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">1. Paper Material Preset</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+              <button type="button" class="paper-preset-btn ${curPreset === 'gold-standard' ? 'active' : ''}" data-preset="gold-standard" style="padding: 7px 4px; border-radius: 6px; font-size: 9.5px; font-weight: 700; background: ${curPreset === 'gold-standard' ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${curPreset === 'gold-standard' ? '#a855f7' : 'rgba(255,255,255,0.1)'}; color: #fff; cursor: pointer;">
+                🗺️ Aged Map / News
+              </button>
+              <button type="button" class="paper-preset-btn ${curPreset === 'document-dossier' ? 'active' : ''}" data-preset="document-dossier" style="padding: 7px 4px; border-radius: 6px; font-size: 9.5px; font-weight: 700; background: ${curPreset === 'document-dossier' ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${curPreset === 'document-dossier' ? '#a855f7' : 'rgba(255,255,255,0.1)'}; color: #fff; cursor: pointer;">
+                📁 Dossier Archive
+              </button>
+              <button type="button" class="paper-preset-btn ${curPreset === 'black-construction' ? 'active' : ''}" data-preset="black-construction" style="padding: 7px 4px; border-radius: 6px; font-size: 9.5px; font-weight: 700; background: ${curPreset === 'black-construction' ? 'rgba(168,85,247,0.35)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${curPreset === 'black-construction' ? '#a855f7' : 'rgba(255,255,255,0.1)'}; color: #fff; cursor: pointer;">
+                ⬛ Black Paper
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 2: Stop-Motion Cadence Controls -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">2. Stop-Motion Feel (Step Frames)</span>
+              <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="paper-inp-stopmotion" ${isStopMotion ? 'checked' : ''} style="cursor: pointer;" />
+                <span style="font-size: 9.5px; font-weight: 700; color: ${isStopMotion ? '#38bdf8' : '#64748b'};"><span id="paper-lbl-fps">${curFps}</span> FPS Cadence</span>
+              </label>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button type="button" id="btn-fps-12" style="flex: 1; padding: 5px 8px; border-radius: 5px; font-size: 9.5px; font-weight: 700; background: ${curFps === 12 ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${curFps === 12 ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; color: #fff; cursor: pointer;">
+                12 FPS (Organic)
+              </button>
+              <button type="button" id="btn-fps-15" style="flex: 1; padding: 5px 8px; border-radius: 5px; font-size: 9.5px; font-weight: 700; background: ${curFps === 15 ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${curFps === 15 ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; color: #fff; cursor: pointer;">
+                15 FPS (Fluid)
+              </button>
+              <button type="button" id="btn-fps-smooth" style="flex: 1; padding: 5px 8px; border-radius: 5px; font-size: 9.5px; font-weight: 700; background: ${!isStopMotion ? 'rgba(168,85,247,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${!isStopMotion ? '#c084fc' : 'rgba(255,255,255,0.1)'}; color: #fff; cursor: pointer;">
+                Smooth 60 FPS
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: 3D Curl & Shadow Physics -->
+          <div style="background: rgba(2,6,23,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3. 3D Peel, Curl & Shadows</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #cbd5e1;">
+                <span>3D Flap Curl Roll-Back</span>
+                <span id="paper-val-curl">${curCurl}%</span>
+              </div>
+              <input type="range" id="paper-slider-curl" min="10" max="100" value="${curCurl}" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #cbd5e1;">
+                <span>Directional Contact Shadow Depth</span>
+                <span id="paper-val-shadow">${curShadow}px</span>
+              </div>
+              <input type="range" id="paper-slider-shadow" min="10" max="60" value="${curShadow}" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #cbd5e1;">
+                <span>Torn Edge Displacement & Shreds</span>
+                <span id="paper-val-roughness">${curRoughness}%</span>
+              </div>
+              <input type="range" id="paper-slider-roughness" min="30" max="120" value="${curRoughness}" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Preset Click Handlers
+      container.querySelectorAll('.paper-preset-btn').forEach(btn => {
+        btn.onclick = () => {
+          const p = btn.getAttribute('data-preset');
+          topCustomizerState.tearPreset = p;
+          if (p === 'gold-standard') {
+            topCustomizerState.primaryUrl = '/paper_tear_hero_gold.jpg';
+            topCustomizerState.secondaryUrl = '/paper_tear_revealed_city.jpg';
+          } else if (p === 'document-dossier') {
+            topCustomizerState.primaryUrl = '/paper_tear_document_dossier.jpg';
+            topCustomizerState.secondaryUrl = '/paper_tear_revealed_city.jpg';
+          } else if (p === 'black-construction') {
+            topCustomizerState.primaryUrl = '/paper_tear_black_construction.jpg';
+            topCustomizerState.secondaryUrl = '/cinematic_split_scene.jpg';
+          }
+          if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+          window.tplRenderContextualInspector('paper-rip-shred');
+        };
+      });
+
+      // Stop-Motion Handlers
+      container.querySelector('#paper-inp-stopmotion')?.addEventListener('change', (e) => {
+        topCustomizerState.tearStopMotion = e.target.checked;
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        window.tplRenderContextualInspector('paper-rip-shred');
+      });
+
+      container.querySelector('#btn-fps-12')?.addEventListener('click', () => {
+        topCustomizerState.tearStopMotion = true;
+        topCustomizerState.tearFps = 12;
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        window.tplRenderContextualInspector('paper-rip-shred');
+      });
+
+      container.querySelector('#btn-fps-15')?.addEventListener('click', () => {
+        topCustomizerState.tearStopMotion = true;
+        topCustomizerState.tearFps = 15;
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        window.tplRenderContextualInspector('paper-rip-shred');
+      });
+
+      container.querySelector('#btn-fps-smooth')?.addEventListener('click', () => {
+        topCustomizerState.tearStopMotion = false;
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        window.tplRenderContextualInspector('paper-rip-shred');
+      });
+
+      // Slider Handlers
+      const sliderCurl = container.querySelector('#paper-slider-curl');
+      sliderCurl?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        topCustomizerState.tearCurl = val;
+        const valEl = container.querySelector('#paper-val-curl');
+        if (valEl) valEl.textContent = `${val}%`;
+      });
+
+      const sliderShadow = container.querySelector('#paper-slider-shadow');
+      sliderShadow?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        topCustomizerState.tearShadowDepth = val;
+        const valEl = container.querySelector('#paper-val-shadow');
+        if (valEl) valEl.textContent = `${val}px`;
+      });
+
+      const sliderRough = container.querySelector('#paper-slider-roughness');
+      sliderRough?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        topCustomizerState.tearRoughness = val;
+        const valEl = container.querySelector('#paper-val-roughness');
+        if (valEl) valEl.textContent = `${val}%`;
+      });
+
+      return;
+    }
+
+    // =========================================================================
     // SPECIAL HANDLER: CINEMATIC 3D SCREEN RECORDING BLUR (screen-blur)
     // =========================================================================
     if (tplId === 'screen-blur') {

@@ -24213,16 +24213,16 @@ id: 'map',
   },
   {
     id: 'paper-rip-shred',
-    title: 'Paper Rip & Shred Transition',
+    title: 'Paper Tear Transition',
     category: 'Transitions',
-    badge: 'James Jani Style',
+    badge: 'MEDIUM',
     difficulty: '1-Click',
-    timeToApply: '4 sec',
+    timeToApply: '3 sec',
     previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.7), rgba(154, 52, 18, 0.4), rgba(15, 23, 42, 0.9))',
-    description: 'Torn paper edge shred effect uncovering newspaper headlines or archival footage cut.',
-    tags: ['Paper Rip', 'Documentary', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=800&auto=format&fit=crop&q=80',
-    secondaryImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80'
+    description: 'Authentic 3D paper tear reveal with fibrous deckle edges, peel curl physics, directional drop shadows, and 12 fps stop-motion cadence.',
+    tags: ['Paper Tear', 'Deckle Edge', 'Stop Motion', 'Johnny Harris', 'Vox'],
+    defaultImage: '/paper_tear_hero_gold.jpg',
+    secondaryImage: '/paper_tear_revealed_city.jpg'
   },
   {
     id: 'gold-frame-spin',
@@ -27378,13 +27378,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     } else if (tplId === 'paper-rip-shred') {
       fxContainer.innerHTML = `
         <div style="position:absolute;inset:0;overflow:hidden;background:#08090e;perspective:900px;">
-          <img src="${tpl.secondaryImage || tpl.defaultImage}" alt="Revealed footage" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
-          <div id="fx-rip-border-${tplId}" style="position:absolute;inset:0;overflow:hidden;background:#fef08a;clip-path:polygon(0 0,100% 0,100% 14%,0 22%);filter:drop-shadow(0 3px 3px rgba(0,0,0,.8));">
-            <div id="fx-rip-${tplId}" style="position:absolute;inset:0;overflow:hidden;clip-path:polygon(0 0,100% 0,100% 12%,0 20%);">
-              <img src="${tpl.defaultImage}" alt="Torn paper layer" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
-            </div>
-          </div>
-          <div style="position:absolute;right:7px;top:7px;padding:2px 6px;border-radius:4px;background:rgba(15,23,42,.85);color:#fef08a;font-size:8px;font-weight:800;letter-spacing:.06em;">PAPER RIP</div>
+          <img src="/paper_tear_revealed_city.jpg" alt="Revealed Scene" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" />
+          <img id="fx-rip-shadow-${tplId}" src="/paper_tear_shadow_pass.png" alt="Contact Shadow" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0.95;" />
+          <img id="fx-rip-left-${tplId}" src="/paper_tear_left_flap.png" alt="Aged Map Flap" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:left center;transition:transform 0.1s ease-out;" />
+          <img id="fx-rip-right-${tplId}" src="/paper_tear_right_flap.png" alt="Archival News Flap" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform-origin:right center;transition:transform 0.1s ease-out;" />
+          <div style="position:absolute;right:7px;top:7px;padding:2px 6px;border-radius:4px;background:rgba(15,23,42,.85);color:#fef08a;font-size:8px;font-weight:800;letter-spacing:.06em;">PAPER TEAR 3D</div>
         </div>
       `;
     } else if (tplId === 'gold-frame-spin') {
@@ -28800,13 +28798,30 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         secImg.style.filter = `brightness(${inBright.toFixed(2)}) contrast(${(1.14 - easeP * 0.14).toFixed(2)})`;
       }
     } else if (tplId === 'paper-rip-shred') {
-      const ripProgress = (Math.sin(t * 3) + 1) / 2;
-      const clipPathAngle = 100 - ripProgress * 100;
-      const ripEl = fxContainer?.querySelector(`#fx-rip-${tplId}`);
-      const rimEl = fxContainer?.querySelector(`#fx-rip-border-${tplId}`);
-      if (ripEl) {
-        ripEl.style.clipPath = `polygon(0 0, 100% 0, 100% ${clipPathAngle}%, 0 ${Math.min(100, clipPathAngle + 12)}%)`;
-        if (rimEl) rimEl.style.clipPath = `polygon(0 0, 100% 0, 100% ${Math.min(100, clipPathAngle + 2)}%, 0 ${Math.min(100, clipPathAngle + 14)}%)`;
+      // 12 fps stop-motion step cadence
+      const fps = 12;
+      const steppedT = Math.floor(t * fps) / fps;
+      const ripProgress = (Math.sin(steppedT * 2.2) + 1) / 2;
+      const curlL = ripProgress * 22; // peel back angle
+      const curlR = ripProgress * 26;
+      const transX_L = -ripProgress * 42;
+      const transX_R = ripProgress * 45;
+      const jitterX = ((Math.sin(steppedT * 77) * 1000) % 2.5);
+      const jitterY = ((Math.cos(steppedT * 83) * 1000) % 2.0);
+
+      const flapL = fxContainer?.querySelector(`#fx-rip-left-${tplId}`);
+      const flapR = fxContainer?.querySelector(`#fx-rip-right-${tplId}`);
+      const shadowEl = fxContainer?.querySelector(`#fx-rip-shadow-${tplId}`);
+
+      if (flapL) {
+        flapL.style.transform = `translate3d(${(transX_L + jitterX).toFixed(1)}px, ${jitterY.toFixed(1)}px, 0) rotateY(${curlL.toFixed(1)}deg) scale(${(1.0 + ripProgress * 0.04).toFixed(3)})`;
+      }
+      if (flapR) {
+        flapR.style.transform = `translate3d(${(transX_R - jitterX).toFixed(1)}px, ${(-jitterY).toFixed(1)}px, 0) rotateY(${-curlR.toFixed(1)}deg) scale(${(1.0 + ripProgress * 0.04).toFixed(3)})`;
+      }
+      if (shadowEl) {
+        shadowEl.style.opacity = `${(0.4 + ripProgress * 0.58).toFixed(2)}`;
+        shadowEl.style.transform = `scale(${(1.0 + ripProgress * 0.03).toFixed(3)})`;
       }
     } else if (tplId === 'gold-frame-spin') {
       const rotateY = Math.sin(t * 2.5) * 22;
@@ -30542,7 +30557,7 @@ function openTopTemplateCustomizer(tpl) {
     const rawP = topCustomizerState.primaryUrl || '';
     let cleanP = (tpl.id === 'parallax') ? 'Foreground Silhouette' : 'Subject Cutout';
     if (rawP.startsWith('blob:')) cleanP = 'Uploaded Asset';
-    else if (tpl.id === 'paper-rip-shred') cleanP = 'Paper Texture';
+    else if (tpl.id === 'paper-rip-shred') cleanP = 'Primary Subject';
     else if (tpl.id === 'text-texturing-grunge') cleanP = 'Grunge Backdrop';
     else if (tpl.id === 'kinetic-decode-typewriter') cleanP = 'Matrix Grid';
     primaryFilename.textContent = cleanP.length > 22 ? cleanP.substring(0, 20) + '...' : cleanP;
@@ -30577,7 +30592,7 @@ function openTopTemplateCustomizer(tpl) {
     let cleanS = 'City Backdrop';
     if (tpl.id === 'film-grain') cleanS = sIsVideo ? (sUrl.split('/').pop() || 'cinematic_footage_loop.mp4') : 'Base Footage Asset';
     else if (sUrl.startsWith('blob:')) cleanS = sIsVideo ? 'Uploaded Video' : 'Uploaded Scene';
-    else if (tpl.id === 'paper-rip-shred') cleanS = 'Revealed Clip';
+    else if (tpl.id === 'paper-rip-shred') cleanS = 'Aged Map';
     else if (sUrl) cleanS = sUrl.split('/').pop() || 'Scene Asset';
     secondaryFilename.textContent = cleanS.length > 22 ? cleanS.substring(0, 20) + '...' : cleanS;
   }
@@ -31308,13 +31323,13 @@ function openTopTemplateCustomizer(tpl) {
     if (topCustomizerState.pushSfxStretch === undefined) topCustomizerState.pushSfxStretch = 135;
     if (topCustomizerState.pushSfxVol === undefined) topCustomizerState.pushSfxVol = 80;
   } else if (tpl.id === 'paper-rip-shred') {
-    if (labelPrim) labelPrim.textContent = '\ud83d\udcf0 Top Paper Tear Layer';
-    if (labelSec) labelSec.textContent = '\ud83c\udfac Revealed Clip / Footage';
+    if (labelPrim) labelPrim.textContent = 'Primary Subject';
+    if (labelSec) labelSec.textContent = 'Aged Map';
     if (wrapSec) wrapSec.style.display = 'flex';
     topCustomizerState.hasTextBehind = false;
-    topCustomizerState.mainText = 'BREAKING REVEAL';
-    topCustomizerState.subText = 'THE SECRET ARCHIVES';
-    topCustomizerState.textColor = '#facc15';
+    topCustomizerState.mainText = 'Paper Tear Transition';
+    topCustomizerState.subText = 'CINEMATIC SEQUENCE';
+    topCustomizerState.textColor = '#ffffff';
   } else if (tpl.id === 'gold-frame-spin') {
     if (wrapPrim) wrapPrim.style.display = 'flex';
     if (labelPrim) labelPrim.textContent = '\ud83d\uddbc\ufe0f Framed Artwork / Image';
@@ -32566,40 +32581,57 @@ function renderTopTemplatePreviewStage() {
       </div>
     `;
   } else if (tplId === 'paper-rip-shred') {
-    const shadowPx = topCustomizerState.tearShadowDepth ?? 28;
+    const shadowPx = topCustomizerState.tearShadowDepth ?? 32;
     const paperIs3D = topCustomizerState.paperPreviewMode === '3d';
-    const paperPlaneTransform = paperIs3D ? 'perspective(1100px) rotateX(12deg) rotateY(-10deg) translateZ(24px) scale(.9)' : 'none';
+    const paperPlaneTransform = paperIs3D ? 'perspective(1100px) rotateX(12deg) rotateY(-8deg) translateZ(28px) scale(0.96)' : 'none';
+    
+    // Check preset or custom textures
+    const preset = topCustomizerState.tearPreset || 'gold-standard';
+    let leftFlapSrc = '/paper_tear_left_flap.png';
+    let rightFlapSrc = '/paper_tear_right_flap.png';
+    let shadowSrc = '/paper_tear_shadow_pass.png';
+    let bgSceneSrc = sec && !sec.includes('unsplash') ? sec : '/paper_tear_revealed_city.jpg';
+
+    if (preset === 'newsprint') {
+      rightFlapSrc = '/paper_tear_newspaper.jpg';
+      leftFlapSrc = '/paper_tear_aged_map.jpg';
+    } else if (preset === 'black-construction') {
+      leftFlapSrc = '/paper_tear_black_construction.jpg';
+      rightFlapSrc = '/paper_tear_black_construction.jpg';
+    } else if (preset === 'document-dossier') {
+      leftFlapSrc = '/paper_tear_document_dossier.jpg';
+      rightFlapSrc = '/paper_tear_document_dossier.jpg';
+    }
+
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #000; cursor: crosshair; perspective: 1100px; transform-style: preserve-3d;">
-        <img id="customizer-live-bg-rev" src="${sec}" alt="Revealed" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: ${paperIs3D ? 'translateZ(-28px) scale(1.12)' : 'scale(1.05)'}; transition: transform 500ms ease;" />
-        ${textBehindHtml}
-        <!-- Under-paper intense ambient crease & drop shadow layer -->
-        <div id="customizer-live-rip-shadow" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; transform: ${paperPlaneTransform}; transform-style: preserve-3d; transform-origin: center center; transition: transform 500ms ease; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.2)}px rgba(0,0,0,0.95)) drop-shadow(0 4px 10px rgba(0,0,0,0.8));">
-          <!-- Exposed paper-fiber rim follows the same tear path as the top layer -->
-          <div id="customizer-live-rip-border" style="position: absolute; inset: 0; overflow: hidden; background: ${topCustomizerState.tearBorderColor || '#f8fafc'}; opacity: ${topCustomizerState.tearBorderEnabled !== false ? 1 : 0};"></div>
-          <!-- Main Torn Paper Layer -->
-          <div id="customizer-live-rip" style="position: absolute; inset: 0; overflow: hidden; opacity: ${currentOpacity};">
-            <img id="customizer-live-fg" src="${prim}" alt="Top Paper / Cloth" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.92) contrast(1.22);" />
-          </div>
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; overflow: hidden; background: #08090d; cursor: crosshair; perspective: 1100px; transform-style: preserve-3d;">
+        <!-- Layer 0: Revealed Background Scene Underneath (Z = 0) -->
+        <div id="customizer-paper-bg-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; transform: ${paperIs3D ? 'translateZ(-40px) scale(1.15)' : 'scale(1.04)'}; transition: transform 500ms ease;">
+          <img id="customizer-live-bg-rev" src="${bgSceneSrc}" alt="Revealed Background Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
         </div>
-        <!-- SVG Overlay for Realistic Cellulose Fiber Edge & 3D Crease Highlight -->
-        <svg id="customizer-live-rip-svg" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: ${subjectZ + 2}; overflow: visible; transform: ${paperPlaneTransform}; transform-origin: center center; transition: transform 500ms ease;">
-          <defs>
-            <filter id="tear-fiber-glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          <!-- Peeling 3D curl under-shadow line -->
-          <path id="customizer-svg-curl-shadow" fill="none" stroke="rgba(0,0,0,0.7)" stroke-width="6" stroke-linecap="round" filter="url(#tear-fiber-glow)" />
-          <!-- Exposed White Cellulose Fiber Core Bleed -->
-          <path id="customizer-svg-fiber-core" fill="none" stroke="${topCustomizerState.tearBorderColor || '#ffffff'}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
-          <!-- Micro-specular highlight line on the curl ridge -->
-          <path id="customizer-svg-fiber-highlight" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.2" stroke-linecap="round" />
-        </svg>
+
+        ${textBehindHtml}
+
+        <!-- Layer 1: Directional Contact Drop Shadows (Z = +50) -->
+        <div id="customizer-live-rip-shadow-wrap" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ}; transform: ${paperPlaneTransform}; transform-origin: center center; transition: transform 500ms ease;">
+          <img id="customizer-live-rip-shadow" src="${shadowSrc}" alt="Tear Contact Drop Shadow" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: ${(shadowPx / 35).toFixed(2)}; filter: drop-shadow(0 ${shadowPx}px ${Math.round(shadowPx * 1.4)}px rgba(0,0,0,0.95)); mix-blend-mode: multiply;" />
+        </div>
+
+        <!-- Layer 2 & 3: 3D Peeling & Ripping Top Paper Sheets (Z = +100) -->
+        <div id="customizer-live-rip-container" style="position: absolute; inset: 0; pointer-events: none; z-index: ${subjectZ + 2}; transform: ${paperPlaneTransform}; transform-origin: center center; transition: transform 500ms ease; opacity: ${currentOpacity};">
+          <!-- Left Torn Paper Flap (Aged Map / Parchment) -->
+          <div id="customizer-rip-flap-left-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: left center; transform-style: preserve-3d;">
+            <img id="customizer-rip-flap-left" src="${leftFlapSrc}" alt="Left Torn Flap" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+
+          <!-- Right Torn Paper Flap (Archival Newsprint / Deckle) -->
+          <div id="customizer-rip-flap-right-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: right center; transform-style: preserve-3d;">
+            <img id="customizer-rip-flap-right" src="${rightFlapSrc}" alt="Right Torn Flap" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+          </div>
+
+          <!-- Exposed White Cellulose Deckle Rim Overlay -->
+          <img id="customizer-live-deckle-edge" src="/paper_tear_deckle_border.png" alt="Deckle Fibers" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; opacity: ${topCustomizerState.tearBorderEnabled !== false ? 0.95 : 0};" />
+        </div>
       </div>
     `;
   } else if (tplId === 'gold-frame-spin') {
@@ -33479,96 +33511,60 @@ function updateTopCustomizerFrame(seqTime, now) {
       }
     }
   } else if (tplId === 'paper-rip-shred') {
-    const rip = document.getElementById('customizer-live-rip');
-    const ripBorder = document.getElementById('customizer-live-rip-border');
-    if (rip) {
-      const spd = topCustomizerState.tearSpeed ?? 1.4;
-      const tearProgress = (Math.sin(localSceneT * spd) + 1) / 2; // 0 to 1
-      const mode = topCustomizerState.tearMode || 'paper'; // 'paper' or 'cloth'
-      const preset = topCustomizerState.tearPreset || 'magnates';
-      const angle = topCustomizerState.tearAngle ?? 135;
-      const roughness = (topCustomizerState.tearRoughness ?? 85) / 100;
-      const hasBorder = topCustomizerState.tearBorderEnabled !== false;
+    const flapL = document.getElementById('customizer-rip-flap-left-wrap');
+    const flapR = document.getElementById('customizer-rip-flap-right-wrap');
+    const shadowEl = document.getElementById('customizer-live-rip-shadow');
+    const bgWrap = document.getElementById('customizer-paper-bg-wrap');
+    const deckleEl = document.getElementById('customizer-live-deckle-edge');
 
-      // Authentic digitized fracture offsets from Magnates Media documentary rip scan
-      const fractureBites = [
-        0, 2.8, -1.5, 4.2, 1.0, 5.8, 2.4, -0.8, 6.2, 3.5, 7.8, 4.1, 1.2, 5.5, 8.4,
-        3.8, 9.2, 6.5, 2.1, 7.4, 11.2, 6.8, 3.2, 8.6, 5.1, 10.4, 7.2, 2.8, 8.5, 12.1,
-        7.4, 3.5, 9.8, 6.2, 11.5, 8.1, 4.0, 9.5, 6.8, 12.8, 8.5, 4.2, 10.1, 6.5, 11.2,
-        8.4, 3.2, 9.1, 13.5, 8.8, 4.5, 10.2, 7.1, 12.0, 8.5, 3.8, 9.4, 6.2, 10.8, 7.5
-      ];
+    const isStopMotion = topCustomizerState.tearStopMotion !== false;
+    const targetFps = topCustomizerState.tearFps || 12; // 12 fps or 15 fps
+    const rawT = localSceneT;
+    const activeT = isStopMotion ? (Math.floor(rawT * targetFps) / targetFps) : rawT;
 
-      const STEPS = fractureBites.length - 1;
-      const ptsTop = [];
-      const ptsBorder = [];
+    const spd = topCustomizerState.tearSpeed ?? 1.35;
+    const tearProgress = (Math.sin(activeT * spd) + 1) / 2; // 0 to 1
 
-      if (preset === 'magnates' || angle === 135) {
-        // True Top-Left to Bottom-Right diagonal tear peeling down:
-        // Tear line originates at top-left corner and sweeps downwards towards bottom-right
-        const sweep = tearProgress * 140 - 20; 
-        for (let i = 0; i <= STEPS; i++) {
-          const t = i / STEPS; // 0 (left) to 1 (right)
-          const xPct = t * 100;
-          
-          let bite = 0;
-          if (mode === 'cloth') {
-            bite = Math.sin(t * Math.PI * 4 + localSceneT * 1.5) * 4.2 * roughness;
-          } else {
-            // Irregular sharp paper bite from digitized scan
-            bite = (fractureBites[i] * 0.95 + Math.sin(t * 31.4) * 1.2) * roughness;
-          }
+    // Sub-pixel stop-motion tactile jitter (±2px, ±0.5deg)
+    let jitterX = 0;
+    let jitterY = 0;
+    let jitterRot = 0;
+    if (isStopMotion) {
+      const seed = Math.floor(rawT * targetFps);
+      jitterX = (((Math.sin(seed * 73.1) * 10000) % 200) / 100) * 1.5; // ±1.5px
+      jitterY = (((Math.cos(seed * 91.7) * 10000) % 200) / 100) * 1.2; // ±1.2px
+      jitterRot = (((Math.sin(seed * 37.4) * 10000) % 100) / 100) * 0.45; // ±0.45deg
+    }
 
-          // Descending slope from top-left (lower Y) down across to right
-          // At x=0 (left): tear starts higher up; at x=100 (right): tear extends lower down
-          const yBase = sweep + t * 45;
-          const yTop = Math.max(0, Math.min(100, yBase + bite));
-          // 1.8% bleached white exposed cellulose paper lip
-          const yRim = Math.max(0, Math.min(100, yTop + (hasBorder ? 1.9 : 0)));
+    const maxSep = (topCustomizerState.tearRoughness ?? 85) * 0.95; // px displacement
+    const transX_L = -tearProgress * (maxSep * 0.65);
+    const transX_R = tearProgress * (maxSep * 0.70);
 
-          ptsTop.push(`${xPct.toFixed(2)}% ${yTop.toFixed(2)}%`);
-          ptsBorder.push(`${xPct.toFixed(2)}% ${yRim.toFixed(2)}%`);
-        }
+    // 3D peel & curl physics: flap lifts and bends outward along the tear seam
+    const curlDeg = (topCustomizerState.tearCurl ?? 60) * 0.42; // e.g. ~25deg
+    const rotY_L = tearProgress * curlDeg;
+    const rotY_R = -tearProgress * (curlDeg * 1.15);
+    const liftZ = tearProgress * 35; // lifts towards camera Z = +100
 
-        // Top paper covers top portion: polygon from (0,0) -> (100,0) -> along tear line from right to left
-        rip.style.clipPath = `polygon(0 0, 100% 0, ${ptsTop.slice().reverse().join(', ')})`;
-        if (ripBorder) {
-          ripBorder.style.clipPath = `polygon(0 0, 100% 0, ${ptsBorder.slice().reverse().join(', ')})`;
-        }
-
-      } else if (preset === 'horizontal' || angle === 0) {
-        const sweepX = tearProgress * 130 - 15;
-        for (let i = 0; i <= STEPS; i++) {
-          const t = i / STEPS;
-          const yPct = t * 100;
-          const bite = (fractureBites[i] * 0.85) * roughness;
-          const xTop = Math.max(0, Math.min(100, sweepX + t * 12 + bite));
-          const xRim = Math.max(0, Math.min(100, xTop + (hasBorder ? 1.8 : 0)));
-          ptsTop.push(`${xTop.toFixed(2)}% ${yPct.toFixed(2)}%`);
-          ptsBorder.push(`${xRim.toFixed(2)}% ${yPct.toFixed(2)}%`);
-        }
-        rip.style.clipPath = `polygon(0 0, ${ptsTop.join(', ')}, 0 100%)`;
-        if (ripBorder) {
-          ripBorder.style.clipPath = `polygon(0 0, ${ptsBorder.join(', ')}, 0 100%)`;
-        }
-
-      } else {
-        // Vertical center rip / Oblique
-        const sweepY = tearProgress * 130 - 15;
-        const slant = preset === 'oblique' ? 30 : 0;
-        for (let i = 0; i <= STEPS; i++) {
-          const t = i / STEPS;
-          const xPct = t * 100;
-          const bite = (fractureBites[i] * 0.9) * roughness;
-          const yTop = Math.max(0, Math.min(100, sweepY + t * slant + bite));
-          const yRim = Math.max(0, Math.min(100, yTop + (hasBorder ? 1.8 : 0)));
-          ptsTop.push(`${xPct.toFixed(2)}% ${yTop.toFixed(2)}%`);
-          ptsBorder.push(`${xRim.toFixed(2)}% ${yRim.toFixed(2)}%`);
-        }
-        rip.style.clipPath = `polygon(0 0, 100% 0, ${ptsTop.slice().reverse().join(', ')})`;
-        if (ripBorder) {
-          ripBorder.style.clipPath = `polygon(0 0, 100% 0, ${ptsBorder.slice().reverse().join(', ')})`;
-        }
-      }
+    if (flapL) {
+      flapL.style.transform = `translate3d(${(transX_L + jitterX).toFixed(2)}px, ${jitterY.toFixed(2)}px, ${liftZ.toFixed(1)}px) rotateY(${rotY_L.toFixed(2)}deg) rotateZ(${jitterRot.toFixed(2)}deg) scale(${(1.0 + tearProgress * 0.04).toFixed(3)})`;
+    }
+    if (flapR) {
+      flapR.style.transform = `translate3d(${(transX_R - jitterX).toFixed(2)}px, ${(-jitterY).toFixed(2)}px, ${liftZ.toFixed(1)}px) rotateY(${rotY_R.toFixed(2)}deg) rotateZ(${(-jitterRot).toFixed(2)}deg) scale(${(1.0 + tearProgress * 0.04).toFixed(3)})`;
+    }
+    if (shadowEl) {
+      const shadowDepth = topCustomizerState.tearShadowDepth ?? 32;
+      const shadowAlpha = Math.min(1, 0.4 + tearProgress * 0.55);
+      shadowEl.style.opacity = `${shadowAlpha.toFixed(2)}`;
+      shadowEl.style.transform = `translate3d(${(jitterX * 0.3).toFixed(2)}px, ${(shadowDepth * 0.18 + jitterY * 0.3).toFixed(2)}px, 0) scale(${(1.0 + tearProgress * 0.02).toFixed(3)})`;
+    }
+    if (deckleEl) {
+      deckleEl.style.transform = `translate3d(${(jitterX * 0.5).toFixed(2)}px, ${(jitterY * 0.5).toFixed(2)}px, ${(liftZ + 2).toFixed(1)}px)`;
+    }
+    if (bgWrap) {
+      // Subtle background reveal push-in parallax
+      const bgZoom = 1.04 + tearProgress * 0.06;
+      bgWrap.style.transform = `scale(${bgZoom.toFixed(3)})`;
     }
   } else if (tplId === 'gold-frame-spin') {
     const frame = document.getElementById('customizer-live-frame');
@@ -38406,11 +38402,11 @@ function startSidebarTemplateHover(cardEl, tpl) {
       `;
     } else if (tplId === 'paper-rip-shred') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; overflow: hidden;">
-          <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover;" />
-          <div id="fx-rip-${tplId}" style="position: absolute; inset: 0; overflow: hidden; background: #fef08a; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.8)); animation: sidecardRip 1.6s ease-in-out infinite alternate;">
-            <img src="${tpl.defaultImage}" alt="Torn paper preview" style="position: absolute; inset: 0 0 2px 0; width: 100%; height: calc(100% - 2px); object-fit: cover;" />
-          </div>
+        <div style="position: absolute; inset: 0; overflow: hidden; background: #000;">
+          <img src="/paper_tear_revealed_city.jpg" style="width: 100%; height: 100%; object-fit: cover;" />
+          <img src="/paper_tear_shadow_pass.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85;" />
+          <img src="/paper_tear_left_flap.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+          <img src="/paper_tear_right_flap.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
         </div>
       `;
     } else if (tplId === 'gold-frame-spin') {
