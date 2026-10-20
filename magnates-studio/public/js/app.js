@@ -27571,7 +27571,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'doc-highlighter-loupe-suite') {
+    } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img src="${tpl.defaultImage || '/forbes_article_hd.svg'}" style="width: 100%; height: 100%; object-fit: contain;" />
@@ -28528,7 +28528,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'doc-highlighter-loupe-suite') {
+    } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #ffffff; overflow: hidden; display: flex; align-items: center; justify-content: center;">
         <img src="${prim || '/forbes_article_reference.png'}" alt="Forbes Article" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -28966,7 +28966,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const c2X = zoomCycle * 14;
         card2.style.transform = `translateX(${c2X}px) translateY(${-Math.sin(t * 1.8) * 6}px) scale(${c2Scale}) rotateY(${-22 + camYaw * 0.5}deg) rotateX(-6deg)`;
       }
-    } else if (tplId === 'doc-highlighter-loupe-suite') {
+    } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
       const yellowBar = fxContainer?.querySelector(`#fx-doc-hl-yellow-${tplId}`);
       const redBar = fxContainer?.querySelector(`#fx-doc-hl-red-${tplId}`);
       const cycle = (t * 1.2) % 3.5;
@@ -29546,7 +29546,6 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-blend-modes': openMagnatesBlendModesSuite,
     'magnates-media-paper-blueprint': openMagnatesPaperBlueprintSuite,
     'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
-    'magnates-media-article-highlight': openMagnatesArticleHighlightSuite,
     'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
   };
 
@@ -29958,10 +29957,6 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-ink-reveal') {
     // Launch Magnates Media Ink Reveal Text Animation Suite
     openMagnatesInkRevealSuite();
-    return;
-  } else if (templateId === 'magnates-media-article-highlight') {
-    // Launch Magnates Media Article & Text Highlighting Suite
-    openMagnatesArticleHighlightSuite();
     return;
   } else if (templateId === 'magnates-media-particle-vfx') {
     // Launch Magnates Media Particle & VFX Overlays Suite
@@ -30439,6 +30434,10 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+    } else if (tpl.id === 'magnates-media-article-highlight') {
+      topCustomizerState.primaryUrl = '/magnates_article_highlight_thumbnail.svg';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/magnates_article_highlight_thumbnail.svg';
     } else if (tpl.id === 'parallax') {
       topCustomizerState.primaryUrl = '';
       topCustomizerState.secondaryUrl = '';
@@ -30499,7 +30498,7 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'empire-timeline'
+    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline'
   ]);
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
@@ -30662,7 +30661,7 @@ function openTopTemplateCustomizer(tpl) {
   // Trace vs Select Text contextual button
   const btnTrace = document.getElementById('btn-tpl-modal-edit-cutout');
   if (btnTrace) {
-    if (tpl.id === 'doc-highlighter-loupe-suite') {
+    if (tpl.id === 'doc-highlighter-loupe-suite' || tpl.id === 'magnates-media-article-highlight') {
       btnTrace.innerHTML = '<span>\ud83d\udd8d\ufe0f</span> Select Text';
       btnTrace.title = 'Draw or click to select text sentence on the document';
       btnTrace.style.background = 'rgba(250, 204, 21, 0.15)';
@@ -31228,6 +31227,59 @@ function openTopTemplateCustomizer(tpl) {
         label: 'Line 2'
       }
     ];
+  } else if (tpl.id === 'magnates-media-article-highlight') {
+    if (labelPrim) labelPrim.textContent = '📄 Archival Broadsheet (HD Vector)';
+    if (wrapSec) wrapSec.style.display = 'none';
+    const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
+    if (aiEngineWrap) aiEngineWrap.style.display = 'none';
+    topCustomizerState.hasTextBehind = false;
+    topCustomizerState.mainText = 'MARKET COLLAPSES IN PANIC';
+    topCustomizerState.subText = 'NEW YORK — Oct 28';
+    topCustomizerState.textColor = '#facc15';
+    topCustomizerState.customDocStyle = 'broadsheet';
+    topCustomizerState.customDocTitle = 'THE FINANCIAL CHRONICLE';
+    topCustomizerState.docStyle = 'none';
+    topCustomizerState.docSweepSpeed = topCustomizerState.docSweepSpeed || 0.8;
+    topCustomizerState.docWhiteout = false;
+    topCustomizerState.docDarkout = false;
+    topCustomizerState.docPunchZoom = false;
+    topCustomizerState.docLoupe = false;
+    topCustomizerState.docCameraScroll = false;
+    topCustomizerState.docTilt = false;
+    topCustomizerState.docBounce = false;
+    topCustomizerState.docRedact = false;
+    topCustomizerState.docFilter = topCustomizerState.docFilter || 'none';
+    topCustomizerState.docScale = topCustomizerState.docScale || 1.0;
+    topCustomizerState.docRot = topCustomizerState.docRot || 0;
+    topCustomizerState.docEasing = topCustomizerState.docEasing || 'cubic';
+    topCustomizerState.enableDustParticles = topCustomizerState.enableDustParticles !== undefined ? topCustomizerState.enableDustParticles : true;
+    topCustomizerState.particleType = topCustomizerState.particleType || 'dust';
+    topCustomizerState.dustDensity = topCustomizerState.dustDensity || 30;
+    topCustomizerState.selectedDocHlIdx = 0;
+    topCustomizerState.selectedDocTarget = 'highlight';
+    topCustomizerState.is3DMode = false;
+    topCustomizerState.docHighlights = [
+      {
+        x: 0.230,
+        y: 0.405,
+        w: 0.170,
+        h: 0.048,
+        color: '#facc15',
+        startTime: 0.3,
+        duration: 0.8,
+        label: 'Line 1'
+      },
+      {
+        x: 0.435,
+        y: 0.400,
+        w: 0.210,
+        h: 0.052,
+        color: '#facc15',
+        startTime: 1.1,
+        duration: 0.7,
+        label: 'Line 2'
+      }
+    ];
   } else if (tpl.id === 'vox-newspaper-cream-dossier') {
     if (labelPrim) labelPrim.textContent = '\ud83d\udcf0 Archival Document / Newspaper Asset';
     if (labelSec) labelSec.textContent = '\ud83c\udfac Supporting Background Footage';
@@ -31743,7 +31795,7 @@ function openTopTemplateCustomizer(tpl) {
 function syncTopTemplateDocHighlighterUI() {
   const wrapHl = document.getElementById('tpl-modal-wrap-doc-highlighter');
   if (!wrapHl) return;
-  const isDocTpl = topCustomizerState.currentTpl?.id === 'doc-highlighter-loupe-suite';
+  const isDocTpl = topCustomizerState.currentTpl?.id === 'doc-highlighter-loupe-suite' || topCustomizerState.currentTpl?.id === 'magnates-media-article-highlight';
   if (!isDocTpl) {
     wrapHl.style.display = 'none';
     return;
@@ -32239,9 +32291,21 @@ let FORBES_DOC_LINES = [
   { id: 'body-6', normX: 0.125, normY: 0.723, normW: 0.540, normH: 0.028, text: '"Someone could come in today and ask for (time off starting) tomorrow," worries' }
 ];
 
+let BROADSHEET_DOC_LINES = [
+  { id: 'b-head', normX: 0.230, normY: 0.250, normW: 0.540, normH: 0.055, text: 'MARKET COLLAPSES IN PANIC' },
+  { id: 'b-sub', normX: 0.230, normY: 0.320, normW: 0.540, normH: 0.035, text: 'NEW YORK — Oct 28 • RECORD 16,410,030 SHARES DUMPED • TOTAL COLLAPSE' },
+  { id: 'b-mark1', normX: 0.230, normY: 0.405, normW: 0.170, normH: 0.048, text: '$14,000,000,000 LOST' },
+  { id: 'b-mark2', normX: 0.435, normY: 0.400, normW: 0.210, normH: 0.052, text: 'NO BUYERS FOUND' },
+  { id: 'b-body1', normX: 0.230, normY: 0.470, normW: 0.540, normH: 0.030, text: 'Felt-tip markers incernine fiber absorption, bleeding into newsprint, handdrawn edges.' },
+  { id: 'b-body2', normX: 0.230, normY: 0.510, normW: 0.540, normH: 0.030, text: 'In thousands of boardrooms, uncontrolled selling drove prices beneath all margins.' }
+];
+
 function getActiveDocLines() {
   if (topCustomizerState.customDocLines && topCustomizerState.customDocLines.length > 0) {
     return topCustomizerState.customDocLines;
+  }
+  if (topCustomizerState.customDocStyle === 'broadsheet' || topCustomizerState.currentTpl?.id === 'magnates-media-article-highlight') {
+    return BROADSHEET_DOC_LINES;
   }
   return FORBES_DOC_LINES;
 }
@@ -32258,7 +32322,7 @@ function renderTopTemplatePreviewStage() {
         : topCustomizerState.primaryUrl);
   const sec = topCustomizerState.secondaryUrl;
 
-  if (BRIDGED_HOVER_TEMPLATE_IDS.has(tplId)) {
+  if (BRIDGED_HOVER_TEMPLATE_IDS.has(tplId) && tplId !== 'magnates-media-article-highlight') {
     const btpl = topCustomizerState.currentTpl;
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
     if (window.tpl3DUse3D && window.tpl3DUse3D(tplId)) {
@@ -32342,7 +32406,7 @@ function renderTopTemplatePreviewStage() {
     }).join('');
   }
 
-  if (tplId === 'doc-highlighter-loupe-suite') {
+  if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
     const highlights = topCustomizerState.docHighlights || [];
     const isWhiteout = !!topCustomizerState.docWhiteout;
     const isDarkout = !!topCustomizerState.docDarkout;
@@ -32391,10 +32455,23 @@ function renderTopTemplatePreviewStage() {
             <!-- AUTHENTIC MULTI-LAYER DOCUMENT SVG: Text is 100% physically in front of highlights! -->
             <svg id="customizer-doc-svg" viewBox="0 0 1920 1080" style="width: 100%; height: 100%; display: block; filter: ${filterCss}; overflow: visible; user-select: none;">
               <!-- LAYER 1: BASE DOCUMENT PAPER & AUTHENTIC PUBLICATION HEADER -->
-              <rect width="1920" height="1080" fill="${topCustomizerState.customDocStyle === 'dossier' ? '#fbf8ee' : '#ffffff'}" />
-              <rect width="1920" height="1080" fill="${topCustomizerState.customDocStyle === 'dossier' ? '#e2d9c2' : '#faf9f6'}" opacity="${topCustomizerState.customDocStyle === 'dossier' ? '0.25' : '0.5'}" />
+              <rect width="1920" height="1080" fill="${topCustomizerState.customDocStyle === 'dossier' ? '#fbf8ee' : (topCustomizerState.customDocStyle === 'broadsheet' ? '#f4efe6' : '#ffffff')}" />
+              <rect width="1920" height="1080" fill="${topCustomizerState.customDocStyle === 'dossier' ? '#e2d9c2' : (topCustomizerState.customDocStyle === 'broadsheet' ? '#ebdcc7' : '#faf9f6')}" opacity="${topCustomizerState.customDocStyle === 'dossier' ? '0.25' : (topCustomizerState.customDocStyle === 'broadsheet' ? '0.35' : '0.5')}" />
 
-              ${topCustomizerState.customDocStyle === 'nytimes' ? `
+              ${topCustomizerState.customDocStyle === 'broadsheet' ? `
+                <!-- THE FINANCIAL CHRONICLE BROADSHEET MASTHEAD & DOUBLE RULES -->
+                <g transform="translate(240, 50)">
+                  <line x1="0" y1="10" x2="1440" y2="10" stroke="#1a140e" stroke-width="3" />
+                  <line x1="0" y1="16" x2="1440" y2="16" stroke="#1a140e" stroke-width="1.2" />
+                  <text x="720" y="60" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="52" font-weight="900" fill="#18120b" letter-spacing="4">${topCustomizerState.customDocTitle || 'THE FINANCIAL CHRONICLE'}</text>
+                  <line x1="0" y1="78" x2="1440" y2="78" stroke="#1a140e" stroke-width="1.2" />
+                  <line x1="0" y1="84" x2="1440" y2="84" stroke="#1a140e" stroke-width="2.5" />
+                  <text x="0" y="106" font-family="'Courier New', monospace" font-size="14" font-weight="700" fill="#5a4b38">VOL. XCIV NO. 28,401</text>
+                  <text x="720" y="106" text-anchor="middle" font-family="'Courier New', monospace" font-size="14" font-weight="700" fill="#5a4b38">NEW YORK, TUESDAY, OCTOBER 29, 1929</text>
+                  <text x="1440" y="106" text-anchor="end" font-family="'Courier New', monospace" font-size="14" font-weight="700" fill="#5a4b38">PRICE THREE CENTS</text>
+                  <line x1="0" y1="116" x2="1440" y2="116" stroke="#1a140e" stroke-width="1.2" />
+                </g>
+              ` : topCustomizerState.customDocStyle === 'nytimes' ? `
                 <!-- THE NEW YORK TIMES MASTHEAD & LAYOUT -->
                 <g transform="translate(240, 55)">
                   <text x="720" y="58" text-anchor="middle" font-family="'Chomsky', 'Times New Roman', serif" font-size="64" font-weight="900" fill="#121212" letter-spacing="1">${topCustomizerState.customDocTitle || 'The New York Times'}</text>
@@ -32469,6 +32546,38 @@ function renderTopTemplatePreviewStage() {
                         <tspan class="doc-snappable-line" data-line-id="${line.id}" x="0" y="${46 + lIdx * 48}">${line.text}</tspan>
                       `).join('')}
                     </text>
+                  </g>
+                ` : topCustomizerState.customDocStyle === 'broadsheet' ? `
+                  <g transform="translate(240, 230)">
+                    <text x="720" y="55" text-anchor="middle" font-family="'Playfair Display', 'Times New Roman', serif" font-size="48" font-weight="900" fill="#0d0a06" letter-spacing="1.5">
+                      <tspan class="doc-snappable-line" data-line-id="b-head" x="720" y="55">MARKET COLLAPSES IN PANIC</tspan>
+                    </text>
+                    <line x1="0" y1="84" x2="1440" y2="84" stroke="#241c13" stroke-width="2" />
+                    <text x="720" y="108" text-anchor="middle" font-family="'Playfair Display', serif" font-size="19" font-style="italic" font-weight="700" fill="#241c13" letter-spacing="1">
+                      <tspan class="doc-snappable-line" data-line-id="b-sub" x="720" y="108">NEW YORK — Oct 28 • RECORD 16,410,030 SHARES DUMPED • TOTAL COLLAPSE</tspan>
+                    </text>
+                    <line x1="0" y1="122" x2="1440" y2="122" stroke="#241c13" stroke-width="1.2" />
+                  </g>
+                  <g transform="translate(240, 415)">
+                    <!-- Left Column -->
+                    <text font-family="'Times New Roman', Georgia, serif" font-size="20" fill="#1e1710" line-height="1.4">
+                      <tspan x="0" y="0" font-weight="700">tadcanning brak, arens,</tspan>
+                      <tspan x="0" y="28">NEW YORK — Oct 28 — At cutse an an</tspan>
+                      <tspan x="0" y="56">jouran set-alentr povnic properly ensure</tspan>
+                      <tspan x="0" y="84">that nan-linders ensure that the dadd</tspan>
+                      <tspan x="0" y="112">would area of all basic analysis.</tspan>
+                    </text>
+                    <!-- Center Focal Quote Block -->
+                    <g transform="translate(420, 0)">
+                      <text font-family="'Playfair Display', 'Times New Roman', serif" font-size="28" font-weight="900" fill="#000000">
+                        <tspan class="doc-snappable-line" data-line-id="b-mark1" x="20" y="24">$14,000,000,000 LOST</tspan>
+                        <tspan class="doc-snappable-line" data-line-id="b-mark2" x="410" y="22">NO BUYERS FOUND</tspan>
+                      </text>
+                      <text font-family="'Times New Roman', Georgia, serif" font-size="21" fill="#140f09">
+                        <tspan class="doc-snappable-line" data-line-id="b-body1" x="0" y="78">Felt-tip markers incernine fiber absorption, bleeding into newsprint, handdrawn edges.</tspan>
+                        <tspan class="doc-snappable-line" data-line-id="b-body2" x="0" y="122">In thousands of boardrooms, uncontrolled selling drove prices beneath all margins.</tspan>
+                      </text>
+                    </g>
                   </g>
                 ` : `
                   <g transform="translate(240, 275)">
@@ -33640,7 +33749,7 @@ function updateTopCustomizerFrame(seqTime, now) {
     }
     const decodeSpan = document.getElementById('customizer-live-decode-text');
     if (decodeSpan) decodeSpan.textContent = displayed;
-  } else if (tplId === 'doc-highlighter-loupe-suite') {
+  } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
     // Atmospheric Dust / Snow / Stars / Fog simulation tick
     if (topCustomizerState.enableDustParticles && typeof renderCustomizerDustSimulation === 'function') {
       renderCustomizerDustSimulation();
@@ -34293,12 +34402,13 @@ transition: 'fly_through',
         duration: dur
       });
     }
-  } else if (tpl.id === 'doc-highlighter-loupe-suite') {
+  } else if (tpl.id === 'doc-highlighter-loupe-suite' || tpl.id === 'magnates-media-article-highlight') {
+    const defaultDocName = tpl.id === 'magnates-media-article-highlight' ? 'Archival_Financial_Broadsheet.svg' : 'Article_Document_Evidence_HD.svg';
     const docClip = {
       id: `img-doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      name: 'Article_Document_Evidence_HD.svg',
+      name: defaultDocName,
       url: prim || tpl.defaultImage || '/forbes_article_hd.svg',
-      file: { name: 'Article_Document_Evidence_HD.svg', url: prim || tpl.defaultImage || '/forbes_article_hd.svg', isImage: true },
+      file: { name: defaultDocName, url: prim || tpl.defaultImage || '/forbes_article_hd.svg', isImage: true },
       start: sceneStart,
       duration: dur,
       scale: topCustomizerState.docScale || 1.0,
@@ -36283,13 +36393,16 @@ function initCustomArticleBuilder() {
       topCustomizerState.customDocStyle = st;
 
       const styleDefaults = {
+        broadsheet: 'THE FINANCIAL CHRONICLE',
         forbes: 'Forbes',
         nytimes: 'The New York Times',
         wsj: 'The Wall Street Journal',
         dossier: 'EXECUTIVE OVERSIGHT INQUIRY'
       };
 
-      if (st === 'forbes') {
+      if (st === 'broadsheet') {
+        topCustomizerState.customDocFont = "'Playfair Display', 'Times New Roman', serif";
+      } else if (st === 'forbes') {
         topCustomizerState.customDocFont = "'Georgia', 'Merriweather', serif";
       } else if (st === 'nytimes') {
         topCustomizerState.customDocFont = "'Cheltenham', 'Times New Roman', serif";
@@ -48735,6 +48848,11 @@ function renderMagnatesArticleLoop(timestamp) {
 }
 
 function openMagnatesArticleHighlightSuite() {
+  const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === 'magnates-media-article-highlight');
+  if (tpl) {
+    openTopTemplateCustomizer(tpl);
+    return;
+  }
   const modal = document.getElementById('modal-magnates-article-highlight-suite');
   if (!modal) return;
   modal.style.display = 'flex';
@@ -51284,7 +51402,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function attachCutoutEditorTriggers() {
   // 1. In Customizer Subject Row
   document.getElementById('btn-tpl-modal-edit-cutout')?.addEventListener('click', () => {
-    if (topCustomizerState.currentTpl?.id === 'doc-highlighter-loupe-suite') {
+    if (topCustomizerState.currentTpl?.id === 'doc-highlighter-loupe-suite' || topCustomizerState.currentTpl?.id === 'magnates-media-article-highlight') {
       if (typeof toggleDocTextSelection === 'function') toggleDocTextSelection();
       return;
     }
