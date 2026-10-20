@@ -24724,6 +24724,29 @@ id: 'map',
     secondaryImage: '/temu_product_right.png'
   },
   {
+    id: 'magnates-media-globe-wavy-nothing',
+    title: 'Spinning Earth Globe & Wavy-to-Flat Kinetic Headline (Scene 3)',
+    category: 'Paper / Cutout',
+    origCategory: 'Documentary',
+    badge: 'Scene 3 Standalone • Linked',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
+    description: 'Standalone Scene 3: As previous elements glide upward, a stylized Earth globe rises from the bottom and spins clockwise while words ("FOR ALMOST NOTHING") ripple in a wave, flatten into a straight line as the period snaps in, and then the globe glides downward to reveal the $1M counter. Live-synced with the Merged Master template.',
+    tags: [
+      'Spinning Globe',
+      'Earth Cutout',
+      'Wavy to Flat Text',
+      'FOR ALMOST NOTHING.',
+      'Paper Cutout',
+      'Scene 3',
+      'James Jani',
+      'Magnates Media'
+    ],
+    defaultImage: '/globe_atlantic_clean.svg',
+    secondaryImage: '/globe_atlantic_clean.svg'
+  },
+  {
     id: 'magnates-media-dual-silhouettes',
     title: '$1,000,000 Counter & Dual Glowing Silhouettes Cutout (Scene B)',
     category: 'Paper / Cutout',
@@ -28406,7 +28429,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-dual-silhouettes') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes') {
       const bgCol = (typeof magnatesBPState !== 'undefined' && magnatesBPState.backdropColor) ? magnatesBPState.backdropColor : '#991b1b';
       const c1 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.9) : 'rgba(165, 22, 22, 0.9)';
       const c2 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.68) : 'rgba(95, 10, 10, 0.68)';
@@ -28420,7 +28443,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         ? '&#x1F525; SCENE 1 // LOGO &amp; WAVY HOOK'
         : (tplId === 'magnates-media-product-price-unfurl'
           ? '&#x1F4E6; SCENE 2 // PRODUCT &amp; PRICE UNFURL'
-          : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE 3 // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // 1 &rarr; 3'));
+          : (tplId === 'magnates-media-globe-wavy-nothing'
+            ? '&#x1F30D; SCENE 3 // SPINNING GLOBE &amp; WAVE'
+            : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE 4 // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // 1 &rarr; 4')));
 
       fxContainer.innerHTML = `
         <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, ${c1} 0%, ${c2} 42%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -28449,6 +28474,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
             <div id="fx-bp-prod2-pill-${tplId}" style="padding: 1px 8px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1px solid rgba(239, 68, 68, 0.4); font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 900; color: #ff1e1e;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod2Price) ? magnatesBPState.prod2Price : '$5.00'}</div>
           </div>
+
+          <!-- Scene 3: Spinning Earth Globe & Wavy-to-Flat Headline ("FOR ALMOST NOTHING.") -->
+          <img id="fx-bp-globe-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.globeUrl) ? magnatesBPState.globeUrl : '/globe_atlantic_clean.svg'}" style="position: absolute; left: 50%; bottom: -62%; width: 78%; aspect-ratio: 1/1; object-fit: contain; border-radius: 50%; z-index: 13; filter: drop-shadow(0 -6px 16px rgba(255,255,255,0.22)); pointer-events: none; opacity: 0;" />
+          <div id="fx-bp-globe-txt-${tplId}" style="position: absolute; left: 5%; right: 5%; top: 37%; transform: translateY(-50%); z-index: 14; text-align: center; font-family: 'Montserrat', 'Arial Black', sans-serif; font-size: 13.5px; font-weight: 900; color: #f20d0d; letter-spacing: 0.5px; text-shadow: 0 0 14px rgba(239,20,20,0.65); pointer-events: none; opacity: 0; white-space: nowrap;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.globeHeadline) ? magnatesBPState.globeHeadline : 'FOR ALMOST NOTHING.'}</div>
 
           <!-- Scene B: Center Red Money Counter -->
           <div id="fx-bp-counter-wrap-${tplId}" style="position: relative; z-index: 4; text-align: center; transform: translateY(-4%); pointer-events: none; opacity: 0;">
@@ -29436,7 +29465,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           card.style.borderColor = '#f59e0b';
         }
       }
-    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-dual-silhouettes') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes') {
       const logoEl = fxContainer?.querySelector(`#fx-bp-logo-${tplId}`);
       const wavyWrapEl = fxContainer?.querySelector(`#fx-bp-wavy-wrap-${tplId}`);
       const wavy1El = fxContainer?.querySelector(`#fx-bp-wavy1-${tplId}`);
@@ -29462,17 +29491,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const prod2Wrap = fxContainer?.querySelector(`#fx-bp-prod2-${tplId}`);
       const prod2Img = fxContainer?.querySelector(`#fx-bp-prod2-img-${tplId}`);
       const prod2Pill = fxContainer?.querySelector(`#fx-bp-prod2-pill-${tplId}`);
+      const globeEl = fxContainer?.querySelector(`#fx-bp-globe-${tplId}`);
+      const globeTxtEl = fxContainer?.querySelector(`#fx-bp-globe-txt-${tplId}`);
 
       const runSceneAHover = (c) => {
         const riseP = easeOut((c - 0.20) / 0.40);
         const shiftLeftP = easeOut((c - 0.90) / 0.45);
         const shiftRightP = easeOut((c - 2.35) / 0.45);
-        const outP = easeIn((c - 5.10) / 0.40);
+        // Products + Logo move UP as a whole at c = 4.85..5.40 while Globe glides in from bottom->up!
+        const moveUpOutP = easeIn((c - 4.85) / 0.55);
         if (logoEl) {
           const netLeft = shiftLeftP * (1 - shiftRightP);
           const tx = -50 - netLeft * 136;
-          const ty = -50 + (1 - riseP) * 180 + outP * 140;
-          const op = Math.max(0, Math.min(1, (c < 0.20 ? 0 : riseP * 1.3) * (1 - outP)));
+          const ty = -50 + (1 - riseP) * 180 - moveUpOutP * 220;
+          const op = Math.max(0, Math.min(1, (c < 0.20 ? 0 : riseP * 1.3) * (1 - moveUpOutP * 1.1)));
           logoEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
           logoEl.style.opacity = op.toFixed(2);
         }
@@ -29486,33 +29518,64 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           wavy2El.style.opacity = l2P.toFixed(2);
         }
         if (prod1Wrap && prod1Img && prod1Pill) {
-          const c1P = easeOut((c - 2.80) / 0.38) * (1 - outP);
-          const p1P = easeOut((c - 3.20) / 0.35) * (1 - outP);
-          prod1Wrap.style.opacity = c > 2.75 ? '1' : '0';
+          const c1P = easeOut((c - 2.80) / 0.38);
+          const p1P = easeOut((c - 3.20) / 0.35);
+          prod1Wrap.style.opacity = (c > 2.75 ? Math.max(0, 1 - moveUpOutP * 1.15) : 0).toFixed(2);
+          prod1Wrap.style.transform = `translateY(${(-moveUpOutP * 135).toFixed(1)}%)`;
           prod1Img.style.clipPath = `inset(${((1 - c1P) * 50).toFixed(1)}% 0% ${((1 - c1P) * 50).toFixed(1)}% 0% round 8px)`;
           prod1Pill.style.clipPath = `inset(0% ${((1 - p1P) * 50).toFixed(1)}% 0% ${((1 - p1P) * 50).toFixed(1)}% round 999px)`;
         }
         if (prod2Wrap && prod2Img && prod2Pill) {
-          const c2P = easeOut((c - 3.65) / 0.38) * (1 - outP);
-          const p2P = easeOut((c - 4.05) / 0.35) * (1 - outP);
-          prod2Wrap.style.opacity = c > 3.60 ? '1' : '0';
+          const c2P = easeOut((c - 3.65) / 0.38);
+          const p2P = easeOut((c - 4.05) / 0.35);
+          prod2Wrap.style.opacity = (c > 3.60 ? Math.max(0, 1 - moveUpOutP * 1.15) : 0).toFixed(2);
+          prod2Wrap.style.transform = `translateY(${(-moveUpOutP * 135).toFixed(1)}%)`;
           prod2Img.style.clipPath = `inset(${((1 - c2P) * 50).toFixed(1)}% 0% ${((1 - c2P) * 50).toFixed(1)}% 0% round 8px)`;
           prod2Pill.style.clipPath = `inset(0% ${((1 - p2P) * 50).toFixed(1)}% 0% ${((1 - p2P) * 50).toFixed(1)}% round 999px)`;
+        }
+        if (globeEl && globeTxtEl) {
+          const gInP = easeOut((c - 4.95) / 0.55);
+          const gOutP = easeIn((c - 7.35) / 0.55);
+          const gActive = c >= 4.90 && c <= 7.95;
+          globeEl.style.opacity = gActive ? Math.max(0, Math.min(1, gInP * 1.4) * (1 - gOutP * 1.1)).toFixed(2) : '0';
+          const gy = (1 - gInP) * 85 + gOutP * 90;
+          const rot = Math.max(0, c - 4.90) * 18;
+          globeEl.style.transform = `translate(-50%, ${gy.toFixed(1)}%) rotate(${rot.toFixed(1)}deg)`;
+          if (typeof renderGlobeWavyHeadlineSpans === 'function') {
+            renderGlobeWavyHeadlineSpans(
+              globeTxtEl,
+              (typeof magnatesBPState !== 'undefined' && magnatesBPState.globeHeadline) ? magnatesBPState.globeHeadline : 'FOR ALMOST NOTHING.',
+              Math.max(0, c - 5.45)
+            );
+          }
+          const txtOp = gActive && c >= 5.45 ? Math.max(0, 1 - easeIn((c - 7.45) / 0.45)) : 0;
+          globeTxtEl.style.opacity = txtOp.toFixed(2);
         }
       };
 
       if (tplId === 'magnates-media-brand-wavy-hook') {
-        // Standalone Scene 1 Hover Preview (Logo Rise + Left Shift + Wavy Text)
+        // Standalone Scene 1 Hover Preview
         const c = t % 3.2;
         runSceneAHover(Math.min(2.30, c));
         if (prod1Wrap) prod1Wrap.style.opacity = '0';
         if (prod2Wrap) prod2Wrap.style.opacity = '0';
+        if (globeEl) globeEl.style.opacity = '0';
+        if (globeTxtEl) globeTxtEl.style.opacity = '0';
         if (counterWrapEl) counterWrapEl.style.opacity = '0';
         if (leftEl) leftEl.style.opacity = '0';
         if (rightEl) rightEl.style.opacity = '0';
       } else if (tplId === 'magnates-media-product-price-unfurl') {
-        // Standalone Scene 2 Hover Preview (Starts at Logo Shift Right -> Left Card & $2.00 -> Right Card & $5.00)
-        const c = 2.15 + (t % 3.45);
+        // Standalone Scene 2 Hover Preview
+        const c = 2.15 + (t % 2.95);
+        runSceneAHover(c);
+        if (globeEl) globeEl.style.opacity = '0';
+        if (globeTxtEl) globeTxtEl.style.opacity = '0';
+        if (counterWrapEl) counterWrapEl.style.opacity = '0';
+        if (leftEl) leftEl.style.opacity = '0';
+        if (rightEl) rightEl.style.opacity = '0';
+      } else if (tplId === 'magnates-media-globe-wavy-nothing') {
+        // Standalone Scene 3 Hover Preview (Products glide up -> Globe rises & spins -> Wavy "FOR ALMOST NOTHING." flattens -> Globe exits down)
+        const c = 4.65 + (t % 3.40);
         runSceneAHover(c);
         if (counterWrapEl) counterWrapEl.style.opacity = '0';
         if (leftEl) leftEl.style.opacity = '0';
@@ -29551,20 +29614,16 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           bgEl.style.opacity = (1 - fadeP).toFixed(2);
         }
       } else {
-        // Merged Master Hover Preview (10.2s cycle: 0..5.5s Scene A1+A2 -> 5.5..10.2s Scene B)
-        const c = t % 10.2;
-        if (c < 5.5) {
-          runSceneAHover(c);
+        // Merged Master Hover Preview (12.4s cycle: 0..7.6s Scene 1+2+3 -> 7.45..12.4s Scene 4 with overlap as Globe exits down!)
+        const c = t % 12.4;
+        runSceneAHover(c);
+        if (c < 7.45) {
           if (counterWrapEl) counterWrapEl.style.opacity = '0';
           if (leftEl) leftEl.style.opacity = '0';
           if (rightEl) rightEl.style.opacity = '0';
           if (bgEl) bgEl.style.opacity = '1';
         } else {
-          const sb = c - 5.5;
-          if (logoEl) logoEl.style.opacity = '0';
-          if (wavyWrapEl) wavyWrapEl.style.opacity = '0';
-          if (prod1Wrap) prod1Wrap.style.opacity = '0';
-          if (prod2Wrap) prod2Wrap.style.opacity = '0';
+          const sb = c - 7.45;
           const fadeP = easeIn((sb - 3.90) / 0.55);
           if (counterWrapEl && counterEl) {
             counterWrapEl.style.opacity = (1 - fadeP).toFixed(2);
@@ -29778,6 +29837,7 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-paper-blueprint': () => openMagnatesPaperBlueprintSuite('full_story_flow'),
     'magnates-media-brand-wavy-hook': () => openMagnatesPaperBlueprintSuite('brand_wavy_intro'),
     'magnates-media-product-price-unfurl': () => openMagnatesPaperBlueprintSuite('products_unfurl'),
+    'magnates-media-globe-wavy-nothing': () => openMagnatesPaperBlueprintSuite('globe_wavy_nothing'),
     'magnates-media-dual-silhouettes': () => openMagnatesPaperBlueprintSuite('dual_silhouette'),
     'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
     'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
@@ -30192,6 +30252,9 @@ function applySelectedHomepageTemplate(templateId) {
     return;
   } else if (templateId === 'magnates-media-product-price-unfurl') {
     openMagnatesPaperBlueprintSuite('products_unfurl');
+    return;
+  } else if (templateId === 'magnates-media-globe-wavy-nothing') {
+    openMagnatesPaperBlueprintSuite('globe_wavy_nothing');
     return;
   } else if (templateId === 'magnates-media-dual-silhouettes') {
     openMagnatesPaperBlueprintSuite('dual_silhouette');
@@ -48301,6 +48364,12 @@ let magnatesBPState = {
   prod2Price: "$5.00",
   prod2GlowColor: "#dc2626",
   prod2GlowIntensity: 45,
+  // Scene 3: Spinning Earth Globe & Wavy-to-Flat Headline ("FOR ALMOST NOTHING.")
+  globeEnabled: true,
+  globeUrl: "/globe_atlantic_clean.svg",
+  globeHeadline: "FOR ALMOST NOTHING.",
+  globeSpinSpeed: 18,
+  globeSpinDir: "cw",
   // Scene B / C (Z=1 Counter, Z=2 Cutout 1, Z=3 Cutout 2)
   showCounter: true,
   showBlueprintGrid: false,
@@ -48337,7 +48406,7 @@ let magnatesBPState = {
 
 const MAGNATES_BP_PRESETS = {
   full_story_flow: {
-    duration: 13.2,
+    duration: 16.0,
     bgPlateUrl: "",
     backdropColor: "#991b1b",
     backdropSpread: 75,
@@ -48454,6 +48523,46 @@ const MAGNATES_BP_PRESETS = {
     hudPreset: "SCENE 2: PRODUCT & PRICE UNFURL",
     l1Label: "Left Silhouette (Scene 3)",
     l2Label: "Right Silhouette (Scene 3)",
+    z0Label: "Crimson Radial Atmosphere"
+  },
+  globe_wavy_nothing: {
+    duration: 5.0,
+    bgPlateUrl: "",
+    backdropColor: "#991b1b",
+    backdropSpread: 75,
+    logoEnabled: true,
+    logoCutoutUrl: "/temu_logo_cutout.png",
+    logoInTime: -1.0,
+    logoShiftTime: -0.8,
+    logoOutTime: 0.25,
+    logoGlowColor: "#ff1e1e",
+    logoGlowIntensity: 90,
+    wavyTextEnabled: false,
+    wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+    wavyLine2: "ON THE INTERNET.",
+    l1Enabled: false,
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    primaryCutoutUrl: "/silhouette_sitting_phone.png",
+    l2Enabled: false,
+    showCounter: false,
+    headline: "$1,000,000",
+    subcaption: "Advertising Those Product.",
+    l1InAnim: "left_to_right",
+    l1OutAnim: "right_to_left",
+    l1InTime: 0.85,
+    l1OutTime: 3.80,
+    l1GlowColor: "#ffffff",
+    l1GlowIntensity: 85,
+    l2InAnim: "bottom_to_up",
+    l2OutAnim: "left_to_right",
+    l2InTime: 0.95,
+    l2OutTime: 4.05,
+    l2GlowColor: "#ffffff",
+    l2GlowIntensity: 85,
+    bgFadeTime: 4.65,
+    hudPreset: "SCENE 3: SPINNING GLOBE & WAVY TEXT",
+    l1Label: "Left Silhouette (Scene 4)",
+    l2Label: "Right Silhouette (Scene 4)",
     z0Label: "Crimson Radial Atmosphere"
   },
   dual_silhouette: {
@@ -48674,6 +48783,92 @@ function renderWavyKineticSpans(containerEl, text, progress, isWavyMode) {
   }
 }
 
+// Renders Scene 3 ("FOR ALMOST NOTHING."):
+// 1) Words appear one after the other in a wavy form (Image 3: "NOTHING" dipped lower in a wave while "FOR ALMOST" is higher)
+// 2) Then the wave flattens out so all words sit on a crisp horizontal line and the trailing period "." snaps in (Image 4)
+function renderGlobeWavyHeadlineSpans(containerEl, rawText, elapsedSec) {
+  if (!containerEl) return;
+  const cleanText = (rawText || 'FOR ALMOST NOTHING.').trim();
+  const hasDot = cleanText.endsWith('.');
+  const coreText = hasDot ? cleanText.slice(0, -1) : cleanText;
+  const words = coreText.split(/\s+/).filter(Boolean);
+
+  const cacheKey = cleanText + '__v1';
+  if (containerEl.getAttribute('data-globe-raw') !== cacheKey) {
+    containerEl.setAttribute('data-globe-raw', cacheKey);
+    containerEl.innerHTML = '';
+    words.forEach((word, wIdx) => {
+      const wSpan = document.createElement('span');
+      wSpan.setAttribute('data-word-idx', String(wIdx));
+      wSpan.style.display = 'inline-block';
+      wSpan.style.willChange = 'transform, opacity';
+      Array.from(word).forEach((ch, cIdx) => {
+        const cSpan = document.createElement('span');
+        cSpan.setAttribute('data-char-idx', String(cIdx));
+        cSpan.style.display = 'inline-block';
+        cSpan.style.willChange = 'transform, opacity';
+        cSpan.textContent = ch;
+        wSpan.appendChild(cSpan);
+      });
+      containerEl.appendChild(wSpan);
+      if (wIdx < words.length - 1) {
+        const spaceSpan = document.createElement('span');
+        spaceSpan.style.display = 'inline-block';
+        spaceSpan.innerHTML = '&nbsp;';
+        containerEl.appendChild(spaceSpan);
+      }
+    });
+    if (hasDot) {
+      const dotSpan = document.createElement('span');
+      dotSpan.setAttribute('data-globe-dot', '1');
+      dotSpan.style.display = 'inline-block';
+      dotSpan.style.willChange = 'transform, opacity';
+      dotSpan.textContent = '.';
+      containerEl.appendChild(dotSpan);
+    }
+  }
+
+  // Timeline inside Scene 3 text reveal (elapsedSec starts at 0 when text begins):
+  // 0.00s -> 1.15s: Words appear one after the other in wavy form (Image 3)
+  // 1.15s -> 1.65s: Wave flattens out smoothly to 0 offset (Image 4)
+  // 1.45s -> 1.70s: Trailing period "." appears as the line stabilizes flat (Image 4)
+  const flattenProg = bpEaseInOutCubic((elapsedSec - 1.10) / 0.52);
+  const waveAmp = 1.0 - flattenProg;
+
+  const wordEls = containerEl.querySelectorAll('[data-word-idx]');
+  const totalWords = wordEls.length || 1;
+  let globalCharIdx = 0;
+
+  wordEls.forEach((wEl, wIdx) => {
+    const wordStart = wIdx * 0.28;
+    const wProg = bpEaseOutCubic((elapsedSec - wordStart) / 0.36);
+    wEl.style.opacity = Math.min(1, wProg * 1.5).toFixed(3);
+
+    // In Image 3, each successive word steps into a wave trough/crest before flattening in Image 4:
+    // Word 0 ("FOR"): slightly high, Word 1 ("ALMOST"): mid-high, Word 2 ("NOTHING"): noticeably lower (+12px dip)
+    const wordWaveOffset = (wIdx === totalWords - 1 && totalWords >= 2) ? 11.0 : (wIdx * 3.0 - 2.0);
+
+    const charEls = wEl.querySelectorAll('[data-char-idx]');
+    charEls.forEach((cEl, cIdx) => {
+      const charDelay = wordStart + cIdx * 0.035;
+      const cProg = bpEaseOutCubic((elapsedSec - charDelay) / 0.32);
+      const entryRise = (1 - cProg) * 20;
+      const charWave = Math.sin(globalCharIdx * 0.55 - elapsedSec * 4.2) * 4.5;
+      const ty = entryRise + (wordWaveOffset + charWave) * waveAmp;
+      cEl.style.transform = `translate3d(0px, ${ty.toFixed(1)}px, 0)`;
+      globalCharIdx++;
+    });
+  });
+
+  const dotEl = containerEl.querySelector('[data-globe-dot="1"]');
+  if (dotEl) {
+    // Dot appears right as the wave flattens (Image 3 has no dot yet; Image 4 has the flat text + dot!)
+    const dotProg = bpEaseOutCubic((elapsedSec - 1.38) / 0.25);
+    dotEl.style.opacity = dotProg.toFixed(3);
+    dotEl.style.transform = `translate3d(0px, ${((1 - dotProg) * 10).toFixed(1)}px, 0) scale(${(0.5 + 0.5 * dotProg).toFixed(2)})`;
+  }
+}
+
 function updateMagnatesBPVisualStyles() {
   const headlineEl = document.getElementById('magnates-bp-headline');
   const subcaptionEl = document.getElementById('magnates-bp-subcaption');
@@ -48701,12 +48896,30 @@ function updateMagnatesBPVisualStyles() {
 
   const p = magnatesBPState.playhead;
   const dur = magnatesBPState.duration;
-  const isFullFlowForTimer = magnatesBPState.preset === 'full_story_flow';
-  const tShiftRightForTimer = magnatesBPState.preset === 'products_unfurl' ? 0.35 : (magnatesBPState.logoShiftRightTime ?? 3.10);
-  const tSceneBStartForTimer = magnatesBPState.productsEnabled ? 7.20 : 4.50;
-  const sceneNumLabel = isFullFlowForTimer
-    ? (p < tShiftRightForTimer ? 'Scene 1' : (p < tSceneBStartForTimer ? 'Scene 2' : 'Scene 3'))
-    : (magnatesBPState.preset === 'brand_wavy_intro' ? 'Scene 1' : (magnatesBPState.preset === 'products_unfurl' ? 'Scene 2' : 'Scene 3'));
+  const isFullFlow = magnatesBPState.preset === 'full_story_flow';
+  const isBrandOnly = magnatesBPState.preset === 'brand_wavy_intro';
+  const isProductsOnly = magnatesBPState.preset === 'products_unfurl';
+  const isGlobeOnly = magnatesBPState.preset === 'globe_wavy_nothing';
+  const isRoomScene = magnatesBPState.preset === 'room_spawn';
+  const hasProductsPhase = isProductsOnly || isGlobeOnly || (isFullFlow && Boolean(magnatesBPState.productsEnabled));
+  const hasGlobePhase = isGlobeOnly || (isFullFlow && Boolean(magnatesBPState.globeEnabled !== false));
+
+  const tShiftRight = isProductsOnly ? 0.35 : (isGlobeOnly ? -2.5 : (magnatesBPState.logoShiftRightTime ?? 3.10));
+  const unfurlDur = magnatesBPState.unfurlSpeed ?? 0.45;
+  // When Scene 2 finishes, the Products + Price tags + Logo move UP as a whole at tOut while the Globe rises from bottom!
+  const tOut = isProductsOnly
+    ? 4.25
+    : (isGlobeOnly ? 0.15 : (hasProductsPhase ? Math.max(6.40, tShiftRight + 3.20) : (magnatesBPState.logoOutTime ?? 4.15)));
+  const tGlobeStart = isGlobeOnly ? 0.15 : (tOut + 0.05);
+  const tGlobeExit = isGlobeOnly ? 3.95 : (tGlobeStart + 3.35); // ~9.85s in full_story_flow
+  // Seamless overlap (Image 5): $1,000,000 counter begins emerging at tGlobeExit + 0.15s (~10.00s) WHILE the globe is gliding down and "FOR ALMOST NOTHING." is fading!
+  const sceneBOffset = isFullFlow
+    ? (hasGlobePhase ? (tGlobeExit + 0.15) : (hasProductsPhase ? 7.20 : 4.50))
+    : 0.0;
+
+  const sceneNumLabel = isFullFlow
+    ? (p < tShiftRight ? 'Scene 1' : (p < tGlobeStart ? 'Scene 2' : (p < sceneBOffset ? 'Scene 3' : 'Scene 4')))
+    : (isBrandOnly ? 'Scene 1' : (isProductsOnly ? 'Scene 2' : (isGlobeOnly ? 'Scene 3' : 'Scene 4')));
   const timeText = `${p.toFixed(1)}s / ${dur.toFixed(1)}s (${sceneNumLabel})`;
   if (timerEl) timerEl.textContent = timeText;
   if (hudTimecode) hudTimecode.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
@@ -48735,13 +48948,6 @@ function updateMagnatesBPVisualStyles() {
     thumbZ3.src = magnatesBPState.primaryCutoutUrl;
   }
 
-  // Determine Timeline Offset for Scene B when in Full Merged Story Flow
-  const isFullFlow = magnatesBPState.preset === 'full_story_flow';
-  const isBrandOnly = magnatesBPState.preset === 'brand_wavy_intro';
-  const isProductsOnly = magnatesBPState.preset === 'products_unfurl';
-  const isRoomScene = magnatesBPState.preset === 'room_spawn';
-  const hasProductsPhase = isProductsOnly || (isFullFlow && Boolean(magnatesBPState.productsEnabled));
-  const sceneBOffset = isFullFlow ? (hasProductsPhase ? 7.20 : 4.50) : 0.0;
   const effectiveBgFadeTime = isFullFlow
     ? (sceneBOffset + magnatesBPState.bgFadeTime)
     : magnatesBPState.bgFadeTime;
@@ -48801,14 +49007,9 @@ function updateMagnatesBPVisualStyles() {
   //     Left Product Card unfurls Top&Bottom -> Left Price ($2.00) unfurls Left&Right ->
   //     Right Product Card unfurls Top&Bottom -> Right Price ($5.00) unfurls Left&Right
   // =========================================================
-  const showSceneA = magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly || isProductsOnly);
-  const tIn = isProductsOnly ? -1.0 : (magnatesBPState.logoInTime ?? 0.35);
-  const tShift = isProductsOnly ? -0.8 : (magnatesBPState.logoShiftTime ?? 1.25);
-  const tShiftRight = isProductsOnly ? 0.35 : (magnatesBPState.logoShiftRightTime ?? 3.10);
-  const unfurlDur = magnatesBPState.unfurlSpeed ?? 0.45;
-  const tOut = isProductsOnly
-    ? 4.25
-    : (hasProductsPhase ? Math.max(magnatesBPState.logoOutTime ?? 6.75, tShiftRight + 3.45) : (magnatesBPState.logoOutTime ?? 4.15));
+  const showSceneA = magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly || isProductsOnly || isGlobeOnly);
+  const tIn = (isProductsOnly || isGlobeOnly) ? -1.0 : (magnatesBPState.logoInTime ?? 0.35);
+  const tShift = (isProductsOnly || isGlobeOnly) ? -0.8 : (magnatesBPState.logoShiftTime ?? 1.25);
 
   if (logoLayer && logoImg) {
     if (!showSceneA) {
@@ -48827,14 +49028,14 @@ function updateMagnatesBPVisualStyles() {
       const shiftLeftProg = bpEaseInOutCubic((p - tShift) / 0.50);
       // 3. Left -> Right back to Center (Image 1 -> Image 2: e.g. 3.10s to 3.62s)
       const shiftRightToCenterProg = hasProductsPhase ? bpEaseInOutCubic((p - tShiftRight) / 0.52) : 0;
-      // 4. Final Exit at end of Scene A2 (at tOut)
-      const exitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.42) : 0;
+      // 4. Final Exit at end of Scene 2 (at tOut): Moves UPWARD as a whole with the product cards & price tags (Image 1)!
+      const exitProg = p >= tOut ? bpEaseInOutCubic((p - tOut) / 0.58) : 0;
 
       // Net left offset: 0 at center, 1 when shifted left, returns to 0 when shifted right back to center!
       const netLeftFactor = shiftLeftProg * (1 - shiftRightToCenterProg);
       const baseTx = -50 - netLeftFactor * 136;
-      const baseTy = -50 + (1 - riseProg) * 185 + exitProg * 140;
-      const op = Math.max(0, Math.min(1, (p < tIn ? 0 : riseProg * 1.35) * (1 - exitProg * 1.15)));
+      const baseTy = -50 + (1 - riseProg) * 185 - exitProg * 235;
+      const op = Math.max(0, Math.min(1, (p < tIn ? 0 : riseProg * 1.35) * (1 - Math.pow(exitProg, 1.4) * 1.15)));
 
       logoLayer.style.transform = `translate3d(${baseTx.toFixed(2)}%, ${baseTy.toFixed(2)}%, 0)`;
       logoLayer.style.opacity = op.toFixed(3);
@@ -48946,17 +49147,16 @@ function updateMagnatesBPVisualStyles() {
     prod2Img.style.opacity = (1.0 - veil2Op * 0.28).toFixed(2);
   }
 
-  const showProducts = showSceneA && hasProductsPhase && p >= (tShiftRight + 0.35) && p < (tOut + 0.45);
-  const prodExitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.40) : 0;
+  const showProducts = showSceneA && hasProductsPhase && p >= (tShiftRight + 0.35) && p < (tOut + 0.65);
+  // At tOut, the entire product card + price tag assembly glides UPWARD as a whole (Image 1 shows the bottom of the red cards & $2.00 / $5.00 tags rising off the top edge!)
+  const prodMoveUpProg = p >= tOut ? bpEaseInOutCubic((p - tOut) / 0.58) : 0;
+  const prodWholeTy = -prodMoveUpProg * 125; // % of layer height upward
+  const prodWholeOp = Math.max(0, 1 - Math.pow(prodMoveUpProg, 1.65) * 1.15);
 
   // Timing milestones matching Images 2, 3, 4, 5:
-  // 1) Left Product Card unfurls Top & Bottom from center line after logo stops at center:
   const tProd1CardStart = tShiftRight + 0.50;
-  // 2) Left Price Tag ($2.00) unfurls Left & Right from center line slightly after:
   const tProd1PriceStart = tProd1CardStart + unfurlDur + 0.12;
-  // 3) Right Product Card unfurls Top & Bottom from center line after Left Price Tag:
   const tProd2CardStart = tProd1PriceStart + unfurlDur + 0.18;
-  // 4) Right Price Tag ($5.00) unfurls Left & Right from center line after Right Product Card:
   const tProd2PriceStart = tProd2CardStart + unfurlDur + 0.12;
 
   if (prod1Layer && prod1Card && prod1Pill) {
@@ -48964,14 +49164,15 @@ function updateMagnatesBPVisualStyles() {
       prod1Layer.style.display = 'none';
     } else {
       prod1Layer.style.display = 'flex';
-      // Vertical Center-Out Unfurl (Top & Bottom expand simultaneously from middle 50%)
-      const c1Prog = bpEaseOutCubic((p - tProd1CardStart) / unfurlDur) * (1 - prodExitProg);
+      prod1Layer.style.transform = `translate3d(0%, ${prodWholeTy.toFixed(2)}%, 0)`;
+      prod1Layer.style.opacity = prodWholeOp.toFixed(3);
+
+      const c1Prog = bpEaseOutCubic((p - tProd1CardStart) / unfurlDur);
       const vInset1 = ((1 - c1Prog) * 50).toFixed(2);
-      prod1Card.style.clipPath = `inset(${vInset1}% 0% ${vInset1}% 0% round 16px)`;
+      prod1Card.style.clipPath = `inset(${vInset1}% 0% ${vInset1}% 0% round 22px)`;
       prod1Card.style.opacity = Math.min(1, c1Prog * 1.8).toFixed(3);
 
-      // Horizontal Center-Out Unfurl (Left & Right expand simultaneously from middle 50%)
-      const p1Prog = bpEaseOutCubic((p - tProd1PriceStart) / (unfurlDur * 0.88)) * (1 - prodExitProg);
+      const p1Prog = bpEaseOutCubic((p - tProd1PriceStart) / (unfurlDur * 0.88));
       const hInset1 = ((1 - p1Prog) * 50).toFixed(2);
       prod1Pill.style.clipPath = `inset(0% ${hInset1}% 0% ${hInset1}% round 999px)`;
       prod1Pill.style.opacity = Math.min(1, p1Prog * 1.8).toFixed(3);
@@ -48983,14 +49184,15 @@ function updateMagnatesBPVisualStyles() {
       prod2Layer.style.display = 'none';
     } else {
       prod2Layer.style.display = 'flex';
-      // Vertical Center-Out Unfurl (Top & Bottom expand simultaneously from middle 50%)
-      const c2Prog = bpEaseOutCubic((p - tProd2CardStart) / unfurlDur) * (1 - prodExitProg);
+      prod2Layer.style.transform = `translate3d(0%, ${prodWholeTy.toFixed(2)}%, 0)`;
+      prod2Layer.style.opacity = prodWholeOp.toFixed(3);
+
+      const c2Prog = bpEaseOutCubic((p - tProd2CardStart) / unfurlDur);
       const vInset2 = ((1 - c2Prog) * 50).toFixed(2);
-      prod2Card.style.clipPath = `inset(${vInset2}% 0% ${vInset2}% 0% round 16px)`;
+      prod2Card.style.clipPath = `inset(${vInset2}% 0% ${vInset2}% 0% round 22px)`;
       prod2Card.style.opacity = Math.min(1, c2Prog * 1.8).toFixed(3);
 
-      // Horizontal Center-Out Unfurl (Left & Right expand simultaneously from middle 50%)
-      const p2Prog = bpEaseOutCubic((p - tProd2PriceStart) / (unfurlDur * 0.88)) * (1 - prodExitProg);
+      const p2Prog = bpEaseOutCubic((p - tProd2PriceStart) / (unfurlDur * 0.88));
       const hInset2 = ((1 - p2Prog) * 50).toFixed(2);
       prod2Pill.style.clipPath = `inset(0% ${hInset2}% 0% ${hInset2}% round 999px)`;
       prod2Pill.style.opacity = Math.min(1, p2Prog * 1.8).toFixed(3);
@@ -48998,10 +49200,67 @@ function updateMagnatesBPVisualStyles() {
   }
 
   // =========================================================
+  // SCENE 3 RENDER: Spinning Earth Globe (Z=8) & Wavy-to-Flat Headline "FOR ALMOST NOTHING." (Z=9)
+  // =========================================================
+  const globeLayer = document.getElementById('magnates-bp-layer-globe');
+  const globeImg = document.getElementById('magnates-bp-img-globe');
+  const globeTextLayer = document.getElementById('magnates-bp-layer-globe-text');
+  const globeHeadlineEl = document.getElementById('magnates-bp-globe-headline');
+
+  if (globeImg && globeImg.getAttribute('src') !== (magnatesBPState.globeUrl || '/globe_atlantic_clean.svg')) {
+    globeImg.src = magnatesBPState.globeUrl || '/globe_atlantic_clean.svg';
+  }
+  const thumbZ8 = document.getElementById('magnates-bp-thumb-z8');
+  if (thumbZ8 && thumbZ8.getAttribute('src') !== (magnatesBPState.globeUrl || '/globe_atlantic_clean.svg')) {
+    thumbZ8.src = magnatesBPState.globeUrl || '/globe_atlantic_clean.svg';
+  }
+
+  const showGlobeScene = hasGlobePhase && p >= (tGlobeStart - 0.05) && p < (tGlobeExit + 0.70);
+  if (globeLayer && globeImg) {
+    if (!showGlobeScene) {
+      globeLayer.style.display = 'none';
+    } else {
+      globeLayer.style.display = 'flex';
+      // 1) Glides in from bottom -> up (tGlobeStart to tGlobeStart + 0.58s, matching Image 1)
+      const gRiseProg = bpEaseOutCubic((p - tGlobeStart) / 0.58);
+      // 2) Exits from its location -> down (tGlobeExit to tGlobeExit + 0.62s, matching Image 5)
+      const gExitDownProg = p >= tGlobeExit ? bpEaseInCubic((p - tGlobeExit) / 0.62) : 0;
+
+      const gy = (1 - gRiseProg) * 85 + gExitDownProg * 92;
+      const gOp = Math.max(0, Math.min(1, gRiseProg * 1.45) * (1 - gExitDownProg * 1.1));
+      globeLayer.style.transform = `translate3d(-50%, ${gy.toFixed(2)}%, 0)`;
+      globeLayer.style.opacity = gOp.toFixed(3);
+
+      // Continuous spin in the direction indicated in Image 2 (Left->Right clockwise arc at top of globe)
+      const spinDegPerSec = magnatesBPState.globeSpinSpeed ?? 18;
+      const spinSign = (magnatesBPState.globeSpinDir || 'cw') === 'ccw' ? -1 : 1;
+      const elapsedGlobe = Math.max(0, p - tGlobeStart);
+      const currentDeg = elapsedGlobe * spinDegPerSec * spinSign;
+      globeImg.style.transform = `rotate(${currentDeg.toFixed(2)}deg)`;
+    }
+  }
+
+  if (globeTextLayer && globeHeadlineEl) {
+    const tGlobeTextStart = tGlobeStart + 0.55;
+    const showGlobeText = showGlobeScene && p >= tGlobeTextStart;
+    if (!showGlobeText) {
+      globeTextLayer.style.display = 'none';
+    } else {
+      globeTextLayer.style.display = 'flex';
+      const elapsedText = p - tGlobeTextStart;
+      renderGlobeWavyHeadlineSpans(globeHeadlineEl, magnatesBPState.globeHeadline || 'FOR ALMOST NOTHING.', elapsedText);
+      // As the globe glides down (tGlobeExit), "FOR ALMOST NOTHING." stays flat briefly so it overlaps with the emerging $999,655 counter (Image 5!) before fading out
+      const textFadeOut = p >= (tGlobeExit + 0.22) ? bpEaseInCubic((p - (tGlobeExit + 0.22)) / 0.42) : 0;
+      globeTextLayer.style.opacity = (Math.max(0, 1 - textFadeOut) * bgOpacity).toFixed(3);
+      globeTextLayer.style.transform = 'translate3d(0px, -50%, 0)';
+    }
+  }
+
+  // =========================================================
   // SCENE B / C RENDER: $1,000,000 Counter (Z=1) & Cutouts (Z=2, Z=3)
   // =========================================================
   const localPB = p - sceneBOffset;
-  const inSceneBWindow = !isBrandOnly && !isProductsOnly && (!isFullFlow || localPB >= 0);
+  const inSceneBWindow = !isBrandOnly && !isProductsOnly && !isGlobeOnly && (!isFullFlow || localPB >= 0);
 
   if (textWrap) {
     if (!magnatesBPState.showCounter || !inSceneBWindow) {
@@ -49138,7 +49397,8 @@ function updateMagnatesBPVisualStyles() {
     let isCardActive = false;
     if (magnatesBPState.preset === 'full_story_flow') {
       if (cType === 'brand_wavy_intro') isCardActive = p < tShiftRight;
-      else if (cType === 'products_unfurl') isCardActive = p >= tShiftRight && p < sceneBOffset;
+      else if (cType === 'products_unfurl') isCardActive = p >= tShiftRight && p < tGlobeStart;
+      else if (cType === 'globe_wavy_nothing') isCardActive = p >= tGlobeStart && p < sceneBOffset;
       else if (cType === 'dual_silhouette') isCardActive = p >= sceneBOffset;
     } else if (magnatesBPState.preset === 'brand_wavy_intro') {
       if (cType === 'brand_wavy_intro') isCardActive = p < tShiftRight;
@@ -49173,6 +49433,16 @@ function updateMagnatesBPVisualStyles() {
       phaseText = "SCENE 2 // 2. LEFT PRODUCT & $2.00 UNFURL";
     } else {
       phaseText = "SCENE 2 // 3. RIGHT PRODUCT & $5.00 UNFURL";
+    }
+  } else if (showGlobeScene) {
+    if (p < tGlobeStart + 0.58) {
+      phaseText = "SCENE 3 // 1. PRODUCTS GLIDE UP & GLOBE RISES";
+    } else if (p < tGlobeStart + 1.70) {
+      phaseText = "SCENE 3 // 2. GLOBE SPINS + WAVY WORDS REVEAL";
+    } else if (p < tGlobeExit) {
+      phaseText = "SCENE 3 // 3. HEADLINE FLATTENS + PERIOD SNAPS";
+    } else {
+      phaseText = "SCENE 3 // 4. GLOBE EXITS DOWN → $1M COUNTER";
     }
   } else {
     if (localPB < magnatesBPState.l1InTime) {
@@ -49246,6 +49516,7 @@ const MAGNATES_BP_SYNC_FIELDS = [
   'prodVeilColor', 'prod1VeilOp', 'prod2VeilOp', 'prod1Bright', 'prod2Bright',
   'prod1Url', 'prod1Price', 'prod1GlowColor', 'prod1GlowIntensity',
   'prod2Url', 'prod2Price', 'prod2GlowColor', 'prod2GlowIntensity',
+  'globeEnabled', 'globeUrl', 'globeHeadline', 'globeSpinSpeed', 'globeSpinDir',
   'headline', 'subcaption',
   'l1InAnim', 'l1OutAnim', 'l1InTime', 'l1OutTime', 'l1GlowColor', 'l1GlowIntensity',
   'l2InAnim', 'l2OutAnim', 'l2InTime', 'l2OutTime', 'l2GlowColor', 'l2GlowIntensity',
@@ -49298,11 +49569,12 @@ function syncMagnatesBPInspectorControlsFromState() {
 
   // Update Modal Header Title based on which linked template / mode is active
   const titleMap = {
-    full_story_flow: 'Merged Master Suite: Brand Hook → Product Unfurl → $1M Silhouettes',
+    full_story_flow: 'Merged Master Suite: Logo Hook → Price Unfurl → Spinning Globe → $1M Silhouettes',
     brand_wavy_intro: 'Scene 1 Suite: Brand Icon Rise, Left Shift & Wavy Headline',
     products_unfurl: 'Scene 2 Suite: Logo Shift Right & Product / Price Unfurl ($2.00 & $5.00)',
-    dual_silhouette: 'Scene 3 Suite: $1,000,000 Counter & Dual Glowing Silhouettes',
-    room_spawn: 'Scene 4 Suite: Empty Office Room & Desk Cutout Glide'
+    globe_wavy_nothing: 'Scene 3 Suite: Spinning Earth Globe & "FOR ALMOST NOTHING." Wavy Reveal',
+    dual_silhouette: 'Scene 4 Suite: $1,000,000 Counter & Dual Glowing Silhouettes',
+    room_spawn: 'Scene 5 Suite: Empty Office Room & Desk Cutout Glide'
   };
   setTxt('magnates-bp-modal-title', titleMap[pKey] || 'Dynamic Cutout & Silhouette Motion Suite');
 
@@ -49357,6 +49629,14 @@ function syncMagnatesBPInspectorControlsFromState() {
   setTxt('magnates-bp-val-unfurl-speed', `${(magnatesBPState.unfurlSpeed ?? 0.45).toFixed(2)}s`);
   setTxt('magnates-bp-label-z6', `Left Product & ${magnatesBPState.prod1Price || '$2.00'} Tag`);
   setTxt('magnates-bp-label-z7', `Right Product & ${magnatesBPState.prod2Price || '$5.00'} Tag`);
+
+  // Sync Scene 3 Spinning Globe & Wavy-to-Flat Headline Controls
+  const chkGlobe = document.getElementById('magnates-bp-toggle-globe');
+  if (chkGlobe) chkGlobe.checked = magnatesBPState.globeEnabled !== false;
+  setVal('magnates-bp-input-globe-text', magnatesBPState.globeHeadline || 'FOR ALMOST NOTHING.');
+  setVal('magnates-bp-globe-spin-speed', magnatesBPState.globeSpinSpeed ?? 18);
+  setTxt('magnates-bp-val-globe-spin', `${magnatesBPState.globeSpinSpeed ?? 18}°/s`);
+  setVal('magnates-bp-globe-spin-dir', magnatesBPState.globeSpinDir || 'cw');
 
   // Sync Scene B / C Controls from shared state
   setVal('magnates-bp-l1-in-anim', magnatesBPState.l1InAnim);
@@ -49451,6 +49731,16 @@ function applyMagnatesBPPresetToState(pKey) {
     magnatesBPState.logoEnabled = true;
     magnatesBPState.wavyTextEnabled = true;
     magnatesBPState.productsEnabled = true;
+    magnatesBPState.l1Enabled = false;
+    magnatesBPState.l2Enabled = false;
+    magnatesBPState.showCounter = false;
+    magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'globe_wavy_nothing') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = true;
+    magnatesBPState.wavyTextEnabled = false;
+    magnatesBPState.productsEnabled = true;
+    magnatesBPState.globeEnabled = true;
     magnatesBPState.l1Enabled = false;
     magnatesBPState.l2Enabled = false;
     magnatesBPState.showCounter = false;
@@ -49626,12 +49916,13 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
   // 2. Highlight and scroll the corresponding control card into view
   const cardLogo = document.getElementById('magnates-bp-card-logo-controls');
   const cardProds = document.getElementById('magnates-bp-card-products-controls');
+  const cardGlobe = document.getElementById('magnates-bp-card-globe-controls');
   const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
   const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
   const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
   const cardExtra = document.getElementById('magnates-bp-card-extra-controls');
 
-  [cardLogo, cardProds, cardL1, cardL2, cardZ0].forEach((c) => {
+  [cardLogo, cardProds, cardGlobe, cardL1, cardL2, cardZ0].forEach((c) => {
     if (c) {
       c.style.borderColor = 'rgba(255,255,255,0.06)';
       c.style.background = 'rgba(255,255,255,0.02)';
@@ -49650,6 +49941,11 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
     cardProds.style.background = 'rgba(251, 113, 133, 0.06)';
     cardProds.style.boxShadow = '0 0 16px rgba(251, 113, 133, 0.15)';
     cardProds.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if ((layerId === 'z8' || layerId === 'z9') && cardGlobe) {
+    cardGlobe.style.borderColor = 'rgba(52, 211, 153, 0.65)';
+    cardGlobe.style.background = 'rgba(52, 211, 153, 0.06)';
+    cardGlobe.style.boxShadow = '0 0 16px rgba(52, 211, 153, 0.15)';
+    cardGlobe.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } else if (layerId === 'z2' && cardL1) {
     cardL1.style.borderColor = 'rgba(56, 189, 248, 0.65)';
     cardL1.style.background = 'rgba(56, 189, 248, 0.06)';
@@ -49694,6 +49990,8 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
   const floatLbl = document.getElementById('magnates-bp-float-label');
   if (floatBar && floatLbl && showFloatingBar) {
     const names = {
+      z9: 'Z=9 // GLOBE WAVY TEXT',
+      z8: 'Z=8 // SPINNING GLOBE',
       z7: 'Z=7 // RIGHT PRODUCT ($5)',
       z6: 'Z=6 // LEFT PRODUCT ($2)',
       z5: 'Z=5 // WAVY HEADLINE',
@@ -49952,9 +50250,49 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
+  // Scene 3 Spinning Earth Globe & Wavy-to-Flat Headline Listeners (Z=8 & Z=9)
+  const ensurePlayheadInGlobe = () => {
+    const tG = magnatesBPState.preset === 'globe_wavy_nothing' ? 0.15 : 6.45;
+    if (magnatesBPState.playhead < tG + 0.6 || magnatesBPState.playhead > tG + 3.1) {
+      magnatesBPState.playhead = tG + 2.0;
+    }
+  };
+  document.getElementById('magnates-bp-toggle-globe')?.addEventListener('change', (e) => {
+    magnatesBPState.globeEnabled = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-globe-text')?.addEventListener('input', (e) => {
+    magnatesBPState.globeHeadline = e.target.value;
+    magnatesBPState.globeEnabled = true;
+    ensurePlayheadInGlobe();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-globe-spin-speed')?.addEventListener('input', (e) => {
+    magnatesBPState.globeSpinSpeed = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-globe-spin');
+    if (lbl) lbl.textContent = `${magnatesBPState.globeSpinSpeed}°/s`;
+    ensurePlayheadInGlobe();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-globe-spin-dir')?.addEventListener('change', (e) => {
+    magnatesBPState.globeSpinDir = e.target.value;
+    ensurePlayheadInGlobe();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-upload-z8')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.globeUrl = URL.createObjectURL(file);
+    magnatesBPState.globeEnabled = true;
+    ensurePlayheadInGlobe();
+    updateMagnatesBPVisualStyles();
+  });
+
   // Granular Layer 1 (Z=2) Controls
   const jumpToSceneBTime = (localT) => {
-    const offset = magnatesBPState.preset === 'full_story_flow' ? (magnatesBPState.productsEnabled ? 7.20 : 4.50) : 0.0;
+    const offset = magnatesBPState.preset === 'full_story_flow'
+      ? (magnatesBPState.globeEnabled !== false ? 10.00 : (magnatesBPState.productsEnabled ? 7.20 : 4.50))
+      : 0.0;
     magnatesBPState.playhead = Math.max(0, offset + localT);
   };
 
@@ -50204,6 +50542,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     else if (sel === 'z3') magnatesBPState.primaryCutoutUrl = url;
     else if (sel === 'z6') magnatesBPState.prod1Url = url;
     else if (sel === 'z7') magnatesBPState.prod2Url = url;
+    else if (sel === 'z8') magnatesBPState.globeUrl = url;
     else if (sel === 'z0') magnatesBPState.bgPlateUrl = url;
     else if (sel && sel.startsWith('extra_')) {
       const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === sel);
@@ -50336,8 +50675,12 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
           magnatesBPState.productsEnabled = true;
           magnatesBPState.playhead = magnatesBPState.logoShiftRightTime ?? 3.10;
           selectMagnatesBPLayer('z6');
+        } else if (targetScene === 'globe_wavy_nothing') {
+          magnatesBPState.globeEnabled = true;
+          magnatesBPState.playhead = 6.45;
+          selectMagnatesBPLayer('z8');
         } else if (targetScene === 'dual_silhouette') {
-          magnatesBPState.playhead = magnatesBPState.productsEnabled ? 7.20 : 4.50;
+          magnatesBPState.playhead = magnatesBPState.globeEnabled !== false ? 10.00 : (magnatesBPState.productsEnabled ? 7.20 : 4.50);
           selectMagnatesBPLayer('z2');
         } else {
           magnatesBPState.playhead = 0.0;
@@ -50348,6 +50691,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
         applyMagnatesBPPresetToState(targetScene);
         magnatesBPState.playhead = 0;
         if (targetScene === 'products_unfurl') selectMagnatesBPLayer('z6');
+        else if (targetScene === 'globe_wavy_nothing') selectMagnatesBPLayer('z8');
         else if (targetScene === 'dual_silhouette') selectMagnatesBPLayer('z2');
         else selectMagnatesBPLayer('z4');
         updateMagnatesBPVisualStyles();
@@ -50405,7 +50749,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   });
 
   const stage = document.getElementById('magnates-bp-stage');
-  ['z2', 'z3', 'z4', 'z5', 'z6', 'z7'].forEach((lid) => {
+  ['z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8', 'z9'].forEach((lid) => {
     const el = stage?.querySelector(`[data-bp-layer="${lid}"]`);
     if (el) {
       el.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(lid));
