@@ -773,12 +773,16 @@
       bodyText: 'According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.',
       dofBokeh: true,
       dofBlur: 14,
-      cameraPitch: 12,
-      cameraYaw: -9,
-      cameraRoll: 2.5,
+      dofBgBlur: 7,
+      dofFgBlur: 14,
+      cameraPitch: 10,
+      cameraYaw: -7,
+      cameraRoll: 2,
       perspective: 1100,
       showDogEar: true,
       dogEarSize: 54,
+      paperBrightness: 104,
+      inkContrast: 115,
       paperAging: 75,
       inkBleed: true,
       inkBleedAmount: 0.6,
@@ -797,6 +801,8 @@
       filmGrain: true,
       filmGrainOpacity: 0.22,
       enableHighlight: true,
+      highlightDelay: 0.8,
+      highlightDuration: 2.2,
       highlightColor: '#facc15',
       highlightPhrase: 'structural vulnerabilities known since Q3'
     },
@@ -3292,9 +3298,30 @@
         if (data.cameraYaw !== undefined) root.style.setProperty('--np-camera-yaw', `${data.cameraYaw}deg`);
         if (data.cameraRoll !== undefined) root.style.setProperty('--np-camera-roll', `${data.cameraRoll}deg`);
         if (data.perspective !== undefined) root.style.setProperty('--np-perspective', `${data.perspective}px`);
-        if (data.dofBlur !== undefined) {
-          root.style.setProperty('--np-dof-fg-blur', `${data.dofBlur}px`);
+        if (data.dofBgBlur !== undefined) {
+          root.style.setProperty('--np-dof-bg-blur', `${data.dofBgBlur}px`);
+        } else if (data.dofBlur !== undefined) {
           root.style.setProperty('--np-dof-bg-blur', `${Math.round(data.dofBlur * 0.55)}px`);
+        }
+        if (data.dofFgBlur !== undefined) {
+          root.style.setProperty('--np-dof-fg-blur', `${data.dofFgBlur}px`);
+        } else if (data.dofBlur !== undefined) {
+          root.style.setProperty('--np-dof-fg-blur', `${data.dofBlur}px`);
+        }
+        if (data.paperBrightness !== undefined) {
+          root.style.setProperty('--np-paper-brightness', `${(data.paperBrightness / 100).toFixed(2)}`);
+        }
+        if (data.inkContrast !== undefined) {
+          root.style.setProperty('--np-ink-contrast', `${(data.inkContrast / 100).toFixed(2)}`);
+        }
+        if (data.highlightDelay !== undefined) {
+          root.style.setProperty('--np-hl-delay', `${data.highlightDelay}s`);
+        }
+        if (data.highlightDuration !== undefined) {
+          root.style.setProperty('--np-hl-duration', `${data.highlightDuration}s`);
+        }
+        if (data.highlightColor !== undefined) {
+          root.style.setProperty('--np-hl-color', data.highlightColor);
         }
         if (data.volumetricRays !== undefined || data.rayIntensity !== undefined) {
           const rayOp = data.volumetricRays !== false ? (data.rayIntensity !== undefined ? data.rayIntensity : 0.95) : 0;
@@ -6594,23 +6621,29 @@
       const masthead = data.masthead || 'THE DAILY TIMES';
       const headline = data.headline || 'MAJOR SCANDAL\nEXPOSED';
       const dateline = data.dateline || 'MONDAY, JANUARY 15, 2024';
-      const dofBlur = data.dofBlur !== undefined ? data.dofBlur : 18;
+      const dofBgBlur = data.dofBgBlur !== undefined ? data.dofBgBlur : (data.dofBlur !== undefined ? Math.round(data.dofBlur * 0.5) : 7);
+      const dofFgBlur = data.dofFgBlur !== undefined ? data.dofFgBlur : (data.dofBlur !== undefined ? data.dofBlur : 14);
+      const paperBrightness = data.paperBrightness !== undefined ? data.paperBrightness : 104;
+      const inkContrast = data.inkContrast !== undefined ? data.inkContrast : 115;
+      const highlightDelay = data.highlightDelay !== undefined ? data.highlightDelay : 0.8;
+      const highlightDuration = data.highlightDuration !== undefined ? data.highlightDuration : 2.2;
+      const highlightColor = data.highlightColor || '#facc15';
       const cameraPitch = data.cameraPitch !== undefined ? data.cameraPitch : 10;
       const cameraYaw = data.cameraYaw !== undefined ? data.cameraYaw : -7;
       const cameraRoll = data.cameraRoll !== undefined ? data.cameraRoll : 2;
       const perspective = data.perspective !== undefined ? data.perspective : 1100;
       const showDogEar = data.showDogEar !== false;
-      const dogEarSize = data.dogEarSize !== undefined ? data.dogEarSize : 58;
+      const dogEarSize = data.dogEarSize !== undefined ? data.dogEarSize : 54;
       const volumetricRays = data.volumetricRays !== false;
-      const rayIntensity = data.rayIntensity !== undefined ? data.rayIntensity : 0.95;
+      const rayIntensity = data.rayIntensity !== undefined ? data.rayIntensity : 0.45;
       const rimLight = data.rimLight !== false;
       const warmSpotlight = data.warmSpotlight !== false;
-      const spotIntensity = data.spotIntensity !== undefined ? data.spotIntensity : 1.4;
+      const spotIntensity = data.spotIntensity !== undefined ? data.spotIntensity : 0.5;
       const dustMotes = data.dustMotes !== false;
       const organicDrift = data.organicDrift !== false;
       const motionBlur = data.motionBlur !== false;
       const filmGrain = data.filmGrain !== false;
-      const filmGrainOpacity = data.filmGrainOpacity !== undefined ? data.filmGrainOpacity : 0.26;
+      const filmGrainOpacity = data.filmGrainOpacity !== undefined ? data.filmGrainOpacity : 0.22;
       const inkBleed = data.inkBleed !== false;
 
       const PRESETS = [
@@ -6654,28 +6687,38 @@
             </div>
           </div>
 
-          <!-- Section 1: Cinematic Composition & Shallow DOF -->
+          <!-- Section 1: Granular Depth of Field (Background & Foreground Bokeh) -->
           <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;gap:6px;">
               <span style="font-size:12px;">🎥</span>
-              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Cinematic Composition & Depth of Field</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Optical Depth of Field & Bokeh</span>
             </div>
 
-            <!-- DOF Slider -->
+            <!-- Background Bokeh Slider -->
             <div style="display:flex;flex-direction:column;gap:3px;">
               <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
-                <span>Shallow Depth of Field (Foreground/Background Bokeh)</span>
-                <span id="np-val-dof" style="color:#facc15;font-family:monospace;">${dofBlur}px</span>
+                <span>Background Archival Blur (Deep Space Bokeh)</span>
+                <span id="np-val-bgblur" style="color:#facc15;font-family:monospace;">${dofBgBlur}px</span>
               </div>
-              <input type="range" id="np-inp-dof" min="0" max="35" step="1" value="${dofBlur}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
-              <div style="font-size:9px;color:#64748b;">Central newspaper remains razor sharp while peripheral clippings blur heavily.</div>
+              <input type="range" id="np-inp-bgblur" min="0" max="25" step="1" value="${dofBgBlur}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Controls how out-of-focus background archival pages appear behind the hero clipping.</div>
+            </div>
+
+            <!-- Foreground Cutout Slider -->
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                <span>Foreground Cutout Blur (Camera Lens Proximity)</span>
+                <span id="np-val-fgblur" style="color:#facc15;font-family:monospace;">${dofFgBlur}px</span>
+              </div>
+              <input type="range" id="np-inp-fgblur" min="0" max="30" step="1" value="${dofFgBlur}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Dramatic lens bokeh for the bottom-left clipping framing the camera.</div>
             </div>
 
             <!-- Camera Dynamic Angle Controls -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
-                  <span>Camera Pitch (Low Angle)</span>
+                  <span>Camera Pitch</span>
                   <span id="np-val-pitch" style="color:#c084fc;font-family:monospace;">${cameraPitch}°</span>
                 </div>
                 <input type="range" id="np-inp-pitch" min="-10" max="35" step="1" value="${cameraPitch}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
@@ -6699,7 +6742,7 @@
 
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <div style="display:flex;justify-content:space-between;font-size:9.5px;color:#94a3b8;">
-                  <span>Perspective Space</span>
+                  <span>Perspective Field</span>
                   <span id="np-val-persp" style="color:#c084fc;font-family:monospace;">${perspective}px</span>
                 </div>
                 <input type="range" id="np-inp-persp" min="600" max="1800" step="50" value="${perspective}" style="width:100%;accent-color:#a855f7;height:3px;cursor:pointer;" />
@@ -6707,18 +6750,38 @@
             </div>
           </div>
 
-          <!-- Section 2: Enhanced Texture & Material Realism -->
+          <!-- Section 2: Paper Clarity & Ink Readability (Image 2 Sharpness) -->
           <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:12px;">📃</span>
-              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Paper Texture & Tactile Realism</span>
+              <span style="font-size:12px;">✨</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Paper Clarity & Ink Readability</span>
+            </div>
+
+            <!-- Paper Exposure / Brightness -->
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                <span>Paper Exposure & Brightness</span>
+                <span id="np-val-paperbright" style="color:#facc15;font-family:monospace;">${paperBrightness}%</span>
+              </div>
+              <input type="range" id="np-inp-paperbright" min="80" max="130" step="1" value="${paperBrightness}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Brightens parchment background so the headline and story pop with high clarity.</div>
+            </div>
+
+            <!-- Ink Contrast / Sharpness -->
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                <span>Ink Contrast & Crispness</span>
+                <span id="np-val-inkcontrast" style="color:#facc15;font-family:monospace;">${inkContrast}%</span>
+              </div>
+              <input type="range" id="np-inp-inkcontrast" min="100" max="160" step="1" value="${inkContrast}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Sharpens typographic black values for razor-sharp readability on mobile & desktop.</div>
             </div>
 
             <!-- Folded Corner Dog-Ear -->
-            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;margin-top:2px;">
               <div>
                 <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Folded / Dog-Eared Corner (Image 2)</div>
-                <div style="font-size:9px;color:#94a3b8;">Realistic 3D triangular flap with drop shadow on paper</div>
+                <div style="font-size:9px;color:#94a3b8;">Realistic 3D triangular flap with cast shadow on paper</div>
               </div>
               <input type="checkbox" id="np-chk-dogear" ${showDogEar ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
             </div>
@@ -6734,17 +6797,54 @@
             <!-- Ink Bleed & Letterpress -->
             <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
               <div>
-                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Ink Bleed & Paper Absorption</div>
-                <div style="font-size:9px;color:#94a3b8;">Letterpress diffusion edge instead of sterile digital text</div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Ink Absorption & Letterpress Edge</div>
+                <div style="font-size:9px;color:#94a3b8;">Authentic press diffusion edge instead of sterile digital text</div>
               </div>
               <input type="checkbox" id="np-chk-inkbleed" ${inkBleed ? 'checked' : ''} style="width:16px;height:16px;accent-color:#f59e0b;cursor:pointer;" />
             </div>
           </div>
 
-          <!-- Section 3: Volumetric & Thematic Lighting -->
+          <!-- Section 3: Text Highlighter Timing & Styling -->
           <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:12px;">✨</span>
+              <span style="font-size:12px;">🖊️</span>
+              <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Text Highlighter Animation</span>
+            </div>
+
+            <!-- Start Delay Slider -->
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                <span>Highlight Start Delay ("When")</span>
+                <span id="np-val-hldelay" style="color:#facc15;font-family:monospace;">${highlightDelay.toFixed(1)}s</span>
+              </div>
+              <input type="range" id="np-inp-hldelay" min="0" max="3" step="0.1" value="${highlightDelay}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Controls how many seconds into the scene before the highlighter begins wiping.</div>
+            </div>
+
+            <!-- Wipe Duration Slider -->
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <div style="display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;">
+                <span>Highlighter Wipe Duration</span>
+                <span id="np-val-hldur" style="color:#facc15;font-family:monospace;">${highlightDuration.toFixed(1)}s</span>
+              </div>
+              <input type="range" id="np-inp-hldur" min="0.5" max="4.5" step="0.1" value="${highlightDuration}" style="width:100%;accent-color:#f59e0b;height:4px;cursor:pointer;" />
+              <div style="font-size:9px;color:#64748b;">Speed of the horizontal highlighter wipe stroke across key evidence.</div>
+            </div>
+
+            <!-- Highlighter Color -->
+            <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);padding:6px 8px;border-radius:6px;">
+              <div>
+                <div style="font-size:10.5px;font-weight:600;color:#e2e8f0;">Highlighter Marker Tint</div>
+                <div style="font-size:9px;color:#94a3b8;">Fluorescent investigative marker wash</div>
+              </div>
+              <input type="color" id="np-inp-hlcolor" value="${highlightColor}" style="border:none;background:transparent;width:28px;height:24px;cursor:pointer;" />
+            </div>
+          </div>
+
+          <!-- Section 4: Volumetric & Thematic Lighting -->
+          <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span style="font-size:12px;">💡</span>
               <span style="font-size:10.5px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;">Volumetric & Thematic Lighting</span>
             </div>
 
@@ -6793,7 +6893,7 @@
             </div>
           </div>
 
-          <!-- Section 4: Kinetic Motion & High-End Polish -->
+          <!-- Section 5: Kinetic Motion & High-End Polish -->
           <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;gap:6px;">
               <span style="font-size:12px;">🌀</span>
@@ -6833,7 +6933,7 @@
             </div>
           </div>
 
-          <!-- Section 5: Editorial Content & Typography -->
+          <!-- Section 6: Editorial Content & Typography -->
           <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;gap:6px;">
               <span style="font-size:12px;">✍️</span>
@@ -6902,7 +7002,12 @@
         }
       };
 
-      bindNpSlider('#np-inp-dof', '#np-val-dof', 'dofBlur', v => `${v}px`);
+      bindNpSlider('#np-inp-bgblur', '#np-val-bgblur', 'dofBgBlur', v => `${v}px`);
+      bindNpSlider('#np-inp-fgblur', '#np-val-fgblur', 'dofFgBlur', v => `${v}px`);
+      bindNpSlider('#np-inp-paperbright', '#np-val-paperbright', 'paperBrightness', v => `${v}%`);
+      bindNpSlider('#np-inp-inkcontrast', '#np-val-inkcontrast', 'inkContrast', v => `${v}%`);
+      bindNpSlider('#np-inp-hldelay', '#np-val-hldelay', 'highlightDelay', v => `${v.toFixed(1)}s`);
+      bindNpSlider('#np-inp-hldur', '#np-val-hldur', 'highlightDuration', v => `${v.toFixed(1)}s`);
       bindNpSlider('#np-inp-pitch', '#np-val-pitch', 'cameraPitch', v => `${v}°`);
       bindNpSlider('#np-inp-yaw', '#np-val-yaw', 'cameraYaw', v => `${v}°`);
       bindNpSlider('#np-inp-roll', '#np-val-roll', 'cameraRoll', v => `${v}°`);
@@ -6910,6 +7015,13 @@
       bindNpSlider('#np-inp-dogsize', '#np-val-dogsize', 'dogEarSize', v => `${v}px`);
       bindNpSlider('#np-inp-rayint', '#np-val-rayint', 'rayIntensity', v => `${Math.round(v * 100)}%`);
       bindNpSlider('#np-inp-grain', '#np-val-grain', 'filmGrainOpacity', v => `${Math.round(v * 100)}%`);
+
+      const hlColorInp = container.querySelector('#np-inp-hlcolor');
+      if (hlColorInp) {
+        hlColorInp.addEventListener('input', e => {
+          window.tplSetContextualData('newspaper-3d', { highlightColor: e.target.value });
+        });
+      }
 
       const bindNpChk = (id, prop) => {
         container.querySelector(id)?.addEventListener('change', e => {

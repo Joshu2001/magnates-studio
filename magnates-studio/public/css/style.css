@@ -12606,7 +12606,8 @@ body.tool-slide-active {
   display: flex;
   align-items: center;
   justify-content: center;
-  transform: rotateX(var(--np-camera-pitch, 12deg)) rotateY(var(--np-camera-yaw, -9deg)) rotateZ(var(--np-camera-roll, 2.5deg));
+  perspective-origin: 50% 45%;
+  transform: translateY(12px) rotateX(var(--np-camera-pitch, 10deg)) rotateY(var(--np-camera-yaw, -7deg)) rotateZ(var(--np-camera-roll, 2deg));
   transition: transform 0.25s ease-out;
 }
 
@@ -12632,7 +12633,7 @@ body.tool-slide-active {
   max-height: 82vh;
   background: linear-gradient(178deg, #f7f2e5 0%, #ede5d2 45%, #e4dac2 100%);
   border-radius: 2px;
-  filter: none !important;
+  filter: brightness(var(--np-paper-brightness, 1.04)) contrast(var(--np-paper-contrast, 1.05)) !important;
   box-shadow: 
     0 35px 85px -15px rgba(0, 0, 0, 0.95),
     0 16px 36px -6px rgba(0, 0, 0, 0.75),
@@ -12745,6 +12746,7 @@ body.tool-slide-active {
   clip-path: polygon(0 0, calc(100% - 52px) 0, 100% 52px, 100% 100%, 0 100%);
   display: flex;
   flex-direction: column;
+  filter: contrast(var(--np-ink-contrast, 1.15));
 }
 
 /* Ink Bleed & Letterpress Effect */
@@ -12831,12 +12833,12 @@ body.tool-slide-active {
 /* Highlighter Stroke with Organic Ink Bleed Edge */
 .tpl-np-highlight-stroke {
   position: absolute;
-  background: rgba(250, 204, 21, 0.58);
+  background: var(--np-hl-color, rgba(250, 204, 21, 0.58));
   border-radius: 2px;
-  box-shadow: 0 0 10px rgba(250, 204, 21, 0.55);
+  box-shadow: 0 0 10px var(--np-hl-color, rgba(250, 204, 21, 0.55));
   mix-blend-mode: multiply;
   pointer-events: none;
-  animation: newspaperHighlightWipe 4.5s cubic-bezier(0.2, 0.8, 0.3, 1) infinite;
+  animation: newspaperHighlightWipe var(--np-hl-duration, 2.2s) cubic-bezier(0.2, 0.8, 0.3, 1) infinite var(--np-hl-delay, 0.8s);
 }
 
 @keyframes newspaperHighlightWipe {
