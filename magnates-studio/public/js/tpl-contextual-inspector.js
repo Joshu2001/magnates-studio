@@ -277,9 +277,18 @@
     'subscribe': {
       type: 'subscribe',
       channel: 'Magnates Media',
-      subs: '1.42M subscribers',
-      btnText: 'SUBSCRIBED',
-      btnColor: '#ef4444'
+      subs: 'Road to 1 million',
+      btnText: 'SUBSCRIBE',
+      btnColor: '#ef4444',
+      positionPreset: 'center',
+      posX: 0,
+      posY: 0,
+      scale: 1.0,
+      transparentBg: true,
+      bgPreset: 'transparent',
+      bgMediaUrl: '',
+      bgMediaType: 'video',
+      showBell: true
     },
 
     // 15. Countdown / Top 10
@@ -3413,9 +3422,47 @@
     } else if (tplId === 'budget') {
       const t = fxc.querySelector('.b-title'); if (t) t.textContent = `50/30/20 Budget \u00b7 ${data.income}`;
     } else if (tplId === 'subscribe') {
-      const c = fxc.querySelector('.sub-ch'); if (c) c.textContent = data.channel;
-      const s = fxc.querySelector('.sub-count'); if (s) s.textContent = data.subs;
-      const btn = fxc.querySelector('.sub-btn'); if (btn) btn.textContent = data.btnText;
+      const c = fxc.querySelector('.sub-ch'); if (c) c.textContent = (data.channel !== undefined) ? data.channel : 'Magnates Media';
+      const s = fxc.querySelector('.sub-count'); if (s) s.textContent = data.subs || 'Road to 1 million';
+      const btn = fxc.querySelector('.sub-btn');
+      if (btn) {
+        const btnLbl = btn.querySelector('.sub-btn-label');
+        if (btnLbl) btnLbl.textContent = data.btnText || 'SUBSCRIBE';
+        else btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6z"/></svg><span class="sub-btn-label">${data.btnText || 'SUBSCRIBE'}</span>`;
+        if (data.btnColor) {
+          btn.style.setProperty('--sub-btn-bg', data.btnColor);
+          btn.style.backgroundColor = data.btnColor;
+          btn.style.boxShadow = `0 8px 24px ${data.btnColor}66`;
+        }
+      }
+      const bell = fxc.querySelector('.bell');
+      if (bell) {
+        bell.style.display = data.showBell !== false ? 'grid' : 'none';
+        if (data.bellColor) bell.style.background = data.bellColor;
+      }
+      const wrap = fxc.querySelector('.sub-wrap');
+      if (wrap) {
+        const posX = typeof data.posX === 'number' ? data.posX : 0;
+        const posY = typeof data.posY === 'number' ? data.posY : 0;
+        const scale = typeof data.scale === 'number' ? data.scale : 1.0;
+        wrap.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+      }
+      const root = fxc.querySelector('.tpl-subscribe');
+      if (root) {
+        if (data.transparentBg) {
+          root.classList.add('is-transparent');
+          root.style.background = 'transparent';
+        } else {
+          root.classList.remove('is-transparent');
+          root.style.background = '';
+        }
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+      }
+      if (typeof window.tplUpdateTransformBox === 'function') {
+        window.tplUpdateTransformBox();
+      }
     } else if (tplId === 'newspaper') {
       const n = fxc.querySelector('.paper-name'); if (n) n.textContent = data.paperName;
       const h = fxc.querySelector('.headline'); if (h) h.textContent = data.headline;
@@ -4015,6 +4062,344 @@
     // =========================================================================
     // CASE 1: DEPTH PARALLAX MULTI-LAYER (Image 1)
     // =========================================================================
+
+    // =========================================================================
+    // SPECIAL HANDLER: SUBSCRIBE BUTTON CTA (subscribe)
+    // =========================================================================
+    if (tplId === 'subscribe') {
+      const presets = [
+        { id: 'tl', label: '↖ Top Left', desc: 'Top Left Corner' },
+        { id: 'tr', label: '↗ Top Right', desc: 'Top Right Corner' },
+        { id: 'center', label: '⏺ Center (Default)', desc: 'Center Stage' },
+        { id: 'bl', label: '↙ Bottom Left', desc: 'Bottom Left Corner' },
+        { id: 'br', label: '↘ Bottom Right', desc: 'Bottom Right Corner' }
+      ];
+
+      const colorPalettes = [
+        { name: 'YouTube Red', hex: '#ef4444' },
+        { name: 'Dark Slate', hex: '#27272a' },
+        { name: 'Electric Cyan', hex: '#06b6d4' },
+        { name: 'Emerald', hex: '#10b981' },
+        { name: 'Amber Gold', hex: '#f59e0b' },
+        { name: 'Royal Purple', hex: '#8b5cf6' },
+        { name: 'Hot Pink', hex: '#ec4899' },
+        { name: 'Crimson', hex: '#b91c1c' }
+      ];
+
+      const curPreset = data.positionPreset || 'center';
+      const curSubs = data.subs || 'Road to 1 million';
+      const curCh = (data.channel !== undefined) ? data.channel : 'Magnates Media';
+      const curBtnText = data.btnText || 'SUBSCRIBE';
+      const curColor = data.btnColor || '#ef4444';
+      const curX = typeof data.posX === 'number' ? data.posX : 0;
+      const curY = typeof data.posY === 'number' ? data.posY : 0;
+      const curScale = typeof data.scale === 'number' ? data.scale : 1.0;
+      const isTrans = data.transparentBg !== false;
+      const showBell = data.showBell !== false;
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.65);">
+          
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:rgba(239,68,68,0.2);color:#ef4444;font-size:12px;font-weight:900;">▶</span>
+              <span style="font-size: 11.5px; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px;">Subscribe CTA Controls</span>
+            </div>
+            <span style="font-size: 9px; color: #38bdf8; font-weight: 800; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 2px 7px; border-radius: 4px;">FOREGROUND LAYER</span>
+          </div>
+
+          <!-- Section 1: Placement & Snap Presets -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Position Presets</span>
+              <span style="font-size: 8.5px; color: #64748b; font-family: monospace;">${curPreset.toUpperCase()}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              ${presets.slice(0, 2).map(p => `
+                <button type="button" class="sub-preset-btn" data-preset="${p.id}" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1px solid ${curPreset === p.id ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${curPreset === p.id ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.04)'}; color: ${curPreset === p.id ? '#38bdf8' : '#cbd5e1'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s;">
+                  ${p.label}
+                </button>
+              `).join('')}
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+              <button type="button" class="sub-preset-btn" data-preset="center" style="padding: 7px 8px; font-size: 10.5px; font-weight: 800; border-radius: 6px; border: 1px solid ${curPreset === 'center' ? '#38bdf8' : 'rgba(56,189,248,0.35)'}; background: ${curPreset === 'center' ? 'rgba(56,189,248,0.25)' : 'rgba(15,23,42,0.6)'}; color: ${curPreset === 'center' ? '#38bdf8' : '#e2e8f0'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
+                ⏺ Center (Default)
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              ${presets.slice(3, 5).map(p => `
+                <button type="button" class="sub-preset-btn" data-preset="${p.id}" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1px solid ${curPreset === p.id ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${curPreset === p.id ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.04)'}; color: ${curPreset === p.id ? '#38bdf8' : '#cbd5e1'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s;">
+                  ${p.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 2: Degrees of Freedom (Custom Coordinates & Scale) -->
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">Degrees of Freedom (Custom Offset)</span>
+              <button type="button" id="sub-btn-reset-tf" style="background: none; border: none; color: #94a3b8; font-size: 9px; cursor: pointer; text-decoration: underline;" title="Reset coordinates to default center">↺ Reset</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>X Position</span>
+                  <span id="sub-val-x" style="color: #38bdf8; font-family: monospace;">${curX}px</span>
+                </div>
+                <input type="range" id="sub-slider-x" min="-360" max="360" value="${curX}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Y Position</span>
+                  <span id="sub-val-y" style="color: #38bdf8; font-family: monospace;">${curY}px</span>
+                </div>
+                <input type="range" id="sub-slider-y" min="-200" max="200" value="${curY}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                <span>Scale Size</span>
+                <span id="sub-val-scale" style="color: #38bdf8; font-family: monospace;">${Math.round(curScale * 100)}%</span>
+              </div>
+              <input type="range" id="sub-slider-scale" min="40" max="220" value="${Math.round(curScale * 100)}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+            </div>
+            <div style="font-size: 8.5px; color: #64748b; font-style: italic; display: flex; align-items: center; gap: 4px;">
+              <span>💡</span> <span>Tap directly on preview canvas to drag or corner-resize with selection box.</span>
+            </div>
+          </div>
+
+          <!-- Section 3: Text & Milestone Content -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Text & Milestone Content</span>
+            
+            <!-- Milestone / Counter Text -->
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; font-weight: 700; color: #cbd5e1;">Milestone / Counter Text</span>
+                <span style="font-size: 8.5px; color: #a855f7;">Editable Goal</span>
+              </div>
+              <input type="text" id="sub-inp-subs" value="${curSubs}" placeholder="e.g. Road to 1 million or Road to 1,000 subscribers" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 9px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+              <!-- Quick Milestone Suggestion Chips -->
+              <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px;">
+                <button type="button" class="sub-chip-subs" data-val="Road to 1 million" style="font-size: 8px; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Road to 1M</button>
+                <button type="button" class="sub-chip-subs" data-val="Road to 1,000 subscribers" style="font-size: 8px; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Road to 1,000</button>
+                <button type="button" class="sub-chip-subs" data-val="Road to 100K" style="font-size: 8px; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Road to 100K</button>
+                <button type="button" class="sub-chip-subs" data-val="1.42M subscribers" style="font-size: 8px; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; padding: 2px 6px; border-radius: 4px; cursor: pointer;">1.42M subs</button>
+              </div>
+            </div>
+
+            <!-- Channel / Subhead -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #cbd5e1;">Channel Name</span>
+                <input type="text" id="sub-inp-channel" value="${curCh}" placeholder="Channel Name" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #cbd5e1;">Button Text</span>
+                <input type="text" id="sub-inp-btn-txt" value="${curBtnText}" placeholder="SUBSCRIBE" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Button Color & Styling -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Button Color & Accent</span>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <input type="color" id="sub-inp-col" value="${curColor}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" title="Custom Button Color" />
+                <span id="sub-val-col" style="font-size: 9px; font-family: monospace; color: #cbd5e1;">${curColor.toUpperCase()}</span>
+              </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+              ${colorPalettes.map(c => `
+                <button type="button" class="sub-col-preset" data-hex="${c.hex}" title="${c.name}" style="width: 22px; height: 22px; border-radius: 5px; background: ${c.hex}; border: 1px solid ${curColor === c.hex ? '#fff' : 'rgba(255,255,255,0.2)'}; cursor: pointer; box-shadow: ${curColor === c.hex ? '0 0 8px ' + c.hex : 'none'}; transition: transform 0.15s;"></button>
+              `).join('')}
+            </div>
+            <!-- Bell Notification Toggle -->
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; margin-top: 4px;">
+              <input type="checkbox" id="sub-chk-bell" ${showBell ? 'checked' : ''} style="accent-color: #ef4444;" />
+              <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Show Animated Notification Bell</span>
+            </label>
+          </div>
+
+          <!-- Section 5: Layer Compositing & Video Overlay -->
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Layer & Backdrop Compositing</span>
+              <span style="font-size: 8.5px; color: #22c55e; font-weight: 700;">VIDEO READY</span>
+            </div>
+            <!-- Transparent Background Checkbox -->
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); padding: 6px 8px; border-radius: 6px;">
+              <input type="checkbox" id="sub-chk-trans" ${isTrans ? 'checked' : ''} style="accent-color: #22c55e;" />
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 10px; color: #f8fafc; font-weight: 700;">Transparent Foreground Overlay</span>
+                <span style="font-size: 8.5px; color: #94a3b8;">Place directly on top of video clips or B-roll with zero background blackness</span>
+              </div>
+            </label>
+
+            <!-- Universal Backdrop & Custom Video Upload -->
+            ${window.tplBuildUniversalBgHtml ? window.tplBuildUniversalBgHtml(data) : ''}
+          </div>
+
+        </div>
+      `;
+
+      // --- EVENT HANDLERS ---
+      // 1. Preset buttons
+      container.querySelectorAll('.sub-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pid = btn.dataset.preset;
+          if (typeof window.tplApplySubscribePreset === 'function') {
+            window.tplApplySubscribePreset(pid);
+          } else {
+            let px = 0, py = 0;
+            if (pid === 'tl') { px = -210; py = -120; }
+            else if (pid === 'tr') { px = 210; py = -120; }
+            else if (pid === 'bl') { px = -210; py = 115; }
+            else if (pid === 'br') { px = 210; py = 115; }
+            window.tplSetContextualData('subscribe', { posX: px, posY: py, positionPreset: pid });
+            window.tplApplyContextualDataToPreview('subscribe');
+          }
+          window.tplRenderContextualInspector('subscribe');
+        });
+      });
+
+      // 2. Custom X, Y, Scale Sliders
+      const sliderX = container.querySelector('#sub-slider-x');
+      const valX = container.querySelector('#sub-val-x');
+      sliderX?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (valX) valX.textContent = `${val}px`;
+        if (topCustomizerState && topCustomizerState.transforms && topCustomizerState.transforms.fg) {
+          topCustomizerState.transforms.fg.x = val;
+        }
+        window.tplSetContextualData('subscribe', { posX: val, positionPreset: 'custom' });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      const sliderY = container.querySelector('#sub-slider-y');
+      const valY = container.querySelector('#sub-val-y');
+      sliderY?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (valY) valY.textContent = `${val}px`;
+        if (topCustomizerState && topCustomizerState.transforms && topCustomizerState.transforms.fg) {
+          topCustomizerState.transforms.fg.y = val;
+        }
+        window.tplSetContextualData('subscribe', { posY: val, positionPreset: 'custom' });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      const sliderScale = container.querySelector('#sub-slider-scale');
+      const valScale = container.querySelector('#sub-val-scale');
+      sliderScale?.addEventListener('input', (e) => {
+        const sc = Number((parseInt(e.target.value, 10) / 100).toFixed(2));
+        if (valScale) valScale.textContent = `${Math.round(sc * 100)}%`;
+        if (topCustomizerState && topCustomizerState.transforms && topCustomizerState.transforms.fg) {
+          topCustomizerState.transforms.fg.scale = sc;
+        }
+        window.tplSetContextualData('subscribe', { scale: sc });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      // Reset transform button
+      container.querySelector('#sub-btn-reset-tf')?.addEventListener('click', () => {
+        if (typeof window.tplApplySubscribePreset === 'function') {
+          window.tplApplySubscribePreset('center');
+        }
+        window.tplSetContextualData('subscribe', { posX: 0, posY: 0, scale: 1.0, positionPreset: 'center' });
+        window.tplApplyContextualDataToPreview('subscribe');
+        window.tplRenderContextualInspector('subscribe');
+      });
+
+      // 3. Text inputs
+      const inpSubs = container.querySelector('#sub-inp-subs');
+      inpSubs?.addEventListener('input', (e) => {
+        window.tplSetContextualData('subscribe', { subs: e.target.value });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      // Quick Chips
+      container.querySelectorAll('.sub-chip-subs').forEach(ch => {
+        ch.addEventListener('click', () => {
+          const v = ch.dataset.val;
+          if (inpSubs) inpSubs.value = v;
+          window.tplSetContextualData('subscribe', { subs: v });
+          window.tplApplyContextualDataToPreview('subscribe');
+        });
+      });
+
+      container.querySelector('#sub-inp-channel')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('subscribe', { channel: e.target.value });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      container.querySelector('#sub-inp-btn-txt')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('subscribe', { btnText: e.target.value });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      // 4. Color pickers & palettes
+      const inpCol = container.querySelector('#sub-inp-col');
+      const valCol = container.querySelector('#sub-val-col');
+      inpCol?.addEventListener('input', (e) => {
+        const hex = e.target.value;
+        if (valCol) valCol.textContent = hex.toUpperCase();
+        window.tplSetContextualData('subscribe', { btnColor: hex });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      container.querySelectorAll('.sub-col-preset').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const hex = btn.dataset.hex;
+          if (inpCol) inpCol.value = hex;
+          if (valCol) valCol.textContent = hex.toUpperCase();
+          window.tplSetContextualData('subscribe', { btnColor: hex });
+          window.tplApplyContextualDataToPreview('subscribe');
+          window.tplRenderContextualInspector('subscribe');
+        });
+      });
+
+      // 5. Bell toggle
+      container.querySelector('#sub-chk-bell')?.addEventListener('change', (e) => {
+        window.tplSetContextualData('subscribe', { showBell: e.target.checked });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      // 6. Transparent background toggle
+      container.querySelector('#sub-chk-trans')?.addEventListener('change', (e) => {
+        window.tplSetContextualData('subscribe', { transparentBg: e.target.checked });
+        window.tplApplyContextualDataToPreview('subscribe');
+      });
+
+      // Wire universal background controls (for video/img underneath)
+      if (typeof window.tplWireUniversalBgControls === 'function') {
+        window.tplWireUniversalBgControls('subscribe', container);
+      }
+
+      // Sync function called when dragged/scaled directly on stage
+      window.tplSyncSubscribeInspectorUI = function() {
+        const liveData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('subscribe') : {};
+        const sx = document.getElementById('sub-slider-x');
+        const vx = document.getElementById('sub-val-x');
+        if (sx && typeof liveData.posX === 'number') { sx.value = liveData.posX; }
+        if (vx && typeof liveData.posX === 'number') { vx.textContent = `${liveData.posX}px`; }
+
+        const sy = document.getElementById('sub-slider-y');
+        const vy = document.getElementById('sub-val-y');
+        if (sy && typeof liveData.posY === 'number') { sy.value = liveData.posY; }
+        if (vy && typeof liveData.posY === 'number') { vy.textContent = `${liveData.posY}px`; }
+
+        const ss = document.getElementById('sub-slider-scale');
+        const vs = document.getElementById('sub-val-scale');
+        if (ss && typeof liveData.scale === 'number') { ss.value = Math.round(liveData.scale * 100); }
+        if (vs && typeof liveData.scale === 'number') { vs.textContent = `${Math.round(liveData.scale * 100)}%`; }
+      };
+
+      return;
+    }
+
     // =========================================================================
     // GOOGLE SEARCH FX SUITE (3D Glassmorphic & Classic 2D Card)
     // =========================================================================

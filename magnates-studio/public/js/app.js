@@ -24107,6 +24107,7 @@ id: 'map',
   },
   {
     id: 'money-trail-map',
+    hidden: true,
     title: 'Offshore Money Trail Map',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24120,6 +24121,7 @@ id: 'map',
   },
   {
     id: 'country-morph-highlight',
+    hidden: true,
     title: 'Country Morph Highlight',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24133,6 +24135,7 @@ id: 'map',
   },
   {
     id: 'zoomout-context-card',
+    hidden: true,
     title: 'Zoom-Out Context Card',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24146,6 +24149,7 @@ id: 'map',
   },
   {
     id: 'border-conflict-shading',
+    hidden: true,
     title: 'Border Conflict Shading',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24159,6 +24163,7 @@ id: 'map',
   },
   {
     id: 'sanctions-embargo-arrows',
+    hidden: true,
     title: 'Sanctions & Embargo Reroute',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24293,6 +24298,7 @@ id: 'map',
   },
   {
     id: 'archival-ink-highlight',
+    hidden: true,
     title: 'Archival Document & Ink Sweep',
     category: 'Text & Titles',
     badge: 'Vox / James Jani',
@@ -24342,6 +24348,7 @@ id: 'map',
   },
   {
     id: 'vox-newspaper-cream-dossier',
+    hidden: true,
     title: 'Vox Newspaper Cream & Archival Paper Dossier',
     category: 'Paper / Cutout',
     badge: 'Vox Aesthetic',
@@ -24456,6 +24463,7 @@ id: 'map',
   },
   {
     id: 'puzzle-piece-reveal',
+    hidden: true,
     title: 'The "Puzzle Piece" Reveal & Story Arc Masking',
     category: '3D Spatial',
     badge: 'James Jani Signature',
@@ -24521,6 +24529,7 @@ id: 'map',
   },
   {
     id: 'glow-drop-shadows',
+    hidden: true,
     title: 'Glow & Drop Shadows',
     category: 'Text & Titles',
     badge: 'James Jani Signature',
@@ -24534,6 +24543,7 @@ id: 'map',
   },
   {
     id: '3d-camera-move-rotation',
+    hidden: true,
     title: '3D Camera Move & Rotation',
     category: '3D Spatial',
     badge: 'James Jani Signature',
@@ -24547,6 +24557,7 @@ id: 'map',
   },
   {
     id: 'audio-visual-jl-cuts',
+    hidden: true,
     title: 'Audio-Visual Pacing: J-Cuts & L-Cuts',
     category: 'Transitions',
     badge: 'James Jani Signature',
@@ -24587,6 +24598,7 @@ id: 'map',
   },
   {
     id: 'og-parallax-depth-engine',
+    hidden: true,
     title: 'OG 3-Layer Parallax Engine',
     category: '3D Spatial',
     badge: 'OG Parallax Signature',
@@ -25210,7 +25222,7 @@ function renderHomepageTemplates() {
 
   // Merge user custom templates with built-in templates
   const customTemplates = getCustomTemplates();
-  const allTemplates = [...customTemplates, ...EFFECT_TEMPLATES_DATA];
+  const allTemplates = [...customTemplates, ...EFFECT_TEMPLATES_DATA].filter(t => !t.hidden);
 
   const filtered = allTemplates.filter(t => {
     let matchesCat = false;
@@ -26218,11 +26230,26 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="bubble me">${m4}</div>
           </div>
         </div>`; } else if (tplId === 'subscribe') {
-      fxContainer.innerHTML = `<div class="tpl-subscribe">
-          <div class="sub-wrap">
-            <div class="sub-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6z"/></svg>SUBSCRIBE</div>
-            <div class="bell"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;color:#fff"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
-            <div class="counter"><span class="num sub-count">1.42M</span> <span class="sub-ch">Magnates Media</span></div>
+      const subData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('subscribe') : {};
+      const ch = subData.channel !== undefined ? subData.channel : 'Magnates Media';
+      const subs = subData.subs || 'Road to 1 million';
+      const btnText = subData.btnText || 'SUBSCRIBE';
+      const btnColor = subData.btnColor || '#ef4444';
+      const posX = typeof subData.posX === 'number' ? subData.posX : 0;
+      const posY = typeof subData.posY === 'number' ? subData.posY : 0;
+      const scale = typeof subData.scale === 'number' ? subData.scale : 1.0;
+      const showBell = subData.showBell !== false;
+      const isTrans = subData.transparentBg !== false;
+      const bgLayerHtml = (typeof window.tplRenderUniversalBgLayer === 'function') ? window.tplRenderUniversalBgLayer(subData) : '';
+      fxContainer.innerHTML = `<div class="tpl-subscribe ${isTrans ? 'is-transparent' : ''}" style="${isTrans ? 'background:transparent;' : ''}">
+          ${bgLayerHtml}
+          <div class="sub-wrap" style="transform: translate(${posX}px, ${posY}px) scale(${scale});">
+            <div class="sub-btn" style="--sub-btn-bg:${btnColor}; background:${btnColor}; box-shadow: 0 8px 24px ${btnColor}66;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6z"/></svg>
+              <span class="sub-btn-label">${btnText}</span>
+            </div>
+            <div class="bell" style="display:${showBell ? 'grid' : 'none'};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px;color:#fff"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+            <div class="counter"><span class="num sub-count">${subs}</span> <span class="sub-ch">${ch}</span></div>
           </div>
         </div>`; } else if (tplId === 'countdown') {
       fxContainer.innerHTML = `<div class="tpl-countdown">
@@ -39506,7 +39533,7 @@ function populateModalTemplatesSidebar() {
     'text-texturing-grunge': 'Grunge Title'
   };
 
-  container.innerHTML = EFFECT_TEMPLATES_DATA.map(t => {
+  container.innerHTML = EFFECT_TEMPLATES_DATA.filter(t => !t.hidden).map(t => {
     const isSelected = (t.id === currentTplId);
     const displayName = t.title.split('(')[0].trim();
 

@@ -25,6 +25,14 @@
     // Ensure state container exists
     if (typeof topCustomizerState === 'undefined') window.topCustomizerState = {};
     if (!topCustomizerState.transforms) topCustomizerState.transforms = { fg: { x: 0, y: 0, scale: 1, isFullscreen: false }, bg: { x: 0, y: 0, scale: 1 }, text: { x: 0, y: 0, scale: 1 } };
+    if (topCustomizerState.currentTpl?.id === 'subscribe' && typeof window.tplGetContextualData === 'function') {
+      const subData = window.tplGetContextualData('subscribe');
+      if (subData) {
+        topCustomizerState.transforms.fg.x = typeof subData.posX === 'number' ? subData.posX : 0;
+        topCustomizerState.transforms.fg.y = typeof subData.posY === 'number' ? subData.posY : 0;
+        topCustomizerState.transforms.fg.scale = typeof subData.scale === 'number' ? subData.scale : 1.0;
+      }
+    }
 
     // Inject or retrieve transform box & toolbar
     let box = document.getElementById('stage-universal-transform-box');
@@ -104,7 +112,7 @@
       return;
     }
     toolbar.style.display = 'flex';
-    const fgCandidate = stage.querySelector('.quote-card, .scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const fgCandidate = stage.querySelector('.tpl-subscribe .sub-wrap, .sub-wrap, .quote-card, .scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
     const textCandidate = stage.querySelector('.scramble-main-text, .zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
     const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
 
@@ -416,7 +424,7 @@
 
       const labelEl = box.querySelector('#stage-tf-label');
       if (labelEl) {
-        labelEl.textContent = type === 'text' ? (tplId === 'quote' ? 'QUOTE TEXT' : 'HEADLINE TEXT') : (type === 'bg' ? 'BACKGROUND SCENE' : (tplId === 'quote' ? 'QUOTE CARD' : 'FOREGROUND SUBJECT'));
+        labelEl.textContent = type === 'text' ? (tplId === 'quote' ? 'QUOTE TEXT' : 'HEADLINE TEXT') : (type === 'bg' ? 'BACKGROUND SCENE' : (tplId === 'subscribe' ? 'SUBSCRIBE CTA' : (tplId === 'quote' ? 'QUOTE CARD' : 'FOREGROUND SUBJECT')));
         labelEl.style.background = type === 'text' ? '#a855f7' : (type === 'bg' ? '#d97706' : '#0284c7');
       }
 
@@ -508,6 +516,39 @@
     // Initial render
     applyTransforms();
     renderToolbar();
+  };
+
+
+  // Helper to programmatically apply preset positioning for subscribe CTA
+  window.tplApplySubscribePreset = function(presetId) {
+    if (typeof topCustomizerState === 'undefined') window.topCustomizerState = {};
+    if (!topCustomizerState.transforms) topCustomizerState.transforms = { fg: { x: 0, y: 0, scale: 1 } };
+    let x = 0, y = 0;
+    if (presetId === 'tl') { x = -210; y = -120; }
+    else if (presetId === 'tr') { x = 210; y = -120; }
+    else if (presetId === 'bl') { x = -210; y = 115; }
+    else if (presetId === 'br') { x = 210; y = 115; }
+    else { x = 0; y = 0; } // center default
+
+    topCustomizerState.transforms.fg.x = x;
+    topCustomizerState.transforms.fg.y = y;
+    topCustomizerState.transforms.fg.isFullscreen = false;
+
+    if (typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('subscribe', { posX: x, posY: y, positionPreset: presetId });
+    }
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    const wrap = stage ? stage.querySelector('.tpl-subscribe .sub-wrap') : null;
+    if (wrap) {
+      const curScale = topCustomizerState.transforms.fg.scale || 1.0;
+      wrap.style.transform = `translate(${x}px, ${y}px) scale(${curScale})`;
+    }
+    if (typeof window.tplUpdateTransformBox === 'function') {
+      window.tplUpdateTransformBox();
+    }
+    if (typeof window.tplSyncSubscribeInspectorUI === 'function') {
+      window.tplSyncSubscribeInspectorUI();
+    }
   };
 
 })();
