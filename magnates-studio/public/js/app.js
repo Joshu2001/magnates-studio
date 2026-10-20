@@ -23346,6 +23346,7 @@ const EFFECT_TEMPLATES_DATA = [
 
   {
     id: 'candle',
+    hidden: true,
     title: 'Candlestick Chart',
     category: 'Finance',
     origCategory: 'Finance',
@@ -23372,6 +23373,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'compound',
+    hidden: true,
     title: 'Compound Interest Curve',
     category: 'Finance',
     origCategory: 'Finance',
@@ -23455,6 +23457,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'pie',
+    hidden: true,
     title: 'Portfolio Allocation Pie',
     category: 'Finance',
     origCategory: 'Finance',
@@ -23520,6 +23523,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'countdown',
+    hidden: true,
     title: 'Countdown / Top 10',
     category: 'Animations',
     origCategory: 'Animations',
@@ -23547,6 +23551,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'chart',
+    hidden: true,
     title: 'Stock Chart Drawing',
     category: 'Finance',
     origCategory: 'Finance',
@@ -23626,6 +23631,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'money',
+    hidden: true,
     title: 'Money Counter',
     category: 'Finance',
     origCategory: 'Finance',
@@ -24053,6 +24059,7 @@ id: 'map',
   },
   {
     id: 'market-cap-race',
+    hidden: true,
     title: 'Market Cap Race Bars',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24066,6 +24073,7 @@ id: 'map',
   },
   {
     id: 'hostile-takeover',
+    hidden: true,
     title: 'Hostile Takeover Progress',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',

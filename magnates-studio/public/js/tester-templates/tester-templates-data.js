@@ -299,6 +299,7 @@
   },
   {
     "id": "money-counter",
+    "hidden": true,
     "title": "Money Counter",
     "category": "Documentary",
     "origCategory": "Documentary",
