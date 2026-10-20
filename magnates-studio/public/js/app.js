@@ -25924,19 +25924,35 @@ window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
       ${bgLayerHtml}
       <div class="pm-scene-wrap" style="background-image: url('${bgImg}');${isCustomBg ? 'mix-blend-mode:lighten;opacity:0.88;' : ''}"></div>
       <div class="pm-spotlight-cone"></div>
+      <div class="pm-godrays"></div>
       <div class="pm-rim-lighting"></div>
+      <div class="pm-doc-glint"></div>
       <div class="pm-dof-overlay"></div>
       <div class="pm-fog-layer pm-fog-1"></div>
       <div class="pm-fog-layer pm-fog-2"></div>
+      <div class="pm-fog-layer pm-fog-3"></div>
       <div class="pm-dust-field">
-        <div class="pm-mote" style="top: 35%; left: 45%; width: 2px; height: 2px; animation-duration: 4.5s; animation-delay: 0.2s;"></div>
-        <div class="pm-mote" style="top: 48%; left: 52%; width: 2.5px; height: 2.5px; animation-duration: 5.2s; animation-delay: 1.1s;"></div>
-        <div class="pm-mote" style="top: 30%; left: 48%; width: 1.5px; height: 1.5px; animation-duration: 3.8s; animation-delay: 0.7s;"></div>
-        <div class="pm-mote" style="top: 42%; left: 40%; width: 2px; height: 2px; animation-duration: 6.0s; animation-delay: 2.3s;"></div>
-        <div class="pm-mote" style="top: 55%; left: 56%; width: 2.5px; height: 2.5px; animation-duration: 4.8s; animation-delay: 1.8s;"></div>
-        <div class="pm-mote" style="top: 25%; left: 51%; width: 1.5px; height: 1.5px; animation-duration: 5.5s; animation-delay: 3.1s;"></div>
-        <div class="pm-mote" style="top: 60%; left: 47%; width: 2px; height: 2px; animation-duration: 4.2s; animation-delay: 0.9s;"></div>
-        <div class="pm-mote" style="top: 38%; left: 58%; width: 2px; height: 2px; animation-duration: 5.8s; animation-delay: 2.7s;"></div>
+        <div class="pm-mote" style="top: 32%; left: 45%; width: 2.5px; height: 2.5px; animation-duration: 4.2s; animation-delay: 0.1s;"></div>
+        <div class="pm-mote" style="top: 48%; left: 52%; width: 3px; height: 3px; animation-duration: 5.0s; animation-delay: 1.0s;"></div>
+        <div class="pm-mote" style="top: 28%; left: 49%; width: 1.8px; height: 1.8px; animation-duration: 3.6s; animation-delay: 0.6s;"></div>
+        <div class="pm-mote" style="top: 40%; left: 39%; width: 2.2px; height: 2.2px; animation-duration: 5.8s; animation-delay: 2.1s;"></div>
+        <div class="pm-mote" style="top: 54%; left: 57%; width: 2.8px; height: 2.8px; animation-duration: 4.6s; animation-delay: 1.6s;"></div>
+        <div class="pm-mote" style="top: 24%; left: 51%; width: 1.8px; height: 1.8px; animation-duration: 5.2s; animation-delay: 2.9s;"></div>
+        <div class="pm-mote" style="top: 62%; left: 46%; width: 2.5px; height: 2.5px; animation-duration: 4.0s; animation-delay: 0.8s;"></div>
+        <div class="pm-mote" style="top: 36%; left: 59%; width: 2px; height: 2px; animation-duration: 5.5s; animation-delay: 2.5s;"></div>
+        <div class="pm-mote" style="top: 44%; left: 43%; width: 1.5px; height: 1.5px; animation-duration: 6.2s; animation-delay: 3.4s;"></div>
+        <div class="pm-mote" style="top: 50%; left: 50%; width: 3.2px; height: 3.2px; animation-duration: 4.4s; animation-delay: 1.4s;"></div>
+      </div>
+      <div class="pm-film-grain"></div>
+      <div class="pm-mystery-overlay">
+        <div class="pm-reticle-corner pm-corner-tl"></div>
+        <div class="pm-reticle-corner pm-corner-tr"></div>
+        <div class="pm-reticle-corner pm-corner-bl"></div>
+        <div class="pm-reticle-corner pm-corner-br"></div>
+        <div class="pm-classified-badge">
+          <span class="pm-rec-dot"></span>
+          <span>LEVEL 5 // EYES ONLY</span>
+        </div>
       </div>
       ${showHud ? `
       <div class="pm-hud-card" style="border-color: ${data.accentColor || '#fbbf24'};">
@@ -26258,17 +26274,15 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
           </div>
         </div>`; } else if (tplId === 'money-stack') {
-    const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
-    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
-    hoverBridgeActive = false;
-    hoverExternalT = null;
-    if (typeof window.tplMountMoneyStack3DStage === 'function') {
-      window.tplMountMoneyStack3DStage(stage, mData);
-    }
-    return;
-  }
-
-  if (tplId === 'google') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #05080c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="/money_stack_cinematic_plate.png" alt="Money Stack" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: moneyMacroDrift 6s ease-in-out infinite alternate;" />
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 45% 40%, transparent 30%, rgba(2,4,8,0.75) 85%); pointer-events: none;"></div>
+          <div style="position: absolute; bottom: 8px; left: 10px; font-family: monospace; font-size: 8px; font-weight: 700; color: #10b981; background: rgba(5,8,14,0.85); border: 1px solid rgba(16,185,129,0.3); padding: 2px 6px; border-radius: 4px;">
+            $100 BUNDLES &bull; 3D MACRO
+          </div>
+        </div>`;
+    } else if (tplId === 'google') {
       const gData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('google') : {};
       const query = gData.query || 'how to invest in index funds';
       const sug1 = gData.suggestion || 'top index funds for passive wealth';
@@ -31164,7 +31178,16 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
-        } else if (tpl.id === 'jani-forbes-fraud-reveal') {
+        } else if (tpl.id === 'money-stack') {
+      topCustomizerState.primaryUrl = '/money_stack_cinematic_plate.png';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/money_stack_cinematic_plate.png';
+      if (typeof window.tplMountMoneyStack3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountMoneyStack3DStage(stage, mData);
+      }
+    } else if (tpl.id === 'jani-forbes-fraud-reveal') {
       topCustomizerState.primaryUrl = '/portrait_cutout_clean.png';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '/portrait_cutout_clean.png';
@@ -33147,6 +33170,19 @@ function renderTopTemplatePreviewStage() {
   if (!stage || !topCustomizerState.currentTpl) return;
   const tplId = topCustomizerState.currentTpl.id;
   if (window.tpl3DSync) window.tpl3DSync(tplId);
+
+  // 3D Photorealistic Money Stack Engine (Vox / James Jani / Magnates Media Style)
+  if (tplId === 'money-stack') {
+    const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountMoneyStack3DStage === 'function') {
+      window.tplMountMoneyStack3DStage(stage, mData);
+    }
+    return;
+  }
+
   const prim = (topCustomizerState.bgRemoved && topCustomizerState.cutoutCanvas)
     ? topCustomizerState.cutoutCanvas.toDataURL()
     : ((topCustomizerState.bgRemoved && topCustomizerState.currentTpl?.cutoutImage)
@@ -34061,6 +34097,14 @@ function updateTopCustomizerFrame(seqTime, now) {
 
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
+
+  if (tplId === 'money-stack') {
+    if (typeof window.stepMoneyStackAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
+      window.stepMoneyStackAnimation(stage, 'money-stack', localSceneT, mData);
+    }
+  }
 
   if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
     const fgImg = document.getElementById('creator-live-fg-img');

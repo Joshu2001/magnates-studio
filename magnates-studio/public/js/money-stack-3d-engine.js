@@ -658,8 +658,17 @@
     moneyRenderer.toneMappingExposure = 1.25;
 
     container.innerHTML = '';
-    container.style.position = 'relative';
+    container.style.position = 'absolute';
+    container.style.inset = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
     container.style.overflow = 'hidden';
+
+    moneyRenderer.domElement.style.position = 'absolute';
+    moneyRenderer.domElement.style.inset = '0';
+    moneyRenderer.domElement.style.width = '100%';
+    moneyRenderer.domElement.style.height = '100%';
+    moneyRenderer.domElement.style.display = 'block';
     container.appendChild(moneyRenderer.domElement);
 
     // 3. OrbitControls for Interactive User Pan/Tilt/Orbit
@@ -711,7 +720,16 @@
       buildVolumetricDustMotes(data);
     }
 
-    // 8. Animation Loop
+    // 8. Initial Immediate Render
+    updatePhysicsStep(0, data);
+    if (moneyRenderer && moneyScene && moneyCamera) {
+      moneyRenderer.render(moneyScene, moneyCamera);
+      // Softly fade background plate once WebGL renders
+      const bgPlate = container.parentElement ? container.parentElement.querySelector('#money-stack-plate-bg') : null;
+      if (bgPlate) bgPlate.style.opacity = '0.35';
+    }
+
+    // Animation Loop
     lastTimestamp = performance.now();
     animClock = 0;
 
@@ -1117,15 +1135,19 @@
    */
   window.tplMountMoneyStack3DStage = function(stage, data) {
     if (!stage) return;
-    const d = Object.assign({}, DEFAULT_CONFIG, data || {});
+    const d = Object.assign({}, DEFAULT_CONFIG, (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(TEMPLATE_ID) : null), data || {});
 
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #05080c; overflow: hidden; cursor: grab;">
-        <div id="money-stack-3d-viewport" style="position: absolute; inset: 0; width: 100%; height: 100%;"></div>
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #05080c; overflow: hidden; cursor: grab; user-select: none;">
+        <!-- High-Resolution Instant Plate Background (Guarantees zero black void) -->
+        <img id="money-stack-plate-bg" src="/money_stack_cinematic_plate.png" alt="Money Stack Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; transition: opacity 0.5s ease; opacity: 1;" />
+
+        <!-- 3D WebGL Three.js Viewport (Overlaid seamlessly) -->
+        <div id="money-stack-3d-viewport" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;"></div>
         
         <!-- Macro Lens Telemetry & Depth-of-Field HUD Pill -->
         <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; z-index: 40; display: flex; align-items: center; gap: 8px;">
-          <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #38bdf8; background: rgba(5,8,14,0.85); border: 1px solid rgba(56,189,248,0.3); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
+          <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #10b981; background: rgba(5,8,14,0.85); border: 1px solid rgba(16,185,129,0.3); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
             3D CURRENCY RIG &bull; 35&deg; MACRO &bull; f/2.8 DoF &bull; 3x $10K BUNDLES
           </span>
           <span style="font-family: monospace; font-size: 9px; color: #94a3b8; background: rgba(5,8,14,0.7); border: 1px solid rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 4px;">
@@ -1136,9 +1158,13 @@
     `;
 
     const viewport = stage.querySelector('#money-stack-3d-viewport');
-    setTimeout(() => {
-      window.initMoneyStack3DScene(viewport, d);
-    }, 30);
+    function triggerInit() {
+      if (typeof window.initMoneyStack3DScene === 'function') {
+        window.initMoneyStack3DScene(viewport, d);
+      }
+    }
+    triggerInit();
+    setTimeout(triggerInit, 60);
   };
 
   /**
