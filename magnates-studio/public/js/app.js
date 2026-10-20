@@ -24676,14 +24676,14 @@ id: 'map',
   },
   {
     id: 'magnates-media-brand-wavy-hook',
-    title: 'Brand Icon Rise, Left Shift & Wavy Kinetic Headline (Scene A)',
+    title: 'Brand Icon Rise, Left Shift & Wavy Kinetic Headline (Scene 1)',
     category: 'Text & Titles',
     origCategory: 'Documentary',
-    badge: 'Scene A Standalone • Linked',
+    badge: 'Scene 1 Standalone • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Standalone Scene A: Starts on a customizable radial glow backdrop, rises a glowing brand/app icon from bottom to center, shifts it left, glides in Line 1, and animates Line 2 upward in a fluid wave. Live-synced with the Merged Master template.',
+    description: 'Standalone Scene 1: Starts on a customizable radial glow backdrop, rises a glowing brand/app icon from bottom to center, shifts it left, glides in Line 1, and animates Line 2 upward in a fluid wave. Live-synced with the Merged Master template.',
     tags: [
       'Brand Logo Reveal',
       'TEMU Logo',
@@ -24692,12 +24692,36 @@ id: 'map',
       'Kinetic Typography',
       'Logo Shift Left',
       'App Icon Cutout',
-      'Scene A',
+      'Scene 1',
       'James Jani',
       'Magnates Media'
     ],
     defaultImage: '/temu_logo_cutout.png',
     secondaryImage: '/temu_logo_cutout.png'
+  },
+  {
+    id: 'magnates-media-product-price-unfurl',
+    title: 'Logo Shift Right & Center-Out Product / Price Split Unfurl (Scene 2)',
+    category: 'Paper / Cutout',
+    origCategory: 'Documentary',
+    badge: 'Scene 2 Standalone • Linked',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
+    description: 'Standalone Scene 2: Brand logo glides right to center (wiping away the headline), then unfurls the Left Product Card from the center toward top & bottom, unfurls the $2.00 Price Tag from the center toward left & right, followed by the Right Product Card and $5.00 Price Tag. Live-synced with the Merged Master template.',
+    tags: [
+      'Product Unfurl',
+      'Price Tag Unfurl',
+      'Center-Out Split Reveal',
+      'TEMU Products',
+      '$2.00 & $5.00',
+      'Paper Cutout',
+      'Scene 2',
+      'James Jani',
+      'Magnates Media'
+    ],
+    defaultImage: '/temu_product_left.png',
+    secondaryImage: '/temu_product_right.png'
   },
   {
     id: 'magnates-media-dual-silhouettes',
@@ -28382,7 +28406,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-dual-silhouettes') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-dual-silhouettes') {
       const bgCol = (typeof magnatesBPState !== 'undefined' && magnatesBPState.backdropColor) ? magnatesBPState.backdropColor : '#991b1b';
       const c1 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.9) : 'rgba(165, 22, 22, 0.9)';
       const c2 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.68) : 'rgba(95, 10, 10, 0.68)';
@@ -28393,8 +28417,10 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const line2Txt = (typeof magnatesBPState !== 'undefined' && magnatesBPState.wavyLine2) ? magnatesBPState.wavyLine2 : 'ON THE INTERNET.';
       const subTxt = (typeof magnatesBPState !== 'undefined' && magnatesBPState.subcaption) ? magnatesBPState.subcaption : 'Advertising Those Product.';
       const badgeLabel = tplId === 'magnates-media-brand-wavy-hook'
-        ? '&#x1F525; SCENE A // LOGO &amp; WAVY HOOK'
-        : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE B // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // A &rarr; B');
+        ? '&#x1F525; SCENE 1 // LOGO &amp; WAVY HOOK'
+        : (tplId === 'magnates-media-product-price-unfurl'
+          ? '&#x1F4E6; SCENE 2 // PRODUCT &amp; PRICE UNFURL'
+          : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE 3 // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // 1 &rarr; 3'));
 
       fxContainer.innerHTML = `
         <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, ${c1} 0%, ${c2} 42%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -29401,7 +29427,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           card.style.borderColor = '#f59e0b';
         }
       }
-    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-dual-silhouettes') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-dual-silhouettes') {
       const logoEl = fxContainer?.querySelector(`#fx-bp-logo-${tplId}`);
       const wavyWrapEl = fxContainer?.querySelector(`#fx-bp-wavy-wrap-${tplId}`);
       const wavy1El = fxContainer?.querySelector(`#fx-bp-wavy1-${tplId}`);
@@ -29467,8 +29493,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       };
 
       if (tplId === 'magnates-media-brand-wavy-hook') {
-        // Standalone Scene A Hover Preview (5.6s cycle)
-        const c = t % 5.6;
+        // Standalone Scene 1 Hover Preview (Logo Rise + Left Shift + Wavy Text)
+        const c = t % 3.2;
+        runSceneAHover(Math.min(2.30, c));
+        if (prod1Wrap) prod1Wrap.style.opacity = '0';
+        if (prod2Wrap) prod2Wrap.style.opacity = '0';
+        if (counterWrapEl) counterWrapEl.style.opacity = '0';
+        if (leftEl) leftEl.style.opacity = '0';
+        if (rightEl) rightEl.style.opacity = '0';
+      } else if (tplId === 'magnates-media-product-price-unfurl') {
+        // Standalone Scene 2 Hover Preview (Starts at Logo Shift Right -> Left Card & $2.00 -> Right Card & $5.00)
+        const c = 2.15 + (t % 3.45);
         runSceneAHover(c);
         if (counterWrapEl) counterWrapEl.style.opacity = '0';
         if (leftEl) leftEl.style.opacity = '0';
@@ -29733,6 +29768,7 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-blend-modes': openMagnatesBlendModesSuite,
     'magnates-media-paper-blueprint': () => openMagnatesPaperBlueprintSuite('full_story_flow'),
     'magnates-media-brand-wavy-hook': () => openMagnatesPaperBlueprintSuite('brand_wavy_intro'),
+    'magnates-media-product-price-unfurl': () => openMagnatesPaperBlueprintSuite('products_unfurl'),
     'magnates-media-dual-silhouettes': () => openMagnatesPaperBlueprintSuite('dual_silhouette'),
     'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
     'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
@@ -30144,6 +30180,9 @@ function applySelectedHomepageTemplate(templateId) {
     return;
   } else if (templateId === 'magnates-media-brand-wavy-hook') {
     openMagnatesPaperBlueprintSuite('brand_wavy_intro');
+    return;
+  } else if (templateId === 'magnates-media-product-price-unfurl') {
+    openMagnatesPaperBlueprintSuite('products_unfurl');
     return;
   } else if (templateId === 'magnates-media-dual-silhouettes') {
     openMagnatesPaperBlueprintSuite('dual_silhouette');
@@ -48318,7 +48357,7 @@ const MAGNATES_BP_PRESETS = {
     z0Label: "Crimson Radial Atmosphere"
   },
   brand_wavy_intro: {
-    duration: 7.4,
+    duration: 4.6,
     bgPlateUrl: "",
     backdropColor: "#991b1b",
     backdropSpread: 75,
@@ -48326,7 +48365,7 @@ const MAGNATES_BP_PRESETS = {
     logoCutoutUrl: "/temu_logo_cutout.png",
     logoInTime: 0.35,
     logoShiftTime: 1.25,
-    logoOutTime: 6.75,
+    logoOutTime: 4.15,
     logoGlowColor: "#ff1e1e",
     logoGlowIntensity: 90,
     wavyTextEnabled: true,
@@ -48351,10 +48390,50 @@ const MAGNATES_BP_PRESETS = {
     l2OutTime: 4.05,
     l2GlowColor: "#ffffff",
     l2GlowIntensity: 85,
-    bgFadeTime: 4.65,
-    hudPreset: "SCENE A: BRAND LOGO & WAVY HEADLINE",
-    l1Label: "Left Silhouette (Scene B)",
-    l2Label: "Right Silhouette (Scene B)",
+    bgFadeTime: 4.25,
+    hudPreset: "SCENE 1: BRAND LOGO & WAVY HEADLINE",
+    l1Label: "Left Silhouette (Scene 3)",
+    l2Label: "Right Silhouette (Scene 3)",
+    z0Label: "Crimson Radial Atmosphere"
+  },
+  products_unfurl: {
+    duration: 4.8,
+    bgPlateUrl: "",
+    backdropColor: "#991b1b",
+    backdropSpread: 75,
+    logoEnabled: true,
+    logoCutoutUrl: "/temu_logo_cutout.png",
+    logoInTime: 0.0,
+    logoShiftTime: 0.0,
+    logoOutTime: 4.30,
+    logoGlowColor: "#ff1e1e",
+    logoGlowIntensity: 90,
+    wavyTextEnabled: true,
+    wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+    wavyLine2: "ON THE INTERNET.",
+    l1Enabled: false,
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    primaryCutoutUrl: "/silhouette_sitting_phone.png",
+    l2Enabled: false,
+    showCounter: false,
+    headline: "$1,000,000",
+    subcaption: "Advertising Those Product.",
+    l1InAnim: "left_to_right",
+    l1OutAnim: "right_to_left",
+    l1InTime: 0.85,
+    l1OutTime: 3.80,
+    l1GlowColor: "#ffffff",
+    l1GlowIntensity: 85,
+    l2InAnim: "bottom_to_up",
+    l2OutAnim: "left_to_right",
+    l2InTime: 0.95,
+    l2OutTime: 4.05,
+    l2GlowColor: "#ffffff",
+    l2GlowIntensity: 85,
+    bgFadeTime: 4.45,
+    hudPreset: "SCENE 2: PRODUCT & PRICE UNFURL",
+    l1Label: "Left Silhouette (Scene 3)",
+    l2Label: "Right Silhouette (Scene 3)",
     z0Label: "Crimson Radial Atmosphere"
   },
   dual_silhouette: {
@@ -48603,11 +48682,11 @@ function updateMagnatesBPVisualStyles() {
   const p = magnatesBPState.playhead;
   const dur = magnatesBPState.duration;
   const isFullFlowForTimer = magnatesBPState.preset === 'full_story_flow';
-  const tShiftRightForTimer = magnatesBPState.logoShiftRightTime ?? 3.10;
+  const tShiftRightForTimer = magnatesBPState.preset === 'products_unfurl' ? 0.35 : (magnatesBPState.logoShiftRightTime ?? 3.10);
   const tSceneBStartForTimer = magnatesBPState.productsEnabled ? 7.20 : 4.50;
   const sceneNumLabel = isFullFlowForTimer
     ? (p < tShiftRightForTimer ? 'Scene 1' : (p < tSceneBStartForTimer ? 'Scene 2' : 'Scene 3'))
-    : (magnatesBPState.preset === 'brand_wavy_intro' ? (p < tShiftRightForTimer ? 'Scene 1' : 'Scene 2') : 'Scene 3');
+    : (magnatesBPState.preset === 'brand_wavy_intro' ? 'Scene 1' : (magnatesBPState.preset === 'products_unfurl' ? 'Scene 2' : 'Scene 3'));
   const timeText = `${p.toFixed(1)}s / ${dur.toFixed(1)}s (${sceneNumLabel})`;
   if (timerEl) timerEl.textContent = timeText;
   if (hudTimecode) hudTimecode.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
@@ -48639,8 +48718,9 @@ function updateMagnatesBPVisualStyles() {
   // Determine Timeline Offset for Scene B when in Full Merged Story Flow
   const isFullFlow = magnatesBPState.preset === 'full_story_flow';
   const isBrandOnly = magnatesBPState.preset === 'brand_wavy_intro';
+  const isProductsOnly = magnatesBPState.preset === 'products_unfurl';
   const isRoomScene = magnatesBPState.preset === 'room_spawn';
-  const hasProductsPhase = Boolean(magnatesBPState.productsEnabled);
+  const hasProductsPhase = isProductsOnly || (isFullFlow && Boolean(magnatesBPState.productsEnabled));
   const sceneBOffset = isFullFlow ? (hasProductsPhase ? 7.20 : 4.50) : 0.0;
   const effectiveBgFadeTime = isFullFlow
     ? (sceneBOffset + magnatesBPState.bgFadeTime)
@@ -48701,12 +48781,14 @@ function updateMagnatesBPVisualStyles() {
   //     Left Product Card unfurls Top&Bottom -> Left Price ($2.00) unfurls Left&Right ->
   //     Right Product Card unfurls Top&Bottom -> Right Price ($5.00) unfurls Left&Right
   // =========================================================
-  const showSceneA = magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly);
-  const tIn = magnatesBPState.logoInTime ?? 0.35;
-  const tShift = magnatesBPState.logoShiftTime ?? 1.25;
-  const tShiftRight = magnatesBPState.logoShiftRightTime ?? 3.10;
+  const showSceneA = magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly || isProductsOnly);
+  const tIn = isProductsOnly ? -1.0 : (magnatesBPState.logoInTime ?? 0.35);
+  const tShift = isProductsOnly ? -0.8 : (magnatesBPState.logoShiftTime ?? 1.25);
+  const tShiftRight = isProductsOnly ? 0.35 : (magnatesBPState.logoShiftRightTime ?? 3.10);
   const unfurlDur = magnatesBPState.unfurlSpeed ?? 0.45;
-  const tOut = hasProductsPhase ? Math.max(magnatesBPState.logoOutTime ?? 6.75, tShiftRight + 3.45) : (magnatesBPState.logoOutTime ?? 4.15);
+  const tOut = isProductsOnly
+    ? 4.25
+    : (hasProductsPhase ? Math.max(magnatesBPState.logoOutTime ?? 6.75, tShiftRight + 3.45) : (magnatesBPState.logoOutTime ?? 4.15));
 
   if (logoLayer && logoImg) {
     if (!showSceneA) {
@@ -48844,7 +48926,7 @@ function updateMagnatesBPVisualStyles() {
   // SCENE B / C RENDER: $1,000,000 Counter (Z=1) & Cutouts (Z=2, Z=3)
   // =========================================================
   const localPB = p - sceneBOffset;
-  const inSceneBWindow = !isBrandOnly && (!isFullFlow || localPB >= 0);
+  const inSceneBWindow = !isBrandOnly && !isProductsOnly && (!isFullFlow || localPB >= 0);
 
   if (textWrap) {
     if (!magnatesBPState.showCounter || !inSceneBWindow) {
@@ -49139,10 +49221,11 @@ function syncMagnatesBPInspectorControlsFromState() {
 
   // Update Modal Header Title based on which linked template / mode is active
   const titleMap = {
-    full_story_flow: 'Merged Master Suite: Brand Logo Hook → $1M Silhouettes',
-    brand_wavy_intro: 'Scene A Suite: Brand Icon Rise, Left Shift & Wavy Headline',
-    dual_silhouette: 'Scene B Suite: $1,000,000 Counter & Dual Glowing Silhouettes',
-    room_spawn: 'Scene C Suite: Empty Office Room & Desk Cutout Glide'
+    full_story_flow: 'Merged Master Suite: Brand Hook → Product Unfurl → $1M Silhouettes',
+    brand_wavy_intro: 'Scene 1 Suite: Brand Icon Rise, Left Shift & Wavy Headline',
+    products_unfurl: 'Scene 2 Suite: Logo Shift Right & Product / Price Unfurl ($2.00 & $5.00)',
+    dual_silhouette: 'Scene 3 Suite: $1,000,000 Counter & Dual Glowing Silhouettes',
+    room_spawn: 'Scene 4 Suite: Empty Office Room & Desk Cutout Glide'
   };
   setTxt('magnates-bp-modal-title', titleMap[pKey] || 'Dynamic Cutout & Silhouette Motion Suite');
 
@@ -49263,6 +49346,15 @@ function applyMagnatesBPPresetToState(pKey) {
     magnatesBPState.bgPlateUrl = "";
     magnatesBPState.logoEnabled = true;
     magnatesBPState.wavyTextEnabled = true;
+    magnatesBPState.l1Enabled = false;
+    magnatesBPState.l2Enabled = false;
+    magnatesBPState.showCounter = false;
+    magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'products_unfurl') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = true;
+    magnatesBPState.wavyTextEnabled = true;
+    magnatesBPState.productsEnabled = true;
     magnatesBPState.l1Enabled = false;
     magnatesBPState.l2Enabled = false;
     magnatesBPState.showCounter = false;
@@ -50070,20 +50162,25 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
     card.addEventListener('click', () => {
       const targetScene = card.getAttribute('data-scene-card');
-      if (targetScene === 'products_unfurl') {
-        if (magnatesBPState.preset === 'dual_silhouette' || magnatesBPState.preset === 'room_spawn') {
-          applyMagnatesBPPresetToState('full_story_flow');
+      if (magnatesBPState.preset === 'full_story_flow') {
+        if (targetScene === 'products_unfurl') {
+          magnatesBPState.productsEnabled = true;
+          magnatesBPState.playhead = magnatesBPState.logoShiftRightTime ?? 3.10;
+          selectMagnatesBPLayer('z6');
+        } else if (targetScene === 'dual_silhouette') {
+          magnatesBPState.playhead = magnatesBPState.productsEnabled ? 7.20 : 4.50;
+          selectMagnatesBPLayer('z2');
+        } else {
+          magnatesBPState.playhead = 0.0;
+          selectMagnatesBPLayer('z4');
         }
-        magnatesBPState.productsEnabled = true;
-        magnatesBPState.playhead = magnatesBPState.logoShiftRightTime ?? 3.10;
-        selectMagnatesBPLayer('z6');
-        updateMagnatesBPVisualStyles();
-      } else if (magnatesBPState.preset === 'full_story_flow') {
-        magnatesBPState.playhead = targetScene === 'dual_silhouette' ? (magnatesBPState.productsEnabled ? 7.20 : 4.50) : 0.0;
         updateMagnatesBPVisualStyles();
       } else if (targetScene) {
         applyMagnatesBPPresetToState(targetScene);
         magnatesBPState.playhead = 0;
+        if (targetScene === 'products_unfurl') selectMagnatesBPLayer('z6');
+        else if (targetScene === 'dual_silhouette') selectMagnatesBPLayer('z2');
+        else selectMagnatesBPLayer('z4');
         updateMagnatesBPVisualStyles();
       }
     });
