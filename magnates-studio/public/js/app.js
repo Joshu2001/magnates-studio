@@ -31213,6 +31213,9 @@ function openTopTemplateCustomizer(tpl) {
     if (wrapSec) wrapSec.style.display = 'flex';
     if (wrapText) wrapText.style.display = 'none';
     if (creatorWrapEl) creatorWrapEl.style.display = 'flex';
+    if (atmosphereWrapEl) atmosphereWrapEl.style.display = 'none';
+    const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
+    if (aiEngineWrap) aiEngineWrap.style.display = 'none';
 
     syncCreatorCalibrationUI();
   } else if (tpl.id === 'spooner-2-5d-photo-parallax') {
@@ -33193,6 +33196,67 @@ function renderTopTemplatePreviewStage() {
       </div>
     `;
     setTimeout(initDocDirectCanvasEditing, 40);
+  } else if (tplId === 'creator-cinematic-backdrop-suite') {
+    const cState = topCustomizerState;
+    const cMode = cState.creatorMode || 'original';
+    const cPreset = cState.creatorVirtualPreset || 'studio';
+    let bgUrl = sec || '/creator_background_plate.png';
+    if (cMode === 'virtual') {
+      if (cPreset === 'cyber') bgUrl = '/creator_cyber_bokeh_preset.png';
+      else if (cPreset === 'boardroom') bgUrl = '/creator_studio_bokeh_preset.png';
+      else bgUrl = '/creator_studio_bokeh_preset.png';
+    }
+    const cBlur = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
+    const cBrightness = cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65;
+    const cTint = cState.creatorTint !== undefined ? cState.creatorTint : 45;
+    const cWarmBokeh = cState.creatorWarmBokeh !== false;
+    const cRim = cState.creatorRim !== undefined ? cState.creatorRim : 75;
+    const cTextLeft = cState.creatorTextLeft || 'this AI company';
+    const cTextRight = cState.creatorTextRight || 'VOICE';
+
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #020b14; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <!-- Layer 0: Background Plate with Depth Blur & Exposure Dimming -->
+        <div id="creator-live-bg-wrap" style="position: absolute; inset: -5%; width: 110%; height: 110%; overflow: hidden;">
+          <img id="creator-live-bg" src="${bgUrl}" alt="Calibrated Background" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(${cBlur}px) brightness(${(cBrightness / 100).toFixed(2)}) contrast(1.25); transform: scale(1.05);" />
+        </div>
+
+        <!-- Layer 1: Volumetric Lighting & Cyan/Teal Atmospheric Grade Overlay -->
+        <div id="creator-live-lighting" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${(cTint / 100).toFixed(2)}) 0%, rgba(30, 58, 138, 0.15) 55%, transparent 75%); z-index: 2;"></div>
+
+        <!-- Layer 2: Moody Warm Bokeh Accent Lamps -->
+        <div id="creator-live-bokeh-wrap" style="position: absolute; inset: 0; pointer-events: none; z-index: 3; display: ${cWarmBokeh ? 'block' : 'none'};">
+          <div id="creator-live-bokeh-left" style="position: absolute; left: 8%; top: 60%; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%); filter: blur(12px);"></div>
+          <div id="creator-live-bokeh-right" style="position: absolute; right: 8%; top: 50%; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, transparent 70%); filter: blur(14px);"></div>
+        </div>
+
+        <!-- Layer 3: Kinetic Text Behind Speaker -->
+        <div id="creator-live-kinetic-text" style="position: absolute; inset: 0; pointer-events: none; z-index: 12;">
+          <div id="creator-live-txt-left" style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.85);">${cTextLeft}</div>
+          <div id="creator-live-txt-right" style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 900; font-size: 54px; color: #ffffff; text-shadow: 0 4px 20px rgba(0,0,0,0.9); letter-spacing: -0.04em;">${cTextRight}</div>
+        </div>
+
+        <!-- Layer 4: Segmented Foreground Speaker with Rim Light -->
+        <div id="creator-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; z-index: 20;">
+          <img id="creator-live-fg-img" src="${prim || '/creator_portrait_cutout.png'}" alt="Creator Cutout" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 95%; max-width: none; object-fit: contain; filter: drop-shadow(0 0 ${Math.round(cRim * 0.24)}px rgba(2, 132, 199, ${(cRim / 100).toFixed(2)})) drop-shadow(0 15px 35px rgba(0,0,0,0.9)); transition: transform 0.05s ease-out;" />
+        </div>
+
+        <!-- Layer 5: Anti-Glitch Face Tracking Reticle Guide (Toggled) -->
+        <div id="creator-live-reticle" style="position: absolute; top: 16%; left: 50%; transform: translateX(-50%); width: 140px; height: 160px; border: 1.5px dashed rgba(56, 189, 248, 0.75); border-radius: 80px 80px 70px 70px; pointer-events: none; z-index: 25; display: ${cState.creatorFaceTrack !== false ? 'block' : 'none'}; box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);">
+          <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: rgba(14, 165, 233, 0.9); color: #fff; font-family: monospace; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; letter-spacing: 0.5px; white-space: nowrap;">
+            AI FACE-LOCK: ACTIVE
+          </div>
+          <div style="position: absolute; top: 50%; left: -6px; width: 12px; height: 1.5px; background: #38bdf8;"></div>
+          <div style="position: absolute; top: 50%; right: -6px; width: 12px; height: 1.5px; background: #38bdf8;"></div>
+          <div style="position: absolute; top: -6px; left: 50%; width: 1.5px; height: 12px; background: #38bdf8;"></div>
+          <div style="position: absolute; bottom: -6px; left: 50%; width: 1.5px; height: 12px; background: #38bdf8;"></div>
+        </div>
+
+        <!-- Layer 6: Hold-out Protection Brush Overlay Canvas -->
+        <canvas id="creator-live-brush-canvas" width="1280" height="720" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: ${cState.creatorBrushActive ? 'auto' : 'none'}; z-index: 30; opacity: 0.75; cursor: crosshair;"></canvas>
+      </div>
+    `;
+    setTimeout(initCreatorBrushInteraction, 50);
   } else if (tplId === 'spooner-2-5d-photo-parallax') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: default; perspective: 1200px;">
@@ -33708,7 +33772,30 @@ function updateTopCustomizerFrame(seqTime, now) {
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
 
-  if (tplId === 'spooner-2-5d-photo-parallax') {
+  if (tplId === 'creator-cinematic-backdrop-suite') {
+    const fgImg = document.getElementById('creator-live-fg-img');
+    const reticle = document.getElementById('creator-live-reticle');
+    const bg = document.getElementById('creator-live-bg');
+    const cState = topCustomizerState;
+    if (cState.creatorFaceTrack !== false && fgImg) {
+      const sens = (cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94) / 100;
+      // Natural organic head sway with temporal low-pass filter (anti-twitch smoothing)
+      const targetX = Math.sin(seqTime * 1.2) * 5 * sens + Math.sin(seqTime * 0.4) * 2.5 * sens;
+      const targetY = Math.cos(seqTime * 0.9) * 2.5 * sens;
+      cState.creatorSmoothedX = (cState.creatorSmoothedX || 0) * 0.92 + targetX * 0.08;
+      cState.creatorSmoothedY = (cState.creatorSmoothedY || 0) * 0.92 + targetY * 0.08;
+      
+      fgImg.style.transform = `translate(calc(-50% + ${cState.creatorSmoothedX.toFixed(2)}px), ${cState.creatorSmoothedY.toFixed(2)}px)`;
+      if (reticle) {
+        reticle.style.transform = `translate(calc(-50% + ${cState.creatorSmoothedX.toFixed(2)}px), ${cState.creatorSmoothedY.toFixed(2)}px)`;
+      }
+    }
+    if (bg) {
+      // Subtle counter-drift parallax for background depth
+      const bgDriftX = -Math.sin(seqTime * 0.8) * 4;
+      bg.style.transform = `scale(1.05) translate(${bgDriftX.toFixed(2)}px, 0)`;
+    }
+  } else if (tplId === 'spooner-2-5d-photo-parallax') {
     const bg = document.getElementById('customizer-live-bg');
     const fg = document.getElementById('customizer-live-fg-wrap');
     // Authentic Chris Spooner Cinematic Pace: Unidirectional smooth push across the shot duration (No ping-pong reversal)
