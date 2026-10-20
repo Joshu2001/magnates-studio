@@ -7521,6 +7521,8 @@ body.tool-slide-active {
 [id$="-stage-frame"]:hover .tpl-modal-player-hud,
 [id$="-video-stage"]:hover .tpl-modal-player-hud,
 [id$="-viewport"]:hover .tpl-modal-player-hud,
+[id$="-stage"]:hover .tpl-modal-player-hud,
+.tpl-stage-hover-parent:hover .tpl-modal-player-hud,
 .tpl-modal-player-hud:hover,
 .studio-main-player-hud:hover,
 .tpl-modal-player-hud.active,

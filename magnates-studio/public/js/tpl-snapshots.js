@@ -708,21 +708,32 @@
     // 34. Paper-Based & Blueprint Cutouts
     'magnates-media-paper-blueprint': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-        <rect width="400" height="225" fill="#041226"/>
-        <!-- Blueprint Grid -->
-        <g stroke="rgba(56,189,248,0.25)" stroke-width="1">
-          <line x1="0" y1="35" x2="400" y2="35"/><line x1="0" y1="75" x2="400" y2="75"/><line x1="0" y1="115" x2="400" y2="115"/><line x1="0" y1="155" x2="400" y2="155"/><line x1="0" y1="195" x2="400" y2="195"/>
-          <line x1="50" y1="0" x2="50" y2="225"/><line x1="120" y1="0" x2="120" y2="225"/><line x1="190" y1="0" x2="190" y2="225"/><line x1="260" y1="0" x2="260" y2="225"/><line x1="330" y1="0" x2="330" y2="225"/>
+        <defs>
+          <radialGradient id="bpCrimGrad" cx="25%" cy="28%" r="75%">
+            <stop offset="0%" stop-color="#991b1b"/>
+            <stop offset="45%" stop-color="#450a0a"/>
+            <stop offset="100%" stop-color="#050101"/>
+          </radialGradient>
+          <filter id="bpSilGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ffffff" flood-opacity="0.9"/>
+            <feDropShadow dx="0" dy="0" stdDeviation="14" flood-color="#ffffff" flood-opacity="0.45"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#bpCrimGrad)"/>
+        <!-- Center Red Money Counter -->
+        <text x="200" y="103" fill="#ff1a1a" font-family="Montserrat, Arial Black, sans-serif" font-weight="900" font-size="31" text-anchor="middle" letter-spacing="0.5">$999,970</text>
+        <text x="200" y="121" fill="#b91c1c" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="11" text-anchor="middle">Advertising Those Product.</text>
+        <!-- Left Standing White Glowing Silhouette -->
+        <g filter="url(#bpSilGlow)" fill="#ffffff" transform="translate(24, 34)">
+          <circle cx="30" cy="22" r="14"/>
+          <path d="M12,42 C12,38 48,38 48,42 L54,112 L42,112 L40,182 L16,182 L14,112 L6,112 Z"/>
+          <path d="M46,46 L68,36 L72,44 L50,58 Z"/>
         </g>
-        <g transform="translate(90, 50)">
-          <rect width="220" height="110" fill="#082f49" stroke="#38bdf8" stroke-width="1.8" rx="4"/>
-          <text x="110" y="32" fill="#38bdf8" font-family="monospace" font-weight="900" font-size="10" letter-spacing="2" text-anchor="middle">TECHNICAL BLUEPRINT #402</text>
-          <line x1="30" y1="45" x2="190" y2="45" stroke="#38bdf8" stroke-width="1"/>
-          <!-- Architecture schematic paths -->
-          <rect x="40" y="55" width="45" height="35" fill="none" stroke="#7dd3fc" stroke-width="1.2"/>
-          <rect x="95" y="55" width="85" height="35" fill="none" stroke="#7dd3fc" stroke-width="1.2"/>
+        <!-- Right Sitting White Glowing Silhouette -->
+        <g filter="url(#bpSilGlow)" fill="#ffffff" transform="translate(290, 82)">
+          <circle cx="52" cy="20" r="13"/>
+          <path d="M34,38 C34,34 68,34 70,40 L76,96 L30,96 L18,140 L6,140 L20,88 L34,88 Z"/>
         </g>
-        
       </svg>
     `)}`,
 

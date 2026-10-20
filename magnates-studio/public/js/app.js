@@ -28339,46 +28339,21 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'magnates-media-paper-blueprint') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #061124; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <!-- Blueprint Technical Grid -->
-          <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: linear-gradient(to right, rgba(0,240,255,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,240,255,0.12) 1px, transparent 1px); opacity: 0.85;"></div>
-          
-          <!-- Blueprint Schematic Concentric Circles -->
-          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" viewBox="0 0 400 225">
-            <circle cx="200" cy="112" r="70" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="4 2" opacity="0.5"/>
-            <line x1="60" y1="112" x2="340" y2="112" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.4"/>
-            <line x1="200" y1="20" x2="200" y2="205" stroke="#38bdf8" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.4"/>
-          </svg>
-
-          <!-- Floating Paper Document Cutout -->
-          <div id="fx-bp-doc-${tplId}" style="position: absolute; width: 130px; height: 110px; background: #0a1f38; border: 1.5px solid #38bdf8; border-radius: 6px; box-shadow: 0 15px 30px rgba(0,0,0,0.9); transform: rotate(-5deg); padding: 8px; transition: transform 0.08s ease;">
-            <div style="font-family: monospace; font-size: 7px; color: #7dd3fc; font-weight: 800; border-bottom: 1px dashed rgba(56,189,248,0.5); padding-bottom: 3px;">
-              BLUEPRINT_SEC_08
-            </div>
-            <div style="margin-top: 6px; width: 100%; height: 45px; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.3); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-              <span style="font-family: monospace; font-size: 7px; color: #38bdf8;">FIG 4A: ARCHITECTURE</span>
-            </div>
+        <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, rgba(165, 22, 22, 0.9) 0%, rgba(95, 10, 10, 0.72) 40%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Center Red Money Counter -->
+          <div id="fx-bp-counter-wrap-${tplId}" style="position: relative; z-index: 4; text-align: center; transform: translateY(-4%); pointer-events: none;">
+            <div id="fx-bp-counter-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 28px; font-weight: 900; color: #ff1a1a; letter-spacing: 0.5px; line-height: 1.05; text-shadow: 0 0 18px rgba(255,20,20,0.7), 0 3px 10px rgba(0,0,0,0.9);">$999,970</div>
+            <div style="font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700; color: #b91c1c; margin-top: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">Advertising Those Product.</div>
           </div>
 
-          <!-- Floating Portrait Cutout (Sticker Stroke) -->
-          <div id="fx-bp-portrait-${tplId}" style="position: relative; z-index: 10; width: 95px; height: 125px; border-radius: 10px; background: #ffffff; padding: 4px; box-shadow: 0 20px 40px rgba(0,0,0,0.95); transform: rotate(4deg); transition: transform 0.08s ease;">
-            <div style="width: 100%; height: 100%; border-radius: 6px; overflow: hidden; background: #0f172a;">
-              <img src="${tpl.secondaryImage}" style="width: 100%; height: 100%; object-fit: cover;" />
-            </div>
-          </div>
+          <!-- Left Standing White Glowing Silhouette -->
+          <img id="fx-bp-left-${tplId}" src="/silhouette_standing_phone.png" style="position: absolute; left: 5%; bottom: 2%; height: 83%; width: auto; object-fit: contain; z-index: 8; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none;" />
 
-          <!-- Moving Hand Cutout Placing Evidence -->
-          <div id="fx-bp-hand-${tplId}" style="position: absolute; bottom: -10px; right: 15px; z-index: 20; pointer-events: none; transition: transform 0.08s ease; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.9));">
-            <svg width="110" height="90" viewBox="0 0 100 80">
-              <path d="M 60 70 L 40 25 L 65 15 L 90 55 Z" fill="#1e293b" stroke="#ffffff" stroke-width="2"/>
-              <path d="M 38 27 L 63 17 L 66 22 L 41 32 Z" fill="#ffffff"/>
-              <path d="M 40 30 C 30 38 18 45 10 40 C 4 36 6 28 15 22 L 45 8 C 50 5 60 8 62 14 Z" fill="#fbcfe8" stroke="#ffffff" stroke-width="2"/>
-              <circle cx="8" cy="22" r="4.5" fill="#ef4444" stroke="#ffffff" stroke-width="1.5"/>
-            </svg>
-          </div>
+          <!-- Right Sitting White Glowing Silhouette -->
+          <img id="fx-bp-right-${tplId}" src="/silhouette_sitting_phone.png" style="position: absolute; right: 0%; bottom: 0%; height: 61%; width: auto; object-fit: contain; z-index: 9; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none;" />
 
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #0ea5e9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(2,132,199,0.5);">
-            \ud83d\udcd0 BLUEPRINT &amp; PAPER
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(220,38,38,0.5);">
+            &#x2728; SILHOUETTE &amp; CUTOUTS
           </div>
         </div>
       `;
@@ -29352,15 +29327,44 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         }
       }
     } else if (tplId === 'magnates-media-paper-blueprint') {
-      const docRot = -5 + Math.sin(t * 1.8) * 3;
-      const portRot = 4 + Math.cos(t * 2.2) * 4;
-      const handOffset = Math.sin(t * 2.5) * 12;
-      const doc = fxContainer?.querySelector(`#fx-bp-doc-${tplId}`);
-      const portrait = fxContainer?.querySelector(`#fx-bp-portrait-${tplId}`);
-      const hand = fxContainer?.querySelector(`#fx-bp-hand-${tplId}`);
-      if (doc) doc.style.transform = `rotate(${docRot.toFixed(1)}deg) translateY(${(-Math.sin(t * 1.8) * 4).toFixed(1)}px)`;
-      if (portrait) portrait.style.transform = `rotate(${portRot.toFixed(1)}deg) translateY(${(Math.sin(t * 2.2) * 5).toFixed(1)}px)`;
-      if (hand) hand.style.transform = `translate(${handOffset.toFixed(1)}px, ${(-Math.abs(handOffset * 0.8)).toFixed(1)}px)`;
+      const cycle = t % 5.2;
+      const counterEl = fxContainer?.querySelector(`#fx-bp-counter-${tplId}`);
+      const leftEl = fxContainer?.querySelector(`#fx-bp-left-${tplId}`);
+      const rightEl = fxContainer?.querySelector(`#fx-bp-right-${tplId}`);
+      const bgEl = fxContainer?.querySelector(`#fx-bp-bg-${tplId}`);
+      const easeOut = (x) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
+      const easeIn = (x) => Math.pow(Math.max(0, Math.min(1, x)), 3);
+
+      // 1. Money counter counts up toward $1,000,000
+      if (counterEl) {
+        const countProg = Math.min(1, cycle / 1.15);
+        const val = Math.floor(850000 + easeOut(countProg) * 150000);
+        counterEl.textContent = '$' + val.toLocaleString('en-US');
+      }
+      // 2. Left silhouette glides Left -> Right at 0.80s, reverses Right -> Left at 3.50s
+      if (leftEl) {
+        const inP = easeOut((cycle - 0.80) / 0.45);
+        const outP = easeIn((cycle - 3.50) / 0.45);
+        const tx = (1 - inP) * -130 + outP * -140;
+        const op = Math.max(0, Math.min(1, inP * (1 - outP)));
+        leftEl.style.transform = `translateX(${tx.toFixed(1)}%)`;
+        leftEl.style.opacity = op.toFixed(2);
+      }
+      // 3. Right silhouette glides Bottom -> Up at 0.90s (+ms), exits Right -> Left at 3.72s (+ms)
+      if (rightEl) {
+        const inP = easeOut((cycle - 0.90) / 0.45);
+        const outP = easeIn((cycle - 3.72) / 0.45);
+        const ty = (1 - inP) * 120;
+        const tx = outP * -240;
+        const op = Math.max(0, Math.min(1, inP * (1 - outP)));
+        rightEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
+        rightEl.style.opacity = op.toFixed(2);
+      }
+      // 4. Background fades away after cutouts exit
+      if (bgEl) {
+        const fadeP = easeIn((cycle - 4.20) / 0.65);
+        bgEl.style.opacity = (1 - fadeP).toFixed(2);
+      }
     } else if (tplId === 'magnates-media-ink-reveal') {
       const bleedScale = 0.5 + ((t * 0.8) % 1.2) * 0.6;
       const titleStretch = 1 + Math.sin(t * 2) * 0.08;
@@ -48013,324 +48017,348 @@ function bindMagnatesBlendModesSuiteModalControls() {
 
 /* =========================================================
    5. MAGNATES MEDIA & JAMES JANI DYNAMIC CUTOUT MOTION SUITE CONTROLLER
-   (True transparent silhouettes, room plate spawn, staggered sequential reveals & exits,
-    center bursts, stop-motion cadence, realistic drop shadows, and parallax crawl)
+   (Granular Entrance & Exit Animations, Smooth Cubic Glides, Staggered Millisecond Delays,
+    $1,000,000 Money Counter Choreography, Full-Scale Office Room Cutout, Hover HUD & Layer Stack)
    ========================================================= */
 let magnatesBPState = {
   isPlaying: true,
   playhead: 0,
-  duration: 5.0,
-  preset: "room_spawn", // 'room_spawn', 'dual_silhouette', 'center_burst', 'blueprint_dossier'
-  choreography: "staggered_sequential", // 'staggered_sequential', 'simultaneous_staggered_exit', 'from_the_heart', 'camera_crawl', 'pop_in_place'
-  paperAngle: 4,
-  showGlow: true,
-  showShadow: true,
+  duration: 6.0,
+  preset: "dual_silhouette", // 'dual_silhouette' (Image 3) | 'room_spawn' (Image 1/2)
+  selectedLayer: "z3",
+  showCounter: true,
   showBlueprintGrid: false,
-  enableJitter: true,
-  headline: "$999,970",
-  subcaption: "ADVERTISING THOSE PRODUCTS.",
-  primaryCutoutUrl: "/laptop_guy_cutout.png",
+  headline: "$1,000,000",
+  subcaption: "Advertising Those Product.",
+  // Z=2 (Cutout 1: Left standing silhouette OR Full-frame desk guy cutout)
   secondaryCutoutUrl: "/silhouette_standing_phone.png",
-  bgPlateUrl: "/room_empty_plate.png",
+  l1InAnim: "left_to_right",
+  l1OutAnim: "right_to_left",
+  l1InTime: 0.85,
+  l1OutTime: 3.80,
+  // Z=3 (Cutout 2: Right sitting silhouette)
+  primaryCutoutUrl: "/silhouette_sitting_phone.png",
+  l2Enabled: true,
+  l2InAnim: "bottom_to_up",
+  l2OutAnim: "right_to_left",
+  l2InTime: 0.95,
+  l2OutTime: 4.05,
+  // Z=0 Background plate & fade out timing
+  bgPlateUrl: "",
+  bgFadeTime: 4.45,
   animFrameId: null,
   lastTimestamp: null
 };
 
 const MAGNATES_BP_PRESETS = {
-  room_spawn: {
-    bgPlateUrl: "/room_empty_plate.png",
-    primaryCutoutUrl: "/laptop_guy_cutout.png",
-    secondaryCutoutUrl: "/silhouette_standing_phone.png",
-    headline: "$999,970",
-    subcaption: "ADVERTISING THOSE PRODUCTS.",
-    choreography: "pop_in_place",
-    showBlueprintGrid: false,
-    showGlow: false,
-    showShadow: true,
-    hudPreset: "PRESET: POP-IN ROOM CUTOUT (JAMES JANI)",
-    hudAnim: "CHOREOGRAPHY: SUDDEN DESK SPAWN"
-  },
   dual_silhouette: {
     bgPlateUrl: "",
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
     primaryCutoutUrl: "/silhouette_sitting_phone.png",
-    secondaryCutoutUrl: "/silhouette_standing_phone.png",
-    headline: "$999,970",
-    subcaption: "ADVERTISING THOSE PRODUCTS.",
-    choreography: "simultaneous_staggered_exit",
-    showBlueprintGrid: false,
-    showGlow: true,
-    showShadow: false,
-    hudPreset: "PRESET: DUAL SILHOUETTES (IMAGE 2)",
-    hudAnim: "CHOREOGRAPHY: STAGGERED GLOWING EXITS"
+    l2Enabled: true,
+    showCounter: true,
+    headline: "$1,000,000",
+    subcaption: "Advertising Those Product.",
+    l1InAnim: "left_to_right",
+    l1OutAnim: "right_to_left",
+    l1InTime: 0.85,
+    l1OutTime: 3.80,
+    l2InAnim: "bottom_to_up",
+    l2OutAnim: "right_to_left",
+    l2InTime: 0.95,
+    l2OutTime: 4.05,
+    bgFadeTime: 4.45,
+    hudPreset: "SCENE: $1M DUAL SILHOUETTES",
+    l1Label: "Left Silhouette Cutout",
+    l2Label: "Right Silhouette Cutout",
+    z0Label: "Crimson Radial Atmosphere"
   },
-  center_burst: {
-    bgPlateUrl: "",
-    primaryCutoutUrl: "/portrait_cutout_clean.png",
-    secondaryCutoutUrl: "/clean_traveler_cutout.png",
-    headline: "EXPONENTIAL LEVERAGE",
-    subcaption: "THE INNER CIRCLE // CORE EMERGENCE",
-    choreography: "from_the_heart",
-    showBlueprintGrid: false,
-    showGlow: true,
-    showShadow: true,
-    hudPreset: "PRESET: CENTER BURST FROM CORE",
-    hudAnim: "CHOREOGRAPHY: EMERGE FROM THE HEART"
-  },
-  blueprint_dossier: {
-    bgPlateUrl: "",
-    primaryCutoutUrl: "/portrait_cutout_clean.png",
-    secondaryCutoutUrl: "/silhouette_standing_phone.png",
-    headline: "DOSSIER ARCHIVE",
-    subcaption: "TECHNICAL BLUEPRINT // 2D SCHEMATIC CUTOUT",
-    choreography: "staggered_sequential",
-    showBlueprintGrid: true,
-    showGlow: false,
-    showShadow: true,
-    hudPreset: "PRESET: TECHNICAL BLUEPRINT DOSSIER",
-    hudAnim: "CHOREOGRAPHY: SEQUENTIAL STAMP & PIN"
+  room_spawn: {
+    bgPlateUrl: "/room_empty_plate.png",
+    secondaryCutoutUrl: "/laptop_guy_cutout.png",
+    primaryCutoutUrl: "/silhouette_sitting_phone.png",
+    l2Enabled: false,
+    showCounter: false,
+    headline: "",
+    subcaption: "",
+    l1InAnim: "bottom_to_up",
+    l1OutAnim: "top_to_down",
+    l1InTime: 0.80,
+    l1OutTime: 4.10,
+    l2InAnim: "bottom_to_up",
+    l2OutAnim: "right_to_left",
+    l2InTime: 1.00,
+    l2OutTime: 4.25,
+    bgFadeTime: 4.65,
+    hudPreset: "SCENE: OFFICE DESK CUTOUT GLIDE",
+    l1Label: "Office Desk Guy Cutout",
+    l2Label: "Secondary Cutout (Hidden)",
+    z0Label: "Empty Office Room Plate"
   }
 };
+
+function bpEaseOutCubic(x) {
+  const c = Math.max(0, Math.min(1, x));
+  return 1 - Math.pow(1 - c, 3);
+}
+
+function bpEaseInCubic(x) {
+  const c = Math.max(0, Math.min(1, x));
+  return c * c * c;
+}
+
+function bpFormatAnimLabel(inAnim, outAnim) {
+  const map = {
+    left_to_right: "Left→Right",
+    bottom_to_up: "Bottom→Up",
+    right_to_left: "Right→Left",
+    top_to_down: "Top→Down",
+    scale_pop: "Scale Pop",
+    fade_out: "Fade Out"
+  };
+  return `In: ${map[inAnim] || inAnim} • Out: ${map[outAnim] || outAnim}`;
+}
+
+function computeGranularCutoutTransform(playhead, inTime, outTime, inAnim, outAnim) {
+  const inDur = 0.48;
+  const outDur = 0.48;
+  let tx = 0;
+  let ty = 0;
+  let scale = 1;
+  let opacity = 1;
+
+  // Entrance Phase (Smooth Cubic Glide — zero jitter/shaking)
+  if (playhead < inTime) {
+    opacity = 0;
+    if (inAnim === "left_to_right") tx = -125;
+    else if (inAnim === "bottom_to_up") ty = 105;
+    else if (inAnim === "right_to_left") tx = 125;
+    else if (inAnim === "scale_pop") scale = 0.72;
+  } else if (playhead < inTime + inDur) {
+    const p = bpEaseOutCubic((playhead - inTime) / inDur);
+    opacity = Math.min(1, p * 1.35);
+    if (inAnim === "left_to_right") tx = (1 - p) * -125;
+    else if (inAnim === "bottom_to_up") ty = (1 - p) * 105;
+    else if (inAnim === "right_to_left") tx = (1 - p) * 125;
+    else if (inAnim === "scale_pop") scale = 0.72 + 0.28 * p;
+  }
+
+  // Exit Phase (Smooth Cubic Glide with millisecond stagger)
+  if (playhead >= outTime) {
+    const q = bpEaseInCubic((playhead - outTime) / outDur);
+    opacity *= Math.max(0, 1 - q * 1.15);
+    if (outAnim === "right_to_left") tx += -160 * q;
+    else if (outAnim === "left_to_right") tx += 160 * q;
+    else if (outAnim === "top_to_down") ty += 105 * q;
+    else if (outAnim === "fade_out") scale *= (1 - 0.08 * q);
+  }
+
+  return {
+    transform: `translate3d(${tx.toFixed(2)}%, ${ty.toFixed(2)}%, 0) scale(${scale.toFixed(3)})`,
+    opacity: Math.max(0, Math.min(1, opacity)).toFixed(3)
+  };
+}
 
 function updateMagnatesBPVisualStyles() {
   const headlineEl = document.getElementById('magnates-bp-headline');
   const subcaptionEl = document.getElementById('magnates-bp-subcaption');
   const primaryImg = document.getElementById('magnates-bp-img-primary');
   const secondaryImg = document.getElementById('magnates-bp-img-secondary');
+  const bgWrap = document.getElementById('magnates-bp-bg-wrap');
+  const crimsonBg = document.getElementById('magnates-bp-crimson-bg');
   const bgPlateImg = document.getElementById('magnates-bp-bg-plate');
   const primaryLayer = document.getElementById('magnates-bp-layer-primary');
   const secondaryLayer = document.getElementById('magnates-bp-layer-secondary');
   const gridLayer = document.getElementById('magnates-bp-grid-layer');
-  const schematicSvg = document.getElementById('magnates-bp-schematic-svg');
-  const groundShadow = document.getElementById('magnates-bp-ground-shadow');
-  const handWrap = document.getElementById('magnates-bp-hand-wrap');
   const textWrap = document.getElementById('magnates-bp-text-wrap');
   const timerEl = document.getElementById('magnates-bp-timer-display');
+  const hudTimecode = document.getElementById('magnates-bp-hud-timecode');
+  const scrubberFill = document.getElementById('magnates-bp-scrubber-fill');
   const hudPreset = document.getElementById('magnates-bp-hud-preset');
   const hudAnim = document.getElementById('magnates-bp-hud-anim');
-
-  if (headlineEl) headlineEl.textContent = magnatesBPState.headline;
-  if (subcaptionEl) subcaptionEl.textContent = magnatesBPState.subcaption;
-  
-  if (primaryImg && primaryImg.getAttribute('src') !== magnatesBPState.primaryCutoutUrl) {
-    primaryImg.src = magnatesBPState.primaryCutoutUrl;
-  }
-  if (secondaryImg && secondaryImg.getAttribute('src') !== magnatesBPState.secondaryCutoutUrl) {
-    secondaryImg.src = magnatesBPState.secondaryCutoutUrl;
-  }
+  const activeLayerPill = document.getElementById('magnates-bp-hud-active-layer-pill');
+  const layerCountBadge = document.getElementById('magnates-bp-layer-count-badge');
 
   const p = magnatesBPState.playhead;
   const dur = magnatesBPState.duration;
-  if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  const timeText = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  if (timerEl) timerEl.textContent = timeText;
+  if (hudTimecode) hudTimecode.textContent = timeText;
+  if (scrubberFill) scrubberFill.style.width = `${Math.max(0, Math.min(100, (p / dur) * 100)).toFixed(1)}%`;
 
-  // Stop-motion quantization (12 fps feel common in documentary cutouts)
-  const quantizedP = magnatesBPState.enableJitter ? Math.floor(p * 12) / 12 : p;
-  const jitterX = magnatesBPState.enableJitter ? (Math.sin(quantizedP * 37) * 1.5) : 0;
-  const jitterY = magnatesBPState.enableJitter ? (Math.cos(quantizedP * 43) * 1.5) : 0;
-  const jitterRot = magnatesBPState.enableJitter ? (Math.sin(quantizedP * 29) * 0.4) : 0;
+  // Sync Cutout Image Sources & Inspector Thumbnails
+  if (secondaryImg && secondaryImg.getAttribute('src') !== magnatesBPState.secondaryCutoutUrl) {
+    secondaryImg.src = magnatesBPState.secondaryCutoutUrl;
+  }
+  if (primaryImg && primaryImg.getAttribute('src') !== magnatesBPState.primaryCutoutUrl) {
+    primaryImg.src = magnatesBPState.primaryCutoutUrl;
+  }
+  const thumbZ2 = document.getElementById('magnates-bp-thumb-z2');
+  if (thumbZ2 && thumbZ2.getAttribute('src') !== magnatesBPState.secondaryCutoutUrl) {
+    thumbZ2.src = magnatesBPState.secondaryCutoutUrl;
+  }
+  const thumbZ3 = document.getElementById('magnates-bp-thumb-z3');
+  if (thumbZ3 && thumbZ3.getAttribute('src') !== magnatesBPState.primaryCutoutUrl) {
+    thumbZ3.src = magnatesBPState.primaryCutoutUrl;
+  }
 
-  // Background Plate vs Blueprint Grid
+  // Z=0 Background Plate vs Crimson Radial Atmosphere + Fade-out at end
+  const isRoomScene = magnatesBPState.preset === 'room_spawn';
+  if (crimsonBg) crimsonBg.style.display = isRoomScene ? 'none' : 'block';
   if (bgPlateImg) {
     if (magnatesBPState.bgPlateUrl) {
       bgPlateImg.style.display = 'block';
       if (bgPlateImg.getAttribute('src') !== magnatesBPState.bgPlateUrl) {
         bgPlateImg.src = magnatesBPState.bgPlateUrl;
       }
-      bgPlateImg.style.opacity = '1';
     } else {
       bgPlateImg.style.display = 'none';
     }
   }
-
   if (gridLayer) {
-    gridLayer.style.opacity = magnatesBPState.showBlueprintGrid ? '0.85' : '0';
-  }
-  if (schematicSvg) {
-    schematicSvg.style.opacity = magnatesBPState.showBlueprintGrid ? '0.8' : '0';
+    gridLayer.style.opacity = magnatesBPState.showBlueprintGrid ? '0.65' : '0';
   }
 
-  // Filter styles (glow vs shadow)
-  if (primaryImg) {
-    let filterStr = '';
-    if (magnatesBPState.showGlow) {
-      filterStr += ' drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 35px rgba(239, 68, 68, 0.6))';
+  // Background fade-out after cutouts exit
+  let bgOpacity = 1;
+  if (p >= magnatesBPState.bgFadeTime) {
+    const fadeQ = bpEaseInCubic((p - magnatesBPState.bgFadeTime) / 0.55);
+    bgOpacity = Math.max(0, 1 - fadeQ);
+  }
+  if (bgWrap) bgWrap.style.opacity = bgOpacity.toFixed(3);
+
+  // Z=1 Center Money Counter ($0 -> $999,970 -> $1,000,000) & Subtitle
+  if (textWrap) {
+    if (!magnatesBPState.showCounter) {
+      textWrap.style.display = 'none';
     } else {
-      filterStr += ' drop-shadow(0 18px 30px rgba(0, 0, 0, 0.75))';
+      textWrap.style.display = 'flex';
+      const rawHead = (magnatesBPState.headline || '').trim();
+      if (headlineEl) {
+        if (rawHead.startsWith('$')) {
+          const targetNum = parseInt(rawHead.replace(/[^0-9]/g, ''), 10) || 1000000;
+          // Rapidly counts up toward $1,000,000; right around 0.85s-0.95s (when silhouettes enter) it passes ~$999,970
+          const countDur = Math.max(0.4, magnatesBPState.l2InTime + 0.20);
+          let currentVal = targetNum;
+          if (p < countDur) {
+            const cProg = bpEaseOutCubic(p / countDur);
+            currentVal = Math.floor(targetNum * (0.82 + 0.18 * cProg));
+          }
+          headlineEl.textContent = '$' + currentVal.toLocaleString('en-US');
+        } else {
+          headlineEl.textContent = rawHead;
+        }
+      }
+      if (subcaptionEl) subcaptionEl.textContent = magnatesBPState.subcaption;
+      // Text also fades out cleanly when background fades out
+      const textEnter = bpEaseOutCubic(p / 0.35);
+      textWrap.style.opacity = (textEnter * bgOpacity).toFixed(3);
     }
-    primaryImg.style.filter = filterStr;
   }
 
-  if (secondaryImg) {
-    let filterStr = '';
-    if (magnatesBPState.showGlow) {
-      filterStr += ' drop-shadow(0 0 16px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 35px rgba(239, 68, 68, 0.6))';
+  // Z=2 Layer 1 Layout & Motion (Left Standing Silhouette OR Full-Frame Office Desk Cutout)
+  if (secondaryLayer && secondaryImg) {
+    if (isRoomScene && magnatesBPState.secondaryCutoutUrl.includes('laptop_guy_cutout')) {
+      // Full-frame 1:1 pixel-aligned office desk cutout so the guy sits naturally at the desk
+      secondaryLayer.style.inset = '0';
+      secondaryLayer.style.left = '0';
+      secondaryLayer.style.bottom = '0';
+      secondaryLayer.style.width = '100%';
+      secondaryLayer.style.height = '100%';
+      secondaryImg.style.width = '100%';
+      secondaryImg.style.height = '100%';
+      secondaryImg.style.objectFit = 'cover';
+      secondaryImg.style.filter = 'drop-shadow(0 14px 28px rgba(0,0,0,0.65))';
     } else {
-      filterStr += ' drop-shadow(0 15px 25px rgba(0, 0, 0, 0.8))';
+      // Large Left Standing Silhouette (83% stage height, matching Image 3)
+      secondaryLayer.style.inset = 'auto';
+      secondaryLayer.style.left = '5%';
+      secondaryLayer.style.bottom = '2%';
+      secondaryLayer.style.width = 'auto';
+      secondaryLayer.style.height = '83%';
+      secondaryImg.style.width = 'auto';
+      secondaryImg.style.height = '100%';
+      secondaryImg.style.objectFit = 'contain';
+      secondaryImg.style.filter = 'drop-shadow(0 0 14px rgba(255,255,255,0.95)) drop-shadow(0 0 32px rgba(255,255,255,0.55))';
     }
-    secondaryImg.style.filter = filterStr;
+
+    const m1 = computeGranularCutoutTransform(
+      p,
+      magnatesBPState.l1InTime,
+      magnatesBPState.l1OutTime,
+      magnatesBPState.l1InAnim,
+      magnatesBPState.l1OutAnim
+    );
+    secondaryLayer.style.transform = m1.transform;
+    secondaryLayer.style.opacity = m1.opacity;
   }
 
-  if (groundShadow) {
-    groundShadow.style.display = magnatesBPState.showShadow ? 'block' : 'none';
-  }
-
-  // CHOREOGRAPHY ANIMATION ENGINE
-  const mode = magnatesBPState.choreography;
-
-  if (mode === 'pop_in_place') {
-    // Exact Image 3 -> Image 4 James Jani transition:
-    // Empty scene plate for first 1.0s, then BAM! The cutout pops onto the desk with slight overshoot
-    const spawnTime = 1.0;
-    if (p < spawnTime) {
-      if (primaryLayer) {
-        primaryLayer.style.opacity = '0';
-        primaryLayer.style.transform = 'translate(0px, 40px) scale(0.95)';
-      }
-      if (secondaryLayer) secondaryLayer.style.opacity = '0';
-      if (handWrap) handWrap.style.opacity = '0';
-      if (textWrap) {
-        textWrap.style.opacity = '0';
-        textWrap.style.transform = 'translateY(15px)';
-      }
+  // Z=3 Layer 2 Layout & Motion (Right Sitting Silhouette, 61% stage height, matching Image 3)
+  if (primaryLayer && primaryImg) {
+    if (!magnatesBPState.l2Enabled) {
+      primaryLayer.style.display = 'none';
     } else {
-      const enterProgress = Math.min(1.0, (p - spawnTime) / 0.35);
-      // Overshoot spring curve: 0 -> 1.06 -> 1.0
-      const overshoot = enterProgress < 1.0 
-        ? Math.sin(enterProgress * Math.PI * 0.75) * 1.08 
-        : 1.0 + Math.sin((p - spawnTime) * 1.5) * 0.01;
-      
-      if (primaryLayer) {
-        primaryLayer.style.opacity = '1';
-        primaryLayer.style.transform = `translate(${jitterX}px, ${jitterY}px) scale(${overshoot})`;
-      }
-      if (secondaryLayer) secondaryLayer.style.opacity = '0';
-      if (handWrap) {
-        handWrap.style.opacity = '1';
-        handWrap.style.right = '40px';
-        handWrap.style.top = '40px';
-      }
-      if (textWrap) {
-        const textProg = Math.min(1.0, (p - (spawnTime + 0.2)) / 0.4);
-        textWrap.style.opacity = `${Math.max(0, textProg)}`;
-        textWrap.style.transform = `translateY(${((1 - Math.max(0, textProg)) * 20).toFixed(1)}px)`;
-      }
-    }
+      primaryLayer.style.display = 'flex';
+      primaryLayer.style.right = '0%';
+      primaryLayer.style.bottom = '0%';
+      primaryLayer.style.height = '61%';
+      primaryImg.style.filter = 'drop-shadow(0 0 14px rgba(255,255,255,0.95)) drop-shadow(0 0 32px rgba(255,255,255,0.55))';
 
-  } else if (mode === 'simultaneous_staggered_exit') {
-    // Image 2 style: Both silhouettes present, then exit one by one
-    // Entrance: Staggered or together in first 0.8s
-    const enterProg1 = Math.min(1.0, p / 0.6);
-    const enterProg2 = Math.min(1.0, p / 0.8);
+      const m2 = computeGranularCutoutTransform(
+        p,
+        magnatesBPState.l2InTime,
+        magnatesBPState.l2OutTime,
+        magnatesBPState.l2InAnim,
+        magnatesBPState.l2OutAnim
+      );
+      primaryLayer.style.transform = m2.transform;
+      primaryLayer.style.opacity = m2.opacity;
+    }
+  }
 
-    // Exits: Element 1 exits at 3.0s, Element 2 exits at 4.2s
-    let exit1 = 0;
-    if (p > 3.0) {
-      exit1 = Math.min(1.0, (p - 3.0) / 0.5); // slides off top-left
-    }
-    let exit2 = 0;
-    if (p > 4.0) {
-      exit2 = Math.min(1.0, (p - 4.0) / 0.5); // slides off bottom-right
-    }
+  // Update HUD Phase Indicator & Layer Stack Subtitles
+  const presetDef = MAGNATES_BP_PRESETS[magnatesBPState.preset];
+  if (hudPreset && presetDef) hudPreset.textContent = presetDef.hudPreset;
 
-    if (secondaryLayer) {
-      // Standing person (Left)
-      secondaryLayer.style.opacity = `${(enterProg1 * (1 - exit1)).toFixed(2)}`;
-      const posX = -190 - (exit1 * 120) + jitterX;
-      const posY = 15 - (exit1 * 80) + jitterY;
-      secondaryLayer.style.transform = `translate(${posX.toFixed(1)}px, ${posY.toFixed(1)}px) rotate(${jitterRot}deg)`;
-    }
-
-    if (primaryLayer) {
-      // Sitting person (Right)
-      primaryLayer.style.opacity = `${(enterProg2 * (1 - exit2)).toFixed(2)}`;
-      const posX = 160 + (exit2 * 120) + jitterX;
-      const posY = 35 + (exit2 * 60) + jitterY;
-      primaryLayer.style.transform = `translate(${posX.toFixed(1)}px, ${posY.toFixed(1)}px) rotate(${jitterRot}deg)`;
-    }
-
-    if (textWrap) {
-      const textProg = Math.min(1.0, p / 0.5);
-      textWrap.style.opacity = `${textProg.toFixed(2)}`;
-      textWrap.style.transform = `scale(${(0.95 + textProg * 0.05).toFixed(2)})`;
-    }
-    if (handWrap) handWrap.style.opacity = '0';
-
-  } else if (mode === 'from_the_heart') {
-    // Cutout 2 emerges from the center / heart of Cutout 1
-    const p1Prog = Math.min(1.0, p / 0.7);
-    const emergeProg = Math.max(0, Math.min(1.0, (p - 1.2) / 0.9));
-
-    if (secondaryLayer) {
-      // Base subject (Center-back)
-      secondaryLayer.style.opacity = `${p1Prog.toFixed(2)}`;
-      const scale1 = 1.0 - (emergeProg * 0.2); // shifts back slightly
-      const shiftX = - (emergeProg * 110) + jitterX;
-      secondaryLayer.style.transform = `translate(${shiftX.toFixed(1)}px, ${jitterY}px) scale(${scale1.toFixed(2)})`;
-    }
-
-    if (primaryLayer) {
-      // Emerging subject burst from heart/center
-      primaryLayer.style.opacity = `${emergeProg.toFixed(2)}`;
-      const burstScale = 0.2 + (emergeProg * 0.9);
-      const shiftX = (emergeProg * 110) + jitterX;
-      primaryLayer.style.transform = `translate(${shiftX.toFixed(1)}px, ${jitterY}px) scale(${burstScale.toFixed(2)}) rotate(${jitterRot}deg)`;
-    }
-
-    if (textWrap) {
-      textWrap.style.opacity = `${emergeProg.toFixed(2)}`;
-      textWrap.style.transform = `translateY(${((1 - emergeProg) * 20).toFixed(1)}px)`;
-    }
-    if (handWrap) handWrap.style.opacity = '0';
-
-  } else if (mode === 'camera_crawl') {
-    // Smooth documentary camera crawl / pan with parallax layers
-    const crawlX = (p / dur) * 80;
-    if (secondaryLayer) {
-      secondaryLayer.style.opacity = '1';
-      // Moves slower (background parallax)
-      secondaryLayer.style.transform = `translate(${(-140 + crawlX * 0.6 + jitterX).toFixed(1)}px, ${jitterY}px) scale(0.9)`;
-    }
-    if (primaryLayer) {
-      primaryLayer.style.opacity = '1';
-      // Moves faster (foreground parallax)
-      primaryLayer.style.transform = `translate(${(120 + crawlX * 1.2 + jitterX).toFixed(1)}px, ${jitterY}px) scale(1.05)`;
-    }
-    if (textWrap) {
-      textWrap.style.opacity = '1';
-      textWrap.style.transform = `translate(${(crawlX * 0.3).toFixed(1)}px, 0px)`;
-    }
-    if (handWrap) handWrap.style.opacity = '0';
-
+  let phaseText = "PHASE: INTRO BUILD";
+  if (p < magnatesBPState.l1InTime) {
+    phaseText = magnatesBPState.showCounter ? "PHASE: 1. COUNTER BUILDING TO $1M" : "PHASE: 1. EMPTY ROOM PLATE";
+  } else if (p < magnatesBPState.l1OutTime) {
+    phaseText = "PHASE: 2. CUTOUTS GLIDE IN";
+  } else if (p < magnatesBPState.bgFadeTime) {
+    phaseText = "PHASE: 3. STAGGERED CUTOUT EXITS";
   } else {
-    // Staggered sequential (Default blueprint dossier style)
-    const prog1 = Math.min(1.0, p / 0.6);
-    const prog2 = Math.max(0, Math.min(1.0, (p - 0.7) / 0.6));
-    const progPin = Math.max(0, Math.min(1.0, (p - 1.4) / 0.4));
-
-    if (secondaryLayer) {
-      secondaryLayer.style.opacity = `${prog1.toFixed(2)}`;
-      const ang = magnatesBPState.paperAngle;
-      secondaryLayer.style.transform = `translate(${(-110 + jitterX).toFixed(1)}px, ${jitterY}px) rotate(${-ang}deg)`;
-    }
-    if (primaryLayer) {
-      primaryLayer.style.opacity = `${prog2.toFixed(2)}`;
-      const ang = magnatesBPState.paperAngle;
-      primaryLayer.style.transform = `translate(${(90 + jitterX).toFixed(1)}px, ${jitterY}px) rotate(${ang}deg)`;
-    }
-    if (handWrap) {
-      handWrap.style.opacity = `${progPin.toFixed(2)}`;
-      handWrap.style.right = '45px';
-      handWrap.style.top = '40px';
-      handWrap.style.transform = `translate(${jitterX}px, ${jitterY}px) scale(${(1.2 - progPin * 0.2).toFixed(2)})`;
-    }
-    if (textWrap) {
-      textWrap.style.opacity = `${prog2.toFixed(2)}`;
-    }
+    phaseText = "PHASE: 4. BACKDROP FADE TO BLACK";
   }
+  if (hudAnim) hudAnim.textContent = phaseText;
 
-  // Update HUD text
-  const currentPresetDef = MAGNATES_BP_PRESETS[magnatesBPState.preset];
-  if (hudPreset && currentPresetDef) hudPreset.textContent = currentPresetDef.hudPreset;
-  if (hudAnim) hudAnim.textContent = `MODE: ${magnatesBPState.choreography.toUpperCase().replace(/_/g, ' ')}`;
+  const activeCount = 1 + (magnatesBPState.showCounter ? 1 : 0) + 1 + (magnatesBPState.l2Enabled ? 1 : 0);
+  if (activeLayerPill) activeLayerPill.textContent = `${activeCount} LAYERS ACTIVE`;
+  if (layerCountBadge) layerCountBadge.textContent = `${activeCount} Stacked`;
+
+  const subZ2 = document.getElementById('magnates-bp-sub-z2');
+  if (subZ2) subZ2.textContent = bpFormatAnimLabel(magnatesBPState.l1InAnim, magnatesBPState.l1OutAnim);
+  const subZ3 = document.getElementById('magnates-bp-sub-z3');
+  if (subZ3) {
+    subZ3.textContent = magnatesBPState.l2Enabled
+      ? bpFormatAnimLabel(magnatesBPState.l2InAnim, magnatesBPState.l2OutAnim)
+      : "Disabled in single-subject scene";
+  }
+}
+
+function syncMagnatesBPPlayButtons() {
+  const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
+  const iconPause = document.getElementById('magnates-bp-hud-icon-pause');
+  const iconPlay = document.getElementById('magnates-bp-hud-icon-play');
+  if (magnatesBPState.isPlaying) {
+    if (btnPlay) btnPlay.textContent = '⏸ Pause';
+    if (iconPause) iconPause.style.display = 'block';
+    if (iconPlay) iconPlay.style.display = 'none';
+  } else {
+    if (btnPlay) btnPlay.textContent = '▶ Play';
+    if (iconPause) iconPause.style.display = 'none';
+    if (iconPlay) iconPlay.style.display = 'block';
+  }
 }
 
 function renderMagnatesBPLoop(timestamp) {
@@ -48348,6 +48376,70 @@ function renderMagnatesBPLoop(timestamp) {
   magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
 }
 
+function applyMagnatesBPPresetToState(pKey) {
+  const pData = MAGNATES_BP_PRESETS[pKey];
+  if (!pData) return;
+  magnatesBPState.preset = pKey;
+  magnatesBPState.bgPlateUrl = pData.bgPlateUrl;
+  magnatesBPState.secondaryCutoutUrl = pData.secondaryCutoutUrl;
+  magnatesBPState.primaryCutoutUrl = pData.primaryCutoutUrl;
+  magnatesBPState.l2Enabled = pData.l2Enabled;
+  magnatesBPState.showCounter = pData.showCounter;
+  magnatesBPState.headline = pData.headline;
+  magnatesBPState.subcaption = pData.subcaption;
+  magnatesBPState.l1InAnim = pData.l1InAnim;
+  magnatesBPState.l1OutAnim = pData.l1OutAnim;
+  magnatesBPState.l1InTime = pData.l1InTime;
+  magnatesBPState.l1OutTime = pData.l1OutTime;
+  magnatesBPState.l2InAnim = pData.l2InAnim;
+  magnatesBPState.l2OutAnim = pData.l2OutAnim;
+  magnatesBPState.l2InTime = pData.l2InTime;
+  magnatesBPState.l2OutTime = pData.l2OutTime;
+  magnatesBPState.bgFadeTime = pData.bgFadeTime;
+
+  // Sync Inspector UI Controls
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  };
+  const setTxt = (id, txt) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+  };
+  setVal('magnates-bp-select-preset', pKey);
+  setVal('magnates-bp-l1-in-anim', pData.l1InAnim);
+  setVal('magnates-bp-l1-out-anim', pData.l1OutAnim);
+  setVal('magnates-bp-l1-in-time', pData.l1InTime);
+  setVal('magnates-bp-l1-out-time', pData.l1OutTime);
+  setTxt('magnates-bp-val-l1-in', `${pData.l1InTime.toFixed(2)}s`);
+  setTxt('magnates-bp-val-l1-out', `${pData.l1OutTime.toFixed(2)}s`);
+
+  setVal('magnates-bp-l2-in-anim', pData.l2InAnim);
+  setVal('magnates-bp-l2-out-anim', pData.l2OutAnim);
+  setVal('magnates-bp-l2-in-time', pData.l2InTime);
+  setVal('magnates-bp-l2-out-time', pData.l2OutTime);
+  setTxt('magnates-bp-val-l2-in', `${pData.l2InTime.toFixed(2)}s`);
+  setTxt('magnates-bp-val-l2-out', `${pData.l2OutTime.toFixed(2)}s`);
+
+  setVal('magnates-bp-input-headline', pData.headline);
+  setVal('magnates-bp-input-subcaption', pData.subcaption);
+  setVal('magnates-bp-bg-fade-time', pData.bgFadeTime);
+  setTxt('magnates-bp-val-bg-fade', `Fade @ ${pData.bgFadeTime.toFixed(2)}s`);
+
+  const chkCounter = document.getElementById('magnates-bp-toggle-counter');
+  if (chkCounter) chkCounter.checked = pData.showCounter;
+
+  setTxt('magnates-bp-label-z2', pData.l1Label);
+  setTxt('magnates-bp-label-z3', pData.l2Label);
+  setTxt('magnates-bp-label-z0', pData.z0Label);
+  setTxt('magnates-bp-card-title-l1', pKey === 'room_spawn' ? 'Cutout 1 (Desk Guy) Motion' : 'Cutout 1 (Left Silhouette) Motion');
+
+  const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
+  if (cardL2) cardL2.style.opacity = pData.l2Enabled ? '1' : '0.45';
+  const rowZ3 = document.getElementById('magnates-bp-row-z3');
+  if (rowZ3) rowZ3.style.opacity = pData.l2Enabled ? '1' : '0.45';
+}
+
 function openMagnatesPaperBlueprintSuite() {
   const modal = document.getElementById('modal-magnates-paper-blueprint-suite');
   if (!modal) return;
@@ -48358,8 +48450,7 @@ function openMagnatesPaperBlueprintSuite() {
   if (magnatesBPState.animFrameId) cancelAnimationFrame(magnatesBPState.animFrameId);
   magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
 
-  const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
-  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
+  syncMagnatesBPPlayButtons();
   updateMagnatesBPVisualStyles();
 }
 
@@ -48374,207 +48465,300 @@ function closeMagnatesPaperBlueprintSuite() {
   }
 }
 
+function highlightMagnatesBPLayerOnStage(layerId) {
+  const stage = document.getElementById('magnates-bp-stage');
+  const hoverBox = document.getElementById('magnates-bp-hover-box');
+  const hoverTag = document.getElementById('magnates-bp-hover-tag');
+  if (!stage || !hoverBox || !hoverTag) return;
+
+  if (!layerId) {
+    hoverBox.style.display = 'none';
+    return;
+  }
+
+  const targetEl = stage.querySelector(`[data-bp-layer="${layerId}"]`);
+  if (!targetEl || targetEl.style.display === 'none') {
+    hoverBox.style.display = 'none';
+    return;
+  }
+
+  const stageRect = stage.getBoundingClientRect();
+  const rect = targetEl.getBoundingClientRect();
+  if (rect.width < 4 || rect.height < 4) {
+    hoverBox.style.display = 'none';
+    return;
+  }
+
+  const pad = 4;
+  const left = Math.max(2, rect.left - stageRect.left - pad);
+  const top = Math.max(2, rect.top - stageRect.top - pad);
+  const width = Math.min(stageRect.width - left - 2, rect.width + pad * 2);
+  const height = Math.min(stageRect.height - top - 2, rect.height + pad * 2);
+
+  hoverBox.style.left = `${left}px`;
+  hoverBox.style.top = `${top}px`;
+  hoverBox.style.width = `${width}px`;
+  hoverBox.style.height = `${height}px`;
+  hoverBox.style.display = 'block';
+
+  const titles = {
+    z3: "Z=3 // RIGHT SILHOUETTE CUTOUT",
+    z2: magnatesBPState.preset === 'room_spawn' ? "Z=2 // OFFICE DESK GUY CUTOUT" : "Z=2 // LEFT SILHOUETTE CUTOUT",
+    z1: "Z=1 // $1,000,000 COUNTER & CAPTION",
+    z0: "Z=0 // BACKDROP ATMOSPHERE"
+  };
+  hoverTag.textContent = titles[layerId] || layerId.toUpperCase();
+}
+
 function bindMagnatesPaperBlueprintSuiteModalControls() {
   document.getElementById('btn-close-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
   document.getElementById('btn-cancel-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
 
-  document.getElementById('btn-magnates-bp-play-pause')?.addEventListener('click', () => {
+  const togglePlay = () => {
     magnatesBPState.isPlaying = !magnatesBPState.isPlaying;
-    const btnPlay = document.getElementById('btn-magnates-bp-play-pause');
+    syncMagnatesBPPlayButtons();
     if (magnatesBPState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
       magnatesBPState.lastTimestamp = null;
       magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
-    } else {
-      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
-      if (magnatesBPState.animFrameId) cancelAnimationFrame(magnatesBPState.animFrameId);
+    } else if (magnatesBPState.animFrameId) {
+      cancelAnimationFrame(magnatesBPState.animFrameId);
     }
-  });
+  };
 
-  document.getElementById('btn-magnates-bp-reset')?.addEventListener('click', () => {
+  const replaySeq = () => {
     magnatesBPState.playhead = 0;
+    magnatesBPState.lastTimestamp = null;
     updateMagnatesBPVisualStyles();
-  });
+    if (!magnatesBPState.isPlaying) {
+      magnatesBPState.isPlaying = true;
+      syncMagnatesBPPlayButtons();
+      magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
+    }
+  };
+
+  document.getElementById('btn-magnates-bp-play-pause')?.addEventListener('click', togglePlay);
+  document.getElementById('btn-magnates-bp-hud-play')?.addEventListener('click', togglePlay);
+  document.getElementById('btn-magnates-bp-reset')?.addEventListener('click', replaySeq);
+  document.getElementById('btn-magnates-bp-hud-replay')?.addEventListener('click', replaySeq);
+
+  // Scrubber bar click & drag support in floating HUD
+  const scrubberWrap = document.getElementById('magnates-bp-scrubber-wrap');
+  if (scrubberWrap) {
+    let isScrubbing = false;
+    const scrubToEvent = (e) => {
+      const rect = scrubberWrap.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      magnatesBPState.playhead = ratio * magnatesBPState.duration;
+      updateMagnatesBPVisualStyles();
+    };
+    scrubberWrap.addEventListener('mousedown', (e) => {
+      isScrubbing = true;
+      scrubToEvent(e);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (isScrubbing) scrubToEvent(e);
+    });
+    window.addEventListener('mouseup', () => {
+      isScrubbing = false;
+    });
+  }
 
   // Preset Selector
   document.getElementById('magnates-bp-select-preset')?.addEventListener('change', (e) => {
-    const pKey = e.target.value;
-    magnatesBPState.preset = pKey;
-    const pData = MAGNATES_BP_PRESETS[pKey];
-    if (pData) {
-      magnatesBPState.bgPlateUrl = pData.bgPlateUrl;
-      magnatesBPState.primaryCutoutUrl = pData.primaryCutoutUrl;
-      magnatesBPState.secondaryCutoutUrl = pData.secondaryCutoutUrl;
-      magnatesBPState.headline = pData.headline;
-      magnatesBPState.subcaption = pData.subcaption;
-      magnatesBPState.choreography = pData.choreography;
-      magnatesBPState.showBlueprintGrid = pData.showBlueprintGrid;
-      magnatesBPState.showGlow = pData.showGlow;
-      magnatesBPState.showShadow = pData.showShadow;
-
-      // Sync form inputs
-      const selChoreo = document.getElementById('magnates-bp-select-choreography');
-      if (selChoreo) selChoreo.value = pData.choreography;
-      const inHead = document.getElementById('magnates-bp-input-headline');
-      if (inHead) inHead.value = pData.headline;
-      const inSub = document.getElementById('magnates-bp-input-subcaption');
-      if (inSub) inSub.value = pData.subcaption;
-      const inP1 = document.getElementById('magnates-bp-input-portrait');
-      if (inP1) inP1.value = pData.primaryCutoutUrl;
-      const inP2 = document.getElementById('magnates-bp-input-secondary');
-      if (inP2) inP2.value = pData.secondaryCutoutUrl;
-      const chkGlow = document.getElementById('magnates-bp-toggle-glow');
-      if (chkGlow) chkGlow.checked = pData.showGlow;
-      const chkShadow = document.getElementById('magnates-bp-toggle-shadow');
-      if (chkShadow) chkShadow.checked = pData.showShadow;
-      const chkGrid = document.getElementById('magnates-bp-toggle-grid');
-      if (chkGrid) chkGrid.checked = pData.showBlueprintGrid;
-    }
+    applyMagnatesBPPresetToState(e.target.value);
     magnatesBPState.playhead = 0;
     updateMagnatesBPVisualStyles();
   });
 
-  // Choreography selector
-  document.getElementById('magnates-bp-select-choreography')?.addEventListener('change', (e) => {
-    magnatesBPState.choreography = e.target.value;
-    magnatesBPState.playhead = 0;
+  // Granular Layer 1 (Z=2) Controls
+  document.getElementById('magnates-bp-l1-in-anim')?.addEventListener('change', (e) => {
+    magnatesBPState.l1InAnim = e.target.value;
+    magnatesBPState.playhead = Math.max(0, magnatesBPState.l1InTime - 0.15);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l1-out-anim')?.addEventListener('change', (e) => {
+    magnatesBPState.l1OutAnim = e.target.value;
+    magnatesBPState.playhead = Math.max(0, magnatesBPState.l1OutTime - 0.15);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l1-in-time')?.addEventListener('input', (e) => {
+    magnatesBPState.l1InTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-l1-in');
+    if (lbl) lbl.textContent = `${magnatesBPState.l1InTime.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l1-out-time')?.addEventListener('input', (e) => {
+    magnatesBPState.l1OutTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-l1-out');
+    if (lbl) lbl.textContent = `${magnatesBPState.l1OutTime.toFixed(2)}s`;
     updateMagnatesBPVisualStyles();
   });
 
-  // Sliders and toggles
-  document.getElementById('magnates-bp-slider-angle')?.addEventListener('input', (e) => {
-    magnatesBPState.paperAngle = parseInt(e.target.value, 10);
-    const label = document.getElementById('magnates-bp-val-angle');
-    if (label) label.textContent = `${magnatesBPState.paperAngle}\u00b0`;
+  // Granular Layer 2 (Z=3) Controls
+  document.getElementById('magnates-bp-l2-in-anim')?.addEventListener('change', (e) => {
+    magnatesBPState.l2InAnim = e.target.value;
+    magnatesBPState.l2Enabled = true;
+    magnatesBPState.playhead = Math.max(0, magnatesBPState.l2InTime - 0.15);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l2-out-anim')?.addEventListener('change', (e) => {
+    magnatesBPState.l2OutAnim = e.target.value;
+    magnatesBPState.l2Enabled = true;
+    magnatesBPState.playhead = Math.max(0, magnatesBPState.l2OutTime - 0.15);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l2-in-time')?.addEventListener('input', (e) => {
+    magnatesBPState.l2InTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-l2-in');
+    if (lbl) lbl.textContent = `${magnatesBPState.l2InTime.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-l2-out-time')?.addEventListener('input', (e) => {
+    magnatesBPState.l2OutTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-l2-out');
+    if (lbl) lbl.textContent = `${magnatesBPState.l2OutTime.toFixed(2)}s`;
     updateMagnatesBPVisualStyles();
   });
 
-  document.getElementById('magnates-bp-toggle-jitter')?.addEventListener('change', (e) => {
-    magnatesBPState.enableJitter = e.target.checked;
+  // Counter & Background Fade Controls
+  document.getElementById('magnates-bp-toggle-counter')?.addEventListener('change', (e) => {
+    magnatesBPState.showCounter = e.target.checked;
     updateMagnatesBPVisualStyles();
   });
-
-  document.getElementById('magnates-bp-toggle-glow')?.addEventListener('change', (e) => {
-    magnatesBPState.showGlow = e.target.checked;
-    updateMagnatesBPVisualStyles();
-  });
-
-  document.getElementById('magnates-bp-toggle-shadow')?.addEventListener('change', (e) => {
-    magnatesBPState.showShadow = e.target.checked;
-    updateMagnatesBPVisualStyles();
-  });
-
-  document.getElementById('magnates-bp-toggle-grid')?.addEventListener('change', (e) => {
-    magnatesBPState.showBlueprintGrid = e.target.checked;
-    updateMagnatesBPVisualStyles();
-  });
-
   document.getElementById('magnates-bp-input-headline')?.addEventListener('input', (e) => {
     magnatesBPState.headline = e.target.value;
+    magnatesBPState.showCounter = true;
+    const chk = document.getElementById('magnates-bp-toggle-counter');
+    if (chk) chk.checked = true;
     updateMagnatesBPVisualStyles();
   });
-
   document.getElementById('magnates-bp-input-subcaption')?.addEventListener('input', (e) => {
     magnatesBPState.subcaption = e.target.value;
     updateMagnatesBPVisualStyles();
   });
-
-  document.getElementById('magnates-bp-input-portrait')?.addEventListener('input', (e) => {
-    magnatesBPState.primaryCutoutUrl = e.target.value;
+  document.getElementById('magnates-bp-bg-fade-time')?.addEventListener('input', (e) => {
+    magnatesBPState.bgFadeTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-bg-fade');
+    if (lbl) lbl.textContent = `Fade @ ${magnatesBPState.bgFadeTime.toFixed(2)}s`;
     updateMagnatesBPVisualStyles();
   });
 
-  document.getElementById('magnates-bp-input-secondary')?.addEventListener('input', (e) => {
-    magnatesBPState.secondaryCutoutUrl = e.target.value;
+  // Custom Cutout Image Replacement Uploads in Layer Stack
+  document.getElementById('magnates-bp-upload-z2')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.secondaryCutoutUrl = URL.createObjectURL(file);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-upload-z3')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.primaryCutoutUrl = URL.createObjectURL(file);
+    magnatesBPState.l2Enabled = true;
     updateMagnatesBPVisualStyles();
   });
 
-  const stockCutouts = [
-    '/laptop_guy_cutout.png',
-    '/silhouette_standing_phone.png',
-    '/silhouette_sitting_phone.png',
-    '/portrait_cutout_clean.png',
-    '/clean_traveler_cutout.png'
-  ];
-  let pIdx = 0;
-  document.getElementById('btn-magnates-bp-shuffle-portrait')?.addEventListener('click', () => {
-    pIdx = (pIdx + 1) % stockCutouts.length;
-    magnatesBPState.primaryCutoutUrl = stockCutouts[pIdx];
-    const inputP = document.getElementById('magnates-bp-input-portrait');
-    if (inputP) inputP.value = magnatesBPState.primaryCutoutUrl;
-    updateMagnatesBPVisualStyles();
+  // Inspector Layer Row Hover & Click Selection + Stage Hover Callout
+  const rows = document.querySelectorAll('.bp-inspector-layer-row');
+  rows.forEach((row) => {
+    const layerId = row.getAttribute('data-layer-id');
+    row.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(layerId));
+    row.addEventListener('mouseleave', () => highlightMagnatesBPLayerOnStage(null));
+    row.addEventListener('click', () => {
+      magnatesBPState.selectedLayer = layerId;
+      rows.forEach((r) => {
+        const active = r.getAttribute('data-layer-id') === layerId;
+        r.style.background = active ? 'rgba(168,85,247,0.12)' : 'rgba(255,255,255,0.03)';
+        r.style.borderColor = active ? 'rgba(168,85,247,0.45)' : 'rgba(255,255,255,0.07)';
+      });
+      highlightMagnatesBPLayerOnStage(layerId);
+    });
   });
 
+  const stage = document.getElementById('magnates-bp-stage');
+  ['z2', 'z3'].forEach((lid) => {
+    const el = stage?.querySelector(`[data-bp-layer="${lid}"]`);
+    if (el) {
+      el.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(lid));
+      el.addEventListener('mouseleave', () => highlightMagnatesBPLayerOnStage(null));
+    }
+  });
+
+  // Apply to Timeline
   document.getElementById('btn-apply-magnates-bp-suite')?.addEventListener('click', () => {
     closeMagnatesPaperBlueprintSuite();
 
-    const bgClip = {
-      id: `img-bp-bg-${Date.now()}`,
-      url: magnatesBPState.bgPlateUrl || '/room_empty_plate.png',
-      start: 0,
-      duration: magnatesBPState.duration,
-      scale: 1.05,
-      zoomEffect: 'kenburns',
-      zoomScale: 1.12,
-      transition: 'crossfade',
-      transitionDuration: 0.8
-    };
-
-    const primaryCutoutClip = {
-      id: `img-bp-cutout-1-${Date.now() + 1}`,
-      url: magnatesBPState.primaryCutoutUrl,
-      start: magnatesBPState.choreography === 'pop_in_place' ? 1.0 : 0.2,
-      duration: magnatesBPState.duration - (magnatesBPState.choreography === 'pop_in_place' ? 1.0 : 0.2),
-      scale: 1.0,
-      rotation: magnatesBPState.paperAngle,
-      stickerBorder: false,
-      shadowElevation: magnatesBPState.showShadow ? 35 : 0,
-      transition: 'pop',
-      transitionDuration: 0.4
-    };
-
-    const secondaryCutoutClip = {
-      id: `img-bp-cutout-2-${Date.now() + 2}`,
-      url: magnatesBPState.secondaryCutoutUrl,
-      start: 0,
-      duration: magnatesBPState.choreography === 'simultaneous_staggered_exit' ? 3.0 : magnatesBPState.duration,
-      scale: 0.95,
-      transition: 'fade',
-      transitionDuration: 0.5
-    };
-
-    const headlineClip = {
-      id: `txt-bp-head-${Date.now() + 3}`,
-      text: magnatesBPState.headline,
-      highlight: magnatesBPState.headline.split(' ')[0] || '',
-      highlightColor: '#ef4444',
-      anim: 'pop',
-      fontSize: 54,
-      fontFamily: 'Impact, sans-serif',
-      start: 0.8,
-      duration: magnatesBPState.duration - 0.8
-    };
-
-    const subtitleClip = {
-      id: `txt-bp-sub-${Date.now() + 4}`,
-      text: magnatesBPState.subcaption,
-      highlight: magnatesBPState.subcaption.split(' ')[0] || '',
-      highlightColor: '#f87171',
-      anim: 'fade',
-      fontSize: 20,
-      fontFamily: 'Inter, sans-serif',
-      start: 1.0,
-      duration: magnatesBPState.duration - 1.0
-    };
-
-    if (timelineClips && timelineClips.image && timelineClips.text) {
-      timelineClips.image = [bgClip, secondaryCutoutClip, primaryCutoutClip];
-      timelineClips.text = [headlineClip, subtitleClip];
-      renderAllTimelineTracks();
-      selectClip(primaryCutoutClip, 'image');
+    const clipsImg = [];
+    if (magnatesBPState.bgPlateUrl) {
+      clipsImg.push({
+        id: `img-bp-bg-${Date.now()}`,
+        url: magnatesBPState.bgPlateUrl,
+        start: 0,
+        duration: magnatesBPState.bgFadeTime + 0.4,
+        scale: 1.0,
+        transition: 'fade',
+        transitionDuration: 0.4
+      });
     }
 
-    showTextTimingAlert(`Applied High-End Cutout & Motion Scene to timeline!`, 'success');
+    clipsImg.push({
+      id: `img-bp-cutout-l1-${Date.now() + 1}`,
+      url: magnatesBPState.secondaryCutoutUrl,
+      start: magnatesBPState.l1InTime,
+      duration: Math.max(0.5, magnatesBPState.l1OutTime - magnatesBPState.l1InTime),
+      scale: 1.0,
+      transition: 'slide',
+      transitionDuration: 0.45
+    });
+
+    if (magnatesBPState.l2Enabled) {
+      clipsImg.push({
+        id: `img-bp-cutout-l2-${Date.now() + 2}`,
+        url: magnatesBPState.primaryCutoutUrl,
+        start: magnatesBPState.l2InTime,
+        duration: Math.max(0.5, magnatesBPState.l2OutTime - magnatesBPState.l2InTime),
+        scale: 1.0,
+        transition: 'slide',
+        transitionDuration: 0.45
+      });
+    }
+
+    const clipsTxt = [];
+    if (magnatesBPState.showCounter && magnatesBPState.headline) {
+      clipsTxt.push({
+        id: `txt-bp-head-${Date.now() + 3}`,
+        text: magnatesBPState.headline,
+        highlight: magnatesBPState.headline,
+        highlightColor: '#ef4444',
+        anim: 'pop',
+        fontSize: 60,
+        fontFamily: 'Montserrat, sans-serif',
+        start: 0,
+        duration: magnatesBPState.bgFadeTime
+      });
+    }
+    if (magnatesBPState.showCounter && magnatesBPState.subcaption) {
+      clipsTxt.push({
+        id: `txt-bp-sub-${Date.now() + 4}`,
+        text: magnatesBPState.subcaption,
+        highlight: '',
+        highlightColor: '#b91c1c',
+        anim: 'fade',
+        fontSize: 22,
+        fontFamily: 'Inter, sans-serif',
+        start: 0.1,
+        duration: magnatesBPState.bgFadeTime - 0.1
+      });
+    }
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = clipsImg;
+      timelineClips.text = clipsTxt;
+      renderAllTimelineTracks();
+      if (clipsImg.length > 0) selectClip(clipsImg[clipsImg.length - 1], 'image');
+    }
+
+    showTextTimingAlert(`Applied Dynamic Cutout & Silhouette Scene to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
