@@ -28399,10 +28399,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       fxContainer.innerHTML = `
         <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, ${c1} 0%, ${c2} 42%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <!-- Scene A: Brand Logo Cutout & Wavy Headline -->
-          <img id="fx-bp-logo-${tplId}" src="${logoUrl}" style="position: absolute; left: 50%; top: 50%; width: 25%; aspect-ratio: 1/1; object-fit: contain; z-index: 12; filter: drop-shadow(0 0 12px rgba(255,30,30,0.95)) drop-shadow(0 0 24px rgba(239,68,68,0.65)); pointer-events: none; opacity: 0;" />
-          <div id="fx-bp-wavy-wrap-${tplId}" style="position: absolute; left: 33%; right: 4%; top: 50%; transform: translateY(-50%); z-index: 11; text-align: center; pointer-events: none; opacity: 0;">
-            <div id="fx-bp-wavy1-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9.5px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line1Txt}</div>
-            <div id="fx-bp-wavy2-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9.5px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; margin-top: 2px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line2Txt}</div>
+          <img id="fx-bp-logo-${tplId}" src="${logoUrl}" style="position: absolute; left: 50%; top: 50%; width: 22.5%; aspect-ratio: 1/1; object-fit: contain; z-index: 12; filter: drop-shadow(0 0 12px rgba(255,30,30,0.95)) drop-shadow(0 0 24px rgba(239,68,68,0.65)); pointer-events: none; opacity: 0;" />
+          <div id="fx-bp-wavy-wrap-${tplId}" style="position: absolute; left: 36.5%; right: 4%; top: 50%; transform: translateY(-50%); z-index: 11; text-align: center; pointer-events: none; opacity: 0;">
+            <div id="fx-bp-wavy1-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line1Txt}</div>
+            <div id="fx-bp-wavy2-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; margin-top: 2px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line2Txt}</div>
+          </div>
+
+          <!-- Scene A2: Left & Right Product Cards (Top/Bottom Unfurl) & Price Tags (Left/Right Unfurl) -->
+          <div id="fx-bp-prod1-${tplId}" style="position: absolute; left: 5%; top: 15%; width: 25%; height: 73%; z-index: 12; display: flex; flex-direction: column; align-items: center; gap: 3%; pointer-events: none; opacity: 0;">
+            <img id="fx-bp-prod1-img-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod1Url) ? magnatesBPState.prod1Url : '/temu_product_left.png'}" style="width: 100%; height: 82%; object-fit: contain; border-radius: 8px;" />
+            <div id="fx-bp-prod1-pill-${tplId}" style="padding: 1px 8px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1px solid rgba(239, 68, 68, 0.4); font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 900; color: #ff1e1e;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod1Price) ? magnatesBPState.prod1Price : '$2.00'}</div>
+          </div>
+          <div id="fx-bp-prod2-${tplId}" style="position: absolute; right: 5%; top: 15%; width: 25%; height: 73%; z-index: 12; display: flex; flex-direction: column; align-items: center; gap: 3%; pointer-events: none; opacity: 0;">
+            <img id="fx-bp-prod2-img-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod2Url) ? magnatesBPState.prod2Url : '/temu_product_right.png'}" style="width: 100%; height: 82%; object-fit: contain; border-radius: 8px;" />
+            <div id="fx-bp-prod2-pill-${tplId}" style="padding: 1px 8px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1px solid rgba(239, 68, 68, 0.4); font-family: 'Montserrat', sans-serif; font-size: 9px; font-weight: 900; color: #ff1e1e;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.prod2Price) ? magnatesBPState.prod2Price : '$5.00'}</div>
           </div>
 
           <!-- Scene B: Center Red Money Counter -->
@@ -29411,27 +29421,55 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         if (rightEl) rightEl.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l2GlowColor || '#ffffff', magnatesBPState.l2GlowIntensity ?? 85, false);
       }
 
-      if (tplId === 'magnates-media-brand-wavy-hook') {
-        // Standalone Scene A Hover Preview (4.8s cycle)
-        const c = t % 4.8;
-        const riseP = easeOut((c - 0.25) / 0.45);
-        const shiftP = easeOut((c - 1.05) / 0.48);
-        const outP = easeIn((c - 3.90) / 0.45);
+      const prod1Wrap = fxContainer?.querySelector(`#fx-bp-prod1-${tplId}`);
+      const prod1Img = fxContainer?.querySelector(`#fx-bp-prod1-img-${tplId}`);
+      const prod1Pill = fxContainer?.querySelector(`#fx-bp-prod1-pill-${tplId}`);
+      const prod2Wrap = fxContainer?.querySelector(`#fx-bp-prod2-${tplId}`);
+      const prod2Img = fxContainer?.querySelector(`#fx-bp-prod2-img-${tplId}`);
+      const prod2Pill = fxContainer?.querySelector(`#fx-bp-prod2-pill-${tplId}`);
+
+      const runSceneAHover = (c) => {
+        const riseP = easeOut((c - 0.20) / 0.40);
+        const shiftLeftP = easeOut((c - 0.90) / 0.45);
+        const shiftRightP = easeOut((c - 2.35) / 0.45);
+        const outP = easeIn((c - 5.10) / 0.40);
         if (logoEl) {
-          const tx = -50 - shiftP * 118 - outP * 120;
-          const ty = -50 + (1 - riseP) * 180;
-          const op = Math.max(0, Math.min(1, (c < 0.25 ? 0 : riseP * 1.3) * (1 - outP)));
+          const netLeft = shiftLeftP * (1 - shiftRightP);
+          const tx = -50 - netLeft * 136;
+          const ty = -50 + (1 - riseP) * 180 + outP * 140;
+          const op = Math.max(0, Math.min(1, (c < 0.20 ? 0 : riseP * 1.3) * (1 - outP)));
           logoEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
           logoEl.style.opacity = op.toFixed(2);
         }
         if (wavyWrapEl && wavy1El && wavy2El) {
-          const l1P = easeOut((c - 1.20) / 0.45);
-          const l2P = easeOut((c - 1.65) / 0.55);
-          wavyWrapEl.style.opacity = (Math.min(1, l1P) * (1 - outP)).toFixed(2);
+          const l1P = easeOut((c - 1.05) / 0.40);
+          const l2P = easeOut((c - 1.45) / 0.50);
+          wavyWrapEl.style.opacity = (Math.min(1, l1P) * (1 - shiftRightP)).toFixed(2);
+          wavyWrapEl.style.clipPath = shiftRightP > 0.01 ? `inset(0% 0% 0% ${(shiftRightP * 65).toFixed(1)}%)` : 'none';
           wavy1El.style.transform = `translateX(${((1 - l1P) * 16).toFixed(1)}px)`;
           wavy2El.style.transform = `translateY(${((1 - l2P) * 18 + Math.sin(l2P * Math.PI) * -4).toFixed(1)}px)`;
           wavy2El.style.opacity = l2P.toFixed(2);
         }
+        if (prod1Wrap && prod1Img && prod1Pill) {
+          const c1P = easeOut((c - 2.80) / 0.38) * (1 - outP);
+          const p1P = easeOut((c - 3.20) / 0.35) * (1 - outP);
+          prod1Wrap.style.opacity = c > 2.75 ? '1' : '0';
+          prod1Img.style.clipPath = `inset(${((1 - c1P) * 50).toFixed(1)}% 0% ${((1 - c1P) * 50).toFixed(1)}% 0% round 8px)`;
+          prod1Pill.style.clipPath = `inset(0% ${((1 - p1P) * 50).toFixed(1)}% 0% ${((1 - p1P) * 50).toFixed(1)}% round 999px)`;
+        }
+        if (prod2Wrap && prod2Img && prod2Pill) {
+          const c2P = easeOut((c - 3.65) / 0.38) * (1 - outP);
+          const p2P = easeOut((c - 4.05) / 0.35) * (1 - outP);
+          prod2Wrap.style.opacity = c > 3.60 ? '1' : '0';
+          prod2Img.style.clipPath = `inset(${((1 - c2P) * 50).toFixed(1)}% 0% ${((1 - c2P) * 50).toFixed(1)}% 0% round 8px)`;
+          prod2Pill.style.clipPath = `inset(0% ${((1 - p2P) * 50).toFixed(1)}% 0% ${((1 - p2P) * 50).toFixed(1)}% round 999px)`;
+        }
+      };
+
+      if (tplId === 'magnates-media-brand-wavy-hook') {
+        // Standalone Scene A Hover Preview (5.6s cycle)
+        const c = t % 5.6;
+        runSceneAHover(c);
         if (counterWrapEl) counterWrapEl.style.opacity = '0';
         if (leftEl) leftEl.style.opacity = '0';
         if (rightEl) rightEl.style.opacity = '0';
@@ -29469,35 +29507,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           bgEl.style.opacity = (1 - fadeP).toFixed(2);
         }
       } else {
-        // Merged Master Hover Preview (8.4s cycle: 0..3.8s Scene A -> 3.8..8.4s Scene B)
-        const c = t % 8.4;
-        if (c < 3.8) {
-          const riseP = easeOut((c - 0.20) / 0.40);
-          const shiftP = easeOut((c - 0.90) / 0.45);
-          const outP = easeIn((c - 3.25) / 0.45);
-          if (logoEl) {
-            const tx = -50 - shiftP * 118 - outP * 120;
-            const ty = -50 + (1 - riseP) * 180;
-            const op = Math.max(0, Math.min(1, (c < 0.20 ? 0 : riseP * 1.3) * (1 - outP)));
-            logoEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
-            logoEl.style.opacity = op.toFixed(2);
-          }
-          if (wavyWrapEl && wavy1El && wavy2El) {
-            const l1P = easeOut((c - 1.05) / 0.40);
-            const l2P = easeOut((c - 1.45) / 0.50);
-            wavyWrapEl.style.opacity = (Math.min(1, l1P) * (1 - outP)).toFixed(2);
-            wavy1El.style.transform = `translateX(${((1 - l1P) * 16).toFixed(1)}px)`;
-            wavy2El.style.transform = `translateY(${((1 - l2P) * 18 + Math.sin(l2P * Math.PI) * -4).toFixed(1)}px)`;
-            wavy2El.style.opacity = l2P.toFixed(2);
-          }
+        // Merged Master Hover Preview (10.2s cycle: 0..5.5s Scene A1+A2 -> 5.5..10.2s Scene B)
+        const c = t % 10.2;
+        if (c < 5.5) {
+          runSceneAHover(c);
           if (counterWrapEl) counterWrapEl.style.opacity = '0';
           if (leftEl) leftEl.style.opacity = '0';
           if (rightEl) rightEl.style.opacity = '0';
           if (bgEl) bgEl.style.opacity = '1';
         } else {
-          const sb = c - 3.8;
+          const sb = c - 5.5;
           if (logoEl) logoEl.style.opacity = '0';
           if (wavyWrapEl) wavyWrapEl.style.opacity = '0';
+          if (prod1Wrap) prod1Wrap.style.opacity = '0';
+          if (prod2Wrap) prod2Wrap.style.opacity = '0';
           const fadeP = easeIn((sb - 3.90) / 0.55);
           if (counterWrapEl && counterEl) {
             counterWrapEl.style.opacity = (1 - fadeP).toFixed(2);
@@ -48207,6 +48230,18 @@ let magnatesBPState = {
   wavyTextEnabled: true,
   wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
   wavyLine2: "ON THE INTERNET.",
+  // Scene A2: Logo Shift Right to Center + Product Cards (Top/Bottom Unfurl) & Price Tags (Left/Right Unfurl)
+  productsEnabled: true,
+  logoShiftRightTime: 3.10,
+  unfurlSpeed: 0.45,
+  prod1Url: "/temu_product_left.png",
+  prod1Price: "$2.00",
+  prod1GlowColor: "#dc2626",
+  prod1GlowIntensity: 45,
+  prod2Url: "/temu_product_right.png",
+  prod2Price: "$5.00",
+  prod2GlowColor: "#dc2626",
+  prod2GlowIntensity: 45,
   // Scene B / C (Z=1 Counter, Z=2 Cutout 1, Z=3 Cutout 2)
   showCounter: true,
   showBlueprintGrid: false,
@@ -48243,7 +48278,7 @@ let magnatesBPState = {
 
 const MAGNATES_BP_PRESETS = {
   full_story_flow: {
-    duration: 10.5,
+    duration: 13.2,
     bgPlateUrl: "",
     backdropColor: "#991b1b",
     backdropSpread: 75,
@@ -48251,7 +48286,7 @@ const MAGNATES_BP_PRESETS = {
     logoCutoutUrl: "/temu_logo_cutout.png",
     logoInTime: 0.35,
     logoShiftTime: 1.25,
-    logoOutTime: 4.15,
+    logoOutTime: 6.75,
     logoGlowColor: "#ff1e1e",
     logoGlowIntensity: 90,
     wavyTextEnabled: true,
@@ -48283,7 +48318,7 @@ const MAGNATES_BP_PRESETS = {
     z0Label: "Crimson Radial Atmosphere"
   },
   brand_wavy_intro: {
-    duration: 5.2,
+    duration: 7.4,
     bgPlateUrl: "",
     backdropColor: "#991b1b",
     backdropSpread: 75,
@@ -48291,7 +48326,7 @@ const MAGNATES_BP_PRESETS = {
     logoCutoutUrl: "/temu_logo_cutout.png",
     logoInTime: 0.35,
     logoShiftTime: 1.25,
-    logoOutTime: 4.25,
+    logoOutTime: 6.75,
     logoGlowColor: "#ff1e1e",
     logoGlowIntensity: 90,
     wavyTextEnabled: true,
@@ -48568,7 +48603,11 @@ function updateMagnatesBPVisualStyles() {
   const p = magnatesBPState.playhead;
   const dur = magnatesBPState.duration;
   const isFullFlowForTimer = magnatesBPState.preset === 'full_story_flow';
-  const sceneNumLabel = isFullFlowForTimer ? (p < 4.5 ? 'Scene 1' : 'Scene 2') : (magnatesBPState.preset === 'brand_wavy_intro' ? 'Scene 1' : 'Scene 2');
+  const tShiftRightForTimer = magnatesBPState.logoShiftRightTime ?? 3.10;
+  const tSceneBStartForTimer = magnatesBPState.productsEnabled ? 7.20 : 4.50;
+  const sceneNumLabel = isFullFlowForTimer
+    ? (p < tShiftRightForTimer ? 'Scene 1' : (p < tSceneBStartForTimer ? 'Scene 2' : 'Scene 3'))
+    : (magnatesBPState.preset === 'brand_wavy_intro' ? (p < tShiftRightForTimer ? 'Scene 1' : 'Scene 2') : 'Scene 3');
   const timeText = `${p.toFixed(1)}s / ${dur.toFixed(1)}s (${sceneNumLabel})`;
   if (timerEl) timerEl.textContent = timeText;
   if (hudTimecode) hudTimecode.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
@@ -48601,7 +48640,8 @@ function updateMagnatesBPVisualStyles() {
   const isFullFlow = magnatesBPState.preset === 'full_story_flow';
   const isBrandOnly = magnatesBPState.preset === 'brand_wavy_intro';
   const isRoomScene = magnatesBPState.preset === 'room_spawn';
-  const sceneBOffset = isFullFlow ? 4.50 : 0.0;
+  const hasProductsPhase = Boolean(magnatesBPState.productsEnabled);
+  const sceneBOffset = isFullFlow ? (hasProductsPhase ? 7.20 : 4.50) : 0.0;
   const effectiveBgFadeTime = isFullFlow
     ? (sceneBOffset + magnatesBPState.bgFadeTime)
     : magnatesBPState.bgFadeTime;
@@ -48655,9 +48695,19 @@ function updateMagnatesBPVisualStyles() {
   if (bgWrap) bgWrap.style.opacity = bgOpacity.toFixed(3);
 
   // =========================================================
-  // SCENE A RENDER: Brand Logo Cutout (Z=4) + Wavy Headline (Z=5)
+  // SCENE A1 & A2 RENDER:
+  // A1: Brand Logo Cutout (Z=4) rises bottom->center, shifts left + Wavy Headline (Z=5)
+  // A2: Brand Logo shifts right back to center (covering/wiping wavy text) ->
+  //     Left Product Card unfurls Top&Bottom -> Left Price ($2.00) unfurls Left&Right ->
+  //     Right Product Card unfurls Top&Bottom -> Right Price ($5.00) unfurls Left&Right
   // =========================================================
   const showSceneA = magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly);
+  const tIn = magnatesBPState.logoInTime ?? 0.35;
+  const tShift = magnatesBPState.logoShiftTime ?? 1.25;
+  const tShiftRight = magnatesBPState.logoShiftRightTime ?? 3.10;
+  const unfurlDur = magnatesBPState.unfurlSpeed ?? 0.45;
+  const tOut = hasProductsPhase ? Math.max(magnatesBPState.logoOutTime ?? 6.75, tShiftRight + 3.45) : (magnatesBPState.logoOutTime ?? 4.15);
+
   if (logoLayer && logoImg) {
     if (!showSceneA) {
       logoLayer.style.display = 'none';
@@ -48669,22 +48719,19 @@ function updateMagnatesBPVisualStyles() {
         false
       );
 
-      const tIn = magnatesBPState.logoInTime;
-      const tShift = magnatesBPState.logoShiftTime;
-      const tOut = magnatesBPState.logoOutTime;
-
-      // 1. Bottom -> Center Rise (e.g. 0.35s to 0.85s)
+      // 1. Bottom -> Center Rise (e.g. 0.35s to 0.83s)
       const riseProg = bpEaseOutCubic((p - tIn) / 0.48);
       // 2. Center -> Left Shift (e.g. 1.25s to 1.75s)
-      const shiftProg = bpEaseInOutCubic((p - tShift) / 0.50);
-      // 3. Exit Glide / Fade (at tOut)
+      const shiftLeftProg = bpEaseInOutCubic((p - tShift) / 0.50);
+      // 3. Left -> Right back to Center (Image 1 -> Image 2: e.g. 3.10s to 3.62s)
+      const shiftRightToCenterProg = hasProductsPhase ? bpEaseInOutCubic((p - tShiftRight) / 0.52) : 0;
+      // 4. Final Exit at end of Scene A2 (at tOut)
       const exitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.42) : 0;
 
-      // Position relative to center (left: 50%, top: 50%)
-      // At center: translate(-50%, -50%)
-      // Shifted left (matching original video gap): logo width is 22.5%, shifting -136% of its width moves center to 19.4% (right edge ~30.6%), leaving a crisp gap before wavy text at 36.5%!
-      const baseTx = -50 - shiftProg * 136 - exitProg * 130;
-      const baseTy = -50 + (1 - riseProg) * 185;
+      // Net left offset: 0 at center, 1 when shifted left, returns to 0 when shifted right back to center!
+      const netLeftFactor = shiftLeftProg * (1 - shiftRightToCenterProg);
+      const baseTx = -50 - netLeftFactor * 136;
+      const baseTy = -50 + (1 - riseProg) * 185 + exitProg * 140;
       const op = Math.max(0, Math.min(1, (p < tIn ? 0 : riseProg * 1.35) * (1 - exitProg * 1.15)));
 
       logoLayer.style.transform = `translate3d(${baseTx.toFixed(2)}%, ${baseTy.toFixed(2)}%, 0)`;
@@ -48697,22 +48744,99 @@ function updateMagnatesBPVisualStyles() {
       wavyWrap.style.display = 'none';
     } else {
       wavyWrap.style.display = 'flex';
-      const tShift = magnatesBPState.logoShiftTime;
-      const tOut = magnatesBPState.logoOutTime;
       const line1Start = tShift + 0.15;
       const line2Start = tShift + 0.68;
 
       const prog1 = Math.max(0, Math.min(1, (p - line1Start) / 0.55));
       const prog2 = Math.max(0, Math.min(1, (p - line2Start) / 0.72));
-      const exitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.40) : 0;
+
+      // As the TEMU logo moves right across the text (Image 1), it covers the left side of the text and wipes/fades it out cleanly by the time the logo stops in the center (Image 2)!
+      const textCoverProg = hasProductsPhase
+        ? bpEaseInOutCubic((p - tShiftRight) / 0.46)
+        : (p >= tOut ? bpEaseInCubic((p - tOut) / 0.40) : 0);
 
       renderWavyKineticSpans(wavyLine1El, magnatesBPState.wavyLine1 || '', prog1, false);
       renderWavyKineticSpans(wavyLine2El, magnatesBPState.wavyLine2 || '', prog2, true);
 
-      const wrapOp = Math.max(0, 1 - exitProg * 1.2) * bgOpacity;
-      const wrapTx = exitProg * 60;
+      // Progressive left-to-right clip wipe as the logo passes over the text + fade out
+      const clipLeft = (textCoverProg * 65).toFixed(1);
+      wavyWrap.style.clipPath = textCoverProg > 0.01 ? `inset(0% 0% 0% ${clipLeft}%)` : 'none';
+      const wrapOp = Math.max(0, 1 - Math.pow(textCoverProg, 1.5) * 1.25) * bgOpacity;
       wavyWrap.style.opacity = wrapOp.toFixed(3);
-      wavyWrap.style.transform = `translate3d(${wrapTx.toFixed(1)}px, -50%, 0)`;
+      wavyWrap.style.transform = `translate3d(0px, -50%, 0)`;
+    }
+  }
+
+  // Render Z=6 (Left Product + $2.00 Tag) & Z=7 (Right Product + $5.00 Tag) Center-Out Unfurl Sequence
+  const prod1Layer = document.getElementById('magnates-bp-layer-prod1');
+  const prod1Card = document.getElementById('magnates-bp-prod1-card');
+  const prod1Img = document.getElementById('magnates-bp-img-prod1');
+  const prod1Pill = document.getElementById('magnates-bp-prod1-price-pill');
+  const prod1Txt = document.getElementById('magnates-bp-prod1-price-text');
+
+  const prod2Layer = document.getElementById('magnates-bp-layer-prod2');
+  const prod2Card = document.getElementById('magnates-bp-prod2-card');
+  const prod2Img = document.getElementById('magnates-bp-img-prod2');
+  const prod2Pill = document.getElementById('magnates-bp-prod2-price-pill');
+  const prod2Txt = document.getElementById('magnates-bp-prod2-price-text');
+
+  if (prod1Img && prod1Img.getAttribute('src') !== magnatesBPState.prod1Url) prod1Img.src = magnatesBPState.prod1Url;
+  if (prod2Img && prod2Img.getAttribute('src') !== magnatesBPState.prod2Url) prod2Img.src = magnatesBPState.prod2Url;
+  const thumbZ6 = document.getElementById('magnates-bp-thumb-z6');
+  if (thumbZ6 && thumbZ6.getAttribute('src') !== magnatesBPState.prod1Url) thumbZ6.src = magnatesBPState.prod1Url;
+  const thumbZ7 = document.getElementById('magnates-bp-thumb-z7');
+  if (thumbZ7 && thumbZ7.getAttribute('src') !== magnatesBPState.prod2Url) thumbZ7.src = magnatesBPState.prod2Url;
+  if (prod1Txt) prod1Txt.textContent = magnatesBPState.prod1Price || '$2.00';
+  if (prod2Txt) prod2Txt.textContent = magnatesBPState.prod2Price || '$5.00';
+
+  const showProducts = showSceneA && hasProductsPhase && p >= (tShiftRight + 0.35) && p < (tOut + 0.45);
+  const prodExitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.40) : 0;
+
+  // Timing milestones matching Images 2, 3, 4, 5:
+  // 1) Left Product Card unfurls Top & Bottom from center line after logo stops at center:
+  const tProd1CardStart = tShiftRight + 0.50;
+  // 2) Left Price Tag ($2.00) unfurls Left & Right from center line slightly after:
+  const tProd1PriceStart = tProd1CardStart + unfurlDur + 0.12;
+  // 3) Right Product Card unfurls Top & Bottom from center line after Left Price Tag:
+  const tProd2CardStart = tProd1PriceStart + unfurlDur + 0.18;
+  // 4) Right Price Tag ($5.00) unfurls Left & Right from center line after Right Product Card:
+  const tProd2PriceStart = tProd2CardStart + unfurlDur + 0.12;
+
+  if (prod1Layer && prod1Card && prod1Pill) {
+    if (!showProducts) {
+      prod1Layer.style.display = 'none';
+    } else {
+      prod1Layer.style.display = 'flex';
+      // Vertical Center-Out Unfurl (Top & Bottom expand simultaneously from middle 50%)
+      const c1Prog = bpEaseOutCubic((p - tProd1CardStart) / unfurlDur) * (1 - prodExitProg);
+      const vInset1 = ((1 - c1Prog) * 50).toFixed(2);
+      prod1Card.style.clipPath = `inset(${vInset1}% 0% ${vInset1}% 0% round 16px)`;
+      prod1Card.style.opacity = Math.min(1, c1Prog * 1.8).toFixed(3);
+
+      // Horizontal Center-Out Unfurl (Left & Right expand simultaneously from middle 50%)
+      const p1Prog = bpEaseOutCubic((p - tProd1PriceStart) / (unfurlDur * 0.88)) * (1 - prodExitProg);
+      const hInset1 = ((1 - p1Prog) * 50).toFixed(2);
+      prod1Pill.style.clipPath = `inset(0% ${hInset1}% 0% ${hInset1}% round 999px)`;
+      prod1Pill.style.opacity = Math.min(1, p1Prog * 1.8).toFixed(3);
+    }
+  }
+
+  if (prod2Layer && prod2Card && prod2Pill) {
+    if (!showProducts) {
+      prod2Layer.style.display = 'none';
+    } else {
+      prod2Layer.style.display = 'flex';
+      // Vertical Center-Out Unfurl (Top & Bottom expand simultaneously from middle 50%)
+      const c2Prog = bpEaseOutCubic((p - tProd2CardStart) / unfurlDur) * (1 - prodExitProg);
+      const vInset2 = ((1 - c2Prog) * 50).toFixed(2);
+      prod2Card.style.clipPath = `inset(${vInset2}% 0% ${vInset2}% 0% round 16px)`;
+      prod2Card.style.opacity = Math.min(1, c2Prog * 1.8).toFixed(3);
+
+      // Horizontal Center-Out Unfurl (Left & Right expand simultaneously from middle 50%)
+      const p2Prog = bpEaseOutCubic((p - tProd2PriceStart) / (unfurlDur * 0.88)) * (1 - prodExitProg);
+      const hInset2 = ((1 - p2Prog) * 50).toFixed(2);
+      prod2Pill.style.clipPath = `inset(0% ${hInset2}% 0% ${hInset2}% round 999px)`;
+      prod2Pill.style.opacity = Math.min(1, p2Prog * 1.8).toFixed(3);
     }
   }
 
@@ -48854,8 +48978,17 @@ function updateMagnatesBPVisualStyles() {
   // Highlight active Storyboard Scene Card during playback
   document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
     const cType = card.getAttribute('data-scene-card');
-    const isCardActive = (magnatesBPState.preset === cType) ||
-      (magnatesBPState.preset === 'full_story_flow' && ((cType === 'brand_wavy_intro' && p < 4.5) || (cType === 'dual_silhouette' && p >= 4.5)));
+    let isCardActive = false;
+    if (magnatesBPState.preset === 'full_story_flow') {
+      if (cType === 'brand_wavy_intro') isCardActive = p < tShiftRight;
+      else if (cType === 'products_unfurl') isCardActive = p >= tShiftRight && p < sceneBOffset;
+      else if (cType === 'dual_silhouette') isCardActive = p >= sceneBOffset;
+    } else if (magnatesBPState.preset === 'brand_wavy_intro') {
+      if (cType === 'brand_wavy_intro') isCardActive = p < tShiftRight;
+      else if (cType === 'products_unfurl') isCardActive = p >= tShiftRight;
+    } else {
+      isCardActive = magnatesBPState.preset === cType;
+    }
     card.style.background = isCardActive ? 'rgba(168,85,247,0.16)' : 'rgba(255,255,255,0.03)';
     card.style.borderColor = isCardActive ? '#a855f7' : 'rgba(255,255,255,0.08)';
   });
@@ -48868,15 +49001,21 @@ function updateMagnatesBPVisualStyles() {
   if (hudPreset && presetDef) hudPreset.textContent = presetDef.hudPreset;
 
   let phaseText = "PHASE: INTRO BUILD";
-  if (showSceneA && p < magnatesBPState.logoOutTime + 0.35) {
-    if (p < magnatesBPState.logoInTime) {
-      phaseText = "SCENE A // 1. ATMOSPHERE BACKDROP";
-    } else if (p < magnatesBPState.logoShiftTime) {
-      phaseText = "SCENE A // 2. LOGO RISES TO CENTER";
-    } else if (p < magnatesBPState.logoShiftTime + 0.65) {
-      phaseText = "SCENE A // 3. SHIFT LEFT + LINE 1";
+  if (showSceneA && p < tOut + 0.35) {
+    if (p < tIn) {
+      phaseText = "SCENE 1 // 1. ATMOSPHERE BACKDROP";
+    } else if (p < tShift) {
+      phaseText = "SCENE 1 // 2. LOGO RISES TO CENTER";
+    } else if (p < tShift + 0.65) {
+      phaseText = "SCENE 1 // 3. SHIFT LEFT + LINE 1";
+    } else if (!hasProductsPhase || p < tShiftRight) {
+      phaseText = "SCENE 1 // 4. WAVY HEADLINE RISE";
+    } else if (p < tProd1CardStart) {
+      phaseText = "SCENE 2 // 1. LOGO SHIFTS RIGHT TO CENTER";
+    } else if (p < tProd2CardStart) {
+      phaseText = "SCENE 2 // 2. LEFT PRODUCT & $2.00 UNFURL";
     } else {
-      phaseText = "SCENE A // 4. WAVY HEADLINE RISE";
+      phaseText = "SCENE 2 // 3. RIGHT PRODUCT & $5.00 UNFURL";
     }
   } else {
     if (localPB < magnatesBPState.l1InTime) {
@@ -48945,6 +49084,9 @@ const MAGNATES_BP_SYNC_FIELDS = [
   'backdropColor', 'backdropSpread',
   'logoCutoutUrl', 'logoInTime', 'logoShiftTime', 'logoOutTime', 'logoGlowColor', 'logoGlowIntensity',
   'wavyLine1', 'wavyLine2',
+  'productsEnabled', 'logoShiftRightTime', 'unfurlSpeed',
+  'prod1Url', 'prod1Price', 'prod1GlowColor', 'prod1GlowIntensity',
+  'prod2Url', 'prod2Price', 'prod2GlowColor', 'prod2GlowIntensity',
   'headline', 'subcaption',
   'l1InAnim', 'l1OutAnim', 'l1InTime', 'l1OutTime', 'l1GlowColor', 'l1GlowIntensity',
   'l2InAnim', 'l2OutAnim', 'l2InTime', 'l2OutTime', 'l2GlowColor', 'l2GlowIntensity',
@@ -49024,6 +49166,18 @@ function syncMagnatesBPInspectorControlsFromState() {
   setTxt('magnates-bp-val-logo-glow', `${magnatesBPState.logoGlowIntensity}%`);
   const chkWavy = document.getElementById('magnates-bp-toggle-wavy-text');
   if (chkWavy) chkWavy.checked = magnatesBPState.wavyTextEnabled;
+
+  // Sync Scene A2 Product & Price Unfurl Controls
+  const chkProds = document.getElementById('magnates-bp-toggle-products');
+  if (chkProds) chkProds.checked = magnatesBPState.productsEnabled ?? true;
+  setVal('magnates-bp-input-prod1-price', magnatesBPState.prod1Price || '$2.00');
+  setVal('magnates-bp-input-prod2-price', magnatesBPState.prod2Price || '$5.00');
+  setVal('magnates-bp-logo-center-time', magnatesBPState.logoShiftRightTime ?? 3.10);
+  setTxt('magnates-bp-val-logo-center', `${(magnatesBPState.logoShiftRightTime ?? 3.10).toFixed(2)}s`);
+  setVal('magnates-bp-unfurl-speed', magnatesBPState.unfurlSpeed ?? 0.45);
+  setTxt('magnates-bp-val-unfurl-speed', `${(magnatesBPState.unfurlSpeed ?? 0.45).toFixed(2)}s`);
+  setTxt('magnates-bp-label-z6', `Left Product & ${magnatesBPState.prod1Price || '$2.00'} Tag`);
+  setTxt('magnates-bp-label-z7', `Right Product & ${magnatesBPState.prod2Price || '$5.00'} Tag`);
 
   // Sync Scene B / C Controls from shared state
   setVal('magnates-bp-l1-in-anim', magnatesBPState.l1InAnim);
@@ -49207,6 +49361,8 @@ function highlightMagnatesBPLayerOnStage(layerId) {
   hoverBox.style.display = 'block';
 
   const titles = {
+    z7: `Z=7 // RIGHT PRODUCT & ${magnatesBPState.prod2Price || '$5.00'} TAG`,
+    z6: `Z=6 // LEFT PRODUCT & ${magnatesBPState.prod1Price || '$2.00'} TAG`,
     z5: "Z=5 // WAVY HOOK TYPOGRAPHY",
     z4: "Z=4 // BRAND LOGO CUTOUT (TEMU)",
     z3: "Z=3 // RIGHT SILHOUETTE CUTOUT",
@@ -49281,12 +49437,13 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
 
   // 2. Highlight and scroll the corresponding control card into view
   const cardLogo = document.getElementById('magnates-bp-card-logo-controls');
+  const cardProds = document.getElementById('magnates-bp-card-products-controls');
   const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
   const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
   const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
   const cardExtra = document.getElementById('magnates-bp-card-extra-controls');
 
-  [cardLogo, cardL1, cardL2, cardZ0].forEach((c) => {
+  [cardLogo, cardProds, cardL1, cardL2, cardZ0].forEach((c) => {
     if (c) {
       c.style.borderColor = 'rgba(255,255,255,0.06)';
       c.style.background = 'rgba(255,255,255,0.02)';
@@ -49300,6 +49457,11 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
     cardLogo.style.background = 'rgba(249, 115, 22, 0.06)';
     cardLogo.style.boxShadow = '0 0 16px rgba(249, 115, 22, 0.15)';
     cardLogo.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if ((layerId === 'z6' || layerId === 'z7') && cardProds) {
+    cardProds.style.borderColor = 'rgba(251, 113, 133, 0.65)';
+    cardProds.style.background = 'rgba(251, 113, 133, 0.06)';
+    cardProds.style.boxShadow = '0 0 16px rgba(251, 113, 133, 0.15)';
+    cardProds.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } else if (layerId === 'z2' && cardL1) {
     cardL1.style.borderColor = 'rgba(56, 189, 248, 0.65)';
     cardL1.style.background = 'rgba(56, 189, 248, 0.06)';
@@ -49344,6 +49506,8 @@ function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
   const floatLbl = document.getElementById('magnates-bp-float-label');
   if (floatBar && floatLbl && showFloatingBar) {
     const names = {
+      z7: 'Z=7 // RIGHT PRODUCT ($5)',
+      z6: 'Z=6 // LEFT PRODUCT ($2)',
       z5: 'Z=5 // WAVY HEADLINE',
       z4: 'Z=4 // BRAND LOGO',
       z3: 'Z=3 // RIGHT CUTOUT',
@@ -49476,9 +49640,60 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
+  // Scene A2 Product Cards & Price Unfurl Controls (Z=6 & Z=7)
+  document.getElementById('magnates-bp-toggle-products')?.addEventListener('change', (e) => {
+    magnatesBPState.productsEnabled = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-prod1-price')?.addEventListener('input', (e) => {
+    magnatesBPState.prod1Price = e.target.value;
+    if (magnatesBPState.playhead < (magnatesBPState.logoShiftRightTime ?? 3.10) + 0.8) {
+      magnatesBPState.playhead = (magnatesBPState.logoShiftRightTime ?? 3.10) + 1.4;
+    }
+    syncMagnatesBPInspectorControlsFromState();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-prod2-price')?.addEventListener('input', (e) => {
+    magnatesBPState.prod2Price = e.target.value;
+    if (magnatesBPState.playhead < (magnatesBPState.logoShiftRightTime ?? 3.10) + 1.8) {
+      magnatesBPState.playhead = (magnatesBPState.logoShiftRightTime ?? 3.10) + 2.5;
+    }
+    syncMagnatesBPInspectorControlsFromState();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-logo-center-time')?.addEventListener('input', (e) => {
+    magnatesBPState.logoShiftRightTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-logo-center');
+    if (lbl) lbl.textContent = `${magnatesBPState.logoShiftRightTime.toFixed(2)}s`;
+    magnatesBPState.playhead = magnatesBPState.logoShiftRightTime + 0.25;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-unfurl-speed')?.addEventListener('input', (e) => {
+    magnatesBPState.unfurlSpeed = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-unfurl-speed');
+    if (lbl) lbl.textContent = `${magnatesBPState.unfurlSpeed.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-upload-z6')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.prod1Url = URL.createObjectURL(file);
+    magnatesBPState.productsEnabled = true;
+    magnatesBPState.playhead = (magnatesBPState.logoShiftRightTime ?? 3.10) + 1.2;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-upload-z7')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.prod2Url = URL.createObjectURL(file);
+    magnatesBPState.productsEnabled = true;
+    magnatesBPState.playhead = (magnatesBPState.logoShiftRightTime ?? 3.10) + 2.3;
+    updateMagnatesBPVisualStyles();
+  });
+
   // Granular Layer 1 (Z=2) Controls
   const jumpToSceneBTime = (localT) => {
-    const offset = magnatesBPState.preset === 'full_story_flow' ? 4.50 : 0.0;
+    const offset = magnatesBPState.preset === 'full_story_flow' ? (magnatesBPState.productsEnabled ? 7.20 : 4.50) : 0.0;
     magnatesBPState.playhead = Math.max(0, offset + localT);
   };
 
@@ -49726,6 +49941,8 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     if (sel === 'z4' || sel === 'z5') magnatesBPState.logoCutoutUrl = url;
     else if (sel === 'z2') magnatesBPState.secondaryCutoutUrl = url;
     else if (sel === 'z3') magnatesBPState.primaryCutoutUrl = url;
+    else if (sel === 'z6') magnatesBPState.prod1Url = url;
+    else if (sel === 'z7') magnatesBPState.prod2Url = url;
     else if (sel === 'z0') magnatesBPState.bgPlateUrl = url;
     else if (sel && sel.startsWith('extra_')) {
       const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === sel);
@@ -49853,8 +50070,16 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
     card.addEventListener('click', () => {
       const targetScene = card.getAttribute('data-scene-card');
-      if (magnatesBPState.preset === 'full_story_flow') {
-        magnatesBPState.playhead = targetScene === 'dual_silhouette' ? 4.50 : 0.0;
+      if (targetScene === 'products_unfurl') {
+        if (magnatesBPState.preset === 'dual_silhouette' || magnatesBPState.preset === 'room_spawn') {
+          applyMagnatesBPPresetToState('full_story_flow');
+        }
+        magnatesBPState.productsEnabled = true;
+        magnatesBPState.playhead = magnatesBPState.logoShiftRightTime ?? 3.10;
+        selectMagnatesBPLayer('z6');
+        updateMagnatesBPVisualStyles();
+      } else if (magnatesBPState.preset === 'full_story_flow') {
+        magnatesBPState.playhead = targetScene === 'dual_silhouette' ? (magnatesBPState.productsEnabled ? 7.20 : 4.50) : 0.0;
         updateMagnatesBPVisualStyles();
       } else if (targetScene) {
         applyMagnatesBPPresetToState(targetScene);
@@ -49914,7 +50139,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   });
 
   const stage = document.getElementById('magnates-bp-stage');
-  ['z2', 'z3', 'z4', 'z5'].forEach((lid) => {
+  ['z2', 'z3', 'z4', 'z5', 'z6', 'z7'].forEach((lid) => {
     const el = stage?.querySelector(`[data-bp-layer="${lid}"]`);
     if (el) {
       el.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(lid));

@@ -9183,6 +9183,26 @@
                 <div id="magnates-bp-wavy-line2" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(12px, 1.72vw, 23px); font-weight: 900; color: #e11d1d; letter-spacing: 0.55px; text-transform: uppercase; line-height: 1.18; text-shadow: 0 0 20px rgba(225,29,29,0.55), 0 3px 10px rgba(0,0,0,0.9); white-space: nowrap;"></div>
               </div>
 
+              <!-- Z=6 Left Product Showcase Card + Price Tag (Unfurls Top&Bottom from middle, then Price Tag unfurls Left&Right from middle) -->
+              <div id="magnates-bp-layer-prod1" data-bp-layer="z6" style="position: absolute; left: 4.8%; top: 15.5%; width: 25.2%; height: 73%; z-index: 14; pointer-events: auto; cursor: pointer; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2.5%;">
+                <div id="magnates-bp-prod1-card" style="width: 100%; height: 83%; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 12px 28px rgba(0,0,0,0.75)); will-change: clip-path, transform, opacity;">
+                  <img id="magnates-bp-img-prod1" src="/temu_product_left.png" alt="Left Product Cutout" style="width: 100%; height: 100%; object-fit: contain;" />
+                </div>
+                <div id="magnates-bp-prod1-price-pill" style="padding: 3px 18px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1.5px solid rgba(239, 68, 68, 0.38); box-shadow: 0 0 18px rgba(220, 38, 38, 0.45), inset 0 0 10px rgba(255, 30, 30, 0.25); display: flex; align-items: center; justify-content: center; will-change: clip-path, transform, opacity;">
+                  <span id="magnates-bp-prod1-price-text" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(13px, 1.85vw, 24px); font-weight: 900; color: #ff1e1e; letter-spacing: 0.5px; text-shadow: 0 0 12px rgba(255,30,30,0.65); white-space: nowrap;">$2.00</span>
+                </div>
+              </div>
+
+              <!-- Z=7 Right Product Showcase Card + Price Tag (Unfurls Top&Bottom from middle, then Price Tag unfurls Left&Right from middle) -->
+              <div id="magnates-bp-layer-prod2" data-bp-layer="z7" style="position: absolute; right: 4.8%; top: 15.5%; width: 25.2%; height: 73%; z-index: 14; pointer-events: auto; cursor: pointer; display: none; flex-direction: column; align-items: center; justify-content: flex-start; gap: 2.5%;">
+                <div id="magnates-bp-prod2-card" style="width: 100%; height: 83%; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 12px 28px rgba(0,0,0,0.75)); will-change: clip-path, transform, opacity;">
+                  <img id="magnates-bp-img-prod2" src="/temu_product_right.png" alt="Right Product Cutout" style="width: 100%; height: 100%; object-fit: contain;" />
+                </div>
+                <div id="magnates-bp-prod2-price-pill" style="padding: 3px 18px; border-radius: 999px; background: rgba(115, 8, 8, 0.92); border: 1.5px solid rgba(239, 68, 68, 0.38); box-shadow: 0 0 18px rgba(220, 38, 38, 0.45), inset 0 0 10px rgba(255, 30, 30, 0.25); display: flex; align-items: center; justify-content: center; will-change: clip-path, transform, opacity;">
+                  <span id="magnates-bp-prod2-price-text" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(13px, 1.85vw, 24px); font-weight: 900; color: #ff1e1e; letter-spacing: 0.5px; text-shadow: 0 0 12px rgba(255,30,30,0.65); white-space: nowrap;">$5.00</span>
+                </div>
+              </div>
+
               <!-- TOP-LEFT FLOATING STUDIO OVERLAY STACK (Matches Image 4: Templates Library + Video/3D + 3D Edit Mode) -->
               <div style="position: absolute; top: 12px; left: 12px; z-index: 35; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
                 <button type="button" id="btn-magnates-bp-open-drawer" style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 20px; background: rgba(15, 17, 26, 0.9); border: 1px solid rgba(168, 85, 247, 0.45); color: #f8fafc; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 4px 14px rgba(0,0,0,0.6);" title="Browse Linked Templates Library">
@@ -9312,22 +9332,32 @@
             <!-- Storyboard Scene Cards Row (Scene 1, Scene 2, + Add Scene) -->
             <div id="magnates-bp-storyboard-row" style="display: flex; align-items: center; gap: 10px; overflow-x: auto; padding: 2px 0;">
               <!-- Scene 1 Card: Brand Logo & Wavy Hook -->
-              <div class="bp-storyboard-scene-card" data-scene-card="brand_wavy_intro" style="display: flex; align-items: center; gap: 10px; min-width: 215px; padding: 8px 12px; border-radius: 10px; background: rgba(168,85,247,0.14); border: 1.5px solid #a855f7; cursor: pointer; transition: all 0.15s;">
+              <div class="bp-storyboard-scene-card" data-scene-card="brand_wavy_intro" data-jump-time="0" style="display: flex; align-items: center; gap: 10px; min-width: 195px; padding: 8px 11px; border-radius: 10px; background: rgba(168,85,247,0.14); border: 1.5px solid #a855f7; cursor: pointer; transition: all 0.15s;">
                 <span style="width: 22px; height: 22px; border-radius: 50%; background: #a855f7; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span>
-                <img src="/temu_logo_cutout.png" style="width: 34px; height: 34px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
+                <img src="/temu_logo_cutout.png" style="width: 32px; height: 32px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
                 <div style="min-width: 0; flex: 1;">
-                  <div style="font-size: 11.5px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 1: Brand Hook</div>
-                  <div style="font-size: 9.5px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Logo Rise &amp; Wavy Headline</div>
+                  <div style="font-size: 11px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 1: Brand Hook</div>
+                  <div style="font-size: 9px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Logo Rise &amp; Wavy Text</div>
                 </div>
               </div>
 
-              <!-- Scene 2 Card: $1,000,000 Counter & Dual Silhouettes -->
-              <div class="bp-storyboard-scene-card" data-scene-card="dual_silhouette" style="display: flex; align-items: center; gap: 10px; min-width: 215px; padding: 8px 12px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.15s;">
+              <!-- Scene 2 Card: Logo Shift Right + Product Cards & Price Tags Unfurl -->
+              <div class="bp-storyboard-scene-card" data-scene-card="products_unfurl" data-jump-time="3.1" style="display: flex; align-items: center; gap: 10px; min-width: 205px; padding: 8px 11px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.15s;">
                 <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span>
-                <img src="/silhouette_standing_phone.png" style="width: 34px; height: 34px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
+                <img src="/temu_product_left.png" style="width: 32px; height: 32px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
                 <div style="min-width: 0; flex: 1;">
-                  <div style="font-size: 11.5px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 2: $1M Cutouts</div>
-                  <div style="font-size: 9.5px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dual Glowing Silhouettes</div>
+                  <div style="font-size: 11px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 2: Price Unfurl</div>
+                  <div style="font-size: 9px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">$2.00 &amp; $5.00 Split Reveal</div>
+                </div>
+              </div>
+
+              <!-- Scene 3 Card: $1,000,000 Counter & Dual Silhouettes -->
+              <div class="bp-storyboard-scene-card" data-scene-card="dual_silhouette" data-jump-time="7.2" style="display: flex; align-items: center; gap: 10px; min-width: 200px; padding: 8px 11px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.15s;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span>
+                <img src="/silhouette_standing_phone.png" style="width: 32px; height: 32px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-size: 11px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 3: $1M Cutouts</div>
+                  <div style="font-size: 9px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Dual Glowing Silhouettes</div>
                 </div>
               </div>
 
@@ -9361,6 +9391,32 @@
               <label for="magnates-bp-add-extra-layer-input" style="font-size: 10px; font-weight: 700; color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 3px;" title="Upload and add a new independent cutout layer to the stage">
                 + ADD LAYER
                 <input type="file" id="magnates-bp-add-extra-layer-input" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+
+            <!-- Z=7 Layer Row: Right Product Card & Price Tag ($5.00) -->
+            <div id="magnates-bp-row-z7" class="bp-inspector-layer-row" data-layer-id="z7" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <img id="magnates-bp-thumb-z7" src="/temu_product_right.png" style="width: 30px; height: 30px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;" />
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span id="magnates-bp-label-z7" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Right Product &amp; $5.00 Tag</span>
+                <span id="magnates-bp-sub-z7" style="font-size: 9.5px; color: #64748b;">Unfurl Top/Bottom &bull; Tag Left/Right</span>
+              </div>
+              <label style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                Replace
+                <input type="file" id="magnates-bp-upload-z7" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+
+            <!-- Z=6 Layer Row: Left Product Card & Price Tag ($2.00) -->
+            <div id="magnates-bp-row-z6" class="bp-inspector-layer-row" data-layer-id="z6" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <img id="magnates-bp-thumb-z6" src="/temu_product_left.png" style="width: 30px; height: 30px; border-radius: 6px; object-fit: contain; background: #1a0505; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;" />
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span id="magnates-bp-label-z6" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Left Product &amp; $2.00 Tag</span>
+                <span id="magnates-bp-sub-z6" style="font-size: 9.5px; color: #64748b;">Unfurl Top/Bottom &bull; Tag Left/Right</span>
+              </div>
+              <label style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                Replace
+                <input type="file" id="magnates-bp-upload-z6" accept="image/*" style="display: none;" />
               </label>
             </div>
 
@@ -9490,6 +9546,45 @@
               <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
                 <input type="range" id="magnates-bp-logo-glow-intensity" min="0" max="100" step="5" value="90" style="flex: 1; accent-color: #f97316; cursor: pointer;" title="Brand Logo Glow Intensity" />
                 <span id="magnates-bp-val-logo-glow" style="font-family: monospace; font-size: 9px; color: #f97316; min-width: 26px; text-align: right;">90%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene A2: Center-Out Product Cards & Price Tags Unfurl Controls (Z=6 & Z=7) -->
+          <div id="magnates-bp-card-products-controls" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #fb7185;">Product Cards &amp; Price Unfurl</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 9px; font-family: monospace; color: #94a3b8;">Z=6 &amp; Z=7</span>
+                <input type="checkbox" id="magnates-bp-toggle-products" checked style="accent-color: #fb7185; cursor: pointer;" title="Enable Logo Shift Right + Product & Price Unfurl Sequence" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <label style="font-size: 9.5px; color: #94a3b8; display: block; margin-bottom: 2px;">Left Price Tag (L&harr;R)</label>
+                <input type="text" id="magnates-bp-input-prod1-price" value="$2.00" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ff1e1e; font-weight: 800; font-size: 11px; outline: none;" />
+              </div>
+              <div>
+                <label style="font-size: 9.5px; color: #94a3b8; display: block; margin-bottom: 2px;">Right Price Tag (L&harr;R)</label>
+                <input type="text" id="magnates-bp-input-prod2-price" value="$5.00" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ff1e1e; font-weight: 800; font-size: 11px; outline: none;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Logo Shift Right</span>
+                  <span id="magnates-bp-val-logo-center" style="font-family: monospace; color: #fb7185;">3.10s</span>
+                </div>
+                <input type="range" id="magnates-bp-logo-center-time" min="2.2" max="4.2" step="0.05" value="3.10" style="width: 100%; accent-color: #fb7185; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Unfurl Speed</span>
+                  <span id="magnates-bp-val-unfurl-speed" style="font-family: monospace; color: #fb7185;">0.45s</span>
+                </div>
+                <input type="range" id="magnates-bp-unfurl-speed" min="0.20" max="0.85" step="0.05" value="0.45" style="width: 100%; accent-color: #fb7185; cursor: pointer;" />
               </div>
             </div>
           </div>
