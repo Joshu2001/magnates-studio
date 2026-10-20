@@ -8828,8 +8828,12 @@
           <div style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 30px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center;">
             <img id="magnates-blend-bg-img" src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80" alt="Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(130%) brightness(55%); display: block;" />
 
-            <!-- Particle / Snow Screen Blend Layer -->
+            <!-- Particle & Environmental FX Blend Layers -->
             <div id="magnates-blend-particles" style="position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; background-image: radial-gradient(#ffffff 1.2px, transparent 1.2px); background-size: 26px 26px; opacity: 0.85;"></div>
+            <div id="magnates-blend-rain" style="position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; display: none; opacity: 0.85; background: repeating-linear-gradient(105deg, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) 1.5px, transparent 1.5px, transparent 24px); background-size: 80px 140px;"></div>
+            <div id="magnates-blend-grain" style="position: absolute; inset: 0; mix-blend-mode: overlay; pointer-events: none; display: none; opacity: 0.4; background-image: radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px); background-size: 4px 4px;"></div>
+            <div id="magnates-blend-lightleak" style="position: absolute; inset: 0; mix-blend-mode: screen; pointer-events: none; display: none; opacity: 0.6; background: radial-gradient(circle at 15% 25%, rgba(244, 63, 94, 0.75) 0%, rgba(251, 146, 60, 0.45) 45%, transparent 75%);"></div>
+            <div id="magnates-blend-grunge" style="position: absolute; inset: 0; mix-blend-mode: difference; pointer-events: none; display: none; opacity: 0.5; background: radial-gradient(#ffffff 1px, transparent 2px), repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0px, rgba(255,255,255,0.15) 2px, transparent 4px, transparent 12px); background-size: 32px 32px, 64px 64px;"></div>
 
             <!-- Overlay Antique Clock Layer -->
             <div id="magnates-blend-clock-wrap" style="position: absolute; inset: 0; mix-blend-mode: overlay; pointer-events: none; display: flex; align-items: center; justify-content: center; opacity: 0.75;">
@@ -8840,16 +8844,6 @@
                 <line x1="50" y1="50" x2="74" y2="50" stroke-width="3" />
                 <circle cx="50" cy="50" r="4" fill="#a855f7" />
               </svg>
-            </div>
-
-            <!-- Subject Text Card with Active Blend Mode -->
-            <div id="magnates-blend-card-element" style="position: relative; z-index: 10; padding: 14px 22px; background: rgba(15,23,42,0.85); border: 2px solid #a855f7; border-radius: 12px; backdrop-filter: blur(8px); box-shadow: 0 15px 35px rgba(0,0,0,0.9); text-align: center; transition: all 0.15s ease;">
-              <div id="magnates-blend-card-sub" style="font-family: monospace; font-size: 8px; font-weight: 800; color: #c084fc; letter-spacing: 1.5px; text-transform: uppercase;">
-                ACTIVE BLEND: SCREEN MODE
-              </div>
-              <div id="magnates-blend-card-title" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 900; color: #ffffff; letter-spacing: 2px; margin-top: 2px;">
-                COMPOSITING TEXTURES
-              </div>
             </div>
 
             <!-- In-Stage Typography -->
@@ -8909,6 +8903,31 @@
             <div id="magnates-blend-mode-desc" style="margin-top: 4px; padding: 6px 8px; border-radius: 6px; background: rgba(2,6,23,0.8); border: 1px solid rgba(168,85,247,0.3); font-size: 9.5px; color: #c084fc; line-height: 1.4;">
               Screen Mode: Drops black values completely to composite snow particles and anamorphic light bursts seamlessly over dark footage.
             </div>
+
+            <!-- Granular Effect Style Selector -->
+            <div style="margin-top: 4px; font-size: 11px; font-weight: 600; color: #cbd5e1;">Atmospheric Effect Overlay</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
+              <button type="button" class="btn-blend-effect-pick" data-fx="snow" style="padding: 5px 2px; font-size: 9.5px; font-weight: 700; border-radius: 5px; background: rgba(168,85,247,0.25); border: 1px solid #a855f7; color: #fff; cursor: pointer;">❄️ Snow</button>
+              <button type="button" class="btn-blend-effect-pick" data-fx="rain" style="padding: 5px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">🌧️ Rain</button>
+              <button type="button" class="btn-blend-effect-pick" data-fx="grain" style="padding: 5px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">🎞️ Grain</button>
+              <button type="button" class="btn-blend-effect-pick" data-fx="lightleak" style="padding: 5px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">✨ Light Leak</button>
+              <button type="button" class="btn-blend-effect-pick" data-fx="grunge" style="padding: 5px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">⚡ Grunge</button>
+              <button type="button" class="btn-blend-effect-pick" data-fx="none" style="padding: 5px 2px; font-size: 9.5px; font-weight: 600; border-radius: 5px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer;">🚫 None</button>
+            </div>
+
+            <!-- Granularity Slider -->
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #94a3b8;">Granularity / Density</span>
+              <span id="magnates-blend-val-granularity" style="font-family: monospace; color: #c084fc;">26px</span>
+            </div>
+            <input type="range" id="magnates-blend-slider-granularity" min="8" max="60" value="26" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+
+            <!-- Effect Speed Slider -->
+            <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 4px;">
+              <span style="color: #94a3b8;">Motion Speed</span>
+              <span id="magnates-blend-val-speed" style="font-family: monospace; color: #c084fc;">1.0x</span>
+            </div>
+            <input type="range" id="magnates-blend-slider-speed" min="2" max="30" value="10" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
 
             <div style="display: flex; justify-content: space-between; font-size: 10.5px; margin-top: 6px;">
               <span style="color: #94a3b8;">Blend Layer Opacity</span>

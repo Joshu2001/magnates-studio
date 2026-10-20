@@ -4724,11 +4724,13 @@ function selectClip(clip, trackType) {
       if (clip.drawingStrokes) {
         miniThumb.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" style="width:20px;height:20px;fill:#ff334b;"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
         if (miniSub) miniSub.textContent = `Drawing \u2022 ${clip.drawMode === 'live' ? 'Speed-Draw Active' : 'Static'} \u2022 ${clip.staggerParts ? 'Staggered' : 'All Strokes'}`;
-      } else if (trackType === 'image' && clip.file?.url) {
-        miniThumb.innerHTML = `<img src="${clip.file.url}" style="width:100%; height:100%; object-fit:cover;">`;
+      } else if (trackType === 'image' && (clip.file?.url || clip.url)) {
+        const imgUrl = clip.file?.url || clip.url;
+        miniThumb.innerHTML = `<img src="${imgUrl}" style="width:100%; height:100%; object-fit:cover;">`;
         if (miniSub) miniSub.textContent = `Image \u2022 ${((clip.scale || 1) * 100).toFixed(0)}% zoom \u2022 Drag on canvas to edit`;
-      } else if (trackType === 'video' && clip.file?.url) {
-        miniThumb.innerHTML = `<video src="${clip.file.url}" style="width:100%; height:100%; object-fit:cover;" muted></video>`;
+      } else if (trackType === 'video' && (clip.file?.url || clip.url)) {
+        const vidUrl = clip.file?.url || clip.url;
+        miniThumb.innerHTML = `<video src="${vidUrl}" style="width:100%; height:100%; object-fit:cover;" muted></video>`;
         if (miniSub) miniSub.textContent = `Video \u2022 ${clip.soundEnabled ? 'Audio On' : 'Muted'} \u2022 ${clip.duration.toFixed(1)}s`;
       } else if (trackType === 'voiceover' || trackType === 'music') {
         miniThumb.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--accent-red);"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`;
@@ -7038,6 +7040,42 @@ if (studioScrubberWrap) {
 
     window.addEventListener('mousemove', onStudioMouseMove);
     window.addEventListener('mouseup', onStudioMouseUp);
+  });
+}
+
+// Studio Canvas Wrapper Hover HUD Wake-up
+const studioCanvasWrapper = document.querySelector('.canvas-wrapper');
+const mainStudioHud = document.getElementById('studio-main-player-hud');
+if (studioCanvasWrapper && mainStudioHud) {
+  let studioHudFadeTimer = null;
+  const showStudioHud = () => {
+    mainStudioHud.classList.add('active');
+    if (studioHudFadeTimer) clearTimeout(studioHudFadeTimer);
+    studioHudFadeTimer = setTimeout(() => {
+      if (!studioCanvasWrapper.matches(':hover') && !mainStudioHud.matches(':hover')) {
+        mainStudioHud.classList.remove('active');
+      }
+    }, 2800);
+  };
+
+  studioCanvasWrapper.addEventListener('mouseenter', showStudioHud);
+  studioCanvasWrapper.addEventListener('mousemove', showStudioHud);
+  studioCanvasWrapper.addEventListener('mouseleave', () => {
+    if (studioHudFadeTimer) clearTimeout(studioHudFadeTimer);
+    studioHudFadeTimer = setTimeout(() => {
+      mainStudioHud.classList.remove('active');
+    }, 1000);
+  });
+
+  mainStudioHud.addEventListener('mouseenter', () => {
+    if (studioHudFadeTimer) clearTimeout(studioHudFadeTimer);
+    mainStudioHud.classList.add('active');
+  });
+  mainStudioHud.addEventListener('mouseleave', () => {
+    if (studioHudFadeTimer) clearTimeout(studioHudFadeTimer);
+    studioHudFadeTimer = setTimeout(() => {
+      mainStudioHud.classList.remove('active');
+    }, 1000);
   });
 }
 
@@ -27539,52 +27577,144 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     } else if (tplId === 'document-3d-fx-engine') {
 
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; perspective: 700px; display: flex; align-items: center; justify-content: center;">
-          <!-- 3D Perspective Paper Sheet -->
-          <div id="fx-doc-paper-${tplId}" style="position: relative; width: 78%; height: 82%; background: #fcfbf7; border-radius: 6px; box-shadow: 0 20px 45px rgba(0,0,0,0.95); padding: 12px; border: 1px solid #e2d9c8; transform-origin: center center; transform-style: preserve-3d; transition: transform 0.05s ease-out;">
-            <div style="height: 2px; background: #1c1917; margin-bottom: 4px;"></div>
-            <div style="font-family: 'Cinzel', serif; font-size: 10.5px; font-weight: 900; color: #1c1917; text-align: center; letter-spacing: 1.5px;">THE FINANCIAL GAZETTE</div>
-            <div style="height: 1px; background: #1c1917; margin-top: 4px; margin-bottom: 6px;"></div>
+        <div style="position: absolute; inset: 0; background: #0c0805; overflow: hidden; perspective: 1100px; perspective-origin: 50% 32%; display: flex; align-items: center; justify-content: center; user-select: none;">
+          <!-- Photorealistic Dark Walnut Executive Desk Surface -->
+          <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 95% 85% at 52% 38%, #24160f 0%, #130b07 65%, #050302 100%);"></div>
+          <div style="position: absolute; inset: 0; opacity: 0.18; pointer-events: none; background-image: repeating-linear-gradient(82deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1.5px, transparent 1.5px, transparent 14px), repeating-linear-gradient(172deg, rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 2px, transparent 2px, transparent 20px);"></div>
+
+          <!-- Volumetric Directional Spotlight (God Ray beam from top-right) -->
+          <div style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(132deg, rgba(255, 246, 222, 0.28) 0%, rgba(255, 235, 190, 0.12) 34%, rgba(255, 220, 160, 0.0) 68%); mix-blend-mode: screen; filter: blur(14px);"></div>
+          <!-- Warm subtle edge vignette -->
+          <div style="position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 100px 30px rgba(3, 2, 2, 0.88);"></div>
+
+          <!-- 3D Camera Rig: Multi-layer Physical Newspaper Stack -->
+          <div id="fx-doc-rig-${tplId}" style="position: relative; width: 78%; height: 80%; transform-style: preserve-3d; transform-origin: center center; display: flex; align-items: center; justify-content: center; transition: transform 0.04s ease-out;">
             
-            <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 11px; font-weight: 900; color: #0f172a; line-height: 1.25; margin-bottom: 8px;">
-              Uncovered Files Reveal $4.2B Secret Algorithm Shift
+            <!-- STACK LAYER 3 (Deepest bottom newspaper, fanned left) -->
+            <div style="position: absolute; width: 102%; height: 104%; background: #dfd6c0; border-radius: 2px; box-shadow: 0 35px 70px rgba(0,0,0,0.85); transform: translate3d(-16px, 18px, -22px) rotate(-3.2deg); border: 1px solid rgba(140, 125, 100, 0.4); overflow: hidden; pointer-events: none;">
+              <div style="position: absolute; inset: 0; opacity: 0.15; background-image: repeating-linear-gradient(0deg, #1c1917 0, #1c1917 1px, transparent 1px, transparent 7px);"></div>
             </div>
 
-            <!-- Vox Marker Highlighter Strip -->
-            <div style="position: relative; margin-bottom: 6px;">
-              <div id="fx-doc-highlighter-${tplId}" style="position: absolute; left: 0; top: 0; bottom: 0; width: 0%; background: rgba(250, 204, 21, 0.9); border-radius: 3px; z-index: 1;"></div>
-              <span style="position: relative; z-index: 2; font-family: Georgia, serif; font-size: 8.5px; font-weight: 700; color: #1e1b4b; display: block; padding: 2px 4px;">
-                "Full structural vulnerabilities known since Q3."
-              </span>
+            <!-- STACK LAYER 2 (Middle newspaper, fanned right) -->
+            <div style="position: absolute; width: 101%; height: 102%; background: #e7dfcc; border-radius: 2px; box-shadow: 0 25px 50px rgba(0,0,0,0.78); transform: translate3d(14px, 12px, -12px) rotate(2.1deg); border: 1px solid rgba(160, 145, 120, 0.45); overflow: hidden; pointer-events: none;">
+              <div style="position: absolute; inset: 0; opacity: 0.18; background-image: repeating-linear-gradient(0deg, #1c1917 0, #1c1917 1px, transparent 1px, transparent 8px);"></div>
             </div>
 
-            <!-- Classified Redaction Censor Bar -->
-            <div id="fx-doc-redact-${tplId}" style="width: 65%; height: 10px; background: #050505; border-radius: 2px; margin-bottom: 6px;"></div>
+            <!-- STACK LAYER 1 (Directly underneath top sheet, slight tilt) -->
+            <div style="position: absolute; width: 100%; height: 100%; background: #eee7d5; border-radius: 2px; box-shadow: 0 16px 35px rgba(0,0,0,0.7); transform: translate3d(-4px, 6px, -4px) rotate(-0.6deg); border: 1px solid rgba(175, 160, 135, 0.5); overflow: hidden; pointer-events: none;">
+              <div style="position: absolute; inset: 0; opacity: 0.12; background-image: repeating-linear-gradient(0deg, #1c1917 0, #1c1917 1px, transparent 1px, transparent 8px);"></div>
+            </div>
 
-            <!-- Paragraph Mockup Lines -->
-            <div style="display: flex; gap: 8px;">
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
-                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 100%;"></div>
-                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 90%;"></div>
-                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 95%;"></div>
+            <!-- TOP BROADSHEET NEWSPAPER (Photorealistic Typesetting & Texture) -->
+            <div id="fx-doc-paper-${tplId}" style="position: relative; width: 100%; height: 100%; background: #f5f0e3; border-radius: 2px; box-shadow: 0 20px 45px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.35); padding: 12px 14px; border: 1px solid rgba(195, 180, 155, 0.6); transform-style: preserve-3d; overflow: visible;">
+              
+              <!-- Realistic Paper Grain Texture Overlay -->
+              <div style="position: absolute; inset: 0; pointer-events: none; opacity: 0.055; background-image: radial-gradient(#1c1917 1px, transparent 0); background-size: 3.5px 3.5px;"></div>
+
+              <!-- Top Depth-Of-Field Bokeh Gradient (Soft lens blur on distant masthead) -->
+              <div style="position: relative; filter: blur(0.6px); transform: translateZ(0);">
+                <!-- Double Masthead Rules -->
+                <div style="border-top: 2.5px solid #1c1917; border-bottom: 0.8px solid #1c1917; height: 3px; margin-bottom: 4px;"></div>
+                
+                <!-- Authentic Masthead -->
+                <div id="fx-doc-masthead-${tplId}" style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 17px; font-weight: 900; color: #1a1614; text-align: center; letter-spacing: 3.8px; text-transform: uppercase; line-height: 1.1;">
+                  THE FINANCIAL GAZETTE
+                </div>
+
+                <!-- Dateline Bar with Hairline Borders -->
+                <div id="fx-doc-dateline-${tplId}" style="display: flex; justify-content: space-between; font-family: 'Times New Roman', Georgia, serif; font-size: 6.8px; font-weight: 600; color: #44403c; border-top: 0.8px solid #292524; border-bottom: 0.8px solid #292524; padding: 2px 2px; margin: 4px 0 6px 0; letter-spacing: 0.4px;">
+                  <span>DATE: 20 October 2021</span>
+                  <span>IONSDAY, 19 HI 17, 2021</span>
+                  <span>EDITION: NO. 719</span>
+                </div>
               </div>
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
-                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 100%;"></div>
-                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 85%;"></div>
-                <div style="height: 3px; background: #94a3b8; border-radius: 1px; width: 92%;"></div>
+
+              <!-- Major Investigative Headline (Razor Sharp Focal Plane, Completely Visible Above Floating Quote) -->
+              <div id="fx-doc-headline-${tplId}" style="font-family: 'Playfair Display', Georgia, serif; font-size: 13px; font-weight: 900; color: #0f141c; line-height: 1.15; margin-bottom: 3px; letter-spacing: -0.2px;">
+                Uncovered Files Reveal $4.2B Secret Algorithm Shift
               </div>
+
+              <!-- Subheader / Author Byline -->
+              <div id="fx-doc-byline-${tplId}" style="font-family: 'Times New Roman', Georgia, serif; font-size: 6.5px; font-style: italic; color: #57534e; margin-bottom: 28px; border-bottom: 0.5px solid rgba(41, 37, 36, 0.25); padding-bottom: 3px;">
+                Authorison Solezeere &bull; Financial Investigation Desk, Special Market Dispatch
+              </div>
+
+              <!-- 4-Column Authentic Typeset Newspaper Article Body (Fills Broadside Sheet like Image 3) -->
+              <div style="display: flex; gap: 8px; font-family: 'Times New Roman', Georgia, serif; font-size: 5.2px; line-height: 1.25; color: #292524; text-align: justify; text-justify: inter-word; max-height: 230px; overflow: hidden;">
+                
+                <!-- Column 1 -->
+                <div style="flex: 1; border-right: 0.5px solid rgba(41, 37, 36, 0.22); padding-right: 6px;">
+                  <div style="font-weight: 700; font-size: 5.6px; margin-bottom: 2px; color: #1c1917;">Setture vulnerabliers</div>
+                  <p style="margin: 0 0 3px 0;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Omnis ratio praeclara est, sed cavenda sunt vitia secreti sermonis inter principes et directores.</p>
+                  <!-- In-situ text footprint behind floating extracted quote -->
+                  <div style="background: rgba(254, 240, 138, 0.28); border-left: 2px solid #eab308; padding: 2px 3px; font-style: italic; font-weight: 700; color: #78350f; margin-bottom: 3px;">
+                    "Full structural vulnerabilities known since Q3."
+                  </div>
+                  <p style="margin: 0 0 3px 0;">Quisquis enim sentit, quid sit substantia veritatis, non dubitat de sententia. Adversis rationibus obstare conantur dum capitalia transferuntur.</p>
+                  <p style="margin: 0 0 3px 0;">Neque vero discedimus ab eo, quod approbatum est; sed adhibemus diligentiam in perscrutandis monumentis privatis.</p>
+                  <p style="margin: 0 0 3px 0;">Expositis igitur his initiis, videmus quanta sit calamitas ignorantiae in negotiis publicis curandis.</p>
+                  <p style="margin: 0 0 3px 0;">Finem enim requirimus, qui et honestatem conservet et damna compescat.</p>
+                  <p style="margin: 0 0 3px 0;">Hoc amplius, auditores praesentia documenta testantur, non ficta sed verissima.</p>
+                  <p style="margin: 0;">Multiplicantur querelae civium qui fraudem passi sunt in apertis mercatibus.</p>
+                </div>
+
+                <!-- Column 2 -->
+                <div style="flex: 1; border-right: 0.5px solid rgba(41, 37, 36, 0.22); padding-right: 6px;">
+                  <p style="margin: 0 0 3px 0;">Tum ille: Tu autem cum in hac divisione rem ipsam teneas, cur verbis aliter utamur? Nihil enim praeter veritatem quaeritur in disputando coram iudicibus.</p>
+                  <div style="font-weight: 700; font-size: 5.6px; margin-bottom: 2px; color: #1c1917;">Audit Protocol Compliance</div>
+                  <p style="margin: 0 0 3px 0;">Explicabo celeriter quid senserim; neque enim obscurum est quod agimus in curia. Equidem eorum omnia quae praeclara sunt dicta non contemno, sed approbo.</p>
+                  <p style="margin: 0 0 3px 0;">Sed quoniam eadem res saepe aliis verbis explicanda est, pergamus ad sequentes quaestiones de transferendis pecuniis.</p>
+                  <p style="margin: 0 0 3px 0;">Nulla fides servabatur ubi lucrum immensum promittebatur clandestinis consiliis.</p>
+                  <p style="margin: 0 0 3px 0;">Itaque conventus decrevit tabulas omnes publicandas esse ante mensis finem.</p>
+                  <p style="margin: 0 0 3px 0;">Constat enim neminem unquam tantam audaciam adhibuisse sine fautoribus potentibus.</p>
+                  <p style="margin: 0;">Quare iustitia poscit plenam rationem reddi omnium transactionum.</p>
+                </div>
+
+                <!-- Column 3 -->
+                <div style="flex: 1; border-right: 0.5px solid rgba(41, 37, 36, 0.22); padding-right: 6px;">
+                  <div style="font-weight: 700; font-size: 5.6px; margin-bottom: 2px; color: #1c1917;">Systemic Exposure</div>
+                  <p style="margin: 0 0 3px 0;">Trading execution protocols operated without independent oversight committee access. Regulators confirmed internal routing metrics deviated by 34.8%.</p>
+                  <p style="margin: 0 0 3px 0;">Offshore account mobility surged ahead of public disclosure statements. Capital reserves were shifted across tiered holding entities during off-peak liquidation sequences.</p>
+                  <p style="margin: 0 0 3px 0;">Interea magistratus rationem deposcunt. Multiplicantur indicia perversae administrationis pecuniae publicae.</p>
+                  <p style="margin: 0 0 3px 0;">Gravissimum autem crimen est conscientia periculorum celatorum ab actoribus mercatus.</p>
+                  <p style="margin: 0 0 3px 0;">Videntur enim leges neglectae fuisse causa privatorum emolumentorum.</p>
+                  <p style="margin: 0 0 3px 0;">Omnes conspirationis partes deteguntur gradatim per litteras interceptas.</p>
+                  <p style="margin: 0;">Nullus locus relinquitur dubitationi de culpa principalium auctorum.</p>
+                </div>
+
+                <!-- Column 4 -->
+                <div style="flex: 1;">
+                  <div style="font-weight: 700; font-size: 5.6px; margin-bottom: 2px; color: #1c1917;">Treasury Oversight Findings</div>
+                  <p style="margin: 0 0 3px 0;">Mandated threshold buffers were artificially reported through automated balancing functions. Audit proceedings continue promptly under federal inquiry.</p>
+                  <p style="margin: 0 0 3px 0;">Quae cum ita sint, finem faciamus tractationi huius quaestionis. Tabulae confiscatae documenta authentica manifestant.</p>
+                  <p style="margin: 0 0 3px 0;">Ceterum censores postulant ut responsabiles ad iudicium vocentur sine ulla dilatione.</p>
+                  <p style="margin: 0 0 3px 0;">Nemo potest diffiteri damnum illatum toti systemati oeconomico propter neglegentiam.</p>
+                  <p style="margin: 0 0 3px 0;">Iustitia igitur exigit restitutionem ac severam poenam transgressoribus.</p>
+                  <p style="margin: 0 0 3px 0;">Spectatores denique monentur ne fidem habeant promissis sine firmo fundamento.</p>
+                  <p style="margin: 0;">Finis imponitur huic relationi cum spe recuperandae veritatis.</p>
+                </div>
+
+              </div>
+
+              <!-- 3D ISOLATED POP-OUT QUOTE EXTRACTION SYSTEM (Physically lifts into Z-Space) -->
+              <div id="fx-doc-extracted-strip-${tplId}" style="position: absolute; left: 10px; right: 10px; top: 112px; background: #faf7ed; border-radius: 3px; border: 0.8px solid rgba(205, 190, 160, 0.75); padding: 5px 12px; transform-style: preserve-3d; transform: translate3d(0, 0, 48px); box-shadow: 0 20px 32px -4px rgba(8, 6, 4, 0.72), 0 6px 14px -2px rgba(8, 6, 4, 0.45); pointer-events: none; z-index: 20;">
+                
+                <!-- Hand-Drawn Dynamic Marker Highlight (Multiply Blending & Rounded Ends) -->
+                <div id="fx-doc-highlighter-${tplId}" style="position: absolute; left: 6px; top: 3px; bottom: 3px; width: 0%; background: linear-gradient(90deg, #fef08a 0%, #facc15 65%, #f59e0b 100%); mix-blend-mode: multiply; border-radius: 3px; z-index: 1; opacity: 0.92; box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);"></div>
+
+                <!-- Isolated Pin-Sharp Serif Quote Text -->
+                <span id="fx-doc-quote-text-${tplId}" style="position: relative; z-index: 2; font-family: 'Playfair Display', 'Times New Roman', Georgia, serif; font-size: 11.2px; font-weight: 900; font-style: italic; color: #0f141c; letter-spacing: -0.15px; display: block; line-height: 1.25;">
+                  “Full structural vulnerabilities known since Q3.”
+                </span>
+              </div>
+
             </div>
 
-            <!-- 3D Pop-Out Headline Badge Card -->
-            <div id="fx-doc-popout-${tplId}" style="position: absolute; right: -8px; bottom: 12px; width: 55%; background: rgba(15,23,42,0.95); border: 1.5px solid #a855f7; border-radius: 6px; padding: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); transform: translateZ(25px);">
-              <div style="font-size: 6px; font-weight: 800; color: #c084fc; font-family: monospace;">\u25cf 3D POP-OUT LAYER</div>
-              <div style="font-size: 8px; font-weight: 900; color: #ffffff; font-family: 'Cinzel', serif; margin-top: 2px;">THE ARCHITECT</div>
-            </div>
           </div>
 
-          <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #7e22ce, #a855f7); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(168,85,247,0.5);">
-            \ud83d\udcf0 3D DOCUMENT FX
+          <!-- Elegant Documentary FX Pill Badge -->
+          <div style="position: absolute; top: 12px; right: 14px; padding: 3px 8px; border-radius: 5px; background: rgba(18, 14, 10, 0.85); border: 1px solid rgba(245, 158, 11, 0.35); color: #fbbf24; font-size: 8.5px; font-weight: 800; letter-spacing: 0.08em; z-index: 30; backdrop-filter: blur(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.6);">
+            3D DOCUMENT FX &bull; JAMES JANI
           </div>
         </div>
       `;
@@ -28814,39 +28944,47 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         redBar.style.width = `${rProg}%`;
       }
     } else if (tplId === 'document-3d-fx-engine') {
-      // 3D paper camera flyover: dynamic tilt, highlighter reveal, and pop-out headline elevation
-      const flyCycle = (Math.sin(t * 1.2 - Math.PI/2) + 1) / 2; // 0 to 1
-      const rotX = 18 + Math.cos(t * 1.3) * 12 + _fx.pitch;
-      const rotY = -14 + Math.sin(t * 1.1) * 18 + _fx.yaw;
-      const rotZ = -4 + Math.sin(t * 0.8) * 5 + _fx.roll;
-      const paperScale = (1.05 + flyCycle * 0.12) * _fx.zoom;
+      // Photorealistic 3D Documentary Camera Rig & Pop-Out Quote Extraction System
+      const cycleT = ((t * 0.85) % 4.0); // 4-second narrative loop
+      const camPush = (Math.sin(t * 0.9 - Math.PI / 2) + 1) / 2; // 0 to 1 smooth push-in
 
-      const paper = fxContainer?.querySelector(`#fx-doc-paper-${tplId}`);
+      // Camera pan, tilt (28-32 deg), and roll push-in
+      const rotX = 29 + Math.sin(t * 0.6) * 3 + _fx.pitch;
+      const rotY = -2.5 + Math.cos(t * 0.5) * 3.5 + _fx.yaw;
+      const rotZ = -1.2 + Math.sin(t * 0.4) * 1.5 + _fx.roll;
+      const cameraScale = (1.06 + camPush * 0.08) * _fx.zoom;
+
+      const rig = fxContainer?.querySelector(`#fx-doc-rig-${tplId}`);
       const hl = fxContainer?.querySelector(`#fx-doc-highlighter-${tplId}`);
-      const popout = fxContainer?.querySelector(`#fx-doc-popout-${tplId}`);
-      const redact = fxContainer?.querySelector(`#fx-doc-redact-${tplId}`);
+      const extractedStrip = fxContainer?.querySelector(`#fx-doc-extracted-strip-${tplId}`);
 
-      if (paper) {
-        paper.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg) scale(${paperScale})`;
+      if (rig) {
+        rig.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) rotateZ(${rotZ}deg) scale(${cameraScale})`;
       }
 
-      // Highlighter progressive wipe sweep (0% to 100%)
+      // Marker Ink: Hand-drawn marker stroke with Multiply blending and dynamic stroke-drawing animation (0% -> 100%)
       if (hl) {
-        const hlWidth = Math.min(100, Math.max(0, ((t * 1.5) % 3.0) * 45));
-        hl.style.width = `${hlWidth}%`;
+        const hlProgress = Math.min(100, Math.max(0, (cycleT - 0.4) * 85));
+        hl.style.width = `${hlProgress}%`;
       }
 
-      // Pop-out card lifts up off the sheet on Z-axis with 3D shadow
-      if (popout) {
-        const liftZ = 18 + Math.sin(t * 2.2) * 10;
-        popout.style.transform = `translateZ(${liftZ}px) translateY(${-liftZ * 0.3}px)`;
-        popout.style.boxShadow = `0 ${liftZ * 1.2}px ${liftZ * 1.6}px rgba(0,0,0,0.95)`;
-      }
+      // 3D Pop-Out Quote Extraction: Target phrase physically lifts off paper surface into Z-space (Z = +50px displacement)
+      if (extractedStrip) {
+        const liftProgress = Math.min(1.0, Math.max(0, (cycleT - 0.9) / 1.15));
+        // Smooth cubic ease-out curve
+        const eased = 1 - Math.pow(1 - liftProgress, 3);
+        const liftZ = 6 + eased * 46; // Rest at 6px, physically lifts to 52px (+46px Z-displacement)
+        const liftY = -eased * 4;     // Slight upward spatial parallax shift
 
-      // Redaction bar periodic wipe
-      if (redact) {
-        const redactW = 40 + Math.abs(Math.sin(t * 1.8)) * 50;
-        redact.style.width = `${redactW}%`;
+        extractedStrip.style.transform = `translate3d(0, ${liftY}px, ${liftZ}px) scale(${1 + eased * 0.025})`;
+
+        // Soft contact drop-shadow casting onto the newspaper page below
+        const shadowBlur = 12 + eased * 24;
+        const shadowSpread = -2 - eased * 2;
+        const shadowY = 10 + eased * 18;
+        const shadowOpacity = 0.35 + eased * 0.38;
+
+        extractedStrip.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px ${shadowSpread}px rgba(8, 6, 4, ${shadowOpacity}), 0 4px 12px rgba(8, 6, 4, 0.4)`;
       }
     } else if (tplId === 'jani-puzzle-narrative-suite') {
       // Periodic assemble/break animation on puzzle pieces
@@ -39587,9 +39725,15 @@ let document3DFXState = {
   controls: null,
   documentMesh: null,
   popoutMesh: null,
+  deskMesh: null,
+  underMesh1: null,
+  underMesh2: null,
   docCanvas: null,
   docCtx: null,
+  quoteCanvas: null,
+  quoteCtx: null,
   textureMap: null,
+  quoteTextureMap: null,
   animId: null,
   isPlaying: false,
   timelineProgress: 0,
@@ -39597,37 +39741,103 @@ let document3DFXState = {
   animTween: null,
   isDraggingCanvas: false,
   dragStartPos: { x: 0, y: 0 },
-  dragStartPitch: 45,
-  dragStartYaw: -20,
-  header: "THE GLOBAL FINANCIAL GAZETTE",
-  headline: "Uncovered Internal Files Reveal $4.2B Secret Market Algorithm Shift",
-  dateline: "NEW YORK \u2014 SPECIAL INVESTIGATION REPORT \u2014 OCT 8, 2026",
+  dragStartPitch: 30,
+  dragStartYaw: -4,
+  header: "THE FINANCIAL GAZETTE",
+  headline: "Uncovered Files Reveal $4.2B Secret Algorithm Shift",
+  byline: "Authorison Solezeere \u2022 Financial Investigation Desk, Special Market Dispatch",
+  dateline: "DATE: 20 October 2021 \u2014 IONSDAY, 19 HI 17, 2021 \u2014 EDITION: NO. 719",
+  quote: "\u201cFull structural vulnerabilities known since Q3.\u201d",
   body: "According to confidential documents leaked earlier today, the core mechanism operated behind closed doors without external oversight. Key executives had full awareness of the structural vulnerabilities as early as Q3, yet chosen strategy remained unchanged while investor capital was mobilized across offshore accounts.",
   paperStyle: 'aged',
   highlightColor: '#facc15',
   enableHighlight: true,
   hlProgress: 1.0,
   enablePopout: true,
-  popElevation: 8.0,
+  popElevation: 10.0,
   enableRedaction: false,
   redactWipe: 0.8,
   vignetteIntensity: 0.65,
   dofBlur: 1.2,
-  pitch: 45,
-  yaw: -20,
-  roll: 8,
-  dist: 55,
+  pitch: 30,
+  yaw: -4,
+  roll: 1,
+  dist: 48,
   parallax: 1.5,
   activeArchetype: 'wsj'
 };
 
 function initDocFXCanvas() {
-  if (document3DFXState.docCanvas) return;
-  const canvas = document.createElement('canvas');
-  canvas.width = 1536;
-  canvas.height = 2048;
-  document3DFXState.docCanvas = canvas;
-  document3DFXState.docCtx = canvas.getContext('2d');
+  if (!document3DFXState.docCanvas) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1536;
+    canvas.height = 2048;
+    document3DFXState.docCanvas = canvas;
+    document3DFXState.docCtx = canvas.getContext('2d');
+  }
+
+  if (!document3DFXState.quoteCanvas) {
+    const qCanvas = document.createElement('canvas');
+    qCanvas.width = 1200;
+    qCanvas.height = 180;
+    document3DFXState.quoteCanvas = qCanvas;
+    document3DFXState.quoteCtx = qCanvas.getContext('2d');
+  }
+}
+
+function renderDocFXQuoteTexture() {
+  const ctx = document3DFXState.quoteCtx;
+  const canvas = document3DFXState.quoteCanvas;
+  if (!ctx || !canvas) return;
+
+  const w = canvas.width;
+  const h = canvas.height;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Warm aged paper ribbon
+  ctx.fillStyle = '#faf7ed';
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(0, 0, w, h, 10);
+  else ctx.rect(0, 0, w, h);
+  ctx.fill();
+
+  // Subtle border
+  ctx.strokeStyle = 'rgba(205, 190, 160, 0.75)';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Hand-drawn marker stroke with Multiply blend mode
+  if (document3DFXState.enableHighlight && document3DFXState.hlProgress > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'multiply';
+    const grad = ctx.createLinearGradient(16, 0, w - 16, 0);
+    grad.addColorStop(0, '#fef08a');
+    grad.addColorStop(0.65, document3DFXState.highlightColor || '#facc15');
+    grad.addColorStop(1, '#f59e0b');
+    ctx.fillStyle = grad;
+
+    const strokeW = Math.max(10, (w - 32) * Math.min(1.0, document3DFXState.hlProgress));
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(16, 14, strokeW, h - 28, 12);
+    else ctx.rect(16, 14, strokeW, h - 28);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Pin-sharp quote text
+  ctx.save();
+  ctx.fillStyle = '#0f141c';
+  ctx.font = 'italic 900 52px "Playfair Display", "Times New Roman", Georgia, serif';
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'left';
+  const quoteStr = document3DFXState.quote || '\u201cFull structural vulnerabilities known since Q3.\u201d';
+  ctx.fillText(quoteStr, 34, h / 2 + 2);
+  ctx.restore();
+
+  if (document3DFXState.quoteTextureMap) {
+    document3DFXState.quoteTextureMap.needsUpdate = true;
+  }
 }
 
 function renderDocFXTexture() {
@@ -39639,46 +39849,108 @@ function renderDocFXTexture() {
   const h = canvas.height;
 
   // Paper styling
-  let bgColor = '#f7f4ea';
-  let textColor = '#1a1a1a';
-  let accentColor = '#851414';
-  let fontMain = '"Merriweather", Georgia, serif';
-  let fontHead = '"Cinzel", "Playfair Display", serif';
+  let bgColor = '#f5f0e3';
+  let textColor = '#1a1614';
+  let fontMain = '"Times New Roman", Georgia, serif';
+  let fontHead = '"Cinzel", "Playfair Display", Georgia, serif';
 
   if (document3DFXState.paperStyle === 'stark') {
     bgColor = '#ffffff';
     textColor = '#0f172a';
-    accentColor = '#2563eb';
   } else if (document3DFXState.paperStyle === 'darkmode') {
     bgColor = '#0f172a';
     textColor = '#f8fafc';
-    accentColor = '#a855f7';
     fontMain = '"Inter", sans-serif';
     fontHead = '"Inter", sans-serif';
-  } else if (document3DFXState.paperStyle === 'manuscript') {
-    bgColor = '#ecfeff';
-    textColor = '#083344';
-    accentColor = '#0891b2';
-    fontMain = '"Courier Prime", "Courier New", monospace';
   }
 
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, w, h);
 
-  // Noise grain
-  ctx.fillStyle = 'rgba(0,0,0,0.02)';
-  for (let i = 0; i < 7000; i++) {
+  // Aged newsprint micro grain texture
+  ctx.fillStyle = 'rgba(0,0,0,0.025)';
+  for (let i = 0; i < 9000; i++) {
     const rx = Math.random() * w;
     const ry = Math.random() * h;
-    ctx.fillRect(rx, ry, 2, 2);
+    ctx.fillRect(rx, ry, 2.5, 2.5);
   }
 
-  const margin = 110;
+  const margin = 100;
   let curY = margin;
 
-  // Top header rule
-  ctx.strokeStyle = textColor;
-  ctx.lineWidth = 4;
+  // 1. Double Masthead Header Rules
+  ctx.strokeStyle = '#1c1917';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 10;
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 56;
+
+  // 2. Publication Masthead Title
+  ctx.fillStyle = textColor;
+  ctx.font = `900 68px ${fontHead}`;
+  ctx.textAlign = 'center';
+  ctx.letterSpacing = '5px';
+  ctx.fillText((document3DFXState.header || 'THE FINANCIAL GAZETTE').toUpperCase(), w / 2, curY);
+  ctx.letterSpacing = '0px';
+
+  curY += 30;
+
+  // 3. Dateline Bar with Hairline Borders
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 32;
+  ctx.font = '700 24px "Times New Roman", Georgia, serif';
+  ctx.fillStyle = '#44403c';
+  ctx.textAlign = 'left';
+  ctx.fillText('DATE: 20 October 2021', margin + 10, curY);
+  ctx.textAlign = 'center';
+  ctx.fillText('IONSDAY, 19 HI 17, 2021', w / 2, curY);
+  ctx.textAlign = 'right';
+  ctx.fillText('EDITION: NO. 719', w - margin - 10, curY);
+
+  curY += 14;
+  ctx.beginPath();
+  ctx.moveTo(margin, curY);
+  ctx.lineTo(w - margin, curY);
+  ctx.stroke();
+
+  curY += 75;
+
+  // 4. Main Investigative Headline (Bold Serif)
+  ctx.fillStyle = '#0f141c';
+  ctx.font = '900 64px "Playfair Display", Georgia, serif';
+  ctx.textAlign = 'left';
+
+  const headlineLines = wrapSpatialCanvasTextLines(ctx, document3DFXState.headline || 'Uncovered Files Reveal $4.2B Secret Algorithm Shift', w - (margin * 2));
+  headlineLines.forEach(line => {
+    ctx.fillText(line, margin, curY);
+    curY += 74;
+  });
+
+  curY += 10;
+
+  // Byline
+  ctx.font = 'italic 26px "Times New Roman", Georgia, serif';
+  ctx.fillStyle = '#57534e';
+  ctx.fillText(document3DFXState.byline || 'Authorison Solezeere \u2022 Financial Investigation Desk, Special Market Dispatch', margin, curY);
+
+  curY += 28;
+  ctx.strokeStyle = 'rgba(41, 37, 36, 0.35)';
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
   ctx.moveTo(margin, curY);
   ctx.lineTo(w - margin, curY);
@@ -39686,111 +39958,103 @@ function renderDocFXTexture() {
 
   curY += 45;
 
-  // Publication title
-  ctx.fillStyle = accentColor;
-  ctx.font = `700 36px ${fontHead}`;
-  ctx.textAlign = 'center';
-  ctx.fillText((document3DFXState.header || '').toUpperCase(), w / 2, curY);
+  // 5. Four Column Authentic Typeset Newspaper Article Body
+  const numCols = 4;
+  const colGap = 36;
+  const totalW = w - (margin * 2);
+  const colW = (totalW - (colGap * (numCols - 1))) / numCols;
 
-  curY += 25;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(margin, curY);
-  ctx.lineTo(w - margin, curY);
-  ctx.stroke();
+  const colTexts = [
+    [
+      { type: 'sub', text: 'Setture vulnerabliers' },
+      { type: 'p', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Omnis ratio praeclara est, sed cavenda sunt vitia secreti sermonis.' },
+      { type: 'footprint', text: document3DFXState.quote || '\u201cFull structural vulnerabilities known since Q3.\u201d' },
+      { type: 'p', text: 'Quisquis enim sentit, quid sit substantia veritatis, non dubitat de sententia. Adversis rationibus obstare conantur dum capitalia transferuntur.' }
+    ],
+    [
+      { type: 'p', text: 'Tum ille: Tu autem cum in hac divisione rem ipsam teneas, cur verbis aliter utamur? Nihil enim praeter veritatem quaeritur in disputando.' },
+      { type: 'sub', text: 'Audit Protocol' },
+      { type: 'p', text: 'Explicabo celeriter quid senserim; neque enim obscurum est quod agimus in curia. Equidem eorum omnia quae praeclara sunt dicta non contemno.' },
+      { type: 'p', text: 'Sed quoniam eadem res saepe aliis verbis explicanda est, pergamus ad sequentes quaestiones.' }
+    ],
+    [
+      { type: 'sub', text: 'Systemic Exposure' },
+      { type: 'p', text: 'Trading execution protocols operated without independent oversight committee access. Regulators confirmed internal routing metrics deviated by 34.8%.' },
+      { type: 'p', text: 'Interea magistratus rationem deposcunt. Multiplicantur indicia perversae administrationis pecuniae publicae trans mare.' }
+    ],
+    [
+      { type: 'p', text: 'Offshore account mobility surged ahead of public disclosure statements. Capital reserves were shifted across tiered holding entities in Q3.' },
+      { type: 'sub', text: 'Treasury Findings' },
+      { type: 'p', text: 'Mandated threshold buffers were artificially reported through automated balancing functions. Audit proceedings continue promptly.' }
+    ]
+  ];
 
-  curY += 40;
-
-  // Dateline
-  ctx.fillStyle = textColor;
-  ctx.font = `600 20px monospace`;
   ctx.textAlign = 'left';
-  ctx.fillText(document3DFXState.dateline || '', margin, curY);
 
-  curY += 35;
-  ctx.beginPath();
-  ctx.moveTo(margin, curY);
-  ctx.lineTo(w - margin, curY);
-  ctx.stroke();
+  for (let c = 0; c < numCols; c++) {
+    const colX = margin + c * (colW + colGap);
+    let colY = curY;
 
-  curY += 70;
-
-  // Main Headline
-  ctx.fillStyle = textColor;
-  ctx.font = `bold 64px ${fontHead}`;
-  ctx.textAlign = 'left';
-
-  const headlineLines = wrapSpatialCanvasTextLines(ctx, document3DFXState.headline || '', w - (margin * 2));
-  headlineLines.forEach(line => {
-    ctx.fillText(line, margin, curY);
-    curY += 78;
-  });
-
-  curY += 30;
-  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(margin, curY);
-  ctx.lineTo(w - margin, curY);
-  ctx.stroke();
-
-  curY += 65;
-
-  // Two Column Body Layout
-  const colGap = 60;
-  const colWidth = (w - (margin * 2) - colGap) / 2;
-
-  ctx.font = `24px ${fontMain}`;
-  ctx.fillStyle = textColor;
-
-  const bodyLines = wrapSpatialCanvasTextLines(ctx, document3DFXState.body || '', colWidth);
-  let colY = curY;
-  let highlightBox = { x: margin - 10, y: colY - 26, width: colWidth + 20, height: 0 };
-
-  bodyLines.forEach(line => {
-    ctx.fillText(line, margin, colY);
-    colY += 38;
-  });
-  highlightBox.height = colY - highlightBox.y;
-
-  // Second column
-  let col2Y = curY;
-  const dummyColText = "Financial regulators declined to comment on pending proceedings. Meanwhile, trading volumes across major index funds surged by 34% within minutes of the market opening, forcing several high-frequency liquidity providers to suspend automated order routing temporarily.";
-  const col2Lines = wrapSpatialCanvasTextLines(ctx, dummyColText, colWidth);
-  col2Lines.forEach(line => {
-    ctx.fillText(line, margin + colWidth + colGap, col2Y);
-    col2Y += 38;
-  });
-
-  // Highlight Overlay
-  if (document3DFXState.enableHighlight && document3DFXState.hlProgress > 0) {
-    ctx.save();
-    ctx.globalCompositeOperation = document3DFXState.paperStyle === 'darkmode' ? 'screen' : 'multiply';
-    ctx.fillStyle = document3DFXState.highlightColor;
-    const animW = highlightBox.width * document3DFXState.hlProgress;
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(highlightBox.x, highlightBox.y, animW, highlightBox.height, 6);
-    } else {
-      ctx.rect(highlightBox.x, highlightBox.y, animW, highlightBox.height);
+    // Vertical column divider rule
+    if (c > 0) {
+      ctx.strokeStyle = 'rgba(41, 37, 36, 0.22)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(colX - (colGap / 2), curY - 15);
+      ctx.lineTo(colX - (colGap / 2), h - margin);
+      ctx.stroke();
     }
-    ctx.fill();
-    ctx.restore();
+
+    const items = colTexts[c];
+    items.forEach(item => {
+      if (item.type === 'sub') {
+        colY += 8;
+        ctx.font = 'bold 24px ' + fontMain;
+        ctx.fillStyle = '#1c1917';
+        ctx.fillText(item.text, colX, colY);
+        colY += 32;
+      } else if (item.type === 'footprint') {
+        // Base page footprint beneath lifted popout quote
+        colY += 6;
+        ctx.save();
+        ctx.fillStyle = 'rgba(254, 240, 138, 0.35)';
+        ctx.fillRect(colX - 4, colY - 20, colW + 8, 54);
+        ctx.fillStyle = '#78350f';
+        ctx.font = 'italic 700 20px ' + fontMain;
+        const fLines = wrapSpatialCanvasTextLines(ctx, item.text, colW);
+        fLines.forEach(l => {
+          ctx.fillText(l, colX, colY);
+          colY += 25;
+        });
+        ctx.restore();
+        colY += 8;
+      } else {
+        ctx.font = '20px ' + fontMain;
+        ctx.fillStyle = textColor;
+        const pLines = wrapSpatialCanvasTextLines(ctx, item.text, colW);
+        pLines.forEach(l => {
+          ctx.fillText(l, colX, colY);
+          colY += 27;
+        });
+        colY += 16;
+      }
+    });
   }
 
-  // Redaction strip
+  // Redaction strip if enabled
   if (document3DFXState.enableRedaction) {
     ctx.save();
     ctx.fillStyle = '#050505';
-    const redactionY = colY + 30;
-    const redactW = colWidth * document3DFXState.redactWipe;
-    ctx.fillRect(margin, redactionY, redactW, 32);
+    const redactW = colW * document3DFXState.redactWipe;
+    ctx.fillRect(margin, curY + 280, redactW, 28);
     ctx.restore();
   }
 
   if (document3DFXState.textureMap) {
     document3DFXState.textureMap.needsUpdate = true;
   }
+
+  renderDocFXQuoteTexture();
 }
 
 function wrapSpatialCanvasTextLines(ctx, text, maxWidth) {
@@ -39828,8 +40092,8 @@ function updateDocFXCameraTransform() {
   camera.rotation.z = rollRad;
   camera.lookAt(0, 0, 0);
 
-  documentMesh.rotation.x = (pitch * 0.005) * parallax;
-  documentMesh.rotation.y = (yaw * 0.005) * parallax;
+  documentMesh.rotation.x = (pitch * 0.003) * parallax;
+  documentMesh.rotation.y = (yaw * 0.003) * parallax;
 }
 
 function initDocument3DFXEngine() {
@@ -39852,8 +40116,8 @@ function initDocument3DFXEngine() {
   const h = container.clientHeight || 500;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
-  camera.position.set(0, -35, 60);
+  const camera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
+  camera.position.set(0, -38, 54);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
   renderer.setSize(w, h);
@@ -39915,20 +40179,68 @@ function initDocument3DFXEngine() {
     }
   });
 
-  // Lights
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+  // 1. Dark Walnut Executive Desk Plane Mesh (Shadow Receiver)
+  const deskGeo = new THREE.PlaneGeometry(160, 120);
+  const deskMat = new THREE.MeshStandardMaterial({
+    color: 0x140d09,
+    roughness: 0.85,
+    metalness: 0.05
+  });
+  const deskMesh = new THREE.Mesh(deskGeo, deskMat);
+  deskMesh.position.set(0, 0, -1.2);
+  deskMesh.receiveShadow = true;
+  scene.add(deskMesh);
+
+  // 2. Physical Newspaper Stack: Under-Layers
+  const underGeo2 = new THREE.PlaneGeometry(37, 49);
+  const underMat2 = new THREE.MeshStandardMaterial({
+    color: 0xdfd6c0,
+    roughness: 0.78,
+    metalness: 0.02
+  });
+  const underMesh2 = new THREE.Mesh(underGeo2, underMat2);
+  underMesh2.position.set(-1.2, 0.7, -0.6);
+  underMesh2.rotation.z = -0.045;
+  underMesh2.castShadow = true;
+  underMesh2.receiveShadow = true;
+  scene.add(underMesh2);
+
+  const underGeo1 = new THREE.PlaneGeometry(36.5, 48.5);
+  const underMat1 = new THREE.MeshStandardMaterial({
+    color: 0xe8e0ce,
+    roughness: 0.72,
+    metalness: 0.02
+  });
+  const underMesh1 = new THREE.Mesh(underGeo1, underMat1);
+  underMesh1.position.set(0.9, 0.4, -0.3);
+  underMesh1.rotation.z = 0.035;
+  underMesh1.castShadow = true;
+  underMesh1.receiveShadow = true;
+  scene.add(underMesh1);
+
+  // 3. Cinematic Warm Volumetric Spotlights & Ambient
+  const ambientLight = new THREE.AmbientLight(0xffeedd, 0.6);
   scene.add(ambientLight);
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 0.95);
-  dirLight.position.set(30, 40, 70);
+  const dirLight = new THREE.DirectionalLight(0xfff3dc, 1.35);
+  dirLight.position.set(32, 52, 70);
   dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 2048;
+  dirLight.shadow.mapSize.height = 2048;
+  dirLight.shadow.camera.near = 10;
+  dirLight.shadow.camera.far = 220;
+  dirLight.shadow.camera.left = -35;
+  dirLight.shadow.camera.right = 35;
+  dirLight.shadow.camera.top = 35;
+  dirLight.shadow.camera.bottom = -35;
+  dirLight.shadow.bias = -0.0004;
   scene.add(dirLight);
 
-  const fillLight = new THREE.DirectionalLight(0xc084fc, 0.4);
-  fillLight.position.set(-30, -20, 40);
+  const fillLight = new THREE.DirectionalLight(0xd97706, 0.28);
+  fillLight.position.set(-25, -20, 35);
   scene.add(fillLight);
 
-  // Texture & Document Plane
+  // 4. Main Top Broadsheet Newspaper Plane
   const textureMap = new THREE.CanvasTexture(document3DFXState.docCanvas);
   textureMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
   document3DFXState.textureMap = textureMap;
@@ -39936,8 +40248,8 @@ function initDocument3DFXEngine() {
   const planeGeo = new THREE.PlaneGeometry(36, 48, 32, 32);
   const planeMat = new THREE.MeshStandardMaterial({
     map: textureMap,
-    roughness: 0.4,
-    metalness: 0.05,
+    roughness: 0.5,
+    metalness: 0.02,
     side: THREE.DoubleSide
   });
 
@@ -39946,16 +40258,21 @@ function initDocument3DFXEngine() {
   documentMesh.receiveShadow = true;
   scene.add(documentMesh);
 
-  // Floating Pop-out Headline Plane
-  const popGeo = new THREE.PlaneGeometry(32, 10);
-  const popMat = new THREE.MeshStandardMaterial({
-    map: textureMap,
-    roughness: 0.3,
+  // 5. Isolated 3D Pop-Out Quote Extraction Mesh (Displacement = +50px / Z = +5.0 in 3D)
+  const quoteTextureMap = new THREE.CanvasTexture(document3DFXState.quoteCanvas);
+  quoteTextureMap.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  document3DFXState.quoteTextureMap = quoteTextureMap;
+
+  const quoteGeo = new THREE.PlaneGeometry(30, 4.5);
+  const quoteMat = new THREE.MeshStandardMaterial({
+    map: quoteTextureMap,
+    roughness: 0.35,
+    metalness: 0.02,
     transparent: true,
-    opacity: 0.98
+    opacity: 0.99
   });
-  const popoutMesh = new THREE.Mesh(popGeo, popMat);
-  popoutMesh.position.set(0, 8, document3DFXState.popElevation * 0.4);
+  const popoutMesh = new THREE.Mesh(quoteGeo, quoteMat);
+  popoutMesh.position.set(0, 4.2, document3DFXState.popElevation * 0.45);
   popoutMesh.castShadow = true;
   documentMesh.add(popoutMesh);
 
@@ -39964,6 +40281,9 @@ function initDocument3DFXEngine() {
   document3DFXState.renderer = renderer;
   document3DFXState.documentMesh = documentMesh;
   document3DFXState.popoutMesh = popoutMesh;
+  document3DFXState.deskMesh = deskMesh;
+  document3DFXState.underMesh1 = underMesh1;
+  document3DFXState.underMesh2 = underMesh2;
 
   renderDocFXTexture();
   updateDocFXCameraTransform();
@@ -46917,6 +47237,9 @@ let magnatesBlendState = {
   playhead: 0,
   duration: 5.0,
   blendMode: 'screen', // 'screen', 'difference', 'overlay'
+  effectType: 'snow', // 'snow', 'rain', 'grain', 'lightleak', 'grunge', 'none'
+  granularity: 26, // particle size / spacing (8 - 60px)
+  speed: 1.0, // animation speed multiplier (0.2 - 3.0x)
   layerOpacity: 85, // 20 to 100%
   showClock: true,
   headline: "TEMPORAL DISTORTION",
@@ -46931,6 +47254,10 @@ function updateMagnatesBlendVisualStyles() {
   const subcaptionEl = document.getElementById('magnates-blend-subcaption');
   const bgImg = document.getElementById('magnates-blend-bg-img');
   const particles = document.getElementById('magnates-blend-particles');
+  const rainEl = document.getElementById('magnates-blend-rain');
+  const grainEl = document.getElementById('magnates-blend-grain');
+  const leakEl = document.getElementById('magnates-blend-lightleak');
+  const grungeEl = document.getElementById('magnates-blend-grunge');
   const clockWrap = document.getElementById('magnates-blend-clock-wrap');
   const clockSvg = document.getElementById('magnates-blend-clock-svg');
   const cardEl = document.getElementById('magnates-blend-card-element');
@@ -46949,17 +47276,68 @@ function updateMagnatesBlendVisualStyles() {
 
   const op = (magnatesBlendState.layerOpacity / 100).toFixed(2);
   const mode = magnatesBlendState.blendMode;
+  const fx = magnatesBlendState.effectType || 'snow';
+  const gran = magnatesBlendState.granularity || 26;
+  const spd = magnatesBlendState.speed || 1.0;
 
-  if (hudActive) hudActive.textContent = `MODE: ${mode.toUpperCase()}`;
+  if (hudActive) hudActive.textContent = `MODE: ${mode.toUpperCase()} [${fx.toUpperCase()}]`;
   if (hudOpacity) hudOpacity.textContent = `OPACITY: ${magnatesBlendState.layerOpacity}%`;
 
   if (clockWrap) clockWrap.style.display = magnatesBlendState.showClock ? 'flex' : 'none';
-  if (clockSvg) clockSvg.style.transform = `rotate(${(p * 35).toFixed(1)}deg)`;
+  if (clockSvg) clockSvg.style.transform = `rotate(${(p * 35 * spd).toFixed(1)}deg)`;
 
-  if (particles) {
-    const drift = (p * 25) % 200;
-    particles.style.backgroundPosition = `${drift}px ${drift}px`;
+  // Hide all effect layers first
+  if (particles) particles.style.display = 'none';
+  if (rainEl) rainEl.style.display = 'none';
+  if (grainEl) grainEl.style.display = 'none';
+  if (leakEl) leakEl.style.display = 'none';
+  if (grungeEl) grungeEl.style.display = 'none';
+
+  // Render chosen effect layer with live animation and granularity
+  if (fx === 'snow' && particles) {
+    particles.style.display = 'block';
+    particles.style.mixBlendMode = mode;
     particles.style.opacity = op;
+    const dotSize = Math.max(0.8, (gran / 22)).toFixed(1);
+    particles.style.backgroundImage = `radial-gradient(#ffffff ${dotSize}px, transparent ${dotSize}px)`;
+    particles.style.backgroundSize = `${gran}px ${gran}px`;
+    const drift = (p * 25 * spd) % (gran * 10);
+    particles.style.backgroundPosition = `${drift}px ${drift}px`;
+  } else if (fx === 'rain' && rainEl) {
+    rainEl.style.display = 'block';
+    rainEl.style.mixBlendMode = mode;
+    rainEl.style.opacity = op;
+    const streakW = Math.max(1, (gran / 20)).toFixed(1);
+    const streakSpacing = Math.round(gran * 0.9);
+    rainEl.style.background = `repeating-linear-gradient(105deg, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) ${streakW}px, transparent ${streakW}px, transparent ${streakSpacing}px)`;
+    rainEl.style.backgroundSize = `${gran * 3}px ${gran * 5}px`;
+    const rainShiftY = (p * 450 * spd) % (gran * 5);
+    const rainShiftX = (p * 120 * spd) % (gran * 3);
+    rainEl.style.backgroundPosition = `${rainShiftX}px ${rainShiftY}px`;
+  } else if (fx === 'grain' && grainEl) {
+    grainEl.style.display = 'block';
+    grainEl.style.mixBlendMode = mode;
+    grainEl.style.opacity = (op * 0.55).toFixed(2);
+    const gSize = Math.max(2, Math.round(gran / 6));
+    grainEl.style.backgroundSize = `${gSize}px ${gSize}px`;
+    const jitterX = Math.round(Math.sin(p * 50 * spd) * 8);
+    const jitterY = Math.round(Math.cos(p * 60 * spd) * 8);
+    grainEl.style.backgroundPosition = `${jitterX}px ${jitterY}px`;
+  } else if (fx === 'lightleak' && leakEl) {
+    leakEl.style.display = 'block';
+    leakEl.style.mixBlendMode = mode;
+    leakEl.style.opacity = (op * 0.75).toFixed(2);
+    const pulse = 15 + Math.sin(p * 3 * spd) * 10;
+    const spread = Math.round(gran * 2);
+    leakEl.style.background = `radial-gradient(circle at ${pulse}% 25%, rgba(244, 63, 94, 0.75) 0%, rgba(251, 146, 60, 0.45) ${spread}%, transparent 80%)`;
+  } else if (fx === 'grunge' && grungeEl) {
+    grungeEl.style.display = 'block';
+    grungeEl.style.mixBlendMode = mode;
+    grungeEl.style.opacity = (op * 0.65).toFixed(2);
+    const gScale = Math.round(gran * 1.5);
+    grungeEl.style.backgroundSize = `${gScale}px ${gScale}px, ${gScale * 2}px ${gScale * 2}px`;
+    const grungeDrift = Math.round((p * 20 * spd) % gScale);
+    grungeEl.style.backgroundPosition = `${grungeDrift}px ${grungeDrift}px`;
   }
 
   if (cardEl) {
@@ -46967,17 +47345,17 @@ function updateMagnatesBlendVisualStyles() {
       cardEl.style.mixBlendMode = 'normal';
       cardEl.style.borderColor = '#38bdf8';
       cardEl.style.background = 'rgba(15,23,42,0.85)';
-      if (cardSub) cardSub.textContent = 'ACTIVE BLEND: SCREEN (PARTICLES)';
+      if (cardSub) cardSub.textContent = `ACTIVE BLEND: SCREEN (${fx.toUpperCase()})`;
     } else if (mode === 'difference') {
       cardEl.style.mixBlendMode = 'difference';
       cardEl.style.borderColor = '#ffffff';
       cardEl.style.background = '#ffffff';
-      if (cardSub) cardSub.textContent = 'ACTIVE BLEND: DIFFERENCE (INVERT NOISE)';
+      if (cardSub) cardSub.textContent = `ACTIVE BLEND: DIFFERENCE (${fx.toUpperCase()})`;
     } else {
       cardEl.style.mixBlendMode = 'overlay';
       cardEl.style.borderColor = '#f59e0b';
       cardEl.style.background = 'rgba(245,158,11,0.5)';
-      if (cardSub) cardSub.textContent = 'ACTIVE BLEND: OVERLAY (ORGANIC TEXTURE)';
+      if (cardSub) cardSub.textContent = `ACTIVE BLEND: OVERLAY (${fx.toUpperCase()})`;
     }
   }
 }
@@ -47069,6 +47447,39 @@ function bindMagnatesBlendModesSuiteModalControls() {
     });
   });
 
+  // Granular Atmospheric Effect Buttons
+  document.querySelectorAll('.btn-blend-effect-pick').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.btn-blend-effect-pick').forEach(b => {
+        b.style.background = 'rgba(255,255,255,0.04)';
+        b.style.borderColor = 'rgba(255,255,255,0.08)';
+        b.style.color = '#cbd5e1';
+      });
+      e.currentTarget.style.background = 'rgba(168,85,247,0.25)';
+      e.currentTarget.style.borderColor = '#a855f7';
+      e.currentTarget.style.color = '#fff';
+      magnatesBlendState.effectType = e.currentTarget.dataset.fx;
+      updateMagnatesBlendVisualStyles();
+    });
+  });
+
+  // Granularity / Density Slider
+  document.getElementById('magnates-blend-slider-granularity')?.addEventListener('input', (e) => {
+    magnatesBlendState.granularity = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-blend-val-granularity');
+    if (label) label.textContent = `${magnatesBlendState.granularity}px`;
+    updateMagnatesBlendVisualStyles();
+  });
+
+  // Motion Speed Slider
+  document.getElementById('magnates-blend-slider-speed')?.addEventListener('input', (e) => {
+    const raw = parseInt(e.target.value, 10);
+    magnatesBlendState.speed = (raw / 10);
+    const label = document.getElementById('magnates-blend-val-speed');
+    if (label) label.textContent = `${magnatesBlendState.speed.toFixed(1)}x`;
+    updateMagnatesBlendVisualStyles();
+  });
+
   document.getElementById('magnates-blend-slider-opacity')?.addEventListener('input', (e) => {
     magnatesBlendState.layerOpacity = parseInt(e.target.value, 10);
     const label = document.getElementById('magnates-blend-val-opacity');
@@ -47097,6 +47508,7 @@ function bindMagnatesBlendModesSuiteModalControls() {
     const bgClip = {
       id: `img-bld-bg-${Date.now()}`,
       url: magnatesBlendState.bgUrl,
+      file: { name: 'Gothic_Castle_Dark_Backdrop.jpg', url: magnatesBlendState.bgUrl, isImage: true },
       start: 0,
       duration: magnatesBlendState.duration,
       scale: 1.15,
@@ -47106,9 +47518,11 @@ function bindMagnatesBlendModesSuiteModalControls() {
       transitionDuration: 0.8
     };
 
+    const fxName = (magnatesBlendState.effectType || 'snow').toUpperCase();
     const blendOverlayClip = {
       id: `img-bld-overlay-${Date.now() + 1}`,
-      name: `Blend_${magnatesBlendState.blendMode.toUpperCase()}_Texture.png`,
+      name: `Blend_${magnatesBlendState.blendMode.toUpperCase()}_${fxName}.png`,
+      file: { name: `Blend_${magnatesBlendState.blendMode.toUpperCase()}_${fxName}.png`, url: '/magnates_blend_modes_thumbnail.svg', isImage: true },
       url: '/magnates_blend_modes_thumbnail.svg',
       start: 0,
       duration: magnatesBlendState.duration,

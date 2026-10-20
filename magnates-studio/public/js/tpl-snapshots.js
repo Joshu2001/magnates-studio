@@ -75,57 +75,125 @@
       </svg>
     `)}`,
 
-    // 15. James Jani 3D Document & Paper FX
+    // 15. James Jani 3D Document & Paper FX (Exact Image 3 Spec)
     'document-3d-fx-engine': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
-          <linearGradient id="bg-doc" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#050608"/>
-            <stop offset="100%" stop-color="#0d1117"/>
+          <radialGradient id="bg-wood" cx="50%" cy="40%" r="75%">
+            <stop offset="0%" stop-color="#24160f"/>
+            <stop offset="60%" stop-color="#120b07"/>
+            <stop offset="100%" stop-color="#050302"/>
+          </radialGradient>
+          <linearGradient id="godray-snap" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fff5dc" stop-opacity="0.28"/>
+            <stop offset="40%" stop-color="#fee6b4" stop-opacity="0.10"/>
+            <stop offset="70%" stop-color="#fed7aa" stop-opacity="0"/>
           </linearGradient>
-          <filter id="paper-shadow" x="-15%" y="-15%" width="130%" height="130%">
-            <feDropShadow dx="-4" dy="16" stdDeviation="16" flood-color="rgba(0,0,0,0.95)"/>
-            <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="rgba(0,0,0,0.85)"/>
+          <filter id="stack-shdw" x="-20%" y="-20%" width="140%" height="150%">
+            <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="rgba(0,0,0,0.92)"/>
           </filter>
-          <linearGradient id="paper-cream" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stop-color="#fdfbf7"/>
-            <stop offset="100%" stop-color="#ede7db"/>
+          <filter id="pop-shdw" x="-25%" y="-40%" width="150%" height="180%">
+            <feDropShadow dx="0" dy="12" stdDeviation="8" flood-color="rgba(0,0,0,0.88)"/>
+          </filter>
+          <filter id="masthead-blur" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="0.7"/>
+          </filter>
+          <linearGradient id="pop-yellow" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#fef08a"/>
+            <stop offset="60%" stop-color="#facc15"/>
+            <stop offset="100%" stop-color="#f59e0b"/>
           </linearGradient>
         </defs>
-        <rect width="400" height="225" fill="url(#bg-doc)"/>
+        <!-- Dark Walnut Desk -->
+        <rect width="400" height="225" fill="url(#bg-wood)"/>
+        <!-- God ray beam -->
+        <polygon points="240,0 400,0 400,225 90,225" fill="url(#godray-snap)" style="mix-blend-mode: screen;"/>
         
-        <!-- Camera-tilted 3D Newsprint Sheet (Realistic paper tone, fiber border, deep drop shadow) -->
-        <g transform="translate(65, 18) skewY(-2.5) rotate(1.2)" filter="url(#paper-shadow)">
-          <rect width="275" height="190" fill="url(#paper-cream)" stroke="#dcd3c1" stroke-width="0.8"/>
+        <!-- Physical Newspaper Stack: Bottom Under-Layer -->
+        <g transform="translate(200, 115) rotate(-3.2) translate(-158, -84)" filter="url(#stack-shdw)">
+          <rect width="316" height="170" rx="1.5" fill="#dfd6c0" stroke="#c5bca6" stroke-width="0.6"/>
+        </g>
+        <!-- Middle Under-Layer -->
+        <g transform="translate(200, 115) rotate(2.0) translate(-155, -82)">
+          <rect width="314" height="168" rx="1.5" fill="#e8e0ce" stroke="#cccaa6" stroke-width="0.6"/>
+        </g>
+        
+        <!-- Top Newspaper Sheet (Slight tilt) -->
+        <g transform="translate(200, 115) rotate(-0.5) translate(-152, -80)">
+          <rect width="310" height="165" rx="1.5" fill="#f7f3e6" stroke="#dcd4c0" stroke-width="0.8"/>
           
-          <!-- Newspaper Masthead Header -->
-          <line x1="18" y1="16" x2="257" y2="16" stroke="#292524" stroke-width="2.5"/>
-          <text x="137.5" y="32" fill="#1c1917" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="14" letter-spacing="3" text-anchor="middle">THE FINANCIAL GAZETTE</text>
-          <text x="137.5" y="42" fill="#78716c" font-family="'Times New Roman', serif" font-size="5.5" letter-spacing="1" font-style="italic" text-anchor="middle">SPECIAL INVESTIGATIVE REPORT \u2022 VOL. XCIV \u2022 OCT 24, 1929</text>
-          <line x1="18" y1="48" x2="257" y2="48" stroke="#292524" stroke-width="0.8"/>
-          
-          <!-- Urgent Headline -->
-          <text x="22" y="66" fill="#1c1917" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="11" letter-spacing="0.2">BILLIONS VANISHED OVERNIGHT</text>
-          
-          <!-- Realistic Textured Highlighter with Multiply Blend -->
-          <rect x="20" y="73" width="175" height="13" fill="#facc15" opacity="0.65" rx="1.5" style="mix-blend-mode: multiply;"/>
-          <text x="23" y="83" fill="#0f172a" font-family="'Times New Roman', Georgia, serif" font-weight="800" font-size="8">OFFSHORE WIRE LEAKS CONFIRMED</text>
-          
-          <!-- Authentic Ragged Redaction Bars -->
-          <rect x="22" y="96" width="118" height="7" fill="#1c1917"/>
-          <rect x="144" y="96" width="65" height="7" fill="#1c1917"/>
-          
-          <!-- Body Text Mockup -->
-          <line x1="22" y1="110" x2="245" y2="110" stroke="#78716c" stroke-width="1"/>
-          <line x1="22" y1="118" x2="225" y2="118" stroke="#78716c" stroke-width="1"/>
-          <line x1="22" y1="126" x2="250" y2="126" stroke="#78716c" stroke-width="1"/>
-          <line x1="22" y1="134" x2="190" y2="134" stroke="#78716c" stroke-width="1"/>
-          
-          <!-- Distressed Rubber Stamp (Angled, Faded Ink Texture) -->
-          <g transform="translate(185, 138) rotate(-9)">
-            <rect width="66" height="24" rx="1" fill="none" stroke="#b91c1c" stroke-width="1.8" stroke-dasharray="32, 1, 12, 1" opacity="0.88"/>
-            <text x="33" y="16" fill="#b91c1c" font-family="monospace" font-weight="900" font-size="8.5" letter-spacing="1.5" text-anchor="middle" opacity="0.9">EVIDENCE #1</text>
+          <!-- Masthead (f/2.8 lens bokeh blur) -->
+          <g filter="url(#masthead-blur)">
+            <line x1="16" y1="16" x2="294" y2="16" stroke="#1c1917" stroke-width="1.8"/>
+            <line x1="16" y1="18.5" x2="294" y2="18.5" stroke="#1c1917" stroke-width="0.6"/>
+            <text x="155" y="34" fill="#1c1917" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="14.5" letter-spacing="3" text-anchor="middle">THE FINANCIAL GAZETTE</text>
+            <line x1="16" y1="40" x2="294" y2="40" stroke="#292524" stroke-width="0.6"/>
+            <text x="20" y="47" fill="#44403c" font-family="'Times New Roman', serif" font-size="5" font-weight="700">DATE: 20 October 2021</text>
+            <text x="155" y="47" fill="#44403c" font-family="'Times New Roman', serif" font-size="5" font-weight="700" text-anchor="middle">IONSDAY, 19 HI 17, 2021</text>
+            <text x="290" y="47" fill="#44403c" font-family="'Times New Roman', serif" font-size="5" font-weight="700" text-anchor="end">Edition: No. 719</text>
+            <line x1="16" y1="50" x2="294" y2="50" stroke="#292524" stroke-width="0.6"/>
           </g>
+
+          <!-- Focal Plane: Headline & Byline -->
+          <text x="17" y="66" fill="#0f141c" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="11" letter-spacing="-0.2">Uncovered Files Reveal $4.2B Secret Algorithm Shift</text>
+          <text x="17" y="74" fill="#57534e" font-family="'Times New Roman', serif" font-size="5.5" font-style="italic">Authorison Solezeere / Adversating, Sala clura • Financial Investigation Desk</text>
+          
+          <!-- 4-Column Typeset Newspaper Article -->
+          <g transform="translate(17, 82)" font-family="'Times New Roman', Georgia, serif" font-size="4" fill="#292524">
+            <text x="0" y="0" font-weight="700" font-size="4.4" fill="#1c1917">Setture vulnerabliers</text>
+            <text x="0" y="6">Lorem ipsum dolor sit amet, consectetur</text>
+            <text x="0" y="12">adipiscing elit. Omnis ratio praeclara</text>
+            <text x="0" y="18">est, sed cavenda sunt vitia secreti.</text>
+            <!-- In-situ footprint under floating quote -->
+            <rect x="0" y="22" width="64" height="7" fill="#fef08a" opacity="0.3" rx="1"/>
+            <text x="1" y="27" font-style="italic" font-weight="700" fill="#78350f" font-size="3.5">"Full structural vulnerabilities known"</text>
+            <text x="0" y="34">Quisquis enim sentit, quid sit substantia</text>
+            <text x="0" y="40">veritatis, non dubitat de sententia.</text>
+            <text x="0" y="46">Quae cum ita sint, finem faciamus.</text>
+          </g>
+          <line x1="86" y1="80" x2="86" y2="155" stroke="#292524" stroke-width="0.4" opacity="0.25"/>
+
+          <g transform="translate(90, 82)" font-family="'Times New Roman', Georgia, serif" font-size="4" fill="#292524">
+            <text x="0" y="0">Tum ille: Tu autem cum in hac divisione</text>
+            <text x="0" y="6">rem ipsam teneas, cur verbis aliter</text>
+            <text x="0" y="12">utamur? Nihil enim praeter veritatem</text>
+            <text x="0" y="18">quaeritur in disputando. Explicabo</text>
+            <text x="0" y="24">celeriter quid senserim; neque enim</text>
+            <text x="0" y="30">obscurum est quod agimus in curia.</text>
+            <text x="0" y="36">Equidem eorum omnia quae praeclara</text>
+            <text x="0" y="42">sunt dicta non contemno, sed approbo.</text>
+          </g>
+          <line x1="156" y1="80" x2="156" y2="155" stroke="#292524" stroke-width="0.4" opacity="0.25"/>
+
+          <g transform="translate(160, 82)" font-family="'Times New Roman', Georgia, serif" font-size="4" fill="#292524">
+            <text x="0" y="0" font-weight="700" font-size="4.4" fill="#1c1917">Systemic Exposure</text>
+            <text x="0" y="6">Trading execution protocols operated</text>
+            <text x="0" y="12">without independent oversight access.</text>
+            <text x="0" y="18">Regulators confirmed routing deviated</text>
+            <text x="0" y="24">by 34.8% during off-peak liquidation.</text>
+            <text x="0" y="30">Interea magistratus rationem deposcunt.</text>
+            <text x="0" y="36">Multiplicantur indicia perversae</text>
+            <text x="0" y="42">administrationis pecuniae publicae.</text>
+          </g>
+          <line x1="228" y1="80" x2="228" y2="155" stroke="#292524" stroke-width="0.4" opacity="0.25"/>
+
+          <g transform="translate(232, 82)" font-family="'Times New Roman', Georgia, serif" font-size="4" fill="#292524">
+            <text x="0" y="0">Offshore account mobility surged ahead</text>
+            <text x="0" y="6">of public disclosure statements.</text>
+            <text x="0" y="12">Capital reserves were shifted across</text>
+            <text x="0" y="18">tiered holding entities in Q3.</text>
+            <text x="0" y="24"><b>Treasury Findings:</b> Mandated</text>
+            <text x="0" y="30">threshold buffers were artificially</text>
+            <text x="0" y="36">reported through balancing functions.</text>
+            <text x="0" y="42">Audit proceedings continue promptly.</text>
+          </g>
+        </g>
+
+        <!-- 3D Pop-Out Quote Extraction System (Image 3 Parity: Z-space lift with drop shadow) -->
+        <g transform="translate(60, 80)" filter="url(#pop-shdw)">
+          <rect width="280" height="21" rx="2" fill="#faf7ed" stroke="#d5cbbb" stroke-width="0.6"/>
+          <rect x="4" y="2.5" width="272" height="16" rx="2" fill="url(#pop-yellow)" opacity="0.9" style="mix-blend-mode: multiply;"/>
+          <text x="10" y="13.5" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-weight="900" font-style="italic" font-size="9.2" fill="#0f141c" letter-spacing="-0.1">“Full structural vulnerabilities known since Q3.”</text>
         </g>
       </svg>
     `)}`,

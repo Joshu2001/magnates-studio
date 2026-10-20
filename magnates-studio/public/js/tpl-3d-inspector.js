@@ -73,9 +73,9 @@
   const DOC_SLOTS = [
     { key: 'masthead', label: 'Masthead', def: 'THE FINANCIAL GAZETTE' },
     { key: 'headline', label: 'Headline', def: 'Uncovered Files Reveal $4.2B Secret Algorithm Shift' },
-    { key: 'quote', label: 'Highlighted Line / Body', def: '"Full structural vulnerabilities known since Q3."' },
-    { key: 'popout', label: 'Pop-out Label', def: 'THE ARCHITECT' },
-    { key: 'dateline', label: 'Dateline (3D)', def: null }
+    { key: 'quote', label: 'Target Quote / Pop-Out', def: '“Full structural vulnerabilities known since Q3.”' },
+    { key: 'byline', label: 'Byline / Subtitle', def: 'Authorison Solezeere • Financial Investigation Desk, Special Market Dispatch' },
+    { key: 'dateline', label: 'Dateline Bar', def: 'DATE: 20 October 2021 — IONSDAY, 19 HI 17, 2021 — EDITION: NO. 719' }
   ];
   // slot -> 3D read/write
   function spatialLayer(i) { return spatial3DState.elements3D && spatial3DState.elements3D[i]; }
@@ -84,7 +84,7 @@
     'a-title': { l: 1, f: 'title' }, 'a-sub': { l: 1, f: 'body' },
     'b-title': { l: 3, f: 'title' }, 'b-sub': { l: 3, f: 'body' }
   };
-  const DOC_3D = { masthead: 'header', headline: 'headline', quote: 'body', dateline: 'dateline' };
+  const DOC_3D = { masthead: 'header', headline: 'headline', quote: 'quote', body: 'body', dateline: 'dateline', byline: 'byline' };
 
   function slotsFor(tplId) {
     const k = kindOf(tplId);
@@ -150,9 +150,9 @@
   function ensureDoc(e) {
     if (!e.doc) {
       const d = document3DFXState;
-      e.doc = { pitch: 45, yaw: -20, roll: 8, dist: 55, hl: 1, parallax: d.parallax, playbackSpeed: d.playbackSpeed || 1, paperStyle: d.paperStyle,
+      e.doc = { pitch: 30, yaw: -4, roll: 1, dist: 48, hl: 1, parallax: d.parallax, playbackSpeed: d.playbackSpeed || 1, paperStyle: d.paperStyle,
         highlightColor: d.highlightColor, enableHighlight: d.enableHighlight, enablePopout: d.enablePopout, enableRedaction: d.enableRedaction,
-        popElevation: d.popElevation, redactWipe: d.redactWipe, header: d.header, headline: d.headline, dateline: d.dateline, body: d.body };
+        popElevation: d.popElevation, redactWipe: d.redactWipe, header: d.header, headline: d.headline, dateline: d.dateline, body: d.body, quote: d.quote, byline: d.byline };
     }
     return e.doc;
   }
@@ -182,7 +182,7 @@
     const sig = JSON.stringify([p, e.texts]);
     if (d._appliedSig === sig) return;
     d._appliedSig = sig;
-    ['parallax', 'playbackSpeed', 'paperStyle', 'highlightColor', 'enableHighlight', 'enablePopout', 'enableRedaction', 'popElevation', 'redactWipe', 'header', 'headline', 'dateline', 'body'].forEach(f => { d[f] = p[f]; });
+    ['parallax', 'playbackSpeed', 'paperStyle', 'highlightColor', 'enableHighlight', 'enablePopout', 'enableRedaction', 'popElevation', 'redactWipe', 'header', 'headline', 'dateline', 'body', 'quote', 'byline'].forEach(f => { d[f] = p[f]; });
     Object.keys(e.texts).forEach(key => { const f = DOC_3D[key]; if (f) d[f] = e.texts[key]; });
     if (d.popoutMesh) d.popoutMesh.visible = d.enablePopout;
     d._texDirty = true;
@@ -972,7 +972,11 @@
       const w = document.createTreeWalker(fxc, NodeFilter.SHOW_TEXT); let n;
       while ((n = w.nextNode())) {
         const t = n.nodeValue.trim(); if (!t) continue;
-        if (slots) { const sl = slots.find(x => x.def === t); if (sl && ov[sl.key] != null) n.nodeValue = ov[sl.key]; }
+        if (slots) {
+          const norm = (s) => String(s || '').replace(/[\u201c\u201d]/g, '"').trim();
+          const sl = slots.find(x => norm(x.def) === norm(t) || x.def === t);
+          if (sl && ov[sl.key] != null) n.nodeValue = ov[sl.key];
+        }
         else if (ov[t] != null) n.nodeValue = ov[t];
       }
     }
@@ -1151,7 +1155,11 @@
         const w = document.createTreeWalker(fxc, NodeFilter.SHOW_TEXT); let n;
         while ((n = w.nextNode())) {
           const t = n.nodeValue.trim(); if (!t) continue;
-          if (slots) { const sl = slots.find(x => x.def === t); if (sl && ov[sl.key] != null) n.nodeValue = ov[sl.key]; }
+          if (slots) {
+          const norm = (s) => String(s || '').replace(/[\u201c\u201d]/g, '"').trim();
+          const sl = slots.find(x => norm(x.def) === norm(t) || x.def === t);
+          if (sl && ov[sl.key] != null) n.nodeValue = ov[sl.key];
+        }
           else if (ov[t] != null) n.nodeValue = ov[t];
         }
       }
