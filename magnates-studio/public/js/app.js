@@ -48017,28 +48017,42 @@ function bindMagnatesBlendModesSuiteModalControls() {
 
 /* =========================================================
    5. MAGNATES MEDIA & JAMES JANI DYNAMIC CUTOUT MOTION SUITE CONTROLLER
-   (Granular Entrance & Exit Animations, Smooth Cubic Glides, Staggered Millisecond Delays,
-    $1,000,000 Money Counter Choreography, Full-Scale Office Room Cutout, Hover HUD & Layer Stack)
+   (Modular Multi-Scene Architecture:
+    - Scene A: Brand Logo Cutout Rise from Bottom -> Center -> Shift Left + Wavy Kinetic Headline
+    - Scene B: $1,000,000 Money Counter -> Dual Glowing Silhouettes
+    - Scene C: Empty Office Room Plate -> Full-Frame Desk Guy Cutout Smooth Glide Up
+    - Full Flow: Merged Master Sequence (Scene A -> Scene B) OR Individually Independent)
    ========================================================= */
 let magnatesBPState = {
   isPlaying: true,
   playhead: 0,
-  duration: 6.0,
-  preset: "dual_silhouette", // 'dual_silhouette' (Image 3) | 'room_spawn' (Image 1/2)
-  selectedLayer: "z3",
+  duration: 10.5,
+  preset: "full_story_flow", // 'full_story_flow' | 'brand_wavy_intro' | 'dual_silhouette' | 'room_spawn'
+  selectedLayer: "z4",
+  // Scene A (Z=4 Brand Logo Cutout & Z=5 Wavy Hook Text)
+  logoEnabled: true,
+  logoCutoutUrl: "/temu_logo_cutout.png",
+  logoInTime: 0.35,
+  logoShiftTime: 1.25,
+  logoOutTime: 4.15,
+  logoGlowColor: "#ff1e1e",
+  logoGlowIntensity: 90,
+  wavyTextEnabled: true,
+  wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+  wavyLine2: "ON THE INTERNET.",
+  // Scene B / C (Z=1 Counter, Z=2 Cutout 1, Z=3 Cutout 2)
   showCounter: true,
   showBlueprintGrid: false,
   headline: "$1,000,000",
   subcaption: "Advertising Those Product.",
-  // Z=2 (Cutout 1: Left standing silhouette OR Full-frame desk guy cutout)
   secondaryCutoutUrl: "/silhouette_standing_phone.png",
+  l1Enabled: true,
   l1InAnim: "left_to_right",
   l1OutAnim: "right_to_left",
   l1InTime: 0.85,
   l1OutTime: 3.80,
   l1GlowColor: "#ffffff",
   l1GlowIntensity: 85,
-  // Z=3 (Cutout 2: Right sitting silhouette)
   primaryCutoutUrl: "/silhouette_sitting_phone.png",
   l2Enabled: true,
   l2InAnim: "bottom_to_up",
@@ -48057,10 +48071,22 @@ let magnatesBPState = {
 };
 
 const MAGNATES_BP_PRESETS = {
-  dual_silhouette: {
+  full_story_flow: {
+    duration: 10.5,
     bgPlateUrl: "",
     backdropColor: "#991b1b",
     backdropSpread: 75,
+    logoEnabled: true,
+    logoCutoutUrl: "/temu_logo_cutout.png",
+    logoInTime: 0.35,
+    logoShiftTime: 1.25,
+    logoOutTime: 4.15,
+    logoGlowColor: "#ff1e1e",
+    logoGlowIntensity: 90,
+    wavyTextEnabled: true,
+    wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+    wavyLine2: "ON THE INTERNET.",
+    l1Enabled: true,
     secondaryCutoutUrl: "/silhouette_standing_phone.png",
     primaryCutoutUrl: "/silhouette_sitting_phone.png",
     l2Enabled: true,
@@ -48080,15 +48106,107 @@ const MAGNATES_BP_PRESETS = {
     l2GlowColor: "#ffffff",
     l2GlowIntensity: 85,
     bgFadeTime: 4.45,
-    hudPreset: "SCENE: $1M DUAL SILHOUETTES",
+    hudPreset: "FULL SEQUENCE: LOGO HOOK → $1M SILHOUETTES",
+    l1Label: "Left Silhouette Cutout",
+    l2Label: "Right Silhouette Cutout",
+    z0Label: "Crimson Radial Atmosphere"
+  },
+  brand_wavy_intro: {
+    duration: 5.2,
+    bgPlateUrl: "",
+    backdropColor: "#991b1b",
+    backdropSpread: 75,
+    logoEnabled: true,
+    logoCutoutUrl: "/temu_logo_cutout.png",
+    logoInTime: 0.35,
+    logoShiftTime: 1.25,
+    logoOutTime: 4.25,
+    logoGlowColor: "#ff1e1e",
+    logoGlowIntensity: 90,
+    wavyTextEnabled: true,
+    wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+    wavyLine2: "ON THE INTERNET.",
+    l1Enabled: false,
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    primaryCutoutUrl: "/silhouette_sitting_phone.png",
+    l2Enabled: false,
+    showCounter: false,
+    headline: "$1,000,000",
+    subcaption: "Advertising Those Product.",
+    l1InAnim: "left_to_right",
+    l1OutAnim: "right_to_left",
+    l1InTime: 0.85,
+    l1OutTime: 3.80,
+    l1GlowColor: "#ffffff",
+    l1GlowIntensity: 85,
+    l2InAnim: "bottom_to_up",
+    l2OutAnim: "left_to_right",
+    l2InTime: 0.95,
+    l2OutTime: 4.05,
+    l2GlowColor: "#ffffff",
+    l2GlowIntensity: 85,
+    bgFadeTime: 4.65,
+    hudPreset: "SCENE A: BRAND LOGO & WAVY HEADLINE",
+    l1Label: "Left Silhouette (Scene B)",
+    l2Label: "Right Silhouette (Scene B)",
+    z0Label: "Crimson Radial Atmosphere"
+  },
+  dual_silhouette: {
+    duration: 6.0,
+    bgPlateUrl: "",
+    backdropColor: "#991b1b",
+    backdropSpread: 75,
+    logoEnabled: false,
+    logoCutoutUrl: "/temu_logo_cutout.png",
+    logoInTime: 0.35,
+    logoShiftTime: 1.25,
+    logoOutTime: 4.15,
+    logoGlowColor: "#ff1e1e",
+    logoGlowIntensity: 90,
+    wavyTextEnabled: false,
+    wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+    wavyLine2: "ON THE INTERNET.",
+    l1Enabled: true,
+    secondaryCutoutUrl: "/silhouette_standing_phone.png",
+    primaryCutoutUrl: "/silhouette_sitting_phone.png",
+    l2Enabled: true,
+    showCounter: true,
+    headline: "$1,000,000",
+    subcaption: "Advertising Those Product.",
+    l1InAnim: "left_to_right",
+    l1OutAnim: "right_to_left",
+    l1InTime: 0.85,
+    l1OutTime: 3.80,
+    l1GlowColor: "#ffffff",
+    l1GlowIntensity: 85,
+    l2InAnim: "bottom_to_up",
+    l2OutAnim: "left_to_right",
+    l2InTime: 0.95,
+    l2OutTime: 4.05,
+    l2GlowColor: "#ffffff",
+    l2GlowIntensity: 85,
+    bgFadeTime: 4.45,
+    hudPreset: "SCENE B: $1M DUAL SILHOUETTES",
     l1Label: "Left Silhouette Cutout",
     l2Label: "Right Silhouette Cutout",
     z0Label: "Crimson Radial Atmosphere"
   },
   room_spawn: {
+    duration: 5.5,
     bgPlateUrl: "/room_empty_plate.png",
     backdropColor: "#1e293b",
     backdropSpread: 60,
+    logoEnabled: false,
+    logoCutoutUrl: "/temu_logo_cutout.png",
+    logoInTime: 0.35,
+    logoShiftTime: 1.25,
+    logoOutTime: 4.15,
+    logoGlowColor: "#ff1e1e",
+    logoGlowIntensity: 90,
+    wavyTextEnabled: false,
+    wavyLine1: "ONE OF THE STRANGEST BUSINESSES",
+    wavyLine2: "ON THE INTERNET.",
+    l1Enabled: true,
     secondaryCutoutUrl: "/laptop_guy_cutout.png",
     primaryCutoutUrl: "/silhouette_sitting_phone.png",
     l2Enabled: false,
@@ -48108,7 +48226,7 @@ const MAGNATES_BP_PRESETS = {
     l2GlowColor: "#ffffff",
     l2GlowIntensity: 85,
     bgFadeTime: 4.65,
-    hudPreset: "SCENE: OFFICE DESK CUTOUT GLIDE",
+    hudPreset: "SCENE C: OFFICE DESK CUTOUT GLIDE",
     l1Label: "Office Desk Guy Cutout",
     l2Label: "Secondary Cutout (Hidden)",
     z0Label: "Empty Office Room Plate"
@@ -48125,10 +48243,15 @@ function bpEaseInCubic(x) {
   return c * c * c;
 }
 
+function bpEaseInOutCubic(x) {
+  const c = Math.max(0, Math.min(1, x));
+  return c < 0.5 ? 4 * c * c * c : 1 - Math.pow(-2 * c + 2, 3) / 2;
+}
+
 function bpHexToRgba(hex, alpha) {
-  let c = hex.replace('#', '');
+  let c = (hex || '#ffffff').replace('#', '');
   if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
-  const num = parseInt(c, 16);
+  const num = parseInt(c, 16) || 0;
   const r = (num >> 16) & 255;
   const g = (num >> 8) & 255;
   const b = num & 255;
@@ -48206,11 +48329,56 @@ function computeGranularCutoutTransform(playhead, inTime, outTime, inAnim, outAn
   };
 }
 
+function renderWavyKineticSpans(containerEl, text, progress, isWavyMode) {
+  if (!containerEl) return;
+  if (containerEl.getAttribute('data-raw-text') !== text) {
+    containerEl.setAttribute('data-raw-text', text);
+    containerEl.innerHTML = '';
+    const chars = Array.from(text);
+    chars.forEach((ch, idx) => {
+      const span = document.createElement('span');
+      span.textContent = ch === ' ' ? ' ' : ch;
+      span.style.display = 'inline-block';
+      span.style.willChange = 'transform, opacity';
+      span.setAttribute('data-ch-idx', idx);
+      containerEl.appendChild(span);
+    });
+  }
+  const spans = containerEl.children;
+  const total = spans.length || 1;
+  for (let i = 0; i < spans.length; i++) {
+    const sp = spans[i];
+    if (!isWavyMode) {
+      // Line 1: Crisp left-to-right staggered slide/reveal
+      const charDelay = (i / total) * 0.35;
+      const localP = bpEaseOutCubic((progress - charDelay) / 0.65);
+      const tx = (1 - localP) * 18;
+      sp.style.opacity = localP.toFixed(3);
+      sp.style.transform = `translate3d(${tx.toFixed(1)}px, 0px, 0)`;
+    } else {
+      // Line 2: Wavy form up (Screenshots 4 & 5: "ON THE" up first while "INTERNET." rises up in a wave)
+      const charDelay = (i / total) * 0.52;
+      const rawLocal = Math.max(0, Math.min(1, (progress - charDelay) / 0.48));
+      const easeP = bpEaseOutCubic(rawLocal);
+      // Wave crest as character rises from bottom -> up
+      const waveCrest = Math.sin(rawLocal * Math.PI) * -6;
+      const ty = (1 - easeP) * 34 + (rawLocal < 1 ? waveCrest : 0);
+      sp.style.opacity = Math.min(1, rawLocal * 1.6).toFixed(3);
+      sp.style.transform = `translate3d(0px, ${ty.toFixed(1)}px, 0)`;
+    }
+  }
+}
+
 function updateMagnatesBPVisualStyles() {
   const headlineEl = document.getElementById('magnates-bp-headline');
   const subcaptionEl = document.getElementById('magnates-bp-subcaption');
   const primaryImg = document.getElementById('magnates-bp-img-primary');
   const secondaryImg = document.getElementById('magnates-bp-img-secondary');
+  const logoLayer = document.getElementById('magnates-bp-layer-logo');
+  const logoImg = document.getElementById('magnates-bp-img-logo');
+  const wavyWrap = document.getElementById('magnates-bp-wavy-wrap');
+  const wavyLine1El = document.getElementById('magnates-bp-wavy-line1');
+  const wavyLine2El = document.getElementById('magnates-bp-wavy-line2');
   const bgWrap = document.getElementById('magnates-bp-bg-wrap');
   const crimsonBg = document.getElementById('magnates-bp-crimson-bg');
   const bgPlateImg = document.getElementById('magnates-bp-bg-plate');
@@ -48233,7 +48401,14 @@ function updateMagnatesBPVisualStyles() {
   if (hudTimecode) hudTimecode.textContent = timeText;
   if (scrubberFill) scrubberFill.style.width = `${Math.max(0, Math.min(100, (p / dur) * 100)).toFixed(1)}%`;
 
-  // Sync Cutout Image Sources & Inspector Thumbnails
+  // Sync Cutout & Logo Image Sources & Inspector Thumbnails
+  if (logoImg && logoImg.getAttribute('src') !== magnatesBPState.logoCutoutUrl) {
+    logoImg.src = magnatesBPState.logoCutoutUrl;
+  }
+  const thumbZ4 = document.getElementById('magnates-bp-thumb-z4');
+  if (thumbZ4 && thumbZ4.getAttribute('src') !== magnatesBPState.logoCutoutUrl) {
+    thumbZ4.src = magnatesBPState.logoCutoutUrl;
+  }
   if (secondaryImg && secondaryImg.getAttribute('src') !== magnatesBPState.secondaryCutoutUrl) {
     secondaryImg.src = magnatesBPState.secondaryCutoutUrl;
   }
@@ -48248,6 +48423,15 @@ function updateMagnatesBPVisualStyles() {
   if (thumbZ3 && thumbZ3.getAttribute('src') !== magnatesBPState.primaryCutoutUrl) {
     thumbZ3.src = magnatesBPState.primaryCutoutUrl;
   }
+
+  // Determine Timeline Offset for Scene B when in Full Merged Story Flow
+  const isFullFlow = magnatesBPState.preset === 'full_story_flow';
+  const isBrandOnly = magnatesBPState.preset === 'brand_wavy_intro';
+  const isRoomScene = magnatesBPState.preset === 'room_spawn';
+  const sceneBOffset = isFullFlow ? 4.50 : 0.0;
+  const effectiveBgFadeTime = isFullFlow
+    ? (sceneBOffset + magnatesBPState.bgFadeTime)
+    : magnatesBPState.bgFadeTime;
 
   // Z=0 Background Plate vs Radial Glow Atmosphere + Fade-out at end
   const hasBgPlate = Boolean(magnatesBPState.bgPlateUrl);
@@ -48264,7 +48448,6 @@ function updateMagnatesBPVisualStyles() {
     }
   }
 
-  // Update Inspector Z=0 thumbnail
   const thumbZ0 = document.getElementById('magnates-bp-thumb-z0');
   if (thumbZ0) {
     if (hasBgPlate) {
@@ -48291,17 +48474,83 @@ function updateMagnatesBPVisualStyles() {
     gridLayer.style.opacity = magnatesBPState.showBlueprintGrid ? '0.65' : '0';
   }
 
-  // Background fade-out after cutouts exit
   let bgOpacity = 1;
-  if (p >= magnatesBPState.bgFadeTime) {
-    const fadeQ = bpEaseInCubic((p - magnatesBPState.bgFadeTime) / 0.55);
+  if (p >= effectiveBgFadeTime) {
+    const fadeQ = bpEaseInCubic((p - effectiveBgFadeTime) / 0.55);
     bgOpacity = Math.max(0, 1 - fadeQ);
   }
   if (bgWrap) bgWrap.style.opacity = bgOpacity.toFixed(3);
 
-  // Z=1 Center Money Counter ($0 -> $999,970 -> $1,000,000) & Subtitle
+  // =========================================================
+  // SCENE A RENDER: Brand Logo Cutout (Z=4) + Wavy Headline (Z=5)
+  // =========================================================
+  const showSceneA = magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly);
+  if (logoLayer && logoImg) {
+    if (!showSceneA) {
+      logoLayer.style.display = 'none';
+    } else {
+      logoLayer.style.display = 'flex';
+      logoImg.style.filter = bpComputeCutoutGlowFilter(
+        magnatesBPState.logoGlowColor || '#ff1e1e',
+        magnatesBPState.logoGlowIntensity ?? 90,
+        false
+      );
+
+      const tIn = magnatesBPState.logoInTime;
+      const tShift = magnatesBPState.logoShiftTime;
+      const tOut = magnatesBPState.logoOutTime;
+
+      // 1. Bottom -> Center Rise (e.g. 0.35s to 0.85s)
+      const riseProg = bpEaseOutCubic((p - tIn) / 0.48);
+      // 2. Center -> Left Shift (e.g. 1.25s to 1.75s)
+      const shiftProg = bpEaseInOutCubic((p - tShift) / 0.50);
+      // 3. Exit Glide / Fade (at tOut)
+      const exitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.42) : 0;
+
+      // Position relative to center (left: 50%, top: 50%)
+      // At center: translate(-50%, -50%)
+      // Shifted left (matching Screenshot 3-5): center moves to ~20% stage X -> -165% of its own width
+      const baseTx = -50 - shiftProg * 118 - exitProg * 130;
+      const baseTy = -50 + (1 - riseProg) * 185;
+      const op = Math.max(0, Math.min(1, (p < tIn ? 0 : riseProg * 1.35) * (1 - exitProg * 1.15)));
+
+      logoLayer.style.transform = `translate3d(${baseTx.toFixed(2)}%, ${baseTy.toFixed(2)}%, 0)`;
+      logoLayer.style.opacity = op.toFixed(3);
+    }
+  }
+
+  if (wavyWrap) {
+    if (!showSceneA || !magnatesBPState.wavyTextEnabled) {
+      wavyWrap.style.display = 'none';
+    } else {
+      wavyWrap.style.display = 'flex';
+      const tShift = magnatesBPState.logoShiftTime;
+      const tOut = magnatesBPState.logoOutTime;
+      const line1Start = tShift + 0.15;
+      const line2Start = tShift + 0.68;
+
+      const prog1 = Math.max(0, Math.min(1, (p - line1Start) / 0.55));
+      const prog2 = Math.max(0, Math.min(1, (p - line2Start) / 0.72));
+      const exitProg = p >= tOut ? bpEaseInCubic((p - tOut) / 0.40) : 0;
+
+      renderWavyKineticSpans(wavyLine1El, magnatesBPState.wavyLine1 || '', prog1, false);
+      renderWavyKineticSpans(wavyLine2El, magnatesBPState.wavyLine2 || '', prog2, true);
+
+      const wrapOp = Math.max(0, 1 - exitProg * 1.2) * bgOpacity;
+      const wrapTx = exitProg * 60;
+      wavyWrap.style.opacity = wrapOp.toFixed(3);
+      wavyWrap.style.transform = `translate3d(${wrapTx.toFixed(1)}px, -50%, 0)`;
+    }
+  }
+
+  // =========================================================
+  // SCENE B / C RENDER: $1,000,000 Counter (Z=1) & Cutouts (Z=2, Z=3)
+  // =========================================================
+  const localPB = p - sceneBOffset;
+  const inSceneBWindow = !isBrandOnly && (!isFullFlow || localPB >= 0);
+
   if (textWrap) {
-    if (!magnatesBPState.showCounter) {
+    if (!magnatesBPState.showCounter || !inSceneBWindow) {
       textWrap.style.display = 'none';
     } else {
       textWrap.style.display = 'flex';
@@ -48309,11 +48558,10 @@ function updateMagnatesBPVisualStyles() {
       if (headlineEl) {
         if (rawHead.startsWith('$')) {
           const targetNum = parseInt(rawHead.replace(/[^0-9]/g, ''), 10) || 1000000;
-          // Rapidly counts up toward $1,000,000; right around 0.85s-0.95s (when silhouettes enter) it passes ~$999,970
           const countDur = Math.max(0.4, magnatesBPState.l2InTime + 0.20);
           let currentVal = targetNum;
-          if (p < countDur) {
-            const cProg = bpEaseOutCubic(p / countDur);
+          if (localPB < countDur) {
+            const cProg = bpEaseOutCubic(localPB / countDur);
             currentVal = Math.floor(targetNum * (0.82 + 0.18 * cProg));
           }
           headlineEl.textContent = '$' + currentVal.toLocaleString('en-US');
@@ -48322,52 +48570,54 @@ function updateMagnatesBPVisualStyles() {
         }
       }
       if (subcaptionEl) subcaptionEl.textContent = magnatesBPState.subcaption;
-      // Text also fades out cleanly when background fades out
-      const textEnter = bpEaseOutCubic(p / 0.35);
+      const textEnter = bpEaseOutCubic(localPB / 0.35);
       textWrap.style.opacity = (textEnter * bgOpacity).toFixed(3);
     }
   }
 
   // Z=2 Layer 1 Layout & Motion (Left Standing Silhouette OR Full-Frame Office Desk Cutout)
   if (secondaryLayer && secondaryImg) {
-    if (isRoomScene && magnatesBPState.secondaryCutoutUrl.includes('laptop_guy_cutout')) {
-      // Full-frame 1:1 pixel-aligned office desk cutout so the guy sits naturally at the desk
-      secondaryLayer.style.inset = '0';
-      secondaryLayer.style.left = '0';
-      secondaryLayer.style.bottom = '0';
-      secondaryLayer.style.width = '100%';
-      secondaryLayer.style.height = '100%';
-      secondaryImg.style.width = '100%';
-      secondaryImg.style.height = '100%';
-      secondaryImg.style.objectFit = 'cover';
-      secondaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 0, true);
+    if (!magnatesBPState.l1Enabled || !inSceneBWindow) {
+      secondaryLayer.style.display = 'none';
     } else {
-      // Large Left Standing Silhouette (83% stage height, matching Image 3)
-      secondaryLayer.style.inset = 'auto';
-      secondaryLayer.style.left = '5%';
-      secondaryLayer.style.bottom = '2%';
-      secondaryLayer.style.width = 'auto';
-      secondaryLayer.style.height = '83%';
-      secondaryImg.style.width = 'auto';
-      secondaryImg.style.height = '100%';
-      secondaryImg.style.objectFit = 'contain';
-      secondaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 85, false);
-    }
+      secondaryLayer.style.display = 'flex';
+      if (isRoomScene && magnatesBPState.secondaryCutoutUrl.includes('laptop_guy_cutout')) {
+        secondaryLayer.style.inset = '0';
+        secondaryLayer.style.left = '0';
+        secondaryLayer.style.bottom = '0';
+        secondaryLayer.style.width = '100%';
+        secondaryLayer.style.height = '100%';
+        secondaryImg.style.width = '100%';
+        secondaryImg.style.height = '100%';
+        secondaryImg.style.objectFit = 'cover';
+        secondaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 0, true);
+      } else {
+        secondaryLayer.style.inset = 'auto';
+        secondaryLayer.style.left = '5%';
+        secondaryLayer.style.bottom = '2%';
+        secondaryLayer.style.width = 'auto';
+        secondaryLayer.style.height = '83%';
+        secondaryImg.style.width = 'auto';
+        secondaryImg.style.height = '100%';
+        secondaryImg.style.objectFit = 'contain';
+        secondaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 85, false);
+      }
 
-    const m1 = computeGranularCutoutTransform(
-      p,
-      magnatesBPState.l1InTime,
-      magnatesBPState.l1OutTime,
-      magnatesBPState.l1InAnim,
-      magnatesBPState.l1OutAnim
-    );
-    secondaryLayer.style.transform = m1.transform;
-    secondaryLayer.style.opacity = m1.opacity;
+      const m1 = computeGranularCutoutTransform(
+        localPB,
+        magnatesBPState.l1InTime,
+        magnatesBPState.l1OutTime,
+        magnatesBPState.l1InAnim,
+        magnatesBPState.l1OutAnim
+      );
+      secondaryLayer.style.transform = m1.transform;
+      secondaryLayer.style.opacity = m1.opacity;
+    }
   }
 
-  // Z=3 Layer 2 Layout & Motion (Right Sitting Silhouette, 61% stage height, matching Image 3)
+  // Z=3 Layer 2 Layout & Motion (Right Sitting Silhouette)
   if (primaryLayer && primaryImg) {
-    if (!magnatesBPState.l2Enabled) {
+    if (!magnatesBPState.l2Enabled || !inSceneBWindow) {
       primaryLayer.style.display = 'none';
     } else {
       primaryLayer.style.display = 'flex';
@@ -48377,7 +48627,7 @@ function updateMagnatesBPVisualStyles() {
       primaryImg.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l2GlowColor || '#ffffff', magnatesBPState.l2GlowIntensity ?? 85, false);
 
       const m2 = computeGranularCutoutTransform(
-        p,
+        localPB,
         magnatesBPState.l2InTime,
         magnatesBPState.l2OutTime,
         magnatesBPState.l2InAnim,
@@ -48393,18 +48643,35 @@ function updateMagnatesBPVisualStyles() {
   if (hudPreset && presetDef) hudPreset.textContent = presetDef.hudPreset;
 
   let phaseText = "PHASE: INTRO BUILD";
-  if (p < magnatesBPState.l1InTime) {
-    phaseText = magnatesBPState.showCounter ? "PHASE: 1. COUNTER BUILDING TO $1M" : "PHASE: 1. EMPTY ROOM PLATE";
-  } else if (p < magnatesBPState.l1OutTime) {
-    phaseText = "PHASE: 2. CUTOUTS GLIDE IN";
-  } else if (p < magnatesBPState.bgFadeTime) {
-    phaseText = "PHASE: 3. STAGGERED CUTOUT EXITS";
+  if (showSceneA && p < magnatesBPState.logoOutTime + 0.35) {
+    if (p < magnatesBPState.logoInTime) {
+      phaseText = "SCENE A // 1. ATMOSPHERE BACKDROP";
+    } else if (p < magnatesBPState.logoShiftTime) {
+      phaseText = "SCENE A // 2. LOGO RISES TO CENTER";
+    } else if (p < magnatesBPState.logoShiftTime + 0.65) {
+      phaseText = "SCENE A // 3. SHIFT LEFT + LINE 1";
+    } else {
+      phaseText = "SCENE A // 4. WAVY HEADLINE RISE";
+    }
   } else {
-    phaseText = "PHASE: 4. BACKDROP FADE TO BLACK";
+    if (localPB < magnatesBPState.l1InTime) {
+      phaseText = magnatesBPState.showCounter ? "SCENE B // 1. COUNTER BUILDING TO $1M" : "SCENE C // 1. EMPTY ROOM PLATE";
+    } else if (localPB < magnatesBPState.l1OutTime) {
+      phaseText = "SCENE B // 2. CUTOUTS GLIDE IN";
+    } else if (localPB < magnatesBPState.bgFadeTime) {
+      phaseText = "SCENE B // 3. STAGGERED CUTOUT EXITS";
+    } else {
+      phaseText = "SCENE B // 4. BACKDROP FADE TO BLACK";
+    }
   }
   if (hudAnim) hudAnim.textContent = phaseText;
 
-  const activeCount = 1 + (magnatesBPState.showCounter ? 1 : 0) + 1 + (magnatesBPState.l2Enabled ? 1 : 0);
+  const activeCount = 1
+    + (showSceneA ? 1 : 0)
+    + (showSceneA && magnatesBPState.wavyTextEnabled ? 1 : 0)
+    + (!isBrandOnly && magnatesBPState.showCounter ? 1 : 0)
+    + (!isBrandOnly && magnatesBPState.l1Enabled ? 1 : 0)
+    + (!isBrandOnly && magnatesBPState.l2Enabled ? 1 : 0);
   if (activeLayerPill) activeLayerPill.textContent = `${activeCount} LAYERS ACTIVE`;
   if (layerCountBadge) layerCountBadge.textContent = `${activeCount} Stacked`;
 
@@ -48414,7 +48681,7 @@ function updateMagnatesBPVisualStyles() {
   if (subZ3) {
     subZ3.textContent = magnatesBPState.l2Enabled
       ? bpFormatAnimLabel(magnatesBPState.l2InAnim, magnatesBPState.l2OutAnim)
-      : "Disabled in single-subject scene";
+      : "Disabled in current scene";
   }
 }
 
@@ -48452,9 +48719,23 @@ function applyMagnatesBPPresetToState(pKey) {
   const pData = MAGNATES_BP_PRESETS[pKey];
   if (!pData) return;
   magnatesBPState.preset = pKey;
+  magnatesBPState.duration = pData.duration || 6.0;
   magnatesBPState.bgPlateUrl = pData.bgPlateUrl;
   magnatesBPState.backdropColor = pData.backdropColor || '#991b1b';
   magnatesBPState.backdropSpread = pData.backdropSpread || 75;
+
+  magnatesBPState.logoEnabled = pData.logoEnabled ?? false;
+  magnatesBPState.logoCutoutUrl = pData.logoCutoutUrl || '/temu_logo_cutout.png';
+  magnatesBPState.logoInTime = pData.logoInTime ?? 0.35;
+  magnatesBPState.logoShiftTime = pData.logoShiftTime ?? 1.25;
+  magnatesBPState.logoOutTime = pData.logoOutTime ?? 4.15;
+  magnatesBPState.logoGlowColor = pData.logoGlowColor || '#ff1e1e';
+  magnatesBPState.logoGlowIntensity = pData.logoGlowIntensity ?? 90;
+  magnatesBPState.wavyTextEnabled = pData.wavyTextEnabled ?? false;
+  magnatesBPState.wavyLine1 = pData.wavyLine1 || 'ONE OF THE STRANGEST BUSINESSES';
+  magnatesBPState.wavyLine2 = pData.wavyLine2 || 'ON THE INTERNET.';
+
+  magnatesBPState.l1Enabled = pData.l1Enabled ?? true;
   magnatesBPState.secondaryCutoutUrl = pData.secondaryCutoutUrl;
   magnatesBPState.primaryCutoutUrl = pData.primaryCutoutUrl;
   magnatesBPState.l2Enabled = pData.l2Enabled;
@@ -48485,6 +48766,29 @@ function applyMagnatesBPPresetToState(pKey) {
     if (el) el.textContent = txt;
   };
   setVal('magnates-bp-select-preset', pKey);
+
+  // Sync Segmented Scene Pill Buttons
+  document.querySelectorAll('.btn-bp-scene-pill').forEach((btn) => {
+    const active = btn.getAttribute('data-preset') === pKey;
+    btn.style.background = active ? 'linear-gradient(135deg, #8b5cf6, #6d28d9)' : 'transparent';
+    btn.style.color = active ? '#ffffff' : '#94a3b8';
+    btn.style.fontWeight = active ? '700' : '600';
+  });
+
+  // Sync Scene A Controls
+  setVal('magnates-bp-input-wavy-line1', magnatesBPState.wavyLine1);
+  setVal('magnates-bp-input-wavy-line2', magnatesBPState.wavyLine2);
+  setVal('magnates-bp-logo-in-time', magnatesBPState.logoInTime);
+  setVal('magnates-bp-logo-shift-time', magnatesBPState.logoShiftTime);
+  setTxt('magnates-bp-val-logo-in', `${magnatesBPState.logoInTime.toFixed(2)}s`);
+  setTxt('magnates-bp-val-logo-shift', `${magnatesBPState.logoShiftTime.toFixed(2)}s`);
+  setVal('magnates-bp-logo-glow-color', magnatesBPState.logoGlowColor);
+  setVal('magnates-bp-logo-glow-intensity', magnatesBPState.logoGlowIntensity);
+  setTxt('magnates-bp-val-logo-glow', `${magnatesBPState.logoGlowIntensity}%`);
+  const chkWavy = document.getElementById('magnates-bp-toggle-wavy-text');
+  if (chkWavy) chkWavy.checked = magnatesBPState.wavyTextEnabled;
+
+  // Sync Scene B / C Controls
   setVal('magnates-bp-l1-in-anim', pData.l1InAnim);
   setVal('magnates-bp-l1-out-anim', pData.l1OutAnim);
   setVal('magnates-bp-l1-in-time', pData.l1InTime);
@@ -48522,10 +48826,23 @@ function applyMagnatesBPPresetToState(pKey) {
   setTxt('magnates-bp-label-z0', pData.z0Label);
   setTxt('magnates-bp-card-title-l1', pKey === 'room_spawn' ? 'Cutout 1 (Desk Guy) Motion' : 'Cutout 1 (Left Silhouette) Motion');
 
+  // Visual active state for cards/rows based on selected modular scene
+  const cardLogo = document.getElementById('magnates-bp-card-logo-controls');
+  if (cardLogo) cardLogo.style.opacity = magnatesBPState.logoEnabled ? '1' : '0.45';
+  const rowZ4 = document.getElementById('magnates-bp-row-z4');
+  if (rowZ4) rowZ4.style.opacity = magnatesBPState.logoEnabled ? '1' : '0.45';
+  const rowZ5 = document.getElementById('magnates-bp-row-z5');
+  if (rowZ5) rowZ5.style.opacity = (magnatesBPState.logoEnabled && magnatesBPState.wavyTextEnabled) ? '1' : '0.45';
+
+  const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
+  if (cardL1) cardL1.style.opacity = magnatesBPState.l1Enabled ? '1' : '0.45';
+  const rowZ2 = document.getElementById('magnates-bp-row-z2');
+  if (rowZ2) rowZ2.style.opacity = magnatesBPState.l1Enabled ? '1' : '0.45';
+
   const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
-  if (cardL2) cardL2.style.opacity = pData.l2Enabled ? '1' : '0.45';
+  if (cardL2) cardL2.style.opacity = magnatesBPState.l2Enabled ? '1' : '0.45';
   const rowZ3 = document.getElementById('magnates-bp-row-z3');
-  if (rowZ3) rowZ3.style.opacity = pData.l2Enabled ? '1' : '0.45';
+  if (rowZ3) rowZ3.style.opacity = magnatesBPState.l2Enabled ? '1' : '0.45';
 }
 
 function openMagnatesPaperBlueprintSuite() {
@@ -48590,6 +48907,8 @@ function highlightMagnatesBPLayerOnStage(layerId) {
   hoverBox.style.display = 'block';
 
   const titles = {
+    z5: "Z=5 // WAVY HOOK TYPOGRAPHY",
+    z4: "Z=4 // BRAND LOGO CUTOUT (TEMU)",
     z3: "Z=3 // RIGHT SILHOUETTE CUTOUT",
     z2: magnatesBPState.preset === 'room_spawn' ? "Z=2 // OFFICE DESK GUY CUTOUT" : "Z=2 // LEFT SILHOUETTE CUTOUT",
     z1: "Z=1 // $1,000,000 COUNTER & CAPTION",
@@ -48611,38 +48930,40 @@ function selectMagnatesBPLayer(layerId) {
     r.style.boxShadow = active ? '0 0 12px rgba(168,85,247,0.2)' : 'none';
   });
 
-  // 2. Highlight and scroll the corresponding Cutout motion card into view
+  // 2. Highlight and scroll the corresponding control card into view
+  const cardLogo = document.getElementById('magnates-bp-card-logo-controls');
   const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
   const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
-  
-  if (layerId === 'z2' && cardL1) {
+  const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
+
+  [cardLogo, cardL1, cardL2, cardZ0].forEach((c) => {
+    if (c) {
+      c.style.borderColor = 'rgba(255,255,255,0.06)';
+      c.style.background = 'rgba(255,255,255,0.02)';
+      c.style.boxShadow = 'none';
+    }
+  });
+
+  if ((layerId === 'z4' || layerId === 'z5') && cardLogo) {
+    cardLogo.style.borderColor = 'rgba(249, 115, 22, 0.65)';
+    cardLogo.style.background = 'rgba(249, 115, 22, 0.06)';
+    cardLogo.style.boxShadow = '0 0 16px rgba(249, 115, 22, 0.15)';
+    cardLogo.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (layerId === 'z2' && cardL1) {
     cardL1.style.borderColor = 'rgba(56, 189, 248, 0.65)';
     cardL1.style.background = 'rgba(56, 189, 248, 0.06)';
     cardL1.style.boxShadow = '0 0 16px rgba(56, 189, 248, 0.15)';
     cardL1.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (cardL2) {
-      cardL2.style.borderColor = 'rgba(255,255,255,0.06)';
-      cardL2.style.background = 'rgba(255,255,255,0.02)';
-      cardL2.style.boxShadow = 'none';
-    }
   } else if (layerId === 'z3' && cardL2) {
     cardL2.style.borderColor = 'rgba(192, 132, 252, 0.65)';
     cardL2.style.background = 'rgba(168, 85, 247, 0.06)';
     cardL2.style.boxShadow = '0 0 16px rgba(168, 85, 247, 0.15)';
     cardL2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (cardL1) {
-      cardL1.style.borderColor = 'rgba(255,255,255,0.06)';
-      cardL1.style.background = 'rgba(255,255,255,0.02)';
-      cardL1.style.boxShadow = 'none';
-    }
-  } else if (layerId === 'z0') {
-    const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
-    if (cardZ0) {
-      cardZ0.style.borderColor = 'rgba(16, 185, 129, 0.65)';
-      cardZ0.style.background = 'rgba(16, 185, 129, 0.06)';
-      cardZ0.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.15)';
-      cardZ0.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+  } else if (layerId === 'z0' && cardZ0) {
+    cardZ0.style.borderColor = 'rgba(16, 185, 129, 0.65)';
+    cardZ0.style.background = 'rgba(16, 185, 129, 0.06)';
+    cardZ0.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.15)';
+    cardZ0.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
   // 3. Highlight boundary box on stage
@@ -48702,22 +49023,83 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     });
   }
 
-  // Preset Selector
+  // Preset Selector Dropdown & Segmented Pill Buttons
   document.getElementById('magnates-bp-select-preset')?.addEventListener('change', (e) => {
     applyMagnatesBPPresetToState(e.target.value);
     magnatesBPState.playhead = 0;
     updateMagnatesBPVisualStyles();
   });
 
+  document.querySelectorAll('.btn-bp-scene-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const pKey = btn.getAttribute('data-preset');
+      if (pKey) {
+        applyMagnatesBPPresetToState(pKey);
+        magnatesBPState.playhead = 0;
+        updateMagnatesBPVisualStyles();
+      }
+    });
+  });
+
+  // Scene A Controls (Z=4 Brand Logo Cutout & Z=5 Wavy Headline)
+  document.getElementById('magnates-bp-input-wavy-line1')?.addEventListener('input', (e) => {
+    magnatesBPState.wavyLine1 = e.target.value;
+    magnatesBPState.wavyTextEnabled = true;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-wavy-line2')?.addEventListener('input', (e) => {
+    magnatesBPState.wavyLine2 = e.target.value;
+    magnatesBPState.wavyTextEnabled = true;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-toggle-wavy-text')?.addEventListener('change', (e) => {
+    magnatesBPState.wavyTextEnabled = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-logo-in-time')?.addEventListener('input', (e) => {
+    magnatesBPState.logoInTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-logo-in');
+    if (lbl) lbl.textContent = `${magnatesBPState.logoInTime.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-logo-shift-time')?.addEventListener('input', (e) => {
+    magnatesBPState.logoShiftTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-logo-shift');
+    if (lbl) lbl.textContent = `${magnatesBPState.logoShiftTime.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-logo-glow-color')?.addEventListener('input', (e) => {
+    magnatesBPState.logoGlowColor = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-logo-glow-intensity')?.addEventListener('input', (e) => {
+    magnatesBPState.logoGlowIntensity = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-logo-glow');
+    if (lbl) lbl.textContent = `${magnatesBPState.logoGlowIntensity}%`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-upload-z4')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.logoCutoutUrl = URL.createObjectURL(file);
+    magnatesBPState.logoEnabled = true;
+    updateMagnatesBPVisualStyles();
+  });
+
   // Granular Layer 1 (Z=2) Controls
+  const jumpToSceneBTime = (localT) => {
+    const offset = magnatesBPState.preset === 'full_story_flow' ? 4.50 : 0.0;
+    magnatesBPState.playhead = Math.max(0, offset + localT);
+  };
+
   document.getElementById('magnates-bp-l1-in-anim')?.addEventListener('change', (e) => {
     magnatesBPState.l1InAnim = e.target.value;
-    magnatesBPState.playhead = Math.max(0, magnatesBPState.l1InTime - 0.15);
+    jumpToSceneBTime(magnatesBPState.l1InTime - 0.15);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-l1-out-anim')?.addEventListener('change', (e) => {
     magnatesBPState.l1OutAnim = e.target.value;
-    magnatesBPState.playhead = Math.max(0, magnatesBPState.l1OutTime - 0.15);
+    jumpToSceneBTime(magnatesBPState.l1OutTime - 0.15);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-l1-in-time')?.addEventListener('input', (e) => {
@@ -48737,13 +49119,13 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   document.getElementById('magnates-bp-l2-in-anim')?.addEventListener('change', (e) => {
     magnatesBPState.l2InAnim = e.target.value;
     magnatesBPState.l2Enabled = true;
-    magnatesBPState.playhead = Math.max(0, magnatesBPState.l2InTime - 0.15);
+    jumpToSceneBTime(magnatesBPState.l2InTime - 0.15);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-l2-out-anim')?.addEventListener('change', (e) => {
     magnatesBPState.l2OutAnim = e.target.value;
     magnatesBPState.l2Enabled = true;
-    magnatesBPState.playhead = Math.max(0, magnatesBPState.l2OutTime - 0.15);
+    jumpToSceneBTime(magnatesBPState.l2OutTime - 0.15);
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-l2-in-time')?.addEventListener('input', (e) => {
@@ -48762,7 +49144,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   // Backdrop Color & Atmosphere Listeners (Z=0)
   const onBackdropColorChange = (newColor) => {
     magnatesBPState.backdropColor = newColor;
-    magnatesBPState.bgPlateUrl = ""; // switch to radial glow mode
+    magnatesBPState.bgPlateUrl = "";
     const inCol1 = document.getElementById('magnates-bp-backdrop-color');
     const inCol2 = document.getElementById('magnates-bp-backdrop-color-quick');
     if (inCol1) inCol1.value = newColor;
@@ -48853,6 +49235,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     const file = e.target.files?.[0];
     if (!file) return;
     magnatesBPState.secondaryCutoutUrl = URL.createObjectURL(file);
+    magnatesBPState.l1Enabled = true;
     updateMagnatesBPVisualStyles();
   });
   document.getElementById('magnates-bp-upload-z3')?.addEventListener('change', (e) => {
@@ -48875,7 +49258,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
   });
 
   const stage = document.getElementById('magnates-bp-stage');
-  ['z2', 'z3'].forEach((lid) => {
+  ['z2', 'z3', 'z4', 'z5'].forEach((lid) => {
     const el = stage?.querySelector(`[data-bp-layer="${lid}"]`);
     if (el) {
       el.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(lid));
@@ -48887,75 +49270,128 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     }
   });
 
-  // Apply to Timeline
+  // Apply to Timeline (Supports Full Merged Flow or Independent Scene A / B / C)
   document.getElementById('btn-apply-magnates-bp-suite')?.addEventListener('click', () => {
     closeMagnatesPaperBlueprintSuite();
 
+    const isFullFlow = magnatesBPState.preset === 'full_story_flow';
+    const isBrandOnly = magnatesBPState.preset === 'brand_wavy_intro';
+    const sceneBOffset = isFullFlow ? 4.50 : 0.0;
+    const now = Date.now();
+
     const clipsImg = [];
+    const clipsTxt = [];
+
     if (magnatesBPState.bgPlateUrl) {
       clipsImg.push({
-        id: `img-bp-bg-${Date.now()}`,
+        id: `img-bp-bg-${now}`,
         url: magnatesBPState.bgPlateUrl,
         start: 0,
-        duration: magnatesBPState.bgFadeTime + 0.4,
+        duration: magnatesBPState.duration,
         scale: 1.0,
         transition: 'fade',
         transitionDuration: 0.4
       });
     }
 
-    clipsImg.push({
-      id: `img-bp-cutout-l1-${Date.now() + 1}`,
-      url: magnatesBPState.secondaryCutoutUrl,
-      start: magnatesBPState.l1InTime,
-      duration: Math.max(0.5, magnatesBPState.l1OutTime - magnatesBPState.l1InTime),
-      scale: 1.0,
-      glowColor: magnatesBPState.l1GlowColor,
-      glowIntensity: magnatesBPState.l1GlowIntensity,
-      transition: 'slide',
-      transitionDuration: 0.45
-    });
-
-    if (magnatesBPState.l2Enabled) {
+    // Scene A Clips (Brand Logo + Wavy Text)
+    if (magnatesBPState.logoEnabled && (isFullFlow || isBrandOnly)) {
       clipsImg.push({
-        id: `img-bp-cutout-l2-${Date.now() + 2}`,
-        url: magnatesBPState.primaryCutoutUrl,
-        start: magnatesBPState.l2InTime,
-        duration: Math.max(0.5, magnatesBPState.l2OutTime - magnatesBPState.l2InTime),
+        id: `img-bp-logo-${now + 1}`,
+        url: magnatesBPState.logoCutoutUrl,
+        start: magnatesBPState.logoInTime,
+        duration: Math.max(0.5, magnatesBPState.logoOutTime - magnatesBPState.logoInTime),
         scale: 1.0,
-        glowColor: magnatesBPState.l2GlowColor,
-        glowIntensity: magnatesBPState.l2GlowIntensity,
+        glowColor: magnatesBPState.logoGlowColor,
+        glowIntensity: magnatesBPState.logoGlowIntensity,
         transition: 'slide',
         transitionDuration: 0.45
       });
+
+      if (magnatesBPState.wavyTextEnabled && magnatesBPState.wavyLine1) {
+        clipsTxt.push({
+          id: `txt-bp-wavy1-${now + 2}`,
+          text: magnatesBPState.wavyLine1,
+          highlight: magnatesBPState.wavyLine1,
+          highlightColor: '#ef4444',
+          anim: 'slide',
+          fontSize: 34,
+          fontFamily: 'Montserrat, sans-serif',
+          start: magnatesBPState.logoShiftTime + 0.15,
+          duration: Math.max(0.5, magnatesBPState.logoOutTime - (magnatesBPState.logoShiftTime + 0.15))
+        });
+      }
+      if (magnatesBPState.wavyTextEnabled && magnatesBPState.wavyLine2) {
+        clipsTxt.push({
+          id: `txt-bp-wavy2-${now + 3}`,
+          text: magnatesBPState.wavyLine2,
+          highlight: magnatesBPState.wavyLine2,
+          highlightColor: '#ef4444',
+          anim: 'wave',
+          fontSize: 34,
+          fontFamily: 'Montserrat, sans-serif',
+          start: magnatesBPState.logoShiftTime + 0.68,
+          duration: Math.max(0.5, magnatesBPState.logoOutTime - (magnatesBPState.logoShiftTime + 0.68))
+        });
+      }
     }
 
-    const clipsTxt = [];
-    if (magnatesBPState.showCounter && magnatesBPState.headline) {
-      clipsTxt.push({
-        id: `txt-bp-head-${Date.now() + 3}`,
-        text: magnatesBPState.headline,
-        highlight: magnatesBPState.headline,
-        highlightColor: '#ef4444',
-        anim: 'pop',
-        fontSize: 60,
-        fontFamily: 'Montserrat, sans-serif',
-        start: 0,
-        duration: magnatesBPState.bgFadeTime
-      });
-    }
-    if (magnatesBPState.showCounter && magnatesBPState.subcaption) {
-      clipsTxt.push({
-        id: `txt-bp-sub-${Date.now() + 4}`,
-        text: magnatesBPState.subcaption,
-        highlight: '',
-        highlightColor: '#b91c1c',
-        anim: 'fade',
-        fontSize: 22,
-        fontFamily: 'Inter, sans-serif',
-        start: 0.1,
-        duration: magnatesBPState.bgFadeTime - 0.1
-      });
+    // Scene B / C Clips ($1M Counter + Cutouts)
+    if (!isBrandOnly) {
+      if (magnatesBPState.l1Enabled) {
+        clipsImg.push({
+          id: `img-bp-cutout-l1-${now + 4}`,
+          url: magnatesBPState.secondaryCutoutUrl,
+          start: sceneBOffset + magnatesBPState.l1InTime,
+          duration: Math.max(0.5, magnatesBPState.l1OutTime - magnatesBPState.l1InTime),
+          scale: 1.0,
+          glowColor: magnatesBPState.l1GlowColor,
+          glowIntensity: magnatesBPState.l1GlowIntensity,
+          transition: 'slide',
+          transitionDuration: 0.45
+        });
+      }
+
+      if (magnatesBPState.l2Enabled) {
+        clipsImg.push({
+          id: `img-bp-cutout-l2-${now + 5}`,
+          url: magnatesBPState.primaryCutoutUrl,
+          start: sceneBOffset + magnatesBPState.l2InTime,
+          duration: Math.max(0.5, magnatesBPState.l2OutTime - magnatesBPState.l2InTime),
+          scale: 1.0,
+          glowColor: magnatesBPState.l2GlowColor,
+          glowIntensity: magnatesBPState.l2GlowIntensity,
+          transition: 'slide',
+          transitionDuration: 0.45
+        });
+      }
+
+      if (magnatesBPState.showCounter && magnatesBPState.headline) {
+        clipsTxt.push({
+          id: `txt-bp-head-${now + 6}`,
+          text: magnatesBPState.headline,
+          highlight: magnatesBPState.headline,
+          highlightColor: '#ef4444',
+          anim: 'pop',
+          fontSize: 60,
+          fontFamily: 'Montserrat, sans-serif',
+          start: sceneBOffset,
+          duration: magnatesBPState.bgFadeTime
+        });
+      }
+      if (magnatesBPState.showCounter && magnatesBPState.subcaption) {
+        clipsTxt.push({
+          id: `txt-bp-sub-${now + 7}`,
+          text: magnatesBPState.subcaption,
+          highlight: '',
+          highlightColor: '#b91c1c',
+          anim: 'fade',
+          fontSize: 22,
+          fontFamily: 'Inter, sans-serif',
+          start: sceneBOffset + 0.1,
+          duration: magnatesBPState.bgFadeTime - 0.1
+        });
+      }
     }
 
     if (timelineClips && timelineClips.image && timelineClips.text) {
@@ -48965,7 +49401,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
       if (clipsImg.length > 0) selectClip(clipsImg[clipsImg.length - 1], 'image');
     }
 
-    showTextTimingAlert(`Applied Dynamic Cutout & Silhouette Scene to timeline!`, 'success');
+    showTextTimingAlert(`Applied Modular Cutout & Wavy Hook Scene to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }

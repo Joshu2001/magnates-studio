@@ -9130,6 +9130,17 @@
               <img id="magnates-bp-img-primary" src="/silhouette_sitting_phone.png" alt="Cutout Layer 2" style="height: 100%; width: auto; object-fit: contain; filter: drop-shadow(0 0 14px rgba(255,255,255,0.95)) drop-shadow(0 0 32px rgba(255,255,255,0.55));" />
             </div>
 
+            <!-- Z=4 Brand Logo Cutout Card (Scene A: Brand Hook / TEMU Intro) -->
+            <div id="magnates-bp-layer-logo" data-bp-layer="z4" style="position: absolute; left: 50%; top: 50%; width: 26%; aspect-ratio: 1/1; z-index: 14; pointer-events: auto; cursor: pointer; display: none; align-items: center; justify-content: center;">
+              <img id="magnates-bp-img-logo" src="/temu_logo_cutout.png" alt="Brand Logo Cutout" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 18px rgba(255,30,30,0.95)) drop-shadow(0 0 42px rgba(239,68,68,0.65));" />
+            </div>
+
+            <!-- Z=5 Wavy Kinetic Headline Block (Scene A: Brand Hook Lines 1 & 2) -->
+            <div id="magnates-bp-wavy-wrap" data-bp-layer="z5" style="position: absolute; left: 34%; right: 4%; top: 50%; transform: translateY(-50%); z-index: 13; pointer-events: auto; cursor: pointer; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 4px;">
+              <div id="magnates-bp-wavy-line1" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(15px, 2.35vw, 31px); font-weight: 900; color: #e11d1d; letter-spacing: 0.6px; text-transform: uppercase; line-height: 1.15; text-shadow: 0 0 22px rgba(225,29,29,0.55), 0 3px 12px rgba(0,0,0,0.9); white-space: nowrap;"></div>
+              <div id="magnates-bp-wavy-line2" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(15px, 2.35vw, 31px); font-weight: 900; color: #e11d1d; letter-spacing: 0.6px; text-transform: uppercase; line-height: 1.15; text-shadow: 0 0 22px rgba(225,29,29,0.55), 0 3px 12px rgba(0,0,0,0.9); white-space: nowrap;"></div>
+            </div>
+
             <!-- Interactive Stage Layer Hover Bounding Box & Callout Tag -->
             <div id="magnates-bp-hover-box" style="position: absolute; pointer-events: none; z-index: 24; border: 1.5px dashed rgba(56, 189, 248, 0.85); border-radius: 8px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.25); display: none;">
               <span id="magnates-bp-hover-tag" style="position: absolute; top: -22px; left: 0; background: rgba(8, 15, 30, 0.92); border: 1px solid #38bdf8; color: #38bdf8; font-family: monospace; font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap;">Z=2 // LEFT SILHOUETTE CUTOUT</span>
@@ -9199,20 +9210,57 @@
             <span id="magnates-bp-layer-count-badge" style="font-size: 9.5px; color: #a855f7; font-family: monospace;">4 Stacked</span>
           </div>
 
-          <!-- Production Scene Preset -->
-          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
-            <div style="font-size: 10.5px; font-weight: 600; color: #cbd5e1;">Production Scene Preset</div>
+          <!-- Modular Production Scene Mode (Option C: Combined or Independent) -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10.5px; font-weight: 600; color: #cbd5e1;">Modular Scene Architecture</span>
+              <span style="font-size: 9px; font-family: monospace; color: #c084fc; background: rgba(168,85,247,0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(168,85,247,0.3);">Independent / Merged</span>
+            </div>
+            <!-- Quick Segmented Scene Switcher Pills -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: #06070b; padding: 3px; border-radius: 7px; border: 1px solid rgba(255,255,255,0.07);">
+              <button type="button" class="btn-bp-scene-pill" data-preset="full_story_flow" style="font-size: 9.5px; font-weight: 700; padding: 5px 4px; border-radius: 5px; border: none; background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: #fff; cursor: pointer; white-space: nowrap;" title="Merged Full Story Sequence (Scene A -> Scene B)">Full Flow</button>
+              <button type="button" class="btn-bp-scene-pill" data-preset="brand_wavy_intro" style="font-size: 9.5px; font-weight: 600; padding: 5px 4px; border-radius: 5px; border: none; background: transparent; color: #94a3b8; cursor: pointer; white-space: nowrap;" title="Independent Scene A: Brand Logo + Wavy Text">Scene A: Logo</button>
+              <button type="button" class="btn-bp-scene-pill" data-preset="dual_silhouette" style="font-size: 9.5px; font-weight: 600; padding: 5px 4px; border-radius: 5px; border: none; background: transparent; color: #94a3b8; cursor: pointer; white-space: nowrap;" title="Independent Scene B: $1M Counter + Silhouettes">Scene B: $1M</button>
+              <button type="button" class="btn-bp-scene-pill" data-preset="room_spawn" style="font-size: 9.5px; font-weight: 600; padding: 5px 4px; border-radius: 5px; border: none; background: transparent; color: #94a3b8; cursor: pointer; white-space: nowrap;" title="Independent Scene C: Office Room Desk Glide">Scene C: Room</button>
+            </div>
             <select id="magnates-bp-select-preset" style="width: 100%; background: #08090d; border: 1px solid rgba(168,85,247,0.45); border-radius: 6px; padding: 6px 10px; color: #f8fafc; font-size: 11px; outline: none; cursor: pointer;">
-              <option value="dual_silhouette" selected>1. $1,000,000 Counter &rarr; Dual Glowing Silhouettes (Image 3)</option>
-              <option value="room_spawn">2. Empty Office Room &rarr; Desk Guy Smooth Glide Up (Image 1/2)</option>
+              <option value="full_story_flow" selected>1. Full Merged Sequence: Brand Logo Wavy Hook &rarr; $1M Silhouettes</option>
+              <option value="brand_wavy_intro">2. Scene A (Independent): Brand Logo Rise, Shift Left &amp; Wavy Text</option>
+              <option value="dual_silhouette">3. Scene B (Independent): $1,000,000 Counter &rarr; Dual Silhouettes</option>
+              <option value="room_spawn">4. Scene C (Independent): Empty Office Room &rarr; Desk Guy Smooth Glide</option>
             </select>
           </div>
 
           <!-- Active Scene Layers Stack (Like all other templates) -->
           <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
             <div style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between;">
-              <span>Scene Layer Stack (Z=0 to Z=3)</span>
+              <span>Scene Layer Stack (Z=0 to Z=5)</span>
               <span style="font-size: 9px; color: #64748b;">Hover / Click to inspect</span>
+            </div>
+
+            <!-- Z=5 Layer Row: Wavy Kinetic Headline (Scene A) -->
+            <div id="magnates-bp-row-z5" class="bp-inspector-layer-row" data-layer-id="z5" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 7px; padding: 5px 8px; cursor: pointer;">
+              <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #fb7185; background: rgba(244,63,94,0.15); padding: 2px 4px; border-radius: 4px;">Z=5</span>
+              <div style="width: 26px; height: 26px; border-radius: 4px; background: #1f0707; border: 1px solid rgba(244,63,94,0.4); display: grid; place-items: center; color: #fb7185; font-size: 9px; font-weight: 900;">WAVE</div>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span style="font-size: 10.5px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Wavy Hook Typography</span>
+                <span id="magnates-bp-sub-z5" style="font-size: 9px; color: #94a3b8;">Line 1 Glide &bull; Line 2 Wavy Rise</span>
+              </div>
+              <input type="checkbox" id="magnates-bp-toggle-wavy-text" checked style="accent-color: #f43f5e; cursor: pointer;" title="Toggle Scene A Wavy Text" />
+            </div>
+
+            <!-- Z=4 Layer Row: Brand Logo Cutout (Scene A) -->
+            <div id="magnates-bp-row-z4" class="bp-inspector-layer-row" data-layer-id="z4" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 7px; padding: 5px 8px; cursor: pointer;">
+              <span style="font-size: 9px; font-family: monospace; font-weight: 700; color: #f97316; background: rgba(249,115,22,0.15); padding: 2px 4px; border-radius: 4px;">Z=4</span>
+              <img id="magnates-bp-thumb-z4" src="/temu_logo_cutout.png" style="width: 26px; height: 26px; border-radius: 4px; object-fit: contain; background: #111; border: 1px solid rgba(255,255,255,0.1);" />
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span id="magnates-bp-label-z4" style="font-size: 10.5px; font-weight: 600; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Brand Logo Cutout (TEMU)</span>
+                <span id="magnates-bp-sub-z4" style="font-size: 9px; color: #94a3b8;">Bottom&rarr;Center &bull; Shift Left</span>
+              </div>
+              <label style="font-size: 9.5px; font-weight: 600; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer;">
+                Replace
+                <input type="file" id="magnates-bp-upload-z4" accept="image/*" style="display: none;" />
+              </label>
             </div>
 
             <!-- Z=3 Layer Row: Right / Primary Cutout -->
@@ -9267,6 +9315,50 @@
                 Replace
                 <input type="file" id="magnates-bp-upload-z0" accept="image/*" style="display: none;" />
               </label>
+            </div>
+          </div>
+
+          <!-- Scene A: Brand Logo Cutout & Wavy Typography Controls (Z=4 & Z=5) -->
+          <div id="magnates-bp-card-logo-controls" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="font-size: 10.5px; font-weight: 700; color: #f97316; display: flex; justify-content: space-between;">
+              <span>Scene A: Brand Logo &amp; Wavy Hook</span>
+              <span style="font-size: 9px; font-family: monospace; color: #94a3b8;">Z=4 &amp; Z=5</span>
+            </div>
+
+            <!-- Line 1 & Line 2 Wavy Hook Text Inputs -->
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <input type="text" id="magnates-bp-input-wavy-line1" value="ONE OF THE STRANGEST BUSINESSES" placeholder="Line 1 (Appears after logo shifts left)" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              <input type="text" id="magnates-bp-input-wavy-line2" value="ON THE INTERNET." placeholder="Line 2 (Appears with wavy form up)" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+            </div>
+
+            <!-- Timing Sliders for Logo Rise, Shift Left, and Wavy Amplitude -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Logo Rise In</span>
+                  <span id="magnates-bp-val-logo-in" style="font-family: monospace; color: #f97316;">0.35s</span>
+                </div>
+                <input type="range" id="magnates-bp-logo-in-time" min="0.05" max="1.5" step="0.05" value="0.35" style="width: 100%; accent-color: #f97316; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Shift Left + Text</span>
+                  <span id="magnates-bp-val-logo-shift" style="font-family: monospace; color: #f97316;">1.25s</span>
+                </div>
+                <input type="range" id="magnates-bp-logo-shift-time" min="0.6" max="2.5" step="0.05" value="1.25" style="width: 100%; accent-color: #f97316; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Brand Logo Glow Aura Controls (Color & Intensity) -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.08);">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <input type="color" id="magnates-bp-logo-glow-color" value="#ff1e1e" style="width: 22px; height: 22px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 0; background: none; cursor: pointer;" title="Brand Logo Glow Aura Color" />
+                <span style="font-size: 9.5px; color: #94a3b8;">Logo Glow</span>
+              </div>
+              <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
+                <input type="range" id="magnates-bp-logo-glow-intensity" min="0" max="100" step="5" value="90" style="flex: 1; accent-color: #f97316; cursor: pointer;" title="Brand Logo Glow Intensity" />
+                <span id="magnates-bp-val-logo-glow" style="font-family: monospace; font-size: 9px; color: #f97316; min-width: 26px; text-align: right;">90%</span>
+              </div>
             </div>
           </div>
 
