@@ -2874,160 +2874,6 @@
       const txt = fxc.querySelector('.tw-text'); if (txt && data.text !== undefined) txt.textContent = data.text;
       const l = fxc.querySelector('.tw-likes'); if (l && data.likes !== undefined) l.textContent = data.likes;
       const rt = fxc.querySelector('.tw-retweets'); if (rt && data.retweets !== undefined) rt.textContent = data.retweets;
-    } else if (tplId === 'google') {
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-
-      const isCinematic = (data.styleMode !== 'classic');
-      const is3D = data.is3DMode !== false;
-
-      container.innerHTML = `
-        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
-          <!-- Header -->
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">🔍</span>
-              <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.8px;">Google Search FX Suite</span>
-            </div>
-            <span style="font-size: 9px; color: #38bdf8; font-weight: 700; background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.35); padding: 2px 6px; border-radius: 4px;">${isCinematic ? '3D GLASSMORPHIC' : 'CLASSIC 2D'}</span>
-          </div>
-
-          <!-- Section 1: Visual Style Version Selector (Image 2 vs Image 1) -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Visual Style &amp; Shader</span>
-              <span style="font-size: 8.5px; color: #a855f7; font-weight: 600;">Default: 3D Documentary</span>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-              <button type="button" id="g-btn-mode-cinematic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${isCinematic ? '#38bdf8' : 'rgba(255,255,255,0.08)'}; background: ${isCinematic ? 'rgba(56,189,248,0.22)' : 'rgba(0,0,0,0.35)'}; color: ${isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
-                <span>✨ 3D Glassmorphic (Image 2)</span>
-              </button>
-              <button type="button" id="g-btn-mode-classic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${!isCinematic ? '#e2e8f0' : 'rgba(255,255,255,0.08)'}; background: ${!isCinematic ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.35)'}; color: ${!isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
-                <span>📄 Classic 2D Card (Image 1)</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 2: Search Query & Suggestions -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Query &amp; Auto-Suggestions</span>
-            
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1.5px solid rgba(56,189,248,0.5); box-shadow: inset 0 0 10px rgba(56,189,248,0.12);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #38bdf8; width: 48px; font-weight: 800;">QUERY</span>
-                <input type="text" id="g-inp-query" value="${data.query || 'how to invest in index funds'}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 600; outline: none;" placeholder="Search query..." />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; width: 48px; font-weight: 700;">SUGG 1 ★</span>
-                <input type="text" id="g-inp-sug1" value="${data.suggestion || 'top index funds for passive wealth'}" style="flex: 1; background: transparent; border: none; color: #cbd5e1; font-size: 10.5px; font-weight: 600; outline: none;" placeholder="Highlighted suggestion..." />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 2</span>
-                <input type="text" id="g-inp-sug2" value="${data.suggestion2 || 's&p 500 historical annual return'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 2..." />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 3</span>
-                <input type="text" id="g-inp-sug3" value="${data.suggestion3 || 'vanguard vs fidelity index funds'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 3..." />
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 3: 3D Spatial Tilt & Optics Controls -->
-          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3D Spatial Rig &amp; Camera Optics</span>
-              <span style="font-size: 8.5px; color: #38bdf8; font-family: monospace;">15° - 25° Tilt</span>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <div style="display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
-                  <span>Y-AXIS SPATIAL TILT</span>
-                  <span id="g-val-tilt-y" style="color: #38bdf8; font-family: monospace;">${data.tiltY !== undefined ? data.tiltY : -18}°</span>
-                </div>
-                <input type="range" id="g-slider-tilt-y" min="-45" max="45" value="${data.tiltY !== undefined ? data.tiltY : -18}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
-                  <span>X-AXIS PERSPECTIVE</span>
-                  <span id="g-val-tilt-x" style="color: #38bdf8; font-family: monospace;">${data.tiltX !== undefined ? data.tiltX : 8}°</span>
-                </div>
-                <input type="range" id="g-slider-tilt-x" min="-30" max="30" value="${data.tiltX !== undefined ? data.tiltX : 8}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
-              </div>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
-              <div>
-                <div style="font-size: 10px; font-weight: 600; color: #e2e8f0;">Dynamic Push-In &amp; f/2.8 Lens Bokeh</div>
-                <div style="font-size: 8.5px; color: #94a3b8;">Focused entry pin-sharp, ambient elements blur gracefully</div>
-              </div>
-              <span style="font-size: 9px; color: #22c55e; font-weight: 700; background: rgba(34,197,94,0.18); padding: 2px 6px; border-radius: 4px;">ACTIVE</span>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // Event Wireups
-      const syncButtons = () => {
-        const pVid = document.getElementById('btn-paper-rip-mode-video');
-        const p3D = document.getElementById('btn-paper-rip-mode-3d');
-        if (pVid && p3D) {
-          const mode3d = (topCustomizerState.paperPreviewMode === '3d' || topCustomizerState.is3DMode);
-          pVid.style.background = !mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
-          pVid.style.color = !mode3d ? '#fff' : '#94a3b8';
-          p3D.style.background = mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
-          p3D.style.color = mode3d ? '#fff' : '#94a3b8';
-        }
-      };
-
-      container.querySelector('#g-btn-mode-cinematic')?.addEventListener('click', () => {
-        topCustomizerState.paperPreviewMode = '3d';
-        topCustomizerState.is3DMode = true;
-        window.tplSetContextualData('google', { styleMode: 'cinematic', is3DMode: true });
-        window.tplRenderContextualInspector('google');
-        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
-        syncButtons();
-      });
-
-      container.querySelector('#g-btn-mode-classic')?.addEventListener('click', () => {
-        topCustomizerState.paperPreviewMode = 'video';
-        topCustomizerState.is3DMode = false;
-        window.tplSetContextualData('google', { styleMode: 'classic', is3DMode: false });
-        window.tplRenderContextualInspector('google');
-        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
-        syncButtons();
-      });
-
-      container.querySelector('#g-inp-query')?.addEventListener('input', (e) => {
-        window.tplSetContextualData('google', { query: e.target.value });
-      });
-      container.querySelector('#g-inp-sug1')?.addEventListener('input', (e) => {
-        window.tplSetContextualData('google', { suggestion: e.target.value });
-      });
-      container.querySelector('#g-inp-sug2')?.addEventListener('input', (e) => {
-        window.tplSetContextualData('google', { suggestion2: e.target.value });
-      });
-      container.querySelector('#g-inp-sug3')?.addEventListener('input', (e) => {
-        window.tplSetContextualData('google', { suggestion3: e.target.value });
-      });
-
-      container.querySelector('#g-slider-tilt-y')?.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        const valEl = container.querySelector('#g-val-tilt-y');
-        if (valEl) valEl.textContent = `${val}°`;
-        window.tplSetContextualData('google', { tiltY: val });
-        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
-      });
-
-      container.querySelector('#g-slider-tilt-x')?.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        const valEl = container.querySelector('#g-val-tilt-x');
-        if (valEl) valEl.textContent = `${val}°`;
-        window.tplSetContextualData('google', { tiltX: val });
-        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
-      });
-
-      return;
     } else if (tplId === 'kinetic') {
       if (wrapSec) wrapSec.style.display = 'none';
       if (wrapText) wrapText.style.display = 'none';
@@ -4010,6 +3856,165 @@
     // =========================================================================
     // CASE 1: DEPTH PARALLAX MULTI-LAYER (Image 1)
     // =========================================================================
+    // =========================================================================
+    // GOOGLE SEARCH FX SUITE (3D Glassmorphic & Classic 2D Card)
+    // =========================================================================
+    if (tplId === 'google') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+
+      const isCinematic = (data.styleMode !== 'classic');
+      const is3D = data.is3DMode !== false;
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">🔍</span>
+              <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.8px;">Google Search FX Suite</span>
+            </div>
+            <span style="font-size: 9px; color: #38bdf8; font-weight: 700; background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.35); padding: 2px 6px; border-radius: 4px;">${isCinematic ? '3D GLASSMORPHIC' : 'CLASSIC 2D'}</span>
+          </div>
+
+          <!-- Section 1: Visual Style Version Selector (Image 2 vs Image 1) -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Visual Style &amp; Shader</span>
+              <span style="font-size: 8.5px; color: #a855f7; font-weight: 600;">Default: 3D Documentary</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" id="g-btn-mode-cinematic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${isCinematic ? '#38bdf8' : 'rgba(255,255,255,0.08)'}; background: ${isCinematic ? 'rgba(56,189,248,0.22)' : 'rgba(0,0,0,0.35)'}; color: ${isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
+                <span>✨ 3D Glassmorphic (Image 2)</span>
+              </button>
+              <button type="button" id="g-btn-mode-classic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${!isCinematic ? '#e2e8f0' : 'rgba(255,255,255,0.08)'}; background: ${!isCinematic ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.35)'}; color: ${!isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
+                <span>📄 Classic 2D Card (Image 1)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 2: Search Query & Suggestions -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Query &amp; Auto-Suggestions</span>
+            
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1.5px solid rgba(56,189,248,0.5); box-shadow: inset 0 0 10px rgba(56,189,248,0.12);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #38bdf8; width: 48px; font-weight: 800;">QUERY</span>
+                <input type="text" id="g-inp-query" value="${data.query || 'how to invest in index funds'}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 600; outline: none;" placeholder="Search query..." />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; width: 48px; font-weight: 700;">SUGG 1 ★</span>
+                <input type="text" id="g-inp-sug1" value="${data.suggestion || 'top index funds for passive wealth'}" style="flex: 1; background: transparent; border: none; color: #cbd5e1; font-size: 10.5px; font-weight: 600; outline: none;" placeholder="Highlighted suggestion..." />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 2</span>
+                <input type="text" id="g-inp-sug2" value="${data.suggestion2 || 's&p 500 historical annual return'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 2..." />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 3</span>
+                <input type="text" id="g-inp-sug3" value="${data.suggestion3 || 'vanguard vs fidelity index funds'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 3..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: 3D Spatial Tilt & Optics Controls -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3D Spatial Rig &amp; Camera Optics</span>
+              <span style="font-size: 8.5px; color: #38bdf8; font-family: monospace;">15° - 25° Tilt</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>Y-AXIS SPATIAL TILT</span>
+                  <span id="g-val-tilt-y" style="color: #38bdf8; font-family: monospace;">${data.tiltY !== undefined ? data.tiltY : -18}°</span>
+                </div>
+                <input type="range" id="g-slider-tilt-y" min="-45" max="45" value="${data.tiltY !== undefined ? data.tiltY : -18}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>X-AXIS PERSPECTIVE</span>
+                  <span id="g-val-tilt-x" style="color: #38bdf8; font-family: monospace;">${data.tiltX !== undefined ? data.tiltX : 8}°</span>
+                </div>
+                <input type="range" id="g-slider-tilt-x" min="-30" max="30" value="${data.tiltX !== undefined ? data.tiltX : 8}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
+              <div>
+                <div style="font-size: 10px; font-weight: 600; color: #e2e8f0;">Dynamic Push-In &amp; f/2.8 Lens Bokeh</div>
+                <div style="font-size: 8.5px; color: #94a3b8;">Focused entry pin-sharp, ambient elements blur gracefully</div>
+              </div>
+              <span style="font-size: 9px; color: #22c55e; font-weight: 700; background: rgba(34,197,94,0.18); padding: 2px 6px; border-radius: 4px;">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event Wireups
+      const syncButtons = () => {
+        const pVid = document.getElementById('btn-paper-rip-mode-video');
+        const p3D = document.getElementById('btn-paper-rip-mode-3d');
+        if (pVid && p3D) {
+          const mode3d = (topCustomizerState.paperPreviewMode === '3d' || topCustomizerState.is3DMode);
+          pVid.style.background = !mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          pVid.style.color = !mode3d ? '#fff' : '#94a3b8';
+          p3D.style.background = mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          p3D.style.color = mode3d ? '#fff' : '#94a3b8';
+        }
+      };
+
+      container.querySelector('#g-btn-mode-cinematic')?.addEventListener('click', () => {
+        topCustomizerState.paperPreviewMode = '3d';
+        topCustomizerState.is3DMode = true;
+        window.tplSetContextualData('google', { styleMode: 'cinematic', is3DMode: true });
+        window.tplRenderContextualInspector('google');
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        syncButtons();
+      });
+
+      container.querySelector('#g-btn-mode-classic')?.addEventListener('click', () => {
+        topCustomizerState.paperPreviewMode = 'video';
+        topCustomizerState.is3DMode = false;
+        window.tplSetContextualData('google', { styleMode: 'classic', is3DMode: false });
+        window.tplRenderContextualInspector('google');
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        syncButtons();
+      });
+
+      container.querySelector('#g-inp-query')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { query: e.target.value });
+      });
+      container.querySelector('#g-inp-sug1')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { suggestion: e.target.value });
+      });
+      container.querySelector('#g-inp-sug2')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { suggestion2: e.target.value });
+      });
+      container.querySelector('#g-inp-sug3')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { suggestion3: e.target.value });
+      });
+
+      container.querySelector('#g-slider-tilt-y')?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#g-val-tilt-y');
+        if (valEl) valEl.textContent = `${val}°`;
+        window.tplSetContextualData('google', { tiltY: val });
+        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
+      });
+
+      container.querySelector('#g-slider-tilt-x')?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#g-val-tilt-x');
+        if (valEl) valEl.textContent = `${val}°`;
+        window.tplSetContextualData('google', { tiltX: val });
+        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
+      });
+
+      return;
+    }
+
     if (tplId === 'quote') {
       const palettes = [
         { id: 'parchment', name: 'Warm Parchment', bg: 'linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 100%)', text: '#3a2418', author: '#8b5a3c', mark: 'rgba(139, 90, 60, 0.16)' },

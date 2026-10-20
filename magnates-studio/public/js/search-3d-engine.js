@@ -397,7 +397,7 @@
     searchScene.fog = new THREE.FogExp2(0x04060a, 0.0018);
 
     searchCamera = new THREE.PerspectiveCamera(36, width / height, 1, 3000);
-    searchCamera.position.set(-65, 20, 520);
+    searchCamera.position.set(-45, 12, 430);
     searchCamera.lookAt(0, 0, 0);
 
     // 2. WebGL Renderer
@@ -495,8 +495,8 @@
     searchCardTexture.magFilter = THREE.LinearFilter;
     searchCardTexture.anisotropy = searchRenderer.capabilities.getMaxAnisotropy();
 
-    // 3D Glass Plane Dimensions
-    const cardGeo = new THREE.PlaneGeometry(280, 208);
+    // 3D Glass Plane Dimensions (Slightly larger for cinematic gold-standard presence)
+    const cardGeo = new THREE.PlaneGeometry(350, 260);
     const cardMat = new THREE.MeshStandardMaterial({
       map: searchCardTexture,
       transparent: true,
@@ -548,8 +548,8 @@
         searchControls.update();
       } else if (searchCamera) {
         // Default subtle cinematic camera drift if user is not actively orbiting
-        searchCamera.position.z = 520 - pushFactor * 35;
-        searchCamera.position.x = -65 + pushFactor * 15;
+        searchCamera.position.z = 430 - pushFactor * 30;
+        searchCamera.position.x = -45 + pushFactor * 12;
       }
 
       // Specular ray pulse
