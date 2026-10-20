@@ -48561,6 +48561,49 @@ function highlightMagnatesBPLayerOnStage(layerId) {
   hoverTag.textContent = titles[layerId] || layerId.toUpperCase();
 }
 
+function selectMagnatesBPLayer(layerId) {
+  if (!layerId) return;
+  magnatesBPState.selectedLayer = layerId;
+
+  // 1. Highlight Inspector layer stack row
+  const rows = document.querySelectorAll('.bp-inspector-layer-row');
+  rows.forEach((r) => {
+    const active = r.getAttribute('data-layer-id') === layerId;
+    r.style.background = active ? 'rgba(168,85,247,0.16)' : 'rgba(255,255,255,0.03)';
+    r.style.borderColor = active ? 'rgba(168,85,247,0.55)' : 'rgba(255,255,255,0.07)';
+    r.style.boxShadow = active ? '0 0 12px rgba(168,85,247,0.2)' : 'none';
+  });
+
+  // 2. Highlight and scroll the corresponding Cutout motion card into view
+  const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
+  const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
+  
+  if (layerId === 'z2' && cardL1) {
+    cardL1.style.borderColor = 'rgba(56, 189, 248, 0.65)';
+    cardL1.style.background = 'rgba(56, 189, 248, 0.06)';
+    cardL1.style.boxShadow = '0 0 16px rgba(56, 189, 248, 0.15)';
+    cardL1.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (cardL2) {
+      cardL2.style.borderColor = 'rgba(255,255,255,0.06)';
+      cardL2.style.background = 'rgba(255,255,255,0.02)';
+      cardL2.style.boxShadow = 'none';
+    }
+  } else if (layerId === 'z3' && cardL2) {
+    cardL2.style.borderColor = 'rgba(192, 132, 252, 0.65)';
+    cardL2.style.background = 'rgba(168, 85, 247, 0.06)';
+    cardL2.style.boxShadow = '0 0 16px rgba(168, 85, 247, 0.15)';
+    cardL2.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (cardL1) {
+      cardL1.style.borderColor = 'rgba(255,255,255,0.06)';
+      cardL1.style.background = 'rgba(255,255,255,0.02)';
+      cardL1.style.boxShadow = 'none';
+    }
+  }
+
+  // 3. Highlight boundary box on stage
+  highlightMagnatesBPLayerOnStage(layerId);
+}
+
 function bindMagnatesPaperBlueprintSuiteModalControls() {
   document.getElementById('btn-close-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
   document.getElementById('btn-cancel-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
@@ -48740,13 +48783,7 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     row.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(layerId));
     row.addEventListener('mouseleave', () => highlightMagnatesBPLayerOnStage(null));
     row.addEventListener('click', () => {
-      magnatesBPState.selectedLayer = layerId;
-      rows.forEach((r) => {
-        const active = r.getAttribute('data-layer-id') === layerId;
-        r.style.background = active ? 'rgba(168,85,247,0.12)' : 'rgba(255,255,255,0.03)';
-        r.style.borderColor = active ? 'rgba(168,85,247,0.45)' : 'rgba(255,255,255,0.07)';
-      });
-      highlightMagnatesBPLayerOnStage(layerId);
+      selectMagnatesBPLayer(layerId);
     });
   });
 
@@ -48756,6 +48793,10 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     if (el) {
       el.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(lid));
       el.addEventListener('mouseleave', () => highlightMagnatesBPLayerOnStage(null));
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectMagnatesBPLayer(lid);
+      });
     }
   });
 
