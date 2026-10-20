@@ -48049,6 +48049,8 @@ let magnatesBPState = {
   l2GlowIntensity: 85,
   // Z=0 Background plate & fade out timing
   bgPlateUrl: "",
+  backdropColor: "#991b1b",
+  backdropSpread: 75,
   bgFadeTime: 4.45,
   animFrameId: null,
   lastTimestamp: null
@@ -48057,6 +48059,8 @@ let magnatesBPState = {
 const MAGNATES_BP_PRESETS = {
   dual_silhouette: {
     bgPlateUrl: "",
+    backdropColor: "#991b1b",
+    backdropSpread: 75,
     secondaryCutoutUrl: "/silhouette_standing_phone.png",
     primaryCutoutUrl: "/silhouette_sitting_phone.png",
     l2Enabled: true,
@@ -48083,6 +48087,8 @@ const MAGNATES_BP_PRESETS = {
   },
   room_spawn: {
     bgPlateUrl: "/room_empty_plate.png",
+    backdropColor: "#1e293b",
+    backdropSpread: 60,
     secondaryCutoutUrl: "/laptop_guy_cutout.png",
     primaryCutoutUrl: "/silhouette_sitting_phone.png",
     l2Enabled: false,
@@ -48243,11 +48249,36 @@ function updateMagnatesBPVisualStyles() {
     thumbZ3.src = magnatesBPState.primaryCutoutUrl;
   }
 
-  // Z=0 Background Plate vs Crimson Radial Atmosphere + Fade-out at end
-  const isRoomScene = magnatesBPState.preset === 'room_spawn';
-  if (crimsonBg) crimsonBg.style.display = isRoomScene ? 'none' : 'block';
+  // Z=0 Background Plate vs Radial Glow Atmosphere + Fade-out at end
+  const hasBgPlate = Boolean(magnatesBPState.bgPlateUrl);
+  const bgColor = magnatesBPState.backdropColor || '#991b1b';
+  const bgSpread = magnatesBPState.backdropSpread || 75;
+
+  if (crimsonBg) {
+    crimsonBg.style.display = hasBgPlate ? 'none' : 'block';
+    if (!hasBgPlate) {
+      const c1 = bpHexToRgba(bgColor, 0.88);
+      const c2 = bpHexToRgba(bgColor, 0.62);
+      const c3 = bpHexToRgba(bgColor, 0.25);
+      crimsonBg.style.background = `radial-gradient(circle at 20% 25%, ${c1} 0%, ${c2} ${Math.round(bgSpread * 0.45)}%, ${c3} ${bgSpread}%, #070101 100%)`;
+    }
+  }
+
+  // Update Inspector Z=0 thumbnail
+  const thumbZ0 = document.getElementById('magnates-bp-thumb-z0');
+  if (thumbZ0) {
+    if (hasBgPlate) {
+      thumbZ0.style.backgroundImage = `url(${magnatesBPState.bgPlateUrl})`;
+      thumbZ0.style.backgroundSize = 'cover';
+      thumbZ0.style.backgroundPosition = 'center';
+    } else {
+      thumbZ0.style.backgroundImage = 'none';
+      thumbZ0.style.background = `radial-gradient(circle, ${bgColor}, #090101)`;
+    }
+  }
+
   if (bgPlateImg) {
-    if (magnatesBPState.bgPlateUrl) {
+    if (hasBgPlate) {
       bgPlateImg.style.display = 'block';
       if (bgPlateImg.getAttribute('src') !== magnatesBPState.bgPlateUrl) {
         bgPlateImg.src = magnatesBPState.bgPlateUrl;
@@ -48422,6 +48453,8 @@ function applyMagnatesBPPresetToState(pKey) {
   if (!pData) return;
   magnatesBPState.preset = pKey;
   magnatesBPState.bgPlateUrl = pData.bgPlateUrl;
+  magnatesBPState.backdropColor = pData.backdropColor || '#991b1b';
+  magnatesBPState.backdropSpread = pData.backdropSpread || 75;
   magnatesBPState.secondaryCutoutUrl = pData.secondaryCutoutUrl;
   magnatesBPState.primaryCutoutUrl = pData.primaryCutoutUrl;
   magnatesBPState.l2Enabled = pData.l2Enabled;
@@ -48476,6 +48509,10 @@ function applyMagnatesBPPresetToState(pKey) {
   setVal('magnates-bp-input-subcaption', pData.subcaption);
   setVal('magnates-bp-bg-fade-time', pData.bgFadeTime);
   setTxt('magnates-bp-val-bg-fade', `Fade @ ${pData.bgFadeTime.toFixed(2)}s`);
+  setVal('magnates-bp-backdrop-color', magnatesBPState.backdropColor);
+  setVal('magnates-bp-backdrop-color-quick', magnatesBPState.backdropColor);
+  setVal('magnates-bp-backdrop-spread', magnatesBPState.backdropSpread);
+  setTxt('magnates-bp-val-backdrop-spread', `${magnatesBPState.backdropSpread}%`);
 
   const chkCounter = document.getElementById('magnates-bp-toggle-counter');
   if (chkCounter) chkCounter.checked = pData.showCounter;
@@ -48598,6 +48635,14 @@ function selectMagnatesBPLayer(layerId) {
       cardL1.style.background = 'rgba(255,255,255,0.02)';
       cardL1.style.boxShadow = 'none';
     }
+  } else if (layerId === 'z0') {
+    const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
+    if (cardZ0) {
+      cardZ0.style.borderColor = 'rgba(16, 185, 129, 0.65)';
+      cardZ0.style.background = 'rgba(16, 185, 129, 0.06)';
+      cardZ0.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.15)';
+      cardZ0.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
   // 3. Highlight boundary box on stage
@@ -48713,6 +48758,48 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     if (lbl) lbl.textContent = `${magnatesBPState.l2OutTime.toFixed(2)}s`;
     updateMagnatesBPVisualStyles();
   });
+
+  // Backdrop Color & Atmosphere Listeners (Z=0)
+  const onBackdropColorChange = (newColor) => {
+    magnatesBPState.backdropColor = newColor;
+    magnatesBPState.bgPlateUrl = ""; // switch to radial glow mode
+    const inCol1 = document.getElementById('magnates-bp-backdrop-color');
+    const inCol2 = document.getElementById('magnates-bp-backdrop-color-quick');
+    if (inCol1) inCol1.value = newColor;
+    if (inCol2) inCol2.value = newColor;
+    updateMagnatesBPVisualStyles();
+  };
+
+  document.getElementById('magnates-bp-backdrop-color')?.addEventListener('input', (e) => onBackdropColorChange(e.target.value));
+  document.getElementById('magnates-bp-backdrop-color-quick')?.addEventListener('input', (e) => onBackdropColorChange(e.target.value));
+
+  document.querySelectorAll('.btn-bp-bg-swatch').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const col = btn.getAttribute('data-bg-color');
+      if (col) onBackdropColorChange(col);
+    });
+  });
+
+  document.getElementById('magnates-bp-backdrop-spread')?.addEventListener('input', (e) => {
+    magnatesBPState.backdropSpread = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-backdrop-spread');
+    if (lbl) lbl.textContent = `${magnatesBPState.backdropSpread}%`;
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('btn-magnates-bp-reset-bg-color')?.addEventListener('click', () => {
+    magnatesBPState.bgPlateUrl = "";
+    updateMagnatesBPVisualStyles();
+  });
+
+  const onUploadBackdropImage = (file) => {
+    if (!file) return;
+    magnatesBPState.bgPlateUrl = URL.createObjectURL(file);
+    updateMagnatesBPVisualStyles();
+  };
+  document.getElementById('magnates-bp-upload-z0')?.addEventListener('change', (e) => onUploadBackdropImage(e.target.files?.[0]));
+  document.getElementById('magnates-bp-upload-z0-card')?.addEventListener('change', (e) => onUploadBackdropImage(e.target.files?.[0]));
 
   // Cutout 1 Glow Aura Listeners
   document.getElementById('magnates-bp-l1-glow-color')?.addEventListener('input', (e) => {
