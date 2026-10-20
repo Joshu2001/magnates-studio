@@ -9226,6 +9226,34 @@
                 <img id="magnates-bp-img-globe" src="/globe_atlantic_clean.svg" alt="Spinning Earth Globe" style="width: 100%; height: 100%; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 -8px 28px rgba(255, 255, 255, 0.22)) drop-shadow(0 12px 35px rgba(0, 0, 0, 0.9)); will-change: transform;" />
               </div>
 
+              <!-- Scene 5 / Phase 2: Boardroom Office Photo (Instant cut, starts zoomed in scale ~2.2x then tracks back & zooms out) -->
+              <div id="magnates-bp-layer-office" data-bp-layer="z12" style="position: absolute; inset: 0; z-index: 17; pointer-events: auto; cursor: pointer; display: none; overflow: hidden; will-change: transform, opacity;">
+                <img id="magnates-bp-img-office" src="/temu_boardroom_office.png" alt="Temu Boardroom Office" style="width: 100%; height: 100%; object-fit: cover; transform-origin: 34% 28%; will-change: transform;" />
+              </div>
+
+              <!-- Scene 5 / Phase 1: Transparent Article Headline & Kinetic Red Marker Highlight (Background removed, sits on dark red backdrop) -->
+              <div id="magnates-bp-layer-article" data-bp-layer="z10" style="position: absolute; left: 8%; right: 8%; top: 12%; z-index: 18; pointer-events: auto; cursor: pointer; display: none; flex-direction: column; gap: 4px; will-change: transform, opacity;">
+                <div id="magnates-bp-article-kicker" style="font-family: 'Georgia', 'Merriweather', 'Times New Roman', serif; font-size: clamp(10px, 1.35vw, 16px); color: #9ca3af; font-weight: 600; letter-spacing: 0.3px;">Global Business</div>
+                <div style="font-family: 'Georgia', 'Merriweather', 'Times New Roman', serif; font-size: clamp(18px, 3.1vw, 40px); font-weight: 700; color: #f3f4f6; line-height: 1.15; letter-spacing: -0.3px;">
+                  <span id="magnates-bp-article-line1">Temu Emerges as the Biggest</span><br />
+                  <span style="position: relative; display: inline-block;">
+                    <span id="magnates-bp-article-highlight" style="position: absolute; left: -4px; top: 0px; bottom: 0px; width: 0%; background: rgba(185, 28, 28, 0.88); border-radius: 4px; z-index: 1; pointer-events: none; transition: none; box-shadow: 0 0 16px rgba(220,38,38,0.5);"></span>
+                    <span id="magnates-bp-article-line2" style="position: relative; z-index: 2;">Shopping App in the U.S.</span>
+                  </span>
+                </div>
+                <div id="magnates-bp-article-sub" style="font-family: 'Georgia', 'Merriweather', serif; font-size: clamp(8px, 1.05vw, 13px); color: #9ca3af; line-height: 1.35; margin-top: 6px; max-width: 680px;">
+                  Affordable prices, a vast product range and a seamless shopping experience helped Temu rise to the top of the U.S. shopping app market.
+                </div>
+                <div id="magnates-bp-article-body" style="font-family: 'Georgia', 'Merriweather', serif; font-size: clamp(7.5px, 0.95vw, 12px); color: #6b7280; line-height: 1.35; margin-top: 4px; max-width: 700px;">
+                  Temu, the Chinese e-commerce platform, has quickly become the most popular shopping app in the United States, surpassing long-established rivals with its combination of low prices, a massive product selection and a smooth, app-first shopping experience.
+                </div>
+              </div>
+
+              <!-- Scene 5: Capitol Building Cutout (Rises Bottom->Up to apex as Highlight sweeps, holds on instant cut, then exits down during Office Zoom-Out) -->
+              <div id="magnates-bp-layer-capitol" data-bp-layer="z11" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 62%; z-index: 19; pointer-events: auto; cursor: pointer; display: none; align-items: flex-end; justify-content: center; will-change: transform, opacity;">
+                <img id="magnates-bp-img-capitol" src="/capitol_dome_cutout.png" alt="U.S. Capitol Building Dome" style="width: 100%; height: 100%; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 -6px 20px rgba(0,0,0,0.85)); will-change: transform;" />
+              </div>
+
               <!-- Z=9 Globe Wavy-to-Flat Headline ("FOR ALMOST NOTHING.") -->
               <div id="magnates-bp-layer-globe-text" data-bp-layer="z9" style="position: absolute; left: 6%; right: 6%; top: 38.5%; transform: translateY(-50%); z-index: 16; pointer-events: auto; cursor: pointer; display: none; align-items: center; justify-content: center; text-align: center; will-change: transform, opacity;">
                 <div id="magnates-bp-globe-headline" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(20px, 3.6vw, 46px); font-weight: 900; color: #f20d0d; letter-spacing: 0.8px; text-transform: uppercase; line-height: 1.1; text-shadow: 0 0 24px rgba(239, 20, 20, 0.65), 0 4px 14px rgba(0,0,0,0.9); white-space: nowrap;"></div>
@@ -9401,6 +9429,16 @@
                 </div>
               </div>
 
+              <!-- Scene 5 Card: Article Highlight, Capitol Rise & Office Zoom-Out -->
+              <div class="bp-storyboard-scene-card" data-scene-card="article_capitol_zoom" data-jump-time="14.8" style="display: flex; align-items: center; gap: 10px; min-width: 215px; padding: 8px 11px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.15s;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">5</span>
+                <img src="/capitol_dome_cutout.png" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; background: #1a0505; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-size: 11px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 5: Capitol &amp; Temu Office</div>
+                  <div style="font-size: 9px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Highlight &rarr; Instant Cut &rarr; Zoom-Out</div>
+                </div>
+              </div>
+
               <!-- + Add Scene Button Card (Matches Image 4) -->
               <button type="button" id="btn-magnates-bp-add-scene" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 135px; height: 54px; padding: 6px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.16); color: #cbd5e1; cursor: pointer; transition: all 0.15s; flex-shrink: 0;" title="Cycle or Add Scene into Merged Sequence">
                 <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #f8fafc;">+</div>
@@ -9432,6 +9470,42 @@
                 + ADD LAYER
                 <input type="file" id="magnates-bp-add-extra-layer-input" accept="image/*" style="display: none;" />
               </label>
+            </div>
+
+            <!-- Z=12 Layer Row: Temu Boardroom Office Photo (Zoom-Out Trackback) -->
+            <div id="magnates-bp-row-z12" class="bp-inspector-layer-row" data-layer-id="z12" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <img id="magnates-bp-thumb-z12" src="/temu_boardroom_office.png" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; background: #0c192c; border: 1px solid rgba(249,115,22,0.35); flex-shrink: 0;" />
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span id="magnates-bp-label-z12" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Boardroom Office Photo</span>
+                <span id="magnates-bp-sub-z12" style="font-size: 9.5px; color: #64748b;">Instant Cut &bull; Scale 2.2x &rarr; 1.0x Zoom-Out</span>
+              </div>
+              <label style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                Replace
+                <input type="file" id="magnates-bp-input-file-office" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+
+            <!-- Z=11 Layer Row: Capitol Building Cutout (Bottom->Up -> Down) -->
+            <div id="magnates-bp-row-z11" class="bp-inspector-layer-row" data-layer-id="z11" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <img id="magnates-bp-thumb-z11" src="/capitol_dome_cutout.png" style="width: 30px; height: 30px; border-radius: 6px; object-fit: cover; background: #1a0505; border: 1px solid rgba(56,189,248,0.35); flex-shrink: 0;" />
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span id="magnates-bp-label-z11" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">U.S. Capitol Dome Cutout</span>
+                <span id="magnates-bp-sub-z11" style="font-size: 9.5px; color: #64748b;">In: Bottom&rarr;Up &bull; Hold &bull; Out: Down</span>
+              </div>
+              <label style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                Replace
+                <input type="file" id="magnates-bp-input-file-capitol" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+
+            <!-- Z=10 Layer Row: Transparent Article Headline & Red Highlight -->
+            <div id="magnates-bp-row-z10" class="bp-inspector-layer-row" data-layer-id="z10" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <div style="width: 30px; height: 30px; border-radius: 6px; background: #3b0707; border: 1px solid rgba(239,68,68,0.5); display: grid; place-items: center; color: #fca5a5; font-size: 8.5px; font-weight: 900; flex-shrink: 0;">NEWS</div>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span id="magnates-bp-label-z10" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Article Headline &amp; Highlight</span>
+                <span id="magnates-bp-sub-z10" style="font-size: 9.5px; color: #64748b;">Transparent BG &bull; Red Marker Sweep</span>
+              </div>
+              <input type="checkbox" id="magnates-bp-toggle-scene5" checked style="accent-color: #f43f5e; cursor: pointer;" title="Toggle Scene 5 Article & Capitol Suite" />
             </div>
 
             <!-- Z=9 Layer Row: Globe Wavy-to-Flat Headline ("FOR ALMOST NOTHING.") -->
@@ -9738,6 +9812,80 @@
           </div>
 
           <!-- Scene 3: Spinning Earth Globe & Wavy-to-Flat Headline Controls (Z=8 & Z=9) -->
+          <!-- Scene 5: Article Headline, Transparent BG, Red Highlight & Capitol Building Controls (Z=10, Z=11, Z=12) -->
+          <div id="magnates-bp-card-scene5-controls" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 10.5px; font-weight: 700; color: #f43f5e;">Scene 5: Article Highlight &amp; Capitol Zoom</span>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 9px; font-family: monospace; color: #94a3b8;">Z=10, 11, 12</span>
+                <input type="checkbox" id="magnates-bp-toggle-s5-active" checked style="accent-color: #f43f5e; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Custom Article Screenshot Upload + Background Removal Toggle -->
+            <div style="background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 7px 9px; display: flex; flex-direction: column; gap: 5px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 9.5px; font-weight: 700; color: #fda4af;">Screenshot / Article Source</span>
+                <label style="font-size: 9px; color: #38bdf8; cursor: pointer; text-decoration: underline;">
+                  Upload Custom Screenshot
+                  <input type="file" id="magnates-bp-input-custom-screenshot" accept="image/*" style="display: none;" />
+                </label>
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; font-size: 9.5px; color: #cbd5e1;">
+                <span>Remove Screenshot Background (Transparent Article)</span>
+                <input type="checkbox" id="magnates-bp-check-remove-bg" checked style="accent-color: #f43f5e; cursor: pointer;" title="Strips white/solid paper backdrop so only text floats on dark red background" />
+              </div>
+            </div>
+
+            <!-- Editable Headline Lines -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div>
+                <label style="font-size: 9px; color: #94a3b8; display: block; margin-bottom: 2px;">Line 1 (Top Title)</label>
+                <input type="text" id="magnates-bp-input-article-line1" value="Temu Emerges as the Biggest" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 4px 6px; color: #fff; font-size: 10px; outline: none;" />
+              </div>
+              <div>
+                <label style="font-size: 9px; color: #94a3b8; display: block; margin-bottom: 2px;">Line 2 (Highlighted)</label>
+                <input type="text" id="magnates-bp-input-article-line2" value="Shopping App in the U.S." style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 5px; padding: 4px 6px; color: #ff4d4d; font-weight: 700; font-size: 10px; outline: none;" />
+              </div>
+            </div>
+
+            <!-- Kinetic Marker Highlight Speed & Color -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>Highlight Sweep Speed</span>
+                  <span id="magnates-bp-val-highlight-speed" style="font-family: monospace; color: #f43f5e;">0.75s</span>
+                </div>
+                <input type="range" id="magnates-bp-slider-highlight-speed" min="0.3" max="2.0" step="0.05" value="0.75" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>Marker Color &amp; Opacity</span>
+                  <input type="color" id="magnates-bp-color-highlight" value="#b91c1c" style="width: 18px; height: 16px; border: 1px solid rgba(255,255,255,0.2); border-radius: 3px; padding: 0; background: none; cursor: pointer;" />
+                </div>
+                <input type="range" id="magnates-bp-slider-highlight-op" min="40" max="100" step="5" value="88" style="width: 100%; accent-color: #f43f5e; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Capitol Rise Height & Office Zoom-Out Duration -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>Capitol Peak Apex</span>
+                  <span id="magnates-bp-val-capitol-apex" style="font-family: monospace; color: #38bdf8;">52%</span>
+                </div>
+                <input type="range" id="magnates-bp-slider-capitol-apex" min="35" max="75" step="1" value="52" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" title="Adjusts how high the Capitol building rises below the text" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>Office Zoom-Out Track</span>
+                  <span id="magnates-bp-val-zoomout-dur" style="font-family: monospace; color: #f97316;">1.40s</span>
+                </div>
+                <input type="range" id="magnates-bp-slider-zoomout-dur" min="0.6" max="3.0" step="0.1" value="1.40" style="width: 100%; accent-color: #f97316; cursor: pointer;" />
+              </div>
+            </div>
+          </div>
+
           <div id="magnates-bp-card-globe-controls" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
               <span style="font-size: 10.5px; font-weight: 700; color: #34d399;">Scene 3: Spinning Globe &amp; Wavy Text</span>
@@ -10487,6 +10635,207 @@
         </div>
 
       </div>
+    </div>
+  </div>
+
+
+  <!-- Interactive Cinematic Portrait Studio & Face-Tracked DOF Calibrator Modal -->
+  <div id="modal-creator-cinematic-suite" class="vector-export-modal" style="display: none; align-items: center; justify-content: center; z-index: 100010; backdrop-filter: blur(14px); background: rgba(5,6,12,0.95); padding: 18px 24px; overflow-y: auto;">
+    <div class="vector-modal-box" style="display: flex; flex-direction: column; gap: 14px; max-width: 1340px; width: 95vw; max-height: 94vh; position: relative; background: #090a10; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), 0 0 1px 1px rgba(255,255,255,0.05); padding: 20px 24px; overflow: hidden;">
+      
+      <!-- Minimalist Header Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); flex-shrink: 0; width: 100%;">
+        <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+          <div style="width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #0284c7, #38bdf8); display: flex; align-items: center; justify-content: center; color: #fff;">
+            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px;">Cinematic Studio &amp; Face-Tracked Background Calibration</h3>
+            <span style="font-size: 10px; color: #38bdf8; font-family: monospace; font-weight: 600;">CALIBRATABLE DOF BLUR &bull; LIGHTING COLOR GRADE &bull; EDGE-LOCK PROTECTION BRUSH</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-cancel-creator-cinematic-suite" style="padding: 7px 14px; font-size: 11.5px; font-weight: 600; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s;">
+            <span style="display: flex; align-items: center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #fff; font-size: 9px; font-weight: 800;">&#x2605;</span>
+            <span>Turn into Template</span>
+          </button>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-creator-cinematic-suite" style="padding: 8px 20px; font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #0284c7, #2563eb); border: 1px solid rgba(56, 189, 248, 0.5); color: #ffffff; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 16px rgba(2, 132, 199, 0.35); display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s;">
+            <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: currentColor;"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span>Apply to Timeline</span>
+          </button>
+          <button type="button" id="btn-close-creator-cinematic-suite" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; transition: all 0.2s;">&#x2715;</button>
+        </div>
+      </div>
+
+      <!-- Two-Column Workspace -->
+      <div style="display: flex; align-items: stretch; gap: 20px; flex: 1; min-height: 0; width: 100%; position: relative;">
+
+        <!-- Left Column: Cinema Canvas Stage & Face Lock Overlay -->
+        <div style="flex: 1.25; display: flex; flex-direction: column; gap: 12px; min-width: 0;">
+          
+          <!-- Viewport Stage -->
+          <div id="creator-stage-viewport" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: inset 0 0 40px rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+            
+            <!-- Layer 1: Background Plate (Virtual Studio or Original Scene) -->
+            <img id="creator-stage-bg" src="creator_background_plate.png" alt="Studio Background Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(28px) brightness(65%) contrast(125%); transition: filter 0.05s ease;" />
+
+            <!-- Layer 2: Customizable Lighting & Rim Gradient Overlay -->
+            <div id="creator-stage-lighting" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, 0.45) 0%, rgba(30, 58, 138, 0.15) 55%, transparent 75%); transition: all 0.08s ease;"></div>
+
+            <!-- Warm Lamp Accent Lights (Left & Right Bokeh Highlights) -->
+            <div id="creator-stage-warm-bokeh-left" style="position: absolute; left: 6%; top: 62%; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, transparent 70%); filter: blur(22px); pointer-events: none;"></div>
+            <div id="creator-stage-warm-bokeh-right" style="position: absolute; right: 5%; top: 52%; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.42) 0%, transparent 70%); filter: blur(26px); pointer-events: none;"></div>
+
+            <!-- Kinetic In-Scene Word Callouts matching reference -->
+            <div id="creator-stage-text-left" style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 26px; color: #ffffff; text-shadow: 0 4px 16px rgba(0,0,0,0.85); pointer-events: none; z-index: 12; letter-spacing: -0.5px;">this AI company</div>
+            <div id="creator-stage-text-right" style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 46px; color: #ffffff; text-shadow: 0 6px 24px rgba(0,0,0,0.85); pointer-events: none; z-index: 12; letter-spacing: -1px;">VOICE</div>
+
+            <!-- Layer 3: Ultra Crisp Foreground Subject Cutout -->
+            <img id="creator-stage-fg" src="creator_portrait_cutout.png" alt="Foreground Subject" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; pointer-events: none; transition: transform 0.04s ease;" />
+
+            <!-- Edge Rim Highlight Simulation -->
+            <div id="creator-stage-rim-light" style="position: absolute; inset: 0; z-index: 11; pointer-events: none; mix-blend-mode: screen; opacity: 0.75; background: radial-gradient(ellipse at 50% 45%, transparent 32%, rgba(56, 189, 248, 0.28) 46%, transparent 58%);"></div>
+
+            <!-- Face Lock Guide / Anti-Glitch Hold-out Zone (Visual Tracker & Holdout) -->
+            <div id="creator-face-lock-reticle" style="position: absolute; width: 190px; height: 230px; border: 2px dashed #38bdf8; border-radius: 50%; pointer-events: none; z-index: 20; box-shadow: 0 0 20px rgba(56,189,248,0.3); transform: translate(-50%, -50%); left: 49.5%; top: 35%; display: flex; align-items: center; justify-content: center;">
+              <span id="creator-face-track-status" style="position: absolute; top: -20px; font-family: monospace; font-size: 8.5px; font-weight: 800; color: #38bdf8; background: rgba(2,6,23,0.9); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.4); text-transform: uppercase;">&#x1F512; Face Lock &bull; Smooth Active</span>
+              <div style="width: 8px; height: 8px; border: 1px solid #38bdf8; border-radius: 50%;"></div>
+            </div>
+
+            <!-- Manual Protection Brush Canvas Overlay -->
+            <canvas id="creator-brush-canvas" width="933" height="523" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 25; pointer-events: auto; opacity: 0.55;"></canvas>
+
+            <!-- Bottom Left Hud telemetry -->
+            <div style="position: absolute; bottom: 10px; left: 12px; z-index: 30; pointer-events: none; display: flex; align-items: center; gap: 8px;">
+              <span id="creator-telemetry-pill" style="font-family: monospace; font-size: 9px; font-weight: 700; color: #38bdf8; background: rgba(5,7,15,0.85); border: 1px solid rgba(56,189,248,0.3); padding: 3px 8px; border-radius: 6px;">TRACKING: ON &bull; BLUR: 28px &bull; JITTER FILTER: 0.94</span>
+            </div>
+          </div>
+
+          <!-- Bottom Cinema Playback & Face-Tracking Scrub Controls -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button type="button" id="btn-creator-play-pause" style="padding: 5px 12px; font-size: 11.5px; font-weight: 700; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); color: #38bdf8; border-radius: 6px; cursor: pointer;">&#x23f8; Pause</button>
+              <button type="button" id="btn-creator-reset" style="padding: 5px 10px; font-size: 11px; font-weight: 600; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #94a3b8; border-radius: 6px; cursor: pointer;">Reset Head</button>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 8px; flex: 1; margin: 0 16px;">
+              <span id="creator-time-display" style="font-family: monospace; font-size: 10.5px; color: #cbd5e1;">0.0s / 6.0s</span>
+              <input type="range" id="creator-timeline-scrub" min="0" max="60" value="0" style="flex: 1; accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <button type="button" id="btn-creator-clear-brush" style="padding: 5px 10px; font-size: 10.5px; font-weight: 600; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 6px; cursor: pointer;">Clear Holdout Brush</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Granular Calibration Controls Drawer -->
+        <div style="flex: 0.95; display: flex; flex-direction: column; gap: 12px; min-width: 320px; max-height: calc(94vh - 90px); overflow-y: auto; padding-right: 4px;">
+          
+          <!-- Mode Segmented Switcher -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px;">Backdrop Source Mode</div>
+            <div style="display: flex; gap: 6px; background: rgba(0,0,0,0.4); padding: 3px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+              <button type="button" id="btn-creator-mode-original" class="creator-mode-tab active" style="flex: 1; padding: 6px; font-size: 11px; font-weight: 700; border-radius: 6px; border: none; background: #0284c7; color: #fff; cursor: pointer;">Original Video / Scene</button>
+              <button type="button" id="btn-creator-mode-virtual" class="creator-mode-tab" style="flex: 1; padding: 6px; font-size: 11px; font-weight: 700; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer;">Virtual Studio Presets</button>
+            </div>
+
+            <!-- Virtual Presets Selector Row -->
+            <div id="creator-virtual-preset-row" style="display: none; flex-direction: column; gap: 6px; margin-top: 6px;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Pick Backdrop:</span>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+                <button type="button" class="creator-bg-preset-btn active" data-preset="studio" style="padding: 6px; border-radius: 6px; border: 1px solid #38bdf8; background: rgba(56,189,248,0.15); color: #fff; font-size: 10px; font-weight: 600; cursor: pointer;">Moody Bokeh</button>
+                <button type="button" class="creator-bg-preset-btn" data-preset="cyber" style="padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; font-size: 10px; font-weight: 600; cursor: pointer;">Cyber Teal</button>
+                <button type="button" class="creator-bg-preset-btn" data-preset="boardroom" style="padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; font-size: 10px; font-weight: 600; cursor: pointer;">Warm Boardroom</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Calibration Controls Group: Blur & Depth of Field -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x1F52C; Calibrate Depth of Field (Blur)</span>
+              <span id="creator-val-blur" style="font-family: monospace; font-size: 10.5px; color: #38bdf8; font-weight: 700;">28px</span>
+            </div>
+            <input type="range" id="creator-slider-blur" min="0" max="60" value="28" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Bokeh Aperture Softness</span>
+              <span id="creator-val-softness" style="font-family: monospace; font-size: 10px; color: #cbd5e1;">1.8 f/stop</span>
+            </div>
+            <input type="range" id="creator-slider-softness" min="10" max="50" value="28" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+          </div>
+
+          <!-- Calibration Controls Group: Background Lighting & Tint -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x2600;&#xfe0f; Calibrate Background Lighting</div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Backdrop Exposure / Brightness</span>
+              <span id="creator-val-brightness" style="font-family: monospace; font-size: 10.5px; color: #38bdf8;">65%</span>
+            </div>
+            <input type="range" id="creator-slider-brightness" min="20" max="130" value="65" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Lighting Tint / Teal Atmosphere</span>
+              <span id="creator-val-tint" style="font-family: monospace; font-size: 10.5px; color: #38bdf8;">45%</span>
+            </div>
+            <input type="range" id="creator-slider-tint" min="0" max="100" value="45" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Warm Bokeh Accent Lamps</span>
+              <input type="checkbox" id="creator-toggle-warm-bokeh" checked style="accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Subject Rim Light Highlight</span>
+              <input type="range" id="creator-slider-rim" min="0" max="100" value="75" style="width: 50%; accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Face Tracking & Anti-Glitch Hold-out Brush Group -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="font-size: 11px; font-weight: 700; color: #38bdf8;">&#x1F512; Face Tracking &amp; Edge Protection</div>
+              <input type="checkbox" id="creator-toggle-face-track" checked style="accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+            <p style="margin: 0; font-size: 10px; color: #94a3b8; line-height: 1.4;">Prevents edges from jittering or glitching when the speaker moves. Smooths temporal mask deltas.</p>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: #94a3b8;">Motion Tracking Sensitivity</span>
+              <span id="creator-val-sensitivity" style="font-family: monospace; font-size: 10px; color: #cbd5e1;">94%</span>
+            </div>
+            <input type="range" id="creator-slider-sensitivity" min="50" max="100" value="94" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+            <!-- Holdout / Protect Brush -->
+            <div style="margin-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10.5px; font-weight: 600; color: #e2e8f0;">&#x1F58C;&#xfe0f; Manual Protection Brush (Hold-out)</span>
+                <span style="font-size: 9px; color: #38bdf8; font-family: monospace;">Brush to Keep Sharp</span>
+              </div>
+              <p style="margin: 0; font-size: 9.5px; color: #64748b;">Paint directly over face, hair, or microphone on stage to lock them in place so they never get blurred.</p>
+              
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 10px; color: #94a3b8;">Brush Size:</span>
+                <input type="range" id="creator-slider-brush-size" min="15" max="90" value="35" style="width: 60%; accent-color: #38bdf8; cursor: pointer;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Text Captions matching reference -->
+          <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x1F4AC; Studio Text Overlay</div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="creator-input-text-left" value="this AI company" placeholder="Left text..." style="flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 11px; outline: none;" />
+              <input type="text" id="creator-input-text-right" value="VOICE" placeholder="Hero punch word..." style="width: 90px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; color: #ffffff; font-size: 11px; font-weight: 800; outline: none;" />
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
   </div>
 

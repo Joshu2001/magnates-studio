@@ -23234,6 +23234,20 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'creator-cinematic-backdrop-suite',
+    title: 'Cinematic Creator Studio: Calibratable DOF, Lighting & Face-Lock',
+    category: 'Vlog & Story',
+    origCategory: 'Vlog & Story',
+    badge: 'NEW • CALIBRATABLE STUDIO',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(8, 47, 73, 0.95), rgba(3, 28, 45, 0.95))',
+    description: 'Cinematic creator backdrop template with calibratable depth-of-field blur, lighting and color grading controls, virtual studio preset switching, edge-smoothing face tracking, and manual holdout protection brush.',
+    tags: ['Background Blur', 'Depth of Field', 'Lighting Calibration', 'Face Tracking', 'Studio Bokeh', 'Hold-out Brush'],
+    defaultImage: '/creator_cinematic_portrait_ref.png',
+    secondaryImage: '/creator_cinematic_voice_ref.png'
+  },
+  {
     id: 'parallax',
     title: 'Depth Parallax Multi-Layer',
     category: 'Parallax',
@@ -24724,6 +24738,19 @@ id: 'map',
     secondaryImage: '/temu_product_right.png'
   },
   {
+    id: 'magnates-media-article-capitol-zoom',
+    title: 'Article Highlight, Capitol Rise & Office Zoom-Out (Scene 5)',
+    category: 'Paper / Cutout',
+    origCategory: 'Documentary',
+    badge: 'Scene 5 Standalone • Linked',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(135deg, #111827 0%, #030712 100%)',
+    description: 'Standalone Scene 5: Transparent article headline with animated red marker sweep as US Capitol rises to apex, followed by an instant cut to zoomed-in Temu office and smooth trackback zoom-out.',
+    tags: ['Article Highlight', 'Capitol Dome', 'Corporate Zoom-Out', 'Temu Boardroom', 'Documentary Motion'],
+    defaultImage: '/capitol_dome_cutout.png'
+  },
+  {
     id: 'magnates-media-globe-wavy-nothing',
     title: 'Spinning Earth Globe & Wavy-to-Flat Kinetic Headline (Scene 3)',
     category: 'Paper / Cutout',
@@ -25308,7 +25335,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['creator-cinematic-backdrop-suite','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -28296,6 +28323,36 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (tplId === 'creator-cinematic-backdrop-suite') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #020b14; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img id="fx-creator-bg-${tplId}" src="/creator_background_plate.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(28px) brightness(65%) contrast(125%);" />
+          <div style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, 0.45) 0%, rgba(30, 58, 138, 0.15) 55%, transparent 75%);"></div>
+          <div style="position: absolute; left: 8%; top: 60%; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%); filter: blur(12px);"></div>
+          <div style="position: absolute; right: 8%; top: 50%; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, transparent 70%); filter: blur(14px);"></div>
+          <div style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.85); z-index: 12;">this AI company</div>
+          <div style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 22px; color: #ffffff; text-shadow: 0 4px 12px rgba(0,0,0,0.85); z-index: 12;">VOICE</div>
+          <img id="fx-creator-fg-${tplId}" src="/creator_portrait_cutout.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10;" />
+          <div id="fx-creator-lock-${tplId}" style="position: absolute; width: 85px; height: 105px; border: 1.5px dashed #38bdf8; border-radius: 50%; left: 49.5%; top: 35%; transform: translate(-50%, -50%); z-index: 20; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+            <span style="position: absolute; top: -14px; font-family: monospace; font-size: 6px; font-weight: 800; color: #38bdf8; background: rgba(2,6,23,0.9); padding: 1px 4px; border-radius: 3px;">LOCK: FACE</span>
+          </div>
+          <div style="position: absolute; bottom: 8px; left: 10px; z-index: 25; pointer-events: none;">
+            <span id="fx-creator-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8; background: rgba(2,6,23,0.85); border: 1px solid rgba(56,189,248,0.3); padding: 2px 6px; border-radius: 4px;">DOF: 28px BLUR // FACE LOCK: ON</span>
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'creator-cinematic-backdrop-suite') {
+      const blurVal = 24 + Math.sin(t * 1.5) * 8;
+      const bgImg = fxContainer?.querySelector(`#fx-creator-bg-${tplId}`);
+      const fgImg = fxContainer?.querySelector(`#fx-creator-fg-${tplId}`);
+      const lockBox = fxContainer?.querySelector(`#fx-creator-lock-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-creator-meter-${tplId}`);
+      if (bgImg) bgImg.style.filter = `blur(${blurVal.toFixed(1)}px) brightness(65%) contrast(125%)`;
+      if (meter) meter.textContent = `DOF: ${blurVal.toFixed(1)}px BLUR // FACE LOCK: SMOOTH`;
+      const swayX = Math.sin(t * 1.2) * 3;
+      const swayY = Math.cos(t * 1.0) * 2;
+      if (fgImg) fgImg.style.transform = `translate(${swayX.toFixed(1)}px, ${swayY.toFixed(1)}px)`;
+      if (lockBox) lockBox.style.transform = `translate(calc(-50% + ${swayX.toFixed(1)}px), calc(-50% + ${swayY.toFixed(1)}px))`;
     } else if (tplId === 'magnates-media-cc-vignette-dof') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #03050c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -28429,7 +28486,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes' || tplId === 'magnates-media-article-capitol-zoom') {
       const bgCol = (typeof magnatesBPState !== 'undefined' && magnatesBPState.backdropColor) ? magnatesBPState.backdropColor : '#991b1b';
       const c1 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.9) : 'rgba(165, 22, 22, 0.9)';
       const c2 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.68) : 'rgba(95, 10, 10, 0.68)';
@@ -28443,9 +28500,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         ? '&#x1F525; SCENE 1 // LOGO &amp; WAVY HOOK'
         : (tplId === 'magnates-media-product-price-unfurl'
           ? '&#x1F4E6; SCENE 2 // PRODUCT &amp; PRICE UNFURL'
-          : (tplId === 'magnates-media-globe-wavy-nothing'
-            ? '&#x1F30D; SCENE 3 // SPINNING GLOBE &amp; WAVE'
-            : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE 4 // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // 1 &rarr; 4')));
+          : (tplId === 'magnates-media-article-capitol-zoom'
+            ? '&#x1F3DB;&#xFE0F; SCENE 5 // ARTICLE &amp; CAPITOL'
+            : (tplId === 'magnates-media-globe-wavy-nothing'
+              ? '&#x1F30D; SCENE 3 // SPINNING GLOBE &amp; WAVE'
+            : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE 4 // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // 1 &rarr; 5'))));
 
       fxContainer.innerHTML = `
         <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, ${c1} 0%, ${c2} 42%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -28484,6 +28543,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div id="fx-bp-counter-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 28px; font-weight: 900; color: #ff1a1a; letter-spacing: 0.5px; line-height: 1.05; text-shadow: 0 0 18px rgba(255,20,20,0.7), 0 3px 10px rgba(0,0,0,0.9);">$999,970</div>
             <div id="fx-bp-sub-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700; color: #b91c1c; margin-top: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">${subTxt}</div>
           </div>
+
+          <!-- Scene 5 Hover Elements -->
+          <img id="fx-bp-office-${tplId}" src="/temu_boardroom_office.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; opacity: 0; transform-origin: 34% 28%; pointer-events: none;" />
+          <div id="fx-bp-article-${tplId}" style="position: absolute; left: 8%; right: 8%; top: 12%; z-index: 11; opacity: 0; pointer-events: none; font-family: Georgia, serif;">
+            <div style="font-size: 8px; color: #9ca3af;">Global Business</div>
+            <div style="font-size: 11px; font-weight: 700; color: #fff; line-height: 1.2;">
+              Temu Emerges as the Biggest<br />
+              <span style="position: relative; display: inline-block;">
+                <span id="fx-bp-hl-${tplId}" style="position: absolute; left: -2px; top: 0; bottom: 0; width: 0%; background: rgba(185,28,28,0.88); border-radius: 2px;"></span>
+                <span style="position: relative; z-index: 2;">Shopping App in the U.S.</span>
+              </span>
+            </div>
+          </div>
+          <img id="fx-bp-capitol-${tplId}" src="/capitol_dome_cutout.png" style="position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 60%; object-fit: contain; object-position: bottom center; z-index: 12; opacity: 0; pointer-events: none;" />
 
           <!-- Left Standing Glowing Silhouette -->
           <img id="fx-bp-left-${tplId}" src="${l1Url}" style="position: absolute; left: 5%; bottom: 2%; height: 83%; width: auto; object-fit: contain; z-index: 8; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none; opacity: 0;" />
@@ -29465,7 +29538,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           card.style.borderColor = '#f59e0b';
         }
       }
-    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes' || tplId === 'magnates-media-article-capitol-zoom') {
       const logoEl = fxContainer?.querySelector(`#fx-bp-logo-${tplId}`);
       const wavyWrapEl = fxContainer?.querySelector(`#fx-bp-wavy-wrap-${tplId}`);
       const wavy1El = fxContainer?.querySelector(`#fx-bp-wavy1-${tplId}`);
@@ -29573,6 +29646,49 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         if (counterWrapEl) counterWrapEl.style.opacity = '0';
         if (leftEl) leftEl.style.opacity = '0';
         if (rightEl) rightEl.style.opacity = '0';
+      } else if (tplId === 'magnates-media-article-capitol-zoom') {
+        // Standalone Scene 5 Hover Preview (Article + Highlight + Capitol Rise -> Instant Cut -> Office Zoom-Out & Capitol Descend)
+        const c = t % 4.6;
+        const officeEl = fxContainer?.querySelector(`#fx-bp-office-${tplId}`);
+        const articleEl = fxContainer?.querySelector(`#fx-bp-article-${tplId}`);
+        const hlEl = fxContainer?.querySelector(`#fx-bp-hl-${tplId}`);
+        const capEl = fxContainer?.querySelector(`#fx-bp-capitol-${tplId}`);
+        if (logoEl) logoEl.style.opacity = '0';
+        if (prod1Wrap) prod1Wrap.style.opacity = '0';
+        if (prod2Wrap) prod2Wrap.style.opacity = '0';
+        if (globeEl) globeEl.style.opacity = '0';
+        if (globeTxtEl) globeTxtEl.style.opacity = '0';
+        if (counterWrapEl) counterWrapEl.style.opacity = '0';
+        if (leftEl) leftEl.style.opacity = '0';
+        if (rightEl) rightEl.style.opacity = '0';
+
+        const tCut = 2.1;
+        if (c < tCut) {
+          // Phase 1: Article with Highlight + Capitol Rise
+          if (officeEl) officeEl.style.opacity = '0';
+          if (articleEl) articleEl.style.opacity = '1';
+          const hlProg = Math.min(1, Math.max(0, (c - 0.25) / 0.85));
+          if (hlEl) hlEl.style.width = `${(hlProg * 100).toFixed(1)}%`;
+          const capProg = easeOut(Math.min(1, Math.max(0, (c - 0.20) / 0.90)));
+          if (capEl) {
+            capEl.style.opacity = '1';
+            capEl.style.transform = `translateY(${((1 - capProg) * 105).toFixed(1)}%)`;
+          }
+        } else {
+          // Phase 2: Instant Cut to Office Zoom-Out & Capitol Descend
+          if (articleEl) articleEl.style.opacity = '0';
+          const zProg = easeInOut((c - tCut) / 1.5);
+          if (officeEl) {
+            officeEl.style.opacity = '1';
+            const sc = 2.2 - zProg * 1.2;
+            officeEl.style.transform = `scale(${sc.toFixed(3)})`;
+          }
+          if (capEl) {
+            const exitP = easeIn((c - tCut) / 1.3);
+            capEl.style.opacity = (1 - exitP * 0.4).toFixed(2);
+            capEl.style.transform = `translateY(${(exitP * 110).toFixed(1)}%)`;
+          }
+        }
       } else if (tplId === 'magnates-media-globe-wavy-nothing') {
         // Standalone Scene 3 Hover Preview (Products glide up -> Globe rises & spins -> Wavy "FOR ALMOST NOTHING." flattens -> Globe exits down)
         const c = 4.65 + (t % 3.40);
@@ -29840,7 +29956,8 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-globe-wavy-nothing': () => openMagnatesPaperBlueprintSuite('globe_wavy_nothing'),
     'magnates-media-dual-silhouettes': () => openMagnatesPaperBlueprintSuite('dual_silhouette'),
     'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
-    'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
+    'magnates-media-particle-vfx': openMagnatesParticleVFXSuite,
+    'creator-cinematic-backdrop-suite': openCreatorCinematicSuite
   };
 
   if (dedicatedSuiteMap[templateId]) {
@@ -30253,6 +30370,9 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-product-price-unfurl') {
     openMagnatesPaperBlueprintSuite('products_unfurl');
     return;
+  } else if (templateId === 'magnates-media-article-capitol-zoom') {
+    openMagnatesPaperBlueprintSuite('article_capitol_zoom');
+    return;
   } else if (templateId === 'magnates-media-globe-wavy-nothing') {
     openMagnatesPaperBlueprintSuite('globe_wavy_nothing');
     return;
@@ -30262,6 +30382,9 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-ink-reveal') {
     // Launch Magnates Media Ink Reveal Text Animation Suite
     openMagnatesInkRevealSuite();
+    return;
+  } else if (templateId === 'creator-cinematic-backdrop-suite') {
+    openCreatorCinematicSuite();
     return;
   } else if (templateId === 'magnates-media-particle-vfx') {
     // Launch Magnates Media Particle & VFX Overlays Suite
@@ -41495,6 +41618,7 @@ function initHomepageTemplateEvents() {
   bindMagnatesInkRevealSuiteModalControls();
   bindMagnatesArticleHighlightSuiteModalControls();
   bindMagnatesParticleVFXSuiteModalControls();
+  bindCreatorCinematicSuiteModalControls();
 }
 
 /* =========================================================
@@ -48364,6 +48488,20 @@ let magnatesBPState = {
   prod2Price: "$5.00",
   prod2GlowColor: "#dc2626",
   prod2GlowIntensity: 45,
+  // Scene 5: Transparent Article Headline, Red Marker Highlight, Capitol Rise & Office Zoom-Out
+  scene5Enabled: true,
+  articleLine1: "Temu Emerges as the Biggest",
+  articleLine2: "Shopping App in the U.S.",
+  articleHighlightSpeed: 0.75,
+  articleHighlightColor: "#b91c1c",
+  articleHighlightOpacity: 88,
+  articleRemoveBg: true,
+  customScreenshotUrl: "",
+  capitolApexY: 52,
+  capitolRiseDur: 0.85,
+  officeZoomOutDur: 1.40,
+  officePhotoUrl: "/temu_boardroom_office.png",
+  capitolCutoutUrl: "/capitol_dome_cutout.png",
   // Scene 3: Spinning Earth Globe & Wavy-to-Flat Headline ("FOR ALMOST NOTHING.")
   globeEnabled: true,
   globeUrl: "/globe_atlantic_clean.svg",
@@ -48406,7 +48544,7 @@ let magnatesBPState = {
 
 const MAGNATES_BP_PRESETS = {
   full_story_flow: {
-    duration: 16.0,
+    duration: 21.0,
     bgPlateUrl: "",
     backdropColor: "#991b1b",
     backdropSpread: 75,
@@ -48524,6 +48662,21 @@ const MAGNATES_BP_PRESETS = {
     l1Label: "Left Silhouette (Scene 3)",
     l2Label: "Right Silhouette (Scene 3)",
     z0Label: "Crimson Radial Atmosphere"
+  },
+  article_capitol_zoom: {
+    duration: 5.2,
+    bgPlateUrl: "",
+    backdropColor: "#991b1b",
+    backdropSpread: 75,
+    logoEnabled: false,
+    showCounter: false,
+    l1Enabled: false,
+    l2Enabled: false,
+    productsEnabled: false,
+    globeEnabled: false,
+    scene5Enabled: true,
+    hudPreset: "SCENE 5: ARTICLE HIGHLIGHT & CAPITOL ZOOM",
+    hudLabel: "Transparent Article // US Capitol // Temu Office"
   },
   globe_wavy_nothing: {
     duration: 5.0,
@@ -48912,14 +49065,19 @@ function updateMagnatesBPVisualStyles() {
     : (isGlobeOnly ? 0.15 : (hasProductsPhase ? Math.max(6.40, tShiftRight + 3.20) : (magnatesBPState.logoOutTime ?? 4.15)));
   const tGlobeStart = isGlobeOnly ? 0.15 : (tOut + 0.05);
   const tGlobeExit = isGlobeOnly ? 3.95 : (tGlobeStart + 3.35); // ~9.85s in full_story_flow
+  const isScene5Only = magnatesBPState.preset === 'article_capitol_zoom';
+  const tScene5Start = isScene5Only ? 0.0 : 14.60; // Begins right after Scene 4 silhouettes exit
+  const tInstantCut = tScene5Start + (magnatesBPState.articleHighlightSpeed ?? 0.75) + 0.35; // Instant hard cut
+  const tScene5End = tInstantCut + (magnatesBPState.officeZoomOutDur ?? 1.40) + 0.50; // Full trackback complete
+
   // Seamless overlap (Image 5): $1,000,000 counter begins emerging at tGlobeExit + 0.15s (~10.00s) WHILE the globe is gliding down and "FOR ALMOST NOTHING." is fading!
   const sceneBOffset = isFullFlow
     ? (hasGlobePhase ? (tGlobeExit + 0.15) : (hasProductsPhase ? 7.20 : 4.50))
     : 0.0;
 
   const sceneNumLabel = isFullFlow
-    ? (p < tShiftRight ? 'Scene 1' : (p < tGlobeStart ? 'Scene 2' : (p < sceneBOffset ? 'Scene 3' : 'Scene 4')))
-    : (isBrandOnly ? 'Scene 1' : (isProductsOnly ? 'Scene 2' : (isGlobeOnly ? 'Scene 3' : 'Scene 4')));
+    ? (p < tShiftRight ? 'Scene 1' : (p < tGlobeStart ? 'Scene 2' : (p < sceneBOffset ? 'Scene 3' : (p < tScene5Start ? 'Scene 4' : 'Scene 5'))))
+    : (isBrandOnly ? 'Scene 1' : (isProductsOnly ? 'Scene 2' : (isGlobeOnly ? 'Scene 3' : (isScene5Only ? 'Scene 5' : 'Scene 4'))));
   const timeText = `${p.toFixed(1)}s / ${dur.toFixed(1)}s (${sceneNumLabel})`;
   if (timerEl) timerEl.textContent = timeText;
   if (hudTimecode) hudTimecode.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
@@ -49259,6 +49417,99 @@ function updateMagnatesBPVisualStyles() {
   }
 
   // =========================================================
+    // =========================================================
+  // SCENE 5 RENDER: Transparent Article, Highlight, Capitol Rise & Office Zoom-Out (Z=10, Z=11, Z=12)
+  // =========================================================
+  const officeLayer = document.getElementById('magnates-bp-layer-office');
+  const officeImg = document.getElementById('magnates-bp-img-office');
+  const articleLayer = document.getElementById('magnates-bp-layer-article');
+  const articleHl = document.getElementById('magnates-bp-article-highlight');
+  const articleLine1 = document.getElementById('magnates-bp-article-line1');
+  const articleLine2 = document.getElementById('magnates-bp-article-line2');
+  const capitolLayer = document.getElementById('magnates-bp-layer-capitol');
+  const capitolImg = document.getElementById('magnates-bp-img-capitol');
+
+  if (officeImg && officeImg.getAttribute('src') !== (magnatesBPState.officePhotoUrl || '/temu_boardroom_office.png')) {
+    officeImg.src = magnatesBPState.officePhotoUrl || '/temu_boardroom_office.png';
+  }
+  if (capitolImg && capitolImg.getAttribute('src') !== (magnatesBPState.capitolCutoutUrl || '/capitol_dome_cutout.png')) {
+    capitolImg.src = magnatesBPState.capitolCutoutUrl || '/capitol_dome_cutout.png';
+  }
+  const thumbZ12 = document.getElementById('magnates-bp-thumb-z12');
+  if (thumbZ12 && thumbZ12.getAttribute('src') !== (magnatesBPState.officePhotoUrl || '/temu_boardroom_office.png')) {
+    thumbZ12.src = magnatesBPState.officePhotoUrl || '/temu_boardroom_office.png';
+  }
+  const thumbZ11 = document.getElementById('magnates-bp-thumb-z11');
+  if (thumbZ11 && thumbZ11.getAttribute('src') !== (magnatesBPState.capitolCutoutUrl || '/capitol_dome_cutout.png')) {
+    thumbZ11.src = magnatesBPState.capitolCutoutUrl || '/capitol_dome_cutout.png';
+  }
+  if (articleLine1) articleLine1.textContent = magnatesBPState.articleLine1 || 'Temu Emerges as the Biggest';
+  if (articleLine2) articleLine2.textContent = magnatesBPState.articleLine2 || 'Shopping App in the U.S.';
+
+  const showScene5 = (isFullFlow || isScene5Only) && magnatesBPState.scene5Enabled !== false && p >= (tScene5Start - 0.1);
+
+  if (!showScene5) {
+    if (officeLayer) officeLayer.style.display = 'none';
+    if (articleLayer) articleLayer.style.display = 'none';
+    if (capitolLayer) capitolLayer.style.display = 'none';
+  } else {
+    // Phase 1 vs Phase 2: Instant hard cut at tInstantCut!
+    const isPhase1 = p < tInstantCut;
+
+    // 1. Article Headline & Kinetic Red Marker Highlight (Phase 1 Only)
+    if (articleLayer && articleHl) {
+      if (!isPhase1) {
+        articleLayer.style.display = 'none';
+      } else {
+        articleLayer.style.display = 'flex';
+        const hlSpeed = magnatesBPState.articleHighlightSpeed ?? 0.75;
+        const hlProg = Math.max(0, Math.min(1, (p - (tScene5Start + 0.15)) / hlSpeed));
+        articleHl.style.width = `${(hlProg * 102).toFixed(1)}%`;
+        const hlCol = magnatesBPState.articleHighlightColor || '#b91c1c';
+        const hlOp = (magnatesBPState.articleHighlightOpacity ?? 88) / 100;
+        articleHl.style.background = bpHexToRgba(hlCol, hlOp);
+        // Fade in smoothly at start of Scene 5
+        const artInP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - tScene5Start) / 0.35)));
+        articleLayer.style.opacity = artInP.toFixed(2);
+      }
+    }
+
+    // 2. Office Photo: Appears INSTANTLY at tInstantCut, starts zoomed in (scale 2.2x), zooms out to 1.0x
+    if (officeLayer && officeImg) {
+      if (isPhase1) {
+        officeLayer.style.display = 'none';
+      } else {
+        officeLayer.style.display = 'block';
+        const zoomDur = magnatesBPState.officeZoomOutDur ?? 1.40;
+        const zProg = bpEaseInOutCubic(Math.min(1, Math.max(0, (p - tInstantCut) / zoomDur)));
+        const currentScale = 2.20 - zProg * 1.20; // 2.20 -> 1.00
+        officeImg.style.transform = `scale(${currentScale.toFixed(4)})`;
+      }
+    }
+
+    // 3. Capitol Building: Rises up during Phase 1 to apex, HOLDS through instant cut, then glides down during Phase 2
+    if (capitolLayer) {
+      capitolLayer.style.display = 'flex';
+      const apexPct = magnatesBPState.capitolApexY ?? 52;
+      // Apex height determines resting translateY
+      // height: 62%, so resting at bottom: 0 gives top at 38%
+      if (isPhase1) {
+        const riseSpeed = magnatesBPState.capitolRiseDur ?? 0.85;
+        const riseP = bpEaseOutCubic(Math.min(1, Math.max(0, (p - (tScene5Start + 0.08)) / riseSpeed)));
+        const ty = (1 - riseP) * 110;
+        capitolLayer.style.transform = `translate3d(0, ${ty.toFixed(2)}%, 0)`;
+        capitolLayer.style.opacity = Math.min(1, riseP * 1.5).toFixed(2);
+      } else {
+        // Phase 2: simultaneously building descends from its location to down
+        const exitSpeed = magnatesBPState.officeZoomOutDur ?? 1.40;
+        const exitP = bpEaseInCubic(Math.min(1, Math.max(0, (p - tInstantCut) / exitSpeed)));
+        const ty = exitP * 112;
+        capitolLayer.style.transform = `translate3d(0, ${ty.toFixed(2)}%, 0)`;
+        capitolLayer.style.opacity = (Math.max(0, 1 - exitP * 0.7)).toFixed(2);
+      }
+    }
+  }
+
   // SCENE B / C RENDER: $1,000,000 Counter (Z=1) & Cutouts (Z=2, Z=3)
   // =========================================================
   const localPB = p - sceneBOffset;
@@ -49631,6 +49882,24 @@ function syncMagnatesBPInspectorControlsFromState() {
   setTxt('magnates-bp-val-unfurl-speed', `${(magnatesBPState.unfurlSpeed ?? 0.45).toFixed(2)}s`);
   setTxt('magnates-bp-label-z6', `Left Product & ${magnatesBPState.prod1Price || '$2.00'} Tag`);
   setTxt('magnates-bp-label-z7', `Right Product & ${magnatesBPState.prod2Price || '$5.00'} Tag`);
+
+  // Sync Scene 5 Controls
+  const chkS5 = document.getElementById('magnates-bp-toggle-scene5');
+  if (chkS5) chkS5.checked = magnatesBPState.scene5Enabled !== false;
+  const chkS5Active = document.getElementById('magnates-bp-toggle-s5-active');
+  if (chkS5Active) chkS5Active.checked = magnatesBPState.scene5Enabled !== false;
+  setVal('magnates-bp-input-article-line1', magnatesBPState.articleLine1 || 'Temu Emerges as the Biggest');
+  setVal('magnates-bp-input-article-line2', magnatesBPState.articleLine2 || 'Shopping App in the U.S.');
+  setVal('magnates-bp-slider-highlight-speed', magnatesBPState.articleHighlightSpeed ?? 0.75);
+  setTxt('magnates-bp-val-highlight-speed', `${(magnatesBPState.articleHighlightSpeed ?? 0.75).toFixed(2)}s`);
+  setVal('magnates-bp-color-highlight', magnatesBPState.articleHighlightColor || '#b91c1c');
+  setVal('magnates-bp-slider-highlight-op', magnatesBPState.articleHighlightOpacity ?? 88);
+  setVal('magnates-bp-slider-capitol-apex', magnatesBPState.capitolApexY ?? 52);
+  setTxt('magnates-bp-val-capitol-apex', `${magnatesBPState.capitolApexY ?? 52}%`);
+  setVal('magnates-bp-slider-zoomout-dur', magnatesBPState.officeZoomOutDur ?? 1.40);
+  setTxt('magnates-bp-val-zoomout-dur', `${(magnatesBPState.officeZoomOutDur ?? 1.40).toFixed(2)}s`);
+  const chkRemBg = document.getElementById('magnates-bp-check-remove-bg');
+  if (chkRemBg) chkRemBg.checked = magnatesBPState.articleRemoveBg !== false;
 
   // Sync Scene 3 Spinning Globe & Wavy-to-Flat Headline Controls
   const chkGlobe = document.getElementById('magnates-bp-toggle-globe');
@@ -50252,6 +50521,128 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     updateMagnatesBPVisualStyles();
   });
 
+  // Scene 5 Article Highlight, Capitol Rise & Office Zoom-Out Listeners (Z=10, Z=11, Z=12)
+  const ensurePlayheadInScene5 = () => {
+    const tS5 = magnatesBPState.preset === 'article_capitol_zoom' ? 0.2 : 14.80;
+    if (magnatesBPState.playhead < tS5 || magnatesBPState.playhead > tS5 + 3.8) {
+      magnatesBPState.playhead = tS5 + 0.5;
+    }
+  };
+
+  document.getElementById('magnates-bp-toggle-scene5')?.addEventListener('change', (e) => {
+    magnatesBPState.scene5Enabled = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-toggle-s5-active')?.addEventListener('change', (e) => {
+    magnatesBPState.scene5Enabled = e.target.checked;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-article-line1')?.addEventListener('input', (e) => {
+    magnatesBPState.articleLine1 = e.target.value;
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-article-line2')?.addEventListener('input', (e) => {
+    magnatesBPState.articleLine2 = e.target.value;
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-slider-highlight-speed')?.addEventListener('input', (e) => {
+    magnatesBPState.articleHighlightSpeed = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-highlight-speed');
+    if (lbl) lbl.textContent = `${magnatesBPState.articleHighlightSpeed.toFixed(2)}s`;
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-color-highlight')?.addEventListener('input', (e) => {
+    magnatesBPState.articleHighlightColor = e.target.value;
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-slider-highlight-op')?.addEventListener('input', (e) => {
+    magnatesBPState.articleHighlightOpacity = parseInt(e.target.value, 10);
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-slider-capitol-apex')?.addEventListener('input', (e) => {
+    magnatesBPState.capitolApexY = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-capitol-apex');
+    if (lbl) lbl.textContent = `${magnatesBPState.capitolApexY}%`;
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-slider-zoomout-dur')?.addEventListener('input', (e) => {
+    magnatesBPState.officeZoomOutDur = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-zoomout-dur');
+    if (lbl) lbl.textContent = `${magnatesBPState.officeZoomOutDur.toFixed(2)}s`;
+    ensurePlayheadInScene5();
+    updateMagnatesBPVisualStyles();
+  });
+
+  // Custom Screenshot Upload with Auto Background Removal
+  document.getElementById('magnates-bp-input-custom-screenshot')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (loadEv) => {
+      const srcUrl = loadEv.target.result;
+      magnatesBPState.customScreenshotUrl = srcUrl;
+      // Strip background on canvas if removeBg is checked
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.width;
+        c.height = img.height;
+        const ctx = c.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        if (magnatesBPState.articleRemoveBg !== false) {
+          const imgData = ctx.getImageData(0, 0, c.width, c.height);
+          const data = imgData.data;
+          // Luma / chroma key: if pixel is white/light gray (paper bg), make it transparent
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i], g = data[i+1], b = data[i+2];
+            const lum = (r + g + b) / 3;
+            if (lum > 215) {
+              data[i+3] = 0;
+            } else if (lum > 170) {
+              data[i+3] = Math.floor(((215 - lum) / 45) * 255);
+            }
+          }
+          ctx.putImageData(imgData, 0, 0);
+        }
+        magnatesBPState.customScreenshotUrl = c.toDataURL('image/png');
+        ensurePlayheadInScene5();
+        updateMagnatesBPVisualStyles();
+      };
+      img.src = srcUrl;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // File replace inputs for Office and Capitol
+  document.getElementById('magnates-bp-input-file-office')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      magnatesBPState.officePhotoUrl = ev.target.result;
+      ensurePlayheadInScene5();
+      updateMagnatesBPVisualStyles();
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('magnates-bp-input-file-capitol')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      magnatesBPState.capitolCutoutUrl = ev.target.result;
+      ensurePlayheadInScene5();
+      updateMagnatesBPVisualStyles();
+    };
+    reader.readAsDataURL(file);
+  });
+
   // Scene 3 Spinning Earth Globe & Wavy-to-Flat Headline Listeners (Z=8 & Z=9)
   const ensurePlayheadInGlobe = () => {
     const tG = magnatesBPState.preset === 'globe_wavy_nothing' ? 0.15 : 6.45;
@@ -50677,6 +51068,10 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
           magnatesBPState.productsEnabled = true;
           magnatesBPState.playhead = magnatesBPState.logoShiftRightTime ?? 3.10;
           selectMagnatesBPLayer('z6');
+        } else if (targetScene === 'article_capitol_zoom') {
+          magnatesBPState.scene5Enabled = true;
+          magnatesBPState.playhead = 14.80;
+          selectMagnatesBPLayer('z10');
         } else if (targetScene === 'globe_wavy_nothing') {
           magnatesBPState.globeEnabled = true;
           magnatesBPState.playhead = 6.45;
@@ -51646,6 +52041,430 @@ function bindMagnatesParticleVFXSuiteModalControls() {
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }
+
+
+/* =========================================================
+   CINEMATIC CREATOR STUDIO & FACE-TRACKED DOF CONTROLLER
+   ========================================================= */
+let creatorCinematicState = {
+  isPlaying: true,
+  playhead: 0,
+  duration: 6.0,
+  lastTimestamp: null,
+  animFrameId: null,
+  mode: 'original', // 'original' or 'virtual'
+  virtualPreset: 'studio', // 'studio', 'cyber', 'boardroom'
+  blur: 28,
+  softness: 28,
+  brightness: 65,
+  tint: 45,
+  warmBokeh: true,
+  rimIntensity: 75,
+  faceTrack: true,
+  sensitivity: 94,
+  brushSize: 35,
+  textLeft: 'this AI company',
+  textRight: 'VOICE',
+  isPainting: false,
+  brushStrokes: [],
+  headX: 0,
+  headY: 0,
+  smoothedX: 0,
+  smoothedY: 0
+};
+
+function openCreatorCinematicSuite() {
+  const modal = document.getElementById('modal-creator-cinematic-suite');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  creatorCinematicState.isPlaying = true;
+  creatorCinematicState.playhead = 0;
+  creatorCinematicState.lastTimestamp = null;
+  if (creatorCinematicState.animFrameId) cancelAnimationFrame(creatorCinematicState.animFrameId);
+  creatorCinematicState.animFrameId = requestAnimationFrame(renderCreatorCinematicLoop);
+
+  const btnPlay = document.getElementById('btn-creator-play-pause');
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
+
+  initCreatorBrushCanvas();
+  updateCreatorVisualStyles();
+}
+
+function closeCreatorCinematicSuite() {
+  const modal = document.getElementById('modal-creator-cinematic-suite');
+  if (!modal) return;
+  modal.style.display = 'none';
+  creatorCinematicState.isPlaying = false;
+  if (creatorCinematicState.animFrameId) {
+    cancelAnimationFrame(creatorCinematicState.animFrameId);
+    creatorCinematicState.animFrameId = null;
+  }
+}
+
+function initCreatorBrushCanvas() {
+  const canvas = document.getElementById('creator-brush-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  // Redraw existing strokes
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (creatorCinematicState.brushStrokes.length > 0) {
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+    creatorCinematicState.brushStrokes.forEach(st => {
+      ctx.beginPath();
+      ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  // Paint events
+  canvas.onpointerdown = (e) => {
+    creatorCinematicState.isPainting = true;
+    canvas.setPointerCapture(e.pointerId);
+    paintBrushPoint(e, canvas, ctx);
+  };
+  canvas.onpointermove = (e) => {
+    if (!creatorCinematicState.isPainting) return;
+    paintBrushPoint(e, canvas, ctx);
+  };
+  canvas.onpointerup = (e) => {
+    creatorCinematicState.isPainting = false;
+  };
+}
+
+function paintBrushPoint(e, canvas, ctx) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const r = creatorCinematicState.brushSize;
+
+  creatorCinematicState.brushStrokes.push({ x, y, r });
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function updateCreatorVisualStyles() {
+  const bgImg = document.getElementById('creator-stage-bg');
+  const lightingEl = document.getElementById('creator-stage-lighting');
+  const bokehL = document.getElementById('creator-stage-warm-bokeh-left');
+  const bokehR = document.getElementById('creator-stage-warm-bokeh-right');
+  const rimEl = document.getElementById('creator-stage-rim-light');
+  const txtL = document.getElementById('creator-stage-text-left');
+  const txtR = document.getElementById('creator-stage-text-right');
+  const tele = document.getElementById('creator-telemetry-pill');
+  const reticle = document.getElementById('creator-face-lock-reticle');
+  const presetRow = document.getElementById('creator-virtual-preset-row');
+
+  // Background Source
+  if (creatorCinematicState.mode === 'virtual') {
+    if (presetRow) presetRow.style.display = 'flex';
+    if (bgImg) {
+      if (creatorCinematicState.virtualPreset === 'studio') bgImg.src = 'creator_studio_bokeh_preset.png';
+      else if (creatorCinematicState.virtualPreset === 'cyber') bgImg.src = 'creator_cyber_bokeh_preset.png';
+      else bgImg.src = 'boardroom_scene_hd.jpg';
+    }
+  } else {
+    if (presetRow) presetRow.style.display = 'none';
+    if (bgImg) bgImg.src = 'creator_background_plate.png';
+  }
+
+  // Calibration Blur & Brightness
+  if (bgImg) {
+    bgImg.style.filter = `blur(${creatorCinematicState.blur}px) brightness(${creatorCinematicState.brightness}%) contrast(125%)`;
+  }
+
+  // Lighting & Tint
+  if (lightingEl) {
+    const tintA = (creatorCinematicState.tint / 100) * 0.75;
+    lightingEl.style.background = `radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 55%, transparent 75%)`;
+  }
+
+  // Bokeh Lamps
+  const bokehDisplay = creatorCinematicState.warmBokeh ? 'block' : 'none';
+  if (bokehL) bokehL.style.display = bokehDisplay;
+  if (bokehR) bokehR.style.display = bokehDisplay;
+
+  // Rim Intensity
+  if (rimEl) {
+    rimEl.style.opacity = (creatorCinematicState.rimIntensity / 100).toFixed(2);
+  }
+
+  // Text
+  if (txtL) txtL.textContent = creatorCinematicState.textLeft;
+  if (txtR) txtR.textContent = creatorCinematicState.textRight;
+
+  // Face Tracking guide
+  if (reticle) {
+    reticle.style.display = creatorCinematicState.faceTrack ? 'flex' : 'none';
+  }
+
+  // Telemetry
+  if (tele) {
+    tele.textContent = `TRACKING: ${creatorCinematicState.faceTrack ? 'SMOOTH_ON' : 'OFF'} • BLUR: ${creatorCinematicState.blur}px • LIGHT: ${creatorCinematicState.brightness}% • HOLD_OUT: ${creatorCinematicState.brushStrokes.length} PTS`;
+  }
+}
+
+function renderCreatorCinematicLoop(timestamp) {
+  if (!creatorCinematicState.isPlaying) return;
+
+  if (!creatorCinematicState.lastTimestamp) creatorCinematicState.lastTimestamp = timestamp;
+  const dt = (timestamp - creatorCinematicState.lastTimestamp) / 1000;
+  creatorCinematicState.lastTimestamp = timestamp;
+
+  creatorCinematicState.playhead = (creatorCinematicState.playhead + dt) % creatorCinematicState.duration;
+
+  // Update scrubber and time display
+  const scrub = document.getElementById('creator-timeline-scrub');
+  const timeLbl = document.getElementById('creator-time-display');
+  if (scrub) scrub.value = Math.floor((creatorCinematicState.playhead / creatorCinematicState.duration) * 60);
+  if (timeLbl) timeLbl.textContent = `${creatorCinematicState.playhead.toFixed(1)}s / ${creatorCinematicState.duration.toFixed(1)}s`;
+
+  // Natural head motion calculation
+  const t = creatorCinematicState.playhead;
+  const rawTargetX = Math.sin(t * 1.6) * 5.5 + Math.sin(t * 3.2) * 2.0;
+  const rawTargetY = Math.cos(t * 1.3) * 3.5;
+
+  // Edge-Lock Smoothing (Temporal Jitter Filter to prevent edge-twitching)
+  const alphaSmooth = creatorCinematicState.faceTrack ? (creatorCinematicState.sensitivity / 100) * 0.18 : 0.02;
+  creatorCinematicState.smoothedX += (rawTargetX - creatorCinematicState.smoothedX) * alphaSmooth;
+  creatorCinematicState.smoothedY += (rawTargetY - creatorCinematicState.smoothedY) * alphaSmooth;
+
+  const fgImg = document.getElementById('creator-stage-fg');
+  const reticle = document.getElementById('creator-face-lock-reticle');
+
+  if (fgImg) {
+    fgImg.style.transform = `translate(${creatorCinematicState.smoothedX.toFixed(2)}px, ${creatorCinematicState.smoothedY.toFixed(2)}px)`;
+  }
+  if (reticle) {
+    reticle.style.transform = `translate(calc(-50% + ${creatorCinematicState.smoothedX.toFixed(2)}px), calc(-50% + ${creatorCinematicState.smoothedY.toFixed(2)}px))`;
+  }
+
+  creatorCinematicState.animFrameId = requestAnimationFrame(renderCreatorCinematicLoop);
+}
+
+function bindCreatorCinematicSuiteModalControls() {
+  document.getElementById('btn-close-creator-cinematic-suite')?.addEventListener('click', closeCreatorCinematicSuite);
+  document.getElementById('btn-cancel-creator-cinematic-suite')?.addEventListener('click', closeCreatorCinematicSuite);
+
+  // Play / Pause
+  document.getElementById('btn-creator-play-pause')?.addEventListener('click', () => {
+    creatorCinematicState.isPlaying = !creatorCinematicState.isPlaying;
+    const btnPlay = document.getElementById('btn-creator-play-pause');
+    if (creatorCinematicState.isPlaying) {
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
+      creatorCinematicState.lastTimestamp = null;
+      creatorCinematicState.animFrameId = requestAnimationFrame(renderCreatorCinematicLoop);
+    } else {
+      if (btnPlay) btnPlay.textContent = '▶ Play';
+      if (creatorCinematicState.animFrameId) cancelAnimationFrame(creatorCinematicState.animFrameId);
+    }
+  });
+
+  // Reset
+  document.getElementById('btn-creator-reset')?.addEventListener('click', () => {
+    creatorCinematicState.playhead = 0;
+    creatorCinematicState.smoothedX = 0;
+    creatorCinematicState.smoothedY = 0;
+  });
+
+  // Clear Brush
+  document.getElementById('btn-creator-clear-brush')?.addEventListener('click', () => {
+    creatorCinematicState.brushStrokes = [];
+    const canvas = document.getElementById('creator-brush-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    updateCreatorVisualStyles();
+  });
+
+  // Scrub slider
+  document.getElementById('creator-timeline-scrub')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 0;
+    creatorCinematicState.playhead = (val / 60) * creatorCinematicState.duration;
+  });
+
+  // Source Mode tab switching
+  document.getElementById('btn-creator-mode-original')?.addEventListener('click', () => {
+    creatorCinematicState.mode = 'original';
+    document.getElementById('btn-creator-mode-original').style.background = '#0284c7';
+    document.getElementById('btn-creator-mode-original').style.color = '#fff';
+    document.getElementById('btn-creator-mode-virtual').style.background = 'transparent';
+    document.getElementById('btn-creator-mode-virtual').style.color = '#94a3b8';
+    updateCreatorVisualStyles();
+  });
+
+  document.getElementById('btn-creator-mode-virtual')?.addEventListener('click', () => {
+    creatorCinematicState.mode = 'virtual';
+    document.getElementById('btn-creator-mode-virtual').style.background = '#0284c7';
+    document.getElementById('btn-creator-mode-virtual').style.color = '#fff';
+    document.getElementById('btn-creator-mode-original').style.background = 'transparent';
+    document.getElementById('btn-creator-mode-original').style.color = '#94a3b8';
+    updateCreatorVisualStyles();
+  });
+
+  // Virtual Presets
+  document.querySelectorAll('.creator-bg-preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.creator-bg-preset-btn').forEach(b => {
+        b.style.border = '1px solid rgba(255,255,255,0.1)';
+        b.style.background = 'rgba(255,255,255,0.03)';
+        b.style.color = '#94a3b8';
+      });
+      btn.style.border = '1px solid #38bdf8';
+      btn.style.background = 'rgba(56,189,248,0.15)';
+      btn.style.color = '#fff';
+      creatorCinematicState.virtualPreset = btn.getAttribute('data-preset');
+      updateCreatorVisualStyles();
+    });
+  });
+
+  // Blur slider
+  document.getElementById('creator-slider-blur')?.addEventListener('input', (e) => {
+    creatorCinematicState.blur = parseInt(e.target.value, 10);
+    const valEl = document.getElementById('creator-val-blur');
+    if (valEl) valEl.textContent = `${creatorCinematicState.blur}px`;
+    updateCreatorVisualStyles();
+  });
+
+  // Softness slider
+  document.getElementById('creator-slider-softness')?.addEventListener('input', (e) => {
+    creatorCinematicState.softness = parseInt(e.target.value, 10);
+    const valEl = document.getElementById('creator-val-softness');
+    if (valEl) valEl.textContent = `${(creatorCinematicState.softness / 15).toFixed(1)} f/stop`;
+    updateCreatorVisualStyles();
+  });
+
+  // Brightness slider
+  document.getElementById('creator-slider-brightness')?.addEventListener('input', (e) => {
+    creatorCinematicState.brightness = parseInt(e.target.value, 10);
+    const valEl = document.getElementById('creator-val-brightness');
+    if (valEl) valEl.textContent = `${creatorCinematicState.brightness}%`;
+    updateCreatorVisualStyles();
+  });
+
+  // Tint slider
+  document.getElementById('creator-slider-tint')?.addEventListener('input', (e) => {
+    creatorCinematicState.tint = parseInt(e.target.value, 10);
+    const valEl = document.getElementById('creator-val-tint');
+    if (valEl) valEl.textContent = `${creatorCinematicState.tint}%`;
+    updateCreatorVisualStyles();
+  });
+
+  // Warm Bokeh toggle
+  document.getElementById('creator-toggle-warm-bokeh')?.addEventListener('change', (e) => {
+    creatorCinematicState.warmBokeh = e.target.checked;
+    updateCreatorVisualStyles();
+  });
+
+  // Rim slider
+  document.getElementById('creator-slider-rim')?.addEventListener('input', (e) => {
+    creatorCinematicState.rimIntensity = parseInt(e.target.value, 10);
+    updateCreatorVisualStyles();
+  });
+
+  // Face track toggle
+  document.getElementById('creator-toggle-face-track')?.addEventListener('change', (e) => {
+    creatorCinematicState.faceTrack = e.target.checked;
+    updateCreatorVisualStyles();
+  });
+
+  // Sensitivity slider
+  document.getElementById('creator-slider-sensitivity')?.addEventListener('input', (e) => {
+    creatorCinematicState.sensitivity = parseInt(e.target.value, 10);
+    const valEl = document.getElementById('creator-val-sensitivity');
+    if (valEl) valEl.textContent = `${creatorCinematicState.sensitivity}%`;
+  });
+
+  // Brush size slider
+  document.getElementById('creator-slider-brush-size')?.addEventListener('input', (e) => {
+    creatorCinematicState.brushSize = parseInt(e.target.value, 10);
+  });
+
+  // Text inputs
+  document.getElementById('creator-input-text-left')?.addEventListener('input', (e) => {
+    creatorCinematicState.textLeft = e.target.value;
+    updateCreatorVisualStyles();
+  });
+  document.getElementById('creator-input-text-right')?.addEventListener('input', (e) => {
+    creatorCinematicState.textRight = e.target.value;
+    updateCreatorVisualStyles();
+  });
+
+  // Apply to Timeline
+  document.getElementById('btn-apply-creator-cinematic-suite')?.addEventListener('click', () => {
+    closeCreatorCinematicSuite();
+
+    const bgUrl = creatorCinematicState.mode === 'virtual'
+      ? (creatorCinematicState.virtualPreset === 'studio' ? '/creator_studio_bokeh_preset.png' : (creatorCinematicState.virtualPreset === 'cyber' ? '/creator_cyber_bokeh_preset.png' : '/boardroom_scene_hd.jpg'))
+      : '/creator_background_plate.png';
+
+    const bgClip = {
+      id: `img-creator-bg-${Date.now()}`,
+      url: bgUrl,
+      start: 0,
+      duration: creatorCinematicState.duration,
+      scale: 1.05,
+      blur: creatorCinematicState.blur,
+      brightness: creatorCinematicState.brightness,
+      tint: creatorCinematicState.tint,
+      transition: 'crossfade',
+      transitionDuration: 0.8
+    };
+
+    const fgClip = {
+      id: `img-creator-fg-${Date.now() + 1}`,
+      name: 'Creator_Speaker_Cutout.png',
+      url: '/creator_portrait_cutout.png',
+      start: 0,
+      duration: creatorCinematicState.duration,
+      scale: 1.0,
+      faceTrack: creatorCinematicState.faceTrack,
+      sensitivity: creatorCinematicState.sensitivity,
+      holdoutPoints: creatorCinematicState.brushStrokes.length,
+      transition: 'fade',
+      transitionDuration: 0.5
+    };
+
+    const textClipLeft = {
+      id: `txt-creator-l-${Date.now() + 2}`,
+      text: creatorCinematicState.textLeft,
+      position: 'center_left',
+      fontSize: 32,
+      fontFamily: 'Inter, sans-serif',
+      textColor: '#ffffff',
+      start: 0,
+      duration: creatorCinematicState.duration
+    };
+
+    const textClipRight = {
+      id: `txt-creator-r-${Date.now() + 3}`,
+      text: creatorCinematicState.textRight,
+      position: 'center_right',
+      fontSize: 54,
+      fontFamily: 'Inter, sans-serif',
+      fontWeight: '900',
+      textColor: '#ffffff',
+      start: 0,
+      duration: creatorCinematicState.duration
+    };
+
+    if (timelineClips && timelineClips.image && timelineClips.text) {
+      timelineClips.image = [bgClip, fgClip];
+      timelineClips.text = [textClipLeft, textClipRight];
+      renderAllTimelineTracks();
+      selectClip(fgClip, 'image');
+    }
+
+    showTextTimingAlert('Applied Cinematic Creator Studio & Face-Tracked Background template to timeline!', 'success');
+    setTimeout(() => showTextTimingAlert(''), 2500);
+  });
+}
+
 
 // --- VIDEO FORMAT & ASPECT RATIO SWITCHER ENGINE (STUDIO & MODAL PREVIEW) ---
 let studioAspectState = { ratio: '16:9', fit: 'contain' };
