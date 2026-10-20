@@ -270,22 +270,22 @@
             <!-- Top Section -->
             <div>
               <!-- Top Ticker & Kicker Bar -->
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span id="jani-txt-ticker-left-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 6.5px; font-weight: 800; color: rgba(255,255,255,0.6); letter-spacing: 0.8px; text-transform: uppercase;">${d.topTickerLeft}</span>
-                <div id="jani-kicker-box-${tplId}" style="background: ${d.kickerBoxBg || '#ef4444'}; padding: 2px 8px; border-radius: 2px; display: ${d.showKickerBox !== false ? 'block' : 'none'};">
-                  <span id="jani-txt-kicker-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 900; color: #fff; letter-spacing: 1px;">${d.kickerBadge}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 14px; width: 100%;">
+                <span id="jani-txt-ticker-left-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 6px; font-weight: 800; color: rgba(255,255,255,0.55); letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; flex-shrink: 1;">${d.topTickerLeft}</span>
+                <div id="jani-kicker-box-${tplId}" style="background: ${d.kickerBoxBg || '#ef4444'}; padding: 2px 7px; border-radius: 2px; display: ${d.showKickerBox !== false ? 'inline-flex' : 'none'}; align-items: center; justify-content: center; flex-shrink: 0; white-space: nowrap; height: 13px; box-sizing: border-box;">
+                  <span id="jani-txt-kicker-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 6.5px; font-weight: 900; color: #ffffff; letter-spacing: 0.8px; white-space: nowrap; text-transform: uppercase; line-height: 1;">${d.kickerBadge}</span>
                 </div>
-                <span id="jani-txt-ticker-right-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 6.5px; font-weight: 800; color: rgba(255,255,255,0.6); letter-spacing: 0.8px; text-transform: uppercase;">${d.topTickerRight}</span>
+                <span id="jani-txt-ticker-right-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 6px; font-weight: 800; color: rgba(255,255,255,0.55); letter-spacing: 0.4px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; flex-shrink: 1; text-align: right;">${d.topTickerRight}</span>
               </div>
 
               <!-- Forbes Masthead with Ghosted DOF Duplicate (Image 2) -->
-              <div style="position: relative; text-align: center; margin-top: 2px;">
+              <div style="position: relative; text-align: center; margin-top: 6px;">
                 <!-- Ghosted Depth-of-Field Blur Duplicate -->
-                <div id="jani-txt-ghost-masthead-${tplId}" style="position: absolute; inset: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 82px; font-weight: 900; letter-spacing: -2px; color: rgba(255,255,255,0.7); filter: blur(10px); transform: translateY(6px); opacity: ${d.ghostBloomOpacity / 100}; line-height: 1;">
+                <div id="jani-txt-ghost-masthead-${tplId}" style="position: absolute; inset: 0; font-family: 'Playfair Display', Georgia, serif; font-size: 80px; font-weight: 900; letter-spacing: -2px; color: rgba(255,255,255,0.7); filter: blur(10px); transform: translateY(6px); opacity: ${d.ghostBloomOpacity / 100}; line-height: 0.95;">
                   ${d.magazineTitle || 'Forbes'}
                 </div>
                 <!-- Main Forbes Masthead -->
-                <div id="jani-txt-main-masthead-${tplId}" style="position: relative; font-family: 'Playfair Display', Georgia, serif; font-size: 82px; font-weight: 900; letter-spacing: -2px; color: ${d.mastheadColor || '#ffffff'}; text-shadow: 0 4px 20px rgba(0,0,0,0.85); line-height: 1;">
+                <div id="jani-txt-main-masthead-${tplId}" style="position: relative; font-family: 'Playfair Display', Georgia, serif; font-size: 80px; font-weight: 900; letter-spacing: -2px; color: ${d.mastheadColor || '#ffffff'}; text-shadow: 0 4px 20px rgba(0,0,0,0.85); line-height: 0.95;">
                   ${d.magazineTitle || 'Forbes'}
                 </div>
               </div>
@@ -388,6 +388,41 @@
     // Audio SFX on flash hits
     if (st.flashTriggerNow && (data.enableFlashSFX !== false)) {
       triggerShutterSFX();
+    }
+
+    // Dynamic text content sync
+    if (data) {
+      const kickerEl = container.querySelector(`#jani-txt-kicker-${tplId}`);
+      if (kickerEl && data.kickerBadge !== undefined) kickerEl.textContent = data.kickerBadge;
+
+      const tickerLeft = container.querySelector(`#jani-txt-ticker-left-${tplId}`);
+      if (tickerLeft && data.topTickerLeft !== undefined) tickerLeft.textContent = data.topTickerLeft;
+
+      const tickerRight = container.querySelector(`#jani-txt-ticker-right-${tplId}`);
+      if (tickerRight && data.topTickerRight !== undefined) tickerRight.textContent = data.topTickerRight;
+
+      const mainMasthead = container.querySelector(`#jani-txt-main-masthead-${tplId}`);
+      if (mainMasthead && data.magazineTitle !== undefined) mainMasthead.textContent = data.magazineTitle;
+
+      if (ghostMasthead && data.magazineTitle !== undefined) ghostMasthead.textContent = data.magazineTitle;
+
+      const fTag = container.querySelector(`#jani-txt-feature-tag-${tplId}`);
+      if (fTag && data.featureTag !== undefined) fTag.textContent = data.featureTag;
+
+      const fTitle = container.querySelector(`#jani-txt-feature-title-${tplId}`);
+      if (fTitle && data.featureTitle !== undefined) fTitle.textContent = data.featureTitle;
+
+      const sub1 = container.querySelector(`#jani-txt-subhead-1-${tplId}`);
+      if (sub1 && data.subHeadline1 !== undefined) sub1.textContent = data.subHeadline1;
+
+      const sub2 = container.querySelector(`#jani-txt-subhead-2-${tplId}`);
+      if (sub2 && data.subHeadline2 !== undefined) sub2.textContent = data.subHeadline2;
+
+      const sName = container.querySelector(`#jani-txt-subject-name-${tplId}`);
+      if (sName && data.subjectName !== undefined) sName.textContent = data.subjectName;
+
+      const sQuote = container.querySelector(`#jani-txt-subject-quote-${tplId}`);
+      if (sQuote && data.subjectQuote !== undefined) sQuote.textContent = data.subjectQuote;
     }
   }
 
@@ -520,20 +555,20 @@
     // Top Kicker Badge
     if (data.showKickerBox !== false) {
       ctx.fillStyle = data.kickerBoxBg || '#ef4444';
-      ctx.fillRect(-45, cy + 18, 90, 16);
+      ctx.fillRect(-42, cy + 18, 84, 13);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '900 8px Inter, sans-serif';
+      ctx.font = '900 6.5px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(data.kickerBadge || 'SPECIAL ISSUE', 0, cy + 29);
+      ctx.fillText(data.kickerBadge || 'SPECIAL ISSUE', 0, cy + 27.5);
     }
 
     // Ticker Headlines
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '800 6.5px Inter, sans-serif';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+    ctx.font = '800 6px Inter, sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(data.topTickerLeft || '', cx + 24, cy + 29);
+    ctx.fillText(data.topTickerLeft || '', cx + 24, cy + 27.5);
     ctx.textAlign = 'right';
-    ctx.fillText(data.topTickerRight || '', cx + coverW - 24, cy + 29);
+    ctx.fillText(data.topTickerRight || '', cx + coverW - 24, cy + 27.5);
 
     // Ghosted Masthead Duplicate (Image 2)
     if (st.ghostOpacity > 0.02) {
