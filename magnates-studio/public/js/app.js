@@ -28476,8 +28476,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
 
           <!-- Scene 3: Spinning Earth Globe & Wavy-to-Flat Headline ("FOR ALMOST NOTHING.") -->
-          <img id="fx-bp-globe-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.globeUrl) ? magnatesBPState.globeUrl : '/globe_atlantic_clean.svg'}" style="position: absolute; left: 50%; bottom: -62%; width: 78%; aspect-ratio: 1/1; object-fit: contain; border-radius: 50%; z-index: 13; filter: drop-shadow(0 -6px 16px rgba(255,255,255,0.22)); pointer-events: none; opacity: 0;" />
-          <div id="fx-bp-globe-txt-${tplId}" style="position: absolute; left: 5%; right: 5%; top: 37%; transform: translateY(-50%); z-index: 14; text-align: center; font-family: 'Montserrat', 'Arial Black', sans-serif; font-size: 13.5px; font-weight: 900; color: #f20d0d; letter-spacing: 0.5px; text-shadow: 0 0 14px rgba(239,20,20,0.65); pointer-events: none; opacity: 0; white-space: nowrap;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.globeHeadline) ? magnatesBPState.globeHeadline : 'FOR ALMOST NOTHING.'}</div>
+          <img id="fx-bp-globe-${tplId}" src="${(typeof magnatesBPState !== 'undefined' && magnatesBPState.globeUrl) ? magnatesBPState.globeUrl : '/globe_atlantic_clean.svg'}" style="position: absolute; left: 50%; top: 50.5%; width: 91.5%; aspect-ratio: 1/1; object-fit: contain; border-radius: 50%; z-index: 13; filter: drop-shadow(0 -6px 16px rgba(255,255,255,0.22)); pointer-events: none; opacity: 0;" />
+          <div id="fx-bp-globe-txt-${tplId}" style="position: absolute; left: 5%; right: 5%; top: 38.5%; transform: translateY(-50%); z-index: 14; text-align: center; font-family: 'Montserrat', 'Arial Black', sans-serif; font-size: 13.5px; font-weight: 900; color: #f20d0d; letter-spacing: 0.5px; text-shadow: 0 0 14px rgba(239,20,20,0.65); pointer-events: none; opacity: 0; white-space: nowrap;">${(typeof magnatesBPState !== 'undefined' && magnatesBPState.globeHeadline) ? magnatesBPState.globeHeadline : 'FOR ALMOST NOTHING.'}</div>
 
           <!-- Scene B: Center Red Money Counter -->
           <div id="fx-bp-counter-wrap-${tplId}" style="position: relative; z-index: 4; text-align: center; transform: translateY(-4%); pointer-events: none; opacity: 0;">
@@ -29538,7 +29538,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           const gOutP = easeIn((c - 7.35) / 0.55);
           const gActive = c >= 4.90 && c <= 7.95;
           globeEl.style.opacity = gActive ? Math.max(0, Math.min(1, gInP * 1.4) * (1 - gOutP * 1.1)).toFixed(2) : '0';
-          const gy = (1 - gInP) * 85 + gOutP * 90;
+          const gy = (1 - gInP) * 58 + gOutP * 65;
           const rot = Math.max(0, c - 4.90) * 18;
           globeEl.style.transform = `translate(-50%, ${gy.toFixed(1)}%) rotate(${rot.toFixed(1)}deg)`;
           if (typeof renderGlobeWavyHeadlineSpans === 'function') {
@@ -49222,11 +49222,13 @@ function updateMagnatesBPVisualStyles() {
     } else {
       globeLayer.style.display = 'flex';
       // 1) Glides in from bottom -> up (tGlobeStart to tGlobeStart + 0.58s, matching Image 1)
+      // Resting position: top: 50.5% with translateY(0%) places apex exactly at 50.5% of stage height,
+      // perfectly below the headline at top: 38.5% with dark negative space breathing room (Image 2)
       const gRiseProg = bpEaseOutCubic((p - tGlobeStart) / 0.58);
       // 2) Exits from its location -> down (tGlobeExit to tGlobeExit + 0.62s, matching Image 5)
       const gExitDownProg = p >= tGlobeExit ? bpEaseInCubic((p - tGlobeExit) / 0.62) : 0;
 
-      const gy = (1 - gRiseProg) * 85 + gExitDownProg * 92;
+      const gy = (1 - gRiseProg) * 58 + gExitDownProg * 65;
       const gOp = Math.max(0, Math.min(1, gRiseProg * 1.45) * (1 - gExitDownProg * 1.1));
       globeLayer.style.transform = `translate3d(-50%, ${gy.toFixed(2)}%, 0)`;
       globeLayer.style.opacity = gOp.toFixed(3);
