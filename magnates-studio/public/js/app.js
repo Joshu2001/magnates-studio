@@ -23247,19 +23247,21 @@ const EFFECT_TEMPLATES_DATA = [
     defaultImage: '/jani_forbes_cover_thumb.svg',
     secondaryImage: '/portrait_cutout_clean.png'
   },
-  {
+    {
     id: 'creator-cinematic-studio',
     title: 'Cinematic Creator Studio: Calibratable DOF, Lighting & Face-Lock',
     category: 'Vlog & Story',
     origCategory: 'Vlog & Story',
     badge: 'NEW • CALIBRATABLE STUDIO',
     difficulty: '1-Click',
-    timeToApply: '2 sec',
+    timeToApply: '6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(8, 47, 73, 0.95), rgba(3, 28, 45, 0.95))',
     description: 'Cinematic creator backdrop template with calibratable depth-of-field blur, lighting and color grading controls, virtual studio preset switching, edge-smoothing face tracking, and manual holdout protection brush.',
     tags: ['Background Blur', 'Depth of Field', 'Lighting Calibration', 'Face Tracking', 'Studio Bokeh', 'Hold-out Brush'],
-    defaultImage: '/creator_cinematic_portrait_ref.png',
-    secondaryImage: '/creator_cinematic_voice_ref.png'
+    defaultImage: '/creator_portrait_cutout.png',
+    cutoutImage: '/creator_portrait_cutout.png',
+    secondaryImage: '/creator_background_plate.png',
+    originalImage: '/creator_cinematic_portrait_ref.png'
   },
   {
     id: 'parallax',
@@ -28342,7 +28344,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'creator-cinematic-backdrop-suite') {
+    } else if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #020b14; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img id="fx-creator-bg-${tplId}" src="/creator_background_plate.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(28px) brightness(65%) contrast(125%);" />
@@ -28360,7 +28362,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'creator-cinematic-backdrop-suite') {
+    } else if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
       const blurVal = 24 + Math.sin(t * 1.5) * 8;
       const bgImg = fxContainer?.querySelector(`#fx-creator-bg-${tplId}`);
       const fgImg = fxContainer?.querySelector(`#fx-creator-fg-${tplId}`);
@@ -29980,8 +29982,7 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-globe-wavy-nothing': () => openMagnatesPaperBlueprintSuite('globe_wavy_nothing'),
     'magnates-media-dual-silhouettes': () => openMagnatesPaperBlueprintSuite('dual_silhouette'),
     'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
-    'magnates-media-particle-vfx': openMagnatesParticleVFXSuite,
-    'creator-cinematic-backdrop-suite': openCreatorCinematicSuite
+    'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
   };
 
   if (dedicatedSuiteMap[templateId]) {
@@ -30407,9 +30408,7 @@ function applySelectedHomepageTemplate(templateId) {
     // Launch Magnates Media Ink Reveal Text Animation Suite
     openMagnatesInkRevealSuite();
     return;
-  } else if (templateId === 'creator-cinematic-backdrop-suite') {
-    openCreatorCinematicSuite();
-    return;
+
   } else if (templateId === 'magnates-media-particle-vfx') {
     // Launch Magnates Media Particle & VFX Overlays Suite
     openMagnatesParticleVFXSuite();
@@ -30895,7 +30894,7 @@ function openTopTemplateCustomizer(tpl) {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountForbes3DStage(stage, cData);
       }
-    } else if (tpl.id === 'creator-cinematic-backdrop-suite') {
+    } else if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
       topCustomizerState.primaryUrl = '/creator_portrait_cutout.png';
       topCustomizerState.secondaryUrl = '/creator_background_plate.png';
       topCustomizerState.originalPhotoUrl = '/creator_cinematic_portrait_ref.png';
@@ -31159,6 +31158,8 @@ function openTopTemplateCustomizer(tpl) {
   // Universal Template Isolation Reset: hide all template-specific panels by default
   const creatorWrapEl = document.getElementById('tpl-modal-wrap-creator-calibration');
   if (creatorWrapEl) creatorWrapEl.style.display = 'none';
+  const quickActionsWrapEl = document.getElementById('tpl-modal-wrap-quick-actions');
+  if (quickActionsWrapEl) quickActionsWrapEl.style.display = 'flex';
   const sigilWrapEl = document.getElementById('tpl-modal-wrap-sigil-fx');
   if (sigilWrapEl) sigilWrapEl.style.display = 'none';
   const spoonerWrapEl = document.getElementById('tpl-modal-spooner-controls');
@@ -31206,13 +31207,14 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
 
-  if (tpl.id === 'creator-cinematic-backdrop-suite') {
+  if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
     if (labelPrim) labelPrim.textContent = '👤 Cutout Speaker (Foreground Face/Torso)';
     if (labelSec) labelSec.textContent = '🌆 Calibrated Background Plate / Studio';
     if (wrapPrim) wrapPrim.style.display = 'flex';
     if (wrapSec) wrapSec.style.display = 'flex';
     if (wrapText) wrapText.style.display = 'none';
     if (creatorWrapEl) creatorWrapEl.style.display = 'flex';
+    if (quickActionsWrapEl) quickActionsWrapEl.style.display = 'none';
     if (atmosphereWrapEl) atmosphereWrapEl.style.display = 'none';
     const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
     if (aiEngineWrap) aiEngineWrap.style.display = 'none';
@@ -32028,7 +32030,7 @@ function openTopTemplateCustomizer(tpl) {
   if (inputTextMain) inputTextMain.value = topCustomizerState.mainText;
   if (inputTextSub) inputTextSub.value = topCustomizerState.subText;
   if (colorTextMain) colorTextMain.value = topCustomizerState.textColor;
-  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand'].concat(BIZ_STORY_IDS).includes(tpl.id) ? 'none' : 'flex';
+  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand', 'creator-cinematic-studio', 'creator-cinematic-backdrop-suite'].concat(BIZ_STORY_IDS).includes(tpl.id) ? 'none' : 'flex';
 
   const modalKineticInput = document.getElementById('modal-kinetic-text-input');
   const modalKineticColor = document.getElementById('modal-kinetic-text-color');
@@ -33196,67 +33198,67 @@ function renderTopTemplatePreviewStage() {
       </div>
     `;
     setTimeout(initDocDirectCanvasEditing, 40);
-  } else if (tplId === 'creator-cinematic-backdrop-suite') {
+  } else if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
     const cState = topCustomizerState;
     const cMode = cState.creatorMode || 'original';
     const cPreset = cState.creatorVirtualPreset || 'studio';
     let bgUrl = sec || '/creator_background_plate.png';
     if (cMode === 'virtual') {
       if (cPreset === 'cyber') bgUrl = '/creator_cyber_bokeh_preset.png';
-      else if (cPreset === 'boardroom') bgUrl = '/creator_studio_bokeh_preset.png';
+      else if (cPreset === 'boardroom') bgUrl = '/boardroom_scene_hd.jpg';
       else bgUrl = '/creator_studio_bokeh_preset.png';
     }
     const cBlur = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
     const cBrightness = cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65;
     const cTint = cState.creatorTint !== undefined ? cState.creatorTint : 45;
+    const tintA = (cTint / 100) * 0.75;
     const cWarmBokeh = cState.creatorWarmBokeh !== false;
     const cRim = cState.creatorRim !== undefined ? cState.creatorRim : 75;
-    const cTextLeft = cState.creatorTextLeft || 'this AI company';
-    const cTextRight = cState.creatorTextRight || 'VOICE';
+    const cTextLeft = cState.creatorTextLeft !== undefined ? cState.creatorTextLeft : 'this AI company';
+    const cTextRight = cState.creatorTextRight !== undefined ? cState.creatorTextRight : 'VOICE';
+    const strokeCount = Array.isArray(cState.creatorBrushStrokes) ? cState.creatorBrushStrokes.length : 0;
 
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #020b14; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
-        <!-- Layer 0: Background Plate with Depth Blur & Exposure Dimming -->
-        <div id="creator-live-bg-wrap" style="position: absolute; inset: -5%; width: 110%; height: 110%; overflow: hidden;">
-          <img id="creator-live-bg" src="${bgUrl}" alt="Calibrated Background" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(${cBlur}px) brightness(${(cBrightness / 100).toFixed(2)}) contrast(1.25); transform: scale(1.05);" />
-        </div>
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <!-- Layer 1: Background Plate (Virtual Studio or Original Scene) -->
+        <img id="creator-live-bg" src="${bgUrl}" alt="Studio Background Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(${cBlur}px) brightness(${cBrightness}%) contrast(125%); transition: filter 0.05s ease;" />
 
-        <!-- Layer 1: Volumetric Lighting & Cyan/Teal Atmospheric Grade Overlay -->
-        <div id="creator-live-lighting" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${(cTint / 100).toFixed(2)}) 0%, rgba(30, 58, 138, 0.15) 55%, transparent 75%); z-index: 2;"></div>
+        <!-- Layer 2: Customizable Lighting & Rim Gradient Overlay -->
+        <div id="creator-live-lighting" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 55%, transparent 75%); transition: all 0.08s ease; z-index: 2;"></div>
 
-        <!-- Layer 2: Moody Warm Bokeh Accent Lamps -->
+        <!-- Warm Lamp Accent Lights (Left & Right Bokeh Highlights) -->
         <div id="creator-live-bokeh-wrap" style="position: absolute; inset: 0; pointer-events: none; z-index: 3; display: ${cWarmBokeh ? 'block' : 'none'};">
-          <div id="creator-live-bokeh-left" style="position: absolute; left: 8%; top: 60%; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%); filter: blur(12px);"></div>
-          <div id="creator-live-bokeh-right" style="position: absolute; right: 8%; top: 50%; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, transparent 70%); filter: blur(14px);"></div>
+          <div id="creator-live-bokeh-left" style="position: absolute; left: 6%; top: 62%; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, transparent 70%); filter: blur(22px); pointer-events: none;"></div>
+          <div id="creator-live-bokeh-right" style="position: absolute; right: 5%; top: 52%; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.42) 0%, transparent 70%); filter: blur(26px); pointer-events: none;"></div>
         </div>
 
-        <!-- Layer 3: Kinetic Text Behind Speaker -->
-        <div id="creator-live-kinetic-text" style="position: absolute; inset: 0; pointer-events: none; z-index: 12;">
-          <div id="creator-live-txt-left" style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 16px; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.85);">${cTextLeft}</div>
-          <div id="creator-live-txt-right" style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 900; font-size: 54px; color: #ffffff; text-shadow: 0 4px 20px rgba(0,0,0,0.9); letter-spacing: -0.04em;">${cTextRight}</div>
+        <!-- Kinetic In-Scene Word Callouts matching reference -->
+        <div id="creator-live-txt-left" style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 26px; color: #ffffff; text-shadow: 0 4px 16px rgba(0,0,0,0.85); pointer-events: none; z-index: 12; letter-spacing: -0.5px;">${cTextLeft}</div>
+        <div id="creator-live-txt-right" style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 900; font-size: 46px; color: #ffffff; text-shadow: 0 6px 24px rgba(0,0,0,0.85); pointer-events: none; z-index: 12; letter-spacing: -1px;">${cTextRight}</div>
+
+        <!-- Layer 3: Ultra Crisp Foreground Subject Cutout -->
+        <img id="creator-live-fg-img" src="${prim || '/creator_portrait_cutout.png'}" alt="Foreground Subject" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; pointer-events: none; transition: transform 0.04s ease;" />
+
+        <!-- Edge Rim Highlight Simulation -->
+        <div id="creator-live-rim-light" style="position: absolute; inset: 0; z-index: 11; pointer-events: none; mix-blend-mode: screen; opacity: ${(cRim / 100).toFixed(2)}; background: radial-gradient(ellipse at 50% 45%, transparent 32%, rgba(56, 189, 248, 0.28) 46%, transparent 58%);"></div>
+
+        <!-- Face Lock Guide / Anti-Glitch Hold-out Zone (Visual Tracker & Holdout) -->
+        <div id="creator-live-reticle" style="position: absolute; width: 190px; height: 230px; border: 2px dashed ${cState.creatorFaceTrack !== false ? '#38bdf8' : 'rgba(148,163,184,0.35)'}; border-radius: 50%; pointer-events: none; z-index: 20; box-shadow: 0 0 20px rgba(56,189,248,0.3); transform: translate(-50%, -50%); left: 49.5%; top: 35%; display: flex; align-items: center; justify-content: center;">
+          <span id="creator-face-track-status" style="position: absolute; top: -20px; font-family: monospace; font-size: 8.5px; font-weight: 800; color: ${cState.creatorFaceTrack !== false ? '#38bdf8' : '#94a3b8'}; background: rgba(2,6,23,0.9); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.4); text-transform: uppercase; white-space: nowrap;">${cState.creatorFaceTrack !== false ? '&#x1F512; Face Lock &bull; Smooth Active' : '&#x1F513; Face Lock &bull; Unfiltered'}</span>
+          <div style="width: 8px; height: 8px; border: 1px solid #38bdf8; border-radius: 50%;"></div>
         </div>
 
-        <!-- Layer 4: Segmented Foreground Speaker with Rim Light -->
-        <div id="creator-live-fg-wrap" style="position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; pointer-events: none; z-index: 20;">
-          <img id="creator-live-fg-img" src="${prim || '/creator_portrait_cutout.png'}" alt="Creator Cutout" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); height: 95%; max-width: none; object-fit: contain; filter: drop-shadow(0 0 ${Math.round(cRim * 0.24)}px rgba(2, 132, 199, ${(cRim / 100).toFixed(2)})) drop-shadow(0 15px 35px rgba(0,0,0,0.9)); transition: transform 0.05s ease-out;" />
-        </div>
+        <!-- Manual Protection Brush Canvas Overlay -->
+        <canvas id="creator-live-brush-canvas" width="933" height="523" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 25; pointer-events: auto; opacity: 0.55; cursor: crosshair;"></canvas>
 
-        <!-- Layer 5: Anti-Glitch Face Tracking Reticle Guide (Toggled) -->
-        <div id="creator-live-reticle" style="position: absolute; top: 16%; left: 50%; transform: translateX(-50%); width: 140px; height: 160px; border: 1.5px dashed rgba(56, 189, 248, 0.75); border-radius: 80px 80px 70px 70px; pointer-events: none; z-index: 25; display: ${cState.creatorFaceTrack !== false ? 'block' : 'none'}; box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);">
-          <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); background: rgba(14, 165, 233, 0.9); color: #fff; font-family: monospace; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 3px; letter-spacing: 0.5px; white-space: nowrap;">
-            AI FACE-LOCK: ACTIVE
-          </div>
-          <div style="position: absolute; top: 50%; left: -6px; width: 12px; height: 1.5px; background: #38bdf8;"></div>
-          <div style="position: absolute; top: 50%; right: -6px; width: 12px; height: 1.5px; background: #38bdf8;"></div>
-          <div style="position: absolute; top: -6px; left: 50%; width: 1.5px; height: 12px; background: #38bdf8;"></div>
-          <div style="position: absolute; bottom: -6px; left: 50%; width: 1.5px; height: 12px; background: #38bdf8;"></div>
+        <!-- Bottom Left HUD Telemetry -->
+        <div style="position: absolute; bottom: 10px; left: 12px; z-index: 30; pointer-events: none; display: flex; align-items: center; gap: 8px;">
+          <span id="creator-telemetry-pill" style="font-family: monospace; font-size: 9px; font-weight: 700; color: #38bdf8; background: rgba(5,7,15,0.85); border: 1px solid rgba(56,189,248,0.3); padding: 3px 8px; border-radius: 6px;">TRACKING: ${cState.creatorFaceTrack !== false ? 'SMOOTH_ON' : 'OFF'} &bull; BLUR: ${cBlur}px &bull; LIGHT: ${cBrightness}% &bull; HOLD_OUT: ${strokeCount} PTS</span>
         </div>
-
-        <!-- Layer 6: Hold-out Protection Brush Overlay Canvas -->
-        <canvas id="creator-live-brush-canvas" width="1280" height="720" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: ${cState.creatorBrushActive ? 'auto' : 'none'}; z-index: 30; opacity: 0.75; cursor: crosshair;"></canvas>
       </div>
     `;
-    setTimeout(initCreatorBrushInteraction, 50);
+    setTimeout(initCreatorBrushInteraction, 40);
+
   } else if (tplId === 'spooner-2-5d-photo-parallax') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; cursor: default; perspective: 1200px;">
@@ -33772,29 +33774,27 @@ function updateTopCustomizerFrame(seqTime, now) {
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
 
-  if (tplId === 'creator-cinematic-backdrop-suite') {
+  if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
     const fgImg = document.getElementById('creator-live-fg-img');
     const reticle = document.getElementById('creator-live-reticle');
-    const bg = document.getElementById('creator-live-bg');
     const cState = topCustomizerState;
-    if (cState.creatorFaceTrack !== false && fgImg) {
-      const sens = (cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94) / 100;
-      // Natural organic head sway with temporal low-pass filter (anti-twitch smoothing)
-      const targetX = Math.sin(seqTime * 1.2) * 5 * sens + Math.sin(seqTime * 0.4) * 2.5 * sens;
-      const targetY = Math.cos(seqTime * 0.9) * 2.5 * sens;
-      cState.creatorSmoothedX = (cState.creatorSmoothedX || 0) * 0.92 + targetX * 0.08;
-      cState.creatorSmoothedY = (cState.creatorSmoothedY || 0) * 0.92 + targetY * 0.08;
-      
-      fgImg.style.transform = `translate(calc(-50% + ${cState.creatorSmoothedX.toFixed(2)}px), ${cState.creatorSmoothedY.toFixed(2)}px)`;
-      if (reticle) {
-        reticle.style.transform = `translate(calc(-50% + ${cState.creatorSmoothedX.toFixed(2)}px), ${cState.creatorSmoothedY.toFixed(2)}px)`;
-      }
+    const t = seqTime;
+    const rawTargetX = Math.sin(t * 1.6) * 5.5 + Math.sin(t * 3.2) * 2.0;
+    const rawTargetY = Math.cos(t * 1.3) * 3.5;
+
+    // Edge-Lock Smoothing (Temporal Jitter Filter to prevent edge-twitching)
+    const sens = cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94;
+    const alphaSmooth = (cState.creatorFaceTrack !== false) ? (sens / 100) * 0.18 : 0.02;
+    cState.creatorSmoothedX = (cState.creatorSmoothedX || 0) + (rawTargetX - (cState.creatorSmoothedX || 0)) * alphaSmooth;
+    cState.creatorSmoothedY = (cState.creatorSmoothedY || 0) + (rawTargetY - (cState.creatorSmoothedY || 0)) * alphaSmooth;
+
+    if (fgImg) {
+      fgImg.style.transform = `translate(${cState.creatorSmoothedX.toFixed(2)}px, ${cState.creatorSmoothedY.toFixed(2)}px)`;
     }
-    if (bg) {
-      // Subtle counter-drift parallax for background depth
-      const bgDriftX = -Math.sin(seqTime * 0.8) * 4;
-      bg.style.transform = `scale(1.05) translate(${bgDriftX.toFixed(2)}px, 0)`;
+    if (reticle) {
+      reticle.style.transform = `translate(calc(-50% + ${cState.creatorSmoothedX.toFixed(2)}px), calc(-50% + ${cState.creatorSmoothedY.toFixed(2)}px))`;
     }
+
   } else if (tplId === 'spooner-2-5d-photo-parallax') {
     const bg = document.getElementById('customizer-live-bg');
     const fg = document.getElementById('customizer-live-fg-wrap');
@@ -34739,7 +34739,7 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
   let textClips = [];
   let focusClip = null;
 
-  if (tpl.id === 'creator-cinematic-backdrop-suite') {
+  if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
     const cState = topCustomizerState;
     const mode = cState.creatorMode || 'original';
     const preset = cState.creatorVirtualPreset || 'studio';
@@ -55181,17 +55181,29 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 }
 
 
+function updateCreatorTelemetryPill() {
+  const cState = topCustomizerState;
+  const tele = document.getElementById('creator-telemetry-pill');
+  if (tele) {
+    const b = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
+    const l = cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65;
+    const pts = Array.isArray(cState.creatorBrushStrokes) ? cState.creatorBrushStrokes.length : 0;
+    tele.textContent = `TRACKING: ${cState.creatorFaceTrack !== false ? 'SMOOTH_ON' : 'OFF'} • BLUR: ${b}px • LIGHT: ${l}% • HOLD_OUT: ${pts} PTS`;
+  }
+}
+
 function syncCreatorCalibrationUI() {
   const cState = topCustomizerState;
   const slBlur = document.getElementById('std-creator-slider-blur');
   const vBlur = document.getElementById('std-creator-val-blur');
   if (slBlur) slBlur.value = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
-  if (vBlur) vBlur.textContent = `${cState.creatorBlur !== undefined ? cState.creatorBlur : 28} px`;
+  if (vBlur) vBlur.textContent = `${cState.creatorBlur !== undefined ? cState.creatorBlur : 28}px`;
 
   const slSoft = document.getElementById('std-creator-slider-softness');
   const vSoft = document.getElementById('std-creator-val-softness');
-  if (slSoft) slSoft.value = cState.creatorSoftness !== undefined ? cState.creatorSoftness : 28;
-  if (vSoft) vSoft.textContent = `${cState.creatorSoftness !== undefined ? cState.creatorSoftness : 28} px`;
+  const softVal = cState.creatorSoftness !== undefined ? cState.creatorSoftness : 28;
+  if (slSoft) slSoft.value = softVal;
+  if (vSoft) vSoft.textContent = `${(softVal / 15).toFixed(1)} f/stop`;
 
   const slBright = document.getElementById('std-creator-slider-brightness');
   const vBright = document.getElementById('std-creator-val-brightness');
@@ -55225,10 +55237,10 @@ function syncCreatorCalibrationUI() {
   if (vBrush) vBrush.textContent = `${cState.creatorBrushSize || 35}px`;
 
   const inLeft = document.getElementById('std-creator-input-text-left');
-  if (inLeft) inLeft.value = cState.creatorTextLeft || 'this AI company';
+  if (inLeft) inLeft.value = cState.creatorTextLeft !== undefined ? cState.creatorTextLeft : 'this AI company';
 
   const inRight = document.getElementById('std-creator-input-text-right');
-  if (inRight) inRight.value = cState.creatorTextRight || 'VOICE';
+  if (inRight) inRight.value = cState.creatorTextRight !== undefined ? cState.creatorTextRight : 'VOICE';
 
   const updateModeButtons = () => {
     const isVirt = cState.creatorMode === 'virtual';
@@ -55236,13 +55248,11 @@ function syncCreatorCalibrationUI() {
     const btnVirt = document.getElementById('btn-creator-mode-virtual');
     const rowVirt = document.getElementById('creator-virtual-preset-row');
     if (btnOrig) {
-      btnOrig.style.border = !isVirt ? '1px solid rgba(168, 85, 247, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)';
-      btnOrig.style.background = !isVirt ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.04)';
+      btnOrig.style.background = !isVirt ? '#0284c7' : 'transparent';
       btnOrig.style.color = !isVirt ? '#fff' : '#94a3b8';
     }
     if (btnVirt) {
-      btnVirt.style.border = isVirt ? '1px solid rgba(168, 85, 247, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)';
-      btnVirt.style.background = isVirt ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.04)';
+      btnVirt.style.background = isVirt ? '#0284c7' : 'transparent';
       btnVirt.style.color = isVirt ? '#fff' : '#94a3b8';
     }
     if (rowVirt) rowVirt.style.display = isVirt ? 'grid' : 'none';
@@ -55251,46 +55261,50 @@ function syncCreatorCalibrationUI() {
       const bPreset = document.getElementById('btn-creator-preset-' + pId);
       if (bPreset) {
         const isAct = (cState.creatorVirtualPreset || 'studio') === pId;
-        bPreset.style.border = isAct ? '1px solid rgba(168, 85, 247, 0.7)' : '1px solid rgba(255, 255, 255, 0.1)';
-        bPreset.style.background = isAct ? 'rgba(168, 85, 247, 0.25)' : 'rgba(255, 255, 255, 0.04)';
-        bPreset.style.color = isAct ? '#d8b4fe' : '#94a3b8';
+        bPreset.style.border = isAct ? '1px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.1)';
+        bPreset.style.background = isAct ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.03)';
+        bPreset.style.color = isAct ? '#fff' : '#94a3b8';
       }
     });
   };
 
   updateModeButtons();
+  updateCreatorTelemetryPill();
 
   if (!window._creatorCalibrationListenersAttached) {
     window._creatorCalibrationListenersAttached = true;
 
     slBlur?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorBlur = val;
-      if (vBlur) vBlur.textContent = `${val} px`;
+      if (vBlur) vBlur.textContent = `${val}px`;
       const bgImg = document.getElementById('creator-live-bg');
-      if (bgImg) bgImg.style.filter = `blur(${val}px) brightness(${((cState.creatorBrightness || 65) / 100).toFixed(2)}) contrast(1.1)`;
+      if (bgImg) bgImg.style.filter = `blur(${val}px) brightness(${cState.creatorBrightness ?? 65}%) contrast(125%)`;
+      updateCreatorTelemetryPill();
     });
 
     slSoft?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorSoftness = val;
-      if (vSoft) vSoft.textContent = `${val} px`;
+      if (vSoft) vSoft.textContent = `${(val / 15).toFixed(1)} f/stop`;
     });
 
     slBright?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorBrightness = val;
       if (vBright) vBright.textContent = `${val}%`;
       const bgImg = document.getElementById('creator-live-bg');
-      if (bgImg) bgImg.style.filter = `blur(${cState.creatorBlur || 28}px) brightness(${(val / 100).toFixed(2)}) contrast(1.1)`;
+      if (bgImg) bgImg.style.filter = `blur(${cState.creatorBlur ?? 28}px) brightness(${val}%) contrast(125%)`;
+      updateCreatorTelemetryPill();
     });
 
     slTint?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorTint = val;
       if (vTint) vTint.textContent = `${val}%`;
+      const tintA = (val / 100) * 0.75;
       const lightOverlay = document.getElementById('creator-live-lighting');
-      if (lightOverlay) lightOverlay.style.background = `radial-gradient(circle at 50% 30%, rgba(6, 182, 212, ${(val / 150).toFixed(2)}) 0%, rgba(15, 23, 42, 0.4) 60%, rgba(2, 6, 23, 0.8) 100%)`;
+      if (lightOverlay) lightOverlay.style.background = `radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 55%, transparent 75%)`;
     });
 
     chkWarm?.addEventListener('change', (e) => {
@@ -55300,27 +55314,33 @@ function syncCreatorCalibrationUI() {
     });
 
     slRim?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorRim = val;
       if (vRim) vRim.textContent = `${val}%`;
-      const fgImg = document.getElementById('creator-live-fg-img');
-      if (fgImg) fgImg.style.filter = `drop-shadow(0 0 ${Math.round(val * 0.2)}px rgba(6, 182, 212, ${(val / 100).toFixed(2)})) drop-shadow(0 20px 35px rgba(0,0,0,0.9))`;
+      const rimEl = document.getElementById('creator-live-rim-light');
+      if (rimEl) rimEl.style.opacity = (val / 100).toFixed(2);
     });
 
     chkFace?.addEventListener('change', (e) => {
       cState.creatorFaceTrack = e.target.checked;
       const reticle = document.getElementById('creator-live-reticle');
-      if (reticle) reticle.style.display = e.target.checked ? 'block' : 'none';
+      const statusEl = document.getElementById('creator-face-track-status');
+      if (reticle) reticle.style.borderColor = e.target.checked ? '#38bdf8' : 'rgba(148,163,184,0.35)';
+      if (statusEl) {
+        statusEl.textContent = e.target.checked ? '🔒 Face Lock • Smooth Active' : '🔓 Face Lock • Unfiltered';
+        statusEl.style.color = e.target.checked ? '#38bdf8' : '#94a3b8';
+      }
+      updateCreatorTelemetryPill();
     });
 
     slSens?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorSensitivity = val;
       if (vSens) vSens.textContent = `${val}%`;
     });
 
     slBrush?.addEventListener('input', (e) => {
-      const val = parseInt(e.target.value);
+      const val = parseInt(e.target.value, 10);
       cState.creatorBrushSize = val;
       if (vBrush) vBrush.textContent = `${val}px`;
     });
@@ -55357,18 +55377,11 @@ function syncCreatorCalibrationUI() {
       });
     });
 
-    document.getElementById('btn-creator-brush-toggle')?.addEventListener('click', () => {
-      cState.creatorBrushActive = !cState.creatorBrushActive;
-      const lbl = document.getElementById('label-creator-brush-mode');
-      const btn = document.getElementById('btn-creator-brush-toggle');
-      if (lbl) lbl.textContent = cState.creatorBrushActive ? 'Hold Brush: PAINTING' : 'Hold Brush: OFF';
-      if (btn) {
-        btn.style.background = cState.creatorBrushActive ? 'rgba(56, 189, 248, 0.3)' : 'rgba(168, 85, 247, 0.2)';
-        btn.style.borderColor = cState.creatorBrushActive ? '#38bdf8' : 'rgba(168, 85, 247, 0.5)';
-        btn.style.color = cState.creatorBrushActive ? '#38bdf8' : '#d8b4fe';
-      }
-      const bCanvas = document.getElementById('creator-live-brush-canvas');
-      if (bCanvas) bCanvas.style.pointerEvents = cState.creatorBrushActive ? 'auto' : 'none';
+    document.getElementById('btn-creator-reset-head')?.addEventListener('click', () => {
+      cState.creatorSmoothedX = 0;
+      cState.creatorSmoothedY = 0;
+      showTextTimingAlert('Head tracking position recentered', 'info');
+      setTimeout(() => showTextTimingAlert(''), 1800);
     });
 
     document.getElementById('btn-creator-clear-brush')?.addEventListener('click', () => {
@@ -55378,8 +55391,9 @@ function syncCreatorCalibrationUI() {
         const ctx = bCanvas.getContext('2d');
         if (ctx) ctx.clearRect(0, 0, bCanvas.width, bCanvas.height);
       }
+      updateCreatorTelemetryPill();
       showTextTimingAlert('Hold-out protection mask cleared', 'info');
-      setTimeout(() => showTextTimingAlert(''), 2000);
+      setTimeout(() => showTextTimingAlert(''), 1800);
     });
   }
 }
@@ -55390,16 +55404,13 @@ function initCreatorBrushInteraction() {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  // Re-draw any existing strokes
   const cState = topCustomizerState;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (Array.isArray(cState.creatorBrushStrokes) && cState.creatorBrushStrokes.length > 0) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
     cState.creatorBrushStrokes.forEach(s => {
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
-      ctx.shadowColor = '#38bdf8';
-      ctx.shadowBlur = 12;
       ctx.fill();
     });
   }
@@ -55414,27 +55425,25 @@ function initCreatorBrushInteraction() {
     const y = (e.clientY - rect.top) * scaleY;
     const r = (cState.creatorBrushSize || 35);
 
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.4)';
-    ctx.shadowColor = '#38bdf8';
-    ctx.shadowBlur = 12;
     ctx.fill();
 
     if (!Array.isArray(cState.creatorBrushStrokes)) cState.creatorBrushStrokes = [];
     cState.creatorBrushStrokes.push({ x, y, radius: r });
+    updateCreatorTelemetryPill();
   };
 
   canvas.onpointerdown = (e) => {
-    if (!cState.creatorBrushActive) return;
     isPainting = true;
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
     paintAt(e);
   };
 
   canvas.onpointermove = (e) => {
-    if (isPainting && cState.creatorBrushActive) {
-      paintAt(e);
-    }
+    if (!isPainting) return;
+    paintAt(e);
   };
 
   canvas.onpointerup = () => { isPainting = false; };
