@@ -48233,6 +48233,10 @@ let magnatesBPState = {
   backdropColor: "#991b1b",
   backdropSpread: 75,
   bgFadeTime: 4.45,
+  extraCutouts: [],
+  audioUrl: "",
+  audioName: "",
+  theaterMode: false,
   animFrameId: null,
   lastTimestamp: null
 };
@@ -48563,9 +48567,11 @@ function updateMagnatesBPVisualStyles() {
 
   const p = magnatesBPState.playhead;
   const dur = magnatesBPState.duration;
-  const timeText = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  const isFullFlowForTimer = magnatesBPState.preset === 'full_story_flow';
+  const sceneNumLabel = isFullFlowForTimer ? (p < 4.5 ? 'Scene 1' : 'Scene 2') : (magnatesBPState.preset === 'brand_wavy_intro' ? 'Scene 1' : 'Scene 2');
+  const timeText = `${p.toFixed(1)}s / ${dur.toFixed(1)}s (${sceneNumLabel})`;
   if (timerEl) timerEl.textContent = timeText;
-  if (hudTimecode) hudTimecode.textContent = timeText;
+  if (hudTimecode) hudTimecode.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
   if (scrubberFill) scrubberFill.style.width = `${Math.max(0, Math.min(100, (p / dur) * 100)).toFixed(1)}%`;
 
   // Sync Cutout & Logo Image Sources & Inspector Thumbnails
@@ -48676,8 +48682,8 @@ function updateMagnatesBPVisualStyles() {
 
       // Position relative to center (left: 50%, top: 50%)
       // At center: translate(-50%, -50%)
-      // Shifted left (matching Screenshot 3-5): center moves to ~20% stage X -> -165% of its own width
-      const baseTx = -50 - shiftProg * 118 - exitProg * 130;
+      // Shifted left (matching original video gap): logo width is 22.5%, shifting -136% of its width moves center to 19.4% (right edge ~30.6%), leaving a crisp gap before wavy text at 36.5%!
+      const baseTx = -50 - shiftProg * 136 - exitProg * 130;
       const baseTy = -50 + (1 - riseProg) * 185;
       const op = Math.max(0, Math.min(1, (p < tIn ? 0 : riseProg * 1.35) * (1 - exitProg * 1.15)));
 
@@ -48804,6 +48810,55 @@ function updateMagnatesBPVisualStyles() {
       primaryLayer.style.opacity = m2.opacity;
     }
   }
+
+  // Render Dynamic Extra User Cutout Layers (Added via + ADD LAYER)
+  const extraStageWrap = document.getElementById('magnates-bp-extra-stage-layers');
+  if (extraStageWrap && Array.isArray(magnatesBPState.extraCutouts)) {
+    magnatesBPState.extraCutouts.forEach((ex) => {
+      let el = extraStageWrap.querySelector(`[data-bp-layer="${ex.id}"]`);
+      if (!el) {
+        el = document.createElement('div');
+        el.setAttribute('data-bp-layer', ex.id);
+        el.style.cssText = 'position: absolute; bottom: 2%; transform: translateX(-50%); pointer-events: auto; cursor: pointer; display: flex; align-items: flex-end; justify-content: center;';
+        const img = document.createElement('img');
+        img.style.cssText = 'height: 100%; width: auto; object-fit: contain;';
+        el.appendChild(img);
+        el.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(ex.id));
+        el.addEventListener('mouseleave', () => highlightMagnatesBPLayerOnStage(null));
+        el.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          selectMagnatesBPLayer(ex.id);
+        });
+        extraStageWrap.appendChild(el);
+      }
+      const img = el.querySelector('img');
+      if (img && img.getAttribute('src') !== ex.url) img.src = ex.url;
+      el.style.display = ex.enabled === false ? 'none' : 'flex';
+      el.style.left = `${ex.x ?? 50}%`;
+      el.style.height = `${ex.scale ?? 55}%`;
+      if (img) {
+        img.style.filter = bpComputeCutoutGlowFilter(ex.glowColor || '#ffffff', ex.glowIntensity ?? 85, false);
+      }
+      const mEx = computeGranularCutoutTransform(
+        inSceneBWindow ? localPB : p,
+        ex.inTime ?? 0.6,
+        ex.outTime ?? (dur - 0.8),
+        ex.inAnim || 'bottom_to_up',
+        ex.outAnim || 'fade_out'
+      );
+      el.style.transform = `translateX(-50%) ${mEx.transform}`;
+      el.style.opacity = mEx.opacity;
+    });
+  }
+
+  // Highlight active Storyboard Scene Card during playback
+  document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
+    const cType = card.getAttribute('data-scene-card');
+    const isCardActive = (magnatesBPState.preset === cType) ||
+      (magnatesBPState.preset === 'full_story_flow' && ((cType === 'brand_wavy_intro' && p < 4.5) || (cType === 'dual_silhouette' && p >= 4.5)));
+    card.style.background = isCardActive ? 'rgba(168,85,247,0.16)' : 'rgba(255,255,255,0.03)';
+    card.style.borderColor = isCardActive ? '#a855f7' : 'rgba(255,255,255,0.08)';
+  });
 
   // Persist shared state so all 3 linked templates stay bidirectionally synchronized
   saveMagnatesBPSharedSyncState();
@@ -49162,7 +49217,56 @@ function highlightMagnatesBPLayerOnStage(layerId) {
   hoverTag.textContent = titles[layerId] || layerId.toUpperCase();
 }
 
-function selectMagnatesBPLayer(layerId) {
+function renderMagnatesBPExtraLayersStack() {
+  const listEl = document.getElementById('magnates-bp-extra-layers-list');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+  (magnatesBPState.extraCutouts || []).forEach((ex, idx) => {
+    const row = document.createElement('div');
+    row.className = 'bp-inspector-layer-row';
+    row.setAttribute('data-layer-id', ex.id);
+    const active = magnatesBPState.selectedLayer === ex.id;
+    row.style.cssText = `display: flex; align-items: center; gap: 8px; background: ${active ? 'rgba(168,85,247,0.16)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${active ? 'rgba(168,85,247,0.55)' : 'rgba(255,255,255,0.07)'}; border-radius: 8px; padding: 6px 8px; cursor: pointer;`;
+    row.innerHTML = `
+      <img src="${ex.url}" style="width: 30px; height: 30px; border-radius: 6px; object-fit: contain; background: #111; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;" />
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+        <span style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ex.name || `Added Cutout #${idx + 1}`}</span>
+        <span style="font-size: 9.5px; color: #e879f9;">Custom Layer (Z=${6 + idx})</span>
+      </div>
+      <label class="bp-extra-replace-lbl" style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+        Replace
+        <input type="file" accept="image/*" style="display: none;" />
+      </label>
+      <button type="button" class="bp-extra-del-btn" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 12px; padding: 2px 4px;" title="Remove Layer">&#x1F5D1;</button>
+    `;
+    row.addEventListener('mouseenter', () => highlightMagnatesBPLayerOnStage(ex.id));
+    row.addEventListener('mouseleave', () => highlightMagnatesBPLayerOnStage(null));
+    row.addEventListener('click', () => selectMagnatesBPLayer(ex.id));
+    const fileIn = row.querySelector('input[type="file"]');
+    fileIn?.addEventListener('click', (ev) => ev.stopPropagation());
+    fileIn?.addEventListener('change', (ev) => {
+      const f = ev.target.files?.[0];
+      if (!f) return;
+      ex.url = URL.createObjectURL(f);
+      ex.name = f.name;
+      renderMagnatesBPExtraLayersStack();
+      updateMagnatesBPVisualStyles();
+    });
+    const delBtn = row.querySelector('.bp-extra-del-btn');
+    delBtn?.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      magnatesBPState.extraCutouts = magnatesBPState.extraCutouts.filter((item) => item.id !== ex.id);
+      const stageEl = document.querySelector(`#magnates-bp-extra-stage-layers [data-bp-layer="${ex.id}"]`);
+      if (stageEl) stageEl.remove();
+      renderMagnatesBPExtraLayersStack();
+      selectMagnatesBPLayer('z4');
+      updateMagnatesBPVisualStyles();
+    });
+    listEl.appendChild(row);
+  });
+}
+
+function selectMagnatesBPLayer(layerId, showFloatingBar = true) {
   if (!layerId) return;
   magnatesBPState.selectedLayer = layerId;
 
@@ -49180,6 +49284,7 @@ function selectMagnatesBPLayer(layerId) {
   const cardL1 = document.getElementById('magnates-bp-card-l1-controls');
   const cardL2 = document.getElementById('magnates-bp-card-l2-controls');
   const cardZ0 = document.getElementById('magnates-bp-card-z0-controls');
+  const cardExtra = document.getElementById('magnates-bp-card-extra-controls');
 
   [cardLogo, cardL1, cardL2, cardZ0].forEach((c) => {
     if (c) {
@@ -49188,6 +49293,7 @@ function selectMagnatesBPLayer(layerId) {
       c.style.boxShadow = 'none';
     }
   });
+  if (cardExtra) cardExtra.style.display = 'none';
 
   if ((layerId === 'z4' || layerId === 'z5') && cardLogo) {
     cardLogo.style.borderColor = 'rgba(249, 115, 22, 0.65)';
@@ -49209,9 +49315,47 @@ function selectMagnatesBPLayer(layerId) {
     cardZ0.style.background = 'rgba(16, 185, 129, 0.06)';
     cardZ0.style.boxShadow = '0 0 16px rgba(16, 185, 129, 0.15)';
     cardZ0.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (layerId.startsWith('extra_') && cardExtra) {
+    const ex = (magnatesBPState.extraCutouts || []).find((item) => item.id === layerId);
+    if (ex) {
+      cardExtra.style.display = 'flex';
+      const titleEl = document.getElementById('magnates-bp-extra-card-title');
+      if (titleEl) titleEl.textContent = `${ex.name || 'Added Cutout'} Motion & Glow`;
+      const colIn = document.getElementById('magnates-bp-extra-glow-color');
+      if (colIn) colIn.value = ex.glowColor || '#ffffff';
+      const intIn = document.getElementById('magnates-bp-extra-glow-intensity');
+      if (intIn) intIn.value = ex.glowIntensity ?? 85;
+      const intVal = document.getElementById('magnates-bp-val-extra-glow');
+      if (intVal) intVal.textContent = `${ex.glowIntensity ?? 85}%`;
+      const xIn = document.getElementById('magnates-bp-extra-x');
+      if (xIn) xIn.value = ex.x ?? 50;
+      const xVal = document.getElementById('magnates-bp-val-extra-x');
+      if (xVal) xVal.textContent = `${ex.x ?? 50}%`;
+      const scIn = document.getElementById('magnates-bp-extra-scale');
+      if (scIn) scIn.value = ex.scale ?? 55;
+      const scVal = document.getElementById('magnates-bp-val-extra-scale');
+      if (scVal) scVal.textContent = `${ex.scale ?? 55}%`;
+      cardExtra.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
-  // 3. Highlight boundary box on stage
+  // 3. Update Floating On-Stage Selection Toolbar (Matches Image 4)
+  const floatBar = document.getElementById('magnates-bp-floating-toolbar');
+  const floatLbl = document.getElementById('magnates-bp-float-label');
+  if (floatBar && floatLbl && showFloatingBar) {
+    const names = {
+      z5: 'Z=5 // WAVY HEADLINE',
+      z4: 'Z=4 // BRAND LOGO',
+      z3: 'Z=3 // RIGHT CUTOUT',
+      z2: 'Z=2 // LEFT CUTOUT',
+      z1: 'Z=1 // $1M COUNTER',
+      z0: 'Z=0 // BACKDROP'
+    };
+    floatLbl.textContent = names[layerId] || 'ADDED CUTOUT';
+    floatBar.style.display = 'flex';
+  }
+
+  // 4. Highlight boundary box on stage
   highlightMagnatesBPLayerOnStage(layerId);
 }
 
@@ -49490,6 +49634,210 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     magnatesBPState.primaryCutoutUrl = URL.createObjectURL(file);
     magnatesBPState.l2Enabled = true;
     updateMagnatesBPVisualStyles();
+  });
+
+  // + ADD LAYER (Upload & spawn a new independent cutout layer on stage & in Inspector)
+  document.getElementById('magnates-bp-add-extra-layer-input')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const id = 'extra_' + Date.now();
+    const url = URL.createObjectURL(file);
+    if (!Array.isArray(magnatesBPState.extraCutouts)) magnatesBPState.extraCutouts = [];
+    magnatesBPState.extraCutouts.push({
+      id,
+      name: file.name,
+      url,
+      enabled: true,
+      x: 50,
+      scale: 58,
+      glowColor: '#ffffff',
+      glowIntensity: 85,
+      inTime: 0.5,
+      outTime: Math.max(3.5, magnatesBPState.duration - 0.8),
+      inAnim: 'bottom_to_up',
+      outAnim: 'fade_out'
+    });
+    renderMagnatesBPExtraLayersStack();
+    updateMagnatesBPVisualStyles();
+    selectMagnatesBPLayer(id, true);
+    e.target.value = '';
+  });
+
+  // Extra Layer Inspector Controls (Glow Color, Glow Intensity, X Position, Scale)
+  document.getElementById('magnates-bp-extra-glow-color')?.addEventListener('input', (e) => {
+    const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === magnatesBPState.selectedLayer);
+    if (ex) {
+      ex.glowColor = e.target.value;
+      updateMagnatesBPVisualStyles();
+    }
+  });
+  document.getElementById('magnates-bp-extra-glow-intensity')?.addEventListener('input', (e) => {
+    const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === magnatesBPState.selectedLayer);
+    if (ex) {
+      ex.glowIntensity = parseInt(e.target.value, 10);
+      const lbl = document.getElementById('magnates-bp-val-extra-glow');
+      if (lbl) lbl.textContent = `${ex.glowIntensity}%`;
+      updateMagnatesBPVisualStyles();
+    }
+  });
+  document.getElementById('magnates-bp-extra-x')?.addEventListener('input', (e) => {
+    const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === magnatesBPState.selectedLayer);
+    if (ex) {
+      ex.x = parseInt(e.target.value, 10);
+      const lbl = document.getElementById('magnates-bp-val-extra-x');
+      if (lbl) lbl.textContent = `${ex.x}%`;
+      updateMagnatesBPVisualStyles();
+    }
+  });
+  document.getElementById('magnates-bp-extra-scale')?.addEventListener('input', (e) => {
+    const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === magnatesBPState.selectedLayer);
+    if (ex) {
+      ex.scale = parseInt(e.target.value, 10);
+      const lbl = document.getElementById('magnates-bp-val-extra-scale');
+      if (lbl) lbl.textContent = `${ex.scale}%`;
+      updateMagnatesBPVisualStyles();
+    }
+  });
+
+  // Floating Stage Selection Toolbar (Quick Glow Swatches, Replace, Done)
+  document.querySelectorAll('.btn-bp-float-glow').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const col = btn.getAttribute('data-color') || '#ffffff';
+      const sel = magnatesBPState.selectedLayer;
+      if (sel === 'z4' || sel === 'z5') magnatesBPState.logoGlowColor = col;
+      else if (sel === 'z2') magnatesBPState.l1GlowColor = col;
+      else if (sel === 'z3') magnatesBPState.l2GlowColor = col;
+      else if (sel === 'z0') magnatesBPState.backdropColor = col;
+      else if (sel && sel.startsWith('extra_')) {
+        const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === sel);
+        if (ex) ex.glowColor = col;
+      }
+      syncMagnatesBPInspectorControlsFromState();
+      updateMagnatesBPVisualStyles();
+    });
+  });
+
+  document.getElementById('magnates-bp-float-upload')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const sel = magnatesBPState.selectedLayer;
+    if (sel === 'z4' || sel === 'z5') magnatesBPState.logoCutoutUrl = url;
+    else if (sel === 'z2') magnatesBPState.secondaryCutoutUrl = url;
+    else if (sel === 'z3') magnatesBPState.primaryCutoutUrl = url;
+    else if (sel === 'z0') magnatesBPState.bgPlateUrl = url;
+    else if (sel && sel.startsWith('extra_')) {
+      const ex = (magnatesBPState.extraCutouts || []).find((i) => i.id === sel);
+      if (ex) ex.url = url;
+      renderMagnatesBPExtraLayersStack();
+    }
+    updateMagnatesBPVisualStyles();
+  });
+
+  document.getElementById('btn-magnates-bp-float-done')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const floatBar = document.getElementById('magnates-bp-floating-toolbar');
+    if (floatBar) floatBar.style.display = 'none';
+    highlightMagnatesBPLayerOnStage(null);
+  });
+
+  document.getElementById('btn-magnates-bp-edit-wavy')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    selectMagnatesBPLayer('z5');
+    document.getElementById('magnates-bp-input-wavy-line1')?.focus();
+  });
+
+  // Top-Left Templates Library Drawer inside Suite
+  const bpDrawer = document.getElementById('magnates-bp-tpl-drawer');
+  document.getElementById('btn-magnates-bp-open-drawer')?.addEventListener('click', () => {
+    if (bpDrawer) bpDrawer.style.display = bpDrawer.style.display === 'flex' ? 'none' : 'flex';
+  });
+  document.getElementById('btn-magnates-bp-close-drawer')?.addEventListener('click', () => {
+    if (bpDrawer) bpDrawer.style.display = 'none';
+  });
+  document.querySelectorAll('.bp-drawer-tpl-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const pKey = card.getAttribute('data-preset');
+      if (pKey) {
+        applyMagnatesBPPresetToState(pKey);
+        magnatesBPState.playhead = 0;
+        updateMagnatesBPVisualStyles();
+      }
+      if (bpDrawer) bpDrawer.style.display = 'none';
+    });
+  });
+
+  // Top-Right Theater View & Fullscreen Toggles
+  document.getElementById('btn-magnates-bp-theater')?.addEventListener('click', () => {
+    magnatesBPState.theaterMode = !magnatesBPState.theaterMode;
+    const inspCol = document.getElementById('magnates-bp-inspector-col');
+    const lbl = document.getElementById('magnates-bp-theater-label');
+    if (inspCol) inspCol.style.display = magnatesBPState.theaterMode ? 'none' : 'flex';
+    if (lbl) lbl.textContent = magnatesBPState.theaterMode ? 'Exit Theater' : 'Theater View';
+  });
+
+  document.getElementById('btn-magnates-bp-fullscreen')?.addEventListener('click', () => {
+    const stageEl = document.getElementById('magnates-bp-stage');
+    if (!stageEl) return;
+    if (!document.fullscreenElement) {
+      stageEl.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.().catch(() => {});
+    }
+  });
+
+  // Bottom Sequence Storyboard Scene Cards & + Add Scene & Add Audio
+  document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const targetScene = card.getAttribute('data-scene-card');
+      if (magnatesBPState.preset === 'full_story_flow') {
+        magnatesBPState.playhead = targetScene === 'dual_silhouette' ? 4.50 : 0.0;
+        updateMagnatesBPVisualStyles();
+      } else if (targetScene) {
+        applyMagnatesBPPresetToState(targetScene);
+        magnatesBPState.playhead = 0;
+        updateMagnatesBPVisualStyles();
+      }
+    });
+  });
+
+  document.getElementById('btn-magnates-bp-add-scene')?.addEventListener('click', () => {
+    applyMagnatesBPPresetToState('full_story_flow');
+    magnatesBPState.playhead = 0;
+    updateMagnatesBPVisualStyles();
+  });
+
+  const bpAudioInput = document.getElementById('magnates-bp-audio-file-input');
+  const bpAudioPlayer = document.getElementById('magnates-bp-audio-player');
+  const bpAudioLbl = document.getElementById('magnates-bp-audio-label');
+  const bpAudioRem = document.getElementById('btn-magnates-bp-remove-audio');
+
+  document.getElementById('btn-magnates-bp-add-audio')?.addEventListener('click', () => {
+    bpAudioInput?.click();
+  });
+  bpAudioInput?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.audioUrl = URL.createObjectURL(file);
+    magnatesBPState.audioName = file.name;
+    if (bpAudioPlayer) {
+      bpAudioPlayer.src = magnatesBPState.audioUrl;
+      bpAudioPlayer.currentTime = 0;
+      if (magnatesBPState.isPlaying) bpAudioPlayer.play().catch(() => {});
+    }
+    if (bpAudioLbl) bpAudioLbl.textContent = file.name.slice(0, 16);
+    if (bpAudioRem) bpAudioRem.style.display = 'inline-block';
+  });
+  bpAudioRem?.addEventListener('click', () => {
+    magnatesBPState.audioUrl = '';
+    magnatesBPState.audioName = '';
+    if (bpAudioPlayer) {
+      bpAudioPlayer.pause();
+      bpAudioPlayer.src = '';
+    }
+    if (bpAudioLbl) bpAudioLbl.textContent = 'Add Audio';
+    bpAudioRem.style.display = 'none';
   });
 
   // Inspector Layer Row Hover & Click Selection + Stage Hover Callout
