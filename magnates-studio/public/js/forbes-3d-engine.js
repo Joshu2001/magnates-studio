@@ -117,6 +117,25 @@
     return 1 - Math.pow(1 - x, 3);
   }
 
+  // Color conversion helper for reactive anamorphic glows
+  function colorToRgba(hexOrColor, alpha) {
+    if (!hexOrColor) return `rgba(56, 189, 248, ${alpha})`;
+    if (hexOrColor.startsWith('#')) {
+      let c = hexOrColor.substring(1);
+      if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+      const num = parseInt(c, 16);
+      if (isNaN(num)) return `rgba(56, 189, 248, ${alpha})`;
+      const r = (num >> 16) & 255;
+      const g = (num >> 8) & 255;
+      const b = num & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+    if (hexOrColor.startsWith('rgb')) {
+      return hexOrColor.replace('rgb(', 'rgba(').replace(')', `, ${alpha})`);
+    }
+    return hexOrColor;
+  }
+
   /**
    * Calculates the instantaneous frame state for any timestamp t (0 <= t <= duration)
    */
@@ -256,12 +275,12 @@
 
           <!-- Anamorphic CRT TV Light Beam (Image 3) -->
           <div id="jani-forbes-beam-${tplId}" style="position: absolute; inset: 0; pointer-events: none; display: none; z-index: 20;">
-            <!-- Wide Anamorphic Cyan Wash -->
-            <div id="jani-forbes-beam-wash-${tplId}" style="position: absolute; left: -120px; right: -120px; top: 40%; height: 64px; transform: translateY(-50%); background: linear-gradient(90deg, rgba(56,189,248,0) 0%, rgba(56,189,248,0.45) 25%, rgba(255,255,255,0.95) 50%, rgba(56,189,248,0.45) 75%, rgba(56,189,248,0) 100%); filter: blur(12px); opacity: 0.9;"></div>
+            <!-- Wide Anamorphic Reactive Wash -->
+            <div id="jani-forbes-beam-wash-${tplId}" style="position: absolute; left: -120px; right: -120px; top: 40%; height: 64px; transform: translateY(-50%); background: linear-gradient(90deg, ${colorToRgba(d.beamColor, 0)} 0%, ${colorToRgba(d.beamColor, 0.55)} 25%, #ffffff 50%, ${colorToRgba(d.beamColor, 0.55)} 75%, ${colorToRgba(d.beamColor, 0)} 100%); filter: blur(12px); opacity: 0.9;"></div>
             <!-- Razor Sharp White Core Line -->
-            <div id="jani-forbes-beam-core-${tplId}" style="position: absolute; left: -120px; right: -120px; top: 40%; height: ${d.beamThickness || 3.5}px; transform: translateY(-50%); background: #ffffff; box-shadow: 0 0 16px 4px ${d.beamColor || '#38bdf8'}, 0 0 40px 10px rgba(96,165,250,0.85);"></div>
+            <div id="jani-forbes-beam-core-${tplId}" style="position: absolute; left: -120px; right: -120px; top: 40%; height: ${d.beamThickness || 3.5}px; transform: translateY(-50%); background: #ffffff; box-shadow: 0 0 16px 4px ${d.beamColor || '#38bdf8'}, 0 0 40px 10px ${colorToRgba(d.beamColor, 0.85)};"></div>
             <!-- Anamorphic Optical Flare Bloom (Left-Center) -->
-            <div id="jani-forbes-beam-flare-${tplId}" style="position: absolute; left: 16%; top: 40%; width: 150px; height: 38px; transform: translate(-50%, -50%); background: radial-gradient(ellipse at center, #ffffff 0%, rgba(147,197,253,0.85) 35%, rgba(37,99,235,0) 70%); filter: blur(2px);"></div>
+            <div id="jani-forbes-beam-flare-${tplId}" style="position: absolute; left: 16%; top: 40%; width: 150px; height: 38px; transform: translate(-50%, -50%); background: radial-gradient(ellipse at center, #ffffff 0%, ${colorToRgba(d.beamColor, 0.85)} 35%, ${colorToRgba(d.beamColor, 0)} 70%); filter: blur(2px);"></div>
           </div>
 
           <!-- Magazine Text Stack Layer -->
@@ -370,6 +389,24 @@
         beamEl.style.opacity = st.beamGlowAlpha.toFixed(3);
       } else {
         beamEl.style.display = 'none';
+      }
+
+      // Reactive color & thickness synchronization on every frame
+      const curColor = (data && data.beamColor) || '#38bdf8';
+      const curThick = (data && data.beamThickness) || 3.5;
+
+      const washEl = container.querySelector(`#jani-forbes-beam-wash-${tplId}`);
+      if (washEl) {
+        washEl.style.background = `linear-gradient(90deg, ${colorToRgba(curColor, 0)} 0%, ${colorToRgba(curColor, 0.55)} 25%, #ffffff 50%, ${colorToRgba(curColor, 0.55)} 75%, ${colorToRgba(curColor, 0)} 100%)`;
+      }
+      const coreEl = container.querySelector(`#jani-forbes-beam-core-${tplId}`);
+      if (coreEl) {
+        coreEl.style.boxShadow = `0 0 16px 4px ${curColor}, 0 0 40px 10px ${colorToRgba(curColor, 0.85)}`;
+        coreEl.style.height = `${curThick}px`;
+      }
+      const flareEl = container.querySelector(`#jani-forbes-beam-flare-${tplId}`);
+      if (flareEl) {
+        flareEl.style.background = `radial-gradient(ellipse at center, #ffffff 0%, ${colorToRgba(curColor, 0.85)} 35%, ${colorToRgba(curColor, 0)} 70%)`;
       }
     }
 
@@ -516,28 +553,33 @@
       const beamY = cy + coverH * 0.40;
       ctx.globalAlpha = st.beamGlowAlpha;
 
-      // Broad Blue Glow
+      const beamClr = data.beamColor || '#38bdf8';
+      const g0 = colorToRgba(beamClr, 0);
+      const g55 = colorToRgba(beamClr, 0.55);
+      const g85 = colorToRgba(beamClr, 0.85);
+
+      // Broad Glow
       const beamGrad = ctx.createLinearGradient(cx - 100, beamY, cx + coverW + 100, beamY);
-      beamGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
-      beamGrad.addColorStop(0.25, 'rgba(56, 189, 248, 0.5)');
+      beamGrad.addColorStop(0, g0);
+      beamGrad.addColorStop(0.25, g55);
       beamGrad.addColorStop(0.5, '#ffffff');
-      beamGrad.addColorStop(0.75, 'rgba(56, 189, 248, 0.5)');
-      beamGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      beamGrad.addColorStop(0.75, g55);
+      beamGrad.addColorStop(1, g0);
 
       ctx.fillStyle = beamGrad;
       ctx.fillRect(cx - 150, beamY - 24, coverW + 300, 48);
 
       // Core White Line
       ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = data.beamColor || '#38bdf8';
+      ctx.shadowColor = beamClr;
       ctx.shadowBlur = 18;
       ctx.fillRect(cx - 150, beamY - (data.beamThickness || 3) / 2, coverW + 300, data.beamThickness || 3);
 
       // Anamorphic Optical Flare
       const flareGrad = ctx.createRadialGradient(cx + 80, beamY, 2, cx + 80, beamY, 70);
       flareGrad.addColorStop(0, '#ffffff');
-      flareGrad.addColorStop(0.35, 'rgba(147, 197, 253, 0.85)');
-      flareGrad.addColorStop(1, 'rgba(37, 99, 235, 0)');
+      flareGrad.addColorStop(0.35, g85);
+      flareGrad.addColorStop(1, g0);
       ctx.fillStyle = flareGrad;
       ctx.beginPath();
       ctx.ellipse(cx + 80, beamY, 70, 18, 0, 0, Math.PI * 2);
@@ -916,7 +958,7 @@
     });
 
     container.querySelector('#btn-forbes-preset-creator')?.addEventListener('click', () => {
-      update({ portraitUrl: '/creator_portrait_cutout.png', portraitPreset: 'creator' });
+      update({ portraitUrl: '/ai_creator_portrait_cutout.png', portraitPreset: 'creator' });
       window.tplRenderContextualInspector(tplId);
     });
 
@@ -1046,7 +1088,25 @@
     });
 
     container.querySelector('#picker-forbes-beam-color')?.addEventListener('input', (e) => {
-      update({ beamColor: e.target.value });
+      const newClr = e.target.value;
+      update({ beamColor: newClr });
+
+      // Immediate reactive DOM sync on stage preview
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const washEl = stage.querySelector(`#jani-forbes-beam-wash-${tplId}`);
+        if (washEl) {
+          washEl.style.background = `linear-gradient(90deg, ${colorToRgba(newClr, 0)} 0%, ${colorToRgba(newClr, 0.55)} 25%, #ffffff 50%, ${colorToRgba(newClr, 0.55)} 75%, ${colorToRgba(newClr, 0)} 100%)`;
+        }
+        const coreEl = stage.querySelector(`#jani-forbes-beam-core-${tplId}`);
+        if (coreEl) {
+          coreEl.style.boxShadow = `0 0 16px 4px ${newClr}, 0 0 40px 10px ${colorToRgba(newClr, 0.85)}`;
+        }
+        const flareEl = stage.querySelector(`#jani-forbes-beam-flare-${tplId}`);
+        if (flareEl) {
+          flareEl.style.background = `radial-gradient(ellipse at center, #ffffff 0%, ${colorToRgba(newClr, 0.85)} 35%, ${colorToRgba(newClr, 0)} 70%)`;
+        }
+      }
     });
 
     // Typography inputs
