@@ -185,7 +185,12 @@
       query: 'how to invest in index funds',
       suggestion: 'top index funds for passive wealth',
       suggestion2: 's&p 500 historical annual return',
-      suggestion3: 'vanguard vs fidelity index funds'
+      suggestion3: 'vanguard vs fidelity index funds',
+      styleMode: 'cinematic',
+      is3DMode: true,
+      tiltY: -18,
+      tiltX: 8,
+      dofBlur: 0.85
     },
 
     // 13. iMessage Thread
@@ -509,25 +514,65 @@
       subjectImg: ''
     },
 
-    // 37. Document Key Highlight
+    // 37. Document Key Highlight (3D Classified Legal Dossier)
     'docheight': {
       type: 'docheight',
       docTitle: 'CONFIDENTIAL AGREEMENT',
+      agencyName: 'GOVERNMENT AGENCY',
+      caseRef: 'CASE FILE: #DOJ-8842-X',
+      classificationLevel: 'CLASSIFIED INFORMATION',
+      showClassifiedHeader: true,
       lines: [
-        { id: 1, text: '1. Intellectual property rights reserved.', highlighted: true },
-        { id: 2, text: '2. Total liability shall not exceed $10,000,000.', highlighted: true },
-        { id: 3, text: '3. Immediate termination upon breach of clause.', highlighted: false }
+        { id: 1, text: '1. Intellectual property rights reserved.', mode: 'highlight', color: '#facc15' },
+        { id: 2, text: '2. Total liability shall not exceed $10,000,000.', mode: 'highlight', color: '#facc15' },
+        { id: 3, text: '3. Immediate termination upon breach of clause.', mode: 'normal', color: '#facc15' },
+        { id: 4, text: 'The redaction must be respected under federal oversight mandate.', mode: 'redact', color: '#000000' }
       ],
-      hlColor: '#facc15'
+      hlColor: '#facc15',
+      showTopSecretStamp: true,
+      topSecretText: 'TOP SECRET',
+      topSecretAngle: 16,
+      showDeclassifiedStamp: true,
+      declassifiedText: 'DECLASSIFIED',
+      declassAngle: -10,
+      showPaperClip: true,
+      showManilaFolder: true,
+      showStackedPages: true,
+      showLeatherCase: true,
+      showCreases: true,
+      envTheme: 'mahogany',
+      spotlightIntensity: 0.85,
+      volumetricRays: true,
+      rayIntensity: 0.45,
+      dustMotes: true,
+      dustCount: 28,
+      vignetteIntensity: 0.9,
+      cameraPitch: 16,
+      cameraYaw: -12,
+      cameraRoll: 3,
+      cameraZoom: 1.05,
+      perspective: 1100,
+      organicDrift: true
     },
 
-    // 38. Kinetic Typography Stack
+    // 38. Kinetic Typography Stack (James Jani Monolithic 3D Architecture)
     'kinetic': {
       type: 'kinetic',
       word1: 'CREATE',
       word2: 'INSPIRE',
-      word3: 'DOMINATE',
-      color: '#ff7a59'
+      word3: 'DELIVER',
+      material: 'bronze',
+      extrusionDepth: 32,
+      bevelSize: 2.2,
+      envPreset: 'darkStudio',
+      bgOpacity: 0.18,
+      bgBlur: 14,
+      floorReflect: 0.65,
+      cameraFlight: 'cinematicPan',
+      dofFocus: 'word2',
+      dofBokehIntensity: 0.75,
+      rimGlowColor: '#f59e0b',
+      rimGlowIntensity: 0.85
     },
 
     // 39. Split Reveal Before / After
@@ -2579,6 +2624,28 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'google') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const vContainer = stage ? stage.querySelector('#search-3d-viewport-container') : null;
+      if (vContainer && typeof window.initSearch3DScene === 'function') {
+        window.initSearch3DScene(vContainer, data);
+        return;
+      } else if (stage && typeof window.tplMountSearch3DStage === 'function') {
+        window.tplMountSearch3DStage(stage, data);
+        return;
+      }
+    }
+    if (tplId === 'kinetic') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const vContainer = stage ? stage.querySelector('#kinetic-3d-viewport-container') : null;
+      if (vContainer && typeof window.initKinetic3DScene === 'function') {
+        window.initKinetic3DScene(vContainer, data);
+        return;
+      } else if (stage && typeof window.tplMountKinetic3DStage === 'function') {
+        window.tplMountKinetic3DStage(stage, data);
+        return;
+      }
+    }
     const stage = document.getElementById('tpl-modal-preview-stage');
     if (!stage) return;
     let fxc = stage.querySelector(`#fx-container-${tplId}`);
@@ -2743,30 +2810,13 @@
         hoverBtn.textContent = data.layerOrder === 'front' ? '\ud83d\udd32 Send Text Behind' : '\ud83d\udd32 Bring Text to Front';
       }
     } else if (tplId === 'docheight') {
-      const head = fxc.querySelector('.doc-header');
-      if (head && data.docTitle) head.textContent = data.docTitle;
-      const lines = Array.isArray(data.lines) ? data.lines : [
-        { id: 1, text: data.line1 || '1. Intellectual property rights reserved.', highlighted: true },
-        { id: 2, text: data.line2 || '2. Total liability shall not exceed $10,000,000.', highlighted: true },
-        { id: 3, text: data.line3 || '3. Immediate termination upon breach of clause.', highlighted: false }
-      ];
-      const hlCol = data.hlColor || '#facc15';
-      const docEl = fxc.querySelector('.doc');
-      if (docEl) {
-        let linesContainer = docEl.querySelector('.dh-stage-lines-wrap');
-        if (!linesContainer) {
-          docEl.querySelectorAll('.doc-text-line').forEach(el => el.remove());
-          linesContainer = document.createElement('div');
-          linesContainer.className = 'dh-stage-lines-wrap';
-          linesContainer.style.cssText = 'display: flex; flex-direction: column; gap: 8px; flex: 1;';
-          docEl.appendChild(linesContainer);
+      if (typeof window.renderDocheightDossierHtml === 'function') {
+        const docRoot = fxc.querySelector('.tpl-docheight');
+        if (docRoot) {
+          fxc.innerHTML = window.renderDocheightDossierHtml(data);
+        } else if (typeof renderTopTemplatePreviewStage === 'function') {
+          renderTopTemplatePreviewStage();
         }
-        linesContainer.innerHTML = lines.map((ln, i) => `
-          <div class="doc-text-line l${i+1}" style="font-size: 10px; color: #334155; font-family: 'Georgia', serif; position: relative; padding: 2px 4px; border-radius: 3px;">
-            <span style="position: relative; z-index: 2;">${ln.text}</span>
-            ${ln.highlighted ? `<div class="highlight" style="position: absolute; inset: 0; background: ${ln.color || hlCol}; opacity: 0.75; z-index: 1; border-radius: 3px;"></div>` : ''}
-          </div>
-        `).join('');
       }
     } else if (tplId === 'ticker') {
       const head = fxc.querySelector('.t-head');
@@ -2824,7 +2874,367 @@
       const txt = fxc.querySelector('.tw-text'); if (txt && data.text !== undefined) txt.textContent = data.text;
       const l = fxc.querySelector('.tw-likes'); if (l && data.likes !== undefined) l.textContent = data.likes;
       const rt = fxc.querySelector('.tw-retweets'); if (rt && data.retweets !== undefined) rt.textContent = data.retweets;
-    } else if (tplId === 'quote') {
+    } else if (tplId === 'google') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+
+      const isCinematic = (data.styleMode !== 'classic');
+      const is3D = data.is3DMode !== false;
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">🔍</span>
+              <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.8px;">Google Search FX Suite</span>
+            </div>
+            <span style="font-size: 9px; color: #38bdf8; font-weight: 700; background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.35); padding: 2px 6px; border-radius: 4px;">${isCinematic ? '3D GLASSMORPHIC' : 'CLASSIC 2D'}</span>
+          </div>
+
+          <!-- Section 1: Visual Style Version Selector (Image 2 vs Image 1) -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Visual Style &amp; Shader</span>
+              <span style="font-size: 8.5px; color: #a855f7; font-weight: 600;">Default: 3D Documentary</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" id="g-btn-mode-cinematic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${isCinematic ? '#38bdf8' : 'rgba(255,255,255,0.08)'}; background: ${isCinematic ? 'rgba(56,189,248,0.22)' : 'rgba(0,0,0,0.35)'}; color: ${isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
+                <span>✨ 3D Glassmorphic (Image 2)</span>
+              </button>
+              <button type="button" id="g-btn-mode-classic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${!isCinematic ? '#e2e8f0' : 'rgba(255,255,255,0.08)'}; background: ${!isCinematic ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.35)'}; color: ${!isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
+                <span>📄 Classic 2D Card (Image 1)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 2: Search Query & Suggestions -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Query &amp; Auto-Suggestions</span>
+            
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1.5px solid rgba(56,189,248,0.5); box-shadow: inset 0 0 10px rgba(56,189,248,0.12);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #38bdf8; width: 48px; font-weight: 800;">QUERY</span>
+                <input type="text" id="g-inp-query" value="${data.query || 'how to invest in index funds'}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 600; outline: none;" placeholder="Search query..." />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; width: 48px; font-weight: 700;">SUGG 1 ★</span>
+                <input type="text" id="g-inp-sug1" value="${data.suggestion || 'top index funds for passive wealth'}" style="flex: 1; background: transparent; border: none; color: #cbd5e1; font-size: 10.5px; font-weight: 600; outline: none;" placeholder="Highlighted suggestion..." />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 2</span>
+                <input type="text" id="g-inp-sug2" value="${data.suggestion2 || 's&p 500 historical annual return'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 2..." />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 3</span>
+                <input type="text" id="g-inp-sug3" value="${data.suggestion3 || 'vanguard vs fidelity index funds'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 3..." />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: 3D Spatial Tilt & Optics Controls -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3D Spatial Rig &amp; Camera Optics</span>
+              <span style="font-size: 8.5px; color: #38bdf8; font-family: monospace;">15° - 25° Tilt</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>Y-AXIS SPATIAL TILT</span>
+                  <span id="g-val-tilt-y" style="color: #38bdf8; font-family: monospace;">${data.tiltY !== undefined ? data.tiltY : -18}°</span>
+                </div>
+                <input type="range" id="g-slider-tilt-y" min="-45" max="45" value="${data.tiltY !== undefined ? data.tiltY : -18}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                  <span>X-AXIS PERSPECTIVE</span>
+                  <span id="g-val-tilt-x" style="color: #38bdf8; font-family: monospace;">${data.tiltX !== undefined ? data.tiltX : 8}°</span>
+                </div>
+                <input type="range" id="g-slider-tilt-x" min="-30" max="30" value="${data.tiltX !== undefined ? data.tiltX : 8}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
+              <div>
+                <div style="font-size: 10px; font-weight: 600; color: #e2e8f0;">Dynamic Push-In &amp; f/2.8 Lens Bokeh</div>
+                <div style="font-size: 8.5px; color: #94a3b8;">Focused entry pin-sharp, ambient elements blur gracefully</div>
+              </div>
+              <span style="font-size: 9px; color: #22c55e; font-weight: 700; background: rgba(34,197,94,0.18); padding: 2px 6px; border-radius: 4px;">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event Wireups
+      const syncButtons = () => {
+        const pVid = document.getElementById('btn-paper-rip-mode-video');
+        const p3D = document.getElementById('btn-paper-rip-mode-3d');
+        if (pVid && p3D) {
+          const mode3d = (topCustomizerState.paperPreviewMode === '3d' || topCustomizerState.is3DMode);
+          pVid.style.background = !mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          pVid.style.color = !mode3d ? '#fff' : '#94a3b8';
+          p3D.style.background = mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
+          p3D.style.color = mode3d ? '#fff' : '#94a3b8';
+        }
+      };
+
+      container.querySelector('#g-btn-mode-cinematic')?.addEventListener('click', () => {
+        topCustomizerState.paperPreviewMode = '3d';
+        topCustomizerState.is3DMode = true;
+        window.tplSetContextualData('google', { styleMode: 'cinematic', is3DMode: true });
+        window.tplRenderContextualInspector('google');
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        syncButtons();
+      });
+
+      container.querySelector('#g-btn-mode-classic')?.addEventListener('click', () => {
+        topCustomizerState.paperPreviewMode = 'video';
+        topCustomizerState.is3DMode = false;
+        window.tplSetContextualData('google', { styleMode: 'classic', is3DMode: false });
+        window.tplRenderContextualInspector('google');
+        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
+        syncButtons();
+      });
+
+      container.querySelector('#g-inp-query')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { query: e.target.value });
+      });
+      container.querySelector('#g-inp-sug1')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { suggestion: e.target.value });
+      });
+      container.querySelector('#g-inp-sug2')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { suggestion2: e.target.value });
+      });
+      container.querySelector('#g-inp-sug3')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { suggestion3: e.target.value });
+      });
+
+      container.querySelector('#g-slider-tilt-y')?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#g-val-tilt-y');
+        if (valEl) valEl.textContent = `${val}°`;
+        window.tplSetContextualData('google', { tiltY: val });
+        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
+      });
+
+      container.querySelector('#g-slider-tilt-x')?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#g-val-tilt-x');
+        if (valEl) valEl.textContent = `${val}°`;
+        window.tplSetContextualData('google', { tiltX: val });
+        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
+      });
+
+      return;
+    } else if (tplId === 'kinetic') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+
+      const materials = [
+        { id: 'bronze', name: 'Brushed Bronze (Image 2)', color: '#cd7f32', border: '#f59e0b' },
+        { id: 'steel', name: 'Industrial Brushed Steel', color: '#cbd5e1', border: '#38bdf8' },
+        { id: 'gold', name: 'Architectural Gold', color: '#fbbf24', border: '#fef08a' },
+        { id: 'matteDark', name: 'Matte Obsidian Slate', color: '#475569', border: '#818cf8' }
+      ];
+
+      const envs = [
+        { id: 'darkStudio', name: 'Architectural Studio (Floor Grid + Spotlight)', icon: '🏛️' },
+        { id: 'archivalStock', name: 'Subtle B-Roll Backdrop (18% Opacity + Vignette)', icon: '🎥' }
+      ];
+
+      const cameraFlights = [
+        { id: 'cinematicPan', name: 'Cinematic Tilt & Pan Sweep (Jani Style)' },
+        { id: 'focusRack', name: 'Dramatic Focus Rack Zoom' },
+        { id: 'monolithicLow', name: 'Monumental Low-Angle Perspective' }
+      ];
+
+      const dofOptions = [
+        { id: 'word2', label: 'Focus INSPIRE (Middle)', desc: 'Word 1 & 3 receive smooth lens bokeh' },
+        { id: 'word1', label: 'Focus CREATE (Top)', desc: 'Foreground & lower words blur out' },
+        { id: 'word3', label: 'Focus DELIVER (Bottom)', desc: 'Camera looks up at razor-sharp base' },
+        { id: 'allSharp', label: 'All Words Sharp', desc: 'Deep architectural depth of field' }
+      ];
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(245,158,11,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">🏛️</span>
+              <span style="font-size: 11px; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.8px;">James Jani 3D Kinetic Typography</span>
+            </div>
+            <span style="font-size: 9px; color: #22c55e; font-weight: 700; background: rgba(34,197,94,0.18); border: 1px solid rgba(34,197,94,0.35); padding: 2px 6px; border-radius: 4px;">PHYSICAL SHADERS</span>
+          </div>
+
+          <!-- Section 1: Monolithic Words Stack -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Monolithic Word Architecture (3-Tier Stack)</span>
+            
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #f59e0b; width: 44px; font-weight: 700;">TIER 1</span>
+                <input type="text" id="kt-inp-word1" value="${data.word1 || 'CREATE'}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 800; outline: none; text-transform: uppercase;" />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 6px; border: 1.5px solid rgba(245,158,11,0.5); box-shadow: inset 0 0 10px rgba(245,158,11,0.15);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #fbbf24; width: 44px; font-weight: 800;">TIER 2 ★</span>
+                <input type="text" id="kt-inp-word2" value="${data.word2 || 'INSPIRE'}" style="flex: 1; background: transparent; border: none; color: #fef08a; font-size: 11.5px; font-weight: 800; outline: none; text-transform: uppercase;" />
+              </div>
+              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+                <span style="font-size: 8.5px; font-family: monospace; color: #f59e0b; width: 44px; font-weight: 700;">TIER 3</span>
+                <input type="text" id="kt-inp-word3" value="${data.word3 || 'DELIVER'}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 800; outline: none; text-transform: uppercase;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Physical Material & Shaders -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Physical Shader Material</span>
+              <span style="font-size: 9px; color: #cbd5e1; font-weight: 600;">Specular Rim Shaders</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              ${materials.map(m => `
+                <button type="button" class="btn-kt-mat" data-mat="${m.id}" style="padding: 6px 8px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${data.material === m.id ? m.border : 'rgba(255,255,255,0.08)'}; background: ${data.material === m.id ? 'rgba(245,158,11,0.2)' : 'rgba(0,0,0,0.35)'}; color: ${data.material === m.id ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s;">
+                  <span style="width: 10px; height: 10px; border-radius: 50%; background: ${m.color}; display: inline-block;"></span>
+                  <span>${m.name}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 3: Extrusion Depth & Bevel Sliders -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                <span>Z-AXIS EXTRUSION</span>
+                <span id="kt-val-extrude" style="color: #cbd5e1; font-family: monospace;">${data.extrusionDepth || 32}px</span>
+              </div>
+              <input type="range" id="kt-slider-extrude" min="16" max="64" value="${data.extrusionDepth || 32}" style="accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                <span>BEVEL CHAMFER</span>
+                <span id="kt-val-bevel" style="color: #cbd5e1; font-family: monospace;">${data.bevelSize || 2.2}px</span>
+              </div>
+              <input type="range" id="kt-slider-bevel" min="1" max="5" step="0.2" value="${data.bevelSize || 2.2}" style="accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- Section 4: Atmospheric Background Studio Environment -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Atmospheric Canvas Backdrop</span>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              ${envs.map(env => `
+                <button type="button" class="btn-kt-env" data-env="${env.id}" style="padding: 6px 8px; font-size: 10px; font-weight: 600; border-radius: 6px; border: 1px solid ${data.envPreset === env.id ? '#f59e0b' : 'rgba(255,255,255,0.08)'}; background: ${data.envPreset === env.id ? 'rgba(245,158,11,0.18)' : 'rgba(0,0,0,0.3)'}; color: ${data.envPreset === env.id ? '#fef08a' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; gap: 6px; text-align: left;">
+                  <span>${env.icon}</span>
+                  <span>${env.name}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 5: 3D Camera Rig & Shallow Depth of Field (DoF) -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3D Camera Flight & Lens Optics</span>
+              <span style="font-size: 8.5px; color: #38bdf8; font-family: monospace;">f/2.8 BOKEH</span>
+            </div>
+
+            <!-- Flight Path Selector -->
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8.5px; color: #64748b;">FLIGHT PATH MOTION</span>
+              <select id="kt-sel-flight" style="background: #09090b; border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 10px; border-radius: 5px; padding: 4px 6px; outline: none; cursor: pointer;">
+                ${cameraFlights.map(cf => `
+                  <option value="${cf.id}" ${data.cameraFlight === cf.id ? 'selected' : ''}>${cf.name}</option>
+                `).join('')}
+              </select>
+            </div>
+
+            <!-- Depth of Field Focal Word -->
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8.5px; color: #64748b;">LENS FOCUS RACK TARGET</span>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                ${dofOptions.map(dof => `
+                  <button type="button" class="btn-kt-dof" data-dof="${dof.id}" style="padding: 4px 6px; font-size: 9px; font-weight: 600; border-radius: 4px; border: 1px solid ${data.dofFocus === dof.id ? '#38bdf8' : 'rgba(255,255,255,0.06)'}; background: ${data.dofFocus === dof.id ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)'}; color: ${data.dofFocus === dof.id ? '#38bdf8' : '#94a3b8'}; cursor: pointer;">
+                    ${dof.label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Event Listeners for Kinetic Typography Stack
+      ['word1', 'word2', 'word3'].forEach(k => {
+        const inp = container.querySelector(`#kt-inp-${k}`);
+        inp?.addEventListener('input', (e) => {
+          const val = e.target.value.toUpperCase();
+          window.tplSetContextualData('kinetic', { [k]: val });
+          window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+        });
+      });
+
+      // Material buttons
+      container.querySelectorAll('.btn-kt-mat').forEach(b => {
+        b.addEventListener('click', () => {
+          const mat = b.dataset.mat;
+          window.tplSetContextualData('kinetic', { material: mat });
+          window.tplRenderContextualInspector('kinetic');
+          window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+        });
+      });
+
+      // Sliders
+      const sExt = container.querySelector('#kt-slider-extrude');
+      sExt?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        container.querySelector('#kt-val-extrude').textContent = `${val}px`;
+        window.tplSetContextualData('kinetic', { extrusionDepth: val });
+        window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+      });
+
+      const sBev = container.querySelector('#kt-slider-bevel');
+      sBev?.addEventListener('input', (e) => {
+        const val = parseFloat(e.target.value);
+        container.querySelector('#kt-val-bevel').textContent = `${val}px`;
+        window.tplSetContextualData('kinetic', { bevelSize: val });
+        window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+      });
+
+      // Environment buttons
+      container.querySelectorAll('.btn-kt-env').forEach(b => {
+        b.addEventListener('click', () => {
+          const env = b.dataset.env;
+          window.tplSetContextualData('kinetic', { envPreset: env });
+          window.tplRenderContextualInspector('kinetic');
+          window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+        });
+      });
+
+      // Camera flight select
+      const selFlight = container.querySelector('#kt-sel-flight');
+      selFlight?.addEventListener('change', (e) => {
+        window.tplSetContextualData('kinetic', { cameraFlight: e.target.value });
+        window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+      });
+
+      // DoF buttons
+      container.querySelectorAll('.btn-kt-dof').forEach(b => {
+        b.addEventListener('click', () => {
+          const dof = b.dataset.dof;
+          window.tplSetContextualData('kinetic', { dofFocus: dof });
+          window.tplRenderContextualInspector('kinetic');
+          window.tplUpdateStageWithContextualData('kinetic', window.tplGetContextualData('kinetic'));
+        });
+      });
+
+      return;
+    }
+
+    if (tplId === 'quote') {
       const q = fxc.querySelector('.quote-text');
       if (q && data.quote !== undefined) {
         q.textContent = data.quote;
@@ -4266,70 +4676,278 @@
         { label: 'Magenta Pink', val: '#f43f5e' },
         { label: 'Amber Orange', val: '#fb923c' }
       ];
-      const lines = Array.isArray(data.lines) ? data.lines : [
-        { id: 1, text: data.line1 || '1. Intellectual property rights reserved.', highlighted: true },
-        { id: 2, text: data.line2 || '2. Total liability shall not exceed $10,000,000.', highlighted: true },
-        { id: 3, text: data.line3 || '3. Immediate termination upon breach of clause.', highlighted: false }
+
+      const rawLines = Array.isArray(data.lines) ? data.lines : [
+        { id: 1, text: data.line1 || '1. Intellectual property rights reserved.', mode: 'highlight' },
+        { id: 2, text: data.line2 || '2. Total liability shall not exceed $10,000,000.', mode: 'highlight' },
+        { id: 3, text: data.line3 || '3. Immediate termination upon breach of clause.', mode: 'normal' },
+        { id: 4, text: 'The redaction must be respected under federal oversight mandate.', mode: 'redact' }
       ];
 
+      const lines = rawLines.map((ln, idx) => {
+        let m = ln.mode;
+        if (!m) {
+          if (ln.redacted || ln.isRedacted) m = 'redact';
+          else if (ln.highlighted) m = 'highlight';
+          else m = 'normal';
+        }
+        return {
+          id: ln.id || (idx + 1),
+          text: ln.text || '',
+          mode: m,
+          color: ln.color || (data.hlColor || '#facc15')
+        };
+      });
+
+      const envTheme = data.envTheme || 'mahogany';
+
       container.innerHTML = `
-        <div style="background: rgba(250,204,21,0.06); border: 1px solid rgba(250,204,21,0.25); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">\ud83d\udcc4</span>
-              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">DOCUMENT HIGHLIGHT CONTROLS</span>
+        <div style="background: rgba(185, 28, 28, 0.06); border: 1px solid rgba(185, 28, 28, 0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px;">
+          
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 7px;">
+              <span style="font-size: 15px;">📁</span>
+              <div>
+                <div style="font-size: 11px; font-weight: 800; color: #f87171; text-transform: uppercase; letter-spacing: 0.8px;">CLASSIFIED DOSSIER ENGINE</div>
+                <div style="font-size: 9px; color: #94a3b8;">High-Stakes Investigative Legal Document</div>
+              </div>
             </div>
-            <button type="button" id="dh-btn-add-line" style="font-size: 9.5px; font-weight: 700; color: #facc15; cursor: pointer; padding: 2px 7px; border-radius: 4px; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.35);">
-              + Add Line
+            <button type="button" id="dh-btn-add-line" style="font-size: 9.5px; font-weight: 800; color: #ef4444; cursor: pointer; padding: 3px 8px; border-radius: 5px; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); display: flex; align-items: center; gap: 4px;">
+              <span>+ Add Clause</span>
             </button>
           </div>
 
-          <!-- Document Title -->
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Document Title</span>
-            <input type="text" id="dh-input-title" value="${data.docTitle || 'CONFIDENTIAL AGREEMENT'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11.5px; font-weight: 700; outline: none;" />
-          </div>
-
-          <!-- Document Clauses & Independent Highlight Passes -->
+          <!-- SECTION 1: DOCUMENT METADATA & AGENCY HEADER -->
           <div style="display: flex; flex-direction: column; gap: 7px;">
-            <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Document Clauses &amp; Highlights</span>
-            <div id="dh-lines-list" style="display: flex; flex-direction: column; gap: 8px;">
-              ${lines.map((ln, idx) => `
-                <div class="dh-line-card" data-idx="${idx}" style="background: rgba(0,0,0,0.4); border: 1px solid ${ln.highlighted ? (data.hlColor || '#facc15') : 'rgba(255,255,255,0.08)'}; border-radius: 7px; padding: 7px 9px; display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s;">
-                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-                    <span style="font-size: 9.5px; font-weight: 800; font-family: monospace; color: #94a3b8;">LINE ${idx + 1}</span>
-                    <div style="display: flex; align-items: center; gap: 6px;">
-                      <button type="button" class="dh-line-toggle-hl" data-idx="${idx}" style="font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 3px; ${ln.highlighted ? `background: rgba(250,204,21,0.22); border: 1px solid ${data.hlColor || '#facc15'}; color: #fff;` : 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #64748b;'}">
-                        <span>${ln.highlighted ? '\ud83d\udd8d\ufe0f Highlighted' : '\u25cb Normal'}</span>
-                      </button>
-                      ${lines.length > 1 ? `<button type="button" class="dh-line-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Delete this line">\u2715</button>` : ''}
-                    </div>
-                  </div>
-                  <input type="text" class="dh-line-input-text" data-idx="${idx}" value="${ln.text}" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10.5px; font-family: 'Georgia', serif; outline: none;" placeholder="Sentence clause..." />
-                </div>
-              `).join('')}
+            <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">1. Legal Document Markings</span>
+            
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <span style="font-size: 9px; color: #94a3b8; text-transform: uppercase;">Document Title</span>
+              <input type="text" id="dh-input-title" value="${data.docTitle || 'CONFIDENTIAL AGREEMENT'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.14); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 9px; color: #94a3b8; text-transform: uppercase;">Agency Name</span>
+                <input type="text" id="dh-input-agency" value="${data.agencyName || 'GOVERNMENT AGENCY'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 6px; color: #fff; font-size: 10px; font-weight: 600;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 9px; color: #94a3b8; text-transform: uppercase;">Case Ref Code</span>
+                <input type="text" id="dh-input-caseref" value="${data.caseRef || 'CASE FILE: #DOJ-8842-X'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 6px; color: #cbd5e1; font-size: 9.5px; font-family: monospace;" />
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 5px 8px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.06);">
+              <span style="font-size: 9px; color: #94a3b8;">Red Classification Header Pill</span>
+              <input type="checkbox" id="dh-chk-classified-header" ${data.showClassifiedHeader !== false ? 'checked' : ''} style="accent-color: #ef4444; cursor: pointer;" />
             </div>
           </div>
 
-          <!-- Highlight Marker Tint & Color Dots -->
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
-            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Marker Tint</span>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <input type="color" id="dh-input-color" value="${data.hlColor || '#facc15'}" style="width: 24px; height: 20px; border: none; background: transparent; cursor: pointer;" />
-              <div style="display: flex; gap: 4px;">
-                ${hlColors.map(c => `
-                  <button type="button" class="dh-color-dot" data-val="${c.val}" style="width: 17px; height: 17px; border-radius: 50%; background: ${c.val}; border: 1.5px solid ${c.val === data.hlColor ? '#fff' : 'rgba(255,255,255,0.2)'}; cursor: pointer;" title="${c.label}"></button>
-                `).join('')}
+          <!-- SECTION 2: OFFICIAL RED RUBBER STAMPS -->
+          <div style="display: flex; flex-direction: column; gap: 7px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #f87171; text-transform: uppercase; letter-spacing: 0.5px;">2. Distressed Rubber Stamps</span>
+            
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <!-- TOP SECRET STAMP -->
+              <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(239,68,68,0.25); border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 10px; font-weight: 800; color: #ef4444; letter-spacing: 1px;">🗳️ TOP SECRET STAMP</span>
+                  <input type="checkbox" id="dh-chk-stamp-topsecret" ${data.showTopSecretStamp !== false ? 'checked' : ''} style="accent-color: #ef4444; cursor: pointer;" />
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center;">
+                  <input type="text" id="dh-input-stamp-topsecret-text" value="${data.topSecretText || 'TOP SECRET'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #ef4444; font-size: 9.5px; font-weight: 800;" />
+                  <div style="display: flex; align-items: center; gap: 4px;" title="Stamp Angle">
+                    <span style="font-size: 8.5px; color: #94a3b8;">Angle:</span>
+                    <input type="range" id="dh-range-stamp-topsecret-angle" min="-35" max="35" value="${data.topSecretAngle !== undefined ? data.topSecretAngle : 16}" style="width: 55px; accent-color: #ef4444; height: 3px;" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- DECLASSIFIED STAMP -->
+              <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(239,68,68,0.25); border-radius: 6px; padding: 6px 8px; display: flex; flex-direction: column; gap: 5px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 10px; font-weight: 800; color: #f87171; letter-spacing: 1px;">🔓 DECLASSIFIED STAMP</span>
+                  <input type="checkbox" id="dh-chk-stamp-declassified" ${data.showDeclassifiedStamp !== false ? 'checked' : ''} style="accent-color: #ef4444; cursor: pointer;" />
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr auto; gap: 6px; align-items: center;">
+                  <input type="text" id="dh-input-stamp-declassified-text" value="${data.declassifiedText || 'DECLASSIFIED'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #f87171; font-size: 9.5px; font-weight: 800;" />
+                  <div style="display: flex; align-items: center; gap: 4px;" title="Stamp Angle">
+                    <span style="font-size: 8.5px; color: #94a3b8;">Angle:</span>
+                    <input type="range" id="dh-range-stamp-declass-angle" min="-35" max="35" value="${data.declassAngle !== undefined ? data.declassAngle : -10}" style="width: 55px; accent-color: #ef4444; height: 3px;" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- SECTION 3: CLAUSES & INDEPENDENT REDACTION / HIGHLIGHT ENGINE -->
+          <div style="display: flex; flex-direction: column; gap: 7px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">3. Clauses, Redactions &amp; Highlights</span>
+              <span style="font-size: 8.5px; color: #94a3b8;">${lines.length} Clauses</span>
+            </div>
+
+            <div id="dh-lines-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; padding-right: 2px;">
+              ${lines.map((ln, idx) => `
+                <div class="dh-line-card" data-idx="${idx}" style="background: rgba(0,0,0,0.45); border: 1px solid ${ln.mode === 'redact' ? '#ef4444' : (ln.mode === 'highlight' ? (data.hlColor || '#facc15') : 'rgba(255,255,255,0.08)')}; border-radius: 7px; padding: 7px 9px; display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                    <span style="font-size: 9px; font-weight: 800; font-family: monospace; color: #94a3b8;">CLAUSE #${idx + 1}</span>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                      <!-- 3-Way Mode Segmented Switch -->
+                      <div style="display: flex; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 1px;">
+                        <button type="button" class="dh-btn-mode-select" data-idx="${idx}" data-mode="normal" style="font-size: 8.5px; font-weight: 700; padding: 2px 5px; border: none; border-radius: 4px; cursor: pointer; ${ln.mode === 'normal' ? 'background: #334155; color: #fff;' : 'background: transparent; color: #64748b;'}">Normal</button>
+                        <button type="button" class="dh-btn-mode-select" data-idx="${idx}" data-mode="highlight" style="font-size: 8.5px; font-weight: 700; padding: 2px 5px; border: none; border-radius: 4px; cursor: pointer; ${ln.mode === 'highlight' ? 'background: #facc15; color: #000;' : 'background: transparent; color: #eab308;'}">🖍️ Highlight</button>
+                        <button type="button" class="dh-btn-mode-select" data-idx="${idx}" data-mode="redact" style="font-size: 8.5px; font-weight: 700; padding: 2px 5px; border: none; border-radius: 4px; cursor: pointer; ${ln.mode === 'redact' ? 'background: #dc2626; color: #fff;' : 'background: transparent; color: #ef4444;'}">⬛ Redact</button>
+                      </div>
+                      ${lines.length > 1 ? `<button type="button" class="dh-line-del" data-idx="${idx}" style="background: none; border: none; color: #ef4444; font-size: 12px; cursor: pointer; padding: 0 4px;" title="Delete this clause">✕</button>` : ''}
+                    </div>
+                  </div>
+                  <input type="text" class="dh-line-input-text" data-idx="${idx}" value="${ln.text}" style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10.5px; font-family: 'Georgia', serif; outline: none;" placeholder="Contract clause text..." />
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Highlighter Color Dots -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px; background: rgba(0,0,0,0.25); padding: 5px 8px; border-radius: 5px;">
+              <span style="font-size: 9px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Highlighter Tint</span>
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <input type="color" id="dh-input-color" value="${data.hlColor || '#facc15'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" />
+                <div style="display: flex; gap: 3px;">
+                  ${hlColors.map(c => `
+                    <button type="button" class="dh-color-dot" data-val="${c.val}" style="width: 15px; height: 15px; border-radius: 50%; background: ${c.val}; border: 1.5px solid ${c.val === (data.hlColor || '#facc15') ? '#fff' : 'rgba(255,255,255,0.2)'}; cursor: pointer;" title="${c.label}"></button>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: TACTILE PAPER MATERIALITY & STACK DEPTH -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">4. Paper Materiality &amp; Stack Depth</span>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-paperclip" ${data.showPaperClip !== false ? 'checked' : ''} style="accent-color: #38bdf8;" />
+                <span>📎 Silver Paper Clip</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-manila" ${data.showManilaFolder !== false ? 'checked' : ''} style="accent-color: #eab308;" />
+                <span>📁 Manila Dossier Tab</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-stacked" ${data.showStackedPages !== false ? 'checked' : ''} style="accent-color: #facc15;" />
+                <span>📑 Stacked Archives</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-leather" ${data.showLeatherCase !== false ? 'checked' : ''} style="accent-color: #a855f7;" />
+                <span>💼 Leather Portfolio</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- SECTION 5: WORKSPACE & ATMOSPHERIC LIGHTING -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">5. Workspace &amp; Lighting Environment</span>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 8.5px; color: #94a3b8; text-transform: uppercase;">Desk Surface</span>
+                <select id="dh-sel-env" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; padding: 4px; color: #fff; font-size: 9.5px;">
+                  <option value="mahogany" ${envTheme === 'mahogany' ? 'selected' : ''}>🪵 Dark Mahogany Desk</option>
+                  <option value="light-table" ${envTheme === 'light-table' ? 'selected' : ''}>💡 Tactical Light Table</option>
+                  <option value="noir" ${envTheme === 'noir' ? 'selected' : ''}>🌑 Noir Bureau Desk</option>
+                  <option value="slate" ${envTheme === 'slate' ? 'selected' : ''}>⬛ Modern Slate Console</option>
+                </select>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Spotlight Beam</span>
+                  <span id="dh-val-spotlight">${Math.round((data.spotlightIntensity !== undefined ? data.spotlightIntensity : 0.85) * 100)}%</span>
+                </div>
+                <input type="range" id="dh-range-spotlight" min="20" max="150" value="${Math.round((data.spotlightIntensity !== undefined ? data.spotlightIntensity : 0.85) * 100)}" style="width: 100%; accent-color: #facc15; height: 3px;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 2px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9px; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-godrays" ${data.volumetricRays !== false ? 'checked' : ''} style="accent-color: #fef08a;" />
+                <span>Volumetric Rays</span>
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9px; color: #e2e8f0; background: rgba(0,0,0,0.3); padding: 4px 6px; border-radius: 4px; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-dust" ${data.dustMotes !== false ? 'checked' : ''} style="accent-color: #facc15;" />
+                <span>Floating Dust Motes</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- SECTION 6: 3D CAMERA RIG & MOVEMENT -->
+          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #c084fc; text-transform: uppercase; letter-spacing: 0.5px;">6. 3D Camera Pan &amp; Tilt</span>
+              <label style="display: flex; align-items: center; gap: 4px; font-size: 8.5px; color: #c084fc; cursor: pointer;">
+                <input type="checkbox" id="dh-chk-drift" ${data.organicDrift !== false ? 'checked' : ''} style="accent-color: #c084fc;" />
+                <span>Organic Drift</span>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Pitch (X)</span>
+                  <span id="dh-val-pitch">${data.cameraPitch !== undefined ? data.cameraPitch : 16}°</span>
+                </div>
+                <input type="range" id="dh-range-pitch" min="-30" max="45" value="${data.cameraPitch !== undefined ? data.cameraPitch : 16}" style="width: 100%; accent-color: #c084fc; height: 3px;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Yaw (Y)</span>
+                  <span id="dh-val-yaw">${data.cameraYaw !== undefined ? data.cameraYaw : -12}°</span>
+                </div>
+                <input type="range" id="dh-range-yaw" min="-40" max="40" value="${data.cameraYaw !== undefined ? data.cameraYaw : -12}" style="width: 100%; accent-color: #c084fc; height: 3px;" />
+              </div>
+            </div>
+          </div>
+
         </div>
       `;
 
-      // Wire docheight controls
-      const tInp = container.querySelector('#dh-input-title');
-      if (tInp) tInp.oninput = (e) => window.tplSetContextualData('docheight', { docTitle: e.target.value });
+      // Wire up all controls
+      container.querySelector('#dh-input-title')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { docTitle: e.target.value });
+      });
+      container.querySelector('#dh-input-agency')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { agencyName: e.target.value });
+      });
+      container.querySelector('#dh-input-caseref')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { caseRef: e.target.value });
+      });
+      container.querySelector('#dh-chk-classified-header')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showClassifiedHeader: e.target.checked });
+      });
 
+      // Rubber Stamps
+      container.querySelector('#dh-chk-stamp-topsecret')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showTopSecretStamp: e.target.checked });
+      });
+      container.querySelector('#dh-input-stamp-topsecret-text')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { topSecretText: e.target.value });
+      });
+      container.querySelector('#dh-range-stamp-topsecret-angle')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { topSecretAngle: parseInt(e.target.value, 10) });
+      });
+
+      container.querySelector('#dh-chk-stamp-declassified')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showDeclassifiedStamp: e.target.checked });
+      });
+      container.querySelector('#dh-input-stamp-declassified-text')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { declassifiedText: e.target.value });
+      });
+      container.querySelector('#dh-range-stamp-declass-angle')?.addEventListener('input', e => {
+        window.tplSetContextualData('docheight', { declassAngle: parseInt(e.target.value, 10) });
+      });
+
+      // Clauses line inputs and mode selectors
       container.querySelectorAll('.dh-line-input-text').forEach(inp => {
         inp.oninput = (e) => {
           const idx = parseInt(e.target.dataset.idx, 10);
@@ -4338,10 +4956,11 @@
         };
       });
 
-      container.querySelectorAll('.dh-line-toggle-hl').forEach(btn => {
+      container.querySelectorAll('.dh-btn-mode-select').forEach(btn => {
         btn.onclick = () => {
           const idx = parseInt(btn.dataset.idx, 10);
-          lines[idx].highlighted = !lines[idx].highlighted;
+          const m = btn.dataset.mode;
+          lines[idx].mode = m;
           window.tplSetContextualData('docheight', { lines: [...lines] });
           window.tplRenderContextualInspector('docheight');
         };
@@ -4356,18 +4975,16 @@
         };
       });
 
-      const addLineBtn = container.querySelector('#dh-btn-add-line');
-      if (addLineBtn) {
-        addLineBtn.onclick = () => {
-          lines.push({
-            id: Date.now(),
-            text: `${lines.length + 1}. Newly added confidential stipulation.`,
-            highlighted: true
-          });
-          window.tplSetContextualData('docheight', { lines: [...lines] });
-          window.tplRenderContextualInspector('docheight');
-        };
-      }
+      container.querySelector('#dh-btn-add-line')?.addEventListener('click', () => {
+        lines.push({
+          id: Date.now(),
+          text: `${lines.length + 1}. Newly verified classified stipulation clause.`,
+          mode: 'highlight',
+          color: data.hlColor || '#facc15'
+        });
+        window.tplSetContextualData('docheight', { lines: [...lines] });
+        window.tplRenderContextualInspector('docheight');
+      });
 
       const colInp = container.querySelector('#dh-input-color');
       if (colInp) {
@@ -4375,7 +4992,6 @@
           window.tplSetContextualData('docheight', { hlColor: e.target.value });
         };
       }
-
       container.querySelectorAll('.dh-color-dot').forEach(dot => {
         dot.onclick = () => {
           const val = dot.dataset.val;
@@ -4383,6 +4999,55 @@
           window.tplSetContextualData('docheight', { hlColor: val });
         };
       });
+
+      // Paper & Stack depth
+      container.querySelector('#dh-chk-paperclip')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showPaperClip: e.target.checked });
+      });
+      container.querySelector('#dh-chk-manila')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showManilaFolder: e.target.checked });
+      });
+      container.querySelector('#dh-chk-stacked')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showStackedPages: e.target.checked });
+      });
+      container.querySelector('#dh-chk-leather')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { showLeatherCase: e.target.checked });
+      });
+
+      // Lighting & Workspace
+      container.querySelector('#dh-sel-env')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { envTheme: e.target.value });
+      });
+      container.querySelector('#dh-range-spotlight')?.addEventListener('input', e => {
+        const val = parseInt(e.target.value, 10) / 100;
+        const valEl = container.querySelector('#dh-val-spotlight');
+        if (valEl) valEl.textContent = `${e.target.value}%`;
+        window.tplSetContextualData('docheight', { spotlightIntensity: val });
+      });
+      container.querySelector('#dh-chk-godrays')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { volumetricRays: e.target.checked });
+      });
+      container.querySelector('#dh-chk-dust')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { dustMotes: e.target.checked });
+      });
+
+      // Camera
+      container.querySelector('#dh-chk-drift')?.addEventListener('change', e => {
+        window.tplSetContextualData('docheight', { organicDrift: e.target.checked });
+      });
+      container.querySelector('#dh-range-pitch')?.addEventListener('input', e => {
+        const p = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#dh-val-pitch');
+        if (valEl) valEl.textContent = `${p}°`;
+        window.tplSetContextualData('docheight', { cameraPitch: p });
+      });
+      container.querySelector('#dh-range-yaw')?.addEventListener('input', e => {
+        const y = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#dh-val-yaw');
+        if (valEl) valEl.textContent = `${y}°`;
+        window.tplSetContextualData('docheight', { cameraYaw: y });
+      });
+
       return;
     }
 

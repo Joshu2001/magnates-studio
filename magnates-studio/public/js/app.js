@@ -30498,7 +30498,7 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline'
+    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google'
   ]);
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
@@ -30515,6 +30515,9 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: true });
     }
+    if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('google', { is3DMode: true });
+    }
   }
 
   const syncPaperModeButtons = () => {
@@ -30523,6 +30526,8 @@ function openTopTemplateCustomizer(tpl) {
       is3D = !!window.tplGetContextualData('map').is3DMode;
     } else if (tpl.id === 'empire-timeline' && typeof window.tplGetContextualData === 'function') {
       is3D = !!window.tplGetContextualData('empire-timeline').is3DMode;
+    } else if (tpl.id === 'google' && typeof window.tplGetContextualData === 'function') {
+      is3D = !!window.tplGetContextualData('google').is3DMode;
     } else if (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)) {
       is3D = true;
     }
@@ -30544,6 +30549,10 @@ function openTopTemplateCustomizer(tpl) {
       window.tplSetContextualData('empire-timeline', { is3DMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
     }
+    if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('google', { is3DMode: false, styleMode: 'classic' });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
+    }
     const btn3dVid = document.getElementById('btn-3d-mode-video');
     if (btn3dVid && tpl.id !== 'map' && tpl.id !== 'empire-timeline') btn3dVid.click();
     syncPaperModeButtons();
@@ -30559,6 +30568,10 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: true });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
+    }
+    if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('google', { is3DMode: true, styleMode: 'cinematic' });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
     }
     const btn3dInteractive = document.getElementById('btn-3d-mode-interactive');
     if (btn3dInteractive && tpl.id !== 'map' && tpl.id !== 'empire-timeline') btn3dInteractive.click();
@@ -32353,6 +32366,21 @@ function renderTopTemplatePreviewStage() {
         ? topCustomizerState.currentTpl.cutoutImage
         : topCustomizerState.primaryUrl);
   const sec = topCustomizerState.secondaryUrl;
+
+  // 3D Glassmorphic Google Search Engine (Vox / James Jani / Magnates Media Style)
+  if (tplId === 'google') {
+    const gData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('google') : {};
+    const is3DActive = (topCustomizerState.paperPreviewMode === '3d' || topCustomizerState.is3DMode) && gData.is3DMode !== false;
+    if (is3DActive) {
+      if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+      hoverBridgeActive = false;
+      hoverExternalT = null;
+      if (typeof window.tplMountSearch3DStage === 'function') {
+        window.tplMountSearch3DStage(stage, gData);
+      }
+      return;
+    }
+  }
 
   if (BRIDGED_HOVER_TEMPLATE_IDS.has(tplId) && tplId !== 'magnates-media-article-highlight') {
     const btpl = topCustomizerState.currentTpl;
