@@ -737,6 +737,63 @@
       </svg>
     `)}`,
 
+    // 34b. Brand Logo Rise, Shift Left & Wavy Kinetic Headline (Standalone Scene A)
+    'magnates-media-brand-wavy-hook': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <radialGradient id="bpHookGrad" cx="22%" cy="28%" r="75%">
+            <stop offset="0%" stop-color="#991b1b"/>
+            <stop offset="45%" stop-color="#450a0a"/>
+            <stop offset="100%" stop-color="#050101"/>
+          </radialGradient>
+          <filter id="bpLogoGlow" x="-35%" y="-35%" width="170%" height="170%">
+            <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ff1e1e" flood-opacity="0.95"/>
+            <feDropShadow dx="0" dy="0" stdDeviation="18" flood-color="#dc2626" flood-opacity="0.6"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#bpHookGrad)"/>
+        <!-- Left Glowing Rounded Brand App Card (TEMU) -->
+        <g filter="url(#bpLogoGlow)" transform="translate(38, 66)">
+          <rect width="88" height="88" rx="20" fill="#ff2414" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>
+          <text x="44" y="36" fill="#ffffff" font-family="Arial, sans-serif" font-weight="900" font-size="14" text-anchor="middle">&#x1F457;&#x1F460;&#x1F45C;</text>
+          <text x="44" y="64" fill="#ffffff" font-family="Montserrat, Arial Black, sans-serif" font-weight="900" font-size="21" letter-spacing="1" text-anchor="middle">TEMU</text>
+        </g>
+        <!-- Right Wavy Kinetic Headline -->
+        <text x="262" y="103" fill="#f01818" font-family="Montserrat, Arial Black, sans-serif" font-weight="900" font-size="12.5" letter-spacing="0.4" text-anchor="middle">ONE OF THE STRANGEST BUSINESSES</text>
+        <text x="234" y="123" fill="#f01818" font-family="Montserrat, Arial Black, sans-serif" font-weight="900" font-size="12.5" letter-spacing="0.4" text-anchor="middle">ON THE</text>
+        <text x="292" y="127" fill="#ff2e2e" font-family="Montserrat, Arial Black, sans-serif" font-weight="900" font-size="12.5" letter-spacing="0.4" text-anchor="middle">INTERNET.</text>
+      </svg>
+    `)}`,
+
+    // 34c. $1,000,000 Counter & Dual Glowing Silhouettes (Standalone Scene B)
+    'magnates-media-dual-silhouettes': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <radialGradient id="bpSilGrad2" cx="25%" cy="28%" r="75%">
+            <stop offset="0%" stop-color="#991b1b"/>
+            <stop offset="45%" stop-color="#450a0a"/>
+            <stop offset="100%" stop-color="#050101"/>
+          </radialGradient>
+          <filter id="bpSilGlow2" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#ffffff" flood-opacity="0.95"/>
+            <feDropShadow dx="0" dy="0" stdDeviation="14" flood-color="#ffffff" flood-opacity="0.5"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#bpSilGrad2)"/>
+        <text x="200" y="103" fill="#ff1a1a" font-family="Montserrat, Arial Black, sans-serif" font-weight="900" font-size="31" text-anchor="middle" letter-spacing="0.5">$1,000,000</text>
+        <text x="200" y="121" fill="#b91c1c" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="11" text-anchor="middle">Advertising Those Product.</text>
+        <g filter="url(#bpSilGlow2)" fill="#ffffff" transform="translate(24, 34)">
+          <circle cx="30" cy="22" r="14"/>
+          <path d="M12,42 C12,38 48,38 48,42 L54,112 L42,112 L40,182 L16,182 L14,112 L6,112 Z"/>
+          <path d="M46,46 L68,36 L72,44 L50,58 Z"/>
+        </g>
+        <g filter="url(#bpSilGlow2)" fill="#ffffff" transform="translate(290, 82)">
+          <circle cx="52" cy="20" r="13"/>
+          <path d="M34,38 C34,34 68,34 70,40 L76,96 L30,96 L18,140 L6,140 L20,88 L34,88 Z"/>
+        </g>
+      </svg>
+    `)}`,
+
     // 35. Ink Reveal & Stretchy Title Animation
     'magnates-media-ink-reveal': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">

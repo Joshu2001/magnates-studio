@@ -24648,36 +24648,81 @@ id: 'map',
   },
   {
     id: 'magnates-media-paper-blueprint',
-    title: 'Paper-Based & Blueprint Cutouts (Dynamic Silhouettes & Room Spawn)',
+    title: 'Paper-Based & Blueprint Cutouts (Merged Master: Logo Hook → $1M Silhouettes)',
     category: 'Paper / Cutout',
     origCategory: 'Documentary',
-    badge: 'Magnates & James Jani Edition',
+    badge: 'Merged Master Sequence • Linked',
     difficulty: '1-Click',
     timeToApply: '2 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Paper-based & technical blueprint cutouts, rotoscoped subject extraction, glowing phone silhouettes, room plate spawn, staggered sequential reveals & exits, center bursts, and 2.5D paper crawling.',
+    description: 'Full merged master narrative combining Scene A (Glowing Brand App Icon bottom-up rise, left shift & wavy kinetic headline) with Scene B ($1,000,000 counter & dual glowing silhouettes). Bidirectionally linked with its two standalone scene templates.',
     tags: [
       'Paper-Based & Blueprint Cutouts',
       'Paper Cutout',
       'Blueprint',
       'Blueprint Cutout',
-      'Paper',
-      'Cutout',
+      'Merged Sequence',
+      'Full Story Flow',
+      'Brand Logo Hook',
+      'TEMU Logo',
+      'Wavy Text',
       'Silhouettes',
-      'Silhouette',
       'Room Spawn',
-      'Empty Room',
-      'Desk Cutout',
-      'Center Burst',
-      'Staggered Motion',
-      'Sequential Exit',
       'James Jani',
-      'Magnates Media',
-      'Rotoscoped Cutouts',
-      'Phone Silhouette'
+      'Magnates Media'
     ],
-    defaultImage: '/laptop_guy_cutout.png',
+    defaultImage: '/temu_logo_cutout.png',
     secondaryImage: '/silhouette_standing_phone.png'
+  },
+  {
+    id: 'magnates-media-brand-wavy-hook',
+    title: 'Brand Icon Rise, Left Shift & Wavy Kinetic Headline (Scene A)',
+    category: 'Text & Titles',
+    origCategory: 'Documentary',
+    badge: 'Scene A Standalone • Linked',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
+    description: 'Standalone Scene A: Starts on a customizable radial glow backdrop, rises a glowing brand/app icon from bottom to center, shifts it left, glides in Line 1, and animates Line 2 upward in a fluid wave. Live-synced with the Merged Master template.',
+    tags: [
+      'Brand Logo Reveal',
+      'TEMU Logo',
+      'Wavy Text',
+      'Wavy Headline',
+      'Kinetic Typography',
+      'Logo Shift Left',
+      'App Icon Cutout',
+      'Scene A',
+      'James Jani',
+      'Magnates Media'
+    ],
+    defaultImage: '/temu_logo_cutout.png',
+    secondaryImage: '/temu_logo_cutout.png'
+  },
+  {
+    id: 'magnates-media-dual-silhouettes',
+    title: '$1,000,000 Counter & Dual Glowing Silhouettes Cutout (Scene B)',
+    category: 'Paper / Cutout',
+    origCategory: 'Documentary',
+    badge: 'Scene B Standalone • Linked',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
+    description: 'Standalone Scene B: Rapidly counts up toward $1,000,000 while full-height glowing standing and sitting phone silhouettes glide in with millisecond stagger, reverse out, and fade the backdrop to black. Live-synced with the Merged Master template.',
+    tags: [
+      'Dual Silhouettes',
+      'Glowing Silhouettes',
+      '$1,000,000 Counter',
+      'Money Counter',
+      'Phone Silhouette',
+      'Paper Cutout',
+      'Staggered Exit',
+      'Scene B',
+      'James Jani',
+      'Magnates Media'
+    ],
+    defaultImage: '/silhouette_standing_phone.png',
+    secondaryImage: '/silhouette_sitting_phone.png'
   },
   {
     id: 'magnates-media-ink-reveal',
@@ -25216,7 +25261,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -28337,23 +28382,43 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'magnates-media-paper-blueprint') {
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-dual-silhouettes') {
+      const bgCol = (typeof magnatesBPState !== 'undefined' && magnatesBPState.backdropColor) ? magnatesBPState.backdropColor : '#991b1b';
+      const c1 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.9) : 'rgba(165, 22, 22, 0.9)';
+      const c2 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.68) : 'rgba(95, 10, 10, 0.68)';
+      const logoUrl = (typeof magnatesBPState !== 'undefined' && magnatesBPState.logoCutoutUrl) ? magnatesBPState.logoCutoutUrl : '/temu_logo_cutout.png';
+      const l1Url = (typeof magnatesBPState !== 'undefined' && magnatesBPState.secondaryCutoutUrl) ? magnatesBPState.secondaryCutoutUrl : '/silhouette_standing_phone.png';
+      const l2Url = (typeof magnatesBPState !== 'undefined' && magnatesBPState.primaryCutoutUrl) ? magnatesBPState.primaryCutoutUrl : '/silhouette_sitting_phone.png';
+      const line1Txt = (typeof magnatesBPState !== 'undefined' && magnatesBPState.wavyLine1) ? magnatesBPState.wavyLine1 : 'ONE OF THE STRANGEST BUSINESSES';
+      const line2Txt = (typeof magnatesBPState !== 'undefined' && magnatesBPState.wavyLine2) ? magnatesBPState.wavyLine2 : 'ON THE INTERNET.';
+      const subTxt = (typeof magnatesBPState !== 'undefined' && magnatesBPState.subcaption) ? magnatesBPState.subcaption : 'Advertising Those Product.';
+      const badgeLabel = tplId === 'magnates-media-brand-wavy-hook'
+        ? '&#x1F525; SCENE A // LOGO &amp; WAVY HOOK'
+        : (tplId === 'magnates-media-dual-silhouettes' ? '&#x2728; SCENE B // $1M SILHOUETTES' : '&#x1F517; MERGED MASTER // A &rarr; B');
+
       fxContainer.innerHTML = `
-        <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, rgba(165, 22, 22, 0.9) 0%, rgba(95, 10, 10, 0.72) 40%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <!-- Center Red Money Counter -->
-          <div id="fx-bp-counter-wrap-${tplId}" style="position: relative; z-index: 4; text-align: center; transform: translateY(-4%); pointer-events: none;">
-            <div id="fx-bp-counter-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 28px; font-weight: 900; color: #ff1a1a; letter-spacing: 0.5px; line-height: 1.05; text-shadow: 0 0 18px rgba(255,20,20,0.7), 0 3px 10px rgba(0,0,0,0.9);">$999,970</div>
-            <div style="font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700; color: #b91c1c; margin-top: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">Advertising Those Product.</div>
+        <div id="fx-bp-bg-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 22% 28%, ${c1} 0%, ${c2} 42%, rgba(20, 3, 3, 0.96) 78%, #050101 100%); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <!-- Scene A: Brand Logo Cutout & Wavy Headline -->
+          <img id="fx-bp-logo-${tplId}" src="${logoUrl}" style="position: absolute; left: 50%; top: 50%; width: 25%; aspect-ratio: 1/1; object-fit: contain; z-index: 12; filter: drop-shadow(0 0 12px rgba(255,30,30,0.95)) drop-shadow(0 0 24px rgba(239,68,68,0.65)); pointer-events: none; opacity: 0;" />
+          <div id="fx-bp-wavy-wrap-${tplId}" style="position: absolute; left: 33%; right: 4%; top: 50%; transform: translateY(-50%); z-index: 11; text-align: center; pointer-events: none; opacity: 0;">
+            <div id="fx-bp-wavy1-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9.5px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line1Txt}</div>
+            <div id="fx-bp-wavy2-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 9.5px; font-weight: 900; color: #ef4444; letter-spacing: 0.3px; margin-top: 2px; text-shadow: 0 0 12px rgba(239,68,68,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${line2Txt}</div>
           </div>
 
-          <!-- Left Standing White Glowing Silhouette -->
-          <img id="fx-bp-left-${tplId}" src="/silhouette_standing_phone.png" style="position: absolute; left: 5%; bottom: 2%; height: 83%; width: auto; object-fit: contain; z-index: 8; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none;" />
+          <!-- Scene B: Center Red Money Counter -->
+          <div id="fx-bp-counter-wrap-${tplId}" style="position: relative; z-index: 4; text-align: center; transform: translateY(-4%); pointer-events: none; opacity: 0;">
+            <div id="fx-bp-counter-${tplId}" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: 28px; font-weight: 900; color: #ff1a1a; letter-spacing: 0.5px; line-height: 1.05; text-shadow: 0 0 18px rgba(255,20,20,0.7), 0 3px 10px rgba(0,0,0,0.9);">$999,970</div>
+            <div id="fx-bp-sub-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 9.5px; font-weight: 700; color: #b91c1c; margin-top: 2px; text-shadow: 0 2px 6px rgba(0,0,0,0.9);">${subTxt}</div>
+          </div>
 
-          <!-- Right Sitting White Glowing Silhouette -->
-          <img id="fx-bp-right-${tplId}" src="/silhouette_sitting_phone.png" style="position: absolute; right: 0%; bottom: 0%; height: 61%; width: auto; object-fit: contain; z-index: 9; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none;" />
+          <!-- Left Standing Glowing Silhouette -->
+          <img id="fx-bp-left-${tplId}" src="${l1Url}" style="position: absolute; left: 5%; bottom: 2%; height: 83%; width: auto; object-fit: contain; z-index: 8; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none; opacity: 0;" />
+
+          <!-- Right Sitting Glowing Silhouette -->
+          <img id="fx-bp-right-${tplId}" src="${l2Url}" style="position: absolute; right: 0%; bottom: 0%; height: 61%; width: auto; object-fit: contain; z-index: 9; filter: drop-shadow(0 0 10px rgba(255,255,255,0.95)) drop-shadow(0 0 22px rgba(255,255,255,0.55)); pointer-events: none; opacity: 0;" />
 
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #dc2626, #991b1b); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(220,38,38,0.5);">
-            &#x2728; SILHOUETTE &amp; CUTOUTS
+            ${badgeLabel}
           </div>
         </div>
       `;
@@ -29326,8 +29391,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           card.style.borderColor = '#f59e0b';
         }
       }
-    } else if (tplId === 'magnates-media-paper-blueprint') {
-      const cycle = t % 5.2;
+    } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-dual-silhouettes') {
+      const logoEl = fxContainer?.querySelector(`#fx-bp-logo-${tplId}`);
+      const wavyWrapEl = fxContainer?.querySelector(`#fx-bp-wavy-wrap-${tplId}`);
+      const wavy1El = fxContainer?.querySelector(`#fx-bp-wavy1-${tplId}`);
+      const wavy2El = fxContainer?.querySelector(`#fx-bp-wavy2-${tplId}`);
+      const counterWrapEl = fxContainer?.querySelector(`#fx-bp-counter-wrap-${tplId}`);
       const counterEl = fxContainer?.querySelector(`#fx-bp-counter-${tplId}`);
       const leftEl = fxContainer?.querySelector(`#fx-bp-left-${tplId}`);
       const rightEl = fxContainer?.querySelector(`#fx-bp-right-${tplId}`);
@@ -29335,35 +29404,126 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       const easeOut = (x) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
       const easeIn = (x) => Math.pow(Math.max(0, Math.min(1, x)), 3);
 
-      // 1. Money counter counts up toward $1,000,000
-      if (counterEl) {
-        const countProg = Math.min(1, cycle / 1.15);
-        const val = Math.floor(850000 + easeOut(countProg) * 150000);
-        counterEl.textContent = '$' + val.toLocaleString('en-US');
+      // Sync live glow filters from shared magnatesBPState
+      if (typeof bpComputeCutoutGlowFilter === 'function' && typeof magnatesBPState !== 'undefined') {
+        if (logoEl) logoEl.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.logoGlowColor || '#ff1e1e', magnatesBPState.logoGlowIntensity ?? 90, false);
+        if (leftEl) leftEl.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l1GlowColor || '#ffffff', magnatesBPState.l1GlowIntensity ?? 85, false);
+        if (rightEl) rightEl.style.filter = bpComputeCutoutGlowFilter(magnatesBPState.l2GlowColor || '#ffffff', magnatesBPState.l2GlowIntensity ?? 85, false);
       }
-      // 2. Left silhouette glides Left -> Right at 0.80s, reverses Right -> Left at 3.50s
-      if (leftEl) {
-        const inP = easeOut((cycle - 0.80) / 0.45);
-        const outP = easeIn((cycle - 3.50) / 0.45);
-        const tx = (1 - inP) * -130 + outP * -140;
-        const op = Math.max(0, Math.min(1, inP * (1 - outP)));
-        leftEl.style.transform = `translateX(${tx.toFixed(1)}%)`;
-        leftEl.style.opacity = op.toFixed(2);
-      }
-      // 3. Right silhouette glides Bottom -> Up at 0.90s (+ms), exits Left -> Right at 3.72s (+ms)
-      if (rightEl) {
-        const inP = easeOut((cycle - 0.90) / 0.45);
-        const outP = easeIn((cycle - 3.72) / 0.45);
-        const ty = (1 - inP) * 120;
-        const tx = outP * 240;
-        const op = Math.max(0, Math.min(1, inP * (1 - outP)));
-        rightEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
-        rightEl.style.opacity = op.toFixed(2);
-      }
-      // 4. Background fades away after cutouts exit
-      if (bgEl) {
-        const fadeP = easeIn((cycle - 4.20) / 0.65);
-        bgEl.style.opacity = (1 - fadeP).toFixed(2);
+
+      if (tplId === 'magnates-media-brand-wavy-hook') {
+        // Standalone Scene A Hover Preview (4.8s cycle)
+        const c = t % 4.8;
+        const riseP = easeOut((c - 0.25) / 0.45);
+        const shiftP = easeOut((c - 1.05) / 0.48);
+        const outP = easeIn((c - 3.90) / 0.45);
+        if (logoEl) {
+          const tx = -50 - shiftP * 118 - outP * 120;
+          const ty = -50 + (1 - riseP) * 180;
+          const op = Math.max(0, Math.min(1, (c < 0.25 ? 0 : riseP * 1.3) * (1 - outP)));
+          logoEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
+          logoEl.style.opacity = op.toFixed(2);
+        }
+        if (wavyWrapEl && wavy1El && wavy2El) {
+          const l1P = easeOut((c - 1.20) / 0.45);
+          const l2P = easeOut((c - 1.65) / 0.55);
+          wavyWrapEl.style.opacity = (Math.min(1, l1P) * (1 - outP)).toFixed(2);
+          wavy1El.style.transform = `translateX(${((1 - l1P) * 16).toFixed(1)}px)`;
+          wavy2El.style.transform = `translateY(${((1 - l2P) * 18 + Math.sin(l2P * Math.PI) * -4).toFixed(1)}px)`;
+          wavy2El.style.opacity = l2P.toFixed(2);
+        }
+        if (counterWrapEl) counterWrapEl.style.opacity = '0';
+        if (leftEl) leftEl.style.opacity = '0';
+        if (rightEl) rightEl.style.opacity = '0';
+      } else if (tplId === 'magnates-media-dual-silhouettes') {
+        // Standalone Scene B Hover Preview (5.2s cycle)
+        const c = t % 5.2;
+        if (logoEl) logoEl.style.opacity = '0';
+        if (wavyWrapEl) wavyWrapEl.style.opacity = '0';
+        if (counterWrapEl && counterEl) {
+          const fadeP = easeIn((c - 4.20) / 0.65);
+          counterWrapEl.style.opacity = (1 - fadeP).toFixed(2);
+          const countProg = Math.min(1, c / 1.15);
+          const val = Math.floor(850000 + easeOut(countProg) * 150000);
+          counterEl.textContent = '$' + val.toLocaleString('en-US');
+        }
+        if (leftEl) {
+          const inP = easeOut((c - 0.80) / 0.45);
+          const outP = easeIn((c - 3.50) / 0.45);
+          const tx = (1 - inP) * -130 + outP * -140;
+          const op = Math.max(0, Math.min(1, inP * (1 - outP)));
+          leftEl.style.transform = `translateX(${tx.toFixed(1)}%)`;
+          leftEl.style.opacity = op.toFixed(2);
+        }
+        if (rightEl) {
+          const inP = easeOut((c - 0.90) / 0.45);
+          const outP = easeIn((c - 3.72) / 0.45);
+          const ty = (1 - inP) * 120;
+          const tx = outP * 240;
+          const op = Math.max(0, Math.min(1, inP * (1 - outP)));
+          rightEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
+          rightEl.style.opacity = op.toFixed(2);
+        }
+        if (bgEl) {
+          const fadeP = easeIn((c - 4.20) / 0.65);
+          bgEl.style.opacity = (1 - fadeP).toFixed(2);
+        }
+      } else {
+        // Merged Master Hover Preview (8.4s cycle: 0..3.8s Scene A -> 3.8..8.4s Scene B)
+        const c = t % 8.4;
+        if (c < 3.8) {
+          const riseP = easeOut((c - 0.20) / 0.40);
+          const shiftP = easeOut((c - 0.90) / 0.45);
+          const outP = easeIn((c - 3.25) / 0.45);
+          if (logoEl) {
+            const tx = -50 - shiftP * 118 - outP * 120;
+            const ty = -50 + (1 - riseP) * 180;
+            const op = Math.max(0, Math.min(1, (c < 0.20 ? 0 : riseP * 1.3) * (1 - outP)));
+            logoEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
+            logoEl.style.opacity = op.toFixed(2);
+          }
+          if (wavyWrapEl && wavy1El && wavy2El) {
+            const l1P = easeOut((c - 1.05) / 0.40);
+            const l2P = easeOut((c - 1.45) / 0.50);
+            wavyWrapEl.style.opacity = (Math.min(1, l1P) * (1 - outP)).toFixed(2);
+            wavy1El.style.transform = `translateX(${((1 - l1P) * 16).toFixed(1)}px)`;
+            wavy2El.style.transform = `translateY(${((1 - l2P) * 18 + Math.sin(l2P * Math.PI) * -4).toFixed(1)}px)`;
+            wavy2El.style.opacity = l2P.toFixed(2);
+          }
+          if (counterWrapEl) counterWrapEl.style.opacity = '0';
+          if (leftEl) leftEl.style.opacity = '0';
+          if (rightEl) rightEl.style.opacity = '0';
+          if (bgEl) bgEl.style.opacity = '1';
+        } else {
+          const sb = c - 3.8;
+          if (logoEl) logoEl.style.opacity = '0';
+          if (wavyWrapEl) wavyWrapEl.style.opacity = '0';
+          const fadeP = easeIn((sb - 3.90) / 0.55);
+          if (counterWrapEl && counterEl) {
+            counterWrapEl.style.opacity = (1 - fadeP).toFixed(2);
+            const countProg = Math.min(1, sb / 1.05);
+            const val = Math.floor(850000 + easeOut(countProg) * 150000);
+            counterEl.textContent = '$' + val.toLocaleString('en-US');
+          }
+          if (leftEl) {
+            const inP = easeOut((sb - 0.70) / 0.42);
+            const outP = easeIn((sb - 3.20) / 0.42);
+            const tx = (1 - inP) * -130 + outP * -140;
+            const op = Math.max(0, Math.min(1, inP * (1 - outP)));
+            leftEl.style.transform = `translateX(${tx.toFixed(1)}%)`;
+            leftEl.style.opacity = op.toFixed(2);
+          }
+          if (rightEl) {
+            const inP = easeOut((sb - 0.80) / 0.42);
+            const outP = easeIn((sb - 3.40) / 0.42);
+            const ty = (1 - inP) * 120;
+            const tx = outP * 240;
+            const op = Math.max(0, Math.min(1, inP * (1 - outP)));
+            rightEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
+            rightEl.style.opacity = op.toFixed(2);
+          }
+          if (bgEl) bgEl.style.opacity = (1 - fadeP).toFixed(2);
+        }
       }
     } else if (tplId === 'magnates-media-ink-reveal') {
       const bleedScale = 0.5 + ((t * 0.8) % 1.2) * 0.6;
@@ -29548,7 +29708,9 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-multi-drop-shadows': openMagnatesDropShadowsSuite,
     'magnates-media-shadowization': openMagnatesShadowizationSuite,
     'magnates-media-blend-modes': openMagnatesBlendModesSuite,
-    'magnates-media-paper-blueprint': openMagnatesPaperBlueprintSuite,
+    'magnates-media-paper-blueprint': () => openMagnatesPaperBlueprintSuite('full_story_flow'),
+    'magnates-media-brand-wavy-hook': () => openMagnatesPaperBlueprintSuite('brand_wavy_intro'),
+    'magnates-media-dual-silhouettes': () => openMagnatesPaperBlueprintSuite('dual_silhouette'),
     'magnates-media-ink-reveal': openMagnatesInkRevealSuite,
     'magnates-media-particle-vfx': openMagnatesParticleVFXSuite
   };
@@ -29955,8 +30117,13 @@ function applySelectedHomepageTemplate(templateId) {
     openMagnatesBlendModesSuite();
     return;
   } else if (templateId === 'magnates-media-paper-blueprint') {
-    // Launch Magnates Media Paper-Based & Blueprint Cutouts Suite
-    openMagnatesPaperBlueprintSuite();
+    openMagnatesPaperBlueprintSuite('full_story_flow');
+    return;
+  } else if (templateId === 'magnates-media-brand-wavy-hook') {
+    openMagnatesPaperBlueprintSuite('brand_wavy_intro');
+    return;
+  } else if (templateId === 'magnates-media-dual-silhouettes') {
+    openMagnatesPaperBlueprintSuite('dual_silhouette');
     return;
   } else if (templateId === 'magnates-media-ink-reveal') {
     // Launch Magnates Media Ink Reveal Text Animation Suite
@@ -48638,6 +48805,9 @@ function updateMagnatesBPVisualStyles() {
     }
   }
 
+  // Persist shared state so all 3 linked templates stay bidirectionally synchronized
+  saveMagnatesBPSharedSyncState();
+
   // Update HUD Phase Indicator & Layer Stack Subtitles
   const presetDef = MAGNATES_BP_PRESETS[magnatesBPState.preset];
   if (hudPreset && presetDef) hudPreset.textContent = presetDef.hudPreset;
@@ -48715,48 +48885,51 @@ function renderMagnatesBPLoop(timestamp) {
   magnatesBPState.animFrameId = requestAnimationFrame(renderMagnatesBPLoop);
 }
 
-function applyMagnatesBPPresetToState(pKey) {
-  const pData = MAGNATES_BP_PRESETS[pKey];
-  if (!pData) return;
-  magnatesBPState.preset = pKey;
-  magnatesBPState.duration = pData.duration || 6.0;
-  magnatesBPState.bgPlateUrl = pData.bgPlateUrl;
-  magnatesBPState.backdropColor = pData.backdropColor || '#991b1b';
-  magnatesBPState.backdropSpread = pData.backdropSpread || 75;
+const MAGNATES_BP_SYNC_STORAGE_KEY = 'magnates_bp_shared_sync_v1';
+const MAGNATES_BP_SYNC_FIELDS = [
+  'backdropColor', 'backdropSpread',
+  'logoCutoutUrl', 'logoInTime', 'logoShiftTime', 'logoOutTime', 'logoGlowColor', 'logoGlowIntensity',
+  'wavyLine1', 'wavyLine2',
+  'headline', 'subcaption',
+  'l1InAnim', 'l1OutAnim', 'l1InTime', 'l1OutTime', 'l1GlowColor', 'l1GlowIntensity',
+  'l2InAnim', 'l2OutAnim', 'l2InTime', 'l2OutTime', 'l2GlowColor', 'l2GlowIntensity',
+  'bgFadeTime'
+];
 
-  magnatesBPState.logoEnabled = pData.logoEnabled ?? false;
-  magnatesBPState.logoCutoutUrl = pData.logoCutoutUrl || '/temu_logo_cutout.png';
-  magnatesBPState.logoInTime = pData.logoInTime ?? 0.35;
-  magnatesBPState.logoShiftTime = pData.logoShiftTime ?? 1.25;
-  magnatesBPState.logoOutTime = pData.logoOutTime ?? 4.15;
-  magnatesBPState.logoGlowColor = pData.logoGlowColor || '#ff1e1e';
-  magnatesBPState.logoGlowIntensity = pData.logoGlowIntensity ?? 90;
-  magnatesBPState.wavyTextEnabled = pData.wavyTextEnabled ?? false;
-  magnatesBPState.wavyLine1 = pData.wavyLine1 || 'ONE OF THE STRANGEST BUSINESSES';
-  magnatesBPState.wavyLine2 = pData.wavyLine2 || 'ON THE INTERNET.';
+function saveMagnatesBPSharedSyncState() {
+  try {
+    const payload = {};
+    MAGNATES_BP_SYNC_FIELDS.forEach((k) => {
+      const val = magnatesBPState[k];
+      // Avoid persisting temporary blob URLs across reloads, keep everything else
+      if (typeof val === 'string' && val.startsWith('blob:')) return;
+      payload[k] = val;
+    });
+    localStorage.setItem(MAGNATES_BP_SYNC_STORAGE_KEY, JSON.stringify(payload));
+  } catch (err) {
+    // Ignore storage quota errors
+  }
+}
 
-  magnatesBPState.l1Enabled = pData.l1Enabled ?? true;
-  magnatesBPState.secondaryCutoutUrl = pData.secondaryCutoutUrl;
-  magnatesBPState.primaryCutoutUrl = pData.primaryCutoutUrl;
-  magnatesBPState.l2Enabled = pData.l2Enabled;
-  magnatesBPState.showCounter = pData.showCounter;
-  magnatesBPState.headline = pData.headline;
-  magnatesBPState.subcaption = pData.subcaption;
-  magnatesBPState.l1InAnim = pData.l1InAnim;
-  magnatesBPState.l1OutAnim = pData.l1OutAnim;
-  magnatesBPState.l1InTime = pData.l1InTime;
-  magnatesBPState.l1OutTime = pData.l1OutTime;
-  magnatesBPState.l1GlowColor = pData.l1GlowColor ?? "#ffffff";
-  magnatesBPState.l1GlowIntensity = pData.l1GlowIntensity ?? 85;
-  magnatesBPState.l2InAnim = pData.l2InAnim;
-  magnatesBPState.l2OutAnim = pData.l2OutAnim;
-  magnatesBPState.l2InTime = pData.l2InTime;
-  magnatesBPState.l2OutTime = pData.l2OutTime;
-  magnatesBPState.l2GlowColor = pData.l2GlowColor ?? "#ffffff";
-  magnatesBPState.l2GlowIntensity = pData.l2GlowIntensity ?? 85;
-  magnatesBPState.bgFadeTime = pData.bgFadeTime;
+function loadMagnatesBPSharedSyncState() {
+  try {
+    const raw = localStorage.getItem(MAGNATES_BP_SYNC_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return;
+    MAGNATES_BP_SYNC_FIELDS.forEach((k) => {
+      if (parsed[k] !== undefined) {
+        magnatesBPState[k] = parsed[k];
+      }
+    });
+  } catch (err) {
+    // Ignore parse errors
+  }
+}
 
-  // Sync Inspector UI Controls
+function syncMagnatesBPInspectorControlsFromState() {
+  const pKey = magnatesBPState.preset;
+  const pData = MAGNATES_BP_PRESETS[pKey] || MAGNATES_BP_PRESETS.full_story_flow;
   const setVal = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.value = val;
@@ -48767,6 +48940,15 @@ function applyMagnatesBPPresetToState(pKey) {
   };
   setVal('magnates-bp-select-preset', pKey);
 
+  // Update Modal Header Title based on which linked template / mode is active
+  const titleMap = {
+    full_story_flow: 'Merged Master Suite: Brand Logo Hook → $1M Silhouettes',
+    brand_wavy_intro: 'Scene A Suite: Brand Icon Rise, Left Shift & Wavy Headline',
+    dual_silhouette: 'Scene B Suite: $1,000,000 Counter & Dual Glowing Silhouettes',
+    room_spawn: 'Scene C Suite: Empty Office Room & Desk Cutout Glide'
+  };
+  setTxt('magnates-bp-modal-title', titleMap[pKey] || 'Dynamic Cutout & Silhouette Motion Suite');
+
   // Sync Segmented Scene Pill Buttons
   document.querySelectorAll('.btn-bp-scene-pill').forEach((btn) => {
     const active = btn.getAttribute('data-preset') === pKey;
@@ -48775,7 +48957,7 @@ function applyMagnatesBPPresetToState(pKey) {
     btn.style.fontWeight = active ? '700' : '600';
   });
 
-  // Sync Scene A Controls
+  // Sync Scene A Controls from shared state
   setVal('magnates-bp-input-wavy-line1', magnatesBPState.wavyLine1);
   setVal('magnates-bp-input-wavy-line2', magnatesBPState.wavyLine2);
   setVal('magnates-bp-logo-in-time', magnatesBPState.logoInTime);
@@ -48788,38 +48970,38 @@ function applyMagnatesBPPresetToState(pKey) {
   const chkWavy = document.getElementById('magnates-bp-toggle-wavy-text');
   if (chkWavy) chkWavy.checked = magnatesBPState.wavyTextEnabled;
 
-  // Sync Scene B / C Controls
-  setVal('magnates-bp-l1-in-anim', pData.l1InAnim);
-  setVal('magnates-bp-l1-out-anim', pData.l1OutAnim);
-  setVal('magnates-bp-l1-in-time', pData.l1InTime);
-  setVal('magnates-bp-l1-out-time', pData.l1OutTime);
-  setTxt('magnates-bp-val-l1-in', `${pData.l1InTime.toFixed(2)}s`);
-  setTxt('magnates-bp-val-l1-out', `${pData.l1OutTime.toFixed(2)}s`);
+  // Sync Scene B / C Controls from shared state
+  setVal('magnates-bp-l1-in-anim', magnatesBPState.l1InAnim);
+  setVal('magnates-bp-l1-out-anim', magnatesBPState.l1OutAnim);
+  setVal('magnates-bp-l1-in-time', magnatesBPState.l1InTime);
+  setVal('magnates-bp-l1-out-time', magnatesBPState.l1OutTime);
+  setTxt('magnates-bp-val-l1-in', `${magnatesBPState.l1InTime.toFixed(2)}s`);
+  setTxt('magnates-bp-val-l1-out', `${magnatesBPState.l1OutTime.toFixed(2)}s`);
   setVal('magnates-bp-l1-glow-color', magnatesBPState.l1GlowColor);
   setVal('magnates-bp-l1-glow-intensity', magnatesBPState.l1GlowIntensity);
   setTxt('magnates-bp-val-l1-glow', `${magnatesBPState.l1GlowIntensity}%`);
 
-  setVal('magnates-bp-l2-in-anim', pData.l2InAnim);
-  setVal('magnates-bp-l2-out-anim', pData.l2OutAnim);
-  setVal('magnates-bp-l2-in-time', pData.l2InTime);
-  setVal('magnates-bp-l2-out-time', pData.l2OutTime);
-  setTxt('magnates-bp-val-l2-in', `${pData.l2InTime.toFixed(2)}s`);
-  setTxt('magnates-bp-val-l2-out', `${pData.l2OutTime.toFixed(2)}s`);
+  setVal('magnates-bp-l2-in-anim', magnatesBPState.l2InAnim);
+  setVal('magnates-bp-l2-out-anim', magnatesBPState.l2OutAnim);
+  setVal('magnates-bp-l2-in-time', magnatesBPState.l2InTime);
+  setVal('magnates-bp-l2-out-time', magnatesBPState.l2OutTime);
+  setTxt('magnates-bp-val-l2-in', `${magnatesBPState.l2InTime.toFixed(2)}s`);
+  setTxt('magnates-bp-val-l2-out', `${magnatesBPState.l2OutTime.toFixed(2)}s`);
   setVal('magnates-bp-l2-glow-color', magnatesBPState.l2GlowColor);
   setVal('magnates-bp-l2-glow-intensity', magnatesBPState.l2GlowIntensity);
   setTxt('magnates-bp-val-l2-glow', `${magnatesBPState.l2GlowIntensity}%`);
 
-  setVal('magnates-bp-input-headline', pData.headline);
-  setVal('magnates-bp-input-subcaption', pData.subcaption);
-  setVal('magnates-bp-bg-fade-time', pData.bgFadeTime);
-  setTxt('magnates-bp-val-bg-fade', `Fade @ ${pData.bgFadeTime.toFixed(2)}s`);
+  setVal('magnates-bp-input-headline', magnatesBPState.headline);
+  setVal('magnates-bp-input-subcaption', magnatesBPState.subcaption);
+  setVal('magnates-bp-bg-fade-time', magnatesBPState.bgFadeTime);
+  setTxt('magnates-bp-val-bg-fade', `Fade @ ${magnatesBPState.bgFadeTime.toFixed(2)}s`);
   setVal('magnates-bp-backdrop-color', magnatesBPState.backdropColor);
   setVal('magnates-bp-backdrop-color-quick', magnatesBPState.backdropColor);
   setVal('magnates-bp-backdrop-spread', magnatesBPState.backdropSpread);
   setTxt('magnates-bp-val-backdrop-spread', `${magnatesBPState.backdropSpread}%`);
 
   const chkCounter = document.getElementById('magnates-bp-toggle-counter');
-  if (chkCounter) chkCounter.checked = pData.showCounter;
+  if (chkCounter) chkCounter.checked = magnatesBPState.showCounter;
 
   setTxt('magnates-bp-label-z2', pData.l1Label);
   setTxt('magnates-bp-label-z3', pData.l2Label);
@@ -48845,9 +49027,67 @@ function applyMagnatesBPPresetToState(pKey) {
   if (rowZ3) rowZ3.style.opacity = magnatesBPState.l2Enabled ? '1' : '0.45';
 }
 
-function openMagnatesPaperBlueprintSuite() {
+// Track custom user silhouette URL so switching to room_spawn and back preserves user uploads
+let _customSilhouetteL1Url = '/silhouette_standing_phone.png';
+
+function applyMagnatesBPPresetToState(pKey) {
+  const pData = MAGNATES_BP_PRESETS[pKey];
+  if (!pData) return;
+  const prevPreset = magnatesBPState.preset;
+  if (prevPreset !== 'room_spawn' && magnatesBPState.secondaryCutoutUrl && !magnatesBPState.secondaryCutoutUrl.includes('laptop_guy_cutout')) {
+    _customSilhouetteL1Url = magnatesBPState.secondaryCutoutUrl;
+  }
+
+  magnatesBPState.preset = pKey;
+  magnatesBPState.duration = pData.duration || 6.0;
+
+  // Toggle which scene modules are active WITHOUT overwriting shared user customizations!
+  if (pKey === 'full_story_flow') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = true;
+    magnatesBPState.wavyTextEnabled = true;
+    magnatesBPState.l1Enabled = true;
+    magnatesBPState.l2Enabled = true;
+    magnatesBPState.showCounter = true;
+    magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'brand_wavy_intro') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = true;
+    magnatesBPState.wavyTextEnabled = true;
+    magnatesBPState.l1Enabled = false;
+    magnatesBPState.l2Enabled = false;
+    magnatesBPState.showCounter = false;
+    magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'dual_silhouette') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = false;
+    magnatesBPState.wavyTextEnabled = false;
+    magnatesBPState.l1Enabled = true;
+    magnatesBPState.l2Enabled = true;
+    magnatesBPState.showCounter = true;
+    magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'room_spawn') {
+    magnatesBPState.bgPlateUrl = "/room_empty_plate.png";
+    magnatesBPState.logoEnabled = false;
+    magnatesBPState.wavyTextEnabled = false;
+    magnatesBPState.l1Enabled = true;
+    magnatesBPState.l2Enabled = false;
+    magnatesBPState.showCounter = false;
+    magnatesBPState.secondaryCutoutUrl = "/laptop_guy_cutout.png";
+  }
+
+  syncMagnatesBPInspectorControlsFromState();
+}
+
+function openMagnatesPaperBlueprintSuite(initialPresetKey) {
   const modal = document.getElementById('modal-magnates-paper-blueprint-suite');
   if (!modal) return;
+  loadMagnatesBPSharedSyncState();
+  const targetPreset = (typeof initialPresetKey === 'string' && MAGNATES_BP_PRESETS[initialPresetKey])
+    ? initialPresetKey
+    : (magnatesBPState.preset || 'full_story_flow');
+  applyMagnatesBPPresetToState(targetPreset);
+
   modal.style.display = 'flex';
   magnatesBPState.isPlaying = true;
   magnatesBPState.playhead = 0;
@@ -48857,6 +49097,11 @@ function openMagnatesPaperBlueprintSuite() {
 
   syncMagnatesBPPlayButtons();
   updateMagnatesBPVisualStyles();
+  if (targetPreset === 'dual_silhouette' || targetPreset === 'room_spawn') {
+    selectMagnatesBPLayer('z2');
+  } else {
+    selectMagnatesBPLayer('z4');
+  }
 }
 
 function closeMagnatesPaperBlueprintSuite() {
@@ -48971,6 +49216,7 @@ function selectMagnatesBPLayer(layerId) {
 }
 
 function bindMagnatesPaperBlueprintSuiteModalControls() {
+  loadMagnatesBPSharedSyncState();
   document.getElementById('btn-close-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
   document.getElementById('btn-cancel-magnates-bp-suite')?.addEventListener('click', closeMagnatesPaperBlueprintSuite);
 
