@@ -28399,53 +28399,62 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>
       `;
     } else if (tplId === 'magnates-media-article-highlight') {
-      fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #120e09; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <!-- Newspaper Sheet with Panning Camera -->
-          <div id="fx-art-sheet-${tplId}" style="position: absolute; width: 140%; height: 140%; background: #eee5d4; border-radius: 6px; padding: 20px; box-shadow: 0 20px 45px rgba(0,0,0,0.9); transform-origin: center center; transition: transform 0.05s linear;">
-            <div style="border-bottom: 2px solid #292116; padding-bottom: 6px; text-align: center;">
-              <span style="font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 900; color: #1e170e; letter-spacing: 2px;">THE FINANCIAL CHRONICLE</span>
-            </div>
-            <div style="margin-top: 10px; font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 900; color: #110c06; text-align: center;">
-              MARKET COLLAPSES IN PANIC
-            </div>
+      // 3D Macro Camera Path: Sweeps from headline to tight macro close-up with 20 deg tilt
+      const cycleTime = 4.5;
+      const progress = ((t % cycleTime) / cycleTime); // 0.0 to 1.0
+      
+      // Smooth cinematic easeInOutCubic
+      const p = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 
-            <!-- Text Columns with Dynamic Marker Highlighter -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px;">
-              <div style="display: flex; flex-direction: column; gap: 5px;">
-                <div style="height: 5px; background: #3b2f1f; width: 90%; border-radius: 2px;"></div>
-                <div style="height: 5px; background: #3b2f1f; width: 95%; border-radius: 2px;"></div>
-                <!-- Yellow Marker Stroke -->
-                <div id="fx-art-mark-1-${tplId}" style="background: rgba(250, 204, 21, 0.9); padding: 2px 4px; border-radius: 2px; width: 0%; overflow: hidden; white-space: nowrap; transition: width 0.15s ease;">
-                  <span style="font-family: monospace; font-size: 8px; font-weight: 900; color: #000;">$14,000,000,000 LOST</span>
-                </div>
-                <div style="height: 5px; background: #3b2f1f; width: 85%; border-radius: 2px;"></div>
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 5px;">
-                <div style="height: 5px; background: #3b2f1f; width: 80%; border-radius: 2px;"></div>
-                <!-- Yellow Marker Stroke #2 -->
-                <div id="fx-art-mark-2-${tplId}" style="background: rgba(250, 204, 21, 0.9); padding: 2px 4px; border-radius: 2px; width: 0%; overflow: hidden; white-space: nowrap; transition: width 0.15s ease;">
-                  <span style="font-family: monospace; font-size: 8px; font-weight: 900; color: #000;">NO BUYERS FOUND</span>
-                </div>
-                <div style="height: 5px; background: #3b2f1f; width: 90%; border-radius: 2px;"></div>
-              </div>
-            </div>
-          </div>
+      // Camera Trajectory: Pan down from headline into target quote close-up
+      const startZoom = 1.25;
+      const targetZoom = 1.95;
+      const zoom = startZoom + p * (targetZoom - startZoom);
 
-          <!-- Camera Optical Focus Reticle -->
-          <div style="position: absolute; inset: 0; pointer-events: none; border: 2px solid rgba(245,158,11,0.5); margin: 18px; border-radius: 8px; box-shadow: inset 0 0 25px rgba(0,0,0,0.6);">
-            <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.85); border: 1px solid #f59e0b; padding: 2px 6px; border-radius: 4px;">
-              <span id="fx-art-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #fbbf24;">
-                PAN SCAN: 140% // HIGHLIGHT PEN ACTIVE
-              </span>
-            </div>
-          </div>
+      // Angled Macro Lens Tilt: 12 deg wide to 21 deg macro
+      const tiltX = 12 + p * 9;
+      const tiltY = -3 + Math.sin(t * 1.2) * 2;
+      const tiltZ = -0.8 + Math.cos(t * 1.1) * 0.5;
 
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #d97706, #b45309); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(217,119,6,0.5);">
-            \ud83d\udcf0 TEXT HIGHLIGHT
-          </div>
-        </div>
-      `;
+      // Panning sweep towards the highlighted lines
+      const startPanX = 20;
+      const targetPanX = -38;
+      const panX = startPanX + p * (targetPanX - startPanX) + Math.sin(t * 1.5) * 2;
+
+      const startPanY = 40;
+      const targetPanY = -28;
+      const panY = startPanY + p * (targetPanY - startPanY);
+
+      // Live Felt-Tip Highlighter Sweep Progress
+      const mark1Prog = Math.min(100, Math.max(0, ((progress - 0.12) / 0.35) * 100));
+      const mark2Prog = Math.min(100, Math.max(0, ((progress - 0.45) / 0.38) * 100));
+
+      const sheet = fxContainer?.querySelector(`#fx-art-sheet-${tplId}`);
+      const m1 = fxContainer?.querySelector(`#fx-art-mark-1-${tplId}`);
+      const m2 = fxContainer?.querySelector(`#fx-art-mark-2-${tplId}`);
+      const meter = fxContainer?.querySelector(`#fx-art-meter-${tplId}`);
+      const masthead = fxContainer?.querySelector(`#fx-art-masthead-${tplId}`);
+      const headline = fxContainer?.querySelector(`#fx-art-headline-${tplId}`);
+      const leftCol = fxContainer?.querySelector(`#fx-art-col-left-${tplId}`);
+      const rightCol = fxContainer?.querySelector(`#fx-art-col-right-${tplId}`);
+
+      if (sheet) {
+        sheet.style.transform = `perspective(1000px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) rotateZ(${tiltZ.toFixed(2)}deg) scale(${zoom.toFixed(3)}) translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px)`;
+      }
+      if (m1) m1.style.width = `${mark1Prog.toFixed(1)}%`;
+      if (m2) m2.style.width = `${mark2Prog.toFixed(1)}%`;
+
+      // Update Video Player Camera Telemetry HUD
+      if (meter) {
+        meter.textContent = `4K MACRO PAN: ${(zoom * 100).toFixed(0)}% // ${tiltX.toFixed(0)}° TILT // INK BLEED ACTIVE`;
+      }
+
+      // Creamy Macro Depth of Field bokeh blur intensification on background as camera gets closer
+      const dofBlur = (p * 2.2).toFixed(1);
+      if (masthead) masthead.style.filter = `blur(${Math.max(0.5, parseFloat(dofBlur) + 0.8)}px)`;
+      if (headline) headline.style.filter = `blur(${dofBlur}px)`;
+      if (leftCol) leftCol.style.filter = `blur(${(p * 1.5).toFixed(1)}px)`;
+      if (rightCol) rightCol.style.filter = `blur(${(p * 1.6).toFixed(1)}px)`;
     } else if (tplId === 'magnates-media-particle-vfx') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #070104; overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -47240,6 +47249,9 @@ let magnatesBlendState = {
   showClock: true,
   headline: "TEMPORAL DISTORTION",
   subcaption: "SCREEN // DIFFERENCE // OVERLAY COMPOSITING",
+  textX: 0, // offset in px
+  textY: 0, // offset in px
+  fontSize: 20, // headline font size in px
   bgUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80",
   animFrameId: null,
   lastTimestamp: null
@@ -47248,6 +47260,7 @@ let magnatesBlendState = {
 function updateMagnatesBlendVisualStyles() {
   const headlineEl = document.getElementById('magnates-blend-headline');
   const subcaptionEl = document.getElementById('magnates-blend-subcaption');
+  const textWrapEl = document.getElementById('magnates-blend-text-container');
   const bgImg = document.getElementById('magnates-blend-bg-img');
   const particles = document.getElementById('magnates-blend-particles');
   const rainEl = document.getElementById('magnates-blend-rain');
@@ -47256,19 +47269,45 @@ function updateMagnatesBlendVisualStyles() {
   const grungeEl = document.getElementById('magnates-blend-grunge');
   const clockWrap = document.getElementById('magnates-blend-clock-wrap');
   const clockSvg = document.getElementById('magnates-blend-clock-svg');
-  const cardEl = document.getElementById('magnates-blend-card-element');
-  const cardSub = document.getElementById('magnates-blend-card-sub');
   const hudActive = document.getElementById('magnates-blend-hud-active');
   const hudOpacity = document.getElementById('magnates-blend-hud-opacity');
   const timerEl = document.getElementById('magnates-blend-timer-display');
+  const hudTimecode = document.getElementById('magnates-blend-hud-timecode');
+  const hudScrubberFill = document.getElementById('magnates-blend-hud-scrubber-fill');
+  const hudPlayIcon = document.getElementById('magnates-blend-hud-icon-play');
+  const hudPauseIcon = document.getElementById('magnates-blend-hud-icon-pause');
+  const hudPillLabel = document.getElementById('magnates-blend-hud-pill-label');
 
-  if (headlineEl) headlineEl.textContent = magnatesBlendState.headline;
-  if (subcaptionEl) subcaptionEl.textContent = magnatesBlendState.subcaption;
+  if (headlineEl) {
+    headlineEl.textContent = magnatesBlendState.headline;
+    headlineEl.style.fontSize = `${magnatesBlendState.fontSize || 20}px`;
+  }
+  if (subcaptionEl) {
+    subcaptionEl.textContent = magnatesBlendState.subcaption;
+    subcaptionEl.style.fontSize = `${Math.max(8, Math.round((magnatesBlendState.fontSize || 20) * 0.45))}px`;
+  }
+  if (textWrapEl) {
+    textWrapEl.style.transform = `translate(${magnatesBlendState.textX || 0}px, ${magnatesBlendState.textY || 0}px)`;
+  }
   if (bgImg && bgImg.src !== magnatesBlendState.bgUrl) bgImg.src = magnatesBlendState.bgUrl;
 
   const p = magnatesBlendState.playhead;
   const dur = magnatesBlendState.duration;
   if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
+  if (hudTimecode) {
+    const curSec = Math.floor(p);
+    const curDec = Math.floor((p % 1) * 10);
+    const totSec = Math.floor(dur);
+    hudTimecode.textContent = `0:0${curSec}.${curDec} / 0:0${totSec}.0`;
+  }
+  if (hudScrubberFill) {
+    const pct = dur > 0 ? (p / dur) * 100 : 0;
+    hudScrubberFill.style.width = `${pct.toFixed(2)}%`;
+  }
+  if (hudPlayIcon && hudPauseIcon) {
+    hudPlayIcon.style.display = magnatesBlendState.isPlaying ? 'none' : 'block';
+    hudPauseIcon.style.display = magnatesBlendState.isPlaying ? 'block' : 'none';
+  }
 
   const op = (magnatesBlendState.layerOpacity / 100).toFixed(2);
   const mode = magnatesBlendState.blendMode;
@@ -47278,6 +47317,19 @@ function updateMagnatesBlendVisualStyles() {
 
   if (hudActive) hudActive.textContent = `MODE: ${mode.toUpperCase()} [${fx.toUpperCase()}]`;
   if (hudOpacity) hudOpacity.textContent = `OPACITY: ${magnatesBlendState.layerOpacity}%`;
+  if (hudPillLabel) hudPillLabel.textContent = `${mode.toUpperCase()} &bull; ${fx.toUpperCase()}`;
+
+  // Update Inspector Layers preview items
+  const layerFxIcon = document.getElementById('magnates-blend-layer-fx-icon');
+  const layerFxName = document.getElementById('magnates-blend-layer-fx-name');
+  const layerFxMeta = document.getElementById('magnates-blend-layer-fx-meta');
+  const fxIcons = { snow: '❄️', rain: '🌧️', grain: '🎞️', lightleak: '✨', grunge: '⚡', none: '🚫' };
+  if (layerFxIcon) layerFxIcon.textContent = fxIcons[fx] || '✨';
+  if (layerFxName) layerFxName.textContent = `Atmospheric ${fx.charAt(0).toUpperCase() + fx.slice(1)} Overlay`;
+  if (layerFxMeta) layerFxMeta.textContent = `${mode.toUpperCase()} &bull; ${magnatesBlendState.layerOpacity}% OPACITY`;
+
+  const layerClockChk = document.getElementById('magnates-blend-layer-clock-chk');
+  if (layerClockChk) layerClockChk.checked = magnatesBlendState.showClock;
 
   if (clockWrap) clockWrap.style.display = magnatesBlendState.showClock ? 'flex' : 'none';
   if (clockSvg) clockSvg.style.transform = `rotate(${(p * 35 * spd).toFixed(1)}deg)`;
@@ -47289,7 +47341,7 @@ function updateMagnatesBlendVisualStyles() {
   if (leakEl) leakEl.style.display = 'none';
   if (grungeEl) grungeEl.style.display = 'none';
 
-  // Render chosen effect layer with live animation and granularity
+  // Render chosen effect layer with realistic animation and granularity
   if (fx === 'snow' && particles) {
     particles.style.display = 'block';
     particles.style.mixBlendMode = mode;
@@ -47303,13 +47355,21 @@ function updateMagnatesBlendVisualStyles() {
     rainEl.style.display = 'block';
     rainEl.style.mixBlendMode = mode;
     rainEl.style.opacity = op;
-    const streakW = Math.max(1, (gran / 20)).toFixed(1);
-    const streakSpacing = Math.round(gran * 0.9);
-    rainEl.style.background = `repeating-linear-gradient(105deg, rgba(255,255,255,0.7) 0px, rgba(255,255,255,0.7) ${streakW}px, transparent ${streakW}px, transparent ${streakSpacing}px)`;
-    rainEl.style.backgroundSize = `${gran * 3}px ${gran * 5}px`;
-    const rainShiftY = (p * 450 * spd) % (gran * 5);
-    const rainShiftX = (p * 120 * spd) % (gran * 3);
-    rainEl.style.backgroundPosition = `${rainShiftX}px ${rainShiftY}px`;
+    // Multi-depth photorealistic rain: fast slanted fine streaks + blurry background droplets
+    const streakW = Math.max(0.75, (gran / 28)).toFixed(1);
+    const streakH = Math.round(gran * 4.5);
+    const spacing = Math.round(gran * 0.85);
+    rainEl.style.background = `
+      repeating-linear-gradient(108deg, rgba(255,255,255,0.85) 0px, rgba(255,255,255,0.85) ${streakW}px, transparent ${streakW}px, transparent ${spacing}px),
+      repeating-linear-gradient(112deg, rgba(200,230,255,0.35) 0px, rgba(200,230,255,0.35) ${streakW * 1.5}px, transparent ${streakW * 1.5}px, transparent ${spacing * 1.8}px),
+      radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1.5px)
+    `;
+    rainEl.style.backgroundSize = `${gran * 2.5}px ${streakH}px, ${gran * 4}px ${streakH * 1.6}px, ${gran * 1.5}px ${gran * 1.5}px`;
+    const rainShiftY1 = (p * 850 * spd) % streakH;
+    const rainShiftX1 = (p * 280 * spd) % (gran * 2.5);
+    const rainShiftY2 = (p * 550 * spd) % (streakH * 1.6);
+    const rainShiftX2 = (p * 180 * spd) % (gran * 4);
+    rainEl.style.backgroundPosition = `${rainShiftX1}px ${rainShiftY1}px, ${rainShiftX2}px ${rainShiftY2}px, 0 0`;
   } else if (fx === 'grain' && grainEl) {
     grainEl.style.display = 'block';
     grainEl.style.mixBlendMode = mode;
@@ -47334,25 +47394,6 @@ function updateMagnatesBlendVisualStyles() {
     grungeEl.style.backgroundSize = `${gScale}px ${gScale}px, ${gScale * 2}px ${gScale * 2}px`;
     const grungeDrift = Math.round((p * 20 * spd) % gScale);
     grungeEl.style.backgroundPosition = `${grungeDrift}px ${grungeDrift}px`;
-  }
-
-  if (cardEl) {
-    if (mode === 'screen') {
-      cardEl.style.mixBlendMode = 'normal';
-      cardEl.style.borderColor = '#38bdf8';
-      cardEl.style.background = 'rgba(15,23,42,0.85)';
-      if (cardSub) cardSub.textContent = `ACTIVE BLEND: SCREEN (${fx.toUpperCase()})`;
-    } else if (mode === 'difference') {
-      cardEl.style.mixBlendMode = 'difference';
-      cardEl.style.borderColor = '#ffffff';
-      cardEl.style.background = '#ffffff';
-      if (cardSub) cardSub.textContent = `ACTIVE BLEND: DIFFERENCE (${fx.toUpperCase()})`;
-    } else {
-      cardEl.style.mixBlendMode = 'overlay';
-      cardEl.style.borderColor = '#f59e0b';
-      cardEl.style.background = 'rgba(245,158,11,0.5)';
-      if (cardSub) cardSub.textContent = `ACTIVE BLEND: OVERLAY (${fx.toUpperCase()})`;
-    }
   }
 }
 
@@ -48347,24 +48388,34 @@ function bindMagnatesInkRevealSuiteModalControls() {
 
 /* =========================================================
    7. MAGNATES MEDIA ARTICLE & TEXT HIGHLIGHTING SUITE CONTROLLER
-   (Smoothly panning/scaling across newspaper clippings while highlighting text blocks)
+   (Overhauled: Photorealistic 3D Macro-Camera Broadsheet, Layers Stack & Felt-Tip Engine)
    ========================================================= */
 let magnatesArticleState = {
   isPlaying: true,
   playhead: 0,
   duration: 5.0,
-  zoomScale: 150, // 110 to 220%
-  panDistance: 30, // 10 to 70px
-  headline: "THE CRASH OF 1929",
-  subcaption: "ARCHIVAL NEWSPAPER CAMERA PAN & SCAN",
-  markText1: "$14,000,000,000 DISAPPEARED",
-  markText2: "BROKERS CALL UNPAID MARGINS",
+  zoomScale: 155, // 110 to 220%
+  panDistance: 35, // 10 to 70px
+  cameraTilt: 20, // 0 to 35 deg
+  dofBokeh: 3.5, // 0 to 8 px
+  markerColor: '#facc15',
+  headline: "MARKET COLLAPSES IN PANIC",
+  subcaption: "NEW YORK — Oct 28",
+  markText1: "$14,000,000,000 LOST",
+  markText2: "NO BUYERS FOUND",
+  layers: {
+    paper: true,
+    text: true,
+    highlighter: true,
+    camera: true
+  },
   animFrameId: null,
   lastTimestamp: null
 };
 
 function updateMagnatesArticleVisualStyles() {
   const headlineEl = document.getElementById('magnates-art-headline');
+  const headlineTextEl = document.getElementById('magnates-art-headline-text');
   const subcaptionEl = document.getElementById('magnates-art-subcaption');
   const sheetEl = document.getElementById('magnates-art-sheet-card');
   const m1Text = document.getElementById('magnates-art-mark-text-1');
@@ -48372,10 +48423,14 @@ function updateMagnatesArticleVisualStyles() {
   const m1Strip = document.getElementById('magnates-art-mark-strip-1');
   const m2Strip = document.getElementById('magnates-art-mark-strip-2');
   const timerEl = document.getElementById('magnates-art-timer-display');
+  const mastheadEl = document.getElementById('magnates-art-masthead');
+  const leftColEl = document.getElementById('magnates-art-col-left');
+  const rightColEl = document.getElementById('magnates-art-col-right');
   const hudZoom = document.getElementById('magnates-art-hud-zoom');
-  const badgePan = document.getElementById('magnates-art-badge-pan');
+  const hudBadgePan = document.getElementById('magnates-art-badge-pan');
 
   if (headlineEl) headlineEl.textContent = magnatesArticleState.headline;
+  if (headlineTextEl) headlineTextEl.textContent = magnatesArticleState.headline;
   if (subcaptionEl) subcaptionEl.textContent = magnatesArticleState.subcaption;
   if (m1Text) m1Text.textContent = magnatesArticleState.markText1;
   if (m2Text) m2Text.textContent = magnatesArticleState.markText2;
@@ -48384,23 +48439,54 @@ function updateMagnatesArticleVisualStyles() {
   const dur = magnatesArticleState.duration;
   if (timerEl) timerEl.textContent = `${p.toFixed(2)}s / ${dur.toFixed(1)}s`;
 
-  const zoom = magnatesArticleState.zoomScale / 100;
+  const normT = Math.min(1.0, Math.max(0.0, p / dur));
+  // Smooth cubic progression for macro transition
+  const smoothP = normT < 0.5 ? 4 * normT * normT * normT : 1 - Math.pow(-2 * normT + 2, 3) / 2;
+
+  const baseZoom = magnatesArticleState.zoomScale / 100;
+  const targetZoom = baseZoom * 1.25;
+  const zoom = baseZoom + smoothP * (targetZoom - baseZoom);
+
+  const baseTilt = magnatesArticleState.layers.camera ? magnatesArticleState.cameraTilt : 0;
+  const tiltX = (baseTilt * 0.7) + smoothP * (baseTilt * 0.3);
+  const tiltY = magnatesArticleState.layers.camera ? (-2 + Math.sin(p * 1.2) * 1.5) : 0;
+
   const panDist = magnatesArticleState.panDistance;
+  const panX = 15 - smoothP * (panDist * 1.5) + Math.sin(p * 1.4) * 2;
+  const panY = 25 - smoothP * (panDist * 1.2);
 
   if (sheetEl) {
-    const panX = Math.sin(p * 1.4) * panDist;
-    const panY = Math.cos(p * 1.1) * (panDist * 0.6);
-    sheetEl.style.transform = `scale(${zoom.toFixed(2)}) translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px)`;
+    sheetEl.style.transform = `perspective(1100px) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) scale(${zoom.toFixed(3)}) translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px)`;
   }
 
-  // Staggered Highlighter pen fill
-  const prog1 = Math.min(100, Math.max(0, (p / (dur * 0.5)) * 100));
-  const prog2 = Math.min(100, Math.max(0, ((p - dur * 0.4) / (dur * 0.5)) * 100));
-  if (m1Strip) m1Strip.style.width = `${prog1}%`;
-  if (m2Strip) m2Strip.style.width = `${prog2}%`;
+  // Staggered Highlighter felt-tip pen sweep
+  const prog1 = magnatesArticleState.layers.highlighter ? Math.min(100, Math.max(0, ((p - 0.3) / (dur * 0.38)) * 100)) : 0;
+  const prog2 = magnatesArticleState.layers.highlighter ? Math.min(100, Math.max(0, ((p - dur * 0.42) / (dur * 0.42)) * 100)) : 0;
+  if (m1Strip) {
+    m1Strip.style.width = `${prog1}%`;
+    m1Strip.style.background = magnatesArticleState.markerColor;
+    m1Strip.style.display = magnatesArticleState.layers.highlighter ? 'block' : 'none';
+  }
+  if (m2Strip) {
+    m2Strip.style.width = `${prog2}%`;
+    m2Strip.style.background = magnatesArticleState.markerColor;
+    m2Strip.style.display = magnatesArticleState.layers.highlighter ? 'block' : 'none';
+  }
+
+  // Text layer visibility
+  if (leftColEl) leftColEl.style.opacity = magnatesArticleState.layers.text ? '1' : '0';
+  if (rightColEl) rightColEl.style.opacity = magnatesArticleState.layers.text ? '1' : '0';
+  if (headlineTextEl) headlineTextEl.style.opacity = magnatesArticleState.layers.text ? '1' : '0';
+
+  // Depth of field bokeh blur on background
+  const maxBlur = magnatesArticleState.layers.camera ? magnatesArticleState.dofBokeh : 0;
+  const curBlur = (smoothP * maxBlur).toFixed(1);
+  if (mastheadEl) mastheadEl.style.filter = `blur(${Math.max(0, parseFloat(curBlur) + 0.8)}px)`;
+  if (leftColEl) leftColEl.style.filter = `blur(${(curBlur * 0.75).toFixed(1)}px)`;
+  if (rightColEl) rightColEl.style.filter = `blur(${(curBlur * 0.85).toFixed(1)}px)`;
 
   if (hudZoom) hudZoom.textContent = `ZOOM: ${magnatesArticleState.zoomScale}%`;
-  if (badgePan) badgePan.textContent = `CAMERA PAN SCAN: ACTIVE // ZOOM ${magnatesArticleState.zoomScale}%`;
+  if (hudBadgePan) hudBadgePan.textContent = `4K MACRO CAMERA: ACTIVE // ${tiltX.toFixed(0)}° TILT`;
 }
 
 function renderMagnatesArticleLoop(timestamp) {
@@ -48429,7 +48515,7 @@ function openMagnatesArticleHighlightSuite() {
   magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
 
   const btnPlay = document.getElementById('btn-magnates-art-play-pause');
-  if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
+  if (btnPlay) btnPlay.textContent = '⏸ Pause';
 }
 
 function closeMagnatesArticleHighlightSuite() {
@@ -48451,17 +48537,37 @@ function bindMagnatesArticleHighlightSuiteModalControls() {
     magnatesArticleState.isPlaying = !magnatesArticleState.isPlaying;
     const btnPlay = document.getElementById('btn-magnates-art-play-pause');
     if (magnatesArticleState.isPlaying) {
-      if (btnPlay) btnPlay.textContent = '\u23f8 Pause';
+      if (btnPlay) btnPlay.textContent = '⏸ Pause';
       magnatesArticleState.lastTimestamp = null;
       magnatesArticleState.animFrameId = requestAnimationFrame(renderMagnatesArticleLoop);
     } else {
-      if (btnPlay) btnPlay.textContent = '\u25b6 Play';
+      if (btnPlay) btnPlay.textContent = '▶ Play';
       if (magnatesArticleState.animFrameId) cancelAnimationFrame(magnatesArticleState.animFrameId);
     }
   });
 
   document.getElementById('btn-magnates-art-reset')?.addEventListener('click', () => {
     magnatesArticleState.playhead = 0;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  // Layer toggles
+  document.getElementById('art-layer-cam-toggle')?.addEventListener('change', (e) => {
+    magnatesArticleState.layers.camera = e.target.checked;
+    updateMagnatesArticleVisualStyles();
+  });
+  document.getElementById('art-layer-hl-toggle')?.addEventListener('change', (e) => {
+    magnatesArticleState.layers.highlighter = e.target.checked;
+    updateMagnatesArticleVisualStyles();
+  });
+  document.getElementById('art-layer-text-toggle')?.addEventListener('change', (e) => {
+    magnatesArticleState.layers.text = e.target.checked;
+    updateMagnatesArticleVisualStyles();
+  });
+  document.getElementById('art-layer-paper-toggle')?.addEventListener('change', (e) => {
+    magnatesArticleState.layers.paper = e.target.checked;
+    const paperEl = document.getElementById('magnates-art-sheet-card');
+    if (paperEl) paperEl.style.opacity = e.target.checked ? '1' : '0.15';
     updateMagnatesArticleVisualStyles();
   });
 
@@ -48477,6 +48583,29 @@ function bindMagnatesArticleHighlightSuiteModalControls() {
     const label = document.getElementById('magnates-art-val-pan');
     if (label) label.textContent = `${magnatesArticleState.panDistance} px`;
     updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-slider-tilt')?.addEventListener('input', (e) => {
+    magnatesArticleState.cameraTilt = parseInt(e.target.value, 10);
+    const label = document.getElementById('magnates-art-val-tilt');
+    if (label) label.textContent = `${magnatesArticleState.cameraTilt}°`;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.getElementById('magnates-art-slider-dof')?.addEventListener('input', (e) => {
+    magnatesArticleState.dofBokeh = parseFloat(e.target.value);
+    const label = document.getElementById('magnates-art-val-dof');
+    if (label) label.textContent = `${magnatesArticleState.dofBokeh} px`;
+    updateMagnatesArticleVisualStyles();
+  });
+
+  document.querySelectorAll('.magnates-art-color-chip')?.forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.magnates-art-color-chip').forEach(c => c.style.borderColor = 'rgba(255,255,255,0.1)');
+      chip.style.borderColor = '#ffffff';
+      magnatesArticleState.markerColor = chip.getAttribute('data-color') || '#facc15';
+      updateMagnatesArticleVisualStyles();
+    });
   });
 
   document.getElementById('magnates-art-input-headline')?.addEventListener('input', (e) => {
@@ -48508,44 +48637,45 @@ function bindMagnatesArticleHighlightSuiteModalControls() {
       start: 0,
       duration: magnatesArticleState.duration,
       scale: magnatesArticleState.zoomScale / 100,
-      zoomEffect: 'drift_in',
-      zoomScale: (magnatesArticleState.zoomScale / 100) * 1.15,
-      transition: 'fly_through',
-      transitionDuration: 0.8
+      zoomEffect: 'macro_tilt',
+      cameraTilt: magnatesArticleState.cameraTilt,
+      zoomScale: (magnatesArticleState.zoomScale / 100) * 1.25,
+      transition: 'dof_pan',
+      transitionDuration: 1.0
     };
 
     const highlight1Clip = {
       id: `txt-art-h1-${Date.now() + 1}`,
       text: magnatesArticleState.markText1,
       highlight: magnatesArticleState.markText1,
-      highlightColor: '#facc15',
-      anim: 'pop',
-      fontSize: 28,
-      fontFamily: 'monospace',
-      start: 0.2,
-      duration: magnatesArticleState.duration - 0.2
+      highlightColor: magnatesArticleState.markerColor,
+      anim: 'felt_sweep',
+      fontSize: 26,
+      fontFamily: 'Playfair Display, serif',
+      start: 0.3,
+      duration: magnatesArticleState.duration - 0.3
     };
 
     const highlight2Clip = {
       id: `txt-art-h2-${Date.now() + 2}`,
       text: magnatesArticleState.markText2,
       highlight: magnatesArticleState.markText2,
-      highlightColor: '#facc15',
-      anim: 'pop',
-      fontSize: 28,
-      fontFamily: 'monospace',
-      start: 0.8,
-      duration: magnatesArticleState.duration - 0.8
+      highlightColor: magnatesArticleState.markerColor,
+      anim: 'felt_sweep',
+      fontSize: 26,
+      fontFamily: 'Playfair Display, serif',
+      start: 1.8,
+      duration: magnatesArticleState.duration - 1.8
     };
 
     const headlineClip = {
       id: `txt-art-head-${Date.now() + 3}`,
       text: magnatesArticleState.headline,
-      highlight: magnatesArticleState.headline.split(' ')[0] || '',
+      highlight: '',
       highlightColor: '#f59e0b',
-      anim: 'stamp',
-      fontSize: 50,
-      fontFamily: 'Cinzel, serif',
+      anim: 'fade',
+      fontSize: 48,
+      fontFamily: 'Playfair Display, serif',
       start: 0,
       duration: magnatesArticleState.duration
     };
@@ -48557,7 +48687,7 @@ function bindMagnatesArticleHighlightSuiteModalControls() {
       selectClip(highlight1Clip, 'text');
     }
 
-    showTextTimingAlert(`Applied Magnates Media Article & Text Highlighting to timeline!`, 'success');
+    showTextTimingAlert(`Applied Photorealistic Article Pan & Highlight to timeline!`, 'success');
     setTimeout(() => showTextTimingAlert(''), 2500);
   });
 }

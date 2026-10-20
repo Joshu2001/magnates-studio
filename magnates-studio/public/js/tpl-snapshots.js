@@ -743,19 +743,98 @@
     // 36. Article & Text Highlighting Panning Camera
     'magnates-media-article-highlight': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-        <rect width="400" height="225" fill="#120e09"/>
-        <g transform="translate(60, 25)">
-          <rect width="280" height="175" rx="6" fill="#fcfbf7" stroke="#e7e0d3" stroke-width="1"/>
-          <text x="140" y="32" fill="#1c1917" font-family="Cinzel, serif" font-weight="900" font-size="14" text-anchor="middle">WALL STREET INVESTIGATION</text>
-          <line x1="25" y1="45" x2="255" y2="45" stroke="#1c1917" stroke-width="1.5"/>
-          <!-- Yellow Marker Highlight #1 -->
-          <rect x="30" y="65" width="160" height="16" fill="#fde047" rx="2"/>
-          <text x="35" y="77" fill="#000" font-family="monospace" font-weight="900" font-size="9">$14,000,000,000 LOST</text>
-          <!-- Yellow Marker Highlight #2 -->
-          <rect x="30" y="105" width="140" height="16" fill="#fde047" rx="2"/>
-          <text x="35" y="117" fill="#000" font-family="monospace" font-weight="900" font-size="9">NO BUYERS FOUND</text>
+        <defs>
+          <filter id="snap-art-grain" x="0%" y="0%" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="4" result="noise" />
+            <feColorMatrix type="matrix" values="0 0 0 0 0.88  0 0 0 0 0.84  0 0 0 0 0.76  0 0 0 0.28 0" result="coloredGrain" />
+            <feComposite operator="over" in="coloredGrain" in2="SourceGraphic" />
+          </filter>
+          <filter id="snap-felt-bleed" x="-10%" y="-15%" width="120%" height="130%">
+            <feTurbulence type="turbulence" baseFrequency="0.12" numOctaves="2" result="turb" />
+            <feDisplacementMap in="SourceGraphic" in2="turb" scale="2.2" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+            <feGaussianBlur in="displaced" stdDeviation="0.4" result="blurred" />
+            <feMerge>
+              <feMergeNode in="blurred" />
+              <feMergeNode in="displaced" opacity="0.9" />
+            </feMerge>
+          </filter>
+          <filter id="snap-lens-bokeh" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="1.8" />
+          </filter>
+          <filter id="snap-lens-subtle" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="0.8" />
+          </filter>
+          <radialGradient id="snap-macro-light" cx="50%" cy="46%" r="58%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+            <stop offset="65%" stop-color="#f5ede0" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#140f0a" stop-opacity="0.55"/>
+          </radialGradient>
+        </defs>
+        <rect width="400" height="225" fill="#f4efe6"/>
+        <rect width="400" height="225" fill="none" filter="url(#snap-art-grain)"/>
+        <g transform="translate(0, -4) scale(1.02)">
+          <g filter="url(#snap-lens-subtle)" opacity="0.84">
+            <line x1="16" y1="20" x2="384" y2="20" stroke="#1f1811" stroke-width="2.2"/>
+            <line x1="16" y1="24" x2="384" y2="24" stroke="#1f1811" stroke-width="0.8"/>
+            <text x="200" y="38" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="15" fill="#18120b" letter-spacing="3.5" text-anchor="middle">THE FINANCIAL CHRONICLE</text>
+            <line x1="16" y1="43" x2="384" y2="43" stroke="#1f1811" stroke-width="0.8"/>
+          </g>
+          <text x="200" y="62" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-weight="900" font-size="16.5" fill="#0d0a06" letter-spacing="0.5" text-anchor="middle">MARKET COLLAPSES IN PANIC</text>
+          <line x1="16" y1="71" x2="384" y2="71" stroke="#251d14" stroke-width="1.2"/>
+          <line x1="16" y1="74" x2="384" y2="74" stroke="#251d14" stroke-width="0.6"/>
+          <text x="200" y="84" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-size="7.5" font-weight="700" font-style="italic" fill="#251d14" letter-spacing="1" text-anchor="middle">NEW YORK — Oct 28</text>
+          <g transform="translate(18, 96)" filter="url(#snap-lens-subtle)" opacity="0.88">
+            <text font-family="'Times New Roman', Georgia, serif" font-size="6.2" fill="#1c160f" line-height="1.25">
+              <tspan x="0" y="8" font-weight="800">tadcanning brak, arens,</tspan>
+              <tspan x="0" y="18">NEW YORK — Oct 28 —</tspan>
+              <tspan x="0" y="27">at cutse an an jouran set-</tspan>
+              <tspan x="0" y="36">alentr povnic properly</tspan>
+              <tspan x="0" y="45">ensure than nan-linders</tspan>
+              <tspan x="0" y="54">ensure that the dadd</tspan>
+            </text>
+          </g>
+          <g transform="translate(110, 96)">
+            <path d="M -12 7 Q 40 5.5, 96 6.5 Q 98 17.5, -12 18 Z" fill="#ffe234" opacity="0.92" style="mix-blend-mode: multiply;" filter="url(#snap-felt-bleed)"/>
+            <text x="-8" y="15" font-family="'Playfair Display', 'Times New Roman', serif" font-size="8.8" font-weight="900" fill="#000000" letter-spacing="0.3">,000 LOST</text>
+            <path d="M 88 5 Q 148 4.5, 208 5.5 Q 206 20, 88 20 Z" fill="#ffe234" opacity="0.9" style="mix-blend-mode: multiply;" filter="url(#snap-felt-bleed)"/>
+            <text font-family="'Times New Roman', Georgia, serif" font-size="6.4" fill="#0f0c08" line-height="1.2">
+              <tspan x="92" y="11" font-weight="700">Felt-tip markers incernine fiber</tspan>
+              <tspan x="92" y="18" font-weight="700">absorption, bleeding into nra-</tspan>
+              <tspan x="92" y="25" fill="#2d2319">ghoning, newsprint, handdraw</tspan>
+              <tspan x="92" y="33" fill="#2d2319">edges.</tspan>
+            </text>
+            <path d="M 216 4 Q 275 3, 318 4.5 Q 317 19.5, 216 19 Z" fill="#facc15" opacity="0.94" style="mix-blend-mode: multiply;" filter="url(#snap-felt-bleed)"/>
+            <text x="222" y="14.5" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-size="8.2" font-weight="900" fill="#000000" letter-spacing="0.4">NO BUYERS FOUND</text>
+            <g transform="translate(316, 4) rotate(14)">
+              <polygon points="0,2 10,0 8,15 0,13" fill="#eab308" stroke="#ca8a04" stroke-width="0.6"/>
+              <polygon points="10,0 18,-2 16,13 8,15" fill="#fde047"/>
+            </g>
+            <g transform="translate(0, 42)">
+              <text font-family="'Times New Roman', Georgia, serif" font-size="6.3" fill="#1a140e" line-height="1.25">
+                <tspan x="0" y="8">The tast mueline news enuts</tspan>
+                <tspan x="0" y="17">shape the brooksatrick in live</tspan>
+                <tspan x="0" y="26">opanning uninager refleshed</tspan>
+              </text>
+            </g>
+            <g transform="translate(118, 42)">
+              <text font-family="'Times New Roman', Georgia, serif" font-size="6.2" fill="#1a140e" line-height="1.25">
+                <tspan x="0" y="8" font-weight="700">NEW YORK — Oct 28 —</tspan>
+                <tspan x="0" y="17">met, consectetur sit am am-</tspan>
+                <tspan x="0" y="26">and alentarth cuied hanning</tspan>
+              </text>
+            </g>
+          </g>
+          <g transform="translate(340, 96)" filter="url(#snap-lens-bokeh)" opacity="0.82">
+            <text font-family="'Times New Roman', Georgia, serif" font-size="6.2" fill="#1c160f">
+              <tspan x="0" y="8">sample mans in eac-</tspan>
+              <tspan x="0" y="17">want to 1,000 p-</tspan>
+              <tspan x="0" y="26">economics and w-</tspan>
+              <tspan x="0" y="35">recentty.</tspan>
+              <tspan x="0" y="46">Brambaut of John</tspan>
+            </text>
+          </g>
         </g>
-        
+        <rect width="400" height="225" fill="url(#snap-macro-light)" pointer-events="none"/>
       </svg>
     `)}`,
 

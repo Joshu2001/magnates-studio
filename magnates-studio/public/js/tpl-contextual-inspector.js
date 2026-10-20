@@ -751,6 +751,18 @@
     // 51. Flying Headlines (3D Cinematic Motion Suite)
     
     // 3D Newspaper Clipping (James Jani / Corridor Digital Cinematic Suite)
+    'magnates-media-article-highlight': {
+      type: 'article-highlight',
+      headline: 'MARKET COLLAPSES IN PANIC',
+      subcaption: 'NEW YORK — Oct 28',
+      markText1: '$14,000,000,000 LOST',
+      markText2: 'NO BUYERS FOUND',
+      zoomScale: 155,
+      cameraTilt: 20,
+      dofBokeh: 3.5,
+      panDistance: 35,
+      markerColor: '#facc15'
+    },
     'newspaper-3d': {
       type: 'newspaper-3d',
       stylePreset: 'scandal',
