@@ -25907,16 +25907,179 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:20%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:40%"></div></div><div class="candle up"><div class="wick top" style="height:25%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle up"><div class="wick top" style="height:35%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:15%"></div><div class="body" style="height:35%"></div><div class="wick bot" style="height:50%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:30%"></div></div><div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:60%"></div><div class="wick bot" style="height:10%"></div></div><div class="candle down"><div class="wick top" style="height:25%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:35%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:25%"></div></div><div class="candle up"><div class="wick top" style="height:15%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:40%"></div></div>
           </div>
         </div>`; } else if (tplId === 'balance') {
-      fxContainer.innerHTML = `<div class="tpl-balance">
-          <div class="b-title">Apple Inc. \u00b7 2024</div>
-          <div class="b-eq"><span class="hl">Assets</span><span>=</span><span class="hl">Liabilities</span><span>+</span><span class="hl">Equity</span></div>
-          <div class="b-row"><span>Cash & Equivalents</span><span class="val">$29.9B</span></div>
-          <div class="b-row"><span>Marketable Securities</span><span class="val">$61.5B</span></div>
-          <div class="b-row"><span>Accounts Receivable</span><span class="val">$29.5B</span></div>
-          <div class="b-row"><span>Total Current Assets</span><span class="val">$143.5B</span></div>
-          <div class="b-row"><span>Short-term Debt</span><span class="val">$16.2B</span></div>
-          <div class="b-row"><span>Long-term Debt</span><span class="val">$95.7B</span></div>
-          <div class="b-total"><span>Shareholders' Equity</span><span class="val">$62.1B</span></div>
+      fxContainer.innerHTML = `<div class="tpl-balance theme-archival">
+          <div class="b-film-grain"></div>
+          <div class="b-spotlight"></div>
+
+          <div class="b-scene-3d">
+            <!-- 3D AR Floating HUD Callout Overlays Hovering in Z-space -->
+            <div class="b-hud-callouts">
+              <div class="b-hud-card b-hud-assets">
+                <div class="b-hud-header">
+                  <span class="b-hud-dot dot-green"></span>
+                  <span class="b-hud-tag">METRIC: TOTAL ASSETS</span>
+                </div>
+                <div class="b-hud-val val-assets val-hud-assets">$143.5B</div>
+                <div class="b-hud-sub">CONSOLIDATED BASE</div>
+              </div>
+
+              <div class="b-hud-card b-hud-liab">
+                <div class="b-hud-header">
+                  <span class="b-hud-dot dot-red"></span>
+                  <span class="b-hud-tag">METRIC: LIABILITIES</span>
+                </div>
+                <div class="b-hud-val val-liab val-hud-liab">$81.4B</div>
+                <div class="b-hud-sub">TOTAL OBLIGATIONS</div>
+              </div>
+
+              <div class="b-hud-card b-hud-equity">
+                <div class="b-hud-header">
+                  <span class="b-hud-dot dot-purple"></span>
+                  <span class="b-hud-tag">METRIC: NET WORTH</span>
+                </div>
+                <div class="b-hud-val val-equity val-hud-equity">$62.1B</div>
+                <div class="b-hud-sub">SHAREHOLDERS' EQUITY</div>
+              </div>
+
+              <div class="b-hud-card b-hud-status">
+                <div class="b-hud-header">
+                  <span class="b-hud-dot dot-emerald pulse"></span>
+                  <span class="b-hud-tag">STATUS: BALANCED</span>
+                </div>
+                <div class="b-hud-eq">A = L + E &#x2713; TRUE</div>
+              </div>
+            </div>
+
+            <!-- Authentic 3D SEC Form 10-K Sheet Asset -->
+            <div class="b-sheet-asset">
+              <!-- Official Archival Stamp -->
+              <div class="b-rubber-stamp">
+                <div class="b-stamp-box">
+                  <span class="stamp-txt-top">SEC EDGAR AUDIT</span>
+                  <span class="stamp-txt-main">VERIFIED</span>
+                  <span class="stamp-txt-sub">GAAP &#x2022; FORM 10-K</span>
+                </div>
+              </div>
+
+              <!-- Formal SEC 10-K Document Header -->
+              <div class="b-sec-head">
+                <div class="b-sec-top-meta">
+                  <span class="b-sec-sec-id">UNITED STATES SECURITIES AND EXCHANGE COMMISSION</span>
+                  <span class="b-sec-reg">WASHINGTON, D.C. 20549</span>
+                </div>
+                <div class="b-sec-form-badge">FORM 10-K &#x2022; ANNUAL REPORT</div>
+                <div class="b-company-name b-company">APPLE INC.</div>
+                <div class="b-sec-table-title">CONSOLIDATED STATEMENTS OF FINANCIAL POSITION</div>
+                <div class="b-period b-sec-period">FORM 10-K &#x2022; FISCAL 2024</div>
+              </div>
+
+              <!-- Multi-Column Sequential SEC Filing Table -->
+              <div class="b-sec-table">
+                <div class="b-tbl-head-row">
+                  <div class="b-tbl-col-lbl">ASSETS &amp; LIABILITIES (ITEMIZED)</div>
+                  <div class="b-tbl-col-yr yr-curr">2024</div>
+                  <div class="b-tbl-col-yr yr-prev">2023</div>
+                </div>
+
+                <!-- Section 1: ASSETS -->
+                <div class="b-tbl-section-title">ASSETS</div>
+                <div class="b-tbl-group-hdr">Current assets:</div>
+                <div class="b-rows-list b-asset-rows">
+                  <div class="b-tbl-row sweep-1">
+                    <span class="b-marker-stroke"></span>
+                    <span class="b-tbl-name">Cash and cash equivalents</span>
+                    <span class="b-tbl-leader"></span>
+                    <span class="b-tbl-val yr-curr val-asset-1">$29.9B</span>
+                    <span class="b-tbl-val yr-prev">$29.9B</span>
+                  </div>
+                  <div class="b-tbl-row sweep-2">
+                    <span class="b-marker-stroke"></span>
+                    <span class="b-tbl-name">Marketable securities (short-term)</span>
+                    <span class="b-tbl-leader"></span>
+                    <span class="b-tbl-val yr-curr val-asset-2">$61.5B</span>
+                    <span class="b-tbl-val yr-prev">$31.5B</span>
+                  </div>
+                  <div class="b-tbl-row">
+                    <span class="b-marker-stroke"></span>
+                    <span class="b-tbl-name">Accounts receivable, net</span>
+                    <span class="b-tbl-leader"></span>
+                    <span class="b-tbl-val yr-curr val-asset-3">$29.5B</span>
+                    <span class="b-tbl-val yr-prev">$28.1B</span>
+                  </div>
+                  <div class="b-tbl-row">
+                    <span class="b-marker-stroke"></span>
+                    <span class="b-tbl-name">Inventories and vendor non-trade</span>
+                    <span class="b-tbl-leader"></span>
+                    <span class="b-tbl-val yr-curr val-asset-4">$22.6B</span>
+                    <span class="b-tbl-val yr-prev">$21.8B</span>
+                  </div>
+                </div>
+
+                <div class="b-tbl-row b-row-subtotal">
+                  <span class="b-tbl-name">Total current assets</span>
+                  <span class="b-tbl-leader"></span>
+                  <span class="b-tbl-val yr-curr val-assets-sub">$143.5B</span>
+                  <span class="b-tbl-val yr-prev">$111.3B</span>
+                </div>
+
+                <div class="b-tbl-row b-row-grandtotal b-row-assets-total">
+                  <span class="b-tbl-name">TOTAL ASSETS</span>
+                  <span class="b-tbl-leader"></span>
+                  <span class="b-tbl-val yr-curr b-double-line val-assets">$143.5B</span>
+                  <span class="b-tbl-val yr-prev b-double-line">$111.3B</span>
+                </div>
+
+                <!-- Section 2: LIABILITIES & EQUITY -->
+                <div class="b-tbl-section-title b-sec-liab-title">LIABILITIES AND SHAREHOLDERS' EQUITY</div>
+                <div class="b-tbl-group-hdr">Current liabilities:</div>
+                <div class="b-rows-list b-liab-rows-inner">
+                  <div class="b-tbl-row">
+                    <span class="b-marker-stroke"></span>
+                    <span class="b-tbl-name">Short-term debt &amp; accounts payable</span>
+                    <span class="b-tbl-leader"></span>
+                    <span class="b-tbl-val yr-curr val-liab-1">$16.2B</span>
+                    <span class="b-tbl-val yr-prev">$14.5B</span>
+                  </div>
+                  <div class="b-tbl-row">
+                    <span class="b-marker-stroke"></span>
+                    <span class="b-tbl-name">Long-term debt obligations</span>
+                    <span class="b-tbl-leader"></span>
+                    <span class="b-tbl-val yr-curr val-liab-2">$65.2B</span>
+                    <span class="b-tbl-val yr-prev">$58.3B</span>
+                  </div>
+                </div>
+
+                <div class="b-tbl-row b-row-subtotal">
+                  <span class="b-tbl-name">Total liabilities</span>
+                  <span class="b-tbl-leader"></span>
+                  <span class="b-tbl-val yr-curr val-liab val-liab-calc">$81.4B</span>
+                  <span class="b-tbl-val yr-prev">$72.8B</span>
+                </div>
+
+                <div class="b-tbl-group-hdr">Shareholders' equity:</div>
+                <div class="b-tbl-row sweep-equity">
+                  <span class="b-marker-stroke b-mint-marker"></span>
+                  <span class="b-tbl-name">Common stock &amp; retained earnings</span>
+                  <span class="b-tbl-leader"></span>
+                  <span class="b-tbl-val yr-curr b-equity-val val-equity val-equity-calc">$62.1B</span>
+                  <span class="b-tbl-val yr-prev">$38.5B</span>
+                </div>
+
+                <div class="b-tbl-row b-row-grandtotal b-row-liab-total">
+                  <span class="b-tbl-name">TOTAL LIABILITIES &amp; SHAREHOLDERS' EQUITY</span>
+                  <span class="b-tbl-leader"></span>
+                  <span class="b-tbl-val yr-curr b-double-line val-liab-equity-sum">$143.5B</span>
+                  <span class="b-tbl-val yr-prev b-double-line">$111.3B</span>
+                </div>
+              </div>
+
+              <!-- Formal 10-K Bottom Verification Notes -->
+              <div class="b-sec-footer">
+                <span class="b-fn">See accompanying Notes to Consolidated Financial Statements</span>
+                <span class="b-audit-seal">PCAOB AUDIT REGISTERED &#x2022; EDGAR CERTIFIED</span>
+              </div>
+            </div>
+          </div>
         </div>`; } else if (tplId === 'compound') {
       fxContainer.innerHTML = `<div class="tpl-compound">
           <div class="ci-head">

@@ -158,17 +158,34 @@
       downColor: '#ef4444'
     },
 
-    // 5. Balance Sheet Breakdown
+        // 5. Balance Sheet Breakdown
     'balance': {
       type: 'balance',
-      assets: '$1,450,000',
-      liabilities: '$620,000',
-      netWorth: '$830,000',
+      theme: 'archival',
+      company: 'APPLE INC.',
+      period: 'FORM 10-K \u00b7 FISCAL 2024',
+      assetsTotal: '$143.5B',
+      liabilitiesTotal: '$81.4B',
+      equityTotal: '$62.1B',
+      assets: '$143.5B',
+      liabilities: '$81.4B',
+      netWorth: '$62.1B',
       assetColor: '#10b981',
-      liabColor: '#ef4444'
+      liabColor: '#ef4444',
+      equityColor: '#6366f1',
+      assetRows: [
+        { name: 'Cash & Equivalents', val: '$29.9B' },
+        { name: 'Marketable Securities', val: '$61.5B' },
+        { name: 'Accounts Receivable', val: '$29.5B' },
+        { name: 'Inventories & Other', val: '$22.6B' }
+      ],
+      liabRows: [
+        { name: 'Short-term Debt & Payables', val: '$16.2B' },
+        { name: 'Long-term Debt Obligations', val: '$65.2B' }
+      ]
     },
 
-    // 6. Compound Interest Curve
+// 6. Compound Interest Curve
     'compound': {
       type: 'compound',
       initial: '$10,000',
@@ -2900,12 +2917,72 @@
       const sym = fxc.querySelector('.c-sym'); if (sym) sym.textContent = data.symbol;
       const pr = fxc.querySelector('.c-price'); if (pr) pr.textContent = data.price;
       const ch = fxc.querySelector('.c-change'); if (ch) ch.textContent = data.change;
-    } else if (tplId === 'balance') {
-      const vals = fxc.querySelectorAll('.bal-val, .b-row .val');
-      if (vals[0]) vals[0].textContent = data.assets;
-      if (vals[1]) vals[1].textContent = data.liabilities;
-      if (vals[2]) vals[2].textContent = data.netWorth;
-    } else if (tplId === 'compound') {
+        } else if (tplId === 'balance') {
+      const root = fxc.querySelector('.tpl-balance');
+      if (root) {
+        root.className = `tpl-balance theme-${data.theme || 'archival'}`;
+      }
+      const comp = fxc.querySelector('.b-company');
+      if (comp && data.company) comp.textContent = data.company;
+      const per = fxc.querySelector('.b-period');
+      if (per && data.period) per.textContent = data.period;
+
+      const aTot = data.assetsTotal || data.assets || '$143.5B';
+      const lTot = data.liabilitiesTotal || data.liabilities || '$81.4B';
+      const eTot = data.equityTotal || data.netWorth || '$62.1B';
+
+      fxc.querySelectorAll('.val-assets').forEach(el => { el.textContent = aTot; });
+      fxc.querySelectorAll('.val-assets-sub').forEach(el => { el.textContent = aTot; });
+      fxc.querySelectorAll('.val-liab').forEach(el => { el.textContent = lTot; });
+      fxc.querySelectorAll('.val-liab-calc').forEach(el => { el.textContent = lTot; });
+      fxc.querySelectorAll('.val-equity').forEach(el => { el.textContent = eTot; });
+      fxc.querySelectorAll('.val-equity-calc').forEach(el => { el.textContent = eTot; });
+      fxc.querySelectorAll('.val-liab-equity-sum').forEach(el => { el.textContent = aTot; });
+
+      // Color highlights
+      if (data.assetColor) {
+        const el = fxc.querySelector('.b-hud-assets .b-hud-tag');
+        if (el) el.style.color = data.assetColor;
+      }
+      if (data.liabColor) {
+        const el = fxc.querySelector('.b-hud-liab .b-hud-tag');
+        if (el) el.style.color = data.liabColor;
+      }
+      if (data.equityColor) {
+        const el = fxc.querySelector('.b-hud-equity .b-hud-tag');
+        if (el) el.style.color = data.equityColor;
+      }
+
+      // Dynamic rows update if provided
+      if (Array.isArray(data.assetRows) && data.assetRows.length > 0) {
+        const aList = fxc.querySelector('.b-asset-rows');
+        if (aList) {
+          aList.innerHTML = data.assetRows.map((r, i) => `
+            <div class="b-tbl-row ${i === 0 ? 'sweep-1' : (i === 1 ? 'sweep-2' : '')}">
+              <span class="b-marker-stroke"></span>
+              <span class="b-tbl-name">${r.name || ''}</span>
+              <span class="b-tbl-leader"></span>
+              <span class="b-tbl-val yr-curr val-asset-${i+1}">${r.val || ''}</span>
+              <span class="b-tbl-val yr-prev">${r.prev || r.val || ''}</span>
+            </div>
+          `).join('');
+        }
+      }
+      if (Array.isArray(data.liabRows) && data.liabRows.length > 0) {
+        const lList = fxc.querySelector('.b-liab-rows-inner');
+        if (lList) {
+          lList.innerHTML = data.liabRows.map((r, i) => `
+            <div class="b-tbl-row">
+              <span class="b-marker-stroke"></span>
+              <span class="b-tbl-name">${r.name || ''}</span>
+              <span class="b-tbl-leader"></span>
+              <span class="b-tbl-val yr-curr val-liab-${i+1}">${r.val || ''}</span>
+              <span class="b-tbl-val yr-prev">${r.prev || r.val || ''}</span>
+            </div>
+          `).join('');
+        }
+      }
+} else if (tplId === 'compound') {
       const v = fxc.querySelector('.ci-val, .ci-amount'); if (v) v.textContent = data.futureVal;
       const subs = fxc.querySelectorAll('.ci-sub');
       if (subs[0]) subs[0].textContent = `Start: ${data.initial}`;
@@ -6200,6 +6277,239 @@
       return;
     }
 
+
+        // SPECIAL HANDLER: BALANCE SHEET BREAKDOWN (balance)
+    // High-End T-Account, Archival 10-K & Bloomberg Glass themes, granular item rows
+    // =========================================================================
+    if (tplId === 'balance') {
+      const presets = [
+        {
+          label: 'Apple Inc. (10-K)',
+          company: 'APPLE INC.',
+          period: 'FORM 10-K \u00b7 FISCAL 2024',
+          assetsTotal: '$143.5B',
+          liabilitiesTotal: '$81.4B',
+          equityTotal: '$62.1B',
+          assetRows: [
+            { name: 'Cash & Equivalents', val: '$29.9B' },
+            { name: 'Marketable Securities', val: '$61.5B' },
+            { name: 'Accounts Receivable', val: '$29.5B' },
+            { name: 'Inventories & Other', val: '$22.6B' }
+          ],
+          liabRows: [
+            { name: 'Short-term Debt & Payables', val: '$16.2B' },
+            { name: 'Long-term Debt Obligations', val: '$65.2B' }
+          ]
+        },
+        {
+          label: 'Tesla Inc. (Auto/Energy)',
+          company: 'TESLA, INC.',
+          period: 'FORM 10-K \u00b7 ANNUAL REPORT',
+          assetsTotal: '$106.6B',
+          liabilitiesTotal: '$43.0B',
+          equityTotal: '$63.6B',
+          assetRows: [
+            { name: 'Cash & Investments', val: '$29.1B' },
+            { name: 'Solar & Gigafactory PP&E', val: '$32.5B' },
+            { name: 'Inventory & Fleet', val: '$14.2B' },
+            { name: 'Other Current Assets', val: '$30.8B' }
+          ],
+          liabRows: [
+            { name: 'Accounts Payable & Accrued', val: '$26.8B' },
+            { name: 'Total Debt & Leases', val: '$16.2B' }
+          ]
+        },
+        {
+          label: 'Tech Startup (Series A)',
+          company: 'NEXUS AI CORP.',
+          period: 'Q3 INVESTOR DECK \u00b7 2024',
+          assetsTotal: '$18.4M',
+          liabilitiesTotal: '$3.2M',
+          equityTotal: '$15.2M',
+          assetRows: [
+            { name: 'Treasury & Silicon Valley Bank', val: '$14.2M' },
+            { name: 'GPU Cluster Compute Assets', val: '$3.1M' },
+            { name: 'Enterprise SaaS Receivables', val: '$1.1M' }
+          ],
+          liabRows: [
+            { name: 'Venture Debt Line', val: '$2.4M' },
+            { name: 'Accounts Payable & Cloud', val: '$0.8M' }
+          ]
+        },
+        {
+          label: 'Personal Net Worth',
+          company: 'EXECUTIVE BALANCE SHEET',
+          period: 'PRIVATE WEALTH STATEMENT',
+          assetsTotal: '$2,450,000',
+          liabilitiesTotal: '$620,000',
+          equityTotal: '$1,830,000',
+          assetRows: [
+            { name: 'Primary Residence Equity', val: '$1,200,000' },
+            { name: 'Index Funds & Equities', val: '$850,000' },
+            { name: 'High-Yield Cash Reserves', val: '$400,000' }
+          ],
+          liabRows: [
+            { name: 'Fixed 30-Yr Mortgage', val: '$580,000' },
+            { name: 'Vehicle & Revolving Debt', val: '$40,000' }
+          ]
+        }
+      ];
+
+      const curTheme = data.theme || 'archival';
+
+      container.innerHTML = `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">\u{1F3DB}\uFE0F</span>
+              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">BALANCE SHEET CONTROLS</span>
+            </div>
+            <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
+          </div>
+
+          <!-- Presets -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Company Template Presets</span>
+            <select id="bal-preset-select" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none; cursor: pointer;">
+              <option value="">-- Choose Corporate Preset --</option>
+              ${presets.map((p, idx) => `<option value="${idx}">${p.label}</option>`).join('')}
+            </select>
+          </div>
+
+          <!-- Theme Mode Switcher -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Visual Aesthetic</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" id="bal-theme-archival" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curTheme === 'archival' ? '#8b5a3c' : 'rgba(255,255,255,0.1)'}; background: ${curTheme === 'archival' ? 'rgba(139,90,60,0.25)' : 'rgba(0,0,0,0.3)'}; color: ${curTheme === 'archival' ? '#fed7aa' : '#94a3b8'}; transition: all 0.15s;">
+                \u{1F4DC} Archival 10-K
+              </button>
+              <button type="button" id="bal-theme-bloomberg" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curTheme === 'bloomberg' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${curTheme === 'bloomberg' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)'}; color: ${curTheme === 'bloomberg' ? '#38bdf8' : '#94a3b8'}; transition: all 0.15s;">
+                \u{1F4BB} Bloomberg Glass
+              </button>
+            </div>
+          </div>
+
+          <!-- Entity & Subtitle -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Entity Name</span>
+              <input type="text" id="bal-inp-company" value="${data.company || 'APPLE INC.'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Filing Period</span>
+              <input type="text" id="bal-inp-period" value="${data.period || 'FORM 10-K \u00b7 FISCAL 2024'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Formula Totals -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">Accounting Equation Totals</span>
+              <span style="font-size: 8.5px; color: #10b981; font-family: monospace;">A = L + E</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;">
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 8.5px; font-weight: 700; color: #10b981;">TOTAL ASSETS</span>
+                <input type="text" id="bal-inp-assets" value="${data.assetsTotal || data.assets || '$143.5B'}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(16,185,129,0.4); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 11px; font-weight: 700; font-family: monospace; outline: none;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 8.5px; font-weight: 700; color: #f43f5e;">LIABILITIES</span>
+                <input type="text" id="bal-inp-liab" value="${data.liabilitiesTotal || data.liabilities || '$81.4B'}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(244,63,94,0.4); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 11px; font-weight: 700; font-family: monospace; outline: none;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 8.5px; font-weight: 700; color: #818cf8;">EQUITY</span>
+                <input type="text" id="bal-inp-equity" value="${data.equityTotal || data.netWorth || '$62.1B'}" style="background: rgba(0,0,0,0.6); border: 1px solid rgba(129,140,248,0.4); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 11px; font-weight: 700; font-family: monospace; outline: none;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Color Customizer -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.25); border-radius: 6px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; align-items: center; gap: 4px;" title="Asset Accent Color">
+              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Assets:</span>
+              <input type="color" id="bal-col-assets" value="${data.assetColor || '#10b981'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;" title="Liabilities Accent Color">
+              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Liabilities:</span>
+              <input type="color" id="bal-col-liab" value="${data.liabColor || '#ef4444'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px;" title="Equity Accent Color">
+              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Equity:</span>
+              <input type="color" id="bal-col-equity" value="${data.equityColor || '#6366f1'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            </div>
+          </div>
+
+          ${window.tplBuildUniversalBgHtml ? window.tplBuildUniversalBgHtml(data) : ''}
+        </div>
+      `;
+
+      if (window.tplWireUniversalBgControls) window.tplWireUniversalBgControls(tplId, container);
+
+      // Event Listeners
+      const presetSel = container.querySelector('#bal-preset-select');
+      if (presetSel) {
+        presetSel.onchange = (e) => {
+          const idx = parseInt(e.target.value, 10);
+          if (!isNaN(idx) && presets[idx]) {
+            const p = presets[idx];
+            window.tplSetContextualData('balance', {
+              company: p.company,
+              period: p.period,
+              assetsTotal: p.assetsTotal,
+              liabilitiesTotal: p.liabilitiesTotal,
+              equityTotal: p.equityTotal,
+              assets: p.assetsTotal,
+              liabilities: p.liabilitiesTotal,
+              netWorth: p.equityTotal,
+              assetRows: p.assetRows,
+              liabRows: p.liabRows
+            });
+            window.tplRenderContextualInspector('balance');
+          }
+        };
+      }
+
+      const btnArch = container.querySelector('#bal-theme-archival');
+      if (btnArch) btnArch.onclick = () => {
+        window.tplSetContextualData('balance', { theme: 'archival' });
+        window.tplRenderContextualInspector('balance');
+      };
+
+      const btnBloom = container.querySelector('#bal-theme-bloomberg');
+      if (btnBloom) btnBloom.onclick = () => {
+        window.tplSetContextualData('balance', { theme: 'bloomberg' });
+        window.tplRenderContextualInspector('balance');
+      };
+
+      const inpComp = container.querySelector('#bal-inp-company');
+      if (inpComp) inpComp.oninput = (e) => window.tplSetContextualData('balance', { company: e.target.value });
+
+      const inpPer = container.querySelector('#bal-inp-period');
+      if (inpPer) inpPer.oninput = (e) => window.tplSetContextualData('balance', { period: e.target.value });
+
+      const inpAss = container.querySelector('#bal-inp-assets');
+      if (inpAss) inpAss.oninput = (e) => window.tplSetContextualData('balance', { assetsTotal: e.target.value, assets: e.target.value });
+
+      const inpLiab = container.querySelector('#bal-inp-liab');
+      if (inpLiab) inpLiab.oninput = (e) => window.tplSetContextualData('balance', { liabilitiesTotal: e.target.value, liabilities: e.target.value });
+
+      const inpEq = container.querySelector('#bal-inp-equity');
+      if (inpEq) inpEq.oninput = (e) => window.tplSetContextualData('balance', { equityTotal: e.target.value, netWorth: e.target.value });
+
+      const colAss = container.querySelector('#bal-col-assets');
+      if (colAss) colAss.oninput = (e) => window.tplSetContextualData('balance', { assetColor: e.target.value });
+
+      const colLiab = container.querySelector('#bal-col-liab');
+      if (colLiab) colLiab.oninput = (e) => window.tplSetContextualData('balance', { liabColor: e.target.value });
+
+      const colEq = container.querySelector('#bal-col-equity');
+      if (colEq) colEq.oninput = (e) => window.tplSetContextualData('balance', { equityColor: e.target.value });
+
+      return;
+    }
+
+    // =========================================================================
 
     // SPECIAL HANDLER: PORTFOLIO ALLOCATION PIE (pie)
     // Allows selecting different portfolio types + customizing slices & percentages
