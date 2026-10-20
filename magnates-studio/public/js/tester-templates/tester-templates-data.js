@@ -27,6 +27,7 @@
   },
   {
     "id": "parallax-depth",
+    "hidden": true,
     "title": "Parallax Depth",
     "category": "Motion",
     "origCategory": "Motion",
@@ -65,6 +66,7 @@
   },
   {
     "id": "doc-highlight",
+    "hidden": true,
     "title": "Document Highlight",
     "category": "Text",
     "origCategory": "Text",
@@ -198,6 +200,7 @@
   },
   {
     "id": "particle-text",
+    "hidden": true,
     "title": "Particle Dissolve",
     "category": "Effects",
     "origCategory": "Effects",
@@ -236,6 +239,7 @@
   },
   {
     "id": "3d-rotate",
+    "hidden": true,
     "title": "3D Card Flip",
     "category": "Motion",
     "origCategory": "Motion",
@@ -359,6 +363,7 @@
   },
   {
     "id": "timeline-anim",
+    "hidden": true,
     "title": "Animated Timeline",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -399,6 +404,7 @@
   },
   {
     "id": "point-annotate",
+    "hidden": true,
     "title": "Point & Highlight",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -621,6 +627,7 @@
   },
   {
     "id": "social-post",
+    "hidden": true,
     "title": "Social Media Pop",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -721,6 +728,7 @@
   },
   {
     "id": "magnify-zoom",
+    "hidden": true,
     "title": "Magnifying Glass",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -981,6 +989,7 @@
   },
   {
     "id": "breaking-news",
+    "hidden": true,
     "title": "Breaking News Ticker",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -1021,6 +1030,7 @@
   },
   {
     "id": "split-compare",
+    "hidden": true,
     "title": "Split Screen Compare",
     "category": "Transitions",
     "origCategory": "Transitions",
@@ -1061,6 +1071,7 @@
   },
   {
     "id": "court-document",
+    "hidden": true,
     "title": "Court Document",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -1141,6 +1152,7 @@
   },
   {
     "id": "fingerprint-reveal",
+    "hidden": true,
     "title": "Fingerprint Reveal",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -1161,6 +1173,7 @@
   },
   {
     "id": "phone-notification",
+    "hidden": true,
     "title": "Phone Notification",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -1181,6 +1194,7 @@
   },
   {
     "id": "luxury-title",
+    "hidden": true,
     "title": "Luxury Title Reveal",
     "category": "Business",
     "origCategory": "Business",
@@ -1341,6 +1355,7 @@
   },
   {
     "id": "luxury-car-reveal",
+    "hidden": true,
     "title": "Luxury Car Reveal",
     "category": "Business",
     "origCategory": "Business",
@@ -1361,6 +1376,7 @@
   },
   {
     "id": "skyscraper-build",
+    "hidden": true,
     "title": "Skyscraper Build",
     "category": "Business",
     "origCategory": "Business",
@@ -1381,6 +1397,7 @@
   },
   {
     "id": "signature-appear",
+    "hidden": true,
     "title": "Signature Appear",
     "category": "Business",
     "origCategory": "Business",
@@ -1401,6 +1418,7 @@
   },
   {
     "id": "wealth-counter",
+    "hidden": true,
     "title": "Wealth Counter",
     "category": "Business",
     "origCategory": "Business",
