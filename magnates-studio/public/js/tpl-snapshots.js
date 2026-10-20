@@ -2,6 +2,48 @@
 // Each snapshot visually mirrors the template's real layout, graphic assets, typography, and motion atmosphere.
 (function () {
   const SNAPSHOTS = {
+    'creator-cinematic-backdrop-suite': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <radialGradient id="bg-radial-teal" cx="50%" cy="45%" r="65%">
+            <stop offset="0%" stop-color="#082f49"/>
+            <stop offset="40%" stop-color="#031c2d"/>
+            <stop offset="100%" stop-color="#020b14"/>
+          </radialGradient>
+          <radialGradient id="warm-lamp-left" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.6"/>
+            <stop offset="60%" stop-color="#d97706" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+          </radialGradient>
+          <radialGradient id="warm-lamp-right" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.55"/>
+            <stop offset="50%" stop-color="#b45309" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#bg-radial-teal)"/>
+        <circle cx="42" cy="155" r="48" fill="url(#warm-lamp-left)"/>
+        <circle cx="365" cy="135" r="56" fill="url(#warm-lamp-right)"/>
+        <circle cx="375" cy="55" r="28" fill="url(#warm-lamp-right)" opacity="0.7"/>
+
+        <text x="54" y="116" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="700" font-size="14" opacity="0.95">this AI company</text>
+        <text x="320" y="119" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="900" font-size="24" letter-spacing="-0.5" text-anchor="middle">VOICE</text>
+
+        <g transform="translate(200, 32)">
+          <path d="M-64,193 C-62,142 -52,120 -32,108 C-18,102 18,102 32,108 C52,120 62,142 64,193 Z" fill="#0f172a" stroke="#38bdf8" stroke-width="1.4"/>
+          <path d="M-12,86 L-10,116 L10,116 L12,86 Z" fill="#c28864"/>
+          <path d="M-14,112 Q0,132 14,112" stroke="#e2e8f0" stroke-width="1.2" fill="none"/>
+          <ellipse cx="0" cy="56" rx="26" ry="34" fill="#c28864"/>
+          <path d="M-28,45 C-26,20 -15,10 0,10 C15,10 26,20 28,45 C24,42 22,35 15,34 C6,33 -4,34 -15,36 C-22,38 -25,43 -28,45 Z" fill="#291a13" stroke="#38bdf8" stroke-width="0.8"/>
+          <path d="M-24,52 C-20,78 -14,88 0,88 C14,88 20,78 24,52 C20,72 12,80 0,80 C-12,80 -20,72 -24,52 Z" fill="#3a251b"/>
+          <ellipse cx="0" cy="54" rx="32" ry="38" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="3 2" opacity="0.85"/>
+          <rect x="-46" y="2" width="92" height="12" rx="2.5" fill="rgba(2,6,23,0.85)" stroke="#38bdf8" stroke-width="0.7"/>
+          <text x="0" y="10.5" fill="#38bdf8" font-family="monospace" font-size="6" font-weight="800" text-anchor="middle">LOCK: FACE TRACK</text>
+        </g>
+
+        <rect x="8" y="198" width="138" height="18" rx="3" fill="rgba(2,6,23,0.88)" stroke="rgba(56,189,248,0.4)" stroke-width="0.8"/>
+        <text x="16" y="210" fill="#38bdf8" font-family="monospace" font-weight="800" font-size="8">CALIBRATABLE DOF &amp; LIGHTING</text>
+      </svg>`)}`,
     // 14. 3D Spatial Motion Titles & Parallax Rig
     'spatial-3d-motion-suite': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
