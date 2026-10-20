@@ -29350,12 +29350,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         leftEl.style.transform = `translateX(${tx.toFixed(1)}%)`;
         leftEl.style.opacity = op.toFixed(2);
       }
-      // 3. Right silhouette glides Bottom -> Up at 0.90s (+ms), exits Right -> Left at 3.72s (+ms)
+      // 3. Right silhouette glides Bottom -> Up at 0.90s (+ms), exits Left -> Right at 3.72s (+ms)
       if (rightEl) {
         const inP = easeOut((cycle - 0.90) / 0.45);
         const outP = easeIn((cycle - 3.72) / 0.45);
         const ty = (1 - inP) * 120;
-        const tx = outP * -240;
+        const tx = outP * 240;
         const op = Math.max(0, Math.min(1, inP * (1 - outP)));
         rightEl.style.transform = `translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
         rightEl.style.opacity = op.toFixed(2);
@@ -48040,7 +48040,7 @@ let magnatesBPState = {
   primaryCutoutUrl: "/silhouette_sitting_phone.png",
   l2Enabled: true,
   l2InAnim: "bottom_to_up",
-  l2OutAnim: "right_to_left",
+  l2OutAnim: "left_to_right",
   l2InTime: 0.95,
   l2OutTime: 4.05,
   // Z=0 Background plate & fade out timing
@@ -48064,7 +48064,7 @@ const MAGNATES_BP_PRESETS = {
     l1InTime: 0.85,
     l1OutTime: 3.80,
     l2InAnim: "bottom_to_up",
-    l2OutAnim: "right_to_left",
+    l2OutAnim: "left_to_right",
     l2InTime: 0.95,
     l2OutTime: 4.05,
     bgFadeTime: 4.45,
