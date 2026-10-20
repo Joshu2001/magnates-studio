@@ -32,6 +32,7 @@
 | `fx-document-scan` | **Vox Document Highlighter Sweep & Loupe Suite** | Motion & Callout | ✅ Implemented | Templates -> *Document Highlighter & Forensic Loupe Suite* or Clip Menu -> *Add Animated Highlighter* / *Add Whiteout Fade* |
 | `fx-parallax-tilt` | **OG 3-Layer Parallax Engine** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *OG 3-Layer Parallax Engine* |
 | `fx-spooner-parallax` | **2.5D Parallax Photo Effect** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *2.5D Parallax Photo Effect* or Clip Menu -> *⚡ 2.5D Parallax Photo* |
+| `jani-forbes-fraud-reveal` | **James Jani Forbes 3D Cover: Paparazzi Flash & Anamorphic Beam** | 3D Spatial & Motion | ✅ Implemented | Templates -> 3D Spatial -> *James Jani Forbes 3D Cover* |
 | `fx-paper-texture` | **Stop-Motion Crumpled Paper Overlay** | Texture & Grain | ⏳ Backlog | Planned: 12fps cycling grain blend mode |
 
 ---

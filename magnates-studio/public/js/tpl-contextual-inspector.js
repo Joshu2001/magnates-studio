@@ -55,6 +55,59 @@
 
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
+    // James Jani Forbes 3D Cover (The Fake Genius $30 Billion Fraud)
+    'jani-forbes-fraud-reveal': Object.assign({}, (typeof window !== 'undefined' && window.JANI_FORBES_CONFIG) || {
+      type: 'jani-forbes',
+      portraitUrl: '/portrait_cutout_clean.png',
+      portraitPreset: 'founder',
+      portraitScale: 1.0,
+      portraitOffsetX: 0,
+      portraitOffsetY: 0,
+      portraitBrightness: 100,
+      portraitContrast: 110,
+      startZoom: 2.45,
+      endZoom: 1.0,
+      startTiltX: 13.0,
+      startTiltY: -17.0,
+      startTiltZ: 5.5,
+      endTiltX: 0.0,
+      endTiltY: 0.0,
+      endTiltZ: 0.0,
+      perspective: 900,
+      startBlur: 18.0,
+      endBlur: 0.0,
+      ghostBloomOpacity: 75,
+      blurResolveTime: 3.2,
+      flashCount: 4,
+      flashTimes: [0.65, 1.15, 1.65, 2.15],
+      flashDuration: 0.14,
+      flashPeakIntensity: 220,
+      flashAmbientDip: 42,
+      enableFlashSFX: true,
+      beamTriggerTime: 2.55,
+      beamDuration: 0.28,
+      beamIntensity: 180,
+      beamThickness: 3.5,
+      beamGlowSpread: 42,
+      beamColor: '#38bdf8',
+      beamFaceBloom: 195,
+      secondaryPulseTime: 3.12,
+      secondaryPulseDuration: 0.16,
+      magazineTitle: 'Forbes',
+      mastheadColor: '#ffffff',
+      kickerBadge: 'SPECIAL ISSUE',
+      showKickerBox: true,
+      kickerBoxBg: '#ef4444',
+      topTickerLeft: "THE VATICAN'S CORRUPTION TRIAL PROBLEM",
+      topTickerRight: "THE MOGUL WHO MASTERED WASHINGTON",
+      featureTag: '40th ANNUAL',
+      featureTitle: 'FORBES 400',
+      subHeadline1: "• NEW RECORD: $4.5 TRILLION FOR AMERICA'S RICHEST",
+      subHeadline2: "• CAN ANYONE REALLY TRUST THE NEW BILLIONAIRES?",
+      subjectName: 'ALEXANDER VANCE',
+      subjectQuote: '"I BUILT AN EMPIRE BEFORE ANYONE KNEW WHAT WAS REAL."',
+      duration: 5.0
+    }),
     // 1. Depth Parallax Multi-Layer
     'parallax': {
       type: 'parallax',
@@ -2624,6 +2677,20 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'jani-forbes-fraud-reveal') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#jani-forbes-viewport-jani-forbes-fraud-reveal')) {
+          if (typeof window.tplMountForbes3DStage === 'function') {
+            window.tplMountForbes3DStage(stage, data);
+          }
+        }
+        if (typeof window.stepJaniForbesAnimation === 'function') {
+          window.stepJaniForbesAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
     if (tplId === 'google') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       const vContainer = stage ? stage.querySelector('#search-3d-viewport-container') : null;
@@ -3830,6 +3897,21 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'jani-forbes-fraud-reveal') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildForbesInspector === 'function') {
+          window.tplBuildForbesInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
         const container = document.getElementById('tpl-modal-dynamic-controls');
     const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
     const wrapPrim = document.getElementById('tpl-modal-wrap-primary');

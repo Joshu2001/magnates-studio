@@ -3,6 +3,29 @@
 (function() {
   window.NEW_TESTER_TEMPLATES = [
   {
+    "id": "jani-forbes-fraud-reveal",
+    "title": "James Jani Forbes 3D Cover: Paparazzi Flash & Anamorphic Beam",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "JANI 3D FX",
+    "difficulty": "Pro 3D",
+    "timeToApply": "5s",
+    "previewGradient": "linear-gradient(135deg, rgba(8, 14, 26, 0.95), rgba(2, 4, 8, 0.95))",
+    "description": "Signature James Jani Forbes 3D zoom-out camera dolly with rapid paparazzi flash strobes, horizontal anamorphic CRT beam streak, depth-of-field blur resolution, and 3D tilt controls.",
+    "tags": [
+      "James Jani",
+      "Forbes Cover",
+      "3D Camera",
+      "Paparazzi Flash",
+      "Anamorphic Flare",
+      "Depth of Field",
+      "Tilt-Shift Blur"
+    ],
+    "previewType": "forbes-flash",
+    "isTesterTemplate": true,
+    "defaultImage": "/jani_forbes_cover_thumb.svg"
+  },
+  {
     "id": "parallax-depth",
     "title": "Parallax Depth",
     "category": "Motion",

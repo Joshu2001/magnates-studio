@@ -23234,6 +23234,20 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'jani-forbes-fraud-reveal',
+    title: 'James Jani Forbes 3D Cover: Paparazzi Flash & Anamorphic Beam',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'JANI 3D FX',
+    difficulty: 'Pro 3D',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(8, 14, 26, 0.95), rgba(2, 4, 8, 0.95))',
+    description: 'Signature James Jani Forbes 3D zoom-out camera dolly with rapid paparazzi flash strobes, horizontal anamorphic CRT beam streak, depth-of-field blur resolution, and 3D tilt controls.',
+    tags: ['James Jani', 'Forbes Cover', '3D Camera', 'Paparazzi Flash', 'Anamorphic Flare', 'Depth of Field', 'Tilt-Shift Blur'],
+    defaultImage: '/jani_forbes_cover_thumb.svg',
+    secondaryImage: '/portrait_cutout_clean.png'
+  },
+  {
     id: 'creator-cinematic-backdrop-suite',
     title: 'Cinematic Creator Studio: Calibratable DOF, Lighting & Face-Lock',
     category: 'Vlog & Story',
@@ -25335,7 +25349,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['creator-cinematic-backdrop-suite','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['jani-forbes-fraud-reveal','creator-cinematic-backdrop-suite','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -28255,6 +28269,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+        } else if (tplId === 'jani-forbes-fraud-reveal') {
+      const jData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-forbes-fraud-reveal') : (window.JANI_FORBES_CONFIG || {});
+      if (typeof window.buildForbesHtml === 'function') {
+        fxContainer.innerHTML = window.buildForbesHtml(tplId, jData);
+      }
     } else if (tplId === 'og-parallax-depth-engine') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #030408; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 750px;">
@@ -29432,6 +29451,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         // Sudden camera impact recoil shake
         const shakeMag = (1 - impactProg) * 8;
         if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
+      }
+        } else if (tplId === 'jani-forbes-fraud-reveal') {
+      if (typeof window.stepJaniForbesAnimation === 'function') {
+        const jData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-forbes-fraud-reveal') : (window.JANI_FORBES_CONFIG || {});
+        window.stepJaniForbesAnimation(fxContainer, tplId, t, jData);
       }
     } else if (tplId === 'og-parallax-depth-engine') {
       const orbitY = Math.sin(t * 1.8) * 16;
@@ -30862,6 +30886,15 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+        } else if (tpl.id === 'jani-forbes-fraud-reveal') {
+      topCustomizerState.primaryUrl = '/portrait_cutout_clean.png';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/portrait_cutout_clean.png';
+      if (typeof window.tplMountForbes3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountForbes3DStage(stage, cData);
+      }
     } else if (tpl.id === 'magnates-media-article-highlight') {
       topCustomizerState.primaryUrl = '/magnates_article_highlight_thumbnail.svg';
       topCustomizerState.secondaryUrl = '';

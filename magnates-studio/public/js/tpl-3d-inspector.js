@@ -14,6 +14,7 @@
   const isBridged = (id) => typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(id);
   // All templates under 3D Spatial category have the Video / 3D switcher!
   const SPATIAL_3D_CATEGORY_IDS = new Set([
+    'jani-forbes-fraud-reveal',
     'og-parallax-depth-engine',
     'spatial-3d-motion-suite',
     'document-3d-fx-engine',
@@ -1037,6 +1038,11 @@
     const cw = cv.width, ch = cv.height;
     c.save();
     try {
+          if (clip.fxScene && clip.fxScene.tplId === 'jani-forbes-fraud-reveal' && typeof window.renderJaniForbesCanvas === 'function') {
+      window.renderJaniForbesCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
       if ((k === 'spatial' || k === 'doc') && sc.entry.mode === '3d' && typeof THREE !== 'undefined') {
         draw3DClip(c, clip, t, cw, ch);
       } else {
