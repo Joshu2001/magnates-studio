@@ -28078,77 +28078,49 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'spatial-3d-motion-suite') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: linear-gradient(180deg, #040710 0%, #0a1120 52%, #111624 80%, #05070d 100%); overflow: hidden; perspective: 950px; display: flex; align-items: center; justify-content: center; user-select: none;">
-          <!-- Volumetric Horizon Fog & Warm Amber Light Leaks -->
-          <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 85% 60% at 50% 54%, rgba(212,175,55,0.24) 0%, rgba(180,83,9,0.10) 45%, rgba(15,23,42,0.05) 75%, transparent 100%); pointer-events: none;"></div>
-          <div id="fx-spatial-rays-${tplId}" style="position: absolute; inset: -10%; background: conic-gradient(from 180deg at 50% 54%, transparent 130deg, rgba(212,175,55,0.16) 160deg, rgba(254,240,138,0.22) 180deg, rgba(212,175,55,0.16) 200deg, transparent 230deg); filter: blur(14px); mix-blend-mode: screen; pointer-events: none;"></div>
+        <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 90% 75% at 50% 45%, #0d121f 0%, #06080f 65%, #030408 100%); overflow: hidden; perspective: 900px; display: flex; align-items: center; justify-content: center; user-select: none;">
+          <!-- Clean Perspective Floor Grid (No Fake Triangle Cones) -->
+          <div id="fx-spatial-grid-${tplId}" style="position: absolute; left: -40%; right: -40%; bottom: -35%; height: 85%; background-image: linear-gradient(to right, rgba(148,163,184,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(217,119,6,0.16) 1px, transparent 1px); background-size: 34px 26px; transform-origin: 50% 0%; transform: rotateX(75deg) translateZ(-20px); mask-image: radial-gradient(ellipse 70% 80% at 50% 45%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.35) 55%, transparent 88%); -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 45%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.35) 55%, transparent 88%); pointer-events: none;"></div>
 
-          <!-- Full-Depth Perspective Horizon Floor Grid (Eliminates Empty Void) -->
-          <div id="fx-spatial-grid-${tplId}" style="position: absolute; left: -35%; right: -35%; bottom: -32%; height: 82%; background-image: linear-gradient(to right, rgba(212,175,55,0.20) 1px, transparent 1px), linear-gradient(to bottom, rgba(212,175,55,0.22) 1px, transparent 1px); background-size: 32px 24px; transform-origin: 50% 0%; transform: rotateX(74deg) translateZ(-20px); mask-image: radial-gradient(ellipse 75% 85% at 50% 35%, rgba(0,0,0,0.95) 15%, rgba(0,0,0,0.4) 55%, transparent 90%); -webkit-mask-image: radial-gradient(ellipse 75% 85% at 50% 35%, rgba(0,0,0,0.95) 15%, rgba(0,0,0,0.4) 55%, transparent 90%); pointer-events: none;"></div>
-
-          <!-- Horizon Rim Glow -->
-          <div style="position: absolute; left: 10%; right: 10%; top: 51%; height: 2px; background: linear-gradient(90deg, transparent, rgba(212,175,55,0.55), #fef08a, rgba(212,175,55,0.55), transparent); filter: blur(2px); opacity: 0.75; pointer-events: none;"></div>
-
-          <!-- Floating Atmospheric Dust Motes -->
-          <div style="position: absolute; inset: 0; background-image: radial-gradient(rgba(254,240,138,0.75) 1px, transparent 1.5px), radial-gradient(rgba(212,175,55,0.55) 1.2px, transparent 2px); background-size: 90px 70px, 130px 95px; background-position: 15px 20px, 60px 45px; opacity: 0.55; pointer-events: none;"></div>
-
-          <!-- Tier 1 Left: 3D Frosted Dark-Glass Archival Image Slate (f/2.8 Bokeh, Safe Upper-Left Corridor) -->
-          <div id="fx-spatial-card1-${tplId}" style="position: absolute; left: 3.5%; top: 8%; width: 31%; height: 27%; background: linear-gradient(135deg, rgba(22,30,48,0.88) 0%, rgba(10,15,28,0.94) 100%); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(212,175,55,0.52); border-radius: 5px; padding: 5px 6px; box-shadow: -3px 4px 0 rgba(5,7,12,0.95), 0 14px 28px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.18); pointer-events: none; transform: rotateY(16deg) rotateX(6deg); filter: blur(0.6px); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; z-index: 2;">
-            <div style="position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,0.12) 0%, rgba(212,175,55,0.05) 35%, transparent 60%); pointer-events: none;"></div>
-            <div style="font-size: 5px; font-weight: 800; color: #D4AF37; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DEPT. TREASURY // CLASSIFIED</div>
-            <div style="display: flex; align-items: center; gap: 5px; flex: 1; margin-top: 2px;">
-              <!-- Archival Microfilm Image Thumbnail -->
-              <div style="width: 32%; height: 92%; border-radius: 2px; background: radial-gradient(circle at 60% 35%, rgba(212,175,55,0.28), #080d1a 85%); border: 1px solid rgba(212,175,55,0.38); position: relative; overflow: hidden; flex-shrink: 0;">
-                <svg viewBox="0 0 40 40" style="width: 100%; height: 100%; display: block;">
-                  <line x1="5" y1="9" x2="35" y2="9" stroke="rgba(212,175,55,0.55)" stroke-width="2"/>
-                  <polyline points="5,32 13,22 21,26 29,14 35,17" fill="none" stroke="#D4AF37" stroke-width="1.8"/>
-                  <circle cx="29" cy="14" r="2.2" fill="#fef08a"/>
-                </svg>
-              </div>
-              <div style="display: flex; flex-direction: column; justify-content: center; overflow: hidden;">
-                <div style="font-size: 6.8px; font-weight: 800; color: #f8fafc; font-family: 'Cinzel', Georgia, serif; line-height: 1.15;">CONFIDENTIAL SCAN</div>
-                <div style="display: inline-block; align-self: flex-start; border: 1px solid #dc2626; background: rgba(185,28,28,0.22); border-radius: 2px; padding: 0.5px 3.5px; font-size: 4.8px; color: #fca5a5; font-family: monospace; font-weight: 900; margin-top: 3px; letter-spacing: 0.6px;">VERIFIED</div>
-              </div>
+          <!-- Left Corridor Real Photographic Plate (Angled Inward on Left Wall) -->
+          <div id="fx-spatial-card1-${tplId}" style="position: absolute; left: 2.5%; top: 14%; width: 25%; height: 46%; background: #0b0f19; border: 1px solid rgba(255,255,255,0.16); border-radius: 5px; box-shadow: 0 18px 36px rgba(0,0,0,0.95); pointer-events: none; transform-origin: left center; transform: rotateY(28deg) rotateX(3deg); overflow: hidden; z-index: 3; display: flex; flex-direction: column;">
+            <div style="position: relative; width: 100%; height: 68%; overflow: hidden; background: #05070c;">
+              <img src="/paper_tear_stock_archival_news.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.12) brightness(0.82) sepia(0.15);" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, transparent 55%);"></div>
+              <span style="position: absolute; top: 4px; left: 5px; padding: 1px 4px; border-radius: 2px; background: rgba(185,28,28,0.85); color: #fff; font-family: monospace; font-size: 4.5px; font-weight: 800; letter-spacing: 0.5px;">VERIFIED</span>
+            </div>
+            <div style="padding: 4px 6px; display: flex; flex-direction: column; justify-content: center; flex: 1; border-top: 1px solid rgba(217,119,6,0.35);">
+              <div style="font-size: 4.5px; font-weight: 700; color: #f59e0b; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DEPT. TREASURY // CLASSIFIED</div>
+              <div style="font-size: 6.5px; font-weight: 800; color: #f8fafc; font-family: 'Cinzel', Georgia, serif; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CONFIDENTIAL SCAN</div>
             </div>
           </div>
 
-          <!-- Tier 1 Right: 3D Frosted Dark-Glass Financial Ledger Slate (f/2.8 Bokeh, Safe Lower-Right Corridor - Zero Text Collision) -->
-          <div id="fx-spatial-card2-${tplId}" style="position: absolute; right: 3.5%; bottom: 6%; width: 31%; height: 27%; background: linear-gradient(135deg, rgba(22,30,48,0.88) 0%, rgba(10,15,28,0.94) 100%); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(212,175,55,0.48); border-radius: 5px; padding: 5px 6px; box-shadow: 3px 4px 0 rgba(5,7,12,0.95), 0 14px 28px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.18); pointer-events: none; transform: rotateY(-16deg) rotateX(-5deg); filter: blur(0.6px); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; z-index: 2;">
-            <div style="position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255,255,255,0.12) 0%, rgba(212,175,55,0.05) 35%, transparent 60%); pointer-events: none;"></div>
-            <div style="font-size: 4.8px; font-weight: 800; color: #D4AF37; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">FINANCIAL MONOPOLY LEDGER</div>
-            <div style="display: flex; align-items: center; gap: 5px; flex: 1; margin-top: 2px;">
-              <!-- Archival Ledger Evidence Thumbnail -->
-              <div style="width: 32%; height: 92%; border-radius: 2px; background: radial-gradient(circle at 50% 40%, rgba(212,175,55,0.24), #080d1a 85%); border: 1px solid rgba(212,175,55,0.38); position: relative; overflow: hidden; flex-shrink: 0;">
-                <svg viewBox="0 0 40 40" style="width: 100%; height: 100%; display: block;">
-                  <rect x="6" y="22" width="5" height="13" fill="rgba(212,175,55,0.45)"/>
-                  <rect x="14" y="16" width="5" height="19" fill="rgba(212,175,55,0.68)"/>
-                  <rect x="22" y="8" width="5" height="27" fill="#D4AF37"/>
-                  <rect x="30" y="13" width="5" height="22" fill="rgba(212,175,55,0.55)"/>
-                </svg>
-              </div>
-              <div style="display: flex; flex-direction: column; justify-content: center; overflow: hidden;">
-                <div style="font-size: 6.5px; font-weight: 800; color: #f8fafc; font-family: 'Cinzel', Georgia, serif; line-height: 1.15;">CAPITAL FLOW $84.2B</div>
-                <div style="font-size: 4.6px; color: #94a3b8; font-family: monospace; margin-top: 2px;">OFFSHORE // WIRE #409</div>
-              </div>
+          <!-- Right Corridor Real Photographic Plate (Angled Inward on Right Wall) -->
+          <div id="fx-spatial-card2-${tplId}" style="position: absolute; right: 2.5%; bottom: 12%; width: 25%; height: 46%; background: #0b0f19; border: 1px solid rgba(255,255,255,0.16); border-radius: 5px; box-shadow: 0 18px 36px rgba(0,0,0,0.95); pointer-events: none; transform-origin: right center; transform: rotateY(-28deg) rotateX(-2deg); overflow: hidden; z-index: 3; display: flex; flex-direction: column;">
+            <div style="position: relative; width: 100%; height: 68%; overflow: hidden; background: #05070c;">
+              <img src="/boardroom_scene_hd.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15) brightness(0.84);" />
+              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, transparent 55%);"></div>
+              <span style="position: absolute; top: 4px; right: 5px; padding: 1px 4px; border-radius: 2px; background: rgba(15,23,42,0.9); border: 1px solid rgba(245,158,11,0.5); color: #fef08a; font-family: monospace; font-size: 4.5px; font-weight: 800;">EXHIBIT B</span>
+            </div>
+            <div style="padding: 4px 6px; display: flex; flex-direction: column; justify-content: center; flex: 1; border-top: 1px solid rgba(217,119,6,0.35);">
+              <div style="font-size: 4.5px; font-weight: 700; color: #94a3b8; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">FINANCIAL MONOPOLY LEDGER</div>
+              <div style="font-size: 6.2px; font-weight: 800; color: #f8fafc; font-family: 'Cinzel', Georgia, serif; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CAPITAL FLOW $84.2B</div>
             </div>
           </div>
 
-          <!-- Tier 2 Focal Center: 3D Metallic Gold-Bevel Headline (Clamped Frustum, Sharp f/2.8 Focus, Golden Ratio Center) -->
-          <div id="fx-spatial-plate-${tplId}" style="position: relative; z-index: 6; text-align: center; transform-style: preserve-3d; transition: transform 0.05s ease-out; max-width: 88%; padding: 4px 10px;">
-            <h3 style="font-family: 'Cinzel', Georgia, serif; font-size: 22px; font-weight: 900; letter-spacing: 4px; background: linear-gradient(180deg, #fff8cc 0%, #D4AF37 38%, #fef08a 55%, #aa771c 82%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; text-transform: uppercase; filter: drop-shadow(0 2px 0 #5c3a08) drop-shadow(0 4px 0 #2e1b03) drop-shadow(0 12px 22px rgba(0,0,0,0.95)) drop-shadow(0 0 14px rgba(212,175,55,0.28)); white-space: nowrap;">
+          <!-- Center Runway Hero Gold Title (Flies Cleanly Down the Middle Between Flanking Plates) -->
+          <div id="fx-spatial-plate-${tplId}" style="position: relative; z-index: 6; text-align: center; transform-style: preserve-3d; transition: transform 0.05s ease-out; max-width: 52%; padding: 4px 8px;">
+            <h3 style="font-family: 'Cinzel', Georgia, serif; font-size: 21px; font-weight: 900; letter-spacing: 3.5px; background: linear-gradient(180deg, #fef08a 0%, #d97706 48%, #fde68a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; text-transform: uppercase; filter: drop-shadow(0 12px 20px rgba(0,0,0,0.95)); white-space: nowrap;">
               THE SYSTEM
             </h3>
-            <div style="width: 78%; height: 1.5px; background: linear-gradient(90deg, transparent, #D4AF37, #fef08a, #D4AF37, transparent); margin: 5px auto; box-shadow: 0 0 10px rgba(212,175,55,0.5);"></div>
-            <span style="font-family: 'Inter', -apple-system, sans-serif; font-size: 7.2px; font-weight: 700; letter-spacing: 2.8px; color: #e2e8f0; text-transform: uppercase; display: block; text-shadow: 0 2px 8px rgba(0,0,0,0.95); white-space: nowrap;">
+            <div style="width: 82%; height: 1px; background: linear-gradient(90deg, transparent, #d97706, transparent); margin: 5px auto;"></div>
+            <span style="font-family: 'Inter', -apple-system, sans-serif; font-size: 6.5px; font-weight: 600; letter-spacing: 2.2px; color: #cbd5e1; text-transform: uppercase; display: block; white-space: nowrap;">
               MANIPULATION &amp; CONTROL
             </span>
           </div>
 
-          <!-- Subtle Vignette Lens Frame -->
-          <div style="position: absolute; inset: 0; box-shadow: inset 0 0 45px rgba(2,4,9,0.85); pointer-events: none; z-index: 8;"></div>
-
           <!-- Elegant Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(10,15,28,0.9); border: 1px solid rgba(212,175,55,0.65); color: #fef08a; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 10;">
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid #d97706; color: #fde68a; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 10;">
             3D SPATIAL RIG
           </div>
         </div>
@@ -29611,48 +29583,38 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       if (cyanEl) cyanEl.style.transform = `translate(${glitchX}px, 0) scale(1.06)`;
       if (redEl) redEl.style.transform = `translate(${-glitchX}px, 0) scale(1.04)`;
     } else if (tplId === 'spatial-3d-motion-suite') {
-      // James Jani Bounded-Frustum Camera Pullback + 3-Tier Parallax Separation (Zero Edge Clipping / Zero Card Overlap)
-      const zoomCycle = (Math.sin(t * 0.85 - Math.PI / 2) + 1) / 2; // 0 (close macro) to 1 (wide reveal)
-      const clampedZoom = Math.max(0.78, Math.min(1.12, _fx.zoom || 1));
-      const camZProgress = (1.06 - zoomCycle * 0.16) * clampedZoom; // Clamped within safe golden-ratio frustum
-      const camPitch = Math.max(-10, Math.min(10, 4 - zoomCycle * 7 + Math.cos(t * 1.1) * 1.5 + (_fx.pitch || 0) * 0.35));
-      const camYaw = Math.max(-10, Math.min(10, Math.sin(t * 0.95) * 4.5 + (_fx.yaw || 0) * 0.35));
-      const camRoll = Math.max(-8, Math.min(8, (_fx.roll || 0) * 0.35));
+      // True Center-Corridor Fly-Through: Camera glides down the middle while flanking photo plates sweep past the left & right walls
+      const zoomCycle = (Math.sin(t * 0.9 - Math.PI / 2) + 1) / 2; // 0 to 1 smooth dolly
+      const clampedZoom = Math.max(0.82, Math.min(1.12, _fx.zoom || 1));
+      const camZProgress = (0.94 + zoomCycle * 0.14) * clampedZoom;
+      const camPitch = Math.max(-8, Math.min(8, 3 - zoomCycle * 5 + (_fx.pitch || 0) * 0.3));
+      const camYaw = Math.max(-8, Math.min(8, Math.sin(t * 0.85) * 3.5 + (_fx.yaw || 0) * 0.3));
+      const camRoll = Math.max(-6, Math.min(6, (_fx.roll || 0) * 0.3));
 
       const plate = fxContainer?.querySelector(`#fx-spatial-plate-${tplId}`);
       const grid = fxContainer?.querySelector(`#fx-spatial-grid-${tplId}`);
-      const rays = fxContainer?.querySelector(`#fx-spatial-rays-${tplId}`);
       const card1 = fxContainer?.querySelector(`#fx-spatial-card1-${tplId}`);
       const card2 = fxContainer?.querySelector(`#fx-spatial-card2-${tplId}`);
 
-      // Tier 2 Central Gold-Bevel Headline stays 100% inside safe viewport frustum
       if (plate) {
         plate.style.transform = `scale(${camZProgress.toFixed(3)}) rotateY(${camYaw.toFixed(2)}deg) rotateX(${camPitch.toFixed(2)}deg) rotateZ(${camRoll.toFixed(2)}deg)`;
       }
-      // Tier 3 Horizon Grid glides smoothly with perspective depth
       if (grid) {
-        const gridZ = -18 - zoomCycle * 28;
-        grid.style.transform = `rotateX(74deg) translateZ(${gridZ.toFixed(1)}px) translateY(${(zoomCycle * 10).toFixed(1)}px)`;
+        const gridZ = -15 - zoomCycle * 32;
+        grid.style.transform = `rotateX(75deg) translateZ(${gridZ.toFixed(1)}px) translateY(${(zoomCycle * 14).toFixed(1)}px)`;
       }
-      if (rays) {
-        rays.style.opacity = (0.72 + Math.sin(t * 1.4) * 0.18).toFixed(2);
-      }
-      // Tier 1 Flanking Frosted-Glass Image/Dossier Slates stay in outer parallax corridors with f/2.8 bokeh
+      // Flanking plates glide outward along the left & right corridor walls so camera moves cleanly in the middle
       if (card1) {
-        const c1Scale = 1.02 - zoomCycle * 0.14;
-        const c1X = -zoomCycle * 6;
-        const c1Y = Math.sin(t * 1.5) * 3.5;
-        const dofBlur1 = (0.45 + (1 - zoomCycle) * 0.65).toFixed(2);
-        card1.style.transform = `translate3d(${c1X.toFixed(1)}px, ${c1Y.toFixed(1)}px, 0) scale(${c1Scale.toFixed(3)}) rotateY(${(16 + camYaw * 0.4).toFixed(1)}deg) rotateX(6deg)`;
-        card1.style.filter = `blur(${dofBlur1}px)`;
+        const c1Scale = 0.88 + zoomCycle * 0.22;
+        const c1X = -zoomCycle * 10;
+        const c1Y = Math.sin(t * 1.4) * 3;
+        card1.style.transform = `translate3d(${c1X.toFixed(1)}px, ${c1Y.toFixed(1)}px, 0) scale(${c1Scale.toFixed(3)}) rotateY(${(28 + camYaw * 0.35).toFixed(1)}deg) rotateX(3deg)`;
       }
       if (card2) {
-        const c2Scale = 1.02 - zoomCycle * 0.14;
-        const c2X = zoomCycle * 6;
-        const c2Y = -Math.sin(t * 1.5) * 3.5;
-        const dofBlur2 = (0.45 + zoomCycle * 0.65).toFixed(2);
-        card2.style.transform = `translate3d(${c2X.toFixed(1)}px, ${c2Y.toFixed(1)}px, 0) scale(${c2Scale.toFixed(3)}) rotateY(${(-16 + camYaw * 0.4).toFixed(1)}deg) rotateX(-5deg)`;
-        card2.style.filter = `blur(${dofBlur2}px)`;
+        const c2Scale = 0.88 + (1 - zoomCycle) * 0.22;
+        const c2X = (1 - zoomCycle) * 10;
+        const c2Y = -Math.sin(t * 1.4) * 3;
+        card2.style.transform = `translate3d(${c2X.toFixed(1)}px, ${c2Y.toFixed(1)}px, 0) scale(${c2Scale.toFixed(3)}) rotateY(${(-28 + camYaw * 0.35).toFixed(1)}deg) rotateX(-2deg)`;
       }
     } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
       const yellowBar = fxContainer?.querySelector(`#fx-doc-hl-yellow-${tplId}`);
@@ -40426,29 +40388,29 @@ function modalAddNextSceneAction() {
 
 /* =========================================================
    3D SPATIAL MOTION SUITE: THREE.JS FULL RUNTIME CONTROLLER
-   (JAMES JANI DOCUMENTARY BENCHMARK: FRUSTUM-CLAMPED CAMERA RIG,
-    GOLD-BEVEL SHADER, FROSTED DARK-GLASS IMAGE/OBJECT ARTIFACTS,
-    VOLUMETRIC HORIZON FOG & SHALLOW f/2.8 DEPTH OF FIELD)
+   (CLEAN DARK ENVIRONMENT, REAL PHOTOGRAPHIC EVIDENCE PLATES,
+    AND TRUE CENTER-CORRIDOR FLY-THROUGH BETWEEN FLANKING OBJECTS)
    ========================================================= */
 const SPATIAL_PRESETS = {
   'docu-essay': [
-    { id: '1', type: 'text', title: 'THE SYSTEM', subtitle: 'CHAPTER I // ARCHITECTS OF POWER', body: '', z: 450, x: 0, y: 20, scale: 1.15, color: '#D4AF37' },
-    { id: '2', type: 'card', artifactMode: 'image', visualTheme: 'treasury-scan', imageUrl: '', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL MICROFILM: EXECUTIVE AUDIT #409 VERIFIED & SEALED.', z: -450, x: -520, y: 145, scale: 0.96, color: '#D4AF37' },
-    { id: '3', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'CHAPTER II // UNSEEN MARKET LEVERS', body: '', z: -1450, x: 0, y: 10, scale: 1.12, color: '#D4AF37' },
-    { id: '4', type: 'card', artifactMode: 'image', visualTheme: 'monopoly-ledger', imageUrl: '', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'OFFSHORE CLEARING HOUSE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN SOVEREIGN TRANSFERS.', z: -2450, x: 520, y: -125, scale: 0.98, color: '#D4AF37' },
-    { id: '5', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'FINAL ACT // THE GLOBAL RESET', body: '', z: -3600, x: 0, y: 15, scale: 1.22, color: '#D4AF37' }
+    { id: '1', type: 'text', title: 'THE SYSTEM', subtitle: 'MANIPULATION & CONTROL', body: '', z: 350, x: 0, y: 15, scale: 1.15, color: '#f59e0b' },
+    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: -350, x: -740, y: 65, scale: 1.0, color: '#f59e0b' },
+    { id: '3', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: -1050, x: 740, y: -45, scale: 1.0, color: '#38bdf8' },
+    { id: '4', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'UNSEEN MARKET LEVERS', body: '', z: -1850, x: 0, y: 15, scale: 1.15, color: '#d97706' },
+    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SOVEREIGN AUDIT FILE', subtitle: 'EXHIBIT C // CENTRAL BANK', body: 'CLASSIFIED CLEARING HOUSE RECORDS & WIRE TELEMETRY.', z: -2650, x: -740, y: 50, scale: 1.0, color: '#ef4444' },
+    { id: '6', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'THE GLOBAL RESET', body: '', z: -3550, x: 0, y: 15, scale: 1.25, color: '#f59e0b' }
   ],
   'cyber-matrix': [
-    { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initSovereignMatrix() {\n  const frustum = clampOpticalBounds(FOV);\n  return new QuantLedger(frustum);\n}', z: 500, x: -480, y: 130, scale: 0.95, color: '#10b981' },
-    { id: '2', type: 'text', title: 'ALGORITHMIC EMPIRE', subtitle: 'HIGH-FREQUENCY SOVEREIGNTY', body: '', z: -650, x: 0, y: 15, scale: 1.15, color: '#D4AF37' },
-    { id: '3', type: 'card', artifactMode: 'object', objectGeometry: 'globe', visualTheme: 'network-nodes', title: 'NEURAL LIQUIDITY MESH', subtitle: 'DARK POOL TELEMETRY', body: 'Autonomous high-dimensional routing across 14,200 institutional nodes.', z: -1850, x: 500, y: -110, scale: 0.98, color: '#38bdf8' },
-    { id: '4', type: 'text', title: 'QUANTUM MONOPOLY', subtitle: 'ZERO-LATENCY CONTROL', body: '', z: -3200, x: 0, y: 10, scale: 1.2, color: '#D4AF37' }
+    { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 400, x: -720, y: 70, scale: 0.95, color: '#10b981' },
+    { id: '2', type: 'text', title: 'ALGORITHMIC', subtitle: 'SYNTHETIC LIQUIDITY', body: '', z: -550, x: 0, y: 15, scale: 1.2, color: '#10b981' },
+    { id: '3', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'NEURAL FEED', subtitle: 'SYNTHETIC REALITY', body: 'Deep spatial neural pathways floating in high dimensional tensor spaces.', z: -1650, x: 720, y: -40, scale: 1.0, color: '#38bdf8' },
+    { id: '4', type: 'text', title: 'QUANTUM REACH', subtitle: 'ZERO-LATENCY CONTROL', body: '', z: -2900, x: 0, y: 15, scale: 1.25, color: '#06b6d4' }
   ],
   'philosophy': [
-    { id: '1', type: 'card', artifactMode: 'image', visualTheme: 'archival-plate', title: 'EPISODE I // THE CAVE', subtitle: 'THE ILLUSION OF CONSENSUS', body: 'We mistake the shadow projected on the wall for the machinery behind it.', z: 450, x: -490, y: 135, scale: 0.96, color: '#D4AF37' },
-    { id: '2', type: 'text', title: 'THE AWAKENING', subtitle: 'PART I // PERCEPTION & REALITY', body: '', z: -950, x: 0, y: 15, scale: 1.18, color: '#D4AF37' },
-    { id: '3', type: 'card', artifactMode: 'object', objectGeometry: 'octahedron', visualTheme: 'archival-plate', title: 'THE PARADOX OF ORDER', subtitle: 'ARCHITECTURAL ARCHIVE', body: 'True control requires no walls when the boundaries are invisible.', z: -2150, x: 500, y: -115, scale: 0.98, color: '#D4AF37' },
-    { id: '4', type: 'text', title: 'BEYOND THE HORIZON', subtitle: 'EPILOGUE // FIRST PRINCIPLES', body: '', z: -3400, x: 0, y: 10, scale: 1.22, color: '#D4AF37' }
+    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'EPISODE I', subtitle: 'THE SEARCH FOR TRUTH', body: 'We spend our entire lives mistaking the shadow on the wall for the reality in front of us.', z: 350, x: -720, y: 60, scale: 1.0, color: '#eab308' },
+    { id: '2', type: 'text', title: 'AWAKENING', subtitle: 'BEYOND PERCEPTION', body: '', z: -850, x: 0, y: 15, scale: 1.25, color: '#eab308' },
+    { id: '3', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'THE PARADOX', subtitle: 'PLATO\'S CAVE', body: 'Freedom is not the absence of boundaries, but the total awareness of them.', z: -1950, x: 720, y: -40, scale: 1.0, color: '#a855f7' },
+    { id: '4', type: 'text', title: 'BEYOND HORIZON', subtitle: 'FIRST PRINCIPLES', body: '', z: -3200, x: 0, y: 15, scale: 1.25, color: '#f59e0b' }
   ]
 };
 
@@ -40459,26 +40421,24 @@ let spatial3DState = {
   elements3D: [],
   particlesMesh: null,
   floorGrid: null,
-  volumetricGroup: null,
   ambientLight: null,
   pointLight: null,
-  rimLight: null,
   animId: null,
   isPlaying: true,
   flightMode: 'zoomthrough', // 'zoomthrough', 'pullback', 'orbit'
   currentTime: 0, // 0 to 1
   mouse: { x: 0, y: 0 },
   activePreset: 'docu-essay',
-  camSpeed: 1.2,
-  camDrift: 28,
+  camSpeed: 1.35,
+  camDrift: 25,
   camPitch: 2,
   camYaw: 0,
-  fovWarp: 50,
+  fovWarp: 52,
   audioEnabled: false,
   audioCtx: null,
   lastZPassCheck: 1200,
   fogDensity: 45,
-  lightIntensity: 110,
+  lightIntensity: 100,
   vignetteAmount: 80,
   gridVisible: true,
   dustVisible: true,
@@ -40486,11 +40446,20 @@ let spatial3DState = {
 };
 
 const _spatialImageTexCache = {};
+// Preload default documentary photographs so they appear instantaneously
+['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg', '/cctv_surveillance_scene.jpg', '/paper_tear_gold_standard.jpg', '/power_meeting_cinematic_plate.jpg'].forEach(u => {
+  if (typeof Image !== 'undefined') {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.onload = () => { _spatialImageTexCache[u] = im; };
+    im.src = u;
+  }
+});
 
-function setSpatialGroupOpacity(obj, opacity, dofFactor) {
+function setSpatialGroupOpacity(obj, opacity) {
   if (!obj) return;
   const clampedOp = Math.max(0, Math.min(1, opacity));
-  obj.visible = clampedOp > 0.015;
+  obj.visible = clampedOp > 0.01;
   obj.traverse(child => {
     if (child.isMesh || child.isLineSegments || child.isPoints) {
       const mats = Array.isArray(child.material) ? child.material : [child.material];
@@ -40506,16 +40475,9 @@ function setSpatialGroupOpacity(obj, opacity, dofFactor) {
         m.transparent = true;
       });
     }
-    // Animate specular sweep bar & 3D artifact object rotation
-    if (child.userData && child.userData.isSpecularSweep) {
-      child.position.x = Math.sin(performance.now() * 0.0012 + (obj.position.z * 0.002)) * 220;
-    }
     if (child.userData && child.userData.isRotatingArtifact) {
-      child.rotation.y += 0.008;
-      child.rotation.x += 0.004;
-    }
-    if (child.userData && child.userData.isDofHalo && dofFactor !== undefined) {
-      child.material.opacity = Math.max(0, Math.min(0.42, dofFactor * 0.35 * clampedOp));
+      child.rotation.y += 0.01;
+      child.rotation.x += 0.005;
     }
   });
 }
@@ -40523,7 +40485,7 @@ function setSpatialGroupOpacity(obj, opacity, dofFactor) {
 function createSpatialTextPlane(item) {
   const canvas = document.createElement('canvas');
   canvas.width = 1600;
-  canvas.height = 420;
+  canvas.height = 380;
   const ctx = canvas.getContext('2d');
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -40531,10 +40493,9 @@ function createSpatialTextPlane(item) {
   const titleText = String(item.title || 'THE SYSTEM').toUpperCase();
   const subText = String(item.subtitle || '').toUpperCase();
   const cx = canvas.width / 2;
-  const cy = subText ? 175 : 210;
+  const cy = subText ? 155 : 190;
 
-  // Dynamic font sizing so long titles ("MANIPULATION & CONTROL") never clip canvas edges
-  let fontSize = 86;
+  let fontSize = 84;
   ctx.font = `900 ${fontSize}px "Cinzel", "Times New Roman", Georgia, serif`;
   while (ctx.measureText(titleText).width > canvas.width - 180 && fontSize > 44) {
     fontSize -= 4;
@@ -40544,80 +40505,47 @@ function createSpatialTextPlane(item) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // 1. Ambient Occlusion Deep Drop Shadow
+  // Deep crisp shadow (no muddy glow)
   ctx.save();
   ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-  ctx.shadowBlur = 32;
-  ctx.shadowOffsetY = 18;
-  ctx.fillStyle = '#1c1004';
-  ctx.fillText(titleText, cx, cy + 7);
+  ctx.shadowBlur = 24;
+  ctx.shadowOffsetY = 12;
+  ctx.fillStyle = '#261404';
+  ctx.fillText(titleText, cx, cy + 5);
   ctx.restore();
 
-  // 2. 3D Metallic Bevel Extrusion Stack (Normal-map style stepped depth)
-  const bevelColors = ['#2e1905', '#4a2908', '#6b3c0c', '#8c5212', '#523009'];
-  for (let b = bevelColors.length - 1; b >= 0; b--) {
-    ctx.fillStyle = bevelColors[b];
-    ctx.fillText(titleText, cx, cy + (b + 1) * 1.4);
-  }
+  // Subtle 3D bevel extrusion
+  ctx.fillStyle = '#5c3409';
+  ctx.fillText(titleText, cx, cy + 3);
+  ctx.fillStyle = '#854d0e';
+  ctx.fillText(titleText, cx, cy + 1.5);
 
-  // 3. Primary Gold Bevel Shader Gradient (#D4AF37 Documentary Benchmark)
-  const goldGrad = ctx.createLinearGradient(cx - 500, cy - fontSize * 0.6, cx + 500, cy + fontSize * 0.6);
-  goldGrad.addColorStop(0.0, '#fff9d2');
-  goldGrad.addColorStop(0.22, '#D4AF37');
-  goldGrad.addColorStop(0.45, '#fef08a');
-  goldGrad.addColorStop(0.68, '#9a6b16');
-  goldGrad.addColorStop(0.85, '#D4AF37');
-  goldGrad.addColorStop(1.0, '#fef3c7');
+  // Crisp Gold Foil Gradient
+  const goldGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+  goldGrad.addColorStop(0.0, '#fef08a');
+  goldGrad.addColorStop(0.3, '#d97706');
+  goldGrad.addColorStop(0.55, '#fde68a');
+  goldGrad.addColorStop(0.8, '#b45309');
+  goldGrad.addColorStop(1.0, '#f59e0b');
 
-  ctx.save();
-  ctx.shadowColor = 'rgba(212, 175, 55, 0.38)';
-  ctx.shadowBlur = 22;
   ctx.fillStyle = goldGrad;
   ctx.fillText(titleText, cx, cy);
-  ctx.restore();
 
-  // 4. Micro-Specular Top Edge Rim Highlight
-  ctx.save();
-  ctx.lineWidth = 1.6;
-  const rimGrad = ctx.createLinearGradient(cx - 450, cy - 30, cx + 450, cy + 10);
-  rimGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
-  rimGrad.addColorStop(0.5, 'rgba(255, 252, 230, 0.78)');
-  rimGrad.addColorStop(1, 'rgba(255, 255, 255, 0.15)');
-  ctx.strokeStyle = rimGrad;
-  ctx.strokeText(titleText, cx, cy - 0.8);
-  ctx.restore();
-
-  // 5. Golden Ratio Divider Rule & Diamond Glint
-  const ruleY = cy + fontSize * 0.68;
-  const ruleHalfW = Math.min(520, Math.max(220, ctx.measureText(titleText).width * 0.45));
-  const ruleGrad = ctx.createLinearGradient(cx - ruleHalfW, ruleY, cx + ruleHalfW, ruleY);
-  ruleGrad.addColorStop(0, 'rgba(212, 175, 55, 0)');
-  ruleGrad.addColorStop(0.25, 'rgba(212, 175, 55, 0.75)');
-  ruleGrad.addColorStop(0.5, '#fef08a');
-  ruleGrad.addColorStop(0.75, 'rgba(212, 175, 55, 0.75)');
-  ruleGrad.addColorStop(1, 'rgba(212, 175, 55, 0)');
-
-  ctx.fillStyle = ruleGrad;
-  ctx.fillRect(cx - ruleHalfW, ruleY - 1.2, ruleHalfW * 2, 2.4);
-
-  // Center diamond ornament
-  ctx.fillStyle = '#fef08a';
-  ctx.beginPath();
-  ctx.moveTo(cx, ruleY - 6);
-  ctx.lineTo(cx + 7, ruleY);
-  ctx.lineTo(cx, ruleY + 6);
-  ctx.lineTo(cx - 7, ruleY);
-  ctx.closePath();
-  ctx.fill();
-
-  // 6. Tracked Documentary Subtitle
   if (subText) {
-    ctx.font = '700 24px "Inter", -apple-system, sans-serif';
-    ctx.fillStyle = '#cbd5e1';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-    ctx.shadowBlur = 10;
-    const spacedSub = subText.split('').join(' ');
-    ctx.fillText(spacedSub, cx, ruleY + 46);
+    // Sleek horizontal divider line tightly coupled to the title
+    const ruleY = cy + 54;
+    const ruleHalfW = 240;
+    const ruleGrad = ctx.createLinearGradient(cx - ruleHalfW, ruleY, cx + ruleHalfW, ruleY);
+    ruleGrad.addColorStop(0, 'rgba(217, 119, 6, 0)');
+    ruleGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.85)');
+    ruleGrad.addColorStop(1, 'rgba(217, 119, 6, 0)');
+    ctx.fillStyle = ruleGrad;
+    ctx.fillRect(cx - ruleHalfW, ruleY, ruleHalfW * 2, 2);
+
+    ctx.font = '600 22px "Inter", -apple-system, sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    const trackedSub = subText.split('').join(' ');
+    ctx.fillText(trackedSub, cx, ruleY + 34);
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -40631,38 +40559,11 @@ function createSpatialTextPlane(item) {
   material.userData = { baseOpacity: 1.0 };
 
   const sc = item.scale || 1;
-  const planeW = 860 * sc;
-  const planeH = 226 * sc;
-  const group = new THREE.Group();
-
-  // Back ambient glow halo for volumetric rim lighting
-  const haloCanvas = document.createElement('canvas');
-  haloCanvas.width = 256;
-  haloCanvas.height = 128;
-  const hctx = haloCanvas.getContext('2d');
-  const hgrad = hctx.createRadialGradient(128, 64, 8, 128, 64, 120);
-  hgrad.addColorStop(0, 'rgba(212, 175, 55, 0.28)');
-  hgrad.addColorStop(0.55, 'rgba(180, 83, 9, 0.08)');
-  hgrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  hctx.fillStyle = hgrad;
-  hctx.fillRect(0, 0, 256, 128);
-  const haloTex = new THREE.CanvasTexture(haloCanvas);
-  const haloMat = new THREE.MeshBasicMaterial({
-    map: haloTex,
-    transparent: true,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-  haloMat.userData = { baseOpacity: 0.85 };
-  const haloMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW * 1.25, planeH * 1.7), haloMat);
-  haloMesh.position.z = -8;
-  group.add(haloMesh);
-
-  const mainMesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), material);
-  group.add(mainMesh);
-
-  group.position.set(item.x || 0, item.y || 0, item.z || 0);
-  group.userData = {
+  const planeW = 820 * sc;
+  const planeH = 195 * sc;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), material);
+  mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
+  mesh.userData = {
     id: item.id || Date.now().toString(),
     type: 'text',
     title: item.title || 'THE SYSTEM',
@@ -40677,9 +40578,9 @@ function createSpatialTextPlane(item) {
     scale: sc,
     planeWidth: planeW,
     planeHeight: planeH,
-    color: item.color || '#D4AF37'
+    color: item.color || '#f59e0b'
   };
-  return group;
+  return mesh;
 }
 
 function wrapSpatialCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
@@ -40699,300 +40600,130 @@ function wrapSpatialCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
   ctx.fillText(line, x, y);
 }
 
-function drawArchivalVisualPlate(ctx, vx, vy, vw, vh, item, loadedImg) {
-  ctx.save();
-  // Clip to archival image frame
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(vx, vy, vw, vh, 8);
-  else ctx.rect(vx, vy, vw, vh);
-  ctx.clip();
-
-  // Deep slate archival plate base
-  const bg = ctx.createRadialGradient(vx + vw * 0.5, vy + vh * 0.4, 10, vx + vw * 0.5, vy + vh * 0.5, vw * 0.85);
-  bg.addColorStop(0, '#162038');
-  bg.addColorStop(0.65, '#0b101d');
-  bg.addColorStop(1, '#05070e');
-  ctx.fillStyle = bg;
-  ctx.fillRect(vx, vy, vw, vh);
-
-  if (loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
-    // Draw custom or archival photograph with high-contrast documentary grading
-    const imgRatio = loadedImg.naturalWidth / loadedImg.naturalHeight;
-    const boxRatio = vw / vh;
-    let dw = vw, dh = vh, dx = vx, dy = vy;
-    if (imgRatio > boxRatio) {
-      dw = vh * imgRatio;
-      dx = vx - (dw - vw) * 0.5;
-    } else {
-      dh = vw / imgRatio;
-      dy = vy - (dh - vh) * 0.5;
-    }
-    ctx.globalAlpha = 0.88;
-    ctx.drawImage(loadedImg, dx, dy, dw, dh);
-    ctx.globalAlpha = 1.0;
-    // Warm sepia/slate documentary duotone wash
-    const wash = ctx.createLinearGradient(vx, vy, vx, vy + vh);
-    wash.addColorStop(0, 'rgba(15, 23, 42, 0.35)');
-    wash.addColorStop(0.5, 'rgba(212, 175, 55, 0.12)');
-    wash.addColorStop(1, 'rgba(5, 8, 17, 0.78)');
-    ctx.fillStyle = wash;
-    ctx.fillRect(vx, vy, vw, vh);
-  } else {
-    // Procedural High-Detail Archival Microfilm / Documentary Evidence Plate
-    const theme = item.visualTheme || ((item.title || '').includes('LEDGER') ? 'monopoly-ledger' : 'treasury-scan');
-    // Subtle microfilm grid lines
-    ctx.strokeStyle = 'rgba(212, 175, 55, 0.11)';
-    ctx.lineWidth = 1;
-    for (let gx = vx; gx < vx + vw; gx += 24) {
-      ctx.beginPath(); ctx.moveTo(gx, vy); ctx.lineTo(gx, vy + vh); ctx.stroke();
-    }
-    for (let gy = vy; gy < vy + vh; gy += 24) {
-      ctx.beginPath(); ctx.moveTo(vx, gy); ctx.lineTo(vx + vw, gy); ctx.stroke();
-    }
-
-    if (theme === 'monopoly-ledger') {
-      // Offshore Capital Flow Bar & Liquidity Trajectory Evidence
-      const bars = [0.32, 0.48, 0.41, 0.67, 0.58, 0.88, 0.76, 0.94];
-      const bw = (vw - 56) / bars.length;
-      bars.forEach((b, idx) => {
-        const bh = b * (vh * 0.58);
-        const bx = vx + 28 + idx * bw;
-        const by = vy + vh - 38 - bh;
-        const bGrad = ctx.createLinearGradient(bx, by, bx, vy + vh - 38);
-        bGrad.addColorStop(0, idx === 5 || idx === 7 ? '#fef08a' : '#D4AF37');
-        bGrad.addColorStop(1, 'rgba(212, 175, 55, 0.18)');
-        ctx.fillStyle = bGrad;
-        ctx.fillRect(bx + 3, by, bw - 8, bh);
-      });
-      // Liquidity curve overlay
-      ctx.strokeStyle = '#fef08a';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      bars.forEach((b, idx) => {
-        const px = vx + 28 + idx * bw + (bw - 8) * 0.5;
-        const py = vy + vh - 38 - b * (vh * 0.58) - 10;
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.stroke();
-    } else {
-      // Declassified Treasury Microfilm Scan & Architectural Seal
-      ctx.strokeStyle = 'rgba(212, 175, 55, 0.45)';
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      ctx.arc(vx + vw * 0.5, vy + vh * 0.42, 46, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(vx + vw * 0.5, vy + vh * 0.42, 34, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Redacted microfilm strips
-      ctx.fillStyle = 'rgba(226, 232, 240, 0.22)';
-      ctx.fillRect(vx + 24, vy + vh - 96, vw - 48, 8);
-      ctx.fillRect(vx + 24, vy + vh - 80, vw - 84, 8);
-      ctx.fillStyle = 'rgba(212, 175, 55, 0.55)';
-      ctx.fillRect(vx + 24, vy + vh - 64, vw - 64, 10);
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-      ctx.fillRect(vx + 68, vy + vh - 97, 92, 10);
-
-      // Signal waveform
-      ctx.strokeStyle = '#D4AF37';
-      ctx.lineWidth = 2.2;
-      ctx.beginPath();
-      const pts = [0.65, 0.52, 0.58, 0.35, 0.44, 0.22, 0.30];
-      pts.forEach((p, idx) => {
-        const px = vx + 26 + (idx / (pts.length - 1)) * (vw - 52);
-        const py = vy + 30 + p * (vh * 0.45);
-        if (idx === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      });
-      ctx.stroke();
-    }
-  }
-
-  // Archival Viewfinder Corner Brackets
-  const cl = 14;
-  ctx.strokeStyle = 'rgba(254, 240, 138, 0.75)';
-  ctx.lineWidth = 2;
-  // TL
-  ctx.beginPath(); ctx.moveTo(vx + 8, vy + 8 + cl); ctx.lineTo(vx + 8, vy + 8); ctx.lineTo(vx + 8 + cl, vy + 8); ctx.stroke();
-  // TR
-  ctx.beginPath(); ctx.moveTo(vx + vw - 8 - cl, vy + 8); ctx.lineTo(vx + vw - 8, vy + 8); ctx.lineTo(vx + vw - 8, vy + 8 + cl); ctx.stroke();
-  // BL
-  ctx.beginPath(); ctx.moveTo(vx + 8, vy + vh - 8 - cl); ctx.lineTo(vx + 8, vy + vh - 8); ctx.lineTo(vx + 8 + cl, vy + vh - 8); ctx.stroke();
-  // BR
-  ctx.beginPath(); ctx.moveTo(vx + vw - 8 - cl, vy + vh - 8); ctx.lineTo(vx + vw - 8, vy + vh - 8); ctx.lineTo(vx + vw - 8, vy + vh - 8 - cl); ctx.stroke();
-
-  // Outer frame border
-  ctx.strokeStyle = 'rgba(212, 175, 55, 0.48)';
-  ctx.lineWidth = 1.5;
-  ctx.strokeRect(vx + 1, vy + 1, vw - 2, vh - 2);
-  ctx.restore();
-}
-
 function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
   const H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  const accent = item.color || '#D4AF37';
+  const accent = item.color || '#f59e0b';
   const mode = item.artifactMode || (item.type === 'object' ? 'object' : 'image');
 
-  // 1. Frosted Dark-Glass Slate Surface (#0b1120 -> #151f35)
-  const glassGrad = ctx.createLinearGradient(0, 0, W, H);
-  glassGrad.addColorStop(0, 'rgba(22, 31, 50, 0.94)');
-  glassGrad.addColorStop(0.5, 'rgba(12, 18, 32, 0.91)');
-  glassGrad.addColorStop(1, 'rgba(7, 11, 21, 0.96)');
-
-  ctx.fillStyle = glassGrad;
+  // Card Base: Clean Dark Slate Dossier Frame
+  ctx.fillStyle = 'rgba(11, 15, 25, 0.96)';
   ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(12, 12, W - 24, H - 24, 18);
-  else ctx.rect(12, 12, W - 24, H - 24);
+  if (ctx.roundRect) ctx.roundRect(10, 10, W - 20, H - 20, 14);
+  else ctx.rect(10, 10, W - 20, H - 20);
   ctx.fill();
 
-  // 2. Diagonal Specular Glass Reflection Sheen
-  const sheenGrad = ctx.createLinearGradient(0, 0, W * 0.75, H * 0.75);
-  sheenGrad.addColorStop(0, 'rgba(255, 255, 255, 0.14)');
-  sheenGrad.addColorStop(0.32, 'rgba(212, 175, 55, 0.06)');
-  sheenGrad.addColorStop(0.55, 'rgba(255, 255, 255, 0.0)');
-  ctx.fillStyle = sheenGrad;
-  ctx.fill();
+  if (mode !== 'card' && loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
+    // Top 64% is the REAL Documentary Photograph (Full-bleed inside the top of the frame)
+    const imgH = Math.round((H - 20) * 0.64);
+    ctx.save();
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(12, 12, W - 24, imgH, [12, 12, 0, 0]);
+    else ctx.rect(12, 12, W - 24, imgH);
+    ctx.clip();
 
-  // 3. Top Archival Classification Bar
-  ctx.fillStyle = 'rgba(5, 8, 16, 0.78)';
-  ctx.fillRect(14, 14, W - 28, 48);
-  ctx.strokeStyle = 'rgba(212, 175, 55, 0.28)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(14, 62);
-  ctx.lineTo(W - 14, 62);
-  ctx.stroke();
+    const imgRatio = loadedImg.naturalWidth / loadedImg.naturalHeight;
+    const boxW = W - 24;
+    const boxRatio = boxW / imgH;
+    let dw = boxW, dh = imgH, dx = 12, dy = 12;
+    if (imgRatio > boxRatio) {
+      dw = imgH * imgRatio;
+      dx = 12 - (dw - boxW) * 0.5;
+    } else {
+      dh = boxW / imgRatio;
+      dy = 12 - (dh - imgH) * 0.35;
+    }
+    ctx.drawImage(loadedImg, dx, dy, dw, dh);
 
-  // Classification Eyebrow
-  ctx.font = '700 17px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#D4AF37';
-  ctx.fillText((item.subtitle || 'ARCHIVAL EVIDENCE // CLASSIFIED').toUpperCase(), 36, 44);
+    // Subtle bottom vignette blending photograph into the dark caption slate
+    const fadeGrad = ctx.createLinearGradient(0, 12 + imgH * 0.45, 0, 12 + imgH);
+    fadeGrad.addColorStop(0, 'rgba(11, 15, 25, 0)');
+    fadeGrad.addColorStop(1, 'rgba(11, 15, 25, 0.98)');
+    ctx.fillStyle = fadeGrad;
+    ctx.fillRect(12, 12, boxW, imgH);
+    ctx.restore();
 
-  // Microfilm Serial Code Right
-  ctx.font = '600 14px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#64748b';
-  ctx.textAlign = 'right';
-  ctx.fillText(mode === 'object' ? '3D ARTIFACT // RIG' : 'PLATE // f/2.8', W - 36, 44);
-  ctx.textAlign = 'left';
+    // Accent divider line under photograph
+    ctx.fillStyle = accent;
+    ctx.fillRect(28, 12 + imgH, W - 56, 2);
 
-  // 4. Left Archival Image / Evidence Plate (Default Image-First Layout)
-  const plateX = 34, plateY = 82, plateW = 280, plateH = H - 114;
-  if (mode !== 'card') {
-    drawArchivalVisualPlate(ctx, plateX, plateY, plateW, plateH, item, loadedImg);
+    // Lower Third Documentary Metadata
+    ctx.font = '700 16px "JetBrains Mono", monospace';
+    ctx.fillStyle = accent;
+    ctx.fillText((item.subtitle || 'DEPT. TREASURY // CLASSIFIED').toUpperCase(), 32, 12 + imgH + 30);
+
+    ctx.font = '800 30px "Cinzel", Georgia, serif';
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText((item.title || 'CONFIDENTIAL SCAN').toUpperCase(), 32, 12 + imgH + 68);
+
+    ctx.font = '400 17px "Inter", sans-serif';
+    ctx.fillStyle = '#94a3b8';
+    wrapSpatialCanvasText(ctx, item.body || '', 32, 12 + imgH + 102, W - 64, 24);
+  } else {
+    // Clean Tactile Text Dossier (when image is still loading or mode === 'card')
+    ctx.fillStyle = 'rgba(18, 24, 38, 0.95)';
+    ctx.fillRect(12, 12, W - 24, 54);
+
+    ctx.font = '700 18px "JetBrains Mono", monospace';
+    ctx.fillStyle = accent;
+    ctx.fillText((item.subtitle || 'DEPT. TREASURY // CLASSIFIED').toUpperCase(), 38, 46);
+
+    ctx.font = '800 38px "Cinzel", Georgia, serif';
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillText((item.title || 'CONFIDENTIAL SCAN').toUpperCase(), 38, 130);
+
+    ctx.fillStyle = accent;
+    ctx.fillRect(38, 155, 180, 2.5);
+
+    ctx.font = '400 22px "Inter", sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    wrapSpatialCanvasText(ctx, item.body || '', 38, 205, W - 76, 34);
   }
 
-  // 5. Right Documentary Typography & Telemetry Column
-  const textX = mode !== 'card' ? (plateX + plateW + 30) : 44;
-  const textMaxW = W - textX - 40;
-
-  ctx.font = '800 32px "Cinzel", Georgia, serif';
-  ctx.fillStyle = '#f8fafc';
-  wrapSpatialCanvasText(ctx, (item.title || 'CONFIDENTIAL SCAN').toUpperCase(), textX, 122, textMaxW, 38);
-
-  // Gold accent divider
-  const divGrad = ctx.createLinearGradient(textX, 0, textX + textMaxW, 0);
-  divGrad.addColorStop(0, '#D4AF37');
-  divGrad.addColorStop(0.7, 'rgba(212, 175, 55, 0.25)');
-  divGrad.addColorStop(1, 'rgba(212, 175, 55, 0)');
-  ctx.fillStyle = divGrad;
-  ctx.fillRect(textX, 182, textMaxW, 2);
-
-  // Body copy
-  ctx.font = '500 20px "Inter", sans-serif';
-  ctx.fillStyle = '#cbd5e1';
-  wrapSpatialCanvasText(ctx, item.body || 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', textX, 222, textMaxW, 30);
-
-  // Bottom Verification Stamp & Redaction Telemetry
-  const stampY = H - 72;
-  ctx.strokeStyle = 'rgba(220, 38, 38, 0.85)';
-  ctx.fillStyle = 'rgba(185, 28, 28, 0.16)';
-  ctx.lineWidth = 2;
+  // Crisp subtle border (no neon glow)
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
   ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(textX, stampY, 152, 34, 4);
-  else ctx.rect(textX, stampY, 152, 34);
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.font = '900 15px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#fca5a5';
-  ctx.fillText('VERIFIED // SEALED', textX + 14, stampY + 22);
-
-  // 6. Metallic Bevel Outer Rim & Inner Specular Border
-  const borderGrad = ctx.createLinearGradient(0, 0, W, H);
-  borderGrad.addColorStop(0, '#fef08a');
-  borderGrad.addColorStop(0.3, accent);
-  borderGrad.addColorStop(0.7, '#475569');
-  borderGrad.addColorStop(1, accent);
-
-  ctx.lineWidth = 3.5;
-  ctx.strokeStyle = borderGrad;
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(12, 12, W - 24, H - 24, 18);
-  else ctx.rect(12, 12, W - 24, H - 24);
+  if (ctx.roundRect) ctx.roundRect(10, 10, W - 20, H - 20, 14);
+  else ctx.rect(10, 10, W - 20, H - 20);
   ctx.stroke();
 }
 
 function createSpatialCardPlane(item) {
   const canvas = document.createElement('canvas');
-  canvas.width = 880;
+  canvas.width = 760;
   canvas.height = 480;
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.anisotropy = 4;
 
-  // Render initial procedural archival plate immediately
-  const cachedImg = item.imageUrl ? _spatialImageTexCache[item.imageUrl] : null;
+  const defaultPhotos = ['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg'];
+  const fallbackPhoto = defaultPhotos[Math.abs(parseInt(item.id || '1', 10)) % defaultPhotos.length];
+  const imgUrl = item.imageUrl !== undefined && item.imageUrl !== '' ? item.imageUrl : fallbackPhoto;
+
+  const cachedImg = _spatialImageTexCache[imgUrl];
   renderSpatialArtifactCanvas(canvas, item, cachedImg);
   texture.needsUpdate = true;
 
-  // If custom imageUrl is provided and not yet loaded, load asynchronously and refresh canvas texture
-  if (item.imageUrl && !cachedImg) {
+  if (imgUrl && (!cachedImg || !cachedImg.complete)) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      _spatialImageTexCache[item.imageUrl] = img;
+      _spatialImageTexCache[imgUrl] = img;
       renderSpatialArtifactCanvas(canvas, item, img);
       texture.needsUpdate = true;
     };
-    img.src = item.imageUrl;
+    img.src = imgUrl;
   }
 
   const sc = item.scale || 1;
-  const cardW = 580 * sc;
-  const cardH = 316 * sc;
+  const cardW = 520 * sc;
+  const cardH = 328 * sc;
   const group = new THREE.Group();
 
-  // 1. Deep 3D Drop-Shadow / Ambient Occlusion Backing Plate
-  const shadowMat = new THREE.MeshBasicMaterial({
-    color: 0x020409,
-    transparent: true,
-    opacity: 0.78,
-    depthWrite: false
-  });
-  shadowMat.userData = { baseOpacity: 0.78 };
-  const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW * 1.04, cardH * 1.06), shadowMat);
-  shadowMesh.position.set(item.x < 0 ? -10 : 10, -12, -14);
-  group.add(shadowMesh);
-
-  // 2. Physical 3D Metallic Bevel Slate Body
-  const bevelMat = new THREE.MeshBasicMaterial({
-    color: 0x292524,
-    transparent: true,
-    opacity: 0.9,
-    depthWrite: false
-  });
-  bevelMat.userData = { baseOpacity: 0.9 };
-  const bevelMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW * 1.012, cardH * 1.018), bevelMat);
-  bevelMesh.position.set(item.x < 0 ? -4 : 4, -4, -5);
-  group.add(bevelMesh);
-
-  // 3. Front Frosted Dark-Glass & Archival Image Slate
   const material = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
@@ -41003,113 +40734,79 @@ function createSpatialCardPlane(item) {
   const frontMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW, cardH), material);
   group.add(frontMesh);
 
-  // 4. Live Specular Light Sweep Bar across the glass slate
-  const sweepMat = new THREE.MeshBasicMaterial({
-    color: 0xfef08a,
-    transparent: true,
-    opacity: 0.09,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false
-  });
-  sweepMat.userData = { baseOpacity: 0.09 };
-  const sweepMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW * 0.16, cardH * 0.96), sweepMat);
-  sweepMesh.position.set(0, 0, 2);
-  sweepMesh.userData = { isSpecularSweep: true };
-  group.add(sweepMesh);
-
-  // 5. Optional 3D Geometric Artifact Object (when artifactMode === 'object' or type === 'object')
+  // Optional 3D Wireframe Object when artifactMode === 'object'
   const mode = item.artifactMode || (item.type === 'object' ? 'object' : 'image');
   if (mode === 'object') {
-    const objGroup = new THREE.Group();
-    const geomType = item.objectGeometry || 'octahedron';
-    let geom;
-    if (geomType === 'globe') {
-      geom = new THREE.IcosahedronGeometry(62 * sc, 2);
-    } else if (geomType === 'torus') {
-      geom = new THREE.TorusKnotGeometry(42 * sc, 10 * sc, 64, 12);
-    } else {
-      geom = new THREE.OctahedronGeometry(60 * sc, 1);
-    }
+    const geom = new THREE.IcosahedronGeometry(55 * sc, 1);
     const wireMat = new THREE.MeshBasicMaterial({
-      color: 0xD4AF37,
+      color: 0xf59e0b,
       wireframe: true,
       transparent: true,
       opacity: 0.85
     });
     wireMat.userData = { baseOpacity: 0.85 };
-    const coreMat = new THREE.MeshBasicMaterial({
-      color: 0x0f172a,
-      transparent: true,
-      opacity: 0.72
-    });
-    coreMat.userData = { baseOpacity: 0.72 };
-    objGroup.add(new THREE.Mesh(geom, coreMat));
-    objGroup.add(new THREE.Mesh(geom, wireMat));
-    objGroup.position.set(-cardW * 0.27, -10 * sc, 28);
-    objGroup.userData = { isRotatingArtifact: true };
-    group.add(objGroup);
+    const wireMesh = new THREE.Mesh(geom, wireMat);
+    wireMesh.position.set(0, 40 * sc, 30);
+    wireMesh.userData = { isRotatingArtifact: true };
+    group.add(wireMesh);
   }
 
-  // Slight inward cinematic tilt toward the central optical axis
-  const baseTiltY = (item.x || 0) < -80 ? 0.16 : ((item.x || 0) > 80 ? -0.16 : 0);
+  // Angle flanking plates inward along the left and right walls of the corridor (true gallery fly-through)
+  const sideSign = (item.x || 0) < 0 ? -1 : 1;
+  const baseTiltY = sideSign < 0 ? 0.38 : -0.38; // ~22 degrees inward toward the center aisle
   group.rotation.y = baseTiltY;
 
-  group.position.set(item.x || 0, item.y || 0, item.z || 0);
+  group.position.set(item.x || (sideSign * 740), item.y || 0, item.z || 0);
   group.userData = {
     id: item.id || Date.now().toString(),
     type: item.type || 'card',
     artifactMode: mode,
-    visualTheme: item.visualTheme || 'treasury-scan',
-    imageUrl: item.imageUrl || '',
-    objectGeometry: item.objectGeometry || 'octahedron',
+    imageUrl: imgUrl,
     title: item.title || 'CONFIDENTIAL SCAN',
     subtitle: item.subtitle || '',
     body: item.body || '',
     initialZ: item.z || 0,
-    baseX: item.x || 0,
+    baseX: item.x || (sideSign * 740),
     baseY: item.y || 0,
     baseRotY: baseTiltY,
-    x: item.x || 0,
+    x: item.x || (sideSign * 740),
     y: item.y || 0,
     z: item.z || 0,
     scale: sc,
     planeWidth: cardW,
     planeHeight: cardH,
-    color: item.color || '#D4AF37'
+    color: item.color || '#f59e0b'
   };
   return group;
 }
 
 function createSpatialCodePlane(item) {
   const canvas = document.createElement('canvas');
-  canvas.width = 760;
-  canvas.height = 420;
+  canvas.width = 700;
+  canvas.height = 400;
   const ctx = canvas.getContext('2d');
 
-  const codeColor = item.color || '#D4AF37';
+  const codeColor = item.color || '#10b981';
 
-  const grad = ctx.createLinearGradient(0, 0, 760, 420);
-  grad.addColorStop(0, 'rgba(15, 23, 42, 0.94)');
-  grad.addColorStop(1, 'rgba(7, 11, 21, 0.96)');
-  ctx.fillStyle = grad;
+  ctx.fillStyle = 'rgba(6, 9, 15, 0.95)';
   ctx.beginPath();
   if (ctx.roundRect) {
-    ctx.roundRect(10, 10, 740, 400, 16);
+    ctx.roundRect(10, 10, 680, 380, 16);
   } else {
-    ctx.rect(10, 10, 740, 400);
+    ctx.rect(10, 10, 680, 380);
   }
   ctx.fill();
 
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2;
   ctx.strokeStyle = codeColor;
   ctx.stroke();
 
   ctx.fillStyle = codeColor;
   ctx.font = 'bold 20px "JetBrains Mono", monospace';
-  ctx.fillText('> ' + (item.title || 'TERMINAL_TRACE.LOG'), 40, 52);
+  ctx.fillText('> ' + item.title, 40, 50);
 
   ctx.font = '18px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#e2e8f0';
+  ctx.fillStyle = '#6ee7b7';
   const lines = (item.text || item.body || '').split('\n');
   lines.forEach((line, i) => {
     ctx.fillText(line, 40, 110 + (i * 32));
@@ -41125,10 +40822,10 @@ function createSpatialCodePlane(item) {
   material.userData = { baseOpacity: 1.0 };
 
   const sc = item.scale || 1;
-  const planeGeo = new THREE.PlaneGeometry(540 * sc, 300 * sc);
+  const planeGeo = new THREE.PlaneGeometry(520 * sc, 295 * sc);
   const mesh = new THREE.Mesh(planeGeo, material);
-  const baseTiltY = (item.x || 0) < -80 ? 0.15 : ((item.x || 0) > 80 ? -0.15 : 0);
-  mesh.rotation.y = baseTiltY;
+  const sideSign = (item.x || 0) < 0 ? -1 : 1;
+  mesh.rotation.y = sideSign < 0 ? 0.35 : -0.35;
   mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
   mesh.userData = {
     id: item.id || Date.now().toString(),
@@ -41138,13 +40835,12 @@ function createSpatialCodePlane(item) {
     initialZ: item.z || 0,
     baseX: item.x || 0,
     baseY: item.y || 0,
-    baseRotY: baseTiltY,
     x: item.x || 0,
     y: item.y || 0,
     z: item.z || 0,
     scale: sc,
-    planeWidth: 540 * sc,
-    planeHeight: 300 * sc,
+    planeWidth: 520 * sc,
+    planeHeight: 295 * sc,
     color: codeColor,
     text: item.text || item.body || '',
     subtitle: '',
@@ -41154,34 +40850,22 @@ function createSpatialCodePlane(item) {
 }
 
 function buildSpatialDustParticles(scene) {
-  const particleCount = 950;
+  const particleCount = 600;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
-  const colors = new Float32Array(particleCount * 3);
-
-  const goldCol = new THREE.Color(0xfde68a);
-  const amberCol = new THREE.Color(0xd97706);
-  const slateCol = new THREE.Color(0x94a3b8);
 
   for (let i = 0; i < particleCount * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 3800;
-    positions[i + 1] = (Math.random() - 0.5) * 2200;
-    positions[i + 2] = (Math.random() - 0.5) * 7500 - 1600;
-
-    const pick = Math.random();
-    const c = pick < 0.55 ? goldCol : (pick < 0.82 ? amberCol : slateCol);
-    colors[i] = c.r;
-    colors[i + 1] = c.g;
-    colors[i + 2] = c.b;
+    positions[i] = (Math.random() - 0.5) * 4000;
+    positions[i + 1] = (Math.random() - 0.5) * 2600;
+    positions[i + 2] = (Math.random() - 0.5) * 7500 - 1800;
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
   const material = new THREE.PointsMaterial({
-    size: 6.0,
-    vertexColors: true,
+    color: 0xcbd5e1,
+    size: 4.5,
     transparent: true,
-    opacity: 0.72,
+    opacity: 0.45,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
@@ -41191,91 +40875,19 @@ function buildSpatialDustParticles(scene) {
   return dust;
 }
 
-function buildSpatialVolumetricEnvironment(scene) {
-  const envGroup = new THREE.Group();
-
-  // 1. Deep Horizon Volumetric Amber & Slate Glow Backdrop
-  const bgCanvas = document.createElement('canvas');
-  bgCanvas.width = 512;
-  bgCanvas.height = 512;
-  const bctx = bgCanvas.getContext('2d');
-  const rad = bctx.createRadialGradient(256, 280, 10, 256, 260, 250);
-  rad.addColorStop(0, 'rgba(212, 175, 55, 0.34)');
-  rad.addColorStop(0.35, 'rgba(180, 83, 9, 0.14)');
-  rad.addColorStop(0.7, 'rgba(15, 23, 42, 0.08)');
-  rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  bctx.fillStyle = rad;
-  bctx.fillRect(0, 0, 512, 512);
-  const bgTex = new THREE.CanvasTexture(bgCanvas);
-
-  // Place volumetric fog curtains at multiple depth tiers so the background is never an empty black void
-  [-900, -2100, -3400, -4800].forEach((zDepth, idx) => {
-    const fogMat = new THREE.MeshBasicMaterial({
-      map: bgTex,
-      transparent: true,
-      opacity: idx === 3 ? 0.85 : 0.42,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    const scale = 3400 + idx * 900;
-    const fogPlane = new THREE.Mesh(new THREE.PlaneGeometry(scale * 1.6, scale), fogMat);
-    fogPlane.position.set(0, -80, zDepth);
-    envGroup.add(fogPlane);
-  });
-
-  // 2. Upward Volumetric Light Ray Cones (Emitted from Horizon Grid)
-  const rayCanvas = document.createElement('canvas');
-  rayCanvas.width = 256;
-  rayCanvas.height = 512;
-  const rctx = rayCanvas.getContext('2d');
-  const rgrad = rctx.createLinearGradient(128, 512, 128, 0);
-  rgrad.addColorStop(0, 'rgba(212, 175, 55, 0.22)');
-  rgrad.addColorStop(0.45, 'rgba(254, 240, 138, 0.07)');
-  rgrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  rctx.fillStyle = rgrad;
-  rctx.beginPath();
-  rctx.moveTo(20, 512);
-  rctx.lineTo(95, 0);
-  rctx.lineTo(161, 0);
-  rctx.lineTo(236, 512);
-  rctx.closePath();
-  rctx.fill();
-  const rayTex = new THREE.CanvasTexture(rayCanvas);
-
-  [-400, -1600, -2800, -4000].forEach((rz, i) => {
-    const rayMat = new THREE.MeshBasicMaterial({
-      map: rayTex,
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-      depthWrite: false
-    });
-    const rayMesh = new THREE.Mesh(new THREE.PlaneGeometry(1800, 1600), rayMat);
-    rayMesh.position.set((i % 2 === 0 ? -1 : 1) * 180, 160, rz);
-    rayMesh.rotation.z = (i % 2 === 0 ? -0.12 : 0.12);
-    envGroup.add(rayMesh);
-  });
-
-  scene.add(envGroup);
-  return envGroup;
-}
-
 function loadSpatialPreset(presetKey) {
   spatial3DState.activePreset = presetKey;
   const scene = spatial3DState.scene;
   if (!scene) return;
 
-  // Clear existing planes
   spatial3DState.elements3D.forEach(obj => scene.remove(obj));
   spatial3DState.elements3D = [];
 
-  // Update preset buttons styling
   document.querySelectorAll('.btn-spatial-preset').forEach(btn => {
     const isAct = btn.dataset.preset === presetKey;
-    btn.style.background = isAct ? 'rgba(212,175,55,0.22)' : 'rgba(18,19,28,0.8)';
-    btn.style.borderColor = isAct ? 'rgba(212,175,55,0.65)' : 'rgba(255,255,255,0.1)';
-    btn.style.color = isAct ? '#fef08a' : '#94a3b8';
+    btn.style.background = isAct ? 'rgba(168,85,247,0.25)' : 'rgba(18,19,28,0.8)';
+    btn.style.borderColor = isAct ? 'rgba(168,85,247,0.6)' : 'rgba(255,255,255,0.1)';
+    btn.style.color = isAct ? '#e9d5ff' : '#94a3b8';
   });
 
   const items = SPATIAL_PRESETS[presetKey] || SPATIAL_PRESETS['docu-essay'];
@@ -41304,20 +40916,19 @@ function renderSpatialLayerList() {
     const u = mesh.userData;
     const div = document.createElement('div');
     div.style.cssText = "background: #121520; padding: 10px 12px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; font-size: 11px; transition: border-color 0.15s;";
-    const dotColor = u.color || '#D4AF37';
-    const badgeLabel = u.type === 'text' ? '3D TITLE' : (u.artifactMode === 'object' ? '3D OBJECT' : (u.type === 'code' ? 'CODE' : 'IMAGE SLATE'));
+    const dotColor = u.color || (u.type === 'text' ? '#f59e0b' : u.type === 'card' ? '#3b82f6' : '#10b981');
 
     div.innerHTML = `
       <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; cursor: pointer;" class="spatial-layer-info-btn" data-index="${index}" title="Click to edit layer">
         <span style="width: 8px; height: 8px; border-radius: 50%; background: ${dotColor}; flex-shrink: 0; box-shadow: 0 0 6px ${dotColor};"></span>
         <div style="overflow: hidden;">
           <div style="font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">${u.title}</div>
-          <div style="font-size: 9.5px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">${badgeLabel} • X:${Math.round(mesh.position.x)} Y:${Math.round(mesh.position.y)}</div>
+          <div style="font-size: 9.5px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">X:${Math.round(u.baseX !== undefined ? u.baseX : mesh.position.x)} Y:${Math.round(u.baseY !== undefined ? u.baseY : mesh.position.y)}</div>
         </div>
       </div>
       <div style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8;">
-        <span style="color: #fef08a; font-weight: 700;">Z: ${Math.round(mesh.position.z)}</span>
-        <button type="button" class="btn-edit-spatial-layer" data-index="${index}" style="background: rgba(212,175,55,0.16); border: 1px solid rgba(212,175,55,0.45); color: #fef08a; border-radius: 5px; cursor: pointer; padding: 2px 7px; font-size: 10px; font-weight: 600;" title="Edit coordinates, text & artifact mode">Edit</button>
+        <span style="color: #c084fc; font-weight: 700;">Z: ${Math.round(mesh.position.z)}</span>
+        <button type="button" class="btn-edit-spatial-layer" data-index="${index}" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #e9d5ff; border-radius: 5px; cursor: pointer; padding: 2px 7px; font-size: 10px; font-weight: 600;" title="Edit coordinates, text & color">Edit</button>
         <button type="button" class="btn-remove-spatial-layer" data-index="${index}" style="background: transparent; border: none; color: #f43f5e; cursor: pointer; padding: 2px 5px; font-size: 12px;" title="Delete plane">\u2715</button>
       </div>
     `;
@@ -41368,15 +40979,15 @@ function openLayerEditorModal(index = -1) {
     if (textInput) textInput.value = u.title || '';
     if (subInput) subInput.value = u.subtitle || '';
     if (bodyInput) bodyInput.value = u.body || u.text || '';
-    if (colorInput) colorInput.value = u.color || '#D4AF37';
+    if (colorInput) colorInput.value = u.color || '#f59e0b';
 
     const curZ = Math.round(mesh.position.z);
     if (zSlider) zSlider.value = curZ;
     if (zValDisplay) zValDisplay.textContent = curZ;
     if (posZInput) posZInput.value = curZ;
 
-    if (posXInput) posXInput.value = Math.round(mesh.position.x);
-    if (posYInput) posYInput.value = Math.round(mesh.position.y);
+    if (posXInput) posXInput.value = Math.round(u.baseX !== undefined ? u.baseX : mesh.position.x);
+    if (posYInput) posYInput.value = Math.round(u.baseY !== undefined ? u.baseY : mesh.position.y);
     if (scaleSlider) scaleSlider.value = (u.scale || 1.0).toFixed(1);
     if (scaleValDisplay) scaleValDisplay.textContent = `${(u.scale || 1.0).toFixed(1)}x`;
 
@@ -41384,15 +40995,15 @@ function openLayerEditorModal(index = -1) {
   } else {
     if (modalTitle) modalTitle.textContent = 'Add 3D Spatial Element';
     if (typeSelect) typeSelect.value = 'card';
-    if (textInput) textInput.value = 'ARCHIVAL EVIDENCE PLATE';
+    if (textInput) textInput.value = 'ARCHIVAL EVIDENCE';
     if (subInput) subInput.value = 'DEPT. TREASURY // CLASSIFIED';
-    if (bodyInput) bodyInput.value = 'Declassified microfilm plate verifying offshore sovereign capital transfers.';
-    if (colorInput) colorInput.value = '#D4AF37';
-    if (zSlider) zSlider.value = -1950;
-    if (zValDisplay) zValDisplay.textContent = -1950;
-    if (posZInput) posZInput.value = -1950;
-    if (posXInput) posXInput.value = -500;
-    if (posYInput) posYInput.value = 120;
+    if (bodyInput) bodyInput.value = 'Declassified photographic record verified under executive audit.';
+    if (colorInput) colorInput.value = '#f59e0b';
+    if (zSlider) zSlider.value = -1500;
+    if (zValDisplay) zValDisplay.textContent = -1500;
+    if (posZInput) posZInput.value = -1500;
+    if (posXInput) posXInput.value = -740;
+    if (posYInput) posYInput.value = 60;
     if (scaleSlider) scaleSlider.value = 1.0;
     if (scaleValDisplay) scaleValDisplay.textContent = '1.0x';
     if (extraFields) extraFields.style.display = 'flex';
@@ -41500,147 +41111,101 @@ function updateSpatialHUDTelemetry() {
 }
 
 function updateSpatialCameraPosition() {
-  const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw, elements3D, pointLight } = spatial3DState;
+  const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw, elements3D } = spatial3DState;
   if (!camera) return;
 
   const driftFactor = Math.max(0, Math.min(1, camDrift / 100));
 
-  // Find the active focal headline plane in front of the camera so we can clamp the frustum
-  let focalPlane = null;
-  let bestFocalDist = Infinity;
-
   if (flightMode === 'zoomthrough') {
-    // Bounded Dolly Flight from Z=1350 to Z=-2750 (keeps the final title in hero framing at t=1)
-    const targetZ = 1350 - (currentTime * 4100);
-    // Gentle S-curve drift clamped strictly to the golden ratio corridor
-    const rawDriftX = Math.sin(currentTime * Math.PI * 2) * (58 * driftFactor) + (mouse.x * 22);
-    const rawDriftY = Math.cos(currentTime * Math.PI * 2) * (32 * driftFactor) + (-mouse.y * 16);
+    // Smooth dolly straight down the center corridor (from Z=1250 to Z=-2750)
+    const targetZ = 1250 - (currentTime * 4000);
+    // Keep camera in the center aisle so it flies cleanly BETWEEN the left and right photographic plates
+    const targetX = Math.sin(currentTime * Math.PI * 2) * (36 * driftFactor) + (mouse.x * 18);
+    const targetY = Math.cos(currentTime * Math.PI * 2) * (20 * driftFactor) + (-mouse.y * 12);
 
     camera.position.z += (targetZ - camera.position.z) * 0.12;
+    camera.position.x += (targetX - camera.position.x) * 0.1;
+    camera.position.y += (targetY - camera.position.y) * 0.1;
 
-    // Identify nearest upcoming headline text plane for frustum clamping
-    for (let i = 0; i < elements3D.length; i++) {
-      const m = elements3D[i];
-      if (m.userData && m.userData.type === 'text') {
-        const dz = camera.position.z - m.position.z;
-        if (dz > 280 && dz < bestFocalDist) {
-          bestFocalDist = dz;
-          focalPlane = m;
-        }
-      }
-    }
-
-    // Frustum Clamping: guarantee headline text stays 100% inside visible viewport boundaries
-    let clampedX = rawDriftX;
-    let clampedY = rawDriftY;
-    let maxYawRad = 0.045;
-    let maxPitchRad = 0.04;
-
-    if (focalPlane) {
-      const dist = Math.max(520, camera.position.z - focalPlane.position.z);
-      const halfFovRad = (camera.fov * 0.5) * (Math.PI / 180);
-      const frustumHalfH = Math.tan(halfFovRad) * dist;
-      const frustumHalfW = frustumHalfH * (camera.aspect || 1.777);
-      const textHalfW = ((focalPlane.userData.planeWidth || 860) * 0.5) * 0.88;
-      const textHalfH = ((focalPlane.userData.planeHeight || 220) * 0.5) * 0.88;
-
-      const safeMarginX = Math.max(12, (frustumHalfW - textHalfW) * 0.65);
-      const safeMarginY = Math.max(10, (frustumHalfH - textHalfH) * 0.65);
-
-      clampedX = Math.max(-safeMarginX, Math.min(safeMarginX, rawDriftX));
-      clampedY = Math.max(-safeMarginY, Math.min(safeMarginY, rawDriftY));
-      maxYawRad = Math.min(0.055, safeMarginX / Math.max(800, dist));
-      maxPitchRad = Math.min(0.045, safeMarginY / Math.max(800, dist));
-    }
-
-    camera.position.x += (clampedX - camera.position.x) * 0.1;
-    camera.position.y += (clampedY - camera.position.y) * 0.1;
-
-    const userPitchRad = Math.max(-maxPitchRad, Math.min(maxPitchRad, (camPitch * Math.PI / 180) * 0.35 + (-mouse.y * 0.025)));
-    const userYawRad = Math.max(-maxYawRad, Math.min(maxYawRad, (camYaw * Math.PI / 180) * 0.35 + (-mouse.x * 0.025)));
-
-    // Steer camera gently toward the active focal headline center so it never truncates off-screen
-    const lookX = focalPlane ? focalPlane.position.x * 0.85 : 0;
-    const lookY = focalPlane ? focalPlane.position.y * 0.85 : 0;
-    const lookZ = camera.position.z - 1100;
-    camera.lookAt(lookX, lookY, lookZ);
-    camera.rotation.x += userPitchRad;
-    camera.rotation.y += userYawRad;
+    camera.lookAt(0, 15, camera.position.z - 1000);
+    camera.rotation.x += Math.max(-0.04, Math.min(0.04, (camPitch * Math.PI / 180) * 0.3 + (-mouse.y * 0.02)));
+    camera.rotation.y += Math.max(-0.04, Math.min(0.04, (camYaw * Math.PI / 180) * 0.3 + (-mouse.x * 0.02)));
 
     checkSpatialZPassWhoosh(camera.position.z);
   } else if (flightMode === 'pullback') {
-    // James Jani Reveal Pullback: starts framed on deep headline (-2500) and pulls back to wide master shot (1350)
-    const targetZ = -2500 + (currentTime * 3850);
-    const targetX = Math.cos(currentTime * Math.PI * 1.5) * (52 * driftFactor);
-    const targetY = Math.sin(currentTime * Math.PI * 1.5) * (28 * driftFactor);
+    const targetZ = -2600 + (currentTime * 3850);
+    const targetX = Math.cos(currentTime * Math.PI * 1.5) * (36 * driftFactor);
+    const targetY = Math.sin(currentTime * Math.PI * 1.5) * (20 * driftFactor);
 
     camera.position.z += (targetZ - camera.position.z) * 0.12;
     camera.position.x += (targetX - camera.position.x) * 0.08;
     camera.position.y += (targetY - camera.position.y) * 0.08;
-    camera.lookAt(0, 10, camera.position.z - 1200);
-    camera.rotation.x += Math.max(-0.05, Math.min(0.05, (camPitch * Math.PI / 180) * 0.35));
-    camera.rotation.y += Math.max(-0.05, Math.min(0.05, (camYaw * Math.PI / 180) * 0.35));
+    camera.lookAt(0, 15, camera.position.z - 1000);
+    camera.rotation.x += Math.max(-0.04, Math.min(0.04, (camPitch * Math.PI / 180) * 0.3));
+    camera.rotation.y += Math.max(-0.04, Math.min(0.04, (camYaw * Math.PI / 180) * 0.3));
   } else if (flightMode === 'orbit') {
-    // Controlled Cinematic Arc Orbit around the central thesis corridor
-    const angle = (currentTime - 0.5) * Math.PI * 0.55;
-    const radius = 1650;
-    camera.position.x = Math.sin(angle) * radius * 0.55;
-    camera.position.z = -1450 + Math.cos(angle) * radius;
-    camera.position.y = 85 + Math.sin(currentTime * Math.PI * 2) * 60;
-    camera.lookAt(0, 10, -1450);
+    const angle = (currentTime - 0.5) * Math.PI * 0.5;
+    const radius = 1550;
+    camera.position.x = Math.sin(angle) * radius * 0.5;
+    camera.position.z = -1400 + Math.cos(angle) * radius;
+    camera.position.y = 60 + Math.sin(currentTime * Math.PI * 2) * 45;
+    camera.lookAt(0, 15, -1400);
   }
 
-  // Move warm volumetric key light along with camera focal zone
-  if (pointLight) {
-    pointLight.position.set(camera.position.x * 0.4, 180, camera.position.z - 950);
-  }
-
-  // Per-Layer Proximity Pass-Through Dissolve, Parallax Corridor Parting & Shallow f/2.8 Depth of Field
+  // Per-Layer Corridor Placement & Sequential Focal Visibility Window
+  // Ensures:
+  // 1) Camera flies IN THE MIDDLE between flanking left/right photographic plates (cards never sit behind center text)
+  // 2) Only ONE hero title is visible in the center focal zone at a time (next title emerges only as current title passes)
   for (let i = 0; i < elements3D.length; i++) {
     const obj = elements3D[i];
     const u = obj.userData || {};
-    const distInFront = camera.position.z - obj.position.z; // > 0 means in front of camera
+    const distInFront = camera.position.z - obj.position.z;
 
-    // 1. Smooth optical fade-out BEFORE hitting the camera lens (eliminates awkward pass-through clipping!)
     let opacity = 1.0;
-    let passPartOffset = 0;
 
-    if (distInFront <= 180) {
-      // Behind or right at camera lens: completely dissolved
-      opacity = 0.0;
-    } else if (distInFront < 560) {
-      // Smooth hermite fade as camera glides through (560 -> 180)
-      const tFade = (distInFront - 180) / (560 - 180);
-      opacity = tFade * tFade * (3 - 2 * tFade);
-      // Flanking artifacts gently part outward as camera passes so they never block the lens
-      if (u.type !== 'text') {
-        const dir = (u.baseX || 0) < 0 ? -1 : 1;
-        passPartOffset = dir * (1 - opacity) * 140;
+    if (u.type === 'text') {
+      // Hero Title Focal Window:
+      // - Fades out smoothly before hitting camera lens (distInFront: 480 -> 220)
+      // - Fully sharp in focal window (distInFront: 480 .. 1350)
+      // - Veiled in deep darkness when far behind the current title (distInFront > 1400 -> 0 by 1950)
+      //   so two titles NEVER stack on top of each other!
+      if (distInFront <= 220) {
+        opacity = 0.0;
+      } else if (distInFront < 480) {
+        const t = (distInFront - 220) / (480 - 220);
+        opacity = t * t * (3 - 2 * t);
+      } else if (distInFront > 1950) {
+        opacity = 0.0;
+      } else if (distInFront > 1350) {
+        const t = 1.0 - (distInFront - 1350) / (1950 - 1350);
+        opacity = t * t * (3 - 2 * t);
       }
-    } else if (distInFront > 3600) {
-      // Far horizon atmospheric fade-in
-      const tFar = Math.max(0, 1 - (distInFront - 3600) / 1800);
-      opacity = tFar * tFar * (3 - 2 * tFar);
+      obj.position.x = u.baseX || 0;
+      obj.position.y = u.baseY || 15;
+    } else {
+      // Flanking Photographic Evidence Plates (Left & Right Corridor Walls):
+      // Enforce wide lateral corridor clearance proportional to distance so cards ALWAYS frame the left & right sides
+      // and NEVER project behind the center text!
+      const rawX = u.baseX !== undefined ? u.baseX : obj.position.x;
+      const sideSign = rawX < 0 ? -1 : 1;
+      const minCorridorHalfWidth = Math.max(Math.abs(rawX), 680, Math.max(0, distInFront) * 0.44);
+      obj.position.x = sideSign * minCorridorHalfWidth;
+      obj.position.y = (u.baseY || 0) + Math.sin(performance.now() * 0.0012 + i * 1.5) * 8;
+
+      if (distInFront <= 140) {
+        opacity = 0.0;
+      } else if (distInFront < 420) {
+        const t = (distInFront - 140) / (420 - 140);
+        opacity = t * t * (3 - 2 * t);
+      } else if (distInFront > 3200) {
+        opacity = 0.0;
+      } else if (distInFront > 2200) {
+        const t = 1.0 - (distInFront - 2200) / (3200 - 2200);
+        opacity = t * t * (3 - 2 * t);
+      }
     }
 
-    // 2. Shallow f/2.8 Lens Depth-of-Field Attenuation (focal sweet spot around 850..1450 units in front)
-    const focalError = Math.abs(distInFront - 1050);
-    const dofFactor = Math.max(0, Math.min(1, (focalError - 350) / 1600));
-    if (u.type !== 'text') {
-      // Peripheral document slates recede softly into bokeh when out of focal plane
-      opacity *= (1.0 - dofFactor * 0.22);
-    }
-
-    // Apply subtle floating motion + outward pass-through parting
-    const floatPhase = performance.now() * 0.001 + i * 1.7;
-    if (u.baseX !== undefined) {
-      obj.position.x = u.baseX + passPartOffset + (u.type !== 'text' ? Math.cos(floatPhase * 0.7) * 8 : 0);
-    }
-    if (u.baseY !== undefined) {
-      obj.position.y = u.baseY + (u.type !== 'text' ? Math.sin(floatPhase) * 10 : Math.sin(floatPhase * 0.6) * 4);
-    }
-
-    setSpatialGroupOpacity(obj, opacity, dofFactor);
+    setSpatialGroupOpacity(obj, opacity);
   }
 
   updateSpatialHUDTelemetry();
@@ -41663,46 +41228,37 @@ function initSpatialThreeJSEngine() {
   const h = container.clientHeight || 500;
 
   const scene = new THREE.Scene();
-  // Cohesive Deep Slate-Navy Documentary Background (No dead black void)
-  scene.background = new THREE.Color(0x060913);
-  scene.fog = new THREE.FogExp2(0x060913, 0.00026);
+  // Clean, High-Contrast Deep Dark Background (Restored — No Muddy Yellow Triangles)
+  scene.background = new THREE.Color(0x07080c);
+  scene.fog = new THREE.FogExp2(0x07080c, 0.00032);
 
-  const camera = new THREE.PerspectiveCamera(50, w / h, 10, 10000);
-  camera.position.set(0, 20, 1350);
+  const camera = new THREE.PerspectiveCamera(52, w / h, 10, 10000);
+  camera.position.set(0, 15, 1250);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
   renderer.setSize(w, h);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x060913, 1.0);
+  renderer.setClearColor(0x07080c, 1.0);
 
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
 
-  // Documentary Lighting Rig: Warm Gold Key + Slate Fill + Amber Horizon Rim
-  const ambientLight = new THREE.AmbientLight(0xfef3c7, 0.95);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
   scene.add(ambientLight);
 
-  const dirLight = new THREE.DirectionalLight(0xD4AF37, 1.35);
-  dirLight.position.set(400, 900, 1200);
+  const dirLight = new THREE.DirectionalLight(0xf59e0b, 1.1);
+  dirLight.position.set(500, 1000, 1000);
   scene.add(dirLight);
 
-  const pointLight = new THREE.PointLight(0xf59e0b, 1.8, 3800);
-  pointLight.position.set(0, 180, -800);
+  const pointLight = new THREE.PointLight(0x38bdf8, 1.2, 3500);
+  pointLight.position.set(0, 0, -2000);
   scene.add(pointLight);
 
-  // Full-Horizon Perspective Floor Grid (Warm Gold #D4AF37 Center & Dark Slate #1e293b Grid)
-  const floorGrid = new THREE.GridHelper(14000, 70, 0xD4AF37, 0x1e293b);
-  floorGrid.position.set(0, -480, -1800);
-  if (floorGrid.material) {
-    const mats = Array.isArray(floorGrid.material) ? floorGrid.material : [floorGrid.material];
-    mats.forEach(m => { m.transparent = true; m.opacity = 0.42; m.depthWrite = false; });
-  }
+  // Clean Architectural Perspective Floor Grid
+  const floorGrid = new THREE.GridHelper(10000, 50, 0x334155, 0x111827);
+  floorGrid.position.set(0, -520, -1500);
   scene.add(floorGrid);
 
-  // Volumetric Fog Curtains & Upward Horizon Light Rays
-  const volumetricGroup = buildSpatialVolumetricEnvironment(scene);
-
-  // Warm Gold & Slate Floating Dust Motes
   const particlesMesh = buildSpatialDustParticles(scene);
 
   spatial3DState.scene = scene;
@@ -41710,7 +41266,6 @@ function initSpatialThreeJSEngine() {
   spatial3DState.renderer = renderer;
   spatial3DState.particlesMesh = particlesMesh;
   spatial3DState.floorGrid = floorGrid;
-  spatial3DState.volumetricGroup = volumetricGroup;
   spatial3DState.ambientLight = ambientLight;
   spatial3DState.pointLight = pointLight;
 
@@ -41724,7 +41279,7 @@ function initSpatialThreeJSEngine() {
 
   function animateSpatialEngine() {
     if (spatial3DState.isPlaying) {
-      spatial3DState.currentTime += 0.0018 * spatial3DState.camSpeed;
+      spatial3DState.currentTime += 0.002 * spatial3DState.camSpeed;
       if (spatial3DState.currentTime > 1) spatial3DState.currentTime = 0;
       const slider = document.getElementById('spatial-timeline-slider');
       if (slider) slider.value = spatial3DState.currentTime * 100;

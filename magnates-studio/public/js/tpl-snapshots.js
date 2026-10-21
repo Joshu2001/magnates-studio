@@ -51,127 +51,65 @@
     'spatial-3d-motion-suite': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
-          <linearGradient id="bg-sp" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#050811"/>
-            <stop offset="48%" stop-color="#0b1222"/>
-            <stop offset="78%" stop-color="#131824"/>
-            <stop offset="100%" stop-color="#06080f"/>
-          </linearGradient>
-          <radialGradient id="vol-fog-sp" cx="50%" cy="54%" r="65%">
-            <stop offset="0%" stop-color="rgba(212,175,55,0.26)"/>
-            <stop offset="42%" stop-color="rgba(180,83,9,0.12)"/>
-            <stop offset="75%" stop-color="rgba(15,23,42,0.08)"/>
-            <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+          <radialGradient id="bg-sp" cx="50%" cy="45%" r="70%">
+            <stop offset="0%" stop-color="#0d121f"/>
+            <stop offset="65%" stop-color="#06080f"/>
+            <stop offset="100%" stop-color="#020306"/>
           </radialGradient>
-          <linearGradient id="godray-up-sp" x1="50%" y1="100%" x2="50%" y2="0%">
-            <stop offset="0%" stop-color="rgba(212,175,55,0.24)"/>
-            <stop offset="55%" stop-color="rgba(212,175,55,0.06)"/>
-            <stop offset="100%" stop-color="rgba(212,175,55,0)"/>
-          </linearGradient>
           <linearGradient id="gold-foil" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#fff6c2"/>
-            <stop offset="22%" stop-color="#D4AF37"/>
-            <stop offset="48%" stop-color="#fef08a"/>
-            <stop offset="72%" stop-color="#aa771c"/>
+            <stop offset="0%" stop-color="#fef08a"/>
+            <stop offset="30%" stop-color="#d97706"/>
+            <stop offset="55%" stop-color="#fde68a"/>
+            <stop offset="80%" stop-color="#b45309"/>
             <stop offset="100%" stop-color="#f59e0b"/>
-          </linearGradient>
-          <linearGradient id="slate-glass" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="rgba(22,30,46,0.92)"/>
-            <stop offset="50%" stop-color="rgba(13,18,30,0.88)"/>
-            <stop offset="100%" stop-color="rgba(8,12,22,0.95)"/>
-          </linearGradient>
-          <linearGradient id="glass-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.16)"/>
-            <stop offset="35%" stop-color="rgba(212,175,55,0.08)"/>
-            <stop offset="55%" stop-color="rgba(255,255,255,0)"/>
           </linearGradient>
           <filter id="heavy-ao" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="rgba(0,0,0,0.95)"/>
-            <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="rgba(212,175,55,0.22)"/>
-          </filter>
-          <filter id="dof-bokeh-sp" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="0.9" result="blur"/>
-            <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="rgba(0,0,0,0.9)"/>
           </filter>
         </defs>
         <rect width="400" height="225" fill="url(#bg-sp)"/>
-        <rect width="400" height="225" fill="url(#vol-fog-sp)"/>
 
-        <!-- Volumetric Upward Light Rays from Horizon Grid -->
-        <polygon points="60,225 155,95 245,95 340,225" fill="url(#godray-up-sp)" opacity="0.85"/>
-        <polygon points="-20,225 120,100 175,100 95,225" fill="url(#godray-up-sp)" opacity="0.45"/>
-        <polygon points="305,225 225,100 280,100 420,225" fill="url(#godray-up-sp)" opacity="0.45"/>
-
-        <!-- Full-Depth Horizon Perspective Grid Floor with Atmospheric Fade -->
-        <g stroke="rgba(212,175,55,0.18)" stroke-width="0.8">
-          <line x1="200" y1="112" x2="-140" y2="225"/>
-          <line x1="200" y1="112" x2="-40" y2="225"/>
-          <line x1="200" y1="112" x2="45" y2="225"/>
-          <line x1="200" y1="112" x2="125" y2="225"/>
-          <line x1="200" y1="112" x2="200" y2="225"/>
-          <line x1="200" y1="112" x2="275" y2="225"/>
-          <line x1="200" y1="112" x2="355" y2="225"/>
-          <line x1="200" y1="112" x2="440" y2="225"/>
-          <line x1="200" y1="112" x2="540" y2="225"/>
-          <line x1="80" y1="126" x2="320" y2="126" stroke="rgba(212,175,55,0.08)"/>
-          <line x1="40" y1="142" x2="360" y2="142" stroke="rgba(212,175,55,0.12)"/>
-          <line x1="0" y1="162" x2="400" y2="162" stroke="rgba(212,175,55,0.16)"/>
-          <line x1="-20" y1="186" x2="420" y2="186" stroke="rgba(212,175,55,0.22)"/>
-          <line x1="-40" y1="214" x2="440" y2="214" stroke="rgba(212,175,55,0.28)"/>
-        </g>
-        <ellipse cx="200" cy="112" rx="170" ry="18" fill="rgba(212,175,55,0.14)"/>
-
-        <!-- Tier 1 Left: 3D Beveled Dark-Glass Archival Image & Dossier Slate (Safe Upper-Left Corridor, f/2.8 Bokeh) -->
-        <g transform="translate(16, 20) rotate(-3)" filter="url(#dof-bokeh-sp)" opacity="0.92">
-          <rect x="-2" y="3" width="114" height="56" rx="4" fill="#05070c" stroke="rgba(212,175,55,0.25)" stroke-width="0.8"/>
-          <rect width="114" height="56" rx="4" fill="url(#slate-glass)" stroke="rgba(212,175,55,0.55)" stroke-width="1"/>
-          <rect width="114" height="56" rx="4" fill="url(#glass-sheen)"/>
-          <rect x="6" y="14" width="36" height="36" rx="2" fill="#0c1322" stroke="rgba(212,175,55,0.35)" stroke-width="0.6"/>
-          <line x1="10" y1="22" x2="38" y2="22" stroke="rgba(212,175,55,0.5)" stroke-width="1.5"/>
-          <polyline points="10,43 17,35 24,39 31,27 38,30" fill="none" stroke="#D4AF37" stroke-width="1.2"/>
-          <circle cx="31" cy="27" r="1.8" fill="#fef08a"/>
-          <text x="6" y="10" fill="#D4AF37" font-family="monospace" font-size="4.8" font-weight="700" letter-spacing="0.8">DEPT. TREASURY // ARCHIVE</text>
-          <text x="47" y="24" fill="#f8fafc" font-family="Georgia, serif" font-size="7.2" font-weight="700">CONFIDENTIAL SCAN</text>
-          <text x="47" y="33" fill="#94a3b8" font-family="monospace" font-size="5">EXHIBIT A-19 // FILM</text>
-          <rect x="47" y="38" width="44" height="11" rx="1.5" fill="rgba(185,28,28,0.18)" stroke="#dc2626" stroke-width="0.8"/>
-          <text x="69" y="45.5" fill="#fca5a5" font-family="monospace" font-size="5.5" font-weight="900" letter-spacing="0.8" text-anchor="middle">VERIFIED</text>
+        <!-- Clean Perspective Floor Grid -->
+        <g stroke="rgba(148,163,184,0.08)" stroke-width="0.9">
+          <line x1="200" y1="115" x2="-120" y2="225"/>
+          <line x1="200" y1="115" x2="-20" y2="225"/>
+          <line x1="200" y1="115" x2="65" y2="225"/>
+          <line x1="200" y1="115" x2="135" y2="225"/>
+          <line x1="200" y1="115" x2="200" y2="225"/>
+          <line x1="200" y1="115" x2="265" y2="225"/>
+          <line x1="200" y1="115" x2="335" y2="225"/>
+          <line x1="200" y1="115" x2="420" y2="225"/>
+          <line x1="200" y1="115" x2="520" y2="225"/>
+          <line x1="40" y1="145" x2="360" y2="145"/>
+          <line x1="0" y1="175" x2="400" y2="175"/>
+          <line x1="-20" y1="205" x2="420" y2="205"/>
         </g>
 
-        <!-- Tier 1 Right: 3D Beveled Dark-Glass Financial Ledger & Evidence Slate (Safe Lower-Right Corridor, f/2.8 Bokeh) -->
-        <g transform="translate(270, 148) rotate(3)" filter="url(#dof-bokeh-sp)" opacity="0.92">
-          <rect x="2" y="3" width="114" height="56" rx="4" fill="#05070c" stroke="rgba(212,175,55,0.25)" stroke-width="0.8"/>
-          <rect width="114" height="56" rx="4" fill="url(#slate-glass)" stroke="rgba(212,175,55,0.5)" stroke-width="1"/>
-          <rect width="114" height="56" rx="4" fill="url(#glass-sheen)"/>
-          <rect x="6" y="14" width="36" height="36" rx="2" fill="#0c1322" stroke="rgba(212,175,55,0.35)" stroke-width="0.6"/>
-          <rect x="10" y="35" width="5" height="11" fill="rgba(212,175,55,0.45)"/>
-          <rect x="18" y="29" width="5" height="17" fill="rgba(212,175,55,0.65)"/>
-          <rect x="26" y="20" width="5" height="26" fill="#D4AF37"/>
-          <rect x="34" y="25" width="4" height="21" fill="rgba(212,175,55,0.5)"/>
-          <text x="6" y="10" fill="#D4AF37" font-family="monospace" font-size="4.6" font-weight="700" letter-spacing="0.6">FINANCIAL MONOPOLY LEDGER</text>
-          <text x="47" y="24" fill="#f8fafc" font-family="Georgia, serif" font-size="6.8" font-weight="700">CAPITAL FLOW $84.2B</text>
-          <text x="47" y="33" fill="#94a3b8" font-family="monospace" font-size="4.8">OFFSHORE // WIRE #409</text>
-          <line x1="47" y1="40" x2="104" y2="40" stroke="rgba(212,175,55,0.35)" stroke-width="0.8"/>
-          <line x1="47" y1="46" x2="92" y2="46" stroke="rgba(148,163,184,0.25)" stroke-width="0.8"/>
+        <!-- Left Corridor Flanking Plate (Clear of Center Runway) -->
+        <g transform="translate(12, 34) skewY(6)" filter="url(#heavy-ao)">
+          <rect width="88" height="72" rx="4" fill="#0b0f19" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
+          <rect x="2" y="2" width="84" height="44" rx="3" fill="#161f33"/>
+          <line x1="2" y1="46" x2="86" y2="46" stroke="#d97706" stroke-width="1"/>
+          <rect x="6" y="6" width="24" height="8" rx="1.5" fill="#991b1b"/>
+          <text x="18" y="12" fill="#ffffff" font-family="monospace" font-size="4.5" font-weight="800" text-anchor="middle">VERIFIED</text>
+          <text x="6" y="55" fill="#f59e0b" font-family="monospace" font-size="4.2" font-weight="700">DEPT. TREASURY</text>
+          <text x="6" y="64" fill="#f8fafc" font-family="Georgia, serif" font-size="6.2" font-weight="700">CONFIDENTIAL SCAN</text>
         </g>
 
-        <!-- Atmospheric Dust Motes & Warm Lens Glints -->
-        <g fill="#fde68a">
-          <circle cx="88" cy="108" r="1.3" opacity="0.65"/>
-          <circle cx="145" cy="68" r="1.8" opacity="0.45"/>
-          <circle cx="262" cy="74" r="1.4" opacity="0.6"/>
-          <circle cx="318" cy="118" r="1.1" opacity="0.5"/>
-          <circle cx="122" cy="168" r="1.5" opacity="0.55"/>
-          <circle cx="238" cy="182" r="1.2" opacity="0.4"/>
+        <!-- Right Corridor Flanking Plate (Clear of Center Runway) -->
+        <g transform="translate(300, 114) skewY(-6)" filter="url(#heavy-ao)">
+          <rect width="88" height="72" rx="4" fill="#0b0f19" stroke="rgba(255,255,255,0.16)" stroke-width="1"/>
+          <rect x="2" y="2" width="84" height="44" rx="3" fill="#131c2e"/>
+          <line x1="2" y1="46" x2="86" y2="46" stroke="#d97706" stroke-width="1"/>
+          <text x="6" y="55" fill="#94a3b8" font-family="monospace" font-size="4.2" font-weight="700">MONOPOLY LEDGER</text>
+          <text x="6" y="64" fill="#f8fafc" font-family="Georgia, serif" font-size="6" font-weight="700">CAPITAL FLOW $84.2B</text>
         </g>
 
-        <!-- Tier 2 Focal Center: 3D Extruded Gold-Bevel Documentary Headline -->
-        <g transform="translate(200, 104)" filter="url(#heavy-ao)">
-          <text x="0" y="-3.5" fill="#422006" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="25" letter-spacing="4.5" text-anchor="middle">THE SYSTEM</text>
-          <text x="0" y="-5" fill="#78350f" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="25" letter-spacing="4.5" text-anchor="middle">THE SYSTEM</text>
-          <text x="0" y="-6.5" fill="url(#gold-foil)" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="25" letter-spacing="4.5" text-anchor="middle">THE SYSTEM</text>
-          <line x1="-95" y1="6" x2="95" y2="6" stroke="url(#gold-foil)" stroke-width="1.2" opacity="0.9"/>
-          <polygon points="0,3 4,6 0,9 -4,6" fill="#fef08a"/>
-          <text x="0" y="20" fill="#e2e8f0" font-family="'Inter', -apple-system, sans-serif" font-weight="700" font-size="7.2" letter-spacing="3.2" text-anchor="middle">MANIPULATION &amp; CONTROL</text>
+        <!-- Center Runway Hero Title (Zero Overlap, Camera Flies Down the Middle) -->
+        <g transform="translate(200, 106)" filter="url(#heavy-ao)">
+          <text x="0" y="-5" fill="url(#gold-foil)" font-family="'Cinzel', 'Times New Roman', Georgia, serif" font-weight="900" font-size="22" letter-spacing="4" text-anchor="middle">THE SYSTEM</text>
+          <line x1="-75" y1="6" x2="75" y2="6" stroke="url(#gold-foil)" stroke-width="1" opacity="0.85"/>
+          <text x="0" y="18" fill="#cbd5e1" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="6.5" letter-spacing="2.5" text-anchor="middle">MANIPULATION &amp; CONTROL</text>
         </g>
       </svg>
     `)}`,

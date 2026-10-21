@@ -45,7 +45,7 @@
 
   // ---------------------------------------------------------------- store
   let store = {};
-  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; if (store['spatial-3d-motion-suite'] && store['spatial-3d-motion-suite']._v !== 3) { delete store['spatial-3d-motion-suite']; } } catch (_) { store = {}; }
+  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; if (store['spatial-3d-motion-suite'] && store['spatial-3d-motion-suite']._v !== 4) { delete store['spatial-3d-motion-suite']; } } catch (_) { store = {}; }
   let saveTimer = null;
   function persist() {
     clearTimeout(saveTimer);
@@ -57,7 +57,7 @@
     }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { _v: 3, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (!store[id]) store[id] = { _v: 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
     return store[id];
   }
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };
@@ -82,9 +82,9 @@
   // slot -> 3D read/write
   function spatialLayer(i) { return spatial3DState.elements3D && spatial3DState.elements3D[i]; }
   const SPATIAL_3D = {
-    'title': { l: 0, f: 'title' }, 'subtitle': { l: 2, f: 'title' },
+    'title': { l: 0, f: 'title' }, 'subtitle': { l: 0, f: 'subtitle' },
     'a-title': { l: 1, f: 'title' }, 'a-sub': { l: 1, f: 'subtitle' },
-    'b-title': { l: 3, f: 'title' }, 'b-sub': { l: 3, f: 'body' }
+    'b-title': { l: 2, f: 'title' }, 'b-sub': { l: 2, f: 'body' }
   };
   const DOC_3D = { masthead: 'header', headline: 'headline', quote: 'quote', body: 'body', dateline: 'dateline', byline: 'byline' };
 
