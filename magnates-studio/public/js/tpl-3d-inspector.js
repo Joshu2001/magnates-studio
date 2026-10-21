@@ -1145,6 +1145,7 @@ ${u.type !== 'text' && (curMode === 'image' || curMode === 'forbes') ? `<div sty
     const k = kindOf(tplId), cid = k === 'spatial' ? 'spatial-threejs-container' : 'doc-threejs-container';
     stage.innerHTML = `<div id="customizer-stage-inner" style="position:absolute;inset:0;overflow:hidden;background:#07090e;"><div data-3d-stage="1" style="position:absolute;inset:0;cursor:grab;"></div></div>`;
     const container = stage.querySelector('[data-3d-stage]');
+    container.id = cid;
     const st = stOf(k);
     if (st.renderer) { st.renderer.domElement.parentNode !== container && (container.innerHTML = '', container.appendChild(st.renderer.domElement)); }
     setTimeout(() => {
@@ -1244,8 +1245,14 @@ ${u.type !== 'text' && (curMode === 'image' || curMode === 'forbes') ? `<div sty
       setTimeout(fit, 180);
     }, 50);
     function fit() {
-      const w = container.clientWidth || 800, h = container.clientHeight || 450;
-      if (st.renderer && st.camera) { st.camera.aspect = w / h; st.camera.updateProjectionMatrix(); st.renderer.setSize(w, h); }
+      const w = container.clientWidth || (stage && stage.clientWidth) || 800;
+      const h = container.clientHeight || (stage && stage.clientHeight) || 450;
+      if (st.renderer && st.camera) {
+        st.camera.aspect = w / h;
+        st.camera.updateProjectionMatrix();
+        st.renderer.setSize(w, h);
+        if (st.scene) st.renderer.render(st.scene, st.camera);
+      }
     }
     if (resizeObs) resizeObs.disconnect();
     if (window.ResizeObserver) { resizeObs = new ResizeObserver(fit); resizeObs.observe(container); }
