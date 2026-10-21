@@ -29,6 +29,7 @@
     'textbehind',
     'docheight'
   ]);
+  window.SPATIAL_3D_CATEGORY_IDS = SPATIAL_3D_CATEGORY_IDS;
   const is3DSpatial = (id) => {
     if (!id) return false;
     if (SPATIAL_3D_CATEGORY_IDS.has(id)) return true;
@@ -57,7 +58,11 @@
     }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { _v: id === 'spatial-3d-motion-suite' ? 5 : 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (!store[id]) store[id] = { _v: id === 'spatial-3d-motion-suite' ? 6 : 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (id === 'spatial-3d-motion-suite' && (!store[id]._v || store[id]._v < 6)) {
+      store[id].mode = '3d';
+      store[id]._v = 6;
+    }
     return store[id];
   }
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };
@@ -2021,7 +2026,7 @@ function collectVideoNodes(stage, tplId) {
 
   window.tpl3DUse3D = (id) => {
     const k = kindOf(id);
-    return (k === 'spatial' || k === 'doc') && entry(id).mode === '3d';
+    return (k === 'spatial' || k === 'doc') && (entry(id).mode !== 'video');
   };
   window.tpl3DMountStage = mount3D;
   window.tpl3DAfterVideoStage = function (stage, tplId) {

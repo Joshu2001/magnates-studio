@@ -31499,12 +31499,12 @@ function openTopTemplateCustomizer(tpl) {
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
     'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board', 'deal-term-sheet', 'scam-redaction'
   ]);
-  const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
+  const isSidebar3DManaged = (typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id)) || (typeof window.SPATIAL_3D_CATEGORY_IDS !== 'undefined' && window.SPATIAL_3D_CATEGORY_IDS.has(tpl.id)) || tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine';
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
   if (paperModeSwitcher) paperModeSwitcher.style.display = showStage3DSwitcher ? 'flex' : 'none';
 
   // Automatically activate 3D Mode by default for any 3D capable template!
-  const has3DCapability = RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id)) || (tpl.category === '3D / Spatial') || (tpl.origCategory === '3D / Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id));
+  const has3DCapability = RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (tpl.category === '3D / Spatial') || (tpl.category === '3D Spatial') || (tpl.origCategory === '3D / Spatial') || (tpl.origCategory === '3D Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id));
   if (has3DCapability) {
     topCustomizerState.paperPreviewMode = '3d';
     topCustomizerState.is3DMode = true;
@@ -31748,7 +31748,7 @@ function openTopTemplateCustomizer(tpl) {
   const pushWrapEl = document.getElementById('tpl-modal-push-controls');
   if (pushWrapEl) pushWrapEl.style.display = 'none';
   const isCustomCartographyOrGraph = (tpl.id === 'map' || tpl.id === 'empire-timeline');
-  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine' || tpl.id === 'pyramid-scheme');
+  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine' || tpl.id === 'pyramid-scheme' || isSidebar3DManaged);
   const isTesterTpl = !!tpl.isTesterTemplate || !!tpl.previewType;
   const hideMediaUploads = isCustomCartographyOrGraph || isDedicated3DSuite || (isTesterTpl && tpl.id !== 'film-grain');
   const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
@@ -31764,7 +31764,10 @@ function openTopTemplateCustomizer(tpl) {
     const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
     if (aiEngineWrap) aiEngineWrap.style.display = 'none';
     const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-    if (stdLayers && tpl.id === 'pyramid-scheme') stdLayers.style.display = 'none';
+    if (stdLayers) stdLayers.style.display = 'none';
+    const host3D = document.getElementById('tpl-modal-3d-controls');
+    if (host3D) host3D.style.display = 'flex';
+    if (typeof window.tpl3DSync === 'function') window.tpl3DSync(tpl.id);
   }
 
   // 3D Interactive Mode button & floating toolbar: scope to relevant 3D templates
@@ -32616,7 +32619,7 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = tpl.title.split('&')[0].trim();
     topCustomizerState.subText = 'FINANCE & WEALTH';
     topCustomizerState.textColor = '#8b5cf6';
-  } else {
+  } else if (!isDedicated3DSuite) {
     if (wrapPrim) wrapPrim.style.display = 'flex';
     if (labelPrim) labelPrim.textContent = '\ud83d\uddbc\ufe0f Primary Subject / Asset';
     if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Scene Asset';
@@ -32625,6 +32628,14 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.mainText = tpl.title.split('&')[0].trim();
     topCustomizerState.subText = 'CINEMATIC SEQUENCE';
     topCustomizerState.textColor = '#ff334b';
+  } else {
+    if (wrapPrim) wrapPrim.style.display = 'none';
+    if (wrapSec) wrapSec.style.display = 'none';
+    if (wrapText) wrapText.style.display = 'none';
+    const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+    if (stdLayers) stdLayers.style.display = 'none';
+    const host3D = document.getElementById('tpl-modal-3d-controls');
+    if (host3D) host3D.style.display = 'flex';
   }
 
   topCustomizerState.textBehindContent = topCustomizerState.mainText;
@@ -32930,6 +32941,15 @@ function openTopTemplateCustomizer(tpl) {
 
   // 5. Show modal
   modal.style.display = 'flex';
+
+  // Ensure 3D suites always hide standard cutout sections and activate 3D inspector
+  if (isDedicated3DSuite) {
+    const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+    if (stdLayers) stdLayers.style.display = 'none';
+    const host3D = document.getElementById('tpl-modal-3d-controls');
+    if (host3D) host3D.style.display = 'flex';
+    if (typeof window.tpl3DSync === 'function') window.tpl3DSync(tpl.id);
+  }
 
   // 6. Populate templates sidebar drawer & sequence storyboard scenes
   populateModalTemplatesSidebar();
@@ -40393,20 +40413,20 @@ function modalAddNextSceneAction() {
    ========================================================= */
 const SPATIAL_PRESETS = {
   'docu-essay': [
-    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 650, x: -740, y: 55, scale: 0.95, color: '#f59e0b' },
-    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: 450, x: 740, y: -40, scale: 0.95, color: '#38bdf8' },
+    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 650, x: -480, y: 55, scale: 0.95, color: '#f59e0b' },
+    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: 450, x: 480, y: -40, scale: 0.95, color: '#38bdf8' },
     { id: '3', type: 'text', title: 'THE SYSTEM', subtitle: 'MANIPULATION & CONTROL', body: '', z: 200, x: 0, y: 15, scale: 1.15, color: '#f59e0b' },
-    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -100, x: -740, y: 45, scale: 0.95, color: '#ef4444' },
-    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -380, x: 740, y: -35, scale: 0.95, color: '#d97706' },
-    { id: '6', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -700, x: -740, y: 60, scale: 0.95, color: '#10b981' },
-    { id: '7', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT PROTOCOL', subtitle: 'MINUTES RECORDED', body: 'AGREEMENT SIGNED BEHIND CLOSED DOORS WITH CONSORTIUM PARTNERS.', z: -1020, x: 740, y: -45, scale: 0.95, color: '#6366f1' },
+    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -100, x: -480, y: 45, scale: 0.95, color: '#ef4444' },
+    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -380, x: 480, y: -35, scale: 0.95, color: '#d97706' },
+    { id: '6', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -700, x: -480, y: 60, scale: 0.95, color: '#10b981' },
+    { id: '7', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT PROTOCOL', subtitle: 'MINUTES RECORDED', body: 'AGREEMENT SIGNED BEHIND CLOSED DOORS WITH CONSORTIUM PARTNERS.', z: -1020, x: 480, y: -45, scale: 0.95, color: '#6366f1' },
     { id: '8', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'THE ARCHITECTURE OF CONSENT', body: '', z: -1400, x: 0, y: 15, scale: 1.15, color: '#d97706' },
-    { id: '9', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'SWISS VAULT REGISTRY', subtitle: 'ACCOUNT NUMBER #88092-B', body: 'ANONYMOUS TRUST DISBURSEMENTS CROSSING MARITIME JURISDICTIONS.', z: -1720, x: -740, y: 50, scale: 0.95, color: '#f59e0b' },
-    { id: '10', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'INTERNATIONAL CLEARING', subtitle: 'SWIFT TRANSACTION RECORD', body: 'SETTLEMENT LOGS CONFLICTING WITH AUDITED ANNUAL FINANCIALS.', z: -2050, x: 740, y: -40, scale: 0.95, color: '#38bdf8' },
-    { id: '11', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SOVEREIGN AUDIT FILE', subtitle: 'EXHIBIT C // CENTRAL BANK', body: 'CLASSIFIED CLEARING HOUSE RECORDS & WIRE TELEMETRY.', z: -2400, x: -740, y: 55, scale: 0.95, color: '#ef4444' },
-    { id: '12', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SURVEILLANCE TIMESTAMP', subtitle: 'INTERCEPT CAM 04', body: 'TIMECODE 04:18:22 PROTOCOL ENGAGED AUTOMATICALLY.', z: -2750, x: 740, y: -35, scale: 0.95, color: '#10b981' },
+    { id: '9', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'SWISS VAULT REGISTRY', subtitle: 'ACCOUNT NUMBER #88092-B', body: 'ANONYMOUS TRUST DISBURSEMENTS CROSSING MARITIME JURISDICTIONS.', z: -1720, x: -480, y: 50, scale: 0.95, color: '#f59e0b' },
+    { id: '10', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'INTERNATIONAL CLEARING', subtitle: 'SWIFT TRANSACTION RECORD', body: 'SETTLEMENT LOGS CONFLICTING WITH AUDITED ANNUAL FINANCIALS.', z: -2050, x: 480, y: -40, scale: 0.95, color: '#38bdf8' },
+    { id: '11', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SOVEREIGN AUDIT FILE', subtitle: 'EXHIBIT C // CENTRAL BANK', body: 'CLASSIFIED CLEARING HOUSE RECORDS & WIRE TELEMETRY.', z: -2400, x: -480, y: 55, scale: 0.95, color: '#ef4444' },
+    { id: '12', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SURVEILLANCE TIMESTAMP', subtitle: 'INTERCEPT CAM 04', body: 'TIMECODE 04:18:22 PROTOCOL ENGAGED AUTOMATICALLY.', z: -2750, x: 480, y: -35, scale: 0.95, color: '#10b981' },
     { id: '13', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'THE FINAL AWAKENING', body: '', z: -3150, x: 0, y: 15, scale: 1.25, color: '#f59e0b' },
-    { id: '14', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'VAULT ARCHIVES SEALED', subtitle: 'FINAL FORENSIC RECORD', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -3550, x: -740, y: 45, scale: 0.95, color: '#d97706' }
+    { id: '14', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'VAULT ARCHIVES SEALED', subtitle: 'FINAL FORENSIC RECORD', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -3550, x: -480, y: 45, scale: 0.95, color: '#d97706' }
   ],
   'cyber-matrix': [
     { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 600, x: -720, y: 65, scale: 0.95, color: '#10b981' },
@@ -41245,7 +41265,8 @@ function updateSpatialCameraPosition() {
       // Flanking corridor exhibits
       const rawX = u.baseX !== undefined ? u.baseX : obj.position.x;
       const sideSign = rawX < 0 ? -1 : 1;
-      const minCorridorHalfWidth = Math.max(Math.abs(rawX), 700, Math.max(0, distInFront) * 0.44);
+      const baseW = Math.abs(rawX) > 0 ? Math.abs(rawX) : 480;
+      const minCorridorHalfWidth = Math.max(360, Math.min(640, baseW));
 
       // Transition effects: slide-in, scale-pop, yaw-drift
       const effect = u.transitionEffect || 'fade';
@@ -41287,6 +41308,54 @@ function updateSpatialCameraPosition() {
 
   updateSpatialHUDTelemetry();
 }
+
+function loadSpatialPreset(presetKey) {
+  spatial3DState.activePreset = presetKey;
+  if (presetKey === 'cyber-matrix') {
+    spatial3DState.envStyle = 'tunnel-cyan';
+    spatial3DState.gridColor = '#06b6d4';
+  } else if (presetKey === 'philosophy') {
+    spatial3DState.envStyle = 'tunnel-gold';
+    spatial3DState.gridColor = '#d4af37';
+  } else if (presetKey === 'cosmic-universe') {
+    spatial3DState.envStyle = 'open-stars';
+    spatial3DState.gridColor = '#38bdf8';
+  } else {
+    spatial3DState.envStyle = 'tunnel-slate';
+    spatial3DState.gridColor = '#64748b';
+  }
+
+  const scene = spatial3DState.scene;
+  if (!scene) return;
+
+  (spatial3DState.elements3D || []).forEach(obj => scene.remove(obj));
+  spatial3DState.elements3D = [];
+
+  document.querySelectorAll('.btn-spatial-preset').forEach(btn => {
+    const isAct = btn.dataset.preset === presetKey;
+    btn.style.background = isAct ? 'rgba(168,85,247,0.25)' : 'rgba(18,19,28,0.8)';
+    btn.style.borderColor = isAct ? 'rgba(168,85,247,0.6)' : 'rgba(255,255,255,0.1)';
+    btn.style.color = isAct ? '#e9d5ff' : '#94a3b8';
+  });
+
+  const items = SPATIAL_PRESETS[presetKey] || SPATIAL_PRESETS['docu-essay'];
+  items.forEach(item => {
+    let mesh = null;
+    if (item.type === 'text') mesh = createSpatialTextPlane(item);
+    else if (item.type === 'card' || item.type === 'image' || item.type === 'object') mesh = createSpatialCardPlane(item);
+    else if (item.type === 'code') mesh = createSpatialCodePlane(item);
+
+    if (mesh) {
+      scene.add(mesh);
+      spatial3DState.elements3D.push(mesh);
+    }
+  });
+
+  if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
+  if (typeof renderSpatialLayerList === 'function') renderSpatialLayerList();
+  if (typeof resetSpatialCameraPath === 'function') resetSpatialCameraPath();
+}
+window.loadSpatialPreset = loadSpatialPreset;
 
 function initSpatialThreeJSEngine() {
   const container = document.getElementById('spatial-threejs-container') || document.getElementById('spatial-threejs-container-legacy');
