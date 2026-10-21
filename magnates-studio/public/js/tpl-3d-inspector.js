@@ -505,6 +505,7 @@
         </label>`,
         `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Runway Path Style
           <select data-k="s-pathstyle" style="${selectCss}">${[
+            'corridor-hallway:Hallway Corridor (Flanking Left/Right)',
             'straight:Straight Center Runway',
             'slalom:Sinusoidal S-Weave',
             'cosmic-wave:Cosmic Wave & Undulation',
@@ -570,6 +571,7 @@
 
       // Section 6: Presets
       html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${[
+        'forbes-hallway:Forbes Museum Tour (James Jani)',
         'docu-essay:Docu-Essay (Gallery)',
         'cyber-matrix:Cyber Matrix (Image 2)',
         'philosophy:Philosophy (Gold)',
@@ -616,6 +618,7 @@
       const editor = !open ? '' : `<div style="display:flex;flex-direction:column;gap:7px;padding:8px 2px 2px;">
         ${u.type !== 'text' && u.type !== 'code' ? `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Artifact Archetype
           <select data-k="l-mode-${i}" style="${selectCss}">
+            <option value="forbes" ${curMode === 'forbes' ? 'selected' : ''}>📰 James Jani Forbes 3D Cover (Beam & Flashes)</option>
             <option value="image" ${curMode === 'image' ? 'selected' : ''}>🖼️ Archival Photograph Plate</option>
             <option value="object" ${curMode === 'object' ? 'selected' : ''}>⬡ 3D Celestial / Wireframe Object</option>
             <option value="card" ${curMode === 'card' ? 'selected' : ''}>📄 Frosted Dossier Text Slate</option>
@@ -633,7 +636,19 @@
           </select>
         </label>` : ''}
 
-        ${u.type !== 'text' && curMode === 'image' ? `<div style="background:#090d16;padding:7px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px;">
+        
+        ${curMode === 'forbes' ? `<div style="background:#090d16;padding:8px;border-radius:6px;border:1px solid rgba(56,189,248,0.25);display:flex;flex-direction:column;gap:6px;">
+          <div style="font-size:10px;font-weight:700;color:#38bdf8;letter-spacing:0.5px;text-transform:uppercase;">Forbes Magazine Customization</div>
+          ${txt('l-magtitle-' + i, 'Magazine Masthead Title', u.magazineTitle || 'Forbes')}
+          ${txt('l-featuretag-' + i, 'Feature Tagline', u.featureTag || 'SPECIAL REPORT // THE ARCHITECT')}
+          ${txt('l-featuretitle-' + i, 'Feature Headline', u.featureTitle || u.title || 'THE $30 BILLION FRAUD')}
+          ${txt('l-kicker-' + i, 'Kicker Badge', u.kickerBadge || 'EXPOSED')}
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#94a3b8;padding:2px 0;">
+            <span>Anamorphic Beam Color</span>
+            <input type="color" data-k="l-beamcol-${i}" value="${u.beamColor || '#38bdf8'}" style="border:none;width:28px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" />
+          </div>
+        </div>` : ''}
+${u.type !== 'text' && (curMode === 'image' || curMode === 'forbes') ? `<div style="background:#090d16;padding:7px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px;">
           <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-size:10px;font-weight:700;color:#cbd5e1;">Image Asset</span>
             <div style="display:flex;gap:4px;">
@@ -882,11 +897,12 @@
     else if (key === 's-fog') { s.fogDensity = v; lab(v + '%'); if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (v / 100) * 0.0008; }
     else if (key === 's-light') { s.lightIntensity = v; lab(v + '%'); if (s.ambientLight) s.ambientLight.intensity = (v / 100) * 0.95; }
     else if (key.startsWith('l-')) {
-      const m = key.match(/^l-(title|sub|body|stamp|trans|font|mode|shape|img|z|x|y|scale|color)-(\d+)$/);
+      const m = key.match(/^l-(title|sub|body|stamp|trans|font|mode|shape|img|z|x|y|scale|color|magtitle|featuretag|featuretitle|kicker|beamcol)-(\d+)$/);
       if (m) {
         const i = parseInt(m[2], 10), field = {
           title: 'title', sub: 'subtitle', body: 'body', stamp: 'stamp', trans: 'transitionEffect', font: 'fontFamily',
-          mode: 'artifactMode', shape: 'objectShape', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color'
+          mode: 'artifactMode', shape: 'objectShape', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color',
+          magtitle: 'magazineTitle', featuretag: 'featureTag', featuretitle: 'featureTitle', kicker: 'kickerBadge', beamcol: 'beamColor'
         }[m[1]];
         const num = ['z', 'x', 'y', 'scale'].includes(field);
         const val = num ? parseFloat(v) : v;
@@ -1004,7 +1020,7 @@
     }
     if (act === 's-add-artifact') {
       const id = Date.now().toString();
-      const newCard = createSpatialCardPlane({ id, type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CLASSIFIED EVIDENCE', subtitle: 'NEW INVESTIGATION EXHIBIT', body: 'Confidential dossier artifact placed into spatial timeline.', z: (s.elements3D && s.elements3D.length ? s.elements3D[s.elements3D.length - 1].position.z - 400 : -1000), x: -740, y: 50, scale: 1.0, color: '#f59e0b' });
+      const newCard = createSpatialCardPlane({ id, type: 'card', artifactMode: 'forbes', imageUrl: '/portrait_cutout_clean.png', magazineTitle: 'Forbes', featureTag: 'SPECIAL REPORT // THE ARCHITECT', featureTitle: 'THE $30 BILLION FRAUD', kickerBadge: 'EXPOSED', title: 'FORBES 3D COVER', subtitle: 'THE FRAUD REVEAL', body: 'Investigative dossier artifact placed into spatial corridor.', z: (s.elements3D && s.elements3D.length ? s.elements3D[s.elements3D.length - 1].position.z - 400 : -1000), x: 0, y: 15, scale: 1.25, color: '#f8fafc' });
       s.scene.add(newCard); s.elements3D.push(newCard);
       openLayerIdx = s.elements3D.length - 1;
       capture(tplId); renderSpatialLayers(); return;
@@ -1310,7 +1326,9 @@ function collectVideoNodes(stage, tplId) {
     if (isTheater) {
       if (sb) sb.style.display = 'none';
       if (pb) pb.style.display = 'none';
-      if (hud) hud.style.display = is3D ? 'none' : '';
+      if (hud) hud.style.display = 'none';
+      const legacyHud = document.querySelector('[style*="3D CAMERA TRACK"]')?.parentElement || document.getElementById('spatial-camera-track-hud');
+      if (legacyHud) legacyHud.style.display = 'none';
       if (box) {
         box.style.padding = '0';
         box.style.border = 'none';
