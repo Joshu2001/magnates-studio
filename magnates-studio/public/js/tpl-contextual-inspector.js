@@ -55,6 +55,24 @@
 
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
+    // Photorealistic 3D Investigative Evidence Envelope Engine
+    'envelope-open': Object.assign({}, (typeof window !== 'undefined' && window.ENVELOPE_3D_CONFIG) || {
+      type: 'envelope-open',
+      envelopeStyle: 'manila_classified',
+      stampText: 'CLASSIFIED: FBI INVESTIGATION',
+      caseNumber: 'CASE FILE: #2026-X-8842',
+      letterHeadline: 'CONFIDENTIAL MEMORANDUM',
+      letterSubhead: 'SUBJECT: PROJECT IRIS - SPECIAL ACCESS REQUIRED',
+      paperTone: '#d9ab6a',
+      letterPaperTone: '#f7f4ea',
+      stampColor: '#b91c1c',
+      stringTieEnabled: true,
+      surfaceType: 'mahogany',
+      cameraPreset: 'macro_cinematic',
+      slideDistance: 78,
+      flapOpenAngle: 168
+    }),
+
     // Photorealistic 3D Paper Currency Stack ($100 US Dollars with Kraft Bands)
     'wire-transfer': Object.assign({}, (typeof window !== 'undefined' && window.WIRE_TRANSFER_CONFIG) || {
       type: 'wire-transfer',
@@ -3145,6 +3163,22 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'envelope-open') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const vp = stage.querySelector('#envelope-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountEnvelope3DStage === 'function') {
+            window.tplMountEnvelope3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initEnvelope3DScene === 'function') {
+            window.initEnvelope3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
     if (tplId === 'wire-transfer') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -4754,6 +4788,23 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'envelope-open') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildEnvelopeInspector === 'function') {
+          window.tplBuildEnvelopeInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'wire-transfer') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       if (container) {
