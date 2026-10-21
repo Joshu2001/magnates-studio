@@ -45,7 +45,7 @@
 
   // ---------------------------------------------------------------- store
   let store = {};
-  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; } catch (_) { store = {}; }
+  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; if (store['spatial-3d-motion-suite'] && store['spatial-3d-motion-suite']._v !== 3) { delete store['spatial-3d-motion-suite']; } } catch (_) { store = {}; }
   let saveTimer = null;
   function persist() {
     clearTimeout(saveTimer);
@@ -57,7 +57,7 @@
     }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (!store[id]) store[id] = { _v: 3, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
     return store[id];
   }
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };
@@ -142,7 +142,7 @@
         dustVisible: s.dustVisible, activePreset: s.activePreset,
         layers: (s.elements3D || []).map(m => {
           const u = m.userData || {};
-          return { id: u.id, type: u.type, title: u.title, subtitle: u.subtitle, body: u.body, text: u.text, color: u.color, scale: u.scale || 1, x: m.position.x, y: m.position.y, z: m.position.z };
+          return { id: u.id, type: u.type, artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'), visualTheme: u.visualTheme || 'treasury-scan', imageUrl: u.imageUrl || '', objectGeometry: u.objectGeometry || 'octahedron', title: u.title, subtitle: u.subtitle, body: u.body, text: u.text, color: u.color, scale: u.scale || 1, x: u.baseX !== undefined ? u.baseX : m.position.x, y: u.baseY !== undefined ? u.baseY : m.position.y, z: m.position.z };
         })
       };
     }
@@ -190,7 +190,7 @@
     d._texDirty = true;
   }
   function buildSpatialMesh(item) {
-    return item.type === 'text' ? createSpatialTextPlane(item) : item.type === 'card' ? createSpatialCardPlane(item) : createSpatialCodePlane(item);
+    return item.type === 'text' ? createSpatialTextPlane(item) : (item.type === 'card' || item.type === 'image' || item.type === 'object') ? createSpatialCardPlane(item) : createSpatialCodePlane(item);
   }
   function setSpatialLayers(items) {
     const s = spatial3DState;
@@ -223,7 +223,7 @@
     const s = spatial3DState, old = s.elements3D[i];
     if (!old || !s.scene) return;
     const u = old.userData;
-    const item = Object.assign({}, u, { x: old.position.x, y: old.position.y, z: old.position.z }, patch);
+    const item = Object.assign({}, u, { x: u.baseX !== undefined ? u.baseX : old.position.x, y: u.baseY !== undefined ? u.baseY : old.position.y, z: old.position.z }, patch);
     if (item.type === 'code') { item.text = item.body = patch.body != null ? patch.body : (u.body || u.text); }
     const mesh = buildSpatialMesh(item);
     if (!mesh) return;
@@ -422,7 +422,7 @@
         `<div style="display:flex;gap:6px;">${btn('s-grid', '\u229e Floor Grid', s.gridVisible)}${btn('s-dust', '\u2726 Dust', s.dustVisible)}</div>`
       ].join(''));
       html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${['docu-essay:Docu-Essay', 'cyber-matrix:Cyber Matrix', 'philosophy:Philosophy'].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
-      html += section('3D Layers', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><button type="button" data-act="s-add" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ Add Text Plane</button>`);
+      html += section('3D Layers & Artifacts', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"><button type="button" data-act="s-add-artifact" style="padding:5px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(212,175,55,.6);background:rgba(212,175,55,.1);color:#fef08a;cursor:pointer;">+ Image / 3D Artifact</button><button type="button" data-act="s-add" style="padding:5px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ 3D Title Plane</button></div>`);
     } else {
       const p = ensureDoc(e);
       html += section('Text', textHtml);
@@ -451,15 +451,26 @@
     const list = spatial3DState.elements3D || [];
     box.innerHTML = list.map((m, i) => {
       const u = m.userData || {}; const open = openLayerIdx === i; const color = u.color || '#f59e0b';
+      const curMode = u.artifactMode || (u.type === 'object' ? 'object' : 'image');
+      const posXVal = Math.round(u.baseX !== undefined ? u.baseX : m.position.x);
+      const posYVal = Math.round(u.baseY !== undefined ? u.baseY : m.position.y);
       const editor = !open ? '' : `<div style="display:flex;flex-direction:column;gap:6px;padding:8px 2px 2px;">
+        ${u.type !== 'text' && u.type !== 'code' ? `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Artifact Mode (Image Default vs 3D Object)
+          <select data-k="l-mode-${i}" style="${selectCss}">
+            <option value="image" ${curMode === 'image' ? 'selected' : ''}>\ud83d\uddbc\ufe0f Archival Image Plate (Recommended Default)</option>
+            <option value="object" ${curMode === 'object' ? 'selected' : ''}>\u2b21 3D Wireframe Object + Glass Slate</option>
+            <option value="card" ${curMode === 'card' ? 'selected' : ''}>\ud83d\udcc4 Frosted Dossier Text Slate</option>
+          </select>
+        </label>` : ''}
+        ${u.type !== 'text' && curMode === 'image' ? txt('l-img-' + i, 'Custom Image URL (blank = Archival Microfilm Plate)', u.imageUrl || '') : ''}
         ${txt('l-title-' + i, 'Title', u.title || '')}
-        ${u.type === 'card' ? txt('l-sub-' + i, 'Subtitle', u.subtitle || '') : ''}
-        ${u.type !== 'text' ? txt('l-body-' + i, u.type === 'code' ? 'Code Lines' : 'Body', u.body || u.text || '', true) : ''}
+        ${u.type !== 'code' ? txt('l-sub-' + i, 'Subtitle / Classification', u.subtitle || '') : ''}
+        ${u.type !== 'text' ? txt('l-body-' + i, u.type === 'code' ? 'Code Lines' : 'Dossier Body', u.body || u.text || '', true) : ''}
         ${row('l-z-' + i, 'Depth (Z)', -5000, 1500, 10, Math.round(m.position.z), v => v)}
-        ${row('l-x-' + i, 'Position X', -1500, 1500, 10, Math.round(m.position.x), v => v)}
-        ${row('l-y-' + i, 'Position Y', -1000, 1000, 10, Math.round(m.position.y), v => v)}
+        ${row('l-x-' + i, 'Position X', -1500, 1500, 10, posXVal, v => v)}
+        ${row('l-y-' + i, 'Position Y', -1000, 1000, 10, posYVal, v => v)}
         ${row('l-scale-' + i, 'Scale', 0.3, 3, 0.05, u.scale || 1, v => Number(v).toFixed(2) + 'x')}
-        <label style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#94a3b8;">Color <input type="color" data-k="l-color-${i}" value="${/^#[0-9a-f]{6}$/i.test(color) ? color : '#f59e0b'}" /></label></div>`;
+        <label style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#94a3b8;">Accent Color <input type="color" data-k="l-color-${i}" value="${/^#[0-9a-f]{6}$/i.test(color) ? color : '#D4AF37'}" /></label></div>`;
       return `<div style="background:#121520;border:1px solid ${open ? 'rgba(168,85,247,.55)' : 'rgba(255,255,255,.08)'};border-radius:8px;padding:7px 9px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
           <div data-act="l-toggle-${i}" style="display:flex;align-items:center;gap:7px;cursor:pointer;overflow:hidden;flex:1;">
@@ -510,16 +521,17 @@
     else if (key === 's-fog') { s.fogDensity = v; lab(v + '%'); if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (v / 100) * 0.0008; }
     else if (key === 's-light') { s.lightIntensity = v; lab(v + '%'); if (s.ambientLight) s.ambientLight.intensity = (v / 100) * 0.95; }
     else if (key.startsWith('l-')) {
-      const m = key.match(/^l-(title|sub|body|z|x|y|scale|color)-(\d+)$/);
+      const m = key.match(/^l-(title|sub|body|mode|img|z|x|y|scale|color)-(\d+)$/);
       if (m) {
-        const i = parseInt(m[2], 10), field = { title: 'title', sub: 'subtitle', body: 'body', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color' }[m[1]];
+        const i = parseInt(m[2], 10), field = { title: 'title', sub: 'subtitle', body: 'body', mode: 'artifactMode', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color' }[m[1]];
         const num = ['z', 'x', 'y', 'scale'].includes(field);
         const val = num ? parseFloat(v) : v;
-        const patch = { [field]: val }; if (field === 'body') patch.text = val;
+        const patch = { [field]: val }; if (field === 'body') patch.text = val; if (field === 'x') patch.baseX = val; if (field === 'y') patch.baseY = val;
         rebuildSpatialLayer(i, patch);
         if (num) lab(field === 'scale' ? Number(val).toFixed(2) + 'x' : String(Math.round(val)));
         // keep unified text in sync when this layer feeds a slot
-        if (!num && field !== 'color') {
+        if (field === 'artifactMode') { renderSpatialLayers(); }
+        if (!num && field !== 'color' && field !== 'artifactMode' && field !== 'imageUrl') {
           Object.keys(SPATIAL_3D).forEach(sk => { const mm = SPATIAL_3D[sk]; if (mm.l === i && mm.f === field) { e.texts[sk] = val; const sl = SPATIAL_SLOTS.find(x => x.key === sk); const node = (videoNodes[tplId] || {})[sl.def]; if (node) node.nodeValue = val; } });
         }
       }
@@ -612,6 +624,12 @@
     if (act === 's-grid') { s.gridVisible = !s.gridVisible; if (s.floorGrid) s.floorGrid.visible = s.gridVisible; capture(tplId); build(tplId); return; }
     if (act === 's-dust') { s.dustVisible = !s.dustVisible; if (s.particlesMesh) s.particlesMesh.visible = s.dustVisible; capture(tplId); build(tplId); return; }
     if (act.startsWith('preset-')) { loadSpatialPreset(act.slice(7)); e.texts = {}; openLayerIdx = -1; capture(tplId); build(tplId); return; }
+    if (act === 's-add-artifact') {
+      const sideX = (s.elements3D.length % 2 === 0) ? -520 : 520;
+      const m = createSpatialCardPlane({ type: 'card', artifactMode: 'image', visualTheme: 'treasury-scan', id: String(Date.now()), title: 'ARCHIVAL EVIDENCE PLATE', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'Photographic microfilm evidence verified under executive audit.', x: sideX, y: 90, z: -1200, color: '#D4AF37', scale: 0.96 });
+      if (m && s.scene) { s.scene.add(m); s.elements3D.push(m); openLayerIdx = s.elements3D.length - 1; capture(tplId); renderSpatialLayers(); }
+      return;
+    }
     if (act === 's-add') {
       const m = createSpatialTextPlane({ type: 'text', id: String(Date.now()), title: 'NEW TEXT', x: 0, y: 0, z: -600, color: '#f59e0b', scale: 1 });
       if (m && s.scene) { s.scene.add(m); s.elements3D.push(m); openLayerIdx = s.elements3D.length - 1; capture(tplId); renderSpatialLayers(); }

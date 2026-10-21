@@ -3453,7 +3453,7 @@
       }
       return;
     }
-    if (tplId === 'deal-term-sheet') {
+    if (tplId === 'deal-term-sheet' || tplId === 'newspaper-3d') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
         const vp = stage.querySelector('#term-sheet-3d-viewport');
@@ -5008,8 +5008,22 @@
       }
       return;
     }
-    if (tplId === 'deal-term-sheet') {
+    if (tplId === 'deal-term-sheet' || tplId === 'newspaper-3d') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section') || document.getElementById('tpl-modal-std-layers');
+      const wrapAi = document.getElementById('tpl-modal-wrap-ai-engine') || document.getElementById('tpl-modal-ai-engine');
+      const wrapAtmo = document.getElementById('tpl-modal-wrap-atmosphere') || document.getElementById('tpl-modal-atmosphere');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapAi) wrapAi.style.display = 'none';
+      if (wrapAtmo) wrapAtmo.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
       if (container) {
         container.style.display = 'flex';
         const data = window.tplGetContextualData(tplId);

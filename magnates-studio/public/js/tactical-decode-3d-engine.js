@@ -2,27 +2,25 @@
  * Photorealistic 3D Environmental Projection Engine for Tension Decode & Typewriter Kinetic Text
  * (Vox / James Jani / Johnny Harris / Magnates Media Documentary Standard)
  *
- * Overhauls the flat 2D vector canvas into a close-up 3D environmental projection:
- * 1. Material Shaders & Environmental Anchor:
- *    - Photorealistic environmental texture: /tactical_desk_hd_plate.png
- *      (Dark mahogany executive desk, tactical blueprint investigation map with coordinate grid lines,
- *       stacked leaked document clippings on the left, dossier top right, vintage brass tactical compass)
- *    - Real-time Normal Mapping: /tactical_desk_normal_map.png
- *      (Matrix code streams physically warp, curve, and break over stacked paper edges, folds, fine print & compass rim)
- *    - Edge Specular Glints & Light Bleed:
- *      (High-gradient paper deckle edges catch bright phosphor green and white specular glints)
- * 2. 3D Spatial Rig & Camera:
- *    - Intimate close-up framing (55%-70% viewport width)
- *    - 25°-35° spatial tilt across X and Y axes with slow subtle macro camera pan
- *    - 3D floating cyber HUD box with glowing cyan border, corner brackets, and cyan specular reflection onto map
- * 3. Typographic Slam & Micro Screen-Shake:
- *    - Individual typewriter letters scramble through cyber glyphs and slam onto paper artifacts
- *    - Micro-shake physical impulses trigger on character resolve
- * 4. Optics & Cinematic Pass:
- *    - Warm focused overhead spotlight with rich directional ambient occlusion opposing the cold green code
- *    - Natural f/2.8 shallow depth of field (tack-sharp active typewriter line, bokeh blur on peripheral papers)
- *    - Volumetric particle drift (30 dust motes caught in the projection beam)
- *    - Analog chromatic aberration & subtle CRT scanline shimmer
+ * Overhauls the flat vector canvas into an authentic photorealistic 3D environmental scene matching Image 2:
+ * 1. Environmental Surface:
+ *    - Dark executive mahogany desk
+ *    - Tactical blueprint investigation map with coordinate grid rings and degree markers
+ *    - Stacked leaked document clippings with aged deckle edges on the left
+ *    - Investigation dossier on top right
+ *    - Vintage brass tactical compass on bottom right
+ *    - Focused warm overhead spotlight opposing the cold green code
+ * 2. Projected Matrix Digital Code:
+ *    - Vertical katakana & numeric streams physically projecting onto the 3D surface
+ *    - Normal-map warping over stacked paper edges and compass rim
+ *    - Bright white/cyan droplet heads with glowing phosphor green fading trails
+ * 3. Central Tactical HUD Box & Typewriter Reveal:
+ *    - Centered monospace mint green subtitle [ HIGH TENSION REVEAL ]
+ *    - Sleek cyan rounded HUD pill (#00f0ff) with horizontal laser flare streaks and dark teal glass interior
+ *    - Kinetic typewriter decode with cyber-glyph scrambling and solid blinking cyan block cursor ▌
+ * 4. Crisp Peripheral UI:
+ *    - Perfectly flat, unskewed 16:9 stage container matching studio viewport
+ *    - Single-source Canvas rendering ensuring zero ghosting, zero double text, and razor-sharp clarity
  */
 
 (function() {
@@ -64,7 +62,7 @@
     try {
       const offCanvas = document.createElement('canvas');
       const w = Math.min(img.naturalWidth || 1920, 960);
-      const h = Math.min(img.naturalHeight || 690, 345);
+      const h = Math.min(img.naturalHeight || 687, 344);
       offCanvas.width = w;
       offCanvas.height = h;
       const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
@@ -101,30 +99,8 @@
     return { nx, ny, nz, gradient };
   }
 
-  // Screen-shake physics engine state
-  let shakeEnergy = 0;
-  let lastCharsCount = -1;
-  let shakeImpulseX = 0;
-  let shakeImpulseY = 0;
-
-  function triggerTypingSlamImpulse() {
-    shakeEnergy = 3.2; // pixels of physical impact
-  }
-
-  function updateShakePhysics(dt) {
-    if (shakeEnergy > 0.05) {
-      shakeImpulseX = (Math.random() - 0.5) * shakeEnergy * 1.5;
-      shakeImpulseY = (Math.random() - 0.5) * shakeEnergy * 1.2;
-      shakeEnergy *= Math.max(0.01, 1.0 - (dt * 12.0)); // Rapid exponential damping
-    } else {
-      shakeEnergy = 0;
-      shakeImpulseX = 0;
-      shakeImpulseY = 0;
-    }
-  }
-
   // Volumetric floating dust particle system
-  const DUST_COUNT = 32;
+  const DUST_COUNT = 20;
   const dustParticles = [];
   function initDustParticles() {
     dustParticles.length = 0;
@@ -132,11 +108,11 @@
       dustParticles.push({
         x: Math.random(),
         y: Math.random(),
-        z: Math.random() * 0.8 + 0.2, // depth factor
-        vx: (Math.random() - 0.5) * 0.025,
-        vy: (Math.random() * 0.03 + 0.01),
-        size: Math.random() * 2.2 + 0.8,
-        alpha: Math.random() * 0.5 + 0.25,
+        z: Math.random() * 0.8 + 0.2,
+        vx: (Math.random() - 0.5) * 0.015,
+        vy: (Math.random() * 0.02 + 0.008),
+        size: Math.random() * 1.8 + 0.6,
+        alpha: Math.random() * 0.4 + 0.2,
         pulseSpeed: Math.random() * 2 + 1
       });
     }
@@ -158,305 +134,8 @@
   }
 
   /**
-   * Main High-Performance Canvas Renderer for 3D Tactical Desk Matrix Projection
-   * Used for both live customizer stage, studio timeline playback, and export.
+   * Helper to draw rounded rectangle paths
    */
-  window.renderTacticalDeskCanvasFrame = function(ctx, width, height, state, elapsed, dt) {
-    if (!ctx || !width || !height) return;
-
-    const t = elapsed !== undefined ? elapsed : 0;
-    dt = Math.min(0.1, dt || 0.016);
-    updateShakePhysics(dt);
-    updateDustParticles(dt);
-
-    const plateImg = loadImg(PLATE_URL);
-    loadImg(NORMAL_URL); // Ensure normal map is loaded
-
-    ctx.save();
-    ctx.clearRect(0, 0, width, height);
-
-    // 1. Slow Macro Camera Drift & 3D Spatial Rig Projection
-    const driftX = Math.sin(t * 0.4) * 5.0 + shakeImpulseX;
-    const driftY = Math.cos(t * 0.3) * 3.0 + shakeImpulseY;
-    const zoomScale = 1.05 + Math.sin(t * 0.2) * 0.015;
-
-    ctx.save();
-    ctx.translate(width / 2 + driftX, height / 2 + driftY);
-    ctx.scale(zoomScale, zoomScale);
-    ctx.translate(-width / 2, -height / 2);
-
-    // 2. Base Environmental Anchor (Desk, Blueprint Map, Leaked Documents, Compass)
-    if (plateImg) {
-      ctx.drawImage(plateImg, 0, 0, width, height);
-    } else {
-      // Photorealistic fallback gradient with blueprint grid if image still loading
-      const bgGrad = ctx.createRadialGradient(width * 0.48, height * 0.35, 10, width * 0.5, height * 0.5, width * 0.7);
-      bgGrad.addColorStop(0, '#0d1821');
-      bgGrad.addColorStop(0.5, '#080d14');
-      bgGrad.addColorStop(1, '#030508');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, width, height);
-    }
-
-    // 3. Directed Warm Overhead Spotlight (opposing the cold green code)
-    const spotX = width * 0.5 + Math.sin(t * 0.2) * 8;
-    const spotY = height * 0.32;
-    const spotRadius = Math.max(width, height) * 0.65;
-    const spotGrad = ctx.createRadialGradient(spotX, spotY, 20, spotX, spotY, spotRadius);
-    spotGrad.addColorStop(0, 'rgba(255, 245, 220, 0.22)');
-    spotGrad.addColorStop(0.35, 'rgba(255, 235, 190, 0.08)');
-    spotGrad.addColorStop(0.7, 'rgba(10, 16, 26, 0.45)');
-    spotGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0.82)');
-    ctx.fillStyle = spotGrad;
-    ctx.fillRect(0, 0, width, height);
-
-    // 4. Projected 3D Matrix Digital Rain with Normal-Mapped Physics
-    const rainEnabled = state.matrixRainEnabled !== false;
-    const baseRainColor = state.matrixRainColor || '#00ff41';
-    const rainSpeed = state.matrixRainSpeed || 1.0;
-    const fontSize = Math.max(11, state.matrixRainDensity || 16);
-    const colCount = Math.floor(width / fontSize);
-
-    if (!state.matrixColumns || state.matrixColumns.length !== colCount) {
-      state.matrixColumns = [];
-      for (let i = 0; i < colCount; i++) {
-        state.matrixColumns.push({
-          y: Math.random() * -120,
-          speed: (Math.random() * 0.65 + 0.65) * rainSpeed,
-          length: Math.floor(Math.random() * 12 + 10)
-        });
-      }
-    }
-
-    if (rainEnabled) {
-      // Diffuse ambient green reflection pass onto underlying desk
-      const glowGrad = ctx.createRadialGradient(width * 0.5, height * 0.5, 40, width * 0.5, height * 0.5, width * 0.45);
-      glowGrad.addColorStop(0, 'rgba(0, 255, 65, 0.12)');
-      glowGrad.addColorStop(0.6, 'rgba(0, 255, 65, 0.03)');
-      glowGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = glowGrad;
-      ctx.fillRect(0, 0, width, height);
-
-      ctx.font = `bold ${fontSize}px monospace`;
-      ctx.textAlign = 'center';
-
-      for (let i = 0; i < colCount; i++) {
-        const col = state.matrixColumns[i];
-        const baseX = i * fontSize + (fontSize / 2);
-
-        // Step drops
-        col.y += fontSize * col.speed * (dt * 45);
-        if (col.y > height + 100 && Math.random() > 0.93) {
-          col.y = Math.random() * -80;
-          col.speed = (Math.random() * 0.65 + 0.65) * rainSpeed;
-        }
-
-        // Draw trail of characters
-        for (let j = 0; j < col.length; j++) {
-          const charY = col.y - (j * fontSize);
-          if (charY < -20 || charY > height + 20) continue;
-
-          const normU = baseX / width;
-          const normV = charY / height;
-          const normal = sampleSurfaceNormal(normU, normV);
-
-          // Normal Map Warping: characters deflect and bend across paper edges and compass
-          const warpX = baseX + normal.nx * 7.5;
-          const warpY = charY + normal.ny * 5.0;
-
-          // Pick character
-          const glyphIdx = Math.floor((Math.abs(Math.sin(i * 13 + j * 7 + t * 4)) * MATRIX_GLYPHS.length)) % MATRIX_GLYPHS.length;
-          const char = MATRIX_GLYPHS[glyphIdx];
-
-          // Leading droplet head (Bright White/Cyan with intense phosphor glow)
-          if (j === 0) {
-            ctx.shadowBlur = 14;
-            ctx.shadowColor = '#00ff41';
-            ctx.fillStyle = '#ffffff';
-            ctx.fillText(char, warpX, warpY);
-
-            // Specular glint on paper borders / compass rim
-            if (normal.gradient > 0.18) {
-              ctx.shadowBlur = 22;
-              ctx.shadowColor = '#38bdf8';
-              ctx.fillStyle = '#f0fdf4';
-              ctx.fillText(char, warpX, warpY);
-            }
-          } else {
-            // Trailing phosphor fade
-            const alpha = Math.max(0.08, 1.0 - (j / col.length));
-            ctx.shadowBlur = j < 3 ? 10 : 4;
-            ctx.shadowColor = baseRainColor;
-            ctx.fillStyle = (j === 1) ? '#a7f3d0' : baseRainColor;
-            ctx.globalAlpha = alpha * 0.9;
-            ctx.fillText(char, warpX, warpY);
-            ctx.globalAlpha = 1.0;
-          }
-        }
-      }
-    }
-
-    // 5. Volumetric Dust Particles caught in projection light beam
-    for (let i = 0; i < dustParticles.length; i++) {
-      const p = dustParticles[i];
-      const px = p.x * width;
-      const py = p.y * height;
-      const pAlpha = p.alpha * (0.6 + Math.sin(t * p.pulseSpeed) * 0.4);
-
-      ctx.save();
-      ctx.shadowBlur = 8;
-      ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-      ctx.fillStyle = `rgba(220, 252, 231, ${pAlpha})`;
-      ctx.beginPath();
-      ctx.arc(px, py, p.size * p.z, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // 6. Central Kinetic HUD Box & Typographic Reveal
-    const isTextShowing = state.textVisible !== false;
-    if (isTextShowing) {
-      renderCentral3DHUD(ctx, width, height, state, t);
-    }
-
-    // 7. Natural f/2.8 Spatial Lens Depth-of-Field & Vignette Pass
-    renderDepthOfFieldAndVignette(ctx, width, height, t);
-
-    ctx.restore(); // Restore camera drift transform
-    ctx.restore(); // Restore global context
-  };
-
-  /**
-   * Renders the 3D Floating Cyan HUD Box and Slam Typewriter Text
-   * Perfectly matches Image 2
-   */
-  function renderCentral3DHUD(ctx, width, height, state, t) {
-    const targetWord = (state.mainText || 'THE ILLUSION OF CHOICE').trim();
-    const subtitleText = state.subText || '[ HIGH TENSION REVEAL ]';
-    const hudColor = state.textColor || '#00f0ff'; // Vibrant cyan
-
-    const typeSpeed = state.matrixTypeSpeed || 1.0;
-    const progress = Math.min(1.0, (t * 0.8 * typeSpeed) % 1.25);
-    const charsRevealed = Math.floor(progress * targetWord.length);
-
-    // Trigger physical screen shake on character lock
-    if (charsRevealed > lastCharsCount && charsRevealed <= targetWord.length) {
-      if (lastCharsCount !== -1) triggerTypingSlamImpulse();
-      lastCharsCount = charsRevealed;
-    }
-
-    let displayed = targetWord.substring(0, charsRevealed);
-    if (charsRevealed < targetWord.length) {
-      const scramIdx = Math.floor((t * 55) % SCRAMBLE_GLYPHS.length);
-      displayed += SCRAMBLE_GLYPHS[scramIdx];
-    }
-
-    const centerX = width * 0.5;
-    const centerY = height * 0.51;
-
-    ctx.save();
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // Subtitle above HUD box
-    ctx.font = '800 13px monospace';
-    ctx.fillStyle = '#a7f3d0';
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = 'rgba(0, 255, 65, 0.7)';
-    ctx.letterSpacing = '2px';
-    ctx.fillText(subtitleText, centerX, centerY - 38);
-
-    // Measure HUD Box
-    ctx.font = '900 22px monospace';
-    const textW = ctx.measureText(targetWord).width;
-    const boxW = Math.max(340, textW + 72);
-    const boxH = 54;
-    const boxX = centerX - boxW / 2;
-    const boxY = centerY - boxH / 2 + 6;
-    const r = 8; // rounded corner
-
-    // Projected Cyan Light Reflection & Ambient Occlusion onto blueprint map below
-    const floorGlow = ctx.createRadialGradient(centerX, centerY + 24, 10, centerX, centerY + 24, boxW * 0.55);
-    floorGlow.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
-    floorGlow.addColorStop(0.5, 'rgba(0, 240, 255, 0.08)');
-    floorGlow.addColorStop(1, 'transparent');
-    ctx.fillStyle = floorGlow;
-    ctx.fillRect(boxX - 30, boxY + 20, boxW + 60, boxH + 30);
-
-    // HUD Glass Container Background
-    ctx.save();
-    ctx.shadowBlur = 25;
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-    ctx.fillStyle = 'rgba(5, 20, 28, 0.88)';
-    roundRect(ctx, boxX, boxY, boxW, boxH, r);
-    ctx.fill();
-    ctx.restore();
-
-    // Glowing Cyan Border
-    ctx.save();
-    ctx.strokeStyle = hudColor;
-    ctx.lineWidth = 1.8;
-    ctx.shadowBlur = 16;
-    ctx.shadowColor = hudColor;
-    roundRect(ctx, boxX, boxY, boxW, boxH, r);
-    ctx.stroke();
-
-    // Subtle Corner Brackets for Tactical Look
-    const tickLen = 7;
-    ctx.lineWidth = 2.5;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = '#ffffff';
-    // Top-left bracket
-    ctx.beginPath();
-    ctx.moveTo(boxX - 3, boxY + tickLen);
-    ctx.lineTo(boxX - 3, boxY - 3);
-    ctx.lineTo(boxX + tickLen, boxY - 3);
-    ctx.stroke();
-    // Top-right bracket
-    ctx.beginPath();
-    ctx.moveTo(boxX + boxW - tickLen, boxY - 3);
-    ctx.lineTo(boxX + boxW + 3, boxY - 3);
-    ctx.lineTo(boxX + boxW + 3, boxY + tickLen);
-    ctx.stroke();
-    // Bottom-left bracket
-    ctx.beginPath();
-    ctx.moveTo(boxX - 3, boxY + boxH - tickLen);
-    ctx.lineTo(boxX - 3, boxY + boxH + 3);
-    ctx.lineTo(boxX + tickLen, boxY + boxH + 3);
-    ctx.stroke();
-    // Bottom-right bracket
-    ctx.beginPath();
-    ctx.moveTo(boxX + boxW - tickLen, boxY + boxH + 3);
-    ctx.lineTo(boxX + boxW + 3, boxY + boxH + 3);
-    ctx.lineTo(boxX + boxW + 3, boxY + boxH - tickLen);
-    ctx.stroke();
-    ctx.restore();
-
-    // Render Decoded Typewriter Characters
-    ctx.save();
-    ctx.font = '900 22px monospace';
-    ctx.fillStyle = hudColor;
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = hudColor;
-    ctx.textAlign = 'center';
-    ctx.fillText(displayed, centerX - 10, centerY + 7);
-
-    // Blinking Terminal Block Cursor ▌
-    const isCursorBlink = Math.floor(t * 4.5) % 2 === 0;
-    if (isCursorBlink) {
-      const curMetrics = ctx.measureText(displayed);
-      const curX = centerX - 10 + (curMetrics.width / 2) + 5;
-      ctx.fillStyle = hudColor;
-      ctx.shadowBlur = 14;
-      ctx.shadowColor = hudColor;
-      ctx.fillRect(curX, centerY - 10 + 7, 8, 20);
-    }
-    ctx.restore();
-
-    ctx.restore();
-  }
-
-  // Helper for drawing rounded rectangle paths
   function roundRect(ctx, x, y, w, h, r) {
     if (w < 2 * r) r = w / 2;
     if (h < 2 * r) r = h / 2;
@@ -470,63 +149,280 @@
   }
 
   /**
-   * Natural f/2.8 Spatial Lens Depth-of-Field & Vignette Pass
+   * Main High-Performance Canvas Renderer for 3D Tactical Desk Matrix Projection
+   * Used for both live customizer stage, studio timeline playback, and export.
    */
-  function renderDepthOfFieldAndVignette(ctx, width, height, t) {
-    // Optical lens vignette
-    const vigGrad = ctx.createRadialGradient(width * 0.5, height * 0.48, width * 0.32, width * 0.5, height * 0.48, width * 0.68);
+  window.renderTacticalDeskCanvasFrame = function(ctx, width, height, state, elapsed, dt) {
+    if (!ctx || !width || !height) return;
+
+    const t = elapsed !== undefined ? elapsed : 0;
+    dt = Math.min(0.1, dt || 0.016);
+    updateDustParticles(dt);
+
+    const plateImg = loadImg(PLATE_URL);
+    loadImg(NORMAL_URL);
+
+    ctx.save();
+    ctx.clearRect(0, 0, width, height);
+
+    // 1. Subtle Organic Macro Camera Micro-Motion (Natural documentary camera feel)
+    const driftX = Math.sin(t * 0.3) * 1.2;
+    const driftY = Math.cos(t * 0.25) * 0.8;
+
+    ctx.save();
+    ctx.translate(driftX, driftY);
+
+    // 2. Base Environmental Anchor (Executive Mahogany Desk, Blueprint Map, Stacked Documents, Dossier, Brass Compass)
+    if (plateImg) {
+      ctx.drawImage(plateImg, 0, 0, width, height);
+    } else {
+      // High-quality dark blueprint gradient fallback while loading
+      const bgGrad = ctx.createRadialGradient(width * 0.5, height * 0.45, 10, width * 0.5, height * 0.5, width * 0.7);
+      bgGrad.addColorStop(0, '#0c1f2b');
+      bgGrad.addColorStop(0.5, '#07121b');
+      bgGrad.addColorStop(1, '#02060a');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, width, height);
+    }
+
+    // 3. Projected 3D Matrix Digital Rain with Normal-Mapped Surface Warping
+    const rainEnabled = state.matrixRainEnabled !== false;
+    const baseRainColor = state.matrixRainColor || '#00ff41';
+    const rainSpeed = state.matrixRainSpeed || 1.0;
+    const colCount = 18; // Elegant, tasteful stream count matching Image 2
+    const colWidth = width / colCount;
+    const fontSize = Math.max(10, Math.round(height * 0.048));
+
+    if (!state.matrixColumns || state.matrixColumns.length !== colCount) {
+      state.matrixColumns = [];
+      for (let i = 0; i < colCount; i++) {
+        state.matrixColumns.push({
+          y: Math.random() * -height * 0.8,
+          speed: (Math.random() * 0.55 + 0.55) * rainSpeed,
+          length: Math.floor(Math.random() * 8 + 6),
+          baseX: (i + 0.5) * colWidth + (Math.random() - 0.5) * (colWidth * 0.4)
+        });
+      }
+    }
+
+    if (rainEnabled) {
+      ctx.font = `bold ${fontSize}px monospace`;
+      ctx.textAlign = 'center';
+
+      for (let i = 0; i < colCount; i++) {
+        const col = state.matrixColumns[i];
+        const baseX = col.baseX;
+
+        // Step drops
+        col.y += fontSize * col.speed * (dt * 30);
+        if (col.y > height + 80) {
+          col.y = Math.random() * -100;
+          col.speed = (Math.random() * 0.55 + 0.55) * rainSpeed;
+        }
+
+        // Draw trail of characters
+        for (let j = 0; j < col.length; j++) {
+          const charY = col.y - (j * fontSize);
+          if (charY < -15 || charY > height + 15) continue;
+
+          const normU = Math.max(0, Math.min(1, baseX / width));
+          const normV = Math.max(0, Math.min(1, charY / height));
+          const normal = sampleSurfaceNormal(normU, normV);
+
+          // Normal Map Warping across stacked paper edges and compass
+          const warpX = baseX + normal.nx * 6.0;
+          const warpY = charY + normal.ny * 4.0;
+
+          const glyphIdx = Math.floor((Math.abs(Math.sin(i * 17 + j * 9 + t * 3.5)) * MATRIX_GLYPHS.length)) % MATRIX_GLYPHS.length;
+          const char = MATRIX_GLYPHS[glyphIdx];
+
+          if (j === 0) {
+            // Bright leading droplet head
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#00f0ff';
+            ctx.fillStyle = '#ffffff';
+            ctx.globalAlpha = 0.95;
+            ctx.fillText(char, warpX, warpY);
+          } else {
+            // Phosphor fading trail
+            const trailAlpha = Math.max(0.06, 0.75 * (1.0 - (j / col.length)));
+            ctx.shadowBlur = j < 3 ? 6 : 2;
+            ctx.shadowColor = baseRainColor;
+            ctx.fillStyle = (j === 1) ? '#a7f3d0' : baseRainColor;
+            ctx.globalAlpha = trailAlpha;
+            ctx.fillText(char, warpX, warpY);
+          }
+        }
+      }
+      ctx.globalAlpha = 1.0;
+      ctx.shadowBlur = 0;
+    }
+
+    // 4. Floating Volumetric Dust Particles caught in projection light
+    for (let i = 0; i < dustParticles.length; i++) {
+      const p = dustParticles[i];
+      const px = p.x * width;
+      const py = p.y * height;
+      const pAlpha = p.alpha * (0.6 + Math.sin(t * p.pulseSpeed) * 0.4);
+
+      ctx.save();
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.7)';
+      ctx.fillStyle = `rgba(220, 252, 231, ${pAlpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(px, py, p.size * p.z, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 5. Central Kinetic HUD Box & Typewriter Reveal
+    const isTextShowing = state.textVisible !== false;
+    if (isTextShowing) {
+      renderCentralHUD(ctx, width, height, state, t);
+    }
+
+    // 6. Subtle Optical Lens Vignette
+    const vigGrad = ctx.createRadialGradient(width * 0.5, height * 0.48, width * 0.35, width * 0.5, height * 0.48, width * 0.68);
     vigGrad.addColorStop(0, 'transparent');
-    vigGrad.addColorStop(0.7, 'rgba(3, 5, 10, 0.35)');
-    vigGrad.addColorStop(1.0, 'rgba(0, 2, 6, 0.75)');
+    vigGrad.addColorStop(0.7, 'rgba(2, 5, 8, 0.25)');
+    vigGrad.addColorStop(1.0, 'rgba(1, 3, 5, 0.65)');
     ctx.fillStyle = vigGrad;
     ctx.fillRect(0, 0, width, height);
+
+    ctx.restore(); // Restore camera drift
+    ctx.restore(); // Restore root context
+  };
+
+  /**
+   * Renders the Central Tactical Cyan HUD Box and Slam Typewriter Text
+   * Pixel-perfect match to Image 2
+   */
+  function renderCentralHUD(ctx, width, height, state, t) {
+    const targetWord = (state.mainText || 'THE ILLUSION OF CHOICE').trim();
+    const subtitleText = (state.subText || '[ HIGH TENSION REVEAL ]').trim().toUpperCase();
+    const hudColor = state.textColor || '#00f0ff'; // Vibrant cyan
+
+    const typeSpeed = state.matrixTypeSpeed || 1.0;
+    const progress = Math.min(1.0, (t * 0.8 * typeSpeed) % 1.25);
+    const charsRevealed = Math.floor(progress * targetWord.length);
+
+    let displayed = targetWord.substring(0, charsRevealed);
+    if (charsRevealed < targetWord.length) {
+      const scramIdx = Math.floor((t * 55) % SCRAMBLE_GLYPHS.length);
+      displayed += SCRAMBLE_GLYPHS[scramIdx];
+    }
+
+    const centerX = width * 0.5;
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // A. Subtitle above HUD box [ HIGH TENSION REVEAL ]
+    // In Image 2 (696x249 coordinates): subtitle is at y = 107px (height * 0.430)
+    const subY = height * 0.430;
+    const subFontSize = Math.max(10, Math.round(height * 0.046));
+    ctx.font = `800 ${subFontSize}px "Courier New", Courier, monospace`;
+    ctx.fillStyle = '#a7f3d0';
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(0, 255, 65, 0.65)';
+    ctx.fillText(subtitleText, centerX, subY);
+
+    // B. Inside the HUD Box: Typewriter text & Cyan Terminal Cursor
+    // In Image 2 (696x249 coordinates): box center is at y = 133px (height * 0.534), box height is 36px (height * 0.145)
+    const boxCenterY = height * 0.534;
+    const mainFontSize = Math.max(13, Math.round(height * 0.068));
+    ctx.font = `900 ${mainFontSize}px "Courier New", Courier, monospace`;
+
+    const textMetrics = ctx.measureText(targetWord);
+    const standardBoxW = width * 0.312; // 217px in 696px width (authentic plate box)
+    const neededBoxW = textMetrics.width + 36;
+
+    // If custom text exceeds standard plate box, dynamically draw expanded cyan glowing pill
+    if (neededBoxW > standardBoxW) {
+      const expBoxW = neededBoxW;
+      const expBoxH = Math.round(height * 0.148);
+      const expBoxX = centerX - expBoxW / 2;
+      const expBoxY = boxCenterY - expBoxH / 2;
+      const r = 6;
+
+      ctx.save();
+      // Translucent dark teal glass interior
+      ctx.fillStyle = 'rgba(6, 30, 40, 0.88)';
+      ctx.shadowBlur = 18;
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+      roundRect(ctx, expBoxX, expBoxY, expBoxW, expBoxH, r);
+      ctx.fill();
+
+      // Glowing Cyan Border
+      ctx.strokeStyle = hudColor;
+      ctx.lineWidth = 1.6;
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = hudColor;
+      roundRect(ctx, expBoxX, expBoxY, expBoxW, expBoxH, r);
+      ctx.stroke();
+
+      // Horizontal Laser Flare Streaks
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(expBoxX, boxCenterY);
+      ctx.lineTo(expBoxX - 25, boxCenterY);
+      ctx.moveTo(expBoxX + expBoxW, boxCenterY);
+      ctx.lineTo(expBoxX + expBoxW + 25, boxCenterY);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Render Typewriter Text
+    ctx.save();
+    ctx.font = `900 ${mainFontSize}px "Courier New", Courier, monospace`;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = hudColor;
+
+    // Shift text slightly left to accommodate the terminal cursor
+    const cursorW = Math.max(5, Math.round(height * 0.024));
+    const cursorH = Math.max(14, Math.round(height * 0.072));
+    const cursorGap = 4;
+    const curDispMetrics = ctx.measureText(displayed);
+    const totalContentW = curDispMetrics.width + cursorGap + cursorW;
+    const startX = centerX - (totalContentW / 2);
+
+    ctx.textAlign = 'left';
+    ctx.fillText(displayed, startX, boxCenterY + 1);
+
+    // Blinking Cyan Terminal Block Cursor ▌
+    const isCursorBlink = Math.floor(t * 4.5) % 2 === 0;
+    if (isCursorBlink) {
+      const curX = startX + curDispMetrics.width + cursorGap;
+      const curY = boxCenterY - (cursorH / 2) + 1;
+      ctx.fillStyle = hudColor;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = hudColor;
+      ctx.fillRect(curX, curY, cursorW, cursorH);
+    }
+    ctx.restore();
+
+    ctx.restore();
   }
 
   /**
    * Mounts the 3D Tactical Environmental Stage into the Customizer Modal
+   * Clean, perfectly flush and unskewed viewport matching Image 2
    */
   window.tplMountTacticalDecode3DStage = function(stage, state) {
     if (!stage) return;
-    const prim = (state.primaryUrl && !state.primaryUrl.includes('unsplash')) ? state.primaryUrl : PLATE_URL;
 
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #030508; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; perspective: 1100px;">
-        <!-- 3D Spatial Rig (25°-35° spatial tilt across X and Y axes) -->
-        <div id="customizer-tactical-3d-rig" style="position: absolute; inset: -5% -6%; width: 110%; height: 110%; transform: rotateX(24deg) rotateY(-3.5deg) scale(1.04); transform-style: preserve-3d; transition: transform 0.2s cubic-bezier(0.16,1,0.3,1);">
-          
-          <!-- Environmental Desk & Evidence Plate -->
-          <img id="customizer-live-tactical-plate" src="${prim}" alt="Tactical Desk Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; pointer-events: none; filter: contrast(112%) brightness(95%);" />
-
-          <!-- High-performance Normal-Mapped Projected Canvas -->
-          <canvas id="customizer-live-matrix-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;"></canvas>
-
-          <!-- Directed Warm Overhead Key Spotlight Overlay -->
-          <div style="position: absolute; inset: 0; z-index: 3; pointer-events: none; background: radial-gradient(circle at 48% 30%, rgba(255,246,220,0.20) 0%, rgba(255,235,190,0.06) 42%, rgba(0,0,0,0.72) 100%); mix-blend-mode: soft-light;"></div>
-
-          <!-- Central Tactical 3D HUD Rig -->
-          <div id="customizer-live-tactical-hud-rig" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 4; pointer-events: none; transform: translateZ(16px); will-change: transform;">
-            <span id="customizer-live-subtitle" style="font-family: monospace; font-size: 11.5px; color: #a7f3d0; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 9px; text-shadow: 0 0 10px rgba(0,255,65,0.7);">
-              ${state.subText || '[ HIGH TENSION REVEAL ]'}
-            </span>
-
-            <div id="customizer-live-decode-box" style="font-family: monospace; font-size: 19px; font-weight: 900; letter-spacing: 2.2px; color: ${state.textColor || '#00f0ff'}; background: rgba(5, 20, 28, 0.88); border: 1.8px solid ${state.textColor || '#00f0ff'}; padding: 9px 24px; border-radius: 8px; box-shadow: 0 0 24px ${state.textColor || '#00f0ff'}40, inset 0 0 15px ${state.textColor || '#00f0ff'}20, 0 16px 36px rgba(0,0,0,0.92); display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(8px); transition: box-shadow 0.2s ease;">
-              <span id="customizer-live-decode-text">${state.mainText || 'THE ILLUSION OF CHOICE'}</span>
-              <span id="customizer-live-cursor" style="display: inline-block; width: 8px; height: 20px; background: ${state.textColor || '#00f0ff'}; box-shadow: 0 0 10px ${state.textColor || '#00f0ff'};" class="pulse-preview-badge"></span>
-            </div>
-          </div>
-
-          <!-- Lens Vignette & Depth Falloff Overlay -->
-          <div style="position: absolute; inset: 0; z-index: 5; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent 45%, rgba(0,2,6,0.65) 100%);"></div>
-
-        </div>
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #030508; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
+        <canvas id="customizer-live-matrix-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
       </div>
     `;
 
-    // Ensure initial render tick
     const canvas = stage.querySelector('#customizer-live-matrix-canvas');
     if (canvas) {
       canvas.width = canvas.clientWidth || 696;
-      canvas.height = canvas.clientHeight || 250;
+      canvas.height = canvas.clientHeight || 249;
       const ctx = canvas.getContext('2d');
       window.renderTacticalDeskCanvasFrame(ctx, canvas.width, canvas.height, state, 0, 0.016);
     }
@@ -541,7 +437,7 @@
 
     if (!canvas._initialized || canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
       canvas.width = canvas.clientWidth || 696;
-      canvas.height = canvas.clientHeight || 250;
+      canvas.height = canvas.clientHeight || 249;
       canvas._initialized = true;
     }
 
@@ -549,33 +445,9 @@
     const dt = (now - (state._lastTacticalNow || now)) / 1000;
     state._lastTacticalNow = now;
 
-    // Render full 3D environmental scene onto the canvas
+    // Render full photorealistic 3D environmental scene onto the canvas with zero ghosting
     window.renderTacticalDeskCanvasFrame(ctx, canvas.width, canvas.height, state, elapsed, Math.min(0.1, dt || 0.016));
-
-    // Update DOM HUD text in sync
-    const targetWord = (state.mainText || 'THE ILLUSION OF CHOICE').trim();
-    const typeSpeed = state.matrixTypeSpeed || 1.0;
-    const progress = Math.min(1.0, (elapsed * 0.8 * typeSpeed) % 1.25);
-    const charsRevealed = Math.floor(progress * targetWord.length);
-
-    let displayed = targetWord.substring(0, charsRevealed);
-    if (charsRevealed < targetWord.length) {
-      const scramIdx = Math.floor((elapsed * 55) % SCRAMBLE_GLYPHS.length);
-      displayed += SCRAMBLE_GLYPHS[scramIdx];
-    }
-
-    const textSpan = document.getElementById('customizer-live-decode-text');
-    if (textSpan) textSpan.textContent = displayed;
-
-    const subSpan = document.getElementById('customizer-live-subtitle');
-    if (subSpan) subSpan.textContent = state.subText || '[ HIGH TENSION REVEAL ]';
-
-    // Apply micro screen shake to HUD container
-    const hudRig = document.getElementById('customizer-live-tactical-hud-rig');
-    if (hudRig) {
-      hudRig.style.transform = `translateZ(16px) translate3d(${shakeImpulseX.toFixed(1)}px, ${shakeImpulseY.toFixed(1)}px, 0)`;
-    }
   };
 
-  console.log('[Tactical Decode 3D Engine] Initialized 3D Environmental Projection Engine');
+  console.log('[Tactical Decode 3D Engine] Initialized Clean 3D Environmental Projection Engine matching Image 2');
 })();

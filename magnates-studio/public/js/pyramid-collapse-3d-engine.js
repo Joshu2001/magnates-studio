@@ -65,6 +65,9 @@
   let pcAnimFrame = null;
   let pcControls = null;
   let pcGroup = null;
+  let ambientLight = null;
+  let spotLight = null;
+  let rimLight = null;
 
   // Structural Objects
   let groundMesh = null;
@@ -810,6 +813,9 @@
     rebarRods = [];
     binarySeamMesh = null;
     dustParticleSystem = null;
+    ambientLight = null;
+    spotLight = null;
+    rimLight = null;
   }
 
   window.tplMountPyramidCollapse3DStage = function(stage, data) {
