@@ -1673,6 +1673,8 @@
     </g>
   </svg>`)}`;
 
+    SNAPSHOTS['conspiracy-board'] = '/red_string_board_cinematic_plate.jpg';
+
   window.tplGetSnapshot = function (id) {
     return SNAPSHOTS[id] || null;
   };

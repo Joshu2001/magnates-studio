@@ -85,6 +85,23 @@
       pinStrikeShake: true
     }),
 
+    'deal-term-sheet': Object.assign({}, (typeof window !== 'undefined' && window.DEAL_TERM_SHEET_CONFIG) || {
+      type: 'deal-term-sheet',
+      title: 'TERM SHEET \u00b7 SERIES A',
+      valuationText: 'Valuation: $80M pre-money',
+      investmentText: 'Investment: $12M for 15%',
+      boardSeatsText: 'Board seats: 2 investor, 3 founder',
+      liquidationPrefText: 'Liquidation pref: 1x non-participating',
+      signeeName: 'Alexander Vance',
+      stamp1Text: 'DEAL CLOSED',
+      stamp2Text: 'APPROVED',
+      showStamp1: true,
+      showStamp2: true,
+      surfaceType: 'mahogany',
+      cameraPreset: 'macro_cinematic',
+      duration: 5.0
+    }),
+
     'envelope-open': Object.assign({}, (typeof window !== 'undefined' && window.ENVELOPE_3D_CONFIG) || {
       type: 'envelope-open',
       envelopeStyle: 'manila_classified',

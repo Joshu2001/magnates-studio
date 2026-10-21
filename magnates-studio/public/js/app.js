@@ -31263,11 +31263,7 @@ function openTopTemplateCustomizer(tpl) {
     } else if (tpl.id === 'conspiracy-board') {
       topCustomizerState.primaryUrl = '/portrait_cutout_clean.png';
       topCustomizerState.secondaryUrl = '';
-      if (typeof window.tplMountRedString3DStage === 'function') {
-        const stage = document.getElementById('tpl-modal-preview-stage');
-        const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountRedString3DStage(stage, cbData);
-      }
+      topCustomizerState.originalPhotoUrl = '/portrait_cutout_clean.png';
     } else if (tpl.id === 'envelope-open') {
       topCustomizerState.primaryUrl = '/classified_envelope_macro_ref.png';
       topCustomizerState.secondaryUrl = '';
@@ -31373,6 +31369,7 @@ function openTopTemplateCustomizer(tpl) {
 
   const modal = document.getElementById('modal-top-template-customizer');
   if (!modal) return;
+  modal.style.display = 'flex';
 
   const paperModeSwitcher = document.getElementById('paper-rip-mode-switcher');
   const paperModeVideo = document.getElementById('btn-paper-rip-mode-video');
@@ -31381,7 +31378,7 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map'
+    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board'
   ]);
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
@@ -33304,6 +33301,18 @@ function renderTopTemplatePreviewStage() {
     hoverExternalT = null;
     if (typeof window.tplMountMoneyStack3DStage === 'function') {
       window.tplMountMoneyStack3DStage(stage, mData);
+    }
+    return;
+  }
+
+  // 3D Photorealistic Red String Investigation Board Engine (James Jani / Magnates Media / Vox Style)
+  if (tplId === 'conspiracy-board') {
+    const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('conspiracy-board') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountRedString3DStage === 'function') {
+      window.tplMountRedString3DStage(stage, cbData);
     }
     return;
   }

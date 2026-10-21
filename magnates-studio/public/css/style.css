@@ -11139,13 +11139,380 @@ body.tool-slide-active {
 @keyframes igPostIn { 0%{opacity:0;transform:translateY(16px) scale(0.96)} 15%,90%{opacity:1;transform:translateY(0) scale(1)} 100%{opacity:0.8} }
 @keyframes igHeartPop { 0%,25%{opacity:0;transform:translate(-50%,-50%) scale(0)} 38%{opacity:1;transform:translate(-50%,-50%) scale(1.25)} 50%,75%{opacity:1;transform:translate(-50%,-50%) scale(1)} 88%,100%{opacity:0} }
 
-/* 34. Checklist */
-.tpl-checklist { background: linear-gradient(135deg,#1a1a2e 0%,#0a0a15 100%); padding: 20px; flex-direction: column; justify-content: center; gap: 10px; }
-.tpl-checklist .check-item { display: flex; align-items: center; gap: 10px; animation: checkIn 3s ease-out infinite; }
-.tpl-checklist .check-box { width: 20px; height: 20px; border-radius: 4px; background: #00d68f; color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
-.tpl-checklist .check-text { font-size: 13px; font-weight: 600; color: #fff; }
-.tpl-checklist .check-item:nth-child(1){animation-delay:0s}.tpl-checklist .check-item:nth-child(2){animation-delay:0.5s}.tpl-checklist .check-item:nth-child(3){animation-delay:1s}.tpl-checklist .check-item:nth-child(4){animation-delay:1.5s}
-@keyframes checkIn { 0%{opacity:0;transform:translateX(-20px)} 15%,85%{opacity:1;transform:translateX(0)} 100%{opacity:0} }
+/* 34. Animated Checklist (Master 3D Paper Artifact Reveal Engine) */
+.tpl-checklist {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: #070a12;
+  user-select: none;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 1. Backdrop Mood & Context */
+.tpl-checklist .cl-desk-surface {
+  position: absolute;
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  background-image: url('/mahogany_desk_texture.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: brightness(0.85) contrast(1.2) saturate(1.1);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tpl-checklist .cl-desk-tactical-wash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 45%, rgba(6, 11, 20, 0.42) 0%, rgba(4, 7, 14, 0.9) 100%),
+              linear-gradient(180deg, rgba(14, 23, 42, 0.5) 0%, rgba(2, 6, 23, 0.8) 100%);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.tpl-checklist .cl-backdrop-blueprint {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, #0d1e33 0%, #08111e 65%, #03070d 100%);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tpl-checklist .cl-blueprint-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.tpl-checklist .cl-blueprint-hud {
+  position: absolute;
+  z-index: 3;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  color: rgba(56, 189, 248, 0.65);
+  letter-spacing: 0.1em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.tpl-checklist .cl-hud-tl { top: 14px; left: 16px; }
+.tpl-checklist .cl-hud-tr { top: 14px; right: 16px; align-items: flex-end; }
+.tpl-checklist .cl-hud-br { bottom: 14px; right: 16px; align-items: flex-end; }
+.tpl-checklist .cl-coord-badge {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+/* 2. Cinematic Lighting & Volumetric Depth */
+.tpl-checklist .cl-overhead-spotlight {
+  position: absolute;
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  background: radial-gradient(ellipse 65% 55% at 50% 45%, rgba(255, 248, 230, 0.28) 0%, rgba(245, 180, 80, 0.08) 50%, transparent 80%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 4;
+  opacity: var(--cl-spot-intensity, 1.0);
+  animation: clSpotlightPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes clSpotlightPulse {
+  0%, 100% {
+    opacity: var(--cl-spot-intensity, 1.0);
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    opacity: calc(var(--cl-spot-intensity, 1.0) * 1.15);
+    transform: scale(1.04) translate(3px, -2px);
+  }
+}
+
+.tpl-checklist .cl-volumetric-shafts {
+  position: absolute;
+  inset: -30%;
+  width: 160%;
+  height: 160%;
+  background: repeating-linear-gradient(132deg, rgba(255, 248, 220, 0.04) 0deg, rgba(255, 248, 220, 0.04) 45px, transparent 45px, transparent 110px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: 5;
+}
+
+.tpl-checklist .cl-cinematic-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.88), inset 0 0 190px rgba(0, 0, 0, 0.96);
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* Floating Volumetric Dust Motes */
+.tpl-checklist .cl-dust-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 7;
+  overflow: hidden;
+}
+
+.tpl-checklist .cl-dust-mote {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(254, 240, 138, 0.95) 0%, rgba(245, 158, 11, 0.45) 60%, transparent 100%);
+  box-shadow: 0 0 6px rgba(254, 240, 138, 0.7);
+  animation: clDustFloat linear infinite;
+  pointer-events: none;
+}
+
+@keyframes clDustFloat {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  15% { opacity: 0.85; }
+  85% { opacity: 0.85; }
+  100% { transform: translate3d(var(--dx, 35px), var(--dy, -90px), 0); opacity: 0; }
+}
+
+/* 3. 3D Spatial Rig */
+.tpl-checklist .cl-3d-spatial-rig {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+}
+
+.tpl-checklist .cl-3d-stage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* CHOICE A: STACKED EVIDENCE SLIPS (IMAGE 2) */
+.tpl-checklist .cl-slips-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  width: 440px;
+  max-width: 90vw;
+  position: relative;
+}
+
+.tpl-checklist .cl-evidence-slip-wrapper {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tpl-checklist .cl-evidence-slip {
+  position: relative;
+  background: linear-gradient(180deg, #f5ebd5 0%, #e8dcbe 100%);
+  border-radius: 2px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.48), 0 3px 8px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+/* Paper Grain Overlay */
+.tpl-checklist .cl-paper-grain-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image: radial-gradient(#cbb993 0.8px, transparent 0.8px), radial-gradient(#faf5e9 0.8px, transparent 0.8px);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Translucent Masking Tape */
+.tpl-checklist .cl-masking-tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%) rotate(0.6deg);
+  width: 82px;
+  height: 19px;
+  background: linear-gradient(180deg, rgba(250, 243, 222, 0.78) 0%, rgba(240, 228, 196, 0.65) 50%, rgba(245, 235, 205, 0.75) 100%);
+  backdrop-filter: blur(1.5px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+  z-index: 10;
+  border-left: 2px dashed rgba(200, 190, 160, 0.45);
+  border-right: 2px dashed rgba(200, 190, 160, 0.45);
+  pointer-events: none;
+  opacity: 0.94;
+}
+
+/* CHOICE B: 3D SPATIAL DOSSIER SHEET (IMAGE 3) */
+.tpl-checklist .cl-dossier-sheet {
+  width: 500px;
+  max-width: 90vw;
+  min-height: 290px;
+  background: linear-gradient(135deg, #f7f0e0 0%, #ece1c6 60%, #e2d3b2 100%);
+  border-radius: 3px;
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.68), 0 6px 16px rgba(0, 0, 0, 0.45);
+  position: relative;
+  padding: 26px 34px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.tpl-checklist .cl-paper-crease-h {
+  position: absolute;
+  top: 48%;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.08) 25%, rgba(255,255,255,0.25) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.tpl-checklist .cl-dossier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.18);
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+}
+
+.tpl-checklist .cl-dossier-agency {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  color: #1e293b;
+}
+
+.tpl-checklist .cl-dossier-code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.tpl-checklist .cl-dossier-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tpl-checklist .cl-dossier-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+/* Official Rubber Stamp Seal (Image 3) */
+.tpl-checklist .cl-official-stamp-seal {
+  position: absolute;
+  bottom: 14px;
+  right: 22px;
+  transform: rotate(-12deg);
+  mix-blend-mode: multiply;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+/* 4. Photorealistic Rubber Ink Stamp Impressions */
+.tpl-checklist .cl-stamp-box-wrap {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  mix-blend-mode: multiply;
+}
+
+.tpl-checklist .cl-stamp-border {
+  stroke: var(--cl-stamp-color, #15803d);
+  stroke-width: 2.8;
+  stroke-dasharray: 28 2 24 1.5;
+  filter: contrast(120%);
+}
+
+.tpl-checklist .cl-stamp-check {
+  stroke: var(--cl-stamp-color, #15803d);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Punchy Stamp Slam Animation */
+.tpl-checklist .cl-stamp-box-wrap.is-slamming {
+  animation: clStampSlam 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  animation-delay: var(--cl-stamp-delay, 0s);
+}
+
+@keyframes clStampSlam {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) rotate(-8deg);
+  }
+  65% {
+    opacity: 1;
+    transform: scale(0.95) rotate(1deg);
+  }
+  100% {
+    opacity: 0.95;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Checklist Item Text */
+.tpl-checklist .cl-item-text {
+  font-size: 15px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: 0.2px;
+  line-height: 1.3;
+  text-shadow: 0 0.5px 1px rgba(0, 0, 0, 0.15);
+}
+
+/* 5. Shallow Depth of Field (f/2.8 Lens Emulation) */
+.tpl-checklist .has-shallow-dof .is-blurred-dof {
+  filter: blur(2.4px) contrast(90%);
+  opacity: 0.52;
+  transform: scale(0.98);
+  transition: filter 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
+}
+
+.tpl-checklist .has-shallow-dof .is-sharp-focus {
+  filter: blur(0px) contrast(105%);
+  opacity: 1.0;
+  transform: scale(1.02);
+  z-index: 5;
+  transition: filter 0.35s ease, opacity 0.35s ease, transform 0.35s ease;
+}
 
 
 
