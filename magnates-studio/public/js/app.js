@@ -24488,16 +24488,16 @@ id: 'map',
   },
   {
     id: 'jani-puzzle-narrative-suite',
-    hidden: true,
-    title: 'James Jani Puzzle & Alpha Matte Suite',
+    title: 'James Jani Puzzle: Modular Reconstruction & Shuffle Engine',
     category: '3D Spatial',
-    badge: 'James Jani Signature',
-    difficulty: '1-Click',
-    timeToApply: '4 sec',
-    previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Deconstruct complex narratives into 3x3 floating puzzle pieces and snap them into place with glowing geometric alpha matte talking points.',
-    tags: ['Puzzle Metaphor', 'Alpha Matte', 'James Jani', 'Retention'],
-    defaultImage: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=800&auto=format&fit=crop&q=80',
+    origCategory: '3D Spatial',
+    badge: 'JANI SIGNATURE',
+    difficulty: 'Cinematic',
+    timeToApply: '10 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(3, 15, 28, 0.95), rgba(2, 6, 12, 0.95))',
+    description: 'Authentic James Jani interlocking puzzle documentary animation: neon cyan glowing edges, dynamic entry & interlocking connection, customizable image slicing, shuffleable falling & popping physics, and narrative badge overlays.',
+    tags: ['James Jani', 'Puzzle', 'Neon Glow', 'Reconstruction', 'Shuffle', 'Image Slicing', 'Crypto Boom'],
+    defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -28296,173 +28296,12 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>
       `;
     } else if (tplId === 'jani-puzzle-narrative-suite') {
-      const pz = (typeof window.tplGetPuzzleConfig === 'function') ? window.tplGetPuzzleConfig() : {
-        bgVisible: true,
-        bgOpacity: 0.35,
-        gridVisible: true,
-        watermarkVisible: true,
-        thesisVisible: true,
-        tileRounding: 4,
-        tileGap: 6,
-        borderColor: '#1e293b',
-        accentColor: '#f59e0b',
-        pulseGlow: true
-      };
-      const primImg = tpl.defaultImage || 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600&q=80';
-      const secImg = tpl.secondaryImage || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80';
-      fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #030407; overflow: hidden; display: flex; align-items: center; justify-content: center; perspective: 850px;">
-          <!-- Secondary Scene Background Asset -->
-          <img id="fx-puzzle-bg-${tplId}" src="${secImg}" alt="Scene Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: ${pz.bgVisible ? pz.bgOpacity : 0}; filter: contrast(135%) brightness(40%) grayscale(25%); transition: opacity 0.2s ease, transform 0.1s ease; pointer-events: none;" />
-          <div id="fx-puzzle-vignette-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(3,4,7,0.4) 0%, rgba(3,4,7,0.92) 80%); pointer-events: none;"></div>
-
-          <!-- Ghosted Watermark -->
-          <div id="fx-puzzle-watermark-${tplId}" style="position: absolute; font-family: 'Cinzel', Georgia, serif; font-size: 24px; font-weight: 900; color: rgba(255,255,255,0.05); letter-spacing: 8px; text-transform: uppercase; pointer-events: none; display: ${pz.watermarkVisible ? 'block' : 'none'};">
-            THE MONOPOLY TRAP
-          </div>
-
-          <!-- Tactical Jigsaw Matrix with Primary Asset mapped across tiles -->
-          <div id="fx-puzzle-grid-${tplId}" style="display: ${pz.gridVisible ? 'grid' : 'none'}; grid-template-columns: repeat(3, 1fr); gap: ${pz.tileGap}px; width: 64%; aspect-ratio: 1/1; position: absolute; z-index: 2; transition: transform 0.1s ease;">
-            <!-- 9 Puzzle Pieces mapping primary subject image -->
-            <div id="fx-piece-0-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 0% 0%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-            <div id="fx-piece-1-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 50% 0%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-            <div id="fx-piece-2-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 100% 0%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-
-            <div id="fx-piece-3-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 0% 50%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-            <!-- Center piece with active highlight accent -->
-            <div id="fx-piece-4-${tplId}" style="position: relative; overflow: hidden; border: 1.5px solid ${pz.accentColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 0 20px ${pz.accentColor}55, 0 12px 30px rgba(0,0,0,0.9); background: #13110d;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 50% 50%; filter: contrast(125%) brightness(105%);"></div>
-              <div id="fx-piece-4-pulse" style="position: absolute; inset: 0; background: radial-gradient(circle, ${pz.accentColor}40 0%, transparent 70%); pointer-events: none;"></div>
-              <div id="fx-piece-4-dot" style="position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: ${pz.accentColor}; box-shadow: 0 0 8px ${pz.accentColor};"></div>
-            </div>
-            <div id="fx-piece-5-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 100% 50%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-
-            <div id="fx-piece-6-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 0% 100%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-            <div id="fx-piece-7-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 50% 100%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-            <div id="fx-piece-8-${tplId}" style="position: relative; overflow: hidden; border: 1px solid ${pz.borderColor}; border-radius: ${pz.tileRounding}px; box-shadow: 0 10px 25px rgba(0,0,0,0.85); background: #0b0f19;">
-              <div class="fx-piece-img" style="position: absolute; inset: 0; background-image: url('${primImg}'); background-size: 300% 300%; background-position: 100% 100%; filter: contrast(115%) brightness(95%);"></div>
-              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.15); pointer-events: none;"></div>
-            </div>
-          </div>
-
-          <!-- James Jani Editorial Alpha Matte Card -->
-          <div id="fx-matte-box-${tplId}" style="position: absolute; z-index: 5; background: rgba(8,12,20,0.92); border: 1px solid ${pz.borderColor}; border-top: 2px solid ${pz.accentColor}; box-shadow: 0 20px 40px rgba(0,0,0,0.95); border-radius: 4px; padding: 10px 16px; width: 74%; text-align: left; backdrop-filter: blur(10px); transition: transform 0.08s ease-out; display: ${pz.thesisVisible ? 'block' : 'none'};">
-            <span id="fx-matte-tag-${tplId}" style="font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 700; color: ${pz.accentColor}; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 3px;">
-              KEY NARRATIVE THESIS
-            </span>
-            <div id="fx-matte-title-${tplId}" style="font-family: 'Playfair Display', Georgia, serif; font-size: 13px; font-weight: 800; color: #f8fafc; font-style: italic; line-height: 1.25;">
-              "The Illusion of Free Choice"
-            </div>
-          </div>
-
-          <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid ${pz.borderColor}; color: #94a3b8; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 10;">
-            PUZZLE ALPHA SUITE
-          </div>
-        </div>
-      `;
-    } else if (tplId === 'jani-countdown-panic-suite') {
-      fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; perspective: 600px;">
-          <!-- 3D Curved Terminal Monitor Screen -->
-          <div style="position: absolute; inset: 6px; background: radial-gradient(circle at 50% 40%, #160609 0%, #080204 60%, #020001 100%); border-radius: 8px; border: 1.5px solid #232936; box-shadow: inset 0 0 25px rgba(0,0,0,0.9), 0 8px 24px rgba(0,0,0,0.8); overflow: hidden; transform: rotateX(8deg);">
-            <!-- Subtle Technical Grid -->
-            <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: linear-gradient(to right, rgba(239,68,68,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(239,68,68,0.08) 1px, transparent 1px); opacity: 0.65;"></div>
-
-            <!-- Volumetric Gradient Area Chart SVG -->
-            <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" preserveAspectRatio="none" viewBox="0 0 400 225">
-              <defs>
-                <linearGradient id="fx-cd-volumetric-${tplId}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="rgba(239, 68, 68, 0.75)" />
-                  <stop offset="40%" stop-color="rgba(185, 28, 28, 0.4)" />
-                  <stop offset="85%" stop-color="rgba(69, 10, 10, 0.15)" />
-                  <stop offset="100%" stop-color="rgba(8, 2, 4, 0)" />
-                </linearGradient>
-              </defs>
-              <path id="fx-countdown-area-${tplId}" d="M 0 105 L 45 98 L 85 115 L 120 95 L 155 110 L 190 92 L 230 128 L 265 112 L 300 152 L 350 162 L 400 178 L 400 225 L 0 225 Z" fill="url(#fx-cd-volumetric-${tplId})" />
-              <path id="fx-countdown-chart-${tplId}" d="M 0 105 L 45 98 L 85 115 L 120 95 L 155 110 L 190 92 L 230 128 L 265 112 L 300 152 L 350 162 L 400 178" fill="none" stroke="#ff2a4b" stroke-width="2.5" />
-            </svg>
-
-            <!-- Screen Optics: Overhead Light Sheen -->
-            <div style="position: absolute; top: 0; left: 20%; right: 20%; height: 40px; background: radial-gradient(ellipse at center top, rgba(255,255,255,0.15) 0%, transparent 80%); pointer-events: none;"></div>
-
-            <!-- Header: Clean Bold Sans-Serif with Tactical HUD Brackets -->
-            <div style="position: absolute; top: 18px; left: 0; right: 0; text-align: center; z-index: 5; font-family: 'Chakra Petch', 'Inter', sans-serif; font-size: 10px; font-weight: 800; color: #e4e4e7; letter-spacing: 2px; text-transform: uppercase;">
-              [ FTX LIQUIDITY CRASH ]
-            </div>
-
-            <!-- Dedicated HUD Monospace Countdown Clock Box (24px padding away from title) -->
-            <div style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); z-index: 5; background: rgba(15,4,6,0.85); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 4px 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 0 8px rgba(239,68,68,0.2); white-space: nowrap;">
-              <div id="fx-countdown-digits-${tplId}" style="font-family: 'JetBrains Mono', 'Share Tech Mono', monospace; font-size: 20px; font-weight: 700; color: #ffffff; text-shadow: 0 0 12px rgba(239,68,68,0.85); letter-spacing: 1px;">
-                T-MINUS 00:06.170
-              </div>
-            </div>
-
-            <!-- Panic Ticker Tape at Bottom -->
-            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(8,2,4,0.95); border-top: 1.5px solid #ef4444; padding: 4px 8px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
-              <div id="fx-countdown-ticker-${tplId}" style="display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 8.5px; white-space: nowrap;">
-                <span style="background: #dc2626; color: #fff; font-weight: 800; padding: 1px 5px; border-radius: 3px;">FTX -94.2%</span>
-                <span style="background: #dc2626; color: #fff; font-weight: 800; padding: 1px 5px; border-radius: 3px;">FTT -94.2%</span>
-                <span style="color: #fca5a5; font-weight: 600;">$BTC $15,820 (-22.4%)</span>
-                <span style="color: #f87171;">|</span>
-                <span style="color: #fca5a5; font-weight: 700;">BINANCE WITHDRAWALS PAUSED</span>
-                <span style="color: #f87171;">|</span>
-                <span style="background: #dc2626; color: #fff; font-weight: 800; padding: 1px 5px; border-radius: 3px;">ALAMEDA BANKRUPT</span>
-              </div>
-            </div>
-
-            <!-- CRT Scanline Shimmer -->
-            <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px); pointer-events: none; opacity: 0.7;"></div>
-          </div>
-
-          <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; box-shadow: 0 4px 12px rgba(239,68,68,0.5);">
-            \u23f1\ufe0f COUNTDOWN FX
-          </div>
-        </div>
-      `;
-    } else if (tplId === 'nonlinear-time-flash') {
-      fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <!-- Visual Background Layer -->
-          <div id="fx-flashback-bg-wrap-${tplId}" style="position: absolute; inset: 0; transition: transform 0.08s ease-out;">
-            <img id="fx-flashback-img-${tplId}" src="flashback_preview_a.jpg" alt="Temporal Jump" style="width: 100%; height: 100%; object-fit: cover; filter: sepia(35%) contrast(115%);" />
-          </div>
-
-          <!-- White Exposure Flash Cut Overlay -->
-          <div id="fx-flash-cut-${tplId}" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; z-index: 20; pointer-events: none; display: flex; align-items: center; justify-content: center;">
-            <span style="background: #ffffff; color: #000000; font-family: monospace; font-size: 11px; font-weight: 900; letter-spacing: 2px; padding: 3px 8px; border: 1px solid #000;">
-              FLASHBACK // -10 YEARS
-            </span>
-          </div>
-
-          <!-- Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #f59e0b, #a855f7); color: #000; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(245,158,11,0.5);">
-            \u26a1 FLASHBACK CUT
-          </div>
-        </div>
-      `;
+      if (typeof window.buildPuzzleStageHtml === 'function') {
+        const pzConfig = (typeof window.tplGetContextualData === 'function') 
+          ? window.tplGetContextualData('jani-puzzle-narrative-suite') 
+          : (window.JANI_PUZZLE_CONFIG || {});
+        fxContainer.innerHTML = window.buildPuzzleStageHtml(tplId, pzConfig);
+      }
     } else if (tplId === 'puzzle-piece-reveal') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #05060a; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 12px;">
@@ -29691,108 +29530,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         extractedStrip.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px ${shadowSpread}px rgba(8, 6, 4, ${shadowOpacity}), 0 4px 12px rgba(8, 6, 4, 0.4)`;
       }
     } else if (tplId === 'jani-puzzle-narrative-suite') {
-      // Periodic assemble/break animation on puzzle pieces
-      const isAssembled = Math.sin(t * 1.5) > -0.2;
-      const matteBox = fxContainer?.querySelector(`#fx-matte-box-${tplId}`);
-      if (matteBox) {
-        const floatY = Math.sin(t * 2.2) * 5;
-        const scale = 1.0 + Math.sin(t * 1.8) * 0.03;
-        matteBox.style.transform = `translateY(${floatY}px) scale(${scale})`;
-      }
-
-      // Camera tilt & subtle 3D parallax on the puzzle grid
-      const grid = fxContainer?.querySelector(`#fx-puzzle-grid-${tplId}`);
-      if (grid) {
-        const pitch = _fx.pitch + Math.sin(t * 1.2) * 2;
-        const yaw = _fx.yaw + Math.cos(t * 1.4) * 3;
-        const roll = _fx.roll;
-        const zoom = _fx.zoom;
-        grid.style.transform = `scale(${zoom}) rotateX(${pitch}deg) rotateY(${yaw}deg) rotateZ(${roll}deg)`;
-      }
-
-      // Subtle slow background pan
-      const bg = fxContainer?.querySelector(`#fx-puzzle-bg-${tplId}`);
-      if (bg) {
-        const panX = Math.sin(t * 0.8) * 8;
-        const panY = Math.cos(t * 0.9) * 4;
-        bg.style.transform = `scale(1.08) translate(${panX}px, ${panY}px)`;
-      }
-
-      // Center active pulse glow
-      const pulse = fxContainer?.querySelector('#fx-piece-4-pulse');
-      if (pulse) {
-        const pOp = 0.4 + Math.sin(t * 3.5) * 0.35;
-        pulse.style.opacity = Math.max(0.1, pOp).toFixed(2);
-      }
-
-      // Pieces scatter or snap
-      for (let i = 0; i < 9; i++) {
-        const p = fxContainer?.querySelector(`#fx-piece-${i}-${tplId}`);
-        if (p) {
-          if (isAssembled) {
-            p.style.transform = 'translate(0px, 0px) rotate(0deg) scale(1)';
-            p.style.opacity = '1';
-          } else {
-            const rx = Math.cos(i * 33 + t * 0.5) * 16;
-            const ry = Math.sin(i * 44 + t * 0.5) * 16;
-            const rot = Math.sin(i * 99) * 15;
-            p.style.transform = `translate(${rx}px, ${ry}px) rotate(${rot}deg) scale(0.92)`;
-            p.style.opacity = '0.75';
-          }
-        }
-      }
-    } else if (tplId === 'jani-countdown-panic-suite') {
-      const remaining = Math.max(0, 10 - ((t * 2.5) % 10));
-      const sec = Math.floor(remaining);
-      const ms = Math.floor((remaining % 1) * 1000);
-      const pad = (n, w = 2) => String(n).padStart(w, '0');
-      
-      const digits = fxContainer?.querySelector(`#fx-countdown-digits-${tplId}`);
-      if (digits) {
-        digits.textContent = `T-MINUS 00:${pad(sec)}.${pad(ms, 3)}`;
-        if (remaining < 3) {
-          digits.style.color = '#ff334b';
-          digits.style.textShadow = '0 0 22px rgba(255, 51, 75, 1)';
-        } else {
-          digits.style.color = '#ffffff';
-          digits.style.textShadow = '0 0 14px rgba(239, 68, 68, 0.85)';
-        }
-      }
-
-      const ticker = fxContainer?.querySelector(`#fx-countdown-ticker-${tplId}`);
-      if (ticker) {
-        const offset = (t * 45) % 350;
-        ticker.style.transform = `translateX(-${offset}px)`;
-      }
-    } else if (tplId === 'nonlinear-time-flash') {
-      // 1. Periodic White Exposure Flash (cycle every 1.6s)
-      const isFlash = (t % 1.6) > 1.35;
-      const flashEl = fxContainer?.querySelector(`#fx-flash-cut-${tplId}`);
-      if (flashEl) {
-        flashEl.style.opacity = isFlash ? '0.96' : '0';
-      }
-
-      // 2. 45-degree directional motion blur and scale jitter
-      const bgWrap = fxContainer?.querySelector(`#fx-flashback-bg-wrap-${tplId}`);
-      const shiftDir = Math.sin(t * 12) * 15;
-      const bgImg = fxContainer?.querySelector(`#fx-flashback-img-${tplId}`);
-      if (bgWrap) {
-        bgWrap.style.transform = `scale(${isFlash ? '1.2' : '1.05'}) rotate(${isFlash ? '3deg' : '0deg'}) translate(${shiftDir}px, 0)`;
-      }
-      if (bgImg) {
-        // Alternate flashback (A) and flashforward (B) footage
-        const isFuture = (t % 3.2) > 1.6;
-        const wantSrc = isFuture ? 'flashback_preview_b.jpg' : 'flashback_preview_a.jpg';
-        if (!bgImg.src.endsWith(wantSrc)) bgImg.src = wantSrc;
-        const colorFilter = isFuture ? 'saturate(115%) contrast(115%)' : 'sepia(35%) contrast(115%)';
-        bgImg.style.filter = `${colorFilter} blur(${isFlash ? '6px' : '0px'})`;
-      }
-
-      // 3. Floating Title Plate
-      const plate = fxContainer?.querySelector(`#fx-flashback-plate-${tplId}`);
-      if (plate) {
-        const floatY = Math.sin(t * 2.5) * 4;
-        plate.style.transform = `translateY(${floatY}px) scale(${isFlash ? 1.05 : 1})`;
+      if (typeof window.stepJaniPuzzleAnimation === 'function') {
+        const pzData = (typeof window.tplGetContextualData === 'function')
+          ? window.tplGetContextualData('jani-puzzle-narrative-suite')
+          : (window.JANI_PUZZLE_CONFIG || {});
+        window.stepJaniPuzzleAnimation(fxContainer, tplId, t, pzData);
       }
     } else if (tplId === 'puzzle-piece-reveal') {
       // 4-Piece progressive lock-in simulation along story arc
@@ -33526,6 +33268,29 @@ function renderTopTemplatePreviewStage() {
   const tplId = topCustomizerState.currentTpl.id;
   if (window.tpl3DSync) window.tpl3DSync(tplId);
 
+  // James Jani Cross-Section Reveal Engine
+  if (tplId === 'jani-cross-section-reveal') {
+    const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountJaniCrossSectionStage === 'function') {
+      window.tplMountJaniCrossSectionStage(stage, cData);
+    }
+    return;
+  }
+
+  // James Jani Forbes 3D Cover Engine
+  if (tplId === 'jani-forbes-fraud-reveal') {
+    const jData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-forbes-fraud-reveal') : (window.JANI_FORBES_CONFIG || {});
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountForbes3DStage === 'function') {
+      window.tplMountForbes3DStage(stage, jData);
+    }
+    return;
+  }
   // 3D Glassmorphic SWIFT Banking Wire Transfer Engine
   if (tplId === 'wire-transfer') {
     const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
@@ -34568,6 +34333,21 @@ function updateTopCustomizerFrame(seqTime, now) {
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
 
+  if (tplId === 'jani-cross-section-reveal') {
+    if (typeof window.stepJaniCrossSectionAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
+      window.stepJaniCrossSectionAnimation(stage, 'jani-cross-section-reveal', localSceneT, cData);
+    }
+  }
+
+  if (tplId === 'jani-forbes-fraud-reveal') {
+    if (typeof window.stepJaniForbesAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const jData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-forbes-fraud-reveal') : (window.JANI_FORBES_CONFIG || {});
+      window.stepJaniForbesAnimation(stage, 'jani-forbes-fraud-reveal', localSceneT, jData);
+    }
+  }
   if (tplId === 'wire-transfer') {
     if (typeof window.stepWireTransferAnimation === 'function') {
       const stage = document.getElementById('tpl-modal-preview-stage');
@@ -43569,6 +43349,16 @@ function openJaniSuite() {
   const modal = document.getElementById('modal-jani-suite');
   if (!modal) return;
   modal.style.display = 'flex';
+
+  // Mount 2.0 James Jani Narrative Puzzle Reconstruction Engine
+  const stageRoot = document.getElementById('jani-puzzle-stage-root');
+  if (stageRoot && typeof window.tplMountJaniPuzzleStage === 'function') {
+    const curPzData = (typeof window.tplGetContextualData === 'function') 
+      ? window.tplGetContextualData('jani-puzzle-narrative-suite') 
+      : (window.JANI_PUZZLE_CONFIG || {});
+    window.tplMountJaniPuzzleStage(stageRoot, curPzData);
+  }
+
   updateJaniPieceSelectOptions();
   renderJaniPuzzleGrid();
   renderJaniRetentionChart();
@@ -43581,6 +43371,9 @@ function closeJaniSuite() {
   const modal = document.getElementById('modal-jani-suite');
   if (!modal) return;
   modal.style.display = 'none';
+  if (typeof window.tplUnmountJaniPuzzleStage === 'function') {
+    window.tplUnmountJaniPuzzleStage();
+  }
   janiSuiteState.isPlaying = false;
   const icon = document.getElementById('jani-play-icon');
   if (icon) icon.textContent = '\u25b6';

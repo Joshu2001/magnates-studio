@@ -3786,7 +3786,10 @@
           <!-- Center Preview Canvas Container -->
           <div style="background: #0e1017; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: 1;">
             
-            <div id="jani-video-stage" style="position: relative; width: 100%; flex: 1; min-height: 280px; max-height: 380px; background: #000; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
+            <div id="jani-video-stage" style="position: relative; width: 100%; flex: 1; min-height: 300px; max-height: 420px; background: #030508; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 50px rgba(0,0,0,0.9);">
+              
+              <!-- Realtime Mount Container for James Jani Puzzle Engine (2.0) -->
+              <div id="jani-puzzle-stage-root" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden;"></div>
               
               <!-- Background Grid Pattern -->
               <div style="position: absolute; inset: 0; background-size: 30px 30px; background-image: linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px); pointer-events: none; opacity: 0.5;"></div>
@@ -3892,19 +3895,22 @@
                 <span id="jani-time-display" style="font-family: ui-monospace, monospace; font-size: 11px; color: #94a3b8; margin-left: 6px;">00:14 / 02:45</span>
               </div>
 
-              <!-- Quick Action Triggers -->
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" id="btn-jani-assemble-puzzle" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 7px; background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); color: #c084fc; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                  <span>&#x1F9E9;</span> Assemble
+              <!-- Quick Action Triggers (James Jani Dynamic Modes) -->
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <button type="button" id="btn-jani-mode-cinematic" class="btn-jani-anim-mode active" data-mode="cinematic-story" style="padding: 5px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; background: rgba(0, 242, 254, 0.2); border: 1px solid #00f2fe; color: #00f2fe; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>🎬</span> Jani Storyboard
                 </button>
-                <button type="button" id="btn-jani-break-puzzle" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 7px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                  <span>&#x1F4A5;</span> Deconstruct
+                <button type="button" id="btn-jani-mode-falling" class="btn-jani-anim-mode" data-mode="falling" style="padding: 5px 10px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>⬇️</span> Falling Drops
                 </button>
-                <button type="button" id="btn-jani-dopamine-spike" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 7px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                  <span>&#x26A1;</span> Pulse
+                <button type="button" id="btn-jani-mode-shuffle" class="btn-jani-anim-mode" data-mode="scatter" style="padding: 5px 10px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>🎲</span> Shuffle Scatter
                 </button>
-                <button type="button" id="btn-jani-cycle-matte" style="padding: 6px 12px; font-size: 11px; font-weight: 600; border-radius: 7px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                  <span>&#x25FB;</span> Matte
+                <button type="button" id="btn-jani-mode-pop" class="btn-jani-anim-mode" data-mode="pop-isolate" style="padding: 5px 10px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>💥</span> Pop & Fly Out
+                </button>
+                <button type="button" id="btn-jani-assemble-puzzle" style="padding: 5px 10px; font-size: 10px; font-weight: 600; border-radius: 6px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #34d399; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                  <span>🧩</span> Snap Together
                 </button>
               </div>
             </div>
@@ -3925,17 +3931,35 @@
             <span style="font-size: 10px; color: #64748b; font-weight: 500;">Active Scene</span>
           </div>
 
-          <!-- Puzzle Grid Complexity Slider -->
+          <!-- Master Image Slicer (Upload Any Image to Cut into Jigsaw) -->
+          <div style="background: rgba(0,242,254,0.04); border: 1px solid rgba(0,242,254,0.2); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; font-weight: 700; color: #00f2fe; text-transform: uppercase; letter-spacing: 0.5px;">📸 Master Image Slicer</span>
+              <label for="jani-master-image-upload" style="font-size: 10px; color: #00f2fe; background: rgba(0,242,254,0.15); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0,242,254,0.3); cursor: pointer; font-weight: 600;">
+                + Upload Image
+              </label>
+              <input type="file" id="jani-master-image-upload" accept="image/*" style="display: none;" />
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <input type="text" id="jani-master-image-url" placeholder="Image URL to slice into puzzle..." value="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" style="flex: 1; background: #07090e; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10px; outline: none;" />
+              <button type="button" id="btn-jani-shuffle-master-img" style="padding: 4px 8px; font-size: 10px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; cursor: pointer;" title="Shuffle stock visual">🎲</button>
+            </div>
+            <div style="font-size: 9px; color: #94a3b8; line-height: 1.3;">
+              Any picture is sliced into authentic interlocking tabs & blanks with cyan bloom edges.
+            </div>
+          </div>
+
+          <!-- Puzzle Grid Layout & Sizing -->
           <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;">
             <div style="display: flex; justify-content: space-between; font-size: 11px;">
-              <span style="color: #cbd5e1; font-weight: 600;">Puzzle Grid Complexity</span>
-              <span id="jani-val-grid" style="color: #c084fc; font-weight: 700;">3 x 3</span>
+              <span style="color: #cbd5e1; font-weight: 600;">Grid Slicing Columns</span>
+              <span id="jani-val-grid" style="color: #00f2fe; font-weight: 700;">3 x 2</span>
             </div>
-            <input type="range" id="jani-slider-grid" min="2" max="4" value="3" style="width: 100%; accent-color: #8b5cf6; cursor: pointer;" />
+            <input type="range" id="jani-slider-grid" min="2" max="4" value="3" style="width: 100%; accent-color: #00f2fe; cursor: pointer;" />
             <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #64748b; font-family: monospace;">
-              <span>2x2 (Macro)</span>
-              <span>3x3 (Standard)</span>
-              <span>4x4 (Complex)</span>
+              <span>2 Cols</span>
+              <span>3 Cols (Default)</span>
+              <span>4 Cols</span>
             </div>
           </div>
 
@@ -12108,6 +12132,7 @@
   <script src="js/search-3d-engine.js?v=1"></script>
   <script src="js/forbes-3d-engine.js?v=1"></script>
   <script src="js/jani-cross-section-engine.js?v=1"></script>
+  <script src="js/jani-puzzle-engine.js?v=1"></script>
   <script src="js/money-stack-3d-engine.js?v=1"></script>
   <script src="js/wire-transfer-3d-engine.js?v=1"></script>
   <script src="js/envelope-3d-engine.js?v=1"></script>
@@ -12120,6 +12145,7 @@
   <script src="js/jani-grunge-paper-engine.js?v=1"></script>
   <script src="js/hypnotic-vertigo-engine.js?v=1"></script>
   <script src="js/countdown-3d-engine.js?v=1"></script>
+  <script src="js/jani-ftx-logo-engine.js?v=1"></script>
   <script src="js/tpl-contextual-inspector.js?v=21"></script>
   <script>
     if (window.location.search.includes('open=countdown')) {

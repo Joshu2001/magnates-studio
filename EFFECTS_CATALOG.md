@@ -621,3 +621,18 @@ These are multi-effect presets that give videos the signature high-production lo
 * [x] **2.5D Parallax Photo Effect (`fx-spooner-parallax`):** Multi-step Photoshop timeline parallax pipeline with subject isolation, clean inpaint plate, Z-separation, and camera push-in zoom.
 * [ ] **Stop-Motion Frame Rate Limiter (`fx-posterize-time`):** Restricting cutout animation to 12fps / 8fps for an authentic paper collage feel.
 * [ ] **Auto Subtitle Whisper Alignment (`fx-auto-captions`):** Direct audio-to-kinetic-text alignment with karaoke-style per-word highlighting.
+
+### James Jani Narrative Puzzle & Modular Reconstruction Engine (`jani-puzzle-narrative-suite`)
+- **Category:** 3D Spatial / Cinematic Storytelling
+- **Visual Aesthetic:** Signature James Jani documentary look with procedural interlocking puzzle tabs and blanks, glowing cyan neon edges (`#00f2fe` with dynamic multi-layer bloom), dark textured vignetted background, tech grid overlay, and procedural floating dust motes.
+- **Dynamic Animation Flow:**
+  1. *Phase 1:* Lead puzzle piece enters from top-left into center.
+  2. *Phase 2:* Second piece enters smoothly from above, sliding down and snapping into an interlocking lock with audio click.
+  3. *Phase 3:* The locked pair translates leftward to re-center.
+  4. *Phase 4:* Multi-piece cascade from left and right snapping into place.
+  5. *Phase 5:* Cinematic 3D camera pan & tilt across the completed puzzle wall.
+- **Granular Controls:**
+  - **Master Image Slicer:** Upload any photo or paste an image URL to slice dynamically across all puzzle pieces.
+  - **Animation Modes:** `cinematic-story` (Storyboard sequence), `falling` (Gravity waterfall drops), `scatter` (Interactive shuffle & snap), `pop-isolate` (3D popped talking point piece), and static assembled view.
+  - **Grid Granularity:** 2x2 macro up to 4x4 complexity.
+  - **Badge Overlays:** Documentary title strips, portrait badges (e.g. Sam Bankman-Fried), documents, and crypto token badges.

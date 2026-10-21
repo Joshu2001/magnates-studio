@@ -1,4 +1,4 @@
-/* FX Scene system for the unified template customizer.
+﻿/* FX Scene system for the unified template customizer.
    - Every bridged template gets an Inspector "Effect Controls" section (motion + editable text).
    - 3D Spatial + 3D Document templates also get a Video/3D switch with full 3D controls.
    - All edits live in a persistent per-template store (localStorage) so nothing resets on close.
@@ -39,7 +39,7 @@
     }
     return false;
   };
-  const DEDICATED_CUSTOMIZER_IDS = new Set(['scam-redaction', 'deal-term-sheet', 'pyramid-scheme', 'checklist', 'instagram']);
+  const DEDICATED_CUSTOMIZER_IDS = new Set(['scam-redaction', 'deal-term-sheet', 'pyramid-scheme', 'checklist', 'instagram', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal']);
   const kindOf = (id) => DEDICATED_CUSTOMIZER_IDS.has(id) ? null : (id === 'document-3d-fx-engine' ? 'doc' : (id === 'spatial-3d-motion-suite' ? 'spatial' : (is3DSpatial(id) ? 'dom3d' : (isBridged(id) ? 'generic' : null))));
   const has3D = (k, id) => k === 'spatial' || k === 'doc' || k === 'dom3d' || is3DSpatial(id);
   const stOf = (k) => k === 'spatial' ? spatial3DState : document3DFXState;
