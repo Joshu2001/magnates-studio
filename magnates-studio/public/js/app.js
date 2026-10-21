@@ -40393,24 +40393,58 @@ function modalAddNextSceneAction() {
    ========================================================= */
 const SPATIAL_PRESETS = {
   'docu-essay': [
-    { id: '1', type: 'text', title: 'THE SYSTEM', subtitle: 'MANIPULATION & CONTROL', body: '', z: 350, x: 0, y: 15, scale: 1.15, color: '#f59e0b' },
-    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: -350, x: -740, y: 65, scale: 1.0, color: '#f59e0b' },
-    { id: '3', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: -1050, x: 740, y: -45, scale: 1.0, color: '#38bdf8' },
-    { id: '4', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'UNSEEN MARKET LEVERS', body: '', z: -1850, x: 0, y: 15, scale: 1.15, color: '#d97706' },
-    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SOVEREIGN AUDIT FILE', subtitle: 'EXHIBIT C // CENTRAL BANK', body: 'CLASSIFIED CLEARING HOUSE RECORDS & WIRE TELEMETRY.', z: -2650, x: -740, y: 50, scale: 1.0, color: '#ef4444' },
-    { id: '6', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'THE GLOBAL RESET', body: '', z: -3550, x: 0, y: 15, scale: 1.25, color: '#f59e0b' }
+    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 650, x: -740, y: 55, scale: 0.95, color: '#f59e0b' },
+    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: 450, x: 740, y: -40, scale: 0.95, color: '#38bdf8' },
+    { id: '3', type: 'text', title: 'THE SYSTEM', subtitle: 'MANIPULATION & CONTROL', body: '', z: 200, x: 0, y: 15, scale: 1.15, color: '#f59e0b' },
+    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -100, x: -740, y: 45, scale: 0.95, color: '#ef4444' },
+    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -380, x: 740, y: -35, scale: 0.95, color: '#d97706' },
+    { id: '6', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -700, x: -740, y: 60, scale: 0.95, color: '#10b981' },
+    { id: '7', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT PROTOCOL', subtitle: 'MINUTES RECORDED', body: 'AGREEMENT SIGNED BEHIND CLOSED DOORS WITH CONSORTIUM PARTNERS.', z: -1020, x: 740, y: -45, scale: 0.95, color: '#6366f1' },
+    { id: '8', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'THE ARCHITECTURE OF CONSENT', body: '', z: -1400, x: 0, y: 15, scale: 1.15, color: '#d97706' },
+    { id: '9', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'SWISS VAULT REGISTRY', subtitle: 'ACCOUNT NUMBER #88092-B', body: 'ANONYMOUS TRUST DISBURSEMENTS CROSSING MARITIME JURISDICTIONS.', z: -1720, x: -740, y: 50, scale: 0.95, color: '#f59e0b' },
+    { id: '10', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'INTERNATIONAL CLEARING', subtitle: 'SWIFT TRANSACTION RECORD', body: 'SETTLEMENT LOGS CONFLICTING WITH AUDITED ANNUAL FINANCIALS.', z: -2050, x: 740, y: -40, scale: 0.95, color: '#38bdf8' },
+    { id: '11', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SOVEREIGN AUDIT FILE', subtitle: 'EXHIBIT C // CENTRAL BANK', body: 'CLASSIFIED CLEARING HOUSE RECORDS & WIRE TELEMETRY.', z: -2400, x: -740, y: 55, scale: 0.95, color: '#ef4444' },
+    { id: '12', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SURVEILLANCE TIMESTAMP', subtitle: 'INTERCEPT CAM 04', body: 'TIMECODE 04:18:22 PROTOCOL ENGAGED AUTOMATICALLY.', z: -2750, x: 740, y: -35, scale: 0.95, color: '#10b981' },
+    { id: '13', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'THE FINAL AWAKENING', body: '', z: -3150, x: 0, y: 15, scale: 1.25, color: '#f59e0b' },
+    { id: '14', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'VAULT ARCHIVES SEALED', subtitle: 'FINAL FORENSIC RECORD', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -3550, x: -740, y: 45, scale: 0.95, color: '#d97706' }
   ],
   'cyber-matrix': [
-    { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 400, x: -720, y: 70, scale: 0.95, color: '#10b981' },
-    { id: '2', type: 'text', title: 'ALGORITHMIC', subtitle: 'SYNTHETIC LIQUIDITY', body: '', z: -550, x: 0, y: 15, scale: 1.2, color: '#10b981' },
-    { id: '3', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'NEURAL FEED', subtitle: 'SYNTHETIC REALITY', body: 'Deep spatial neural pathways floating in high dimensional tensor spaces.', z: -1650, x: 720, y: -40, scale: 1.0, color: '#38bdf8' },
-    { id: '4', type: 'text', title: 'QUANTUM REACH', subtitle: 'ZERO-LATENCY CONTROL', body: '', z: -2900, x: 0, y: 15, scale: 1.25, color: '#06b6d4' }
+    { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 600, x: -720, y: 65, scale: 0.95, color: '#10b981' },
+    { id: '2', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'NEURAL NODE 01', subtitle: 'QUANTUM ENCRYPTION', body: 'Autonomous mesh relay processing encrypted packet routes.', z: 400, x: 720, y: -40, scale: 0.95, color: '#06b6d4' },
+    { id: '3', type: 'text', title: 'ALGORITHMIC', subtitle: 'SYNTHETIC LIQUIDITY', body: '', z: 150, x: 0, y: 15, scale: 1.2, color: '#10b981' },
+    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'NEURAL FEED', subtitle: 'SYNTHETIC REALITY', body: 'Deep spatial neural pathways floating in high dimensional tensor spaces.', z: -300, x: -720, y: 45, scale: 0.95, color: '#38bdf8' },
+    { id: '5', type: 'card', artifactMode: 'object', objectShape: 'octahedron', title: 'SECURITY ENCLAVE', subtitle: 'TPM HARDWARE VAULT', body: 'Isolated memory block holding root certificate authorities.', z: -650, x: 720, y: -45, scale: 0.95, color: '#10b981' },
+    { id: '6', type: 'code', artifactMode: 'code', title: 'SUBROUTINE_ZERO.C', text: 'void breach() {\n  unlock_ring0();\n  sync_ledger(NULL);\n}', z: -1000, x: -720, y: 55, scale: 0.95, color: '#06b6d4' },
+    { id: '7', type: 'text', title: 'QUANTUM REACH', subtitle: 'ZERO-LATENCY CONTROL', body: '', z: -1400, x: 0, y: 15, scale: 1.25, color: '#06b6d4' },
+    { id: '8', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'DATA ARCHIVE', subtitle: 'EXABYTE CLUSTER', body: 'Decentralized high frequency nodes processing global market feeds.', z: -1800, x: -720, y: 40, scale: 0.95, color: '#38bdf8' },
+    { id: '9', type: 'card', artifactMode: 'object', objectShape: 'torus', title: 'SYNAPSE RING', subtitle: 'OPTICAL BACKBONE', body: 'Sub-sea fiber line carrying petabytes per millisecond.', z: -2200, x: 720, y: -40, scale: 0.95, color: '#a855f7' },
+    { id: '10', type: 'text', title: 'ROOT ACCESS', subtitle: 'TERMINAL CONVERGENCE', body: '', z: -2700, x: 0, y: 15, scale: 1.25, color: '#10b981' },
+    { id: '11', type: 'code', artifactMode: 'code', title: 'KERNEL_EXIT.ASM', text: 'mov rax, 0x1\nmov rdi, 0x0\nsyscall', z: -3100, x: -720, y: 50, scale: 0.95, color: '#06b6d4' }
   ],
   'philosophy': [
-    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'EPISODE I', subtitle: 'THE SEARCH FOR TRUTH', body: 'We spend our entire lives mistaking the shadow on the wall for the reality in front of us.', z: 350, x: -720, y: 60, scale: 1.0, color: '#eab308' },
-    { id: '2', type: 'text', title: 'AWAKENING', subtitle: 'BEYOND PERCEPTION', body: '', z: -850, x: 0, y: 15, scale: 1.25, color: '#eab308' },
-    { id: '3', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'THE PARADOX', subtitle: 'PLATO\'S CAVE', body: 'Freedom is not the absence of boundaries, but the total awareness of them.', z: -1950, x: 720, y: -40, scale: 1.0, color: '#a855f7' },
-    { id: '4', type: 'text', title: 'BEYOND HORIZON', subtitle: 'FIRST PRINCIPLES', body: '', z: -3200, x: 0, y: 15, scale: 1.25, color: '#f59e0b' }
+    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'EPISODE I', subtitle: 'THE SEARCH FOR TRUTH', body: 'We spend our entire lives mistaking the shadow on the wall for the reality in front of us.', z: 550, x: -740, y: 50, scale: 0.95, color: '#d4af37' },
+    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'THE SOCIAL CONTRACT', subtitle: 'LEVIATHAN ESSAY', body: 'Institutions build towers of gold upon foundations of collective belief.', z: 300, x: 740, y: -40, scale: 0.95, color: '#f59e0b' },
+    { id: '3', type: 'text', title: 'THE ILLUSION', subtitle: 'THE SHADOW ON THE WALL', body: '', z: 50, x: 0, y: 15, scale: 1.15, color: '#d4af37' },
+    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'THE PARADOX', subtitle: 'SOCRATIC DIALOGUE', body: 'The only true wisdom is in knowing you know nothing at all.', z: -400, x: -740, y: 55, scale: 0.95, color: '#fde68a' },
+    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'ARISTOCRACY OF MIND', subtitle: 'PHILOSOPHY OF POWER', body: 'Power is never seized by accident; it is engineered through quiet persistence.', z: -850, x: 740, y: -45, scale: 0.95, color: '#f59e0b' },
+    { id: '6', type: 'text', title: 'THE AWAKENING', subtitle: 'BREAKING THE CONDITIONING', body: '', z: -1400, x: 0, y: 15, scale: 1.2, color: '#fde68a' },
+    { id: '7', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'METAPHYSICAL ARCHIVE', subtitle: 'CAUSALITY & DESTINY', body: 'Every action echoes across centuries of unspoken momentum.', z: -1900, x: -740, y: 45, scale: 0.95, color: '#d4af37' },
+    { id: '8', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'THE NEW DAWN', subtitle: 'ENLIGHTENMENT', body: 'Clear sight is the greatest asset an individual can possess in an uncertain world.', z: -2450, x: 740, y: -35, scale: 0.95, color: '#f59e0b' },
+    { id: '9', type: 'text', title: 'CONSCIOUSNESS', subtitle: 'BEYOND THE LABYRINTH', body: '', z: -2950, x: 0, y: 15, scale: 1.25, color: '#d4af37' }
+  ],
+  'cosmic-universe': [
+    { id: '1', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'ALPHA CENTAURI BEACON', subtitle: 'DEEP STELLAR SENSOR', body: 'Pulsing celestial beacon marking interstellar coordinate zero.', z: 600, x: -750, y: 60, scale: 1.1, color: '#38bdf8' },
+    { id: '2', type: 'card', artifactMode: 'object', objectShape: 'torus', title: 'STARGATE CELESTIAL RING', subtitle: 'WORMHOLE RUNWAY', body: 'Rotating quantum torus generating localized gravitational corridors.', z: 400, x: 750, y: -50, scale: 1.15, color: '#a855f7' },
+    { id: '3', type: 'text', title: 'COSMIC VOYAGE', subtitle: 'NAVIGATING THROUGH THE STARS', body: '', z: 150, x: 0, y: 15, scale: 1.25, color: '#38bdf8' },
+    { id: '4', type: 'card', artifactMode: 'object', objectShape: 'octahedron', title: 'QUANTUM DIAMOND CRYSTAL', subtitle: 'ZERO-POINT ENERGY EMITTER', body: 'Faceted octahedron crystal resonating at cosmic microwave background frequencies.', z: -250, x: -750, y: 45, scale: 1.05, color: '#f59e0b' },
+    { id: '5', type: 'card', artifactMode: 'object', objectShape: 'dodecahedron', title: 'STELLAR CORE POLYHEDRON', subtitle: 'FUSION ANCHOR', body: 'Dense core housing artificial micro-singularity propulsion.', z: -650, x: 750, y: -40, scale: 1.1, color: '#10b981' },
+    { id: '6', type: 'card', artifactMode: 'object', objectShape: 'monolith', title: 'DEEP SPACE MONOLITH', subtitle: 'INTERSTELLAR ANOMALY', body: 'Hyper-smooth black glass obelisk emitting coherent harmonic signals.', z: -1050, x: -750, y: 55, scale: 1.2, color: '#c084fc' },
+    { id: '7', type: 'text', title: 'HORIZON TRANSIT', subtitle: 'BEYOND KNOWN GALAXY', body: '', z: -1450, x: 0, y: 15, scale: 1.2, color: '#a855f7' },
+    { id: '8', type: 'card', artifactMode: 'object', objectShape: 'torus', title: 'ORBITAL RING PLATFORM', subtitle: 'SUB-LIGHT ACCELERATOR', body: 'Macro-engineering ring suspended between twin pulsar gravity wells.', z: -1850, x: 750, y: -45, scale: 1.15, color: '#38bdf8' },
+    { id: '9', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'PULSAR CHRONOMETER', subtitle: 'CELESTIAL TIMEKEEPER', body: 'Atomic precision clock locked to millisecond pulsar rotations.', z: -2250, x: -750, y: 50, scale: 1.05, color: '#f59e0b' },
+    { id: '10', type: 'card', artifactMode: 'object', objectShape: 'octahedron', title: 'NEBULA CONDENSER', subtitle: 'MATTER HARVESTER', body: 'Magnetic funnel gathering ionized hydrogen from stellar nursery clouds.', z: -2650, x: 750, y: -40, scale: 1.1, color: '#10b981' },
+    { id: '11', type: 'text', title: 'THE UNIVERSE BEYOND', subtitle: 'INFINITE CELESTIAL DEPTH', body: '', z: -3100, x: 0, y: 15, scale: 1.3, color: '#38bdf8' },
+    { id: '12', type: 'card', artifactMode: 'object', objectShape: 'monolith', title: 'COSMIC GENESIS RELIC', subtitle: 'VAULT OF INFINITY', body: 'Permanent marker left at boundary of observed cosmic web.', z: -3550, x: -750, y: 45, scale: 1.2, color: '#e0e7ff' }
   ]
 };
 
@@ -40421,11 +40455,19 @@ let spatial3DState = {
   elements3D: [],
   particlesMesh: null,
   floorGrid: null,
+  gridMeshes: null,
   ambientLight: null,
   pointLight: null,
   animId: null,
   isPlaying: true,
-  flightMode: 'zoomthrough', // 'zoomthrough', 'pullback', 'orbit'
+  flightMode: 'zoomthrough', // 'zoomthrough' (Zoom In), 'pullback' (Zoom Out), 'slalom', 'orbit', 'custom-path'
+  pathStyle: 'straight', // 'straight', 'slalom', 'cosmic-wave', 'custom'
+  pathCurve: 0, // -100 to +100
+  drawnPath: null, // array of { t, x, y }
+  showText: true, // boolean to toggle text overlays (allows pure 3D universe navigation)
+  envStyle: 'tunnel-cyan', // 'tunnel-cyan' (Image 2 Tron), 'tunnel-gold', 'tunnel-slate', 'open-stars' (Image 1), 'deep-cosmos'
+  gridLuminescence: 100, // 0 to 200%
+  gridColor: '#06b6d4',
   currentTime: 0, // 0 to 1
   mouse: { x: 0, y: 0 },
   activePreset: 'docu-essay',
@@ -40693,6 +40735,14 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
 }
 
 function createSpatialCardPlane(item) {
+  const sc = item.scale || 1;
+  const cardW = 520 * sc;
+  const cardH = 328 * sc;
+  const group = new THREE.Group();
+
+  const mode = item.artifactMode || (item.type === 'object' ? 'object' : (item.type === 'card' ? 'card' : 'image'));
+  const isPureCelestial = (mode === 'object');
+
   const canvas = document.createElement('canvas');
   canvas.width = 760;
   canvas.height = 480;
@@ -40700,7 +40750,7 @@ function createSpatialCardPlane(item) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.anisotropy = 4;
 
-  const defaultPhotos = ['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg'];
+  const defaultPhotos = ['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg', '/cctv_surveillance_scene.jpg', '/paper_tear_gold_standard.jpg', '/power_meeting_cinematic_plate.jpg'];
   const fallbackPhoto = defaultPhotos[Math.abs(parseInt(item.id || '1', 10)) % defaultPhotos.length];
   const imgUrl = item.imageUrl !== undefined && item.imageUrl !== '' ? item.imageUrl : fallbackPhoto;
 
@@ -40719,41 +40769,71 @@ function createSpatialCardPlane(item) {
     img.src = imgUrl;
   }
 
-  const sc = item.scale || 1;
-  const cardW = 520 * sc;
-  const cardH = 328 * sc;
-  const group = new THREE.Group();
-
   const material = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
     side: THREE.DoubleSide,
     depthWrite: false
   });
-  material.userData = { baseOpacity: 1.0 };
+  material.userData = { baseOpacity: isPureCelestial ? 0.35 : 1.0 };
   const frontMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW, cardH), material);
   group.add(frontMesh);
 
-  // Optional 3D Wireframe Object when artifactMode === 'object'
-  const mode = item.artifactMode || (item.type === 'object' ? 'object' : 'image');
-  if (mode === 'object') {
-    const geom = new THREE.IcosahedronGeometry(55 * sc, 1);
+  // High-End 3D Celestial / Wireframe Geometric Object
+  if (isPureCelestial) {
+    const shape = item.objectShape || item.objectGeometry || 'icosahedron';
+    const objSize = 75 * sc;
+    let geom = null;
+
+    if (shape === 'torus') {
+      geom = new THREE.TorusGeometry(objSize * 0.85, objSize * 0.28, 16, 36);
+    } else if (shape === 'octahedron') {
+      geom = new THREE.OctahedronGeometry(objSize, 0);
+    } else if (shape === 'dodecahedron') {
+      geom = new THREE.DodecahedronGeometry(objSize, 0);
+    } else if (shape === 'monolith') {
+      geom = new THREE.BoxGeometry(objSize * 0.65, objSize * 1.5, objSize * 0.22);
+    } else {
+      geom = new THREE.IcosahedronGeometry(objSize, 1);
+    }
+
+    const accentColor = item.color ? new THREE.Color(item.color) : new THREE.Color(0x38bdf8);
+
+    // Glowing Wireframe Outer Shell
     const wireMat = new THREE.MeshBasicMaterial({
-      color: 0xf59e0b,
+      color: accentColor,
       wireframe: true,
       transparent: true,
-      opacity: 0.85
+      opacity: 0.95
     });
-    wireMat.userData = { baseOpacity: 0.85 };
+    wireMat.userData = { baseOpacity: 0.95 };
     const wireMesh = new THREE.Mesh(geom, wireMat);
-    wireMesh.position.set(0, 40 * sc, 30);
-    wireMesh.userData = { isRotatingArtifact: true };
+    wireMesh.position.set(0, 30 * sc, 45);
+    wireMesh.userData = {
+      isRotatingArtifact: true,
+      rotSpeedX: 0.006 + (Math.random() * 0.008),
+      rotSpeedY: 0.012 + (Math.random() * 0.01)
+    };
+
+    // Inner Faceted Semi-Translucent Solid Core
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: accentColor,
+      roughness: 0.15,
+      metalness: 0.85,
+      transparent: true,
+      opacity: 0.55
+    });
+    coreMat.userData = { baseOpacity: 0.55 };
+    const coreMesh = new THREE.Mesh(geom.clone(), coreMat);
+    coreMesh.scale.set(0.92, 0.92, 0.92);
+    wireMesh.add(coreMesh);
+
     group.add(wireMesh);
   }
 
-  // Angle flanking plates inward along the left and right walls of the corridor (true gallery fly-through)
+  // Angle flanking plates inward along the left and right walls of the corridor (true hallway gallery)
   const sideSign = (item.x || 0) < 0 ? -1 : 1;
-  const baseTiltY = sideSign < 0 ? 0.38 : -0.38; // ~22 degrees inward toward the center aisle
+  const baseTiltY = sideSign < 0 ? 0.38 : -0.38; // ~22 degrees inward toward center aisle
   group.rotation.y = baseTiltY;
 
   group.position.set(item.x || (sideSign * 740), item.y || 0, item.z || 0);
@@ -40761,6 +40841,7 @@ function createSpatialCardPlane(item) {
     id: item.id || Date.now().toString(),
     type: item.type || 'card',
     artifactMode: mode,
+    objectShape: item.objectShape || item.objectGeometry || 'icosahedron',
     imageUrl: imgUrl,
     title: item.title || 'CONFIDENTIAL SCAN',
     subtitle: item.subtitle || '',
@@ -40850,22 +40931,22 @@ function createSpatialCodePlane(item) {
 }
 
 function buildSpatialDustParticles(scene) {
-  const particleCount = 600;
+  const particleCount = 1200;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
 
   for (let i = 0; i < particleCount * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 4000;
-    positions[i + 1] = (Math.random() - 0.5) * 2600;
-    positions[i + 2] = (Math.random() - 0.5) * 7500 - 1800;
+    positions[i] = (Math.random() - 0.5) * 4500;
+    positions[i + 1] = (Math.random() - 0.5) * 2800;
+    positions[i + 2] = (Math.random() - 0.5) * 9500 - 1500;
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const material = new THREE.PointsMaterial({
-    color: 0xcbd5e1,
-    size: 4.5,
+    color: 0xe2e8f0,
+    size: 4.8,
     transparent: true,
-    opacity: 0.45,
+    opacity: 0.55,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
@@ -40875,8 +40956,88 @@ function buildSpatialDustParticles(scene) {
   return dust;
 }
 
+function updateSpatialEnvironmentGrid() {
+  const { gridMeshes, envStyle, gridLuminescence, gridColor, gridVisible, dustVisible, particlesMesh, scene } = spatial3DState;
+  if (!gridMeshes || !gridMeshes.group) return;
+
+  const lum = Math.max(0, (gridLuminescence !== undefined ? gridLuminescence : 100) / 100);
+  let hex = gridColor;
+  if (!hex) {
+    if (envStyle === 'tunnel-gold') hex = '#d4af37';
+    else if (envStyle === 'tunnel-slate') hex = '#64748b';
+    else hex = '#06b6d4';
+  }
+  const color = new THREE.Color(hex);
+
+  const isTunnel = envStyle ? envStyle.startsWith('tunnel') : true;
+  const isOpenStars = envStyle === 'open-stars';
+  const isDeepCosmos = envStyle === 'deep-cosmos';
+
+  const styleHelper = (gh) => {
+    if (!gh || !gh.material) return;
+    gh.material.transparent = true;
+    gh.material.opacity = Math.min(1.0, 0.55 * lum);
+    if (gh.material.color) gh.material.color.copy(color);
+  };
+
+  [gridMeshes.floor, gridMeshes.ceiling, gridMeshes.leftWall, gridMeshes.rightWall].forEach(styleHelper);
+
+  if (!gridVisible || isDeepCosmos) {
+    gridMeshes.group.visible = false;
+  } else if (isOpenStars) {
+    gridMeshes.group.visible = true;
+    gridMeshes.floor.visible = true;
+    gridMeshes.ceiling.visible = false;
+    gridMeshes.leftWall.visible = false;
+    gridMeshes.rightWall.visible = false;
+  } else {
+    // Full 3D Grid Tunnel (Image 2)
+    gridMeshes.group.visible = true;
+    gridMeshes.floor.visible = true;
+    gridMeshes.ceiling.visible = true;
+    gridMeshes.leftWall.visible = true;
+    gridMeshes.rightWall.visible = true;
+  }
+
+  if (particlesMesh) {
+    particlesMesh.visible = (dustVisible !== false) || isDeepCosmos || isOpenStars;
+  }
+
+  if (scene && scene.fog) {
+    if (isDeepCosmos) scene.fog.density = 0.00015;
+    else if (isTunnel) scene.fog.density = 0.00028;
+    else scene.fog.density = 0.00035;
+  }
+}
+
+function sampleDrawnPathX(path, t) {
+  if (!path || path.length === 0) return 0;
+  if (path.length === 1) return path[0].x || 0;
+  const idx = Math.max(0, Math.min(path.length - 2, Math.floor(t * (path.length - 1))));
+  const p0 = path[idx];
+  const p1 = path[idx + 1];
+  const spanT = (p1.t !== undefined && p0.t !== undefined && p1.t > p0.t) ? (t - p0.t) / (p1.t - p0.t) : (t * (path.length - 1) - idx);
+  const frac = Math.max(0, Math.min(1, spanT));
+  const smoothFrac = frac * frac * (3 - 2 * frac);
+  return (p0.x || 0) + ((p1.x || 0) - (p0.x || 0)) * smoothFrac;
+}
+
 function loadSpatialPreset(presetKey) {
   spatial3DState.activePreset = presetKey;
+  if (presetKey === 'cyber-matrix') {
+    spatial3DState.envStyle = 'tunnel-cyan';
+    spatial3DState.gridColor = '#06b6d4';
+  } else if (presetKey === 'philosophy') {
+    spatial3DState.envStyle = 'tunnel-gold';
+    spatial3DState.gridColor = '#d4af37';
+  } else if (presetKey === 'cosmic-universe') {
+    spatial3DState.envStyle = 'open-stars';
+    spatial3DState.gridColor = '#38bdf8';
+  } else {
+    spatial3DState.envStyle = 'tunnel-slate';
+    spatial3DState.gridColor = '#64748b';
+  }
+
   const scene = spatial3DState.scene;
   if (!scene) return;
 
@@ -40903,6 +41064,7 @@ function loadSpatialPreset(presetKey) {
     }
   });
 
+  if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
   renderSpatialLayerList();
   resetSpatialCameraPath();
 }
@@ -41111,51 +41273,69 @@ function updateSpatialHUDTelemetry() {
 }
 
 function updateSpatialCameraPosition() {
-  const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw, elements3D } = spatial3DState;
+  const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw, elements3D, showText, pathStyle, pathCurve, drawnPath } = spatial3DState;
   if (!camera) return;
 
   const driftFactor = Math.max(0, Math.min(1, camDrift / 100));
+  const t = Math.max(0, Math.min(1, currentTime));
 
-  if (flightMode === 'zoomthrough') {
-    // Smooth dolly straight down the center corridor (from Z=1250 to Z=-2750)
-    const targetZ = 1250 - (currentTime * 4000);
-    // Keep camera in the center aisle so it flies cleanly BETWEEN the left and right photographic plates
-    const targetX = Math.sin(currentTime * Math.PI * 2) * (36 * driftFactor) + (mouse.x * 18);
-    const targetY = Math.cos(currentTime * Math.PI * 2) * (20 * driftFactor) + (-mouse.y * 12);
+  // Determine Z trajectory based on mode
+  let targetZ = 1350;
+  let targetX = 0;
+  let targetY = 15;
 
-    camera.position.z += (targetZ - camera.position.z) * 0.12;
-    camera.position.x += (targetX - camera.position.x) * 0.1;
-    camera.position.y += (targetY - camera.position.y) * 0.1;
-
-    camera.lookAt(0, 15, camera.position.z - 1000);
-    camera.rotation.x += Math.max(-0.04, Math.min(0.04, (camPitch * Math.PI / 180) * 0.3 + (-mouse.y * 0.02)));
-    camera.rotation.y += Math.max(-0.04, Math.min(0.04, (camYaw * Math.PI / 180) * 0.3 + (-mouse.x * 0.02)));
-
-    checkSpatialZPassWhoosh(camera.position.z);
-  } else if (flightMode === 'pullback') {
-    const targetZ = -2600 + (currentTime * 3850);
-    const targetX = Math.cos(currentTime * Math.PI * 1.5) * (36 * driftFactor);
-    const targetY = Math.sin(currentTime * Math.PI * 1.5) * (20 * driftFactor);
-
-    camera.position.z += (targetZ - camera.position.z) * 0.12;
-    camera.position.x += (targetX - camera.position.x) * 0.08;
-    camera.position.y += (targetY - camera.position.y) * 0.08;
-    camera.lookAt(0, 15, camera.position.z - 1000);
-    camera.rotation.x += Math.max(-0.04, Math.min(0.04, (camPitch * Math.PI / 180) * 0.3));
-    camera.rotation.y += Math.max(-0.04, Math.min(0.04, (camYaw * Math.PI / 180) * 0.3));
+  if (flightMode === 'pullback') {
+    // Zoom Out: Pullback from corridor depth (-3650 -> 1350)
+    targetZ = -3650 + (t * 5000);
   } else if (flightMode === 'orbit') {
-    const angle = (currentTime - 0.5) * Math.PI * 0.5;
-    const radius = 1550;
-    camera.position.x = Math.sin(angle) * radius * 0.5;
-    camera.position.z = -1400 + Math.cos(angle) * radius;
-    camera.position.y = 60 + Math.sin(currentTime * Math.PI * 2) * 45;
-    camera.lookAt(0, 15, -1400);
+    // 360 Panoramic Orbit Tour
+    const angle = (t - 0.5) * Math.PI * 0.75;
+    const radius = 1600;
+    targetX = Math.sin(angle) * radius * 0.55;
+    targetZ = -1400 + Math.cos(angle) * radius;
+    targetY = 60 + Math.sin(t * Math.PI * 2) * 45;
+  } else {
+    // zoomthrough (Default Zoom In) & custom-path & slalom
+    targetZ = 1350 - (t * 5000);
   }
 
-  // Per-Layer Corridor Placement & Sequential Focal Visibility Window
-  // Ensures:
-  // 1) Camera flies IN THE MIDDLE between flanking left/right photographic plates (cards never sit behind center text)
-  // 2) Only ONE hero title is visible in the center focal zone at a time (next title emerges only as current title passes)
+  // Lateral X and Vertical Y trajectory
+  if (flightMode === 'orbit') {
+    // already computed
+  } else if (pathStyle === 'slalom' || flightMode === 'slalom') {
+    // S-Curve Slalom: weaves gently between left and right corridor exhibits
+    targetX = Math.sin(t * Math.PI * 3) * 160 * driftFactor;
+    targetY = 15 + Math.cos(t * Math.PI * 3) * 25 * driftFactor;
+  } else if (pathStyle === 'cosmic-wave') {
+    targetX = Math.sin(t * Math.PI * 2) * 140 * driftFactor;
+    targetY = 15 + Math.cos(t * Math.PI * 4) * 55 * driftFactor;
+  } else if (drawnPath && drawnPath.length >= 2) {
+    // Custom user-drawn flight path: interpolate along drawn points
+    targetX = sampleDrawnPathX(drawnPath, t);
+    targetY = 15 + (pathCurve || 0) * 0.2;
+  } else {
+    // Straight Center Runway (or subtle curve with pathCurve offset)
+    const curveOffset = (pathCurve || 0) * 3.5;
+    targetX = Math.sin(t * Math.PI) * curveOffset + (Math.sin(t * Math.PI * 2) * (36 * driftFactor));
+    targetY = 15 + (Math.cos(t * Math.PI * 2) * (20 * driftFactor));
+  }
+
+  // Smooth camera position interpolation
+  camera.position.z += (targetZ - camera.position.z) * 0.14;
+  camera.position.x += (targetX - camera.position.x) * 0.12;
+  camera.position.y += (targetY - camera.position.y) * 0.12;
+
+  // Standard 3D Aim & Tilt (yaw & pitch)
+  const pitchRad = ((camPitch || 0) * Math.PI) / 180;
+  const yawRad = ((camYaw || 0) * Math.PI) / 180;
+  const lookDistance = 1000;
+  const lookTargetX = camera.position.x + Math.sin(yawRad) * lookDistance + (mouse.x * 24);
+  const lookTargetY = camera.position.y - Math.sin(pitchRad) * lookDistance + (-mouse.y * 16);
+  const lookTargetZ = camera.position.z - Math.cos(yawRad) * Math.cos(pitchRad) * lookDistance;
+
+  camera.lookAt(lookTargetX, lookTargetY, lookTargetZ);
+
+  // Per-Layer Focal Visibility & Lateral Corridor Clearance
   for (let i = 0; i < elements3D.length; i++) {
     const obj = elements3D[i];
     const u = obj.userData || {};
@@ -41164,44 +41344,42 @@ function updateSpatialCameraPosition() {
     let opacity = 1.0;
 
     if (u.type === 'text') {
-      // Hero Title Focal Window:
-      // - Fades out smoothly before hitting camera lens (distInFront: 480 -> 220)
-      // - Fully sharp in focal window (distInFront: 480 .. 1350)
-      // - Veiled in deep darkness when far behind the current title (distInFront > 1400 -> 0 by 1950)
-      //   so two titles NEVER stack on top of each other!
+      if (showText === false) {
+        setSpatialGroupOpacity(obj, 0.0);
+        continue;
+      }
+      // Hero Title Focal Window
       if (distInFront <= 220) {
         opacity = 0.0;
       } else if (distInFront < 480) {
-        const t = (distInFront - 220) / (480 - 220);
-        opacity = t * t * (3 - 2 * t);
+        const p = (distInFront - 220) / (480 - 220);
+        opacity = p * p * (3 - 2 * p);
       } else if (distInFront > 1950) {
         opacity = 0.0;
       } else if (distInFront > 1350) {
-        const t = 1.0 - (distInFront - 1350) / (1950 - 1350);
-        opacity = t * t * (3 - 2 * t);
+        const p = 1.0 - (distInFront - 1350) / (1950 - 1350);
+        opacity = p * p * (3 - 2 * p);
       }
       obj.position.x = u.baseX || 0;
       obj.position.y = u.baseY || 15;
     } else {
-      // Flanking Photographic Evidence Plates (Left & Right Corridor Walls):
-      // Enforce wide lateral corridor clearance proportional to distance so cards ALWAYS frame the left & right sides
-      // and NEVER project behind the center text!
+      // Flanking corridor exhibits (left & right walls)
       const rawX = u.baseX !== undefined ? u.baseX : obj.position.x;
       const sideSign = rawX < 0 ? -1 : 1;
-      const minCorridorHalfWidth = Math.max(Math.abs(rawX), 680, Math.max(0, distInFront) * 0.44);
+      const minCorridorHalfWidth = Math.max(Math.abs(rawX), 700, Math.max(0, distInFront) * 0.44);
       obj.position.x = sideSign * minCorridorHalfWidth;
       obj.position.y = (u.baseY || 0) + Math.sin(performance.now() * 0.0012 + i * 1.5) * 8;
 
       if (distInFront <= 140) {
         opacity = 0.0;
       } else if (distInFront < 420) {
-        const t = (distInFront - 140) / (420 - 140);
-        opacity = t * t * (3 - 2 * t);
+        const p = (distInFront - 140) / (420 - 140);
+        opacity = p * p * (3 - 2 * p);
       } else if (distInFront > 3200) {
         opacity = 0.0;
       } else if (distInFront > 2200) {
-        const t = 1.0 - (distInFront - 2200) / (3200 - 2200);
-        opacity = t * t * (3 - 2 * t);
+        const p = 1.0 - (distInFront - 2200) / (3200 - 2200);
+        opacity = p * p * (3 - 2 * p);
       }
     }
 
@@ -41228,9 +41406,8 @@ function initSpatialThreeJSEngine() {
   const h = container.clientHeight || 500;
 
   const scene = new THREE.Scene();
-  // Clean, High-Contrast Deep Dark Background (Restored — No Muddy Yellow Triangles)
   scene.background = new THREE.Color(0x07080c);
-  scene.fog = new THREE.FogExp2(0x07080c, 0.00032);
+  scene.fog = new THREE.FogExp2(0x07080c, 0.0003);
 
   const camera = new THREE.PerspectiveCamera(52, w / h, 10, 10000);
   camera.position.set(0, 15, 1250);
@@ -41254,10 +41431,33 @@ function initSpatialThreeJSEngine() {
   pointLight.position.set(0, 0, -2000);
   scene.add(pointLight);
 
-  // Clean Architectural Perspective Floor Grid
-  const floorGrid = new THREE.GridHelper(10000, 50, 0x334155, 0x111827);
-  floorGrid.position.set(0, -520, -1500);
-  scene.add(floorGrid);
+  // Full 3D Grid Tunnel / Corridor System (Image 2 Tron Tunnel vs Image 1 Floor Grid)
+  const gridGroup = new THREE.Group();
+  scene.add(gridGroup);
+
+  const tunnelDivisions = 50;
+  const tunnelLen = 10000;
+  const tunnelW = 1800;
+  const tunnelH = 960;
+
+  const floorGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
+  floorGrid.position.set(0, -tunnelH / 2, -1500);
+  gridGroup.add(floorGrid);
+
+  const ceilingGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
+  ceilingGrid.position.set(0, tunnelH / 2, -1500);
+  ceilingGrid.rotation.x = Math.PI;
+  gridGroup.add(ceilingGrid);
+
+  const leftWallGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
+  leftWallGrid.position.set(-tunnelW / 2, 0, -1500);
+  leftWallGrid.rotation.z = Math.PI / 2;
+  gridGroup.add(leftWallGrid);
+
+  const rightWallGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
+  rightWallGrid.position.set(tunnelW / 2, 0, -1500);
+  rightWallGrid.rotation.z = -Math.PI / 2;
+  gridGroup.add(rightWallGrid);
 
   const particlesMesh = buildSpatialDustParticles(scene);
 
@@ -41266,6 +41466,13 @@ function initSpatialThreeJSEngine() {
   spatial3DState.renderer = renderer;
   spatial3DState.particlesMesh = particlesMesh;
   spatial3DState.floorGrid = floorGrid;
+  spatial3DState.gridMeshes = {
+    group: gridGroup,
+    floor: floorGrid,
+    ceiling: ceilingGrid,
+    leftWall: leftWallGrid,
+    rightWall: rightWallGrid
+  };
   spatial3DState.ambientLight = ambientLight;
   spatial3DState.pointLight = pointLight;
 
@@ -41275,6 +41482,7 @@ function initSpatialThreeJSEngine() {
     spatial3DState.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
   });
 
+  updateSpatialEnvironmentGrid();
   loadSpatialPreset('docu-essay');
 
   function animateSpatialEngine() {
@@ -41289,8 +41497,22 @@ function initSpatialThreeJSEngine() {
     updateSpatialCameraPosition();
 
     if (particlesMesh && spatial3DState.dustVisible) {
-      particlesMesh.rotation.y += 0.00025;
-      particlesMesh.rotation.x += 0.00008;
+      particlesMesh.rotation.y += 0.0003;
+      particlesMesh.rotation.x += 0.0001;
+    }
+
+    // Slowly tumble 3D celestial wireframe objects
+    if (spatial3DState.elements3D && spatial3DState.elements3D.length) {
+      for (let i = 0; i < spatial3DState.elements3D.length; i++) {
+        const grp = spatial3DState.elements3D[i];
+        for (let j = 0; j < grp.children.length; j++) {
+          const child = grp.children[j];
+          if (child.userData && child.userData.isRotatingArtifact) {
+            child.rotation.x += (child.userData.rotSpeedX || 0.01);
+            child.rotation.y += (child.userData.rotSpeedY || 0.015);
+          }
+        }
+      }
     }
 
     if (spatial3DState.renderer && spatial3DState.scene && spatial3DState.camera) {

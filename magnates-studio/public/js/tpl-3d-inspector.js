@@ -45,7 +45,7 @@
 
   // ---------------------------------------------------------------- store
   let store = {};
-  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; if (store['spatial-3d-motion-suite'] && store['spatial-3d-motion-suite']._v !== 4) { delete store['spatial-3d-motion-suite']; } } catch (_) { store = {}; }
+  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; if (store['spatial-3d-motion-suite'] && store['spatial-3d-motion-suite']._v !== 5) { delete store['spatial-3d-motion-suite']; } } catch (_) { store = {}; }
   let saveTimer = null;
   function persist() {
     clearTimeout(saveTimer);
@@ -57,7 +57,7 @@
     }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { _v: 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (!store[id]) store[id] = { _v: id === 'spatial-3d-motion-suite' ? 5 : 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
     return store[id];
   }
   window.tpl3DFx = { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 };
@@ -140,9 +140,11 @@
         flightMode: s.flightMode, camSpeed: s.camSpeed, camDrift: s.camDrift, camPitch: s.camPitch, camYaw: s.camYaw,
         fovWarp: s.fovWarp, fogDensity: s.fogDensity, lightIntensity: s.lightIntensity, gridVisible: s.gridVisible,
         dustVisible: s.dustVisible, activePreset: s.activePreset,
+        envStyle: s.envStyle, gridLuminescence: s.gridLuminescence, gridColor: s.gridColor,
+        showText: s.showText, pathStyle: s.pathStyle, pathCurve: s.pathCurve, drawnPath: s.drawnPath,
         layers: (s.elements3D || []).map(m => {
           const u = m.userData || {};
-          return { id: u.id, type: u.type, artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'), visualTheme: u.visualTheme || 'treasury-scan', imageUrl: u.imageUrl || '', objectGeometry: u.objectGeometry || 'octahedron', title: u.title, subtitle: u.subtitle, body: u.body, text: u.text, color: u.color, scale: u.scale || 1, x: u.baseX !== undefined ? u.baseX : m.position.x, y: u.baseY !== undefined ? u.baseY : m.position.y, z: m.position.z };
+          return { id: u.id, type: u.type, artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'), objectShape: u.objectShape || u.objectGeometry || 'icosahedron', objectGeometry: u.objectShape || u.objectGeometry || 'icosahedron', imageUrl: u.imageUrl || '', title: u.title, subtitle: u.subtitle, body: u.body, text: u.text, color: u.color, scale: u.scale || 1, x: u.baseX !== undefined ? u.baseX : m.position.x, y: u.baseY !== undefined ? u.baseY : m.position.y, z: m.position.z };
         })
       };
     }
@@ -205,13 +207,14 @@
     if (s._appliedSig === sig && s.scene) return;
     s._appliedSig = sig;
     if (sp) {
-      ['flightMode', 'camSpeed', 'camDrift', 'camPitch', 'camYaw', 'fovWarp', 'fogDensity', 'lightIntensity', 'gridVisible', 'dustVisible', 'activePreset'].forEach(f => { if (sp[f] !== undefined) s[f] = sp[f]; });
+      ['flightMode', 'camSpeed', 'camDrift', 'camPitch', 'camYaw', 'fovWarp', 'fogDensity', 'lightIntensity', 'gridVisible', 'dustVisible', 'activePreset', 'envStyle', 'gridLuminescence', 'gridColor', 'showText', 'pathStyle', 'pathCurve', 'drawnPath'].forEach(f => { if (sp[f] !== undefined) s[f] = sp[f]; });
       if (sp.layers && sp.layers.length) setSpatialLayers(sp.layers);
     }
     if (s.camera) { s.camera.fov = s.fovWarp; s.camera.updateProjectionMatrix(); }
     if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (s.fogDensity / 100) * 0.0008;
     if (s.ambientLight) s.ambientLight.intensity = (s.lightIntensity / 100) * 0.95;
-    if (s.floorGrid) s.floorGrid.visible = s.gridVisible;
+    if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
+    else if (s.floorGrid) s.floorGrid.visible = s.gridVisible;
     if (s.particlesMesh) s.particlesMesh.visible = s.dustVisible;
     // unified text overrides
     Object.keys(e.texts).forEach(key => {
@@ -407,22 +410,460 @@
       }
     } else if (k === 'spatial') {
       const s = spatial3DState;
-      html += section('Text', textHtml);
-      html += section('Camera Rig', [
-        `<select data-k="flight" style="${selectCss}">${['zoomthrough:Zoom-Through', 'pullback:Pullback Reveal', 'orbit:360\u00b0 Orbit'].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${s.flightMode === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>`,
+      // Text header with Creator Mode toggle
+      const textSectionHeader = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#e2e8f0;">Headline Typography</span>
+        <button type="button" data-act="s-toggle-text" style="padding:4px 9px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid ${s.showText !== false ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'};background:${s.showText !== false ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${s.showText !== false ? '#6ee7b7' : '#fca5a5'};cursor:pointer;">${s.showText !== false ? '✓ Text Visible' : '⊘ Hidden (Pure 3D Universe)'}</button>
+      </div>`;
+      html += section('Text Overlays', textSectionHeader + (s.showText !== false ? textHtml : '<div style="font-size:10.5px;color:#94a3b8;font-style:italic;padding:6px 0;">Headline typography hidden. Camera navigates purely through 3D floating exhibits & celestial objects in space.</div>'));
+
+      // Flight Rig & Trajectory
+      const pathMiniCanvas = `<div style="background:#0b0f19;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;margin-top:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.5px;">Flight Runway / Road Path</span>
+          <button type="button" data-act="s-reset-path" style="font-size:9.5px;color:#a855f7;background:transparent;border:none;cursor:pointer;text-decoration:underline;">Reset Center</button>
+        </div>
+        <canvas id="spatial-path-canvas" width="220" height="75" style="width:100%;height:75px;background:#05070c;border:1px solid rgba(168,85,247,0.3);border-radius:6px;cursor:crosshair;touch-action:none;display:block;"></canvas>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#64748b;margin-top:4px;">
+          <span>← Left Wall</span>
+          <span style="color:#c084fc;">Drag to shape flight path</span>
+          <span>Right Wall →</span>
+        </div>
+      </div>`;
+
+      html += section('Camera Rig & Flight Path', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Flight Mode
+          <select data-k="flight" style="${selectCss}">${[
+            'zoomthrough:Zoom In (Hallway Fly-Through)',
+            'pullback:Zoom Out (Reverse Pullback)',
+            'slalom:S-Curve Slalom Weave',
+            'orbit:360\\u00b0 Panoramic Orbit Tour',
+            'custom-path:Custom Drawn Trajectory'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${s.flightMode === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Runway Path Style
+          <select data-k="s-pathstyle" style="${selectCss}">${[
+            'straight:Straight Center Runway',
+            'slalom:Sinusoidal S-Weave',
+            'cosmic-wave:Cosmic Wave & Undulation',
+            'custom:Interactive Custom Drawn Path'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.pathStyle || 'straight') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        row('s-pathcurve', 'Runway Banking / Curve', -100, 100, 1, s.pathCurve || 0, v => (v > 0 ? '+' : '') + v + '%'),
+        pathMiniCanvas,
         row('s-speed', 'Zoom Speed (Z-Velocity)', 0.2, 4, 0.1, s.camSpeed, v => v.toFixed(1) + 'x'),
         row('s-drift', 'X/Y Motion Drift', 0, 100, 1, s.camDrift, v => v + '%'),
-        row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '\u00b0'),
-        row('s-pitch', 'Tilt Pitch (X)', -30, 30, 1, s.camPitch, v => v + '\u00b0'),
-        row('s-yaw', 'Rotation Yaw (Y)', -30, 30, 1, s.camYaw, v => v + '\u00b0')
+        row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '\\u00b0'),
+        row('s-pitch', 'Tilt Pitch (X)', -45, 45, 1, Math.round(s.camPitch), v => v + '\\u00b0'),
+        row('s-yaw', 'Rotation Yaw (Y)', -65, 65, 1, Math.round(s.camYaw), v => v + '\\u00b0')
       ].join(''));
-      html += section('Atmosphere', [
-        row('s-fog', 'Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
-        row('s-light', 'Ambient Glow', 20, 200, 1, s.lightIntensity, v => v + '%'),
-        `<div style="display:flex;gap:6px;">${btn('s-grid', '\u229e Floor Grid', s.gridVisible)}${btn('s-dust', '\u2726 Dust', s.dustVisible)}</div>`
+
+      // Environment & Luminescence (Image 2 Tron Tunnel vs Image 1 Floor Grid + Stars)
+      html += section('Environment & Luminescence', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Environment Style (Reference Images)
+          <select data-k="s-env" style="${selectCss}">${[
+            'tunnel-cyan:Cyber Grid Tunnel (Image 2)',
+            'tunnel-gold:Gold Documentary Tunnel (Image 2)',
+            'tunnel-slate:Slate Architectural Tunnel',
+            'open-stars:Floor Grid & Cosmic Starfield (Image 1)',
+            'deep-cosmos:Deep Cosmos Void (Pure Stars)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.envStyle || 'tunnel-cyan') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        row('s-lum', 'Grid Luminescence / Glow', 0, 200, 1, s.gridLuminescence !== undefined ? s.gridLuminescence : 100, v => v + '%'),
+        `<label style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:#94a3b8;padding:4px 0;">Grid Line Color <input type="color" data-k="s-gridcolor" value="${s.gridColor || (s.envStyle === 'tunnel-gold' ? '#d4af37' : s.envStyle === 'tunnel-slate' ? '#64748b' : '#06b6d4')}" style="border:none;width:32px;height:24px;border-radius:4px;cursor:pointer;background:transparent;" /></label>`,
+        row('s-fog', 'Atmospheric Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
+        row('s-light', 'Ambient Lighting Glow', 20, 200, 1, s.lightIntensity, v => v + '%'),
+        `<div style="display:flex;gap:6px;">${btn('s-grid', '\\u229e Grid Active', s.gridVisible)}${btn('s-dust', '\\u2726 Cosmic Starfield / Dust', s.dustVisible)}</div>`
       ].join(''));
-      html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${['docu-essay:Docu-Essay', 'cyber-matrix:Cyber Matrix', 'philosophy:Philosophy'].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
-      html += section('3D Layers & Artifacts', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"><button type="button" data-act="s-add-artifact" style="padding:5px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(212,175,55,.6);background:rgba(212,175,55,.1);color:#fef08a;cursor:pointer;">+ Image / 3D Artifact</button><button type="button" data-act="s-add" style="padding:5px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ 3D Title Plane</button></div>`);
+
+      // Presets
+      html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${[
+        'docu-essay:Docu-Essay (Gallery)',
+        'cyber-matrix:Cyber Matrix (Image 2)',
+        'philosophy:Philosophy (Gold)',
+        'cosmic-universe:Cosmic Universe (Stars)'
+      ].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
+
+      // 3D Layers
+      html += section('Corridor Exhibits & 3D Layers', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;"><button type="button" data-act="s-add-artifact" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(212,175,55,.6);background:rgba(212,175,55,.1);color:#fef08a;cursor:pointer;">+ Image / 3D Celestial</button><button type="button" data-act="s-add" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ Hero Title Plane</button></div>`);
+    } else {
+      const p = ensureDoc(e);
+      html += section('Text', textHtml);
+      html += section('Camera', [
+        row('d-pitch', 'Tilt Pitch (X)', 0, 75, 1, Math.round(p.pitch), v => v + '\u00b0'),
+        row('d-yaw', 'Rotation Yaw (Y)', -60, 60, 1, Math.round(p.yaw), v => v + '\u00b0'),
+        row('d-roll', 'Roll (Z)', -45, 45, 1, Math.round(p.roll), v => v + '\u00b0'),
+        row('d-dist', 'Camera Distance', 20, 110, 1, Math.round(p.dist), v => v),
+        row('d-parallax', 'Parallax Strength', 0, 4, 0.1, p.parallax, v => v.toFixed(1) + 'x')
+      ].join(''));
+      html += section('Paper', `<select data-k="d-paper" style="${selectCss}">${['aged:Aged Newsprint', 'stark:Stark White', 'darkmode:Dark Mode', 'manuscript:Manuscript'].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${p.paperStyle === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>`);
+      html += section('Layers', [
+        `<div style="display:flex;gap:6px;flex-wrap:wrap;">${btn('d-hl', 'Highlighter', p.enableHighlight)}${btn('d-pop', 'Pop-out Headline', p.enablePopout)}${btn('d-red', 'Redaction', p.enableRedaction)}</div>`,
+        row('d-hlprog', 'Highlight Amount', 0, 100, 1, Math.round(p.hl * 100), v => v + '%'),
+        row('d-popelev', 'Pop-out Elevation', 0, 20, 0.5, p.popElevation, v => v),
+        row('d-redwipe', 'Redaction Wipe', 0, 100, 1, Math.round(p.redactWipe * 100), v => v + '%'),
+        `<label style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#94a3b8;">Highlight Color <input type="color" data-k="d-hlcolor" value="${p.highlightColor}" /></label>`
+      ].join(''));
+    }
+    h.innerHTML = html;
+    if (mode === '3d' && k === 'spatial') renderSpatialLayers();
+  }
+
+  function renderSpatialLayers() {
+    const box = document.getElementById('tpl3d-layers'); if (!box) return;
+    const list = spatial3DState.elements3D || [];
+    box.innerHTML = list.map((m, i) => {
+      const u = m.userData || {}; const open = openLayerIdx === i; const color = u.color || '#f59e0b';
+      const curMode = u.artifactMode || (u.type === 'object' ? 'object' : 'image');
+      const curShape = u.objectShape || u.objectGeometry || 'icosahedron';
+      const posXVal = Math.round(u.baseX !== undefined ? u.baseX : m.position.x);
+      const posYVal = Math.round(u.baseY !== undefined ? u.baseY : m.position.y);
+      const editor = !open ? '' : `<div style="display:flex;flex-direction:column;gap:6px;padding:8px 2px 2px;">
+        ${u.type !== 'text' && u.type !== 'code' ? `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Artifact Mode
+          <select data-k="l-mode-${i}" style="${selectCss}">
+            <option value="image" ${curMode === 'image' ? 'selected' : ''}>🖼️ Archival Image Plate (Microfilm documentary)</option>
+            <option value="object" ${curMode === 'object' ? 'selected' : ''}>⬡ 3D Celestial / Wireframe Object</option>
+            <option value="card" ${curMode === 'card' ? 'selected' : ''}>📄 Frosted Dossier Text Slate</option>
+          </select>
+        </label>` : ''}
+        ${curMode === 'object' ? `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Celestial 3D Shape
+          <select data-k="l-shape-${i}" style="${selectCss}">
+            <option value="icosahedron" ${curShape === 'icosahedron' ? 'selected' : ''}>✦ Icosahedron Cosmic Gem</option>
+            <option value="torus" ${curShape === 'torus' ? 'selected' : ''}>◎ Stargate Celestial Ring</option>
+            <option value="octahedron" ${curShape === 'octahedron' ? 'selected' : ''}>◇ Quantum Diamond Crystal</option>
+            <option value="dodecahedron" ${curShape === 'dodecahedron' ? 'selected' : ''}>⬢ Stellar Polyhedron</option>
+            <option value="monolith" ${curShape === 'monolith' ? 'selected' : ''}>▮ Sci-Fi Space Monolith</option>
+          </select>
+        </label>` : ''}
+        ${u.type !== 'text' && curMode === 'image' ? txt('l-img-' + i, 'Custom Image URL (blank = Archival Microfilm Plate)', u.imageUrl || '') : ''}
+        ${txt('l-title-' + i, 'Title', u.title || '')}
+        ${u.type !== 'code' ? txt('l-sub-' + i, 'Subtitle / Classification', u.subtitle || '') : ''}
+        ${u.type !== 'text' ? txt('l-body-' + i, u.type === 'code' ? 'Code Lines' : 'Dossier Body', u.body || u.text || '', true) : ''}
+        ${row('l-z-' + i, 'Depth (Z)', -5000, 1500, 10, Math.round(m.position.z), v => v)}
+        ${row('l-x-' + i, 'Position X', -1500, 1500, 10, posXVal, v => v)}
+        ${row('l-y-' + i, 'Position Y', -1000, 1000, 10, posYVal, v => v)}
+        ${row('l-scale-' + i, 'Scale', 0.3, 3, 0.05, u.scale || 1, v => Number(v).toFixed(2) + 'x')}
+        <label style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#94a3b8;">Accent Color <input type="color" data-k="l-color-${i}" value="${/^#[0-9a-f]{6}$/i.test(color) ? color : '#D4AF37'}" /></label></div>`;
+      return `<div style="background:#121520;border:1px solid ${open ? 'rgba(168,85,247,.55)' : 'rgba(255,255,255,.08)'};border-radius:8px;padding:7px 9px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <div data-act="l-toggle-${i}" style="display:flex;align-items:center;gap:7px;cursor:pointer;overflow:hidden;flex:1;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
+            <span style="font-size:11px;font-weight:700;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.title || (u.type === 'text' ? '3D Title Plane' : 'Corridor Slate')}</span>
+            <span style="font-size:9.5px;color:#94a3b8;font-family:monospace;">Z:${Math.round(m.position.z)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button type="button" data-act="l-up-${i}" style="background:transparent;border:none;color:#94a3b8;font-size:10px;cursor:pointer;padding:2px 4px;">▲</button>
+            <button type="button" data-act="l-down-${i}" style="background:transparent;border:none;color:#94a3b8;font-size:10px;cursor:pointer;padding:2px 4px;">▼</button>
+            <button type="button" data-act="l-del-${i}" style="background:transparent;border:none;color:#ef4444;font-size:11px;cursor:pointer;padding:2px 4px;">×</button>
+          </div>
+        </div>
+        ${editor}
+      </div>`;
+    }).join('');
+
+    initSpatialPathCanvas();
+  }
+
+  function initSpatialPathCanvas() {
+    const canvas = document.getElementById('spatial-path-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const s = spatial3DState;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width, h = canvas.height;
+
+      // Draw Corridor Boundaries (Left & Right Walls)
+      ctx.strokeStyle = 'rgba(6,182,212,0.3)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      // Left Wall
+      ctx.beginPath(); ctx.moveTo(25, 6); ctx.lineTo(25, h - 6); ctx.stroke();
+      // Right Wall
+      ctx.beginPath(); ctx.moveTo(w - 25, 6); ctx.lineTo(w - 25, h - 6); ctx.stroke();
+      // Centerline
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath(); ctx.moveTo(w / 2, 6); ctx.lineTo(w / 2, h - 6); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Draw Flight Path
+      ctx.strokeStyle = '#c084fc';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = 'rgba(192,132,252,0.8)';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+
+      const steps = 40;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        let px = 0;
+        if (s.pathStyle === 'slalom' || s.flightMode === 'slalom') {
+          px = Math.sin(t * Math.PI * 3) * 55;
+        } else if (s.pathStyle === 'cosmic-wave') {
+          px = Math.sin(t * Math.PI * 2) * 50;
+        } else if (s.drawnPath && s.drawnPath.length >= 2) {
+          const sampleX = sampleDrawnPathX(s.drawnPath, t);
+          px = (sampleX / 740) * (w / 2 - 30);
+        } else {
+          const curveOffset = (s.pathCurve || 0) * 0.6;
+          px = Math.sin(t * Math.PI) * curveOffset;
+        }
+        const canvasX = (w / 2) + px;
+        const canvasY = 8 + t * (h - 16);
+        if (i === 0) ctx.moveTo(canvasX, canvasY);
+        else ctx.lineTo(canvasX, canvasY);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Draw Current Camera Live Position Dot
+      const currentT = Math.max(0, Math.min(1, s.currentTime || 0));
+      let curPx = 0;
+      if (s.pathStyle === 'slalom' || s.flightMode === 'slalom') {
+        curPx = Math.sin(currentT * Math.PI * 3) * 55;
+      } else if (s.drawnPath && s.drawnPath.length >= 2) {
+        curPx = (sampleDrawnPathX(s.drawnPath, currentT) / 740) * (w / 2 - 30);
+      } else {
+        curPx = Math.sin(currentT * Math.PI) * ((s.pathCurve || 0) * 0.6);
+      }
+      const curX = (w / 2) + curPx;
+      const curY = 8 + currentT * (h - 16);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(curX, curY, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    draw();
+
+    // Mouse / Touch drawing on the canvas
+    let drawing = false;
+    let strokePoints = [];
+
+    const onPointer = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0].clientX);
+      const clientY = ev.clientY !== undefined ? ev.clientY : (ev.touches && ev.touches[0].clientY);
+      const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+      const normT = Math.max(0, Math.min(1, (y - 8) / (rect.height - 16)));
+      const normX = ((x - rect.width / 2) / (rect.width / 2 - 30)) * 740;
+
+      strokePoints.push({ t: normT, x: Math.max(-740, Math.min(740, normX)) });
+      strokePoints.sort((a, b) => a.t - b.t);
+
+      s.pathStyle = 'custom';
+      s.flightMode = 'custom-path';
+      s.drawnPath = strokePoints.slice();
+
+      const selMode = host()?.querySelector('[data-k="flight"]');
+      const selStyle = host()?.querySelector('[data-k="s-pathstyle"]');
+      if (selMode) selMode.value = 'custom-path';
+      if (selStyle) selStyle.value = 'custom';
+
+      draw();
+      persist();
+    };
+
+    canvas.onpointerdown = (ev) => {
+      drawing = true;
+      strokePoints = [];
+      try { canvas.setPointerCapture(ev.pointerId); } catch (_) {}
+      onPointer(ev);
+    };
+
+    canvas.onpointermove = (ev) => {
+      if (!drawing) return;
+      onPointer(ev);
+    };
+
+    const stopDraw = (ev) => {
+      if (!drawing) return;
+      drawing = false;
+      try { canvas.releasePointerCapture(ev.pointerId); } catch (_) {}
+      persist();
+    };
+
+    canvas.onpointerup = stopDraw;
+    canvas.onpointercancel = stopDraw;
+  }
+  function build(tplId) {
+    const h = host(); const k = kindOf(tplId);
+    if (!h) return;
+    if (!k) { h.style.display = 'none'; h.innerHTML = ''; return; }
+    h.style.display = 'flex';
+    const e = entry(tplId); const fx = e.fx;
+    const mode = has3D(k, tplId) ? e.mode : 'video';
+    let html = `<div style="display:flex;align-items:center;justify-content:space-between;"><span style="${lbl}">Effect Controls</span>`;
+    if (has3D(k, tplId)) {
+      html += `<div style="display:flex;gap:3px;background:rgba(18,19,28,.9);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,.08);">
+        <button type="button" data-act="mode-video" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === 'video' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === 'video' ? '#fff' : '#94a3b8'};">\u25b6 Video</button>
+        <button type="button" data-act="mode-3d" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === '3d' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === '3d' ? '#fff' : '#94a3b8'};">\u2b21 3D</button></div>`;
+    }
+    html += `</div>`;
+
+    // shared text section (same fields in Video and 3D)
+    const slots = slotsFor(tplId);
+    const textHtml = slots.map((sl, i) => {
+      let v = e.texts[sl.key];
+      if (v == null) v = (mode === '3d' ? get3DText(tplId, sl) : null);
+      if (v == null) v = sl.def != null ? sl.def : '';
+      return txt('tx-' + i, sl.label, v);
+    }).join('');
+
+    if (mode === 'video' || k === 'dom3d') {
+      if (mode === '3d' && k === 'dom3d') {
+        html += `<div style="background:linear-gradient(135deg, rgba(168,85,247,0.18), rgba(56,189,248,0.12));border:1px solid rgba(192,132,252,0.45);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:15px;">\ud83d\udd90\ufe0f</span>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:10.5px;font-weight:800;color:#f3e8ff;letter-spacing:0.04em;">INTERACTIVE 3D HAND ORBIT ACTIVE</span>
+            <span style="font-size:9.5px;color:#cbd5e1;">Grab &amp; drag the stage to tilt/rotate in 3D \u2022 Scroll wheel to zoom</span>
+          </div>
+        </div>`;
+      }
+      html += section(mode === '3d' ? '3D Camera Rig & Orbit' : 'Motion', [
+        row('v-speed', 'Playback Speed', -3.0, 3.0, 0.1, fx.speed, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
+        row('v-pitch', 'Tilt Pitch (X)', -45, 45, 1, fx.pitch, v => v + '\u00b0'),
+        row('v-yaw', 'Rotation Yaw (Y)', -45, 45, 1, fx.yaw, v => v + '\u00b0'),
+        row('v-roll', 'Roll (Z)', -30, 30, 1, fx.roll, v => v + '\u00b0'),
+        row('v-zoom', 'Zoom / Depth', 0.6, 2.2, 0.05, fx.zoom, v => v.toFixed(2) + 'x'),
+        `<button type="button" data-act="v-reset" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cbd5e1;cursor:pointer;">Reset 3D Camera</button>`
+      ].join(''));
+
+      if (tplId === 'jani-puzzle-narrative-suite') {
+        const pz = ensurePuzzle(e);
+        html += section('Layer Visibility', [
+          `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            ${btn('pz-toggle-bg', 'Background Image', pz.bgVisible)}
+            ${btn('pz-toggle-grid', 'Puzzle Pieces (3x3)', pz.gridVisible)}
+            ${btn('pz-toggle-thesis', 'Editorial Thesis Card', pz.thesisVisible)}
+            ${btn('pz-toggle-watermark', 'Watermark Title', pz.watermarkVisible)}
+          </div>`
+        ].join(''));
+
+        html += section('Tile Shape & Layout', [
+          row('pz-rounding', 'Corner Rounding', 0, 16, 1, pz.tileRounding, v => v + 'px'),
+          row('pz-gap', 'Tile Spacing / Dispersion', 0, 16, 1, pz.tileGap, v => v + 'px'),
+          row('pz-bgop', 'Backdrop Scene Opacity', 0, 100, 5, Math.round(pz.bgOpacity * 100), v => v + '%')
+        ].join(''));
+
+        html += section('Colors & Borders', [
+          `<div style="display:flex;gap:12px;align-items:center;padding:4px 0;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#94a3b8;flex:1;">
+              Accent Glow
+              <input type="color" data-k="pz-accent" value="${pz.accentColor}" style="border:none;background:transparent;cursor:pointer;width:24px;height:24px;padding:0;" />
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#94a3b8;flex:1;">
+              Tile Border
+              <input type="color" data-k="pz-border" value="${pz.borderColor}" style="border:none;background:transparent;cursor:pointer;width:24px;height:24px;padding:0;" />
+            </label>
+          </div>`
+        ].join(''));
+      }
+
+      // Text is optional with a clean + Add Text button
+      const hasAnyText = slots.some(sl => {
+        const val = e.texts[sl.key] != null ? e.texts[sl.key] : sl.def;
+        return val && val.trim().length > 0;
+      });
+      if (hasAnyText || e.showTextSection) {
+        html += section('Text & Kinetic Titles', `
+          <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+            <button type="button" data-act="clear-all-text-slots" style="font-size:9.5px;padding:2px 6px;border-radius:4px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;cursor:pointer;">Clear All Text</button>
+          </div>
+          ${textHtml}
+        `);
+      } else {
+        html += `<div style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);border-radius:6px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10.5px;color:#64748b;">No text overlays active (Clean Canvas)</span>
+          <button type="button" data-act="add-kinetic-slot" style="font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(56,189,248,0.2);border:1px solid rgba(56,189,248,0.5);color:#38bdf8;cursor:pointer;">+ Add Text</button>
+        </div>`;
+      }
+    } else if (k === 'spatial') {
+      const s = spatial3DState;
+      // Text header with Creator Mode toggle
+      const textSectionHeader = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#e2e8f0;">Headline Typography</span>
+        <button type="button" data-act="s-toggle-text" style="padding:4px 9px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid ${s.showText !== false ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'};background:${s.showText !== false ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${s.showText !== false ? '#6ee7b7' : '#fca5a5'};cursor:pointer;">${s.showText !== false ? '✓ Text Visible' : '⊘ Hidden (Pure 3D Universe)'}</button>
+      </div>`;
+      html += section('Text Overlays', textSectionHeader + (s.showText !== false ? textHtml : '<div style="font-size:10.5px;color:#94a3b8;font-style:italic;padding:6px 0;">Headline typography hidden. Camera navigates purely through 3D floating exhibits & celestial objects in space.</div>'));
+
+      // Flight Rig & Trajectory
+      const pathMiniCanvas = `<div style="background:#0b0f19;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;margin-top:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.5px;">Flight Runway / Road Path</span>
+          <button type="button" data-act="s-reset-path" style="font-size:9.5px;color:#a855f7;background:transparent;border:none;cursor:pointer;text-decoration:underline;">Reset Center</button>
+        </div>
+        <canvas id="spatial-path-canvas" width="220" height="75" style="width:100%;height:75px;background:#05070c;border:1px solid rgba(168,85,247,0.3);border-radius:6px;cursor:crosshair;touch-action:none;display:block;"></canvas>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#64748b;margin-top:4px;">
+          <span>← Left Wall</span>
+          <span style="color:#c084fc;">Drag to shape flight path</span>
+          <span>Right Wall →</span>
+        </div>
+      </div>`;
+
+      html += section('Camera Rig & Flight Path', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Flight Mode
+          <select data-k="flight" style="${selectCss}">${[
+            'zoomthrough:Zoom In (Hallway Fly-Through)',
+            'pullback:Zoom Out (Reverse Pullback)',
+            'slalom:S-Curve Slalom Weave',
+            'orbit:360\\u00b0 Panoramic Orbit Tour',
+            'custom-path:Custom Drawn Trajectory'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${s.flightMode === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Runway Path Style
+          <select data-k="s-pathstyle" style="${selectCss}">${[
+            'straight:Straight Center Runway',
+            'slalom:Sinusoidal S-Weave',
+            'cosmic-wave:Cosmic Wave & Undulation',
+            'custom:Interactive Custom Drawn Path'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.pathStyle || 'straight') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        row('s-pathcurve', 'Runway Banking / Curve', -100, 100, 1, s.pathCurve || 0, v => (v > 0 ? '+' : '') + v + '%'),
+        pathMiniCanvas,
+        row('s-speed', 'Zoom Speed (Z-Velocity)', 0.2, 4, 0.1, s.camSpeed, v => v.toFixed(1) + 'x'),
+        row('s-drift', 'X/Y Motion Drift', 0, 100, 1, s.camDrift, v => v + '%'),
+        row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '\\u00b0'),
+        row('s-pitch', 'Tilt Pitch (X)', -45, 45, 1, Math.round(s.camPitch), v => v + '\\u00b0'),
+        row('s-yaw', 'Rotation Yaw (Y)', -65, 65, 1, Math.round(s.camYaw), v => v + '\\u00b0')
+      ].join(''));
+
+      // Environment & Luminescence (Image 2 Tron Tunnel vs Image 1 Floor Grid + Stars)
+      html += section('Environment & Luminescence', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Environment Style (Reference Images)
+          <select data-k="s-env" style="${selectCss}">${[
+            'tunnel-cyan:Cyber Grid Tunnel (Image 2)',
+            'tunnel-gold:Gold Documentary Tunnel (Image 2)',
+            'tunnel-slate:Slate Architectural Tunnel',
+            'open-stars:Floor Grid & Cosmic Starfield (Image 1)',
+            'deep-cosmos:Deep Cosmos Void (Pure Stars)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.envStyle || 'tunnel-cyan') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        row('s-lum', 'Grid Luminescence / Glow', 0, 200, 1, s.gridLuminescence !== undefined ? s.gridLuminescence : 100, v => v + '%'),
+        `<label style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:#94a3b8;padding:4px 0;">Grid Line Color <input type="color" data-k="s-gridcolor" value="${s.gridColor || (s.envStyle === 'tunnel-gold' ? '#d4af37' : s.envStyle === 'tunnel-slate' ? '#64748b' : '#06b6d4')}" style="border:none;width:32px;height:24px;border-radius:4px;cursor:pointer;background:transparent;" /></label>`,
+        row('s-fog', 'Atmospheric Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
+        row('s-light', 'Ambient Lighting Glow', 20, 200, 1, s.lightIntensity, v => v + '%'),
+        `<div style="display:flex;gap:6px;">${btn('s-grid', '\\u229e Grid Active', s.gridVisible)}${btn('s-dust', '\\u2726 Cosmic Starfield / Dust', s.dustVisible)}</div>`
+      ].join(''));
+
+      // Presets
+      html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${[
+        'docu-essay:Docu-Essay (Gallery)',
+        'cyber-matrix:Cyber Matrix (Image 2)',
+        'philosophy:Philosophy (Gold)',
+        'cosmic-universe:Cosmic Universe (Stars)'
+      ].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
+
+      // 3D Layers
+      html += section('Corridor Exhibits & 3D Layers', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;"><button type="button" data-act="s-add-artifact" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(212,175,55,.6);background:rgba(212,175,55,.1);color:#fef08a;cursor:pointer;">+ Image / 3D Celestial</button><button type="button" data-act="s-add" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ Hero Title Plane</button></div>`);
     } else {
       const p = ensureDoc(e);
       html += section('Text', textHtml);
@@ -512,7 +953,12 @@
     else if (key === 'v-yaw') { fx.yaw = v; lab(v + '\u00b0'); }
     else if (key === 'v-roll') { fx.roll = v; lab(v + '\u00b0'); }
     else if (key === 'v-zoom') { fx.zoom = v; lab(v.toFixed(2) + 'x'); }
-    else if (key === 'flight') { s.flightMode = v; }
+    else if (key === 'flight') { s.flightMode = v; initSpatialPathCanvas(); }
+    else if (key === 's-pathstyle') { s.pathStyle = v; initSpatialPathCanvas(); }
+    else if (key === 's-pathcurve') { s.pathCurve = v; lab((v > 0 ? '+' : '') + v + '%'); initSpatialPathCanvas(); }
+    else if (key === 's-env') { s.envStyle = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-lum') { s.gridLuminescence = v; lab(v + '%'); if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-gridcolor') { s.gridColor = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
     else if (key === 's-speed') { s.camSpeed = v; lab(v.toFixed(1) + 'x'); }
     else if (key === 's-drift') { s.camDrift = v; lab(v + '%'); }
     else if (key === 's-fov') { s.fovWarp = v; lab(v + '\u00b0'); if (s.camera) { s.camera.fov = v; s.camera.updateProjectionMatrix(); } }
@@ -521,9 +967,9 @@
     else if (key === 's-fog') { s.fogDensity = v; lab(v + '%'); if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (v / 100) * 0.0008; }
     else if (key === 's-light') { s.lightIntensity = v; lab(v + '%'); if (s.ambientLight) s.ambientLight.intensity = (v / 100) * 0.95; }
     else if (key.startsWith('l-')) {
-      const m = key.match(/^l-(title|sub|body|mode|img|z|x|y|scale|color)-(\d+)$/);
+      const m = key.match(/^l-(title|sub|body|mode|shape|img|z|x|y|scale|color)-(\d+)$/);
       if (m) {
-        const i = parseInt(m[2], 10), field = { title: 'title', sub: 'subtitle', body: 'body', mode: 'artifactMode', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color' }[m[1]];
+        const i = parseInt(m[2], 10), field = { title: 'title', sub: 'subtitle', body: 'body', mode: 'artifactMode', shape: 'objectShape', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color' }[m[1]];
         const num = ['z', 'x', 'y', 'scale'].includes(field);
         const val = num ? parseFloat(v) : v;
         const patch = { [field]: val }; if (field === 'body') patch.text = val; if (field === 'x') patch.baseX = val; if (field === 'y') patch.baseY = val;
@@ -621,8 +1067,18 @@
       const wm = document.getElementById(`fx-puzzle-watermark-${tplId}`); if (wm) wm.style.display = pz.watermarkVisible ? 'block' : 'none';
       persist(); build(tplId); return;
     }
-    if (act === 's-grid') { s.gridVisible = !s.gridVisible; if (s.floorGrid) s.floorGrid.visible = s.gridVisible; capture(tplId); build(tplId); return; }
-    if (act === 's-dust') { s.dustVisible = !s.dustVisible; if (s.particlesMesh) s.particlesMesh.visible = s.dustVisible; capture(tplId); build(tplId); return; }
+    if (act === 's-toggle-text') {
+      s.showText = s.showText === false ? true : false;
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-reset-path') {
+      s.pathStyle = 'straight';
+      s.pathCurve = 0;
+      s.drawnPath = null;
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-grid') { s.gridVisible = !s.gridVisible; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); capture(tplId); build(tplId); return; }
+    if (act === 's-dust') { s.dustVisible = !s.dustVisible; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); capture(tplId); build(tplId); return; }
     if (act.startsWith('preset-')) { loadSpatialPreset(act.slice(7)); e.texts = {}; openLayerIdx = -1; capture(tplId); build(tplId); return; }
     if (act === 's-add-artifact') {
       const sideX = (s.elements3D.length % 2 === 0) ? -520 : 520;
@@ -665,7 +1121,7 @@
     pill.id = 'dom3d-orbit-pill';
     pill.style.cssText = 'position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:85;display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(15,23,42,0.88);backdrop-filter:blur(10px);border:1px solid rgba(192,132,252,0.55);color:#f3e8ff;font-size:11px;font-weight:800;letter-spacing:0.05em;box-shadow:0 8px 24px rgba(0,0,0,0.65);pointer-events:none;white-space:nowrap;';
     pill.innerHTML = `<span style="font-size:14px;">\ud83d\udd90\ufe0f</span><span>3D INTERACTIVE MODE \u2014 DRAG TO TILT &amp; ROTATE \u2022 SCROLL TO ZOOM</span>`;
-    inner.appendChild(pill);
+    // pill omitted from center of 3D canvas so view remains completely clean and standard
 
     if (inner.dataset.dom3dBound === tplId) return;
     inner.dataset.dom3dBound = tplId;
@@ -736,11 +1192,94 @@
       if (!container.isConnected) return;
       ensureEngine(k, container);
       fit(); startLoop(k);
-      if (k === 'spatial') container.addEventListener('mousemove', (ev) => {
-        const r = container.getBoundingClientRect();
-        spatial3DState.mouse.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
-        spatial3DState.mouse.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+
+      // True Interactive 3D Hand Grab & Flight Navigation
+      let dragging = false, startX = 0, startY = 0, startYaw = 0, startPitch = 0;
+      container.style.cursor = 'grab';
+
+      container.addEventListener('pointerdown', (ev) => {
+        if (ev.target.closest('button, input, select, .tpl-modal-player-hud')) return;
+        dragging = true;
+        startX = ev.clientX;
+        startY = ev.clientY;
+        startYaw = k === 'spatial' ? (spatial3DState.camYaw || 0) : (document3DFXState.yaw || 0);
+        startPitch = k === 'spatial' ? (spatial3DState.camPitch || 0) : (document3DFXState.pitch || 0);
+        container.style.cursor = 'grabbing';
+        try { container.setPointerCapture(ev.pointerId); } catch (_) {}
       });
+
+      container.addEventListener('pointermove', (ev) => {
+        const r = container.getBoundingClientRect();
+        if (k === 'spatial') {
+          spatial3DState.mouse.x = ((ev.clientX - r.left) / r.width) * 2 - 1;
+          spatial3DState.mouse.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+        }
+
+        if (!dragging) return;
+        const dx = ev.clientX - startX;
+        const dy = ev.clientY - startY;
+
+        if (k === 'spatial') {
+          spatial3DState.camYaw = Math.max(-65, Math.min(65, startYaw + dx * 0.18));
+          spatial3DState.camPitch = Math.max(-45, Math.min(45, startPitch - dy * 0.18));
+
+          const h = host();
+          if (h) {
+            const yIn = h.querySelector('[data-k="s-yaw"]');
+            const pIn = h.querySelector('[data-k="s-pitch"]');
+            if (yIn) yIn.value = Math.round(spatial3DState.camYaw);
+            if (pIn) pIn.value = Math.round(spatial3DState.camPitch);
+            setLabel('s-yaw', Math.round(spatial3DState.camYaw) + '°');
+            setLabel('s-pitch', Math.round(spatial3DState.camPitch) + '°');
+          }
+        } else {
+          document3DFXState.yaw = Math.max(-60, Math.min(60, startYaw + dx * 0.2));
+          document3DFXState.pitch = Math.max(0, Math.min(75, startPitch - dy * 0.2));
+          const h = host();
+          if (h) {
+            const yIn = h.querySelector('[data-k="d-yaw"]');
+            const pIn = h.querySelector('[data-k="d-pitch"]');
+            if (yIn) yIn.value = Math.round(document3DFXState.yaw);
+            if (pIn) pIn.value = Math.round(document3DFXState.pitch);
+            setLabel('d-yaw', Math.round(document3DFXState.yaw) + '°');
+            setLabel('d-pitch', Math.round(document3DFXState.pitch) + '°');
+          }
+        }
+      });
+
+      const stopDrag = (ev) => {
+        if (!dragging) return;
+        dragging = false;
+        container.style.cursor = 'grab';
+        try { container.releasePointerCapture(ev.pointerId); } catch (_) {}
+        persist();
+      };
+      container.addEventListener('pointerup', stopDrag);
+      container.addEventListener('pointercancel', stopDrag);
+
+      // Mouse Wheel Navigation (Glide down hallway corridor / universe)
+      container.addEventListener('wheel', (ev) => {
+        ev.preventDefault();
+        if (k === 'spatial') {
+          const delta = ev.deltaY * 0.0006;
+          spatial3DState.currentTime = Math.max(0, Math.min(1, spatial3DState.currentTime + delta));
+          const slider = document.getElementById('spatial-timeline-slider');
+          if (slider) slider.value = spatial3DState.currentTime * 100;
+          if (typeof updateSpatialTimelineDisplay === 'function') updateSpatialTimelineDisplay();
+          if (typeof updateSpatialCameraPosition === 'function') updateSpatialCameraPosition();
+          initSpatialPathCanvas();
+        } else {
+          const delta = ev.deltaY * 0.05;
+          document3DFXState.dist = Math.max(20, Math.min(110, document3DFXState.dist + delta));
+          const h = host();
+          if (h) {
+            const dIn = h.querySelector('[data-k="d-dist"]');
+            if (dIn) dIn.value = Math.round(document3DFXState.dist);
+            setLabel('d-dist', String(Math.round(document3DFXState.dist)));
+          }
+        }
+      }, { passive: false });
+
       lastKey = ''; window.tpl3DSync(tplId);
       setTimeout(fit, 60);
       setTimeout(fit, 180);
@@ -753,7 +1292,7 @@
     if (window.ResizeObserver) { resizeObs = new ResizeObserver(fit); resizeObs.observe(container); }
   }
 
-  function collectVideoNodes(stage, tplId) {
+function collectVideoNodes(stage, tplId) {
     const fxc = stage.querySelector('#fx-container-' + tplId), nodes = {};
     if (fxc) {
       const w = document.createTreeWalker(fxc, NodeFilter.SHOW_TEXT); let n;
@@ -835,7 +1374,7 @@
     if (isTheater) {
       if (sb) sb.style.display = 'none';
       if (pb) pb.style.display = 'none';
-      if (hud) hud.style.display = '';
+      if (hud) hud.style.display = is3D ? 'none' : '';
       if (box) {
         box.style.padding = '0';
         box.style.border = 'none';
