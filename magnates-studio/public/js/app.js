@@ -23293,6 +23293,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'docheight',
+    hidden: true,
     title: 'Document Key Highlight',
     category: 'Paper / Cutout',
     origCategory: 'Paper / Cutout',
@@ -24337,6 +24338,7 @@ id: 'map',
   },
   {
     id: 'spotlight-lens-sweep',
+    hidden: true,
     title: 'Dramatic Spotlight & Vignette Cut',
     category: 'Color & Vibe',
     badge: 'James Jani',

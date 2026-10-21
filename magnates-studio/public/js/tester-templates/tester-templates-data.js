@@ -324,6 +324,7 @@
   },
   {
     "id": "photo-stack-3d",
+    "hidden": true,
     "title": "3D Photo Stack",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -511,6 +512,7 @@
   },
   {
     "id": "scrapbook-flip",
+    "hidden": true,
     "title": "Scrapbook Page Flip",
     "category": "Documentary",
     "origCategory": "Documentary",
@@ -1267,6 +1269,7 @@
   },
   {
     "id": "stock-ticker",
+    "hidden": true,
     "title": "Stock Ticker Scroll",
     "category": "Business",
     "origCategory": "Business",
@@ -1327,6 +1330,7 @@
   },
   {
     "id": "gold-gradient",
+    "hidden": true,
     "title": "Gold Gradient Overlay",
     "category": "Effects",
     "origCategory": "Effects",
@@ -1471,6 +1475,7 @@
   },
   {
     "id": "success-montage",
+    "hidden": true,
     "title": "Success Montage",
     "category": "Business",
     "origCategory": "Business",
