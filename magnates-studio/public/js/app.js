@@ -23278,6 +23278,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'textbehind',
+    hidden: true,
     title: 'Text Behind Object',
     category: 'Text & Titles',
     origCategory: 'Text & Titles',
@@ -23306,6 +23307,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'kinetic',
+    hidden: true,
     title: 'Kinetic Typography Stack',
     category: 'Text & Titles',
     origCategory: 'Text & Titles',
@@ -23645,6 +23647,7 @@ const EFFECT_TEMPLATES_DATA = [
   },
   {
     id: 'glitch',
+    hidden: true,
     title: 'Glitch Reveal',
     category: 'Glitches',
     origCategory: 'Glitches',
@@ -23834,6 +23837,7 @@ id: 'map',
   },
   {
     id: 'comic',
+    hidden: true,
     title: 'Comic POW!',
     category: 'Animations',
     origCategory: 'Animations',
@@ -24113,6 +24117,7 @@ id: 'map',
   },
   {
     id: 'world-map-flyover',
+    hidden: true,
     title: 'World Map Connection Flyover',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24196,6 +24201,7 @@ id: 'map',
   },
   {
     id: 'timeline-scrubber-map',
+    hidden: true,
     title: 'Timeline Scrubber Map',
     category: 'Business Storytelling',
     origCategory: 'Business Storytelling',
@@ -24267,6 +24273,7 @@ id: 'map',
   },
   {
     id: 'paper-rip-shred',
+    hidden: true,
     title: 'Paper Tear Transition',
     category: 'Transitions',
     badge: 'MEDIUM',
@@ -24691,6 +24698,7 @@ id: 'map',
   },
   {
     id: 'magnates-media-shadowization',
+    hidden: true,
     title: 'Color Grading & Shadowization (Fill Silhouettes)',
     category: 'Color & Vibe',
     badge: 'Magnates Media Signature',
@@ -25016,6 +25024,7 @@ id: 'map',
   },
   {
     id: 'cryptowallet',
+    hidden: true,
     title: 'Crypto Wallet Balance',
     category: 'Finance',
     origCategory: 'Crypto',
@@ -25043,6 +25052,7 @@ id: 'map',
   },
   {
     id: 'creditscore',
+    hidden: true,
     title: 'Credit Score Gauge',
     category: 'Finance',
     origCategory: 'Personal Finance',
@@ -25056,6 +25066,7 @@ id: 'map',
   },
   {
     id: 'budget',
+    hidden: true,
     title: '50/30/20 Budget Breakdown',
     category: 'Finance',
     origCategory: 'Personal Finance',
@@ -25069,6 +25080,7 @@ id: 'map',
   },
   {
     id: 'crash',
+    hidden: true,
     title: 'Market Crash Animation',
     category: 'Finance',
     origCategory: 'Market Analysis',
@@ -25396,7 +25408,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['money-stack', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['wire-transfer', 'money-stack', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -25915,7 +25927,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['money-stack', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['envelope-open', 'wire-transfer', 'money-stack', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
 
 
 window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
@@ -26281,7 +26293,25 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             </div>
             <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
           </div>
-        </div>`; } else if (tplId === 'money-stack') {
+        </div>`; } else if (tplId === 'wire-transfer') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #040711; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="/wire_transfer_cinematic_plate.png" alt="Wire Transfer 3D" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2,4,8,0.7) 100%); pointer-events: none;"></div>
+          <div style="position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; background: rgba(8,14,26,0.85); border: 1px solid rgba(56,189,248,0.4); backdrop-filter: blur(4px); pointer-events: none;">
+            <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#38bdf8;box-shadow:0 0 6px #38bdf8;"></span>
+            <span style="font-family: monospace; font-size: 8px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">SWIFT 3D HUD</span>
+          </div>
+        </div>`; } else if (tplId === 'envelope-open') {
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #06080d; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="/classified_envelope_macro_ref.png" alt="Evidence Envelope" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); filter: contrast(115%) brightness(90%);" />
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 45% 45%, transparent 25%, rgba(6,8,13,0.85) 90%); pointer-events: none;"></div>
+          <div style="position: absolute; bottom: 8px; left: 10px; font-family: monospace; font-size: 8px; font-weight: 800; color: #ef4444; background: rgba(10,12,18,0.9); border: 1px solid rgba(239,68,68,0.4); padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">
+            3D EVIDENCE ENVELOPE &bull; CLASSIFIED
+          </div>
+        </div>`;
+    } else if (tplId === 'money-stack') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #05080c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img src="/money_stack_cinematic_plate.png" alt="Money Stack" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.05); animation: moneyMacroDrift 6s ease-in-out infinite alternate;" />
@@ -28567,7 +28597,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-        } else if (tplId === 'money-stack') {
+        } else if (tplId === 'wire-transfer') {
+      if (typeof window.stepWireTransferAnimation === 'function') {
+        const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
+        window.stepWireTransferAnimation(fxContainer, tplId, t, wtData);
+      }
+    } else if (tplId === 'envelope-open') {
+      if (typeof window.stepEnvelopeAnimation === 'function') {
+        const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('envelope-open') : {};
+        window.stepEnvelopeAnimation(fxContainer, tplId, t, eData);
+      }
+    } else if (tplId === 'money-stack') {
       if (typeof window.stepMoneyStackAnimation === 'function') {
         const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
         window.stepMoneyStackAnimation(fxContainer, tplId, t, mData);
@@ -31186,7 +31226,25 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = tpl.defaultImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20200%22%20width%3D%22200%22%20height%3D%22200%22%3E%3Crect%20x%3D%2225%22%20y%3D%2215%22%20width%3D%22150%22%20height%3D%22170%22%20rx%3D%226%22%20fill%3D%22%23ffffff%22%20stroke%3D%22%23d4d0c4%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2240%22%20x2%3D%22155%22%20y2%3D%2240%22%20stroke%3D%22%230f172a%22%20stroke-width%3D%224%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%2260%22%20width%3D%22105%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%2285%22%20x2%3D%22145%22%20y2%3D%2285%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3Crect%20x%3D%2245%22%20y%3D%22105%22%20width%3D%2290%22%20height%3D%2210%22%20rx%3D%222%22%20fill%3D%22%23facc15%22%20opacity%3D%220.8%22%2F%3E%3Cline%20x1%3D%2245%22%20y1%3D%22130%22%20x2%3D%22135%22%20y2%3D%22130%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.secondaryUrl = tpl.secondaryImage || 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23f4ecd8%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%2250%22%20x2%3D%22400%22%20y2%3D%2250%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22120%22%20x2%3D%22400%22%20y2%3D%22120%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3Cline%20x1%3D%220%22%20y1%3D%22180%22%20x2%3D%22400%22%20y2%3D%22180%22%20stroke%3D%22rgba(0%2C0%2C0%2C0.04)%22%20stroke-width%3D%222%22%2F%3E%3C%2Fsvg%3E';
       topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
-        } else if (tpl.id === 'money-stack') {
+        } else if (tpl.id === 'wire-transfer') {
+      topCustomizerState.primaryUrl = '/wire_transfer_cinematic_plate.png';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/wire_transfer_cinematic_plate.png';
+      if (typeof window.tplMountWireTransfer3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountWireTransfer3DStage(stage, wtData);
+      }
+    } else if (tpl.id === 'envelope-open') {
+      topCustomizerState.primaryUrl = '/classified_envelope_macro_ref.png';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/classified_envelope_macro_ref.png';
+      if (typeof window.tplMountEnvelope3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountEnvelope3DStage(stage, eData);
+      }
+    } else if (tpl.id === 'money-stack') {
       topCustomizerState.primaryUrl = '/money_stack_cinematic_plate.png';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '/money_stack_cinematic_plate.png';
@@ -33179,6 +33237,30 @@ function renderTopTemplatePreviewStage() {
   const tplId = topCustomizerState.currentTpl.id;
   if (window.tpl3DSync) window.tpl3DSync(tplId);
 
+  // 3D Glassmorphic SWIFT Banking Wire Transfer Engine
+  if (tplId === 'wire-transfer') {
+    const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountWireTransfer3DStage === 'function') {
+      window.tplMountWireTransfer3DStage(stage, wtData);
+    }
+    return;
+  }
+
+  // 3D Photorealistic Evidence Envelope Engine (Vox / James Jani / Magnates Media Style)
+  if (tplId === 'envelope-open') {
+    const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('envelope-open') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountEnvelope3DStage === 'function') {
+      window.tplMountEnvelope3DStage(stage, eData);
+    }
+    return;
+  }
+
   // 3D Photorealistic Money Stack Engine (Vox / James Jani / Magnates Media Style)
   if (tplId === 'money-stack') {
     const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
@@ -34105,6 +34187,22 @@ function updateTopCustomizerFrame(seqTime, now) {
 
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
+
+  if (tplId === 'wire-transfer') {
+    if (typeof window.stepWireTransferAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
+      window.stepWireTransferAnimation(stage, 'wire-transfer', localSceneT, wtData);
+    }
+  }
+
+  if (tplId === 'envelope-open') {
+    if (typeof window.stepEnvelopeAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('envelope-open') : {};
+      window.stepEnvelopeAnimation(stage, 'envelope-open', localSceneT, eData);
+    }
+  }
 
   if (tplId === 'money-stack') {
     if (typeof window.stepMoneyStackAnimation === 'function') {

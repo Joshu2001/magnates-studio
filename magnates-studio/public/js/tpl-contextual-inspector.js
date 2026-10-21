@@ -56,6 +56,35 @@
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
     // Photorealistic 3D Paper Currency Stack ($100 US Dollars with Kraft Bands)
+    'wire-transfer': Object.assign({}, (typeof window !== 'undefined' && window.WIRE_TRANSFER_CONFIG) || {
+      type: 'wire-transfer',
+      originTitle: 'ORIGIN /',
+      originSubtitle: 'Cayman Islands Branch',
+      originIban: 'IBAN / XXXX-XXXX-XXXX-XXXX-8003',
+      originSwift: 'SWIFT code  1234568',
+      originBankLogo: 'SWIFT',
+      destBadge: 'Shell Corp',
+      destTitle: 'Destination Account',
+      destAccountNum: '#8492',
+      transferAmount: 2500000.00,
+      destCurrencySymbol: String.fromCharCode(36),
+      destPrefix: '+',
+      statusAlert: 'Balance counter alert',
+      beamSpeed: 1.25,
+      beamGlowColor: '#7dd3fc',
+      beamCoreColor: '#ffffff',
+      particleCount: 160,
+      impactPulseEnabled: true,
+      counterSpeed: 1.0,
+      cameraTiltY: 18.0,
+      cameraTiltX: 6.0,
+      cameraDistance: 440,
+      dofBlur: 0.85,
+      tacticalGridEnabled: true,
+      matrixTelemetryEnabled: true,
+      vignetteIntensity: 0.75,
+      styleMode: 'investigative_hud'
+    }),
     'money-stack': Object.assign({}, (typeof window !== 'undefined' && window.MONEY_STACK_CONFIG) || {
       type: 'money-stack',
       stackCount: 3,
@@ -3116,6 +3145,22 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'wire-transfer') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const vp = stage.querySelector('#wire-transfer-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountWireTransfer3DStage === 'function') {
+            window.tplMountWireTransfer3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initWireTransfer3DScene === 'function') {
+            window.initWireTransfer3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
     if (tplId === 'money-stack') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -4709,6 +4754,17 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'wire-transfer') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildWireTransferInspector === 'function') {
+          window.tplBuildWireTransferInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'money-stack') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       if (container) {
