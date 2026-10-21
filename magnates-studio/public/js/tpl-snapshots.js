@@ -1857,6 +1857,90 @@
   </svg>`)}`;
 
     SNAPSHOTS['conspiracy-board'] = '/red_string_board_cinematic_plate.jpg';
+    SNAPSHOTS['scam-redaction'] = "data:image/svg+xml;utf8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="fdDesk" cx="50%" cy="46%" r="62%">
+      <stop offset="0%" stop-color="#3d1d12"/>
+      <stop offset="42%" stop-color="#1e0c07"/>
+      <stop offset="100%" stop-color="#050302"/>
+    </radialGradient>
+    <radialGradient id="fdSpotlight" cx="50%" cy="48%" r="58%">
+      <stop offset="0%" stop-color="#fff8e8" stop-opacity="0.22"/>
+      <stop offset="35%" stop-color="#fed7aa" stop-opacity="0.08"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.72"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.95"/>
+    </radialGradient>
+    <filter id="fdPaperShadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="10" dy="20" stdDeviation="15" flood-color="#000000" flood-opacity="0.92"/>
+    </filter>
+    <filter id="fdSubtleShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="6" dy="12" stdDeviation="10" flood-color="#000000" flood-opacity="0.75"/>
+    </filter>
+  </defs>
+  <rect width="400" height="225" fill="url(#fdDesk)"/>
+  <g stroke="rgba(56, 189, 248, 0.12)" stroke-width="0.7">
+    <line x1="0" y1="55" x2="400" y2="55"/><line x1="0" y1="110" x2="400" y2="110"/><line x1="0" y1="165" x2="400" y2="165"/>
+    <line x1="80" y1="0" x2="80" y2="225"/><line x1="180" y1="0" x2="180" y2="225"/><line x1="280" y1="0" x2="280" y2="225"/>
+  </g>
+  <g stroke="rgba(56, 189, 248, 0.35)" stroke-width="1.2">
+    <line x1="45" y1="35" x2="55" y2="35"/><line x1="50" y1="30" x2="50" y2="40"/>
+    <line x1="345" y1="185" x2="355" y2="185"/><line x1="350" y1="180" x2="350" y2="190"/>
+  </g>
+  <text x="14" y="22" fill="rgba(56, 189, 248, 0.45)" font-family="monospace" font-size="5" font-weight="700">LAT // 40°42'51"N · LON // 74°00'23"W</text>
+  <text x="386" y="22" fill="rgba(56, 189, 248, 0.45)" font-family="monospace" font-size="5" font-weight="700" text-anchor="end">GRID REF 8842-X</text>
+  <g transform="translate(62, 38) rotate(-16)" filter="url(#fdSubtleShadow)" opacity="0.88">
+    <rect width="115" height="150" rx="2" fill="#eedcb3" stroke="rgba(0,0,0,0.2)" stroke-width="0.8"/>
+    <rect x="8" y="10" width="85" height="12" fill="none" stroke="#8b261b" stroke-width="0.8"/>
+    <text x="12" y="18" fill="#8b261b" font-family="serif" font-weight="900" font-size="5.5" letter-spacing="0.5">INVESTIGATION</text>
+    <line x1="8" y1="30" x2="100" y2="30" stroke="#4a3b2c" stroke-width="0.6"/>
+    <line x1="8" y1="38" x2="95" y2="38" stroke="#4a3b2c" stroke-width="0.6"/>
+    <line x1="8" y1="46" x2="80" y2="46" stroke="#4a3b2c" stroke-width="0.6"/>
+    <line x1="8" y1="54" x2="90" y2="54" stroke="#4a3b2c" stroke-width="0.6"/>
+  </g>
+  <g transform="translate(98, 24) rotate(-8)" filter="url(#fdSubtleShadow)">
+    <rect width="84" height="105" rx="1.5" fill="#f4ecd8" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/>
+    <g transform="translate(42, 22) rotate(-6)">
+      <rect x="-30" y="-7" width="60" height="14" fill="none" stroke="#b91c1c" stroke-width="1.2"/>
+      <text x="0" y="3" fill="#b91c1c" font-family="monospace" font-weight="900" font-size="6.5" letter-spacing="0.8" text-anchor="middle">TOP SECRET</text>
+    </g>
+    <line x1="8" y1="42" x2="72" y2="42" stroke="#3a2e22" stroke-width="0.6"/>
+    <rect x="8" y="52" width="60" height="4" fill="#111"/>
+    <rect x="8" y="60" width="45" height="4" fill="#111"/>
+  </g>
+  <g transform="translate(210, 42) rotate(14)" filter="url(#fdSubtleShadow)" opacity="0.9">
+    <rect width="115" height="150" rx="2" fill="#f7f4ea" stroke="rgba(0,0,0,0.18)" stroke-width="0.8"/>
+    <text x="58" y="18" fill="#1e293b" font-family="serif" font-weight="900" font-size="7.5" letter-spacing="1" text-anchor="middle">CONTRACT</text>
+    <line x1="10" y1="28" x2="105" y2="28" stroke="#334155" stroke-width="0.6"/>
+    <line x1="10" y1="36" x2="98" y2="36" stroke="#334155" stroke-width="0.6"/>
+    <rect x="10" y="44" width="75" height="5" fill="#111"/>
+    <rect x="10" y="54" width="60" height="5" fill="#111"/>
+    <text x="12" y="118" fill="#1e293b" font-family="serif" font-style="italic" font-size="5">Signature</text>
+    <path d="M 28 116 C 36 104 44 122 52 112 S 66 118 75 106" fill="none" stroke="#1e3a8a" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="26" y1="122" x2="88" y2="122" stroke="#334155" stroke-width="0.6"/>
+  </g>
+  <g transform="translate(136, 34) skewY(-2.5) rotate(3)" filter="url(#fdPaperShadow)">
+    <rect width="144" height="110" rx="2" fill="#fbf8ef" stroke="rgba(0,0,0,0.18)" stroke-width="0.8"/>
+    <text x="72" y="15" fill="#3a2418" font-family="monospace" font-weight="900" font-size="5.2" letter-spacing="0.6" text-anchor="middle">INTERNAL MEMO · EYES ONLY</text>
+    <line x1="10" y1="19" x2="134" y2="19" stroke="rgba(58, 36, 24, 0.35)" stroke-dasharray="2 1.5" stroke-width="0.5"/>
+    <g font-family="monospace" font-size="4.4" fill="#3a2418">
+      <text x="10" y="30">To: Board of Directors</text>
+      <text x="10" y="42">From:</text>
+      <rect x="30" y="35" width="62" height="7.5" fill="#111"/>
+      <text x="10" y="54">Re: Q3 revenue booked via side letters</text>
+      <text x="10" y="63">totaling</text>
+      <rect x="9" y="68" width="65" height="9.5" rx="1.5" fill="#facc15" opacity="0.9"/>
+      <text x="12" y="75" fill="#000" font-weight="900" font-size="5.2">$8.4 BILLION</text>
+      <text x="10" y="90" fill="#ef4444" font-weight="800">DO NOT DISCLOSE.</text>
+    </g>
+    <g transform="translate(108, 92) rotate(-14)">
+      <rect x="-24" y="-7.5" width="48" height="15" fill="none" stroke="#c1121f" stroke-width="1.3" rx="1.5"/>
+      <rect x="-22" y="-5.5" width="44" height="11" fill="none" stroke="#c1121f" stroke-width="0.5" rx="1"/>
+      <text x="0" y="3" fill="#c1121f" font-family="monospace" font-weight="900" font-size="5.2" letter-spacing="0.6" text-anchor="middle">CONFIDENTIAL</text>
+    </g>
+  </g>
+  <rect width="400" height="225" fill="url(#fdSpotlight)" pointer-events="none"/>
+</svg>`);
+
     SNAPSHOTS['deal-term-sheet'] = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
   <defs>
     <radialGradient id="tsDesk" cx="50%" cy="45%" r="65%">

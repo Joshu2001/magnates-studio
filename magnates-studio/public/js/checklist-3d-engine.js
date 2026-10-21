@@ -3,7 +3,7 @@
  * Replicating investigative documentary standards (Vox, James Jani, Magnates Media, Johnny Harris)
  *
  * Supports Dual Master Aesthetic Choices:
- * - Choice A (Image 2): "Stacked Evidence Slips" (Tactile cut paper slips pinned with masking tape on Dark Mahogany Desk or Map Grid)
+ * - Choice A (Image 2): "Stacked Evidence Slips" (Tactile cut paper slips falling down and pinned with masking tape)
  * - Choice B (Image 3): "3D Spatial Dossier" (25°-35° tilted weathered parchment document with rubber seal stamp & f/2.8 shallow DOF)
  */
 
@@ -26,8 +26,8 @@
     spotlightIntensity: 1.0, // 0.2 to 1.5
     volumetricDust: true,
     stampColor: '#15803d', // authentic distressed green ink
-    tiltAngleX: 28, // 25° - 35° spatial pitch
-    tiltAngleY: -12, // spatial yaw
+    tiltAngleX: 14, // spatial pitch
+    tiltAngleY: 0, // spatial yaw
     coverageScale: 58, // 50% - 65% of viewport width
     organicTape: true,
     organicStampSeal: true,
@@ -167,12 +167,11 @@
   /**
    * Generates Photorealistic Distressed Ink Stamp Checkbox & Mark
    */
-  function getInkStampCheckboxHtml(isChecked, stampColor, itemIndex, isSlamActive) {
+  function getInkStampCheckboxHtml(isChecked, stampColor, stampDelay, isSlamActive) {
     const slamClass = isSlamActive ? 'is-slamming' : '';
-    const delay = (itemIndex * 0.45).toFixed(2);
     
     return `
-      <div class="cl-stamp-box-wrap ${slamClass}" style="--cl-stamp-color: ${stampColor}; --cl-stamp-delay: ${delay}s;">
+      <div class="cl-stamp-box-wrap ${slamClass}" style="--cl-stamp-color: ${stampColor}; --cl-stamp-delay: ${stampDelay}s;">
         <svg class="cl-stamp-svg" viewBox="0 0 38 38" width="34" height="34">
           <!-- Distressed Stamped Outer Box -->
           <rect x="3.5" y="3.5" width="31" height="31" rx="2.5" 
@@ -277,7 +276,10 @@
     const spotIntensity = (typeof data.spotlightIntensity === 'number') ? data.spotlightIntensity : 1.0;
     const isDof = data.depthOfField !== false;
     const focusIdx = (typeof data.activeFocusIndex === 'number') ? data.activeFocusIndex : (data.items.length - 1);
-    const scalePercent = Math.max(45, Math.min(80, data.coverageScale || 58));
+    
+    // Scale factor: Robust unitless multiplier (1.00 = default 58% coverage)
+    const rawCoverage = typeof data.coverageScale === 'number' ? data.coverageScale : 58;
+    const scaleFactor = (Math.max(40, Math.min(85, rawCoverage)) / 58).toFixed(3);
     
     // 3D Spatial Angles
     const tiltX = (typeof data.tiltAngleX === 'number') ? data.tiltAngleX : (isDossier ? 28 : 14);
@@ -291,7 +293,7 @@
 
     return `
       <div class="tpl-checklist ${isDossier ? 'mode-dossier' : 'mode-slips'} env-${bgEnv}" 
-           style="--cl-spot-intensity: ${spotIntensity}; --cl-coverage-scale: ${scalePercent}%;">
+           style="--cl-spot-intensity: ${spotIntensity}; --cl-scale-factor: ${scaleFactor};">
         
         ${getPaperDefsSvg()}
 
@@ -316,12 +318,12 @@
         <!-- Deep Cinematic Edge Vignette -->
         <div class="cl-cinematic-vignette"></div>
 
-        <!-- 3. 3D SPATIAL RIG & VIEWPORT FRAMING (50%-65% Coverage) -->
+        <!-- 3. 3D SPATIAL RIG & VIEWPORT FRAMING -->
         <div class="cl-3d-spatial-rig">
-          <div class="cl-3d-stage" style="transform: perspective(1100px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${tiltZ}deg) scale(calc(var(--cl-coverage-scale) / 58));">
+          <div class="cl-3d-stage" style="transform: perspective(1100px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) rotateZ(${tiltZ}deg) scale(${scaleFactor});">
 
             ${isDossier ? `
-              <!-- CHOICE B (IMAGE 3): 3D SPATIAL AGED PARCHMENT DOSSIER SHEET -->
+              <!-- CHOICE B (IMAGE 3): 3D SPATIAL AGED PARCHMENT DOSSIER SHEET (FALLING DOSSIER) -->
               <div class="cl-dossier-sheet ${isDof ? 'has-shallow-dof' : ''}">
                 <div class="cl-paper-grain-overlay"></div>
                 <div class="cl-paper-deckle-edge"></div>
@@ -342,10 +344,12 @@
                       const blurClass = (isDof && !isFocused) ? 'is-blurred-dof' : 'is-sharp-focus';
                       const isChecked = (typeof item === 'object') ? item.checked !== false : true;
                       const text = (typeof item === 'object') ? (item.text || '') : item;
+                      const itemDelay = (0.55 + idx * 0.3).toFixed(2);
+                      const stampDelay = (0.7 + idx * 0.3).toFixed(2);
 
                       return `
-                        <div class="cl-dossier-item ${blurClass}" data-item-idx="${idx}">
-                          ${getInkStampCheckboxHtml(isChecked, stampColor, idx, data.organicStampSlam !== false)}
+                        <div class="cl-dossier-item ${blurClass}" style="--cl-item-delay: ${itemDelay}s;" data-item-idx="${idx}">
+                          ${getInkStampCheckboxHtml(isChecked, stampColor, stampDelay, data.organicStampSlam !== false)}
                           <div class="cl-item-text">${text}</div>
                         </div>
                       `;
@@ -357,7 +361,7 @@
                 </div>
               </div>
             ` : `
-              <!-- CHOICE A (IMAGE 2): STACKED TACTILE EVIDENCE SLIPS PINNED WITH TAPE -->
+              <!-- CHOICE A (IMAGE 2): STACKED TACTILE EVIDENCE SLIPS PINNED WITH TAPE (FALLING SLIPS) -->
               <div class="cl-slips-stack ${isDof ? 'has-shallow-dof' : ''}">
                 ${items.map((item, idx) => {
                   const isFocused = (focusIdx === -1 || idx === focusIdx);
@@ -365,20 +369,22 @@
                   const isChecked = (typeof item === 'object') ? item.checked !== false : true;
                   const text = (typeof item === 'object') ? (item.text || '') : item;
                   const rot = slipAngles[idx % slipAngles.length];
+                  const dropDelay = (idx * 0.32 + 0.08).toFixed(2);
+                  const stampDelay = (idx * 0.32 + 0.48).toFixed(2);
 
                   return `
                     <div class="cl-evidence-slip-wrapper ${blurClass}" 
-                         style="--cl-slip-rot: ${rot}deg; transform: rotate(${rot}deg);" 
+                         style="--cl-slip-rot: ${rot}deg; --cl-drop-delay: ${dropDelay}s;" 
                          data-item-idx="${idx}">
                       
-                      <!-- Translucent Masking Tape Pinning the Slip -->
+                      <!-- Translucent Masking Tape Pinning the Slip (Snaps after landing) -->
                       ${data.organicTape !== false ? getMaskingTapeHtml() : ''}
 
                       <div class="cl-evidence-slip">
                         <div class="cl-paper-grain-overlay"></div>
                         
-                        <!-- Ink Stamped Checkmark Box -->
-                        ${getInkStampCheckboxHtml(isChecked, stampColor, idx, data.organicStampSlam !== false)}
+                        <!-- Ink Stamped Checkmark Box (Slams after drop) -->
+                        ${getInkStampCheckboxHtml(isChecked, stampColor, stampDelay, data.organicStampSlam !== false)}
                         
                         <!-- Tactile Paper Inscription Text -->
                         <div class="cl-item-text">${text}</div>
@@ -397,16 +403,15 @@
   };
 
   /**
-   * Re-triggers the stamp slam animation in the DOM
+   * Re-triggers the falling paper slips & stamp slam animations
    */
   window.tplTriggerChecklistStampAnimation = function(container) {
     if (!container) return;
-    const stamps = container.querySelectorAll('.cl-stamp-box-wrap');
-    stamps.forEach((stamp) => {
-      stamp.classList.remove('is-slamming');
-      // Trigger browser reflow
-      void stamp.offsetWidth;
-      stamp.classList.add('is-slamming');
+    const animEls = container.querySelectorAll('.cl-evidence-slip-wrapper, .cl-dossier-sheet, .cl-dossier-item, .cl-stamp-box-wrap, .cl-masking-tape, .cl-official-stamp-seal');
+    animEls.forEach((el) => {
+      el.style.animation = 'none';
+      void el.offsetWidth; // Force reflow
+      el.style.animation = '';
     });
   };
 
@@ -640,7 +645,7 @@
       dot.onclick = () => update({ stampColor: dot.dataset.val });
     });
 
-    // Replay Slam
+    // Replay Slam & Drop
     const btnReplay = container.querySelector('#cl-btn-replay-slam');
     if (btnReplay) {
       btnReplay.onclick = () => {

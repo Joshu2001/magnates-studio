@@ -97,7 +97,7 @@
   const imageAssets = new Map();
 
   function preloadImage(url) {
-    if (!url || imageAssets.has(url)) return;
+    if (typeof Image === 'undefined' || !url || imageAssets.has(url)) return;
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => imageAssets.set(url, img);

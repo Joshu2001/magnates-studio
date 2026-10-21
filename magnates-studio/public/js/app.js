@@ -38346,6 +38346,10 @@ function bindTopTemplateCustomizerEvents() {
   const replayCustomizer = () => {
     topCustomizerState.startTime = performance.now();
     if (window.tpl3DOnReplay) window.tpl3DOnReplay();
+    if (topCustomizerState.currentTpl && topCustomizerState.currentTpl.id === 'checklist' && typeof window.tplTriggerChecklistStampAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) window.tplTriggerChecklistStampAnimation(stage);
+    }
     activeStoryboardSceneIndex = 0;
     const aud = document.getElementById('modal-customizer-audio-player');
     if (aud) aud.currentTime = 0;
