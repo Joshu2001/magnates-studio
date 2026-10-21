@@ -85,18 +85,70 @@
       pinStrikeShake: true
     }),
 
+    'jani-countdown-panic-suite': {
+      type: 'jani-countdown-panic-suite',
+      title: 'FTX LIQUIDITY CRASH',
+      quote: '"And in less than 48 hours... $32 Billion vanished into thin air."',
+      tickerText: '$FTT -94.2%  |  BTC $15,820 (-22.4%)  |  BINANCE WITHDRAWALS PAUSED  |  $ETH $1,080 (-28.9%)  |  ALAMEDA RESEARCH BANKRUPT',
+      tickerEnabled: true,
+      totalDuration: 10,
+      displayMode: 'tminus',
+      stylePreset: 'neon-red',
+      vignetteIntensity: 80,
+      crtEnabled: true,
+      shakeEnabled: true,
+      customBgImage: null,
+      customBgUrl: ''
+    },
+
+    'pyramid-scheme': Object.assign({}, (typeof window !== 'undefined' && window.PYRAMID_COLLAPSE_CONFIG) || {
+      type: 'pyramid-scheme',
+      is3DMode: true,
+      styleMode: 'concrete',
+      actionEffect: 'crumble',
+      crumbleSpeed: 1.0,
+      collapseIntensity: 0.85,
+      debrisCount: 45,
+      dustIntensity: 1.0
+    }),
+
     'deal-term-sheet': Object.assign({}, (typeof window !== 'undefined' && window.DEAL_TERM_SHEET_CONFIG) || {
       type: 'deal-term-sheet',
+      is3DMode: true,
+      cameraPitch: 29,
+      cameraYaw: -13,
       title: 'TERM SHEET \u00b7 SERIES A',
+      confidentialBadge: 'STRICTLY CONFIDENTIAL \u00b7 FOR DISCUSSION ONLY',
+      companyName: 'ACME CORP / ATLAS VENTURES',
+      dateText: 'October 24, 2024 \u00b7 Wilmington, Delaware',
+      preamble: 'The undersigned parties enter into this binding Term Sheet setting forth the principal terms of the Series A Preferred Stock financing in accordance with Section 4(a)(2) of the Securities Act of 1933.',
+      dealTerms: [
+        { id: 'term-1', label: 'Valuation:', value: '$80M pre-money', highlighted: true, color: '#facc15' },
+        { id: 'term-2', label: 'Investment:', value: '$12M for 15%', highlighted: true, color: '#facc15' },
+        { id: 'term-3', label: 'Board Seats:', value: '2 Investor, 3 Founder', highlighted: false, color: '#4ade80' },
+        { id: 'term-4', label: 'Liquidation Pref:', value: '1x Non-Participating', highlighted: false, color: '#38bdf8' },
+        { id: 'term-5', label: 'Option Pool:', value: '10% Unallocated Post-Closing', highlighted: false, color: '#f43f5e' }
+      ],
       valuationText: 'Valuation: $80M pre-money',
       investmentText: 'Investment: $12M for 15%',
       boardSeatsText: 'Board seats: 2 investor, 3 founder',
       liquidationPrefText: 'Liquidation pref: 1x non-participating',
+      clause2: '2. The definitive agreements shall contain customary representations, warranties and covenants. All intellectual property of the company shall be fully assigned to the corporation upon closing.',
+      clause3: '3. The fountain pen ink shall constitute binding execution upon delivery to legal escrow under Delaware Law.',
+      signatureLabel: 'Authorized Signature,',
       signeeName: 'Alexander Vance',
+      signeeTitle: 'CEO & Managing Partner',
+      inkColor: '#1e293b',
       stamp1Text: 'DEAL CLOSED',
+      stamp1Color: '#b91c1c',
+      stamp1Angle: -14,
       stamp2Text: 'APPROVED',
+      stamp2Color: '#b91c1c',
+      stamp2Angle: -16,
       showStamp1: true,
       showStamp2: true,
+      paperTone: '#f5f0e1',
+      highlighterColor: '#facc15',
       surfaceType: 'mahogany',
       cameraPreset: 'macro_cinematic',
       duration: 5.0
@@ -122,6 +174,7 @@
       tiltAngleX: 29,
       tiltAngleY: -10,
       coverageScale: 62,
+      is3DMode: false,
       duration: 5.0
     }),
 
@@ -3331,6 +3384,47 @@
       }
       return;
     }
+    if (tplId === 'pyramid-scheme') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const is3D = data.is3DMode !== false && (typeof topCustomizerState === 'undefined' || topCustomizerState.paperPreviewMode !== 'video');
+        if (!is3D) {
+          if (typeof window.tplMountPyramidCollapseVideoStage === 'function') {
+            window.tplMountPyramidCollapseVideoStage(stage, data);
+          }
+          return;
+        }
+        const vp = stage.querySelector('#pyramid-collapse-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountPyramidCollapse3DStage === 'function') {
+            window.tplMountPyramidCollapse3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initPyramidCollapse3DScene === 'function') {
+            window.initPyramidCollapse3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
+    if (tplId === 'jani-countdown-panic-suite') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage && typeof window.tplMountCountdown3DStage === 'function') {
+        window.tplMountCountdown3DStage(stage, data);
+      }
+      return;
+    }
+    if (tplId === 'jani-countdown-panic-suite') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildCountdownInspector === 'function') {
+          window.tplBuildCountdownInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'deal-term-sheet') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -3350,14 +3444,19 @@
     if (tplId === 'scam-redaction') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
+        const is3D = data.is3DMode === true || (typeof topCustomizerState !== 'undefined' && topCustomizerState.paperPreviewMode === '3d');
         const vp = stage.querySelector('#fraud-dossier-3d-viewport');
-        if (!vp) {
-          if (typeof window.tplMountFraudDossier3DStage === 'function') {
-            window.tplMountFraudDossier3DStage(stage, data);
-          }
-        } else {
+        const fxWrap = stage.querySelector('#fx-container-scam-redaction') || stage.querySelector('.fd-scene-root');
+        if (!is3D && fxWrap && typeof window.tplBuildFraudDossierHtml === 'function') {
+          const target = stage.querySelector('#fx-container-scam-redaction') || stage.querySelector('#customizer-stage-inner') || stage;
+          target.innerHTML = window.tplBuildFraudDossierHtml(data);
+        } else if (is3D && vp) {
           if (typeof window.initFraudDossier3DScene === 'function') {
             window.initFraudDossier3DScene(vp, data);
+          }
+        } else {
+          if (typeof window.renderTopTemplatePreviewStage === 'function') {
+            window.renderTopTemplatePreviewStage();
           }
         }
       }
@@ -4858,6 +4957,25 @@
         const data = window.tplGetContextualData(tplId);
         if (typeof window.tplBuildMoneyStackInspector === 'function') {
           window.tplBuildMoneyStackInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if (tplId === 'pyramid-scheme') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (stdLayers) stdLayers.style.display = 'none';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildPyramidCollapseInspector === 'function') {
+          window.tplBuildPyramidCollapseInspector(container, data, tplId);
         }
       }
       return;

@@ -251,11 +251,13 @@
     if (currentFrame !== state._lastStopMotionFrame) {
       state._lastStopMotionFrame = currentFrame;
 
-      // 1. Organic Film Gate Weave: discrete per-frame random offsets
-      const weave = getStopMotionWeave(currentFrame);
+      // James Jani Cinematic Macro Push & Atmospheric Drift (Zero Shaking)
+      const macroZoom = 1.00 + (Math.sin(elapsed * 0.45) * 0.5 + 0.5) * 0.04;
+      const driftX = Math.sin(elapsed * 0.3) * 0.8;
+      const driftY = Math.cos(elapsed * 0.25) * 0.5;
 
       if (rig) {
-        rig.style.transform = `translate3d(${weave.posX.toFixed(1)}px, ${weave.posY.toFixed(1)}px, 0) rotate(${weave.rot.toFixed(2)}deg) scale(${weave.scale.toFixed(4)})`;
+        rig.style.transform = `translate3d(${driftX.toFixed(2)}px, ${driftY.toFixed(2)}px, 0) scale(${macroZoom.toFixed(4)})`;
       }
 
       // 2. 35mm projector gate flicker: subtle ±2% brightness variation
@@ -280,8 +282,8 @@
       // 5. Dynamic light leak pulse / sweep
       const leakTop = document.getElementById('jani-light-leak-top');
       if (leakTop) {
-        const sweepX = (pseudoRandom(currentFrame * 2.1) - 0.5) * 6;
-        const opacity = 0.22 + pseudoRandom(currentFrame * 4.3) * 0.12;
+        const sweepX = Math.sin(elapsed * 0.7) * 16;
+        const opacity = 0.22 + Math.sin(elapsed * 1.1) * 0.08;
         leakTop.style.transform = `translateX(${sweepX.toFixed(1)}px)`;
         leakTop.style.opacity = opacity.toFixed(2);
       }
@@ -355,12 +357,15 @@
     const plateUrl = state?.primaryUrl || DEFAULT_PLATE;
     const mainTitle = formatTitleText(state?.mainText || 'POWER & GREED');
     const subtitle = state?.subText || 'CHAPTER IV: THE MANIPULATION';
-    const weave = getStopMotionWeave(Math.floor((t || 0) * 12));
+    const macroZoom = 1.00 + (Math.sin((t || 0) * 0.8) * 0.5 + 0.5) * 0.038;
+    const driftX = Math.sin((t || 0) * 0.5) * 0.6;
+    const driftY = Math.cos((t || 0) * 0.4) * 0.4;
+    const sweepX = Math.sin((t || 0) * 1.2) * 14;
 
     container.innerHTML = `
       <div style="position: absolute; inset: 0; background: #0c0a07; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-        <div style="position: absolute; inset: -4%; width: 108%; height: 108%; transform: translate3d(${weave.posX.toFixed(1)}px, ${weave.posY.toFixed(1)}px, 0) rotate(${weave.rot.toFixed(2)}deg) scale(${weave.scale.toFixed(4)});">
-          <img src="${plateUrl}" alt="Aged Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(${(weave.flicker * 100).toFixed(1)}%) contrast(106%);" />
+        <div style="position: absolute; inset: -4%; width: 108%; height: 108%; transform: translate3d(${driftX.toFixed(1)}px, ${driftY.toFixed(1)}px, 0) scale(${macroZoom.toFixed(4)});">
+          <img src="${plateUrl}" alt="Aged Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(100%) contrast(106%);" />
           <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; padding: 12px;">
             <h3 style="font-family: 'Cinzel Decorative', 'Cinzel', Georgia, serif; font-size: 22px; font-weight: 900; letter-spacing: 4px; color: ${state?.titleColor || '#d4af37'}; margin: 0; text-transform: uppercase; mix-blend-mode: multiply; opacity: 0.90; text-shadow: 0 1px 1px rgba(255,248,220,0.4), 0 -1px 2px rgba(35,20,8,0.7);">
               ${mainTitle}
@@ -374,7 +379,7 @@
             </div>
           </div>
           <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, transparent 48%, rgba(24, 16, 8, 0.38) 78%, rgba(4, 2, 1, 0.82) 100%); pointer-events: none;"></div>
-          <div style="position: absolute; top: -10%; left: 15%; width: 70%; height: 60%; background: radial-gradient(ellipse at 50% 10%, rgba(255, 235, 175, 0.25) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none;"></div>
+          <div style="position: absolute; top: -10%; left: 15%; width: 70%; height: 60%; background: radial-gradient(ellipse at 50% 10%, rgba(255, 235, 175, 0.25) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none; transform: translateX(${sweepX.toFixed(1)}px);"></div>
         </div>
       </div>
     `;

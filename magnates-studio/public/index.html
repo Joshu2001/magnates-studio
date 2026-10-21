@@ -12117,12 +12117,15 @@
   <script src="js/checklist-3d-engine.js?v=1"></script>
   <script src="js/instagram-3d-engine.js?v=1"></script>
   <script src="js/jani-grunge-paper-engine.js?v=1"></script>
+  <script src="js/countdown-3d-engine.js?v=1"></script>
   <script src="js/tpl-contextual-inspector.js?v=21"></script>
   <script>
     if (window.location.search.includes('open=countdown')) {
       window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
-          if (typeof openCountdownSuite === 'function') openCountdownSuite();
+          const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined') ? EFFECT_TEMPLATES_DATA.find(t => t.id === 'jani-countdown-panic-suite') : null;
+          if (tpl && typeof openTopTemplateCustomizer === 'function') openTopTemplateCustomizer(tpl);
+          else if (typeof openCountdownSuite === 'function') openCountdownSuite();
         }, 800);
       });
     }

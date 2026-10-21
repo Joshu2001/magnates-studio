@@ -58,6 +58,7 @@
     tiltAngleX: 29, // 25° - 35° spatial pitch
     tiltAngleY: -10, // spatial yaw
     coverageScale: 62, // 55% - 65% of viewport width
+    is3DMode: false,
     duration: 5.0
   };
 
@@ -78,6 +79,7 @@
   let topSecretMesh = null;
   let contractMesh = null;
   let memoMesh = null;
+  let memoFrontMesh = null;
   let dustParticleGroup = null;
   let contactShadowMesh = null;
 
@@ -95,6 +97,16 @@
   // Texture Cache
   const textureCache = new Map();
   const imageAssets = new Map();
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
   function preloadImage(url) {
     if (typeof Image === 'undefined' || !url || imageAssets.has(url)) return;
@@ -828,30 +840,35 @@
     const memoTex = new THREE.CanvasTexture(memoCv);
     memoTex.anisotropy = 8;
 
+    const memoGroup = new THREE.Group();
+
+    // 4a. Top surface plane (undistorted 1:1 texture mapping)
+    const frontGeo = new THREE.PlaneGeometry(memoWidth, memoHeight);
     const frontMat = new THREE.MeshStandardMaterial({
       map: memoTex,
       roughness: 0.78,
       metalness: 0.02
     });
+    memoFrontMesh = new THREE.Mesh(frontGeo, frontMat);
+    memoFrontMesh.rotation.x = -Math.PI / 2;
+    memoFrontMesh.position.y = memoThickness * 0.5 + 0.05;
+    memoFrontMesh.castShadow = true;
+    memoFrontMesh.receiveShadow = true;
+    memoGroup.add(memoFrontMesh);
 
-    const backMat = new THREE.MeshStandardMaterial({
+    // 4b. Base paper slab (physical thickness & deckle rim)
+    const slabGeo = new THREE.BoxGeometry(memoWidth, memoThickness, memoHeight);
+    const slabMat = new THREE.MeshStandardMaterial({
       color: new THREE.Color(data.paperTone || '#fbf8ef'),
       roughness: 0.85,
       metalness: 0.01
     });
+    const slabMesh = new THREE.Mesh(slabGeo, slabMat);
+    slabMesh.castShadow = true;
+    slabMesh.receiveShadow = true;
+    memoGroup.add(slabMesh);
 
-    const sideMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#dcd5c1'),
-      roughness: 0.9,
-      metalness: 0.01
-    });
-
-    const materials = [sideMat, sideMat, sideMat, sideMat, frontMat, backMat];
-    const memoGeo = new THREE.BoxGeometry(memoWidth, memoThickness, memoHeight);
-
-    memoMesh = new THREE.Mesh(memoGeo, materials);
-    memoMesh.castShadow = true;
-    memoMesh.receiveShadow = true;
+    memoMesh = memoGroup;
     memoMesh.position.set(0, 1.8, 8);
     memoMesh.rotation.y = THREE.MathUtils.degToRad(-3);
     fdGroup.add(memoMesh);
@@ -982,7 +999,13 @@
 
     // Update dynamic memo texture (reflecting current redaction, highlighter & stamp state)
     const cv = generateMemoTexture(data, ct);
-    if (memoMesh.material && memoMesh.material[4]) {
+    if (memoFrontMesh && memoFrontMesh.material && memoFrontMesh.material.map) {
+      const tex = memoFrontMesh.material.map;
+      if (tex && tex.image !== cv) {
+        tex.image = cv;
+        tex.needsUpdate = true;
+      }
+    } else if (memoMesh.material && memoMesh.material[4]) {
       const tex = memoMesh.material[4].map;
       if (tex && tex.image !== cv) {
         tex.image = cv;
@@ -1028,6 +1051,7 @@
     fdCamera = null;
     fdGroup = null;
     memoMesh = null;
+    memoFrontMesh = null;
     deskMesh = null;
     gridMesh = null;
     investMesh = null;
@@ -1038,11 +1062,50 @@
   }
 
   /**
+   * Mounts the HTML/CSS 3D Fraud Dossier Stage inside the Customizer Modal (matches Image 2 hover preview 100%)
+   */
+  window.tplMountFraudDossierVideoStage = function(stage, data) {
+    if (!stage) return;
+    const d = Object.assign({}, DEFAULT_CONFIG, (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(TEMPLATE_ID) : null), data || {});
+    cleanupFraudDossier3DScene();
+
+    if (typeof window.applyModeLayout === 'function') {
+      window.applyModeLayout(false);
+    }
+
+    stage.innerHTML = `
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #06090e; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <div id="fx-container-scam-redaction" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+          ${window.tplBuildFraudDossierHtml(d)}
+        </div>
+        <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; z-index: 40; display: flex; align-items: center; gap: 8px;">
+          <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #ef4444; background: rgba(10,12,18,0.92); border: 1px solid rgba(239,68,68,0.4); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
+            FRAUD DOSSIER &bull; EYES ONLY &bull; REDACTION BAR &bull; CONFIDENTIAL STAMP
+          </span>
+          <span style="font-family: monospace; font-size: 9px; color: #94a3b8; background: rgba(10,12,18,0.75); border: 1px solid rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 4px;">
+            VIDEO PREVIEW
+          </span>
+        </div>
+      </div>
+    `;
+  };
+
+  /**
    * Mounts the 3D Fraud Dossier Stage inside the Customizer Modal
    */
   window.tplMountFraudDossier3DStage = function(stage, data) {
     if (!stage) return;
     const d = Object.assign({}, DEFAULT_CONFIG, (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(TEMPLATE_ID) : null), data || {});
+
+    // If currently in video preview mode, mount the video stage instead
+    if (typeof topCustomizerState !== 'undefined' && topCustomizerState.paperPreviewMode === 'video' && !d.is3DMode) {
+      window.tplMountFraudDossierVideoStage(stage, d);
+      return;
+    }
+
+    if (typeof window.applyModeLayout === 'function') {
+      window.applyModeLayout(true);
+    }
 
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #06090e; overflow: hidden; cursor: grab; user-select: none;">
@@ -1066,12 +1129,81 @@
 
     const viewport = stage.querySelector('#fraud-dossier-3d-viewport');
     function triggerInit() {
-      if (typeof window.initFraudDossier3DScene === 'function') {
+      if (typeof window.initFraudDossier3DScene === 'function' && viewport) {
         window.initFraudDossier3DScene(viewport, d);
       }
     }
     triggerInit();
     setTimeout(triggerInit, 60);
+  };
+
+  /**
+   * HTML/CSS dynamic stepping for timeline scrubbing & live playback
+   */
+  function stepFraudDossierHtml(root, t, data) {
+    if (!root) return;
+    const bar = root.querySelector('.rd-bar');
+    const hl = root.querySelector('.rd-hl');
+    const stamp = root.querySelector('.rd-stamp');
+
+    if (bar && data.showRedaction !== false) {
+      if (t < 0.8) {
+        bar.style.transform = 'scaleX(0)';
+        bar.style.opacity = '0';
+        bar.style.animation = 'none';
+      } else if (t >= 0.8 && t < 1.1) {
+        const prog = (t - 0.8) / 0.3;
+        bar.style.transform = `scaleX(${Math.min(1, Math.max(0, prog * 1.05))})`;
+        bar.style.opacity = '1';
+        bar.style.animation = 'none';
+      } else {
+        bar.style.transform = 'scaleX(1)';
+        bar.style.opacity = '1';
+        bar.style.animation = 'none';
+      }
+    }
+
+    if (hl && data.showHighlighter !== false) {
+      if (t < 1.6) {
+        hl.style.background = 'transparent';
+        hl.style.animation = 'none';
+      } else {
+        hl.style.background = data.highlighterColor ? `${data.highlighterColor}d9` : 'rgba(250, 204, 21, 0.85)';
+        hl.style.mixBlendMode = 'multiply';
+        hl.style.animation = 'none';
+      }
+    }
+
+    if (stamp && data.showStamp !== false) {
+      if (t < 2.3) {
+        stamp.style.opacity = '0';
+        stamp.style.transform = 'rotate(-14deg) scale(1.4)';
+        stamp.style.animation = 'none';
+      } else if (t >= 2.3 && t < 2.7) {
+        const prog = (t - 2.3) / 0.4;
+        stamp.style.opacity = `${Math.min(1, prog * 1.5)}`;
+        stamp.style.transform = `rotate(-14deg) scale(${1.4 - prog * 0.4})`;
+        stamp.style.animation = 'none';
+      } else {
+        stamp.style.opacity = '1';
+        stamp.style.transform = 'rotate(-14deg) scale(1)';
+        stamp.style.animation = 'none';
+      }
+    }
+  }
+
+  /**
+   * Triggers or resets the CSS 3D animation loop
+   */
+  window.tplTriggerFraudDossierAnimation = function(stage) {
+    if (!stage) stage = document.getElementById('tpl-modal-preview-stage');
+    if (!stage) return;
+    const wrap = stage.querySelector('#fx-container-scam-redaction') || stage.querySelector('#customizer-stage-inner') || stage;
+    const root = stage.querySelector('.fd-scene-root');
+    if (root && wrap) {
+      const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(TEMPLATE_ID) : {};
+      wrap.innerHTML = window.tplBuildFraudDossierHtml(fdData);
+    }
   };
 
   /**
@@ -1081,13 +1213,21 @@
     if (!container) return;
     manualT = t;
     isManualScrub = true;
-    const d = Object.assign({}, DEFAULT_CONFIG, data || {});
+    const d = Object.assign({}, DEFAULT_CONFIG, (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(TEMPLATE_ID) : null), data || {});
 
     const viewport = container.querySelector('#fraud-dossier-3d-viewport');
-    if (!viewport && !fdRenderer) {
-      window.initFraudDossier3DScene(container, d);
+    if (viewport) {
+      if (!fdRenderer) {
+        window.initFraudDossier3DScene(viewport, d);
+      }
+      updateAnimationStep(t, d);
+      return;
     }
-    updateAnimationStep(t, d);
+
+    const root = container.querySelector('.fd-scene-root');
+    if (root) {
+      stepFraudDossierHtml(root, t, d);
+    }
   };
 
   /**
@@ -1176,13 +1316,43 @@
   window.tplBuildFraudDossierHtml = function(data) {
     const d = Object.assign({}, DEFAULT_CONFIG, data || {});
 
+    // Dynamic desk surface background
+    let deskBg = "url('/mahogany_desk_texture.jpg') center/cover no-repeat";
+    if (d.surfaceType === 'blueprint') {
+      deskBg = 'radial-gradient(circle at 50% 50%, #0d253f 0%, #061220 100%)';
+    } else if (d.surfaceType === 'dark_slate') {
+      deskBg = 'radial-gradient(circle at 50% 50%, #1e2530 0%, #080a0f 100%)';
+    }
+
+    const gridDisplay = d.showCoordinateGrid !== false ? 'block' : 'none';
+    const dustDisplay = d.volumetricDust !== false ? 'block' : 'none';
+    const spotIntensity = d.spotlightIntensity !== undefined ? d.spotlightIntensity : 2.2;
+    const spotOpacity = Math.min(1, Math.max(0.1, (spotIntensity / 2.2) * 0.95));
+
+    const pitch = d.tiltAngleX !== undefined ? d.tiltAngleX : 29;
+    const scale = d.coverageScale !== undefined ? d.coverageScale : 62;
+    const maxW = Math.round(275 * (scale / 58));
+
+    const showBar = d.showRedaction !== false;
+    const showStamp = d.showStamp !== false;
+    const showHl = d.showHighlighter !== false;
+
+    const safeTitle = escapeHtml(d.title || 'INTERNAL MEMO \u00b7 EYES ONLY');
+    const safeRecipient = escapeHtml(d.recipient || 'To: Board of Directors');
+    const safeSenderLabel = escapeHtml(d.senderLabel || 'From:');
+    const safeSubject1 = escapeHtml(d.subjectLine1 || 'Re: Q3 revenue booked via');
+    const safeSubject2 = escapeHtml(d.subjectLine2 || 'side letters totaling');
+    const safeAmount = escapeHtml(d.highlightedAmount || '$8.4 BILLION');
+    const safeWarning = escapeHtml(d.disclosureWarning || 'DO NOT DISCLOSE.');
+    const safeStamp = escapeHtml(d.stampText || 'CONFIDENTIAL');
+
     return `
       <div class="fd-scene-root">
         <!-- 1. Dark Mahogany Desk Surface -->
-        <div class="fd-desk-surface"></div>
+        <div class="fd-desk-surface" style="background: ${deskBg};"></div>
 
         <!-- 2. Investigative Topographic Coordinate Lines & Crosshairs -->
-        <div class="fd-grid-overlay">
+        <div class="fd-grid-overlay" style="display: ${gridDisplay};">
           <div class="fd-hud-coord fd-hud-tl">LAT // 40\u00b042'51"N &bull; LON // 74\u00b000'23"W</div>
           <div class="fd-hud-coord fd-hud-tr">GRID REF 8842-X &bull; SECTOR 04</div>
           <svg class="fd-grid-svg" viewBox="0 0 1000 600" preserveAspectRatio="none">
@@ -1205,10 +1375,10 @@
         </div>
 
         <!-- 3. Focused Overhead Key Spotlight with Rich Vignette -->
-        <div class="fd-key-spotlight"></div>
+        <div class="fd-key-spotlight" style="opacity: ${spotOpacity};"></div>
 
         <!-- 4. Volumetric Dust Motes -->
-        <div class="fd-dust-layer">
+        <div class="fd-dust-layer" style="display: ${dustDisplay};">
           <div class="fd-mote fd-m1"></div>
           <div class="fd-mote fd-m2"></div>
           <div class="fd-mote fd-m3"></div>
@@ -1252,22 +1422,22 @@
           </div>
 
           <!-- Layer 4: Center Foreground Hero Memo Artifact (Sharp Focus) -->
-          <div class="fd-paper-layer fd-layer-hero">
+          <div class="fd-paper-layer fd-layer-hero" style="transform: rotateX(${pitch}deg) rotateY(-10deg) rotateZ(3.2deg); width: ${scale}%; max-width: ${maxW}px; background: ${d.paperTone || '#fbf8ef'};">
             <div class="fd-hero-paper-grain"></div>
-            <div class="rd-head">${d.title || 'INTERNAL MEMO \u00b7 EYES ONLY'}</div>
+            <div class="rd-head">${safeTitle}</div>
             <div class="rd-divider"></div>
-            <div class="rd-line">${d.recipient || 'To: Board of Directors'}</div>
+            <div class="rd-line">${safeRecipient}</div>
             <div class="rd-line rd-from">
-              <span>${d.senderLabel || 'From:'}</span>
-              <span class="rd-bar"></span>
+              <span>${safeSenderLabel}</span>
+              ${showBar ? '<span class="rd-bar"></span>' : ''}
             </div>
-            <div class="rd-line">${d.subjectLine1 || 'Re: Q3 revenue booked via'}</div>
-            <div class="rd-line">${d.subjectLine2 || 'side letters totaling'}</div>
+            <div class="rd-line">${safeSubject1}</div>
+            <div class="rd-line">${safeSubject2}</div>
             <div class="rd-line rd-hl-wrap">
-              <span class="rd-hl">${d.highlightedAmount || '$8.4 BILLION'}</span>
+              <span class="rd-hl" style="${showHl ? '' : 'background: transparent !important; animation: none !important;'}">${safeAmount}</span>
             </div>
-            <div class="rd-line rd-disclose">${d.disclosureWarning || 'DO NOT DISCLOSE.'}</div>
-            <div class="rd-stamp">${d.stampText || 'CONFIDENTIAL'}</div>
+            <div class="rd-line rd-disclose">${safeWarning}</div>
+            ${showStamp ? `<div class="rd-stamp" style="border-color: ${d.stampColor || '#c1121f'}; color: ${d.stampColor || '#c1121f'};">${safeStamp}</div>` : ''}
           </div>
         </div>
       </div>

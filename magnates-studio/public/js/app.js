@@ -24327,7 +24327,7 @@ id: 'map',
     previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.8), rgba(69, 26, 3, 0.5), rgba(15, 23, 42, 0.9))',
     description: 'James Jani signature 12fps stop-motion chapter card with tactile aged paper, fiber displacement, letterpress serif typography, and 35mm film artifacts.',
     tags: ['James Jani', 'Grunge Text', 'Paper Texture', 'Stop Motion', 'Chapter Title'],
-    defaultImage: '/jani_clean_kraft_plate_hd.png',
+    defaultImage: '/jani_chapter_card_thumbnail.jpg',
     secondaryImage: '/paper_tear_stock_archival_news.jpg'
   },
   {
@@ -27940,7 +27940,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               </div>
             </div>
             <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, transparent 48%, rgba(24, 16, 8, 0.38) 78%, rgba(4, 2, 1, 0.82) 100%); pointer-events: none;"></div>
-            <div style="position: absolute; top: -10%; left: 15%; width: 70%; height: 60%; background: radial-gradient(ellipse at 50% 10%, rgba(255, 235, 175, 0.25) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none;"></div>
+            <div id="fx-leak-top-${tplId}" style="position: absolute; top: -10%; left: 15%; width: 70%; height: 60%; background: radial-gradient(ellipse at 50% 10%, rgba(255, 235, 175, 0.25) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none;"></div>
           </div>
           <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(180, 83, 9, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
             📜 12FPS CHAPTER
@@ -29498,18 +29498,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         frameEl.style.transform = `perspective(600px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.02)`;
       }
     } else if (tplId === 'text-texturing-grunge') {
-      // 12fps Stop-motion gate weave and tactile projector flicker
-      const frameIdx = Math.floor(t * 12);
-      const r1 = (Math.sin(frameIdx * 3.71 + 1.13) * 43758.5453) % 1;
-      const r2 = (Math.sin(frameIdx * 5.39 + 2.77) * 43758.5453) % 1;
-      const r3 = (Math.sin(frameIdx * 7.19 + 4.31) * 43758.5453) % 1;
-      const r4 = (Math.sin(frameIdx * 11.33 + 6.97) * 43758.5453) % 1;
-      const rot = (r1 - 0.5) * 1.4;
-      const scale = 1.00 + Math.abs(r2) * 0.02;
-      const posX = (r3 > 0.5 ? 1 : -1) * (2.0 + Math.abs(r3 * 4.0) % 2.0);
-      const posY = (r4 > 0.5 ? 1 : -1) * (2.0 + Math.abs(r4 * 4.0) % 2.0);
+      // James Jani Smooth Cinematic Macro Push & Light Sweep (Zero Shaking)
+      const macroZoom = 1.00 + (Math.sin(t * 0.8) * 0.5 + 0.5) * 0.038;
+      const driftX = Math.sin(t * 0.5) * 0.6;
+      const driftY = Math.cos(t * 0.4) * 0.4;
       const rig = fxContainer?.querySelector(`#fx-grunge-rig-${tplId}`);
-      if (rig) rig.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
+      if (rig) rig.style.transform = `translate3d(${driftX.toFixed(1)}px, ${driftY.toFixed(1)}px, 0) scale(${macroZoom.toFixed(4)})`;
+
+      const leak = fxContainer?.querySelector(`#fx-leak-top-${tplId}`);
+      if (leak) {
+        const sweep = Math.sin(t * 1.2) * 14;
+        leak.style.transform = `translateX(${sweep.toFixed(1)}px)`;
+      }
     } else if (tplId === 'kinetic-decode-typewriter') {
       // Matrix-style character scrambling decode loop
       const targetWord = "THE ILLUSION OF CHOICE";
@@ -30401,7 +30401,6 @@ function applySelectedHomepageTemplate(templateId) {
 
     'og-parallax-depth-engine': openOGParallaxSuite,
     'jani-puzzle-narrative-suite': openJaniSuite,
-    'jani-countdown-panic-suite': openCountdownSuite,
     'nonlinear-time-flash': openFlashbackSuite,
     'puzzle-piece-reveal': openPuzzleRevealSuite,
     'light-rays-lens-leaks': openLightRaysSuite,
@@ -30754,8 +30753,7 @@ function applySelectedHomepageTemplate(templateId) {
     openJaniSuite();
     return;
   } else if (templateId === 'jani-countdown-panic-suite') {
-    // Launch James Jani Countdown Effect & Panic Ticker Suite
-    openCountdownSuite();
+    openTopTemplateCustomizer(tpl);
     return;
   } else if (templateId === 'nonlinear-time-flash') {
     // Launch James Jani Nonlinear Flashbacks & Flashforwards Suite
@@ -31350,6 +31348,16 @@ function openTopTemplateCustomizer(tpl) {
         const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountEnvelope3DStage(stage, eData);
       }
+    } else if (tpl.id === 'jani-countdown-panic-suite') {
+      topCustomizerState.primaryUrl = '/countdown_warroom_clean_bg.png';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/countdown_warroom_clean_bg.png';
+      topCustomizerState.duration = 10;
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+      if (typeof window.tplMountCountdown3DStage === 'function' && stage) {
+        window.tplMountCountdown3DStage(stage, cdData);
+      }
     } else if (tpl.id === 'deal-term-sheet') {
       topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
       topCustomizerState.secondaryUrl = '/paper_tear_stock_vintage_map.jpg';
@@ -31372,10 +31380,14 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '/mahogany_desk_texture.jpg';
-      if (typeof window.tplMountFraudDossier3DStage === 'function') {
-        const stage = document.getElementById('tpl-modal-preview-stage');
-        const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountFraudDossier3DStage(stage, fdData);
+      topCustomizerState.paperPreviewMode = 'video';
+      topCustomizerState.is3DMode = false;
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+      if (typeof window.tplMountFraudDossierVideoStage === 'function' && stage) {
+        window.tplMountFraudDossierVideoStage(stage, fdData);
+      } else if (typeof window.tplMountFraudDossier3DStage === 'function' && stage) {
+        window.tplMountFraudDossier3DStage(stage, fdData);
       }
     } else if (tpl.id === 'money-stack') {
       topCustomizerState.primaryUrl = '/money_stack_cinematic_plate.png';
@@ -31511,6 +31523,13 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('pyramid-scheme', { is3DMode: true });
     }
+    if (tpl.id === 'scam-redaction') {
+      topCustomizerState.paperPreviewMode = 'video';
+      topCustomizerState.is3DMode = false;
+      if (typeof window.tplSetContextualData === 'function') {
+        window.tplSetContextualData('scam-redaction', { is3DMode: false });
+      }
+    }
   }
 
   const syncPaperModeButtons = () => {
@@ -31525,6 +31544,8 @@ function openTopTemplateCustomizer(tpl) {
       is3D = !!window.tplGetContextualData('google').is3DMode;
     } else if (tpl.id === 'deal-term-sheet' && typeof window.tplGetContextualData === 'function') {
       is3D = window.tplGetContextualData('deal-term-sheet').is3DMode !== false;
+    } else if (tpl.id === 'scam-redaction' && typeof window.tplGetContextualData === 'function') {
+      is3D = !!window.tplGetContextualData('scam-redaction').is3DMode;
     } else if (tpl.id === 'pyramid-scheme' && typeof window.tplGetContextualData === 'function') {
       is3D = window.tplGetContextualData('pyramid-scheme').is3DMode !== false;
     } else if (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)) {
@@ -31560,6 +31581,11 @@ function openTopTemplateCustomizer(tpl) {
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('deal-term-sheet');
       if (typeof window.applyModeLayout === 'function') window.applyModeLayout(false);
     }
+    if (tpl.id === 'scam-redaction' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('scam-redaction', { is3DMode: false });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('scam-redaction');
+      if (typeof window.applyModeLayout === 'function') window.applyModeLayout(false);
+    }
     if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('pyramid-scheme', { is3DMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('pyramid-scheme');
@@ -31591,6 +31617,11 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('deal-term-sheet', { is3DMode: true });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('deal-term-sheet');
+      if (typeof window.applyModeLayout === 'function') window.applyModeLayout(true);
+    }
+    if (tpl.id === 'scam-redaction' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('scam-redaction', { is3DMode: true });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('scam-redaction');
       if (typeof window.applyModeLayout === 'function') window.applyModeLayout(true);
     }
     if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
@@ -31714,7 +31745,7 @@ function openTopTemplateCustomizer(tpl) {
   const pushWrapEl = document.getElementById('tpl-modal-push-controls');
   if (pushWrapEl) pushWrapEl.style.display = 'none';
   const isCustomCartographyOrGraph = (tpl.id === 'map' || tpl.id === 'empire-timeline');
-  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine');
+  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine' || tpl.id === 'pyramid-scheme');
   const isTesterTpl = !!tpl.isTesterTemplate || !!tpl.previewType;
   const hideMediaUploads = isCustomCartographyOrGraph || isDedicated3DSuite || (isTesterTpl && tpl.id !== 'film-grain');
   const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
@@ -31729,6 +31760,8 @@ function openTopTemplateCustomizer(tpl) {
     if (quickActionsWrapEl) quickActionsWrapEl.style.display = 'none';
     const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
     if (aiEngineWrap) aiEngineWrap.style.display = 'none';
+    const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+    if (stdLayers && tpl.id === 'pyramid-scheme') stdLayers.style.display = 'none';
   }
 
   // 3D Interactive Mode button & floating toolbar: scope to relevant 3D templates
@@ -33482,7 +33515,27 @@ function renderTopTemplatePreviewStage() {
     return;
   }
 
+  // James Jani 3D Financial War Room Countdown & Panic Ticker Engine
+  if (tplId === 'jani-countdown-panic-suite') {
+    const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-countdown-panic-suite') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountCountdown3DStage === 'function') {
+      window.tplMountCountdown3DStage(stage, cdData);
+    }
+    return;
+  }
+
   // 3D Photorealistic Deal Term Sheet Engine
+  if (tplId === 'jani-countdown-panic-suite') {
+    if (typeof window.stepCountdownAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-countdown-panic-suite') : {};
+      window.stepCountdownAnimation(stage, 'jani-countdown-panic-suite', localSceneT, cdData);
+    }
+  }
+
   if (tplId === 'deal-term-sheet') {
     const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
     const is3D = dtData.is3DMode !== false && topCustomizerState.paperPreviewMode !== 'video';
@@ -33534,6 +33587,21 @@ function renderTopTemplatePreviewStage() {
   // 3D Photorealistic Fraud Dossier Redaction Engine
   if (tplId === 'scam-redaction') {
     const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scam-redaction') : {};
+    const is3D = fdData.is3DMode === true || topCustomizerState.paperPreviewMode === '3d';
+    if (!is3D) {
+      if (typeof window.tplMountFraudDossierVideoStage === 'function') {
+        window.tplMountFraudDossierVideoStage(stage, fdData);
+      } else if (typeof window.tplBuildFraudDossierHtml === 'function') {
+        stage.innerHTML = `
+          <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #06090e; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <div id="fx-container-scam-redaction" style="position: absolute; inset: 0; width: 100%; height: 100%;">
+              ${window.tplBuildFraudDossierHtml(fdData)}
+            </div>
+          </div>
+        `;
+      }
+      return;
+    }
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
     hoverBridgeActive = false;
     hoverExternalT = null;
