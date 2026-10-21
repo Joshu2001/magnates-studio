@@ -1057,6 +1057,13 @@ ${u.type !== 'text' && (curMode === 'image' || curMode === 'forbes') ? `<div sty
     if (act === 'd-pop') { d.enablePopout = !d.enablePopout; if (d.popoutMesh) d.popoutMesh.visible = d.enablePopout; persist(); build(tplId); return; }
     if (act === 'd-red') { d.enableRedaction = !d.enableRedaction; d._texDirty = true; persist(); build(tplId); return; }
   }
+  function bindHost() {
+    const h = host(); if (!h || h.dataset.bound) return;
+    h.dataset.bound = '1';
+    h.addEventListener('input', onInput);
+    h.addEventListener('change', onInput);
+    h.addEventListener('click', onClick);
+  }
   function attachDom3DInteractiveRig(stage, tplId) {
     const inner = stage.querySelector('#customizer-stage-inner') || stage;
     const e = entry(tplId);
