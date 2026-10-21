@@ -31499,7 +31499,7 @@ function openTopTemplateCustomizer(tpl) {
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
     'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board', 'deal-term-sheet', 'scam-redaction'
   ]);
-  const isSidebar3DManaged = (typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id)) || (typeof window.SPATIAL_3D_CATEGORY_IDS !== 'undefined' && window.SPATIAL_3D_CATEGORY_IDS.has(tpl.id)) || tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine';
+  const isSidebar3DManaged = tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine';
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
   if (paperModeSwitcher) paperModeSwitcher.style.display = showStage3DSwitcher ? 'flex' : 'none';
 
@@ -31748,7 +31748,7 @@ function openTopTemplateCustomizer(tpl) {
   const pushWrapEl = document.getElementById('tpl-modal-push-controls');
   if (pushWrapEl) pushWrapEl.style.display = 'none';
   const isCustomCartographyOrGraph = (tpl.id === 'map' || tpl.id === 'empire-timeline');
-  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine' || tpl.id === 'pyramid-scheme' || isSidebar3DManaged);
+  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine' || tpl.id === 'pyramid-scheme');
   const isTesterTpl = !!tpl.isTesterTemplate || !!tpl.previewType;
   const hideMediaUploads = isCustomCartographyOrGraph || isDedicated3DSuite || (isTesterTpl && tpl.id !== 'film-grain');
   const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
