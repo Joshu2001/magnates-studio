@@ -1519,8 +1519,191 @@
 </svg>`)}`,
     'scramble': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-sc" cx="50%" cy="50%" r="65%"><stop offset="0%" stop-color="#0a2014"/><stop offset="65%" stop-color="#040c07"/><stop offset="100%" stop-color="#010402"/></radialGradient><linearGradient id="sc-hdr" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#021a0f"/><stop offset="100%" stop-color="#08291a"/></linearGradient><filter id="sc-glow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00ff88" flood-opacity="0.75"/></filter><pattern id="sc-lines" width="4" height="4" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="4" y2="0" stroke="rgba(0,0,0,0.4)" stroke-width="1.5"/></pattern></defs><rect width="400" height="225" fill="url(#bg-sc)"/><rect width="400" height="225" fill="url(#sc-lines)"/><g transform="translate(24, 22)"><rect width="352" height="181" rx="6" fill="rgba(3,8,5,0.92)" stroke="rgba(0,255,136,0.5)" stroke-width="1.2"/><rect width="352" height="22" rx="6" fill="url(#sc-hdr)"/><circle cx="12" cy="11" r="3.2" fill="#ef4444"/><circle cx="21" cy="11" r="3.2" fill="#f59e0b"/><circle cx="30" cy="11" r="3.2" fill="#10b981"/><text x="40" y="14" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700" letter-spacing="0.8">ROOT@0x7A_DARKNET // [SYS_BREACH_ESTABLISHED]</text><rect x="290" y="4" width="54" height="14" rx="2.5" fill="rgba(0,255,136,0.18)" stroke="rgba(0,255,136,0.4)" stroke-width="0.8"/><text x="317" y="14" fill="#00ff88" font-family="'JetBrains Mono', monospace" font-size="6.5" font-weight="900" letter-spacing="1" text-anchor="middle">DECRYPT</text><text x="18" y="48" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" letter-spacing="0.5">&gt; EXEC_OVERRIDE // DECRYPT_STREAM:</text><text x="18" y="70" fill="rgba(0,255,136,0.4)" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="600" letter-spacing="1.5">[ 0x7F | %$#@!*&amp; // CIPHER_CYCLE ]</text><g filter="url(#sc-glow)"><text x="176" y="116" fill="#00ff88" font-family="'JetBrains Mono', 'Courier New', monospace" font-weight="900" font-size="25" letter-spacing="2.5" text-anchor="middle">ACCESS GRANTED</text></g><rect x="306" y="98" width="4" height="20" fill="#00ff88"/><line x1="16" y1="148" x2="336" y2="148" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4, 3"/><text x="18" y="166" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="7.5" letter-spacing="0.4">IP: 185.220.101.5 // CIPHER: AES-256-GCM // PORT: 9050</text><text x="334" y="166" fill="#00ff88" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="800" text-anchor="end">STATUS: OK</text></g></svg>`)}`,
     'newspaper': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="38" fill="#8b5a3c" font-family="Georgia, serif" font-weight="900" font-size="12" letter-spacing="4" text-anchor="middle">THE DAILY TIMES</text><line x1="40" y1="48" x2="360" y2="48" stroke="#3a2418" stroke-width="2"/><g transform="translate(40, 95)"><text fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">HISTORIC DISCOVERY</text><text y="28" fill="#3a2418" font-family="Georgia, serif" font-weight="900" font-size="22" text-anchor="middle" x="160">SHOCKS THE WORLD</text><text y="58" fill="#5a3a28" font-family="Georgia, serif" font-style="italic" font-size="12" text-anchor="middle" x="160">Experts call it a major breakthrough</text></g></svg>`)}`,
-    'instagram': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#0f172a"/><g transform="translate(100, 15)"><rect width="200" height="195" rx="10" fill="#fff"/><circle cx="24" cy="20" r="10" fill="#0ea5e9"/><text x="42" y="24" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="10.5">@creator</text><rect x="0" y="38" width="200" height="110" fill="#1e293b"/><path d="M 100 112 L 88 100 C 80 92 80 80 88 74 C 94 70 100 76 100 76 C 100 76 106 70 112 74 C 120 80 120 92 112 100 Z" fill="#ef4444"/><text x="12" y="184" fill="#262626" font-family="'Inter', sans-serif" font-weight="700" font-size="9.5">12,453 likes</text></g></svg>`)}`,
-    'checklist': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`,
+    'instagram': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="ig-bg-snap" cx="50%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#141d30"/>
+      <stop offset="55%" stop-color="#080c16"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </radialGradient>
+    <radialGradient id="ig-key-snap" cx="50%" cy="0%" r="80%">
+      <stop offset="0%" stop-color="rgba(255,245,234,0.3)"/>
+      <stop offset="60%" stop-color="rgba(255,245,234,0.04)"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </radialGradient>
+    <linearGradient id="ig-glass-snap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(30, 41, 64, 0.88)"/>
+      <stop offset="50%" stop-color="rgba(18, 24, 38, 0.82)"/>
+      <stop offset="100%" stop-color="rgba(9, 13, 24, 0.94)"/>
+    </linearGradient>
+    <linearGradient id="ig-ring-snap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="35%" stop-color="#ec4899"/>
+      <stop offset="70%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="ig-glint-snap" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+      <stop offset="48%" stop-color="rgba(255,255,255,0.25)"/>
+      <stop offset="52%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <filter id="ig-glow-snap" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="4.5" flood-color="#ef4444" flood-opacity="0.8"/>
+    </filter>
+    <filter id="ig-card-shadow" x="-30%" y="-20%" width="160%" height="150%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#000000" flood-opacity="0.85"/>
+    </filter>
+    <clipPath id="ig-card-clip">
+      <rect width="180" height="205" rx="14"/>
+    </clipPath>
+    <clipPath id="ig-img-clip">
+      <rect width="160" height="98" rx="8"/>
+    </clipPath>
+  </defs>
+
+  <rect width="400" height="225" fill="url(#ig-bg-snap)"/>
+  <rect width="400" height="225" fill="url(#ig-key-snap)"/>
+
+  <g opacity="0.35" filter="blur(5px)">
+    <rect x="18" y="20" width="70" height="85" rx="6" fill="#1e293b" stroke="#334155" stroke-width="0.8"/>
+    <rect x="18" y="118" width="70" height="85" rx="6" fill="#0f172a" stroke="#334155" stroke-width="0.8"/>
+    <rect x="312" y="15" width="70" height="85" rx="6" fill="#1e293b" stroke="#334155" stroke-width="0.8"/>
+    <rect x="312" y="112" width="70" height="85" rx="6" fill="#0f172a" stroke="#334155" stroke-width="0.8"/>
+  </g>
+
+  <g opacity="0.08" stroke="#38bdf8" stroke-width="0.5">
+    <line x1="0" y1="56" x2="400" y2="56"/>
+    <line x1="0" y1="112" x2="400" y2="112"/>
+    <line x1="0" y1="168" x2="400" y2="168"/>
+    <line x1="100" y1="0" x2="100" y2="225"/>
+    <line x1="200" y1="0" x2="200" y2="225"/>
+    <line x1="300" y1="0" x2="300" y2="225"/>
+  </g>
+
+  <circle cx="85" cy="45" r="14" fill="#fcd34d" opacity="0.08" filter="blur(3px)"/>
+  <circle cx="325" cy="65" r="18" fill="#38bdf8" opacity="0.09" filter="blur(4px)"/>
+  <circle cx="295" cy="175" r="12" fill="#f43f5e" opacity="0.07" filter="blur(3px)"/>
+  <circle cx="68" cy="180" r="1.5" fill="#38bdf8" opacity="0.6"/>
+  <circle cx="330" cy="140" r="1.8" fill="#fff" opacity="0.7"/>
+  <circle cx="95" cy="88" r="1.2" fill="#fff" opacity="0.5"/>
+
+  <ellipse cx="205" cy="208" rx="78" ry="12" fill="#000000" opacity="0.75" filter="blur(4px)"/>
+
+  <g transform="translate(112, 10) rotate(4) skewX(-2.5)" filter="url(#ig-card-shadow)">
+    <rect width="180" height="205" rx="14" fill="url(#ig-glass-snap)" stroke="rgba(255,255,255,0.18)" stroke-width="1"/>
+    <line x1="16" y1="1" x2="164" y2="1" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/>
+
+    <g clip-path="url(#ig-card-clip)">
+      <polygon points="40,0 90,0 30,205 -20,205" fill="url(#ig-glint-snap)"/>
+
+      <g transform="translate(12, 10)">
+        <circle cx="10" cy="10" r="10.5" fill="none" stroke="url(#ig-ring-snap)" stroke-width="1.5"/>
+        <circle cx="10" cy="10" r="8.5" fill="#1e293b"/>
+        <text x="26" y="10" fill="#f8fafc" font-family="'Inter', sans-serif" font-weight="700" font-size="9" text-anchor="start">@creator</text>
+        <circle cx="70" cy="8" r="3.6" fill="#38bdf8"/>
+        <path d="M 68.5 8 L 69.8 9.2 L 72 6.8" fill="none" stroke="#fff" stroke-width="0.8" stroke-linecap="round"/>
+        <text x="26" y="17" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="6">♫ Original Audio</text>
+        <circle cx="152" cy="8" r="1.2" fill="#cbd5e1"/>
+        <circle cx="156" cy="8" r="1.2" fill="#cbd5e1"/>
+        <circle cx="160" cy="8" r="1.2" fill="#cbd5e1"/>
+      </g>
+
+      <g transform="translate(10, 34)" clip-path="url(#ig-img-clip)">
+        <rect width="160" height="98" fill="#0f172a"/>
+        <linearGradient id="mtn-snap" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e293b"/>
+          <stop offset="40%" stop-color="#38bdf8"/>
+          <stop offset="70%" stop-color="#f59e0b"/>
+          <stop offset="100%" stop-color="#0f172a"/>
+        </linearGradient>
+        <rect width="160" height="98" fill="url(#mtn-snap)"/>
+        <polygon points="0,98 35,48 70,72 110,38 160,98" fill="#090d16" opacity="0.85"/>
+        <polygon points="20,98 60,58 95,78 135,46 160,82 160,98" fill="#020408" opacity="0.95"/>
+        <circle cx="110" cy="38" r="14" fill="#fef08a" opacity="0.75" filter="blur(3px)"/>
+        <rect width="160" height="98" fill="url(#ig-glint-snap)" opacity="0.6"/>
+
+        <g transform="translate(80, 48) scale(1.15)" filter="url(#ig-glow-snap)">
+          <path d="M 0 3 C -5 -3 -10 1 -10 6 C -10 11 -5 15 0 19 C 5 15 10 11 10 6 C 10 1 5 -3 0 3 Z" fill="#ef4444"/>
+        </g>
+      </g>
+      <rect x="10" y="34" width="160" height="98" rx="8" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="0.8"/>
+
+      <g transform="translate(12, 138)">
+        <path d="M 6 2 C 3 -1 0 1 0 4.5 C 0 8 3 10.5 6 13 C 9 10.5 12 8 12 4.5 C 12 1 9 -1 6 2 Z" fill="#ef4444" filter="drop-shadow(0 0 3px rgba(239,68,68,0.6))"/>
+        <circle cx="26" cy="6" r="5" fill="none" stroke="#f8fafc" stroke-width="1"/>
+        <path d="M 38 2 L 46 6 L 38 10 L 40 6 Z" fill="none" stroke="#f8fafc" stroke-width="1"/>
+        <rect x="52" y="2" width="46" height="9" rx="4.5" fill="rgba(56,189,248,0.18)" stroke="rgba(56,189,248,0.4)" stroke-width="0.6"/>
+        <text x="75" y="8.5" fill="#38bdf8" font-family="'Inter', sans-serif" font-weight="700" font-size="5" text-anchor="middle">♫ TRACK</text>
+        <path d="M 152 2 L 158 2 L 158 12 L 155 9.5 L 152 12 Z" fill="none" stroke="#f8fafc" stroke-width="1"/>
+      </g>
+
+      <g transform="translate(12, 158)">
+        <text x="0" y="2" fill="#f8fafc" font-family="'Inter', sans-serif" font-weight="800" font-size="8">1,248,900 likes</text>
+        <text x="0" y="13" fill="#f8fafc" font-family="'Inter', sans-serif" font-weight="700" font-size="7">@creator <tspan font-weight="400" fill="#cbd5e1">Expandable 1 part to roast...</tspan><tspan fill="#94a3b8" font-weight="600"> more</tspan></text>
+        <text x="0" y="23" fill="#94a3b8" font-family="'Inter', sans-serif" font-size="6">📍 Location  •  💬 3,420 comments</text>
+        <text x="0" y="32" fill="#64748b" font-family="'Inter', sans-serif" font-size="5.5">14 HOURS AGO</text>
+      </g>
+    </g>
+  </g>
+</svg>`)}`,
+    'checklist': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="bg-spot" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#2d1d14"/>
+      <stop offset="45%" stop-color="#180e0a"/>
+      <stop offset="100%" stop-color="#070403"/>
+    </radialGradient>
+    <filter id="cl-drop" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <rect width="400" height="225" fill="url(#bg-spot)"/>
+  <!-- Topographic coordinate lines -->
+  <g stroke="rgba(56,189,248,0.12)" stroke-width="0.8" fill="none">
+    <path d="M 0 60 Q 150 20 300 70 T 400 50"/>
+    <path d="M 0 160 Q 200 120 400 170"/>
+    <line x1="80" y1="0" x2="80" y2="225" stroke-dasharray="2,3"/>
+    <line x1="320" y1="0" x2="320" y2="225" stroke-dasharray="2,3"/>
+  </g>
+  <!-- Overhead spotlight glow -->
+  <ellipse cx="200" cy="112" rx="160" ry="90" fill="rgba(255,248,220,0.08)"/>
+  <!-- 4 Taped Slips -->
+  <g filter="url(#cl-drop)">
+    <!-- Slip 1 -->
+    <g transform="translate(100, 24) rotate(-1.2)">
+      <rect x="0" y="0" width="200" height="34" rx="2" fill="#f4ead5" stroke="rgba(0,0,0,0.1)"/>
+      <rect x="80" y="-5" width="40" height="10" fill="rgba(245,235,200,0.8)" rx="1"/>
+      <rect x="12" y="7" width="20" height="20" rx="2" fill="none" stroke="#15803d" stroke-width="2"/>
+      <path d="M 16 17 L 20 22 L 28 11" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round"/>
+      <text x="40" y="21" fill="#1e293b" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10.5">Register Company LLC</text>
+    </g>
+    <!-- Slip 2 -->
+    <g transform="translate(98, 68) rotate(1.4)">
+      <rect x="0" y="0" width="204" height="34" rx="2" fill="#ece0c5" stroke="rgba(0,0,0,0.1)"/>
+      <rect x="82" y="-5" width="40" height="10" fill="rgba(245,235,200,0.8)" rx="1"/>
+      <rect x="12" y="7" width="20" height="20" rx="2" fill="none" stroke="#15803d" stroke-width="2"/>
+      <path d="M 16 17 L 20 22 L 28 11" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round"/>
+      <text x="40" y="21" fill="#1e293b" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10.5">Open Business Account</text>
+    </g>
+    <!-- Slip 3 -->
+    <g transform="translate(97, 114) rotate(-0.8)">
+      <rect x="0" y="0" width="206" height="34" rx="2" fill="#f6eedc" stroke="rgba(0,0,0,0.1)"/>
+      <rect x="83" y="-5" width="40" height="10" fill="rgba(245,235,200,0.8)" rx="1"/>
+      <rect x="12" y="7" width="20" height="20" rx="2" fill="none" stroke="#15803d" stroke-width="2"/>
+      <path d="M 16 17 L 20 22 L 28 11" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round"/>
+      <text x="40" y="21" fill="#1e293b" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10.5">Acquire First 100 Clients</text>
+    </g>
+    <!-- Slip 4 -->
+    <g transform="translate(99, 160) rotate(1.2)">
+      <rect x="0" y="0" width="202" height="34" rx="2" fill="#e9debf" stroke="rgba(0,0,0,0.1)"/>
+      <rect x="81" y="-5" width="40" height="10" fill="rgba(245,235,200,0.8)" rx="1"/>
+      <rect x="12" y="7" width="20" height="20" rx="2" fill="none" stroke="#15803d" stroke-width="2"/>
+      <path d="M 16 17 L 20 22 L 28 11" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round"/>
+      <text x="40" y="21" fill="#1e293b" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="10.5">Automate Sales Funnel</text>
+    </g>
+  </g>
+</svg>`)}`,
     'parallax': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="px-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#080e18"/><stop offset="45%" stop-color="#16243b"/><stop offset="80%" stop-color="#2c3d5a"/><stop offset="100%" stop-color="#d97d62"/></linearGradient><radialGradient id="px-sun-glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fff8db"/><stop offset="30%" stop-color="#ffd27a"/><stop offset="70%" stop-color="rgba(255, 180, 80, 0.45)"/><stop offset="100%" stop-color="rgba(255, 180, 80, 0)"/></radialGradient><linearGradient id="mtn-grad-far" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b2354"/><stop offset="100%" stop-color="#1c102a"/></linearGradient><linearGradient id="mtn-grad-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#221433"/><stop offset="100%" stop-color="#0e0717"/></linearGradient><linearGradient id="mtn-grad-near" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#140b22"/><stop offset="100%" stop-color="#040108"/></linearGradient><filter id="px-shadow"><feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#000000" flood-opacity="0.8"/></filter></defs><rect width="400" height="225" fill="url(#px-sky)"/><circle cx="270" cy="58" r="54" fill="url(#px-sun-glow)"/><circle cx="270" cy="58" r="22" fill="#fff4c2" opacity="0.95"/><path d="M-20,225 L-20,110 L45,68 L110,120 L185,55 L255,115 L320,75 L380,125 L420,95 L420,225 Z" fill="url(#mtn-grad-far)" opacity="0.95"/><path d="M-20,225 L-20,135 L50,95 L125,145 L195,88 L275,150 L345,100 L420,155 L420,225 Z" fill="url(#mtn-grad-mid)"/><path d="M-20,225 L-20,165 L60,130 L140,180 L200,120 L270,175 L360,135 L420,180 L420,225 Z" fill="url(#mtn-grad-near)"/><g transform="translate(182, 86)" filter="url(#px-shadow)"><path d="M-30,139 Q18,130 66,139 L66,145 L-30,145 Z" fill="#040108"/><path d="M12,46 L12,102 L6,139 L18,139 L22,100 L26,139 L38,139 L32,102 L32,46 Z" fill="#040108"/><path d="M8,32 C6,40 7,58 9,68 C14,72 30,72 35,68 C37,58 38,40 36,32 Z" fill="#040108"/><rect x="-3" y="34" width="13" height="30" rx="4" fill="#040108"/><circle cx="22" cy="20" r="9.5" fill="#040108"/><path d="M22,12 Q35,16 37,20 L24,20 Z" fill="#040108"/><line x1="44" y1="26" x2="39" y2="139" stroke="#040108" stroke-width="2.5" stroke-linecap="round"/></g></svg>`)}`,
     'textbehind': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="tb-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0b111e"/><stop offset="50%" stop-color="#141c2e"/><stop offset="100%" stop-color="#0a0d17"/></linearGradient><filter id="tb-text-shadow"><feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="rgba(0,0,0,0.7)"/></filter><filter id="tb-subj-shadow"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="rgba(0,0,0,0.95)"/></filter></defs><rect width="400" height="225" fill="url(#tb-bg)"/><path d="M0,225 L0,170 L70,140 L160,185 L250,135 L330,175 L400,145 L400,225 Z" fill="#070a12" opacity="0.8"/><g filter="url(#tb-text-shadow)"><text x="200" y="128" fill="#ffffff" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="900" font-size="78" letter-spacing="-2" text-anchor="middle">DREAM</text></g><g transform="translate(200, 32)" filter="url(#tb-subj-shadow)"><circle cx="0" cy="22" r="16" fill="#0f172a" stroke="#38bdf8" stroke-width="0.8" opacity="0.95"/><rect x="-7" y="36" width="14" height="10" fill="#0f172a"/><path d="M-42,54 C-32,46 -15,44 0,44 C15,44 32,46 42,54 L52,110 L54,195 L-54,195 L-52,110 Z" fill="#0f172a"/><path d="M-42,54 C-32,46 -15,44 0,44 C15,44 32,46 42,54" fill="none" stroke="#60a5fa" stroke-width="1.8" opacity="0.7"/><path d="M-22,54 L-18,125" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/><path d="M22,54 L18,125" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/></g></svg>`)}`,
     'docheight': 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Cdefs%3E%3CradialGradient%20id%3D%22dh-snap-spot%22%20cx%3D%2245%25%22%20cy%3D%2240%25%22%20r%3D%2265%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%232a1f18%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23140d09%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23050302%22%2F%3E%3C%2FradialGradient%3E%3Cfilter%20id%3D%22dh-snap-shadow%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%3E%3CfeDropShadow%20dx%3D%220%22%20dy%3D%2210%22%20stdDeviation%3D%2212%22%20flood-color%3D%22%23000%22%20flood-opacity%3D%220.85%22%2F%3E%3C%2Ffilter%3E%3C%2Fdefs%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23dh-snap-spot)%22%2F%3E%3Crect%20x%3D%2270%22%20y%3D%2216%22%20width%3D%22258%22%20height%3D%22194%22%20rx%3D%227%22%20fill%3D%22%23181310%22%20stroke%3D%22%233d2c20%22%20filter%3D%22url(%23dh-snap-shadow)%22%2F%3E%3Crect%20x%3D%2278%22%20y%3D%2222%22%20width%3D%22246%22%20height%3D%22182%22%20rx%3D%224%22%20fill%3D%22%23cfb687%22%2F%3E%3Crect%20x%3D%2284%22%20y%3D%2225%22%20width%3D%22232%22%20height%3D%22175%22%20rx%3D%222%22%20fill%3D%22%23faf6ec%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%2246%22%20fill%3D%22%231e293b%22%20font-size%3D%228%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%3ECONFIDENTIAL%20INVESTIGATIVE%20DOSSIER%3C%2Ftext%3E%3Crect%20x%3D%2294%22%20y%3D%2294%22%20width%3D%22140%22%20height%3D%2214%22%20fill%3D%22rgba(250%2C204%2C21%2C0.5)%22%2F%3E%3Crect%20x%3D%2294%22%20y%3D%22132%22%20width%3D%22150%22%20height%3D%2215%22%20fill%3D%22%2309090b%22%20rx%3D%222%22%2F%3E%3Cg%20transform%3D%22translate(258%2C%20140)%20rotate(-14)%22%3E%3Crect%20x%3D%22-40%22%20y%3D%22-12%22%20width%3D%2280%22%20height%3D%2224%22%20rx%3D%223%22%20fill%3D%22rgba(220%2C38%2C38%2C0.12)%22%20stroke%3D%22%23dc2626%22%20stroke-width%3D%221.5%22%2F%3E%3Ctext%20x%3D%220%22%20y%3D%224%22%20fill%3D%22%23dc2626%22%20font-size%3D%229%22%20font-weight%3D%22900%22%20text-anchor%3D%22middle%22%3ETOP%20SECRET%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fsvg%3E',
@@ -1674,6 +1857,58 @@
   </svg>`)}`;
 
     SNAPSHOTS['conspiracy-board'] = '/red_string_board_cinematic_plate.jpg';
+    SNAPSHOTS['deal-term-sheet'] = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="tsDesk" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#4a2517"/>
+      <stop offset="45%" stop-color="#241009"/>
+      <stop offset="100%" stop-color="#0a0503"/>
+    </radialGradient>
+    <radialGradient id="tsVignette" cx="52%" cy="48%" r="60%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="60%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.65"/>
+    </radialGradient>
+    <filter id="tsShadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="8" dy="16" stdDeviation="12" flood-color="#000000" flood-opacity="0.85"/>
+    </filter>
+  </defs>
+  <rect width="400" height="225" fill="url(#tsDesk)"/>
+  <g transform="translate(15, -20) rotate(-24)">
+    <rect width="130" height="95" rx="2" fill="#c4b18b" stroke="#7a6745" stroke-width="0.8" opacity="0.6"/>
+    <path d="M 15 25 Q 40 10 65 35 T 115 20" fill="none" stroke="#685536" stroke-width="0.8" stroke-dasharray="3 2" opacity="0.7"/>
+    <path d="M 25 55 Q 60 40 90 65" fill="none" stroke="#685536" stroke-width="0.6" stroke-dasharray="2 2" opacity="0.6"/>
+    <circle cx="70" cy="45" r="14" fill="none" stroke="#685536" stroke-width="0.5" opacity="0.5"/>
+  </g>
+  <g transform="translate(155, 18) skewY(-3) rotate(3)" filter="url(#tsShadow)">
+    <rect width="112" height="158" rx="2" fill="#f5f0e1" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/>
+    <text x="10" y="16" fill="#64748b" font-family="monospace" font-size="3.5">1. PREFERRED STOCK FINANCING</text>
+    <text x="56" y="27" fill="#1e293b" font-family="monospace" font-weight="900" font-size="5.8" letter-spacing="0.5" text-anchor="middle">TERM SHEET \u00b7 SERIES A</text>
+    <line x1="10" y1="31" x2="102" y2="31" stroke="rgba(30,41,59,0.35)" stroke-dasharray="2 1.5" stroke-width="0.5"/>
+    <g font-family="monospace" font-size="4.6" font-weight="700">
+      <rect x="9" y="36" width="82" height="8" rx="1.5" fill="#facc15" opacity="0.85"/>
+      <text x="11" y="42" fill="#0f172a">Valuation: $80M pre-money</text>
+      <rect x="9" y="47" width="76" height="8" rx="1.5" fill="#facc15" opacity="0.85"/>
+      <text x="11" y="53" fill="#0f172a">Investment: $12M for 15%</text>
+      <text x="11" y="64" fill="#334155" font-weight="500">Board seats: 2 inv, 3 founder</text>
+      <text x="11" y="74" fill="#334155" font-weight="500">Liquidation pref: 1x non-part</text>
+    </g>
+    <text x="10" y="87" fill="#64748b" font-family="monospace" font-size="3.2">2. Definitive agreements binding upon execution.</text>
+    <text x="10" y="93" fill="#64748b" font-family="monospace" font-size="3.2">3. Fountain pen ink delivers binding escrow.</text>
+    <text x="10" y="108" fill="#1e293b" font-family="Georgia, serif" font-size="4.5">Signature,</text>
+    <path d="M 28 106 C 36 94 42 112 50 102 S 64 108 72 98 L 84 104" fill="none" stroke="#1e293b" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="26" y1="112" x2="88" y2="112" stroke="rgba(30,41,59,0.4)" stroke-width="0.6"/>
+    <g transform="translate(68, 126) rotate(-13)">
+      <rect x="-18" y="-6" width="36" height="12" fill="none" stroke="#b91c1c" stroke-width="1"/>
+      <text x="0" y="2.5" fill="#b91c1c" font-family="monospace" font-weight="900" font-size="4.2" letter-spacing="0.5" text-anchor="middle">DEAL CLOSED</text>
+    </g>
+    <g transform="translate(82, 140) rotate(-16)">
+      <rect x="-14" y="-5.5" width="28" height="11" fill="none" stroke="#b91c1c" stroke-width="1"/>
+      <text x="0" y="2" fill="#b91c1c" font-family="monospace" font-weight="900" font-size="4" letter-spacing="0.5" text-anchor="middle">APPROVED</text>
+    </g>
+  </g>
+  <rect width="400" height="225" fill="url(#tsVignette)" pointer-events="none"/>
+</svg>`)}`;
 
   window.tplGetSnapshot = function (id) {
     return SNAPSHOTS[id] || null;

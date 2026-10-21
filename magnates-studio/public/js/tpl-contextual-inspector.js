@@ -745,22 +745,45 @@
     // 34. Instagram Post
     'instagram': {
       type: 'instagram',
-      username: 'luxury_lifestyle',
-      caption: 'The grind never stops. Private terminal.',
-      likes: '124,592 likes',
-      image: ''
+      username: '@creator',
+      verified: true,
+      caption: 'Expandable 1 part to roast cinematic storytelling highlights and more...',
+      likesCount: 1248900,
+      likes: '1,248,900 likes',
+      location: '📍 Location, 💬 Comment',
+      timestamp: '14 hours ago',
+      audioTrack: 'Original Audio • @creator',
+      postImage: '/clean_mountain_backdrop.png',
+      frostedFilter: true,
+      keyLightColor: '#fff5ea',
+      spatialPitch: 20,
+      spatialTilt: 10,
+      backdropType: 'feed_grid'
     },
 
-    // 35. Animated Checklist
+    // 35. Animated Checklist (Master 3D Paper Artifact Reveal Engine)
     'checklist': {
       type: 'checklist',
+      layoutMode: 'slips', // 'slips' (Image 2) or 'dossier' (Image 3)
+      bgEnvironment: 'desk', // 'desk' (Dark Mahogany Desk) or 'blueprint' (Investigative Blue Map Grid)
       title: 'Action Steps',
       items: [
-        'Register Company LLC',
-        'Open Business Account',
-        'Acquire First 100 Clients',
-        'Automate Sales Funnel'
-      ]
+        { text: 'Register Company LLC', checked: true },
+        { text: 'Open Business Account', checked: true },
+        { text: 'Acquire First 100 Clients', checked: true },
+        { text: 'Automate Sales Funnel', checked: true }
+      ],
+      activeFocusIndex: 3,
+      depthOfField: true,
+      spotlightIntensity: 1.0,
+      volumetricDust: true,
+      stampColor: '#15803d',
+      tiltAngleX: 14,
+      tiltAngleY: 0,
+      coverageScale: 58,
+      organicTape: true,
+      organicStampSeal: true,
+      organicStampSlam: true
     },
 
     // 36. Text Behind Object
@@ -3273,6 +3296,22 @@
       }
       return;
     }
+    if (tplId === 'deal-term-sheet') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const vp = stage.querySelector('#term-sheet-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountDealTermSheet3DStage === 'function') {
+            window.tplMountDealTermSheet3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initDealTermSheet3DScene === 'function') {
+            window.initDealTermSheet3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
     if (tplId === 'jani-forbes-fraud-reveal') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -3893,9 +3932,16 @@
     } else if (tplId === 'money') {
       const d = fxc.querySelector('.dollar'); if (d) d.textContent = data.amount;
       const l = fxc.querySelector('.money-label, .label'); if (l) l.textContent = data.label;
+    } else if (tplId === 'instagram') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const viewport = stage ? stage.querySelector('#instagram-3d-viewport') : null;
+      if (viewport && typeof window.initInstagram3DScene === 'function') {
+        window.initInstagram3DScene(viewport, data);
+      }
     } else if (tplId === 'checklist') {
-      const items = fxc.querySelectorAll('.check-text');
-      (data.items || []).forEach((txt, i) => { if (items[i]) items[i].textContent = txt; });
+      if (typeof window.tplBuildChecklistHtml === 'function') {
+        fxc.innerHTML = window.tplBuildChecklistHtml(data);
+      }
     } else if (tplId === 'progress') {
       let root = fxc.querySelector('.tpl-progress');
       if (!root || !root.classList.contains('cinematic-hud-progress')) {
@@ -4637,6 +4683,40 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'instagram') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildInstagramInspector === 'function') {
+          window.tplBuildInstagramInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if (tplId === 'checklist') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildChecklistInspector === 'function') {
+          window.tplBuildChecklistInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'conspiracy-board') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
@@ -4689,6 +4769,17 @@
         const data = window.tplGetContextualData(tplId);
         if (typeof window.tplBuildMoneyStackInspector === 'function') {
           window.tplBuildMoneyStackInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if (tplId === 'deal-term-sheet') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildDealTermSheetInspector === 'function') {
+          window.tplBuildDealTermSheetInspector(container, data, tplId);
         }
       }
       return;

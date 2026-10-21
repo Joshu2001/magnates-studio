@@ -23984,12 +23984,13 @@ id: 'map',
     title: 'Animated Checklist',
     category: 'Animations',
     origCategory: 'Animations',
-    badge: 'PRODUCTIVITY',
+    badge: '3D ARTIFACT',
+    is3D: true,
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Checklist items appearing and checking off. Perfect for "how to" and productivity content.',
-    tags: ['Animations', 'Animated Checklist', 'Motion Template'],
+    previewGradient: 'linear-gradient(135deg, rgba(20, 24, 33, 0.98), rgba(8, 12, 20, 0.95))',
+    description: 'Photorealistic 3D paper artifact reveal engine: physical file clippings, masking tape, rubber ink stamp impressions, dramatic overhead spotlight, and depth-of-field optics.',
+    tags: ['Animations', 'Animated Checklist', '3D Spatial', 'Paper Artifact', 'James Jani'],
     defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0a0a15"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-cl)"/><g transform="translate(80, 40)"><g transform="translate(0, 0)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Research topic</text></g><g transform="translate(0, 35)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Write script</text></g><g transform="translate(0, 70)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Record audio</text></g><g transform="translate(0, 105)"><rect width="20" height="20" rx="4" fill="#00d68f"/><text x="10" y="15" fill="#fff" font-size="13" text-anchor="middle">\u2713</text><text x="32" y="15" fill="#fff" font-family="'Inter', sans-serif" font-weight="700" font-size="13">Edit video</text></g></g></svg>`)}`
   },
 
@@ -26632,12 +26633,15 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="ig-image"><div class="ig-heart"><svg width="42" height="42" viewBox="0 0 24 24" fill="#ef4444"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div></div>
           </div>
         </div>`; } else if (tplId === 'checklist') {
-      fxContainer.innerHTML = `<div class="tpl-checklist">
-          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Research topic</div></div>
-          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Write script</div></div>
-          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Record audio</div></div>
-          <div class="check-item"><div class="check-box">\u2713</div><div class="check-text">Edit video</div></div>
-        </div>`;
+      const clData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('checklist') : {};
+      if (typeof window.tplBuildChecklistHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildChecklistHtml(clData);
+      } else {
+        fxContainer.innerHTML = `<div class="tpl-checklist"></div>`;
+      }
+      if (typeof window.tplTriggerChecklistStampAnimation === 'function') {
+        window.tplTriggerChecklistStampAnimation(fxContainer);
+      }
     } else if (tplId === 'parallax') {
       const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('parallax') : {};
       const isCustomFig = (pData.figureImg && !pData.figureImg.includes('data:image/svg')) || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg'));

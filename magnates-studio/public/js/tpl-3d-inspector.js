@@ -1038,7 +1038,17 @@
     const cw = cv.width, ch = cv.height;
     c.save();
     try {
-          if (clip.fxScene && clip.fxScene.tplId === 'money-stack' && typeof window.renderMoneyStackCanvas === 'function') {
+          if (clip.fxScene && clip.fxScene.tplId === 'instagram' && typeof window.renderInstagramCanvas === 'function') {
+      window.renderInstagramCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
+    if (clip.fxScene && clip.fxScene.tplId === 'deal-term-sheet' && typeof window.renderDealTermSheetCanvas === 'function') {
+      window.renderDealTermSheetCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
+    if (clip.fxScene && clip.fxScene.tplId === 'money-stack' && typeof window.renderMoneyStackCanvas === 'function') {
       window.renderMoneyStackCanvas(c, clip, t, cw, ch);
       c.restore();
       return;
