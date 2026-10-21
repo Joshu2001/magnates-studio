@@ -393,12 +393,24 @@
     'receipt': {
       type: 'receipt',
       store: 'WHOLE FOODS MARKET',
+      authCode: 'TERM #0491 · AUTH VERIFIED',
       items: [
         { name: 'Organic Almond Milk', price: '$4.99' },
         { name: 'Avocado 4-Pack', price: '$6.49' },
         { name: 'Grass-Fed Ribeye', price: '$22.80' }
       ],
-      total: '$34.28'
+      total: '$34.28',
+      isOverlay: true,            // By default it should be an overlay!
+      positionPreset: 'center',   // Snap presets: 'center', 'br', 'bl', 'tr', 'tl', 'custom'
+      posX: 0,
+      posY: 0,
+      scale: 1.0,
+      rotation: 0,
+      transparentBg: true,        // By default transparent overlay!
+      receiptTheme: 'classic',
+      bgPreset: 'transparent',
+      bgMediaUrl: '',
+      bgMediaType: 'video'
     },
 
     // 12. Google Search Typing
@@ -3660,9 +3672,47 @@
     } else if (tplId === 'receipt') {
       const st = fxc.querySelector('.r-store'); if (st && data.store) st.textContent = data.store;
       const tot = fxc.querySelector('.r-total-val'); if (tot && data.total) tot.textContent = data.total;
-      const wrap = fxc.querySelector('.r-items-wrap');
-      if (wrap && Array.isArray(data.items)) {
-        wrap.innerHTML = data.items.map(it => `<div class="r-item"><span class="name">${it.name || it}</span><span class="price">${it.price || ''}</span></div>`).join('');
+      const auth = fxc.querySelector('.r-auth'); if (auth && data.authCode) auth.textContent = data.authCode;
+      const wrapItems = fxc.querySelector('.r-items-wrap');
+      if (wrapItems && Array.isArray(data.items)) {
+        wrapItems.innerHTML = data.items.map(it => `<div class="r-item"><span class="name">${it.name || it}</span><span class="price">${it.price || ''}</span></div>`).join('');
+      }
+      const isOverlay = data.isOverlay !== false;
+      const isTrans = data.transparentBg !== false && isOverlay;
+      const root = fxc.querySelector('.tpl-receipt');
+      if (root) {
+        if (isOverlay) {
+          root.classList.add('is-overlay-mode');
+          root.classList.remove('is-object-mode');
+        } else {
+          root.classList.add('is-object-mode');
+          root.classList.remove('is-overlay-mode');
+        }
+        if (isTrans) {
+          root.classList.add('is-transparent');
+          root.style.background = 'transparent';
+        } else {
+          root.classList.remove('is-transparent');
+          root.style.background = '';
+        }
+        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+          window.tplSyncUniversalBgStageLayer(root, data);
+        }
+      }
+      const wrap = fxc.querySelector('.r-wrap');
+      if (wrap) {
+        const posX = typeof data.posX === 'number' ? data.posX : 0;
+        const posY = typeof data.posY === 'number' ? data.posY : 0;
+        const scale = typeof data.scale === 'number' ? data.scale : 1.0;
+        const rot = typeof data.rotation === 'number' ? data.rotation : 0;
+        wrap.style.transform = `translate(${posX}px, ${posY}px) scale(${scale}) rotate(${rot}deg)`;
+      }
+      const paper = fxc.querySelector('.r-paper');
+      if (paper && data.receiptTheme) {
+        paper.className = `r-paper theme-${data.receiptTheme}`;
+      }
+      if (typeof window.tplUpdateTransformBox === 'function') {
+        window.tplUpdateTransformBox();
       }
     } else if (tplId === 'google') {
       const q = fxc.querySelector('.g-query, .typed-text'); if (q && data.query !== undefined) q.textContent = data.query;
@@ -5212,6 +5262,554 @@
 
       return;
     }
+
+    // =========================================================================
+    // SPECIAL HANDLER: RECEIPT / INVOICE OVERLAY & OBJECT (receipt)
+    // =========================================================================
+    if (tplId === 'receipt') {
+      const isOverlay = data.isOverlay !== false; // Default: true (overlay)
+      const isTrans = data.transparentBg !== false && isOverlay;
+      const curPreset = data.positionPreset || 'center';
+      const curStore = data.store || 'WHOLE FOODS MARKET';
+      const curAuth = data.authCode || 'TERM #0491 \u00b7 AUTH VERIFIED';
+      const curTotal = data.total || '$34.28';
+      const curItems = Array.isArray(data.items) && data.items.length ? data.items : [
+        { name: 'Organic Almond Milk', price: '$4.99' },
+        { name: 'Avocado 4-Pack', price: '$6.49' },
+        { name: 'Grass-Fed Ribeye', price: '$22.80' }
+      ];
+      const curX = typeof data.posX === 'number' ? data.posX : 0;
+      const curY = typeof data.posY === 'number' ? data.posY : 0;
+      const curScale = typeof data.scale === 'number' ? data.scale : 1.0;
+      const curRot = typeof data.rotation === 'number' ? data.rotation : 0;
+      const curTheme = data.receiptTheme || 'classic';
+
+      const presets = [
+        { id: 'tl', label: '\u2196 Top Left', desc: 'Top Left Corner' },
+        { id: 'tr', label: '\u2197 Top Right', desc: 'Top Right Corner' },
+        { id: 'center', label: '\u23fa Center (Default)', desc: 'Center Stage' },
+        { id: 'bl', label: '\u2199 Bottom Left', desc: 'Bottom Left Corner' },
+        { id: 'br', label: '\u2198 Bottom Right', desc: 'Bottom Right Corner' }
+      ];
+
+      const quickReceiptTemplates = [
+        {
+          id: 'grocery',
+          label: '\ud83d\uded2 Whole Foods ($34.28)',
+          store: 'WHOLE FOODS MARKET',
+          auth: 'TERM #0491 \u00b7 AUTH VERIFIED',
+          theme: 'classic',
+          total: '$34.28',
+          items: [
+            { name: 'Organic Almond Milk', price: '$4.99' },
+            { name: 'Avocado 4-Pack', price: '$6.49' },
+            { name: 'Grass-Fed Ribeye', price: '$22.80' }
+          ]
+        },
+        {
+          id: 'apple',
+          label: '\ud83d\udcbb Apple Store ($1,299)',
+          store: 'APPLE FIFTH AVENUE',
+          auth: 'ORD #8921 \u00b7 INVOICE PAID',
+          theme: 'dark',
+          total: '$1,299.00',
+          items: [
+            { name: 'MacBook Air M3 16GB', price: '$1,099.00' },
+            { name: 'AppleCare+ 3-Year Plan', price: '$149.00' },
+            { name: 'USB-C Dual 35W Adapter', price: '$51.00' }
+          ]
+        },
+        {
+          id: 'cafe',
+          label: '\u2615 Starbucks ($14.75)',
+          store: 'STARBUCKS RESERVE',
+          auth: 'STORE #204 \u00b7 REGISTER 02',
+          theme: 'thermal',
+          total: '$14.75',
+          items: [
+            { name: 'Iced Brown Sugar Oat', price: '$6.25' },
+            { name: 'Nitro Cold Brew Cream', price: '$5.50' },
+            { name: 'Butter Croissant Warmed', price: '$3.00' }
+          ]
+        },
+        {
+          id: 'luxury',
+          label: '\ud83d\udecd\ufe0f Gucci Luxury ($2,850)',
+          store: 'GUCCI BEVERLY HILLS',
+          auth: 'VIP CLIENT ID #00482',
+          theme: 'luxury',
+          total: '$2,850.00',
+          items: [
+            { name: 'GG Marmont Matelass\u00e9 Bag', price: '$2,450.00' },
+            { name: 'Silk Monogram Scarf', price: '$400.00' }
+          ]
+        },
+        {
+          id: 'flight',
+          label: '\u2708\ufe0f Emirates Airline ($840)',
+          store: 'EMIRATES AIRLINE',
+          auth: 'TKT #176-928401 \u00b7 CONFIRMED',
+          theme: 'kraft',
+          total: '$840.00',
+          items: [
+            { name: 'JFK \u2192 DXB Economy Flex', price: '$720.00' },
+            { name: 'Extra Legroom Row 18', price: '$70.00' },
+            { name: 'Onboard High-Speed WiFi', price: '$50.00' }
+          ]
+        }
+      ];
+
+      const paperThemes = [
+        { id: 'classic', label: 'Classic White', border: '#cbd5e1' },
+        { id: 'thermal', label: 'Thermal Yellow', border: '#fef08a' },
+        { id: 'dark', label: 'Dark Obsidian', border: '#38bdf8' },
+        { id: 'kraft', label: 'Kraft Brown', border: '#d97706' },
+        { id: 'luxury', label: 'Gold Luxury', border: '#f59e0b' }
+      ];
+
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.65);">
+          
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:rgba(56,189,248,0.2);color:#38bdf8;font-size:12px;font-weight:900;">\ud83e\uddfe</span>
+              <span style="font-size: 11.5px; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.5px;">Receipt / Invoice Controls</span>
+            </div>
+            <span style="font-size: 9px; color: ${isOverlay ? '#38bdf8' : '#a855f7'}; font-weight: 800; background: ${isOverlay ? 'rgba(56,189,248,0.15)' : 'rgba(168,85,247,0.15)'}; border: 1px solid ${isOverlay ? 'rgba(56,189,248,0.3)' : 'rgba(168,85,247,0.3)'}; padding: 2px 7px; border-radius: 4px;">${isOverlay ? 'OVERLAY MODE (DEFAULT)' : 'STANDALONE OBJECT'}</span>
+          </div>
+
+          <!-- Section 1: Behavior Switcher (Overlay vs Standalone Object) -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Behavior & Display Mode</span>
+              <span style="font-size: 8.5px; color: ${isOverlay ? '#38bdf8' : '#a855f7'}; font-weight: 700;">${isOverlay ? '\u2605 DEFAULT OVERLAY' : 'STUDIO OBJECT'}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <button type="button" id="rcpt-btn-mode-overlay" style="padding: 8px 10px; font-size: 10px; font-weight: 700; border-radius: 8px; border: 1.5px solid ${isOverlay ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${isOverlay ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)'}; color: ${isOverlay ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; transition: all 0.15s; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="color: #38bdf8; font-size: 11px;">\u2728</span>
+                  <span style="font-weight: 800; color: ${isOverlay ? '#38bdf8' : '#e2e8f0'};">Video Overlay</span>
+                </div>
+                <span style="font-size: 8px; color: #94a3b8; line-height: 1.2;">Transparent floating sticker on video B-roll / clips</span>
+              </button>
+              <button type="button" id="rcpt-btn-mode-object" style="padding: 8px 10px; font-size: 10px; font-weight: 700; border-radius: 8px; border: 1.5px solid ${!isOverlay ? '#a855f7' : 'rgba(255,255,255,0.1)'}; background: ${!isOverlay ? 'rgba(168,85,247,0.2)' : 'rgba(255,255,255,0.03)'}; color: ${!isOverlay ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; transition: all 0.15s; text-align: left;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                  <span style="color: #a855f7; font-size: 11px;">\ud83d\udce6</span>
+                  <span style="font-weight: 800; color: ${!isOverlay ? '#c084fc' : '#e2e8f0'};">Scene Object</span>
+                </div>
+                <span style="font-size: 8px; color: #94a3b8; line-height: 1.2;">Centered item on dark studio desk backdrop</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 2: Placement & Snap Presets -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Position Presets</span>
+              <span style="font-size: 8.5px; color: #64748b; font-family: monospace;">${curPreset.toUpperCase()}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              ${presets.slice(0, 2).map(p => `
+                <button type="button" class="rcpt-preset-btn" data-preset="${p.id}" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1px solid ${curPreset === p.id ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${curPreset === p.id ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.04)'}; color: ${curPreset === p.id ? '#38bdf8' : '#cbd5e1'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s;">
+                  ${p.label}
+                </button>
+              `).join('')}
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 6px;">
+              <button type="button" class="rcpt-preset-btn" data-preset="center" style="padding: 7px 8px; font-size: 10.5px; font-weight: 800; border-radius: 6px; border: 1px solid ${curPreset === 'center' ? '#38bdf8' : 'rgba(56,189,248,0.35)'}; background: ${curPreset === 'center' ? 'rgba(56,189,248,0.25)' : 'rgba(15,23,42,0.6)'}; color: ${curPreset === 'center' ? '#38bdf8' : '#e2e8f0'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
+                \u23fa Center (Default)
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;">
+              ${presets.slice(3, 5).map(p => `
+                <button type="button" class="rcpt-preset-btn" data-preset="${p.id}" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1px solid ${curPreset === p.id ? '#38bdf8' : 'rgba(255,255,255,0.12)'}; background: ${curPreset === p.id ? 'rgba(56,189,248,0.22)' : 'rgba(255,255,255,0.04)'}; color: ${curPreset === p.id ? '#38bdf8' : '#cbd5e1'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: all 0.15s;">
+                  ${p.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 3: Fine-Tuning Sliders (X, Y, Scale, Rotation) -->
+          <div style="display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.3); padding: 9px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">Direct Transform Sliders</span>
+              <button type="button" id="rcpt-btn-reset-tf" style="font-size: 8px; font-weight: 700; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #94a3b8; padding: 2px 7px; border-radius: 4px; cursor: pointer;">Reset Position</button>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>X Position</span>
+                  <span id="rcpt-val-x" style="color: #38bdf8; font-family: monospace;">${curX}px</span>
+                </div>
+                <input type="range" id="rcpt-slider-x" min="-360" max="360" value="${curX}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Y Position</span>
+                  <span id="rcpt-val-y" style="color: #38bdf8; font-family: monospace;">${curY}px</span>
+                </div>
+                <input type="range" id="rcpt-slider-y" min="-200" max="200" value="${curY}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Scale Size</span>
+                  <span id="rcpt-val-scale" style="color: #38bdf8; font-family: monospace;">${Math.round(curScale * 100)}%</span>
+                </div>
+                <input type="range" id="rcpt-slider-scale" min="40" max="220" value="${Math.round(curScale * 100)}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Paper Tilt Angle</span>
+                  <span id="rcpt-val-rot" style="color: #38bdf8; font-family: monospace;">${curRot}\u00b0</span>
+                </div>
+                <input type="range" id="rcpt-slider-rot" min="-25" max="25" value="${curRot}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div style="font-size: 8.5px; color: #64748b; font-style: italic; display: flex; align-items: center; gap: 4px;">
+              <span>\ud83d\udca1</span> <span>Tap directly on preview canvas to drag or corner-resize with selection box.</span>
+            </div>
+          </div>
+
+          <!-- Section 4: Quick Story Presets Chips -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Quick Preset Templates</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              ${quickReceiptTemplates.map(t => `
+                <button type="button" class="rcpt-quick-preset-btn" data-qid="${t.id}" style="font-size: 8.5px; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; padding: 3px 7px; border-radius: 5px; cursor: pointer; transition: all 0.15s;">
+                  ${t.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 5: Receipt Content Editor -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Receipt / Invoice Content</span>
+            
+            <!-- Store Name & Header -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #cbd5e1;">Store / Brand Name</span>
+                <input type="text" id="rcpt-inp-store" value="${curStore}" placeholder="Store name" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9px; font-weight: 700; color: #cbd5e1;">Auth / Subtitle</span>
+                <input type="text" id="rcpt-inp-auth" value="${curAuth}" placeholder="Auth info" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+              </div>
+            </div>
+
+            <!-- Receipt Line Items -->
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; font-weight: 700; color: #cbd5e1;">Itemized Expense Lines</span>
+                <button type="button" id="rcpt-btn-add-item" style="font-size: 9px; font-weight: 700; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; padding: 2px 8px; border-radius: 4px; cursor: pointer;">+ Add Item</button>
+              </div>
+              <div id="rcpt-items-list" style="display: flex; flex-direction: column; gap: 5px; max-height: 180px; overflow-y: auto; padding-right: 2px;">
+                ${curItems.map((it, idx) => `
+                  <div class="rcpt-item-row" data-idx="${idx}" style="display: grid; grid-template-columns: 1fr 75px 24px; gap: 5px; align-items: center;">
+                    <input type="text" class="rcpt-inp-item-name" data-idx="${idx}" value="${it.name || ''}" placeholder="Item name" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 7px; color: #fff; font-size: 10px; outline: none;" />
+                    <input type="text" class="rcpt-inp-item-price" data-idx="${idx}" value="${it.price || ''}" placeholder="$0.00" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 7px; color: #38bdf8; font-size: 10px; font-family: monospace; outline: none; text-align: right;" />
+                    <button type="button" class="rcpt-btn-del-item" data-idx="${idx}" title="Remove Item" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; border-radius: 4px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px;">\u2715</button>
+                  </div>
+                `).join('')}
+              </div>
+              
+              <!-- Total USD Row -->
+              <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; margin-top: 2px;">
+                <span style="font-size: 9.5px; font-weight: 800; color: #f8fafc; text-transform: uppercase;">Total USD</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <button type="button" id="rcpt-btn-auto-sum" style="font-size: 8px; font-weight: 700; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #22c55e; padding: 2px 5px; border-radius: 3px; cursor: pointer;" title="Auto-sum items">\u2211 Auto-Sum</button>
+                  <input type="text" id="rcpt-inp-total" value="${curTotal}" style="width: 80px; background: transparent; border: none; color: #22c55e; font-size: 12px; font-weight: 800; font-family: monospace; text-align: right; outline: none;" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 6: Paper Theme & Material -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Paper Theme & Texture</span>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+              ${paperThemes.map(th => `
+                <button type="button" class="rcpt-theme-btn" data-theme="${th.id}" style="padding: 5px 7px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${curTheme === th.id ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${curTheme === th.id ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)'}; color: ${curTheme === th.id ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; transition: all 0.15s;">
+                  ${th.label}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 7: Layer Compositing & Video Overlay -->
+          <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Layer &amp; Backdrop Compositing</span>
+              <span style="font-size: 8.5px; color: #22c55e; font-weight: 700;">VIDEO READY</span>
+            </div>
+            <!-- Transparent Background Checkbox -->
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.25); padding: 6px 8px; border-radius: 6px;">
+              <input type="checkbox" id="rcpt-chk-trans" ${isTrans ? 'checked' : ''} style="accent-color: #22c55e;" />
+              <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 10px; color: #f8fafc; font-weight: 700;">Transparent Foreground Overlay</span>
+                <span style="font-size: 8.5px; color: #94a3b8;">Place directly on top of video clips or B-roll with zero background blackness</span>
+              </div>
+            </label>
+
+            <!-- Universal Backdrop & Custom Video Upload -->
+            ${window.tplBuildUniversalBgHtml ? window.tplBuildUniversalBgHtml(data) : ''}
+          </div>
+
+        </div>
+      `;
+
+      // --- EVENT HANDLERS ---
+      // Mode Switchers (Overlay vs Object)
+      container.querySelector('#rcpt-btn-mode-overlay')?.addEventListener('click', () => {
+        window.tplSetContextualData('receipt', { isOverlay: true, transparentBg: true });
+        window.tplApplyContextualDataToPreview('receipt');
+        window.tplRenderContextualInspector('receipt');
+      });
+
+      container.querySelector('#rcpt-btn-mode-object')?.addEventListener('click', () => {
+        window.tplSetContextualData('receipt', { isOverlay: false, transparentBg: false, positionPreset: 'center' });
+        if (typeof window.tplApplyReceiptPreset === 'function') {
+          window.tplApplyReceiptPreset('center');
+        }
+        window.tplApplyContextualDataToPreview('receipt');
+        window.tplRenderContextualInspector('receipt');
+      });
+
+      // Preset buttons
+      container.querySelectorAll('.rcpt-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const pid = btn.dataset.preset;
+          if (typeof window.tplApplyReceiptPreset === 'function') {
+            window.tplApplyReceiptPreset(pid);
+          } else {
+            let px = 0, py = 0;
+            if (pid === 'tl') { px = -200; py = -100; }
+            else if (pid === 'tr') { px = 200; py = -100; }
+            else if (pid === 'bl') { px = -200; py = 90; }
+            else if (pid === 'br') { px = 200; py = 90; }
+            window.tplSetContextualData('receipt', { posX: px, posY: py, positionPreset: pid });
+            window.tplApplyContextualDataToPreview('receipt');
+          }
+          window.tplRenderContextualInspector('receipt');
+        });
+      });
+
+      // Sliders
+      const sliderX = container.querySelector('#rcpt-slider-x');
+      const valX = container.querySelector('#rcpt-val-x');
+      sliderX?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (valX) valX.textContent = `${val}px`;
+        if (typeof topCustomizerState !== 'undefined' && topCustomizerState.transforms && topCustomizerState.transforms.fg) {
+          topCustomizerState.transforms.fg.x = val;
+        }
+        window.tplSetContextualData('receipt', { posX: val, positionPreset: 'custom' });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      const sliderY = container.querySelector('#rcpt-slider-y');
+      const valY = container.querySelector('#rcpt-val-y');
+      sliderY?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        if (valY) valY.textContent = `${val}px`;
+        if (typeof topCustomizerState !== 'undefined' && topCustomizerState.transforms && topCustomizerState.transforms.fg) {
+          topCustomizerState.transforms.fg.y = val;
+        }
+        window.tplSetContextualData('receipt', { posY: val, positionPreset: 'custom' });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      const sliderScale = container.querySelector('#rcpt-slider-scale');
+      const valScale = container.querySelector('#rcpt-val-scale');
+      sliderScale?.addEventListener('input', (e) => {
+        const sc = Number((parseInt(e.target.value, 10) / 100).toFixed(2));
+        if (valScale) valScale.textContent = `${Math.round(sc * 100)}%`;
+        if (typeof topCustomizerState !== 'undefined' && topCustomizerState.transforms && topCustomizerState.transforms.fg) {
+          topCustomizerState.transforms.fg.scale = sc;
+        }
+        window.tplSetContextualData('receipt', { scale: sc });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      const sliderRot = container.querySelector('#rcpt-slider-rot');
+      const valRot = container.querySelector('#rcpt-val-rot');
+      sliderRot?.addEventListener('input', (e) => {
+        const rot = parseInt(e.target.value, 10);
+        if (valRot) valRot.textContent = `${rot}\u00b0`;
+        window.tplSetContextualData('receipt', { rotation: rot });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      // Reset transform
+      container.querySelector('#rcpt-btn-reset-tf')?.addEventListener('click', () => {
+        if (typeof window.tplApplyReceiptPreset === 'function') {
+          window.tplApplyReceiptPreset('center');
+        }
+        window.tplSetContextualData('receipt', { posX: 0, posY: 0, scale: 1.0, rotation: 0, positionPreset: 'center' });
+        window.tplApplyContextualDataToPreview('receipt');
+        window.tplRenderContextualInspector('receipt');
+      });
+
+      // Quick template presets
+      container.querySelectorAll('.rcpt-quick-preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const qid = btn.dataset.qid;
+          const matched = quickReceiptTemplates.find(t => t.id === qid);
+          if (matched) {
+            window.tplSetContextualData('receipt', {
+              store: matched.store,
+              authCode: matched.auth,
+              receiptTheme: matched.theme,
+              total: matched.total,
+              items: JSON.parse(JSON.stringify(matched.items))
+            });
+            window.tplApplyContextualDataToPreview('receipt');
+            window.tplRenderContextualInspector('receipt');
+          }
+        });
+      });
+
+      // Store & Auth inputs
+      container.querySelector('#rcpt-inp-store')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('receipt', { store: e.target.value });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      container.querySelector('#rcpt-inp-auth')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('receipt', { authCode: e.target.value });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      // Line items input binding
+      const bindItemEvents = () => {
+        container.querySelectorAll('.rcpt-inp-item-name').forEach(inp => {
+          inp.oninput = (e) => {
+            const idx = parseInt(inp.dataset.idx, 10);
+            const live = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+            const items = [...(live.items || curItems)];
+            if (items[idx]) {
+              items[idx].name = e.target.value;
+              window.tplSetContextualData('receipt', { items });
+              window.tplApplyContextualDataToPreview('receipt');
+            }
+          };
+        });
+
+        container.querySelectorAll('.rcpt-inp-item-price').forEach(inp => {
+          inp.oninput = (e) => {
+            const idx = parseInt(inp.dataset.idx, 10);
+            const live = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+            const items = [...(live.items || curItems)];
+            if (items[idx]) {
+              items[idx].price = e.target.value;
+              window.tplSetContextualData('receipt', { items });
+              window.tplApplyContextualDataToPreview('receipt');
+            }
+          };
+        });
+
+        container.querySelectorAll('.rcpt-btn-del-item').forEach(btn => {
+          btn.onclick = () => {
+            const idx = parseInt(btn.dataset.idx, 10);
+            const live = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+            const items = [...(live.items || curItems)];
+            if (items.length > 1) {
+              items.splice(idx, 1);
+              window.tplSetContextualData('receipt', { items });
+              window.tplApplyContextualDataToPreview('receipt');
+              window.tplRenderContextualInspector('receipt');
+            }
+          };
+        });
+      };
+      bindItemEvents();
+
+      // Add item button
+      container.querySelector('#rcpt-btn-add-item')?.addEventListener('click', () => {
+        const live = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+        const items = [...(live.items || curItems)];
+        items.push({ name: 'New Line Item', price: '$9.99' });
+        window.tplSetContextualData('receipt', { items });
+        window.tplApplyContextualDataToPreview('receipt');
+        window.tplRenderContextualInspector('receipt');
+      });
+
+      // Total input & Auto-sum
+      const inpTotal = container.querySelector('#rcpt-inp-total');
+      inpTotal?.addEventListener('input', (e) => {
+        window.tplSetContextualData('receipt', { total: e.target.value });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      container.querySelector('#rcpt-btn-auto-sum')?.addEventListener('click', () => {
+        const live = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+        const items = live.items || curItems;
+        let sum = 0;
+        items.forEach(it => {
+          const num = parseFloat(String(it.price || '').replace(/[^0-9.]/g, ''));
+          if (!isNaN(num)) sum += num;
+        });
+        const formatted = '$' + sum.toFixed(2);
+        if (inpTotal) inpTotal.value = formatted;
+        window.tplSetContextualData('receipt', { total: formatted });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      // Paper Themes
+      container.querySelectorAll('.rcpt-theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const th = btn.dataset.theme;
+          window.tplSetContextualData('receipt', { receiptTheme: th });
+          window.tplApplyContextualDataToPreview('receipt');
+          window.tplRenderContextualInspector('receipt');
+        });
+      });
+
+      // Transparent Background Toggle
+      container.querySelector('#rcpt-chk-trans')?.addEventListener('change', (e) => {
+        window.tplSetContextualData('receipt', { transparentBg: e.target.checked });
+        window.tplApplyContextualDataToPreview('receipt');
+      });
+
+      // Wire universal background controls (for video/img underneath)
+      if (typeof window.tplWireUniversalBgControls === 'function') {
+        window.tplWireUniversalBgControls('receipt', container);
+      }
+
+      // Sync function called when dragged/scaled directly on stage
+      window.tplSyncReceiptInspectorUI = function() {
+        const liveData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('receipt') : {};
+        const sx = document.getElementById('rcpt-slider-x');
+        const vx = document.getElementById('rcpt-val-x');
+        if (sx && typeof liveData.posX === 'number') { sx.value = liveData.posX; }
+        if (vx && typeof liveData.posX === 'number') { vx.textContent = `${liveData.posX}px`; }
+
+        const sy = document.getElementById('rcpt-slider-y');
+        const vy = document.getElementById('rcpt-val-y');
+        if (sy && typeof liveData.posY === 'number') { sy.value = liveData.posY; }
+        if (vy && typeof liveData.posY === 'number') { vy.textContent = `${liveData.posY}px`; }
+
+        const ss = document.getElementById('rcpt-slider-scale');
+        const vs = document.getElementById('rcpt-val-scale');
+        if (ss && typeof liveData.scale === 'number') { ss.value = Math.round(liveData.scale * 100); }
+        if (vs && typeof liveData.scale === 'number') { vs.textContent = `${Math.round(liveData.scale * 100)}%`; }
+
+        const sr = document.getElementById('rcpt-slider-rot');
+        const vr = document.getElementById('rcpt-val-rot');
+        if (sr && typeof liveData.rotation === 'number') { sr.value = liveData.rotation; }
+        if (vr && typeof liveData.rotation === 'number') { vr.textContent = `${liveData.rotation}\u00b0`; }
+      };
+
+      return;
+    }
+
 
     // =========================================================================
     // GOOGLE SEARCH FX SUITE (3D Glassmorphic & Classic 2D Card)

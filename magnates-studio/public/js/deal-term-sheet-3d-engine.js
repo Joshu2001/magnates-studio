@@ -4,7 +4,8 @@
  *
  * Features:
  * 1. Material Shaders & Geometry:
- *    - Authentic vertical US Letter / A4 paper geometry (8.5" x 11" aspect ratio)
+ *    - Authentic vertical US Letter paper geometry (8.5" x 11" aspect ratio)
+ *    - Dual-layer mesh: physical paper box edge + plane front face with direct UV mapping
  *    - Heavy cotton paper micro-fiber grain, subtle corner curvature, and physical edge thickness
  *    - Realistic fountain-pen cursive ink trailing with pressure variation (thick downstrokes, thin upstrokes)
  *    - Dual rubber ink stamps ("DEAL CLOSED" & "APPROVED") with porous ink bleed and multiply blending
@@ -18,6 +19,7 @@
  *    - Angled archival vintage map (/paper_tear_stock_vintage_map.jpg) resting in the upper left corner
  *    - Directional warm overhead key spotlight with soft contact shadows and peripheral vignette falloff
  * 4. Production Integration:
+ *    - Full segmented Video / 3D switcher in contextual inspector
  *    - Real-time customizer playback, timeline scrub synchronization, and 4K canvas video export
  */
 
@@ -29,6 +31,9 @@
   // Default Doc-Drama Legal Term Sheet Configuration
   const DEFAULT_CONFIG = {
     type: 'deal-term-sheet',
+    is3DMode: true,
+    cameraPitch: 29,
+    cameraYaw: -13,
     title: 'TERM SHEET \u00b7 SERIES A',
     companyName: 'ACME CORP / ATLAS VENTURES',
     preamble: '1. The undersigned parties hereby execute this binding Term Sheet setting forth the principal terms of the Series A Preferred Stock financing of the Company.',
@@ -37,7 +42,7 @@
     boardSeatsText: 'Board seats: 2 investor, 3 founder',
     liquidationPrefText: 'Liquidation pref: 1x non-participating',
     clause2: '2. The fountain pen execution hereto represents definitive agreement, binding upon all corporate parties and successors. Escrow conditions shall close within thirty (30) business days under Delaware Law.',
-    clause3: '3. The fountain pen ink shall constitute binding execution upon delivery.',
+    clause3: '3. The fountain pen ink shall constitute binding execution upon delivery to legal escrow.',
     signatureLabel: 'Signature,',
     signeeName: 'Alexander Vance',
     stamp1Text: 'DEAL CLOSED',
@@ -48,10 +53,10 @@
     highlighterColor: '#facc15',
     inkColor: '#1e293b',
     stampColor: '#b91c1c',
-    surfaceType: 'mahogany', // 'mahogany', 'tactical_grid', 'dark_leather'
+    surfaceType: 'mahogany', // 'mahogany', 'tactical_grid'
     cameraPreset: 'macro_cinematic', // 'macro_cinematic', 'isometric_evidence', 'top_down_dossier'
     lightWarmth: '#fff3db',
-    lightIntensity: 2.2,
+    lightIntensity: 2.4,
     duration: 5.0
   };
 
@@ -64,7 +69,8 @@
   let tsGroup = null;
 
   // Meshes
-  let paperMesh = null;
+  let paperBoxMesh = null;
+  let paperFrontMesh = null;
   let tableMesh = null;
   let mapMesh = null;
   let contactShadowMesh = null;
@@ -79,6 +85,11 @@
   let manualT = 0;
   let animClock = 0;
   let lastTimestamp = 0;
+
+  // Video Mode State
+  let videoAnimFrame = null;
+  let videoClock = 0;
+  let videoLastTimestamp = 0;
 
   // Texture Cache
   const textureCache = new Map();
@@ -106,7 +117,7 @@
     const ct = Math.max(0, Math.min(dur, t !== undefined ? t : (dur * 0.9)));
     // Quantize cache key to ~30fps for smooth performance during playback
     const frameIndex = Math.round(ct * 30);
-    const key = `ts_tex_${frameIndex}_${data.valuationText}_${data.investmentText}_${data.stamp1Text}_${data.paperTone}`;
+    const key = `ts_tex_${frameIndex}_${data.valuationText}_${data.investmentText}_${data.stamp1Text}_${data.paperTone}_${data.signeeName}`;
 
     if (textureCache.has(key)) return textureCache.get(key);
 
@@ -123,7 +134,7 @@
 
     // Subtle edge aging / vignette on paper
     const paperGrad = ctx.createRadialGradient(w * 0.5, h * 0.5, w * 0.3, w * 0.5, h * 0.5, w * 0.72);
-    paperGrad.addColorStop(0, 'rgba(255, 255, 255, 0.15)');
+    paperGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
     paperGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0)');
     paperGrad.addColorStop(1, 'rgba(120, 85, 45, 0.12)'); // Aged paper edge patina
     ctx.fillStyle = paperGrad;
@@ -132,7 +143,6 @@
     // 2. Cotton Paper Micro-Fiber Grain
     const imgData = ctx.getImageData(0, 0, w, h);
     const pix = imgData.data;
-    // Fast pseudo-noise loop
     for (let i = 0; i < pix.length; i += 8) {
       const n = (Math.random() - 0.5) * 11;
       pix[i] = Math.min(255, Math.max(0, pix[i] + n));
@@ -142,18 +152,17 @@
     ctx.putImageData(imgData, 0, 0);
 
     // Subtle fine legal borders
-    ctx.strokeStyle = 'rgba(40, 25, 15, 0.08)';
+    ctx.strokeStyle = 'rgba(40, 25, 15, 0.1)';
     ctx.lineWidth = 1;
     ctx.strokeRect(40, 40, w - 80, h - 80);
 
     const marginX = 140;
     let currentY = 170;
 
-    // 3. Clause 1 & Legal Preamble (Small Formal Legal Font)
+    // 3. Clause 1 & Legal Preamble (Formal Legal Monospace)
     ctx.fillStyle = '#475569';
     ctx.font = '500 21px "Courier New", Courier, monospace';
     ctx.textAlign = 'left';
-    ctx.letterSpacing = '0.5px';
 
     const preambleLines = [
       'The undersigned parties enter into this binding Term Sheet for the Series A Preferred',
@@ -171,7 +180,6 @@
     ctx.fillStyle = '#1e293b';
     ctx.font = '900 38px "JetBrains Mono", "Courier New", monospace';
     ctx.textAlign = 'center';
-    ctx.letterSpacing = '4px';
     ctx.fillText(data.title || 'TERM SHEET \u00b7 SERIES A', w * 0.5, currentY);
 
     currentY += 22;
@@ -188,7 +196,7 @@
     currentY += 80;
 
     // 5. Deal Key Terms with Animated Yellow Highlighter Sweeps
-    // Timing: Line 1 highlights from t=0.6s to 1.3s; Line 2 highlights from t=1.1s to 1.8s
+    // Line 1 highlights from t=0.6s to 1.3s; Line 2 highlights from t=1.1s to 1.8s
     const hlT1 = Math.max(0, Math.min(1, (ct - 0.6) / 0.7));
     const hlT2 = Math.max(0, Math.min(1, (ct - 1.1) / 0.7));
 
@@ -203,8 +211,7 @@
     if (hlT1 > 0) {
       ctx.save();
       ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = 'rgba(250, 204, 21, 0.82)'; // Rich yellow marker
-      // Chiseled marker sweep
+      ctx.fillStyle = data.highlighterColor || 'rgba(250, 204, 21, 0.85)';
       const drawW = valW * hlT1;
       ctx.beginPath();
       ctx.moveTo(marginX - 10, currentY - 32);
@@ -228,7 +235,7 @@
     if (hlT2 > 0) {
       ctx.save();
       ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = 'rgba(250, 204, 21, 0.82)';
+      ctx.fillStyle = data.highlighterColor || 'rgba(250, 204, 21, 0.85)';
       const drawW = invW * hlT2;
       ctx.beginPath();
       ctx.moveTo(marginX - 10, currentY - 32);
@@ -270,14 +277,14 @@
     currentY += 85;
 
     // 7. Signature Line & Fountain Pen Cursive Execution
-    // Timing: Signature draws from t=1.8s to 3.2s
+    // Signature draws from t=1.8s to 3.2s
     const sigProgress = Math.max(0, Math.min(1, (ct - 1.8) / 1.4));
 
     ctx.fillStyle = '#1e293b';
     ctx.font = '700 28px "Georgia", serif';
     ctx.fillText(data.signatureLabel || 'Signature,', marginX, currentY);
 
-    // Signature line
+    // Signature rule
     ctx.strokeStyle = 'rgba(30, 41, 59, 0.45)';
     ctx.lineWidth = 1.8;
     ctx.beginPath();
@@ -356,10 +363,9 @@
     ctx.fillText('AUTHORIZED SIGNATURE \u00b7 CEO / MANAGING PARTNER', marginX + 175, currentY + 36);
 
     // 8. Authentic Rubber Stamps ("DEAL CLOSED" and "APPROVED")
-    // Stamp 1: DEAL CLOSED slams at t=3.2s
+    // Stamp 1: DEAL CLOSED slams at t=3.1s
     if (data.showStamp1 !== false && ct >= 3.1) {
       const stampProg1 = Math.max(0, Math.min(1, (ct - 3.1) / 0.35));
-      // Slam impact bounce
       const scale1 = stampProg1 < 0.6
         ? (2.2 - (stampProg1 / 0.6) * 1.25)
         : (0.95 + (stampProg1 - 0.6) * 0.125);
@@ -376,7 +382,7 @@
       });
     }
 
-    // Stamp 2: APPROVED slams at t=3.65s (offset lower right, overlapping)
+    // Stamp 2: APPROVED slams at t=3.6s
     if (data.showStamp2 !== false && ct >= 3.6) {
       const stampProg2 = Math.max(0, Math.min(1, (ct - 3.6) / 0.35));
       const scale2 = stampProg2 < 0.6
@@ -428,10 +434,9 @@
     ctx.fillStyle = color || '#b91c1c';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.letterSpacing = '3px';
     ctx.fillText(text, 0, 1);
 
-    // Stamp ink voids & micro-distress (porous rubber stamp texture)
+    // Stamp ink voids & micro-distress
     ctx.fillStyle = 'rgba(245, 240, 225, 0.45)';
     for (let i = 0; i < 28; i++) {
       const rx = (Math.random() - 0.5) * boxW;
@@ -449,7 +454,6 @@
    * - Dark Executive Mahogany Desk
    * - Archival Vintage Map sitting in the upper left
    * - Soft Contact Shadow Mesh
-   * - PBR Lighting Rig with Warm Directional Key Spotlight
    */
   function buildStudioEnvironment(data) {
     // 1. Mahogany Desk Surface
@@ -460,7 +464,6 @@
       tableTex = new THREE.Texture(mahoganyImg);
       tableTex.needsUpdate = true;
     } else {
-      // Fallback rich mahogany procedural canvas
       const cv = document.createElement('canvas');
       cv.width = 512; cv.height = 512;
       const c = cv.getContext('2d');
@@ -542,6 +545,9 @@
 
   /**
    * Builds the 3D Vertical US Letter Legal Term Sheet Mesh ($8.5" \times 11"$)
+   * Uses dual-mesh architecture:
+   * 1. paperBoxMesh for authentic 3D cotton paper thickness
+   * 2. paperFrontMesh (PlaneGeometry) with standard UV mapping for the procedural document canvas
    */
   function buildTermSheetAssembly(data, t) {
     if (tsGroup && tsScene) {
@@ -551,53 +557,66 @@
 
     tsGroup = new THREE.Group();
 
-    // Vertical US Letter Document Proportions (width = 138, height = 180, thickness = 0.6)
-    const docWidth = 138;
-    const docHeight = 180;
+    // Vertical US Letter Document Proportions: 8.5" x 11" (width = 140, height = 181.18, thickness = 0.6)
+    const docWidth = 140;
+    const docHeight = 181.18;
     const docThickness = 0.6;
 
     const paperCanvas = generateTermSheetTexture(data, t);
     const paperTex = new THREE.CanvasTexture(paperCanvas);
     paperTex.anisotropy = 8;
+    paperTex.generateMipmaps = true;
 
-    // Front & Back materials
-    const frontMat = new THREE.MeshStandardMaterial({
-      map: paperTex,
-      roughness: 0.82,
-      metalness: 0.02,
-      bumpScale: 0.02
-    });
-
-    const backMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color(data.paperTone || '#f5f0e1'),
-      roughness: 0.85,
-      metalness: 0.02
-    });
-
+    // 1. Physical paper edge & back box
     const sideMat = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#e2d8c3'), // Physical paper border cut edge
+      color: new THREE.Color(data.paperTone || '#f5f0e1'),
       roughness: 0.9,
       metalness: 0.01
     });
 
-    // Box Geometry: [right, left, top, bottom, front, back]
-    const materials = [sideMat, sideMat, sideMat, sideMat, frontMat, backMat];
     const docGeo = new THREE.BoxGeometry(docWidth, docThickness, docHeight);
+    paperBoxMesh = new THREE.Mesh(docGeo, sideMat);
+    paperBoxMesh.castShadow = true;
+    paperBoxMesh.receiveShadow = true;
+    paperBoxMesh.position.set(0, docThickness * 0.5, 0);
+    tsGroup.add(paperBoxMesh);
 
-    paperMesh = new THREE.Mesh(docGeo, materials);
-    paperMesh.castShadow = true;
-    paperMesh.receiveShadow = true;
-    paperMesh.position.set(0, docThickness * 0.5, 0);
-    tsGroup.add(paperMesh);
+    // 2. Paper Front Face Plane (Canvas Texture)
+    // Standard PlaneGeometry guarantees perfect UV orientation
+    const frontMat = new THREE.MeshStandardMaterial({
+      map: paperTex,
+      roughness: 0.82,
+      metalness: 0.02
+    });
 
-    // Apply 3D Spatial Framing: 28°-32° Pitch tilt with slight yaw (matching Image 2)
-    tsGroup.rotation.x = THREE.MathUtils.degToRad(29);
-    tsGroup.rotation.y = THREE.MathUtils.degToRad(-13);
+    const frontGeo = new THREE.PlaneGeometry(docWidth, docHeight);
+    paperFrontMesh = new THREE.Mesh(frontGeo, frontMat);
+    paperFrontMesh.rotation.x = -Math.PI / 2; // Lie flat on top of box (+Y up)
+    paperFrontMesh.position.set(0, docThickness + 0.04, 0); // Raised slightly to avoid z-fighting
+    paperFrontMesh.castShadow = true;
+    paperFrontMesh.receiveShadow = true;
+    tsGroup.add(paperFrontMesh);
+
+    // Apply 3D Spatial Pitch & Yaw tilt (default: ~29° Pitch, -13° Yaw)
+    const pitch = (data.cameraPitch !== undefined) ? data.cameraPitch : 29;
+    const yaw = (data.cameraYaw !== undefined) ? data.cameraYaw : -13;
+    tsGroup.rotation.x = THREE.MathUtils.degToRad(pitch);
+    tsGroup.rotation.y = THREE.MathUtils.degToRad(yaw);
     tsGroup.rotation.z = THREE.MathUtils.degToRad(4.5);
     tsGroup.position.set(16, 8, -5);
 
     tsScene.add(tsGroup);
   }
+
+  /**
+   * Allows real-time tilt / yaw adjustments from inspector sliders
+   */
+  window.tplSetDealTermSheetAngles = function(pitch, yaw) {
+    if (tsGroup) {
+      if (pitch !== undefined) tsGroup.rotation.x = THREE.MathUtils.degToRad(pitch);
+      if (yaw !== undefined) tsGroup.rotation.y = THREE.MathUtils.degToRad(yaw);
+    }
+  };
 
   /**
    * Initializes the Three.js Viewport inside the target container
@@ -697,15 +716,15 @@
    * Updates dynamic 3D elements for timestamp t (0 <= t <= duration)
    */
   function updateAnimationStep(t, data) {
-    if (!paperMesh) return;
+    if (!paperFrontMesh) return;
     const dur = Math.max(1, data.duration || 5.0);
     const ct = Math.max(0, Math.min(dur, t));
 
-    // Update dynamic paper canvas texture (reflecting current highlighter & signature state)
+    // Update dynamic paper canvas texture (reflecting current highlighter, signature & stamps)
     const cv = generateTermSheetTexture(data, ct);
-    if (paperMesh.material && paperMesh.material[4]) {
-      const tex = paperMesh.material[4].map;
-      if (tex && tex.image !== cv) {
+    if (paperFrontMesh.material && paperFrontMesh.material.map) {
+      const tex = paperFrontMesh.material.map;
+      if (tex.image !== cv) {
         tex.image = cv;
         tex.needsUpdate = true;
       }
@@ -734,6 +753,10 @@
       cancelAnimationFrame(tsAnimFrame);
       tsAnimFrame = null;
     }
+    if (videoAnimFrame) {
+      cancelAnimationFrame(videoAnimFrame);
+      videoAnimFrame = null;
+    }
     if (tsControls) {
       tsControls.dispose();
       tsControls = null;
@@ -747,7 +770,8 @@
     }
     tsScene = null;
     tsCamera = null;
-    paperMesh = null;
+    paperBoxMesh = null;
+    paperFrontMesh = null;
     tableMesh = null;
     mapMesh = null;
     contactShadowMesh = null;
@@ -759,6 +783,11 @@
   window.tplMountDealTermSheet3DStage = function(stage, data) {
     if (!stage) return;
     const d = Object.assign({}, DEFAULT_CONFIG, (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(TEMPLATE_ID) : null), data || {});
+
+    // Automatically expand stage to full theater view in 3D Mode
+    if (typeof window.applyModeLayout === 'function') {
+      window.applyModeLayout(true);
+    }
 
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #080a0f; overflow: hidden; cursor: grab; user-select: none;">
@@ -773,8 +802,8 @@
           <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #facc15; background: rgba(10,12,18,0.92); border: 1px solid rgba(250,204,21,0.4); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
             3D TERM SHEET RIG &bull; US LETTER 8.5"&times;11" &bull; FOUNTAIN PEN INK &bull; RUBBER STAMPS
           </span>
-          <span style="font-family: monospace; font-size: 9px; color: #94a3b8; background: rgba(10,12,18,0.75); border: 1px solid rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 4px;">
-            DRAG TO ORBIT
+          <span style="font-family: monospace; font-size: 9px; color: #2effc6; background: rgba(10,12,18,0.85); border: 1px solid rgba(46,255,198,0.3); padding: 3px 6px; border-radius: 4px; font-weight: 700;">
+            DRAG TO ORBIT / TILT
           </span>
         </div>
       </div>
@@ -791,6 +820,96 @@
   };
 
   /**
+   * Mounts the Flat 2D Video Stage for Deal Term Sheet
+   */
+  window.tplMountDealTermSheetVideoStage = function(stage, data) {
+    if (!stage) return;
+    const d = Object.assign({}, DEFAULT_CONFIG, (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(TEMPLATE_ID) : null), data || {});
+    cleanupDealTermSheet3DScene();
+
+    // Standard layout (playback bar & storyboard visible)
+    if (typeof window.applyModeLayout === 'function') {
+      window.applyModeLayout(false);
+    }
+
+    stage.innerHTML = `
+      <div id="term-sheet-video-stage" style="position: absolute; inset: 0; background: #080a0f; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+        <canvas id="term-sheet-video-canvas" width="1280" height="720" style="width: 100%; height: 100%; object-fit: contain;"></canvas>
+        <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; z-index: 40; display: flex; align-items: center; gap: 8px;">
+          <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #38bdf8; background: rgba(10,12,18,0.92); border: 1px solid rgba(56,189,248,0.4); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
+            FLAT VIDEO MODE &bull; US LETTER 8.5"&times;11" &bull; DOC-DRAMA
+          </span>
+        </div>
+      </div>
+    `;
+
+    const cv = stage.querySelector('#term-sheet-video-canvas');
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+
+    videoClock = 0;
+    videoLastTimestamp = performance.now();
+
+    function vLoop(now) {
+      videoAnimFrame = requestAnimationFrame(vLoop);
+      const dt = (now - videoLastTimestamp) / 1000;
+      videoLastTimestamp = now;
+
+      if (!isManualScrub) {
+        videoClock = (videoClock + dt) % (d.duration || 5.0);
+      } else {
+        videoClock = manualT;
+      }
+      renderDealTermSheetDirect2D(ctx, d, videoClock, cv.width, cv.height);
+    }
+    videoAnimFrame = requestAnimationFrame(vLoop);
+  };
+
+  /**
+   * Direct 2D Canvas Blit for Video Stage, Hover Thumbnails, and Video Export
+   */
+  function renderDealTermSheetDirect2D(ctx, d, t, cw, ch) {
+    if (!ctx) return;
+    const dur = Math.max(1, d.duration || 5.0);
+    const ct = Math.max(0, Math.min(dur, t));
+
+    // 1. Draw mahogany desk background
+    const deskImg = imageAssets.get('/mahogany_desk_texture.jpg');
+    if (deskImg && deskImg.complete) {
+      ctx.drawImage(deskImg, 0, 0, cw, ch);
+    } else {
+      ctx.fillStyle = '#1c0f0a';
+      ctx.fillRect(0, 0, cw, ch);
+    }
+
+    // 2. Draw archival vintage map in top left
+    const mapImg = imageAssets.get('/paper_tear_stock_vintage_map.jpg');
+    if (mapImg && mapImg.complete) {
+      ctx.save();
+      ctx.translate(cw * 0.14, ch * 0.16);
+      ctx.rotate(-26 * Math.PI / 180);
+      ctx.drawImage(mapImg, -cw * 0.18, -ch * 0.18, cw * 0.36, ch * 0.32);
+      ctx.restore();
+    }
+
+    // 3. Draw vertical US Letter legal term sheet with realistic perspective slant & drop shadow
+    const cv = generateTermSheetTexture(d, ct);
+
+    ctx.save();
+    ctx.translate(cw * 0.52, ch * 0.51);
+    ctx.transform(1, -0.05, 0.18, 0.90, 0, 0); // 3D perspective tilt
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+    ctx.shadowBlur = 32;
+    ctx.shadowOffsetX = 14;
+    ctx.shadowOffsetY = 24;
+
+    const docW = cw * 0.38;
+    const docH = docW * (11 / 8.5);
+    ctx.drawImage(cv, -docW * 0.5, -docH * 0.5, docW, docH);
+    ctx.restore();
+  }
+
+  /**
    * Stepper callback for hover preview loop & live customizer playback
    */
   window.stepDealTermSheetAnimation = function(container, tplId, t, data) {
@@ -800,10 +919,18 @@
     const d = Object.assign({}, DEFAULT_CONFIG, data || {});
 
     const viewport = container.querySelector('#term-sheet-3d-viewport');
-    if (!viewport && !tsRenderer) {
-      window.initDealTermSheet3DScene(container, d);
+    if (viewport) {
+      if (!tsRenderer) {
+        window.initDealTermSheet3DScene(viewport, d);
+      }
+      updateAnimationStep(t, d);
     }
-    updateAnimationStep(t, d);
+
+    const vCanvas = container.querySelector('#term-sheet-video-canvas');
+    if (vCanvas) {
+      const ctx = vCanvas.getContext('2d');
+      renderDealTermSheetDirect2D(ctx, d, t, vCanvas.width, vCanvas.height);
+    }
   };
 
   /**
@@ -820,72 +947,89 @@
       return;
     }
 
-    // High-resolution standalone 2D canvas blit fallback
-    const cv = generateTermSheetTexture(d, t);
-    // Draw mahogany desk background
-    const deskImg = imageAssets.get('/mahogany_desk_texture.jpg');
-    if (deskImg && deskImg.complete) {
-      ctx.drawImage(deskImg, 0, 0, cw, ch);
-    } else {
-      ctx.fillStyle = '#1c0f0a';
-      ctx.fillRect(0, 0, cw, ch);
-    }
-
-    // Draw vintage map in top left
-    const mapImg = imageAssets.get('/paper_tear_stock_vintage_map.jpg');
-    if (mapImg && mapImg.complete) {
-      ctx.save();
-      ctx.translate(cw * 0.12, ch * 0.15);
-      ctx.rotate(-26 * Math.PI / 180);
-      ctx.drawImage(mapImg, -cw * 0.2, -ch * 0.2, cw * 0.4, ch * 0.35);
-      ctx.restore();
-    }
-
-    // Draw 3D tilted term sheet document
-    ctx.save();
-    ctx.translate(cw * 0.52, ch * 0.52);
-    ctx.transform(1, -0.06, 0.22, 0.88, 0, 0); // 3D perspective slant
-    // Soft drop shadow
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-    ctx.shadowBlur = 30;
-    ctx.shadowOffsetX = 12;
-    ctx.shadowOffsetY = 24;
-
-    const docW = cw * 0.38;
-    const docH = docW * (11 / 8.5);
-    ctx.drawImage(cv, -docW * 0.5, -docH * 0.5, docW, docH);
-    ctx.restore();
+    renderDealTermSheetDirect2D(ctx, d, t, cw, ch);
   };
 
   /**
    * Contextual Inspector Controls Builder for Customizer
+   * Includes:
+   * - [ ▶ Video ] [ ⬡ 3D ] Segmented Mode Switcher
+   * - 3D Camera Controls (Angle Presets, Tilt Pitch slider, Rotation Yaw slider)
+   * - Key Deal Terms with animated yellow highlighter sweep
+   * - Signature and Rubber Stamps customization
    */
   window.tplBuildDealTermSheetInspector = function(container, data, tplId) {
     if (!container) return;
     const d = Object.assign({}, DEFAULT_CONFIG, data || {});
+    const is3D = d.is3DMode !== false;
+    const pitch = (d.cameraPitch !== undefined) ? d.cameraPitch : 29;
+    const yaw = (d.cameraYaw !== undefined) ? d.cameraYaw : -13;
 
     container.innerHTML = `
-      <div style="display: flex; flex-direction: column; gap: 14px; padding: 4px 0;">
-        <!-- Header Badge -->
-        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08);">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 14px;">📜</span>
-            <span style="font-size: 11px; font-weight: 800; color: #facc15; text-transform: uppercase; letter-spacing: 0.8px;">3D Deal Term Sheet Signing</span>
+      <div style="display: flex; flex-direction: column; gap: 12px; padding: 4px 0;">
+        <!-- Header with Video / 3D Segmented Switcher -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 10.5px; font-weight: 800; color: #facc15; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; gap: 4px;">
+              <span>\ud83d\udcdc</span> Term Sheet Engine
+            </span>
+            <!-- Video / 3D Mode Switcher -->
+            <div id="ts-mode-switcher-wrap" style="display: flex; gap: 2px; background: rgba(18,19,28,0.9); padding: 2px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12);">
+              <button type="button" id="btn-ts-mode-video" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${!is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${!is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Flat Video Playback View">\u25b6 Video</button>
+              <button type="button" id="btn-ts-mode-3d" style="padding: 2.5px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; background: ${is3D ? 'rgba(168,85,247,0.35)' : 'transparent'}; color: ${is3D ? '#fff' : '#94a3b8'}; transition: all 0.2s;" title="Cinematic 3D Depth & Orbit View">\u2b21 3D</button>
+            </div>
           </div>
-          <span style="font-size: 9px; color: #facc15; font-weight: 700; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.35); padding: 2px 6px; border-radius: 4px;">PBR THREE.JS RIG</span>
+          <span style="font-size: 9px; color: ${is3D ? '#2effc6' : '#facc15'}; font-weight: 800; background: ${is3D ? 'rgba(46,255,198,0.15)' : 'rgba(250,204,21,0.15)'}; border: 1px solid ${is3D ? 'rgba(46,255,198,0.35)' : 'rgba(250,204,21,0.35)'}; padding: 2px 6px; border-radius: 4px;">
+            ${is3D ? '\u2b21 3D ACTIVE' : 'DOC-DRAMA'}
+          </span>
         </div>
+
+        <!-- 3D Camera Controls (Shown when 3D Mode is Active) -->
+        ${is3D ? `
+        <div style="background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.32); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 9.5px; font-weight: 800; color: #e9d5ff; text-transform: uppercase; letter-spacing: 0.5px;">\ud83c\udfa5 3D Camera &amp; Tilt Angle</span>
+            <span style="font-size: 8.5px; font-family: monospace; color: #2effc6; font-weight: 700;">DRAG CANVAS TO ORBIT</span>
+          </div>
+
+          <!-- 3D Angle Presets -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+            <button type="button" class="ts-3d-preset-btn" data-pitch="29" data-yaw="-13" style="padding: 4px 5px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.4); color: #cbd5e1; cursor: pointer;">Cinematic (30\u00b0)</button>
+            <button type="button" class="ts-3d-preset-btn" data-pitch="42" data-yaw="-22" style="padding: 4px 5px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.4); color: #cbd5e1; cursor: pointer;">Isometric (45\u00b0)</button>
+            <button type="button" class="ts-3d-preset-btn" data-pitch="5" data-yaw="0" style="padding: 4px 5px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid rgba(255,255,255,0.12); background: rgba(0,0,0,0.4); color: #cbd5e1; cursor: pointer;">Top-Down</button>
+          </div>
+
+          <!-- Pitch / Tilt Slider -->
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+              <span>TILT PITCH</span>
+              <span id="ts-val-pitch" style="font-family: monospace; color: #2effc6; font-weight: 700;">${pitch}\u00b0</span>
+            </div>
+            <input type="range" id="ts-slider-pitch" min="0" max="60" value="${pitch}" style="accent-color: #a855f7; height: 3px; cursor: pointer;" />
+          </div>
+
+          <!-- Yaw / Angle Slider -->
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+              <span>ROTATION YAW</span>
+              <span id="ts-val-yaw" style="font-family: monospace; color: #2effc6; font-weight: 700;">${yaw}\u00b0</span>
+            </div>
+            <input type="range" id="ts-slider-yaw" min="-45" max="45" value="${yaw}" style="accent-color: #a855f7; height: 3px; cursor: pointer;" />
+          </div>
+        </div>
+        ` : ''}
 
         <!-- Section 1: Deal Valuation & Investment (Highlighter Sweeps) -->
         <div style="display: flex; flex-direction: column; gap: 8px;">
           <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Key Deal Terms &amp; Highlighter</span>
 
           <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 8.5px; color: #cbd5e1;">Line 1 (Swept with Highlighter)</span>
+            <span style="font-size: 8.5px; color: #cbd5e1;">Line 1 (Swept with Yellow Highlighter)</span>
             <input type="text" id="ts-inp-val" value="${d.valuationText || 'Valuation: $80M pre-money'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #facc15; font-weight: 800; padding: 5px 8px; border-radius: 6px; font-size: 11px; outline: none;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="font-size: 8.5px; color: #cbd5e1;">Line 2 (Swept with Highlighter)</span>
+            <span style="font-size: 8.5px; color: #cbd5e1;">Line 2 (Swept with Yellow Highlighter)</span>
             <input type="text" id="ts-inp-inv" value="${d.investmentText || 'Investment: $12M for 15%'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #facc15; font-weight: 800; padding: 5px 8px; border-radius: 6px; font-size: 11px; outline: none;" />
           </div>
 
@@ -924,25 +1068,25 @@
           </div>
         </div>
 
-        <!-- Section 3: Studio Environment & Macro Camera -->
+        <!-- Section 3: Studio Environment & Desk Surface -->
         <div style="display: flex; flex-direction: column; gap: 8px;">
-          <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Environment &amp; Camera Rig</span>
+          <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Environment &amp; Desk Surface</span>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <div style="display: flex; flex-direction: column; gap: 4px;">
               <span style="font-size: 8.5px; color: #cbd5e1;">Desk Surface</span>
               <select id="ts-sel-surface" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 5px 8px; border-radius: 6px; font-size: 10.5px; outline: none;">
                 <option value="mahogany" ${d.surfaceType === 'mahogany' ? 'selected' : ''}>Executive Mahogany</option>
-                <option value="tactical_grid" ${d.surfaceType === 'tactical_grid' ? 'selected' : ''}>Dark Slate / Tactical Grid</option>
+                <option value="tactical_grid" ${d.surfaceType === 'tactical_grid' ? 'selected' : ''}>Dark Tactical Grid</option>
               </select>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 4px;">
-              <span style="font-size: 8.5px; color: #cbd5e1;">Camera Rig</span>
-              <select id="ts-sel-camera" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 5px 8px; border-radius: 6px; font-size: 10.5px; outline: none;">
-                <option value="macro_cinematic" ${d.cameraPreset === 'macro_cinematic' ? 'selected' : ''}>30&deg; Macro Cinematic (Vox/Jani)</option>
-                <option value="isometric_evidence" ${d.cameraPreset === 'isometric_evidence' ? 'selected' : ''}>45&deg; Forensic Isometric</option>
-                <option value="top_down_dossier" ${d.cameraPreset === 'top_down_dossier' ? 'selected' : ''}>Top-Down Surveillance Dossier</option>
+              <span style="font-size: 8.5px; color: #cbd5e1;">Paper Tone</span>
+              <select id="ts-sel-tone" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 5px 8px; border-radius: 6px; font-size: 10.5px; outline: none;">
+                <option value="#f5f0e1" ${d.paperTone === '#f5f0e1' ? 'selected' : ''}>Vintage Ivory Cotton</option>
+                <option value="#ffffff" ${d.paperTone === '#ffffff' ? 'selected' : ''}>Bright Legal White</option>
+                <option value="#fef3c7" ${d.paperTone === '#fef3c7' ? 'selected' : ''}>Aged Amber Parchment</option>
               </select>
             </div>
           </div>
@@ -964,6 +1108,82 @@
       }
     }
 
+    const setMode = (is3DActive) => {
+      textureCache.clear();
+      updateData({ is3DMode: is3DActive });
+      if (typeof topCustomizerState !== 'undefined') {
+        topCustomizerState.is3DMode = is3DActive;
+        topCustomizerState.paperPreviewMode = is3DActive ? '3d' : 'video';
+      }
+      // Sync top stage buttons
+      const pVid = document.getElementById('btn-paper-rip-mode-video');
+      const p3D = document.getElementById('btn-paper-rip-mode-3d');
+      if (pVid && p3D) {
+        pVid.style.background = !is3DActive ? 'rgba(168,85,247,.35)' : 'transparent';
+        pVid.style.color = !is3DActive ? '#fff' : '#94a3b8';
+        p3D.style.background = is3DActive ? 'rgba(168,85,247,.35)' : 'transparent';
+        p3D.style.color = is3DActive ? '#fff' : '#94a3b8';
+      }
+      if (typeof window.applyModeLayout === 'function') {
+        window.applyModeLayout(is3DActive);
+      }
+      if (typeof renderTopTemplatePreviewStage === 'function') {
+        renderTopTemplatePreviewStage();
+      }
+      if (typeof window.tplRenderContextualInspector === 'function') {
+        window.tplRenderContextualInspector(tplId);
+      }
+    };
+
+    container.querySelector('#btn-ts-mode-video')?.addEventListener('click', () => setMode(false));
+    container.querySelector('#btn-ts-mode-3d')?.addEventListener('click', () => setMode(true));
+
+    // 3D Camera Controls Wiring
+    const pitchSlider = container.querySelector('#ts-slider-pitch');
+    const yawSlider = container.querySelector('#ts-slider-yaw');
+    const pitchVal = container.querySelector('#ts-val-pitch');
+    const yawVal = container.querySelector('#ts-val-yaw');
+
+    pitchSlider?.addEventListener('input', (e) => {
+      const p = parseInt(e.target.value, 10);
+      if (pitchVal) pitchVal.textContent = `${p}\u00b0`;
+      if (typeof window.tplSetDealTermSheetAngles === 'function') {
+        window.tplSetDealTermSheetAngles(p, undefined);
+      }
+      if (typeof window.tplSetContextualData === 'function') {
+        window.tplSetContextualData(tplId, { cameraPitch: p });
+      }
+    });
+
+    yawSlider?.addEventListener('input', (e) => {
+      const y = parseInt(e.target.value, 10);
+      if (yawVal) yawVal.textContent = `${y}\u00b0`;
+      if (typeof window.tplSetDealTermSheetAngles === 'function') {
+        window.tplSetDealTermSheetAngles(undefined, y);
+      }
+      if (typeof window.tplSetContextualData === 'function') {
+        window.tplSetContextualData(tplId, { cameraYaw: y });
+      }
+    });
+
+    container.querySelectorAll('.ts-3d-preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = parseInt(btn.dataset.pitch, 10);
+        const y = parseInt(btn.dataset.yaw, 10);
+        if (pitchSlider) pitchSlider.value = p;
+        if (yawSlider) yawSlider.value = y;
+        if (pitchVal) pitchVal.textContent = `${p}\u00b0`;
+        if (yawVal) yawVal.textContent = `${y}\u00b0`;
+        if (typeof window.tplSetDealTermSheetAngles === 'function') {
+          window.tplSetDealTermSheetAngles(p, y);
+        }
+        if (typeof window.tplSetContextualData === 'function') {
+          window.tplSetContextualData(tplId, { cameraPitch: p, cameraYaw: y });
+        }
+      });
+    });
+
+    // Content inputs
     container.querySelector('#ts-inp-val')?.addEventListener('input', (e) => {
       textureCache.clear();
       updateData({ valuationText: e.target.value });
@@ -1003,8 +1223,9 @@
       updateData({ surfaceType: e.target.value });
     });
 
-    container.querySelector('#ts-sel-camera')?.addEventListener('change', (e) => {
-      updateData({ cameraPreset: e.target.value });
+    container.querySelector('#ts-sel-tone')?.addEventListener('change', (e) => {
+      textureCache.clear();
+      updateData({ paperTone: e.target.value });
     });
 
     container.querySelector('#btn-ts-reset')?.addEventListener('click', () => {

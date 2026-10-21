@@ -25,12 +25,12 @@
     // Ensure state container exists
     if (typeof topCustomizerState === 'undefined') window.topCustomizerState = {};
     if (!topCustomizerState.transforms) topCustomizerState.transforms = { fg: { x: 0, y: 0, scale: 1, isFullscreen: false }, bg: { x: 0, y: 0, scale: 1 }, text: { x: 0, y: 0, scale: 1 } };
-    if (topCustomizerState.currentTpl?.id === 'subscribe' && typeof window.tplGetContextualData === 'function') {
-      const subData = window.tplGetContextualData('subscribe');
-      if (subData) {
-        topCustomizerState.transforms.fg.x = typeof subData.posX === 'number' ? subData.posX : 0;
-        topCustomizerState.transforms.fg.y = typeof subData.posY === 'number' ? subData.posY : 0;
-        topCustomizerState.transforms.fg.scale = typeof subData.scale === 'number' ? subData.scale : 1.0;
+    if ((topCustomizerState.currentTpl?.id === 'subscribe' || topCustomizerState.currentTpl?.id === 'receipt') && typeof window.tplGetContextualData === 'function') {
+      const liveData = window.tplGetContextualData(topCustomizerState.currentTpl.id);
+      if (liveData) {
+        topCustomizerState.transforms.fg.x = typeof liveData.posX === 'number' ? liveData.posX : 0;
+        topCustomizerState.transforms.fg.y = typeof liveData.posY === 'number' ? liveData.posY : 0;
+        topCustomizerState.transforms.fg.scale = typeof liveData.scale === 'number' ? liveData.scale : 1.0;
       }
     }
 
@@ -112,7 +112,7 @@
       return;
     }
     toolbar.style.display = 'flex';
-    const fgCandidate = stage.querySelector('.tpl-subscribe .sub-wrap, .sub-wrap, .quote-card, .scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .r-paper, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const fgCandidate = stage.querySelector('.tpl-subscribe .sub-wrap, .tpl-receipt .r-wrap, .sub-wrap, .r-wrap, .r-paper, .quote-card, .scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
     const textCandidate = stage.querySelector('.scramble-main-text, .zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
     const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
 
@@ -386,11 +386,14 @@
           fgCandidate.style.transform = isZoomProduct
             ? `translate(-50%, -50%) scale(${safeScale.toFixed(3)})`
             : `translate(0px, 0px) scale(${safeScale.toFixed(3)})`;
-        } else if (fgTf.x || fgTf.y || (fgTf.scale && fgTf.scale !== 1)) {
+        } else if (fgTf.x || fgTf.y || (fgTf.scale && fgTf.scale !== 1) || (tplId === 'receipt')) {
           fgCandidate.style.transformOrigin = 'center center';
           if (isZoomProduct) {
             fgCandidate.style.animation = 'none';
             fgCandidate.style.transform = `translate(calc(-50% + ${fgTf.x}px), calc(-50% + ${fgTf.y}px)) scale(${fgTf.scale || 1})`;
+          } else if (tplId === 'receipt') {
+            const rot = (typeof window.tplGetContextualData === 'function' && window.tplGetContextualData('receipt')?.rotation) || 0;
+            fgCandidate.style.transform = `translate(${fgTf.x || 0}px, ${fgTf.y || 0}px) scale(${fgTf.scale || 1}) rotate(${rot}deg)`;
           } else {
             fgCandidate.style.transform = `translate(${fgTf.x}px, ${fgTf.y}px) scale(${fgTf.scale || 1})`;
           }
@@ -424,7 +427,7 @@
 
       const labelEl = box.querySelector('#stage-tf-label');
       if (labelEl) {
-        labelEl.textContent = type === 'text' ? (tplId === 'quote' ? 'QUOTE TEXT' : 'HEADLINE TEXT') : (type === 'bg' ? 'BACKGROUND SCENE' : (tplId === 'subscribe' ? 'SUBSCRIBE CTA' : (tplId === 'quote' ? 'QUOTE CARD' : 'FOREGROUND SUBJECT')));
+        labelEl.textContent = type === 'text' ? (tplId === 'quote' ? 'QUOTE TEXT' : 'HEADLINE TEXT') : (type === 'bg' ? 'BACKGROUND SCENE' : (tplId === 'subscribe' ? 'SUBSCRIBE CTA' : (tplId === 'receipt' ? ((typeof window.tplGetContextualData === 'function' && window.tplGetContextualData('receipt')?.isOverlay === false) ? 'RECEIPT OBJECT' : 'RECEIPT OVERLAY') : (tplId === 'quote' ? 'QUOTE CARD' : 'FOREGROUND SUBJECT'))));
         labelEl.style.background = type === 'text' ? '#a855f7' : (type === 'bg' ? '#d97706' : '#0284c7');
       }
 
@@ -488,6 +491,15 @@
           tf.y = initialOffsetY + dy;
           tf.isFullscreen = false;
           applyTransforms();
+          if (targetType === 'fg') {
+            if (tplId === 'subscribe' && typeof window.tplSyncSubscribeInspectorUI === 'function') {
+              window.tplSetContextualData('subscribe', { posX: tf.x, posY: tf.y, positionPreset: 'custom' });
+              window.tplSyncSubscribeInspectorUI();
+            } else if (tplId === 'receipt' && typeof window.tplSyncReceiptInspectorUI === 'function') {
+              window.tplSetContextualData('receipt', { posX: tf.x, posY: tf.y, positionPreset: 'custom' });
+              window.tplSyncReceiptInspectorUI();
+            }
+          }
         }
       } else if (isResizing && currentTargetEl) {
         const dx = e.clientX - dragStartX;
@@ -498,6 +510,15 @@
           tf.isFullscreen = false;
           applyTransforms();
           renderToolbar();
+          if (targetType === 'fg') {
+            if (tplId === 'subscribe' && typeof window.tplSyncSubscribeInspectorUI === 'function') {
+              window.tplSetContextualData('subscribe', { scale: Number(tf.scale.toFixed(2)) });
+              window.tplSyncSubscribeInspectorUI();
+            } else if (tplId === 'receipt' && typeof window.tplSyncReceiptInspectorUI === 'function') {
+              window.tplSetContextualData('receipt', { scale: Number(tf.scale.toFixed(2)) });
+              window.tplSyncReceiptInspectorUI();
+            }
+          }
         }
       }
     };
@@ -548,6 +569,39 @@
     }
     if (typeof window.tplSyncSubscribeInspectorUI === 'function') {
       window.tplSyncSubscribeInspectorUI();
+    }
+  };
+
+  // Helper to programmatically apply preset positioning for receipt overlay
+  window.tplApplyReceiptPreset = function(presetId) {
+    if (typeof topCustomizerState === 'undefined') window.topCustomizerState = {};
+    if (!topCustomizerState.transforms) topCustomizerState.transforms = { fg: { x: 0, y: 0, scale: 1 } };
+    let x = 0, y = 0;
+    if (presetId === 'tl') { x = -200; y = -100; }
+    else if (presetId === 'tr') { x = 200; y = -100; }
+    else if (presetId === 'bl') { x = -200; y = 90; }
+    else if (presetId === 'br') { x = 200; y = 90; }
+    else { x = 0; y = 0; } // center default
+
+    topCustomizerState.transforms.fg.x = x;
+    topCustomizerState.transforms.fg.y = y;
+    topCustomizerState.transforms.fg.isFullscreen = false;
+
+    if (typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('receipt', { posX: x, posY: y, positionPreset: presetId });
+    }
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    const wrap = stage ? stage.querySelector('.tpl-receipt .r-wrap, .tpl-receipt .r-paper') : null;
+    if (wrap) {
+      const curScale = topCustomizerState.transforms.fg.scale || 1.0;
+      const curRot = (typeof window.tplGetContextualData === 'function' && window.tplGetContextualData('receipt')?.rotation) || 0;
+      wrap.style.transform = `translate(${x}px, ${y}px) scale(${curScale}) rotate(${curRot}deg)`;
+    }
+    if (typeof window.tplUpdateTransformBox === 'function') {
+      window.tplUpdateTransformBox();
+    }
+    if (typeof window.tplSyncReceiptInspectorUI === 'function') {
+      window.tplSyncReceiptInspectorUI();
     }
   };
 

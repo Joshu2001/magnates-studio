@@ -867,18 +867,30 @@ function drawTextLayer(specificTextClip) {
     const boxX = centerX - boxW / 2;
     const boxY = centerY - boxH / 2 + 10;
 
-    // Translucent terminal container
-    ctx.fillStyle = 'rgba(5, 10, 8, 0.92)';
+    // Projected Cyan Light Reflection onto blueprint map below
+    const floorGlow = ctx.createRadialGradient(centerX, centerY + 24, 10, centerX, centerY + 24, boxW * 0.55);
+    floorGlow.addColorStop(0, 'rgba(0, 240, 255, 0.35)');
+    floorGlow.addColorStop(0.5, 'rgba(0, 240, 255, 0.08)');
+    floorGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = floorGlow;
+    ctx.fillRect(boxX - 30, boxY + 20, boxW + 60, boxH + 30);
+
+    // Translucent cyber terminal container
+    ctx.fillStyle = 'rgba(5, 20, 28, 0.9)';
     ctx.shadowBlur = 30;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-    ctx.fillRect(boxX, boxY, boxW, boxH);
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(boxX, boxY, boxW, boxH, 8) : ctx.rect(boxX, boxY, boxW, boxH);
+    ctx.fill();
 
-    // Glowing container border
+    // Glowing container border with corner brackets
     ctx.strokeStyle = primaryColor;
     ctx.lineWidth = 2;
     ctx.shadowBlur = 18;
     ctx.shadowColor = primaryColor;
-    ctx.strokeRect(boxX, boxY, boxW, boxH);
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(boxX, boxY, boxW, boxH, 8) : ctx.rect(boxX, boxY, boxW, boxH);
+    ctx.stroke();
 
     // Render decoded text
     ctx.fillStyle = primaryColor;
@@ -3235,7 +3247,11 @@ function render(now) {
       const nowTs = performance.now();
       const dt = (nowTs - (rainState._lastTs || nowTs)) / 1000;
       rainState._lastTs = nowTs;
-      renderMatrixRainCanvasFrame(ctx, canvas.width, canvas.height, rainState, Math.min(0.1, dt || 0.016));
+      if (matrixActiveClip && matrixActiveClip.isTactical3D && typeof window.renderTacticalDeskCanvasFrame === 'function') {
+        window.renderTacticalDeskCanvasFrame(ctx, canvas.width, canvas.height, Object.assign({}, rainState, { textVisible: false }), currentTime - matrixActiveClip.start, dt);
+      } else {
+        renderMatrixRainCanvasFrame(ctx, canvas.width, canvas.height, rainState, Math.min(0.1, dt || 0.016));
+      }
     }
 
     // 2. Layer-Ordered Visual Elements (Media & Kinetic Text arranged by z-index)
@@ -24102,7 +24118,9 @@ id: 'map',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Tiered pyramid filling with investors layer by layer, then cracking and collapsing when the money runs out. Built for Ponzi takedowns.',
     tags: ['Business Storytelling', 'Pyramid Scheme Collapse', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pyr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0f0f"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pyr)"/><text x="200" y="26" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" letter-spacing="2" text-anchor="middle">STRUCTURE UNSUSTAINABLE</text><polygon points="200,42 236,84 164,84" fill="#ffd23f"/><text x="200" y="72" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">FOUNDER</text><polygon points="150,96 250,96 268,128 132,128" fill="#ff8c42"/><text x="200" y="118" fill="#000" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">EARLY INVESTORS \u00b7 +400%</text><polygon points="120,140 280,140 302,172 98,172" fill="#c1440e"/><text x="200" y="162" fill="#fff" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LATE ADOPTERS \u00b7 BREAK-EVEN</text><polygon points="88,184 312,184 336,214 64,214" fill="#5a1e1e"/><text x="200" y="204" fill="#ff9d9d" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LAST 90% \u00b7 TOTAL LOSS</text><path d="M 196 42 L 204 96 L 192 140 L 206 214" stroke="#000" stroke-width="3" fill="none" opacity="0.55"/></svg>`)}`
+    defaultImage: '/pyramid_concrete_plate_clean.png',
+    secondaryImage: '/pyramid_matrix_plate_clean.png',
+    legacyImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><linearGradient id="bg-pyr" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c0f0f"/><stop offset="100%" stop-color="#0a0505"/></linearGradient></defs><rect width="400" height="225" fill="url(#bg-pyr)"/><text x="200" y="26" fill="#ff4757" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="11" letter-spacing="2" text-anchor="middle">STRUCTURE UNSUSTAINABLE</text><polygon points="200,42 236,84 164,84" fill="#ffd23f"/><text x="200" y="72" fill="#000" font-family="monospace" font-weight="900" font-size="9" text-anchor="middle">FOUNDER</text><polygon points="150,96 250,96 268,128 132,128" fill="#ff8c42"/><text x="200" y="118" fill="#000" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">EARLY INVESTORS \u00b7 +400%</text><polygon points="120,140 280,140 302,172 98,172" fill="#c1440e"/><text x="200" y="162" fill="#fff" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LATE ADOPTERS \u00b7 BREAK-EVEN</text><polygon points="88,184 312,184 336,214 64,214" fill="#5a1e1e"/><text x="200" y="204" fill="#ff9d9d" font-family="monospace" font-weight="700" font-size="9" text-anchor="middle">LAST 90% \u00b7 TOTAL LOSS</text><path d="M 196 42 L 204 96 L 192 140 L 206 214" stroke="#000" stroke-width="3" fill="none" opacity="0.55"/></svg>`)}`
   },
   {
     id: 'investigate-globe',
@@ -24306,11 +24324,11 @@ id: 'map',
     badge: 'James Jani Signature',
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.8), rgba(49, 46, 129, 0.5), rgba(15, 23, 42, 0.9))',
-    description: 'Textured vintage paper, screen-print halftone noise, and distressed grunge overlay on bold cinematic titles.',
-    tags: ['Grunge Text', 'Paper Texture', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80',
-    secondaryImage: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80'
+    previewGradient: 'linear-gradient(to top, rgba(120, 53, 15, 0.8), rgba(69, 26, 3, 0.5), rgba(15, 23, 42, 0.9))',
+    description: 'James Jani signature 12fps stop-motion chapter card with tactile aged paper, fiber displacement, letterpress serif typography, and 35mm film artifacts.',
+    tags: ['James Jani', 'Grunge Text', 'Paper Texture', 'Stop Motion', 'Chapter Title'],
+    defaultImage: '/jani_clean_kraft_plate_hd.png',
+    secondaryImage: '/paper_tear_stock_archival_news.jpg'
   },
   {
     id: 'kinetic-decode-typewriter',
@@ -24322,7 +24340,7 @@ id: 'map',
     previewGradient: 'linear-gradient(to top, rgba(88, 28, 135, 0.8), rgba(15, 23, 42, 0.6), rgba(0, 0, 0, 0.95))',
     description: 'High-tension matrix character decoding and rapid typewriter reveal with blinking terminal block cursor.',
     tags: ['Decode Text', 'Typewriter', 'Kinetic Typo'],
-    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80'
+    defaultImage: '/tactical_desk_hd_plate.png'
   },
   {
     id: 'archival-ink-highlight',
@@ -24505,7 +24523,7 @@ id: 'map',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Jani\u2019s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    defaultImage: '/tactical_desk_hd_plate.png',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -24557,7 +24575,7 @@ id: 'map',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines together" text assembly for investigative tension.',
     tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+    defaultImage: '/tactical_desk_hd_plate.png',
     secondaryImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -25942,7 +25960,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'scam-redaction', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'pyramid-scheme', 'scam-redaction', 'pyramid-scheme', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
 
 
 window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
@@ -26300,13 +26318,25 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         { name: 'Grass-Fed Ribeye', price: '$22.80' }
       ];
       const total = rData.total || '$34.28';
-      fxContainer.innerHTML = `<div class="tpl-receipt">
-          <div class="r-paper">
-            <div class="r-head"><div class="r-store">${store}</div><div style="font-size:8px;font-weight:500;color:#64748b;margin-top:2px;">TERM #0491 \u00b7 AUTH VERIFIED</div></div>
-            <div class="r-items-wrap">
-              ${items.map(it => `<div class="r-item"><span class="name">${it.name}</span><span class="price">${it.price}</span></div>`).join('')}
+      const auth = rData.authCode || 'TERM #0491 \u00b7 AUTH VERIFIED';
+      const isOverlay = rData.isOverlay !== false; // Default: true (overlay)
+      const isTrans = rData.transparentBg !== false && isOverlay; // Default: true
+      const posX = typeof rData.posX === 'number' ? rData.posX : 0;
+      const posY = typeof rData.posY === 'number' ? rData.posY : 0;
+      const scale = typeof rData.scale === 'number' ? rData.scale : 1.0;
+      const rot = typeof rData.rotation === 'number' ? rData.rotation : 0;
+      const theme = rData.receiptTheme || 'classic';
+      const bgLayerHtml = (typeof window.tplRenderUniversalBgLayer === 'function') ? window.tplRenderUniversalBgLayer(rData) : '';
+      fxContainer.innerHTML = `<div class="tpl-receipt ${isTrans ? 'is-transparent' : ''} ${isOverlay ? 'is-overlay-mode' : 'is-object-mode'}" style="${isTrans ? 'background:transparent;' : ''}">
+          ${bgLayerHtml}
+          <div class="r-wrap" style="transform: translate(${posX}px, ${posY}px) scale(${scale}) rotate(${rot}deg);">
+            <div class="r-paper theme-${theme}">
+              <div class="r-head"><div class="r-store">${store}</div><div class="r-auth" style="font-size:8px;font-weight:500;color:#64748b;margin-top:2px;">${auth}</div></div>
+              <div class="r-items-wrap">
+                ${items.map(it => `<div class="r-item"><span class="name">${it.name || it}</span><span class="price">${it.price || ''}</span></div>`).join('')}
+              </div>
+              <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
             </div>
-            <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
           </div>
         </div>`; } else if (tplId === 'wire-transfer') {
       fxContainer.innerHTML = `
@@ -27894,26 +27924,26 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'text-texturing-grunge') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #0e0c14; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 16px;">
-          <!-- Distressed Paper / Grain Texture Backdrop -->
-          <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(147, 51, 234, 0.35) 0%, rgba(30, 27, 75, 0.6) 50%, #000 100%);"></div>
-          <img id="fx-bg-${tplId}" src="${tpl.defaultImage}" alt="Paper Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(2) grayscale(0.2);" />
-          
-          <!-- Cinematic Grunge Text Plate -->
-          <div id="fx-grunge-plate-${tplId}" style="position: relative; text-align: center; z-index: 2; padding: 12px; pointer-events: none;">
-            <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 900; letter-spacing: 4px; color: #f3e8ff; margin: 0; text-transform: uppercase; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.95));">
-              POWER & GREED
-            </h3>
-            <div style="width: 70%; height: 2px; background: rgba(168, 85, 247, 0.85); margin: 6px auto; box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);"></div>
-            <span style="font-family: monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 3px; color: #d8b4fe; text-transform: uppercase; display: block;">
-              CHAPTER IV: THE MANIPULATION
-            </span>
+        <div style="position: absolute; inset: 0; background: #0c0a07; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <div id="fx-grunge-rig-${tplId}" style="position: absolute; inset: -4%; width: 108%; height: 108%; transform-origin: 50% 50%;">
+            <img id="fx-bg-${tplId}" src="${tpl.defaultImage || '/jani_clean_kraft_plate_hd.png'}" alt="Aged Paper" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(100%) contrast(106%);" />
+            <div id="fx-grunge-plate-${tplId}" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 2; padding: 12px; pointer-events: none;">
+              <h3 style="font-family: 'Cinzel Decorative', 'Cinzel', Georgia, serif; font-size: 21px; font-weight: 900; letter-spacing: 4px; color: #d4af37; margin: 0; text-transform: uppercase; mix-blend-mode: multiply; opacity: 0.90; text-shadow: 0 1px 1px rgba(255,248,220,0.4), 0 -1px 2px rgba(35,20,8,0.7);">
+                “POWER & GREED”
+              </h3>
+              <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px;">
+                <div style="width: 32px; height: 1px; background: linear-gradient(to right, transparent, rgba(197, 155, 76, 0.85));"></div>
+                <span style="font-family: 'Cinzel', Georgia, serif; font-size: 8px; font-weight: 700; letter-spacing: 2px; color: #c59b4c; text-transform: uppercase; mix-blend-mode: multiply; opacity: 0.88;">
+                  CHAPTER IV: THE MANIPULATION
+                </span>
+                <div style="width: 32px; height: 1px; background: linear-gradient(to left, transparent, rgba(197, 155, 76, 0.85));"></div>
+              </div>
+            </div>
+            <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 48%, transparent 48%, rgba(24, 16, 8, 0.38) 78%, rgba(4, 2, 1, 0.82) 100%); pointer-events: none;"></div>
+            <div style="position: absolute; top: -10%; left: 15%; width: 70%; height: 60%; background: radial-gradient(ellipse at 50% 10%, rgba(255, 235, 175, 0.25) 0%, transparent 70%); mix-blend-mode: screen; pointer-events: none;"></div>
           </div>
-
-          <!-- Color burn vignette -->
-          <div style="position: absolute; inset: 0; background: rgba(88, 28, 135, 0.2); mix-blend-mode: color-burn; pointer-events: none;"></div>
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(147, 51, 234, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            \ud83d\udcdc GRUNGE PAPER
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(180, 83, 9, 0.9); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
+            📜 12FPS CHAPTER
           </div>
         </div>
       `;
@@ -28304,35 +28334,56 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'jani-countdown-panic-suite') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #080204; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 14px;">
-          <!-- Moving Technical Grid -->
-          <div style="position: absolute; inset: 0; background-size: 26px 26px; background-image: linear-gradient(to right, rgba(239,68,68,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(239,68,68,0.08) 1px, transparent 1px); opacity: 0.6;"></div>
-          
-          <!-- Animated Stock Collapse Curve SVG -->
-          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" preserveAspectRatio="none" viewBox="0 0 400 225">
-            <path id="fx-countdown-chart-${tplId}" d="M 0 100 Q 150 90, 260 140 T 400 185" fill="none" stroke="#ef4444" stroke-width="2.5" opacity="0.85" />
-          </svg>
+        <div style="position: absolute; inset: 0; background: #07090e; overflow: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; perspective: 600px;">
+          <!-- 3D Curved Terminal Monitor Screen -->
+          <div style="position: absolute; inset: 6px; background: radial-gradient(circle at 50% 40%, #160609 0%, #080204 60%, #020001 100%); border-radius: 8px; border: 1.5px solid #232936; box-shadow: inset 0 0 25px rgba(0,0,0,0.9), 0 8px 24px rgba(0,0,0,0.8); overflow: hidden; transform: rotateX(8deg);">
+            <!-- Subtle Technical Grid -->
+            <div style="position: absolute; inset: 0; background-size: 24px 24px; background-image: linear-gradient(to right, rgba(239,68,68,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(239,68,68,0.08) 1px, transparent 1px); opacity: 0.65;"></div>
 
-          <!-- Label -->
-          <div style="position: relative; z-index: 5; font-family: 'Chakra Petch', sans-serif; font-size: 9.5px; font-weight: 800; color: #a1a1aa; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;">
-            FTX LIQUIDITY CRASH
-          </div>
+            <!-- Volumetric Gradient Area Chart SVG -->
+            <svg style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;" preserveAspectRatio="none" viewBox="0 0 400 225">
+              <defs>
+                <linearGradient id="fx-cd-volumetric-${tplId}" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(239, 68, 68, 0.75)" />
+                  <stop offset="40%" stop-color="rgba(185, 28, 28, 0.4)" />
+                  <stop offset="85%" stop-color="rgba(69, 10, 10, 0.15)" />
+                  <stop offset="100%" stop-color="rgba(8, 2, 4, 0)" />
+                </linearGradient>
+              </defs>
+              <path id="fx-countdown-area-${tplId}" d="M 0 105 L 45 98 L 85 115 L 120 95 L 155 110 L 190 92 L 230 128 L 265 112 L 300 152 L 350 162 L 400 178 L 400 225 L 0 225 Z" fill="url(#fx-cd-volumetric-${tplId})" />
+              <path id="fx-countdown-chart-${tplId}" d="M 0 105 L 45 98 L 85 115 L 120 95 L 155 110 L 190 92 L 230 128 L 265 112 L 300 152 L 350 162 L 400 178" fill="none" stroke="#ff2a4b" stroke-width="2.5" />
+            </svg>
 
-          <!-- Countdown Big Digits -->
-          <div id="fx-countdown-digits-${tplId}" style="position: relative; z-index: 5; font-family: 'Share Tech Mono', monospace; font-size: 26px; font-weight: 700; color: #ef4444; text-shadow: 0 0 16px rgba(239,68,68,0.8); letter-spacing: 1px;">
-            T-MINUS 00:04.280
-          </div>
+            <!-- Screen Optics: Overhead Light Sheen -->
+            <div style="position: absolute; top: 0; left: 20%; right: 20%; height: 40px; background: radial-gradient(ellipse at center top, rgba(255,255,255,0.15) 0%, transparent 80%); pointer-events: none;"></div>
 
-          <!-- Panic Meter -->
-          <div style="position: relative; z-index: 5; width: 65%; height: 2.5px; background: rgba(255,255,255,0.15); margin-top: 6px; border-radius: 2px; overflow: hidden;">
-            <div id="fx-countdown-bar-${tplId}" style="width: 70%; height: 100%; background: #ef4444; box-shadow: 0 0 8px #ef4444;"></div>
-          </div>
+            <!-- Header: Clean Bold Sans-Serif with Tactical HUD Brackets -->
+            <div style="position: absolute; top: 18px; left: 0; right: 0; text-align: center; z-index: 5; font-family: 'Chakra Petch', 'Inter', sans-serif; font-size: 10px; font-weight: 800; color: #e4e4e7; letter-spacing: 2px; text-transform: uppercase;">
+              [ FTX LIQUIDITY CRASH ]
+            </div>
 
-          <!-- Bottom Live Ticker -->
-          <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(9,9,11,0.95); border-top: 1px solid rgba(239,68,68,0.5); padding: 3px 8px; overflow: hidden; white-space: nowrap;">
-            <span id="fx-countdown-ticker-${tplId}" style="font-family: monospace; font-size: 8px; color: #f87171; display: inline-block;">
-              $FTT -94.2%  \u2022  $BTC $15,820 (-22.4%)  \u2022  BINANCE WITHDRAWALS PAUSED
-            </span>
+            <!-- Dedicated HUD Monospace Countdown Clock Box (24px padding away from title) -->
+            <div style="position: absolute; top: 40px; left: 50%; transform: translateX(-50%); z-index: 5; background: rgba(15,4,6,0.85); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 4px 14px; box-shadow: 0 4px 14px rgba(0,0,0,0.7), inset 0 0 8px rgba(239,68,68,0.2); white-space: nowrap;">
+              <div id="fx-countdown-digits-${tplId}" style="font-family: 'JetBrains Mono', 'Share Tech Mono', monospace; font-size: 20px; font-weight: 700; color: #ffffff; text-shadow: 0 0 12px rgba(239,68,68,0.85); letter-spacing: 1px;">
+                T-MINUS 00:06.170
+              </div>
+            </div>
+
+            <!-- Panic Ticker Tape at Bottom -->
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(8,2,4,0.95); border-top: 1.5px solid #ef4444; padding: 4px 8px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; gap: 8px;">
+              <div id="fx-countdown-ticker-${tplId}" style="display: inline-flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 8.5px; white-space: nowrap;">
+                <span style="background: #dc2626; color: #fff; font-weight: 800; padding: 1px 5px; border-radius: 3px;">FTX -94.2%</span>
+                <span style="background: #dc2626; color: #fff; font-weight: 800; padding: 1px 5px; border-radius: 3px;">FTT -94.2%</span>
+                <span style="color: #fca5a5; font-weight: 600;">$BTC $15,820 (-22.4%)</span>
+                <span style="color: #f87171;">|</span>
+                <span style="color: #fca5a5; font-weight: 700;">BINANCE WITHDRAWALS PAUSED</span>
+                <span style="color: #f87171;">|</span>
+                <span style="background: #dc2626; color: #fff; font-weight: 800; padding: 1px 5px; border-radius: 3px;">ALAMEDA BANKRUPT</span>
+              </div>
+            </div>
+
+            <!-- CRT Scanline Shimmer -->
+            <div style="position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px); pointer-events: none; opacity: 0.7;"></div>
           </div>
 
           <!-- Badge tag -->
@@ -28643,6 +28694,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       if (typeof window.stepDealTermSheetAnimation === 'function') {
         const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
         window.stepDealTermSheetAnimation(fxContainer, tplId, t, dtData);
+      }
+    } else if (tplId === 'pyramid-scheme') {
+      if (typeof window.stepPyramidCollapseAnimation === 'function') {
+        const pcData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('pyramid-scheme') : {};
+        window.stepPyramidCollapseAnimation(fxContainer, tplId, t, pcData);
       }
     } else if (tplId === 'scam-redaction') {
       if (typeof window.stepFraudDossierAnimation === 'function') {
@@ -29442,14 +29498,18 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         frameEl.style.transform = `perspective(600px) rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.02)`;
       }
     } else if (tplId === 'text-texturing-grunge') {
-      // Subconscious handheld paper jitter and breathing vignette
-      const jitterX = Math.sin(t * 14) * 2;
-      const jitterY = Math.cos(t * 16) * 2;
-      const bgZoom = 1.05 + Math.sin(t * 2) * 0.04;
-      const plate = fxContainer?.querySelector(`#fx-grunge-plate-${tplId}`);
-      const bgEl = fxContainer?.querySelector(`#fx-bg-${tplId}`);
-      if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
-      if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
+      // 12fps Stop-motion gate weave and tactile projector flicker
+      const frameIdx = Math.floor(t * 12);
+      const r1 = (Math.sin(frameIdx * 3.71 + 1.13) * 43758.5453) % 1;
+      const r2 = (Math.sin(frameIdx * 5.39 + 2.77) * 43758.5453) % 1;
+      const r3 = (Math.sin(frameIdx * 7.19 + 4.31) * 43758.5453) % 1;
+      const r4 = (Math.sin(frameIdx * 11.33 + 6.97) * 43758.5453) % 1;
+      const rot = (r1 - 0.5) * 1.4;
+      const scale = 1.00 + Math.abs(r2) * 0.02;
+      const posX = (r3 > 0.5 ? 1 : -1) * (2.0 + Math.abs(r3 * 4.0) % 2.0);
+      const posY = (r4 > 0.5 ? 1 : -1) * (2.0 + Math.abs(r4 * 4.0) % 2.0);
+      const rig = fxContainer?.querySelector(`#fx-grunge-rig-${tplId}`);
+      if (rig) rig.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
     } else if (tplId === 'kinetic-decode-typewriter') {
       // Matrix-style character scrambling decode loop
       const targetWord = "THE ILLUSION OF CHOICE";
@@ -29664,7 +29724,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         }
       }
     } else if (tplId === 'jani-countdown-panic-suite') {
-      // Countdown animation simulation
       const remaining = Math.max(0, 10 - ((t * 2.5) % 10));
       const sec = Math.floor(remaining);
       const ms = Math.floor((remaining % 1) * 1000);
@@ -29677,19 +29736,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           digits.style.color = '#ff334b';
           digits.style.textShadow = '0 0 22px rgba(255, 51, 75, 1)';
         } else {
-          digits.style.color = '#ef4444';
-          digits.style.textShadow = '0 0 16px rgba(239, 68, 68, 0.8)';
+          digits.style.color = '#ffffff';
+          digits.style.textShadow = '0 0 14px rgba(239, 68, 68, 0.85)';
         }
-      }
-
-      const bar = fxContainer?.querySelector(`#fx-countdown-bar-${tplId}`);
-      if (bar) {
-        bar.style.width = `${((10 - remaining) / 10) * 100}%`;
       }
 
       const ticker = fxContainer?.querySelector(`#fx-countdown-ticker-${tplId}`);
       if (ticker) {
-        const offset = (t * 50) % 200;
+        const offset = (t * 45) % 350;
         ticker.style.transform = `translateX(-${offset}px)`;
       }
     } else if (tplId === 'nonlinear-time-flash') {
@@ -30346,7 +30400,6 @@ function applySelectedHomepageTemplate(templateId) {
   const dedicatedSuiteMap = {
 
     'og-parallax-depth-engine': openOGParallaxSuite,
-    'spatial-3d-motion-suite': openSpatial3DMotionSuite,
     'jani-puzzle-narrative-suite': openJaniSuite,
     'jani-countdown-panic-suite': openCountdownSuite,
     'nonlinear-time-flash': openFlashbackSuite,
@@ -30528,36 +30581,36 @@ function applySelectedHomepageTemplate(templateId) {
       selectClip(docClip, 'image');
     }
   } else if (templateId === 'text-texturing-grunge') {
-    // James Jani Vintage Paper & Distressed Grunge Texture Title
+    // James Jani Vintage Paper & Kraft Folder Chapter Card
     const textureClip = {
       id: `img-tex-${Date.now()}`,
-      name: 'James_Jani_Paper_Texture.jpg',
-      url: tpl.defaultImage,
+      name: 'James_Jani_Kraft_Folder.png',
+      url: topCustomizerState.primaryUrl || '/jani_clean_kraft_plate_hd.png',
       start: 0,
-      duration: 6,
-      scale: 1.15
+      duration: topCustomizerState.duration || 6,
+      scale: 1.05
     };
     const grungeTitle = {
       id: `txt-${Date.now() + 1}`,
-      text: 'POWER & GREED',
-      highlight: 'POWER',
-      highlightColor: '#c084fc',
+      text: topCustomizerState.mainText || 'POWER & GREED',
+      highlight: '',
+      highlightColor: topCustomizerState.titleColor || '#ffffff',
       anim: 'pop',
       fontSize: 68,
-      fontFamily: 'Playfair Display, Georgia, serif',
+      fontFamily: 'Cinzel Decorative, Cinzel, serif',
       start: 0,
-      duration: 6
+      duration: topCustomizerState.duration || 6
     };
     const subtitle = {
       id: `txt-${Date.now() + 2}`,
-      text: 'CHAPTER IV: THE MANIPULATION',
+      text: topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION',
       highlight: '',
-      highlightColor: '#a855f7',
+      highlightColor: topCustomizerState.textColor || '#d4af37',
       anim: 'slide_up',
-      fontSize: 28,
-      fontFamily: 'monospace',
+      fontSize: 24,
+      fontFamily: 'Cinzel, Georgia, serif',
       start: 0.5,
-      duration: 5.5
+      duration: (topCustomizerState.duration || 6) - 0.5
     };
     if (timelineClips && timelineClips.image && timelineClips.text) {
       timelineClips.image = [textureClip];
@@ -30566,29 +30619,31 @@ function applySelectedHomepageTemplate(templateId) {
       selectClip(grungeTitle, 'text');
     }
   } else if (templateId === 'kinetic-decode-typewriter') {
-    // Tension Matrix Decode & Typewriter Kinetic Text
+    // Tension Matrix Decode & Typewriter Kinetic Text (3D Tactical Environmental Standard)
     const matrixClip = {
       id: `img-matrix-${Date.now()}`,
-      name: 'Matrix_Rain_Engine.png',
-      url: tpl.defaultImage,
+      name: 'Tactical_Desk_Plate.png',
+      url: '/tactical_desk_hd_plate.png',
       start: 0,
       duration: 6,
-      scale: 1.2,
+      scale: 1.0,
       zIndex: 10,
       matrixRain: true,
-      matrixRainColor: '#00ff41',
-      matrixRainSpeed: 1.0,
-      matrixRainDensity: 16
+      matrixRainColor: topCustomizerState.matrixRainColor || '#00ff41',
+      matrixRainSpeed: topCustomizerState.matrixRainSpeed || 1.0,
+      matrixRainDensity: topCustomizerState.matrixRainDensity || 16,
+      isTactical3D: true
     };
     const decodeTitle = {
       id: `txt-${Date.now() + 1}`,
-      text: 'THE ILLUSION OF CHOICE',
-      subtitle: '[ HIGH TENSION REVEAL ]',
-      textColor: '#00ff41',
-      highlightColor: '#00ff41',
+      text: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
+      subtitle: topCustomizerState.subText || '[ HIGH TENSION REVEAL ]',
+      textColor: topCustomizerState.textColor || '#00f0ff',
+      highlightColor: topCustomizerState.textColor || '#00f0ff',
       anim: 'decode_typewriter',
       matrixDecode: true,
-      typeSpeed: 1.0,
+      isTactical3D: true,
+      typeSpeed: topCustomizerState.matrixTypeSpeed || 1.0,
       fontSize: 38,
       fontFamily: 'monospace',
       start: 0,
@@ -30689,8 +30744,7 @@ function applySelectedHomepageTemplate(templateId) {
       selectClip(glitchClip, 'image');
     }
   } else if (templateId === 'spatial-3d-motion-suite') {
-    // Launch full Three.js 3D Spatial Motion Suite Studio
-    openSpatial3DMotionSuite();
+    openTopTemplateCustomizer(tpl);
     return;
   } else if (templateId === 'document-3d-fx-engine') {
     openTopTemplateCustomizer(tpl);
@@ -31305,6 +31359,15 @@ function openTopTemplateCustomizer(tpl) {
         const dData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountDealTermSheet3DStage(stage, dData);
       }
+    } else if (tpl.id === 'pyramid-scheme') {
+      topCustomizerState.primaryUrl = '/pyramid_concrete_plate_clean.png';
+      topCustomizerState.secondaryUrl = '/pyramid_matrix_plate_clean.png';
+      topCustomizerState.originalPhotoUrl = '/pyramid_concrete_plate_clean.png';
+      if (typeof window.tplMountPyramidCollapse3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const pcData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountPyramidCollapse3DStage(stage, pcData);
+      }
     } else if (tpl.id === 'scam-redaction') {
       topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
       topCustomizerState.secondaryUrl = '';
@@ -31442,6 +31505,12 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('google', { is3DMode: true });
     }
+    if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('deal-term-sheet', { is3DMode: true });
+    }
+    if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('pyramid-scheme', { is3DMode: true });
+    }
   }
 
   const syncPaperModeButtons = () => {
@@ -31454,6 +31523,10 @@ function openTopTemplateCustomizer(tpl) {
       is3D = !!window.tplGetContextualData('empire-timeline').is3DMode;
     } else if (tpl.id === 'google' && typeof window.tplGetContextualData === 'function') {
       is3D = !!window.tplGetContextualData('google').is3DMode;
+    } else if (tpl.id === 'deal-term-sheet' && typeof window.tplGetContextualData === 'function') {
+      is3D = window.tplGetContextualData('deal-term-sheet').is3DMode !== false;
+    } else if (tpl.id === 'pyramid-scheme' && typeof window.tplGetContextualData === 'function') {
+      is3D = window.tplGetContextualData('pyramid-scheme').is3DMode !== false;
     } else if (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)) {
       is3D = true;
     }
@@ -31482,6 +31555,16 @@ function openTopTemplateCustomizer(tpl) {
       window.tplSetContextualData('google', { is3DMode: false, styleMode: 'classic' });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
     }
+    if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('deal-term-sheet', { is3DMode: false });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('deal-term-sheet');
+      if (typeof window.applyModeLayout === 'function') window.applyModeLayout(false);
+    }
+    if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('pyramid-scheme', { is3DMode: false });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('pyramid-scheme');
+      if (typeof window.applyModeLayout === 'function') window.applyModeLayout(false);
+    }
     const btn3dVid = document.getElementById('btn-3d-mode-video');
     if (btn3dVid && tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') btn3dVid.click();
     syncPaperModeButtons();
@@ -31504,6 +31587,16 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('google', { is3DMode: true, styleMode: 'cinematic' });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
+    }
+    if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('deal-term-sheet', { is3DMode: true });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('deal-term-sheet');
+      if (typeof window.applyModeLayout === 'function') window.applyModeLayout(true);
+    }
+    if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('pyramid-scheme', { is3DMode: true });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('pyramid-scheme');
+      if (typeof window.applyModeLayout === 'function') window.applyModeLayout(true);
     }
     const btn3dInteractive = document.getElementById('btn-3d-mode-interactive');
     if (btn3dInteractive && tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') btn3dInteractive.click();
@@ -31547,7 +31640,7 @@ function openTopTemplateCustomizer(tpl) {
     else if (tpl.id === 'magnates-media-article-highlight') cleanP = 'broadsheet_financial.svg';
     else if (tpl.id === 'doc-highlighter-loupe-suite') cleanP = 'forbes_article_hd.svg';
     else if (tpl.id === 'paper-rip-shred') cleanP = 'Primary Subject';
-    else if (tpl.id === 'text-texturing-grunge') cleanP = 'Grunge Backdrop';
+    else if (tpl.id === 'text-texturing-grunge') cleanP = 'Vintage Paper Backdrop';
     else if (tpl.id === 'kinetic-decode-typewriter') cleanP = 'Matrix Grid';
     primaryFilename.textContent = cleanP.length > 22 ? cleanP.substring(0, 20) + '...' : cleanP;
   }
@@ -31621,16 +31714,22 @@ function openTopTemplateCustomizer(tpl) {
   const pushWrapEl = document.getElementById('tpl-modal-push-controls');
   if (pushWrapEl) pushWrapEl.style.display = 'none';
   const isCustomCartographyOrGraph = (tpl.id === 'map' || tpl.id === 'empire-timeline');
+  const isDedicated3DSuite = (tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine');
   const isTesterTpl = !!tpl.isTesterTemplate || !!tpl.previewType;
-  const hideMediaUploads = isCustomCartographyOrGraph || (isTesterTpl && tpl.id !== 'film-grain');
+  const hideMediaUploads = isCustomCartographyOrGraph || isDedicated3DSuite || (isTesterTpl && tpl.id !== 'film-grain');
   const atmosphereWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
-  if (atmosphereWrapEl) atmosphereWrapEl.style.display = isCustomCartographyOrGraph ? 'none' : 'flex';
+  if (atmosphereWrapEl) atmosphereWrapEl.style.display = (isCustomCartographyOrGraph || isDedicated3DSuite) ? 'none' : 'flex';
   const primWrapEl = document.getElementById('tpl-modal-wrap-primary');
   if (primWrapEl) primWrapEl.style.display = (hideMediaUploads || tpl.id === 'film-grain') ? 'none' : 'flex';
   const secWrapEl = document.getElementById('tpl-modal-wrap-secondary');
   if (secWrapEl) secWrapEl.style.display = hideMediaUploads ? 'none' : 'flex';
   const txtWrapEl = document.getElementById('tpl-modal-wrap-text');
-  if (txtWrapEl) txtWrapEl.style.display = isCustomCartographyOrGraph ? 'none' : 'flex';
+  if (txtWrapEl) txtWrapEl.style.display = (isCustomCartographyOrGraph || isDedicated3DSuite) ? 'none' : 'flex';
+  if (isDedicated3DSuite) {
+    if (quickActionsWrapEl) quickActionsWrapEl.style.display = 'none';
+    const aiEngineWrap = document.getElementById('tpl-modal-wrap-ai-engine');
+    if (aiEngineWrap) aiEngineWrap.style.display = 'none';
+  }
 
   // 3D Interactive Mode button & floating toolbar: scope to relevant 3D templates
   const btn3DMode = document.getElementById('btn-toggle-3d-interactive-mode');
@@ -32151,13 +32250,32 @@ function openTopTemplateCustomizer(tpl) {
     topCustomizerState.subText = 'SCANDAL';
     topCustomizerState.textColor = '#ff334b';
   } else if (tpl.id === 'text-texturing-grunge') {
-    if (labelPrim) labelPrim.textContent = '\ud83d\udcdc Vintage Paper / Grunge Texture Backdrop';
-    if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Accent / Overlay';
+    if (labelPrim) labelPrim.textContent = '📜 Vintage Paper / Kraft Folder Backdrop';
+    if (labelSec) labelSec.textContent = '🎬 Archival News Overlay';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'POWER & GREED';
     topCustomizerState.subText = 'CHAPTER IV: THE MANIPULATION';
-    topCustomizerState.textColor = '#c084fc';
+    topCustomizerState.titleColor = '#ffffff';
+    topCustomizerState.textColor = '#d4af37';
+    topCustomizerState.fontFamily = "'Cinzel Decorative', 'Cinzel', serif";
+    topCustomizerState.stopMotionFps = 12;
+    topCustomizerState.enableDustParticles = true;
+    topCustomizerState.particleType = 'dust';
+    topCustomizerState.dustDensity = 25;
+    const colorTitle = document.getElementById('tpl-modal-color-text-title');
+    if (colorTitle) colorTitle.value = topCustomizerState.titleColor;
+    const colorSub = document.getElementById('tpl-modal-color-text-main');
+    if (colorSub) colorSub.value = topCustomizerState.textColor;
+    const chkDust = document.getElementById('tpl-modal-toggle-dust');
+    if (chkDust) chkDust.checked = true;
+    const btnDust = document.getElementById('btn-particle-dust') || document.getElementById('btn-part-dust');
+    if (btnDust) {
+      btnDust.style.borderColor = 'rgba(245,158,11,0.6)';
+      btnDust.style.background = 'rgba(245,158,11,0.22)';
+      btnDust.style.color = '#fef08a';
+      btnDust.style.fontWeight = '700';
+    }
   } else if (tpl.id === 'kinetic-decode-typewriter') {
     if (labelPrim) labelPrim.textContent = '\ud83d\udcbb Matrix Code / Cyber Grid Texture';
     if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Scene Asset';
@@ -32480,7 +32598,7 @@ function openTopTemplateCustomizer(tpl) {
   if (inputTextMain) inputTextMain.value = topCustomizerState.mainText;
   if (inputTextSub) inputTextSub.value = topCustomizerState.subText;
   if (colorTextMain) colorTextMain.value = topCustomizerState.textColor;
-  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand', 'creator-cinematic-studio', 'creator-cinematic-backdrop-suite'].concat(BIZ_STORY_IDS).includes(tpl.id) ? 'none' : 'flex';
+  if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand', 'creator-cinematic-studio', 'creator-cinematic-backdrop-suite', 'spatial-3d-motion-suite', 'document-3d-fx-engine'].concat(BIZ_STORY_IDS).includes(tpl.id) ? 'none' : 'flex';
 
   const modalKineticInput = document.getElementById('modal-kinetic-text-input');
   const modalKineticColor = document.getElementById('modal-kinetic-text-color');
@@ -33367,6 +33485,13 @@ function renderTopTemplatePreviewStage() {
   // 3D Photorealistic Deal Term Sheet Engine
   if (tplId === 'deal-term-sheet') {
     const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
+    const is3D = dtData.is3DMode !== false && topCustomizerState.paperPreviewMode !== 'video';
+    if (!is3D) {
+      if (typeof window.tplMountDealTermSheetVideoStage === 'function') {
+        window.tplMountDealTermSheetVideoStage(stage, dtData);
+      }
+      return;
+    }
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
     hoverBridgeActive = false;
     hoverExternalT = null;
@@ -33374,6 +33499,36 @@ function renderTopTemplatePreviewStage() {
       window.tplMountDealTermSheet3DStage(stage, dtData);
     }
     return;
+  }
+
+  // 3D Photorealistic Pyramid Collapse Engine (Vox / James Jani Standard)
+  if (tplId === 'pyramid-scheme') {
+    const pcData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('pyramid-scheme') : {};
+    const is3D = pcData.is3DMode !== false && topCustomizerState.paperPreviewMode !== 'video';
+    if (!is3D) {
+      if (typeof window.tplMountPyramidCollapseVideoStage === 'function') {
+        window.tplMountPyramidCollapseVideoStage(stage, pcData);
+      }
+      return;
+    }
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountPyramidCollapse3DStage === 'function') {
+      window.tplMountPyramidCollapse3DStage(stage, pcData);
+    }
+    return;
+  }
+
+  // 3D Tactical Environmental Projection Engine (Vox / James Jani / Johnny Harris / Magnates Media Standard)
+  if (tplId === 'kinetic-decode-typewriter') {
+    if (typeof window.tplMountTacticalDecode3DStage === 'function') {
+      if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+      hoverBridgeActive = false;
+      hoverExternalT = null;
+      window.tplMountTacticalDecode3DStage(stage, topCustomizerState);
+      return;
+    }
   }
 
   // 3D Photorealistic Fraud Dossier Redaction Engine
@@ -33932,39 +34087,40 @@ function renderTopTemplatePreviewStage() {
       </div>
     `;
   } else if (tplId === 'text-texturing-grunge') {
-    stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #0e0c14; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
-        <div style="position: absolute; inset: 0; background: radial-gradient(circle at center, rgba(147, 51, 234, 0.35) 0%, rgba(30, 27, 75, 0.6) 50%, #000 100%);"></div>
-        <img id="customizer-live-bg" src="${prim}" alt="Paper Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.35; filter: contrast(2) grayscale(0.2);" />
-        ${isTextShowing ? `
-        <div id="customizer-live-grunge-plate" style="position: relative; text-align: center; z-index: 2; padding: 12px; pointer-events: none;">
-          <h3 style="font-family: 'Playfair Display', Georgia, serif; font-size: 32px; font-weight: 900; letter-spacing: 4px; color: ${topCustomizerState.textColor || '#f3e8ff'}; margin: 0; text-transform: uppercase; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.95));">
-            ${topCustomizerState.mainText || 'POWER & GREED'}
-          </h3>
-          <div style="width: 70%; height: 2px; background: rgba(168, 85, 247, 0.85); margin: 6px auto; box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);"></div>
-          <span style="font-family: monospace; font-size: 11px; font-weight: 700; letter-spacing: 3px; color: #d8b4fe; text-transform: uppercase; display: block;">
-            ${topCustomizerState.subText || 'CHAPTER IV: THE MANIPULATION'}
-          </span>
-        </div>` : ''}
-      </div>
-    `;
+    if (typeof window.tplMountJaniGrungePaperStage === 'function') {
+      window.tplMountJaniGrungePaperStage(stage, topCustomizerState);
+    } else {
+      stage.innerHTML = `
+        <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #0c0a07; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img id="customizer-live-bg" src="${prim || '/jani_clean_kraft_plate_hd.png'}" alt="Paper Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+      `;
+    }
   } else if (tplId === 'kinetic-decode-typewriter') {
-    stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #040608; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; cursor: crosshair;">
-        <canvas id="customizer-live-matrix-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none;"></canvas>
-        <img id="customizer-live-bg" src="${prim}" alt="Matrix Texture" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.15; filter: contrast(1.6); mix-blend-mode: screen; z-index: 2; pointer-events: none;" />
-        ${isTextShowing ? `
-        <div style="position: relative; z-index: 4; font-family: monospace; text-align: center; pointer-events: none;">
-          <span style="font-size: 11px; color: #a7f3d0; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; display: block; margin-bottom: 8px; text-shadow: 0 0 10px rgba(0,255,65,0.6);">
-            ${topCustomizerState.subText || '[ HIGH TENSION REVEAL ]'}
-          </span>
-          <div id="customizer-live-decode-box" style="font-size: 18px; font-weight: 900; letter-spacing: 2px; color: ${topCustomizerState.textColor || '#00ff41'}; background: rgba(5, 10, 8, 0.92); border: 1px solid ${topCustomizerState.textColor || '#00ff41'}; padding: 10px 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 20px ${topCustomizerState.textColor || '#00ff41'}40; display: inline-flex; align-items: center; gap: 6px;">
-            <span id="customizer-live-decode-text">${topCustomizerState.mainText || 'THE ILLUSION OF CHOICE'}</span>
-            <span style="display: inline-block; width: 8px; height: 20px; background: ${topCustomizerState.textColor || '#00ff41'}; box-shadow: 0 0 8px ${topCustomizerState.textColor || '#00ff41'};" class="pulse-preview-badge"></span>
+    if (typeof window.tplMountTacticalDecode3DStage === 'function') {
+      window.tplMountTacticalDecode3DStage(stage, topCustomizerState);
+    } else {
+      stage.innerHTML = `
+        <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #030508; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair; perspective: 1100px;">
+          <div id="customizer-tactical-3d-rig" style="position: absolute; inset: -5% -6%; width: 110%; height: 110%; transform: rotateX(24deg) rotateY(-3.5deg) scale(1.04); transform-style: preserve-3d;">
+            <img id="customizer-live-tactical-plate" src="/tactical_desk_hd_plate.png" alt="Tactical Desk Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; pointer-events: none; filter: contrast(112%) brightness(95%);" />
+            <canvas id="customizer-live-matrix-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none;"></canvas>
+            <div style="position: absolute; inset: 0; z-index: 3; pointer-events: none; background: radial-gradient(circle at 48% 30%, rgba(255,246,220,0.20) 0%, rgba(255,235,190,0.06) 42%, rgba(0,0,0,0.72) 100%); mix-blend-mode: soft-light;"></div>
+            ${isTextShowing ? `
+            <div id="customizer-live-tactical-hud-rig" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 4; pointer-events: none; transform: translateZ(16px);">
+              <span id="customizer-live-subtitle" style="font-family: monospace; font-size: 11.5px; color: #a7f3d0; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 9px; text-shadow: 0 0 10px rgba(0,255,65,0.7);">
+                ${topCustomizerState.subText || '[ HIGH TENSION REVEAL ]'}
+              </span>
+              <div id="customizer-live-decode-box" style="font-family: monospace; font-size: 19px; font-weight: 900; letter-spacing: 2.2px; color: ${topCustomizerState.textColor || '#00f0ff'}; background: rgba(5, 20, 28, 0.88); border: 1.8px solid ${topCustomizerState.textColor || '#00f0ff'}; padding: 9px 24px; border-radius: 8px; box-shadow: 0 0 24px ${topCustomizerState.textColor || '#00f0ff'}40, inset 0 0 15px ${topCustomizerState.textColor || '#00f0ff'}20, 0 16px 36px rgba(0,0,0,0.92); display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(8px);">
+                <span id="customizer-live-decode-text">${topCustomizerState.mainText || 'THE ILLUSION OF CHOICE'}</span>
+                <span id="customizer-live-cursor" style="display: inline-block; width: 8px; height: 20px; background: ${topCustomizerState.textColor || '#00f0ff'}; box-shadow: 0 0 10px ${topCustomizerState.textColor || '#00f0ff'};" class="pulse-preview-badge"></span>
+              </div>
+            </div>` : ''}
+            <div style="position: absolute; inset: 0; z-index: 5; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent 45%, rgba(0,2,6,0.65) 100%);"></div>
           </div>
-        </div>` : ''}
-      </div>
-    `;
+        </div>
+      `;
+    }
   } else if (tplId === 'vox-newspaper-cream-dossier') {
     stage.innerHTML = `
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #f4eedb; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
@@ -34340,6 +34496,14 @@ function updateTopCustomizerFrame(seqTime, now) {
       const stage = document.getElementById('tpl-modal-preview-stage');
       const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
       window.stepDealTermSheetAnimation(stage, 'deal-term-sheet', localSceneT, dtData);
+    }
+  }
+
+  if (tplId === 'pyramid-scheme') {
+    if (typeof window.stepPyramidCollapseAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const pcData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('pyramid-scheme') : {};
+      window.stepPyramidCollapseAnimation(stage, 'pyramid-scheme', localSceneT, pcData);
     }
   }
 
@@ -34932,41 +35096,46 @@ function updateTopCustomizerFrame(seqTime, now) {
     if (bgEl) bgEl.style.transform = `scale(1.1) translate(${bgShiftX}px, 0)`;
     if (textBehind) textBehind.style.transform = `scale(${textScale})`;
   } else if (tplId === 'text-texturing-grunge') {
-    const jitterX = Math.sin(localSceneT * 14) * 2;
-    const jitterY = Math.cos(localSceneT * 16) * 2;
-    const bgZoom = 1.05 + Math.sin(localSceneT * 2) * 0.04;
-    const plate = document.getElementById('customizer-live-grunge-plate');
-    const bgEl = document.getElementById('customizer-live-bg');
-    if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
-    if (bgEl) bgEl.style.transform = `scale(${bgZoom})`;
+    if (typeof window.tplUpdateJaniGrungePaperFrame === 'function') {
+      window.tplUpdateJaniGrungePaperFrame(topCustomizerState, localSceneT, now);
+    } else {
+      const jitterX = Math.sin(localSceneT * 14) * 2;
+      const jitterY = Math.cos(localSceneT * 16) * 2;
+      const plate = document.getElementById('customizer-live-grunge-plate');
+      if (plate) plate.style.transform = `translate(${jitterX}px, ${jitterY}px)`;
+    }
   } else if (tplId === 'kinetic-decode-typewriter') {
-    const rainCanvas = document.getElementById('customizer-live-matrix-canvas');
-    if (rainCanvas && topCustomizerState.matrixRainEnabled) {
-      if (!rainCanvas._initialized || rainCanvas.width !== rainCanvas.clientWidth) {
-        rainCanvas.width = rainCanvas.clientWidth || 540;
-        rainCanvas.height = rainCanvas.clientHeight || 360;
-        rainCanvas._initialized = true;
+    if (typeof window.tplUpdateTacticalDecode3DFrame === 'function') {
+      window.tplUpdateTacticalDecode3DFrame(topCustomizerState, localSceneT, now);
+    } else {
+      const rainCanvas = document.getElementById('customizer-live-matrix-canvas');
+      if (rainCanvas && topCustomizerState.matrixRainEnabled) {
+        if (!rainCanvas._initialized || rainCanvas.width !== rainCanvas.clientWidth) {
+          rainCanvas.width = rainCanvas.clientWidth || 540;
+          rainCanvas.height = rainCanvas.clientHeight || 360;
+          rainCanvas._initialized = true;
+        }
+        const rCtx = rainCanvas.getContext('2d');
+        const dt = (now - (topCustomizerState._lastRainNow || now)) / 1000;
+        topCustomizerState._lastRainNow = now;
+        renderMatrixRainCanvasFrame(rCtx, rainCanvas.width, rainCanvas.height, topCustomizerState, Math.min(0.1, dt || 0.016));
+      } else if (rainCanvas && !topCustomizerState.matrixRainEnabled) {
+        const rCtx = rainCanvas.getContext('2d');
+        rCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
       }
-      const rCtx = rainCanvas.getContext('2d');
-      const dt = (now - (topCustomizerState._lastRainNow || now)) / 1000;
-      topCustomizerState._lastRainNow = now;
-      renderMatrixRainCanvasFrame(rCtx, rainCanvas.width, rainCanvas.height, topCustomizerState, Math.min(0.1, dt || 0.016));
-    } else if (rainCanvas && !topCustomizerState.matrixRainEnabled) {
-      const rCtx = rainCanvas.getContext('2d');
-      rCtx.clearRect(0, 0, rainCanvas.width, rainCanvas.height);
-    }
 
-    const targetWord = topCustomizerState.mainText || "THE ILLUSION OF CHOICE";
-    const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const typeSpeed = topCustomizerState.matrixTypeSpeed || 1.0;
-    const progress = Math.min(1, (localSceneT * 0.8 * typeSpeed) % 1.25);
-    const charsRevealed = Math.floor(progress * targetWord.length);
-    let displayed = targetWord.substring(0, charsRevealed);
-    if (charsRevealed < targetWord.length) {
-      displayed += glyphs[Math.floor((localSceneT * 50) % glyphs.length)];
+      const targetWord = topCustomizerState.mainText || "THE ILLUSION OF CHOICE";
+      const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const typeSpeed = topCustomizerState.matrixTypeSpeed || 1.0;
+      const progress = Math.min(1, (localSceneT * 0.8 * typeSpeed) % 1.25);
+      const charsRevealed = Math.floor(progress * targetWord.length);
+      let displayed = targetWord.substring(0, charsRevealed);
+      if (charsRevealed < targetWord.length) {
+        displayed += glyphs[Math.floor((localSceneT * 50) % glyphs.length)];
+      }
+      const decodeSpan = document.getElementById('customizer-live-decode-text');
+      if (decodeSpan) decodeSpan.textContent = displayed;
     }
-    const decodeSpan = document.getElementById('customizer-live-decode-text');
-    if (decodeSpan) decodeSpan.textContent = displayed;
   } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
     // Atmospheric Dust / Snow / Stars / Fog simulation tick
     if (topCustomizerState.enableDustParticles && typeof renderCustomizerDustSimulation === 'function') {
@@ -40168,11 +40337,11 @@ function modalAddNextSceneAction() {
    ========================================================= */
 const SPATIAL_PRESETS = {
   'docu-essay': [
-    { id: '1', type: 'text', title: 'THE SYSTEM', z: 600, x: -120, y: 80, scale: 1.2, color: '#f59e0b', subtitle: '', body: '' },
-    { id: '2', type: 'card', title: 'HEADLINE 1929', subtitle: 'FINANCIAL PANIC SPREADS', body: 'Markets tumble as investors grapple with unprecedented systemic instability and speculative fever.', z: -600, x: 220, y: -40, scale: 1.0, color: '#3b82f6' },
-    { id: '3', type: 'text', title: 'MANIPULATION', z: -1800, x: -280, y: -100, scale: 1.5, color: '#ef4444', subtitle: '', body: '' },
-    { id: '4', type: 'card', title: 'THE ARCHITECT', subtitle: 'BEHIND CLOSED DOORS', body: '"If you control the narrative, you control the perception of reality itself."', z: -3000, x: 180, y: 120, scale: 1.1, color: '#f59e0b' },
-    { id: '5', type: 'text', title: 'THE TRAP', z: -4200, x: 0, y: 0, scale: 2.2, color: '#a855f7', subtitle: '', body: '' }
+    { id: '1', type: 'text', title: 'THE SYSTEM', z: 600, x: 0, y: 60, scale: 1.25, color: '#f59e0b', subtitle: '', body: '' },
+    { id: '2', type: 'card', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: -400, x: -300, y: 40, scale: 1.05, color: '#ef4444' },
+    { id: '3', type: 'text', title: 'MANIPULATION & CONTROL', z: -1400, x: 0, y: -100, scale: 1.4, color: '#d97706', subtitle: '', body: '' },
+    { id: '4', type: 'card', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: -2600, x: 300, y: 80, scale: 1.1, color: '#38bdf8' },
+    { id: '5', type: 'text', title: 'THE SYSTEM OVERRIDE', z: -4200, x: 0, y: 0, scale: 2.0, color: '#a855f7', subtitle: '', body: '' }
   ],
   'cyber-matrix': [
     { id: '1', type: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 800, x: -200, y: 100, scale: 1.0, color: '#10b981' },
@@ -40718,7 +40887,7 @@ function updateSpatialCameraPosition() {
 }
 
 function initSpatialThreeJSEngine() {
-  const container = document.getElementById('spatial-threejs-container');
+  const container = document.getElementById('spatial-threejs-container') || document.getElementById('spatial-threejs-container-legacy');
   if (!container || typeof THREE === 'undefined') return;
 
   if (spatial3DState.renderer) {
@@ -40812,6 +40981,11 @@ function initSpatialThreeJSEngine() {
 }
 
 function openSpatial3DMotionSuite() {
+  const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined') && EFFECT_TEMPLATES_DATA.find(t => t.id === 'spatial-3d-motion-suite');
+  if (tpl && typeof openTopTemplateCustomizer === 'function') {
+    openTopTemplateCustomizer(tpl);
+    return;
+  }
   const modal = document.getElementById('modal-spatial-3d-suite');
   if (!modal) return;
   modal.style.display = 'flex';
@@ -43251,71 +43425,54 @@ function showCountdownToast(msg) {
   }, 3200);
 }
 
+// --- Countdown Suite Asset Management ---
+const countdownAssets = {
+  bgPlate: null,
+  fgPapers: null,
+  isLoaded: false
+};
+
+function ensureCountdownAssets() {
+  if (countdownAssets.isLoaded) return;
+  const bg = new Image();
+  bg.crossOrigin = 'anonymous';
+  bg.src = '/countdown_warroom_clean_bg.png';
+  bg.onload = () => { countdownAssets.bgPlate = bg; };
+  countdownAssets.bgPlate = bg;
+
+  const fg = new Image();
+  fg.crossOrigin = 'anonymous';
+  fg.src = '/countdown_warroom_foreground_papers.png';
+  fg.onload = () => { countdownAssets.fgPapers = fg; };
+  countdownAssets.fgPapers = fg;
+
+  countdownAssets.isLoaded = true;
+}
+
+if (typeof window !== 'undefined') {
+  ensureCountdownAssets();
+}
+
 function drawCountdownBackground(ctx, w, h, progress) {
-  // If custom background image uploaded / set
+  ensureCountdownAssets();
+  
+  // If custom user background image was uploaded / specified
   if (countdownSuiteState.customBgImage && countdownSuiteState.customBgImage.complete) {
     ctx.drawImage(countdownSuiteState.customBgImage, 0, 0, w, h);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(0, 0, w, h);
+  } else if (countdownAssets.bgPlate && countdownAssets.bgPlate.complete && countdownAssets.bgPlate.naturalWidth > 0) {
+    // 3D Curved Financial War Room Terminal Screen Environment
+    ctx.drawImage(countdownAssets.bgPlate, 0, 0, w, h);
   } else {
-    // Deep dark cinematic gradient
-    const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, w * 0.85);
-    bgGrad.addColorStop(0, '#120507');
-    bgGrad.addColorStop(0.6, '#080204');
+    // Fallback radial gradient war room environment
+    const bgGrad = ctx.createRadialGradient(w * 0.42, h * 0.5, 40, w * 0.42, h * 0.5, w * 0.8);
+    bgGrad.addColorStop(0, '#160609');
+    bgGrad.addColorStop(0.55, '#080204');
     bgGrad.addColorStop(1, '#000000');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
   }
-
-  // Tech Grid Lines
-  ctx.strokeStyle = 'rgba(239, 68, 68, 0.08)';
-  ctx.lineWidth = 1;
-  const gridSize = 40;
-  for (let x = 0; x < w; x += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, h);
-    ctx.stroke();
-  }
-  for (let y = 0; y < h; y += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(w, y);
-    ctx.stroke();
-  }
-
-  // Crashing Stock Chart Line in Background
-  ctx.beginPath();
-  ctx.lineWidth = 4;
-  const lineGrad = ctx.createLinearGradient(0, 0, w, 0);
-  lineGrad.addColorStop(0, '#22c55e');
-  lineGrad.addColorStop(0.4, '#eab308');
-  lineGrad.addColorStop(1, '#ef4444');
-  ctx.strokeStyle = lineGrad;
-
-  const totalPoints = countdownSuiteState.chartPoints.length;
-  const step = w / (totalPoints - 1);
-
-  for (let i = 0; i < totalPoints; i++) {
-    let dropFactor = (i / totalPoints) > (1 - progress * 0.8) ? (1 + progress * 2.5) : 1;
-    let val = countdownSuiteState.chartPoints[i] / dropFactor;
-    if (progress > 0.7) val += (Math.random() - 0.5) * 0.08;
-    let x = i * step;
-    let y = h * 0.3 + (1 - val) * (h * 0.5);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.stroke();
-
-  // Gradient under stock line
-  ctx.lineTo(w, h);
-  ctx.lineTo(0, h);
-  ctx.closePath();
-  const fillGrad = ctx.createLinearGradient(0, 0, 0, h);
-  fillGrad.addColorStop(0, 'rgba(239, 68, 68, 0.18)');
-  fillGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-  ctx.fillStyle = fillGrad;
-  ctx.fill();
 }
 
 function drawCountdownEffect(ctx, w, h, remainingSec) {
@@ -43331,110 +43488,350 @@ function drawCountdownEffect(ctx, w, h, remainingSec) {
     timeStr = `23:${pad(59 - mins)}:${pad(59 - secs)}`;
   }
 
+  // Central Monitor Positioning Geometry
+  // The center monitor screen center is at xc = 535
+  const xc = 535;
+  const progress = Math.max(0, Math.min(1, 1 - (remainingSec / countdownSuiteState.totalDuration)));
+
   ctx.save();
 
-  let primaryColor = "#ef4444";
-  let glowColor = "rgba(239, 68, 68, 0.8)";
-  let fontStack = "'Share Tech Mono', monospace";
-
-  if (countdownSuiteState.stylePreset === 'matrix') {
-    primaryColor = "#22c55e";
-    glowColor = "rgba(34, 197, 94, 0.8)";
-  } else if (countdownSuiteState.stylePreset === 'stark') {
-    primaryColor = "#ffffff";
-    glowColor = "rgba(255, 255, 255, 0.5)";
-    fontStack = "'Chakra Petch', sans-serif";
-  } else if (countdownSuiteState.stylePreset === 'dramatic') {
-    primaryColor = "#f59e0b";
-    glowColor = "rgba(245, 158, 11, 0.7)";
-    fontStack = "'Playfair Display', serif";
+  // 1. Technical Coordinate Grid on Monitor Screen
+  ctx.save();
+  ctx.strokeStyle = "rgba(239, 68, 68, 0.07)";
+  ctx.lineWidth = 1;
+  for (let x = 190; x <= 880; x += 32) {
+    ctx.beginPath();
+    ctx.moveTo(x, 110);
+    ctx.lineTo(x - 8, 615);
+    ctx.stroke();
   }
+  for (let y = 120; y <= 610; y += 32) {
+    ctx.beginPath();
+    ctx.moveTo(185, y);
+    ctx.lineTo(885, y - 4);
+    ctx.stroke();
+  }
+  ctx.restore();
 
-  // Headline Banner Label
+  // 2. Headline & Tactical HUD Layer: [ FTX LIQUIDITY CRASH ]
+  ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `700 22px 'Chakra Petch', sans-serif`;
-  ctx.fillStyle = '#a1a1aa';
-  ctx.fillText(countdownSuiteState.title.toUpperCase(), w / 2, h / 2 - 90);
+  ctx.font = "700 23px 'Chakra Petch', 'Inter', -apple-system, sans-serif";
+  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(255, 255, 255, 0.5)";
+  ctx.shadowBlur = 8;
+  const titleText = (countdownSuiteState.title || "FTX LIQUIDITY CRASH").toUpperCase();
+  ctx.fillText(`[ ${titleText} ]`, xc, 178);
+  ctx.restore();
 
-  // Main Digital Countdown Clock with Neon Glow
-  ctx.shadowColor = glowColor;
-  ctx.shadowBlur = 25;
-  ctx.fillStyle = primaryColor;
-  ctx.font = `700 80px ${fontStack}`;
-  ctx.fillText(timeStr, w / 2, h / 2 + 10);
+  // 3. Tactile Monospace Countdown Rig inside Clean HUD Box (24px+ padding below headline)
+  const boxW = 420;
+  const boxH = 54;
+  const by0 = 214;
+  const textY = by0 + boxH / 2;
+  const bx0 = xc - boxW / 2;
+  const bx1 = xc + boxW / 2;
+  const by1 = by0 + boxH;
 
-  // Sub-bar HUD accents
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-  ctx.fillRect(w / 2 - 200, h / 2 + 45, 400, 2);
-
-  // Panic Meter Bar
-  const panicProgress = Math.max(0, Math.min(1, 1 - (remainingSec / countdownSuiteState.totalDuration)));
-  ctx.fillStyle = primaryColor;
-  ctx.fillRect(w / 2 - 200, h / 2 + 45, 400 * panicProgress, 3);
-
-  // Pulsing Warning Tag if time < 3s
-  if (remainingSec < 3 && remainingSec > 0) {
-    const pulseOpacity = (Math.sin(performance.now() * 0.02) + 1) / 2;
-    ctx.fillStyle = `rgba(239, 68, 68, ${pulseOpacity})`;
-    ctx.font = `700 16px 'Chakra Petch', sans-serif`;
-    ctx.fillText("\u26a0\ufe0f IMMINENT SYSTEMIC COLLAPSE", w / 2, h / 2 + 85);
+  ctx.save();
+  // Translucent dark glass box
+  ctx.fillStyle = "rgba(12, 3, 5, 0.85)";
+  ctx.beginPath();
+  if (ctx.roundRect) {
+    ctx.roundRect(bx0, by0, boxW, boxH, 8);
+  } else {
+    ctx.rect(bx0, by0, boxW, boxH);
   }
+  ctx.fill();
+
+  // Fine HUD border
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.32)";
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+
+  // Tactical Corner L-Brackets
+  const cl = 9;
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(bx0, by0 + cl); ctx.lineTo(bx0, by0); ctx.lineTo(bx0 + cl, by0);
+  ctx.moveTo(bx1 - cl, by0); ctx.lineTo(bx1, by0); ctx.lineTo(bx1, by0 + cl);
+  ctx.moveTo(bx0, by1 - cl); ctx.lineTo(bx0, by1); ctx.lineTo(bx0 + cl, by1);
+  ctx.moveTo(bx1 - cl, by1); ctx.lineTo(bx1, by1); ctx.lineTo(bx1, by1 - cl);
+  ctx.stroke();
+
+  // High-Density Monospace Typography with Micro-Chromatic Aberration
+  ctx.font = "700 35px 'JetBrains Mono', 'DIN Pro', 'Share Tech Mono', ui-monospace, monospace";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Red Channel Shift (+1.5px)
+  ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
+  ctx.fillText(timeStr, xc + 1.5, textY);
+
+  // Cyan Channel Shift (-1.5px)
+  ctx.fillStyle = "rgba(56, 189, 248, 0.65)";
+  ctx.fillText(timeStr, xc - 1.5, textY);
+
+  // Core Monospace Glow Pass
+  if (remainingSec < 3) {
+    ctx.fillStyle = "#ff334b";
+    ctx.shadowColor = "rgba(255, 51, 75, 0.95)";
+    ctx.shadowBlur = 22;
+  } else {
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "rgba(239, 68, 68, 0.85)";
+    ctx.shadowBlur = 14;
+  }
+  ctx.fillText(timeStr, xc, textY);
+  ctx.restore();
+
+  // 4. Volumetric Crimson Gradient Area Chart & Candlestick Drops
+  const chartX0 = 210;
+  const chartX1 = 865;
+  const chartW = chartX1 - chartX0;
+  const chartBottom = 524;
+  const totalPoints = 50;
+  const pts = [];
+
+  for (let i = 0; i < totalPoints; i++) {
+    const norm = i / (totalPoints - 1);
+    const dropFactor = norm > (1 - progress * 0.85) ? (1 + progress * 2.6) : 1;
+    let baseVal = (countdownSuiteState.chartPoints[i] || 0.65) / dropFactor;
+    if (progress > 0.65 && norm > 0.5) baseVal += (Math.sin(i * 9.7 + performance.now() * 0.01) * 0.04);
+    const px = chartX0 + norm * chartW;
+    const py = 285 + (1 - baseVal) * 215;
+    pts.push({ x: px, y: Math.max(280, Math.min(chartBottom, py)) });
+  }
+
+  // Draw Area Fill with rich crimson gradient
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(chartX0, chartBottom);
+  for (let i = 0; i < pts.length; i++) {
+    ctx.lineTo(pts[i].x, pts[i].y);
+  }
+  ctx.lineTo(chartX1, chartBottom);
+  ctx.closePath();
+
+  const fillGrad = ctx.createLinearGradient(0, 280, 0, chartBottom);
+  fillGrad.addColorStop(0, "rgba(239, 68, 68, 0.78)");
+  fillGrad.addColorStop(0.35, "rgba(185, 28, 28, 0.48)");
+  fillGrad.addColorStop(0.75, "rgba(69, 10, 10, 0.26)");
+  fillGrad.addColorStop(1, "rgba(8, 2, 4, 0.04)");
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+
+  // Matrix Digital Data Streams inside Area
+  ctx.fillStyle = "rgba(255, 120, 120, 0.16)";
+  ctx.font = "10px 'JetBrains Mono', monospace";
+  const nowTime = performance.now() * 0.003;
+  for (let c = 0; c < 14; c++) {
+    const colX = chartX0 + 25 + c * 45;
+    const colY = 320 + ((nowTime * 45 + c * 38) % 170);
+    ctx.fillText((c % 2 === 0 ? "1" : "0"), colX, colY);
+  }
+
+  // Candlestick Markers along the chart
+  for (let i = 2; i < pts.length - 2; i += 3) {
+    const pt = pts[i];
+    const candleH = 14 + (i % 4) * 6;
+    const candleW = 5;
+    // Wick
+    ctx.strokeStyle = "rgba(239, 68, 68, 0.85)";
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(pt.x, pt.y - 8);
+    ctx.lineTo(pt.x, pt.y + candleH + 8);
+    ctx.stroke();
+    // Body
+    ctx.fillStyle = "#dc2626";
+    ctx.fillRect(pt.x - candleW / 2, pt.y, candleW, candleH);
+  }
+
+  // Key Trigger Drop Nodes (glowing pulsing circles)
+  const triggerIndices = [14, 27, 41];
+  triggerIndices.forEach(idx => {
+    if (idx < pts.length) {
+      const tp = pts[idx];
+      ctx.save();
+      ctx.shadowColor = "#ef4444";
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(tp.x, tp.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pulsing Ring
+      const rPulse = 6 + (Math.sin(performance.now() * 0.008 + idx) + 1) * 3;
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.85)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(tp.x, tp.y, rPulse, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  });
+
+  // Top Neon Glowing Jagged Contour Line
+  ctx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    if (i === 0) ctx.moveTo(pts[i].x, pts[i].y);
+    else ctx.lineTo(pts[i].x, pts[i].y);
+  }
+  ctx.strokeStyle = "#ff2a4b";
+  ctx.lineWidth = 3.2;
+  ctx.shadowColor = "#ef4444";
+  ctx.shadowBlur = 14;
+  ctx.stroke();
+  ctx.restore();
 
   ctx.restore();
 }
 
 function drawCountdownStockTicker(ctx, w, h) {
   if (!countdownSuiteState.tickerEnabled) return;
-  const tickerH = 42;
-
-  ctx.fillStyle = 'rgba(9, 9, 11, 0.94)';
-  ctx.fillRect(0, h - tickerH, w, tickerH);
-
-  ctx.fillStyle = 'rgba(239, 68, 68, 0.6)';
-  ctx.fillRect(0, h - tickerH, w, 2);
+  const tickerX0 = 195;
+  const tickerX1 = 875;
+  const tickerW = tickerX1 - tickerX0;
+  const tickerY0 = 566;
+  const tickerH = 38;
 
   ctx.save();
-  ctx.font = "600 15px 'Share Tech Mono', monospace";
-  ctx.fillStyle = "#f87171";
+  // Clip to the monitor bottom bezel bounds
+  ctx.beginPath();
+  ctx.rect(tickerX0, tickerY0, tickerW, tickerH);
+  ctx.clip();
 
-  countdownSuiteState.tickerOffset -= 2.5;
-  const textWidth = ctx.measureText(countdownSuiteState.tickerText).width;
-  if (Math.abs(countdownSuiteState.tickerOffset) > textWidth) {
+  // Dark high-contrast background bar
+  ctx.fillStyle = "rgba(8, 2, 4, 0.96)";
+  ctx.fillRect(tickerX0, tickerY0, tickerW, tickerH);
+
+  // Red top border line
+  ctx.strokeStyle = "rgba(239, 68, 68, 0.85)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(tickerX0, tickerY0);
+  ctx.lineTo(tickerX1, tickerY0);
+  ctx.stroke();
+
+  // Scrolling Marquee offset
+  countdownSuiteState.tickerOffset -= 2.2;
+
+  // Render ticker text with bold badges
+  const textY = tickerY0 + tickerH / 2 + 4;
+  const items = countdownSuiteState.tickerText.split(/[•|]/).map(s => s.trim()).filter(Boolean);
+
+  // Measure full line width
+  ctx.font = "700 12px 'JetBrains Mono', 'Share Tech Mono', monospace";
+  let blockW = 0;
+  const itemWidths = items.map(item => {
+    const isBadge = item.includes('-') || item.includes('PAUSED') || item.includes('BANKRUPT');
+    const badgeW = ctx.measureText(item).width + (isBadge ? 18 : 10);
+    blockW += badgeW + 16;
+    return { text: item, isBadge, width: badgeW };
+  });
+
+  if (blockW > 0 && Math.abs(countdownSuiteState.tickerOffset) > blockW) {
     countdownSuiteState.tickerOffset = 0;
   }
 
-  ctx.fillText(countdownSuiteState.tickerText + "   " + countdownSuiteState.tickerText, countdownSuiteState.tickerOffset + 20, h - 15);
+  // Draw 2 passes for seamless looping
+  for (let pass = 0; pass < 2; pass++) {
+    let curX = tickerX0 + countdownSuiteState.tickerOffset + pass * (blockW + 40);
+    for (let k = 0; k < itemWidths.length; k++) {
+      const it = itemWidths[k];
+      if (curX + it.width > tickerX0 - 50 && curX < tickerX1 + 50) {
+        if (it.isBadge) {
+          // Solid Red Pill Badge
+          ctx.fillStyle = "#dc2626";
+          ctx.beginPath();
+          if (ctx.roundRect) {
+            ctx.roundRect(curX, tickerY0 + 8, it.width, 22, 4);
+          } else {
+            ctx.rect(curX, tickerY0 + 8, it.width, 22);
+          }
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "800 11.5px 'JetBrains Mono', monospace";
+          ctx.textAlign = 'center';
+          ctx.fillText(it.text, curX + it.width / 2, textY);
+        } else {
+          ctx.fillStyle = "#fca5a5";
+          ctx.font = "600 12px 'JetBrains Mono', monospace";
+          ctx.textAlign = 'left';
+          ctx.fillText(it.text, curX + 4, textY);
+        }
+
+        // Separator pipe
+        ctx.fillStyle = "rgba(239, 68, 68, 0.6)";
+        ctx.fillText("|", curX + it.width + 6, textY);
+      }
+      curX += it.width + 16;
+    }
+  }
+
   ctx.restore();
 }
 
 function drawCountdownDramaticSubtitle(ctx, w, h) {
   if (!countdownSuiteState.quote.trim()) return;
+  const xc = 535;
+  const yc = 542;
+
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `italic 22px 'Playfair Display', serif`;
-  ctx.fillStyle = 'rgba(244, 244, 245, 0.95)';
-  ctx.shadowColor = 'rgba(0,0,0,0.9)';
-  ctx.shadowBlur = 10;
-  ctx.fillText(countdownSuiteState.quote, w / 2, h - 75);
+  ctx.font = "italic 600 13.5px 'Playfair Display', Georgia, serif";
+  ctx.fillStyle = "rgba(244, 244, 245, 0.96)";
+  ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
+  ctx.shadowBlur = 8;
+  ctx.fillText(countdownSuiteState.quote, xc, yc);
   ctx.restore();
 }
 
 function drawCountdownAtmosphere(ctx, w, h) {
-  const intensity = countdownSuiteState.vignetteIntensity;
-  if (intensity > 0) {
-    const vigGrad = ctx.createRadialGradient(w / 2, h / 2, w * 0.3, w / 2, h / 2, w * 0.75);
-    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
-    vigGrad.addColorStop(1, `rgba(0,0,0,${intensity * 0.95})`);
-    ctx.fillStyle = vigGrad;
-    ctx.fillRect(0, 0, w, h);
+  // 1. Composite Foreground Physical Paper Notes (over monitor bezels)
+  if (countdownAssets.fgPapers && countdownAssets.fgPapers.complete && countdownAssets.fgPapers.naturalWidth > 0) {
+    ctx.drawImage(countdownAssets.fgPapers, 0, 0, w, h);
   }
 
+  // 2. CRT Scanline Shaders Overlay (opacity 0.08 across the screen)
   if (countdownSuiteState.crtEnabled) {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-    for (let y = 0; y < h; y += 4) {
-      ctx.fillRect(0, y, w, 1);
+    ctx.save();
+    ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+    for (let y = 110; y < 615; y += 3) {
+      ctx.fillRect(190, y, 685, 1.2);
     }
+    ctx.restore();
+  }
+
+  // 3. Specular Glass Glare Pass across top corners
+  ctx.save();
+  const glareGrad = ctx.createLinearGradient(195, 110, 360, 260);
+  glareGrad.addColorStop(0, "rgba(255, 255, 255, 0.09)");
+  glareGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.02)");
+  glareGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+  ctx.fillStyle = glareGrad;
+  ctx.beginPath();
+  ctx.moveTo(195, 115);
+  ctx.lineTo(420, 110);
+  ctx.lineTo(215, 300);
+  ctx.lineTo(190, 250);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  // 4. Subtle Vignette Falloff
+  const intensity = countdownSuiteState.vignetteIntensity;
+  if (intensity > 0) {
+    ctx.save();
+    const vigGrad = ctx.createRadialGradient(w * 0.42, h * 0.5, w * 0.28, w * 0.42, h * 0.5, w * 0.65);
+    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    vigGrad.addColorStop(1, `rgba(0,0,0,${intensity * 0.75})`);
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
   }
 }
 
@@ -43536,6 +43933,7 @@ function renderCountdownLoop(now) {
 }
 
 function openCountdownSuite() {
+  ensureCountdownAssets();
   const modal = document.getElementById('modal-countdown-suite');
   if (!modal) return;
   modal.style.display = 'flex';

@@ -64,12 +64,12 @@
   // ---------------------------------------------------------------- text slots
   // Pure parallax defaults to clean canvas (no text by default)
   const SPATIAL_SLOTS = [
-    { key: 'title', label: 'Main Title', def: '' },
-    { key: 'subtitle', label: 'Subtitle', def: '' },
-    { key: 'a-title', label: 'Card A Title', def: '' },
-    { key: 'a-sub', label: 'Card A Detail', def: '' },
-    { key: 'b-title', label: 'Card B Title', def: '' },
-    { key: 'b-sub', label: 'Card B Detail', def: '' }
+    { key: 'title', label: 'Main 3D Title', def: 'THE SYSTEM' },
+    { key: 'subtitle', label: 'Sub-Title', def: 'MANIPULATION & CONTROL' },
+    { key: 'a-title', label: 'Card A Title', def: 'CONFIDENTIAL SCAN' },
+    { key: 'a-sub', label: 'Card A Department', def: 'DEPT. TREASURY // CLASSIFIED' },
+    { key: 'b-title', label: 'Card B Title', def: 'FINANCIAL MONOPOLY LEDGER' },
+    { key: 'b-sub', label: 'Card B Flow / Detail', def: 'CAPITAL FLOW $84.2B' }
   ];
   const DOC_SLOTS = [
     { key: 'masthead', label: 'Masthead', def: 'THE FINANCIAL GAZETTE' },
@@ -81,8 +81,8 @@
   // slot -> 3D read/write
   function spatialLayer(i) { return spatial3DState.elements3D && spatial3DState.elements3D[i]; }
   const SPATIAL_3D = {
-    'title': { l: 0, f: 'title' }, 'subtitle': { l: 1, f: 'subtitle' },
-    'a-title': { l: 1, f: 'title' }, 'a-sub': { l: 1, f: 'body' },
+    'title': { l: 0, f: 'title' }, 'subtitle': { l: 2, f: 'title' },
+    'a-title': { l: 1, f: 'title' }, 'a-sub': { l: 1, f: 'subtitle' },
     'b-title': { l: 3, f: 'title' }, 'b-sub': { l: 3, f: 'body' }
   };
   const DOC_3D = { masthead: 'header', headline: 'headline', quote: 'quote', body: 'body', dateline: 'dateline', byline: 'byline' };
@@ -801,6 +801,7 @@
   }
   window.tplInitTheaterToggle = initTheaterToggle;
 
+  window.applyModeLayout = applyModeLayout;
   function applyModeLayout(is3D) {
     const sb = document.getElementById('tpl-modal-storyboard-container');
     const pb = document.getElementById('tpl-modal-playback-bar');
@@ -815,7 +816,7 @@
     if (isTheater) {
       if (sb) sb.style.display = 'none';
       if (pb) pb.style.display = 'none';
-      if (hud) hud.style.display = 'none';
+      if (hud) hud.style.display = '';
       if (box) {
         box.style.padding = '0';
         box.style.border = 'none';
@@ -1045,6 +1046,11 @@
     }
     if (clip.fxScene && clip.fxScene.tplId === 'deal-term-sheet' && typeof window.renderDealTermSheetCanvas === 'function') {
       window.renderDealTermSheetCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
+    if (clip.fxScene && clip.fxScene.tplId === 'pyramid-scheme' && typeof window.renderPyramidCollapseCanvas === 'function') {
+      window.renderPyramidCollapseCanvas(c, clip, t, cw, ch);
       c.restore();
       return;
     }
