@@ -157,19 +157,47 @@
     'scam-redaction': Object.assign({}, (typeof window !== 'undefined' && window.FRAUD_DOSSIER_CONFIG) || {
       type: 'scam-redaction',
       title: 'INTERNAL MEMO \u00b7 EYES ONLY',
+      titleColor: '#3a2418',
       recipient: 'To: Board of Directors',
+      recipientColor: '#3a2418',
       senderLabel: 'From:',
-      highlightedAmount: '$8.4 BILLION',
-      disclosureWarning: 'DO NOT DISCLOSE.',
-      stampText: 'CONFIDENTIAL',
-      showStamp: true,
+      senderRedacted: 'Alexander Vance, CFO',
+      senderColor: '#3a2418',
+      redactionColor: '#111111',
       showRedaction: true,
+      subjectLine1: 'Re: Q3 revenue booked via',
+      subjectLine2: 'side letters totaling',
+      subjectColor: '#3a2418',
+      highlightedAmount: '$8.4 BILLION',
+      highlighterColor: '#facc15',
       showHighlighter: true,
+      disclosureWarning: 'DO NOT DISCLOSE.',
+      warningColor: '#ef4444',
+      showWarning: true,
+      stampText: 'CONFIDENTIAL',
+      stampColor: '#c1121f',
+      stampAngle: -14,
+      showStamp: true,
       paperTone: '#fbf8ef',
+      paperBrightness: 100,
+      paperContrast: 105,
+      backgroundBlur: 1.5,
+      floatingMotion: true,
+      floatAmplitude: 100,
+      floatSpeed: 1.0,
+      investigationHeader: 'INVESTIGATION // FILE 904',
+      investigationSubject: 'SUBJECT: OFF-BALANCE SHEET LIABILITIES',
+      investigationExhibit: 'EXHIBIT D-4: REVENUE COMMINGLING',
+      investigationSeal: 'SUBPOENA VERIFIED',
+      topSecretHeader: 'TOP SECRET',
+      topSecretClassifier: 'LEVEL 4 CLASSIFIED \u00b7 OIG AUDIT',
+      contractHeader: 'CONTRACT',
+      contractLine1: 'WHEREAS Corporation executed side covenants;',
+      contractLine2: 'NOW THEREFORE undisclosed considerations apply;',
+      showContractSignature: true,
       surfaceType: 'mahogany',
       spotlightIntensity: 2.2,
       volumetricDust: true,
-      depthOfField: true,
       showCoordinateGrid: true,
       tiltAngleX: 29,
       tiltAngleY: -10,
@@ -4993,6 +5021,16 @@
     }
     if (tplId === 'scam-redaction') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
       if (container) {
         container.style.display = 'flex';
         const data = window.tplGetContextualData(tplId);

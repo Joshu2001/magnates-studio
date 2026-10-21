@@ -38,7 +38,8 @@
     }
     return false;
   };
-  const kindOf = (id) => id === 'document-3d-fx-engine' ? 'doc' : (id === 'spatial-3d-motion-suite' ? 'spatial' : (is3DSpatial(id) ? 'dom3d' : (isBridged(id) ? 'generic' : null)));
+  const DEDICATED_CUSTOMIZER_IDS = new Set(['scam-redaction', 'deal-term-sheet', 'pyramid-scheme', 'checklist', 'instagram']);
+  const kindOf = (id) => DEDICATED_CUSTOMIZER_IDS.has(id) ? null : (id === 'document-3d-fx-engine' ? 'doc' : (id === 'spatial-3d-motion-suite' ? 'spatial' : (is3DSpatial(id) ? 'dom3d' : (isBridged(id) ? 'generic' : null))));
   const has3D = (k, id) => k === 'spatial' || k === 'doc' || k === 'dom3d' || is3DSpatial(id);
   const stOf = (k) => k === 'spatial' ? spatial3DState : document3DFXState;
 
