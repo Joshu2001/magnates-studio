@@ -56,6 +56,35 @@
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
     // Photorealistic 3D Investigative Evidence Envelope Engine
+    'conspiracy-board': Object.assign({}, (typeof window !== 'undefined' && window.RED_STRING_3D_CONFIG) || {
+      type: 'conspiracy-board',
+      node0Label: 'Target A',
+      node0Sub: 'Lead Architect',
+      node0Photo: '/ceo_portrait_cutout.jpg',
+      node1Label: 'Key Witness',
+      node1Sub: 'Former CFO',
+      node1Photo: '/portrait_cutout_clean.png',
+      node2Label: 'Photo #3',
+      node2Sub: 'Boardroom Meet',
+      node2Photo: '/boardroom_scene_hd_thumb.jpg',
+      node3Label: 'Suspect 2',
+      node3Sub: 'Offshore Escrow',
+      node3Photo: '/interview_cutin_cinematic.jpg',
+      node4Label: 'Alibi',
+      node4Sub: 'Foreign Accounts',
+      node4Photo: '/creator_portrait_cutout.png',
+      yarnColor: '#c81e1e',
+      yarnTension: 0.72,
+      yarnRadius: 2.2,
+      yarnStyle: 'crimson_braided',
+      pinFinish: 'vintage_brass',
+      corkStyle: 'warm_cork',
+      cameraPreset: 'cinematic_30',
+      cameraTilt: 28.0,
+      cameraGlide: true,
+      pinStrikeShake: true
+    }),
+
     'envelope-open': Object.assign({}, (typeof window !== 'undefined' && window.ENVELOPE_3D_CONFIG) || {
       type: 'envelope-open',
       envelopeStyle: 'manila_classified',
@@ -3163,6 +3192,22 @@
 
   // --- 3. LIVE STAGE DOM UPDATER ---
   window.tplUpdateStageWithContextualData = function(tplId, data) {
+    if (tplId === 'conspiracy-board') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const vp = stage.querySelector('#red-string-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountRedString3DStage === 'function') {
+            window.tplMountRedString3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initRedString3DScene === 'function') {
+            window.initRedString3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
     if (tplId === 'envelope-open') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -3267,7 +3312,10 @@
       if (typeof window.initUniversalStageTransformEngine === 'function') {
         window.initUniversalStageTransformEngine();
       }
-    } else if (tplId === 'empire-timeline') {
+      return;
+    }
+
+    if (tplId === 'empire-timeline') {
       fxc.innerHTML = window.tplBuildEmpireTimelineHtml(data);
       fxc.style.display = 'block';
       const defImg = stage.querySelector(`#default-img-${tplId}`);
@@ -3359,222 +3407,6 @@
       if (typeof window.initUniversalStageTransformEngine === 'function') {
         window.initUniversalStageTransformEngine();
       }
-    } else if (tplId === 'empire-map') {
-      if (stdLayers) stdLayers.style.display = 'none';
-      const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
-      if (aiWrapEl) aiWrapEl.style.display = 'none';
-      const atmoWrapEl = document.getElementById('tpl-modal-wrap-atmosphere');
-      if (atmoWrapEl) atmoWrapEl.style.display = 'flex';
-
-      const is3D = data.is3DMode !== false;
-      const curStyle = data.mapStyle || 'tactical-dark';
-      const curTerritory = data.highlightTerritory || 'India';
-
-      container.innerHTML = `
-        <div style="background: rgba(15,23,42,0.85); border: 1px solid rgba(45,212,191,0.35); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
-          <!-- Header & Quick Preset Selector -->
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 10px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 15px;">🌐</span>
-              <span style="font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #2dd4bf; text-transform: uppercase;">Empire Expansion Map • Vox / Harris Standard</span>
-            </div>
-            <span style="font-size: 9px; font-weight: 700; background: rgba(45,212,191,0.15); color: #2dd4bf; border: 1px solid rgba(45,212,191,0.3); border-radius: 4px; padding: 2px 7px;">PRO 3D CARTOGRAPHY</span>
-          </div>
-
-          <!-- Preset Switcher -->
-          <div>
-            <label style="display: block; font-size: 9.5px; font-weight: 700; color: #94a3b8; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;">Documentary Style Preset</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-              <button type="button" class="emp-preset-btn ${curStyle === 'tactical-dark' ? 'active' : ''}" data-preset="tactical-dark" style="padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curStyle === 'tactical-dark' ? '#2dd4bf' : 'rgba(255,255,255,0.1)'}; background: ${curStyle === 'tactical-dark' ? 'rgba(45,212,191,0.2)' : 'rgba(255,255,255,0.04)'}; color: ${curStyle === 'tactical-dark' ? '#2dd4bf' : '#cbd5e1'}; text-align: left;">
-                🛰️ Tactical Dark Grid (Image 2)
-              </button>
-              <button type="button" class="emp-preset-btn ${curStyle === 'vintage-cartography' ? 'active' : ''}" data-preset="vintage-cartography" style="padding: 7px 10px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curStyle === 'vintage-cartography' ? '#f59e0b' : 'rgba(255,255,255,0.1)'}; background: ${curStyle === 'vintage-cartography' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)'}; color: ${curStyle === 'vintage-cartography' ? '#f59e0b' : '#cbd5e1'}; text-align: left;">
-                📜 Vintage Paper (Vox Style)
-              </button>
-            </div>
-          </div>
-
-          <!-- Section 1: 3D Spatial Camera & Lens Optics -->
-          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
-              <span>🎥 3D Camera Rig & Lens Optics (f/2.8 Bokeh)</span>
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #94a3b8; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-3d" ${is3D ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
-                3D Perspective
-              </label>
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <div>
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
-                  <span>Camera Pitch</span>
-                  <span id="emp-val-pitch">${data.pitch3D !== undefined ? data.pitch3D : 28}°</span>
-                </div>
-                <input type="range" id="emp-inp-pitch" min="15" max="42" step="1" value="${data.pitch3D !== undefined ? data.pitch3D : 28}" style="width: 100%; cursor: pointer; accent-color: #2dd4bf;"/>
-              </div>
-              <div>
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
-                  <span>Camera Yaw</span>
-                  <span id="emp-val-yaw">${data.yaw3D !== undefined ? data.yaw3D : -3}°</span>
-                </div>
-                <input type="range" id="emp-inp-yaw" min="-25" max="25" step="1" value="${data.yaw3D !== undefined ? data.yaw3D : -3}" style="width: 100%; cursor: pointer; accent-color: #2dd4bf;"/>
-              </div>
-            </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 2px;">
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-glide" ${data.cameraGlide !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
-                3D Sweeping Camera Glide
-              </label>
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-dof" ${data.depthOfField !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
-                f/2.8 Lens Bokeh (Horizon Blur)
-              </label>
-            </div>
-          </div>
-
-          <!-- Section 2: Parabolic 3D Light-Arcs & Expansion Routes -->
-          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9;">
-              ⚡ Parabolic 3D Light-Arcs & Trajectories
-            </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <div>
-                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Arc Glow Color</label>
-                <input type="color" id="emp-inp-arc-col" value="${data.arcColor || '#fbbf24'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; cursor: pointer; background: transparent;"/>
-              </div>
-              <div>
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8; margin-bottom: 2px;">
-                  <span>Arc Height / Curvature</span>
-                  <span id="emp-val-curv">${data.arcCurvature !== undefined ? data.arcCurvature : '1.0'}x</span>
-                </div>
-                <input type="range" id="emp-inp-curv" min="0.5" max="1.8" step="0.1" value="${data.arcCurvature !== undefined ? data.arcCurvature : 1.0}" style="width: 100%; cursor: pointer; accent-color: #fbbf24;"/>
-              </div>
-            </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-multistrand" ${data.arcMultiStrand !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #fbbf24;"/>
-                Multi-Strand Fiber-Optic Bundles
-              </label>
-            </div>
-          </div>
-
-          <!-- Section 3: Captured Territory Highlight & Hub Pins -->
-          <div style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="font-size: 10px; font-weight: 800; color: #f1f5f9;">
-              📍 Expansion Hubs & Captured Territory Fill
-            </div>
-            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px;">
-              <div>
-                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Captured Territory</label>
-                <select id="emp-sel-territory" style="width: 100%; padding: 5px 8px; background: rgba(15,23,42,0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 5px; color: #f8fafc; font-size: 10px; cursor: pointer;">
-                  <option value="India" ${curTerritory === 'India' ? 'selected' : ''}>🇮🇳 India (Image 2 Standard)</option>
-                  <option value="United States of America" ${curTerritory === 'United States of America' ? 'selected' : ''}>🇺🇸 United States</option>
-                  <option value="United Kingdom" ${curTerritory === 'United Kingdom' ? 'selected' : ''}>🇬🇧 United Kingdom</option>
-                  <option value="Germany" ${curTerritory === 'Germany' ? 'selected' : ''}>🇩🇪 Germany</option>
-                  <option value="China" ${curTerritory === 'China' ? 'selected' : ''}>🇨🇳 China</option>
-                  <option value="None" ${curTerritory === 'None' ? 'selected' : ''}>None (Routes Only)</option>
-                </select>
-              </div>
-              <div>
-                <label style="display: block; font-size: 9px; color: #94a3b8; margin-bottom: 3px;">Territory Glow</label>
-                <input type="color" id="emp-inp-terr-col" value="${data.highlightColor || '#2dd4bf'}" style="width: 100%; height: 26px; border: none; border-radius: 4px; cursor: pointer; background: transparent;"/>
-              </div>
-            </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-shockwaves" ${data.showShockwaves !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
-                Pulsing Ground Shockwaves
-              </label>
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-borders" ${data.showCountryBorders !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
-                Country Boundary Outlines
-              </label>
-              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
-                <input type="checkbox" id="emp-toggle-dotmatrix" ${data.showDotMatrix !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #2dd4bf;"/>
-                Dot-Matrix Mesh
-              </label>
-            </div>
-          </div>
-        </div>
-      `;
-
-      // Event Listeners for Inspector Controls
-      container.querySelectorAll('.emp-preset-btn').forEach(btn => {
-        btn.onclick = () => {
-          const p = btn.dataset.preset;
-          const updates = p === 'vintage-cartography' ? {
-            mapStyle: 'vintage-cartography',
-            arcColor: '#ef4444',
-            arcGlowColor: 'rgba(239, 68, 68, 0.45)',
-            highlightColor: '#dc2626'
-          } : {
-            mapStyle: 'tactical-dark',
-            arcColor: '#fbbf24',
-            arcGlowColor: 'rgba(245, 158, 11, 0.45)',
-            highlightColor: '#2dd4bf'
-          };
-          window.tplSetContextualData('empire-map', updates);
-          window.tplRenderContextualInspector('empire-map');
-        };
-      });
-
-      const t3D = container.querySelector('#emp-toggle-3d');
-      if (t3D) t3D.onchange = (e) => {
-        window.tplSetContextualData('empire-map', { is3DMode: e.target.checked });
-        window.tplRenderContextualInspector('empire-map');
-      };
-
-      const pInp = container.querySelector('#emp-inp-pitch');
-      if (pInp) pInp.oninput = (e) => {
-        const v = parseFloat(e.target.value);
-        const lbl = container.querySelector('#emp-val-pitch');
-        if (lbl) lbl.textContent = `${v}°`;
-        window.tplSetContextualData('empire-map', { pitch3D: v });
-      };
-
-      const yInp = container.querySelector('#emp-inp-yaw');
-      if (yInp) yInp.oninput = (e) => {
-        const v = parseFloat(e.target.value);
-        const lbl = container.querySelector('#emp-val-yaw');
-        if (lbl) lbl.textContent = `${v}°`;
-        window.tplSetContextualData('empire-map', { yaw3D: v });
-      };
-
-      const tGlide = container.querySelector('#emp-toggle-glide');
-      if (tGlide) tGlide.onchange = (e) => window.tplSetContextualData('empire-map', { cameraGlide: e.target.checked });
-
-      const tDof = container.querySelector('#emp-toggle-dof');
-      if (tDof) tDof.onchange = (e) => window.tplSetContextualData('empire-map', { depthOfField: e.target.checked });
-
-      const arcColInp = container.querySelector('#emp-inp-arc-col');
-      if (arcColInp) arcColInp.oninput = (e) => window.tplSetContextualData('empire-map', { arcColor: e.target.value, arcGlowColor: e.target.value + '73' });
-
-      const curvInp = container.querySelector('#emp-inp-curv');
-      if (curvInp) curvInp.oninput = (e) => {
-        const v = parseFloat(e.target.value);
-        const lbl = container.querySelector('#emp-val-curv');
-        if (lbl) lbl.textContent = `${v.toFixed(1)}x`;
-        window.tplSetContextualData('empire-map', { arcCurvature: v });
-      };
-
-      const tStrand = container.querySelector('#emp-toggle-multistrand');
-      if (tStrand) tStrand.onchange = (e) => window.tplSetContextualData('empire-map', { arcMultiStrand: e.target.checked });
-
-      const terrSel = container.querySelector('#emp-sel-territory');
-      if (terrSel) terrSel.onchange = (e) => window.tplSetContextualData('empire-map', { highlightTerritory: e.target.value });
-
-      const terrColInp = container.querySelector('#emp-inp-terr-col');
-      if (terrColInp) terrColInp.oninput = (e) => window.tplSetContextualData('empire-map', { highlightColor: e.target.value });
-
-      const tShock = container.querySelector('#emp-toggle-shockwaves');
-      if (tShock) tShock.onchange = (e) => window.tplSetContextualData('empire-map', { showShockwaves: e.target.checked });
-
-      const tBorders = container.querySelector('#emp-toggle-borders');
-      if (tBorders) tBorders.onchange = (e) => window.tplSetContextualData('empire-map', { showCountryBorders: e.target.checked });
-
-      const tDots = container.querySelector('#emp-toggle-dotmatrix');
-      if (tDots) tDots.onchange = (e) => window.tplSetContextualData('empire-map', { showDotMatrix: e.target.checked });
-
-      return;
     }
 
     if (tplId === 'map-pin-drop') {
@@ -4788,6 +4620,23 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'conspiracy-board') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildRedStringInspector === 'function') {
+          window.tplBuildRedStringInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'envelope-open') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
@@ -6410,15 +6259,7 @@
     // SPECIAL HANDLER: EMPIRE RISE & FALL TIMELINE (empire-timeline)
     // James Jani / Magnates Media Documentary Visuals, Hairline, Milestones
     // =========================================================================
-    if (tplId === 'empire-map') {
-      fxc.innerHTML = window.tplBuildEmpireMapHtml(data);
-      fxc.style.display = 'block';
-      const defImg = stage.querySelector(`#default-img-${tplId}`);
-      if (defImg) defImg.style.display = 'none';
-      if (typeof window.initUniversalStageTransformEngine === 'function') {
-        window.initUniversalStageTransformEngine();
-      }
-    } else if (tplId === 'empire-timeline') {
+    if (tplId === 'empire-timeline') {
       if (stdLayers) stdLayers.style.display = 'none';
       const aiWrapEl = document.getElementById('tpl-modal-wrap-ai-engine');
       if (aiWrapEl) aiWrapEl.style.display = 'none';

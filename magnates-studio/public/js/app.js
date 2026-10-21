@@ -25400,6 +25400,14 @@ function renderHomepageTemplates() {
       stopTemplateHoverVideo(card, tpl);
     });
 
+    const useBtn = card.querySelector('.home-tpl-btn-use');
+    if (useBtn) {
+      useBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        applySelectedHomepageTemplate(tplId);
+      });
+    }
+
     card.addEventListener('click', () => {
       applySelectedHomepageTemplate(tplId);
     });
@@ -25927,7 +25935,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['envelope-open', 'wire-transfer', 'money-stack', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
 
 
 window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
@@ -26302,7 +26310,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#38bdf8;box-shadow:0 0 6px #38bdf8;"></span>
             <span style="font-family: monospace; font-size: 8px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">SWIFT 3D HUD</span>
           </div>
-        </div>`; } else if (tplId === 'envelope-open') {
+        </div>`; } else if (tplId === 'conspiracy-board') {
+      const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('conspiracy-board') : {};
+      const previewHtml = (typeof window.tplBuildRedStringBoardPreviewHtml === 'function') ? window.tplBuildRedStringBoardPreviewHtml(cbData) : '';
+      fxContainer.innerHTML = previewHtml;
+    } else if (tplId === 'envelope-open') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #06080d; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img src="/classified_envelope_macro_ref.png" alt="Evidence Envelope" style="width: 100%; height: 100%; object-fit: cover; transform: scale(1.04); filter: contrast(115%) brightness(90%);" />
@@ -28602,6 +28614,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
         window.stepWireTransferAnimation(fxContainer, tplId, t, wtData);
       }
+    } else if (tplId === 'conspiracy-board') {
+      if (typeof window.stepRedStringAnimation === 'function') {
+        const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('conspiracy-board') : {};
+        window.stepRedStringAnimation(fxContainer, tplId, t, cbData);
+      }
     } else if (tplId === 'envelope-open') {
       if (typeof window.stepEnvelopeAnimation === 'function') {
         const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('envelope-open') : {};
@@ -30291,7 +30308,13 @@ function applySelectedHomepageTemplate(templateId) {
     return;
   }
 
-  const tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
+  let tpl = EFFECT_TEMPLATES_DATA.find(t => t.id === templateId);
+  if (!tpl && typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
+    tpl = window.NEW_TESTER_TEMPLATES.find(t => t.id === templateId);
+  }
+  if (!tpl && typeof window !== 'undefined' && Array.isArray(window.TESTER_TEMPLATES_DATA)) {
+    tpl = window.TESTER_TEMPLATES_DATA.find(t => t.id === templateId);
+  }
   if (!tpl) return;
 
   // Dedicated interactive full suites launch their dedicated suite preview modals
@@ -31235,6 +31258,14 @@ function openTopTemplateCustomizer(tpl) {
         const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountWireTransfer3DStage(stage, wtData);
       }
+    } else if (tpl.id === 'conspiracy-board') {
+      topCustomizerState.primaryUrl = '/portrait_cutout_clean.png';
+      topCustomizerState.secondaryUrl = '';
+      if (typeof window.tplMountRedString3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountRedString3DStage(stage, cbData);
+      }
     } else if (tpl.id === 'envelope-open') {
       topCustomizerState.primaryUrl = '/classified_envelope_macro_ref.png';
       topCustomizerState.secondaryUrl = '';
@@ -31377,6 +31408,8 @@ function openTopTemplateCustomizer(tpl) {
     let is3D = topCustomizerState.paperPreviewMode === '3d';
     if (tpl.id === 'map' && typeof window.tplGetContextualData === 'function') {
       is3D = !!window.tplGetContextualData('map').is3DMode;
+    } else if (tpl.id === 'empire-map' && typeof window.tplGetContextualData === 'function') {
+      is3D = !!window.tplGetContextualData('empire-map').is3DMode;
     } else if (tpl.id === 'empire-timeline' && typeof window.tplGetContextualData === 'function') {
       is3D = !!window.tplGetContextualData('empire-timeline').is3DMode;
     } else if (tpl.id === 'google' && typeof window.tplGetContextualData === 'function') {
@@ -31410,9 +31443,9 @@ function openTopTemplateCustomizer(tpl) {
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
     }
     const btn3dVid = document.getElementById('btn-3d-mode-video');
-    if (btn3dVid && tpl.id !== 'map' && tpl.id !== 'empire-timeline') btn3dVid.click();
+    if (btn3dVid && tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') btn3dVid.click();
     syncPaperModeButtons();
-    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline') renderTopTemplatePreviewStage();
+    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') renderTopTemplatePreviewStage();
   };
   if (paperMode3D) paperMode3D.onclick = () => {
     topCustomizerState.paperPreviewMode = '3d';
@@ -31433,9 +31466,9 @@ function openTopTemplateCustomizer(tpl) {
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
     }
     const btn3dInteractive = document.getElementById('btn-3d-mode-interactive');
-    if (btn3dInteractive && tpl.id !== 'map' && tpl.id !== 'empire-timeline') btn3dInteractive.click();
+    if (btn3dInteractive && tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') btn3dInteractive.click();
     syncPaperModeButtons();
-    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline') renderTopTemplatePreviewStage();
+    if (tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') renderTopTemplatePreviewStage();
   };
   syncPaperModeButtons();
 
@@ -34193,6 +34226,14 @@ function updateTopCustomizerFrame(seqTime, now) {
       const stage = document.getElementById('tpl-modal-preview-stage');
       const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
       window.stepWireTransferAnimation(stage, 'wire-transfer', localSceneT, wtData);
+    }
+  }
+
+  if (tplId === 'conspiracy-board') {
+    if (typeof window.stepRedStringAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('conspiracy-board') : {};
+      window.stepRedStringAnimation(stage, 'conspiracy-board', localSceneT, cbData);
     }
   }
 
@@ -55886,4 +55927,9 @@ function initCreatorBrushInteraction() {
 
   canvas.onpointerup = () => { isPainting = false; };
   canvas.onpointercancel = () => { isPainting = false; };
+}
+
+if (typeof window !== 'undefined') {
+  window.applySelectedHomepageTemplate = applySelectedHomepageTemplate;
+  window.openTopTemplateCustomizer = openTopTemplateCustomizer;
 }
