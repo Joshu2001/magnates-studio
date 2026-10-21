@@ -137,14 +137,31 @@
     if (k === 'spatial' && spatial3DState.renderer) {
       const s = spatial3DState;
       e.spatial = {
-        flightMode: s.flightMode, camSpeed: s.camSpeed, camDrift: s.camDrift, camPitch: s.camPitch, camYaw: s.camYaw,
+        flightMode: s.flightMode, camSpeed: s.camSpeed, camDrift: s.camDrift, camShake: s.camShake, camPitch: s.camPitch, camYaw: s.camYaw,
         fovWarp: s.fovWarp, fogDensity: s.fogDensity, lightIntensity: s.lightIntensity, gridVisible: s.gridVisible,
         dustVisible: s.dustVisible, activePreset: s.activePreset,
-        envStyle: s.envStyle, gridLuminescence: s.gridLuminescence, gridColor: s.gridColor,
-        showText: s.showText, pathStyle: s.pathStyle, pathCurve: s.pathCurve, drawnPath: s.drawnPath,
+        bgStyle: s.bgStyle, bgColor: s.bgColor, transparentBg: s.transparentBg,
+        envStyle: s.envStyle, gridDensity: s.gridDensity, gridSpeed: s.gridSpeed, gridLuminescence: s.gridLuminescence, gridGlow: s.gridGlow, gridColor: s.gridColor,
+        starCount: s.starCount, starSize: s.starSize, starSpeed: s.starSpeed, showCelestialObjects: s.showCelestialObjects,
+        showText: s.showText, textFont: s.textFont, textStyle: s.textStyle, textPrimaryColor: s.textPrimaryColor, textSecondaryColor: s.textSecondaryColor, textBevel: s.textBevel,
+        pathStyle: s.pathStyle, pathCurve: s.pathCurve, drawnPath: s.drawnPath,
         layers: (s.elements3D || []).map(m => {
           const u = m.userData || {};
-          return { id: u.id, type: u.type, artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'), objectShape: u.objectShape || u.objectGeometry || 'icosahedron', objectGeometry: u.objectShape || u.objectGeometry || 'icosahedron', imageUrl: u.imageUrl || '', title: u.title, subtitle: u.subtitle, body: u.body, text: u.text, color: u.color, scale: u.scale || 1, x: u.baseX !== undefined ? u.baseX : m.position.x, y: u.baseY !== undefined ? u.baseY : m.position.y, z: m.position.z };
+          return {
+            id: u.id, type: u.type,
+            artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'),
+            objectShape: u.objectShape || u.objectGeometry || 'icosahedron',
+            objectGeometry: u.objectShape || u.objectGeometry || 'icosahedron',
+            imageUrl: u.imageUrl || '',
+            title: u.title, subtitle: u.subtitle, body: u.body, text: u.text,
+            stamp: u.stamp || '',
+            transitionEffect: u.transitionEffect || 'fade',
+            fontFamily: u.fontFamily || 'Cinzel',
+            color: u.color, scale: u.scale || 1,
+            x: u.baseX !== undefined ? u.baseX : m.position.x,
+            y: u.baseY !== undefined ? u.baseY : m.position.y,
+            z: m.position.z
+          };
         })
       };
     }
@@ -207,7 +224,7 @@
     if (s._appliedSig === sig && s.scene) return;
     s._appliedSig = sig;
     if (sp) {
-      ['flightMode', 'camSpeed', 'camDrift', 'camPitch', 'camYaw', 'fovWarp', 'fogDensity', 'lightIntensity', 'gridVisible', 'dustVisible', 'activePreset', 'envStyle', 'gridLuminescence', 'gridColor', 'showText', 'pathStyle', 'pathCurve', 'drawnPath'].forEach(f => { if (sp[f] !== undefined) s[f] = sp[f]; });
+      ['flightMode', 'camSpeed', 'camDrift', 'camShake', 'camPitch', 'camYaw', 'fovWarp', 'fogDensity', 'lightIntensity', 'gridVisible', 'dustVisible', 'activePreset', 'bgStyle', 'bgColor', 'transparentBg', 'envStyle', 'gridDensity', 'gridSpeed', 'gridLuminescence', 'gridGlow', 'gridColor', 'starCount', 'starSize', 'starSpeed', 'showCelestialObjects', 'showText', 'textFont', 'textStyle', 'textPrimaryColor', 'textSecondaryColor', 'textBevel', 'pathStyle', 'pathCurve', 'drawnPath'].forEach(f => { if (sp[f] !== undefined) s[f] = sp[f]; });
       if (sp.layers && sp.layers.length) setSpatialLayers(sp.layers);
     }
     if (s.camera) { s.camera.fov = s.fovWarp; s.camera.updateProjectionMatrix(); }
@@ -245,7 +262,16 @@
   function driveSpatial(e, t) {
     const s = spatial3DState;
     s.isPlaying = false;
-    s.currentTime = ((t * 0.12 * s.camSpeed) % 1 + 1) % 1;
+    const speed = s.camSpeed !== undefined ? s.camSpeed : 1.0;
+    const absSpeed = Math.max(0.1, Math.abs(speed));
+    // Full sequence cycle traversal: slow speeds take longer, high speeds fly faster, but ALL speeds traverse 100% of runway!
+    const cycleDuration = 10 / absSpeed;
+    const progress = (t % cycleDuration) / cycleDuration;
+    if (speed < 0) {
+      s.currentTime = 1.0 - progress;
+    } else {
+      s.currentTime = progress;
+    }
   }
   function driveDoc(e, t) {
     const d = document3DFXState, p = ensureDoc(e);
@@ -410,14 +436,45 @@
       }
     } else if (k === 'spatial') {
       const s = spatial3DState;
-      // Text header with Creator Mode toggle
+
+      // Section 1: Typography Granularity (Beyond Gold)
       const textSectionHeader = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <span style="font-size:11px;font-weight:700;color:#e2e8f0;">Headline Typography</span>
         <button type="button" data-act="s-toggle-text" style="padding:4px 9px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid ${s.showText !== false ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'};background:${s.showText !== false ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${s.showText !== false ? '#6ee7b7' : '#fca5a5'};cursor:pointer;">${s.showText !== false ? '✓ Text Visible' : '⊘ Hidden (Pure 3D Universe)'}</button>
       </div>`;
-      html += section('Text Overlays', textSectionHeader + (s.showText !== false ? textHtml : '<div style="font-size:10.5px;color:#94a3b8;font-style:italic;padding:6px 0;">Headline typography hidden. Camera navigates purely through 3D floating exhibits & celestial objects in space.</div>'));
 
-      // Flight Rig & Trajectory
+      const textControls = [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Headline Font Family
+          <select data-k="s-text-font" style="${selectCss}">${[
+            'Cinzel:Cinzel (Imperial Serif)',
+            'Playfair Display:Playfair Display (Editorial High-Fashion)',
+            'JetBrains Mono:JetBrains Mono (Technical Dossier)',
+            'Inter:Inter (Clean Ultra-Modern)',
+            'Impact:Impact (Punchy Title)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.textFont || 'Cinzel') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Typography Shader Style
+          <select data-k="s-text-style" style="${selectCss}">${[
+            'gold:Imperial 24K Gold Foil (Default)',
+            'chrome:Platinum Mirror Chrome',
+            'cyan:Quantum Neon Cyan',
+            'emerald:Syndicate Emerald Green',
+            'crimson:Dark Power Blood Crimson',
+            'white:Pure Titanium White',
+            'custom:Custom Two-Tone Gradient'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.textStyle || 'gold') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        s.textStyle === 'custom' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 0;">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#94a3b8;">Color 1 <input type="color" data-k="s-text-c1" value="${s.textPrimaryColor || '#f59e0b'}" style="border:none;width:28px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#94a3b8;">Color 2 <input type="color" data-k="s-text-c2" value="${s.textSecondaryColor || '#fde68a'}" style="border:none;width:28px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+        </div>` : '',
+        row('s-text-bevel', '3D Bevel Depth', 1, 6, 1, s.textBevel || 3, v => v + ' layers'),
+        s.showText !== false ? textHtml : '<div style="font-size:10.5px;color:#94a3b8;font-style:italic;padding:6px 0;">Headline typography hidden. Camera navigates purely through 3D floating exhibits & celestial objects in space.</div>'
+      ].join('');
+
+      html += section('Text Overlays & Typography', textSectionHeader + textControls);
+
+      // Section 2: Camera Rig, Velocity Normalization & Path Drawer
       const pathMiniCanvas = `<div style="background:#0b0f19;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;margin-top:6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <span style="font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.5px;">Flight Runway / Road Path</span>
@@ -449,18 +506,37 @@
             'custom:Interactive Custom Drawn Path'
           ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.pathStyle || 'straight') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
         </label>`,
+        row('s-speed', 'Zoom Speed (Z-Velocity - Bidirectional)', -3.0, 3.0, 0.1, s.camSpeed !== undefined ? s.camSpeed : 1.0, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
+        row('s-shake', 'Handheld Camera Shake (Human Imperfection)', 0, 100, 1, s.camShake !== undefined ? s.camShake : 15, v => v + '%'),
         row('s-pathcurve', 'Runway Banking / Curve', -100, 100, 1, s.pathCurve || 0, v => (v > 0 ? '+' : '') + v + '%'),
         pathMiniCanvas,
-        row('s-speed', 'Zoom Speed (Z-Velocity)', 0.2, 4, 0.1, s.camSpeed, v => v.toFixed(1) + 'x'),
         row('s-drift', 'X/Y Motion Drift', 0, 100, 1, s.camDrift, v => v + '%'),
         row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '\\u00b0'),
         row('s-pitch', 'Tilt Pitch (X)', -45, 45, 1, Math.round(s.camPitch), v => v + '\\u00b0'),
         row('s-yaw', 'Rotation Yaw (Y)', -65, 65, 1, Math.round(s.camYaw), v => v + '\\u00b0')
       ].join(''));
 
-      // Environment & Luminescence (Image 2 Tron Tunnel vs Image 1 Floor Grid + Stars)
-      html += section('Environment & Luminescence', [
-        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Environment Style (Reference Images)
+      // Section 3: Modular Background Architecture
+      html += section('Background Architecture', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Background Environment Mode
+          <select data-k="s-bgstyle" style="${selectCss}">${[
+            'grid-stars:Hybrid Grid Corridor + Starfield',
+            'pitch-dark:100% Pitch Black Void (Stark Contrast)',
+            'grid-only:Architectural / Cyber Grid Corridor Only',
+            'stars-only:Deep Cosmos Void (Pure Stars)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.bgStyle || 'grid-stars') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:10px;color:#94a3b8;">Backdrop Base Tint <input type="color" data-k="s-bgcolor" value="${s.bgColor || '#07080c'}" style="border:none;width:30px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+          <button type="button" data-act="s-toggle-alpha" style="padding:4px 9px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid ${s.transparentBg ? 'rgba(16,185,129,0.6)' : 'rgba(255,255,255,0.15)'};background:${s.transparentBg ? 'rgba(16,185,129,0.15)' : 'transparent'};color:${s.transparentBg ? '#6ee7b7' : '#94a3b8'};cursor:pointer;">${s.transparentBg ? '⊞ Alpha Transparent' : '■ Solid Backdrop'}</button>
+        </div>`,
+        row('s-fog', 'Atmospheric Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
+        row('s-light', 'Ambient Lighting Glow', 20, 200, 1, s.lightIntensity, v => v + '%')
+      ].join(''));
+
+      // Section 4: Grid Density, Cell Spacing & Conveyor Flow
+      html += section('Grid Tunnel & Luminescence', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Tunnel Architectural Preset
           <select data-k="s-env" style="${selectCss}">${[
             'tunnel-cyan:Cyber Grid Tunnel (Image 2)',
             'tunnel-gold:Gold Documentary Tunnel (Image 2)',
@@ -469,14 +545,25 @@
             'deep-cosmos:Deep Cosmos Void (Pure Stars)'
           ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.envStyle || 'tunnel-cyan') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
         </label>`,
-        row('s-lum', 'Grid Luminescence / Glow', 0, 200, 1, s.gridLuminescence !== undefined ? s.gridLuminescence : 100, v => v + '%'),
-        `<label style="display:flex;align-items:center;justify-content:space-between;font-size:10.5px;color:#94a3b8;padding:4px 0;">Grid Line Color <input type="color" data-k="s-gridcolor" value="${s.gridColor || (s.envStyle === 'tunnel-gold' ? '#d4af37' : s.envStyle === 'tunnel-slate' ? '#64748b' : '#06b6d4')}" style="border:none;width:32px;height:24px;border-radius:4px;cursor:pointer;background:transparent;" /></label>`,
-        row('s-fog', 'Atmospheric Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
-        row('s-light', 'Ambient Lighting Glow', 20, 200, 1, s.lightIntensity, v => v + '%'),
-        `<div style="display:flex;gap:6px;">${btn('s-grid', '\\u229e Grid Active', s.gridVisible)}${btn('s-dust', '\\u2726 Cosmic Starfield / Dust', s.dustVisible)}</div>`
+        row('s-grid-density', 'Grid Density / Cell Mesh', 20, 120, 2, s.gridDensity || 60, v => v + ' divisions'),
+        row('s-grid-speed', 'Grid Conveyor Streaming Speed', 0, 3, 0.1, s.gridSpeed !== undefined ? s.gridSpeed : 1.0, v => v.toFixed(1) + 'x'),
+        row('s-lum', 'Grid Line Luminescence / Brightness', 0, 200, 1, s.gridLuminescence !== undefined ? s.gridLuminescence : 100, v => v + '%'),
+        row('s-gridglow', 'Grid Light Glow / Point Intensity', 0, 200, 1, s.gridGlow !== undefined ? s.gridGlow : 100, v => v + '%'),
+        `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:10px;color:#94a3b8;">Grid Line Color <input type="color" data-k="s-gridcolor" value="${s.gridColor || '#06b6d4'}" style="border:none;width:30px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+          ${btn('s-grid', '⊞ Grid Active', s.gridVisible)}
+        </div>`
       ].join(''));
 
-      // Presets
+      // Section 5: Starfield & Cosmic Dust Granularity
+      html += section('Starfield & Cosmic Dust', [
+        row('s-star-count', 'Star Count', 100, 2500, 50, s.starCount || 1200, v => v + ' stars'),
+        row('s-star-size', 'Star Particle Size', 1, 10, 0.2, s.starSize || 4.8, v => v.toFixed(1) + 'px'),
+        row('s-star-speed', 'Starfield Drift & Twinkle Speed', 0, 3, 0.1, s.starSpeed !== undefined ? s.starSpeed : 1.0, v => v.toFixed(1) + 'x'),
+        `<div style="display:flex;gap:6px;">${btn('s-dust', '✦ Stars Active', s.dustVisible)}${btn('s-toggle-celestial', '⬡ Celestial 3D Objects', s.showCelestialObjects !== false)}</div>`
+      ].join(''));
+
+      // Section 6: Presets
       html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${[
         'docu-essay:Docu-Essay (Gallery)',
         'cyber-matrix:Cyber Matrix (Image 2)',
@@ -484,7 +571,482 @@
         'cosmic-universe:Cosmic Universe (Stars)'
       ].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
 
-      // 3D Layers
+      // Section 7: Corridor Exhibits & 3D Layers
+      html += section('Corridor Exhibits & 3D Layers', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;"><button type="button" data-act="s-add-artifact" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(212,175,55,.6);background:rgba(212,175,55,.1);color:#fef08a;cursor:pointer;">+ Image / 3D Celestial</button><button type="button" data-act="s-add" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ Hero Title Plane</button></div>`);
+    } else {
+      const p = ensureDoc(e);
+      html += section('Text', textHtml);
+      html += section('Camera', [
+        row('d-pitch', 'Tilt Pitch (X)', 0, 75, 1, Math.round(p.pitch), v => v + '\u00b0'),
+        row('d-yaw', 'Rotation Yaw (Y)', -60, 60, 1, Math.round(p.yaw), v => v + '\u00b0'),
+        row('d-roll', 'Roll (Z)', -45, 45, 1, Math.round(p.roll), v => v + '\u00b0'),
+        row('d-dist', 'Camera Distance', 20, 110, 1, Math.round(p.dist), v => v),
+        row('d-parallax', 'Parallax Strength', 0, 4, 0.1, p.parallax, v => v.toFixed(1) + 'x')
+      ].join(''));
+      html += section('Paper', `<select data-k="d-paper" style="${selectCss}">${['aged:Aged Newsprint', 'stark:Stark White', 'darkmode:Dark Mode', 'manuscript:Manuscript'].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${p.paperStyle === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>`);
+      html += section('Layers', [
+        `<div style="display:flex;gap:6px;flex-wrap:wrap;">${btn('d-hl', 'Highlighter', p.enableHighlight)}${btn('d-pop', 'Pop-out Headline', p.enablePopout)}${btn('d-red', 'Redaction', p.enableRedaction)}</div>`,
+        row('d-hlprog', 'Highlight Amount', 0, 100, 1, Math.round(p.hl * 100), v => v + '%'),
+        row('d-popelev', 'Pop-out Elevation', 0, 20, 0.5, p.popElevation, v => v),
+        row('d-redwipe', 'Redaction Wipe', 0, 100, 1, Math.round(p.redactWipe * 100), v => v + '%'),
+        `<label style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#94a3b8;">Highlight Color <input type="color" data-k="d-hlcolor" value="${p.highlightColor}" /></label>`
+      ].join(''));
+    }
+    h.innerHTML = html;
+    if (mode === '3d' && k === 'spatial') renderSpatialLayers();
+  }
+
+  function renderSpatialLayers() {
+    const box = document.getElementById('tpl3d-layers'); if (!box) return;
+    const list = spatial3DState.elements3D || [];
+    box.innerHTML = list.map((m, i) => {
+      const u = m.userData || {}; const open = openLayerIdx === i; const color = u.color || '#f59e0b';
+      const curMode = u.artifactMode || (u.type === 'object' ? 'object' : (u.type === 'card' ? 'card' : 'image'));
+      const curShape = u.objectShape || u.objectGeometry || 'icosahedron';
+      const curTrans = u.transitionEffect || 'fade';
+      const curFont = u.fontFamily || 'Cinzel';
+      const posXVal = Math.round(u.baseX !== undefined ? u.baseX : m.position.x);
+      const posYVal = Math.round(u.baseY !== undefined ? u.baseY : m.position.y);
+
+      const editor = !open ? '' : `<div style="display:flex;flex-direction:column;gap:7px;padding:8px 2px 2px;">
+        ${u.type !== 'text' && u.type !== 'code' ? `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Artifact Archetype
+          <select data-k="l-mode-${i}" style="${selectCss}">
+            <option value="image" ${curMode === 'image' ? 'selected' : ''}>🖼️ Archival Photograph Plate</option>
+            <option value="object" ${curMode === 'object' ? 'selected' : ''}>⬡ 3D Celestial / Wireframe Object</option>
+            <option value="card" ${curMode === 'card' ? 'selected' : ''}>📄 Frosted Dossier Text Slate</option>
+            <option value="chart" ${curMode === 'chart' ? 'selected' : ''}>📈 Financial Candlestick / Graph Trend Slate</option>
+          </select>
+        </label>` : ''}
+
+        ${curMode === 'object' ? `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Celestial 3D Shape
+          <select data-k="l-shape-${i}" style="${selectCss}">
+            <option value="icosahedron" ${curShape === 'icosahedron' ? 'selected' : ''}>✦ Icosahedron Cosmic Gem</option>
+            <option value="torus" ${curShape === 'torus' ? 'selected' : ''}>◎ Stargate Celestial Ring</option>
+            <option value="octahedron" ${curShape === 'octahedron' ? 'selected' : ''}>◇ Quantum Diamond Crystal</option>
+            <option value="dodecahedron" ${curShape === 'dodecahedron' ? 'selected' : ''}>⬢ Stellar Polyhedron</option>
+            <option value="monolith" ${curShape === 'monolith' ? 'selected' : ''}>▮ Sci-Fi Space Monolith</option>
+          </select>
+        </label>` : ''}
+
+        ${u.type !== 'text' && curMode === 'image' ? `<div style="background:#090d16;padding:7px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-size:10px;font-weight:700;color:#cbd5e1;">Image Asset</span>
+            <div style="display:flex;gap:4px;">
+              <input type="file" id="l-file-input-${i}" accept="image/*" style="display:none;" />
+              <button type="button" data-act="l-pick-file-${i}" style="padding:2px 8px;font-size:9.5px;font-weight:600;border-radius:4px;border:1px solid rgba(56,189,248,0.4);background:rgba(56,189,248,0.12);color:#38bdf8;cursor:pointer;">📁 Upload / Replace</button>
+              <button type="button" data-act="l-remove-img-${i}" style="padding:2px 8px;font-size:9.5px;font-weight:600;border-radius:4px;border:1px solid rgba(239,68,68,0.4);background:rgba(239,68,68,0.1);color:#fca5a5;cursor:pointer;">❌ Remove Image</button>
+            </div>
+          </div>
+          ${txt('l-img-' + i, 'Image URL', u.imageUrl || '')}
+        </div>` : ''}
+
+        ${u.type !== 'text' && u.type !== 'code' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Entrance Effect
+            <select data-k="l-trans-${i}" style="${selectCss}">
+              <option value="fade" ${curTrans === 'fade' ? 'selected' : ''}>Fade Dissolve</option>
+              <option value="slide-in" ${curTrans === 'slide-in' ? 'selected' : ''}>Slide In from Wall</option>
+              <option value="scale-pop" ${curTrans === 'scale-pop' ? 'selected' : ''}>Scale Pop-Up</option>
+              <option value="yaw-drift" ${curTrans === 'yaw-drift' ? 'selected' : ''}>Yaw Angle Drift</option>
+            </select>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Card Font
+            <select data-k="l-font-${i}" style="${selectCss}">
+              <option value="Cinzel" ${curFont === 'Cinzel' ? 'selected' : ''}>Cinzel (Serif)</option>
+              <option value="JetBrains Mono" ${curFont === 'JetBrains Mono' ? 'selected' : ''}>JetBrains Mono</option>
+              <option value="Inter" ${curFont === 'Inter' ? 'selected' : ''}>Inter (Sans)</option>
+              <option value="Playfair Display" ${curFont === 'Playfair Display' ? 'selected' : ''}>Playfair Display</option>
+              <option value="Impact" ${curFont === 'Impact' ? 'selected' : ''}>Impact</option>
+            </select>
+          </label>
+        </div>` : ''}
+
+        ${txt('l-title-' + i, 'Title', u.title || '')}
+        ${u.type !== 'code' ? txt('l-sub-' + i, 'Subtitle / Classification', u.subtitle || '') : ''}
+        ${u.type !== 'text' && curMode === 'image' ? txt('l-stamp-' + i, 'Security Stamp (e.g. CLASSIFIED, VERIFIED)', u.stamp || '') : ''}
+        ${u.type !== 'text' ? txt('l-body-' + i, u.type === 'code' ? 'Code Lines' : 'Dossier Body Text', u.body || u.text || '', true) : ''}
+        ${row('l-z-' + i, 'Depth (Z)', -5000, 1500, 10, Math.round(m.position.z), v => v)}
+        ${row('l-x-' + i, 'Position X', -1500, 1500, 10, posXVal, v => v)}
+        ${row('l-y-' + i, 'Position Y', -1000, 1000, 10, posYVal, v => v)}
+        ${row('l-scale-' + i, 'Scale', 0.3, 3, 0.05, u.scale || 1, v => Number(v).toFixed(2) + 'x')}
+        <label style="display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#94a3b8;padding:2px 0;">Accent Color <input type="color" data-k="l-color-${i}" value="${/^#[0-9a-f]{6}$/i.test(color) ? color : '#D4AF37'}" style="border:none;width:28px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+      </div>`;
+
+      return `<div style="background:#121520;border:1px solid ${open ? 'rgba(168,85,247,.55)' : 'rgba(255,255,255,.08)'};border-radius:8px;padding:7px 9px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+          <div data-act="l-toggle-${i}" style="display:flex;align-items:center;gap:7px;cursor:pointer;overflow:hidden;flex:1;">
+            <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>
+            <span style="font-size:11px;font-weight:700;color:#f1f5f9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${u.title || (u.type === 'text' ? '3D Title Plane' : 'Corridor Slate')}</span>
+            <span style="font-size:9.5px;color:#94a3b8;font-family:monospace;">Z:${Math.round(m.position.z)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button type="button" data-act="l-up-${i}" style="background:transparent;border:none;color:#94a3b8;font-size:10px;cursor:pointer;padding:2px 4px;">▲</button>
+            <button type="button" data-act="l-down-${i}" style="background:transparent;border:none;color:#94a3b8;font-size:10px;cursor:pointer;padding:2px 4px;">▼</button>
+            <button type="button" data-act="l-del-${i}" style="background:transparent;border:none;color:#ef4444;font-size:11px;cursor:pointer;padding:2px 4px;">×</button>
+          </div>
+        </div>
+        ${editor}
+      </div>`;
+    }).join('');
+
+    initSpatialPathCanvas();
+  }
+
+  function initSpatialPathCanvas() {
+    const canvas = document.getElementById('spatial-path-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const s = spatial3DState;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width, h = canvas.height;
+
+      // Draw Corridor Boundaries
+      ctx.strokeStyle = 'rgba(6,182,212,0.3)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(25, 6); ctx.lineTo(25, h - 6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(w - 25, 6); ctx.lineTo(w - 25, h - 6); ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.setLineDash([2, 4]);
+      ctx.beginPath(); ctx.moveTo(w / 2, 6); ctx.lineTo(w / 2, h - 6); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Flight Path
+      ctx.strokeStyle = '#c084fc';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = 'rgba(192,132,252,0.8)';
+      ctx.shadowBlur = 6;
+      ctx.beginPath();
+
+      const steps = 40;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        let px = 0;
+        if (s.pathStyle === 'slalom' || s.flightMode === 'slalom') {
+          px = Math.sin(t * Math.PI * 3) * 55;
+        } else if (s.pathStyle === 'cosmic-wave') {
+          px = Math.sin(t * Math.PI * 2) * 50;
+        } else if (s.drawnPath && s.drawnPath.length >= 2) {
+          const sampleX = sampleDrawnPathX(s.drawnPath, t);
+          px = (sampleX / 740) * (w / 2 - 30);
+        } else {
+          const curveOffset = (s.pathCurve || 0) * 0.6;
+          px = Math.sin(t * Math.PI) * curveOffset;
+        }
+        const canvasX = (w / 2) + px;
+        const canvasY = 8 + t * (h - 16);
+        if (i === 0) ctx.moveTo(canvasX, canvasY);
+        else ctx.lineTo(canvasX, canvasY);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Current Camera Live Position Dot
+      const currentT = Math.max(0, Math.min(1, s.currentTime || 0));
+      let curPx = 0;
+      if (s.pathStyle === 'slalom' || s.flightMode === 'slalom') {
+        curPx = Math.sin(currentT * Math.PI * 3) * 55;
+      } else if (s.drawnPath && s.drawnPath.length >= 2) {
+        curPx = (sampleDrawnPathX(s.drawnPath, currentT) / 740) * (w / 2 - 30);
+      } else {
+        curPx = Math.sin(currentT * Math.PI) * ((s.pathCurve || 0) * 0.6);
+      }
+      const curX = (w / 2) + curPx;
+      const curY = 8 + currentT * (h - 16);
+
+      ctx.fillStyle = '#f59e0b';
+      ctx.shadowColor = '#f59e0b';
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.arc(curX, curY, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    draw();
+
+    let drawing = false;
+    let strokePoints = [];
+
+    const onPointer = (ev) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0].clientX);
+      const clientY = ev.clientY !== undefined ? ev.clientY : (ev.touches && ev.touches[0].clientY);
+      const x = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const y = Math.max(0, Math.min(rect.height, clientY - rect.top));
+
+      const normT = Math.max(0, Math.min(1, (y - 8) / (rect.height - 16)));
+      const normX = ((x - rect.width / 2) / (rect.width / 2 - 30)) * 740;
+
+      strokePoints.push({ t: normT, x: Math.max(-740, Math.min(740, normX)) });
+      strokePoints.sort((a, b) => a.t - b.t);
+
+      s.pathStyle = 'custom';
+      s.flightMode = 'custom-path';
+      s.drawnPath = strokePoints.slice();
+
+      const selMode = host()?.querySelector('[data-k="flight"]');
+      const selStyle = host()?.querySelector('[data-k="s-pathstyle"]');
+      if (selMode) selMode.value = 'custom-path';
+      if (selStyle) selStyle.value = 'custom';
+
+      draw();
+      persist();
+    };
+
+    canvas.onpointerdown = (ev) => {
+      drawing = true;
+      strokePoints = [];
+      try { canvas.setPointerCapture(ev.pointerId); } catch (_) {}
+      onPointer(ev);
+    };
+
+    canvas.onpointermove = (ev) => {
+      if (!drawing) return;
+      onPointer(ev);
+    };
+
+    const stopDraw = (ev) => {
+      if (!drawing) return;
+      drawing = false;
+      try { canvas.releasePointerCapture(ev.pointerId); } catch (_) {}
+      persist();
+    };
+
+    canvas.onpointerup = stopDraw;
+    canvas.onpointercancel = stopDraw;
+  }
+  function build(tplId) {
+    const h = host(); const k = kindOf(tplId);
+    if (!h) return;
+    if (!k) { h.style.display = 'none'; h.innerHTML = ''; return; }
+    h.style.display = 'flex';
+    const e = entry(tplId); const fx = e.fx;
+    const mode = has3D(k, tplId) ? e.mode : 'video';
+    let html = `<div style="display:flex;align-items:center;justify-content:space-between;"><span style="${lbl}">Effect Controls</span>`;
+    if (has3D(k, tplId)) {
+      html += `<div style="display:flex;gap:3px;background:rgba(18,19,28,.9);padding:2px;border-radius:8px;border:1px solid rgba(255,255,255,.08);">
+        <button type="button" data-act="mode-video" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === 'video' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === 'video' ? '#fff' : '#94a3b8'};">\u25b6 Video</button>
+        <button type="button" data-act="mode-3d" style="padding:3px 10px;font-size:10.5px;font-weight:700;border-radius:6px;border:none;cursor:pointer;background:${mode === '3d' ? 'rgba(168,85,247,.35)' : 'transparent'};color:${mode === '3d' ? '#fff' : '#94a3b8'};">\u2b21 3D</button></div>`;
+    }
+    html += `</div>`;
+
+    // shared text section (same fields in Video and 3D)
+    const slots = slotsFor(tplId);
+    const textHtml = slots.map((sl, i) => {
+      let v = e.texts[sl.key];
+      if (v == null) v = (mode === '3d' ? get3DText(tplId, sl) : null);
+      if (v == null) v = sl.def != null ? sl.def : '';
+      return txt('tx-' + i, sl.label, v);
+    }).join('');
+
+    if (mode === 'video' || k === 'dom3d') {
+      if (mode === '3d' && k === 'dom3d') {
+        html += `<div style="background:linear-gradient(135deg, rgba(168,85,247,0.18), rgba(56,189,248,0.12));border:1px solid rgba(192,132,252,0.45);border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <span style="font-size:15px;">\ud83d\udd90\ufe0f</span>
+          <div style="display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:10.5px;font-weight:800;color:#f3e8ff;letter-spacing:0.04em;">INTERACTIVE 3D HAND ORBIT ACTIVE</span>
+            <span style="font-size:9.5px;color:#cbd5e1;">Grab &amp; drag the stage to tilt/rotate in 3D \u2022 Scroll wheel to zoom</span>
+          </div>
+        </div>`;
+      }
+      html += section(mode === '3d' ? '3D Camera Rig & Orbit' : 'Motion', [
+        row('v-speed', 'Playback Speed', -3.0, 3.0, 0.1, fx.speed, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
+        row('v-pitch', 'Tilt Pitch (X)', -45, 45, 1, fx.pitch, v => v + '\u00b0'),
+        row('v-yaw', 'Rotation Yaw (Y)', -45, 45, 1, fx.yaw, v => v + '\u00b0'),
+        row('v-roll', 'Roll (Z)', -30, 30, 1, fx.roll, v => v + '\u00b0'),
+        row('v-zoom', 'Zoom / Depth', 0.6, 2.2, 0.05, fx.zoom, v => v.toFixed(2) + 'x'),
+        `<button type="button" data-act="v-reset" style="padding:5px;font-size:10.5px;border-radius:6px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#cbd5e1;cursor:pointer;">Reset 3D Camera</button>`
+      ].join(''));
+
+      if (tplId === 'jani-puzzle-narrative-suite') {
+        const pz = ensurePuzzle(e);
+        html += section('Layer Visibility', [
+          `<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            ${btn('pz-toggle-bg', 'Background Image', pz.bgVisible)}
+            ${btn('pz-toggle-grid', 'Puzzle Pieces (3x3)', pz.gridVisible)}
+            ${btn('pz-toggle-thesis', 'Editorial Thesis Card', pz.thesisVisible)}
+            ${btn('pz-toggle-watermark', 'Watermark Title', pz.watermarkVisible)}
+          </div>`
+        ].join(''));
+
+        html += section('Tile Shape & Layout', [
+          row('pz-rounding', 'Corner Rounding', 0, 16, 1, pz.tileRounding, v => v + 'px'),
+          row('pz-gap', 'Tile Spacing / Dispersion', 0, 16, 1, pz.tileGap, v => v + 'px'),
+          row('pz-bgop', 'Backdrop Scene Opacity', 0, 100, 5, Math.round(pz.bgOpacity * 100), v => v + '%')
+        ].join(''));
+
+        html += section('Colors & Borders', [
+          `<div style="display:flex;gap:12px;align-items:center;padding:4px 0;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#94a3b8;flex:1;">
+              Accent Glow
+              <input type="color" data-k="pz-accent" value="${pz.accentColor}" style="border:none;background:transparent;cursor:pointer;width:24px;height:24px;padding:0;" />
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#94a3b8;flex:1;">
+              Tile Border
+              <input type="color" data-k="pz-border" value="${pz.borderColor}" style="border:none;background:transparent;cursor:pointer;width:24px;height:24px;padding:0;" />
+            </label>
+          </div>`
+        ].join(''));
+      }
+
+      // Text is optional with a clean + Add Text button
+      const hasAnyText = slots.some(sl => {
+        const val = e.texts[sl.key] != null ? e.texts[sl.key] : sl.def;
+        return val && val.trim().length > 0;
+      });
+      if (hasAnyText || e.showTextSection) {
+        html += section('Text & Kinetic Titles', `
+          <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
+            <button type="button" data-act="clear-all-text-slots" style="font-size:9.5px;padding:2px 6px;border-radius:4px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;cursor:pointer;">Clear All Text</button>
+          </div>
+          ${textHtml}
+        `);
+      } else {
+        html += `<div style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);border-radius:6px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:10.5px;color:#64748b;">No text overlays active (Clean Canvas)</span>
+          <button type="button" data-act="add-kinetic-slot" style="font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:5px;background:rgba(56,189,248,0.2);border:1px solid rgba(56,189,248,0.5);color:#38bdf8;cursor:pointer;">+ Add Text</button>
+        </div>`;
+      }
+    } else if (k === 'spatial') {
+      const s = spatial3DState;
+
+      // Section 1: Typography Granularity (Beyond Gold)
+      const textSectionHeader = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:700;color:#e2e8f0;">Headline Typography</span>
+        <button type="button" data-act="s-toggle-text" style="padding:4px 9px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid ${s.showText !== false ? 'rgba(16,185,129,0.5)' : 'rgba(239,68,68,0.5)'};background:${s.showText !== false ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)'};color:${s.showText !== false ? '#6ee7b7' : '#fca5a5'};cursor:pointer;">${s.showText !== false ? '✓ Text Visible' : '⊘ Hidden (Pure 3D Universe)'}</button>
+      </div>`;
+
+      const textControls = [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Headline Font Family
+          <select data-k="s-text-font" style="${selectCss}">${[
+            'Cinzel:Cinzel (Imperial Serif)',
+            'Playfair Display:Playfair Display (Editorial High-Fashion)',
+            'JetBrains Mono:JetBrains Mono (Technical Dossier)',
+            'Inter:Inter (Clean Ultra-Modern)',
+            'Impact:Impact (Punchy Title)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.textFont || 'Cinzel') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Typography Shader Style
+          <select data-k="s-text-style" style="${selectCss}">${[
+            'gold:Imperial 24K Gold Foil (Default)',
+            'chrome:Platinum Mirror Chrome',
+            'cyan:Quantum Neon Cyan',
+            'emerald:Syndicate Emerald Green',
+            'crimson:Dark Power Blood Crimson',
+            'white:Pure Titanium White',
+            'custom:Custom Two-Tone Gradient'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.textStyle || 'gold') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        s.textStyle === 'custom' ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 0;">
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#94a3b8;">Color 1 <input type="color" data-k="s-text-c1" value="${s.textPrimaryColor || '#f59e0b'}" style="border:none;width:28px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+          <label style="display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#94a3b8;">Color 2 <input type="color" data-k="s-text-c2" value="${s.textSecondaryColor || '#fde68a'}" style="border:none;width:28px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+        </div>` : '',
+        row('s-text-bevel', '3D Bevel Depth', 1, 6, 1, s.textBevel || 3, v => v + ' layers'),
+        s.showText !== false ? textHtml : '<div style="font-size:10.5px;color:#94a3b8;font-style:italic;padding:6px 0;">Headline typography hidden. Camera navigates purely through 3D floating exhibits & celestial objects in space.</div>'
+      ].join('');
+
+      html += section('Text Overlays & Typography', textSectionHeader + textControls);
+
+      // Section 2: Camera Rig, Velocity Normalization & Path Drawer
+      const pathMiniCanvas = `<div style="background:#0b0f19;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px 10px;margin-top:6px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:10px;font-weight:700;color:#cbd5e1;text-transform:uppercase;letter-spacing:0.5px;">Flight Runway / Road Path</span>
+          <button type="button" data-act="s-reset-path" style="font-size:9.5px;color:#a855f7;background:transparent;border:none;cursor:pointer;text-decoration:underline;">Reset Center</button>
+        </div>
+        <canvas id="spatial-path-canvas" width="220" height="75" style="width:100%;height:75px;background:#05070c;border:1px solid rgba(168,85,247,0.3);border-radius:6px;cursor:crosshair;touch-action:none;display:block;"></canvas>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:#64748b;margin-top:4px;">
+          <span>← Left Wall</span>
+          <span style="color:#c084fc;">Drag to shape flight path</span>
+          <span>Right Wall →</span>
+        </div>
+      </div>`;
+
+      html += section('Camera Rig & Flight Path', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Flight Mode
+          <select data-k="flight" style="${selectCss}">${[
+            'zoomthrough:Zoom In (Hallway Fly-Through)',
+            'pullback:Zoom Out (Reverse Pullback)',
+            'slalom:S-Curve Slalom Weave',
+            'orbit:360\\u00b0 Panoramic Orbit Tour',
+            'custom-path:Custom Drawn Trajectory'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${s.flightMode === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Runway Path Style
+          <select data-k="s-pathstyle" style="${selectCss}">${[
+            'straight:Straight Center Runway',
+            'slalom:Sinusoidal S-Weave',
+            'cosmic-wave:Cosmic Wave & Undulation',
+            'custom:Interactive Custom Drawn Path'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.pathStyle || 'straight') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        row('s-speed', 'Zoom Speed (Z-Velocity - Bidirectional)', -3.0, 3.0, 0.1, s.camSpeed !== undefined ? s.camSpeed : 1.0, v => (v >= 0 ? '+' : '') + v.toFixed(1) + 'x'),
+        row('s-shake', 'Handheld Camera Shake (Human Imperfection)', 0, 100, 1, s.camShake !== undefined ? s.camShake : 15, v => v + '%'),
+        row('s-pathcurve', 'Runway Banking / Curve', -100, 100, 1, s.pathCurve || 0, v => (v > 0 ? '+' : '') + v + '%'),
+        pathMiniCanvas,
+        row('s-drift', 'X/Y Motion Drift', 0, 100, 1, s.camDrift, v => v + '%'),
+        row('s-fov', 'Vertigo / FOV Warp', 30, 90, 1, s.fovWarp, v => v + '\\u00b0'),
+        row('s-pitch', 'Tilt Pitch (X)', -45, 45, 1, Math.round(s.camPitch), v => v + '\\u00b0'),
+        row('s-yaw', 'Rotation Yaw (Y)', -65, 65, 1, Math.round(s.camYaw), v => v + '\\u00b0')
+      ].join(''));
+
+      // Section 3: Modular Background Architecture
+      html += section('Background Architecture', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Background Environment Mode
+          <select data-k="s-bgstyle" style="${selectCss}">${[
+            'grid-stars:Hybrid Grid Corridor + Starfield',
+            'pitch-dark:100% Pitch Black Void (Stark Contrast)',
+            'grid-only:Architectural / Cyber Grid Corridor Only',
+            'stars-only:Deep Cosmos Void (Pure Stars)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.bgStyle || 'grid-stars') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:10px;color:#94a3b8;">Backdrop Base Tint <input type="color" data-k="s-bgcolor" value="${s.bgColor || '#07080c'}" style="border:none;width:30px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+          <button type="button" data-act="s-toggle-alpha" style="padding:4px 9px;font-size:10px;font-weight:700;border-radius:6px;border:1px solid ${s.transparentBg ? 'rgba(16,185,129,0.6)' : 'rgba(255,255,255,0.15)'};background:${s.transparentBg ? 'rgba(16,185,129,0.15)' : 'transparent'};color:${s.transparentBg ? '#6ee7b7' : '#94a3b8'};cursor:pointer;">${s.transparentBg ? '⊞ Alpha Transparent' : '■ Solid Backdrop'}</button>
+        </div>`,
+        row('s-fog', 'Atmospheric Fog Density', 0, 100, 1, s.fogDensity, v => v + '%'),
+        row('s-light', 'Ambient Lighting Glow', 20, 200, 1, s.lightIntensity, v => v + '%')
+      ].join(''));
+
+      // Section 4: Grid Density, Cell Spacing & Conveyor Flow
+      html += section('Grid Tunnel & Luminescence', [
+        `<label style="display:flex;flex-direction:column;gap:3px;font-size:10px;color:#94a3b8;">Tunnel Architectural Preset
+          <select data-k="s-env" style="${selectCss}">${[
+            'tunnel-cyan:Cyber Grid Tunnel (Image 2)',
+            'tunnel-gold:Gold Documentary Tunnel (Image 2)',
+            'tunnel-slate:Slate Architectural Tunnel',
+            'open-stars:Floor Grid & Cosmic Starfield (Image 1)',
+            'deep-cosmos:Deep Cosmos Void (Pure Stars)'
+          ].map(o => { const [v, n] = o.split(':'); return `<option value="${v}" ${(s.envStyle || 'tunnel-cyan') === v ? 'selected' : ''}>${n}</option>`; }).join('')}</select>
+        </label>`,
+        row('s-grid-density', 'Grid Density / Cell Mesh', 20, 120, 2, s.gridDensity || 60, v => v + ' divisions'),
+        row('s-grid-speed', 'Grid Conveyor Streaming Speed', 0, 3, 0.1, s.gridSpeed !== undefined ? s.gridSpeed : 1.0, v => v.toFixed(1) + 'x'),
+        row('s-lum', 'Grid Line Luminescence / Brightness', 0, 200, 1, s.gridLuminescence !== undefined ? s.gridLuminescence : 100, v => v + '%'),
+        row('s-gridglow', 'Grid Light Glow / Point Intensity', 0, 200, 1, s.gridGlow !== undefined ? s.gridGlow : 100, v => v + '%'),
+        `<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;">
+          <label style="display:flex;align-items:center;gap:8px;font-size:10px;color:#94a3b8;">Grid Line Color <input type="color" data-k="s-gridcolor" value="${s.gridColor || '#06b6d4'}" style="border:none;width:30px;height:22px;border-radius:4px;cursor:pointer;background:transparent;" /></label>
+          ${btn('s-grid', '⊞ Grid Active', s.gridVisible)}
+        </div>`
+      ].join(''));
+
+      // Section 5: Starfield & Cosmic Dust Granularity
+      html += section('Starfield & Cosmic Dust', [
+        row('s-star-count', 'Star Count', 100, 2500, 50, s.starCount || 1200, v => v + ' stars'),
+        row('s-star-size', 'Star Particle Size', 1, 10, 0.2, s.starSize || 4.8, v => v.toFixed(1) + 'px'),
+        row('s-star-speed', 'Starfield Drift & Twinkle Speed', 0, 3, 0.1, s.starSpeed !== undefined ? s.starSpeed : 1.0, v => v.toFixed(1) + 'x'),
+        `<div style="display:flex;gap:6px;">${btn('s-dust', '✦ Stars Active', s.dustVisible)}${btn('s-toggle-celestial', '⬡ Celestial 3D Objects', s.showCelestialObjects !== false)}</div>`
+      ].join(''));
+
+      // Section 6: Presets
+      html += section('Presets', `<div style="display:flex;gap:6px;flex-wrap:wrap;">${[
+        'docu-essay:Docu-Essay (Gallery)',
+        'cyber-matrix:Cyber Matrix (Image 2)',
+        'philosophy:Philosophy (Gold)',
+        'cosmic-universe:Cosmic Universe (Stars)'
+      ].map(o => { const [v, n] = o.split(':'); return btn('preset-' + v, n, s.activePreset === v); }).join('')}</div>`);
+
+      // Section 7: Corridor Exhibits & 3D Layers
       html += section('Corridor Exhibits & 3D Layers', `<div id="tpl3d-layers" style="display:flex;flex-direction:column;gap:6px;"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;"><button type="button" data-act="s-add-artifact" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(212,175,55,.6);background:rgba(212,175,55,.1);color:#fef08a;cursor:pointer;">+ Image / 3D Celestial</button><button type="button" data-act="s-add" style="padding:6px;font-size:10px;font-weight:700;border-radius:6px;border:1px dashed rgba(168,85,247,.5);background:transparent;color:#d8b4fe;cursor:pointer;">+ Hero Title Plane</button></div>`);
     } else {
       const p = ensureDoc(e);
@@ -949,89 +1511,178 @@
 
     if (key.startsWith('tx-')) { setText(tplId, slotsFor(tplId)[parseInt(key.slice(3), 10)], v); }
     else if (key === 'v-speed') { fx.speed = v; lab((v >= 0 ? '+' : '') + v.toFixed(1) + 'x'); }
-    else if (key === 'v-pitch') { fx.pitch = v; lab(v + '\u00b0'); }
-    else if (key === 'v-yaw') { fx.yaw = v; lab(v + '\u00b0'); }
-    else if (key === 'v-roll') { fx.roll = v; lab(v + '\u00b0'); }
+    else if (key === 'v-pitch') { fx.pitch = v; lab(v + '°'); }
+    else if (key === 'v-yaw') { fx.yaw = v; lab(v + '°'); }
+    else if (key === 'v-roll') { fx.roll = v; lab(v + '°'); }
     else if (key === 'v-zoom') { fx.zoom = v; lab(v.toFixed(2) + 'x'); }
     else if (key === 'flight') { s.flightMode = v; initSpatialPathCanvas(); }
     else if (key === 's-pathstyle') { s.pathStyle = v; initSpatialPathCanvas(); }
     else if (key === 's-pathcurve') { s.pathCurve = v; lab((v > 0 ? '+' : '') + v + '%'); initSpatialPathCanvas(); }
-    else if (key === 's-env') { s.envStyle = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
-    else if (key === 's-lum') { s.gridLuminescence = v; lab(v + '%'); if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
-    else if (key === 's-gridcolor') { s.gridColor = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
-    else if (key === 's-speed') { s.camSpeed = v; lab(v.toFixed(1) + 'x'); }
+    else if (key === 's-speed') { s.camSpeed = v; lab((v >= 0 ? '+' : '') + v.toFixed(1) + 'x'); }
+    else if (key === 's-shake') { s.camShake = v; lab(v + '%'); }
     else if (key === 's-drift') { s.camDrift = v; lab(v + '%'); }
-    else if (key === 's-fov') { s.fovWarp = v; lab(v + '\u00b0'); if (s.camera) { s.camera.fov = v; s.camera.updateProjectionMatrix(); } }
-    else if (key === 's-pitch') { s.camPitch = v; lab(v + '\u00b0'); }
-    else if (key === 's-yaw') { s.camYaw = v; lab(v + '\u00b0'); }
+    else if (key === 's-fov') { s.fovWarp = v; lab(v + '°'); if (s.camera) { s.camera.fov = v; s.camera.updateProjectionMatrix(); } }
+    else if (key === 's-pitch') { s.camPitch = v; lab(v + '°'); }
+    else if (key === 's-yaw') { s.camYaw = v; lab(v + '°'); }
+    else if (key === 's-text-font') { s.textFont = v; setSpatialLayers((s.elements3D || []).map(m => m.userData)); }
+    else if (key === 's-text-style') { s.textStyle = v; build(tplId); setSpatialLayers((s.elements3D || []).map(m => m.userData)); }
+    else if (key === 's-text-c1') { s.textPrimaryColor = v; setSpatialLayers((s.elements3D || []).map(m => m.userData)); }
+    else if (key === 's-text-c2') { s.textSecondaryColor = v; setSpatialLayers((s.elements3D || []).map(m => m.userData)); }
+    else if (key === 's-text-bevel') { s.textBevel = v; lab(v + ' layers'); setSpatialLayers((s.elements3D || []).map(m => m.userData)); }
+    else if (key === 's-bgstyle') { s.bgStyle = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-bgcolor') { s.bgColor = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-env') { s.envStyle = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-grid-density') { s.gridDensity = v; lab(v + ' divisions'); if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-grid-speed') { s.gridSpeed = v; lab(v.toFixed(1) + 'x'); }
+    else if (key === 's-lum') { s.gridLuminescence = v; lab(v + '%'); if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-gridglow') { s.gridGlow = v; lab(v + '%'); if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-gridcolor') { s.gridColor = v; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); }
+    else if (key === 's-star-count') { s.starCount = v; lab(v + ' stars'); if (typeof buildSpatialDustParticles === 'function' && s.scene) { if (s.particlesMesh) s.scene.remove(s.particlesMesh); s.particlesMesh = buildSpatialDustParticles(s.scene); } }
+    else if (key === 's-star-size') { s.starSize = v; lab(v.toFixed(1) + 'px'); if (s.particlesMesh && s.particlesMesh.material) s.particlesMesh.material.size = v; }
+    else if (key === 's-star-speed') { s.starSpeed = v; lab(v.toFixed(1) + 'x'); }
     else if (key === 's-fog') { s.fogDensity = v; lab(v + '%'); if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (v / 100) * 0.0008; }
     else if (key === 's-light') { s.lightIntensity = v; lab(v + '%'); if (s.ambientLight) s.ambientLight.intensity = (v / 100) * 0.95; }
     else if (key.startsWith('l-')) {
-      const m = key.match(/^l-(title|sub|body|mode|shape|img|z|x|y|scale|color)-(\d+)$/);
+      const m = key.match(/^l-(title|sub|body|stamp|trans|font|mode|shape|img|z|x|y|scale|color)-(\d+)$/);
       if (m) {
-        const i = parseInt(m[2], 10), field = { title: 'title', sub: 'subtitle', body: 'body', mode: 'artifactMode', shape: 'objectShape', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color' }[m[1]];
+        const i = parseInt(m[2], 10), field = {
+          title: 'title', sub: 'subtitle', body: 'body', stamp: 'stamp', trans: 'transitionEffect', font: 'fontFamily',
+          mode: 'artifactMode', shape: 'objectShape', img: 'imageUrl', z: 'z', x: 'x', y: 'y', scale: 'scale', color: 'color'
+        }[m[1]];
         const num = ['z', 'x', 'y', 'scale'].includes(field);
         const val = num ? parseFloat(v) : v;
-        const patch = { [field]: val }; if (field === 'body') patch.text = val; if (field === 'x') patch.baseX = val; if (field === 'y') patch.baseY = val;
+        const patch = { [field]: val };
+        if (field === 'body') patch.text = val;
+        if (field === 'x') patch.baseX = val;
+        if (field === 'y') patch.baseY = val;
         rebuildSpatialLayer(i, patch);
         if (num) lab(field === 'scale' ? Number(val).toFixed(2) + 'x' : String(Math.round(val)));
-        // keep unified text in sync when this layer feeds a slot
         if (field === 'artifactMode') { renderSpatialLayers(); }
-        if (!num && field !== 'color' && field !== 'artifactMode' && field !== 'imageUrl') {
-          Object.keys(SPATIAL_3D).forEach(sk => { const mm = SPATIAL_3D[sk]; if (mm.l === i && mm.f === field) { e.texts[sk] = val; const sl = SPATIAL_SLOTS.find(x => x.key === sk); const node = (videoNodes[tplId] || {})[sl.def]; if (node) node.nodeValue = val; } });
-        }
       }
     }
-    else if (key === 'd-pitch') { ensureDoc(e).pitch = v; lab(v + '\u00b0'); }
-    else if (key === 'd-yaw') { ensureDoc(e).yaw = v; lab(v + '\u00b0'); }
-    else if (key === 'd-roll') { ensureDoc(e).roll = v; lab(v + '\u00b0'); }
-    else if (key === 'd-dist') { ensureDoc(e).dist = v; lab(String(v)); }
-    else if (key === 'd-parallax') { ensureDoc(e).parallax = v; d.parallax = v; lab(v.toFixed(1) + 'x'); }
-    else if (key === 'd-paper') { ensureDoc(e).paperStyle = v; d.paperStyle = v; d._texDirty = true; }
-    else if (key === 'd-hlprog') { ensureDoc(e).hl = v / 100; lab(v + '%'); }
-    else if (key === 'd-popelev') { ensureDoc(e).popElevation = v; d.popElevation = v; lab(String(v)); }
-    else if (key === 'd-redwipe') { ensureDoc(e).redactWipe = v / 100; d.redactWipe = v / 100; d._texDirty = true; lab(v + '%'); }
-    else if (key === 'd-hlcolor') { ensureDoc(e).highlightColor = v; d.highlightColor = v; d._texDirty = true; }
-    else if (key === 'pz-rounding') {
-      const pz = ensurePuzzle(e); pz.tileRounding = v; lab(v + 'px');
-      document.querySelectorAll(`#fx-puzzle-grid-${tplId} > div`).forEach(el => el.style.borderRadius = v + 'px');
+    else if (key.startsWith('d-')) {
+      const p = ensureDoc(e);
+      if (key === 'd-pitch') { p.pitch = v; lab(v + '°'); d.pitch = v; }
+      else if (key === 'd-yaw') { p.yaw = v; lab(v + '°'); d.yaw = v; }
+      else if (key === 'd-roll') { p.roll = v; lab(v + '°'); d.roll = v; }
+      else if (key === 'd-dist') { p.dist = v; lab(String(Math.round(v))); d.dist = v; }
+      else if (key === 'd-parallax') { p.parallax = v; lab(v.toFixed(1) + 'x'); d.parallax = v; }
+      else if (key === 'd-paper') { p.paperStyle = v; d.paperStyle = v; d._texDirty = true; }
+      else if (key === 'd-hlprog') { p.hl = v / 100; lab(v + '%'); d.hl = p.hl; d._texDirty = true; }
+      else if (key === 'd-popelev') { p.popElevation = v; lab(String(v)); d.popElevation = v; }
+      else if (key === 'd-redwipe') { p.redactWipe = v / 100; lab(v + '%'); d.redactWipe = p.redactWipe; d._texDirty = true; }
+      else if (key === 'd-hlcolor') { p.highlightColor = v; d.highlightColor = v; d._texDirty = true; }
     }
-    else if (key === 'pz-gap') {
-      const pz = ensurePuzzle(e); pz.tileGap = v; lab(v + 'px');
-      const g = document.getElementById(`fx-puzzle-grid-${tplId}`); if (g) g.style.gap = v + 'px';
-    }
-    else if (key === 'pz-bgop') {
-      const pz = ensurePuzzle(e); pz.bgOpacity = v / 100; lab(v + '%');
-      const bg = document.getElementById(`fx-puzzle-bg-${tplId}`); if (bg && pz.bgVisible) bg.style.opacity = (v / 100);
-    }
-    else if (key === 'pz-accent') {
-      const pz = ensurePuzzle(e); pz.accentColor = v;
-      const c4 = document.getElementById(`fx-piece-4-${tplId}`); if (c4) { c4.style.borderColor = v; c4.style.boxShadow = `0 0 20px ${v}55, 0 12px 30px rgba(0,0,0,0.9)`; }
-      const pulse = document.getElementById('fx-piece-4-pulse'); if (pulse) pulse.style.background = `radial-gradient(circle, ${v}40 0%, transparent 70%)`;
-      const dot = document.getElementById('fx-piece-4-dot'); if (dot) { dot.style.background = v; dot.style.boxShadow = `0 0 8px ${v}`; }
-      const tag = document.getElementById(`fx-matte-tag-${tplId}`); if (tag) tag.style.color = v;
-      const box = document.getElementById(`fx-matte-box-${tplId}`); if (box) box.style.borderTopColor = v;
-    }
-    else if (key === 'pz-border') {
-      const pz = ensurePuzzle(e); pz.borderColor = v;
-      document.querySelectorAll(`#fx-puzzle-grid-${tplId} > div`).forEach(el => { if (el.id !== `fx-piece-4-${tplId}`) el.style.borderColor = v; });
-      const box = document.getElementById(`fx-matte-box-${tplId}`); if (box) { box.style.borderLeftColor = v; box.style.borderRightColor = v; box.style.borderBottomColor = v; }
-    }
-    capture(tplId);
     persist();
   }
-
   function onClick(ev) {
     const b = ev.target.closest('[data-act]'); if (!b || !curTpl) return;
     const act = b.dataset.act, tplId = curTpl, e = entry(tplId), s = spatial3DState, d = document3DFXState;
+
+    if (act === 's-toggle-text') {
+      s.showText = s.showText === false ? true : false;
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-toggle-alpha') {
+      s.transparentBg = !s.transparentBg;
+      if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-toggle-celestial') {
+      s.showCelestialObjects = s.showCelestialObjects === false ? true : false;
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-reset-path') {
+      s.pathStyle = 'straight';
+      s.pathCurve = 0;
+      s.drawnPath = null;
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-grid') {
+      s.gridVisible = !s.gridVisible;
+      if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
+      capture(tplId); build(tplId); return;
+    }
+    if (act === 's-dust') {
+      s.dustVisible = !s.dustVisible;
+      if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
+      capture(tplId); build(tplId); return;
+    }
+    if (act.startsWith('preset-')) {
+      loadSpatialPreset(act.replace('preset-', ''));
+      capture(tplId); build(tplId); return;
+    }
+    if (act.startsWith('l-remove-img-')) {
+      const idx = parseInt(act.replace('l-remove-img-', ''), 10);
+      rebuildSpatialLayer(idx, { imageUrl: '', artifactMode: 'card' });
+      capture(tplId); renderSpatialLayers(); return;
+    }
+    if (act.startsWith('l-pick-file-')) {
+      const idx = parseInt(act.replace('l-pick-file-', ''), 10);
+      const fileInput = document.getElementById('l-file-input-' + idx);
+      if (fileInput) {
+        fileInput.onchange = (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (re) => {
+              rebuildSpatialLayer(idx, { imageUrl: re.target.result, artifactMode: 'image' });
+              capture(tplId); renderSpatialLayers();
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+        fileInput.click();
+      }
+      return;
+    }
+    if (act.startsWith('l-toggle-')) {
+      const idx = parseInt(act.slice(9), 10);
+      openLayerIdx = openLayerIdx === idx ? -1 : idx;
+      renderSpatialLayers(); return;
+    }
+    if (act.startsWith('l-del-')) {
+      const idx = parseInt(act.slice(6), 10);
+      if (s.elements3D && s.elements3D[idx]) {
+        s.scene.remove(s.elements3D[idx]);
+        s.elements3D.splice(idx, 1);
+        if (openLayerIdx === idx) openLayerIdx = -1;
+        capture(tplId); renderSpatialLayers();
+      }
+      return;
+    }
+    if (act.startsWith('l-up-') || act.startsWith('l-down-')) {
+      const up = act.startsWith('l-up-');
+      const idx = parseInt(act.slice(up ? 5 : 7), 10);
+      const list = s.elements3D || [];
+      const target = up ? idx - 1 : idx + 1;
+      if (target >= 0 && target < list.length) {
+        const tmp = list[idx]; list[idx] = list[target]; list[target] = tmp;
+        openLayerIdx = target;
+        capture(tplId); renderSpatialLayers();
+      }
+      return;
+    }
+    if (act === 's-add-artifact') {
+      const id = Date.now().toString();
+      const newCard = createSpatialCardPlane({ id, type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CLASSIFIED EVIDENCE', subtitle: 'NEW INVESTIGATION EXHIBIT', body: 'Confidential dossier artifact placed into spatial timeline.', z: (s.elements3D && s.elements3D.length ? s.elements3D[s.elements3D.length - 1].position.z - 400 : -1000), x: -740, y: 50, scale: 1.0, color: '#f59e0b' });
+      s.scene.add(newCard); s.elements3D.push(newCard);
+      openLayerIdx = s.elements3D.length - 1;
+      capture(tplId); renderSpatialLayers(); return;
+    }
+    if (act === 's-add') {
+      const id = Date.now().toString();
+      const newTitle = createSpatialTextPlane({ id, type: 'text', title: 'KEYWORD PHRASE', subtitle: 'SUBHEADING NARRATIVE', body: '', z: (s.elements3D && s.elements3D.length ? s.elements3D[s.elements3D.length - 1].position.z - 400 : -1000), x: 0, y: 15, scale: 1.15, color: '#f59e0b' });
+      s.scene.add(newTitle); s.elements3D.push(newTitle);
+      openLayerIdx = s.elements3D.length - 1;
+      capture(tplId); renderSpatialLayers(); return;
+    }
     if (act === 'add-kinetic-slot') {
-      e.showTextSection = true;
-      e.texts['title'] = 'CINEMATIC HORIZON';
+      e.showTextSection = true; e.texts['title'] = 'CINEMATIC HORIZON';
       persist(); build(tplId); return;
     }
     if (act === 'clear-all-text-slots') {
-      e.showTextSection = false;
-      slotsFor(tplId).forEach(sl => { e.texts[sl.key] = ''; });
+      e.showTextSection = false; slotsFor(tplId).forEach(sl => { e.texts[sl.key] = ''; });
       persist(); build(tplId); return;
     }
     if (act === 'mode-video' || act === 'mode-3d') {
@@ -1047,64 +1698,10 @@
       return;
     }
     if (act === 'v-reset') { Object.assign(e.fx, { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }); persist(); build(tplId); return; }
-    if (act === 'pz-toggle-bg') {
-      const pz = ensurePuzzle(e); pz.bgVisible = !pz.bgVisible;
-      const bg = document.getElementById(`fx-puzzle-bg-${tplId}`); if (bg) bg.style.opacity = pz.bgVisible ? pz.bgOpacity : 0;
-      persist(); build(tplId); return;
-    }
-    if (act === 'pz-toggle-grid') {
-      const pz = ensurePuzzle(e); pz.gridVisible = !pz.gridVisible;
-      const g = document.getElementById(`fx-puzzle-grid-${tplId}`); if (g) g.style.display = pz.gridVisible ? 'grid' : 'none';
-      persist(); build(tplId); return;
-    }
-    if (act === 'pz-toggle-thesis') {
-      const pz = ensurePuzzle(e); pz.thesisVisible = !pz.thesisVisible;
-      const box = document.getElementById(`fx-matte-box-${tplId}`); if (box) box.style.display = pz.thesisVisible ? 'block' : 'none';
-      persist(); build(tplId); return;
-    }
-    if (act === 'pz-toggle-watermark') {
-      const pz = ensurePuzzle(e); pz.watermarkVisible = !pz.watermarkVisible;
-      const wm = document.getElementById(`fx-puzzle-watermark-${tplId}`); if (wm) wm.style.display = pz.watermarkVisible ? 'block' : 'none';
-      persist(); build(tplId); return;
-    }
-    if (act === 's-toggle-text') {
-      s.showText = s.showText === false ? true : false;
-      capture(tplId); build(tplId); return;
-    }
-    if (act === 's-reset-path') {
-      s.pathStyle = 'straight';
-      s.pathCurve = 0;
-      s.drawnPath = null;
-      capture(tplId); build(tplId); return;
-    }
-    if (act === 's-grid') { s.gridVisible = !s.gridVisible; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); capture(tplId); build(tplId); return; }
-    if (act === 's-dust') { s.dustVisible = !s.dustVisible; if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid(); capture(tplId); build(tplId); return; }
-    if (act.startsWith('preset-')) { loadSpatialPreset(act.slice(7)); e.texts = {}; openLayerIdx = -1; capture(tplId); build(tplId); return; }
-    if (act === 's-add-artifact') {
-      const sideX = (s.elements3D.length % 2 === 0) ? -520 : 520;
-      const m = createSpatialCardPlane({ type: 'card', artifactMode: 'image', visualTheme: 'treasury-scan', id: String(Date.now()), title: 'ARCHIVAL EVIDENCE PLATE', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'Photographic microfilm evidence verified under executive audit.', x: sideX, y: 90, z: -1200, color: '#D4AF37', scale: 0.96 });
-      if (m && s.scene) { s.scene.add(m); s.elements3D.push(m); openLayerIdx = s.elements3D.length - 1; capture(tplId); renderSpatialLayers(); }
-      return;
-    }
-    if (act === 's-add') {
-      const m = createSpatialTextPlane({ type: 'text', id: String(Date.now()), title: 'NEW TEXT', x: 0, y: 0, z: -600, color: '#f59e0b', scale: 1 });
-      if (m && s.scene) { s.scene.add(m); s.elements3D.push(m); openLayerIdx = s.elements3D.length - 1; capture(tplId); renderSpatialLayers(); }
-      return;
-    }
-    if (act.startsWith('l-toggle-')) { const i = parseInt(act.slice(9), 10); openLayerIdx = openLayerIdx === i ? -1 : i; renderSpatialLayers(); return; }
-    if (act.startsWith('l-del-')) { removeSpatialLayer(parseInt(act.slice(6), 10)); openLayerIdx = -1; capture(tplId); renderSpatialLayers(); return; }
-    const p = () => ensureDoc(e);
-    if (act === 'd-hl') { p().enableHighlight = !p().enableHighlight; d.enableHighlight = p().enableHighlight; d._texDirty = true; persist(); build(tplId); return; }
-    if (act === 'd-pop') { p().enablePopout = !p().enablePopout; d.enablePopout = p().enablePopout; if (d.popoutMesh) d.popoutMesh.visible = d.enablePopout; persist(); build(tplId); return; }
-    if (act === 'd-red') { p().enableRedaction = !p().enableRedaction; d.enableRedaction = p().enableRedaction; d._texDirty = true; persist(); build(tplId); return; }
+    if (act === 'd-hl') { d.enableHighlight = !d.enableHighlight; d._texDirty = true; persist(); build(tplId); return; }
+    if (act === 'd-pop') { d.enablePopout = !d.enablePopout; if (d.popoutMesh) d.popoutMesh.visible = d.enablePopout; persist(); build(tplId); return; }
+    if (act === 'd-red') { d.enableRedaction = !d.enableRedaction; d._texDirty = true; persist(); build(tplId); return; }
   }
-  function bindHost() {
-    const h = host(); if (!h || h.dataset.bound) return;
-    h.dataset.bound = '1';
-    h.addEventListener('input', onInput); h.addEventListener('change', onInput); h.addEventListener('click', onClick);
-  }
-
-  // ---------------------------------------------------------------- customizer stage hooks
   function attachDom3DInteractiveRig(stage, tplId) {
     const inner = stage.querySelector('#customizer-stage-inner') || stage;
     const e = entry(tplId);

@@ -40460,22 +40460,51 @@ let spatial3DState = {
   pointLight: null,
   animId: null,
   isPlaying: true,
-  flightMode: 'zoomthrough', // 'zoomthrough' (Zoom In), 'pullback' (Zoom Out), 'slalom', 'orbit', 'custom-path'
+
+  // Background & Environment System
+  bgStyle: 'grid-stars', // 'pitch-dark', 'grid-only', 'stars-only', 'grid-stars'
+  bgColor: '#07080c',
+  transparentBg: false,
+  envStyle: 'tunnel-cyan', // 'tunnel-cyan', 'tunnel-gold', 'tunnel-slate', 'open-stars', 'deep-cosmos'
+
+  // Grid Granularity Controls
+  gridDensity: 60, // 20 to 120 lines
+  gridSpeed: 1.0, // 0 to 3x conveyor flow
+  gridLuminescence: 100, // 0 to 200%
+  gridGlow: 100, // 0 to 200%
+  gridColor: '#06b6d4',
+
+  // Starfield & Cosmic Dust Controls
+  starCount: 1200, // 100 to 2500
+  starSize: 4.8, // 1 to 10px
+  starSpeed: 1.0, // 0 to 3x
+  showCelestialObjects: true,
+
+  // Camera Flight & Depth Normalization
+  flightMode: 'zoomthrough', // 'zoomthrough', 'pullback', 'slalom', 'orbit', 'custom-path'
   pathStyle: 'straight', // 'straight', 'slalom', 'cosmic-wave', 'custom'
   pathCurve: 0, // -100 to +100
   drawnPath: null, // array of { t, x, y }
-  showText: true, // boolean to toggle text overlays (allows pure 3D universe navigation)
-  envStyle: 'tunnel-cyan', // 'tunnel-cyan' (Image 2 Tron), 'tunnel-gold', 'tunnel-slate', 'open-stars' (Image 1), 'deep-cosmos'
-  gridLuminescence: 100, // 0 to 200%
-  gridColor: '#06b6d4',
-  currentTime: 0, // 0 to 1
-  mouse: { x: 0, y: 0 },
-  activePreset: 'docu-essay',
-  camSpeed: 1.35,
+  camSpeed: 1.0, // -3.0 to +3.0 (negative speed for reverse flight)
   camDrift: 25,
+  camShake: 15, // 0 to 100% organic handheld shake
+  focalPauses: false, // momentary dwell at hero headlines
   camPitch: 2,
   camYaw: 0,
   fovWarp: 52,
+  currentTime: 0, // 0 to 1
+
+  // Typography Granularity
+  showText: true,
+  textFont: 'Cinzel', // 'Cinzel', 'Playfair Display', 'JetBrains Mono', 'Inter', 'Impact'
+  textStyle: 'gold', // 'gold', 'chrome', 'cyan', 'emerald', 'crimson', 'white', 'custom'
+  textPrimaryColor: '#f59e0b',
+  textSecondaryColor: '#fde68a',
+  textBevel: 3,
+
+  // Optics & Post FX
+  chromaticAberration: false,
+  filmGrain: true,
   audioEnabled: false,
   audioCtx: null,
   lastZPassCheck: 1200,
@@ -40484,7 +40513,9 @@ let spatial3DState = {
   vignetteAmount: 80,
   gridVisible: true,
   dustVisible: true,
-  editingLayerIndex: -1
+  editingLayerIndex: -1,
+  mouse: { x: 0, y: 0 },
+  activePreset: 'docu-essay'
 };
 
 const _spatialImageTexCache = {};
@@ -40537,61 +40568,107 @@ function createSpatialTextPlane(item) {
   const cx = canvas.width / 2;
   const cy = subText ? 155 : 190;
 
+  const fontFam = item.fontFamily || spatial3DState.textFont || 'Cinzel';
+  const textStyle = item.textStyle || spatial3DState.textStyle || 'gold';
+
   let fontSize = 84;
-  ctx.font = `900 ${fontSize}px "Cinzel", "Times New Roman", Georgia, serif`;
-  while (ctx.measureText(titleText).width > canvas.width - 180 && fontSize > 44) {
+  ctx.font = `900 ${fontSize}px "${fontFam}", "Times New Roman", Georgia, serif`;
+  while (ctx.measureText(titleText).width > canvas.width - 180 && fontSize > 40) {
     fontSize -= 4;
-    ctx.font = `900 ${fontSize}px "Cinzel", "Times New Roman", Georgia, serif`;
+    ctx.font = `900 ${fontSize}px "${fontFam}", "Times New Roman", Georgia, serif`;
   }
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  // Deep crisp shadow (no muddy glow)
+  // Deep Crisp Drop Shadow
   ctx.save();
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 12;
-  ctx.fillStyle = '#261404';
-  ctx.fillText(titleText, cx, cy + 5);
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.96)';
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetY = 14;
+  ctx.fillStyle = '#05070c';
+  ctx.fillText(titleText, cx, cy + 6);
   ctx.restore();
 
-  // Subtle 3D bevel extrusion
-  ctx.fillStyle = '#5c3409';
-  ctx.fillText(titleText, cx, cy + 3);
-  ctx.fillStyle = '#854d0e';
-  ctx.fillText(titleText, cx, cy + 1.5);
+  // Multi-tier 3D bevel extrusion
+  const bevel = item.textBevel !== undefined ? item.textBevel : (spatial3DState.textBevel || 3);
+  for (let b = bevel; b >= 1; b--) {
+    ctx.fillStyle = textStyle === 'chrome' ? 'rgba(30,41,59,0.9)' : textStyle === 'cyan' ? 'rgba(8,51,68,0.9)' : textStyle === 'emerald' ? 'rgba(6,78,59,0.9)' : textStyle === 'crimson' ? 'rgba(69,10,10,0.9)' : '#5c3409';
+    ctx.fillText(titleText, cx, cy + b * 1.5);
+  }
 
-  // Crisp Gold Foil Gradient
-  const goldGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
-  goldGrad.addColorStop(0.0, '#fef08a');
-  goldGrad.addColorStop(0.3, '#d97706');
-  goldGrad.addColorStop(0.55, '#fde68a');
-  goldGrad.addColorStop(0.8, '#b45309');
-  goldGrad.addColorStop(1.0, '#f59e0b');
+  // Preset Text Gradients
+  let textGrad = null;
+  if (textStyle === 'chrome') {
+    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad.addColorStop(0.0, '#ffffff');
+    textGrad.addColorStop(0.28, '#cbd5e1');
+    textGrad.addColorStop(0.52, '#64748b');
+    textGrad.addColorStop(0.78, '#cbd5e1');
+    textGrad.addColorStop(1.0, '#ffffff');
+  } else if (textStyle === 'cyan') {
+    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad.addColorStop(0.0, '#cffafe');
+    textGrad.addColorStop(0.3, '#06b6d4');
+    textGrad.addColorStop(0.65, '#0284c7');
+    textGrad.addColorStop(1.0, '#38bdf8');
+  } else if (textStyle === 'emerald') {
+    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad.addColorStop(0.0, '#d1fae5');
+    textGrad.addColorStop(0.35, '#10b981');
+    textGrad.addColorStop(0.7, '#047857');
+    textGrad.addColorStop(1.0, '#34d399');
+  } else if (textStyle === 'crimson') {
+    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad.addColorStop(0.0, '#fee2e2');
+    textGrad.addColorStop(0.3, '#ef4444');
+    textGrad.addColorStop(0.7, '#991b1b');
+    textGrad.addColorStop(1.0, '#f87171');
+  } else if (textStyle === 'white') {
+    textGrad = '#f8fafc';
+  } else if (textStyle === 'custom') {
+    const c1 = item.primaryColor || spatial3DState.textPrimaryColor || '#f59e0b';
+    const c2 = item.secondaryColor || spatial3DState.textSecondaryColor || '#fde68a';
+    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad.addColorStop(0.0, c1);
+    textGrad.addColorStop(0.5, c2);
+    textGrad.addColorStop(1.0, c1);
+  } else {
+    // Default Gold Foil
+    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad.addColorStop(0.0, '#fef08a');
+    textGrad.addColorStop(0.3, '#d97706');
+    textGrad.addColorStop(0.55, '#fde68a');
+    textGrad.addColorStop(0.8, '#b45309');
+    textGrad.addColorStop(1.0, '#f59e0b');
+  }
 
-  ctx.fillStyle = goldGrad;
+  ctx.fillStyle = textGrad;
   ctx.fillText(titleText, cx, cy);
 
   if (subText) {
-    // Sleek horizontal divider line tightly coupled to the title
     const ruleY = cy + 54;
-    const ruleHalfW = 240;
+    const ruleHalfW = 260;
     const ruleGrad = ctx.createLinearGradient(cx - ruleHalfW, ruleY, cx + ruleHalfW, ruleY);
     ruleGrad.addColorStop(0, 'rgba(217, 119, 6, 0)');
-    ruleGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.85)');
+    ruleGrad.addColorStop(0.5, item.color || '#f59e0b');
     ruleGrad.addColorStop(1, 'rgba(217, 119, 6, 0)');
     ctx.fillStyle = ruleGrad;
     ctx.fillRect(cx - ruleHalfW, ruleY, ruleHalfW * 2, 2);
 
-    ctx.font = '600 22px "Inter", -apple-system, sans-serif';
-    ctx.fillStyle = '#94a3b8';
-    const trackedSub = subText.split('').join(' ');
-    ctx.fillText(trackedSub, cx, ruleY + 34);
+    ctx.font = '700 22px "JetBrains Mono", monospace';
+    ctx.fillStyle = item.color || '#fde68a';
+    ctx.letterSpacing = '6px';
+    ctx.fillText(subText, cx, cy + 86);
   }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.anisotropy = 4;
+
+  const sc = item.scale || 1;
+  const planeW = 980 * sc;
+  const planeH = 232 * sc;
+
   const material = new THREE.MeshBasicMaterial({
     map: texture,
     transparent: true,
@@ -40600,46 +40677,29 @@ function createSpatialTextPlane(item) {
   });
   material.userData = { baseOpacity: 1.0 };
 
-  const sc = item.scale || 1;
-  const planeW = 820 * sc;
-  const planeH = 195 * sc;
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(planeW, planeH), material);
-  mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
+  mesh.position.set(item.x || 0, item.y || 15, item.z || 0);
   mesh.userData = {
     id: item.id || Date.now().toString(),
     type: 'text',
     title: item.title || 'THE SYSTEM',
     subtitle: item.subtitle || '',
-    body: item.body || '',
     initialZ: item.z || 0,
     baseX: item.x || 0,
-    baseY: item.y || 0,
+    baseY: item.y || 15,
     x: item.x || 0,
-    y: item.y || 0,
+    y: item.y || 15,
     z: item.z || 0,
     scale: sc,
     planeWidth: planeW,
     planeHeight: planeH,
-    color: item.color || '#f59e0b'
+    color: item.color || '#f59e0b',
+    fontFamily: fontFam,
+    textStyle: textStyle,
+    primaryColor: item.primaryColor || spatial3DState.textPrimaryColor,
+    secondaryColor: item.secondaryColor || spatial3DState.textSecondaryColor
   };
   return mesh;
-}
-
-function wrapSpatialCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
-  const words = (text || '').split(' ');
-  let line = '';
-  for (let n = 0; n < words.length; n++) {
-    let testLine = line + words[n] + ' ';
-    let metrics = ctx.measureText(testLine);
-    if (metrics.width > maxWidth && n > 0) {
-      ctx.fillText(line, x, y);
-      line = words[n] + ' ';
-      y += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  ctx.fillText(line, x, y);
 }
 
 function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
@@ -40649,17 +40709,19 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
   ctx.clearRect(0, 0, W, H);
 
   const accent = item.color || '#f59e0b';
-  const mode = item.artifactMode || (item.type === 'object' ? 'object' : 'image');
+  const mode = item.artifactMode || (item.type === 'object' ? 'object' : (item.type === 'card' ? 'card' : 'image'));
+  const fontFam = item.fontFamily || 'Cinzel';
+  const stamp = item.stamp || (item.color === '#ef4444' ? 'CLASSIFIED' : item.color === '#10b981' ? 'VERIFIED' : 'CONFIDENTIAL');
 
-  // Card Base: Clean Dark Slate Dossier Frame
-  ctx.fillStyle = 'rgba(11, 15, 25, 0.96)';
+  // Frosted Dark Glass Dossier Frame
+  ctx.fillStyle = 'rgba(11, 15, 25, 0.94)';
   ctx.beginPath();
   if (ctx.roundRect) ctx.roundRect(10, 10, W - 20, H - 20, 14);
   else ctx.rect(10, 10, W - 20, H - 20);
   ctx.fill();
 
-  if (mode !== 'card' && loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
-    // Top 64% is the REAL Documentary Photograph (Full-bleed inside the top of the frame)
+  if (mode === 'image' && loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
+    // Archival Photographic Plate
     const imgH = Math.round((H - 20) * 0.64);
     ctx.save();
     ctx.beginPath();
@@ -40680,7 +40742,7 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     }
     ctx.drawImage(loadedImg, dx, dy, dw, dh);
 
-    // Subtle bottom vignette blending photograph into the dark caption slate
+    // Blended dark bottom vignette
     const fadeGrad = ctx.createLinearGradient(0, 12 + imgH * 0.45, 0, 12 + imgH);
     fadeGrad.addColorStop(0, 'rgba(11, 15, 25, 0)');
     fadeGrad.addColorStop(1, 'rgba(11, 15, 25, 0.98)');
@@ -40688,50 +40750,110 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillRect(12, 12, boxW, imgH);
     ctx.restore();
 
-    // Accent divider line under photograph
+    // Redaction / Classification Stamp
+    ctx.save();
+    ctx.translate(W - 130, 36);
+    ctx.rotate(-0.08);
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(-10, -14, 110, 26);
+    ctx.font = '800 13px "JetBrains Mono", monospace';
+    ctx.fillStyle = accent;
+    ctx.fillText(stamp, 0, 4);
+    ctx.restore();
+
+    // Accent Line
     ctx.fillStyle = accent;
     ctx.fillRect(28, 12 + imgH, W - 56, 2);
 
-    // Lower Third Documentary Metadata
-    ctx.font = '700 16px "JetBrains Mono", monospace';
+    // Lower Metadata
+    ctx.font = '700 15px "JetBrains Mono", monospace';
     ctx.fillStyle = accent;
     ctx.fillText((item.subtitle || 'DEPT. TREASURY // CLASSIFIED').toUpperCase(), 32, 12 + imgH + 30);
 
-    ctx.font = '800 30px "Cinzel", Georgia, serif';
+    ctx.font = `800 28px "${fontFam}", Georgia, serif`;
     ctx.fillStyle = '#f8fafc';
-    ctx.fillText((item.title || 'CONFIDENTIAL SCAN').toUpperCase(), 32, 12 + imgH + 68);
+    ctx.fillText((item.title || 'CONFIDENTIAL SCAN').toUpperCase(), 32, 12 + imgH + 66);
 
-    ctx.font = '400 17px "Inter", sans-serif';
+    ctx.font = '400 16px "Inter", sans-serif';
     ctx.fillStyle = '#94a3b8';
-    wrapSpatialCanvasText(ctx, item.body || '', 32, 12 + imgH + 102, W - 64, 24);
-  } else {
-    // Clean Tactile Text Dossier (when image is still loading or mode === 'card')
-    ctx.fillStyle = 'rgba(18, 24, 38, 0.95)';
-    ctx.fillRect(12, 12, W - 24, 54);
+    wrapSpatialCanvasText(ctx, item.body || '', 32, 12 + imgH + 100, W - 64, 22);
+  } else if (mode === 'chart') {
+    // 3D Financial Candlestick / Graph Trend Slate
+    ctx.fillStyle = '#080c14';
+    ctx.fillRect(20, 20, W - 40, H - 40);
 
-    ctx.font = '700 18px "JetBrains Mono", monospace';
+    // Draw decorative candlestick bars and grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 1;
+    for (let gy = 50; gy < H - 50; gy += 40) {
+      ctx.beginPath(); ctx.moveTo(30, gy); ctx.lineTo(W - 30, gy); ctx.stroke();
+    }
+
+    // Glowing graph trend curve
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 3;
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.moveTo(35, H * 0.65);
+    ctx.bezierCurveTo(W * 0.25, H * 0.8, W * 0.45, H * 0.35, W * 0.68, H * 0.45);
+    ctx.lineTo(W - 35, H * 0.22);
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    // Trend Title
+    ctx.font = '700 16px "JetBrains Mono", monospace';
     ctx.fillStyle = accent;
-    ctx.fillText((item.subtitle || 'DEPT. TREASURY // CLASSIFIED').toUpperCase(), 38, 46);
+    ctx.fillText(item.subtitle || 'FINANCIAL METRIC // TELEMETRY', 35, 45);
 
-    ctx.font = '800 38px "Cinzel", Georgia, serif';
-    ctx.fillStyle = '#f8fafc';
-    ctx.fillText((item.title || 'CONFIDENTIAL SCAN').toUpperCase(), 38, 130);
+    ctx.font = `800 28px "${fontFam}", Georgia, serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(item.title || 'MARKET VOLUME DISCREPANCY', 35, 80);
 
-    ctx.fillStyle = accent;
-    ctx.fillRect(38, 155, 180, 2.5);
-
-    ctx.font = '400 22px "Inter", sans-serif';
+    ctx.font = '400 16px "Inter", sans-serif';
     ctx.fillStyle = '#cbd5e1';
-    wrapSpatialCanvasText(ctx, item.body || '', 38, 205, W - 76, 34);
+    wrapSpatialCanvasText(ctx, item.body || 'Capital flow indicates structural liquidity redistribution across decentralized nodes.', 35, H - 90, W - 70, 22);
+  } else {
+    // Minimalist Frosted Dossier Text Slate (No Image or Clean Slate)
+    const headerGrad = ctx.createLinearGradient(0, 14, 0, 85);
+    headerGrad.addColorStop(0, 'rgba(255,255,255,0.05)');
+    headerGrad.addColorStop(1, 'rgba(255,255,255,0.01)');
+    ctx.fillStyle = headerGrad;
+    ctx.fillRect(14, 14, W - 28, 70);
+
+    ctx.fillStyle = accent;
+    ctx.fillRect(32, 28, 6, 42);
+
+    ctx.font = '700 16px "JetBrains Mono", monospace';
+    ctx.fillStyle = accent;
+    ctx.fillText((item.subtitle || 'EXECUTIVE SUMMARY').toUpperCase(), 48, 44);
+
+    ctx.font = `800 28px "${fontFam}", Georgia, serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText((item.title || 'ARCHIVAL RECORD').toUpperCase(), 48, 72);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.fillRect(32, 102, W - 64, 1);
+
+    ctx.font = '400 18px "Inter", -apple-system, sans-serif';
+    ctx.fillStyle = '#e2e8f0';
+    wrapSpatialCanvasText(ctx, item.body || 'Declassified dossier record entered into official forensic catalog.', 36, 145, W - 72, 26);
   }
 
-  // Crisp subtle border (no neon glow)
-  ctx.lineWidth = 2.5;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(10, 10, W - 20, H - 20, 14);
-  else ctx.rect(10, 10, W - 20, H - 20);
+  // Double metallic bevel border
+  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
+
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.45;
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(14, 14, W - 28, H - 28, 10);
+  else ctx.rect(14, 14, W - 28, H - 28);
+  ctx.stroke();
+  ctx.globalAlpha = 1.0;
 }
 
 function createSpatialCardPlane(item) {
@@ -40752,9 +40874,9 @@ function createSpatialCardPlane(item) {
 
   const defaultPhotos = ['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg', '/cctv_surveillance_scene.jpg', '/paper_tear_gold_standard.jpg', '/power_meeting_cinematic_plate.jpg'];
   const fallbackPhoto = defaultPhotos[Math.abs(parseInt(item.id || '1', 10)) % defaultPhotos.length];
-  const imgUrl = item.imageUrl !== undefined && item.imageUrl !== '' ? item.imageUrl : fallbackPhoto;
+  const imgUrl = (item.imageUrl !== undefined && item.imageUrl !== '') ? item.imageUrl : (mode === 'card' ? '' : fallbackPhoto);
 
-  const cachedImg = _spatialImageTexCache[imgUrl];
+  const cachedImg = imgUrl ? _spatialImageTexCache[imgUrl] : null;
   renderSpatialArtifactCanvas(canvas, item, cachedImg);
   texture.needsUpdate = true;
 
@@ -40775,11 +40897,11 @@ function createSpatialCardPlane(item) {
     side: THREE.DoubleSide,
     depthWrite: false
   });
-  material.userData = { baseOpacity: isPureCelestial ? 0.35 : 1.0 };
+  material.userData = { baseOpacity: isPureCelestial ? 0.3 : 1.0 };
   const frontMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW, cardH), material);
   group.add(frontMesh);
 
-  // High-End 3D Celestial / Wireframe Geometric Object
+  // Pure 3D Celestial / Wireframe Geometric Object
   if (isPureCelestial) {
     const shape = item.objectShape || item.objectGeometry || 'icosahedron';
     const objSize = 75 * sc;
@@ -40799,7 +40921,6 @@ function createSpatialCardPlane(item) {
 
     const accentColor = item.color ? new THREE.Color(item.color) : new THREE.Color(0x38bdf8);
 
-    // Glowing Wireframe Outer Shell
     const wireMat = new THREE.MeshBasicMaterial({
       color: accentColor,
       wireframe: true,
@@ -40815,7 +40936,6 @@ function createSpatialCardPlane(item) {
       rotSpeedY: 0.012 + (Math.random() * 0.01)
     };
 
-    // Inner Faceted Semi-Translucent Solid Core
     const coreMat = new THREE.MeshStandardMaterial({
       color: accentColor,
       roughness: 0.15,
@@ -40831,9 +40951,9 @@ function createSpatialCardPlane(item) {
     group.add(wireMesh);
   }
 
-  // Angle flanking plates inward along the left and right walls of the corridor (true hallway gallery)
+  // Flanking gallery angle inward
   const sideSign = (item.x || 0) < 0 ? -1 : 1;
-  const baseTiltY = sideSign < 0 ? 0.38 : -0.38; // ~22 degrees inward toward center aisle
+  const baseTiltY = sideSign < 0 ? 0.38 : -0.38;
   group.rotation.y = baseTiltY;
 
   group.position.set(item.x || (sideSign * 740), item.y || 0, item.z || 0);
@@ -40846,6 +40966,9 @@ function createSpatialCardPlane(item) {
     title: item.title || 'CONFIDENTIAL SCAN',
     subtitle: item.subtitle || '',
     body: item.body || '',
+    stamp: item.stamp || '',
+    transitionEffect: item.transitionEffect || 'fade', // 'fade', 'slide-in', 'scale-pop', 'yaw-drift'
+    fontFamily: item.fontFamily || 'Cinzel',
     initialZ: item.z || 0,
     baseX: item.x || (sideSign * 740),
     baseY: item.y || 0,
@@ -40957,8 +41080,20 @@ function buildSpatialDustParticles(scene) {
 }
 
 function updateSpatialEnvironmentGrid() {
-  const { gridMeshes, envStyle, gridLuminescence, gridColor, gridVisible, dustVisible, particlesMesh, scene } = spatial3DState;
+  const { gridMeshes, bgStyle, envStyle, gridLuminescence, gridGlow, gridColor, gridDensity, gridVisible, dustVisible, particlesMesh, scene, renderer, bgColor, transparentBg } = spatial3DState;
   if (!gridMeshes || !gridMeshes.group) return;
+
+  // Background color & transparent pass
+  if (scene) {
+    if (transparentBg) {
+      scene.background = null;
+      if (renderer) renderer.setClearColor(0x000000, 0);
+    } else {
+      const col = new THREE.Color(bgColor || '#07080c');
+      scene.background = col;
+      if (renderer) renderer.setClearColor(col, 1.0);
+    }
+  }
 
   const lum = Math.max(0, (gridLuminescence !== undefined ? gridLuminescence : 100) / 100);
   let hex = gridColor;
@@ -40969,10 +41104,6 @@ function updateSpatialEnvironmentGrid() {
   }
   const color = new THREE.Color(hex);
 
-  const isTunnel = envStyle ? envStyle.startsWith('tunnel') : true;
-  const isOpenStars = envStyle === 'open-stars';
-  const isDeepCosmos = envStyle === 'deep-cosmos';
-
   const styleHelper = (gh) => {
     if (!gh || !gh.material) return;
     gh.material.transparent = true;
@@ -40982,7 +41113,12 @@ function updateSpatialEnvironmentGrid() {
 
   [gridMeshes.floor, gridMeshes.ceiling, gridMeshes.leftWall, gridMeshes.rightWall].forEach(styleHelper);
 
-  if (!gridVisible || isDeepCosmos) {
+  const isPitchDark = bgStyle === 'pitch-dark';
+  const isStarsOnly = bgStyle === 'stars-only' || envStyle === 'deep-cosmos';
+  const isGridOnly = bgStyle === 'grid-only';
+  const isOpenStars = envStyle === 'open-stars';
+
+  if (!gridVisible || isPitchDark || isStarsOnly) {
     gridMeshes.group.visible = false;
   } else if (isOpenStars) {
     gridMeshes.group.visible = true;
@@ -40991,7 +41127,7 @@ function updateSpatialEnvironmentGrid() {
     gridMeshes.leftWall.visible = false;
     gridMeshes.rightWall.visible = false;
   } else {
-    // Full 3D Grid Tunnel (Image 2)
+    // 3D Grid Tunnel (Image 2)
     gridMeshes.group.visible = true;
     gridMeshes.floor.visible = true;
     gridMeshes.ceiling.visible = true;
@@ -41000,295 +41136,35 @@ function updateSpatialEnvironmentGrid() {
   }
 
   if (particlesMesh) {
-    particlesMesh.visible = (dustVisible !== false) || isDeepCosmos || isOpenStars;
+    particlesMesh.visible = (dustVisible !== false) && !isPitchDark && !isGridOnly;
+  }
+
+  if (spatial3DState.pointLight) {
+    spatial3DState.pointLight.intensity = (gridGlow || 100) / 100 * 1.4;
   }
 
   if (scene && scene.fog) {
-    if (isDeepCosmos) scene.fog.density = 0.00015;
-    else if (isTunnel) scene.fog.density = 0.00028;
-    else scene.fog.density = 0.00035;
-  }
-}
-
-function sampleDrawnPathX(path, t) {
-  if (!path || path.length === 0) return 0;
-  if (path.length === 1) return path[0].x || 0;
-  const idx = Math.max(0, Math.min(path.length - 2, Math.floor(t * (path.length - 1))));
-  const p0 = path[idx];
-  const p1 = path[idx + 1];
-  const spanT = (p1.t !== undefined && p0.t !== undefined && p1.t > p0.t) ? (t - p0.t) / (p1.t - p0.t) : (t * (path.length - 1) - idx);
-  const frac = Math.max(0, Math.min(1, spanT));
-  const smoothFrac = frac * frac * (3 - 2 * frac);
-  return (p0.x || 0) + ((p1.x || 0) - (p0.x || 0)) * smoothFrac;
-}
-
-function loadSpatialPreset(presetKey) {
-  spatial3DState.activePreset = presetKey;
-  if (presetKey === 'cyber-matrix') {
-    spatial3DState.envStyle = 'tunnel-cyan';
-    spatial3DState.gridColor = '#06b6d4';
-  } else if (presetKey === 'philosophy') {
-    spatial3DState.envStyle = 'tunnel-gold';
-    spatial3DState.gridColor = '#d4af37';
-  } else if (presetKey === 'cosmic-universe') {
-    spatial3DState.envStyle = 'open-stars';
-    spatial3DState.gridColor = '#38bdf8';
-  } else {
-    spatial3DState.envStyle = 'tunnel-slate';
-    spatial3DState.gridColor = '#64748b';
-  }
-
-  const scene = spatial3DState.scene;
-  if (!scene) return;
-
-  spatial3DState.elements3D.forEach(obj => scene.remove(obj));
-  spatial3DState.elements3D = [];
-
-  document.querySelectorAll('.btn-spatial-preset').forEach(btn => {
-    const isAct = btn.dataset.preset === presetKey;
-    btn.style.background = isAct ? 'rgba(168,85,247,0.25)' : 'rgba(18,19,28,0.8)';
-    btn.style.borderColor = isAct ? 'rgba(168,85,247,0.6)' : 'rgba(255,255,255,0.1)';
-    btn.style.color = isAct ? '#e9d5ff' : '#94a3b8';
-  });
-
-  const items = SPATIAL_PRESETS[presetKey] || SPATIAL_PRESETS['docu-essay'];
-  items.forEach(item => {
-    let mesh = null;
-    if (item.type === 'text') mesh = createSpatialTextPlane(item);
-    else if (item.type === 'card' || item.type === 'image' || item.type === 'object') mesh = createSpatialCardPlane(item);
-    else if (item.type === 'code') mesh = createSpatialCodePlane(item);
-
-    if (mesh) {
-      scene.add(mesh);
-      spatial3DState.elements3D.push(mesh);
-    }
-  });
-
-  if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
-  renderSpatialLayerList();
-  resetSpatialCameraPath();
-}
-
-function renderSpatialLayerList() {
-  const container = document.getElementById('spatial-layers-container');
-  if (!container) return;
-  container.innerHTML = '';
-
-  spatial3DState.elements3D.forEach((mesh, index) => {
-    const u = mesh.userData;
-    const div = document.createElement('div');
-    div.style.cssText = "background: #121520; padding: 10px 12px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: space-between; font-size: 11px; transition: border-color 0.15s;";
-    const dotColor = u.color || (u.type === 'text' ? '#f59e0b' : u.type === 'card' ? '#3b82f6' : '#10b981');
-
-    div.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; cursor: pointer;" class="spatial-layer-info-btn" data-index="${index}" title="Click to edit layer">
-        <span style="width: 8px; height: 8px; border-radius: 50%; background: ${dotColor}; flex-shrink: 0; box-shadow: 0 0 6px ${dotColor};"></span>
-        <div style="overflow: hidden;">
-          <div style="font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">${u.title}</div>
-          <div style="font-size: 9.5px; color: #94a3b8; font-family: 'JetBrains Mono', monospace;">X:${Math.round(u.baseX !== undefined ? u.baseX : mesh.position.x)} Y:${Math.round(u.baseY !== undefined ? u.baseY : mesh.position.y)}</div>
-        </div>
-      </div>
-      <div style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8;">
-        <span style="color: #c084fc; font-weight: 700;">Z: ${Math.round(mesh.position.z)}</span>
-        <button type="button" class="btn-edit-spatial-layer" data-index="${index}" style="background: rgba(168,85,247,0.15); border: 1px solid rgba(168,85,247,0.4); color: #e9d5ff; border-radius: 5px; cursor: pointer; padding: 2px 7px; font-size: 10px; font-weight: 600;" title="Edit coordinates, text & color">Edit</button>
-        <button type="button" class="btn-remove-spatial-layer" data-index="${index}" style="background: transparent; border: none; color: #f43f5e; cursor: pointer; padding: 2px 5px; font-size: 12px;" title="Delete plane">\u2715</button>
-      </div>
-    `;
-    container.appendChild(div);
-  });
-
-  container.querySelectorAll('.btn-edit-spatial-layer, .spatial-layer-info-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = parseInt(e.currentTarget.dataset.index, 10);
-      openLayerEditorModal(idx);
-    });
-  });
-
-  container.querySelectorAll('.btn-remove-spatial-layer').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = parseInt(e.currentTarget.dataset.index, 10);
-      removeSpatialLayer(idx);
-    });
-  });
-}
-
-function openLayerEditorModal(index = -1) {
-  spatial3DState.editingLayerIndex = index;
-  const modal = document.getElementById('modal-spatial-add-layer');
-  if (!modal) return;
-
-  const modalTitle = document.getElementById('spatial-layer-modal-title');
-  const typeSelect = document.getElementById('modal-layer-type');
-  const textInput = document.getElementById('modal-layer-text');
-  const subInput = document.getElementById('modal-layer-subtitle');
-  const bodyInput = document.getElementById('modal-layer-body');
-  const extraFields = document.getElementById('modal-layer-extra-card-fields');
-  const colorInput = document.getElementById('modal-layer-color');
-  const zSlider = document.getElementById('modal-layer-z-slider');
-  const zValDisplay = document.getElementById('modal-layer-z-val');
-  const posXInput = document.getElementById('modal-layer-x');
-  const posYInput = document.getElementById('modal-layer-y');
-  const posZInput = document.getElementById('modal-layer-z');
-  const scaleSlider = document.getElementById('modal-layer-scale-slider');
-  const scaleValDisplay = document.getElementById('modal-layer-scale-val');
-
-  if (index >= 0 && spatial3DState.elements3D[index]) {
-    const mesh = spatial3DState.elements3D[index];
-    const u = mesh.userData;
-
-    if (modalTitle) modalTitle.textContent = `Edit 3D Layer: ${u.title}`;
-    if (typeSelect) typeSelect.value = u.type || 'text';
-    if (textInput) textInput.value = u.title || '';
-    if (subInput) subInput.value = u.subtitle || '';
-    if (bodyInput) bodyInput.value = u.body || u.text || '';
-    if (colorInput) colorInput.value = u.color || '#f59e0b';
-
-    const curZ = Math.round(mesh.position.z);
-    if (zSlider) zSlider.value = curZ;
-    if (zValDisplay) zValDisplay.textContent = curZ;
-    if (posZInput) posZInput.value = curZ;
-
-    if (posXInput) posXInput.value = Math.round(u.baseX !== undefined ? u.baseX : mesh.position.x);
-    if (posYInput) posYInput.value = Math.round(u.baseY !== undefined ? u.baseY : mesh.position.y);
-    if (scaleSlider) scaleSlider.value = (u.scale || 1.0).toFixed(1);
-    if (scaleValDisplay) scaleValDisplay.textContent = `${(u.scale || 1.0).toFixed(1)}x`;
-
-    if (extraFields) extraFields.style.display = u.type !== 'text' ? 'flex' : 'none';
-  } else {
-    if (modalTitle) modalTitle.textContent = 'Add 3D Spatial Element';
-    if (typeSelect) typeSelect.value = 'card';
-    if (textInput) textInput.value = 'ARCHIVAL EVIDENCE';
-    if (subInput) subInput.value = 'DEPT. TREASURY // CLASSIFIED';
-    if (bodyInput) bodyInput.value = 'Declassified photographic record verified under executive audit.';
-    if (colorInput) colorInput.value = '#f59e0b';
-    if (zSlider) zSlider.value = -1500;
-    if (zValDisplay) zValDisplay.textContent = -1500;
-    if (posZInput) posZInput.value = -1500;
-    if (posXInput) posXInput.value = -740;
-    if (posYInput) posYInput.value = 60;
-    if (scaleSlider) scaleSlider.value = 1.0;
-    if (scaleValDisplay) scaleValDisplay.textContent = '1.0x';
-    if (extraFields) extraFields.style.display = 'flex';
-  }
-
-  modal.style.display = 'flex';
-}
-
-function removeSpatialLayer(index) {
-  const mesh = spatial3DState.elements3D[index];
-  if (mesh && spatial3DState.scene) {
-    spatial3DState.scene.remove(mesh);
-    spatial3DState.elements3D.splice(index, 1);
-    renderSpatialLayerList();
-  }
-}
-
-function triggerSpatialWhooshSound() {
-  if (!spatial3DState.audioEnabled) return;
-  if (!spatial3DState.audioCtx) {
-    spatial3DState.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  const ctx = spatial3DState.audioCtx;
-  if (ctx.state === 'suspended') {
-    ctx.resume();
-  }
-
-  const bufferSize = ctx.sampleRate * 0.55;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1;
-  }
-
-  const noise = ctx.createBufferSource();
-  noise.buffer = buffer;
-
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'bandpass';
-  filter.frequency.setValueAtTime(140, ctx.currentTime);
-  filter.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime + 0.28);
-  filter.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.55);
-  filter.Q.value = 3.2;
-
-  const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.01, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(0.38, ctx.currentTime + 0.22);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.55);
-
-  noise.connect(filter);
-  filter.connect(gain);
-  gain.connect(ctx.destination);
-
-  noise.start();
-  noise.stop(ctx.currentTime + 0.55);
-}
-
-function checkSpatialZPassWhoosh(camZ) {
-  if (!spatial3DState.audioEnabled) return;
-  spatial3DState.elements3D.forEach(mesh => {
-    const meshZ = mesh.position.z;
-    if (spatial3DState.lastZPassCheck > meshZ && camZ <= meshZ) {
-      triggerSpatialWhooshSound();
-    }
-  });
-  spatial3DState.lastZPassCheck = camZ;
-}
-
-function resetSpatialCameraPath() {
-  spatial3DState.currentTime = 0;
-  spatial3DState.lastZPassCheck = 1200;
-  const slider = document.getElementById('spatial-timeline-slider');
-  if (slider) slider.value = 0;
-  updateSpatialTimelineDisplay();
-}
-
-function updateSpatialTimelineDisplay() {
-  const display = document.getElementById('spatial-time-display');
-  if (!display) return;
-  const totalSec = Math.floor(spatial3DState.currentTime * 10);
-  const ms = Math.floor((spatial3DState.currentTime * 10 - totalSec) * 100);
-  display.textContent = `00:${totalSec.toString().padStart(2, '0')}.${ms.toString().padStart(2, '0')}`;
-}
-
-function updateSpatialHUDTelemetry() {
-  const { camera, camSpeed } = spatial3DState;
-  if (!camera) return;
-
-  const hudX = document.getElementById('hud-cam-x');
-  const hudY = document.getElementById('hud-cam-y');
-  const hudZ = document.getElementById('hud-cam-z');
-  const hudVel = document.getElementById('hud-vel');
-  const hudFov = document.getElementById('hud-fov');
-
-  if (hudX) hudX.textContent = camera.position.x.toFixed(1);
-  if (hudY) hudY.textContent = camera.position.y.toFixed(1);
-  if (hudZ) hudZ.textContent = camera.position.z.toFixed(1);
-  if (hudVel) hudVel.textContent = `${camSpeed.toFixed(1)}x`;
-  if (hudFov) hudFov.textContent = `${Math.round(camera.fov)}\u00b0`;
-
-  const telem = document.getElementById('spatial-cam-telemetry');
-  if (telem) {
-    telem.textContent = `X: ${camera.position.x.toFixed(1)} | Y: ${camera.position.y.toFixed(1)} | Z: ${camera.position.z.toFixed(1)}`;
+    if (isPitchDark) scene.fog.density = 0.00005;
+    else if (isStarsOnly) scene.fog.density = 0.00018;
+    else scene.fog.density = 0.00028;
   }
 }
 
 function updateSpatialCameraPosition() {
-  const { camera, flightMode, currentTime, camDrift, mouse, camPitch, camYaw, elements3D, showText, pathStyle, pathCurve, drawnPath } = spatial3DState;
+  const { camera, flightMode, currentTime, camDrift, camShake, mouse, camPitch, camYaw, elements3D, showText, pathStyle, pathCurve, drawnPath } = spatial3DState;
   if (!camera) return;
 
   const driftFactor = Math.max(0, Math.min(1, camDrift / 100));
   const t = Math.max(0, Math.min(1, currentTime));
 
-  // Determine Z trajectory based on mode
+  // Determine Z trajectory based on mode (Full runway depth -3800 to 1350)
   let targetZ = 1350;
   let targetX = 0;
   let targetY = 15;
 
   if (flightMode === 'pullback') {
-    // Zoom Out: Pullback from corridor depth (-3650 -> 1350)
-    targetZ = -3650 + (t * 5000);
+    targetZ = -3800 + (t * 5150);
   } else if (flightMode === 'orbit') {
-    // 360 Panoramic Orbit Tour
     const angle = (t - 0.5) * Math.PI * 0.75;
     const radius = 1600;
     targetX = Math.sin(angle) * radius * 0.55;
@@ -41296,34 +41172,37 @@ function updateSpatialCameraPosition() {
     targetY = 60 + Math.sin(t * Math.PI * 2) * 45;
   } else {
     // zoomthrough (Default Zoom In) & custom-path & slalom
-    targetZ = 1350 - (t * 5000);
+    targetZ = 1350 - (t * 5150);
   }
 
-  // Lateral X and Vertical Y trajectory
+  // Lateral X & Y trajectory
   if (flightMode === 'orbit') {
     // already computed
   } else if (pathStyle === 'slalom' || flightMode === 'slalom') {
-    // S-Curve Slalom: weaves gently between left and right corridor exhibits
     targetX = Math.sin(t * Math.PI * 3) * 160 * driftFactor;
     targetY = 15 + Math.cos(t * Math.PI * 3) * 25 * driftFactor;
   } else if (pathStyle === 'cosmic-wave') {
     targetX = Math.sin(t * Math.PI * 2) * 140 * driftFactor;
     targetY = 15 + Math.cos(t * Math.PI * 4) * 55 * driftFactor;
   } else if (drawnPath && drawnPath.length >= 2) {
-    // Custom user-drawn flight path: interpolate along drawn points
     targetX = sampleDrawnPathX(drawnPath, t);
     targetY = 15 + (pathCurve || 0) * 0.2;
   } else {
-    // Straight Center Runway (or subtle curve with pathCurve offset)
     const curveOffset = (pathCurve || 0) * 3.5;
     targetX = Math.sin(t * Math.PI) * curveOffset + (Math.sin(t * Math.PI * 2) * (36 * driftFactor));
     targetY = 15 + (Math.cos(t * Math.PI * 2) * (20 * driftFactor));
   }
 
-  // Smooth camera position interpolation
+  // Organic Handheld Camera Shake (Human Imperfection pass)
+  const shakeAmt = (camShake || 15) / 100;
+  const now = performance.now() * 0.0018;
+  const shakeX = Math.sin(now * 2.8) * 4.5 * shakeAmt;
+  const shakeY = Math.cos(now * 3.4) * 3.2 * shakeAmt;
+  const shakeRoll = Math.sin(now * 1.9) * 0.006 * shakeAmt;
+
   camera.position.z += (targetZ - camera.position.z) * 0.14;
-  camera.position.x += (targetX - camera.position.x) * 0.12;
-  camera.position.y += (targetY - camera.position.y) * 0.12;
+  camera.position.x += ((targetX + shakeX) - camera.position.x) * 0.12;
+  camera.position.y += ((targetY + shakeY) - camera.position.y) * 0.12;
 
   // Standard 3D Aim & Tilt (yaw & pitch)
   const pitchRad = ((camPitch || 0) * Math.PI) / 180;
@@ -41334,8 +41213,9 @@ function updateSpatialCameraPosition() {
   const lookTargetZ = camera.position.z - Math.cos(yawRad) * Math.cos(pitchRad) * lookDistance;
 
   camera.lookAt(lookTargetX, lookTargetY, lookTargetZ);
+  camera.rotation.z += shakeRoll;
 
-  // Per-Layer Focal Visibility & Lateral Corridor Clearance
+  // Per-Layer Focal Visibility, Transition Effects & Corridor Clearance
   for (let i = 0; i < elements3D.length; i++) {
     const obj = elements3D[i];
     const u = obj.userData || {};
@@ -41348,7 +41228,6 @@ function updateSpatialCameraPosition() {
         setSpatialGroupOpacity(obj, 0.0);
         continue;
       }
-      // Hero Title Focal Window
       if (distInFront <= 220) {
         opacity = 0.0;
       } else if (distInFront < 480) {
@@ -41363,12 +41242,32 @@ function updateSpatialCameraPosition() {
       obj.position.x = u.baseX || 0;
       obj.position.y = u.baseY || 15;
     } else {
-      // Flanking corridor exhibits (left & right walls)
+      // Flanking corridor exhibits
       const rawX = u.baseX !== undefined ? u.baseX : obj.position.x;
       const sideSign = rawX < 0 ? -1 : 1;
       const minCorridorHalfWidth = Math.max(Math.abs(rawX), 700, Math.max(0, distInFront) * 0.44);
-      obj.position.x = sideSign * minCorridorHalfWidth;
+
+      // Transition effects: slide-in, scale-pop, yaw-drift
+      const effect = u.transitionEffect || 'fade';
+      let effX = sideSign * minCorridorHalfWidth;
+      let effScale = u.scale || 1.0;
+      let effRotY = u.baseRotY || (sideSign < 0 ? 0.38 : -0.38);
+
+      if (distInFront > 800 && distInFront < 2600) {
+        const normDist = (distInFront - 800) / (2600 - 800);
+        if (effect === 'slide-in') {
+          effX += sideSign * normDist * 160;
+        } else if (effect === 'scale-pop') {
+          effScale *= (1.0 - normDist * 0.28);
+        } else if (effect === 'yaw-drift') {
+          effRotY += sideSign * normDist * 0.35;
+        }
+      }
+
+      obj.position.x = effX;
       obj.position.y = (u.baseY || 0) + Math.sin(performance.now() * 0.0012 + i * 1.5) * 8;
+      obj.scale.set(effScale, effScale, effScale);
+      obj.rotation.y = effRotY;
 
       if (distInFront <= 140) {
         opacity = 0.0;
@@ -41487,8 +41386,13 @@ function initSpatialThreeJSEngine() {
 
   function animateSpatialEngine() {
     if (spatial3DState.isPlaying) {
-      spatial3DState.currentTime += 0.002 * spatial3DState.camSpeed;
-      if (spatial3DState.currentTime > 1) spatial3DState.currentTime = 0;
+      // Traverse entire runway smoothly with camSpeed (supports negative speed)
+      const speedStep = 0.0018 * (spatial3DState.camSpeed !== undefined ? spatial3DState.camSpeed : 1.0);
+      spatial3DState.currentTime += speedStep;
+
+      if (spatial3DState.currentTime > 1.0) spatial3DState.currentTime = 0.0;
+      else if (spatial3DState.currentTime < 0.0) spatial3DState.currentTime = 1.0;
+
       const slider = document.getElementById('spatial-timeline-slider');
       if (slider) slider.value = spatial3DState.currentTime * 100;
       updateSpatialTimelineDisplay();
@@ -41496,12 +41400,18 @@ function initSpatialThreeJSEngine() {
 
     updateSpatialCameraPosition();
 
-    if (particlesMesh && spatial3DState.dustVisible) {
-      particlesMesh.rotation.y += 0.0003;
-      particlesMesh.rotation.x += 0.0001;
+    // Active Grid Conveyor streaming flow down corridor
+    if (spatial3DState.gridMeshes && spatial3DState.gridMeshes.group && spatial3DState.gridSpeed > 0) {
+      const flowZ = (spatial3DState.currentTime * 3000 * spatial3DState.gridSpeed) % 200;
+      spatial3DState.gridMeshes.group.position.z = flowZ;
     }
 
-    // Slowly tumble 3D celestial wireframe objects
+    if (particlesMesh && spatial3DState.dustVisible) {
+      particlesMesh.rotation.y += 0.0003 * (spatial3DState.starSpeed || 1);
+      particlesMesh.rotation.x += 0.0001 * (spatial3DState.starSpeed || 1);
+    }
+
+    // Tumble 3D celestial wireframe objects
     if (spatial3DState.elements3D && spatial3DState.elements3D.length) {
       for (let i = 0; i < spatial3DState.elements3D.length; i++) {
         const grp = spatial3DState.elements3D[i];
@@ -41521,8 +41431,7 @@ function initSpatialThreeJSEngine() {
 
     spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
   }
-
-  spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
+spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
 }
 
 function openSpatial3DMotionSuite() {
