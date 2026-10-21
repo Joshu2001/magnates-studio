@@ -1,4 +1,4 @@
-# Magnates Studio — Effects & Capabilities Catalog (ND Registry)
+﻿# Magnates Studio — Effects & Capabilities Catalog (ND Registry)
 
 > **File Purpose:** Master registry of all visual effects, kinetic typography styles, audio treatments, and editing capabilities in **Magnates Studio**. 
 > Designed as a dual-purpose specification:
