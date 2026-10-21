@@ -33527,15 +33527,6 @@ function renderTopTemplatePreviewStage() {
     return;
   }
 
-  // 3D Photorealistic Deal Term Sheet Engine
-  if (tplId === 'jani-countdown-panic-suite') {
-    if (typeof window.stepCountdownAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-countdown-panic-suite') : {};
-      window.stepCountdownAnimation(stage, 'jani-countdown-panic-suite', localSceneT, cdData);
-    }
-  }
-
   if (tplId === 'deal-term-sheet') {
     const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
     const is3D = dtData.is3DMode !== false && topCustomizerState.paperPreviewMode !== 'video';
@@ -34548,6 +34539,14 @@ function updateTopCustomizerFrame(seqTime, now) {
       const stage = document.getElementById('tpl-modal-preview-stage');
       const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('envelope-open') : {};
       window.stepEnvelopeAnimation(stage, 'envelope-open', localSceneT, eData);
+    }
+  }
+
+  if (tplId === 'jani-countdown-panic-suite') {
+    if (typeof window.stepCountdownAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-countdown-panic-suite') : {};
+      window.stepCountdownAnimation(stage, 'jani-countdown-panic-suite', localSceneT, cdData);
     }
   }
 

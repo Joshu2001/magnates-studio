@@ -515,7 +515,8 @@
     if (canvas) {
       const ctx = canvas.getContext('2d');
       const d = getConfig(data);
-      renderCountdownCanvasFrame(ctx, canvas.width, canvas.height, d, t, d.totalDuration || 10);
+      const totalDur = (typeof topCustomizerState !== 'undefined' && topCustomizerState.duration) ? topCustomizerState.duration : (d.totalDuration || 10);
+      renderCountdownCanvasFrame(ctx, canvas.width, canvas.height, d, t, totalDur);
     }
   };
 
