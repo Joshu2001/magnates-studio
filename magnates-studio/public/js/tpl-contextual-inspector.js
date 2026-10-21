@@ -102,6 +102,29 @@
       duration: 5.0
     }),
 
+    'scam-redaction': Object.assign({}, (typeof window !== 'undefined' && window.FRAUD_DOSSIER_CONFIG) || {
+      type: 'scam-redaction',
+      title: 'INTERNAL MEMO \u00b7 EYES ONLY',
+      recipient: 'To: Board of Directors',
+      senderLabel: 'From:',
+      highlightedAmount: '$8.4 BILLION',
+      disclosureWarning: 'DO NOT DISCLOSE.',
+      stampText: 'CONFIDENTIAL',
+      showStamp: true,
+      showRedaction: true,
+      showHighlighter: true,
+      paperTone: '#fbf8ef',
+      surfaceType: 'mahogany',
+      spotlightIntensity: 2.2,
+      volumetricDust: true,
+      depthOfField: true,
+      showCoordinateGrid: true,
+      tiltAngleX: 29,
+      tiltAngleY: -10,
+      coverageScale: 62,
+      duration: 5.0
+    }),
+
     'envelope-open': Object.assign({}, (typeof window !== 'undefined' && window.ENVELOPE_3D_CONFIG) || {
       type: 'envelope-open',
       envelopeStyle: 'manila_classified',
@@ -3312,6 +3335,22 @@
       }
       return;
     }
+    if (tplId === 'scam-redaction') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        const vp = stage.querySelector('#fraud-dossier-3d-viewport');
+        if (!vp) {
+          if (typeof window.tplMountFraudDossier3DStage === 'function') {
+            window.tplMountFraudDossier3DStage(stage, data);
+          }
+        } else {
+          if (typeof window.initFraudDossier3DScene === 'function') {
+            window.initFraudDossier3DScene(vp, data);
+          }
+        }
+      }
+      return;
+    }
     if (tplId === 'jani-forbes-fraud-reveal') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -4780,6 +4819,17 @@
         const data = window.tplGetContextualData(tplId);
         if (typeof window.tplBuildDealTermSheetInspector === 'function') {
           window.tplBuildDealTermSheetInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if (tplId === 'scam-redaction') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildFraudDossierInspector === 'function') {
+          window.tplBuildFraudDossierInspector(container, data, tplId);
         }
       }
       return;

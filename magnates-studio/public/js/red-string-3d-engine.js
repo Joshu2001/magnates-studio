@@ -664,7 +664,7 @@
     // 1. Scene & Camera Setup
     rsScene = new THREE.Scene();
     rsScene.background = new THREE.Color(0x06080c);
-    rsScene.fog = new THREE.FogExp2(0x06080c, 0.0016);
+    rsScene.fog = new THREE.Fog(0x06080c, 900, 2800);
 
     rsCamera = new THREE.PerspectiveCamera(36, width / height, 1, 3000);
     applyCameraPreset(data);
@@ -704,33 +704,40 @@
       rsControls.minPolarAngle = Math.PI / 12.0;
     }
 
-    // 4. Dramatic Forensic Studio Lighting Rig
-    ambientLight = new THREE.AmbientLight(0x2d241e, 0.95);
+    // 4. Dramatic Forensic Studio Lighting Rig (Vibrant, high-contrast, fully illuminated)
+    // Clear Warm Ambient Light
+    ambientLight = new THREE.AmbientLight(0xfff3e0, 1.45);
     rsScene.add(ambientLight);
 
-    // Single Warm Overhead Directional Spotlight (James Jani / Magnates Media Look)
-    spotLight = new THREE.SpotLight(new THREE.Color(data.spotlightWarmth || '#fff3db'), data.spotlightIntensity || 2.3);
-    spotLight.position.set(-40, 220, 360);
+    // Direct Overhead Key Directional Light (Ensures whole board is crisp, vivid, and bright)
+    const overheadKeyLight = new THREE.DirectionalLight(0xffffff, 1.6);
+    overheadKeyLight.position.set(0, 180, 480);
+    overheadKeyLight.castShadow = true;
+    overheadKeyLight.shadow.mapSize.width = 2048;
+    overheadKeyLight.shadow.mapSize.height = 2048;
+    overheadKeyLight.shadow.bias = -0.0001;
+    rsScene.add(overheadKeyLight);
+
+    // Warm Directional Spotlight (James Jani / Magnates Media Signature Warm Glow)
+    spotLight = new THREE.SpotLight(new THREE.Color(data.spotlightWarmth || '#fff3db'), data.spotlightIntensity || 3.2);
+    spotLight.position.set(-60, 260, 420);
     spotLight.target.position.set(0, 0, 0);
-    spotLight.angle = Math.PI / 3.4;
-    spotLight.penumbra = 0.72;
-    spotLight.decay = 1.25;
-    spotLight.distance = 1800;
-    spotLight.castShadow = true;
-    spotLight.shadow.mapSize.width = 2048;
-    spotLight.shadow.mapSize.height = 2048;
-    spotLight.shadow.bias = -0.0003;
+    spotLight.angle = Math.PI / 2.6;
+    spotLight.penumbra = 0.6;
+    spotLight.decay = 0; // Crucial: decay=0 ensures full light transmission across 3D distance!
+    spotLight.distance = 0;
+    spotLight.castShadow = false;
     rsScene.add(spotLight);
     rsScene.add(spotLight.target);
 
     // Cool Specular Edge Rim Light (High-stakes documentary blue contrast)
-    coolRimLight = new THREE.DirectionalLight(0x7dd3fc, data.rimLightIntensity || 0.85);
-    coolRimLight.position.set(380, -180, 220);
+    coolRimLight = new THREE.DirectionalLight(0x7dd3fc, data.rimLightIntensity || 1.1);
+    coolRimLight.position.set(420, -180, 280);
     rsScene.add(coolRimLight);
 
-    // Subtle Front Warm Fill Light
-    warmFillLight = new THREE.DirectionalLight(0xfdba74, 0.55);
-    warmFillLight.position.set(-280, 140, 180);
+    // Warm Fill Light
+    warmFillLight = new THREE.DirectionalLight(0xfdba74, 0.95);
+    warmFillLight.position.set(-320, 160, 220);
     rsScene.add(warmFillLight);
 
     // 5. Build 3D Corkboard Environment
@@ -817,10 +824,12 @@
     // 1. Cork Surface Plane
     const corkCv = generateCorkTexture(data);
     const corkTex = new THREE.CanvasTexture(corkCv);
+    corkTex.needsUpdate = true;
     corkTex.anisotropy = rsRenderer ? rsRenderer.capabilities.getMaxAnisotropy() : 4;
 
     const bumpCv = generateCorkBumpMap();
     const bumpTex = new THREE.CanvasTexture(bumpCv);
+    bumpTex.needsUpdate = true;
     bumpTex.wrapS = THREE.RepeatWrapping;
     bumpTex.wrapT = THREE.RepeatWrapping;
     bumpTex.repeat.set(2, 2);
@@ -909,6 +918,7 @@
 
     const tapeTexCv = generateMaskingTapeTexture();
     const tapeTex = new THREE.CanvasTexture(tapeTexCv);
+    tapeTex.needsUpdate = true;
 
     nodesData.forEach(nd => {
       // 1. Polaroid Card Box Mesh (130 x 156 mm)
@@ -918,6 +928,7 @@
 
       const pCv = generatePolaroidTexture(nd.idx, nd.label, nd.photo, nd.sub);
       const pTex = new THREE.CanvasTexture(pCv);
+      pTex.needsUpdate = true;
       pTex.anisotropy = 4;
 
       const cardGeo = new THREE.BoxGeometry(pWidth, pHeight, pThickness);
@@ -997,6 +1008,7 @@
     // Red yarn texture with twisted spiral braid
     const yarnCv = generateYarnTexture(data);
     const yarnTex = new THREE.CanvasTexture(yarnCv);
+    yarnTex.needsUpdate = true;
     yarnTex.wrapS = THREE.RepeatWrapping;
     yarnTex.wrapT = THREE.RepeatWrapping;
     yarnTex.repeat.set(24, 1);
@@ -1202,30 +1214,34 @@
     });
 
     // 3. Dynamic 3D Spatial Camera Glide (James Jani / Vox Tracking Style)
-    if (data.cameraGlide !== false && rsCamera && !rsControls?.state) {
-      // Dynamic camera path following active connections
+    const isUserInteracting = rsControls && rsControls.state !== -1 && rsControls.state !== undefined;
+    if (data.cameraGlide !== false && rsCamera && !isUserInteracting) {
       if (t < 1.2) {
-        // Early focus: gliding towards Target A and Key Witness
         const u = t / 1.2;
         rsCamera.position.x = THREE.MathUtils.lerp(-180, -90, u) + shakeOffset.x;
         rsCamera.position.y = THREE.MathUtils.lerp(-90, -110, u) + shakeOffset.y;
         rsCamera.position.z = THREE.MathUtils.lerp(380, 420, u);
-        rsCamera.lookAt(-120 + u * 40, 20 - u * 25, 0);
+        const tx = -120 + u * 40;
+        const ty = 20 - u * 25;
+        rsCamera.lookAt(tx, ty, 0);
+        if (rsControls) rsControls.target.set(tx, ty, 0);
       } else if (t < 2.5) {
-        // Mid focus: sweeping across Key Witness to Photo #3 & Suspect 2
         const u = (t - 1.2) / 1.3;
         rsCamera.position.x = THREE.MathUtils.lerp(-90, 60, u) + shakeOffset.x;
         rsCamera.position.y = THREE.MathUtils.lerp(-110, -95, u) + shakeOffset.y;
         rsCamera.position.z = THREE.MathUtils.lerp(420, 440, u);
-        rsCamera.lookAt(-40 + u * 120, -5 + u * 30, 0);
+        const tx = -40 + u * 120;
+        const ty = -5 + u * 30;
+        rsCamera.lookAt(tx, ty, 0);
+        if (rsControls) rsControls.target.set(tx, ty, 0);
       } else {
-        // Climax & Settle: Pulling back into the full cinematic 30° hero angle
         const u = Math.min(1.0, (t - 2.5) / 1.5);
-        const smoothU = 0.5 - 0.5 * Math.cos(u * Math.PI); // Ease in-out
+        const smoothU = 0.5 - 0.5 * Math.cos(u * Math.PI);
         rsCamera.position.x = THREE.MathUtils.lerp(60, -20, smoothU) + shakeOffset.x;
         rsCamera.position.y = THREE.MathUtils.lerp(-95, -145, smoothU) + shakeOffset.y;
         rsCamera.position.z = THREE.MathUtils.lerp(440, 460, smoothU);
         rsCamera.lookAt(10, 15, 0);
+        if (rsControls) rsControls.target.set(10, 15, 0);
       }
     }
 
@@ -1274,7 +1290,7 @@
         <div id="red-string-3d-viewport" style="position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden;"></div>
         
         <!-- Depth-of-Field & Vignette Lens Flare Overlay -->
-        <div id="rs-dof-overlay" style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 48% 46%, transparent 40%, rgba(6, 8, 12, 0.45) 85%, rgba(3, 4, 6, 0.85) 100%);"></div>
+        <div id="rs-dof-overlay" style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 48% 46%, transparent 55%, rgba(6, 8, 12, 0.18) 85%, rgba(3, 4, 6, 0.45) 100%);"></div>
 
         <!-- 3D HUD Badge -->
         <div style="position: absolute; top: 12px; left: 14px; pointer-events: none; display: flex; align-items: center; gap: 8px;">

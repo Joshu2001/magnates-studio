@@ -1048,6 +1048,11 @@
       c.restore();
       return;
     }
+    if (clip.fxScene && clip.fxScene.tplId === 'scam-redaction' && typeof window.renderFraudDossierCanvas === 'function') {
+      window.renderFraudDossierCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
     if (clip.fxScene && clip.fxScene.tplId === 'money-stack' && typeof window.renderMoneyStackCanvas === 'function') {
       window.renderMoneyStackCanvas(c, clip, t, cw, ch);
       c.restore();

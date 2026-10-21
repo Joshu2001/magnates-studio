@@ -25495,6 +25495,10 @@ function bizStoryHoverMarkup(id) {
         <svg class="ts-sig" viewBox="0 0 160 40"><path d="M 6 26 C 30 8 44 36 68 20 S 112 30 132 12 L 150 22"/></svg>
         <div class="ts-stamp">DEAL CLOSED</div></div>`;
     case 'scam-redaction':
+      if (typeof window.tplBuildFraudDossierHtml === 'function') {
+        const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scam-redaction') : {};
+        return window.tplBuildFraudDossierHtml(fdData);
+      }
       return `<div class="rd-paper">
         <div class="rd-head">INTERNAL MEMO \u00b7 EYES ONLY</div>
         <div class="rd-line">To: Board of Directors</div>
@@ -25938,7 +25942,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'scam-redaction', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
 
 
 window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
@@ -26326,6 +26330,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             3D EVIDENCE ENVELOPE &bull; CLASSIFIED
           </div>
         </div>`;
+    } else if (tplId === 'scam-redaction') {
+      if (typeof window.tplBuildFraudDossierHtml === 'function') {
+        const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scam-redaction') : {};
+        fxContainer.innerHTML = window.tplBuildFraudDossierHtml(fdData);
+      }
     } else if (tplId === 'money-stack') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #05080c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -28629,6 +28638,16 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       if (typeof window.stepEnvelopeAnimation === 'function') {
         const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('envelope-open') : {};
         window.stepEnvelopeAnimation(fxContainer, tplId, t, eData);
+      }
+    } else if (tplId === 'deal-term-sheet') {
+      if (typeof window.stepDealTermSheetAnimation === 'function') {
+        const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
+        window.stepDealTermSheetAnimation(fxContainer, tplId, t, dtData);
+      }
+    } else if (tplId === 'scam-redaction') {
+      if (typeof window.stepFraudDossierAnimation === 'function') {
+        const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scam-redaction') : {};
+        window.stepFraudDossierAnimation(fxContainer, tplId, t, fdData);
       }
     } else if (tplId === 'money-stack') {
       if (typeof window.stepMoneyStackAnimation === 'function') {
@@ -31277,6 +31296,24 @@ function openTopTemplateCustomizer(tpl) {
         const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountEnvelope3DStage(stage, eData);
       }
+    } else if (tpl.id === 'deal-term-sheet') {
+      topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
+      topCustomizerState.secondaryUrl = '/paper_tear_stock_vintage_map.jpg';
+      topCustomizerState.originalPhotoUrl = '/mahogany_desk_texture.jpg';
+      if (typeof window.tplMountDealTermSheet3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const dData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountDealTermSheet3DStage(stage, dData);
+      }
+    } else if (tpl.id === 'scam-redaction') {
+      topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/mahogany_desk_texture.jpg';
+      if (typeof window.tplMountFraudDossier3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountFraudDossier3DStage(stage, fdData);
+      }
     } else if (tpl.id === 'money-stack') {
       topCustomizerState.primaryUrl = '/money_stack_cinematic_plate.png';
       topCustomizerState.secondaryUrl = '';
@@ -31382,7 +31419,7 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board'
+    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board', 'deal-term-sheet', 'scam-redaction'
   ]);
   const isSidebar3DManaged = typeof SPATIAL_3D_CATEGORY_IDS !== 'undefined' && SPATIAL_3D_CATEGORY_IDS.has(tpl.id);
   const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
@@ -33312,11 +33349,41 @@ function renderTopTemplatePreviewStage() {
   // 3D Photorealistic Red String Investigation Board Engine (James Jani / Magnates Media / Vox Style)
   if (tplId === 'conspiracy-board') {
     const cbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('conspiracy-board') : {};
+    if (topCustomizerState.paperPreviewMode === 'video') {
+      if (typeof window.tplBuildRedStringBoardPreviewHtml === 'function') {
+        stage.innerHTML = window.tplBuildRedStringBoardPreviewHtml(cbData);
+      }
+      return;
+    }
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
     hoverBridgeActive = false;
     hoverExternalT = null;
     if (typeof window.tplMountRedString3DStage === 'function') {
       window.tplMountRedString3DStage(stage, cbData);
+    }
+    return;
+  }
+
+  // 3D Photorealistic Deal Term Sheet Engine
+  if (tplId === 'deal-term-sheet') {
+    const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountDealTermSheet3DStage === 'function') {
+      window.tplMountDealTermSheet3DStage(stage, dtData);
+    }
+    return;
+  }
+
+  // 3D Photorealistic Fraud Dossier Redaction Engine
+  if (tplId === 'scam-redaction') {
+    const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scam-redaction') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountFraudDossier3DStage === 'function') {
+      window.tplMountFraudDossier3DStage(stage, fdData);
     }
     return;
   }
@@ -34265,6 +34332,22 @@ function updateTopCustomizerFrame(seqTime, now) {
       const stage = document.getElementById('tpl-modal-preview-stage');
       const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('money-stack') : {};
       window.stepMoneyStackAnimation(stage, 'money-stack', localSceneT, mData);
+    }
+  }
+
+  if (tplId === 'deal-term-sheet') {
+    if (typeof window.stepDealTermSheetAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const dtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('deal-term-sheet') : {};
+      window.stepDealTermSheetAnimation(stage, 'deal-term-sheet', localSceneT, dtData);
+    }
+  }
+
+  if (tplId === 'scam-redaction') {
+    if (typeof window.stepFraudDossierAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const fdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('scam-redaction') : {};
+      window.stepFraudDossierAnimation(stage, 'scam-redaction', localSceneT, fdData);
     }
   }
 
