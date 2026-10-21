@@ -1,4 +1,4 @@
-﻿/* FX Scene system for the unified template customizer.
+/* FX Scene system for the unified template customizer.
    - Every bridged template gets an Inspector "Effect Controls" section (motion + editable text).
    - 3D Spatial + 3D Document templates also get a Video/3D switch with full 3D controls.
    - All edits live in a persistent per-template store (localStorage) so nothing resets on close.
@@ -14,7 +14,8 @@
   const isBridged = (id) => typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(id);
   // All templates under 3D Spatial category have the Video / 3D switcher!
   const SPATIAL_3D_CATEGORY_IDS = new Set(['money-stack', 
-    'jani-forbes-fraud-reveal',
+    'jani-forbes-fraud-reveal', 'jani-ftx-logo-reveal',
+    'jani-ftx-logo-reveal',
     'og-parallax-depth-engine',
     'spatial-3d-motion-suite',
     'document-3d-fx-engine',
@@ -46,7 +47,13 @@
 
   // ---------------------------------------------------------------- store
   let store = {};
-  try { store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; if (store['spatial-3d-motion-suite'] && store['spatial-3d-motion-suite']._v !== 5) { delete store['spatial-3d-motion-suite']; } } catch (_) { store = {}; }
+  try {
+    store = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {};
+    if (store['spatial-3d-motion-suite'] && (!store['spatial-3d-motion-suite']._v || store['spatial-3d-motion-suite']._v < 10)) {
+      delete store['spatial-3d-motion-suite'];
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (_) {}
+    }
+  } catch (_) { store = {}; }
   let saveTimer = null;
   function persist() {
     clearTimeout(saveTimer);
@@ -58,10 +65,11 @@
     }, 250);
   }
   function entry(id) {
-    if (!store[id]) store[id] = { _v: id === 'spatial-3d-motion-suite' ? 6 : 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
-    if (id === 'spatial-3d-motion-suite' && (!store[id]._v || store[id]._v < 6)) {
+    if (!store[id]) store[id] = { _v: id === 'spatial-3d-motion-suite' ? 10 : 4, mode: '3d', fx: { speed: 1, pitch: 0, yaw: 0, roll: 0, zoom: 1 }, texts: {}, spatial: null, doc: null, snapshot: null };
+    if (id === 'spatial-3d-motion-suite' && (!store[id]._v || store[id]._v < 10)) {
       store[id].mode = '3d';
-      store[id]._v = 6;
+      store[id]._v = 10;
+      store[id].spatial = null;
     }
     return store[id];
   }
@@ -141,33 +149,70 @@
     const k = kindOf(tplId); const e = entry(tplId);
     if (k === 'spatial' && spatial3DState.renderer) {
       const s = spatial3DState;
+      const validLayers = (s.elements3D && s.elements3D.length > 0) ? s.elements3D.map(m => {
+        const u = m.userData || {};
+        return {
+          id: u.id, type: u.type,
+          artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'),
+          objectShape: u.objectShape || u.objectGeometry || 'icosahedron',
+          objectGeometry: u.objectShape || u.objectGeometry || 'icosahedron',
+          imageUrl: u.imageUrl || '',
+          magazineTitle: u.magazineTitle,
+          featureTag: u.featureTag,
+          featureTitle: u.featureTitle,
+          topTickerLeft: u.topTickerLeft,
+          topTickerRight: u.topTickerRight,
+          kickerBadge: u.kickerBadge,
+          beamActive: u.beamActive,
+          beamColor: u.beamColor,
+          paparazziFlashes: u.paparazziFlashes,
+          title: u.title, subtitle: u.subtitle, body: u.body, text: u.text,
+          stamp: u.stamp || '',
+          transitionEffect: u.transitionEffect || 'fade',
+          fontFamily: u.fontFamily || 'Cinzel',
+          color: u.color, scale: u.scale || 1,
+          x: u.baseX !== undefined ? u.baseX : m.position.x,
+          y: u.baseY !== undefined ? u.baseY : m.position.y,
+          z: m.position.z
+        };
+      }) : (e.spatial && e.spatial.layers && e.spatial.layers.length > 0 ? e.spatial.layers : null);
+
       e.spatial = {
-        flightMode: s.flightMode, camSpeed: s.camSpeed, camDrift: s.camDrift, camShake: s.camShake, camPitch: s.camPitch, camYaw: s.camYaw,
-        fovWarp: s.fovWarp, fogDensity: s.fogDensity, lightIntensity: s.lightIntensity, gridVisible: s.gridVisible,
-        dustVisible: s.dustVisible, activePreset: s.activePreset,
-        bgStyle: s.bgStyle, bgColor: s.bgColor, transparentBg: s.transparentBg,
-        envStyle: s.envStyle, gridDensity: s.gridDensity, gridSpeed: s.gridSpeed, gridLuminescence: s.gridLuminescence, gridGlow: s.gridGlow, gridColor: s.gridColor,
-        starCount: s.starCount, starSize: s.starSize, starSpeed: s.starSpeed, showCelestialObjects: s.showCelestialObjects,
-        showText: s.showText, textFont: s.textFont, textStyle: s.textStyle, textPrimaryColor: s.textPrimaryColor, textSecondaryColor: s.textSecondaryColor, textBevel: s.textBevel,
-        pathStyle: s.pathStyle, pathCurve: s.pathCurve, drawnPath: s.drawnPath,
-        layers: (s.elements3D || []).map(m => {
-          const u = m.userData || {};
-          return {
-            id: u.id, type: u.type,
-            artifactMode: u.artifactMode || (u.type === 'text' ? 'text' : 'image'),
-            objectShape: u.objectShape || u.objectGeometry || 'icosahedron',
-            objectGeometry: u.objectShape || u.objectGeometry || 'icosahedron',
-            imageUrl: u.imageUrl || '',
-            title: u.title, subtitle: u.subtitle, body: u.body, text: u.text,
-            stamp: u.stamp || '',
-            transitionEffect: u.transitionEffect || 'fade',
-            fontFamily: u.fontFamily || 'Cinzel',
-            color: u.color, scale: u.scale || 1,
-            x: u.baseX !== undefined ? u.baseX : m.position.x,
-            y: u.baseY !== undefined ? u.baseY : m.position.y,
-            z: m.position.z
-          };
-        })
+        flightMode: s.flightMode || 'museum-tour',
+        camSpeed: s.camSpeed !== undefined ? s.camSpeed : 1.0,
+        camDrift: s.camDrift !== undefined ? s.camDrift : 25,
+        camShake: s.camShake !== undefined ? s.camShake : 12,
+        camPitch: s.camPitch || 0,
+        camYaw: s.camYaw || 0,
+        fovWarp: s.fovWarp || 52,
+        fogDensity: s.fogDensity !== undefined ? s.fogDensity : 28,
+        lightIntensity: s.lightIntensity !== undefined ? s.lightIntensity : 100,
+        gridVisible: s.gridVisible !== false,
+        dustVisible: s.dustVisible !== false,
+        activePreset: s.activePreset || 'forbes-hallway',
+        bgStyle: s.bgStyle || 'grid-stars',
+        bgColor: s.bgColor || '#07080c',
+        transparentBg: !!s.transparentBg,
+        envStyle: s.envStyle || 'tunnel-cyan',
+        gridDensity: s.gridDensity || 60,
+        gridSpeed: s.gridSpeed !== undefined ? s.gridSpeed : 1.0,
+        gridLuminescence: s.gridLuminescence !== undefined ? s.gridLuminescence : 100,
+        gridGlow: s.gridGlow !== undefined ? s.gridGlow : 100,
+        gridColor: s.gridColor || '#06b6d4',
+        starCount: s.starCount || 1200,
+        starSize: s.starSize || 4.8,
+        starSpeed: s.starSpeed !== undefined ? s.starSpeed : 1.0,
+        showCelestialObjects: s.showCelestialObjects !== false,
+        showText: s.showText !== false,
+        textFont: s.textFont || 'Cinzel',
+        textStyle: s.textStyle || 'white',
+        textPrimaryColor: s.textPrimaryColor || '#ffffff',
+        textSecondaryColor: s.textSecondaryColor || '#cbd5e1',
+        textBevel: s.textBevel !== false,
+        pathStyle: s.pathStyle || 'straight',
+        pathCurve: s.pathCurve || 0,
+        drawnPath: s.drawnPath || null,
+        layers: validLayers
       };
     }
     if (k === 'spatial' && e.spatial) spatial3DState._appliedSig = JSON.stringify([e.spatial, e.texts]);
@@ -226,20 +271,26 @@
   function applySpatialStored(e) {
     const s = spatial3DState, sp = e.spatial;
     const sig = JSON.stringify([sp, e.texts]);
-    if (s._appliedSig === sig && s.scene) return;
+    if (s._appliedSig === sig && s.scene && s.elements3D && s.elements3D.length > 0) return;
     s._appliedSig = sig;
     if (sp) {
       ['flightMode', 'camSpeed', 'camDrift', 'camShake', 'camPitch', 'camYaw', 'fovWarp', 'fogDensity', 'lightIntensity', 'gridVisible', 'dustVisible', 'activePreset', 'bgStyle', 'bgColor', 'transparentBg', 'envStyle', 'gridDensity', 'gridSpeed', 'gridLuminescence', 'gridGlow', 'gridColor', 'starCount', 'starSize', 'starSpeed', 'showCelestialObjects', 'showText', 'textFont', 'textStyle', 'textPrimaryColor', 'textSecondaryColor', 'textBevel', 'pathStyle', 'pathCurve', 'drawnPath'].forEach(f => { if (sp[f] !== undefined) s[f] = sp[f]; });
       if (sp.layers && sp.layers.length) setSpatialLayers(sp.layers);
     }
-    if (s.camera) { s.camera.fov = s.fovWarp; s.camera.updateProjectionMatrix(); }
-    if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + (s.fogDensity / 100) * 0.0008;
-    if (s.ambientLight) s.ambientLight.intensity = (s.lightIntensity / 100) * 0.95;
+    // Guarantee corridor elements are loaded
+    if (!s.elements3D || s.elements3D.length === 0) {
+      if (typeof loadSpatialPreset === 'function') {
+        loadSpatialPreset(s.activePreset || 'forbes-hallway');
+      }
+    }
+    if (s.camera) { s.camera.fov = s.fovWarp || 52; s.camera.updateProjectionMatrix(); }
+    if (s.scene && s.scene.fog) s.scene.fog.density = 0.0001 + ((s.fogDensity || 28) / 100) * 0.0008;
+    if (s.ambientLight) s.ambientLight.intensity = ((s.lightIntensity || 100) / 100) * 0.95;
     if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
     else if (s.floorGrid) s.floorGrid.visible = s.gridVisible;
-    if (s.particlesMesh) s.particlesMesh.visible = s.dustVisible;
+    if (s.particlesMesh) s.particlesMesh.visible = s.dustVisible !== false;
     // unified text overrides
-    Object.keys(e.texts).forEach(key => {
+    Object.keys(e.texts || {}).forEach(key => {
       const m = SPATIAL_3D[key]; if (!m) return;
       rebuildSpatialLayer(m.l, m.f === 'body' ? { body: e.texts[key], text: e.texts[key] } : { [m.f]: e.texts[key] }, true);
     });
@@ -324,7 +375,7 @@
   }
   function stopLoop(k) { const st = stOf(k); if (st.animId) { cancelAnimationFrame(st.animId); st.animId = null; } }
 
-  function s_applyFirst(e, tplId) { applySpatialStored(e); if (!e.spatial) capture(tplId); }
+  function s_applyFirst(e, tplId) { applySpatialStored(e); if (!e.spatial || !e.spatial.layers || !e.spatial.layers.length) capture(tplId); }
   // make sure engine exists & has this entry applied; container = where renderer should live
   function ensureEngine(k, container) {
     const tplId = k === 'spatial' ? 'spatial-3d-motion-suite' : 'document-3d-fx-engine';
@@ -1587,6 +1638,11 @@ function collectVideoNodes(stage, tplId) {
     }
     if (clip.fxScene && clip.fxScene.tplId === 'money-stack' && typeof window.renderMoneyStackCanvas === 'function') {
       window.renderMoneyStackCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
+    if (clip.fxScene && clip.fxScene.tplId === 'jani-ftx-logo-reveal' && typeof window.renderJaniFtxLogoCanvas === 'function') {
+      window.renderJaniFtxLogoCanvas(c, clip, t, cw, ch);
       c.restore();
       return;
     }
