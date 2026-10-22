@@ -1,4 +1,4 @@
-﻿/* ==============================================================================
+/* ==============================================================================
    REGAARDER STUDIO - CONTEXTUAL TEMPLATE INSPECTOR SUITE
    Provides granular, top-priority editing controls for all extracted document templates.
    Controls appear directly at the top of the Inspector panel.
@@ -55,6 +55,36 @@
 
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
+    // James Jani Cinematic Letterbox & Lower Caption Frame
+    'jani-cinematic-letterbox': {
+      type: 'jani-cinematic-letterbox',
+      mediaUrl: '/jani_cinematic_letterbox_ref.png',
+      mediaType: 'image',
+      mediaScale: 1.0,
+      mediaX: 0,
+      mediaY: 0,
+      barColor: '#000000',
+      topBarColor: '#000000',
+      bottomBarColor: '#000000',
+      separateBarColors: false,
+      barHeightPercent: 14,
+      captionText: 'SPUN OVER THE COURSE OF A FEW YEARS.',
+      captionFont: 'Oswald, "Bebas Neue", "Impact", -apple-system, sans-serif',
+      captionSize: 28,
+      captionColor: '#ffffff',
+      captionLetterSpacing: 2.5,
+      captionUppercase: true,
+      captionAnim: 'pop',
+      showChannelTag: true,
+      channelTagText: 'JANi',
+      showActionTag: true,
+      actionTagText: 'SUBSCRIBE',
+      cameraMotion: 'slow-push',
+      grainOverlay: true,
+      grainOpacity: 0.12,
+      duration: 6.0
+    },
+
     // Photorealistic 3D Investigative Evidence Envelope Engine
     'conspiracy-board': Object.assign({}, (typeof window !== 'undefined' && window.RED_STRING_3D_CONFIG) || {
       type: 'conspiracy-board',
@@ -224,6 +254,9 @@
     }),
 
     // Photorealistic 3D Paper Currency Stack ($100 US Dollars with Kraft Bands)
+    // Cinematic Merger & Acquisition collision engine (see merger-acquisition-engine.js)
+    'merger-acquisition': Object.assign({ type: 'merger-acquisition' }, (typeof window !== 'undefined' && window.MERGER_ACQ_CONFIG) || {}),
+
     'wire-transfer': Object.assign({}, (typeof window !== 'undefined' && window.WIRE_TRANSFER_CONFIG) || {
       type: 'wire-transfer',
       originTitle: 'ORIGIN /',
@@ -1581,7 +1614,7 @@
   // --- 2. GET & SET CONTEXTUAL DATA ---
   window.tplGetContextualData = function(tplId) {
     if (!tplId) return {};
-        const d = DEFAULTS[tplId];
+        const d = DEFAULTS[tplId] || (tplId === 'countdown-timer' && typeof window.getCountdownTimerDefaultConfig === 'function' ? window.getCountdownTimerDefaultConfig() : null) || (tplId === 'circular-spin-flashlight-glitch' && typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : null);
     if (!d) return {};
     const stored = (localStore[tplId] && Object.keys(localStore[tplId]).length > 0) ? localStore[tplId] : {};
     const live = (typeof topCustomizerState !== 'undefined' && topCustomizerState.customData && topCustomizerState.customData[tplId]) ? topCustomizerState.customData[tplId] : {};
@@ -3400,6 +3433,10 @@
       }
       return;
     }
+    if (tplId === 'merger-acquisition') {
+      if (typeof window.tplUpdateMergerAcqStage === 'function') window.tplUpdateMergerAcqStage(data);
+      return;
+    }
     if (tplId === 'wire-transfer') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -3534,6 +3571,139 @@
         }
         if (typeof window.stepJaniCrossSectionAnimation === 'function') {
           window.stepJaniCrossSectionAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'document-barrage-suite') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#doc-barrage-container')) {
+          if (typeof window.tplMountDocumentBarrageStage === 'function') {
+            window.tplMountDocumentBarrageStage(stage, data);
+          }
+        }
+        if (typeof window.stepDocumentBarrageAnimation === 'function') {
+          window.stepDocumentBarrageAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'document-barrage-suite') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildDocumentBarrageInspector === 'function') {
+          window.tplBuildDocumentBarrageInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+            if (tplId === 'countdown-timer') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#cdt-wrapper')) {
+          if (typeof window.tplMountCountdownTimerStage === 'function') {
+            window.tplMountCountdownTimerStage(stage, data);
+          }
+        }
+        if (typeof window.stepCountdownTimerAnimation === 'function') {
+          window.stepCountdownTimerAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
+
+        if (tplId === 'circular-spin-flashlight-glitch') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#csf-wrapper')) {
+          if (typeof window.tplMountCircularSpinFlashStage === 'function') {
+            window.tplMountCircularSpinFlashStage(stage, data);
+          }
+        }
+        if (typeof window.stepCircularSpinFlashAnimation === 'function') {
+          window.stepCircularSpinFlashAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
+
+    if (tplId === 'multi-image-flash-sequence') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#multi-flash-wrapper')) {
+          if (typeof window.tplMountMultiImageFlashStage === 'function') {
+            window.tplMountMultiImageFlashStage(stage, data);
+          }
+        }
+        if (typeof window.stepMultiImageFlashAnimation === 'function') {
+          window.stepMultiImageFlashAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'jani-cinematic-letterbox') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage && !stage.querySelector('#jcl-root')) {
+        if (typeof window.tplMountJaniCinematicLetterboxStage === 'function') {
+          window.tplMountJaniCinematicLetterboxStage(stage, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'cinematic-light-trail-typewriter') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#cinematic-light-trail-root')) {
+          if (typeof window.tplMountCinematicLightTrailStage === 'function') {
+            window.tplMountCinematicLightTrailStage(stage, data);
+          }
+        } else {
+          if (typeof window.tplUpdateCinematicLightTrail === 'function') {
+            window.tplUpdateCinematicLightTrail(data);
+          }
+        }
+      }
+      return;
+    }
+    if (tplId === 'jani-cinematic-letterbox') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage && !stage.querySelector('#jcl-root')) {
+        if (typeof window.tplMountJaniCinematicLetterboxStage === 'function') {
+          window.tplMountJaniCinematicLetterboxStage(stage, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'cinematic-light-trail-typewriter') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        const d = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildCinematicLightTrailInspector === 'function') {
+          window.tplBuildCinematicLightTrailInspector(container, d, tplId);
         }
       }
       return;
@@ -4963,6 +5133,24 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
+    if (tplId === 'jani-cinematic-letterbox') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        if (typeof window.tplRenderJaniCinematicLetterboxInspector === 'function') {
+          window.tplRenderJaniCinematicLetterboxInspector(container);
+        }
+      }
+      return;
+    }
     if (tplId === 'hypnotic-vertigo-roll') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
@@ -5198,6 +5386,17 @@
       }
       return;
     }
+    if (tplId === 'merger-acquisition') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildMergerAcqInspector === 'function') {
+          window.tplBuildMergerAcqInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
     if (tplId === 'wire-transfer') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       if (container) {
@@ -5370,6 +5569,106 @@
         bindCross('inp-cross-scrolldur', 'scrollDuration');
         bindCross('inp-cross-dust', 'dustEnabled', v => v);
         bindCross('inp-cross-dustcount', 'dustParticleCount', parseInt);
+      }
+      return;
+    }
+    if (tplId === 'document-barrage-suite') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#doc-barrage-container')) {
+          if (typeof window.tplMountDocumentBarrageStage === 'function') {
+            window.tplMountDocumentBarrageStage(stage, data);
+          }
+        }
+        if (typeof window.stepDocumentBarrageAnimation === 'function') {
+          window.stepDocumentBarrageAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'document-barrage-suite') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildDocumentBarrageInspector === 'function') {
+          window.tplBuildDocumentBarrageInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+            if (tplId === 'countdown-timer') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildCountdownTimerInspector === 'function') {
+          window.tplBuildCountdownTimerInspector(container, data);
+        }
+      }
+      return;
+    }
+
+        if (tplId === 'circular-spin-flashlight-glitch') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildCircularSpinFlashInspector === 'function') {
+          window.tplBuildCircularSpinFlashInspector(container, data);
+        }
+      }
+      return;
+    }
+
+    if (tplId === 'multi-image-flash-sequence') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
+      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
+      if (stdLayers) stdLayers.style.display = 'none';
+      if (wrapPrim) wrapPrim.style.display = 'none';
+      if (wrapSec) wrapSec.style.display = 'none';
+      if (wrapText) wrapText.style.display = 'none';
+      if (container) {
+        container.style.display = 'flex';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildMultiImageFlashInspector === 'function') {
+          window.tplBuildMultiImageFlashInspector(container, data);
+        }
       }
       return;
     }

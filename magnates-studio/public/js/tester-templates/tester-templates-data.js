@@ -3,6 +3,76 @@
 (function() {
   window.NEW_TESTER_TEMPLATES = [
   {
+    "id": "jani-cinematic-letterbox",
+    "title": "James Jani Cinematic Letterbox & Lower Caption Frame",
+    "category": "Documentary",
+    "origCategory": "Documentary",
+    "badge": "JANI CINEMATIC",
+    "difficulty": "Easy",
+    "timeToApply": "6s",
+    "previewGradient": "linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(20, 20, 25, 0.98))",
+    "description": "Signature documentary letterbox frame with customizable top and bottom matte bars, centered draggable video or photo stage, and high-impact lower third caption space with condensed documentary typography.",
+    "tags": [
+      "James Jani",
+      "Cinematic Letterbox",
+      "Lower Caption",
+      "Widescreen Matte",
+      "Documentary",
+      "Aspect Ratio",
+      "Subtitles"
+    ],
+    "isTesterTemplate": true,
+    "defaultImage": "/jani_cinematic_letterbox_ref.png"
+  },
+  {
+    "id": "circular-spin-flashlight-glitch",
+    "title": "Circular Arc Spin & Paparazzi Flashlight Glitch Transition",
+    "category": "Transitions",
+    "origCategory": "Transitions",
+    "badge": "CINEMATIC BURST",
+    "difficulty": "Easy",
+    "timeToApply": "5s",
+    "previewGradient": "linear-gradient(135deg, rgba(3, 7, 18, 0.95), rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.95))",
+    "description": "Image initiates a circular arc spin from left over head down to right, accompanied by falling particles and a 4-flash photoflash sequence (1 slow bloom, 3 fast paparazzi bursts) culminating in a digital glitch transition to a second person.",
+    "tags": [
+      "Circular Spin",
+      "Doodle Arc",
+      "Flashlight",
+      "Paparazzi Flash",
+      "Falling Particles",
+      "Glitch Transition",
+      "AI Subject Reveal"
+    ],
+    "previewType": "circular-spin-flashlight-glitch",
+    "isTesterTemplate": true,
+    "defaultImage": "/generated_person_1.jpg",
+    "secondaryImage": "/generated_person_2.jpg"
+  },
+  {
+    "id": "cinematic-light-trail-typewriter",
+    "title": "Cinematic Light Trail Typewriter & Glitch Reveal",
+    "category": "Text & Titles",
+    "origCategory": "Text & Titles",
+    "badge": "CINEMATIC MASTER",
+    "difficulty": "Easy",
+    "timeToApply": "7s",
+    "previewGradient": "linear-gradient(135deg, rgba(0, 0, 0, 0.95), rgba(15, 23, 42, 0.95))",
+    "description": "Black screen typewriter typography with horizontal luminous light trails (anamorphic flare beam), CRT scanlines, dust motes, high-frequency digital glitch-out, and secondary scene reveal.",
+    "tags": [
+      "Typewriter",
+      "Light Trail",
+      "Anamorphic Streak",
+      "Glitch Out",
+      "Cinematic Text",
+      "Secondary Reveal",
+      "CRT Scanlines"
+    ],
+    "previewType": "lightTrailTypewriter",
+    "isTesterTemplate": true,
+    "defaultImage": "/boardroom_scene_hd.jpg"
+  },
+
+  {
     "id": "jani-forbes-fraud-reveal",
     "title": "James Jani Forbes 3D Cover: Paparazzi Flash & Anamorphic Beam",
     "category": "3D Spatial",
@@ -1122,7 +1192,7 @@
     ],
     "previewType": "staticTransition",
     "isTesterTemplate": true,
-    "defaultImage": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%2306201b%22%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23040d0b%22%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3CradialGradient%20id%3D%22glow%22%20cx%3D%2250%25%22%20cy%3D%2245%25%22%20r%3D%2260%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(16%2C%20185%2C%20129%2C%200.25)%22%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(0%2C0%2C0%2C0)%22%2F%3E%0A%20%20%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%20%20%20%20%3Cfilter%20id%3D%22shadow%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%3E%0A%20%20%20%20%20%20%20%20%3CfeDropShadow%20dx%3D%220%22%20dy%3D%228%22%20stdDeviation%3D%2212%22%20flood-color%3D%22rgba(0%2C0%2C0%2C0.8)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Ffilter%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23bg)%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23glow)%22%2F%3E%0A%20%20%20%20%0A%20%20%20%20%3C!--%20Subtle%20technical%20grid%20lines%20--%3E%0A%20%20%20%20%3Cg%20stroke%3D%22rgba(255%2C255%2C255%2C0.04)%22%20stroke-width%3D%221%22%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%220%22%20y1%3D%2256%22%20x2%3D%22400%22%20y2%3D%2256%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%220%22%20y1%3D%22168%22%20x2%3D%22400%22%20y2%3D%22168%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22100%22%20y1%3D%220%22%20x2%3D%22100%22%20y2%3D%22225%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22300%22%20y1%3D%220%22%20x2%3D%22300%22%20y2%3D%22225%22%2F%3E%0A%20%20%20%20%3C%2Fg%3E%0A%0A%20%20%20%20%3C!--%20Center%20Graphic%20Emblem%20--%3E%0A%20%20%20%20%3Cg%20transform%3D%22translate(200%2C%2085)%22%20filter%3D%22url(%23shadow)%22%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%220%22%20r%3D%2232%22%20fill%3D%22rgba(255%2C255%2C255%2C0.03)%22%20stroke%3D%22%2310b981%22%20stroke-width%3D%221.5%22%20stroke-dasharray%3D%223%2C%203%22%20opacity%3D%220.6%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%220%22%20r%3D%2224%22%20fill%3D%22rgba(255%2C255%2C255%2C0.05)%22%20stroke%3D%22%2310b981%22%20stroke-width%3D%221.2%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20Stylized%20Play%2FFX%20Icon%20--%3E%0A%20%20%20%20%20%20%3Cpolygon%20points%3D%22-5%2C-8%2010%2C0%20-5%2C8%22%20fill%3D%22%2310b981%22%2F%3E%0A%20%20%20%20%3C%2Fg%3E%0A%0A%20%20%20%20%3C!--%20Category%20Pill%20--%3E%0A%20%20%20%20%3Cg%20transform%3D%22translate(200%2C%20138)%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22-45%22%20y%3D%22-10%22%20width%3D%2290%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22rgba(0%2C0%2C0%2C0.6)%22%20stroke%3D%22%2310b981%22%20stroke-width%3D%220.8%22%20opacity%3D%220.9%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%220%22%20y%3D%223.5%22%20fill%3D%22%2310b981%22%20font-family%3D%22'JetBrains%20Mono'%2C%20monospace%22%20font-size%3D%228%22%20font-weight%3D%22700%22%20letter-spacing%3D%221.5%22%20text-anchor%3D%22middle%22%3ETRANSITIONS%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fg%3E%0A%0A%20%20%20%20%3C!--%20Title%20Heading%20--%3E%0A%20%20%20%20%3Ctext%20x%3D%22200%22%20y%3D%22180%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Inter'%2C%20sans-serif%22%20font-weight%3D%22800%22%20font-size%3D%2214%22%20letter-spacing%3D%220.5%22%20text-anchor%3D%22middle%22%3ETV%20STATIC%20TRANSITION%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%22200%22%20y%3D%22196%22%20fill%3D%22%2394a3b8%22%20font-family%3D%22'JetBrains%20Mono'%2C%20monospace%22%20font-size%3D%228.5%22%20font-weight%3D%22500%22%20letter-spacing%3D%221%22%20text-anchor%3D%22middle%22%3EHOVER%20TO%20PREVIEW%20FX%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+    "defaultImage": "/tv_static_thumbnail.svg"
   },
   {
     "id": "polaroid-scatter",
@@ -1354,11 +1424,11 @@
     "title": "Merger & Acquisition",
     "category": "Business",
     "origCategory": "Business",
-    "badge": "MEDIUM",
-    "difficulty": "Medium",
-    "timeToApply": "2-3s",
+    "badge": "FEATURED",
+    "difficulty": "Advanced",
+    "timeToApply": "12s",
     "previewGradient": "linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))",
-    "description": "Two companies merging with smooth animation. Visualizes business deals and acquisitions.",
+    "description": "Two company logos collide in a cinematic blast of sparks, shards and light, fuse into a plasma core and reveal the merged brand. Fully customizable.",
     "tags": [
       "merger",
       "acquisition",
@@ -1367,7 +1437,7 @@
     ],
     "previewType": "mergerAcquisition",
     "isTesterTemplate": true,
-    "defaultImage": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%0A%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%3ClinearGradient%20id%3D%22bg%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%230f172a%22%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23060913%22%2F%3E%0A%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%3CradialGradient%20id%3D%22glow%22%20cx%3D%2250%25%22%20cy%3D%2245%25%22%20r%3D%2260%25%22%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(56%2C%20189%2C%20248%2C%200.25)%22%2F%3E%0A%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(0%2C0%2C0%2C0)%22%2F%3E%0A%20%20%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%20%20%20%20%3Cfilter%20id%3D%22shadow%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%3E%0A%20%20%20%20%20%20%20%20%3CfeDropShadow%20dx%3D%220%22%20dy%3D%228%22%20stdDeviation%3D%2212%22%20flood-color%3D%22rgba(0%2C0%2C0%2C0.8)%22%2F%3E%0A%20%20%20%20%20%20%3C%2Ffilter%3E%0A%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23bg)%22%2F%3E%0A%20%20%20%20%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23glow)%22%2F%3E%0A%20%20%20%20%0A%20%20%20%20%3C!--%20Subtle%20technical%20grid%20lines%20--%3E%0A%20%20%20%20%3Cg%20stroke%3D%22rgba(255%2C255%2C255%2C0.04)%22%20stroke-width%3D%221%22%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%220%22%20y1%3D%2256%22%20x2%3D%22400%22%20y2%3D%2256%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%220%22%20y1%3D%22168%22%20x2%3D%22400%22%20y2%3D%22168%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22100%22%20y1%3D%220%22%20x2%3D%22100%22%20y2%3D%22225%22%2F%3E%0A%20%20%20%20%20%20%3Cline%20x1%3D%22300%22%20y1%3D%220%22%20x2%3D%22300%22%20y2%3D%22225%22%2F%3E%0A%20%20%20%20%3C%2Fg%3E%0A%0A%20%20%20%20%3C!--%20Center%20Graphic%20Emblem%20--%3E%0A%20%20%20%20%3Cg%20transform%3D%22translate(200%2C%2085)%22%20filter%3D%22url(%23shadow)%22%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%220%22%20r%3D%2232%22%20fill%3D%22rgba(255%2C255%2C255%2C0.03)%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%221.5%22%20stroke-dasharray%3D%223%2C%203%22%20opacity%3D%220.6%22%2F%3E%0A%20%20%20%20%20%20%3Ccircle%20cx%3D%220%22%20cy%3D%220%22%20r%3D%2224%22%20fill%3D%22rgba(255%2C255%2C255%2C0.05)%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%221.2%22%2F%3E%0A%20%20%20%20%20%20%3C!--%20Stylized%20Play%2FFX%20Icon%20--%3E%0A%20%20%20%20%20%20%3Cpolygon%20points%3D%22-5%2C-8%2010%2C0%20-5%2C8%22%20fill%3D%22%2338bdf8%22%2F%3E%0A%20%20%20%20%3C%2Fg%3E%0A%0A%20%20%20%20%3C!--%20Category%20Pill%20--%3E%0A%20%20%20%20%3Cg%20transform%3D%22translate(200%2C%20138)%22%3E%0A%20%20%20%20%20%20%3Crect%20x%3D%22-45%22%20y%3D%22-10%22%20width%3D%2290%22%20height%3D%2220%22%20rx%3D%2210%22%20fill%3D%22rgba(0%2C0%2C0%2C0.6)%22%20stroke%3D%22%2338bdf8%22%20stroke-width%3D%220.8%22%20opacity%3D%220.9%22%2F%3E%0A%20%20%20%20%20%20%3Ctext%20x%3D%220%22%20y%3D%223.5%22%20fill%3D%22%2338bdf8%22%20font-family%3D%22'JetBrains%20Mono'%2C%20monospace%22%20font-size%3D%228%22%20font-weight%3D%22700%22%20letter-spacing%3D%221.5%22%20text-anchor%3D%22middle%22%3EBUSINESS%3C%2Ftext%3E%0A%20%20%20%20%3C%2Fg%3E%0A%0A%20%20%20%20%3C!--%20Title%20Heading%20--%3E%0A%20%20%20%20%3Ctext%20x%3D%22200%22%20y%3D%22180%22%20fill%3D%22%23ffffff%22%20font-family%3D%22'Inter'%2C%20sans-serif%22%20font-weight%3D%22800%22%20font-size%3D%2214%22%20letter-spacing%3D%220.5%22%20text-anchor%3D%22middle%22%3EMERGER%20%26AMP%3B%20ACQUISITION%3C%2Ftext%3E%0A%20%20%20%20%3Ctext%20x%3D%22200%22%20y%3D%22196%22%20fill%3D%22%2394a3b8%22%20font-family%3D%22'JetBrains%20Mono'%2C%20monospace%22%20font-size%3D%228.5%22%20font-weight%3D%22500%22%20letter-spacing%3D%221%22%20text-anchor%3D%22middle%22%3EHOVER%20TO%20PREVIEW%20FX%3C%2Ftext%3E%0A%20%20%3C%2Fsvg%3E"
+    "defaultImage": "/merger_acquisition_thumbnail.svg"
   },
   {
     "id": "luxury-car-reveal",

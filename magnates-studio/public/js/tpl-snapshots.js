@@ -2,6 +2,48 @@
 // Each snapshot visually mirrors the template's real layout, graphic assets, typography, and motion atmosphere.
 (function () {
   const SNAPSHOTS = {
+    'countdown-timer': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <radialGradient id="cdt-bg" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#2d060c"/>
+            <stop offset="55%" stop-color="#120205"/>
+            <stop offset="100%" stop-color="#030104"/>
+          </radialGradient>
+          <radialGradient id="cdt-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ef4444" stop-opacity="0.8"/>
+            <stop offset="60%" stop-color="#dc2626" stop-opacity="0.2"/>
+            <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#cdt-bg)"/>
+        
+        <!-- Radar Circles & Ticks -->
+        <circle cx="200" cy="112" r="78" fill="none" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="2 4" opacity="0.35"/>
+        <circle cx="200" cy="112" r="68" fill="none" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="6 6" opacity="0.4"/>
+        <circle cx="200" cy="112" r="58" fill="none" stroke="#ef4444" stroke-width="4" stroke-dasharray="364" stroke-dashoffset="91" opacity="0.9"/>
+        <circle cx="200" cy="112" r="38" fill="url(#cdt-glow)"/>
+        
+        <!-- Cardinal crosshairs -->
+        <line x1="200" y1="26" x2="200" y2="34" stroke="#ef4444" stroke-width="2"/>
+        <line x1="200" y1="190" x2="200" y2="198" stroke="#ef4444" stroke-width="2"/>
+        <line x1="114" y1="112" x2="122" y2="112" stroke="#ef4444" stroke-width="2"/>
+        <line x1="278" y1="112" x2="286" y2="112" stroke="#ef4444" stroke-width="2"/>
+
+        <!-- Top Status Pill -->
+        <rect x="140" y="14" width="120" height="16" rx="4" fill="rgba(0,0,0,0.7)" stroke="#ef4444" stroke-width="0.8"/>
+        <circle cx="150" cy="22" r="2.5" fill="#ef4444"/>
+        <text x="204" y="25" fill="#f87171" font-family="monospace" font-size="7.5" font-weight="700" letter-spacing="1.5" text-anchor="middle">T-MINUS // ARMED</text>
+
+        <!-- Big Center 3 -->
+        <text x="200" y="132" fill="#ffffff" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="56" text-anchor="middle" filter="drop-shadow(0 0 10px #ef4444)">3</text>
+        <line x1="170" y1="140" x2="230" y2="140" stroke="#ef4444" stroke-width="2"/>
+        <text x="200" y="152" fill="#fca5a5" font-family="monospace" font-size="7.5" font-weight="700" letter-spacing="2" text-anchor="middle">SECONDS</text>
+
+        <!-- Bottom Status -->
+        <text x="200" y="208" fill="#f87171" font-family="monospace" font-size="8" font-weight="700" letter-spacing="2" text-anchor="middle">&lt; CLIMAX IMPACT AT T-ZERO &gt;</text>
+      </svg>
+    `)},
     'text-texturing-grunge': '/jani_chapter_card_thumbnail.jpg',
     'power-meeting': '/power_meeting_cinematic_plate.jpg',
     'creator-cinematic-studio': `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bg-radial-teal" cx="50%" cy="45%" r="65%"><stop offset="0%" stop-color="#082f49"/><stop offset="40%" stop-color="#031c2d"/><stop offset="100%" stop-color="#020b14"/></radialGradient><radialGradient id="warm-lamp-left" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.6"/><stop offset="60%" stop-color="#d97706" stop-opacity="0.15"/><stop offset="100%" stop-color="#000000" stop-opacity="0"/></radialGradient><radialGradient id="warm-lamp-right" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fbbf24" stop-opacity="0.55"/><stop offset="50%" stop-color="#b45309" stop-opacity="0.12"/><stop offset="100%" stop-color="#000000" stop-opacity="0"/></radialGradient></defs><rect width="400" height="225" fill="url(#bg-radial-teal)"/><circle cx="42" cy="155" r="48" fill="url(#warm-lamp-left)"/><circle cx="365" cy="135" r="56" fill="url(#warm-lamp-right)"/><text x="54" y="116" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="700" font-size="14" opacity="0.95">this AI company</text><text x="320" y="119" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="900" font-size="24" letter-spacing="-0.5" text-anchor="middle">VOICE</text></svg>`)}`,
@@ -285,7 +327,115 @@
       </svg>
     `)}`,
 
+    // 16.6. Investigative Document Barrage & Screen-Filling Dossier Suite
+    'document-barrage-suite': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <filter id="bg-blur-snap" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+          <filter id="doc-shadow-snap" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.8" />
+          </filter>
+        </defs>
+
+        <!-- Blurred Background Room -->
+        <rect width="400" height="225" fill="#0f172a" />
+        <g filter="url(#bg-blur-snap)" opacity="0.65">
+          <circle cx="120" cy="80" r="90" fill="#1e3a5f" />
+          <circle cx="300" cy="140" r="110" fill="#0369a1" />
+          <rect x="0" y="100" width="400" height="125" fill="#0b1120" />
+        </g>
+        <radialGradient id="vig-snap" cx="50%" cy="50%" r="65%">
+          <stop offset="40%" stop-color="#000000" stop-opacity="0" />
+          <stop offset="100%" stop-color="#000000" stop-opacity="0.75" />
+        </radialGradient>
+        <rect width="400" height="225" fill="url(#vig-snap)" />
+
+        <!-- Stacking Document Papers (Filling Room) -->
+        <g transform="translate(140, 75) rotate(-10) scale(0.65)" filter="url(#doc-shadow-snap)">
+          <rect x="0" y="0" width="160" height="210" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+          <line x1="20" y1="25" x2="140" y2="25" stroke="#94a3b8" stroke-width="2" />
+          <rect x="20" y="40" width="80" height="6" fill="#334155" />
+          <rect x="20" y="55" width="120" height="4" fill="#64748b" />
+          <rect x="20" y="65" width="115" height="4" fill="#64748b" />
+          <rect x="20" y="75" width="100" height="4" fill="#64748b" />
+          <rect x="20" y="95" width="120" height="4" fill="#64748b" />
+          <rect x="20" y="105" width="90" height="4" fill="#64748b" />
+        </g>
+
+        <g transform="translate(195, 60) rotate(8) scale(0.68)" filter="url(#doc-shadow-snap)">
+          <rect x="0" y="0" width="160" height="210" rx="3" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5" />
+          <line x1="20" y1="25" x2="140" y2="25" stroke="#94a3b8" stroke-width="2" />
+          <rect x="20" y="40" width="100" height="6" fill="#1e293b" />
+          <rect x="20" y="55" width="120" height="4" fill="#64748b" />
+          <rect x="20" y="65" width="115" height="4" fill="#64748b" />
+          <rect x="20" y="80" width="110" height="4" fill="#dc2626" />
+        </g>
+
+        <g transform="translate(160, 45) rotate(-2) scale(0.72)" filter="url(#doc-shadow-snap)">
+          <rect x="0" y="0" width="160" height="210" rx="3" fill="#ffffff" stroke="#64748b" stroke-width="1.5" />
+          <line x1="20" y1="25" x2="140" y2="25" stroke="#475569" stroke-width="2" />
+          <rect x="20" y="38" width="90" height="6" fill="#0f172a" />
+          <rect x="20" y="52" width="120" height="4" fill="#475569" />
+          <rect x="20" y="62" width="118" height="4" fill="#475569" />
+          <rect x="20" y="72" width="110" height="4" fill="#475569" />
+          <rect x="20" y="88" width="120" height="4" fill="#475569" />
+        </g>
+
+        <!-- NBC Style Lower Third Bar -->
+        <g transform="translate(25, 160)" filter="url(#doc-shadow-snap)">
+          <rect x="0" y="0" width="350" height="26" fill="#1e3a5f" rx="1" />
+          <rect x="0" y="0" width="80" height="26" fill="#0284c7" />
+          <text x="40" y="17" fill="#ffffff" font-family="'Inter', sans-serif" font-weight="900" font-size="9" text-anchor="middle" letter-spacing="1">NBC NEWS</text>
+          <text x="92" y="17" fill="#f8fafc" font-family="'Impact', sans-serif" font-size="12" letter-spacing="1">CRYPTO-PROMOTING CELEBRITIES UNDER FIRE</text>
+          <rect x="0" y="27" width="280" height="16" fill="rgba(10,15,25,0.95)" />
+          <line x1="0" y1="27" x2="0" y2="43" stroke="#f59e0b" stroke-width="3" />
+          <text x="8" y="39" fill="#f59e0b" font-family="'Inter', sans-serif" font-weight="800" font-size="8" letter-spacing="0.5">THE MULTI-BILLION DOLLAR CLASS-ACTION LAWSUIT</text>
+        </g>
+      </svg>
+    `)}`,
+
     // 16.5. James Jani FTX 3D Kinetic Logo Builder
+    'multi-image-flash-sequence': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <linearGradient id="mflash-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#020617"/>
+            <stop offset="60%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#020617"/>
+          </linearGradient>
+          <radialGradient id="mflash-burst" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+            <stop offset="30%" stop-color="#38bdf8" stop-opacity="0.6"/>
+            <stop offset="70%" stop-color="#0284c7" stop-opacity="0.15"/>
+            <stop offset="100%" stop-color="#0284c7" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <rect width="400" height="225" fill="url(#mflash-bg)"/>
+        
+        <!-- Film Strip Thumbnails -->
+        <rect x="25" y="45" width="75" height="110" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+        <rect x="115" y="45" width="75" height="110" rx="6" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <rect x="205" y="45" width="75" height="110" rx="6" fill="#1e293b" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <rect x="295" y="45" width="80" height="110" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="2"/>
+
+        <!-- Flash burst on first item -->
+        <circle cx="62" cy="100" r="48" fill="url(#mflash-burst)"/>
+
+        <!-- Motion Arrows -->
+        <path d="M 125 100 L 175 100 M 165 92 L 175 100 L 165 108" stroke="#38bdf8" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 265 100 L 215 100 M 225 92 L 215 100 L 225 108" stroke="#38bdf8" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        
+        <!-- Center Bloom Rings on 4th -->
+        <circle cx="335" cy="100" r="14" fill="none" stroke="#38bdf8" stroke-width="2"/>
+        <circle cx="335" cy="100" r="26" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="2,2"/>
+
+        <!-- Title Badge -->
+        <rect x="50" y="175" width="300" height="28" rx="6" fill="rgba(15,23,42,0.85)" stroke="rgba(56,189,248,0.4)" stroke-width="1"/>
+        <text x="200" y="193" fill="#38bdf8" font-family="'Inter', sans-serif" font-size="11" font-weight="800" text-anchor="middle" letter-spacing="1.5">⚡ MULTI-IMAGE FLASH &amp; LATERAL SEQUENCE</text>
+      </svg>
+    `)}`,
     'jani-ftx-logo-reveal': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
         <defs>
@@ -346,6 +496,48 @@
 
         <!-- Film Vignette Frame -->
         <rect width="400" height="225" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+      </svg>
+    `)}`,
+
+    // 16.6. Cinematic Light Trail Typewriter & Glitch Reveal
+    'cinematic-light-trail-typewriter': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <radialGradient id="clt-bg-void" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#000000"/>
+            <stop offset="60%" stop-color="#020408"/>
+            <stop offset="100%" stop-color="#000000"/>
+          </radialGradient>
+          <linearGradient id="clt-beam-flare" x1="0%" y1="50%" x2="100%" y2="50%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
+            <stop offset="25%" stop-color="rgba(56,189,248,0.2)"/>
+            <stop offset="50%" stop-color="#ffffff"/>
+            <stop offset="75%" stop-color="rgba(56,189,248,0.2)"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+          <filter id="clt-beam-glow" x="-20%" y="-100%" width="140%" height="300%">
+            <feGaussianBlur stdDeviation="6" result="blur1"/>
+            <feGaussianBlur stdDeviation="18" result="blur2"/>
+            <feMerge>
+              <feMergeNode in="blur2"/>
+              <feMergeNode in="blur1"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- Pure Black Void -->
+        <rect width="400" height="225" fill="url(#clt-bg-void)"/>
+
+        <!-- Horizontal Anamorphic Light Beam Streak -->
+        <rect x="10" y="110" width="380" height="5" fill="url(#clt-beam-flare)" filter="url(#clt-beam-glow)"/>
+        <rect x="50" y="112" width="300" height="1.5" fill="#ffffff" opacity="0.95"/>
+
+        <!-- Typewriter Condensed Text with Blinking Underscore -->
+        <text x="200" y="117" fill="#ffffff" font-family="'Oswald', sans-serif" font-weight="700" font-size="15" letter-spacing="3" text-anchor="middle" filter="url(#clt-beam-glow)">THIS IS NOT ONE OF THOSE STO_</text>
+
+        <!-- Subtle Scanlines Hint -->
+        <path d="M 0 100 L 400 100 M 0 106 L 400 106 M 0 112 L 400 112 M 0 118 L 400 118 M 0 124 L 400 124" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
       </svg>
     `)}`,
 
@@ -2060,6 +2252,149 @@
     </g>
   </g>
   <rect width="400" height="225" fill="url(#tsVignette)" pointer-events="none"/>
+</svg>`)}`;
+
+  SNAPSHOTS['circular-spin-flashlight-glitch'] = `data:image/svg+xml;utf8,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+      <defs>
+        <radialGradient id="csf-bg-dark" cx="50%" cy="50%" r="75%">
+          <stop offset="0%" stop-color="#0b1329"/>
+          <stop offset="70%" stop-color="#050811"/>
+          <stop offset="100%" stop-color="#020408"/>
+        </radialGradient>
+        <radialGradient id="csf-flash-burst" cx="50%" cy="45%" r="50%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="35%" stop-color="rgba(214,240,255,0.95)"/>
+          <stop offset="70%" stop-color="rgba(56,189,248,0.3)"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <linearGradient id="csf-arc-grad" x1="0%" y1="100%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ef4444"/>
+          <stop offset="50%" stop-color="#f87171"/>
+          <stop offset="100%" stop-color="#dc2626"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="225" fill="url(#csf-bg-dark)"/>
+      <!-- Falling Particles -->
+      <circle cx="85" cy="40" r="1.5" fill="#e2e8f0" opacity="0.6"/>
+      <circle cx="120" cy="110" r="2.2" fill="#ffd166" opacity="0.8"/>
+      <circle cx="170" cy="65" r="1.8" fill="#e2e8f0" opacity="0.7"/>
+      <circle cx="230" cy="140" r="2.5" fill="#38bdf8" opacity="0.8"/>
+      <circle cx="280" cy="75" r="1.5" fill="#e2e8f0" opacity="0.5"/>
+      <circle cx="320" cy="130" r="2.0" fill="#ffd166" opacity="0.75"/>
+      <circle cx="360" cy="90" r="1.5" fill="#e2e8f0" opacity="0.6"/>
+      <circle cx="60" cy="165" r="2.2" fill="#e2e8f0" opacity="0.7"/>
+      <circle cx="205" cy="180" r="1.8" fill="#38bdf8" opacity="0.6"/>
+      <!-- Circular Doodle Arc Path -->
+      <path d="M 110 145 C 100 65, 290 60, 285 140" fill="none" stroke="url(#csf-arc-grad)" stroke-width="3" stroke-dasharray="4,4"/>
+      <polygon points="285,148 277,136 293,136" fill="#ef4444"/>
+      <!-- Flashlight Optical Core -->
+      <circle cx="200" cy="100" r="75" fill="url(#csf-flash-burst)"/>
+      <!-- Glitch Slices -->
+      <rect x="130" y="88" width="140" height="4" fill="rgba(255,0,85,0.7)"/>
+      <rect x="145" y="105" width="130" height="3" fill="rgba(0,240,255,0.8)"/>
+      <!-- Badge Title -->
+      <rect x="75" y="185" width="250" height="26" rx="4" fill="rgba(0,0,0,0.85)" stroke="rgba(56,189,248,0.4)" stroke-width="1"/>
+      <text x="200" y="202" fill="#ffffff" font-family="sans-serif" font-size="10.5" font-weight="800" letter-spacing="1.5" text-anchor="middle">CIRCULAR SPIN &amp; 4-FLASH</text>
+    </svg>
+  `)}`;
+
+  SNAPSHOTS['static-transition'] = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <style>
+      @keyframes staticNoise1 { 0%, 100% { opacity: 0.25; } 50% { opacity: 0.85; } }
+      @keyframes staticNoise2 { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.2; } }
+      @keyframes staticNoise3 { 0%, 100% { opacity: 0.3; } 40% { opacity: 0.9; } 80% { opacity: 0.15; } }
+      @keyframes staticNoise4 { 0%, 100% { opacity: 0.65; } 30% { opacity: 0.1; } 70% { opacity: 0.95; } }
+      .n1 { animation: staticNoise1 0.18s steps(2) infinite 0.02s; }
+      .n2 { animation: staticNoise2 0.25s steps(2) infinite 0.08s; }
+      .n3 { animation: staticNoise3 0.14s steps(2) infinite 0.04s; }
+      .n4 { animation: staticNoise4 0.22s steps(2) infinite 0.11s; }
+    </style>
+    <radialGradient id="tv-crt-vignette" cx="50%" cy="50%" r="72%">
+      <stop offset="65%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.6"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Dark CRT Screen Void -->
+  <rect width="400" height="225" fill="#000000"/>
+
+  <!-- Horizontal Scanlines (10% increments matching hover preview) -->
+  <g class="tv-scanlines">
+    <line x1="0" y1="0.0" x2="400" y2="0.0" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="22.5" x2="400" y2="22.5" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="45.0" x2="400" y2="45.0" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="67.5" x2="400" y2="67.5" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="90.0" x2="400" y2="90.0" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="112.5" x2="400" y2="112.5" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="135.0" x2="400" y2="135.0" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="157.5" x2="400" y2="157.5" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="180.0" x2="400" y2="180.0" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+    <line x1="0" y1="202.5" x2="400" y2="202.5" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  </g>
+
+  <!-- TV Static Noise Pixels -->
+  <g class="tv-noise-pixels">
+    <rect class="n1" x="253.5" y="11.3" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n2" x="93.7" y="162.1" width="3" height="3" fill="#ffffff" opacity="0.75"/>
+    <rect class="n3" x="170.0" y="12.3" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n4" x="202.1" y="11.6" width="4" height="4" fill="#ffffff" opacity="0.9"/>
+    <rect class="n1" x="257.6" y="121.5" width="4" height="4" fill="#ffffff" opacity="0.6"/>
+    <rect class="n2" x="234.3" y="177.6" width="3" height="3" fill="#ffffff" opacity="0.35"/>
+    <rect class="n3" x="276.1" y="78.1" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n4" x="375.6" y="77.4" width="3" height="3" fill="#ffffff" opacity="0.6"/>
+    <rect class="n1" x="45.1" y="185.7" width="4" height="4" fill="#ffffff" opacity="0.25"/>
+    <rect class="n2" x="288.2" y="119.7" width="5" height="5" fill="#ffffff" opacity="0.25"/>
+    <rect class="n3" x="220.0" y="181.8" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+    <rect class="n4" x="81.8" y="20.7" width="4" height="4" fill="#ffffff" opacity="0.45"/>
+    <rect class="n1" x="386.3" y="187.3" width="3" height="3" fill="#ffffff" opacity="0.6"/>
+    <rect class="n2" x="114.7" y="140.8" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n3" x="150.1" y="50.4" width="4" height="4" fill="#ffffff" opacity="0.9"/>
+    <rect class="n4" x="367.7" y="143.4" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+    <rect class="n1" x="288.0" y="40.6" width="5" height="5" fill="#ffffff" opacity="0.45"/>
+    <rect class="n2" x="388.0" y="141.7" width="4" height="4" fill="#ffffff" opacity="0.9"/>
+    <rect class="n3" x="132.5" y="168.9" width="3" height="3" fill="#ffffff" opacity="0.35"/>
+    <rect class="n4" x="323.6" y="176.7" width="5" height="5" fill="#ffffff" opacity="0.45"/>
+    <rect class="n1" x="33.4" y="199.6" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n2" x="259.7" y="89.9" width="5" height="5" fill="#ffffff" opacity="0.35"/>
+    <rect class="n3" x="109.7" y="58.3" width="4" height="4" fill="#ffffff" opacity="0.9"/>
+    <rect class="n4" x="232.5" y="196.3" width="5" height="5" fill="#ffffff" opacity="0.45"/>
+    <rect class="n1" x="92.2" y="217.5" width="5" height="5" fill="#ffffff" opacity="0.25"/>
+    <rect class="n2" x="298.2" y="188.6" width="4" height="4" fill="#ffffff" opacity="0.9"/>
+    <rect class="n3" x="69.4" y="150.3" width="3" height="3" fill="#ffffff" opacity="0.6"/>
+    <rect class="n4" x="154.5" y="217.2" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+    <rect class="n1" x="338.5" y="8.4" width="3" height="3" fill="#ffffff" opacity="0.9"/>
+    <rect class="n2" x="347.8" y="165.2" width="4" height="4" fill="#ffffff" opacity="0.25"/>
+    <rect class="n3" x="120.7" y="39.5" width="3" height="3" fill="#ffffff" opacity="0.9"/>
+    <rect class="n4" x="344.3" y="61.8" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+    <rect class="n1" x="358.4" y="190.5" width="4" height="4" fill="#ffffff" opacity="0.9"/>
+    <rect class="n2" x="202.9" y="48.2" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n3" x="215.1" y="171.1" width="3" height="3" fill="#ffffff" opacity="0.75"/>
+    <rect class="n4" x="132.5" y="10.1" width="4" height="4" fill="#ffffff" opacity="0.45"/>
+    <rect class="n1" x="99.9" y="57.1" width="3" height="3" fill="#ffffff" opacity="0.25"/>
+    <rect class="n2" x="289.1" y="179.0" width="4" height="4" fill="#ffffff" opacity="0.35"/>
+    <rect class="n3" x="261.3" y="206.7" width="4" height="4" fill="#ffffff" opacity="0.45"/>
+    <rect class="n4" x="210.6" y="134.6" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+    <rect class="n1" x="298.0" y="152.3" width="4" height="4" fill="#ffffff" opacity="0.6"/>
+    <rect class="n2" x="390.1" y="143.8" width="5" height="5" fill="#ffffff" opacity="0.75"/>
+    <rect class="n3" x="181.4" y="58.6" width="3" height="3" fill="#ffffff" opacity="0.45"/>
+    <rect class="n4" x="16.1" y="123.4" width="4" height="4" fill="#ffffff" opacity="0.25"/>
+    <rect class="n1" x="35.3" y="139.8" width="4" height="4" fill="#ffffff" opacity="0.25"/>
+    <rect class="n2" x="355.7" y="188.2" width="3" height="3" fill="#ffffff" opacity="0.75"/>
+    <rect class="n3" x="99.4" y="147.8" width="4" height="4" fill="#ffffff" opacity="0.75"/>
+    <rect class="n4" x="58.8" y="204.3" width="5" height="5" fill="#ffffff" opacity="0.35"/>
+    <rect class="n1" x="309.3" y="177.2" width="4" height="4" fill="#ffffff" opacity="0.25"/>
+    <rect class="n2" x="45.2" y="97.4" width="5" height="5" fill="#ffffff" opacity="0.6"/>
+    <rect class="n3" x="187.3" y="160.6" width="3" height="3" fill="#ffffff" opacity="0.25"/>
+    <rect class="n4" x="162.6" y="77.9" width="3" height="3" fill="#ffffff" opacity="0.35"/>
+    <rect class="n1" x="81.6" y="119.7" width="4" height="4" fill="#ffffff" opacity="0.6"/>
+    <rect class="n2" x="78.5" y="104.1" width="3" height="3" fill="#ffffff" opacity="0.6"/>
+    <rect class="n3" x="318.3" y="187.5" width="3" height="3" fill="#ffffff" opacity="0.25"/>
+  </g>
+
+  <!-- CRT Vignette -->
+  <rect width="400" height="225" fill="url(#tv-crt-vignette)" pointer-events="none"/>
 </svg>`)}`;
 
   window.tplGetSnapshot = function (id) {

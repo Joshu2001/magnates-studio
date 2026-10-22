@@ -1,4 +1,4 @@
-﻿# Magnates Studio — Effects & Capabilities Catalog (ND Registry)
+# Magnates Studio — Effects & Capabilities Catalog (ND Registry)
 
 > **File Purpose:** Master registry of all visual effects, kinetic typography styles, audio treatments, and editing capabilities in **Magnates Studio**. 
 > Designed as a dual-purpose specification:
@@ -33,6 +33,9 @@
 | `fx-parallax-tilt` | **OG 3-Layer Parallax Engine** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *OG 3-Layer Parallax Engine* |
 | `fx-spooner-parallax` | **2.5D Parallax Photo Effect** | 2.5D Camera & Depth | ✅ Implemented | Templates -> 3D Spatial -> *2.5D Parallax Photo Effect* or Clip Menu -> *⚡ 2.5D Parallax Photo* |
 | `jani-forbes-fraud-reveal` | **James Jani Forbes 3D Cover: Paparazzi Flash & Anamorphic Beam** | 3D Spatial & Motion | ✅ Implemented | Templates -> 3D Spatial -> *James Jani Forbes 3D Cover* |
+| `multi-image-flash-sequence` | **Modular Multi-Image Shutter Flash & Lateral Sequence Suite** | Transitions & Storyboard | ✅ Implemented | Templates -> Transitions -> *Modular Multi-Image Shutter Flash* |
+| `cinematic-light-trail-typewriter` | **Cinematic Light Trail Typewriter & Glitch Reveal** | Text & Titles | ✅ Implemented | Templates -> Text & Titles -> *Cinematic Light Trail Typewriter* |
+| `jani-cinematic-letterbox` | **James Jani Cinematic Letterbox & Lower Caption Frame** | Documentary & Framing | ✅ Implemented | Templates -> Documentary -> *James Jani Cinematic Letterbox* |
 | `fx-paper-texture` | **Stop-Motion Crumpled Paper Overlay** | Texture & Grain | ⏳ Backlog | Planned: 12fps cycling grain blend mode |
 
 ---
@@ -709,3 +712,198 @@ These are multi-effect presets that give videos the signature high-production lo
   }
 }
 ```
+
+
+---
+
+## 📽️ Cinematic Light Trail Typewriter & Glitch Reveal Suite
+
+### Overview & Narrative Intent
+* **System ID:** `cinematic-light-trail-typewriter`
+* **Industry & Creator Aliases:** Anamorphic Streak Typewriter, James Jani Mystery Title, High-Tension Statement Reveal, Digital Glitch Breakout
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** ⚡ High Tension & Climactic Narrative Statement
+* **Visual Description:**
+  The iconic mystery documentary statement opener: pitch-black cinematic screen where condensed uppercase typography (*"THIS IS NOT ONE OF THOSE STORIES"*) is typed character-by-character with a pulsating cursor. As each character appears, it leaves a brilliant, directional trail of light (signature 2.39:1 anamorphic horizontal lens flare streak) with an intense white-hot core and soft dissipating bloom tails. CRT scanlines, 35mm film grain, and subtle dust scratches add optical analog weight. Once the phrase completes, after a brief psychological pause, the text violently detonates in a high-frequency digital CRT glitch (horizontal slice displacement, chromatic aberration split, and static noise scramble) before immediately revealing a secondary background plate or video through an impactful camera flash punch-zoom.
+
+### Granular Customization Capabilities
+1. **Background**:
+   * Changeable black screen void with subtle radial vignette.
+   * Upload custom background image or video file (`bgMediaUrl`).
+   * Color tinting, darkness / dimming slider (0% - 100%), and vignette shadow intensity.
+   * Preset backdrops: Pure Black Void, Smoky Fog, Boardroom Silhouette, Tactical Desk, CCTV Surveillance.
+2. **Typography & Content**:
+   * Fully editable text string with character-by-character animation.
+   * Font selector: Oswald (Tall Condensed), Bebas Neue, Inter, JetBrains Mono, Cinzel, Anton.
+   * Font size, letter spacing (tracking), font weight, text color, and diffuse glow.
+   * Blinking cursor style: Underscore (`_`), Vertical Pipe (`|`), Block (`█`), or None.
+   * Typing duration and pause before glitch.
+3. **Light Trail & Direction**:
+   * Multi-directional light control:
+     * **Horizontal (0°)**: Classic anamorphic cinema lens flare streak cutting across the frame.
+     * **Vertical (90°)**: Volumetric ascending/descending pillar of light.
+     * **Diagonal (45° / 135°)**: Angled dynamic streak.
+     * **Custom Dial (0° - 360°)**: Granular rotational steering.
+     * **Radial (360°)**: Expanding omnidirectional bloom halo.
+   * Light color picker (white, electric cyan, amber, crimson, neon violet).
+   * Beam length / spread slider (150px - 1400px).
+   * Core beam intensity and bloom diffusion radius.
+   * Trail persistence / linger decay rate.
+4. **Glitch-Out Climax**:
+   * High-frequency horizontal slice displacement (reproducing Image 3).
+   * Chromatic RGB split (red/cyan separation) and digital raster noise.
+   * Glitch intensity slider (0.2x - 2.5x) and duration slider (0.2s - 1.5s).
+5. **Secondary Scene Reveal**:
+   * Upload custom target image or video (`revealMediaUrl`).
+   * Built-in dramatic presets (Boardroom, Tactical War Room, CCTV, Tokyo Night).
+   * Transition styles: Camera Flash Punch-Zoom, Glitch Impact Cut, Cross Dissolve.
+6. **Atmospheric Texture**:
+   * CRT scanlines with toggle and opacity slider.
+   * Procedural floating dust motes & 35mm hair scratch flickers.
+   * Optical chromatic aberration.
+
+### Contextual Inspector Parameters
+```json
+{
+  "text": "THIS IS NOT ONE OF THOSE STORIES",
+  "fontFamily": "Oswald, sans-serif",
+  "fontSize": 44,
+  "letterSpacing": 6,
+  "textColor": "#ffffff",
+  "cursorStyle": "_",
+  "cursorBlinkSpeed": 2.5,
+  "typingDuration": 3.2,
+  "holdBeforeGlitch": 1.2,
+  "lightDirection": "horizontal",
+  "lightAngle": 0,
+  "lightColor": "#ffffff",
+  "trailLength": 750,
+  "beamIntensity": 2.2,
+  "bloomRadius": 28,
+  "backgroundColor": "#000000",
+  "bgMediaUrl": "",
+  "bgDarkness": 0.85,
+  "vignetteIntensity": 0.85,
+  "scanlines": true,
+  "scanlineOpacity": 0.28,
+  "dustScratches": true,
+  "dustCount": 45,
+  "chromaticAberration": true,
+  "glitchEnabled": true,
+  "glitchIntensity": 1.35,
+  "glitchDuration": 0.65,
+  "revealMediaUrl": "/boardroom_scene_hd.jpg",
+  "revealStyle": "flash-zoom",
+  "revealHoldDuration": 2.2,
+  "totalDuration": 7.2
+}
+```
+
+### AI Action Signature (Machine-Readable Spec)
+```json
+{
+  "action": "apply_template",
+  "templateId": "cinematic-light-trail-typewriter",
+  "category": "Text & Titles",
+  "parameters": {
+    "text": "THIS IS NOT ONE OF THOSE STORIES",
+    "lightDirection": "horizontal",
+    "lightColor": "#ffffff",
+    "beamIntensity": 2.2,
+    "glitchIntensity": 1.35,
+    "revealMediaUrl": "/boardroom_scene_hd.jpg",
+    "revealStyle": "flash-zoom"
+  }
+}
+```
+
+
+---
+
+## ⚡ 17. Modular Multi-Image Shutter Flash & Lateral Sequence Suite
+
+### 17.1 Cinematic Multi-Image Flash & Lateral Storyboard Engine
+* **System ID:** `multi-image-flash-sequence`
+* **Category:** Transitions & Documentary Storytelling
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** ⚡ High-Energy Investigative Shock $\rightarrow$ Lateral Ping-Pong $\rightarrow$ Sluggish Center Dread
+* **Visual & Acoustic Choreography:**
+  1. **Clip 1 (Forensic Photoflash):** Realistic camera flash with non-linear phosphor decay, optical halation, camera micro-shake, and acoustic shutter sound profile.
+  2. **Clip 2 (Left-to-Right Lateral Push):** Directional push with simulated shutter angle motion blur.
+  3. **Clip 3 (Right-to-Left Lateral Push):** Counter-directional push maintaining narrative momentum.
+  4. **Clip 4 (Center Core Sluggish Bloom):** Slow, heavy expansion from the center core of the previous image accompanied by sub-bass bloom.
+  5. **Modular Extension:** Supports unlimited ($N$) images with customizable transition types, durations, and stock swapping.
+* **1-Click Mood Psychology Presets:**
+  * **Investigative Exposé (Cold Xenon):** Heavy DSLR mirror slap, high contrast, cold daylight tint.
+  * **Vintage Archival (Warm Amber):** Nostalgic 35mm mechanical Leica snap, warm incandescent flash, soft film grain.
+  * **High-Octane Paparazzi Burst:** Triple strobe burst, aggressive whips, fast-paced editorial energy.
+  * **True Crime / Psychological Descent:** Muted desaturated flash, disposable crunch, sluggish center creep with deep sub-bass.
+* **How to Access:** Navigate to **Templates** -> **Transitions** -> **"Modular Multi-Image Shutter Flash & Lateral Sequence Suite"**.
+
+
+---
+
+## 🎬 18. James Jani Cinematic Letterbox & Lower Caption Frame
+
+### 18.1 Signature Documentary Letterbox Matte & Lower Space
+* **System ID:** `jani-cinematic-letterbox`
+* **Industry & Creator Aliases:** James Jani Letterbox, Documentary Subtitle Frame, Cinematic Widescreen Matte, Lower Caption Frame
+* **Status:** ✅ Implemented
+* **Pacing & Energy:** 🎙️ Monologue Narrative Pace / Cinematic Monologue & Evidence Presentation
+* **Visual Description:**
+  The iconic widescreen presentation frame from James Jani video essays:
+  1. **Top & Bottom Matte Bars:** Customizable color letterbox bars (pure cinematic black `#000000`, obsidian navy, studio dark, crimson, or vintage ivory), selectable as unified or independent colors.
+  2. **Centered Middle Media:** Video clip or photo sitting centered in the middle aperture without taking the full screen. Interactive dragging and scaling supported directly on canvas.
+  3. **Lower Caption Space:** Prominent subtitle/caption text space situated directly under the media in the bottom matte bar (`"SPUN OVER THE COURSE OF A FEW YEARS."`) rendered in high-impact condensed bold uppercase typography with live inline editing.
+  4. **Corner Watermark & Badges:** Signature bottom-left channel brand watermark (`JANi`) and bottom-right call-to-action (`SUBSCRIBE`).
+  5. **Atmosphere:** 35mm film grain texture pass and slow cinematic camera push-in.
+* **How to Achieve in Magnates Studio:**
+  1. Open **Templates** -> **Documentary** -> Select **"James Jani Cinematic Letterbox & Lower Caption Frame"**.
+  2. In the Inspector, choose Top & Bottom Bar colors, bar height percentage (e.g. 14% Anamorphic, 16% CinemaScope, 11% Univisium), drag the photo/video to your preferred framing, and customize the subtitle caption text.
+  3. Click **"Apply to Timeline"** to generate editable timeline tracks.
+
+
+---
+
+## 🕒 19. Cinematic Tension Countdown Timer HUD & Climax Impact Engine
+
+### 19.1 High-Stakes Documentary Countdown Dial & Tension Riser
+* **System ID:** `countdown-timer`
+* **Industry & Creator Aliases:** Vox T-Minus Clock, James Jani Countdown, Climax Timer HUD, Dramatic Listicle Rank Reveal, Tension Countdown
+* **Status:** ✅ Implemented & Upgraded
+* **Pacing & Energy:** ⚡⚡⚡ High Tension Build / Climax Impact Transition
+* **Visual & Structural Description:**
+  The definitive countdown timer engine engineered for documentary tension building, chapter intros, and climactic reveals:
+  1. **Fullscreen-Adaptive Architecture:** Dynamically scales to any resolution (720p, 1080p, 4K, ultrawide 21:9, and vertical 9:16). Numbers scale dynamically (`clamp(68px, 18vmin, 220px)`) providing commanding screen presence in Fullscreen and Theater view.
+  2. **4 Display Modes:**
+     * **Big Numeral (3, 2, 1):** Huge block typography that springs forward with overshoot on each second tick.
+     * **T-Minus Monospace (`[ T-MINUS 00:03.42 ]`):** Military-grade telemetry clock with live centisecond counters.
+     * **Digital Stopwatch (`00:03:42`):** Clean mission countdown clock.
+     * **Top 10 List Rank (`#3 OF 10`):** Listicle rank countdown.
+  3. **3 Display Scale Presets:**
+     * **Massive (85% Viewport):** Blockbuster screen-filling countdown dial for fullscreen tension.
+     * **Standard (65% Viewport):** Balanced layout with telemetry cards.
+     * **Compact (45% Viewport):** Tight picture-in-picture / corner overlay layout.
+  4. **Multi-Layered Precision HUD Geometry:**
+     * Dynamic circular SVG arc that smoothly drains or fills 360° synced with timeline progress (`stroke-dashoffset`).
+     * Outer rotating 120s radar reticle with 60 degree ticks and cardinal degree markers.
+     * Counter-rotating inner orbital ring and pulsing shockwave rings on each integer second tick.
+     * Tactical corner brackets, anamorphic laser flare streaks, and CRT scanlines.
+  5. **Zero Climax State:**
+     * Optical screen bloom flash and camera recoil impact shake.
+     * Customizable climax reveal word (`IMPACT`, `ZERO`, `REVEAL`, `CRASH`, etc.) in blazing neon glow.
+     * 28Hz sub-bass impact drop and audio shockwave.
+  6. **Integrated Procedural Audio Engine:**
+     * Web Audio API synthesized mechanical clock ticking, bio-thriller heartbeat, or radar chirp with pitch ramping toward zero.
+     * Optional toggle and master volume slider.
+  7. **6 One-Click Aesthetic Presets:**
+     * **Crimson Thriller (Default):** Deep dark vignette, red pulsing glow, subtle CRT scanlines, red chromatic aberration.
+     * **Cyberpunk Cyan HUD:** Sci-fi tactical grid, cyan & electric blue dual rings, digital crosshairs, telemetry coordinates.
+     * **Gold Prestige:** Dark navy & warm amber gold aesthetic, serif typography, elegant thin concentric rings.
+     * **Minimal Swiss (Vox/Bloomberg):** Ultra-clean monochrome, high-contrast stark numbers, precision circular SVG progress bar.
+     * **Hazard Warning:** High-contrast caution yellow, flashing beacon strobe, military stencil aesthetic.
+     * **Matrix Stream:** Phosphor green terminal stream, CRT distortion.
+* **How to Access:**
+  1. Open **Templates** -> **Documentary** or **Motion Graphics** -> Select **"Countdown Timer"**.
+  2. In the contextual inspector, select your style preset, start count, display mode, scale size, headline texts, and audio settings.
+  3. Scrub playback timeline or toggle fullscreen to watch the dynamic countdown count down in real time.

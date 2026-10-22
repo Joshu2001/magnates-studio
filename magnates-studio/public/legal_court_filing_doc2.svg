@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 880" width="680" height="880">
+  <defs>
+    <filter id="doc-subtle-grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.96   0 0 0 0 0.95   0 0 0 0 0.93  0 0 0 0.07 0" />
+      <feBlend mode="multiply" in="SourceGraphic" />
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="680" height="880" fill="#fcfbfa" stroke="#e5e7eb" stroke-width="1" rx="2" />
+  <rect x="0" y="0" width="680" height="880" fill="url(#doc-subtle-grain)" opacity="0.5" />
+
+  <line x="45" y="32" x="635" y="32" stroke="#9ca3af" stroke-width="0.8" />
+  <text x="50%" y="24" text-anchor="middle" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#4b5563" letter-spacing="1.5">Case 22-11068-JTD   Filed 11/14/22   Page 2 of 8</text>
+
+  <text x="50%" y="68" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#111827" letter-spacing="1.2">UNITED STATES DISTRICT COURT</text>
+  <text x="50%" y="92" text-anchor="middle" font-family="'Times New Roman', serif" font-size="13.5" font-weight="600" fill="#374151">SOUTHERN DISTRICT OF NEW YORK</text>
+  <line x="50" y="108" x="630" y="108" stroke="#111827" stroke-width="1.5" />
+
+  <text x="50%" y="140" text-anchor="middle" font-family="'Times New Roman', serif" font-size="14" font-weight="bold" fill="#111827" letter-spacing="1">CLASS-ACTION COMPLAINT FOR MULTI-BILLION DAMAGES</text>
+<text x="50%" y="164" text-anchor="middle" font-family="'Times New Roman', serif" font-size="14" font-weight="bold" fill="#111827" letter-spacing="1">VIOLATION OF THE SECURITIES EXCHANGE ACT OF 1934</text>
+<text x="65" y="188" font-family="'Times New Roman', serif" font-size="12.5" font-weight="bold" fill="#111827">12.</text>
+<text x="90" y="188" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">Plaintiffs bring this nationwide class action on behalf of all retail purchasers who held unregistered accounts.</text>
+<text x="60" y="208" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="228" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="65" y="260" font-family="'Times New Roman', serif" font-size="12.5" font-weight="bold" fill="#111827">13.</text>
+<text x="90" y="260" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">Defendants made false representations asserting that client custody funds were safely backed 1-to-1 at all times.</text>
+<text x="60" y="280" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="300" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="65" y="332" font-family="'Times New Roman', serif" font-size="12.5" font-weight="bold" fill="#111827">14.</text>
+<text x="90" y="332" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">Promotional marketing deceptively portrayed high-risk speculative tokens as insured custodial reserve deposits.</text>
+<text x="60" y="352" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="372" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="392" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+
+  <g transform="translate(520, 180) rotate(10)">
+        <rect x="-85" y="-24" width="170" height="48" rx="3" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-dasharray="5,3" opacity="0.88" />
+        <text x="0" y="-3" text-anchor="middle" font-family="'Impact', 'Arial Black', sans-serif" font-size="15" font-weight="bold" fill="#1d4ed8" opacity="0.9" letter-spacing="2">CLASS ACTION</text>
+        <text x="0" y="15" text-anchor="middle" font-family="'Courier New', monospace" font-size="9.5" font-weight="bold" fill="#1d4ed8" opacity="0.9">UNITED STATES COURT</text>
+      </g>
+
+
+  <text x="50%" y="855" text-anchor="middle" font-family="'Times New Roman', serif" font-size="11" fill="#6b7280">Page 2 of 8</text>
+</svg>

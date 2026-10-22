@@ -2833,6 +2833,11 @@ function drawCrowdWaypointsOverlay(ctx, dx, dy, w, h, clip) {
     ctx.restore();
   }
 
+  // 5. Cinematic Letterbox Frame Overlay (Top and Bottom Matte Bars + Lower Space)
+  if (targetClip?.cinematicLetterbox && typeof window.renderJaniCinematicLetterboxCanvasFrame === 'function') {
+    window.renderJaniCinematicLetterboxCanvasFrame(ctx, canvas.width, canvas.height, targetClip, clipElapsed);
+  }
+
   ctx.restore();
 }
 
@@ -21907,6 +21912,78 @@ let currentTemplateCategoryFilter = 'all';
 // Built-in Curated Templates Engineered for Beginners
 const BUILTIN_TEMPLATES = [
   {
+    id: 'tpl_jani_cinematic_letterbox',
+    name: 'James Jani Cinematic Letterbox & Caption',
+    category: 'documentary',
+    badge: 'Cinematic Matte',
+    aspectRatio: '16:9',
+    duration: 8,
+    description: 'Widescreen letterbox matte bars with customizable colors, centered draggable photo/video, and lower typography space.',
+    requires: ['image', 'text'],
+    slots: [
+      { id: 'slot-1', type: 'image', label: 'Centered Middle Media', duration: 8.0, hint: 'Draggable video or photo in center' },
+      { id: 'slot-2', type: 'text', label: 'Lower Caption Subtitle', duration: 8.0, text: 'SPUN OVER THE COURSE OF A FEW YEARS.' }
+    ],
+    previewBg: 'linear-gradient(135deg, #090a10, #171b26)',
+    state: {
+      duration: 8,
+      background: [{ id: 'bg-1', start: 0, duration: 8, bgType: 'solid_black', bgColor: '#000000' }],
+      image: [
+        {
+          id: 'clip-media-letterbox-default',
+          start: 0,
+          duration: 8,
+          url: '/jani_cinematic_letterbox_ref.png',
+          file: { name: 'Jani_Letterbox_Frame.png', url: '/jani_cinematic_letterbox_ref.png', isImage: true },
+          scale: 1.0,
+          x: 0,
+          y: 0,
+          cinematicLetterbox: true,
+          letterboxConfig: {
+            barColor: '#000000',
+            topBarColor: '#000000',
+            bottomBarColor: '#000000',
+            separateBarColors: false,
+            barHeightPercent: 14,
+            captionText: 'SPUN OVER THE COURSE OF A FEW YEARS.',
+            captionFont: 'Oswald, "Bebas Neue", Impact, sans-serif',
+            captionSize: 32,
+            captionColor: '#ffffff',
+            captionLetterSpacing: 2.5,
+            captionUppercase: true,
+            showChannelTag: true,
+            channelTagText: 'JANi',
+            showActionTag: true,
+            actionTagText: 'SUBSCRIBE'
+          },
+          zIndex: 15
+        }
+      ],
+      text: [
+        {
+          id: 'txt-letterbox-caption',
+          start: 0,
+          duration: 8,
+          text: 'SPUN OVER THE COURSE OF A FEW YEARS.',
+          highlight: '',
+          fontFamily: 'Oswald, "Bebas Neue", Impact, sans-serif',
+          fontSize: 32,
+          textColor: '#ffffff',
+          highlightColor: '#ff334b',
+          anim: 'pop',
+          sfx: 'whoosh',
+          position: 'bottom',
+          y: 280,
+          letterSpacing: 2.5,
+          zIndex: 35,
+          layerOrder: 'front'
+        }
+      ],
+      chart: [],
+      quote: []
+    }
+  },
+  {
     id: 'tpl_tiktok_hook_viral',
     name: 'TikTok / Reels Viral Hook & Drop',
     category: 'tiktok_reels',
@@ -23250,6 +23327,20 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'jani-cinematic-letterbox',
+    title: 'James Jani Cinematic Letterbox & Lower Caption Frame',
+    category: 'Documentary',
+    origCategory: 'Documentary',
+    badge: 'JANI CINEMATIC',
+    difficulty: '1-Click',
+    timeToApply: '6 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(20, 20, 25, 0.98))',
+    description: 'Iconic widescreen documentary letterbox template with customizable top and bottom matte bars (user selectable colors), centered draggable photo/video framing, and prominent lower space for stylized typing captions.',
+    tags: ['James Jani', 'Cinematic Letterbox', 'Lower Caption', 'Widescreen Matte', 'Documentary', 'Aspect Ratio', 'Subtitles'],
+    defaultImage: '/jani_cinematic_letterbox_ref.png',
+    secondaryImage: '/cinematic_footage_loop.mp4'
+  },
+  {
     id: 'jani-cross-section-reveal',
     title: 'James Jani Cross-Section: Dust Drift & Zoom-Rise Underworld Scroll',
     category: '3D Spatial',
@@ -24500,6 +24591,58 @@ id: 'map',
     defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
   },
+    {
+    id: 'cinematic-light-trail-typewriter',
+    title: 'Cinematic Light Trail Typewriter & Glitch Reveal',
+    category: 'Text & Titles',
+    badge: 'Cinematic Master',
+    difficulty: '1-Click',
+    timeToApply: '7 sec',
+    previewGradient: 'linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(56, 189, 248, 0.25), rgba(0, 0, 0, 0.8))',
+    description: 'Cinematic typewriter typography with luminous directional light trails (horizontal anamorphic beams), CRT scanlines, dust scratches, intense digital glitch-out, and secondary scene reveal.',
+    tags: ['Typewriter', 'Light Trail', 'Anamorphic Flare', 'Glitch Reveal', 'Cinematic Title', 'Text FX'],
+    defaultImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23000000%22%2F%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22streak%22%20x1%3D%220%25%22%20y1%3D%2250%25%22%20x2%3D%22100%25%22%20y2%3D%2250%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0)%22%2F%3E%3Cstop%20offset%3D%2235%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0.3)%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23ffffff%22%2F%3E%3Cstop%20offset%3D%2265%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0.3)%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0)%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20x%3D%2220%22%20y%3D%22110%22%20width%3D%22360%22%20height%3D%224%22%20fill%3D%22url(%23streak)%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22116%22%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2216%22%20font-weight%3D%22900%22%20letter-spacing%3D%223%22%20text-anchor%3D%22middle%22%3ETHIS%20IS%20NOT%20ONE%20OF%20THOSE%20STO_%3C%2Ftext%3E%3C%2Fsvg%3E',
+    secondaryImage: '/boardroom_scene_hd.jpg'
+  },
+  {
+    id: 'document-barrage-suite',
+    title: 'Screen-Filling Document Barrage & Evidence Stack Suite',
+    category: '3D Spatial',
+    badge: 'Pro Documentary',
+    difficulty: 'Pro Editor',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(2, 132, 199, 0.35), rgba(15, 23, 42, 0.9))',
+    description: 'Investigative documentary screen fill: room background blurs out while legal filings, court petitions, and evidence sheets appear one by one cascading in 3D perspective to fill the screen. Fully granular controls for background blur, stagger arrival, entrance style (slam, drift, whip, depth-dive), custom uploads, and broadcast news lower-third banner.',
+    tags: ['Documentary', 'Legal Documents', 'Background Blur', 'Screen Fill', 'Cascading Arrival', 'Lawsuit', 'Lower Third', 'Paper Slam SFX'],
+    defaultImage: 'legal_court_filing_doc1.svg',
+    secondaryImage: 'legal_court_filing_doc2.svg'
+  },
+    {
+    id: 'circular-spin-flashlight-glitch',
+    title: 'Circular Arc Spin & Paparazzi Flashlight Glitch Transition',
+    category: 'Transitions',
+    badge: 'Cinematic Burst',
+    difficulty: 'Pro Editor',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(3, 7, 18, 0.95), rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.95))',
+    description: 'Image initiates a circular arc spin from left over head down to right, accompanied by falling particles and a 4-flash photoflash sequence (1 slow bloom, 3 fast paparazzi bursts) culminating in a digital glitch transition to a second person.',
+    tags: ['Circular Spin', 'Doodle Arc', 'Flashlight', 'Paparazzi Flash', 'Falling Particles', 'Glitch Transition', 'AI Subject Reveal'],
+    defaultImage: 'generated_person_1.jpg',
+    secondaryImage: 'generated_person_2.jpg'
+  },
+{
+    id: 'multi-image-flash-sequence',
+    title: 'Modular Multi-Image Shutter Flash & Lateral Sequence Suite',
+    category: 'Transitions',
+    badge: 'Granular Storyboard Suite',
+    difficulty: 'Pro Editor',
+    timeToApply: '5 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(56, 189, 248, 0.25), rgba(15, 23, 42, 0.85))',
+    description: 'Cinematic documentary 4+ image sequence: high-impact forensic photoflash with realistic phosphor decay and micro-shake, counter-directional lateral pushes, and sluggish center core expansion. Unlimited images, 4 acoustic shutter profiles, and 1-click mood psychology presets.',
+    tags: ['Camera Flash', 'Multi-Image', 'Lateral Push', 'Sluggish Bloom', 'Documentary', 'Sound FX', 'Mood Presets'],
+    defaultImage: 'photocut_scene1.png',
+    secondaryImage: 'photocut_scene4.png'
+  },
   {
     id: 'jani-ftx-logo-reveal',
     title: 'James Jani FTX 3D Kinetic Logo Builder',
@@ -25464,7 +25607,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['circular-spin-flashlight-glitch', 'document-barrage-suite', 'wire-transfer', 'money-stack', 'multi-image-flash-sequence', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -26013,7 +26156,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'pyramid-scheme', 'scam-redaction', 'pyramid-scheme', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['countdown-timer', 'circular-spin-flashlight-glitch', 'conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'pyramid-scheme', 'scam-redaction', 'pyramid-scheme', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting', 'merger-acquisition']);
 
 
 window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
@@ -26391,7 +26534,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
             </div>
           </div>
-        </div>`; } else if (tplId === 'wire-transfer') {
+        </div>`; } else if (tplId === 'merger-acquisition') {
+      if (typeof window.tplMountMergerAcqPreview === 'function') window.tplMountMergerAcqPreview(fxContainer);
+    } else if (tplId === 'wire-transfer') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #040711; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img src="/wire_transfer_cinematic_plate.png" alt="Wire Transfer 3D" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -28308,6 +28453,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (tplId === 'document-barrage-suite') {
+      if (typeof window.stepDocumentBarrageAnimation === 'function') {
+        const docConfig = (typeof window.tplGetContextualData === 'function')
+          ? window.tplGetContextualData('document-barrage-suite')
+          : (window.DOCUMENT_BARRAGE_CONFIG || {});
+        window.stepDocumentBarrageAnimation(fxContainer, tplId, t, docConfig);
+      }
     } else if (tplId === 'jani-puzzle-narrative-suite') {
       if (typeof window.buildPuzzleStageHtml === 'function') {
         const pzConfig = (typeof window.tplGetContextualData === 'function') 
@@ -28567,7 +28719,39 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'jani-cross-section-reveal') {
+        } else if (tplId === 'countdown-timer') {
+      if (typeof window.stepCountdownTimerAnimation === 'function') {
+        const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('countdown-timer') : (typeof window.getCountdownTimerDefaultConfig === 'function' ? window.getCountdownTimerDefaultConfig() : {});
+        if (!fxContainer.querySelector('#cdt-wrapper') && typeof window.tplMountCountdownTimerStage === 'function') {
+          window.tplMountCountdownTimerStage(fxContainer, cdtData);
+        }
+        window.stepCountdownTimerAnimation(fxContainer, tplId, t, cdtData);
+      }
+} else if (tplId === 'circular-spin-flashlight-glitch') {
+      if (typeof window.stepCircularSpinFlashAnimation === 'function') {
+        const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : (typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : {});
+        if (!fxContainer.querySelector('#csf-wrapper') && typeof window.tplMountCircularSpinFlashStage === 'function') {
+          window.tplMountCircularSpinFlashStage(fxContainer, csfData);
+        }
+        window.stepCircularSpinFlashAnimation(fxContainer, tplId, t, csfData);
+      }
+} else   if (tplId === 'countdown-timer') {
+    if (typeof window.stepCountdownTimerAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('countdown-timer') : {};
+      window.stepCountdownTimerAnimation(stage, 'countdown-timer', localSceneT, cdtData);
+    }
+  }
+
+  if (tplId === 'circular-spin-flashlight-glitch') {
+    if (typeof window.stepCircularSpinFlashAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : (typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : {});
+      window.stepCircularSpinFlashAnimation(stage, 'circular-spin-flashlight-glitch', localSceneT, csfData);
+    }
+  }
+
+  if (tplId === 'jani-cross-section-reveal') {
       if (typeof window.stepJaniCrossSectionAnimation === 'function') {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
         window.stepJaniCrossSectionAnimation(fxContainer, tplId, t, cData);
@@ -29542,6 +29726,13 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
         extractedStrip.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px ${shadowSpread}px rgba(8, 6, 4, ${shadowOpacity}), 0 4px 12px rgba(8, 6, 4, 0.4)`;
       }
+    } else if (tplId === 'document-barrage-suite') {
+      if (typeof window.stepDocumentBarrageAnimation === 'function') {
+        const docConfig = (typeof window.tplGetContextualData === 'function')
+          ? window.tplGetContextualData('document-barrage-suite')
+          : (window.DOCUMENT_BARRAGE_CONFIG || {});
+        window.stepDocumentBarrageAnimation(fxContainer, tplId, t, docConfig);
+      }
     } else if (tplId === 'jani-puzzle-narrative-suite') {
       if (typeof window.stepJaniPuzzleAnimation === 'function') {
         const pzData = (typeof window.tplGetContextualData === 'function')
@@ -29668,7 +29859,15 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const shakeMag = (1 - impactProg) * 8;
         if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
       }
-        } else if (tplId === 'jani-cross-section-reveal') {
+        } else if (tplId === 'circular-spin-flashlight-glitch') {
+      if (typeof window.stepCircularSpinFlashAnimation === 'function') {
+        const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : (typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : {});
+        if (!fxContainer.querySelector('#csf-wrapper') && typeof window.tplMountCircularSpinFlashStage === 'function') {
+          window.tplMountCircularSpinFlashStage(fxContainer, csfData);
+        }
+        window.stepCircularSpinFlashAnimation(fxContainer, tplId, t, csfData);
+      }
+} else if (tplId === 'jani-cross-section-reveal') {
       if (typeof window.stepJaniCrossSectionAnimation === 'function') {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
         window.stepJaniCrossSectionAnimation(fxContainer, tplId, t, cData);
@@ -31139,7 +31338,14 @@ function openTopTemplateCustomizer(tpl) {
         const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountEnvelope3DStage(stage, eData);
       }
-    } else if (tpl.id === 'jani-countdown-panic-suite') {
+        } else if (tpl.id === 'countdown-timer') {
+      topCustomizerState.duration = 6;
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+      if (typeof window.tplMountCountdownTimerStage === 'function' && stage) {
+        window.tplMountCountdownTimerStage(stage, cdtData);
+      }
+} else if (tpl.id === 'jani-countdown-panic-suite') {
       topCustomizerState.primaryUrl = '/countdown_warroom_clean_bg.png';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '/countdown_warroom_clean_bg.png';
@@ -31148,6 +31354,15 @@ function openTopTemplateCustomizer(tpl) {
       const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
       if (typeof window.tplMountCountdown3DStage === 'function' && stage) {
         window.tplMountCountdown3DStage(stage, cdData);
+      }
+    } else if (tpl.id === 'merger-acquisition') {
+      topCustomizerState.primaryUrl = '/merger_acquisition_thumbnail.svg';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = '/merger_acquisition_thumbnail.svg';
+      if (typeof window.tplMountMergerAcqStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const maData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountMergerAcqStage(stage, maData);
       }
     } else if (tpl.id === 'deal-term-sheet') {
       topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
@@ -31189,6 +31404,15 @@ function openTopTemplateCustomizer(tpl) {
         const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountMoneyStack3DStage(stage, mData);
       }
+    } else if (tpl.id === 'document-barrage-suite') {
+      topCustomizerState.primaryUrl = 'legal_court_filing_doc1.svg';
+      topCustomizerState.secondaryUrl = 'legal_court_filing_doc2.svg';
+      topCustomizerState.originalPhotoUrl = 'legal_court_filing_doc1.svg';
+      if (typeof window.tplMountDocumentBarrageStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountDocumentBarrageStage(stage, dbData);
+      }
     } else if (tpl.id === 'jani-cross-section-reveal') {
       topCustomizerState.primaryUrl = '/jani_cross_top.png';
       topCustomizerState.secondaryUrl = '/jani_cross_bottom.png';
@@ -31207,7 +31431,19 @@ function openTopTemplateCustomizer(tpl) {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountForbes3DStage(stage, cData);
       }
-    } else if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
+    } else if (tpl.id === 'jani-cinematic-letterbox') {
+    if (typeof window.tplJaniCinematicLetterboxMakeClips === 'function') {
+      const res = window.tplJaniCinematicLetterboxMakeClips(tpl, sceneStart, dur, opts);
+      imageClips = res.imageClips || [];
+      const vClips = res.videoClips || [];
+      textClips = res.textClips || [];
+      focusClip = res.focusClip;
+      if (vClips.length > 0) {
+        if (!timelineClips.video) timelineClips.video = [];
+        timelineClips.video = timelineClips.video.concat(vClips);
+      }
+    }
+  } else if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
       topCustomizerState.primaryUrl = '/creator_portrait_cutout.png';
       topCustomizerState.secondaryUrl = '/creator_background_plate.png';
       topCustomizerState.originalPhotoUrl = '/creator_cinematic_portrait_ref.png';
@@ -31263,7 +31499,9 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
   topCustomizerState.depth = 65;
-  topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
+  topCustomizerState.duration = (tpl.id === 'merger-acquisition' && typeof window.MERGER_ACQ_TOTAL === 'function')
+    ? Math.max(1, Math.round(window.MERGER_ACQ_TOTAL(typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(tpl.id) : null) * 10) / 10)
+    : (parseInt(tpl.timeToApply) || 6);
   topCustomizerState.isPlaying = true;
   const isCutoutTpl = tpl.id === 'subject-25d-parallax' || tpl.id === 'spooner-2-5d-photo-parallax' || tpl.id === 'magnates-paper-vector-cutout';
   topCustomizerState.bgRemoved = isCutoutTpl;
@@ -31605,7 +31843,34 @@ function openTopTemplateCustomizer(tpl) {
     if (aiEngineWrap) aiEngineWrap.style.display = 'none';
 
     syncCreatorCalibrationUI();
-  } else if (tpl.id === 'spooner-2-5d-photo-parallax') {
+  } else if (tpl.id === 'jani-cinematic-letterbox') {
+      topCustomizerState.primaryUrl = tpl.defaultImage || '/jani_cinematic_letterbox_ref.png';
+      topCustomizerState.secondaryUrl = '';
+      topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
+      if (typeof window.tplMountJaniCinematicLetterboxStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountJaniCinematicLetterboxStage(stage, d);
+      }
+    } else if (tpl.id === 'circular-spin-flashlight-glitch') {
+      topCustomizerState.primaryUrl = 'generated_person_1.jpg';
+      topCustomizerState.secondaryUrl = 'generated_person_2.jpg';
+      topCustomizerState.originalPhotoUrl = '';
+      if (typeof window.tplMountCircularSpinFlashStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountCircularSpinFlashStage(stage, d);
+      }
+} else if (tpl.id === 'cinematic-light-trail-typewriter') {
+      topCustomizerState.primaryUrl = '';
+      topCustomizerState.secondaryUrl = '/boardroom_scene_hd.jpg';
+      topCustomizerState.originalPhotoUrl = '';
+      if (typeof window.tplMountCinematicLightTrailStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountCinematicLightTrailStage(stage, d);
+      }
+      } else if (tpl.id === 'spooner-2-5d-photo-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground (1:1 Registered)';
     if (labelSec) labelSec.textContent = 'Inpainted Scene Backdrop (1:1 Registered)';
     if (wrapSec) wrapSec.style.display = 'flex';
@@ -33281,7 +33546,27 @@ function renderTopTemplatePreviewStage() {
   const tplId = topCustomizerState.currentTpl.id;
   if (window.tpl3DSync) window.tpl3DSync(tplId);
 
+  // Screen-Filling Document Barrage & Evidence Stack Suite
+  if (tplId === 'document-barrage-suite') {
+    const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('document-barrage-suite') : (window.DOCUMENT_BARRAGE_CONFIG || {});
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountDocumentBarrageStage === 'function') {
+      window.tplMountDocumentBarrageStage(stage, dbData);
+    }
+    return;
+  }
+
   // James Jani Cross-Section Reveal Engine
+  if (tplId === 'document-barrage-suite') {
+    if (typeof window.stepDocumentBarrageAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('document-barrage-suite') : (window.DOCUMENT_BARRAGE_CONFIG || {});
+      window.stepDocumentBarrageAnimation(stage, 'document-barrage-suite', localSceneT, dbData);
+    }
+  }
+
   if (tplId === 'jani-cross-section-reveal') {
     const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
@@ -33304,6 +33589,18 @@ function renderTopTemplatePreviewStage() {
     }
     return;
   }
+  // Cinematic Merger & Acquisition Collision Engine
+  if (tplId === 'merger-acquisition') {
+    const maData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('merger-acquisition') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountMergerAcqStage === 'function') {
+      window.tplMountMergerAcqStage(stage, maData);
+    }
+    return;
+  }
+
   // 3D Glassmorphic SWIFT Banking Wire Transfer Engine
   if (tplId === 'wire-transfer') {
     const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
@@ -33359,6 +33656,39 @@ function renderTopTemplatePreviewStage() {
   }
 
   // James Jani 3D Financial War Room Countdown & Panic Ticker Engine
+      if (tplId === 'countdown-timer') {
+    const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('countdown-timer') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountCountdownTimerStage === 'function') {
+      window.tplMountCountdownTimerStage(stage, cdtData);
+    }
+    return;
+  }
+
+  if (tplId === 'circular-spin-flashlight-glitch') {
+    const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountCircularSpinFlashStage === 'function') {
+      window.tplMountCircularSpinFlashStage(stage, csfData);
+    }
+    return;
+  }
+
+  if (tplId === 'multi-image-flash-sequence') {
+    const flashData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('multi-image-flash-sequence') : {};
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountMultiImageFlashStage === 'function') {
+      window.tplMountMultiImageFlashStage(stage, flashData);
+    }
+    return;
+  }
+
   if (tplId === 'jani-ftx-logo-reveal') {
     const ftxData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-ftx-logo-reveal') : {};
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
@@ -33368,6 +33698,22 @@ function renderTopTemplatePreviewStage() {
       window.tplMountJaniFtxLogoStage(stage, ftxData);
     }
     return;
+  }
+
+    if (tplId === 'circular-spin-flashlight-glitch') {
+    if (typeof window.stepCircularSpinFlashAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : {};
+      window.stepCircularSpinFlashAnimation(stage, 'circular-spin-flashlight-glitch', localSceneT, csfData);
+    }
+  }
+
+  if (tplId === 'multi-image-flash-sequence') {
+    if (typeof window.stepMultiImageFlashAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const flashData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('multi-image-flash-sequence') : {};
+      window.stepMultiImageFlashAnimation(stage, 'multi-image-flash-sequence', localSceneT, flashData);
+    }
   }
 
   if (tplId === 'jani-ftx-logo-reveal') {
@@ -34365,6 +34711,14 @@ function updateTopCustomizerFrame(seqTime, now) {
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
 
+  if (tplId === 'document-barrage-suite') {
+    if (typeof window.stepDocumentBarrageAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('document-barrage-suite') : (window.DOCUMENT_BARRAGE_CONFIG || {});
+      window.stepDocumentBarrageAnimation(stage, 'document-barrage-suite', localSceneT, dbData);
+    }
+  }
+
   if (tplId === 'jani-cross-section-reveal') {
     if (typeof window.stepJaniCrossSectionAnimation === 'function') {
       const stage = document.getElementById('tpl-modal-preview-stage');
@@ -34380,6 +34734,14 @@ function updateTopCustomizerFrame(seqTime, now) {
       window.stepJaniForbesAnimation(stage, 'jani-forbes-fraud-reveal', localSceneT, jData);
     }
   }
+  if (tplId === 'merger-acquisition') {
+    if (typeof window.stepMergerAcqAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const maData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('merger-acquisition') : {};
+      window.stepMergerAcqAnimation(stage, 'merger-acquisition', localSceneT, maData);
+    }
+  }
+
   if (tplId === 'wire-transfer') {
     if (typeof window.stepWireTransferAnimation === 'function') {
       const stage = document.getElementById('tpl-modal-preview-stage');

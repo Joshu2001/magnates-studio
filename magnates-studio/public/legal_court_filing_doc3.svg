@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 880" width="680" height="880">
+  <defs>
+    <filter id="doc-subtle-grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.96   0 0 0 0 0.95   0 0 0 0 0.93  0 0 0 0.07 0" />
+      <feBlend mode="multiply" in="SourceGraphic" />
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="680" height="880" fill="#fcfbfa" stroke="#e5e7eb" stroke-width="1" rx="2" />
+  <rect x="0" y="0" width="680" height="880" fill="url(#doc-subtle-grain)" opacity="0.5" />
+
+  <line x="45" y="32" x="635" y="32" stroke="#9ca3af" stroke-width="0.8" />
+  <text x="50%" y="24" text-anchor="middle" font-family="'Courier New', monospace" font-size="11" font-weight="bold" fill="#4b5563" letter-spacing="1.5">Case 22-11068-JTD   Filed 11/14/22   Page 4 of 8</text>
+
+  <text x="50%" y="68" text-anchor="middle" font-family="'Times New Roman', serif" font-size="16" font-weight="bold" fill="#111827" letter-spacing="1.2">UNITED STATES BANKRUPTCY COURT</text>
+  <text x="50%" y="92" text-anchor="middle" font-family="'Times New Roman', serif" font-size="13.5" font-weight="600" fill="#374151">DISTRICT OF DELAWARE - DISCOVERY EX. B</text>
+  <line x="50" y="108" x="630" y="108" stroke="#111827" stroke-width="1.5" />
+
+  <text x="50%" y="140" text-anchor="middle" font-family="'Times New Roman', serif" font-size="14" font-weight="bold" fill="#111827" letter-spacing="1">DECLARATION OF FORENSIC RESTRUCTURING EXECUTIVES</text>
+<text x="65" y="164" font-family="'Times New Roman', serif" font-size="12.5" font-weight="bold" fill="#111827">28.</text>
+<text x="90" y="164" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">The Debtors did not maintain centralized ledgers or accurate accounting of customer cryptocurrency holdings.</text>
+<text x="60" y="184" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="204" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="65" y="236" font-family="'Times New Roman', serif" font-size="12.5" font-weight="bold" fill="#111827">29.</text>
+<text x="90" y="236" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">Management utilized an unsecured automated script to grant undisclosed credit limits exceeding eight billion dollars.</text>
+<text x="60" y="256" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="276" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="296" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="65" y="328" font-family="'Times New Roman', serif" font-size="12.5" font-weight="bold" fill="#111827">30.</text>
+<text x="90" y="328" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">Corporate funds were routinely commingled and deployed into speculative leveraged proprietary trading positions.</text>
+<text x="60" y="348" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="368" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+<text x="60" y="388" font-family="'Times New Roman', serif" font-size="12" fill="#1f2937" letter-spacing="0.1">management repeatedly represented compliance with financial controls, yet commingled retail investor deposits.</text>
+
+  <g transform="translate(130, 720) rotate(-6)">
+        <rect x="-85" y="-24" width="170" height="48" rx="3" fill="none" stroke="#d97706" stroke-width="2.5" stroke-dasharray="5,3" opacity="0.88" />
+        <text x="0" y="-3" text-anchor="middle" font-family="'Impact', 'Arial Black', sans-serif" font-size="15" font-weight="bold" fill="#d97706" opacity="0.9" letter-spacing="2">EXHIBIT A</text>
+        <text x="0" y="15" text-anchor="middle" font-family="'Courier New', monospace" font-size="9.5" font-weight="bold" fill="#d97706" opacity="0.9">UNITED STATES COURT</text>
+      </g>
+
+
+  <text x="50%" y="855" text-anchor="middle" font-family="'Times New Roman', serif" font-size="11" fill="#6b7280">Page 4 of 8</text>
+</svg>

@@ -8225,7 +8225,7 @@
             <span id="tpl-modal-val-blur">2px</span>
             <input type="range" id="tpl-modal-slider-blur" min="0" max="16" step="0.5" value="2" />
             <span id="tpl-modal-val-duration">6 sec</span>
-            <input type="range" id="tpl-modal-slider-duration" min="2" max="12" value="6" />
+            <input type="range" id="tpl-modal-slider-duration" min="2" max="30" value="6" />
           </div>
 
         </div>
@@ -12121,12 +12121,12 @@
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
   <script src="js/world-geo-data.js?v=1"></script>
-  <script src="js/tpl-snapshots.js?v=15"></script>
-  <script src="js/tester-templates/tester-templates.bundle.js?v=6"></script>
-  <script src="js/tester-templates/tester-templates-data.js?v=6"></script>
-  <script src="js/app.js?v=357"></script>
-  <script src="js/tpl-3d-inspector.js?v=16"></script>
-  <script src="js/tpl-stage-transform.js?v=8"></script>
+  <script src="js/tpl-snapshots.js?v=16"></script>
+  <script src="js/tester-templates/tester-templates.bundle.js?v=7"></script>
+  <script src="js/tester-templates/tester-templates-data.js?v=8"></script>
+  <script src="js/app.js?v=2?v=359"></script>
+  <script src="js/tpl-3d-inspector.js?v=17"></script>
+  <script src="js/tpl-stage-transform.js?v=9"></script>
   <script src="js/kinetic-3d-engine.js?v=1"></script>
   <script src="js/tactical-decode-3d-engine.js?v=2"></script>
   <script src="js/search-3d-engine.js?v=1"></script>
@@ -12146,8 +12146,31 @@
   <script src="js/hypnotic-vertigo-engine.js?v=1"></script>
   <script src="js/countdown-3d-engine.js?v=1"></script>
   <script src="js/jani-ftx-logo-engine.js?v=1"></script>
-  <script src="js/tpl-contextual-inspector.js?v=21"></script>
+  <script src="js/multi-image-flash-engine.js?v=1"></script>
+  <script src="js/document-barrage-engine.js?v=1"></script>
+  <script src="js/cinematic-light-trail-engine.js?v=1"></script>
+  <script src="js/circular-spin-flashlight-glitch-engine.js?v=2"></script>
+  <script src="js/countdown-timer-engine.js?v=1"></script>
+
+  <script src="js/merger-acquisition-engine.js?v=1"></script>
+<script src="js/tpl-contextual-inspector.js?v=23"></script>
   <script>
+        if (window.location.search.includes('open=countdowntimer') || window.location.search.includes('open=countdown-timer')) {
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined') ? EFFECT_TEMPLATES_DATA.find(t => t.id === 'countdown-timer') : null;
+          if (tpl && typeof openTopTemplateCustomizer === 'function') openTopTemplateCustomizer(tpl);
+        }, 600);
+      });
+    }
+    if (window.location.search.includes('open=circularspin') || window.location.search.includes('open=spinflash')) {
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined') ? EFFECT_TEMPLATES_DATA.find(t => t.id === 'circular-spin-flashlight-glitch') : null;
+          if (tpl && typeof openTopTemplateCustomizer === 'function') openTopTemplateCustomizer(tpl);
+        }, 800);
+      });
+    }
     if (window.location.search.includes('open=countdown')) {
       window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {

@@ -1621,6 +1621,11 @@ function collectVideoNodes(stage, tplId) {
       c.restore();
       return;
     }
+    if (clip.fxScene && clip.fxScene.tplId === 'merger-acquisition' && typeof window.renderMergerAcquisitionCanvas === 'function') {
+      window.renderMergerAcquisitionCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
     if (clip.fxScene && clip.fxScene.tplId === 'deal-term-sheet' && typeof window.renderDealTermSheetCanvas === 'function') {
       window.renderDealTermSheetCanvas(c, clip, t, cw, ch);
       c.restore();
