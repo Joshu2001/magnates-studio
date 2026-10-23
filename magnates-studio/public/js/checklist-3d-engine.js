@@ -19,8 +19,8 @@
     layoutMode: 'slips', // 'slips' (Stacked Evidence Slips) or 'dossier' (3D Spatial Dossier)
     bgEnvironment: 'desk', // 'desk' (Dark Mahogany Desk) or 'blueprint' (Investigative Blue Map Grid)
     title: 'ACTION STEPS',
-    blurMode: 'sequential', // 'sequential' (appears blurred, fades away one-by-one to 0px) | 'rack-focus' | 'none'
-    entryBlurPx: 6.5,       // Initial blur when each item appears (fades out to 0px one by one)
+    blurMode: 'none', // 'sequential' (appears blurred, fades away one-by-one to 0px) | 'rack-focus' | 'none'
+    entryBlurPx: 0,         // Initial blur when each item appears (fades out to 0px one by one)
     unblurDurationSec: 0.55, // How long each item takes to unblur to sharp
     unblurHoldSec: 0.18,    // Brief hold before blur fades out on each item
     stepIntervalSec: 0.38,  // Time stagger between item 1, item 2, item 3, item 4
