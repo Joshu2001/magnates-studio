@@ -266,7 +266,7 @@
         smokeIntensity: s.smokeIntensity !== undefined ? s.smokeIntensity : 65,
         smokeColor: s.smokeColor || '#1e293b',
         activePreset: s.activePreset || 'documentary',
-        bgStyle: s.bgStyle || 'cyber-set',
+        bgStyle: s.bgStyle || 'deep-cosmos',
         bgColor: s.bgColor || '#05070d',
         transparentBg: !!s.transparentBg,
         envStyle: s.envStyle || 'deep-cosmos',
@@ -344,6 +344,52 @@
     (s.elements3D || []).forEach(m => s.scene.remove(m));
     s.elements3D = [];
     items.forEach(it => { const m = buildSpatialMesh(it); if (m) { s.scene.add(m); s.elements3D.push(m); } });
+  }
+  // Reference art direction is applied only when a user explicitly chooses a style.
+  // Do not rebuild meshes here: their images, text, transforms and camera recordings are user data.
+  // The renderer continues to own scene construction and timeline/export synchronization.
+  const REFERENCE_STYLE_LIGHTING = Object.freeze({
+    documentary: Object.freeze({
+      bgColor: '#080c12', gridVisible: false, gridGlow: 0,
+      gridLuminescence: 0, cardContourColor: '#c3a16c',
+      cardContourWidth: 1, cardContourGlow: 0, smokeColor: '#1e293b',
+      smokeIntensity: 24, fogDensity: 28, lightIntensity: 90,
+      textPrimaryColor: '#c3a16c', textSecondaryColor: '#e3d4b8',
+      textStyle: 'gold', envStyle: 'deep-cosmos'
+    }),
+    'tech-investigative': Object.freeze({
+      bgColor: '#030d17', gridVisible: true, gridGlow: 18,
+      gridLuminescence: 18, gridColor: '#0e7490',
+      cardContourColor: '#38bdf8', cardContourWidth: 1,
+      cardContourGlow: 8, smokeColor: '#082f49',
+      smokeIntensity: 30, fogDensity: 24, lightIntensity: 110,
+      textPrimaryColor: '#a5e8ff', textSecondaryColor: '#7dd3fc',
+      textStyle: 'silver', envStyle: 'tunnel-cyan'
+    }),
+    cyberpunk: Object.freeze({
+      bgColor: '#0b0514', gridVisible: true, gridGlow: 46,
+      gridLuminescence: 32, gridColor: '#a855f7',
+      cardContourColor: '#c084fc', cardContourWidth: 1.5,
+      cardContourGlow: 35, smokeColor: '#581c87',
+      smokeIntensity: 42, fogDensity: 32, lightIntensity: 120,
+      textPrimaryColor: '#e9d5ff', textSecondaryColor: '#c084fc',
+      textStyle: 'neon', envStyle: 'tunnel-slate'
+    })
+  });
+  function applyReferenceArtDirection(id) {
+    const settings = REFERENCE_STYLE_LIGHTING[id];
+    if (!settings) return false;
+    const state = spatial3DState;
+    Object.keys(settings).forEach(key => { state[key] = settings[key]; });
+    state.stylePreset = id;
+    state.activePreset = id;
+    if (state.scene && state.scene.fog) {
+      state.scene.fog.density = 0.0001 + (state.fogDensity / 100) * 0.0008;
+    }
+    if (state.ambientLight) state.ambientLight.intensity = (state.lightIntensity / 100) * 0.95;
+    if (typeof updateSpatialEnvironmentGrid === 'function') updateSpatialEnvironmentGrid();
+    else if (state.floorGrid) state.floorGrid.visible = state.gridVisible;
+    return true;
   }
   function applySpatialStored(e) {
     const s = spatial3DState, sp = e.spatial;
@@ -1970,6 +2016,9 @@
       } else if (typeof loadSpatialPreset === 'function') {
         loadSpatialPreset(styleId);
       }
+      // Keep art direction deterministic even when older preset loaders differ.
+      // Preserve existing layers and recorded trajectories, then persist chosen appearance.
+      applyReferenceArtDirection(styleId);
       capture(tplId); build(tplId); return;
     }
     if (act.startsWith('s-sample-beat-')) {
