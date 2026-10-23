@@ -266,7 +266,7 @@
         smokeIntensity: s.smokeIntensity !== undefined ? s.smokeIntensity : 65,
         smokeColor: s.smokeColor || '#1e293b',
         activePreset: s.activePreset || 'documentary',
-        bgStyle: s.bgStyle || 'deep-cosmos',
+        bgStyle: s.bgStyle || 'cyber-set',
         bgColor: s.bgColor || '#05070d',
         transparentBg: !!s.transparentBg,
         envStyle: s.envStyle || 'deep-cosmos',
