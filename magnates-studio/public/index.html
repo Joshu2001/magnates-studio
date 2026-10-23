@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Regaarder Studio - Professional Creative Video Editor</title>
+  <title>Regaarder Studio</title>
+  <meta name="description" content="Professional creative documentary and 3D visual effects video editor with timeline compositing, kinetic typography, and 3D scene engines.">
+  <meta property="og:title" content="Regaarder Studio">
+  <meta property="og:description" content="Professional creative documentary and 3D visual effects video editor with timeline compositing, kinetic typography, and 3D scene engines.">
   <link rel="stylesheet" href="css/style.css?v=330">
   <link rel="stylesheet" href="js/tester-templates/tester-templates.scoped.css?v=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="js/helvetiker_bold.typeface.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="app-container">
@@ -2019,6 +2023,173 @@
               </div>
             </div>
 
+            <!-- ==================== 2D / 3D CUSTOM MOTION PATH & EASING STUDIO ==================== -->
+            <div class="control-row accordion-card open" id="inspector-motion-path-section" style="margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 8px;">
+              <div class="fx-header" onclick="this.parentElement.classList.toggle('open')" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer; white-space: nowrap;">
+                <label style="margin: 0; display: flex; align-items: center; gap: 6px; font-weight: 700; cursor: pointer; font-size: 11.5px; color: #38bdf8;">
+                  <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; flex-shrink: 0;"><path d="M3 17c3-6 6-6 9 0s6 6 9-6"/><circle cx="3" cy="17" r="2" fill="currentColor"/><circle cx="21" cy="11" r="2" fill="currentColor"/></svg>
+                  <span>2D / 3D Motion Path</span>
+                </label>
+                <div style="display: flex; gap: 5px; align-items: center;" onclick="event.stopPropagation()">
+                  <span class="badge" id="badge-motion-path-state" style="font-size: 9px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px;">Off</span>
+                  <input type="checkbox" id="inspector-motion-path-toggle" title="Enable 2D/3D Custom Motion Path on Clip" style="cursor: pointer; accent-color: #38bdf8;">
+                  <svg class="accordion-chevron" viewBox="0 0 24 24" onclick="this.closest('.accordion-card').classList.toggle('open')"><path d="M19 9l-7 7-7-7"/></svg>
+                </div>
+              </div>
+
+              <div class="fx-body" style="background: rgba(10, 14, 24, 0.55); border: 1px solid rgba(56, 189, 248, 0.18); border-radius: 8px; padding: 8px;">
+                <!-- Dimension Switcher (2D Planar vs 3D Spatial) + Stage Draw Trigger -->
+                <div style="display: flex; gap: 4px; align-items: center; margin-bottom: 6px;">
+                  <div style="display: flex; flex: 1; background: rgba(0,0,0,0.35); padding: 2px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.07);">
+                    <button type="button" id="btn-mp-dim-2d" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 9.5px; padding: 3px 4px; border: none; background: rgba(56,189,248,0.2); color: #38bdf8; font-weight: 700;">2D Planar</button>
+                    <button type="button" id="btn-mp-dim-3d" class="btn btn-secondary btn-sm" style="flex: 1; font-size: 9.5px; padding: 3px 4px; border: none; background: transparent; color: #94a3b8; font-weight: 600;">3D Spatial</button>
+                  </div>
+                  <button type="button" id="btn-mp-draw-on-stage" class="btn btn-secondary btn-sm" title="Draw or Edit Motion Path Directly on Main Stage Canvas" style="font-size: 9.5px; padding: 4px 7px; border-color: rgba(16, 185, 129, 0.45); color: #34d399; font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
+                    <span>✏️ Stage Draw</span>
+                  </button>
+                  <button type="button" id="btn-mp-preview-play" class="btn btn-secondary btn-sm" title="Preview Clip Motion Along Path" style="font-size: 9.5px; padding: 4px 7px; border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 700;">▶</button>
+                </div>
+
+                <!-- Tool Mode: Freehand Sketch vs Waypoint Nodes + Stage Overlay Toggle -->
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 4px; margin-bottom: 6px;">
+                  <div style="display: flex; gap: 3px;">
+                    <button type="button" id="btn-mp-tool-freehand" class="btn btn-secondary btn-sm" style="font-size: 9px; padding: 2px 6px; border-color: #38bdf8; color: #38bdf8;" title="Drag to sketch a continuous freehand motion path">✍️ Freehand</button>
+                    <button type="button" id="btn-mp-tool-nodes" class="btn btn-secondary btn-sm" style="font-size: 9px; padding: 2px 6px;" title="Click to add waypoints, drag nodes to reshape, double-click node to delete">◆ Waypoints</button>
+                  </div>
+                  <label style="font-size: 9px; color: #cbd5e1; display: flex; align-items: center; gap: 4px; cursor: pointer; margin: 0;" title="Show motion trajectory spline & handles on the main video stage">
+                    <input type="checkbox" id="inspector-mp-show-overlay" checked style="accent-color: #38bdf8; cursor: pointer;">
+                    <span>Stage Guide</span>
+                  </label>
+                </div>
+
+                <!-- Interactive Visual 2D/3D Path Pad Canvas -->
+                <div style="position: relative; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid rgba(56, 189, 248, 0.28); background: #050811; margin-bottom: 6px;">
+                  <canvas id="inspector-motion-path-canvas" width="260" height="146" style="width: 100%; height: 132px; display: block; cursor: crosshair;"></canvas>
+                  <div style="position: absolute; top: 4px; left: 6px; right: 6px; display: flex; justify-content: space-between; pointer-events: none; font-size: 8.5px; font-family: monospace; color: rgba(226,232,240,0.85);">
+                    <span id="mp-pad-mode-label" style="background: rgba(5,8,17,0.75); padding: 1px 4px; border-radius: 3px; border: 1px solid rgba(56,189,248,0.25); color: #38bdf8;">3D CORRIDOR PAD</span>
+                    <span id="mp-pad-coords-label" style="background: rgba(5,8,17,0.75); padding: 1px 4px; border-radius: 3px;">X:0 Y:0 Z:0.0</span>
+                  </div>
+                  <div style="position: absolute; bottom: 3px; left: 6px; right: 6px; display: flex; justify-content: space-between; pointer-events: none; font-size: 8px; color: rgba(148,163,184,0.8);">
+                    <span><b style="color:#10b981;">●</b> Start → <b style="color:#a855f7;">●</b> End</span>
+                    <span id="mp-pad-hint-label">Drag to draw • Wheel on node = 3D Z</span>
+                  </div>
+                </div>
+
+                <!-- Quick Trajectory Presets + Reverse & Clear -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; margin-bottom: 6px;">
+                  <button type="button" class="btn btn-secondary btn-sm mp-preset-btn" data-mp-preset="s-curve" style="font-size: 8.5px; padding: 3px 2px;">〰️ S-Curve</button>
+                  <button type="button" class="btn btn-secondary btn-sm mp-preset-btn" data-mp-preset="orbit-3d" style="font-size: 8.5px; padding: 3px 2px;">🪐 3D Orbit</button>
+                  <button type="button" class="btn btn-secondary btn-sm mp-preset-btn" data-mp-preset="whip-arc" style="font-size: 8.5px; padding: 3px 2px;">⚡ Whip Arc</button>
+                  <button type="button" class="btn btn-secondary btn-sm mp-preset-btn" data-mp-preset="figure-8" style="font-size: 8.5px; padding: 3px 2px;">♾️ Figure-8</button>
+                  <button type="button" class="btn btn-secondary btn-sm mp-preset-btn" data-mp-preset="spiral-dive" style="font-size: 8.5px; padding: 3px 2px;">🌀 3D Spiral</button>
+                  <button type="button" class="btn btn-secondary btn-sm mp-preset-btn" data-mp-preset="float-drift" style="font-size: 8.5px; padding: 3px 2px;">☁️ Float</button>
+                  <button type="button" id="btn-mp-reverse" class="btn btn-secondary btn-sm" title="Reverse Start & End Direction" style="font-size: 8.5px; padding: 3px 2px; color: #fbbf24;">⇄ Reverse</button>
+                  <button type="button" id="btn-mp-clear" class="btn btn-secondary btn-sm" title="Clear Motion Path" style="font-size: 8.5px; padding: 3px 2px; color: #f87171;">✕ Clear</button>
+                </div>
+
+                <!-- Smoothing & Path Excursion Scale -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;">
+                  <div>
+                    <label style="display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); margin-bottom: 1px;">
+                      <span>Spline Smooth:</span>
+                      <span id="inspector-mp-smooth-val" style="color: #38bdf8; font-family: monospace;">75%</span>
+                    </label>
+                    <input type="range" id="inspector-mp-smooth-slider" min="0" max="100" step="5" value="75" style="width: 100%; margin: 0; accent-color: #38bdf8;">
+                  </div>
+                  <div>
+                    <label style="display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); margin-bottom: 1px;">
+                      <span>Path Span:</span>
+                      <span id="inspector-mp-span-val" style="color: #38bdf8; font-family: monospace;">100%</span>
+                    </label>
+                    <input type="range" id="inspector-mp-span-slider" min="20" max="200" step="5" value="100" style="width: 100%; margin: 0; accent-color: #38bdf8;">
+                  </div>
+                </div>
+
+                <!-- 3D Spatial Depth & Banking Controls -->
+                <div id="inspector-mp-3d-controls" style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.24); border-radius: 6px; padding: 6px; margin-bottom: 6px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="font-size: 9.5px; font-weight: 700; color: #c084fc;">CUBE / 3D SPATIAL RIG</span>
+                    <select id="inspector-mp-z-profile" style="background: var(--bg-input); border: 1px solid rgba(168,85,247,0.35); color: #e9d5ff; padding: 2px 5px; border-radius: 4px; font-size: 9px;">
+                      <option value="arc-apex">3D Swoop (Far → Near → Far)</option>
+                      <option value="push-in">3D Push-In (Deep → Close)</option>
+                      <option value="pull-out">3D Pull-Back (Close → Deep)</option>
+                      <option value="valley-dive">3D Valley Dive (Close → Deep → Close)</option>
+                      <option value="wave-z">3D Sine Z-Wave</option>
+                      <option value="custom-nodes">Per-Node Z Depth (Wheel / Slider)</option>
+                    </select>
+                  </div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 4px;">
+                    <div>
+                      <label style="display: flex; justify-content: space-between; font-size: 9px; color: #cbd5e1;">
+                        <span>Z-Depth Range:</span>
+                        <span id="inspector-mp-zdepth-val" style="color: #c084fc; font-family: monospace;">65%</span>
+                      </label>
+                      <input type="range" id="inspector-mp-zdepth-slider" min="0" max="150" step="5" value="65" style="width: 100%; margin: 0; accent-color: #a855f7;">
+                    </div>
+                    <div>
+                      <label style="display: flex; justify-content: space-between; font-size: 9px; color: #cbd5e1;">
+                        <span>3D Bank / Tilt:</span>
+                        <span id="inspector-mp-bank-val" style="color: #c084fc; font-family: monospace;">18°</span>
+                      </label>
+                      <input type="range" id="inspector-mp-bank-slider" min="0" max="45" step="1" value="18" style="width: 100%; margin: 0; accent-color: #a855f7;">
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                    <span style="font-size: 9px; color: #cbd5e1; white-space: nowrap;">Selected Node Z:</span>
+                    <input type="range" id="inspector-mp-node-z-slider" min="-100" max="100" step="5" value="0" style="flex: 1; margin: 0; accent-color: #a855f7;">
+                    <span id="inspector-mp-node-z-val" style="font-size: 9px; font-family: monospace; color: #e9d5ff; min-width: 34px; text-align: right;">0.00</span>
+                  </div>
+                </div>
+
+                <!-- Orientation & Loop Behavior -->
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 6px;">
+                  <label style="font-size: 9.5px; color: #e2e8f0; display: flex; align-items: center; gap: 4px; cursor: pointer; margin: 0;" title="Automatically rotate/orient the clip along the path's tangent direction">
+                    <input type="checkbox" id="inspector-mp-auto-orient" style="accent-color: #38bdf8; cursor: pointer;">
+                    <span>Auto-Orient to Path</span>
+                  </label>
+                  <select id="inspector-mp-loop-mode" style="background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 2px 5px; border-radius: 4px; font-size: 9.5px;">
+                    <option value="once">Play Once (0→100%)</option>
+                    <option value="pingpong">Ping-Pong (Bounce)</option>
+                    <option value="loop">Continuous Loop</option>
+                  </select>
+                </div>
+
+                <!-- Visual Easing Curve Control & Interactive Bezier Editor -->
+                <div style="background: rgba(0,0,0,0.32); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 4px; margin-bottom: 5px;">
+                    <span style="font-size: 9.5px; font-weight: 700; color: #00f0ff;">⏱️ PATH EASING CURVE</span>
+                    <select id="inspector-mp-easing-select" style="flex: 1; max-width: 145px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 2px 5px; border-radius: 4px; font-size: 9.5px;">
+                      <option value="easeInOutCubic">Smooth Ease In/Out</option>
+                      <option value="linear">Linear Constant</option>
+                      <option value="easeOutExpo">Whip In → Slow Settle</option>
+                      <option value="easeInExpo">Slow Build → Whip Out</option>
+                      <option value="easeOutBack">Overshoot Snap</option>
+                      <option value="spring">Elastic Spring</option>
+                      <option value="customBezier">Custom Cubic-Bezier</option>
+                    </select>
+                  </div>
+
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <div style="position: relative; width: 112px; height: 68px; border-radius: 5px; overflow: hidden; border: 1px solid rgba(0, 240, 255, 0.25); background: #050811; flex-shrink: 0;">
+                      <canvas id="inspector-mp-easing-canvas" width="112" height="68" style="width: 112px; height: 68px; display: block; cursor: pointer;" title="Drag cyan/amber Bezier handles to customize path velocity"></canvas>
+                    </div>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                      <div>
+                        <label style="display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted);">
+                          <span>Path Speed:</span>
+                          <span id="inspector-mp-speed-val" style="color: #00f0ff; font-family: monospace;">1.0x</span>
+                        </label>
+                        <input type="range" id="inspector-mp-speed-slider" min="0.2" max="3.0" step="0.1" value="1.0" style="width: 100%; margin: 0; accent-color: #00f0ff;">
+                      </div>
+                      <div style="font-size: 8.5px; font-family: monospace; color: #94a3b8; line-height: 1.35;" id="inspector-mp-bezier-readout">
+                        cubic-bezier(0.65, 0.00, 0.35, 1.00)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Adjust & Color Grade Section (Tone, Colors, Details) -->
             
             <!-- ==================== DOCUMENT HIGHLIGHTING & FOCUS SECTION ==================== -->
@@ -2326,6 +2497,110 @@
                   </select>
                 </div>
 
+                <!-- MOTION BLUR & CAMERA FLASH FX SECTION -->
+                <div id="inspector-motionblur-flash-section" style="margin-top: 10px; margin-bottom: 8px; border-top: 1px solid rgba(56,189,248,0.22); padding-top: 8px; background: rgba(15,23,42,0.45); border-radius: 6px; padding: 8px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-size: 10.5px; font-weight: 800; color: #38bdf8; letter-spacing: 0.3px;">⚡ MOTION BLUR &amp; CAMERA FLASH</span>
+                    <span id="badge-motionblur-flash-state" style="font-size: 9px; font-weight: 700; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px;">Ready</span>
+                  </div>
+
+                  <!-- 1. Motion Blur Toggle & Granular Intensity -->
+                  <div style="background: rgba(0,0,0,0.28); border: 1px solid rgba(56,189,248,0.16); border-radius: 5px; padding: 7px; margin-bottom: 6px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;">
+                      <label style="font-size: 10.5px; font-weight: 700; color: #e2e8f0; display: flex; align-items: center; gap: 5px; cursor: pointer; margin: 0;">
+                        <input type="checkbox" id="inspector-motion-blur-toggle">
+                        <span>Motion Blur</span>
+                      </label>
+                      <div style="display: flex; align-items: center; gap: 5px;">
+                        <span id="inspector-motion-blur-shutter" style="font-size: 9px; font-family: monospace; color: #94a3b8; background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.22); padding: 1px 5px; border-radius: 3px;">0° Shutter</span>
+                        <span id="inspector-motion-blur-val" style="font-size: 10px; font-family: monospace; color: #38bdf8; font-weight: 700;">Off</span>
+                      </div>
+                    </div>
+
+                    <!-- Granular Intensity Slider + Micro-Step & Direct Numeric Input -->
+                    <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 5px;">
+                      <button type="button" id="btn-motion-blur-step-down" class="btn btn-secondary btn-sm" title="Decrease blur intensity by 0.5%" style="padding: 1px 5px; font-size: 10px; line-height: 1.2; min-width: 20px;">−</button>
+                      <input type="range" id="inspector-motion-blur-slider" min="0" max="100" step="0.5" value="0" style="flex: 1; margin: 0; accent-color: #38bdf8;">
+                      <button type="button" id="btn-motion-blur-step-up" class="btn btn-secondary btn-sm" title="Increase blur intensity by 0.5%" style="padding: 1px 5px; font-size: 10px; line-height: 1.2; min-width: 20px;">+</button>
+                      <input type="number" id="inspector-motion-blur-num" min="0" max="100" step="0.5" value="0" title="Exact Motion Blur Intensity (%)" style="width: 48px; background: var(--bg-input); border: 1px solid var(--border-color); color: #38bdf8; font-family: monospace; font-size: 10px; font-weight: 700; padding: 2px 4px; border-radius: 4px; text-align: right;">
+                    </div>
+
+                    <!-- Quick Shutter Angle / Intensity Presets -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 3px; margin-bottom: 6px;">
+                      <button type="button" class="btn btn-secondary btn-sm mb-preset-btn" data-mb-preset="0" style="flex: 1; font-size: 8.5px; padding: 2px 3px;">Off</button>
+                      <button type="button" class="btn btn-secondary btn-sm mb-preset-btn" data-mb-preset="15" title="90° Crisp Shutter (15%)" style="flex: 1; font-size: 8.5px; padding: 2px 3px;">90° Subtle</button>
+                      <button type="button" class="btn btn-secondary btn-sm mb-preset-btn" data-mb-preset="35" title="180° Natural Cinema Shutter (35%)" style="flex: 1; font-size: 8.5px; padding: 2px 3px;">180° Cinema</button>
+                      <button type="button" class="btn btn-secondary btn-sm mb-preset-btn" data-mb-preset="65" title="270° High-Speed Whip (65%)" style="flex: 1; font-size: 8.5px; padding: 2px 3px;">270° Whip</button>
+                      <button type="button" class="btn btn-secondary btn-sm mb-preset-btn" data-mb-preset="95" title="360° Extreme Smear (95%)" style="flex: 1; font-size: 8.5px; padding: 2px 3px;">360° Max</button>
+                    </div>
+
+                    <!-- Trail Samples / Smoothness Density -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 5px;">
+                      <span style="font-size: 9.5px; color: var(--text-muted); white-space: nowrap;">Trail Samples:</span>
+                      <input type="range" id="inspector-motion-blur-samples" min="2" max="16" step="1" value="8" style="flex: 1; margin: 0; accent-color: #38bdf8;">
+                      <span id="inspector-motion-blur-samples-val" style="font-size: 9.5px; font-family: monospace; color: #cbd5e1; min-width: 42px; text-align: right;">8x Smooth</span>
+                    </div>
+
+                    <!-- Blur Vector & Custom Angle -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 4px;">
+                      <span style="font-size: 9.5px; color: var(--text-muted);">Blur Vector:</span>
+                      <select id="inspector-motion-blur-angle" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 3px 6px; border-radius: 4px; font-size: 10px;">
+                        <option value="horizontal">0° Horizontal Streak</option>
+                        <option value="vertical">90° Vertical Streak</option>
+                        <option value="diagonal">45° Diagonal Whip</option>
+                        <option value="radial">Radial Zoom Smear</option>
+                        <option value="path">Follow 2D/3D Motion Path</option>
+                        <option value="custom">Custom Angle (°)</option>
+                      </select>
+                    </div>
+                    <div id="inspector-motion-blur-deg-row" style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
+                      <span style="font-size: 9.5px; color: var(--text-muted); white-space: nowrap;">Vector Angle:</span>
+                      <input type="range" id="inspector-motion-blur-deg" min="0" max="360" step="1" value="0" style="flex: 1; margin: 0; accent-color: #38bdf8;">
+                      <span id="inspector-motion-blur-deg-val" style="font-size: 9.5px; font-family: monospace; color: #38bdf8; min-width: 32px; text-align: right;">0°</span>
+                    </div>
+                  </div>
+
+                  <!-- 2. Camera Flash Effect Toggle, Brilliance, Color & Shutter SFX -->
+                  <div style="background: rgba(0,0,0,0.28); border: 1px solid rgba(251,191,36,0.18); border-radius: 5px; padding: 6px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                      <label style="font-size: 10.5px; font-weight: 700; color: #fbbf24; display: flex; align-items: center; gap: 5px; cursor: pointer; margin: 0;">
+                        <input type="checkbox" id="inspector-camera-flash-toggle">
+                        <span>📸 Camera Flash Effect</span>
+                      </label>
+                      <button type="button" id="btn-inspector-test-flash" class="btn btn-secondary btn-sm" style="font-size: 9px; padding: 2px 6px; border-color: rgba(251,191,36,0.4); color: #fbbf24;">⚡ Flash Now</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 4px;">
+                      <div>
+                        <label style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-muted);">
+                          <span>Brilliance:</span>
+                          <span id="inspector-camera-flash-intensity-val" style="color: #fff;">190%</span>
+                        </label>
+                        <input type="range" id="inspector-camera-flash-intensity" min="50" max="320" step="5" value="190" style="width: 100%;">
+                      </div>
+                      <div>
+                        <label style="display: flex; justify-content: space-between; font-size: 9.5px; color: var(--text-muted);">
+                          <span>Decay:</span>
+                          <span id="inspector-camera-flash-duration-val" style="color: #fff;">0.45s</span>
+                        </label>
+                        <input type="range" id="inspector-camera-flash-duration" min="0.10" max="1.50" step="0.05" value="0.45" style="width: 100%;">
+                      </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                      <input type="color" id="inspector-camera-flash-color" value="#fff5e0" title="Flashlight Color Tint" style="width: 28px; height: 22px; padding: 0; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; background: transparent; cursor: pointer;">
+                      <select id="inspector-camera-flash-sfx" style="flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; padding: 3px 6px; border-radius: 4px; font-size: 10px;">
+                        <option value="slr_35mm">📷 35mm SLR Shutter SFX</option>
+                        <option value="paparazzi_xenon">⚡ Paparazzi Xenon + Whine</option>
+                        <option value="polaroid_instant">🎞️ Polaroid Motor Eject</option>
+                        <option value="vintage_bulb">💡 Vintage Press Flashbulb</option>
+                        <option value="mirrorless_silent">🔇 Silent Mirrorless Click</option>
+                        <option value="none">🔇 Mute Shutter Sound</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
                 <button type="button" class="btn btn-secondary btn-sm" id="btn-reset-clip-adjust" style="width: 100%; margin-top: 6px; font-size: 10.5px;">
                   Reset Adjustments
                 </button>
@@ -2527,6 +2802,69 @@
                     <option value="2.0">Dramatic (2.0s)</option>
                     <option value="custom">Custom...</option>
                   </select>
+                </div>
+              </div>
+
+              <!-- J-Cut / L-Cut Audio-Visual Pacing Toggle Studio -->
+              <div id="inspector-jcut-lcut-box" style="background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 6px; padding: 8px; margin-top: 6px; display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 9.5px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">Audio-Visual Cut Pacing</span>
+                  <span class="badge" id="inspector-jcut-lcut-badge" style="font-size: 9px; background: rgba(56, 189, 248, 0.14); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-family: var(--font-mono);">SYNC CUT</span>
+                </div>
+
+                <!-- 3-Way Interactive Pacing Toggle: Sync | J-Cut | L-Cut -->
+                <div class="btn-group" style="display: grid; grid-template-columns: 1fr 1.25fr 1.25fr; gap: 4px;">
+                  <button type="button" class="btn btn-secondary btn-sm jcut-lcut-mode-btn active" id="btn-pacing-sync" data-pacing="sync" style="padding: 5px 4px; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 1px;" title="Standard Cut: Audio and Video cut simultaneously">
+                    <span>Sync Cut</span>
+                    <span style="font-size: 8px; opacity: 0.7; font-weight: 500;">A+V Aligned</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm jcut-lcut-mode-btn" id="btn-pacing-jcut" data-pacing="j-cut" style="padding: 5px 4px; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 1px;" title="J-Cut: Audio leads video (next scene's audio starts before video cut)">
+                    <span style="color: #38bdf8;">J-Cut</span>
+                    <span style="font-size: 8px; opacity: 0.75; font-weight: 500;">Audio Leads</span>
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm jcut-lcut-mode-btn" id="btn-pacing-lcut" data-pacing="l-cut" style="padding: 5px 4px; font-size: 10px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 1px;" title="L-Cut: Video leads audio (previous audio trails under new video)">
+                    <span style="color: #f59e0b;">L-Cut</span>
+                    <span style="font-size: 8px; opacity: 0.75; font-weight: 500;">Video Leads</span>
+                  </button>
+                </div>
+
+                <!-- Live Visual Split-Track Diagram (V1 / A1 Cut Overhang Preview) -->
+                <div id="inspector-jcut-lcut-diagram" style="background: rgba(2, 6, 23, 0.75); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 5px; padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; position: relative; overflow: hidden;">
+                  <!-- Center Cut Line -->
+                  <div style="position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; border-left: 1px dashed rgba(255, 255, 255, 0.25); pointer-events: none; z-index: 3;"></div>
+                  <!-- V1 Track Row -->
+                  <div style="display: flex; align-items: center; gap: 6px; font-size: 8.5px; font-family: var(--font-mono); color: #94a3b8;">
+                    <span style="width: 18px; font-weight: 700; color: #a855f7;">V1</span>
+                    <div style="flex: 1; height: 11px; background: rgba(255,255,255,0.04); border-radius: 3px; position: relative; display: flex; overflow: hidden;">
+                      <div id="jcut-diag-v-out" style="width: 50%; height: 100%; background: rgba(148, 163, 184, 0.28); border-right: 1.5px solid #e2e8f0; transition: width 0.18s ease;"></div>
+                      <div id="jcut-diag-v-in" style="flex: 1; height: 100%; background: rgba(168, 85, 247, 0.45); transition: all 0.18s ease;"></div>
+                    </div>
+                  </div>
+                  <!-- A1 Track Row -->
+                  <div style="display: flex; align-items: center; gap: 6px; font-size: 8.5px; font-family: var(--font-mono); color: #94a3b8;">
+                    <span style="width: 18px; font-weight: 700; color: #38bdf8;">A1</span>
+                    <div style="flex: 1; height: 11px; background: rgba(255,255,255,0.04); border-radius: 3px; position: relative; display: flex; overflow: hidden;">
+                      <div id="jcut-diag-a-out" style="width: 50%; height: 100%; background: rgba(148, 163, 184, 0.25); border-right: 1.5px solid #38bdf8; transition: width 0.18s ease;"></div>
+                      <div id="jcut-diag-a-in" style="flex: 1; height: 100%; background: rgba(56, 189, 248, 0.48); transition: all 0.18s ease;"></div>
+                    </div>
+                  </div>
+                  <div id="inspector-jcut-lcut-desc" style="font-size: 8.5px; color: #94a3b8; text-align: center; line-height: 1.2;">Audio &amp; video cut simultaneously at the edit point.</div>
+                </div>
+
+                <!-- Lead / Lag Offset Slider & Crossfade Curve (Visible when J-Cut or L-Cut is active) -->
+                <div id="inspector-jcut-lcut-controls" style="display: none; flex-direction: column; gap: 5px; padding-top: 2px; border-top: 1px dashed rgba(255,255,255,0.08);">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="inspector-jcut-lcut-offset-label" style="font-size: 9px; color: #cbd5e1; font-weight: 600;">Audio Lead Offset</span>
+                    <span id="inspector-jcut-lcut-offset-val" style="font-size: 9.5px; font-family: var(--font-mono); font-weight: 700; color: #38bdf8;">-0.80s</span>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <input type="range" id="inspector-jcut-lcut-offset-slider" min="1" max="30" value="8" style="flex: 1; accent-color: #38bdf8; cursor: pointer;" />
+                    <select id="inspector-jcut-lcut-curve" style="background: var(--bg-input); border: 1px solid var(--border-color); color: #e2e8f0; padding: 2px 5px; border-radius: 4px; font-size: 9px;" title="Audio Crossfade Curve">
+                      <option value="constant-power">Const Power</option>
+                      <option value="s-curve">Smooth S-Curve</option>
+                      <option value="linear">Linear Fade</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
@@ -7109,16 +7447,17 @@
           </div>
 
           <!-- Section: Media Layers -->
-          <div id="tpl-modal-standard-layers-section" style="display: flex; flex-direction: column; gap: 8px; position: sticky; top: -14px; background: #0c0e15; z-index: 25; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08);"><div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; justify-content: space-between;"><span>Layers</span>
+          <div id="tpl-modal-standard-layers-section" style="display: flex; flex-direction: column; gap: 8px; position: sticky; top: -14px; background: #0c0e15; z-index: 25; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.08);"><div style="order: 0; font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px; display: flex; align-items: center; justify-content: space-between;"><span>&#x1F5C2;&#xFE0F; Scene Layers (Z=0 BG &#x2192; Media)</span>
               <label for="tpl-modal-add-image-cutout" id="tpl-modal-btn-add-image" title="Add Layer" style="font-size: 10px; font-weight: 500; color: #a855f7; cursor: pointer; display: inline-flex; align-items: center; gap: 2px;">
                 + Add Layer
-                <input type="file" id="tpl-modal-add-image-cutout" accept="image/*" style="display: none;" />
+                <input type="file" id="tpl-modal-add-image-cutout" accept="image/*,video/*" style="display: none;" />
               </label>
             </div>
 
-            <!-- Subject Layer Row -->
-            <div id="tpl-modal-wrap-primary" style="display: flex; flex-direction: column; gap: 6px;">
+            <!-- Subject Layer Row (Z=1 Foreground Media, ordered after Z=0 Background) -->
+            <div id="tpl-modal-wrap-primary" style="order: 2; display: flex; flex-direction: column; gap: 6px;">
               <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 8px;">
+                <span style="font-size: 8.5px; font-family: monospace; font-weight: 800; color: #c084fc; background: rgba(168,85,247,0.14); border: 1px solid rgba(168,85,247,0.35); padding: 2px 4px; border-radius: 4px; flex-shrink: 0;">Z=1</span>
                 <img id="tpl-modal-thumb-primary" src="" alt="Subject" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;" />
                 <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
                   <span id="tpl-modal-label-primary" style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Cutout Subject</span>
@@ -7365,7 +7704,8 @@
             </div>
 
             <!-- Background Layer Row -->
-            <div id="tpl-modal-wrap-secondary" style="display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 6px 8px; position: relative;">
+            <div id="tpl-modal-wrap-secondary" style="order: 1; display: flex; align-items: center; gap: 8px; background: rgba(56,189,248,0.04); border: 1px solid rgba(56,189,248,0.18); border-radius: 8px; padding: 6px 8px; position: relative;">
+              <span style="font-size: 8.5px; font-family: monospace; font-weight: 800; color: #38bdf8; background: rgba(56,189,248,0.14); border: 1px solid rgba(56,189,248,0.35); padding: 2px 4px; border-radius: 4px; flex-shrink: 0;">Z=0</span>
               <div id="tpl-modal-thumb-sec-wrap" style="width: 32px; height: 32px; border-radius: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; position: relative; background: #0b0f19; display: flex; align-items: center; justify-content: center;">
                 <img id="tpl-modal-thumb-secondary" src="" alt="Background" style="width: 100%; height: 100%; object-fit: cover; display: block;" />
                 <video id="tpl-modal-thumb-secondary-video" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover; display: none;"></video>
@@ -7452,13 +7792,15 @@
             <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
               <span style="font-size: 10px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Backdrop Source Mode</span>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: #05070e; padding: 4px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
-                <button type="button" id="btn-creator-mode-orig" style="padding: 6px 8px; font-size: 10.5px; font-weight: 700; border-radius: 6px; border: none; background: #0284c7; color: #fff; cursor: pointer; transition: 0.15s;">Original Video / Scene</button>
-                <button type="button" id="btn-creator-mode-virtual" style="padding: 6px 8px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer; transition: 0.15s;">Virtual Studio Presets</button>
+                <button type="button" id="btn-creator-mode-orig" style="padding: 6px 8px; font-size: 10.5px; font-weight: 600; border-radius: 6px; border: none; background: transparent; color: #94a3b8; cursor: pointer; transition: 0.15s;">Original Video Blur</button>
+                <button type="button" id="btn-creator-mode-virtual" style="padding: 6px 8px; font-size: 10.5px; font-weight: 700; border-radius: 6px; border: none; background: #0284c7; color: #fff; cursor: pointer; transition: 0.15s;">Virtual Studio Presets</button>
               </div>
 
               <!-- Virtual Studio Presets Row -->
-              <div id="creator-virtual-preset-row" style="display: none; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 2px;">
+              <div id="creator-virtual-preset-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 2px;">
                 <button type="button" id="btn-creator-preset-studio" style="padding: 6px 4px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1px solid #38bdf8; background: rgba(56,189,248,0.15); color: #fff; cursor: pointer;">Moody Bokeh</button>
+                <button type="button" id="btn-creator-preset-stars" style="padding: 6px 4px; font-size: 9.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer;">Starfield</button>
+                <button type="button" id="btn-creator-preset-room" style="padding: 6px 4px; font-size: 9.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer;">Glowing Room</button>
                 <button type="button" id="btn-creator-preset-cyber" style="padding: 6px 4px; font-size: 9.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer;">Cyber Teal</button>
                 <button type="button" id="btn-creator-preset-boardroom" style="padding: 6px 4px; font-size: 9.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer;">Boardroom</button>
               </div>
@@ -7467,10 +7809,16 @@
             <!-- Calibration Controls Group: Depth of Field Blur -->
             <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x1F3AC; Calibrate Depth of Field (Blur)</span>
+                <span style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x1F3AC; Background Blur (0px &#x2013; 60px)</span>
                 <span id="std-creator-val-blur" style="font-family: monospace; font-size: 10.5px; font-weight: 700; color: #38bdf8;">28px</span>
               </div>
-              <input type="range" id="std-creator-slider-blur" min="0" max="60" value="28" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+              <input type="range" id="std-creator-slider-blur" min="0" max="60" step="1" value="28" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+                <button type="button" class="btn-creator-blur-preset" data-blur="0" style="padding: 4px 2px; font-size: 9px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #cbd5e1; cursor: pointer;">0px Sharp</button>
+                <button type="button" class="btn-creator-blur-preset" data-blur="12" style="padding: 4px 2px; font-size: 9px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #cbd5e1; cursor: pointer;">12px Soft</button>
+                <button type="button" class="btn-creator-blur-preset" data-blur="28" style="padding: 4px 2px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid #38bdf8; background: rgba(56,189,248,0.15); color: #fff; cursor: pointer;">28px Bokeh</button>
+                <button type="button" class="btn-creator-blur-preset" data-blur="48" style="padding: 4px 2px; font-size: 9px; font-weight: 600; border-radius: 5px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #cbd5e1; cursor: pointer;">48px Deep</button>
+              </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
                 <span style="font-size: 10.5px; color: #94a3b8;">Bokeh Aperture Softness</span>
@@ -7501,56 +7849,93 @@
               </div>
 
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 10.5px; color: #94a3b8;">Subject Rim Light Highlight</span>
+                <span style="font-size: 10.5px; color: #94a3b8;">Backlight Aura (Behind Speaker)</span>
                 <span id="std-creator-val-rim" style="font-family: monospace; font-size: 10px; color: #38bdf8; margin-left: auto; margin-right: 8px;">75%</span>
                 <input type="range" id="std-creator-slider-rim" min="0" max="100" value="75" style="width: 45%; accent-color: #38bdf8; cursor: pointer;" />
               </div>
             </div>
 
-            <!-- Face Tracking & Anti-Glitch Hold-out Brush Group -->
+            <!-- Deterministic Background Zone & Seated Auto-Adjust Group -->
+            <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(56, 189, 248, 0.22); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 11px; font-weight: 700; color: #38bdf8;">&#x1F4D0; Background Zone &amp; Seated Auto-Adjust</div>
+                <span id="std-creator-val-zone-badge" style="font-family: monospace; font-size: 9.5px; font-weight: 700; color: #22c55e; background: rgba(34,197,94,0.12); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(34,197,94,0.3);">Auto-Fit Seated</span>
+              </div>
+              <p style="margin: 0; font-size: 9.5px; color: #94a3b8; line-height: 1.35;">Full-screen background when empty. When a video is added, automatically detects desk/elbow level so the background only sits behind the speaker.</p>
+
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+                <button type="button" id="btn-creator-zone-autoground" style="padding: 6px 4px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1px solid #38bdf8; background: rgba(56,189,248,0.16); color: #fff; cursor: pointer;" title="Automatically anchors seated speaker flush to bottom edge and strips desk/cup artifacts">Auto-Fit Bottom</button>
+                <button type="button" id="btn-creator-zone-wall" style="padding: 6px 4px; font-size: 9.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer;" title="Replaces only the back wall above the desk line and keeps the foreground desk below">Back Wall Only</button>
+                <button type="button" id="btn-creator-zone-full" style="padding: 6px 4px; font-size: 9.5px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: #94a3b8; cursor: pointer;" title="1:1 unshifted full-screen background replacement">1:1 Full Frame</button>
+              </div>
+
+              <div id="creator-horizon-slider-row" style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span id="std-creator-lbl-horizon" style="font-size: 10px; color: #94a3b8;">Desk / Bottom Trim Cutoff (Auto-Detected)</span>
+                  <span id="std-creator-val-horizon" style="font-family: monospace; font-size: 10px; color: #38bdf8;">Auto</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="range" id="std-creator-slider-horizon" min="45" max="100" value="100" style="flex: 1; accent-color: #38bdf8; cursor: pointer;" />
+                  <button type="button" id="btn-creator-horizon-auto" style="padding: 3px 7px; font-size: 9px; font-weight: 700; border-radius: 5px; border: 1px solid #38bdf8; background: rgba(56,189,248,0.15); color: #fff; cursor: pointer;">Auto</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anti-Flicker Person Cutout & Edge Color Decontamination Group -->
             <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-size: 11px; font-weight: 700; color: #38bdf8;">&#x1F512; Face Tracking &amp; Edge Protection</div>
+                <div style="font-size: 11px; font-weight: 700; color: #38bdf8;">&#x2702;&#xfe0f; Edge Color Decontamination &amp; Choke</div>
                 <input type="checkbox" id="std-creator-toggle-face-track" checked style="accent-color: #38bdf8; cursor: pointer;" />
               </div>
-              <p style="margin: 0; font-size: 9.5px; color: #94a3b8; line-height: 1.35;">Prevents edges from jittering or glitching when the speaker moves. Smooths temporal mask deltas.</p>
+              <p style="margin: 0; font-size: 9.5px; color: #94a3b8; line-height: 1.35;">Replaces white wall/table bleed on border pixels with the speaker&#39;s true interior sweater/hair color and removes detached desk props.</p>
 
               <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 10.5px; color: #94a3b8;">Motion Tracking Sensitivity</span>
+                <span style="font-size: 10.5px; color: #94a3b8;">Edge Color Decontamination (De-Halo)</span>
+                <span id="std-creator-val-decontaminate" style="font-family: monospace; font-size: 10px; color: #38bdf8;">92%</span>
+              </div>
+              <input type="range" id="std-creator-slider-decontaminate" min="0" max="100" value="92" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10.5px; color: #94a3b8;">Cutout Edge Tightness (Remove Wall Halo)</span>
+                <span id="std-creator-val-edge-choke" style="font-family: monospace; font-size: 10px; color: #38bdf8;">82%</span>
+              </div>
+              <input type="range" id="std-creator-slider-edge-choke" min="20" max="95" value="82" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 10.5px; color: #94a3b8;">Anti-Flicker Temporal Smoothing</span>
                 <span id="std-creator-val-sensitivity" style="font-family: monospace; font-size: 10px; color: #cbd5e1;">94%</span>
               </div>
               <input type="range" id="std-creator-slider-sensitivity" min="50" max="100" value="94" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
 
-              <!-- Holdout / Protect Brush -->
+              <!-- Holdout / Protect Brush (Off by default so clicking stage doesn't paint blue circles) -->
               <div style="margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; display: flex; flex-direction: column; gap: 6px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 10.5px; font-weight: 600; color: #e2e8f0;">&#x1F58C;&#xfe0f; Manual Protection Brush (Hold-out)</span>
-                  <span style="font-size: 9px; color: #38bdf8; font-family: monospace;">Brush to Keep Sharp</span>
+                  <span style="font-size: 10.5px; font-weight: 600; color: #e2e8f0;">&#x1F58C;&#xfe0f; Manual Hold-out Brush</span>
+                  <button type="button" id="btn-creator-toggle-brush" style="padding: 3px 8px; font-size: 9.5px; font-weight: 700; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #94a3b8; border-radius: 5px; cursor: pointer;">Brush: OFF</button>
                 </div>
-                <p style="margin: 0; font-size: 9px; color: #64748b;">Paint directly over face, hair, or microphone on stage to lock them in place so they never get blurred.</p>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <span style="font-size: 9.5px; color: #94a3b8;">Brush Size:</span>
                   <input type="range" id="std-creator-slider-brush-size" min="15" max="80" value="35" style="flex: 1; accent-color: #38bdf8; cursor: pointer;" />
                   <span id="std-creator-val-brush-size" style="font-size: 9.5px; font-family: monospace; color: #38bdf8;">35px</span>
                 </div>
                 <div style="display: flex; gap: 6px; margin-top: 2px;">
-                  <button type="button" id="btn-creator-reset-head" style="flex: 1; padding: 5px 8px; font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Reset Head</button>
-                  <button type="button" id="btn-creator-clear-brush" style="flex: 1; padding: 5px 8px; font-size: 10px; font-weight: 600; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 6px; cursor: pointer;">Clear Holdout Brush</button>
+                  <button type="button" id="btn-creator-reset-head" style="flex: 1; padding: 5px 8px; font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; border-radius: 6px; cursor: pointer;">Reset Cutout Mask</button>
+                  <button type="button" id="btn-creator-clear-brush" style="flex: 1; padding: 5px 8px; font-size: 10px; font-weight: 600; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 6px; cursor: pointer;">Clear Brush</button>
                 </div>
               </div>
             </div>
 
-            <!-- In-Scene Kinetic Text Controls -->
+            <!-- In-Scene Kinetic Text Controls (Optional, Blank by Default) -->
             <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-              <div style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x1F4AC; In-Scene Kinetic Typography</div>
+              <div style="font-size: 11px; font-weight: 700; color: #f8fafc;">&#x1F4AC; Optional Text Behind Speaker</div>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                 <div>
-                  <label style="font-size: 9.5px; color: #94a3b8; display: block; margin-bottom: 3px;">Left Callout Text</label>
-                  <input type="text" id="std-creator-input-text-left" value="this AI company" style="width: 100%; box-sizing: border-box; padding: 5px 8px; background: #05070e; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-size: 11px;" />
+                  <label style="font-size: 9.5px; color: #94a3b8; display: block; margin-bottom: 3px;">Left Callout (Optional)</label>
+                  <input type="text" id="std-creator-input-text-left" value="" placeholder="Type left text..." style="width: 100%; box-sizing: border-box; padding: 5px 8px; background: #05070e; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-size: 11px;" />
                 </div>
                 <div>
-                  <label style="font-size: 9.5px; color: #94a3b8; display: block; margin-bottom: 3px;">Right Bold Callout</label>
-                  <input type="text" id="std-creator-input-text-right" value="VOICE" style="width: 100%; box-sizing: border-box; padding: 5px 8px; background: #05070e; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800;" />
+                  <label style="font-size: 9.5px; color: #94a3b8; display: block; margin-bottom: 3px;">Right Bold Callout (Optional)</label>
+                  <input type="text" id="std-creator-input-text-right" value="" placeholder="Type right text..." style="width: 100%; box-sizing: border-box; padding: 5px 8px; background: #05070e; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #fff; font-size: 11px; font-weight: 800;" />
                 </div>
               </div>
             </div>
@@ -7755,9 +8140,10 @@
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-size: 10px; color: #cbd5e1; font-weight: 600;">Text Behind</span>
                 <div style="display: flex; gap: 3px;">
+                  <button type="button" id="spooner-txt-dir-off" style="padding: 2px 6px; font-size: 9px; font-weight: 700; border-radius: 4px; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.5); color: #38bdf8; cursor: pointer;">Off</button>
                   <button type="button" id="spooner-txt-dir-push" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Push In</button>
                   <button type="button" id="spooner-txt-dir-pull" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Pull Out</button>
-                  <button type="button" id="spooner-txt-dir-static" style="padding: 2px 6px; font-size: 9px; font-weight: 700; border-radius: 4px; background: rgba(56,189,248,0.2); border: 1px solid rgba(56,189,248,0.5); color: #38bdf8; cursor: pointer;">Drift</button>
+                  <button type="button" id="spooner-txt-dir-static" style="padding: 2px 6px; font-size: 9px; font-weight: 500; border-radius: 4px; background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; cursor: pointer;">Drift</button>
                 </div>
               </div>
             </div>
@@ -8017,6 +8403,146 @@
           </div>
 
 
+          <!-- Section: 3D Investigative Decode & Documentary Environment -->
+          <div id="tpl-modal-wrap-matrix" style="display: none; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.6px;">Investigative Decode Engine</span>
+              <span style="font-size: 9px; color: #fbbf24; font-family: monospace; font-weight: 700;">KINETIC 3D</span>
+            </div>
+
+            <!-- Animation Style & Container Style Dropdowns -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 7px 8px;">
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Animation Reveal Style</span>
+                <select id="tpl-modal-select-decode-anim" style="width: 100%; background: #161926; border: 1px solid rgba(245,158,11,0.35); border-radius: 5px; padding: 4px 6px; color: #f8fafc; font-size: 10px; font-weight: 600; outline: none; cursor: pointer;">
+                  <option value="expanding-decode">Dynamic Expanding + Leading Decode (Default)</option>
+                  <option value="expanding-clean">Fast Expanding Typewriter (No Decode)</option>
+                  <option value="static-dossier">Fixed-Slot Dossier Cipher (Static Width)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Main Container Style</span>
+                <select id="tpl-modal-select-decode-container" style="width: 100%; background: #161926; border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 6px; color: #cbd5e1; font-size: 10px; font-weight: 500; outline: none; cursor: pointer;">
+                  <option value="glow-outline">Minimal Colored Outline Box (Default)</option>
+                  <option value="dossier-spine">Dossier Left-Spine Plate (Editorial)</option>
+                  <option value="none">No Container (Floating Text Only)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Background Environment</span>
+                <select id="tpl-modal-select-decode-env" style="width: 100%; background: #161926; border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 6px; color: #cbd5e1; font-size: 10px; font-weight: 500; outline: none; cursor: pointer;">
+                  <option value="darkroom-dossier">3D Darkroom Dossier (Archival Sheets)</option>
+                  <option value="dark-screen">Dark Screen Backdrop (Clean Obsidian)</option>
+                  <option value="geospatial-tactical">Geospatial Recon Grid (Concentric Rings)</option>
+                  <option value="minimal-obsidian">Minimal Studio Slate (Pure Dark)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Theme & Text Color Customizer (Synced by default, independently customizable) -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 7px 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9.5px; color: #94a3b8; font-weight: 600;">Color Palette (Theme &amp; Text)</span>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <button type="button" class="decode-color-preset-btn" data-title-col="#f59e0b" data-accent-col="#f59e0b" title="Amber Gold (Default)" style="width: 14px; height: 14px; border-radius: 50%; background: #f59e0b; border: 1.5px solid rgba(255,255,255,0.55); cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="decode-color-preset-btn" data-title-col="#00f0ff" data-accent-col="#00f0ff" title="Cyan Pulse (Image 1 Style)" style="width: 14px; height: 14px; border-radius: 50%; background: #00f0ff; border: 1.5px solid rgba(255,255,255,0.55); cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="decode-color-preset-btn" data-title-col="#10b981" data-accent-col="#10b981" title="Emerald Terminal" style="width: 14px; height: 14px; border-radius: 50%; background: #10b981; border: 1.5px solid rgba(255,255,255,0.55); cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="decode-color-preset-btn" data-title-col="#ef4444" data-accent-col="#ef4444" title="Crimson Classified" style="width: 14px; height: 14px; border-radius: 50%; background: #ef4444; border: 1.5px solid rgba(255,255,255,0.55); cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="decode-color-preset-btn" data-title-col="#a855f7" data-accent-col="#a855f7" title="Violet Neon" style="width: 14px; height: 14px; border-radius: 50%; background: #a855f7; border: 1.5px solid rgba(255,255,255,0.55); cursor: pointer; padding: 0;"></button>
+                  <button type="button" class="decode-color-preset-btn" data-title-col="#f8fafc" data-accent-col="#f59e0b" title="White Text + Amber Box" style="width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, #f8fafc 50%, #f59e0b 50%); border: 1.5px solid rgba(255,255,255,0.55); cursor: pointer; padding: 0;"></button>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+                <label style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 5px; padding: 4px 7px; font-size: 9.5px; color: #cbd5e1; cursor: pointer;">
+                  <span>Theme Color</span>
+                  <input type="color" id="tpl-modal-decode-accent-color" value="#f59e0b" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer; padding: 0;" />
+                </label>
+                <label style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 5px; padding: 4px 7px; font-size: 9.5px; color: #cbd5e1; cursor: pointer;">
+                  <span>Text Color</span>
+                  <input type="color" id="tpl-modal-decode-title-color" value="#f59e0b" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer; padding: 0;" />
+                </label>
+              </div>
+            </div>
+
+            <!-- Size, Container Scale & Subtitle Accolade Controls -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 7px 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 9px; color: #94a3b8; min-width: 72px; font-weight: 600;">TEXT SIZE</span>
+                <input type="range" id="tpl-modal-slider-decode-text-size" min="0.5" max="2.2" step="0.05" value="1.0" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <span id="tpl-modal-val-decode-text-size" style="font-size: 9.5px; font-family: monospace; color: #fde68a; width: 32px; text-align: right;">1.0x</span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 9px; color: #94a3b8; min-width: 72px; font-weight: 600;">BOX PADDING</span>
+                <input type="range" id="tpl-modal-slider-decode-box-size" min="0.5" max="2.2" step="0.05" value="1.0" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <span id="tpl-modal-val-decode-box-size" style="font-size: 9.5px; font-family: monospace; color: #fde68a; width: 32px; text-align: right;">1.0x</span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 9px; color: #94a3b8; min-width: 72px; font-weight: 600;">SUBTITLE SZ</span>
+                <input type="range" id="tpl-modal-slider-decode-sub-size" min="0.5" max="2.0" step="0.05" value="1.0" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <span id="tpl-modal-val-decode-sub-size" style="font-size: 9.5px; font-family: monospace; color: #fde68a; width: 32px; text-align: right;">1.0x</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;" title="When unchecked (default), subtitle displays with [ ... ] brackets and no container box, like Image 1.">
+                  <input type="checkbox" id="tpl-modal-decode-sub-container" style="accent-color: #f59e0b; cursor: pointer;" />
+                  <span>Subtitle Container Box</span>
+                </label>
+                <span style="font-size: 8.5px; color: #64748b; font-family: monospace;">[ ACCOLADES ]</span>
+              </div>
+            </div>
+
+            <!-- Cipher Decode Speed & Mechanical Cadence -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 7px 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 9px; color: #94a3b8; min-width: 72px; font-weight: 600;">REVEAL SPEED</span>
+                <input type="range" id="tpl-modal-slider-matrix-typespeed" min="0.4" max="3.0" step="0.1" value="1.3" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <span id="tpl-modal-val-matrix-typespeed" style="font-size: 9.5px; font-family: monospace; color: #fde68a; width: 28px; text-align: right;">1.3x</span>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 2px;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                  <input type="checkbox" id="tpl-modal-decode-redaction-sweep" style="accent-color: #f59e0b; cursor: pointer;" />
+                  <span>Keyword Highlight Sweep</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                  <input type="checkbox" id="tpl-modal-decode-12fps" style="accent-color: #f59e0b; cursor: pointer;" />
+                  <span>12fps Cadence</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Background Archival Telemetry Stream Controls -->
+            <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; padding: 7px 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <label style="display: flex; align-items: center; gap: 6px; font-size: 10px; color: #cbd5e1; cursor: pointer;">
+                  <input type="checkbox" id="tpl-modal-matrix-rain-enable" checked style="accent-color: #f59e0b; cursor: pointer;" />
+                  <span>Archival Telemetry Stream</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                  <span style="font-size: 8.5px; color: #64748b;">Stream Color</span>
+                  <input type="color" id="tpl-modal-matrix-rain-color" value="#f59e0b" title="Telemetry Stream Tint" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer; padding: 0;" />
+                </div>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 9px; color: #64748b; min-width: 56px;">STREAM SPD</span>
+                <input type="range" id="tpl-modal-slider-matrix-speed" min="0.3" max="2.5" step="0.1" value="1.0" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <span id="tpl-modal-val-matrix-speed" style="font-size: 9px; font-family: monospace; color: #cbd5e1; width: 28px; text-align: right;">1.0x</span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 9px; color: #64748b; min-width: 56px;">DENSITY</span>
+                <input type="range" id="tpl-modal-slider-matrix-density" min="12" max="26" step="2" value="18" style="flex: 1; accent-color: #f59e0b; height: 3px; cursor: pointer;" />
+                <span id="tpl-modal-val-matrix-density" style="font-size: 9px; font-family: monospace; color: #cbd5e1; width: 56px; text-align: right;">Dense</span>
+              </div>
+            </div>
+          </div>
+
           <!-- Section: Typography -->
           <div id="tpl-modal-wrap-text" style="display: flex; flex-direction: column; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
             <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -8225,7 +8751,7 @@
             <span id="tpl-modal-val-blur">2px</span>
             <input type="range" id="tpl-modal-slider-blur" min="0" max="16" step="0.5" value="2" />
             <span id="tpl-modal-val-duration">6 sec</span>
-            <input type="range" id="tpl-modal-slider-duration" min="2" max="30" value="6" />
+            <input type="range" id="tpl-modal-slider-duration" min="2" max="12" value="6" />
           </div>
 
         </div>
@@ -12121,12 +12647,12 @@
   <audio id="audio-player"></audio>
   <audio id="bgm-player"></audio>
   <script src="js/world-geo-data.js?v=1"></script>
-  <script src="js/tpl-snapshots.js?v=16"></script>
-  <script src="js/tester-templates/tester-templates.bundle.js?v=7"></script>
-  <script src="js/tester-templates/tester-templates-data.js?v=8"></script>
-  <script src="js/app.js?v=2?v=359"></script>
-  <script src="js/tpl-3d-inspector.js?v=17"></script>
-  <script src="js/tpl-stage-transform.js?v=9"></script>
+  <script src="js/tpl-snapshots.js?v=17"></script>
+  <script src="js/tester-templates/tester-templates.bundle.js?v=6"></script>
+  <script src="js/tester-templates/tester-templates-data.js?v=7"></script>
+  <script src="js/app.js?v=365"></script>
+  <script src="js/tpl-3d-inspector.js?v=22"></script>
+  <script src="js/tpl-stage-transform.js?v=8"></script>
   <script src="js/kinetic-3d-engine.js?v=1"></script>
   <script src="js/tactical-decode-3d-engine.js?v=2"></script>
   <script src="js/search-3d-engine.js?v=1"></script>
@@ -12146,31 +12672,10 @@
   <script src="js/hypnotic-vertigo-engine.js?v=1"></script>
   <script src="js/countdown-3d-engine.js?v=1"></script>
   <script src="js/jani-ftx-logo-engine.js?v=1"></script>
-  <script src="js/multi-image-flash-engine.js?v=1"></script>
-  <script src="js/document-barrage-engine.js?v=1"></script>
-  <script src="js/cinematic-light-trail-engine.js?v=1"></script>
-  <script src="js/circular-spin-flashlight-glitch-engine.js?v=2"></script>
-  <script src="js/countdown-timer-engine.js?v=1"></script>
-
-  <script src="js/merger-acquisition-engine.js?v=1"></script>
-<script src="js/tpl-contextual-inspector.js?v=23"></script>
+  <script src="js/jani-flash-quad-engine.js?v=2"></script>
+  <script src="js/jani-spin-flash-glitch-engine.js?v=2"></script>
+  <script src="js/tpl-contextual-inspector.js?v=23"></script>
   <script>
-        if (window.location.search.includes('open=countdowntimer') || window.location.search.includes('open=countdown-timer')) {
-      window.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-          const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined') ? EFFECT_TEMPLATES_DATA.find(t => t.id === 'countdown-timer') : null;
-          if (tpl && typeof openTopTemplateCustomizer === 'function') openTopTemplateCustomizer(tpl);
-        }, 600);
-      });
-    }
-    if (window.location.search.includes('open=circularspin') || window.location.search.includes('open=spinflash')) {
-      window.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-          const tpl = (typeof EFFECT_TEMPLATES_DATA !== 'undefined') ? EFFECT_TEMPLATES_DATA.find(t => t.id === 'circular-spin-flashlight-glitch') : null;
-          if (tpl && typeof openTopTemplateCustomizer === 'function') openTopTemplateCustomizer(tpl);
-        }, 800);
-      });
-    }
     if (window.location.search.includes('open=countdown')) {
       window.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {

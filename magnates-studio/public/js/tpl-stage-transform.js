@@ -104,17 +104,345 @@
     const tplId = topCustomizerState.currentTpl?.id;
     const mapCtxData = (tplId === 'map' && typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('map') : null;
     const isMapInteractive3D = !!(mapCtxData && (mapCtxData.is3DMode || mapCtxData.drawOnScreenMode));
-    const isDom3DHandOrbit = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode && ['zoom', 'parallax', 'textbehind', 'docheight'].includes(tplId));
-    const isBypassStageTransform = isMapInteractive3D || tplId === 'conspiracy-board' || tplId === 'wire-transfer' || tplId === 'merger-acquisition' || tplId === 'envelope-open' || tplId === 'money-stack' || tplId === 'map-pin-drop' || tplId === 'map' || tplId === 'empire-map' || tplId === 'empire-timeline' || tplId === 'headline-fly' || tplId === 'newspaper-3d' || tplId === 'screen-blur' || tplId === 'docheight' || (tplId === 'google' && topCustomizerState?.is3DMode) || isDom3DHandOrbit;
+    const isUniversal3DOrbitActive = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode);
+
+    // Bind direct drag & 3D orbit for Cinematic Progress HUD (.tpl-progress)
+    if (tplId === 'progress') {
+      const progRoot = stage.querySelector('.tpl-progress');
+      const progFrame = stage.querySelector('.tpl-progress .hud-progress-frame');
+      if (progRoot && progFrame && progRoot.dataset.progInteractiveBound !== '1') {
+        progRoot.dataset.progInteractiveBound = '1';
+        let pMode = null;
+        let sX = 0, sY = 0, oX = 0, oY = 0, oTiltX = 0, oTiltY = 0;
+        progRoot.addEventListener('pointerdown', (ev) => {
+          if (ev.target.closest('button, input, select')) return;
+          const d = (typeof window.tplGetContextualData === 'function') ? (window.tplGetContextualData('progress') || {}) : {};
+          const in3D = !!(typeof topCustomizerState !== 'undefined' && topCustomizerState.is3DMode);
+          pMode = (in3D || ev.altKey || ev.shiftKey) ? 'orbit3d' : 'move';
+          sX = ev.clientX;
+          sY = ev.clientY;
+          oX = Number(d.posX) || 0;
+          oY = Number(d.posY) || 0;
+          oTiltX = Number(d.tiltX) || 0;
+          oTiltY = Number(d.tiltY) || 0;
+          try { progRoot.setPointerCapture(ev.pointerId); } catch (_) {}
+        });
+        progRoot.addEventListener('pointermove', (ev) => {
+          if (!pMode) return;
+          const r = stage.getBoundingClientRect();
+          const dx = ev.clientX - sX;
+          const dy = ev.clientY - sY;
+          if (pMode === 'orbit3d') {
+            const nY = Math.max(-55, Math.min(55, Math.round(oTiltY + dx * 0.32)));
+            const nX = Math.max(-45, Math.min(45, Math.round(oTiltX - dy * 0.28)));
+            progFrame.style.setProperty('--hud-tilt-x', `${nX}deg`);
+            progFrame.style.setProperty('--hud-tilt-y', `${nY}deg`);
+            const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('progress') : null;
+            if (d) { d.tiltX = nX; d.tiltY = nY; }
+          } else {
+            const nX = Math.max(-35, Math.min(35, Math.round(oX + (dx / Math.max(r.width, 1)) * 100)));
+            const nY = Math.max(-35, Math.min(35, Math.round(oY + (dy / Math.max(r.height, 1)) * 100)));
+            progRoot.style.setProperty('--hud-pos-x', `${nX}%`);
+            progRoot.style.setProperty('--hud-pos-y', `${nY}%`);
+            const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('progress') : null;
+            if (d) { d.posX = nX; d.posY = nY; }
+          }
+        });
+        const finishProgDrag = () => {
+          if (!pMode) return;
+          pMode = null;
+          if (typeof window.tplSaveContextualStore === 'function') window.tplSaveContextualStore();
+        };
+        progRoot.addEventListener('pointerup', finishProgDrag);
+        progRoot.addEventListener('pointercancel', finishProgDrag);
+      }
+    }
+
+    // Universal 3D Stage Orbit for any general template when [ ⬡ 3D ] is active
+    if (isUniversal3DOrbitActive && !['google', 'checklist', 'progress', 'conspiracy-board', 'wire-transfer', 'envelope-open', 'money-stack', 'map-pin-drop', 'map', 'empire-map', 'empire-timeline', 'headline-fly', 'newspaper-3d', 'screen-blur', 'docheight'].includes(tplId)) {
+      const tplRoot = stage.querySelector('.home-tpl-fx-container > div') || stageInner.firstElementChild;
+      if (tplRoot && tplRoot.dataset.univ3dBound !== '1') {
+        tplRoot.dataset.univ3dBound = '1';
+        tplRoot.style.transformStyle = 'preserve-3d';
+        stageInner.style.perspective = '1150px';
+        let uOrbit = false, uSX = 0, uSY = 0;
+        let curRX = Number(topCustomizerState.univ3dRX) || 12;
+        let curRY = Number(topCustomizerState.univ3dRY) || -16;
+        tplRoot.style.transform = `perspective(1150px) rotateX(${curRX}deg) rotateY(${curRY}deg)`;
+        tplRoot.style.cursor = 'grab';
+        tplRoot.addEventListener('pointerdown', (ev) => {
+          if (ev.target.closest('button, input, select, #paper-rip-mode-switcher')) return;
+          if (!topCustomizerState.is3DMode) return;
+          uOrbit = true;
+          uSX = ev.clientX;
+          uSY = ev.clientY;
+          curRX = Number(topCustomizerState.univ3dRX) || 12;
+          curRY = Number(topCustomizerState.univ3dRY) || -16;
+          tplRoot.style.cursor = 'grabbing';
+          try { tplRoot.setPointerCapture(ev.pointerId); } catch (_) {}
+        });
+        tplRoot.addEventListener('pointermove', (ev) => {
+          if (!uOrbit || !topCustomizerState.is3DMode) return;
+          const nRY = Math.max(-65, Math.min(65, Math.round(curRY + (ev.clientX - uSX) * 0.35)));
+          const nRX = Math.max(-50, Math.min(50, Math.round(curRX - (ev.clientY - uSY) * 0.30)));
+          topCustomizerState.univ3dRX = nRX;
+          topCustomizerState.univ3dRY = nRY;
+          tplRoot.style.transform = `perspective(1150px) rotateX(${nRX}deg) rotateY(${nRY}deg)`;
+        });
+        const endUOrbit = () => {
+          uOrbit = false;
+          tplRoot.style.cursor = 'grab';
+        };
+        tplRoot.addEventListener('pointerup', endUOrbit);
+        tplRoot.addEventListener('pointercancel', endUOrbit);
+      }
+    } else {
+      const tplRoot = stage.querySelector('.home-tpl-fx-container > div');
+      if (tplRoot && tplRoot.dataset.univ3dBound === '1' && !isUniversal3DOrbitActive) {
+        tplRoot.style.transform = '';
+      }
+    }
+
+    // =========================================================================
+    // UNIVERSAL 3D KEYFRAME MOTION RECORDER (FOR ALL 3D TEMPLATES & ELEMENTS)
+    // =========================================================================
+    if (!window._universal3DRecordedPaths) {
+      try {
+        window._universal3DRecordedPaths = JSON.parse(localStorage.getItem('regaarder_univ_3d_paths_v1') || '{}') || {};
+      } catch (_) {
+        window._universal3DRecordedPaths = {};
+      }
+    }
+    if (!window._univ3dRecordState) {
+      window._univ3dRecordState = { isRecording: false, isReplaying: false, tplId: null, startTime: 0, frames: [], rafId: null };
+    }
+
+    const persistUniv3DPaths = () => {
+      try {
+        localStorage.setItem('regaarder_univ_3d_paths_v1', JSON.stringify(window._universal3DRecordedPaths));
+      } catch (_) {}
+    };
+
+    const captureUniv3DFrameSnapshot = (activeTplId) => {
+      const ctxRaw = (typeof window.tplGetContextualData === 'function' && activeTplId) ? window.tplGetContextualData(activeTplId) : null;
+      const numericCtx = {};
+      if (ctxRaw && typeof ctxRaw === 'object') {
+        ['posX', 'posY', 'scale', 'tiltX', 'tiltY', 'rotX', 'rotY', 'rotZ', 'camPitch', 'camYaw', 'camRoll', 'camZoom', 'zoomLevel', 'rotation'].forEach(k => {
+          if (typeof ctxRaw[k] === 'number' && !isNaN(ctxRaw[k])) numericCtx[k] = ctxRaw[k];
+        });
+      }
+      const progRoot = stage.querySelector('.tpl-progress');
+      const progFrame = stage.querySelector('.tpl-progress .hud-progress-frame');
+      const tplRoot = stage.querySelector('.home-tpl-fx-container > div') || stageInner.firstElementChild;
+      return {
+        t: performance.now() - window._univ3dRecordState.startTime,
+        univ3dRX: Number(topCustomizerState.univ3dRX) || 0,
+        univ3dRY: Number(topCustomizerState.univ3dRY) || 0,
+        fx: window.tpl3DFx ? Object.assign({}, window.tpl3DFx) : null,
+        fgTf: topCustomizerState.transforms?.fg ? Object.assign({}, topCustomizerState.transforms.fg) : null,
+        ctx: numericCtx,
+        hudPosX: progRoot ? progRoot.style.getPropertyValue('--hud-pos-x') : '',
+        hudPosY: progRoot ? progRoot.style.getPropertyValue('--hud-pos-y') : '',
+        hudTiltX: progFrame ? progFrame.style.getPropertyValue('--hud-tilt-x') : '',
+        hudTiltY: progFrame ? progFrame.style.getPropertyValue('--hud-tilt-y') : '',
+        rootTransform: (tplRoot && tplRoot.style) ? tplRoot.style.transform : ''
+      };
+    };
+
+    const applyUniv3DInterpolatedFrame = (activeTplId, fA, fB, alpha) => {
+      const lerp = (a, b) => a + (b - a) * alpha;
+      if (typeof fA.univ3dRX === 'number' && typeof fB.univ3dRX === 'number') {
+        topCustomizerState.univ3dRX = lerp(fA.univ3dRX, fB.univ3dRX);
+        topCustomizerState.univ3dRY = lerp(fA.univ3dRY, fB.univ3dRY);
+      }
+      if (fA.fx && fB.fx && window.tpl3DFx) {
+        ['pitch', 'yaw', 'roll', 'zoom'].forEach(k => {
+          if (typeof fA.fx[k] === 'number' && typeof fB.fx[k] === 'number') {
+            window.tpl3DFx[k] = Number(lerp(fA.fx[k], fB.fx[k]).toFixed(2));
+          }
+        });
+      }
+      if (fA.fgTf && fB.fgTf && topCustomizerState.transforms?.fg) {
+        topCustomizerState.transforms.fg.x = lerp(fA.fgTf.x || 0, fB.fgTf.x || 0);
+        topCustomizerState.transforms.fg.y = lerp(fA.fgTf.y || 0, fB.fgTf.y || 0);
+        topCustomizerState.transforms.fg.scale = lerp(fA.fgTf.scale || 1, fB.fgTf.scale || 1);
+      }
+      if (fA.ctx && fB.ctx && typeof window.tplGetContextualData === 'function') {
+        const liveD = window.tplGetContextualData(activeTplId);
+        if (liveD) {
+          Object.keys(fA.ctx).forEach(k => {
+            if (typeof fA.ctx[k] === 'number' && typeof fB.ctx[k] === 'number') {
+              liveD[k] = Number(lerp(fA.ctx[k], fB.ctx[k]).toFixed(2));
+            }
+          });
+          if (activeTplId === 'progress') {
+            const pRoot = stage.querySelector('.tpl-progress');
+            const pFrame = stage.querySelector('.tpl-progress .hud-progress-frame');
+            if (pRoot && typeof liveD.posX === 'number') {
+              pRoot.style.setProperty('--hud-pos-x', `${liveD.posX}%`);
+              pRoot.style.setProperty('--hud-pos-y', `${liveD.posY || 0}%`);
+            }
+            if (pFrame && typeof liveD.tiltX === 'number') {
+              pFrame.style.setProperty('--hud-tilt-x', `${liveD.tiltX}deg`);
+              pFrame.style.setProperty('--hud-tilt-y', `${liveD.tiltY || 0}deg`);
+            }
+          } else if (typeof window.tplUpdateStageWithContextualData === 'function') {
+            window.tplUpdateStageWithContextualData(activeTplId, liveD);
+          }
+        }
+      }
+      const tplRoot = stage.querySelector('.home-tpl-fx-container > div') || stageInner.firstElementChild;
+      if (tplRoot && topCustomizerState.is3DMode && !['google', 'spatial-3d-motion-suite', 'progress'].includes(activeTplId)) {
+        tplRoot.style.transform = `perspective(1150px) rotateX(${(topCustomizerState.univ3dRX || 0).toFixed(1)}deg) rotateY(${(topCustomizerState.univ3dRY || 0).toFixed(1)}deg)`;
+      }
+    };
+
+    window.tplReplayUniversal3DMotion = function(activeTplId) {
+      const targetId = activeTplId || topCustomizerState.currentTpl?.id;
+      if (!targetId) return;
+      if (targetId === 'google' && typeof window.tplReplayGoogleRecordedMotion === 'function') {
+        window.tplReplayGoogleRecordedMotion();
+        return;
+      }
+      const pathObj = window._universal3DRecordedPaths[targetId];
+      if (!pathObj || !Array.isArray(pathObj.frames) || pathObj.frames.length < 2) return;
+      const st = window._univ3dRecordState;
+      if (st.rafId) cancelAnimationFrame(st.rafId);
+      st.isReplaying = true;
+      const frames = pathObj.frames;
+      const totalDur = Math.max(400, pathObj.durationMs || frames[frames.length - 1].t || 2500);
+      const t0 = performance.now();
+      const step = (now) => {
+        if (!st.isReplaying) return;
+        const elapsed = now - t0;
+        const clamped = Math.min(elapsed, totalDur);
+        let idx = 0;
+        while (idx < frames.length - 2 && frames[idx + 1].t < clamped) idx++;
+        const fA = frames[idx];
+        const fB = frames[Math.min(frames.length - 1, idx + 1)];
+        const span = Math.max(1, (fB.t || 0) - (fA.t || 0));
+        const alpha = Math.max(0, Math.min(1, (clamped - (fA.t || 0)) / span));
+        applyUniv3DInterpolatedFrame(targetId, fA, fB, alpha);
+        if (elapsed < totalDur) {
+          st.rafId = requestAnimationFrame(step);
+        } else {
+          st.isReplaying = false;
+          renderUniv3DRecorderHud();
+        }
+      };
+      renderUniv3DRecorderHud();
+      st.rafId = requestAnimationFrame(step);
+    };
+
+    window.tplToggleUniversal3DMotionRecord = function(activeTplId) {
+      const targetId = activeTplId || topCustomizerState.currentTpl?.id;
+      if (!targetId) return;
+      const st = window._univ3dRecordState;
+      if (!st.isRecording) {
+        if (st.rafId) cancelAnimationFrame(st.rafId);
+        st.isReplaying = false;
+        st.isRecording = true;
+        st.tplId = targetId;
+        st.startTime = performance.now();
+        st.frames = [captureUniv3DFrameSnapshot(targetId)];
+      } else {
+        st.isRecording = false;
+        st.frames.push(captureUniv3DFrameSnapshot(targetId));
+        if (st.frames.length >= 2) {
+          window._universal3DRecordedPaths[targetId] = {
+            durationMs: Math.max(400, performance.now() - st.startTime),
+            frames: st.frames.slice()
+          };
+          persistUniv3DPaths();
+          window.tplReplayUniversal3DMotion(targetId);
+        }
+      }
+      renderUniv3DRecorderHud();
+    };
+
+    window.tplClearUniversal3DMotion = function(activeTplId) {
+      const targetId = activeTplId || topCustomizerState.currentTpl?.id;
+      if (!targetId) return;
+      delete window._universal3DRecordedPaths[targetId];
+      persistUniv3DPaths();
+      renderUniv3DRecorderHud();
+    };
+
+    const ALWAYS_3D_CAPABLE_TPLS = new Set([
+      'progress', 'checklist', 'scam-redaction', 'deal-term-sheet', 'pyramid-scheme',
+      'money-stack', 'wire-transfer', 'envelope-open', 'conspiracy-board', 'map',
+      'empire-map', 'empire-timeline', 'headline-fly', 'newspaper-3d', 'document-3d-fx-engine',
+      'jani-forbes-fraud-reveal', 'jani-ftx-logo-reveal', 'jani-flash-quad-sequence', 'jani-spin-flash-glitch-reveal'
+    ]);
+    const shouldShowUniv3DHud = tplId && tplId !== 'google' && tplId !== 'spatial-3d-motion-suite' && (isUniversal3DOrbitActive || isMapInteractive3D || ALWAYS_3D_CAPABLE_TPLS.has(tplId) || (window.SPATIAL_3D_CATEGORY_IDS && window.SPATIAL_3D_CATEGORY_IDS.has(tplId)));
+
+    let u3dHud = document.getElementById('universal-3d-motion-recorder-hud');
+    if (!u3dHud) {
+      u3dHud = document.createElement('div');
+      u3dHud.id = 'universal-3d-motion-recorder-hud';
+      u3dHud.style.cssText = 'position:absolute;bottom:12px;right:14px;z-index:990;display:none;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:rgba(10,14,26,0.90);backdrop-filter:blur(12px);border:1px solid rgba(56,189,248,0.42);color:#e0f2fe;font-size:10.5px;font-weight:700;letter-spacing:0.03em;box-shadow:0 8px 24px rgba(0,0,0,0.65);pointer-events:auto;';
+      stageInner.appendChild(u3dHud);
+    }
+
+    function renderUniv3DRecorderHud() {
+      if (!u3dHud) return;
+      if (!shouldShowUniv3DHud) {
+        u3dHud.style.display = 'none';
+        return;
+      }
+      u3dHud.style.display = 'flex';
+      const st = window._univ3dRecordState;
+      const isRec = st.isRecording && st.tplId === tplId;
+      const saved = window._universal3DRecordedPaths[tplId];
+      const hasSaved = !!(saved && saved.frames && saved.frames.length >= 2);
+      u3dHud.innerHTML = `
+        <span style="color:#94a3b8;font-size:9.5px;">3D Motion:</span>
+        <button type="button" id="u3d-hud-rec-btn" style="background:${isRec ? 'rgba(239,68,68,0.92)' : 'rgba(239,68,68,0.22)'};border:1px solid ${isRec ? '#f87171' : 'rgba(239,68,68,0.55)'};color:${isRec ? '#fff' : '#fca5a5'};border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;">
+          <span>${isRec ? '\u25a0' : '\u25cf'}</span><span>${isRec ? 'Stop & Save Path' : 'Record 3D Motion'}</span>
+        </button>
+        ${hasSaved && !isRec ? `<button type="button" id="u3d-hud-replay-btn" style="background:rgba(16,185,129,0.24);border:1px solid rgba(52,211,153,0.6);color:#6ee7b7;border-radius:999px;padding:2px 9px;font-size:10px;font-weight:800;cursor:pointer;">\u25b6 Replay (${saved.frames.length} pts)</button>` : ''}
+        ${hasSaved && !isRec ? `<button type="button" id="u3d-hud-clear-btn" title="Clear Recorded 3D Path" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:#cbd5e1;border-radius:999px;padding:2px 6px;font-size:9.5px;font-weight:700;cursor:pointer;">\u2715</button>` : ''}
+      `;
+      u3dHud.querySelector('#u3d-hud-rec-btn')?.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        window.tplToggleUniversal3DMotionRecord(tplId);
+      });
+      u3dHud.querySelector('#u3d-hud-replay-btn')?.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        window.tplReplayUniversal3DMotion(tplId);
+      });
+      u3dHud.querySelector('#u3d-hud-clear-btn')?.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        window.tplClearUniversal3DMotion(tplId);
+      });
+    }
+    renderUniv3DRecorderHud();
+
+    if (stage.dataset.u3dRecCaptureBound !== '1') {
+      stage.dataset.u3dRecCaptureBound = '1';
+      let lastSampleTs = 0;
+      const sampleIfRecording = () => {
+        const st = window._univ3dRecordState;
+        if (!st || !st.isRecording) return;
+        const now = performance.now();
+        if (now - lastSampleTs < 16) return;
+        lastSampleTs = now;
+        st.frames.push(captureUniv3DFrameSnapshot(st.tplId));
+      };
+      stage.addEventListener('pointermove', sampleIfRecording, { passive: true });
+      stage.addEventListener('wheel', sampleIfRecording, { passive: true });
+    }
+
+    const isBypassStageTransform = isMapInteractive3D || tplId === 'progress' || tplId === 'conspiracy-board' || tplId === 'wire-transfer' || tplId === 'envelope-open' || tplId === 'money-stack' || tplId === 'map-pin-drop' || tplId === 'map' || tplId === 'empire-map' || tplId === 'empire-timeline' || tplId === 'headline-fly' || tplId === 'newspaper-3d' || tplId === 'screen-blur' || tplId === 'docheight' || tplId === 'google' || tplId === 'checklist' || isUniversal3DOrbitActive;
     if (isBypassStageTransform) {
       box.style.display = 'none';
       toolbar.style.display = 'none';
       return;
     }
     toolbar.style.display = 'flex';
-    const fgCandidate = stage.querySelector('.tpl-subscribe .sub-wrap, .tpl-receipt .r-wrap, .sub-wrap, .r-wrap, .r-paper, .quote-card, .scramble-terminal, .tpl-zoom .product, .ceo-cutout-wrap, .boardroom-scene-wrap, .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .notif-stack, .ig-post, .cert, .p-card, .globe-viewport, #customizer-live-fg-wrap, #customizer-live-fg, .home-tpl-fx-container > div');
+    const fgCandidate = stage.querySelector('.tpl-subscribe .sub-wrap, .tpl-receipt .r-paper, .tpl-receipt .r-wrap, .r-paper, .sub-wrap, .quote-card, .scramble-terminal, .tpl-zoom .product, [id^="zb-cutout-wrap-"], [id^="fx-iris-container-"], .tpl-polaroid .polaroid-1, .subject, .figure, .doc, .tweet-card, .google-frame, .imessage-phone, .notif-stack, .ig-post, .cert, .p-card, .tpl-redcircle .red-circle, .tpl-countdown .big-num, .tpl-bearbull .bb-icon, .tpl-creditscore .cs-gauge, .globe-viewport, #customizer-live-fg, .ceo-cutout-wrap, .boardroom-scene-wrap, #customizer-live-fg-wrap, .home-tpl-fx-container > div');
     const textCandidate = stage.querySelector('.scramble-main-text, .zoom-hud-bottom, .ceo-info-card, .boardroom-hud-card, .cctv-hud-header, .bigtext, .doc-header, .w-title, .quote-text, .headline, .caption-wrap');
-    const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-textbehind, .tpl-docheight, .tpl-parallax, #customizer-live-bg, .layer-mid, .mtn-back');
+    const bgCandidate = stage.querySelector('.tpl-universal-bg-layer, .tpl-parallax .mtn-back, .tpl-textbehind, .tpl-docheight, #customizer-live-bg, .layer-mid, .mtn-back, .tpl-parallax');
 
     // Direct independent pointer dragging for Polaroid #1 and Polaroid #2 on stage
     if (tplId === 'polaroid') {
@@ -239,16 +567,29 @@
           selectTarget('fg');
         });
       } else if (targetType === 'fg') {
+        const isParallax = tplId === 'parallax';
+        const fgDir = topCustomizerState.spoonerFgDir || 'push';
+        const fgZoomPct = Math.round(((topCustomizerState.spoonerFgZoom !== undefined ? topCustomizerState.spoonerFgZoom : 1.22)) * 100);
         toolbar.innerHTML = `
           <div style="display: flex; align-items: center; gap: 4px; border-right: 1px solid rgba(255,255,255,0.15); padding-right: 6px;">
             <span style="font-size: 9.5px; font-weight: 800; color: #2effc6; font-family: monospace;">FOREGROUND LAYER</span>
           </div>
+          ${isParallax ? `
+          <div style="display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.45); border: 1px solid rgba(46,255,198,0.35); border-radius: 5px; padding: 1px 4px;" title="Foreground Motion Direction & Zoom %">
+            <button type="button" id="stage-tb-px-fg-dir" style="background: rgba(46,255,198,0.18); border: 1px solid rgba(46,255,198,0.45); border-radius: 3px; color: #2effc6; font-size: 9px; font-weight: 800; padding: 1px 5px; cursor: pointer;">
+              ${fgDir === 'push' ? '\u2197 Push In' : '\u2199 Pull Out'}
+            </button>
+            <button type="button" id="stage-tb-px-fg-zdec" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 2px;">-</button>
+            <span id="stage-tb-px-fg-zval" style="font-size: 9.5px; font-family: monospace; color: #fff; font-weight: 700; min-width: 30px; text-align: center;" title="Push/Pull Zoom Percentage">${fgZoomPct}%</span>
+            <button type="button" id="stage-tb-px-fg-zinc" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 2px;">+</button>
+          </div>
+          ` : ''}
           <!-- Fullscreen / Fit Toggle -->
           <button type="button" id="stage-tb-fullscreen" style="background: ${tf.isFullscreen ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.08)'}; border: 1px solid ${tf.isFullscreen ? '#38bdf8' : 'rgba(255,255,255,0.2)'}; border-radius: 4px; color: #fff; font-size: 9.5px; font-weight: 700; padding: 2px 7px; cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Toggle Full Screen Stage Coverage">
             <span>\u26f6</span> ${tf.isFullscreen ? 'Fit Mode' : 'Fullscreen'}
           </button>
           <!-- Scale Zoom Steppers -->
-          <div style="display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 4px;">
+          <div style="display: flex; align-items: center; gap: 2px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 1px 4px;" title="Subject Base Scale">
             <button type="button" id="stage-tb-scale-dec" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 3px;">-</button>
             <span id="stage-tb-scale-val" style="font-size: 10px; font-family: monospace; color: #2effc6; font-weight: 700; min-width: 32px; text-align: center;">${Math.round((tf.scale || 1) * 100)}%</span>
             <button type="button" id="stage-tb-scale-inc" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 3px;">+</button>
@@ -264,6 +605,23 @@
           ${textCandidate ? `<button type="button" id="stage-tb-switch-txt" style="background: none; border: none; color: #38bdf8; font-size: 9.5px; cursor: pointer; text-decoration: underline;">Edit Text</button>` : ''}
         `;
         // Wire fg toolbar
+        toolbar.querySelector('#stage-tb-px-fg-dir')?.addEventListener('click', () => {
+          const nextFg = (topCustomizerState.spoonerFgDir || 'push') === 'push' ? 'pull' : 'push';
+          topCustomizerState.spoonerFgDir = nextFg;
+          topCustomizerState.spoonerBgDir = nextFg === 'push' ? 'pull' : 'push';
+          renderToolbar();
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
+        });
+        toolbar.querySelector('#stage-tb-px-fg-zdec')?.addEventListener('click', () => {
+          const cur = topCustomizerState.spoonerFgZoom !== undefined ? topCustomizerState.spoonerFgZoom : 1.22;
+          topCustomizerState.spoonerFgZoom = Number(Math.max(1.04, cur - 0.03).toFixed(2));
+          renderToolbar();
+        });
+        toolbar.querySelector('#stage-tb-px-fg-zinc')?.addEventListener('click', () => {
+          const cur = topCustomizerState.spoonerFgZoom !== undefined ? topCustomizerState.spoonerFgZoom : 1.22;
+          topCustomizerState.spoonerFgZoom = Number(Math.min(1.60, cur + 0.03).toFixed(2));
+          renderToolbar();
+        });
         toolbar.querySelector('#stage-tb-fullscreen')?.addEventListener('click', () => {
           tf.isFullscreen = !tf.isFullscreen;
           if (tf.isFullscreen) {
@@ -301,6 +659,9 @@
           selectTarget('text');
         });
       } else if (targetType === 'bg') {
+        const isParallax = tplId === 'parallax';
+        const bgDir = topCustomizerState.spoonerBgDir || 'pull';
+        const bgZoomPct = Math.round(((topCustomizerState.spoonerBgZoom !== undefined ? topCustomizerState.spoonerBgZoom : 1.16)) * 100);
         const bgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tplId) : {};
         const curPreset = bgData.bgPreset || 'default';
         const presets = window.UNIVERSAL_BG_PRESETS || [
@@ -317,6 +678,16 @@
           <div style="display: flex; align-items: center; gap: 4px; border-right: 1px solid rgba(255,255,255,0.15); padding-right: 6px;">
             <span style="font-size: 9.5px; font-weight: 800; color: #f59e0b; font-family: monospace;">BACKGROUND</span>
           </div>
+          ${isParallax ? `
+          <div style="display: flex; align-items: center; gap: 3px; background: rgba(0,0,0,0.45); border: 1px solid rgba(56,189,248,0.35); border-radius: 5px; padding: 1px 4px;" title="Background Motion Direction & Zoom %">
+            <button type="button" id="stage-tb-px-bg-dir" style="background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.45); border-radius: 3px; color: #38bdf8; font-size: 9px; font-weight: 800; padding: 1px 5px; cursor: pointer;">
+              ${bgDir === 'pull' ? '\u2199 Pull Out' : '\u2197 Push In'}
+            </button>
+            <button type="button" id="stage-tb-px-bg-zdec" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 2px;">-</button>
+            <span id="stage-tb-px-bg-zval" style="font-size: 9.5px; font-family: monospace; color: #fff; font-weight: 700; min-width: 30px; text-align: center;" title="Push/Pull Zoom Percentage">${bgZoomPct}%</span>
+            <button type="button" id="stage-tb-px-bg-zinc" style="background: none; border: none; color: #cbd5e1; font-size: 11px; font-weight: 700; cursor: pointer; padding: 0 2px;">+</button>
+          </div>
+          ` : ''}
           <!-- Universal Backdrop Preset Selector -->
           <select id="stage-tb-bg-preset" style="background: rgba(0,0,0,0.65); border: 1px solid rgba(245,158,11,0.45); border-radius: 4px; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; outline: none; cursor: pointer;">
             ${presets.map(p => `<option value="${p.id}" ${p.id === curPreset ? 'selected' : ''} style="background:#0f172a;color:#fff;">${p.label}</option>`).join('')}
@@ -337,6 +708,23 @@
             Subject \u25b4
           </button>
         `;
+        toolbar.querySelector('#stage-tb-px-bg-dir')?.addEventListener('click', () => {
+          const nextBg = (topCustomizerState.spoonerBgDir || 'pull') === 'pull' ? 'push' : 'pull';
+          topCustomizerState.spoonerBgDir = nextBg;
+          topCustomizerState.spoonerFgDir = nextBg === 'pull' ? 'push' : 'pull';
+          renderToolbar();
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector(tplId);
+        });
+        toolbar.querySelector('#stage-tb-px-bg-zdec')?.addEventListener('click', () => {
+          const cur = topCustomizerState.spoonerBgZoom !== undefined ? topCustomizerState.spoonerBgZoom : 1.16;
+          topCustomizerState.spoonerBgZoom = Number(Math.max(1.04, cur - 0.03).toFixed(2));
+          renderToolbar();
+        });
+        toolbar.querySelector('#stage-tb-px-bg-zinc')?.addEventListener('click', () => {
+          const cur = topCustomizerState.spoonerBgZoom !== undefined ? topCustomizerState.spoonerBgZoom : 1.16;
+          topCustomizerState.spoonerBgZoom = Number(Math.min(1.50, cur + 0.03).toFixed(2));
+          renderToolbar();
+        });
         toolbar.querySelector('#stage-tb-bg-preset')?.addEventListener('change', (e) => {
           if (typeof window.tplSetContextualData === 'function') {
             window.tplSetContextualData(tplId, { bgPreset: e.target.value, bgMediaUrl: '', bgMediaType: 'image' });
@@ -372,7 +760,8 @@
     const applyTransforms = () => {
       const fgTf = topCustomizerState.transforms.fg;
       if (fgCandidate && fgTf && tplId !== 'polaroid') {
-        const isZoomProduct = fgCandidate.classList.contains('product');
+        const isZoomProduct = fgCandidate.classList.contains('product') || (fgCandidate.id && fgCandidate.id.startsWith('fx-iris-container-'));
+        const isBottomCenteredCutout = fgCandidate.classList.contains('figure') || fgCandidate.classList.contains('subject') || (fgCandidate.id && fgCandidate.id.startsWith('zb-cutout-wrap-'));
         if (fgTf.isFullscreen) {
           const sRect = stage.getBoundingClientRect();
           const naturalW = fgCandidate.offsetWidth || 380;
@@ -382,15 +771,19 @@
             (sRect.height * 0.88) / Math.max(naturalH, 1)
           );
           const safeScale = Math.max(1, Math.min(fitScale, 2.4));
-          fgCandidate.style.transformOrigin = 'center center';
+          fgCandidate.style.transformOrigin = isBottomCenteredCutout ? 'center bottom' : 'center center';
           fgCandidate.style.transform = isZoomProduct
             ? `translate(-50%, -50%) scale(${safeScale.toFixed(3)})`
-            : `translate(0px, 0px) scale(${safeScale.toFixed(3)})`;
+            : (isBottomCenteredCutout
+                ? `translateX(-50%) scale(${safeScale.toFixed(3)})`
+                : `translate(0px, 0px) scale(${safeScale.toFixed(3)})`);
         } else if (fgTf.x || fgTf.y || (fgTf.scale && fgTf.scale !== 1) || (tplId === 'receipt')) {
-          fgCandidate.style.transformOrigin = 'center center';
+          fgCandidate.style.transformOrigin = isBottomCenteredCutout ? 'center bottom' : 'center center';
           if (isZoomProduct) {
             fgCandidate.style.animation = 'none';
             fgCandidate.style.transform = `translate(calc(-50% + ${fgTf.x}px), calc(-50% + ${fgTf.y}px)) scale(${fgTf.scale || 1})`;
+          } else if (isBottomCenteredCutout) {
+            fgCandidate.style.transform = `translate(calc(-50% + ${fgTf.x || 0}px), ${fgTf.y || 0}px) scale(${fgTf.scale || 1})`;
           } else if (tplId === 'receipt') {
             const rot = (typeof window.tplGetContextualData === 'function' && window.tplGetContextualData('receipt')?.rotation) || 0;
             fgCandidate.style.transform = `translate(${fgTf.x || 0}px, ${fgTf.y || 0}px) scale(${fgTf.scale || 1}) rotate(${rot}deg)`;
@@ -435,20 +828,84 @@
       updateBox();
     };
 
-    // Update bounding box position
+    // Update bounding box position (tightly fitted to actual visual item/icon)
     const updateBox = () => {
       if (!currentTargetEl || !box) {
         if (box) box.style.display = 'none';
         return;
       }
-      const elRect = currentTargetEl.getBoundingClientRect();
       const parentRect = stageInner.getBoundingClientRect();
+      let elRect = currentTargetEl.getBoundingClientRect();
+      let left = elRect.left - parentRect.left;
+      let top = elRect.top - parentRect.top;
+      let width = elRect.width;
+      let height = elRect.height;
+
+      if (targetType === 'bg') {
+        left = 4;
+        top = 4;
+        width = Math.max(40, parentRect.width - 8);
+        height = Math.max(40, parentRect.height - 8);
+      } else if (targetType === 'fg') {
+        // 1. If the element is a full-stage wrapper (or >82% of stage), check for tighter inner visual item
+        const isNearlyFullStage = (width > parentRect.width * 0.82 && height > parentRect.height * 0.82);
+        if (isNearlyFullStage) {
+          const innerVisual = currentTargetEl.querySelector(
+            '.b-sheet-asset, .r-paper, .sub-btn, .quote-card, .p-card, .cert, .tweet-card, .google-frame, .imessage-phone, .notif-stack, .ig-post, .red-circle, .big-num, .bb-icon, .cs-gauge, #customizer-live-fg, .ceo-cutout-img'
+          );
+          if (innerVisual) {
+            const ir = innerVisual.getBoundingClientRect();
+            if (ir.width > 16 && ir.height > 16 && (ir.width < width * 0.94 || ir.height < height * 0.94)) {
+              left = ir.left - parentRect.left;
+              top = ir.top - parentRect.top;
+              width = ir.width;
+              height = ir.height;
+            }
+          }
+        }
+
+        // 2. If element or its image uses a cutout asset with transparent horizontal margins, tighten box to visible subject
+        const imgEl = currentTargetEl.tagName === 'IMG' ? currentTargetEl : currentTargetEl.querySelector('img');
+        const bgStr = (currentTargetEl.style && currentTargetEl.style.background) || '';
+        const srcStr = ((imgEl && (imgEl.currentSrc || imgEl.src)) || bgStr || '');
+        if (currentTargetEl.classList.contains('ceo-cutout-wrap') || srcStr.includes('ceo_portrait_alpha_cutout')) {
+          const newW = width * 0.48;
+          const newH = height * 0.92;
+          left += (width - newW) * 0.5;
+          top += height * 0.06;
+          width = newW;
+          height = newH;
+        } else if (currentTargetEl.classList.contains('product') && tplId === 'zoom') {
+          const newW = width * 0.58;
+          const newH = height * 0.68;
+          left += (width - newW) * 0.5;
+          top += (height - newH) * 0.5;
+          width = newW;
+          height = newH;
+        } else if ((srcStr.includes('hiker_cutout') || srcStr.includes('clean_traveler_cutout')) && !currentTargetEl.classList.contains('figure') && !currentTargetEl.classList.contains('subject')) {
+          const newW = width * 0.24;
+          const newH = height * 0.64;
+          left += (width - newW) * 0.5;
+          top += height * 0.22;
+          width = newW;
+          height = newH;
+        }
+
+      }
+
+      // Clamp box inside stage boundaries so handles remain reachable on screen for all target types (fg, bg, text)
+      const maxLeft = Math.max(0, parentRect.width - 20);
+      const maxTop = Math.max(0, parentRect.height - 20);
+      left = Math.max(3, Math.min(maxLeft, left));
+      top = Math.max(3, Math.min(maxTop, top));
+      width = Math.min(width, parentRect.width - left - 3);
+      height = Math.min(height, parentRect.height - top - 3);
 
       box.style.display = 'block';
-      box.style.left = `${elRect.left - parentRect.left}px`;
-      box.style.top = `${elRect.top - parentRect.top}px`;
-      box.style.width = `${elRect.width}px`;
-      box.style.height = `${elRect.height}px`;
+      box.style.left = `${Math.round(left)}px`;
+      box.style.top = `${Math.round(top)}px`;
+      box.style.width = `${Math.round(width)}px`;
+      box.style.height = `${Math.round(height)}px`;
     };
     window.tplUpdateTransformBox = updateBox;
 

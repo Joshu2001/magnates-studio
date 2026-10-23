@@ -1119,6 +1119,12 @@ function buildClipColorFilter(clip) {
     filters.push(`blur(${clip.blur}px)`);
   }
 
+  // Motion Blur optical softening component
+  if (clip.motionBlurEnabled && (clip.motionBlurIntensity || 0) > 0) {
+    const mbPx = ((clip.motionBlurIntensity || 0) / 100) * 6.5;
+    filters.push(`blur(${mbPx.toFixed(2)}px)`);
+  }
+
   // Temperature & Tint Hue Rotations
   if (temp !== 0) {
     if (temp > 0) {
@@ -1978,6 +1984,17 @@ function drawMediaLayer(specificClip) {
     kfRot += tiltRot;
   }
 
+  const mpSample = (targetClip && targetClip.motionPathEnabled && typeof evaluateClipMotionPath === 'function')
+    ? evaluateClipMotionPath(targetClip, clipElapsed, w, h)
+    : null;
+  if (mpSample) {
+    kfPosX += mpSample.offsetX;
+    kfPosY += mpSample.offsetY;
+    kfScale *= mpSample.scaleMult;
+    kfRot += mpSample.rotDeg;
+    targetClip._lastMotionPathTangentRad = mpSample.tangentRad;
+  }
+
   const finalW = dw * kfScale;
   const finalH = dh * kfScale;
   const scrollOffset = getClipDocumentScrollOffset(targetClip, currentTime, finalW, finalH);
@@ -2013,9 +2030,19 @@ function drawMediaLayer(specificClip) {
     ctx.rotate((kfRot * Math.PI) / 180);
     ctx.translate(-cx, -cy);
   }
+  if (mpSample && mpSample.is3D) {
+    const cx = dx + finalW / 2;
+    const cy = dy + finalH / 2;
+    ctx.translate(cx, cy);
+    ctx.transform(mpSample.bankScaleX, mpSample.bankSkewY, mpSample.bankSkewX, mpSample.bankScaleY, 0, 0);
+    ctx.translate(-cx, -cy);
+  }
   ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-  ctx.shadowBlur = targetClip?.vectorEffect ? 45 : (targetClip?.goldFrameRig ? 55 : 35);
-  ctx.shadowOffsetY = targetClip?.vectorEffect ? 14 : 10;
+  ctx.shadowBlur = (targetClip?.vectorEffect ? 45 : (targetClip?.goldFrameRig ? 55 : 35)) + (mpSample ? mpSample.shadowBlurAdd : 0);
+  ctx.shadowOffsetY = (targetClip?.vectorEffect ? 14 : 10) + (mpSample ? mpSample.shadowOffsetYAdd : 0);
+  if (mpSample && mpSample.shadowOffsetXAdd) {
+    ctx.shadowOffsetX = mpSample.shadowOffsetXAdd;
+  }
 
   try {
 
@@ -2602,6 +2629,92 @@ function drawMediaLayer(specificClip) {
           }
           ctx.restore();
         }
+
+        // Render Directional / Radial / Custom Angle Motion Blur Streaks when enabled on clip
+        if (targetClip.motionBlurEnabled && (parseFloat(targetClip.motionBlurIntensity) || 0) > 0 && renderSource) {
+          const rawInt = Math.min(100, Math.max(0, parseFloat(targetClip.motionBlurIntensity) || 0));
+          const mbInt = rawInt / 100;
+          const mbAngle = targetClip.motionBlurAngle || 'horizontal';
+          const samples = Math.min(16, Math.max(2, parseInt(targetClip.motionBlurSamples, 10) || 8));
+          const maxShift = mbInt * 44 * (finalW / 1280);
+          const customDeg = parseFloat(targetClip.motionBlurCustomDeg) || 0;
+          const rad = (customDeg * Math.PI) / 180;
+          ctx.save();
+          ctx.shadowColor = 'transparent';
+          for (let s = 1; s <= samples; s++) {
+            const frac = (s / samples) - 0.5;
+            ctx.globalAlpha = (0.34 * mbInt) / (s * 0.45 + 0.55);
+            if (mbAngle === 'radial') {
+              const rScale = 1 + Math.abs(frac) * mbInt * 0.16;
+              const rw = finalW * rScale;
+              const rh = finalH * rScale;
+              ctx.drawImage(renderSource, dx - (rw - finalW) / 2, dy - (rh - finalH) / 2, rw, rh);
+            } else {
+              let sxOff = 0;
+              let syOff = 0;
+              if (mbAngle === 'horizontal') {
+                sxOff = frac * maxShift;
+              } else if (mbAngle === 'vertical') {
+                syOff = frac * maxShift;
+              } else if (mbAngle === 'diagonal') {
+                sxOff = frac * maxShift * 0.7071;
+                syOff = frac * maxShift * 0.7071;
+              } else if (mbAngle === 'path') {
+                const pathRad = targetClip._lastMotionPathTangentRad !== undefined ? targetClip._lastMotionPathTangentRad : rad;
+                sxOff = Math.cos(pathRad) * frac * maxShift;
+                syOff = Math.sin(pathRad) * frac * maxShift;
+              } else if (mbAngle === 'custom') {
+                sxOff = Math.cos(rad) * frac * maxShift;
+                syOff = Math.sin(rad) * frac * maxShift;
+              }
+              ctx.drawImage(renderSource, dx + sxOff, dy + syOff, finalW, finalH);
+            }
+          }
+          ctx.restore();
+        }
+
+        // Render Camera Flash & Flashlight Strobe Burst when enabled on clip
+        if (targetClip.cameraFlashEnabled) {
+          const flashElapsed = Math.max(0, currentTime - targetClip.start);
+          const manualAge = targetClip._manualFlashTimestamp ? (performance.now() - targetClip._manualFlashTimestamp) / 1000 : 999;
+          const effectiveFlashT = Math.min(flashElapsed, manualAge);
+          const flashDur = Math.max(0.10, parseFloat(targetClip.cameraFlashDuration) || 0.45);
+          const flashInt = Math.max(50, parseFloat(targetClip.cameraFlashIntensity) || 190);
+          const flashHex = targetClip.cameraFlashColor || '#fff5e0';
+
+          // Trigger camera shutter SFX once when playback enters the clip start window
+          if (isPlaying && flashElapsed >= 0 && flashElapsed < 0.09) {
+            const nowMs = performance.now();
+            if (!targetClip._lastCameraFlashSfxAt || (nowMs - targetClip._lastCameraFlashSfxAt) > 650) {
+              targetClip._lastCameraFlashSfxAt = nowMs;
+              const sfxProfile = targetClip.cameraFlashSfx || 'slr_35mm';
+              if (sfxProfile !== 'none' && typeof window.playJaniFlashQuadTestSound === 'function') {
+                window.playJaniFlashQuadTestSound(sfxProfile, 90, 1.0);
+              }
+            }
+          }
+
+          if (effectiveFlashT <= flashDur) {
+            const fp = effectiveFlashT / flashDur;
+            const decay = Math.pow(1 - fp, 2.1);
+            const alpha = Math.min(1, ((flashInt - 40) / 180) * decay);
+            if (alpha > 0.01) {
+              ctx.save();
+              ctx.globalCompositeOperation = 'screen';
+              ctx.globalAlpha = alpha;
+              const cx = dx + finalW * 0.5;
+              const cy = dy + finalH * 0.46;
+              const rad = Math.max(finalW, finalH) * 0.78;
+              const fGrad = ctx.createRadialGradient(cx, cy, 8, cx, cy, rad);
+              fGrad.addColorStop(0, '#ffffff');
+              fGrad.addColorStop(0.45, flashHex);
+              fGrad.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = fGrad;
+              ctx.fillRect(dx, dy, finalW, finalH);
+              ctx.restore();
+            }
+          }
+        }
       }
 
       ctx.restore();
@@ -2831,11 +2944,6 @@ function drawCrowdWaypointsOverlay(ctx, dx, dy, w, h, clip) {
     });
     ctx.stroke();
     ctx.restore();
-  }
-
-  // 5. Cinematic Letterbox Frame Overlay (Top and Bottom Matte Bars + Lower Space)
-  if (targetClip?.cinematicLetterbox && typeof window.renderJaniCinematicLetterboxCanvasFrame === 'function') {
-    window.renderJaniCinematicLetterboxCanvasFrame(ctx, canvas.width, canvas.height, targetClip, clipElapsed);
   }
 
   ctx.restore();
@@ -3239,9 +3347,22 @@ function render(now) {
     const matrixActiveClip = (timelineClips.image || []).find(c => currentTime >= c.start && currentTime <= (c.start + c.duration) && c.matrixRain);
     if (bgType === 'matrix_rain' || matrixActiveClip) {
       const rainState = matrixActiveClip ? {
+        matrixRainEnabled: matrixActiveClip.matrixRainEnabled !== false,
         matrixRainDensity: matrixActiveClip.matrixRainDensity || 16,
-        matrixRainColor: matrixActiveClip.matrixRainColor || '#00ff41',
+        matrixRainColor: matrixActiveClip.matrixRainColor || '#f59e0b',
         matrixRainSpeed: matrixActiveClip.matrixRainSpeed || 1.0,
+        textColor: matrixActiveClip.textColor || '#f59e0b',
+        titleColor: matrixActiveClip.titleColor || matrixActiveClip.textColor || '#f59e0b',
+        decodeEnvPreset: matrixActiveClip.decodeEnvPreset || 'darkroom-dossier',
+        decodeAnimStyle: matrixActiveClip.decodeAnimStyle || 'expanding-decode',
+        decodeContainerStyle: matrixActiveClip.decodeContainerStyle || 'none',
+        decodeSubContainer: !!matrixActiveClip.decodeSubContainer,
+        decodeTextScale: matrixActiveClip.decodeTextScale || 1.0,
+        decodeBoxScale: matrixActiveClip.decodeBoxScale || 1.0,
+        decodeSubScale: matrixActiveClip.decodeSubScale || 1.0,
+        matrixTypeSpeed: matrixActiveClip.matrixTypeSpeed || 1.3,
+        mainText: matrixActiveClip.mainText || 'THE ILLUSION OF CHOICE',
+        subText: matrixActiveClip.subText || 'EXHIBIT A · DECLASSIFIED',
         matrixColumns: matrixActiveClip._matrixColumns || (matrixActiveClip._matrixColumns = [])
       } : {
         matrixRainDensity: fxState.stageBackground?.density || 16,
@@ -3275,6 +3396,15 @@ function render(now) {
       drawMarqueeSelectionOverlay();
     }
 
+    // 5.5. Custom 2D/3D Motion Path Trajectory & Handles Overlay on Stage
+    if (!isExporting && typeof drawStageMotionPathOverlay === 'function') {
+      drawStageMotionPathOverlay(ctx);
+    }
+    if (isPlaying && typeof drawInspectorMotionPathPad === 'function' && selectedClip && selectedClip.clip && selectedClip.clip.motionPathEnabled) {
+      drawInspectorMotionPathPad();
+      drawInspectorMotionPathEasingGraph();
+    }
+
     // 6. Freehand Drawing Ink Overlay (Multi-brush vector strokes)
     drawScreenInkOverlay(ctx);
 
@@ -3306,20 +3436,50 @@ function render(now) {
 
 
 function syncAudioPlayback() {
-  // Voiceover track sync
-  const activeVoice = timelineClips.voiceover.find(c => currentTime >= c.start && currentTime <= (c.start + c.duration));
+  // Voiceover track sync (with J-Cut / L-Cut audio lead/lag transition pacing support)
+  let activeVoice = timelineClips.voiceover.find(c => {
+    const mode = c.cutPacingMode || 'sync';
+    const off = (mode === 'j-cut' || mode === 'l-cut') ? (c.cutPacingOffset || 0.8) : 0;
+    const effStart = mode === 'j-cut' ? Math.max(0, c.start - off) : c.start;
+    const effEnd = mode === 'l-cut' ? (c.start + c.duration + off) : (c.start + c.duration);
+    return currentTime >= effStart && currentTime <= effEnd;
+  });
+  // Also check if an active visual clip has a J-Cut or L-Cut pacing offset applied to underlying voiceover
+  const activeVisualForPacing = [...(timelineClips.video || []), ...(timelineClips.image || [])].find(c => {
+    if (!c.cutPacingMode || c.cutPacingMode === 'sync') return false;
+    const off = c.cutPacingOffset || 0.8;
+    const effStart = c.cutPacingMode === 'j-cut' ? Math.max(0, c.start - off) : c.start;
+    const effEnd = c.cutPacingMode === 'l-cut' ? (c.start + c.duration + off) : (c.start + c.duration);
+    return currentTime >= effStart && currentTime <= effEnd;
+  });
   if (activeVoice) {
     if (audioPlayer.dataset.currentUrl !== activeVoice.file.url) {
       audioPlayer.dataset.currentUrl = activeVoice.file.url;
       audioPlayer.src = activeVoice.file.url;
     }
     const clipOffset = activeVoice.audioOffset || 0;
-    const offset = (currentTime - activeVoice.start) + clipOffset;
+    const offset = Math.max(0, (currentTime - activeVoice.start) + clipOffset);
     if (audioPlayer.paused) audioPlayer.play().catch(() => {});
     if (Math.abs(audioPlayer.currentTime - offset) > 0.25) {
       audioPlayer.currentTime = offset;
     }
-    audioPlayer.volume = (activeVoice.volume !== undefined ? activeVoice.volume : 100) / 100;
+    let volMult = 1.0;
+    const pacingClip = (activeVoice.cutPacingMode && activeVoice.cutPacingMode !== 'sync') ? activeVoice : activeVisualForPacing;
+    if (pacingClip && pacingClip.cutPacingMode === 'j-cut') {
+      const lead = pacingClip.cutPacingOffset || 0.8;
+      if (currentTime < pacingClip.start && currentTime >= pacingClip.start - lead) {
+        const p = Math.max(0, Math.min(1, (currentTime - (pacingClip.start - lead)) / lead));
+        volMult = pacingClip.cutPacingCurve === 'constant-power' ? Math.sin(p * Math.PI * 0.5) : (pacingClip.cutPacingCurve === 's-curve' ? (p * p * (3 - 2 * p)) : p);
+      }
+    } else if (pacingClip && pacingClip.cutPacingMode === 'l-cut') {
+      const trail = pacingClip.cutPacingOffset || 0.8;
+      const cutEnd = pacingClip.start + pacingClip.duration;
+      if (currentTime > cutEnd && currentTime <= cutEnd + trail) {
+        const p = Math.max(0, Math.min(1, 1 - (currentTime - cutEnd) / trail));
+        volMult = pacingClip.cutPacingCurve === 'constant-power' ? Math.sin(p * Math.PI * 0.5) : (pacingClip.cutPacingCurve === 's-curve' ? (p * p * (3 - 2 * p)) : p);
+      }
+    }
+    audioPlayer.volume = Math.max(0, Math.min(1, ((activeVoice.volume !== undefined ? activeVoice.volume : 100) / 100) * volMult));
   } else {
     if (audioPlayer.src && !audioPlayer.paused) {
       audioPlayer.pause();
@@ -4828,6 +4988,19 @@ function selectClip(clip, trackType) {
       }
     }
 
+    // Populate 2D / 3D Motion Path & Easing Studio Section
+    const mpSec = document.getElementById('inspector-motion-path-section');
+    if (mpSec) {
+      if (['image', 'video', 'chart'].includes(trackType)) {
+        mpSec.style.display = 'block';
+        if (typeof syncInspectorMotionPathUI === 'function') {
+          syncInspectorMotionPathUI(clip);
+        }
+      } else {
+        mpSec.style.display = 'none';
+      }
+    }
+
     // Populate Adjust & Filter Sections
     const adjustSec = document.getElementById('inspector-adjust-section');
     const filterSec = document.getElementById('inspector-filter-section');
@@ -4934,6 +5107,65 @@ function selectClip(clip, trackType) {
       const vigVal = document.getElementById('inspector-vignette-val');
       if (vigSlider) vigSlider.value = clip.vignette || 0;
       if (vigVal) vigVal.textContent = `${clip.vignette || 0}%`;
+
+      // MOTION BLUR & CAMERA FLASH FX CONTROLS
+      const mbToggle = document.getElementById('inspector-motion-blur-toggle');
+      const mbSlider = document.getElementById('inspector-motion-blur-slider');
+      const mbNum = document.getElementById('inspector-motion-blur-num');
+      const mbVal = document.getElementById('inspector-motion-blur-val');
+      const mbShutter = document.getElementById('inspector-motion-blur-shutter');
+      const mbSamples = document.getElementById('inspector-motion-blur-samples');
+      const mbSamplesVal = document.getElementById('inspector-motion-blur-samples-val');
+      const mbAngle = document.getElementById('inspector-motion-blur-angle');
+      const mbDeg = document.getElementById('inspector-motion-blur-deg');
+      const mbDegVal = document.getElementById('inspector-motion-blur-deg-val');
+      const mbIntensity = Math.round((parseFloat(clip.motionBlurIntensity) || 0) * 10) / 10;
+      const mbSampleCount = parseInt(clip.motionBlurSamples, 10) || 8;
+      const mbCustomDeg = Math.round(parseFloat(clip.motionBlurCustomDeg) || 0);
+      const fmtMbInt = Number.isInteger(mbIntensity) ? `${mbIntensity}` : mbIntensity.toFixed(1);
+      const shutterAngle = clip.motionBlurEnabled && mbIntensity > 0 ? Math.round((mbIntensity / 100) * 360) : 0;
+      if (mbToggle) mbToggle.checked = !!clip.motionBlurEnabled;
+      if (mbSlider) mbSlider.value = mbIntensity;
+      if (mbNum) mbNum.value = mbIntensity;
+      if (mbVal) mbVal.textContent = clip.motionBlurEnabled && mbIntensity > 0 ? `${fmtMbInt}%` : 'Off';
+      if (mbShutter) mbShutter.textContent = `${shutterAngle}° Shutter`;
+      if (mbSamples) mbSamples.value = mbSampleCount;
+      if (mbSamplesVal) mbSamplesVal.textContent = `${mbSampleCount}x ${mbSampleCount >= 12 ? 'Ultra' : mbSampleCount >= 7 ? 'Smooth' : 'Fast'}`;
+      if (mbAngle) mbAngle.value = clip.motionBlurAngle || 'horizontal';
+      if (mbDeg) mbDeg.value = mbCustomDeg;
+      if (mbDegVal) mbDegVal.textContent = `${mbCustomDeg}°`;
+      document.querySelectorAll('.mb-preset-btn').forEach((btn) => {
+        const pVal = parseFloat(btn.getAttribute('data-mb-preset') || '0');
+        const isActive = (pVal === 0 && (!clip.motionBlurEnabled || mbIntensity === 0)) || (clip.motionBlurEnabled && Math.abs(mbIntensity - pVal) < 0.6);
+        btn.style.borderColor = isActive ? '#38bdf8' : '';
+        btn.style.color = isActive ? '#38bdf8' : '';
+      });
+
+      const cfToggle = document.getElementById('inspector-camera-flash-toggle');
+      const cfIntSlider = document.getElementById('inspector-camera-flash-intensity');
+      const cfIntVal = document.getElementById('inspector-camera-flash-intensity-val');
+      const cfDurSlider = document.getElementById('inspector-camera-flash-duration');
+      const cfDurVal = document.getElementById('inspector-camera-flash-duration-val');
+      const cfColor = document.getElementById('inspector-camera-flash-color');
+      const cfSfx = document.getElementById('inspector-camera-flash-sfx');
+      const curCfInt = clip.cameraFlashIntensity !== undefined ? clip.cameraFlashIntensity : 190;
+      const curCfDur = clip.cameraFlashDuration !== undefined ? clip.cameraFlashDuration : 0.45;
+      if (cfToggle) cfToggle.checked = !!clip.cameraFlashEnabled;
+      if (cfIntSlider) cfIntSlider.value = curCfInt;
+      if (cfIntVal) cfIntVal.textContent = `${curCfInt}%`;
+      if (cfDurSlider) cfDurSlider.value = curCfDur;
+      if (cfDurVal) cfDurVal.textContent = `${Number(curCfDur).toFixed(2)}s`;
+      if (cfColor) cfColor.value = clip.cameraFlashColor || '#fff5e0';
+      if (cfSfx) cfSfx.value = clip.cameraFlashSfx || 'slr_35mm';
+
+      const mbFlashBadge = document.getElementById('badge-motionblur-flash-state');
+      if (mbFlashBadge) {
+        const activeList = [];
+        if (clip.motionBlurEnabled && mbIntensity > 0) activeList.push('Blur');
+        if (clip.cameraFlashEnabled) activeList.push('Flash');
+        mbFlashBadge.textContent = activeList.length > 0 ? activeList.join(' + ') : 'Ready';
+        mbFlashBadge.style.color = activeList.length > 0 ? '#38bdf8' : '#94a3b8';
+      }
 
       // FILTER INTENSITY & ACTIVE BADGE
       const fIntSlider = document.getElementById('inspector-filter-intensity-slider');
@@ -5081,6 +5313,10 @@ function selectClip(clip, trackType) {
         if (transDirBox) transDirBox.style.display = hasTrans ? 'block' : 'none';
         if (transSpeedBox) transSpeedBox.style.display = hasTrans ? 'block' : 'none';
         if (transModeBox) transModeBox.style.display = hasTrans ? 'flex' : 'none';
+
+        if (typeof syncInspectorJCutLCutUI === 'function') {
+          syncInspectorJCutLCutUI(clip);
+        }
       } else {
         transSection.style.display = 'none';
       }
@@ -8499,10 +8735,205 @@ document.getElementById('btn-reset-clip-adjust')?.addEventListener('click', () =
   clip.grain = 0;
   clip.denoise = 0;
   clip.vignette = 0;
+  clip.motionBlurEnabled = false;
+  clip.motionBlurIntensity = 0;
+  clip.motionBlurSamples = 8;
+  clip.motionBlurAngle = 'horizontal';
+  clip.motionBlurCustomDeg = 0;
+  clip.cameraFlashEnabled = false;
+  clip.cameraFlashIntensity = 190;
+  clip.cameraFlashDuration = 0.45;
+  clip.cameraFlashColor = '#fff5e0';
+  clip.cameraFlashSfx = 'slr_35mm';
   clip.blendMode = 'normal';
   selectClip(clip, selectedClip.trackType);
   renderCanvas();
   showTextTimingAlert('Reset adjustments to neutral', 'info');
+});
+
+// Helper to apply granular Motion Blur intensity and sync all inspector controls
+function applyClipMotionBlurIntensity(rawVal, forceEnable = null) {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  const clamped = Math.min(100, Math.max(0, Math.round((parseFloat(rawVal) || 0) * 2) / 2));
+  clip.motionBlurIntensity = clamped;
+  clip.motionBlurEnabled = forceEnable !== null ? !!forceEnable : clamped > 0;
+
+  const fmtVal = Number.isInteger(clamped) ? `${clamped}` : clamped.toFixed(1);
+  const shutterDeg = clip.motionBlurEnabled && clamped > 0 ? Math.round((clamped / 100) * 360) : 0;
+
+  const chk = document.getElementById('inspector-motion-blur-toggle');
+  if (chk) chk.checked = clip.motionBlurEnabled;
+  const sl = document.getElementById('inspector-motion-blur-slider');
+  if (sl) sl.value = clamped;
+  const num = document.getElementById('inspector-motion-blur-num');
+  if (num) num.value = clamped;
+  const valEl = document.getElementById('inspector-motion-blur-val');
+  if (valEl) valEl.textContent = clip.motionBlurEnabled && clamped > 0 ? `${fmtVal}%` : 'Off';
+  const shutEl = document.getElementById('inspector-motion-blur-shutter');
+  if (shutEl) shutEl.textContent = `${shutterDeg}° Shutter`;
+
+  document.querySelectorAll('.mb-preset-btn').forEach((btn) => {
+    const pVal = parseFloat(btn.getAttribute('data-mb-preset') || '0');
+    const isActive = (pVal === 0 && (!clip.motionBlurEnabled || clamped === 0)) || (clip.motionBlurEnabled && Math.abs(clamped - pVal) < 0.6);
+    btn.style.borderColor = isActive ? '#38bdf8' : '';
+    btn.style.color = isActive ? '#38bdf8' : '';
+  });
+
+  renderCanvas();
+}
+
+// Motion Blur & Camera Flash Inspector Listeners
+document.getElementById('inspector-motion-blur-toggle')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  const enable = e.target.checked;
+  const targetInt = enable && (!clip.motionBlurIntensity || clip.motionBlurIntensity <= 0) ? 35 : (clip.motionBlurIntensity || 0);
+  applyClipMotionBlurIntensity(targetInt, enable);
+});
+
+document.getElementById('inspector-motion-blur-slider')?.addEventListener('input', (e) => {
+  applyClipMotionBlurIntensity(e.target.value);
+});
+
+document.getElementById('inspector-motion-blur-num')?.addEventListener('input', (e) => {
+  applyClipMotionBlurIntensity(e.target.value);
+});
+
+document.getElementById('btn-motion-blur-step-down')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const cur = parseFloat(selectedClip.clip.motionBlurIntensity) || 0;
+  applyClipMotionBlurIntensity(Math.max(0, cur - 0.5));
+});
+
+document.getElementById('btn-motion-blur-step-up')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const cur = parseFloat(selectedClip.clip.motionBlurIntensity) || 0;
+  applyClipMotionBlurIntensity(Math.min(100, cur + 0.5));
+});
+
+document.querySelectorAll('.mb-preset-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const presetVal = parseFloat(btn.getAttribute('data-mb-preset') || '0');
+    applyClipMotionBlurIntensity(presetVal, presetVal > 0);
+  });
+});
+
+document.getElementById('inspector-motion-blur-samples')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const count = Math.min(16, Math.max(2, parseInt(e.target.value, 10) || 8));
+  selectedClip.clip.motionBlurSamples = count;
+  const sVal = document.getElementById('inspector-motion-blur-samples-val');
+  if (sVal) sVal.textContent = `${count}x ${count >= 12 ? 'Ultra' : count >= 7 ? 'Smooth' : 'Fast'}`;
+  renderCanvas();
+});
+
+document.getElementById('inspector-motion-blur-angle')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const mode = e.target.value;
+  selectedClip.clip.motionBlurAngle = mode;
+  const degMap = { horizontal: 0, diagonal: 45, vertical: 90 };
+  if (degMap[mode] !== undefined) {
+    selectedClip.clip.motionBlurCustomDeg = degMap[mode];
+    const degSl = document.getElementById('inspector-motion-blur-deg');
+    const degVal = document.getElementById('inspector-motion-blur-deg-val');
+    if (degSl) degSl.value = degMap[mode];
+    if (degVal) degVal.textContent = `${degMap[mode]}°`;
+  }
+  renderCanvas();
+});
+
+document.getElementById('inspector-motion-blur-deg')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const deg = Math.min(360, Math.max(0, parseInt(e.target.value, 10) || 0));
+  selectedClip.clip.motionBlurCustomDeg = deg;
+  selectedClip.clip.motionBlurAngle = 'custom';
+  const angleSel = document.getElementById('inspector-motion-blur-angle');
+  if (angleSel) angleSel.value = 'custom';
+  const degVal = document.getElementById('inspector-motion-blur-deg-val');
+  if (degVal) degVal.textContent = `${deg}°`;
+  renderCanvas();
+});
+
+document.getElementById('inspector-camera-flash-toggle')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  clip.cameraFlashEnabled = e.target.checked;
+  if (clip.cameraFlashEnabled) {
+    clip.cameraFlashIntensity = clip.cameraFlashIntensity || 190;
+    clip.cameraFlashDuration = clip.cameraFlashDuration || 0.45;
+    clip.cameraFlashColor = clip.cameraFlashColor || '#fff5e0';
+    clip.cameraFlashSfx = clip.cameraFlashSfx || 'slr_35mm';
+    clip._manualFlashTimestamp = performance.now();
+    if (clip.cameraFlashSfx !== 'none' && typeof window.playJaniFlashQuadTestSound === 'function') {
+      window.playJaniFlashQuadTestSound(clip.cameraFlashSfx, 90, 1.0);
+    }
+    const pulsePreview = (step = 0) => {
+      renderCanvas();
+      if (step < 25) requestAnimationFrame(() => pulsePreview(step + 1));
+    };
+    requestAnimationFrame(() => pulsePreview(0));
+  } else {
+    renderCanvas();
+  }
+  selectClip(clip, selectedClip.trackType);
+});
+
+document.getElementById('btn-inspector-test-flash')?.addEventListener('click', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  clip.cameraFlashEnabled = true;
+  const chk = document.getElementById('inspector-camera-flash-toggle');
+  if (chk) chk.checked = true;
+  clip._manualFlashTimestamp = performance.now();
+  const sfxProfile = clip.cameraFlashSfx || document.getElementById('inspector-camera-flash-sfx')?.value || 'slr_35mm';
+  if (sfxProfile !== 'none' && typeof window.playJaniFlashQuadTestSound === 'function') {
+    window.playJaniFlashQuadTestSound(sfxProfile, 95, 1.0);
+  }
+  const pulsePreview = (step = 0) => {
+    renderCanvas();
+    if (step < 28) requestAnimationFrame(() => pulsePreview(step + 1));
+  };
+  requestAnimationFrame(() => pulsePreview(0));
+});
+
+document.getElementById('inspector-camera-flash-intensity')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const val = parseInt(e.target.value, 10) || 190;
+  selectedClip.clip.cameraFlashIntensity = val;
+  selectedClip.clip.cameraFlashEnabled = true;
+  const chk = document.getElementById('inspector-camera-flash-toggle');
+  if (chk) chk.checked = true;
+  const lbl = document.getElementById('inspector-camera-flash-intensity-val');
+  if (lbl) lbl.textContent = `${val}%`;
+  selectedClip.clip._manualFlashTimestamp = performance.now();
+  renderCanvas();
+});
+
+document.getElementById('inspector-camera-flash-duration')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const val = parseFloat(e.target.value) || 0.45;
+  selectedClip.clip.cameraFlashDuration = val;
+  const lbl = document.getElementById('inspector-camera-flash-duration-val');
+  if (lbl) lbl.textContent = `${val.toFixed(2)}s`;
+  renderCanvas();
+});
+
+document.getElementById('inspector-camera-flash-color')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  selectedClip.clip.cameraFlashColor = e.target.value;
+  selectedClip.clip.cameraFlashEnabled = true;
+  selectedClip.clip._manualFlashTimestamp = performance.now();
+  renderCanvas();
+});
+
+document.getElementById('inspector-camera-flash-sfx')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const profile = e.target.value;
+  selectedClip.clip.cameraFlashSfx = profile;
+  if (profile !== 'none' && typeof window.playJaniFlashQuadTestSound === 'function') {
+    window.playJaniFlashQuadTestSound(profile, 90, 1.0);
+  }
 });
 
 // Custom LUT loader support
@@ -8780,6 +9211,1328 @@ document.getElementById('btn-apply-curve-modal')?.addEventListener('click', () =
   document.getElementById('modal-curve-editor').style.display = 'none';
 });
 
+// ==================== 2D / 3D CUSTOM MOTION PATH & EASING STUDIO ====================
+const MOTION_PATH_PRESETS = {
+  's-curve': [
+    { x: -0.34, y: 0.24, z: -0.25 },
+    { x: -0.14, y: -0.22, z: 0.15 },
+    { x: 0.14, y: 0.22, z: 0.35 },
+    { x: 0.34, y: -0.20, z: 0.0 }
+  ],
+  'orbit-3d': [
+    { x: -0.32, y: 0.04, z: -0.45 },
+    { x: -0.08, y: -0.24, z: 0.10 },
+    { x: 0.26, y: -0.06, z: 0.65 },
+    { x: 0.08, y: 0.24, z: 0.20 },
+    { x: -0.26, y: 0.12, z: -0.25 }
+  ],
+  'whip-arc': [
+    { x: -0.40, y: 0.28, z: -0.40 },
+    { x: -0.05, y: -0.18, z: 0.45 },
+    { x: 0.36, y: -0.04, z: 0.10 }
+  ],
+  'figure-8': [
+    { x: -0.30, y: -0.18, z: -0.20 },
+    { x: -0.30, y: 0.18, z: 0.25 },
+    { x: 0.0, y: 0.0, z: 0.55 },
+    { x: 0.30, y: -0.18, z: 0.25 },
+    { x: 0.30, y: 0.18, z: -0.20 },
+    { x: 0.0, y: 0.0, z: 0.0 }
+  ],
+  'spiral-dive': [
+    { x: -0.36, y: -0.24, z: -0.60 },
+    { x: 0.32, y: -0.20, z: -0.25 },
+    { x: 0.26, y: 0.22, z: 0.10 },
+    { x: -0.20, y: 0.18, z: 0.40 },
+    { x: -0.08, y: -0.10, z: 0.65 },
+    { x: 0.0, y: 0.0, z: 0.85 }
+  ],
+  'float-drift': [
+    { x: -0.16, y: 0.10, z: -0.15 },
+    { x: -0.04, y: -0.08, z: 0.20 },
+    { x: 0.08, y: 0.06, z: 0.30 },
+    { x: 0.18, y: -0.05, z: 0.05 }
+  ]
+};
+
+let mpToolMode = 'freehand'; // 'freehand' | 'nodes'
+let mpSelectedNodeIdx = 0;
+let mpIsDrawingPad = false;
+let mpDraggingNodeIdx = -1;
+let mpRawFreehandPts = [];
+let mpStageDrawActive = false;
+let mpStageIsDrawing = false;
+let mpStageDraggingNodeIdx = -1;
+let mpStageRawPts = [];
+let mpDraggingBezierHandle = null; // 'p1' | 'p2' | null
+
+function ensureClipMotionPathDefaults(clip) {
+  if (!clip) return;
+  if (clip.motionPathEnabled === undefined) clip.motionPathEnabled = false;
+  if (!clip.motionPathDimension) clip.motionPathDimension = '3d'; // '2d' | '3d'
+  if (!Array.isArray(clip.motionPathPoints) || clip.motionPathPoints.length < 2) {
+    clip.motionPathPoints = MOTION_PATH_PRESETS['s-curve'].map(p => ({ ...p }));
+  }
+  if (clip.motionPathSmoothing === undefined) clip.motionPathSmoothing = 75;
+  if (clip.motionPathSpan === undefined) clip.motionPathSpan = 100;
+  if (!clip.motionPathZProfile) clip.motionPathZProfile = 'arc-apex';
+  if (clip.motionPathZDepth === undefined) clip.motionPathZDepth = 65;
+  if (clip.motionPathBank === undefined) clip.motionPathBank = 18;
+  if (clip.motionPathAutoOrient === undefined) clip.motionPathAutoOrient = false;
+  if (!clip.motionPathLoopMode) clip.motionPathLoopMode = 'once';
+  if (!clip.motionPathEasing) clip.motionPathEasing = 'easeInOutCubic';
+  if (clip.motionPathSpeed === undefined) clip.motionPathSpeed = 1.0;
+  if (clip.motionPathShowOverlay === undefined) clip.motionPathShowOverlay = true;
+  if (!clip.motionPathBezier) {
+    clip.motionPathBezier = { x1: 0.65, y1: 0.0, x2: 0.35, y2: 1.0 };
+  }
+}
+
+function evalCubicBezier1D(p1, p2, t) {
+  const u = 1 - t;
+  return 3 * u * u * t * p1 + 3 * u * t * t * p2 + t * t * t;
+}
+
+function solveCubicBezierEasing(x1, y1, x2, y2, targetX) {
+  if (targetX <= 0) return 0;
+  if (targetX >= 1) return 1;
+  let lo = 0, hi = 1, mid = targetX;
+  for (let i = 0; i < 14; i++) {
+    mid = (lo + hi) * 0.5;
+    const xEst = evalCubicBezier1D(x1, x2, mid);
+    if (Math.abs(xEst - targetX) < 0.0005) break;
+    if (xEst < targetX) lo = mid;
+    else hi = mid;
+  }
+  return evalCubicBezier1D(y1, y2, mid);
+}
+
+function evaluateMotionPathEasing(clip, rawT) {
+  const t = Math.max(0, Math.min(1, rawT));
+  const mode = (clip && clip.motionPathEasing) || 'easeInOutCubic';
+  if (mode === 'linear') return t;
+  if (mode === 'easeInOutCubic') {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  }
+  if (mode === 'easeOutExpo') {
+    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+  }
+  if (mode === 'easeInExpo') {
+    return t === 0 ? 0 : Math.pow(2, 10 * t - 10);
+  }
+  if (mode === 'easeOutBack') {
+    const c1 = 1.70158;
+    const c3 = c1 + 1;
+    return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
+  }
+  if (mode === 'spring') {
+    if (t === 0 || t === 1) return t;
+    return Math.pow(2, -9 * t) * Math.sin((t * 9 - 0.75) * ((2 * Math.PI) / 3)) + 1;
+  }
+  const bz = (clip && clip.motionPathBezier) || { x1: 0.65, y1: 0.0, x2: 0.35, y2: 1.0 };
+  return solveCubicBezierEasing(bz.x1, bz.y1, bz.x2, bz.y2, t);
+}
+
+// Catmull-Rom / tension spline sampler for 2D/3D points [{x, y, z}]
+function sampleMotionPathSpline(points, uClamped, smoothingPct = 75, zProfile = 'arc-apex') {
+  if (!Array.isArray(points) || points.length === 0) {
+    return { x: 0, y: 0, z: 0, vx: 1, vy: 0, vz: 0 };
+  }
+  if (points.length === 1) {
+    return { x: points[0].x || 0, y: points[0].y || 0, z: points[0].z || 0, vx: 1, vy: 0, vz: 0 };
+  }
+
+  const u = Math.max(0, Math.min(1, uClamped));
+  const n = points.length - 1;
+  const scaled = u * n;
+  const idx = Math.min(n - 1, Math.floor(scaled));
+  const t = scaled - idx;
+
+  const p0 = points[Math.max(0, idx - 1)];
+  const p1 = points[idx];
+  const p2 = points[Math.min(n, idx + 1)];
+  const p3 = points[Math.min(n, idx + 2)];
+
+  const tension = (Math.max(0, Math.min(100, smoothingPct)) / 100) * 0.5;
+  const t2 = t * t;
+  const t3 = t2 * t;
+
+  const interpChannel = (v0, v1, v2, v3) => {
+    const m1 = (v2 - v0) * tension;
+    const m2 = (v3 - v1) * tension;
+    const a = 2 * v1 - 2 * v2 + m1 + m2;
+    const b = -3 * v1 + 3 * v2 - 2 * m1 - m2;
+    const c = m1;
+    const d = v1;
+    return a * t3 + b * t2 + c * t + d;
+  };
+
+  const derivChannel = (v0, v1, v2, v3) => {
+    const m1 = (v2 - v0) * tension;
+    const m2 = (v3 - v1) * tension;
+    const a = 2 * v1 - 2 * v2 + m1 + m2;
+    const b = -3 * v1 + 3 * v2 - 2 * m1 - m2;
+    const c = m1;
+    return 3 * a * t2 + 2 * b * t + c;
+  };
+
+  const x = interpChannel(p0.x || 0, p1.x || 0, p2.x || 0, p3.x || 0);
+  const y = interpChannel(p0.y || 0, p1.y || 0, p2.y || 0, p3.y || 0);
+  const vx = derivChannel(p0.x || 0, p1.x || 0, p2.x || 0, p3.x || 0);
+  const vy = derivChannel(p0.y || 0, p1.y || 0, p2.y || 0, p3.y || 0);
+
+  let z = interpChannel(p0.z || 0, p1.z || 0, p2.z || 0, p3.z || 0);
+  if (zProfile === 'push-in') {
+    z = -0.5 + u * 1.15;
+  } else if (zProfile === 'pull-out') {
+    z = 0.65 - u * 1.15;
+  } else if (zProfile === 'arc-apex') {
+    z = -0.35 + Math.sin(u * Math.PI) * 0.95;
+  } else if (zProfile === 'valley-dive') {
+    z = 0.35 - Math.sin(u * Math.PI) * 0.85;
+  } else if (zProfile === 'wave-z') {
+    z = Math.sin(u * Math.PI * 2) * 0.65;
+  }
+
+  return { x, y, z, vx, vy, vz: 0 };
+}
+
+function evaluateClipMotionPath(clip, clipElapsed, stageW, stageH) {
+  if (!clip || !clip.motionPathEnabled || !Array.isArray(clip.motionPathPoints) || clip.motionPathPoints.length < 2) {
+    return null;
+  }
+  const dur = Math.max(0.1, clip.duration || 5.0);
+  const spd = Math.max(0.1, parseFloat(clip.motionPathSpeed) || 1.0);
+  const rawProgress = Math.max(0, (clipElapsed / dur) * spd);
+  const loopMode = clip.motionPathLoopMode || 'once';
+
+  let normT = 0;
+  if (loopMode === 'loop') {
+    normT = rawProgress % 1.0;
+  } else if (loopMode === 'pingpong') {
+    const cycle = Math.floor(rawProgress);
+    const rem = rawProgress - cycle;
+    normT = (cycle % 2 === 0) ? rem : (1.0 - rem);
+  } else {
+    normT = Math.min(1.0, rawProgress);
+  }
+
+  const easedT = evaluateMotionPathEasing(clip, normT);
+  const clampedU = Math.max(0, Math.min(1, easedT));
+  const overshootFactor = easedT - clampedU;
+
+  const is3D = (clip.motionPathDimension || '3d') === '3d';
+  const zProf = is3D ? (clip.motionPathZProfile || 'arc-apex') : 'flat';
+  const sample = sampleMotionPathSpline(clip.motionPathPoints, clampedU, clip.motionPathSmoothing ?? 75, zProf);
+
+  const spanScale = (clip.motionPathSpan !== undefined ? clip.motionPathSpan : 100) / 100;
+  const finalNormX = (sample.x + sample.vx * overshootFactor * 0.35) * spanScale;
+  const finalNormY = (sample.y + sample.vy * overshootFactor * 0.35) * spanScale;
+
+  const offsetX = finalNormX * stageW;
+  const offsetY = finalNormY * stageH;
+
+  const tangentRad = Math.atan2(sample.vy * stageH, sample.vx * stageW);
+  const tangentDeg = (tangentRad * 180) / Math.PI;
+  const rotDeg = clip.motionPathAutoOrient ? tangentDeg : 0;
+
+  let scaleMult = 1.0;
+  let bankScaleX = 1.0;
+  let bankScaleY = 1.0;
+  let bankSkewX = 0.0;
+  let bankSkewY = 0.0;
+  let shadowBlurAdd = 0;
+  let shadowOffsetXAdd = 0;
+  let shadowOffsetYAdd = 0;
+
+  if (is3D) {
+    const zRange = (clip.motionPathZDepth !== undefined ? clip.motionPathZDepth : 65) / 100;
+    const zVal = Math.max(-0.9, Math.min(1.5, sample.z));
+    scaleMult = Math.max(0.25, 1.0 + zVal * 0.65 * zRange);
+
+    const bankDeg = clip.motionPathBank !== undefined ? clip.motionPathBank : 18;
+    const bankRad = (bankDeg * Math.PI) / 180;
+    const velMag = Math.min(1.5, Math.hypot(sample.vx, sample.vy) * 1.4);
+    const normVx = Math.max(-1, Math.min(1, sample.vx * 1.6));
+    const normVy = Math.max(-1, Math.min(1, sample.vy * 1.6));
+
+    // Simulated 3D yaw/pitch perspective foreshortening & banking skew
+    bankScaleX = Math.max(0.72, Math.cos(bankRad * Math.abs(normVx) * 0.85));
+    bankScaleY = Math.max(0.78, Math.cos(bankRad * Math.abs(normVy) * 0.65));
+    bankSkewY = Math.sin(bankRad * normVx * 0.42) * 0.28 * Math.min(1, velMag + 0.25);
+    bankSkewX = -Math.sin(bankRad * normVy * 0.35) * 0.22 * Math.min(1, velMag + 0.25);
+
+    shadowBlurAdd = Math.max(0, zVal * 42 * zRange);
+    shadowOffsetYAdd = Math.round(zVal * 26 * zRange);
+    shadowOffsetXAdd = Math.round(-finalNormX * 28 * zRange);
+  }
+
+  return {
+    is3D,
+    normT,
+    easedT,
+    x: finalNormX,
+    y: finalNormY,
+    z: is3D ? sample.z : 0,
+    offsetX,
+    offsetY,
+    scaleMult,
+    rotDeg,
+    tangentRad,
+    tangentDeg,
+    bankScaleX,
+    bankScaleY,
+    bankSkewX,
+    bankSkewY,
+    shadowBlurAdd,
+    shadowOffsetXAdd,
+    shadowOffsetYAdd
+  };
+}
+
+function simplifyMotionPathPoints(rawPts, targetCount = 6) {
+  if (!Array.isArray(rawPts) || rawPts.length <= 2) return rawPts;
+  // Compute cumulative arc length
+  const dists = [0];
+  let totalLen = 0;
+  for (let i = 1; i < rawPts.length; i++) {
+    totalLen += Math.hypot(rawPts[i].x - rawPts[i - 1].x, rawPts[i].y - rawPts[i - 1].y);
+    dists.push(totalLen);
+  }
+  if (totalLen < 0.01) {
+    return [rawPts[0], rawPts[rawPts.length - 1]];
+  }
+  const count = Math.max(3, Math.min(9, targetCount));
+  const out = [];
+  for (let k = 0; k < count; k++) {
+    const targetD = (k / (count - 1)) * totalLen;
+    let idx = 0;
+    while (idx < dists.length - 2 && dists[idx + 1] < targetD) idx++;
+    const segLen = Math.max(0.0001, dists[idx + 1] - dists[idx]);
+    const frac = Math.max(0, Math.min(1, (targetD - dists[idx]) / segLen));
+    const pA = rawPts[idx];
+    const pB = rawPts[idx + 1];
+    out.push({
+      x: Math.round((pA.x + (pB.x - pA.x) * frac) * 1000) / 1000,
+      y: Math.round((pA.y + (pB.y - pA.y) * frac) * 1000) / 1000,
+      z: Math.round(((pA.z || 0) + ((pB.z || 0) - (pA.z || 0)) * frac) * 100) / 100
+    });
+  }
+  return out;
+}
+
+function drawInspectorMotionPathPad() {
+  const pad = document.getElementById('inspector-motion-path-canvas');
+  if (!pad) return;
+  const ctx2 = pad.getContext('2d');
+  const W = pad.width;
+  const H = pad.height;
+  ctx2.clearRect(0, 0, W, H);
+
+  const clip = selectedClip && selectedClip.clip ? selectedClip.clip : null;
+  if (clip) ensureClipMotionPathDefaults(clip);
+
+  const is3D = !clip || (clip.motionPathDimension || '3d') === '3d';
+  const cx = W / 2;
+  const cy = H / 2;
+
+  // 1. Background Grid (3D Perspective Corridor or 2D Planar Grid)
+  ctx2.save();
+  if (is3D) {
+    const radGrad = ctx2.createRadialGradient(cx, cy, 6, cx, cy, W * 0.65);
+    radGrad.addColorStop(0, 'rgba(56, 189, 248, 0.10)');
+    radGrad.addColorStop(0.55, 'rgba(168, 85, 247, 0.05)');
+    radGrad.addColorStop(1, 'rgba(5, 8, 17, 0.0)');
+    ctx2.fillStyle = radGrad;
+    ctx2.fillRect(0, 0, W, H);
+
+    // Inner 3D depth frame boxes & diagonal vanishing rays
+    ctx2.strokeStyle = 'rgba(56, 189, 248, 0.13)';
+    ctx2.lineWidth = 1;
+    [0.36, 0.62, 0.86].forEach(s => {
+      const rw = W * s;
+      const rh = H * s;
+      ctx2.strokeRect(cx - rw / 2, cy - rh / 2, rw, rh);
+    });
+    ctx2.beginPath();
+    ctx2.moveTo(0, 0); ctx2.lineTo(cx - W * 0.18, cy - H * 0.18);
+    ctx2.moveTo(W, 0); ctx2.lineTo(cx + W * 0.18, cy - H * 0.18);
+    ctx2.moveTo(0, H); ctx2.lineTo(cx - W * 0.18, cy + H * 0.18);
+    ctx2.moveTo(W, H); ctx2.lineTo(cx + W * 0.18, cy + H * 0.18);
+    ctx2.stroke();
+  } else {
+    ctx2.strokeStyle = 'rgba(255, 255, 255, 0.07)';
+    ctx2.lineWidth = 1;
+    for (let x = W / 6; x < W; x += W / 6) {
+      ctx2.beginPath(); ctx2.moveTo(x, 0); ctx2.lineTo(x, H); ctx2.stroke();
+    }
+    for (let y = H / 4; y < H; y += H / 4) {
+      ctx2.beginPath(); ctx2.moveTo(0, y); ctx2.lineTo(W, y); ctx2.stroke();
+    }
+  }
+
+  // Center crosshair
+  ctx2.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+  ctx2.setLineDash([3, 3]);
+  ctx2.beginPath();
+  ctx2.moveTo(cx, 0); ctx2.lineTo(cx, H);
+  ctx2.moveTo(0, cy); ctx2.lineTo(W, cy);
+  ctx2.stroke();
+  ctx2.setLineDash([]);
+  ctx2.restore();
+
+  if (!clip) return;
+
+  const pts = mpIsDrawingPad && mpRawFreehandPts.length >= 2 ? mpRawFreehandPts : (clip.motionPathPoints || []);
+  if (pts.length < 2) return;
+
+  const zProf = is3D ? (clip.motionPathZProfile || 'arc-apex') : 'flat';
+  const smooth = clip.motionPathSmoothing ?? 75;
+  const spanScale = (clip.motionPathSpan !== undefined ? clip.motionPathSpan : 100) / 100;
+
+  // 2. Draw 3D Floor Shadow Projection when in 3D mode
+  if (is3D) {
+    ctx2.save();
+    ctx2.strokeStyle = 'rgba(168, 85, 247, 0.22)';
+    ctx2.lineWidth = 1.5;
+    ctx2.setLineDash([2, 3]);
+    ctx2.beginPath();
+    for (let i = 0; i <= 48; i++) {
+      const u = i / 48;
+      const s = sampleMotionPathSpline(pts, u, smooth, zProf);
+      const px = cx + s.x * spanScale * W;
+      const py = cy + s.y * spanScale * H + 14;
+      if (i === 0) ctx2.moveTo(px, py);
+      else ctx2.lineTo(px, py);
+    }
+    ctx2.stroke();
+    ctx2.setLineDash([]);
+    ctx2.restore();
+  }
+
+  // 3. Draw Smoothed Trajectory Spline
+  const grad = ctx2.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#10b981');
+  grad.addColorStop(0.5, '#00f0ff');
+  grad.addColorStop(1, '#a855f7');
+
+  ctx2.save();
+  ctx2.strokeStyle = grad;
+  ctx2.lineWidth = 2.6;
+  ctx2.shadowColor = 'rgba(0, 240, 255, 0.55)';
+  ctx2.shadowBlur = 8;
+  ctx2.beginPath();
+  for (let i = 0; i <= 64; i++) {
+    const u = i / 64;
+    const s = sampleMotionPathSpline(pts, u, smooth, zProf);
+    const px = cx + s.x * spanScale * W;
+    const py = cy + s.y * spanScale * H;
+    if (i === 0) ctx2.moveTo(px, py);
+    else ctx2.lineTo(px, py);
+  }
+  ctx2.stroke();
+  ctx2.restore();
+
+  // 4. Draw Directional Velocity Chevrons along spline
+  [0.25, 0.5, 0.75].forEach(u => {
+    const s = sampleMotionPathSpline(pts, u, smooth, zProf);
+    const px = cx + s.x * spanScale * W;
+    const py = cy + s.y * spanScale * H;
+    const ang = Math.atan2(s.vy * H, s.vx * W);
+    ctx2.save();
+    ctx2.translate(px, py);
+    ctx2.rotate(ang);
+    ctx2.fillStyle = '#38bdf8';
+    ctx2.beginPath();
+    ctx2.moveTo(4, 0);
+    ctx2.lineTo(-3, -3.2);
+    ctx2.lineTo(-3, 3.2);
+    ctx2.closePath();
+    ctx2.fill();
+    ctx2.restore();
+  });
+
+  // 5. Draw Waypoint Nodes (with 3D Z-depth halo sizing)
+  if (!mpIsDrawingPad) {
+    pts.forEach((pt, idx) => {
+      const px = cx + (pt.x || 0) * spanScale * W;
+      const py = cy + (pt.y || 0) * spanScale * H;
+      const nodeZ = is3D ? (pt.z || 0) : 0;
+      const r = Math.max(3.5, Math.min(8.5, 5.2 + nodeZ * 2.5));
+      const isSel = idx === mpSelectedNodeIdx;
+      const color = idx === 0 ? '#10b981' : (idx === pts.length - 1 ? '#a855f7' : '#38bdf8');
+
+      ctx2.save();
+      if (isSel) {
+        ctx2.strokeStyle = '#ffffff';
+        ctx2.lineWidth = 1.5;
+        ctx2.beginPath();
+        ctx2.arc(px, py, r + 3.5, 0, Math.PI * 2);
+        ctx2.stroke();
+      }
+      ctx2.fillStyle = color;
+      ctx2.strokeStyle = '#050811';
+      ctx2.lineWidth = 1.5;
+      ctx2.beginPath();
+      ctx2.arc(px, py, r, 0, Math.PI * 2);
+      ctx2.fill();
+      ctx2.stroke();
+      ctx2.restore();
+    });
+  }
+
+  // 6. Draw Live Playhead Position Puck on the Path
+  const clipElapsed = Math.max(0, currentTime - (clip.start || 0));
+  const liveSample = evaluateClipMotionPath(
+    Object.assign({}, clip, { motionPathEnabled: true }),
+    clipElapsed,
+    W,
+    H
+  );
+  if (liveSample) {
+    const puckX = cx + liveSample.offsetX;
+    const puckY = cy + liveSample.offsetY;
+    ctx2.save();
+    ctx2.fillStyle = '#fbbf24';
+    ctx2.shadowColor = '#fbbf24';
+    ctx2.shadowBlur = 10;
+    ctx2.translate(puckX, puckY);
+    ctx2.rotate((liveSample.rotDeg * Math.PI) / 180);
+    ctx2.beginPath();
+    ctx2.moveTo(0, -5.5);
+    ctx2.lineTo(5.5, 0);
+    ctx2.lineTo(0, 5.5);
+    ctx2.lineTo(-5.5, 0);
+    ctx2.closePath();
+    ctx2.fill();
+    ctx2.restore();
+
+    const coordsLbl = document.getElementById('mp-pad-coords-label');
+    if (coordsLbl) {
+      coordsLbl.textContent = `X:${Math.round(liveSample.x * 100)}% Y:${Math.round(liveSample.y * 100)}% Z:${liveSample.z.toFixed(2)}`;
+    }
+  }
+}
+
+function drawInspectorMotionPathEasingGraph() {
+  const c = document.getElementById('inspector-mp-easing-canvas');
+  if (!c) return;
+  const ctx2 = c.getContext('2d');
+  const W = c.width;
+  const H = c.height;
+  ctx2.clearRect(0, 0, W, H);
+
+  const clip = selectedClip && selectedClip.clip ? selectedClip.clip : null;
+  if (clip) ensureClipMotionPathDefaults(clip);
+
+  const padX = 10;
+  const padY = 10;
+  const gW = W - padX * 2;
+  const gH = H - padY * 2;
+
+  // Grid
+  ctx2.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx2.lineWidth = 1;
+  ctx2.strokeRect(padX, padY, gW, gH);
+
+  const bz = (clip && clip.motionPathBezier) || { x1: 0.65, y1: 0.0, x2: 0.35, y2: 1.0 };
+  const mode = (clip && clip.motionPathEasing) || 'easeInOutCubic';
+
+  // Draw Bezier Control Tangents
+  const p0x = padX, p0y = padY + gH;
+  const p3x = padX + gW, p3y = padY;
+  const p1x = padX + bz.x1 * gW, p1y = padY + (1 - bz.y1) * gH;
+  const p2x = padX + bz.x2 * gW, p2y = padY + (1 - bz.y2) * gH;
+
+  ctx2.save();
+  ctx2.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+  ctx2.setLineDash([2, 2]);
+  ctx2.beginPath();
+  ctx2.moveTo(p0x, p0y); ctx2.lineTo(p1x, p1y);
+  ctx2.moveTo(p3x, p3y); ctx2.lineTo(p2x, p2y);
+  ctx2.stroke();
+  ctx2.setLineDash([]);
+  ctx2.restore();
+
+  // Draw Easing Curve
+  ctx2.save();
+  ctx2.strokeStyle = '#00f0ff';
+  ctx2.lineWidth = 2.2;
+  ctx2.shadowColor = 'rgba(0, 240, 255, 0.5)';
+  ctx2.shadowBlur = 6;
+  ctx2.beginPath();
+  for (let i = 0; i <= 40; i++) {
+    const t = i / 40;
+    const val = evaluateMotionPathEasing(clip, t);
+    const x = padX + t * gW;
+    const y = padY + (1 - Math.max(-0.15, Math.min(1.15, val))) * gH;
+    if (i === 0) ctx2.moveTo(x, y);
+    else ctx2.lineTo(x, y);
+  }
+  ctx2.stroke();
+  ctx2.restore();
+
+  // Draw draggable P1 (cyan) & P2 (amber) handles
+  [
+    { x: p1x, y: p1y, color: '#38bdf8' },
+    { x: p2x, y: p2y, color: '#fbbf24' }
+  ].forEach(h => {
+    ctx2.save();
+    ctx2.fillStyle = h.color;
+    ctx2.strokeStyle = '#050811';
+    ctx2.lineWidth = 1.5;
+    ctx2.beginPath();
+    ctx2.arc(h.x, h.y, 4.2, 0, Math.PI * 2);
+    ctx2.fill();
+    ctx2.stroke();
+    ctx2.restore();
+  });
+
+  const readout = document.getElementById('inspector-mp-bezier-readout');
+  if (readout) {
+    readout.textContent = mode === 'customBezier'
+      ? `bezier(${bz.x1.toFixed(2)}, ${bz.y1.toFixed(2)}, ${bz.x2.toFixed(2)}, ${bz.y2.toFixed(2)})`
+      : `Curve: ${mode} (${bz.x1.toFixed(2)}, ${bz.y1.toFixed(2)}, ${bz.x2.toFixed(2)}, ${bz.y2.toFixed(2)})`;
+  }
+}
+
+// Render interactive 2D/3D Motion Path Spline & Waypoint Gizmos directly on Main Stage (#preview-canvas)
+function drawStageMotionPathOverlay(ctx) {
+  if (!selectedClip || !selectedClip.clip) return;
+  const clip = selectedClip.clip;
+  if (!['image', 'video', 'chart'].includes(selectedClip.trackType)) return;
+  if (!clip.motionPathEnabled && !mpStageDrawActive) return;
+  if (clip.motionPathShowOverlay === false && !mpStageDrawActive) return;
+
+  ensureClipMotionPathDefaults(clip);
+  const W = canvas.width;
+  const H = canvas.height;
+  const cx = W / 2;
+  const cy = H / 2;
+  const is3D = (clip.motionPathDimension || '3d') === '3d';
+  const zProf = is3D ? (clip.motionPathZProfile || 'arc-apex') : 'flat';
+  const smooth = clip.motionPathSmoothing ?? 75;
+  const spanScale = (clip.motionPathSpan !== undefined ? clip.motionPathSpan : 100) / 100;
+
+  const pts = (mpStageIsDrawing && mpStageRawPts.length >= 2) ? mpStageRawPts : clip.motionPathPoints;
+  if (!pts || pts.length < 2) return;
+
+  ctx.save();
+
+  // Stage Draw Mode Banner
+  if (mpStageDrawActive) {
+    const bannerTxt = '✏️ MOTION PATH DRAW MODE: Drag on stage to sketch path, or drag waypoint nodes (Click "Stage Draw" to exit)';
+    ctx.font = '700 13px Inter, sans-serif';
+    const bW = ctx.measureText(bannerTxt).width + 28;
+    const bX = cx - bW / 2;
+    const bY = 18;
+    ctx.fillStyle = 'rgba(6, 12, 24, 0.92)';
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 1.5;
+    if (ctx.roundRect) {
+      ctx.beginPath(); ctx.roundRect(bX, bY, bW, 30, 8); ctx.fill(); ctx.stroke();
+    } else {
+      ctx.fillRect(bX, bY, bW, 30); ctx.strokeRect(bX, bY, bW, 30);
+    }
+    ctx.fillStyle = '#34d399';
+    ctx.fillText(bannerTxt, bX + 14, bY + 20);
+  }
+
+  // 1. 3D Shadow Ribbon on Stage
+  if (is3D) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(168, 85, 247, 0.32)';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 6]);
+    ctx.beginPath();
+    for (let i = 0; i <= 80; i++) {
+      const u = i / 80;
+      const s = sampleMotionPathSpline(pts, u, smooth, zProf);
+      const sx = cx + s.x * spanScale * W;
+      const sy = cy + s.y * spanScale * H + 36;
+      if (i === 0) ctx.moveTo(sx, sy);
+      else ctx.lineTo(sx, sy);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // 2. Main Glowing Trajectory Spline on Stage
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#10b981');
+  grad.addColorStop(0.5, '#00f0ff');
+  grad.addColorStop(1, '#a855f7');
+
+  ctx.save();
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 4;
+  ctx.shadowColor = 'rgba(0, 240, 255, 0.65)';
+  ctx.shadowBlur = 12;
+  ctx.beginPath();
+  for (let i = 0; i <= 90; i++) {
+    const u = i / 90;
+    const s = sampleMotionPathSpline(pts, u, smooth, zProf);
+    const sx = cx + s.x * spanScale * W;
+    const sy = cy + s.y * spanScale * H;
+    if (i === 0) ctx.moveTo(sx, sy);
+    else ctx.lineTo(sx, sy);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // 3. Directional Arrows along Stage Path
+  [0.2, 0.4, 0.6, 0.8].forEach(u => {
+    const s = sampleMotionPathSpline(pts, u, smooth, zProf);
+    const sx = cx + s.x * spanScale * W;
+    const sy = cy + s.y * spanScale * H;
+    const ang = Math.atan2(s.vy * H, s.vx * W);
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#00f0ff';
+    ctx.beginPath();
+    ctx.moveTo(9, 0);
+    ctx.lineTo(-6, -6);
+    ctx.lineTo(-6, 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // 4. Waypoint Handles on Stage
+  if (!mpStageIsDrawing) {
+    pts.forEach((pt, idx) => {
+      const sx = cx + (pt.x || 0) * spanScale * W;
+      const sy = cy + (pt.y || 0) * spanScale * H;
+      const nodeZ = is3D ? (pt.z || 0) : 0;
+      const r = Math.max(8, Math.min(18, 11 + nodeZ * 5));
+      const color = idx === 0 ? '#10b981' : (idx === pts.length - 1 ? '#a855f7' : '#38bdf8');
+
+      ctx.save();
+      if (idx === mpSelectedNodeIdx) {
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(sx, sy, r + 6, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.fillStyle = color;
+      ctx.strokeStyle = '#050811';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(idx === 0 ? 'S' : (idx === pts.length - 1 ? 'E' : `${idx + 1}`), sx, sy);
+      ctx.restore();
+    });
+  }
+
+  ctx.restore();
+}
+
+function syncInspectorMotionPathUI(clip) {
+  if (!clip) return;
+  ensureClipMotionPathDefaults(clip);
+
+  const toggle = document.getElementById('inspector-motion-path-toggle');
+  if (toggle) toggle.checked = !!clip.motionPathEnabled;
+
+  const is3D = (clip.motionPathDimension || '3d') === '3d';
+  const badge = document.getElementById('badge-motion-path-state');
+  if (badge) {
+    badge.textContent = clip.motionPathEnabled ? (is3D ? '3D Active' : '2D Active') : 'Off';
+    badge.style.color = clip.motionPathEnabled ? (is3D ? '#c084fc' : '#38bdf8') : '#94a3b8';
+  }
+
+  const btn2D = document.getElementById('btn-mp-dim-2d');
+  const btn3D = document.getElementById('btn-mp-dim-3d');
+  if (btn2D) {
+    btn2D.style.background = !is3D ? 'rgba(56,189,248,0.22)' : 'transparent';
+    btn2D.style.color = !is3D ? '#38bdf8' : '#94a3b8';
+  }
+  if (btn3D) {
+    btn3D.style.background = is3D ? 'rgba(168,85,247,0.25)' : 'transparent';
+    btn3D.style.color = is3D ? '#c084fc' : '#94a3b8';
+  }
+
+  const padModeLbl = document.getElementById('mp-pad-mode-label');
+  if (padModeLbl) {
+    padModeLbl.textContent = is3D ? '3D SPATIAL PAD' : '2D PLANAR PAD';
+    padModeLbl.style.color = is3D ? '#c084fc' : '#38bdf8';
+  }
+
+  const box3D = document.getElementById('inspector-mp-3d-controls');
+  if (box3D) box3D.style.opacity = is3D ? '1' : '0.45';
+
+  const chkOverlay = document.getElementById('inspector-mp-show-overlay');
+  if (chkOverlay) chkOverlay.checked = clip.motionPathShowOverlay !== false;
+
+  const smSlider = document.getElementById('inspector-mp-smooth-slider');
+  const smVal = document.getElementById('inspector-mp-smooth-val');
+  if (smSlider) smSlider.value = clip.motionPathSmoothing ?? 75;
+  if (smVal) smVal.textContent = `${clip.motionPathSmoothing ?? 75}%`;
+
+  const spSlider = document.getElementById('inspector-mp-span-slider');
+  const spVal = document.getElementById('inspector-mp-span-val');
+  if (spSlider) spSlider.value = clip.motionPathSpan ?? 100;
+  if (spVal) spVal.textContent = `${clip.motionPathSpan ?? 100}%`;
+
+  const zProfSel = document.getElementById('inspector-mp-z-profile');
+  if (zProfSel) zProfSel.value = clip.motionPathZProfile || 'arc-apex';
+
+  const zdSlider = document.getElementById('inspector-mp-zdepth-slider');
+  const zdVal = document.getElementById('inspector-mp-zdepth-val');
+  if (zdSlider) zdSlider.value = clip.motionPathZDepth ?? 65;
+  if (zdVal) zdVal.textContent = `${clip.motionPathZDepth ?? 65}%`;
+
+  const bkSlider = document.getElementById('inspector-mp-bank-slider');
+  const bkVal = document.getElementById('inspector-mp-bank-val');
+  if (bkSlider) bkSlider.value = clip.motionPathBank ?? 18;
+  if (bkVal) bkVal.textContent = `${clip.motionPathBank ?? 18}°`;
+
+  const selNode = clip.motionPathPoints[mpSelectedNodeIdx] || clip.motionPathPoints[0] || { z: 0 };
+  const nzSlider = document.getElementById('inspector-mp-node-z-slider');
+  const nzVal = document.getElementById('inspector-mp-node-z-val');
+  if (nzSlider) nzSlider.value = Math.round((selNode.z || 0) * 100);
+  if (nzVal) nzVal.textContent = (selNode.z || 0).toFixed(2);
+
+  const chkOrient = document.getElementById('inspector-mp-auto-orient');
+  if (chkOrient) chkOrient.checked = !!clip.motionPathAutoOrient;
+
+  const loopSel = document.getElementById('inspector-mp-loop-mode');
+  if (loopSel) loopSel.value = clip.motionPathLoopMode || 'once';
+
+  const easeSel = document.getElementById('inspector-mp-easing-select');
+  if (easeSel) easeSel.value = clip.motionPathEasing || 'easeInOutCubic';
+
+  const spdSlider = document.getElementById('inspector-mp-speed-slider');
+  const spdVal = document.getElementById('inspector-mp-speed-val');
+  const curSpd = parseFloat(clip.motionPathSpeed) || 1.0;
+  if (spdSlider) spdSlider.value = curSpd;
+  if (spdVal) spdVal.textContent = `${curSpd.toFixed(1)}x`;
+
+  drawInspectorMotionPathPad();
+  drawInspectorMotionPathEasingGraph();
+}
+
+function initInspectorMotionPathStudio() {
+  document.getElementById('inspector-motion-path-toggle')?.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    selectedClip.clip.motionPathEnabled = e.target.checked;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('btn-mp-dim-2d')?.addEventListener('click', () => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    selectedClip.clip.motionPathDimension = '2d';
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('btn-mp-dim-3d')?.addEventListener('click', () => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    selectedClip.clip.motionPathDimension = '3d';
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  const btnFreehand = document.getElementById('btn-mp-tool-freehand');
+  const btnNodes = document.getElementById('btn-mp-tool-nodes');
+  const setMpToolMode = (mode) => {
+    mpToolMode = mode;
+    if (btnFreehand) {
+      btnFreehand.style.borderColor = mode === 'freehand' ? '#38bdf8' : '';
+      btnFreehand.style.color = mode === 'freehand' ? '#38bdf8' : '';
+    }
+    if (btnNodes) {
+      btnNodes.style.borderColor = mode === 'nodes' ? '#38bdf8' : '';
+      btnNodes.style.color = mode === 'nodes' ? '#38bdf8' : '';
+    }
+    const hint = document.getElementById('mp-pad-hint-label');
+    if (hint) {
+      hint.textContent = mode === 'freehand'
+        ? 'Drag to sketch • Wheel on node = 3D Z'
+        : 'Click to add node • Double-click = delete';
+    }
+  };
+  btnFreehand?.addEventListener('click', () => setMpToolMode('freehand'));
+  btnNodes?.addEventListener('click', () => setMpToolMode('nodes'));
+
+  document.getElementById('btn-mp-draw-on-stage')?.addEventListener('click', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    mpStageDrawActive = !mpStageDrawActive;
+    selectedClip.clip.motionPathEnabled = true;
+    selectedClip.clip.motionPathShowOverlay = true;
+    const btn = e.currentTarget;
+    btn.style.background = mpStageDrawActive ? 'rgba(16, 185, 129, 0.25)' : '';
+    btn.style.borderColor = mpStageDrawActive ? '#10b981' : 'rgba(16, 185, 129, 0.45)';
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+    showTextTimingAlert(
+      mpStageDrawActive
+        ? '✏️ Stage Motion Path Mode Active: Drag on the video stage to draw or move path nodes!'
+        : 'Stage Motion Path Draw Mode exited',
+      'info'
+    );
+  });
+
+  document.getElementById('btn-mp-preview-play')?.addEventListener('click', () => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    selectedClip.clip.motionPathEnabled = true;
+    currentTime = selectedClip.clip.start || 0;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    if (!isPlaying) {
+      document.getElementById('btn-play')?.click();
+    }
+  });
+
+  document.getElementById('inspector-mp-show-overlay')?.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathShowOverlay = e.target.checked;
+    renderCanvas();
+  });
+
+  document.querySelectorAll('.mp-preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!selectedClip || !selectedClip.clip) return;
+      const presetKey = btn.getAttribute('data-mp-preset');
+      const pts = MOTION_PATH_PRESETS[presetKey];
+      if (!pts) return;
+      ensureClipMotionPathDefaults(selectedClip.clip);
+      selectedClip.clip.motionPathPoints = pts.map(p => ({ ...p }));
+      selectedClip.clip.motionPathEnabled = true;
+      if (presetKey === 'orbit-3d' || presetKey === 'spiral-dive') {
+        selectedClip.clip.motionPathDimension = '3d';
+        selectedClip.clip.motionPathZProfile = 'custom-nodes';
+      }
+      mpSelectedNodeIdx = 0;
+      syncInspectorMotionPathUI(selectedClip.clip);
+      renderCanvas();
+    });
+  });
+
+  document.getElementById('btn-mp-reverse')?.addEventListener('click', () => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    selectedClip.clip.motionPathPoints.reverse();
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('btn-mp-clear')?.addEventListener('click', () => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathEnabled = false;
+    selectedClip.clip.motionPathPoints = [
+      { x: -0.25, y: 0.0, z: 0.0 },
+      { x: 0.25, y: 0.0, z: 0.0 }
+    ];
+    mpStageDrawActive = false;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-smooth-slider')?.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathSmoothing = parseInt(e.target.value, 10) || 0;
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-span-slider')?.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathSpan = parseInt(e.target.value, 10) || 100;
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-z-profile')?.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathZProfile = e.target.value;
+    selectedClip.clip.motionPathDimension = '3d';
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-zdepth-slider')?.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathZDepth = parseInt(e.target.value, 10) || 0;
+    selectedClip.clip.motionPathDimension = '3d';
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-bank-slider')?.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathBank = parseInt(e.target.value, 10) || 0;
+    selectedClip.clip.motionPathDimension = '3d';
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-node-z-slider')?.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    ensureClipMotionPathDefaults(selectedClip.clip);
+    const zVal = (parseInt(e.target.value, 10) || 0) / 100;
+    const pts = selectedClip.clip.motionPathPoints;
+    const targetNode = pts[mpSelectedNodeIdx] || pts[0];
+    if (targetNode) {
+      targetNode.z = zVal;
+      selectedClip.clip.motionPathZProfile = 'custom-nodes';
+      selectedClip.clip.motionPathDimension = '3d';
+      selectedClip.clip.motionPathEnabled = true;
+      syncInspectorMotionPathUI(selectedClip.clip);
+      renderCanvas();
+    }
+  });
+
+  document.getElementById('inspector-mp-auto-orient')?.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathAutoOrient = e.target.checked;
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-loop-mode')?.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathLoopMode = e.target.value;
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-easing-select')?.addEventListener('change', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    const val = e.target.value;
+    selectedClip.clip.motionPathEasing = val;
+    selectedClip.clip.motionPathEnabled = true;
+    const presetBeziers = {
+      linear: { x1: 0.25, y1: 0.25, x2: 0.75, y2: 0.75 },
+      easeInOutCubic: { x1: 0.65, y1: 0.0, x2: 0.35, y2: 1.0 },
+      easeOutExpo: { x1: 0.16, y1: 1.0, x2: 0.30, y2: 1.0 },
+      easeInExpo: { x1: 0.70, y1: 0.0, x2: 0.84, y2: 0.0 },
+      easeOutBack: { x1: 0.34, y1: 1.35, x2: 0.64, y2: 1.0 },
+      spring: { x1: 0.22, y1: 1.40, x2: 0.36, y2: 1.0 }
+    };
+    if (presetBeziers[val]) {
+      selectedClip.clip.motionPathBezier = { ...presetBeziers[val] };
+    }
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  document.getElementById('inspector-mp-speed-slider')?.addEventListener('input', (e) => {
+    if (!selectedClip || !selectedClip.clip) return;
+    selectedClip.clip.motionPathSpeed = parseFloat(e.target.value) || 1.0;
+    selectedClip.clip.motionPathEnabled = true;
+    syncInspectorMotionPathUI(selectedClip.clip);
+    renderCanvas();
+  });
+
+  // Interactive Inspector Pad Pointer Events (Freehand Sketch + Waypoint Node Drag + Wheel 3D Z)
+  const pad = document.getElementById('inspector-motion-path-canvas');
+  if (pad) {
+    const getPadLocal = (ev) => {
+      const r = pad.getBoundingClientRect();
+      const px = ((ev.clientX - r.left) / Math.max(1, r.width)) * pad.width;
+      const py = ((ev.clientY - r.top) / Math.max(1, r.height)) * pad.height;
+      const clip = selectedClip?.clip;
+      const spanScale = ((clip?.motionPathSpan ?? 100) / 100) || 1;
+      const normX = Math.max(-0.48, Math.min(0.48, ((px - pad.width / 2) / pad.width) / spanScale));
+      const normY = Math.max(-0.48, Math.min(0.48, ((py - pad.height / 2) / pad.height) / spanScale));
+      return { px, py, normX, normY };
+    };
+
+    const findHitPadNode = (px, py) => {
+      const clip = selectedClip?.clip;
+      if (!clip || !Array.isArray(clip.motionPathPoints)) return -1;
+      const spanScale = (clip.motionPathSpan ?? 100) / 100;
+      for (let i = 0; i < clip.motionPathPoints.length; i++) {
+        const pt = clip.motionPathPoints[i];
+        const nx = pad.width / 2 + (pt.x || 0) * spanScale * pad.width;
+        const ny = pad.height / 2 + (pt.y || 0) * spanScale * pad.height;
+        if (Math.hypot(px - nx, py - ny) <= 10) return i;
+      }
+      return -1;
+    };
+
+    pad.addEventListener('pointerdown', (ev) => {
+      if (!selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      ensureClipMotionPathDefaults(clip);
+      const loc = getPadLocal(ev);
+      const hitIdx = findHitPadNode(loc.px, loc.py);
+      try { pad.setPointerCapture(ev.pointerId); } catch (_) {}
+
+      if (hitIdx >= 0) {
+        mpSelectedNodeIdx = hitIdx;
+        mpDraggingNodeIdx = hitIdx;
+        clip.motionPathEnabled = true;
+        syncInspectorMotionPathUI(clip);
+        renderCanvas();
+        return;
+      }
+
+      if (mpToolMode === 'nodes') {
+        clip.motionPathPoints.push({ x: loc.normX, y: loc.normY, z: 0 });
+        mpSelectedNodeIdx = clip.motionPathPoints.length - 1;
+        mpDraggingNodeIdx = mpSelectedNodeIdx;
+        clip.motionPathEnabled = true;
+        syncInspectorMotionPathUI(clip);
+        renderCanvas();
+      } else {
+        mpIsDrawingPad = true;
+        mpRawFreehandPts = [{ x: loc.normX, y: loc.normY, z: -0.2 }];
+        clip.motionPathEnabled = true;
+        drawInspectorMotionPathPad();
+      }
+    });
+
+    pad.addEventListener('pointermove', (ev) => {
+      if (!selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      const loc = getPadLocal(ev);
+      if (mpDraggingNodeIdx >= 0 && clip.motionPathPoints[mpDraggingNodeIdx]) {
+        clip.motionPathPoints[mpDraggingNodeIdx].x = loc.normX;
+        clip.motionPathPoints[mpDraggingNodeIdx].y = loc.normY;
+        drawInspectorMotionPathPad();
+        renderCanvas();
+      } else if (mpIsDrawingPad) {
+        const last = mpRawFreehandPts[mpRawFreehandPts.length - 1];
+        if (!last || Math.hypot(loc.normX - last.x, loc.normY - last.y) > 0.015) {
+          const prog = Math.min(1, mpRawFreehandPts.length / 24);
+          mpRawFreehandPts.push({ x: loc.normX, y: loc.normY, z: Math.sin(prog * Math.PI) * 0.45 });
+          drawInspectorMotionPathPad();
+        }
+      }
+    });
+
+    const finishPadPointer = () => {
+      if (!selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      if (mpIsDrawingPad) {
+        mpIsDrawingPad = false;
+        if (mpRawFreehandPts.length >= 2) {
+          clip.motionPathPoints = simplifyMotionPathPoints(mpRawFreehandPts, 6);
+          clip.motionPathEnabled = true;
+          mpSelectedNodeIdx = 0;
+        }
+        mpRawFreehandPts = [];
+        syncInspectorMotionPathUI(clip);
+        renderCanvas();
+      }
+      mpDraggingNodeIdx = -1;
+    };
+    pad.addEventListener('pointerup', finishPadPointer);
+    pad.addEventListener('pointercancel', finishPadPointer);
+
+    pad.addEventListener('dblclick', (ev) => {
+      if (!selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      const loc = getPadLocal(ev);
+      const hitIdx = findHitPadNode(loc.px, loc.py);
+      if (hitIdx >= 0 && clip.motionPathPoints.length > 2) {
+        clip.motionPathPoints.splice(hitIdx, 1);
+        mpSelectedNodeIdx = Math.max(0, hitIdx - 1);
+        syncInspectorMotionPathUI(clip);
+        renderCanvas();
+      }
+    });
+
+    pad.addEventListener('wheel', (ev) => {
+      if (!selectedClip || !selectedClip.clip) return;
+      ev.preventDefault();
+      const clip = selectedClip.clip;
+      ensureClipMotionPathDefaults(clip);
+      const loc = getPadLocal(ev);
+      const hitIdx = findHitPadNode(loc.px, loc.py);
+      const targetIdx = hitIdx >= 0 ? hitIdx : mpSelectedNodeIdx;
+      const pt = clip.motionPathPoints[targetIdx];
+      if (pt) {
+        mpSelectedNodeIdx = targetIdx;
+        const delta = ev.deltaY < 0 ? 0.08 : -0.08;
+        pt.z = Math.max(-1.0, Math.min(1.0, Math.round(((pt.z || 0) + delta) * 100) / 100));
+        clip.motionPathDimension = '3d';
+        clip.motionPathZProfile = 'custom-nodes';
+        clip.motionPathEnabled = true;
+        syncInspectorMotionPathUI(clip);
+        renderCanvas();
+      }
+    }, { passive: false });
+  }
+
+  // Interactive Easing Bezier Graph Pointer Events
+  const easeCanvas = document.getElementById('inspector-mp-easing-canvas');
+  if (easeCanvas) {
+    const getEaseCoords = (ev) => {
+      const r = easeCanvas.getBoundingClientRect();
+      const px = ((ev.clientX - r.left) / Math.max(1, r.width)) * easeCanvas.width;
+      const py = ((ev.clientY - r.top) / Math.max(1, r.height)) * easeCanvas.height;
+      const padX = 10, padY = 10;
+      const gW = easeCanvas.width - padX * 2;
+      const gH = easeCanvas.height - padY * 2;
+      const bx = Math.max(0, Math.min(1, (px - padX) / gW));
+      const by = Math.max(-0.35, Math.min(1.35, 1 - (py - padY) / gH));
+      return { px, py, bx, by, padX, padY, gW, gH };
+    };
+
+    easeCanvas.addEventListener('pointerdown', (ev) => {
+      if (!selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      ensureClipMotionPathDefaults(clip);
+      const c = getEaseCoords(ev);
+      const bz = clip.motionPathBezier;
+      const p1x = c.padX + bz.x1 * c.gW, p1y = c.padY + (1 - bz.y1) * c.gH;
+      const p2x = c.padX + bz.x2 * c.gW, p2y = c.padY + (1 - bz.y2) * c.gH;
+      const d1 = Math.hypot(c.px - p1x, c.py - p1y);
+      const d2 = Math.hypot(c.px - p2x, c.py - p2y);
+      mpDraggingBezierHandle = d1 <= d2 ? 'p1' : 'p2';
+      clip.motionPathEasing = 'customBezier';
+      clip.motionPathEnabled = true;
+      try { easeCanvas.setPointerCapture(ev.pointerId); } catch (_) {}
+      if (mpDraggingBezierHandle === 'p1') { bz.x1 = c.bx; bz.y1 = c.by; }
+      else { bz.x2 = c.bx; bz.y2 = c.by; }
+      syncInspectorMotionPathUI(clip);
+      renderCanvas();
+    });
+
+    easeCanvas.addEventListener('pointermove', (ev) => {
+      if (!mpDraggingBezierHandle || !selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      const c = getEaseCoords(ev);
+      const bz = clip.motionPathBezier;
+      if (mpDraggingBezierHandle === 'p1') { bz.x1 = c.bx; bz.y1 = c.by; }
+      else { bz.x2 = c.bx; bz.y2 = c.by; }
+      drawInspectorMotionPathEasingGraph();
+      renderCanvas();
+    });
+
+    const endBezierDrag = () => { mpDraggingBezierHandle = null; };
+    easeCanvas.addEventListener('pointerup', endBezierDrag);
+    easeCanvas.addEventListener('pointercancel', endBezierDrag);
+  }
+
+  // Main Stage (#preview-canvas) Direct Motion Path Drawing & Node Dragging Integration
+  if (typeof canvas !== 'undefined' && canvas) {
+    const findHitStageMotionNode = (pt) => {
+      if (!selectedClip || !selectedClip.clip) return -1;
+      const clip = selectedClip.clip;
+      if (!clip.motionPathEnabled && !mpStageDrawActive) return -1;
+      if (clip.motionPathShowOverlay === false && !mpStageDrawActive) return -1;
+      ensureClipMotionPathDefaults(clip);
+      const spanScale = (clip.motionPathSpan ?? 100) / 100;
+      const pts = clip.motionPathPoints || [];
+      for (let i = 0; i < pts.length; i++) {
+        const sx = canvas.width / 2 + (pts[i].x || 0) * spanScale * canvas.width;
+        const sy = canvas.height / 2 + (pts[i].y || 0) * spanScale * canvas.height;
+        if (Math.hypot(pt.x - sx, pt.y - sy) <= 24) return i;
+      }
+      return -1;
+    };
+
+    canvas.addEventListener('mousedown', (e) => {
+      if (!selectedClip || !selectedClip.clip) return;
+      if (!['image', 'video', 'chart'].includes(selectedClip.trackType)) return;
+      const clip = selectedClip.clip;
+      const pt = getCanvasPointer(e);
+      const hitNodeIdx = findHitStageMotionNode(pt);
+
+      if (hitNodeIdx >= 0) {
+        mpSelectedNodeIdx = hitNodeIdx;
+        mpStageDraggingNodeIdx = hitNodeIdx;
+        syncInspectorMotionPathUI(clip);
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+
+      if (mpStageDrawActive) {
+        ensureClipMotionPathDefaults(clip);
+        const spanScale = ((clip.motionPathSpan ?? 100) / 100) || 1;
+        const normX = Math.max(-0.48, Math.min(0.48, ((pt.x - canvas.width / 2) / canvas.width) / spanScale));
+        const normY = Math.max(-0.48, Math.min(0.48, ((pt.y - canvas.height / 2) / canvas.height) / spanScale));
+        if (mpToolMode === 'nodes') {
+          clip.motionPathPoints.push({ x: normX, y: normY, z: 0 });
+          mpSelectedNodeIdx = clip.motionPathPoints.length - 1;
+          mpStageDraggingNodeIdx = mpSelectedNodeIdx;
+          clip.motionPathEnabled = true;
+          syncInspectorMotionPathUI(clip);
+          renderCanvas();
+        } else {
+          mpStageIsDrawing = true;
+          mpStageRawPts = [{ x: normX, y: normY, z: -0.2 }];
+          clip.motionPathEnabled = true;
+        }
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      }
+    }, true);
+
+    window.addEventListener('mousemove', (e) => {
+      if (mpStageDraggingNodeIdx < 0 && !mpStageIsDrawing) return;
+      if (!selectedClip || !selectedClip.clip) return;
+      const clip = selectedClip.clip;
+      const pt = getCanvasPointer(e);
+      const spanScale = ((clip.motionPathSpan ?? 100) / 100) || 1;
+      const normX = Math.max(-0.48, Math.min(0.48, ((pt.x - canvas.width / 2) / canvas.width) / spanScale));
+      const normY = Math.max(-0.48, Math.min(0.48, ((pt.y - canvas.height / 2) / canvas.height) / spanScale));
+
+      if (mpStageDraggingNodeIdx >= 0 && clip.motionPathPoints[mpStageDraggingNodeIdx]) {
+        clip.motionPathPoints[mpStageDraggingNodeIdx].x = normX;
+        clip.motionPathPoints[mpStageDraggingNodeIdx].y = normY;
+        drawInspectorMotionPathPad();
+        renderCanvas();
+      } else if (mpStageIsDrawing) {
+        const last = mpStageRawPts[mpStageRawPts.length - 1];
+        if (!last || Math.hypot(normX - last.x, normY - last.y) > 0.012) {
+          const prog = Math.min(1, mpStageRawPts.length / 30);
+          mpStageRawPts.push({ x: normX, y: normY, z: Math.sin(prog * Math.PI) * 0.45 });
+          renderCanvas();
+        }
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (mpStageIsDrawing && selectedClip && selectedClip.clip) {
+        const clip = selectedClip.clip;
+        mpStageIsDrawing = false;
+        if (mpStageRawPts.length >= 2) {
+          clip.motionPathPoints = simplifyMotionPathPoints(mpStageRawPts, 6);
+          clip.motionPathEnabled = true;
+          mpSelectedNodeIdx = 0;
+          syncInspectorMotionPathUI(clip);
+        }
+        mpStageRawPts = [];
+        renderCanvas();
+      }
+      mpStageDraggingNodeIdx = -1;
+    });
+  }
+}
+
+initInspectorMotionPathStudio();
+
 // ==================== SIDEBAR INSPECTOR: TRANSITIONS & MOTION ====================
 document.getElementById('inspector-trans-type-select')?.addEventListener('change', (e) => {
   if (!selectedClip || !selectedClip.clip) return;
@@ -8905,6 +10658,166 @@ document.getElementById('inspector-trans-dur-dropdown')?.addEventListener('chang
     showTextTimingAlert(`Duration: ${dur.toFixed(2)}s`, 'success');
     setTimeout(() => showTextTimingAlert(''), 1500);
   }
+});
+
+// =========================================================================
+// J-CUT / L-CUT AUDIO-VIDEO SPLIT PACING TOGGLE & LIVE VISUAL DIAGRAM
+// =========================================================================
+function syncInspectorJCutLCutUI(clip) {
+  if (!clip) return;
+  const mode = clip.jCutLCutMode || 'none';
+  const offset = clip.jCutLCutOffset !== undefined ? parseFloat(clip.jCutLCutOffset) : 0.8;
+  const curve = clip.jCutLCutCurve || 'constant-power';
+
+  const btnSync = document.getElementById('btn-pacing-sync');
+  const btnJ = document.getElementById('btn-pacing-jcut');
+  const btnL = document.getElementById('btn-pacing-lcut');
+  const badge = document.getElementById('inspector-jcut-lcut-badge');
+  const controlsWrap = document.getElementById('inspector-jcut-lcut-controls');
+  const offsetSlider = document.getElementById('inspector-jcut-lcut-offset-slider');
+  const offsetVal = document.getElementById('inspector-jcut-lcut-offset-val');
+  const offsetLabel = document.getElementById('inspector-jcut-lcut-offset-label');
+  const curveSel = document.getElementById('inspector-jcut-lcut-curve');
+
+  const setBtnState = (btn, active, activeBg, activeBorder, activeColor) => {
+    if (!btn) return;
+    btn.classList.toggle('active', active);
+    btn.style.background = active ? activeBg : 'rgba(255,255,255,0.03)';
+    btn.style.border = active ? `1px solid ${activeBorder}` : '1px solid rgba(255,255,255,0.08)';
+    btn.style.color = active ? activeColor : '#94a3b8';
+    btn.style.boxShadow = active ? `0 0 12px ${activeBg}` : 'none';
+  };
+
+  setBtnState(btnSync, mode === 'none', 'rgba(148,163,184,0.22)', 'rgba(148,163,184,0.5)', '#f8fafc');
+  setBtnState(btnJ, mode === 'j-cut', 'rgba(56,189,248,0.22)', '#38bdf8', '#e0f2fe');
+  setBtnState(btnL, mode === 'l-cut', 'rgba(245,158,11,0.22)', '#f59e0b', '#fef3c7');
+
+  if (badge) {
+    if (mode === 'j-cut') {
+      badge.textContent = `J-CUT (-${offset.toFixed(1)}s AUDIO LEAD)`;
+      badge.style.background = 'rgba(56,189,248,0.2)';
+      badge.style.color = '#38bdf8';
+      badge.style.borderColor = 'rgba(56,189,248,0.45)';
+    } else if (mode === 'l-cut') {
+      badge.textContent = `L-CUT (+${offset.toFixed(1)}s VIDEO LEAD)`;
+      badge.style.background = 'rgba(245,158,11,0.2)';
+      badge.style.color = '#fbbf24';
+      badge.style.borderColor = 'rgba(245,158,11,0.45)';
+    } else {
+      badge.textContent = 'SYNC CUT';
+      badge.style.background = 'rgba(56,189,248,0.12)';
+      badge.style.color = '#94a3b8';
+      badge.style.borderColor = 'rgba(255,255,255,0.12)';
+    }
+  }
+
+  if (controlsWrap) {
+    controlsWrap.style.opacity = mode === 'none' ? '0.45' : '1';
+    controlsWrap.style.pointerEvents = mode === 'none' ? 'none' : 'auto';
+  }
+  if (offsetSlider) offsetSlider.value = Math.round(offset * 10);
+  if (offsetVal) {
+    offsetVal.textContent = mode === 'j-cut' ? `-${offset.toFixed(2)}s` : (mode === 'l-cut' ? `+${offset.toFixed(2)}s` : `${offset.toFixed(2)}s`);
+    offsetVal.style.color = mode === 'l-cut' ? '#fbbf24' : '#38bdf8';
+  }
+  if (offsetLabel) {
+    offsetLabel.textContent = mode === 'j-cut' ? 'Audio Pre-Roll Lead Time' : (mode === 'l-cut' ? 'Audio Trail / Video Lead Time' : 'Split Lead / Lag Offset');
+  }
+  if (curveSel) curveSel.value = curve;
+
+  // Update visual split-track overhang diagram
+  const vCutLine = document.getElementById('jcut-diag-v-cut');
+  const aCutLine = document.getElementById('jcut-diag-a-cut');
+  const overhang = document.getElementById('jcut-diag-overhang');
+  const vTag = document.getElementById('jcut-diag-v-tag');
+  const aTag = document.getElementById('jcut-diag-a-tag');
+  const shiftPct = Math.min(26, Math.max(6, Math.round((offset / 3.0) * 26)));
+
+  if (vCutLine && aCutLine && overhang) {
+    if (mode === 'j-cut') {
+      vCutLine.style.left = '54%';
+      aCutLine.style.left = `${54 - shiftPct}%`;
+      aCutLine.style.background = '#38bdf8';
+      overhang.style.display = 'flex';
+      overhang.style.left = `${54 - shiftPct}%`;
+      overhang.style.width = `${shiftPct}%`;
+      overhang.style.background = 'rgba(56,189,248,0.28)';
+      overhang.style.border = '1px dashed #38bdf8';
+      overhang.style.color = '#bae6fd';
+      overhang.textContent = `J-LEAD -${offset.toFixed(1)}s`;
+      if (vTag) vTag.textContent = 'V-Cut @ 0.0s';
+      if (aTag) { aTag.textContent = `Audio Leads -${offset.toFixed(1)}s`; aTag.style.color = '#38bdf8'; }
+    } else if (mode === 'l-cut') {
+      vCutLine.style.left = '46%';
+      aCutLine.style.left = `${46 + shiftPct}%`;
+      aCutLine.style.background = '#f59e0b';
+      overhang.style.display = 'flex';
+      overhang.style.left = '46%';
+      overhang.style.width = `${shiftPct}%`;
+      overhang.style.background = 'rgba(245,158,11,0.28)';
+      overhang.style.border = '1px dashed #f59e0b';
+      overhang.style.color = '#fde68a';
+      overhang.textContent = `L-TRAIL +${offset.toFixed(1)}s`;
+      if (vTag) vTag.textContent = 'Video Cuts Early';
+      if (aTag) { aTag.textContent = `Audio Trails +${offset.toFixed(1)}s`; aTag.style.color = '#fbbf24'; }
+    } else {
+      vCutLine.style.left = '50%';
+      aCutLine.style.left = '50%';
+      aCutLine.style.background = '#94a3b8';
+      overhang.style.display = 'none';
+      if (vTag) vTag.textContent = 'Cut Point';
+      if (aTag) { aTag.textContent = 'Synced Audio'; aTag.style.color = '#94a3b8'; }
+    }
+  }
+}
+window.syncInspectorJCutLCutUI = syncInspectorJCutLCutUI;
+
+['btn-pacing-sync', 'btn-pacing-jcut', 'btn-pacing-lcut'].forEach((btnId) => {
+  document.getElementById(btnId)?.addEventListener('click', () => {
+    if (!selectedClip || !selectedClip.clip) return;
+    const btn = document.getElementById(btnId);
+    const mode = btn?.dataset?.pacingMode || 'none';
+    selectedClip.clip.jCutLCutMode = mode;
+    if (selectedClip.clip.jCutLCutOffset === undefined) {
+      selectedClip.clip.jCutLCutOffset = 0.8;
+    }
+    if (mode !== 'none' && (!selectedClip.clip.transition || selectedClip.clip.transition === 'none')) {
+      selectedClip.clip.transition = 'dissolve';
+    }
+    syncInspectorJCutLCutUI(selectedClip.clip);
+    if (typeof injectTransitionChips === 'function') injectTransitionChips();
+    recordState(`Set Pacing Mode: ${mode.toUpperCase()}`);
+    saveProjectState(false);
+    const labelMap = {
+      'none': 'Sync Cut (Aligned V/A)',
+      'j-cut': `J-Cut Active (Audio leads video by ${(selectedClip.clip.jCutLCutOffset || 0.8).toFixed(1)}s)`,
+      'l-cut': `L-Cut Active (Video leads audio by ${(selectedClip.clip.jCutLCutOffset || 0.8).toFixed(1)}s)`
+    };
+    showTextTimingAlert(labelMap[mode] || 'Pacing updated', 'info');
+    setTimeout(() => showTextTimingAlert(''), 1800);
+  });
+});
+
+document.getElementById('inspector-jcut-lcut-offset-slider')?.addEventListener('input', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  const val = parseInt(e.target.value, 10) / 10;
+  selectedClip.clip.jCutLCutOffset = val;
+  syncInspectorJCutLCutUI(selectedClip.clip);
+  if (typeof injectTransitionChips === 'function') injectTransitionChips();
+});
+
+document.getElementById('inspector-jcut-lcut-offset-slider')?.addEventListener('change', () => {
+  if (!selectedClip || !selectedClip.clip) return;
+  recordState('Adjust J/L-Cut Lead Offset');
+  saveProjectState(false);
+});
+
+document.getElementById('inspector-jcut-lcut-curve')?.addEventListener('change', (e) => {
+  if (!selectedClip || !selectedClip.clip) return;
+  selectedClip.clip.jCutLCutCurve = e.target.value;
+  syncInspectorJCutLCutUI(selectedClip.clip);
+  recordState('Set J/L-Cut Audio Curve');
+  saveProjectState(false);
 });
 
 // Custom Angle Slider
@@ -18025,7 +19938,9 @@ function injectTransitionChips() {
         const chip = document.createElement('div');
         chip.className = 'transition-chip';
         const hasTrans = clipB.transition && clipB.transition !== 'none';
-        if (hasTrans) chip.classList.add('has-transition');
+        const pacingMode = clipB.cutPacingMode || 'sync';
+        const hasPacing = pacingMode === 'j-cut' || pacingMode === 'l-cut';
+        if (hasTrans || hasPacing) chip.classList.add('has-transition');
 
         const isSelected = selectedTransitionId && selectedTransitionId.clipId === clipB.id && selectedTransitionId.trackType === type;
         if (isSelected) chip.classList.add('is-selected-transition');
@@ -18033,14 +19948,18 @@ function injectTransitionChips() {
         chip.style.left = `${boundaryTime * pps}px`;
 
         const transConfig = TRANSITION_TYPES[clipB.transition] || null;
-        const labelText = hasTrans ? `${transConfig?.label || clipB.transition} ${(clipB.transitionDuration || 0.5).toFixed(1)}s` : 'Add Transition';
+        const pacingOffset = (clipB.cutPacingOffset !== undefined ? clipB.cutPacingOffset : 0.8).toFixed(1);
+        const pacingBadge = pacingMode === 'j-cut' ? ` • J-CUT -${pacingOffset}s` : (pacingMode === 'l-cut' ? ` • L-CUT +${pacingOffset}s` : '');
+        const labelText = hasTrans
+          ? `${transConfig?.label || clipB.transition} ${(clipB.transitionDuration || 0.5).toFixed(1)}s${pacingBadge}`
+          : (hasPacing ? (pacingMode === 'j-cut' ? `J-Cut (-${pacingOffset}s Audio Lead)` : `L-Cut (+${pacingOffset}s Video Lead)`) : 'Add Transition');
 
         chip.innerHTML = `
           <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           <span class="transition-chip-label">${labelText}</span>
         `;
 
-        chip.title = hasTrans ? `Transition: ${transConfig?.label || clipB.transition} (Click to edit)` : 'Click to add cut transition';
+        chip.title = (hasTrans || hasPacing) ? `Transition: ${labelText} (Click to edit)` : 'Click to add cut transition';
 
         chip.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -21912,78 +23831,6 @@ let currentTemplateCategoryFilter = 'all';
 // Built-in Curated Templates Engineered for Beginners
 const BUILTIN_TEMPLATES = [
   {
-    id: 'tpl_jani_cinematic_letterbox',
-    name: 'James Jani Cinematic Letterbox & Caption',
-    category: 'documentary',
-    badge: 'Cinematic Matte',
-    aspectRatio: '16:9',
-    duration: 8,
-    description: 'Widescreen letterbox matte bars with customizable colors, centered draggable photo/video, and lower typography space.',
-    requires: ['image', 'text'],
-    slots: [
-      { id: 'slot-1', type: 'image', label: 'Centered Middle Media', duration: 8.0, hint: 'Draggable video or photo in center' },
-      { id: 'slot-2', type: 'text', label: 'Lower Caption Subtitle', duration: 8.0, text: 'SPUN OVER THE COURSE OF A FEW YEARS.' }
-    ],
-    previewBg: 'linear-gradient(135deg, #090a10, #171b26)',
-    state: {
-      duration: 8,
-      background: [{ id: 'bg-1', start: 0, duration: 8, bgType: 'solid_black', bgColor: '#000000' }],
-      image: [
-        {
-          id: 'clip-media-letterbox-default',
-          start: 0,
-          duration: 8,
-          url: '/jani_cinematic_letterbox_ref.png',
-          file: { name: 'Jani_Letterbox_Frame.png', url: '/jani_cinematic_letterbox_ref.png', isImage: true },
-          scale: 1.0,
-          x: 0,
-          y: 0,
-          cinematicLetterbox: true,
-          letterboxConfig: {
-            barColor: '#000000',
-            topBarColor: '#000000',
-            bottomBarColor: '#000000',
-            separateBarColors: false,
-            barHeightPercent: 14,
-            captionText: 'SPUN OVER THE COURSE OF A FEW YEARS.',
-            captionFont: 'Oswald, "Bebas Neue", Impact, sans-serif',
-            captionSize: 32,
-            captionColor: '#ffffff',
-            captionLetterSpacing: 2.5,
-            captionUppercase: true,
-            showChannelTag: true,
-            channelTagText: 'JANi',
-            showActionTag: true,
-            actionTagText: 'SUBSCRIBE'
-          },
-          zIndex: 15
-        }
-      ],
-      text: [
-        {
-          id: 'txt-letterbox-caption',
-          start: 0,
-          duration: 8,
-          text: 'SPUN OVER THE COURSE OF A FEW YEARS.',
-          highlight: '',
-          fontFamily: 'Oswald, "Bebas Neue", Impact, sans-serif',
-          fontSize: 32,
-          textColor: '#ffffff',
-          highlightColor: '#ff334b',
-          anim: 'pop',
-          sfx: 'whoosh',
-          position: 'bottom',
-          y: 280,
-          letterSpacing: 2.5,
-          zIndex: 35,
-          layerOrder: 'front'
-        }
-      ],
-      chart: [],
-      quote: []
-    }
-  },
-  {
     id: 'tpl_tiktok_hook_viral',
     name: 'TikTok / Reels Viral Hook & Drop',
     category: 'tiktok_reels',
@@ -23327,18 +25174,32 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
-    id: 'jani-cinematic-letterbox',
-    title: 'James Jani Cinematic Letterbox & Lower Caption Frame',
-    category: 'Documentary',
-    origCategory: 'Documentary',
-    badge: 'JANI CINEMATIC',
-    difficulty: '1-Click',
-    timeToApply: '6 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(10, 10, 10, 0.98), rgba(20, 20, 25, 0.98))',
-    description: 'Iconic widescreen documentary letterbox template with customizable top and bottom matte bars (user selectable colors), centered draggable photo/video framing, and prominent lower space for stylized typing captions.',
-    tags: ['James Jani', 'Cinematic Letterbox', 'Lower Caption', 'Widescreen Matte', 'Documentary', 'Aspect Ratio', 'Subtitles'],
-    defaultImage: '/jani_cinematic_letterbox_ref.png',
-    secondaryImage: '/cinematic_footage_loop.mp4'
+    id: 'jani-spin-flash-glitch-reveal',
+    title: 'Circular Spin, Falling Particles, 1+3 Flashlight Strobe & Glitch Reveal',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'NEW • FLASH GLITCH FX',
+    difficulty: 'Pro Suite',
+    timeToApply: '5.4 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(8, 25, 45, 0.96), rgba(4, 6, 12, 0.98))',
+    description: 'Clockwise left-to-right circular spin with falling dust particles, 1 slow flashlight bloom + 3 rapid-fire paparazzi strobes, optical slice glitch breakup, and moody cyan Subject 2 portrait reveal.',
+    tags: ['Circular Spin', 'Falling Particles', '1+3 Flashlight', 'Flashlight Color', 'Glitch Reveal', 'Dual Portrait', 'James Jani'],
+    defaultImage: '/interview_cutin_cinematic.jpg',
+    secondaryImage: '/cinematic_split_scene.jpg'
+  },
+  {
+    id: 'jani-flash-quad-sequence',
+    title: '4-Beat Flash, Directional Slide & Sluggish Center Emergence',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'NEW • PSYCHOLOGY FX',
+    difficulty: 'Pro Suite',
+    timeToApply: '6.4 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(4, 6, 11, 0.98))',
+    description: '4-stage documentary photo choreography: Beat 1 Camera Flash + Flashlight Cone & Shutter SFX, Beat 2 Left→Right entrance, Beat 3 Right→Left counter-slide, and Beat 4 Sluggish Center Fade-In Emergence with 5 Psychological Mood Presets.',
+    tags: ['Camera Flash', 'Flashlight', 'Directional Slide', 'Sluggish Center', 'Mood Psychology', 'Shutter SFX', 'James Jani'],
+    defaultImage: '/assets/aistudio/image_463745bd.png',
+    secondaryImage: '/assets/aistudio/image_174cfa38.png'
   },
   {
     id: 'jani-cross-section-reveal',
@@ -23379,10 +25240,10 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(8, 47, 73, 0.95), rgba(3, 28, 45, 0.95))',
     description: 'Cinematic creator backdrop template with calibratable depth-of-field blur, lighting and color grading controls, virtual studio preset switching, edge-smoothing face tracking, and manual holdout protection brush.',
     tags: ['Background Blur', 'Depth of Field', 'Lighting Calibration', 'Face Tracking', 'Studio Bokeh', 'Hold-out Brush'],
-    defaultImage: '/creator_portrait_cutout.png',
-    cutoutImage: '/creator_portrait_cutout.png',
-    secondaryImage: '/creator_background_plate.png',
-    originalImage: '/creator_cinematic_portrait_ref.png'
+    defaultImage: '/creator_studio_bokeh_preset.png',
+    cutoutImage: '',
+    secondaryImage: '/creator_studio_bokeh_preset.png',
+    originalImage: ''
   },
   {
     id: 'parallax',
@@ -23391,11 +25252,12 @@ const EFFECT_TEMPLATES_DATA = [
     origCategory: 'Parallax',
     badge: 'TRENDING',
     difficulty: '1-Click',
-    timeToApply: '3 sec',
+    timeToApply: '6 sec',
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Cinematic layered depth with foreground, midground, and background multi-plane motion.',
     tags: ['Parallax', 'Depth Parallax Multi-Layer', 'Creator Motion'],
-    defaultImage: `data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22px-sky%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23080e18%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%2316243b%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2280%25%22%20stop-color%3D%22%232c3d5a%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23d97d62%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22px-sun-glow%22%20cx%3D%2250%25%22%20cy%3D%2250%25%22%20r%3D%2250%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fff8db%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2230%25%22%20stop-color%3D%22%23ffd27a%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2270%25%22%20stop-color%3D%22rgba(255%2C%20180%2C%2080%2C%200.45)%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(255%2C%20180%2C%2080%2C%200)%22%2F%3E%0A%20%20%20%20%3C%2FradialGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22mtn-grad-far%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%233b2354%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%231c102a%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22mtn-grad-mid%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23221433%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%230e0717%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22mtn-grad-near%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23140b22%22%2F%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%3Cfilter%20id%3D%22px-shadow%22%3E%0A%20%20%20%20%20%20%3CfeDropShadow%20dx%3D%220%22%20dy%3D%226%22%20stdDeviation%3D%225%22%20flood-color%3D%22%23000000%22%20flood-opacity%3D%220.8%22%2F%3E%0A%20%20%20%20%3C%2Ffilter%3E%0A%20%20%3C%2Fdefs%3E%0A%20%20%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22url(%23px-sky)%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2258%22%20r%3D%2254%22%20fill%3D%22url(%23px-sun-glow)%22%2F%3E%0A%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2258%22%20r%3D%2222%22%20fill%3D%22%23fff4c2%22%20opacity%3D%220.95%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M-20%2C225%20L-20%2C110%20L45%2C68%20L110%2C120%20L185%2C55%20L255%2C115%20L320%2C75%20L380%2C125%20L420%2C95%20L420%2C225%20Z%22%20fill%3D%22url(%23mtn-grad-far)%22%20opacity%3D%220.95%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M-20%2C225%20L-20%2C135%20L50%2C95%20L125%2C145%20L195%2C88%20L275%2C150%20L345%2C100%20L420%2C155%20L420%2C225%20Z%22%20fill%3D%22url(%23mtn-grad-mid)%22%2F%3E%0A%20%20%3Cpath%20d%3D%22M-20%2C225%20L-20%2C165%20L60%2C130%20L140%2C180%20L200%2C120%20L270%2C175%20L360%2C135%20L420%2C180%20L420%2C225%20Z%22%20fill%3D%22url(%23mtn-grad-near)%22%2F%3E%0A%20%20%3Cg%20transform%3D%22translate(182%2C%2086)%22%20filter%3D%22url(%23px-shadow)%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M-30%2C139%20Q18%2C130%2066%2C139%20L66%2C145%20L-30%2C145%20Z%22%20fill%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M12%2C46%20L12%2C102%20L6%2C139%20L18%2C139%20L22%2C100%20L26%2C139%20L38%2C139%20L32%2C102%20L32%2C46%20Z%22%20fill%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M8%2C32%20C6%2C40%207%2C58%209%2C68%20C14%2C72%2030%2C72%2035%2C68%20C37%2C58%2038%2C40%2036%2C32%20Z%22%20fill%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3Crect%20x%3D%22-3%22%20y%3D%2234%22%20width%3D%2213%22%20height%3D%2230%22%20rx%3D%224%22%20fill%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2222%22%20cy%3D%2220%22%20r%3D%229.5%22%20fill%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M22%2C12%20Q35%2C16%2037%2C20%20L24%2C20%20Z%22%20fill%3D%22%23040108%22%2F%3E%0A%20%20%20%20%3Cline%20x1%3D%2244%22%20y1%3D%2226%22%20x2%3D%2239%22%20y2%3D%22139%22%20stroke%3D%22%23040108%22%20stroke-width%3D%222.5%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E`
+    defaultImage: '/parallax_multilayer_thumb.png',
+    secondaryImage: '/hiker_background_inpainted.png'
   },
   {
     id: 'textbehind',
@@ -23493,7 +25355,7 @@ const EFFECT_TEMPLATES_DATA = [
     previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
     description: 'Assets = Liabilities + Equity formula with line-by-line highlighting. Perfect for accounting explainers.',
     tags: ['Finance', 'Balance Sheet Breakdown', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#f4ecd8"/><text x="200" y="30" fill="#8b5a3c" font-family="monospace" font-weight="700" font-size="11" letter-spacing="2" text-anchor="middle">APPLE INC. \u00b7 BALANCE SHEET</text><rect x="40" y="42" width="320" height="30" rx="4" fill="rgba(139,90,60,0.12)"/><text x="200" y="62" fill="#3a2418" font-family="monospace" font-weight="800" font-size="13" text-anchor="middle">ASSETS = LIABILITIES + EQUITY</text><g transform="translate(40, 85)" font-family="monospace" font-size="10" fill="#3a2418"><text x="10" y="15">Cash &amp; Equivalents</text><text x="310" y="15" text-anchor="end" font-weight="700">$29.9B</text><text x="10" y="35">Marketable Securities</text><text x="310" y="35" text-anchor="end" font-weight="700">$61.5B</text><line x1="10" y1="46" x2="310" y2="46" stroke="#8b5a3c" stroke-width="0.8" opacity="0.3"/><text x="10" y="62">Short-term Debt</text><text x="310" y="62" text-anchor="end" font-weight="700">$16.2B</text><text x="10" y="80">Long-term Debt</text><text x="310" y="80" text-anchor="end" font-weight="700">$95.7B</text><line x1="10" y1="92" x2="310" y2="92" stroke="#8b5a3c" stroke-width="1.5"/><text x="10" y="110" font-weight="900" fill="#7c5cff">Shareholders' Equity</text><text x="310" y="110" text-anchor="end" font-weight="900" fill="#7c5cff">$62.1B</text></g></svg>`)}`
+    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><defs><radialGradient id="bsBg" cx="50%" cy="45%" r="65%"><stop offset="0%" stop-color="#172030"/><stop offset="100%" stop-color="#090c12"/></radialGradient></defs><rect width="400" height="225" fill="url(#bsBg)"/><g transform="translate(122, 18) skewX(-5) rotate(1.5)"><rect x="-4" y="6" width="156" height="186" rx="2" fill="rgba(0,0,0,0.55)"/><rect width="156" height="186" rx="2" fill="#efede6" stroke="#c8c2b4" stroke-width="0.8"/><text x="78" y="15" fill="#0f172a" font-family="Georgia,serif" font-weight="700" font-size="7.5" text-anchor="middle" letter-spacing="0.8">APPLE INC.</text><text x="78" y="22" fill="#334155" font-family="Georgia,serif" font-size="4.3" text-anchor="middle">CONSOLIDATED STATEMENTS OF FINANCIAL POSITION</text><line x1="8" y1="27" x2="148" y2="27" stroke="#0f172a" stroke-width="0.8"/><g transform="translate(108, 6) rotate(-8)"><rect width="38" height="15" rx="1.5" fill="rgba(185,28,28,0.08)" stroke="#b91c1c" stroke-width="1"/><text x="19" y="10" fill="#b91c1c" font-family="sans-serif" font-weight="900" font-size="5.5" text-anchor="middle">VERIFIED</text></g><rect x="8" y="42" width="140" height="9" fill="rgba(134,209,166,0.55)"/><rect x="8" y="53" width="140" height="9" fill="rgba(134,209,166,0.55)"/><text x="11" y="49" fill="#0f172a" font-family="serif" font-size="5.2">Cash &amp; Equivalents</text><text x="145" y="49" fill="#0f172a" font-family="monospace" font-weight="700" font-size="5.2" text-anchor="end">$29.9B</text><text x="11" y="60" fill="#0f172a" font-family="serif" font-size="5.2">Marketable Securities</text><text x="145" y="60" fill="#0f172a" font-family="monospace" font-weight="700" font-size="5.2" text-anchor="end">$61.5B</text><text x="11" y="88" fill="#0f172a" font-family="serif" font-weight="700" font-size="5.5">Total assets</text><text x="145" y="88" fill="#0f172a" font-family="monospace" font-weight="800" font-size="5.5" text-anchor="end">$143.5B</text><rect x="8" y="124" width="140" height="9" fill="rgba(235,172,168,0.55)"/><text x="11" y="131" fill="#0f172a" font-family="serif" font-weight="700" font-size="5.2">Total liabilities</text><text x="145" y="131" fill="#0f172a" font-family="monospace" font-weight="700" font-size="5.2" text-anchor="end">$81.4B</text><rect x="8" y="146" width="140" height="9" fill="rgba(196,188,228,0.65)"/><text x="11" y="153" fill="#0f172a" font-family="serif" font-size="5">Common stock &amp; retained</text><text x="145" y="153" fill="#0f172a" font-family="monospace" font-weight="700" font-size="5.2" text-anchor="end">$62.1B</text></g><polyline points="96,52 110,52 118,60" fill="none" stroke="#34d399" stroke-width="1.2"/><circle cx="118" cy="60" r="2.5" fill="#34d399"/><rect x="12" y="28" width="84" height="46" rx="5" fill="#131822" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/><circle cx="20" cy="37" r="2.2" fill="#34d399"/><text x="26" y="39" fill="#cbd5e1" font-family="sans-serif" font-weight="600" font-size="6">Total Assets</text><text x="18" y="55" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="11">$143.5B</text><text x="72" y="51" fill="#34d399" font-family="sans-serif" font-weight="700" font-size="5.5">+4.2%</text><text x="18" y="66" fill="#64748b" font-family="sans-serif" font-size="5">Consolidated balance</text><rect x="296" y="24" width="90" height="44" rx="5" fill="#131822" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/><circle cx="304" cy="33" r="2.2" fill="#94a3b8"/><text x="310" y="35" fill="#cbd5e1" font-family="sans-serif" font-weight="600" font-size="6">Balance Check</text><text x="302" y="50" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="10.5">Balanced</text><text x="302" y="61" fill="#94a3b8" font-family="sans-serif" font-size="4.8">Assets = Liabilities + Equity</text><rect x="296" y="88" width="90" height="46" rx="5" fill="#131822" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/><circle cx="304" cy="97" r="2.2" fill="#f87171"/><text x="310" y="99" fill="#cbd5e1" font-family="sans-serif" font-weight="600" font-size="6">Total Liabilities</text><text x="302" y="115" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="11">$81.4B</text><text x="354" y="111" fill="#f87171" font-family="sans-serif" font-weight="700" font-size="5.5">+3.1%</text><text x="302" y="126" fill="#64748b" font-family="sans-serif" font-size="5">Outstanding obligations</text><rect x="296" y="152" width="90" height="46" rx="5" fill="#131822" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/><circle cx="304" cy="161" r="2.2" fill="#a78bfa"/><text x="310" y="163" fill="#cbd5e1" font-family="sans-serif" font-weight="600" font-size="6">Shareholders' Equity</text><text x="302" y="179" fill="#ffffff" font-family="sans-serif" font-weight="800" font-size="11">$62.1B</text><text x="354" y="175" fill="#a78bfa" font-family="sans-serif" font-weight="700" font-size="5.5">+5.6%</text><text x="302" y="190" fill="#64748b" font-family="sans-serif" font-size="4.8">Net assets attributable</text></svg>`)}`
   },
   {
     id: 'compound',
@@ -23614,10 +25476,10 @@ const EFFECT_TEMPLATES_DATA = [
     badge: 'DOC FAVORITE',
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(18, 19, 36, 0.95), rgba(9, 10, 18, 0.95))',
-    description: 'Animated Google search with typing cursor and auto-suggestions. The signature look of every documentary channel.',
-    tags: ['Animations', 'Google Search Typing', 'Motion Template'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225"><rect width="400" height="225" fill="#fff"/><g transform="translate(200, 42)"><text font-family="'Space Grotesk', sans-serif" font-size="34" font-weight="700" text-anchor="middle"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC05">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan></text></g><g transform="translate(50, 68)"><rect width="300" height="36" rx="18" fill="#fff" stroke="#dfe1e5" stroke-width="1.2"/><circle cx="20" cy="18" r="6" fill="none" stroke="#9aa0a6" stroke-width="1.8"/><line x1="24" y1="22" x2="29" y2="27" stroke="#9aa0a6" stroke-width="1.8"/><text x="36" y="23" fill="#202124" font-family="'Inter', sans-serif" font-size="12">what happened to...</text><line x1="165" y1="10" x2="165" y2="26" stroke="#202124" stroke-width="1.5"/></g><g transform="translate(65, 120)" font-family="'Inter', sans-serif" font-size="11" fill="#202124"><text x="0" y="0">\ud83d\udd0d what happened to db cooper</text><text x="0" y="24">\ud83d\udd0d what happened in chernobyl</text><text x="0" y="48">\ud83d\udd0d what happened last night</text></g></svg>`)}`
+    previewGradient: 'linear-gradient(135deg, rgba(10, 20, 40, 0.96), rgba(4, 8, 18, 0.98))',
+    description: 'Frosted dark glass Google search card with glowing cyan-blue aurora backdrop, live typing cursor, auto-suggest capsules, and adaptive 65% documentary framing.',
+    tags: ['Animations', 'Google Search Typing', 'James Jani', 'Motion Template'],
+    defaultImage: '/assets/aistudio/image_e33ac0a6.png'
   },
   {
     id: 'imessage',
@@ -23990,76 +25852,13 @@ id: 'map',
     title: 'Cinematic Progress HUD',
     category: 'Animations',
     origCategory: 'Animations',
-    badge: 'CINEMATIC HUD',
+    badge: 'DOC DATA HUD',
     difficulty: '1-Click',
     timeToApply: '3 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(10, 14, 26, 0.95), rgba(4, 7, 14, 0.95))',
-    description: 'Volumetric 3D glass progress HUD with dynamic leading-edge callout pin, live metric tracking, dual-tone neon liquid fill, and spark emissions.',
-    tags: ['Animations', 'Cinematic Progress HUD', 'Project Funding', 'Motion Template', 'Volumetric Glass'],
-    defaultImage: `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
-  <defs>
-    <radialGradient id="hud-bg-grad" cx="50%" cy="50%" r="75%">
-      <stop offset="0%" stop-color="#0a1220"/>
-      <stop offset="60%" stop-color="#050811"/>
-      <stop offset="100%" stop-color="#020306"/>
-    </radialGradient>
-    <linearGradient id="hud-neon-fill" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#ff007f"/>
-      <stop offset="60%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#00e5ff"/>
-    </linearGradient>
-    <filter id="hud-tip-glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#00e5ff" flood-opacity="0.9"/>
-      <feDropShadow dx="0" dy="0" stdDeviation="10" flood-color="#00e5ff" flood-opacity="0.5"/>
-    </filter>
-  </defs>
-  <rect width="400" height="225" fill="url(#hud-bg-grad)"/>
-  
-  <!-- Header Stack -->
-  <g transform="translate(60, 48)">
-    <text x="0" y="0" fill="#f8fafc" font-family="'Space Grotesk', -apple-system, sans-serif" font-weight="900" font-size="13" letter-spacing="1.5">PROJECT FUNDING STATUS</text>
-    <text x="0" y="14" fill="#34d399" font-family="'JetBrains Mono', monospace" font-weight="800" font-size="8" letter-spacing="1">[PHASE 2 / 3 ACTIVE]</text>
-  </g>
-
-  <!-- 3D Glass Track Capsule (Centered ~65% width) -->
-  <g transform="translate(60, 86)">
-    <!-- Outer Glass Capsule Bevel -->
-    <rect width="280" height="26" rx="13" fill="rgba(15,23,42,0.6)" stroke="rgba(255,255,255,0.22)" stroke-width="1.2"/>
-    <!-- Inner Dark Frosted Recessed Channel -->
-    <rect x="4" y="4" width="272" height="18" rx="9" fill="rgba(2,6,15,0.85)" stroke="rgba(255,255,255,0.06)" stroke-width="0.8"/>
-    <!-- Active Neon Liquid Fill Bar (74%) -->
-    <rect x="4" y="4" width="201" height="18" rx="9" fill="url(#hud-neon-fill)"/>
-    <!-- Liquid Specular Sheen -->
-    <rect x="6" y="6" width="197" height="6" rx="3" fill="rgba(255,255,255,0.35)"/>
-    <!-- Leading Edge Tip Glow Node -->
-    <circle cx="205" cy="13" r="5" fill="#ffffff" filter="url(#hud-tip-glow)"/>
-    <!-- Spark Emitter Dots -->
-    <circle cx="209" cy="8" r="1" fill="#fff"/>
-    <circle cx="214" cy="11" r="1.3" fill="#00e5ff"/>
-    <circle cx="212" cy="17" r="0.8" fill="#ff007f"/>
-    <circle cx="218" cy="15" r="1" fill="#38bdf8"/>
-  </g>
-
-  <!-- Tip Callout Anchor at ~74% (x = 265) -->
-  <g transform="translate(265, 86)">
-    <!-- Top Bubble: 74% -->
-    <g transform="translate(-22, -32)">
-      <rect width="44" height="24" rx="5" fill="rgba(15,23,42,0.92)" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
-      <path d="M 18,24 L 22,28 L 26,24 Z" fill="rgba(15,23,42,0.92)"/>
-      <text x="22" y="16" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="900" font-size="12" text-anchor="middle">74%</text>
-    </g>
-
-    <!-- Curved Tether Path -->
-    <path d="M 0,13 C 0,32 -18,40 -18,60" fill="none" stroke="#00e5ff" stroke-width="1.2" stroke-linecap="round"/>
-
-    <!-- Lower Financial Metric Card -->
-    <g transform="translate(-14, 52)">
-      <rect width="98" height="30" rx="5" fill="rgba(11,18,32,0.92)" stroke="rgba(0,229,255,0.35)" stroke-width="0.8"/>
-      <text x="8" y="14" fill="#f8fafc" font-family="'Space Grotesk', sans-serif" font-weight="800" font-size="7.5">$74,000,000 Raised</text>
-      <text x="8" y="24" fill="#94a3b8" font-family="'Inter', sans-serif" font-weight="600" font-size="6">Target: $100,000,000</text>
-    </g>
-  </g>
-</svg>`)}`
+    previewGradient: 'linear-gradient(135deg, rgba(12, 18, 34, 0.96), rgba(5, 8, 16, 0.98))',
+    description: 'High-end financial documentary progress visualization with restrained violet-to-cyan bar, endpoint-aligned callout badge, and 3 selectable editorial styles.',
+    tags: ['Animations', 'Cinematic Progress HUD', 'Project Funding', 'Documentary Data', 'Financial Storytelling'],
+    defaultImage: '/assets/aistudio/image_fb1bacf4.png'
   },
   {
     id: 'scramble',
@@ -24439,13 +26238,13 @@ id: 'map',
     id: 'kinetic-decode-typewriter',
     title: 'Tension Decode & Typewriter Kinetic Text',
     category: 'Text & Titles',
-    badge: 'Vox / Tactical 3D',
+    badge: 'James Jani / Vox 3D',
     difficulty: '1-Click',
     timeToApply: '4 sec',
-    previewGradient: 'linear-gradient(to top, rgba(6, 30, 40, 0.9), rgba(8, 13, 20, 0.7), rgba(0, 0, 0, 0.95))',
-    description: 'High-tension 3D tactical environmental projection with Matrix stream trace and typewriter reveal.',
-    tags: ['Decode Text', 'Typewriter', 'Kinetic Typo', 'Tactical 3D'],
-    defaultImage: '/tactical_desk_hd_plate.png'
+    previewGradient: 'linear-gradient(to top, rgba(28, 25, 23, 0.92), rgba(13, 16, 23, 0.8), rgba(4, 5, 8, 0.96))',
+    description: '3D investigative darkroom dossier with mechanical cipher character lock-in, redaction sweep, and tungsten spotlighting.',
+    tags: ['Decode Text', 'Typewriter', 'Kinetic Typo', 'James Jani'],
+    defaultImage: '/clean_terminal_warroom_plate.png'
   },
   {
     id: 'archival-ink-highlight',
@@ -24559,10 +26358,10 @@ id: 'map',
     difficulty: '1-Click',
     timeToApply: '4 sec',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
-    description: 'Cinematic 3D gold-bevel title floating over a glowing perspective floor grid with drifting document cards and cinematic camera pullback.',
-    tags: ['3D Titles', 'Camera Pullback', 'James Jani'],
-    defaultImage: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&auto=format&fit=crop&q=80',
-    secondaryImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80'
+    description: 'Cinematic 3D documentary title & multi-plane evidence parallax rig with warm volumetric god-rays, world-map floor pedestal, 5 camera presets, and 3 art directions.',
+    tags: ['3D Titles', 'Parallax Rig', 'James Jani', 'Documentary'],
+    defaultImage: '/assets/aistudio/image_84dd7e42.png',
+    secondaryImage: '/paper_tear_stock_archival_news.jpg'
   },
   {
     id: 'document-3d-fx-engine',
@@ -24590,58 +26389,6 @@ id: 'map',
     tags: ['James Jani', 'Puzzle', 'Neon Glow', 'Reconstruction', 'Shuffle', 'Image Slicing', 'Crypto Boom'],
     defaultImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
     secondaryImage: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=80'
-  },
-    {
-    id: 'cinematic-light-trail-typewriter',
-    title: 'Cinematic Light Trail Typewriter & Glitch Reveal',
-    category: 'Text & Titles',
-    badge: 'Cinematic Master',
-    difficulty: '1-Click',
-    timeToApply: '7 sec',
-    previewGradient: 'linear-gradient(to top, rgba(0, 0, 0, 0.95), rgba(56, 189, 248, 0.25), rgba(0, 0, 0, 0.8))',
-    description: 'Cinematic typewriter typography with luminous directional light trails (horizontal anamorphic beams), CRT scanlines, dust scratches, intense digital glitch-out, and secondary scene reveal.',
-    tags: ['Typewriter', 'Light Trail', 'Anamorphic Flare', 'Glitch Reveal', 'Cinematic Title', 'Text FX'],
-    defaultImage: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20400%20225%22%20width%3D%22400%22%20height%3D%22225%22%3E%3Crect%20width%3D%22400%22%20height%3D%22225%22%20fill%3D%22%23000000%22%2F%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22streak%22%20x1%3D%220%25%22%20y1%3D%2250%25%22%20x2%3D%22100%25%22%20y2%3D%2250%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0)%22%2F%3E%3Cstop%20offset%3D%2235%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0.3)%22%2F%3E%3Cstop%20offset%3D%2250%25%22%20stop-color%3D%22%23ffffff%22%2F%3E%3Cstop%20offset%3D%2265%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0.3)%22%2F%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22rgba(56%2C189%2C248%2C0)%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20x%3D%2220%22%20y%3D%22110%22%20width%3D%22360%22%20height%3D%224%22%20fill%3D%22url(%23streak)%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22116%22%20fill%3D%22%23ffffff%22%20font-family%3D%22sans-serif%22%20font-size%3D%2216%22%20font-weight%3D%22900%22%20letter-spacing%3D%223%22%20text-anchor%3D%22middle%22%3ETHIS%20IS%20NOT%20ONE%20OF%20THOSE%20STO_%3C%2Ftext%3E%3C%2Fsvg%3E',
-    secondaryImage: '/boardroom_scene_hd.jpg'
-  },
-  {
-    id: 'document-barrage-suite',
-    title: 'Screen-Filling Document Barrage & Evidence Stack Suite',
-    category: '3D Spatial',
-    badge: 'Pro Documentary',
-    difficulty: 'Pro Editor',
-    timeToApply: '5 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(2, 132, 199, 0.35), rgba(15, 23, 42, 0.9))',
-    description: 'Investigative documentary screen fill: room background blurs out while legal filings, court petitions, and evidence sheets appear one by one cascading in 3D perspective to fill the screen. Fully granular controls for background blur, stagger arrival, entrance style (slam, drift, whip, depth-dive), custom uploads, and broadcast news lower-third banner.',
-    tags: ['Documentary', 'Legal Documents', 'Background Blur', 'Screen Fill', 'Cascading Arrival', 'Lawsuit', 'Lower Third', 'Paper Slam SFX'],
-    defaultImage: 'legal_court_filing_doc1.svg',
-    secondaryImage: 'legal_court_filing_doc2.svg'
-  },
-    {
-    id: 'circular-spin-flashlight-glitch',
-    title: 'Circular Arc Spin & Paparazzi Flashlight Glitch Transition',
-    category: 'Transitions',
-    badge: 'Cinematic Burst',
-    difficulty: 'Pro Editor',
-    timeToApply: '5 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(3, 7, 18, 0.95), rgba(56, 189, 248, 0.35), rgba(15, 23, 42, 0.95))',
-    description: 'Image initiates a circular arc spin from left over head down to right, accompanied by falling particles and a 4-flash photoflash sequence (1 slow bloom, 3 fast paparazzi bursts) culminating in a digital glitch transition to a second person.',
-    tags: ['Circular Spin', 'Doodle Arc', 'Flashlight', 'Paparazzi Flash', 'Falling Particles', 'Glitch Transition', 'AI Subject Reveal'],
-    defaultImage: 'generated_person_1.jpg',
-    secondaryImage: 'generated_person_2.jpg'
-  },
-{
-    id: 'multi-image-flash-sequence',
-    title: 'Modular Multi-Image Shutter Flash & Lateral Sequence Suite',
-    category: 'Transitions',
-    badge: 'Granular Storyboard Suite',
-    difficulty: 'Pro Editor',
-    timeToApply: '5 sec',
-    previewGradient: 'linear-gradient(135deg, rgba(2, 6, 23, 0.95), rgba(56, 189, 248, 0.25), rgba(15, 23, 42, 0.85))',
-    description: 'Cinematic documentary 4+ image sequence: high-impact forensic photoflash with realistic phosphor decay and micro-shake, counter-directional lateral pushes, and sluggish center core expansion. Unlimited images, 4 acoustic shutter profiles, and 1-click mood psychology presets.',
-    tags: ['Camera Flash', 'Multi-Image', 'Lateral Push', 'Sluggish Bloom', 'Documentary', 'Sound FX', 'Mood Presets'],
-    defaultImage: 'photocut_scene1.png',
-    secondaryImage: 'photocut_scene4.png'
   },
   {
     id: 'jani-ftx-logo-reveal',
@@ -24693,7 +26440,7 @@ id: 'map',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Jani\u2019s recurring metaphorical motif: interlocking abstract puzzle pieces that mask documentary footage and snap together along connecting story arcs.',
     tags: ['Puzzle Mask', 'Story Arc', 'Metaphor', 'Glowing Vector', 'James Jani'],
-    defaultImage: '/tactical_desk_hd_plate.png',
+    defaultImage: '/investigative_decode_dossier_plate.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -24745,7 +26492,7 @@ id: 'map',
     previewGradient: 'linear-gradient(to top, rgba(15, 23, 42, 0.75), rgba(30, 41, 59, 0.35), rgba(7, 9, 14, 0.2))',
     description: 'Dynamic character offset scrambling, typewriter cursors, matrix-style glyph decoding, and "decode lines together" text assembly for investigative tension.',
     tags: ['Typewriter', 'Character Offset', 'Decode Lines', 'Glitch Reveal', 'James Jani'],
-    defaultImage: '/tactical_desk_hd_plate.png',
+    defaultImage: '/investigative_decode_dossier_plate.svg',
     secondaryImage: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80'
   },
   {
@@ -25607,7 +27354,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['circular-spin-flashlight-glitch', 'document-barrage-suite', 'wire-transfer', 'money-stack', 'multi-image-flash-sequence', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -25838,106 +27585,228 @@ window.tplRenderUniversalBgLayer = function (data, fallbackBgStyle) {
 };
 
 // =========================================================================
-// CINEMATIC PROGRESS HUD: Liquid Glass Track & Leading-Edge Metric Callouts
+// CINEMATIC PROGRESS HUD: High-End Financial Documentary Storytelling
+// Direction A (Default — Reference Image 4): Premium Documentary
+// Direction B: Cinematic Technology
+// Direction C: Editorial Data Storytelling
 // =========================================================================
 window.tplBuildProgressHtml = function (data) {
   const d = data || {};
-  const title = (d.title !== undefined) ? String(d.title) : (d.goal || 'PROJECT FUNDING STATUS');
-  const subtitle = (d.subtitle !== undefined) ? String(d.subtitle) : '[PHASE 2 / 3 ACTIVE]';
+  const stylePreset = d.stylePreset === 'tech' ? 'tech' : (d.stylePreset === 'editorial' ? 'editorial' : 'documentary');
+  const styleClass = stylePreset === 'tech' ? 'style-tech' : (stylePreset === 'editorial' ? 'style-editorial' : 'style-documentary');
+
+  const eyebrow = (d.eyebrow !== undefined) ? String(d.eyebrow) : 'PROJECT FUNDING';
+  const title = (d.title !== undefined && d.title !== 'PROJECT FUNDING STATUS')
+    ? String(d.title)
+    : ((d.goal && d.goal !== 'PROJECT FUNDING STATUS') ? String(d.goal) : 'Funding Progress');
+
+  let phaseLabel = (d.phaseLabel !== undefined) ? String(d.phaseLabel) : 'Phase 2 of 3';
+  let phaseStatus = (d.phaseStatus !== undefined) ? String(d.phaseStatus) : 'Active';
+  if (d.subtitle && d.phaseLabel === undefined && d.subtitle !== '[PHASE 2 / 3 ACTIVE]') {
+    const parts = String(d.subtitle).split('·');
+    phaseLabel = parts[0].trim();
+    phaseStatus = parts[1] ? parts[1].trim() : '';
+  }
+
   const rawPct = (d.percent !== undefined) ? String(d.percent).replace(/[^0-9.]/g, '') : '74';
   const pctNum = Math.max(0, Math.min(100, parseFloat(rawPct) || 74));
-  const currentAmt = (d.currentAmount !== undefined) ? String(d.currentAmount) : (d.amount || '$74,000,000 Raised');
-  const targetAmt = (d.targetAmount !== undefined) ? String(d.targetAmount) : 'Target: $100,000,000';
-  const gradStart = d.gradientStart || '#ff007f';
-  const gradEnd = d.gradientEnd || '#00e5ff';
-  const barWidth = Math.max(40, Math.min(90, Number(d.barWidthPercent || 68)));
-  const showSparks = d.showSparks !== false;
-  const showShimmer = d.showShimmer !== false;
-  const showGrain = d.showFilmGrain !== false;
-  const bgPreset = d.bgPreset || 'cinematic-dark';
+  const pctSubLabel = (d.calloutSublabel !== undefined) ? String(d.calloutSublabel) : ((d.pctSubLabel !== undefined) ? String(d.pctSubLabel) : 'of target');
+
+  let raisedValue = (d.raisedValue !== undefined) ? String(d.raisedValue) : '';
+  let raisedLabel = (d.raisedLabel !== undefined) ? String(d.raisedLabel) : 'Raised';
+  if (!raisedValue) {
+    const rawCurrent = (d.currentAmount !== undefined) ? String(d.currentAmount) : (d.amount || '$74,000,000');
+    raisedValue = rawCurrent.replace(/\s*Raised$/i, '').trim() || '$74,000,000';
+  }
+
+  let targetValue = (d.targetValue !== undefined) ? String(d.targetValue) : '';
+  let targetLabel = (d.targetLabel !== undefined) ? String(d.targetLabel) : 'Target';
+  if (!targetValue) {
+    const rawTarget = (d.targetAmount !== undefined) ? String(d.targetAmount) : '$100,000,000';
+    targetValue = rawTarget.replace(/^Target:\s*/i, '').trim() || '$100,000,000';
+  }
+
+  const gradStart = (d.gradientStart && d.gradientStart !== '#ff007f') ? d.gradientStart : '#7c3aed';
+  const gradEnd = (d.gradientEnd && d.gradientEnd !== '#00e5ff') ? d.gradientEnd : '#38bdf8';
+  const barWidth = Math.max(35, Math.min(95, Number(d.barWidthPercent || 72)));
+  const compScale = (barWidth / 72).toFixed(3);
+  const trackHeight = Math.max(8, Math.min(36, Number(d.barThickness || d.trackHeightPx || 28)));
+  const posX = Number(d.posX) || 0;
+  const posY = Number(d.posY) || 0;
+  const tiltX = Number(d.tiltX) || 0;
+  const tiltY = Number(d.tiltY) || 0;
+  const radialGlow = (d.radialGlowIntensity !== undefined ? Number(d.radialGlowIntensity) : 0.78);
+  const normGlow = (radialGlow > 2 ? radialGlow / 100 : radialGlow).toFixed(2);
+  const showEndpointDot = d.showEndpointDot !== false;
+  const showGrain = d.showFilmGrain === true;
+  const isTrans = d.transparentBg === true;
+
+  const bgPreset = d.bgPreset || 'default';
   const bgData = Object.assign({}, d, { bgPreset });
-  const bgLayerHtml = window.tplRenderUniversalBgLayer ? window.tplRenderUniversalBgLayer(bgData) : `<div class="tpl-universal-bg-layer bg-preset-${bgPreset}"></div>`;
+  const bgLayerHtml = (window.tplRenderUniversalBgLayer && (d.bgMediaUrl || (bgPreset && bgPreset !== 'default' && bgPreset !== 'cinematic-dark')))
+    ? window.tplRenderUniversalBgLayer(bgData)
+    : '';
+
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => {
+      const rootEl = document.querySelector('#customizer-stage [data-tpl-progress-root="1"]') || document.querySelector('[data-tpl-progress-root="1"]');
+      if (rootEl && typeof window.tplTriggerProgressHudAnimation === 'function') {
+        window.tplTriggerProgressHudAnimation(rootEl, d);
+      }
+    });
+  }
 
   return `
-    <div class="tpl-progress cinematic-hud-progress has-universal-bg" style="--hud-grad-start: ${gradStart}; --hud-grad-end: ${gradEnd}; --hud-bar-width: ${barWidth}%;">
+    <div class="tpl-progress cinematic-hud-progress ${styleClass} ${isTrans ? 'is-transparent-bg' : ''} ${bgLayerHtml ? 'has-universal-bg' : ''}"
+         data-tpl-progress-root="1"
+         data-target-pct="${pctNum}"
+         style="--hud-grad-start: ${gradStart};
+                --hud-grad-end: ${gradEnd};
+                --hud-bar-width: ${barWidth}%;
+                --hud-comp-scale: ${compScale};
+                --hud-track-height: ${trackHeight}px;
+                --hud-pos-x: ${posX}px;
+                --hud-pos-y: ${posY}px;
+                --hud-tilt-x: ${tiltX}deg;
+                --hud-tilt-y: ${tiltY}deg;
+                --hud-radial-glow: ${normGlow};">
       ${bgLayerHtml}
       ${showGrain ? '<div class="hud-film-grain-overlay"></div>' : ''}
-      <div class="hud-atmosphere-vignette"></div>
-      
-      <!-- Constrained Cinematic Canvas Container (60%–70% width, centered) -->
-      <div class="hud-progress-frame">
-        
-        <!-- Header & Architecture Stack -->
+      <!-- Reference Image 4 Planetary / Horizon Light Arcs & Top Radial Glow -->
+      <div class="hud-atmosphere-vignette">
+        <div class="hud-horizon-arc arc-top-right"></div>
+        <div class="hud-horizon-arc arc-bottom-left"></div>
+      </div>
+
+      <!-- Proportional Documentary Composition Container (Default 72% canvas width, centered) -->
+      <div class="hud-progress-frame" data-hud-frame="1">
+
+        <!-- Header Stack on Left (Exact Reference Image 4 Hierarchy — Never Collides with 74% Badge) -->
         <div class="hud-progress-header">
-          <div class="hud-title-row">
+          <div class="hud-header-left">
+            <div class="hud-eyebrow-row">
+              <span class="hud-eyebrow-text prog-eyebrow">${eyebrow}</span>
+              <span class="hud-eyebrow-accent-bar"></span>
+            </div>
             <h1 class="hud-main-title prog-goal">${title}</h1>
-          </div>
-          <div class="hud-meta-row">
-            <span class="hud-meta-tag prog-subtitle">${subtitle}</span>
+            <div class="hud-phase-subrow prog-subtitle">
+              <span class="hud-phase-name">${phaseLabel}</span>
+              ${phaseStatus ? `<span class="hud-phase-dot">&middot;</span><span class="hud-phase-active-pill">${phaseStatus}</span>` : ''}
+            </div>
           </div>
         </div>
 
-        <!-- 3D Volumetric Glass Track Container -->
+        <!-- Luminous Violet-to-Sky Progress Track with Stacked Endpoint Speech-Bubble Callout -->
         <div class="hud-track-outer-capsule">
-          <div class="hud-glass-refraction-highlight"></div>
-          
-          <!-- Inner Frosted Recessed Channel -->
           <div class="hud-track-inner-channel prog-bar">
-            <!-- Active Neon Volumetric Fill Bar -->
             <div class="hud-fill-stream prog-bar-fill" style="width: ${pctNum}%;">
-              <div class="hud-liquid-sheen"></div>
-              ${showShimmer ? '<div class="hud-light-sweep-beam"></div>' : ''}
-              
-              <!-- Glowing Liquid Leading Edge Tip -->
-              <div class="hud-leading-edge-tip">
-                <div class="hud-leading-core-glow"></div>
-                <div class="hud-leading-specular-bead"></div>
-                ${showSparks ? `
-                  <div class="hud-spark-emitter">
-                    <span class="spark sp-1"></span>
-                    <span class="spark sp-2"></span>
-                    <span class="spark sp-3"></span>
-                    <span class="spark sp-4"></span>
-                    <span class="spark sp-5"></span>
-                    <span class="spark sp-6"></span>
-                    <span class="spark sp-7"></span>
-                    <span class="spark sp-8"></span>
-                  </div>
-                ` : ''}
-              </div>
+              <div class="hud-fill-shimmer-wave"></div>
+              <div class="hud-fill-top-specular"></div>
+              ${showEndpointDot ? `
+                <div class="hud-leading-edge-tip">
+                  <div class="hud-leading-core-glow"></div>
+                  <div class="hud-leading-specular-bead"></div>
+                </div>
+              ` : ''}
             </div>
           </div>
 
-          <!-- Glass Outer Specular Bevel Border -->
-          <div class="hud-outer-glass-specular-ring"></div>
+          <!-- Stacked Endpoint Callout Badge ("74%" over "of target" with glowing violet border & V-beak) -->
+          <div class="hud-dynamic-callout-anchor" style="left: ${pctNum}%;">
+            <div class="hud-tip-bubble-pct">
+              <div class="hud-bubble-top-glint"></div>
+              <span class="hud-pct-number prog-percent prog-pct">${pctNum}%</span>
+              ${pctSubLabel ? `<span class="hud-pct-sub prog-pct-sub">${pctSubLabel}</span>` : ''}
+              <svg class="hud-bubble-beak-svg" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 0 L12 12 L23 0 Z" fill="rgba(22, 24, 48, 0.96)" />
+                <path d="M1 0 L12 12 L23 0" stroke="rgba(167, 139, 250, 0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
         </div>
 
-        <!-- Tip-Anchored Dynamic Floating Callout Nodes -->
-        <div class="hud-dynamic-callout-anchor" style="left: calc((100% - var(--hud-bar-width)) / 2 + (var(--hud-bar-width) * ${pctNum} / 100));">
-          
-          <!-- Top Floating Bubble: Clean Large Percentage -->
-          <div class="hud-tip-bubble-pct">
-            <span class="hud-pct-number prog-percent prog-pct">${pctNum}%</span>
-            <div class="hud-bubble-beak-down"></div>
+        <!-- Integrated Two-Column Financial Data Footer with Center Vertical Divider (Reference Image 4) -->
+        <div class="hud-financial-footer">
+          <div class="hud-stat-col is-left">
+            <div class="hud-stat-accent-line"></div>
+            <div class="hud-stat-content">
+              <div class="hud-stat-value is-raised prog-amt-raised" data-target-val="${raisedValue}">${raisedValue}</div>
+              <div class="hud-stat-label prog-label-raised">${raisedLabel}</div>
+            </div>
           </div>
 
-          <!-- Connecting Curved HUD Vector Line -->
-          <svg class="hud-callout-tether-svg" viewBox="0 0 40 80" fill="none" preserveAspectRatio="none">
-            <path d="M 0,0 C 0,35 -24,45 -24,80" stroke="${gradEnd}" stroke-width="1.8" stroke-linecap="round" opacity="0.95"/>
-            <circle cx="0" cy="0" r="3.2" fill="#ffffff" stroke="${gradEnd}" stroke-width="1.5" filter="drop-shadow(0 0 6px ${gradEnd})"/>
-          </svg>
+          <div class="hud-footer-center-divider"></div>
 
-          <!-- Lower Pinned Financial Metric Card -->
-          <div class="hud-financial-card">
-            <div class="hud-card-glass-sheen"></div>
-            <div class="hud-card-raised-amt prog-amt-raised">${currentAmt}</div>
-            <div class="hud-card-target-amt prog-amt-target">${targetAmt}</div>
+          <div class="hud-stat-col is-right">
+            <div class="hud-stat-content">
+              <div class="hud-stat-value is-target prog-amt-target">${targetValue}</div>
+              <div class="hud-stat-label prog-label-target">${targetLabel}</div>
+            </div>
           </div>
         </div>
 
       </div>
-    </div>
-  `;
+    </div>`;
+};
+
+let _progressHudAnimRaf = null;
+window.tplTriggerProgressHudAnimation = function (containerEl, customData) {
+  const rootEl = (containerEl && containerEl.matches && containerEl.matches('[data-tpl-progress-root="1"]'))
+    ? containerEl
+    : (containerEl || document).querySelector('[data-tpl-progress-root="1"]');
+  if (!rootEl) return;
+
+  if (_progressHudAnimRaf) {
+    cancelAnimationFrame(_progressHudAnimRaf);
+    _progressHudAnimRaf = null;
+  }
+
+  const d = customData || (typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData('progress') : null) || {};
+  const targetPct = Math.max(0, Math.min(100, parseFloat(String(d.percent !== undefined ? d.percent : (rootEl.dataset.targetPct || '74')).replace(/[^0-9.]/g, '')) || 74));
+  const fillEl = rootEl.querySelector('.hud-fill-stream.prog-bar-fill');
+  const calloutEl = rootEl.querySelector('.hud-dynamic-callout-anchor');
+  const pctTextEl = rootEl.querySelector('.hud-pct-number.prog-pct');
+  const raisedEl = rootEl.querySelector('.prog-amt-raised');
+
+  const rawRaisedStr = raisedEl ? (raisedEl.dataset.targetVal || raisedEl.textContent || '$74,000,000') : '$74,000,000';
+  const prefixMatch = rawRaisedStr.match(/^[^0-9]*/);
+  const suffixMatch = rawRaisedStr.match(/[^0-9,.\s]*$/);
+  const prefix = prefixMatch ? prefixMatch[0] : '$';
+  const suffix = suffixMatch ? suffixMatch[0] : '';
+  const numericTarget = parseFloat(rawRaisedStr.replace(/[^0-9.]/g, '')) || 74000000;
+  const hasCommas = rawRaisedStr.includes(',');
+
+  const durMs = 1550;
+  const t0 = performance.now();
+
+  const stepAnim = (now) => {
+    if (!rootEl.isConnected) return;
+    const p = Math.min(1, (now - t0) / durMs);
+    // Smooth cubic-out ease
+    const ease = 1 - Math.pow(1 - p, 3);
+    const curPct = targetPct * ease;
+
+    if (fillEl) fillEl.style.width = `${curPct.toFixed(2)}%`;
+    if (calloutEl) calloutEl.style.left = `${curPct.toFixed(2)}%`;
+    if (pctTextEl) pctTextEl.textContent = `${Math.round(curPct)}%`;
+    if (raisedEl && numericTarget > 0) {
+      const curVal = Math.round(numericTarget * ease);
+      const formatted = hasCommas ? curVal.toLocaleString('en-US') : String(curVal);
+      raisedEl.textContent = `${prefix}${formatted}${suffix}`;
+    }
+
+    if (p < 1) {
+      _progressHudAnimRaf = requestAnimationFrame(stepAnim);
+    } else {
+      if (fillEl) fillEl.style.width = `${targetPct}%`;
+      if (calloutEl) calloutEl.style.left = `${targetPct}%`;
+      if (pctTextEl) pctTextEl.textContent = `${Math.round(targetPct)}%`;
+      if (raisedEl) raisedEl.textContent = rawRaisedStr;
+      _progressHudAnimRaf = null;
+    }
+  };
+
+  _progressHudAnimRaf = requestAnimationFrame(stepAnim);
 };
 
 window.tplTriggerProgressAnimation = function (rootEl, data) {
@@ -25945,44 +27814,69 @@ window.tplTriggerProgressAnimation = function (rootEl, data) {
   const fillEl = rootEl.querySelector('.prog-bar-fill');
   const anchorEl = rootEl.querySelector('.hud-dynamic-callout-anchor');
   const pctEl = rootEl.querySelector('.prog-pct');
+  const raisedEl = rootEl.querySelector('.prog-amt-raised');
   const d = data || {};
   const rawPct = (d.percent !== undefined) ? String(d.percent).replace(/[^0-9.]/g, '') : '74';
   const targetPct = Math.max(0, Math.min(100, parseFloat(rawPct) || 74));
-  const barWidth = Math.max(40, Math.min(90, Number(d.barWidthPercent || 68)));
+  const durationSec = Math.max(0.4, Math.min(6.0, Number(d.animDuration || 1.8)));
 
   if (!fillEl || !anchorEl || !pctEl) return;
 
-  // Keyframed Smooth Reveal Animation from 0% to Target %
+  // Parse currency figure for smooth upward count if formatted like "$74,000,000" or "$74M"
+  const finalRaisedStr = raisedEl ? (raisedEl.getAttribute('data-target-val') || raisedEl.textContent || '$74,000,000') : '$74,000,000';
+  const numMatch = finalRaisedStr.match(/^([^0-9]*)([0-9][0-9,]*(?:\.[0-9]+)?)(.*)$/);
+
   fillEl.style.transition = 'none';
   anchorEl.style.transition = 'none';
   fillEl.style.width = '0%';
-  anchorEl.style.left = `calc((100% - ${barWidth}%) / 2)`;
+  anchorEl.style.left = '0%';
   pctEl.textContent = '0%';
 
   let startT = null;
-  const durationMs = 1800; // 1.8s cinematic deceleration
+  const durationMs = durationSec * 1000;
 
   function cubicEaseOut(t) {
     return 1 - Math.pow(1 - t, 3);
   }
 
+  function formatCountedAmount(progressEase) {
+    if (!numMatch) return finalRaisedStr;
+    const prefix = numMatch[1] || '';
+    const rawDigits = numMatch[2].replace(/,/g, '');
+    const suffix = numMatch[3] || '';
+    const targetVal = parseFloat(rawDigits);
+    if (isNaN(targetVal)) return finalRaisedStr;
+    const hasDecimals = rawDigits.includes('.');
+    const decimals = hasDecimals ? (rawDigits.split('.')[1] || '').length : 0;
+    const currentNum = targetVal * progressEase;
+    if (numMatch[2].includes(',')) {
+      return prefix + Math.round(currentNum).toLocaleString('en-US') + suffix;
+    }
+    return prefix + currentNum.toFixed(decimals) + suffix;
+  }
+
   function frame(timestamp) {
+    if (!fillEl.isConnected) return;
     if (!startT) startT = timestamp;
     const elapsed = timestamp - startT;
     const progress = Math.min(1, elapsed / durationMs);
     const eased = cubicEaseOut(progress);
-    const currentVal = (targetPct * eased).toFixed(0);
+    const currentPctVal = Math.round(targetPct * eased);
 
-    fillEl.style.width = `${targetPct * eased}%`;
-    anchorEl.style.left = `calc((100% - ${barWidth}%) / 2 + (${barWidth}% * ${targetPct * eased} / 100))`;
-    pctEl.textContent = `${currentVal}%`;
+    fillEl.style.width = `${(targetPct * eased).toFixed(2)}%`;
+    anchorEl.style.left = `${(targetPct * eased).toFixed(2)}%`;
+    pctEl.textContent = `${currentPctVal}%`;
+    if (raisedEl && numMatch) {
+      raisedEl.textContent = progress < 1 ? formatCountedAmount(eased) : finalRaisedStr;
+    }
 
     if (progress < 1) {
       requestAnimationFrame(frame);
     } else {
       fillEl.style.width = `${targetPct}%`;
-      anchorEl.style.left = `calc((100% - ${barWidth}%) / 2 + (${barWidth}% * ${targetPct} / 100))`;
+      anchorEl.style.left = `${targetPct}%`;
       pctEl.textContent = `${targetPct}%`;
+      if (raisedEl) raisedEl.textContent = finalRaisedStr;
     }
   }
 
@@ -26156,7 +28050,7 @@ window.tplTriggerScrambleAnimation = function (rootEl, data) {
   }, intervalMs);
 };
 
-const UPGRADED_PRO_TESTER_IDS = new Set(['countdown-timer', 'circular-spin-flashlight-glitch', 'conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'pyramid-scheme', 'scam-redaction', 'pyramid-scheme', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting', 'merger-acquisition']);
+const UPGRADED_PRO_TESTER_IDS = new Set(['conspiracy-board', 'envelope-open', 'wire-transfer', 'money-stack', 'deal-term-sheet', 'pyramid-scheme', 'scam-redaction', 'ceo-portrait', 'boardroom-zoom', 'security-camera', 'film-grain', 'headline-fly', 'newspaper-3d', 'screen-blur', 'map', 'map-pin-drop', 'interview-cutin', 'power-meeting', 'fast-cut-montage', 'split-reveal', 'mask-reveal', 'tension-text', 'zoom-blur']);
 
 
 window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
@@ -26212,6 +28106,34 @@ window.tplBuildPowerMeetingHtml = function(pmData, isCustomizer) {
   `;
 };
 
+window.tplFitBalanceSheet = function(root) {
+  if (!root) return;
+  const update = () => {
+    const parent = root.parentElement;
+    const w = root.clientWidth || (parent && parent.clientWidth) || 1280;
+    const h = root.clientHeight || (parent && parent.clientHeight) || 720;
+    if (w <= 0 || h <= 0) return;
+    const scale = Math.min(w / 1280, h / 720);
+    root.style.setProperty('--bal-scale', (scale > 0 ? scale : 1).toFixed(4));
+  };
+  update();
+  if (window.ResizeObserver && !root._balResizeObs) {
+    const ro = new ResizeObserver(() => update());
+    ro.observe(root);
+    if (root.parentElement) ro.observe(root.parentElement);
+    root._balResizeObs = ro;
+  }
+};
+
+window.tplFitAllBalanceSheets = function() {
+  document.querySelectorAll('.tpl-balance').forEach(el => {
+    if (window.tplFitBalanceSheet) window.tplFitBalanceSheet(el);
+  });
+};
+window.addEventListener('resize', () => {
+  if (window.tplFitAllBalanceSheets) window.tplFitAllBalanceSheets();
+});
+
 function startTemplateHoverVideo(cardEl, tpl, manual) {
   if (!tpl) return;
   const tplId = tpl.id;
@@ -26247,52 +28169,98 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
             <div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:20%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:40%"></div></div><div class="candle up"><div class="wick top" style="height:25%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle up"><div class="wick top" style="height:35%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:20%"></div></div><div class="candle down"><div class="wick top" style="height:15%"></div><div class="body" style="height:35%"></div><div class="wick bot" style="height:50%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:50%"></div><div class="wick bot" style="height:30%"></div></div><div class="candle up"><div class="wick top" style="height:30%"></div><div class="body" style="height:60%"></div><div class="wick bot" style="height:10%"></div></div><div class="candle down"><div class="wick top" style="height:25%"></div><div class="body" style="height:40%"></div><div class="wick bot" style="height:35%"></div></div><div class="candle up"><div class="wick top" style="height:20%"></div><div class="body" style="height:55%"></div><div class="wick bot" style="height:25%"></div></div><div class="candle up"><div class="wick top" style="height:15%"></div><div class="body" style="height:45%"></div><div class="wick bot" style="height:40%"></div></div>
           </div>
         </div>`; } else if (tplId === 'balance') {
-      fxContainer.innerHTML = `<div class="tpl-balance theme-archival">
+      const bContW = fxContainer.clientWidth || fxContainer.offsetWidth || 1280;
+      const bContH = fxContainer.clientHeight || fxContainer.offsetHeight || (bContW * 9 / 16);
+      const bInitScale = Math.min(bContW / 1280, bContH / 720).toFixed(4);
+      fxContainer.innerHTML = `<div class="tpl-balance theme-archival has-dof-focus" style="--bal-scale: ${bInitScale}; --bal-unfocus-blur: 1.2px; --bal-unfocus-opacity: 0.55; --bal-line-alpha: 0.28; --bal-leader-alpha: 0.22;">
+        <div class="b-viewport">
           <div class="b-film-grain"></div>
           <div class="b-spotlight"></div>
 
-          <div class="b-scene-3d">
-            <!-- 3D AR Floating HUD Callout Overlays Hovering in Z-space -->
-            <div class="b-hud-callouts">
-              <div class="b-hud-card b-hud-assets">
-                <div class="b-hud-header">
-                  <span class="b-hud-dot dot-green"></span>
-                  <span class="b-hud-tag">METRIC: TOTAL ASSETS</span>
-                </div>
+          <!-- Precision SVG Bent Leader Lines & Glowing Anchor Dots (1280x720 Coordinate Space) -->
+          <svg class="b-leader-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <!-- Top-Left: Total Assets Leader (Green) -->
+            <polyline class="b-leader-line line-assets" points="241,125 295,125 355,200" />
+            <circle class="b-leader-dot dot-assets" cx="355" cy="200" r="5" />
+            <!-- Top-Right: Balance Check Leader (Slate) -->
+            <polyline class="b-leader-line line-status" points="1039,100 990,100 950,138" />
+            <circle class="b-leader-dot dot-status" cx="950" cy="138" r="4.5" />
+            <!-- Middle-Right: Total Liabilities Leader (Coral) -->
+            <polyline class="b-leader-line line-liab" points="1039,332 985,332 940,375" />
+            <circle class="b-leader-dot dot-liab" cx="940" cy="375" r="5" />
+            <!-- Bottom-Right: Shareholders' Equity Leader (Purple) -->
+            <polyline class="b-leader-line line-equity" points="1039,615 980,615 920,555" />
+            <circle class="b-leader-dot dot-equity" cx="920" cy="555" r="5" />
+          </svg>
+
+          <!-- 4 Sleek Dark Glassmorphic Callout Cards (Matching Target Reference UI) -->
+          <div class="b-hud-callouts">
+            <!-- 1. Top-Left: Total Assets -->
+            <div class="b-hud-card b-hud-assets">
+              <div class="b-hud-header">
+                <span class="b-hud-dot dot-green"></span>
+                <span class="b-hud-tag">Total Assets</span>
+              </div>
+              <div class="b-hud-main-row">
                 <div class="b-hud-val val-assets val-hud-assets">$143.5B</div>
-                <div class="b-hud-sub">CONSOLIDATED BASE</div>
-              </div>
-
-              <div class="b-hud-card b-hud-liab">
-                <div class="b-hud-header">
-                  <span class="b-hud-dot dot-red"></span>
-                  <span class="b-hud-tag">METRIC: LIABILITIES</span>
+                <div class="b-hud-delta">
+                  <span class="b-delta-pct pct-green">&uarr; 4.2%</span>
+                  <span class="b-delta-vs">vs. 2023</span>
                 </div>
-                <div class="b-hud-val val-liab val-hud-liab">$81.4B</div>
-                <div class="b-hud-sub">TOTAL OBLIGATIONS</div>
               </div>
-
-              <div class="b-hud-card b-hud-equity">
-                <div class="b-hud-header">
-                  <span class="b-hud-dot dot-purple"></span>
-                  <span class="b-hud-tag">METRIC: NET WORTH</span>
-                </div>
-                <div class="b-hud-val val-equity val-hud-equity">$62.1B</div>
-                <div class="b-hud-sub">SHAREHOLDERS' EQUITY</div>
-              </div>
-
-              <div class="b-hud-card b-hud-status">
-                <div class="b-hud-header">
-                  <span class="b-hud-dot dot-emerald pulse"></span>
-                  <span class="b-hud-tag">STATUS: BALANCED</span>
-                </div>
-                <div class="b-hud-eq">A = L + E &#x2713; TRUE</div>
-              </div>
+              <div class="b-hud-sub">Consolidated balance</div>
             </div>
 
+            <!-- 2. Top-Right: Balance Check -->
+            <div class="b-hud-card b-hud-status">
+              <div class="b-hud-header-between">
+                <div class="b-hud-header">
+                  <span class="b-hud-dot dot-slate pulse"></span>
+                  <span class="b-hud-tag">Balance Check</span>
+                </div>
+                <span class="b-hud-check-icon">&#x2713;</span>
+              </div>
+              <div class="b-hud-val b-hud-status-val">Balanced</div>
+              <div class="b-hud-sub b-hud-eq">Assets = Liabilities + Equity</div>
+            </div>
+
+            <!-- 3. Middle-Right: Total Liabilities -->
+            <div class="b-hud-card b-hud-liab">
+              <div class="b-hud-header">
+                <span class="b-hud-dot dot-red"></span>
+                <span class="b-hud-tag">Total Liabilities</span>
+              </div>
+              <div class="b-hud-main-row">
+                <div class="b-hud-val val-liab val-hud-liab">$81.4B</div>
+                <div class="b-hud-delta">
+                  <span class="b-delta-pct pct-red">&uarr; 3.1%</span>
+                  <span class="b-delta-vs">vs. 2023</span>
+                </div>
+              </div>
+              <div class="b-hud-sub">Outstanding obligations</div>
+            </div>
+
+            <!-- 4. Bottom-Right: Shareholders' Equity -->
+            <div class="b-hud-card b-hud-equity">
+              <div class="b-hud-header">
+                <span class="b-hud-dot dot-purple"></span>
+                <span class="b-hud-tag">Shareholders' Equity</span>
+              </div>
+              <div class="b-hud-main-row">
+                <div class="b-hud-val val-equity val-hud-equity">$62.1B</div>
+                <div class="b-hud-delta">
+                  <span class="b-delta-pct pct-purple">&uarr; 5.6%</span>
+                  <span class="b-delta-vs">vs. 2023</span>
+                </div>
+              </div>
+              <div class="b-hud-sub">Net assets attributable to equity</div>
+            </div>
+          </div>
+
+          <div class="b-scene-3d">
             <!-- Authentic 3D SEC Form 10-K Sheet Asset -->
             <div class="b-sheet-asset">
-              <!-- Official Archival Stamp -->
+              <!-- Official Archival Stamp (Kept from Image 2) -->
               <div class="b-rubber-stamp">
                 <div class="b-stamp-box">
                   <span class="stamp-txt-top">SEC EDGAR AUDIT</span>
@@ -26303,11 +28271,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
               <!-- Formal SEC 10-K Document Header -->
               <div class="b-sec-head">
-                <div class="b-sec-top-meta">
-                  <span class="b-sec-sec-id">UNITED STATES SECURITIES AND EXCHANGE COMMISSION</span>
-                  <span class="b-sec-reg">WASHINGTON, D.C. 20549</span>
-                </div>
-                <div class="b-sec-form-badge">FORM 10-K &#x2022; ANNUAL REPORT</div>
                 <div class="b-company-name b-company">APPLE INC.</div>
                 <div class="b-sec-table-title">CONSOLIDATED STATEMENTS OF FINANCIAL POSITION</div>
                 <div class="b-period b-sec-period">FORM 10-K &#x2022; FISCAL 2024</div>
@@ -26323,35 +28286,35 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
                 <!-- Section 1: ASSETS -->
                 <div class="b-tbl-section-title">ASSETS</div>
-                <div class="b-tbl-group-hdr">Current assets:</div>
+                <div class="b-tbl-group-hdr">Current assets</div>
                 <div class="b-rows-list b-asset-rows">
-                  <div class="b-tbl-row sweep-1">
-                    <span class="b-marker-stroke"></span>
-                    <span class="b-tbl-name">Cash and cash equivalents</span>
+                  <div class="b-tbl-row b-row-hl-mint sweep-1">
+                    <span class="b-marker-stroke b-mint-marker"></span>
+                    <span class="b-tbl-name">Cash &amp; Equivalents</span>
                     <span class="b-tbl-leader"></span>
                     <span class="b-tbl-val yr-curr val-asset-1">$29.9B</span>
                     <span class="b-tbl-val yr-prev">$29.9B</span>
                   </div>
-                  <div class="b-tbl-row sweep-2">
-                    <span class="b-marker-stroke"></span>
-                    <span class="b-tbl-name">Marketable securities (short-term)</span>
+                  <div class="b-tbl-row b-row-hl-mint sweep-2">
+                    <span class="b-marker-stroke b-mint-marker"></span>
+                    <span class="b-tbl-name">Marketable Securities</span>
                     <span class="b-tbl-leader"></span>
                     <span class="b-tbl-val yr-curr val-asset-2">$61.5B</span>
-                    <span class="b-tbl-val yr-prev">$31.5B</span>
+                    <span class="b-tbl-val yr-prev">$61.5B</span>
                   </div>
                   <div class="b-tbl-row">
                     <span class="b-marker-stroke"></span>
                     <span class="b-tbl-name">Accounts receivable, net</span>
                     <span class="b-tbl-leader"></span>
                     <span class="b-tbl-val yr-curr val-asset-3">$29.5B</span>
-                    <span class="b-tbl-val yr-prev">$28.1B</span>
+                    <span class="b-tbl-val yr-prev">$29.5B</span>
                   </div>
                   <div class="b-tbl-row">
                     <span class="b-marker-stroke"></span>
-                    <span class="b-tbl-name">Inventories and vendor non-trade</span>
+                    <span class="b-tbl-name">Inventories</span>
                     <span class="b-tbl-leader"></span>
                     <span class="b-tbl-val yr-curr val-asset-4">$22.6B</span>
-                    <span class="b-tbl-val yr-prev">$21.8B</span>
+                    <span class="b-tbl-val yr-prev">$22.6B</span>
                   </div>
                 </div>
 
@@ -26363,33 +28326,34 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                 </div>
 
                 <div class="b-tbl-row b-row-grandtotal b-row-assets-total">
-                  <span class="b-tbl-name">TOTAL ASSETS</span>
+                  <span class="b-tbl-name">Total assets</span>
                   <span class="b-tbl-leader"></span>
                   <span class="b-tbl-val yr-curr b-double-line val-assets">$143.5B</span>
                   <span class="b-tbl-val yr-prev b-double-line">$111.3B</span>
                 </div>
 
                 <!-- Section 2: LIABILITIES & EQUITY -->
-                <div class="b-tbl-section-title b-sec-liab-title">LIABILITIES AND SHAREHOLDERS' EQUITY</div>
+                <div class="b-tbl-section-title b-sec-liab-title">LIABILITIES &amp; SHAREHOLDERS' EQUITY</div>
                 <div class="b-tbl-group-hdr">Current liabilities:</div>
                 <div class="b-rows-list b-liab-rows-inner">
                   <div class="b-tbl-row">
                     <span class="b-marker-stroke"></span>
-                    <span class="b-tbl-name">Short-term debt &amp; accounts payable</span>
+                    <span class="b-tbl-name">Short-term debt</span>
                     <span class="b-tbl-leader"></span>
                     <span class="b-tbl-val yr-curr val-liab-1">$16.2B</span>
                     <span class="b-tbl-val yr-prev">$14.5B</span>
                   </div>
                   <div class="b-tbl-row">
                     <span class="b-marker-stroke"></span>
-                    <span class="b-tbl-name">Long-term debt obligations</span>
+                    <span class="b-tbl-name">Long-term debt</span>
                     <span class="b-tbl-leader"></span>
                     <span class="b-tbl-val yr-curr val-liab-2">$65.2B</span>
                     <span class="b-tbl-val yr-prev">$58.3B</span>
                   </div>
                 </div>
 
-                <div class="b-tbl-row b-row-subtotal">
+                <div class="b-tbl-row b-row-subtotal b-row-hl-coral sweep-liab">
+                  <span class="b-marker-stroke b-coral-marker"></span>
                   <span class="b-tbl-name">Total liabilities</span>
                   <span class="b-tbl-leader"></span>
                   <span class="b-tbl-val yr-curr val-liab val-liab-calc">$81.4B</span>
@@ -26397,8 +28361,8 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                 </div>
 
                 <div class="b-tbl-group-hdr">Shareholders' equity:</div>
-                <div class="b-tbl-row sweep-equity">
-                  <span class="b-marker-stroke b-mint-marker"></span>
+                <div class="b-tbl-row b-row-hl-purple sweep-equity">
+                  <span class="b-marker-stroke b-purple-marker"></span>
                   <span class="b-tbl-name">Common stock &amp; retained earnings</span>
                   <span class="b-tbl-leader"></span>
                   <span class="b-tbl-val yr-curr b-equity-val val-equity val-equity-calc">$62.1B</span>
@@ -26406,7 +28370,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
                 </div>
 
                 <div class="b-tbl-row b-row-grandtotal b-row-liab-total">
-                  <span class="b-tbl-name">TOTAL LIABILITIES &amp; SHAREHOLDERS' EQUITY</span>
+                  <span class="b-tbl-name">Total liabilities &amp; shareholders' equity</span>
                   <span class="b-tbl-leader"></span>
                   <span class="b-tbl-val yr-curr b-double-line val-liab-equity-sum">$143.5B</span>
                   <span class="b-tbl-val yr-prev b-double-line">$111.3B</span>
@@ -26415,12 +28379,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
 
               <!-- Formal 10-K Bottom Verification Notes -->
               <div class="b-sec-footer">
-                <span class="b-fn">See accompanying Notes to Consolidated Financial Statements</span>
-                <span class="b-audit-seal">PCAOB AUDIT REGISTERED &#x2022; EDGAR CERTIFIED</span>
+                <span class="b-fn">See accompanying Notes to Consolidated Financial Statements.</span>
               </div>
             </div>
           </div>
-        </div>`; } else if (tplId === 'compound') {
+        </div>
+      </div>`;
+      if (typeof window.tplFitBalanceSheet === 'function') {
+        window.tplFitBalanceSheet(fxContainer.querySelector('.tpl-balance'));
+      }
+      if (typeof window.tplGetContextualData === 'function' && typeof window.tplUpdateStageWithContextualData === 'function') {
+        const cData = window.tplGetContextualData('balance');
+        window.tplUpdateStageWithContextualData('balance', cData);
+      }
+    } else if (tplId === 'compound') {
       fxContainer.innerHTML = `<div class="tpl-compound">
           <div class="ci-head">
             <div><div class="ci-label">Initial Investment</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:rgba(255,255,255,0.8)">$1,000</div></div>
@@ -26534,9 +28506,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
               <div class="r-total"><span>TOTAL USD</span><span class="r-total-val">${total}</span></div>
             </div>
           </div>
-        </div>`; } else if (tplId === 'merger-acquisition') {
-      if (typeof window.tplMountMergerAcqPreview === 'function') window.tplMountMergerAcqPreview(fxContainer);
-    } else if (tplId === 'wire-transfer') {
+        </div>`; } else if (tplId === 'wire-transfer') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #040711; overflow: hidden; display: flex; align-items: center; justify-content: center;">
           <img src="/wire_transfer_cinematic_plate.png" alt="Wire Transfer 3D" style="width: 100%; height: 100%; object-fit: cover;" />
@@ -26574,25 +28544,15 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`;
     } else if (tplId === 'google') {
       const gData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('google') : {};
-      const query = gData.query || 'how to invest in index funds';
-      const sug1 = gData.suggestion || 'top index funds for passive wealth';
-      const sug2 = gData.suggestion2 || 's&p 500 historical annual return';
-      const sug3 = gData.suggestion3 || 'vanguard vs fidelity index funds';
-      const searchIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;color:#9aa0a6;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`;
-      fxContainer.innerHTML = `<div class="tpl-google">
-          <div class="google-frame">
-            <div class="g-logo"><span class="b">G</span><span class="r">o</span><span class="y">o</span><span class="b">g</span><span class="e">l</span><span class="r">e</span></div>
-            <div class="search-bar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:16px;height:16px;color:#4285F4;flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <div class="typed-text g-query">${query}</div>
-            </div>
-            <div class="suggestions">
-              <div class="sugg g-sug">${searchIcon}<span class="g-sug-text">${sug1}</span></div>
-              <div class="sugg g-sug2">${searchIcon}<span class="g-sug-text">${sug2}</span></div>
-              <div class="sugg g-sug3">${searchIcon}<span class="g-sug-text">${sug3}</span></div>
-            </div>
-          </div>
-        </div>`; } else if (tplId === 'imessage') {
+      if (typeof window.tplBuildGoogleSearchHtml === 'function') {
+        fxContainer.innerHTML = window.tplBuildGoogleSearchHtml(gData);
+        if (typeof window.tplTriggerGoogleSearchAnimation === 'function') {
+          window.tplTriggerGoogleSearchAnimation(fxContainer, gData);
+        }
+      } else {
+        fxContainer.innerHTML = `<div class="tpl-google"></div>`;
+      }
+    } else if (tplId === 'imessage') {
       const imData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('imessage') : {};
       const contact = imData.contact || 'Insider Source';
       const m1 = imData.msg1 || 'hey, are you up?';
@@ -26881,13 +28841,21 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       }
     } else if (tplId === 'parallax') {
       const pData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('parallax') : {};
-      const isCustomFig = (pData.figureImg && !pData.figureImg.includes('data:image/svg')) || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg'));
+      const isCustomFig = (pData.figureImg && !pData.figureImg.includes('data:image/svg') && !pData.figureImg.includes('parallax_multilayer_thumb')) || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg') && !topCustomizerState.primaryUrl.includes('parallax_multilayer_thumb'));
       const isCustomMtn = (pData.mountainsImg && !pData.mountainsImg.includes('data:image/svg')) || (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl && !topCustomizerState.secondaryUrl.includes('data:image/svg'));
       const figUrl = pData.figureImg || (isCustomFig ? topCustomizerState.primaryUrl : '/hiker_cutout_clean_final.png');
       const mtnUrl = pData.mountainsImg || (isCustomMtn ? topCustomizerState.secondaryUrl : '/hiker_background_inpainted.png');
-      const figStyle = `style="clip-path: none; background: url('${figUrl}') center bottom/contain no-repeat; width: 165px; height: 86%;"`;
+      const isDefaultHiker = !isCustomFig || figUrl.includes('hiker_cutout') || figUrl.includes('clean_traveler_cutout');
+      const zScale = Number(pData.zoomScale || 1.15) / 1.15;
+      const figImgStyle = isDefaultHiker
+        ? 'position: absolute; top: -60.5%; left: 46%; transform: translateX(-50%); width: 705%; max-width: none; height: auto; pointer-events: none; user-select: none; display: block;'
+        : 'width: 100%; height: 100%; object-fit: contain; object-position: center bottom; pointer-events: none; display: block;';
+      const figStyle = `style="clip-path: none; background: none; overflow: visible; width: 25%; height: 74%; bottom: 0; left: 50%; transform: translateX(-50%) scale(${zScale.toFixed(3)}); transform-origin: center bottom;"`;
       const mtnStyle = `style="clip-path: none; background: url('${mtnUrl}') center/cover no-repeat;"`;
-      fxContainer.innerHTML = `<div class="tpl-parallax"><div class="layer layer-back"><div class="sun"></div></div><div class="layer layer-mid"><div class="mtn-back" ${mtnStyle}></div></div><div class="layer layer-front"><div class="mtn-front"></div><div class="figure" ${figStyle}></div></div></div>`;
+      const txtDirInit = (typeof topCustomizerState !== 'undefined' && topCustomizerState.spoonerTxtDir) ? topCustomizerState.spoonerTxtDir : 'off';
+      const txtDisplay = (txtDirInit && txtDirInit !== 'off') ? 'flex' : 'none';
+      const txtContent = (typeof topCustomizerState !== 'undefined' && topCustomizerState.mainText) ? topCustomizerState.mainText : 'DEPTH PARALLAX';
+      fxContainer.innerHTML = `<div class="tpl-parallax"><div class="layer layer-back"><div class="sun"></div></div><div class="layer layer-mid"><div class="mtn-back" ${mtnStyle}></div></div><div class="layer layer-text-behind" style="position: absolute; inset: 0; display: ${txtDisplay}; align-items: center; justify-content: center; pointer-events: none; z-index: 2;"><span class="bigtext" style="font-family: 'Space Grotesk', Impact, sans-serif; font-size: 64px; font-weight: 900; color: rgba(255,255,255,0.92); letter-spacing: 3px; text-transform: uppercase; text-shadow: 0 8px 28px rgba(0,0,0,0.85); transform: translateY(-18%);">${txtContent}</span></div><div class="layer layer-front"><div class="mtn-front"></div><div class="figure" ${figStyle}><img class="figure-img" src="${figUrl}" alt="" style="${figImgStyle}" /></div></div></div>`;
     } else if (tplId === 'textbehind') {
       const data = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('textbehind') : { bgText: 'DREAM', textColor: '#ffffff' };
       const subjUrl = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl) ? topCustomizerState.primaryUrl : '';
@@ -26958,7 +28926,7 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         </div>`;
     } else if (tplId === 'kinetic') {
       fxContainer.innerHTML = `<div class="tpl-kinetic"><div class="kt kt1">CREATE</div><div class="kt kt2">INSPIRE</div><div class="kt kt3">DELIVER</div></div>`;
-    } else if (tplId === 'split') {
+    } else if (tplId === 'split' || tplId === 'split-reveal') {
       const sData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('split') : {};
       const customLeft = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : (sData.leftImg || '/cinematic_split_scene.jpg');
       const customRight = (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl && !topCustomizerState.secondaryUrl.includes('data:image/svg')) ? topCustomizerState.secondaryUrl : (sData.rightImg || '/cinematic_split_scene.jpg');
@@ -26981,6 +28949,277 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           <div class="split-hud-badge split-label-left">${lblL}</div>
           <div class="split-hud-badge split-label-right">${lblR}</div>
         </div>`;
+    } else if (tplId === 'mask-reveal') {
+      const mrBg = '/boardroom_scene_hd.jpg';
+      const mrCutout = '/ceo_portrait_alpha_cutout.png';
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #05070e; overflow: hidden;">
+          <img src="${mrBg}" alt="Boardroom Background" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.28; filter: brightness(0.4) contrast(1.3);" />
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(5,7,14,0.3) 0%, rgba(5,7,14,0.92) 100%);"></div>
+          
+          <!-- Crosshairs -->
+          <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.08); transform: translateY(-50%); pointer-events: none;"></div>
+          <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(255,255,255,0.08); transform: translateX(-50%); pointer-events: none;"></div>
+          
+          <!-- Iris Aperture Mask -->
+          <div id="fx-iris-container-${tplId}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 160px; height: 160px; border-radius: 50%; overflow: hidden; border: 2px solid #10b981; box-shadow: 0 0 24px rgba(16,185,129,0.55), 0 0 50px rgba(16,185,129,0.25);">
+            <img src="${mrBg}" alt="Boardroom" style="position: absolute; inset: -20px; width: calc(100% + 40px); height: calc(100% + 40px); object-fit: cover; filter: brightness(0.85) contrast(1.1);" />
+            <img src="${mrCutout}" alt="Executive Cutout" style="position: absolute; top: 4px; left: 50%; transform: translateX(-50%); height: 100%; width: auto; object-fit: contain;" />
+            <div style="position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 20px rgba(16,185,129,0.35); pointer-events: none;"></div>
+          </div>
+          
+          <!-- Outer Optical Reticle Rings -->
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 184px; height: 184px; border-radius: 50%; border: 1px dashed rgba(16,185,129,0.45); pointer-events: none;"></div>
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 210px; height: 210px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); pointer-events: none;"></div>
+          
+          <!-- Top Badge -->
+          <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(6,9,18,0.92); border: 1px solid rgba(16,185,129,0.45); padding: 3px 10px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 800; color: #10b981; letter-spacing: 1.2px; white-space: nowrap; z-index: 5;">
+            ◎ CIRCLE MASK REVEAL // 85MM
+          </div>
+          <!-- Bottom HUD -->
+          <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(6,9,18,0.92); border: 1px solid rgba(255,255,255,0.18); padding: 3px 12px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 700; color: #e2e8f0; letter-spacing: 1px; white-space: nowrap; z-index: 5;">
+            F/1.4 · ISO 800 · AF-LOCK [0.85M]
+          </div>
+        </div>
+      `;
+    } else if (tplId === 'fast-cut-montage') {
+      const fcmPlates = [
+        { src: '/tokyo_1987_cinematic.jpg', label: 'BEAT 01 // TOKYO NIGHT', color: '#38bdf8' },
+        { src: '/boardroom_scene_hd.jpg', label: 'BEAT 02 // BOARDROOM', color: '#fbbf24' },
+        { src: '/cinematic_split_scene.jpg', label: 'BEAT 03 // PHOTOJOURNALIST', color: '#f43f5e' },
+        { src: '/cctv_surveillance_scene.jpg', label: 'BEAT 04 // BANK SURVEILLANCE', color: '#10b981' }
+      ];
+      fxContainer.innerHTML = `
+        <div id="fcm-wrap-${tplId}" style="position: absolute; inset: 0; background: #000; overflow: hidden;">
+          <img id="fcm-img-${tplId}" src="${fcmPlates[0].src}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.12s ease-out;" />
+          <div id="fcm-flash-${tplId}" style="position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.08s ease-out; z-index: 4;"></div>
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.85) 100%); pointer-events: none; z-index: 2;"></div>
+          
+          <!-- Top Telemetry -->
+          <div style="position: absolute; top: 10px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+            <div id="fcm-badge-${tplId}" style="background: rgba(6,9,18,0.92); border: 1px solid #38bdf8; padding: 3px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 800; color: #38bdf8; letter-spacing: 1px;">
+              ${fcmPlates[0].label}
+            </div>
+            <div style="background: rgba(244,63,94,0.25); border: 1px solid #f43f5e; padding: 2px 7px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 800; color: #f43f5e; letter-spacing: 1px;">
+              140 BPM SYNC
+            </div>
+          </div>
+          
+          <!-- Center Reticle -->
+          <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%; pointer-events: none; z-index: 3;">
+            <div style="position: absolute; top: 50%; left: -6px; right: -6px; height: 1px; background: rgba(255,255,255,0.7);"></div>
+            <div style="position: absolute; left: 50%; top: -6px; bottom: -6px; width: 1px; background: rgba(255,255,255,0.7);"></div>
+          </div>
+
+          <!-- Bottom Timecode -->
+          <div style="position: absolute; bottom: 8px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; z-index: 5; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; color: #cbd5e1;">
+            <span id="fcm-tc-${tplId}">00:00:01:04</span>
+            <span style="color: #38bdf8; font-weight: 700;">FAST-CUT HOOK FX</span>
+          </div>
+        </div>
+      `;
+      let fcmIdx = 0;
+      const fcmImg = fxContainer.querySelector(`#fcm-img-${tplId}`);
+      const fcmFlash = fxContainer.querySelector(`#fcm-flash-${tplId}`);
+      const fcmBadge = fxContainer.querySelector(`#fcm-badge-${tplId}`);
+      const fcmTc = fxContainer.querySelector(`#fcm-tc-${tplId}`);
+      const cutTimer = setInterval(() => {
+        if (!document.body.contains(fxContainer)) {
+          clearInterval(cutTimer);
+          return;
+        }
+        fcmIdx = (fcmIdx + 1) % fcmPlates.length;
+        const cur = fcmPlates[fcmIdx];
+        if (fcmFlash) {
+          fcmFlash.style.opacity = '0.85';
+          setTimeout(() => { if (fcmFlash) fcmFlash.style.opacity = '0'; }, 65);
+        }
+        if (fcmImg) {
+          fcmImg.src = cur.src;
+          fcmImg.style.transform = `scale(${1.04 + (fcmIdx % 2) * 0.08})`;
+        }
+        if (fcmBadge) {
+          fcmBadge.textContent = cur.label;
+          fcmBadge.style.color = cur.color;
+          fcmBadge.style.borderColor = cur.color;
+        }
+        if (fcmTc) {
+          fcmTc.textContent = `00:00:0${fcmIdx + 1}:${(12 + fcmIdx * 6).toString().padStart(2, '0')}`;
+        }
+      }, 420);
+      fxContainer._fcmTimer = cutTimer;
+    } else if (tplId === 'tension-text') {
+      const words = ['HE...', 'LOST...', 'EVERYTHING.'];
+      fxContainer.innerHTML = `
+        <div style="position: absolute; inset: 0; background: #040509; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img src="/interview_cutin_cinematic.jpg" alt="Documentary Interview" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4) contrast(1.25);" />
+          <div style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.15) 20%, rgba(4,5,9,0.92) 100%);"></div>
+          
+          <!-- Top Kicker -->
+          <div style="position: absolute; top: 16px; left: 50%; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 700; color: #fbbf24; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 8px rgba(245,158,11,0.5); z-index: 4;">
+            [ 00:04:12 · KEY TESTIMONY ]
+          </div>
+          
+          <!-- Dramatic Center Text Word -->
+          <div id="tt-word-${tplId}" style="position: relative; z-index: 5; font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 26px; font-weight: 900; color: #f8fafc; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 0 20px rgba(245,158,11,0.7), 0 4px 16px rgba(0,0,0,0.9); transform: scale(1); transition: transform 0.12s ease-out, color 0.12s ease-out;">
+            HE...
+          </div>
+          
+          <!-- Bottom Tag -->
+          <div style="position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); background: rgba(6,9,18,0.88); border: 1px solid rgba(245,158,11,0.4); padding: 3px 12px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 700; color: #fde68a; letter-spacing: 1.2px; white-space: nowrap; z-index: 4;">
+            TENSION TEXT FLASH · SUSPENSE
+          </div>
+        </div>
+      `;
+      let wIdx = 0;
+      const wordEl = fxContainer.querySelector(`#tt-word-${tplId}`);
+      const ttTimer = setInterval(() => {
+        if (!document.body.contains(fxContainer)) {
+          clearInterval(ttTimer);
+          return;
+        }
+        wIdx = (wIdx + 1) % words.length;
+        if (wordEl) {
+          wordEl.textContent = words[wIdx];
+          wordEl.style.transform = 'scale(1.15)';
+          wordEl.style.color = wIdx === 2 ? '#fbbf24' : '#f8fafc';
+          wordEl.style.fontSize = wIdx === 2 ? '28px' : '24px';
+          setTimeout(() => { if (wordEl) wordEl.style.transform = 'scale(1)'; }, 90);
+        }
+      }, 550);
+      fxContainer._ttTimer = ttTimer;
+    } else if (tplId === 'zoom-blur') {
+      const zbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('zoom-blur') : {};
+      const zbScene = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg'))
+        ? topCustomizerState.primaryUrl
+        : (zbData.sceneUrl || '/boardroom_scene_hd.jpg');
+      const zbSubject = zbData.subjectUrl || '/ceo_portrait_alpha_cutout.png';
+      const zbHl = zbData.headline || 'THE MASTERMIND';
+      const zbKic = zbData.kicker || '[ 00:01:28 · TARGET IDENTIFIED ]';
+      const zbSub = zbData.subline || 'RADIAL BURST // PIN-SHARP CUTOUT';
+      const zbTCol = zbData.textColor || '#ffffff';
+      const zbACol = zbData.accentColor || '#38bdf8';
+      const zbKCol = zbData.kickerColor || '#fbbf24';
+      const blurPx = zbData.blurIntensity || 14;
+      const zoomMax = zbData.zoomScale || 1.35;
+
+      fxContainer.innerHTML = `
+        <div id="zb-wrap-${tplId}" style="position: absolute; inset: 0; background: #030712; overflow: hidden; display: flex; align-items: center; justify-content: center; user-select: none;">
+          <!-- Layer 1: Background Scene with Radial Blur Dynamics -->
+          <div id="zb-bg-layer" class="zb-bg-scene" style="position: absolute; inset: -24px; background-image: url('${zbScene}'); background-size: cover; background-position: center; filter: brightness(0.42) contrast(1.25) blur(0px); transform: scale(1.04); transform-origin: center center; transition: filter 0.3s cubic-bezier(0.16,1,0.3,1), transform 0.3s cubic-bezier(0.16,1,0.3,1);"></div>
+          
+          <!-- Optical Streaks -->
+          <div id="zb-streaks-${tplId}" style="position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 15%, rgba(56,189,248,0.2) 60%, rgba(14,165,233,0.45) 100%); mix-blend-mode: screen; opacity: 0; transition: opacity 0.22s ease-out; pointer-events: none;"></div>
+          
+          <!-- Center Reticle Line Overlay -->
+          <div style="position: absolute; inset: 0; pointer-events: none; opacity: 0.35;">
+            <div style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(56,189,248,0.35);"></div>
+            <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(56,189,248,0.35);"></div>
+          </div>
+
+          <!-- Layer 2: Cutout Subject (Bursting Forward into Pin-Sharp Focus) -->
+          <div id="zb-cutout-wrap-${tplId}" style="position: absolute; bottom: 0; left: 50%; width: 220px; height: 185px; transform: translateX(-50%) scale(0.9); transform-origin: bottom center; transition: transform 0.35s cubic-bezier(0.34, 1.4, 0.64, 1), filter 0.25s ease-out; z-index: 3; pointer-events: none;">
+            <img id="zb-cutout-img" class="zb-cutout-img" src="${zbSubject}" alt="Cutout Subject" style="width: 100%; height: 100%; object-fit: contain; object-position: bottom center; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.95)) drop-shadow(0 0 14px rgba(56,189,248,0.55));" />
+            <!-- Corner Brackets -->
+            <div style="position: absolute; top: 12px; left: 38px; width: 12px; height: 12px; border-top: 2px solid ${zbACol}; border-left: 2px solid ${zbACol};"></div>
+            <div style="position: absolute; top: 12px; right: 38px; width: 12px; height: 12px; border-top: 2px solid ${zbACol}; border-right: 2px solid ${zbACol};"></div>
+            <div style="position: absolute; bottom: 12px; left: 38px; width: 12px; height: 12px; border-bottom: 2px solid ${zbACol}; border-left: 2px solid ${zbACol};"></div>
+            <div style="position: absolute; bottom: 12px; right: 38px; width: 12px; height: 12px; border-bottom: 2px solid ${zbACol}; border-right: 2px solid ${zbACol};"></div>
+          </div>
+
+          <!-- Optical Flash Pulse -->
+          <div id="zb-flash-${tplId}" style="position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity 0.08s ease-out; z-index: 4;"></div>
+
+          <!-- Layer 3: Kinetic Headline Burst (Snap to Crisp Focus) -->
+          <div id="zb-text-wrap-${tplId}" style="position: absolute; top: 44%; left: 50%; transform: translate(-50%, -50%) scale(0.8); text-align: center; z-index: 5; pointer-events: none; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease-out, opacity 0.22s ease-out; filter: blur(6px); opacity: 0.6;">
+            <div id="zb-kicker" class="zb-kicker" style="font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 800; color: ${zbKCol}; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; text-shadow: 0 0 10px rgba(245,158,11,0.8);">
+              ${zbKic}
+            </div>
+            <div id="zb-headline" class="zb-headline" style="font-family: 'Space Grotesk', 'Inter', sans-serif; font-size: 23px; font-weight: 900; color: ${zbTCol}; letter-spacing: 3.5px; text-transform: uppercase; text-shadow: 0 0 24px rgba(56,189,248,0.85), 0 4px 18px rgba(0,0,0,0.95); line-height: 1.05;">
+              ${zbHl}
+            </div>
+            <div id="zb-subline" class="zb-subline" style="font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 700; color: ${zbACol}; letter-spacing: 1.8px; margin-top: 4px;">
+              ${zbSub}
+            </div>
+          </div>
+
+          <!-- Top HUD Telemetry -->
+          <div style="position: absolute; top: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 6; pointer-events: none;">
+            <div style="background: rgba(3,7,18,0.9); border: 1px solid rgba(56,189,248,0.5); padding: 2.5px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8; letter-spacing: 1px;">
+              ◎ ZOOM BURST COMBO
+            </div>
+            <div style="background: rgba(3,7,18,0.9); border: 1px solid rgba(245,158,11,0.5); padding: 2.5px 8px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 800; color: #fbbf24; letter-spacing: 1px;">
+              48MM F/1.2 · 2.4X
+            </div>
+          </div>
+
+          <!-- Bottom Telemetry HUD -->
+          <div style="position: absolute; bottom: 8px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 6; pointer-events: none; font-family: 'JetBrains Mono', monospace; font-size: 7px; color: #cbd5e1;">
+            <span>SHUTTER: 1/48S</span>
+            <span style="color: #38bdf8; font-weight: 700;">BG BLUR + CUTOUT + KINETIC</span>
+            <span>AF-LOCK [0.85M]</span>
+          </div>
+        </div>
+      `;
+
+      const bgLayer = fxContainer.querySelector('#zb-bg-layer');
+      const streaks = fxContainer.querySelector(`#zb-streaks-${tplId}`);
+      const cutoutWrap = fxContainer.querySelector(`#zb-cutout-wrap-${tplId}`);
+      const textWrap = fxContainer.querySelector(`#zb-text-wrap-${tplId}`);
+      const flash = fxContainer.querySelector(`#zb-flash-${tplId}`);
+
+      function triggerBurstAnim() {
+        if (!bgLayer || !cutoutWrap || !textWrap) return;
+        // 1. Pre-burst prep
+        bgLayer.style.filter = 'brightness(0.35) contrast(1.3) blur(0px)';
+        bgLayer.style.transform = 'scale(1.02)';
+        cutoutWrap.style.transform = 'translateX(-50%) scale(0.88)';
+        textWrap.style.transform = 'translate(-50%, -50%) scale(0.75)';
+        textWrap.style.filter = 'blur(8px)';
+        textWrap.style.opacity = '0.4';
+        if (streaks) streaks.style.opacity = '0';
+
+        setTimeout(() => {
+          if (!document.body.contains(fxContainer)) return;
+          // 2. Optical Flash
+          if (flash) {
+            flash.style.opacity = '0.7';
+            setTimeout(() => { if (flash) flash.style.opacity = '0'; }, 70);
+          }
+          // 3. EXPLOSIVE BURST: BG gets heavy radial blur, Cutout zooms forward, Text snaps sharp!
+          const curData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('zoom-blur') : {};
+          const curBlur = curData.blurIntensity || blurPx;
+          const curZoom = curData.zoomScale || zoomMax;
+
+          bgLayer.style.filter = `brightness(0.55) contrast(1.4) blur(${curBlur}px)`;
+          bgLayer.style.transform = `scale(${curZoom})`;
+          if (streaks) streaks.style.opacity = '0.85';
+
+          cutoutWrap.style.transform = 'translateX(-50%) scale(1.14)';
+          cutoutWrap.style.filter = 'drop-shadow(0 0 18px rgba(56,189,248,0.7))';
+
+          textWrap.style.transform = 'translate(-50%, -50%) scale(1.05)';
+          textWrap.style.filter = 'blur(0px)';
+          textWrap.style.opacity = '1.0';
+
+          // 4. Subtle settle
+          setTimeout(() => {
+            if (!document.body.contains(fxContainer)) return;
+            textWrap.style.transform = 'translate(-50%, -50%) scale(1.0)';
+          }, 240);
+        }, 120);
+      }
+
+      window.triggerZoomBlurBurst = triggerBurstAnim;
+      triggerBurstAnim();
+      const zbTimer = setInterval(() => {
+        if (!document.body.contains(fxContainer)) {
+          clearInterval(zbTimer);
+          return;
+        }
+        triggerBurstAnim();
+      }, 2200);
+      fxContainer._zbTimer = zbTimer;
     } else if (tplId === 'zoom') {
       const zData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('zoom') : {};
       const customProd = (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl && !topCustomizerState.primaryUrl.includes('data:image/svg')) ? topCustomizerState.primaryUrl : (zData.productImg || '/product_scan_3d.jpg');
@@ -28147,19 +30386,24 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'kinetic-decode-typewriter') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: #030508; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <img src="/tactical_desk_hd_plate.png" alt="Tactical Desk Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: contrast(105%) brightness(95%);" />
-          <div style="position: relative; z-index: 2; font-family: monospace; text-align: center; display: flex; flex-direction: column; align-items: center;">
-            <span style="font-size: 8px; color: #a7f3d0; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; display: block; margin-bottom: 5px; text-shadow: 0 0 6px rgba(0,255,65,0.7);">
-              [ HIGH TENSION REVEAL ]
+        <div style="position: absolute; inset: 0; background: #040508; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <img id="fx-decode-bg-${tplId}" src="/clean_terminal_warroom_plate.png" alt="Investigative Terminal Backdrop" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.88; transition: transform 0.1s linear;" />
+          <div style="position: relative; z-index: 2; width: 92%; display: flex; flex-direction: column; align-items: center;">
+            <span style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 7px; color: #fbbf24; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; text-shadow: 0 0 8px rgba(245, 158, 11, 0.55);">
+              [ EXHIBIT A · DECLASSIFIED ]
             </span>
-            <div id="fx-decode-box-${tplId}" style="font-size: 11px; font-weight: 900; letter-spacing: 1.5px; color: #ffffff; background: rgba(6, 30, 40, 0.88); border: 1.4px solid #00f0ff; padding: 4px 10px; border-radius: 5px; box-shadow: 0 0 12px rgba(0,240,255,0.5); display: inline-flex; align-items: center; gap: 4px;">
-              <span id="fx-decode-text-${tplId}">THE ILLUSION OF CHOICE</span>
-              <span style="display: inline-block; width: 5px; height: 12px; background: #00f0ff; box-shadow: 0 0 8px #00f0ff;" class="pulse-preview-badge"></span>
+            <div id="fx-decode-box-${tplId}" style="position: relative; width: auto; min-width: 28px; max-width: 90%; background: transparent; border: none; padding: 2px 4px; box-shadow: none; display: inline-flex; align-items: center; justify-content: center; overflow: hidden;">
+              <div id="fx-decode-hl-${tplId}" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); height: 80%; width: 0%; background: rgba(245, 158, 11, 0.12); border-radius: 2px; pointer-events: none;"></div>
+              <div style="position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 1px; white-space: nowrap;">
+                <span id="fx-decode-text-${tplId}" style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #f59e0b; text-shadow: 0 0 8px rgba(245,158,11,0.5);">THE</span>
+                <span id="fx-decode-cipher-${tplId}" style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #fde68a; text-shadow: 0 0 10px rgba(245,158,11,0.85);"></span>
+                <span style="display: inline-block; width: 4px; height: 10px; margin-left: 2px; background: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,0.9);" class="pulse-preview-badge"></span>
+              </div>
             </div>
           </div>
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: rgba(0, 240, 255, 0.2); border: 1px solid rgba(0, 240, 255, 0.5); color: #00f0ff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 4; box-shadow: 0 4px 10px rgba(0,0,0,0.6);">
-            ⚡ 3D TACTICAL TRACE
+          <div style="position: absolute; bottom: 7px; left: 12px; right: 12px; display: flex; justify-content: space-between; font-family: 'Courier New', monospace; font-size: 6.5px; color: rgba(148,163,184,0.7); letter-spacing: 1px; z-index: 3;">
+            <span>SEC FILING // 10-K</span>
+            <span style="color: rgba(245,158,11,0.9);">24.0 FPS · KINETIC 3D</span>
           </div>
         </div>
       `;
@@ -28250,50 +30494,11 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       `;
     } else if (tplId === 'spatial-3d-motion-suite') {
       fxContainer.innerHTML = `
-        <div style="position: absolute; inset: 0; background: radial-gradient(ellipse 90% 75% at 50% 45%, #0d121f 0%, #06080f 65%, #030408 100%); overflow: hidden; perspective: 900px; display: flex; align-items: center; justify-content: center; user-select: none;">
-          <!-- Clean Perspective Floor Grid (No Fake Triangle Cones) -->
-          <div id="fx-spatial-grid-${tplId}" style="position: absolute; left: -40%; right: -40%; bottom: -35%; height: 85%; background-image: linear-gradient(to right, rgba(148,163,184,0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(217,119,6,0.16) 1px, transparent 1px); background-size: 34px 26px; transform-origin: 50% 0%; transform: rotateX(75deg) translateZ(-20px); mask-image: radial-gradient(ellipse 70% 80% at 50% 45%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.35) 55%, transparent 88%); -webkit-mask-image: radial-gradient(ellipse 70% 80% at 50% 45%, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.35) 55%, transparent 88%); pointer-events: none;"></div>
-
-          <!-- Left Corridor Real Photographic Plate (Angled Inward on Left Wall) -->
-          <div id="fx-spatial-card1-${tplId}" style="position: absolute; left: 2.5%; top: 14%; width: 25%; height: 46%; background: #0b0f19; border: 1px solid rgba(255,255,255,0.16); border-radius: 5px; box-shadow: 0 18px 36px rgba(0,0,0,0.95); pointer-events: none; transform-origin: left center; transform: rotateY(28deg) rotateX(3deg); overflow: hidden; z-index: 3; display: flex; flex-direction: column;">
-            <div style="position: relative; width: 100%; height: 68%; overflow: hidden; background: #05070c;">
-              <img src="/paper_tear_stock_archival_news.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.12) brightness(0.82) sepia(0.15);" />
-              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, transparent 55%);"></div>
-              <span style="position: absolute; top: 4px; left: 5px; padding: 1px 4px; border-radius: 2px; background: rgba(185,28,28,0.85); color: #fff; font-family: monospace; font-size: 4.5px; font-weight: 800; letter-spacing: 0.5px;">VERIFIED</span>
-            </div>
-            <div style="padding: 4px 6px; display: flex; flex-direction: column; justify-content: center; flex: 1; border-top: 1px solid rgba(217,119,6,0.35);">
-              <div style="font-size: 4.5px; font-weight: 700; color: #f59e0b; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DEPT. TREASURY // CLASSIFIED</div>
-              <div style="font-size: 6.5px; font-weight: 800; color: #f8fafc; font-family: 'Cinzel', Georgia, serif; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CONFIDENTIAL SCAN</div>
-            </div>
-          </div>
-
-          <!-- Right Corridor Real Photographic Plate (Angled Inward on Right Wall) -->
-          <div id="fx-spatial-card2-${tplId}" style="position: absolute; right: 2.5%; bottom: 12%; width: 25%; height: 46%; background: #0b0f19; border: 1px solid rgba(255,255,255,0.16); border-radius: 5px; box-shadow: 0 18px 36px rgba(0,0,0,0.95); pointer-events: none; transform-origin: right center; transform: rotateY(-28deg) rotateX(-2deg); overflow: hidden; z-index: 3; display: flex; flex-direction: column;">
-            <div style="position: relative; width: 100%; height: 68%; overflow: hidden; background: #05070c;">
-              <img src="/boardroom_scene_hd.jpg" alt="" style="width: 100%; height: 100%; object-fit: cover; filter: contrast(1.15) brightness(0.84);" />
-              <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, transparent 55%);"></div>
-              <span style="position: absolute; top: 4px; right: 5px; padding: 1px 4px; border-radius: 2px; background: rgba(15,23,42,0.9); border: 1px solid rgba(245,158,11,0.5); color: #fef08a; font-family: monospace; font-size: 4.5px; font-weight: 800;">EXHIBIT B</span>
-            </div>
-            <div style="padding: 4px 6px; display: flex; flex-direction: column; justify-content: center; flex: 1; border-top: 1px solid rgba(217,119,6,0.35);">
-              <div style="font-size: 4.5px; font-weight: 700; color: #94a3b8; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">FINANCIAL MONOPOLY LEDGER</div>
-              <div style="font-size: 6.2px; font-weight: 800; color: #f8fafc; font-family: 'Cinzel', Georgia, serif; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">CAPITAL FLOW $84.2B</div>
-            </div>
-          </div>
-
-          <!-- Center Runway Hero Gold Title (Flies Cleanly Down the Middle Between Flanking Plates) -->
-          <div id="fx-spatial-plate-${tplId}" style="position: relative; z-index: 6; text-align: center; transform-style: preserve-3d; transition: transform 0.05s ease-out; max-width: 52%; padding: 4px 8px;">
-            <h3 style="font-family: 'Cinzel', Georgia, serif; font-size: 21px; font-weight: 900; letter-spacing: 3.5px; background: linear-gradient(180deg, #fef08a 0%, #d97706 48%, #fde68a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; text-transform: uppercase; filter: drop-shadow(0 12px 20px rgba(0,0,0,0.95)); white-space: nowrap;">
-              THE SYSTEM
-            </h3>
-            <div style="width: 82%; height: 1px; background: linear-gradient(90deg, transparent, #d97706, transparent); margin: 5px auto;"></div>
-            <span style="font-family: 'Inter', -apple-system, sans-serif; font-size: 6.5px; font-weight: 600; letter-spacing: 2.2px; color: #cbd5e1; text-transform: uppercase; display: block; white-space: nowrap;">
-              MANIPULATION &amp; CONTROL
-            </span>
-          </div>
-
-          <!-- Elegant Badge tag -->
-          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 4px; background: rgba(15,23,42,0.9); border: 1px solid #d97706; color: #fde68a; font-size: 8px; font-weight: 800; letter-spacing: 0.05em; z-index: 10;">
-            3D SPATIAL RIG
+        <div style="position: absolute; inset: 0; background: #05070c; overflow: hidden; display: flex; align-items: center; justify-content: center; user-select: none;">
+          <img src="/spatial_3d_real_snapshot.jpg?v=3" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45;" />
+          <canvas id="fx-spatial-live-webgl-${tplId}" width="640" height="360" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; z-index: 2;"></canvas>
+          <div id="fx-spatial-hover-badge-${tplId}" style="position: absolute; top: 8px; right: 8px; padding: 2px 7px; border-radius: 4px; background: rgba(6, 10, 20, 0.88); border: 1px solid rgba(245, 158, 11, 0.65); color: #fde68a; font-family: 'JetBrains Mono', monospace; font-size: 7.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 10; pointer-events: none;">
+            3D LIVE PRESET
           </div>
         </div>
       `;
@@ -28453,13 +30658,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-    } else if (tplId === 'document-barrage-suite') {
-      if (typeof window.stepDocumentBarrageAnimation === 'function') {
-        const docConfig = (typeof window.tplGetContextualData === 'function')
-          ? window.tplGetContextualData('document-barrage-suite')
-          : (window.DOCUMENT_BARRAGE_CONFIG || {});
-        window.stepDocumentBarrageAnimation(fxContainer, tplId, t, docConfig);
-      }
     } else if (tplId === 'jani-puzzle-narrative-suite') {
       if (typeof window.buildPuzzleStageHtml === 'function') {
         const pzConfig = (typeof window.tplGetContextualData === 'function') 
@@ -28719,42 +30917,23 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
-        } else if (tplId === 'countdown-timer') {
-      if (typeof window.stepCountdownTimerAnimation === 'function') {
-        const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('countdown-timer') : (typeof window.getCountdownTimerDefaultConfig === 'function' ? window.getCountdownTimerDefaultConfig() : {});
-        if (!fxContainer.querySelector('#cdt-wrapper') && typeof window.tplMountCountdownTimerStage === 'function') {
-          window.tplMountCountdownTimerStage(fxContainer, cdtData);
-        }
-        window.stepCountdownTimerAnimation(fxContainer, tplId, t, cdtData);
+    } else if (tplId === 'jani-spin-flash-glitch-reveal') {
+      if (typeof window.buildSpinFlashGlitchHtml === 'function') {
+        const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
+        fxContainer.innerHTML = window.buildSpinFlashGlitchHtml(tplId, sfgData);
       }
-} else if (tplId === 'circular-spin-flashlight-glitch') {
-      if (typeof window.stepCircularSpinFlashAnimation === 'function') {
-        const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : (typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : {});
-        if (!fxContainer.querySelector('#csf-wrapper') && typeof window.tplMountCircularSpinFlashStage === 'function') {
-          window.tplMountCircularSpinFlashStage(fxContainer, csfData);
-        }
-        window.stepCircularSpinFlashAnimation(fxContainer, tplId, t, csfData);
+    } else if (tplId === 'jani-flash-quad-sequence') {
+      if (typeof window.buildFlashQuadHtml === 'function') {
+        const fqData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-flash-quad-sequence') : (window.JANI_FLASH_QUAD_CONFIG || {});
+        fxContainer.innerHTML = window.buildFlashQuadHtml(tplId, fqData);
       }
-} else   if (tplId === 'countdown-timer') {
-    if (typeof window.stepCountdownTimerAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('countdown-timer') : {};
-      window.stepCountdownTimerAnimation(stage, 'countdown-timer', localSceneT, cdtData);
-    }
-  }
-
-  if (tplId === 'circular-spin-flashlight-glitch') {
-    if (typeof window.stepCircularSpinFlashAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : (typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : {});
-      window.stepCircularSpinFlashAnimation(stage, 'circular-spin-flashlight-glitch', localSceneT, csfData);
-    }
-  }
-
-  if (tplId === 'jani-cross-section-reveal') {
+    } else if (tplId === 'jani-cross-section-reveal') {
+      const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
+      if (typeof window.buildCrossSectionHtml === 'function') {
+        fxContainer.innerHTML = window.buildCrossSectionHtml(tplId, cData);
+      }
       if (typeof window.stepJaniCrossSectionAnimation === 'function') {
-        const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
-        window.stepJaniCrossSectionAnimation(fxContainer, tplId, t, cData);
+        window.stepJaniCrossSectionAnimation(fxContainer, tplId, 0, cData);
       }
     } else if (tplId === 'jani-forbes-fraud-reveal') {
       const jData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-forbes-fraud-reveal') : (window.JANI_FORBES_CONFIG || {});
@@ -28832,33 +31011,16 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
     } else if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #020b14; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-          <img id="fx-creator-bg-${tplId}" src="/creator_background_plate.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(28px) brightness(65%) contrast(125%);" />
+          <img id="fx-creator-bg-${tplId}" src="/creator_studio_bokeh_preset.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(22px) brightness(72%) contrast(125%);" />
           <div style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, 0.45) 0%, rgba(30, 58, 138, 0.15) 55%, transparent 75%);"></div>
           <div style="position: absolute; left: 8%; top: 60%; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.5) 0%, transparent 70%); filter: blur(12px);"></div>
           <div style="position: absolute; right: 8%; top: 50%; width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.45) 0%, transparent 70%); filter: blur(14px);"></div>
-          <div style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.85); z-index: 12;">this AI company</div>
-          <div style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', sans-serif; font-weight: 900; font-size: 22px; color: #ffffff; text-shadow: 0 4px 12px rgba(0,0,0,0.85); z-index: 12;">VOICE</div>
-          <img id="fx-creator-fg-${tplId}" src="/creator_portrait_cutout.png" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10;" />
-          <div id="fx-creator-lock-${tplId}" style="position: absolute; width: 85px; height: 105px; border: 1.5px dashed #38bdf8; border-radius: 50%; left: 49.5%; top: 35%; transform: translate(-50%, -50%); z-index: 20; display: flex; align-items: center; justify-content: center; pointer-events: none;">
-            <span style="position: absolute; top: -14px; font-family: monospace; font-size: 6px; font-weight: 800; color: #38bdf8; background: rgba(2,6,23,0.9); padding: 1px 4px; border-radius: 3px;">LOCK: FACE</span>
-          </div>
-          <div style="position: absolute; bottom: 8px; left: 10px; z-index: 25; pointer-events: none;">
-            <span id="fx-creator-meter-${tplId}" style="font-family: monospace; font-size: 7.5px; font-weight: 800; color: #38bdf8; background: rgba(2,6,23,0.85); border: 1px solid rgba(56,189,248,0.3); padding: 2px 6px; border-radius: 4px;">DOF: 28px BLUR // FACE LOCK: ON</span>
-          </div>
         </div>
       `;
     } else if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
-      const blurVal = 24 + Math.sin(t * 1.5) * 8;
+      const blurVal = 22 + Math.sin(t * 1.5) * 6;
       const bgImg = fxContainer?.querySelector(`#fx-creator-bg-${tplId}`);
-      const fgImg = fxContainer?.querySelector(`#fx-creator-fg-${tplId}`);
-      const lockBox = fxContainer?.querySelector(`#fx-creator-lock-${tplId}`);
-      const meter = fxContainer?.querySelector(`#fx-creator-meter-${tplId}`);
-      if (bgImg) bgImg.style.filter = `blur(${blurVal.toFixed(1)}px) brightness(65%) contrast(125%)`;
-      if (meter) meter.textContent = `DOF: ${blurVal.toFixed(1)}px BLUR // FACE LOCK: SMOOTH`;
-      const swayX = Math.sin(t * 1.2) * 3;
-      const swayY = Math.cos(t * 1.0) * 2;
-      if (fgImg) fgImg.style.transform = `translate(${swayX.toFixed(1)}px, ${swayY.toFixed(1)}px)`;
-      if (lockBox) lockBox.style.transform = `translate(calc(-50% + ${swayX.toFixed(1)}px), calc(-50% + ${swayY.toFixed(1)}px))`;
+      if (bgImg) bgImg.style.filter = `blur(${blurVal.toFixed(1)}px) brightness(72%) contrast(125%)`;
     } else if (tplId === 'magnates-media-cc-vignette-dof') {
       fxContainer.innerHTML = `
         <div style="position: absolute; inset: 0; background: #03050c; overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -29311,9 +31473,14 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
   }
 
   function animateHoverLoop(now) {
+    const resolveSpeedMult = (raw) => {
+      const n = Number(raw);
+      if (isNaN(n) || n === 0) return 1;
+      return n < 0 ? Math.max(0.1, 1 / (1 + Math.abs(n))) : n;
+    };
     const t = manual
-      ? manual.t * ((manual.fx && manual.fx.speed) || 1)
-      : ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? ((window.tpl3DFx && window.tpl3DFx.speed) || 1) : 1);
+      ? manual.t * resolveSpeedMult(manual.fx && manual.fx.speed)
+      : ((hoverBridgeActive && hoverExternalT !== null) ? hoverExternalT : (now - hoverStartTime) / 1000) * (hoverBridgeActive ? resolveSpeedMult(window.tpl3DFx && window.tpl3DFx.speed) : 1);
     const _fx = manual ? Object.assign({ pitch: 0, yaw: 0, roll: 0, zoom: 1 }, manual.fx || {}) : ((hoverBridgeActive && window.tpl3DFx) ? window.tpl3DFx : { pitch: 0, yaw: 0, roll: 0, zoom: 1 });
 
     if (tplId === 'pyramid-scheme') {
@@ -29564,17 +31731,31 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         leak.style.transform = `translateX(${sweep.toFixed(1)}px)`;
       }
     } else if (tplId === 'kinetic-decode-typewriter') {
-      // Matrix-style character scrambling decode loop
+      // Fast Dynamic Expanding Container & Leading-Edge Decode Hover Preview
       const targetWord = "THE ILLUSION OF CHOICE";
-      const glyphs = "!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      const progress = Math.min(1, (t * 0.8) % 1.25);
-      const charsRevealed = Math.floor(progress * targetWord.length);
-      let displayed = targetWord.substring(0, charsRevealed);
+      const glyphs = "0123456789ABCDEF§‡ΔØ¶#%&*";
+      const cycle = (t * 0.85) % 1.45;
+      const progress = Math.min(1, cycle / 0.88);
+      const charsRevealed = Math.max(1, Math.floor(progress * targetWord.length));
+      const lockedStr = targetWord.substring(0, charsRevealed);
+      let cipherStr = "";
       if (charsRevealed < targetWord.length) {
-        displayed += glyphs[Math.floor((t * 50) % glyphs.length)];
+        cipherStr = glyphs[Math.floor((t * 40) % glyphs.length)];
       }
       const decodeSpan = fxContainer?.querySelector(`#fx-decode-text-${tplId}`);
-      if (decodeSpan) decodeSpan.textContent = displayed;
+      if (decodeSpan) decodeSpan.textContent = lockedStr;
+      const cipherSpan = fxContainer?.querySelector(`#fx-decode-cipher-${tplId}`);
+      if (cipherSpan) cipherSpan.textContent = cipherStr;
+      const hlBar = fxContainer?.querySelector(`#fx-decode-hl-${tplId}`);
+      if (hlBar) {
+        const hlProg = Math.max(0, Math.min(1, (progress - 0.68) / 0.32));
+        hlBar.style.width = `${(hlProg * 28).toFixed(1)}%`;
+      }
+      const bgImg = fxContainer?.querySelector(`#fx-decode-bg-${tplId}`);
+      if (bgImg) {
+        const scale = 1.0 + (cycle / 1.45) * 0.06;
+        bgImg.style.transform = `scale(${scale.toFixed(4)})`;
+      }
     } else if (tplId === 'magnates-paper-vector-cutout') {
       // 3D Parallax floating of cutout sticker over background and breathing scale on text behind
       const stickerPanX = Math.sin(t * 2.4) * 14;
@@ -29638,38 +31819,9 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
       if (cyanEl) cyanEl.style.transform = `translate(${glitchX}px, 0) scale(1.06)`;
       if (redEl) redEl.style.transform = `translate(${-glitchX}px, 0) scale(1.04)`;
     } else if (tplId === 'spatial-3d-motion-suite') {
-      // True Center-Corridor Fly-Through: Camera glides down the middle while flanking photo plates sweep past the left & right walls
-      const zoomCycle = (Math.sin(t * 0.9 - Math.PI / 2) + 1) / 2; // 0 to 1 smooth dolly
-      const clampedZoom = Math.max(0.82, Math.min(1.12, _fx.zoom || 1));
-      const camZProgress = (0.94 + zoomCycle * 0.14) * clampedZoom;
-      const camPitch = Math.max(-8, Math.min(8, 3 - zoomCycle * 5 + (_fx.pitch || 0) * 0.3));
-      const camYaw = Math.max(-8, Math.min(8, Math.sin(t * 0.85) * 3.5 + (_fx.yaw || 0) * 0.3));
-      const camRoll = Math.max(-6, Math.min(6, (_fx.roll || 0) * 0.3));
-
-      const plate = fxContainer?.querySelector(`#fx-spatial-plate-${tplId}`);
-      const grid = fxContainer?.querySelector(`#fx-spatial-grid-${tplId}`);
-      const card1 = fxContainer?.querySelector(`#fx-spatial-card1-${tplId}`);
-      const card2 = fxContainer?.querySelector(`#fx-spatial-card2-${tplId}`);
-
-      if (plate) {
-        plate.style.transform = `scale(${camZProgress.toFixed(3)}) rotateY(${camYaw.toFixed(2)}deg) rotateX(${camPitch.toFixed(2)}deg) rotateZ(${camRoll.toFixed(2)}deg)`;
-      }
-      if (grid) {
-        const gridZ = -15 - zoomCycle * 32;
-        grid.style.transform = `rotateX(75deg) translateZ(${gridZ.toFixed(1)}px) translateY(${(zoomCycle * 14).toFixed(1)}px)`;
-      }
-      // Flanking plates glide outward along the left & right corridor walls so camera moves cleanly in the middle
-      if (card1) {
-        const c1Scale = 0.88 + zoomCycle * 0.22;
-        const c1X = -zoomCycle * 10;
-        const c1Y = Math.sin(t * 1.4) * 3;
-        card1.style.transform = `translate3d(${c1X.toFixed(1)}px, ${c1Y.toFixed(1)}px, 0) scale(${c1Scale.toFixed(3)}) rotateY(${(28 + camYaw * 0.35).toFixed(1)}deg) rotateX(3deg)`;
-      }
-      if (card2) {
-        const c2Scale = 0.88 + (1 - zoomCycle) * 0.22;
-        const c2X = (1 - zoomCycle) * 10;
-        const c2Y = -Math.sin(t * 1.4) * 3;
-        card2.style.transform = `translate3d(${c2X.toFixed(1)}px, ${c2Y.toFixed(1)}px, 0) scale(${c2Scale.toFixed(3)}) rotateY(${(-28 + camYaw * 0.35).toFixed(1)}deg) rotateX(-2deg)`;
+      // Render the REAL Three.js 3D WebGL scene & active preset directly onto the hover preview canvas!
+      if (typeof window.tplRenderSpatialHoverCanvas === 'function') {
+        window.tplRenderSpatialHoverCanvas(fxContainer, tplId, t, _fx);
       }
     } else if (tplId === 'doc-highlighter-loupe-suite' || tplId === 'magnates-media-article-highlight') {
       const yellowBar = fxContainer?.querySelector(`#fx-doc-hl-yellow-${tplId}`);
@@ -29725,13 +31877,6 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const shadowOpacity = 0.35 + eased * 0.38;
 
         extractedStrip.style.boxShadow = `0 ${shadowY}px ${shadowBlur}px ${shadowSpread}px rgba(8, 6, 4, ${shadowOpacity}), 0 4px 12px rgba(8, 6, 4, 0.4)`;
-      }
-    } else if (tplId === 'document-barrage-suite') {
-      if (typeof window.stepDocumentBarrageAnimation === 'function') {
-        const docConfig = (typeof window.tplGetContextualData === 'function')
-          ? window.tplGetContextualData('document-barrage-suite')
-          : (window.DOCUMENT_BARRAGE_CONFIG || {});
-        window.stepDocumentBarrageAnimation(fxContainer, tplId, t, docConfig);
       }
     } else if (tplId === 'jani-puzzle-narrative-suite') {
       if (typeof window.stepJaniPuzzleAnimation === 'function') {
@@ -29859,15 +32004,17 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const shakeMag = (1 - impactProg) * 8;
         if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
       }
-        } else if (tplId === 'circular-spin-flashlight-glitch') {
-      if (typeof window.stepCircularSpinFlashAnimation === 'function') {
-        const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : (typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : {});
-        if (!fxContainer.querySelector('#csf-wrapper') && typeof window.tplMountCircularSpinFlashStage === 'function') {
-          window.tplMountCircularSpinFlashStage(fxContainer, csfData);
-        }
-        window.stepCircularSpinFlashAnimation(fxContainer, tplId, t, csfData);
+        } else if (tplId === 'jani-spin-flash-glitch-reveal') {
+      if (typeof window.stepJaniSpinFlashGlitchAnimation === 'function') {
+        const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
+        window.stepJaniSpinFlashGlitchAnimation(fxContainer, tplId, t, sfgData);
       }
-} else if (tplId === 'jani-cross-section-reveal') {
+    } else if (tplId === 'jani-flash-quad-sequence') {
+      if (typeof window.stepJaniFlashQuadAnimation === 'function') {
+        const fqData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-flash-quad-sequence') : (window.JANI_FLASH_QUAD_CONFIG || {});
+        window.stepJaniFlashQuadAnimation(fxContainer, tplId, t, fqData);
+      }
+    } else if (tplId === 'jani-cross-section-reveal') {
       if (typeof window.stepJaniCrossSectionAnimation === 'function') {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
         window.stepJaniCrossSectionAnimation(fxContainer, tplId, t, cData);
@@ -30299,7 +32446,77 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const ff = String(Math.floor((t % 1) * 24)).padStart(2, '0');
         tcEl.textContent = `${baseDate}  ${hh}:${mm}:${ss}:${ff}`;
       }
-    } else if (['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','parallax','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur','interview-cutin','power-meeting'].concat(BIZ_STORY_IDS).includes(tplId)) {
+    } else if (tplId === 'parallax') {
+      // Multi-Layer Depth Parallax driven by clean unidirectional Push In / Pull Out progression
+      const layerBack = fxContainer?.querySelector('.tpl-parallax .layer-back');
+      const layerMid = fxContainer?.querySelector('.tpl-parallax .layer-mid');
+      const layerFront = fxContainer?.querySelector('.tpl-parallax .layer-front');
+      const layerTxt = fxContainer?.querySelector('.tpl-parallax .layer-text-behind');
+      const mtnBack = fxContainer?.querySelector('.tpl-parallax .mtn-back');
+      const hasState = typeof topCustomizerState !== 'undefined' && topCustomizerState.currentTpl?.id === 'parallax';
+      const dur = Math.max(2, (hasState && topCustomizerState.duration) ? topCustomizerState.duration : 6);
+      const cycleProgress = ((t % dur) + dur) % dur / dur; // 0..1 across scene duration
+      // Smooth unidirectional ease-out progression (0.0 -> 1.0) across the scene duration (no circular ping-pong!)
+      const p = 1 - Math.pow(1 - cycleProgress, 2.2);
+      const depthMult = hasState ? ((topCustomizerState.depth || 65) / 65) : 1.0;
+      const fgDir = (hasState && topCustomizerState.spoonerFgDir) ? topCustomizerState.spoonerFgDir : 'push';
+      const bgDir = (hasState && topCustomizerState.spoonerBgDir) ? topCustomizerState.spoonerBgDir : 'pull';
+      const txtDir = (hasState && topCustomizerState.spoonerTxtDir) ? topCustomizerState.spoonerTxtDir : 'off';
+      const maxFgZoom = 1.0 + (((hasState && topCustomizerState.spoonerFgZoom !== undefined) ? topCustomizerState.spoonerFgZoom : 1.22) - 1.0) * depthMult;
+      const maxBgZoom = 1.0 + (((hasState && topCustomizerState.spoonerBgZoom !== undefined) ? topCustomizerState.spoonerBgZoom : 1.16) - 1.0) * depthMult;
+      // Default horizontal pan is 0 so layers purely Push In and Pull Out along the Z-depth axis without circular dancing
+      const maxPan = ((hasState && topCustomizerState.spoonerPan !== undefined) ? topCustomizerState.spoonerPan : 0) * depthMult;
+      const blurPx = (hasState && topCustomizerState.spoonerBlur !== undefined) ? topCustomizerState.spoonerBlur : 0.0;
+
+      let fgZoom = 1.0;
+      if (fgDir === 'push') fgZoom = 1.0 + p * (maxFgZoom - 1.0);
+      else if (fgDir === 'pull') fgZoom = maxFgZoom - p * (maxFgZoom - 1.0);
+      else fgZoom = 1.04;
+
+      let bgZoom = 1.0;
+      if (bgDir === 'push') bgZoom = 1.0 + p * (maxBgZoom - 1.0);
+      else if (bgDir === 'pull') bgZoom = maxBgZoom - p * (maxBgZoom - 1.0);
+      else bgZoom = 1.05;
+
+      // Linear horizontal drift only if user explicitly sets Horizontal Drift > 0
+      const panProgress = (p - 0.5) * 2; // -1..+1
+      const fgPanX = panProgress * maxPan;
+      const bgPanX = -panProgress * (maxPan * 0.55);
+
+      if (layerFront) {
+        layerFront.style.animation = 'none';
+        layerFront.style.transformOrigin = 'center bottom';
+        layerFront.style.transform = `translate3d(${fgPanX.toFixed(2)}px, 0px, 0px) scale(${fgZoom.toFixed(4)})`;
+      }
+      if (layerMid) {
+        layerMid.style.animation = 'none';
+        layerMid.style.transformOrigin = 'center center';
+        layerMid.style.transform = `translate3d(${bgPanX.toFixed(2)}px, 0px, 0px) scale(${bgZoom.toFixed(4)})`;
+      }
+      if (mtnBack) {
+        mtnBack.style.filter = blurPx > 0
+          ? `blur(${blurPx.toFixed(1)}px) brightness(0.92) contrast(1.06)`
+          : 'brightness(0.92) contrast(1.06)';
+      }
+      if (layerBack) {
+        layerBack.style.animation = 'none';
+        layerBack.style.transformOrigin = 'center center';
+        const sunZoom = 1.0 + (bgZoom - 1.0) * 0.75;
+        layerBack.style.transform = `translate3d(${(bgPanX * 0.6).toFixed(2)}px, 0px, 0px) scale(${sunZoom.toFixed(4)})`;
+      }
+      if (layerTxt) {
+        if (!txtDir || txtDir === 'off') {
+          layerTxt.style.display = 'none';
+        } else {
+          layerTxt.style.display = 'flex';
+          let tZoom = 1.0;
+          if (txtDir === 'push') tZoom = 0.96 + p * 0.16;
+          else if (txtDir === 'pull') tZoom = 1.12 - p * 0.16;
+          else tZoom = 1.02;
+          layerTxt.style.transform = `translate3d(${(-fgPanX * 0.25).toFixed(2)}px, 0px, 0px) scale(${tZoom.toFixed(4)})`;
+        }
+      }
+    } else if (['zoom-blur','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','textbehind','docheight','kinetic','split','zoom','ceo-portrait','boardroom-zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand','screen-blur','interview-cutin','power-meeting'].concat(BIZ_STORY_IDS).includes(tplId)) {
       // Self-contained CSS keyframe animations, no generic shift needed
     } else {
       const shiftX = Math.sin(t * 3) * 14;
@@ -30336,6 +32553,9 @@ function stopTemplateHoverVideo(cardEl, tpl) {
   const playHover = cardEl.querySelector(`#play-hover-${tplId}`);
 
   if (fxContainer) {
+    if (fxContainer._fcmTimer) { clearInterval(fxContainer._fcmTimer); fxContainer._fcmTimer = null; }
+    if (fxContainer._ttTimer) { clearInterval(fxContainer._ttTimer); fxContainer._ttTimer = null; }
+    if (fxContainer._zbTimer) { clearInterval(fxContainer._zbTimer); fxContainer._zbTimer = null; }
     if (typeof window.unmountTesterTemplatePreview === 'function') {
       window.unmountTesterTemplatePreview(fxContainer);
     }
@@ -30599,33 +32819,52 @@ function applySelectedHomepageTemplate(templateId) {
       selectClip(grungeTitle, 'text');
     }
   } else if (templateId === 'kinetic-decode-typewriter') {
-    // Tension Matrix Decode & Typewriter Kinetic Text (3D Tactical Environmental Standard)
+    // Investigative Documentary Kinetic Decode & 3D Dossier
     const matrixClip = {
       id: `img-matrix-${Date.now()}`,
-      name: 'Tactical_Desk_Plate.png',
-      url: '/tactical_desk_hd_plate.png',
+      name: 'Investigative_Dossier_Plate.svg',
+      url: '/investigative_decode_dossier_plate.svg',
       start: 0,
       duration: 6,
       scale: 1.0,
       zIndex: 10,
       matrixRain: true,
-      matrixRainColor: topCustomizerState.matrixRainColor || '#00ff41',
+      matrixRainEnabled: topCustomizerState.matrixRainEnabled !== false,
+      matrixRainColor: topCustomizerState.matrixRainColor || '#f59e0b',
       matrixRainSpeed: topCustomizerState.matrixRainSpeed || 1.0,
-      matrixRainDensity: topCustomizerState.matrixRainDensity || 16,
+      matrixRainDensity: topCustomizerState.matrixRainDensity || 18,
+      textColor: topCustomizerState.textColor || '#f59e0b',
+      titleColor: topCustomizerState.titleColor || topCustomizerState.textColor || '#f59e0b',
+      decodeEnvPreset: topCustomizerState.decodeEnvPreset || 'darkroom-dossier',
+      decodeAnimStyle: topCustomizerState.decodeAnimStyle || 'expanding-decode',
+      decodeContainerStyle: topCustomizerState.decodeContainerStyle || 'none',
+      decodeSubContainer: !!topCustomizerState.decodeSubContainer,
+      decodeTextScale: topCustomizerState.decodeTextScale || 1.0,
+      decodeBoxScale: topCustomizerState.decodeBoxScale || 1.0,
+      decodeSubScale: topCustomizerState.decodeSubScale || 1.0,
+      matrixTypeSpeed: topCustomizerState.matrixTypeSpeed || 1.3,
+      mainText: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
+      subText: topCustomizerState.subText || 'EXHIBIT A · DECLASSIFIED',
       isTactical3D: true
     };
     const decodeTitle = {
       id: `txt-${Date.now() + 1}`,
       text: topCustomizerState.mainText || 'THE ILLUSION OF CHOICE',
-      subtitle: topCustomizerState.subText || '[ HIGH TENSION REVEAL ]',
-      textColor: topCustomizerState.textColor || '#00f0ff',
-      highlightColor: topCustomizerState.textColor || '#00f0ff',
+      subtitle: topCustomizerState.subText || 'EXHIBIT A · DECLASSIFIED',
+      textColor: topCustomizerState.titleColor || topCustomizerState.textColor || '#f59e0b',
+      highlightColor: topCustomizerState.textColor || '#f59e0b',
       anim: 'decode_typewriter',
-      matrixDecode: true,
+      matrixDecode: topCustomizerState.decodeAnimStyle !== 'expanding-clean',
+      decodeAnimStyle: topCustomizerState.decodeAnimStyle || 'expanding-decode',
+      decodeContainerStyle: topCustomizerState.decodeContainerStyle || 'none',
+      decodeSubContainer: !!topCustomizerState.decodeSubContainer,
+      decodeTextScale: topCustomizerState.decodeTextScale || 1.0,
+      decodeBoxScale: topCustomizerState.decodeBoxScale || 1.0,
+      decodeSubScale: topCustomizerState.decodeSubScale || 1.0,
       isTactical3D: true,
-      typeSpeed: topCustomizerState.matrixTypeSpeed || 1.0,
-      fontSize: 38,
-      fontFamily: 'monospace',
+      typeSpeed: topCustomizerState.matrixTypeSpeed || 1.3,
+      fontSize: 22,
+      fontFamily: topCustomizerState.decodeFontFamily || "'JetBrains Mono', 'Courier New', monospace",
       start: 0,
       duration: 6,
       zIndex: 20
@@ -31338,14 +33577,7 @@ function openTopTemplateCustomizer(tpl) {
         const eData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountEnvelope3DStage(stage, eData);
       }
-        } else if (tpl.id === 'countdown-timer') {
-      topCustomizerState.duration = 6;
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-      if (typeof window.tplMountCountdownTimerStage === 'function' && stage) {
-        window.tplMountCountdownTimerStage(stage, cdtData);
-      }
-} else if (tpl.id === 'jani-countdown-panic-suite') {
+    } else if (tpl.id === 'jani-countdown-panic-suite') {
       topCustomizerState.primaryUrl = '/countdown_warroom_clean_bg.png';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '/countdown_warroom_clean_bg.png';
@@ -31354,15 +33586,6 @@ function openTopTemplateCustomizer(tpl) {
       const cdData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
       if (typeof window.tplMountCountdown3DStage === 'function' && stage) {
         window.tplMountCountdown3DStage(stage, cdData);
-      }
-    } else if (tpl.id === 'merger-acquisition') {
-      topCustomizerState.primaryUrl = '/merger_acquisition_thumbnail.svg';
-      topCustomizerState.secondaryUrl = '';
-      topCustomizerState.originalPhotoUrl = '/merger_acquisition_thumbnail.svg';
-      if (typeof window.tplMountMergerAcqStage === 'function') {
-        const stage = document.getElementById('tpl-modal-preview-stage');
-        const maData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountMergerAcqStage(stage, maData);
       }
     } else if (tpl.id === 'deal-term-sheet') {
       topCustomizerState.primaryUrl = '/mahogany_desk_texture.jpg';
@@ -31404,14 +33627,23 @@ function openTopTemplateCustomizer(tpl) {
         const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountMoneyStack3DStage(stage, mData);
       }
-    } else if (tpl.id === 'document-barrage-suite') {
-      topCustomizerState.primaryUrl = 'legal_court_filing_doc1.svg';
-      topCustomizerState.secondaryUrl = 'legal_court_filing_doc2.svg';
-      topCustomizerState.originalPhotoUrl = 'legal_court_filing_doc1.svg';
-      if (typeof window.tplMountDocumentBarrageStage === 'function') {
+    } else if (tpl.id === 'jani-spin-flash-glitch-reveal') {
+      topCustomizerState.primaryUrl = '/interview_cutin_cinematic.jpg';
+      topCustomizerState.secondaryUrl = '/cinematic_split_scene.jpg';
+      topCustomizerState.originalPhotoUrl = '/interview_cutin_cinematic.jpg';
+      if (typeof window.tplMountJaniSpinFlashGlitchStage === 'function') {
         const stage = document.getElementById('tpl-modal-preview-stage');
-        const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountDocumentBarrageStage(stage, dbData);
+        const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountJaniSpinFlashGlitchStage(stage, sfgData);
+      }
+    } else if (tpl.id === 'jani-flash-quad-sequence') {
+      topCustomizerState.primaryUrl = '/assets/aistudio/image_463745bd.png';
+      topCustomizerState.secondaryUrl = '/assets/aistudio/image_174cfa38.png';
+      topCustomizerState.originalPhotoUrl = '/assets/aistudio/image_463745bd.png';
+      if (typeof window.tplMountJaniFlashQuadStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const fqData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountJaniFlashQuadStage(stage, fqData);
       }
     } else if (tpl.id === 'jani-cross-section-reveal') {
       topCustomizerState.primaryUrl = '/jani_cross_top.png';
@@ -31431,25 +33663,15 @@ function openTopTemplateCustomizer(tpl) {
         const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountForbes3DStage(stage, cData);
       }
-    } else if (tpl.id === 'jani-cinematic-letterbox') {
-    if (typeof window.tplJaniCinematicLetterboxMakeClips === 'function') {
-      const res = window.tplJaniCinematicLetterboxMakeClips(tpl, sceneStart, dur, opts);
-      imageClips = res.imageClips || [];
-      const vClips = res.videoClips || [];
-      textClips = res.textClips || [];
-      focusClip = res.focusClip;
-      if (vClips.length > 0) {
-        if (!timelineClips.video) timelineClips.video = [];
-        timelineClips.video = timelineClips.video.concat(vClips);
-      }
-    }
-  } else if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
-      topCustomizerState.primaryUrl = '/creator_portrait_cutout.png';
-      topCustomizerState.secondaryUrl = '/creator_background_plate.png';
-      topCustomizerState.originalPhotoUrl = '/creator_cinematic_portrait_ref.png';
+    } else if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')) {
+      topCustomizerState.primaryUrl = '';
+      topCustomizerState.primaryIsVideo = false;
+      topCustomizerState.secondaryUrl = '/creator_studio_bokeh_preset.png';
+      topCustomizerState.secondaryIsVideo = false;
+      topCustomizerState.originalPhotoUrl = '';
       topCustomizerState.bgRemoved = true;
-      topCustomizerState.hasTextBehind = true;
-      topCustomizerState.creatorMode = topCustomizerState.creatorMode || 'original';
+      topCustomizerState.hasTextBehind = false;
+      topCustomizerState.creatorMode = topCustomizerState.creatorMode || 'virtual';
       topCustomizerState.creatorVirtualPreset = topCustomizerState.creatorVirtualPreset || 'studio';
       topCustomizerState.creatorBlur = topCustomizerState.creatorBlur !== undefined ? topCustomizerState.creatorBlur : 28;
       topCustomizerState.creatorSoftness = topCustomizerState.creatorSoftness !== undefined ? topCustomizerState.creatorSoftness : 28;
@@ -31458,13 +33680,22 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.creatorWarmBokeh = topCustomizerState.creatorWarmBokeh !== undefined ? topCustomizerState.creatorWarmBokeh : true;
       topCustomizerState.creatorRim = topCustomizerState.creatorRim !== undefined ? topCustomizerState.creatorRim : 75;
       topCustomizerState.creatorFaceTrack = topCustomizerState.creatorFaceTrack !== undefined ? topCustomizerState.creatorFaceTrack : true;
+      topCustomizerState.creatorBgZoneMode = topCustomizerState.creatorBgZoneMode || 'auto-ground';
+      topCustomizerState.creatorHorizonAuto = topCustomizerState.creatorHorizonAuto !== undefined ? topCustomizerState.creatorHorizonAuto : true;
+      topCustomizerState.creatorHorizonPct = topCustomizerState.creatorHorizonPct !== undefined ? topCustomizerState.creatorHorizonPct : 100;
+      topCustomizerState.creatorDecontaminate = topCustomizerState.creatorDecontaminate !== undefined ? topCustomizerState.creatorDecontaminate : 92;
+      topCustomizerState.creatorEdgeChoke = topCustomizerState.creatorEdgeChoke !== undefined ? topCustomizerState.creatorEdgeChoke : 82;
       topCustomizerState.creatorSensitivity = topCustomizerState.creatorSensitivity !== undefined ? topCustomizerState.creatorSensitivity : 94;
       topCustomizerState.creatorBrushSize = topCustomizerState.creatorBrushSize || 35;
-      topCustomizerState.creatorTextLeft = topCustomizerState.creatorTextLeft || 'this AI company';
-      topCustomizerState.creatorTextRight = topCustomizerState.creatorTextRight || 'VOICE';
-      topCustomizerState.creatorBrushStrokes = topCustomizerState.creatorBrushStrokes || [];
+      topCustomizerState.creatorBrushActive = false;
+      topCustomizerState.creatorTextLeft = '';
+      topCustomizerState.creatorTextRight = '';
+      topCustomizerState.creatorBrushStrokes = [];
       topCustomizerState.creatorSmoothedX = 0;
       topCustomizerState.creatorSmoothedY = 0;
+      window._creatorDetectedBottomY = null;
+      window._creatorDetectedTopY = null;
+      window._creatorFrameLockCount = 0;
     } else if (tpl.id === 'magnates-media-article-highlight') {
       topCustomizerState.primaryUrl = '/magnates_article_highlight_thumbnail.svg';
       topCustomizerState.secondaryUrl = '';
@@ -31473,6 +33704,14 @@ function openTopTemplateCustomizer(tpl) {
       topCustomizerState.primaryUrl = '';
       topCustomizerState.secondaryUrl = '';
       topCustomizerState.originalPhotoUrl = '';
+      topCustomizerState.spoonerDir = 'push';
+      topCustomizerState.spoonerFgDir = 'push';
+      topCustomizerState.spoonerBgDir = 'pull';
+      topCustomizerState.spoonerTxtDir = 'off';
+      topCustomizerState.spoonerFgZoom = 1.22;
+      topCustomizerState.spoonerBgZoom = 1.16;
+      topCustomizerState.spoonerPan = 0;
+      topCustomizerState.spoonerBlur = 0.0;
     } else if (typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(tpl.id) && tpl.id !== 'magnates-media-article-highlight') {
       topCustomizerState.primaryUrl = '';
       topCustomizerState.secondaryUrl = '';
@@ -31499,9 +33738,7 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
   topCustomizerState.depth = 65;
-  topCustomizerState.duration = (tpl.id === 'merger-acquisition' && typeof window.MERGER_ACQ_TOTAL === 'function')
-    ? Math.max(1, Math.round(window.MERGER_ACQ_TOTAL(typeof window.tplGetContextualData === 'function' ? window.tplGetContextualData(tpl.id) : null) * 10) / 10)
-    : (parseInt(tpl.timeToApply) || 6);
+  topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
   topCustomizerState.isPlaying = true;
   const isCutoutTpl = tpl.id === 'subject-25d-parallax' || tpl.id === 'spooner-2-5d-photo-parallax' || tpl.id === 'magnates-paper-vector-cutout';
   topCustomizerState.bgRemoved = isCutoutTpl;
@@ -31532,14 +33769,16 @@ function openTopTemplateCustomizer(tpl) {
     'map', 'paper-rip-shred',
     'spooner-2-5d-photo-parallax', 'subject-25d-parallax', 'parallax-zoom',
     'directional-push-split-wipe', 'gold-frame-spin', 'dark-power-sigil',
-    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board', 'deal-term-sheet', 'scam-redaction'
+    'doc-highlighter-loupe-suite', 'magnates-media-article-highlight', 'empire-timeline', 'google', 'empire-map', 'conspiracy-board', 'deal-term-sheet', 'scam-redaction', 'checklist', 'progress'
   ]);
   const isSidebar3DManaged = tpl.id === 'spatial-3d-motion-suite' || tpl.id === 'document-3d-fx-engine';
-  const showStage3DSwitcher = !isSidebar3DManaged && RELEVANT_3D_SWITCH_IDS.has(tpl.id);
+  // Show the [ ▶ Video ] [ ⬡ 3D ] stage switcher across ALL templates so every template can toggle between Video & 3D
+  const showStage3DSwitcher = !isSidebar3DManaged;
   if (paperModeSwitcher) paperModeSwitcher.style.display = showStage3DSwitcher ? 'flex' : 'none';
 
-  // Automatically activate 3D Mode by default for any 3D capable template!
-  const has3DCapability = RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (tpl.category === '3D / Spatial') || (tpl.category === '3D Spatial') || (tpl.origCategory === '3D / Spatial') || (tpl.origCategory === '3D Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id));
+  // For Google Search and Progress HUD, default to front-facing Reference Image 3 / 4 Video view unless user clicks 3D
+  const defaultToVideoView = (tpl.id === 'google' || tpl.id === 'progress' || tpl.id === 'scam-redaction');
+  const has3DCapability = !defaultToVideoView && (RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (tpl.category === '3D / Spatial') || (tpl.category === '3D Spatial') || (tpl.origCategory === '3D / Spatial') || (tpl.origCategory === '3D Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)));
   if (has3DCapability) {
     topCustomizerState.paperPreviewMode = '3d';
     topCustomizerState.is3DMode = true;
@@ -31552,26 +33791,25 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: true });
     }
-    if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
-      window.tplSetContextualData('google', { is3DMode: true });
-    }
     if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('deal-term-sheet', { is3DMode: true });
     }
     if (tpl.id === 'pyramid-scheme' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('pyramid-scheme', { is3DMode: true });
     }
-    if (tpl.id === 'scam-redaction') {
-      topCustomizerState.paperPreviewMode = 'video';
-      topCustomizerState.is3DMode = false;
-      if (typeof window.tplSetContextualData === 'function') {
-        window.tplSetContextualData('scam-redaction', { is3DMode: false });
-      }
+  } else {
+    topCustomizerState.paperPreviewMode = 'video';
+    topCustomizerState.is3DMode = false;
+    if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('google', { is3DMode: false, tiltX: 0, tiltY: 0 });
+    }
+    if (tpl.id === 'scam-redaction' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('scam-redaction', { is3DMode: false });
     }
   }
 
   const syncPaperModeButtons = () => {
-    let is3D = topCustomizerState.paperPreviewMode === '3d';
+    let is3D = topCustomizerState.paperPreviewMode === '3d' || !!topCustomizerState.is3DMode;
     if (tpl.id === 'map' && typeof window.tplGetContextualData === 'function') {
       is3D = !!window.tplGetContextualData('map').is3DMode;
     } else if (tpl.id === 'empire-map' && typeof window.tplGetContextualData === 'function') {
@@ -31586,8 +33824,6 @@ function openTopTemplateCustomizer(tpl) {
       is3D = !!window.tplGetContextualData('scam-redaction').is3DMode;
     } else if (tpl.id === 'pyramid-scheme' && typeof window.tplGetContextualData === 'function') {
       is3D = window.tplGetContextualData('pyramid-scheme').is3DMode !== false;
-    } else if (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)) {
-      is3D = true;
     }
     [[paperModeVideo, !is3D], [paperMode3D, is3D]].forEach(([button, active]) => {
       if (!button) return;
@@ -31603,16 +33839,21 @@ function openTopTemplateCustomizer(tpl) {
       window.tplSetContextualData('map', { is3DMode: false, drawOnScreenMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('map');
     }
-    if (tpl.id === 'empire-map' && typeof window.tplSetContextualData === 'function') {
-      window.tplSetContextualData('empire-map', { is3DMode: true });
-    }
     if (tpl.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('empire-timeline', { is3DMode: false });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
     }
     if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
-      window.tplSetContextualData('google', { is3DMode: false, styleMode: 'classic' });
+      window.tplSetContextualData('google', { is3DMode: false, tiltX: 0, tiltY: 0 });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
+    }
+    if (tpl.id === 'progress' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('progress', { is3DMode: false, tiltX: 0, tiltY: 0 });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('progress');
+    }
+    if (tpl.id === 'checklist' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('checklist', { tiltAngleX: 0, tiltAngleY: 0 });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('checklist');
     }
     if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('deal-term-sheet', { is3DMode: false });
@@ -31649,8 +33890,16 @@ function openTopTemplateCustomizer(tpl) {
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('empire-timeline');
     }
     if (tpl.id === 'google' && typeof window.tplSetContextualData === 'function') {
-      window.tplSetContextualData('google', { is3DMode: true, styleMode: 'cinematic' });
+      window.tplSetContextualData('google', { is3DMode: true, styleMode: 'cinematic', tiltY: -18, tiltX: 8 });
       if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('google');
+    }
+    if (tpl.id === 'progress' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('progress', { is3DMode: true, tiltY: -14, tiltX: 8 });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('progress');
+    }
+    if (tpl.id === 'checklist' && typeof window.tplSetContextualData === 'function') {
+      window.tplSetContextualData('checklist', { tiltAngleX: 18, tiltAngleY: -10 });
+      if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('checklist');
     }
     if (tpl.id === 'deal-term-sheet' && typeof window.tplSetContextualData === 'function') {
       window.tplSetContextualData('deal-term-sheet', { is3DMode: true });
@@ -31689,8 +33938,8 @@ function openTopTemplateCustomizer(tpl) {
   // 2. Populate Media inputs and thumbs
   const primaryThumb = document.getElementById('tpl-modal-thumb-primary');
   const primaryInput = document.getElementById('tpl-modal-url-primary');
-  const fallbackThumbP = (tpl.id === 'parallax')
-    ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="%230b0d14"/><polygon points="10,28 16,6 22,28" fill="%2338bdf8"/></svg>'
+  const fallbackThumbP = (tpl.id === 'parallax' || tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite')
+    ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><rect width="32" height="32" fill="%230b0d14"/><circle cx="16" cy="12" r="5" fill="none" stroke="%2338bdf8" stroke-width="1.8" stroke-dasharray="2 2"/><path d="M8,27 C8,21 24,21 24,27" fill="none" stroke="%2338bdf8" stroke-width="1.8" stroke-dasharray="2 2"/></svg>'
     : (tpl.id === 'magnates-media-article-highlight' ? '/magnates_article_highlight_thumbnail.svg' : (tpl.id === 'doc-highlighter-loupe-suite' ? '/forbes_article_hd.svg' : (tpl.defaultImage || '')));
   const finalPrimarySrc = topCustomizerState.primaryUrl || fallbackThumbP;
   if (primaryThumb) {
@@ -31705,12 +33954,13 @@ function openTopTemplateCustomizer(tpl) {
   if (primaryFilename) {
     const rawP = topCustomizerState.primaryUrl || '';
     let cleanP = (tpl.id === 'parallax') ? 'Foreground Silhouette' : 'Subject Cutout';
-    if (rawP.startsWith('blob:')) cleanP = 'Uploaded Asset';
+    if ((tpl.id === 'creator-cinematic-studio' || tpl.id === 'creator-cinematic-backdrop-suite') && !rawP) cleanP = 'Add Speaker Video...';
+    else if (rawP.startsWith('blob:')) cleanP = 'Uploaded Speaker Video';
     else if (tpl.id === 'magnates-media-article-highlight') cleanP = 'broadsheet_financial.svg';
     else if (tpl.id === 'doc-highlighter-loupe-suite') cleanP = 'forbes_article_hd.svg';
     else if (tpl.id === 'paper-rip-shred') cleanP = 'Primary Subject';
     else if (tpl.id === 'text-texturing-grunge') cleanP = 'Vintage Paper Backdrop';
-    else if (tpl.id === 'kinetic-decode-typewriter') cleanP = 'Matrix Grid';
+    else if (tpl.id === 'kinetic-decode-typewriter') cleanP = 'Archival Dossier 3D';
     primaryFilename.textContent = cleanP.length > 22 ? cleanP.substring(0, 20) + '...' : cleanP;
   }
 
@@ -31843,34 +34093,7 @@ function openTopTemplateCustomizer(tpl) {
     if (aiEngineWrap) aiEngineWrap.style.display = 'none';
 
     syncCreatorCalibrationUI();
-  } else if (tpl.id === 'jani-cinematic-letterbox') {
-      topCustomizerState.primaryUrl = tpl.defaultImage || '/jani_cinematic_letterbox_ref.png';
-      topCustomizerState.secondaryUrl = '';
-      topCustomizerState.originalPhotoUrl = topCustomizerState.primaryUrl;
-      if (typeof window.tplMountJaniCinematicLetterboxStage === 'function') {
-        const stage = document.getElementById('tpl-modal-preview-stage');
-        const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountJaniCinematicLetterboxStage(stage, d);
-      }
-    } else if (tpl.id === 'circular-spin-flashlight-glitch') {
-      topCustomizerState.primaryUrl = 'generated_person_1.jpg';
-      topCustomizerState.secondaryUrl = 'generated_person_2.jpg';
-      topCustomizerState.originalPhotoUrl = '';
-      if (typeof window.tplMountCircularSpinFlashStage === 'function') {
-        const stage = document.getElementById('tpl-modal-preview-stage');
-        const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountCircularSpinFlashStage(stage, d);
-      }
-} else if (tpl.id === 'cinematic-light-trail-typewriter') {
-      topCustomizerState.primaryUrl = '';
-      topCustomizerState.secondaryUrl = '/boardroom_scene_hd.jpg';
-      topCustomizerState.originalPhotoUrl = '';
-      if (typeof window.tplMountCinematicLightTrailStage === 'function') {
-        const stage = document.getElementById('tpl-modal-preview-stage');
-        const d = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
-        if (stage) window.tplMountCinematicLightTrailStage(stage, d);
-      }
-      } else if (tpl.id === 'spooner-2-5d-photo-parallax') {
+  } else if (tpl.id === 'spooner-2-5d-photo-parallax') {
     if (labelPrim) labelPrim.textContent = 'Cutout Subject / Foreground (1:1 Registered)';
     if (labelSec) labelSec.textContent = 'Inpainted Scene Backdrop (1:1 Registered)';
     if (wrapSec) wrapSec.style.display = 'flex';
@@ -32234,7 +34457,7 @@ function openTopTemplateCustomizer(tpl) {
             if (!e.target.closest('#sigil-floating-layer-toolbar')) {
               topCustomizerState.selectedSigilLayer = null;
               if (floatingToolbar) floatingToolbar.style.display = 'none';
-              document.querySelectorAll('[data-sigil-layer-key]').forEach(el => el.style.outline = 'none');
+              document.querySelectorAll('[data-sigil-layer-key], [data-sigil-layer-key] img').forEach(el => el.style.outline = 'none');
             }
             return;
           }
@@ -32243,16 +34466,18 @@ function openTopTemplateCustomizer(tpl) {
           const layerName = targetLayer.getAttribute('data-sigil-layer-name') || layerKey;
           topCustomizerState.selectedSigilLayer = layerKey;
 
-          // Outline selected layer
-          document.querySelectorAll('[data-sigil-layer-key]').forEach(el => el.style.outline = 'none');
-          targetLayer.style.outline = '2px dashed #2effc6';
+          // Outline selected layer (wrap the inner icon/image tightly instead of full-screen container)
+          document.querySelectorAll('[data-sigil-layer-key], [data-sigil-layer-key] img').forEach(el => el.style.outline = 'none');
+          const visualNode = targetLayer.querySelector('img') || targetLayer;
+          visualNode.style.outline = '2px dashed #2effc6';
+          visualNode.style.outlineOffset = '4px';
 
           // Position floating toolbar above selected layer
           if (floatingToolbar) {
             floatingToolbar.style.display = 'flex';
             if (floatLabel) floatLabel.textContent = layerName;
             if (floatBright) floatBright.value = topCustomizerState.sigilBrightness[layerKey] || 100;
-            const rect = targetLayer.getBoundingClientRect();
+            const rect = visualNode.getBoundingClientRect();
             const stageRect = stageWrap.getBoundingClientRect();
             const topPos = Math.max(10, rect.top - stageRect.top - 42);
             const leftPos = Math.max(10, Math.min(stageRect.width - 240, rect.left - stageRect.left + (rect.width / 2) - 100));
@@ -32378,13 +34603,28 @@ function openTopTemplateCustomizer(tpl) {
       btnDust.style.fontWeight = '700';
     }
   } else if (tpl.id === 'kinetic-decode-typewriter') {
-    if (labelPrim) labelPrim.textContent = '\ud83d\udcbb Matrix Code / Cyber Grid Texture';
-    if (labelSec) labelSec.textContent = '\ud83c\udfac Secondary Scene Asset';
+    if (labelPrim) labelPrim.textContent = '🗂️ Archival Dossier / Custom Plate';
+    if (labelSec) labelSec.textContent = '🎬 Secondary Scene Asset';
     if (wrapSec) wrapSec.style.display = 'none';
     topCustomizerState.hasTextBehind = false;
     topCustomizerState.mainText = 'THE ILLUSION OF CHOICE';
-    topCustomizerState.subText = '[ HIGH TENSION REVEAL ]';
-    topCustomizerState.textColor = '#00f0ff';
+    topCustomizerState.subText = 'EXHIBIT A · DECLASSIFIED';
+    topCustomizerState.textColor = '#f59e0b';
+    topCustomizerState.titleColor = '#f59e0b';
+    topCustomizerState._customDecodeTitleColor = false;
+    topCustomizerState.matrixRainColor = '#f59e0b';
+    topCustomizerState.matrixTypeSpeed = 1.3;
+    topCustomizerState.decodeAnimStyle = topCustomizerState.decodeAnimStyle || 'expanding-decode';
+    topCustomizerState.decodeContainerStyle = topCustomizerState.decodeContainerStyle || 'none';
+    topCustomizerState.decodeEnvPreset = topCustomizerState.decodeEnvPreset || 'darkroom-dossier';
+    topCustomizerState.decodeSubContainer = !!topCustomizerState.decodeSubContainer;
+    topCustomizerState.decodeTextScale = topCustomizerState.decodeTextScale || 1.0;
+    topCustomizerState.decodeBoxScale = topCustomizerState.decodeBoxScale || 1.0;
+    topCustomizerState.decodeSubScale = topCustomizerState.decodeSubScale || 1.0;
+    topCustomizerState._userChangedDecodeFont = false;
+    topCustomizerState.decodeFontFamily = topCustomizerState.decodeFontFamily || "'JetBrains Mono', 'Fira Code', 'Courier New', monospace";
+    topCustomizerState.decodeRedactionSweep = !!topCustomizerState.decodeRedactionSweep;
+    topCustomizerState.decodePosterize12fps = !!topCustomizerState.decodePosterize12fps;
   } else if (tpl.id === 'doc-highlighter-loupe-suite') {
     if (labelPrim) labelPrim.textContent = '\ud83d\udcc4 Forbes Article Document (HD Vector)';
     if (wrapSec) wrapSec.style.display = 'none';
@@ -32707,6 +34947,8 @@ function openTopTemplateCustomizer(tpl) {
   if (inputTextMain) inputTextMain.value = topCustomizerState.mainText;
   if (inputTextSub) inputTextSub.value = topCustomizerState.subText;
   if (colorTextMain) colorTextMain.value = topCustomizerState.textColor;
+  const colorTitleInputEl = document.getElementById('tpl-modal-color-text-title');
+  if (colorTitleInputEl) colorTitleInputEl.value = topCustomizerState.titleColor || '#ffffff';
   if (wrapText) wrapText.style.display = ['candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist', 'parallax', 'textbehind', 'docheight', 'kinetic', 'split', 'zoom', 'fedrate', 'bearbull', 'certificate', 'cryptowallet', 'realestate', 'creditscore', 'budget', 'crash', 'dividend', 'supplydemand', 'creator-cinematic-studio', 'creator-cinematic-backdrop-suite', 'spatial-3d-motion-suite', 'document-3d-fx-engine'].concat(BIZ_STORY_IDS).includes(tpl.id) ? 'none' : 'flex';
 
   const modalKineticInput = document.getElementById('modal-kinetic-text-input');
@@ -32714,7 +34956,7 @@ function openTopTemplateCustomizer(tpl) {
   if (modalKineticInput) modalKineticInput.value = topCustomizerState.mainText;
   if (modalKineticColor) modalKineticColor.value = topCustomizerState.textColor;
 
-  // Matrix Rain Customizer Panel Sync
+  // Investigative Decode & Archival Telemetry Panel Sync
   const wrapMatrix = document.getElementById('tpl-modal-wrap-matrix');
   if (wrapMatrix) {
     if (tpl.id === 'kinetic-decode-typewriter') {
@@ -32722,19 +34964,47 @@ function openTopTemplateCustomizer(tpl) {
       const rainEnable = document.getElementById('tpl-modal-matrix-rain-enable');
       if (rainEnable) rainEnable.checked = topCustomizerState.matrixRainEnabled !== false;
       const rainColor = document.getElementById('tpl-modal-matrix-rain-color');
-      if (rainColor) rainColor.value = topCustomizerState.matrixRainColor || '#00ff41';
+      if (rainColor) rainColor.value = topCustomizerState.matrixRainColor || '#f59e0b';
+      const decodeTitleCol = document.getElementById('tpl-modal-decode-title-color');
+      if (decodeTitleCol) decodeTitleCol.value = topCustomizerState.titleColor || topCustomizerState.textColor || '#f59e0b';
+      const decodeAccentCol = document.getElementById('tpl-modal-decode-accent-color');
+      if (decodeAccentCol) decodeAccentCol.value = topCustomizerState.textColor || '#f59e0b';
+      const selectAnim = document.getElementById('tpl-modal-select-decode-anim');
+      if (selectAnim) selectAnim.value = topCustomizerState.decodeAnimStyle || 'expanding-decode';
+      const selectContainer = document.getElementById('tpl-modal-select-decode-container');
+      if (selectContainer) selectContainer.value = topCustomizerState.decodeContainerStyle || 'none';
+      const selectEnv = document.getElementById('tpl-modal-select-decode-env');
+      if (selectEnv) selectEnv.value = topCustomizerState.decodeEnvPreset || 'darkroom-dossier';
+      const sliderTextSz = document.getElementById('tpl-modal-slider-decode-text-size');
+      const valTextSz = document.getElementById('tpl-modal-val-decode-text-size');
+      if (sliderTextSz) sliderTextSz.value = topCustomizerState.decodeTextScale || 1.0;
+      if (valTextSz) valTextSz.textContent = `${(topCustomizerState.decodeTextScale || 1.0).toFixed(2).replace(/\.00$/, '.0')}x`;
+      const sliderBoxSz = document.getElementById('tpl-modal-slider-decode-box-size');
+      const valBoxSz = document.getElementById('tpl-modal-val-decode-box-size');
+      if (sliderBoxSz) sliderBoxSz.value = topCustomizerState.decodeBoxScale || 1.0;
+      if (valBoxSz) valBoxSz.textContent = `${(topCustomizerState.decodeBoxScale || 1.0).toFixed(2).replace(/\.00$/, '.0')}x`;
+      const sliderSubSz = document.getElementById('tpl-modal-slider-decode-sub-size');
+      const valSubSz = document.getElementById('tpl-modal-val-decode-sub-size');
+      if (sliderSubSz) sliderSubSz.value = topCustomizerState.decodeSubScale || 1.0;
+      if (valSubSz) valSubSz.textContent = `${(topCustomizerState.decodeSubScale || 1.0).toFixed(2).replace(/\.00$/, '.0')}x`;
+      const chkSubContainer = document.getElementById('tpl-modal-decode-sub-container');
+      if (chkSubContainer) chkSubContainer.checked = !!topCustomizerState.decodeSubContainer;
       const rainSpeed = document.getElementById('tpl-modal-slider-matrix-speed');
       const rainSpeedVal = document.getElementById('tpl-modal-val-matrix-speed');
       if (rainSpeed) rainSpeed.value = topCustomizerState.matrixRainSpeed || 1.0;
       if (rainSpeedVal) rainSpeedVal.textContent = `${(topCustomizerState.matrixRainSpeed || 1.0).toFixed(1)}x`;
       const rainDensity = document.getElementById('tpl-modal-slider-matrix-density');
       const rainDensityVal = document.getElementById('tpl-modal-val-matrix-density');
-      if (rainDensity) rainDensity.value = topCustomizerState.matrixRainDensity || 16;
-      if (rainDensityVal) rainDensityVal.textContent = (topCustomizerState.matrixRainDensity || 16) <= 14 ? 'Ultra Dense' : (topCustomizerState.matrixRainDensity || 16) <= 18 ? 'Dense' : 'Sparse';
+      if (rainDensity) rainDensity.value = topCustomizerState.matrixRainDensity || 18;
+      if (rainDensityVal) rainDensityVal.textContent = (topCustomizerState.matrixRainDensity || 18) <= 14 ? 'Ultra Dense' : (topCustomizerState.matrixRainDensity || 18) <= 18 ? 'Dense' : 'Sparse';
       const typeSpeed = document.getElementById('tpl-modal-slider-matrix-typespeed');
       const typeSpeedVal = document.getElementById('tpl-modal-val-matrix-typespeed');
-      if (typeSpeed) typeSpeed.value = topCustomizerState.matrixTypeSpeed || 1.0;
-      if (typeSpeedVal) typeSpeedVal.textContent = `${(topCustomizerState.matrixTypeSpeed || 1.0).toFixed(1)}x`;
+      if (typeSpeed) typeSpeed.value = topCustomizerState.matrixTypeSpeed || 1.3;
+      if (typeSpeedVal) typeSpeedVal.textContent = `${(topCustomizerState.matrixTypeSpeed || 1.3).toFixed(1)}x`;
+      const chkRedact = document.getElementById('tpl-modal-decode-redaction-sweep');
+      if (chkRedact) chkRedact.checked = !!topCustomizerState.decodeRedactionSweep;
+      const chk12fps = document.getElementById('tpl-modal-decode-12fps');
+      if (chk12fps) chk12fps.checked = !!topCustomizerState.decodePosterize12fps;
     } else {
       wrapMatrix.style.display = 'none';
     }
@@ -33546,27 +35816,31 @@ function renderTopTemplatePreviewStage() {
   const tplId = topCustomizerState.currentTpl.id;
   if (window.tpl3DSync) window.tpl3DSync(tplId);
 
-  // Screen-Filling Document Barrage & Evidence Stack Suite
-  if (tplId === 'document-barrage-suite') {
-    const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('document-barrage-suite') : (window.DOCUMENT_BARRAGE_CONFIG || {});
+  // Circular Spin, Falling Particles, 1+3 Flashlight Strobe & Glitch Reveal Engine
+  if (tplId === 'jani-spin-flash-glitch-reveal') {
+    const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
     hoverBridgeActive = false;
     hoverExternalT = null;
-    if (typeof window.tplMountDocumentBarrageStage === 'function') {
-      window.tplMountDocumentBarrageStage(stage, dbData);
+    if (typeof window.tplMountJaniSpinFlashGlitchStage === 'function') {
+      window.tplMountJaniSpinFlashGlitchStage(stage, sfgData);
+    }
+    return;
+  }
+
+  // 4-Beat Flash, Directional & Sluggish Center Emergence Engine
+  if (tplId === 'jani-flash-quad-sequence') {
+    const fqData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-flash-quad-sequence') : (window.JANI_FLASH_QUAD_CONFIG || {});
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountJaniFlashQuadStage === 'function') {
+      window.tplMountJaniFlashQuadStage(stage, fqData);
     }
     return;
   }
 
   // James Jani Cross-Section Reveal Engine
-  if (tplId === 'document-barrage-suite') {
-    if (typeof window.stepDocumentBarrageAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('document-barrage-suite') : (window.DOCUMENT_BARRAGE_CONFIG || {});
-      window.stepDocumentBarrageAnimation(stage, 'document-barrage-suite', localSceneT, dbData);
-    }
-  }
-
   if (tplId === 'jani-cross-section-reveal') {
     const cData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-cross-section-reveal') : (window.JANI_CROSS_SECTION_CONFIG || {});
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
@@ -33589,18 +35863,6 @@ function renderTopTemplatePreviewStage() {
     }
     return;
   }
-  // Cinematic Merger & Acquisition Collision Engine
-  if (tplId === 'merger-acquisition') {
-    const maData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('merger-acquisition') : {};
-    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
-    hoverBridgeActive = false;
-    hoverExternalT = null;
-    if (typeof window.tplMountMergerAcqStage === 'function') {
-      window.tplMountMergerAcqStage(stage, maData);
-    }
-    return;
-  }
-
   // 3D Glassmorphic SWIFT Banking Wire Transfer Engine
   if (tplId === 'wire-transfer') {
     const wtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('wire-transfer') : {};
@@ -33656,39 +35918,6 @@ function renderTopTemplatePreviewStage() {
   }
 
   // James Jani 3D Financial War Room Countdown & Panic Ticker Engine
-      if (tplId === 'countdown-timer') {
-    const cdtData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('countdown-timer') : {};
-    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
-    hoverBridgeActive = false;
-    hoverExternalT = null;
-    if (typeof window.tplMountCountdownTimerStage === 'function') {
-      window.tplMountCountdownTimerStage(stage, cdtData);
-    }
-    return;
-  }
-
-  if (tplId === 'circular-spin-flashlight-glitch') {
-    const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : {};
-    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
-    hoverBridgeActive = false;
-    hoverExternalT = null;
-    if (typeof window.tplMountCircularSpinFlashStage === 'function') {
-      window.tplMountCircularSpinFlashStage(stage, csfData);
-    }
-    return;
-  }
-
-  if (tplId === 'multi-image-flash-sequence') {
-    const flashData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('multi-image-flash-sequence') : {};
-    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
-    hoverBridgeActive = false;
-    hoverExternalT = null;
-    if (typeof window.tplMountMultiImageFlashStage === 'function') {
-      window.tplMountMultiImageFlashStage(stage, flashData);
-    }
-    return;
-  }
-
   if (tplId === 'jani-ftx-logo-reveal') {
     const ftxData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-ftx-logo-reveal') : {};
     if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
@@ -33698,22 +35927,6 @@ function renderTopTemplatePreviewStage() {
       window.tplMountJaniFtxLogoStage(stage, ftxData);
     }
     return;
-  }
-
-    if (tplId === 'circular-spin-flashlight-glitch') {
-    if (typeof window.stepCircularSpinFlashAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const csfData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('circular-spin-flashlight-glitch') : {};
-      window.stepCircularSpinFlashAnimation(stage, 'circular-spin-flashlight-glitch', localSceneT, csfData);
-    }
-  }
-
-  if (tplId === 'multi-image-flash-sequence') {
-    if (typeof window.stepMultiImageFlashAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const flashData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('multi-image-flash-sequence') : {};
-      window.stepMultiImageFlashAnimation(stage, 'multi-image-flash-sequence', localSceneT, flashData);
-    }
   }
 
   if (tplId === 'jani-ftx-logo-reveal') {
@@ -33817,17 +36030,14 @@ function renderTopTemplatePreviewStage() {
         : topCustomizerState.primaryUrl);
   const sec = topCustomizerState.secondaryUrl;
 
-  // 3D Glassmorphic Google Search Engine (Vox / James Jani / Magnates Media Style)
+  // Reference Image 3 Documentary Google Search Engine (Adaptive 65% Default, Draggable & Resizable)
   if (tplId === 'google') {
     const gData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('google') : {};
-    const is3DActive = (topCustomizerState.paperPreviewMode === '3d' || topCustomizerState.is3DMode) && gData.is3DMode !== false;
-    if (is3DActive) {
-      if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
-      hoverBridgeActive = false;
-      hoverExternalT = null;
-      if (typeof window.tplMountSearch3DStage === 'function') {
-        window.tplMountSearch3DStage(stage, gData);
-      }
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountSearch3DStage === 'function') {
+      window.tplMountSearch3DStage(stage, gData);
       return;
     }
   }
@@ -33852,6 +36062,9 @@ function renderTopTemplatePreviewStage() {
     startTemplateHoverVideo(stage, btplView);
     if (typeof window.tplUpdateStageWithContextualData === 'function' && typeof window.tplGetContextualData === 'function') {
       window.tplUpdateStageWithContextualData(tplId, window.tplGetContextualData(tplId));
+    }
+    if (tplId === 'balance' && typeof window.tplFitBalanceSheet === 'function') {
+      window.tplFitBalanceSheet(stage.querySelector('.tpl-balance'));
     }
     if (window.tpl3DAfterVideoStage) window.tpl3DAfterVideoStage(stage, tplId);
     if (typeof window.initUniversalStageTransformEngine === 'function') {
@@ -34151,64 +36364,88 @@ function renderTopTemplatePreviewStage() {
     setTimeout(initDocDirectCanvasEditing, 40);
   } else if ((tplId === 'creator-cinematic-studio' || tplId === 'creator-cinematic-backdrop-suite')) {
     const cState = topCustomizerState;
-    const cMode = cState.creatorMode || 'original';
+    const cMode = cState.creatorMode || 'virtual';
     const cPreset = cState.creatorVirtualPreset || 'studio';
-    let bgUrl = sec || '/creator_background_plate.png';
+    const starfieldSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720"><defs><radialGradient id="neb1" cx="35%" cy="40%" r="60%"><stop offset="0%" stop-color="#1e1b4b"/><stop offset="45%" stop-color="#090d16"/><stop offset="100%" stop-color="#020409"/></radialGradient><radialGradient id="neb2" cx="72%" cy="55%" r="45%"><stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.35"/><stop offset="50%" stop-color="#6366f1" stop-opacity="0.15"/><stop offset="100%" stop-color="#000" stop-opacity="0"/></radialGradient></defs><rect width="1280" height="720" fill="url(#neb1)"/><rect width="1280" height="720" fill="url(#neb2)"/><g fill="#ffffff"><circle cx="140" cy="110" r="2.2" opacity="0.9"/><circle cx="290" cy="240" r="1.5" opacity="0.7"/><circle cx="460" cy="95" r="2.6" opacity="0.95"/><circle cx="620" cy="180" r="1.8" opacity="0.8"/><circle cx="820" cy="120" r="2.4" opacity="0.9"/><circle cx="1040" cy="210" r="3.0" opacity="0.95"/><circle cx="1150" cy="90" r="1.7" opacity="0.75"/><circle cx="210" cy="480" r="2.5" opacity="0.85"/><circle cx="380" cy="590" r="1.9" opacity="0.7"/><circle cx="740" cy="520" r="2.8" opacity="0.9"/><circle cx="960" cy="440" r="2.1" opacity="0.8"/><circle cx="1120" cy="580" r="2.6" opacity="0.9"/><circle cx="540" cy="360" r="2.0" opacity="0.65"/></g><g fill="#38bdf8"><circle cx="330" cy="150" r="3.5" opacity="0.7"/><circle cx="890" cy="290" r="4.0" opacity="0.75"/><circle cx="180" cy="340" r="3.2" opacity="0.65"/><circle cx="1060" cy="420" r="3.8" opacity="0.7"/></g></svg>`)}`;
+    let bgUrl = sec || '/creator_studio_bokeh_preset.png';
     if (cMode === 'virtual') {
       if (cPreset === 'cyber') bgUrl = '/creator_cyber_bokeh_preset.png';
       else if (cPreset === 'boardroom') bgUrl = '/boardroom_scene_hd.jpg';
+      else if (cPreset === 'room') bgUrl = '/creator_background_plate.png';
+      else if (cPreset === 'stars') bgUrl = starfieldSvg;
       else bgUrl = '/creator_studio_bokeh_preset.png';
+    } else {
+      bgUrl = prim || sec || '/creator_background_plate.png';
     }
-    const cBlur = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
+    const bgIsVideo = (cMode === 'original' && prim && cState.primaryIsVideo) ||
+      (cMode !== 'virtual' && cState.secondaryIsVideo) ||
+      /\.(mp4|webm|mov)(\?|$)/i.test(bgUrl);
+    const fgHasSource = Boolean(prim && prim.trim() !== '');
+    const fgIsVideo = Boolean(fgHasSource && (cState.primaryIsVideo || /\.(mp4|webm|mov)(\?|$)/i.test(prim)));
+
+    const cBlur = cState.creatorBlur !== undefined ? cState.creatorBlur : (cPreset === 'stars' ? 4 : 28);
     const cBrightness = cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65;
     const cTint = cState.creatorTint !== undefined ? cState.creatorTint : 45;
     const tintA = (cTint / 100) * 0.75;
     const cWarmBokeh = cState.creatorWarmBokeh !== false;
     const cRim = cState.creatorRim !== undefined ? cState.creatorRim : 75;
-    const cTextLeft = cState.creatorTextLeft !== undefined ? cState.creatorTextLeft : 'this AI company';
-    const cTextRight = cState.creatorTextRight !== undefined ? cState.creatorTextRight : 'VOICE';
-    const strokeCount = Array.isArray(cState.creatorBrushStrokes) ? cState.creatorBrushStrokes.length : 0;
+    const cTextLeft = cState.creatorTextLeft !== undefined ? cState.creatorTextLeft : '';
+    const cTextRight = cState.creatorTextRight !== undefined ? cState.creatorTextRight : '';
+    const brushActive = Boolean(cState.creatorBrushActive);
 
     stage.innerHTML = `
-      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: crosshair;">
-        <!-- Layer 1: Background Plate (Virtual Studio or Original Scene) -->
-        <img id="creator-live-bg" src="${bgUrl}" alt="Studio Background Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: blur(${cBlur}px) brightness(${cBrightness}%) contrast(125%); transition: filter 0.05s ease;" />
+      <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #020617; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: ${brushActive ? 'crosshair' : 'default'};">
+        <!-- Layer 1: Background Plate (Virtual Studio Preset or Blurred Original Video, Z=1) -->
+        ${bgIsVideo
+          ? `<video id="creator-live-bg" src="${bgUrl}" autoplay loop muted playsinline style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: blur(${cBlur}px) brightness(${cBrightness}%) contrast(118%); transform: ${cBlur > 0 ? 'scale(1.06)' : 'scale(1.0)'}; transition: filter 0.05s ease;"></video>`
+          : `<img id="creator-live-bg" src="${bgUrl}" alt="Studio Background Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; filter: blur(${cBlur}px) brightness(${cBrightness}%) contrast(118%); transform: ${cBlur > 0 ? 'scale(1.06)' : 'scale(1.0)'}; transition: filter 0.05s ease;" />`
+        }
 
-        <!-- Layer 2: Customizable Lighting & Rim Gradient Overlay -->
-        <div id="creator-live-lighting" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 55%, transparent 75%); transition: all 0.08s ease; z-index: 2;"></div>
+        <!-- Layer 2: Customizable Background Atmosphere Tint (Strictly BEHIND Speaker, Z=2) -->
+        <div id="creator-live-lighting" style="position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: radial-gradient(ellipse at 50% 42%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 58%, transparent 80%); transition: all 0.08s ease; z-index: 2;"></div>
 
-        <!-- Warm Lamp Accent Lights (Left & Right Bokeh Highlights) -->
+        <!-- Layer 3: Warm Lamp Accent Lights (Strictly BEHIND Speaker, Z=3) -->
         <div id="creator-live-bokeh-wrap" style="position: absolute; inset: 0; pointer-events: none; z-index: 3; display: ${cWarmBokeh ? 'block' : 'none'};">
           <div id="creator-live-bokeh-left" style="position: absolute; left: 6%; top: 62%; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, transparent 70%); filter: blur(22px); pointer-events: none;"></div>
           <div id="creator-live-bokeh-right" style="position: absolute; right: 5%; top: 52%; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, 0.42) 0%, transparent 70%); filter: blur(26px); pointer-events: none;"></div>
         </div>
 
-        <!-- Kinetic In-Scene Word Callouts matching reference -->
-        <div id="creator-live-txt-left" style="position: absolute; left: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 26px; color: #ffffff; text-shadow: 0 4px 16px rgba(0,0,0,0.85); pointer-events: none; z-index: 12; letter-spacing: -0.5px;">${cTextLeft}</div>
-        <div id="creator-live-txt-right" style="position: absolute; right: 12%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 900; font-size: 46px; color: #ffffff; text-shadow: 0 6px 24px rgba(0,0,0,0.85); pointer-events: none; z-index: 12; letter-spacing: -1px;">${cTextRight}</div>
+        <!-- Layer 4: Backlight Aura Behind Speaker (Strictly BEHIND Speaker, Z=4, never covers speaker) -->
+        <div id="creator-live-rim-light" style="position: absolute; inset: 0; z-index: 4; pointer-events: none; mix-blend-mode: screen; opacity: ${fgHasSource ? (cRim / 100).toFixed(2) : '0'}; background: radial-gradient(circle at 50% 48%, rgba(56, 189, 248, 0.35) 0%, rgba(14, 165, 233, 0.12) 34%, transparent 62%);"></div>
 
-        <!-- Layer 3: Ultra Crisp Foreground Subject Cutout -->
-        <img id="creator-live-fg-img" src="${prim || '/creator_portrait_cutout.png'}" alt="Foreground Subject" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 10; pointer-events: none; transition: transform 0.04s ease;" />
+        <!-- Layer 6: Optional In-Scene Typography Behind Cutout Speaker (Z=6, behind Z=10 speaker) -->
+        <div id="creator-live-txt-left" style="position: absolute; left: 8%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 26px; color: #ffffff; text-shadow: 0 4px 16px rgba(0,0,0,0.85); pointer-events: none; z-index: 6; letter-spacing: -0.5px; display: ${cTextLeft ? 'block' : 'none'};">${cTextLeft}</div>
+        <div id="creator-live-txt-right" style="position: absolute; right: 10%; top: 48%; transform: translateY(-50%); font-family: 'Inter', -apple-system, sans-serif; font-weight: 900; font-size: 46px; color: #ffffff; text-shadow: 0 6px 24px rgba(0,0,0,0.85); pointer-events: none; z-index: 6; letter-spacing: -1px; display: ${cTextRight ? 'block' : 'none'};">${cTextRight}</div>
 
-        <!-- Edge Rim Highlight Simulation -->
-        <div id="creator-live-rim-light" style="position: absolute; inset: 0; z-index: 11; pointer-events: none; mix-blend-mode: screen; opacity: ${(cRim / 100).toFixed(2)}; background: radial-gradient(ellipse at 50% 45%, transparent 32%, rgba(56, 189, 248, 0.28) 46%, transparent 58%);"></div>
+        <!-- Hidden source element for real-time MediaPipe SelfieSegmentation -->
+        ${fgHasSource
+          ? (fgIsVideo
+              ? `<video id="creator-source-media" src="${prim}" autoplay loop muted playsinline crossorigin="anonymous" style="display: none;"></video>`
+              : `<img id="creator-source-media" src="${prim}" crossorigin="anonymous" style="display: none;" />`)
+          : ''
+        }
 
-        <!-- Face Lock Guide / Anti-Glitch Hold-out Zone (Visual Tracker & Holdout) -->
-        <div id="creator-live-reticle" style="position: absolute; width: 190px; height: 230px; border: 2px dashed ${cState.creatorFaceTrack !== false ? '#38bdf8' : 'rgba(148,163,184,0.35)'}; border-radius: 50%; pointer-events: none; z-index: 20; box-shadow: 0 0 20px rgba(56,189,248,0.3); transform: translate(-50%, -50%); left: 49.5%; top: 35%; display: flex; align-items: center; justify-content: center;">
-          <span id="creator-face-track-status" style="position: absolute; top: -20px; font-family: monospace; font-size: 8.5px; font-weight: 800; color: ${cState.creatorFaceTrack !== false ? '#38bdf8' : '#94a3b8'}; background: rgba(2,6,23,0.9); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.4); text-transform: uppercase; white-space: nowrap;">${cState.creatorFaceTrack !== false ? '&#x1F512; Face Lock &bull; Smooth Active' : '&#x1F513; Face Lock &bull; Unfiltered'}</span>
-          <div style="width: 8px; height: 8px; border: 1px solid #38bdf8; border-radius: 50%;"></div>
+        <!-- Layer 10: Top Foreground Layer — Anti-Flicker Segmented Speaker Canvas (Nothing covers the speaker) -->
+        <canvas id="creator-live-fg-canvas" width="960" height="540" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; z-index: 10; pointer-events: none; display: ${fgHasSource ? 'block' : 'none'};"></canvas>
+
+        <!-- Empty State Prompt when no Speaker Video is attached yet -->
+        <div id="creator-empty-subject-prompt" style="position: relative; z-index: 18; display: ${fgHasSource ? 'none' : 'flex'}; flex-direction: column; align-items: center; gap: 8px; background: rgba(2, 6, 23, 0.72); border: 1px dashed rgba(56, 189, 248, 0.45); backdrop-filter: blur(8px); padding: 16px 24px; border-radius: 12px; text-align: center;">
+          <div style="font-size: 11.5px; font-weight: 700; color: #f8fafc;">No Speaker Video Attached</div>
+          <div style="font-size: 10px; color: #94a3b8; max-width: 260px; line-height: 1.4;">Upload your video to automatically cut out the person over this ambient backdrop.</div>
+          <button type="button" id="btn-creator-stage-upload" style="margin-top: 4px; padding: 6px 14px; font-size: 10.5px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #0284c7, #2563eb); border: 1px solid rgba(56,189,248,0.5); border-radius: 7px; cursor: pointer;">+ Add Speaker Video / Media</button>
         </div>
 
-        <!-- Manual Protection Brush Canvas Overlay -->
-        <canvas id="creator-live-brush-canvas" width="933" height="523" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 25; pointer-events: auto; opacity: 0.55; cursor: crosshair;"></canvas>
-
-        <!-- Bottom Left HUD Telemetry -->
-        <div style="position: absolute; bottom: 10px; left: 12px; z-index: 30; pointer-events: none; display: flex; align-items: center; gap: 8px;">
-          <span id="creator-telemetry-pill" style="font-family: monospace; font-size: 9px; font-weight: 700; color: #38bdf8; background: rgba(5,7,15,0.85); border: 1px solid rgba(56,189,248,0.3); padding: 3px 8px; border-radius: 6px;">TRACKING: ${cState.creatorFaceTrack !== false ? 'SMOOTH_ON' : 'OFF'} &bull; BLUR: ${cBlur}px &bull; LIGHT: ${cBrightness}% &bull; HOLD_OUT: ${strokeCount} PTS</span>
-        </div>
+        <!-- Invisible Interaction Layer for Optional Manual Hold-out Brush (Only active when Brush toggle is ON) -->
+        <canvas id="creator-live-brush-canvas" width="960" height="540" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 15; pointer-events: ${(fgHasSource && brushActive) ? 'auto' : 'none'}; opacity: 0; cursor: crosshair;"></canvas>
       </div>
     `;
-    setTimeout(initCreatorBrushInteraction, 40);
+    setTimeout(() => {
+      initCreatorBrushInteraction();
+      startCreatorLiveSegmentationEngine();
+      document.getElementById('btn-creator-stage-upload')?.addEventListener('click', () => {
+        document.getElementById('tpl-modal-upload-primary')?.click();
+      });
+    }, 40);
 
   } else if (tplId === 'spooner-2-5d-photo-parallax') {
     stage.innerHTML = `
@@ -34711,11 +36948,19 @@ function updateTopCustomizerFrame(seqTime, now) {
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
 
-  if (tplId === 'document-barrage-suite') {
-    if (typeof window.stepDocumentBarrageAnimation === 'function') {
+  if (tplId === 'jani-spin-flash-glitch-reveal') {
+    if (typeof window.stepJaniSpinFlashGlitchAnimation === 'function') {
       const stage = document.getElementById('tpl-modal-preview-stage');
-      const dbData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('document-barrage-suite') : (window.DOCUMENT_BARRAGE_CONFIG || {});
-      window.stepDocumentBarrageAnimation(stage, 'document-barrage-suite', localSceneT, dbData);
+      const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
+      window.stepJaniSpinFlashGlitchAnimation(stage, 'jani-spin-flash-glitch-reveal', localSceneT, sfgData);
+    }
+  }
+
+  if (tplId === 'jani-flash-quad-sequence') {
+    if (typeof window.stepJaniFlashQuadAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const fqData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-flash-quad-sequence') : (window.JANI_FLASH_QUAD_CONFIG || {});
+      window.stepJaniFlashQuadAnimation(stage, 'jani-flash-quad-sequence', localSceneT, fqData);
     }
   }
 
@@ -34734,14 +36979,6 @@ function updateTopCustomizerFrame(seqTime, now) {
       window.stepJaniForbesAnimation(stage, 'jani-forbes-fraud-reveal', localSceneT, jData);
     }
   }
-  if (tplId === 'merger-acquisition') {
-    if (typeof window.stepMergerAcqAnimation === 'function') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      const maData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('merger-acquisition') : {};
-      window.stepMergerAcqAnimation(stage, 'merger-acquisition', localSceneT, maData);
-    }
-  }
-
   if (tplId === 'wire-transfer') {
     if (typeof window.stepWireTransferAnimation === 'function') {
       const stage = document.getElementById('tpl-modal-preview-stage');
@@ -35809,64 +38046,73 @@ function buildClipsForTemplateScene(tpl, sceneStart, dur, opts) {
       layerOrder: 'back'
     };
 
-    const fgClip = {
-      id: `img-fg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      name: 'Speaker_Cutout.png',
-      url: prim || '/creator_portrait_cutout.png',
-      file: { name: 'Speaker_Cutout.png', url: prim || '/creator_portrait_cutout.png', isImage: true },
-      start: sceneStart,
-      duration: dur,
-      scale: 1.0,
-      faceTracking: {
-        enabled: cState.creatorFaceTrack !== false,
-        sensitivity: cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94,
-        jitterFreeSmoothing: true,
-        temporalLowPass: 0.92
-      },
-      holdoutBrushStrokes: cState.creatorBrushStrokes || [],
-      opacity: opacityVal,
-      zIndex: 40,
-      layerOrder: 'front'
-    };
+    const fgClips = [];
+    if (prim && prim.trim() !== '') {
+      const fgClip = {
+        id: `img-fg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+        name: 'Speaker_Cutout',
+        url: prim,
+        file: { name: 'Speaker_Cutout', url: prim, isImage: !topCustomizerState.primaryIsVideo, isVideo: !!topCustomizerState.primaryIsVideo },
+        start: sceneStart,
+        duration: dur,
+        scale: 1.0,
+        faceTracking: {
+          enabled: cState.creatorFaceTrack !== false,
+          sensitivity: cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94,
+          jitterFreeSmoothing: true,
+          temporalLowPass: 0.92
+        },
+        holdoutBrushStrokes: cState.creatorBrushStrokes || [],
+        opacity: opacityVal,
+        zIndex: 40,
+        layerOrder: 'front'
+      };
+      fgClips.push(fgClip);
+      focusClip = fgClip;
+    } else {
+      focusClip = bgClip;
+    }
+    imageClips = [bgClip, ...fgClips];
 
-    focusClip = fgClip;
-    imageClips = [bgClip, fgClip];
+    // Optional Left subtitle kinetic text (only added if user typed text)
+    const textLeft = (cState.creatorTextLeft || '').trim();
+    if (textLeft) {
+      textClips.push({
+        id: `txt-left-${Date.now()}`,
+        text: textLeft,
+        highlight: '',
+        highlightColor: '#38bdf8',
+        anim: 'fade',
+        fontSize: 32,
+        fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+        zIndex: 22,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur,
+        x: 240,
+        y: 420
+      });
+    }
 
-    // Left subtitle kinetic text
-    const textLeft = cState.creatorTextLeft || 'this AI company';
-    textClips.push({
-      id: `txt-left-${Date.now()}`,
-      text: textLeft,
-      highlight: '',
-      highlightColor: '#38bdf8',
-      anim: 'fade',
-      fontSize: 32,
-      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-      zIndex: 22,
-      layerOrder: 'middle',
-      start: sceneStart,
-      duration: dur,
-      x: 240,
-      y: 420
-    });
-
-    // Right headline bold kinetic text
-    const textRight = cState.creatorTextRight || 'VOICE';
-    textClips.push({
-      id: `txt-right-${Date.now()}`,
-      text: textRight,
-      highlight: textRight,
-      highlightColor: '#ffffff',
-      anim: 'pop',
-      fontSize: 96,
-      fontFamily: 'Impact, sans-serif',
-      zIndex: 24,
-      layerOrder: 'middle',
-      start: sceneStart,
-      duration: dur,
-      x: 960,
-      y: 450
-    });
+    // Optional Right headline bold kinetic text (only added if user typed text)
+    const textRight = (cState.creatorTextRight || '').trim();
+    if (textRight) {
+      textClips.push({
+        id: `txt-right-${Date.now()}`,
+        text: textRight,
+        highlight: textRight,
+        highlightColor: '#ffffff',
+        anim: 'pop',
+        fontSize: 96,
+        fontFamily: 'Impact, sans-serif',
+        zIndex: 24,
+        layerOrder: 'middle',
+        start: sceneStart,
+        duration: dur,
+        x: 960,
+        y: 450
+      });
+    }
   } else if (tpl.id === 'subject-25d-parallax') {
     const bgClip = {
       id: `img-bg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -37034,14 +39280,34 @@ function initCustomizerOnScreenTransform() {
     const targetEl = isFg ? fgWrap : bgWrap;
     if (!targetEl) return;
 
-    const rect = targetEl.getBoundingClientRect();
+    const rawRect = targetEl.getBoundingClientRect();
     const parentRect = stageInner.getBoundingClientRect();
+    let leftPx = rawRect.left - parentRect.left;
+    let topPx = rawRect.top - parentRect.top;
+    let widthPx = rawRect.width;
+    let heightPx = rawRect.height;
+
+    if (isFg) {
+      const fgImg = targetEl.querySelector('#customizer-live-fg, img');
+      const srcStr = (fgImg && (fgImg.currentSrc || fgImg.src)) || '';
+      if (srcStr.includes('hiker_cutout') || srcStr.includes('clean_traveler_cutout')) {
+        widthPx = rawRect.width * 0.24;
+        heightPx = rawRect.height * 0.64;
+        leftPx = (rawRect.left - parentRect.left) + (rawRect.width - widthPx) * 0.5;
+        topPx = (rawRect.top - parentRect.top) + rawRect.height * 0.22;
+      } else if (srcStr.includes('ceo_portrait_alpha_cutout')) {
+        widthPx = rawRect.width * 0.52;
+        heightPx = rawRect.height * 0.94;
+        leftPx = (rawRect.left - parentRect.left) + rawRect.width * 0.26;
+        topPx = (rawRect.top - parentRect.top) + rawRect.height * 0.04;
+      }
+    }
 
     box.style.display = 'block';
-    box.style.left = `${rect.left - parentRect.left}px`;
-    box.style.top = `${rect.top - parentRect.top}px`;
-    box.style.width = `${rect.width}px`;
-    box.style.height = `${rect.height}px`;
+    box.style.left = `${leftPx}px`;
+    box.style.top = `${topPx}px`;
+    box.style.width = `${widthPx}px`;
+    box.style.height = `${heightPx}px`;
 
     if (handleLabel) {
       handleLabel.textContent = isFg ? 'FOREGROUND CUTOUT' : 'BACKDROP PLATE';
@@ -39117,6 +41383,16 @@ function bindTopTemplateCustomizerEvents() {
           thumbImg.src = url;
         }
       }
+      if (topCustomizerState.currentTpl && (topCustomizerState.currentTpl.id === 'creator-cinematic-studio' || topCustomizerState.currentTpl.id === 'creator-cinematic-backdrop-suite')) {
+        // When user uploads a video/image to Backdrop (Z=0) in Creator Studio and hasn't set a speaker video yet,
+        // automatically route it to the Speaker Cutout (Z=1) as well so the person is segmented immediately!
+        if (!topCustomizerState.primaryUrl) {
+          topCustomizerState.primaryUrl = url;
+          topCustomizerState.primaryIsVideo = isVideo;
+          const fnP = document.getElementById('tpl-modal-filename-primary');
+          if (fnP) fnP.textContent = file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name;
+        }
+      }
       const fnEl = document.getElementById('tpl-modal-filename-secondary');
       if (fnEl) {
         fnEl.textContent = file.name.length > 22 ? file.name.substring(0, 20) + '...' : file.name;
@@ -39555,18 +41831,27 @@ function bindTopTemplateCustomizerEvents() {
     const valBgDir = document.getElementById('spooner-val-bg-dir');
     if (valBgDir) valBgDir.textContent = bgDir.toUpperCase().replace('_', ' ');
 
-    // Text buttons
-    ['push', 'pull', 'static'].forEach(dir => {
+    // Text buttons (including 'off' when no text behind is active)
+    const effectiveTxtDir = topCustomizerState.spoonerTxtDir || (topCustomizerState.currentTpl?.id === 'parallax' ? 'off' : 'drift');
+    ['off', 'push', 'pull', 'static'].forEach(dir => {
       const b = document.getElementById(`spooner-txt-dir-${dir}`);
       if (b) {
-        const active = (txtDir === dir || (dir === 'static' && txtDir === 'drift'));
-        b.style.border = active ? '1px solid rgba(192,132,252,0.6)' : '1px solid rgba(255,255,255,0.08)';
-        b.style.background = active ? 'rgba(192,132,252,0.22)' : 'transparent';
-        b.style.color = active ? '#c084fc' : '#94a3b8';
+        const active = (effectiveTxtDir === dir || (dir === 'static' && effectiveTxtDir === 'drift'));
+        if (dir === 'off') {
+          b.style.border = active ? '1px solid rgba(56,189,248,0.6)' : '1px solid rgba(255,255,255,0.08)';
+          b.style.background = active ? 'rgba(56,189,248,0.22)' : 'transparent';
+          b.style.color = active ? '#38bdf8' : '#94a3b8';
+        } else {
+          b.style.border = active ? '1px solid rgba(192,132,252,0.6)' : '1px solid rgba(255,255,255,0.08)';
+          b.style.background = active ? 'rgba(192,132,252,0.22)' : 'transparent';
+          b.style.color = active ? '#c084fc' : '#94a3b8';
+        }
       }
     });
     const valTxtDir = document.getElementById('spooner-val-txt-dir');
-    if (valTxtDir) valTxtDir.textContent = txtDir.toUpperCase();
+    if (valTxtDir) valTxtDir.textContent = effectiveTxtDir.toUpperCase();
+    const txtBehindEl = document.getElementById('customizer-live-text-behind');
+    if (txtBehindEl) txtBehindEl.style.display = (effectiveTxtDir === 'off') ? 'none' : 'flex';
 
     // Quick coupled preset active state
     const btnPush = document.getElementById('spooner-btn-dir-push');
@@ -39612,10 +41897,11 @@ function bindTopTemplateCustomizerEvents() {
     });
   });
 
-  // Wire up Text Behind Individual Direction Buttons
-  ['push', 'pull', 'static'].forEach(dir => {
+  // Wire up Text Behind Individual Direction Buttons (including Off)
+  ['off', 'push', 'pull', 'static'].forEach(dir => {
     document.getElementById(`spooner-txt-dir-${dir}`)?.addEventListener('click', () => {
       topCustomizerState.spoonerTxtDir = dir;
+      topCustomizerState.hasTextBehind = (dir !== 'off');
       window.syncSpoonerDirectionButtons();
     });
   });
@@ -39781,15 +42067,29 @@ function bindTopTemplateCustomizerEvents() {
 
   document.getElementById('tpl-modal-color-text-title')?.addEventListener('input', (e) => {
     topCustomizerState.titleColor = e.target.value;
-    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+    topCustomizerState._customDecodeTitleColor = true;
+    const decodeTitleCol = document.getElementById('tpl-modal-decode-title-color');
+    if (decodeTitleCol) decodeTitleCol.value = e.target.value;
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-color-text-main')?.addEventListener('input', (e) => {
     topCustomizerState.textColor = e.target.value;
     topCustomizerState.textBehindColor = e.target.value;
+    const decodeAccentCol = document.getElementById('tpl-modal-decode-accent-color');
+    if (decodeAccentCol) decodeAccentCol.value = e.target.value;
+    if (topCustomizerState.currentTpl?.id === 'kinetic-decode-typewriter' && !topCustomizerState._customDecodeTitleColor) {
+      topCustomizerState.titleColor = e.target.value;
+      const decodeTitleCol = document.getElementById('tpl-modal-decode-title-color');
+      if (decodeTitleCol) decodeTitleCol.value = e.target.value;
+      const stdTitle = document.getElementById('tpl-modal-color-text-title');
+      if (stdTitle) stdTitle.value = e.target.value;
+    }
     const modalKineticColor = document.getElementById('modal-kinetic-text-color');
     if (modalKineticColor) modalKineticColor.value = e.target.value;
-    renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   // Kinetic Text Inputs
@@ -39831,6 +42131,10 @@ function bindTopTemplateCustomizerEvents() {
     const target = topCustomizerState.activeTextTarget || 'main';
     const styleObj = target === 'main' ? topCustomizerState.mainStyle : topCustomizerState.subStyle;
     styleObj.fontFamily = e.target.value;
+    if (topCustomizerState.currentTpl?.id === 'kinetic-decode-typewriter') {
+      topCustomizerState._userChangedDecodeFont = true;
+      topCustomizerState.decodeFontFamily = e.target.value;
+    }
     renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
@@ -39841,6 +42145,22 @@ function bindTopTemplateCustomizerEvents() {
     styleObj.fontSize = sz;
     const lbl = document.getElementById('tpl-modal-val-font-size');
     if (lbl) lbl.textContent = `${sz}px`;
+    if (topCustomizerState.currentTpl?.id === 'kinetic-decode-typewriter') {
+      const scaled = Math.max(0.5, Math.min(2.2, sz / 52));
+      if (target === 'sub') {
+        topCustomizerState.decodeSubScale = scaled;
+        const slSub = document.getElementById('tpl-modal-slider-decode-sub-size');
+        const valSub = document.getElementById('tpl-modal-val-decode-sub-size');
+        if (slSub) slSub.value = scaled;
+        if (valSub) valSub.textContent = `${scaled.toFixed(1)}x`;
+      } else {
+        topCustomizerState.decodeTextScale = scaled;
+        const slTxt = document.getElementById('tpl-modal-slider-decode-text-size');
+        const valTxt = document.getElementById('tpl-modal-val-decode-text-size');
+        if (slTxt) slTxt.value = scaled;
+        if (valTxt) valTxt.textContent = `${scaled.toFixed(1)}x`;
+      }
+    }
     renderTopTemplatePreviewStage(); if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
@@ -39913,13 +42233,146 @@ function bindTopTemplateCustomizerEvents() {
 
 
 
-  // Matrix Rain Customizer Engine Event Listeners
+  // Investigative Decode & Archival Telemetry Customizer Engine Event Listeners
   document.getElementById('tpl-modal-matrix-rain-enable')?.addEventListener('change', (e) => {
     topCustomizerState.matrixRainEnabled = e.target.checked;
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
   });
 
   document.getElementById('tpl-modal-matrix-rain-color')?.addEventListener('input', (e) => {
     topCustomizerState.matrixRainColor = e.target.value;
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+  });
+
+  document.getElementById('tpl-modal-decode-title-color')?.addEventListener('input', (e) => {
+    topCustomizerState.titleColor = e.target.value;
+    topCustomizerState._customDecodeTitleColor = true;
+    const titleInput = document.getElementById('tpl-modal-color-text-title');
+    if (titleInput) titleInput.value = e.target.value;
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+  });
+
+  document.getElementById('tpl-modal-decode-accent-color')?.addEventListener('input', (e) => {
+    const col = e.target.value;
+    topCustomizerState.textColor = col;
+    topCustomizerState.textBehindColor = col;
+    topCustomizerState.matrixRainColor = col;
+    const elRain = document.getElementById('tpl-modal-matrix-rain-color');
+    if (elRain) elRain.value = col;
+    const subInput = document.getElementById('tpl-modal-color-text-main');
+    if (subInput) subInput.value = col;
+    // By default, keep main text color synced with dominant theme color unless user manually customized text color
+    if (!topCustomizerState._customDecodeTitleColor) {
+      topCustomizerState.titleColor = col;
+      const elTitle = document.getElementById('tpl-modal-decode-title-color');
+      if (elTitle) elTitle.value = col;
+      const stdTitle = document.getElementById('tpl-modal-color-text-title');
+      if (stdTitle) stdTitle.value = col;
+    }
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+  });
+
+  document.querySelectorAll('.decode-color-preset-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const accentCol = btn.getAttribute('data-accent-col') || '#f59e0b';
+      const titleCol = btn.getAttribute('data-title-col') || accentCol;
+      topCustomizerState.titleColor = titleCol;
+      topCustomizerState.textColor = accentCol;
+      topCustomizerState.textBehindColor = accentCol;
+      topCustomizerState.matrixRainColor = accentCol;
+      topCustomizerState._customDecodeTitleColor = (titleCol.toLowerCase() !== accentCol.toLowerCase());
+
+      const elTitle = document.getElementById('tpl-modal-decode-title-color');
+      if (elTitle) elTitle.value = titleCol;
+      const elAccent = document.getElementById('tpl-modal-decode-accent-color');
+      if (elAccent) elAccent.value = accentCol;
+      const elRain = document.getElementById('tpl-modal-matrix-rain-color');
+      if (elRain) elRain.value = accentCol;
+      const stdTitle = document.getElementById('tpl-modal-color-text-title');
+      if (stdTitle) stdTitle.value = titleCol;
+      const stdSub = document.getElementById('tpl-modal-color-text-main');
+      if (stdSub) stdSub.value = accentCol;
+      renderTopTemplatePreviewStage();
+      if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+    });
+  });
+
+  document.getElementById('tpl-modal-slider-decode-text-size')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 1.0;
+    topCustomizerState.decodeTextScale = val;
+    const lbl = document.getElementById('tpl-modal-val-decode-text-size');
+    if (lbl) lbl.textContent = `${val.toFixed(2).replace(/\.00$/, '.0')}x`;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-slider-decode-box-size')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 1.0;
+    topCustomizerState.decodeBoxScale = val;
+    const lbl = document.getElementById('tpl-modal-val-decode-box-size');
+    if (lbl) lbl.textContent = `${val.toFixed(2).replace(/\.00$/, '.0')}x`;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-slider-decode-sub-size')?.addEventListener('input', (e) => {
+    const val = parseFloat(e.target.value) || 1.0;
+    topCustomizerState.decodeSubScale = val;
+    const lbl = document.getElementById('tpl-modal-val-decode-sub-size');
+    if (lbl) lbl.textContent = `${val.toFixed(2).replace(/\.00$/, '.0')}x`;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-decode-sub-container')?.addEventListener('change', (e) => {
+    topCustomizerState.decodeSubContainer = !!e.target.checked;
+    renderTopTemplatePreviewStage();
+  });
+
+  document.getElementById('tpl-modal-select-decode-anim')?.addEventListener('change', (e) => {
+    topCustomizerState.decodeAnimStyle = e.target.value || 'expanding-decode';
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+  });
+
+  document.getElementById('tpl-modal-select-decode-container')?.addEventListener('change', (e) => {
+    topCustomizerState.decodeContainerStyle = e.target.value || 'none';
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+  });
+
+  document.getElementById('tpl-modal-select-decode-env')?.addEventListener('change', (e) => {
+    const env = e.target.value || 'darkroom-dossier';
+    topCustomizerState.decodeEnvPreset = env;
+    document.querySelectorAll('.tactical-env-btn').forEach((b) => {
+      const isAct = b.getAttribute('data-doc-env') === env;
+      b.style.background = isAct ? 'rgba(245, 158, 11, 0.22)' : 'transparent';
+      b.style.color = isAct ? '#fde68a' : '#94a3b8';
+    });
+    renderTopTemplatePreviewStage();
+    if (typeof restartTopTemplateHoverBridge === 'function') restartTopTemplateHoverBridge();
+  });
+
+
+  document.getElementById('tpl-modal-slider-matrix-typespeed')?.addEventListener('input', (e) => {
+    topCustomizerState.matrixTypeSpeed = parseFloat(e.target.value) || 1.3;
+    const lbl = document.getElementById('tpl-modal-val-matrix-typespeed');
+    if (lbl) lbl.textContent = `${topCustomizerState.matrixTypeSpeed.toFixed(1)}x`;
+  });
+
+  document.getElementById('tpl-modal-decode-redaction-sweep')?.addEventListener('change', (e) => {
+    topCustomizerState.decodeRedactionSweep = e.target.checked;
+  });
+
+  document.getElementById('tpl-modal-decode-12fps')?.addEventListener('change', (e) => {
+    topCustomizerState.decodePosterize12fps = e.target.checked;
+    const stageBtn = document.getElementById('btn-tactical-toggle-12fps');
+    if (stageBtn) {
+      stageBtn.textContent = e.target.checked ? '12fps: ON' : '12fps: Off';
+      stageBtn.style.borderColor = e.target.checked ? 'rgba(245, 158, 11, 0.55)' : 'rgba(255, 255, 255, 0.14)';
+      stageBtn.style.color = e.target.checked ? '#fde68a' : '#cbd5e1';
+    }
   });
 
   document.getElementById('tpl-modal-slider-matrix-speed')?.addEventListener('input', (e) => {
@@ -39934,7 +42387,7 @@ function bindTopTemplateCustomizerEvents() {
   });
 
   document.getElementById('tpl-modal-slider-matrix-density')?.addEventListener('input', (e) => {
-    topCustomizerState.matrixRainDensity = parseInt(e.target.value, 10) || 16;
+    topCustomizerState.matrixRainDensity = parseInt(e.target.value, 10) || 18;
     const lbl = document.getElementById('tpl-modal-val-matrix-density');
     if (lbl) {
       lbl.textContent = topCustomizerState.matrixRainDensity <= 14 ? 'Ultra Dense' : topCustomizerState.matrixRainDensity <= 18 ? 'Dense' : 'Sparse';
@@ -40628,71 +43081,93 @@ function modalAddNextSceneAction() {
     AND TRUE CENTER-CORRIDOR FLY-THROUGH BETWEEN FLANKING OBJECTS)
    ========================================================= */
 const SPATIAL_PRESETS = {
+  // STYLE PRESET 1: PREMIUM DOCUMENTARY (DEFAULT — Matches Master Images 4 & 5: image_53a765e4.png & image_84dd7e42.png)
+  'documentary': [
+    { id: '1', type: 'card', artifactMode: 'dossier-confidential', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL DOSSIER', subtitle: 'DEPT. TREASURY // EXHIBIT A', body: 'DECLASSIFIED ARCHIVAL RECORD: EXECUTIVE BRIEFING & PORTRAIT FILE.', stamp: 'CONFIDENTIAL', z: 220, x: -355, y: -92, rotY: 0.32, scale: 0.86, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '2', type: 'card', artifactMode: 'banking-monopoly', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B IN OFFSHORE TRANSFERS', stamp: 'VERIFIED', z: 210, x: 355, y: -88, rotY: -0.32, scale: 0.88, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '3', type: 'card', artifactMode: 'boardroom-sunbeams', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT', subtitle: 'CLOSED-DOOR CONSORTIUM', body: 'Sovereign liquidity policy coordinated across private reserve chairs.', stamp: 'RESTRICTED', z: 45, x: -375, y: 88, rotY: 0.28, scale: 0.84, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '4', type: 'card', artifactMode: 'world-red-network', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'GLOBAL CLEARING NETWORK', subtitle: 'OFFSHORE ROUTING MATRIX', body: 'Cross-border shell entities linked to central clearing houses.', stamp: 'EXHIBIT 04', z: 40, x: 375, y: 92, rotY: -0.28, scale: 0.84, color: '#ef4444', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '5', type: 'text', title: 'AWAKENING', midTitle: 'THE SYSTEM', subtitle: 'BEYOND PERCEPTION', body: '', z: 65, x: 0, y: 14, scale: 1.08, color: '#d4af37', contourColor: '#d4af37', textStyle: 'gold', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '6', type: 'card', artifactMode: 'image', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_gold_standard.jpg', title: 'SOVEREIGN BULLION AUDIT', subtitle: 'FEDERAL RESERVE ARCHIVE', body: 'Historical reserve ledger documenting institutional monetary shift.', stamp: 'ARCHIVE', z: -155, x: -290, y: 158, rotY: 0.22, scale: 0.72, color: '#d4af37', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '7', type: 'card', artifactMode: 'image', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CENTRAL BANK CHARTER', subtitle: 'HISTORICAL RECORD 1913', body: 'Foundational reserve act establishing central clearing authority.', stamp: 'RECORD', z: -165, x: 290, y: 160, rotY: -0.22, scale: 0.72, color: '#d4af37', cameraAction: 'glance', stopHere: false, sfxId: 'none' }
+  ],
+  // STYLE PRESET 2: TECH / INVESTIGATIVE (Matches Image 6: image_52974681.png — Holographic Cyan Globe + 4 Glass Monitors)
+  'tech-investigative': [
+    { id: '1', type: 'card', artifactMode: 'political-capitol', contourShape: 'rounded-rect', contourColor: '#38bdf8', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'POLITICAL INFLUENCE', subtitle: 'NETWORK ANALYSIS', body: 'EXEC_NODE // LEGISLATIVE LOBBYING & POLICY CORRIDOR TELEMETRY.', stamp: 'NET-SCAN', z: 195, x: -365, y: -78, rotY: 0.34, scale: 0.88, color: '#38bdf8', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '2', type: 'card', artifactMode: 'cyber-ops-hacker', contourShape: 'rounded-rect', contourColor: '#38bdf8', imageUrl: '/cctv_surveillance_scene.jpg', title: 'CYBER OPERATIONS', subtitle: 'TRACE LOGS', body: 'PACKET INTERCEPT // ENCRYPTED OFFSHORE ROUTING NODES VERIFIED.', stamp: 'TRACE', z: 195, x: 365, y: -78, rotY: -0.34, scale: 0.88, color: '#38bdf8', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '3', type: 'card', artifactMode: 'satellite-recon', contourShape: 'rounded-rect', contourColor: '#38bdf8', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SATELLITE TELEMETRY', subtitle: 'GEOSPATIAL RECON // 47.37N', body: 'Orbital synthetic aperture radar lock on dark-pool data center.', stamp: 'SAT-LOCK', z: 15, x: -380, y: 112, rotY: 0.28, scale: 0.80, color: '#38bdf8', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '4', type: 'card', artifactMode: 'market-manipulation-chart', contourShape: 'rounded-rect', contourColor: '#38bdf8', imageUrl: '/boardroom_scene_hd.jpg', title: 'MARKET MANIPULATION', subtitle: 'ALGORITHMIC LIQUIDITY SWEEP', body: 'High-frequency order book spoofing detected across global indices.', stamp: 'ANOMALY', z: 15, x: 380, y: 112, rotY: -0.28, scale: 0.82, color: '#38bdf8', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '5', type: 'card', artifactMode: 'object', objectShape: 'hologram-globe', contourShape: 'circle-portal', contourColor: '#00e5ff', title: 'GLOBAL NETWORK CORE', subtitle: '3D HOLOGRAPHIC TELEMETRY', body: 'Real-time planetary node topology and submarine cable traffic.', z: 85, x: 0, y: 12, scale: 1.28, color: '#00e5ff', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '6', type: 'text', title: 'AWAKENING', midTitle: 'THE SYSTEM', subtitle: 'BEYOND PERCEPTION', body: '', z: -155, x: 0, y: 120, scale: 0.94, color: '#38bdf8', contourColor: '#38bdf8', textStyle: 'cyan', cameraAction: 'glance', stopHere: false, sfxId: 'none' }
+  ],
+  // STYLE PRESET 3: CYBERPUNK (Matches Image 7: image_b4fbb58b.png — Neon Violet Grid + Chrome-Violet Title + Globe + 4 Panels)
+  'cyberpunk': [
+    { id: '1', type: 'card', artifactMode: 'cyber-ops-hacker', contourShape: 'rounded-rect', contourColor: '#a855f7', imageUrl: '/cctv_surveillance_scene.jpg', title: 'CYBER OPERATIONS', subtitle: 'THREAT ANALYSIS', body: 'NEURAL INTRUSION // ZERO-DAY KERNEL OVERRIDE DETECTED.', stamp: 'BREACH', z: 205, x: -365, y: -82, rotY: 0.34, scale: 0.88, color: '#a855f7', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '2', type: 'card', artifactMode: 'market-manipulation-chart', contourShape: 'rounded-rect', contourColor: '#ec4899', imageUrl: '/boardroom_scene_hd.jpg', title: 'MARKET MANIPULATION', subtitle: 'SYNTHETIC LIQUIDITY CASCADE', body: 'Automated flash-crash vector triggered across decentralized pools.', stamp: 'ALERT', z: 205, x: 365, y: -82, rotY: -0.34, scale: 0.88, color: '#ec4899', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '3', type: 'card', artifactMode: 'satellite-recon', contourShape: 'rounded-rect', contourColor: '#a855f7', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'GLOBAL NODE MATRIX', subtitle: 'SUBNET TOPOLOGY', body: 'Encrypted dark-fiber relays spanning 14 sovereign jurisdictions.', stamp: 'NODE-09', z: 25, x: -380, y: 108, rotY: 0.28, scale: 0.80, color: '#a855f7', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '4', type: 'card', artifactMode: 'political-capitol', contourShape: 'rounded-rect', contourColor: '#c084fc', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'POLITICAL INFLUENCE', subtitle: 'NETWORK MAPPING', body: 'Algorithmic sentiment steering and regulatory capture index.', stamp: 'MAPPED', z: 25, x: 380, y: 108, rotY: -0.28, scale: 0.82, color: '#c084fc', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '5', type: 'text', title: 'AWAKENING', midTitle: 'THE SYSTEM', subtitle: 'BEYOND PERCEPTION', body: '', z: 95, x: 0, y: 14, scale: 1.08, color: '#e879f9', contourColor: '#a855f7', textStyle: 'chrome', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '6', type: 'card', artifactMode: 'object', objectShape: 'hologram-globe', contourShape: 'circle-portal', contourColor: '#a855f7', title: 'PLANETARY NEXUS', subtitle: 'NEURAL MESH CORE', body: 'Holographic global grid synchronized to central AI mainframes.', z: -45, x: 0, y: 16, scale: 1.18, color: '#a855f7', cameraAction: 'glance', stopHere: false, sfxId: 'none' }
+  ],
   'forbes-hallway': [
-    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 750, x: -520, y: 55, scale: 0.95, color: '#f59e0b' },
-    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: 500, x: 520, y: -40, scale: 0.95, color: '#38bdf8' },
-    { id: '3', type: 'card', artifactMode: 'forbes', imageUrl: '/portrait_cutout_clean.png', magazineTitle: 'Forbes', featureTag: 'SPECIAL REPORT // THE ARCHITECT', featureTitle: 'THE $30 BILLION FRAUD', topTickerLeft: 'EXCLUSIVE INVESTIGATION', kickerBadge: 'EXPOSED', topTickerRight: 'VOL. 104 NO. 8', title: 'FORBES 3D COVER', subtitle: 'THE FRAUD REVEAL', body: 'The iconic Forbes cover sequence in 3D: paparazzi flashes, anamorphic flare & macro inspection.', z: 120, x: 0, y: 15, scale: 1.25, color: '#f8fafc', beamActive: true, isHeroForbes: true },
-    { id: '4', type: 'text', title: 'AWAKENING', subtitle: 'BEYOND PERCEPTION', body: '', z: -350, x: 0, y: 15, scale: 1.2, color: '#f8fafc' },
-    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -700, x: -520, y: 45, scale: 0.95, color: '#ef4444' },
-    { id: '6', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -1050, x: 520, y: -35, scale: 0.95, color: '#d97706' },
-    { id: '7', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'STELLAR GEM BEACON', subtitle: 'ASTRONOMICAL RECORD', body: 'A faceted celestial relic floating in deep cosmic space.', z: -1400, x: -520, y: 55, scale: 1.1, color: '#38bdf8' },
-    { id: '8', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -1750, x: 520, y: -45, scale: 0.95, color: '#10b981' },
-    { id: '9', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'FINAL FORENSIC CLIMAX', body: '', z: -2200, x: 0, y: 15, scale: 1.25, color: '#f8fafc' },
-    { id: '10', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'VAULT ARCHIVES SEALED', subtitle: 'FINAL FORENSIC RECORD', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -2700, x: -520, y: 45, scale: 0.95, color: '#d97706' }
+    { id: '0', type: 'text', title: 'THE SYSTEM', subtitle: 'MANIPULATION & CONTROL', body: '', z: 650, x: 0, y: 15, scale: 1.22, color: '#f59e0b', contourColor: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '1', type: 'card', artifactMode: 'dossier-confidential', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'LEFT WALL // EXHIBIT 01', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 420, x: -490, y: 35, scale: 0.98, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '2', type: 'card', artifactMode: 'banking-monopoly', contourShape: 'rounded-rect', contourColor: '#d4af37', videoUrl: '/template_previews/market-crash.mp4', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B IN OFFSHORE TRANSFERS.', z: 120, x: 490, y: -25, scale: 1.0, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '3', type: 'card', artifactMode: 'forbes', contourShape: 'rounded-rect', contourColor: '#f59e0b', imageUrl: '/portrait_cutout_clean.png', magazineTitle: 'Forbes', featureTag: 'SPECIAL REPORT // THE ARCHITECT', featureTitle: 'THE $30 BILLION FRAUD', topTickerLeft: 'EXCLUSIVE INVESTIGATION', kickerBadge: 'EXPOSED', topTickerRight: 'VOL. 104 NO. 8', title: 'FORBES 3D COVER', subtitle: 'CENTER HERO // MACRO EXHIBIT', body: 'The iconic Forbes cover sequence in 3D: paparazzi flashes, anamorphic flare & macro inspection.', z: -220, x: 0, y: 15, scale: 1.22, color: '#f8fafc', beamActive: true, isHeroForbes: true, cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '4', type: 'card', artifactMode: 'world-red-network', contourShape: 'arch-frame', contourColor: '#ef4444', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'MUSEUM ARCH // EVIDENCE MATRIX', subtitle: 'LEFT GALLERY ALCOVE // EXHIBIT 04', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -600, x: -510, y: 30, scale: 1.04, color: '#ef4444', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '5', type: 'card', artifactMode: 'image', contourShape: 'sharp-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'RIGHT GALLERY WALL // AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -920, x: 510, y: -20, scale: 1.0, color: '#d4af37', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '6', type: 'text', title: 'AWAKENING', midTitle: 'THE SYSTEM', subtitle: 'BEYOND PERCEPTION', body: '', z: -1240, x: 0, y: 15, scale: 1.18, color: '#f59e0b', contourColor: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '7', type: 'card', artifactMode: 'object', objectShape: 'hologram-globe', contourShape: 'hexagon-prism', contourColor: '#38bdf8', title: 'GLOBAL TELEMETRY CORE', subtitle: 'SCULPTURE PEDESTAL // EXHIBIT 07', body: 'Holographic planetary node matrix floating in deep museum space.', z: -1560, x: -480, y: 40, scale: 1.08, color: '#38bdf8', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '8', type: 'card', artifactMode: 'video', contourShape: 'rounded-rect', contourColor: '#10b981', videoUrl: '/template_previews/surveillance.mp4', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 SURVEILLANCE REEL', subtitle: 'LIVE VIDEO FEED // EXHIBIT 08', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -1940, x: 500, y: -30, scale: 1.0, color: '#10b981', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '9', type: 'card', artifactMode: 'boardroom-sunbeams', shapeType: 'hexagon-prism', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'SOVEREIGN SUMMIT ARCHIVE', subtitle: 'HEXAGONAL VAULT // EXHIBIT 09', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -2340, x: -490, y: 30, scale: 1.04, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '10', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'FINAL FORENSIC CLIMAX', body: '', z: -2720, x: 0, y: 15, scale: 1.25, color: '#f59e0b', contourColor: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' }
   ],
   'docu-essay': [
-    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 700, x: -500, y: 55, scale: 0.95, color: '#f59e0b' },
-    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY LEDGER', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B UNACCOUNTED IN OFFSHORE TRANSFERS.', z: 500, x: 500, y: -40, scale: 0.95, color: '#38bdf8' },
-    { id: '3', type: 'text', title: 'AWAKENING', subtitle: 'BEYOND PERCEPTION', body: '', z: 200, x: 0, y: 15, scale: 1.2, color: '#f8fafc' },
-    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -100, x: -500, y: 45, scale: 0.95, color: '#ef4444' },
-    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -380, x: 500, y: -35, scale: 0.95, color: '#d97706' },
-    { id: '6', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -700, x: -500, y: 60, scale: 0.95, color: '#10b981' },
-    { id: '7', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT PROTOCOL', subtitle: 'MINUTES RECORDED', body: 'AGREEMENT SIGNED BEHIND CLOSED DOORS WITH CONSORTIUM PARTNERS.', z: -1020, x: 500, y: -45, scale: 0.95, color: '#6366f1' },
-    { id: '8', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'THE ARCHITECTURE OF CONSENT', body: '', z: -1400, x: 0, y: 15, scale: 1.15, color: '#f8fafc' },
-    { id: '9', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'SWISS VAULT REGISTRY', subtitle: 'ACCOUNT NUMBER #88092-B', body: 'ANONYMOUS TRUST DISBURSEMENTS CROSSING MARITIME JURISDICTIONS.', z: -1720, x: -500, y: 50, scale: 0.95, color: '#f59e0b' },
-    { id: '10', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'INTERNATIONAL CLEARING', subtitle: 'SWIFT TRANSACTION RECORD', body: 'SETTLEMENT LOGS CONFLICTING WITH AUDITED ANNUAL FINANCIALS.', z: -2050, x: 500, y: -40, scale: 0.95, color: '#38bdf8' },
-    { id: '11', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'SOVEREIGN AUDIT FILE', subtitle: 'EXHIBIT C // CENTRAL BANK', body: 'CLASSIFIED CLEARING HOUSE RECORDS & WIRE TELEMETRY.', z: -2400, x: -500, y: 55, scale: 0.95, color: '#ef4444' },
-    { id: '12', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SURVEILLANCE TIMESTAMP', subtitle: 'INTERCEPT CAM 04', body: 'TIMECODE 04:18:22 PROTOCOL ENGAGED AUTOMATICALLY.', z: -2750, x: 500, y: -35, scale: 0.95, color: '#10b981' },
-    { id: '13', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'THE FINAL AWAKENING', body: '', z: -3150, x: 0, y: 15, scale: 1.25, color: '#f8fafc' },
-    { id: '14', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'VAULT ARCHIVES SEALED', subtitle: 'FINAL FORENSIC RECORD', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -3550, x: -500, y: 45, scale: 0.95, color: '#d97706' }
+    { id: '1', type: 'card', artifactMode: 'dossier-confidential', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 700, x: -500, y: 55, scale: 0.95, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '2', type: 'card', artifactMode: 'banking-monopoly', contourShape: 'rounded-rect', contourColor: '#d4af37', videoUrl: '/template_previews/market-crash.mp4', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B IN OFFSHORE TRANSFERS.', z: 420, x: 500, y: -40, scale: 0.95, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '3', type: 'text', title: 'AWAKENING', midTitle: 'THE SYSTEM', subtitle: 'BEYOND PERCEPTION', body: '', z: 120, x: 0, y: 15, scale: 1.25, color: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '4', type: 'card', artifactMode: 'world-red-network', contourShape: 'rounded-rect', contourColor: '#ef4444', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -220, x: -500, y: 45, scale: 0.98, color: '#ef4444', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '5', type: 'card', artifactMode: 'image', contourShape: 'sharp-rect', contourColor: '#f59e0b', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -560, x: 500, y: -35, scale: 0.95, color: '#f59e0b', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '6', type: 'card', artifactMode: 'cyber-ops-hacker', contourShape: 'rounded-rect', contourColor: '#10b981', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -900, x: -500, y: 60, scale: 0.95, color: '#10b981', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '7', type: 'card', artifactMode: 'boardroom-sunbeams', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT PROTOCOL', subtitle: 'MINUTES RECORDED', body: 'AGREEMENT SIGNED BEHIND CLOSED DOORS WITH CONSORTIUM PARTNERS.', z: -1280, x: 500, y: -45, scale: 0.95, color: '#d4af37', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' },
+    { id: '8', type: 'text', title: 'MANIPULATION & CONTROL', subtitle: 'THE ARCHITECTURE OF CONSENT', body: '', z: -1680, x: 0, y: 15, scale: 1.15, color: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '9', type: 'card', artifactMode: 'image', contourShape: 'diamond-rhombus', contourColor: '#f59e0b', imageUrl: '/paper_tear_gold_standard.jpg', title: 'VAULT ARCHIVES SEALED', subtitle: 'FINAL FORENSIC RECORD', body: 'INVESTIGATION CONCLUDED. ARCHIVAL DOSSIER STORED IN PERMANENT REGISTRY.', z: -2150, x: -500, y: 45, scale: 0.95, color: '#f59e0b', cameraAction: 'stop-zoom', stopHere: false, sfxId: 'none' }
   ],
   'cyber-matrix': [
-    { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 600, x: -520, y: 65, scale: 0.95, color: '#10b981' },
-    { id: '2', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'NEURAL NODE 01', subtitle: 'QUANTUM ENCRYPTION', body: 'Autonomous mesh relay processing encrypted packet routes.', z: 400, x: 520, y: -40, scale: 0.95, color: '#06b6d4' },
-    { id: '3', type: 'text', title: 'ALGORITHMIC', subtitle: 'SYNTHETIC LIQUIDITY', body: '', z: 150, x: 0, y: 15, scale: 1.2, color: '#06b6d4' },
-    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/cctv_surveillance_scene.jpg', title: 'NEURAL FEED', subtitle: 'SYNTHETIC REALITY', body: 'Deep spatial neural pathways floating in high dimensional tensor spaces.', z: -300, x: -520, y: 45, scale: 0.95, color: '#38bdf8' },
-    { id: '5', type: 'card', artifactMode: 'object', objectShape: 'octahedron', title: 'SECURITY ENCLAVE', subtitle: 'TPM HARDWARE VAULT', body: 'Isolated memory block holding root certificate authorities.', z: -650, x: 520, y: -45, scale: 0.95, color: '#10b981' },
-    { id: '6', type: 'code', artifactMode: 'code', title: 'SUBROUTINE_ZERO.C', text: 'void breach() {\n  unlock_ring0();\n  sync_ledger(NULL);\n}', z: -1000, x: -520, y: 55, scale: 0.95, color: '#06b6d4' },
-    { id: '7', type: 'text', title: 'QUANTUM REACH', subtitle: 'ZERO-LATENCY CONTROL', body: '', z: -1400, x: 0, y: 15, scale: 1.25, color: '#06b6d4' },
-    { id: '8', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'DATA ARCHIVE', subtitle: 'EXABYTE CLUSTER', body: 'Decentralized high frequency nodes processing global market feeds.', z: -1800, x: -520, y: 40, scale: 0.95, color: '#38bdf8' },
-    { id: '9', type: 'card', artifactMode: 'object', objectShape: 'torus', title: 'SYNAPSE RING', subtitle: 'OPTICAL BACKBONE', body: 'Sub-sea fiber line carrying petabytes per millisecond.', z: -2200, x: 520, y: -40, scale: 0.95, color: '#a855f7' },
-    { id: '10', type: 'text', title: 'ROOT ACCESS', subtitle: 'TERMINAL CONVERGENCE', body: '', z: -2700, x: 0, y: 15, scale: 1.25, color: '#10b981' },
-    { id: '11', type: 'code', artifactMode: 'code', title: 'KERNEL_EXIT.ASM', text: 'mov rax, 0x1\nmov rdi, 0x0\nsyscall', z: -3100, x: -520, y: 50, scale: 0.95, color: '#06b6d4' }
+    { id: '1', type: 'code', artifactMode: 'code', title: 'SYSTEM_OVERRIDE.TS', text: 'function initMatrix() {\n  const depth = Math.tan(FOV);\n  return new Space(depth);\n}', z: 600, x: -520, y: 65, scale: 0.95, color: '#10b981', cameraAction: 'glance', stopHere: false },
+    { id: '2', type: 'card', artifactMode: 'object', objectShape: 'hologram-globe', contourShape: 'chamfer-octagon', contourColor: '#06b6d4', title: 'NEURAL NODE 01', subtitle: 'QUANTUM ENCRYPTION', body: 'Autonomous mesh relay processing encrypted packet routes.', z: 320, x: 520, y: -40, scale: 0.95, color: '#06b6d4', cameraAction: 'glance', stopHere: false },
+    { id: '3', type: 'text', title: 'ALGORITHMIC', midTitle: 'THE SYSTEM', subtitle: 'SYNTHETIC LIQUIDITY', body: '', z: 40, x: 0, y: 15, scale: 1.2, color: '#06b6d4', cameraAction: 'glance', stopHere: false },
+    { id: '4', type: 'card', artifactMode: 'cyber-ops-hacker', contourShape: 'hexagon-prism', contourColor: '#38bdf8', videoUrl: '/template_previews/surveillance.mp4', imageUrl: '/cctv_surveillance_scene.jpg', title: 'NEURAL FEED', subtitle: 'SYNTHETIC REALITY', body: 'Deep spatial neural pathways floating in high dimensional tensor spaces.', z: -340, x: -520, y: 45, scale: 0.95, color: '#38bdf8', cameraAction: 'glance', stopHere: false },
+    { id: '5', type: 'card', artifactMode: 'market-manipulation-chart', objectShape: 'octahedron', contourShape: 'sharp-rect', contourColor: '#10b981', title: 'SECURITY ENCLAVE', subtitle: 'TPM HARDWARE VAULT', body: 'Isolated memory block holding root certificate authorities.', z: -720, x: 520, y: -45, scale: 0.95, color: '#10b981', cameraAction: 'glance', stopHere: false },
+    { id: '6', type: 'code', artifactMode: 'code', title: 'SUBROUTINE_ZERO.C', text: 'void breach() {\n  unlock_ring0();\n  sync_ledger(NULL);\n}', z: -1100, x: -520, y: 55, scale: 0.95, color: '#06b9d4', cameraAction: 'glance', stopHere: false },
+    { id: '7', type: 'text', title: 'QUANTUM REACH', subtitle: 'ZERO-LATENCY CONTROL', body: '', z: -1550, x: 0, y: 15, scale: 1.25, color: '#06b6d4', cameraAction: 'glance', stopHere: false }
   ],
   'philosophy': [
-    { id: '1', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'EPISODE I', subtitle: 'THE SEARCH FOR TRUTH', body: 'We spend our entire lives mistaking the shadow on the wall for the reality in front of us.', z: 550, x: -520, y: 50, scale: 0.95, color: '#d4af37' },
-    { id: '2', type: 'card', artifactMode: 'image', imageUrl: '/boardroom_scene_hd.jpg', title: 'THE SOCIAL CONTRACT', subtitle: 'LEVIATHAN ESSAY', body: 'Institutions build towers of gold upon foundations of collective belief.', z: 300, x: 520, y: -40, scale: 0.95, color: '#f59e0b' },
-    { id: '3', type: 'text', title: 'THE ILLUSION', subtitle: 'THE SHADOW ON THE WALL', body: '', z: 50, x: 0, y: 15, scale: 1.15, color: '#f8fafc' },
-    { id: '4', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'THE PARADOX', subtitle: 'SOCRATIC DIALOGUE', body: 'The only true wisdom is in knowing you know nothing at all.', z: -400, x: -520, y: 55, scale: 0.95, color: '#fde68a' },
-    { id: '5', type: 'card', artifactMode: 'image', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'ARISTOCRACY OF MIND', subtitle: 'PHILOSOPHY OF POWER', body: 'Power is never seized by accident; it is engineered through quiet persistence.', z: -850, x: 520, y: -45, scale: 0.95, color: '#f59e0b' },
-    { id: '6', type: 'text', title: 'THE AWAKENING', subtitle: 'BREAKING THE CONDITIONING', body: '', z: -1400, x: 0, y: 15, scale: 1.2, color: '#f8fafc' },
-    { id: '7', type: 'card', artifactMode: 'image', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'METAPHYSICAL ARCHIVE', subtitle: 'CAUSALITY & DESTINY', body: 'Every action echoes across centuries of unspoken momentum.', z: -1900, x: -520, y: 45, scale: 0.95, color: '#d4af37' },
-    { id: '8', type: 'card', artifactMode: 'image', imageUrl: '/paper_tear_gold_standard.jpg', title: 'THE NEW DAWN', subtitle: 'ENLIGHTENMENT', body: 'Clear sight is the greatest asset an individual can possess in an uncertain world.', z: -2450, x: 520, y: -35, scale: 0.95, color: '#f59e0b' },
-    { id: '9', type: 'text', title: 'CONSCIOUSNESS', subtitle: 'BEYOND THE LABYRINTH', body: '', z: -2950, x: 0, y: 15, scale: 1.25, color: '#f8fafc' }
+    { id: '1', type: 'card', artifactMode: 'shape', shapeType: 'arch-frame', contourShape: 'arch-frame', contourColor: '#d4af37', imageUrl: '/paper_tear_gold_standard.jpg', title: 'EPISODE I', subtitle: 'THE SEARCH FOR TRUTH', body: 'We spend our entire lives mistaking the shadow on the wall for the reality in front of us.', z: 550, x: -520, y: 50, scale: 0.98, color: '#d4af37', cameraAction: 'glance', stopHere: false },
+    { id: '2', type: 'card', artifactMode: 'boardroom-sunbeams', contourShape: 'rounded-rect', contourColor: '#f59e0b', imageUrl: '/boardroom_scene_hd.jpg', title: 'THE SOCIAL CONTRACT', subtitle: 'LEVIATHAN ESSAY', body: 'Institutions build towers of gold upon foundations of collective belief.', z: 250, x: 520, y: -40, scale: 0.95, color: '#f59e0b', cameraAction: 'glance', stopHere: false },
+    { id: '3', type: 'text', title: 'THE ILLUSION', midTitle: 'THE SYSTEM', subtitle: 'THE SHADOW ON THE WALL', body: '', z: -50, x: 0, y: 15, scale: 1.15, color: '#f59e0b', cameraAction: 'glance', stopHere: false },
+    { id: '4', type: 'card', artifactMode: 'dossier-confidential', contourShape: 'sharp-rect', contourColor: '#fde68a', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'THE PARADOX', subtitle: 'SOCRATIC DIALOGUE', body: 'The only true wisdom is in knowing you know nothing at all.', z: -450, x: -520, y: 55, scale: 0.95, color: '#fde68a', cameraAction: 'glance', stopHere: false },
+    { id: '5', type: 'card', artifactMode: 'shape', shapeType: 'circle-portal', contourShape: 'circle-portal', contourColor: '#f59e0b', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'ARISTOCRACY OF MIND', subtitle: 'PHILOSOPHY OF POWER', body: 'Power is never seized by accident; it is engineered through quiet persistence.', z: -900, x: 520, y: -45, scale: 0.98, color: '#f59e0b', cameraAction: 'glance', stopHere: false },
+    { id: '6', type: 'text', title: 'THE AWAKENING', subtitle: 'BREAKING THE CONDITIONING', body: '', z: -1400, x: 0, y: 15, scale: 1.2, color: '#f59e0b', cameraAction: 'glance', stopHere: false }
   ],
   'cosmic-universe': [
-    { id: '1', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'ALPHA CENTAURI BEACON', subtitle: 'DEEP STELLAR SENSOR', body: 'Pulsing celestial beacon marking interstellar coordinate zero.', z: 600, x: -520, y: 60, scale: 1.1, color: '#38bdf8' },
-    { id: '2', type: 'card', artifactMode: 'object', objectShape: 'torus', title: 'STARGATE CELESTIAL RING', subtitle: 'WORMHOLE RUNWAY', body: 'Rotating quantum torus generating localized gravitational corridors.', z: 400, x: 520, y: -50, scale: 1.15, color: '#a855f7' },
-    { id: '3', type: 'text', title: 'COSMIC VOYAGE', subtitle: 'NAVIGATING THROUGH THE STARS', body: '', z: 150, x: 0, y: 15, scale: 1.25, color: '#38bdf8' },
-    { id: '4', type: 'card', artifactMode: 'object', objectShape: 'octahedron', title: 'QUANTUM DIAMOND CRYSTAL', subtitle: 'ZERO-POINT ENERGY EMITTER', body: 'Faceted octahedron crystal resonating at cosmic microwave background frequencies.', z: -250, x: -520, y: 45, scale: 1.05, color: '#f59e0b' },
-    { id: '5', type: 'card', artifactMode: 'object', objectShape: 'dodecahedron', title: 'STELLAR CORE POLYHEDRON', subtitle: 'FUSION ANCHOR', body: 'Dense core housing artificial micro-singularity propulsion.', z: -650, x: 520, y: -40, scale: 1.1, color: '#10b981' },
-    { id: '6', type: 'card', artifactMode: 'object', objectShape: 'monolith', title: 'DEEP SPACE MONOLITH', subtitle: 'INTERSTELLAR ANOMALY', body: 'Hyper-smooth black glass obelisk emitting coherent harmonic signals.', z: -1050, x: -520, y: 55, scale: 1.2, color: '#c084fc' },
-    { id: '7', type: 'text', title: 'HORIZON TRANSIT', subtitle: 'BEYOND KNOWN GALAXY', body: '', z: -1450, x: 0, y: 15, scale: 1.2, color: '#a855f7' },
-    { id: '8', type: 'card', artifactMode: 'object', objectShape: 'torus', title: 'ORBITAL RING PLATFORM', subtitle: 'SUB-LIGHT ACCELERATOR', body: 'Macro-engineering ring suspended between twin pulsar gravity wells.', z: -1850, x: 520, y: -45, scale: 1.15, color: '#38bdf8' },
-    { id: '9', type: 'card', artifactMode: 'object', objectShape: 'icosahedron', title: 'PULSAR CHRONOMETER', subtitle: 'CELESTIAL TIMEKEEPER', body: 'Atomic precision clock locked to millisecond pulsar rotations.', z: -2250, x: -520, y: 50, scale: 1.05, color: '#f59e0b' },
-    { id: '10', type: 'card', artifactMode: 'object', objectShape: 'octahedron', title: 'NEBULA CONDENSER', subtitle: 'MATTER HARVESTER', body: 'Magnetic funnel gathering ionized hydrogen from stellar nursery clouds.', z: -2650, x: 520, y: -40, scale: 1.1, color: '#10b981' },
-    { id: '11', type: 'text', title: 'THE UNIVERSE BEYOND', subtitle: 'INFINITE CELESTIAL DEPTH', body: '', z: -3100, x: 0, y: 15, scale: 1.3, color: '#38bdf8' },
-    { id: '12', type: 'card', artifactMode: 'object', objectShape: 'monolith', title: 'COSMIC GENESIS RELIC', subtitle: 'VAULT OF INFINITY', body: 'Permanent marker left at boundary of observed cosmic web.', z: -3550, x: -520, y: 45, scale: 1.2, color: '#e0e7ff' }
+    { id: '1', type: 'card', artifactMode: 'object', objectShape: 'hologram-globe', contourShape: 'hexagon-prism', contourColor: '#38bdf8', title: 'ALPHA CENTAURI BEACON', subtitle: 'DEEP STELLAR SENSOR', body: 'Pulsing celestial beacon marking interstellar coordinate zero.', z: 600, x: -520, y: 60, scale: 1.1, color: '#38bdf8', cameraAction: 'glance', stopHere: false },
+    { id: '2', type: 'card', artifactMode: 'object', objectShape: 'torus', contourShape: 'circle-portal', contourColor: '#a855f7', title: 'STARGATE CELESTIAL RING', subtitle: 'WORMHOLE RUNWAY', body: 'Rotating quantum torus generating localized gravitational corridors.', z: 320, x: 520, y: -50, scale: 1.15, color: '#a855f7', cameraAction: 'glance', stopHere: false },
+    { id: '3', type: 'text', title: 'COSMIC VOYAGE', midTitle: 'BEYOND TIME', subtitle: 'NAVIGATING THROUGH THE STARS', body: '', z: 40, x: 0, y: 15, scale: 1.25, color: '#f59e0b', cameraAction: 'glance', stopHere: false },
+    { id: '4', type: 'card', artifactMode: 'object', objectShape: 'octahedron', contourShape: 'diamond-rhombus', contourColor: '#f59e0b', title: 'QUANTUM DIAMOND CRYSTAL', subtitle: 'ZERO-POINT ENERGY EMITTER', body: 'Faceted octahedron crystal resonating at cosmic microwave background frequencies.', z: -340, x: -520, y: 45, scale: 1.05, color: '#f59e0b', cameraAction: 'glance', stopHere: false },
+    { id: '5', type: 'card', artifactMode: 'object', objectShape: 'dodecahedron', contourShape: 'chamfer-octagon', contourColor: '#10b981', title: 'STELLAR CORE POLYHEDRON', subtitle: 'FUSION ANCHOR', body: 'Dense core housing artificial micro-singularity propulsion.', z: -760, x: 520, y: -40, scale: 1.1, color: '#10b981', cameraAction: 'glance', stopHere: false },
+    { id: '6', type: 'card', artifactMode: 'object', objectShape: 'monolith', contourShape: 'sharp-rect', contourColor: '#c084fc', title: 'DEEP SPACE MONOLITH', subtitle: 'INTERSTELLAR ANOMALY', body: 'Hyper-smooth black glass obelisk emitting coherent harmonic signals.', z: -1200, x: -520, y: 55, scale: 1.2, color: '#c084fc', cameraAction: 'glance', stopHere: false }
+  ],
+  'awakening-gallery': [
+    { id: '1', type: 'card', artifactMode: 'dossier-confidential', contourShape: 'rounded-rect', contourColor: '#d4af37', imageUrl: '/paper_tear_stock_archival_news.jpg', title: 'CONFIDENTIAL SCAN', subtitle: 'DEPT. TREASURY // CLASSIFIED', body: 'ARCHIVAL DOSSIER: VERIFIED & SEALED UNDER EXECUTIVE ORDER.', z: 540, x: -500, y: 42, scale: 0.96, color: '#d4af37', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '2', type: 'card', artifactMode: 'banking-monopoly', contourShape: 'rounded-rect', contourColor: '#d4af37', videoUrl: '/template_previews/market-crash.mp4', imageUrl: '/boardroom_scene_hd.jpg', title: 'FINANCIAL MONOPOLY', subtitle: 'BANKING CONGLOMERATE', body: 'CAPITAL FLOW: $84.2B IN OFFSHORE TRANSFERS.', z: 320, x: 500, y: -32, scale: 0.96, color: '#d4af37', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '3', type: 'text', title: 'AWAKENING', midTitle: 'THE SYSTEM', subtitle: 'BEYOND PERCEPTION', body: '', z: 40, x: 0, y: 15, scale: 1.28, color: '#f59e0b', contourColor: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '4', type: 'card', artifactMode: 'world-red-network', contourShape: 'arch-frame', contourColor: '#ef4444', imageUrl: '/red_string_board_cinematic_plate.jpg', title: 'NETWORK CONSPIRACY NODES', subtitle: 'EVIDENCE MATRIX // EXHIBIT A', body: 'CROSS-REFERENCED CLEARING HOUSE LOGS AND SHELL ENTITIES.', z: -280, x: -510, y: 38, scale: 0.98, color: '#ef4444', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '5', type: 'card', artifactMode: 'boardroom-sunbeams', contourShape: 'sharp-rect', contourColor: '#f59e0b', imageUrl: '/paper_tear_gold_standard.jpg', title: 'GOLD STANDARD DISCREPANCY', subtitle: 'FEDERAL RESERVE AUDIT', body: 'UNACCOUNTED BULLION AUDIT EXCEEDING DECLARED TREASURY RESERVES.', z: -620, x: 510, y: -28, scale: 0.96, color: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '6', type: 'text', title: 'THE SYSTEM', subtitle: 'MANIPULATION & CONTROL', body: '', z: -980, x: 0, y: 15, scale: 1.24, color: '#f59e0b', contourColor: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '7', type: 'card', artifactMode: 'cyber-ops-hacker', contourShape: 'rounded-rect', contourColor: '#10b981', imageUrl: '/cctv_surveillance_scene.jpg', title: 'SECTOR 7 LOG', subtitle: 'OFF-GRID CLEARANCE', body: 'SATELLITE INTERCEPT 44.92N 12.44E TIME 03:41 UTC.', z: -1340, x: -500, y: 45, scale: 0.96, color: '#10b981', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '8', type: 'card', artifactMode: 'political-capitol', contourShape: 'hexagon-prism', contourColor: '#38bdf8', imageUrl: '/power_meeting_cinematic_plate.jpg', title: 'EXECUTIVE SUMMIT PROTOCOL', subtitle: 'MINUTES RECORDED', body: 'AGREEMENT SIGNED BEHIND CLOSED DOORS WITH CONSORTIUM PARTNERS.', z: -1720, x: 500, y: -35, scale: 0.96, color: '#38bdf8', cameraAction: 'glance', stopHere: false, sfxId: 'none' },
+    { id: '9', type: 'text', title: 'THE SYSTEM OVERRIDE', subtitle: 'FINAL FORENSIC CLIMAX', body: '', z: -2160, x: 0, y: 15, scale: 1.28, color: '#f59e0b', contourColor: '#f59e0b', cameraAction: 'glance', stopHere: false, sfxId: 'none' }
   ]
 };
 
@@ -40702,6 +43177,9 @@ let spatial3DState = {
   renderer: null,
   elements3D: [],
   particlesMesh: null,
+  smokeGroup: null,
+  volumetricRaysGroup: null,
+  worldPedestalGroup: null,
   floorGrid: null,
   gridMeshes: null,
   ambientLight: null,
@@ -40709,64 +43187,167 @@ let spatial3DState = {
   animId: null,
   isPlaying: true,
 
-  // Background & Environment System
-  bgStyle: 'grid-stars', // 'pitch-dark', 'grid-only', 'stars-only', 'grid-stars'
-  bgColor: '#07080c',
-  transparentBg: false,
-  envStyle: 'tunnel-cyan', // 'tunnel-cyan', 'tunnel-gold', 'tunnel-slate', 'open-stars', 'deep-cosmos'
+  // Master Style Preset ('documentary' Default | 'tech-investigative' | 'cyberpunk')
+  stylePreset: 'documentary',
 
-  // Grid Granularity Controls
-  gridDensity: 60, // 20 to 120 lines
-  gridSpeed: 1.0, // 0 to 3x conveyor flow
-  gridLuminescence: 100, // 0 to 200%
-  gridGlow: 100, // 0 to 200%
-  gridColor: '#06b6d4',
+  // Selectable Environment & Background System (Dark atmospheric space by default; grid optional & disabled by default)
+  bgStyle: 'black-stars-smoke',
+  bgColor: '#05060b',
+  transparentBg: false,
+  envStyle: 'tunnel-gold',
+  smokeVisible: true,
+  smokeIntensity: 68,
+  smokeColor: '#262018',
+
+  // Optional Perspective Grid Controls (Disabled by default per art direction; enabled in Cyberpunk or via toggle)
+  gridDensity: 140,
+  gridSpeed: 0.65,
+  gridLuminescence: 38,
+  gridGlow: 75,
+  gridColor: '#d4af37',
+  gridWallMode: 'floor-only',
 
   // Starfield & Cosmic Dust Controls
-  starCount: 1200, // 100 to 2500
-  starSize: 4.8, // 1 to 10px
-  starSpeed: 1.0, // 0 to 3x
+  starCount: 1200,
+  starSize: 3.2,
+  starSpeed: 0.75,
   showCelestialObjects: true,
 
-  // Camera Flight & Museum Pacing
-  flightMode: 'museum-tour', // 'museum-tour', 'zoomthrough', 'pullback', 'slalom', 'orbit', 'custom-path'
-  pathStyle: 'corridor-hallway', // 'corridor-hallway', 'straight', 'slalom', 'cosmic-wave', 'custom'
-  pathCurve: 0, // -100 to +100
-  drawnPath: null, // array of { t, x, y }
-  camSpeed: 1.0, // -3.0 to +3.0 (negative speed for reverse flight)
-  camDrift: 20,
-  camShake: 12, // 0 to 100% organic handheld shake
-  focalPauses: true, // museum tour stops & zooms into hero exhibits
-  camPitch: 2,
+  // Global & Per-Card Contour Customization (Restrained Antique Gold Hairline Default)
+  cardContourColor: '#d4af37',
+  cardContourShape: 'preset-default',
+  cardContourWidth: 1.8,
+  cardContourGlow: 32,
+
+  // Camera Movement Presets & Stop System
+  // Supports: 'establishing-shot' (Default), 'slow-dolly', 'lateral-reveal', 'evidence-focus', 'hero-title',
+  // plus 'museum-tour', 'back-to-front-back', 'front-to-back', 'left-to-right-weave', 'right-to-left-weave', 'zoomthrough', 'pullback', 'slalom', 'orbit', 'custom-path'
+  flightMode: 'establishing-shot',
+  stopMode: 'none',
+  randomStopLayerId: null,
+
+  // Speed, Negative Motion & Granular Slow-Mo Ramp ("Slows, slows... and BOOM starts again!")
+  camSpeed: 1.0,
+  slowMoRampEnabled: false,
+  slowMoCurvePreset: 'slow-slow-boom',
+  slowMoTriggerT: 0.45,
+  slowMoDecelSpan: 0.18,
+  slowMoDipSpeed: -0.35,
+  slowMoBoomBurst: 1.85,
+  _liveVelocityMult: 1.0,
+  _inBoomPhase: false,
+  _inDipPhase: false,
+
+  // 3D Hand Detour & Steering on Top of Active Route (Never Frozen in Time!)
+  handControlMode: 'detour-spring',
+  handDetourX: 0,
+  handDetourY: 0,
+  handDetourZ: 0,
+  handTargetDetourX: 0,
+  handTargetDetourY: 0,
+  handTargetDetourZ: 0,
+  isHandDragging: false,
+
+  cameramanStyle: 'roaming-curator',
+  slowMoIntensity: 68,
+  zoomInspectDepth: 65,
+  detourVeerStrength: 75,
+  wallLookAround: 65,
+  pathStyle: 'corridor-hallway',
+  pathCurve: 0,
+  drawnPath: null,
+  camDrift: 16,
+  camShake: 6,
+  focalPauses: true,
+  camPitch: 0,
   camYaw: 0,
-  fovWarp: 52,
-  currentTime: 0, // 0 to 1
+  fovWarp: 50,
+  currentTime: 0,
 
-  // Typography Granularity
+  // Typography Granularity (Sculpted Antique Gold Default)
   showText: true,
-  textFont: 'Cinzel', // 'Cinzel', 'Playfair Display', 'JetBrains Mono', 'Inter', 'Impact'
-  textStyle: 'white', // 'white', 'gold', 'chrome', 'cyan', 'emerald', 'crimson', 'custom'
-  textPrimaryColor: '#ffffff',
-  textSecondaryColor: '#e2e8f0',
-  textBevel: 2,
+  textFont: 'Cinzel',
+  textStyle: 'gold',
+  textPrimaryColor: '#d4af37',
+  textSecondaryColor: '#fef08a',
+  textBevel: 4,
 
-  // Optics & Post FX
+  // Audio Manager & Custom SFX Assignment System
+  audioEnabled: true,
+  audioVolume: 0.80,
+  audioCtx: null,
+  _recordAudioDest: null,
+  customAudioClips: [],
+  audioEvents: {
+    onSceneStart: 'none',
+    onFlyByTransition: 'none',
+    onObjectStop: 'none',
+    onSlowMoDip: 'none',
+    onSlowMoBoom: 'none',
+    onTextReveal: 'none'
+  },
+  audioEventSettings: {
+    onSceneStart: { volume: 0.85, fade: 0.25 },
+    onFlyByTransition: { volume: 0.80, fade: 0.20 },
+    onObjectStop: { volume: 0.85, fade: 0.15 },
+    onSlowMoDip: { volume: 0.85, fade: 0.35 },
+    onSlowMoBoom: { volume: 0.95, fade: 0.20 },
+    onTextReveal: { volume: 0.75, fade: 0.15 }
+  },
+  lastZPassCheck: 1200,
+  _lastStopSoundLayerId: null,
+  _lastDipSoundTime: 0,
+  _lastBoomSoundTime: 0,
+
+  // 3D Mode Default Free Walk-Through + Starting Point + Auto Zoom In / Zoom Out + Zoom Speed & FX + Tap-Object Fly-Through
+  threeDWalkMode: 'free-walk',
+  customStartPoint: { x: 0, y: 15, z: 760, yaw: 0, pitch: 0 },
+  hasCustomStartPoint: false,
+  lastStartZoomAction: null,
+  zoomActionSpeed: 1.0,
+  zoomPercent: 100,
+  zoomFxShake: false,
+  zoomFxShakeIntensity: 55,
+  zoomFxPulse: false,
+  zoomFxPulseIntensity: 55,
+  zoomFxBoom: false,
+  zoomFxBoomIntensity: 65,
+  _flyThroughTarget: null,
+  _boomFlashAlpha: 0,
+  _lastFlyThroughTs: 0,
+  _isVideoPaused: false,
+  _pausedFreezeMs: null,
+
+  // Interactive 3D Camera & Video Recording State
+  recordStartBase: 'establishing-shot',
+  isRecording: false,
+  recordStartTime: 0,
+  recordElapsedSec: 0,
+  _recordingFrames: [],
+  _mediaRecorder: null,
+  _recordedChunks: [],
+  lastRecordedTrajectory: null,
+  lastRecordedVideoUrl: null,
+  lastRecordedVideoFilename: null,
+  customRecordedPresets: [],
+  defaultFlightPreset: 'establishing-shot',
+
+  // Optics & Post FX (Grid disabled by default per documentary art direction!)
   chromaticAberration: false,
   filmGrain: true,
-  audioEnabled: false,
-  audioCtx: null,
-  lastZPassCheck: 1200,
-  fogDensity: 40,
-  lightIntensity: 110,
-  vignetteAmount: 80,
-  gridVisible: true,
+  fogDensity: 28,
+  lightIntensity: 115,
+  vignetteAmount: 82,
+  gridVisible: false,
   dustVisible: true,
   editingLayerIndex: -1,
   mouse: { x: 0, y: 0 },
-  activePreset: 'forbes-hallway'
+  activePreset: 'documentary'
 };
 
 const _spatialImageTexCache = {};
+const _spatialVideoTexCache = {};
+const _spatialCustomAudioCache = {};
 // Preload default documentary photographs so they appear instantaneously
 ['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg', '/cctv_surveillance_scene.jpg', '/paper_tear_gold_standard.jpg', '/power_meeting_cinematic_plate.jpg'].forEach(u => {
   if (typeof Image !== 'undefined') {
@@ -40797,33 +43378,62 @@ function setSpatialGroupOpacity(obj, opacity) {
       });
     }
     if (child.userData && child.userData.isRotatingArtifact) {
-      child.rotation.y += 0.01;
-      child.rotation.x += 0.005;
+      child.rotation.y += 0.006;
+      child.rotation.x += 0.003;
     }
   });
 }
 
 function createSpatialTextPlane(item) {
   const canvas = document.createElement('canvas');
-  canvas.width = 1600;
-  canvas.height = 380;
+  canvas.width = 1680;
+  canvas.height = 520;
   const ctx = canvas.getContext('2d');
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const titleText = String(item.title || 'THE SYSTEM').toUpperCase();
+  const titleText = String(item.title || 'AWAKENING').toUpperCase();
+  const midTitle = String(item.midTitle || (titleText === 'AWAKENING' ? 'THE SYSTEM' : '')).toUpperCase();
   const subText = String(item.subtitle || '').toUpperCase();
   const cx = canvas.width / 2;
-  const cy = subText ? 155 : 190;
+  const cy = midTitle ? 168 : (subText ? 190 : 250);
 
   const fontFam = item.fontFamily || spatial3DState.textFont || 'Cinzel';
-  const textStyle = item.textStyle || spatial3DState.textStyle || 'gold';
+  const stylePreset = spatial3DState.stylePreset || 'documentary';
+  const textStyle = item.textStyle || (stylePreset === 'cyberpunk' ? 'chrome' : (stylePreset === 'tech-investigative' ? 'cyan' : (spatial3DState.textStyle || 'gold')));
 
-  let fontSize = 84;
-  ctx.font = `900 ${fontSize}px "${fontFam}", "Times New Roman", Georgia, serif`;
-  while (ctx.measureText(titleText).width > canvas.width - 180 && fontSize > 40) {
+  // Feathered elliptical spotlight halo behind hero title (fades to 0.0 well inside all 4 canvas edges so no rectangular boundary can ever appear)
+  ctx.save();
+  ctx.translate(cx, cy + 28);
+  ctx.scale(2.5, 0.72);
+  const haloGrad = ctx.createRadialGradient(0, 0, 8, 0, 0, 210);
+  if (stylePreset === 'cyberpunk' || textStyle === 'chrome') {
+    haloGrad.addColorStop(0.0, 'rgba(168, 85, 247, 0.36)');
+    haloGrad.addColorStop(0.45, 'rgba(124, 58, 237, 0.14)');
+    haloGrad.addColorStop(0.85, 'rgba(88, 28, 135, 0.03)');
+    haloGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+  } else if (stylePreset === 'tech-investigative' || textStyle === 'cyan') {
+    haloGrad.addColorStop(0.0, 'rgba(56, 189, 248, 0.30)');
+    haloGrad.addColorStop(0.45, 'rgba(14, 165, 233, 0.11)');
+    haloGrad.addColorStop(0.85, 'rgba(2, 132, 199, 0.02)');
+    haloGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+  } else {
+    haloGrad.addColorStop(0.0, 'rgba(245, 158, 11, 0.36)');
+    haloGrad.addColorStop(0.45, 'rgba(180, 83, 9, 0.14)');
+    haloGrad.addColorStop(0.85, 'rgba(120, 53, 15, 0.02)');
+    haloGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+  }
+  ctx.fillStyle = haloGrad;
+  ctx.beginPath();
+  ctx.arc(0, 0, 210, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  let fontSize = 104;
+  ctx.font = `900 ${fontSize}px "${fontFam}", "Playfair Display", Georgia, serif`;
+  while (ctx.measureText(titleText).width > canvas.width - 180 && fontSize > 44) {
     fontSize -= 4;
-    ctx.font = `900 ${fontSize}px "${fontFam}", "Times New Roman", Georgia, serif`;
+    ctx.font = `900 ${fontSize}px "${fontFam}", "Playfair Display", Georgia, serif`;
   }
 
   ctx.textAlign = 'center';
@@ -40832,34 +43442,42 @@ function createSpatialTextPlane(item) {
   // Deep Crisp Drop Shadow
   ctx.save();
   ctx.shadowColor = 'rgba(0, 0, 0, 0.96)';
-  ctx.shadowBlur = 28;
+  ctx.shadowBlur = 32;
   ctx.shadowOffsetY = 14;
-  ctx.fillStyle = '#05070c';
-  ctx.fillText(titleText, cx, cy + 6);
+  ctx.fillStyle = '#040509';
+  ctx.fillText(titleText, cx, cy + 7);
   ctx.restore();
 
   // Multi-tier 3D bevel extrusion
-  const bevel = item.textBevel !== undefined ? item.textBevel : (spatial3DState.textBevel || 3);
+  const bevel = item.textBevel !== undefined ? item.textBevel : (spatial3DState.textBevel || 5);
   for (let b = bevel; b >= 1; b--) {
-    ctx.fillStyle = textStyle === 'chrome' ? 'rgba(30,41,59,0.9)' : textStyle === 'cyan' ? 'rgba(8,51,68,0.9)' : textStyle === 'emerald' ? 'rgba(6,78,59,0.9)' : textStyle === 'crimson' ? 'rgba(69,10,10,0.9)' : '#5c3409';
-    ctx.fillText(titleText, cx, cy + b * 1.5);
+    ctx.fillStyle = textStyle === 'chrome'
+      ? 'rgba(59, 28, 94, 0.92)'
+      : textStyle === 'cyan'
+        ? 'rgba(8, 51, 68, 0.92)'
+        : textStyle === 'emerald'
+          ? 'rgba(6, 78, 59, 0.92)'
+          : textStyle === 'crimson'
+            ? 'rgba(69, 10, 10, 0.92)'
+            : textStyle === 'white'
+              ? 'rgba(15, 23, 42, 0.92)'
+              : '#4a2906';
+    ctx.fillText(titleText, cx, cy + b * 1.7);
   }
 
-  // Preset Text Gradients
   let textGrad = null;
   if (textStyle === 'chrome') {
-    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
+    textGrad = ctx.createLinearGradient(cx, cy - 55, cx, cy + 55);
     textGrad.addColorStop(0.0, '#ffffff');
-    textGrad.addColorStop(0.28, '#cbd5e1');
-    textGrad.addColorStop(0.52, '#64748b');
-    textGrad.addColorStop(0.78, '#cbd5e1');
-    textGrad.addColorStop(1.0, '#ffffff');
+    textGrad.addColorStop(0.35, '#f3e8ff');
+    textGrad.addColorStop(0.68, '#c084fc');
+    textGrad.addColorStop(1.0, '#f0abfc');
   } else if (textStyle === 'cyan') {
     textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
-    textGrad.addColorStop(0.0, '#cffafe');
-    textGrad.addColorStop(0.3, '#06b6d4');
-    textGrad.addColorStop(0.65, '#0284c7');
-    textGrad.addColorStop(1.0, '#38bdf8');
+    textGrad.addColorStop(0.0, '#e0f2fe');
+    textGrad.addColorStop(0.35, '#38bdf8');
+    textGrad.addColorStop(0.7, '#0284c7');
+    textGrad.addColorStop(1.0, '#bae6fd');
   } else if (textStyle === 'emerald') {
     textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
     textGrad.addColorStop(0.0, '#d1fae5');
@@ -40875,47 +43493,100 @@ function createSpatialTextPlane(item) {
   } else if (textStyle === 'white') {
     textGrad = '#f8fafc';
   } else if (textStyle === 'custom') {
-    const c1 = item.primaryColor || spatial3DState.textPrimaryColor || '#f59e0b';
-    const c2 = item.secondaryColor || spatial3DState.textSecondaryColor || '#fde68a';
+    const c1 = item.primaryColor || spatial3DState.textPrimaryColor || '#d4af37';
+    const c2 = item.secondaryColor || spatial3DState.textSecondaryColor || '#fef08a';
     textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
     textGrad.addColorStop(0.0, c1);
     textGrad.addColorStop(0.5, c2);
     textGrad.addColorStop(1.0, c1);
   } else {
-    // Default Gold Foil
-    textGrad = ctx.createLinearGradient(cx - 450, cy - 45, cx + 450, cy + 45);
-    textGrad.addColorStop(0.0, '#fef08a');
-    textGrad.addColorStop(0.3, '#d97706');
-    textGrad.addColorStop(0.55, '#fde68a');
-    textGrad.addColorStop(0.8, '#b45309');
-    textGrad.addColorStop(1.0, '#f59e0b');
+    // Sculpted Antique Gold (Matches Master Images 4 & 5: AWAKENING)
+    textGrad = ctx.createLinearGradient(cx, cy - 55, cx, cy + 55);
+    textGrad.addColorStop(0.0, '#fffbeb');
+    textGrad.addColorStop(0.28, '#fde68a');
+    textGrad.addColorStop(0.62, '#d97706');
+    textGrad.addColorStop(0.88, '#92400e');
+    textGrad.addColorStop(1.0, '#fef08a');
   }
 
   ctx.fillStyle = textGrad;
   ctx.fillText(titleText, cx, cy);
 
-  if (subText) {
-    const ruleY = cy + 54;
-    const ruleHalfW = 260;
-    const ruleGrad = ctx.createLinearGradient(cx - ruleHalfW, ruleY, cx + ruleHalfW, ruleY);
-    ruleGrad.addColorStop(0, 'rgba(217, 119, 6, 0)');
-    ruleGrad.addColorStop(0.5, item.color || '#f59e0b');
-    ruleGrad.addColorStop(1, 'rgba(217, 119, 6, 0)');
-    ctx.fillStyle = ruleGrad;
-    ctx.fillRect(cx - ruleHalfW, ruleY, ruleHalfW * 2, 2);
+  // Anamorphic horizontal lens-flare hot-spot directly under AWAKENING (Matches Images 5 & 7)
+  const flareY = cy + 44;
+  ctx.save();
+  const streakGrad = ctx.createLinearGradient(cx - 380, flareY, cx + 380, flareY);
+  const flareCol = textStyle === 'chrome' ? 'rgba(232, 121, 249, 0.85)' : (textStyle === 'cyan' ? 'rgba(56, 189, 248, 0.85)' : 'rgba(251, 191, 36, 0.9)');
+  streakGrad.addColorStop(0.0, 'rgba(0,0,0,0)');
+  streakGrad.addColorStop(0.35, flareCol);
+  streakGrad.addColorStop(0.5, '#ffffff');
+  streakGrad.addColorStop(0.65, flareCol);
+  streakGrad.addColorStop(1.0, 'rgba(0,0,0,0)');
+  ctx.fillStyle = streakGrad;
+  ctx.fillRect(cx - 380, flareY - 1.5, 760, 3);
 
-    ctx.font = '700 22px "JetBrains Mono", monospace';
-    ctx.fillStyle = item.color || '#fde68a';
-    ctx.letterSpacing = '6px';
-    ctx.fillText(subText, cx, cy + 86);
+  const coreGlow = ctx.createRadialGradient(cx, flareY, 2, cx, flareY, 46);
+  coreGlow.addColorStop(0.0, 'rgba(255, 255, 255, 0.95)');
+  coreGlow.addColorStop(0.35, flareCol);
+  coreGlow.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = coreGlow;
+  ctx.beginPath();
+  ctx.arc(cx, flareY, 46, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Tier 2: "—— THE SYSTEM ——" with flanking horizontal rules (Matches Master Images 4, 5, 7)
+  if (midTitle) {
+    const midY = cy + 88;
+    ctx.font = `700 38px "${fontFam}", "Inter", serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur = 14;
+    ctx.fillText(midTitle, cx, midY);
+    ctx.shadowBlur = 0;
+
+    const midW = ctx.measureText(midTitle).width;
+    const ruleGap = 28;
+    const ruleLen = 190;
+    const ruleColor = textStyle === 'chrome' ? '#c084fc' : (textStyle === 'cyan' ? '#38bdf8' : '#d4af37');
+
+    const leftGrad = ctx.createLinearGradient(cx - midW / 2 - ruleGap - ruleLen, midY, cx - midW / 2 - ruleGap, midY);
+    leftGrad.addColorStop(0, 'rgba(255,255,255,0)');
+    leftGrad.addColorStop(1, ruleColor);
+    ctx.fillStyle = leftGrad;
+    ctx.fillRect(cx - midW / 2 - ruleGap - ruleLen, midY - 1.5, ruleLen, 3);
+
+    const rightGrad = ctx.createLinearGradient(cx + midW / 2 + ruleGap, midY, cx + midW / 2 + ruleGap + ruleLen, midY);
+    rightGrad.addColorStop(0, ruleColor);
+    rightGrad.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = rightGrad;
+    ctx.fillRect(cx + midW / 2 + ruleGap, midY - 1.5, ruleLen, 3);
+  }
+
+  if (subText) {
+    const subY = midTitle ? cy + 142 : cy + 86;
+    const ruleY = subY - 28;
+    const ruleHalfW = 310;
+    const accentRule = textStyle === 'chrome' ? '#a855f7' : (textStyle === 'cyan' ? '#38bdf8' : '#d4af37');
+    const ruleGrad = ctx.createLinearGradient(cx - ruleHalfW, ruleY, cx + ruleHalfW, ruleY);
+    ruleGrad.addColorStop(0, 'rgba(245, 158, 11, 0)');
+    ruleGrad.addColorStop(0.5, accentRule);
+    ruleGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+    ctx.fillStyle = ruleGrad;
+    ctx.fillRect(cx - ruleHalfW, ruleY, ruleHalfW * 2, 1.5);
+
+    ctx.font = '700 22px "Inter", "JetBrains Mono", sans-serif';
+    ctx.fillStyle = textStyle === 'chrome' ? '#e9d5ff' : (textStyle === 'cyan' ? '#bae6fd' : '#fde68a');
+    const spacedSub = subText.indexOf('  ') >= 0 ? subText : subText.split('').join(' ');
+    ctx.fillText(spacedSub, cx, subY);
   }
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.anisotropy = 4;
 
   const sc = item.scale || 1;
-  const planeW = 980 * sc;
-  const planeH = 232 * sc;
+  const planeW = 1040 * sc;
+  const planeH = 272 * sc;
 
   const material = new THREE.MeshBasicMaterial({
     map: texture,
@@ -40930,8 +43601,9 @@ function createSpatialTextPlane(item) {
   mesh.userData = {
     id: item.id || Date.now().toString(),
     type: 'text',
-    title: item.title || 'THE SYSTEM',
-    subtitle: item.subtitle || '',
+    title: item.title || 'AWAKENING',
+    midTitle: item.midTitle || 'THE SYSTEM',
+    subtitle: item.subtitle || 'BEYOND PERCEPTION',
     initialZ: item.z || 0,
     baseX: item.x || 0,
     baseY: item.y || 15,
@@ -40941,48 +43613,159 @@ function createSpatialTextPlane(item) {
     scale: sc,
     planeWidth: planeW,
     planeHeight: planeH,
-    color: item.color || '#f59e0b',
+    color: item.color || '#d4af37',
+    contourColor: item.contourColor || item.color || '#d4af37',
+    contourShape: item.contourShape || 'rounded-rect',
     fontFamily: fontFam,
     textStyle: textStyle,
     primaryColor: item.primaryColor || spatial3DState.textPrimaryColor,
-    secondaryColor: item.secondaryColor || spatial3DState.textSecondaryColor
+    secondaryColor: item.secondaryColor || spatial3DState.textSecondaryColor,
+    cameraAction: item.cameraAction || 'glance',
+    stopHere: !!item.stopHere,
+    sfxId: item.sfxId || 'none',
+    visible: item.visible !== false
   };
   return mesh;
 }
 
-function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
+function wrapSpatialCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+  const words = String(text || '').split(' ');
+  let line = '';
+  let curY = y;
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if (metrics.width > maxWidth && n > 0) {
+      ctx.fillText(line.trim(), x, curY);
+      line = words[n] + ' ';
+      curY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  if (line.trim()) ctx.fillText(line.trim(), x, curY);
+}
+
+// ============================================================================
+// UNIVERSAL CARD CONTOUR PATH TRACER (Supports 8 Presets + Custom Shapes)
+// ============================================================================
+function traceCardContourPath(ctx, shape, x, y, w, h) {
+  ctx.beginPath();
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  const s = shape || 'rounded-rect';
+
+  if (s === 'sharp-rect') {
+    ctx.rect(x, y, w, h);
+  } else if (s === 'chamfer-octagon') {
+    const cut = Math.min(w, h) * 0.085;
+    ctx.moveTo(x + cut, y);
+    ctx.lineTo(x + w - cut, y);
+    ctx.lineTo(x + w, y + cut);
+    ctx.lineTo(x + w, y + h - cut);
+    ctx.lineTo(x + w - cut, y + h);
+    ctx.lineTo(x + cut, y + h);
+    ctx.lineTo(x, y + h - cut);
+    ctx.lineTo(x, y + cut);
+    ctx.closePath();
+  } else if (s === 'arch-frame') {
+    const archTopR = Math.min(w * 0.48, h * 0.44);
+    const left = cx - archTopR;
+    const right = cx + archTopR;
+    ctx.moveTo(left, y + h);
+    ctx.lineTo(left, y + archTopR);
+    ctx.arc(cx, y + archTopR, archTopR, Math.PI, 0, false);
+    ctx.lineTo(right, y + h);
+    ctx.closePath();
+  } else if (s === 'hexagon-prism') {
+    const rx = w * 0.48;
+    const ry = h * 0.48;
+    for (let i = 0; i < 6; i++) {
+      const ang = (i * Math.PI) / 3;
+      const px = cx + Math.cos(ang) * rx;
+      const py = cy + Math.sin(ang) * ry;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  } else if (s === 'diamond-rhombus') {
+    ctx.moveTo(cx, y);
+    ctx.lineTo(x + w, cy);
+    ctx.lineTo(cx, y + h);
+    ctx.lineTo(x, cy);
+    ctx.closePath();
+  } else if (s === 'circle-portal') {
+    const r = Math.min(w, h) * 0.46;
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  } else if (s === 'capsule-pill') {
+    const rad = Math.min(w, h) * 0.45;
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, rad);
+    else ctx.rect(x, y, w, h);
+  } else {
+    // 'rounded-rect' default
+    if (ctx.roundRect) ctx.roundRect(x, y, w, h, 16);
+    else ctx.rect(x, y, w, h);
+  }
+}
+
+function drawCardContourBorder(ctx, shape, x, y, w, h, contourColor, contourWidth, contourGlow) {
+  if (contourWidth <= 0) return;
+  ctx.save();
+  traceCardContourPath(ctx, shape, x, y, w, h);
+  if (contourGlow > 0) {
+    ctx.shadowColor = contourColor;
+    ctx.shadowBlur = Math.round((contourGlow / 100) * 24);
+  }
+  ctx.strokeStyle = contourColor;
+  ctx.lineWidth = contourWidth;
+  ctx.stroke();
+
+  // Subtle inner precision hairline
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.35;
+  traceCardContourPath(ctx, shape, x + 5, y + 5, w - 10, h - 10);
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function renderSpatialArtifactCanvas(canvas, item, loadedMedia) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
   const H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  const accent = item.color || '#38bdf8';
+  const globalShape = spatial3DState.cardContourShape && spatial3DState.cardContourShape !== 'preset-default'
+    ? spatial3DState.cardContourShape
+    : null;
   const mode = item.artifactMode || (item.type === 'object' ? 'object' : (item.type === 'card' ? 'card' : 'image'));
+  const resolvedShape = globalShape || item.contourShape || (mode === 'shape' ? (item.shapeType || 'arch-frame') : 'rounded-rect');
+  const accent = item.contourColor || item.color || spatial3DState.cardContourColor || '#f59e0b';
+  const contourW = item.contourWidth !== undefined ? item.contourWidth : (spatial3DState.cardContourWidth !== undefined ? spatial3DState.cardContourWidth : 3);
+  const contourGlow = item.contourGlow !== undefined ? item.contourGlow : (spatial3DState.cardContourGlow !== undefined ? spatial3DState.cardContourGlow : 60);
+
   const fontFam = item.fontFamily || 'Cinzel';
-  const stamp = item.stamp || (item.color === '#ef4444' ? 'CLASSIFIED' : item.color === '#10b981' ? 'VERIFIED' : 'CONFIDENTIAL');
+  const stamp = item.stamp || (accent === '#ef4444' ? 'CLASSIFIED' : accent === '#10b981' ? 'LIVE VIDEO' : 'CONFIDENTIAL');
+
+  const isVideoEl = loadedMedia && loadedMedia.tagName === 'VIDEO';
+  const mediaW = isVideoEl ? (loadedMedia.videoWidth || 640) : (loadedMedia && loadedMedia.naturalWidth ? loadedMedia.naturalWidth : 0);
+  const mediaH = isVideoEl ? (loadedMedia.videoHeight || 360) : (loadedMedia && loadedMedia.naturalHeight ? loadedMedia.naturalHeight : 0);
+  const hasMedia = loadedMedia && ((isVideoEl && loadedMedia.readyState >= 2) || (!isVideoEl && loadedMedia.complete && mediaW > 0));
 
   // MODE: FORBES 3D MAGAZINE COVER (James Jani Style)
   if (mode === 'forbes') {
-    // 1. Dark Studio Backdrop Plate
+    ctx.save();
+    traceCardContourPath(ctx, resolvedShape, 12, 12, W - 24, H - 24);
     const bgGrad = ctx.createRadialGradient(W * 0.5, H * 0.45, 10, W * 0.5, H * 0.45, W * 0.65);
     bgGrad.addColorStop(0, '#151a29');
     bgGrad.addColorStop(0.65, '#060912');
     bgGrad.addColorStop(1.0, '#000000');
     ctx.fillStyle = bgGrad;
-    ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(10, 10, W - 20, H - 20, 8);
-    else ctx.rect(10, 10, W - 20, H - 20);
     ctx.fill();
+    ctx.clip();
 
-    // 2. Subject Portrait
-    if (loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
-      ctx.save();
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(14, 14, W - 28, H - 28, 6);
-      else ctx.rect(14, 14, W - 28, H - 28);
-      ctx.clip();
-
-      const imgRatio = loadedImg.naturalWidth / loadedImg.naturalHeight;
+    if (hasMedia) {
+      const imgRatio = mediaW / mediaH;
       const boxW = W - 28;
       const boxH = H - 28;
       let dw = boxW, dh = boxH, dx = 14, dy = 14;
@@ -40993,15 +43776,11 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
         dh = boxW / imgRatio;
         dy = 14 - (dh - boxH) * 0.15;
       }
-      ctx.drawImage(loadedImg, dx, dy, dw, dh);
-      ctx.restore();
+      ctx.drawImage(loadedMedia, dx, dy, dw, dh);
     }
 
-    // 3. Anamorphic CRT Beam Flare across eyes (James Jani signature)
     const beamY = H * 0.40;
     const curBeamColor = item.beamColor || '#38bdf8';
-    
-    // Beam glow wash
     const washGrad = ctx.createLinearGradient(0, beamY - 32, W, beamY + 32);
     washGrad.addColorStop(0.0, 'rgba(56, 189, 248, 0)');
     washGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.45)');
@@ -41011,14 +43790,12 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillStyle = washGrad;
     ctx.fillRect(14, beamY - 26, W - 28, 52);
 
-    // Razor Core Beam Line
     ctx.shadowColor = curBeamColor;
     ctx.shadowBlur = 18;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(14, beamY - 1.5, W - 28, 3);
     ctx.shadowBlur = 0;
 
-    // Optical flare bloom at golden ratio
     const flareX = W * 0.28;
     const flareGrad = ctx.createRadialGradient(flareX, beamY, 2, flareX, beamY, 70);
     flareGrad.addColorStop(0.0, '#ffffff');
@@ -41029,12 +43806,10 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.arc(flareX, beamY, 70, 0, Math.PI * 2);
     ctx.fill();
 
-    // 4. Top Ticker & Kicker Bar
     ctx.font = '800 13px "Inter", sans-serif';
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     ctx.fillText((item.topTickerLeft || 'EXCLUSIVE INVESTIGATION').toUpperCase(), 28, 38);
 
-    // Kicker badge
     ctx.fillStyle = '#ef4444';
     ctx.beginPath();
     if (ctx.roundRect) ctx.roundRect(W / 2 - 38, 24, 76, 20, 3);
@@ -41052,18 +43827,13 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillText((item.topTickerRight || 'VOL. 104 NO. 8').toUpperCase(), W - 28, 38);
     ctx.textAlign = 'left';
 
-    // 5. Forbes Masthead with Ghost Bloom
     const magTitle = (item.magazineTitle || 'Forbes');
     ctx.font = '900 78px "Playfair Display", Georgia, serif';
     ctx.textAlign = 'center';
-
-    // Ghost bloom behind
     ctx.shadowColor = 'rgba(255,255,255,0.6)';
     ctx.shadowBlur = 24;
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.fillText(magTitle, W / 2, 118);
-
-    // Crisp foreground text
     ctx.shadowColor = 'rgba(0,0,0,0.9)';
     ctx.shadowBlur = 12;
     ctx.fillStyle = '#ffffff';
@@ -41071,7 +43841,6 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.shadowBlur = 0;
     ctx.textAlign = 'left';
 
-    // 6. Bottom Feature Story Headline
     ctx.font = 'italic 700 18px "Playfair Display", Georgia, serif';
     ctx.fillStyle = '#ffffff';
     ctx.fillText(item.featureTag || 'SPECIAL REPORT // THE ARCHITECT', 28, H - 75);
@@ -41079,31 +43848,412 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.font = '900 34px "Playfair Display", Georgia, serif';
     ctx.fillStyle = '#ffffff';
     ctx.fillText((item.featureTitle || item.title || 'THE $30 BILLION FRAUD').toUpperCase(), 28, H - 35);
+    ctx.restore();
 
-    // Sleek border frame
-    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(12, 12, W - 24, H - 24);
+    drawCardContourBorder(ctx, resolvedShape, 12, 12, W - 24, H - 24, accent, contourW, contourGlow);
     return;
   }
 
-  // Frosted Dark Glass Dossier Frame
-  ctx.fillStyle = 'rgba(11, 15, 25, 0.94)';
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(10, 10, W - 20, H - 20, 14);
-  else ctx.rect(10, 10, W - 20, H - 20);
-  ctx.fill();
+  // MODE: GEOMETRIC MUSEUM SHAPE FRAME OR ANY CARD WITH GEOMETRIC CONTOUR ('arch-frame', 'circle-portal', 'hexagon-prism', 'diamond-rhombus')
+  if (mode === 'shape' || ['arch-frame', 'circle-portal', 'hexagon-prism', 'diamond-rhombus'].includes(resolvedShape)) {
+    const shapeType = ['arch-frame', 'circle-portal', 'hexagon-prism', 'diamond-rhombus'].includes(resolvedShape)
+      ? resolvedShape
+      : (item.shapeType || 'arch-frame');
+    ctx.save();
+    traceCardContourPath(ctx, shapeType, 36, 18, W - 72, H - 112);
 
-  if (mode === 'image' && loadedImg && loadedImg.complete && loadedImg.naturalWidth > 0) {
-    // Archival Photographic Plate
+    ctx.fillStyle = '#090d18';
+    ctx.fill();
+    ctx.save();
+    ctx.clip();
+    if (hasMedia) {
+      const imgRatio = mediaW / mediaH;
+      let dw = W, dh = H, dx = 0, dy = 0;
+      if (imgRatio > W / H) {
+        dw = H * imgRatio;
+        dx = -(dw - W) * 0.5;
+      } else {
+        dh = W / imgRatio;
+        dy = -(dh - H) * 0.3;
+      }
+      ctx.drawImage(loadedMedia, dx, dy, dw, dh);
+      const vGrad = ctx.createLinearGradient(0, H * 0.4, 0, H - 90);
+      vGrad.addColorStop(0, 'rgba(9,13,24,0)');
+      vGrad.addColorStop(1, 'rgba(9,13,24,0.88)');
+      ctx.fillStyle = vGrad;
+      ctx.fillRect(0, 0, W, H);
+    }
+    ctx.restore();
+    ctx.restore();
+
+    drawCardContourBorder(ctx, shapeType, 36, 18, W - 72, H - 112, accent, Math.max(2, contourW), contourGlow);
+
+    // Museum Pedestal Plaque below shape
+    ctx.fillStyle = 'rgba(11, 15, 25, 0.94)';
+    traceCardContourPath(ctx, 'rounded-rect', 45, H - 88, W - 90, 74);
+    ctx.fill();
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = Math.max(1.5, contourW * 0.6);
+    ctx.stroke();
+
+    ctx.textAlign = 'center';
+    ctx.font = '700 13px "JetBrains Mono", monospace';
+    ctx.fillStyle = accent;
+    ctx.fillText((item.subtitle || 'MUSEUM GALLERY INSTALLATION').toUpperCase(), W / 2, H - 62);
+    ctx.font = `800 23px "${fontFam}", Georgia, serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText((item.title || 'ARCHITECTURAL ARTIFACT').toUpperCase(), W / 2, H - 32);
+    ctx.textAlign = 'left';
+    return;
+  }
+
+  // Art-Directed Documentary, Tech-Investigative & Cyberpunk Evidence Plates (Matching Images 4, 5, 6, 7)
+  ctx.save();
+  traceCardContourPath(ctx, resolvedShape, 12, 12, W - 24, H - 24);
+  ctx.fillStyle = mode === 'dossier-confidential' ? '#1c1813' : 'rgba(10, 14, 24, 0.95)';
+  ctx.fill();
+  ctx.clip();
+
+  if (mode === 'dossier-confidential') {
+    // Manila Classified Dossier Folder + B&W Archival Portrait Photo + Red CONFIDENTIAL Stamp (Image 5 bottom-left)
+    const manilaGrad = ctx.createLinearGradient(12, 12, W - 12, H - 12);
+    manilaGrad.addColorStop(0.0, '#d6be96');
+    manilaGrad.addColorStop(0.55, '#bfa378');
+    manilaGrad.addColorStop(1.0, '#967b52');
+    ctx.fillStyle = manilaGrad;
+    ctx.fillRect(18, 22, W - 36, H - 38);
+
+    // Subtle lined paper sheet inside folder
+    ctx.fillStyle = '#efe6d5';
+    ctx.fillRect(34, 38, W - 68, H - 68);
+    ctx.strokeStyle = 'rgba(120, 95, 65, 0.22)';
+    ctx.lineWidth = 1;
+    for (let ly = 72; ly < H - 45; ly += 22) {
+      ctx.beginPath(); ctx.moveTo(48, ly); ctx.lineTo(W - 52, ly); ctx.stroke();
+    }
+
+    // Archival B&W Portrait Photo Card pinned on left
+    ctx.save();
+    ctx.translate(64, 62);
+    ctx.rotate(-0.04);
+    ctx.fillStyle = '#faf8f5';
+    ctx.shadowColor = 'rgba(0,0,0,0.45)';
+    ctx.shadowBlur = 14;
+    ctx.fillRect(0, 0, 210, 250);
+    ctx.shadowBlur = 0;
+    if (hasMedia) {
+      ctx.drawImage(loadedMedia, 12, 12, 186, 196);
+    } else {
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(12, 12, 186, 196);
+    }
+    // Archival executive silhouette in B&W photo
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+    ctx.beginPath();
+    ctx.arc(105, 88, 32, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(45, 208);
+    ctx.quadraticCurveTo(105, 130, 165, 208);
+    ctx.closePath();
+    ctx.fill();
+    ctx.font = '700 11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#334155';
+    ctx.fillText('SUBJECT // FILE #094-A', 22, 232);
+    ctx.restore();
+
+    // Redacted classification bars & typewriter lines on right side of dossier
+    ctx.fillStyle = '#1e1b18';
+    ctx.font = '700 15px "JetBrains Mono", monospace';
+    ctx.fillText((item.subtitle || 'DEPT. TREASURY // EXHIBIT A').toUpperCase(), 300, 88);
+    ctx.fillRect(300, 104, 340, 14);
+    ctx.fillRect(300, 128, 280, 14);
+    ctx.fillStyle = 'rgba(30, 27, 24, 0.72)';
+    ctx.font = '600 15px "Courier New", monospace';
+    wrapSpatialCanvasText(ctx, item.body || 'DECLASSIFIED ARCHIVAL RECORD: EXECUTIVE BRIEFING & PORTRAIT FILE.', 300, 174, 390, 22);
+
+    // Bold Red Rubber Stamp: CONFIDENTIAL
+    ctx.save();
+    ctx.translate(475, 310);
+    ctx.rotate(-0.14);
+    ctx.strokeStyle = '#b91c1c';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(-145, -34, 290, 64);
+    ctx.strokeStyle = 'rgba(185, 28, 28, 0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-139, -28, 278, 52);
+    ctx.font = '900 34px "Inter", "Impact", sans-serif';
+    ctx.fillStyle = '#b91c1c';
+    ctx.textAlign = 'center';
+    ctx.fillText((item.stamp || 'CONFIDENTIAL').toUpperCase(), 0, 11);
+    ctx.restore();
+  } else if (mode === 'banking-monopoly') {
+    // Right Foreground Documentary Card: BANKING CONGLOMERATE / FINANCIAL MONOPOLY / CAPITAL FLOW: $84.2B (Image 4 bottom-right)
+    if (hasMedia) {
+      ctx.drawImage(loadedMedia, 12, 12, W - 24, H - 24);
+    }
+    const darkGrad = ctx.createLinearGradient(0, 12, 0, H - 12);
+    darkGrad.addColorStop(0.0, 'rgba(8, 12, 22, 0.45)');
+    darkGrad.addColorStop(0.5, 'rgba(8, 12, 22, 0.78)');
+    darkGrad.addColorStop(1.0, 'rgba(5, 8, 15, 0.96)');
+    ctx.fillStyle = darkGrad;
+    ctx.fillRect(12, 12, W - 24, H - 24);
+
+    // Subtle warm city/boardroom horizon glow
+    const warmGlow = ctx.createRadialGradient(W * 0.72, H * 0.32, 10, W * 0.72, H * 0.32, 260);
+    warmGlow.addColorStop(0, 'rgba(245, 158, 11, 0.28)');
+    warmGlow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+    ctx.fillStyle = warmGlow;
+    ctx.fillRect(12, 12, W - 24, H - 24);
+
+    ctx.fillStyle = '#d4af37';
+    ctx.font = '700 18px "Inter", sans-serif';
+    ctx.fillText((item.subtitle || 'BANKING CONGLOMERATE').toUpperCase(), 38, H - 148);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 38px "Inter", sans-serif';
+    ctx.fillText((item.title || 'FINANCIAL MONOPOLY').toUpperCase(), 38, H - 102);
+
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.45)';
+    ctx.fillRect(38, H - 82, W - 76, 1.5);
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '600 20px "JetBrains Mono", monospace';
+    ctx.fillText((item.body || 'CAPITAL FLOW: $84.2B IN OFFSHORE TRANSFERS').toUpperCase(), 38, H - 46);
+  } else if (mode === 'boardroom-sunbeams') {
+    // Silhouetted Boardroom Power Meeting with Warm Golden Volumetric Window Sunbeams (Image 5 mid-left)
+    if (hasMedia) {
+      ctx.drawImage(loadedMedia, 12, 12, W - 24, H - 24);
+    }
+    const roomGrad = ctx.createLinearGradient(0, 12, 0, H - 12);
+    roomGrad.addColorStop(0, 'rgba(24, 18, 10, 0.55)');
+    roomGrad.addColorStop(1, 'rgba(8, 6, 4, 0.92)');
+    ctx.fillStyle = roomGrad;
+    ctx.fillRect(12, 12, W - 24, H - 24);
+
+    // Tall bright golden window panes on left + diagonal sunbeams
+    for (let wIdx = 0; wIdx < 3; wIdx++) {
+      const wx = 42 + wIdx * 78;
+      ctx.fillStyle = 'rgba(254, 240, 138, 0.28)';
+      ctx.fillRect(wx, 28, 48, 190);
+      const rayG = ctx.createLinearGradient(wx, 28, wx + 340, H - 20);
+      rayG.addColorStop(0, 'rgba(251, 191, 36, 0.34)');
+      rayG.addColorStop(1, 'rgba(251, 191, 36, 0)');
+      ctx.fillStyle = rayG;
+      ctx.beginPath();
+      ctx.moveTo(wx, 28);
+      ctx.lineTo(wx + 48, 28);
+      ctx.lineTo(wx + 380, H - 20);
+      ctx.lineTo(wx + 210, H - 20);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Conference table & executive silhouettes
+    ctx.fillStyle = '#090807';
+    ctx.beginPath();
+    ctx.moveTo(60, H - 85);
+    ctx.lineTo(W - 60, H - 85);
+    ctx.lineTo(W - 20, H - 24);
+    ctx.lineTo(20, H - 24);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = '#fde68a';
+    ctx.font = '700 15px "JetBrains Mono", monospace';
+    ctx.fillText((item.subtitle || 'CLOSED-DOOR CONSORTIUM').toUpperCase(), 36, H - 56);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `800 26px "${fontFam}", Georgia, serif`;
+    ctx.fillText((item.title || 'EXECUTIVE SUMMIT').toUpperCase(), 36, H - 26);
+  } else if (mode === 'world-red-network') {
+    // World Map Connection Board with Glowing Red Arcs & Nodes (Image 5 top-right)
+    ctx.fillStyle = '#090d16';
+    ctx.fillRect(12, 12, W - 24, H - 24);
+    if (hasMedia) {
+      ctx.save();
+      ctx.globalAlpha = 0.42;
+      ctx.drawImage(loadedMedia, 12, 12, W - 24, H - 24);
+      ctx.restore();
+    }
+    // Glowing red network arcs across world coordinates
+    const nodes = [
+      { x: 170, y: 155, label: 'NYC' },
+      { x: 355, y: 125, label: 'LON' },
+      { x: 420, y: 150, label: 'ZUR' },
+      { x: 585, y: 195, label: 'SGP' },
+      { x: 245, y: 255, label: 'CYM' }
+    ];
+    ctx.save();
+    ctx.strokeStyle = '#ef4444';
+    ctx.shadowColor = '#ef4444';
+    ctx.shadowBlur = 12;
+    ctx.lineWidth = 2.6;
+    for (let i = 0; i < nodes.length - 1; i++) {
+      const a = nodes[i];
+      const b = nodes[i + 1];
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.quadraticCurveTo((a.x + b.x) / 2, Math.min(a.y, b.y) - 55, b.x, b.y);
+      ctx.stroke();
+    }
+    nodes.forEach(n => {
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(n.x, n.y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 12px "JetBrains Mono", monospace';
+      ctx.fillText(n.label, n.x + 10, n.y + 4);
+    });
+    ctx.restore();
+
+    ctx.fillStyle = 'rgba(8, 11, 19, 0.88)';
+    ctx.fillRect(12, H - 108, W - 24, 96);
+    ctx.fillStyle = '#ef4444';
+    ctx.font = '700 15px "JetBrains Mono", monospace';
+    ctx.fillText((item.subtitle || 'OFFSHORE ROUTING MATRIX').toUpperCase(), 34, H - 72);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `800 26px "${fontFam}", Georgia, serif`;
+    ctx.fillText((item.title || 'GLOBAL CLEARING NETWORK').toUpperCase(), 34, H - 36);
+  } else if (mode === 'political-capitol') {
+    // POLITICAL INFLUENCE / NETWORK ANALYSIS with Capitol Dome & Targeting Reticle (Image 6 bottom-left & Image 7 top-right)
+    if (hasMedia) {
+      ctx.drawImage(loadedMedia, 12, 12, W - 24, H - 24);
+    }
+    const tintGrad = ctx.createLinearGradient(0, 12, 0, H - 12);
+    tintGrad.addColorStop(0, 'rgba(8, 22, 42, 0.55)');
+    tintGrad.addColorStop(1, 'rgba(4, 10, 22, 0.95)');
+    ctx.fillStyle = tintGrad;
+    ctx.fillRect(12, 12, W - 24, H - 24);
+
+    // Capitol dome architectural silhouette + HUD reticle
+    ctx.save();
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 1.6;
+    ctx.globalAlpha = 0.55;
+    ctx.beginPath();
+    ctx.arc(W * 0.62, H * 0.42, 68, Math.PI, 0, false);
+    ctx.stroke();
+    ctx.strokeRect(W * 0.62 - 82, H * 0.42, 164, 52);
+    // Targeting reticle
+    ctx.beginPath();
+    ctx.arc(W * 0.34, H * 0.42, 42, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 32px "Inter", sans-serif';
+    ctx.fillText((item.title || 'POLITICAL INFLUENCE').toUpperCase(), 36, H - 72);
+    ctx.fillStyle = accent;
+    ctx.font = '700 18px "JetBrains Mono", monospace';
+    ctx.fillText((item.subtitle || 'NETWORK ANALYSIS').toUpperCase(), 36, H - 38);
+  } else if (mode === 'market-manipulation-chart') {
+    // MARKET MANIPULATION Glowing Financial Chart + Volume Bars (Image 6 top-right & Image 7 bottom-right)
+    ctx.fillStyle = '#060c18';
+    ctx.fillRect(12, 12, W - 24, H - 24);
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+    ctx.lineWidth = 1;
+    for (let gx = 48; gx < W - 36; gx += 58) {
+      ctx.beginPath(); ctx.moveTo(gx, 36); ctx.lineTo(gx, H - 90); ctx.stroke();
+    }
+    for (let gy = 48; gy < H - 90; gy += 44) {
+      ctx.beginPath(); ctx.moveTo(36, gy); ctx.lineTo(W - 36, gy); ctx.stroke();
+    }
+    // Volume bars along bottom of chart
+    const bars = [38, 62, 45, 84, 56, 95, 72, 118, 88, 134, 110, 152];
+    bars.forEach((bh, idx) => {
+      const bx = 52 + idx * 54;
+      ctx.fillStyle = idx % 3 === 0 ? 'rgba(239, 68, 68, 0.45)' : 'rgba(56, 189, 248, 0.38)';
+      ctx.fillRect(bx, H - 105 - bh * 0.7, 28, bh * 0.7);
+    });
+    // Glowing trend line
+    ctx.save();
+    ctx.strokeStyle = accent;
+    ctx.shadowColor = accent;
+    ctx.shadowBlur = 16;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(48, H - 160);
+    ctx.lineTo(155, H - 195);
+    ctx.lineTo(250, H - 150);
+    ctx.lineTo(370, H - 245);
+    ctx.lineTo(480, H - 215);
+    ctx.lineTo(610, H - 315);
+    ctx.lineTo(695, H - 345);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 32px "Inter", sans-serif';
+    ctx.fillText((item.title || 'MARKET MANIPULATION').toUpperCase(), 36, H - 42);
+  } else if (mode === 'cyber-ops-hacker') {
+    // CYBER OPERATIONS / TRACE LOGS (Image 6 bottom-right & Image 7 bottom-left)
+    if (hasMedia) {
+      ctx.drawImage(loadedMedia, 12, 12, W - 24, H - 24);
+    }
+    const cybGrad = ctx.createLinearGradient(0, 12, 0, H - 12);
+    cybGrad.addColorStop(0, 'rgba(6, 12, 24, 0.45)');
+    cybGrad.addColorStop(1, 'rgba(4, 8, 18, 0.95)');
+    ctx.fillStyle = cybGrad;
+    ctx.fillRect(12, 12, W - 24, H - 24);
+
+    // Dual code monitor overlays
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.82)';
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 1.5;
+    ctx.fillRect(42, 42, 250, 145);
+    ctx.strokeRect(42, 42, 250, 145);
+    ctx.fillRect(W - 292, 42, 250, 145);
+    ctx.strokeRect(W - 292, 42, 250, 145);
+
+    ctx.fillStyle = accent;
+    ctx.font = '600 12px "JetBrains Mono", monospace';
+    ctx.fillText('> SSH ROOT@10.24.88.1 // OK', 56, 72);
+    ctx.fillText('> DECRYPT_STREAM: [ACTIVE]', 56, 96);
+    ctx.fillText('> TRACE_HOP: ZURICH -> CAYMAN', 56, 120);
+    ctx.fillText('> PACKET_DUMP: 84.2 GB', W - 276, 72);
+    ctx.fillText('> CIPHER: AES-256-GCM', W - 276, 96);
+    ctx.fillText('> STATUS: BYPASS VERIFIED', W - 276, 120);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 32px "Inter", sans-serif';
+    ctx.fillText((item.title || 'CYBER OPERATIONS').toUpperCase(), 36, H - 72);
+    ctx.fillStyle = accent;
+    ctx.font = '700 18px "JetBrains Mono", monospace';
+    ctx.fillText((item.subtitle || 'TRACE LOGS').toUpperCase(), 36, H - 38);
+  } else if (mode === 'satellite-recon') {
+    // SATELLITE TELEMETRY / GLOBAL NODE MAP (Image 6 top-left & Image 7 top-left)
+    if (hasMedia) {
+      ctx.drawImage(loadedMedia, 12, 12, W - 24, H - 24);
+    }
+    ctx.fillStyle = 'rgba(6, 14, 28, 0.76)';
+    ctx.fillRect(12, 12, W - 24, H - 24);
+    // Corner HUD targeting brackets & crosshair
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(36, 36, W - 72, H - 130);
+    ctx.beginPath();
+    ctx.arc(W / 2, (H - 60) / 2, 58, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(W / 2 - 78, (H - 60) / 2);
+    ctx.lineTo(W / 2 + 78, (H - 60) / 2);
+    ctx.moveTo(W / 2, (H - 60) / 2 - 78);
+    ctx.lineTo(W / 2, (H - 60) / 2 + 78);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '800 28px "Inter", sans-serif';
+    ctx.fillText((item.title || 'SATELLITE TELEMETRY').toUpperCase(), 36, H - 52);
+    ctx.fillStyle = accent;
+    ctx.font = '700 15px "JetBrains Mono", monospace';
+    ctx.fillText((item.subtitle || 'GEOSPATIAL RECON // 47.37N').toUpperCase(), 36, H - 24);
+  } else if ((mode === 'image' || mode === 'video') && hasMedia) {
     const imgH = Math.round((H - 20) * 0.64);
     ctx.save();
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(12, 12, W - 24, imgH, [12, 12, 0, 0]);
-    else ctx.rect(12, 12, W - 24, imgH);
+    ctx.rect(12, 12, W - 24, imgH);
     ctx.clip();
 
-    const imgRatio = loadedImg.naturalWidth / loadedImg.naturalHeight;
+    const imgRatio = mediaW / mediaH;
     const boxW = W - 24;
     const boxRatio = boxW / imgH;
     let dw = boxW, dh = imgH, dx = 12, dy = 12;
@@ -41114,9 +44264,8 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
       dh = boxW / imgRatio;
       dy = 12 - (dh - imgH) * 0.35;
     }
-    ctx.drawImage(loadedImg, dx, dy, dw, dh);
+    ctx.drawImage(loadedMedia, dx, dy, dw, dh);
 
-    // Blended dark bottom vignette
     const fadeGrad = ctx.createLinearGradient(0, 12 + imgH * 0.45, 0, 12 + imgH);
     fadeGrad.addColorStop(0, 'rgba(11, 15, 25, 0)');
     fadeGrad.addColorStop(1, 'rgba(11, 15, 25, 0.98)');
@@ -41124,26 +44273,24 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillRect(12, 12, boxW, imgH);
     ctx.restore();
 
-    // Redaction / Classification Stamp
+    // Live Video indicator or Classification Stamp
     ctx.save();
-    ctx.translate(W - 130, 36);
-    ctx.rotate(-0.08);
-    ctx.strokeStyle = accent;
+    ctx.translate(W - 135, 36);
+    ctx.rotate(mode === 'video' ? 0 : -0.08);
+    ctx.strokeStyle = mode === 'video' ? '#ef4444' : accent;
     ctx.lineWidth = 2;
-    ctx.strokeRect(-10, -14, 110, 26);
-    ctx.font = '800 13px "JetBrains Mono", monospace';
-    ctx.fillStyle = accent;
-    ctx.fillText(stamp, 0, 4);
+    ctx.strokeRect(-10, -14, 118, 26);
+    ctx.font = '800 12px "JetBrains Mono", monospace';
+    ctx.fillStyle = mode === 'video' ? '#ef4444' : accent;
+    ctx.fillText(mode === 'video' ? '● LIVE VIDEO' : stamp, -2, 4);
     ctx.restore();
 
-    // Accent Line
     ctx.fillStyle = accent;
     ctx.fillRect(28, 12 + imgH, W - 56, 2);
 
-    // Lower Metadata
     ctx.font = '700 15px "JetBrains Mono", monospace';
     ctx.fillStyle = accent;
-    ctx.fillText((item.subtitle || 'DEPT. TREASURY // CLASSIFIED').toUpperCase(), 32, 12 + imgH + 30);
+    ctx.fillText((item.subtitle || (mode === 'video' ? 'MOTION EXHIBIT // B-ROLL' : 'DEPT. TREASURY // CLASSIFIED')).toUpperCase(), 32, 12 + imgH + 30);
 
     ctx.font = `800 28px "${fontFam}", Georgia, serif`;
     ctx.fillStyle = '#f8fafc';
@@ -41153,18 +44300,15 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillStyle = '#94a3b8';
     wrapSpatialCanvasText(ctx, item.body || '', 32, 12 + imgH + 100, W - 64, 22);
   } else if (mode === 'chart') {
-    // 3D Financial Candlestick / Graph Trend Slate
     ctx.fillStyle = '#080c14';
     ctx.fillRect(20, 20, W - 40, H - 40);
 
-    // Draw decorative candlestick bars and grid lines
     ctx.strokeStyle = 'rgba(255,255,255,0.06)';
     ctx.lineWidth = 1;
     for (let gy = 50; gy < H - 50; gy += 40) {
       ctx.beginPath(); ctx.moveTo(30, gy); ctx.lineTo(W - 30, gy); ctx.stroke();
     }
 
-    // Glowing graph trend curve
     ctx.strokeStyle = accent;
     ctx.lineWidth = 3;
     ctx.shadowColor = accent;
@@ -41176,7 +44320,6 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.stroke();
     ctx.shadowBlur = 0;
 
-    // Trend Title
     ctx.font = '700 16px "JetBrains Mono", monospace';
     ctx.fillStyle = accent;
     ctx.fillText(item.subtitle || 'FINANCIAL METRIC // TELEMETRY', 35, 45);
@@ -41189,7 +44332,6 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillStyle = '#cbd5e1';
     wrapSpatialCanvasText(ctx, item.body || 'Capital flow indicates structural liquidity redistribution across decentralized nodes.', 35, H - 90, W - 70, 22);
   } else {
-    // Minimalist Frosted Dossier Text Slate (No Image or Clean Slate)
     const headerGrad = ctx.createLinearGradient(0, 14, 0, 85);
     headerGrad.addColorStop(0, 'rgba(255,255,255,0.05)');
     headerGrad.addColorStop(1, 'rgba(255,255,255,0.01)');
@@ -41214,21 +44356,12 @@ function renderSpatialArtifactCanvas(canvas, item, loadedImg) {
     ctx.fillStyle = '#e2e8f0';
     wrapSpatialCanvasText(ctx, item.body || 'Declassified dossier record entered into official forensic catalog.', 36, 145, W - 72, 26);
   }
+  ctx.restore();
 
-  // Double metallic bevel border
-  ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.45;
-  ctx.beginPath();
-  if (ctx.roundRect) ctx.roundRect(14, 14, W - 28, H - 28, 10);
-  else ctx.rect(14, 14, W - 28, H - 28);
-  ctx.stroke();
-  ctx.globalAlpha = 1.0;
+  // Outer Customizable Contour Border & Glow
+  drawCardContourBorder(ctx, resolvedShape, 12, 12, W - 24, H - 24, accent, contourW, contourGlow);
 }
+
 function createSpatialCardPlane(item) {
   const sc = item.scale || 1;
   const cardW = 520 * sc;
@@ -41237,6 +44370,7 @@ function createSpatialCardPlane(item) {
 
   const mode = item.artifactMode || (item.type === 'object' ? 'object' : (item.type === 'card' ? 'card' : 'image'));
   const isPureCelestial = (mode === 'object');
+  const isHologramGlobe = isPureCelestial && (item.objectShape === 'hologram-globe');
 
   const canvas = document.createElement('canvas');
   canvas.width = 760;
@@ -41248,9 +44382,35 @@ function createSpatialCardPlane(item) {
   const defaultPhotos = ['/paper_tear_stock_archival_news.jpg', '/boardroom_scene_hd.jpg', '/red_string_board_cinematic_plate.jpg', '/cctv_surveillance_scene.jpg', '/paper_tear_gold_standard.jpg', '/power_meeting_cinematic_plate.jpg'];
   const fallbackPhoto = defaultPhotos[Math.abs(parseInt(item.id || '1', 10)) % defaultPhotos.length];
   const imgUrl = (item.imageUrl !== undefined && item.imageUrl !== '') ? item.imageUrl : (mode === 'card' ? '' : fallbackPhoto);
+  const vidUrl = item.videoUrl || ((mode === 'video' && /\.(mp4|webm|mov)(\?|$)/i.test(imgUrl)) ? imgUrl : '');
+
+  let activeVideoEl = null;
+  if (mode === 'video' && vidUrl && typeof document !== 'undefined') {
+    let vid = _spatialVideoTexCache[vidUrl];
+    if (!vid) {
+      vid = document.createElement('video');
+      vid.crossOrigin = 'anonymous';
+      vid.src = vidUrl;
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.autoplay = true;
+      vid.addEventListener('canplay', () => {
+        vid.play().catch(() => {});
+        renderSpatialArtifactCanvas(canvas, item, vid);
+        texture.needsUpdate = true;
+      });
+      vid.load();
+      vid.play().catch(() => {});
+      _spatialVideoTexCache[vidUrl] = vid;
+    } else if (vid.paused) {
+      vid.play().catch(() => {});
+    }
+    activeVideoEl = vid;
+  }
 
   const cachedImg = imgUrl ? _spatialImageTexCache[imgUrl] : null;
-  renderSpatialArtifactCanvas(canvas, item, cachedImg);
+  renderSpatialArtifactCanvas(canvas, item, activeVideoEl && activeVideoEl.readyState >= 2 ? activeVideoEl : cachedImg);
   texture.needsUpdate = true;
 
   if (imgUrl && (!cachedImg || !cachedImg.complete)) {
@@ -41258,101 +44418,214 @@ function createSpatialCardPlane(item) {
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       _spatialImageTexCache[imgUrl] = img;
-      renderSpatialArtifactCanvas(canvas, item, img);
-      texture.needsUpdate = true;
+      if (!activeVideoEl || activeVideoEl.readyState < 2) {
+        renderSpatialArtifactCanvas(canvas, item, img);
+        texture.needsUpdate = true;
+      }
     };
     img.src = imgUrl;
   }
 
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    transparent: true,
-    side: THREE.DoubleSide,
-    depthWrite: false
-  });
-  material.userData = { baseOpacity: isPureCelestial ? 0.3 : 1.0 };
-  const frontMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW, cardH), material);
-  group.add(frontMesh);
-
-  // Pure 3D Celestial / Wireframe Geometric Object
-  if (isPureCelestial) {
-    const shape = item.objectShape || item.objectGeometry || 'icosahedron';
-    const objSize = 75 * sc;
-    let geom = null;
-
-    if (shape === 'torus') {
-      geom = new THREE.TorusGeometry(objSize * 0.85, objSize * 0.28, 16, 36);
-    } else if (shape === 'octahedron') {
-      geom = new THREE.OctahedronGeometry(objSize, 0);
-    } else if (shape === 'dodecahedron') {
-      geom = new THREE.DodecahedronGeometry(objSize, 0);
-    } else if (shape === 'monolith') {
-      geom = new THREE.BoxGeometry(objSize * 0.65, objSize * 1.5, objSize * 0.22);
-    } else {
-      geom = new THREE.IcosahedronGeometry(objSize, 1);
-    }
-
-    const accentColor = item.color ? new THREE.Color(item.color) : new THREE.Color(0x38bdf8);
-
-    const wireMat = new THREE.MeshBasicMaterial({
-      color: accentColor,
-      wireframe: true,
+  if (!isHologramGlobe) {
+    const material = new THREE.MeshBasicMaterial({
+      map: texture,
       transparent: true,
-      opacity: 0.95
+      side: THREE.DoubleSide,
+      depthWrite: false
     });
-    wireMat.userData = { baseOpacity: 0.95 };
-    const wireMesh = new THREE.Mesh(geom, wireMat);
-    wireMesh.position.set(0, 30 * sc, 45);
-    wireMesh.userData = {
-      isRotatingArtifact: true,
-      rotSpeedX: 0.006 + (Math.random() * 0.008),
-      rotSpeedY: 0.012 + (Math.random() * 0.01)
-    };
-
-    const coreMat = new THREE.MeshStandardMaterial({
-      color: accentColor,
-      roughness: 0.15,
-      metalness: 0.85,
-      transparent: true,
-      opacity: 0.55
-    });
-    coreMat.userData = { baseOpacity: 0.55 };
-    const coreMesh = new THREE.Mesh(geom.clone(), coreMat);
-    coreMesh.scale.set(0.92, 0.92, 0.92);
-    wireMesh.add(coreMesh);
-
-    group.add(wireMesh);
+    material.userData = { baseOpacity: isPureCelestial ? 0.3 : 1.0 };
+    const frontMesh = new THREE.Mesh(new THREE.PlaneGeometry(cardW, cardH), material);
+    group.add(frontMesh);
   }
 
-  // Flanking gallery angle inward
-  const sideSign = (item.x || 0) < 0 ? -1 : 1;
-  const baseTiltY = sideSign < 0 ? 0.38 : -0.38;
+  // Pure 3D Celestial / Holographic World Globe / Wireframe Geometric Object
+  if (isPureCelestial) {
+    const shape = item.objectShape || item.objectGeometry || 'icosahedron';
+    const resolvedCol = item.contourColor || item.color || spatial3DState.cardContourColor || '#38bdf8';
+    const accentColor = new THREE.Color(resolvedCol);
+
+    if (shape === 'hologram-globe') {
+      // 3D Holographic Dotted & Wireframe World Globe with Orbital Data Rings (Matches Images 6 & 7)
+      const globeRadius = 155 * sc;
+      const globeGroup = new THREE.Group();
+      globeGroup.userData = {
+        isRotatingArtifact: true,
+        rotSpeedX: 0.0008,
+        rotSpeedY: 0.0055
+      };
+
+      // Inner dark atmospheric occlusion core
+      const coreGeo = new THREE.SphereGeometry(globeRadius * 0.94, 32, 32);
+      const coreMat = new THREE.MeshBasicMaterial({
+        color: 0x040814,
+        transparent: true,
+        opacity: 0.78
+      });
+      coreMat.userData = { baseOpacity: 0.78 };
+      globeGroup.add(new THREE.Mesh(coreGeo, coreMat));
+
+      // Latitude / Longitude wireframe graticule sphere
+      const wireGeo = new THREE.SphereGeometry(globeRadius, 28, 20);
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: accentColor,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.32
+      });
+      wireMat.userData = { baseOpacity: 0.32 };
+      globeGroup.add(new THREE.Mesh(wireGeo, wireMat));
+
+      // Dense holographic continent point-cloud sphere
+      const dotCount = 1600;
+      const dotPositions = new Float32Array(dotCount * 3);
+      for (let i = 0; i < dotCount; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = u * 2.0 * Math.PI;
+        const phi = Math.acos(2.0 * v - 1.0);
+        // Cluster points into realistic continental bands
+        const latCheck = Math.sin(theta * 2.2) * Math.cos(phi * 2.8) + Math.cos(theta * 3.5) * 0.4;
+        const r = globeRadius * (latCheck > -0.15 ? 1.015 : 0.99);
+        dotPositions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        dotPositions[i * 3 + 1] = r * Math.cos(phi);
+        dotPositions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+      }
+      const dotGeo = new THREE.BufferGeometry();
+      dotGeo.setAttribute('position', new THREE.BufferAttribute(dotPositions, 3));
+      const dotMat = new THREE.PointsMaterial({
+        color: accentColor,
+        size: 3.6 * sc,
+        transparent: true,
+        opacity: 0.95,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      dotMat.userData = { baseOpacity: 0.95 };
+      globeGroup.add(new THREE.Points(dotGeo, dotMat));
+
+      // Outer orbital telemetry rings
+      const ringGeo1 = new THREE.RingGeometry(globeRadius * 1.22, globeRadius * 1.24, 64);
+      const ringMat1 = new THREE.MeshBasicMaterial({
+        color: accentColor,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.55,
+        blending: THREE.AdditiveBlending
+      });
+      ringMat1.userData = { baseOpacity: 0.55 };
+      const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
+      ring1.rotation.x = Math.PI * 0.42;
+      ring1.rotation.y = 0.22;
+      globeGroup.add(ring1);
+
+      const ringGeo2 = new THREE.RingGeometry(globeRadius * 1.42, globeRadius * 1.435, 64);
+      const ring2 = new THREE.Mesh(ringGeo2, ringMat1.clone());
+      ring2.rotation.x = -Math.PI * 0.36;
+      ring2.rotation.z = 0.35;
+      globeGroup.add(ring2);
+
+      group.add(globeGroup);
+    } else {
+      const objSize = 75 * sc;
+      let geom = null;
+
+      if (shape === 'torus') {
+        geom = new THREE.TorusGeometry(objSize * 0.85, objSize * 0.28, 16, 36);
+      } else if (shape === 'octahedron') {
+        geom = new THREE.OctahedronGeometry(objSize, 0);
+      } else if (shape === 'dodecahedron') {
+        geom = new THREE.DodecahedronGeometry(objSize, 0);
+      } else if (shape === 'monolith') {
+        geom = new THREE.BoxGeometry(objSize * 0.65, objSize * 1.5, objSize * 0.22);
+      } else {
+        geom = new THREE.IcosahedronGeometry(objSize, 1);
+      }
+
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: accentColor,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.95
+      });
+      wireMat.userData = { baseOpacity: 0.95 };
+      const wireMesh = new THREE.Mesh(geom, wireMat);
+      wireMesh.position.set(0, 30 * sc, 45);
+      wireMesh.userData = {
+        isRotatingArtifact: true,
+        rotSpeedX: 0.004 + (Math.random() * 0.004),
+        rotSpeedY: 0.007 + (Math.random() * 0.005)
+      };
+
+      const coreMat = new THREE.MeshStandardMaterial({
+        color: accentColor,
+        roughness: 0.15,
+        metalness: 0.85,
+        transparent: true,
+        opacity: 0.55
+      });
+      coreMat.userData = { baseOpacity: 0.55 };
+      const coreMesh = new THREE.Mesh(geom.clone(), coreMat);
+      coreMesh.scale.set(0.92, 0.92, 0.92);
+      wireMesh.add(coreMesh);
+
+      group.add(wireMesh);
+    }
+  }
+
+  // Subtle inward gallery angle
+  const sideSign = (item.x || 0) < -80 ? -1 : ((item.x || 0) > 80 ? 1 : 0);
+  const baseTiltY = sideSign < 0 ? 0.24 : (sideSign > 0 ? -0.24 : 0);
   group.rotation.y = baseTiltY;
 
-  group.position.set(item.x || (sideSign * 740), item.y || 0, item.z || 0);
+  const resolvedContourColor = item.contourColor || item.color || spatial3DState.cardContourColor || '#38bdf8';
+  const resolvedContourShape = item.contourShape || (mode === 'shape' ? (item.shapeType || 'arch-frame') : 'rounded-rect');
+
+  group.position.set(item.x !== undefined ? item.x : (sideSign * 500), item.y || 0, item.z || 0);
   group.userData = {
     id: item.id || Date.now().toString(),
     type: item.type || 'card',
     artifactMode: mode,
     objectShape: item.objectShape || item.objectGeometry || 'icosahedron',
+    shapeType: item.shapeType || resolvedContourShape,
+    contourShape: resolvedContourShape,
+    contourColor: resolvedContourColor,
+    contourWidth: item.contourWidth !== undefined ? item.contourWidth : (spatial3DState.cardContourWidth !== undefined ? spatial3DState.cardContourWidth : 3),
+    contourGlow: item.contourGlow !== undefined ? item.contourGlow : (spatial3DState.cardContourGlow !== undefined ? spatial3DState.cardContourGlow : 60),
     imageUrl: imgUrl,
+    videoUrl: vidUrl,
+    _videoEl: activeVideoEl,
+    _canvas: canvas,
+    _texture: texture,
+    _itemConfig: Object.assign({}, item, { artifactMode: mode, imageUrl: imgUrl, videoUrl: vidUrl, contourShape: resolvedContourShape, contourColor: resolvedContourColor }),
+    magazineTitle: item.magazineTitle,
+    featureTag: item.featureTag,
+    featureTitle: item.featureTitle,
+    topTickerLeft: item.topTickerLeft,
+    topTickerRight: item.topTickerRight,
+    kickerBadge: item.kickerBadge,
+    beamActive: item.beamActive,
+    beamColor: item.beamColor,
     title: item.title || 'CONFIDENTIAL SCAN',
     subtitle: item.subtitle || '',
     body: item.body || '',
     stamp: item.stamp || '',
-    transitionEffect: item.transitionEffect || 'fade', // 'fade', 'slide-in', 'scale-pop', 'yaw-drift'
+    transitionEffect: item.transitionEffect || 'fade',
     fontFamily: item.fontFamily || 'Cinzel',
+    cameraAction: item.cameraAction || 'glance',
+    stopHere: !!item.stopHere,
+    sfxId: item.sfxId || 'none',
+    visible: item.visible !== false,
     initialZ: item.z || 0,
-    baseX: item.x || (sideSign * 740),
+    baseX: item.x !== undefined ? item.x : (sideSign * 500),
     baseY: item.y || 0,
     baseRotY: baseTiltY,
-    x: item.x || (sideSign * 740),
+    x: item.x !== undefined ? item.x : (sideSign * 500),
     y: item.y || 0,
     z: item.z || 0,
     scale: sc,
     planeWidth: cardW,
     planeHeight: cardH,
-    color: item.color || '#f59e0b'
+    color: resolvedContourColor
   };
   return group;
 }
@@ -41363,20 +44636,14 @@ function createSpatialCodePlane(item) {
   canvas.height = 400;
   const ctx = canvas.getContext('2d');
 
-  const codeColor = item.color || '#10b981';
+  const codeColor = item.contourColor || item.color || '#10b981';
+  const shape = item.contourShape || 'rounded-rect';
 
+  ctx.save();
+  traceCardContourPath(ctx, shape, 10, 10, 680, 380);
   ctx.fillStyle = 'rgba(6, 9, 15, 0.95)';
-  ctx.beginPath();
-  if (ctx.roundRect) {
-    ctx.roundRect(10, 10, 680, 380, 16);
-  } else {
-    ctx.rect(10, 10, 680, 380);
-  }
   ctx.fill();
-
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = codeColor;
-  ctx.stroke();
+  ctx.clip();
 
   ctx.fillStyle = codeColor;
   ctx.font = 'bold 20px "JetBrains Mono", monospace';
@@ -41388,6 +44655,9 @@ function createSpatialCodePlane(item) {
   lines.forEach((line, i) => {
     ctx.fillText(line, 40, 110 + (i * 32));
   });
+  ctx.restore();
+
+  drawCardContourBorder(ctx, shape, 10, 10, 680, 380, codeColor, item.contourWidth || 2.5, 55);
 
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.MeshBasicMaterial({
@@ -41402,12 +44672,14 @@ function createSpatialCodePlane(item) {
   const planeGeo = new THREE.PlaneGeometry(520 * sc, 295 * sc);
   const mesh = new THREE.Mesh(planeGeo, material);
   const sideSign = (item.x || 0) < 0 ? -1 : 1;
-  mesh.rotation.y = sideSign < 0 ? 0.35 : -0.35;
+  mesh.rotation.y = sideSign < 0 ? 0.24 : -0.24;
   mesh.position.set(item.x || 0, item.y || 0, item.z || 0);
   mesh.userData = {
     id: item.id || Date.now().toString(),
     type: 'code',
     artifactMode: 'code',
+    contourShape: shape,
+    contourColor: codeColor,
     title: item.title,
     initialZ: item.z || 0,
     baseX: item.x || 0,
@@ -41419,6 +44691,8 @@ function createSpatialCodePlane(item) {
     planeWidth: 520 * sc,
     planeHeight: 295 * sc,
     color: codeColor,
+    stopHere: !!item.stopHere,
+    sfxId: item.sfxId || 'none',
     text: item.text || item.body || '',
     subtitle: '',
     body: item.text || item.body || ''
@@ -41427,7 +44701,7 @@ function createSpatialCodePlane(item) {
 }
 
 function buildSpatialDustParticles(scene) {
-  const particleCount = 1200;
+  const particleCount = spatial3DState.starCount || 1400;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
 
@@ -41440,9 +44714,9 @@ function buildSpatialDustParticles(scene) {
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const material = new THREE.PointsMaterial({
     color: 0xe2e8f0,
-    size: 4.8,
+    size: spatial3DState.starSize || 3.8,
     transparent: true,
-    opacity: 0.55,
+    opacity: 0.65,
     blending: THREE.AdditiveBlending,
     depthWrite: false
   });
@@ -41452,227 +44726,1715 @@ function buildSpatialDustParticles(scene) {
   return dust;
 }
 
-function updateSpatialEnvironmentGrid() {
-  const { gridMeshes, bgStyle, envStyle, gridLuminescence, gridGlow, gridColor, gridDensity, gridVisible, dustVisible, particlesMesh, scene, renderer, bgColor, transparentBg } = spatial3DState;
+function buildSpatialSmokeClouds(scene) {
+  const smokeGroup = new THREE.Group();
+  const puffCanvas = document.createElement('canvas');
+  puffCanvas.width = 256;
+  puffCanvas.height = 256;
+  const pCtx = puffCanvas.getContext('2d');
+  const rad = pCtx.createRadialGradient(128, 128, 8, 128, 128, 124);
+  rad.addColorStop(0.0, 'rgba(148, 163, 184, 0.34)');
+  rad.addColorStop(0.45, 'rgba(71, 85, 105, 0.16)');
+  rad.addColorStop(1.0, 'rgba(15, 23, 42, 0.0)');
+  pCtx.fillStyle = rad;
+  pCtx.fillRect(0, 0, 256, 256);
+
+  const puffTex = new THREE.CanvasTexture(puffCanvas);
+  const puffCount = 42;
+  for (let i = 0; i < puffCount; i++) {
+    const mat = new THREE.MeshBasicMaterial({
+      map: puffTex,
+      color: new THREE.Color(spatial3DState.smokeColor || '#334155'),
+      transparent: true,
+      opacity: 0.22 * ((spatial3DState.smokeIntensity !== undefined ? spatial3DState.smokeIntensity : 65) / 100),
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    const size = 900 + Math.random() * 1100;
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(size, size * 0.65), mat);
+    plane.position.set(
+      (Math.random() - 0.5) * 2200,
+      -340 + (Math.random() - 0.35) * 620,
+      1100 - (i / puffCount) * 5200 + (Math.random() - 0.5) * 240
+    );
+    plane.rotation.z = Math.random() * Math.PI * 2;
+    plane.userData = {
+      driftSpeed: 0.0003 + Math.random() * 0.0006,
+      baseX: plane.position.x,
+      baseY: plane.position.y,
+      phase: i * 0.7
+    };
+    smokeGroup.add(plane);
+  }
+  scene.add(smokeGroup);
+  return smokeGroup;
+}
+window.buildSpatialSmokeClouds = buildSpatialSmokeClouds;
+
+function rebuildSpatialGridHelpers() {
+  const { gridMeshes, gridDensity, gridColor, envStyle } = spatial3DState;
   if (!gridMeshes || !gridMeshes.group) return;
 
-  // Background color & transparent pass
-  if (scene) {
-    if (transparentBg) {
-      scene.background = null;
-      if (renderer) renderer.setClearColor(0x000000, 0);
-    } else {
-      const col = new THREE.Color(bgColor || '#07080c');
-      scene.background = col;
-      if (renderer) renderer.setClearColor(col, 1.0);
-    }
-  }
-
-  const lum = Math.max(0, (gridLuminescence !== undefined ? gridLuminescence : 100) / 100);
+  const targetDivisions = Math.max(30, Math.min(360, Math.round(gridDensity || 180)));
   let hex = gridColor;
   if (!hex) {
     if (envStyle === 'tunnel-gold') hex = '#d4af37';
     else if (envStyle === 'tunnel-slate') hex = '#64748b';
     else hex = '#06b6d4';
   }
+  const mainCol = new THREE.Color(hex);
+  const subCol = mainCol.clone().multiplyScalar(0.38);
+
+  if (
+    gridMeshes._builtDivisions === targetDivisions &&
+    gridMeshes._builtHex === hex.toLowerCase()
+  ) {
+    return;
+  }
+
+  while (gridMeshes.group.children.length > 0) {
+    const ch = gridMeshes.group.children[0];
+    gridMeshes.group.remove(ch);
+    if (ch.geometry) ch.geometry.dispose();
+    if (ch.material) ch.material.dispose();
+  }
+
+  const tunnelLen = 10000;
+  const tunnelW = 1800;
+  const tunnelH = 960;
+
+  const floorGrid = new THREE.GridHelper(tunnelLen, targetDivisions, mainCol, subCol);
+  floorGrid.position.set(0, -tunnelH / 2, -1500);
+  gridMeshes.group.add(floorGrid);
+
+  const ceilingGrid = new THREE.GridHelper(tunnelLen, targetDivisions, mainCol, subCol);
+  ceilingGrid.position.set(0, tunnelH / 2, -1500);
+  ceilingGrid.rotation.x = Math.PI;
+  gridMeshes.group.add(ceilingGrid);
+
+  const leftWallGrid = new THREE.GridHelper(tunnelLen, targetDivisions, mainCol, subCol);
+  leftWallGrid.position.set(-tunnelW / 2, 0, -1500);
+  leftWallGrid.rotation.z = Math.PI / 2;
+  gridMeshes.group.add(leftWallGrid);
+
+  const rightWallGrid = new THREE.GridHelper(tunnelLen, targetDivisions, mainCol, subCol);
+  rightWallGrid.position.set(tunnelW / 2, 0, -1500);
+  rightWallGrid.rotation.z = -Math.PI / 2;
+  gridMeshes.group.add(rightWallGrid);
+
+  gridMeshes.floor = floorGrid;
+  gridMeshes.ceiling = ceilingGrid;
+  gridMeshes.leftWall = leftWallGrid;
+  gridMeshes.rightWall = rightWallGrid;
+  gridMeshes._builtDivisions = targetDivisions;
+  gridMeshes._builtHex = hex.toLowerCase();
+  spatial3DState.floorGrid = floorGrid;
+}
+window.rebuildSpatialGridHelpers = rebuildSpatialGridHelpers;
+
+function buildSpatialAtmosphericStageProps(scene) {
+  // 1. Volumetric God-Rays streaming from top-right (Matches Master Images 4, 5, 7 with 0-alpha feathered edges)
+  const raysGroup = new THREE.Group();
+  const rayCanvas = document.createElement('canvas');
+  rayCanvas.width = 256;
+  rayCanvas.height = 512;
+  const rCtx = rayCanvas.getContext('2d');
+  rCtx.clearRect(0, 0, 256, 512);
+
+  // Soft vertical + horizontal feathered beam so no rectangular plane edge can ever be seen
+  for (let y = 0; y < 512; y += 2) {
+    const ny = y / 512;
+    const vFade = Math.sin(ny * Math.PI) * (1 - ny * 0.55);
+    const halfW = 36 + ny * 76;
+    const hGrad = rCtx.createLinearGradient(128 - halfW, y, 128 + halfW, y);
+    const peakAlpha = (0.34 * vFade).toFixed(4);
+    const midAlpha = (0.14 * vFade).toFixed(4);
+    hGrad.addColorStop(0.0, 'rgba(0, 0, 0, 0)');
+    hGrad.addColorStop(0.28, `rgba(245, 158, 11, ${midAlpha})`);
+    hGrad.addColorStop(0.50, `rgba(255, 250, 220, ${peakAlpha})`);
+    hGrad.addColorStop(0.72, `rgba(245, 158, 11, ${midAlpha})`);
+    hGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+    rCtx.fillStyle = hGrad;
+    rCtx.fillRect(128 - halfW, y, halfW * 2, 2);
+  }
+
+  const rayTex = new THREE.CanvasTexture(rayCanvas);
+  const rayConfigs = [
+    { x: 240, y: 310, z: -90, rotZ: -0.44, w: 680, h: 1250, op: 0.44 },
+    { x: 340, y: 290, z: -150, rotZ: -0.52, w: 540, h: 1300, op: 0.34 },
+    { x: 110, y: 320, z: -130, rotZ: -0.34, w: 520, h: 1200, op: 0.28 }
+  ];
+  rayConfigs.forEach(rc => {
+    const rMat = new THREE.MeshBasicMaterial({
+      map: rayTex,
+      color: new THREE.Color('#f59e0b'),
+      transparent: true,
+      opacity: rc.op,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    const rMesh = new THREE.Mesh(new THREE.PlaneGeometry(rc.w, rc.h), rMat);
+    rMesh.position.set(rc.x, rc.y, rc.z);
+    rMesh.rotation.z = rc.rotZ;
+    raysGroup.add(rMesh);
+  });
+  scene.add(raysGroup);
+  spatial3DState.volumetricRaysGroup = raysGroup;
+
+  // 2. Reflective Obsidian & Antique-Gold World Map Pedestal Floor (Matches Master Images 4, 5, 6)
+  const pedestalGroup = new THREE.Group();
+  const floorCanvas = document.createElement('canvas');
+  floorCanvas.width = 1024;
+  floorCanvas.height = 1024;
+  const fCtx = floorCanvas.getContext('2d');
+
+  const fGrad = fCtx.createRadialGradient(512, 512, 20, 512, 512, 490);
+  fGrad.addColorStop(0.0, 'rgba(245, 158, 11, 0.42)');
+  fGrad.addColorStop(0.28, 'rgba(180, 83, 9, 0.18)');
+  fGrad.addColorStop(0.65, 'rgba(15, 23, 42, 0.12)');
+  fGrad.addColorStop(1.0, 'rgba(0, 0, 0, 0)');
+  fCtx.fillStyle = fGrad;
+  fCtx.fillRect(0, 0, 1024, 1024);
+
+  // Concentric documentary meridian rings & stylized continental dot-matrix on floor
+  fCtx.strokeStyle = 'rgba(251, 191, 36, 0.28)';
+  fCtx.lineWidth = 1.5;
+  [140, 240, 340, 440].forEach(r => {
+    fCtx.beginPath();
+    fCtx.arc(512, 512, r, 0, Math.PI * 2);
+    fCtx.stroke();
+  });
+  // Stylized world map continents in warm gold dots on the floor
+  fCtx.fillStyle = 'rgba(253, 230, 138, 0.45)';
+  for (let i = 0; i < 950; i++) {
+    const ang = (i * 0.37) % (Math.PI * 2);
+    const rad = 75 + ((i * 19) % 350);
+    const wave = Math.sin(ang * 3) * Math.cos(rad * 0.025);
+    if (wave > -0.1) {
+      const px = 512 + Math.cos(ang) * rad;
+      const py = 512 + Math.sin(ang) * (rad * 0.65);
+      fCtx.fillRect(px, py, 2.5, 2.5);
+    }
+  }
+
+  const floorTex = new THREE.CanvasTexture(floorCanvas);
+  const floorMat = new THREE.MeshBasicMaterial({
+    map: floorTex,
+    color: new THREE.Color('#ffffff'),
+    transparent: true,
+    opacity: 0.85,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide
+  });
+  const floorDisc = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400), floorMat);
+  floorDisc.rotation.x = -Math.PI / 2;
+  floorDisc.position.set(0, -340, -120);
+  pedestalGroup.add(floorDisc);
+  scene.add(pedestalGroup);
+  spatial3DState.worldPedestalGroup = pedestalGroup;
+}
+
+function updateSpatialEnvironmentGrid() {
+  const { gridMeshes, bgStyle, envStyle, stylePreset, gridLuminescence, gridGlow, gridColor, gridVisible, dustVisible, particlesMesh, smokeGroup, smokeVisible, smokeIntensity, smokeColor, gridWallMode, scene, renderer, bgColor, transparentBg, volumetricRaysGroup, worldPedestalGroup } = spatial3DState;
+  if (!gridMeshes || !gridMeshes.group) return;
+
+  rebuildSpatialGridHelpers();
+
+  if (scene) {
+    if (transparentBg) {
+      scene.background = null;
+      if (renderer) renderer.setClearColor(0x000000, 0);
+    } else {
+      const isPitchMode = bgStyle === 'pitch-black' || bgStyle === 'pitch-dark' || bgStyle === 'black-stars' || bgStyle === 'black-smoke' || bgStyle === 'black-stars-smoke';
+      const col = new THREE.Color(isPitchMode ? (bgColor || '#04050a') : (bgColor || '#05070c'));
+      scene.background = col;
+      if (renderer) renderer.setClearColor(col, 1.0);
+    }
+  }
+
+  const lum = Math.max(0, (gridLuminescence !== undefined ? gridLuminescence : 38) / 100);
+  let hex = gridColor;
+  if (!hex) {
+    if (stylePreset === 'cyberpunk') hex = '#a855f7';
+    else if (stylePreset === 'tech-investigative') hex = '#00e5ff';
+    else if (envStyle === 'tunnel-gold') hex = '#d4af37';
+    else if (envStyle === 'tunnel-slate') hex = '#64748b';
+    else hex = '#d4af37';
+  }
   const color = new THREE.Color(hex);
 
   const styleHelper = (gh) => {
     if (!gh || !gh.material) return;
     gh.material.transparent = true;
-    gh.material.opacity = Math.min(1.0, 0.55 * lum);
+    gh.material.opacity = Math.min(0.95, 0.45 * lum);
     if (gh.material.color) gh.material.color.copy(color);
   };
 
   [gridMeshes.floor, gridMeshes.ceiling, gridMeshes.leftWall, gridMeshes.rightWall].forEach(styleHelper);
 
-  const isPitchDark = bgStyle === 'pitch-dark';
-  const isStarsOnly = bgStyle === 'stars-only' || envStyle === 'deep-cosmos';
-  const isGridOnly = bgStyle === 'grid-only';
-  const isOpenStars = envStyle === 'open-stars';
+  const mode = bgStyle || 'black-stars-smoke';
+  // Respect explicit gridVisible toggle even when bgStyle is 'black-stars-smoke'
+  const showGridByMode = (gridVisible === true) && (mode !== 'pitch-black');
+  const showStarsByMode = (mode === 'black-stars' || mode === 'stars-only' || mode === 'black-stars-smoke' || mode === 'cyber-set' || mode === 'grid-stars') && (dustVisible !== false);
+  const showSmokeByMode = (mode === 'black-smoke' || mode === 'black-stars-smoke' || mode === 'cyber-set' || mode === 'grid-stars') && (smokeVisible !== false);
 
-  if (!gridVisible || isPitchDark || isStarsOnly) {
+  const wallMode = gridWallMode || 'floor-only';
+  if (!showGridByMode) {
     gridMeshes.group.visible = false;
-  } else if (isOpenStars) {
-    gridMeshes.group.visible = true;
-    gridMeshes.floor.visible = true;
-    gridMeshes.ceiling.visible = false;
-    gridMeshes.leftWall.visible = false;
-    gridMeshes.rightWall.visible = false;
   } else {
-    // 3D Grid Tunnel (Image 2)
     gridMeshes.group.visible = true;
     gridMeshes.floor.visible = true;
-    gridMeshes.ceiling.visible = true;
-    gridMeshes.leftWall.visible = true;
-    gridMeshes.rightWall.visible = true;
+    gridMeshes.ceiling.visible = (wallMode === 'tunnel' || wallMode === 'floor-ceiling');
+    gridMeshes.leftWall.visible = (wallMode === 'tunnel');
+    gridMeshes.rightWall.visible = (wallMode === 'tunnel');
+  }
+
+  if (volumetricRaysGroup) {
+    volumetricRaysGroup.visible = !transparentBg && (mode !== 'pitch-black');
+    const rayCol = new THREE.Color(
+      stylePreset === 'cyberpunk' ? '#a855f7' : (stylePreset === 'tech-investigative' ? '#0ea5e9' : '#f59e0b')
+    );
+    volumetricRaysGroup.children.forEach(ch => {
+      if (ch.material && ch.material.color) ch.material.color.copy(rayCol);
+    });
+  }
+
+  if (worldPedestalGroup) {
+    worldPedestalGroup.visible = !transparentBg && (mode !== 'pitch-black');
+    const pedCol = new THREE.Color(
+      stylePreset === 'cyberpunk' ? '#c084fc' : (stylePreset === 'tech-investigative' ? '#38bdf8' : '#fbbf24')
+    );
+    worldPedestalGroup.children.forEach(ch => {
+      if (ch.material && ch.material.color) ch.material.color.copy(pedCol);
+    });
   }
 
   if (particlesMesh) {
-    particlesMesh.visible = (dustVisible !== false) && !isPitchDark && !isGridOnly;
+    particlesMesh.visible = showStarsByMode;
+  }
+
+  if (smokeGroup) {
+    smokeGroup.visible = showSmokeByMode;
+    const sOp = 0.22 * ((smokeIntensity !== undefined ? smokeIntensity : 65) / 100);
+    const sCol = new THREE.Color(smokeColor || '#262018');
+    smokeGroup.children.forEach(ch => {
+      if (ch.material) {
+        ch.material.opacity = sOp;
+        ch.material.color.copy(sCol);
+      }
+    });
   }
 
   if (spatial3DState.pointLight) {
-    spatial3DState.pointLight.intensity = (gridGlow || 100) / 100 * 1.4;
+    spatial3DState.pointLight.intensity = (gridGlow !== undefined ? gridGlow : 85) / 100 * 1.4;
   }
 
   if (scene && scene.fog) {
-    if (isPitchDark) scene.fog.density = 0.00005;
-    else if (isStarsOnly) scene.fog.density = 0.00018;
-    else scene.fog.density = 0.00028;
+    if (mode === 'pitch-black' || mode === 'pitch-dark') scene.fog.density = 0.00004;
+    else if (showSmokeByMode) scene.fog.density = 0.00024;
+    else scene.fog.density = 0.00018;
   }
 }
 
+function sampleDrawnPathX(path, t) {
+  if (!path || path.length === 0) return 0;
+  if (path.length === 1) return path[0].x;
+  const idx = t * (path.length - 1);
+  const i0 = Math.max(0, Math.min(path.length - 1, Math.floor(idx)));
+  const i1 = Math.max(0, Math.min(path.length - 1, i0 + 1));
+  const frac = idx - i0;
+  return path[i0].x * (1 - frac) + path[i1].x * frac;
+}
+window.sampleDrawnPathX = sampleDrawnPathX;
+
+// =========================================================================
+// 3D SPATIAL AUDIO MANAGER: CINEMATIC PRESET LIBRARY + CUSTOM UPLOADED SFX
+// Includes 'Whoosh', 'Riser', 'Impact', Paper Rustle, Marker Squeak,
+// Camera Shutter, Deep Air Whoosh, Slow-Mo Boom, Time-Warp, & Per-SFX Volume/Fade
+// =========================================================================
+const SPATIAL_BUILTIN_SFX = [
+  { id: 'whoosh', name: 'Whoosh', icon: '💨', label: '💨 Whoosh', desc: 'Crisp cinematic stereo pass-by whoosh' },
+  { id: 'riser', name: 'Riser', icon: '📈', label: '📈 Riser', desc: 'Tension-building harmonic sweep riser' },
+  { id: 'impact', name: 'Impact', icon: '💥', label: '💥 Impact', desc: 'Heavy trailer transient & sub-bass impact' },
+  { id: 'paper-rustle', name: 'Paper Rustle', icon: '📄', label: '📄 Archival Paper Rustle', desc: 'Crisp multi-fold document crinkle' },
+  { id: 'marker-squeak', name: 'Marker Squeak', icon: '🖊️', label: '🖊️ Felt Marker Squeak', desc: 'High-friction highlighter stroke' },
+  { id: 'camera-shutter', name: 'Camera Shutter', icon: '📸', label: '📸 DSLR Camera Shutter', desc: 'Mechanical mirror click & flash charge' },
+  { id: 'cinematic-whoosh', name: 'Deep Air Whoosh', icon: '🌬️', label: '🌬️ Deep Air Whoosh', desc: 'Low-end spatial pass-by air sweep' },
+  { id: 'sub-bass-boom', name: 'Slow-Mo Boom', icon: '🔊', label: '🔊 Slow-Mo Boom', desc: '85Hz→28Hz sub-bass resume drop' },
+  { id: 'tape-slow-down', name: 'Time-Warp', icon: '⏳', label: '⏳ Time-Warp Slow-Mo', desc: 'Pitch-drop deceleration warble' }
+];
+window.SPATIAL_BUILTIN_SFX = SPATIAL_BUILTIN_SFX;
+
+function ensureSpatialAudioCtx() {
+  if (!spatial3DState.audioCtx) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return null;
+    spatial3DState.audioCtx = new AudioCtx();
+  }
+  if (spatial3DState.audioCtx.state === 'suspended') {
+    spatial3DState.audioCtx.resume().catch(() => {});
+  }
+  return spatial3DState.audioCtx;
+}
+
+function connectSpatialAudioOutput(node, ctx) {
+  if (!node || !ctx) return;
+  node.connect(ctx.destination);
+  if (spatial3DState.isRecording && spatial3DState._recordAudioDest) {
+    try { node.connect(spatial3DState._recordAudioDest); } catch (_) {}
+  }
+}
+
+function playSpatialSFX(sfxId, forcePreview, opts) {
+  if (!sfxId || sfxId === 'none') return;
+  if (!forcePreview && !spatial3DState.audioEnabled) return;
+
+  const rawMaster = spatial3DState.audioVolume !== undefined ? spatial3DState.audioVolume : 0.80;
+  const masterVol = rawMaster > 1.5 ? (rawMaster / 100) : rawMaster;
+
+  const evKey = opts && opts.eventKey;
+  const evCfg = (evKey && spatial3DState.audioEventSettings && spatial3DState.audioEventSettings[evKey]) || {};
+  const indivVolPct = (opts && opts.volume !== undefined) ? opts.volume : (evCfg.volume !== undefined ? evCfg.volume : 85);
+  const indivFadePct = (opts && opts.fade !== undefined) ? opts.fade : (evCfg.fade !== undefined ? evCfg.fade : 20);
+
+  const vol = Math.max(0.01, Math.min(1.0, masterVol * (indivVolPct / 100)));
+  const fadeNorm = Math.max(0.0, Math.min(1.0, indivFadePct / 100)); // 0..1 controls fade-in / fade-out smoothness
+
+  // Check if sfxId is a user-uploaded custom audio clip
+  if (sfxId.startsWith('custom-sfx-')) {
+    const clip = (spatial3DState.customAudioClips || []).find(c => c.id === sfxId);
+    if (clip && clip.dataUrl) {
+      try {
+        let audioEl = _spatialCustomAudioCache[clip.id];
+        if (!audioEl || audioEl.src !== clip.dataUrl) {
+          audioEl = new Audio(clip.dataUrl);
+          _spatialCustomAudioCache[clip.id] = audioEl;
+        }
+        audioEl.currentTime = 0;
+        if (fadeNorm > 0.05) {
+          audioEl.volume = Math.max(0.01, vol * 0.1);
+          audioEl.play().catch(() => {});
+          const fadeMs = Math.round(fadeNorm * 450);
+          const steps = 8;
+          let step = 0;
+          const iv = setInterval(() => {
+            step++;
+            audioEl.volume = Math.min(1.0, vol * (step / steps));
+            if (step >= steps) clearInterval(iv);
+          }, Math.max(15, Math.floor(fadeMs / steps)));
+        } else {
+          audioEl.volume = vol;
+          audioEl.play().catch(() => {});
+        }
+      } catch (_) {}
+    }
+    return;
+  }
+
+  const ctx = ensureSpatialAudioCtx();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+
+  try {
+    if (sfxId === 'whoosh') {
+      // Crisp Cinematic 'Whoosh' with Doppler Filter Peak & Fade Envelope
+      const dur = 0.38 + fadeNorm * 0.28;
+      const attack = Math.max(0.02, 0.08 + fadeNorm * 0.14);
+      const bufSize = Math.floor(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) {
+        const p = i / bufSize;
+        data[i] = (Math.random() * 2 - 1) * Math.sin(p * Math.PI);
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(220, now);
+      bp.frequency.exponentialRampToValueAtTime(1450, now + dur * 0.45);
+      bp.frequency.exponentialRampToValueAtTime(180, now + dur);
+      bp.Q.value = 1.8;
+
+      const subOsc = ctx.createOscillator();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(75, now);
+      subOsc.frequency.exponentialRampToValueAtTime(165, now + dur * 0.45);
+      subOsc.frequency.exponentialRampToValueAtTime(48, now + dur);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.002, now);
+      gain.gain.linearRampToValueAtTime(0.42 * vol, now + attack);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      const subGain = ctx.createGain();
+      subGain.gain.setValueAtTime(0.002, now);
+      subGain.gain.linearRampToValueAtTime(0.24 * vol, now + attack);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      src.connect(bp);
+      bp.connect(gain);
+      connectSpatialAudioOutput(gain, ctx);
+
+      subOsc.connect(subGain);
+      connectSpatialAudioOutput(subGain, ctx);
+
+      src.start(now);
+      subOsc.start(now);
+      src.stop(now + dur);
+      subOsc.stop(now + dur);
+    } else if (sfxId === 'riser') {
+      // Cinematic Tension 'Riser' (Dual Detuned Pitch Sweep + Filtered Noise Swell)
+      const dur = 0.85 + fadeNorm * 0.55;
+      const attack = Math.max(0.08, dur * (0.35 + fadeNorm * 0.35));
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      osc1.type = 'sawtooth';
+      osc2.type = 'triangle';
+      osc1.frequency.setValueAtTime(110, now);
+      osc1.frequency.exponentialRampToValueAtTime(880, now + dur * 0.92);
+      osc2.frequency.setValueAtTime(165, now);
+      osc2.frequency.exponentialRampToValueAtTime(1320, now + dur * 0.92);
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(240, now);
+      lp.frequency.exponentialRampToValueAtTime(4800, now + dur * 0.9);
+      lp.Q.value = 3.2;
+
+      const nSize = Math.floor(ctx.sampleRate * dur);
+      const nBuf = ctx.createBuffer(1, nSize, ctx.sampleRate);
+      const nData = nBuf.getChannelData(0);
+      for (let i = 0; i < nSize; i++) nData[i] = (Math.random() * 2 - 1) * (i / nSize);
+      const nSrc = ctx.createBufferSource();
+      nSrc.buffer = nBuf;
+
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.002, now);
+      g.gain.exponentialRampToValueAtTime(0.32 * vol, now + attack);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      osc1.connect(lp);
+      osc2.connect(lp);
+      nSrc.connect(lp);
+      lp.connect(g);
+      connectSpatialAudioOutput(g, ctx);
+
+      osc1.start(now);
+      osc2.start(now);
+      nSrc.start(now);
+      osc1.stop(now + dur);
+      osc2.stop(now + dur);
+      nSrc.stop(now + dur);
+    } else if (sfxId === 'impact') {
+      // Heavy Cinematic 'Impact' (Transient Crack + Deep Sub-Bass Drop + Metallic Tail)
+      const dur = 0.85 + fadeNorm * 0.45;
+      const attack = Math.max(0.008, fadeNorm * 0.09);
+
+      // 1. Sub-bass punch
+      const sub = ctx.createOscillator();
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(135, now);
+      sub.frequency.exponentialRampToValueAtTime(32, now + 0.28);
+      sub.frequency.exponentialRampToValueAtTime(24, now + dur);
+
+      const subG = ctx.createGain();
+      subG.gain.setValueAtTime(0.005, now);
+      subG.gain.linearRampToValueAtTime(0.68 * vol, now + attack);
+      subG.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      sub.connect(subG);
+      connectSpatialAudioOutput(subG, ctx);
+      sub.start(now);
+      sub.stop(now + dur);
+
+      // 2. Transient crack & reverberant tail
+      const nSize = Math.floor(ctx.sampleRate * dur);
+      const nBuf = ctx.createBuffer(1, nSize, ctx.sampleRate);
+      const nData = nBuf.getChannelData(0);
+      for (let i = 0; i < nSize; i++) {
+        const p = i / nSize;
+        nData[i] = (Math.random() * 2 - 1) * Math.exp(-p * 5.5);
+      }
+      const nSrc = ctx.createBufferSource();
+      nSrc.buffer = nBuf;
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(2600, now);
+      lp.frequency.exponentialRampToValueAtTime(220, now + dur);
+      const nG = ctx.createGain();
+      nG.gain.setValueAtTime(0.005, now);
+      nG.gain.linearRampToValueAtTime(0.45 * vol, now + attack);
+      nG.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      nSrc.connect(lp);
+      lp.connect(nG);
+      connectSpatialAudioOutput(nG, ctx);
+      nSrc.start(now);
+      nSrc.stop(now + dur);
+    } else if (sfxId === 'paper-rustle') {
+      // Crisp multi-burst filtered archival paper rustle & page turn
+      const dur = 0.36 + fadeNorm * 0.18;
+      const attack = Math.max(0.02, 0.04 + fadeNorm * 0.08);
+      const bufSize = Math.floor(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) {
+        const p = i / bufSize;
+        const env = Math.sin(p * Math.PI) * (0.45 + 0.55 * Math.pow(Math.sin(p * Math.PI * 5.5), 2));
+        const crackle = (Math.random() > 0.92 ? (Math.random() * 2 - 1) * 1.8 : (Math.random() * 2 - 1) * 0.55);
+        data[i] = crackle * env;
+      }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.setValueAtTime(1100, now);
+
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.setValueAtTime(2400, now);
+      bp.frequency.exponentialRampToValueAtTime(4200, now + 0.16);
+      bp.frequency.exponentialRampToValueAtTime(1800, now + dur);
+      bp.Q.value = 1.4;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.42 * vol, now + attack);
+      gain.gain.exponentialRampToValueAtTime(0.002, now + dur);
+
+      src.connect(hp);
+      hp.connect(bp);
+      bp.connect(gain);
+      connectSpatialAudioOutput(gain, ctx);
+      src.start(now);
+      src.stop(now + dur);
+    } else if (sfxId === 'marker-squeak') {
+      // Felt-tip marker squeak + paper friction noise
+      const dur = 0.28 + fadeNorm * 0.14;
+      const attack = Math.max(0.015, 0.025 + fadeNorm * 0.06);
+      const osc = ctx.createOscillator();
+      const mod = ctx.createOscillator();
+      const modGain = ctx.createGain();
+      osc.type = 'triangle';
+      mod.type = 'sine';
+      mod.frequency.setValueAtTime(48, now);
+      modGain.gain.setValueAtTime(140, now);
+
+      osc.frequency.setValueAtTime(1650, now);
+      osc.frequency.exponentialRampToValueAtTime(2680, now + 0.09);
+      osc.frequency.exponentialRampToValueAtTime(1920, now + 0.19);
+      osc.frequency.exponentialRampToValueAtTime(2450, now + dur);
+
+      const squeakGain = ctx.createGain();
+      squeakGain.gain.setValueAtTime(0.001, now);
+      squeakGain.gain.linearRampToValueAtTime(0.16 * vol, now + attack);
+      squeakGain.gain.setValueAtTime(0.12 * vol, now + dur * 0.65);
+      squeakGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      mod.connect(modGain);
+      modGain.connect(osc.frequency);
+      osc.connect(squeakGain);
+      connectSpatialAudioOutput(squeakGain, ctx);
+
+      osc.start(now);
+      mod.start(now);
+      osc.stop(now + dur);
+      mod.stop(now + dur);
+
+      const nSize = Math.floor(ctx.sampleRate * dur);
+      const nBuf = ctx.createBuffer(1, nSize, ctx.sampleRate);
+      const nData = nBuf.getChannelData(0);
+      for (let i = 0; i < nSize; i++) nData[i] = (Math.random() * 2 - 1) * 0.4;
+      const nSrc = ctx.createBufferSource();
+      nSrc.buffer = nBuf;
+      const nFilt = ctx.createBiquadFilter();
+      nFilt.type = 'bandpass';
+      nFilt.frequency.setValueAtTime(3200, now);
+      nFilt.Q.value = 2.0;
+      const nGain = ctx.createGain();
+      nGain.gain.setValueAtTime(0.14 * vol, now);
+      nGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      nSrc.connect(nFilt);
+      nFilt.connect(nGain);
+      connectSpatialAudioOutput(nGain, ctx);
+      nSrc.start(now);
+      nSrc.stop(now + dur);
+    } else if (sfxId === 'camera-shutter') {
+      // Mechanical DSLR double-click mirror slap + flash capacitor
+      const makeClick = (offset, freq, clickVol) => {
+        const cDur = 0.045;
+        const cBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * cDur), ctx.sampleRate);
+        const cData = cBuf.getChannelData(0);
+        for (let i = 0; i < cData.length; i++) {
+          cData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.008));
+        }
+        const cSrc = ctx.createBufferSource();
+        cSrc.buffer = cBuf;
+        const bp = ctx.createBiquadFilter();
+        bp.type = 'bandpass';
+        bp.frequency.setValueAtTime(freq, now + offset);
+        bp.Q.value = 1.8;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(clickVol * vol, now + offset);
+        g.gain.exponentialRampToValueAtTime(0.001, now + offset + cDur);
+        cSrc.connect(bp);
+        bp.connect(g);
+        connectSpatialAudioOutput(g, ctx);
+        cSrc.start(now + offset);
+        cSrc.stop(now + offset + cDur);
+      };
+      makeClick(0.0, 1800, 0.55);
+      makeClick(0.065, 2400, 0.48);
+
+      const fOsc = ctx.createOscillator();
+      const fGain = ctx.createGain();
+      fOsc.type = 'sine';
+      fOsc.frequency.setValueAtTime(2800, now + 0.07);
+      fOsc.frequency.exponentialRampToValueAtTime(5400, now + 0.32 + fadeNorm * 0.15);
+      fGain.gain.setValueAtTime(0.001, now + 0.07);
+      fGain.gain.linearRampToValueAtTime(0.045 * vol, now + 0.11);
+      fGain.gain.exponentialRampToValueAtTime(0.0005, now + 0.34 + fadeNorm * 0.15);
+      fOsc.connect(fGain);
+      connectSpatialAudioOutput(fGain, ctx);
+      fOsc.start(now + 0.07);
+      fOsc.stop(now + 0.34 + fadeNorm * 0.15);
+    } else if (sfxId === 'sub-bass-boom') {
+      const dur = 0.75 + fadeNorm * 0.35;
+      const attack = Math.max(0.015, 0.03 + fadeNorm * 0.09);
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(95, now);
+      osc.frequency.exponentialRampToValueAtTime(31, now + dur);
+      g.gain.setValueAtTime(0.01, now);
+      g.gain.linearRampToValueAtTime(0.55 * vol, now + attack);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(g);
+      connectSpatialAudioOutput(g, ctx);
+      osc.start(now);
+      osc.stop(now + dur);
+    } else if (sfxId === 'tape-slow-down') {
+      const dur = 0.55 + fadeNorm * 0.25;
+      const attack = Math.max(0.02, 0.04 + fadeNorm * 0.08);
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(340, now);
+      osc.frequency.exponentialRampToValueAtTime(52, now + dur);
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(900, now);
+      lp.frequency.exponentialRampToValueAtTime(140, now + dur);
+      g.gain.setValueAtTime(0.01, now);
+      g.gain.linearRampToValueAtTime(0.22 * vol, now + attack);
+      g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(lp);
+      lp.connect(g);
+      connectSpatialAudioOutput(g, ctx);
+      osc.start(now);
+      osc.stop(now + dur);
+    } else {
+      // 'cinematic-whoosh' default
+      const dur = 0.44 + fadeNorm * 0.25;
+      const attack = Math.max(0.02, 0.12 + fadeNorm * 0.12);
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.sin((i / bufferSize) * Math.PI);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(140, now);
+      filter.frequency.exponentialRampToValueAtTime(540, now + dur * 0.42);
+      filter.frequency.exponentialRampToValueAtTime(110, now + dur);
+      filter.Q.value = 1.6;
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.01, now);
+      gain.gain.linearRampToValueAtTime(0.28 * vol, now + attack);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      connectSpatialAudioOutput(gain, ctx);
+      noise.start(now);
+      noise.stop(now + dur);
+    }
+  } catch (_) {}
+}
+window.playSpatialSFX = playSpatialSFX;
+
+function triggerSpatialWhooshSound() {
+  const ev = spatial3DState.audioEvents || {};
+  if (ev.onFlyByTransition && ev.onFlyByTransition !== 'none') {
+    playSpatialSFX(ev.onFlyByTransition, false, { eventKey: 'onFlyByTransition' });
+  }
+}
+
+function checkSpatialZPassWhoosh(camZ) {
+  if (!spatial3DState.audioEnabled || spatial3DState._isVideoPaused) {
+    spatial3DState.lastZPassCheck = camZ;
+    return;
+  }
+  const prevZ = spatial3DState.lastZPassCheck;
+  spatial3DState.lastZPassCheck = camZ;
+  if (Math.abs(prevZ - camZ) > 350 || Math.abs(prevZ - camZ) < 0.05) return;
+
+  const ev = spatial3DState.audioEvents || {};
+  for (let i = 0; i < spatial3DState.elements3D.length; i++) {
+    const mesh = spatial3DState.elements3D[i];
+    if (!mesh || (mesh.userData && mesh.userData.visible === false)) continue;
+    const elZ = mesh.position.z;
+    const passPoint = elZ + 180;
+    if ((prevZ > passPoint && camZ <= passPoint) || (prevZ < passPoint && camZ >= passPoint)) {
+      const u = mesh.userData || {};
+      const evKey = u.type === 'text' ? 'onTextReveal' : 'onFlyByTransition';
+      const layerSfx = (u.sfxId && u.sfxId !== 'none') ? u.sfxId : ((ev[evKey] && ev[evKey] !== 'none') ? ev[evKey] : 'none');
+      if (layerSfx && layerSfx !== 'none') {
+        playSpatialSFX(layerSfx, false, {
+          eventKey: evKey,
+          volume: u.sfxVol !== undefined ? u.sfxVol : undefined,
+          fade: u.sfxFade !== undefined ? u.sfxFade : undefined
+        });
+      }
+      break;
+    }
+  }
+}
+
+function updateSpatialHUDTelemetry() {
+  const { camera, flightMode, elements3D } = spatial3DState;
+  if (!camera) return;
+  const hudZ = document.getElementById('spatial-hud-z');
+  const hudFov = document.getElementById('spatial-hud-fov');
+  const hudLayers = document.getElementById('spatial-hud-layers');
+  const hudMode = document.getElementById('spatial-hud-cam-mode');
+  if (hudZ) hudZ.textContent = `${camera.position.z.toFixed(1)}`;
+  if (hudFov) hudFov.textContent = `${Math.round(camera.fov)}°`;
+  if (hudLayers) hudLayers.textContent = `${elements3D.length}`;
+  if (hudMode) {
+    const modeLabels = {
+      'back-to-front-back': 'PRESET 1: BACK → FRONT → BACK (ZOOM-OUT LOOP)',
+      'front-to-back': 'PRESET 2: FRONT → BACK (FORWARD DEPTH)',
+      'left-to-right-weave': 'PRESET 3: LEFT → RIGHT (3D DEPTH WEAVE)',
+      'right-to-left-weave': 'PRESET 4: RIGHT → LEFT (3D DEPTH WEAVE)',
+      'museum-tour': 'MUSEUM CAMERAMAN',
+      'zoomthrough': 'CORRIDOR FLY-THROUGH',
+      'pullback': 'PULL-BACK REVEAL',
+      'slalom': 'SLALOM DRIFT',
+      'orbit': 'ORBITAL RIG',
+      'custom-path': 'CUSTOM DRAWN PATH'
+    };
+    hudMode.textContent = modeLabels[flightMode] || 'PRESET 1: BACK → FRONT → BACK';
+  }
+  checkSpatialZPassWhoosh(camera.position.z);
+}
+
+function resetSpatialCameraPath() {
+  if (!spatial3DState.camera) return;
+  spatial3DState.currentTime = 0;
+  spatial3DState.lastZPassCheck = 1150;
+  spatial3DState.manualTargetX = 0;
+  spatial3DState.manualTargetY = 15;
+  spatial3DState.manualTargetZ = 880;
+  spatial3DState.manualCamX = 0;
+  spatial3DState.manualCamY = 15;
+  spatial3DState.manualCamZ = 880;
+  if (spatial3DState.flightMode === 'pullback' || spatial3DState.flightMode === 'back-to-front-back') {
+    spatial3DState.camera.position.set(0, 15, -2650);
+  } else {
+    spatial3DState.camera.position.set(0, 15, 1100);
+  }
+  const slider = document.getElementById('spatial-timeline-slider');
+  if (slider) slider.value = 0;
+  updateSpatialTimelineDisplay();
+}
+
+function updateSpatialTimelineDisplay() {
+  const disp = document.getElementById('spatial-timecode-display');
+  if (!disp) return;
+  const totalSec = 10;
+  const cur = spatial3DState.currentTime * totalSec;
+  const s = Math.floor(cur);
+  const f = Math.floor((cur - s) * 30);
+  disp.textContent = `00:${String(s).padStart(2, '0')}:${String(f).padStart(2, '0')} / 00:10:00`;
+}
+window.updateSpatialTimelineDisplay = updateSpatialTimelineDisplay;
+
+function renderSpatialLayerList() {
+  const listEl = document.getElementById('spatial-layer-list');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+
+  spatial3DState.elements3D.forEach((mesh, index) => {
+    const data = mesh.userData || {};
+    const row = document.createElement('div');
+    row.style.cssText = 'background:#131826; border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:10px; display:flex; flex-direction:column; gap:8px;';
+
+    const badgeColors = {
+      text: { bg: 'rgba(245,158,11,0.18)', text: '#fbbf24', label: '3D TITLE' },
+      card: { bg: 'rgba(56,189,248,0.18)', text: '#38bdf8', label: 'EXHIBIT' },
+      code: { bg: 'rgba(16,185,129,0.18)', text: '#34d399', label: 'CODE TERMINAL' }
+    };
+    const b = badgeColors[data.type] || badgeColors.card;
+
+    row.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="padding:2px 6px; border-radius:4px; background:${b.bg}; color:${b.text}; font-size:9px; font-weight:800;">${b.label}</span>
+          <span style="font-size:11px; font-weight:700; color:#f8fafc; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${data.title || 'Layer'}</span>
+        </div>
+        <div style="display:flex; gap:4px;">
+          <button class="btn-edit-spatial-layer" data-index="${index}" style="background:rgba(255,255,255,0.06); border:none; color:#cbd5e1; border-radius:4px; padding:3px 6px; font-size:9px; cursor:pointer;">Edit</button>
+          <button class="btn-del-spatial-layer" data-index="${index}" style="background:rgba(239,68,68,0.15); border:none; color:#f87171; border-radius:4px; padding:3px 6px; font-size:9px; cursor:pointer;">✕</button>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; font-size:9px; color:#94a3b8; font-family:'JetBrains Mono', monospace;">
+        <div>X: <strong style="color:#e2e8f0;">${Math.round(mesh.position.x)}</strong></div>
+        <div>Y: <strong style="color:#e2e8f0;">${Math.round(mesh.position.y)}</strong></div>
+        <div>Z: <strong style="color:#38bdf8;">${Math.round(mesh.position.z)}</strong></div>
+      </div>
+    `;
+    listEl.appendChild(row);
+  });
+
+  listEl.querySelectorAll('.btn-edit-spatial-layer').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.index, 10);
+      openLayerEditorModal(idx);
+    });
+  });
+
+  listEl.querySelectorAll('.btn-del-spatial-layer').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.index, 10);
+      removeSpatialLayer(idx);
+    });
+  });
+
+  updateSpatialHUDTelemetry();
+}
+
+function openLayerEditorModal(index = -1) {
+  spatial3DState.editingLayerIndex = index;
+  const modal = document.getElementById('spatial-layer-editor-modal');
+  if (!modal) return;
+  const titleEl = document.getElementById('spatial-editor-modal-title');
+  const typeEl = document.getElementById('spatial-edit-type');
+  const headingEl = document.getElementById('spatial-edit-heading');
+  const bodyEl = document.getElementById('spatial-edit-body');
+  const zEl = document.getElementById('spatial-edit-z');
+  const xEl = document.getElementById('spatial-edit-x');
+
+  if (index >= 0 && spatial3DState.elements3D[index]) {
+    const mesh = spatial3DState.elements3D[index];
+    const d = mesh.userData || {};
+    if (titleEl) titleEl.textContent = `Edit Layer #${index + 1}`;
+    if (typeEl) typeEl.value = d.type || 'card';
+    if (headingEl) headingEl.value = d.title || '';
+    if (bodyEl) bodyEl.value = d.body || d.subtitle || '';
+    if (zEl) zEl.value = Math.round(mesh.position.z);
+    if (xEl) xEl.value = Math.round(mesh.position.x);
+  } else {
+    if (titleEl) titleEl.textContent = 'Add New 3D Spatial Layer';
+    if (typeEl) typeEl.value = 'card';
+    if (headingEl) headingEl.value = 'CLASSIFIED EXHIBIT';
+    if (bodyEl) bodyEl.value = 'ARCHIVAL EVIDENCE RECORD VERIFIED.';
+    if (zEl) zEl.value = -400;
+    if (xEl) xEl.value = -500;
+  }
+
+  modal.style.display = 'flex';
+}
+
+function removeSpatialLayer(index) {
+  const mesh = spatial3DState.elements3D[index];
+  if (!mesh || !spatial3DState.scene) return;
+  spatial3DState.scene.remove(mesh);
+  spatial3DState.elements3D.splice(index, 1);
+  renderSpatialLayerList();
+}
+
+// =========================================================================
+// SMOOTH 3D SPATIAL CAMERA CHOREOGRAPHY & HAND WALK-THROUGH ENGINE
+// - Supports 4 Motion Presets:
+//   1) 'back-to-front-back' (Back -> Front -> Back zoom-out loop)
+//   2) 'front-to-back' (Front -> Back reverse glide)
+//   3) 'left-to-right-weave' (Left -> Right weaving behind & in front of cards)
+//   4) 'right-to-left-weave' (Right -> Left weaving behind & in front of cards)
+// - Non-Compulsory Object Stops (only stops where user points out or 1 random pick)
+// - Direct 3D Hand Walk-Through in 3D Mode (follows user's hand smoothly!)
+// =========================================================================
 function updateSpatialCameraPosition() {
-  const { camera, flightMode, currentTime, camDrift, camShake, mouse, camPitch, camYaw, elements3D, showText, pathStyle, pathCurve, drawnPath } = spatial3DState;
+  const {
+    camera, flightMode, currentTime, camDrift, camShake,
+    mouse, camPitch, camYaw, elements3D, showText, pathStyle, pathCurve,
+    drawnPath, zoomInspectDepth, stopMode, randomStopLayerId, cameramanStyle
+  } = spatial3DState;
   if (!camera) return;
 
-  const driftFactor = Math.max(0, Math.min(1, camDrift / 100));
-  const t = Math.max(0, Math.min(1, currentTime));
+  const driftFactor = Math.max(0, Math.min(1, (camDrift !== undefined ? camDrift : 22) / 100));
+  const zoomAmt = Math.max(0, Math.min(1, (zoomInspectDepth !== undefined ? zoomInspectDepth : 60) / 100));
+  const t = Math.max(0, Math.min(1, currentTime || 0));
 
-  // Determine Z trajectory based on mode (Full runway depth -3800 to 1350)
-  let targetZ = 1350;
-  let targetX = 0;
-  let targetY = 15;
-
-  if (flightMode === 'pullback') {
-    // Smooth zoom out from corridor depth
-    targetZ = -3800 + (t * 5150);
-  } else if (flightMode === 'orbit') {
-    const angle = (t - 0.5) * Math.PI * 0.75;
-    const radius = 1600;
-    targetX = Math.sin(angle) * radius * 0.55;
-    targetZ = -1400 + Math.cos(angle) * radius;
-    targetY = 60 + Math.sin(t * Math.PI * 2) * 45;
-  } else if (flightMode === 'museum-tour') {
-    // High-end Museum Tour pacing (Glide -> Pause / Macro Zoom on Hero Exhibits -> Accelerate to Next)
-    // Pacing curve with deliberate inspection plateaus:
-    let easedT = t;
-    if (t >= 0.22 && t <= 0.42) {
-      // Hero exhibit plateau (e.g. Forbes Cover / Main Feature close-up inspect)
-      const plateauProgress = (t - 0.22) / (0.42 - 0.22);
-      // Gentle micro-float during the inspection pause
-      easedT = 0.24 + Math.sin(plateauProgress * Math.PI) * 0.02;
-    } else if (t > 0.42) {
-      // Resume flight down corridor
-      const rem = (t - 0.42) / (1.0 - 0.42);
-      easedT = 0.26 + (rem * 0.74);
-    } else {
-      easedT = t * (0.24 / 0.22);
+  // Refresh any active video textures on exhibits
+  for (let i = 0; i < elements3D.length; i++) {
+    const u = elements3D[i].userData;
+    if (u && u._videoEl && u._videoEl.readyState >= 2 && u._canvas && u._texture) {
+      if (u._videoEl.paused) u._videoEl.play().catch(() => {});
+      renderSpatialArtifactCanvas(u._canvas, u._itemConfig || u, u._videoEl);
+      u._texture.needsUpdate = true;
     }
-
-    targetZ = 1350 - (easedT * 5150);
-  } else {
-    // Standard zoomthrough (Fly-Through Corridor) & custom-path
-    targetZ = 1350 - (t * 5150);
   }
 
-  // Lateral X & Y trajectory
-  if (flightMode === 'orbit') {
-    // already computed
-  } else if (pathStyle === 'slalom' || flightMode === 'slalom') {
-    targetX = Math.sin(t * Math.PI * 3) * 160 * driftFactor;
-    targetY = 15 + Math.cos(t * Math.PI * 3) * 25 * driftFactor;
-  } else if (pathStyle === 'cosmic-wave') {
-    targetX = Math.sin(t * Math.PI * 2) * 140 * driftFactor;
-    targetY = 15 + Math.cos(t * Math.PI * 4) * 55 * driftFactor;
-  } else if (drawnPath && drawnPath.length >= 2) {
-    targetX = sampleDrawnPathX(drawnPath, t);
-    targetY = 15 + (pathCurve || 0) * 0.2;
-  } else {
-    const curveOffset = (pathCurve || 0) * 3.5;
-    targetX = Math.sin(t * Math.PI) * curveOffset + (Math.sin(t * Math.PI * 2) * (36 * driftFactor));
-    targetY = 15 + (Math.cos(t * Math.PI * 2) * (20 * driftFactor));
-  }
+  const isHorizontalWeave = (flightMode === 'left-to-right-weave' || flightMode === 'right-to-left-weave');
 
-  // Organic Handheld Camera Shake (Human Imperfection pass)
-  const shakeAmt = (camShake || 12) / 100;
-  const now = performance.now() * 0.0018;
-  const shakeX = Math.sin(now * 2.8) * 4.5 * shakeAmt;
-  const shakeY = Math.cos(now * 3.4) * 3.2 * shakeAmt;
-  const shakeRoll = Math.sin(now * 1.9) * 0.006 * shakeAmt;
-
-  camera.position.z += (targetZ - camera.position.z) * 0.14;
-  camera.position.x += ((targetX + shakeX) - camera.position.x) * 0.12;
-  camera.position.y += ((targetY + shakeY) - camera.position.y) * 0.12;
-
-  // Standard 3D Aim & Tilt (yaw & pitch)
-  const pitchRad = ((camPitch || 0) * Math.PI) / 180;
-  const yawRad = ((camYaw || 0) * Math.PI) / 180;
-  const lookDistance = 1000;
-  const lookTargetX = camera.position.x + Math.sin(yawRad) * lookDistance + (mouse.x * 24);
-  const lookTargetY = camera.position.y - Math.sin(pitchRad) * lookDistance + (-mouse.y * 16);
-  const lookTargetZ = camera.position.z - Math.cos(yawRad) * Math.cos(pitchRad) * lookDistance;
-
-  camera.lookAt(lookTargetX, lookTargetY, lookTargetZ);
-  camera.rotation.z += shakeRoll;
-
-  // Per-Layer Focal Visibility, Transition Effects & Corridor Clearance
+  // Position exhibits in 3D space (in horizontal weave modes, spread exhibits across X and staggered Z so camera weaves behind & in front of them!)
+  const visibleMeshes = [];
   for (let i = 0; i < elements3D.length; i++) {
     const obj = elements3D[i];
     const u = obj.userData || {};
-    const distInFront = camera.position.z - obj.position.z;
+    if (u.visible === false || (u.type === 'text' && showText === false)) {
+      setSpatialGroupOpacity(obj, 0.0);
+      continue;
+    }
+    visibleMeshes.push({ obj, u, index: i });
+  }
 
-    let opacity = 1.0;
-
-    if (u.type === 'text') {
-      if (showText === false) {
-        setSpatialGroupOpacity(obj, 0.0);
-        continue;
-      }
-      if (distInFront <= 220) {
-        opacity = 0.0;
-      } else if (distInFront < 480) {
-        const p = (distInFront - 220) / (480 - 220);
-        opacity = p * p * (3 - 2 * p);
-      } else if (distInFront > 2100) {
-        opacity = 0.0;
-      } else if (distInFront > 1400) {
-        const p = 1.0 - (distInFront - 1400) / (2100 - 1400);
-        opacity = p * p * (3 - 2 * p);
-      }
-      obj.position.x = u.baseX || 0;
-      obj.position.y = u.baseY || 15;
+  let nowMs = performance.now();
+  if (spatial3DState._isVideoPaused && !spatial3DState._is3DStageActive) {
+    if (!spatial3DState._pausedFreezeMs) spatial3DState._pausedFreezeMs = nowMs;
+    nowMs = spatial3DState._pausedFreezeMs;
+  } else {
+    spatial3DState._pausedFreezeMs = null;
+  }
+  for (let k = 0; k < visibleMeshes.length; k++) {
+    const { obj, u, index } = visibleMeshes[k];
+    if (isHorizontalWeave) {
+      // Spread across X from -720 to +720 with non-sequential staggered Z depths (-120 to -1350)
+      const count = Math.max(1, visibleMeshes.length - 1);
+      const fracX = count > 0 ? (k / count) : 0.5;
+      const spreadX = -720 + fracX * 1440;
+      const depthPattern = [-180, -680, -320, -940, -240, -820, -440, -1080, -290, -740, -520];
+      const staggerZ = depthPattern[k % depthPattern.length];
+      obj.position.x = spreadX;
+      obj.position.z = staggerZ;
+      obj.position.y = (u.baseY || 0) + Math.sin(nowMs * 0.0012 + index * 1.3) * 5;
+      obj.rotation.y = (spreadX < -120 ? 0.14 : (spreadX > 120 ? -0.14 : 0));
+      const sc = u.scale || 1.0;
+      obj.scale.set(sc, sc, sc);
     } else {
-      // Flanking corridor exhibits (left and right walls, center hero passes)
-      const rawX = u.baseX !== undefined ? u.baseX : obj.position.x;
-      const sideSign = rawX < 0 ? -1 : (rawX > 0 ? 1 : 0);
-      const isCenterHero = sideSign === 0;
+      // Standard Z-Corridor & Semicircular Stage layout with continuous 3D floating life
+      obj.position.z = u.initialZ !== undefined ? u.initialZ : (u.z || 0);
+      if (u.type === 'text') {
+        obj.position.x = (u.baseX || 0) + Math.sin(nowMs * 0.0008 + index) * 2.5;
+        obj.position.y = (u.baseY || 14) + Math.cos(nowMs * 0.0011 + index) * 2.5;
+        const sc = u.scale || 1.0;
+        obj.scale.set(sc, sc, sc);
+      } else {
+        const rawX = u.baseX !== undefined ? u.baseX : obj.position.x;
+        const sideSign = rawX < -60 ? -1 : (rawX > 60 ? 1 : 0);
+        const isCenterHero = sideSign === 0;
+        obj.position.x = isCenterHero ? 0 : rawX;
+        obj.position.y = (u.baseY || 0) + Math.sin(nowMs * 0.0011 + index * 1.4) * 3.5;
+        const sc = u.scale || 1.0;
+        obj.scale.set(sc, sc, sc);
+        obj.rotation.y = isCenterHero ? 0 : (u.baseRotY !== undefined ? u.baseRotY : (sideSign < 0 ? 0.30 : -0.30));
+      }
+    }
+  }
 
-      const baseW = Math.abs(rawX) > 0 ? Math.abs(rawX) : (isCenterHero ? 0 : 500);
-      const minCorridorHalfWidth = isCenterHero ? 0 : Math.max(380, Math.min(640, baseW));
+  let targetX = 0;
+  let targetY = 15;
+  let targetZ = 820;
+  let dynamicLookX = 0;
+  let dynamicLookY = 14;
+  let dynamicLookZ = 20;
+  let useDynamicLook = true;
 
-      // Transition effects: slide-in, scale-pop, yaw-drift
-      const effect = u.transitionEffect || 'fade';
-      let effX = sideSign * minCorridorHalfWidth;
-      let effScale = u.scale || 1.0;
-      let effRotY = isCenterHero ? 0 : (u.baseRotY || (sideSign < 0 ? 0.38 : -0.38));
+  // =========================================================================
+  // 3D MODE DEFAULT FREE WALK-THROUGH (Unless user triggered Zoom In / Out from Start or Recording)
+  // =========================================================================
+  const is3DFreeWalk = Boolean(
+    spatial3DState._is3DStageActive &&
+    !spatial3DState.isRecording &&
+    (spatial3DState.threeDWalkMode || 'free-walk') === 'free-walk'
+  );
 
-      if (distInFront > 800 && distInFront < 2600) {
-        const normDist = (distInFront - 800) / (2600 - 800);
-        if (effect === 'slide-in') {
-          effX += sideSign * normDist * 160;
-        } else if (effect === 'scale-pop') {
-          effScale *= (1.0 - normDist * 0.28);
-        } else if (effect === 'yaw-drift') {
-          effRotY += sideSign * normDist * 0.35;
+  // Determine which objects (if any) the camera should stop at / inspect
+  const pinnedStops = [];
+  if (!is3DFreeWalk) {
+    if (stopMode === 'user-selected') {
+      visibleMeshes.forEach(({ obj, u }) => {
+        if (u.stopHere) pinnedStops.push({ obj, u });
+      });
+    } else if (stopMode === 'random-single') {
+      let chosen = visibleMeshes.find(({ u }) => u.id === randomStopLayerId);
+      if (!chosen && visibleMeshes.length > 0) {
+        const cardCandidates = visibleMeshes.filter(({ u }) => u.type !== 'text');
+        const pool = cardCandidates.length > 0 ? cardCandidates : visibleMeshes;
+        chosen = pool[Math.floor(pool.length / 2)];
+        if (chosen) spatial3DState.randomStopLayerId = chosen.u.id;
+      }
+      if (chosen) pinnedStops.push(chosen);
+    } else if (flightMode === 'museum-tour' && stopMode === 'none') {
+      // Original Roaming Corridor Tour ('museum-tour') Default Behavior:
+      // Roams through the corridor and organically detours toward corridor exhibits (1.5x slower cycle)
+      const tourExhibits = visibleMeshes
+        .filter(({ u }) => u.type !== 'text')
+        .slice()
+        .sort((a, b) => b.obj.position.z - a.obj.position.z);
+      for (let i = 0; i < tourExhibits.length; i += 2) {
+        pinnedStops.push(tourExhibits[i]);
+      }
+    }
+  }
+
+  // Helper: Interpolate a user-recorded 3D trajectory at normalized progress p in [0, 1]
+  const sampleRecordedTrajectory = (frames, p) => {
+    if (!Array.isArray(frames) || frames.length === 0) return null;
+    if (frames.length === 1) return frames[0];
+    const clampedP = Math.max(0, Math.min(1, p));
+    const idxFloat = clampedP * (frames.length - 1);
+    const i0 = Math.max(0, Math.min(frames.length - 1, Math.floor(idxFloat)));
+    const i1 = Math.max(0, Math.min(frames.length - 1, i0 + 1));
+    const frac = idxFloat - i0;
+    const f0 = frames[i0], f1 = frames[i1];
+    return {
+      x: f0.x + (f1.x - f0.x) * frac,
+      y: f0.y + (f1.y - f0.y) * frac,
+      z: f0.z + (f1.z - f0.z) * frac,
+      lookX: f0.lookX + (f1.lookX - f0.lookX) * frac,
+      lookY: f0.lookY + (f1.lookY - f0.lookY) * frac,
+      lookZ: f0.lookZ + (f1.lookZ - f0.lookZ) * frac
+    };
+  };
+
+  // Check if flightMode is a user-recorded custom preset or 'free-hand' (No Preset)
+  let activeRecordedFrames = null;
+  let activeStartZoomPreset = null;
+  const rawLastRec = spatial3DState.lastRecordedTrajectory;
+  const lastRecFrames = Array.isArray(rawLastRec) ? rawLastRec : (rawLastRec && Array.isArray(rawLastRec.frames) ? rawLastRec.frames : null);
+  if (flightMode === 'recorded-custom' && lastRecFrames && lastRecFrames.length > 0) {
+    activeRecordedFrames = lastRecFrames;
+  } else if (typeof flightMode === 'string' && (flightMode.startsWith('custom-rec-') || flightMode.startsWith('custom-start-'))) {
+    const foundPreset = (spatial3DState.customRecordedPresets || []).find(cp => cp.id === flightMode);
+    if (foundPreset) {
+      if (foundPreset.presetType === 'start-point-zoom' && foundPreset.startPoint) {
+        activeStartZoomPreset = foundPreset;
+      } else {
+        const kf = foundPreset.frames || foundPreset.keyframes;
+        if (Array.isArray(kf) && kf.length > 0) activeRecordedFrames = kf;
+      }
+    }
+  }
+
+  // Helper: Base continuous trajectory at normalized progress p in [0, 1]
+  const sampleBaseTrajectory = (p) => {
+    if (activeRecordedFrames) {
+      const recPose = sampleRecordedTrajectory(activeRecordedFrames, p);
+      if (recPose) return recPose;
+    }
+    const clampedP = Math.max(0, Math.min(1, p));
+    const smoothP = 0.5 - 0.5 * Math.cos(clampedP * Math.PI);
+
+    // Check if running a Starting-Point Zoom In / Zoom Out trajectory (live or saved preset)
+    if (flightMode === 'start-point-zoom-in' || flightMode === 'start-point-zoom-out' || activeStartZoomPreset) {
+      const sp = (activeStartZoomPreset && activeStartZoomPreset.startPoint)
+        ? activeStartZoomPreset.startPoint
+        : (spatial3DState.customStartPoint || { x: 0, y: 15, z: 760, yaw: 0, pitch: 0 });
+      const dir = activeStartZoomPreset
+        ? (activeStartZoomPreset.zoomDirection || 'in')
+        : (flightMode === 'start-point-zoom-out' ? 'out' : 'in');
+      const startX = Number(sp.x || 0);
+      const startY = Number(sp.y !== undefined ? sp.y : 15);
+      const startZ = Number(sp.z !== undefined ? sp.z : 760);
+      const endZ = dir === 'out' ? Math.max(1150, startZ + 1850) : Math.min(-2720, startZ - 2400);
+      const endX = startX * 0.15;
+      const endY = 15;
+      const bz = startZ + (endZ - startZ) * smoothP;
+      const bx = startX + (endX - startX) * smoothP + Math.sin(clampedP * Math.PI * 2) * (35 * driftFactor);
+      const by = startY + (endY - startY) * smoothP + Math.cos(clampedP * Math.PI * 2) * (8 * driftFactor);
+      const yawRadSp = ((sp.yaw || 0) * (1 - smoothP * 0.75) * Math.PI) / 180;
+      const pitchRadSp = ((sp.pitch || 0) * (1 - smoothP * 0.75) * Math.PI) / 180;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx * 0.4 + Math.sin(yawRadSp) * 650,
+        lookY: by - Math.sin(pitchRadSp) * 450,
+        lookZ: bz - 900
+      };
+    }
+
+    if (flightMode === 'establishing-shot') {
+      // CINEMATIC CAMERA PRESET 1 (DEFAULT): Establishing Shot — 4-Beat Documentary Flow
+      // Keeps all flanking evidence plates and the hero title simultaneously in frame (Matches Images 5, 6, 7)
+      const bz = 880 - smoothP * 165;
+      const bx = Math.sin(clampedP * Math.PI * 2) * (24 * driftFactor);
+      const by = 24 - smoothP * 10 + Math.cos(clampedP * Math.PI * 2) * (4 * driftFactor);
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx * 0.18, lookY: 14, lookZ: 20
+      };
+    } else if (flightMode === 'slow-dolly') {
+      // CINEMATIC CAMERA PRESET 2: Slow Dolly — Restrained, authoritative linear push-in
+      const bz = 890 - clampedP * 210;
+      const bx = Math.sin(clampedP * Math.PI) * (12 * driftFactor);
+      const by = 16;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: 0, lookY: 14, lookZ: 20
+      };
+    } else if (flightMode === 'lateral-reveal') {
+      // CINEMATIC CAMERA PRESET 3: Lateral Reveal — Smooth horizontal parallax tracking shot
+      const bx = -135 + smoothP * 270;
+      const bz = 780 - Math.sin(clampedP * Math.PI) * 65;
+      const by = 18 + Math.cos(clampedP * Math.PI) * 5;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: 0, lookY: 14, lookZ: 30
+      };
+    } else if (flightMode === 'evidence-focus') {
+      // CINEMATIC CAMERA PRESET 4: Evidence Focus — Rack-focus weave from left dossier to right conglomerate to center title
+      let bx = 0, by = 15, bz = 810, lx = 0, ly = 14, lz = 30;
+      if (clampedP < 0.34) {
+        const lp = clampedP / 0.34;
+        const s = 0.5 - 0.5 * Math.cos(lp * Math.PI);
+        bx = -115 * s; by = -12 * s + 15; bz = 840 - 95 * s;
+        lx = -220 * s; ly = -32 * s + 14 * (1 - s); lz = 160 * s + 30 * (1 - s);
+      } else if (clampedP < 0.68) {
+        const lp = (clampedP - 0.34) / 0.34;
+        const s = 0.5 - 0.5 * Math.cos(lp * Math.PI);
+        bx = -115 + 230 * s; by = 3; bz = 745;
+        lx = -220 + 440 * s; ly = -32; lz = 160;
+      } else {
+        const lp = (clampedP - 0.68) / 0.32;
+        const s = 0.5 - 0.5 * Math.cos(lp * Math.PI);
+        bx = 115 * (1 - s); by = 3 + 12 * s; bz = 745 - 35 * s;
+        lx = 220 * (1 - s); ly = -32 * (1 - s) + 14 * s; lz = 160 * (1 - s) + 30 * s;
+      }
+      return { x: bx, y: by, z: bz, lookX: lx, lookY: ly, lookZ: lz };
+    } else if (flightMode === 'hero-title') {
+      // CINEMATIC CAMERA PRESET 5: Hero Title — Dramatic crane descent settling on the central 3D title
+      const bz = 820 - smoothP * 170;
+      const by = 52 - smoothP * 38;
+      const bx = Math.sin(clampedP * Math.PI) * 14;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: 0, lookY: 14, lookZ: 40
+      };
+    } else if (flightMode === 'free-hand') {
+      const sp = spatial3DState.customStartPoint || { x: 0, y: 15, z: 760 };
+      return {
+        x: sp.x || 0, y: sp.y !== undefined ? sp.y : 15, z: sp.z !== undefined ? sp.z : 760,
+        lookX: sp.x || 0, lookY: sp.y !== undefined ? sp.y : 15, lookZ: (sp.z !== undefined ? sp.z : 760) - 900
+      };
+    } else if (flightMode === 'back-to-front-back') {
+      // PRESET 1: Starts from the very back (-2650), moves to the front (+1050), and back (-2650)
+      const loopWave = 0.5 - 0.5 * Math.cos(clampedP * Math.PI * 2); // 0 -> 1 -> 0
+      const bz = -2650 + loopWave * 3700;
+      const bx = Math.sin(clampedP * Math.PI * 2) * (65 * driftFactor) + ((pathCurve || 0) * 2.2 * Math.sin(clampedP * Math.PI));
+      const by = 15 + Math.cos(clampedP * Math.PI * 2) * (14 * driftFactor);
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx * 0.35, lookY: 15, lookZ: bz - 900
+      };
+    } else if (flightMode === 'pullback') {
+      // Classic Zoom Out / Pullback: From deep back (-2650) continuously to the front (+1050)
+      const bz = -2650 + smoothP * 3700;
+      const bx = Math.sin(clampedP * Math.PI * 2) * (65 * driftFactor) + ((pathCurve || 0) * 2.2 * Math.sin(clampedP * Math.PI));
+      const by = 15 + Math.cos(clampedP * Math.PI * 2) * (14 * driftFactor);
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx * 0.35, lookY: 15, lookZ: bz - 900
+      };
+    } else if (flightMode === 'center-title-through') {
+      // CENTER TITLE + SIDE GALLERY ZOOM-THROUGH (Image 3 style: Title dead-center, objects on left/right walls, zooms straight through them!)
+      const bz = 1040 - smoothP * 3650;
+      const bx = Math.sin(clampedP * Math.PI * 2) * (16 * driftFactor);
+      const by = 15 + Math.cos(clampedP * Math.PI * 2) * (6 * driftFactor);
+      return {
+        x: bx, y: by, z: bz,
+        lookX: 0, lookY: 15, lookZ: bz - 950
+      };
+    } else if (flightMode === 'front-to-back' || flightMode === 'zoomthrough' || flightMode === 'museum-tour') {
+      // PRESET 2 / Zoom In / Museum Tour base spine: Starts from the very front (+1100) and glides to the very back (-2750)
+      const bz = 1100 - smoothP * 3850;
+      const bx = Math.sin(clampedP * Math.PI * 2) * (55 * driftFactor) + ((pathCurve || 0) * 2.2 * Math.sin(clampedP * Math.PI));
+      const by = 15 + Math.cos(clampedP * Math.PI * 2) * (12 * driftFactor);
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx * 0.35, lookY: 15, lookZ: bz - 900
+      };
+    } else if (flightMode === 'left-to-right-weave') {
+      // PRESET 3: Moves from Left (-760) to Right (+760), weaving in depth behind & in front of objects!
+      const bx = -760 + smoothP * 1520;
+      const bz = -240 + Math.sin(clampedP * Math.PI * 2.5) * 380;
+      const by = 18 + Math.sin(clampedP * Math.PI * 2) * 18;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx + 90, lookY: 12, lookZ: bz - 680
+      };
+    } else if (flightMode === 'right-to-left-weave') {
+      // PRESET 4: Moves from Right (+760) to Left (-760), weaving in depth behind & in front of objects!
+      const bx = 760 - smoothP * 1520;
+      const bz = -240 + Math.sin(clampedP * Math.PI * 2.5) * 380;
+      const by = 18 + Math.sin(clampedP * Math.PI * 2) * 18;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: bx - 90, lookY: 12, lookZ: bz - 680
+      };
+    } else if (flightMode === 'slalom') {
+      const bz = 1100 - smoothP * 3800;
+      const bx = Math.sin(clampedP * Math.PI * 4) * (290 * Math.max(0.35, driftFactor));
+      const by = 15 + Math.cos(clampedP * Math.PI * 4) * 18;
+      return {
+        x: bx, y: by, z: bz,
+        lookX: -bx * 0.45, lookY: 15, lookZ: bz - 750
+      };
+    } else if (flightMode === 'orbit') {
+      const angle = (clampedP - 0.5) * Math.PI * 0.85;
+      const radius = 1500;
+      return {
+        x: Math.sin(angle) * radius * 0.55,
+        y: 35 + Math.sin(clampedP * Math.PI * 2) * 25,
+        z: -1100 + Math.cos(angle) * radius,
+        lookX: 0, lookY: 15, lookZ: -900
+      };
+    } else if (drawnPath && drawnPath.length >= 2) {
+      const bz = 1100 - smoothP * 3800;
+      const bx = sampleDrawnPathX(drawnPath, clampedP);
+      return {
+        x: bx, y: 15, z: bz,
+        lookX: bx * 0.5, lookY: 15, lookZ: bz - 850
+      };
+    } else {
+      const bz = 1100 - smoothP * 3800;
+      const bx = Math.sin(clampedP * Math.PI * 3) * 140 * driftFactor;
+      return {
+        x: bx, y: 15, z: bz,
+        lookX: bx * 0.4, lookY: 15, lookZ: bz - 850
+      };
+    }
+  };
+
+  const isFlyThroughActive = Boolean(spatial3DState._flyThroughTarget && spatial3DState._flyThroughTarget.active);
+
+  if (isFlyThroughActive) {
+    // =========================================================================
+    // DIRECT OBJECT TAP FLY-THROUGH AT INSPECTOR ZOOM/CAMERA SPEED
+    // Flies directly from current camera position straight through the tapped 3D object!
+    // =========================================================================
+    const ft = spatial3DState._flyThroughTarget;
+    const prevTs = spatial3DState._lastFlyThroughTs || nowMs;
+    const dtSec = Math.min(0.06, Math.max(0.004, (nowMs - prevTs) / 1000));
+    spatial3DState._lastFlyThroughTs = nowMs;
+
+    const zoomSpd = Math.max(0.15, Number(spatial3DState.zoomActionSpeed !== undefined ? spatial3DState.zoomActionSpeed : (spatial3DState.camSpeed || 1.0)));
+    // Scale duration by distance so short hops and deep corridor flights both feel locked to the sidebar speed slider
+    const totalDist = Math.max(380, Math.hypot(ft.endX - ft.startX, ft.endY - ft.startY, ft.endZ - ft.startZ));
+    const baseFlightSec = Math.max(0.95, Math.min(4.2, totalDist / 920));
+    const stepProg = (dtSec / baseFlightSec) * zoomSpd;
+    ft.progress = Math.min(1.0, (ft.progress || 0) + stepProg);
+
+    const p = ft.progress;
+    // Smooth ease-in-out with an energetic push right through the object plane (around p = 0.72)
+    const easeP = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+
+    targetX = ft.startX + (ft.endX - ft.startX) * easeP;
+    targetY = ft.startY + (ft.endY - ft.startY) * easeP;
+    targetZ = ft.startZ + (ft.endZ - ft.startZ) * easeP;
+
+    // Look directly through the tapped object's center along the flight line
+    const lookAheadZ = ft.endZ - (ft.startZ >= ft.objZ ? 600 : -600);
+    dynamicLookX = ft.objX;
+    dynamicLookY = ft.objY;
+    dynamicLookZ = ft.objZ + (lookAheadZ - ft.objZ) * Math.max(0, (p - 0.55) / 0.45);
+    useDynamicLook = true;
+
+    // Trigger "Boom / Sound-of-Light" warp as the camera pierces right through the object plane!
+    if (p >= 0.64 && !ft.boomTriggered) {
+      ft.boomTriggered = true;
+      if (spatial3DState.zoomFxBoom) {
+        spatial3DState._boomFlashAlpha = Math.max(0.45, Math.min(1.0, (spatial3DState.zoomFxBoomIntensity || 65) / 100));
+        if (typeof playSpatialSFX === 'function' && spatial3DState.audioEnabled) {
+          playSpatialSFX('sub-bass-boom', false, { volume: 90, fade: 15 });
         }
       }
+    }
 
-      obj.position.x = effX;
-      obj.position.y = (u.baseY || 0) + Math.sin(performance.now() * 0.0012 + i * 1.5) * 6;
-      obj.scale.set(effScale, effScale, effScale);
-      obj.rotation.y = effRotY;
+    if (ft.progress >= 1.0) {
+      ft.active = false;
+      spatial3DState.customStartPoint = {
+        x: Number(ft.endX.toFixed(1)),
+        y: Number(ft.endY.toFixed(1)),
+        z: Number(ft.endZ.toFixed(1)),
+        yaw: 0,
+        pitch: 0
+      };
+      spatial3DState.hasCustomStartPoint = true;
+      spatial3DState.handTargetDetourX = 0;
+      spatial3DState.handTargetDetourY = 0;
+      spatial3DState.handTargetDetourZ = 0;
+      spatial3DState.handDetourX = 0;
+      spatial3DState.handDetourY = 0;
+      spatial3DState.handDetourZ = 0;
+      if (spatial3DState._is3DStageActive) {
+        spatial3DState.threeDWalkMode = 'free-walk';
+      }
+      if (typeof window.rebuild3DInspector === 'function') {
+        window.rebuild3DInspector();
+      }
+    }
+  } else if (is3DFreeWalk) {
+    // In 3D Mode by default: user freely moves through the 3D scene from their Starting Point
+    const sp = spatial3DState.customStartPoint || { x: 0, y: 15, z: 760, yaw: 0, pitch: 0 };
+    targetX = sp.x || 0;
+    targetY = sp.y !== undefined ? sp.y : 15;
+    targetZ = sp.z !== undefined ? sp.z : 760;
+    dynamicLookX = targetX;
+    dynamicLookY = targetY;
+    dynamicLookZ = targetZ - 900;
+    useDynamicLook = true;
+  } else if (pinnedStops.length === 0 || activeRecordedFrames || flightMode === 'free-hand' || flightMode === 'start-point-zoom-in' || flightMode === 'start-point-zoom-out' || flightMode === 'center-title-through' || activeStartZoomPreset) {
+    // Continuous Smooth Glide along the active preset / recorded trajectory / start-point zoom
+    const pose = sampleBaseTrajectory(t);
+    targetX = pose.x;
+    targetY = pose.y;
+    targetZ = pose.z;
+    dynamicLookX = pose.lookX;
+    dynamicLookY = pose.lookY;
+    dynamicLookZ = pose.lookZ;
+    useDynamicLook = true;
+  } else {
+    // Waypoint Tour (either 'museum-tour' roaming exhibits or user-selected / random stop)
+    const startPose = sampleBaseTrajectory(0);
+    const endPose = sampleBaseTrajectory(1);
 
-      if (distInFront <= 140) {
+    const orderedStops = pinnedStops.slice().sort((a, b) => {
+      if (flightMode === 'left-to-right-weave') return a.obj.position.x - b.obj.position.x;
+      if (flightMode === 'right-to-left-weave') return b.obj.position.x - a.obj.position.x;
+      if (flightMode === 'back-to-front-back' || flightMode === 'pullback') return a.obj.position.z - b.obj.position.z;
+      return b.obj.position.z - a.obj.position.z;
+    });
+
+    const waypoints = [{
+      x: startPose.x, y: startPose.y, z: startPose.z,
+      lookX: startPose.lookX, lookY: startPose.lookY, lookZ: startPose.lookZ,
+      dwell: 0.0, layerId: null
+    }];
+
+    const isAutoMuseumTour = (flightMode === 'museum-tour' && stopMode === 'none');
+    const inspectDist = Math.max(260, 460 - zoomAmt * 160);
+    orderedStops.forEach(({ obj, u }) => {
+      const ox = obj.position.x;
+      const oy = obj.position.y;
+      const oz = obj.position.z;
+      waypoints.push({
+        x: ox * (isAutoMuseumTour ? 0.62 : 0.72),
+        y: oy + 8,
+        z: oz + inspectDist,
+        lookX: ox,
+        lookY: oy,
+        lookZ: oz,
+        dwell: isAutoMuseumTour ? 0.16 : 0.24,
+        layerId: u.id,
+        sfxId: u.sfxId,
+        sfxVol: u.sfxVol,
+        sfxFade: u.sfxFade
+      });
+    });
+
+    waypoints.push({
+      x: endPose.x, y: endPose.y, z: endPose.z,
+      lookX: endPose.lookX, lookY: endPose.lookY, lookZ: endPose.lookZ,
+      dwell: 0.0, layerId: null
+    });
+
+    const segWeights = [];
+    let totalW = 0;
+    for (let i = 0; i < waypoints.length - 1; i++) {
+      const moveW = 0.42;
+      const pauseW = waypoints[i + 1].dwell || 0;
+      const w = moveW + pauseW;
+      segWeights.push({ moveW, pauseW, total: w });
+      totalW += w;
+    }
+
+    let accum = 0, segIdx = 0, localT = 0;
+    for (let i = 0; i < segWeights.length; i++) {
+      const nw = segWeights[i].total / (totalW || 1);
+      if (t <= accum + nw || i === segWeights.length - 1) {
+        segIdx = i;
+        localT = nw > 0 ? Math.max(0, Math.min(1, (t - accum) / nw)) : 0;
+        break;
+      }
+      accum += nw;
+    }
+
+    const p0 = waypoints[segIdx];
+    const p1 = waypoints[segIdx + 1] || p0;
+    const sw = segWeights[segIdx] || { moveW: 1, pauseW: 0, total: 1 };
+    const moveRatio = sw.moveW / sw.total;
+
+    let interp = 0;
+    let inStopPlateau = false;
+    let plateauFrac = 0;
+    if (localT < moveRatio) {
+      const mf = localT / Math.max(0.001, moveRatio);
+      interp = 0.5 - 0.5 * Math.cos(mf * Math.PI);
+    } else {
+      inStopPlateau = true;
+      plateauFrac = (localT - moveRatio) / Math.max(0.001, 1 - moveRatio);
+      interp = 1.0;
+      if (p1.layerId && spatial3DState._lastStopSoundLayerId !== p1.layerId && !spatial3DState._isVideoPaused) {
+        spatial3DState._lastStopSoundLayerId = p1.layerId;
+        const ev = spatial3DState.audioEvents || {};
+        const stopSfx = (p1.sfxId && p1.sfxId !== 'none') ? p1.sfxId : ((ev.onObjectStop && ev.onObjectStop !== 'none') ? ev.onObjectStop : 'none');
+        if (stopSfx && stopSfx !== 'none') {
+          playSpatialSFX(stopSfx, false, {
+            eventKey: 'onObjectStop',
+            volume: p1.sfxVol,
+            fade: p1.sfxFade
+          });
+        }
+      }
+    }
+    if (!inStopPlateau) {
+      spatial3DState._lastStopSoundLayerId = null;
+    }
+
+    targetX = p0.x + (p1.x - p0.x) * interp;
+    targetY = p0.y + (p1.y - p0.y) * interp;
+    targetZ = p0.z + (p1.z - p0.z) * interp;
+
+    if (inStopPlateau) {
+      const gentlePush = Math.sin(plateauFrac * Math.PI) * (65 * zoomAmt);
+      const orbitWeave = Math.sin(plateauFrac * Math.PI * 2) * (18 * driftFactor);
+      targetZ -= gentlePush;
+      targetX += orbitWeave;
+    }
+
+    dynamicLookX = p0.lookX + (p1.lookX - p0.lookX) * interp;
+    dynamicLookY = p0.lookY + (p1.lookY - p0.lookY) * interp;
+    dynamicLookZ = p0.lookZ + (p1.lookZ - p0.lookZ) * interp;
+    useDynamicLook = true;
+  }
+
+  // =========================================================================
+  // LIVE 3D HAND DETOUR & FREE WALK-THROUGH LAYER
+  // =========================================================================
+  const shouldHoldDetour = is3DFreeWalk || (spatial3DState.handControlMode === 'detour-hold') || (flightMode === 'free-hand') || !!spatial3DState.isRecording;
+  if (!spatial3DState.isHandDragging && !shouldHoldDetour) {
+    spatial3DState.handTargetDetourX = (spatial3DState.handTargetDetourX || 0) * 0.93;
+    spatial3DState.handTargetDetourY = (spatial3DState.handTargetDetourY || 0) * 0.93;
+    spatial3DState.handTargetDetourZ = (spatial3DState.handTargetDetourZ || 0) * 0.94;
+    spatial3DState.camYaw = (spatial3DState.camYaw || 0) * 0.93;
+    spatial3DState.camPitch = (spatial3DState.camPitch || 0) * 0.93;
+  }
+
+  spatial3DState.handDetourX = (spatial3DState.handDetourX || 0) + ((spatial3DState.handTargetDetourX || 0) - (spatial3DState.handDetourX || 0)) * 0.18;
+  spatial3DState.handDetourY = (spatial3DState.handDetourY || 0) + ((spatial3DState.handTargetDetourY || 0) - (spatial3DState.handDetourY || 0)) * 0.18;
+  spatial3DState.handDetourZ = (spatial3DState.handDetourZ || 0) + ((spatial3DState.handTargetDetourZ || 0) - (spatial3DState.handDetourZ || 0)) * 0.18;
+
+  // =========================================================================
+  // ZOOM MOTION & ENTRY EFFECTS: SHAKE, PULSE & BOOM ("SOUND OF LIGHT" WARP)
+  // =========================================================================
+  const isZoomMotionActive = isFlyThroughActive ||
+    spatial3DState.threeDWalkMode === 'auto-zoom-in' ||
+    spatial3DState.threeDWalkMode === 'auto-zoom-out' ||
+    flightMode === 'start-point-zoom-in' ||
+    flightMode === 'start-point-zoom-out' ||
+    flightMode === 'center-title-through' ||
+    flightMode === 'zoomthrough' ||
+    flightMode === 'pullback' ||
+    !!activeStartZoomPreset;
+
+  const baseShakeAmt = (spatial3DState._isVideoPaused || (is3DFreeWalk && !isFlyThroughActive)) ? 0 : Math.max(0, (camShake !== undefined ? camShake : 12) / 100);
+  const zoomShakeBoost = (isZoomMotionActive && spatial3DState.zoomFxShake && !spatial3DState._isVideoPaused)
+    ? ((spatial3DState.zoomFxShakeIntensity !== undefined ? spatial3DState.zoomFxShakeIntensity : 55) / 100) * 1.65
+    : 0;
+  const shakeAmt = baseShakeAmt + zoomShakeBoost;
+
+  const nowSec = nowMs * 0.0015;
+  const shakeX = shakeAmt > 0
+    ? (Math.sin(nowSec * 2.1) * 6.5 + Math.cos(nowSec * 9.5) * 4.2 + Math.sin(nowSec * 19.0) * (zoomShakeBoost * 11)) * shakeAmt
+    : 0;
+  const shakeY = shakeAmt > 0
+    ? (Math.cos(nowSec * 2.6) * 4.8 + Math.sin(nowSec * 8.7) * 3.5 + Math.cos(nowSec * 17.5) * (zoomShakeBoost * 9)) * shakeAmt
+    : 0;
+
+  // Pulse Effect (Rhythmic heartbeat surge along Z & FOV)
+  let pulseZOffset = 0;
+  let pulseFovOffset = 0;
+  if (isZoomMotionActive && spatial3DState.zoomFxPulse && !spatial3DState._isVideoPaused) {
+    const pulseStr = (spatial3DState.zoomFxPulseIntensity !== undefined ? spatial3DState.zoomFxPulseIntensity : 55) / 100;
+    const pulseWave = Math.pow(Math.max(0, Math.sin(nowMs * 0.009)), 3);
+    pulseZOffset = -pulseWave * 85 * pulseStr;
+    pulseFovOffset = -pulseWave * 9.5 * pulseStr;
+  }
+
+  // Boom / "Sound of Light" Warp Effect (Hyper-drive FOV punch & light flash when entering objects)
+  let boomFovOffset = 0;
+  if (spatial3DState.zoomFxBoom && isZoomMotionActive && !spatial3DState._isVideoPaused) {
+    const boomStr = (spatial3DState.zoomFxBoomIntensity !== undefined ? spatial3DState.zoomFxBoomIntensity : 65) / 100;
+    if (isFlyThroughActive && spatial3DState._flyThroughTarget) {
+      const fp = spatial3DState._flyThroughTarget.progress || 0;
+      // Warp FOV widens as camera approaches object, then snaps through at light speed!
+      const warpBell = Math.sin(Math.min(1, fp) * Math.PI);
+      boomFovOffset = warpBell * 24 * boomStr;
+    } else {
+      // Check proximity to any 3D object along Z for automatic entry boom
+      for (let i = 0; i < elements3D.length; i++) {
+        const em = elements3D[i];
+        if (!em || (em.userData && em.userData.visible === false)) continue;
+        const distZ = Math.abs(camera.position.z - em.position.z);
+        if (distZ < 220) {
+          const prox = 1 - (distZ / 220);
+          boomFovOffset = Math.max(boomFovOffset, prox * prox * 20 * boomStr);
+          if (distZ < 55 && spatial3DState._boomFlashAlpha < 0.25) {
+            spatial3DState._boomFlashAlpha = 0.55 * boomStr;
+          }
+        }
+      }
+    }
+  }
+
+  // Update visual "Sound of Light" Boom flash overlay if present
+  if (spatial3DState._boomFlashAlpha > 0.01) {
+    spatial3DState._boomFlashAlpha *= 0.86;
+    const flashEl = document.getElementById('spatial-boom-flash-overlay');
+    if (flashEl) {
+      flashEl.style.opacity = String(Math.min(0.85, spatial3DState._boomFlashAlpha).toFixed(3));
+    }
+  } else {
+    spatial3DState._boomFlashAlpha = 0;
+    const flashEl = document.getElementById('spatial-boom-flash-overlay');
+    if (flashEl && flashEl.style.opacity !== '0') flashEl.style.opacity = '0';
+  }
+
+  // Apply dynamic FOV warp from Pulse / Boom effects + persistent manualZoomPct from - / 100% / + buttons
+  const baseFov = spatial3DState.fovWarp || 52;
+  const targetFov = Math.max(28, Math.min(98, baseFov + pulseFovOffset + boomFovOffset));
+  const manualZoomPct = Math.max(40, Math.min(250, Number(spatial3DState.manualZoomPct !== undefined ? spatial3DState.manualZoomPct : 100)));
+  const targetCamZoom = manualZoomPct / 100;
+  let projNeedsUpdate = false;
+  if (Math.abs(camera.fov - targetFov) > 0.15) {
+    camera.fov += (targetFov - camera.fov) * 0.22;
+    projNeedsUpdate = true;
+  }
+  if (Math.abs((camera.zoom || 1) - targetCamZoom) > 0.008) {
+    camera.zoom = (camera.zoom || 1) + (targetCamZoom - (camera.zoom || 1)) * 0.24;
+    projNeedsUpdate = true;
+  }
+  if (projNeedsUpdate) {
+    camera.updateProjectionMatrix();
+  }
+
+  const manualZoomZOffset = -((manualZoomPct - 100) / 100) * 240;
+  const finalTargetX = targetX + (isFlyThroughActive ? 0 : spatial3DState.handDetourX) + shakeX;
+  const finalTargetY = targetY + (isFlyThroughActive ? 0 : spatial3DState.handDetourY) + shakeY;
+  const finalTargetZ = targetZ + (isFlyThroughActive ? 0 : spatial3DState.handDetourZ) + pulseZOffset + manualZoomZOffset;
+
+  // Responsive damping when steering with hand or flying through a tapped object
+  const posLerp = isFlyThroughActive ? 0.28 : (spatial3DState.isHandDragging ? 0.22 : (spatial3DState._isVideoPaused ? 0.35 : 0.095));
+  camera.position.z += (finalTargetZ - camera.position.z) * posLerp;
+  camera.position.x += (finalTargetX - camera.position.x) * posLerp;
+  camera.position.y += (finalTargetY - camera.position.y) * posLerp;
+
+  const pitchRad = ((spatial3DState.camPitch || 0) * Math.PI) / 180;
+  const yawRad = ((spatial3DState.camYaw || 0) * Math.PI) / 180;
+
+  if (useDynamicLook) {
+    const detourLookX = dynamicLookX + (isFlyThroughActive ? 0 : spatial3DState.handDetourX * 0.85) + Math.sin(yawRad) * 650;
+    const detourLookY = dynamicLookY + (isFlyThroughActive ? 0 : spatial3DState.handDetourY * 0.85) - Math.sin(pitchRad) * 480;
+    const detourLookZ = dynamicLookZ + (isFlyThroughActive ? 0 : spatial3DState.handDetourZ * 0.85);
+
+    const lookLerp = isFlyThroughActive ? 0.28 : (spatial3DState.isHandDragging ? 0.22 : (spatial3DState._isVideoPaused ? 0.35 : 0.095));
+    spatial3DState._smoothLookX = (spatial3DState._smoothLookX !== undefined ? spatial3DState._smoothLookX : detourLookX) + (detourLookX - (spatial3DState._smoothLookX || 0)) * lookLerp;
+    spatial3DState._smoothLookY = (spatial3DState._smoothLookY !== undefined ? spatial3DState._smoothLookY : detourLookY) + (detourLookY - (spatial3DState._smoothLookY || 15)) * lookLerp;
+    spatial3DState._smoothLookZ = (spatial3DState._smoothLookZ !== undefined ? spatial3DState._smoothLookZ : detourLookZ) + (detourLookZ - (spatial3DState._smoothLookZ || 0)) * lookLerp;
+
+    camera.lookAt(spatial3DState._smoothLookX, spatial3DState._smoothLookY, spatial3DState._smoothLookZ);
+
+    const detourVelocityX = (spatial3DState.handTargetDetourX || 0) - (spatial3DState.handDetourX || 0);
+    const bankRoll = Math.max(-0.12, Math.min(0.12, -detourVelocityX * 0.00045 + (shakeAmt > 0 ? Math.sin(nowSec * 1.7) * 0.012 * shakeAmt : 0)));
+    camera.rotation.z += (bankRoll - camera.rotation.z) * 0.12;
+  } else {
+    const lookDistance = 1000;
+    const lookTargetX = camera.position.x + Math.sin(yawRad) * lookDistance;
+    const lookTargetY = camera.position.y - Math.sin(pitchRad) * lookDistance;
+    const lookTargetZ = camera.position.z - Math.cos(yawRad) * Math.cos(pitchRad) * lookDistance;
+    camera.lookAt(lookTargetX, lookTargetY, lookTargetZ);
+  }
+
+  // Trigger fly-by SFX when passing exhibits along Z
+  checkSpatialZPassWhoosh(camera.position.z);
+
+  // =========================================================================
+  // CAPTURE LIVE 3D CAMERA KEYFRAME IF RECORDING IS ACTIVE
+  // =========================================================================
+  if (spatial3DState.isRecording) {
+    const elapsed = (nowMs - (spatial3DState.recordStartTime || nowMs)) / 1000;
+    spatial3DState.recordElapsedSec = elapsed;
+    if (!Array.isArray(spatial3DState._recordingFrames)) spatial3DState._recordingFrames = [];
+    const frames = spatial3DState._recordingFrames;
+    const lastF = frames.length > 0 ? frames[frames.length - 1] : null;
+    if (!lastF || (elapsed - lastF.timeOffset) >= 0.032) {
+      frames.push({
+        timeOffset: Number(elapsed.toFixed(3)),
+        x: Number(camera.position.x.toFixed(2)),
+        y: Number(camera.position.y.toFixed(2)),
+        z: Number(camera.position.z.toFixed(2)),
+        lookX: Number((spatial3DState._smoothLookX || 0).toFixed(2)),
+        lookY: Number((spatial3DState._smoothLookY || 15).toFixed(2)),
+        lookZ: Number((spatial3DState._smoothLookZ || -500).toFixed(2))
+      });
+    }
+    const recTimerEl = document.getElementById('spatial-rec-live-timer');
+    if (recTimerEl) {
+      recTimerEl.textContent = `● REC ${elapsed.toFixed(1)}s (${frames.length} pts)`;
+    }
+  }
+
+  // Per-Layer Visibility & Pass-Through Protection (Allow flying right through objects and center titles!)
+  const hasActiveDetour = isFlyThroughActive || flightMode === 'center-title-through' || spatial3DState.activePreset === 'awakening-gallery' || Math.abs(spatial3DState.handDetourX || 0) > 15 || Math.abs(spatial3DState.handDetourZ || 0) > 15 || spatial3DState.isHandDragging || flightMode === 'free-hand' || !!activeRecordedFrames;
+  for (let i = 0; i < elements3D.length; i++) {
+    const obj = elements3D[i];
+    const u = obj.userData || {};
+    if (u.visible === false || (u.type === 'text' && showText === false)) {
+      setSpatialGroupOpacity(obj, 0.0);
+      continue;
+    }
+
+    const dz = camera.position.z - obj.position.z;
+    const dx = Math.abs(camera.position.x - obj.position.x);
+    let opacity = 1.0;
+
+    if (isHorizontalWeave || hasActiveDetour) {
+      // Allow camera to fly straight through the object plane (only fading in the last 55 units as it crosses the lens)
+      if (Math.abs(dz) < 55 && dx < 280) {
+        opacity = Math.max(0.15, Math.abs(dz) / 55);
+      } else {
+        opacity = 1.0;
+      }
+    } else {
+      if (dz <= 45) {
         opacity = 0.0;
-      } else if (distInFront < 420) {
-        const p = (distInFront - 140) / (420 - 140);
+      } else if (dz < 180) {
+        const p = (dz - 45) / (180 - 45);
         opacity = p * p * (3 - 2 * p);
-      } else if (distInFront > 3400) {
+      } else if (dz > 3900) {
         opacity = 0.0;
-      } else if (distInFront > 2400) {
-        const p = 1.0 - (distInFront - 2400) / (3400 - 2400);
+      } else if (dz > 2900) {
+        const p = 1.0 - (dz - 2900) / (3900 - 2900);
         opacity = p * p * (3 - 2 * p);
       }
     }
@@ -41680,16 +46442,489 @@ function updateSpatialCameraPosition() {
     setSpatialGroupOpacity(obj, opacity);
   }
 
+  if (typeof window.updateSpatialTopZoomHUD === 'function') {
+    window.updateSpatialTopZoomHUD();
+  }
   updateSpatialHUDTelemetry();
 }
+
+// =========================================================================
+// LIVE 3D CAMERA & LOCAL VIDEO RECORDING ENGINE
+// Records the 3D WebGL Canvas + Audio to a local video file (.webm/.mp4)
+// AND records the user's mouse-steered 3D camera path to save as Preset/Default
+// =========================================================================
+window.startSpatialRecording = function (baseModeOverride) {
+  const s = spatial3DState;
+  if (s.isRecording) return;
+
+  const chosenBase = baseModeOverride || s.recordStartBase || 'museum-tour';
+  s.recordStartBase = chosenBase;
+  s.flightMode = chosenBase;
+  s.currentTime = 0;
+  s.handTargetDetourX = 0;
+  s.handTargetDetourY = 0;
+  s.handTargetDetourZ = 0;
+  s.handDetourX = 0;
+  s.handDetourY = 0;
+  s.handDetourZ = 0;
+  s.camYaw = 0;
+  s.camPitch = 0;
+  s._recordingFrames = [];
+  s.recordStartTime = performance.now();
+  s.recordElapsedSec = 0;
+  s.isRecording = true;
+
+  // Start MediaRecorder on the 3D WebGL Canvas so we save a real video file locally on stop
+  s._recordedChunks = [];
+  s._mediaRecorder = null;
+  try {
+    const canvasEl = s.renderer && s.renderer.domElement;
+    if (canvasEl && typeof canvasEl.captureStream === 'function' && typeof MediaRecorder !== 'undefined') {
+      const videoStream = canvasEl.captureStream(60);
+      const tracks = [...videoStream.getVideoTracks()];
+
+      const actx = ensureSpatialAudioCtx();
+      if (actx && typeof actx.createMediaStreamDestination === 'function') {
+        s._recordAudioDest = actx.createMediaStreamDestination();
+        const audioTracks = s._recordAudioDest.stream.getAudioTracks();
+        if (audioTracks.length > 0) tracks.push(audioTracks[0]);
+      }
+
+      const combinedStream = new MediaStream(tracks);
+      const mimeCandidates = [
+        'video/mp4;codecs=avc1',
+        'video/mp4',
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=vp8',
+        'video/webm'
+      ];
+      let selectedMime = '';
+      for (let i = 0; i < mimeCandidates.length; i++) {
+        if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(mimeCandidates[i])) {
+          selectedMime = mimeCandidates[i];
+          break;
+        }
+      }
+
+      const recOptions = selectedMime ? { mimeType: selectedMime, videoBitsPerSecond: 8000000 } : { videoBitsPerSecond: 8000000 };
+      const mr = new MediaRecorder(combinedStream, recOptions);
+      s._mediaRecorder = mr;
+
+      mr.ondataavailable = (ev) => {
+        if (ev.data && ev.data.size > 0) {
+          s._recordedChunks.push(ev.data);
+        }
+      };
+
+      mr.onstop = () => {
+        try {
+          if (!s._recordedChunks || s._recordedChunks.length === 0) return;
+          const mime = mr.mimeType || selectedMime || 'video/webm';
+          const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+          const blob = new Blob(s._recordedChunks, { type: mime });
+          if (s.lastRecordedVideoUrl) {
+            try { URL.revokeObjectURL(s.lastRecordedVideoUrl); } catch (_) {}
+          }
+          const url = URL.createObjectURL(blob);
+          const fname = `spatial-3d-recording-${new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)}.${ext}`;
+          s.lastRecordedVideoUrl = url;
+          s.lastRecordedVideoFilename = fname;
+
+          // Automatically download the recorded video file locally onto the user's device!
+          window.downloadLastSpatialRecording();
+          if (typeof window.showToast === 'function') {
+            window.showToast(`🎥 Saved recorded 3D video locally (${fname})! You can now save the motion as a Preset or Default.`);
+          }
+          if (typeof window.tpl3DSync === 'function') {
+            window.tpl3DSync('spatial-3d-motion-suite');
+          }
+        } catch (_) {}
+      };
+
+      mr.start(100);
+    }
+  } catch (_) {}
+
+  if (s.audioEvents && s.audioEvents.onSceneStart) {
+    playSpatialSFX(s.audioEvents.onSceneStart, false, { eventKey: 'onSceneStart' });
+  }
+};
+
+window.stopSpatialRecording = function () {
+  const s = spatial3DState;
+  if (!s.isRecording) return;
+  s.isRecording = false;
+
+  if (Array.isArray(s._recordingFrames) && s._recordingFrames.length >= 2) {
+    const durSec = s._recordingFrames[s._recordingFrames.length - 1].timeOffset || 6.0;
+    s.lastRecordedTrajectory = {
+      frames: s._recordingFrames.slice(),
+      durationSec: durSec,
+      basePreset: s.recordStartBase || 'free-hand'
+    };
+    s.flightMode = 'recorded-custom';
+    s.threeDWalkMode = 'route-detour';
+    s.currentTime = 0;
+  }
+
+  if (s._mediaRecorder && s._mediaRecorder.state !== 'inactive') {
+    try { s._mediaRecorder.stop(); } catch (_) {}
+  }
+};
+
+window.downloadLastSpatialRecording = function () {
+  const s = spatial3DState;
+  if (!s.lastRecordedVideoUrl) return;
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = s.lastRecordedVideoUrl;
+  a.download = s.lastRecordedVideoFilename || `spatial-3d-recording-${Date.now()}.webm`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { try { a.remove(); } catch (_) {} }, 300);
+};
+
+window.saveRecordedSpatialPreset = function (customName, makeDefault) {
+  const s = spatial3DState;
+  const rawLast = s.lastRecordedTrajectory;
+  const frames = (rawLast && Array.isArray(rawLast.frames) && rawLast.frames.length >= 2)
+    ? rawLast.frames.slice()
+    : (Array.isArray(rawLast) && rawLast.length >= 2
+      ? rawLast.slice()
+      : (Array.isArray(s._recordingFrames) && s._recordingFrames.length >= 2 ? s._recordingFrames.slice() : null));
+  if (!frames) return null;
+
+  if (!Array.isArray(s.customRecordedPresets)) s.customRecordedPresets = [];
+  const idx = s.customRecordedPresets.length + 1;
+  const presetId = 'custom-rec-' + Date.now();
+  const cleanTitle = (customName && String(customName).trim()) ? String(customName).trim() : `Recorded Path #${idx}`;
+  const durSec = frames[frames.length - 1].timeOffset || 8.0;
+
+  const newPreset = {
+    id: presetId,
+    name: cleanTitle,
+    title: `🎬 ${cleanTitle}`,
+    badge: makeDefault ? 'DEFAULT (USER RECORDED)' : `CUSTOM PRESET #${idx}`,
+    desc: `User-recorded 3D mouse walk-through (${durSec.toFixed(1)}s, ${frames.length} keyframes • Base: ${s.recordStartBase || 'free-hand'}).`,
+    basePreset: s.recordStartBase || 'free-hand',
+    durationSec: durSec,
+    frames: frames,
+    keyframes: frames
+  };
+
+  s.customRecordedPresets.push(newPreset);
+  s.flightMode = presetId;
+  s.threeDWalkMode = 'route-detour';
+  if (makeDefault) {
+    s.defaultFlightPreset = presetId;
+  }
+  if (typeof window.showToast === 'function') {
+    window.showToast(makeDefault
+      ? `⭐ Saved "${cleanTitle}" and set it as the Default 3D Camera Option!`
+      : `💾 Saved "${cleanTitle}" to Camera Movement Presets!`);
+  }
+  return newPreset;
+};
+
+// =========================================================================
+// 3D MODE STARTING POINT + AUTO ZOOM IN / ZOOM OUT + SAVE AS PRESET
+// =========================================================================
+window.setSpatial3DStartingPoint = function () {
+  const s = spatial3DState;
+  const camX = s.camera ? Number(s.camera.position.x.toFixed(1)) : Number(((s.customStartPoint?.x || 0) + (s.handDetourX || 0)).toFixed(1));
+  const camY = s.camera ? Number(s.camera.position.y.toFixed(1)) : Number(((s.customStartPoint?.y || 15) + (s.handDetourY || 0)).toFixed(1));
+  const camZ = s.camera ? Number(s.camera.position.z.toFixed(1)) : Number(((s.customStartPoint?.z || 760) + (s.handDetourZ || 0)).toFixed(1));
+  const yaw = Number((s.camYaw || 0).toFixed(1));
+  const pitch = Number((s.camPitch || 0).toFixed(1));
+
+  s.customStartPoint = { x: camX, y: camY, z: camZ, yaw, pitch };
+  s.hasCustomStartPoint = true;
+  s.handTargetDetourX = 0;
+  s.handTargetDetourY = 0;
+  s.handTargetDetourZ = 0;
+  s.handDetourX = 0;
+  s.handDetourY = 0;
+  s.handDetourZ = 0;
+  s.threeDWalkMode = 'free-walk';
+  if (typeof window.showToast === 'function') {
+    window.showToast(`📍 Starting Point set at X:${camX}, Y:${camY}, Z:${camZ}! Click Zoom In or Zoom Out to fly from here.`);
+  }
+  return s.customStartPoint;
+};
+
+window.triggerSpatial3DZoomFromStart = function (direction) {
+  const s = spatial3DState;
+  const dir = direction === 'out' ? 'out' : 'in';
+  if (s._flyThroughTarget) s._flyThroughTarget.active = false;
+  // If user moved in free-walk and hasn't locked a starting point yet (or moved away from it), capture current camera position
+  if (!s.hasCustomStartPoint || Math.abs(s.handDetourZ || 0) > 25 || Math.abs(s.handDetourX || 0) > 25) {
+    const camX = s.camera ? Number(s.camera.position.x.toFixed(1)) : 0;
+    const camY = s.camera ? Number(s.camera.position.y.toFixed(1)) : 15;
+    const camZ = s.camera ? Number(s.camera.position.z.toFixed(1)) : 760;
+    s.customStartPoint = {
+      x: camX,
+      y: camY,
+      z: camZ,
+      yaw: Number((s.camYaw || 0).toFixed(1)),
+      pitch: Number((s.camPitch || 0).toFixed(1))
+    };
+    s.hasCustomStartPoint = true;
+  }
+  s.handTargetDetourX = 0;
+  s.handTargetDetourY = 0;
+  s.handTargetDetourZ = 0;
+  s.handDetourX = 0;
+  s.handDetourY = 0;
+  s.handDetourZ = 0;
+  s.lastStartZoomAction = dir;
+  s.threeDWalkMode = dir === 'out' ? 'auto-zoom-out' : 'auto-zoom-in';
+  s.flightMode = dir === 'out' ? 'start-point-zoom-out' : 'start-point-zoom-in';
+  s.currentTime = 0;
+  s._isVideoPaused = false;
+  if (s.camera && s.customStartPoint) {
+    s.camera.position.set(s.customStartPoint.x, s.customStartPoint.y, s.customStartPoint.z);
+  }
+  if (s.zoomFxBoom) {
+    s._boomFlashAlpha = Math.max(0.35, ((s.zoomFxBoomIntensity || 65) / 100) * 0.7);
+  }
+  if (typeof window.updateSpatialTopZoomHUD === 'function') window.updateSpatialTopZoomHUD();
+  if (typeof window.showToast === 'function') {
+    const spd = Number(s.zoomActionSpeed !== undefined ? s.zoomActionSpeed : 1.0).toFixed(2);
+    window.showToast(dir === 'out'
+      ? `↙ Zooming Out from Z:${s.customStartPoint.z} at ${spd}x speed!`
+      : `↗ Zooming In from Z:${s.customStartPoint.z} at ${spd}x speed!`);
+  }
+};
+
+// Direct Tap / Click on Any 3D Object on Stage -> Fly Directly Through It at Sidebar Speed!
+window.triggerSpatialObjectFlyThrough = function (targetObj, layerIdx) {
+  const s = spatial3DState;
+  if (!targetObj || !s.camera) return;
+  const u = targetObj.userData || {};
+  const objX = Number(targetObj.position.x || 0);
+  const objY = Number(targetObj.position.y !== undefined ? targetObj.position.y : 15);
+  const objZ = Number(targetObj.position.z || 0);
+
+  const startX = Number(s.camera.position.x || 0);
+  const startY = Number(s.camera.position.y || 15);
+  const startZ = Number(s.camera.position.z || 760);
+
+  // Fly straight from current camera coordinates directly through (objX, objY, objZ) and emerge 420 units beyond it!
+  const approachDir = startZ >= objZ ? -1 : 1; // -1 = flying deeper down -Z corridor; +1 = flying forward from behind
+  const passThroughDist = 420;
+  const endX = objX;
+  const endY = objY;
+  const endZ = objZ + approachDir * passThroughDist;
+
+  s._lastFlyThroughTs = performance.now();
+  s._flyThroughTarget = {
+    active: true,
+    layerIdx: layerIdx !== undefined ? layerIdx : -1,
+    layerId: u.id || '',
+    layerTitle: u.title || (u.type === 'text' ? '3D Title' : '3D Object'),
+    startX,
+    startY,
+    startZ,
+    objX,
+    objY,
+    objZ,
+    endX,
+    endY,
+    endZ,
+    progress: 0,
+    boomTriggered: false
+  };
+
+  s.threeDWalkMode = 'fly-through-object';
+  s._isVideoPaused = false;
+
+  const spd = Number(s.zoomActionSpeed !== undefined ? s.zoomActionSpeed : (s.camSpeed || 1.0)).toFixed(2);
+  if (typeof window.showToast === 'function') {
+    window.showToast(`🎯 Flying directly through "${s._flyThroughTarget.layerTitle}" at ${spd}x speed!`);
+  }
+  if (typeof window.updateSpatialTopZoomHUD === 'function') {
+    window.updateSpatialTopZoomHUD();
+  }
+};
+
+// Step or Reset Manual Zoom Percentage (- / 100% / + Top Stage & Sidebar Controls)
+window.stepSpatialManualZoom = function (deltaPct) {
+  const s = spatial3DState;
+  const cur = Number(s.manualZoomPct !== undefined ? s.manualZoomPct : 100);
+  const next = Math.max(40, Math.min(250, Math.round((cur + Number(deltaPct || 0)) / 5) * 5));
+  s.manualZoomPct = next;
+  s.zoomPercent = next;
+  if (s.camera) {
+    s.camera.zoom = next / 100;
+    s.camera.updateProjectionMatrix();
+  }
+  if (typeof window.updateSpatialTopZoomHUD === 'function') window.updateSpatialTopZoomHUD();
+  if (typeof window.showToast === 'function') {
+    window.showToast(deltaPct > 0 ? `🔍 Zoomed In to ${next}%` : `🔎 Zoomed Out to ${next}%`);
+  }
+  return next;
+};
+
+window.resetSpatialManualZoom = function () {
+  const s = spatial3DState;
+  if (s._flyThroughTarget) s._flyThroughTarget.active = false;
+  s.manualZoomPct = 100;
+  s.zoomPercent = 100;
+  s.customStartPoint = { x: 0, y: 15, z: 760, yaw: 0, pitch: 0 };
+  s.hasCustomStartPoint = true;
+  s.handTargetDetourX = 0;
+  s.handTargetDetourY = 0;
+  s.handTargetDetourZ = 0;
+  s.handDetourX = 0;
+  s.handDetourY = 0;
+  s.handDetourZ = 0;
+  s.camYaw = 0;
+  s.camPitch = 0;
+  if (s.camera) {
+    s.camera.zoom = 1.0;
+    s.camera.updateProjectionMatrix();
+  }
+  if (typeof window.updateSpatialTopZoomHUD === 'function') window.updateSpatialTopZoomHUD();
+  if (typeof window.showToast === 'function') {
+    window.showToast('🔄 Reset 3D Zoom to 100%');
+  }
+};
+
+// Live Top-of-Stage & Sidebar Zoom Percentage + Free Walk Quick Controls Synchronizer
+window.updateSpatialTopZoomHUD = function () {
+  const s = spatial3DState;
+  const hud = document.getElementById('spatial-top-zoom-hud');
+  const isSpatialOpen = (typeof topCustomizerState !== 'undefined' && topCustomizerState.currentTpl && topCustomizerState.currentTpl.id === 'spatial-3d-motion-suite');
+  if (hud) {
+    hud.style.display = isSpatialOpen ? 'inline-flex' : 'none';
+  }
+  if (!s.camera) return;
+
+  const manualPct = Number(s.manualZoomPct !== undefined ? s.manualZoomPct : 100);
+  const detourBonus = Math.round(-(s.handDetourZ || 0) / 14);
+  const clampedPct = Math.max(40, Math.min(250, manualPct + detourBonus));
+  s.zoomPercent = clampedPct;
+
+  const topBtnPctEl = document.getElementById('btn-spatial-top-zoom-pct');
+  if (topBtnPctEl) topBtnPctEl.textContent = `${clampedPct}%`;
+
+  const topPctEl = document.getElementById('spatial-top-hud-pct');
+  if (topPctEl) topPctEl.textContent = `${clampedPct}%`;
+
+  const sidePctEl = document.getElementById('spatial-sidebar-zoom-pct');
+  if (sidePctEl) sidePctEl.textContent = `${clampedPct}%`;
+
+  const btnFreeWalk = document.getElementById('btn-spatial-top-freewalk');
+  const btnZoomIn = document.getElementById('btn-spatial-top-zoom-in');
+  const btnZoomOut = document.getElementById('btn-spatial-top-zoom-out');
+
+  const isFreeWalk = s._is3DStageActive && s.threeDWalkMode === 'free-walk' && !(s._flyThroughTarget && s._flyThroughTarget.active);
+  const isZoomIn = clampedPct > 100 || s.threeDWalkMode === 'auto-zoom-in' || (s._flyThroughTarget && s._flyThroughTarget.active);
+  const isZoomOut = clampedPct < 100 || s.threeDWalkMode === 'auto-zoom-out';
+
+  if (btnFreeWalk) {
+    btnFreeWalk.style.background = isFreeWalk ? 'rgba(16,185,129,0.32)' : 'rgba(255,255,255,0.06)';
+    btnFreeWalk.style.borderColor = isFreeWalk ? '#34d399' : 'rgba(255,255,255,0.16)';
+    btnFreeWalk.style.color = isFreeWalk ? '#a7f3d0' : '#cbd5e1';
+  }
+  if (btnZoomIn) {
+    btnZoomIn.style.background = isZoomIn ? 'rgba(56,189,248,0.35)' : 'rgba(56,189,248,0.12)';
+    btnZoomIn.style.borderColor = isZoomIn ? '#38bdf8' : 'rgba(56,189,248,0.38)';
+    btnZoomIn.style.color = isZoomIn ? '#ffffff' : '#bae6fd';
+  }
+  if (btnZoomOut) {
+    btnZoomOut.style.background = isZoomOut ? 'rgba(168,85,247,0.35)' : 'rgba(168,85,247,0.12)';
+    btnZoomOut.style.borderColor = isZoomOut ? '#c084fc' : 'rgba(192,132,252,0.38)';
+    btnZoomOut.style.color = isZoomOut ? '#ffffff' : '#e9d5ff';
+  }
+};
+
+window.saveSpatialStartZoomPreset = function (customName, makeDefault, directionOverride) {
+  const s = spatial3DState;
+  const sp = s.customStartPoint || { x: 0, y: 15, z: 760, yaw: 0, pitch: 0 };
+  const dir = directionOverride || s.lastStartZoomAction || (s.flightMode === 'start-point-zoom-out' ? 'out' : 'in');
+  if (!Array.isArray(s.customRecordedPresets)) s.customRecordedPresets = [];
+  const idx = s.customRecordedPresets.length + 1;
+  const presetId = 'custom-start-' + Date.now();
+  const defaultLabel = `${dir === 'out' ? 'Zoom Out' : 'Zoom In'} from Z=${Math.round(sp.z)}`;
+  const cleanTitle = (customName && String(customName).trim()) ? String(customName).trim() : defaultLabel;
+
+  const newPreset = {
+    id: presetId,
+    presetType: 'start-point-zoom',
+    zoomDirection: dir,
+    startPoint: Object.assign({}, sp),
+    name: cleanTitle,
+    title: `${dir === 'out' ? '↙' : '↗'} ${cleanTitle}`,
+    badge: makeDefault ? 'DEFAULT (START ZOOM)' : `START PT ${dir.toUpperCase()}`,
+    desc: `Starts at X:${Math.round(sp.x)}, Y:${Math.round(sp.y)}, Z:${Math.round(sp.z)} and automatically ${dir === 'out' ? 'zooms out to front' : 'zooms in through corridor'}.`,
+    basePreset: dir === 'out' ? 'start-point-zoom-out' : 'start-point-zoom-in',
+    durationSec: 12.0
+  };
+
+  s.customRecordedPresets.push(newPreset);
+  s.flightMode = presetId;
+  s.threeDWalkMode = dir === 'out' ? 'auto-zoom-out' : 'auto-zoom-in';
+  s.currentTime = 0;
+  if (makeDefault) {
+    s.defaultFlightPreset = presetId;
+  }
+  if (typeof window.showToast === 'function') {
+    window.showToast(makeDefault
+      ? `⭐ Saved "${cleanTitle}" and set it as Default Preset!`
+      : `💾 Saved "${cleanTitle}" to Camera Movement Presets!`);
+  }
+  return newPreset;
+};
+
 function loadSpatialPreset(presetKey) {
   spatial3DState.activePreset = presetKey;
-  if (presetKey === 'forbes-hallway') {
+  if (presetKey === 'documentary') {
+    spatial3DState.stylePreset = 'documentary';
+    spatial3DState.envStyle = 'tunnel-gold';
+    spatial3DState.gridColor = '#d4af37';
+    spatial3DState.gridVisible = false;
+    spatial3DState.bgStyle = 'black-stars-smoke';
+    spatial3DState.cardContourColor = '#d4af37';
+    spatial3DState.cardContourWidth = 1.8;
+    spatial3DState.cardContourGlow = 32;
+    spatial3DState.textStyle = 'gold';
+    spatial3DState.flightMode = spatial3DState.flightMode || 'establishing-shot';
+  } else if (presetKey === 'tech-investigative') {
+    spatial3DState.stylePreset = 'tech-investigative';
     spatial3DState.envStyle = 'tunnel-cyan';
-    spatial3DState.gridColor = '#06b6d4';
-    spatial3DState.flightMode = 'museum-tour';
+    spatial3DState.gridColor = '#00e5ff';
+    spatial3DState.gridVisible = false;
+    spatial3DState.bgStyle = 'black-stars-smoke';
+    spatial3DState.cardContourColor = '#38bdf8';
+    spatial3DState.cardContourWidth = 2.0;
+    spatial3DState.cardContourGlow = 48;
+    spatial3DState.textStyle = 'cyan';
+    spatial3DState.flightMode = spatial3DState.flightMode || 'establishing-shot';
+  } else if (presetKey === 'cyberpunk') {
+    spatial3DState.stylePreset = 'cyberpunk';
+    spatial3DState.envStyle = 'tunnel-cyan';
+    spatial3DState.gridColor = '#a855f7';
+    spatial3DState.gridVisible = true;
+    spatial3DState.gridWallMode = 'floor-only';
+    spatial3DState.bgStyle = 'cyber-set';
+    spatial3DState.cardContourColor = '#a855f7';
+    spatial3DState.cardContourWidth = 2.4;
+    spatial3DState.cardContourGlow = 65;
+    spatial3DState.textStyle = 'chrome';
+    spatial3DState.flightMode = spatial3DState.flightMode || 'establishing-shot';
+  } else if (presetKey === 'forbes-hallway') {
+    spatial3DState.envStyle = 'tunnel-gold';
+    spatial3DState.gridColor = '#d4af37';
+    spatial3DState.flightMode = spatial3DState.flightMode || spatial3DState.defaultFlightPreset || 'establishing-shot';
     spatial3DState.pathStyle = 'corridor-hallway';
-    spatial3DState.textStyle = 'white';
+    spatial3DState.textStyle = 'gold';
+  } else if (presetKey === 'awakening-gallery') {
+    spatial3DState.envStyle = 'tunnel-gold';
+    spatial3DState.gridColor = '#d4af37';
+    spatial3DState.flightMode = 'center-title-through';
+    spatial3DState.pathStyle = 'corridor-hallway';
+    spatial3DState.textStyle = 'gold';
   } else if (presetKey === 'cyber-matrix') {
     spatial3DState.envStyle = 'tunnel-cyan';
     spatial3DState.gridColor = '#06b6d4';
@@ -41697,15 +46932,15 @@ function loadSpatialPreset(presetKey) {
   } else if (presetKey === 'philosophy') {
     spatial3DState.envStyle = 'tunnel-gold';
     spatial3DState.gridColor = '#d4af37';
-    spatial3DState.textStyle = 'white';
+    spatial3DState.textStyle = 'gold';
   } else if (presetKey === 'cosmic-universe') {
     spatial3DState.envStyle = 'open-stars';
     spatial3DState.gridColor = '#38bdf8';
-    spatial3DState.textStyle = 'cyan';
+    spatial3DState.textStyle = 'gold';
   } else {
     spatial3DState.envStyle = 'tunnel-slate';
     spatial3DState.gridColor = '#64748b';
-    spatial3DState.textStyle = 'white';
+    spatial3DState.textStyle = 'gold';
   }
 
   const scene = spatial3DState.scene;
@@ -41721,11 +46956,11 @@ function loadSpatialPreset(presetKey) {
     btn.style.color = isAct ? '#e9d5ff' : '#94a3b8';
   });
 
-  const items = SPATIAL_PRESETS[presetKey] || SPATIAL_PRESETS['forbes-hallway'] || SPATIAL_PRESETS['docu-essay'];
+  const items = SPATIAL_PRESETS[presetKey] || SPATIAL_PRESETS['documentary'] || SPATIAL_PRESETS['forbes-hallway'];
   items.forEach(item => {
     let mesh = null;
     if (item.type === 'text') mesh = createSpatialTextPlane(item);
-    else if (item.type === 'card' || item.type === 'image' || item.type === 'object') mesh = createSpatialCardPlane(item);
+    else if (item.type === 'card' || item.type === 'image' || item.type === 'object' || item.type === 'video' || item.type === 'shape') mesh = createSpatialCardPlane(item);
     else if (item.type === 'code') mesh = createSpatialCodePlane(item);
 
     if (mesh) {
@@ -41739,6 +46974,13 @@ function loadSpatialPreset(presetKey) {
   if (typeof resetSpatialCameraPath === 'function') resetSpatialCameraPath();
 }
 window.loadSpatialPreset = loadSpatialPreset;
+
+window.applySpatialStylePreset = function(styleId) {
+  const targetStyle = (styleId === 'tech-investigative' || styleId === 'cyberpunk') ? styleId : 'documentary';
+  spatial3DState.stylePreset = targetStyle;
+  loadSpatialPreset(targetStyle);
+};
+
 function initSpatialThreeJSEngine() {
   const container = document.getElementById('spatial-threejs-container') || document.getElementById('spatial-threejs-container-legacy');
   if (!container || typeof THREE === 'undefined') return;
@@ -41749,6 +46991,9 @@ function initSpatialThreeJSEngine() {
     spatial3DState.camera.aspect = w / h;
     spatial3DState.camera.updateProjectionMatrix();
     spatial3DState.renderer.setSize(w, h);
+    if (!spatial3DState.elements3D || spatial3DState.elements3D.length === 0) {
+      loadSpatialPreset(spatial3DState.activePreset || 'documentary');
+    }
     return;
   }
 
@@ -41756,16 +47001,16 @@ function initSpatialThreeJSEngine() {
   const h = container.clientHeight || 500;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x07080c);
-  scene.fog = new THREE.FogExp2(0x07080c, 0.0003);
+  scene.background = new THREE.Color(0x05060b);
+  scene.fog = new THREE.FogExp2(0x05060b, 0.00022);
 
-  const camera = new THREE.PerspectiveCamera(52, w / h, 10, 10000);
-  camera.position.set(0, 15, 1250);
+  const camera = new THREE.PerspectiveCamera(50, w / h, 10, 10000);
+  camera.position.set(0, 24, 1060);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, preserveDrawingBuffer: true });
   renderer.setSize(w, h);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x07080c, 1.0);
+  renderer.setClearColor(0x05060b, 1.0);
 
   container.innerHTML = '';
   container.appendChild(renderer.domElement);
@@ -41773,55 +47018,35 @@ function initSpatialThreeJSEngine() {
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
   scene.add(ambientLight);
 
-  const dirLight = new THREE.DirectionalLight(0xf59e0b, 1.1);
+  const dirLight = new THREE.DirectionalLight(0xf59e0b, 1.2);
   dirLight.position.set(500, 1000, 1000);
   scene.add(dirLight);
 
-  const pointLight = new THREE.PointLight(0x38bdf8, 1.2, 3500);
-  pointLight.position.set(0, 0, -2000);
+  const pointLight = new THREE.PointLight(0xd4af37, 1.25, 3500);
+  pointLight.position.set(0, 120, -400);
   scene.add(pointLight);
 
-  // Full 3D Grid Tunnel / Corridor System (Image 2 Tron Tunnel vs Image 1 Floor Grid)
+  // Tiny Fine 3D Cyber Grid Group (optional, disabled by default in Documentary mode)
   const gridGroup = new THREE.Group();
   scene.add(gridGroup);
 
-  const tunnelDivisions = 50;
-  const tunnelLen = 10000;
-  const tunnelW = 1800;
-  const tunnelH = 960;
-
-  const floorGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
-  floorGrid.position.set(0, -tunnelH / 2, -1500);
-  gridGroup.add(floorGrid);
-
-  const ceilingGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
-  ceilingGrid.position.set(0, tunnelH / 2, -1500);
-  ceilingGrid.rotation.x = Math.PI;
-  gridGroup.add(ceilingGrid);
-
-  const leftWallGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
-  leftWallGrid.position.set(-tunnelW / 2, 0, -1500);
-  leftWallGrid.rotation.z = Math.PI / 2;
-  gridGroup.add(leftWallGrid);
-
-  const rightWallGrid = new THREE.GridHelper(tunnelLen, tunnelDivisions, 0x06b6d4, 0x0f172a);
-  rightWallGrid.position.set(tunnelW / 2, 0, -1500);
-  rightWallGrid.rotation.z = -Math.PI / 2;
-  gridGroup.add(rightWallGrid);
-
   const particlesMesh = buildSpatialDustParticles(scene);
+  const smokeGroup = buildSpatialSmokeClouds(scene);
+  buildSpatialAtmosphericStageProps(scene);
 
   spatial3DState.scene = scene;
   spatial3DState.camera = camera;
   spatial3DState.renderer = renderer;
   spatial3DState.particlesMesh = particlesMesh;
-  spatial3DState.floorGrid = floorGrid;
+  spatial3DState.smokeGroup = smokeGroup;
   spatial3DState.gridMeshes = {
     group: gridGroup,
-    floor: floorGrid,
-    ceiling: ceilingGrid,
-    leftWall: leftWallGrid,
-    rightWall: rightWallGrid
+    floor: null,
+    ceiling: null,
+    leftWall: null,
+    rightWall: null,
+    _builtDivisions: 0,
+    _builtHex: ''
   };
   spatial3DState.ambientLight = ambientLight;
   spatial3DState.pointLight = pointLight;
@@ -41833,12 +47058,11 @@ function initSpatialThreeJSEngine() {
   });
 
   updateSpatialEnvironmentGrid();
-  loadSpatialPreset(spatial3DState.activePreset || 'forbes-hallway');
+  loadSpatialPreset(spatial3DState.activePreset || 'documentary');
 
   function animateSpatialEngine() {
     if (spatial3DState.isPlaying) {
-      // Traverse entire runway smoothly with camSpeed (supports negative speed)
-      const speedStep = 0.0018 * (spatial3DState.camSpeed !== undefined ? spatial3DState.camSpeed : 1.0);
+      const speedStep = 0.0014 * (spatial3DState.camSpeed !== undefined ? spatial3DState.camSpeed : 1.0);
       spatial3DState.currentTime += speedStep;
 
       if (spatial3DState.currentTime > 1.0) spatial3DState.currentTime = 0.0;
@@ -41853,13 +47077,23 @@ function initSpatialThreeJSEngine() {
 
     // Active Grid Conveyor streaming flow down corridor
     if (spatial3DState.gridMeshes && spatial3DState.gridMeshes.group && spatial3DState.gridSpeed > 0) {
-      const flowZ = (spatial3DState.currentTime * 3000 * spatial3DState.gridSpeed) % 200;
+      const cellSpan = 10000 / Math.max(40, spatial3DState.gridDensity || 180);
+      const flowZ = (spatial3DState.currentTime * 2400 * spatial3DState.gridSpeed) % cellSpan;
       spatial3DState.gridMeshes.group.position.z = flowZ;
     }
 
-    if (particlesMesh && spatial3DState.dustVisible) {
-      particlesMesh.rotation.y += 0.0003 * (spatial3DState.starSpeed || 1);
-      particlesMesh.rotation.x += 0.0001 * (spatial3DState.starSpeed || 1);
+    if (spatial3DState.particlesMesh && spatial3DState.particlesMesh.visible) {
+      spatial3DState.particlesMesh.rotation.y += 0.0003 * (spatial3DState.starSpeed || 1);
+      spatial3DState.particlesMesh.rotation.x += 0.0001 * (spatial3DState.starSpeed || 1);
+    }
+
+    if (spatial3DState.smokeGroup && spatial3DState.smokeGroup.visible) {
+      const nowT = performance.now() * 0.001;
+      spatial3DState.smokeGroup.children.forEach(puff => {
+        const ud = puff.userData || {};
+        puff.rotation.z += (ud.driftSpeed || 0.0004);
+        puff.position.x = (ud.baseX || 0) + Math.sin(nowT * 0.5 + (ud.phase || 0)) * 55;
+      });
     }
 
     // Tumble 3D celestial wireframe objects
@@ -41882,7 +47116,7 @@ function initSpatialThreeJSEngine() {
 
     spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
   }
-spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
+  spatial3DState.animId = requestAnimationFrame(animateSpatialEngine);
 }
 
 function openSpatial3DMotionSuite() {
@@ -57157,22 +62391,28 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
 
 function updateCreatorTelemetryPill() {
-  const cState = topCustomizerState;
-  const tele = document.getElementById('creator-telemetry-pill');
-  if (tele) {
-    const b = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
-    const l = cState.creatorBrightness !== undefined ? cState.creatorBrightness : 65;
-    const pts = Array.isArray(cState.creatorBrushStrokes) ? cState.creatorBrushStrokes.length : 0;
-    tele.textContent = `TRACKING: ${cState.creatorFaceTrack !== false ? 'SMOOTH_ON' : 'OFF'} • BLUR: ${b}px • LIGHT: ${l}% • HOLD_OUT: ${pts} PTS`;
-  }
+  // Stage telemetry overlay removed for a clean preview stage
 }
 
 function syncCreatorCalibrationUI() {
   const cState = topCustomizerState;
   const slBlur = document.getElementById('std-creator-slider-blur');
   const vBlur = document.getElementById('std-creator-val-blur');
-  if (slBlur) slBlur.value = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
-  if (vBlur) vBlur.textContent = `${cState.creatorBlur !== undefined ? cState.creatorBlur : 28}px`;
+  const curBlur = cState.creatorBlur !== undefined ? cState.creatorBlur : 28;
+  if (slBlur) slBlur.value = curBlur;
+  if (vBlur) vBlur.textContent = `${curBlur}px`;
+
+  const updateBlurPresetButtons = (val) => {
+    document.querySelectorAll('.btn-creator-blur-preset').forEach(btn => {
+      const bVal = parseInt(btn.getAttribute('data-blur'), 10);
+      const isAct = bVal === val;
+      btn.style.border = isAct ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)';
+      btn.style.background = isAct ? 'rgba(56,189,248,0.15)' : 'rgba(255,255,255,0.03)';
+      btn.style.color = isAct ? '#fff' : '#cbd5e1';
+      btn.style.fontWeight = isAct ? '700' : '600';
+    });
+  };
+  updateBlurPresetButtons(curBlur);
 
   const slSoft = document.getElementById('std-creator-slider-softness');
   const vSoft = document.getElementById('std-creator-val-softness');
@@ -57201,6 +62441,69 @@ function syncCreatorCalibrationUI() {
   const chkFace = document.getElementById('std-creator-toggle-face-track');
   if (chkFace) chkFace.checked = cState.creatorFaceTrack !== false;
 
+  const slChoke = document.getElementById('std-creator-slider-edge-choke');
+  const vChoke = document.getElementById('std-creator-val-edge-choke');
+  const curChoke = cState.creatorEdgeChoke !== undefined ? cState.creatorEdgeChoke : 82;
+  if (slChoke) slChoke.value = curChoke;
+  if (vChoke) vChoke.textContent = `${curChoke}%`;
+
+  const slDecon = document.getElementById('std-creator-slider-decontaminate');
+  const vDecon = document.getElementById('std-creator-val-decontaminate');
+  const curDecon = cState.creatorDecontaminate !== undefined ? cState.creatorDecontaminate : 92;
+  if (slDecon) slDecon.value = curDecon;
+  if (vDecon) vDecon.textContent = `${curDecon}%`;
+
+  const slHorizon = document.getElementById('std-creator-slider-horizon');
+  const vHorizon = document.getElementById('std-creator-val-horizon');
+  const curHorizon = cState.creatorHorizonPct !== undefined ? cState.creatorHorizonPct : 100;
+  if (slHorizon) slHorizon.value = curHorizon;
+
+  const updateZoneButtonsUI = () => {
+    const mode = cState.creatorBgZoneMode || 'auto-ground';
+    const badge = document.getElementById('std-creator-val-zone-badge');
+    const btnAutoGround = document.getElementById('btn-creator-zone-autoground');
+    const btnWall = document.getElementById('btn-creator-zone-wall');
+    const btnFull = document.getElementById('btn-creator-zone-full');
+    const btnHorizonAuto = document.getElementById('btn-creator-horizon-auto');
+
+    [
+      [btnAutoGround, 'auto-ground'],
+      [btnWall, 'wall-only'],
+      [btnFull, 'full-frame']
+    ].forEach(([btn, mId]) => {
+      if (!btn) return;
+      const isAct = mode === mId;
+      btn.style.border = isAct ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.12)';
+      btn.style.background = isAct ? 'rgba(56,189,248,0.18)' : 'rgba(255,255,255,0.04)';
+      btn.style.color = isAct ? '#38bdf8' : '#cbd5e1';
+      btn.style.fontWeight = isAct ? '700' : '600';
+    });
+
+    if (badge) {
+      badge.textContent = mode === 'auto-ground'
+        ? 'Auto-Fit Bottom'
+        : mode === 'wall-only'
+          ? 'Back Wall Only'
+          : '1:1 Full Frame';
+    }
+    if (vHorizon) {
+      if (mode === 'auto-ground') {
+        vHorizon.textContent = cState.creatorHorizonAuto !== false ? 'Auto (100% Grounded)' : `${cState.creatorHorizonPct ?? 100}%`;
+      } else if (mode === 'wall-only') {
+        vHorizon.textContent = cState.creatorHorizonAuto !== false ? `Auto Wall (${cState.creatorHorizonPct ?? 64}%)` : `${cState.creatorHorizonPct ?? 64}%`;
+      } else {
+        vHorizon.textContent = `${cState.creatorHorizonPct ?? 100}%`;
+      }
+    }
+    if (btnHorizonAuto) {
+      const isAuto = cState.creatorHorizonAuto !== false;
+      btnHorizonAuto.style.borderColor = isAuto ? 'rgba(56,189,248,0.35)' : 'rgba(255,255,255,0.12)';
+      btnHorizonAuto.style.background = isAuto ? 'rgba(56,189,248,0.15)' : 'rgba(255,255,255,0.04)';
+      btnHorizonAuto.style.color = isAuto ? '#38bdf8' : '#94a3b8';
+    }
+  };
+  updateZoneButtonsUI();
+
   const slSens = document.getElementById('std-creator-slider-sensitivity');
   const vSens = document.getElementById('std-creator-val-sensitivity');
   if (slSens) slSens.value = cState.creatorSensitivity !== undefined ? cState.creatorSensitivity : 94;
@@ -57211,14 +62514,29 @@ function syncCreatorCalibrationUI() {
   if (slBrush) slBrush.value = cState.creatorBrushSize || 35;
   if (vBrush) vBrush.textContent = `${cState.creatorBrushSize || 35}px`;
 
+  const btnBrushToggle = document.getElementById('btn-creator-toggle-brush');
+  const updateBrushButtonUI = () => {
+    if (!btnBrushToggle) return;
+    const on = Boolean(cState.creatorBrushActive);
+    btnBrushToggle.textContent = on ? 'Brush: ON (Paint Stage)' : 'Brush: OFF';
+    btnBrushToggle.style.background = on ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.05)';
+    btnBrushToggle.style.borderColor = on ? '#38bdf8' : 'rgba(255,255,255,0.12)';
+    btnBrushToggle.style.color = on ? '#38bdf8' : '#94a3b8';
+    const bCanvas = document.getElementById('creator-live-brush-canvas');
+    if (bCanvas) {
+      bCanvas.style.pointerEvents = (on && cState.primaryUrl) ? 'auto' : 'none';
+    }
+  };
+  updateBrushButtonUI();
+
   const inLeft = document.getElementById('std-creator-input-text-left');
-  if (inLeft) inLeft.value = cState.creatorTextLeft !== undefined ? cState.creatorTextLeft : 'this AI company';
+  if (inLeft) inLeft.value = cState.creatorTextLeft !== undefined ? cState.creatorTextLeft : '';
 
   const inRight = document.getElementById('std-creator-input-text-right');
-  if (inRight) inRight.value = cState.creatorTextRight !== undefined ? cState.creatorTextRight : 'VOICE';
+  if (inRight) inRight.value = cState.creatorTextRight !== undefined ? cState.creatorTextRight : '';
 
   const updateModeButtons = () => {
-    const isVirt = cState.creatorMode === 'virtual';
+    const isVirt = (cState.creatorMode || 'virtual') === 'virtual';
     const btnOrig = document.getElementById('btn-creator-mode-orig');
     const btnVirt = document.getElementById('btn-creator-mode-virtual');
     const rowVirt = document.getElementById('creator-virtual-preset-row');
@@ -57232,7 +62550,7 @@ function syncCreatorCalibrationUI() {
     }
     if (rowVirt) rowVirt.style.display = isVirt ? 'grid' : 'none';
 
-    ['studio', 'cyber', 'boardroom'].forEach(pId => {
+    ['studio', 'stars', 'room', 'cyber', 'boardroom'].forEach(pId => {
       const bPreset = document.getElementById('btn-creator-preset-' + pId);
       if (bPreset) {
         const isAct = (cState.creatorVirtualPreset || 'studio') === pId;
@@ -57244,18 +62562,32 @@ function syncCreatorCalibrationUI() {
   };
 
   updateModeButtons();
-  updateCreatorTelemetryPill();
+
+  const applyLiveBlurValue = (val) => {
+    cState.creatorBlur = val;
+    if (slBlur) slBlur.value = val;
+    if (vBlur) vBlur.textContent = `${val}px`;
+    updateBlurPresetButtons(val);
+    const bgImg = document.getElementById('creator-live-bg');
+    if (bgImg) {
+      bgImg.style.filter = `blur(${val}px) brightness(${cState.creatorBrightness ?? 65}%) contrast(118%)`;
+      bgImg.style.transform = val > 0 ? 'scale(1.06)' : 'scale(1.0)';
+    }
+  };
 
   if (!window._creatorCalibrationListenersAttached) {
     window._creatorCalibrationListenersAttached = true;
 
     slBlur?.addEventListener('input', (e) => {
       const val = parseInt(e.target.value, 10);
-      cState.creatorBlur = val;
-      if (vBlur) vBlur.textContent = `${val}px`;
-      const bgImg = document.getElementById('creator-live-bg');
-      if (bgImg) bgImg.style.filter = `blur(${val}px) brightness(${cState.creatorBrightness ?? 65}%) contrast(125%)`;
-      updateCreatorTelemetryPill();
+      applyLiveBlurValue(val);
+    });
+
+    document.querySelectorAll('.btn-creator-blur-preset').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bVal = parseInt(btn.getAttribute('data-blur'), 10);
+        if (!Number.isNaN(bVal)) applyLiveBlurValue(bVal);
+      });
     });
 
     slSoft?.addEventListener('input', (e) => {
@@ -57269,8 +62601,7 @@ function syncCreatorCalibrationUI() {
       cState.creatorBrightness = val;
       if (vBright) vBright.textContent = `${val}%`;
       const bgImg = document.getElementById('creator-live-bg');
-      if (bgImg) bgImg.style.filter = `blur(${cState.creatorBlur ?? 28}px) brightness(${val}%) contrast(125%)`;
-      updateCreatorTelemetryPill();
+      if (bgImg) bgImg.style.filter = `blur(${cState.creatorBlur ?? 28}px) brightness(${val}%) contrast(118%)`;
     });
 
     slTint?.addEventListener('input', (e) => {
@@ -57279,7 +62610,7 @@ function syncCreatorCalibrationUI() {
       if (vTint) vTint.textContent = `${val}%`;
       const tintA = (val / 100) * 0.75;
       const lightOverlay = document.getElementById('creator-live-lighting');
-      if (lightOverlay) lightOverlay.style.background = `radial-gradient(ellipse at 50% 40%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 55%, transparent 75%)`;
+      if (lightOverlay) lightOverlay.style.background = `radial-gradient(ellipse at 50% 42%, rgba(2, 132, 199, ${tintA.toFixed(2)}) 0%, rgba(30, 58, 138, ${(tintA * 0.4).toFixed(2)}) 58%, transparent 80%)`;
     });
 
     chkWarm?.addEventListener('change', (e) => {
@@ -57293,19 +62624,77 @@ function syncCreatorCalibrationUI() {
       cState.creatorRim = val;
       if (vRim) vRim.textContent = `${val}%`;
       const rimEl = document.getElementById('creator-live-rim-light');
-      if (rimEl) rimEl.style.opacity = (val / 100).toFixed(2);
+      if (rimEl && cState.primaryUrl) rimEl.style.opacity = (val / 100).toFixed(2);
     });
 
     chkFace?.addEventListener('change', (e) => {
       cState.creatorFaceTrack = e.target.checked;
-      const reticle = document.getElementById('creator-live-reticle');
-      const statusEl = document.getElementById('creator-face-track-status');
-      if (reticle) reticle.style.borderColor = e.target.checked ? '#38bdf8' : 'rgba(148,163,184,0.35)';
-      if (statusEl) {
-        statusEl.textContent = e.target.checked ? '🔒 Face Lock • Smooth Active' : '🔓 Face Lock • Unfiltered';
-        statusEl.style.color = e.target.checked ? '#38bdf8' : '#94a3b8';
+    });
+
+    slChoke?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      cState.creatorEdgeChoke = val;
+      if (vChoke) vChoke.textContent = `${val}%`;
+    });
+
+    slDecon?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      cState.creatorDecontaminate = val;
+      if (vDecon) vDecon.textContent = `${val}%`;
+    });
+
+    document.getElementById('btn-creator-zone-autoground')?.addEventListener('click', () => {
+      cState.creatorBgZoneMode = 'auto-ground';
+      cState.creatorHorizonAuto = true;
+      cState.creatorHorizonPct = 100;
+      if (slHorizon) slHorizon.value = 100;
+      updateZoneButtonsUI();
+    });
+
+    document.getElementById('btn-creator-zone-wall')?.addEventListener('click', () => {
+      cState.creatorBgZoneMode = 'wall-only';
+      cState.creatorHorizonAuto = true;
+      const detPct = window._creatorDetectedBottomY
+        ? Math.min(92, Math.max(45, Math.round(window._creatorDetectedBottomY * 100)))
+        : 64;
+      cState.creatorHorizonPct = detPct;
+      if (slHorizon) slHorizon.value = detPct;
+      updateZoneButtonsUI();
+    });
+
+    document.getElementById('btn-creator-zone-full')?.addEventListener('click', () => {
+      cState.creatorBgZoneMode = 'full-frame';
+      cState.creatorHorizonAuto = false;
+      cState.creatorHorizonPct = 100;
+      if (slHorizon) slHorizon.value = 100;
+      updateZoneButtonsUI();
+    });
+
+    slHorizon?.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      cState.creatorHorizonPct = val;
+      cState.creatorHorizonAuto = false;
+      if (val < 98 && (cState.creatorBgZoneMode || 'auto-ground') === 'auto-ground') {
+        cState.creatorBgZoneMode = 'wall-only';
       }
-      updateCreatorTelemetryPill();
+      updateZoneButtonsUI();
+    });
+
+    document.getElementById('btn-creator-horizon-auto')?.addEventListener('click', () => {
+      cState.creatorHorizonAuto = true;
+      window._creatorFrameLockCount = 0;
+      if ((cState.creatorBgZoneMode || 'auto-ground') === 'wall-only') {
+        const detPct = window._creatorDetectedBottomY
+          ? Math.min(92, Math.max(45, Math.round(window._creatorDetectedBottomY * 100)))
+          : 64;
+        cState.creatorHorizonPct = detPct;
+        if (slHorizon) slHorizon.value = detPct;
+      } else {
+        cState.creatorBgZoneMode = 'auto-ground';
+        cState.creatorHorizonPct = 100;
+        if (slHorizon) slHorizon.value = 100;
+      }
+      updateZoneButtonsUI();
     });
 
     slSens?.addEventListener('input', (e) => {
@@ -57320,16 +62709,27 @@ function syncCreatorCalibrationUI() {
       if (vBrush) vBrush.textContent = `${val}px`;
     });
 
+    btnBrushToggle?.addEventListener('click', () => {
+      cState.creatorBrushActive = !cState.creatorBrushActive;
+      updateBrushButtonUI();
+    });
+
     inLeft?.addEventListener('input', (e) => {
       cState.creatorTextLeft = e.target.value;
       const tLeft = document.getElementById('creator-live-txt-left');
-      if (tLeft) tLeft.textContent = e.target.value;
+      if (tLeft) {
+        tLeft.textContent = e.target.value;
+        tLeft.style.display = e.target.value.trim() ? 'block' : 'none';
+      }
     });
 
     inRight?.addEventListener('input', (e) => {
       cState.creatorTextRight = e.target.value;
       const tRight = document.getElementById('creator-live-txt-right');
-      if (tRight) tRight.textContent = e.target.value;
+      if (tRight) {
+        tRight.textContent = e.target.value;
+        tRight.style.display = e.target.value.trim() ? 'block' : 'none';
+      }
     });
 
     document.getElementById('btn-creator-mode-orig')?.addEventListener('click', () => {
@@ -57344,9 +62744,12 @@ function syncCreatorCalibrationUI() {
       renderTopTemplatePreviewStage();
     });
 
-    ['studio', 'cyber', 'boardroom'].forEach(pId => {
+    ['studio', 'stars', 'room', 'cyber', 'boardroom'].forEach(pId => {
       document.getElementById('btn-creator-preset-' + pId)?.addEventListener('click', () => {
         cState.creatorVirtualPreset = pId;
+        if (pId === 'stars' && (cState.creatorBlur === 28 || cState.creatorBlur === undefined)) {
+          applyLiveBlurValue(4);
+        }
         updateModeButtons();
         renderTopTemplatePreviewStage();
       });
@@ -57355,22 +62758,520 @@ function syncCreatorCalibrationUI() {
     document.getElementById('btn-creator-reset-head')?.addEventListener('click', () => {
       cState.creatorSmoothedX = 0;
       cState.creatorSmoothedY = 0;
-      showTextTimingAlert('Head tracking position recentered', 'info');
+      window._creatorTemporalMaskBuf = null;
+      window._creatorDetectedBottomY = null;
+      window._creatorDetectedTopY = null;
+      window._creatorFrameLockCount = 0;
+      showTextTimingAlert('Cutout mask & auto-fit reset', 'info');
       setTimeout(() => showTextTimingAlert(''), 1800);
     });
 
     document.getElementById('btn-creator-clear-brush')?.addEventListener('click', () => {
       cState.creatorBrushStrokes = [];
+      cState.creatorBrushActive = false;
+      updateBrushButtonUI();
       const bCanvas = document.getElementById('creator-live-brush-canvas');
       if (bCanvas) {
         const ctx = bCanvas.getContext('2d');
         if (ctx) ctx.clearRect(0, 0, bCanvas.width, bCanvas.height);
       }
-      updateCreatorTelemetryPill();
-      showTextTimingAlert('Hold-out protection mask cleared', 'info');
+      showTextTimingAlert('Hold-out brush cleared', 'info');
       setTimeout(() => showTextTimingAlert(''), 1800);
     });
   }
+}
+
+let _creatorSelfieSegmenter = null;
+let _creatorSegmenterReady = false;
+let _creatorSegLoopId = null;
+
+function ensureCreatorSelfieSegmenter() {
+  if (_creatorSelfieSegmenter || typeof window.SelfieSegmentation !== 'function') return;
+  try {
+    _creatorSelfieSegmenter = new window.SelfieSegmentation({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`
+    });
+    _creatorSelfieSegmenter.setOptions({ modelSelection: 1 });
+    _creatorSelfieSegmenter.onResults((results) => {
+      window._creatorLatestSegMask = results.segmentationMask;
+      _creatorSegmenterReady = true;
+    });
+  } catch (err) {
+    console.warn('SelfieSegmentation init warning:', err);
+  }
+}
+
+function startCreatorLiveSegmentationEngine() {
+  if (_creatorSegLoopId) {
+    cancelAnimationFrame(_creatorSegLoopId);
+    _creatorSegLoopId = null;
+  }
+  const sourceEl = document.getElementById('creator-source-media');
+  const fgCanvas = document.getElementById('creator-live-fg-canvas');
+  if (!sourceEl || !fgCanvas) return;
+
+  ensureCreatorSelfieSegmenter();
+
+  const ctx = fgCanvas.getContext('2d');
+  // Small high-speed mask & RGB decontamination processing buffer (320x180)
+  const mw = 320;
+  const mh = 180;
+  const rawMaskCanvas = document.createElement('canvas');
+  rawMaskCanvas.width = mw;
+  rawMaskCanvas.height = mh;
+  const rawMaskCtx = rawMaskCanvas.getContext('2d', { willReadFrequently: true });
+
+  const srcSmallCanvas = document.createElement('canvas');
+  srcSmallCanvas.width = mw;
+  srcSmallCanvas.height = mh;
+  const srcSmallCtx = srcSmallCanvas.getContext('2d', { willReadFrequently: true });
+
+  const refinedMaskCanvas = document.createElement('canvas');
+  refinedMaskCanvas.width = mw;
+  refinedMaskCanvas.height = mh;
+  const refinedMaskCtx = refinedMaskCanvas.getContext('2d');
+
+  const fullMaskCanvas = document.createElement('canvas');
+  fullMaskCanvas.width = fgCanvas.width;
+  fullMaskCanvas.height = fgCanvas.height;
+  const fullMaskCtx = fullMaskCanvas.getContext('2d');
+
+  const cleanWorkCanvas = document.createElement('canvas');
+  cleanWorkCanvas.width = fgCanvas.width;
+  cleanWorkCanvas.height = fgCanvas.height;
+  const cleanWorkCtx = cleanWorkCanvas.getContext('2d');
+
+  if (!window._creatorTemporalMaskBuf || window._creatorTemporalMaskBuf.length !== mw * mh) {
+    window._creatorTemporalMaskBuf = new Float32Array(mw * mh);
+  }
+
+  if (sourceEl.tagName === 'VIDEO') {
+    sourceEl.play().catch(() => {});
+  }
+
+  let isSendingFrame = false;
+
+  const renderStep = async () => {
+    const activeCanvas = document.getElementById('creator-live-fg-canvas');
+    const activeSource = document.getElementById('creator-source-media');
+    if (!activeCanvas || !activeSource || activeCanvas !== fgCanvas) return;
+
+    const w = fgCanvas.width;
+    const h = fgCanvas.height;
+    const isVid = activeSource.tagName === 'VIDEO';
+    const ready = isVid ? activeSource.readyState >= 2 : activeSource.complete && activeSource.naturalWidth > 0;
+
+    if (ready) {
+      if (_creatorSelfieSegmenter && !isSendingFrame) {
+        isSendingFrame = true;
+        try {
+          await _creatorSelfieSegmenter.send({ image: activeSource });
+        } catch (_) {}
+        isSendingFrame = false;
+      }
+
+      if (window._creatorLatestSegMask && _creatorSegmenterReady) {
+        rawMaskCtx.clearRect(0, 0, mw, mh);
+        rawMaskCtx.drawImage(window._creatorLatestSegMask, 0, 0, mw, mh);
+        srcSmallCtx.drawImage(activeSource, 0, 0, mw, mh);
+
+        const maskImgData = rawMaskCtx.getImageData(0, 0, mw, mh);
+        const mData = maskImgData.data;
+        const srcImgData = srcSmallCtx.getImageData(0, 0, mw, mh);
+        const srcData = srcImgData.data;
+
+        const chokePct = topCustomizerState.creatorEdgeChoke ?? 82;
+        const deconPct = topCustomizerState.creatorDecontaminate ?? 92;
+        const zoneMode = topCustomizerState.creatorBgZoneMode || 'auto-ground';
+
+        // 1. Sample the room's background wall color from guaranteed background pixels (upper frame, rawConf < 25)
+        let bgR = 0, bgG = 0, bgB = 0, bgCount = 0;
+        const sampleMaxY = Math.floor(mh * 0.65);
+        for (let y = 2; y < sampleMaxY; y += 3) {
+          const rowOff = y * mw;
+          for (let x = 2; x < mw - 2; x += 4) {
+            const p4 = (rowOff + x) * 4;
+            const rawConf = Math.max(mData[p4], mData[p4 + 3]);
+            if (rawConf < 25) {
+              bgR += srcData[p4];
+              bgG += srcData[p4 + 1];
+              bgB += srcData[p4 + 2];
+              bgCount++;
+            }
+          }
+        }
+        const wallR = bgCount > 12 ? bgR / bgCount : 215;
+        const wallG = bgCount > 12 ? bgG / bgCount : 215;
+        const wallB = bgCount > 12 ? bgB / bgCount : 210;
+        const wallLuma = wallR * 0.299 + wallG * 0.587 + wallB * 0.114;
+
+        // 2. Build strict initial binary/confidence pass & measure row geometry (head center, head width, torso top & bottom)
+        const lowThresh = Math.round(135 + (chokePct / 100) * 92); // ~210 at 82% choke
+        const highThresh = Math.min(253, lowThresh + 26);
+        const range = Math.max(1, highThresh - lowThresh);
+
+        const pass1 = new Uint8Array(mw * mh);
+        const rowCounts = new Uint16Array(mh);
+        const rowMinX = new Uint16Array(mh);
+        const rowMaxX = new Uint16Array(mh);
+        rowMinX.fill(mw);
+
+        for (let y = 0; y < mh; y++) {
+          const rowOff = y * mw;
+          for (let x = 0; x < mw; x++) {
+            const idx = rowOff + x;
+            const p4 = idx * 4;
+            const rawConf = Math.max(mData[p4], mData[p4 + 3]);
+            if (rawConf <= lowThresh) {
+              pass1[idx] = 0;
+            } else {
+              let norm = (rawConf - lowThresh) / range;
+              if (norm > 1) norm = 1;
+              const aVal = Math.round(norm * 255);
+              pass1[idx] = aVal;
+              if (aVal > 180) {
+                rowCounts[y]++;
+                if (x < rowMinX[y]) rowMinX[y] = x;
+                if (x > rowMaxX[y]) rowMaxX[y] = x;
+              }
+            }
+          }
+        }
+
+        // 3. Deterministic Subject Geometry & Seated Table Cutoff Detection
+        let topY = -1;
+        let peakRowCount = 0;
+        for (let y = 0; y < mh; y++) {
+          if (rowCounts[y] >= 6) {
+            if (topY === -1) topY = y;
+            if (rowCounts[y] > peakRowCount) peakRowCount = rowCounts[y];
+          }
+        }
+
+        let bottomY = mh - 1;
+        if (topY !== -1 && peakRowCount >= 12) {
+          let gapRows = 0;
+          let lastValidY = topY;
+          const minRowSupport = Math.max(8, Math.floor(peakRowCount * 0.14));
+          for (let y = topY; y < mh; y++) {
+            if (rowCounts[y] >= minRowSupport) {
+              lastValidY = y;
+              gapRows = 0;
+            } else {
+              gapRows++;
+              if (gapRows >= 4 && y > topY + Math.floor(mh * 0.22)) {
+                break;
+              }
+            }
+          }
+          bottomY = Math.max(topY + 25, lastValidY - (lastValidY < mh - 6 ? 2 : 0));
+        }
+
+        let headSumCenter = 0, headSumWidth = 0, headRows = 0;
+        if (topY !== -1 && bottomY > topY + 15) {
+          const headStart = topY + 3;
+          const headEnd = Math.min(mh - 1, topY + Math.floor((bottomY - topY) * 0.40));
+          for (let y = headStart; y <= headEnd; y++) {
+            if (rowMaxX[y] > rowMinX[y] + 6) {
+              headSumCenter += (rowMinX[y] + rowMaxX[y]) * 0.5;
+              headSumWidth += (rowMaxX[y] - rowMinX[y]);
+              headRows++;
+            }
+          }
+        }
+        const headCenterX = headRows > 0 ? headSumCenter / headRows : mw * 0.5;
+        const headWidth = headRows > 0 ? Math.max(24, headSumWidth / headRows) : mw * 0.22;
+        const maxTorsoHalfSpan = Math.max(headWidth * 1.52, mw * 0.25);
+
+        const rawTopRatio = topY !== -1 ? topY / mh : 0.08;
+        const rawBotRatio = topY !== -1 ? (bottomY + 1) / mh : 0.98;
+        if (window._creatorDetectedBottomY == null) {
+          window._creatorDetectedBottomY = rawBotRatio;
+          window._creatorDetectedTopY = rawTopRatio;
+          window._creatorFrameLockCount = 1;
+        } else {
+          const lockFrames = window._creatorFrameLockCount || 1;
+          const alpha = lockFrames < 18 ? 0.25 : 0.02;
+          if (Math.abs(rawBotRatio - window._creatorDetectedBottomY) > 0.008 || lockFrames < 18) {
+            window._creatorDetectedBottomY = window._creatorDetectedBottomY * (1 - alpha) + rawBotRatio * alpha;
+            window._creatorDetectedTopY = window._creatorDetectedTopY * (1 - alpha) + rawTopRatio * alpha;
+          }
+          window._creatorFrameLockCount = lockFrames + 1;
+        }
+
+        if (zoneMode === 'wall-only' && topCustomizerState.creatorHorizonAuto !== false) {
+          const autoWallPct = Math.min(92, Math.max(45, Math.round(window._creatorDetectedBottomY * 100)));
+          topCustomizerState.creatorHorizonPct = autoWallPct;
+          const slH = document.getElementById('std-creator-slider-horizon');
+          const vH = document.getElementById('std-creator-val-horizon');
+          if (slH) slH.value = autoWallPct;
+          if (vH) vH.textContent = `Auto Wall (${autoWallPct}%)`;
+        }
+
+        // 4. Build guaranteed deep interior core (4-pass 8-neighbor erosion)
+        let coreCur = new Uint8Array(pass1);
+        let coreNext = new Uint8Array(mw * mh);
+        for (let iter = 0; iter < 4; iter++) {
+          coreNext.fill(0);
+          for (let y = 1; y < mh - 1; y++) {
+            const rOff = y * mw;
+            for (let x = 1; x < mw - 1; x++) {
+              const i = rOff + x;
+              if (coreCur[i] < 245) continue;
+              const m8 = Math.min(
+                coreCur[i - 1], coreCur[i + 1],
+                coreCur[i - mw], coreCur[i + mw],
+                coreCur[i - mw - 1], coreCur[i - mw + 1],
+                coreCur[i + mw - 1], coreCur[i + mw + 1]
+              );
+              coreNext[i] = m8 >= 245 ? 255 : 0;
+            }
+          }
+          const tmp = coreCur;
+          coreCur = coreNext;
+          coreNext = tmp;
+        }
+
+        // 5. Strip outer-shell room wall halo, white table strip, detached bottom blobs, and side desk props (coffee mug)
+        const lowerTorsoStartY = topY !== -1 ? topY + Math.floor((bottomY - topY) * 0.50) : Math.floor(mh * 0.45);
+        const stripLineY = bottomY - 3;
+
+        for (let y = 0; y < mh; y++) {
+          const rowOff = y * mw;
+          for (let x = 0; x < mw; x++) {
+            const idx = rowOff + x;
+            let aVal = pass1[idx];
+            if (aVal === 0) continue;
+
+            if (y > bottomY) {
+              pass1[idx] = 0;
+              continue;
+            }
+
+            if (y >= lowerTorsoStartY && Math.abs(x - headCenterX) > maxTorsoHalfSpan) {
+              pass1[idx] = 0;
+              continue;
+            }
+
+            const p4 = idx * 4;
+            const r = srcData[p4], g = srcData[p4 + 1], b = srcData[p4 + 2];
+            const luma = r * 0.299 + g * 0.587 + b * 0.114;
+            const maxC = Math.max(r, g, b), minC = Math.min(r, g, b);
+            const sat = maxC > 0 ? (maxC - minC) / maxC : 0;
+
+            if (y >= stripLineY && luma > 150 && sat < 0.24) {
+              pass1[idx] = 0;
+              continue;
+            }
+
+            if (coreCur[idx] === 0 && chokePct > 30) {
+              const distWall = Math.abs(r - wallR) + Math.abs(g - wallG) + Math.abs(b - wallB);
+              const wallMatchThresh = 26 + (chokePct / 100) * 48;
+              const isBrightNeutral = (luma > Math.min(155, wallLuma - 18) && sat < 0.22);
+              if (distWall < wallMatchThresh || isBrightNeutral) {
+                pass1[idx] = 0;
+              }
+            }
+          }
+        }
+
+        // 6. Multi-pass inward morphological choke (1 to 3 passes of true 8-neighbor erosion)
+        const erodePasses = chokePct >= 86 ? 3 : (chokePct >= 62 ? 2 : (chokePct >= 38 ? 1 : 0));
+        let curAlpha = pass1;
+        let nextAlpha = new Uint8Array(mw * mh);
+
+        for (let ep = 0; ep < erodePasses; ep++) {
+          for (let y = 0; y < mh; y++) {
+            const rOff = y * mw;
+            for (let x = 0; x < mw; x++) {
+              const i = rOff + x;
+              const v = curAlpha[i];
+              if (v === 0 || x === 0 || x === mw - 1 || y === 0 || y === mh - 1) {
+                nextAlpha[i] = 0;
+                continue;
+              }
+              const nMin = Math.min(
+                v,
+                curAlpha[i - 1], curAlpha[i + 1],
+                curAlpha[i - mw], curAlpha[i + mw],
+                curAlpha[i - mw - 1], curAlpha[i - mw + 1],
+                curAlpha[i + mw - 1], curAlpha[i + mw + 1]
+              );
+              nextAlpha[i] = Math.round(nMin * 0.85 + v * 0.15);
+            }
+          }
+          const swap = curAlpha;
+          curAlpha = nextAlpha;
+          nextAlpha = swap;
+        }
+
+        // 7. 1-pass inward feathering + Temporal EMA stabilization
+        const temporalBuf = window._creatorTemporalMaskBuf;
+        const sens = topCustomizerState.creatorSensitivity ?? 94;
+        const temporalKeep = (topCustomizerState.creatorFaceTrack !== false)
+          ? Math.min(0.82, Math.max(0.15, (sens - 40) / 72))
+          : 0;
+
+        const finalAlpha = new Uint8Array(mw * mh);
+        for (let y = 1; y < mh - 1; y++) {
+          const rOff = y * mw;
+          for (let x = 1; x < mw - 1; x++) {
+            const idx = rOff + x;
+            let val = curAlpha[idx];
+            if (val > 0) {
+              const avg4 = (curAlpha[idx - 1] + curAlpha[idx + 1] + curAlpha[idx - mw] + curAlpha[idx + mw]) * 0.25;
+              val = Math.min(val, Math.round(val * 0.65 + avg4 * 0.35));
+            }
+            const prev = temporalBuf[idx];
+            const effKeep = val < prev ? temporalKeep * 0.35 : temporalKeep;
+            const smoothed = effKeep > 0 ? (prev * effKeep + val * (1 - effKeep)) : val;
+            temporalBuf[idx] = smoothed;
+
+            const outA = smoothed < 32 ? 0 : (smoothed > 235 ? 255 : Math.round(smoothed));
+            finalAlpha[idx] = outA;
+            const p4 = idx * 4;
+            mData[p4] = 255;
+            mData[p4 + 1] = 255;
+            mData[p4 + 2] = 255;
+            mData[p4 + 3] = outA;
+          }
+        }
+
+        // 8. Inward RGB Edge Color Decontamination (De-Halo)
+        if (deconPct > 10) {
+          const blendStrength = deconPct / 100;
+          const searchRadius = deconPct >= 75 ? 5 : 3;
+          for (let y = searchRadius; y < mh - searchRadius; y++) {
+            const rOff = y * mw;
+            for (let x = searchRadius; x < mw - searchRadius; x++) {
+              const idx = rOff + x;
+              const a = finalAlpha[idx];
+              if (a === 0 || coreCur[idx] === 255) continue;
+
+              let foundR = -1, foundG = -1, foundB = -1;
+              for (let step = 1; step <= searchRadius && foundR === -1; step++) {
+                const offsets = [
+                  -step, step, -step * mw, step * mw,
+                  -step * mw - step, -step * mw + step,
+                  step * mw - step, step * mw + step
+                ];
+                for (let k = 0; k < 8; k++) {
+                  const nIdx = idx + offsets[k];
+                  if (coreCur[nIdx] === 255) {
+                    const np4 = nIdx * 4;
+                    foundR = srcData[np4];
+                    foundG = srcData[np4 + 1];
+                    foundB = srcData[np4 + 2];
+                    break;
+                  }
+                }
+              }
+
+              const p4 = idx * 4;
+              if (foundR !== -1) {
+                srcData[p4] = Math.round(srcData[p4] * (1 - blendStrength) + foundR * blendStrength);
+                srcData[p4 + 1] = Math.round(srcData[p4 + 1] * (1 - blendStrength) + foundG * blendStrength);
+                srcData[p4 + 2] = Math.round(srcData[p4 + 2] * (1 - blendStrength) + foundB * blendStrength);
+              } else {
+                srcData[p4] = Math.round(srcData[p4] * 0.55);
+                srcData[p4 + 1] = Math.round(srcData[p4 + 1] * 0.55);
+                srcData[p4 + 2] = Math.round(srcData[p4 + 2] * 0.55);
+              }
+            }
+          }
+          srcSmallCtx.putImageData(srcImgData, 0, 0);
+        }
+
+        refinedMaskCtx.putImageData(maskImgData, 0, 0);
+
+        fullMaskCtx.clearRect(0, 0, w, h);
+        fullMaskCtx.drawImage(refinedMaskCanvas, 0, 0, w, h);
+      } else {
+        fullMaskCtx.clearRect(0, 0, w, h);
+      }
+
+      // Apply optional Hold-out Protection Brush strokes
+      const strokes = topCustomizerState.creatorBrushStrokes;
+      if (Array.isArray(strokes) && strokes.length > 0) {
+        fullMaskCtx.save();
+        fullMaskCtx.globalCompositeOperation = 'source-over';
+        fullMaskCtx.fillStyle = '#ffffff';
+        fullMaskCtx.filter = 'blur(3px)';
+        strokes.forEach(s => {
+          fullMaskCtx.beginPath();
+          fullMaskCtx.arc(s.x, s.y, s.radius || 35, 0, Math.PI * 2);
+          fullMaskCtx.fill();
+        });
+        fullMaskCtx.restore();
+      }
+
+      // 9. Composite Speaker with Deterministic Background Zone / Seated Auto-Ground Framing
+      ctx.clearRect(0, 0, w, h);
+      if (window._creatorLatestSegMask && _creatorSegmenterReady) {
+        cleanWorkCtx.clearRect(0, 0, w, h);
+        cleanWorkCtx.save();
+        cleanWorkCtx.drawImage(activeSource, 0, 0, w, h);
+        if ((topCustomizerState.creatorDecontaminate ?? 92) > 10) {
+          cleanWorkCtx.globalAlpha = 0.85;
+          cleanWorkCtx.drawImage(srcSmallCanvas, 0, 0, w, h);
+          cleanWorkCtx.globalAlpha = 1.0;
+        }
+        cleanWorkCtx.globalCompositeOperation = 'destination-in';
+        cleanWorkCtx.drawImage(fullMaskCanvas, 0, 0, w, h);
+        cleanWorkCtx.restore();
+
+        const zoneMode = topCustomizerState.creatorBgZoneMode || 'auto-ground';
+        const detBot = window._creatorDetectedBottomY ?? 0.98;
+        const detTop = window._creatorDetectedTopY ?? 0.08;
+
+        if (zoneMode === 'auto-ground' && detBot < 0.94 && detBot > 0.38) {
+          const personSpan = Math.max(0.25, detBot - detTop);
+          const maxScaleForHeadroom = 0.86 / personSpan;
+          const scale = Math.min(1.36, Math.max(1.06, maxScaleForHeadroom));
+          const anchorX = w * 0.5;
+          const srcBottomY = detBot * h;
+
+          ctx.save();
+          ctx.translate(anchorX, h);
+          ctx.scale(scale, scale);
+          ctx.translate(-anchorX, -srcBottomY);
+          ctx.drawImage(cleanWorkCanvas, 0, 0, w, h);
+          ctx.restore();
+        } else if (zoneMode === 'wall-only') {
+          const horizonPct = (topCustomizerState.creatorHorizonPct ?? 64) / 100;
+          const horizonY = Math.round(h * horizonPct);
+
+          ctx.save();
+          if (horizonY < h - 4) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(0, horizonY, w, h - horizonY);
+            ctx.clip();
+            ctx.filter = 'brightness(62%) contrast(108%)';
+            ctx.drawImage(activeSource, 0, 0, w, h);
+            ctx.restore();
+
+            const grad = ctx.createLinearGradient(0, horizonY - 12, 0, horizonY + 24);
+            grad.addColorStop(0, 'rgba(2, 6, 23, 0)');
+            grad.addColorStop(0.5, 'rgba(2, 6, 23, 0.55)');
+            grad.addColorStop(1, 'rgba(2, 6, 23, 0.15)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, horizonY - 12, w, 36);
+          }
+          ctx.drawImage(cleanWorkCanvas, 0, 0, w, h);
+          ctx.restore();
+        } else {
+          ctx.drawImage(cleanWorkCanvas, 0, 0, w, h);
+        }
+      } else {
+        ctx.drawImage(activeSource, 0, 0, w, h);
+      }
+    }
+
+    _creatorSegLoopId = requestAnimationFrame(renderStep);
+  };
+
+  _creatorSegLoopId = requestAnimationFrame(renderStep);
 }
 
 function initCreatorBrushInteraction() {
@@ -57381,18 +63282,11 @@ function initCreatorBrushInteraction() {
 
   const cState = topCustomizerState;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (Array.isArray(cState.creatorBrushStrokes) && cState.creatorBrushStrokes.length > 0) {
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
-    cState.creatorBrushStrokes.forEach(s => {
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-  }
 
   let isPainting = false;
 
   const paintAt = (e) => {
+    if (!cState.creatorBrushActive) return;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -57400,24 +63294,19 @@ function initCreatorBrushInteraction() {
     const y = (e.clientY - rect.top) * scaleY;
     const r = (cState.creatorBrushSize || 35);
 
-    ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-
     if (!Array.isArray(cState.creatorBrushStrokes)) cState.creatorBrushStrokes = [];
     cState.creatorBrushStrokes.push({ x, y, radius: r });
-    updateCreatorTelemetryPill();
   };
 
   canvas.onpointerdown = (e) => {
+    if (!cState.creatorBrushActive) return;
     isPainting = true;
     try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
     paintAt(e);
   };
 
   canvas.onpointermove = (e) => {
-    if (!isPainting) return;
+    if (!isPainting || !cState.creatorBrushActive) return;
     paintAt(e);
   };
 

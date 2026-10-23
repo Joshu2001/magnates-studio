@@ -2,9 +2,10 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const { exec } = require('child_process');
 
 const app = express();
-const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 5173;
+const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 
 // Directory setup
 const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
@@ -263,7 +264,6 @@ app.delete('/api/templates/:id', (req, res) => {
 });
 
 // Server-side Universal Video Transcoder & Export Processor
-const { exec } = require('child_process');
 
 app.post('/api/export/transcode', upload.single('video'), (req, res) => {
   if (!req.file) {
@@ -356,11 +356,11 @@ app.post('/api/proxy/generate', (req, res) => {
 });
 
 function startServer(port) {
-  const server = app.listen(port);
+  const server = app.listen(port, '0.0.0.0');
   
   server.on('listening', () => {
     const actualPort = server.address().port;
-    console.log(`Magnates Studio running at http://localhost:${actualPort}`);
+    console.log(`Magnates Studio running at http://0.0.0.0:${actualPort}`);
   });
 
   server.on('error', (err) => {

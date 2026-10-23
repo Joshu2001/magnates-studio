@@ -1,21 +1,18 @@
 {
   "name": "magnates-studio",
   "version": "1.0.0",
-  "description": "",
-  "main": "electron.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "electron": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "Professional creative documentary and 3D visual effects video editor with timeline compositing, kinetic typography, and 3D scene engines.",
+  "main": "server.js",
   "type": "commonjs",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "node --check server.js",
+    "lint": "node --check server.js"
+  },
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.3.0",
-    "multer": "^2.4.0"
+    "express": "^4.21.2",
+    "multer": "^2.1.1"
   }
 }

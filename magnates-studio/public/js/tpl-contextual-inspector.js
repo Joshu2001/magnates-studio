@@ -47,44 +47,70 @@
     localStore['vhs'].feedUrl = '/vhs_summer_1989_bg.jpg';
   }
 
+  // Migrate checklist so items appear with blur and unblur one-by-one to 0px sharp by default
+  if (localStore['checklist'] && !localStore['checklist']._migratedSequentialUnblurV3) {
+    localStore['checklist'].blurMode = 'sequential';
+    localStore['checklist'].entryBlurPx = 6.5;
+    localStore['checklist'].unblurDurationSec = 0.55;
+    localStore['checklist'].unblurStaggerSec = 0.32;
+    localStore['checklist'].depthOfField = false;
+    localStore['checklist'].globalBlurPx = 0;
+    localStore['checklist'].activeFocusIndex = -1;
+    localStore['checklist'].fallMotionBlurPx = 6.5;
+    if (Array.isArray(localStore['checklist'].items)) {
+      localStore['checklist'].items.forEach((it) => {
+        it.blurPx = 0;
+        if (it.unblurDelayOffsetSec === undefined) it.unblurDelayOffsetSec = 0;
+      });
+    }
+    localStore['checklist']._migratedSequentialUnblurV3 = true;
+  }
+
+  // Migrate Google Search Typing UI to Reference Image 3 defaults (65% width centered, aurora enabled, front-facing)
+  if (localStore['google'] && !localStore['google']._migratedRefImage3V3) {
+    localStore['google'].widthPercent = 65;
+    localStore['google'].sizePreset = 'standard';
+    localStore['google'].lockAspectRatio = true;
+    localStore['google'].auroraEnabled = true;
+    localStore['google'].auroraIntensity = 90;
+    localStore['google'].tiltX = 0;
+    localStore['google'].tiltY = 0;
+    localStore['google'].posX = 0;
+    localStore['google'].posY = 0;
+    localStore['google'].scale = 1;
+    localStore['google'].rotation = 0;
+    localStore['google']._migratedRefImage3V3 = true;
+  }
+
+  // Migrate Cinematic Progress HUD to Reference Image 4 (Direction A: Premium Documentary)
+  if (localStore['progress'] && !localStore['progress']._migratedRefImage4V3) {
+    localStore['progress'].stylePreset = 'documentary';
+    localStore['progress'].eyebrow = 'PROJECT FUNDING';
+    localStore['progress'].title = 'Funding Progress';
+    localStore['progress'].phaseLabel = 'Phase 2 of 3';
+    localStore['progress'].phaseStatus = 'Active';
+    localStore['progress'].percent = '74%';
+    localStore['progress'].calloutSublabel = 'of target';
+    localStore['progress'].raisedValue = '$74,000,000';
+    localStore['progress'].raisedLabel = 'Raised';
+    localStore['progress'].targetValue = '$100,000,000';
+    localStore['progress'].targetLabel = 'Target';
+    localStore['progress'].gradientStart = '#7c3aed';
+    localStore['progress'].gradientEnd = '#38bdf8';
+    localStore['progress'].barWidthPercent = 70;
+    localStore['progress'].barThickness = 12;
+    localStore['progress']._migratedRefImage4V3 = true;
+  }
+
   function persistStore() {
     try {
       localStorage.setItem(STORE_KEY, JSON.stringify(localStore));
     } catch (_) {}
   }
+  window.tplSaveContextualStore = persistStore;
 
   // --- 1. DEFAULT DATA CONFIGURATIONS FOR ALL 50 EXTRACTED TEMPLATES ---
   const DEFAULTS = {
-    // James Jani Cinematic Letterbox & Lower Caption Frame
-    'jani-cinematic-letterbox': {
-      type: 'jani-cinematic-letterbox',
-      mediaUrl: '/jani_cinematic_letterbox_ref.png',
-      mediaType: 'image',
-      mediaScale: 1.0,
-      mediaX: 0,
-      mediaY: 0,
-      barColor: '#000000',
-      topBarColor: '#000000',
-      bottomBarColor: '#000000',
-      separateBarColors: false,
-      barHeightPercent: 14,
-      captionText: 'SPUN OVER THE COURSE OF A FEW YEARS.',
-      captionFont: 'Oswald, "Bebas Neue", "Impact", -apple-system, sans-serif',
-      captionSize: 28,
-      captionColor: '#ffffff',
-      captionLetterSpacing: 2.5,
-      captionUppercase: true,
-      captionAnim: 'pop',
-      showChannelTag: true,
-      channelTagText: 'JANi',
-      showActionTag: true,
-      actionTagText: 'SUBSCRIBE',
-      cameraMotion: 'slow-push',
-      grainOverlay: true,
-      grainOpacity: 0.12,
-      duration: 6.0
-    },
-
     // Photorealistic 3D Investigative Evidence Envelope Engine
     'conspiracy-board': Object.assign({}, (typeof window !== 'undefined' && window.RED_STRING_3D_CONFIG) || {
       type: 'conspiracy-board',
@@ -254,9 +280,6 @@
     }),
 
     // Photorealistic 3D Paper Currency Stack ($100 US Dollars with Kraft Bands)
-    // Cinematic Merger & Acquisition collision engine (see merger-acquisition-engine.js)
-    'merger-acquisition': Object.assign({ type: 'merger-acquisition' }, (typeof window !== 'undefined' && window.MERGER_ACQ_CONFIG) || {}),
-
     'wire-transfer': Object.assign({}, (typeof window !== 'undefined' && window.WIRE_TRANSFER_CONFIG) || {
       type: 'wire-transfer',
       originTitle: 'ORIGIN /',
@@ -321,7 +344,89 @@
       vignetteDepth: 0.72,
       duration: 5.0
     }),
-    // James Jani Forbes 3D Cover (The Fake Genius $30 Billion Fraud)
+    'jani-spin-flash-glitch-reveal': Object.assign({}, (typeof window !== 'undefined' && window.JANI_SPIN_FLASH_GLITCH_CONFIG) || {
+      type: 'jani-spin-flash-glitch',
+      moodPreset: 'investigative_expose',
+      subject1Url: '/interview_cutin_cinematic.jpg',
+      sub1Zoom: 1.68,
+      sub1FocalX: 57,
+      sub1FocalY: 32,
+      subject2Url: '/cinematic_split_scene.jpg',
+      sub2Zoom: 1.28,
+      sub2FocalX: 50,
+      sub2FocalY: 34,
+      flashlightColor: '#38bdf8',
+      flashlightColorIntensity: 72,
+      flashBrilliance: 225,
+      flashlightRadius: 64,
+      flashlightFalloff: 60,
+      slowFlashStart: 0.52,
+      slowFlashDuration: 0.68,
+      fastFlashStart: 1.58,
+      fastFlashCount: 3,
+      fastFlashInterval: 0.16,
+      fastFlashDuration: 0.095,
+      spinDirection: 'ltr_cw',
+      spinStartAngle: -18,
+      spinEndAngle: 22,
+      spinArcRadiusX: 58,
+      spinArcRadiusY: 34,
+      spin3DTilt: 16,
+      showSpinGuide: false,
+      particlesEnabled: true,
+      particleCount: 68,
+      particleFallSpeed: 1.25,
+      particleWindSway: 0.45,
+      particleSize: 2.4,
+      particleColor: '#fde68a',
+      glitchIntensity: 85,
+      glitchDuration: 0.46,
+      glitchSliceCount: 14,
+      glitchChromaticOffset: 18,
+      subject2CyanGrade: 78,
+      subject2RevealZoom: 1.08,
+      duration: 5.4,
+      speedMultiplier: 1.0,
+      enableAudioSFX: true,
+      sfxVolume: 85
+    }),
+    'jani-flash-quad-sequence': Object.assign({}, (typeof window !== 'undefined' && window.JANI_FLASH_QUAD_CONFIG) || {
+      type: 'jani-flash-quad',
+      moodPreset: 'genius',
+      image1Url: '/assets/aistudio/image_463745bd.png',
+      image2Url: '/assets/aistudio/image_c2fee6b7.png',
+      image3Url: '/assets/aistudio/image_560b8340.png',
+      image4Url: '/assets/aistudio/image_174cfa38.png',
+      flashBrilliance: 210,
+      flashColor: '#fff5e0',
+      flashDecayDuration: 0.42,
+      preFlashDip: 35,
+      flashlightRadius: 68,
+      flashlightFalloff: 55,
+      retinalAfterimage: 30,
+      shutterSoundProfile: 'slr_35mm',
+      enableShutterSFX: true,
+      shutterVolume: 85,
+      shutterPitch: 1.0,
+      enableSlideWhoosh: true,
+      enableSubSwell: true,
+      layoutStyle: 'stack',
+      ltrSpeed: 0.42,
+      rtlSpeed: 0.42,
+      slideOvershoot: 18,
+      slideMotionBlur: 10,
+      photoBorderWidth: 6,
+      sluggishness: 0.82,
+      centerEmergenceDuration: 1.35,
+      centerStartScale: 0.36,
+      centerFocusPullBlur: 16,
+      centerGhostTrail: 55,
+      speedMultiplier: 1.0,
+      beat1Duration: 1.45,
+      beat2Duration: 1.35,
+      beat3Duration: 1.35,
+      beat4Duration: 2.25
+    }),
     'jani-cross-section-reveal': Object.assign({}, (typeof window !== 'undefined' && window.JANI_CROSS_SECTION_CONFIG) || {
       type: 'jani-cross-section',
       topImageUrl: '/jani_cross_top.png',
@@ -459,6 +564,12 @@
       assetColor: '#10b981',
       liabColor: '#ef4444',
       equityColor: '#6366f1',
+      dofFocusEnabled: true,
+      unfocusedBlur: 1.2,
+      unfocusedOpacity: 0.6,
+      lineAlpha: 0.28,
+      leaderAlpha: 0.22,
+      cameraTilt: 13.5,
       assetRows: [
         { name: 'Cash & Equivalents', val: '$29.9B' },
         { name: 'Marketable Securities', val: '$61.5B' },
@@ -547,7 +658,7 @@
       bgMediaType: 'video'
     },
 
-    // 12. Google Search Typing
+    // 12. Google Search Typing (Reference Image 3: Frosted Glass Card + Aurora + 65% Default Width)
     'google': {
       type: 'google',
       query: 'how to invest in index funds',
@@ -555,10 +666,28 @@
       suggestion2: 's&p 500 historical annual return',
       suggestion3: 'vanguard vs fidelity index funds',
       styleMode: 'cinematic',
-      is3DMode: true,
-      tiltY: -18,
-      tiltX: 8,
-      dofBlur: 0.85
+      auroraEnabled: true,
+      auroraIntensity: 85,
+      widthPercent: 65,
+      sizePreset: 'standard',
+      lockAspectRatio: true,
+      posX: 0,
+      posY: 0,
+      scale: 1,
+      rotation: 0,
+      tiltX: 0,
+      tiltY: 0,
+      keyframeEnabled: false,
+      kfStartX: 0,
+      kfStartY: 18,
+      kfStartScale: 0.92,
+      kfStartRot: 0,
+      kfEndX: 0,
+      kfEndY: 0,
+      kfEndScale: 1.0,
+      kfEndRot: 0,
+      kfDuration: 1.2,
+      typingSpeedMs: 42
     },
 
     // 13. iMessage Thread
@@ -871,21 +1000,31 @@
       feedUrl: '/vhs_summer_1989_bg.jpg'
     },
 
-    // 31. Progress Bar / Cinematic Progress HUD
+    // 31. Progress Bar / Cinematic Progress HUD (Reference Image 4: 3 Selectable Documentary Directions)
     'progress': {
       type: 'progress',
-      title: 'PROJECT FUNDING STATUS',
-      subtitle: '[PHASE 2 / 3 ACTIVE]',
+      stylePreset: 'documentary', // 'documentary' (A - Default Ref Image 4), 'tech' (B), 'editorial' (C)
+      eyebrow: 'PROJECT FUNDING',
+      title: 'Funding Progress',
+      phaseLabel: 'Phase 2 of 3',
+      phaseStatus: 'Active',
       percent: '74%',
-      currentAmount: '$74,000,000 Raised',
-      targetAmount: 'Target: $100,000,000',
-      gradientStart: '#ff007f', // Vibrant magenta/pink
-      gradientEnd: '#00e5ff',   // Electric cyan/blue
-      barWidthPercent: 68,     // 68% viewport width constraint
-      showSparks: true,
-      showShimmer: true,
-      showFilmGrain: true,
-      glowIntensity: 1.0,
+      calloutSublabel: 'of target',
+      raisedValue: '$74,000,000',
+      raisedLabel: 'Raised',
+      targetValue: '$100,000,000',
+      targetLabel: 'Target',
+      gradientStart: '#7c3aed', // Restrained violet
+      gradientEnd: '#38bdf8',   // Refined cyan-blue
+      barWidthPercent: 70,      // 70% default documentary width
+      barThickness: 8,          // Slim 8px track
+      posX: 0,
+      posY: 0,
+      scale: 1,
+      radialGlowIntensity: 0.65,
+      showEndpointDot: true,
+      showFilmGrain: false,
+      animDurationSec: 1.35,
       bgPreset: 'cinematic-dark'
     },
 
@@ -930,20 +1069,27 @@
       backdropType: 'feed_grid'
     },
 
-    // 35. Animated Checklist (Master 3D Paper Artifact Reveal Engine)
+    // 35. Animated Checklist (Master 3D Paper Artifact Reveal Engine - Sequential Blur-to-Sharp Reveal by Default)
     'checklist': {
       type: 'checklist',
       layoutMode: 'slips', // 'slips' (Image 2) or 'dossier' (Image 3)
       bgEnvironment: 'desk', // 'desk' (Dark Mahogany Desk) or 'blueprint' (Investigative Blue Map Grid)
       title: 'Action Steps',
       items: [
-        { text: 'Register Company LLC', checked: true },
-        { text: 'Open Business Account', checked: true },
-        { text: 'Acquire First 100 Clients', checked: true },
-        { text: 'Automate Sales Funnel', checked: true }
+        { text: 'Register Company LLC', checked: true, blurPx: 0, unblurDelayOffsetSec: 0 },
+        { text: 'Open Business Account', checked: true, blurPx: 0, unblurDelayOffsetSec: 0 },
+        { text: 'Acquire First 100 Clients', checked: true, blurPx: 0, unblurDelayOffsetSec: 0 },
+        { text: 'Automate Sales Funnel', checked: true, blurPx: 0, unblurDelayOffsetSec: 0 }
       ],
-      activeFocusIndex: 3,
-      depthOfField: true,
+      blurMode: 'sequential', // 'sequential' (Appear Blurred -> Fade Out 1-by-1), 'focus' (Hold Blur on Unfocused), 'off'
+      entryBlurPx: 6.5,
+      unblurDurationSec: 0.55,
+      unblurStaggerSec: 0.32,
+      activeFocusIndex: -1,
+      depthOfField: false,
+      globalBlurPx: 0,
+      blurredItemOpacity: 0.85,
+      fallMotionBlurPx: 6.5,
       spotlightIntensity: 1.0,
       volumetricDust: true,
       stampColor: '#15803d',
@@ -1116,6 +1262,25 @@
       bgPreset: 'default',
       bgMediaUrl: '',
       bgMediaType: 'image'
+    },
+
+    // 40C-2. Zoom Blur Burst (Editorial Combo: Background Radial Blur + Cutout Burst + Kinetic Text)
+    'zoom-blur': {
+      type: 'zoom-blur',
+      headline: 'THE MASTERMIND',
+      kicker: '[ 00:01:28 · TARGET IDENTIFIED ]',
+      subline: 'RADIAL BURST // PIN-SHARP CUTOUT',
+      subjectUrl: '/ceo_portrait_alpha_cutout.png',
+      sceneUrl: '/boardroom_scene_hd.jpg',
+      blurIntensity: 14,
+      zoomScale: 1.35,
+      subjectZoom: 1.15,
+      textColor: '#ffffff',
+      accentColor: '#38bdf8',
+      kickerColor: '#fbbf24',
+      shutterSpeed: '1/48S',
+      reticleBrackets: true,
+      fontFamily: "'Space Grotesk', sans-serif"
     },
 
     // 40D. Security Camera Overlay
@@ -1614,7 +1779,7 @@
   // --- 2. GET & SET CONTEXTUAL DATA ---
   window.tplGetContextualData = function(tplId) {
     if (!tplId) return {};
-        const d = DEFAULTS[tplId] || (tplId === 'countdown-timer' && typeof window.getCountdownTimerDefaultConfig === 'function' ? window.getCountdownTimerDefaultConfig() : null) || (tplId === 'circular-spin-flashlight-glitch' && typeof window.getCircularSpinFlashDefaultConfig === 'function' ? window.getCircularSpinFlashDefaultConfig() : null);
+        const d = DEFAULTS[tplId];
     if (!d) return {};
     const stored = (localStore[tplId] && Object.keys(localStore[tplId]).length > 0) ? localStore[tplId] : {};
     const live = (typeof topCustomizerState !== 'undefined' && topCustomizerState.customData && topCustomizerState.customData[tplId]) ? topCustomizerState.customData[tplId] : {};
@@ -3433,10 +3598,6 @@
       }
       return;
     }
-    if (tplId === 'merger-acquisition') {
-      if (typeof window.tplUpdateMergerAcqStage === 'function') window.tplUpdateMergerAcqStage(data);
-      return;
-    }
     if (tplId === 'wire-transfer') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -3556,154 +3717,7 @@
           }
         }
         if (typeof window.stepJaniCrossSectionAnimation === 'function') {
-          window.stepJaniCrossSectionAnimation(stage, tplId, t, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'jani-cross-section-reveal') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#jani-cross-viewport-jani-cross-section-reveal')) {
-          if (typeof window.tplMountJaniCrossSectionStage === 'function') {
-            window.tplMountJaniCrossSectionStage(stage, data);
-          }
-        }
-        if (typeof window.stepJaniCrossSectionAnimation === 'function') {
           window.stepJaniCrossSectionAnimation(stage, tplId, 0, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'document-barrage-suite') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#doc-barrage-container')) {
-          if (typeof window.tplMountDocumentBarrageStage === 'function') {
-            window.tplMountDocumentBarrageStage(stage, data);
-          }
-        }
-        if (typeof window.stepDocumentBarrageAnimation === 'function') {
-          window.stepDocumentBarrageAnimation(stage, tplId, 0, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'document-barrage-suite') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (stdLayers) stdLayers.style.display = 'none';
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        const data = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildDocumentBarrageInspector === 'function') {
-          window.tplBuildDocumentBarrageInspector(container, data, tplId);
-        }
-      }
-      return;
-    }
-            if (tplId === 'countdown-timer') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#cdt-wrapper')) {
-          if (typeof window.tplMountCountdownTimerStage === 'function') {
-            window.tplMountCountdownTimerStage(stage, data);
-          }
-        }
-        if (typeof window.stepCountdownTimerAnimation === 'function') {
-          window.stepCountdownTimerAnimation(stage, tplId, 0, data);
-        }
-      }
-      return;
-    }
-
-        if (tplId === 'circular-spin-flashlight-glitch') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#csf-wrapper')) {
-          if (typeof window.tplMountCircularSpinFlashStage === 'function') {
-            window.tplMountCircularSpinFlashStage(stage, data);
-          }
-        }
-        if (typeof window.stepCircularSpinFlashAnimation === 'function') {
-          window.stepCircularSpinFlashAnimation(stage, tplId, 0, data);
-        }
-      }
-      return;
-    }
-
-    if (tplId === 'multi-image-flash-sequence') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#multi-flash-wrapper')) {
-          if (typeof window.tplMountMultiImageFlashStage === 'function') {
-            window.tplMountMultiImageFlashStage(stage, data);
-          }
-        }
-        if (typeof window.stepMultiImageFlashAnimation === 'function') {
-          window.stepMultiImageFlashAnimation(stage, tplId, 0, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'jani-cinematic-letterbox') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage && !stage.querySelector('#jcl-root')) {
-        if (typeof window.tplMountJaniCinematicLetterboxStage === 'function') {
-          window.tplMountJaniCinematicLetterboxStage(stage, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'cinematic-light-trail-typewriter') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#cinematic-light-trail-root')) {
-          if (typeof window.tplMountCinematicLightTrailStage === 'function') {
-            window.tplMountCinematicLightTrailStage(stage, data);
-          }
-        } else {
-          if (typeof window.tplUpdateCinematicLightTrail === 'function') {
-            window.tplUpdateCinematicLightTrail(data);
-          }
-        }
-      }
-      return;
-    }
-    if (tplId === 'jani-cinematic-letterbox') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage && !stage.querySelector('#jcl-root')) {
-        if (typeof window.tplMountJaniCinematicLetterboxStage === 'function') {
-          window.tplMountJaniCinematicLetterboxStage(stage, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'cinematic-light-trail-typewriter') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (stdLayers) stdLayers.style.display = 'none';
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        const d = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildCinematicLightTrailInspector === 'function') {
-          window.tplBuildCinematicLightTrailInspector(container, d, tplId);
         }
       }
       return;
@@ -3738,10 +3752,41 @@
       }
       return;
     }
+    if (tplId === 'jani-spin-flash-glitch-reveal') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#jani-sfg-viewport-jani-spin-flash-glitch-reveal')) {
+          if (typeof window.tplMountJaniSpinFlashGlitchStage === 'function') {
+            window.tplMountJaniSpinFlashGlitchStage(stage, data);
+          }
+        }
+        if (typeof window.stepJaniSpinFlashGlitchAnimation === 'function') {
+          window.stepJaniSpinFlashGlitchAnimation(stage, tplId, 0.62, data);
+        }
+      }
+      return;
+    }
+    if (tplId === 'jani-flash-quad-sequence') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#jani-flash-quad-viewport-jani-flash-quad-sequence')) {
+          if (typeof window.tplMountJaniFlashQuadStage === 'function') {
+            window.tplMountJaniFlashQuadStage(stage, data);
+          }
+        }
+        if (typeof window.stepJaniFlashQuadAnimation === 'function') {
+          window.stepJaniFlashQuadAnimation(stage, tplId, 0, data);
+        }
+      }
+      return;
+    }
     if (tplId === 'google') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       const vContainer = stage ? stage.querySelector('#search-3d-viewport-container') : null;
-      if (vContainer && typeof window.initSearch3DScene === 'function') {
+      if (vContainer && typeof window.tplUpdateGoogleSearchLive === 'function' && vContainer.querySelector('.tpl-google')) {
+        window.tplUpdateGoogleSearchLive(vContainer, data);
+        return;
+      } else if (vContainer && typeof window.initSearch3DScene === 'function') {
         window.initSearch3DScene(vContainer, data);
         return;
       } else if (stage && typeof window.tplMountSearch3DStage === 'function') {
@@ -3817,14 +3862,25 @@
       if (p) p.style.background = `linear-gradient(180deg, ${data.skyTop || '#0d1b2a'} 0%, #1b263b 50%, ${data.skyBottom || '#415a77'} 100%)`;
       
       const rawFig = data.figureImg || (typeof topCustomizerState !== 'undefined' && topCustomizerState.primaryUrl);
-      const isCustomFig = rawFig && !rawFig.includes('data:image/svg');
+      const isCustomFig = rawFig && !rawFig.includes('data:image/svg') && !rawFig.includes('parallax_multilayer_thumb');
       const fig = fxc.querySelector('.figure');
       if (fig) {
         const useFig = isCustomFig ? rawFig : '/hiker_cutout_clean_final.png';
+        const isDefaultHiker = !isCustomFig || useFig.includes('hiker_cutout') || useFig.includes('clean_traveler_cutout');
+        const zScale = Number(data.zoomScale || 1.15) / 1.15;
         fig.style.clipPath = 'none';
-        fig.style.background = `url("${useFig}") center bottom/contain no-repeat`;
-        fig.style.width = '165px';
-        fig.style.height = '86%';
+        fig.style.background = 'none';
+        fig.style.overflow = 'visible';
+        fig.style.width = '25%';
+        fig.style.height = '74%';
+        fig.style.bottom = '0';
+        fig.style.left = '50%';
+        fig.style.transformOrigin = 'center bottom';
+        fig.style.transform = `translateX(-50%) scale(${zScale.toFixed(3)})`;
+        const imgStyle = isDefaultHiker
+          ? 'position: absolute; top: -60.5%; left: 46%; transform: translateX(-50%); width: 705%; max-width: none; height: auto; pointer-events: none; user-select: none; display: block;'
+          : 'width: 100%; height: 100%; object-fit: contain; object-position: center bottom; pointer-events: none; display: block;';
+        fig.innerHTML = `<img class="figure-img" src="${useFig}" alt="" style="${imgStyle}" />`;
       }
       const rawMtn = data.mountainsImg || (typeof topCustomizerState !== 'undefined' && topCustomizerState.secondaryUrl);
       const isCustomMtn = rawMtn && !rawMtn.includes('data:image/svg');
@@ -3960,16 +4016,76 @@
       const sym = fxc.querySelector('.c-sym'); if (sym) sym.textContent = data.symbol;
       const pr = fxc.querySelector('.c-price'); if (pr) pr.textContent = data.price;
       const ch = fxc.querySelector('.c-change'); if (ch) ch.textContent = data.change;
-        } else if (tplId === 'balance') {
+    } else if (tplId === 'balance') {
       const root = fxc.querySelector('.tpl-balance');
       if (root) {
         root.className = `tpl-balance theme-${data.theme || 'archival'}`;
-      }
-      const comp = fxc.querySelector('.b-company');
-      if (comp && data.company) comp.textContent = data.company;
-      const per = fxc.querySelector('.b-period');
-      if (per && data.period) per.textContent = data.period;
+        if (typeof window.tplFitBalanceSheet === 'function') window.tplFitBalanceSheet(root);
 
+        // CSS Variables for dynamic colors and timings
+        if (data.cardAssetsDot) root.style.setProperty('--card-assets-dot', data.cardAssetsDot);
+        if (data.cardStatusDot) root.style.setProperty('--card-status-dot', data.cardStatusDot);
+        if (data.cardLiabDot) root.style.setProperty('--card-liab-dot', data.cardLiabDot);
+        if (data.cardEquityDot) root.style.setProperty('--card-equity-dot', data.cardEquityDot);
+
+        if (data.sceneOrbitDur !== undefined) root.style.setProperty('--scene-orbit-dur', data.sceneOrbitDur + 's');
+        if (data.stampDelay !== undefined) root.style.setProperty('--stamp-delay', data.stampDelay + 's');
+        if (data.stampDur !== undefined) root.style.setProperty('--stamp-dur', data.stampDur + 's');
+
+        if (data.sweep1Delay !== undefined) root.style.setProperty('--sweep-1-delay', data.sweep1Delay + 's');
+        if (data.sweep1Color) root.style.setProperty('--sweep-1-color', data.sweep1Color);
+        if (data.sweep1Dur !== undefined) root.style.setProperty('--sweep-1-dur', data.sweep1Dur + 's');
+
+        if (data.sweep2Delay !== undefined) root.style.setProperty('--sweep-2-delay', data.sweep2Delay + 's');
+        if (data.sweep2Color) root.style.setProperty('--sweep-2-color', data.sweep2Color);
+        if (data.sweep2Dur !== undefined) root.style.setProperty('--sweep-2-dur', data.sweep2Dur + 's');
+
+        if (data.sweepLiabDelay !== undefined) root.style.setProperty('--sweep-liab-delay', data.sweepLiabDelay + 's');
+        if (data.sweepLiabColor) root.style.setProperty('--sweep-liab-color', data.sweepLiabColor);
+        if (data.sweepLiabDur !== undefined) root.style.setProperty('--sweep-liab-dur', data.sweepLiabDur + 's');
+
+        if (data.sweepEquityDelay !== undefined) root.style.setProperty('--sweep-equity-delay', data.sweepEquityDelay + 's');
+        if (data.sweepEquityColor) root.style.setProperty('--sweep-equity-color', data.sweepEquityColor);
+        if (data.sweepEquityDur !== undefined) root.style.setProperty('--sweep-equity-dur', data.sweepEquityDur + 's');
+
+        if (data.cardAssetsDelay !== undefined) root.style.setProperty('--card-assets-delay', data.cardAssetsDelay + 's');
+        if (data.cardStatusDelay !== undefined) root.style.setProperty('--card-status-delay', data.cardStatusDelay + 's');
+        if (data.cardLiabDelay !== undefined) root.style.setProperty('--card-liab-delay', data.cardLiabDelay + 's');
+        if (data.cardEquityDelay !== undefined) root.style.setProperty('--card-equity-delay', data.cardEquityDelay + 's');
+      }
+
+      // Rubber stamp updates
+      const stampEl = fxc.querySelector('.b-rubber-stamp');
+      if (stampEl) {
+        stampEl.style.display = (data.stampEnabled === false) ? 'none' : 'block';
+        if (data.stampTop !== undefined) {
+          const el = stampEl.querySelector('.stamp-txt-top');
+          if (el) el.textContent = data.stampTop;
+        }
+        if (data.stampMain !== undefined) {
+          const el = stampEl.querySelector('.stamp-txt-main');
+          if (el) el.textContent = data.stampMain;
+        }
+        if (data.stampSub !== undefined) {
+          const el = stampEl.querySelector('.stamp-txt-sub');
+          if (el) el.textContent = data.stampSub;
+        }
+        if (data.stampColor) {
+          const box = stampEl.querySelector('.b-stamp-box');
+          if (box) {
+            box.style.borderColor = data.stampColor;
+            box.style.color = data.stampColor;
+          }
+        }
+      }
+
+      // Header updates
+      const comp = fxc.querySelector('.b-company');
+      if (comp && data.company !== undefined) comp.textContent = data.company;
+      const per = fxc.querySelector('.b-period');
+      if (per && data.period !== undefined) per.textContent = data.period;
+
+      // Totals
       const aTot = data.assetsTotal || data.assets || '$143.5B';
       const lTot = data.liabilitiesTotal || data.liabilities || '$81.4B';
       const eTot = data.equityTotal || data.netWorth || '$62.1B';
@@ -3982,7 +4098,76 @@
       fxc.querySelectorAll('.val-equity-calc').forEach(el => { el.textContent = eTot; });
       fxc.querySelectorAll('.val-liab-equity-sum').forEach(el => { el.textContent = aTot; });
 
-      // Color highlights
+      // HUD Card 1 (Assets)
+      const cAssets = fxc.querySelector('.b-hud-assets');
+      if (cAssets) {
+        if (data.cardAssetsTag !== undefined) {
+          const t = cAssets.querySelector('.b-hud-tag'); if (t) t.textContent = data.cardAssetsTag;
+        }
+        if (data.cardAssetsVal !== undefined) {
+          const v = cAssets.querySelector('.val-hud-assets'); if (v) v.textContent = data.cardAssetsVal;
+        }
+        if (data.cardAssetsPct !== undefined) {
+          const p = cAssets.querySelector('.b-delta-pct'); if (p) p.textContent = data.cardAssetsPct;
+        }
+        if (data.cardAssetsSub !== undefined) {
+          const s = cAssets.querySelector('.b-hud-sub'); if (s) s.textContent = data.cardAssetsSub;
+        }
+      }
+
+      // HUD Card 2 (Status)
+      const cStatus = fxc.querySelector('.b-hud-status');
+      if (cStatus) {
+        if (data.cardStatusTag !== undefined) {
+          const t = cStatus.querySelector('.b-hud-tag'); if (t) t.textContent = data.cardStatusTag;
+        }
+        if (data.cardStatusVal !== undefined) {
+          const v = cStatus.querySelector('.b-hud-status-val'); if (v) v.textContent = data.cardStatusVal;
+        }
+        if (data.cardStatusSub !== undefined) {
+          const s = cStatus.querySelector('.b-hud-sub'); if (s) s.textContent = data.cardStatusSub;
+        }
+        const checkIcon = cStatus.querySelector('.b-hud-check-icon');
+        if (checkIcon) {
+          checkIcon.style.display = (data.cardStatusCheck === false) ? 'none' : 'inline-flex';
+        }
+      }
+
+      // HUD Card 3 (Liabilities)
+      const cLiab = fxc.querySelector('.b-hud-liab');
+      if (cLiab) {
+        if (data.cardLiabTag !== undefined) {
+          const t = cLiab.querySelector('.b-hud-tag'); if (t) t.textContent = data.cardLiabTag;
+        }
+        if (data.cardLiabVal !== undefined) {
+          const v = cLiab.querySelector('.val-hud-liab'); if (v) v.textContent = data.cardLiabVal;
+        }
+        if (data.cardLiabPct !== undefined) {
+          const p = cLiab.querySelector('.b-delta-pct'); if (p) p.textContent = data.cardLiabPct;
+        }
+        if (data.cardLiabSub !== undefined) {
+          const s = cLiab.querySelector('.b-hud-sub'); if (s) s.textContent = data.cardLiabSub;
+        }
+      }
+
+      // HUD Card 4 (Equity)
+      const cEquity = fxc.querySelector('.b-hud-equity');
+      if (cEquity) {
+        if (data.cardEquityTag !== undefined) {
+          const t = cEquity.querySelector('.b-hud-tag'); if (t) t.textContent = data.cardEquityTag;
+        }
+        if (data.cardEquityVal !== undefined) {
+          const v = cEquity.querySelector('.val-hud-equity'); if (v) v.textContent = data.cardEquityVal;
+        }
+        if (data.cardEquityPct !== undefined) {
+          const p = cEquity.querySelector('.b-delta-pct'); if (p) p.textContent = data.cardEquityPct;
+        }
+        if (data.cardEquitySub !== undefined) {
+          const s = cEquity.querySelector('.b-hud-sub'); if (s) s.textContent = data.cardEquitySub;
+        }
+      }
+
+      // Legacy Color highlights compatibility
       if (data.assetColor) {
         const el = fxc.querySelector('.b-hud-assets .b-hud-tag');
         if (el) el.style.color = data.assetColor;
@@ -4001,8 +4186,8 @@
         const aList = fxc.querySelector('.b-asset-rows');
         if (aList) {
           aList.innerHTML = data.assetRows.map((r, i) => `
-            <div class="b-tbl-row ${i === 0 ? 'sweep-1' : (i === 1 ? 'sweep-2' : '')}">
-              <span class="b-marker-stroke"></span>
+            <div class="b-tbl-row ${i === 0 ? 'b-row-hl-mint sweep-1' : (i === 1 ? 'b-row-hl-mint sweep-2' : '')}">
+              <span class="b-marker-stroke ${i < 2 ? 'b-mint-marker' : ''}"></span>
               <span class="b-tbl-name">${r.name || ''}</span>
               <span class="b-tbl-leader"></span>
               <span class="b-tbl-val yr-curr val-asset-${i+1}">${r.val || ''}</span>
@@ -4025,7 +4210,33 @@
           `).join('');
         }
       }
-} else if (tplId === 'compound') {
+
+      // Depth of Field focus mode, unfocused blur, mystery lines, and camera tilt
+      const balRoot = fxc.querySelector('.tpl-balance');
+      if (balRoot) {
+        const dofEnabled = data.dofFocusEnabled !== false;
+        balRoot.classList.toggle('has-dof-focus', dofEnabled);
+        const blurPx = data.unfocusedBlur !== undefined ? data.unfocusedBlur : 1.2;
+        const opacityVal = data.unfocusedOpacity !== undefined ? data.unfocusedOpacity : 0.55;
+        balRoot.style.setProperty('--bal-unfocus-blur', `${blurPx}px`);
+        balRoot.style.setProperty('--bal-unfocus-opacity', `${opacityVal}`);
+
+        // Mystery line alpha control
+        const lineAlpha = data.lineAlpha !== undefined ? data.lineAlpha : 0.28;
+        const leaderAlpha = data.leaderAlpha !== undefined ? data.leaderAlpha : 0.22;
+        balRoot.style.setProperty('--bal-line-alpha', `${lineAlpha}`);
+        balRoot.style.setProperty('--bal-leader-alpha', `${leaderAlpha}`);
+
+        // 3D Camera tilt control
+        if (data.cameraTilt !== undefined) {
+          const scene3D = balRoot.querySelector('.b-scene-3d');
+          if (scene3D) {
+            const tilt = parseFloat(data.cameraTilt);
+            scene3D.style.transform = `translate(-50%, -50%) rotateX(${tilt}deg) rotateY(${(-tilt * 0.85).toFixed(1)}deg) rotateZ(1.2deg)`;
+          }
+        }
+      }
+    } else if (tplId === 'compound') {
       const v = fxc.querySelector('.ci-val, .ci-amount'); if (v) v.textContent = data.futureVal;
       const subs = fxc.querySelectorAll('.ci-sub');
       if (subs[0]) subs[0].textContent = `Start: ${data.initial}`;
@@ -4393,56 +4604,12 @@
         fxc.innerHTML = window.tplBuildChecklistHtml(data);
       }
     } else if (tplId === 'progress') {
-      let root = fxc.querySelector('.tpl-progress');
-      if (!root || !root.classList.contains('cinematic-hud-progress')) {
-        fxc.innerHTML = window.tplBuildProgressHtml ? window.tplBuildProgressHtml(data) : '';
-        root = fxc.querySelector('.tpl-progress');
-      }
-      if (root) {
-        if (typeof window.tplSyncUniversalBgStageLayer === 'function') {
+      if (typeof window.tplBuildProgressHtml === 'function') {
+        fxc.innerHTML = window.tplBuildProgressHtml(data);
+        const root = fxc.querySelector('.tpl-progress');
+        if (root && typeof window.tplSyncUniversalBgStageLayer === 'function') {
           window.tplSyncUniversalBgStageLayer(root, data);
         }
-        const gradStart = data.gradientStart || '#ff007f';
-        const gradEnd = data.gradientEnd || '#00e5ff';
-        const barWidth = Math.max(40, Math.min(90, Number(data.barWidthPercent || 68)));
-        root.style.setProperty('--hud-grad-start', gradStart);
-        root.style.setProperty('--hud-grad-end', gradEnd);
-        root.style.setProperty('--hud-bar-width', `${barWidth}%`);
-
-        const g = root.querySelector('.prog-goal');
-        if (g && data.title !== undefined) g.textContent = data.title;
-        else if (g && data.goal !== undefined) g.textContent = data.goal;
-
-        const sub = root.querySelector('.prog-subtitle');
-        if (sub && data.subtitle !== undefined) sub.textContent = data.subtitle;
-
-        const rawPct = (data.percent !== undefined) ? String(data.percent).replace(/[^0-9.]/g, '') : '74';
-        const pctNum = Math.max(0, Math.min(100, parseFloat(rawPct) || 74));
-
-        const p = root.querySelector('.prog-pct');
-        if (p) p.textContent = `${pctNum}%`;
-
-        const b = root.querySelector('.prog-bar-fill');
-        if (b) b.style.width = `${pctNum}%`;
-
-        const anchor = root.querySelector('.hud-dynamic-callout-anchor');
-        if (anchor) anchor.style.left = `calc((100% - var(--hud-bar-width)) / 2 + (var(--hud-bar-width) * ${pctNum} / 100))`;
-
-        const rAmt = root.querySelector('.prog-amt-raised');
-        if (rAmt && data.currentAmount !== undefined) rAmt.textContent = data.currentAmount;
-        else if (rAmt && data.amount !== undefined) rAmt.textContent = data.amount;
-
-        const tAmt = root.querySelector('.prog-amt-target');
-        if (tAmt && data.targetAmount !== undefined) tAmt.textContent = data.targetAmount;
-
-        const sparks = root.querySelector('.hud-spark-emitter');
-        if (sparks) sparks.style.display = (data.showSparks === false) ? 'none' : 'block';
-
-        const shimmer = root.querySelector('.hud-light-sweep-beam');
-        if (shimmer) shimmer.style.display = (data.showShimmer === false) ? 'none' : 'block';
-
-        const grain = root.querySelector('.hud-film-grain-overlay');
-        if (grain) grain.style.display = (data.showFilmGrain === false) ? 'none' : 'block';
       }
     } else if (tplId === 'scramble') {
       let root = fxc.querySelector('.tpl-scramble');
@@ -4744,6 +4911,26 @@
       if (sb) {
         if (data.subline !== undefined) sb.textContent = data.subline;
         if (data.accentColor) sb.style.color = data.accentColor;
+      }
+    } else if (tplId === 'zoom-blur') {
+      const bg = fxc.querySelector('#zb-bg-layer') || fxc.querySelector('.zb-bg-scene');
+      if (bg && data.sceneUrl) bg.style.backgroundImage = `url("${data.sceneUrl}")`;
+      const cut = fxc.querySelector('#zb-cutout-img') || fxc.querySelector('.zb-cutout-img');
+      if (cut && data.subjectUrl) cut.src = data.subjectUrl;
+      const hl = fxc.querySelector('#zb-headline') || fxc.querySelector('.zb-headline');
+      if (hl) {
+        if (data.headline !== undefined) hl.textContent = data.headline;
+        if (data.textColor) hl.style.color = data.textColor;
+      }
+      const kic = fxc.querySelector('#zb-kicker') || fxc.querySelector('.zb-kicker');
+      if (kic) {
+        if (data.kicker !== undefined) kic.textContent = data.kicker;
+        if (data.kickerColor) kic.style.color = data.kickerColor;
+      }
+      const sub = fxc.querySelector('#zb-subline') || fxc.querySelector('.zb-subline');
+      if (sub) {
+        if (data.subline !== undefined) sub.textContent = data.subline;
+        if (data.accentColor) sub.style.color = data.accentColor;
       }
     } else if (tplId === 'security-camera') {
       const root = fxc.querySelector('.tpl-security-camera');
@@ -5133,24 +5320,6 @@
 
   // --- 4. RENDER CONTEXTUAL INSPECTOR MODULES ---
   window.tplRenderContextualInspector = function(tplId) {
-    if (tplId === 'jani-cinematic-letterbox') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        if (typeof window.tplRenderJaniCinematicLetterboxInspector === 'function') {
-          window.tplRenderJaniCinematicLetterboxInspector(container);
-        }
-      }
-      return;
-    }
     if (tplId === 'hypnotic-vertigo-roll') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
@@ -5386,17 +5555,6 @@
       }
       return;
     }
-    if (tplId === 'merger-acquisition') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      if (container) {
-        container.style.display = 'flex';
-        const data = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildMergerAcqInspector === 'function') {
-          window.tplBuildMergerAcqInspector(container, data, tplId);
-        }
-      }
-      return;
-    }
     if (tplId === 'wire-transfer') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       if (container) {
@@ -5485,20 +5643,6 @@
       return;
     }
     if (tplId === 'jani-cross-section-reveal') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#jani-cross-viewport-jani-cross-section-reveal')) {
-          if (typeof window.tplMountJaniCrossSectionStage === 'function') {
-            window.tplMountJaniCrossSectionStage(stage, data);
-          }
-        }
-        if (typeof window.stepJaniCrossSectionAnimation === 'function') {
-          window.stepJaniCrossSectionAnimation(stage, tplId, t, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'jani-cross-section-reveal') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
       const wrapText = document.getElementById('tpl-modal-wrap-text');
@@ -5572,106 +5716,6 @@
       }
       return;
     }
-    if (tplId === 'document-barrage-suite') {
-      const stage = document.getElementById('tpl-modal-preview-stage');
-      if (stage) {
-        if (!stage.querySelector('#doc-barrage-container')) {
-          if (typeof window.tplMountDocumentBarrageStage === 'function') {
-            window.tplMountDocumentBarrageStage(stage, data);
-          }
-        }
-        if (typeof window.stepDocumentBarrageAnimation === 'function') {
-          window.stepDocumentBarrageAnimation(stage, tplId, 0, data);
-        }
-      }
-      return;
-    }
-    if (tplId === 'document-barrage-suite') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (stdLayers) stdLayers.style.display = 'none';
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        const data = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildDocumentBarrageInspector === 'function') {
-          window.tplBuildDocumentBarrageInspector(container, data, tplId);
-        }
-      }
-      return;
-    }
-            if (tplId === 'countdown-timer') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (stdLayers) stdLayers.style.display = 'none';
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        const data = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildCountdownTimerInspector === 'function') {
-          window.tplBuildCountdownTimerInspector(container, data);
-        }
-      }
-      return;
-    }
-
-        if (tplId === 'circular-spin-flashlight-glitch') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (stdLayers) stdLayers.style.display = 'none';
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        const data = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildCircularSpinFlashInspector === 'function') {
-          window.tplBuildCircularSpinFlashInspector(container, data);
-        }
-      }
-      return;
-    }
-
-    if (tplId === 'multi-image-flash-sequence') {
-      const container = document.getElementById('tpl-modal-dynamic-controls');
-      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
-      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
-      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
-      const wrapText = document.getElementById('tpl-modal-wrap-text');
-      const tpl3dControls = document.getElementById('tpl-modal-3d-controls');
-      if (tpl3dControls) { tpl3dControls.style.display = 'none'; tpl3dControls.innerHTML = ''; }
-      if (stdLayers) stdLayers.style.display = 'none';
-      if (wrapPrim) wrapPrim.style.display = 'none';
-      if (wrapSec) wrapSec.style.display = 'none';
-      if (wrapText) wrapText.style.display = 'none';
-      if (container) {
-        container.style.display = 'flex';
-        const data = window.tplGetContextualData(tplId);
-        if (typeof window.tplBuildMultiImageFlashInspector === 'function') {
-          window.tplBuildMultiImageFlashInspector(container, data);
-        }
-      }
-      return;
-    }
     if (tplId === 'jani-ftx-logo-reveal') {
       const container = document.getElementById('tpl-modal-dynamic-controls');
       const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
@@ -5704,6 +5748,44 @@
         const data = window.tplGetContextualData(tplId);
         if (typeof window.tplBuildForbesInspector === 'function') {
           window.tplBuildForbesInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if (tplId === 'jani-flash-quad-sequence') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (stdLayers) stdLayers.style.display = 'none';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildJaniFlashQuadInspector === 'function') {
+          window.tplBuildJaniFlashQuadInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if (tplId === 'jani-spin-flash-glitch-reveal') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (stdLayers) stdLayers.style.display = 'none';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildJaniSpinFlashGlitchInspector === 'function') {
+          window.tplBuildJaniSpinFlashGlitchInspector(container, data, tplId);
         }
       }
       return;
@@ -6627,124 +6709,267 @@
       if (wrapSec) wrapSec.style.display = 'none';
       if (wrapText) wrapText.style.display = 'none';
 
-      const isCinematic = (data.styleMode !== 'classic');
-      const is3D = data.is3DMode !== false;
+      const widthPct = Math.max(25, Math.min(98, Number(data.widthPercent !== undefined ? data.widthPercent : 65)));
+      const sizePreset = data.sizePreset || (widthPct <= 40 ? 'compact' : (widthPct >= 90 ? 'fullscreen' : 'standard'));
+      const lockAspect = data.lockAspectRatio !== false;
+      const auroraEnabled = data.auroraEnabled !== false;
+      const auroraIntensity = data.auroraIntensity !== undefined ? Number(data.auroraIntensity) : 85;
+      const styleMode = data.styleMode || 'cinematic';
+      const posX = Math.round(Number(data.posX || 0));
+      const posY = Math.round(Number(data.posY || 0));
+      const rotation = Math.round(Number(data.rotation || 0));
+      const tiltX = Math.round(Number(data.tiltX || 0));
+      const tiltY = Math.round(Number(data.tiltY || 0));
+      const kfEnabled = data.keyframeEnabled === true;
 
       container.innerHTML = `
-        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.6);">
+        <div style="background: rgba(11,17,32,0.88); border: 1px solid rgba(56,189,248,0.32); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 11px; box-shadow: 0 10px 28px rgba(0,0,0,0.65);">
           <!-- Header -->
           <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;">
             <div style="display: flex; align-items: center; gap: 6px;">
               <span style="font-size: 13px;">🔍</span>
-              <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.8px;">Google Search FX Suite</span>
+              <span style="font-size: 11px; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.7px;">Google Search Studio</span>
             </div>
-            <span style="font-size: 9px; color: #38bdf8; font-weight: 700; background: rgba(56,189,248,0.18); border: 1px solid rgba(56,189,248,0.35); padding: 2px 6px; border-radius: 4px;">${isCinematic ? '3D GLASSMORPHIC' : 'CLASSIC 2D'}</span>
+            <span style="font-size: 8.5px; color: #38bdf8; font-weight: 700; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.35); padding: 2px 7px; border-radius: 999px;">ADAPTIVE ${widthPct}%</span>
           </div>
 
-          <!-- Section 1: Visual Style Version Selector (Image 2 vs Image 1) -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
+          <!-- Section 1: Size Presets & Proportional Canvas Scaling -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.65); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 9px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Visual Style &amp; Shader</span>
-              <span style="font-size: 8.5px; color: #a855f7; font-weight: 600;">Default: 3D Documentary</span>
+              <span style="font-size: 8.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.6px;">Size Preset &amp; Canvas Scale</span>
+              <span id="g-val-width-pct" style="font-size: 9.5px; font-family: monospace; color: #38bdf8; font-weight: 700;">${widthPct}% Width</span>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-              <button type="button" id="g-btn-mode-cinematic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${isCinematic ? '#38bdf8' : 'rgba(255,255,255,0.08)'}; background: ${isCinematic ? 'rgba(56,189,248,0.22)' : 'rgba(0,0,0,0.35)'}; color: ${isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
-                <span>✨ 3D Glassmorphic (Image 2)</span>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+              <button type="button" class="g-preset-size-btn" data-preset="compact" data-width="35" style="padding: 6px 4px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${sizePreset === 'compact' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${sizePreset === 'compact' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: ${sizePreset === 'compact' ? '#fff' : '#94a3b8'}; cursor: pointer;">
+                Compact (35%)
               </button>
-              <button type="button" id="g-btn-mode-classic" style="padding: 7px 9px; font-size: 10px; font-weight: 700; border-radius: 6px; border: 1.5px solid ${!isCinematic ? '#e2e8f0' : 'rgba(255,255,255,0.08)'}; background: ${!isCinematic ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.35)'}; color: ${!isCinematic ? '#fff' : '#94a3b8'}; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;">
-                <span>📄 Classic 2D Card (Image 1)</span>
+              <button type="button" class="g-preset-size-btn" data-preset="standard" data-width="65" style="padding: 6px 4px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${sizePreset === 'standard' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${sizePreset === 'standard' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: ${sizePreset === 'standard' ? '#fff' : '#94a3b8'}; cursor: pointer;">
+                Standard (65%)
+              </button>
+              <button type="button" class="g-preset-size-btn" data-preset="fullscreen" data-width="95" style="padding: 6px 4px; font-size: 9.5px; font-weight: 700; border-radius: 6px; border: 1px solid ${sizePreset === 'fullscreen' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${sizePreset === 'fullscreen' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.35)'}; color: ${sizePreset === 'fullscreen' ? '#fff' : '#94a3b8'}; cursor: pointer;">
+                Fullscreen (95%)
+              </button>
+            </div>
+            <input type="range" id="g-slider-width-pct" min="25" max="95" step="1" value="${widthPct}" style="width: 100%; accent-color: #38bdf8; height: 4px; cursor: pointer; margin-top: 2px;" />
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 2px;">
+              <label style="display: flex; align-items: center; gap: 5px; font-size: 9px; color: #cbd5e1; cursor: pointer;">
+                <input type="checkbox" id="g-chk-lock-aspect" ${lockAspect ? 'checked' : ''} style="accent-color: #38bdf8;" />
+                <span>Lock Aspect Ratio (Proportional Scaling)</span>
+              </label>
+              <button type="button" id="g-btn-center-reset" style="padding: 2px 7px; font-size: 8.5px; font-weight: 700; border-radius: 4px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #e2e8f0; cursor: pointer;">
+                Center (65%)
               </button>
             </div>
           </div>
 
-          <!-- Section 2: Search Query & Suggestions -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Query &amp; Auto-Suggestions</span>
-            
-            <div style="display: flex; flex-direction: column; gap: 5px;">
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1.5px solid rgba(56,189,248,0.5); box-shadow: inset 0 0 10px rgba(56,189,248,0.12);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #38bdf8; width: 48px; font-weight: 800;">QUERY</span>
-                <input type="text" id="g-inp-query" value="${data.query || 'how to invest in index funds'}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 600; outline: none;" placeholder="Search query..." />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #94a3b8; width: 48px; font-weight: 700;">SUGG 1 ★</span>
-                <input type="text" id="g-inp-sug1" value="${data.suggestion || 'top index funds for passive wealth'}" style="flex: 1; background: transparent; border: none; color: #cbd5e1; font-size: 10.5px; font-weight: 600; outline: none;" placeholder="Highlighted suggestion..." />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 2</span>
-                <input type="text" id="g-inp-sug2" value="${data.suggestion2 || 's&p 500 historical annual return'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 2..." />
-              </div>
-              <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
-                <span style="font-size: 8.5px; font-family: monospace; color: #64748b; width: 48px; font-weight: 700;">SUGG 3</span>
-                <input type="text" id="g-inp-sug3" value="${data.suggestion3 || 'vanguard vs fidelity index funds'}" style="flex: 1; background: transparent; border: none; color: #94a3b8; font-size: 10.5px; outline: none;" placeholder="Suggestion 3..." />
-              </div>
-            </div>
-          </div>
-
-          <!-- Section 3: 3D Spatial Tilt & Optics Controls -->
-          <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px;">
+          <!-- Section 2: Position, Rotation & Optional 3D Perspective -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 9px;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">3D Spatial Rig &amp; Camera Optics</span>
-              <span style="font-size: 8.5px; color: #38bdf8; font-family: monospace;">15° - 25° Tilt</span>
+              <span style="font-size: 8.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Transform (Drag on Stage or Fine-Tune)</span>
+              <span style="font-size: 8px; color: #64748b; font-family: monospace;">16:9 · 9:16 · 1:1</span>
             </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-              <div style="display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
-                  <span>Y-AXIS SPATIAL TILT</span>
-                  <span id="g-val-tilt-y" style="color: #38bdf8; font-family: monospace;">${data.tiltY !== undefined ? data.tiltY : -18}°</span>
-                </div>
-                <input type="range" id="g-slider-tilt-y" min="-45" max="45" value="${data.tiltY !== undefined ? data.tiltY : -18}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 3px;">
-                <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
-                  <span>X-AXIS PERSPECTIVE</span>
-                  <span id="g-val-tilt-x" style="color: #38bdf8; font-family: monospace;">${data.tiltX !== undefined ? data.tiltX : 8}°</span>
-                </div>
-                <input type="range" id="g-slider-tilt-x" min="-30" max="30" value="${data.tiltX !== undefined ? data.tiltX : 8}" style="accent-color: #38bdf8; height: 3px; cursor: pointer;" />
-              </div>
-            </div>
-
-            <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 6px 8px; border-radius: 6px; margin-top: 2px;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
               <div>
-                <div style="font-size: 10px; font-weight: 600; color: #e2e8f0;">Dynamic Push-In &amp; f/2.8 Lens Bokeh</div>
-                <div style="font-size: 8.5px; color: #94a3b8;">Focused entry pin-sharp, ambient elements blur gracefully</div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>POS X</span>
+                  <span id="g-val-pos-x" style="color: #38bdf8; font-family: monospace;">${posX}px</span>
+                </div>
+                <input type="range" id="g-slider-pos-x" min="-260" max="260" value="${posX}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
               </div>
-              <span style="font-size: 9px; color: #22c55e; font-weight: 700; background: rgba(34,197,94,0.18); padding: 2px 6px; border-radius: 4px;">ACTIVE</span>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>POS Y</span>
+                  <span id="g-val-pos-y" style="color: #38bdf8; font-family: monospace;">${posY}px</span>
+                </div>
+                <input type="range" id="g-slider-pos-y" min="-180" max="180" value="${posY}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>ROTATE</span>
+                  <span id="g-val-rot" style="color: #38bdf8; font-family: monospace;">${rotation}°</span>
+                </div>
+                <input type="range" id="g-slider-rot" min="-25" max="25" value="${rotation}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>3D TILT Y</span>
+                  <span id="g-val-tilt-y" style="color: #a855f7; font-family: monospace;">${tiltY}°</span>
+                </div>
+                <input type="range" id="g-slider-tilt-y" min="-30" max="30" value="${tiltY}" style="width: 100%; accent-color: #a855f7; height: 3px; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>3D TILT X</span>
+                  <span id="g-val-tilt-x" style="color: #a855f7; font-family: monospace;">${tiltX}°</span>
+                </div>
+                <input type="range" id="g-slider-tilt-x" min="-25" max="25" value="${tiltX}" style="width: 100%; accent-color: #a855f7; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Search Query & Auto-Suggestions -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 8.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Search Query &amp; Suggestions</span>
+              <button type="button" id="g-btn-replay-typing" style="padding: 2px 8px; font-size: 8.5px; font-weight: 700; border-radius: 4px; border: 1px solid rgba(56,189,248,0.45); background: rgba(56,189,248,0.15); color: #38bdf8; cursor: pointer;">
+                ▶ Replay Typing
+              </button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.42); padding: 5px 8px; border-radius: 6px; border: 1.5px solid rgba(56,189,248,0.5);">
+              <span style="font-size: 8px; font-family: monospace; color: #38bdf8; width: 46px; font-weight: 800;">QUERY</span>
+              <input type="text" id="g-inp-query" value="${(data.query || 'how to invest in index funds').replace(/"/g, '&quot;')}" style="flex: 1; background: transparent; border: none; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.07);">
+              <span style="font-size: 8px; font-family: monospace; color: #94a3b8; width: 46px; font-weight: 700;">ROW 1</span>
+              <input type="text" id="g-inp-sug1" value="${(data.suggestion || 'top index funds for passive wealth').replace(/"/g, '&quot;')}" style="flex: 1; background: transparent; border: none; color: #e2e8f0; font-size: 10.5px; outline: none;" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.07);">
+              <span style="font-size: 8px; font-family: monospace; color: #94a3b8; width: 46px; font-weight: 700;">ROW 2</span>
+              <input type="text" id="g-inp-sug2" value="${(data.suggestion2 || 's&p 500 historical annual return').replace(/"/g, '&quot;')}" style="flex: 1; background: transparent; border: none; color: #e2e8f0; font-size: 10.5px; outline: none;" />
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.35); padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.07);">
+              <span style="font-size: 8px; font-family: monospace; color: #94a3b8; width: 46px; font-weight: 700;">ROW 3</span>
+              <input type="text" id="g-inp-sug3" value="${(data.suggestion3 || 'vanguard vs fidelity index funds').replace(/"/g, '&quot;')}" style="flex: 1; background: transparent; border: none; color: #e2e8f0; font-size: 10.5px; outline: none;" />
+            </div>
+          </div>
+
+          <!-- Section 4: Aurora Light Waves & Card Appearance -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 9px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 700; color: #e2e8f0; cursor: pointer;">
+                <input type="checkbox" id="g-chk-aurora" ${auroraEnabled ? 'checked' : ''} style="accent-color: #38bdf8;" />
+                <span>Glowing Aurora Light Waves Backdrop</span>
+              </label>
+              <span id="g-val-aurora" style="font-size: 8.5px; font-family: monospace; color: #38bdf8;">${auroraIntensity}%</span>
+            </div>
+            <input type="range" id="g-slider-aurora" min="0" max="100" value="${auroraIntensity}" ${!auroraEnabled ? 'disabled' : ''} style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer; opacity: ${auroraEnabled ? 1 : 0.4};" />
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 2px;">
+              <button type="button" id="g-btn-mode-cinematic" style="padding: 5px 8px; font-size: 9.5px; font-weight: 700; border-radius: 5px; border: 1px solid ${styleMode !== 'classic' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${styleMode !== 'classic' ? 'rgba(56,189,248,0.18)' : 'rgba(0,0,0,0.35)'}; color: ${styleMode !== 'classic' ? '#fff' : '#94a3b8'}; cursor: pointer;">
+                ✨ Frosted Dark Glass
+              </button>
+              <button type="button" id="g-btn-mode-classic" style="padding: 5px 8px; font-size: 9.5px; font-weight: 700; border-radius: 5px; border: 1px solid ${styleMode === 'classic' ? '#e2e8f0' : 'rgba(255,255,255,0.1)'}; background: ${styleMode === 'classic' ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.35)'}; color: ${styleMode === 'classic' ? '#fff' : '#94a3b8'}; cursor: pointer;">
+                📄 Clean Light Card
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 5: Keyframe Animation (Position, Scale, Rotation) -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.5); border: 1px solid rgba(168,85,247,0.25); border-radius: 8px; padding: 9px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; font-weight: 700; color: #e9d5ff; cursor: pointer;">
+                <input type="checkbox" id="g-chk-keyframe" ${kfEnabled ? 'checked' : ''} style="accent-color: #a855f7;" />
+                <span>Keyframe Motion (Start → End)</span>
+              </label>
+              <button type="button" id="g-btn-play-kf" style="padding: 2px 7px; font-size: 8.5px; font-weight: 700; border-radius: 4px; border: 1px solid rgba(168,85,247,0.45); background: rgba(168,85,247,0.2); color: #e9d5ff; cursor: pointer;">
+                ▶ Preview Motion
+              </button>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; opacity: ${kfEnabled ? 1 : 0.5};">
+              <div>
+                <span style="font-size: 7.5px; color: #94a3b8; display: block;">START SCALE</span>
+                <input type="number" id="g-kf-start-scale" step="0.05" min="0.4" max="1.6" value="${data.kfStartScale !== undefined ? data.kfStartScale : 0.92}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; color: #fff; font-size: 9.5px; padding: 3px 5px;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #94a3b8; display: block;">START Y (PX)</span>
+                <input type="number" id="g-kf-start-y" step="5" min="-200" max="200" value="${data.kfStartY !== undefined ? data.kfStartY : 18}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; color: #fff; font-size: 9.5px; padding: 3px 5px;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #94a3b8; display: block;">START ROT (°)</span>
+                <input type="number" id="g-kf-start-rot" step="1" min="-45" max="45" value="${data.kfStartRot !== undefined ? data.kfStartRot : 0}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 4px; color: #fff; font-size: 9.5px; padding: 3px 5px;" />
+              </div>
             </div>
           </div>
         </div>
       `;
 
-      // Event Wireups
-      const syncButtons = () => {
-        const pVid = document.getElementById('btn-paper-rip-mode-video');
-        const p3D = document.getElementById('btn-paper-rip-mode-3d');
-        if (pVid && p3D) {
-          const mode3d = (topCustomizerState.paperPreviewMode === '3d' || topCustomizerState.is3DMode);
-          pVid.style.background = !mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
-          pVid.style.color = !mode3d ? '#fff' : '#94a3b8';
-          p3D.style.background = mode3d ? 'rgba(168,85,247,.35)' : 'transparent';
-          p3D.style.color = mode3d ? '#fff' : '#94a3b8';
-        }
+      // Helper for live sync when stage drag/resize happens
+      window.tplSyncGoogleInspectorUI = () => {
+        const latest = window.tplGetContextualData('google');
+        const wEl = container.querySelector('#g-val-width-pct');
+        const wSlider = container.querySelector('#g-slider-width-pct');
+        if (wEl && latest.widthPercent !== undefined) wEl.textContent = `${Math.round(latest.widthPercent)}% Width`;
+        if (wSlider && latest.widthPercent !== undefined) wSlider.value = Math.round(latest.widthPercent);
+        const pxEl = container.querySelector('#g-val-pos-x');
+        const pxSlider = container.querySelector('#g-slider-pos-x');
+        if (pxEl && latest.posX !== undefined) pxEl.textContent = `${Math.round(latest.posX)}px`;
+        if (pxSlider && latest.posX !== undefined) pxSlider.value = Math.round(latest.posX);
+        const pyEl = container.querySelector('#g-val-pos-y');
+        const pySlider = container.querySelector('#g-slider-pos-y');
+        if (pyEl && latest.posY !== undefined) pyEl.textContent = `${Math.round(latest.posY)}px`;
+        if (pySlider && latest.posY !== undefined) pySlider.value = Math.round(latest.posY);
       };
 
-      container.querySelector('#g-btn-mode-cinematic')?.addEventListener('click', () => {
-        topCustomizerState.paperPreviewMode = '3d';
-        topCustomizerState.is3DMode = true;
-        window.tplSetContextualData('google', { styleMode: 'cinematic', is3DMode: true });
-        window.tplRenderContextualInspector('google');
-        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
-        syncButtons();
+      // Preset Size Buttons (Compact 35%, Standard 65%, Fullscreen 95%)
+      container.querySelectorAll('.g-preset-size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const preset = btn.dataset.preset;
+          const w = Number(btn.dataset.width || 65);
+          window.tplSetContextualData('google', { sizePreset: preset, widthPercent: w, scale: 1 });
+          window.tplRenderContextualInspector('google');
+        });
       });
 
-      container.querySelector('#g-btn-mode-classic')?.addEventListener('click', () => {
-        topCustomizerState.paperPreviewMode = 'video';
-        topCustomizerState.is3DMode = false;
-        window.tplSetContextualData('google', { styleMode: 'classic', is3DMode: false });
+      container.querySelector('#g-slider-width-pct')?.addEventListener('input', (e) => {
+        const w = parseInt(e.target.value, 10);
+        const preset = w <= 40 ? 'compact' : (w >= 90 ? 'fullscreen' : 'standard');
+        const lbl = container.querySelector('#g-val-width-pct');
+        if (lbl) lbl.textContent = `${w}% Width`;
+        window.tplSetContextualData('google', { widthPercent: w, sizePreset: preset, scale: 1 });
+      });
+
+      container.querySelector('#g-chk-lock-aspect')?.addEventListener('change', (e) => {
+        window.tplSetContextualData('google', { lockAspectRatio: e.target.checked });
+      });
+
+      container.querySelector('#g-btn-center-reset')?.addEventListener('click', () => {
+        window.tplSetContextualData('google', {
+          widthPercent: 65,
+          sizePreset: 'standard',
+          posX: 0,
+          posY: 0,
+          scale: 1,
+          rotation: 0,
+          tiltX: 0,
+          tiltY: 0
+        });
         window.tplRenderContextualInspector('google');
-        if (typeof renderTopTemplatePreviewStage === 'function') renderTopTemplatePreviewStage();
-        syncButtons();
+      });
+
+      container.querySelector('#g-slider-pos-x')?.addEventListener('input', (e) => {
+        const v = parseInt(e.target.value, 10);
+        const lbl = container.querySelector('#g-val-pos-x');
+        if (lbl) lbl.textContent = `${v}px`;
+        window.tplSetContextualData('google', { posX: v });
+      });
+
+      container.querySelector('#g-slider-pos-y')?.addEventListener('input', (e) => {
+        const v = parseInt(e.target.value, 10);
+        const lbl = container.querySelector('#g-val-pos-y');
+        if (lbl) lbl.textContent = `${v}px`;
+        window.tplSetContextualData('google', { posY: v });
+      });
+
+      container.querySelector('#g-slider-rot')?.addEventListener('input', (e) => {
+        const v = parseInt(e.target.value, 10);
+        const lbl = container.querySelector('#g-val-rot');
+        if (lbl) lbl.textContent = `${v}°`;
+        window.tplSetContextualData('google', { rotation: v });
+      });
+
+      container.querySelector('#g-slider-tilt-y')?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#g-val-tilt-y');
+        if (valEl) valEl.textContent = `${val}°`;
+        window.tplSetContextualData('google', { tiltY: val });
+      });
+
+      container.querySelector('#g-slider-tilt-x')?.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value, 10);
+        const valEl = container.querySelector('#g-val-tilt-x');
+        if (valEl) valEl.textContent = `${val}°`;
+        window.tplSetContextualData('google', { tiltX: val });
       });
 
       container.querySelector('#g-inp-query')?.addEventListener('input', (e) => {
@@ -6760,20 +6985,56 @@
         window.tplSetContextualData('google', { suggestion3: e.target.value });
       });
 
-      container.querySelector('#g-slider-tilt-y')?.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        const valEl = container.querySelector('#g-val-tilt-y');
-        if (valEl) valEl.textContent = `${val}°`;
-        window.tplSetContextualData('google', { tiltY: val });
-        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
+      container.querySelector('#g-btn-replay-typing')?.addEventListener('click', () => {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.tplTriggerGoogleSearchAnimation === 'function') {
+          window.tplTriggerGoogleSearchAnimation(stage, window.tplGetContextualData('google'));
+        }
       });
 
-      container.querySelector('#g-slider-tilt-x')?.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        const valEl = container.querySelector('#g-val-tilt-x');
-        if (valEl) valEl.textContent = `${val}°`;
-        window.tplSetContextualData('google', { tiltX: val });
-        window.tplUpdateStageWithContextualData('google', window.tplGetContextualData('google'));
+      container.querySelector('#g-chk-aurora')?.addEventListener('change', (e) => {
+        window.tplSetContextualData('google', { auroraEnabled: e.target.checked });
+        window.tplRenderContextualInspector('google');
+      });
+
+      container.querySelector('#g-slider-aurora')?.addEventListener('input', (e) => {
+        const v = parseInt(e.target.value, 10);
+        const lbl = container.querySelector('#g-val-aurora');
+        if (lbl) lbl.textContent = `${v}%`;
+        window.tplSetContextualData('google', { auroraIntensity: v });
+      });
+
+      container.querySelector('#g-btn-mode-cinematic')?.addEventListener('click', () => {
+        window.tplSetContextualData('google', { styleMode: 'cinematic' });
+        window.tplRenderContextualInspector('google');
+      });
+
+      container.querySelector('#g-btn-mode-classic')?.addEventListener('click', () => {
+        window.tplSetContextualData('google', { styleMode: 'classic' });
+        window.tplRenderContextualInspector('google');
+      });
+
+      container.querySelector('#g-chk-keyframe')?.addEventListener('change', (e) => {
+        window.tplSetContextualData('google', { keyframeEnabled: e.target.checked });
+        window.tplRenderContextualInspector('google');
+      });
+
+      container.querySelector('#g-kf-start-scale')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { kfStartScale: parseFloat(e.target.value) || 0.92 });
+      });
+      container.querySelector('#g-kf-start-y')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { kfStartY: parseInt(e.target.value, 10) || 0 });
+      });
+      container.querySelector('#g-kf-start-rot')?.addEventListener('input', (e) => {
+        window.tplSetContextualData('google', { kfStartRot: parseInt(e.target.value, 10) || 0 });
+      });
+
+      container.querySelector('#g-btn-play-kf')?.addEventListener('click', () => {
+        window.tplSetContextualData('google', { keyframeEnabled: true });
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.tplTriggerGoogleSearchAnimation === 'function') {
+          window.tplTriggerGoogleSearchAnimation(stage, window.tplGetContextualData('google'));
+        }
       });
 
       return;
@@ -9109,28 +9370,34 @@
         {
           label: 'Apple Inc. (10-K)',
           company: 'APPLE INC.',
-          period: 'FORM 10-K \u00b7 FISCAL 2024',
+          period: 'FORM 10-K · FISCAL 2024',
           assetsTotal: '$143.5B',
           liabilitiesTotal: '$81.4B',
           equityTotal: '$62.1B',
+          cardAssetsVal: '$143.5B',
+          cardLiabVal: '$81.4B',
+          cardEquityVal: '$62.1B',
           assetRows: [
             { name: 'Cash & Equivalents', val: '$29.9B' },
             { name: 'Marketable Securities', val: '$61.5B' },
-            { name: 'Accounts Receivable', val: '$29.5B' },
-            { name: 'Inventories & Other', val: '$22.6B' }
+            { name: 'Accounts receivable, net', val: '$29.5B' },
+            { name: 'Inventories', val: '$22.6B' }
           ],
           liabRows: [
-            { name: 'Short-term Debt & Payables', val: '$16.2B' },
-            { name: 'Long-term Debt Obligations', val: '$65.2B' }
+            { name: 'Short-term debt', val: '$16.2B' },
+            { name: 'Long-term debt', val: '$65.2B' }
           ]
         },
         {
           label: 'Tesla Inc. (Auto/Energy)',
           company: 'TESLA, INC.',
-          period: 'FORM 10-K \u00b7 ANNUAL REPORT',
+          period: 'FORM 10-K · ANNUAL REPORT',
           assetsTotal: '$106.6B',
           liabilitiesTotal: '$43.0B',
           equityTotal: '$63.6B',
+          cardAssetsVal: '$106.6B',
+          cardLiabVal: '$43.0B',
+          cardEquityVal: '$63.6B',
           assetRows: [
             { name: 'Cash & Investments', val: '$29.1B' },
             { name: 'Solar & Gigafactory PP&E', val: '$32.5B' },
@@ -9145,10 +9412,13 @@
         {
           label: 'Tech Startup (Series A)',
           company: 'NEXUS AI CORP.',
-          period: 'Q3 INVESTOR DECK \u00b7 2024',
+          period: 'Q3 INVESTOR DECK · 2024',
           assetsTotal: '$18.4M',
           liabilitiesTotal: '$3.2M',
           equityTotal: '$15.2M',
+          cardAssetsVal: '$18.4M',
+          cardLiabVal: '$3.2M',
+          cardEquityVal: '$15.2M',
           assetRows: [
             { name: 'Treasury & Silicon Valley Bank', val: '$14.2M' },
             { name: 'GPU Cluster Compute Assets', val: '$3.1M' },
@@ -9166,6 +9436,9 @@
           assetsTotal: '$2,450,000',
           liabilitiesTotal: '$620,000',
           equityTotal: '$1,830,000',
+          cardAssetsVal: '$2.45M',
+          cardLiabVal: '$620K',
+          cardEquityVal: '$1.83M',
           assetRows: [
             { name: 'Primary Residence Equity', val: '$1,200,000' },
             { name: 'Index Funds & Equities', val: '$850,000' },
@@ -9179,18 +9452,39 @@
       ];
 
       const curTheme = data.theme || 'archival';
+      const curTab = data._activeBalanceTab || 'doc';
 
-      container.innerHTML = `
-        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
-          <!-- Header -->
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">\u{1F3DB}\uFE0F</span>
-              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">BALANCE SHEET CONTROLS</span>
-            </div>
-            <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
-          </div>
+      // Default rows if not set
+      const curAssetRows = (Array.isArray(data.assetRows) && data.assetRows.length > 0) ? data.assetRows : [
+        { name: 'Cash & Equivalents', val: '$29.9B' },
+        { name: 'Marketable Securities', val: '$61.5B' },
+        { name: 'Accounts receivable, net', val: '$29.5B' },
+        { name: 'Inventories', val: '$22.6B' }
+      ];
+      const curLiabRows = (Array.isArray(data.liabRows) && data.liabRows.length > 0) ? data.liabRows : [
+        { name: 'Short-term debt', val: '$16.2B' },
+        { name: 'Long-term debt', val: '$65.2B' }
+      ];
 
+      // Tab bar navigation HTML
+      const tabNavHtml = `
+        <div style="display: flex; gap: 4px; background: rgba(0,0,0,0.5); padding: 3px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+          <button type="button" class="bal-tab-btn" data-tab="doc" style="flex: 1; padding: 6px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; background: ${curTab === 'doc' ? 'rgba(56,189,248,0.22)' : 'transparent'}; color: ${curTab === 'doc' ? '#38bdf8' : '#94a3b8'}; transition: all 0.15s;">
+            📄 Doc & Rows
+          </button>
+          <button type="button" class="bal-tab-btn" data-tab="cards" style="flex: 1; padding: 6px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; background: ${curTab === 'cards' ? 'rgba(16,185,129,0.22)' : 'transparent'}; color: ${curTab === 'cards' ? '#34d399' : '#94a3b8'}; transition: all 0.15s;">
+            🗂️ 4 HUD Cards
+          </button>
+          <button type="button" class="bal-tab-btn" data-tab="timing" style="flex: 1; padding: 6px 4px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; background: ${curTab === 'timing' ? 'rgba(168,85,247,0.22)' : 'transparent'}; color: ${curTab === 'timing' ? '#c084fc' : '#94a3b8'}; transition: all 0.15s;">
+            ⏱️ Timing
+          </button>
+        </div>
+      `;
+
+      // TAB 1: Document & Rows Content
+      let tabContentHtml = '';
+      if (curTab === 'doc') {
+        tabContentHtml = `
           <!-- Presets -->
           <div style="display: flex; flex-direction: column; gap: 4px;">
             <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Company Template Presets</span>
@@ -9205,10 +9499,10 @@
             <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Visual Aesthetic</span>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
               <button type="button" id="bal-theme-archival" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curTheme === 'archival' ? '#8b5a3c' : 'rgba(255,255,255,0.1)'}; background: ${curTheme === 'archival' ? 'rgba(139,90,60,0.25)' : 'rgba(0,0,0,0.3)'}; color: ${curTheme === 'archival' ? '#fed7aa' : '#94a3b8'}; transition: all 0.15s;">
-                \u{1F4DC} Archival 10-K
+                📜 Archival 10-K
               </button>
               <button type="button" id="bal-theme-bloomberg" style="padding: 6px 8px; font-size: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; border: 1px solid ${curTheme === 'bloomberg' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; background: ${curTheme === 'bloomberg' ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)'}; color: ${curTheme === 'bloomberg' ? '#38bdf8' : '#94a3b8'}; transition: all 0.15s;">
-                \u{1F4BB} Bloomberg Glass
+                💻 Bloomberg Glass
               </button>
             </div>
           </div>
@@ -9221,7 +9515,7 @@
             </div>
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span style="font-size: 9.5px; font-weight: 600; color: #94a3b8; text-transform: uppercase;">Filing Period</span>
-              <input type="text" id="bal-inp-period" value="${data.period || 'FORM 10-K \u00b7 FISCAL 2024'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
+              <input type="text" id="bal-inp-period" value="${data.period || 'FORM 10-K · FISCAL 2024'}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 600; outline: none;" />
             </div>
           </div>
 
@@ -9247,21 +9541,312 @@
             </div>
           </div>
 
-          <!-- Color Customizer -->
-          <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.25); border-radius: 6px; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.06);">
-            <div style="display: flex; align-items: center; gap: 4px;" title="Asset Accent Color">
-              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Assets:</span>
-              <input type="color" id="bal-col-assets" value="${data.assetColor || '#10b981'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+          <!-- Itemized Rows Customizer -->
+          <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #34d399; text-transform: uppercase;">Current Assets Rows</span>
+              <span style="font-size: 8px; color: #64748b;">(Row sweeps applied to 1 & 2)</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 4px;" title="Liabilities Accent Color">
-              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Liabilities:</span>
-              <input type="color" id="bal-col-liab" value="${data.liabColor || '#ef4444'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            ${curAssetRows.map((r, i) => `
+              <div style="display: grid; grid-template-columns: 1fr 65px; gap: 4px;">
+                <input type="text" class="bal-asset-row-name" data-idx="${i}" value="${r.name || ''}" placeholder="Line Item" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #e2e8f0; font-size: 10px;" />
+                <input type="text" class="bal-asset-row-val" data-idx="${i}" value="${r.val || ''}" placeholder="$ Value" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(52,211,153,0.3); border-radius: 4px; padding: 3px 6px; color: #34d399; font-size: 10px; font-family: monospace; text-align: right;" />
+              </div>
+            `).join('')}
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #f87171; text-transform: uppercase;">Liabilities Itemized Rows</span>
             </div>
-            <div style="display: flex; align-items: center; gap: 4px;" title="Equity Accent Color">
-              <span style="font-size: 9px; color: #94a3b8; font-weight: 600;">Equity:</span>
-              <input type="color" id="bal-col-equity" value="${data.equityColor || '#6366f1'}" style="width: 22px; height: 20px; border: none; background: transparent; cursor: pointer;" />
+            ${curLiabRows.map((r, i) => `
+              <div style="display: grid; grid-template-columns: 1fr 65px; gap: 4px;">
+                <input type="text" class="bal-liab-row-name" data-idx="${i}" value="${r.name || ''}" placeholder="Debt Item" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; color: #e2e8f0; font-size: 10px;" />
+                <input type="text" class="bal-liab-row-val" data-idx="${i}" value="${r.val || ''}" placeholder="$ Value" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(248,113,113,0.3); border-radius: 4px; padding: 3px 6px; color: #f87171; font-size: 10px; font-family: monospace; text-align: right;" />
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Cinematic Depth of Field & Line Mystery Controls -->
+          <div style="background: rgba(15,23,42,0.5); border: 1px solid rgba(56,189,248,0.25); border-radius: 8px; padding: 9px; display: flex; flex-direction: column; gap: 7px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="bal-chk-dof" ${data.dofFocusEnabled !== false ? 'checked' : ''} style="cursor: pointer; accent-color: #38bdf8;" />
+                <label for="bal-chk-dof" style="font-size: 9.5px; font-weight: 700; color: #38bdf8; text-transform: uppercase; cursor: pointer;">Focus Highlighted (Blur Unfocused)</label>
+              </div>
+              <span style="font-size: 8.5px; color: #94a3b8; font-family: monospace;" id="bal-lbl-dof-val">${data.unfocusedBlur !== undefined ? data.unfocusedBlur : 1.2}px</span>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #cbd5e1;">
+                <span>Unfocused Text Blur:</span>
+                <span id="bal-lbl-unfocus-blur" style="color: #38bdf8; font-family: monospace;">${data.unfocusedBlur !== undefined ? data.unfocusedBlur : 1.2}px</span>
+              </div>
+              <input type="range" id="bal-rng-unfocus-blur" min="0" max="4" step="0.2" value="${data.unfocusedBlur !== undefined ? data.unfocusedBlur : 1.2}" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #cbd5e1;">
+                <span>Unfocused Opacity:</span>
+                <span id="bal-lbl-unfocus-op" style="color: #38bdf8; font-family: monospace;">${Math.round((data.unfocusedOpacity !== undefined ? data.unfocusedOpacity : 0.55) * 100)}%</span>
+              </div>
+              <input type="range" id="bal-rng-unfocus-op" min="0.2" max="1.0" step="0.05" value="${data.unfocusedOpacity !== undefined ? data.unfocusedOpacity : 0.55}" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 3px; margin-top: 2px; padding-top: 5px; border-top: 1px solid rgba(255,255,255,0.06);">
+              <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #cbd5e1;">
+                <span>Line Delicacy & Mystery:</span>
+                <span id="bal-lbl-line-alpha" style="color: #fed7aa; font-family: monospace;">${Math.round((data.lineAlpha !== undefined ? data.lineAlpha : 0.28) * 100)}%</span>
+              </div>
+              <input type="range" id="bal-rng-line-alpha" min="0.10" max="0.75" step="0.05" value="${data.lineAlpha !== undefined ? data.lineAlpha : 0.28}" style="width: 100%; accent-color: #f59e0b; cursor: pointer;" />
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #cbd5e1;">
+                <span>3D Camera Tilt (0° = Flat & Razor Sharp):</span>
+                <span id="bal-lbl-cam-tilt" style="color: #c084fc; font-family: monospace;">${data.cameraTilt !== undefined ? data.cameraTilt : 13.5}°</span>
+              </div>
+              <input type="range" id="bal-rng-cam-tilt" min="0" max="22" step="0.5" value="${data.cameraTilt !== undefined ? data.cameraTilt : 13.5}" style="width: 100%; accent-color: #c084fc; cursor: pointer;" />
             </div>
           </div>
+
+          <!-- Official Rubber Stamp Customizer -->
+          <div style="background: rgba(185,28,28,0.08); border: 1px solid rgba(185,28,28,0.3); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="bal-chk-stamp" ${data.stampEnabled !== false ? 'checked' : ''} style="cursor: pointer;" />
+                <label for="bal-chk-stamp" style="font-size: 9.5px; font-weight: 700; color: #f87171; text-transform: uppercase; cursor: pointer;">Official Audit Stamp</label>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 8.5px; color: #94a3b8;">Ink:</span>
+                <input type="color" id="bal-col-stamp" value="${data.stampColor || '#b91c1c'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px;">
+              <input type="text" id="bal-inp-stamptop" value="${data.stampTop || 'SEC EDGAR AUDIT'}" placeholder="Top Header" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 5px; color: #fca5a5; font-size: 9px; font-weight: 700;" />
+              <input type="text" id="bal-inp-stampmain" value="${data.stampMain || 'VERIFIED'}" placeholder="Main Stamp" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 5px; color: #f87171; font-size: 9px; font-weight: 900;" />
+              <input type="text" id="bal-inp-stampsub" value="${data.stampSub || 'GAAP • FORM 10-K'}" placeholder="Sub Text" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 5px; color: #fca5a5; font-size: 9px;" />
+            </div>
+          </div>
+        `;
+      } else if (curTab === 'cards') {
+        // TAB 2: 4 HUD Cards Customizer
+        tabContentHtml = `
+          <!-- CARD 1: Total Assets -->
+          <div style="background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.25); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: ${data.cardAssetsDot || '#34d399'}; display: inline-block;"></span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #34d399;">CARD 1 · TOTAL ASSETS (TOP-LEFT)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 8px; color: #94a3b8;">Dot/Line:</span>
+                <input type="color" id="bal-col-card-assets" value="${data.cardAssetsDot || '#34d399'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card1-tag" value="${data.cardAssetsTag || 'Total Assets'}" placeholder="Tag/Label" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px;" />
+              <input type="text" id="bal-inp-card1-val" value="${data.cardAssetsVal || data.assetsTotal || '$143.5B'}" placeholder="Main Value" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px; font-weight: 700; font-family: monospace;" />
+            </div>
+            <div style="display: grid; grid-template-columns: 80px 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card1-pct" value="${data.cardAssetsPct || '↑ 4.2%'}" placeholder="Delta %" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(52,211,153,0.3); border-radius: 4px; padding: 4px 6px; color: #34d399; font-size: 10px; font-weight: 700;" />
+              <input type="text" id="bal-inp-card1-sub" value="${data.cardAssetsSub || 'Consolidated balance'}" placeholder="Subtitle description" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #94a3b8; font-size: 9.5px;" />
+            </div>
+          </div>
+
+          <!-- CARD 2: Balance Check -->
+          <div style="background: rgba(148,163,184,0.06); border: 1px solid rgba(148,163,184,0.22); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: ${data.cardStatusDot || '#94a3b8'}; display: inline-block;"></span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1;">CARD 2 · BALANCE CHECK (TOP-RIGHT)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 8px; color: #94a3b8;">Dot/Line:</span>
+                <input type="color" id="bal-col-card-status" value="${data.cardStatusDot || '#94a3b8'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card2-tag" value="${data.cardStatusTag || 'Balance Check'}" placeholder="Tag/Label" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px;" />
+              <input type="text" id="bal-inp-card2-val" value="${data.cardStatusVal || 'Balanced'}" placeholder="Status Value" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px; font-weight: 700;" />
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 5px; align-items: center;">
+              <input type="text" id="bal-inp-card2-sub" value="${data.cardStatusSub || 'Assets = Liabilities + Equity'}" placeholder="Equation description" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #94a3b8; font-size: 9.5px;" />
+              <label style="display: flex; align-items: center; gap: 3px; font-size: 8.5px; color: #94a3b8; cursor: pointer;">
+                <input type="checkbox" id="bal-chk-card2-icon" ${data.cardStatusCheck !== false ? 'checked' : ''} /> Checkmark
+              </label>
+            </div>
+          </div>
+
+          <!-- CARD 3: Total Liabilities -->
+          <div style="background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.25); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: ${data.cardLiabDot || '#f87171'}; display: inline-block;"></span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #f87171;">CARD 3 · LIABILITIES (MID-RIGHT)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 8px; color: #94a3b8;">Dot/Line:</span>
+                <input type="color" id="bal-col-card-liab" value="${data.cardLiabDot || '#f87171'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card3-tag" value="${data.cardLiabTag || 'Total Liabilities'}" placeholder="Tag/Label" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px;" />
+              <input type="text" id="bal-inp-card3-val" value="${data.cardLiabVal || data.liabilitiesTotal || '$81.4B'}" placeholder="Main Value" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px; font-weight: 700; font-family: monospace;" />
+            </div>
+            <div style="display: grid; grid-template-columns: 80px 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card3-pct" value="${data.cardLiabPct || '↑ 3.1%'}" placeholder="Delta %" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(248,113,113,0.3); border-radius: 4px; padding: 4px 6px; color: #f87171; font-size: 10px; font-weight: 700;" />
+              <input type="text" id="bal-inp-card3-sub" value="${data.cardLiabSub || 'Outstanding obligations'}" placeholder="Subtitle description" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #94a3b8; font-size: 9.5px;" />
+            </div>
+          </div>
+
+          <!-- CARD 4: Shareholders' Equity -->
+          <div style="background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.25); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: ${data.cardEquityDot || '#a78bfa'}; display: inline-block;"></span>
+                <span style="font-size: 9.5px; font-weight: 700; color: #a78bfa;">CARD 4 · EQUITY (BOT-RIGHT)</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 8px; color: #94a3b8;">Dot/Line:</span>
+                <input type="color" id="bal-col-card-equity" value="${data.cardEquityDot || '#a78bfa'}" style="width: 20px; height: 18px; border: none; background: transparent; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card4-tag" value="${data.cardEquityTag || 'Shareholders\' Equity'}" placeholder="Tag/Label" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px;" />
+              <input type="text" id="bal-inp-card4-val" value="${data.cardEquityVal || data.equityTotal || '$62.1B'}" placeholder="Main Value" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #fff; font-size: 10px; font-weight: 700; font-family: monospace;" />
+            </div>
+            <div style="display: grid; grid-template-columns: 80px 1fr; gap: 5px;">
+              <input type="text" id="bal-inp-card4-pct" value="${data.cardEquityPct || '↑ 5.6%'}" placeholder="Delta %" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(167,139,250,0.3); border-radius: 4px; padding: 4px 6px; color: #a78bfa; font-size: 10px; font-weight: 700;" />
+              <input type="text" id="bal-inp-card4-sub" value="${data.cardEquitySub || 'Net assets attributable to equity'}" placeholder="Subtitle description" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 6px; color: #94a3b8; font-size: 9.5px;" />
+            </div>
+          </div>
+        `;
+      } else if (curTab === 'timing') {
+        // TAB 3: Timeline Timing Content
+        tabContentHtml = `
+          <!-- 3D Orbit Camera Speed -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">3D Camera Orbit Duration</span>
+              <span id="bal-lbl-orbit" style="font-size: 9.5px; color: #38bdf8; font-weight: 700; font-family: monospace;">${data.sceneOrbitDur || 10}s</span>
+            </div>
+            <input type="range" id="bal-rng-orbit" min="4" max="24" step="0.5" value="${data.sceneOrbitDur || 10}" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+          </div>
+
+          <!-- Official Stamp Slam Timing -->
+          <div style="background: rgba(185,28,28,0.08); border: 1px solid rgba(185,28,28,0.25); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9.5px; font-weight: 700; color: #f87171; text-transform: uppercase;">Stamp Slam Trigger Delay</span>
+              <span id="bal-lbl-stamp-delay" style="font-size: 9.5px; color: #f87171; font-weight: 700; font-family: monospace;">${data.stampDelay !== undefined ? data.stampDelay : 0}s</span>
+            </div>
+            <input type="range" id="bal-rng-stamp-delay" min="0" max="4" step="0.1" value="${data.stampDelay !== undefined ? data.stampDelay : 0}" style="width: 100%; accent-color: #f87171; cursor: pointer;" />
+          </div>
+
+          <!-- Highlighter Sweeps Delays & Colors -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">Row Highlighter Sweeps Timing</span>
+
+            <!-- Sweep 1: Cash -->
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; color: #34d399; font-weight: 600;">Cash & Equiv Sweep Delay:</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="color" id="bal-col-sweep1" value="${data.sweep1Color || '#8ed0a8'}" style="width: 18px; height: 16px; border: none; background: transparent; cursor: pointer;" title="Highlighter Color" />
+                  <span id="bal-lbl-sw1" style="font-size: 9px; color: #34d399; font-family: monospace;">${data.sweep1Delay !== undefined ? data.sweep1Delay : 0.3}s</span>
+                </div>
+              </div>
+              <input type="range" id="bal-rng-sw1" min="0" max="4" step="0.1" value="${data.sweep1Delay !== undefined ? data.sweep1Delay : 0.3}" style="width: 100%; accent-color: #34d399; cursor: pointer;" />
+            </div>
+
+            <!-- Sweep 2: Marketable Securities -->
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; color: #34d399; font-weight: 600;">Securities Sweep Delay:</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="color" id="bal-col-sweep2" value="${data.sweep2Color || '#8ed0a8'}" style="width: 18px; height: 16px; border: none; background: transparent; cursor: pointer;" title="Highlighter Color" />
+                  <span id="bal-lbl-sw2" style="font-size: 9px; color: #34d399; font-family: monospace;">${data.sweep2Delay !== undefined ? data.sweep2Delay : 0.9}s</span>
+                </div>
+              </div>
+              <input type="range" id="bal-rng-sw2" min="0" max="4" step="0.1" value="${data.sweep2Delay !== undefined ? data.sweep2Delay : 0.9}" style="width: 100%; accent-color: #34d399; cursor: pointer;" />
+            </div>
+
+            <!-- Sweep 3: Total Liabilities -->
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; color: #f87171; font-weight: 600;">Liabilities Sweep Delay:</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="color" id="bal-col-sweepliab" value="${data.sweepLiabColor || '#ebaca8'}" style="width: 18px; height: 16px; border: none; background: transparent; cursor: pointer;" title="Highlighter Color" />
+                  <span id="bal-lbl-swliab" style="font-size: 9px; color: #f87171; font-family: monospace;">${data.sweepLiabDelay !== undefined ? data.sweepLiabDelay : 1.5}s</span>
+                </div>
+              </div>
+              <input type="range" id="bal-rng-swliab" min="0" max="4" step="0.1" value="${data.sweepLiabDelay !== undefined ? data.sweepLiabDelay : 1.5}" style="width: 100%; accent-color: #f87171; cursor: pointer;" />
+            </div>
+
+            <!-- Sweep 4: Shareholders' Equity -->
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; color: #c084fc; font-weight: 600;">Equity Sweep Delay:</span>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="color" id="bal-col-sweepequity" value="${data.sweepEquityColor || '#c4bce4'}" style="width: 18px; height: 16px; border: none; background: transparent; cursor: pointer;" title="Highlighter Color" />
+                  <span id="bal-lbl-sweq" style="font-size: 9px; color: #c084fc; font-family: monospace;">${data.sweepEquityDelay !== undefined ? data.sweepEquityDelay : 2.1}s</span>
+                </div>
+              </div>
+              <input type="range" id="bal-rng-sweq" min="0" max="4" step="0.1" value="${data.sweepEquityDelay !== undefined ? data.sweepEquityDelay : 2.1}" style="width: 100%; accent-color: #c084fc; cursor: pointer;" />
+            </div>
+          </div>
+
+          <!-- HUD Floating Animation Stagger Delays -->
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1; text-transform: uppercase;">4 HUD Cards Stagger Delays</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Assets:</span>
+                  <span id="bal-lbl-card-a-del" style="color: #fff; font-family: monospace;">${data.cardAssetsDelay !== undefined ? data.cardAssetsDelay : 0}s</span>
+                </div>
+                <input type="range" id="bal-rng-card-a-del" min="0" max="3" step="0.1" value="${data.cardAssetsDelay !== undefined ? data.cardAssetsDelay : 0}" style="width: 100%; accent-color: #34d399;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Status:</span>
+                  <span id="bal-lbl-card-s-del" style="color: #fff; font-family: monospace;">${data.cardStatusDelay !== undefined ? data.cardStatusDelay : 0.6}s</span>
+                </div>
+                <input type="range" id="bal-rng-card-s-del" min="0" max="3" step="0.1" value="${data.cardStatusDelay !== undefined ? data.cardStatusDelay : 0.6}" style="width: 100%; accent-color: #cbd5e1;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Liabilities:</span>
+                  <span id="bal-lbl-card-l-del" style="color: #fff; font-family: monospace;">${data.cardLiabDelay !== undefined ? data.cardLiabDelay : 1.2}s</span>
+                </div>
+                <input type="range" id="bal-rng-card-l-del" min="0" max="3" step="0.1" value="${data.cardLiabDelay !== undefined ? data.cardLiabDelay : 1.2}" style="width: 100%; accent-color: #f87171;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8;">
+                  <span>Equity:</span>
+                  <span id="bal-lbl-card-e-del" style="color: #fff; font-family: monospace;">${data.cardEquityDelay !== undefined ? data.cardEquityDelay : 1.8}s</span>
+                </div>
+                <input type="range" id="bal-rng-card-e-del" min="0" max="3" step="0.1" value="${data.cardEquityDelay !== undefined ? data.cardEquityDelay : 1.8}" style="width: 100%; accent-color: #a78bfa;" />
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 11px;">
+          <!-- Header -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 13px;">🏛️</span>
+              <span style="font-size: 11px; font-weight: 700; color: #f1f5f9; text-transform: uppercase; letter-spacing: 0.5px;">BALANCE SHEET CONTROLS</span>
+            </div>
+            <span style="font-size: 9px; color: #10b981; font-weight: 700; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); padding: 1px 6px; border-radius: 4px;">TOP PRIORITY</span>
+          </div>
+
+          <!-- Tab Bar -->
+          ${tabNavHtml}
+
+          <!-- Tab Active Panel -->
+          ${tabContentHtml}
 
           ${window.tplBuildUniversalBgHtml ? window.tplBuildUniversalBgHtml(data) : ''}
         </div>
@@ -9269,65 +9854,322 @@
 
       if (window.tplWireUniversalBgControls) window.tplWireUniversalBgControls(tplId, container);
 
-      // Event Listeners
-      const presetSel = container.querySelector('#bal-preset-select');
-      if (presetSel) {
-        presetSel.onchange = (e) => {
-          const idx = parseInt(e.target.value, 10);
-          if (!isNaN(idx) && presets[idx]) {
-            const p = presets[idx];
-            window.tplSetContextualData('balance', {
-              company: p.company,
-              period: p.period,
-              assetsTotal: p.assetsTotal,
-              liabilitiesTotal: p.liabilitiesTotal,
-              equityTotal: p.equityTotal,
-              assets: p.assetsTotal,
-              liabilities: p.liabilitiesTotal,
-              netWorth: p.equityTotal,
-              assetRows: p.assetRows,
-              liabRows: p.liabRows
-            });
-            window.tplRenderContextualInspector('balance');
-          }
+      // Tab switcher event listeners
+      container.querySelectorAll('.bal-tab-btn').forEach(btn => {
+        btn.onclick = () => {
+          const tab = btn.dataset.tab;
+          window.tplSetContextualData('balance', { _activeBalanceTab: tab });
+          window.tplRenderContextualInspector('balance');
+        };
+      });
+
+      // EVENT LISTENERS: TAB 1 (Document & Rows)
+      if (curTab === 'doc') {
+        const presetSel = container.querySelector('#bal-preset-select');
+        if (presetSel) {
+          presetSel.onchange = (e) => {
+            const idx = parseInt(e.target.value, 10);
+            if (!isNaN(idx) && presets[idx]) {
+              const p = presets[idx];
+              window.tplSetContextualData('balance', {
+                company: p.company,
+                period: p.period,
+                assetsTotal: p.assetsTotal,
+                liabilitiesTotal: p.liabilitiesTotal,
+                equityTotal: p.equityTotal,
+                assets: p.assetsTotal,
+                liabilities: p.liabilitiesTotal,
+                netWorth: p.equityTotal,
+                cardAssetsVal: p.cardAssetsVal || p.assetsTotal,
+                cardLiabVal: p.cardLiabVal || p.liabilitiesTotal,
+                cardEquityVal: p.cardEquityVal || p.equityTotal,
+                assetRows: p.assetRows,
+                liabRows: p.liabRows
+              });
+              window.tplRenderContextualInspector('balance');
+            }
+          };
+        }
+
+        const btnArch = container.querySelector('#bal-theme-archival');
+        if (btnArch) btnArch.onclick = () => {
+          window.tplSetContextualData('balance', { theme: 'archival' });
+          window.tplRenderContextualInspector('balance');
+        };
+
+        const btnBloom = container.querySelector('#bal-theme-bloomberg');
+        if (btnBloom) btnBloom.onclick = () => {
+          window.tplSetContextualData('balance', { theme: 'bloomberg' });
+          window.tplRenderContextualInspector('balance');
+        };
+
+        const inpComp = container.querySelector('#bal-inp-company');
+        if (inpComp) inpComp.oninput = (e) => window.tplSetContextualData('balance', { company: e.target.value });
+
+        const inpPer = container.querySelector('#bal-inp-period');
+        if (inpPer) inpPer.oninput = (e) => window.tplSetContextualData('balance', { period: e.target.value });
+
+        const inpAss = container.querySelector('#bal-inp-assets');
+        if (inpAss) inpAss.oninput = (e) => window.tplSetContextualData('balance', { assetsTotal: e.target.value, assets: e.target.value });
+
+        const inpLiab = container.querySelector('#bal-inp-liab');
+        if (inpLiab) inpLiab.oninput = (e) => window.tplSetContextualData('balance', { liabilitiesTotal: e.target.value, liabilities: e.target.value });
+
+        const inpEq = container.querySelector('#bal-inp-equity');
+        if (inpEq) inpEq.oninput = (e) => window.tplSetContextualData('balance', { equityTotal: e.target.value, netWorth: e.target.value });
+
+        // Asset rows item editors
+        container.querySelectorAll('.bal-asset-row-name').forEach(inp => {
+          inp.oninput = (e) => {
+            const idx = parseInt(e.target.dataset.idx, 10);
+            const rows = [...curAssetRows];
+            if (rows[idx]) {
+              rows[idx] = Object.assign({}, rows[idx], { name: e.target.value });
+              window.tplSetContextualData('balance', { assetRows: rows });
+            }
+          };
+        });
+        container.querySelectorAll('.bal-asset-row-val').forEach(inp => {
+          inp.oninput = (e) => {
+            const idx = parseInt(e.target.dataset.idx, 10);
+            const rows = [...curAssetRows];
+            if (rows[idx]) {
+              rows[idx] = Object.assign({}, rows[idx], { val: e.target.value });
+              window.tplSetContextualData('balance', { assetRows: rows });
+            }
+          };
+        });
+
+        // Liability rows item editors
+        container.querySelectorAll('.bal-liab-row-name').forEach(inp => {
+          inp.oninput = (e) => {
+            const idx = parseInt(e.target.dataset.idx, 10);
+            const rows = [...curLiabRows];
+            if (rows[idx]) {
+              rows[idx] = Object.assign({}, rows[idx], { name: e.target.value });
+              window.tplSetContextualData('balance', { liabRows: rows });
+            }
+          };
+        });
+        container.querySelectorAll('.bal-liab-row-val').forEach(inp => {
+          inp.oninput = (e) => {
+            const idx = parseInt(e.target.dataset.idx, 10);
+            const rows = [...curLiabRows];
+            if (rows[idx]) {
+              rows[idx] = Object.assign({}, rows[idx], { val: e.target.value });
+              window.tplSetContextualData('balance', { liabRows: rows });
+            }
+          };
+        });
+
+        // Stamp controls
+        const chkStamp = container.querySelector('#bal-chk-stamp');
+        if (chkStamp) chkStamp.onchange = (e) => window.tplSetContextualData('balance', { stampEnabled: e.target.checked });
+
+        const colStamp = container.querySelector('#bal-col-stamp');
+        if (colStamp) colStamp.oninput = (e) => window.tplSetContextualData('balance', { stampColor: e.target.value });
+
+        const inpStampTop = container.querySelector('#bal-inp-stamptop');
+        if (inpStampTop) inpStampTop.oninput = (e) => window.tplSetContextualData('balance', { stampTop: e.target.value });
+
+        const inpStampMain = container.querySelector('#bal-inp-stampmain');
+        if (inpStampMain) inpStampMain.oninput = (e) => window.tplSetContextualData('balance', { stampMain: e.target.value });
+
+        const inpStampSub = container.querySelector('#bal-inp-stampsub');
+        if (inpStampSub) inpStampSub.oninput = (e) => window.tplSetContextualData('balance', { stampSub: e.target.value });
+
+        // Depth of field & line mystery listeners
+        const chkDof = container.querySelector('#bal-chk-dof');
+        if (chkDof) chkDof.onchange = (e) => window.tplSetContextualData('balance', { dofFocusEnabled: e.target.checked });
+
+        const rngBlur = container.querySelector('#bal-rng-unfocus-blur');
+        if (rngBlur) rngBlur.oninput = (e) => {
+          const v = parseFloat(e.target.value);
+          const lbl = container.querySelector('#bal-lbl-unfocus-blur');
+          const lblDof = container.querySelector('#bal-lbl-dof-val');
+          if (lbl) lbl.textContent = `${v}px`;
+          if (lblDof) lblDof.textContent = `${v}px`;
+          window.tplSetContextualData('balance', { unfocusedBlur: v });
+        };
+
+        const rngOp = container.querySelector('#bal-rng-unfocus-op');
+        if (rngOp) rngOp.oninput = (e) => {
+          const v = parseFloat(e.target.value);
+          const lbl = container.querySelector('#bal-lbl-unfocus-op');
+          if (lbl) lbl.textContent = `${Math.round(v * 100)}%`;
+          window.tplSetContextualData('balance', { unfocusedOpacity: v });
+        };
+
+        const rngLineAlpha = container.querySelector('#bal-rng-line-alpha');
+        if (rngLineAlpha) rngLineAlpha.oninput = (e) => {
+          const v = parseFloat(e.target.value);
+          const lbl = container.querySelector('#bal-lbl-line-alpha');
+          if (lbl) lbl.textContent = `${Math.round(v * 100)}%`;
+          window.tplSetContextualData('balance', { lineAlpha: v, leaderAlpha: Math.max(0.12, v * 0.8) });
+        };
+
+        const rngCamTilt = container.querySelector('#bal-rng-cam-tilt');
+        if (rngCamTilt) rngCamTilt.oninput = (e) => {
+          const v = parseFloat(e.target.value);
+          const lbl = container.querySelector('#bal-lbl-cam-tilt');
+          if (lbl) lbl.textContent = `${v}°`;
+          window.tplSetContextualData('balance', { cameraTilt: v });
         };
       }
 
-      const btnArch = container.querySelector('#bal-theme-archival');
-      if (btnArch) btnArch.onclick = () => {
-        window.tplSetContextualData('balance', { theme: 'archival' });
-        window.tplRenderContextualInspector('balance');
-      };
+      // EVENT LISTENERS: TAB 2 (4 HUD Cards)
+      if (curTab === 'cards') {
+        // Card 1
+        const colC1 = container.querySelector('#bal-col-card-assets');
+        if (colC1) colC1.oninput = (e) => window.tplSetContextualData('balance', { cardAssetsDot: e.target.value, assetColor: e.target.value });
+        const c1Tag = container.querySelector('#bal-inp-card1-tag');
+        if (c1Tag) c1Tag.oninput = (e) => window.tplSetContextualData('balance', { cardAssetsTag: e.target.value });
+        const c1Val = container.querySelector('#bal-inp-card1-val');
+        if (c1Val) c1Val.oninput = (e) => window.tplSetContextualData('balance', { cardAssetsVal: e.target.value });
+        const c1Pct = container.querySelector('#bal-inp-card1-pct');
+        if (c1Pct) c1Pct.oninput = (e) => window.tplSetContextualData('balance', { cardAssetsPct: e.target.value });
+        const c1Sub = container.querySelector('#bal-inp-card1-sub');
+        if (c1Sub) c1Sub.oninput = (e) => window.tplSetContextualData('balance', { cardAssetsSub: e.target.value });
 
-      const btnBloom = container.querySelector('#bal-theme-bloomberg');
-      if (btnBloom) btnBloom.onclick = () => {
-        window.tplSetContextualData('balance', { theme: 'bloomberg' });
-        window.tplRenderContextualInspector('balance');
-      };
+        // Card 2
+        const colC2 = container.querySelector('#bal-col-card-status');
+        if (colC2) colC2.oninput = (e) => window.tplSetContextualData('balance', { cardStatusDot: e.target.value });
+        const c2Tag = container.querySelector('#bal-inp-card2-tag');
+        if (c2Tag) c2Tag.oninput = (e) => window.tplSetContextualData('balance', { cardStatusTag: e.target.value });
+        const c2Val = container.querySelector('#bal-inp-card2-val');
+        if (c2Val) c2Val.oninput = (e) => window.tplSetContextualData('balance', { cardStatusVal: e.target.value });
+        const c2Sub = container.querySelector('#bal-inp-card2-sub');
+        if (c2Sub) c2Sub.oninput = (e) => window.tplSetContextualData('balance', { cardStatusSub: e.target.value });
+        const c2Chk = container.querySelector('#bal-chk-card2-icon');
+        if (c2Chk) c2Chk.onchange = (e) => window.tplSetContextualData('balance', { cardStatusCheck: e.target.checked });
 
-      const inpComp = container.querySelector('#bal-inp-company');
-      if (inpComp) inpComp.oninput = (e) => window.tplSetContextualData('balance', { company: e.target.value });
+        // Card 3
+        const colC3 = container.querySelector('#bal-col-card-liab');
+        if (colC3) colC3.oninput = (e) => window.tplSetContextualData('balance', { cardLiabDot: e.target.value, liabColor: e.target.value });
+        const c3Tag = container.querySelector('#bal-inp-card3-tag');
+        if (c3Tag) c3Tag.oninput = (e) => window.tplSetContextualData('balance', { cardLiabTag: e.target.value });
+        const c3Val = container.querySelector('#bal-inp-card3-val');
+        if (c3Val) c3Val.oninput = (e) => window.tplSetContextualData('balance', { cardLiabVal: e.target.value });
+        const c3Pct = container.querySelector('#bal-inp-card3-pct');
+        if (c3Pct) c3Pct.oninput = (e) => window.tplSetContextualData('balance', { cardLiabPct: e.target.value });
+        const c3Sub = container.querySelector('#bal-inp-card3-sub');
+        if (c3Sub) c3Sub.oninput = (e) => window.tplSetContextualData('balance', { cardLiabSub: e.target.value });
 
-      const inpPer = container.querySelector('#bal-inp-period');
-      if (inpPer) inpPer.oninput = (e) => window.tplSetContextualData('balance', { period: e.target.value });
+        // Card 4
+        const colC4 = container.querySelector('#bal-col-card-equity');
+        if (colC4) colC4.oninput = (e) => window.tplSetContextualData('balance', { cardEquityDot: e.target.value, equityColor: e.target.value });
+        const c4Tag = container.querySelector('#bal-inp-card4-tag');
+        if (c4Tag) c4Tag.oninput = (e) => window.tplSetContextualData('balance', { cardEquityTag: e.target.value });
+        const c4Val = container.querySelector('#bal-inp-card4-val');
+        if (c4Val) c4Val.oninput = (e) => window.tplSetContextualData('balance', { cardEquityVal: e.target.value });
+        const c4Pct = container.querySelector('#bal-inp-card4-pct');
+        if (c4Pct) c4Pct.oninput = (e) => window.tplSetContextualData('balance', { cardEquityPct: e.target.value });
+        const c4Sub = container.querySelector('#bal-inp-card4-sub');
+        if (c4Sub) c4Sub.oninput = (e) => window.tplSetContextualData('balance', { cardEquitySub: e.target.value });
+      }
 
-      const inpAss = container.querySelector('#bal-inp-assets');
-      if (inpAss) inpAss.oninput = (e) => window.tplSetContextualData('balance', { assetsTotal: e.target.value, assets: e.target.value });
+      // EVENT LISTENERS: TAB 3 (Timeline Timing)
+      if (curTab === 'timing') {
+        const rngOrbit = container.querySelector('#bal-rng-orbit');
+        if (rngOrbit) {
+          rngOrbit.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-orbit'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { sceneOrbitDur: v });
+          };
+        }
 
-      const inpLiab = container.querySelector('#bal-inp-liab');
-      if (inpLiab) inpLiab.oninput = (e) => window.tplSetContextualData('balance', { liabilitiesTotal: e.target.value, liabilities: e.target.value });
+        const rngStampDelay = container.querySelector('#bal-rng-stamp-delay');
+        if (rngStampDelay) {
+          rngStampDelay.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-stamp-delay'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { stampDelay: v });
+          };
+        }
 
-      const inpEq = container.querySelector('#bal-inp-equity');
-      if (inpEq) inpEq.oninput = (e) => window.tplSetContextualData('balance', { equityTotal: e.target.value, netWorth: e.target.value });
+        // Sweeps
+        const rngSw1 = container.querySelector('#bal-rng-sw1');
+        if (rngSw1) {
+          rngSw1.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-sw1'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { sweep1Delay: v });
+          };
+        }
+        const colSw1 = container.querySelector('#bal-col-sweep1');
+        if (colSw1) colSw1.oninput = (e) => window.tplSetContextualData('balance', { sweep1Color: e.target.value });
 
-      const colAss = container.querySelector('#bal-col-assets');
-      if (colAss) colAss.oninput = (e) => window.tplSetContextualData('balance', { assetColor: e.target.value });
+        const rngSw2 = container.querySelector('#bal-rng-sw2');
+        if (rngSw2) {
+          rngSw2.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-sw2'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { sweep2Delay: v });
+          };
+        }
+        const colSw2 = container.querySelector('#bal-col-sweep2');
+        if (colSw2) colSw2.oninput = (e) => window.tplSetContextualData('balance', { sweep2Color: e.target.value });
 
-      const colLiab = container.querySelector('#bal-col-liab');
-      if (colLiab) colLiab.oninput = (e) => window.tplSetContextualData('balance', { liabColor: e.target.value });
+        const rngSwL = container.querySelector('#bal-rng-swliab');
+        if (rngSwL) {
+          rngSwL.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-swliab'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { sweepLiabDelay: v });
+          };
+        }
+        const colSwL = container.querySelector('#bal-col-sweepliab');
+        if (colSwL) colSwL.oninput = (e) => window.tplSetContextualData('balance', { sweepLiabColor: e.target.value });
 
-      const colEq = container.querySelector('#bal-col-equity');
-      if (colEq) colEq.oninput = (e) => window.tplSetContextualData('balance', { equityColor: e.target.value });
+        const rngSwE = container.querySelector('#bal-rng-sweq');
+        if (rngSwE) {
+          rngSwE.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-sweq'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { sweepEquityDelay: v });
+          };
+        }
+        const colSwE = container.querySelector('#bal-col-sweepequity');
+        if (colSwE) colSwE.oninput = (e) => window.tplSetContextualData('balance', { sweepEquityColor: e.target.value });
+
+        // HUD Card delays
+        const rngCA = container.querySelector('#bal-rng-card-a-del');
+        if (rngCA) {
+          rngCA.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-card-a-del'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { cardAssetsDelay: v });
+          };
+        }
+
+        const rngCS = container.querySelector('#bal-rng-card-s-del');
+        if (rngCS) {
+          rngCS.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-card-s-del'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { cardStatusDelay: v });
+          };
+        }
+
+        const rngCL = container.querySelector('#bal-rng-card-l-del');
+        if (rngCL) {
+          rngCL.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-card-l-del'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { cardLiabDelay: v });
+          };
+        }
+
+        const rngCE = container.querySelector('#bal-rng-card-e-del');
+        if (rngCE) {
+          rngCE.oninput = (e) => {
+            const v = parseFloat(e.target.value);
+            const lbl = container.querySelector('#bal-lbl-card-e-del'); if (lbl) lbl.textContent = `${v}s`;
+            window.tplSetContextualData('balance', { cardEquityDelay: v });
+          };
+        }
+      }
 
       return;
     }
@@ -9991,6 +10833,183 @@
     }
 
     // =========================================================================
+    // SPECIAL HANDLER: ZOOM BLUR BURST (zoom-blur)
+    // =========================================================================
+    if (tplId === 'zoom-blur') {
+      if (wrapSec) wrapSec.style.display = 'none';
+      container.innerHTML = `
+        <div style="background: rgba(15,23,42,0.65); border: 1px solid rgba(56,189,248,0.35); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+              <span style="font-size: 11px; font-weight: 800; color: #38bdf8; text-transform: uppercase;">Zoom Blur Burst · Editorial Combo</span>
+            </div>
+            <button type="button" id="zb-btn-trigger-burst" style="font-size: 9px; font-weight: 800; color: #0284c7; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.5); padding: 3px 8px; border-radius: 4px; cursor: pointer;">
+              ⚡ Trigger Burst
+            </button>
+          </div>
+
+          <!-- Headline & Kicker -->
+          <div style="display: flex; flex-direction: column; gap: 3px;">
+            <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Kinetic Headline (Bursts forward)</span>
+            <input type="text" id="zb-inp-hl" value="${data.headline || 'THE MASTERMIND'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;" />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Top Accolade / Kicker</span>
+              <input type="text" id="zb-inp-kic" value="${data.kicker || '[ 00:01:28 · TARGET IDENTIFIED ]'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 4px 6px; color: #fbbf24; font-size: 9.5px; font-weight: 700;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span style="font-size: 8.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Subline</span>
+              <input type="text" id="zb-inp-sub" value="${data.subline || 'RADIAL BURST // PIN-SHARP CUTOUT'}" style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 4px 6px; color: #38bdf8; font-size: 9.5px; font-weight: 700;" />
+            </div>
+          </div>
+
+          <!-- Color Pickers -->
+          <div style="display: flex; gap: 12px; align-items: center; background: rgba(0,0,0,0.25); padding: 6px 10px; border-radius: 6px;">
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Headline:</span>
+              <input type="color" id="zb-inp-tcol" value="${data.textColor || '#ffffff'}" style="width:20px;height:20px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Accent Cyan:</span>
+              <input type="color" id="zb-inp-acol" value="${data.accentColor || '#38bdf8'}" style="width:20px;height:20px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+            <div style="display: flex; gap: 4px; align-items: center;">
+              <span style="font-size: 8.5px; color: #94a3b8;">Kicker Amber:</span>
+              <input type="color" id="zb-inp-kcol" value="${data.kickerColor || '#fbbf24'}" style="width:20px;height:20px;border:none;background:transparent;cursor:pointer;" />
+            </div>
+          </div>
+
+          <!-- Subject Cutout Preset Switcher -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Foreground Cutout Subject</span>
+              <label style="font-size: 8.5px; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); padding: 2px 6px; border-radius: 3px; cursor: pointer;">
+                + Upload Cutout
+                <input type="file" id="zb-up-cutout" accept="image/*" style="display:none;" />
+              </label>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;">
+              <button type="button" class="zb-preset-cutout-btn" data-cutout="/ceo_portrait_alpha_cutout.png" style="background: ${data.subjectUrl === '/ceo_portrait_alpha_cutout.png' ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.subjectUrl === '/ceo_portrait_alpha_cutout.png' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8.5px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                Executive CEO
+              </button>
+              <button type="button" class="zb-preset-cutout-btn" data-cutout="/laptop_guy_cutout.png" style="background: ${data.subjectUrl === '/laptop_guy_cutout.png' ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.subjectUrl === '/laptop_guy_cutout.png' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8.5px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                Investigator
+              </button>
+              <button type="button" class="zb-preset-cutout-btn" data-cutout="/hiker_cutout_clean_final.png" style="background: ${data.subjectUrl === '/hiker_cutout_clean_final.png' ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.subjectUrl === '/hiker_cutout_clean_final.png' ? '#38bdf8' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8.5px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                Outdoor Figure
+              </button>
+            </div>
+          </div>
+
+          <!-- Background Scene Preset Switcher -->
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Background Scene (Radial Blur Pass)</span>
+              <label style="font-size: 8.5px; font-weight: 700; color: #fbbf24; background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.4); padding: 2px 6px; border-radius: 3px; cursor: pointer;">
+                + Upload Scene
+                <input type="file" id="zb-up-scene" accept="image/*" style="display:none;" />
+              </label>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;">
+              <button type="button" class="zb-preset-scene-btn" data-scene="/boardroom_scene_hd.jpg" style="background: ${data.sceneUrl === '/boardroom_scene_hd.jpg' ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.sceneUrl === '/boardroom_scene_hd.jpg' ? '#fbbf24' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                Boardroom
+              </button>
+              <button type="button" class="zb-preset-scene-btn" data-scene="/tokyo_1987_cinematic.jpg" style="background: ${data.sceneUrl === '/tokyo_1987_cinematic.jpg' ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.sceneUrl === '/tokyo_1987_cinematic.jpg' ? '#fbbf24' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                Tokyo Night
+              </button>
+              <button type="button" class="zb-preset-scene-btn" data-scene="/clean_terminal_warroom_plate.png" style="background: ${data.sceneUrl === '/clean_terminal_warroom_plate.png' ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.sceneUrl === '/clean_terminal_warroom_plate.png' ? '#fbbf24' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                War Room
+              </button>
+              <button type="button" class="zb-preset-scene-btn" data-scene="/cctv_surveillance_scene.jpg" style="background: ${data.sceneUrl === '/cctv_surveillance_scene.jpg' ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.05)'}; border: 1px solid ${data.sceneUrl === '/cctv_surveillance_scene.jpg' ? '#fbbf24' : 'rgba(255,255,255,0.1)'}; color: #e2e8f0; font-size: 8px; font-weight: 700; padding: 4px; border-radius: 4px; cursor: pointer;">
+                Bank CCTV
+              </button>
+            </div>
+          </div>
+
+          <!-- Sliders: Blur Intensity & Shutter -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                <span>Radial Blur Intensity</span>
+                <span id="zb-lbl-blur">${data.blurIntensity || 14}px</span>
+              </div>
+              <input type="range" id="zb-rng-blur" min="4" max="28" value="${data.blurIntensity || 14}" style="width: 100%; accent-color: #38bdf8;" />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                <span>Forward Burst Zoom</span>
+                <span id="zb-lbl-zoom">${((data.zoomScale || 1.35) * 100).toFixed(0)}%</span>
+              </div>
+              <input type="range" id="zb-rng-zoom" min="110" max="170" value="${Math.round((data.zoomScale || 1.35) * 100)}" style="width: 100%; accent-color: #fbbf24;" />
+            </div>
+          </div>
+        </div>
+      `;
+
+      container.querySelector('#zb-inp-hl')?.addEventListener('input', e => window.tplSetContextualData('zoom-blur', { headline: e.target.value }));
+      container.querySelector('#zb-inp-kic')?.addEventListener('input', e => window.tplSetContextualData('zoom-blur', { kicker: e.target.value }));
+      container.querySelector('#zb-inp-sub')?.addEventListener('input', e => window.tplSetContextualData('zoom-blur', { subline: e.target.value }));
+      container.querySelector('#zb-inp-tcol')?.addEventListener('input', e => window.tplSetContextualData('zoom-blur', { textColor: e.target.value }));
+      container.querySelector('#zb-inp-acol')?.addEventListener('input', e => window.tplSetContextualData('zoom-blur', { accentColor: e.target.value }));
+      container.querySelector('#zb-inp-kcol')?.addEventListener('input', e => window.tplSetContextualData('zoom-blur', { kickerColor: e.target.value }));
+
+      container.querySelectorAll('.zb-preset-cutout-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const c = btn.getAttribute('data-cutout');
+          window.tplSetContextualData('zoom-blur', { subjectUrl: c });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('zoom-blur');
+        });
+      });
+
+      container.querySelectorAll('.zb-preset-scene-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const s = btn.getAttribute('data-scene');
+          window.tplSetContextualData('zoom-blur', { sceneUrl: s });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('zoom-blur');
+        });
+      });
+
+      container.querySelector('#zb-up-cutout')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) {
+          window.tplSetContextualData('zoom-blur', { subjectUrl: URL.createObjectURL(f) });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('zoom-blur');
+        }
+      });
+
+      container.querySelector('#zb-up-scene')?.addEventListener('change', e => {
+        const f = e.target.files && e.target.files[0];
+        if (f) {
+          window.tplSetContextualData('zoom-blur', { sceneUrl: URL.createObjectURL(f) });
+          if (typeof window.tplRenderContextualInspector === 'function') window.tplRenderContextualInspector('zoom-blur');
+        }
+      });
+
+      container.querySelector('#zb-rng-blur')?.addEventListener('input', e => {
+        const v = parseInt(e.target.value, 10);
+        const lbl = container.querySelector('#zb-lbl-blur');
+        if (lbl) lbl.textContent = `${v}px`;
+        window.tplSetContextualData('zoom-blur', { blurIntensity: v });
+      });
+
+      container.querySelector('#zb-rng-zoom')?.addEventListener('input', e => {
+        const v = parseInt(e.target.value, 10) / 100;
+        const lbl = container.querySelector('#zb-lbl-zoom');
+        if (lbl) lbl.textContent = `${(v * 100).toFixed(0)}%`;
+        window.tplSetContextualData('zoom-blur', { zoomScale: v });
+      });
+
+      container.querySelector('#zb-btn-trigger-burst')?.addEventListener('click', () => {
+        if (typeof window.triggerZoomBlurBurst === 'function') window.triggerZoomBlurBurst();
+      });
+
+      return;
+    }
+
+    // =========================================================================
     // SPECIAL HANDLER: SECURITY CAMERA OVERLAY (security-camera)
     // =========================================================================
     if (tplId === 'security-camera') {
@@ -10060,107 +11079,187 @@
       if (wrapPrim) wrapPrim.style.display = 'none';
       if (wrapSec) wrapSec.style.display = 'none';
 
-      const curTitle = data.title !== undefined ? data.title : (data.goal || 'PROJECT FUNDING STATUS');
-      const curSub = data.subtitle !== undefined ? data.subtitle : '[PHASE 2 / 3 ACTIVE]';
+      const stylePreset = data.stylePreset || 'documentary';
+      const curEyebrow = data.eyebrow !== undefined ? data.eyebrow : 'PROJECT FUNDING';
+      const curTitle = (data.title !== undefined && data.title !== 'PROJECT FUNDING STATUS') ? data.title : 'Funding Progress';
+      const curPhaseLabel = data.phaseLabel !== undefined ? data.phaseLabel : 'Phase 2 of 3';
+      const curPhaseStatus = data.phaseStatus !== undefined ? data.phaseStatus : 'Active';
       const curPct = (data.percent !== undefined) ? String(data.percent).replace(/[^0-9.]/g, '') : '74';
-      const curRaised = data.currentAmount !== undefined ? data.currentAmount : (data.amount || '$74,000,000 Raised');
-      const curTarget = data.targetAmount !== undefined ? data.targetAmount : 'Target: $100,000,000';
-      const gradStart = data.gradientStart || '#ff007f';
-      const gradEnd = data.gradientEnd || '#00e5ff';
-      const barWidth = data.barWidthPercent !== undefined ? Number(data.barWidthPercent) : 68;
+      const curCalloutSub = data.calloutSublabel !== undefined ? data.calloutSublabel : 'of target';
+      const curRaisedVal = data.raisedValue !== undefined ? data.raisedValue : '$74,000,000';
+      const curRaisedLbl = data.raisedLabel !== undefined ? data.raisedLabel : 'Raised';
+      const curTargetVal = data.targetValue !== undefined ? data.targetValue : '$100,000,000';
+      const curTargetLbl = data.targetLabel !== undefined ? data.targetLabel : 'Target';
+      const gradStart = (data.gradientStart && data.gradientStart !== '#ff007f') ? data.gradientStart : '#7c3aed';
+      const gradEnd = (data.gradientEnd && data.gradientEnd !== '#00e5ff') ? data.gradientEnd : '#38bdf8';
+      const barWidth = data.barWidthPercent !== undefined ? Number(data.barWidthPercent) : 70;
+      const barThickness = data.barThickness !== undefined ? Number(data.barThickness) : 8;
+      const posX = Math.round(Number(data.posX || 0));
+      const posY = Math.round(Number(data.posY || 0));
+
+      const HUD_STYLE_DIRECTIONS = [
+        { id: 'documentary', badge: 'A · DEFAULT', title: 'Premium Documentary', desc: 'Restrained violet-to-blue, speech callout, financial storytelling' },
+        { id: 'tech', badge: 'B · TECH', title: 'Cinematic Technology', desc: 'Clean precision ticks & restrained cyan-blue telemetry' },
+        { id: 'editorial', badge: 'C · EDITORIAL', title: 'Editorial Storytelling', desc: 'High-contrast serif figures & minimal investigative rule' }
+      ];
 
       const HUD_GRAD_PRESETS = [
-        { label: 'Cyber Magenta / Cyan', start: '#ff007f', end: '#00e5ff' },
-        { label: 'Gold / Electric Blue', start: '#f59e0b', end: '#38bdf8' },
-        { label: 'Emerald / Mint Glow', start: '#10b981', end: '#34d399' },
-        { label: 'Sunset Red / Amber', start: '#ef4444', end: '#f59e0b' }
+        { label: 'Restrained Violet → Blue', start: '#7c3aed', end: '#38bdf8' },
+        { label: 'Institutional Blue → Cyan', start: '#2563eb', end: '#06b6d4' },
+        { label: 'Emerald Sovereign', start: '#059669', end: '#34d399' },
+        { label: 'Editorial Gold → Amber', start: '#d97706', end: '#fbbf24' }
       ];
 
       container.innerHTML = `
-        <div style="background: rgba(4,8,18,0.85); border: 1px solid rgba(0,229,255,0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 0 25px rgba(0,229,255,0.08);">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 6px;">
+        <div style="background: rgba(8,12,24,0.92); border: 1px solid rgba(124,58,237,0.35); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 11px; box-shadow: 0 10px 30px rgba(0,0,0,0.65);">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 7px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 13px;">💎</span>
-              <span style="font-size: 11px; font-weight: 800; color: #00e5ff; text-transform: uppercase; letter-spacing: 0.5px;">Cinematic Progress HUD</span>
+              <span style="width: 3px; height: 12px; border-radius: 2px; background: #7c3aed; display: inline-block;"></span>
+              <span style="font-size: 11px; font-weight: 800; color: #f8fafc; text-transform: uppercase; letter-spacing: 0.6px;">Documentary Progress Studio</span>
             </div>
-            <span style="font-size: 9px; color: #ff007f; font-weight: 800; background: rgba(255,0,127,0.18); border: 1px solid rgba(255,0,127,0.35); padding: 2px 6px; border-radius: 4px;">VOLUMETRIC GLASS</span>
+            <span style="font-size: 8.5px; color: #c4b5fd; font-weight: 700; background: rgba(124,58,237,0.18); border: 1px solid rgba(124,58,237,0.38); padding: 2px 7px; border-radius: 999px;">${stylePreset.toUpperCase()}</span>
           </div>
 
-          <!-- Section 1: Typography & Meta Stack -->
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Header Title</span>
-            <input type="text" id="hud-inp-title" value="${curTitle}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #fff; font-size: 11px; font-weight: 700; outline: none;" />
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 3px;">
-            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Metadata Tag / Status Badge</span>
-            <input type="text" id="hud-inp-subtitle" value="${curSub}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 6px 8px; color: #34d399; font-family: monospace; font-size: 11px; font-weight: 700; outline: none;" />
-          </div>
-
-          <!-- Section 2: Progress Metrics & Real-time Live Tracking -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 800; color: #94a3b8;">
-                <span>PROGRESS</span>
-                <span id="hud-val-pct" style="color: #00e5ff;">${curPct}%</span>
-              </div>
-              <input type="range" id="hud-inp-pct" min="0" max="100" step="1" value="${curPct}" style="width: 100%; accent-color: #00e5ff; height: 4px; cursor: pointer;" />
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 800; color: #94a3b8;">
-                <span>CANVAS WIDTH</span>
-                <span id="hud-val-width" style="color: #a855f7;">${barWidth}%</span>
-              </div>
-              <input type="range" id="hud-inp-width" min="45" max="85" step="1" value="${barWidth}" style="width: 100%; accent-color: #a855f7; height: 4px; cursor: pointer;" />
-            </div>
-          </div>
-
-          <!-- Section 3: Financial Callout Card Fields -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Raised Amount Metric</span>
-              <input type="text" id="hud-inp-raised" value="${curRaised}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #fff; font-size: 10.5px; font-weight: 700; outline: none;" />
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">Target Goal Sub-label</span>
-              <input type="text" id="hud-inp-target" value="${curTarget}" style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12); border-radius: 6px; padding: 5px 8px; color: #94a3b8; font-size: 10.5px; font-weight: 600; outline: none;" />
-            </div>
-          </div>
-
-          <!-- Section 4: Dual-Tone Neon Theme Presets -->
+          <!-- Section 1: 3 Selectable Visual Directions (Shared Data & Animation) -->
           <div style="display: flex; flex-direction: column; gap: 5px;">
-            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Neon Fill Gradient</span>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 8.5px; font-weight: 800; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px;">Visual Direction (Preserves Data)</span>
+              <span style="font-size: 8px; color: #94a3b8;">3 Styles</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+              ${HUD_STYLE_DIRECTIONS.map(dir => {
+                const active = stylePreset === dir.id;
+                return `
+                  <button type="button" class="hud-style-dir-btn" data-style="${dir.id}" style="padding: 7px 6px; border-radius: 7px; border: 1.5px solid ${active ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}; background: ${active ? 'rgba(124,58,237,0.22)' : 'rgba(0,0,0,0.38)'}; color: ${active ? '#fff' : '#94a3b8'}; cursor: pointer; text-align: left; display: flex; flex-direction: column; gap: 2px; transition: all 0.15s;">
+                    <span style="font-size: 7.5px; font-weight: 800; color: ${active ? '#c4b5fd' : '#64748b'}; letter-spacing: 0.5px;">${dir.badge}</span>
+                    <span style="font-size: 9.5px; font-weight: 700; color: ${active ? '#fff' : '#cbd5e1'}; line-height: 1.15;">${dir.title}</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <!-- Section 2: Header Hierarchy (Eyebrow, Title, Phase Pill) -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 9px;">
+            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Header &amp; Phase Indicator</span>
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 6px;">
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">EYEBROW TAG</span>
+                <input type="text" id="hud-inp-eyebrow" value="${curEyebrow.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; font-weight: 700; outline: none;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">MAIN HEADING</span>
+                <input type="text" id="hud-inp-title" value="${curTitle.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #fff; font-size: 10.5px; font-weight: 600; outline: none;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 6px;">
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">PHASE LABEL</span>
+                <input type="text" id="hud-inp-phase-label" value="${curPhaseLabel.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #cbd5e1; font-size: 10px; outline: none;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">PHASE STATUS</span>
+                <input type="text" id="hud-inp-phase-status" value="${curPhaseStatus.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #94a3b8; font-size: 10px; outline: none;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Progress Endpoint & Integrated Financial Figures -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 9px;">
+            <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 8px; align-items: end;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; font-weight: 800; color: #cbd5e1; margin-bottom: 3px;">
+                  <span>PROGRESS ENDPOINT</span>
+                  <span id="hud-val-pct" style="color: #38bdf8; font-family: monospace;">${curPct}%</span>
+                </div>
+                <input type="range" id="hud-inp-pct" min="0" max="100" step="1" value="${curPct}" style="width: 100%; accent-color: #38bdf8; height: 4px; cursor: pointer;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">BADGE SUB-LABEL</span>
+                <input type="text" id="hud-inp-callout-sub" value="${curCalloutSub.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 4px 7px; color: #cbd5e1; font-size: 10px; outline: none;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px; margin-top: 2px;">
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">PRIMARY FIGURE (RAISED)</span>
+                <input type="text" id="hud-inp-raised-val" value="${curRaisedVal.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #fff; font-size: 10.5px; font-weight: 700; outline: none;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">PRIMARY LABEL</span>
+                <input type="text" id="hud-inp-raised-lbl" value="${curRaisedLbl.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #94a3b8; font-size: 10px; outline: none;" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px;">
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">SECONDARY FIGURE (TARGET)</span>
+                <input type="text" id="hud-inp-target-val" value="${curTargetVal.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #cbd5e1; font-size: 10.5px; font-weight: 600; outline: none;" />
+              </div>
+              <div>
+                <span style="font-size: 7.5px; color: #64748b; display: block; margin-bottom: 2px;">SECONDARY LABEL</span>
+                <input type="text" id="hud-inp-target-lbl" value="${curTargetLbl.replace(/"/g, '&quot;')}" style="width: 100%; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.12); border-radius: 5px; padding: 5px 7px; color: #64748b; font-size: 10px; outline: none;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Composition Size, Proportional Scaling & Track Styling -->
+          <div style="display: flex; flex-direction: column; gap: 6px; background: rgba(15,23,42,0.55); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 9px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Composition Scale &amp; Track Geometry</span>
+              <button type="button" id="hud-btn-reset-layout" style="padding: 1px 6px; font-size: 8px; font-weight: 700; border-radius: 4px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: #cbd5e1; cursor: pointer;">Reset 70%</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>CANVAS WIDTH</span>
+                  <span id="hud-val-width" style="color: #c4b5fd; font-family: monospace;">${barWidth}%</span>
+                </div>
+                <input type="range" id="hud-inp-width" min="40" max="92" step="1" value="${barWidth}" style="width: 100%; accent-color: #8b5cf6; height: 3px; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>BAR THICKNESS</span>
+                  <span id="hud-val-thick" style="color: #38bdf8; font-family: monospace;">${barThickness}px</span>
+                </div>
+                <input type="range" id="hud-inp-thick" min="4" max="16" step="1" value="${barThickness}" style="width: 100%; accent-color: #38bdf8; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>OFFSET X</span>
+                  <span id="hud-val-posx" style="color: #94a3b8; font-family: monospace;">${posX}px</span>
+                </div>
+                <input type="range" id="hud-inp-posx" min="-220" max="220" step="1" value="${posX}" style="width: 100%; accent-color: #8b5cf6; height: 3px; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 8px; color: #94a3b8;">
+                  <span>OFFSET Y</span>
+                  <span id="hud-val-posy" style="color: #94a3b8; font-family: monospace;">${posY}px</span>
+                </div>
+                <input type="range" id="hud-inp-posy" min="-160" max="160" step="1" value="${posY}" style="width: 100%; accent-color: #8b5cf6; height: 3px; cursor: pointer;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 5: Signature Accent Color Palette -->
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-size: 8px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Signature Accent Gradient</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
               ${HUD_GRAD_PRESETS.map(p => `
-                <button type="button" class="hud-grad-preset-btn" data-start="${p.start}" data-end="${p.end}" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid ${gradStart === p.start ? '#00e5ff' : 'rgba(255,255,255,0.08)'}; background: ${gradStart === p.start ? 'rgba(0,229,255,0.15)' : 'rgba(0,0,0,0.4)'}; color: #cbd5e1; font-size: 9.5px; font-weight: 700; cursor: pointer; text-align: left;">
-                  <span style="width: 14px; height: 14px; border-radius: 4px; background: linear-gradient(135deg, ${p.start}, ${p.end}); display: inline-block; flex-shrink: 0;"></span>
+                <button type="button" class="hud-grad-preset-btn" data-start="${p.start}" data-end="${p.end}" style="display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; border: 1px solid ${gradStart === p.start ? '#8b5cf6' : 'rgba(255,255,255,0.08)'}; background: ${gradStart === p.start ? 'rgba(124,58,237,0.18)' : 'rgba(0,0,0,0.4)'}; color: #e2e8f0; font-size: 9px; font-weight: 700; cursor: pointer; text-align: left;">
+                  <span style="width: 13px; height: 13px; border-radius: 4px; background: linear-gradient(135deg, ${p.start}, ${p.end}); display: inline-block; flex-shrink: 0;"></span>
                   <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.label}</span>
                 </button>
               `).join('')}
             </div>
           </div>
 
-          <!-- Section 5: Cinematic Polish Toggles -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 8px;">
-            <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; font-weight: 700; cursor: pointer;">
-              <input type="checkbox" id="hud-inp-sparks" ${data.showSparks !== false ? 'checked' : ''} style="accent-color: #00e5ff;" />
-              Tip Spark Emissions
-            </label>
-            <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; font-weight: 700; cursor: pointer;">
-              <input type="checkbox" id="hud-inp-shimmer" ${data.showShimmer !== false ? 'checked' : ''} style="accent-color: #00e5ff;" />
-              Light Sweep Shimmer
-            </label>
-            <label style="display: flex; align-items: center; gap: 6px; font-size: 9.5px; color: #cbd5e1; font-weight: 700; cursor: pointer; grid-column: span 2;">
-              <input type="checkbox" id="hud-inp-grain" ${data.showFilmGrain !== false ? 'checked' : ''} style="accent-color: #00e5ff;" />
-              Cinematic Film Grain Overlay
-            </label>
-          </div>
-
           <!-- Retrigger Animation Action -->
-          <button type="button" id="hud-btn-retrigger" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px; border-radius: 6px; border: 1px solid rgba(0,229,255,0.4); background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(255,0,127,0.2)); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease;">
+          <button type="button" id="hud-btn-retrigger" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 7px; border: 1px solid rgba(124,58,237,0.5); background: linear-gradient(135deg, rgba(124,58,237,0.28), rgba(56,189,248,0.22)); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer;">
             <span>▶</span>
-            <span>Replay Cinematic HUD Reveal (0% → ${curPct}%)</span>
+            <span>Replay Documentary Progress (0% → ${curPct}%)</span>
           </button>
 
           <!-- Studio Background & Video B-Roll Suite -->
@@ -10168,12 +11267,25 @@
         </div>
       `;
 
-      // Wire controls
+      // Wire 3 Visual Direction Buttons (Preserves all user content)
+      container.querySelectorAll('.hud-style-dir-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.tplSetContextualData('progress', { stylePreset: btn.dataset.style });
+          window.tplRenderContextualInspector('progress');
+        });
+      });
+
+      container.querySelector('#hud-inp-eyebrow')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { eyebrow: e.target.value });
+      });
       container.querySelector('#hud-inp-title')?.addEventListener('input', e => {
         window.tplSetContextualData('progress', { title: e.target.value, goal: e.target.value });
       });
-      container.querySelector('#hud-inp-subtitle')?.addEventListener('input', e => {
-        window.tplSetContextualData('progress', { subtitle: e.target.value });
+      container.querySelector('#hud-inp-phase-label')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { phaseLabel: e.target.value });
+      });
+      container.querySelector('#hud-inp-phase-status')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { phaseStatus: e.target.value });
       });
       container.querySelector('#hud-inp-pct')?.addEventListener('input', e => {
         const val = e.target.value;
@@ -10181,17 +11293,49 @@
         if (valLabel) valLabel.textContent = `${val}%`;
         window.tplSetContextualData('progress', { percent: `${val}%` });
       });
+      container.querySelector('#hud-inp-callout-sub')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { calloutSublabel: e.target.value });
+      });
+      container.querySelector('#hud-inp-raised-val')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { raisedValue: e.target.value });
+      });
+      container.querySelector('#hud-inp-raised-lbl')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { raisedLabel: e.target.value });
+      });
+      container.querySelector('#hud-inp-target-val')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { targetValue: e.target.value });
+      });
+      container.querySelector('#hud-inp-target-lbl')?.addEventListener('input', e => {
+        window.tplSetContextualData('progress', { targetLabel: e.target.value });
+      });
+
       container.querySelector('#hud-inp-width')?.addEventListener('input', e => {
-        const val = e.target.value;
+        const val = Number(e.target.value);
         const widthLabel = container.querySelector('#hud-val-width');
         if (widthLabel) widthLabel.textContent = `${val}%`;
-        window.tplSetContextualData('progress', { barWidthPercent: Number(val) });
+        window.tplSetContextualData('progress', { barWidthPercent: val });
       });
-      container.querySelector('#hud-inp-raised')?.addEventListener('input', e => {
-        window.tplSetContextualData('progress', { currentAmount: e.target.value, amount: e.target.value });
+      container.querySelector('#hud-inp-thick')?.addEventListener('input', e => {
+        const val = Number(e.target.value);
+        const thickLabel = container.querySelector('#hud-val-thick');
+        if (thickLabel) thickLabel.textContent = `${val}px`;
+        window.tplSetContextualData('progress', { barThickness: val });
       });
-      container.querySelector('#hud-inp-target')?.addEventListener('input', e => {
-        window.tplSetContextualData('progress', { targetAmount: e.target.value });
+      container.querySelector('#hud-inp-posx')?.addEventListener('input', e => {
+        const val = Number(e.target.value);
+        const lbl = container.querySelector('#hud-val-posx');
+        if (lbl) lbl.textContent = `${val}px`;
+        window.tplSetContextualData('progress', { posX: val });
+      });
+      container.querySelector('#hud-inp-posy')?.addEventListener('input', e => {
+        const val = Number(e.target.value);
+        const lbl = container.querySelector('#hud-val-posy');
+        if (lbl) lbl.textContent = `${val}px`;
+        window.tplSetContextualData('progress', { posY: val });
+      });
+      container.querySelector('#hud-btn-reset-layout')?.addEventListener('click', () => {
+        window.tplSetContextualData('progress', { barWidthPercent: 70, barThickness: 8, posX: 0, posY: 0, scale: 1 });
+        window.tplRenderContextualInspector('progress');
       });
 
       container.querySelectorAll('.hud-grad-preset-btn').forEach(btn => {
@@ -10202,16 +11346,6 @@
           });
           window.tplRenderContextualInspector('progress');
         };
-      });
-
-      container.querySelector('#hud-inp-sparks')?.addEventListener('change', e => {
-        window.tplSetContextualData('progress', { showSparks: e.target.checked });
-      });
-      container.querySelector('#hud-inp-shimmer')?.addEventListener('change', e => {
-        window.tplSetContextualData('progress', { showShimmer: e.target.checked });
-      });
-      container.querySelector('#hud-inp-grain')?.addEventListener('change', e => {
-        window.tplSetContextualData('progress', { showFilmGrain: e.target.checked });
       });
 
       container.querySelector('#hud-btn-retrigger')?.addEventListener('click', () => {
