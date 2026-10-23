@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+  <defs>
+    <radialGradient id="thumbBg" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#1e222d"/>
+      <stop offset="60%" stop-color="#0a0c10"/>
+      <stop offset="100%" stop-color="#020305"/>
+    </radialGradient>
+    <filter id="thumbGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ffffff" flood-opacity="0.8"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="16" flood-color="#ffffff" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="thumbPrinter" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="225" fill="url(#thumbBg)"/>
+
+  <!-- Table Silhouette -->
+  <polygon points="60,150 340,150 360,170 40,170" fill="#181c25"/>
+  <rect x="55" y="170" width="12" height="45" fill="#0c0e14"/>
+  <rect x="333" y="170" width="12" height="45" fill="#0c0e14"/>
+  <line x1="40" y1="170" x2="360" y2="170" stroke="#475569" stroke-width="1.2"/>
+
+  <!-- Mini Printer Model -->
+  <g transform="translate(145, 118)">
+    <rect x="0" y="14" width="110" height="36" rx="4" fill="url(#thumbPrinter)"/>
+    <path d="M4,14 L106,14 L102,4 L8,4 Z" fill="#e2e8f0"/>
+    <rect x="22" y="34" width="66" height="15" rx="2" fill="#0f172a"/>
+    <rect x="6" y="18" width="18" height="12" rx="2" fill="#0284c7"/>
+    <circle cx="55" cy="24" r="4" fill="#64748b"/>
+  </g>
+
+  <!-- Left Mini Jewel Case -->
+  <polygon points="85,160 115,158 120,165 90,167" fill="#64748b" opacity="0.6"/>
+
+  <!-- Floating White Spec Card with Volumetric Glow -->
+  <g transform="translate(130, 26)" filter="url(#thumbGlow)">
+    <rect x="0" y="0" width="140" height="66" rx="10" fill="#ffffff"/>
+    
+    <!-- Printer Mini Icon on Card -->
+    <rect x="10" y="14" width="36" height="24" rx="3" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+    <rect x="14" y="24" width="28" height="8" rx="1" fill="#0f172a"/>
+
+    <!-- Spec Copy -->
+    <text x="54" y="18" fill="#64748b" font-family="'Inter', sans-serif" font-weight="800" font-size="5" letter-spacing="0.5">PREMIUM SERIES</text>
+    <text x="54" y="27" fill="#0f172a" font-family="'Inter', sans-serif" font-weight="700" font-size="6.5">Wireless All-in-One</text>
+    
+    <!-- 5 Gold Stars -->
+    <text x="54" y="37" fill="#f59e0b" font-family="sans-serif" font-size="6">★★★★★</text>
+
+    <!-- Price Tag -->
+    <text x="54" y="52" fill="#0f172a" font-family="'Inter', sans-serif" font-weight="900" font-size="10">$149.99</text>
+  </g>
+
+  <!-- Glitch / Light Slit Hint Indicator -->
+  <rect x="135" y="100" width="130" height="1.5" fill="#ffffff" opacity="0.8"/>
+</svg>

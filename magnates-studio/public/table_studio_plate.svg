@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+  <defs>
+    <!-- Dark Studio Environment Gradient -->
+    <radialGradient id="studioWallGrad" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1e222d"/>
+      <stop offset="35%" stop-color="#11141c"/>
+      <stop offset="75%" stop-color="#07080c"/>
+      <stop offset="100%" stop-color="#020305"/>
+    </radialGradient>
+
+    <!-- Table Top Spotlight Downward Bloom -->
+    <radialGradient id="tableSpotlight" cx="50%" cy="62%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.14"/>
+      <stop offset="30%" stop-color="#94a3b8" stop-opacity="0.08"/>
+      <stop offset="70%" stop-color="#334155" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Table Wood Surface Gradient -->
+    <linearGradient id="tableTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e232e"/>
+      <stop offset="25%" stop-color="#2a303e"/>
+      <stop offset="50%" stop-color="#252b37"/>
+      <stop offset="75%" stop-color="#181c25"/>
+      <stop offset="100%" stop-color="#0f1218"/>
+    </linearGradient>
+
+    <!-- Table Front Skirt / Apron Gradient -->
+    <linearGradient id="tableApronGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#12151c"/>
+      <stop offset="100%" stop-color="#07080c"/>
+    </linearGradient>
+
+    <!-- Table Leg Gradients with Rim Lighting -->
+    <linearGradient id="legGradLeft" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1a1e27"/>
+      <stop offset="30%" stop-color="#12151d"/>
+      <stop offset="100%" stop-color="#050609"/>
+    </linearGradient>
+    <linearGradient id="legGradRight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#050609"/>
+      <stop offset="70%" stop-color="#12151d"/>
+      <stop offset="100%" stop-color="#1a1e27"/>
+    </linearGradient>
+
+    <!-- Floor Drop Shadow Under Table -->
+    <radialGradient id="floorShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#000000" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Dark Ambient Wall / Background -->
+  <rect width="1600" height="900" fill="url(#studioWallGrad)"/>
+
+  <!-- Subtle Overhead Spotlight Cone -->
+  <polygon points="500,0 1100,0 1450,560 150,560" fill="url(#tableSpotlight)"/>
+
+  <!-- Floor Contact Shadow Under Table Base -->
+  <ellipse cx="800" cy="850" rx="600" ry="45" fill="url(#floorShadow)"/>
+
+  <!-- Table Structure -->
+  <g id="tableModel">
+    <!-- Back Table Legs (Cast in deep shadow) -->
+    <polygon points="400,600 440,600 435,820 405,820" fill="#06070a"/>
+    <polygon points="1160,600 1200,600 1195,820 1165,820" fill="#06070a"/>
+
+    <!-- Front Left Table Leg -->
+    <polygon points="310,600 365,600 355,870 320,870" fill="url(#legGradLeft)"/>
+    <!-- Leg Specular Corner Highlight -->
+    <line x1="311" y1="600" x2="321" y2="870" stroke="#334155" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- Front Right Table Leg -->
+    <polygon points="1235,600 1290,600 1280,870 1245,870" fill="url(#legGradRight)"/>
+    <!-- Leg Specular Corner Highlight -->
+    <line x1="1289" y1="600" x2="1279" y2="870" stroke="#334155" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- Table Front Apron / Under-Beam -->
+    <polygon points="270,590 1330,590 1330,640 270,640" fill="url(#tableApronGrad)"/>
+    <line x1="270" y1="640" x2="1330" y2="640" stroke="#1e293b" stroke-width="1" opacity="0.4"/>
+
+    <!-- Table Top Surface (Perspective Trapezoid) -->
+    <polygon points="310,530 1290,530 1360,592 240,592" fill="url(#tableTopGrad)"/>
+
+    <!-- Subtle Wood Grain Planks on Tabletop -->
+    <line x1="310" y1="550" x2="1290" y2="550" stroke="#334155" stroke-width="0.8" opacity="0.25"/>
+    <line x1="280" y1="570" x2="1320" y2="570" stroke="#334155" stroke-width="0.8" opacity="0.2"/>
+
+    <!-- Ambient Sheen / Specular Light Reflection on Table Surface -->
+    <ellipse cx="800" cy="565" rx="280" ry="16" fill="#ffffff" opacity="0.14" filter="blur(6px)"/>
+    <ellipse cx="800" cy="565" rx="140" ry="8" fill="#ffffff" opacity="0.18" filter="blur(3px)"/>
+
+    <!-- Front Table Edge Chamfer / Specular Bevel Line -->
+    <polygon points="240,592 1360,592 1360,600 240,600" fill="#2d3748"/>
+    <line x1="240" y1="592" x2="1360" y2="592" stroke="#64748b" stroke-width="1.8" opacity="0.75"/>
+    <line x1="240" y1="600" x2="1360" y2="600" stroke="#0f172a" stroke-width="1.2"/>
+  </g>
+</svg>

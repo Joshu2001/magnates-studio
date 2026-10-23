@@ -748,6 +748,47 @@
       </svg>
     `)}`,
 
+    // 34-P. Cinematic White Glitch & Floating Card Reveal
+    'magnates-media-printer-glitch-card': `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">
+        <defs>
+          <radialGradient id="pgSnapBg" cx="50%" cy="32%" r="68%">
+            <stop offset="0%" stop-color="#1e222d"/>
+            <stop offset="55%" stop-color="#0a0c10"/>
+            <stop offset="100%" stop-color="#020305"/>
+          </radialGradient>
+          <filter id="pgSnapGlow" x="-25%" y="-25%" width="150%" height="150%">
+            <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#ffffff" flood-opacity="0.85"/>
+            <feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#000000" flood-opacity="0.5"/>
+          </filter>
+        </defs>
+        <rect width="400" height="225" fill="url(#pgSnapBg)"/>
+        <!-- Studio Tabletop -->
+        <polygon points="50,148 350,148 375,172 25,172" fill="#181c25"/>
+        <line x1="25" y1="172" x2="375" y2="172" stroke="#475569" stroke-width="1.2"/>
+        <rect x="42" y="172" width="14" height="42" fill="#0c0e14"/>
+        <rect x="344" y="172" width="14" height="42" fill="#0c0e14"/>
+        <!-- Printer Vector Model -->
+        <g transform="translate(142, 114)">
+          <rect x="0" y="16" width="116" height="40" rx="4" fill="#e2e8f0"/>
+          <path d="M6,16 L110,16 L104,4 L12,4 Z" fill="#f8fafc"/>
+          <rect x="24" y="38" width="68" height="18" rx="2" fill="#0f172a"/>
+          <rect x="8" y="20" width="20" height="14" rx="2" fill="#0284c7"/>
+          <circle cx="58" cy="27" r="4.5" fill="#64748b"/>
+        </g>
+        <!-- Floating Spec Card -->
+        <g filter="url(#pgSnapGlow)" transform="translate(130, 22)">
+          <rect width="140" height="70" rx="10" fill="#ffffff"/>
+          <rect x="10" y="14" width="38" height="26" rx="3" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.8"/>
+          <rect x="14" y="25" width="30" height="10" rx="1" fill="#0f172a"/>
+          <text x="56" y="20" fill="#64748b" font-family="'Inter', sans-serif" font-weight="800" font-size="5.2" letter-spacing="0.5">PREMIUM SERIES</text>
+          <text x="56" y="30" fill="#0f172a" font-family="'Inter', sans-serif" font-weight="700" font-size="7">Wireless All-in-One</text>
+          <text x="56" y="41" fill="#f59e0b" font-family="sans-serif" font-size="6.5">★★★★★</text>
+          <text x="56" y="56" fill="#0f172a" font-family="'Inter', sans-serif" font-weight="900" font-size="10.5">$149.99</text>
+        </g>
+      </svg>
+    `)}`,
+
     // 34. Paper-Based & Blueprint Cutouts
     'magnates-media-paper-blueprint': `data:image/svg+xml;utf8,${encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" width="400" height="225">

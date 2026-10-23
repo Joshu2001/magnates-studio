@@ -26662,6 +26662,29 @@ id: 'map',
     secondaryImage: 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&auto=format&fit=crop&q=80'
   },
   {
+    id: 'magnates-media-printer-glitch-card',
+    title: 'Cinematic White Glitch & Floating Card Reveal',
+    category: 'Product / Hardware',
+    origCategory: 'Documentary',
+    badge: 'Hardware Glitch • Card Reveal',
+    difficulty: '1-Click',
+    timeToApply: '2 sec',
+    previewGradient: 'linear-gradient(135deg, #1e222d 0%, #08090d 100%)',
+    description: 'Standalone hardware reveal: Ambient studio tabletop, subtle white luma movie-glitch printer spawn, smooth push-in camera zoom, 100ms pause, and center-out expanding floating product spec card with volumetric glow.',
+    tags: [
+      'White Glitch Reveal',
+      'Product Spec Card',
+      'Vertical Unfold',
+      'Light Slit Ignition',
+      'Hardware Reveal',
+      'Printer Showcase',
+      'James Jani',
+      'Magnates Media'
+    ],
+    defaultImage: '/printer_glitch_thumbnail.svg',
+    secondaryImage: '/printer_chassis_cutout.svg'
+  },
+  {
     id: 'magnates-media-paper-blueprint',
     title: 'Paper-Based & Blueprint Cutouts (Merged Master: Logo Hook → $1M Silhouettes)',
     category: 'Paper / Cutout',
@@ -27354,7 +27377,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-printer-glitch-card','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -31154,6 +31177,36 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (tplId === 'magnates-media-printer-glitch-card') {
+      fxContainer.innerHTML = `
+        <div id="fx-pg-wrap-${tplId}" style="position: absolute; inset: 0; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <div id="fx-pg-zoom-${tplId}" style="position: absolute; inset: 0; transform-origin: 50% 58%; will-change: transform;">
+            <img src="/table_studio_plate.svg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;" />
+            <img id="fx-pg-acc-${tplId}" src="/desk_accessories_cutout.svg" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0;" />
+            <div id="fx-pg-hero-${tplId}" style="position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 44%; aspect-ratio: 800/500; opacity: 0;">
+              <img src="/printer_chassis_cutout.svg" style="width: 100%; height: 100%; object-fit: contain;" />
+            </div>
+            <div id="fx-pg-flash-${tplId}" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; mix-blend-mode: screen; pointer-events: none;"></div>
+            <div style="position: absolute; left: 50%; top: 31%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;">
+              <div id="fx-pg-slit-${tplId}" style="position: absolute; width: 140px; height: 2.5px; border-radius: 999px; background: #ffffff; box-shadow: 0 0 12px #fff, 0 0 25px rgba(255,255,255,0.9); opacity: 0; transform: scaleX(0);"></div>
+              <div id="fx-pg-card-${tplId}" style="position: relative; width: 145px; height: 74px; border-radius: 10px; background: #ffffff; box-shadow: 0 0 24px rgba(255,255,255,0.85), 0 10px 25px rgba(0,0,0,0.7); display: flex; align-items: center; padding: 7px 10px; gap: 7px; opacity: 0; clip-path: inset(50% 0% 50% 0% round 10px);">
+                <div style="width: 40%; height: 86%; border-radius: 6px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; padding: 3px; box-sizing: border-box; flex-shrink: 0;">
+                  <img src="/printer_chassis_cutout.svg" style="width: 100%; height: 100%; object-fit: contain;" />
+                </div>
+                <div style="display: flex; flex-direction: column; justify-content: center; gap: 1px; flex: 1; min-width: 0;">
+                  <div style="font-family: 'Inter', sans-serif; font-size: 5px; font-weight: 800; color: #64748b; letter-spacing: 0.5px;">PREMIUM SERIES</div>
+                  <div style="font-family: 'Inter', sans-serif; font-size: 7px; font-weight: 800; color: #0f172a; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Wireless All-in-One</div>
+                  <div style="color: #f59e0b; font-size: 6px;">★★★★★</div>
+                  <div style="font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 900; color: #0f172a; margin-top: 1px;">$149.99</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="position: absolute; top: 10px; right: 10px; padding: 2px 7px; border-radius: 6px; background: linear-gradient(135deg, #0284c7, #818cf8); color: #fff; font-size: 8.5px; font-weight: 800; letter-spacing: 0.05em; z-index: 30; box-shadow: 0 4px 12px rgba(56,189,248,0.5);">
+            ⚡ WHITE GLITCH &amp; CARD
+          </div>
+        </div>
+      `;
     } else if (tplId === 'magnates-media-paper-blueprint' || tplId === 'magnates-media-brand-wavy-hook' || tplId === 'magnates-media-product-price-unfurl' || tplId === 'magnates-media-globe-wavy-nothing' || tplId === 'magnates-media-dual-silhouettes' || tplId === 'magnates-media-article-capitol-zoom') {
       const bgCol = (typeof magnatesBPState !== 'undefined' && magnatesBPState.backdropColor) ? magnatesBPState.backdropColor : '#991b1b';
       const c1 = (typeof bpHexToRgba === 'function') ? bpHexToRgba(bgCol, 0.9) : 'rgba(165, 22, 22, 0.9)';
@@ -32237,6 +32290,67 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         if (counterWrapEl) counterWrapEl.style.opacity = '0';
         if (leftEl) leftEl.style.opacity = '0';
         if (rightEl) rightEl.style.opacity = '0';
+      } else if (tplId === 'magnates-media-printer-glitch-card') {
+        const c = t % 4.8;
+        const zoomWrap = fxContainer?.querySelector(`#fx-pg-zoom-${tplId}`);
+        const heroEl = fxContainer?.querySelector(`#fx-pg-hero-${tplId}`);
+        const accEl = fxContainer?.querySelector(`#fx-pg-acc-${tplId}`);
+        const flashEl = fxContainer?.querySelector(`#fx-pg-flash-${tplId}`);
+        const slitEl = fxContainer?.querySelector(`#fx-pg-slit-${tplId}`);
+        const cardEl = fxContainer?.querySelector(`#fx-pg-card-${tplId}`);
+
+        const tG = 0.5;
+        const dG = 0.12;
+        const tZ = 0.8;
+        const dZ = 1.3;
+        const tSlit = tZ + dZ + 0.10;
+        const dSlit = 0.08;
+        const tUnf = tSlit + dSlit;
+        const dUnf = 0.75;
+
+        if (c < tG) {
+          if (heroEl) heroEl.style.opacity = '0';
+          if (accEl) accEl.style.opacity = '0';
+          if (flashEl) flashEl.style.opacity = '0';
+          if (zoomWrap) zoomWrap.style.transform = 'scale(1)';
+          if (slitEl) slitEl.style.opacity = '0';
+          if (cardEl) cardEl.style.opacity = '0';
+        } else if (c < tG + dG) {
+          const fProg = (c - tG) / dG;
+          const fOp = Math.sin(fProg * Math.PI);
+          if (heroEl) heroEl.style.opacity = '1';
+          if (accEl) accEl.style.opacity = '1';
+          if (flashEl) flashEl.style.opacity = fOp.toFixed(3);
+          if (zoomWrap) zoomWrap.style.transform = 'scale(1)';
+          if (slitEl) slitEl.style.opacity = '0';
+          if (cardEl) cardEl.style.opacity = '0';
+        } else if (c < tZ + dZ) {
+          if (heroEl) heroEl.style.opacity = '1';
+          if (accEl) accEl.style.opacity = '1';
+          if (flashEl) flashEl.style.opacity = '0';
+          const zProg = easeInOut((c - tZ) / dZ);
+          const sc = 1 + zProg * 0.55;
+          if (zoomWrap) zoomWrap.style.transform = `scale(${sc.toFixed(3)})`;
+          if (slitEl) slitEl.style.opacity = '0';
+          if (cardEl) cardEl.style.opacity = '0';
+        } else if (c < tUnf) {
+          if (zoomWrap) zoomWrap.style.transform = 'scale(1.55)';
+          const sProg = easeOut((c - tSlit) / dSlit);
+          if (slitEl) {
+            slitEl.style.opacity = '1';
+            slitEl.style.transform = `scaleX(${sProg.toFixed(3)})`;
+          }
+          if (cardEl) cardEl.style.opacity = '0';
+        } else {
+          if (zoomWrap) zoomWrap.style.transform = 'scale(1.55)';
+          const uProg = easeOut((c - tUnf) / dUnf);
+          const vInset = ((1 - uProg) * 50).toFixed(1);
+          if (slitEl) slitEl.style.opacity = Math.max(0, 1 - uProg * 1.6).toFixed(3);
+          if (cardEl) {
+            cardEl.style.opacity = '1';
+            cardEl.style.clipPath = `inset(${vInset}% 0% ${vInset}% 0% round 8px)`;
+          }
+        }
       } else if (tplId === 'magnates-media-article-capitol-zoom') {
         // Standalone Scene 5 Hover Preview (Article + Highlight + Capitol Rise -> Instant Cut -> Office Zoom-Out & Capitol Descend)
         const c = t % 4.6;
@@ -32618,6 +32732,7 @@ function applySelectedHomepageTemplate(templateId) {
     'magnates-media-multi-drop-shadows': openMagnatesDropShadowsSuite,
     'magnates-media-shadowization': openMagnatesShadowizationSuite,
     'magnates-media-blend-modes': openMagnatesBlendModesSuite,
+    'magnates-media-printer-glitch-card': () => openMagnatesPaperBlueprintSuite('printer_glitch_card'),
     'magnates-media-paper-blueprint': () => openMagnatesPaperBlueprintSuite('full_story_flow'),
     'magnates-media-brand-wavy-hook': () => openMagnatesPaperBlueprintSuite('brand_wavy_intro'),
     'magnates-media-product-price-unfurl': () => openMagnatesPaperBlueprintSuite('products_unfurl'),
@@ -33046,6 +33161,9 @@ function applySelectedHomepageTemplate(templateId) {
   } else if (templateId === 'magnates-media-blend-modes') {
     // Launch Magnates Media Blend Modes Suite
     openMagnatesBlendModesSuite();
+    return;
+  } else if (templateId === 'magnates-media-printer-glitch-card') {
+    openMagnatesPaperBlueprintSuite('printer_glitch_card');
     return;
   } else if (templateId === 'magnates-media-paper-blueprint') {
     openMagnatesPaperBlueprintSuite('full_story_flow');
@@ -55981,6 +56099,26 @@ let magnatesBPState = {
   l1GlowColor: "#ffffff",
   l1GlowIntensity: 85,
   primaryCutoutUrl: "/silhouette_sitting_phone.png",
+  // Dedicated Scene: White Glitch & Spec Card Reveal
+  printerGlitchTime: 0.80,
+  printerGlitchDur: 0.12,
+  printerGlitchIntensity: 100,
+  printerZoomStart: 1.20,
+  printerZoomDur: 1.60,
+  printerZoomScale: 1.55,
+  printerSlitDelay: 0.10,
+  printerSlitDur: 0.08,
+  printerUnfoldDur: 0.75,
+  printerCardSeries: "PREMIUM SERIES",
+  printerCardTitle: "Wireless Color All-in-One Printer",
+  printerCardStars: 5,
+  printerCardPrice: "$149.99",
+  printerCardGlowColor: "#ffffff",
+  printerCardGlowRadius: 36,
+  printerCardRadius: 20,
+  printerHeroUrl: "/printer_chassis_cutout.svg",
+  printerAccessoriesUrl: "/desk_accessories_cutout.svg",
+  printerTableBgUrl: "/table_studio_plate.svg",
   l2Enabled: true,
   l2InAnim: "bottom_to_up",
   l2OutAnim: "left_to_right",
@@ -56216,6 +56354,24 @@ const MAGNATES_BP_PRESETS = {
     l1Label: "Left Silhouette Cutout",
     l2Label: "Right Silhouette Cutout",
     z0Label: "Crimson Radial Atmosphere"
+  },
+  printer_glitch_card: {
+    duration: 6.5,
+    bgPlateUrl: "",
+    backdropColor: "#1e222d",
+    backdropSpread: 60,
+    logoEnabled: false,
+    wavyTextEnabled: false,
+    productsEnabled: false,
+    globeEnabled: false,
+    scene5Enabled: false,
+    l1Enabled: false,
+    l2Enabled: false,
+    showCounter: false,
+    hudPreset: "SCENE 6: WHITE GLITCH & SPEC CARD UNFOLD",
+    l1Label: "Printer Hero Cutout",
+    l2Label: "Floating Spec Card",
+    z0Label: "Studio Tabletop Plate"
   },
   room_spawn: {
     duration: 5.5,
@@ -57153,6 +57309,161 @@ function updateMagnatesBPVisualStyles() {
     });
   }
 
+  // =========================================================
+  // SCENE 6 RENDER: White Glitch & Spec Card Unfold (Dedicated Scene)
+  // =========================================================
+  const printerSceneEl = document.getElementById('magnates-bp-printer-scene');
+  const printerZoomWrap = document.getElementById('magnates-bp-printer-zoom-wrap');
+  const printerHeroWrap = document.getElementById('magnates-bp-printer-hero-wrap');
+  const printerHeroImg = document.getElementById('magnates-bp-printer-hero-img');
+  const printerAccessories = document.getElementById('magnates-bp-printer-accessories');
+  const printerGlitchFlash = document.getElementById('magnates-bp-glitch-flash-layer');
+  const printerLightSlit = document.getElementById('magnates-bp-light-slit');
+  const printerSpecCard = document.getElementById('magnates-bp-spec-card');
+  const printerCardThumb = document.getElementById('magnates-bp-card-thumb-img');
+  const printerCardSeriesEl = document.getElementById('magnates-bp-card-series');
+  const printerCardTitleEl = document.getElementById('magnates-bp-card-title');
+  const printerCardStarsEl = document.getElementById('magnates-bp-card-stars');
+  const printerCardPriceEl = document.getElementById('magnates-bp-card-price');
+
+  const isPrinterScene = magnatesBPState.preset === 'printer_glitch_card';
+  if (printerSceneEl) {
+    if (!isPrinterScene) {
+      printerSceneEl.style.display = 'none';
+    } else {
+      printerSceneEl.style.display = 'block';
+
+      // Ensure images are set
+      if (printerHeroImg && printerHeroImg.getAttribute('src') !== (magnatesBPState.printerHeroUrl || '/printer_chassis_cutout.svg')) {
+        printerHeroImg.src = magnatesBPState.printerHeroUrl || '/printer_chassis_cutout.svg';
+      }
+      if (printerCardThumb && printerCardThumb.getAttribute('src') !== (magnatesBPState.printerHeroUrl || '/printer_chassis_cutout.svg')) {
+        printerCardThumb.src = magnatesBPState.printerHeroUrl || '/printer_chassis_cutout.svg';
+      }
+      if (printerAccessories && printerAccessories.getAttribute('src') !== (magnatesBPState.printerAccessoriesUrl || '/desk_accessories_cutout.svg')) {
+        printerAccessories.src = magnatesBPState.printerAccessoriesUrl || '/desk_accessories_cutout.svg';
+      }
+
+      // Sync spec copy
+      if (printerCardSeriesEl) printerCardSeriesEl.textContent = magnatesBPState.printerCardSeries || 'PREMIUM SERIES';
+      if (printerCardTitleEl) printerCardTitleEl.textContent = magnatesBPState.printerCardTitle || 'Wireless Color All-in-One Printer';
+      if (printerCardStarsEl) {
+        const s = parseInt(magnatesBPState.printerCardStars, 10) || 5;
+        printerCardStarsEl.textContent = s >= 5 ? '★★★★★' : (s === 4 ? '★★★★☆' : '★★★☆☆');
+      }
+      if (printerCardPriceEl) printerCardPriceEl.textContent = magnatesBPState.printerCardPrice || '$149.99';
+
+      // Sync card glow & radius
+      if (printerSpecCard) {
+        const glowCol = magnatesBPState.printerCardGlowColor || '#ffffff';
+        const glowRad = magnatesBPState.printerCardGlowRadius ?? 36;
+        const cRad = magnatesBPState.printerCardRadius ?? 20;
+        printerSpecCard.style.borderRadius = `${cRad}px`;
+        printerSpecCard.style.boxShadow = `0 0 ${glowRad}px ${bpHexToRgba(glowCol, 0.88)}, 0 24px 60px rgba(0,0,0,0.7)`;
+      }
+
+      // Timeline keyframes:
+      const tGlitch = magnatesBPState.printerGlitchTime ?? 0.80;
+      const dGlitch = (magnatesBPState.printerGlitchDur ?? 120) / 1000;
+      const tZoomStart = magnatesBPState.printerZoomStart ?? 1.20;
+      const dZoom = magnatesBPState.printerZoomDur ?? 1.60;
+      const tZoomEnd = tZoomStart + dZoom;
+      const targetScale = magnatesBPState.printerZoomScale ?? 1.55;
+      const slitDelay = (magnatesBPState.printerSlitDelay ?? 100) / 1000;
+      const tSlitStart = tZoomEnd + slitDelay;
+      const dSlit = magnatesBPState.printerSlitDur ?? 0.08;
+      const tUnfoldStart = tSlitStart + dSlit;
+      const dUnfold = magnatesBPState.printerUnfoldDur ?? 0.75;
+
+      // 1. Glitch spawn calculations
+      if (p < tGlitch) {
+        if (printerHeroWrap) printerHeroWrap.style.opacity = '0';
+        if (printerAccessories) printerAccessories.style.opacity = '0';
+        if (printerGlitchFlash) printerGlitchFlash.style.opacity = '0';
+      } else if (p < tGlitch + dGlitch) {
+        const gProg = (p - tGlitch) / dGlitch;
+        const gOp = (gProg < 0.45)
+          ? Math.sin((gProg / 0.45) * Math.PI) * 0.95
+          : Math.sin(((gProg - 0.45) / 0.55) * Math.PI) * 0.85;
+        const fInt = (magnatesBPState.printerGlitchIntensity ?? 100) / 100;
+        if (printerHeroWrap) {
+          printerHeroWrap.style.opacity = '1';
+          const jitter = (Math.sin(p * 90) * 3).toFixed(1);
+          printerHeroWrap.style.transform = `translate(calc(-50% + ${jitter}px), -50%)`;
+          printerHeroWrap.style.filter = `brightness(${(1 + gOp * 2).toFixed(2)}) contrast(${(1 + gOp * 0.4).toFixed(2)})`;
+        }
+        if (printerAccessories) {
+          printerAccessories.style.opacity = '1';
+          printerAccessories.style.filter = `brightness(${(1 + gOp * 1.6).toFixed(2)})`;
+        }
+        if (printerGlitchFlash) {
+          printerGlitchFlash.style.opacity = (gOp * fInt).toFixed(3);
+        }
+      } else {
+        if (printerHeroWrap) {
+          printerHeroWrap.style.opacity = '1';
+          printerHeroWrap.style.transform = 'translate(-50%, -50%)';
+          printerHeroWrap.style.filter = 'none';
+        }
+        if (printerAccessories) {
+          printerAccessories.style.opacity = '1';
+          printerAccessories.style.filter = 'none';
+        }
+        if (printerGlitchFlash) printerGlitchFlash.style.opacity = '0';
+      }
+
+      // 2. Camera zoom calculations
+      if (printerZoomWrap) {
+        if (p < tZoomStart) {
+          printerZoomWrap.style.transform = 'scale(1)';
+        } else if (p < tZoomEnd) {
+          const zProg = bpEaseInOutCubic((p - tZoomStart) / dZoom);
+          const curScale = 1 + zProg * (targetScale - 1);
+          printerZoomWrap.style.transform = `scale(${curScale.toFixed(3)})`;
+        } else {
+          printerZoomWrap.style.transform = `scale(${targetScale.toFixed(3)})`;
+        }
+      }
+
+      // 3. Post-zoom light slit ignition & Center-Out Vertical Unfold
+      const cRad = magnatesBPState.printerCardRadius ?? 20;
+      if (p < tSlitStart) {
+        if (printerLightSlit) {
+          printerLightSlit.style.opacity = '0';
+          printerLightSlit.style.transform = 'scaleX(0)';
+        }
+        if (printerSpecCard) printerSpecCard.style.opacity = '0';
+      } else if (p < tUnfoldStart) {
+        const sProg = bpEaseOutCubic((p - tSlitStart) / dSlit);
+        if (printerLightSlit) {
+          printerLightSlit.style.opacity = '1';
+          printerLightSlit.style.transform = `scaleX(${sProg.toFixed(3)})`;
+        }
+        if (printerSpecCard) {
+          printerSpecCard.style.opacity = '0';
+          printerSpecCard.style.clipPath = `inset(50% 0% 50% 0% round ${cRad}px)`;
+        }
+      } else if (p < tUnfoldStart + dUnfold) {
+        const uProg = bpEaseOutCubic((p - tUnfoldStart) / dUnfold);
+        const vInset = ((1 - uProg) * 50).toFixed(2);
+        if (printerLightSlit) {
+          printerLightSlit.style.opacity = Math.max(0, 1 - uProg * 1.6).toFixed(3);
+          printerLightSlit.style.transform = 'scaleX(1)';
+        }
+        if (printerSpecCard) {
+          printerSpecCard.style.opacity = '1';
+          printerSpecCard.style.clipPath = `inset(${vInset}% 0% ${vInset}% 0% round ${cRad}px)`;
+        }
+      } else {
+        if (printerLightSlit) printerLightSlit.style.opacity = '0';
+        if (printerSpecCard) {
+          printerSpecCard.style.opacity = '1';
+          printerSpecCard.style.clipPath = `inset(0% 0% 0% 0% round ${cRad}px)`;
+        }
+      }
+    }
+  }
+
   // Highlight active Storyboard Scene Card during playback
   document.querySelectorAll('.bp-storyboard-scene-card').forEach((card) => {
     const cType = card.getAttribute('data-scene-card');
@@ -57181,6 +57492,28 @@ function updateMagnatesBPVisualStyles() {
   if (hudPreset && presetDef) hudPreset.textContent = presetDef.hudPreset;
 
   let phaseText = "PHASE: INTRO BUILD";
+  if (isPrinterScene) {
+    const tG = magnatesBPState.printerGlitchTime ?? 0.80;
+    const tZ = magnatesBPState.printerZoomStart ?? 1.20;
+    const tZE = tZ + (magnatesBPState.printerZoomDur ?? 1.60);
+    const tS = tZE + ((magnatesBPState.printerSlitDelay ?? 100) / 1000);
+    const tU = tS + (magnatesBPState.printerSlitDur ?? 0.08);
+    const tUE = tU + (magnatesBPState.printerUnfoldDur ?? 0.75);
+
+    if (p < tG) {
+      phaseText = "SCENE 6 // 1. AMBIENT STUDIO TABLETOP";
+    } else if (p < tZ) {
+      phaseText = "SCENE 6 // 2. WHITE LUMA GLITCH PRINTER SPAWN";
+    } else if (p < tZE) {
+      phaseText = "SCENE 6 // 3. SMOOTH HERO CAMERA ZOOM";
+    } else if (p < tU) {
+      phaseText = "SCENE 6 // 4. 100MS DELAY + LIGHT SLIT IGNITION";
+    } else if (p < tUE) {
+      phaseText = "SCENE 6 // 5. CENTER-OUT VERTICAL SPEC CARD UNFOLD";
+    } else {
+      phaseText = "SCENE 6 // 6. FULL FLOATING SPEC CARD REVEAL";
+    }
+  } else 
   if (showSceneA && p < tOut + 0.35) {
     if (p < tIn) {
       phaseText = "SCENE 1 // 1. ATMOSPHERE BACKDROP";
@@ -57345,7 +57678,8 @@ function syncMagnatesBPInspectorControlsFromState() {
     products_unfurl: 'Scene 2 Suite: Logo Shift Right & Product / Price Unfurl ($2.00 & $5.00)',
     globe_wavy_nothing: 'Scene 3 Suite: Spinning Earth Globe & "FOR ALMOST NOTHING." Wavy Reveal',
     dual_silhouette: 'Scene 4 Suite: $1,000,000 Counter & Dual Glowing Silhouettes',
-    room_spawn: 'Scene 5 Suite: Empty Office Room & Desk Cutout Glide'
+    room_spawn: 'Scene 5 Suite: Empty Office Room & Desk Cutout Glide',
+    printer_glitch_card: 'Scene 6 Suite: Cinematic White Glitch & Floating Card Reveal'
   };
   setTxt('magnates-bp-modal-title', titleMap[pKey] || 'Dynamic Cutout & Silhouette Motion Suite');
 
@@ -57424,6 +57758,35 @@ function syncMagnatesBPInspectorControlsFromState() {
   setTxt('magnates-bp-val-zoomout-dur', `${(magnatesBPState.officeZoomOutDur ?? 1.45).toFixed(2)}s`);
   const chkRemBg = document.getElementById('magnates-bp-check-remove-bg');
   if (chkRemBg) chkRemBg.checked = magnatesBPState.articleRemoveBg !== false;
+
+  // Sync Scene 6 White Glitch & Spec Card Controls
+  const isPrinterPreset = pKey === 'printer_glitch_card';
+  const cardPrinterCtrl = document.getElementById('magnates-bp-card-printer-controls');
+  if (cardPrinterCtrl) cardPrinterCtrl.style.display = isPrinterPreset ? 'flex' : 'none';
+  const rowPrinterHero = document.getElementById('magnates-bp-row-printer-hero');
+  if (rowPrinterHero) rowPrinterHero.style.display = isPrinterPreset ? 'flex' : 'none';
+  const rowPrinterCard = document.getElementById('magnates-bp-row-printer-card');
+  if (rowPrinterCard) rowPrinterCard.style.display = isPrinterPreset ? 'flex' : 'none';
+
+  setVal('magnates-bp-printer-glitch-time', magnatesBPState.printerGlitchTime ?? 0.80);
+  setTxt('magnates-bp-val-printer-glitch-time', `${(magnatesBPState.printerGlitchTime ?? 0.80).toFixed(2)}s`);
+  setVal('magnates-bp-printer-glitch-dur', magnatesBPState.printerGlitchDur ?? 120);
+  setTxt('magnates-bp-val-printer-glitch-dur', `${magnatesBPState.printerGlitchDur ?? 120}ms`);
+  setVal('magnates-bp-printer-zoom-dur', magnatesBPState.printerZoomDur ?? 1.60);
+  setTxt('magnates-bp-val-printer-zoom-dur', `${(magnatesBPState.printerZoomDur ?? 1.60).toFixed(2)}s`);
+  setVal('magnates-bp-printer-zoom-scale', magnatesBPState.printerZoomScale ?? 1.55);
+  setTxt('magnates-bp-val-printer-zoom-scale', `${(magnatesBPState.printerZoomScale ?? 1.55).toFixed(2)}x`);
+  setVal('magnates-bp-printer-slit-delay', magnatesBPState.printerSlitDelay ?? 100);
+  setTxt('magnates-bp-val-printer-slit-delay', `${magnatesBPState.printerSlitDelay ?? 100}ms`);
+  setVal('magnates-bp-printer-unfold-dur', magnatesBPState.printerUnfoldDur ?? 0.75);
+  setTxt('magnates-bp-val-printer-unfold-dur', `${(magnatesBPState.printerUnfoldDur ?? 0.75).toFixed(2)}s`);
+  setVal('magnates-bp-input-printer-series', magnatesBPState.printerCardSeries || 'PREMIUM SERIES');
+  setVal('magnates-bp-input-printer-title', magnatesBPState.printerCardTitle || 'Wireless Color All-in-One Printer');
+  setVal('magnates-bp-input-printer-price', magnatesBPState.printerCardPrice || '$149.99');
+  setVal('magnates-bp-select-printer-stars', magnatesBPState.printerCardStars ?? 5);
+  setVal('magnates-bp-printer-glow-color', magnatesBPState.printerCardGlowColor || '#ffffff');
+  setVal('magnates-bp-printer-glow-radius', magnatesBPState.printerCardGlowRadius ?? 36);
+  setTxt('magnates-bp-val-printer-glow', `${magnatesBPState.printerCardGlowRadius ?? 36}px`);
 
   // Sync Scene 3 Spinning Globe & Wavy-to-Flat Headline Controls
   const chkGlobe = document.getElementById('magnates-bp-toggle-globe');
@@ -57559,6 +57922,16 @@ function applyMagnatesBPPresetToState(pKey) {
     magnatesBPState.l2Enabled = true;
     magnatesBPState.showCounter = true;
     magnatesBPState.secondaryCutoutUrl = _customSilhouetteL1Url || '/silhouette_standing_phone.png';
+  } else if (pKey === 'printer_glitch_card') {
+    magnatesBPState.bgPlateUrl = "";
+    magnatesBPState.logoEnabled = false;
+    magnatesBPState.wavyTextEnabled = false;
+    magnatesBPState.productsEnabled = false;
+    magnatesBPState.globeEnabled = false;
+    magnatesBPState.scene5Enabled = false;
+    magnatesBPState.l1Enabled = false;
+    magnatesBPState.l2Enabled = false;
+    magnatesBPState.showCounter = false;
   } else if (pKey === 'room_spawn') {
     magnatesBPState.bgPlateUrl = "/room_empty_plate.png";
     magnatesBPState.logoEnabled = false;
@@ -58464,6 +58837,76 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
     magnatesBPState.subcaption = e.target.value;
     updateMagnatesBPVisualStyles();
   });
+  // Scene 6 Printer Glitch & Floating Card Listeners
+  document.getElementById('magnates-bp-printer-glitch-time')?.addEventListener('input', (e) => {
+    magnatesBPState.printerGlitchTime = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-printer-glitch-time');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerGlitchTime.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-glitch-dur')?.addEventListener('input', (e) => {
+    magnatesBPState.printerGlitchDur = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-printer-glitch-dur');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerGlitchDur}ms`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-zoom-dur')?.addEventListener('input', (e) => {
+    magnatesBPState.printerZoomDur = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-printer-zoom-dur');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerZoomDur.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-zoom-scale')?.addEventListener('input', (e) => {
+    magnatesBPState.printerZoomScale = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-printer-zoom-scale');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerZoomScale.toFixed(2)}x`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-slit-delay')?.addEventListener('input', (e) => {
+    magnatesBPState.printerSlitDelay = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-printer-slit-delay');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerSlitDelay}ms`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-unfold-dur')?.addEventListener('input', (e) => {
+    magnatesBPState.printerUnfoldDur = parseFloat(e.target.value);
+    const lbl = document.getElementById('magnates-bp-val-printer-unfold-dur');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerUnfoldDur.toFixed(2)}s`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-printer-series')?.addEventListener('input', (e) => {
+    magnatesBPState.printerCardSeries = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-printer-title')?.addEventListener('input', (e) => {
+    magnatesBPState.printerCardTitle = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-printer-price')?.addEventListener('input', (e) => {
+    magnatesBPState.printerCardPrice = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-select-printer-stars')?.addEventListener('change', (e) => {
+    magnatesBPState.printerCardStars = parseInt(e.target.value, 10);
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-glow-color')?.addEventListener('input', (e) => {
+    magnatesBPState.printerCardGlowColor = e.target.value;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-printer-glow-radius')?.addEventListener('input', (e) => {
+    magnatesBPState.printerCardGlowRadius = parseInt(e.target.value, 10);
+    const lbl = document.getElementById('magnates-bp-val-printer-glow');
+    if (lbl) lbl.textContent = `${magnatesBPState.printerCardGlowRadius}px`;
+    updateMagnatesBPVisualStyles();
+  });
+  document.getElementById('magnates-bp-input-printer-hero')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    magnatesBPState.printerHeroUrl = URL.createObjectURL(file);
+    updateMagnatesBPVisualStyles();
+  });
+
   document.getElementById('magnates-bp-bg-fade-time')?.addEventListener('input', (e) => {
     magnatesBPState.bgFadeTime = parseFloat(e.target.value);
     const lbl = document.getElementById('magnates-bp-val-bg-fade');

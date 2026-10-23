@@ -9796,6 +9796,10 @@
               <div style="font-size: 11px; font-weight: 700; color: #f8fafc;">6. Scene 5 Standalone: Office Room Desk Glide</div>
               <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Empty Office Room Plate &rarr; Desk Cutout Spawn</div>
             </div>
+            <div class="bp-drawer-tpl-card" data-preset="printer_glitch_card" style="padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer;">
+              <div style="font-size: 11px; font-weight: 700; color: #f8fafc;">7. Cinematic White Glitch &amp; Floating Card Reveal</div>
+              <div style="font-size: 9.5px; color: #94a3b8; margin-top: 2px;">Tabletop &rarr; White Glitch Printer Spawn &rarr; Zoom &rarr; Floating Card Unfold</div>
+            </div>
           </div>
         </div>
 
@@ -9927,6 +9931,47 @@
                 <div id="magnates-bp-globe-headline" style="font-family: 'Montserrat', 'Inter', 'Arial Black', sans-serif; font-size: clamp(20px, 3.6vw, 46px); font-weight: 900; color: #f20d0d; letter-spacing: 0.8px; text-transform: uppercase; line-height: 1.1; text-shadow: 0 0 24px rgba(239, 20, 20, 0.65), 0 4px 14px rgba(0,0,0,0.9); white-space: nowrap;"></div>
               </div>
 
+              <!-- Dedicated Scene: Cinematic White Glitch & Floating Card Reveal -->
+              <div id="magnates-bp-printer-scene" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 22; display: none; overflow: hidden; pointer-events: none;">
+                <!-- Inner Zoomable Stage Container -->
+                <div id="magnates-bp-printer-zoom-wrap" style="position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: 50% 58%; will-change: transform;">
+                  <!-- Background Studio Table Plate -->
+                  <img id="magnates-bp-printer-bg" src="/table_studio_plate.svg" alt="Studio Table Plate" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none;" />
+                  
+                  <!-- Desk Accessories (Jewel Cases & Blotter) -->
+                  <img id="magnates-bp-printer-accessories" src="/desk_accessories_cutout.svg" alt="Desk Accessories" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; will-change: opacity, filter;" />
+
+                  <!-- Printer Hero Model -->
+                  <div id="magnates-bp-printer-hero-wrap" data-bp-layer="printer_hero" style="position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 44%; max-width: 620px; aspect-ratio: 800/500; opacity: 0; pointer-events: auto; cursor: pointer; will-change: opacity, filter, transform;">
+                    <img id="magnates-bp-printer-hero-img" src="/printer_chassis_cutout.svg" alt="Printer Model" style="width: 100%; height: 100%; object-fit: contain;" />
+                  </div>
+
+                  <!-- Subtle White Movie-Glitch Flash Overlay -->
+                  <div id="magnates-bp-glitch-flash-layer" style="position: absolute; inset: 0; background: #ffffff; opacity: 0; pointer-events: none; mix-blend-mode: screen; z-index: 28; will-change: opacity;"></div>
+
+                  <!-- Floating Spec Card Container -->
+                  <div id="magnates-bp-card-anchor" data-bp-layer="printer_card" style="position: absolute; left: 50%; top: 31%; transform: translate(-50%, -50%); z-index: 30; pointer-events: auto; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                    <!-- Glowing Horizontal Light Slit (Ignites first, blooms, then vertically expands) -->
+                    <div id="magnates-bp-light-slit" style="position: absolute; width: 340px; height: 3.5px; border-radius: 999px; background: #ffffff; box-shadow: 0 0 16px #ffffff, 0 0 38px rgba(255,255,255,0.95), 0 0 75px rgba(255,255,255,0.6); opacity: 0; transform: scaleX(0); will-change: transform, opacity; pointer-events: none;"></div>
+
+                    <!-- Rounded White Spec Card (Unrolls vertically from center-out) -->
+                    <div id="magnates-bp-spec-card" style="position: relative; width: 350px; height: 175px; border-radius: 20px; background: #ffffff; box-shadow: 0 0 36px rgba(255, 255, 255, 0.88), 0 24px 60px rgba(0, 0, 0, 0.7); display: flex; align-items: center; padding: 16px 20px; box-sizing: border-box; gap: 16px; opacity: 0; clip-path: inset(50% 0% 50% 0% round 20px); will-change: clip-path, opacity, transform;">
+                      <!-- Left: Product Mini Thumbnail -->
+                      <div style="width: 40%; height: 86%; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; padding: 6px; box-sizing: border-box; overflow: hidden; flex-shrink: 0;">
+                        <img id="magnates-bp-card-thumb-img" src="/printer_chassis_cutout.svg" alt="Card Preview" style="width: 100%; height: 100%; object-fit: contain;" />
+                      </div>
+                      <!-- Right: Specs Typography & Price -->
+                      <div style="display: flex; flex-direction: column; justify-content: center; gap: 3px; flex: 1; min-width: 0;">
+                        <div id="magnates-bp-card-series" style="font-family: 'Inter', -apple-system, sans-serif; font-size: 8.5px; font-weight: 800; color: #64748b; letter-spacing: 0.8px; text-transform: uppercase;">PREMIUM SERIES</div>
+                        <div id="magnates-bp-card-title" style="font-family: 'Inter', -apple-system, sans-serif; font-size: 13.5px; font-weight: 800; color: #0f172a; line-height: 1.15; letter-spacing: -0.2px;">Wireless Color All-in-One Printer</div>
+                        <div id="magnates-bp-card-stars" style="color: #f59e0b; font-size: 11px; margin-top: 1px; letter-spacing: 1px;">★★★★★</div>
+                        <div id="magnates-bp-card-price" style="font-family: 'Inter', -apple-system, sans-serif; font-size: 21px; font-weight: 900; color: #0f172a; margin-top: 4px; letter-spacing: -0.5px;">$149.99</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- TOP-LEFT FLOATING STUDIO OVERLAY STACK (Matches Image 4: Templates Library + Video/3D + 3D Edit Mode) -->
               <div style="position: absolute; top: 12px; left: 12px; z-index: 35; display: flex; flex-direction: column; align-items: flex-start; gap: 6px;">
                 <button type="button" id="btn-magnates-bp-open-drawer" style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 20px; background: rgba(15, 17, 26, 0.9); border: 1px solid rgba(168, 85, 247, 0.45); color: #f8fafc; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(10px); box-shadow: 0 4px 14px rgba(0,0,0,0.6);" title="Browse Linked Templates Library">
@@ -10029,6 +10074,7 @@
                 <button type="button" class="btn-bp-scene-pill" data-preset="products_unfurl" style="font-size: 9.5px; font-weight: 600; padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">2: Unfurl</button>
                 <button type="button" class="btn-bp-scene-pill" data-preset="globe_wavy_nothing" style="font-size: 9.5px; font-weight: 600; padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">3: Globe</button>
                 <button type="button" class="btn-bp-scene-pill" data-preset="dual_silhouette" style="font-size: 9.5px; font-weight: 600; padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">4: $1M</button>
+                <button type="button" class="btn-bp-scene-pill" data-preset="printer_glitch_card" style="font-size: 9.5px; font-weight: 600; padding: 5px 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: transparent; color: #94a3b8; cursor: pointer;">5: Glitch Card</button>
               </div>
             </div>
           </div>
@@ -10107,6 +10153,16 @@
                 </div>
               </div>
 
+              <!-- Scene 6 Card: Cinematic White Glitch & Floating Card Reveal -->
+              <div class="bp-storyboard-scene-card" data-scene-card="printer_glitch_card" data-jump-time="0" style="display: flex; align-items: center; gap: 10px; min-width: 215px; padding: 8px 11px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); cursor: pointer; transition: all 0.15s;">
+                <span style="width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #cbd5e1; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">6</span>
+                <img src="/printer_glitch_thumbnail.svg" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; background: #0c1017; border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;" />
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-size: 11px; font-weight: 700; color: #f8fafc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Scene 6: Glitch &amp; Card</div>
+                  <div style="font-size: 9px; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">White Glitch &rarr; Zoom &rarr; Unfold</div>
+                </div>
+              </div>
+
               <!-- + Add Scene Button Card (Matches Image 4) -->
               <button type="button" id="btn-magnates-bp-add-scene" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-width: 135px; height: 54px; padding: 6px 14px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.16); color: #cbd5e1; cursor: pointer; transition: all 0.15s; flex-shrink: 0;" title="Cycle or Add Scene into Merged Sequence">
                 <div style="width: 18px; height: 18px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #f8fafc;">+</div>
@@ -10138,6 +10194,27 @@
                 + ADD LAYER
                 <input type="file" id="magnates-bp-add-extra-layer-input" accept="image/*" style="display: none;" />
               </label>
+            </div>
+
+            <!-- Printer Glitch Scene Layers -->
+            <div id="magnates-bp-row-printer-hero" class="bp-inspector-layer-row" data-layer-id="printer_hero" style="display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <img src="/printer_chassis_cutout.svg" style="width: 30px; height: 30px; border-radius: 6px; object-fit: contain; background: #111; border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0;" />
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Printer Model &amp; Desk Items</span>
+                <span style="font-size: 9.5px; color: #64748b;">White Glitch Spawn &bull; Smooth Camera Zoom</span>
+              </div>
+              <label style="font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; cursor: pointer;">
+                Replace
+                <input type="file" id="magnates-bp-input-printer-hero" accept="image/*" style="display: none;" />
+              </label>
+            </div>
+
+            <div id="magnates-bp-row-printer-card" class="bp-inspector-layer-row" data-layer-id="printer_card" style="display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 6px 8px; cursor: pointer;">
+              <div style="width: 30px; height: 30px; border-radius: 6px; background: #ffffff; border: 1px solid rgba(255,255,255,0.4); display: grid; place-items: center; color: #000; font-size: 8px; font-weight: 900; flex-shrink: 0;">CARD</div>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                <span style="font-size: 11px; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Floating Spec Card</span>
+                <span style="font-size: 9.5px; color: #64748b;">Slit Ignition &bull; Center-Out Vertical Unfold</span>
+              </div>
             </div>
 
             <!-- Z=12 Layer Row: Temu Boardroom Office Photo (Zoom-Out Trackback) -->
@@ -10311,6 +10388,7 @@
             <option value="globe_wavy_nothing">Scene 3: Spinning Globe &amp; Wavy Text</option>
             <option value="dual_silhouette">Scene 4: $1M Silhouettes</option>
             <option value="room_spawn">Scene 5: Room Spawn</option>
+            <option value="printer_glitch_card">Scene 6: Glitch &amp; Card Reveal</option>
           </select>
 
           <!-- Scene A: Brand Logo Cutout & Wavy Typography Controls (Z=4 & Z=5) -->
@@ -10725,6 +10803,95 @@
               <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
                 <input type="range" id="magnates-bp-l2-glow-intensity" min="0" max="100" step="5" value="85" style="flex: 1; accent-color: #a855f7; cursor: pointer;" title="Cutout 2 Glow Intensity" />
                 <span id="magnates-bp-val-l2-glow" style="font-family: monospace; font-size: 9px; color: #c084fc; min-width: 26px; text-align: right;">85%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene 6: Cinematic White Glitch & Floating Card Reveal Controls -->
+          <div id="magnates-bp-card-printer-controls" style="display: none; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 12px; flex-direction: column; gap: 8px;">
+            <div style="font-size: 10.5px; font-weight: 700; color: #38bdf8; display: flex; justify-content: space-between;">
+              <span>White Glitch &amp; Floating Card Controls</span>
+              <span style="font-size: 9px; font-family: monospace; color: #94a3b8;">Glitch &bull; Zoom &bull; Unfold</span>
+            </div>
+
+            <!-- Glitch Timing & Duration -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Glitch Spawn</span>
+                  <span id="magnates-bp-val-printer-glitch-time" style="font-family: monospace; color: #38bdf8;">0.80s</span>
+                </div>
+                <input type="range" id="magnates-bp-printer-glitch-time" min="0.1" max="2.5" step="0.05" value="0.80" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Flash Dur</span>
+                  <span id="magnates-bp-val-printer-glitch-dur" style="font-family: monospace; color: #38bdf8;">120ms</span>
+                </div>
+                <input type="range" id="magnates-bp-printer-glitch-dur" min="40" max="300" step="10" value="120" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Camera Zoom Timing & Scale -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Zoom Duration</span>
+                  <span id="magnates-bp-val-printer-zoom-dur" style="font-family: monospace; color: #38bdf8;">1.60s</span>
+                </div>
+                <input type="range" id="magnates-bp-printer-zoom-dur" min="0.6" max="3.5" step="0.1" value="1.60" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Hero Zoom Scale</span>
+                  <span id="magnates-bp-val-printer-zoom-scale" style="font-family: monospace; color: #38bdf8;">1.55x</span>
+                </div>
+                <input type="range" id="magnates-bp-printer-zoom-scale" min="1.1" max="2.2" step="0.05" value="1.55" style="width: 100%; accent-color: #38bdf8; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Slit Delay & Card Unfold Duration -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Post-Zoom Delay</span>
+                  <span id="magnates-bp-val-printer-slit-delay" style="font-family: monospace; color: #a855f7;">100ms</span>
+                </div>
+                <input type="range" id="magnates-bp-printer-slit-delay" min="0" max="500" step="20" value="100" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+              </div>
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 9.5px; color: #94a3b8;">
+                  <span>Vertical Unfold</span>
+                  <span id="magnates-bp-val-printer-unfold-dur" style="font-family: monospace; color: #a855f7;">0.75s</span>
+                </div>
+                <input type="range" id="magnates-bp-printer-unfold-dur" min="0.2" max="2.0" step="0.05" value="0.75" style="width: 100%; accent-color: #a855f7; cursor: pointer;" />
+              </div>
+            </div>
+
+            <!-- Card Copy Customization -->
+            <div style="display: flex; flex-direction: column; gap: 5px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+              <span style="font-size: 9.5px; font-weight: 700; color: #cbd5e1;">CARD CONTENT &amp; SPECS</span>
+              <input type="text" id="magnates-bp-input-printer-series" value="PREMIUM SERIES" placeholder="Series / Category Badge" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              <input type="text" id="magnates-bp-input-printer-title" value="Wireless Color All-in-One Printer" placeholder="Product Title / Headline" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                <input type="text" id="magnates-bp-input-printer-price" value="$149.99" placeholder="Price Tag" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #ffffff; font-size: 10.5px; outline: none;" />
+                <select id="magnates-bp-select-printer-stars" style="width: 100%; background: #08090d; border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 5px 8px; color: #f59e0b; font-size: 10.5px; outline: none;">
+                  <option value="5" selected>★★★★★ (5 Stars)</option>
+                  <option value="4">★★★★☆ (4 Stars)</option>
+                  <option value="3">★★★☆☆ (3 Stars)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Card Glow & Aesthetics -->
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-top: 4px; border-top: 1px dashed rgba(255,255,255,0.08);">
+              <div style="display: flex; align-items: center; gap: 5px;">
+                <input type="color" id="magnates-bp-printer-glow-color" value="#ffffff" style="width: 22px; height: 22px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 0; background: none; cursor: pointer;" title="Card Outer Glow Color" />
+                <span style="font-size: 9.5px; color: #94a3b8;">Card Glow</span>
+              </div>
+              <div style="flex: 1; display: flex; align-items: center; gap: 6px;">
+                <input type="range" id="magnates-bp-printer-glow-radius" min="10" max="60" step="2" value="36" style="flex: 1; accent-color: #ffffff; cursor: pointer;" title="Card Glow Blur Radius" />
+                <span id="magnates-bp-val-printer-glow" style="font-family: monospace; font-size: 9px; color: #ffffff; min-width: 26px; text-align: right;">36px</span>
               </div>
             </div>
           </div>
