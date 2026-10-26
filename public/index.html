@@ -7500,17 +7500,40 @@
               </div>
             </div>
 
-            <!-- Playback Controls Bar -->
-            <div id="tpl-modal-playback-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; flex-shrink: 0; padding: 6px 4px 0; margin-top: 12px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <button type="button" id="btn-tpl-modal-play-toggle" style="padding: 7px 18px; font-size: 11.5px; font-weight: 600; background: #151824; border: 1px solid rgba(255,255,255,0.12); color: #f8fafc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
+            <!-- Playback Controls Bar (Play/Pause [Space], Seek Step [←/→], Volume [↑/↓]) -->
+            <div id="tpl-modal-playback-bar" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; flex-shrink: 0; padding: 6px 4px 0; margin-top: 12px; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <button type="button" id="btn-tpl-modal-play-toggle" title="Play / Pause (Shortcut: Space)" style="padding: 6px 14px; font-size: 11px; font-weight: 700; background: #151824; border: 1px solid rgba(255,255,255,0.14); color: #f8fafc; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
                   <span>&#x275A;&#x275A; Pause</span>
                 </button>
-                <button type="button" id="btn-tpl-modal-reset" style="padding: 7px 16px; font-size: 11.5px; font-weight: 500; background: #151824; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
+                <button type="button" id="btn-tpl-modal-reset" title="Restart from 0.00s" style="padding: 6px 11px; font-size: 11px; font-weight: 600; background: #151824; border: 1px solid rgba(255,255,255,0.12); color: #cbd5e1; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.15s; box-shadow: 0 4px 12px rgba(0,0,0,0.4);" onmouseover="this.style.background='#1f2333';" onmouseout="this.style.background='#151824';">
                   <span>&#x21BA; Replay</span>
                 </button>
-              </div>
 
+                <!-- Customizable Arrow-Key Seek Step Control (Default: 2s, supports ms or s) -->
+                <div style="display: inline-flex; align-items: center; gap: 4px; background: #131722; border: 1px solid rgba(99,102,241,0.28); border-radius: 8px; padding: 3px 6px;" title="Use Left/Right Arrow Keys to seek backward/forward by this step (supports milliseconds or seconds)">
+                  <button type="button" id="btn-tpl-modal-seek-back" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; border-radius: 5px; padding: 2px 6px; font-size: 10px; font-weight: 700; font-family: ui-monospace, monospace; cursor: pointer;" title="Seek Backward (Left Arrow)">&larr; -2s</button>
+                  <input type="number" id="tpl-modal-seek-step-input" value="2" min="0.001" max="60000" step="any" style="width: 44px; background: #0b0e16; border: 1px solid rgba(255,255,255,0.14); color: #f8fafc; border-radius: 4px; padding: 2px 4px; font-size: 10.5px; font-weight: 700; font-family: ui-monospace, monospace; text-align: center;" title="Custom seek amount for Left/Right arrows" />
+                  <select id="tpl-modal-seek-step-unit" style="background: #0b0e16; border: 1px solid rgba(255,255,255,0.14); color: #a5b4fc; border-radius: 4px; padding: 2px 3px; font-size: 10px; font-weight: 700; cursor: pointer;" title="Seek unit: Seconds (s) or Milliseconds (ms)">
+                    <option value="s" selected>sec</option>
+                    <option value="ms">ms</option>
+                  </select>
+                  <div style="display: inline-flex; gap: 2px;">
+                    <button type="button" class="btn-tpl-seek-preset" data-val="200" data-unit="ms" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; border-radius: 4px; padding: 1px 4px; font-size: 9px; font-weight: 600; cursor: pointer;" title="Set arrow step to 200 milliseconds">200ms</button>
+                    <button type="button" class="btn-tpl-seek-preset" data-val="1" data-unit="s" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; border-radius: 4px; padding: 1px 4px; font-size: 9px; font-weight: 600; cursor: pointer;" title="Set arrow step to 1 second">1s</button>
+                    <button type="button" class="btn-tpl-seek-preset" data-val="2" data-unit="s" style="background: rgba(99,102,241,0.22); border: 1px solid rgba(99,102,241,0.55); color: #e0e7ff; border-radius: 4px; padding: 1px 4px; font-size: 9px; font-weight: 700; cursor: pointer;" title="Set arrow step to 2 seconds (Default)">2s</button>
+                    <button type="button" class="btn-tpl-seek-preset" data-val="4" data-unit="s" style="background: transparent; border: 1px solid rgba(255,255,255,0.08); color: #94a3b8; border-radius: 4px; padding: 1px 4px; font-size: 9px; font-weight: 600; cursor: pointer;" title="Set arrow step to 4 seconds">4s</button>
+                  </div>
+                  <button type="button" id="btn-tpl-modal-seek-fwd" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #e2e8f0; border-radius: 5px; padding: 2px 6px; font-size: 10px; font-weight: 700; font-family: ui-monospace, monospace; cursor: pointer;" title="Seek Forward (Right Arrow)">+2s &rarr;</button>
+                </div>
+
+                <!-- Volume Control (Up/Down Arrow Keys) -->
+                <div style="display: inline-flex; align-items: center; gap: 5px; background: #131722; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 3px 8px;" title="Use Up/Down Arrow Keys to adjust volume">
+                  <button type="button" id="btn-tpl-modal-vol-mute" style="background: none; border: none; color: #cbd5e1; font-size: 12px; cursor: pointer; padding: 0; line-height: 1;" title="Mute / Unmute">&#x1F50A;</button>
+                  <input type="range" id="tpl-modal-vol-slider" min="0" max="100" step="1" value="80" style="width: 54px; accent-color: #6366f1; cursor: pointer;" />
+                  <span id="tpl-modal-vol-label" style="font-size: 10px; font-weight: 700; font-family: ui-monospace, monospace; color: #cbd5e1; min-width: 28px; text-align: right;">80%</span>
+                </div>
+              </div>
             </div>
           </div>
 

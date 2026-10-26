@@ -38295,13 +38295,14 @@ function updateTopCustomizerFrame(seqTime, now) {
 }
 
 function renderCustomizerFrameAtTime(targetTime) {
-  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 1;
   const totalSeqDur = hasMultipleScenes
     ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
-    : (topCustomizerState.duration || 6);
+    : (topCustomizerState.duration || (projectScenes && projectScenes[0]?.duration) || 6);
 
   const clampedTime = Math.max(0, Math.min(targetTime, totalSeqDur));
   topCustomizerState.startTime = performance.now() - (clampedTime * 1000);
+  topCustomizerState.pausedElapsedMs = clampedTime * 1000;
   
   const aud = document.getElementById('modal-customizer-audio-player');
   if (aud && aud.duration) {
@@ -41507,6 +41508,205 @@ function bindTopTemplateCustomizerEvents() {
     replayCustomizer();
   });
 
+  // ---------------------------------------------------------------------------
+  // Universal Keyboard Shortcuts & Seek / Volume Controls for #modal-top-template-customizer
+  // - Space: Pause / Unpause
+  // - ArrowLeft / ArrowRight: Seek backward / forward by customizable step (default 2s; supports ms or s)
+  // - ArrowUp / ArrowDown: Volume Up / Down by 5%
+  // ---------------------------------------------------------------------------
+  if (typeof topCustomizerState.seekStepVal !== 'number') topCustomizerState.seekStepVal = 2;
+  if (!topCustomizerState.seekStepUnit) topCustomizerState.seekStepUnit = 's';
+  if (typeof topCustomizerState.volume !== 'number') topCustomizerState.volume = 80;
+  if (typeof topCustomizerState.isMuted !== 'boolean') topCustomizerState.isMuted = false;
+
+  let _tplShortcutToastTimer = null;
+  const showTopCustomizerShortcutToast = (msg) => {
+    const stageCont = document.getElementById('tpl-modal-preview-stage-container');
+    if (!stageCont) return;
+    let toast = document.getElementById('tpl-modal-shortcut-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'tpl-modal-shortcut-toast';
+      toast.style.cssText = 'position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:85;padding:5px 13px;border-radius:999px;background:rgba(15,18,28,0.92);border:1px solid rgba(139,92,246,0.55);color:#f8fafc;font-size:11px;font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,0.55);transition:opacity 0.18s ease;';
+      stageCont.appendChild(toast);
+    }
+    toast.textContent = msg;
+    toast.style.opacity = '1';
+    if (_tplShortcutToastTimer) clearTimeout(_tplShortcutToastTimer);
+    _tplShortcutToastTimer = setTimeout(() => {
+      if (toast) toast.style.opacity = '0';
+    }, 1150);
+  };
+
+  const tplSeekStepInput = document.getElementById('tpl-modal-seek-step-input');
+  const tplSeekStepUnit = document.getElementById('tpl-modal-seek-step-unit');
+  const btnTplSeekBack = document.getElementById('btn-tpl-modal-seek-back');
+  const btnTplSeekFwd = document.getElementById('btn-tpl-modal-seek-fwd');
+  const tplPresetBtns = document.querySelectorAll('.btn-tpl-seek-preset');
+
+  const getTplSeekStepSeconds = () => {
+    const rawVal = Math.max(0.001, parseFloat(topCustomizerState.seekStepVal) || 2);
+    return topCustomizerState.seekStepUnit === 'ms' ? rawVal / 1000 : rawVal;
+  };
+
+  const formatTplSeekStepLabel = () => {
+    const rawVal = Math.max(0.001, parseFloat(topCustomizerState.seekStepVal) || 2);
+    const unit = topCustomizerState.seekStepUnit === 'ms' ? 'ms' : 's';
+    const cleanVal = Number.isInteger(rawVal) ? String(rawVal) : rawVal.toFixed(2).replace(/\.?0+$/, '');
+    return `${cleanVal}${unit}`;
+  };
+
+  const syncTplSeekStepUI = () => {
+    if (tplSeekStepInput && document.activeElement !== tplSeekStepInput) {
+      tplSeekStepInput.value = String(topCustomizerState.seekStepVal ?? 2);
+    }
+    if (tplSeekStepUnit) {
+      tplSeekStepUnit.value = topCustomizerState.seekStepUnit || 's';
+    }
+    const lbl = formatTplSeekStepLabel();
+    if (btnTplSeekBack) btnTplSeekBack.innerHTML = `&larr; -${lbl}`;
+    if (btnTplSeekFwd) btnTplSeekFwd.innerHTML = `+${lbl} &rarr;`;
+    tplPresetBtns.forEach((btn) => {
+      const bVal = parseFloat(btn.getAttribute('data-val') || '0');
+      const bUnit = btn.getAttribute('data-unit') || 's';
+      const isMatch = Math.abs(bVal - (topCustomizerState.seekStepVal ?? 2)) < 0.0001 && bUnit === (topCustomizerState.seekStepUnit || 's');
+      btn.style.background = isMatch ? 'rgba(99,102,241,0.22)' : 'transparent';
+      btn.style.borderColor = isMatch ? 'rgba(99,102,241,0.55)' : 'rgba(255,255,255,0.08)';
+      btn.style.color = isMatch ? '#e0e7ff' : '#94a3b8';
+      btn.style.fontWeight = isMatch ? '700' : '600';
+    });
+  };
+
+  const getCurrentCustomizerPlayheadSeconds = () => {
+    const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 1;
+    const totalSeqDur = hasMultipleScenes
+      ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
+      : (topCustomizerState.duration || (projectScenes && projectScenes[0]?.duration) || 6);
+    const rawElapsedMs = topCustomizerState.isPlaying
+      ? (performance.now() - (topCustomizerState.startTime || performance.now()))
+      : (typeof topCustomizerState.pausedElapsedMs === 'number'
+          ? topCustomizerState.pausedElapsedMs
+          : (performance.now() - (topCustomizerState.startTime || performance.now())));
+    const curSec = Math.max(0, rawElapsedMs / 1000) % Math.max(0.5, totalSeqDur);
+    return { curSec, totalSeqDur };
+  };
+
+  const seekTopCustomizerByDirection = (dir) => {
+    const stepSec = getTplSeekStepSeconds();
+    const { curSec, totalSeqDur } = getCurrentCustomizerPlayheadSeconds();
+    const nextSec = Math.max(0, Math.min(totalSeqDur, curSec + dir * stepSec));
+    renderCustomizerFrameAtTime(nextSec);
+    const lbl = formatTplSeekStepLabel();
+    showTopCustomizerShortcutToast(`${dir < 0 ? '⏪ -' : '⏩ +'}${lbl} → ${nextSec.toFixed(2)}s / ${totalSeqDur.toFixed(1)}s`);
+  };
+
+  tplSeekStepInput?.addEventListener('input', (e) => {
+    const v = parseFloat(e.target.value);
+    if (!Number.isNaN(v) && v > 0) {
+      topCustomizerState.seekStepVal = v;
+      syncTplSeekStepUI();
+    }
+  });
+  tplSeekStepUnit?.addEventListener('change', (e) => {
+    topCustomizerState.seekStepUnit = e.target.value === 'ms' ? 'ms' : 's';
+    syncTplSeekStepUI();
+    showTopCustomizerShortcutToast(`Seek Step: ±${formatTplSeekStepLabel()}`);
+  });
+  tplPresetBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      topCustomizerState.seekStepVal = parseFloat(btn.getAttribute('data-val') || '2');
+      topCustomizerState.seekStepUnit = btn.getAttribute('data-unit') === 'ms' ? 'ms' : 's';
+      syncTplSeekStepUI();
+      showTopCustomizerShortcutToast(`Seek Step: ±${formatTplSeekStepLabel()}`);
+    });
+  });
+  btnTplSeekBack?.addEventListener('click', () => seekTopCustomizerByDirection(-1));
+  btnTplSeekFwd?.addEventListener('click', () => seekTopCustomizerByDirection(1));
+  syncTplSeekStepUI();
+
+  // Volume Slider, Mute Button & Up/Down Arrow Support for #modal-top-template-customizer
+  const tplVolSlider = document.getElementById('tpl-modal-vol-slider');
+  const tplVolLabel = document.getElementById('tpl-modal-vol-label');
+  const tplVolMuteBtn = document.getElementById('btn-tpl-modal-vol-mute');
+
+  const syncTplVolumeUI = (showToast = false) => {
+    const effVol = topCustomizerState.isMuted ? 0 : Math.max(0, Math.min(100, Math.round(topCustomizerState.volume ?? 80)));
+    if (tplVolSlider) tplVolSlider.value = String(effVol);
+    if (tplVolLabel) tplVolLabel.textContent = `${effVol}%`;
+    if (tplVolMuteBtn) {
+      tplVolMuteBtn.innerHTML = effVol === 0 ? '&#x1F507;' : (effVol < 50 ? '&#x1F509;' : '&#x1F50A;');
+    }
+    const aud = document.getElementById('modal-customizer-audio-player');
+    if (aud) {
+      aud.muted = !!topCustomizerState.isMuted;
+      aud.volume = effVol / 100;
+    }
+    if (showToast) {
+      showTopCustomizerShortcutToast(`${effVol === 0 ? '🔇 Muted' : `🔊 Volume: ${effVol}%`}`);
+    }
+  };
+
+  tplVolSlider?.addEventListener('input', (e) => {
+    topCustomizerState.volume = Math.max(0, Math.min(100, parseInt(e.target.value, 10) || 0));
+    topCustomizerState.isMuted = topCustomizerState.volume === 0;
+    syncTplVolumeUI(true);
+  });
+  tplVolMuteBtn?.addEventListener('click', () => {
+    topCustomizerState.isMuted = !topCustomizerState.isMuted;
+    if (!topCustomizerState.isMuted && (topCustomizerState.volume ?? 0) === 0) {
+      topCustomizerState.volume = 80;
+    }
+    syncTplVolumeUI(true);
+  });
+  syncTplVolumeUI(false);
+
+  window.addEventListener('keydown', (e) => {
+    const modal = document.getElementById('modal-top-template-customizer');
+    if (!modal || modal.style.display === 'none') return;
+
+    const activeEl = document.activeElement;
+    if (activeEl) {
+      const tag = (activeEl.tagName || '').toUpperCase();
+      // Only skip shortcuts when typing in text/number/textarea/select controls (allow range sliders & buttons!)
+      if (tag === 'TEXTAREA' || tag === 'SELECT' || activeEl.isContentEditable) {
+        return;
+      }
+      if (tag === 'INPUT') {
+        const inputType = (activeEl.type || 'text').toLowerCase();
+        if (inputType !== 'range' && inputType !== 'checkbox' && inputType !== 'button') {
+          return;
+        }
+      }
+    }
+
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (activeEl && activeEl.tagName === 'BUTTON') activeEl.blur();
+      setCustomizerPlaying(!topCustomizerState.isPlaying);
+      showTopCustomizerShortcutToast(topCustomizerState.isPlaying ? '▶ Playing' : '⏸ Paused');
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (activeEl && activeEl.type === 'range') activeEl.blur();
+      seekTopCustomizerByDirection(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (activeEl && activeEl.type === 'range') activeEl.blur();
+      seekTopCustomizerByDirection(1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (activeEl && activeEl.type === 'range') activeEl.blur();
+      topCustomizerState.isMuted = false;
+      topCustomizerState.volume = Math.min(100, Math.round((topCustomizerState.volume ?? 80) + 5));
+      syncTplVolumeUI(true);
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (activeEl && activeEl.type === 'range') activeEl.blur();
+      topCustomizerState.volume = Math.max(0, Math.round((topCustomizerState.volume ?? 80) - 5));
+      topCustomizerState.isMuted = topCustomizerState.volume === 0;
+      syncTplVolumeUI(true);
+    }
+  });
+
   // HUD Scrubber Drag Seeking & YouTube-style Floating Hover Tooltip
   const scrubberWrap = document.getElementById('tpl-hud-scrubber-wrap');
   const tooltip = document.getElementById('tpl-hud-preview-tooltip');
@@ -43386,6 +43586,7 @@ function populateModalScenesStoryboard() {
     // When switching templates with single default scene, keep Scene 1 in sync with active template
     projectScenes[0].tplId = topCustomizerState.currentTpl.id;
     projectScenes[0].thumb = topCustomizerState.primaryUrl || topCustomizerState.currentTpl.defaultImage;
+    projectScenes[0].duration = topCustomizerState.duration || parseInt(topCustomizerState.currentTpl.timeToApply) || 6;
   }
 
   let html = projectScenes.map((sc, idx) => {

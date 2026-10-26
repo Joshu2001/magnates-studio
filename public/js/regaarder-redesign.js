@@ -3939,6 +3939,62 @@
       icon: LUCIDE_ICONS.layers,
       fileInputId: '',
       domSelector: ''
+    },
+    left_logo_adidas: {
+      id: 'left_logo_adidas',
+      name: 'Left Brand Logo',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      fileInputId: '',
+      domSelector: ''
+    },
+    right_logo_puma: {
+      id: 'right_logo_puma',
+      name: 'Right Brand Logo',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      fileInputId: '',
+      domSelector: ''
+    },
+    earth_globe_3d: {
+      id: 'earth_globe_3d',
+      name: '3D Spinning Earth',
+      variant: 'object3d',
+      icon: LUCIDE_ICONS.cube3d,
+      fileInputId: '',
+      domSelector: ''
+    },
+    central_light_rift: {
+      id: 'central_light_rift',
+      name: 'Central Light Rift',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.wand,
+      fileInputId: '',
+      domSelector: ''
+    },
+    travelling_sun_star: {
+      id: 'travelling_sun_star',
+      name: 'Sun-Star & Lens Flare',
+      variant: 'animation',
+      icon: LUCIDE_ICONS.effectsTab,
+      fileInputId: '',
+      domSelector: ''
+    },
+    cosmic_nebula_backdrop: {
+      id: 'cosmic_nebula_backdrop',
+      name: 'Cosmic Nebula Field',
+      variant: 'media',
+      icon: LUCIDE_ICONS.lookTab,
+      fileInputId: '',
+      domSelector: ''
+    },
+    satellite_map_plate: {
+      id: 'satellite_map_plate',
+      name: 'Satellite Map Plate',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      fileInputId: '',
+      domSelector: ''
     }
   };
 
