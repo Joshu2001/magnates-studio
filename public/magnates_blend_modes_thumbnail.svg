@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="blend-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#050a14"/>
+      <stop offset="50%" stop-color="#02050b"/>
+      <stop offset="100%" stop-color="#000205"/>
+    </linearGradient>
+
+    <!-- Cyan Screen Mode Glow -->
+    <radialGradient id="screen-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+      <stop offset="40%" stop-color="#0284c7" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#blend-bg)"/>
+
+  <!-- 3 Distinct Blend Mode Demonstration Cards in Studio Stage -->
+
+  <!-- CARD 1: SCREEN BLEND (Particles, Snow & Volumetric Light) -->
+  <g transform="translate(60, 90)">
+    <rect width="200" height="240" rx="14" fill="#0b1120" stroke="#38bdf8" stroke-width="1.5"/>
+    <!-- Simulated Film Footage -->
+    <rect x="15" y="15" width="170" height="150" rx="10" fill="#1e293b"/>
+    <!-- Screen Overlay Particles / Light Beam -->
+    <circle cx="100" cy="90" r="60" fill="url(#screen-glow)"/>
+    <!-- Falling snow particles -->
+    <circle cx="50" cy="60" r="3" fill="#ffffff" opacity="0.8"/>
+    <circle cx="130" cy="45" r="4" fill="#ffffff" opacity="0.9"/>
+    <circle cx="85" cy="120" r="2.5" fill="#ffffff" opacity="0.75"/>
+    <circle cx="150" cy="110" r="3.5" fill="#ffffff" opacity="0.85"/>
+    <rect x="20" y="180" width="160" height="22" rx="4" fill="rgba(2,132,199,0.25)" stroke="#38bdf8" stroke-width="1"/>
+    <text x="100" y="195" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="800" text-anchor="middle">
+      SCREEN (SNOW/LIGHT)
+    </text>
+  </g>
+
+  <!-- CARD 2: DIFFERENCE BLEND (Film Noise & Vintage Inverted Text) -->
+  <g transform="translate(300, 90)">
+    <rect width="200" height="240" rx="14" fill="#0b1120" stroke="#a855f7" stroke-width="1.5"/>
+    <!-- Simulated Footprint Footage with inverted Difference Effect -->
+    <rect x="15" y="15" width="170" height="150" rx="10" fill="#1e1b4b"/>
+    <rect x="35" y="45" width="130" height="90" fill="#f43f5e" opacity="0.75"/>
+    <!-- Inverted difference pattern -->
+    <path d="M45 55 L155 125 L45 125 Z" fill="#06b6d4" opacity="0.8"/>
+    <text x="100" y="95" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="900" text-anchor="middle">
+      DIFF NOISE
+    </text>
+    <rect x="20" y="180" width="160" height="22" rx="4" fill="rgba(168,85,247,0.25)" stroke="#a855f7" stroke-width="1"/>
+    <text x="100" y="195" fill="#c084fc" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="800" text-anchor="middle">
+      DIFFERENCE (GRAIN/TXT)
+    </text>
+  </g>
+
+  <!-- CARD 3: OVERLAY BLEND (Antique Clock Gear & Paper Textures) -->
+  <g transform="translate(540, 90)">
+    <rect width="200" height="240" rx="14" fill="#0b1120" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect x="15" y="15" width="170" height="150" rx="10" fill="#292524"/>
+    <!-- Overlay Antique Clock Mechanism Gear -->
+    <circle cx="100" cy="90" r="48" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-dasharray="8,6"/>
+    <circle cx="100" cy="90" r="28" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <line x1="100" y1="90" x2="100" y2="58" stroke="#fbbf24" stroke-width="2"/>
+    <line x1="100" y1="90" x2="125" y2="105" stroke="#fbbf24" stroke-width="2"/>
+    <rect x="20" y="180" width="160" height="22" rx="4" fill="rgba(245,158,11,0.25)" stroke="#f59e0b" stroke-width="1"/>
+    <text x="100" y="195" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="800" text-anchor="middle">
+      OVERLAY (CLOCK/TEX)
+    </text>
+  </g>
+
+  <!-- Title Pill -->
+  <g transform="translate(200, 375)">
+    <rect width="400" height="50" rx="10" fill="rgba(4,8,18,0.95)" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="200" y="22" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="800" text-anchor="middle" letter-spacing="1.5">
+      MAGNATES MEDIA // COMPOSITING SUITE
+    </text>
+    <text x="200" y="40" fill="#ffffff" font-family="'Cinzel', serif" font-size="15" font-weight="900" text-anchor="middle">
+      SCREEN, DIFFERENCE &amp; OVERLAY BLEND MODES
+    </text>
+  </g>
+</svg>

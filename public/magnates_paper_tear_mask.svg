@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="100%">
+  <!-- Definition of Realistic Torn Paper Edge with Cellulose Fibers & Drop Shadow -->
+  <defs>
+    <filter id="torn-shadow" x="-10%" y="-10%" width="140%" height="140%">
+      <feDropShadow dx="-4" dy="16" stdDeviation="14" flood-color="#000000" flood-opacity="0.95"/>
+      <feDropShadow dx="-1" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.85"/>
+    </filter>
+  </defs>
+
+  <!-- Authentic Digitized Paper Tear Contour from Top-Left to Bottom-Right -->
+  <!-- Top-left remains covered paper, fracturing diagonally down to bottom-right -->
+  <path id="torn-paper-edge-path" d="M 0,0 L 1000,0 L 1000,420 
+    L 985,416 L 968,412 L 954,417 L 940,410 L 922,406 L 910,412 L 895,404 L 880,401 
+    L 865,408 L 848,398 L 832,404 L 815,391 L 802,396 L 788,382 L 775,387 L 760,375 
+    L 744,379 L 730,366 L 715,372 L 701,358 L 685,364 L 670,349 L 655,355 L 638,340 
+    L 624,345 L 610,329 L 594,335 L 579,320 L 565,326 L 548,308 L 535,314 L 518,296 
+    L 504,302 L 488,285 L 474,291 L 458,272 L 442,279 L 426,260 L 412,267 L 395,248 
+    L 380,254 L 364,235 L 349,242 L 332,221 L 318,228 L 302,208 L 286,215 L 270,194 
+    L 255,201 L 238,180 L 222,187 L 205,165 L 190,172 L 174,150 L 158,157 L 140,135 
+    L 125,142 L 108,120 L 92,127 L 75,104 L 60,111 L 42,88 L 25,95 L 10,72 L 0,78 Z" fill="#ffffff" />
+</svg>

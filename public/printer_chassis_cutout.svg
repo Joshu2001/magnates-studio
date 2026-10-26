@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <!-- Printer Drop Shadow -->
+    <filter id="printerShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#000000" flood-opacity="0.85"/>
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Linear Gradients for 3D Shading -->
+    <linearGradient id="bodyTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="60%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+
+    <linearGradient id="bodyFrontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f1f5f9"/>
+      <stop offset="8%" stop-color="#e2e8f0"/>
+      <stop offset="90%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+
+    <linearGradient id="scannerTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+
+    <linearGradient id="scannerBevelGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94a3b8"/>
+      <stop offset="25%" stop-color="#cbd5e1"/>
+      <stop offset="75%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#64748b"/>
+    </linearGradient>
+
+    <linearGradient id="feederFlapGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+
+    <linearGradient id="trayCavityGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="20%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+
+    <linearGradient id="touchscreenFrame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+
+    <filter id="ledGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#10b981" flood-opacity="0.9"/>
+    </filter>
+
+    <radialGradient id="screenGlass" cx="30%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
+      <stop offset="60%" stop-color="#0f172a" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Shadow Base -->
+  <g filter="url(#printerShadow)">
+    <rect x="150" y="380" width="500" height="24" rx="10" fill="#000000" opacity="0.6"/>
+  </g>
+
+  <!-- Group of Printer Machine -->
+  <g id="printerMachine">
+    <!-- Main Lower Chassis -->
+    <rect x="140" y="210" width="520" height="180" rx="14" fill="url(#bodyFrontGrad)"/>
+    
+    <!-- Top Chamfer of Lower Chassis -->
+    <path d="M140,218 Q140,210 152,210 L648,210 Q660,210 660,218 L658,226 L142,226 Z" fill="#ffffff" opacity="0.6"/>
+
+    <!-- Subtle Horizontal Seam Line -->
+    <line x1="140" y1="285" x2="660" y2="285" stroke="#94a3b8" stroke-width="1.2" opacity="0.4"/>
+
+    <!-- Bottom Base Shadow Inset -->
+    <rect x="150" y="382" width="500" height="10" rx="4" fill="#64748b" opacity="0.5"/>
+
+    <!-- Scanner Module / Mid Section -->
+    <g id="scannerSection">
+      <!-- Upper Body Wedge / Scanner Deck -->
+      <path d="M152,148 L648,148 Q664,148 664,162 L660,210 L140,210 L136,162 Q136,148 152,148 Z" fill="url(#bodyTopGrad)"/>
+      <path d="M136,164 L664,164" stroke="#ffffff" stroke-width="1" opacity="0.8"/>
+      
+      <!-- Scanner Lid / Automatic Document Feeder (ADF) -->
+      <path d="M175,100 L625,100 Q640,100 644,112 L652,148 L148,148 L156,112 Q160,100 175,100 Z" fill="url(#scannerTopGrad)"/>
+      <!-- Feeder Bevel Recess -->
+      <path d="M210,102 L590,102 L575,124 L225,124 Z" fill="url(#feederFlapGrad)"/>
+      <line x1="225" y1="124" x2="575" y2="124" stroke="#64748b" stroke-width="1.5"/>
+
+      <!-- Document Feeder Tray Lip -->
+      <path d="M300,102 L500,102 L485,116 L315,116 Z" fill="#94a3b8" opacity="0.5"/>
+    </g>
+
+    <!-- Center Output Paper Tray Slot / Cavity -->
+    <g id="paperTray">
+      <!-- Dark Internal Cavity -->
+      <rect x="235" y="320" width="330" height="66" rx="6" fill="url(#trayCavityGrad)"/>
+      <rect x="240" y="322" width="320" height="4" fill="#000000" opacity="0.8"/>
+
+      <!-- Pull-Out Paper Catch Tray Extension -->
+      <path d="M245,335 L555,335 Q560,335 560,340 L560,380 Q560,384 555,384 L245,384 Q240,384 240,380 L240,340 Q240,335 245,335 Z" fill="url(#bodyFrontGrad)"/>
+      <!-- Tray Finger Recess / Handle Cutout -->
+      <rect x="360" y="344" width="80" height="14" rx="4" fill="#1e293b"/>
+      <rect x="362" y="346" width="76" height="4" rx="2" fill="#0f172a"/>
+    </g>
+
+    <!-- Modern Angled Touchscreen Display (Left of center) -->
+    <g id="touchScreen" transform="translate(182, 230)">
+      <!-- Bezel Outer Frame -->
+      <rect x="0" y="0" width="94" height="66" rx="8" fill="url(#touchscreenFrame)" stroke="#475569" stroke-width="2"/>
+      <rect x="2" y="2" width="90" height="62" rx="6" fill="#0f172a"/>
+
+      <!-- Glass Screen -->
+      <rect x="5" y="5" width="84" height="54" rx="4" fill="url(#screenGlass)"/>
+
+      <!-- Mini UI Icons on Display -->
+      <!-- App Icon 1 (Copy - Cyan) -->
+      <rect x="12" y="14" width="16" height="16" rx="3" fill="#06b6d4" opacity="0.9"/>
+      <rect x="15" y="17" width="10" height="10" rx="1" fill="#ffffff" opacity="0.9"/>
+      <!-- App Icon 2 (Scan - Emerald) -->
+      <rect x="34" y="14" width="16" height="16" rx="3" fill="#10b981" opacity="0.9"/>
+      <path d="M37,22 L47,22 M39,18 L45,18 M39,26 L45,26" stroke="#ffffff" stroke-width="1.2"/>
+      <!-- App Icon 3 (Settings - Violet) -->
+      <rect x="56" y="14" width="16" height="16" rx="3" fill="#8b5cf6" opacity="0.9"/>
+      <circle cx="64" cy="22" r="4" fill="none" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Status Bar Top & Home Indicator Bottom -->
+      <line x1="8" y1="46" x2="80" y2="46" stroke="#334155" stroke-width="0.8"/>
+      <circle cx="44" cy="53" r="2.5" fill="#64748b"/>
+    </g>
+
+    <!-- Tiny Power LED / Status Indicator (to left of screen) -->
+    <g transform="translate(162, 252)">
+      <circle cx="4" cy="4" r="3" fill="#10b981" filter="url(#ledGlow)"/>
+      <circle cx="4" cy="4" r="1.5" fill="#ffffff"/>
+    </g>
+
+    <!-- Brand Emblem / Circular Logo Badge (Center Front) -->
+    <g id="brandEmblem" transform="translate(400, 260)">
+      <circle cx="0" cy="0" r="21" fill="none" stroke="#64748b" stroke-width="2.5" opacity="0.8"/>
+      <!-- Sleek Stylized Geometric Monogram -->
+      <path d="M-8,-11 L-8,11 M-4,-8 L-4,8 M4,-11 L4,11 M8,-8 L8,8" stroke="#475569" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M-10,-2 L10,-2" stroke="#475569" stroke-width="2.5"/>
+    </g>
+
+    <!-- Right Side Model Typography Badge -->
+    <g transform="translate(610, 360)">
+      <text x="0" y="0" fill="#94a3b8" font-family="'Inter', -apple-system, sans-serif" font-weight="700" font-size="7.5" letter-spacing="1">SERIES 9000 // AIO</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Vignette -->
+    <radialGradient id="bg-grad" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#1e1b4b" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#090514" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#030208" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Multi-tier Outer Glow Filter -->
+    <filter id="cutout-pop-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <!-- Outer intense neon amber/gold aura -->
+      <feGaussianBlur stdDeviation="16" result="blur-wide"/>
+      <feFlood flood-color="#f59e0b" flood-opacity="0.75" result="color-wide"/>
+      <feComposite in="color-wide" in2="blur-wide" operator="in" result="glow-wide"/>
+
+      <!-- Inner tight crisp cyan/white edge punch -->
+      <feGaussianBlur stdDeviation="4" result="blur-tight"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.9" result="color-tight"/>
+      <feComposite in="color-tight" in2="blur-tight" operator="in" result="glow-tight"/>
+
+      <!-- Drop shadow for contrast separation -->
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000000" flood-opacity="0.95" result="shadow"/>
+
+      <feMerge>
+        <feMergeNode in="shadow"/>
+        <feMergeNode in="glow-wide"/>
+        <feMergeNode in="glow-tight"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <clipPath id="subject-cutout-clip">
+      <rect x="290" y="75" width="220" height="280" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#bg-grad)"/>
+
+  <!-- Low Contrast Dark Background Scene Grid -->
+  <g opacity="0.25" stroke="#6366f1" stroke-width="1">
+    <line x1="0" y1="225" x2="800" y2="225"/>
+    <line x1="400" y1="0" x2="400" y2="450"/>
+    <circle cx="400" cy="225" r="180" fill="none"/>
+    <circle cx="400" cy="225" r="260" fill="none"/>
+  </g>
+
+  <!-- Glowing Aura Backlight Behind Cutout -->
+  <circle cx="400" cy="210" r="140" fill="#f59e0b" opacity="0.35" filter="blur(28px)"/>
+
+  <!-- Popping High-Contrast Cutout Subject with Multi-Tier Glow -->
+  <g filter="url(#cutout-pop-glow)">
+    <rect x="286" y="71" width="228" height="288" rx="18" fill="none" stroke="#fbbf24" stroke-width="3"/>
+    <g clip-path="url(#subject-cutout-clip)">
+      <rect x="290" y="75" width="220" height="280" fill="#0b0f1d"/>
+      <radialGradient id="portrait-pop-light" cx="50%" cy="30%" r="70%">
+        <stop offset="0%" stop-color="#fef08a"/>
+        <stop offset="35%" stop-color="#f59e0b"/>
+        <stop offset="80%" stop-color="#1e1b4b"/>
+        <stop offset="100%" stop-color="#05050d"/>
+      </radialGradient>
+      <rect x="290" y="75" width="220" height="280" fill="url(#portrait-pop-light)"/>
+      <circle cx="400" cy="165" r="48" fill="#ffffff"/>
+      <path d="M335 320 C345 240, 370 225, 400 225 C430 225, 455 240, 465 320 Z" fill="#0f172a"/>
+      <path d="M375 235 L400 280 L425 235 Z" fill="#f59e0b"/>
+      <rect x="372" y="155" width="24" height="14" rx="4" fill="#090d16"/>
+      <rect x="404" y="155" width="24" height="14" rx="4" fill="#090d16"/>
+    </g>
+  </g>
+
+  <!-- High-Contrast Equalizer Readout HUD (Left) -->
+  <g transform="translate(50, 160)">
+    <rect width="180" height="130" rx="10" fill="rgba(10,8,22,0.92)" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
+    <text x="16" y="26" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800">STACKED CONTRAST &amp; GLOW</text>
+    <text x="16" y="52" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="8.5">BRIGHTNESS: +35%</text>
+    <rect x="16" y="58" width="148" height="5" rx="2" fill="#1e1b4b"/>
+    <rect x="16" y="58" width="115" height="5" rx="2" fill="#f59e0b"/>
+    <text x="16" y="86" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="8.5">CONTRAST: +50%</text>
+    <rect x="16" y="92" width="148" height="5" rx="2" fill="#1e1b4b"/>
+    <rect x="16" y="92" width="130" height="5" rx="2" fill="#fbbf24"/>
+    <text x="16" y="116" fill="#f59e0b" font-family="'JetBrains Mono', monospace" font-size="8">INNER/OUTER GLOW: DUAL</text>
+  </g>
+
+  <!-- Pop Separation Badge (Right) -->
+  <g transform="translate(570, 160)">
+    <rect width="180" height="130" rx="10" fill="rgba(10,8,22,0.92)" stroke="rgba(245,158,11,0.4)" stroke-width="1.5"/>
+    <text x="16" y="26" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800">ISOLATION METRICS</text>
+    <text x="16" y="52" fill="#e2e8f0" font-family="'Inter', sans-serif" font-size="11" font-weight="700">PNG POP RATIO: 3.4x</text>
+    <text x="16" y="72" fill="#94a3b8" font-family="Georgia, serif" font-size="10" font-style="italic">Luma edge separation</text>
+    <rect x="16" y="94" width="148" height="22" rx="4" fill="rgba(245,158,11,0.2)" stroke="#f59e0b" stroke-width="1"/>
+    <text x="90" y="109" fill="#fef08a" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" text-anchor="middle">CUTOUT SUBJECT POPS</text>
+  </g>
+
+  <!-- Title Pill -->
+  <g transform="translate(200, 375)">
+    <rect width="400" height="50" rx="10" fill="rgba(8,5,18,0.95)" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="200" y="22" fill="#fbbf24" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="800" text-anchor="middle" letter-spacing="1.5">
+      MAGNATES MEDIA // CUTOUT ENHANCEMENT
+    </text>
+    <text x="200" y="40" fill="#ffffff" font-family="'Cinzel', serif" font-size="15" font-weight="900" text-anchor="middle">
+      BRIGHTNESS, CONTRAST, &amp; GLOW
+    </text>
+  </g>
+</svg>

@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Paper Fiber Grain Shader -->
+    <filter id="hd-paper-grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="4" result="noise" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.88  0 0 0 0 0.84  0 0 0 0 0.76  0 0 0 0.32 0" result="coloredGrain" />
+      <feComposite operator="over" in="coloredGrain" in2="SourceGraphic" />
+    </filter>
+
+    <!-- Felt-Tip Highlighter Ink Bleed & Edge Noise -->
+    <filter id="hd-felt-bleed" x="-10%" y="-15%" width="120%" height="130%">
+      <feTurbulence type="turbulence" baseFrequency="0.09" numOctaves="3" result="turb" />
+      <feDisplacementMap in="SourceGraphic" in2="turb" scale="3.2" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+      <feGaussianBlur in="displaced" stdDeviation="0.6" result="blurred" />
+      <feMerge>
+        <feMergeNode in="blurred" />
+        <feMergeNode in="displaced" opacity="0.92" />
+      </feMerge>
+    </filter>
+
+    <!-- Macro Lens Depth of Field Gaussian Bokeh -->
+    <filter id="hd-lens-bokeh" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="2.8" />
+    </filter>
+    <filter id="hd-lens-subtle-bokeh" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="1.2" />
+    </filter>
+
+    <!-- Warm Directional Spotlight Lighting Sweep -->
+    <radialGradient id="hd-macro-light" cx="48%" cy="44%" r="62%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.38"/>
+      <stop offset="65%" stop-color="#f5ede0" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#140f0a" stop-opacity="0.65"/>
+    </radialGradient>
+
+    <!-- Shadow under BroadSheet Page -->
+    <filter id="hd-sheet-shadow" x="-5%" y="-5%" width="115%" height="115%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.75" />
+    </filter>
+  </defs>
+
+  <!-- Deep Archival Studio Background -->
+  <rect width="800" height="450" fill="#0d0a07"/>
+
+  <!-- 3D Angled Macro BroadSheet Canvas -->
+  <g transform="translate(45, 18) rotate(-0.5)" filter="url(#hd-sheet-shadow)">
+    <!-- Cream Broadsheet Paper Sheet with Fiber Normal Grain -->
+    <rect width="710" height="415" rx="3" fill="#f4efe6"/>
+    <rect width="710" height="415" rx="3" fill="none" filter="url(#hd-paper-grain)"/>
+
+    <!-- Subtle Paper Aging Edge Vignette -->
+    <rect width="710" height="415" rx="3" fill="none" stroke="#d5c8b2" stroke-width="1.5" opacity="0.7"/>
+
+    <!-- Top Newspaper Header & Masthead (Soft Lens Bokeh) -->
+    <g filter="url(#hd-lens-subtle-bokeh)" opacity="0.86">
+      <line x1="30" y1="28" x2="680" y2="28" stroke="#1f1811" stroke-width="3"/>
+      <line x1="30" y1="34" x2="680" y2="34" stroke="#1f1811" stroke-width="1"/>
+      <text x="355" y="58" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="25" fill="#18120b" letter-spacing="5" text-anchor="middle">THE FINANCIAL CHRONICLE</text>
+      
+      <g transform="translate(0, 71)">
+        <text x="35" y="0" font-family="'Courier New', monospace" font-size="9.5" font-weight="700" fill="#4d3f2f">VOL. XCIV NO. 28,401</text>
+        <text x="355" y="0" font-family="'Courier New', monospace" font-size="9.5" font-weight="700" fill="#4d3f2f" text-anchor="middle">NEW YORK, TUESDAY, OCTOBER 29, 1929</text>
+        <text x="675" y="0" font-family="'Courier New', monospace" font-size="9.5" font-weight="700" fill="#4d3f2f" text-anchor="end">PRICE THREE CENTS</text>
+      </g>
+      
+      <line x1="30" y1="78" x2="680" y2="78" stroke="#1f1811" stroke-width="1"/>
+    </g>
+
+    <!-- Main Editorial Headline: Crisp Serif Archival Typography -->
+    <text x="355" y="118" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-weight="900" font-size="33" fill="#0d0a06" letter-spacing="1.2" text-anchor="middle">
+      MARKET COLLAPSES IN PANIC
+    </text>
+
+    <!-- Dateline Double Rule -->
+    <line x1="30" y1="134" x2="680" y2="134" stroke="#251d14" stroke-width="1.8"/>
+    <line x1="30" y1="138" x2="680" y2="138" stroke="#251d14" stroke-width="0.8"/>
+
+    <g transform="translate(0, 154)">
+      <text x="355" y="0" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-size="12" font-weight="700" font-style="italic" fill="#251d14" letter-spacing="1.5" text-anchor="middle">
+        NEW YORK — Oct 28 &nbsp;&bull;&nbsp; RECORD 16,410,030 SHARES DUMPED &nbsp;&bull;&nbsp; TOTAL COLLAPSE
+      </text>
+    </g>
+
+    <!-- Multi-Column Typesetting with Authentic Serif Columns -->
+    <!-- Column 1: Left Background Column (Soft Lens Bokeh Falloff) -->
+    <g transform="translate(32, 175)" filter="url(#hd-lens-subtle-bokeh)" opacity="0.85">
+      <text font-family="'Times New Roman', Georgia, serif" font-size="10" fill="#1c160f" line-height="1.3">
+        <tspan x="0" y="12" font-weight="800">tadcanning brak, arens,</tspan>
+        <tspan x="0" y="27" font-weight="800">NEW YORK — Oct 28 — </tspan>
+        <tspan x="0" y="42">At cutse an an jouran set-</tspan>
+        <tspan x="0" y="57">alentr povnic properly</tspan>
+        <tspan x="0" y="72">ensure than nan-linders</tspan>
+        <tspan x="0" y="87">ensure that the dadd</tspan>
+        <tspan x="0" y="102">would area of all basic</tspan>
+        <tspan x="0" y="117">analysis as contagion</tspan>
+        <tspan x="0" y="132">spread across trading.</tspan>
+        <tspan x="0" y="152" font-weight="700">Brokers Stood Stunned</tspan>
+        <tspan x="0" y="167">As ticker lines trailed</tspan>
+        <tspan x="0" y="182">record hours behind trade.</tspan>
+      </text>
+    </g>
+
+    <!-- Divider Line 1 -->
+    <line x1="172" y1="175" x2="172" y2="390" stroke="#d5c8b2" stroke-width="0.8"/>
+
+    <!-- Column 2 & 3: Pin-Sharp Macro Focal Zone with Photorealistic Felt-Tip Highlighter -->
+    <g transform="translate(185, 175)">
+      <!-- Highlight #1: Organic Bleeding Yellow Marker Stroke -->
+      <path d="M -15 11 Q 50 8, 125 10 Q 128 32, -15 34 Z" fill="#ffe234" opacity="0.92" style="mix-blend-mode: multiply;" filter="url(#hd-felt-bleed)"/>
+      <text x="-8" y="27" font-family="'Playfair Display', 'Times New Roman', serif" font-size="14.5" font-weight="900" fill="#000000" letter-spacing="0.5">,000 LOST</text>
+
+      <!-- Middle Body Text with Felt-Tip Marker Ink Bleed into Fibers -->
+      <path d="M 115 8 Q 230 6, 325 8 Q 323 35, 115 36 Z" fill="#ffe234" opacity="0.9" style="mix-blend-mode: multiply;" filter="url(#hd-felt-bleed)"/>
+      <text font-family="'Times New Roman', Georgia, serif" font-size="10.8" fill="#0f0c08" line-height="1.25">
+        <tspan x="122" y="19" font-weight="700">Felt-tip markers incernine fiber</tspan>
+        <tspan x="122" y="32" font-weight="700">absorption, bleeding into nra-</tspan>
+        <tspan x="122" y="46" fill="#2d2319">ghoning, newsprint, handdraw</tspan>
+        <tspan x="122" y="59" fill="#2d2319">edges.</tspan>
+      </text>
+
+      <!-- Highlight #2: Smoking Gun Target Quote -->
+      <path d="M 335 7 Q 430 5.5, 485 7.5 Q 484 33, 335 34 Z" fill="#facc15" opacity="0.95" style="mix-blend-mode: multiply;" filter="url(#hd-felt-bleed)"/>
+      <text x="345" y="26.5" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-size="13.5" font-weight="900" fill="#000000" letter-spacing="0.6">
+        NO BUYERS FOUND
+      </text>
+
+      <!-- Authentic Felt-Tip Highlighter Chisel Nib at Stroke Head -->
+      <g transform="translate(482, 6) rotate(16)">
+        <polygon points="0,3 15,0 12,24 0,20" fill="#eab308" stroke="#ca8a04" stroke-width="0.8"/>
+        <polygon points="15,0 26,-3 23,21 12,24" fill="#fde047"/>
+        <line x1="1" y1="12" x2="13" y2="12" stroke="#ca8a04" stroke-width="0.5"/>
+      </g>
+
+      <!-- Razor-Sharp Sub-Paragraph Columns -->
+      <g transform="translate(0, 68)">
+        <!-- Col 2 Narrative -->
+        <text font-family="'Times New Roman', Georgia, serif" font-size="10.2" fill="#140f09" line-height="1.3">
+          <tspan x="0" y="14">The tast mueline news enuts</tspan>
+          <tspan x="0" y="29">shape the brooksatrick in live</tspan>
+          <tspan x="0" y="44">opanning uninager refleshed the</tspan>
+          <tspan x="0" y="59">clasm: of the dni whist-</tspan>
+          <tspan x="0" y="74">onling lever analysis ascints.</tspan>
+          <tspan x="0" y="89">In thousands of boardrooms,</tspan>
+          <tspan x="0" y="104">uncontrolled selling drove</tspan>
+          <tspan x="0" y="119">prices beneath par value.</tspan>
+        </text>
+
+        <!-- Col 3 Narrative -->
+        <text font-family="'Times New Roman', Georgia, serif" font-size="10.2" fill="#140f09" line-height="1.3" transform="translate(170, 0)">
+          <tspan x="0" y="14" font-weight="800">NEW YORK — Oct 28 —</tspan>
+          <tspan x="0" y="29">met, consectetur sit am am-</tspan>
+          <tspan x="0" y="44">and alentarth cuied hanning</tspan>
+          <tspan x="0" y="59">wargest corporate insolven-</tspan>
+          <tspan x="0" y="74">inkia lioso, asocial facility</tspan>
+          <tspan x="0" y="89">largest corporate insolven</tspan>
+          <tspan x="0" y="104">and other modern history,</tspan>
+          <tspan x="0" y="119">finding as contagion deepens.</tspan>
+        </text>
+      </g>
+    </g>
+
+    <!-- Divider Line 2 -->
+    <line x1="535" y1="175" x2="535" y2="390" stroke="#d5c8b2" stroke-width="0.8"/>
+
+    <!-- Column 4: Far Right Column (Soft Lens Depth Blur) -->
+    <g transform="translate(548, 175)" filter="url(#hd-lens-bokeh)" opacity="0.8">
+      <text font-family="'Times New Roman', Georgia, serif" font-size="10.2" fill="#1c160f" line-height="1.3">
+        <tspan x="0" y="14">sample mans in eac-</tspan>
+        <tspan x="0" y="29">want to 1,000 p-</tspan>
+        <tspan x="0" y="44">economics and w-</tspan>
+        <tspan x="0" y="59">recentty.</tspan>
+        <tspan x="0" y="76" font-weight="700">Brambaut of John</tspan>
+        <tspan x="0" y="91">immine, lacorute</tspan>
+        <tspan x="0" y="106">rumics, new dim-</tspan>
+        <tspan x="0" y="121">veoltatlisttary de.</tspan>
+      </text>
+    </g>
+
+    <!-- Macro Lens Spotlight Vignette Sweep -->
+    <rect width="710" height="415" rx="3" fill="url(#hd-macro-light)" pointer-events="none"/>
+  </g>
+</svg>

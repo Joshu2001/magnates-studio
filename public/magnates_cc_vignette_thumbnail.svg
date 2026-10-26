@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background Vignette Mask Gradient -->
+    <radialGradient id="cc-vignette-grad" cx="50%" cy="50%" r="58%">
+      <stop offset="0%" stop-color="#0284c7" stop-opacity="0.12"/>
+      <stop offset="45%" stop-color="#000000" stop-opacity="0.45"/>
+      <stop offset="78%" stop-color="#020617" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.98"/>
+    </radialGradient>
+
+    <!-- Cyan Accent Linear -->
+    <linearGradient id="cyan-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+
+    <!-- Bokeh Orbs Filter -->
+    <filter id="bokeh-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+
+    <filter id="cutout-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.95"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="12" flood-color="#38bdf8" flood-opacity="0.35"/>
+    </filter>
+
+    <!-- Clipping path for cutout subject -->
+    <clipPath id="subject-frame">
+      <rect x="290" y="75" width="220" height="280" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <!-- Deep Obsidian Dark Slate Backdrop -->
+  <rect width="800" height="450" fill="#04060d"/>
+
+  <!-- Simulated DOF Blurred Background Wall / Archival Elements -->
+  <g filter="url(#bokeh-blur)" opacity="0.65">
+    <rect x="60" y="60" width="300" height="200" fill="#1e293b" rx="12"/>
+    <rect x="440" y="80" width="300" height="180" fill="#0f172a" rx="12"/>
+    <circle cx="180" cy="160" r="70" fill="#0369a1" opacity="0.4"/>
+    <circle cx="620" cy="220" r="90" fill="#1e3a8a" opacity="0.45"/>
+    <circle cx="400" cy="120" r="60" fill="#0284c7" opacity="0.25"/>
+    <circle cx="120" cy="340" r="80" fill="#0f766e" opacity="0.3"/>
+    <circle cx="680" cy="320" r="85" fill="#1d4ed8" opacity="0.35"/>
+  </g>
+
+  <!-- CC Vignette Lens Falloff Overlay -->
+  <rect width="800" height="450" fill="url(#cc-vignette-grad)"/>
+
+  <!-- Vignette Angle / Aperture Guides -->
+  <g stroke="rgba(56,189,248,0.22)" stroke-dasharray="4,6" fill="none">
+    <ellipse cx="400" cy="215" rx="360" ry="195"/>
+    <ellipse cx="400" cy="215" rx="270" ry="145"/>
+    <ellipse cx="400" cy="215" rx="180" ry="95"/>
+    <!-- Focus Crosshair ticks -->
+    <line x1="400" y1="20" x2="400" y2="40"/>
+    <line x1="400" y1="390" x2="400" y2="410"/>
+    <line x1="30" y1="215" x2="50" y2="215"/>
+    <line x1="750" y1="215" x2="770" y2="215"/>
+  </g>
+
+  <!-- In-Focus Sharp Cutout Subject (Center Focus Point) -->
+  <g filter="url(#cutout-shadow)">
+    <!-- Cyan Outline Halo / Isolation Border -->
+    <rect x="286" y="71" width="228" height="288" rx="18" fill="none" stroke="url(#cyan-accent)" stroke-width="2.5"/>
+
+    <!-- Cutout Image Container -->
+    <g clip-path="url(#subject-frame)">
+      <rect x="290" y="75" width="220" height="280" fill="#0f172a"/>
+      <!-- Gradient silhouette representation of crisp cutout -->
+      <radialGradient id="face-glow" cx="50%" cy="32%" r="60%">
+        <stop offset="0%" stop-color="#38bdf8"/>
+        <stop offset="45%" stop-color="#1e3a8a"/>
+        <stop offset="100%" stop-color="#050814"/>
+      </radialGradient>
+      <rect x="290" y="75" width="220" height="280" fill="url(#face-glow)"/>
+
+      <!-- Sharp Character Vector Details -->
+      <circle cx="400" cy="165" r="46" fill="#f1f5f9"/>
+      <path d="M335 320 C345 240, 370 230, 400 230 C430 230, 455 240, 465 320 Z" fill="#0f172a"/>
+      <path d="M375 235 L400 280 L425 235 Z" fill="#ffffff"/>
+      <path d="M394 245 L406 245 L402 315 L398 315 Z" fill="#0284c7"/>
+      <!-- Noir Sunglasses -->
+      <rect x="372" y="155" width="24" height="14" rx="4" fill="#090d16"/>
+      <rect x="404" y="155" width="24" height="14" rx="4" fill="#090d16"/>
+      <line x1="396" y1="162" x2="404" y2="162" stroke="#090d16" stroke-width="2"/>
+    </g>
+
+    <!-- In-Focus Target Reticle Marker -->
+    <rect x="330" y="325" width="140" height="24" rx="6" fill="rgba(2,6,23,0.92)" stroke="#38bdf8" stroke-width="1.2"/>
+    <circle cx="344" cy="337" r="4" fill="#38bdf8"/>
+    <text x="356" y="341" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="800">SHARP FOCUS (0px)</text>
+  </g>
+
+  <!-- CC Vignette Intensity HUD Meter (Left) -->
+  <g transform="translate(50, 160)">
+    <rect width="180" height="130" rx="10" fill="rgba(8,12,24,0.92)" stroke="rgba(56,189,248,0.3)" stroke-width="1.5"/>
+    <text x="16" y="26" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800">CC VIGNETTE CONTROLS</text>
+    
+    <text x="16" y="52" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="8.5">AMOUNT: 85%</text>
+    <rect x="16" y="58" width="148" height="6" rx="3" fill="#1e293b"/>
+    <rect x="16" y="58" width="125" height="6" rx="3" fill="#38bdf8"/>
+
+    <text x="16" y="86" fill="#94a3b8" font-family="'JetBrains Mono', monospace" font-size="8.5">DOF BLUR: 12px</text>
+    <rect x="16" y="92" width="148" height="6" rx="3" fill="#1e293b"/>
+    <rect x="16" y="92" width="90" height="6" rx="3" fill="#0284c7"/>
+
+    <text x="16" y="116" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="7.5">FALLOFF: SMOOTH QUAD</text>
+  </g>
+
+  <!-- Focus Pull / Narrative Target HUD (Right) -->
+  <g transform="translate(570, 160)">
+    <rect width="180" height="130" rx="10" fill="rgba(8,12,24,0.92)" stroke="rgba(56,189,248,0.3)" stroke-width="1.5"/>
+    <text x="16" y="26" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800">DEPTH OF FOCUS</text>
+    
+    <text x="16" y="50" fill="#e2e8f0" font-family="'Inter', sans-serif" font-size="11" font-weight="700">FOCAL LOCK: ON</text>
+    <text x="16" y="70" fill="#94a3b8" font-family="Georgia, serif" font-size="10" font-style="italic">Subject pops forward</text>
+    <text x="16" y="85" fill="#94a3b8" font-family="Georgia, serif" font-size="10" font-style="italic">Background falls off</text>
+    
+    <rect x="16" y="98" width="148" height="20" rx="4" fill="rgba(2,132,199,0.2)" stroke="#0284c7" stroke-width="1"/>
+    <text x="90" y="112" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700" text-anchor="middle">CUTOUT ISOLATION</text>
+  </g>
+
+  <!-- Bottom Headline Card -->
+  <g transform="translate(200, 368)">
+    <rect width="400" height="56" rx="10" fill="rgba(4,7,16,0.94)" stroke="url(#cyan-accent)" stroke-width="1.5"/>
+    <text x="200" y="24" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="800" text-anchor="middle" letter-spacing="1.5">
+      MAGNATES MEDIA // ATMOSPHERE &amp; LIGHTING
+    </text>
+    <text x="200" y="44" fill="#ffffff" font-family="'Cinzel', serif" font-size="16" font-weight="900" text-anchor="middle" letter-spacing="1">
+      CC VIGNETTE &amp; DEPTH OF FOCUS
+    </text>
+  </g>
+
+  <!-- Top Badges -->
+  <g transform="translate(30, 24)">
+    <rect width="180" height="28" rx="6" fill="rgba(2,132,199,0.2)" stroke="#38bdf8" stroke-width="1"/>
+    <text x="90" y="18" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800" text-anchor="middle">MAGNATES MEDIA</text>
+  </g>
+
+  <g transform="translate(580, 24)">
+    <rect width="190" height="28" rx="6" fill="rgba(15,23,42,0.9)" stroke="rgba(56,189,248,0.5)" stroke-width="1"/>
+    <circle cx="16" cy="14" r="4" fill="#38bdf8"/>
+    <text x="100" y="18" fill="#e2e8f0" font-family="'Inter', sans-serif" font-size="10" font-weight="700" text-anchor="middle">CC VIGNETTE + DOF</text>
+  </g>
+</svg>

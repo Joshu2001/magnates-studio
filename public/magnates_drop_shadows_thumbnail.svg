@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="shadow-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090a14"/>
+      <stop offset="100%" stop-color="#020306"/>
+    </linearGradient>
+
+    <!-- Floor Grid Perspective Gradient -->
+    <linearGradient id="floor-fade" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.02"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#shadow-bg)"/>
+
+  <!-- Tilted 3D Ground Floor Grid where shadows project -->
+  <g opacity="0.35" stroke="#38bdf8" stroke-width="1.2">
+    <!-- Vanishing floor perspective -->
+    <line x1="400" y1="200" x2="0" y2="450"/>
+    <line x1="400" y1="200" x2="200" y2="450"/>
+    <line x1="400" y1="200" x2="400" y2="450"/>
+    <line x1="400" y1="200" x2="600" y2="450"/>
+    <line x1="400" y1="200" x2="800" y2="450"/>
+    <ellipse cx="400" cy="360" rx="360" ry="70" fill="none"/>
+    <ellipse cx="400" cy="300" rx="260" ry="50" fill="none"/>
+  </g>
+
+  <!-- SHADOW LAYER 1: Deep Distant Ambient Shadow (Soft, High Blur, Low Opacity, Angle 125°) -->
+  <ellipse cx="470" cy="360" rx="140" ry="45" fill="#000000" opacity="0.65" filter="blur(26px)"/>
+
+  <!-- SHADOW LAYER 2: Directional Contact Shadow (Medium Blur, Medium Opacity, Offset Down-Right) -->
+  <ellipse cx="440" cy="340" rx="100" ry="32" fill="#000000" opacity="0.85" filter="blur(14px)"/>
+
+  <!-- SHADOW LAYER 3: Tight Occlusion Shadow (Sharp Contact Base, High Opacity) -->
+  <ellipse cx="415" cy="320" rx="65" ry="18" fill="#000000" opacity="0.95" filter="blur(5px)"/>
+
+  <!-- Ray lines indicating shadow projection vectors -->
+  <g stroke="rgba(245,158,11,0.5)" stroke-dasharray="4,4" stroke-width="1.5">
+    <line x1="400" y1="120" x2="470" y2="360"/>
+    <line x1="320" y1="220" x2="440" y2="340"/>
+  </g>
+
+  <!-- Floating Flat 2D Cutout Portrait Card (Levitating at Z:+120px) -->
+  <g transform="translate(300, 70)">
+    <rect width="200" height="250" rx="16" fill="#0e1322" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="100" cy="90" r="42" fill="#e2e8f0"/>
+    <path d="M45 230 C55 160, 75 145, 100 145 C125 145, 145 160, 155 230 Z" fill="#1e293b"/>
+    <rect x="75" y="80" width="22" height="12" rx="3" fill="#090d16"/>
+    <rect x="103" y="80" width="22" height="12" rx="3" fill="#090d16"/>
+    <!-- Floating Depth Indicator -->
+    <rect x="25" y="210" width="150" height="24" rx="6" fill="rgba(2,6,23,0.92)" stroke="#38bdf8" stroke-width="1"/>
+    <text x="100" y="226" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" text-anchor="middle">
+      FLOATING ELEVATION: 45PX
+    </text>
+  </g>
+
+  <!-- Inspector Shadow Stack Breakdown (Left) -->
+  <g transform="translate(50, 160)">
+    <rect width="180" height="130" rx="10" fill="rgba(8,12,24,0.92)" stroke="rgba(56,189,248,0.35)" stroke-width="1.5"/>
+    <text x="16" y="26" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800">MULTI-TIER SHADOWS</text>
+    <text x="16" y="50" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="8.5">LAYER 1: AMBIENT (26px)</text>
+    <text x="16" y="72" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="8.5">LAYER 2: CAST (14px)</text>
+    <text x="16" y="94" fill="#cbd5e1" font-family="'JetBrains Mono', monospace" font-size="8.5">LAYER 3: CONTACT (5px)</text>
+    <rect x="16" y="106" width="148" height="16" rx="4" fill="rgba(56,189,248,0.15)"/>
+    <text x="90" y="118" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700" text-anchor="middle">REALISTIC DEPTH</text>
+  </g>
+
+  <!-- Title Pill -->
+  <g transform="translate(200, 375)">
+    <rect width="400" height="50" rx="10" fill="rgba(8,12,24,0.95)" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="200" y="22" fill="#38bdf8" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="800" text-anchor="middle" letter-spacing="1.5">
+      MAGNATES MEDIA // 2D CUTOUT FLOATING
+    </text>
+    <text x="200" y="40" fill="#ffffff" font-family="'Cinzel', serif" font-size="15" font-weight="900" text-anchor="middle">
+      MULTI-LAYERED DROP SHADOWS
+    </text>
+  </g>
+</svg>

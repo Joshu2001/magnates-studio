@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <!-- Dark Wood Table Gradient -->
+    <radialGradient id="deskGrad" cx="52%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#24160f" />
+      <stop offset="55%" stop-color="#140c07" />
+      <stop offset="100%" stop-color="#050302" />
+    </radialGradient>
+
+    <!-- Volumetric Spotlight / God Ray Gradient -->
+    <linearGradient id="godRay" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fff5dc" stop-opacity="0.32" />
+      <stop offset="35%" stop-color="#fee6b4" stop-opacity="0.14" />
+      <stop offset="70%" stop-color="#fed7aa" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Warm Newsprint Paper Gradients -->
+    <linearGradient id="paperGradTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f7f3e6" />
+      <stop offset="100%" stop-color="#ebe4d2" />
+    </linearGradient>
+
+    <linearGradient id="paperGradMid" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8e0ce" />
+      <stop offset="100%" stop-color="#ddd4bf" />
+    </linearGradient>
+
+    <linearGradient id="paperGradBot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#dfd6c2" />
+      <stop offset="100%" stop-color="#d4caa4" />
+    </linearGradient>
+
+    <!-- Golden Marker Highlighter Gradient -->
+    <linearGradient id="markerYellow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="50%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+
+    <!-- Contact Drop Shadows -->
+    <filter id="stackShadow" x="-20%" y="-20%" width="145%" height="150%">
+      <feDropShadow dx="0" dy="30" stdDeviation="28" flood-color="#000000" flood-opacity="0.88" />
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#0a0604" flood-opacity="0.65" />
+    </filter>
+
+    <filter id="topSheetShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#080605" flood-opacity="0.65" />
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#080605" flood-opacity="0.45" />
+    </filter>
+
+    <filter id="popoutShadow" x="-25%" y="-35%" width="150%" height="180%">
+      <feDropShadow dx="0" dy="24" stdDeviation="16" flood-color="#000000" flood-opacity="0.85" />
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f0c08" flood-opacity="0.5" />
+    </filter>
+
+    <!-- Depth of Field (f/2.8 Lens Bokeh Simulation) for Distant Masthead -->
+    <filter id="mastheadBokeh" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="1.2" />
+    </filter>
+  </defs>
+
+  <!-- 1. Dark Executive Wooden Desk Surface -->
+  <rect width="800" height="450" fill="url(#deskGrad)" />
+  
+  <!-- Subtle Desk Wood Grain Striations -->
+  <g opacity="0.16">
+    <line x1="0" y1="60" x2="800" y2="70" stroke="#fff" stroke-width="0.8" />
+    <line x1="0" y1="120" x2="800" y2="135" stroke="#000" stroke-width="1.5" />
+    <line x1="0" y1="180" x2="800" y2="195" stroke="#fff" stroke-width="0.6" />
+    <line x1="0" y1="240" x2="800" y2="250" stroke="#000" stroke-width="1.2" />
+    <line x1="0" y1="320" x2="800" y2="330" stroke="#fff" stroke-width="0.7" />
+    <line x1="0" y1="390" x2="800" y2="400" stroke="#000" stroke-width="1.6" />
+  </g>
+
+  <!-- 2. Volumetric Diagonal Spotlight Beam (God Ray) -->
+  <polygon points="480,0 800,0 800,450 180,450" fill="url(#godRay)" style="mix-blend-mode: screen;" />
+
+  <!-- 3. Physical Newspaper Stack (3D Spatial Layering) -->
+  <!-- Bottom Stack Sheet (Fanned slightly left) -->
+  <g transform="translate(400, 225) rotate(-3.5) translate(-315, -165)" filter="url(#stackShadow)">
+    <rect width="630" height="340" rx="3" fill="url(#paperGradBot)" stroke="#c5bca6" stroke-width="1" />
+    <line x1="40" y1="35" x2="590" y2="35" stroke="#292524" stroke-width="1.5" opacity="0.25" />
+    <line x1="40" y1="55" x2="590" y2="55" stroke="#292524" stroke-width="0.8" opacity="0.2" />
+  </g>
+
+  <!-- Middle Stack Sheet (Fanned slightly right) -->
+  <g transform="translate(400, 225) rotate(2.2) translate(-310, -162)">
+    <rect width="625" height="335" rx="3" fill="url(#paperGradMid)" stroke="#cccaa6" stroke-width="1" />
+    <line x1="40" y1="35" x2="585" y2="35" stroke="#292524" stroke-width="1.5" opacity="0.3" />
+  </g>
+
+  <!-- Top Newspaper Sheet (Slight tilt, authentic typesetting) -->
+  <g transform="translate(400, 225) rotate(-0.5) translate(-305, -158)" filter="url(#topSheetShadow)">
+    <rect width="615" height="330" rx="2.5" fill="url(#paperGradTop)" stroke="#dcd4c0" stroke-width="1.2" />
+
+    <!-- Paper Grain Micro Texture -->
+    <rect width="615" height="330" fill="#000" opacity="0.035" />
+
+    <!-- A. Masthead Area with Subtle Depth-Of-Field Bokeh Blur -->
+    <g filter="url(#mastheadBokeh)">
+      <!-- Top Double Hairline Rules -->
+      <line x1="32" y1="32" x2="583" y2="32" stroke="#1c1917" stroke-width="3.2" />
+      <line x1="32" y1="37" x2="583" y2="37" stroke="#1c1917" stroke-width="1.0" />
+
+      <!-- Authentic Newspaper Masthead Title -->
+      <text x="307" y="68" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-weight="900" font-size="29" fill="#1a1512" letter-spacing="6" text-anchor="middle">
+        THE FINANCIAL GAZETTE
+      </text>
+
+      <!-- Dateline Bar Between Borders -->
+      <line x1="32" y1="80" x2="583" y2="80" stroke="#292524" stroke-width="1.2" />
+      <text x="40" y="93" font-family="'Times New Roman', Georgia, serif" font-size="10" font-weight="700" fill="#44403c" letter-spacing="0.8">
+        DATE: 20 October 2021
+      </text>
+      <text x="307" y="93" font-family="'Times New Roman', Georgia, serif" font-size="10" font-weight="700" fill="#44403c" letter-spacing="0.8" text-anchor="middle">
+        IONSDAY, 19 HI 17, 2021
+      </text>
+      <text x="575" y="93" font-family="'Times New Roman', Georgia, serif" font-size="10" font-weight="700" fill="#44403c" letter-spacing="0.8" text-anchor="end">
+        Edition: No. 719
+      </text>
+      <line x1="32" y1="99" x2="583" y2="99" stroke="#292524" stroke-width="1.2" />
+    </g>
+
+    <!-- B. Pin-Sharp Foreground Focal Plane: Headline & Byline -->
+    <text x="34" y="132" font-family="'Playfair Display', Georgia, serif" font-weight="900" font-size="22" fill="#0f141c" letter-spacing="-0.3">
+      Uncovered Files Reveal $4.2B Secret Algorithm Shift
+    </text>
+
+    <text x="34" y="148" font-family="'Times New Roman', Georgia, serif" font-size="11" font-style="italic" fill="#57534e">
+      Authorison Solezeere / Adversating, Sala clura &#8226; Financial Investigation Desk
+    </text>
+
+    <!-- C. 4-Column Authentic Typeset Newspaper Article (No Grey Bars!) -->
+    <!-- Column 1 -->
+    <g transform="translate(34, 164)" font-family="'Times New Roman', Georgia, serif" font-size="7.8" fill="#292524" line-height="1.25">
+      <text x="0" y="0" font-weight="700" font-size="8.8" fill="#1c1917">Setture vulnerabliers</text>
+      <text x="0" y="12">Lorem ipsum dolor sit amet,</text>
+      <text x="0" y="23">consectetur adipiscing elit.</text>
+      <text x="0" y="34">Omnis ratio praeclara est, sed</text>
+      <text x="0" y="45">cavenda sunt vitia secreti sermonis.</text>
+      <text x="0" y="56">Quisquis enim sentit, quid sit</text>
+      <text x="0" y="67">substantia veritatis, non dubitat.</text>
+      <text x="0" y="78">Adversis rationibus obstare conantur</text>
+      <text x="0" y="89">dum capitalia transferuntur.</text>
+      <text x="0" y="100">Quae cum ita sint, finem faciamus.</text>
+    </g>
+    <line x1="172" y1="162" x2="172" y2="310" stroke="#292524" stroke-width="0.6" opacity="0.3" />
+
+    <!-- Column 2 (Origin footprint of extracted quote) -->
+    <g transform="translate(180, 164)" font-family="'Times New Roman', Georgia, serif" font-size="7.8" fill="#292524">
+      <text x="0" y="0">Tum ille: Tu autem cum in hac</text>
+      <text x="0" y="11">divisione rem ipsam teneas, cur</text>
+      <text x="0" y="22">verbis aliter utamur? Nihil enim</text>
+      <!-- Base footprint for extracted quote -->
+      <rect x="-2" y="28" width="128" height="15" fill="#fef08a" opacity="0.35" rx="1.5" />
+      <text x="0" y="39" font-style="italic" font-weight="700" fill="#78350f">"Full structural vulnerabilities known"</text>
+      <text x="0" y="54">praeter veritatem quaeritur in</text>
+      <text x="0" y="65">disputando. Explicabo celeriter</text>
+      <text x="0" y="76">quid senserim; neque enim obscurum.</text>
+      <text x="0" y="87">Equidem eorum omnia quae praeclara</text>
+      <text x="0" y="98">sunt dicta non contemno, sed approbo.</text>
+    </g>
+    <line x1="316" y1="162" x2="316" y2="310" stroke="#292524" stroke-width="0.6" opacity="0.3" />
+
+    <!-- Column 3 -->
+    <g transform="translate(324, 164)" font-family="'Times New Roman', Georgia, serif" font-size="7.8" fill="#292524">
+      <text x="0" y="0" font-weight="700" font-size="8.8" fill="#1c1917">Systemic Exposure</text>
+      <text x="0" y="12">Trading execution protocols</text>
+      <text x="0" y="23">operated without independent</text>
+      <text x="0" y="34">oversight committee access.</text>
+      <text x="0" y="45">Regulators confirmed routing</text>
+      <text x="0" y="56">deviated by 34.8% during liquidation.</text>
+      <text x="0" y="67">Interea magistratus rationem</text>
+      <text x="0" y="78">deposcunt. Multiplicantur indicia</text>
+      <text x="0" y="89">perversae administrationis pecuniae.</text>
+      <text x="0" y="100">Sed quoniam eadem res explicanda.</text>
+    </g>
+    <line x1="458" y1="162" x2="458" y2="310" stroke="#292524" stroke-width="0.6" opacity="0.3" />
+
+    <!-- Column 4 -->
+    <g transform="translate(466, 164)" font-family="'Times New Roman', Georgia, serif" font-size="7.8" fill="#292524">
+      <text x="0" y="0">Offshore account mobility</text>
+      <text x="0" y="11">surged ahead of public release.</text>
+      <text x="0" y="22">Capital reserves were shifted</text>
+      <text x="0" y="33">across tiered holding entities.</text>
+      <text x="0" y="44"><b>Treasury Findings:</b></text>
+      <text x="0" y="55">Mandated threshold buffers were</text>
+      <text x="0" y="66">artificially reported through</text>
+      <text x="0" y="77">automated balancing functions.</text>
+      <text x="0" y="88">Audit proceedings continue with</text>
+      <text x="0" y="99">formal subpoenas scheduled.</text>
+    </g>
+  </g>
+
+  <!-- 4. 3D Pop-Out Quote Extraction System (Physically Lifted in Z-Space, Exact Match to Image 3) -->
+  <g transform="translate(120, 160)" filter="url(#popoutShadow)">
+    <!-- Extracted Paper Strip -->
+    <rect x="0" y="0" width="560" height="42" rx="4" fill="#faf7ed" stroke="#d5cbbb" stroke-width="1.2" />
+
+    <!-- Dynamic Hand-Drawn Yellow Marker Stroke with Multiply Blending -->
+    <rect x="8" y="5" width="544" height="32" rx="4" fill="url(#markerYellow)" opacity="0.9" style="mix-blend-mode: multiply;" />
+
+    <!-- Pin-Sharp Floating Target Quote Text -->
+    <text x="20" y="27" font-family="'Playfair Display', 'Times New Roman', Georgia, serif" font-weight="900" font-style="italic" font-size="18.5" fill="#0f141c" letter-spacing="-0.2">
+      “Full structural vulnerabilities known since Q3.”
+    </text>
+  </g>
+
+  <!-- 5. Cinematic Vignette Overlay -->
+  <rect width="800" height="450" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="30" pointer-events="none" />
+</svg>
