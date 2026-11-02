@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 516" width="2760" height="1548" preserveAspectRatio="none">
+  <defs>
+    <filter id="accShadow" x="-20%" y="-30%" width="140%" height="170%">
+      <feGaussianBlur stdDeviation="3.2" />
+    </filter>
+    <linearGradient id="cdCaseTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#484b52" stop-opacity="0.92" />
+      <stop offset="50%" stop-color="#2d3036" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#1e2024" stop-opacity="0.98" />
+    </linearGradient>
+    <linearGradient id="cdDiscGrad" x1="0%" y1="0%" x2="100%" y2="35%">
+      <stop offset="0%" stop-color="#b8c0cc" />
+      <stop offset="35%" stop-color="#eef2f7" />
+      <stop offset="52%" stop-color="#ffffff" />
+      <stop offset="70%" stop-color="#c6d0de" />
+      <stop offset="100%" stop-color="#8d96a6" />
+    </linearGradient>
+    <linearGradient id="cdAcrylicSheen" x1="0%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.32" />
+      <stop offset="42%" stop-color="#ffffff" stop-opacity="0.06" />
+      <stop offset="43%" stop-color="#ffffff" stop-opacity="0.0" />
+      <stop offset="100%" stop-color="#dce6f5" stop-opacity="0.14" />
+    </linearGradient>
+    <linearGradient id="padSurfaceGrad" x1="0%" y1="0%" x2="100%" y2="25%">
+      <stop offset="0%" stop-color="#8c92a4" />
+      <stop offset="45%" stop-color="#9da4b8" />
+      <stop offset="80%" stop-color="#888fa2" />
+      <stop offset="100%" stop-color="#757b8d" />
+    </linearGradient>
+    <linearGradient id="padEdgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d2d8e6" />
+      <stop offset="50%" stop-color="#eef2fa" />
+      <stop offset="100%" stop-color="#aeb5c7" />
+    </linearGradient>
+  </defs>
+
+  <!-- Soft Tabletop Contact Shadows -->
+  <polygon points="308,309 364,307 368,321 310,323" fill="rgba(0,0,0,0.82)" filter="url(#accShadow)" />
+  <polygon points="262,324 336,322 342,341 265,343" fill="rgba(0,0,0,0.88)" filter="url(#accShadow)" />
+  <polygon points="576,328 656,327 664,337 580,338" fill="rgba(0,0,0,0.82)" filter="url(#accShadow)" />
+
+  <!-- 1. Back-Right Optical CD Jewel Case (x: 310..364, y: 299..319) -->
+  <g>
+    <polygon points="310,305 318,299 318,303.5 310,309.5" fill="#1b1c20" />
+    <polygon points="310,305 362,306.5 362,311 310,309.5" fill="#282a30" />
+    <polygon points="313,306.2 359,307.5 359,309.6 313,308.3" fill="#b8bec8" opacity="0.85" />
+    <polygon points="318,299 364,300 362,306.5 310,305" fill="url(#cdCaseTop)" stroke="#cfd6e2" stroke-width="0.55" />
+    <ellipse cx="338" cy="302.8" rx="17.5" ry="2.2" fill="url(#cdDiscGrad)" stroke="#ffffff" stroke-width="0.3" />
+    <ellipse cx="338" cy="302.8" rx="4.5" ry="0.6" fill="#2c2f36" stroke="#d8dee9" stroke-width="0.25" />
+    <polygon points="318,299 364,300 362,306.5 310,305" fill="url(#cdAcrylicSheen)" />
+  </g>
+
+  <!-- 2. Bottom-Left Stacked Optical CD Jewel Case (x: 266..336, y: 318..339) -->
+  <g>
+    <polygon points="266,326 276,318 276,323.5 266,331.5" fill="#16181c" />
+    <polygon points="266,331.5 332,333 332,338.2 266,336.7" fill="#22252b" />
+    <polygon points="270,332.8 328,334.1 328,336.6 270,335.3" fill="#aeb5c0" opacity="0.8" />
+    <polygon points="332,333 338,324.5 338,329.7 332,338.2" fill="#32363f" />
+    <polygon points="276,318 338,319.5 332,333 266,331.5" fill="url(#cdCaseTop)" stroke="#c2cad6" stroke-width="0.6" />
+    <ellipse cx="302" cy="325.6" rx="22.5" ry="4.4" fill="url(#cdDiscGrad)" stroke="#ffffff" stroke-width="0.35" />
+    <ellipse cx="302" cy="325.6" rx="5.8" ry="1.2" fill="#282b32" stroke="#dce2ec" stroke-width="0.3" />
+    <polygon points="276,318 338,319.5 332,333 266,331.5" fill="url(#cdAcrylicSheen)" />
+  </g>
+
+  <!-- 3. Top-Left Stacked Optical CD Jewel Case (x: 265..335, y: 309..329) -->
+  <g>
+    <polygon points="265,321 331,322.5 331,325.5 265,324" fill="rgba(0,0,0,0.65)" />
+    <polygon points="265,317.5 275,309.5 275,314.5 265,322.5" fill="#1a1c21" />
+    <polygon points="265,317.5 330,319 330,324 265,322.5" fill="#2a2d34" />
+    <polygon points="269,318.7 326,320 326,322.4 269,321.1" fill="#cbd2dc" opacity="0.88" />
+    <polygon points="330,319 336,311 336,316 330,324" fill="#3b404a" />
+    <polygon points="275,309.5 336,311 330,319 265,317.5" fill="url(#cdCaseTop)" stroke="#e2e8f0" stroke-width="0.65" />
+    <ellipse cx="300.5" cy="314.3" rx="22" ry="3.2" fill="url(#cdDiscGrad)" stroke="#ffffff" stroke-width="0.4" />
+    <path d="M 282 313.5 L 296 314.1 L 289 316.8 Z" fill="#ffffff" opacity="0.55" />
+    <path d="M 305 314.5 L 319 315.1 L 312 311.8 Z" fill="#ffffff" opacity="0.45" />
+    <ellipse cx="300.5" cy="314.3" rx="5.5" ry="0.85" fill="#25282e" stroke="#e2e8f0" stroke-width="0.3" />
+    <polygon points="275,309.5 336,311 330,319 265,317.5" fill="url(#cdAcrylicSheen)" />
+    <line x1="265" y1="317.5" x2="330" y2="319" stroke="#f8fafc" stroke-width="0.7" opacity="0.85" />
+  </g>
+
+  <!-- 4. Right Sleek Anodized Space-Grey / Brushed-Aluminum Desk Pad (x: 577..661, y: 325..335) -->
+  <g>
+    <polygon points="577,333.2 661,333.2 660,334.8 577,334.8" fill="#2c303a" />
+    <polygon points="577,332.2 661,332.2 661,333.4 577,333.4" fill="url(#padEdgeGrad)" />
+    <polygon points="577,325.2 649,325.2 661,332.2 577,332.2" fill="url(#padSurfaceGrad)" />
+    <polyline points="577,325.2 649,325.2 661,332.2 577,332.2" fill="none" stroke="#dce3f2" stroke-width="0.55" opacity="0.85" />
+  </g>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340">
+  <rect width="600" height="340" rx="18" fill="#182232" stroke="#334155" stroke-width="4"/>
+  <rect x="24" y="24" width="552" height="58" rx="8" fill="#0f172a"/>
+  <circle cx="56" cy="53" r="14" fill="#ef4444"/>
+  <text x="56" y="59" text-anchor="middle" fill="#fff" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="18">!</text>
+  <text x="86" y="60" fill="#f8fafc" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="22">HP Cartridge Protection</text>
+  <rect x="48" y="114" width="504" height="92" rx="12" fill="#dc2626"/>
+  <text x="300" y="154" text-anchor="middle" fill="#fff" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="28">BLOCK CARTRIDGE?</text>
+  <text x="300" y="186" text-anchor="middle" fill="#fee2e2" font-family="Inter,Arial,sans-serif" font-weight="600" font-size="16">Non-HP circuitry detected in slot K/C/M/Y</text>
+  <rect x="170" y="232" width="260" height="64" rx="32" fill="#10b981"/>
+  <text x="300" y="272" text-anchor="middle" fill="#052e16" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="24">CONFIRMED ✓</text>
+</svg>

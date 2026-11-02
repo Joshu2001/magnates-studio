@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 516">
+  <defs>
+    <radialGradient id="crimsonStage" cx="50%" cy="50%" r="65%">
+      <stop offset="0%" stop-color="#7f1d1d"/>
+      <stop offset="55%" stop-color="#310a0b"/>
+      <stop offset="100%" stop-color="#090406"/>
+    </radialGradient>
+  </defs>
+  <rect width="920" height="516" fill="url(#crimsonStage)"/>
+  <g id="card-handle" transform="translate(110,96)">
+    <rect width="310" height="324" rx="22" fill="#ffffff" stroke="#e2e8f0" stroke-width="3"/>
+    <rect x="28" y="28" width="254" height="145" rx="14" fill="#f1f5f9"/>
+    <text x="155" y="110" text-anchor="middle" fill="#334155" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="22">RAZOR HANDLE</text>
+    <text x="155" y="216" text-anchor="middle" fill="#0f172a" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="22">Premium Handle</text>
+    <rect x="75" y="242" width="160" height="54" rx="27" fill="#10b981"/>
+    <text x="155" y="278" text-anchor="middle" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="28">$9.99</text>
+  </g>
+  <g id="card-blades" transform="translate(495,96)">
+    <rect width="315" height="324" rx="22" fill="#ffffff" stroke="#fca5a5" stroke-width="3"/>
+    <rect x="28" y="28" width="259" height="145" rx="14" fill="#fef2f2"/>
+    <text x="157" y="110" text-anchor="middle" fill="#991b1b" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="20">REFILL BLADES (4x)</text>
+    <text x="157" y="216" text-anchor="middle" fill="#0f172a" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="20">Replacement Blades</text>
+    <rect x="77" y="242" width="160" height="54" rx="27" fill="#ef4444"/>
+    <text x="157" y="278" text-anchor="middle" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="28">$29.99</text>
+  </g>
+</svg>

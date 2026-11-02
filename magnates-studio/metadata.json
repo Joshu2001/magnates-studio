@@ -1,0 +1,6 @@
+{
+  "name": "Regaarder Studio",
+  "description": "Professional creative documentary and 3D visual effects video editor with timeline compositing, kinetic typography, and 3D scene engines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

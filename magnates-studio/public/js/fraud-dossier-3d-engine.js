@@ -869,14 +869,6 @@
         <div id="fx-container-scam-redaction" style="position: absolute; inset: 0; width: 100%; height: 100%;">
           ${window.tplBuildFraudDossierHtml(d)}
         </div>
-        <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; z-index: 40; display: flex; align-items: center; gap: 8px;">
-          <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #ef4444; background: rgba(10,12,18,0.92); border: 1px solid rgba(239,68,68,0.4); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
-            FRAUD DOSSIER &bull; EYES ONLY &bull; REDACTION BAR &bull; CONFIDENTIAL STAMP
-          </span>
-          <span style="font-family: monospace; font-size: 9px; color: #94a3b8; background: rgba(10,12,18,0.75); border: 1px solid rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 4px;">
-            VIDEO PREVIEW
-          </span>
-        </div>
       </div>
     `;
   };
@@ -897,14 +889,6 @@
       <div id="customizer-stage-inner" style="position: absolute; inset: 0; background: #06090e; overflow: hidden; cursor: grab; user-select: none;">
         <img id="fraud-dossier-plate-bg" src="/mahogany_desk_texture.jpg" alt="Mahogany Desk" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.35; filter: contrast(125%) brightness(70%);" />
         <div id="fraud-dossier-3d-viewport" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;"></div>
-        <div style="position: absolute; bottom: 12px; left: 14px; pointer-events: none; z-index: 40; display: flex; align-items: center; gap: 8px;">
-          <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: #ef4444; background: rgba(10,12,18,0.92); border: 1px solid rgba(239,68,68,0.4); padding: 3px 8px; border-radius: 4px; text-transform: uppercase;">
-            3D FRAUD DOSSIER RIG &bull; EYES ONLY &bull; REDACTION BAR &bull; CONFIDENTIAL STAMP
-          </span>
-          <span style="font-family: monospace; font-size: 9px; color: #94a3b8; background: rgba(10,12,18,0.75); border: 1px solid rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 4px;">
-            DRAG TO ORBIT
-          </span>
-        </div>
       </div>
     `;
 

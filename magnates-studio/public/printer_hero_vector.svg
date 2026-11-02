@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 516" width="2760" height="1548" preserveAspectRatio="none">
+  <defs>
+    <!-- Soft tabletop contact shadow blur -->
+    <filter id="pShadow" x="-15%" y="-20%" width="130%" height="150%">
+      <feGaussianBlur stdDeviation="4.5" />
+    </filter>
+    <filter id="ledGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="1.4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <!-- Smooth 3D Studio Lighting Gradients (Zero vertical seams!) -->
+    <linearGradient id="adfTopGrad" x1="0%" y1="0%" x2="100%" y2="12%">
+      <stop offset="0%" stop-color="#e3e1da" />
+      <stop offset="48%" stop-color="#d8d6cf" />
+      <stop offset="100%" stop-color="#c4c2ba" />
+    </linearGradient>
+    <linearGradient id="adfWedgeGrad" x1="0%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#a8a6a0" />
+      <stop offset="55%" stop-color="#918f89" />
+      <stop offset="100%" stop-color="#767570" />
+    </linearGradient>
+    <linearGradient id="chuteDarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#585956" />
+      <stop offset="60%" stop-color="#454644" />
+      <stop offset="100%" stop-color="#353634" />
+    </linearGradient>
+    <linearGradient id="scannerBedGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#dfddd6" />
+      <stop offset="45%" stop-color="#ceccc5" />
+      <stop offset="100%" stop-color="#aba9a2" />
+    </linearGradient>
+    <linearGradient id="mainChassisGrad" x1="0%" y1="0%" x2="100%" y2="18%">
+      <stop offset="0%" stop-color="#bab8b1" />
+      <stop offset="28%" stop-color="#c6c4bd" />
+      <stop offset="65%" stop-color="#b4b2ab" />
+      <stop offset="100%" stop-color="#9a9892" />
+    </linearGradient>
+    <linearGradient id="mainChassisVert" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22" />
+      <stop offset="9%" stop-color="#ffffff" stop-opacity="0.04" />
+      <stop offset="85%" stop-color="#000000" stop-opacity="0.06" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.24" />
+    </linearGradient>
+    <linearGradient id="lowerBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#84827c" />
+      <stop offset="30%" stop-color="#96948e" />
+      <stop offset="70%" stop-color="#8a8882" />
+      <stop offset="100%" stop-color="#72706b" />
+    </linearGradient>
+    <linearGradient id="trayFrontGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b4b2ab" />
+      <stop offset="20%" stop-color="#9e9c95" />
+      <stop offset="100%" stop-color="#82807a" />
+    </linearGradient>
+    <linearGradient id="hpBadgeGrad" x1="0%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#6b6c68" />
+      <stop offset="52%" stop-color="#585955" />
+      <stop offset="100%" stop-color="#484946" />
+    </linearGradient>
+    <clipPath id="hpEmblemClip">
+      <circle cx="472.5" cy="270.5" r="9.2" />
+    </clipPath>
+  </defs>
+
+  <!-- 1. Soft Tabletop Contact Shadow under Printer -->
+  <ellipse cx="470.5" cy="336.5" rx="102" ry="6.5" fill="rgba(0,0,0,0.78)" filter="url(#pShadow)" />
+  <rect x="373" y="331" width="195" height="7" rx="2" fill="rgba(8,9,11,0.88)" filter="url(#pShadow)" />
+
+  <!-- 2. Lower Paper Tray & Base Chassis (x: 373..568, y: 292..335) -->
+  <rect x="373.5" y="292" width="194" height="41" rx="2.5" fill="url(#lowerBodyGrad)" />
+  <!-- Horizontal groove between lower tray levels -->
+  <rect x="373.5" y="307.5" width="194" height="1.6" fill="#464542" />
+  <rect x="373.5" y="309.1" width="194" height="1.0" fill="#a8a6a0" opacity="0.65" />
+  <!-- Bottom rubber base shadow & feet -->
+  <rect x="375" y="331" width="191" height="4.2" rx="1" fill="#17181a" />
+  <rect x="376" y="332.5" width="35" height="2.6" rx="0.8" fill="#7c7a74" />
+  <rect x="529" y="332.5" width="35" height="2.6" rx="0.8" fill="#7c7a74" />
+
+  <!-- 3. Dark Recessed Paper Output Cavity (x: 416..529, y: 290..314) -->
+  <rect x="416" y="290" width="113" height="24" rx="1.8" fill="#1b1c1f" />
+  <rect x="422" y="296" width="101" height="1.5" fill="#3a3b3e" />
+  <rect x="422" y="300.5" width="101" height="1.5" fill="#2e2f32" />
+
+  <!-- 4. Center Front Output Tray Extension (x: 411..529, y: 306..335.5) -->
+  <rect x="411" y="306.5" width="118" height="28.5" rx="2" fill="url(#trayFrontGrad)" />
+  <rect x="413" y="305" width="114" height="2.4" rx="1" fill="#c6c4bd" />
+  <!-- Center dark hand-grip notch at bottom of tray -->
+  <rect x="451" y="324.5" width="39" height="10.8" rx="1.2" fill="#18191c" />
+  <!-- Subtle model badge on bottom-right -->
+  <rect x="539" y="319" width="20" height="1.4" rx="0.5" fill="#5a5955" opacity="0.75" />
+
+  <!-- 5. Main Middle Chassis Body (x: 372..569, y: 247..293) - 100% Seamless! -->
+  <rect x="372" y="247" width="197" height="46" rx="2.5" fill="url(#mainChassisGrad)" />
+  <rect x="372" y="247" width="197" height="46" rx="2.5" fill="url(#mainChassisVert)" />
+  <!-- Top crisp bevel highlight on main chassis -->
+  <rect x="373" y="247" width="195" height="1.6" rx="0.8" fill="#e2e0d8" opacity="0.85" />
+  <!-- Subtle vertical industrial panel seams on left and right pillars -->
+  <line x1="426" y1="248" x2="426" y2="292.5" stroke="#7d7b76" stroke-width="0.7" opacity="0.65" />
+  <line x1="426.7" y1="248" x2="426.7" y2="292.5" stroke="#d4d2cb" stroke-width="0.6" opacity="0.55" />
+  <line x1="528.5" y1="248" x2="528.5" y2="292.5" stroke="#7d7b76" stroke-width="0.7" opacity="0.65" />
+  <line x1="529.2" y1="248" x2="529.2" y2="292.5" stroke="#d4d2cb" stroke-width="0.6" opacity="0.55" />
+
+  <!-- 6. Scanner Glass Bed Shadow Seam (y: 244.5..247.2) -->
+  <rect x="373.5" y="244.5" width="194" height="2.8" fill="#3a3937" />
+
+  <!-- 7. Flat Right Scanner Bed Lid (x: 374..567.5, y: 235.5..245) -->
+  <path d="M 378 235.5 L 561 235.5 L 567.5 241.5 L 567.5 245 L 374 245 L 374 239 Z" fill="url(#scannerBedGrad)" />
+  <line x1="375" y1="241.5" x2="567" y2="241.5" stroke="#eceae3" stroke-width="0.9" opacity="0.75" />
+
+  <!-- 8. Top Angled ADF Document Feeder Lid (x: 376..540, y: 223..244.5) - 100% INTACT TOP! -->
+  <!-- Dark-slate recessed feeder tray on top-right of ADF lid (solid matte slate, NEVER cut out!) -->
+  <path d="M 434 223 L 508 223 L 516 229.5 L 516 235.5 L 434 235.5 Z" fill="url(#chuteDarkGrad)" />
+  <!-- Silver paper guide rails inside top feeder chute -->
+  <polygon points="442,223.8 504,223.8 498,227.2 438,227.2" fill="#c8c6bf" />
+  <polygon points="446,227.8 509,227.8 505,230.2 442,230.2" fill="#8e8d88" />
+  <!-- Warm-white top cover of ADF lid (continuous unbroken top edge from x=381 to x=508!) -->
+  <path d="M 382 223 L 444 223 L 438 229.5 L 516 229.5 L 516 232.2 L 376.5 232.2 L 376.5 227.2 Z" fill="url(#adfTopGrad)" />
+  <line x1="382" y1="223.5" x2="504" y2="223.5" stroke="#f4f2ec" stroke-width="1.0" opacity="0.9" />
+  <!-- Sculpted diagonal wedge underside of ADF feeder -->
+  <polygon points="377.5,232 516,232 473,244.5 379,244.5" fill="url(#adfWedgeGrad)" />
+  <polygon points="378,232 516,232 492,237.5 378.5,237.5" fill="#b4b2ab" opacity="0.65" />
+  <!-- Subtle right hinge shadow behind ADF wedge -->
+  <polygon points="473,244.5 516,232 536,235.5 524,244.5" fill="#686763" opacity="0.75" />
+
+  <!-- 9. Authentic Metallic HP Circular Emblem at Center (cx=472.5, cy=270.5, r=9.2, matching image_996b0927.png) -->
+  <circle cx="472.5" cy="270.5" r="9.45" fill="#9e9c95" opacity="0.55" />
+  <circle cx="472.5" cy="270.5" r="9.2" fill="url(#hpBadgeGrad)" />
+  <!-- Iconic 16-deg slanted lowercase "hp" whose ascender ("h") and descender ("p") breach the circle perimeter -->
+  <g clip-path="url(#hpEmblemClip)">
+    <g transform="translate(472.5, 270.5) skewX(-16.5)">
+      <!-- Lowercase 'h': left full-height ascender stem from top rim (-9.5) to baseline (+3.8) + right arched leg -->
+      <path d="M -4.8 -9.6 H -2.7 V -3.6 H -0.3 C 0.65 -3.6 1.15 -3.1 1.15 -2.15 V 3.8 H -0.95 V -1.85 H -2.7 V 3.8 H -4.8 Z" fill="#c0beb7" />
+      <!-- Lowercase 'p': left descender stem from x-height (-3.6) to bottom rim (+9.6) + right rounded bowl with counter cutout -->
+      <path fill-rule="evenodd" d="M 2.35 -3.6 H 6.65 C 7.65 -3.6 8.15 -3.05 8.15 -2.05 V 2.25 C 8.15 3.25 7.65 3.8 6.65 3.8 H 4.45 V 9.6 H 2.35 Z M 4.45 -1.85 H 6.05 V 2.05 H 4.45 Z" fill="#c0beb7" />
+    </g>
+  </g>
+
+  <!-- 10. Dual Glowing Green Status LEDs on Left Pillar (x=380.5, y=260.5 & 264.5) -->
+  <circle cx="380.5" cy="260.5" r="1.1" fill="#4ade80" filter="url(#ledGlow)" />
+  <circle cx="380.5" cy="260.5" r="0.65" fill="#dcfce7" />
+  <circle cx="380.5" cy="264.5" r="1.1" fill="#4ade80" filter="url(#ledGlow)" />
+  <circle cx="380.5" cy="264.5" r="0.65" fill="#dcfce7" />
+
+  <!-- 11. LCD Screen Bezel Frame (x: 389..427, y: 248.5..282.5, matching #magnates-bp-printer-lcd-bezel) -->
+  <rect x="388.5" y="248" width="39" height="35" rx="3.8" fill="#d2d0c9" />
+  <rect x="389.5" y="249" width="37" height="33" rx="3.2" fill="#18191c" />
+  <rect x="390.5" y="250" width="35" height="31" rx="2.6" fill="#232529" stroke="#525459" stroke-width="0.5" />
+</svg>

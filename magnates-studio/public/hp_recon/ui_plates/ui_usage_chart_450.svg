@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440">
+  <rect width="760" height="440" rx="22" fill="#ffffff" stroke="#cbd5e1" stroke-width="3"/>
+  <text x="48" y="64" fill="#0f172a" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="28">Usage data: 450 pages</text>
+  <text x="48" y="96" fill="#64748b" font-family="Inter,Arial,sans-serif" font-weight="600" font-size="16">HP Instant Ink Monthly Telemetry</text>
+  <line x1="60" y1="350" x2="700" y2="350" stroke="#cbd5e1" stroke-width="3"/>
+  <rect x="105" y="190" width="90" height="160" rx="10" fill="#0284c7"/>
+  <rect x="245" y="140" width="90" height="210" rx="10" fill="#0ea5e9"/>
+  <rect x="385" y="230" width="90" height="120" rx="10" fill="#38bdf8"/>
+  <rect x="525" y="165" width="90" height="185" rx="10" fill="#0369a1"/>
+  <g transform="translate(80,118)">
+    <rect width="175" height="52" rx="10" fill="#0f172a"/>
+    <text x="87" y="32" text-anchor="middle" fill="#ffffff" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="16">January: 150 pages</text>
+  </g>
+</svg>

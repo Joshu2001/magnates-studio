@@ -1382,7 +1382,6 @@
 
   window.DEAL_TERM_SHEET_CONFIG = DEFAULT_CONFIG;
   window.DEAL_DOC_PRESETS = PRESETS;
+  window.tplSyncDealTermSheet = syncLive;
   console.log('[Doc-Drama Engine] v3 ready');
 })();
-
-window.tplSyncDealTermSheet = syncLive;
