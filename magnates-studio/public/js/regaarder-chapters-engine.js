@@ -413,7 +413,7 @@
         bridge.sync = mediaMod.syncPromo;
         bridge.config = cloneDeep(mod.defaults);
         bridge.media = Object.fromEntries(Object.entries(mod.sources).map(([id, file]) =>
-          [id, /\\.mp4$/i.test(file) ? sourceVideo(file, 'promo129/') : sourceImage(file, 'promo129/')]
+          [id, /\.mp4$/i.test(file) ? sourceVideo(file, 'promo129/') : sourceImage(file, 'promo129/')]
         ));
       }
       bridge.ready = true;
