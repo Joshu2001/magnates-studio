@@ -5712,6 +5712,11 @@
       const wrappedOpen = function () {
         restoreDistributedNodes();
         const res = origOpen.apply(this, arguments);
+        // Documentary sequences are playback templates; only the native rig opens in 3D.
+        const openedId = arguments[0]?.id;
+        if (window.REGAARDER_CHAPTER_TEMPLATE_IDS?.includes(openedId)) {
+          window.syncUniversal3DStageMode?.(false);
+        }
         organizeUniversalTemplateControls();
         bindStealthRedScrollbars();
         bindUniversalContextualToolbarHooks();
