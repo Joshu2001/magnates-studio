@@ -2434,6 +2434,48 @@
     };
 
     const CURATED_TEMPLATE_CARD_META = {
+      'regaarder-origins-slow-reveal': {
+        shortTitle: 'Origins Slow Reveal',
+        shortSub: 'Eye Strip & Paper Tears',
+        cat: 'Cinematic',
+        thumb: '/assets/regaarder-motion/portrait.png',
+        priority: 0
+      },
+      'regaarder-pele-pact-chapter': {
+        shortTitle: 'The Pelé Pact',
+        shortSub: 'Chapter 6 · 18:50–20:14',
+        cat: 'Documentary',
+        thumb: '/assets/regaarder-motion/portrait.png',
+        priority: 1
+      },
+      'regaarder-minute16-chapter': {
+        shortTitle: 'Minute 16 Chapter',
+        shortSub: 'Ships & Warehouse',
+        cat: 'Documentary',
+        thumb: '/assets/regaarder-motion/portrait.png',
+        priority: 2
+      },
+      'regaarder-minute17-chapter': {
+        shortTitle: 'Minute 17 Chapter',
+        shortSub: 'Next Gen & Split Flare',
+        cat: 'Documentary',
+        thumb: '/assets/regaarder-motion/portrait.png',
+        priority: 3
+      },
+      'regaarder-final-chapter': {
+        shortTitle: 'The Final Chapter',
+        shortSub: 'Revival & Flame Overlays',
+        cat: 'Documentary',
+        thumb: '/assets/regaarder-motion/fire.png',
+        priority: 4
+      },
+      'regaarder-native3d-surface-builder': {
+        shortTitle: 'Native 3D Builder',
+        shortSub: 'Multires & Surface UV',
+        cat: '3D Spatial',
+        thumb: '/assets/regaarder-motion/standing.png',
+        priority: 5
+      },
       'magnates-media-printer-glitch-card': {
         shortTitle: 'Cinematic White Glitch',
         shortSub: 'Floating Card Reveal',
@@ -3495,6 +3537,48 @@
     // Always place Saved Look Presets at the top of the Look tab
     panes.look.appendChild(createLookPresetsCard(() => document.getElementById('tpl-modal-preview-stage')));
 
+    const activeTplId = ((typeof topCustomizerState !== 'undefined' ? topCustomizerState : window.topCustomizerState)?.currentTpl?.id) || '';
+    if (activeTplId === 'regaarder-origins-slow-reveal' && typeof window.tplBuildOriginsSlowRevealRegaarderPanes === 'function') {
+      window.tplBuildOriginsSlowRevealRegaarderPanes(panes, advDrawer, universalShellRefs);
+      return;
+    }
+    if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(activeTplId) && typeof window.tplBuildRegaarderChapterRegaarderPanes === 'function') {
+      const p = window.tplBuildRegaarderChapterRegaarderPanes(activeTplId);
+      if (p) {
+        panes.content.innerHTML = p.content;
+        panes.motion.innerHTML = p.motion;
+        panes.look.appendChild(createLookPresetsCard(() => document.getElementById('tpl-modal-preview-stage')));
+        panes.look.insertAdjacentHTML('beforeend', p.look);
+        panes.effects.innerHTML = p.effects;
+        if (advDrawer) advDrawer.innerHTML = p.advanced;
+        const modal = document.getElementById('modal-top-template-customizer');
+        if (modal && typeof window.wireRegaarderChapterInspectorEvents === 'function') {
+          window.wireRegaarderChapterInspectorEvents(modal, activeTplId);
+        }
+        return;
+      }
+    }
+    if (activeTplId === 'regaarder-native3d-surface-builder' && typeof window.tplBuildRegaarderNative3DRegaarderPanes === 'function') {
+      const p = window.tplBuildRegaarderNative3DRegaarderPanes();
+      if (p) {
+        panes.content.innerHTML = p.content;
+        panes.motion.innerHTML = p.motion;
+        panes.look.appendChild(createLookPresetsCard(() => document.getElementById('tpl-modal-preview-stage')));
+        panes.look.insertAdjacentHTML('beforeend', p.look);
+        panes.effects.innerHTML = p.effects;
+        if (advDrawer) advDrawer.innerHTML = p.advanced;
+        const modal = document.getElementById('modal-top-template-customizer');
+        if (modal && typeof window.wireRegaarderNative3DInspectorEvents === 'function') {
+          window.wireRegaarderNative3DInspectorEvents(modal);
+        }
+        return;
+      }
+    }
+    if (activeTplId === 'adidas-puma-cosmic-earth-suite' && typeof window.tplBuildAdidasPumaCosmicRegaarderPanes === 'function') {
+      window.tplBuildAdidasPumaCosmicRegaarderPanes(panes, advDrawer, universalShellRefs);
+      return;
+    }
+
     const isSectionActive = (el) => {
       if (!el) return false;
       let cur = el;
@@ -3641,6 +3725,7 @@
       advDrawer.appendChild(cleanAdvFallback);
     }
   }
+  window.organizeUniversalTemplateControls = organizeUniversalTemplateControls;
 
   /* --------------------------------------------------------------------------
      6. PART C: STANDALONE 3D & MAGNATES SUITE MODALS (.vector-export-modal)
@@ -3975,6 +4060,309 @@
       icon: LUCIDE_ICONS.layers,
       fileInputId: '',
       domSelector: ''
+    },
+    origins_eye: {
+      id: 'origins_eye',
+      name: 'Eye Strip',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.shapeSquare,
+      fileInputId: '',
+      domSelector: '[data-origins-obj="origins_eye"]'
+    },
+    origins_portrait: {
+      id: 'origins_portrait',
+      name: 'Archival Portrait',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      fileInputId: 'rg-origins-upload-portrait',
+      domSelector: '[data-origins-obj="origins_portrait"]'
+    },
+    origins_title: {
+      id: 'origins_title',
+      name: 'Headline',
+      variant: 'text',
+      icon: LUCIDE_ICONS.text,
+      fileInputId: '',
+      domSelector: '[data-origins-obj="origins_title"]'
+    },
+    origins_adidas: {
+      id: 'origins_adidas',
+      name: 'Left Brand Lockup',
+      variant: 'object3d',
+      icon: LUCIDE_ICONS.cube3d,
+      fileInputId: 'rg-origins-upload-adidas',
+      domSelector: '[data-origins-obj="origins_adidas"]'
+    },
+    origins_puma: {
+      id: 'origins_puma',
+      name: 'Right Brand Lockup',
+      variant: 'object3d',
+      icon: LUCIDE_ICONS.cube3d,
+      fileInputId: 'rg-origins-upload-puma',
+      domSelector: '[data-origins-obj="origins_puma"]'
+    },
+    origins_tear: {
+      id: 'origins_tear',
+      name: 'Tear Reveal Image',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      fileInputId: 'rg-origins-upload-reveal',
+      domSelector: '[data-origins-obj="origins_tear"]'
+    },
+    origins_map: {
+      id: 'origins_map',
+      name: 'Aerial Map',
+      variant: 'media',
+      icon: LUCIDE_ICONS.lookTab,
+      fileInputId: 'rg-origins-upload-map',
+      domSelector: '[data-origins-obj="origins_map"]'
+    },
+    origins_lamp: {
+      id: 'origins_lamp',
+      name: 'Desk Lamp',
+      variant: 'object3d',
+      icon: LUCIDE_ICONS.layers,
+      fileInputId: 'rg-origins-upload-lamp',
+      domSelector: '[data-origins-obj="origins_lamp"]'
+    },
+    origins_fire: {
+      id: 'origins_fire',
+      name: 'Living Flame',
+      variant: 'animation',
+      icon: LUCIDE_ICONS.motionTab,
+      fileInputId: 'rg-origins-upload-fire',
+      domSelector: '[data-origins-obj="origins_fire"]'
+    },
+    // Regaarder Chapter Objects
+    chapter_pele_handshake: {
+      id: 'chapter_pele_handshake',
+      name: 'Handshake Clasp',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_pele_handshake"]'
+    },
+    chapter_pele_guest0: {
+      id: 'chapter_pele_guest0',
+      name: 'Left Diner (Blue)',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_pele_guest0"]'
+    },
+    chapter_pele_guest1: {
+      id: 'chapter_pele_guest1',
+      name: 'Right Diner (Red)',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_pele_guest1"]'
+    },
+    chapter_pele_poster: {
+      id: 'chapter_pele_poster',
+      name: 'Mexico 70 Poster',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      domSelector: '[data-chapter-obj="chapter_pele_poster"]'
+    },
+    chapter_pele_paper1: {
+      id: 'chapter_pele_paper1',
+      name: 'Lead Newspaper',
+      variant: 'text',
+      icon: LUCIDE_ICONS.lookTab,
+      domSelector: '[data-chapter-obj="chapter_pele_paper1"]'
+    },
+    chapter_pele_player0: {
+      id: 'chapter_pele_player0',
+      name: 'Pelé Bicycle Kick',
+      variant: 'media',
+      icon: LUCIDE_ICONS.motionTab,
+      domSelector: '[data-chapter-obj="chapter_pele_player0"]'
+    },
+    chapter_m16_group: {
+      id: 'chapter_m16_group',
+      name: 'Celebration Trio',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_m16_group"]'
+    },
+    chapter_m16_boot: {
+      id: 'chapter_m16_boot',
+      name: 'Pedestal Boot',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_m16_boot"]'
+    },
+    chapter_m16_ship_blue: {
+      id: 'chapter_m16_ship_blue',
+      name: 'Adidas Cargo Ship',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_m16_ship_blue"]'
+    },
+    chapter_m16_ship_orange: {
+      id: 'chapter_m16_ship_orange',
+      name: 'PUMA Cargo Ship',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_m16_ship_orange"]'
+    },
+    chapter_m16_bootpair: {
+      id: 'chapter_m16_bootpair',
+      name: 'Warehouse Boot Pair',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_m16_bootpair"]'
+    },
+    chapter_m17_blue: {
+      id: 'chapter_m17_blue',
+      name: 'Blue Portrait',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_m17_blue"]'
+    },
+    chapter_m17_red: {
+      id: 'chapter_m17_red',
+      name: 'Red Portrait',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_m17_red"]'
+    },
+    chapter_m17_photo: {
+      id: 'chapter_m17_photo',
+      name: 'Archival Family Photo',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      domSelector: '[data-chapter-obj="chapter_m17_photo"]'
+    },
+    chapter_m17_shoe_blue: {
+      id: 'chapter_m17_shoe_blue',
+      name: 'Floating Blue Boot',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_m17_shoe_blue"]'
+    },
+    chapter_m17_shoe_red: {
+      id: 'chapter_m17_shoe_red',
+      name: 'Floating Red Boot',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_m17_shoe_red"]'
+    },
+    chapter_final_shoe: {
+      id: 'chapter_final_shoe',
+      name: 'Burning Trainer Mesh',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_final_shoe"]'
+    },
+    chapter_final_titles: {
+      id: 'chapter_final_titles',
+      name: 'Chapter Headline',
+      variant: 'text',
+      icon: LUCIDE_ICONS.lookTab,
+      domSelector: '[data-chapter-obj="chapter_final_titles"]'
+    },
+    chapter_final_adidas: {
+      id: 'chapter_final_adidas',
+      name: 'Adidas Card',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_final_adidas"]'
+    },
+    chapter_final_puma: {
+      id: 'chapter_final_puma',
+      name: 'PUMA Card',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_final_puma"]'
+    },
+    // Regaarder Native 3D Objects
+    n3d_actor_primary: {
+      id: 'n3d_actor_primary',
+      name: 'Primary Humanoid Rig',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-n3d-obj="n3d_actor_primary"]'
+    },
+    n3d_actor_secondary: {
+      id: 'n3d_actor_secondary',
+      name: 'Secondary Coach Rig',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-n3d-obj="n3d_actor_secondary"]'
+    },
+    n3d_prop_hat: {
+      id: 'n3d_prop_hat',
+      name: 'Tailored Brimmed Hat',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-n3d-obj="n3d_prop_hat"]'
+    },
+    n3d_prop_desk: {
+      id: 'n3d_prop_desk',
+      name: 'Studio Desk & Chair Prop',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-n3d-obj="n3d_prop_desk"]'
+    },
+    // Regaarder Blank Composition Layer Objects
+    blank_layer: {
+      id: 'blank_layer',
+      name: 'Blank Canvas Layer',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers
+    },
+    blank_image: {
+      id: 'blank_image',
+      name: 'Media Plane',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon
+    },
+    blank_image3d: {
+      id: 'blank_image3d',
+      name: '3D Image Plane',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d
+    },
+    blank_text: {
+      id: 'blank_text',
+      name: 'Written Typography',
+      variant: 'text',
+      icon: LUCIDE_ICONS.type
+    },
+    blank_fireoverlay: {
+      id: 'blank_fireoverlay',
+      name: 'Living Flame Layer',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.wand
+    },
+    blank_cloudoverlay: {
+      id: 'blank_cloudoverlay',
+      name: 'Cloud Drift Layer',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.wand
+    },
+    blank_surface: {
+      id: 'blank_surface',
+      name: 'Surface Reveal Layer',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.wand
+    },
+    blank_object3d: {
+      id: 'blank_object3d',
+      name: '3D Primitive Object',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.cube3d
+    },
+    blank_region: {
+      id: 'blank_region',
+      name: 'Color Division Region',
+      variant: 'shape',
+      icon: LUCIDE_ICONS.wand
+    },
+    blank_adjustment: {
+      id: 'blank_adjustment',
+      name: 'Live Adjustment Layer',
+      variant: 'media',
+      icon: LUCIDE_ICONS.wand
     }
   };
 
@@ -4093,6 +4481,11 @@
         }
         return document.getElementById('magnates-bp-stage');
       } else {
+        const meta = HUMAN_OBJECT_CATALOG[state.objectKey];
+        if (meta && meta.domSelector) {
+          const el = document.querySelector(meta.domSelector);
+          if (el) return el;
+        }
         const tfBox = document.getElementById('stage-universal-transform-box');
         if (tfBox && tfBox.style.display !== 'none') {
           const r = tfBox.getBoundingClientRect();
@@ -4104,6 +4497,64 @@
 
     const getAvailableSceneObjects = () => {
       if (state.contextType === 'template') {
+        const activeTplId = ((typeof topCustomizerState !== 'undefined' ? topCustomizerState : window.topCustomizerState)?.currentTpl?.id) || '';
+        if (activeTplId === 'regaarder-origins-slow-reveal') {
+          return [
+            HUMAN_OBJECT_CATALOG.origins_eye,
+            HUMAN_OBJECT_CATALOG.origins_portrait,
+            HUMAN_OBJECT_CATALOG.origins_title,
+            HUMAN_OBJECT_CATALOG.origins_adidas,
+            HUMAN_OBJECT_CATALOG.origins_puma,
+            HUMAN_OBJECT_CATALOG.origins_tear,
+            HUMAN_OBJECT_CATALOG.origins_map,
+            HUMAN_OBJECT_CATALOG.origins_lamp,
+            HUMAN_OBJECT_CATALOG.origins_fire
+          ];
+        }
+        if (activeTplId === 'regaarder-pele-pact-chapter') {
+          return [
+            HUMAN_OBJECT_CATALOG.chapter_pele_handshake,
+            HUMAN_OBJECT_CATALOG.chapter_pele_guest0,
+            HUMAN_OBJECT_CATALOG.chapter_pele_guest1,
+            HUMAN_OBJECT_CATALOG.chapter_pele_poster,
+            HUMAN_OBJECT_CATALOG.chapter_pele_paper1,
+            HUMAN_OBJECT_CATALOG.chapter_pele_player0
+          ];
+        }
+        if (activeTplId === 'regaarder-minute16-chapter') {
+          return [
+            HUMAN_OBJECT_CATALOG.chapter_m16_group,
+            HUMAN_OBJECT_CATALOG.chapter_m16_boot,
+            HUMAN_OBJECT_CATALOG.chapter_m16_ship_blue,
+            HUMAN_OBJECT_CATALOG.chapter_m16_ship_orange,
+            HUMAN_OBJECT_CATALOG.chapter_m16_bootpair
+          ];
+        }
+        if (activeTplId === 'regaarder-minute17-chapter') {
+          return [
+            HUMAN_OBJECT_CATALOG.chapter_m17_blue,
+            HUMAN_OBJECT_CATALOG.chapter_m17_red,
+            HUMAN_OBJECT_CATALOG.chapter_m17_photo,
+            HUMAN_OBJECT_CATALOG.chapter_m17_shoe_blue,
+            HUMAN_OBJECT_CATALOG.chapter_m17_shoe_red
+          ];
+        }
+        if (activeTplId === 'regaarder-final-chapter') {
+          return [
+            HUMAN_OBJECT_CATALOG.chapter_final_shoe,
+            HUMAN_OBJECT_CATALOG.chapter_final_titles,
+            HUMAN_OBJECT_CATALOG.chapter_final_adidas,
+            HUMAN_OBJECT_CATALOG.chapter_final_puma
+          ];
+        }
+        if (activeTplId === 'regaarder-native3d-surface-builder') {
+          return [
+            HUMAN_OBJECT_CATALOG.n3d_actor_primary,
+            HUMAN_OBJECT_CATALOG.n3d_actor_secondary,
+            HUMAN_OBJECT_CATALOG.n3d_prop_hat,
+            HUMAN_OBJECT_CATALOG.n3d_prop_desk
+          ];
+        }
         return [
           HUMAN_OBJECT_CATALOG.text,
           HUMAN_OBJECT_CATALOG.fg,
@@ -4249,6 +4700,23 @@
       const dot = toolbarEl.querySelector('[data-role="ctx-color-dot"]');
       if (dot) dot.style.background = hex;
 
+      if (String(state.objectKey || '').startsWith('origins_') && typeof window.applyOriginsSlowRevealToolbarAction === 'function') {
+        window.applyOriginsSlowRevealToolbarAction('color', state.objectKey, hex);
+        return;
+      }
+      if (String(state.objectKey || '').startsWith('chapter_') && typeof window.applyRegaarderChapterToolbarAction === 'function') {
+        window.applyRegaarderChapterToolbarAction('color', state.objectKey, hex);
+        return;
+      }
+      if (String(state.objectKey || '').startsWith('n3d_') && typeof window.applyRegaarderNative3DToolbarAction === 'function') {
+        window.applyRegaarderNative3DToolbarAction('color', state.objectKey, hex);
+        return;
+      }
+      if ((state.contextType === 'blank' || String(state.objectKey || '').startsWith('blank_')) && typeof window.applyRegaarderBlankToolbarAction === 'function') {
+        window.applyRegaarderBlankToolbarAction('color', state.objectKey, hex);
+        return;
+      }
+
       if (state.contextType === 'blueprint') {
         if (typeof window.applyMagnatesBPLayerGlow === 'function') {
           window.applyMagnatesBPLayerGlow(hex);
@@ -4270,6 +4738,22 @@
 
     const applyOpacityToSelectedObject = (val) => {
       state.opacity = val;
+      if (String(state.objectKey || '').startsWith('origins_') && typeof window.applyOriginsSlowRevealToolbarAction === 'function') {
+        window.applyOriginsSlowRevealToolbarAction('opacity', state.objectKey, val);
+        return;
+      }
+      if (String(state.objectKey || '').startsWith('chapter_') && typeof window.applyRegaarderChapterToolbarAction === 'function') {
+        window.applyRegaarderChapterToolbarAction('opacity', state.objectKey, val);
+        return;
+      }
+      if (String(state.objectKey || '').startsWith('n3d_') && typeof window.applyRegaarderNative3DToolbarAction === 'function') {
+        window.applyRegaarderNative3DToolbarAction('opacity', state.objectKey, val);
+        return;
+      }
+      if ((state.contextType === 'blank' || String(state.objectKey || '').startsWith('blank_')) && typeof window.applyRegaarderBlankToolbarAction === 'function') {
+        window.applyRegaarderBlankToolbarAction('opacity', state.objectKey, val);
+        return;
+      }
       const domEl = (() => {
         const meta = HUMAN_OBJECT_CATALOG[state.objectKey];
         if (meta && meta.domSelector) return document.querySelector(meta.domSelector);
@@ -4293,6 +4777,26 @@
 
       if (cmd === 'rotate') {
         state.activeTool = 'rotate';
+        if (String(state.objectKey || '').startsWith('origins_') && typeof window.applyOriginsSlowRevealToolbarAction === 'function') {
+          window.applyOriginsSlowRevealToolbarAction('rotate', state.objectKey);
+          renderToolbar();
+          return;
+        }
+        if (String(state.objectKey || '').startsWith('chapter_') && typeof window.applyRegaarderChapterToolbarAction === 'function') {
+          window.applyRegaarderChapterToolbarAction('rotate', state.objectKey);
+          renderToolbar();
+          return;
+        }
+        if (String(state.objectKey || '').startsWith('n3d_') && typeof window.applyRegaarderNative3DToolbarAction === 'function') {
+          window.applyRegaarderNative3DToolbarAction('rotate', state.objectKey);
+          renderToolbar();
+          return;
+        }
+        if ((state.contextType === 'blank' || String(state.objectKey || '').startsWith('blank_')) && typeof window.applyRegaarderBlankToolbarAction === 'function') {
+          window.applyRegaarderBlankToolbarAction('rotate', state.objectKey);
+          renderToolbar();
+          return;
+        }
         if (domEl) {
           const curRot = parseFloat(domEl.dataset.rgRotation || '0');
           const nextRot = (curRot + 15) % 360;
@@ -4346,6 +4850,10 @@
       }
 
       if (cmd === 'duplicate') {
+        if ((state.contextType === 'blank' || String(state.objectKey || '').startsWith('blank_')) && typeof window.applyRegaarderBlankToolbarAction === 'function') {
+          window.applyRegaarderBlankToolbarAction('duplicate', state.objectKey);
+          return;
+        }
         if (state.contextType === 'blueprint' && typeof window.addMagnatesBPCustomShape === 'function') {
           window.addMagnatesBPCustomShape('rounded');
         } else if (domEl && domEl.parentElement) {
@@ -4435,6 +4943,11 @@
       }
 
       if (cmd === 'delete') {
+        if ((state.contextType === 'blank' || String(state.objectKey || '').startsWith('blank_')) && typeof window.applyRegaarderBlankToolbarAction === 'function') {
+          window.applyRegaarderBlankToolbarAction('delete', state.objectKey);
+          hide();
+          return;
+        }
         if (state.objectKey === 'card') {
           const remBtn = document.querySelector('[data-action="remove-card-image"]');
           if (remBtn) remBtn.click();
@@ -4856,6 +5369,17 @@
     toolbarEl._rgController = controller;
     window.RegaarderContextualToolbar = controller;
     return controller;
+  }
+
+  // Provide immediate proxy to window.RegaarderContextualToolbar so callers can invoke anytime
+  if (!window.RegaarderContextualToolbar) {
+    window.RegaarderContextualToolbar = {
+      showForObject: (opts) => createUniversalContextualToolbar().showForObject(opts),
+      hide: () => createUniversalContextualToolbar().hide(),
+      updatePosition: () => createUniversalContextualToolbar().updatePosition(),
+      executeCommand: (cmd) => createUniversalContextualToolbar().executeCommand(cmd),
+      getState: () => createUniversalContextualToolbar().getState()
+    };
   }
 
   function bindUniversalContextualToolbarHooks() {

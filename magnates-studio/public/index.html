@@ -70,6 +70,24 @@
           <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
           <span>New Project</span>
         </button>
+
+        <!-- Blank Composition Studio trigger -->
+        <button type="button" id="btn-top-blank-comp" onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()" title="Open Blank Composition Studio (Build multi-layer sequences from scratch)" style="padding: 6px 12px; font-size: 11.5px; font-weight: 600; border-radius: 8px; border: 1px solid rgba(130, 60, 240, 0.35); background: rgba(130, 60, 240, 0.12); color: #d8b4fe; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2;"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M3 9h18"/></svg>
+          <span>Blank Comp</span>
+        </button>
+
+        <!-- Story & Prompts Studio trigger -->
+        <button type="button" id="btn-top-story-prompts" onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" title="Open Story Context & Generative AI Prompts Studio" style="padding: 6px 12px; font-size: 11.5px; font-weight: 500; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.04); color: #cbd5e1; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>Story & Prompts</span>
+        </button>
+
+        <!-- Assets & Tools Workbench trigger -->
+        <button type="button" id="btn-top-assets-tools" onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()" title="Open Assets & Tools Workbench (Media Registry, 3D Image Animator, Cutout Studio)" style="padding: 6px 12px; font-size: 11.5px; font-weight: 500; border-radius: 8px; border: 1px solid rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.1); color: #7dd3fc; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+          <svg viewBox="0 0 24 24" style="width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2;"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Assets & Tools</span>
+        </button>
         <!-- Contextual secondary tools (Editor Mode only) -->
         <div class="actions-contextual-group editor-only-nav" id="top-contextual-actions" style="display: none;"></div>
 
@@ -151,6 +169,18 @@
         <button type="button" class="rail-btn" data-rail-tab="projects" title="Saved Projects & Backups">
           <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
           <span class="rail-label">Projects</span>
+        </button>
+        <button type="button" class="rail-btn" data-rail-tab="blank-comp" title="Blank Composition Studio (Build from scratch)" onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()">
+          <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 3v18M3 9h18" stroke="currentColor" stroke-width="2"/></svg>
+          <span class="rail-label">Blank</span>
+        </button>
+        <button type="button" class="rail-btn" data-rail-tab="story-prompts" title="Story Context & AI Prompts" onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()">
+          <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span class="rail-label">Story & AI</span>
+        </button>
+        <button type="button" class="rail-btn" data-rail-tab="assets-tools" title="Assets & Tools Workbench (3D Image Animator, Cutout Studio)" onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()">
+          <svg class="ui-icon rail-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span class="rail-label">Tools</span>
         </button>
       </nav>
  
@@ -3397,6 +3427,36 @@
         <!-- Category Pills -->
         <div id="home-category-pills" style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 6px;">
           <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Quick Workflows: Blank Composition, Story & Prompts, Assets & Tools -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; max-width: 900px; margin-top: 14px;">
+          <!-- Blank Comp Card -->
+          <div onclick="window.RegaarderBlankComposition && window.RegaarderBlankComposition.open()" role="button" tabindex="0" style="background: rgba(130, 60, 240, 0.08); border: 1px solid rgba(130, 60, 240, 0.35); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 16px;">✨</span>
+              <strong style="font-size: 13px; color: #fff;">Blank Composition</strong>
+            </div>
+            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.4;">Build from scratch with multi-layer timing, 3D planes & shaders.</p>
+          </div>
+
+          <!-- Story & Prompts Card -->
+          <div onclick="window.RegaarderStoryContext && window.RegaarderStoryContext.open()" role="button" tabindex="0" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 16px;">📖</span>
+              <strong style="font-size: 13px; color: #fff;">Story & Prompts</strong>
+            </div>
+            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.4;">Voiceover transcript, scene narrative intent & AI prompt records.</p>
+          </div>
+
+          <!-- Assets & Tools Card -->
+          <div onclick="window.RegaarderAssetWorkbench && window.RegaarderAssetWorkbench.open()" role="button" tabindex="0" style="background: rgba(56, 189, 248, 0.06); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; transition: all 0.2s;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <span style="font-size: 16px;">🛠️</span>
+              <strong style="font-size: 13px; color: #fff;">Assets & Tools</strong>
+            </div>
+            <p style="font-size: 11px; color: #94a3b8; margin: 0; line-height: 1.4;">3D Image Animator, Manual Cutout Studio & media bin.</p>
+          </div>
         </div>
       </div>
 
@@ -13560,8 +13620,14 @@
   <script src="js/jani-ftx-logo-engine.js?v=1"></script>
   <script src="js/jani-flash-quad-engine.js?v=2"></script>
   <script src="js/jani-spin-flash-glitch-engine.js?v=2"></script>
-  <script src="js/tpl-contextual-inspector.js?v=24"></script>
-  <script src="js/regaarder-redesign.js?v=17"></script>
+  <script src="js/regaarder-origins-slow-reveal-engine.js?v=1"></script>
+  <script src="js/regaarder-chapters-engine.js?v=1"></script>
+  <script src="js/regaarder-native3d-engine.js?v=1"></script>
+  <script src="js/regaarder-blank-composition.js?v=1"></script>
+  <script src="js/regaarder-story-prompts.js?v=1"></script>
+  <script src="js/regaarder-assets-tools.js?v=1"></script>
+  <script src="js/tpl-contextual-inspector.js?v=25"></script>
+  <script src="js/regaarder-redesign.js?v=18"></script>
   <script src="js/hp-documentary-engine.js?v=1"></script>
   <script>
     if (window.location.search.includes('open=countdown')) {

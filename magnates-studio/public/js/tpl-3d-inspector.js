@@ -14,6 +14,12 @@
   const isBridged = (id) => typeof BRIDGED_HOVER_TEMPLATE_IDS !== 'undefined' && BRIDGED_HOVER_TEMPLATE_IDS.has(id);
   // All templates under 3D Spatial category have the Video / 3D switcher!
   const SPATIAL_3D_CATEGORY_IDS = new Set(['money-stack', 
+    'regaarder-origins-slow-reveal',
+    'regaarder-pele-pact-chapter',
+    'regaarder-minute16-chapter',
+    'regaarder-minute17-chapter',
+    'regaarder-final-chapter',
+    'regaarder-native3d-surface-builder',
     'jani-spin-flash-glitch-reveal',
     'jani-flash-quad-sequence',
     'jani-forbes-fraud-reveal', 'jani-ftx-logo-reveal',
@@ -42,7 +48,7 @@
     }
     return false;
   };
-  const DEDICATED_CUSTOMIZER_IDS = new Set(['scam-redaction', 'deal-term-sheet', 'pyramid-scheme', 'checklist', 'instagram', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal', 'jani-flash-quad-sequence', 'jani-spin-flash-glitch-reveal']);
+  const DEDICATED_CUSTOMIZER_IDS = new Set(['scam-redaction', 'deal-term-sheet', 'pyramid-scheme', 'checklist', 'instagram', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal', 'jani-flash-quad-sequence', 'jani-spin-flash-glitch-reveal', 'regaarder-origins-slow-reveal', 'regaarder-pele-pact-chapter', 'regaarder-minute16-chapter', 'regaarder-minute17-chapter', 'regaarder-final-chapter', 'regaarder-native3d-surface-builder']);
   const kindOf = (id) => DEDICATED_CUSTOMIZER_IDS.has(id) ? null : (id === 'document-3d-fx-engine' ? 'doc' : (id === 'spatial-3d-motion-suite' ? 'spatial' : (is3DSpatial(id) ? 'dom3d' : (isBridged(id) ? 'generic' : null))));
   const has3D = (k, id) => k === 'spatial' || k === 'doc' || k === 'dom3d' || is3DSpatial(id);
   const stOf = (k) => k === 'spatial' ? spatial3DState : document3DFXState;
@@ -3273,6 +3279,25 @@ function collectVideoNodes(stage, tplId) {
       window.renderJaniFlashQuadCanvas(c, clip, t, cw, ch);
       c.restore();
       return;
+    }
+    if (clip.fxScene && clip.fxScene.tplId === 'regaarder-origins-slow-reveal' && typeof window.renderOriginsSlowRevealCanvas === 'function') {
+      window.renderOriginsSlowRevealCanvas(c, clip, t, cw, ch);
+      c.restore();
+      return;
+    }
+    if (clip.fxScene && window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(clip.fxScene.tplId)) {
+      if (typeof window.stepRegaarderChapterAnimation === 'function') {
+        window.stepRegaarderChapterAnimation({ querySelector: () => c.canvas }, clip.fxScene.tplId, t);
+        c.restore();
+        return;
+      }
+    }
+    if (clip.fxScene && clip.fxScene.tplId === 'regaarder-native3d-surface-builder') {
+      if (typeof window.stepRegaarderNative3DAnimation === 'function') {
+        window.stepRegaarderNative3DAnimation({ querySelector: () => c.canvas }, clip.fxScene.tplId, t);
+        c.restore();
+        return;
+      }
     }
     if (clip.fxScene && clip.fxScene.tplId === 'jani-spin-flash-glitch-reveal' && typeof window.renderJaniSpinFlashGlitchCanvas === 'function') {
       window.renderJaniSpinFlashGlitchCanvas(c, clip, t, cw, ch);

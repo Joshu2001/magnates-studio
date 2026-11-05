@@ -1,0 +1,838 @@
+{
+  "version": 127,
+  "master_interval": [
+    1130,
+    1214
+  ],
+  "duration": 84,
+  "assets": [
+    {
+      "id": "room",
+      "file": "assets/pele126/room-clean.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "d6c72bc88917161dc37c475c343262a56acf0937ac3c350e0c4f275e1d7f0a16",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true
+    },
+    {
+      "id": "table",
+      "file": "assets/pele126/table.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "373a69c57ffe3d710e98d704e9e7304486dc6b189e105d73999f5f3ce1805772",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        70,
+        0,
+        821,
+        439
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "chairBlue",
+      "file": "assets/pele126/chair-blue.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "0e508a2fb02874a04fb11ed29ae24de1f47434923042e6d299f91ec467fedcd1",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        225,
+        12,
+        665,
+        439
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "chairRed",
+      "file": "assets/pele126/chair-red.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "2236a503909cb99caf2ca34c761d3f10e4ac46653f9ad48a0478141461b3f899",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        234,
+        13,
+        651,
+        442
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "cash",
+      "file": "assets/pele126/cash-stack.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "9108519fb299a2e6d53d3d29ef222324d1bb99f477636c94d69454dbed46e0a1",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        139,
+        37,
+        738,
+        410
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "guest0",
+      "file": "assets/pele126/guest0.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "cb53b5a793d0cd782493869c7445980ed5df176eb28f8c8a53673eddc40e730b",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        76,
+        17,
+        412,
+        497
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Independent person cutout; clean room underneath has no baked-in diner."
+    },
+    {
+      "id": "guest1",
+      "file": "assets/pele126/guest1.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "c1983df7df4c783987f98f1a29bd23886c347dc21204c2937e7b5543ee82ec16",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        113,
+        18,
+        428,
+        493
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Independent person cutout; clean room underneath has no baked-in diner."
+    },
+    {
+      "id": "guest2",
+      "file": "assets/pele126/guest2.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "1b9db713d62cf760d460312f8dfe5be71eac11d33143eff52a46dc0dac0b219e",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        118,
+        13,
+        433,
+        490
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Independent person cutout; clean room underneath has no baked-in diner."
+    },
+    {
+      "id": "guest3",
+      "file": "assets/pele126/guest3.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "adbf27a800ef3841ec382f5737bae7d82e6d2b30e7e41952b631c12d8859eb20",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        84,
+        5,
+        451,
+        499
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Independent person cutout; clean room underneath has no baked-in diner."
+    },
+    {
+      "id": "guest4",
+      "file": "assets/pele126/guest4.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "b42cceef56d943b42c0f128ea952986884ab1256a7b03511edb7e0a69865765d",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        58,
+        4,
+        396,
+        497
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Independent person cutout; clean room underneath has no baked-in diner."
+    },
+    {
+      "id": "guest5",
+      "file": "assets/pele126/guest5.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "bebf1682630c6e107293c8bdd338d0d5c39f53c3f4cdf31bde87faef0d6933d5",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        72,
+        7,
+        458,
+        498
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Independent person cutout; clean room underneath has no baked-in diner."
+    },
+    {
+      "id": "handshake",
+      "file": "assets/pele126/existing-pack/02_figures/handshake_clasp_both_arms.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "e16fb2a30a57eacf865e589d5211054ef7ced889ea566039c54cc6a17933659d",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        0,
+        0,
+        2172,
+        693
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "portraitBlue",
+      "file": "assets/pele126/portrait-blue.png",
+      "size": [
+        887,
+        887
+      ],
+      "sha256": "92b45b746f9d50c15bce8c597ebfa85188bbcb83588debc19219cc28b6b8bd73",
+      "archival": false,
+      "classification": "ARCHIVAL-DERIVED \u00b7 AI-ASSISTED EXTRACTION",
+      "used": true,
+      "bounds": [
+        32,
+        12,
+        864,
+        887
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "archival_source": true,
+      "original_pixels_unchanged": false,
+      "notes": "Source-referenced extraction/restoration; original originals preserved. Not labeled untouched archival photography."
+    },
+    {
+      "id": "portraitRed",
+      "file": "assets/pele126/portrait-red.png",
+      "size": [
+        887,
+        887
+      ],
+      "sha256": "bfc673d388704a0c50a73f92c87659efc9f3fdc3a21ba1a3d8dd5a1e87f094c8",
+      "archival": false,
+      "classification": "ARCHIVAL-DERIVED \u00b7 AI-ASSISTED EXTRACTION",
+      "used": true,
+      "bounds": [
+        38,
+        26,
+        867,
+        887
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "archival_source": true,
+      "original_pixels_unchanged": false,
+      "notes": "Source-referenced extraction/restoration; original originals preserved. Not labeled untouched archival photography."
+    },
+    {
+      "id": "stage",
+      "file": "assets/pele126/rival-wall-v127.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "38a3ae9875fa5fc868601d22797301441621b20c37ebf9fb60c3df7cd52dab55",
+      "archival": false,
+      "classification": "GENERATED RECONSTRUCTION \u00b7 cinematic lit plaster wall",
+      "used": true
+    },
+    {
+      "id": "smoke",
+      "file": "assets/pele126/existing-pack/01_backgrounds/interstitial_smoky_cyan_crimson.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "b676e5a52dcf4eef8d71039b2fa4c84c2f2de5b8e08f1f4293aa61de9a518104",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true
+    },
+    {
+      "id": "wood",
+      "file": "assets/pele126/existing-pack/01_backgrounds/mexico_blue_red_wood_no_emblem.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "eb9fcd9af33d44ca2d49b84843520f74863d1ff5e089206ddc739fb7d1068e5b",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true
+    },
+    {
+      "id": "poster",
+      "file": "assets/pele126/existing-pack/04_mexico_1970/mexico70_poster_PRECOMPOSED_OPTIONAL.png",
+      "size": [
+        1070,
+        1280
+      ],
+      "sha256": "793564d58df9e0156faedfa58fe1cbd64134418c676e347fbaf03b11739ab420",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        25,
+        35,
+        1041,
+        1243
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "blueCard",
+      "file": "assets/pele126/existing-pack/06_brand_cards/blue_blank_distressed_card.png",
+      "size": [
+        980,
+        870
+      ],
+      "sha256": "b20fd5510f414a0363de82b4316994fb4fd7c3eb5b2f0a56e33c2f5fc6c124a8",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        38,
+        45,
+        943,
+        826
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "redCard",
+      "file": "assets/pele126/existing-pack/06_brand_cards/red_blank_distressed_card.png",
+      "size": [
+        980,
+        870
+      ],
+      "sha256": "b2589cb6072b2e1cf8be7bb61f5fbbc81edcfa849356d49c96111fc301d86cdf",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        38,
+        45,
+        943,
+        826
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "logoBlue",
+      "file": "assets/pele126/adidas-vector.png",
+      "size": [
+        1200,
+        840
+      ],
+      "sha256": "b1a597e465a9c65666851ef916c0dc5b697176d296913a326547849ff0b6274b",
+      "archival": false,
+      "classification": "SOURCED VECTOR \u00b7 Adidas trefoil \u00b7 rendered SVG derivative",
+      "used": true,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_url": "https://commons.wikimedia.org/wiki/File:Adidas_trefoil_logo.svg"
+    },
+    {
+      "id": "logoRed",
+      "file": "assets/pele126/puma-vector.png",
+      "size": [
+        1038,
+        518
+      ],
+      "sha256": "ead77f1f9a96248b899901739032e368036bd8068e1d86d6f7ff504edf691928",
+      "archival": false,
+      "classification": "SOURCED VECTOR \u00b7 PUMA lockup \u00b7 rendered SVG derivative",
+      "used": true,
+      "alpha_range": [
+        0,
+        255
+      ],
+      "source_url": "https://www.svgrepo.com/svg/303336/puma-logo"
+    },
+    {
+      "id": "moneyOne",
+      "file": "assets/pele126/dollar-one.jpg",
+      "size": [
+        1839,
+        785
+      ],
+      "sha256": "5965eda4008f922024c90061b16d7c9e230ee6d76cdd85abbb8008b912f15669",
+      "archival": false,
+      "classification": "SOURCED CURRENCY GRAPHIC",
+      "used": true,
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/00/1_USD_2009_obverse_F_star_note.jpg",
+      "notes": "Modern notes reused as visual motif, matching reference convention; not a claim of1970 banknote design."
+    },
+    {
+      "id": "moneyHundred",
+      "file": "assets/pele126/dollar-hundred.jpg",
+      "size": [
+        2048,
+        898
+      ],
+      "sha256": "69a0a2dd47a38ec5b01c6a43e96159bc36cc4c884d897614c48e3707dfc14f56",
+      "archival": false,
+      "classification": "SOURCED CURRENCY GRAPHIC",
+      "used": true,
+      "source_url": "https://xtb.scdn5.secure.raxcdn.com/default/0104/22/b3f382dd-0484-4305-a42f-6371056ad849/engin-akyurt-7awvqdr36y0-unsplash.jpg",
+      "notes": "Modern notes reused as visual motif, matching reference convention; not a claim of1970 banknote design."
+    },
+    {
+      "id": "peleBall",
+      "file": "assets/pele126/pele-ball-archival.jpg",
+      "size": [
+        3868,
+        2575
+      ],
+      "sha256": "1a296717d8fa737e69364c1d947e23aad59bf0ea45b6c2ad5ce8a614a210340c",
+      "archival": true,
+      "classification": "ARCHIVAL IMAGE \u00b7 ORIGINAL FILE",
+      "used": true,
+      "source_url": "https://cloudfront-us-east-1.images.arcpublishing.com/bloomberglinea/MKCHIGBUXNBWBGWK3YMRNSPPBM.jpg",
+      "presentation": [
+        "cropping",
+        "grayscale grade",
+        "paper surface",
+        "camera movement"
+      ],
+      "original_pixels_unchanged": true
+    },
+    {
+      "id": "footballBackground",
+      "file": "assets/pele126/football-clean.png",
+      "size": [
+        1508,
+        1043
+      ],
+      "sha256": "39a75421d23267e3e2b1ee141ce9a42abff943e106ee795c87570683af189650",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true
+    },
+    {
+      "id": "player0",
+      "file": "assets/pele126/player0.png",
+      "size": [
+        574,
+        532
+      ],
+      "sha256": "351632bfb25aab39a700f81f54d50a3ac9a6bb030624ba0ec6e8d93a79050146",
+      "archival": false,
+      "classification": "ARCHIVAL-DERIVED \u00b7 AI-ASSISTED EXTRACTION",
+      "used": true,
+      "bounds": [
+        3,
+        3,
+        571,
+        529
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "archival_source": true,
+      "original_pixels_unchanged": false,
+      "notes": "Source-referenced extraction/restoration; original originals preserved. Not labeled untouched archival photography."
+    },
+    {
+      "id": "player1",
+      "file": "assets/pele126/player1.png",
+      "size": [
+        225,
+        584
+      ],
+      "sha256": "62e6a14289643b4bbabf8a65624e30bd2d894606997a58aed788c49aacc65801",
+      "archival": false,
+      "classification": "ARCHIVAL-DERIVED \u00b7 AI-ASSISTED EXTRACTION",
+      "used": true,
+      "bounds": [
+        3,
+        3,
+        222,
+        581
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "archival_source": true,
+      "original_pixels_unchanged": false,
+      "notes": "Source-referenced extraction/restoration; original originals preserved. Not labeled untouched archival photography."
+    },
+    {
+      "id": "player2",
+      "file": "assets/pele126/player2.png",
+      "size": [
+        265,
+        603
+      ],
+      "sha256": "074fc0b477acf61e7088367a56b075be9b6666018c9f98d4fdea80e45d6eed58",
+      "archival": false,
+      "classification": "ARCHIVAL-DERIVED \u00b7 AI-ASSISTED EXTRACTION",
+      "used": true,
+      "bounds": [
+        3,
+        3,
+        262,
+        600
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "archival_source": true,
+      "original_pixels_unchanged": false,
+      "notes": "Source-referenced extraction/restoration; original originals preserved. Not labeled untouched archival photography."
+    },
+    {
+      "id": "ball",
+      "file": "assets/pele126/ball.png",
+      "size": [
+        133,
+        129
+      ],
+      "sha256": "5d2a2389a292781a921555a466e39d3ff010ef705c089b3bb5a688f27c565ec8",
+      "archival": false,
+      "classification": "ARCHIVAL-DERIVED \u00b7 AI-ASSISTED EXTRACTION",
+      "used": true,
+      "bounds": [
+        3,
+        3,
+        130,
+        126
+      ],
+      "alpha_range": [
+        0,
+        255
+      ],
+      "archival_source": true,
+      "original_pixels_unchanged": false,
+      "notes": "Source-referenced extraction/restoration; original originals preserved. Not labeled untouched archival photography."
+    },
+    {
+      "id": "fireAtlas",
+      "file": "assets/pele126/fire-atlas.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "0fdca6c1bd5734fb07ee31cd3a0d376839e56122c5ad019a98bec391c0d32d40",
+      "archival": false,
+      "classification": "GENERATED VFX \u00b7 FLAME FLIPBOOK",
+      "used": true,
+      "bounds": [
+        161,
+        79,
+        1407,
+        990
+      ],
+      "alpha_range": [
+        0,
+        254
+      ],
+      "notes": "Inferred burning-cash treatment; six interpolated frames and separate light emission, not claimed original technique."
+    },
+    {
+      "id": "bootBlue",
+      "file": "assets/pele126/../minute17/shoe-blue-v125.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "ec27e92d8c524eb1d8d31850b75b0f46fc3c3295463dda355cc0c8555a4be104",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        20,
+        132,
+        496,
+        375
+      ],
+      "alpha_range": [
+        0,
+        254
+      ]
+    },
+    {
+      "id": "bootRed",
+      "file": "assets/pele126/../minute17/shoe-red-v125.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "a05cf47a52acfeb2283a2f025133b671010fd3333258c6a0761f190269635189",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        21,
+        130,
+        497,
+        380
+      ],
+      "alpha_range": [
+        0,
+        254
+      ]
+    },
+    {
+      "id": "paperEdge",
+      "file": "assets/pele126/../minute17/photo-paper-edge-v125.png",
+      "size": [
+        1396,
+        1127
+      ],
+      "sha256": "acdd15c111d892ded22b0704dab363ac3d7144bb38903a384772afe74cae9fb6",
+      "archival": false,
+      "classification": "GENERATED ILLUSTRATION",
+      "used": true,
+      "bounds": [
+        43,
+        57,
+        1356,
+        1079
+      ],
+      "alpha_range": [
+        0,
+        255
+      ]
+    },
+    {
+      "id": "nextInsert",
+      "file": "assets/pele126/next-frames/001.png",
+      "size": [
+        640,
+        360
+      ],
+      "sha256": "f48365b8887ec16ea411f4ef8ee37ebfca3c637a164ed0d5099ada86b900344d",
+      "archival": true,
+      "classification": "ARCHIVAL VIDEO \u00b7 EXISTING SOURCE EXCERPT",
+      "used": true,
+      "source": "supplied reference MP4,1213.4\u20131214.0s",
+      "notes": "Exact0.6-second handoff retained as video plus native-render decoded frames."
+    },
+    {
+      "id": "newspaper1",
+      "file": "assets/pele126/placar-page-2.jpg",
+      "size": [
+        1500,
+        984
+      ],
+      "sha256": "bdc9b33870ab9bcb70994c6208bea57b2a61166df550165dc84165812af77876",
+      "archival": true,
+      "classification": "ARCHIVAL SCAN \u00b7 PLACAR no.1 \u00b7 20 March 1970 \u00b7 left page",
+      "notes": "Default uses native editable type; file is preserved alternative. Replacing this binding or enabling Use scanned paper switches to a full paper image while retaining its path.",
+      "used": true,
+      "bounds": [
+        0,
+        0,
+        750,
+        984
+      ],
+      "source_url": "https://placar.com.br/colunas/ha-55-anos-a-receita-de-pele-para-o-tri-na-edicao-numero-1-de-placar/"
+    },
+    {
+      "id": "newspaper2",
+      "file": "assets/pele126/placar-page-1.jpg",
+      "size": [
+        745,
+        545
+      ],
+      "sha256": "35396e59cb5da72a100de10f65ec55a730449650cb7aae581b5a6ed74fa42ec5",
+      "archival": true,
+      "classification": "ARCHIVAL SCAN \u00b7 PLACAR no.1 \u00b7 20 March 1970 \u00b7 page38",
+      "notes": "Default uses native editable type; file is preserved alternative. Replacing this binding or enabling Use scanned paper switches to a full paper image while retaining its path.",
+      "used": true,
+      "source_url": "https://placar.com.br/colunas/ha-55-anos-a-receita-de-pele-para-o-tri-na-edicao-numero-1-de-placar/"
+    },
+    {
+      "id": "photoPrint",
+      "file": "assets/pele126/pele-ball-archival.jpg",
+      "size": [
+        3868,
+        2575
+      ],
+      "sha256": "1a296717d8fa737e69364c1d947e23aad59bf0ea45b6c2ad5ce8a614a210340c",
+      "archival": true,
+      "classification": "ARCHIVAL IMAGE \u00b7 ORIGINAL FILE",
+      "notes": "Independent photograph print source"
+    },
+    {
+      "id": "guest6",
+      "file": "assets/pele126/foreground-guests-v127.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "a94503e188465010c5906eefdf64d179e3da79d2aa2d44c1dac28019df08ae8c",
+      "classification": "GENERATED RECONSTRUCTION \u00b7 seated foreground man",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        0,
+        0,
+        800,
+        1024
+      ]
+    },
+    {
+      "id": "guest7",
+      "file": "assets/pele126/foreground-guests-v127.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "a94503e188465010c5906eefdf64d179e3da79d2aa2d44c1dac28019df08ae8c",
+      "classification": "GENERATED RECONSTRUCTION \u00b7 seated foreground woman",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        800,
+        0,
+        1536,
+        1024
+      ]
+    }
+  ],
+  "script_source": "The Nazi Brothers Who Started Rival Shoe Companies.docx, lines482\u2013523",
+  "archival_policy": "Originals retained. Derived/reconstructed illustrations distinguished. Printed paper facsimiles are not authentic archival newspapers.",
+  "inferred_boot_mark": "Editable native stripe highlight overlay on boot, matched to visual emphasis; not a modification to the preserved source photo.",
+  "source_originals": [
+    {
+      "file": "assets/pele126/pele-bicycle-archival.jpg",
+      "source_url": "https://images.ctfassets.net/pjshm78m9jt4/4si4HH3GCCjH5sWIs6CaCc/0f0b243cb1cc0f667b9738b28ff1ea6a/pele_2.jpeg",
+      "sha256": "49a7acff991a07c96aa3fe6ce46bc24004aa231a155cdce01ed05f09ab259a39",
+      "original_file_preserved": true
+    },
+    {
+      "file": "assets/pele126/pele-ball-archival.jpg",
+      "source_url": "https://cloudfront-us-east-1.images.arcpublishing.com/bloomberglinea/MKCHIGBUXNBWBGWK3YMRNSPPBM.jpg",
+      "sha256": "1a296717d8fa737e69364c1d947e23aad59bf0ea45b6c2ad5ce8a614a210340c",
+      "original_file_preserved": true
+    },
+    {
+      "file": "assets/pele126/horst-archival.jpg",
+      "source_url": "https://www.pagina12.com.ar/resizer/v2/G44DQN3DHBRWGNZRGEYGMNBUMI.jpg?auth=7064f39397847ed023da74242b5bb86c3d561ea903dc465437372dba84837ea4&width=950",
+      "sha256": "9546b2fb6c0bdcebbc96b4d483335a60d481293f92d5dc3629f1765780df18b2",
+      "original_file_preserved": true
+    },
+    {
+      "file": "assets/pele126/dollar-one.jpg",
+      "source_url": "https://upload.wikimedia.org/wikipedia/commons/0/00/1_USD_2009_obverse_F_star_note.jpg",
+      "sha256": "5965eda4008f922024c90061b16d7c9e230ee6d76cdd85abbb8008b912f15669",
+      "original_file_preserved": true
+    },
+    {
+      "file": "assets/pele126/dollar-hundred-source.jpg",
+      "source_url": "https://xtb.scdn5.secure.raxcdn.com/default/0104/22/b3f382dd-0484-4305-a42f-6371056ad849/engin-akyurt-7awvqdr36y0-unsplash.jpg",
+      "sha256": "5eda241800925ae7154ed1a66cf35d197301a5179e89d526aac2057e153ceec6",
+      "original_file_preserved": true
+    }
+  ],
+  "independent_people_count": 11,
+  "paper_replacements": "newspaper1/newspaper2 bind optional full scans; default native editable facsimiles. photoPrint is independent."
+}

@@ -25174,6 +25174,90 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'regaarder-pele-pact-chapter',
+    title: 'The Pelé Pact · Chapter 6 (18:50–20:14)',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'REGAARDER MOTION 002',
+    difficulty: 'Pro Suite',
+    timeToApply: '84.0 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(22, 55, 67, 0.96), rgba(8, 14, 20, 0.98))',
+    description: 'Wine & dine restaurant with independent cutouts, descending handshake clasp, escalating rival bids with burning cash, Mexico 70 camera roll, Placard newspaper collage, crossed brand cards, and iconic bicycle kick boot punch-in.',
+    tags: ['Pelé Pact', 'Chapter 6', 'Handshake', 'Mexico 70', 'Newspaper Collage', 'Bicycle Kick', 'Documentary'],
+    defaultImage: '/assets/regaarder-motion/portrait.png',
+    secondaryImage: '/assets/regaarder-motion/reveal.png'
+  },
+  {
+    id: 'regaarder-minute16-chapter',
+    title: 'Minute 16 · Cargo Ships, Pedestal & Warehouse (16:00–17:00)',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'REGAARDER MOTION 003',
+    difficulty: 'Pro Suite',
+    timeToApply: '60.0 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(11, 36, 48, 0.96), rgba(7, 9, 11, 0.98))',
+    description: 'Trophy archival crowd passage, shoe showcase pedestal pullback with money stacks, water reflection with Adidas/Puma ocean shipment split, and warehouse boot elevation with pointing accusatory hands.',
+    tags: ['Minute 16', 'Cargo Ships', 'Water Reflection', 'Shoe Pedestal', 'Warehouse Accusations', 'Documentary'],
+    defaultImage: '/assets/regaarder-motion/portrait.png',
+    secondaryImage: '/assets/regaarder-motion/reveal.png'
+  },
+  {
+    id: 'regaarder-minute17-chapter',
+    title: 'Minute 17 · Rain Rivalry, Next Gen & Split Flare (17:00–18:00)',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'REGAARDER MOTION 004',
+    difficulty: 'Pro Suite',
+    timeToApply: '60.0 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(36, 38, 75, 0.96), rgba(3, 4, 6, 0.98))',
+    description: 'City profile portraits under torrential seeded rain, heat-shimmering sportswear products, masked family panel rises with reflection pools, retreating archival photograph, and chromatic cyan/crimson split with blinding optical flare.',
+    tags: ['Minute 17', 'Seeded Rain', 'Next Generation', 'Family Panels', 'Photo Split', 'Optical Flare'],
+    defaultImage: '/assets/regaarder-motion/portrait.png',
+    secondaryImage: '/assets/regaarder-motion/reveal.png'
+  },
+  {
+    id: 'regaarder-final-chapter',
+    title: 'The Final Chapter · Legacy, Revival & Fire Overlays (23:29–26:54)',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'REGAARDER MOTION 005',
+    difficulty: 'Pro Suite',
+    timeToApply: '205.6 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(35, 14, 18, 0.96), rgba(5, 5, 8, 0.98))',
+    description: 'Full documentary climax: Founders parlor pullback, burning sneaker with dynamic video flame emitters, financial distress with wave-deforming brand cards, Nike gold vortex, Predator showcase, Yeezy gloss card, Alexander McQueen runway, and headquarters aerial pins.',
+    tags: ['Final Chapter', 'Chapter 7', 'Burning Shoe', 'Video Flame Atlas', 'Nike Vortex', 'Predator', 'Headquarters Pins'],
+    defaultImage: '/assets/regaarder-motion/fire.png',
+    secondaryImage: '/assets/regaarder-motion/reveal.png'
+  },
+  {
+    id: 'regaarder-native3d-surface-builder',
+    title: 'Native 3D · Character Rig & V108 Surface Builder',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'REGAARDER NATIVE 3D',
+    difficulty: 'Pro Suite',
+    timeToApply: 'Interactive',
+    previewGradient: 'linear-gradient(135deg, rgba(20, 24, 32, 0.96), rgba(11, 15, 21, 0.98))',
+    description: 'Full native 3D anatomical humanoid workspace: multiresolution surface subdivision, planar/cylindrical UV unwrapping, 3D vertex paint brush, PBR roughness/metalness/bump-to-normal maps, tailored hat/wardrobe, and GLB export.',
+    tags: ['Native 3D', 'Surface Builder', 'Multiresolution', 'UV Unwrapping', 'Vertex Paint', 'PBR Shading', 'GLB Export'],
+    defaultImage: '/assets/regaarder-motion/standing.png',
+    secondaryImage: '/assets/regaarder-motion/outdoor.png'
+  },
+  {
+    id: 'regaarder-origins-slow-reveal',
+    title: 'Origins: Herzogenaurach Slow Reveal, Eye Strip & Organic Paper Tears',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'REGAARDER MOTION 001',
+    difficulty: 'Pro Suite',
+    timeToApply: '13.6 sec',
+    previewGradient: 'linear-gradient(135deg, rgba(40, 61, 79, 0.96), rgba(16, 17, 19, 0.98))',
+    description: 'Bavarian aerial town map, Adidas & PUMA dual lockups, historical portrait with customizable torn-paper eye strip, organic spreading paper tears reveal, and optional Living Fire & Desk Lamp continuation.',
+    tags: ['Slow Reveal', 'Eye Strip', 'Organic Paper Tears', 'Herzogenaurach', 'Living Fire', 'Regaarder Motion'],
+    defaultImage: '/assets/regaarder-motion/portrait.png',
+    secondaryImage: '/assets/regaarder-motion/reveal.png'
+  },
+  {
     id: 'jani-spin-flash-glitch-reveal',
     title: 'Circular Spin, Falling Particles, 1+3 Flashlight Strobe & Glitch Reveal',
     category: '3D Spatial',
@@ -27377,7 +27461,7 @@ function renderHomepageTemplates() {
 
 // Business Storytelling templates (Magnates channel): CSS-keyframe driven, wired into hover preview + customizer bridge
 const BIZ_STORY_IDS = ['empire-timeline','founder-faceoff','cash-burn-meter','deal-term-sheet','scam-redaction','market-cap-race','hostile-takeover','pyramid-scheme','money-trail-map','investigate-globe','world-map-flyover','country-morph-highlight','zoomout-context-card','border-conflict-shading','sanctions-embargo-arrows','timeline-scrubber-map'];
-const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-printer-glitch-card','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
+const BRIDGED_HOVER_TEMPLATE_IDS = new Set(['zoom-blur', 'regaarder-origins-slow-reveal', 'regaarder-pele-pact-chapter', 'regaarder-minute16-chapter', 'regaarder-minute17-chapter', 'regaarder-final-chapter', 'regaarder-native3d-surface-builder', 'jani-spin-flash-glitch-reveal', 'jani-flash-quad-sequence', 'wire-transfer', 'money-stack', 'jani-ftx-logo-reveal', 'jani-cross-section-reveal', 'jani-forbes-fraud-reveal','parallax','textbehind','docheight','kinetic','split','zoom','candle','balance','compound','wealth','bloom','ticker','inflation','snowball','pie','receipt','google','imessage','subscribe','countdown','redcircle','chart','typewriter','notif','hormozi','kenburns','tweet','money','glitch','map','news','quote','polaroid','comic','vhs','progress','scramble','newspaper','instagram','checklist','dark-power-sigil','og-parallax-depth-engine','spatial-3d-motion-suite','document-3d-fx-engine','jani-puzzle-narrative-suite','jani-countdown-panic-suite','nonlinear-time-flash','puzzle-piece-reveal','light-rays-lens-leaks','monochromatic-crushed-grading','heavy-elliptical-vignette','text-reveal-modifiers','glow-drop-shadows','3d-camera-move-rotation','audio-visual-jl-cuts','subbass-drops-risers','magnates-media-3d-projection','magnates-media-cc-vignette-dof','magnates-media-brightness-glow','magnates-media-multi-drop-shadows','magnates-media-shadowization','magnates-media-blend-modes','magnates-media-printer-glitch-card','magnates-media-paper-blueprint','magnates-media-brand-wavy-hook','magnates-media-dual-silhouettes','magnates-media-ink-reveal','magnates-media-article-highlight','magnates-media-particle-vfx','parallax','textbehind','docheight','kinetic','split','zoom','fedrate','bearbull','certificate','cryptowallet','realestate','creditscore','budget','crash','dividend','supplydemand'].concat(BIZ_STORY_IDS));
 if (typeof window !== 'undefined' && Array.isArray(window.NEW_TESTER_TEMPLATES)) {
   window.NEW_TESTER_TEMPLATES.forEach(item => BRIDGED_HOVER_TEMPLATE_IDS.add(item.id));
 }
@@ -30940,6 +31024,19 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
           </div>
         </div>
       `;
+    } else if (tplId === 'regaarder-origins-slow-reveal') {
+      if (typeof window.buildOriginsSlowRevealHtml === 'function') {
+        const osrData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('regaarder-origins-slow-reveal') : (window.REGAARDER_ORIGINS_CONFIG || {});
+        fxContainer.innerHTML = window.buildOriginsSlowRevealHtml(tplId, osrData);
+      }
+    } else if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tplId)) {
+      if (typeof window.renderRegaarderChapterStage === 'function') {
+        window.renderRegaarderChapterStage(fxContainer, tplId, true);
+      }
+    } else if (tplId === 'regaarder-native3d-surface-builder') {
+      if (typeof window.renderRegaarderNative3DStage === 'function') {
+        window.renderRegaarderNative3DStage(fxContainer, tplId, true);
+      }
     } else if (tplId === 'jani-spin-flash-glitch-reveal') {
       if (typeof window.buildSpinFlashGlitchHtml === 'function') {
         const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
@@ -32077,7 +32174,20 @@ function startTemplateHoverVideo(cardEl, tpl, manual) {
         const shakeMag = (1 - impactProg) * 8;
         if (cardWrap) cardWrap.style.transform = `translate(${Math.sin(t * 50) * shakeMag}px, ${Math.cos(t * 50) * shakeMag}px) scale(1.04)`;
       }
-        } else if (tplId === 'jani-spin-flash-glitch-reveal') {
+        } else if (tplId === 'regaarder-origins-slow-reveal') {
+      if (typeof window.stepOriginsSlowRevealAnimation === 'function') {
+        const osrData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('regaarder-origins-slow-reveal') : (window.REGAARDER_ORIGINS_CONFIG || {});
+        window.stepOriginsSlowRevealAnimation(fxContainer, tplId, t, osrData);
+      }
+    } else if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tplId)) {
+      if (typeof window.stepRegaarderChapterAnimation === 'function') {
+        window.stepRegaarderChapterAnimation(fxContainer, tplId, t);
+      }
+    } else if (tplId === 'regaarder-native3d-surface-builder') {
+      if (typeof window.stepRegaarderNative3DAnimation === 'function') {
+        window.stepRegaarderNative3DAnimation(fxContainer, tplId, t);
+      }
+    } else if (tplId === 'jani-spin-flash-glitch-reveal') {
       if (typeof window.stepJaniSpinFlashGlitchAnimation === 'function') {
         const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
         window.stepJaniSpinFlashGlitchAnimation(fxContainer, tplId, t, sfgData);
@@ -33470,6 +33580,8 @@ let topCustomizerState = {
   matrixTypeSpeed: 1.0,
   matrixColumns: []
 };
+window.topCustomizerState = topCustomizerState;
+window.EFFECT_TEMPLATES_DATA = EFFECT_TEMPLATES_DATA;
 
 function syncTopTemplateTypographyUI() {
   const target = topCustomizerState.activeTextTarget || 'main';
@@ -33831,6 +33943,31 @@ function openTopTemplateCustomizer(tpl) {
         const stage = document.getElementById('tpl-modal-preview-stage');
         const mData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
         if (stage) window.tplMountMoneyStack3DStage(stage, mData);
+      }
+    } else if (tpl.id === 'regaarder-origins-slow-reveal') {
+      topCustomizerState.primaryUrl = '/assets/regaarder-motion/portrait.png';
+      topCustomizerState.secondaryUrl = '/assets/regaarder-motion/reveal.png';
+      topCustomizerState.originalPhotoUrl = '/assets/regaarder-motion/portrait.png';
+      if (typeof window.tplMountOriginsSlowRevealStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        const osrData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData(tpl.id) : {};
+        if (stage) window.tplMountOriginsSlowRevealStage(stage, osrData);
+      }
+    } else if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tpl.id)) {
+      topCustomizerState.primaryUrl = '/assets/regaarder-motion/portrait.png';
+      topCustomizerState.secondaryUrl = '/assets/regaarder-motion/reveal.png';
+      topCustomizerState.originalPhotoUrl = '/assets/regaarder-motion/portrait.png';
+      if (typeof window.renderRegaarderChapterStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage) window.renderRegaarderChapterStage(stage, tpl.id, false);
+      }
+    } else if (tpl.id === 'regaarder-native3d-surface-builder') {
+      topCustomizerState.primaryUrl = '/assets/regaarder-motion/standing.png';
+      topCustomizerState.secondaryUrl = '/assets/regaarder-motion/outdoor.png';
+      topCustomizerState.originalPhotoUrl = '/assets/regaarder-motion/standing.png';
+      if (typeof window.renderRegaarderNative3DStage === 'function') {
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage) window.renderRegaarderNative3DStage(stage, tpl.id, false);
       }
     } else if (tpl.id === 'jani-spin-flash-glitch-reveal') {
       topCustomizerState.primaryUrl = '/interview_cutin_cinematic.jpg';
@@ -36034,6 +36171,40 @@ function renderTopTemplatePreviewStage() {
   const tplId = topCustomizerState.currentTpl.id;
   if (window.tpl3DSync) window.tpl3DSync(tplId);
 
+  // Regaarder Motion 001: Origins Slow Reveal, Eye Strip & Organic Paper Tears Engine
+  if (tplId === 'regaarder-origins-slow-reveal') {
+    const osrData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('regaarder-origins-slow-reveal') : (window.REGAARDER_ORIGINS_CONFIG || {});
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.tplMountOriginsSlowRevealStage === 'function') {
+      window.tplMountOriginsSlowRevealStage(stage, osrData);
+    }
+    return;
+  }
+
+  // Regaarder Motion Chapters: Pelé Pact, Minute 16, Minute 17, Final Chapter
+  if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tplId)) {
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.renderRegaarderChapterStage === 'function') {
+      window.renderRegaarderChapterStage(stage, tplId, false);
+    }
+    return;
+  }
+
+  // Regaarder Native 3D: Character Rig & V108 Surface Builder
+  if (tplId === 'regaarder-native3d-surface-builder') {
+    if (activeHoverAnimFrame) { cancelAnimationFrame(activeHoverAnimFrame); activeHoverAnimFrame = null; }
+    hoverBridgeActive = false;
+    hoverExternalT = null;
+    if (typeof window.renderRegaarderNative3DStage === 'function') {
+      window.renderRegaarderNative3DStage(stage, tplId, false);
+    }
+    return;
+  }
+
   // Circular Spin, Falling Particles, 1+3 Flashlight Strobe & Glitch Reveal Engine
   if (tplId === 'jani-spin-flash-glitch-reveal') {
     const sfgData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('jani-spin-flash-glitch-reveal') : (window.JANI_SPIN_FLASH_GLITCH_CONFIG || {});
@@ -37165,6 +37336,28 @@ function updateTopCustomizerFrame(seqTime, now) {
 
   const tplId = topCustomizerState.currentTpl?.id;
   const depthFactor = (topCustomizerState.depth || 65) / 100;
+
+  if (tplId === 'regaarder-origins-slow-reveal') {
+    if (typeof window.stepOriginsSlowRevealAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      const osrData = (typeof window.tplGetContextualData === 'function') ? window.tplGetContextualData('regaarder-origins-slow-reveal') : (window.REGAARDER_ORIGINS_CONFIG || {});
+      window.stepOriginsSlowRevealAnimation(stage, 'regaarder-origins-slow-reveal', localSceneT, osrData);
+    }
+  }
+
+  if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tplId)) {
+    if (typeof window.stepRegaarderChapterAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      window.stepRegaarderChapterAnimation(stage, tplId, localSceneT);
+    }
+  }
+
+  if (tplId === 'regaarder-native3d-surface-builder') {
+    if (typeof window.stepRegaarderNative3DAnimation === 'function') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      window.stepRegaarderNative3DAnimation(stage, tplId, localSceneT);
+    }
+  }
 
   if (tplId === 'jani-spin-flash-glitch-reveal') {
     if (typeof window.stepJaniSpinFlashGlitchAnimation === 'function') {
@@ -48945,6 +49138,33 @@ function initHomepageTemplateEvents() {
     btn.addEventListener('click', () => {
       switchStudioView('home');
     });
+  });
+
+  // Regaarder Workflow Tools: Blank Composition, Story & Prompts, Assets & Tools
+  document.querySelectorAll('.rail-btn[data-rail-tab="blank-comp"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.RegaarderBlankComposition) window.RegaarderBlankComposition.open();
+    });
+  });
+  document.querySelectorAll('.rail-btn[data-rail-tab="story-prompts"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.RegaarderStoryContext) window.RegaarderStoryContext.open();
+    });
+  });
+  document.querySelectorAll('.rail-btn[data-rail-tab="assets-tools"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.RegaarderAssetWorkbench) window.RegaarderAssetWorkbench.open();
+    });
+  });
+
+  document.getElementById('btn-top-blank-comp')?.addEventListener('click', () => {
+    if (window.RegaarderBlankComposition) window.RegaarderBlankComposition.open();
+  });
+  document.getElementById('btn-top-story-prompts')?.addEventListener('click', () => {
+    if (window.RegaarderStoryContext) window.RegaarderStoryContext.open();
+  });
+  document.getElementById('btn-top-assets-tools')?.addEventListener('click', () => {
+    if (window.RegaarderAssetWorkbench) window.RegaarderAssetWorkbench.open();
   });
 
   // Search filter

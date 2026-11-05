@@ -1,0 +1,472 @@
+{
+  "version": "minute17-v125",
+  "source_interval": [
+    1020,
+    1080
+  ],
+  "assets": [
+    {
+      "id": "adidas-trefoil",
+      "file": "assets/minute17/adidas-trefoil.svg",
+      "sha256": "762e0d68ecb5468498a710e778184bcdaac88536c9818982beb0cab479663227",
+      "archival": false,
+      "status": "integrated"
+    },
+    {
+      "id": "adult-blue",
+      "file": "assets/minute17/adult-blue.png",
+      "sha256": "d8a3ec4e88ebf77ec69eb1f440ec5de49983aaa819b73bee12981c9feabcdf05",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "provenance": "AI-generated illustrative figure; not verified identity",
+      "bounds": [
+        347,
+        19,
+        643,
+        1515
+      ]
+    },
+    {
+      "id": "adult-red",
+      "file": "assets/minute17/adult-red.png",
+      "sha256": "0343f659cfe8e0e2edaf57d1737eae7c055fdadaef0758723a870d21ccfc047b",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "provenance": "AI-generated illustrative figure; not verified identity",
+      "bounds": [
+        295,
+        16,
+        774,
+        1524
+      ]
+    },
+    {
+      "id": "confrontation-city-v120",
+      "file": "assets/minute17/confrontation-city-v120.png",
+      "sha256": "e40290b07d7ca7a83884126a6ea5f8388703687966b47dc907ca62ca05cd6bdc",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB"
+    },
+    {
+      "id": "family-source-scene",
+      "file": "assets/minute17/family-source-scene.mp4",
+      "sha256": "998c33e2ca74e593f115c7c120236dc013b61e756d74869d001e92afe7bd359b",
+      "archival": false,
+      "status": "preserved_alternative_not_composited",
+      "provenance": "Exact reuse of supplied original scene; underlying photograph attribution unresolved",
+      "kind": "reference-scene-video",
+      "contains_archival_image": true,
+      "render_role": "not composited; flattened reference only",
+      "classification_note": "Supersedes overly broad archival=true flag in asset checkpoint; this is not verified historical moving footage."
+    },
+    {
+      "id": "flare",
+      "file": "assets/minute17/flare.svg",
+      "sha256": "d09ec818216230911604ea040b17af2c4f2bf0f27b001f123f102fbd3535deff",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "panel-blue",
+      "file": "assets/minute17/panel-blue.png",
+      "sha256": "418644b1b7d4d0c297b1a9a342dd7f22243fcecc00e505f5e6bee960f6fad5a9",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "id": "panel-red",
+      "file": "assets/minute17/panel-red.png",
+      "sha256": "c904752792d28c354ab4bba573bf6885045ea11171bd033a369e15609276d708",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGB"
+    },
+    {
+      "id": "photo-split-left",
+      "file": "assets/minute17/photo-split-left.svg",
+      "sha256": "5c46b7a7e9f5f4b06dd0a27e970067fe190cf228b8b8ebf3de4a9eede0abc3ad",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "photo-split-right",
+      "file": "assets/minute17/photo-split-right.svg",
+      "sha256": "63df808a8c562d20a0f7d722c74714b7d44f4d47e3097e1e12f2673f8b3cf3ae",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "profile-blue",
+      "file": "assets/minute17/profile-blue.png",
+      "sha256": "4cc56032aa97e6f4ac4b3f6a3789051d2f9b13966e96c56ed8b806e6c9092a9c",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "bounds": [
+        12,
+        113,
+        939,
+        1422
+      ]
+    },
+    {
+      "id": "profile-orange",
+      "file": "assets/minute17/profile-orange.png",
+      "sha256": "9a6987ff79bffa7a919ea37cc36fc84f568dc8028fed9ec6d32104b6cef6a600",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1086,
+        1448
+      ],
+      "mode": "RGBA",
+      "bounds": [
+        162,
+        71,
+        1075,
+        1416
+      ]
+    },
+    {
+      "id": "puma-symbol-v121",
+      "file": "assets/minute17/puma-symbol-v121.svg",
+      "sha256": "a065b2abba71dc3e53457624d097982aa501c296501a18784cd995896864679a",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "shoe-blue",
+      "file": "assets/minute17/shoe-blue.svg",
+      "sha256": "5d22f0b0b02d73cc339dcfe681e4e5f0ac1b8ada85e4c6a7c37fcf4d8356fe65",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "shoe-red",
+      "file": "assets/minute17/shoe-red.svg",
+      "sha256": "26897d16966fe8098de65c9e8a352d3a56ee283e0e103726096aec0fbb6d08cc",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "shorts-blue",
+      "file": "assets/minute17/shorts-blue.svg",
+      "sha256": "cd1b74a3395d59baf45516b98011a12f547cdbaa55efebdc20454c8f240312b9",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "shorts-red",
+      "file": "assets/minute17/shorts-red.svg",
+      "sha256": "5aa90524869f01ca9f8df77b1378fc306b4cd96f1d4dd745a5ec820a7ec3b9d6",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "sock-blue",
+      "file": "assets/minute17/sock-blue.svg",
+      "sha256": "3a729928b07755c438ba9e07af2630908ae535312214ed0f282e62022b596ef5",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "sock-red",
+      "file": "assets/minute17/sock-red.svg",
+      "sha256": "6e3c7aec2e162b492aa9e41bab9343de05b32c32a309c9d14577cf760787f4e8",
+      "archival": false,
+      "status": "preserved_alternative_not_composited"
+    },
+    {
+      "id": "son-blue",
+      "file": "assets/minute17/son-blue.png",
+      "sha256": "464c564d0a2fa2cf9c8c1203339454d146467b6d6d81182c26c24cb8f04ae5b1",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "provenance": "AI-generated illustrative figure; not verified identity",
+      "bounds": [
+        344,
+        16,
+        640,
+        1519
+      ]
+    },
+    {
+      "id": "son-red",
+      "file": "assets/minute17/son-red.png",
+      "sha256": "df9edb80d04301128431fea49dec5236e9beeea1089105de2195e319423fb824",
+      "archival": false,
+      "status": "integrated",
+      "size": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "alpha_extrema": [
+        0,
+        254
+      ],
+      "provenance": "AI-generated illustrative figure; not verified identity",
+      "bounds": [
+        349,
+        14,
+        656,
+        1522
+      ]
+    },
+    {
+      "id": "family-archival",
+      "file": "assets/minute17/family-archival.png",
+      "sha256": "81824fd05dd50f9642f9f34b76f971649a7cdf08d261276dd8a84f006f67e0b6",
+      "size": [
+        711,
+        576
+      ],
+      "archival": true,
+      "ai_generated": false,
+      "status": "integrated",
+      "provenance": "User-supplied photograph; same composition as supplied reference photo panel",
+      "source_url": "https://realhistory.blog.hu/2023/07/23/ismert_markak_ismeretlen_tortenetek_208",
+      "source_image_url": "https://m.blog.hu/re/realhistory/image/2138747_noscale_1arrxd_hfksye.jpg",
+      "rights_status": "not established",
+      "alterations": "none",
+      "kind": "archival-image",
+      "render_role": "single coherent framed photograph until intentional two-piece split",
+      "animation": {
+        "effect_ids": [
+          "framed-photo-retreat",
+          "photo-split-flare"
+        ],
+        "master_interval": [
+          1045.5,
+          1061
+        ],
+        "local_interval": [
+          25.5,
+          41
+        ],
+        "source_pixels_unchanged": true,
+        "people_cutouts": false,
+        "instructions": "Replace photograph to retain panel retreat and split. Edit Photo size, retreat, split start, gap, tilt and flare controls. No independent person deformation.",
+        "presentation_effects": [
+          "frame",
+          "camera pullback",
+          "mild perspective",
+          "complementary split masks",
+          "independent fragment transforms",
+          "cyan/red tint",
+          "flare",
+          "fade",
+          "worn paper clipping",
+          "paper perimeter overlay",
+          "film dust, grain and emulsion wear"
+        ]
+      },
+      "render_binding": "photo"
+    },
+    {
+      "id": "puma-symbol-v124",
+      "file": "assets/minute17/puma-symbol-v124.svg",
+      "archival": false,
+      "kind": "brand-graphic",
+      "status": "integrated",
+      "source": "existing puma-symbol-v121.svg",
+      "alterations": [
+        "explicit high-resolution SVG dimensions",
+        "magenta fill"
+      ],
+      "sha256": "53876c884503dce7372c8f26dc404e1195dbf0f04b66dee4fb5ca40325326775"
+    },
+    {
+      "id": "shorts-blue-v125",
+      "file": "assets/minute17/shorts-blue-v125.png",
+      "archival": false,
+      "kind": "generated-product-illustration",
+      "status": "integrated",
+      "bounds": [
+        18,
+        65,
+        493,
+        450
+      ],
+      "sha256": "d3ee748b975d0bb39af28f13dd659bbfcfe964a24fe0804544c42baf45c8f1c3",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Transparent atlas cell extraction, alpha preserved"
+    },
+    {
+      "id": "shorts-red-v125",
+      "file": "assets/minute17/shorts-red-v125.png",
+      "archival": false,
+      "kind": "generated-product-illustration",
+      "status": "integrated",
+      "bounds": [
+        17,
+        65,
+        493,
+        453
+      ],
+      "sha256": "6597804ce0a3bce05711190b6ca081810040fdf67e43de612d05861e9cd7da9c",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Transparent atlas cell extraction, alpha preserved"
+    },
+    {
+      "id": "shoe-blue-v125",
+      "file": "assets/minute17/shoe-blue-v125.png",
+      "archival": false,
+      "kind": "generated-product-illustration",
+      "status": "integrated",
+      "bounds": [
+        20,
+        132,
+        496,
+        375
+      ],
+      "sha256": "ec27e92d8c524eb1d8d31850b75b0f46fc3c3295463dda355cc0c8555a4be104",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Transparent atlas cell extraction, alpha preserved"
+    },
+    {
+      "id": "shoe-red-v125",
+      "file": "assets/minute17/shoe-red-v125.png",
+      "archival": false,
+      "kind": "generated-product-illustration",
+      "status": "integrated",
+      "bounds": [
+        21,
+        130,
+        497,
+        380
+      ],
+      "sha256": "a05cf47a52acfeb2283a2f025133b671010fd3333258c6a0761f190269635189",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Transparent atlas cell extraction, alpha preserved"
+    },
+    {
+      "id": "sock-blue-v125",
+      "file": "assets/minute17/sock-blue-v125.png",
+      "archival": false,
+      "kind": "generated-product-illustration",
+      "status": "integrated",
+      "bounds": [
+        139,
+        19,
+        433,
+        486
+      ],
+      "sha256": "907a62035364450df48cf18bf215d4bf09b72f277cc7801d9782dee6c1eee553",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Transparent atlas cell extraction, alpha preserved"
+    },
+    {
+      "id": "sock-red-v125",
+      "file": "assets/minute17/sock-red-v125.png",
+      "archival": false,
+      "kind": "generated-product-illustration",
+      "status": "integrated",
+      "bounds": [
+        141,
+        19,
+        437,
+        488
+      ],
+      "sha256": "eb79d9da466d96c8293c65e7a2b405e0730d4712047dc3807beb077d5698544d",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Transparent atlas cell extraction, alpha preserved"
+    },
+    {
+      "id": "photo-paper-edge-v125",
+      "file": "assets/minute17/photo-paper-edge-v125.png",
+      "archival": false,
+      "kind": "generated-paper-overlay",
+      "status": "integrated",
+      "bounds": [
+        43,
+        57,
+        1356,
+        1079
+      ],
+      "sha256": "acdd15c111d892ded22b0704dab363ac3d7144bb38903a384772afe74cae9fb6",
+      "provenance": "Built-in image generation; presentation artwork, not archival media",
+      "derivation": "Generated edge texture based on selected comparison image; original archival pixels unchanged"
+    }
+  ],
+  "active_files": [
+    "confrontation-city-v120.png",
+    "profile-blue.png",
+    "profile-orange.png",
+    "adidas-trefoil.svg",
+    "puma-symbol-v124.svg",
+    "shorts-blue-v125.png",
+    "shorts-red-v125.png",
+    "shoe-blue-v125.png",
+    "shoe-red-v125.png",
+    "sock-blue-v125.png",
+    "sock-red-v125.png",
+    "panel-blue.png",
+    "panel-red.png",
+    "adult-blue.png",
+    "adult-red.png",
+    "son-blue.png",
+    "son-red.png",
+    "family-archival.png",
+    "photo-paper-edge-v125.png"
+  ],
+  "timeline": {
+    "master_start_seconds": 1020,
+    "duration_seconds": 60,
+    "clock": "master = 1020 + local; output = 24 fps; source = 30 fps",
+    "promotion_replacement": [
+      43,
+      60
+    ]
+  },
+  "animation_module": "minute17-sequence.js",
+  "preset_file": "minute17-default-preset.json",
+  "finishing_module": "minute17-finishing.js",
+  "asset_creation_guidelines": "docs/ASSET-CREATION-GUIDELINES.md",
+  "provenance_notes": "Generated products replace illustrative graphic defaults; no new archival photograph is fabricated."
+}

@@ -1,286 +1,46 @@
 {
   "text": [
     {
-      "id": "hp-ch1-text-card",
-      "start": 5.0,
-      "duration": 13.8,
-      "text": "Wireless Color All-in-One Printer • $149.99 → $99.99",
-      "highlight": "$99.99",
+      "id": "clip-text-1",
+      "start": 0,
+      "duration": 5,
+      "text": "Did Google pump and dump?",
+      "highlight": "pump and dump",
       "fontFamily": "'Inter', sans-serif",
-      "fontSize": 42,
+      "fontSize": 64,
       "textColor": "#ffffff",
-      "highlightColor": "#f59e0b",
+      "highlightColor": "#ff334b",
       "anim": "pop",
       "sfx": "whoosh",
       "position": "center",
       "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch2-text-hook",
-      "start": 36.8,
-      "duration": 3.1,
-      "text": "Let's get right into it",
-      "highlight": "right into it",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 52,
-      "textColor": "#ffffff",
-      "highlightColor": "#38bdf8",
-      "anim": "slide",
-      "sfx": "whoosh",
-      "position": "center",
-      "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch3-text-razor",
-      "start": 58.8,
-      "duration": 5.0,
-      "text": "Premium Handle ($9.99) vs Replacement Blades ($29.99)",
-      "highlight": "$29.99",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 40,
-      "textColor": "#ffffff",
-      "highlightColor": "#ef4444",
-      "anim": "pop",
-      "sfx": "pop",
-      "position": "bottom",
-      "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch4-text-ceo",
-      "start": 76.0,
-      "duration": 13.8,
-      "text": "HP's CEO Says If You Don't Use Their Printer Ink, You're a 'Bad Investment'",
-      "highlight": "'Bad Investment'",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 36,
-      "textColor": "#ffffff",
-      "highlightColor": "#38bdf8",
-      "anim": "slide",
-      "sfx": "whoosh",
-      "position": "top",
-      "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch6-text-iso",
-      "start": 145.0,
-      "duration": 11.8,
-      "text": "DESIGN • MANUFACTURE • ADVERTISE",
-      "highlight": "MANUFACTURE",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 44,
-      "textColor": "#ffffff",
-      "highlightColor": "#ec4899",
-      "anim": "pop",
-      "sfx": "pop",
-      "position": "bottom",
-      "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch7-text-accc",
-      "start": 178.0,
-      "duration": 9.8,
-      "text": "ACCC: HP to compensate printer customers over Dynamic Security",
-      "highlight": "Dynamic Security",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 38,
-      "textColor": "#ffffff",
-      "highlightColor": "#ef4444",
-      "anim": "slide",
-      "sfx": "whoosh",
-      "position": "top",
-      "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch8-text-cat",
-      "start": 224.0,
-      "duration": 15.8,
-      "text": "RUNNING SCRIPT CAT-ATTACK.BAT // CVE-2022-28722",
-      "highlight": "CVE-2022-28722",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 40,
-      "textColor": "#4ade80",
-      "highlightColor": "#ef4444",
-      "anim": "typewriter",
-      "sfx": "glitch",
-      "position": "bottom",
-      "zIndex": 30,
-      "layerOrder": "front"
-    },
-    {
-      "id": "hp-ch10-text-lock",
-      "start": 372.0,
-      "duration": 18.0,
-      "text": "SUBSCRIPTION STATUS: ENDED // CARTRIDGES: DISABLED [X]",
-      "highlight": "CARTRIDGES: DISABLED",
-      "fontFamily": "'Inter', sans-serif",
-      "fontSize": 42,
-      "textColor": "#ffffff",
-      "highlightColor": "#ef4444",
-      "anim": "pop",
-      "sfx": "glitch",
-      "position": "top",
-      "zIndex": 30,
-      "layerOrder": "front"
+      "layerOrder": "front",
+      "_renderBounds": {
+        "x": 204,
+        "y": 431.6,
+        "w": 951.5,
+        "h": 108.79999999999995
+      }
     }
   ],
-  "chart": [
-    {
-      "id": "hp-chart-cnbc-hpq",
-      "name": "CNBC HP INC. (HPQ) 28.65 +0.34 (+1.20%)",
-      "type": "line",
-      "start": 77.5,
-      "duration": 8.5
-    },
-    {
-      "id": "hp-chart-usage-450",
-      "name": "HP Instant Ink Usage Data: 450 Pages (January: 150 pages)",
-      "type": "bar",
-      "start": 330.0,
-      "duration": 6.5
-    }
-  ],
+  "chart": [],
   "quote": [],
-  "image": [
-    {
-      "id": "hp-ch1-img",
-      "name": "Ch 1 (0:00–0:19): Studio Printer & 0:05 Light-Slit Unfold",
-      "url": "/hp_recon/plates/plate_s006.jpg",
-      "start": 0.0,
-      "duration": 18.8,
-      "scale": 1.0,
-      "transition": "glitch",
-      "transitionDuration": 0.16
-    },
-    {
-      "id": "hp-ch2-img",
-      "name": "Ch 2 (0:19–0:40): Block Cartridge UI, Glowing HP Logo & Orbital Earth",
-      "url": "/hp_recon/plates/plate_s035.jpg",
-      "start": 18.8,
-      "duration": 21.1,
-      "scale": 1.0,
-      "transition": "fade",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch3-img",
-      "name": "Ch 3 (0:40–1:04): Smart Tank 7000 Split & Razor-and-Blades Pricing",
-      "url": "/hp_recon/plates/plate_s061.jpg",
-      "start": 40.0,
-      "duration": 23.8,
-      "scale": 1.0,
-      "transition": "slide",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch4-img",
-      "name": "Ch 4 (1:04–1:30): PetaPixel CEO 'Bad Investment' Article & CNBC HPQ",
-      "url": "/hp_recon/plates/plate_s078.jpg",
-      "start": 64.0,
-      "duration": 25.8,
-      "scale": 1.0,
-      "transition": "fade",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch5-img",
-      "name": "Ch 5 (1:30–2:02): Original HP Supplies 5-Cartridge Lineup & Phone Scroll",
-      "url": "/hp_recon/plates/plate_s115.jpg",
-      "start": 90.0,
-      "duration": 31.8,
-      "scale": 1.0,
-      "transition": "slide",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch6-img",
-      "name": "Ch 6 (2:02–2:58): 3D Isometric Skyscraper/Factory Islands & Cartridge Chips",
-      "url": "/hp_recon/plates/plate_s155.jpg",
-      "start": 122.0,
-      "duration": 55.8,
-      "scale": 1.0,
-      "transition": "fade",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch7-img",
-      "name": "Ch 7 (2:58–3:27): ACCC Press Release & Firmware Update Non-HP Chip Lock",
-      "url": "/hp_recon/plates/plate_s202.jpg",
-      "start": 178.0,
-      "duration": 28.8,
-      "scale": 1.0,
-      "transition": "fade",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch8-img",
-      "name": "Ch 8 (3:27–4:00): CAT-ATTACK.BAT Green CRT Terminal & CVE-2022-28722",
-      "url": "/hp_recon/plates/plate_s225.jpg",
-      "start": 207.0,
-      "duration": 32.8,
-      "scale": 1.0,
-      "transition": "glitch",
-      "transitionDuration": 0.25
-    },
-    {
-      "id": "hp-ch9-img",
-      "name": "Ch 9 (4:00–4:49): Glowing Silicon Microchip, Dynamic Security & Holograms",
-      "url": "/hp_recon/plates/plate_s288.jpg",
-      "start": 240.0,
-      "duration": 48.8,
-      "scale": 1.0,
-      "transition": "fade",
-      "transitionDuration": 0.35
-    },
-    {
-      "id": "hp-ch10-img",
-      "name": "Ch 10 (4:49–6:30): Usage Bar Chart, CRN $500M Article & Neon Remote Lock",
-      "url": "/hp_recon/plates/plate_s387.jpg",
-      "start": 289.0,
-      "duration": 101.0,
-      "scale": 1.0,
-      "transition": "fade",
-      "transitionDuration": 0.35
-    }
-  ],
+  "image": [],
   "video": [],
-  "voiceover": [
-    {
-      "id": "hp-vo-master-6m30s",
-      "name": "Mundo Startup Narration & Documentary Dialogue (0:00–6:30)",
-      "url": "/hp_recon/hp_ref_audio_6m30s.mp3",
-      "start": 0,
-      "duration": 390.0,
-      "volume": 100
-    }
-  ],
-  "music": [
-    {
-      "id": "hp-sfx-bgm-6m30s",
-      "name": "Synchronized Documentary Score & 833 Onset SFX Bus",
-      "url": "/hp_recon/hp_ref_audio_6m30s.mp3",
-      "start": 0,
-      "duration": 390.0,
-      "volume": 85
-    }
-  ],
+  "voiceover": [],
+  "music": [],
   "background": [
     {
       "id": "clip-bg-default",
       "start": 0,
-      "duration": 390.0,
+      "duration": 60,
       "bgType": "cyber_grid",
       "bgColor": "#0a0b0e"
     }
   ],
   "currentTime": 0,
-  "duration": 390.0,
-  "savedAt": 1793600000000,
-  "projectName": "La merecida muerte de las impresoras HP — Mundo Startup (6:30 Reconstruction)",
-  "projectId": "proj_hp_documentary_6m30s"
+  "duration": 368.14,
+  "savedAt": 1793861267653,
+  "projectName": "New Project 1",
+  "projectId": "proj_1793860826743_865o"
 }

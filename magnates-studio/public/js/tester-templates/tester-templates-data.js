@@ -3,6 +3,141 @@
 (function() {
   window.NEW_TESTER_TEMPLATES = [
   {
+    "id": "regaarder-pele-pact-chapter",
+    "title": "The Pelé Pact · Chapter 6 (18:50–20:14)",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "REGAARDER MOTION 002",
+    "difficulty": "Pro Suite",
+    "timeToApply": "84.0s",
+    "previewGradient": "linear-gradient(135deg, rgba(22, 55, 67, 0.96), rgba(8, 14, 20, 0.98))",
+    "description": "Wine & dine restaurant with independent cutouts, descending handshake clasp, escalating rival bids with burning cash, Mexico 70 camera roll, Placard newspaper collage, crossed brand cards, and iconic bicycle kick boot punch-in.",
+    "tags": [
+      "Pelé Pact",
+      "Chapter 6",
+      "Handshake",
+      "Mexico 70",
+      "Newspaper Collage",
+      "Bicycle Kick",
+      "Documentary"
+    ],
+    "previewType": "regaarder-chapter",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/portrait.png"
+  },
+  {
+    "id": "regaarder-minute16-chapter",
+    "title": "Minute 16 · Cargo Ships, Pedestal & Warehouse (16:00–17:00)",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "REGAARDER MOTION 003",
+    "difficulty": "Pro Suite",
+    "timeToApply": "60.0s",
+    "previewGradient": "linear-gradient(135deg, rgba(11, 36, 48, 0.96), rgba(7, 9, 11, 0.98))",
+    "description": "Trophy archival crowd passage, shoe showcase pedestal pullback with money stacks, water reflection with Adidas/Puma ocean shipment split, and warehouse boot elevation with pointing accusatory hands.",
+    "tags": [
+      "Minute 16",
+      "Cargo Ships",
+      "Water Reflection",
+      "Shoe Pedestal",
+      "Warehouse Accusations",
+      "Documentary"
+    ],
+    "previewType": "regaarder-chapter",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/portrait.png"
+  },
+  {
+    "id": "regaarder-minute17-chapter",
+    "title": "Minute 17 · Rain Rivalry, Next Gen & Split Flare (17:00–18:00)",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "REGAARDER MOTION 004",
+    "difficulty": "Pro Suite",
+    "timeToApply": "60.0s",
+    "previewGradient": "linear-gradient(135deg, rgba(36, 38, 75, 0.96), rgba(3, 4, 6, 0.98))",
+    "description": "City profile portraits under torrential seeded rain, heat-shimmering sportswear products, masked family panel rises with reflection pools, retreating archival photograph, and chromatic cyan/crimson split with blinding optical flare.",
+    "tags": [
+      "Minute 17",
+      "Seeded Rain",
+      "Next Generation",
+      "Family Panels",
+      "Photo Split",
+      "Optical Flare"
+    ],
+    "previewType": "regaarder-chapter",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/portrait.png"
+  },
+  {
+    "id": "regaarder-final-chapter",
+    "title": "The Final Chapter · Legacy, Revival & Fire Overlays (23:29–26:54)",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "REGAARDER MOTION 005",
+    "difficulty": "Pro Suite",
+    "timeToApply": "205.6s",
+    "previewGradient": "linear-gradient(135deg, rgba(35, 14, 18, 0.96), rgba(5, 5, 8, 0.98))",
+    "description": "Full documentary climax: Founders parlor pullback, burning sneaker with dynamic video flame emitters, financial distress with wave-deforming brand cards, Nike gold vortex, Predator showcase, Yeezy gloss card, Alexander McQueen runway, and headquarters aerial pins.",
+    "tags": [
+      "Final Chapter",
+      "Chapter 7",
+      "Burning Shoe",
+      "Video Flame Atlas",
+      "Nike Vortex",
+      "Predator",
+      "Headquarters Pins"
+    ],
+    "previewType": "regaarder-chapter",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/fire.png"
+  },
+  {
+    "id": "regaarder-native3d-surface-builder",
+    "title": "Native 3D · Character Rig & V108 Surface Builder",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "REGAARDER NATIVE 3D",
+    "difficulty": "Pro Suite",
+    "timeToApply": "Interactive",
+    "previewGradient": "linear-gradient(135deg, rgba(20, 24, 32, 0.96), rgba(11, 15, 21, 0.98))",
+    "description": "Full native 3D anatomical humanoid workspace: multiresolution surface subdivision, planar/cylindrical UV unwrapping, 3D vertex paint brush, PBR roughness/metalness/bump-to-normal maps, tailored hat/wardrobe, and GLB export.",
+    "tags": [
+      "Native 3D",
+      "Surface Builder",
+      "Multiresolution",
+      "UV Unwrapping",
+      "Vertex Paint",
+      "PBR Shading",
+      "GLB Export"
+    ],
+    "previewType": "regaarder-native3d",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/standing.png"
+  },
+  {
+    "id": "regaarder-origins-slow-reveal",
+    "title": "Origins: Herzogenaurach Slow Reveal, Eye Strip & Organic Paper Tears",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "REGAARDER MOTION 001",
+    "difficulty": "Pro Suite",
+    "timeToApply": "13.6s",
+    "previewGradient": "linear-gradient(135deg, rgba(40, 61, 79, 0.96), rgba(16, 17, 19, 0.98))",
+    "description": "Bavarian aerial town map, Adidas & PUMA dual lockups, historical portrait with customizable torn-paper eye strip, organic spreading paper tears reveal, and optional Living Fire & Desk Lamp continuation.",
+    "tags": [
+      "Slow Reveal",
+      "Eye Strip",
+      "Organic Paper Tears",
+      "Herzogenaurach",
+      "Living Fire",
+      "Regaarder Motion"
+    ],
+    "previewType": "origins-slow-reveal",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/portrait.png"
+  },
+  {
     "id": "jani-spin-flash-glitch-reveal",
     "title": "Circular Spin, Falling Particles, 1+3 Flashlight Strobe & Glitch Reveal",
     "category": "3D Spatial",

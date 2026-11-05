@@ -344,6 +344,32 @@
       vignetteDepth: 0.72,
       duration: 5.0
     }),
+    'regaarder-pele-pact-chapter': { type: 'regaarder-pele-pact-chapter', duration: 84 },
+    'regaarder-minute16-chapter': { type: 'regaarder-minute16-chapter', duration: 60 },
+    'regaarder-minute17-chapter': { type: 'regaarder-minute17-chapter', duration: 60 },
+    'regaarder-final-chapter': { type: 'regaarder-final-chapter', duration: 205.6 },
+    'regaarder-native3d-surface-builder': { type: 'regaarder-native3d-surface-builder', duration: 5 },
+    'regaarder-origins-slow-reveal': Object.assign({}, (typeof window !== 'undefined' && window.REGAARDER_ORIGINS_CONFIG) || {
+      type: 'regaarder-origins-slow-reveal',
+      variantMode: 'origins',
+      mapUrl: '/assets/regaarder-motion/map.png',
+      adidasBarsUrl: '/assets/regaarder-motion/adidas-bars.svg',
+      adidasWordUrl: '/assets/regaarder-motion/adidas-wordmark.svg',
+      pumaLockupUrl: '/assets/regaarder-motion/puma-lockup.svg',
+      portraitUrl: '/assets/regaarder-motion/portrait.png',
+      revealUrl: '/assets/regaarder-motion/reveal.png',
+      placeText: 'HERZOGENAURACH',
+      captionText: 'ORIGINS / A DOCUMENTARY STUDY',
+      eyeColor: '#c6324a',
+      eyeShape: 'torn',
+      eyeBlend: 'bleed',
+      eyeIntensity: 55,
+      portraitStartOpacity: 8,
+      spreadSpeed: 55,
+      openingDuration: 8.0,
+      continuationEnabled: false,
+      duration: 13.6
+    }),
     'jani-spin-flash-glitch-reveal': Object.assign({}, (typeof window !== 'undefined' && window.JANI_SPIN_FLASH_GLITCH_CONFIG) || {
       type: 'jani-spin-flash-glitch',
       moodPreset: 'investigative_expose',
@@ -3752,6 +3778,34 @@
       }
       return;
     }
+    if (window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tplId)) {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage && typeof window.renderRegaarderChapterStage === 'function') {
+        window.renderRegaarderChapterStage(stage, tplId, false);
+      }
+      return;
+    }
+    if (tplId === 'regaarder-native3d-surface-builder') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage && typeof window.renderRegaarderNative3DStage === 'function') {
+        window.renderRegaarderNative3DStage(stage, tplId, false);
+      }
+      return;
+    }
+    if (tplId === 'regaarder-origins-slow-reveal') {
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      if (stage) {
+        if (!stage.querySelector('#regaarder-origins-viewport-regaarder-origins-slow-reveal')) {
+          if (typeof window.tplMountOriginsSlowRevealStage === 'function') {
+            window.tplMountOriginsSlowRevealStage(stage, data);
+          }
+        }
+        if (typeof window.stepOriginsSlowRevealAnimation === 'function') {
+          window.stepOriginsSlowRevealAnimation(stage, tplId, 6.2, data);
+        }
+      }
+      return;
+    }
     if (tplId === 'jani-spin-flash-glitch-reveal') {
       const stage = document.getElementById('tpl-modal-preview-stage');
       if (stage) {
@@ -5768,6 +5822,43 @@
         const data = window.tplGetContextualData(tplId);
         if (typeof window.tplBuildJaniFlashQuadInspector === 'function') {
           window.tplBuildJaniFlashQuadInspector(container, data, tplId);
+        }
+      }
+      return;
+    }
+    if ((window.REGAARDER_CHAPTER_TEMPLATE_IDS && window.REGAARDER_CHAPTER_TEMPLATE_IDS.includes(tplId)) || tplId === 'regaarder-native3d-surface-builder') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (stdLayers) stdLayers.style.display = 'none';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        if (typeof window.organizeUniversalTemplateControls === 'function') {
+          window.organizeUniversalTemplateControls();
+        }
+      }
+      return;
+    }
+    if (tplId === 'regaarder-origins-slow-reveal') {
+      const container = document.getElementById('tpl-modal-dynamic-controls');
+      const stdLayers = document.getElementById('tpl-modal-standard-layers-section');
+      const wrapPrim = document.getElementById('tpl-modal-wrap-primary');
+      const wrapSec = document.getElementById('tpl-modal-wrap-secondary');
+      const wrapText = document.getElementById('tpl-modal-wrap-text');
+      if (container) {
+        container.style.display = 'flex';
+        if (stdLayers) stdLayers.style.display = 'none';
+        if (wrapPrim) wrapPrim.style.display = 'none';
+        if (wrapSec) wrapSec.style.display = 'none';
+        if (wrapText) wrapText.style.display = 'none';
+        const data = window.tplGetContextualData(tplId);
+        if (typeof window.tplBuildOriginsSlowRevealInspector === 'function') {
+          window.tplBuildOriginsSlowRevealInspector(container, data, tplId);
         }
       }
       return;
