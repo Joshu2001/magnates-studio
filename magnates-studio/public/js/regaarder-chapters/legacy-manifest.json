@@ -1,0 +1,589 @@
+{
+  "version": 128,
+  "master_interval": [
+    1214,
+    1285
+  ],
+  "duration": 71,
+  "assets": [
+    {
+      "id": "archive",
+      "file": "assets/legacy128/archive-frames/0001.jpg",
+      "size": [
+        640,
+        360
+      ],
+      "sha256": "cc1a6c60670a6b5caa2da013dd160802c4d4894f5f802a459e40bf9e2e556820",
+      "classification": "REFERENCE VIDEO EXCERPT \u00b7 source framing removed at runtime \u00b7 360p",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "tvStage",
+      "file": "assets/legacy128/crt-stage.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "072a3669a157b9e5b58c43709a02fc610ac5b9d4f6d3f8e66410b37142ad4e34",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "tvStack",
+      "file": "assets/legacy128/crt-stack.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "7a031957c7dc877a099503693faed701302df78deb1805224444b5d969f8f283",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "stadium",
+      "file": "assets/legacy128/stadium.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "c73f656602b778180ba41fdf857614b5c0a8ce28f1867904a81282e1362b67da",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "celebration",
+      "file": "assets/legacy128/celebration.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "87084a6e93f0742d3f71ee48e76e3e732d05985829c179fdfa42e0a7bcf67a16",
+      "classification": "RESTORED / GENERATED RECONSTRUCTION \u00b7 supplied Pel\u00e9 celebration frame",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        1,
+        1,
+        1671,
+        941
+      ]
+    },
+    {
+      "id": "shoe0",
+      "file": "assets/legacy128/king-cutout.png",
+      "size": [
+        1774,
+        887
+      ],
+      "sha256": "b2f640063e735e4504fe4aca918334149c401057c9db792fe0ae056b07fd1d74",
+      "classification": "GENERATED EXTRACTION \u00b7 official KING Top relaunch photograph \u00b7 not a 1970 master",
+      "archival": false,
+      "used": true,
+      "source_url": "https://uk.puma.com/uk/en/pd/king-top-fg-football-boots/105607?swatch=01",
+      "bounds": [
+        16,
+        72,
+        1759,
+        826
+      ]
+    },
+    {
+      "id": "shoe1",
+      "file": "assets/legacy128/king-cutout.png",
+      "size": [
+        1774,
+        887
+      ],
+      "sha256": "b2f640063e735e4504fe4aca918334149c401057c9db792fe0ae056b07fd1d74",
+      "classification": "GENERATED EXTRACTION \u00b7 official KING Top relaunch photograph \u00b7 not a 1970 master",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        16,
+        72,
+        1759,
+        826
+      ]
+    },
+    {
+      "id": "shoe2",
+      "file": "assets/legacy128/king-views.png",
+      "size": [
+        1942,
+        809
+      ],
+      "sha256": "cf064cb150c1c2d3d9e9c785f449396825c560f2e014e75a14a5612326dedd65",
+      "classification": "GENERATED PRODUCT VIEW \u00b7 source-referenced near-camera derivative",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        149,
+        95,
+        923,
+        729
+      ]
+    },
+    {
+      "id": "shoe3",
+      "file": "assets/legacy128/king-views.png",
+      "size": [
+        1942,
+        809
+      ],
+      "sha256": "cf064cb150c1c2d3d9e9c785f449396825c560f2e014e75a14a5612326dedd65",
+      "classification": "GENERATED PRODUCT VIEW \u00b7 source-referenced near-camera derivative",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        1041,
+        94,
+        1881,
+        753
+      ]
+    },
+    {
+      "id": "shoe4",
+      "file": "assets/legacy128/king-views.png",
+      "size": [
+        1942,
+        809
+      ],
+      "sha256": "cf064cb150c1c2d3d9e9c785f449396825c560f2e014e75a14a5612326dedd65",
+      "classification": "GENERATED PRODUCT VIEW \u00b7 source-referenced near-camera derivative",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        149,
+        95,
+        923,
+        729
+      ]
+    },
+    {
+      "id": "shoe5",
+      "file": "assets/legacy128/king-views.png",
+      "size": [
+        1942,
+        809
+      ],
+      "sha256": "cf064cb150c1c2d3d9e9c785f449396825c560f2e014e75a14a5612326dedd65",
+      "classification": "GENERATED PRODUCT VIEW \u00b7 source-referenced near-camera derivative",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        1041,
+        94,
+        1881,
+        753
+      ]
+    },
+    {
+      "id": "youngBlue",
+      "file": "assets/legacy128/young-profiles.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "663b6f532ce9962fa4ed6ca93ce700351598b0319e8e09d6051f8230c6c997d2",
+      "classification": "GENERATED SYMBOLIC PROFILE \u00b7 anonymous rival",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        1,
+        0,
+        614,
+        724
+      ]
+    },
+    {
+      "id": "youngRed",
+      "file": "assets/legacy128/young-profiles.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "663b6f532ce9962fa4ed6ca93ce700351598b0319e8e09d6051f8230c6c997d2",
+      "classification": "GENERATED SYMBOLIC PROFILE \u00b7 anonymous rival",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        1562,
+        6,
+        2169,
+        724
+      ]
+    },
+    {
+      "id": "olderLeft",
+      "file": "assets/legacy128/older-profiles.png",
+      "size": [
+        2076,
+        757
+      ],
+      "sha256": "f60ebe879fed59290cf4529c788b67bb1f62a65982aba086549e78a32b607506",
+      "classification": "RECONSTRUCTED PROFILE \u00b7 archival identity reference, new pose",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        114,
+        6,
+        881,
+        757
+      ]
+    },
+    {
+      "id": "olderRight",
+      "file": "assets/legacy128/older-profiles.png",
+      "size": [
+        2076,
+        757
+      ],
+      "sha256": "f60ebe879fed59290cf4529c788b67bb1f62a65982aba086549e78a32b607506",
+      "classification": "RECONSTRUCTED PROFILE \u00b7 archival identity reference, new pose",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        1257,
+        9,
+        1935,
+        757
+      ]
+    },
+    {
+      "id": "coffinLeft",
+      "file": "assets/legacy128/coffin.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "27b43ddc05486d1bd3153346880592f97c02eae5e068e6bd8fed9b91c805d261",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        148,
+        8,
+        876,
+        1530
+      ],
+      "photoRect": [
+        398,
+        306,
+        614,
+        595
+      ]
+    },
+    {
+      "id": "coffinRight",
+      "file": "assets/legacy128/coffin.png",
+      "size": [
+        1024,
+        1536
+      ],
+      "sha256": "27b43ddc05486d1bd3153346880592f97c02eae5e068e6bd8fed9b91c805d261",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        148,
+        8,
+        876,
+        1530
+      ],
+      "photoRect": [
+        398,
+        306,
+        614,
+        595
+      ]
+    },
+    {
+      "id": "photoLeft",
+      "file": "assets/legacy128/rudolf-original.jpg",
+      "size": [
+        923,
+        1200
+      ],
+      "sha256": "6cf318ec6096de5a6076cbfaf3f4409337c98ecde03c425b7dfcd073788707b1",
+      "classification": "ARCHIVAL ORIGINAL \u00b7 Rudolf Dassler \u00b7 PUMA Archive via Deutsche Biographie",
+      "archival": true,
+      "used": true,
+      "source_url": "https://www.deutsche-biographie.de/dbo027444-5.html"
+    },
+    {
+      "id": "photoRight",
+      "file": "assets/legacy128/adi-original.jpg",
+      "size": [
+        1200,
+        900
+      ],
+      "sha256": "969e741d7fa7c9894159b5ec87d257fdfef176015d25cc3091a99846f2d961df",
+      "classification": "ARCHIVAL ORIGINAL \u00b7 Adolf Dassler \u00b7 adidas Archive",
+      "archival": true,
+      "used": true,
+      "source_url": "https://www.adidas-group.com/en/magazine/innovation/the-history-of-adidas-a-background-of-collaboration-and-innovation",
+      "bounds": [
+        330,
+        0,
+        830,
+        570
+      ]
+    },
+    {
+      "id": "ground",
+      "file": "assets/legacy128/grave-ground.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "330c37d0b0fab10c2df1eaf45701c5ecf28e36eede2d170b6435aa350d4db63f",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "room",
+      "file": "assets/legacy128/../pele126/room-clean.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "d6c72bc88917161dc37c475c343262a56acf0937ac3c350e0c4f275e1d7f0a16",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "chairLeft",
+      "file": "assets/legacy128/../pele126/chair-blue.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "0e508a2fb02874a04fb11ed29ae24de1f47434923042e6d299f91ec467fedcd1",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        225,
+        12,
+        665,
+        439
+      ]
+    },
+    {
+      "id": "chairRight",
+      "file": "assets/legacy128/../pele126/chair-red.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "2236a503909cb99caf2ca34c761d3f10e4ac46653f9ad48a0478141461b3f899",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        234,
+        13,
+        651,
+        442
+      ]
+    },
+    {
+      "id": "table",
+      "file": "assets/legacy128/../pele126/table.png",
+      "size": [
+        887,
+        443
+      ],
+      "sha256": "373a69c57ffe3d710e98d704e9e7304486dc6b189e105d73999f5f3ce1805772",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        70,
+        0,
+        821,
+        439
+      ]
+    },
+    {
+      "id": "dinerLeft",
+      "file": "assets/legacy128/../pele126/guest0.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "cb53b5a793d0cd782493869c7445980ed5df176eb28f8c8a53673eddc40e730b",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        76,
+        17,
+        412,
+        497
+      ]
+    },
+    {
+      "id": "dinerRight",
+      "file": "assets/legacy128/../pele126/guest1.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "c1983df7df4c783987f98f1a29bd23886c347dc21204c2937e7b5543ee82ec16",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        113,
+        18,
+        428,
+        493
+      ]
+    },
+    {
+      "id": "foreLeft",
+      "file": "assets/legacy128/../pele126/guest3.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "adbf27a800ef3841ec382f5737bae7d82e6d2b30e7e41952b631c12d8859eb20",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        84,
+        5,
+        451,
+        499
+      ]
+    },
+    {
+      "id": "foreRight",
+      "file": "assets/legacy128/../pele126/guest5.png",
+      "size": [
+        512,
+        512
+      ],
+      "sha256": "bebf1682630c6e107293c8bdd338d0d5c39f53c3f4cdf31bde87faef0d6933d5",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        72,
+        7,
+        458,
+        498
+      ]
+    },
+    {
+      "id": "handshake",
+      "file": "assets/legacy128/../pele126/existing-pack/02_figures/handshake_clasp_both_arms.png",
+      "size": [
+        2172,
+        724
+      ],
+      "sha256": "e16fb2a30a57eacf865e589d5211054ef7ced889ea566039c54cc6a17933659d",
+      "classification": "GENERATED ILLUSTRATION",
+      "archival": false,
+      "used": true,
+      "bounds": [
+        0,
+        0,
+        2172,
+        693
+      ]
+    },
+    {
+      "id": "logoBlue",
+      "file": "assets/legacy128/../pele126/adidas-vector.png",
+      "size": [
+        1200,
+        840
+      ],
+      "sha256": "b1a597e465a9c65666851ef916c0dc5b697176d296913a326547849ff0b6274b",
+      "classification": "SOURCED VECTOR \u00b7 Adidas trefoil \u00b7 rendered SVG derivative",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "logoRed",
+      "file": "assets/legacy128/../pele126/puma-vector.png",
+      "size": [
+        1038,
+        518
+      ],
+      "sha256": "ead77f1f9a96248b899901739032e368036bd8068e1d86d6f7ff504edf691928",
+      "classification": "SOURCED VECTOR \u00b7 PUMA lockup \u00b7 rendered SVG derivative",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "billOne",
+      "file": "assets/legacy128/../pele126/dollar-one.jpg",
+      "size": [
+        1839,
+        785
+      ],
+      "sha256": "5965eda4008f922024c90061b16d7c9e230ee6d76cdd85abbb8008b912f15669",
+      "classification": "SOURCED CURRENCY GRAPHIC",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "billHundred",
+      "file": "assets/legacy128/../pele126/dollar-hundred.jpg",
+      "size": [
+        2048,
+        898
+      ],
+      "sha256": "69a0a2dd47a38ec5b01c6a43e96159bc36cc4c884d897614c48e3707dfc14f56",
+      "classification": "SOURCED CURRENCY GRAPHIC",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "flowAtlas",
+      "file": "assets/legacy128/../pele126/fire-atlas.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "0fdca6c1bd5734fb07ee31cd3a0d376839e56122c5ad019a98bec391c0d32d40",
+      "classification": "REUSED PROJECT ASSET",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "burnAtlas",
+      "file": "assets/legacy128/film-burn-atlas.png",
+      "size": [
+        1536,
+        1024
+      ],
+      "sha256": "44db083d88aa64a1b240081a12f23a136c9530b1974b4d67880e97a601e3f80b",
+      "classification": "GENERATED RECONSTRUCTION",
+      "archival": false,
+      "used": true
+    },
+    {
+      "id": "brandWall",
+      "file": "assets/legacy128/../pele126/rival-wall-v127.png",
+      "size": [
+        1672,
+        941
+      ],
+      "sha256": "38a3ae9875fa5fc868601d22797301441621b20c37ebf9fb60c3df7cd52dab55",
+      "classification": "REUSED PROJECT ASSET",
+      "archival": false,
+      "used": true
+    }
+  ]
+}
