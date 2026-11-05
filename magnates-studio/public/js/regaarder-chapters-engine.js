@@ -352,8 +352,13 @@
     const image = new Image();
     image.crossOrigin = 'anonymous';
     image.onload = refreshDocumentaryFrame;
-    image.onerror = () => console.warn('[RegaarderDocumentary] Source image unavailable:', file);
-    image.src = new URL(file, MOTION_MEDIA_ROOT + base).href;
+    const remote = new URL(file, MOTION_MEDIA_ROOT + base).href;
+    const local = base === 'promo129/' ? '/assets/promo129/' + file : remote;
+    image.onerror = () => {
+      if (image.src !== remote) image.src = remote;
+      else console.warn('[RegaarderDocumentary] Source image unavailable:', file);
+    };
+    image.src = local;
     return image;
   }
 
@@ -365,8 +370,13 @@
     video.preload = 'auto';
     video.addEventListener('loadeddata', refreshDocumentaryFrame);
     video.addEventListener('seeked', refreshDocumentaryFrame);
-    video.addEventListener('error', () => console.warn('[RegaarderDocumentary] Source video unavailable:', file));
-    video.src = new URL(file, MOTION_MEDIA_ROOT + base).href;
+    const remote = new URL(file, MOTION_MEDIA_ROOT + base).href;
+    const local = base === 'promo129/' ? '/assets/promo129/' + file : remote;
+    video.addEventListener('error', () => {
+      if (video.src !== remote) video.src = remote;
+      else console.warn('[RegaarderDocumentary] Source video unavailable:', file);
+    });
+    video.src = local;
     return video;
   }
 
