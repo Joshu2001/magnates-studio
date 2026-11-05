@@ -163,16 +163,31 @@
     state.nativeLoading = true;
     state.nativeLoadPromise = (async () => {
       try {
-        const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod] = await Promise.all([
+        const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod, sceneStoreMod] = await Promise.all([
           import('/native3d-v97/engine.js'),
           import('/native3d-v97/scene.js'),
           import('/native3d-v97/final-scenes.js'),
           import('/native3d-v97/checkpoint.js'),
-          import('/native3d-v97/surface-ui.js')
+          import('/native3d-v97/surface-ui.js'),
+          import('/native3d-v97/scene-store.js')
         ]);
         const data = await engineMod.loadHumanoid();
         state.nativeData = data;
-        state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod };
+        state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod, sceneStoreMod };
+        // Sculpt offsets, vertex selections, bone changes and material maps can
+        // exceed localStorage limits. The original Motion IndexedDB store is
+        // available here, with its small-scene localStorage fallback.
+        await Promise.all(Object.keys(PRESET_SCENES).map(async (preset) => {
+          try {
+            const saved = await sceneStoreMod.readNativeScene('magnates-native3d-v108:' + preset);
+            if (!saved) return;
+            const scene = typeof saved === 'string' ? JSON.parse(saved) : saved;
+            sceneMod.validateScene(scene);
+            state.savedScenes[preset] = scene;
+          } catch (error) {
+            console.warn('[RegaarderNative3D] Could not restore ' + preset + ':', error);
+          }
+        }));
         const offscreen = document.createElement('canvas');
         offscreen.width = 960;
         offscreen.height = 540;
@@ -924,7 +939,13 @@
       const activePreset = state.preset;
       state.autoOrbit = false;
       const close = () => {
-        if (state.inlineEditor?.api) state.inlineEditor.api.dispose();
+        const editor = state.inlineEditor?.api;
+        if (editor) {
+          try {
+            state.sceneTime = Math.min(Math.max(0, editor.getTime()), Math.max(.001, editor.getScene().duration - 1/30));
+          } catch (error) { console.warn('[RegaarderNative3D] Could not sync editor time:', error); }
+          editor.dispose();
+        }
         host?.remove();
         window.removeEventListener('keydown', onEscape, true);
         state.inlineEditor = null;
@@ -950,6 +971,11 @@
       api = editorMod.mountNativeEditor(host, structuredClone(state.nativeScene), state.nativeData, {
         onSave(next) {
           state.savedScenes[activePreset] = structuredClone(next);
+          const store = state.nativeMods?.sceneStoreMod;
+          if (store) {
+            Promise.resolve(store.writeNativeScene('magnates-native3d-v108:' + activePreset, structuredClone(next)))
+              .catch(error => console.warn('[RegaarderNative3D] Native scene could not be saved:', error));
+          }
           if (state.preset === activePreset) {
             state.nativeScene = structuredClone(next);
             state.nativeSceneDirty = true;
