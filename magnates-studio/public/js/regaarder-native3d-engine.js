@@ -84,7 +84,7 @@
     shirtVisible: true,
     shirtColor: '#137cba',
     trousersVisible: true,
-    trousersColor: '#343e4b',
+    trousersColor: '#137cba',
     hatVisible: true,
     hatColor: '#dedbca',
     roughness: 0.46,
@@ -105,9 +105,9 @@
     smokeEnabled: true,
     smokeDensity: 0.85,
     actorOffsets: {
-      n3d_actor_primary: { x: 0, y: 0, rot: 0, opacity: 1, color: '#137cba' },
-      n3d_actor_secondary: { x: 0, y: 0, rot: 0, opacity: 1, color: '#eee9da' },
-      n3d_prop_hat: { x: 0, y: 0, rot: 0, opacity: 1, color: '#dedbca' },
+      n3d_actor_primary: { x: 0, y: 0, rot: 90, opacity: 1, color: '#137cba' },
+      n3d_actor_secondary: { x: 0, y: 0, rot: -65, opacity: 1, color: '#eee9da' },
+      n3d_prop_hat: { x: 0, y: 0, rot: 0, lift: 0, opacity: 1, color: '#dedbca' },
       n3d_prop_desk: { x: 0, y: 0, rot: 0, opacity: 1, color: '#e4e2da' }
     },
     nativeReady: false,
@@ -121,9 +121,9 @@
   window.REGAARDER_NATIVE3D_CONFIG = state;
 
   const STAGE_OBJECTS = [
-    { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 35, y: 54, w: 26, h: 68 },
-    { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 65, y: 52, w: 26, h: 68 },
-    { id: 'n3d_prop_hat', name: 'Tailored Fedora Hat', variant: 'shape', x: 65, y: 22, w: 16, h: 14 },
+    { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 28, y: 56, w: 22, h: 72 },
+    { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 46, y: 58, w: 22, h: 72 },
+    { id: 'n3d_prop_hat', name: 'Tailored Fedora Hat', variant: 'shape', x: 46, y: 39, w: 14, h: 12 },
     { id: 'n3d_prop_desk', name: 'Studio Props', variant: 'shape', x: 50, y: 74, w: 46, h: 24 }
   ];
 
@@ -183,6 +183,15 @@
     const cam = sc.nodes.find((n) => n.type === 'camera');
     if (cam) {
       cam.fov = state.cameraFov;
+      const radYaw = ((state.cameraYaw || 18) * Math.PI) / 180;
+      const radPitch = ((state.cameraPitch || 12) * Math.PI) / 180;
+      const radius = 4.3;
+      cam.position = [
+        Math.sin(radYaw) * Math.cos(radPitch) * radius,
+        1.2 + Math.sin(radPitch) * radius,
+        Math.cos(radYaw) * Math.cos(radPitch) * radius
+      ];
+      cam.target = [0, 1.2, 0];
     }
     const keyLight = sc.nodes.find((n) => n.id === 'key' || (n.name && n.name.toLowerCase().includes('key')));
     if (keyLight) {
@@ -214,10 +223,44 @@
         h.material.metalness = state.metalness;
         h.parts = h.parts || {};
         h.parts.shirt = { ...(h.parts.shirt || {}), visible: state.shirtVisible, color: state.shirtColor, roughness: state.roughness };
-        h.parts.trousers = { ...(h.parts.trousers || {}), visible: state.trousersVisible, color: state.trousersColor, roughness: state.roughness };
+        h.parts.trousers = { ...(h.parts.trousers || {}), visible: state.trousersVisible, color: state.trousersColor || state.shirtColor, roughness: state.roughness };
+
+        const pOff = state.actorOffsets.n3d_actor_primary || {};
+        h.rotation = h.rotation || [0, 90, 0];
+        if (typeof pOff.rot === 'number') {
+          h.rotation[1] = pOff.rot;
+        }
+        if (typeof pOff.x === 'number') {
+          h.position = h.position || [-0.65, 0, 0.3];
+          h.position[0] = -0.65 + (pOff.x * 0.003);
+        }
+        if (typeof pOff.y === 'number') {
+          h.position = h.position || [-0.65, 0, 0.3];
+          h.position[1] = -(pOff.y * 0.003);
+        }
       } else if (idx === 1) {
+        const sOff = state.actorOffsets.n3d_actor_secondary || {};
+        h.rotation = h.rotation || [0, -65, 0];
+        if (typeof sOff.rot === 'number') {
+          h.rotation[1] = sOff.rot;
+        }
+        if (typeof sOff.x === 'number') {
+          h.position = h.position || [0.65, 0, -0.6];
+          h.position[0] = 0.65 + (sOff.x * 0.003);
+        }
+        if (typeof sOff.y === 'number') {
+          h.position = h.position || [0.65, 0, -0.6];
+          h.position[1] = -(sOff.y * 0.003);
+        }
+        const hatOff = state.actorOffsets.n3d_prop_hat || {};
         h.parts = h.parts || {};
-        h.parts.hat = { ...(h.parts.hat || {}), visible: state.hatVisible, color: state.hatColor };
+        h.parts.hat = {
+          ...(h.parts.hat || {}),
+          visible: state.hatVisible,
+          color: state.hatColor,
+          lift: (hatOff.lift || 0),
+          offsetX: (hatOff.x || 0) * 0.002
+        };
       }
     });
   }
@@ -402,6 +445,88 @@
     ctx.restore();
   }
 
+  function updateHitBoxesFrom3DScene(canvas) {
+    if (!canvas || !state.nativeEngine || !state.nativeScene || !state.nativeMods) return;
+    const viewport = canvas.closest('.rg-n3d-viewport') || canvas.parentElement;
+    if (!viewport) return;
+    const engine = state.nativeEngine;
+    const camera = engine.camera;
+    const T = state.nativeMods.engineMod && state.nativeMods.engineMod.T;
+    if (!camera || !T || !engine.characters) return;
+
+    camera.updateMatrixWorld(true);
+    camera.updateProjectionMatrix();
+
+    const W = 960, H = 540;
+
+    const calcBounds = (threeObj) => {
+      if (!threeObj) return null;
+      threeObj.updateMatrixWorld(true);
+      const box = new T.Box3().setFromObject(threeObj);
+      if (box.isEmpty() || !isFinite(box.min.x)) return null;
+      const corners = [
+        new T.Vector3(box.min.x, box.min.y, box.min.z),
+        new T.Vector3(box.min.x, box.min.y, box.max.z),
+        new T.Vector3(box.min.x, box.max.y, box.min.z),
+        new T.Vector3(box.min.x, box.max.y, box.max.z),
+        new T.Vector3(box.max.x, box.min.y, box.min.z),
+        new T.Vector3(box.max.x, box.min.y, box.max.z),
+        new T.Vector3(box.max.x, box.max.y, box.min.z),
+        new T.Vector3(box.max.x, box.max.y, box.max.z)
+      ];
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      corners.forEach((p) => {
+        p.project(camera);
+        const px = (p.x * 0.5 + 0.5) * W;
+        const py = (-p.y * 0.5 + 0.5) * H;
+        minX = Math.min(minX, px);
+        maxX = Math.max(maxX, px);
+        minY = Math.min(minY, py);
+        maxY = Math.max(maxY, py);
+      });
+      if (minX >= maxX || minY >= maxY) return null;
+      return {
+        cx: (minX + maxX) / 2,
+        cy: (minY + maxY) / 2,
+        w: Math.max(28, maxX - minX),
+        h: Math.max(28, maxY - minY)
+      };
+    };
+
+    const charList = Array.from(engine.characters.entries());
+    const blueChar = engine.characters.get('blue') || (charList[0] && charList[0][1]);
+    const coachChar = engine.characters.get('coach') || (charList[1] && charList[1][1]);
+
+    if (blueChar && blueChar.group) {
+      const b = calcBounds(blueChar.group);
+      if (b) applyBoxToHitElement(viewport, 'n3d_actor_primary', b);
+    }
+    if (coachChar && coachChar.group) {
+      const b = calcBounds(coachChar.group);
+      if (b) applyBoxToHitElement(viewport, 'n3d_actor_secondary', b);
+
+      let hatObj = coachChar.hat;
+      if (!hatObj) {
+        coachChar.group.traverse((c) => {
+          if (c.name && c.name.toLowerCase().includes('hat')) hatObj = c;
+        });
+      }
+      if (hatObj) {
+        const hb = calcBounds(hatObj);
+        if (hb) applyBoxToHitElement(viewport, 'n3d_prop_hat', hb);
+      }
+    }
+  }
+
+  function applyBoxToHitElement(viewport, objId, b) {
+    const el = viewport.querySelector(`[data-n3d-obj="${objId}"]`);
+    if (!el) return;
+    el.style.left = `${((b.cx / 960) * 100).toFixed(2)}%`;
+    el.style.top = `${((b.cy / 540) * 100).toFixed(2)}%`;
+    el.style.width = `${((b.w / 960) * 100).toFixed(2)}%`;
+    el.style.height = `${((b.h / 540) * 100).toFixed(2)}%`;
+  }
+
   function renderNative3DCanvas(canvas, timeSec) {
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -415,6 +540,7 @@
         state.nativeEngine.render(state.nativeScene, t);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(state.nativeEngine.canvas, 0, 0, canvas.width, canvas.height);
+        updateHitBoxesFrom3DScene(canvas);
         return;
       } catch (e) {
         // Fallback to projected renderer if WebGL context unavailable
@@ -432,7 +558,7 @@
           <div class="rg-n3d-hit-box"
                data-n3d-obj="${obj.id}"
                data-n3d-variant="${obj.variant}"
-               title="${obj.name} (Click to select · Drag to orbit/reposition)"
+               title="${obj.name} (Drag with Hand Cursor to Turn / Move in 3D)"
                style="position:absolute;left:${obj.x}%;top:${obj.y}%;width:${obj.w}%;height:${obj.h}%;transform:translate(-50%,-50%);border:1.5px dashed transparent;border-radius:10px;cursor:grab;transition:border-color 0.15s ease, background 0.15s ease;">
           </div>
         `).join('')}
@@ -440,8 +566,8 @@
     ` : '';
 
     return `
-      <div id="regaarder-n3d-viewport-${suffix}" class="rg-n3d-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#0b0f17;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
-        <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
+      <div id="regaarder-n3d-viewport-${suffix}" class="rg-n3d-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#0b0f17;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;cursor:default;">
+        <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;cursor:default;"></canvas>
         ${hitOverlayHtml}
       </div>
     `;
@@ -461,6 +587,8 @@
       const objId = box.getAttribute('data-n3d-obj');
       const variant = box.getAttribute('data-n3d-variant') || 'media';
 
+      box.style.cursor = 'grab';
+
       box.addEventListener('mouseenter', () => {
         box.style.borderColor = 'rgba(155, 107, 255, 0.65)';
       });
@@ -472,7 +600,7 @@
 
       let dragging = false;
       let startX = 0, startY = 0;
-      let origX = 0, origY = 0;
+      let origX = 0, origY = 0, origRot = 0, origLift = 0;
 
       box.addEventListener('pointerdown', (e) => {
         e.stopPropagation();
@@ -484,6 +612,7 @@
         box.classList.add('is-selected');
         box.style.borderColor = '#9B6BFF';
         box.style.background = 'rgba(155, 107, 255, 0.08)';
+        box.style.cursor = 'grabbing';
 
         state.activeActor = objId;
         if (objId === 'n3d_prop_hat') state.activeSurface = 'hat-brim';
@@ -499,12 +628,19 @@
           });
         }
 
-        const off = state.actorOffsets[objId] || (state.actorOffsets[objId] = { x: 0, y: 0, rot: 0, opacity: 1 });
+        const off = state.actorOffsets[objId] || (state.actorOffsets[objId] = {
+          x: 0,
+          y: 0,
+          rot: objId === 'n3d_actor_primary' ? 90 : (objId === 'n3d_actor_secondary' ? -65 : 0),
+          opacity: 1
+        });
         dragging = true;
         startX = e.clientX;
         startY = e.clientY;
         origX = off.x || 0;
         origY = off.y || 0;
+        origRot = typeof off.rot === 'number' ? off.rot : (objId === 'n3d_actor_primary' ? 90 : (objId === 'n3d_actor_secondary' ? -65 : 0));
+        origLift = off.lift || 0;
         try { box.setPointerCapture(e.pointerId); } catch (err) {}
       });
 
@@ -515,16 +651,76 @@
         const dy = ((e.clientY - startY) / Math.max(1, rect.height)) * 540;
         const off = state.actorOffsets[objId];
         if (off) {
-          off.x = Math.round(origX + dx);
-          off.y = Math.round(origY + dy);
+          if (objId === 'n3d_actor_primary' || objId === 'n3d_actor_secondary') {
+            // Turning the humanoid using the hand cursor in 3D mode:
+            // Horizontal drag turns / rotates the character (yaw) in real-time
+            const deltaYaw = dx * 0.75;
+            off.rot = Math.round((origRot + deltaYaw) * 10) / 10;
+            // Vertical drag repositions / shifts position
+            off.y = Math.round(origY + dy * 0.5);
+          } else if (objId === 'n3d_prop_hat') {
+            // Dragging hat moves it upward / downward (lift) and adjusts lateral offset
+            off.lift = origLift - (dy * 0.003);
+            off.x = Math.round(origX + dx * 0.5);
+          } else {
+            off.x = Math.round(origX + dx);
+            off.y = Math.round(origY + dy);
+          }
           renderNative3DCanvas(canvas, (window.topCustomizerState && window.topCustomizerState.currentTime) || 0);
+          if (window.RegaarderContextualToolbar) {
+            window.RegaarderContextualToolbar.updatePosition();
+          }
         }
       });
 
-      const endDrag = () => { dragging = false; };
+      const endDrag = (e) => {
+        if (dragging) {
+          dragging = false;
+          box.style.cursor = 'grab';
+          try { box.releasePointerCapture(e.pointerId); } catch (err) {}
+        }
+      };
       box.addEventListener('pointerup', endDrag);
       box.addEventListener('pointercancel', endDrag);
     });
+
+    // Orbit / Pan camera navigation when dragging empty space on the 3D canvas
+    let isOrbiting = false;
+    let orbitStartX = 0, orbitStartY = 0;
+    let origYaw = state.cameraYaw || 18, origPitch = state.cameraPitch || 12;
+
+    viewport.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('[data-n3d-obj]')) return;
+      isOrbiting = true;
+      orbitStartX = e.clientX;
+      orbitStartY = e.clientY;
+      origYaw = state.cameraYaw || 18;
+      origPitch = state.cameraPitch || 12;
+      viewport.style.cursor = 'grabbing';
+      try { viewport.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    viewport.addEventListener('pointermove', (e) => {
+      if (!isOrbiting) return;
+      const dx = e.clientX - orbitStartX;
+      const dy = e.clientY - orbitStartY;
+      state.cameraYaw = Math.round(((origYaw + dx * 0.35) % 360) * 10) / 10;
+      state.cameraPitch = Math.max(-40, Math.min(75, Math.round((origPitch + dy * 0.35) * 10) / 10));
+      renderNative3DCanvas(canvas, (window.topCustomizerState && window.topCustomizerState.currentTime) || 0);
+      if (window.RegaarderContextualToolbar) {
+        window.RegaarderContextualToolbar.updatePosition();
+      }
+    });
+
+    const endOrbit = (e) => {
+      if (isOrbiting) {
+        isOrbiting = false;
+        viewport.style.cursor = 'default';
+        try { viewport.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+    };
+    viewport.addEventListener('pointerup', endOrbit);
+    viewport.addEventListener('pointercancel', endOrbit);
   }
 
   window.renderRegaarderNative3DStage = function (container, templateId, isHover) {
@@ -549,16 +745,29 @@
     const off = state.actorOffsets[objectKey] || (state.actorOffsets[objectKey] = { x: 0, y: 0, rot: 0, opacity: 1 });
     if (actionType === 'color') {
       off.color = value;
-      if (objectKey === 'n3d_actor_primary') state.shirtColor = value;
-      else if (objectKey === 'n3d_prop_hat') state.hatColor = value;
-      else if (objectKey === 'n3d_actor_secondary') state.keyLightColor = value;
+      if (objectKey === 'n3d_actor_primary') {
+        state.shirtColor = value;
+        state.trousersColor = value;
+      } else if (objectKey === 'n3d_prop_hat') {
+        state.hatColor = value;
+      } else if (objectKey === 'n3d_actor_secondary') {
+        state.keyLightColor = value;
+      }
     } else if (actionType === 'opacity') {
       off.opacity = Math.max(0.1, Math.min(1, Number(value) / 100));
     } else if (actionType === 'rotate') {
-      state.cameraYaw = (state.cameraYaw + (Number(value) || 15)) % 360;
+      const rotStep = Number(value) || 25;
+      if (objectKey === 'n3d_actor_primary' || objectKey === 'n3d_actor_secondary') {
+        off.rot = ((off.rot || 0) + rotStep) % 360;
+      } else {
+        state.cameraYaw = (state.cameraYaw + rotStep) % 360;
+      }
     } else if (actionType === 'align') {
       off.x = 0;
       off.y = 0;
+      off.lift = 0;
+      if (objectKey === 'n3d_actor_primary') off.rot = 90;
+      if (objectKey === 'n3d_actor_secondary') off.rot = -65;
     }
     const stage = document.getElementById('tpl-modal-preview-stage');
     if (stage) {

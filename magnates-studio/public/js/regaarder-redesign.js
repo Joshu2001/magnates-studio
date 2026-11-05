@@ -4533,12 +4533,17 @@
         <span class="rg-ctx-corner-handle is-tr"></span>
         <span class="rg-ctx-corner-handle is-bl"></span>
         <span class="rg-ctx-corner-handle is-br"></span>
+        <span class="rg-ctx-edge-handle is-top"></span>
+        <span class="rg-ctx-edge-handle is-bottom"></span>
+        <span class="rg-ctx-edge-handle is-left"></span>
+        <span class="rg-ctx-edge-handle is-right"></span>
       `;
       document.body.appendChild(selectionFrameEl);
     }
 
     const state = {
       visible: false,
+      selectionStyle: 'box', // 'box' | 'lasso'
       contextType: 'blueprint', // 'blueprint' | 'template'
       objectKey: 'card',
       objectName: 'Product Card',
@@ -4733,7 +4738,7 @@
         bottom: window.innerHeight - 80
       };
 
-      // Position the 4-handle glowing purple selection frame around the selected object (unless it is the full stage backdrop)
+      // Position the glowing selection frame around the selected object (unless it is the full stage backdrop)
       const isStageBackdrop = targetEl === stageEl || state.objectKey === 'backdrop' || state.objectKey === 'bg';
       if (selectionFrameEl) {
         if (!isStageBackdrop && targetRect.width > 12 && targetRect.height > 12) {
@@ -4741,6 +4746,7 @@
           selectionFrameEl.style.top = `${Math.round(targetRect.top)}px`;
           selectionFrameEl.style.width = `${Math.round(targetRect.width)}px`;
           selectionFrameEl.style.height = `${Math.round(targetRect.height)}px`;
+          selectionFrameEl.classList.toggle('is-lasso', state.selectionStyle === 'lasso');
           selectionFrameEl.classList.add('is-visible');
         } else {
           selectionFrameEl.classList.remove('is-visible');
@@ -5101,6 +5107,9 @@
             <span>Replace</span>
           </button>
         ` : ''}
+        <button type="button" class="rg-ctx-prop-btn" data-ctx-toggle-box-style title="Switch Selection Style: ${state.selectionStyle === 'lasso' ? 'Contoured Lasso' : 'Classic Box'}">
+          <span style="font-size: 11px; font-weight: 700; color: #E9D5FF;">${state.selectionStyle === 'lasso' ? '⚬ Lasso' : '⬚ Box'}</span>
+        </button>
         <div class="rg-ctx-identity-wrap">
           <button type="button" class="rg-ctx-prop-btn" data-ctx-popover-trigger="color" title="Object Accent & Glow Color">
             <span class="rg-ctx-color-dot" data-role="ctx-color-dot" style="background:${state.colorHex};"></span>
@@ -5309,6 +5318,19 @@
         });
       });
 
+      // Bind Selection Style toggle (Classic Box vs Contoured Lasso)
+      toolbarEl.querySelectorAll('[data-ctx-toggle-box-style]').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          state.selectionStyle = state.selectionStyle === 'lasso' ? 'box' : 'lasso';
+          if (selectionFrameEl) {
+            selectionFrameEl.classList.toggle('is-lasso', state.selectionStyle === 'lasso');
+          }
+          renderToolbar();
+          updatePosition();
+        });
+      });
+
       // Bind command buttons
       toolbarEl.querySelectorAll('[data-ctx-cmd]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -5471,6 +5493,15 @@
       hide,
       updatePosition,
       executeCommand,
+      setSelectionStyle: (style) => {
+        state.selectionStyle = style === 'lasso' ? 'lasso' : 'box';
+        if (selectionFrameEl) {
+          selectionFrameEl.classList.toggle('is-lasso', state.selectionStyle === 'lasso');
+        }
+        renderToolbar();
+        updatePosition();
+      },
+      getSelectionStyle: () => state.selectionStyle,
       getState: () => ({ ...state })
     };
 
@@ -5486,6 +5517,8 @@
       hide: () => createUniversalContextualToolbar().hide(),
       updatePosition: () => createUniversalContextualToolbar().updatePosition(),
       executeCommand: (cmd) => createUniversalContextualToolbar().executeCommand(cmd),
+      setSelectionStyle: (style) => createUniversalContextualToolbar().setSelectionStyle(style),
+      getSelectionStyle: () => createUniversalContextualToolbar().getSelectionStyle(),
       getState: () => createUniversalContextualToolbar().getState()
     };
   }

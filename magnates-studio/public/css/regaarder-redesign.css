@@ -2792,7 +2792,7 @@ body.rg-ctx-toolbar-active #stage-tf-label {
   box-shadow: 0 0 28px rgba(155, 107, 255, 0.52), inset 0 0 16px rgba(155, 107, 255, 0.18) !important;
 }
 
-/* Active Selection Frame Overlay with 4 Crisp Corner Handles */
+/* Active Selection Frame Overlay with 4 Crisp Corner Handles & Contoured Lasso Mode */
 .rg-ctx-selection-frame {
   position: fixed;
   z-index: 2147483635;
@@ -2808,6 +2808,17 @@ body.rg-ctx-toolbar-active #stage-tf-label {
   display: block;
 }
 
+/* Contoured Dashed Lasso / Capsule Silhouette */
+.rg-ctx-selection-frame.is-lasso {
+  border: 2px dashed #C084FC !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 0 28px rgba(192, 132, 252, 0.65), inset 0 0 16px rgba(155, 107, 255, 0.35) !important;
+}
+
+.rg-ctx-selection-frame.is-lasso .rg-ctx-corner-handle {
+  display: none !important;
+}
+
 .rg-ctx-corner-handle {
   position: absolute;
   width: 10px;
@@ -2816,6 +2827,7 @@ body.rg-ctx-toolbar-active #stage-tf-label {
   border: 2px solid #823CF0;
   border-radius: 2.5px;
   box-shadow: 0 0 10px rgba(155, 107, 255, 0.9), 0 2px 4px rgba(0, 0, 0, 0.5);
+  pointer-events: auto;
 }
 
 .rg-ctx-corner-handle.is-tl {
@@ -2836,6 +2848,51 @@ body.rg-ctx-toolbar-active #stage-tf-label {
 .rg-ctx-corner-handle.is-br {
   bottom: -6px;
   right: -6px;
+}
+
+/* Edge Handles for Dragging & Scaling */
+.rg-ctx-edge-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #E9D5FF;
+  border: 2px solid #9333EA;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(192, 132, 252, 0.9);
+  pointer-events: auto;
+  transition: transform 0.12s ease;
+}
+
+.rg-ctx-edge-handle:hover {
+  transform: scale(1.35);
+}
+
+.rg-ctx-edge-handle.is-top {
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.rg-ctx-edge-handle.is-bottom {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.rg-ctx-edge-handle.is-left {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+}
+
+.rg-ctx-edge-handle.is-right {
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: ew-resize;
 }
 
 /* Main Floating Contextual Toolbar Container */
