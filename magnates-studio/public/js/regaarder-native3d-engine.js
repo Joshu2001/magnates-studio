@@ -16,7 +16,7 @@
   const PRESET_SCENES = {
     handshake: {
       id: 'handshake',
-      label: '01 Handshake · Paired Contact',
+      label: '01 Handshake · Paired Contact', shortLabel: '01 Handshake', previewTime: 1.95,
       description: 'Two anatomical characters with finger-contact grip solver & studio softboxes',
       background: '#141820',
       primaryColor: '#137cba',
@@ -24,7 +24,7 @@
     },
     checkpoint: {
       id: 'checkpoint',
-      label: '02 14:55 Crimson Seated & Coach',
+      label: '02 14:55 Crimson Seated & Coach', shortLabel: '02 Seated & Coach', previewTime: 1.8,
       description: 'Seated crimson figure in chair at desk, cream coach with brimmed hat & depth smoke',
       background: '#220406',
       primaryColor: '#9d1514',
@@ -32,7 +32,7 @@
     },
     team: {
       id: 'team',
-      label: '03 Three Red Players Formation',
+      label: '03 Three Red Players Formation', shortLabel: '03 Red Trio', previewTime: 0.65,
       description: 'Trio formation with independent bone poses, wardrobe & rim lighting',
       background: '#17080a',
       primaryColor: '#b91c1c',
@@ -40,7 +40,7 @@
     },
     humanoid: {
       id: 'humanoid',
-      label: '04 Anatomical Mannequin Studio',
+      label: '04 Anatomical Mannequin Studio', shortLabel: '04 Mannequin', previewTime: 0.5,
       description: 'Single mannequin for multiresolution sculpting, UV projection & vertex painting',
       background: '#11151b',
       primaryColor: '#7d8c9d',
@@ -48,7 +48,7 @@
     },
     blue: {
       id: 'blue',
-      label: '05 Blue & Cream Coach',
+      label: '05 Blue & Cream Coach', shortLabel: '05 Blue & Coach', previewTime: 0.5,
       description: 'Blue figure and cream coach with tailored fedora hat and dynamic 3D studio lighting',
       background: '#151322',
       primaryColor: '#137cba',
@@ -115,7 +115,11 @@
     nativeEngine: null,
     nativeScene: null,
     nativeData: null,
-    nativeMods: null
+    nativeMods: null,
+    nativeSceneDirty: false,
+    savedScenes: {},
+    sceneTime: 0.5,
+    inlineEditor: null
   };
 
   window.REGAARDER_NATIVE3D_CONFIG = state;
@@ -192,12 +196,18 @@
     } else {
       state.nativeScene = sceneMod.createNativeScene('humanoid');
     }
+    if (state.savedScenes[state.preset]) {
+      state.nativeScene = structuredClone(state.savedScenes[state.preset]);
+      state.nativeSceneDirty = true;
+    } else {
+      state.nativeSceneDirty = false;
+    }
     syncStateToNativeScene();
   }
 
   function syncStateToNativeScene() {
     const sc = state.nativeScene;
-    if (!sc || !Array.isArray(sc.nodes)) return;
+    if (!sc || !Array.isArray(sc.nodes) || state.nativeSceneDirty) return;
     sc.background = state.backgroundHex;
     sc.lighting = sc.lighting || {};
     sc.lighting.exposure = state.exposure;
@@ -228,6 +238,12 @@
     }
 
     const humanoids = sc.nodes.filter((n) => n.type === 'humanoid');
+    // The source's handshake and red-team rigs carry intentionally authored poses, materials,
+    // lights and animated locations. Do not overwrite them with the blue-pair defaults.
+    if (!['blue', 'checkpoint'].includes(state.preset)) {
+      humanoids.forEach((h) => { h.wireframe = !!state.wireframe; });
+      return;
+    }
     if (state.preset === 'checkpoint') {
       const redNode = sc.nodes.find((n) => n.id === 'red') || humanoids[0];
       const rOff = state.actorOffsets.n3d_actor_crimson || state.actorOffsets.n3d_actor_primary || {};
@@ -566,37 +582,29 @@
       };
     };
 
-    const charList = Array.from(engine.characters.entries());
-    const primaryId = state.preset === 'checkpoint' ? 'n3d_actor_crimson' : 'n3d_actor_primary';
-    const secondaryId = state.preset === 'checkpoint' ? 'n3d_actor_coach' : 'n3d_actor_secondary';
-
-    const p1Char = engine.characters.get('red') || engine.characters.get('blue') || (charList[0] && charList[0][1]);
-    const coachChar = engine.characters.get('coach') || (charList[1] && charList[1][1]);
-
-    if (p1Char && p1Char.group) {
-      const b = calcBounds(p1Char.group);
-      if (b) applyBoxToHitElement(viewport, primaryId, b);
-    }
-    if (coachChar && coachChar.group) {
-      const b = calcBounds(coachChar.group);
-      if (b) applyBoxToHitElement(viewport, secondaryId, b);
-
-      let hatObj = coachChar.hat;
-      if (!hatObj) {
-        coachChar.group.traverse((c) => {
-          if (c.name && c.name.toLowerCase().includes('hat')) hatObj = c;
+    const actorsByPreset = {
+      checkpoint: [['n3d_actor_crimson', 'red'], ['n3d_actor_coach', 'coach']],
+      handshake: [['n3d_actor_primary', 'final-blue'], ['n3d_actor_secondary', 'final-coach']],
+      team: [['n3d_actor_p1', 'final-player-0'], ['n3d_actor_primary', 'final-player-1'], ['n3d_actor_secondary', 'final-player-2']],
+      humanoid: [['n3d_actor_primary', 'humanoid']],
+      blue: [['n3d_actor_primary', 'blue'], ['n3d_actor_secondary', 'coach']]
+    };
+    for (const [overlayId, nodeId] of (actorsByPreset[state.preset] || actorsByPreset.blue)) {
+      const character = engine.characters.get(nodeId);
+      if (!character?.group) continue;
+      const bounds = calcBounds(character.group);
+      if (bounds) applyBoxToHitElement(viewport, overlayId, bounds);
+      if (nodeId === 'coach' || nodeId === 'final-coach') {
+        let hat = character.hat;
+        if (!hat) character.group.traverse((child) => {
+          if (!hat && child.name?.toLowerCase().includes('hat')) hat = child;
         });
-      }
-      if (hatObj) {
-        const hb = calcBounds(hatObj);
-        if (hb) applyBoxToHitElement(viewport, 'n3d_prop_hat', hb);
+        const hatBounds = hat && calcBounds(hat);
+        if (hatBounds) applyBoxToHitElement(viewport, 'n3d_prop_hat', hatBounds);
       }
     }
-
-    const deskBox = viewport.querySelector('[data-n3d-obj="n3d_prop_desk"]');
-    if (deskBox) {
-      deskBox.style.display = state.preset === 'checkpoint' ? 'block' : 'none';
-    }
+    const desk = viewport.querySelector('[data-n3d-obj="n3d_prop_desk"]');
+    if (desk) desk.style.display = state.preset === 'checkpoint' ? 'block' : 'none';
   }
 
   function applyBoxToHitElement(viewport, objId, b) {
@@ -617,7 +625,9 @@
       try {
         syncStateToNativeScene();
         const dur = state.nativeScene.duration || 5;
-        const t = Math.max(0, Number(timeSec) || 0) % dur;
+        const isStillEditMode = !!window.topCustomizerState?.is3DMode;
+        const rawTime = isStillEditMode ? state.sceneTime : Number(timeSec);
+        const t = Math.max(0, Number(rawTime) || 0) % dur;
         state.nativeEngine.render(state.nativeScene, t);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(state.nativeEngine.canvas, 0, 0, canvas.width, canvas.height);
@@ -648,12 +658,13 @@
     ` : '';
 
     const presetPillsHtml = !isHover ? `
-      <div class="rg-n3d-presets-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:6px;background:rgba(15,19,28,0.92);border:1px solid rgba(255,255,255,0.12);padding:4px 8px;border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+      <div class="rg-n3d-presets-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;max-width:calc(100% - 18px);overflow-x:auto;align-items:center;gap:6px;white-space:nowrap;background:rgba(15,19,28,0.92);border:1px solid rgba(255,255,255,0.12);padding:4px 8px;border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.6);">
         ${Object.values(PRESET_SCENES).map((p) => `
-          <button type="button" class="rg-n3d-preset-pill ${state.preset === p.id ? 'is-active' : ''}" data-n3d-preset="${p.id}" style="padding:5px 12px;border-radius:14px;border:none;cursor:pointer;font-size:11px;font-weight:700;color:${state.preset === p.id ? '#ffffff' : '#94a3b8'};background:${state.preset === p.id ? '#6d28d9' : 'transparent'};transition:all 0.15s ease;">
-            ${p.label}
+          <button type="button" class="rg-n3d-preset-pill ${state.preset === p.id ? 'is-active' : ''}" data-n3d-preset="${p.id}" title="${p.description}" style="white-space:nowrap;flex-shrink:0;padding:5px 12px;border-radius:14px;border:none;cursor:pointer;font-size:11px;font-weight:700;color:${state.preset === p.id ? '#ffffff' : '#94a3b8'};background:${state.preset === p.id ? '#6d28d9' : 'transparent'};transition:all 0.15s ease;">
+            ${p.shortLabel}
           </button>
         `).join('')}
+        <button type="button" data-n3d-open-workspace title="Edit the real vertex, edge, face and skeletal geometry" style="flex-shrink:0;white-space:nowrap;padding:5px 11px;border-radius:14px;border:1px solid #a78bfa;color:white;background:#4c1d95;font-size:11px;font-weight:700;cursor:pointer">Mesh / Rig Editor</button>
       </div>
     ` : '';
 
@@ -681,6 +692,8 @@
         const pKey = btn.getAttribute('data-n3d-preset');
         if (pKey && PRESET_SCENES[pKey]) {
           state.preset = pKey;
+          state.sceneTime = PRESET_SCENES[pKey].previewTime;
+          state.autoOrbit = false;
           state.backgroundHex = PRESET_SCENES[pKey].background;
           state.shirtColor = PRESET_SCENES[pKey].primaryColor;
           rebuildNativeSceneFromPreset();
@@ -693,6 +706,12 @@
           }
         }
       });
+    });
+
+    const workbench = viewport.querySelector('[data-n3d-open-workspace]');
+    if (workbench) workbench.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openIntegratedMeshEditor(viewport);
     });
 
     const hitBoxes = viewport.querySelectorAll('[data-n3d-obj]');
@@ -803,7 +822,7 @@
     let origYaw = state.cameraYaw || 18, origPitch = state.cameraPitch || 12;
 
     viewport.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('[data-n3d-obj]')) return;
+      if (e.target.closest('[data-n3d-obj],button,.rg-n3d-presets-bar')) return;
       isOrbiting = true;
       orbitStartX = e.clientX;
       orbitStartY = e.clientY;
@@ -835,6 +854,100 @@
     viewport.addEventListener('pointerup', endOrbit);
     viewport.addEventListener('pointercancel', endOrbit);
   }
+
+  // A real V108 geometry workspace in the same application, not a decorative 2D mesh overlay.
+  // The original Motion editor owns Three.js raycasting, vertex/edge/face selection,
+  // orange selection markers, sculpt brush strokes, bone gizmos and history.
+  async function openIntegratedMeshEditor(viewport) {
+    if (state.inlineEditor) return;
+    state.inlineEditor = { loading: true };
+    let host, api;
+    try {
+      await ensureNative3DLoaded();
+      if (!state.nativeReady || !state.nativeData || !state.nativeScene) {
+        throw Error('Native WebGL humanoid assets are unavailable; the 2D preview cannot provide mesh editing.');
+      }
+      if (!document.getElementById('rg-native-editor-css')) {
+        const sheet = document.createElement('link');
+        sheet.id = 'rg-native-editor-css';
+        sheet.rel = 'stylesheet';
+        sheet.href = '/native3d-v97/editor.css';
+        document.head.append(sheet);
+      }
+      host = document.createElement('section');
+      host.className = 'rg-native-integrated-editor';
+      host.setAttribute('role', 'region');
+      host.setAttribute('aria-label', 'Native mesh and rig editor');
+      host.style.cssText = 'position:fixed;inset:44px 14px 12px;z-index:2147483000;background:#11151b;color:#fff;border:1px solid #6d28d9;border-radius:14px;box-shadow:0 28px 90px #000e;overflow:auto;';
+      document.body.appendChild(host);
+      const editorMod = await import('/native3d-v97/editor.js');
+      const exportMod = await import('/native3d-v97/export.js');
+      const activePreset = state.preset;
+      state.autoOrbit = false;
+      const close = () => {
+        if (state.inlineEditor?.api) state.inlineEditor.api.dispose();
+        host?.remove();
+        window.removeEventListener('keydown', onEscape, true);
+        state.inlineEditor = null;
+        if (viewport?.isConnected) {
+          const canvas = viewport.querySelector('canvas');
+          if (canvas) renderNative3DCanvas(canvas, state.sceneTime);
+        }
+      };
+      const onEscape = (event) => {
+        if (event.key === 'Escape' && !event.target.closest('input,textarea,select')) {
+          event.preventDefault();
+          close();
+        }
+      };
+      host.addEventListener('click', (event) => {
+        if (event.target.closest('[data-act="close"]')) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          close();
+        }
+      }, true);
+      window.addEventListener('keydown', onEscape, true);
+      api = editorMod.mountNativeEditor(host, structuredClone(state.nativeScene), state.nativeData, {
+        onSave(next) {
+          state.savedScenes[activePreset] = structuredClone(next);
+          if (state.preset === activePreset) {
+            state.nativeScene = structuredClone(next);
+            state.nativeSceneDirty = true;
+            const canvas = viewport?.querySelector('canvas');
+            if (canvas) renderNative3DCanvas(canvas, state.sceneTime);
+          }
+        },
+        async onExportGLB(next) {
+          await exportMod.downloadGLB(await exportMod.exportNativeGLB(next, state.nativeData));
+        }
+      });
+      state.inlineEditor = { host, api, close };
+      host.querySelector('.n3-top strong')?.replaceChildren(document.createTextNode('Regaarder Motion · Editable 3D Mesh & Rig'));
+      // Video playback belongs to Video mode. Native bone/sculpt controls remain interactive.
+      const timeline = host.querySelector('.n3-timeline');
+      if (timeline) timeline.style.display = 'none';
+      host.querySelector('[data-act="close"]')?.setAttribute('title', 'Return to the studio 3D viewport');
+    } catch (err) {
+      if (api) api.dispose();
+      host?.remove();
+      state.inlineEditor = null;
+      console.error('[RegaarderNative3D] Mesh editor integration failed:', err);
+      if (viewport) {
+        const warning = document.createElement('div');
+        warning.textContent = 'Mesh workspace unavailable: ' + err.message;
+        warning.style.cssText = 'position:absolute;top:40px;left:12px;z-index:60;background:#42151b;color:#fff;padding:9px;border-radius:8px';
+        viewport.append(warning);
+        setTimeout(() => warning.remove(), 6000);
+      }
+    }
+  }
+
+  window.openNative3DWorkshop = () => {
+    const viewport = document.querySelector('.rg-n3d-viewport:not([id*="hover"])');
+    if (viewport) return openIntegratedMeshEditor(viewport);
+    throw Error('Open the Native 3D Surface Builder stage first.');
+  };
 
   window.renderRegaarderNative3DStage = function (container, templateId, isHover) {
     if (!container) return;
