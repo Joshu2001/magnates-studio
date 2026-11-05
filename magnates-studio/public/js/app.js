@@ -33863,6 +33863,7 @@ function generateCutoutCanvasForUrl(url, callback) {
 
 window.syncUniversal3DStageMode = function (is3D) {
   topCustomizerState.is3DMode = !!is3D;
+  if (is3D && topCustomizerState.currentTpl?.id === 'regaarder-native3d-surface-builder') topCustomizerState.isPlaying = false;
   topCustomizerState.paperPreviewMode = is3D ? '3d' : 'video';
 
   const containers = [
@@ -33878,6 +33879,7 @@ window.syncUniversal3DStageMode = function (is3D) {
     else c.classList.remove('is-3d-stage');
   });
 
+  document.getElementById('tpl-modal-timer-badge')?.classList.toggle('rg-hidden-in-3d', !!is3D);
   const playbackBar = document.getElementById('tpl-modal-playback-bar');
   if (playbackBar) playbackBar.style.display = is3D ? 'none' : 'flex';
 
@@ -34321,7 +34323,7 @@ function openTopTemplateCustomizer(tpl) {
 
   // For Google Search and Progress HUD, default to front-facing Reference Image 3 / 4 Video view unless user clicks 3D
   const defaultToVideoView = (tpl.id === 'google' || tpl.id === 'progress' || tpl.id === 'scam-redaction');
-  const has3DCapability = !defaultToVideoView && (RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (tpl.category === '3D / Spatial') || (tpl.category === '3D Spatial') || (tpl.origCategory === '3D / Spatial') || (tpl.origCategory === '3D Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)));
+  const has3DCapability = !defaultToVideoView && (tpl.id === 'regaarder-native3d-surface-builder' || RELEVANT_3D_SWITCH_IDS.has(tpl.id) || isSidebar3DManaged || (tpl.category === '3D / Spatial') || (tpl.category === '3D Spatial') || (tpl.origCategory === '3D / Spatial') || (tpl.origCategory === '3D Spatial') || (window.tpl3DUse3D && window.tpl3DUse3D(tpl.id)));
   if (has3DCapability) {
     topCustomizerState.paperPreviewMode = '3d';
     topCustomizerState.is3DMode = true;
@@ -38580,7 +38582,11 @@ function startTopCustomizerLoop() {
       ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
       : (topCustomizerState.duration || 6);
 
-    const seqTime = t % totalSeqDur;
+    let seqTime = t % totalSeqDur;
+    if (!hasMultipleScenes && topCustomizerState.currentTpl?.id === 'regaarder-full-documentary' && seqTime >= 1080 && seqTime < 1130) {
+      topCustomizerState.startTime -= (1130 - seqTime) * 1000;
+      seqTime = 1130;
+    }
     topCustomizerState.currentTime = seqTime;
     updateTopCustomizerFrame(seqTime, now);
 

@@ -3404,3 +3404,11 @@ body.rg-ctx-toolbar-active #stage-tf-label {
 
 
 
+
+/* Mode state wins over hover/fullscreen HUD rules. */
+.is-3d-stage #tpl-modal-player-hud,
+.is-3d-stage .tpl-modal-player-hud,
+.is-3d-stage #tpl-modal-timer-badge,
+.is-3d-stage .rg-playback-bar,
+.rg-hidden-in-3d { display:none !important; pointer-events:none !important; }
+.rg-n3d-viewport { touch-action:none; }

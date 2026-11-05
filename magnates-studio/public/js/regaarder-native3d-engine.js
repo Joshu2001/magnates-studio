@@ -72,7 +72,12 @@
     cameraPitch: 12,
     cameraZoom: 1.0,
     cameraFov: 32,
-    autoOrbit: true,
+    autoOrbit: false,
+    editTool: 'orbit',
+    brushRadius: 0.065,
+    showTopology: true,
+    showBones: false,
+    selectedBone: 'head',
     orbitSpeed: 0.45,
     exposure: 0.92,
     ambientIntensity: 0.65,
@@ -123,28 +128,28 @@
   function getActiveStageObjects(preset = state.preset) {
     if (preset === 'checkpoint') {
       return [
-        { id: 'n3d_actor_crimson', name: 'Seated Red Figure', variant: 'media', x: 30, y: 56, w: 24, h: 68 },
-        { id: 'n3d_actor_coach', name: 'Secondary Coach Rig', variant: 'media', x: 68, y: 54, w: 24, h: 72 },
-        { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'shape', x: 68, y: 35, w: 14, h: 12 },
-        { id: 'n3d_prop_desk', name: 'Studio Desk & Chair Prop', variant: 'shape', x: 44, y: 70, w: 34, h: 24 }
+        { id: 'n3d_actor_crimson', name: 'Seated Red Figure', variant: 'object3d', x: 30, y: 56, w: 24, h: 68 },
+        { id: 'n3d_actor_coach', name: 'Secondary Coach Rig', variant: 'object3d', x: 68, y: 54, w: 24, h: 72 },
+        { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'object3d', x: 68, y: 35, w: 14, h: 12 },
+        { id: 'n3d_prop_desk', name: 'Studio Desk & Chair Prop', variant: 'object3d', x: 44, y: 70, w: 34, h: 24 }
       ];
     }
     if (preset === 'team') {
       return [
-        { id: 'n3d_actor_p1', name: 'Left Wing Player', variant: 'media', x: 28, y: 56, w: 22, h: 70 },
-        { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 50, y: 53, w: 22, h: 72 },
-        { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 72, y: 56, w: 22, h: 70 }
+        { id: 'n3d_actor_p1', name: 'Left Wing Player', variant: 'object3d', x: 28, y: 56, w: 22, h: 70 },
+        { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'object3d', x: 50, y: 53, w: 22, h: 72 },
+        { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'object3d', x: 72, y: 56, w: 22, h: 70 }
       ];
     }
     if (preset === 'humanoid') {
       return [
-        { id: 'n3d_actor_primary', name: 'Anatomical Mannequin', variant: 'media', x: 50, y: 54, w: 24, h: 74 }
+        { id: 'n3d_actor_primary', name: 'Anatomical Mannequin', variant: 'object3d', x: 50, y: 54, w: 24, h: 74 }
       ];
     }
     return [
-      { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 38, y: 56, w: 22, h: 72 },
-      { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 62, y: 54, w: 22, h: 72 },
-      { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'shape', x: 62, y: 35, w: 14, h: 12 }
+      { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'object3d', x: 38, y: 56, w: 22, h: 72 },
+      { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'object3d', x: 62, y: 54, w: 22, h: 72 },
+      { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'object3d', x: 62, y: 35, w: 14, h: 12 }
     ];
   }
 
@@ -155,16 +160,17 @@
     if (typeof window === 'undefined' || (navigator && navigator.userAgent && navigator.userAgent.includes('jsdom'))) return;
     state.nativeLoading = true;
     try {
-      const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod] = await Promise.all([
+      const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod, stageEditMod] = await Promise.all([
         import('/native3d-v97/engine.js'),
         import('/native3d-v97/scene.js'),
         import('/native3d-v97/final-scenes.js'),
         import('/native3d-v97/checkpoint.js'),
-        import('/native3d-v97/surface-ui.js')
+        import('/native3d-v97/surface-ui.js'),
+        import('/native3d-v97/stage-editor.js')
       ]);
       const data = await engineMod.loadHumanoid();
       state.nativeData = data;
-      state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod };
+      state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod, stageEditMod };
       const offscreen = document.createElement('canvas');
       offscreen.width = 960;
       offscreen.height = 540;
@@ -192,135 +198,69 @@
     } else {
       state.nativeScene = sceneMod.createNativeScene('humanoid');
     }
+    state.baseNodes = structuredClone(state.nativeScene.nodes);
+    state.backgroundHex = PRESET_SCENES[state.preset].background;
+    state.editScene = null;
+    state.meshEditor?.reset();
     syncStateToNativeScene();
   }
 
-  function syncStateToNativeScene() {
-    const sc = state.nativeScene;
-    if (!sc || !Array.isArray(sc.nodes)) return;
+  const PREVIEW_TIMES = { handshake: 1.95, checkpoint: 1.8, team: 0.65, humanoid: 0, blue: 0 };
+  function isEditing() {
+    return window.topCustomizerState?.paperPreviewMode === '3d';
+  }
+  function actorObjectId(node, index) {
+    if (state.preset === 'checkpoint') return node.id === 'red' ? 'n3d_actor_crimson' : 'n3d_actor_coach';
+    if (state.preset === 'team') return ['n3d_actor_p1', 'n3d_actor_primary', 'n3d_actor_secondary'][index];
+    return index === 0 ? 'n3d_actor_primary' : 'n3d_actor_secondary';
+  }
+  function syncStateToNativeScene(sc = state.nativeScene) {
+    if (!sc?.nodes) return;
     sc.background = state.backgroundHex;
-    sc.lighting = sc.lighting || {};
-    sc.lighting.exposure = state.exposure;
-    sc.lighting.ambient = state.ambientIntensity;
-
-    const cam = sc.nodes.find((n) => n.type === 'camera');
-    if (cam) {
-      cam.fov = state.cameraFov;
-      const radYaw = ((state.cameraYaw || 18) * Math.PI) / 180;
-      const radPitch = ((state.cameraPitch || 12) * Math.PI) / 180;
-      const radius = 4.3;
-      cam.position = [
-        Math.sin(radYaw) * Math.cos(radPitch) * radius,
-        1.2 + Math.sin(radPitch) * radius,
-        Math.cos(radYaw) * Math.cos(radPitch) * radius
-      ];
-      cam.target = [0, 1.2, 0];
-    }
-    const keyLight = sc.nodes.find((n) => n.id === 'key' || (n.name && n.name.toLowerCase().includes('key')));
-    if (keyLight) {
-      keyLight.intensity = state.keyLightIntensity;
-      keyLight.color = state.keyLightColor;
-    }
-    const rimLight = sc.nodes.find((n) => n.id === 'rim' || (n.name && n.name.toLowerCase().includes('rim')));
-    if (rimLight) {
-      rimLight.intensity = state.rimLightIntensity;
-      rimLight.color = state.rimLightColor;
-    }
-
-    const humanoids = sc.nodes.filter((n) => n.type === 'humanoid');
-    if (state.preset === 'checkpoint') {
-      const redNode = sc.nodes.find((n) => n.id === 'red') || humanoids[0];
-      const rOff = state.actorOffsets.n3d_actor_crimson || state.actorOffsets.n3d_actor_primary || {};
-      if (redNode) {
-        redNode.wireframe = !!state.wireframe;
-        redNode.position = [-0.94 + ((rOff.x || 0) * 0.003), -((rOff.y || 0) * 0.003), 0.6];
-        redNode.rotation = [0, typeof rOff.rot === 'number' ? rOff.rot : 90, 0];
-        redNode.leanAngle = 65;
-        redNode.pose = 'seated';
-        redNode.material = redNode.material || {};
-        redNode.material.color = '#9d1514';
-        redNode.parts = redNode.parts || {};
-        redNode.parts.shirt = { ...(redNode.parts.shirt || {}), color: '#9d1514', visible: true };
-        redNode.parts.trousers = { ...(redNode.parts.trousers || {}), color: '#7f1212', visible: true };
-        redNode.visible = true;
-      }
-      const coachNode = sc.nodes.find((n) => n.id === 'coach') || humanoids[1];
-      const cOff = state.actorOffsets.n3d_actor_coach || state.actorOffsets.n3d_actor_secondary || {};
-      if (coachNode) {
-        coachNode.wireframe = !!state.wireframe;
-        coachNode.position = [0.83 + ((cOff.x || 0) * 0.003), -((cOff.y || 0) * 0.003), -0.15];
-        coachNode.rotation = [0, typeof cOff.rot === 'number' ? cOff.rot : 90, 0];
-        coachNode.pose = 'folded';
-        coachNode.material = coachNode.material || {};
-        coachNode.material.color = '#e0ded0';
-        coachNode.parts = coachNode.parts || {};
-        coachNode.parts.shirt = { ...(coachNode.parts.shirt || {}), color: '#e0ded0', visible: true };
-        coachNode.parts.trousers = { ...(coachNode.parts.trousers || {}), color: '#cdc8b8', visible: true };
-        coachNode.parts.hat = { ...(coachNode.parts.hat || {}), visible: true, color: state.hatColor };
-        coachNode.visible = true;
-      }
-      sc.nodes.filter((n) => n.id.startsWith('table-') || n.id.startsWith('chair-') || n.id === 'smoke-back').forEach((n) => {
-        n.visible = true;
-      });
-    } else {
-      humanoids.forEach((h, idx) => {
-        h.wireframe = !!state.wireframe;
-        h.proportions = {
-          headSize: state.headSize,
-          neckLength: 0.95,
-          shoulderWidth: state.shoulderWidth,
-          armLength: state.armLength,
-          legLength: state.legLength
-        };
-        h.shape = h.shape || {};
-        h.shape.female = state.foundation === 'female' ? 1 : 0;
-        if (idx === 0) {
-          h.material = h.material || {};
-          h.material.color = state.shirtColor;
-          h.material.roughness = state.roughness;
-          h.material.metalness = state.metalness;
-          h.parts = h.parts || {};
-          h.parts.shirt = { ...(h.parts.shirt || {}), visible: state.shirtVisible, color: state.shirtColor, roughness: state.roughness };
-          h.parts.trousers = { ...(h.parts.trousers || {}), visible: state.trousersVisible, color: state.trousersColor || state.shirtColor, roughness: state.roughness };
-
-          const pOff = state.actorOffsets.n3d_actor_primary || {};
-          h.rotation = h.rotation || [0, 90, 0];
-          if (typeof pOff.rot === 'number') {
-            h.rotation[1] = pOff.rot;
-          }
-          if (typeof pOff.x === 'number') {
-            h.position = h.position || [-0.65, 0, 0.3];
-            h.position[0] = -0.65 + (pOff.x * 0.003);
-          }
-          if (typeof pOff.y === 'number') {
-            h.position = h.position || [-0.65, 0, 0.3];
-            h.position[1] = -(pOff.y * 0.003);
-          }
-        } else if (idx === 1) {
-          const sOff = state.actorOffsets.n3d_actor_secondary || {};
-          h.rotation = h.rotation || [0, -65, 0];
-          if (typeof sOff.rot === 'number') {
-            h.rotation[1] = sOff.rot;
-          }
-          if (typeof sOff.x === 'number') {
-            h.position = h.position || [0.65, 0, -0.6];
-            h.position[0] = 0.65 + (sOff.x * 0.003);
-          }
-          if (typeof sOff.y === 'number') {
-            h.position = h.position || [0.65, 0, -0.6];
-            h.position[1] = -(sOff.y * 0.003);
-          }
-          const hatOff = state.actorOffsets.n3d_prop_hat || {};
-          h.parts = h.parts || {};
-          h.parts.hat = {
-            ...(h.parts.hat || {}),
-            visible: state.hatVisible,
-            color: state.hatColor,
-            lift: (hatOff.lift || 0),
-            offsetX: (hatOff.x || 0) * 0.002
-          };
+    sc.lighting = { ...sc.lighting, exposure: state.exposure, ambient: state.ambientIntensity };
+    // Preserve each preset's choreography; user offsets are relative to its own foundation.
+    const humanoids = sc.nodes.filter(n => n.type === 'humanoid');
+    humanoids.forEach((h, i) => {
+      const base = state.baseNodes?.find(n => n.id === h.id) || h;
+      const off = state.actorOffsets[actorObjectId(h, i)] || {};
+      h.wireframe = !!state.wireframe;
+      h.editCage = isEditing() && state.showTopology;
+      h.proportions = { ...h.proportions, headSize: state.headSize, shoulderWidth: state.shoulderWidth, armLength: state.armLength, legLength: state.legLength };
+      h.shape = { ...h.shape, female: state.foundation === 'female' ? 1 : 0 };
+      h.position = [...base.position];
+      h.position[0] += (off.x || 0) * .003;
+      h.position[1] -= (off.y || 0) * .003;
+      h.rotation = [...base.rotation];
+      h.rotation[1] += off.yaw || 0;
+      h.parts = structuredClone(h.parts || {});
+      for (const part of ['shirt', 'trousers']) {
+        h.parts[part] = { ...h.parts[part], roughness: off.roughness ?? state.roughness, metalness: off.metalness ?? state.metalness };
+        if (i === 0 && state.preset === 'blue') {
+          h.parts[part].color = part === 'shirt' ? state.shirtColor : state.trousersColor;
+          h.parts[part].visible = state[part + 'Visible'];
         }
-      });
+        if (off.colorEdited) h.parts[part].color = off.color;
+      }
+      h.material = { ...h.material, roughness: off.roughness ?? state.roughness, metalness: off.metalness ?? state.metalness };
+      if (off.colorEdited) h.material = { ...h.material, color: off.color };
+      if (off.opacity !== undefined) h.material = { ...h.material, opacity: off.opacity };
+      if (base.parts?.hat?.visible) {
+        const hat = state.actorOffsets.n3d_prop_hat || {};
+        h.parts.hat = { ...h.parts.hat, visible: state.hatVisible, color: state.hatColor, lift: Math.max(-.15, Math.min(.15, hat.lift || 0)) };
+      }
+    });
+    for (const light of sc.nodes.filter(n=>n.type==='light')) {
+      if(light.id==='key'){light.intensity=state.keyLightIntensity;light.color=state.keyLightColor;}
+      if(light.id==='rim'){light.intensity=state.rimLightIntensity;light.color=state.rimLightColor;}
+    }
+    if (isEditing()) {
+      const cam = sc.nodes.find(n => n.type === 'camera');
+      if (cam) {
+        const yaw = state.cameraYaw * Math.PI / 180, pitch = state.cameraPitch * Math.PI / 180, r = 4.3 / state.cameraZoom;
+        cam.fov = state.cameraFov;
+        cam.position = [Math.sin(yaw)*Math.cos(pitch)*r, 1.1+Math.sin(pitch)*r, Math.cos(yaw)*Math.cos(pitch)*r];
+        cam.target = [0, 1.1, 0];
+      }
     }
   }
 
@@ -566,32 +506,14 @@
       };
     };
 
-    const charList = Array.from(engine.characters.entries());
-    const primaryId = state.preset === 'checkpoint' ? 'n3d_actor_crimson' : 'n3d_actor_primary';
-    const secondaryId = state.preset === 'checkpoint' ? 'n3d_actor_coach' : 'n3d_actor_secondary';
-
-    const p1Char = engine.characters.get('red') || engine.characters.get('blue') || (charList[0] && charList[0][1]);
-    const coachChar = engine.characters.get('coach') || (charList[1] && charList[1][1]);
-
-    if (p1Char && p1Char.group) {
-      const b = calcBounds(p1Char.group);
-      if (b) applyBoxToHitElement(viewport, primaryId, b);
-    }
-    if (coachChar && coachChar.group) {
-      const b = calcBounds(coachChar.group);
-      if (b) applyBoxToHitElement(viewport, secondaryId, b);
-
-      let hatObj = coachChar.hat;
-      if (!hatObj) {
-        coachChar.group.traverse((c) => {
-          if (c.name && c.name.toLowerCase().includes('hat')) hatObj = c;
-        });
-      }
-      if (hatObj) {
-        const hb = calcBounds(hatObj);
-        if (hb) applyBoxToHitElement(viewport, 'n3d_prop_hat', hb);
-      }
-    }
+    const actors=state.nativeScene.nodes.filter(n=>n.type==='humanoid');
+    actors.forEach((node,i)=>{
+      const character=engine.characters.get(node.id);
+      if(!character?.group.visible)return;
+      const bounds=calcBounds(character.group);
+      if(bounds)applyBoxToHitElement(viewport,actorObjectId(node,i),bounds);
+      if(character.hat?.visible){const hb=calcBounds(character.hat);if(hb)applyBoxToHitElement(viewport,'n3d_prop_hat',hb);}
+    });
 
     const deskBox = viewport.querySelector('[data-n3d-obj="n3d_prop_desk"]');
     if (deskBox) {
@@ -615,13 +537,28 @@
 
     if (state.nativeReady && state.nativeEngine && state.nativeScene) {
       try {
-        syncStateToNativeScene();
+        const editing = isEditing();
+        let scene = state.nativeScene;
+        if (editing) {
+          if (!state.editScene) {
+            state.editScene = { ...scene, nodes: scene.nodes.map(n => {
+              const evaluated = state.nativeMods.sceneMod.nodeAt(n, PREVIEW_TIMES[state.preset]);
+              for (const k of ['tracks','boneTracks','bonePositionTracks','boneScaleTracks','partTracks','ikTracks','handPoseTracks']) evaluated[k] = {};
+              return evaluated;
+            }) };
+            // Edits are stored on the source nodes, and survive both mode changes and GLB export.
+          }
+          scene = state.editScene;
+          scene.nodes.forEach(n => { const source = state.nativeScene.nodes.find(x => x.id === n.id); if (source) for (const k of ['sculpt','multires','weights']) n[k] = source[k]; });
+        }
+        syncStateToNativeScene(scene);
         const dur = state.nativeScene.duration || 5;
         const t = Math.max(0, Number(timeSec) || 0) % dur;
-        state.nativeEngine.render(state.nativeScene, t);
+        state.nativeEngine.render(scene, editing ? PREVIEW_TIMES[state.preset] : t);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(state.nativeEngine.canvas, 0, 0, canvas.width, canvas.height);
         updateHitBoxesFrom3DScene(canvas);
+        if (editing) state.meshEditor?.draw(ctx);
         return;
       } catch (e) {
         // Fallback to projected renderer if WebGL context unavailable
@@ -648,10 +585,10 @@
     ` : '';
 
     const presetPillsHtml = !isHover ? `
-      <div class="rg-n3d-presets-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:6px;background:rgba(15,19,28,0.92);border:1px solid rgba(255,255,255,0.12);padding:4px 8px;border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+      <div class="rg-n3d-presets-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;max-width:95%;overflow-x:auto;display:flex;align-items:center;gap:6px;background:rgba(15,19,28,0.92);border:1px solid rgba(255,255,255,0.12);padding:4px 8px;border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.6);">
         ${Object.values(PRESET_SCENES).map((p) => `
-          <button type="button" class="rg-n3d-preset-pill ${state.preset === p.id ? 'is-active' : ''}" data-n3d-preset="${p.id}" style="padding:5px 12px;border-radius:14px;border:none;cursor:pointer;font-size:11px;font-weight:700;color:${state.preset === p.id ? '#ffffff' : '#94a3b8'};background:${state.preset === p.id ? '#6d28d9' : 'transparent'};transition:all 0.15s ease;">
-            ${p.label}
+          <button type="button" class="rg-n3d-preset-pill ${state.preset === p.id ? 'is-active' : ''}" data-n3d-preset="${p.id}" title="${p.label} — ${p.description}" style="white-space:nowrap;flex-shrink:0;padding:5px 12px;border-radius:14px;border:none;cursor:pointer;font-size:11px;font-weight:700;color:${state.preset === p.id ? '#ffffff' : '#94a3b8'};background:${state.preset === p.id ? '#6d28d9' : 'transparent'};transition:all 0.15s ease;">
+            ${({handshake:'01 Handshake',checkpoint:'02 Seated & Coach',team:'03 Red Trio',humanoid:'04 Mannequin',blue:'05 Blue & Coach'})[p.id]}
           </button>
         `).join('')}
       </div>
@@ -672,6 +609,8 @@
 
     ensureNative3DLoaded().then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
+      if (!viewport.isConnected || !state.nativeReady) return;
+      state.meshEditor = state.nativeMods.stageEditMod.mountStageEditor(viewport, canvas, state, () => renderNative3DCanvas(canvas, 0));
       renderNative3DCanvas(canvas, t);
     });
 
@@ -716,6 +655,7 @@
       let origX = 0, origY = 0, origRot = 0, origLift = 0;
 
       box.addEventListener('pointerdown', (e) => {
+        if (!isEditing() || state.editTool !== 'orbit') return;
         e.stopPropagation();
         hitBoxes.forEach((b) => {
           b.classList.remove('is-selected');
@@ -736,6 +676,7 @@
           window.RegaarderContextualToolbar.showForObject({
             contextType: 'template',
             objectKey: objId,
+            label: getActiveStageObjects().find(object=>object.id===objId)?.name || '3D Object',
             variant,
             anchorElement: box
           });
@@ -752,7 +693,8 @@
         startY = e.clientY;
         origX = off.x || 0;
         origY = off.y || 0;
-        origRot = typeof off.rot === 'number' ? off.rot : (objId === 'n3d_actor_primary' ? 90 : (objId === 'n3d_actor_secondary' ? -65 : 0));
+        origRot = off.yaw || 0;
+        /* legacy rotation */ const unusedRot = typeof off.rot === 'number' ? off.rot : (objId === 'n3d_actor_primary' ? 90 : (objId === 'n3d_actor_secondary' ? -65 : 0));
         origLift = off.lift || 0;
         try { box.setPointerCapture(e.pointerId); } catch (err) {}
       });
@@ -764,11 +706,11 @@
         const dy = ((e.clientY - startY) / Math.max(1, rect.height)) * 540;
         const off = state.actorOffsets[objId];
         if (off) {
-          if (objId === 'n3d_actor_primary' || objId === 'n3d_actor_secondary') {
+          if (objId.startsWith('n3d_actor_') && state.objectDragMode !== 'move') {
             // Turning the humanoid using the hand cursor in 3D mode:
             // Horizontal drag turns / rotates the character (yaw) in real-time
             const deltaYaw = dx * 0.75;
-            off.rot = Math.round((origRot + deltaYaw) * 10) / 10;
+            off.yaw = Math.round((origRot + deltaYaw) * 10) / 10;
             // Vertical drag repositions / shifts position
             off.y = Math.round(origY + dy * 0.5);
           } else if (objId === 'n3d_prop_hat') {
@@ -803,7 +745,7 @@
     let origYaw = state.cameraYaw || 18, origPitch = state.cameraPitch || 12;
 
     viewport.addEventListener('pointerdown', (e) => {
-      if (e.target.closest('[data-n3d-obj]')) return;
+      if (!isEditing() || state.editTool !== 'orbit' || e.target.closest('[data-n3d-obj], button')) return;
       isOrbiting = true;
       orbitStartX = e.clientX;
       orbitStartY = e.clientY;
@@ -838,6 +780,8 @@
 
   window.renderRegaarderNative3DStage = function (container, templateId, isHover) {
     if (!container) return;
+    state.meshEditor?.dispose();
+    state.meshEditor = null;
     container.innerHTML = buildNative3DStageHTML(templateId || TEMPLATE_ID, isHover);
     const canvas = container.querySelector('canvas');
     renderNative3DCanvas(canvas, 0.5);
@@ -848,6 +792,12 @@
 
   window.renderProjectedMannequinScene = renderProjectedMannequinScene;
   window.syncStateToNativeScene = syncStateToNativeScene;
+  window.ensureNative3DLoaded = ensureNative3DLoaded;
+  window.setRegaarderNative3DPreset = function (preset) {
+    if (!PRESET_SCENES[preset]) return;
+    state.preset = preset;
+    rebuildNativeSceneFromPreset();
+  };
 
   window.stepRegaarderNative3DAnimation = function (container, templateId, elapsedSec) {
     if (!container) return;
@@ -859,22 +809,23 @@
   window.applyRegaarderNative3DToolbarAction = function (actionType, objectKey, value) {
     if (!objectKey || !objectKey.startsWith('n3d_')) return false;
     const off = state.actorOffsets[objectKey] || (state.actorOffsets[objectKey] = { x: 0, y: 0, rot: 0, opacity: 1 });
-    if (actionType === 'color') {
+    if (actionType === 'select' || actionType === 'move') { state.editTool='orbit';state.objectDragMode=actionType==='move'?'move':'turn';
+    } else if(actionType === 'style') {off.roughness=value==='matte'?.9:value==='metal'?.2:.46;off.metalness=value==='metal'?.8:0;
+    } else if (actionType === 'color') {
       off.color = value;
+      off.colorEdited = true;
       if (objectKey === 'n3d_actor_primary') {
         state.shirtColor = value;
         state.trousersColor = value;
       } else if (objectKey === 'n3d_prop_hat') {
         state.hatColor = value;
-      } else if (objectKey === 'n3d_actor_secondary') {
-        state.keyLightColor = value;
       }
     } else if (actionType === 'opacity') {
       off.opacity = Math.max(0.1, Math.min(1, Number(value) / 100));
     } else if (actionType === 'rotate') {
       const rotStep = Number(value) || 25;
-      if (objectKey === 'n3d_actor_primary' || objectKey === 'n3d_actor_secondary') {
-        off.rot = ((off.rot || 0) + rotStep) % 360;
+      if (objectKey.startsWith('n3d_actor_')) {
+        off.yaw = ((off.yaw || 0) + rotStep) % 360;
       } else {
         state.cameraYaw = (state.cameraYaw + rotStep) % 360;
       }
@@ -930,14 +881,17 @@
   window.tplBuildRegaarderNative3DRegaarderPanes = function () {
     const contentHtml = `
       <div class="rg-inspector-section">
-        <div class="rg-section-header"><span class="rg-section-title">3D Mesh, Topology & Rigging Workshop</span></div>
+        <div class="rg-section-header"><span class="rg-section-title">Mesh & Skeleton</span></div>
         <div class="rg-section-body">
-          <button type="button" class="rg-btn-primary" data-action="open-3d-workshop" style="width:100%;padding:9px 12px;background:linear-gradient(135deg, #7c3aed, #4f46e5);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:11.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(124,58,237,0.35);">
-            <span>🛠️</span> Open 3D Mesh & Rigging Workshop
-          </button>
-          <div style="font-size:10px;color:#94a3b8;margin-top:6px;line-height:1.4;">
-            Launch the full native 3D viewport with wireframe topology, vertex sculpting brushes (Smooth, Grab, Inflate), and bone rigging.
-          </div>
+          <label class="rg-ctrl-label">Stage tool</label>
+          <select class="rg-select" data-n3d-prop="editTool">
+            ${Object.entries({orbit:'Hand · turn object / orbit background',select:'Select mesh region',grab:'Drag mesh region',inflate:'Sculpt · inflate',smooth:'Sculpt · smooth'}).map(([k,v])=>`<option value="${k}" ${state.editTool===k?'selected':''}>${v}</option>`).join('')}
+          </select>
+          <label><input type="checkbox" data-n3d-bool="showTopology" ${state.showTopology?'checked':''}> Topology & vertices</label>
+          <label><input type="checkbox" data-n3d-bool="showBones" ${state.showBones?'checked':''}> Skeleton</label>
+          <div class="rg-ctrl-row"><label class="rg-ctrl-label">Region radius</label><input type="range" min="0.015" max="0.2" step="0.005" value="${state.brushRadius}" data-n3d-num="brushRadius"></div>
+          <button class="rg-btn-secondary" data-n3d-action="undo-mesh">Undo mesh edit</button>
+          <p style="font-size:11px;color:#94a3b8">Drag on the body to edit. Use Hand to turn characters; drag the background to orbit. Shift-click adds a region.</p>
         </div>
       </div>
 
@@ -996,7 +950,13 @@
       </div>
     `;
 
+    const boneNames = state.nativeData?.joints || ['head','wrist.L','wrist.R','foot.L','foot.R'];
     const motionHtml = `
+      <div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Selected Actor · Bone Rotation</span></div><div class="rg-section-body">
+      <select class="rg-select" data-n3d-prop="selectedBone">${boneNames.map(k=>`<option ${k===state.selectedBone?'selected':''}>${k}</option>`).join('')}</select>
+      ${['X','Y','Z'].map((axis,i)=>`<div class="rg-ctrl-row"><label>${axis} rotation</label><input type="range" min="-90" max="90" value="0" data-n3d-bone-axis="${i}"></div>`).join('')}
+      </div></div>
+
       <div class="rg-inspector-section">
         <div class="rg-section-header"><span class="rg-section-title">Skeleton Rig, IK & Finger Contact</span></div>
         <div class="rg-section-body">
@@ -1182,6 +1142,20 @@
   window.wireRegaarderNative3DInspectorEvents = function (modalEl) {
     if (!modalEl) return;
 
+    modalEl.querySelector('[data-n3d-action="undo-mesh"]')?.addEventListener('click', () => state.meshEditor?.undo());
+    modalEl.querySelectorAll('[data-n3d-bone-axis]').forEach(input => input.addEventListener('input', () => {
+      const actors = state.nativeScene?.nodes.filter(n=>n.type==='humanoid') || [];
+      const node = actors.find((n,i)=>actorObjectId(n,i)===state.activeActor) || actors[0];
+      if (!node) return;
+      node.bones ||= {};
+      const bone = node.bones[state.selectedBone] ||= {rotation:[0,0,0]};
+      bone.rotation ||= [0,0,0];
+      bone.rotation[Number(input.dataset.n3dBoneAxis)] = Number(input.value);
+      if (node.boneTracks) delete node.boneTracks[state.selectedBone];
+      if (state.editScene) { const editNode = state.editScene.nodes.find(n=>n.id===node.id); editNode.bones[state.selectedBone] = structuredClone(bone); }
+      const stage = document.getElementById('tpl-modal-preview-stage');
+      window.stepRegaarderNative3DAnimation(stage, TEMPLATE_ID, 0);
+    }));
     const uvCanvas = modalEl.querySelector('[data-role="n3d-uv-canvas"]');
     if (uvCanvas) renderUVPreviewCanvas(uvCanvas);
 
@@ -1205,6 +1179,11 @@
       sel.addEventListener('change', () => {
         const k = sel.getAttribute('data-n3d-prop');
         state[k] = sel.value;
+        if(k==='pose'){
+          const actors=state.nativeScene?.nodes.filter(n=>n.type==='humanoid')||[];
+          const node=actors.find((n,i)=>actorObjectId(n,i)===state.activeActor)||actors[0];
+          if(node){node.pose=sel.value;delete node.tracks?.pose;state.editScene=null;}
+        }
         if (k === 'preset' && PRESET_SCENES[sel.value]) {
           state.backgroundHex = PRESET_SCENES[sel.value].background;
           state.shirtColor = PRESET_SCENES[sel.value].primaryColor;
@@ -1219,6 +1198,11 @@
         const k = inp.getAttribute('data-n3d-num');
         state[k] = parseFloat(inp.value);
         if (k === 'legLength') state.armLength = state[k];
+        if(k==='leanAngle'||k==='handCurl'){
+          const actors=state.nativeScene?.nodes.filter(n=>n.type==='humanoid')||[];
+          const node=actors.find((n,i)=>actorObjectId(n,i)===state.activeActor)||actors[0];
+          if(node){if(k==='leanAngle'){node.leanAngle=state[k];delete node.tracks?.leanAngle;}else{node.handPose={L:state[k],R:state[k]};node.handPoseTracks={};}state.editScene=null;}
+        }
         const valSpan = inp.parentElement?.querySelector('.rg-ctrl-val');
         if (valSpan) {
           if (k === 'multiresDisplayLevel') valSpan.textContent = `Level ${state[k]}`;
@@ -1250,6 +1234,7 @@
         if (state.nativeReady && state.nativeScene && state.nativeData) {
           try {
             const expMod = await import('../native3d-v97/export.js');
+            syncStateToNativeScene();
             const glb = await expMod.exportNativeGLB(state.nativeScene, state.nativeData);
             expMod.downloadGLB(glb);
           } catch (e) {

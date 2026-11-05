@@ -62,6 +62,35 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, 'public')));
+// Restored documentary assets are immutable source files from the user's original
+// repository. Keep the 550 MB media pack out of the editor's deployment bundle.
+// Local vendored media wins above; otherwise stream the pinned original asset.
+app.get(/^\/regaarder-documentary\/(.+)$/,  async (req, res) => {
+  const relative = req.params[0];
+  if (!relative || relative.split('/').some(part => part === '..' || part === '.') || !/^[a-zA-Z0-9_./%() +@-]+$/.test(relative)) return res.sendStatus(400);
+  const revision = 'dd0646757b042248d99b171166fc9e6dea5af1f8';
+  const url = 'https://raw.githubusercontent.com/Joshu2001/Regaarder-Motion/' + revision + '/dist/' + relative.split('/').map(encodeURIComponent).join('/');
+  try {
+    const headers = req.headers.range ? { Range: req.headers.range } : {};
+    const upstream = await fetch(url, { headers, signal: AbortSignal.timeout(30000) });
+    if (!upstream.ok) return res.sendStatus(upstream.status);
+    res.status(upstream.status);
+    for (const name of ['content-type', 'content-length', 'content-range', 'accept-ranges']) {
+      const value = upstream.headers.get(name); if (value) res.setHeader(name, value);
+    }
+    res.type(path.extname(relative));
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    const { Readable } = require('node:stream');
+    const stream = Readable.fromWeb(upstream.body);
+    res.on('close', () => stream.destroy());
+    stream.on('error', () => res.destroy());
+    stream.pipe(res);
+  } catch (error) {
+    console.error('Documentary asset unavailable:', relative, error.message);
+    if (!res.headersSent) res.sendStatus(502); else res.destroy();
+  }
+});
+
 app.use('/media/uploads', express.static(uploadsDir));
 app.use('/media/uploads/proxies', express.static(proxiesDir));
 if (fs.existsSync(userDownloads)) {

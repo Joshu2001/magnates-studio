@@ -4883,6 +4883,7 @@
       const domEl = meta.domSelector ? document.querySelector(meta.domSelector) : null;
 
       if (cmd === 'select' || cmd === 'move') {
+        if(String(state.objectKey||'').startsWith('n3d_')) window.applyRegaarderNative3DToolbarAction?.(cmd,state.objectKey);
         state.activeTool = cmd;
         state.confirmMode = null;
         renderToolbar();
@@ -5074,7 +5075,8 @@
     };
 
     const renderToolbar = () => {
-      const schema = TOOLBAR_VARIANT_SCHEMAS[state.variant] || TOOLBAR_VARIANT_SCHEMAS.media;
+      const isNative3D=String(state.objectKey||'').startsWith('n3d_');
+      const schema = isNative3D ? {...TOOLBAR_VARIANT_SCHEMAS.object3d,primaryTools:['select','move','rotate'],quickProps:['color','style']} : (TOOLBAR_VARIANT_SCHEMAS[state.variant] || TOOLBAR_VARIANT_SCHEMAS.media);
       const meta = HUMAN_OBJECT_CATALOG[state.objectKey] || HUMAN_OBJECT_CATALOG.card;
       const availableObjects = getAvailableSceneObjects();
       const activeQuickStyle = (getBpParams && getBpParams().printerCardQuickStyle) || 'clean';
@@ -5111,12 +5113,12 @@
           <span style="font-size: 11px; font-weight: 700; color: #E9D5FF;">${state.selectionStyle === 'lasso' ? '⚬ Lasso' : '⬚ Box'}</span>
         </button>
         <div class="rg-ctx-identity-wrap">
-          <button type="button" class="rg-ctx-prop-btn" data-ctx-popover-trigger="color" title="Object Accent & Glow Color">
+          <button type="button" class="rg-ctx-prop-btn" data-ctx-popover-trigger="color" title="${isNative3D ? 'Surface Color' : 'Object Accent & Glow Color'}">
             <span class="rg-ctx-color-dot" data-role="ctx-color-dot" style="background:${state.colorHex};"></span>
             <span>Color</span>
           </button>
           <div class="rg-ctx-popover" data-ctx-popover="color">
-            <div class="rg-ctx-popover-header">Object Accent & Glow</div>
+            <div class="rg-ctx-popover-header">${isNative3D ? 'Surface Color' : 'Object Accent & Glow'}</div>
             <div class="rg-ctx-swatch-grid">
               ${['#9B6BFF', '#823CF0', '#38bdf8', '#f97316', '#22c55e', '#ffffff'].map((hex) => `
                 <button type="button" class="rg-ctx-swatch-btn ${state.colorHex.toLowerCase() === hex.toLowerCase() ? 'is-active' : ''}" style="background:${hex};" data-ctx-swatch="${hex}" title="${hex}"></button>
@@ -5131,12 +5133,12 @@
           </button>
           <div class="rg-ctx-popover is-right" data-ctx-popover="style">
             <div class="rg-ctx-popover-header">Quick Style Preset</div>
-            ${[
+            ${(isNative3D ? [{id:'clean',label:'Smooth Surface'},{id:'matte',label:'Matte Surface'},{id:'metal',label:'Metallic Surface'}] : [
               { id: 'clean', label: 'Clean Surface' },
               { id: 'glass', label: 'Frosted Glass' },
               { id: 'glow', label: 'Purple Rim Glow' },
               { id: 'outline', label: 'Crisp Outline' }
-            ].map((st) => `
+            ]).map((st) => `
               <button type="button" class="rg-ctx-menu-item ${activeQuickStyle === st.id ? 'is-selected' : ''}" data-ctx-quick-style="${st.id}">
                 <span class="rg-ctx-menu-item-left">
                   ${LUCIDE_ICONS.effectsTab}
@@ -5285,6 +5287,10 @@
         ${confirmGroupHtml}
       `;
 
+      if(isNative3D){
+        toolbarEl.querySelector('[data-ctx-popover-trigger="more"]')?.setAttribute('hidden','');
+        toolbarEl.querySelector('[data-ctx-toggle-box-style]')?.setAttribute('hidden','');
+      }
       // Bind popover toggles
       toolbarEl.querySelectorAll('[data-ctx-popover-trigger]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
@@ -5358,6 +5364,7 @@
           e.stopPropagation();
           const presetId = item.getAttribute('data-ctx-quick-style');
           if (presetId) {
+            if(String(state.objectKey||'').startsWith('n3d_')){window.applyRegaarderNative3DToolbarAction?.('style',state.objectKey,presetId);closeAllPopovers();return;}
             const inspStyleBtn = document.querySelector(`.rg-style-card[data-style-preset="${presetId}"]`);
             if (inspStyleBtn) {
               inspStyleBtn.click();
