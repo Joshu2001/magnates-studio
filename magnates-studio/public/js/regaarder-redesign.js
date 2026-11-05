@@ -5712,11 +5712,9 @@
       const wrappedOpen = function () {
         restoreDistributedNodes();
         const res = origOpen.apply(this, arguments);
-        setTimeout(() => {
-          organizeUniversalTemplateControls();
-          bindStealthRedScrollbars();
-          bindUniversalContextualToolbarHooks();
-        }, 15);
+        organizeUniversalTemplateControls();
+        bindStealthRedScrollbars();
+        bindUniversalContextualToolbarHooks();
         return res;
       };
       wrappedOpen._rgWrapped = true;
@@ -5729,11 +5727,9 @@
       const wrappedRender = function () {
         restoreDistributedNodes();
         const res = origRender.apply(this, arguments);
-        setTimeout(() => {
-          organizeUniversalTemplateControls();
-          bindStealthRedScrollbars();
-          bindUniversalContextualToolbarHooks();
-        }, 20);
+        organizeUniversalTemplateControls();
+        bindStealthRedScrollbars();
+        bindUniversalContextualToolbarHooks();
         return res;
       };
       wrappedRender._rgWrapped = true;

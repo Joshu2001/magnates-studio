@@ -12,11 +12,15 @@
   ],
   "routes": [
     {
-      "src": "/regaarder-documentary(?:-v2)?/index.html",
+      "src": "/regaarder-documentary(?:-v[23])?/index.html",
       "dest": "/public/regaarder-documentary/index.html"
     },
     {
-      "src": "/regaarder-documentary(?:-v2)?/(.*)",
+      "src": "/regaarder-documentary(?:-v[23])?/(runtime-part[0-9]+\\.js)",
+      "dest": "/public/regaarder-documentary/$1"
+    },
+    {
+      "src": "/regaarder-documentary(?:-v[23])?/(.*)",
       "dest": "/server.js"
     },
     {

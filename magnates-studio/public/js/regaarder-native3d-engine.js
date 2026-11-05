@@ -157,7 +157,7 @@
 
   let nativeLoadPromise = null;
   async function ensureNative3DLoaded() {
-    if (state.nativeReady) return;
+    if (state.nativeReady || state.nativeError) return;
     if (nativeLoadPromise && state.nativeLoading) return nativeLoadPromise;
     if (typeof window === 'undefined' || (navigator && navigator.userAgent && navigator.userAgent.includes('jsdom'))) return;
     state.nativeLoading = true;
@@ -830,7 +830,7 @@
 
   window.stepRegaarderNative3DAnimation = function (container, templateId, elapsedSec) {
     if (!container) return;
-    const canvas = container.querySelector('canvas');
+    const canvas = container.querySelector(`[data-template-id="${templateId || TEMPLATE_ID}"] canvas`);
     if (!canvas) return;
     renderNative3DCanvas(canvas, elapsedSec);
   };

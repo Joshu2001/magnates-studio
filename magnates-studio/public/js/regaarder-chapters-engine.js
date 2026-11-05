@@ -369,8 +369,7 @@
             ensureChapterModuleLoaded('regaarder-pele-pact-chapter'),
             ensureChapterModuleLoaded('regaarder-minute16-chapter'),
             ensureChapterModuleLoaded('regaarder-minute17-chapter'),
-            ensureChapterModuleLoaded('regaarder-final-chapter'),
-            (typeof window.ensureNative3DLoaded === 'function' ? window.ensureNative3DLoaded() : Promise.resolve())
+            ensureChapterModuleLoaded('regaarder-final-chapter')
           ]).catch(() => {});
         }, 150);
 
@@ -455,7 +454,7 @@
             rt.media[id] = im;
             return (im.decode ? im.decode() : Promise.resolve()).catch(() => {}).then(() => {
               const stage = document.getElementById('tpl-modal-preview-stage');
-              if (stage) {
+              if (stage?.querySelector(`[data-template-id="${templateId}"]`)) {
                 const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
                 window.stepRegaarderChapterAnimation(stage, templateId, t);
               }
@@ -508,23 +507,23 @@
     if (sourceRuntime.loading) return sourceRuntime.loading;
     sourceRuntime.loading = (async () => {
       const [legacy,promo,promoMedia] = await Promise.all([
-        import('../regaarder-documentary-v2/legacy-sequence.js'),
-        import('../regaarder-documentary-v2/promo-sequence.js'),
-        import('../regaarder-documentary-v2/promo-media.js')
+        import('../regaarder-documentary-v3/legacy-sequence.js'),
+        import('../regaarder-documentary-v3/promo-sequence.js'),
+        import('../regaarder-documentary-v3/promo-media.js')
       ]);
       const image = async url => { const im=new Image(); im.src=url; await im.decode(); return im; };
-      const redraw = () => { const cv=document.querySelector('#tpl-modal-preview-stage canvas'); if(cv) paintChapterFrame(cv,'regaarder-full-documentary',window.topCustomizerState?.currentTime || 0); };
+      const redraw = () => { const cv=document.querySelector('#tpl-modal-preview-stage [data-template-id="regaarder-full-documentary"] canvas'); if(cv) paintChapterFrame(cv,'regaarder-full-documentary',window.topCustomizerState?.currentTime || 0); };
       const video = url => {
         const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';v.src=url;
         v.addEventListener('seeked',redraw);v.addEventListener('loadeddata',redraw);return v;
       };
       const media=await legacy.preloadLegacy({
-        manifest:async()=>{const r=await fetch('/regaarder-documentary-v2/legacy-manifest.json');return r.json();},
-        image:file=>image('/regaarder-documentary-v2/assets/legacy128/'+file)
+        manifest:async()=>{const r=await fetch('/regaarder-documentary-v3/legacy-manifest.json');return r.json();},
+        image:file=>image('/regaarder-documentary-v3/assets/legacy128/'+file)
       });
       sourceRuntime.legacyMedia=Object.fromEntries(media);
-      sourceRuntime.legacyMedia.archive=video('/regaarder-documentary-v2/assets/legacy128/archive-reference-excerpt.mp4');
-      sourceRuntime.promoMedia=Object.fromEntries(await Promise.all(Object.entries(promo.sources).map(async([id,file])=>[id,['host','flame'].includes(id)?video('/regaarder-documentary-v2/assets/promo129/'+file):await image('/regaarder-documentary-v2/assets/promo129/'+file)])));
+      sourceRuntime.legacyMedia.archive=video('/regaarder-documentary-v3/assets/legacy128/archive-reference-excerpt.mp4');
+      sourceRuntime.promoMedia=Object.fromEntries(await Promise.all(Object.entries(promo.sources).map(async([id,file])=>[id,['host','flame'].includes(id)?video('/regaarder-documentary-v3/assets/promo129/'+file):await image('/regaarder-documentary-v3/assets/promo129/'+file)])));
       Object.assign(sourceRuntime,{legacy,promo,promoSync:promoMedia.syncPromo,ready:true});redraw();
     })().catch(err=>{console.error('[Documentary source]',err);sourceRuntime.loading=null;});
     return sourceRuntime.loading;
@@ -676,7 +675,7 @@
     return `
       <div id="regaarder-chapter-viewport-${suffix}" class="rg-chapter-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#04060a;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
         <canvas id="regaarder-chapter-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
-        ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary-v2/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
+        ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary-v3/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
         ${interactiveOverlayHtml}
       </div>
     `;
@@ -689,7 +688,7 @@
 
     ensureChapterModuleLoaded(templateId).then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
-      paintChapterFrame(canvas, templateId, t);
+      if (canvas?.isConnected && viewport.dataset.templateId === templateId) paintChapterFrame(canvas, templateId, t);
     });
 
     // Interactive object hit boxes -> Universal Contextual Toolbar + Drag
@@ -783,7 +782,8 @@
 
   window.stepRegaarderChapterAnimation = function (container, templateId, elapsedSec) {
     if (!container) return;
-    const canvas = container.querySelector('canvas');
+    const viewport = container.querySelector(`[data-template-id="${templateId}"]`);
+    const canvas = viewport?.querySelector('canvas');
     if (!canvas) return;
     paintChapterFrame(canvas, templateId, elapsedSec);
     syncChapterHitOverlay(container, templateId, elapsedSec);
