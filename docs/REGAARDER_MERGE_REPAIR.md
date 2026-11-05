@@ -56,3 +56,13 @@ The live browser exposed three additional failures after the initial merge:
 Native loading now shares its in-flight promise so hover loading and opening the editor cannot race past mesh-editor setup. Renderer errors produce an explicit load state rather than flat cartoon figures. Preset edit views preserve sampled source transforms, proportions, camera framing and lighting defaults instead of resetting the camera or replacing tracked pose positions with base positions.
 
 Regression checks reproduce the truncated-response headers, verify static delivery for browser dependencies, and confirm that the playback stage leaves its closed dialog. Browser verification for this follow-up is recorded in its PR.
+
+## Cross-template repaint and startup repair
+
+Background final-chapter image callbacks and legacy/promo video events used the first open canvas. After switching to Native 3D they could paint documentary title frames over the native loading screen. All chapter animation steps and asynchronous repaints now require their own template viewport.
+
+The original repository reused six early runtime filenames for later chapters. Early directors failed module linking (chapterCutout, chapterSequenceStages and related exports). The documentary proxy now selects the archived v70-refinement versions for those six files. A fresh v3 URL namespace avoids cached incompatible resources. All 103 reachable early runtime modules linked successfully with these mappings.
+
+The 45 sequential classic script downloads are packaged, in original order, into four statically served runtime parts. The inspector is organized synchronously when opening or switching templates. Opening the master no longer creates an unused native WebGL renderer in the background. Humanoid asset fetches time out with an explicit error instead of waiting indefinitely; renderer failure is retained rather than retried on every render.
+
+Validation: regression suite passes, including cross-template repaint isolation and archived-source URL selection; runtime bundles pass syntax checks. Live visual verification remains required; this automation browser reports WebGL disabled.

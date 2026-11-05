@@ -65,11 +65,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Restored documentary assets are immutable source files from the user's original
 // repository. Keep the 550 MB media pack out of the editor's deployment bundle.
 // Local vendored media wins above; otherwise stream the pinned original asset.
-app.get(/^\/regaarder-documentary(?:-v2)?\/(.+)$/,  async (req, res) => {
+app.get(/^\/regaarder-documentary(?:-v[23])?\/(.+)$/,  async (req, res) => {
   const relative = req.params[0];
   if (!relative || relative.split('/').some(part => part === '..' || part === '.') || !/^[a-zA-Z0-9_./%() +@-]+$/.test(relative)) return res.sendStatus(400);
   const revision = 'dd0646757b042248d99b171166fc9e6dea5af1f8';
-  const url = 'https://raw.githubusercontent.com/Joshu2001/Regaarder-Motion/' + revision + '/dist/' + relative.split('/').map(encodeURIComponent).join('/');
+  // The source repo reused these filenames for later chapters. Early directors
+  // require the archived implementations and their original named exports.
+  const earlyModules = new Set(['chapter-sequence.js', 'city-engine.js', 'depot-finale.js', 'grounded-walk.js', 'sequence-expansion.js', 'animation-library-director.js']);
+  const sourcePath = earlyModules.has(relative) ? 'assets/archive/v70-refinement/' + relative : relative;
+  const url = 'https://raw.githubusercontent.com/Joshu2001/Regaarder-Motion/' + revision + '/dist/' + sourcePath.split('/').map(encodeURIComponent).join('/');
   try {
     const headers = { 'Accept-Encoding': 'identity', ...(req.headers.range ? { Range: req.headers.range } : {}) };
     const upstream = await fetch(url, { headers, signal: AbortSignal.timeout(30000) });

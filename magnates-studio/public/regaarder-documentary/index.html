@@ -25,65 +25,65 @@ function setSpeed(v){speed=+v;revealSeconds=10-speed*.08;settings.duration=8+rev
 function openEditor(){if(!editor.open)editor.showModal();document.querySelector('#editName').textContent=variants[selected][0];playing=true;document.querySelector('#play').textContent='Ⅱ'}document.querySelector('#openEditor').onclick=()=>{t=0;openEditor()};document.querySelectorAll('.card').forEach(c=>c.addEventListener('click',openEditor));document.querySelector('#watchTear').onclick=()=>{t=7.5/settings.duration;playing=true;document.querySelector('#play').textContent='Ⅱ'};document.querySelector('#closeEditor').onclick=()=>editor.close();editor.addEventListener('close',()=>{playing=false;document.querySelector('#play').textContent='▶'});editor.addEventListener('click',e=>{if(e.target===editor)editor.close()});document.querySelector('#replacePicture').onclick=()=>document.querySelector('#nextPicture').click();document.querySelector('#nextPicture').onchange=e=>{const file=e.target.files[0];if(!file)return;if(uploadUrl)URL.revokeObjectURL(uploadUrl);uploadUrl=URL.createObjectURL(file);revealImage.src=uploadUrl;revealImage.onload=()=>{t=8/settings.duration;playing=true}};document.querySelector('#reset').addEventListener('click',()=>{document.querySelector('#spreadSpeed').value=55;setSpeed(55)});Object.keys(defaults).forEach(k=>document.querySelector('#'+k).addEventListener('input',()=>setSpeed(speed)));document.querySelectorAll('.card').forEach(c=>frame(c.querySelector('.scene'),.83));
 </script><style>
 .effectStages{display:flex;gap:3px;padding:10px;background:#18191c;border-bottom:1px solid #2c2e34;overflow:auto}.effectStages button{flex:1;min-width:65px;border:1px solid transparent;background:none;border-radius:5px;padding:9px 5px;font-size:11px;color:#858894}.effectStages button span{font-size:8px;display:block;margin-bottom:5px;color:#616571}.effectStages button.active{background:#30283e;border-color:#615276;color:#e4d7fa}.effectStages button.playing span{color:#c6a8ff}.effectField label{display:flex;justify-content:space-between;gap:12px;margin:22px 0 12px}.effectField input{width:100%;accent-color:#c0a6ef}.effectField output{font-size:11px;color:#baa0e3}.fineTune{margin-top:25px!important}.resetAll{width:100%;margin-top:24px;font-size:11px;color:#8b8f99}.continuation{pointer-events:none}.overlay .inspector{max-height:75vh}.overlay .workspace{grid-template-columns:minmax(0,1fr) 295px}.overlay{width:min(1460px,97vw);max-width:97vw}.scene .caption{display:none}input[type=range]{cursor:pointer} @media(max-width:950px){.overlay .workspace{grid-template-columns:1fr}.overlay .inspector{max-height:none}.effectStages button{padding:9px 3px}}
-</style><script src="soft-media-blur.js?v=motion-v70"></script><script src="flame-engine.js?v=motion-v70"></script><script src="continuation.js?v=motion-v70"></script><script src="epilogue.js?v=motion-v70"></script><script src="chess.js?v=motion-v70"></script><script src="chess-director.js?v=motion-v70"></script><script src="surface-reveal.js?v=motion-v70"></script><script src="city.js?v=motion-v70"></script><script src="noir.js?v=motion-v70"></script><script src="asset-workbench.js?v=motion-v70"></script></html>
+</style><script src="runtime-part1.js"></script><script src="runtime-part2.js"></script><script src="runtime-part3.js"></script><script src="runtime-part4.js"></script></html>
 <style>.blurSurface{position:absolute;inset:0;z-index:20;pointer-events:none;touch-action:none;cursor:crosshair}.effectStages button{min-width:48px}.effectStages{padding:7px}.effectStages button span{font-size:8px}.overlay .workspace{grid-template-columns:minmax(0,1fr) 295px}@media(max-width:950px){.overlay .workspace{grid-template-columns:1fr}}</style>
 <style>.fireHandles{position:absolute;inset:0;z-index:30;pointer-events:none}.fireHandle{position:absolute;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;border:1px solid #ffe5be;background:#28190dbb;color:#fff2dd;pointer-events:auto;touch-action:none;cursor:grab;font-size:20px}.fireHandle.selected{outline:2px solid #d2b9ff;outline-offset:3px}.fireLayersPanel{border-top:1px solid #353039;margin-top:20px;padding-top:2px}.fireLayersPanel input{width:100%;accent-color:#c7adf3}.effectStages button{min-width:44px;padding-left:2px;padding-right:2px}.effectStages{gap:1px}.effectStages button span{font-size:7px}.effectStages button{font-size:10px}</style>
-<script src="composition-core.js?v=motion-v92"></script>
 
-<script src="story-context.js?v=motion-v70"></script>
 
-<script src="battle.js?v=motion-v70"></script>
 
-<script src="media-tools.js?v=motion-v70"></script>
-<script src="asset-selection.js?v=motion-v70"></script>
 
-<script src="depot.js?v=motion-v70"></script>
 
-<script src="player-controls.js?v=layout-v34"></script>
-<script src="depot-director.js?v=motion-v70"></script>
 
-<script src="chapter-director.js?v=motion-v70"></script>
+
+
+
+
+
+
+
+
+
 
 <style>.logos .adidas,.logos .puma{width:34%;display:flex;align-items:center;flex-direction:column;gap:18px}.logos .openingBars{width:62%;height:auto}.logos .openingWord{width:90%;height:auto}.logos .puma>img{width:100%;height:auto;filter:brightness(0) invert(1)}</style>
 
-<script src="nursery-director.js?v=motion-v70"></script>
 
-<script src="village-director.js?v=motion-v70"></script>
 
-<script src="precision-director.js?v=motion-v70"></script>
-<script src="layer-director.js?v=motion-v70"></script>
 
-<script src="shared-effects-director.js?v=motion-v70"></script>
 
-<script src="easy-director.js?v=motion-v70"></script>
 
-<script src="history-director.js?v=motion-v70"></script>
 
-<script src="eye-director.js?v=motion-v70"></script>
 
-<script src="model-studio-director.js?v=motion-v70"></script>
-<script src="walk-studio-director.js?v=motion-v70"></script>
-<script src="animation-library-director.js?v=motion-v92"></script>
 
-<script src="globe-director.js?v=motion-v70"></script>
 
-<script src="refinement-director.js?v=motion-v71"></script>
 
-<script src="continuation-director.js?v=motion-v72"></script>
-<script src="olympic-director.js?v=motion-v73"></script>
-<script src="betrayal-director.js?v=motion-v79"></script>
-<script src="wartime-director.js?v=motion-v79"></script>
-<script src="shelter-director.js?v=motion-v81"></script>
-<script src="trial-director.js?v=motion-v82"></script>
-<script src="feud-director.js?v=motion-v83"></script>
-<script src="division-director.js?v=motion-v84"></script>
-<script src="communities-director.js?v=motion-v85"></script>
-<script src="opportunity-director.js?v=motion-v86"></script>
-<script src="checkpoint-director.js?v=motion-v92"></script>
 
-<script src="native3d-director-v97.js?v=motion-v108"></script>
 
-<script src="final-director-v97.js?v=motion-v108"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <script>
