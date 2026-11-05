@@ -671,7 +671,7 @@
         ${currentObjects.map((obj) => `
           <div class="rg-n3d-hit-box"
                data-n3d-obj="${obj.id}"
-               data-n3d-variant="${obj.variant}"
+               data-n3d-variant="object3d"
                title="${obj.name} (Drag with Hand Cursor to Turn / Move in 3D)"
                style="position:absolute;left:${obj.x}%;top:${obj.y}%;width:${obj.w}%;height:${obj.h}%;transform:translate(-50%,-50%);border:1.5px dashed transparent;border-radius:10px;cursor:grab;transition:border-color 0.15s ease, background 0.15s ease;">
           </div>
@@ -893,7 +893,7 @@
   async function openIntegratedMeshEditor(viewport) {
     if (state.inlineEditor) return;
     state.inlineEditor = { loading: true };
-    let host, api;
+    let host, api, onEscape;
     try {
       await ensureNative3DLoaded();
       if (!state.nativeReady || !state.nativeData || !state.nativeScene) {
@@ -926,7 +926,7 @@
           if (canvas) renderNative3DCanvas(canvas, state.sceneTime);
         }
       };
-      const onEscape = (event) => {
+      onEscape = (event) => {
         if (event.key === 'Escape' && !event.target.closest('input,textarea,select')) {
           event.preventDefault();
           close();
@@ -955,6 +955,16 @@
         }
       });
       state.inlineEditor = { host, api, close };
+      // Match the selected character in the 2D stage to its actual Three.js rig.
+      const actorIds = {
+        checkpoint: { n3d_actor_crimson: 'red', n3d_actor_coach: 'coach' },
+        handshake: { n3d_actor_primary: 'final-blue', n3d_actor_secondary: 'final-coach' },
+        team: { n3d_actor_p1: 'final-player-0', n3d_actor_primary: 'final-player-1', n3d_actor_secondary: 'final-player-2' },
+        humanoid: { n3d_actor_primary: 'humanoid' },
+        blue: { n3d_actor_primary: 'blue', n3d_actor_secondary: 'coach' }
+      };
+      const selectedId = actorIds[state.preset]?.[state.activeActor];
+      if (selectedId && state.nativeScene.nodes.some((n) => n.id === selectedId)) api.select(selectedId);
       host.querySelector('.n3-top strong')?.replaceChildren(document.createTextNode('Regaarder Motion · Editable 3D Mesh & Rig'));
       // Video playback belongs to Video mode. Native bone/sculpt controls remain interactive.
       const timeline = host.querySelector('.n3-timeline');
@@ -963,6 +973,7 @@
     } catch (err) {
       if (api) api.dispose();
       host?.remove();
+      if (onEscape) window.removeEventListener('keydown', onEscape, true);
       state.inlineEditor = null;
       console.error('[RegaarderNative3D] Mesh editor integration failed:', err);
       if (viewport) {
