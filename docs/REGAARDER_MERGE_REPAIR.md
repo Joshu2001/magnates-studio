@@ -43,3 +43,16 @@ To avoid duplicating roughly 550 MB of source media in this editor repository/de
 All changed JavaScript passes syntax checks and `git diff --check`.
 
 Browser/WebGL verification is outstanding: this workspace had no browser binary, its download failed, and the cloud browser could not open the local preview. In particular, verify ray picking and dragging at different aspect ratios, topology/skeleton alignment, repeated preset/mode switching, the source frame's readiness, and video scrubbing/loading after deployment. This patch should remain a draft until those visual checks pass. No live deployment is part of this repair.
+
+
+## Live renderer delivery follow-up
+
+The live browser exposed three additional failures after the initial merge:
+
+- `/native3d-v97/engine.js`, `stage-editor.js` and `vendor/three.module.js` were being transformed to CommonJS by the Node build (`exports`/`require`), which cannot execute as browser ES modules. The deployment now emits public resources through `@vercel/static`, resolving existing static files before the server fallback.
+- The original-resource proxy forwarded an upstream compressed `Content-Length` while `fetch()` delivered decoded bytes. Browsers consequently parsed truncated scripts. The proxy now requests identity encoding and lets HTTP frame the actual body. Namespace `regaarder-documentary-v2` avoids old immutable cached failures.
+- The original playback stage remained inside a closed dialog. Its exact DOM node now moves to the document's visible playback root. Editor chrome is hidden before blocking scripts execute, preventing the page flash.
+
+Native loading now shares its in-flight promise so hover loading and opening the editor cannot race past mesh-editor setup. Renderer errors produce an explicit load state rather than flat cartoon figures. Preset edit views preserve sampled source transforms, proportions, camera framing and lighting defaults instead of resetting the camera or replacing tracked pose positions with base positions.
+
+Regression checks reproduce the truncated-response headers, verify static delivery for browser dependencies, and confirm that the playback stage leaves its closed dialog. Browser verification for this follow-up is recorded in its PR.
