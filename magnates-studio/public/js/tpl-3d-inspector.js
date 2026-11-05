@@ -2989,6 +2989,12 @@ function collectVideoNodes(stage, tplId) {
     const timerBadge = document.getElementById('tpl-modal-timer-badge');
 
     const isTheater = (typeof stageTheaterActive !== 'undefined' && !!stageTheaterActive) || !!is3D;
+    // Propagate the mode to every stage ancestor; the playback hover HUD
+    // is dynamically injected and must be suppressed by CSS as well.
+    const stageRoot = document.getElementById('tpl-modal-preview-stage');
+    for (const el of [box, stageCont, stageRoot]) {
+      if (el) el.classList.toggle('is-3d-stage', !!is3D);
+    }
 
     if (isTheater) {
       if (sb) sb.style.display = 'none';
@@ -3061,7 +3067,11 @@ function collectVideoNodes(stage, tplId) {
       stageTheaterActive = true;
       updateTheaterButtonUI();
     }
-    applyModeLayout(isDom3DActive);
+    // A native Regaarder 3D template may not belong to the legacy
+    // SPATIAL_3D_CATEGORY_IDS registry. Never turn its playback HUD back on
+    // immediately after app.js has switched the preview into 3D edit mode.
+    const isCustom3D = (typeof topCustomizerState !== 'undefined' && !!topCustomizerState.is3DMode);
+    applyModeLayout(isDom3DActive || isCustom3D);
     if (k === 'dom3d') attachDom3DInteractiveRig(stage, tplId);
     const before = Object.keys(videoNodes[tplId] || {}).length;
     collectVideoNodes(stage, tplId);
