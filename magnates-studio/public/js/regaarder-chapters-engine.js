@@ -349,7 +349,7 @@
         const loadedMap = await mod.preloadPele({
           manifest: async () => {
             try {
-              const r = await fetch('pele-manifest.json');
+              const r = await fetch('/js/regaarder-chapters/pele-manifest.json');
               return r.ok ? await r.json() : { assets: [] };
             } catch (e) { return { assets: [] }; }
           },
@@ -377,7 +377,7 @@
         const loadedMap = await mod.preloadMinute17({
           manifest: async () => {
             try {
-              const r = await fetch('minute17-manifest.json');
+              const r = await fetch('/js/regaarder-chapters/minute17-manifest.json');
               return r.ok ? await r.json() : { assets: [] };
             } catch (e) { return { assets: [] }; }
           },
@@ -513,6 +513,7 @@
       }
     }
     if (t < 960) {
+      if(typeof window.renderOriginsSlowRevealFrame==='function'){window.renderOriginsSlowRevealFrame(ctx.canvas,4+(t%6),window.REGAARDER_ORIGINS_CONFIG||{});return;}
       clearSourceFrame(ctx);return;
     } else if (t >= 960 && t < 1020) {
       const rtM16 = chapterRuntime['regaarder-minute16-chapter'];
@@ -741,6 +742,7 @@
 
   window.renderRegaarderChapterStage = function (container, templateId, isHover) {
     if (!container) return;
+    if(!isHover&&container.querySelector(`[data-template-id="${templateId}"]`)){window.stepRegaarderChapterAnimation(container,templateId,window.topCustomizerState?.currentTime||0);return;}
     container.innerHTML = buildChapterStageHTML(templateId, isHover);
     const canvas = container.querySelector('canvas');
     paintChapterFrame(canvas, templateId, 0.5);
