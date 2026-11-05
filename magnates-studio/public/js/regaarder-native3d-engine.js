@@ -157,31 +157,38 @@
   const STAGE_OBJECTS = getActiveStageObjects('blue');
 
   async function ensureNative3DLoaded() {
-    if (state.nativeReady || state.nativeLoading) return;
-    if (typeof window === 'undefined' || (navigator && navigator.userAgent && navigator.userAgent.includes('jsdom'))) return;
+    if (state.nativeReady) return state.nativeEngine;
+    if (state.nativeLoading) return state.nativeLoadPromise;
+    if (typeof window === 'undefined' || (typeof navigator !== 'undefined' && navigator.userAgent?.includes('jsdom'))) return null;
     state.nativeLoading = true;
-    try {
-      const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod] = await Promise.all([
-        import('/native3d-v97/engine.js'),
-        import('/native3d-v97/scene.js'),
-        import('/native3d-v97/final-scenes.js'),
-        import('/native3d-v97/checkpoint.js'),
-        import('/native3d-v97/surface-ui.js')
-      ]);
-      const data = await engineMod.loadHumanoid();
-      state.nativeData = data;
-      state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod };
-      const offscreen = document.createElement('canvas');
-      offscreen.width = 960;
-      offscreen.height = 540;
-      state.nativeEngine = new engineMod.Native3DEngine(offscreen, data, { width: 960, height: 540, cacheWorlds: false });
-      rebuildNativeSceneFromPreset();
-      state.nativeReady = true;
-    } catch (err) {
-      console.warn('[RegaarderNative3D] Using deterministic 2.5D/3D software projection:', err.message);
-    } finally {
-      state.nativeLoading = false;
-    }
+    state.nativeLoadPromise = (async () => {
+      try {
+        const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod] = await Promise.all([
+          import('/native3d-v97/engine.js'),
+          import('/native3d-v97/scene.js'),
+          import('/native3d-v97/final-scenes.js'),
+          import('/native3d-v97/checkpoint.js'),
+          import('/native3d-v97/surface-ui.js')
+        ]);
+        const data = await engineMod.loadHumanoid();
+        state.nativeData = data;
+        state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod };
+        const offscreen = document.createElement('canvas');
+        offscreen.width = 960;
+        offscreen.height = 540;
+        state.nativeEngine = new engineMod.Native3DEngine(offscreen, data, { width: 960, height: 540, cacheWorlds: false });
+        rebuildNativeSceneFromPreset();
+        state.nativeReady = true;
+        return state.nativeEngine;
+      } catch (err) {
+        console.warn('[RegaarderNative3D] Native WebGL loading failed:', err);
+        return null;
+      } finally {
+        state.nativeLoading = false;
+        state.nativeLoadPromise = null;
+      }
+    })();
+    return state.nativeLoadPromise;
   }
 
   function rebuildNativeSceneFromPreset() {
