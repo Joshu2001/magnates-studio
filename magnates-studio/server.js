@@ -65,7 +65,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Restored documentary assets are immutable source files from the user's original
 // repository. Keep the 550 MB media pack out of the editor's deployment bundle.
 // Local vendored media wins above; otherwise stream the pinned original asset.
-app.get(/^\/regaarder-documentary(?:-v[23])?\/(.+)$/,  async (req, res) => {
+app.get(/^\/regaarder-documentary(?:-v[234])?\/(.+)$/,  async (req, res) => {
   const relative = req.params[0];
   if (!relative || relative.split('/').some(part => part === '..' || part === '.') || !/^[a-zA-Z0-9_./%() +@-]+$/.test(relative)) return res.sendStatus(400);
   const revision = 'dd0646757b042248d99b171166fc9e6dea5af1f8';

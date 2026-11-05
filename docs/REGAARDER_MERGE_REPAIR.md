@@ -66,3 +66,13 @@ The original repository reused six early runtime filenames for later chapters. E
 The 45 sequential classic script downloads are packaged, in original order, into four statically served runtime parts. The inspector is organized synchronously when opening or switching templates. Opening the master no longer creates an unused native WebGL renderer in the background. Humanoid asset fetches time out with an explicit error instead of waiting indefinitely; renderer failure is retained rather than retried on every render.
 
 Validation: regression suite passes, including cross-template repaint isolation and archived-source URL selection; runtime bundles pass syntax checks. Live visual verification remains required; this automation browser reports WebGL disabled.
+
+## WebGL-independent rendering and playback demand loading
+
+Added a Canvas depth-buffer renderer for the exact Three.js skinned meshes when WebGL context creation fails. It reuses Native3DEngine poses, geometry, camera, picking and sculpt data, with simplified diffuse lighting and no PBR texture/environment effects. Unchanged paused software frames are cached. Native hover rendering now joins the shared loader without disposing the active mesh editor. Loader phase/error text is visible in the DOM.
+
+Removed the embedded standalone page's autonomous timeline loop and hidden card-poster painting. The editor owns playback time. Master loading no longer downloads the legacy/promo and four later chapter media packs together; modules are loaded at their timeline intervals and repaint the master after completion. Chapter failures show their actual errors instead of synthetic chapter banners.
+
+The embedded source engine also receives the software backend through explicit static routes. Renderer-v4 entry script versions and a v4 source namespace prevent the previous browser resources from being reused.
+
+Validation: both regression suites pass. The software test forces WebGL failure, renders over 10,000 real anatomical triangles from both 53,514-vertex rigs, verifies scene movement changes the output, and checks paused frame caching. A local browser download failed (truncated archive), and managed-browser screenshots remain unavailable; full live playback still needs visual confirmation.

@@ -117,6 +117,7 @@
     },
     nativeReady: false,
     nativeLoading: false,
+    nativePhase: "Loading 3D modules…",
     nativeEngine: null,
     nativeScene: null,
     nativeData: null,
@@ -172,7 +173,9 @@
         import('/native3d-v97/surface-ui.js'),
         import('/native3d-v97/stage-editor.js')
       ]);
+      state.nativePhase = "Loading humanoid mesh and wardrobe…";
       const data = await engineMod.loadHumanoid();
+      state.nativePhase = "Preparing 3D scene…";
       state.nativeData = data;
       state.nativeMods = { engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod, stageEditMod };
       const offscreen = document.createElement('canvas');
@@ -556,8 +559,14 @@
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    const status = canvas.parentElement?.querySelector('[data-n3d-status]');
+    if (status) {
+      status.textContent = state.nativeError ? '3D error: ' + state.nativeError : state.nativeReady ? (state.nativeEngine?.renderer?.isSoftwareRenderer ? 'Software 3D · reduced lighting' : '') : state.nativePhase;
+      status.dataset.state = state.nativeError ? 'error' : state.nativeReady ? 'ready' : 'loading';
+      status.style.display = status.textContent ? 'block' : 'none';
+    }
 
-    if (state.nativeReady && state.nativeEngine && state.nativeScene) {
+    if (state.nativeReady && !state.nativeError && state.nativeEngine && state.nativeScene) {
       try {
         const editing = isEditing();
         let scene = state.nativeScene;
@@ -592,7 +601,7 @@
     // state instead of disguising a missing native renderer as a working scene.
     ctx.fillStyle = '#10141b';ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle = '#cbd5e1';ctx.textAlign = 'center';ctx.font = '16px Arial';
-    ctx.fillText(state.nativeError ? '3D viewport could not load. Reload to retry.' : 'Loading 3D geometry…',canvas.width/2,canvas.height/2);
+    ctx.fillText(state.nativeError ? '3D could not load: ' + state.nativeError : state.nativePhase,canvas.width/2,canvas.height/2);
   }
 
   function buildNative3DStageHTML(templateId, isHover) {
@@ -625,6 +634,7 @@
     return `
       <div id="regaarder-n3d-viewport-${suffix}" class="rg-n3d-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#0b0f17;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;cursor:default;">
         <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;cursor:default;"></canvas>
+        <div data-n3d-status role="status" style="position:absolute;left:12px;top:52px;z-index:25;padding:5px 9px;background:#080b10cc;color:#cbd5e1;font:12px Arial;pointer-events:none"></div>
         ${hitOverlayHtml}
         ${presetPillsHtml}
       </div>
@@ -809,13 +819,14 @@
 
   window.renderRegaarderNative3DStage = function (container, templateId, isHover) {
     if (!container) return;
-    state.meshEditor?.dispose();
-    state.meshEditor = null;
+    if (!isHover) {state.meshEditor?.dispose();state.meshEditor = null;}
     container.innerHTML = buildNative3DStageHTML(templateId || TEMPLATE_ID, isHover);
     const canvas = container.querySelector('canvas');
     renderNative3DCanvas(canvas, 0.5);
     if (!isHover) {
       wireNative3DStageInteractions(container, templateId || TEMPLATE_ID);
+    } else {
+      ensureNative3DLoaded().then(() => {if (canvas.isConnected) renderNative3DCanvas(canvas, PREVIEW_TIMES[state.preset]);});
     }
   };
 
