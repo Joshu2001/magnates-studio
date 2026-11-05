@@ -33861,6 +33861,135 @@ function generateCutoutCanvasForUrl(url, callback) {
   };
 }
 
+window.syncUniversal3DStageMode = function (is3D) {
+  topCustomizerState.is3DMode = !!is3D;
+  topCustomizerState.paperPreviewMode = is3D ? '3d' : 'video';
+
+  const containers = [
+    document.getElementById('tpl-modal-preview-stage-container'),
+    document.getElementById('modal-top-template-customizer'),
+    document.getElementById('modal-magnates-paper-blueprint-suite'),
+    document.getElementById('magnates-bp-canvas-box'),
+    document.getElementById('customizer-stage-inner')
+  ];
+  containers.forEach((c) => {
+    if (!c) return;
+    if (is3D) c.classList.add('is-3d-stage');
+    else c.classList.remove('is-3d-stage');
+  });
+
+  const playbackBar = document.getElementById('tpl-modal-playback-bar');
+  if (playbackBar) playbackBar.style.display = is3D ? 'none' : 'flex';
+
+  const storyboardContainer = document.getElementById('tpl-modal-storyboard-container');
+  if (storyboardContainer) storyboardContainer.style.display = is3D ? 'none' : 'flex';
+
+  const bpHud = document.getElementById('magnates-bp-player-hud');
+  if (bpHud) bpHud.style.display = is3D ? 'none' : 'block';
+
+  const bpPlaybackBar = document.querySelector('#magnates-bp-canvas-box > div:last-child');
+  if (bpPlaybackBar) bpPlaybackBar.style.display = is3D ? 'none' : 'flex';
+
+  const customizerControls = document.getElementById('modal-customizer-controls');
+  if (customizerControls) customizerControls.style.display = is3D ? 'none' : 'flex';
+
+  // Synchronize button styling across all mode switches
+  const pairs = [
+    ['btn-paper-rip-mode-video', 'btn-paper-rip-mode-3d'],
+    ['btn-doc-mode-video', 'btn-doc-mode-3d'],
+    ['btn-magnates-bp-mode-video', 'btn-magnates-bp-mode-3d'],
+    ['btn-3d-mode-video', 'btn-3d-mode-3d']
+  ];
+  pairs.forEach(([vId, dId]) => {
+    const vBtn = document.getElementById(vId);
+    const dBtn = document.getElementById(dId);
+    if (vBtn) {
+      vBtn.style.background = !is3D ? 'rgba(168,85,247,.35)' : 'transparent';
+      vBtn.style.color = !is3D ? '#fff' : '#94a3b8';
+      vBtn.setAttribute('aria-pressed', !is3D ? 'true' : 'false');
+    }
+    if (dBtn) {
+      dBtn.style.background = is3D ? 'rgba(168,85,247,.35)' : 'transparent';
+      dBtn.style.color = is3D ? '#fff' : '#94a3b8';
+      dBtn.setAttribute('aria-pressed', is3D ? 'true' : 'false');
+    }
+  });
+
+  const toggleBtns = [
+    document.getElementById('btn-toggle-3d-interactive-mode'),
+    document.getElementById('btn-magnates-bp-3d-edit')
+  ];
+  toggleBtns.forEach((btn) => {
+    if (!btn) return;
+    btn.style.background = is3D ? 'rgba(46,255,198,0.25)' : 'rgba(168,85,247,0.15)';
+    btn.style.borderColor = is3D ? '#2effc6' : 'rgba(168,85,247,0.5)';
+    btn.style.color = is3D ? '#2effc6' : '#c084fc';
+    const dot = btn.querySelector('span:first-child');
+    if (dot) {
+      dot.style.background = is3D ? '#2effc6' : '#a855f7';
+      dot.style.boxShadow = is3D ? '0 0 10px #2effc6' : '0 0 8px #a855f7';
+    }
+    const lbl = btn.querySelector('#label-3d-mode, #magnates-bp-hud-preset');
+    if (lbl) {
+      lbl.textContent = is3D ? '3D EDIT: ON' : '3D EDIT MODE';
+    }
+  });
+};
+
+window.openNative3DWorkshop = async function () {
+  const dlg = document.getElementById('modal-native3d-editor');
+  if (!dlg) return;
+  dlg.style.display = 'block';
+  if (typeof dlg.showModal === 'function') {
+    try { dlg.showModal(); } catch (e) {}
+  }
+
+  dlg.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#c084fc;font:15px Inter,sans-serif;padding:40px;">Loading 3D Mesh & Rigging Workshop…</div>';
+
+  try {
+    const { mountNativeEditor } = await import('/native3d-v97/editor.js');
+    const { loadHumanoid } = await import('/native3d-v97/engine.js');
+    const { createNativeScene, validateScene } = await import('/native3d-v97/scene.js');
+    const { createCheckpoint3D } = await import('/native3d-v97/checkpoint.js');
+    const { exportNativeGLB, downloadGLB } = await import('/native3d-v97/export.js');
+
+    const data = await loadHumanoid();
+    const n3dState = window.REGAARDER_NATIVE3D_CONFIG || {};
+    let initialScene = n3dState.nativeScene;
+    if (!initialScene) {
+      if (n3dState.preset === 'checkpoint') initialScene = createCheckpoint3D();
+      else initialScene = createNativeScene(n3dState.preset || 'blue');
+    }
+
+    dlg.innerHTML = '';
+    const api = mountNativeEditor(dlg, initialScene, data, {
+      onSave: (scene) => {
+        if (window.REGAARDER_NATIVE3D_CONFIG) {
+          window.REGAARDER_NATIVE3D_CONFIG.nativeScene = scene;
+        }
+        const stage = document.getElementById('tpl-modal-preview-stage');
+        if (stage && typeof window.stepRegaarderNative3DAnimation === 'function') {
+          window.stepRegaarderNative3DAnimation(stage, 'regaarder-native3d-surface-builder', 0);
+        }
+      },
+      onExportGLB: async (scene) => {
+        downloadGLB(await exportNativeGLB(scene, data));
+      }
+    });
+
+    const closeBtn = dlg.querySelector('[data-act="close"]');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        if (typeof dlg.close === 'function') dlg.close();
+        dlg.style.display = 'none';
+      });
+    }
+  } catch (err) {
+    console.error('Failed to mount 3D workshop:', err);
+    dlg.innerHTML = `<div style="padding:24px;color:#f87171;">Failed to launch 3D Editor: ${err.message}<br><button type="button" onclick="this.closest('dialog').close();this.closest('dialog').style.display='none';" style="margin-top:12px;padding:6px 12px;background:#222;color:#fff;border:1px solid #444;border-radius:6px;cursor:pointer;">Close</button></div>`;
+  }
+};
+
 function openTopTemplateCustomizer(tpl) {
   if (!tpl) return;
   topCustomizerState.currentTpl = tpl;
@@ -34207,6 +34336,9 @@ function openTopTemplateCustomizer(tpl) {
       is3D = !!window.tplGetContextualData('scam-redaction').is3DMode;
     } else if (tpl.id === 'pyramid-scheme' && typeof window.tplGetContextualData === 'function') {
       is3D = window.tplGetContextualData('pyramid-scheme').is3DMode !== false;
+    }
+    if (typeof window.syncUniversal3DStageMode === 'function') {
+      window.syncUniversal3DStageMode(is3D);
     }
     [[paperModeVideo, !is3D], [paperMode3D, is3D]].forEach(([button, active]) => {
       if (!button) return;
@@ -34813,7 +34945,16 @@ function openTopTemplateCustomizer(tpl) {
       };
 
       btnToggle3D?.addEventListener('click', () => {
+        if (topCustomizerState.currentTpl?.id === 'regaarder-native3d-surface-builder') {
+          if (typeof window.openNative3DWorkshop === 'function') {
+            window.openNative3DWorkshop();
+            return;
+          }
+        }
         topCustomizerState.is3DMode = !topCustomizerState.is3DMode;
+        if (typeof window.syncUniversal3DStageMode === 'function') {
+          window.syncUniversal3DStageMode(topCustomizerState.is3DMode);
+        }
         update3DModeUI();
         if (topCustomizerState.currentTpl?.id === 'empire-timeline' && typeof window.tplSetContextualData === 'function') {
           window.tplSetContextualData('empire-timeline', { is3DMode: topCustomizerState.is3DMode });
@@ -40761,9 +40902,17 @@ function initDoc3DModeControls() {
   update3DUI();
 
   btn3D.onclick = () => {
+    if (topCustomizerState.currentTpl?.id === 'regaarder-native3d-surface-builder') {
+      if (typeof window.openNative3DWorkshop === 'function') {
+        window.openNative3DWorkshop();
+        return;
+      }
+    }
     topCustomizerState.is3DMode = !topCustomizerState.is3DMode;
+    if (typeof window.syncUniversal3DStageMode === 'function') {
+      window.syncUniversal3DStageMode(topCustomizerState.is3DMode);
+    }
     update3DUI();
-    syncTopTemplateDocHighlighterUI();
     renderTopTemplatePreviewStage();
     showTextTimingAlert(topCustomizerState.is3DMode ? '3D Interactive Mode ON: Hover mouse across canvas to tilt' : '3D Interactive Mode OFF', 'info');
     setTimeout(() => showTextTimingAlert(''), 2000);
@@ -61627,6 +61776,28 @@ function bindMagnatesPaperBlueprintSuiteModalControls() {
 
   // Top-Left Templates Library Drawer inside Suite
   const bpDrawer = document.getElementById('magnates-bp-tpl-drawer');
+  document.getElementById('btn-magnates-bp-mode-video')?.addEventListener('click', () => {
+    if (typeof window.syncUniversal3DStageMode === 'function') {
+      window.syncUniversal3DStageMode(false);
+    }
+  });
+  document.getElementById('btn-magnates-bp-mode-3d')?.addEventListener('click', () => {
+    if (typeof window.syncUniversal3DStageMode === 'function') {
+      window.syncUniversal3DStageMode(true);
+    }
+  });
+  document.getElementById('btn-magnates-bp-3d-edit')?.addEventListener('click', () => {
+    if (topCustomizerState.currentTpl?.id === 'regaarder-native3d-surface-builder') {
+      if (typeof window.openNative3DWorkshop === 'function') {
+        window.openNative3DWorkshop();
+        return;
+      }
+    }
+    const next3D = !topCustomizerState.is3DMode;
+    if (typeof window.syncUniversal3DStageMode === 'function') {
+      window.syncUniversal3DStageMode(next3D);
+    }
+  });
   document.getElementById('btn-magnates-bp-open-drawer')?.addEventListener('click', () => {
     if (bpDrawer) bpDrawer.style.display = bpDrawer.style.display === 'flex' ? 'none' : 'flex';
   });

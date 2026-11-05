@@ -133,18 +133,26 @@
       ],
       selectedLayer: 'hotShoe',
       stageObjects: [
-        { id: 'chapter_final_shoe', layerId: 'hotShoe', name: 'Burning Trainer Mesh', variant: 'media', x: 50, y: 54, w: 46, h: 44 },
-        { id: 'chapter_final_shoe_tl', layerId: 'chapterShoes', name: 'Floating Boot (Top Left)', variant: 'media', x: 18, y: 38, w: 22, h: 22 },
-        { id: 'chapter_final_shoe_tr', layerId: 'chapterShoes', name: 'Floating Boot (Top Right)', variant: 'media', x: 82, y: 36, w: 22, h: 22 },
-        { id: 'chapter_final_shoe_bl', layerId: 'chapterShoes', name: 'Floating Boot (Bottom Left)', variant: 'media', x: 20, y: 84, w: 22, h: 22 },
-        { id: 'chapter_final_shoe_br', layerId: 'chapterShoes', name: 'Floating Boot (Bottom Right)', variant: 'media', x: 78, y: 82, w: 22, h: 22 },
-        { id: 'chapter_final_titles', layerId: 'titles', name: 'Chapter Headline', variant: 'text', x: 50, y: 48, w: 58, h: 24 },
-        { id: 'chapter_final_adidas', layerId: 'adidasCard', name: 'Adidas Card', variant: 'media', x: 32, y: 52, w: 28, h: 34 },
-        { id: 'chapter_final_puma', layerId: 'pumaCard', name: 'PUMA Card', variant: 'media', x: 66, y: 54, w: 28, h: 34 },
-        { id: 'chapter_final_sofa', layerId: 'sofa', name: 'Leather Parlor Sofa', variant: 'media', x: 50, y: 86, w: 68, h: 26 },
-        { id: 'chapter_final_robert', layerId: 'robert', name: 'Robert Louis-Dreyfus', variant: 'media', x: 42, y: 52, w: 26, h: 48 },
-        { id: 'chapter_final_kanye', layerId: 'kanye', name: 'Kanye West Cutout', variant: 'media', x: 72, y: 50, w: 24, h: 48 },
-        { id: 'chapter_final_beckham', layerId: 'beckham', name: 'David Beckham Cutout', variant: 'media', x: 26, y: 50, w: 24, h: 48 }
+        { id: 'chapter_final_shoe_tl', layerId: 'chapterShoes', name: 'Floating Boot (Top Left)', variant: 'media', x: 18, y: 38, w: 22, h: 22, sceneId: 'Final Chapter' },
+        { id: 'chapter_final_shoe_tr', layerId: 'chapterShoes', name: 'Floating Boot (Top Right)', variant: 'media', x: 82, y: 36, w: 22, h: 22, sceneId: 'Final Chapter' },
+        { id: 'chapter_final_shoe_bl', layerId: 'chapterShoes', name: 'Floating Boot (Bottom Left)', variant: 'media', x: 20, y: 84, w: 22, h: 22, sceneId: 'Final Chapter' },
+        { id: 'chapter_final_shoe_br', layerId: 'chapterShoes', name: 'Floating Boot (Bottom Right)', variant: 'media', x: 78, y: 82, w: 22, h: 22, sceneId: 'Final Chapter' },
+        { id: 'chapter_final_blue_frame', layerId: 'blueTrim', name: 'Adi Dassler Portrait & Blue Trim', variant: 'media', x: 32, y: 44, w: 28, h: 56, sceneId: 'Founders' },
+        { id: 'chapter_final_red_frame', layerId: 'redTrim', name: 'Rudolf Dassler Portrait & Red Trim', variant: 'media', x: 68, y: 44, w: 28, h: 56, sceneId: 'Founders' },
+        { id: 'chapter_final_sofa', layerId: 'sofa', name: 'Leather Parlor Sofa', variant: 'media', x: 50, y: 88, w: 64, h: 24, sceneId: 'Founders' },
+        { id: 'chapter_final_viewer_blue', layerId: 'viewerBlue', name: 'Viewer Silhouette Blue', variant: 'media', x: 20, y: 78, w: 32, h: 44, sceneId: 'Founders' },
+        { id: 'chapter_final_viewer_red', layerId: 'viewerRed', name: 'Viewer Silhouette Red', variant: 'media', x: 80, y: 78, w: 32, h: 44, sceneId: 'Founders' },
+        { id: 'chapter_final_shoe', layerId: 'hotShoe', name: 'Burning Trainer Mesh', variant: 'media', x: 50, y: 54, w: 46, h: 44, sceneId: 'Burning shoe' },
+        { id: 'chapter_final_paper_a', layerId: 'paperA', name: 'Deed of Debt A', variant: 'media', x: 28, y: 38, w: 32, h: 36, sceneId: 'Financial distress' },
+        { id: 'chapter_final_paper_b', layerId: 'paperB', name: 'Deed of Debt B', variant: 'media', x: 54, y: 38, w: 32, h: 36, sceneId: 'Financial distress' },
+        { id: 'chapter_final_adidas', layerId: 'adidasCard', name: 'Adidas Card', variant: 'media', x: 32, y: 64, w: 28, h: 34, sceneId: 'Financial distress' },
+        { id: 'chapter_final_puma', layerId: 'pumaCard', name: 'PUMA Card', variant: 'media', x: 66, y: 64, w: 28, h: 34, sceneId: 'Financial distress' },
+        { id: 'chapter_final_robert', layerId: 'robert', name: 'Robert Louis-Dreyfus', variant: 'media', x: 42, y: 52, w: 26, h: 48, sceneId: 'Nike vortex' },
+        { id: 'chapter_final_beckham', layerId: 'beckham', name: 'David Beckham Cutout', variant: 'media', x: 26, y: 50, w: 24, h: 48, sceneId: 'Predator' },
+        { id: 'chapter_final_kobe', layerId: 'kobe', name: 'Kobe Bryant Cutout', variant: 'media', x: 74, y: 50, w: 24, h: 48, sceneId: 'Predator' },
+        { id: 'chapter_final_kanye', layerId: 'kanye', name: 'Kanye West Cutout', variant: 'media', x: 72, y: 50, w: 24, h: 48, sceneId: 'Yeezy' },
+        { id: 'chapter_final_mcqueen', layerId: 'mcqueen', name: 'Alexander McQueen', variant: 'media', x: 34, y: 50, w: 26, h: 48, sceneId: 'McQueen and Rihanna' },
+        { id: 'chapter_final_rihanna', layerId: 'rihanna', name: 'Rihanna Runway Cutout', variant: 'media', x: 66, y: 50, w: 26, h: 48, sceneId: 'McQueen and Rihanna' }
       ]
     },
     'regaarder-full-documentary': {
@@ -287,12 +295,40 @@
 
   CHAPTER_TEMPLATE_IDS.forEach(ensureFallbackConfig);
 
+  const docMediaCache = {};
+  function getDocArchivalImage(src) {
+    if (docMediaCache[src]) return docMediaCache[src];
+    const im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.src = src;
+    docMediaCache[src] = im;
+    return im;
+  }
+
   async function ensureChapterModuleLoaded(templateId) {
     const rt = chapterRuntime[templateId];
     if (!rt || rt.ready || rt.loading) return rt;
     rt.loading = true;
     try {
       if (templateId === 'regaarder-full-documentary') {
+        const docArchivalUrls = [
+          '/assets/regaarder-motion/map.png',
+          '/assets/regaarder-motion/portrait.png',
+          '/assets/regaarder-motion/pair-v2.png',
+          '/assets/regaarder-motion/faces-v3.png',
+          '/assets/regaarder-motion/young-man-v2.png',
+          '/assets/regaarder-motion/clouds.png',
+          '/assets/regaarder-motion/adidas-bars.svg',
+          '/assets/regaarder-motion/puma-lockup.svg',
+          '/assets/minute16/vintage-boot.png',
+          '/assets/pele126/dollar-hundred-source.jpg',
+          '/assets/pele126/horst-archival.jpg',
+          '/assets/final-chapter/wall.png',
+          '/assets/final-chapter/wood.png',
+          '/assets/final-chapter/dust.png'
+        ];
+        docArchivalUrls.forEach((u) => getDocArchivalImage(u));
+
         await Promise.all([
           ensureChapterModuleLoaded('regaarder-pele-pact-chapter'),
           ensureChapterModuleLoaded('regaarder-minute16-chapter'),
@@ -364,8 +400,8 @@
           cues: { ...cloneDeep(mod.defaults.cues), ...(rt.config?.cues || {}) },
           layers: { ...cloneDeep(mod.defaults.layers), ...(rt.config?.layers || {}) }
         };
-        Object.entries(mod.sources).forEach(([id, file]) => {
-          if (rt.media[id]) return;
+        const loadPromises = Object.entries(mod.sources).map(([id, file]) => {
+          if (rt.media[id]) return Promise.resolve(rt.media[id]);
           const url = '/assets/final-chapter/' + file;
           if (file.endsWith('.mp4')) {
             const v = document.createElement('video');
@@ -374,13 +410,23 @@
             v.preload = 'auto';
             v.src = url;
             rt.media[id] = v;
+            return Promise.resolve(v);
           } else {
             const im = new Image();
             im.crossOrigin = 'anonymous';
             im.src = url;
             rt.media[id] = im;
+            return (im.decode ? im.decode() : Promise.resolve()).catch(() => {}).then(() => {
+              const stage = document.getElementById('tpl-modal-preview-stage');
+              if (stage) {
+                const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
+                window.stepRegaarderChapterAnimation(stage, templateId, t);
+              }
+              return im;
+            });
           }
         });
+        await Promise.all(loadPromises);
       }
       rt.ready = true;
     } catch (err) {
@@ -401,7 +447,6 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle animated light sweep
     const sweepX = ((timeSec * 90) % (W + 400)) - 200;
     const glow = ctx.createRadialGradient(sweepX, H * 0.45, 10, sweepX, H * 0.45, 360);
     glow.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
@@ -413,29 +458,252 @@
     ctx.textAlign = 'center';
     ctx.fillStyle = '#94a3b8';
     ctx.font = '700 16px Inter, system-ui, sans-serif';
-    ctx.fillText(rt.subtitle.toUpperCase(), W / 2, H / 2 - 28);
+    ctx.fillText((rt.subtitle || '').toUpperCase(), W / 2, H / 2 - 28);
     ctx.fillStyle = '#f8fafc';
     ctx.font = '800 38px Inter, system-ui, sans-serif';
-    ctx.fillText(rt.title.toUpperCase(), W / 2, H / 2 + 18);
+    ctx.fillText((rt.title || '').toUpperCase(), W / 2, H / 2 + 18);
+    ctx.restore();
+  }
+
+  function paintArchivalDocumentarySegment(ctx, t, W, H) {
+    ctx.save();
+
+    let actTitle = 'CHAPTER 1 · THE DASSLER BROTHERS WORKSHOP';
+    let actSubtitle = '1924–1936 · BAVARIAN ARTISANS & THE BIRTH OF SPIKES';
+    let bgUrl = '/assets/regaarder-motion/map.png';
+    let fgLeftUrl = '/assets/regaarder-motion/portrait.png';
+    let fgRightUrl = '/assets/regaarder-motion/young-man-v2.png';
+    let centerUrl = '/assets/minute16/vintage-boot.png';
+    let showSplit = false;
+
+    if (t < 180) {
+      actTitle = 'CHAPTER 1 · THE DASSLER BROTHERS WORKSHOP';
+      actSubtitle = '1924–1936 · BAVARIAN ARTISANS & THE BIRTH OF SPIKES';
+      bgUrl = '/assets/regaarder-motion/map.png';
+      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
+      fgRightUrl = '/assets/regaarder-motion/young-man-v2.png';
+      centerUrl = '/assets/minute16/vintage-boot.png';
+    } else if (t < 360) {
+      actTitle = 'CHAPTER 2 · THE 1936 OLYMPIC TRIUMPH';
+      actSubtitle = 'BERLIN 1936 · JESSE OWENS & THE GOLDEN HAND-CRAFTED SPIKES';
+      bgUrl = '/assets/regaarder-motion/clouds.png';
+      centerUrl = '/assets/regaarder-motion/pair-v2.png';
+      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
+      fgRightUrl = '/assets/minute16/vintage-boot.png';
+    } else if (t < 540) {
+      actTitle = 'CHAPTER 3 · THE GREAT SCHISM (1948)';
+      actSubtitle = 'HERZOGENAURACH DIVIDED · ADIDAS VS PUMA ACROSS THE AURACH';
+      bgUrl = '/assets/regaarder-motion/faces-v3.png';
+      fgLeftUrl = '/assets/regaarder-motion/adidas-bars.svg';
+      fgRightUrl = '/assets/regaarder-motion/puma-lockup.svg';
+      showSplit = true;
+    } else if (t < 720) {
+      actTitle = 'CHAPTER 4 · THE MIRACLE OF BERN (1954)';
+      actSubtitle = 'SWITZERLAND 1954 · SCREW-IN STUDS IN TORRENTIAL SEEDED RAIN';
+      bgUrl = '/assets/final-chapter/wall.png';
+      centerUrl = '/assets/minute16/vintage-boot.png';
+      fgLeftUrl = '/assets/minute16/captain-cutout-v122.png';
+      fgRightUrl = '/assets/minute16/rightPlayer-cutout-v122.png';
+    } else if (t < 895) {
+      actTitle = 'CHAPTER 4 · SECRET ENVOYS & UNDERGROUND WARS';
+      actSubtitle = '1960–1970 · ESPIONAGE, BRIBES & THE RACE FOR WORLD CUP PLAYERS';
+      bgUrl = '/assets/final-chapter/wood.png';
+      fgLeftUrl = '/assets/pele126/horst-archival.jpg';
+      centerUrl = '/assets/pele126/dollar-hundred-source.jpg';
+    } else if (t >= 1080 && t < 1130) {
+      actTitle = 'INTERMISSION · THE SECRET CONTRACT & ESCALATING BIDS';
+      actSubtitle = '18:00–18:50 · RIVAL BIDS FOR THE WORLD’S GREATEST ATHLETE';
+      bgUrl = '/assets/final-chapter/wood.png';
+      fgLeftUrl = '/assets/pele126/horst-archival.jpg';
+      centerUrl = '/assets/pele126/dollar-hundred-source.jpg';
+    } else if (t >= 1214 && t < 1409) {
+      actTitle = 'EPILOGUE · GLOBAL EXPANSION & MULTI-BILLION SNEAKER WARS';
+      actSubtitle = '20:14–23:29 · WALL STREET, SATELLITE BROADCASTS & RECOVERY';
+      bgUrl = '/assets/final-chapter/wall.png';
+      fgLeftUrl = '/assets/final-chapter/adidasCard.png';
+      fgRightUrl = '/assets/final-chapter/pumaCard.png';
+      centerUrl = '/assets/final-chapter/sofa.png';
+    }
+
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0a0e17');
+    grad.addColorStop(1, '#030508');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    const bgImg = getDocArchivalImage(bgUrl);
+    if (bgImg && bgImg.naturalWidth) {
+      ctx.save();
+      const zoom = 1.05 + 0.05 * Math.sin(t * 0.12);
+      const panX = Math.sin(t * 0.08) * 24;
+      const panY = Math.cos(t * 0.06) * 12;
+      ctx.translate(W / 2 + panX, H / 2 + panY);
+      ctx.scale(zoom, zoom);
+      ctx.globalAlpha = 0.42;
+      ctx.drawImage(bgImg, -W / 2, -H / 2, W, H);
+      ctx.restore();
+    }
+
+    if (showSplit) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      const splitGradL = ctx.createLinearGradient(0, 0, W / 2, 0);
+      splitGradL.addColorStop(0, 'rgba(29, 78, 216, 0.28)');
+      splitGradL.addColorStop(1, 'rgba(29, 78, 216, 0.02)');
+      ctx.fillStyle = splitGradL;
+      ctx.fillRect(0, 0, W / 2, H);
+
+      const splitGradR = ctx.createLinearGradient(W, 0, W / 2, 0);
+      splitGradR.addColorStop(0, 'rgba(185, 28, 28, 0.28)');
+      splitGradR.addColorStop(1, 'rgba(185, 28, 28, 0.02)');
+      ctx.fillStyle = splitGradR;
+      ctx.fillRect(W / 2, 0, W / 2, H);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+      ctx.setLineDash([6, 6]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(W / 2, 40);
+      ctx.lineTo(W / 2, H - 70);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    if (fgLeftUrl) {
+      const leftImg = getDocArchivalImage(fgLeftUrl);
+      if (leftImg && leftImg.naturalWidth) {
+        ctx.save();
+        const floatY = Math.sin(t * 0.4 + 1.2) * 6;
+        ctx.translate(W * 0.24, H * 0.44 + floatY);
+        const lScale = Math.min(220 / leftImg.naturalWidth, 260 / leftImg.naturalHeight);
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 18;
+        ctx.drawImage(leftImg, -leftImg.naturalWidth * lScale / 2, -leftImg.naturalHeight * lScale / 2, leftImg.naturalWidth * lScale, leftImg.naturalHeight * lScale);
+        ctx.restore();
+      }
+    }
+
+    if (centerUrl) {
+      const centerImg = getDocArchivalImage(centerUrl);
+      if (centerImg && centerImg.naturalWidth) {
+        ctx.save();
+        const floatY = Math.sin(t * 0.45) * 8;
+        ctx.translate(W * 0.50, H * 0.46 + floatY);
+        const cScale = Math.min(280 / centerImg.naturalWidth, 240 / centerImg.naturalHeight);
+        ctx.shadowColor = 'rgba(0,0,0,0.85)';
+        ctx.shadowBlur = 24;
+        ctx.drawImage(centerImg, -centerImg.naturalWidth * cScale / 2, -centerImg.naturalHeight * cScale / 2, centerImg.naturalWidth * cScale, centerImg.naturalHeight * cScale);
+        ctx.restore();
+      }
+    }
+
+    if (fgRightUrl) {
+      const rightImg = getDocArchivalImage(fgRightUrl);
+      if (rightImg && rightImg.naturalWidth) {
+        ctx.save();
+        const floatY = Math.sin(t * 0.38 + 2.5) * 6;
+        ctx.translate(W * 0.76, H * 0.44 + floatY);
+        const rScale = Math.min(220 / rightImg.naturalWidth, 260 / rightImg.naturalHeight);
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 18;
+        ctx.drawImage(rightImg, -rightImg.naturalWidth * rScale / 2, -rightImg.naturalHeight * rScale / 2, rightImg.naturalWidth * rScale, rightImg.naturalHeight * rScale);
+        ctx.restore();
+      }
+    }
+
+    const vigGrad = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.65);
+    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    vigGrad.addColorStop(1, 'rgba(3,5,8,0.78)');
+    ctx.fillStyle = vigGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    for (let p = 0; p < 18; p++) {
+      const px = ((p * 137.5 + t * 24) % (W + 40)) - 20;
+      const py = ((p * 93.1 + Math.sin(t * 0.5 + p) * 30 + p * 28) % (H + 40)) - 20;
+      const pr = (p % 3) * 0.8 + 0.8;
+      ctx.beginPath();
+      ctx.arc(px, py, pr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const barH = 68;
+    const barY = H - barH - 14;
+    const barW = W - 48;
+    const barX = 24;
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(10, 14, 24, 0.88)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barW, barH, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    const accentGrad = ctx.createLinearGradient(barX, barY, barX + barW, barY);
+    accentGrad.addColorStop(0, '#38bdf8');
+    accentGrad.addColorStop(0.5, '#a855f7');
+    accentGrad.addColorStop(1, '#f97316');
+    ctx.fillStyle = accentGrad;
+    ctx.fillRect(barX + 16, barY + 2, barW - 32, 2);
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '800 16px Inter, system-ui, sans-serif';
+    ctx.fillText(actTitle, barX + 20, barY + 28);
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '500 12px Inter, system-ui, sans-serif';
+    ctx.fillText(actSubtitle, barX + 20, barY + 50);
+
+    ctx.textAlign = 'right';
+    const curM = Math.floor(t / 60);
+    const curS = Math.floor(t % 60).toString().padStart(2, '0');
+    ctx.fillStyle = '#cbd5e1';
+    ctx.font = '700 14px ui-monospace, monospace';
+    ctx.fillText(`${curM}:${curS} / 26:54`, barX + barW - 20, barY + 32);
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = '600 11px ui-monospace, monospace';
+    ctx.fillText('MASTER TIMELINE', barX + barW - 20, barY + 50);
+
+    ctx.restore();
     ctx.restore();
   }
 
   function paintDocumentarySequence(ctx, t) {
     const W = 960, H = 540;
     if (t < 20) {
-      if (typeof window.tplPaintOriginsSlowRevealFrame === 'function') {
-        window.tplPaintOriginsSlowRevealFrame(ctx, t, window.REGAARDER_ORIGINS_CONFIG || {});
+      if (typeof window.renderOriginsSlowRevealCanvas === 'function') {
+        window.renderOriginsSlowRevealCanvas(ctx, null, t, W, H);
+        return;
+      }
+      if (typeof window.renderOriginsSlowRevealFrame === 'function') {
+        window.renderOriginsSlowRevealFrame(ctx.canvas, t, window.REGAARDER_ORIGINS_CONFIG || {});
         return;
       }
     } else if (t >= 895 && t < 960) {
       const n3dState = window.REGAARDER_NATIVE3D_CONFIG;
       if (n3dState && n3dState.nativeReady && n3dState.nativeEngine && n3dState.nativeScene) {
         try {
+          if (n3dState.preset !== 'checkpoint') {
+            n3dState.preset = 'checkpoint';
+            if (typeof window.syncStateToNativeScene === 'function') window.syncStateToNativeScene();
+          }
           n3dState.nativeEngine.render(n3dState.nativeScene, (t - 895) % 5);
           ctx.clearRect(0, 0, W, H);
           ctx.drawImage(n3dState.nativeEngine.canvas, 0, 0, W, H);
           return;
         } catch (e) {}
+      }
+      if (typeof window.renderProjectedMannequinScene === 'function') {
+        const prevPreset = n3dState?.preset;
+        if (n3dState) n3dState.preset = 'checkpoint';
+        window.renderProjectedMannequinScene(ctx, (t - 895) % 5);
+        if (n3dState && prevPreset) n3dState.preset = prevPreset;
+        return;
       }
     } else if (t >= 960 && t < 1020) {
       const rtM16 = chapterRuntime['regaarder-minute16-chapter'];
@@ -463,33 +731,7 @@
       }
     }
 
-    // Default documentary timeline card for intermissions
-    ctx.save();
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#0d131d');
-    grad.addColorStop(1, '#05070b');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '700 15px Inter, system-ui, sans-serif';
-    const curM = Math.floor(t / 60);
-    const curS = Math.floor(t % 60).toString().padStart(2, '0');
-    ctx.fillText(`REGAARDER MASTER SEQUENCE · ${curM}:${curS} / 26:54`, W / 2, H / 2 - 20);
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = '800 30px Inter, system-ui, sans-serif';
-    let chapterName = 'ORIGINS';
-    if (t < 20) chapterName = 'CHAPTER 0 · ORIGINS SLOW REVEAL';
-    else if (t < 895) chapterName = 'CHAPTERS 1–4 · EARLY DECADES & ARCHIVAL FEUD';
-    else if (t < 960) chapterName = 'CHECKPOINT · NATIVE 3D MANNEQUINS STUDIO';
-    else if (t < 1020) chapterName = 'CHAPTER 5 · MINUTE 16 VICTORY & WAREHOUSE';
-    else if (t < 1080) chapterName = 'CHAPTER 5 · MINUTE 17 RAIN RIVALRY & SPLIT FLARE';
-    else if (t < 1214) chapterName = 'CHAPTER 6 · THE PELÉ PACT (18:50–20:14)';
-    else if (t < 1409) chapterName = 'CHAPTER 6 · BRAND REVIVAL & EPILOGUE';
-    else chapterName = 'CHAPTER 7 · THE FINAL CHAPTER (23:29–26:54)';
-    ctx.fillText(chapterName, W / 2, H / 2 + 22);
-    ctx.restore();
+    paintArchivalDocumentarySegment(ctx, t, W, H);
   }
 
   function paintChapterFrame(canvas, templateId, timeSec) {
@@ -525,22 +767,49 @@
     renderFallbackPreview(ctx, rt, t);
   }
 
+  function syncChapterHitOverlay(container, templateId, timeSec) {
+    if (!container) return;
+    const rt = chapterRuntime[templateId];
+    if (!rt || !Array.isArray(rt.stageObjects)) return;
+    const t = Number(timeSec) || 0;
+    const curScene = (rt.scenes || []).find((s) => t >= s.start && t < s.end) || rt.scenes?.[0];
+    const curSceneId = curScene ? curScene.id : null;
+    const hitBoxes = container.querySelectorAll('[data-chapter-obj]');
+    hitBoxes.forEach((box) => {
+      const objId = box.getAttribute('data-chapter-obj');
+      const obj = rt.stageObjects.find((o) => o.id === objId);
+      if (!obj) return;
+      if (obj.sceneId && obj.sceneId !== curSceneId) {
+        box.style.display = 'none';
+        box.style.pointerEvents = 'none';
+      } else {
+        box.style.display = 'block';
+        box.style.pointerEvents = 'auto';
+      }
+    });
+  }
+
   function buildChapterStageHTML(templateId, isHover) {
     const rt = chapterRuntime[templateId];
     if (!rt) return '';
     const suffix = isHover ? `hover-${templateId}` : templateId;
+    const activeTime = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
+    const curScene = (rt.scenes || []).find((s) => activeTime >= s.start && activeTime < s.end) || rt.scenes?.[0];
+    const curSceneId = curScene ? curScene.id : null;
 
     const interactiveOverlayHtml = !isHover ? `
       <div class="rg-chapter-hit-layer" data-role="chapter-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:auto;">
-        ${rt.stageObjects.map((obj) => `
+        ${rt.stageObjects.map((obj) => {
+          const isVisible = !obj.sceneId || obj.sceneId === curSceneId;
+          return `
           <div class="rg-chapter-hit-box"
                data-chapter-obj="${obj.id}"
                data-chapter-layer="${obj.layerId}"
                data-chapter-variant="${obj.variant}"
                title="${obj.name} (Click to select · Drag to reposition)"
-               style="position:absolute;left:${obj.x}%;top:${obj.y}%;width:${obj.w}%;height:${obj.h}%;transform:translate(-50%,-50%);border:1.5px dashed transparent;border-radius:8px;cursor:grab;transition:border-color 0.15s ease, background 0.15s ease;">
+               style="position:absolute;left:${obj.x}%;top:${obj.y}%;width:${obj.w}%;height:${obj.h}%;transform:translate(-50%,-50%);border:1.5px dashed transparent;border-radius:8px;cursor:grab;transition:border-color 0.15s ease, background 0.15s ease;display:${isVisible ? 'block' : 'none'};pointer-events:${isVisible ? 'auto' : 'none'};">
           </div>
-        `).join('')}
+        `;}).join('')}
       </div>
     ` : '';
 
@@ -551,7 +820,6 @@
       </div>
     `;
   }
-
   function wireChapterStageInteractions(container, templateId) {
     const rt = chapterRuntime[templateId];
     if (!rt || !container) return;
@@ -655,6 +923,7 @@
     const canvas = container.querySelector('canvas');
     if (!canvas) return;
     paintChapterFrame(canvas, templateId, elapsedSec);
+    syncChapterHitOverlay(container, templateId, elapsedSec);
   };
 
   // Toolbar action handler for all Chapter objects

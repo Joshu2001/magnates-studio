@@ -14,17 +14,9 @@
   window.REGAARDER_NATIVE3D_TEMPLATE_ID = TEMPLATE_ID;
 
   const PRESET_SCENES = {
-    blue: {
-      id: 'blue',
-      label: '01 Blue & Cream Coach',
-      description: 'Blue figure and cream coach with tailored fedora hat and dynamic 3D studio lighting',
-      background: '#151322',
-      primaryColor: '#137cba',
-      secondaryColor: '#dedbca'
-    },
     handshake: {
       id: 'handshake',
-      label: '02 Handshake · Paired Contact',
+      label: '01 Handshake · Paired Contact',
       description: 'Two anatomical characters with finger-contact grip solver & studio softboxes',
       background: '#141820',
       primaryColor: '#137cba',
@@ -32,15 +24,15 @@
     },
     checkpoint: {
       id: 'checkpoint',
-      label: '03 14:55 Crimson Seated & Coach',
-      description: 'Seated crimson figure, cream coach with brimmed hat, desk assembly & depth smoke',
+      label: '02 14:55 Crimson Seated & Coach',
+      description: 'Seated crimson figure in chair at desk, cream coach with brimmed hat & depth smoke',
       background: '#220406',
       primaryColor: '#9d1514',
       secondaryColor: '#eee9da'
     },
     team: {
       id: 'team',
-      label: '04 Three Red Players Formation',
+      label: '03 Three Red Players Formation',
       description: 'Trio formation with independent bone poses, wardrobe & rim lighting',
       background: '#17080a',
       primaryColor: '#b91c1c',
@@ -48,11 +40,19 @@
     },
     humanoid: {
       id: 'humanoid',
-      label: '05 Anatomical Mannequin Studio',
+      label: '04 Anatomical Mannequin Studio',
       description: 'Single mannequin for multiresolution sculpting, UV projection & vertex painting',
       background: '#11151b',
       primaryColor: '#7d8c9d',
       secondaryColor: '#343e4b'
+    },
+    blue: {
+      id: 'blue',
+      label: '05 Blue & Cream Coach',
+      description: 'Blue figure and cream coach with tailored fedora hat and dynamic 3D studio lighting',
+      background: '#151322',
+      primaryColor: '#137cba',
+      secondaryColor: '#dedbca'
     }
   };
 
@@ -120,12 +120,35 @@
 
   window.REGAARDER_NATIVE3D_CONFIG = state;
 
-  const STAGE_OBJECTS = [
-    { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 28, y: 56, w: 22, h: 72 },
-    { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 46, y: 58, w: 22, h: 72 },
-    { id: 'n3d_prop_hat', name: 'Tailored Fedora Hat', variant: 'shape', x: 46, y: 39, w: 14, h: 12 },
-    { id: 'n3d_prop_desk', name: 'Studio Props', variant: 'shape', x: 50, y: 74, w: 46, h: 24 }
-  ];
+  function getActiveStageObjects(preset = state.preset) {
+    if (preset === 'checkpoint') {
+      return [
+        { id: 'n3d_actor_crimson', name: 'Seated Red Figure', variant: 'media', x: 30, y: 56, w: 24, h: 68 },
+        { id: 'n3d_actor_coach', name: 'Secondary Coach Rig', variant: 'media', x: 68, y: 54, w: 24, h: 72 },
+        { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'shape', x: 68, y: 35, w: 14, h: 12 },
+        { id: 'n3d_prop_desk', name: 'Studio Desk & Chair Prop', variant: 'shape', x: 44, y: 70, w: 34, h: 24 }
+      ];
+    }
+    if (preset === 'team') {
+      return [
+        { id: 'n3d_actor_p1', name: 'Left Wing Player', variant: 'media', x: 28, y: 56, w: 22, h: 70 },
+        { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 50, y: 53, w: 22, h: 72 },
+        { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 72, y: 56, w: 22, h: 70 }
+      ];
+    }
+    if (preset === 'humanoid') {
+      return [
+        { id: 'n3d_actor_primary', name: 'Anatomical Mannequin', variant: 'media', x: 50, y: 54, w: 24, h: 74 }
+      ];
+    }
+    return [
+      { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 38, y: 56, w: 22, h: 72 },
+      { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 62, y: 54, w: 22, h: 72 },
+      { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'shape', x: 62, y: 35, w: 14, h: 12 }
+    ];
+  }
+
+  const STAGE_OBJECTS = getActiveStageObjects('blue');
 
   async function ensureNative3DLoaded() {
     if (state.nativeReady || state.nativeLoading) return;
@@ -205,64 +228,100 @@
     }
 
     const humanoids = sc.nodes.filter((n) => n.type === 'humanoid');
-    humanoids.forEach((h, idx) => {
-      h.wireframe = !!state.wireframe;
-      h.proportions = {
-        headSize: state.headSize,
-        neckLength: 0.95,
-        shoulderWidth: state.shoulderWidth,
-        armLength: state.armLength,
-        legLength: state.legLength
-      };
-      h.shape = h.shape || {};
-      h.shape.female = state.foundation === 'female' ? 1 : 0;
-      if (idx === 0) {
-        h.material = h.material || {};
-        h.material.color = state.shirtColor;
-        h.material.roughness = state.roughness;
-        h.material.metalness = state.metalness;
-        h.parts = h.parts || {};
-        h.parts.shirt = { ...(h.parts.shirt || {}), visible: state.shirtVisible, color: state.shirtColor, roughness: state.roughness };
-        h.parts.trousers = { ...(h.parts.trousers || {}), visible: state.trousersVisible, color: state.trousersColor || state.shirtColor, roughness: state.roughness };
-
-        const pOff = state.actorOffsets.n3d_actor_primary || {};
-        h.rotation = h.rotation || [0, 90, 0];
-        if (typeof pOff.rot === 'number') {
-          h.rotation[1] = pOff.rot;
-        }
-        if (typeof pOff.x === 'number') {
-          h.position = h.position || [-0.65, 0, 0.3];
-          h.position[0] = -0.65 + (pOff.x * 0.003);
-        }
-        if (typeof pOff.y === 'number') {
-          h.position = h.position || [-0.65, 0, 0.3];
-          h.position[1] = -(pOff.y * 0.003);
-        }
-      } else if (idx === 1) {
-        const sOff = state.actorOffsets.n3d_actor_secondary || {};
-        h.rotation = h.rotation || [0, -65, 0];
-        if (typeof sOff.rot === 'number') {
-          h.rotation[1] = sOff.rot;
-        }
-        if (typeof sOff.x === 'number') {
-          h.position = h.position || [0.65, 0, -0.6];
-          h.position[0] = 0.65 + (sOff.x * 0.003);
-        }
-        if (typeof sOff.y === 'number') {
-          h.position = h.position || [0.65, 0, -0.6];
-          h.position[1] = -(sOff.y * 0.003);
-        }
-        const hatOff = state.actorOffsets.n3d_prop_hat || {};
-        h.parts = h.parts || {};
-        h.parts.hat = {
-          ...(h.parts.hat || {}),
-          visible: state.hatVisible,
-          color: state.hatColor,
-          lift: (hatOff.lift || 0),
-          offsetX: (hatOff.x || 0) * 0.002
-        };
+    if (state.preset === 'checkpoint') {
+      const redNode = sc.nodes.find((n) => n.id === 'red') || humanoids[0];
+      const rOff = state.actorOffsets.n3d_actor_crimson || state.actorOffsets.n3d_actor_primary || {};
+      if (redNode) {
+        redNode.wireframe = !!state.wireframe;
+        redNode.position = [-0.94 + ((rOff.x || 0) * 0.003), -((rOff.y || 0) * 0.003), 0.6];
+        redNode.rotation = [0, typeof rOff.rot === 'number' ? rOff.rot : 90, 0];
+        redNode.leanAngle = 65;
+        redNode.pose = 'seated';
+        redNode.material = redNode.material || {};
+        redNode.material.color = '#9d1514';
+        redNode.parts = redNode.parts || {};
+        redNode.parts.shirt = { ...(redNode.parts.shirt || {}), color: '#9d1514', visible: true };
+        redNode.parts.trousers = { ...(redNode.parts.trousers || {}), color: '#7f1212', visible: true };
+        redNode.visible = true;
       }
-    });
+      const coachNode = sc.nodes.find((n) => n.id === 'coach') || humanoids[1];
+      const cOff = state.actorOffsets.n3d_actor_coach || state.actorOffsets.n3d_actor_secondary || {};
+      if (coachNode) {
+        coachNode.wireframe = !!state.wireframe;
+        coachNode.position = [0.83 + ((cOff.x || 0) * 0.003), -((cOff.y || 0) * 0.003), -0.15];
+        coachNode.rotation = [0, typeof cOff.rot === 'number' ? cOff.rot : 90, 0];
+        coachNode.pose = 'folded';
+        coachNode.material = coachNode.material || {};
+        coachNode.material.color = '#e0ded0';
+        coachNode.parts = coachNode.parts || {};
+        coachNode.parts.shirt = { ...(coachNode.parts.shirt || {}), color: '#e0ded0', visible: true };
+        coachNode.parts.trousers = { ...(coachNode.parts.trousers || {}), color: '#cdc8b8', visible: true };
+        coachNode.parts.hat = { ...(coachNode.parts.hat || {}), visible: true, color: state.hatColor };
+        coachNode.visible = true;
+      }
+      sc.nodes.filter((n) => n.id.startsWith('table-') || n.id.startsWith('chair-') || n.id === 'smoke-back').forEach((n) => {
+        n.visible = true;
+      });
+    } else {
+      humanoids.forEach((h, idx) => {
+        h.wireframe = !!state.wireframe;
+        h.proportions = {
+          headSize: state.headSize,
+          neckLength: 0.95,
+          shoulderWidth: state.shoulderWidth,
+          armLength: state.armLength,
+          legLength: state.legLength
+        };
+        h.shape = h.shape || {};
+        h.shape.female = state.foundation === 'female' ? 1 : 0;
+        if (idx === 0) {
+          h.material = h.material || {};
+          h.material.color = state.shirtColor;
+          h.material.roughness = state.roughness;
+          h.material.metalness = state.metalness;
+          h.parts = h.parts || {};
+          h.parts.shirt = { ...(h.parts.shirt || {}), visible: state.shirtVisible, color: state.shirtColor, roughness: state.roughness };
+          h.parts.trousers = { ...(h.parts.trousers || {}), visible: state.trousersVisible, color: state.trousersColor || state.shirtColor, roughness: state.roughness };
+
+          const pOff = state.actorOffsets.n3d_actor_primary || {};
+          h.rotation = h.rotation || [0, 90, 0];
+          if (typeof pOff.rot === 'number') {
+            h.rotation[1] = pOff.rot;
+          }
+          if (typeof pOff.x === 'number') {
+            h.position = h.position || [-0.65, 0, 0.3];
+            h.position[0] = -0.65 + (pOff.x * 0.003);
+          }
+          if (typeof pOff.y === 'number') {
+            h.position = h.position || [-0.65, 0, 0.3];
+            h.position[1] = -(pOff.y * 0.003);
+          }
+        } else if (idx === 1) {
+          const sOff = state.actorOffsets.n3d_actor_secondary || {};
+          h.rotation = h.rotation || [0, -65, 0];
+          if (typeof sOff.rot === 'number') {
+            h.rotation[1] = sOff.rot;
+          }
+          if (typeof sOff.x === 'number') {
+            h.position = h.position || [0.65, 0, -0.6];
+            h.position[0] = 0.65 + (sOff.x * 0.003);
+          }
+          if (typeof sOff.y === 'number') {
+            h.position = h.position || [0.65, 0, -0.6];
+            h.position[1] = -(sOff.y * 0.003);
+          }
+          const hatOff = state.actorOffsets.n3d_prop_hat || {};
+          h.parts = h.parts || {};
+          h.parts.hat = {
+            ...(h.parts.hat || {}),
+            visible: state.hatVisible,
+            color: state.hatColor,
+            lift: (hatOff.lift || 0),
+            offsetX: (hatOff.x || 0) * 0.002
+          };
+        }
+      });
+    }
   }
 
   // Deterministic 3D wireframe/shaded mannequin fallback renderer (also used in JSDOM or while Three.js loads)
@@ -407,18 +466,32 @@
       drawHumanoid(W * 0.31 + p1.x, H * 0.55 + p1.y, 0.96, '#b91c1c', '#1e293b', false, state.hatColor, 1);
       drawHumanoid(W * 0.50, H * 0.52, 1.08, state.shirtColor, state.trousersColor, false, state.hatColor, 1);
       drawHumanoid(W * 0.69 + p2.x, H * 0.55 + p2.y, 0.96, '#991b1b', '#1e293b', false, state.hatColor, -1);
+    } else if (state.preset === 'checkpoint') {
+      // 14:55 Crimson Seated & Coach Reconstruction (Image 4 & 10)
+      const gSmoke = ctx.createRadialGradient(W * 0.5, H * 0.45, 10, W * 0.5, H * 0.45, 320);
+      gSmoke.addColorStop(0, 'rgba(160, 140, 140, 0.18)');
+      gSmoke.addColorStop(1, 'transparent');
+      ctx.fillStyle = gSmoke;
+      ctx.fillRect(0, 0, W, H);
+
+      // Desk assembly
+      const deskOff = state.actorOffsets.n3d_prop_desk || { x: 0, y: 0 };
+      ctx.fillStyle = '#f1efe7';
+      ctx.fillRect(W * 0.34 + deskOff.x, H * 0.58 + deskOff.y, 270, 10);
+      ctx.fillStyle = '#080a10';
+      ctx.fillRect(W * 0.36 + deskOff.x, H * 0.58 + 10 + deskOff.y, 240, 95);
+
+      // Seated crimson figure on chair (left)
+      const rOff = state.actorOffsets.n3d_actor_crimson || p1;
+      drawHumanoid(W * 0.26 + rOff.x, H * 0.60 + rOff.y, 0.98, '#9d1514', '#7f1212', false, state.hatColor, 1);
+
+      // Standing cream coach in fedora (right)
+      const cOff = state.actorOffsets.n3d_actor_coach || p2;
+      drawHumanoid(W * 0.74 + cOff.x, H * 0.54 + cOff.y, 1.08, '#dedbca', '#c5c2b0', true, state.hatColor, -1);
     } else {
-      // Handshake or 14:55 Checkpoint pair
-      if (state.preset === 'checkpoint') {
-        // Desk & Chair assembly
-        const deskOff = state.actorOffsets.n3d_prop_desk || { x: 0, y: 0 };
-        ctx.fillStyle = '#e4e2da';
-        ctx.fillRect(W * 0.36 + deskOff.x, H * 0.56 + deskOff.y, 240, 8);
-        ctx.fillStyle = '#090b10';
-        ctx.fillRect(W * 0.38 + deskOff.x, H * 0.56 + 8 + deskOff.y, 210, 95);
-      }
+      // Blue & Cream or Handshake pair
       drawHumanoid(W * 0.38 + p1.x - sway * 0.4, H * 0.55 + p1.y, 1.06, state.shirtColor, state.trousersColor, false, state.hatColor, 1);
-      drawHumanoid(W * 0.62 + p2.x + sway * 0.4, H * 0.54 + p2.y, 1.08, '#eee9da', '#d6d3c4', true, state.hatColor, -1);
+      drawHumanoid(W * 0.62 + p2.x + sway * 0.4, H * 0.54 + p2.y, 1.08, '#dedbca', '#c5c2b0', true, state.hatColor, -1);
     }
 
     // HUD badge for V108 Surface Builder telemetry
@@ -494,16 +567,19 @@
     };
 
     const charList = Array.from(engine.characters.entries());
-    const blueChar = engine.characters.get('blue') || (charList[0] && charList[0][1]);
+    const primaryId = state.preset === 'checkpoint' ? 'n3d_actor_crimson' : 'n3d_actor_primary';
+    const secondaryId = state.preset === 'checkpoint' ? 'n3d_actor_coach' : 'n3d_actor_secondary';
+
+    const p1Char = engine.characters.get('red') || engine.characters.get('blue') || (charList[0] && charList[0][1]);
     const coachChar = engine.characters.get('coach') || (charList[1] && charList[1][1]);
 
-    if (blueChar && blueChar.group) {
-      const b = calcBounds(blueChar.group);
-      if (b) applyBoxToHitElement(viewport, 'n3d_actor_primary', b);
+    if (p1Char && p1Char.group) {
+      const b = calcBounds(p1Char.group);
+      if (b) applyBoxToHitElement(viewport, primaryId, b);
     }
     if (coachChar && coachChar.group) {
       const b = calcBounds(coachChar.group);
-      if (b) applyBoxToHitElement(viewport, 'n3d_actor_secondary', b);
+      if (b) applyBoxToHitElement(viewport, secondaryId, b);
 
       let hatObj = coachChar.hat;
       if (!hatObj) {
@@ -515,6 +591,11 @@
         const hb = calcBounds(hatObj);
         if (hb) applyBoxToHitElement(viewport, 'n3d_prop_hat', hb);
       }
+    }
+
+    const deskBox = viewport.querySelector('[data-n3d-obj="n3d_prop_desk"]');
+    if (deskBox) {
+      deskBox.style.display = state.preset === 'checkpoint' ? 'block' : 'none';
     }
   }
 
@@ -551,10 +632,11 @@
 
   function buildNative3DStageHTML(templateId, isHover) {
     const suffix = isHover ? `hover-${templateId}` : templateId;
+    const currentObjects = getActiveStageObjects(state.preset);
 
     const hitOverlayHtml = !isHover ? `
       <div class="rg-n3d-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:auto;">
-        ${STAGE_OBJECTS.map((obj) => `
+        ${currentObjects.map((obj) => `
           <div class="rg-n3d-hit-box"
                data-n3d-obj="${obj.id}"
                data-n3d-variant="${obj.variant}"
@@ -565,10 +647,21 @@
       </div>
     ` : '';
 
+    const presetPillsHtml = !isHover ? `
+      <div class="rg-n3d-presets-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:6px;background:rgba(15,19,28,0.92);border:1px solid rgba(255,255,255,0.12);padding:4px 8px;border-radius:24px;backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+        ${Object.values(PRESET_SCENES).map((p) => `
+          <button type="button" class="rg-n3d-preset-pill ${state.preset === p.id ? 'is-active' : ''}" data-n3d-preset="${p.id}" style="padding:5px 12px;border-radius:14px;border:none;cursor:pointer;font-size:11px;font-weight:700;color:${state.preset === p.id ? '#ffffff' : '#94a3b8'};background:${state.preset === p.id ? '#6d28d9' : 'transparent'};transition:all 0.15s ease;">
+            ${p.label}
+          </button>
+        `).join('')}
+      </div>
+    ` : '';
+
     return `
       <div id="regaarder-n3d-viewport-${suffix}" class="rg-n3d-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#0b0f17;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;cursor:default;">
         <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;cursor:default;"></canvas>
         ${hitOverlayHtml}
+        ${presetPillsHtml}
       </div>
     `;
   }
@@ -580,6 +673,26 @@
     ensureNative3DLoaded().then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
       renderNative3DCanvas(canvas, t);
+    });
+
+    viewport.querySelectorAll('[data-n3d-preset]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pKey = btn.getAttribute('data-n3d-preset');
+        if (pKey && PRESET_SCENES[pKey]) {
+          state.preset = pKey;
+          state.backgroundHex = PRESET_SCENES[pKey].background;
+          state.shirtColor = PRESET_SCENES[pKey].primaryColor;
+          rebuildNativeSceneFromPreset();
+          const stage = document.getElementById('tpl-modal-preview-stage');
+          if (stage) {
+            window.renderRegaarderNative3DStage(stage, TEMPLATE_ID, false);
+          }
+          if (typeof window.organizeUniversalTemplateControls === 'function') {
+            window.organizeUniversalTemplateControls();
+          }
+        }
+      });
     });
 
     const hitBoxes = viewport.querySelectorAll('[data-n3d-obj]');
@@ -733,6 +846,9 @@
     }
   };
 
+  window.renderProjectedMannequinScene = renderProjectedMannequinScene;
+  window.syncStateToNativeScene = syncStateToNativeScene;
+
   window.stepRegaarderNative3DAnimation = function (container, templateId, elapsedSec) {
     if (!container) return;
     const canvas = container.querySelector('canvas');
@@ -813,6 +929,18 @@
   // Standardized 4-Tab Contextual Inspector (Content, Motion, Look, Effects) + Advanced Controls
   window.tplBuildRegaarderNative3DRegaarderPanes = function () {
     const contentHtml = `
+      <div class="rg-inspector-section">
+        <div class="rg-section-header"><span class="rg-section-title">3D Mesh, Topology & Rigging Workshop</span></div>
+        <div class="rg-section-body">
+          <button type="button" class="rg-btn-primary" data-action="open-3d-workshop" style="width:100%;padding:9px 12px;background:linear-gradient(135deg, #7c3aed, #4f46e5);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:11.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 14px rgba(124,58,237,0.35);">
+            <span>🛠️</span> Open 3D Mesh & Rigging Workshop
+          </button>
+          <div style="font-size:10px;color:#94a3b8;margin-top:6px;line-height:1.4;">
+            Launch the full native 3D viewport with wireframe topology, vertex sculpting brushes (Smooth, Grab, Inflate), and bone rigging.
+          </div>
+        </div>
+      </div>
+
       <div class="rg-inspector-section">
         <div class="rg-section-header"><span class="rg-section-title">3D Scene Preset & Foundation</span></div>
         <div class="rg-section-body">
@@ -1056,6 +1184,14 @@
 
     const uvCanvas = modalEl.querySelector('[data-role="n3d-uv-canvas"]');
     if (uvCanvas) renderUVPreviewCanvas(uvCanvas);
+
+    modalEl.querySelectorAll('[data-action="open-3d-workshop"]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (typeof window.openNative3DWorkshop === 'function') {
+          window.openNative3DWorkshop();
+        }
+      });
+    });
 
     const refreshStage = () => {
       const stage = document.getElementById('tpl-modal-preview-stage');

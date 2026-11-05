@@ -3342,5 +3342,43 @@ body.rg-ctx-toolbar-active #stage-tf-label {
   color: var(--rg-toolbar-icon-primary);
 }
 
+/* --------------------------------------------------------------------------
+   3D Mode Stage & HUD Rules
+   When 3D Mode is active on the stage, video playback controls, HUD timelines,
+   and bottom storyboards are cleanly suppressed.
+   -------------------------------------------------------------------------- */
+.is-3d-stage #tpl-modal-playback-bar,
+.is-3d-stage #magnates-bp-player-hud,
+.is-3d-stage .tpl-modal-player-hud,
+.is-3d-stage #tpl-modal-storyboard-container,
+.is-3d-stage #modal-customizer-controls,
+.is-3d-stage #modal-customizer-timeline-slider,
+.is-3d-stage .tpl-hud-scrubber-wrap {
+  display: none !important;
+}
+
+#modal-native3d-editor {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 100000;
+  width: min(1520px, 98vw);
+  max-width: 98vw;
+  height: min(920px, 96vh);
+  max-height: 96vh;
+  padding: 0;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 14px;
+  background: #0f1319;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+#modal-native3d-editor::backdrop {
+  background: rgba(4, 6, 12, 0.85);
+  backdrop-filter: blur(12px);
+}
+
+
 
 
