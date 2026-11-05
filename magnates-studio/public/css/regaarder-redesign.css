@@ -1137,16 +1137,24 @@
   z-index: 60 !important;
 }
 
-.tpl-stage-hover-parent:hover #magnates-bp-player-hud,
-.tpl-stage-hover-parent:hover #tpl-modal-player-hud,
-.tpl-stage-hover-parent:hover .tpl-modal-player-hud,
-#magnates-bp-stage:hover #magnates-bp-player-hud,
-#magnates-bp-canvas-box:hover #magnates-bp-player-hud,
-#tpl-modal-preview-stage-container:hover #tpl-modal-player-hud,
-#tpl-modal-preview-canvas-box:hover #tpl-modal-player-hud,
-#tpl-modal-preview-stage:hover #tpl-modal-player-hud {
+.tpl-stage-hover-parent:not(.is-3d-stage):hover #magnates-bp-player-hud,
+.tpl-stage-hover-parent:not(.is-3d-stage):hover #tpl-modal-player-hud,
+.tpl-stage-hover-parent:not(.is-3d-stage):hover .tpl-modal-player-hud,
+#magnates-bp-stage:not(.is-3d-stage):hover #magnates-bp-player-hud,
+#magnates-bp-canvas-box:not(.is-3d-stage):hover #magnates-bp-player-hud,
+#tpl-modal-preview-stage-container:not(.is-3d-stage):hover #tpl-modal-player-hud,
+#tpl-modal-preview-canvas-box:not(.is-3d-stage):hover #tpl-modal-player-hud,
+#tpl-modal-preview-stage:not(.is-3d-stage):hover #tpl-modal-player-hud {
   opacity: 1 !important;
   pointer-events: auto !important;
+}
+
+/* Ensure seek bar & thumb are prominent and responsive in video mode */
+#tpl-modal-player-hud:hover .tpl-hud-scrubber-track {
+  height: 5px !important;
+}
+#tpl-modal-player-hud:hover .tpl-hud-scrubber-thumb {
+  transform: translateY(-50%) scale(1) !important;
 }
 
 /* Hide ONLY the duplicate bottom playback bar below the stage (keep all top-left/top-right stage controls & Templates Library visible!) */
@@ -3343,18 +3351,32 @@ body.rg-ctx-toolbar-active #stage-tf-label {
 }
 
 /* --------------------------------------------------------------------------
-   3D Mode Stage & HUD Rules
-   When 3D Mode is active on the stage, video playback controls, HUD timelines,
-   and bottom storyboards are cleanly suppressed.
+   3D Mode Stage & Complete HUD Suppression Rules
+   When 3D Mode is active on the stage, ALL video playback controls, hover HUDS,
+   scrubbers, and bottom storyboards are 100% suppressed with zero hover leaks.
    -------------------------------------------------------------------------- */
 .is-3d-stage #tpl-modal-playback-bar,
 .is-3d-stage #magnates-bp-player-hud,
+.is-3d-stage #tpl-modal-player-hud,
 .is-3d-stage .tpl-modal-player-hud,
+.is-3d-stage .tpl-modal-player-hud *,
 .is-3d-stage #tpl-modal-storyboard-container,
 .is-3d-stage #modal-customizer-controls,
 .is-3d-stage #modal-customizer-timeline-slider,
-.is-3d-stage .tpl-hud-scrubber-wrap {
+.is-3d-stage .tpl-hud-scrubber-wrap,
+#tpl-modal-preview-stage-container.is-3d-stage #tpl-modal-player-hud,
+#tpl-modal-preview-stage-container.is-3d-stage:hover #tpl-modal-player-hud,
+#tpl-modal-preview-stage-container.is-3d-stage .tpl-modal-player-hud,
+#tpl-modal-preview-stage-container.is-3d-stage:hover .tpl-modal-player-hud,
+#tpl-modal-preview-stage.is-3d-stage:hover #tpl-modal-player-hud,
+#tpl-modal-preview-canvas-box.is-3d-stage:hover #tpl-modal-player-hud,
+#magnates-bp-canvas-box.is-3d-stage #magnates-bp-player-hud,
+#magnates-bp-canvas-box.is-3d-stage:hover #magnates-bp-player-hud,
+#magnates-bp-stage.is-3d-stage:hover #magnates-bp-player-hud {
   display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
 }
 
 #modal-native3d-editor {

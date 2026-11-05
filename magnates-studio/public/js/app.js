@@ -33884,8 +33884,35 @@ window.syncUniversal3DStageMode = function (is3D) {
   const storyboardContainer = document.getElementById('tpl-modal-storyboard-container');
   if (storyboardContainer) storyboardContainer.style.display = is3D ? 'none' : 'flex';
 
+  const tplHud = document.getElementById('tpl-modal-player-hud');
+  if (tplHud) {
+    if (is3D) {
+      tplHud.style.setProperty('display', 'none', 'important');
+      tplHud.style.setProperty('opacity', '0', 'important');
+      tplHud.style.setProperty('visibility', 'hidden', 'important');
+      tplHud.style.setProperty('pointer-events', 'none', 'important');
+    } else {
+      tplHud.style.removeProperty('display');
+      tplHud.style.removeProperty('opacity');
+      tplHud.style.removeProperty('visibility');
+      tplHud.style.removeProperty('pointer-events');
+    }
+  }
+
   const bpHud = document.getElementById('magnates-bp-player-hud');
-  if (bpHud) bpHud.style.display = is3D ? 'none' : 'block';
+  if (bpHud) {
+    if (is3D) {
+      bpHud.style.setProperty('display', 'none', 'important');
+      bpHud.style.setProperty('opacity', '0', 'important');
+      bpHud.style.setProperty('visibility', 'hidden', 'important');
+      bpHud.style.setProperty('pointer-events', 'none', 'important');
+    } else {
+      bpHud.style.removeProperty('display');
+      bpHud.style.removeProperty('opacity');
+      bpHud.style.removeProperty('visibility');
+      bpHud.style.removeProperty('pointer-events');
+    }
+  }
 
   const bpPlaybackBar = document.querySelector('#magnates-bp-canvas-box > div:last-child');
   if (bpPlaybackBar) bpPlaybackBar.style.display = is3D ? 'none' : 'flex';
@@ -33993,6 +34020,10 @@ window.openNative3DWorkshop = async function () {
 function openTopTemplateCustomizer(tpl) {
   if (!tpl) return;
   topCustomizerState.currentTpl = tpl;
+  const is3DInitial = tpl.id === 'regaarder-native3d-surface-builder' || tpl.previewType === 'regaarder-native3d';
+  if (typeof window.syncUniversal3DStageMode === 'function') {
+    window.syncUniversal3DStageMode(is3DInitial);
+  }
   topCustomizerState.transforms = { fg: { x: 0, y: 0, scale: 1, isFullscreen: false }, bg: { x: 0, y: 0, scale: 1 }, text: { x: 0, y: 0, scale: 1 } };
   if (tpl.id === 'spooner-2-5d-photo-parallax') {
     topCustomizerState.originalPhotoUrl = 'hiker_parallax_reference.png';

@@ -177,11 +177,20 @@
       ],
       selectedLayer: 'masterTimeline',
       stageObjects: [
-        { id: 'doc_origins_portrait', layerId: 'portrait', name: 'Archival Portrait', variant: 'media', x: 50, y: 50, w: 42, h: 58 },
-        { id: 'doc_pele_handshake', layerId: 'handshake', name: 'Handshake Clasp', variant: 'media', x: 50, y: 24, w: 36, h: 28 },
-        { id: 'doc_final_shoe', layerId: 'hotShoe', name: 'Burning Trainer Mesh', variant: 'media', x: 50, y: 52, w: 42, h: 38 },
-        { id: 'doc_final_adidas', layerId: 'adidasCard', name: 'Adidas Brand Card', variant: 'media', x: 32, y: 52, w: 28, h: 34 },
-        { id: 'doc_final_puma', layerId: 'pumaCard', name: 'PUMA Brand Card', variant: 'media', x: 66, y: 54, w: 28, h: 34 }
+        { id: 'doc_origins_portrait', layerId: 'portrait', name: 'Archival Founder Portrait', variant: 'media', x: 50, y: 50, w: 42, h: 58, sceneId: 'origins' },
+        { id: 'doc_act1_adolf', layerId: 'portrait', name: 'Adolf Dassler (Founder)', variant: 'media', x: 24, y: 44, w: 26, h: 48, sceneId: 'early_feud', minTime: 20, maxTime: 180 },
+        { id: 'doc_act1_shoe', layerId: 'vintageBoot', name: 'Original Hand-Forged Spikes (1924)', variant: 'media', x: 50, y: 46, w: 32, h: 36, sceneId: 'early_feud', minTime: 55, maxTime: 180 },
+        { id: 'doc_act1_rudolf', layerId: 'brother', name: 'Rudolf Dassler (Co-Founder)', variant: 'media', x: 76, y: 44, w: 26, h: 48, sceneId: 'early_feud', minTime: 110, maxTime: 180 },
+        { id: 'doc_act2_golden_spikes', layerId: 'goldenSpikes', name: 'Jesse Owens Golden Spikes (1936)', variant: 'media', x: 50, y: 46, w: 34, h: 36, sceneId: 'early_feud', minTime: 180, maxTime: 360 },
+        { id: 'doc_act3_adidas_logo', layerId: 'adidasBars', name: 'Adidas 3-Stripes Mark (1948)', variant: 'media', x: 25, y: 45, w: 30, h: 36, sceneId: 'early_feud', minTime: 360, maxTime: 540 },
+        { id: 'doc_act3_puma_logo', layerId: 'pumaLockup', name: 'PUMA Formstrip & Cat (1948)', variant: 'media', x: 75, y: 45, w: 30, h: 36, sceneId: 'early_feud', minTime: 360, maxTime: 540 },
+        { id: 'doc_act4_bern_boot', layerId: 'bernBoot', name: 'Screw-in Studded Boot (Bern 1954)', variant: 'media', x: 50, y: 46, w: 32, h: 36, sceneId: 'early_feud', minTime: 540, maxTime: 720 },
+        { id: 'doc_act5_contract', layerId: 'contract', name: 'Underground Secret Contract', variant: 'media', x: 50, y: 46, w: 32, h: 36, sceneId: 'early_feud', minTime: 720, maxTime: 895 },
+        { id: 'doc_checkpoint_figure', layerId: 'mannequinRig', name: 'Checkpoint 3D Mannequin Rig', variant: 'model', x: 50, y: 50, w: 40, h: 60, sceneId: 'checkpoint3d', minTime: 895, maxTime: 960 },
+        { id: 'doc_pele_handshake', layerId: 'handshake', name: 'Handshake Clasp', variant: 'media', x: 50, y: 24, w: 36, h: 28, sceneId: 'pele', minTime: 1130, maxTime: 1214 },
+        { id: 'doc_final_shoe', layerId: 'hotShoe', name: 'Burning Trainer Mesh', variant: 'media', x: 50, y: 52, w: 42, h: 38, sceneId: 'final', minTime: 1409, maxTime: 1614.6 },
+        { id: 'doc_final_adidas', layerId: 'adidasCard', name: 'Adidas Brand Card', variant: 'media', x: 32, y: 52, w: 28, h: 34, sceneId: 'final', minTime: 1409, maxTime: 1614.6 },
+        { id: 'doc_final_puma', layerId: 'pumaCard', name: 'PUMA Brand Card', variant: 'media', x: 66, y: 54, w: 28, h: 34, sceneId: 'final', minTime: 1409, maxTime: 1614.6 }
       ]
     }
   };
@@ -285,7 +294,22 @@
           title: 'REGAARDER MASTER SEQUENCE',
           subtitle: '0:00–26:54 FULL DOCUMENTARY'
         },
-        layers: {}
+        layers: {
+          portrait: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          vintageBoot: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          brother: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          goldenSpikes: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          adidasBars: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          pumaLockup: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          bernBoot: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          contract: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          mannequinRig: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          handshake: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          hotShoe: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          adidasCard: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          pumaCard: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true },
+          masterTimeline: { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, blur: 0, depth: 1, visible: true }
+        }
       };
     }
 
@@ -311,32 +335,44 @@
     rt.loading = true;
     try {
       if (templateId === 'regaarder-full-documentary') {
-        const docArchivalUrls = [
+        const immediateUrls = [
           '/assets/regaarder-motion/map.png',
           '/assets/regaarder-motion/portrait.png',
           '/assets/regaarder-motion/pair-v2.png',
-          '/assets/regaarder-motion/faces-v3.png',
-          '/assets/regaarder-motion/young-man-v2.png',
-          '/assets/regaarder-motion/clouds.png',
-          '/assets/regaarder-motion/adidas-bars.svg',
-          '/assets/regaarder-motion/puma-lockup.svg',
-          '/assets/minute16/vintage-boot.png',
-          '/assets/pele126/dollar-hundred-source.jpg',
-          '/assets/pele126/horst-archival.jpg',
-          '/assets/final-chapter/wall.png',
-          '/assets/final-chapter/wood.png',
-          '/assets/final-chapter/dust.png'
+          '/assets/minute16/vintage-boot.png'
         ];
-        docArchivalUrls.forEach((u) => getDocArchivalImage(u));
+        await Promise.all(immediateUrls.map((u) => {
+          const im = getDocArchivalImage(u);
+          return (im.decode ? im.decode().catch(() => {}) : Promise.resolve());
+        }));
 
-        await Promise.all([
-          ensureChapterModuleLoaded('regaarder-pele-pact-chapter'),
-          ensureChapterModuleLoaded('regaarder-minute16-chapter'),
-          ensureChapterModuleLoaded('regaarder-minute17-chapter'),
-          ensureChapterModuleLoaded('regaarder-final-chapter'),
-          (typeof window.ensureNative3DLoaded === 'function' ? window.ensureNative3DLoaded() : Promise.resolve())
-        ]);
         rt.ready = true;
+        rt.loading = false;
+
+        // Lazy-load later chapter modules in background without stalling playback
+        setTimeout(() => {
+          const laterUrls = [
+            '/assets/regaarder-motion/faces-v3.png',
+            '/assets/regaarder-motion/clouds.png',
+            '/assets/regaarder-motion/adidas-bars.svg',
+            '/assets/regaarder-motion/puma-lockup.svg',
+            '/assets/pele126/dollar-hundred-source.jpg',
+            '/assets/pele126/horst-archival.jpg',
+            '/assets/final-chapter/wall.png',
+            '/assets/final-chapter/wood.png',
+            '/assets/final-chapter/dust.png'
+          ];
+          laterUrls.forEach((u) => getDocArchivalImage(u));
+
+          Promise.allSettled([
+            ensureChapterModuleLoaded('regaarder-pele-pact-chapter'),
+            ensureChapterModuleLoaded('regaarder-minute16-chapter'),
+            ensureChapterModuleLoaded('regaarder-minute17-chapter'),
+            ensureChapterModuleLoaded('regaarder-final-chapter'),
+            (typeof window.ensureNative3DLoaded === 'function' ? window.ensureNative3DLoaded() : Promise.resolve())
+          ]).catch(() => {});
+        }, 150);
+
         return rt;
       }
 
@@ -471,18 +507,32 @@
     let actTitle = 'CHAPTER 1 · THE DASSLER BROTHERS WORKSHOP';
     let actSubtitle = '1924–1936 · BAVARIAN ARTISANS & THE BIRTH OF SPIKES';
     let bgUrl = '/assets/regaarder-motion/map.png';
-    let fgLeftUrl = '/assets/regaarder-motion/portrait.png';
-    let fgRightUrl = '/assets/regaarder-motion/young-man-v2.png';
-    let centerUrl = '/assets/minute16/vintage-boot.png';
+    let fgLeftUrl = null;
+    let fgRightUrl = null;
+    let centerUrl = null;
     let showSplit = false;
 
-    if (t < 180) {
+    if (t < 55) {
       actTitle = 'CHAPTER 1 · THE DASSLER BROTHERS WORKSHOP';
-      actSubtitle = '1924–1936 · BAVARIAN ARTISANS & THE BIRTH OF SPIKES';
+      actSubtitle = '1924–1928 · BAVARIAN ARTISANS & THE LAUNDRY ROOM ATELIER';
       bgUrl = '/assets/regaarder-motion/map.png';
       fgLeftUrl = '/assets/regaarder-motion/portrait.png';
-      fgRightUrl = '/assets/regaarder-motion/young-man-v2.png';
+      centerUrl = null;
+      fgRightUrl = null;
+    } else if (t < 110) {
+      actTitle = 'CHAPTER 1 · FORGING THE FIRST RUNNING SPIKES';
+      actSubtitle = '1924–1928 · ADOLF DASSLER FORGES HAND-HAMMERED STEEL TRACK SHOES';
+      bgUrl = '/assets/regaarder-motion/map.png';
+      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
       centerUrl = '/assets/minute16/vintage-boot.png';
+      fgRightUrl = null;
+    } else if (t < 180) {
+      actTitle = 'CHAPTER 1 · ADOLF & RUDOLF JOIN FORCES';
+      actSubtitle = '1928–1936 · GEBRÜDER DASSLER SCHUHFABRIK ON THE WORLD STAGE';
+      bgUrl = '/assets/regaarder-motion/map.png';
+      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
+      centerUrl = '/assets/minute16/vintage-boot.png';
+      fgRightUrl = '/assets/regaarder-motion/pair-v2.png';
     } else if (t < 360) {
       actTitle = 'CHAPTER 2 · THE 1936 OLYMPIC TRIUMPH';
       actSubtitle = 'BERLIN 1936 · JESSE OWENS & THE GOLDEN HAND-CRAFTED SPIKES';
@@ -767,6 +817,15 @@
     renderFallbackPreview(ctx, rt, t);
   }
 
+  function isChapterObjActive(obj, curSceneId, timeSec) {
+    if (!obj) return false;
+    const t = Number(timeSec) || 0;
+    if (obj.sceneId && curSceneId && obj.sceneId !== curSceneId) return false;
+    if (typeof obj.minTime === 'number' && t < obj.minTime) return false;
+    if (typeof obj.maxTime === 'number' && t > obj.maxTime) return false;
+    return true;
+  }
+
   function syncChapterHitOverlay(container, templateId, timeSec) {
     if (!container) return;
     const rt = chapterRuntime[templateId];
@@ -779,7 +838,8 @@
       const objId = box.getAttribute('data-chapter-obj');
       const obj = rt.stageObjects.find((o) => o.id === objId);
       if (!obj) return;
-      if (obj.sceneId && obj.sceneId !== curSceneId) {
+      const active = isChapterObjActive(obj, curSceneId, t);
+      if (!active) {
         box.style.display = 'none';
         box.style.pointerEvents = 'none';
       } else {
@@ -800,7 +860,7 @@
     const interactiveOverlayHtml = !isHover ? `
       <div class="rg-chapter-hit-layer" data-role="chapter-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:auto;">
         ${rt.stageObjects.map((obj) => {
-          const isVisible = !obj.sceneId || obj.sceneId === curSceneId;
+          const isVisible = isChapterObjActive(obj, curSceneId, activeTime);
           return `
           <div class="rg-chapter-hit-box"
                data-chapter-obj="${obj.id}"
@@ -864,9 +924,11 @@
         rt.selectedLayer = layerId;
 
         if (window.RegaarderContextualToolbar && typeof window.RegaarderContextualToolbar.showForObject === 'function') {
+          const stageObj = rt.stageObjects.find((o) => o.id === objId);
           window.RegaarderContextualToolbar.showForObject({
             contextType: 'template',
             objectKey: objId,
+            label: stageObj ? stageObj.name : objId,
             variant,
             anchorElement: box
           });
