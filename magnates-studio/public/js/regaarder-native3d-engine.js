@@ -14,9 +14,17 @@
   window.REGAARDER_NATIVE3D_TEMPLATE_ID = TEMPLATE_ID;
 
   const PRESET_SCENES = {
+    blue: {
+      id: 'blue',
+      label: '01 Blue & Cream Coach',
+      description: 'Blue figure and cream coach with tailored fedora hat and dynamic 3D studio lighting',
+      background: '#151322',
+      primaryColor: '#137cba',
+      secondaryColor: '#dedbca'
+    },
     handshake: {
       id: 'handshake',
-      label: '01 Handshake · Paired Contact',
+      label: '02 Handshake · Paired Contact',
       description: 'Two anatomical characters with finger-contact grip solver & studio softboxes',
       background: '#141820',
       primaryColor: '#137cba',
@@ -24,7 +32,7 @@
     },
     checkpoint: {
       id: 'checkpoint',
-      label: '02 14:55 Crimson Seated & Coach',
+      label: '03 14:55 Crimson Seated & Coach',
       description: 'Seated crimson figure, cream coach with brimmed hat, desk assembly & depth smoke',
       background: '#220406',
       primaryColor: '#9d1514',
@@ -32,7 +40,7 @@
     },
     team: {
       id: 'team',
-      label: '03 Three Red Players Formation',
+      label: '04 Three Red Players Formation',
       description: 'Trio formation with independent bone poses, wardrobe & rim lighting',
       background: '#17080a',
       primaryColor: '#b91c1c',
@@ -40,7 +48,7 @@
     },
     humanoid: {
       id: 'humanoid',
-      label: '04 Anatomical Mannequin Studio',
+      label: '05 Anatomical Mannequin Studio',
       description: 'Single mannequin for multiresolution sculpting, UV projection & vertex painting',
       background: '#11151b',
       primaryColor: '#7d8c9d',
@@ -49,7 +57,7 @@
   };
 
   const state = {
-    preset: 'handshake',
+    preset: 'blue',
     foundation: 'male', // 'male' | 'female'
     activeActor: 'actor_primary',
     activeSurface: 'body', // 'body' | 'head' | 'shirt' | 'trousers' | 'hat-brim' | 'hat-crown'
@@ -113,10 +121,10 @@
   window.REGAARDER_NATIVE3D_CONFIG = state;
 
   const STAGE_OBJECTS = [
-    { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 38, y: 54, w: 26, h: 64 },
-    { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 64, y: 52, w: 26, h: 64 },
-    { id: 'n3d_prop_hat', name: 'Tailored Brimmed Hat', variant: 'shape', x: 64, y: 24, w: 16, h: 14 },
-    { id: 'n3d_prop_desk', name: 'Studio Desk & Chair Prop', variant: 'shape', x: 52, y: 74, w: 46, h: 24 }
+    { id: 'n3d_actor_primary', name: 'Primary Humanoid Rig', variant: 'media', x: 35, y: 54, w: 26, h: 68 },
+    { id: 'n3d_actor_secondary', name: 'Secondary Coach Rig', variant: 'media', x: 65, y: 52, w: 26, h: 68 },
+    { id: 'n3d_prop_hat', name: 'Tailored Fedora Hat', variant: 'shape', x: 65, y: 22, w: 16, h: 14 },
+    { id: 'n3d_prop_desk', name: 'Studio Props', variant: 'shape', x: 50, y: 74, w: 46, h: 24 }
   ];
 
   async function ensureNative3DLoaded() {
@@ -125,11 +133,11 @@
     state.nativeLoading = true;
     try {
       const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod] = await Promise.all([
-        import('../native3d-v97/engine.js'),
-        import('../native3d-v97/scene.js'),
-        import('../native3d-v97/final-scenes.js'),
-        import('../native3d-v97/checkpoint.js'),
-        import('../native3d-v97/surface-ui.js')
+        import('/native3d-v97/engine.js'),
+        import('/native3d-v97/scene.js'),
+        import('/native3d-v97/final-scenes.js'),
+        import('/native3d-v97/checkpoint.js'),
+        import('/native3d-v97/surface-ui.js')
       ]);
       const data = await engineMod.loadHumanoid();
       state.nativeData = data;
@@ -150,7 +158,9 @@
   function rebuildNativeSceneFromPreset() {
     if (!state.nativeMods) return;
     const { sceneMod, finalMod, checkpointMod } = state.nativeMods;
-    if (state.preset === 'handshake') {
+    if (state.preset === 'blue') {
+      state.nativeScene = sceneMod.createNativeScene('blue');
+    } else if (state.preset === 'handshake') {
       state.nativeScene = finalMod.createFinalHandshake();
     } else if (state.preset === 'checkpoint') {
       state.nativeScene = checkpointMod.createCheckpoint3D();
@@ -415,15 +425,6 @@
 
   function buildNative3DStageHTML(templateId, isHover) {
     const suffix = isHover ? `hover-${templateId}` : templateId;
-    const presetBarHtml = !isHover ? `
-      <div class="rg-n3d-preset-bar" data-role="n3d-preset-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:32;display:flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:rgba(10,12,18,0.84);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 28px rgba(0,0,0,0.45);">
-        ${Object.values(PRESET_SCENES).map((p) => `
-          <button type="button" class="rg-n3d-preset-pill ${state.preset === p.id ? 'is-active' : ''}" data-n3d-preset="${p.id}" style="border:none;background:${state.preset === p.id ? 'rgba(130,60,240,0.34)' : 'transparent'};color:${state.preset === p.id ? '#fff' : 'rgba(226,232,240,0.75)'};font-size:10.5px;font-weight:600;padding:4px 10px;border-radius:999px;cursor:pointer;white-space:nowrap;">
-            ${p.label}
-          </button>
-        `).join('')}
-      </div>
-    ` : '';
 
     const hitOverlayHtml = !isHover ? `
       <div class="rg-n3d-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:auto;">
@@ -442,7 +443,6 @@
       <div id="regaarder-n3d-viewport-${suffix}" class="rg-n3d-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#0b0f17;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
         <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
         ${hitOverlayHtml}
-        ${presetBarHtml}
       </div>
     `;
   }
@@ -454,28 +454,6 @@
     ensureNative3DLoaded().then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
       renderNative3DCanvas(canvas, t);
-    });
-
-    viewport.querySelectorAll('[data-n3d-preset]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const presetId = btn.getAttribute('data-n3d-preset');
-        if (!PRESET_SCENES[presetId]) return;
-        state.preset = presetId;
-        state.backgroundHex = PRESET_SCENES[presetId].background;
-        state.shirtColor = PRESET_SCENES[presetId].primaryColor;
-        rebuildNativeSceneFromPreset();
-        viewport.querySelectorAll('[data-n3d-preset]').forEach((b) => {
-          const active = b.getAttribute('data-n3d-preset') === presetId;
-          b.classList.toggle('is-active', active);
-          b.style.background = active ? 'rgba(130,60,240,0.34)' : 'transparent';
-          b.style.color = active ? '#fff' : 'rgba(226,232,240,0.75)';
-        });
-        renderNative3DCanvas(canvas, (window.topCustomizerState && window.topCustomizerState.currentTime) || 0);
-        if (typeof window.organizeUniversalTemplateControls === 'function') {
-          window.organizeUniversalTemplateControls();
-        }
-      });
     });
 
     const hitBoxes = viewport.querySelectorAll('[data-n3d-obj]');

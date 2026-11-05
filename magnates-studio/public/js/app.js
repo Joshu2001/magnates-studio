@@ -34080,8 +34080,23 @@ function openTopTemplateCustomizer(tpl) {
     }
   }
   topCustomizerState.depth = 65;
-  topCustomizerState.duration = parseInt(tpl.timeToApply) || 6;
+  if (window.REGAARDER_CHAPTER_RUNTIME && window.REGAARDER_CHAPTER_RUNTIME[tpl.id]) {
+    topCustomizerState.duration = window.REGAARDER_CHAPTER_RUNTIME[tpl.id].duration || parseFloat(tpl.timeToApply) || 6;
+  } else {
+    topCustomizerState.duration = parseFloat(tpl.timeToApply) || 6;
+  }
+  topCustomizerState.currentTime = 0;
+  topCustomizerState.pausedElapsedMs = 0;
+  topCustomizerState.startTime = performance.now();
   topCustomizerState.isPlaying = true;
+  const initPlayBtn = document.getElementById('btn-tpl-modal-play-toggle');
+  if (initPlayBtn) initPlayBtn.textContent = '\u275a\u275a Pause';
+  const initIconPlay = document.getElementById('tpl-hud-icon-play');
+  const initIconPause = document.getElementById('tpl-hud-icon-pause');
+  if (initIconPlay && initIconPause) {
+    initIconPlay.style.display = 'none';
+    initIconPause.style.display = 'block';
+  }
   const isCutoutTpl = tpl.id === 'subject-25d-parallax' || tpl.id === 'spooner-2-5d-photo-parallax' || tpl.id === 'magnates-paper-vector-cutout';
   topCustomizerState.bgRemoved = isCutoutTpl;
   topCustomizerState.hasTextBehind = isCutoutTpl;
@@ -38340,6 +38355,8 @@ function renderCustomizerFrameAtTime(targetTime) {
     : (topCustomizerState.duration || 6);
 
   const clampedTime = Math.max(0, Math.min(targetTime, totalSeqDur));
+  topCustomizerState.currentTime = clampedTime;
+  topCustomizerState.pausedElapsedMs = clampedTime * 1000;
   topCustomizerState.startTime = performance.now() - (clampedTime * 1000);
   
   const aud = document.getElementById('modal-customizer-audio-player');
@@ -38366,6 +38383,7 @@ function startTopCustomizerLoop() {
       : (topCustomizerState.duration || 6);
 
     const seqTime = t % totalSeqDur;
+    topCustomizerState.currentTime = seqTime;
     updateTopCustomizerFrame(seqTime, now);
 
     topCustomizerState.animId = requestAnimationFrame(loop);
@@ -41496,8 +41514,11 @@ function bindTopTemplateCustomizerEvents() {
     if (play !== topCustomizerState.isPlaying) {
       if (!play) {
         topCustomizerState.pausedElapsedMs = performance.now() - topCustomizerState.startTime;
-      } else if (typeof topCustomizerState.pausedElapsedMs === 'number') {
-        topCustomizerState.startTime = performance.now() - topCustomizerState.pausedElapsedMs;
+      } else {
+        const elapsed = (typeof topCustomizerState.pausedElapsedMs === 'number')
+          ? topCustomizerState.pausedElapsedMs
+          : ((topCustomizerState.currentTime || 0) * 1000);
+        topCustomizerState.startTime = performance.now() - elapsed;
       }
     }
     topCustomizerState.isPlaying = play;
@@ -43347,8 +43368,15 @@ function modalSelectTemplateCard(templateId) {
   const isAddingNew = (window._modalInAddSceneMode === true);
   window._modalInAddSceneMode = false;
 
+  const getTplDuration = (t) => {
+    if (window.REGAARDER_CHAPTER_RUNTIME && window.REGAARDER_CHAPTER_RUNTIME[t.id]) {
+      return window.REGAARDER_CHAPTER_RUNTIME[t.id].duration || parseFloat(t.timeToApply) || 6;
+    }
+    return parseFloat(t.timeToApply) || 6;
+  };
+
   if (!Array.isArray(projectScenes) || projectScenes.length === 0) {
-    const dur = parseInt(tpl.timeToApply) || 6;
+    const dur = getTplDuration(tpl);
     projectScenes = [
       {
         id: `scene-1`,
@@ -43362,7 +43390,7 @@ function modalSelectTemplateCard(templateId) {
     activeStoryboardSceneIndex = 0;
   } else if (isAddingNew) {
     // Explicitly tapped "+ Add Scene" button -> append a new scene
-    const dur = parseInt(tpl.timeToApply) || 6;
+    const dur = getTplDuration(tpl);
     let totalDuration = 0;
     projectScenes.forEach(s => { totalDuration += (s.duration || 6); });
     const newIdx = projectScenes.length;
@@ -43381,6 +43409,7 @@ function modalSelectTemplateCard(templateId) {
     const curSc = projectScenes[activeStoryboardSceneIndex];
     if (curSc) {
       curSc.tplId = tpl.id;
+      curSc.duration = getTplDuration(tpl);
       curSc.title = `Scene ${activeStoryboardSceneIndex + 1}: ${tpl.title.split('(')[0].trim()}`;
       curSc.thumb = tpl.defaultImage;
       curSc.prim = tpl.defaultImage;

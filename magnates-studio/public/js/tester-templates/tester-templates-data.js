@@ -3,6 +3,28 @@
 (function() {
   window.NEW_TESTER_TEMPLATES = [
   {
+    "id": "regaarder-full-documentary",
+    "title": "Regaarder Documentary · Master Full Sequence (0:00–26:54)",
+    "category": "3D Spatial",
+    "origCategory": "3D Spatial",
+    "badge": "MASTER DOCUMENTARY",
+    "difficulty": "Pro Suite",
+    "timeToApply": "1614.6s",
+    "previewGradient": "linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(6, 8, 12, 0.99))",
+    "description": "The complete 26-minute master documentary sequence from 0:00 to 26:54: Origins Slow Reveal, Archival Feud, Checkpoint 3D Mannequins, Minute 16 Victory, Minute 17 Rain Rivalry, Chapter 6 Pelé Pact, and Chapter 7 The Final Chapter.",
+    "tags": [
+      "Master Timeline",
+      "Full Documentary",
+      "26 Minutes",
+      "All Chapters",
+      "Regaarder Motion",
+      "Continuous Playback"
+    ],
+    "previewType": "regaarder-chapter",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/regaarder-motion/portrait.png"
+  },
+  {
     "id": "regaarder-pele-pact-chapter",
     "title": "The Pelé Pact · Chapter 6 (18:50–20:14)",
     "category": "3D Spatial",

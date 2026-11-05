@@ -16,7 +16,8 @@
     'regaarder-pele-pact-chapter',
     'regaarder-minute16-chapter',
     'regaarder-minute17-chapter',
-    'regaarder-final-chapter'
+    'regaarder-final-chapter',
+    'regaarder-full-documentary'
   ];
 
   window.REGAARDER_CHAPTER_TEMPLATE_IDS = CHAPTER_TEMPLATE_IDS;
@@ -133,9 +134,46 @@
       selectedLayer: 'hotShoe',
       stageObjects: [
         { id: 'chapter_final_shoe', layerId: 'hotShoe', name: 'Burning Trainer Mesh', variant: 'media', x: 50, y: 54, w: 46, h: 44 },
+        { id: 'chapter_final_shoe_tl', layerId: 'chapterShoes', name: 'Floating Boot (Top Left)', variant: 'media', x: 18, y: 38, w: 22, h: 22 },
+        { id: 'chapter_final_shoe_tr', layerId: 'chapterShoes', name: 'Floating Boot (Top Right)', variant: 'media', x: 82, y: 36, w: 22, h: 22 },
+        { id: 'chapter_final_shoe_bl', layerId: 'chapterShoes', name: 'Floating Boot (Bottom Left)', variant: 'media', x: 20, y: 84, w: 22, h: 22 },
+        { id: 'chapter_final_shoe_br', layerId: 'chapterShoes', name: 'Floating Boot (Bottom Right)', variant: 'media', x: 78, y: 82, w: 22, h: 22 },
         { id: 'chapter_final_titles', layerId: 'titles', name: 'Chapter Headline', variant: 'text', x: 50, y: 48, w: 58, h: 24 },
         { id: 'chapter_final_adidas', layerId: 'adidasCard', name: 'Adidas Card', variant: 'media', x: 32, y: 52, w: 28, h: 34 },
-        { id: 'chapter_final_puma', layerId: 'pumaCard', name: 'PUMA Card', variant: 'media', x: 66, y: 54, w: 28, h: 34 }
+        { id: 'chapter_final_puma', layerId: 'pumaCard', name: 'PUMA Card', variant: 'media', x: 66, y: 54, w: 28, h: 34 },
+        { id: 'chapter_final_sofa', layerId: 'sofa', name: 'Leather Parlor Sofa', variant: 'media', x: 50, y: 86, w: 68, h: 26 },
+        { id: 'chapter_final_robert', layerId: 'robert', name: 'Robert Louis-Dreyfus', variant: 'media', x: 42, y: 52, w: 26, h: 48 },
+        { id: 'chapter_final_kanye', layerId: 'kanye', name: 'Kanye West Cutout', variant: 'media', x: 72, y: 50, w: 24, h: 48 },
+        { id: 'chapter_final_beckham', layerId: 'beckham', name: 'David Beckham Cutout', variant: 'media', x: 26, y: 50, w: 24, h: 48 }
+      ]
+    },
+    'regaarder-full-documentary': {
+      key: 'documentary',
+      title: 'Regaarder Documentary · Master Sequence',
+      subtitle: '0:00–26:54 · The Complete 7-Chapter Master Documentary Sequence',
+      duration: 1614.6,
+      ready: false,
+      loading: false,
+      mod: null,
+      media: {},
+      config: null,
+      defaults: null,
+      scenes: [
+        { id: 'origins', start: 0, end: 20, label: '01 · 0:00 Origins Slow Reveal' },
+        { id: 'early_feud', start: 20, end: 895, label: '02 · 0:20 Early Decades & Archival Feud' },
+        { id: 'checkpoint3d', start: 895, end: 960, label: '03 · 14:55 Checkpoint 3D Mannequins' },
+        { id: 'minute16', start: 960, end: 1020, label: '04 · 16:00 Minute 16 Victory & Accusations' },
+        { id: 'minute17', start: 1020, end: 1080, label: '05 · 17:00 Minute 17 Rain Rivalry & Split Flare' },
+        { id: 'pele', start: 1130, end: 1214, label: '06 · 18:50 Chapter 6: The Pelé Pact' },
+        { id: 'final', start: 1409, end: 1614.6, label: '07 · 23:29 Chapter 7: The Final Climax' }
+      ],
+      selectedLayer: 'masterTimeline',
+      stageObjects: [
+        { id: 'doc_origins_portrait', layerId: 'portrait', name: 'Archival Portrait', variant: 'media', x: 50, y: 50, w: 42, h: 58 },
+        { id: 'doc_pele_handshake', layerId: 'handshake', name: 'Handshake Clasp', variant: 'media', x: 50, y: 24, w: 36, h: 28 },
+        { id: 'doc_final_shoe', layerId: 'hotShoe', name: 'Burning Trainer Mesh', variant: 'media', x: 50, y: 52, w: 42, h: 38 },
+        { id: 'doc_final_adidas', layerId: 'adidasCard', name: 'Adidas Brand Card', variant: 'media', x: 32, y: 52, w: 28, h: 34 },
+        { id: 'doc_final_puma', layerId: 'pumaCard', name: 'PUMA Brand Card', variant: 'media', x: 66, y: 54, w: 28, h: 34 }
       ]
     }
   };
@@ -232,6 +270,15 @@
         cues: {},
         layers
       };
+    } else if (templateId === 'regaarder-full-documentary') {
+      rt.defaults = {
+        speed: 1, reverse: false, zoom: 1, exposure: 1,
+        copy: {
+          title: 'REGAARDER MASTER SEQUENCE',
+          subtitle: '0:00–26:54 FULL DOCUMENTARY'
+        },
+        layers: {}
+      };
     }
 
     rt.config = cloneDeep(rt.defaults);
@@ -245,6 +292,18 @@
     if (!rt || rt.ready || rt.loading) return rt;
     rt.loading = true;
     try {
+      if (templateId === 'regaarder-full-documentary') {
+        await Promise.all([
+          ensureChapterModuleLoaded('regaarder-pele-pact-chapter'),
+          ensureChapterModuleLoaded('regaarder-minute16-chapter'),
+          ensureChapterModuleLoaded('regaarder-minute17-chapter'),
+          ensureChapterModuleLoaded('regaarder-final-chapter'),
+          (typeof window.ensureNative3DLoaded === 'function' ? window.ensureNative3DLoaded() : Promise.resolve())
+        ]);
+        rt.ready = true;
+        return rt;
+      }
+
       if (templateId === 'regaarder-pele-pact-chapter') {
         const mod = await import('./regaarder-chapters/pele-sequence.js');
         rt.mod = mod;
@@ -260,7 +319,7 @@
           image: async (file) => {
             const im = new Image();
             im.crossOrigin = 'anonymous';
-            im.src = 'assets/pele126/' + file;
+            im.src = '/assets/pele126/' + file;
             try { await im.decode(); } catch (e) {}
             return im;
           }
@@ -271,7 +330,7 @@
         rt.mod = mod;
         rt.defaults = cloneDeep(mod.minute16Defaults);
         rt.config = { ...cloneDeep(mod.minute16Defaults), ...rt.config, layers: { ...cloneDeep(mod.minute16Defaults.layers), ...(rt.config?.layers || {}) } };
-        const loadedMap = mod.preloadMinute16('assets/minute16/');
+        const loadedMap = mod.preloadMinute16('/assets/minute16/');
         loadedMap.forEach((v, k) => { if (!rt.media[k]) rt.media[k] = v; });
       } else if (templateId === 'regaarder-minute17-chapter') {
         const mod = await import('./regaarder-chapters/minute17-sequence.js');
@@ -288,7 +347,7 @@
           image: async (file) => {
             const im = new Image();
             im.crossOrigin = 'anonymous';
-            im.src = 'assets/minute17/' + file;
+            im.src = '/assets/minute17/' + file;
             try { await im.decode(); } catch (e) {}
             return im;
           }
@@ -307,7 +366,7 @@
         };
         Object.entries(mod.sources).forEach(([id, file]) => {
           if (rt.media[id]) return;
-          const url = 'assets/final-chapter/' + file;
+          const url = '/assets/final-chapter/' + file;
           if (file.endsWith('.mp4')) {
             const v = document.createElement('video');
             v.muted = true;
@@ -361,6 +420,78 @@
     ctx.restore();
   }
 
+  function paintDocumentarySequence(ctx, t) {
+    const W = 960, H = 540;
+    if (t < 20) {
+      if (typeof window.tplPaintOriginsSlowRevealFrame === 'function') {
+        window.tplPaintOriginsSlowRevealFrame(ctx, t, window.REGAARDER_ORIGINS_CONFIG || {});
+        return;
+      }
+    } else if (t >= 895 && t < 960) {
+      const n3dState = window.REGAARDER_NATIVE3D_CONFIG;
+      if (n3dState && n3dState.nativeReady && n3dState.nativeEngine && n3dState.nativeScene) {
+        try {
+          n3dState.nativeEngine.render(n3dState.nativeScene, (t - 895) % 5);
+          ctx.clearRect(0, 0, W, H);
+          ctx.drawImage(n3dState.nativeEngine.canvas, 0, 0, W, H);
+          return;
+        } catch (e) {}
+      }
+    } else if (t >= 960 && t < 1020) {
+      const rtM16 = chapterRuntime['regaarder-minute16-chapter'];
+      if (rtM16 && rtM16.ready && rtM16.mod) {
+        rtM16.mod.paintMinute16(ctx, t - 960, rtM16.media, rtM16.config);
+        return;
+      }
+    } else if (t >= 1020 && t < 1080) {
+      const rtM17 = chapterRuntime['regaarder-minute17-chapter'];
+      if (rtM17 && rtM17.ready && rtM17.mod) {
+        rtM17.mod.paintMinute17(ctx, t - 1020, rtM17.media, rtM17.config);
+        return;
+      }
+    } else if (t >= 1130 && t < 1214) {
+      const rtPele = chapterRuntime['regaarder-pele-pact-chapter'];
+      if (rtPele && rtPele.ready && rtPele.mod) {
+        rtPele.mod.paintPele(ctx, t - 1130, rtPele.media, rtPele.config);
+        return;
+      }
+    } else if (t >= 1409 && t <= 1614.6) {
+      const rtFinal = chapterRuntime['regaarder-final-chapter'];
+      if (rtFinal && rtFinal.ready && rtFinal.mod) {
+        rtFinal.mod.paint(ctx, t - 1409, rtFinal.media, rtFinal.config);
+        return;
+      }
+    }
+
+    // Default documentary timeline card for intermissions
+    ctx.save();
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, '#0d131d');
+    grad.addColorStop(1, '#05070b');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '700 15px Inter, system-ui, sans-serif';
+    const curM = Math.floor(t / 60);
+    const curS = Math.floor(t % 60).toString().padStart(2, '0');
+    ctx.fillText(`REGAARDER MASTER SEQUENCE · ${curM}:${curS} / 26:54`, W / 2, H / 2 - 20);
+    ctx.fillStyle = '#f8fafc';
+    ctx.font = '800 30px Inter, system-ui, sans-serif';
+    let chapterName = 'ORIGINS';
+    if (t < 20) chapterName = 'CHAPTER 0 · ORIGINS SLOW REVEAL';
+    else if (t < 895) chapterName = 'CHAPTERS 1–4 · EARLY DECADES & ARCHIVAL FEUD';
+    else if (t < 960) chapterName = 'CHECKPOINT · NATIVE 3D MANNEQUINS STUDIO';
+    else if (t < 1020) chapterName = 'CHAPTER 5 · MINUTE 16 VICTORY & WAREHOUSE';
+    else if (t < 1080) chapterName = 'CHAPTER 5 · MINUTE 17 RAIN RIVALRY & SPLIT FLARE';
+    else if (t < 1214) chapterName = 'CHAPTER 6 · THE PELÉ PACT (18:50–20:14)';
+    else if (t < 1409) chapterName = 'CHAPTER 6 · BRAND REVIVAL & EPILOGUE';
+    else chapterName = 'CHAPTER 7 · THE FINAL CHAPTER (23:29–26:54)';
+    ctx.fillText(chapterName, W / 2, H / 2 + 22);
+    ctx.restore();
+  }
+
   function paintChapterFrame(canvas, templateId, timeSec) {
     if (!canvas) return;
     const rt = chapterRuntime[templateId];
@@ -371,6 +502,10 @@
     if (!ctx) return;
 
     const t = Math.max(0, Number(timeSec) || 0) % rt.duration;
+    if (templateId === 'regaarder-full-documentary') {
+      paintDocumentarySequence(ctx, t);
+      return;
+    }
     if (rt.ready && rt.mod) {
       try {
         if (templateId === 'regaarder-pele-pact-chapter') {
@@ -395,16 +530,6 @@
     if (!rt) return '';
     const suffix = isHover ? `hover-${templateId}` : templateId;
 
-    const scenePillsHtml = !isHover ? `
-      <div class="rg-chapter-beat-bar" data-role="chapter-beat-bar" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:32;display:flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:rgba(10,12,18,0.82);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.12);box-shadow:0 10px 28px rgba(0,0,0,0.45);max-width:94%;overflow-x:auto;">
-        ${rt.scenes.map((sc, idx) => `
-          <button type="button" class="rg-chapter-scene-pill ${idx === 0 ? 'is-active' : ''}" data-chapter-scene="${sc.id}" data-scene-start="${sc.start}" style="border:none;background:${idx === 0 ? 'rgba(130,60,240,0.32)' : 'transparent'};color:${idx === 0 ? '#fff' : 'rgba(226,232,240,0.75)'};font-size:10.5px;font-weight:600;padding:4px 9px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:all 0.16s ease;">
-            ${sc.label}
-          </button>
-        `).join('')}
-      </div>
-    ` : '';
-
     const interactiveOverlayHtml = !isHover ? `
       <div class="rg-chapter-hit-layer" data-role="chapter-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:auto;">
         ${rt.stageObjects.map((obj) => `
@@ -423,7 +548,6 @@
       <div id="regaarder-chapter-viewport-${suffix}" class="rg-chapter-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#04060a;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
         <canvas id="regaarder-chapter-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
         ${interactiveOverlayHtml}
-        ${scenePillsHtml}
       </div>
     `;
   }
@@ -437,26 +561,6 @@
     ensureChapterModuleLoaded(templateId).then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
       paintChapterFrame(canvas, templateId, t);
-    });
-
-    // Scene pill jump
-    viewport.querySelectorAll('[data-chapter-scene]').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        viewport.querySelectorAll('[data-chapter-scene]').forEach((b) => {
-          b.classList.remove('is-active');
-          b.style.background = 'transparent';
-          b.style.color = 'rgba(226,232,240,0.75)';
-        });
-        btn.classList.add('is-active');
-        btn.style.background = 'rgba(130,60,240,0.32)';
-        btn.style.color = '#fff';
-        const startSec = parseFloat(btn.getAttribute('data-scene-start')) || 0;
-        if (window.topCustomizerState) {
-          window.topCustomizerState.currentTime = startSec + 0.1;
-        }
-        paintChapterFrame(canvas, templateId, startSec + 0.1);
-      });
     });
 
     // Interactive object hit boxes -> Universal Contextual Toolbar + Drag
@@ -619,6 +723,11 @@
         <div class="rg-ctrl-row"><label class="rg-ctrl-label">Distress Line</label><input type="text" class="rg-text-input" data-ch-copy="distress" value="${cp.distress || 'BUT REVIVING THEM WOULDN’T BE'}"></div>
         <div class="rg-ctrl-row"><label class="rg-ctrl-label">Adidas HQ Pin</label><input type="text" class="rg-text-input" data-ch-copy="adidasHQ" value="${cp.adidasHQ || 'ADIDAS HEADQUARTERS'}"></div>
         <div class="rg-ctrl-row"><label class="rg-ctrl-label">PUMA HQ Pin</label><input type="text" class="rg-text-input" data-ch-copy="pumaHQ" value="${cp.pumaHQ || 'PUMA HEADQUARTERS'}"></div>
+      `;
+    } else if (templateId === 'regaarder-full-documentary') {
+      copyInputsHtml = `
+        <div class="rg-ctrl-row"><label class="rg-ctrl-label">Documentary Title</label><input type="text" class="rg-text-input" data-ch-copy="title" value="REGAARDER MASTER SEQUENCE"></div>
+        <div class="rg-ctrl-row"><label class="rg-ctrl-label">Documentary Subtitle</label><input type="text" class="rg-text-input" data-ch-copy="subtitle" value="0:00–26:54 FULL DOCUMENTARY"></div>
       `;
     }
 

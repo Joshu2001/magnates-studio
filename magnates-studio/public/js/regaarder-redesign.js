@@ -4274,6 +4274,97 @@
       icon: LUCIDE_ICONS.layers,
       domSelector: '[data-chapter-obj="chapter_final_puma"]'
     },
+    chapter_final_shoe_tl: {
+      id: 'chapter_final_shoe_tl',
+      name: 'Floating Boot (Top Left)',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_final_shoe_tl"]'
+    },
+    chapter_final_shoe_tr: {
+      id: 'chapter_final_shoe_tr',
+      name: 'Floating Boot (Top Right)',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_final_shoe_tr"]'
+    },
+    chapter_final_shoe_bl: {
+      id: 'chapter_final_shoe_bl',
+      name: 'Floating Boot (Bottom Left)',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_final_shoe_bl"]'
+    },
+    chapter_final_shoe_br: {
+      id: 'chapter_final_shoe_br',
+      name: 'Floating Boot (Bottom Right)',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="chapter_final_shoe_br"]'
+    },
+    chapter_final_sofa: {
+      id: 'chapter_final_sofa',
+      name: 'Leather Parlor Sofa',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="chapter_final_sofa"]'
+    },
+    chapter_final_robert: {
+      id: 'chapter_final_robert',
+      name: 'Robert Louis-Dreyfus',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      domSelector: '[data-chapter-obj="chapter_final_robert"]'
+    },
+    chapter_final_kanye: {
+      id: 'chapter_final_kanye',
+      name: 'Kanye West Cutout',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      domSelector: '[data-chapter-obj="chapter_final_kanye"]'
+    },
+    chapter_final_beckham: {
+      id: 'chapter_final_beckham',
+      name: 'David Beckham Cutout',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      domSelector: '[data-chapter-obj="chapter_final_beckham"]'
+    },
+    doc_origins_portrait: {
+      id: 'doc_origins_portrait',
+      name: 'Archival Portrait',
+      variant: 'media',
+      icon: LUCIDE_ICONS.imageIcon,
+      domSelector: '[data-chapter-obj="doc_origins_portrait"]'
+    },
+    doc_pele_handshake: {
+      id: 'doc_pele_handshake',
+      name: 'Handshake Clasp',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="doc_pele_handshake"]'
+    },
+    doc_final_shoe: {
+      id: 'doc_final_shoe',
+      name: 'Burning Trainer Mesh',
+      variant: 'media',
+      icon: LUCIDE_ICONS.cube3d,
+      domSelector: '[data-chapter-obj="doc_final_shoe"]'
+    },
+    doc_final_adidas: {
+      id: 'doc_final_adidas',
+      name: 'Adidas Brand Card',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="doc_final_adidas"]'
+    },
+    doc_final_puma: {
+      id: 'doc_final_puma',
+      name: 'PUMA Brand Card',
+      variant: 'media',
+      icon: LUCIDE_ICONS.layers,
+      domSelector: '[data-chapter-obj="doc_final_puma"]'
+    },
     // Regaarder Native 3D Objects
     n3d_actor_primary: {
       id: 'n3d_actor_primary',
@@ -4542,9 +4633,26 @@
         if (activeTplId === 'regaarder-final-chapter') {
           return [
             HUMAN_OBJECT_CATALOG.chapter_final_shoe,
+            HUMAN_OBJECT_CATALOG.chapter_final_shoe_tl,
+            HUMAN_OBJECT_CATALOG.chapter_final_shoe_tr,
+            HUMAN_OBJECT_CATALOG.chapter_final_shoe_bl,
+            HUMAN_OBJECT_CATALOG.chapter_final_shoe_br,
             HUMAN_OBJECT_CATALOG.chapter_final_titles,
             HUMAN_OBJECT_CATALOG.chapter_final_adidas,
-            HUMAN_OBJECT_CATALOG.chapter_final_puma
+            HUMAN_OBJECT_CATALOG.chapter_final_puma,
+            HUMAN_OBJECT_CATALOG.chapter_final_sofa,
+            HUMAN_OBJECT_CATALOG.chapter_final_robert,
+            HUMAN_OBJECT_CATALOG.chapter_final_kanye,
+            HUMAN_OBJECT_CATALOG.chapter_final_beckham
+          ];
+        }
+        if (activeTplId === 'regaarder-full-documentary') {
+          return [
+            HUMAN_OBJECT_CATALOG.doc_origins_portrait,
+            HUMAN_OBJECT_CATALOG.doc_pele_handshake,
+            HUMAN_OBJECT_CATALOG.doc_final_shoe,
+            HUMAN_OBJECT_CATALOG.doc_final_adidas,
+            HUMAN_OBJECT_CATALOG.doc_final_puma
           ];
         }
         if (activeTplId === 'regaarder-native3d-surface-builder') {
