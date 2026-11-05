@@ -4879,6 +4879,14 @@
     };
 
     const executeCommand = (cmd) => {
+      if (cmd === 'native-mesh-edit' && String(state.objectKey || '').startsWith('n3d_')) {
+        hide();
+        if (typeof window.openNative3DWorkshop === 'function') {
+          Promise.resolve(window.openNative3DWorkshop()).catch((error) =>
+            console.warn('[RegaarderNative3D] Could not open native mesh workspace:', error));
+        }
+        return;
+      }
       const meta = HUMAN_OBJECT_CATALOG[state.objectKey] || HUMAN_OBJECT_CATALOG.card;
       const domEl = meta.domSelector ? document.querySelector(meta.domSelector) : null;
 
@@ -5074,7 +5082,12 @@
     };
 
     const renderToolbar = () => {
-      const schema = TOOLBAR_VARIANT_SCHEMAS[state.variant] || TOOLBAR_VARIANT_SCHEMAS.media;
+      const isNative3DObject = String(state.objectKey || '').startsWith('n3d_');
+      const schema = isNative3DObject ? {
+        variantName: 'Native 3D Mesh and Rig',
+        primaryTools: ['select', 'move', 'rotate'],
+        quickProps: []
+      } : (TOOLBAR_VARIANT_SCHEMAS[state.variant] || TOOLBAR_VARIANT_SCHEMAS.media);
       const meta = HUMAN_OBJECT_CATALOG[state.objectKey] || HUMAN_OBJECT_CATALOG.card;
       const availableObjects = getAvailableSceneObjects();
       const activeQuickStyle = (getBpParams && getBpParams().printerCardQuickStyle) || 'clean';
@@ -5100,7 +5113,12 @@
         `;
       }).join('');
 
-      const quickPropsHtml = `
+      const quickPropsHtml = isNative3DObject ? `
+        <button type="button" class="rg-ctx-prop-btn" data-ctx-cmd="native-mesh-edit"
+          title="Edit true 3D vertices, edges, faces, rigging and sculpt brush strokes">
+          <span>◈</span><span>Mesh / Rig</span>
+        </button>
+      ` : `
         ${schema.quickProps.includes('replace') ? `
           <button type="button" class="rg-ctx-prop-btn" data-ctx-cmd="replace" title="Replace Media">
             ${LUCIDE_ICONS.imageIcon}
