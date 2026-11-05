@@ -1,0 +1,25 @@
+name: Regaarder Motion merge recovery
+
+on:
+  push:
+    branches:
+      - fix/regaarder-motion-merge-recovery-20261105
+  pull_request:
+    paths:
+      - 'magnates-studio/public/js/**'
+      - 'magnates-studio/public/native3d-v97/**'
+      - 'magnates-studio/public/assets/**'
+      - 'scripts/verify_regaarder_merge.cjs'
+      - '.github/workflows/regaarder-merge-check.yml'
+
+jobs:
+  source-and-media-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify recovered 3D and original motion modules
+        run: node scripts/verify_regaarder_merge.cjs
