@@ -155,10 +155,14 @@
 
   const STAGE_OBJECTS = getActiveStageObjects('blue');
 
+  let nativeLoadPromise = null;
   async function ensureNative3DLoaded() {
-    if (state.nativeReady || state.nativeLoading) return;
+    if (state.nativeReady) return;
+    if (nativeLoadPromise && state.nativeLoading) return nativeLoadPromise;
     if (typeof window === 'undefined' || (navigator && navigator.userAgent && navigator.userAgent.includes('jsdom'))) return;
     state.nativeLoading = true;
+    state.nativeError = null;
+    nativeLoadPromise = (async () => {
     try {
       const [engineMod, sceneMod, finalMod, checkpointMod, surfaceUiMod, stageEditMod] = await Promise.all([
         import('/native3d-v97/engine.js'),
@@ -178,10 +182,13 @@
       rebuildNativeSceneFromPreset();
       state.nativeReady = true;
     } catch (err) {
-      console.warn('[RegaarderNative3D] Using deterministic 2.5D/3D software projection:', err.message);
+      state.nativeError = err.message;
+      console.error('[RegaarderNative3D] Native renderer failed:', err);
     } finally {
       state.nativeLoading = false;
     }
+    })();
+    return nativeLoadPromise;
   }
 
   function rebuildNativeSceneFromPreset() {
@@ -199,10 +206,24 @@
       state.nativeScene = sceneMod.createNativeScene('humanoid');
     }
     state.baseNodes = structuredClone(state.nativeScene.nodes);
-    state.backgroundHex = PRESET_SCENES[state.preset].background;
+    state.backgroundHex = state.nativeScene.background;
+    const sample = n => sceneMod.nodeAt(n, PREVIEW_TIMES[state.preset]);
+    const camera = sample(state.nativeScene.nodes.find(n=>n.type==='camera'));
+    const target = camera.target || [0,1,0];
+    const delta = camera.position.map((v,i)=>v-target[i]);
+    state.cameraRadius = Math.hypot(...delta);
+    state.cameraTarget = [...target];
+    state.cameraYaw = Math.atan2(delta[0],delta[2])*180/Math.PI;
+    state.cameraPitch = Math.asin(delta[1]/state.cameraRadius)*180/Math.PI;
+    state.cameraFov = camera.fov;
+    state.cameraZoom = 1;
+    state.exposure = state.nativeScene.lighting?.exposure ?? .92;
+    state.ambientIntensity = state.nativeScene.lighting?.ambient ?? .65;
+    const key = state.nativeScene.nodes.find(n=>n.id==='key'), rim = state.nativeScene.nodes.find(n=>n.id==='rim');
+    if(key){state.keyLightIntensity=sample(key).intensity;state.keyLightColor=sample(key).color;}
+    if(rim){state.rimLightIntensity=sample(rim).intensity;state.rimLightColor=sample(rim).color;}
     state.editScene = null;
     state.meshEditor?.reset();
-    syncStateToNativeScene();
   }
 
   const PREVIEW_TIMES = { handshake: 1.95, checkpoint: 1.8, team: 0.65, humanoid: 0, blue: 0 };
@@ -221,11 +242,11 @@
     // Preserve each preset's choreography; user offsets are relative to its own foundation.
     const humanoids = sc.nodes.filter(n => n.type === 'humanoid');
     humanoids.forEach((h, i) => {
-      const base = state.baseNodes?.find(n => n.id === h.id) || h;
+      const base = (sc===state.editScene ? state.editBaseNodes : state.baseNodes)?.find(n => n.id === h.id) || h;
       const off = state.actorOffsets[actorObjectId(h, i)] || {};
       h.wireframe = !!state.wireframe;
       h.editCage = isEditing() && state.showTopology;
-      h.proportions = { ...h.proportions, headSize: state.headSize, shoulderWidth: state.shoulderWidth, armLength: state.armLength, legLength: state.legLength };
+      h.proportions = { ...h.proportions, headSize: (base.proportions?.headSize ?? 1.06)*state.headSize/1.06, shoulderWidth: (base.proportions?.shoulderWidth ?? 1)*state.shoulderWidth, armLength: (base.proportions?.armLength ?? 1)*state.armLength, legLength: (base.proportions?.legLength ?? 1)*state.legLength };
       h.shape = { ...h.shape, female: state.foundation === 'female' ? 1 : 0 };
       h.position = [...base.position];
       h.position[0] += (off.x || 0) * .003;
@@ -246,7 +267,7 @@
       if (off.opacity !== undefined) h.material = { ...h.material, opacity: off.opacity };
       if (base.parts?.hat?.visible) {
         const hat = state.actorOffsets.n3d_prop_hat || {};
-        h.parts.hat = { ...h.parts.hat, visible: state.hatVisible, color: state.hatColor, lift: Math.max(-.15, Math.min(.15, hat.lift || 0)) };
+        h.parts.hat = { ...h.parts.hat, visible: state.hatVisible, color: state.hatColor, lift: Math.max(-.15, Math.min(.15, (base.parts.hat.lift || 0)+(hat.lift || 0))) };
       }
     });
     for (const light of sc.nodes.filter(n=>n.type==='light')) {
@@ -256,10 +277,11 @@
     if (isEditing()) {
       const cam = sc.nodes.find(n => n.type === 'camera');
       if (cam) {
-        const yaw = state.cameraYaw * Math.PI / 180, pitch = state.cameraPitch * Math.PI / 180, r = 4.3 / state.cameraZoom;
+        const yaw = state.cameraYaw * Math.PI / 180, pitch = state.cameraPitch * Math.PI / 180, r = (state.cameraRadius || 4.3) / state.cameraZoom;
+        const target = state.cameraTarget || [0,1.1,0];
         cam.fov = state.cameraFov;
-        cam.position = [Math.sin(yaw)*Math.cos(pitch)*r, 1.1+Math.sin(pitch)*r, Math.cos(yaw)*Math.cos(pitch)*r];
-        cam.target = [0, 1.1, 0];
+        cam.position = [target[0]+Math.sin(yaw)*Math.cos(pitch)*r, target[1]+Math.sin(pitch)*r, target[2]+Math.cos(yaw)*Math.cos(pitch)*r];
+        cam.target = [...target];
       }
     }
   }
@@ -546,6 +568,7 @@
               for (const k of ['tracks','boneTracks','bonePositionTracks','boneScaleTracks','partTracks','ikTracks','handPoseTracks']) evaluated[k] = {};
               return evaluated;
             }) };
+            state.editBaseNodes = structuredClone(state.editScene.nodes);
             // Edits are stored on the source nodes, and survive both mode changes and GLB export.
           }
           scene = state.editScene;
@@ -561,10 +584,15 @@
         if (editing) state.meshEditor?.draw(ctx);
         return;
       } catch (e) {
-        // Fallback to projected renderer if WebGL context unavailable
+        state.nativeError = e.message;
+        console.error('[RegaarderNative3D] Frame failed:', e);
       }
     }
-    renderProjectedMannequinScene(ctx, timeSec || 0);
+    // A software illustration cannot offer mesh editing. Show the actual load
+    // state instead of disguising a missing native renderer as a working scene.
+    ctx.fillStyle = '#10141b';ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = '#cbd5e1';ctx.textAlign = 'center';ctx.font = '16px Arial';
+    ctx.fillText(state.nativeError ? '3D viewport could not load. Reload to retry.' : 'Loading 3D geometry…',canvas.width/2,canvas.height/2);
   }
 
   function buildNative3DStageHTML(templateId, isHover) {
@@ -609,7 +637,8 @@
 
     ensureNative3DLoaded().then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
-      if (!viewport.isConnected || !state.nativeReady) return;
+      if (!viewport.isConnected) return;
+      if (!state.nativeReady) {renderNative3DCanvas(canvas, t);return;}
       state.meshEditor = state.nativeMods.stageEditMod.mountStageEditor(viewport, canvas, state, () => renderNative3DCanvas(canvas, 0));
       renderNative3DCanvas(canvas, t);
     });

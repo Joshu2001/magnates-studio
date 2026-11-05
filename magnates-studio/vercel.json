@@ -2,14 +2,31 @@
   "version": 2,
   "builds": [
     {
+      "src": "public/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
+      "src": "/regaarder-documentary(?:-v2)?/index.html",
+      "dest": "/public/regaarder-documentary/index.html"
+    },
+    {
+      "src": "/regaarder-documentary(?:-v2)?/(.*)",
+      "dest": "/server.js"
+    },
+    {
       "src": "/(.*)",
-      "dest": "server.js"
+      "dest": "/public/$1",
+      "check": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
     }
   ]
 }

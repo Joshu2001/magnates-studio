@@ -31,6 +31,13 @@ const {createCanvas,loadImage}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MO
  const visible=state.nativeScene.nodes.map(n=>scene.nodeAt(n,1.8));
  assert.equal(visible.find(n=>n.id==='red').visible,true,'red figure visible in preview window');
  assert(visible.some(n=>n.id.startsWith('chair-')&&n.visible),'chair visible');
+ state.editScene={...state.nativeScene,nodes:structuredClone(visible)};
+ state.editBaseNodes=structuredClone(visible);
+ context.window.syncStateToNativeScene(state.editScene);
+ for(const id of ['red','coach'])assert.equal(JSON.stringify(state.editScene.nodes.find(n=>n.id===id).position),JSON.stringify(visible.find(n=>n.id===id).position),'edit mode preserves tracked '+id+' pose');
+ const authoredCamera=visible.find(n=>n.type==='camera'),editCamera=state.editScene.nodes.find(n=>n.type==='camera');
+ authoredCamera.position.forEach((v,i)=>assert(Math.abs(editCamera.position[i]-v)<1e-9,'edit camera preserves authored framing'));
+
  context.window.setRegaarderNative3DPreset('humanoid');
  const n=state.nativeScene.nodes.find(n=>n.type==='humanoid');
  const mesh=new T.Mesh(new T.PlaneGeometry(.1,.1,2,2));mesh.userData.surface='body';
@@ -55,14 +62,28 @@ const {createCanvas,loadImage}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MO
  assert(!engine.includes('paintArchivalDocumentarySegment'),'synthetic collage removed');
  assert(engine.includes('t >= 1214 && t < 1285'),'legacy timing');assert(engine.includes('t >= 1285 && t < 1405'),'promo timing');
  process.env.VERCEL='1';
+ const config=JSON.parse(fs.readFileSync(path.join(root,'../vercel.json'),'utf8'));
+ assert(config.builds.some(b=>b.use==='@vercel/static'),'browser files must have a static build');
+ for(const resource of ['/native3d-v97/engine.js','/vendor/three.module.js','/v88/camera-keys.js','/js/regaarder-chapters/chapter-sequence.js']){
+   let destination;
+   for(const route of config.routes){const match=resource.match(new RegExp('^'+route.src+'$'));if(!match)continue;const dest=resource.replace(new RegExp('^'+route.src+'$'),route.dest);if(route.check&&!fs.existsSync(path.join(root,'..',dest)))continue;destination=dest;break;}
+   assert(destination.startsWith('/public/'),resource+' must bypass Node transpilation');
+ }
+ const html=fs.readFileSync(path.join(root,'regaarder-documentary/index.html'),'utf8');
+ assert(html.indexOf('body>*{visibility:hidden!important}')<html.indexOf('<script>'),'editor chrome must be hidden before scripts load');
+ const {JSDOM}=require('../magnates-studio/node_modules/jsdom');
+ const dom=new JSDOM(html,{runScripts:'outside-only'}),w=dom.window;
+ Object.assign(w,{base:w.document.getElementById('stage'),playing:false,settings:{duration:960},t:0,frame:()=>{}});
+ const bridge=[...w.document.scripts].find(script=>script.textContent.includes('window.RegaarderDocumentaryBridge={'));
+ w.eval(bridge.textContent);assert.equal(w.base.parentElement,w.document.body,'playback stage must leave the closed editor dialog');dom.window.close();
  const originalFetch=global.fetch;let requested;
- global.fetch=async (url,options)=>{requested={url,options};return new Response('export const ready=true',{status:206,headers:{'content-type':'text/plain','content-range':'bytes 0-22/23'}})};
+ global.fetch=async (url,options)=>{requested={url,options};return new Response('export const ready=true',{status:206,headers:{'content-type':'text/plain','content-range':'bytes 0-22/23','content-length':'8','content-encoding':'gzip'}})};
  const app=require('../magnates-studio/server.js');const http=require('node:http');
  const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));
  const request=p=>new Promise((resolve,reject)=>{http.get({host:'127.0.0.1',port:server.address().port,path:p,headers:{Range:'bytes=0-22'}},res=>{let body='';res.on('data',c=>body+=c);res.on('end',()=>resolve({status:res.statusCode,type:res.headers['content-type'],body}));}).on('error',reject)});
- const response=await request('/regaarder-documentary/source-proxy-test.js');
+ const response=await request('/regaarder-documentary-v2/source-proxy-test.js');
  assert.equal(response.status,206);assert(response.type.includes('javascript'));assert.equal(response.body,'export const ready=true');
- assert(requested.url.includes('/dd0646757b042248d99b171166fc9e6dea5af1f8/dist/'));assert.equal(requested.options.headers.Range,'bytes=0-22');
+ assert(requested.url.includes('/dd0646757b042248d99b171166fc9e6dea5af1f8/dist/'));assert.equal(requested.options.headers.Range,'bytes=0-22');assert.equal(requested.options.headers['Accept-Encoding'],'identity');
  await new Promise(r=>server.close(r));global.fetch=originalFetch;
  console.log('PASS: five authentic presets, scene validation, relative transforms, seated visibility, persistent mesh deformation, legacy/promo source assets, six distinct rendered promo frames, master timing.');
 })().catch(e=>{console.error(e);process.exitCode=1});
