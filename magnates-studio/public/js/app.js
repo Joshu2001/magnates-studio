@@ -25174,6 +25174,21 @@ if (document.readyState === 'loading') {
    ========================================================= */
 const EFFECT_TEMPLATES_DATA = [
   {
+    id: 'regaarder-full-documentary',
+    title: 'Regaarder Documentary · Master Full Sequence (0:00–26:54)',
+    category: '3D Spatial',
+    origCategory: '3D Spatial',
+    badge: 'MASTER DOCUMENTARY',
+    difficulty: 'Pro Suite',
+    timeToApply: '1614.6s',
+    previewGradient: 'linear-gradient(135deg, rgba(17, 24, 39, 0.98), rgba(6, 8, 12, 0.99))',
+    description: 'The complete 26-minute Regaarder documentary master sequence spanning all chapters from minute 0 to minute 26: Herzogenaurach Origins, Decades Feud, Native 3D Humanoid Rig, Minute 16 Warehouse & Victory, Minute 17 Rain Rivalry, Pelé Pact, and The Final Chapter.',
+    tags: ['Master Documentary', 'Full Movie', '26 Minutes', 'All Chapters', '3D Spatial', 'Cinematic Motion'],
+    defaultImage: '/assets/regaarder-motion/portrait.png',
+    secondaryImage: '/assets/final-chapter/wall.png',
+    featured: true
+  },
+  {
     id: 'regaarder-pele-pact-chapter',
     title: 'The Pelé Pact · Chapter 6 (18:50–20:14)',
     category: '3D Spatial',
@@ -34085,6 +34100,17 @@ function openTopTemplateCustomizer(tpl) {
   } else {
     topCustomizerState.duration = parseFloat(tpl.timeToApply) || 6;
   }
+  projectScenes = [
+    {
+      id: 'scene-1',
+      title: `Scene 1: ${(tpl.title || '').split('(')[0].trim()}`,
+      tplId: tpl.id,
+      start: 0,
+      duration: topCustomizerState.duration,
+      thumb: topCustomizerState.primaryUrl || tpl.defaultImage
+    }
+  ];
+  activeStoryboardSceneIndex = 0;
   topCustomizerState.currentTime = 0;
   topCustomizerState.pausedElapsedMs = 0;
   topCustomizerState.startTime = performance.now();
@@ -37273,7 +37299,7 @@ function renderTopTemplatePreviewStage() {
 function updateTopCustomizerFrame(seqTime, now) {
   if (hoverBridgeActive) hoverExternalT = seqTime;
   if (window.tpl3DOnFrame) window.tpl3DOnFrame(seqTime);
-  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 1;
   const totalSeqDur = hasMultipleScenes
     ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
     : (topCustomizerState.duration || 6);
@@ -38349,7 +38375,7 @@ function updateTopCustomizerFrame(seqTime, now) {
 }
 
 function renderCustomizerFrameAtTime(targetTime) {
-  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+  const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 1;
   const totalSeqDur = hasMultipleScenes
     ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
     : (topCustomizerState.duration || 6);
@@ -38377,7 +38403,7 @@ function startTopCustomizerLoop() {
     }
 
     const t = (now - topCustomizerState.startTime) / 1000;
-    const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 0;
+    const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 1;
     const totalSeqDur = hasMultipleScenes
       ? projectScenes.reduce((acc, sc) => acc + (sc.duration || 6), 0)
       : (topCustomizerState.duration || 6);
@@ -43454,6 +43480,7 @@ function populateModalScenesStoryboard() {
     // When switching templates with single default scene, keep Scene 1 in sync with active template
     projectScenes[0].tplId = topCustomizerState.currentTpl.id;
     projectScenes[0].thumb = topCustomizerState.primaryUrl || topCustomizerState.currentTpl.defaultImage;
+    projectScenes[0].duration = topCustomizerState.duration || 6;
   }
 
   let html = projectScenes.map((sc, idx) => {

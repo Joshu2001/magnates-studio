@@ -1,0 +1,253 @@
+{
+  "trophy": {
+    "file": "trophy-presentation.jpg",
+    "archival": true,
+    "kind": "archival-image",
+    "source": "retrieved BRUZZ / Collection Kurt Deswert",
+    "modified": false
+  },
+  "celebration": {
+    "file": "celebration-original.png",
+    "archival": true,
+    "kind": "archival-image",
+    "source": "user supplied image(20261103-145917).png",
+    "modified": false,
+    "bytePreserved": true,
+    "renderRole": "source-only; flattened photo is not composited"
+  },
+  "showcase": {
+    "file": "stage-room-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "pedestal": {
+    "file": "pedestal-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "moneyLeft": {
+    "file": "money-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "moneyRight": {
+    "file": "money-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "bankLeft": {
+    "file": "bank-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "bankFront": {
+    "file": "bank-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "celebrationGroup": {
+    "file": "celebration-group-v123.png",
+    "archival": false,
+    "kind": "archival-image-reconstruction",
+    "source": "user supplied archival photograph",
+    "modified": true,
+    "aiAssisted": true,
+    "modifications": [
+      "AI-assisted connected-group extraction and edge reconstruction"
+    ],
+    "renderRole": "single active foreground group; all three people share one transform"
+  },
+  "celebrationClean": {
+    "file": "celebration-clean-v121.png",
+    "archival": false,
+    "kind": "reconstruction",
+    "source": "celebration-original.png",
+    "modified": true,
+    "modifications": [
+      "full clean plate used as the background; original flattened photograph is not composited"
+    ]
+  },
+  "captain": {
+    "file": "captain-cutout-v121.png",
+    "archival": true,
+    "kind": "archival-image-derived",
+    "source": "celebration-original.png",
+    "modified": true,
+    "modifications": [
+      "legacy polygon alpha mask"
+    ],
+    "subjectPixels": "original photograph",
+    "renderRole": "inactive individual layer; replaced by connected celebrationGroup"
+  },
+  "rightPlayer": {
+    "file": "rightPlayer-cutout-v121.png",
+    "archival": true,
+    "kind": "archival-image-derived",
+    "source": "celebration-original.png",
+    "modified": true,
+    "modifications": [
+      "legacy polygon alpha mask"
+    ],
+    "subjectPixels": "original photograph",
+    "renderRole": "inactive individual layer; replaced by connected celebrationGroup"
+  },
+  "foregroundFan": {
+    "file": "foregroundFan-cutout-v121.png",
+    "archival": true,
+    "kind": "archival-image-derived",
+    "source": "celebration-original.png",
+    "modified": true,
+    "modifications": [
+      "legacy polygon alpha mask"
+    ],
+    "subjectPixels": "original photograph",
+    "renderRole": "inactive individual layer; replaced by connected celebrationGroup"
+  },
+  "pumaSymbol": {
+    "file": "puma-symbol-v121.svg",
+    "archival": false,
+    "kind": "brand-graphic",
+    "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/puma.svg",
+    "modified": true,
+    "modifications": [
+      "white fill"
+    ]
+  },
+  "sea": {
+    "file": "sea-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "boot": {
+    "file": "boot-single-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "bootPair": {
+    "file": "boot-pair-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "observer": {
+    "file": "observer-back.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "blue": {
+    "file": "ship-blue-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "orange": {
+    "file": "ship-orange-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "warehouse": {
+    "file": "warehouse-empty-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "boxes": {
+    "file": "boxes-v121.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "handUpperLeft": {
+    "file": "hand-upper-left.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "handRight": {
+    "file": "hand-down-left-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "handLowerLeft": {
+    "file": "hand-right.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "handLowerRight": {
+    "file": "hand-down-left-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "profileBlue": {
+    "file": "profile-blue.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "profileOrange": {
+    "file": "profile-orange.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "city": {
+    "file": "confrontation-city-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "crowd": {
+    "file": "crowd-v120.png",
+    "archival": false,
+    "kind": "generated-artwork",
+    "source": "project asset",
+    "modified": true
+  },
+  "archive": {
+    "file": "archive-1600-1613-reference-only.mp4",
+    "archival": true,
+    "kind": "archival-video",
+    "source": "existing supplied reference-only segment",
+    "sourceMasterStart": 960,
+    "playbackRange": [
+      0,
+      5.67
+    ],
+    "modified": false,
+    "bytePreserved": true
+  }
+}

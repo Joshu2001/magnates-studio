@@ -1,0 +1,553 @@
+{
+  "version": "v123",
+  "items": [
+    {
+      "file": "pedestal-v121.png",
+      "slots": [
+        "pedestal"
+      ],
+      "metadata": [
+        {
+          "file": "pedestal-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "372f67927d11ef07e54b1ad834e187aa4e345c8f82e381f9ced54bf4963bc5c0"
+    },
+    {
+      "file": "showcase-v120.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "ecf2969228a1a6bfa30481e85e5604c36b2d11eb26b47ba7c91a23372ac9a2d3"
+    },
+    {
+      "file": "crowd-v120.png",
+      "slots": [
+        "crowd"
+      ],
+      "metadata": [
+        {
+          "file": "crowd-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "30bda833a3e538096e99d74af9f2d72539a815dc37a5f266a93ff1ad94f814e3"
+    },
+    {
+      "file": "captain-cutout-v121.png",
+      "slots": [
+        "captain"
+      ],
+      "metadata": [
+        {
+          "file": "captain-cutout-v121.png",
+          "archival": true,
+          "kind": "archival-image-derived",
+          "source": "celebration-original.png",
+          "modified": true,
+          "modifications": [
+            "legacy polygon alpha mask"
+          ],
+          "subjectPixels": "original photograph",
+          "renderRole": "inactive individual layer; replaced by connected celebrationGroup"
+        }
+      ],
+      "sha256": "734ba62fe554e083bc1e7de0809536198136462dd95ebc02e8d57f2243bafe9d"
+    },
+    {
+      "file": "warehouse-empty.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "d6afd5190731f1c8c5094dec371e2f745b0c5cdeacb7a8f99effe5d6c1083982"
+    },
+    {
+      "file": "archive-1600-1613-reference-only.mp4",
+      "slots": [
+        "archive"
+      ],
+      "metadata": [
+        {
+          "file": "archive-1600-1613-reference-only.mp4",
+          "archival": true,
+          "kind": "archival-video",
+          "source": "existing supplied reference-only segment",
+          "sourceMasterStart": 960,
+          "playbackRange": [
+            0,
+            5.67
+          ],
+          "modified": false,
+          "bytePreserved": true
+        }
+      ],
+      "sha256": "b48dc376d1a650e361b8411eb1cdc2bd8c303dcb692f2ff52c0e1f235c93faa0"
+    },
+    {
+      "file": "ship-blue-v120.png",
+      "slots": [
+        "blue"
+      ],
+      "metadata": [
+        {
+          "file": "ship-blue-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "62a3018d9abd9f658e1c6eb77c161839063d1ac56f89b641cb3b207374fa36b5"
+    },
+    {
+      "file": "foregroundFan-cutout-v121.png",
+      "slots": [
+        "foregroundFan"
+      ],
+      "metadata": [
+        {
+          "file": "foregroundFan-cutout-v121.png",
+          "archival": true,
+          "kind": "archival-image-derived",
+          "source": "celebration-original.png",
+          "modified": true,
+          "modifications": [
+            "legacy polygon alpha mask"
+          ],
+          "subjectPixels": "original photograph",
+          "renderRole": "inactive individual layer; replaced by connected celebrationGroup"
+        }
+      ],
+      "sha256": "bc22fe42ade37bed1890edf556205f06b0b6ff06731e4a3be714df31fa88b317"
+    },
+    {
+      "file": "celebration-clean-v121.png",
+      "slots": [
+        "celebrationClean"
+      ],
+      "metadata": [
+        {
+          "file": "celebration-clean-v121.png",
+          "archival": false,
+          "kind": "reconstruction",
+          "source": "celebration-original.png",
+          "modified": true,
+          "modifications": [
+            "full clean plate used as the background; original flattened photograph is not composited"
+          ]
+        }
+      ],
+      "sha256": "78050ce9516a495edbddc77587336eaa3e34e28930ef02da5ef6402a8c785f31"
+    },
+    {
+      "file": "vintage-boot.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "da3feee02745a93e80a5ebc45269c4ff18ac8ba79d2d28d67e949eafbb749fc4"
+    },
+    {
+      "file": "celebration-original.png",
+      "slots": [
+        "celebration"
+      ],
+      "metadata": [
+        {
+          "file": "celebration-original.png",
+          "archival": true,
+          "kind": "archival-image",
+          "source": "user supplied image(20261103-145917).png",
+          "modified": false,
+          "bytePreserved": true,
+          "renderRole": "source-only; flattened photo is not composited"
+        }
+      ],
+      "sha256": "5cb0e87ce544b1ac743158d491c21b96ad505423e1614af1d931dd4135f935b0"
+    },
+    {
+      "file": "trophy-presentation.jpg",
+      "slots": [
+        "trophy"
+      ],
+      "metadata": [
+        {
+          "file": "trophy-presentation.jpg",
+          "archival": true,
+          "kind": "archival-image",
+          "source": "retrieved BRUZZ / Collection Kurt Deswert",
+          "modified": false
+        }
+      ],
+      "sha256": "6a53ecb07c3e28f7415019cfab0764a1b57939f69ea35ef8622e29cb97d2fb33"
+    },
+    {
+      "file": "hand-right.png",
+      "slots": [
+        "handLowerLeft"
+      ],
+      "metadata": [
+        {
+          "file": "hand-right.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "3640d7b81609a3c3843b1045b79c6ea80a11ea8303d0c31d25fb2e087cae6170"
+    },
+    {
+      "file": "stage-room-v121.png",
+      "slots": [
+        "showcase"
+      ],
+      "metadata": [
+        {
+          "file": "stage-room-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "b99ed7194600f0186b73faf90ec03bbcbdfb4fcfa51a1671907c84781bc5e476"
+    },
+    {
+      "file": "profile-orange.png",
+      "slots": [
+        "profileOrange"
+      ],
+      "metadata": [
+        {
+          "file": "profile-orange.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "9a6987ff79bffa7a919ea37cc36fc84f568dc8028fed9ec6d32104b6cef6a600"
+    },
+    {
+      "file": "marker-orange.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "d0b8dd739860a6c18160f58ab71bbe07fdb07c262ca340803f0ed656b459b613"
+    },
+    {
+      "file": "boxes-v121.png",
+      "slots": [
+        "boxes"
+      ],
+      "metadata": [
+        {
+          "file": "boxes-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "7b9276c5e1971583932b9a04f343ea11d00263fe0890e7b99d7635272f25955f"
+    },
+    {
+      "file": "showcase-empty.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "58edccb3b7349b2bef7de1ba8c55637279096e8b9f3580c9e82288f2504c0d3d"
+    },
+    {
+      "file": "money-v121.png",
+      "slots": [
+        "moneyLeft",
+        "moneyRight"
+      ],
+      "metadata": [
+        {
+          "file": "money-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        },
+        {
+          "file": "money-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "a901afccda165dabca1074e02f85a30f1f214adc433b470279b8e81ec9747505"
+    },
+    {
+      "file": "boot-single-v120.png",
+      "slots": [
+        "boot"
+      ],
+      "metadata": [
+        {
+          "file": "boot-single-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "b5f8f7265e2823b3f7859836f1608f9209a98c8909180e63c41773521a8661ce"
+    },
+    {
+      "file": "sea-v121.png",
+      "slots": [
+        "sea"
+      ],
+      "metadata": [
+        {
+          "file": "sea-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "96f35d1e809462c35cfaca282c5a34f12f59dfc8c1a2220f111cdf6dc9264143"
+    },
+    {
+      "file": "profile-blue.png",
+      "slots": [
+        "profileBlue"
+      ],
+      "metadata": [
+        {
+          "file": "profile-blue.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "4cc56032aa97e6f4ac4b3f6a3789051d2f9b13966e96c56ed8b806e6c9092a9c"
+    },
+    {
+      "file": "warehouse-v120.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "2ca6e64f99d6f301d13d926c507c03fa2080ced7c147d2883a61c6d55694a56e"
+    },
+    {
+      "file": "observer-back.png",
+      "slots": [
+        "observer"
+      ],
+      "metadata": [
+        {
+          "file": "observer-back.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "1ecfd65027933a437dc35533fd83aecfe4353c2c36c9d18be1b8411285df6238"
+    },
+    {
+      "file": "marker-blue.png",
+      "slots": [],
+      "metadata": [],
+      "sha256": "057a3049d6f574b1881bf749d48d63a3cf86b922f091b3289adfd6c24e277d02"
+    },
+    {
+      "file": "rightPlayer-cutout-v121.png",
+      "slots": [
+        "rightPlayer"
+      ],
+      "metadata": [
+        {
+          "file": "rightPlayer-cutout-v121.png",
+          "archival": true,
+          "kind": "archival-image-derived",
+          "source": "celebration-original.png",
+          "modified": true,
+          "modifications": [
+            "legacy polygon alpha mask"
+          ],
+          "subjectPixels": "original photograph",
+          "renderRole": "inactive individual layer; replaced by connected celebrationGroup"
+        }
+      ],
+      "sha256": "6e4426646b61ccc6dc5e7e109c5b9cc186ff84466da5e2b9814b4eaa89b2734e"
+    },
+    {
+      "file": "bank-v121.png",
+      "slots": [
+        "bankLeft",
+        "bankFront"
+      ],
+      "metadata": [
+        {
+          "file": "bank-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        },
+        {
+          "file": "bank-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "90fc3a931d836cbc5fb818de60f54d12425409482fc42bd3f0bc098dacb11cd5"
+    },
+    {
+      "file": "warehouse-empty-v121.png",
+      "slots": [
+        "warehouse"
+      ],
+      "metadata": [
+        {
+          "file": "warehouse-empty-v121.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "1bcc0858fd1955668c02a408fa6b5d270bd4280615383048fd45b728a9ef2984"
+    },
+    {
+      "file": "hand-down-left-v120.png",
+      "slots": [
+        "handRight",
+        "handLowerRight"
+      ],
+      "metadata": [
+        {
+          "file": "hand-down-left-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        },
+        {
+          "file": "hand-down-left-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "2d492af1f31ac7405d98e7b0013ab31ac4ff16dac0bbad6d437fa84c3bb1f3db"
+    },
+    {
+      "file": "boot-pair-v120.png",
+      "slots": [
+        "bootPair"
+      ],
+      "metadata": [
+        {
+          "file": "boot-pair-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "2eec0c6b6921df20332f7eba6aaf566f5f631477e24d5e730f6e70dd499b242e"
+    },
+    {
+      "file": "puma-symbol-v121.svg",
+      "slots": [
+        "pumaSymbol"
+      ],
+      "metadata": [
+        {
+          "file": "puma-symbol-v121.svg",
+          "archival": false,
+          "kind": "brand-graphic",
+          "source": "https://raw.githubusercontent.com/simple-icons/simple-icons/11.15.0/icons/puma.svg",
+          "modified": true,
+          "modifications": [
+            "white fill"
+          ]
+        }
+      ],
+      "sha256": "a065b2abba71dc3e53457624d097982aa501c296501a18784cd995896864679a"
+    },
+    {
+      "file": "confrontation-city-v120.png",
+      "slots": [
+        "city"
+      ],
+      "metadata": [
+        {
+          "file": "confrontation-city-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "e40290b07d7ca7a83884126a6ea5f8388703687966b47dc907ca62ca05cd6bdc"
+    },
+    {
+      "file": "celebration-group-v123.png",
+      "slots": [
+        "celebrationGroup"
+      ],
+      "metadata": [
+        {
+          "file": "celebration-group-v123.png",
+          "archival": false,
+          "kind": "archival-image-reconstruction",
+          "source": "user supplied archival photograph",
+          "modified": true,
+          "aiAssisted": true,
+          "modifications": [
+            "AI-assisted connected-group extraction and edge reconstruction"
+          ],
+          "renderRole": "single active foreground group; all three people share one transform"
+        }
+      ],
+      "sha256": "0bc812dc3eee4b2e4a61be5a78f6231ad382b9376b8fcc7d2e519094edabbc60"
+    },
+    {
+      "file": "ship-orange-v120.png",
+      "slots": [
+        "orange"
+      ],
+      "metadata": [
+        {
+          "file": "ship-orange-v120.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "bbcd350d4c3f76a66b6de0113d9c0559deb846c6a07186a7a735e662f592f8f4"
+    },
+    {
+      "file": "hand-upper-left.png",
+      "slots": [
+        "handUpperLeft"
+      ],
+      "metadata": [
+        {
+          "file": "hand-upper-left.png",
+          "archival": false,
+          "kind": "generated-artwork",
+          "source": "project asset",
+          "modified": true
+        }
+      ],
+      "sha256": "7462546d6b4835c7b6c420c1e4e9f1cc4a7513aabd5e5c5a22b12c4cf9c40da3"
+    }
+  ]
+}
