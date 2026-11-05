@@ -12,15 +12,19 @@
   ],
   "routes": [
     {
-      "src": "/regaarder-documentary(?:-v[23])?/index.html",
+      "src": "/regaarder-documentary(?:-v[234])?/index.html",
       "dest": "/public/regaarder-documentary/index.html"
     },
     {
-      "src": "/regaarder-documentary(?:-v[23])?/(runtime-part[0-9]+\\.js)",
+      "src": "/regaarder-documentary(?:-v[234])?/(runtime-part[0-9]+\\.js)",
       "dest": "/public/regaarder-documentary/$1"
     },
     {
-      "src": "/regaarder-documentary(?:-v[23])?/(.*)",
+      "src": "/regaarder-documentary(?:-v[234])?/native3d-v97/(engine\\.js|software-renderer\\.js)",
+      "dest": "/public/native3d-v97/$1"
+    },
+    {
+      "src": "/regaarder-documentary(?:-v[234])?/(.*)",
       "dest": "/server.js"
     },
     {

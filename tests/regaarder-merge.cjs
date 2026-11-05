@@ -81,10 +81,10 @@ const {createCanvas,loadImage}=require(process.env.CODEX_PRIMARY_RUNTIME_NODE_MO
  const app=require('../magnates-studio/server.js');const http=require('node:http');
  const server=app.listen(0,'127.0.0.1');await new Promise(r=>server.once('listening',r));
  const request=p=>new Promise((resolve,reject)=>{http.get({host:'127.0.0.1',port:server.address().port,path:p,headers:{Range:'bytes=0-22'}},res=>{let body='';res.on('data',c=>body+=c);res.on('end',()=>resolve({status:res.statusCode,type:res.headers['content-type'],body}));}).on('error',reject)});
- const response=await request('/regaarder-documentary-v3/source-proxy-test.js');
+ const response=await request('/regaarder-documentary-v4/source-proxy-test.js');
  assert.equal(response.status,206);assert(response.type.includes('javascript'));assert.equal(response.body,'export const ready=true');
  assert(requested.url.includes('/dd0646757b042248d99b171166fc9e6dea5af1f8/dist/'));assert.equal(requested.options.headers.Range,'bytes=0-22');assert.equal(requested.options.headers['Accept-Encoding'],'identity');
- await request('/regaarder-documentary-v3/chapter-sequence.js?v=motion-v70');
+ await request('/regaarder-documentary-v4/chapter-sequence.js?v=motion-v70');
  assert(requested.url.endsWith('/dist/assets/archive/v70-refinement/chapter-sequence.js'),'early scenes must resolve their own archived module');
  // A background chapter completion must never paint into the active native canvas.
  const chapters={window:{},console,structuredClone};

@@ -331,48 +331,13 @@
 
   async function ensureChapterModuleLoaded(templateId) {
     const rt = chapterRuntime[templateId];
-    if (!rt || rt.ready || rt.loading) return rt;
+    if (!rt || rt.ready || rt.loading || rt.error) return rt;
     rt.loading = true;
     try {
       if (templateId === 'regaarder-full-documentary') {
-        loadSourceRuntime();
-        const immediateUrls = [
-          '/assets/regaarder-motion/map.png',
-          '/assets/regaarder-motion/portrait.png',
-          '/assets/regaarder-motion/pair-v2.png',
-          '/assets/minute16/vintage-boot.png'
-        ];
-        await Promise.all(immediateUrls.map((u) => {
-          const im = getDocArchivalImage(u);
-          return (im.decode ? im.decode().catch(() => {}) : Promise.resolve());
-        }));
-
+        // The first sixteen minutes belong to the embedded source renderer.
+        // Later chapters load only when sought, not as competing 600 MB preloads.
         rt.ready = true;
-        rt.loading = false;
-
-        // Lazy-load later chapter modules in background without stalling playback
-        setTimeout(() => {
-          const laterUrls = [
-            '/assets/regaarder-motion/faces-v3.png',
-            '/assets/regaarder-motion/clouds.png',
-            '/assets/regaarder-motion/adidas-bars.svg',
-            '/assets/regaarder-motion/puma-lockup.svg',
-            '/assets/pele126/dollar-hundred-source.jpg',
-            '/assets/pele126/horst-archival.jpg',
-            '/assets/final-chapter/wall.png',
-            '/assets/final-chapter/wood.png',
-            '/assets/final-chapter/dust.png'
-          ];
-          laterUrls.forEach((u) => getDocArchivalImage(u));
-
-          Promise.allSettled([
-            ensureChapterModuleLoaded('regaarder-pele-pact-chapter'),
-            ensureChapterModuleLoaded('regaarder-minute16-chapter'),
-            ensureChapterModuleLoaded('regaarder-minute17-chapter'),
-            ensureChapterModuleLoaded('regaarder-final-chapter')
-          ]).catch(() => {});
-        }, 150);
-
         return rt;
       }
 
@@ -466,9 +431,12 @@
       }
       rt.ready = true;
     } catch (err) {
-      console.warn('[RegaarderChapter] Module load fallback active for', templateId, err.message);
+      rt.error = err.message;
+      console.error('[RegaarderChapter] Module load failed:', templateId, err);
     } finally {
       rt.loading = false;
+      const masterCanvas = document.querySelector('#tpl-modal-preview-stage [data-template-id="regaarder-full-documentary"] canvas');
+      if (masterCanvas) paintChapterFrame(masterCanvas, 'regaarder-full-documentary', window.topCustomizerState?.currentTime || 0);
     }
     return rt;
   }
@@ -507,9 +475,9 @@
     if (sourceRuntime.loading) return sourceRuntime.loading;
     sourceRuntime.loading = (async () => {
       const [legacy,promo,promoMedia] = await Promise.all([
-        import('../regaarder-documentary-v3/legacy-sequence.js'),
-        import('../regaarder-documentary-v3/promo-sequence.js'),
-        import('../regaarder-documentary-v3/promo-media.js')
+        import('../regaarder-documentary-v4/legacy-sequence.js'),
+        import('../regaarder-documentary-v4/promo-sequence.js'),
+        import('../regaarder-documentary-v4/promo-media.js')
       ]);
       const image = async url => { const im=new Image(); im.src=url; await im.decode(); return im; };
       const redraw = () => { const cv=document.querySelector('#tpl-modal-preview-stage [data-template-id="regaarder-full-documentary"] canvas'); if(cv) paintChapterFrame(cv,'regaarder-full-documentary',window.topCustomizerState?.currentTime || 0); };
@@ -518,12 +486,12 @@
         v.addEventListener('seeked',redraw);v.addEventListener('loadeddata',redraw);return v;
       };
       const media=await legacy.preloadLegacy({
-        manifest:async()=>{const r=await fetch('/regaarder-documentary-v3/legacy-manifest.json');return r.json();},
-        image:file=>image('/regaarder-documentary-v3/assets/legacy128/'+file)
+        manifest:async()=>{const r=await fetch('/regaarder-documentary-v4/legacy-manifest.json');return r.json();},
+        image:file=>image('/regaarder-documentary-v4/assets/legacy128/'+file)
       });
       sourceRuntime.legacyMedia=Object.fromEntries(media);
-      sourceRuntime.legacyMedia.archive=video('/regaarder-documentary-v3/assets/legacy128/archive-reference-excerpt.mp4');
-      sourceRuntime.promoMedia=Object.fromEntries(await Promise.all(Object.entries(promo.sources).map(async([id,file])=>[id,['host','flame'].includes(id)?video('/regaarder-documentary-v3/assets/promo129/'+file):await image('/regaarder-documentary-v3/assets/promo129/'+file)])));
+      sourceRuntime.legacyMedia.archive=video('/regaarder-documentary-v4/assets/legacy128/archive-reference-excerpt.mp4');
+      sourceRuntime.promoMedia=Object.fromEntries(await Promise.all(Object.entries(promo.sources).map(async([id,file])=>[id,['host','flame'].includes(id)?video('/regaarder-documentary-v4/assets/promo129/'+file):await image('/regaarder-documentary-v4/assets/promo129/'+file)])));
       Object.assign(sourceRuntime,{legacy,promo,promoSync:promoMedia.syncPromo,ready:true});redraw();
     })().catch(err=>{console.error('[Documentary source]',err);sourceRuntime.loading=null;});
     return sourceRuntime.loading;
@@ -532,6 +500,9 @@
 
   function paintDocumentarySequence(ctx, t) {
     const W = 960, H = 540;
+    const needed = t>=1409 ? 'regaarder-final-chapter' : t>=1130 && t<1214 ? 'regaarder-pele-pact-chapter' : t>=1020 && t<1080 ? 'regaarder-minute17-chapter' : t>=960 && t<1020 ? 'regaarder-minute16-chapter' : null;
+    if (needed) ensureChapterModuleLoaded(needed);
+    if (t>=1214 && t<1405) loadSourceRuntime();
     const viewport=ctx.canvas.closest('.rg-chapter-viewport');
     const frame=viewport?.querySelector('[data-documentary-source]');
     if(frame){
@@ -581,6 +552,7 @@
     // 18:00–18:50 is the source's omitted sponsor interval; 23:25–23:29
     // is its intentional black transition. Loading frames are black, never fake scenes.
     clearSourceFrame(ctx);
+    if (needed) {ctx.fillStyle='#cbd5e1';ctx.font='16px Arial';ctx.textAlign='center';ctx.fillText(chapterRuntime[needed].error ? 'Scene error: '+chapterRuntime[needed].error : 'Loading original scene layers…',480,270);}
   }
 
   function paintChapterFrame(canvas, templateId, timeSec) {
@@ -610,10 +582,11 @@
         }
         return;
       } catch (e) {
-        // Fallback if any asset is still decoding
+        if (rt.error !== e.message) console.error('[RegaarderChapter] Frame failed:', templateId, e);
+        rt.error = e.message;
       }
     }
-    renderFallbackPreview(ctx, rt, t);
+    clearSourceFrame(ctx);ctx.fillStyle='#cbd5e1';ctx.textAlign='center';ctx.font='16px Arial';ctx.fillText(rt.error ? 'Scene error: '+rt.error : 'Loading original scene layers…',480,270);
   }
 
   function isChapterObjActive(obj, curSceneId, timeSec) {
@@ -675,7 +648,7 @@
     return `
       <div id="regaarder-chapter-viewport-${suffix}" class="rg-chapter-viewport" data-template-id="${templateId}" style="position:relative;width:100%;height:100%;background:#04060a;overflow:hidden;display:flex;align-items:center;justify-content:center;user-select:none;">
         <canvas id="regaarder-chapter-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;"></canvas>
-        ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary-v3/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
+        ${templateId === 'regaarder-full-documentary' && !isHover ? '<iframe data-documentary-source title="Documentary sequence" src="/regaarder-documentary-v4/index.html" style="position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;z-index:1"></iframe>' : ''}
         ${interactiveOverlayHtml}
       </div>
     `;
