@@ -217,6 +217,13 @@
   function syncStateToNativeScene() {
     const sc = state.nativeScene;
     if (!sc || !Array.isArray(sc.nodes) || state.nativeSceneDirty) return;
+    // The Motion source's handshake, checkpoint, red trio and anatomical scenes
+    // have their own authored animation tracks, camera, props and lighting.
+    // Flat "blue coach" controls must not overwrite any of those originals.
+    if (state.preset !== 'blue') {
+      sc.nodes.filter(n => n.type === 'humanoid').forEach(n => { n.wireframe = !!state.wireframe; });
+      return;
+    }
     sc.background = state.backgroundHex;
     sc.lighting = sc.lighting || {};
     sc.lighting.exposure = state.exposure;
