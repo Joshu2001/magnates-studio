@@ -676,6 +676,12 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(state.nativeEngine.canvas, 0, 0, canvas.width, canvas.height);
         updateHitBoxesFrom3DScene(canvas);
+        // Once Three.js has loaded, use surface raycasting rather than
+        // rectangular CSS hit regions. Keep the boxes only as toolbar anchors.
+        const vp = canvas.closest('.rg-n3d-viewport');
+        const layer = vp?.querySelector('.rg-n3d-hit-layer');
+        if (layer) layer.style.pointerEvents = 'none';
+        vp?.querySelectorAll('[data-n3d-obj]').forEach(el => { el.style.pointerEvents = 'none'; });
         return;
       } catch (e) {
         // Fallback to projected renderer if WebGL context unavailable
@@ -868,6 +874,72 @@
       box.addEventListener('pointerup', endDrag);
       box.addEventListener('pointercancel', endDrag);
     });
+
+    // Object-accurate raycast selection and hover. Unlike the old bounding-box
+    // overlays, this does not select a character when the cursor is in empty
+    // space next to a limb or between two people.
+    function pick3DCharacter(event) {
+      const engine = state.nativeEngine;
+      const T = state.nativeMods?.engineMod?.T;
+      if (!state.nativeReady || !engine?.characters?.size || !T) return null;
+      const bounds = canvas.getBoundingClientRect();
+      const w = Math.min(bounds.width, bounds.height * 16 / 9);
+      const h = w * 9 / 16;
+      const x = event.clientX - bounds.left - (bounds.width - w) / 2;
+      const y = event.clientY - bounds.top - (bounds.height - h) / 2;
+      if (x < 0 || y < 0 || x > w || y > h) return null;
+      const pointer = new T.Vector2(x / w * 2 - 1, 1 - y / h * 2);
+      const ray = new T.Raycaster();
+      const camera = (state.orbitOverride && state.previewCamera) || engine.camera;
+      camera.updateMatrixWorld(true);
+      ray.setFromCamera(pointer, camera);
+      const roots = [...engine.characters.values()].map(character => character.group).filter(Boolean);
+      const hit = ray.intersectObjects(roots, true).find(h => h.object.visible && h.object.isMesh);
+      if (!hit) return null;
+      let nodeId = null;
+      for (let current = hit.object; current; current = current.parent) {
+        if (current.userData?.nodeId) { nodeId = current.userData.nodeId; break; }
+      }
+      if (!nodeId) return null;
+      const ids = {
+        blue: { blue: 'n3d_actor_primary', coach: 'n3d_actor_secondary' },
+        checkpoint: { red: 'n3d_actor_crimson', coach: 'n3d_actor_coach' },
+        handshake: { 'final-blue': 'n3d_actor_primary', 'final-coach': 'n3d_actor_secondary' },
+        team: { 'final-player-0': 'n3d_actor_p1', 'final-player-1': 'n3d_actor_primary', 'final-player-2': 'n3d_actor_secondary' },
+        humanoid: { humanoid: 'n3d_actor_primary' }
+      };
+      const objectKey = ids[state.preset]?.[nodeId];
+      return objectKey ? { objectKey, hit } : null;
+    }
+    viewport.addEventListener('pointermove', (event) => {
+      if (event.buttons || state.inlineEditor || event.target.closest('button')) return;
+      const picked = pick3DCharacter(event);
+      if (state.nativeReady) {
+        viewport.style.cursor = picked ? 'grab' : 'default';
+        canvas.style.cursor = picked ? 'grab' : 'default';
+      }
+    }, true);
+    viewport.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 || event.target.closest('button')) return;
+      const picked = pick3DCharacter(event);
+      if (!picked) return;
+      state.activeActor = picked.objectKey;
+      state.activeSurface = picked.hit.object.userData?.surface || picked.hit.object.userData?.part || 'body';
+      const boxes = viewport.querySelectorAll('[data-n3d-obj]');
+      boxes.forEach(box => {
+        const selected = box.dataset.n3dObj === picked.objectKey;
+        box.classList.toggle('is-selected', selected);
+        box.style.borderColor = selected ? '#9B6BFF' : 'transparent';
+        box.style.background = selected ? 'rgba(155,107,255,0.06)' : 'transparent';
+      });
+      const anchor = viewport.querySelector('[data-n3d-obj="' + picked.objectKey + '"]');
+      if (anchor && typeof window.RegaarderContextualToolbar?.showForObject === 'function') {
+        window.RegaarderContextualToolbar.showForObject({
+          contextType: 'template', objectKey: picked.objectKey, variant: 'object3d',
+          anchorElement: anchor
+        });
+      }
+    }, true);
 
     // Orbit / Pan camera navigation when dragging empty space on the 3D canvas
     let isOrbiting = false;
