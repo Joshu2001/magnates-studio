@@ -119,7 +119,9 @@
     nativeSceneDirty: false,
     savedScenes: {},
     sceneTime: 0.5,
-    inlineEditor: null
+    inlineEditor: null,
+    orbitOverride: false,
+    previewCamera: null
   };
 
   window.REGAARDER_NATIVE3D_CONFIG = state;
@@ -539,7 +541,7 @@
     const viewport = canvas.closest('.rg-n3d-viewport') || canvas.parentElement;
     if (!viewport) return;
     const engine = state.nativeEngine;
-    const camera = engine.camera;
+    const camera = (state.orbitOverride && state.previewCamera) || engine.camera;
     const T = state.nativeMods.engineMod && state.nativeMods.engineMod.T;
     if (!camera || !T || !engine.characters) return;
 
@@ -628,7 +630,20 @@
         const isStillEditMode = !!window.topCustomizerState?.is3DMode;
         const rawTime = isStillEditMode ? state.sceneTime : Number(timeSec);
         const t = Math.max(0, Number(rawTime) || 0) % dur;
-        state.nativeEngine.render(state.nativeScene, t);
+        let cameraOverride = null;
+        if (state.orbitOverride) {
+          const T = state.nativeMods.engineMod.T;
+          const view = state.previewCamera || (state.previewCamera = new T.PerspectiveCamera(state.cameraFov, 960 / 540, 0.02, 100));
+          const az = state.cameraYaw * Math.PI / 180;
+          const el = state.cameraPitch * Math.PI / 180;
+          const distance = 4.3 / Math.max(0.3, state.cameraZoom || 1);
+          view.position.set(distance * Math.sin(az) * Math.cos(el), 1.15 + distance * Math.sin(el), distance * Math.cos(az) * Math.cos(el));
+          view.lookAt(0, 1.15, 0);
+          view.fov = state.cameraFov;
+          view.updateProjectionMatrix();
+          cameraOverride = view;
+        }
+        state.nativeEngine.render(state.nativeScene, t, cameraOverride);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(state.nativeEngine.canvas, 0, 0, canvas.width, canvas.height);
         updateHitBoxesFrom3DScene(canvas);
@@ -694,6 +709,7 @@
           state.preset = pKey;
           state.sceneTime = PRESET_SCENES[pKey].previewTime;
           state.autoOrbit = false;
+          state.orbitOverride = false;
           state.backgroundHex = PRESET_SCENES[pKey].background;
           state.shirtColor = PRESET_SCENES[pKey].primaryColor;
           rebuildNativeSceneFromPreset();
@@ -732,6 +748,7 @@
 
       let dragging = false;
       let startX = 0, startY = 0;
+      let origCameraYaw = 18, origCameraPitch = 12;
       let origX = 0, origY = 0, origRot = 0, origLift = 0;
 
       box.addEventListener('pointerdown', (e) => {
@@ -769,6 +786,8 @@
         dragging = true;
         startX = e.clientX;
         startY = e.clientY;
+        origCameraYaw = state.cameraYaw;
+        origCameraPitch = state.cameraPitch;
         origX = off.x || 0;
         origY = off.y || 0;
         origRot = typeof off.rot === 'number' ? off.rot : (objId === 'n3d_actor_primary' ? 90 : (objId === 'n3d_actor_secondary' ? -65 : 0));
@@ -783,7 +802,12 @@
         const dy = ((e.clientY - startY) / Math.max(1, rect.height)) * 540;
         const off = state.actorOffsets[objId];
         if (off) {
-          if (objId === 'n3d_actor_primary' || objId === 'n3d_actor_secondary') {
+          if (state.preset !== 'blue' && state.preset !== 'checkpoint') {
+            // Preserve the source-authored animation tracks; use actual 3D camera orbit.
+            state.orbitOverride = true;
+            state.cameraYaw = Math.round((origCameraYaw + dx * 0.45) * 10) / 10;
+            state.cameraPitch = Math.max(-40, Math.min(75, Math.round((origCameraPitch + dy * 0.3) * 10) / 10));
+          } else if (objId === 'n3d_actor_primary' || objId === 'n3d_actor_secondary' || objId === 'n3d_actor_crimson' || objId === 'n3d_actor_coach') {
             // Turning the humanoid using the hand cursor in 3D mode:
             // Horizontal drag turns / rotates the character (yaw) in real-time
             const deltaYaw = dx * 0.75;
@@ -836,6 +860,7 @@
       if (!isOrbiting) return;
       const dx = e.clientX - orbitStartX;
       const dy = e.clientY - orbitStartY;
+      state.orbitOverride = true;
       state.cameraYaw = Math.round(((origYaw + dx * 0.35) % 360) * 10) / 10;
       state.cameraPitch = Math.max(-40, Math.min(75, Math.round((origPitch + dy * 0.35) * 10) / 10));
       renderNative3DCanvas(canvas, (window.topCustomizerState && window.topCustomizerState.currentTime) || 0);
@@ -948,6 +973,8 @@
     if (viewport) return openIntegratedMeshEditor(viewport);
     throw Error('Open the Native 3D Surface Builder stage first.');
   };
+
+  window.ensureNative3DLoaded = ensureNative3DLoaded;
 
   window.renderRegaarderNative3DStage = function (container, templateId, isHover) {
     if (!container) return;
