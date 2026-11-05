@@ -329,6 +329,119 @@
     return im;
   }
 
+  // The 20:14–23:25 source programs were never imported by the template merge.
+  // Use their actual source choreography and licensed repository assets, not an
+  // invented cross-chapter collage. These URLs are a temporary source-repository
+  // media dependency until the original binaries are bundled into this project.
+  const MOTION_MEDIA_ROOT = 'https://raw.githubusercontent.com/Joshu2001/Regaarder-Motion/main/dist/assets/';
+  const documentaryBridges = {
+    legacy: { ready: false, loading: null, mod: null, media: {}, config: null },
+    promo: { ready: false, loading: null, mod: null, sync: null, media: {}, config: null }
+  };
+
+  function refreshDocumentaryFrame() {
+    const stage = document.getElementById('tpl-modal-preview-stage');
+    if (!stage || !stage.querySelector('[data-template-id="regaarder-full-documentary"]')) return;
+    const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
+    if (typeof window.stepRegaarderChapterAnimation === 'function') {
+      window.stepRegaarderChapterAnimation(stage, 'regaarder-full-documentary', t);
+    }
+  }
+
+  function sourceImage(file, base = 'legacy128/') {
+    const image = new Image();
+    image.crossOrigin = 'anonymous';
+    image.onload = refreshDocumentaryFrame;
+    image.onerror = () => console.warn('[RegaarderDocumentary] Source image unavailable:', file);
+    image.src = new URL(file, MOTION_MEDIA_ROOT + base).href;
+    return image;
+  }
+
+  function sourceVideo(file, base) {
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'auto';
+    video.addEventListener('loadeddata', refreshDocumentaryFrame);
+    video.addEventListener('seeked', refreshDocumentaryFrame);
+    video.addEventListener('error', () => console.warn('[RegaarderDocumentary] Source video unavailable:', file));
+    video.src = new URL(file, MOTION_MEDIA_ROOT + base).href;
+    return video;
+  }
+
+  function ensureDocumentaryBridge(name) {
+    const bridge = documentaryBridges[name];
+    if (!bridge) return Promise.reject(Error('Unknown documentary sequence: ' + name));
+    if (bridge.ready) return Promise.resolve(bridge);
+    if (bridge.loading) return bridge.loading;
+    bridge.loading = (async () => {
+      if (name === 'legacy') {
+        const mod = await import('./regaarder-chapters/legacy-sequence.js');
+        bridge.mod = mod;
+        bridge.config = cloneDeep(mod.legacyDefaults);
+        const media = await mod.preloadLegacy({
+          manifest: async () => {
+            const response = await fetch('/js/regaarder-chapters/legacy-manifest.json');
+            if (!response.ok) throw Error('Legacy source manifest missing');
+            return response.json();
+          },
+          image: async (file) => sourceImage(file)
+        });
+        bridge.media = Object.fromEntries(media);
+        const archive = sourceVideo('archive-reference-excerpt.mp4', 'legacy128/');
+        archive.addEventListener('loadeddata', () => {
+          bridge.media.archive = archive;
+          refreshDocumentaryFrame();
+        }, { once: true });
+      } else {
+        const [mod, mediaMod] = await Promise.all([
+          import('./regaarder-chapters/promo-sequence.js'),
+          import('./regaarder-chapters/promo-media.js')
+        ]);
+        bridge.mod = mod;
+        bridge.sync = mediaMod.syncPromo;
+        bridge.config = cloneDeep(mod.defaults);
+        bridge.media = Object.fromEntries(Object.entries(mod.sources).map(([id, file]) =>
+          [id, /\\.mp4$/i.test(file) ? sourceVideo(file, 'promo129/') : sourceImage(file, 'promo129/')]
+        ));
+      }
+      bridge.ready = true;
+      refreshDocumentaryFrame();
+      return bridge;
+    })().catch((error) => {
+      console.warn('[RegaarderDocumentary] Failed to import ' + name, error);
+      bridge.loading = null;
+      return bridge;
+    });
+    return bridge.loading;
+  }
+
+  function paintUnimportedDocumentarySegment(ctx, t) {
+    const W = 960, H = 540;
+    ctx.save();
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#0a1020');
+    bg.addColorStop(1, '#09090e');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#6d28d9';
+    ctx.fillRect(100, 179, 4, 180);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = 'bold 25px system-ui';
+    ctx.fillText('Source sequence not yet imported', 126, 242);
+    ctx.fillStyle = '#a4b0c3';
+    ctx.font = '15px system-ui';
+    const span = t < 895 ? '00:20–14:55 · Early documentary chapters' :
+      t < 1130 ? '18:00–18:50 · Original interlude' :
+      t < 1214 ? '18:50–20:14 · Chapter media loading' :
+      t < 1409 ? 'Original transition or media loading' : 'Source chapter loading';
+    ctx.fillText(span, 126, 280);
+    ctx.fillText('No substitute footage or unrelated cutouts are being shown.', 126, 311);
+    ctx.restore();
+  }
+
   async function ensureChapterModuleLoaded(templateId) {
     const rt = chapterRuntime[templateId];
     if (!rt || rt.ready || rt.loading) return rt;
@@ -369,6 +482,8 @@
             ensureChapterModuleLoaded('regaarder-minute16-chapter'),
             ensureChapterModuleLoaded('regaarder-minute17-chapter'),
             ensureChapterModuleLoaded('regaarder-final-chapter'),
+            ensureDocumentaryBridge('legacy'),
+            ensureDocumentaryBridge('promo'),
             (typeof window.ensureNative3DLoaded === 'function' ? window.ensureNative3DLoaded() : Promise.resolve())
           ]).catch(() => {});
         }, 150);
@@ -501,227 +616,6 @@
     ctx.restore();
   }
 
-  function paintArchivalDocumentarySegment(ctx, t, W, H) {
-    ctx.save();
-
-    let actTitle = 'CHAPTER 1 · THE DASSLER BROTHERS WORKSHOP';
-    let actSubtitle = '1924–1936 · BAVARIAN ARTISANS & THE BIRTH OF SPIKES';
-    let bgUrl = '/assets/regaarder-motion/map.png';
-    let fgLeftUrl = null;
-    let fgRightUrl = null;
-    let centerUrl = null;
-    let showSplit = false;
-
-    if (t < 55) {
-      actTitle = 'CHAPTER 1 · THE DASSLER BROTHERS WORKSHOP';
-      actSubtitle = '1924–1928 · BAVARIAN ARTISANS & THE LAUNDRY ROOM ATELIER';
-      bgUrl = '/assets/regaarder-motion/map.png';
-      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
-      centerUrl = null;
-      fgRightUrl = null;
-    } else if (t < 110) {
-      actTitle = 'CHAPTER 1 · FORGING THE FIRST RUNNING SPIKES';
-      actSubtitle = '1924–1928 · ADOLF DASSLER FORGES HAND-HAMMERED STEEL TRACK SHOES';
-      bgUrl = '/assets/regaarder-motion/map.png';
-      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
-      centerUrl = '/assets/minute16/vintage-boot.png';
-      fgRightUrl = null;
-    } else if (t < 180) {
-      actTitle = 'CHAPTER 1 · ADOLF & RUDOLF JOIN FORCES';
-      actSubtitle = '1928–1936 · GEBRÜDER DASSLER SCHUHFABRIK ON THE WORLD STAGE';
-      bgUrl = '/assets/regaarder-motion/map.png';
-      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
-      centerUrl = '/assets/minute16/vintage-boot.png';
-      fgRightUrl = '/assets/regaarder-motion/pair-v2.png';
-    } else if (t < 360) {
-      actTitle = 'CHAPTER 2 · THE 1936 OLYMPIC TRIUMPH';
-      actSubtitle = 'BERLIN 1936 · JESSE OWENS & THE GOLDEN HAND-CRAFTED SPIKES';
-      bgUrl = '/assets/regaarder-motion/clouds.png';
-      centerUrl = '/assets/regaarder-motion/pair-v2.png';
-      fgLeftUrl = '/assets/regaarder-motion/portrait.png';
-      fgRightUrl = '/assets/minute16/vintage-boot.png';
-    } else if (t < 540) {
-      actTitle = 'CHAPTER 3 · THE GREAT SCHISM (1948)';
-      actSubtitle = 'HERZOGENAURACH DIVIDED · ADIDAS VS PUMA ACROSS THE AURACH';
-      bgUrl = '/assets/regaarder-motion/faces-v3.png';
-      fgLeftUrl = '/assets/regaarder-motion/adidas-bars.svg';
-      fgRightUrl = '/assets/regaarder-motion/puma-lockup.svg';
-      showSplit = true;
-    } else if (t < 720) {
-      actTitle = 'CHAPTER 4 · THE MIRACLE OF BERN (1954)';
-      actSubtitle = 'SWITZERLAND 1954 · SCREW-IN STUDS IN TORRENTIAL SEEDED RAIN';
-      bgUrl = '/assets/final-chapter/wall.png';
-      centerUrl = '/assets/minute16/vintage-boot.png';
-      fgLeftUrl = '/assets/minute16/captain-cutout-v122.png';
-      fgRightUrl = '/assets/minute16/rightPlayer-cutout-v122.png';
-    } else if (t < 895) {
-      actTitle = 'CHAPTER 4 · SECRET ENVOYS & UNDERGROUND WARS';
-      actSubtitle = '1960–1970 · ESPIONAGE, BRIBES & THE RACE FOR WORLD CUP PLAYERS';
-      bgUrl = '/assets/final-chapter/wood.png';
-      fgLeftUrl = '/assets/pele126/horst-archival.jpg';
-      centerUrl = '/assets/pele126/dollar-hundred-source.jpg';
-    } else if (t >= 1080 && t < 1130) {
-      actTitle = 'INTERMISSION · THE SECRET CONTRACT & ESCALATING BIDS';
-      actSubtitle = '18:00–18:50 · RIVAL BIDS FOR THE WORLD’S GREATEST ATHLETE';
-      bgUrl = '/assets/final-chapter/wood.png';
-      fgLeftUrl = '/assets/pele126/horst-archival.jpg';
-      centerUrl = '/assets/pele126/dollar-hundred-source.jpg';
-    } else if (t >= 1214 && t < 1409) {
-      actTitle = 'EPILOGUE · GLOBAL EXPANSION & MULTI-BILLION SNEAKER WARS';
-      actSubtitle = '20:14–23:29 · WALL STREET, SATELLITE BROADCASTS & RECOVERY';
-      bgUrl = '/assets/final-chapter/wall.png';
-      fgLeftUrl = '/assets/final-chapter/adidasCard.png';
-      fgRightUrl = '/assets/final-chapter/pumaCard.png';
-      centerUrl = '/assets/final-chapter/sofa.png';
-    }
-
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#0a0e17');
-    grad.addColorStop(1, '#030508');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    const bgImg = getDocArchivalImage(bgUrl);
-    if (bgImg && bgImg.naturalWidth) {
-      ctx.save();
-      const zoom = 1.05 + 0.05 * Math.sin(t * 0.12);
-      const panX = Math.sin(t * 0.08) * 24;
-      const panY = Math.cos(t * 0.06) * 12;
-      ctx.translate(W / 2 + panX, H / 2 + panY);
-      ctx.scale(zoom, zoom);
-      ctx.globalAlpha = 0.42;
-      ctx.drawImage(bgImg, -W / 2, -H / 2, W, H);
-      ctx.restore();
-    }
-
-    if (showSplit) {
-      ctx.save();
-      ctx.globalCompositeOperation = 'screen';
-      const splitGradL = ctx.createLinearGradient(0, 0, W / 2, 0);
-      splitGradL.addColorStop(0, 'rgba(29, 78, 216, 0.28)');
-      splitGradL.addColorStop(1, 'rgba(29, 78, 216, 0.02)');
-      ctx.fillStyle = splitGradL;
-      ctx.fillRect(0, 0, W / 2, H);
-
-      const splitGradR = ctx.createLinearGradient(W, 0, W / 2, 0);
-      splitGradR.addColorStop(0, 'rgba(185, 28, 28, 0.28)');
-      splitGradR.addColorStop(1, 'rgba(185, 28, 28, 0.02)');
-      ctx.fillStyle = splitGradR;
-      ctx.fillRect(W / 2, 0, W / 2, H);
-
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
-      ctx.setLineDash([6, 6]);
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(W / 2, 40);
-      ctx.lineTo(W / 2, H - 70);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.restore();
-    }
-
-    if (fgLeftUrl) {
-      const leftImg = getDocArchivalImage(fgLeftUrl);
-      if (leftImg && leftImg.naturalWidth) {
-        ctx.save();
-        const floatY = Math.sin(t * 0.4 + 1.2) * 6;
-        ctx.translate(W * 0.24, H * 0.44 + floatY);
-        const lScale = Math.min(220 / leftImg.naturalWidth, 260 / leftImg.naturalHeight);
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        ctx.shadowBlur = 18;
-        ctx.drawImage(leftImg, -leftImg.naturalWidth * lScale / 2, -leftImg.naturalHeight * lScale / 2, leftImg.naturalWidth * lScale, leftImg.naturalHeight * lScale);
-        ctx.restore();
-      }
-    }
-
-    if (centerUrl) {
-      const centerImg = getDocArchivalImage(centerUrl);
-      if (centerImg && centerImg.naturalWidth) {
-        ctx.save();
-        const floatY = Math.sin(t * 0.45) * 8;
-        ctx.translate(W * 0.50, H * 0.46 + floatY);
-        const cScale = Math.min(280 / centerImg.naturalWidth, 240 / centerImg.naturalHeight);
-        ctx.shadowColor = 'rgba(0,0,0,0.85)';
-        ctx.shadowBlur = 24;
-        ctx.drawImage(centerImg, -centerImg.naturalWidth * cScale / 2, -centerImg.naturalHeight * cScale / 2, centerImg.naturalWidth * cScale, centerImg.naturalHeight * cScale);
-        ctx.restore();
-      }
-    }
-
-    if (fgRightUrl) {
-      const rightImg = getDocArchivalImage(fgRightUrl);
-      if (rightImg && rightImg.naturalWidth) {
-        ctx.save();
-        const floatY = Math.sin(t * 0.38 + 2.5) * 6;
-        ctx.translate(W * 0.76, H * 0.44 + floatY);
-        const rScale = Math.min(220 / rightImg.naturalWidth, 260 / rightImg.naturalHeight);
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        ctx.shadowBlur = 18;
-        ctx.drawImage(rightImg, -rightImg.naturalWidth * rScale / 2, -rightImg.naturalHeight * rScale / 2, rightImg.naturalWidth * rScale, rightImg.naturalHeight * rScale);
-        ctx.restore();
-      }
-    }
-
-    const vigGrad = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, W * 0.65);
-    vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
-    vigGrad.addColorStop(1, 'rgba(3,5,8,0.78)');
-    ctx.fillStyle = vigGrad;
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.fillStyle = 'rgba(255,255,255,0.18)';
-    for (let p = 0; p < 18; p++) {
-      const px = ((p * 137.5 + t * 24) % (W + 40)) - 20;
-      const py = ((p * 93.1 + Math.sin(t * 0.5 + p) * 30 + p * 28) % (H + 40)) - 20;
-      const pr = (p % 3) * 0.8 + 0.8;
-      ctx.beginPath();
-      ctx.arc(px, py, pr, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    const barH = 68;
-    const barY = H - barH - 14;
-    const barW = W - 48;
-    const barX = 24;
-
-    ctx.save();
-    ctx.fillStyle = 'rgba(10, 14, 24, 0.88)';
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.roundRect(barX, barY, barW, barH, 12);
-    ctx.fill();
-    ctx.stroke();
-
-    const accentGrad = ctx.createLinearGradient(barX, barY, barX + barW, barY);
-    accentGrad.addColorStop(0, '#38bdf8');
-    accentGrad.addColorStop(0.5, '#a855f7');
-    accentGrad.addColorStop(1, '#f97316');
-    ctx.fillStyle = accentGrad;
-    ctx.fillRect(barX + 16, barY + 2, barW - 32, 2);
-
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#f8fafc';
-    ctx.font = '800 16px Inter, system-ui, sans-serif';
-    ctx.fillText(actTitle, barX + 20, barY + 28);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '500 12px Inter, system-ui, sans-serif';
-    ctx.fillText(actSubtitle, barX + 20, barY + 50);
-
-    ctx.textAlign = 'right';
-    const curM = Math.floor(t / 60);
-    const curS = Math.floor(t % 60).toString().padStart(2, '0');
-    ctx.fillStyle = '#cbd5e1';
-    ctx.font = '700 14px ui-monospace, monospace';
-    ctx.fillText(`${curM}:${curS} / 26:54`, barX + barW - 20, barY + 32);
-
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = '600 11px ui-monospace, monospace';
-    ctx.fillText('MASTER TIMELINE', barX + barW - 20, barY + 50);
-
-    ctx.restore();
-    ctx.restore();
-  }
 
   function paintDocumentarySequence(ctx, t) {
     const W = 960, H = 540;
@@ -735,26 +629,22 @@
         return;
       }
     } else if (t >= 895 && t < 960) {
-      const n3dState = window.REGAARDER_NATIVE3D_CONFIG;
-      if (n3dState && n3dState.nativeReady && n3dState.nativeEngine && n3dState.nativeScene) {
+      const n3d = window.REGAARDER_NATIVE3D_CONFIG;
+      if (n3d?.nativeReady && n3d.nativeEngine && n3d.nativeMods?.checkpointMod) {
         try {
-          if (n3dState.preset !== 'checkpoint') {
-            n3dState.preset = 'checkpoint';
-            if (typeof window.syncStateToNativeScene === 'function') window.syncStateToNativeScene();
-          }
-          n3dState.nativeEngine.render(n3dState.nativeScene, (t - 895) % 5);
+          n3d.docCheckpointScene ||= n3d.nativeMods.checkpointMod.createCheckpoint3D();
+          n3d.nativeEngine.render(n3d.docCheckpointScene, (t - 895) % n3d.docCheckpointScene.duration);
           ctx.clearRect(0, 0, W, H);
-          ctx.drawImage(n3dState.nativeEngine.canvas, 0, 0, W, H);
+          ctx.drawImage(n3d.nativeEngine.canvas, 0, 0, W, H);
           return;
-        } catch (e) {}
+        } catch (error) {
+          console.warn('[RegaarderDocumentary] Checkpoint scene render failed:', error);
+        }
       }
-      if (typeof window.renderProjectedMannequinScene === 'function') {
-        const prevPreset = n3dState?.preset;
-        if (n3dState) n3dState.preset = 'checkpoint';
-        window.renderProjectedMannequinScene(ctx, (t - 895) % 5);
-        if (n3dState && prevPreset) n3dState.preset = prevPreset;
-        return;
-      }
+      // Keep the authored checkpoint scene in its own preset; never replace it
+      // with a generic blue-pair mannequin or invent a placeholder cutout.
+      paintUnimportedDocumentarySegment(ctx, t);
+      return;
     } else if (t >= 960 && t < 1020) {
       const rtM16 = chapterRuntime['regaarder-minute16-chapter'];
       if (rtM16 && rtM16.ready && rtM16.mod) {
@@ -773,6 +663,35 @@
         rtPele.mod.paintPele(ctx, t - 1130, rtPele.media, rtPele.config);
         return;
       }
+    } else if (t >= 1214 && t < 1285) {
+      const bridge = documentaryBridges.legacy;
+      if (bridge.ready && bridge.mod) {
+        try {
+          const local = t - 1214;
+          const archive = bridge.media.archive;
+          if (archive?.tagName === 'VIDEO' && archive.readyState >= 2 && local < bridge.config.diningStart) {
+            const frame = bridge.mod.archiveTime(local, bridge.config);
+            const clamped = Math.min(Math.max(0, (archive.duration || 18) - 0.04), frame);
+            if (!archive.seeking && Math.abs(archive.currentTime - clamped) > 0.04) archive.currentTime = clamped;
+          }
+          bridge.mod.paintLegacy(ctx, local, bridge.media, bridge.config);
+          return;
+        } catch (error) { console.warn('[RegaarderDocumentary] Legacy render failed:', error); }
+      }
+      paintUnimportedDocumentarySegment(ctx, t);
+      return;
+    } else if (t >= 1285 && t < 1405) {
+      const bridge = documentaryBridges.promo;
+      if (bridge.ready && bridge.mod) {
+        try {
+          const local = t - 1285;
+          if (bridge.sync) bridge.sync(bridge.media, local, refreshDocumentaryFrame);
+          bridge.mod.paint(ctx, local, bridge.media, bridge.config);
+          return;
+        } catch (error) { console.warn('[RegaarderDocumentary] Promo render failed:', error); }
+      }
+      paintUnimportedDocumentarySegment(ctx, t);
+      return;
     } else if (t >= 1409 && t <= 1614.6) {
       const rtFinal = chapterRuntime['regaarder-final-chapter'];
       if (rtFinal && rtFinal.ready && rtFinal.mod) {
@@ -781,7 +700,7 @@
       }
     }
 
-    paintArchivalDocumentarySegment(ctx, t, W, H);
+    paintUnimportedDocumentarySegment(ctx, t);
   }
 
   function paintChapterFrame(canvas, templateId, timeSec) {
