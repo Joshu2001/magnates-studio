@@ -329,6 +329,22 @@
     return im;
   }
 
+  // Capture the current render's layer transforms, not nominal inspector rectangles.
+  let activeCapture=null;
+  window.RegaarderLayerFrame={
+    require(ctx,id){if(activeCapture?.ctx===ctx){activeCapture.required.add(id);const m=ctx.getTransform();activeCapture.parents[id]=[m.a,m.b,m.c,m.d];}},
+    bounds(ctx,id,x,y,w,h){if(activeCapture?.ctx!==ctx||ctx.globalAlpha<.015)return;const m=ctx.getTransform(),pts=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(([x,y])=>[m.a*x+m.c*y+m.e,m.b*x+m.d*y+m.f]);const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);if(!xs.every(Number.isFinite)||!ys.every(Number.isFinite))return;activeCapture.bounds[id]={x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs),h:Math.max(...ys)-Math.min(...ys)};}
+  };
+  function trackedPaint(ctx,rt,fn){const previous=activeCapture;activeCapture={ctx,required:new Set(),bounds:{},parents:{}};try{fn();rt.drawnLayers=activeCapture.bounds;rt.requiredLayers=[...activeCapture.required];rt.layerParents=activeCapture.parents;}finally{activeCapture=previous;}}
+  function chapterForTime(id,t){if(id!=='regaarder-full-documentary')return id;return t>=1409?'regaarder-final-chapter':t>=1130&&t<1214?'regaarder-pele-pact-chapter':t>=1020&&t<1080?'regaarder-minute17-chapter':t>=960&&t<1020?'regaarder-minute16-chapter':null;}
+  window.getRegaarderPlaybackReadiness=function(id,t){
+    if(id==='regaarder-native3d-surface-builder')return !!stateForNative()?.nativeReady;
+    const child=chapterForTime(id,t),rt=chapterRuntime[child];
+    if(id==='regaarder-full-documentary'&&t<960){const frame=document.querySelector('#tpl-modal-preview-stage [data-documentary-source]');try{return !!frame?.contentWindow.RegaarderDocumentaryBridge?.ready();}catch{return false;}}
+    if(!rt)return true;if(rt.error)return true;if(!rt.ready)return false;
+    return (rt.requiredLayers||[]).every(key=>{const im=rt.media[key];return !im||im.readyState!==undefined?(!im||im.readyState>=2):im.complete&&im.naturalWidth>0;});
+  };
+  function stateForNative(){return window.REGAARDER_NATIVE3D_CONFIG;}
   async function ensureChapterModuleLoaded(templateId) {
     const rt = chapterRuntime[templateId];
     if (!rt || rt.ready || rt.loading || rt.error) return rt;
@@ -349,15 +365,16 @@
         const loadedMap = await mod.preloadPele({
           manifest: async () => {
             try {
-              const r = await fetch('pele-manifest.json');
+              const r = await fetch('/js/regaarder-chapters/pele-manifest.json');
               return r.ok ? await r.json() : { assets: [] };
             } catch (e) { return { assets: [] }; }
           },
           image: async (file) => {
             const im = new Image();
             im.crossOrigin = 'anonymous';
+            im.addEventListener('load',()=>{document.querySelectorAll(`[data-template-id="${templateId}"] canvas`).forEach(canvas=>paintChapterFrame(canvas,templateId,window.topCustomizerState?.currentTime||1.5));},{once:true});
             im.src = '/assets/pele126/' + file;
-            try { await im.decode(); } catch (e) {}
+            await Promise.race([im.decode().catch(()=>{}),new Promise(resolve=>setTimeout(resolve,15000))]);
             return im;
           }
         });
@@ -377,15 +394,16 @@
         const loadedMap = await mod.preloadMinute17({
           manifest: async () => {
             try {
-              const r = await fetch('minute17-manifest.json');
+              const r = await fetch('/js/regaarder-chapters/minute17-manifest.json');
               return r.ok ? await r.json() : { assets: [] };
             } catch (e) { return { assets: [] }; }
           },
           image: async (file) => {
             const im = new Image();
             im.crossOrigin = 'anonymous';
+            im.addEventListener('load',()=>{document.querySelectorAll(`[data-template-id="${templateId}"] canvas`).forEach(canvas=>paintChapterFrame(canvas,templateId,window.topCustomizerState?.currentTime||1.5));},{once:true});
             im.src = '/assets/minute17/' + file;
-            try { await im.decode(); } catch (e) {}
+            await Promise.race([im.decode().catch(()=>{}),new Promise(resolve=>setTimeout(resolve,15000))]);
             return im;
           }
         });
@@ -415,6 +433,7 @@
           } else {
             const im = new Image();
             im.crossOrigin = 'anonymous';
+            im.addEventListener('load',()=>{document.querySelectorAll(`[data-template-id="${templateId}"] canvas`).forEach(canvas=>paintChapterFrame(canvas,templateId,window.topCustomizerState?.currentTime||1.5));},{once:true});
             im.src = url;
             rt.media[id] = im;
             return (im.decode ? im.decode() : Promise.resolve()).catch(() => {}).then(() => {
@@ -427,7 +446,7 @@
             });
           }
         });
-        await Promise.all(loadPromises);
+        await Promise.race([Promise.all(loadPromises),new Promise(resolve=>setTimeout(resolve,15000))]);
       }
       rt.ready = true;
     } catch (err) {
@@ -508,28 +527,29 @@
     if(frame){
       frame.style.display=t<960?'block':'none';
       if(t<960){
-        try { frame.contentWindow.RegaarderDocumentaryBridge?.seek(t); } catch(e) {}
+        try {const bridge=frame.contentWindow.RegaarderDocumentaryBridge;if(bridge){const runtime=chapterRuntime['regaarder-full-documentary'];bridge.setLayers(runtime.config.layers);bridge.seek(t);runtime.drawnLayers=bridge.layers();for(const id of Object.keys(runtime.drawnLayers)){runtime.config.layers[id]||={x:0,y:0,scale:1,rotation:0,opacity:1,blur:0,depth:1,visible:true};}}} catch(e) {}
         clearSourceFrame(ctx);return;
       }
     }
     if (t < 960) {
+      if(typeof window.renderOriginsSlowRevealFrame==='function'){window.renderOriginsSlowRevealFrame(ctx.canvas,4+(t%6),window.REGAARDER_ORIGINS_CONFIG||{});return;}
       clearSourceFrame(ctx);return;
     } else if (t >= 960 && t < 1020) {
       const rtM16 = chapterRuntime['regaarder-minute16-chapter'];
       if (rtM16 && rtM16.ready && rtM16.mod) {
-        rtM16.mod.paintMinute16(ctx, t - 960, rtM16.media, rtM16.config);
+        trackedPaint(ctx,rtM16,()=>rtM16.mod.paintMinute16(ctx, t - 960, rtM16.media, rtM16.config));
         return;
       }
     } else if (t >= 1020 && t < 1080) {
       const rtM17 = chapterRuntime['regaarder-minute17-chapter'];
       if (rtM17 && rtM17.ready && rtM17.mod) {
-        rtM17.mod.paintMinute17(ctx, t - 1020, rtM17.media, rtM17.config);
+        trackedPaint(ctx,rtM17,()=>rtM17.mod.paintMinute17(ctx, t - 1020, rtM17.media, rtM17.config));
         return;
       }
     } else if (t >= 1130 && t < 1214) {
       const rtPele = chapterRuntime['regaarder-pele-pact-chapter'];
       if (rtPele && rtPele.ready && rtPele.mod) {
-        rtPele.mod.paintPele(ctx, t - 1130, rtPele.media, rtPele.config);
+        trackedPaint(ctx,rtPele,()=>rtPele.mod.paintPele(ctx, t - 1130, rtPele.media, rtPele.config));
         return;
       }
     } else if (t >= 1214 && t < 1285 && sourceRuntime.ready) {
@@ -544,7 +564,7 @@
     } else if (t >= 1409 && t <= 1614.6) {
       const rtFinal = chapterRuntime['regaarder-final-chapter'];
       if (rtFinal && rtFinal.ready && rtFinal.mod) {
-        rtFinal.mod.paint(ctx, t - 1409, rtFinal.media, rtFinal.config);
+        trackedPaint(ctx,rtFinal,()=>rtFinal.mod.paint(ctx, t - 1409, rtFinal.media, rtFinal.config));
         return;
       }
     }
@@ -572,13 +592,13 @@
     if (rt.ready && rt.mod) {
       try {
         if (templateId === 'regaarder-pele-pact-chapter') {
-          rt.mod.paintPele(ctx, t, rt.media, rt.config);
+          trackedPaint(ctx,rt,()=>rt.mod.paintPele(ctx, t, rt.media, rt.config));
         } else if (templateId === 'regaarder-minute16-chapter') {
-          rt.mod.paintMinute16(ctx, t, rt.media, rt.config);
+          trackedPaint(ctx,rt,()=>rt.mod.paintMinute16(ctx, t, rt.media, rt.config));
         } else if (templateId === 'regaarder-minute17-chapter') {
-          rt.mod.paintMinute17(ctx, t, rt.media, rt.config);
+          trackedPaint(ctx,rt,()=>rt.mod.paintMinute17(ctx, t, rt.media, rt.config));
         } else if (templateId === 'regaarder-final-chapter') {
-          rt.mod.paint(ctx, t, rt.media, rt.config);
+          trackedPaint(ctx,rt,()=>rt.mod.paint(ctx, t, rt.media, rt.config));
         }
         return;
       } catch (e) {
@@ -598,27 +618,21 @@
     return true;
   }
 
-  function syncChapterHitOverlay(container, templateId, timeSec) {
-    if (!container) return;
-    const rt = chapterRuntime[templateId];
-    if (!rt || !Array.isArray(rt.stageObjects)) return;
-    const t = Number(timeSec) || 0;
-    const curScene = (rt.scenes || []).find((s) => t >= s.start && t < s.end) || rt.scenes?.[0];
-    const curSceneId = curScene ? curScene.id : null;
-    const hitBoxes = container.querySelectorAll('[data-chapter-obj]');
-    hitBoxes.forEach((box) => {
-      const objId = box.getAttribute('data-chapter-obj');
-      const obj = rt.stageObjects.find((o) => o.id === objId);
-      if (!obj) return;
-      const active = isChapterObjActive(obj, curSceneId, t);
-      if (!active) {
-        box.style.display = 'none';
-        box.style.pointerEvents = 'none';
-      } else {
-        box.style.display = 'block';
-        box.style.pointerEvents = 'auto';
-      }
-    });
+  function syncChapterHitOverlay(container,templateId,timeSec){
+    const owner=chapterForTime(templateId,timeSec)||(templateId==='regaarder-full-documentary'&&timeSec<960?templateId:null),rt=chapterRuntime[owner],host=container.querySelector('[data-role="chapter-hit-layer"]');if(!host)return;
+    const bounds=rt?.drawnLayers||{};
+    for(const box of host.querySelectorAll('[data-chapter-obj]'))box.style.display='none';
+    if(!rt)return;
+    for(const [layerId,actual] of Object.entries(bounds)){
+      if(!rt.config.layers?.[layerId]||actual.w<1||actual.h<1)continue;
+      let object=rt.stageObjects.find(o=>o.layerId===layerId);
+      if(!object){object={id:owner+'_'+layerId,layerId,variant:layerId==='titles'?'text':'media',name:layerId.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]/g,' ').slice(0,24)};rt.stageObjects.push(object);}
+      let box=[...host.children].find(el=>el.dataset.chapterObj===object.id);
+      if(!box){box=document.createElement('div');box.className='rg-chapter-hit-box';box.dataset.chapterObj=object.id;box.style.cssText='position:absolute;border:1.5px solid transparent;cursor:grab;pointer-events:auto;box-sizing:border-box';host.appendChild(box);}
+      box.dataset.chapterLayer=layerId;box.dataset.chapterOwner=owner;box.title=object.name;box.style.display='block';box.style.left=actual.x/960*100+'%';box.style.top=actual.y/540*100+'%';box.style.width=actual.w/960*100+'%';box.style.height=actual.h/540*100+'%';box.style.transform='none';
+      if(box.classList.contains('is-selected'))window.RegaarderContextualToolbar?.updatePosition();
+    }
+    const selected=host.querySelector('.is-selected');if(selected?.style.display==='none')window.RegaarderContextualToolbar?.hide();
   }
 
   function buildChapterStageHTML(templateId, isHover) {
@@ -629,8 +643,8 @@
     const curScene = (rt.scenes || []).find((s) => activeTime >= s.start && activeTime < s.end) || rt.scenes?.[0];
     const curSceneId = curScene ? curScene.id : null;
 
-    const interactiveOverlayHtml = !isHover && templateId !== 'regaarder-full-documentary' ? `
-      <div class="rg-chapter-hit-layer" data-role="chapter-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:auto;">
+    const interactiveOverlayHtml = !isHover ? `
+      <div class="rg-chapter-hit-layer" data-role="chapter-hit-layer" style="position:absolute;inset:0;z-index:22;pointer-events:none;">
         ${rt.stageObjects.map((obj) => {
           const isVisible = isChapterObjActive(obj, curSceneId, activeTime);
           return `
@@ -661,89 +675,29 @@
 
     ensureChapterModuleLoaded(templateId).then(() => {
       const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
-      if (canvas?.isConnected && viewport.dataset.templateId === templateId) paintChapterFrame(canvas, templateId, t);
+      if (canvas?.isConnected && viewport.dataset.templateId === templateId) {paintChapterFrame(canvas, templateId, t);syncChapterHitOverlay(container,templateId,t);}
     });
 
-    // Interactive object hit boxes -> Universal Contextual Toolbar + Drag
-    const hitBoxes = viewport.querySelectorAll('[data-chapter-obj]');
-    hitBoxes.forEach((box) => {
-      box.addEventListener('mouseenter', () => {
-        box.style.borderColor = 'rgba(155, 107, 255, 0.65)';
-      });
-      box.addEventListener('mouseleave', () => {
-        if (!box.classList.contains('is-selected')) {
-          box.style.borderColor = 'transparent';
-        }
-      });
-
-      let dragging = false;
-      let startX = 0, startY = 0;
-      let origLayerX = 0, origLayerY = 0;
-      const objId = box.getAttribute('data-chapter-obj');
-      const layerId = box.getAttribute('data-chapter-layer');
-      const variant = box.getAttribute('data-chapter-variant') || 'media';
-
-      box.addEventListener('pointerdown', (e) => {
-        e.stopPropagation();
-        hitBoxes.forEach((b) => {
-          b.classList.remove('is-selected');
-          b.style.borderColor = 'transparent';
-          b.style.background = 'transparent';
-        });
-        box.classList.add('is-selected');
-        box.style.borderColor = '#9B6BFF';
-        box.style.background = 'rgba(155, 107, 255, 0.08)';
-
-        rt.selectedLayer = layerId;
-
-        if (window.RegaarderContextualToolbar && typeof window.RegaarderContextualToolbar.showForObject === 'function') {
-          const stageObj = rt.stageObjects.find((o) => o.id === objId);
-          window.RegaarderContextualToolbar.showForObject({
-            contextType: 'template',
-            objectKey: objId,
-            label: stageObj ? stageObj.name : objId,
-            variant,
-            anchorElement: box
-          });
-        }
-
-        const cfg = ensureFallbackConfig(templateId);
-        const layerObj = (cfg.layers && cfg.layers[layerId]) || { x: 0, y: 0 };
-        dragging = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        origLayerX = layerObj.x || 0;
-        origLayerY = layerObj.y || 0;
-        try { box.setPointerCapture(e.pointerId); } catch (err) {}
-      });
-
-      box.addEventListener('pointermove', (e) => {
-        if (!dragging) return;
-        const rect = viewport.getBoundingClientRect();
-        const scaleX = 960 / Math.max(1, rect.width);
-        const scaleY = 540 / Math.max(1, rect.height);
-        const dx = (e.clientX - startX) * scaleX;
-        const dy = (e.clientY - startY) * scaleY;
-        const cfg = ensureFallbackConfig(templateId);
-        if (cfg.layers && cfg.layers[layerId]) {
-          cfg.layers[layerId].x = Math.round(origLayerX + dx);
-          cfg.layers[layerId].y = Math.round(origLayerY + dy);
-          const t = (window.topCustomizerState && window.topCustomizerState.currentTime) || 0;
-          paintChapterFrame(canvas, templateId, t);
-        }
-      });
-
-      const endDrag = () => { dragging = false; };
-      box.addEventListener('pointerup', endDrag);
-      box.addEventListener('pointercancel', endDrag);
+    let drag=null;
+    viewport.addEventListener('pointerdown',e=>{
+      const box=e.target.closest('[data-chapter-owner]');if(!box)return;e.preventDefault();e.stopPropagation();
+      const owner=box.dataset.chapterOwner,rt=chapterRuntime[owner],id=box.dataset.chapterLayer,layer=rt?.config.layers[id];if(!layer)return;
+      viewport.querySelectorAll('.is-selected').forEach(el=>{el.classList.remove('is-selected');el.style.borderColor='transparent';});box.classList.add('is-selected');box.style.borderColor='#9B6BFF';rt.selectedLayer=id;
+      const object=rt.stageObjects.find(o=>o.id===box.dataset.chapterObj);
+      window.RegaarderContextualToolbar?.showForObject({contextType:'template',objectKey:object.id,label:object.name,variant:object.variant,anchorElement:box});
+      drag={box,layer,x:e.clientX,y:e.clientY,original:[layer.x||0,layer.y||0],matrix:rt.layerParents?.[id]||[1,0,0,1]};box.setPointerCapture(e.pointerId);
     });
+    viewport.addEventListener('pointermove',e=>{if(!drag)return;const rect=viewport.getBoundingClientRect(),x=(e.clientX-drag.x)*960/rect.width,y=(e.clientY-drag.y)*540/rect.height,[a,b,c,d]=drag.matrix,det=a*d-b*c;if(Math.abs(det)<1e-8)return;drag.layer.x=drag.original[0]+(d*x-c*y)/det;drag.layer.y=drag.original[1]+(-b*x+a*y)/det;const t=window.topCustomizerState?.currentTime||0;paintChapterFrame(canvas,templateId,t);syncChapterHitOverlay(container,templateId,t);});
+    const end=()=>{drag=null;};viewport.addEventListener('pointerup',end);viewport.addEventListener('pointercancel',end);
   }
 
   window.renderRegaarderChapterStage = function (container, templateId, isHover) {
     if (!container) return;
+    if(!isHover&&container.querySelector(`[data-template-id="${templateId}"]`)){window.stepRegaarderChapterAnimation(container,templateId,window.topCustomizerState?.currentTime||0);return;}
     container.innerHTML = buildChapterStageHTML(templateId, isHover);
     const canvas = container.querySelector('canvas');
-    paintChapterFrame(canvas, templateId, 0.5);
+    paintChapterFrame(canvas, templateId, window.topCustomizerState?.currentTime||0.5);
+    syncChapterHitOverlay(container,templateId,window.topCustomizerState?.currentTime||0.5);
     if (!isHover) {
       wireChapterStageInteractions(container, templateId);
     } else {
@@ -803,7 +757,7 @@
           <label class="rg-ctrl-label">Jump to scene</label><select class="rg-select" data-ch-action="jump-scene">${rt.scenes.map(scene=>`<option value="${scene.start}">${scene.label}</option>`).join('')}</select>
           <p style="font-size:11px;color:#94a3b8">Original scene playback. The source sponsor interval (18:00–18:50) is skipped. Use the individual chapter templates to edit their layers.</p>
         </div></div>`,
-        motion:'',look:'',effects:'',advanced:''
+        motion:'',look:'',effects:'',advanced:'<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Original scene settings</span></div><div class="rg-section-body"><button type="button" class="rg-btn-secondary" data-ch-all-controls>Load current scene controls</button><div data-ch-all-settings></div></div></div>' 
       };
     }
     const layerIds = Object.keys(cfg.layers || {});
@@ -1008,7 +962,8 @@
       </div>
     `;
 
-    const advancedHtml = `
+    const advancedHtml = `<div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">All scene settings</span></div><div class="rg-section-body"><button type="button" class="rg-btn-secondary" data-ch-all-controls>Load all editable settings</button><div data-ch-all-settings></div></div></div>
+
       <div class="rg-inspector-section">
         <div class="rg-section-header"><span class="rg-section-title">Diagnostics & Timing Calibration</span></div>
         <div class="rg-section-body">
@@ -1045,6 +1000,16 @@
       }
     };
 
+    modalEl.querySelector('[data-ch-all-controls]')?.addEventListener('click',()=>{
+      const host=modalEl.querySelector('[data-ch-all-settings]');host.replaceChildren();
+      const current=window.topCustomizerState?.currentTime||0,child=chapterForTime(templateId,current),runtime=chapterRuntime[child];
+      if(templateId==='regaarder-full-documentary'&&current<960){
+        const bridge=document.querySelector('#tpl-modal-preview-stage [data-documentary-source]')?.contentWindow.RegaarderDocumentaryBridge;
+        const controls=bridge?.controls()||[];if(!controls.length){host.textContent='Original controls are still loading. Try again when the scene appears.';return;}
+        for(const control of controls){if(control.type==='file'||control.type==='hidden'||control.type==='submit')continue;const label=document.createElement('label');label.textContent=control.label.slice(0,100);label.style.display='block';const input=document.createElement(control.type==='button'?'button':control.type==='select'?'select':'input');input.className='rg-input';if(control.type==='select')for(const option of control.options){const o=document.createElement('option');o.textContent=option.label;o.value=option.value;input.appendChild(o);}else input.type=control.type==='button'?'button':control.type;
+          if(control.type==='button'){input.textContent=control.label;input.addEventListener('click',()=>bridge.control(control.index));}else{if(control.type==='checkbox')input.checked=control.value;else input.value=control.value;for(const key of ['min','max','step'])if(control[key])input[key]=control[key];input.addEventListener('change',()=>bridge.control(control.index,input.type==='checkbox'?input.checked:input.value));}label.appendChild(input);host.appendChild(label);}
+      }else if(runtime){const walk=(object,parent,labelPrefix='')=>{for(const [key,value] of Object.entries(object)){if(value&&typeof value==='object'){const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent=key.replace(/([a-z])([A-Z])/g,'$1 $2');details.appendChild(summary);parent.appendChild(details);walk(value,details,labelPrefix+key+'.');continue;}if(!['number','string','boolean'].includes(typeof value)||['schema','version'].includes(key))continue;const label=document.createElement('label');label.textContent=key.replace(/([a-z])([A-Z])/g,'$1 $2');label.style.display='block';const input=document.createElement('input');input.className='rg-input';input.type=typeof value==='boolean'?'checkbox':typeof value==='number'?'number':'text';if(input.type==='checkbox')input.checked=value;else input.value=value;if(input.type==='number')input.step='any';input.addEventListener('change',()=>{const next=input.type==='checkbox'?input.checked:input.type==='number'?Number(input.value):input.value;if(typeof next==='number'&&!Number.isFinite(next))return;object[key]=next;refreshStage();});label.appendChild(input);parent.appendChild(label);}};walk(runtime.config,host);}else host.textContent='This interval uses its original sequence controls.';
+    });
     modalEl.querySelectorAll('[data-ch-prop]').forEach((inp) => {
       inp.addEventListener('input', () => {
         cfg[inp.getAttribute('data-ch-prop')] = inp.value;

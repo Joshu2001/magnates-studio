@@ -90,19 +90,32 @@ function openEditor(){if(!editor.open)editor.showModal();document.querySelector(
 // The original stage lives inside a closed dialog. Move that exact stage node,
 // preserving source renderer references, into the visible playback root.
 document.body.appendChild(base);
+let studioLayerEdits={},studioDrawnLayers={},studioEditKey='',studioSeekKey='';
+function captureStudioLayers(){
+ const rootRect=base.getBoundingClientRect(),sx=960/Math.max(1,rootRect.width),sy=540/Math.max(1,rootRect.height),restore=[];
+ const ids=new Map(Object.entries(typeof sprites==='object'?sprites:{}).map(([id,image])=>[image,id]));
+ for(const canvas of base.querySelectorAll('canvas')){const ctx=canvas.getContext('2d');if(!ctx)continue;const original=ctx.drawImage,rect=canvas.getBoundingClientRect();
+ ctx.drawImage=function(image,...args){const id=ids.get(image);if(!id)return original.call(ctx,image,...args);const edit=studioLayerEdits[id]||{},dest=args.length===8?args.slice(4):args.length===4?args:[...args,image.naturalWidth||image.width,image.naturalHeight||image.height];
+ ctx.save();ctx.translate(edit.x||0,edit.y||0);if(edit.visible===false){ctx.restore();return;}ctx.globalAlpha*=edit.opacity??1;
+ const [x,y,w,h]=dest,m=ctx.getTransform(),k=rect.width/Math.max(1,canvas.width)*sx,l=rect.height/Math.max(1,canvas.height)*sy,points=[[x,y],[x+w,y],[x+w,y+h],[x,y+h]].map(([a,b])=>[(m.a*a+m.c*b+m.e)*k+(rect.left-rootRect.left)*sx,(m.b*a+m.d*b+m.f)*l+(rect.top-rootRect.top)*sy]);
+ if(ctx.globalAlpha>.015)studioDrawnLayers[id]={x:Math.min(...points.map(p=>p[0])),y:Math.min(...points.map(p=>p[1])),w:Math.max(...points.map(p=>p[0]))-Math.min(...points.map(p=>p[0])),h:Math.max(...points.map(p=>p[1]))-Math.min(...points.map(p=>p[1]))};
+ try{return original.call(ctx,image,...args);}finally{ctx.restore();}};restore.push(()=>{ctx.drawImage=original;});}
+ return ()=>restore.forEach(fn=>fn());
+}
 window.RegaarderDocumentaryBridge={
+ layers:()=>studioDrawnLayers,
+ setLayers(layers){studioLayerEdits=layers||{};const key=JSON.stringify(studioLayerEdits);if(key!==studioEditKey){studioEditKey=key;base._renderKey='';}},
  ready:()=>!!window.motionFinalReady,
+ controls(){return [...document.querySelectorAll('.inspector input,.inspector select,.inspector textarea,.inspector button')].map((el,index)=>({index,type:el.tagName==='BUTTON'?'button':el.tagName==='SELECT'?'select':el.type||'text',label:el.labels?.[0]?.textContent?.trim()||el.closest('label')?.textContent?.trim()||el.title||el.textContent?.trim()||el.id||'Setting',value:el.type==='checkbox'?el.checked:el.value,min:el.min,max:el.max,step:el.step,options:el.options?[...el.options].map(o=>({label:o.text,value:o.value})):[]}));},
+ control(index,value){const el=document.querySelectorAll('.inspector input,.inspector select,.inspector textarea,.inspector button')[index];if(!el)return;if(el.tagName==='BUTTON')el.click();else{if(el.type==='checkbox')el.checked=!!value;else el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));}base._renderKey='';frame(base,t);},
  seek(seconds){
    playing=false;
+   const seekKey=seconds+'|'+studioEditKey;if(seekKey!==studioSeekKey){studioDrawnLayers={};studioSeekKey=seekKey;}
    const duration=settings.duration;
    t=Math.max(0,Math.min(duration-.00001,seconds))/duration;
-   base._renderKey='';frame(base,t);
+   const restore=captureStudioLayers();
+   try{frame(base,t);}finally{restore();}
  }
 };
 </script>
-<script>
-let studioSourceTime=0;
-const originalSourceSeek=window.RegaarderDocumentaryBridge.seek;
-window.RegaarderDocumentaryBridge.seek=function(seconds){studioSourceTime=seconds;originalSourceSeek(seconds)};
-setInterval(()=>{if(window.RegaarderDocumentaryBridge.ready())originalSourceSeek(studioSourceTime)},250);
-</script>
+

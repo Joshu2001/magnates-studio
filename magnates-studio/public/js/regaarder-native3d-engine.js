@@ -254,6 +254,7 @@
       h.position = [...base.position];
       h.position[0] += (off.x || 0) * .003;
       h.position[1] -= (off.y || 0) * .003;
+      h.position[2] += (off.z || 0) * .003;
       h.rotation = [...base.rotation];
       h.rotation[1] += off.yaw || 0;
       h.parts = structuredClone(h.parts || {});
@@ -586,7 +587,8 @@
         syncStateToNativeScene(scene);
         const dur = state.nativeScene.duration || 5;
         const t = Math.max(0, Number(timeSec) || 0) % dur;
-        state.nativeEngine.render(scene, editing ? PREVIEW_TIMES[state.preset] : t);
+        const renderKey=JSON.stringify(scene)+'|'+(editing?PREVIEW_TIMES[state.preset]:t);
+        if(state.nativeRenderKey!==renderKey){state.nativeEngine.render(scene,editing?PREVIEW_TIMES[state.preset]:t);state.nativeRenderKey=renderKey;}
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(state.nativeEngine.canvas, 0, 0, canvas.width, canvas.height);
         updateHitBoxesFrom3DScene(canvas);
@@ -636,6 +638,7 @@
         <canvas id="regaarder-n3d-canvas-${suffix}" width="960" height="540" style="width:100%;height:100%;object-fit:contain;display:block;cursor:default;"></canvas>
         <div data-n3d-status role="status" style="position:absolute;left:12px;top:52px;z-index:25;padding:5px 9px;background:#080b10cc;color:#cbd5e1;font:12px Arial;pointer-events:none"></div>
         ${hitOverlayHtml}
+        ${!isHover?`<nav aria-label="3D viewport zoom" style="position:absolute;left:14px;bottom:56px;z-index:31;display:flex;gap:6px;padding:6px;border-radius:var(--rg-toolbar-radius,12px);background:var(--rg-toolbar-bg,#1B1628);border:1px solid var(--rg-toolbar-border,#3B2A5F)"><button class="rg-btn-secondary" data-n3d-zoom="out" aria-label="Zoom out">−</button><button class="rg-btn-secondary" data-n3d-zoom="in" aria-label="Zoom in">Zoom +</button><button class="rg-btn-secondary" data-n3d-zoom="reset">Fit</button><output data-n3d-zoom-label>${state.cameraZoom.toFixed(2)}×</output></nav>`:''}
         ${presetPillsHtml}
       </div>
     `;
@@ -653,6 +656,7 @@
       renderNative3DCanvas(canvas, t);
     });
 
+    viewport.querySelectorAll('[data-n3d-zoom]').forEach(button=>button.addEventListener('click',()=>{state.cameraZoom=Math.max(.05,Math.min(64,button.dataset.n3dZoom==='reset'?1:state.cameraZoom*(button.dataset.n3dZoom==='in'?1.5:1/1.5)));const label=viewport.querySelector('[data-n3d-zoom-label]');if(label)label.textContent=state.cameraZoom.toFixed(2)+'×';renderNative3DCanvas(canvas,0);}));
     viewport.querySelectorAll('[data-n3d-preset]').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -727,6 +731,7 @@
           rot: objId === 'n3d_actor_primary' ? 90 : (objId === 'n3d_actor_secondary' ? -65 : 0),
           opacity: 1
         });
+        state.editSession?.begin();
         dragging = true;
         startX = e.clientX;
         startY = e.clientY;
@@ -770,6 +775,7 @@
       const endDrag = (e) => {
         if (dragging) {
           dragging = false;
+          state.editSession?.commit();
           box.style.cursor = 'grab';
           try { box.releasePointerCapture(e.pointerId); } catch (err) {}
         }
@@ -819,6 +825,7 @@
 
   window.renderRegaarderNative3DStage = function (container, templateId, isHover) {
     if (!container) return;
+    if(!isHover&&container.querySelector('.rg-n3d-viewport')){renderNative3DCanvas(container.querySelector('canvas'),window.topCustomizerState?.currentTime||0);return;}
     if (!isHover) {state.meshEditor?.dispose();state.meshEditor = null;}
     container.innerHTML = buildNative3DStageHTML(templateId || TEMPLATE_ID, isHover);
     const canvas = container.querySelector('canvas');
@@ -848,6 +855,8 @@
 
   window.applyRegaarderNative3DToolbarAction = function (actionType, objectKey, value) {
     if (!objectKey || !objectKey.startsWith('n3d_')) return false;
+    state.editSession?.begin();
+    queueMicrotask(()=>state.editSession?.commit());
     const off = state.actorOffsets[objectKey] || (state.actorOffsets[objectKey] = { x: 0, y: 0, rot: 0, opacity: 1 });
     if (actionType === 'select' || actionType === 'move') { state.editTool='orbit';state.objectDragMode=actionType==='move'?'move':'turn';
     } else if(actionType === 'style') {off.roughness=value==='matte'?.9:value==='metal'?.2:.46;off.metalness=value==='metal'?.8:0;
@@ -925,13 +934,20 @@
         <div class="rg-section-body">
           <label class="rg-ctrl-label">Stage tool</label>
           <select class="rg-select" data-n3d-prop="editTool">
-            ${Object.entries({orbit:'Hand · turn object / orbit background',select:'Select mesh region',grab:'Drag mesh region',inflate:'Sculpt · inflate',smooth:'Sculpt · smooth'}).map(([k,v])=>`<option value="${k}" ${state.editTool===k?'selected':''}>${v}</option>`).join('')}
+            ${Object.entries({orbit:'Hand · turn object / orbit background',select:'Select mesh region',box:'Box select vertices (through surface)',bone:'Move skeleton joint','guide-circle':'Draw ellipse guide','guide-box':'Draw box guide','guide-line':'Draw line guide',grab:'Drag mesh region',inflate:'Sculpt · inflate',smooth:'Sculpt · smooth'}).map(([k,v])=>`<option value="${k}" ${state.editTool===k?'selected':''}>${v}</option>`).join('')}
           </select>
           <label><input type="checkbox" data-n3d-bool="showTopology" ${state.showTopology?'checked':''}> Topology & vertices</label>
           <label><input type="checkbox" data-n3d-bool="showBones" ${state.showBones?'checked':''}> Skeleton</label>
           <div class="rg-ctrl-row"><label class="rg-ctrl-label">Region radius</label><input type="range" min="0.015" max="0.2" step="0.005" value="${state.brushRadius}" data-n3d-num="brushRadius"></div>
-          <button class="rg-btn-secondary" data-n3d-action="undo-mesh">Undo mesh edit</button>
-          <p style="font-size:11px;color:#94a3b8">Drag on the body to edit. Use Hand to turn characters; drag the background to orbit. Shift-click adds a region.</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="rg-btn-secondary" data-n3d-action="undo-mesh">Undo</button><button class="rg-btn-secondary" data-n3d-action="redo">Redo</button><button class="rg-btn-secondary" data-n3d-action="save">Save in browser</button><button class="rg-btn-secondary" data-n3d-action="load">Restore saved</button></div>
+          <label class="rg-ctrl-label">Selection</label><select class="rg-select" data-n3d-prop="selectionScope"><option value="region" ${(!state.selectionScope||state.selectionScope==='region')?'selected':''}>Connected region</option><option value="surface" ${state.selectionScope==='surface'?'selected':''}>Whole surface</option><option value="actor" ${state.selectionScope==='actor'?'selected':''}>Selected actor (numeric move)</option><option value="all" ${state.selectionScope==='all'?'selected':''}>All actors (numeric move)</option></select>
+          <label class="rg-ctrl-label">Move axis</label><select class="rg-select" data-n3d-prop="moveAxis">${['free','x','y','z'].map(k=>`<option value="${k}" ${(state.moveAxis||'free')===k?'selected':''}>${k==='free'?'Free movement':k.toUpperCase()}</option>`).join('')}</select>
+          <label>View target X<input type="number" step="0.001" value="${(state.cameraTarget||[0,1.1,0])[0]}" data-n3d-target="0"></label><label>View target Y<input type="number" step="0.001" value="${(state.cameraTarget||[0,1.1,0])[1]}" data-n3d-target="1"></label><label>View target Z<input type="number" step="0.001" value="${(state.cameraTarget||[0,1.1,0])[2]}" data-n3d-target="2"></label>
+          <label>Snap (mm)<input class="rg-input" type="number" min="0" max="100" step="0.1" value="${state.snapMillimetres||0}" data-n3d-num="snapMillimetres"></label>
+          <label>Precision move (mm)<input class="rg-input" type="number" step="0.1" value="1" data-n3d-distance></label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">${['x','y','z'].map((a,i)=>`<button class="rg-btn-secondary" data-n3d-move="${i}">Move ${a.toUpperCase()}</button>`).join('')}<button class="rg-btn-secondary" data-n3d-action="round">Round region</button><button class="rg-btn-secondary" data-n3d-action="flatten">Flatten region</button><button class="rg-btn-secondary" data-n3d-action="straighten">Straighten actor</button><button class="rg-btn-secondary" data-n3d-action="clearGuides">Clear guides</button></div>
+          <p role="status" data-n3d-feedback style="font-size:11px;color:#c4b5fd"></p>
+          <p style="font-size:11px;color:#94a3b8">Shift-click adds a region. Box selects through one surface. Joint drag rotates the selected joint; use Motion for exact angles. Guides stay fixed on screen for calibration. Ctrl/Cmd-Z undoes, Shift-Z redoes.</p>
         </div>
       </div>
 
@@ -991,10 +1007,13 @@
     `;
 
     const boneNames = state.nativeData?.joints || ['head','wrist.L','wrist.R','foot.L','foot.R'];
+    const selectedActorNodes=state.nativeScene?.nodes.filter(n=>n.type==='humanoid')||[];
+    const selectedActor=selectedActorNodes.find((n,i)=>n.id===state.selectedBoneActor||actorObjectId(n,i)===state.activeActor)||selectedActorNodes[0];
+    const selectedRotation=selectedActor?.bones?.[state.selectedBone]?.rotation||[0,0,0];
     const motionHtml = `
       <div class="rg-inspector-section"><div class="rg-section-header"><span class="rg-section-title">Selected Actor · Bone Rotation</span></div><div class="rg-section-body">
       <select class="rg-select" data-n3d-prop="selectedBone">${boneNames.map(k=>`<option ${k===state.selectedBone?'selected':''}>${k}</option>`).join('')}</select>
-      ${['X','Y','Z'].map((axis,i)=>`<div class="rg-ctrl-row"><label>${axis} rotation</label><input type="range" min="-90" max="90" value="0" data-n3d-bone-axis="${i}"></div>`).join('')}
+      ${['X','Y','Z'].map((axis,i)=>`<div class="rg-ctrl-row"><label>${axis} rotation</label><input type="range" min="-90" max="90" step="0.1" value="${selectedRotation[i]}" data-n3d-bone-axis="${i}"></div>`).join('')}
       </div></div>
 
       <div class="rg-inspector-section">
@@ -1033,7 +1052,7 @@
           </div>
           <div class="rg-ctrl-row">
             <div class="rg-ctrl-top"><label class="rg-ctrl-label">Camera Dolly Zoom</label><span class="rg-ctrl-val">${Number(state.cameraZoom).toFixed(2)}×</span></div>
-            <input type="range" class="rg-range" min="0.6" max="1.6" step="0.02" value="${state.cameraZoom}" data-n3d-num="cameraZoom">
+            <input type="range" class="rg-range" min="0.05" max="64" step="0.05" value="${state.cameraZoom}" data-n3d-num="cameraZoom">
           </div>
           <div class="rg-ctrl-row">
             <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;cursor:pointer;">
@@ -1182,17 +1201,23 @@
   window.wireRegaarderNative3DInspectorEvents = function (modalEl) {
     if (!modalEl) return;
 
-    modalEl.querySelector('[data-n3d-action="undo-mesh"]')?.addEventListener('click', () => state.meshEditor?.undo());
+    const feedback=text=>{const el=modalEl.querySelector('[data-n3d-feedback]');if(el)el.textContent=text;};
+    modalEl.querySelectorAll('[data-n3d-action]').forEach(button=>button.addEventListener('click',()=>{const action=button.dataset.n3dAction;try{if(!state.meshEditor)throw Error('Wait for the 3D scene to finish loading');if(action==='undo-mesh')state.meshEditor.undo();else if(['redo','save','load','straighten','clearGuides'].includes(action))state.meshEditor[action]();else if(['round','flatten'].includes(action))state.meshEditor.shape(action);else return;feedback(action==='save'?'Saved on this browser.':'Edit applied.');}catch(e){feedback(e.message);}}));
+    modalEl.querySelectorAll('[data-n3d-target]').forEach(input=>input.addEventListener('change',()=>{const v=Number(input.value);if(!Number.isFinite(v))return;state.editSession?.begin();state.cameraTarget||=[0,1.1,0];state.cameraTarget[Number(input.dataset.n3dTarget)]=v;state.editSession?.commit();window.stepRegaarderNative3DAnimation(document.getElementById('tpl-modal-preview-stage'),TEMPLATE_ID,0);}));
+    modalEl.querySelectorAll('[data-n3d-move]').forEach(button=>button.addEventListener('click',()=>{try{const amount=Number(modalEl.querySelector('[data-n3d-distance]').value);if(!Number.isFinite(amount)||Math.abs(amount)>150)throw Error('Use a movement between -150 and 150 mm');const delta=[0,0,0];delta[Number(button.dataset.n3dMove)]=amount/1000;state.meshEditor?.move(delta);}catch(e){feedback(e.message);}}));
+    modalEl.querySelectorAll('[data-n3d-bone-axis]').forEach(input=>{input.addEventListener('pointerdown',()=>state.editSession?.begin());input.addEventListener('change',()=>state.editSession?.commit());});
     modalEl.querySelectorAll('[data-n3d-bone-axis]').forEach(input => input.addEventListener('input', () => {
       const actors = state.nativeScene?.nodes.filter(n=>n.type==='humanoid') || [];
-      const node = actors.find((n,i)=>actorObjectId(n,i)===state.activeActor) || actors[0];
+      const node = actors.find((n,i)=>n.id===state.selectedBoneActor||actorObjectId(n,i)===state.activeActor) || actors[0];
       if (!node) return;
+      state.editSession?.begin();
       node.bones ||= {};
       const bone = node.bones[state.selectedBone] ||= {rotation:[0,0,0]};
       bone.rotation ||= [0,0,0];
       bone.rotation[Number(input.dataset.n3dBoneAxis)] = Number(input.value);
       if (node.boneTracks) delete node.boneTracks[state.selectedBone];
-      if (state.editScene) { const editNode = state.editScene.nodes.find(n=>n.id===node.id); editNode.bones[state.selectedBone] = structuredClone(bone); }
+      state.editScene=null;
+      state.editSession?.commit();
       const stage = document.getElementById('tpl-modal-preview-stage');
       window.stepRegaarderNative3DAnimation(stage, TEMPLATE_ID, 0);
     }));
@@ -1218,10 +1243,12 @@
     modalEl.querySelectorAll('[data-n3d-prop]').forEach((sel) => {
       sel.addEventListener('change', () => {
         const k = sel.getAttribute('data-n3d-prop');
+        state.editSession?.begin();
         state[k] = sel.value;
+        if(k==='editTool'&&sel.value==='bone')state.showBones=true;
         if(k==='pose'){
           const actors=state.nativeScene?.nodes.filter(n=>n.type==='humanoid')||[];
-          const node=actors.find((n,i)=>actorObjectId(n,i)===state.activeActor)||actors[0];
+          const node=actors.find((n,i)=>n.id===state.selectedBoneActor||actorObjectId(n,i)===state.activeActor)||actors[0];
           if(node){node.pose=sel.value;delete node.tracks?.pose;state.editScene=null;}
         }
         if (k === 'preset' && PRESET_SCENES[sel.value]) {
@@ -1229,18 +1256,22 @@
           state.shirtColor = PRESET_SCENES[sel.value].primaryColor;
           rebuildNativeSceneFromPreset();
         }
+        state.editSession?.commit();
+        document.querySelectorAll('[data-n3d-preset]').forEach(button=>{const active=button.dataset.n3dPreset===state.preset;button.classList.toggle('is-active',active);button.style.background=active?'#6d28d9':'transparent';button.style.color=active?'#fff':'#94a3b8';});
         refreshStage();
       });
     });
 
+    modalEl.querySelectorAll('[data-n3d-num],[data-n3d-bool]').forEach(input=>{input.addEventListener('pointerdown',()=>state.editSession?.begin());input.addEventListener('change',()=>state.editSession?.commit());});
     modalEl.querySelectorAll('[data-n3d-num]').forEach((inp) => {
       inp.addEventListener('input', () => {
         const k = inp.getAttribute('data-n3d-num');
+        state.editSession?.begin();
         state[k] = parseFloat(inp.value);
         if (k === 'legLength') state.armLength = state[k];
         if(k==='leanAngle'||k==='handCurl'){
           const actors=state.nativeScene?.nodes.filter(n=>n.type==='humanoid')||[];
-          const node=actors.find((n,i)=>actorObjectId(n,i)===state.activeActor)||actors[0];
+          const node=actors.find((n,i)=>n.id===state.selectedBoneActor||actorObjectId(n,i)===state.activeActor)||actors[0];
           if(node){if(k==='leanAngle'){node.leanAngle=state[k];delete node.tracks?.leanAngle;}else{node.handPose={L:state[k],R:state[k]};node.handPoseTracks={};}state.editScene=null;}
         }
         const valSpan = inp.parentElement?.querySelector('.rg-ctrl-val');

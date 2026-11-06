@@ -34381,6 +34381,15 @@ function openTopTemplateCustomizer(tpl) {
     });
   };
   if (paperModeVideo) paperModeVideo.onclick = () => {
+    if(tpl.id==='regaarder-native3d'||tpl.id?.startsWith('regaarder-')){
+      const was3D=topCustomizerState.paperPreviewMode==='3d';
+      if(!was3D)topCustomizerState.resumeAfter3D=topCustomizerState.isPlaying;
+      topCustomizerState.paperPreviewMode='video';topCustomizerState.is3DMode=false;
+      topCustomizerState.isPlaying=(topCustomizerState.resumeAfter3D??true);
+      topCustomizerState.startTime=performance.now()-(topCustomizerState.currentTime||0)*1000;
+      syncPaperModeButtons();renderTopTemplatePreviewStage();return;
+    }
+
     topCustomizerState.paperPreviewMode = 'video';
     topCustomizerState.is3DMode = false;
     if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
@@ -34424,6 +34433,15 @@ function openTopTemplateCustomizer(tpl) {
     if (tpl.id !== 'map' && tpl.id !== 'empire-timeline' && tpl.id !== 'empire-map') renderTopTemplatePreviewStage();
   };
   if (paperMode3D) paperMode3D.onclick = () => {
+    if(tpl.id==='regaarder-native3d'||tpl.id?.startsWith('regaarder-')){
+      const was3D=topCustomizerState.paperPreviewMode==='3d';
+      if(!was3D)topCustomizerState.resumeAfter3D=topCustomizerState.isPlaying;
+      topCustomizerState.paperPreviewMode='3d';topCustomizerState.is3DMode=true;
+      topCustomizerState.isPlaying=false;
+      topCustomizerState.startTime=performance.now()-(topCustomizerState.currentTime||0)*1000;
+      syncPaperModeButtons();renderTopTemplatePreviewStage();return;
+    }
+
     topCustomizerState.paperPreviewMode = '3d';
     topCustomizerState.is3DMode = true;
     if (tpl.id === 'map' && typeof window.tplSetContextualData === 'function') {
@@ -38570,12 +38588,15 @@ function renderCustomizerFrameAtTime(targetTime) {
 function startTopCustomizerLoop() {
   topCustomizerState.startTime = performance.now();
 
+  let previousTick=performance.now();
   function loop(now) {
+    const elapsed=now-previousTick;previousTick=now;
     if (!topCustomizerState.isPlaying) {
       topCustomizerState.animId = requestAnimationFrame(loop);
       return;
     }
 
+    if(window.getRegaarderPlaybackReadiness?.(topCustomizerState.currentTpl?.id,topCustomizerState.currentTime||0)===false){topCustomizerState.startTime+=elapsed;updateTopCustomizerFrame(topCustomizerState.currentTime||0,now);topCustomizerState.animId=requestAnimationFrame(loop);return;}
     const t = (now - topCustomizerState.startTime) / 1000;
     const hasMultipleScenes = Array.isArray(projectScenes) && projectScenes.length > 1;
     const totalSeqDur = hasMultipleScenes

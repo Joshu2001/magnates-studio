@@ -6,6 +6,7 @@ export class SoftwareRenderer {
   setSize(w,h){this.domElement.width=w;this.domElement.height=h;}
   setPixelRatio(){} setClearAlpha(){} dispose(){} setRenderTarget(){} getRenderTarget(){return null;}
   clear(){this.context.clearRect(0,0,this.domElement.width,this.domElement.height);}
+  texture(map){if(!map?.image)return null;this.textures??=new WeakMap();const cached=this.textures.get(map);if(cached?.version===map.version)return cached;try{const src=map.image,w=src.width||src.naturalWidth,h=src.height||src.naturalHeight;if(!w||!h)return null;const cv=document.createElement('canvas');cv.width=w;cv.height=h;const c=cv.getContext('2d');c.drawImage(src,0,0);const record={version:map.version,w,h,data:c.getImageData(0,0,w,h).data,flipY:map.flipY};this.textures.set(map,record);return record;}catch{return null;}}
   render(scene,camera){
     const c=this.context,w=this.domElement.width,h=this.domElement.height;
     c.globalAlpha=1;c.fillStyle=scene.background?.isColor?'#'+scene.background.getHexString():'#131821';c.fillRect(0,0,w,h);
@@ -38,13 +39,14 @@ export class SoftwareRenderer {
         normal.crossVectors(a,b).normalize();
         const strength=material.isMeshBasicMaterial?1:.32+.68*Math.max(0,normal.dot(light));
         const color=(material.color||new T.Color('white')).clone().multiplyScalar(strength);
-        faces.push({z:(points[ia+2]+points[ib+2]+points[ic+2])/3,z0:points[ia+2],z1:points[ib+2],z2:points[ic+2],x0,y0,x1,y1,x2,y2,color:color.getHex(),alpha:material.opacity??1});
+        faces.push({z:(points[ia+2]+points[ib+2]+points[ic+2])/3,z0:points[ia+2],z1:points[ib+2],z2:points[ic+2],x0,y0,x1,y1,x2,y2,color:color.getHex(),alpha:material.opacity??1,depthWrite:material.depthWrite!==false,texture:this.texture(material.map),uv:g.attributes.uv?[ia,ib,ic].map(i=>[g.attributes.uv.getX(i/6),g.attributes.uv.getY(i/6)]):null});
       }
     });
     // Depth-buffer rasterization avoids hundreds of thousands of Canvas path calls
     // and prevents the cracks caused by antialiasing adjoining tiny triangles.
     const image=c.getImageData(0,0,w,h),pixels=image.data;
     this.depth??=new Float32Array(w*h);if(this.depth.length!==w*h)this.depth=new Float32Array(w*h);this.depth.fill(Infinity);
+    faces.sort((a,b)=>(a.depthWrite===b.depthWrite?b.z-a.z:a.depthWrite?-1:1));
     for(const f of faces){
       const minX=Math.max(0,Math.floor(Math.min(f.x0,f.x1,f.x2))),maxX=Math.min(w-1,Math.ceil(Math.max(f.x0,f.x1,f.x2)));
       const minY=Math.max(0,Math.floor(Math.min(f.y0,f.y1,f.y2))),maxY=Math.min(h-1,Math.ceil(Math.max(f.y0,f.y1,f.y2)));
@@ -55,8 +57,9 @@ export class SoftwareRenderer {
         const v=((f.y2-f.y0)*(x+.5-f.x2)+(f.x0-f.x2)*(y+.5-f.y2))/d;
         if(u<0||v<0||u+v>1)continue;
         const z=u*f.z0+v*f.z1+(1-u-v)*f.z2,i=y*w+x;if(z>=this.depth[i])continue;
-        this.depth[i]=z;const at=i*4,alpha=f.alpha;
-        pixels[at]=r*alpha+pixels[at]*(1-alpha);pixels[at+1]=g*alpha+pixels[at+1]*(1-alpha);pixels[at+2]=b*alpha+pixels[at+2]*(1-alpha);pixels[at+3]=255;
+        const at=i*4;let alpha=f.alpha,red=r,green=g,blue=b;
+        if(f.texture&&f.uv){const tex=f.texture,tx=u*f.uv[0][0]+v*f.uv[1][0]+(1-u-v)*f.uv[2][0],ty=u*f.uv[0][1]+v*f.uv[1][1]+(1-u-v)*f.uv[2][1],px=Math.max(0,Math.min(tex.w-1,Math.floor(tx*tex.w))),py=Math.max(0,Math.min(tex.h-1,Math.floor((tex.flipY?1-ty:ty)*tex.h))),offset=(py*tex.w+px)*4;alpha*=tex.data[offset+3]/255;red*=tex.data[offset]/255;green*=tex.data[offset+1]/255;blue*=tex.data[offset+2]/255;}if(alpha<.005)continue;if(f.depthWrite)this.depth[i]=z;
+        pixels[at]=red*alpha+pixels[at]*(1-alpha);pixels[at+1]=green*alpha+pixels[at+1]*(1-alpha);pixels[at+2]=blue*alpha+pixels[at+2]*(1-alpha);pixels[at+3]=255;
       }
     }
     c.putImageData(image,0,0);
