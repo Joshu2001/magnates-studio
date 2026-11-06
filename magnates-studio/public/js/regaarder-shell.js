@@ -63,3 +63,132 @@
  const discover=node=>{if(node.nodeType!==1)return;if(node.id==='btn-toggle-3d-interactive-mode')refineToggle(node);if(node.classList.contains('rg-inspector-section'))refineMeshInspector(node);node.querySelectorAll?.('.rg-inspector-section').forEach(refineMeshInspector);node.querySelectorAll?.('#btn-toggle-3d-interactive-mode').forEach(refineToggle);};
  discover(document.body);new MutationObserver(records=>{for(const record of records)for(const node of record.addedNodes)discover(node);}).observe(document.body,{childList:true,subtree:true});
 })();
+
+/* Library-wide inspector presentation. Move original nodes; never clone controls or handlers. */
+(()=>{
+ 'use strict';
+ const disclosureState=new Map();
+ const paneNames={content:'Content',motion:'Animation & timing',look:'Appearance',effects:'Effects'};
+ const taskIcons={content:'M3 4h18v16H3z M7 8h10 M7 12h10 M7 16h6',motion:'m8 4 12 8-12 8z',look:'M12 3a9 9 0 1 0 0 18V3z M12 3a9 9 0 0 1 0 18',effects:'m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z'};
+ const getTemplate=shell=>{const modal=shell?.closest('.vector-export-modal');return modal&&modal.id!=='modal-top-template-customizer'?modal.id:window.topCustomizerState?.currentTpl?.id||'scene';};
+ const titles={
+  'Chapter Beats & Timeline':'Choose a scene','Documentary scenes':'Choose a scene',
+  'Titles & Editorial Copy':'Scene text','Independent Layer & Media Slot':'Scene media',
+  '3D Scene Preset & Foundation':'Character & scene','Anatomical Proportions':'Body proportions',
+  'Mesh & Skeleton':'Shape & pose','Camera & Sequence Pace':'Camera & timing'
+ };
+ function makeGroup(title,children){
+  const section=document.createElement('div');section.className='rg-inspector-section';
+  const header=document.createElement('div');header.className='rg-section-header';
+  const label=document.createElement('span');label.className='rg-section-title';label.textContent=title;header.appendChild(label);
+  section.appendChild(header);for(const child of children)section.appendChild(child);return section;
+ }
+ function splitGeneric(section){
+  const controls=[...section.children].filter(n=>n.dataset.inspectorKind);
+  if(!controls.length)return;
+  const pane=section.parentElement,groups=new Map();
+  for(const node of controls){const key=node.dataset.inspectorKind;const name=key==='media'?'Scene media':key==='text'?'Text & captions':({motion:'Animation settings',look:'Appearance settings',effects:'Effects settings'}[pane.dataset.pane]||'Scene settings');if(!groups.has(name))groups.set(name,[]);groups.get(name).push(node);}
+  for(const [name,nodes]of groups){
+   // Keep a short initial form. Remaining controls stay accessible in a named drawer.
+   if(nodes.length>5){pane.insertBefore(makeGroup(name,nodes.slice(0,4)),section);const more=makeGroup('More '+name.toLowerCase(),nodes.slice(4));more.dataset.rmStartClosed='true';pane.insertBefore(more,section);}
+   else pane.insertBefore(makeGroup(name,nodes),section);
+  }
+  section.remove();
+ }
+ function normalize(section,index){
+  if(section.dataset.rmInspector)return;
+  const header=section.querySelector(':scope > .rg-section-header');
+  if(!header)return;
+  const interactiveHeader=!!header.querySelector('button,input,select');
+  const title=header.querySelector('.rg-section-title');if(!title)return;
+  const originalTitle=title.textContent.trim();title.textContent=titles[originalTitle]||originalTitle;
+  const pane=section.closest('[data-pane]')?.dataset.pane||'advanced';
+  const key=[getTemplate(section.closest('.rg-inspector-shell')),pane,originalTitle,index].join(':');
+  const details=document.createElement('details');details.className='rm-inspector-task';
+  const summary=document.createElement('summary');
+  const icon=document.createElement('span');icon.className='rm-task-icon';icon.setAttribute('aria-hidden','true');icon.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="'+(taskIcons[pane]||taskIcons.effects)+'"/></svg>';
+  const help=header.querySelector('.rg-section-subtitle')?.textContent.trim();if(help){summary.title=help;summary.setAttribute('aria-description',help);}
+  summary.setAttribute('role','button');summary.appendChild(icon);
+  if(interactiveHeader){const heading=document.createElement('span');heading.className='rm-task-heading';heading.textContent=title.textContent;summary.appendChild(heading);title.hidden=true;header.classList.add('rm-task-actions');}else summary.appendChild(header);
+  details.appendChild(summary);
+  const body=document.createElement('div');body.className='rm-task-body';
+  for(const node of [...section.childNodes])body.appendChild(node);
+  details.appendChild(body);section.appendChild(details);section.dataset.rmInspector='true';
+  const essential=/choose a scene|scene text|text & captions|scene media|shape & pose/i.test(title.textContent);
+  details.open=disclosureState.has(key)?disclosureState.get(key):section.dataset.rmStartClosed!=='true'&&(essential||index===0);
+  summary.setAttribute('aria-expanded',String(details.open));
+  details.addEventListener('toggle',()=>{disclosureState.set(key,details.open);summary.setAttribute('aria-expanded',String(details.open));});
+  // Labels must remain meaningful without hover; help is supplementary.
+  for(const field of section.querySelectorAll('input,select,textarea')){
+   if(!field.getAttribute('aria-label')&&!field.labels?.length){
+    const row=field.closest('.rg-ctrl-row,.rg-field-group,.rg-slider-row,.rg-toggle-row');
+    const label=row?.querySelector('label,.rg-slider-header>span,.rg-toggle-label')?.textContent.trim()||(field.previousElementSibling?.tagName==='LABEL'?field.previousElementSibling.textContent.trim():'');
+    if(label)field.setAttribute('aria-label',label);
+   }
+  }
+ }
+ function enhance(shell){
+  if(!shell?.isConnected)return;
+  for(const pane of shell.querySelectorAll('.rg-tab-pane')){
+   for(const section of [...pane.children])if(section.classList.contains('rg-inspector-section')&&!section.dataset.rmInspector)splitGeneric(section);
+   [...pane.children].filter(n=>n.classList.contains('rg-inspector-section')).forEach(normalize);
+   if(!pane.querySelector('.rg-inspector-section')&&!pane.querySelector('.rm-pane-empty')){
+    const empty=document.createElement('p');empty.className='rm-pane-empty';empty.textContent='No '+(paneNames[pane.dataset.pane]||'additional controls').toLowerCase()+' settings for this template.';pane.appendChild(empty);
+   }else if(pane.querySelector('.rg-inspector-section'))pane.querySelector('.rm-pane-empty')?.remove();
+  }
+  shell.querySelectorAll('.rg-advanced-drawer > .rg-inspector-section').forEach(normalize);
+ }
+ function syncContext(shell){
+  const state=window.topCustomizerState,tid=getTemplate(shell);
+  const rt=window.REGAARDER_CHAPTER_RUNTIME?.[tid];
+  const time=Number(state?.currentTime)||0;
+  const scenes=rt?.scenes||[];
+  const scene=[...scenes].reverse().find(s=>time>=s.start)||scenes[0];
+  const select=shell.querySelector('[data-ch-action="jump-scene"]');
+  if(scene&&select&&document.activeElement!==select)select.value=String(scene.start);
+  let context=shell.querySelector(':scope > .rm-inspector-context');
+  if(!context){context=document.createElement('div');context.className='rm-inspector-context';context.innerHTML='<span class="rm-context-kicker"></span><strong></strong><span class="rm-context-help"></span>';shell.querySelector('.rg-inspector-tabs')?.after(context);}
+  const identity=document.querySelector('.rg-ctx-toolbar:not([hidden]) .rg-ctx-identity-label');
+  const selected=identity&&identity.getClientRects().length?identity.textContent.trim():'';
+  const heading=scene?.label?.replace(/^\d+\s*[·:.]?\s*/,'')||selected||'Scene settings';
+  const values=[scene?'CURRENT SCENE':selected?'SELECTED OBJECT':'INSPECTOR',heading,selected?'Selected: '+selected:scene?'Select an object on the canvas to edit it.':'Open a section to adjust its settings.'];
+  [context.children[0],context.children[1],context.children[2]].forEach((el,i)=>{if(el.textContent!==values[i])el.textContent=values[i];});
+  const mediaSelect=shell.querySelector('[data-ch-action="select-layer"]');
+  if(mediaSelect){
+   for(const option of mediaSelect.options){const name=rt?.stageObjects?.find(o=>o.layerId===option.value)?.name||option.value.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/[_-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());if(option.textContent!==name)option.textContent=name;}
+   const image=rt?.media?.[mediaSelect.value];
+   const src=image?.tagName==='IMG'?(image.currentSrc||image.src):'';
+   let preview=mediaSelect.closest('.rg-section-body')?.querySelector('.rm-selected-media');
+   if(!preview){preview=document.createElement('div');preview.className='rm-selected-media';preview.innerHTML='<img alt="Selected layer preview"><span></span>';mediaSelect.closest('.rg-ctrl-row')?.before(preview);}
+   if(preview){const img=preview.querySelector('img');if(src&&img.getAttribute('src')!==src)img.src=src;img.hidden=!src;const label=mediaSelect.selectedOptions[0]?.textContent||'Selected layer';if(preview.lastElementChild.textContent!==label)preview.lastElementChild.textContent=label;}
+  }
+  const signature=tid+':'+(scene?.id||'');
+  if(shell.dataset.rmSceneContext===signature)return;
+  if(shell.contains(document.activeElement)&&document.activeElement.matches('[data-ch-copy],[data-ch-prop]'))return;
+  shell.dataset.rmSceneContext=signature;
+  // Explicit scene membership only; unclassified controls are never hidden.
+  const membership={
+   'regaarder-final-chapter':{label:['Final Chapter'],title:['Final Chapter'],distress:['Financial distress'],adidasHQ:['Final rivalry'],pumaHQ:['Final rivalry']},
+   'regaarder-pele-pact-chapter':{chapterTitle:['chapter'],chapterLabel:['chapter'],paperTitle:['newspapers'],secondTitle:['newspapers']},
+   'regaarder-minute17-chapter':{bridgeTitle:['bridge'],bridgeSubtitle:['bridge']}
+  }[tid]||{};
+  const rows=[...shell.querySelectorAll('[data-ch-copy],[data-ch-prop]')].map(field=>({field,row:field.closest('.rg-ctrl-row')})).filter(x=>x.row&&membership[x.field.dataset.chCopy||x.field.dataset.chProp]);
+  if(!rows.length)return;
+  const body=rows[0].row.closest('.rm-task-body')||rows[0].row.parentElement;
+  let other=body.querySelector(':scope > .rm-other-scene-text');
+  if(!other){other=document.createElement('details');other.className='rm-other-scene-text';const summary=document.createElement('summary');summary.textContent='Text in other scenes';other.appendChild(summary);body.appendChild(other);}
+  for(const {field,row}of rows){const belongs=membership[field.dataset.chCopy||field.dataset.chProp].includes(scene?.id);if(belongs)body.insertBefore(row,other);else other.appendChild(row);}
+  other.hidden=other.children.length===1;
+ }
+ let queued=false;
+ function refresh(){queued=false;for(const shell of document.querySelectorAll('.rg-inspector-shell')){enhance(shell);syncContext(shell);}}
+ function schedule(){if(!queued){queued=true;queueMicrotask(refresh);}}
+ // Watch only structural changes. Range dragging and animation frames do not rebuild the inspector.
+ const observer=new MutationObserver(records=>{
+  if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.matches('.rg-inspector-shell,.rg-tab-pane,.rg-inspector-section')||n.querySelector('.rg-inspector-shell,.rg-tab-pane,.rg-inspector-section')))))schedule();
+ });
+ observer.observe(document.body,{childList:true,subtree:true});
+ window.RegaarderInspector={refresh:schedule};
+ setInterval(()=>{for(const shell of document.querySelectorAll('.rg-inspector-shell'))if(shell.getClientRects().length)syncContext(shell);},300);
+ schedule();
+})();
