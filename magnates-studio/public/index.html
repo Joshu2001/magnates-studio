@@ -19,32 +19,13 @@
   <script src="js/helvetiker_bold.typeface.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="/css/regaarder-shell.css?v=1">
 </head>
 <body>
   <div class="app-container">
     <!-- Top Pro Navigation Bar -->
     <header class="top-nav" id="top-nav-bar">
-      <div class="brand" title="Regaarder Studio">
-        <svg class="brand-logo-svg" viewBox="0 0 32 32" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="regaarderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#a855f7" />
-              <stop offset="50%" stop-color="#8b5cf6" />
-              <stop offset="100%" stop-color="#6366f1" />
-            </linearGradient>
-            <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ffffff" />
-              <stop offset="100%" stop-color="#e9d5ff" />
-            </linearGradient>
-          </defs>
-          <!-- Modern Minimalist Infinite Edit Aperture Mark -->
-          <rect x="2" y="2" width="28" height="28" rx="8" fill="url(#regaarderGrad)" />
-          <!-- Sleek Cut & Dynamic Play Chevron Shape -->
-          <path d="M12.5 9.5L22 16L12.5 22.5V9.5Z" fill="url(#playGrad)" />
-          <path d="M9.5 9.5V22.5" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" opacity="0.8" />
-        </svg>
-        <span class="brand-title">REGAARDER <span class="brand-sub">STUDIO</span></span>
-      </div>
+      <div class="brand" title="Regaarder Motion"><img src="/assets/regaarder-ribbon.svg" alt="" width="48" height="28"><span class="brand-title">REGAARDER <span class="rm-brand-accent">MOTION</span></span></div>
 
       <!-- Project Breadcrumbs (Editor Mode only) -->
       <div class="project-info editor-only-nav" id="top-project-info" style="display: none;">
@@ -13628,7 +13609,7 @@
   <script src="js/regaarder-story-prompts.js?v=1"></script>
   <script src="js/regaarder-assets-tools.js?v=1"></script>
   <script src="js/tpl-contextual-inspector.js?v=25"></script>
-  <script src="js/regaarder-redesign.js?v=renderer-v4"></script>
+  <script src="js/regaarder-redesign.js?v=shell-v1"></script>
   <script src="js/hp-documentary-engine.js?v=1"></script>
   <script>
     if (window.location.search.includes('open=countdown')) {
@@ -13643,5 +13624,6 @@
   </script>
   <!-- Native 3D / V108 Surface Builder & Mesh Rigging Workshop Modal -->
   <dialog id="modal-native3d-editor" class="native3d-dialog" style="display:none;"></dialog>
+  <script src="/js/regaarder-shell.js?v=1"></script>
 </body>
 </html>

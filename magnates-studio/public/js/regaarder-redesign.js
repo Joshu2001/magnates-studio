@@ -77,12 +77,9 @@
     bar.className = 'rg-global-topbar';
     bar.innerHTML = `
       <div class="rg-topbar-left">
-        <div class="rg-rail-brand-corner" data-action="corner-home" title="Regaarder Studio">
-          ${LUCIDE_ICONS.railWingLogo}
-        </div>
         <div class="rg-brand-group" data-action="close-to-home" title="Return to Regaarder Studio">
-          <div class="rg-brand-logo">${LUCIDE_ICONS.brandRLogo}</div>
-          <span class="rg-brand-title">Regaarder Studio</span>
+          <div class="rg-brand-logo"><img src="/assets/regaarder-ribbon.svg" alt="" width="48" height="28"></div>
+          <span class="rg-brand-title">REGAARDER <span class="rm-brand-accent">MOTION</span></span>
         </div>
       </div>
       <div class="rg-top-mode-pills">
@@ -120,7 +117,6 @@
     };
 
     bar.querySelector('[data-action="close-to-home"]').addEventListener('click', handleCloseHome);
-    bar.querySelector('[data-action="corner-home"]').addEventListener('click', handleCloseHome);
 
     bar.querySelectorAll('.rg-top-mode-pill').forEach((pill) => {
       pill.addEventListener('click', () => {
