@@ -95,37 +95,19 @@ export function mountStageEditor(viewport, canvas, state, redraw) {
     if(!editing())return;e.preventDefault();
     state.cameraZoom=clampZoom(state.cameraZoom*Math.exp(-e.deltaY*.001));redraw();
   },{passive:false,signal:events.signal});
+  let projectionKey='',projectionCache=[];
   function draw(ctx){
     if(!editing())return;
     const camera=state.nativeEngine.camera,project=v=>v.project(camera),list=surfaces();
-    let vertices=0,edges=0,faces=0;
+    const key=state.nativeRenderKey+'|'+state.showTopology+'|'+state.showBones;
+    if(key!==projectionKey||projectionCache.length!==list.length||projectionCache.some((entry,i)=>entry.mesh!==list[i].mesh)){
+      projectionKey=key;projectionCache=list.map(({mesh})=>{const g=mesh.geometry,a=g.index.array;let topology=topologyCache.get(g);if(!topology||topology.index!==g.index){const used=[...new Set(a)],edges=[],seen=new Set();for(let k=0;k<a.length;k+=3)for(let j=0;j<3;j++){const u=a[k+j],v=a[k+(j+1)%3],key=u<v?u+':'+v:v+':'+u;if(!seen.has(key)){seen.add(key);edges.push([u,v]);}}topology={index:g.index,used,edges};topologyCache.set(g,topology);}const points=new Map();if(state.showTopology)for(const i of topology.used){const v=project(point(mesh,i));points.set(i,[(v.x+1)*480,(1-v.y)*270,v.z]);}return {mesh,topology,points};});
+    }
     ctx.save();ctx.lineWidth=.65;
-    for(const {mesh} of list){
-      const g=mesh.geometry,a=g.index.array;let topology=topologyCache.get(g);
-      if(!topology||topology.index!==g.index){const used=[...new Set(a)],edges=[],seen=new Set();for(let k=0;k<a.length;k+=3)for(let j=0;j<3;j++){const u=a[k+j],v=a[k+(j+1)%3],key=u<v?u+':'+v:v+':'+u;if(!seen.has(key)){seen.add(key);edges.push([u,v]);}}topology={index:g.index,used,edges};topologyCache.set(g,topology);}
-      const {used}=topology,points=new Map();
-      vertices+=used.length;faces+=a.length/3;
-      if(!state.showTopology)continue;
-      for(const i of used){const v=project(point(mesh,i));points.set(i,[(v.x+1)*480,(1-v.y)*270,v.z]);}
-      ctx.strokeStyle='rgba(17,19,24,.65)';ctx.beginPath();
-      for(const [u,v] of topology.edges){const p=points.get(u),q=points.get(v);if(p[2]>1||q[2]>1||p[2]<-1||q[2]<-1||Math.hypot(p[0]-q[0],p[1]-q[1])<1.5)continue;ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);}ctx.stroke();edges+=topology.edges.length;
-      ctx.fillStyle='rgba(17,19,24,.65)';
-      for(const p of points.values())if(p[2]<1&&p[2]>-1)ctx.fillRect(p[0]-.7,p[1]-.7,1.4,1.4);
-      const active=selection?.mesh===mesh?selection:hover?.mesh===mesh?hover:null;
-      if(active){ctx.fillStyle='#ff8c00';for(const i of active.ids){const p=points.get(i);if(p)ctx.fillRect(p[0]-1.7,p[1]-1.7,3.4,3.4);}}
-    }
-    if(state.showBones){
-      ctx.strokeStyle='#ffbf69';ctx.lineWidth=2;
-      for(const c of state.nativeEngine.characters.values())if(visible(c.group))for(const bone of c.bones){
-        if(!bone.parent?.isBone)continue;
-        const a=project(bone.getWorldPosition(new T.Vector3())),b=project(bone.parent.getWorldPosition(new T.Vector3()));
-        ctx.beginPath();ctx.moveTo((a.x+1)*480,(1-a.y)*270);ctx.lineTo((b.x+1)*480,(1-b.y)*270);ctx.stroke();
-      }
-    }
-    if(state.showTopology){
-      ctx.fillStyle='rgba(8,11,16,.8)';ctx.fillRect(12,48,175,100);ctx.fillStyle='#e2e8f0';ctx.font='11px monospace';
-      [`Objects  ${list.length}`,`Vertices ${selection?.ids.length||0} / ${vertices}`,`Edges    ${edges}`,`Faces    ${faces}`,`Triangles ${faces}`].forEach((line,i)=>ctx.fillText(line,22,66+i*17));
-    }
+    let vertices=0,edges=0,faces=0;
+    for(const {mesh,topology,points} of projectionCache){vertices+=topology.used.length;edges+=topology.edges.length;faces+=mesh.geometry.index.count/3;if(!state.showTopology)continue;ctx.strokeStyle='rgba(17,19,24,.65)';ctx.beginPath();for(const [u,v] of topology.edges){const p=points.get(u),q=points.get(v);if(p[2]>1||q[2]>1||p[2]<-1||q[2]<-1||Math.hypot(p[0]-q[0],p[1]-q[1])<1.5)continue;ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);}ctx.stroke();ctx.fillStyle='rgba(17,19,24,.65)';for(const p of points.values())if(p[2]<1&&p[2]>-1)ctx.fillRect(p[0]-.7,p[1]-.7,1.4,1.4);const active=selection?.mesh===mesh?selection:hover?.mesh===mesh?hover:null;if(active){ctx.fillStyle='#ff8c00';for(const i of active.ids){const p=points.get(i);if(p&&p[2]>-1&&p[2]<1)ctx.fillRect(p[0]-1.7,p[1]-1.7,3.4,3.4);}}}
+    if(state.showBones){ctx.lineWidth=2;for(const [id,c] of state.nativeEngine.characters)if(visible(c.group))for(const bone of c.bones){if(!bone.parent?.isBone)continue;const a=project(bone.getWorldPosition(new T.Vector3())),b=project(bone.parent.getWorldPosition(new T.Vector3()));if(a.z<-1||a.z>1||b.z<-1||b.z>1)continue;ctx.strokeStyle=bone.name===state.selectedBone&&id===state.selectedBoneActor?'#ff8c00':'#ffbf69';ctx.beginPath();ctx.moveTo((a.x+1)*480,(1-a.y)*270);ctx.lineTo((b.x+1)*480,(1-b.y)*270);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.fillRect((a.x+1)*480-2,(1-a.y)*270-2,4,4);}}
+    if(state.showTopology){ctx.fillStyle='rgba(8,11,16,.8)';ctx.fillRect(12,48,175,100);ctx.fillStyle='#e2e8f0';ctx.font='11px monospace';[`Objects  ${list.length}`,`Vertices ${selection?.ids.length||0} / ${vertices}`,`Edges    ${edges}`,`Faces    ${faces}`,`Triangles ${faces}`].forEach((line,i)=>ctx.fillText(line,22,66+i*17));}
     ctx.strokeStyle='#c4b5fd';ctx.lineWidth=1.5;
     for(const guide of [...(state.guides||[]),...(drag?.guide?[{type:drag.guide,start:drag.start,end:drag.end}]:[])]){const [x,y]=guide.start,[u,v]=guide.end;ctx.beginPath();if(guide.type==='circle')ctx.ellipse((x+u)/2,(y+v)/2,Math.max(.1,Math.abs(u-x)/2),Math.max(.1,Math.abs(v-y)/2),0,0,Math.PI*2);else if(guide.type==='line'){ctx.moveTo(x,y);ctx.lineTo(u,v);}else ctx.rect(x,y,u-x,v-y);ctx.stroke();}
     if(drag?.box){ctx.setLineDash([5,4]);ctx.strokeRect(drag.start[0],drag.start[1],drag.end[0]-drag.start[0],drag.end[1]-drag.start[1]);}
@@ -137,7 +119,7 @@ export function mountStageEditor(viewport, canvas, state, redraw) {
   return {draw,reset(){selection=hover=drag=null;},undo(){if(session.undo()){selection=hover=drag=null;redraw();}},redo(){if(session.redo()){selection=hover=drag=null;redraw();}},
     save(){session.save();},load(){session.load();selection=hover=drag=null;redraw();},
     straighten(){change(()=>{const id=state.selectedBoneActor||selection?.id;const actors=state.nativeScene.nodes.filter(n=>n.type==='humanoid');const actor=actors.find(n=>n.id===id)||actors.find(n=>n.id===state.activeActor?.replace('n3d_actor_',''))||actors[0];if(actor){actor.pose='standing';actor.leanAngle=0;actor.bones={};actor.boneTracks={};actor.bonePositionTracks={};actor.boneScaleTracks={};if(actor.tracks){delete actor.tracks.pose;delete actor.tracks.leanAngle;}}});},
-    move(delta){if(!selection)throw Error('Select a mesh region first');change(()=>{const s=selection,n=source(s),layer=structuredClone(editLayer(n,s.mesh)||{topology:s.topology,vertices:{}}),vectors=localDragVectors(s.mesh,s.ids,delta);for(const i of s.ids)layer.vertices[i]=(layer.vertices[i]||[0,0,0]).map((v,j)=>Math.max(-.15,Math.min(.15,v+vectors[i][j])));setEditLayer(n,s.mesh,layer);});},
+    move(delta){if(['actor','all'].includes(state.selectionScope)){change(()=>{const actors=state.nativeScene.nodes.filter(n=>n.type==='humanoid');for(const [i,n] of actors.entries()){const key=state.preset==='checkpoint'?(n.id==='red'?'n3d_actor_crimson':'n3d_actor_coach'):state.preset==='team'?['n3d_actor_p1','n3d_actor_primary','n3d_actor_secondary'][i]:i===0?'n3d_actor_primary':'n3d_actor_secondary';if(state.selectionScope!=='all'&&key!==state.activeActor&&n.id!==state.selectedBoneActor)continue;const off=state.actorOffsets[key]||={};off.x=(off.x||0)+delta[0]/.003;off.y=(off.y||0)-delta[1]/.003;off.z=(off.z||0)+delta[2]/.003;}});return;}if(!selection)throw Error('Select a mesh region first');change(()=>{const s=selection,n=source(s),layer=structuredClone(editLayer(n,s.mesh)||{topology:s.topology,vertices:{}}),vectors=localDragVectors(s.mesh,s.ids,delta);for(const i of s.ids)layer.vertices[i]=(layer.vertices[i]||[0,0,0]).map((v,j)=>Math.max(-.15,Math.min(.15,v+vectors[i][j])));setEditLayer(n,s.mesh,layer);});},
     shape(mode){if(!selection)throw Error('Select a mesh region first');change(()=>{const s=selection,positions=s.ids.map(i=>point(s.mesh,i)),center=positions.reduce((a,p)=>a.add(p),new T.Vector3()).multiplyScalar(1/positions.length),radius=positions.reduce((sum,p)=>sum+p.distanceTo(center),0)/positions.length,normal=state.nativeEngine.camera.getWorldDirection(new T.Vector3()),layer=structuredClone(editLayer(source(s),s.mesh)||{topology:s.topology,vertices:{}});for(let k=0;k<s.ids.length;k++){const i=s.ids[k],p=positions[k],offset=p.clone().sub(center),target=mode==='round'?center.clone().add(offset.clone().normalize().multiplyScalar(radius)):p.clone().addScaledVector(normal,-offset.dot(normal));const d=target.sub(p).multiplyScalar(.25),v=localDragVectors(s.mesh,[i],d.toArray())[i];layer.vertices[i]=(layer.vertices[i]||[0,0,0]).map((x,j)=>Math.max(-.15,Math.min(.15,x+v[j])));}setEditLayer(source(s),s.mesh,layer);});},
     clearGuides(){change(()=>{state.guides=[];});},
     dispose(){session.commit();events.abort();}};

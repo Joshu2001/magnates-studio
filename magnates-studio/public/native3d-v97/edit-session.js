@@ -1,5 +1,5 @@
 // Persistent editor transactions; renderer and model buffers never enter history.
-const keys=['nativeScene','baseNodes','actorOffsets','preset','cameraZoom','cameraYaw','cameraPitch','cameraTarget','guides'];
+const keys=['nativeScene','baseNodes','actorOffsets','preset','cameraZoom','cameraYaw','cameraPitch','cameraTarget','guides','foundation','activeActor','activeSurface','pose','headSize','shoulderWidth','armLength','legLength','leanAngle','handCurl','cameraFov','cameraRadius','editTool','brushRadius','showTopology','showBones','selectedBone','selectedBoneActor','exposure','ambientIntensity','keyLightIntensity','keyLightColor','rimLightIntensity','rimLightColor','backgroundHex','shirtVisible','shirtColor','trousersVisible','trousersColor','hatVisible','hatColor','roughness','metalness','wireframe','selectionScope','moveAxis','snapMillimetres'];
 export function editSession(state){
  if(state.editSession)return state.editSession;
  const past=[],future=[];

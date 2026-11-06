@@ -15,6 +15,7 @@ export function paint(ctx,raw,media,f=defaults){
  function layer(id,x,y,scale,rotation,alpha,draw,blend='source-over'){
   const l=f.layers[id];
   if(!l?.visible||alpha<=0)return;
+  globalThis.RegaarderLayerFrame?.require(ctx,id);
   ctx.save();
   ctx.translate(x+l.x+(x-480)*(l.depth-1)*.17,y+l.y+(y-270)*(l.depth-1)*.17);
   ctx.rotate((rotation+l.rotation)*turns);
@@ -22,7 +23,9 @@ export function paint(ctx,raw,media,f=defaults){
   ctx.globalAlpha*=clamp(alpha*l.opacity);
   ctx.globalCompositeOperation=blend;
   if(l.blur)ctx.filter='blur('+l.blur+'px)';
-  draw();
+  const originalDraw=ctx.drawImage;
+  ctx.drawImage=function(image,...args){const d=args.length===8?args.slice(4):args.length===4?args:[...args,image.naturalWidth||image.width,image.naturalHeight||image.height];globalThis.RegaarderLayerFrame?.bounds(ctx,id,...d);return originalDraw.call(ctx,image,...args);};
+  try{draw();}finally{ctx.drawImage=originalDraw;}
   ctx.restore();
  }
  function title(text,x,y,size,color,opacity){
