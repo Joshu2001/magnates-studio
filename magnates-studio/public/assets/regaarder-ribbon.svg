@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 8 268 100"><defs>
+ <linearGradient id="rm-wave-front" x1="0" y1="0" x2="0.88" y2="1"><stop offset="0%" stop-color="#DA96FF"/><stop offset="37%" stop-color="#AF55F4"/><stop offset="100%" stop-color="#8140D8"/></linearGradient>
+ <linearGradient id="rm-wave-front2" x1="0.09" y1="0" x2="0.92" y2="1"><stop offset="0%" stop-color="#D58FFF"/><stop offset="45%" stop-color="#AD5BFA"/><stop offset="100%" stop-color="#8240DF"/></linearGradient>
+ <linearGradient id="rm-wave-shadow" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7439CB"/><stop offset="50%" stop-color="#542896"/><stop offset="100%" stop-color="#2E1D58"/></linearGradient>
+ <linearGradient id="rm-wave-shadow2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#803BCA"/><stop offset="45%" stop-color="#4F267F"/><stop offset="100%" stop-color="#1B1835"/></linearGradient>
+</defs>
+<!-- Dark back faces form the depth of the continuous ribbon -->
+<path d="M 112 13 C 127 13 134 26 145 50 C 156 77 158 92 171 95 C 157 104 146 105 138 92 C 125 74 119 38 105 17 Z" fill="url(#rm-wave-shadow)"/>
+<path d="M 216 13 C 232 14 238 33 246 56 L 264 103 L 238 103 C 225 89 217 54 206 19 Z" fill="url(#rm-wave-shadow2)"/>
+<!-- Front ribbons: left rise, middle dip, right rise -->
+<path d="M 4 103 C 25 100 35 79 47 56 C 64 23 68 13 94 13 L 119 13 C 106 17 96 41 84 66 C 69 96 60 103 36 103 Z" fill="url(#rm-wave-front)"/>
+<path d="M 132 103 C 152 101 160 79 174 50 C 188 20 192 13 217 13 L 232 13 C 219 18 212 41 199 69 C 187 94 176 103 153 103 Z" fill="url(#rm-wave-front2)"/>
+<path d="M 70 22 C 78 16 85 16 111 16" fill="none" stroke="#F4BBFF" stroke-opacity=".22" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M 188 23 C 196 16 204 16 224 16" fill="none" stroke="#F4BBFF" stroke-opacity=".18" stroke-width="2.5" stroke-linecap="round"/></svg>
