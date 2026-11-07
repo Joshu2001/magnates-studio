@@ -1,0 +1,46 @@
+'use strict';
+/** No dependencies: node tests/tesla-opening.cjs from repository root. */
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const path=require('node:path');
+const root=path.resolve(__dirname,'../magnates-studio/public');
+const code=fs.readFileSync(path.join(root,'js/tesla-opening-engine.js'),'utf8');
+const page=fs.readFileSync(path.join(root,'tesla-opening.html'),'utf8');
+assert.match(page,/Tesla — The Electrical Age/);
+assert.match(page,/Content<\/button>.*Motion<\/button>.*Look<\/button>.*Effects<\/button>/s);
+let data=null;
+const store={getItem:()=>data,setItem:(k,v)=>data=v,removeItem:()=>{data=null}};
+const win={localStorage:store,console,document:{createElement(){return {getContext(){return{}},click(){}}}}};
+vm.runInNewContext(code,{window:win,document:win.document,Math,JSON,Image:class{},FileReader:class{},URL,Blob,performance});
+const api=win.MagnatesTeslaOpening;
+assert.ok(api,'engine registers');
+assert.equal(api.duration,7);
+for(const key of ['rainSpeed','rainWind','lightningTime1','cameraEnd','portraitDuration','paperDuration','cityLightStart','cloudDarkening','glassReflections'])assert.ok(key in api.config,key);
+for(const slot of ['room','window_frame','portrait','blueprint','city_mid','city_far','storm_clouds','foreground_roof'])assert.ok(api.assetSlots.includes(slot),slot);
+const noop=()=>{};
+function ctxStub(){
+ const g={addColorStop:noop};
+ const target={canvas:{width:1280,height:720},createLinearGradient:()=>g,createRadialGradient:()=>g,measureText:()=>({width:20})};
+ for(const fn of ['save','restore','fillRect','clearRect','beginPath','rect','clip','translate','scale','rotate','drawImage','stroke','strokeRect','moveTo','lineTo','ellipse','fill'])target[fn]=noop;
+ return target;
+}
+const ctx=ctxStub(),canvas={width:1280,height:720,getContext:()=>ctx};ctx.canvas=canvas;
+for(const t of [0,.55,1.1,2.1,3,4.9,5.8,7])assert.doesNotThrow(()=>api.render(canvas,t),'frame '+t);
+api.set('rainSpeed',2);
+api.set('cityLightStart',5.7);
+api.setLayer('portrait','depth',.4);
+api.setLayer('blueprint','visible',false);
+assert.equal(api.getLayer('portrait').depth,.4);
+assert.equal(api.getLayer('blueprint').visible,false);
+const project=api.exportProject();
+assert.equal(project.id,'tesla-electrical-age');
+assert.equal(project.config.rainSpeed,2);
+assert.equal(project.layers.portrait.depth,.4);
+assert.equal(project.layers.blueprint.visible,false);
+assert.ok(data.includes('cityLightStart'));
+api.reset();
+assert.equal(api.config.rainSpeed,1);
+assert.equal(api.getLayer('portrait').depth,0);
+assert.throws(()=>api.set('__proto__',3));
+console.log('Tesla source-template smoke checks passed');
