@@ -81,6 +81,7 @@ function rain(ctx,t,W,H,glass){
 }
 function interior(ctx,t,W,H){
  let p=ramp(t,.40,1.0);ctx.save();
+ ctx.beginPath();ctx.rect(0,0,W,H);ctx.rect(W*.31,0,W*.69,H*.77);ctx.clip('evenodd');
  let g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#100b0e');g.addColorStop(1,'#322016');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
  if(images.room){ ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.rect(W*.31,0,W*.69,H*.77);ctx.clip('evenodd');imageRect(ctx,'room',0,0,W,H);ctx.restore(); } else {ctx.fillStyle='#211915';ctx.fillRect(0,0,W*.30,H);ctx.fillStyle='#503026';ctx.fillRect(0,H*.85,W,H*.15);
  ctx.fillStyle='#271b14';for(let i=0;i<5;i++)ctx.fillRect(12+i*50,40,34,H*.76);
@@ -147,7 +148,7 @@ const store='magnates-tesla-opening-v1';
 async function importProject(json){let p=JSON.parse(json);if(p.id!==ID)throw Error('Not a Tesla project');
  config={...defaults,...p.config};layers={...layers,...p.layers};global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:p.assets||{}}));for(let [k,v] of Object.entries(p.assets||{})){if(slots.includes(k))await loadData(k,v)}}
 const api={id:ID,duration:D,assetSlots:slots,config,render,
- set(k,v){if(!(k in defaults))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
+ set(k,v){if(!Object.prototype.hasOwnProperty.call(defaults,k))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  getLayer:id=>({...layers[id]}),
  setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
