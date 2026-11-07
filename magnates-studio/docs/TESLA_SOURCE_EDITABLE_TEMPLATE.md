@@ -34,12 +34,15 @@ Camera is deterministic from timeline time; weather particle seeds are stable. C
 | books | Book stack cutout | Desk top |
 | window_frame | Window muntins only, transparent cutout | In front of city |
 | glass_reflection | Transparent reflected specular / droplets | Glass plane |
-| storm_clouds | Seamless animated-looking cloud plate (renderer adds drift) | Far background |
+| storm_clouds | Cloud plate; procedural atmosphere continues behind it | Far background |
+| lightning_overlay | Replaceable transparent lightning image | Storm FX |
+| rain_overlay | Replaceable transparent rain-streak texture, moved by renderer | Storm FX |
+| city_lights_emission | Transparent windows-only emission image revealed by wave mask | Building lights |
 | city_far | Distant skyline with transparent sky | Farthest city |
 | city_mid | Midground architecture with transparent sky | Intermediate city |
 | foreground_roof | Near rooftops with transparent skyline | Nearest outside |
 
-Existing local V10 and V2 production packages contain candidate sources for many slots, but they have **not been uploaded into the GitHub branch** in this change. Their extraction quality, alignment and provenance require review before publishing the Tesla card as final.
+The downloadable conversation asset import pack `tesla_editable_asset_import_pack.zip` contains 14 mapped reconstruction candidates for the 17 slots. Three new overlay slots can use user-provided PNGs. These source PNG files have **not been uploaded into the GitHub branch** in this change. Their extraction quality, alignment and provenance require review before publishing the Tesla card as final.
 
 ### Fidelity criteria for acceptance
 - Opening begins with short near-black, not prolonged darkness.
