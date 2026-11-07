@@ -18,14 +18,14 @@ const defaults=Object.freeze({
  lightningDuration:.17,rainOn:true,lightningOn:true,cloudsOn:true,lampOn:true,glassOn:true,cityLightsOn:true
 });
 let config={...defaults}, images={},sources={};
-let layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true}]));
+let layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true,entrance:0,fadeIn:0,exit:7,fadeOut:0}]));
 const canvasTmp=()=>document.createElement('canvas');
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const smooth=v=>{v=clamp(v);return v*v*(3-2*v)};
 const ramp=(t,s,d)=>smooth((t-s)/Math.max(.01,d));
 const rand=(n,seed)=>{let x=Math.sin((n+1)*12.9898+seed*78.233)*43758.5453;return x-Math.floor(x)};
 function loadData(id,data){return new Promise((resolve,reject)=>{let im=new Image();im.onload=()=>{images[id]=im;sources[id]=data;resolve()};im.onerror=reject;im.src=data})}
-function imageRect(ctx,id,x,y,w,h,alpha=1){if(!images[id])return false;let p=layers[id]||{};if(p.visible===false)return true;ctx.save();ctx.translate(x+w/2+(Number(p.x)||0)*ctx.canvas.width/100+(Number(p.depth)||0)*Math.max(0,ctx.__teslaTime-2.8)*12,y+h/2+(Number(p.y)||0)*ctx.canvas.height/100);ctx.rotate((Number(p.rotation)||0)*Math.PI/180);let scale=Number(p.scale)||1;ctx.scale(scale,scale);ctx.globalAlpha*=alpha*(Number(p.opacity)??1);ctx.drawImage(images[id],-w/2,-h/2,w,h);ctx.restore();return true}
+function imageRect(ctx,id,x,y,w,h,alpha=1){if(!images[id])return false;let p=layers[id]||{};if(p.visible===false)return true;ctx.save();ctx.translate(x+w/2+(Number(p.x)||0)*ctx.canvas.width/100+(Number(p.depth)||0)*Math.max(0,ctx.__teslaTime-2.8)*12,y+h/2+(Number(p.y)||0)*ctx.canvas.height/100);ctx.rotate((Number(p.rotation)||0)*Math.PI/180);let scale=Number(p.scale)||1;ctx.scale(scale,scale);let at=ctx.__teslaTime||0;let enter=(Number(p.fadeIn)||0)>0?ramp(at,Number(p.entrance)||0,Number(p.fadeIn)):at>=(Number(p.entrance)||0)?1:0;let leave=(Number(p.fadeOut)||0)>0?1-ramp(at,(Number(p.exit)||7)-(Number(p.fadeOut)||0),Number(p.fadeOut)):at<=(Number(p.exit)||7)?1:0;ctx.globalAlpha*=alpha*(Number(p.opacity)??1)*enter*leave;ctx.drawImage(images[id],-w/2,-h/2,w,h);ctx.restore();return true}
 function sky(ctx,t,W,H){
  let grad=ctx.createLinearGradient(0,0,0,H);
  grad.addColorStop(0,'#060d1c');grad.addColorStop(.58,'#13243b');grad.addColorStop(1,'#050b14');
@@ -154,7 +154,7 @@ async function importProject(json){let p=JSON.parse(json);if(p.id!==ID)throw Err
 const api={id:ID,duration:D,assetSlots:slots,config,render,
  set(k,v){if(!Object.prototype.hasOwnProperty.call(defaults,k))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  getLayer:id=>({...layers[id]}),
- setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
+ setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible','entrance','fadeIn','exit','fadeOut'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  clearAsset:id=>{delete images[id];delete sources[id];global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
  exportProject:()=>({id:ID,version:2,config:{...config},layers:JSON.parse(JSON.stringify(layers)),assets:{...sources},duration:D,scenes:[{id:'study',start:0,end:4.8},{id:'window',start:4.8,end:5.7},{id:'city',start:5.7,end:7}]}),
