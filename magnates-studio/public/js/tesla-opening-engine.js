@@ -55,7 +55,7 @@ function skyline(ctx,t,W,H){
 function bolt(ctx,time,t,W,H){
  const intensity=config.lightningStrength;
  for(let k=0;k<2;k++){let hit=config['lightningTime'+(k+1)];let d=Math.abs(t-hit);
- if(d>config.lightningDuration)returnIfNone(); // no effect; other strike may still be active
+ if(d>config.lightningDuration)continue;
  let alpha=Math.exp(-Math.pow(d/(config.lightningDuration*.36),2))*intensity;
  if(alpha<.02)continue;
  ctx.save();ctx.globalCompositeOperation='screen';ctx.fillStyle='rgba(158,188,245,'+(.12*alpha)+')';ctx.fillRect(0,0,W,H);
@@ -64,7 +64,7 @@ function bolt(ctx,time,t,W,H){
  ctx.shadowColor='#a8caff';ctx.shadowBlur=23;ctx.strokeStyle='rgba(195,221,255,'+(.9*alpha)+')';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;
  ctx.strokeStyle='rgba(255,255,255,'+alpha+')';ctx.lineWidth=1;ctx.stroke();ctx.restore();
  }
- function returnIfNone(){}
+
 }
 function rain(ctx,t,W,H,glass){
  if(!config.rainOn)return;let amount=Math.round((glass?95:270)*config.rainAmount);
@@ -81,9 +81,9 @@ function rain(ctx,t,W,H,glass){
 function interior(ctx,t,W,H){
  let p=ramp(t,.40,1.0);ctx.save();
  let g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#100b0e');g.addColorStop(1,'#322016');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- if(!imageRect(ctx,'room',0,0,W,H)){ctx.fillStyle='#211915';ctx.fillRect(0,0,W*.30,H);ctx.fillStyle='#503026';ctx.fillRect(0,H*.85,W,H*.15);
+ if(images.room){ ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.rect(W*.31,0,W*.69,H*.77);ctx.clip('evenodd');imageRect(ctx,'room',0,0,W,H);ctx.restore(); } else {ctx.fillStyle='#211915';ctx.fillRect(0,0,W*.30,H);ctx.fillStyle='#503026';ctx.fillRect(0,H*.85,W,H*.15);
  ctx.fillStyle='#271b14';for(let i=0;i<5;i++)ctx.fillRect(12+i*50,40,34,H*.76);
- ctx.fillStyle='#0e0d13';ctx.fillRect(W*.31,0,W*.69,H*.77)}
+ /* Aperture stays transparent: city is rendered behind the glass. */}
  ctx.restore();
  // Objects remain separately editable, source images take precedence.
  if(!imageRect(ctx,'desk',W*.19,H*.70,W*.78,H*.30)){ctx.fillStyle='#372116';ctx.fillRect(0,H*.79,W,H*.21)}
@@ -147,8 +147,8 @@ async function importProject(json){let p=JSON.parse(json);if(p.id!==ID)throw Err
  config={...defaults,...p.config};global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:p.assets||{}}));for(let [k,v] of Object.entries(p.assets||{})){if(slots.includes(k))await loadData(k,v)}}
 const api={id:ID,duration:D,assetSlots:slots,config,render,
  set(k,v){if(!(k in defaults))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
- loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url)},
- clearAsset:id=>{delete images[id];delete sources[id]},
+ loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
+ clearAsset:id=>{delete images[id];delete sources[id];global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
  exportProject:()=>({id:ID,version:1,config:{...config},assets:{...sources},duration:D,scenes:[{id:'study',start:0,end:4.8},{id:'window',start:4.8,end:5.7},{id:'city',start:5.7,end:7}]}),
  downloadProject(){download('tesla-electrical-age.project.json',new Blob([JSON.stringify(api.exportProject(),null,2)],{type:'application/json'}))},
  importProject,
