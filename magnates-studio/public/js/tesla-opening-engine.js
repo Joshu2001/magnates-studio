@@ -149,10 +149,38 @@ function render(canvas,t){
 }
 function download(name,blob){let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),10000)}
 const store='magnates-tesla-opening-v1';
+function persist(){
+ try{global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers}))}
+ catch(e){global.console.warn('Tesla preferences could not be saved locally',e)}
+}
+function assetDb(){
+ return new Promise(resolve=>{
+  if(!global.indexedDB)return resolve(null);
+  try{const req=global.indexedDB.open('magnates-tesla-assets-v1',1);
+   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('images'))req.result.createObjectStore('images')};
+   req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);
+  }catch(e){resolve(null)}
+ });
+}
+async function saveAsset(id,src){
+ const db=await assetDb();if(!db)return;
+ await new Promise(resolve=>{try{const tx=db.transaction('images','readwrite');tx.objectStore('images').put(src,id);tx.oncomplete=resolve;tx.onerror=resolve}catch(e){resolve()}});
+ db.close();
+}
+async function eraseAsset(id){
+ const db=await assetDb();if(!db)return;
+ await new Promise(resolve=>{try{const tx=db.transaction('images','readwrite');if(id===null)tx.objectStore('images').clear();else tx.objectStore('images').delete(id);tx.oncomplete=resolve;tx.onerror=resolve}catch(e){resolve()}});
+ db.close();
+}
+async function restoreAssets(){
+ const db=await assetDb();if(!db)return;
+ const jobs=slots.map(id=>new Promise(resolve=>{try{const r=db.transaction('images').objectStore('images').get(id);r.onsuccess=async()=>{if(r.result){try{await loadData(id,r.result)}catch(e){}}resolve()};r.onerror=resolve}catch(e){resolve()}}));
+ await Promise.all(jobs);db.close();
+}
 async function importProject(json){let p=JSON.parse(json);if(p.id!==ID)throw Error('Not a Tesla project');
- config={...defaults,...p.config};layers={...layers,...p.layers};global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:p.assets||{}}));for(let [k,v] of Object.entries(p.assets||{})){if(slots.includes(k))await loadData(k,v)}}
+ config={...defaults,...p.config};layers={...layers,...p.layers};persist();await eraseAsset(null);for(let [k,v] of Object.entries(p.assets||{})){if(slots.includes(k)){await loadData(k,v);await saveAsset(k,v)}}}
 const api={id:ID,duration:D,assetSlots:slots,config,render,
- set(k,v){if(!Object.prototype.hasOwnProperty.call(defaults,k))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
+ set(k,v){if(!Object.prototype.hasOwnProperty.call(defaults,k))throw Error('Unknown parameter: '+k);config[k]=v;persist()},
  getLayer:id=>({...layers[id]}),
  setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible','entrance','fadeIn','exit','fadeOut'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
@@ -160,7 +188,7 @@ const api={id:ID,duration:D,assetSlots:slots,config,render,
  exportProject:()=>({id:ID,version:2,config:{...config},layers:JSON.parse(JSON.stringify(layers)),assets:{...sources},duration:D,scenes:[{id:'study',start:0,end:4.8},{id:'window',start:4.8,end:5.7},{id:'city',start:5.7,end:7}]}),
  downloadProject(){download('tesla-electrical-age.project.json',new Blob([JSON.stringify(api.exportProject(),null,2)],{type:'application/json'}))},
  importProject,
- reset(){config={...defaults};api.config=config;layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true}]));images={};sources={};global.localStorage.removeItem(store)},
+ reset(){config={...defaults};api.config=config;layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true}]));images={};sources={};global.localStorage.removeItem(store);eraseAsset(null)},
  async recordWebM(canvas){if(!canvas.captureStream||!global.MediaRecorder)throw Error('MediaRecorder unavailable');
  let stream=canvas.captureStream(30),mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
  let chunks=[],rec=new MediaRecorder(stream,{mimeType:mime});rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
@@ -169,6 +197,7 @@ const api={id:ID,duration:D,assetSlots:slots,config,render,
  await new Promise(resolve=>{function frame(){let sec=(performance.now()-started)/1000;render(canvas,Math.min(D,sec));if(sec<D)requestAnimationFrame(frame);else resolve()}requestAnimationFrame(frame)});
  rec.stop();await done;stream.getTracks().forEach(t=>t.stop());download('tesla-electrical-age.webm',new Blob(chunks,{type:mime}))}
 };
-try{let saved=global.localStorage.getItem(store);if(saved){let p=JSON.parse(saved);config={...defaults,...p.config};layers={...layers,...p.layers};api.config=config;Object.entries(p.assets||{}).filter(([k])=>slots.includes(k)).forEach(([k,v])=>loadData(k,v))}}catch(e){global.console.warn('Tesla previous session cannot reload',e)}
+try{let saved=global.localStorage.getItem(store);if(saved){let p=JSON.parse(saved);config={...defaults,...p.config};layers={...layers,...p.layers};api.config=config;if(p.assets&&Object.keys(p.assets).length){Object.entries(p.assets).filter(([k])=>slots.includes(k)).forEach(([k,v])=>loadData(k,v))}else restoreAssets()}}catch(e){global.console.warn('Tesla previous session cannot reload',e)}
+if(!global.localStorage.getItem(store))restoreAssets();
 global.MagnatesTeslaOpening=api;
 })(window);
