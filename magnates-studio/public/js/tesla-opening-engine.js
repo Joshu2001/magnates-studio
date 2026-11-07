@@ -18,13 +18,14 @@ const defaults=Object.freeze({
  lightningDuration:.17,rainOn:true,lightningOn:true,cloudsOn:true,lampOn:true,glassOn:true,cityLightsOn:true
 });
 let config={...defaults}, images={},sources={};
+let layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true}]));
 const canvasTmp=()=>document.createElement('canvas');
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const smooth=v=>{v=clamp(v);return v*v*(3-2*v)};
 const ramp=(t,s,d)=>smooth((t-s)/Math.max(.01,d));
 const rand=(n,seed)=>{let x=Math.sin((n+1)*12.9898+seed*78.233)*43758.5453;return x-Math.floor(x)};
 function loadData(id,data){return new Promise((resolve,reject)=>{let im=new Image();im.onload=()=>{images[id]=im;sources[id]=data;resolve()};im.onerror=reject;im.src=data})}
-function imageRect(ctx,id,x,y,w,h,alpha=1){if(!images[id])return false;ctx.save();ctx.globalAlpha*=alpha;ctx.drawImage(images[id],x,y,w,h);ctx.restore();return true}
+function imageRect(ctx,id,x,y,w,h,alpha=1){if(!images[id])return false;let p=layers[id]||{};if(p.visible===false)return true;ctx.save();ctx.translate(x+w/2+(Number(p.x)||0)*ctx.canvas.width/100+(Number(p.depth)||0)*Math.max(0,ctx.__teslaTime-2.8)*12,y+h/2+(Number(p.y)||0)*ctx.canvas.height/100);ctx.rotate((Number(p.rotation)||0)*Math.PI/180);let scale=Number(p.scale)||1;ctx.scale(scale,scale);ctx.globalAlpha*=alpha*(Number(p.opacity)??1);ctx.drawImage(images[id],-w/2,-h/2,w,h);ctx.restore();return true}
 function sky(ctx,t,W,H){
  let grad=ctx.createLinearGradient(0,0,0,H);
  grad.addColorStop(0,'#060d1c');grad.addColorStop(.58,'#13243b');grad.addColorStop(1,'#050b14');
@@ -124,7 +125,7 @@ function window(ctx,t,W,H){
 }
 function render(canvas,t){
  if(!canvas || !canvas.getContext)return;let ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;t=clamp(t,0,D);
- ctx.clearRect(0,0,W,H);
+ ctx.clearRect(0,0,W,H);ctx.__teslaTime=t;
  let push=ramp(t,config.pushStart,config.pushEnd);
  let crossed=ramp(t,config.windowCross,.75);
  let z=config.cameraStart+(config.cameraEnd-config.cameraStart)*push;
@@ -144,15 +145,17 @@ function render(canvas,t){
 function download(name,blob){let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),10000)}
 const store='magnates-tesla-opening-v1';
 async function importProject(json){let p=JSON.parse(json);if(p.id!==ID)throw Error('Not a Tesla project');
- config={...defaults,...p.config};global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:p.assets||{}}));for(let [k,v] of Object.entries(p.assets||{})){if(slots.includes(k))await loadData(k,v)}}
+ config={...defaults,...p.config};layers={...layers,...p.layers};global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:p.assets||{}}));for(let [k,v] of Object.entries(p.assets||{})){if(slots.includes(k))await loadData(k,v)}}
 const api={id:ID,duration:D,assetSlots:slots,config,render,
- set(k,v){if(!(k in defaults))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
- loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
+ set(k,v){if(!(k in defaults))throw Error('Unknown parameter: '+k);config[k]=v;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
+ getLayer:id=>({...layers[id]}),
+ setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
+ loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
  clearAsset:id=>{delete images[id];delete sources[id];global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
- exportProject:()=>({id:ID,version:1,config:{...config},assets:{...sources},duration:D,scenes:[{id:'study',start:0,end:4.8},{id:'window',start:4.8,end:5.7},{id:'city',start:5.7,end:7}]}),
+ exportProject:()=>({id:ID,version:2,config:{...config},layers:JSON.parse(JSON.stringify(layers)),assets:{...sources},duration:D,scenes:[{id:'study',start:0,end:4.8},{id:'window',start:4.8,end:5.7},{id:'city',start:5.7,end:7}]}),
  downloadProject(){download('tesla-electrical-age.project.json',new Blob([JSON.stringify(api.exportProject(),null,2)],{type:'application/json'}))},
  importProject,
- reset(){config={...defaults};api.config=config;images={};sources={};global.localStorage.removeItem(store)},
+ reset(){config={...defaults};api.config=config;layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true}]));images={};sources={};global.localStorage.removeItem(store)},
  async recordWebM(canvas){if(!canvas.captureStream||!global.MediaRecorder)throw Error('MediaRecorder unavailable');
  let stream=canvas.captureStream(30),mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
  let chunks=[],rec=new MediaRecorder(stream,{mimeType:mime});rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
@@ -161,6 +164,6 @@ const api={id:ID,duration:D,assetSlots:slots,config,render,
  await new Promise(resolve=>{function frame(){let sec=(performance.now()-started)/1000;render(canvas,Math.min(D,sec));if(sec<D)requestAnimationFrame(frame);else resolve()}requestAnimationFrame(frame)});
  rec.stop();await done;stream.getTracks().forEach(t=>t.stop());download('tesla-electrical-age.webm',new Blob(chunks,{type:mime}))}
 };
-try{let saved=global.localStorage.getItem(store);if(saved){let p=JSON.parse(saved);config={...defaults,...p.config};api.config=config;Object.entries(p.assets||{}).filter(([k])=>slots.includes(k)).forEach(([k,v])=>loadData(k,v))}}catch(e){global.console.warn('Tesla previous session cannot reload',e)}
+try{let saved=global.localStorage.getItem(store);if(saved){let p=JSON.parse(saved);config={...defaults,...p.config};layers={...layers,...p.layers};api.config=config;Object.entries(p.assets||{}).filter(([k])=>slots.includes(k)).forEach(([k,v])=>loadData(k,v))}}catch(e){global.console.warn('Tesla previous session cannot reload',e)}
 global.MagnatesTeslaOpening=api;
 })(window);
