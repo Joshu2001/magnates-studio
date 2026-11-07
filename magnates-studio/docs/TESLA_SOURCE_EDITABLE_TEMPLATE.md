@@ -1,7 +1,7 @@
 # Tesla — The Electrical Age (7s)
 ## Source-driven editable documentary scene for Magnates Studio
 
-**Status:** beta feature branch. The canvas renderer and controls are source-based. It is **not** an MP4/GIF playback wrapper. Current fallback artwork is stylized and does **not** reproduce the approved photo-realistic V4/V11 frame until matching production PNG plates are imported.
+**Status:** beta feature branch; pending high-resolution production asset upload, gallery integration acceptance and a passing hosted-browser verification. The canvas renderer and controls are source-based. It is **not** an MP4/GIF playback wrapper. Current fallback artwork is stylized and does **not** reproduce the approved photo-realistic V4/V11 frame until matching production PNG plates are imported.
 
 ### Open editor
 Navigate to `/tesla-opening.html` (from Studio's floating Tesla link). The template uses the existing Studio's **Content / Motion / Look / Effects + Advanced Controls** organization; it lives on its own route to prevent regressions in other template customizers.
@@ -18,7 +18,7 @@ Camera is deterministic from timeline time; weather particle seeds are stable. C
 ### Review and export
 - Stage Play/Pause + seek bar preview source animation, not a video element.
 - Export JSON stores all parameter changes, layer transforms and uploaded image data as data URLs.
-- Import JSON restores all saved settings and replaceable artwork.
+- Import JSON restores all saved settings and replaceable artwork. Imported raster images are stored in IndexedDB (not localStorage); localStorage only holds small settings. Export JSON as a portable backup.
 - Record WebM (MediaRecorder; browser support required). WebM is a review output, NOT the editable source. If the browser lacks MediaRecorder or the system throttles Canvas it may not be a reliable frame-accurate master. Final MP4 export requires the existing Studio transcoding path or a separate deterministic frame exporter.
 
 ### Asset-slot order and recommended mapping
