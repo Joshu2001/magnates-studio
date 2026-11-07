@@ -182,13 +182,13 @@ async function importProject(json){let p=JSON.parse(json);if(p.id!==ID)throw Err
 const api={id:ID,duration:D,assetSlots:slots,config,render,
  set(k,v){if(!Object.prototype.hasOwnProperty.call(defaults,k))throw Error('Unknown parameter: '+k);config[k]=v;persist()},
  getLayer:id=>({...layers[id]}),
- setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible','entrance','fadeIn','exit','fadeOut'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
- loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);global.localStorage.setItem(store,JSON.stringify({id:ID,config,layers,assets:sources}))},
- clearAsset:id=>{delete images[id];delete sources[id];global.localStorage.setItem(store,JSON.stringify({id:ID,config,assets:sources}))},
+ setLayer(id,key,value){if(!slots.includes(id)||!['x','y','scale','rotation','opacity','depth','visible','entrance','fadeIn','exit','fadeOut'].includes(key))throw Error('Unknown layer/property');layers[id][key]=value;persist()},
+ loadAsset:async(id,file)=>{if(!slots.includes(id))throw Error('Unknown slot');let url=await new Promise((resolve,reject)=>{let r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)});await loadData(id,url);await saveAsset(id,url);persist()},
+ clearAsset:id=>{delete images[id];delete sources[id];eraseAsset(id);persist()},
  exportProject:()=>({id:ID,version:2,config:{...config},layers:JSON.parse(JSON.stringify(layers)),assets:{...sources},duration:D,scenes:[{id:'study',start:0,end:4.8},{id:'window',start:4.8,end:5.7},{id:'city',start:5.7,end:7}]}),
  downloadProject(){download('tesla-electrical-age.project.json',new Blob([JSON.stringify(api.exportProject(),null,2)],{type:'application/json'}))},
  importProject,
- reset(){config={...defaults};api.config=config;layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true}]));images={};sources={};global.localStorage.removeItem(store);eraseAsset(null)},
+ reset(){config={...defaults};api.config=config;layers=Object.fromEntries(slots.map(id=>[id,{x:0,y:0,scale:1,rotation:0,opacity:1,depth:0,visible:true,entrance:0,fadeIn:0,exit:7,fadeOut:0}]));images={};sources={};global.localStorage.removeItem(store);eraseAsset(null)},
  async recordWebM(canvas){if(!canvas.captureStream||!global.MediaRecorder)throw Error('MediaRecorder unavailable');
  let stream=canvas.captureStream(30),mime=MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm';
  let chunks=[],rec=new MediaRecorder(stream,{mimeType:mime});rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
