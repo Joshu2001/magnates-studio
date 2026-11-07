@@ -7,7 +7,7 @@
 (function(global){
 'use strict';
 const ID='tesla-electrical-age', D=7, TAU=Math.PI*2;
-const slots=['room','window_frame','glass_reflection','portrait','blueprint','chair','desk','lamp','coil','books','foreground_roof','city_mid','city_far','storm_clouds'];
+const slots=['room','window_frame','glass_reflection','portrait','blueprint','chair','desk','lamp','coil','books','foreground_roof','city_mid','city_far','storm_clouds','lightning_overlay','rain_overlay','city_lights_emission'];
 const defaults=Object.freeze({
  cameraStart:.91,cameraEnd:2.10,pushStart:2.8,pushEnd:6.6,windowCross:4.85,depth:.65,
  roomExposure:1,cityExposure:1,glassReflections:.29,lampGlow:1,vignette:.25,
@@ -50,6 +50,7 @@ function skyline(ctx,t,W,H){
  if(p<.001)continue;ctx.globalAlpha=.12+.85*p;ctx.fillStyle=i%5?'#e9a45c':'#ffe0a0';
  ctx.fillRect(x,y,2.5+rand(i,54)*4,4+rand(i,55)*6);
  }ctx.globalAlpha=1}
+ if(images.city_lights_emission&&config.cityLightsOn){ctx.save();const wave=ramp(t,config.cityLightStart,config.cityLightSpread);ctx.beginPath();ctx.rect(0,0,W*wave,H);ctx.clip();imageRect(ctx,'city_lights_emission',0,0,W,H,wave);ctx.restore()}
  if(images.foreground_roof){ctx.save();ctx.translate((t-5)*config.depth*-13,0);imageRect(ctx,'foreground_roof',-55,H*.68,W+110,H*.32);ctx.restore()}
  else{ctx.fillStyle='#07101a';ctx.beginPath();ctx.moveTo(0,H*.91);ctx.lineTo(W*.19,H*.84);ctx.lineTo(W*.38,H*.92);ctx.lineTo(W*.68,H*.89);ctx.lineTo(W,H*.98);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.fill()}
 }
@@ -60,6 +61,7 @@ function bolt(ctx,time,t,W,H){
  let alpha=Math.exp(-Math.pow(d/(config.lightningDuration*.36),2))*intensity;
  if(alpha<.02)continue;
  ctx.save();ctx.globalCompositeOperation='screen';ctx.fillStyle='rgba(158,188,245,'+(.12*alpha)+')';ctx.fillRect(0,0,W,H);
+ if(images.lightning_overlay){imageRect(ctx,'lightning_overlay',0,0,W,H,alpha);ctx.restore();continue;}
  let sx=W*(.56+rand(k,77)*.20),y=0;ctx.beginPath();ctx.moveTo(sx,y);
  for(let i=0;i<13;i++){let x=sx+Math.sin(i*2.8+k)*16+i*8;y=(i+1)*H*.045;ctx.lineTo(x,y)}
  ctx.shadowColor='#a8caff';ctx.shadowBlur=23;ctx.strokeStyle='rgba(195,221,255,'+(.9*alpha)+')';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;
@@ -77,7 +79,9 @@ function rain(ctx,t,W,H,glass){
  let len=glass?2+rand(i,14)*13:9+rand(i,15)*25;
  ctx.strokeStyle='rgba(190,214,236,'+((glass?.10:.055)+rand(i,11)*(glass?.22:.18))+')';
  ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+len*config.rainWind*(glass?.06:.5),y+len);ctx.stroke();
- }ctx.restore();
+ }
+ if(images.rain_overlay){ctx.save();ctx.globalAlpha=.30;let dy=(t*config.rainSpeed*110)%H;imageRect(ctx,'rain_overlay',0,dy-H,W,H);imageRect(ctx,'rain_overlay',0,dy,W,H);ctx.restore()}
+ ctx.restore();
 }
 function interior(ctx,t,W,H){
  let p=ramp(t,.40,1.0);ctx.save();
