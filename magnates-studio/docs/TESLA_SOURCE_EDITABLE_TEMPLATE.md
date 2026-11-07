@@ -7,8 +7,8 @@
 Navigate to `/tesla-opening.html` (from Studio's floating Tesla link). The template uses the existing Studio's **Content / Motion / Look / Effects + Advanced Controls** organization; it lives on its own route to prevent regressions in other template customizers.
 
 ### Editable controls
-- **Content:** replace each asset slot with a PNG/JPG/WebP, including room wall, chair, desk, books, coil, lamp, blueprint, portrait, window frame, glass reflections, three city planes and storm clouds. Each asset independently exposes horizontal/vertical position, depth, scale, rotation, opacity and visibility.
-- **Motion:** initial/final camera scale, camera push start/end, city parallax strength, window-cross timing.
+- **Content:** replace each asset slot with a PNG/JPG/WebP, including room wall, chair, desk, books, coil, lamp, blueprint, portrait, window frame, glass reflections, three city planes and storm clouds. Each asset independently exposes horizontal/vertical position, depth, scale, rotation, opacity, visibility and editable entrance/exit times and fade durations.
+- **Motion:** initial/final camera scale (reversible zoom-in/zoom-out), camera push start/end, city parallax strength, window-cross timing.
 - **Look:** room and city exposure, glass reflectivity, lamp glow, vignette.
 - **Effects:** exterior rain density, speed, wind, pane rain; clouds drift/darkening; lightning intensity, two strike times and duration; city light activation start/spread/count; blueprint and portrait reveal start/duration; on/off switches for each major effect.
 - **Advanced:** exact strike times, blueprint and portrait positions, parameter fine-tuning.
