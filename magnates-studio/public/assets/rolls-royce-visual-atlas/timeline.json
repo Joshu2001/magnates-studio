@@ -2000,6 +2000,53 @@
         }
       ],
       "transition": "Montage / radial bridge"
+    },
+    {
+      "n": 60,
+      "startFrame": 3540,
+      "endFrame": 3600,
+      "startSeconds": 118,
+      "endSeconds": 120,
+      "sourceFrameStart": 3540,
+      "sourceFrameEnd": 3599,
+      "atlasPage": 60,
+      "section": "Apprenticeship and tools",
+      "phase": "PROGRESS",
+      "observation": "Fee, worker, tools and model wheelbarrow inserts; dark industrial plates and bright radial bridges.",
+      "motion": "Continue the fee/worker/tools/model-wheelbarrow insert montage with dark industrial plates and bright radial bridges; carry through the two-minute endpoint.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Fee",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "tools",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "model wheelbarrow",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-5",
+          "role": "industrial plate",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage / radial bridge"
     }
   ],
   "assetPolicy": "Every source field is null until linked to an extracted original asset. Do not substitute unrelated repository artwork.",
