@@ -1,0 +1,30 @@
+{
+  "id": "barry-minkow-opening",
+  "title": "Barry Minkow · The $7 Million Job That Didn’t Exist",
+  "version": "1.0.0",
+  "kind": "scene-template",
+  "durationSeconds": 8,
+  "frameRate": 24,
+  "resolution": {"width": 1280, "height": 720},
+  "status": "preview-ready",
+  "textLayersEditable": true,
+  "provenance": "AI-generated illustrative scene plates and portrait cutout, not archival photography. Portrait/background are separate compositing layers.",
+  "sequence": [
+    {"in":0,"out":0.55,"beat":"White flash contracts and dissipates","layers":["optical flash","film texture"]},
+    {"in":0.55,"out":1.45,"beat":"Storm sky and Sacramento skyline emerge","layers":["moving storm sky","city plate","grain"]},
+    {"in":1.45,"out":2.65,"beat":"Blue office tower rises into frame; camera pushes in","layers":["tower cutout","city plate","storm sky"]},
+    {"in":2.65,"out":3.85,"beat":"Warm searchlight sweeps across the facade","layers":["moving light beam","tower cutout"]},
+    {"in":3.85,"out":5.05,"beat":"Gold title reveals over the tower","layers":["editable title","gold reveal matte","tower cutout"]},
+    {"in":5.05,"out":6.35,"beat":"Gold-edged occlusion climbs as the unfinished corridor is revealed upward","layers":["corridor plate","gold wipe","editable allegation qualifier"]},
+    {"in":6.35,"out":7.12,"beat":"Corridor draws forward with a slow camera creep","layers":["corridor plate","editable allegation qualifier"]},
+    {"in":7.12,"out":8,"beat":"Flash transition reveals separate facade plate and portrait cutout","layers":["portrait facade background","caption-free portrait cutout","editable name title"]}
+  ],
+  "assets": [
+    {"id":"sky","src":"assets/sacramento-storm-sky.webp","role":"moving cloud plate","classification":"AI-generated scene art"},
+    {"id":"city","src":"assets/sacramento-skyline.webp","role":"Sacramento skyline plate","classification":"AI-generated scene art"},
+    {"id":"tower","src":"assets/office-tower-cutout.webp","role":"separate blue office tower cutout","classification":"AI-generated scene art; transparent PNG"},
+    {"id":"corridor","src":"assets/construction-corridor.webp","role":"unfinished office corridor","classification":"AI-generated scene art"},
+    {"id":"portraitBackground","src":"assets/portrait-facade-background.webp","role":"separate grayscale facade plate behind portrait","classification":"AI-generated scene art"},
+    {"id":"portrait","src":"assets/barry-minkow-caption-free-portrait.webp","role":"caption-free portrait cutout","classification":"AI-generated illustrative portrait, not an authenticated likeness or archival photo"}
+  ]
+}
