@@ -1,0 +1,2011 @@
+{
+  "title": "Rolls-Royce — Visual Atlas Reconstruction Template",
+  "segment": {
+    "fromSeconds": 0,
+    "toSeconds": 120,
+    "label": "Opening 2 minutes"
+  },
+  "durationFrames": 3600,
+  "fps": 30,
+  "width": 1920,
+  "height": 1080,
+  "timebase": "Integer 30 fps frames; frame 0 = 00:00:00:00; each atlas page spans 60 source frames; end frames are exclusive.",
+  "status": "Reference-derived visual template and timing specification. It is not a rendered film. Source plates are not embedded because only the visual atlas PDF was provided.",
+  "reference": {
+    "file": "Rolls_Royce_All_Frames_Visual_Atlas (1).pdf",
+    "pages": "1–60",
+    "sourceFrameRule": "zero-based frame index divided by 30",
+    "atlasPageRule": "page n represents frames (n−1)*60 through n*60−1"
+  },
+  "visualGrammar": [
+    "Alternate luxury-car plates entering vertically; smoke and scanline texture bridges angle changes.",
+    "Hold wheel detail while a brush mask reveals child/teddy; scale the car away.",
+    "Overlap retreating and advancing child/hall plates with title movement in foreground.",
+    "Drop image into radial tunnel, then resolve textured yellow/white chapter typography with scale/rotation settling.",
+    "Spin marque to rest, dip to dark, then build portrait/date/family/mill layers.",
+    "Carry translucent BANKRUPT type over mill/family and rural imagery; use forward zooms and radial exits.",
+    "Use railway-focused zoom into expanding irregular aperture; brighten landscape as boy and birds resolve.",
+    "Darken intimate family detail while school/work imagery replaces it.",
+    "Intercut debt title and food close-ups with HARD LABOUR over worker imagery.",
+    "Shift work/railway into fee close-up, then worker/tools/model-wheelbarrow inserts with radial bridges."
+  ],
+  "chapters": [
+    {
+      "start": 0,
+      "end": 6,
+      "title": "Luxury-car hook",
+      "desc": "Alternating luxury-car plates with persistent smoky scanline texture; the hook is built through repeated angle changes."
+    },
+    {
+      "start": 6,
+      "end": 10,
+      "title": "Car-to-child brush reveal",
+      "desc": "Wheel close-up holds while brush mask reveals child and teddy; car recedes."
+    },
+    {
+      "start": 10,
+      "end": 18,
+      "title": "Child, title and contrast",
+      "desc": "Outgoing child retreats as the next child/hall advances underneath the title."
+    },
+    {
+      "start": 18,
+      "end": 28,
+      "title": "Chapter 1 card",
+      "desc": "Image drops into radial tunnel; textured yellow/white chapter type arrives and settles."
+    },
+    {
+      "start": 28,
+      "end": 40,
+      "title": "Royce’s birth and family",
+      "desc": "Rotating marque to portrait and 1863; family cutouts and flour-mill exterior form the biography tableau."
+    },
+    {
+      "start": 40,
+      "end": 58,
+      "title": "Bankruptcy and family poverty",
+      "desc": "Smoke and translucent red BANKRUPT overlay; mill/family plates, forward zooms, distressed rural images."
+    },
+    {
+      "start": 58,
+      "end": 80,
+      "title": "Road, railway and boy",
+      "desc": "Zoom to railway, expanding irregular aperture, then boy/birds over brightening landscape."
+    },
+    {
+      "start": 80,
+      "end": 94,
+      "title": "Family loss and hardship",
+      "desc": "Hand/baby details darken as school/work imagery takes over."
+    },
+    {
+      "start": 94,
+      "end": 116,
+      "title": "Debt, food and labor",
+      "desc": "Red DEBT, bread/milk close-ups, yellow HARD LABOUR over worker imagery."
+    },
+    {
+      "start": 116,
+      "end": 120,
+      "title": "Apprenticeship and tools",
+      "desc": "Fee close-up, worker/tools and model wheelbarrow inserts; dark industrial plates and bright radial bridges."
+    }
+  ],
+  "beats": [
+    {
+      "n": 1,
+      "startFrame": 0,
+      "endFrame": 60,
+      "startSeconds": 0,
+      "endSeconds": 2,
+      "sourceFrameStart": 0,
+      "sourceFrameEnd": 59,
+      "atlasPage": 1,
+      "section": "Luxury-car hook",
+      "phase": "TRANSITION",
+      "observation": "Alternating luxury-car plates enter from above/below; smoky/scanline texture persists between angles.",
+      "motion": "Alternate vertically entering car plates; preserve smoke/scanline texture across angle changes.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Luxury car plates",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "smoke/scanline overlay",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Alternating plate entrance"
+    },
+    {
+      "n": 2,
+      "startFrame": 60,
+      "endFrame": 120,
+      "startSeconds": 2,
+      "endSeconds": 4,
+      "sourceFrameStart": 60,
+      "sourceFrameEnd": 119,
+      "atlasPage": 2,
+      "section": "Luxury-car hook",
+      "phase": "TRANSITION",
+      "observation": "Alternating luxury-car plates enter from above/below; smoky/scanline texture persists between angles.",
+      "motion": "Continue alternating car angles; retain the same textured transition field.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Luxury car plates",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "smoke/scanline overlay",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Alternating plate entrance"
+    },
+    {
+      "n": 3,
+      "startFrame": 120,
+      "endFrame": 180,
+      "startSeconds": 4,
+      "endSeconds": 6,
+      "sourceFrameStart": 120,
+      "sourceFrameEnd": 179,
+      "atlasPage": 3,
+      "section": "Luxury-car hook",
+      "phase": "TRANSITION",
+      "observation": "Alternating luxury-car plates enter from above/below; smoky/scanline texture persists between angles.",
+      "motion": "Continue alternating angles; the smoky scanline field bridges each switch.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Luxury car plates",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "smoke/scanline overlay",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Alternating plate entrance"
+    },
+    {
+      "n": 4,
+      "startFrame": 180,
+      "endFrame": 240,
+      "startSeconds": 6,
+      "endSeconds": 8,
+      "sourceFrameStart": 180,
+      "sourceFrameEnd": 239,
+      "atlasPage": 4,
+      "section": "Car to child reveal",
+      "phase": "TRANSITION",
+      "observation": "Wheel close-up holds under the child/teddy brush reveal; child expands as the car recedes.",
+      "motion": "Lock the wheel detail; brush-reveal child and teddy across it while the car scales back.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Wheel close-up",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "child/teddy cutout",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "brush mask",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Brush reveal + scale recede"
+    },
+    {
+      "n": 5,
+      "startFrame": 240,
+      "endFrame": 300,
+      "startSeconds": 8,
+      "endSeconds": 10,
+      "sourceFrameStart": 240,
+      "sourceFrameEnd": 299,
+      "atlasPage": 5,
+      "section": "Car to child reveal",
+      "phase": "TRANSITION",
+      "observation": "Wheel close-up holds under the child/teddy brush reveal; child expands as the car recedes.",
+      "motion": "Finish the reveal with the child/teddy dominant and the car receding.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Wheel close-up",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "child/teddy cutout",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Brush reveal resolves"
+    },
+    {
+      "n": 6,
+      "startFrame": 300,
+      "endFrame": 360,
+      "startSeconds": 10,
+      "endSeconds": 12,
+      "sourceFrameStart": 300,
+      "sourceFrameEnd": 359,
+      "atlasPage": 6,
+      "section": "Child, title and contrast",
+      "phase": "TRANSITION",
+      "observation": "Outgoing child recedes as the next child/hall and advancing title overlap.",
+      "motion": "Overlap the outgoing child’s retreat, next child/hall entrance and advancing title.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Child plates",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "hall plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Scale overlap + title advance"
+    },
+    {
+      "n": 7,
+      "startFrame": 360,
+      "endFrame": 420,
+      "startSeconds": 12,
+      "endSeconds": 14,
+      "sourceFrameStart": 360,
+      "sourceFrameEnd": 419,
+      "atlasPage": 7,
+      "section": "Child, title and contrast",
+      "phase": "TRANSITION",
+      "observation": "Outgoing child recedes as the next child/hall and advancing title overlap.",
+      "motion": "Continue the layered child-to-hall change; title advances through the overlap.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Child plates",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "hall plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Layered overlap"
+    },
+    {
+      "n": 8,
+      "startFrame": 420,
+      "endFrame": 480,
+      "startSeconds": 14,
+      "endSeconds": 16,
+      "sourceFrameStart": 420,
+      "sourceFrameEnd": 479,
+      "atlasPage": 8,
+      "section": "Child, title and contrast",
+      "phase": "TRANSITION",
+      "observation": "Outgoing child recedes as the next child/hall and advancing title overlap.",
+      "motion": "Continue the overlap; preserve title movement as a foreground plane.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Child plates",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "hall plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Layered overlap"
+    },
+    {
+      "n": 9,
+      "startFrame": 480,
+      "endFrame": 540,
+      "startSeconds": 16,
+      "endSeconds": 18,
+      "sourceFrameStart": 480,
+      "sourceFrameEnd": 539,
+      "atlasPage": 9,
+      "section": "Child, title and contrast",
+      "phase": "TRANSITION",
+      "observation": "Outgoing child recedes as the next child/hall and advancing title overlap.",
+      "motion": "Allow the outgoing child to recede while the hall and title take over.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Hall plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Scale recede"
+    },
+    {
+      "n": 10,
+      "startFrame": 540,
+      "endFrame": 600,
+      "startSeconds": 18,
+      "endSeconds": 20,
+      "sourceFrameStart": 540,
+      "sourceFrameEnd": 599,
+      "atlasPage": 10,
+      "section": "Chapter 1 card",
+      "phase": "TRANSITION",
+      "observation": "Image drops into the radial tunnel before the chapter title.",
+      "motion": "Drop the image into a radial tunnel; bring in chapter typography after the drop.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Radial tunnel",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "chapter title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Radial tunnel drop"
+    },
+    {
+      "n": 11,
+      "startFrame": 600,
+      "endFrame": 660,
+      "startSeconds": 20,
+      "endSeconds": 22,
+      "sourceFrameStart": 600,
+      "sourceFrameEnd": 659,
+      "atlasPage": 11,
+      "section": "Chapter 1 card",
+      "phase": "PROGRESS",
+      "observation": "Radial tunnel, textured yellow/white chapter typography, brief scale/rotation settling.",
+      "motion": "Resolve textured yellow/white title with a short scale and rotation settle.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Radial tunnel",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "yellow/white type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Scale/rotation settle"
+    },
+    {
+      "n": 12,
+      "startFrame": 660,
+      "endFrame": 720,
+      "startSeconds": 22,
+      "endSeconds": 24,
+      "sourceFrameStart": 660,
+      "sourceFrameEnd": 719,
+      "atlasPage": 12,
+      "section": "Chapter 1 card",
+      "phase": "PROGRESS",
+      "observation": "Radial tunnel, textured yellow/white chapter typography, brief scale/rotation settling.",
+      "motion": "Hold title on radial tunnel; retain textured fill and restrained motion.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Radial tunnel",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "chapter typography",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Held title"
+    },
+    {
+      "n": 13,
+      "startFrame": 720,
+      "endFrame": 780,
+      "startSeconds": 24,
+      "endSeconds": 26,
+      "sourceFrameStart": 720,
+      "sourceFrameEnd": 779,
+      "atlasPage": 13,
+      "section": "Chapter 1 card",
+      "phase": "PROGRESS",
+      "observation": "Radial tunnel, textured yellow/white chapter typography, brief scale/rotation settling.",
+      "motion": "Continue the title hold; let radial depth remain active behind lettering.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Radial tunnel",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "chapter typography",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Radial depth hold"
+    },
+    {
+      "n": 14,
+      "startFrame": 780,
+      "endFrame": 840,
+      "startSeconds": 26,
+      "endSeconds": 28,
+      "sourceFrameStart": 780,
+      "sourceFrameEnd": 839,
+      "atlasPage": 14,
+      "section": "Chapter 1 card",
+      "phase": "PROGRESS",
+      "observation": "Radial tunnel, textured yellow/white chapter typography, brief scale/rotation settling.",
+      "motion": "Finish the chapter card on its settled typography.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Radial tunnel",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "chapter typography",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Settled hold"
+    },
+    {
+      "n": 15,
+      "startFrame": 840,
+      "endFrame": 900,
+      "startSeconds": 28,
+      "endSeconds": 30,
+      "sourceFrameStart": 840,
+      "sourceFrameEnd": 899,
+      "atlasPage": 15,
+      "section": "Royce’s birth and family",
+      "phase": "TRANSITION",
+      "observation": "Spinning Rolls-Royce mark settles, dips to dark, then portrait/1863 reveal begins.",
+      "motion": "Spin the Rolls-Royce mark to a stop; dip dark; begin portrait and 1863 reveal.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Spinning marque",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "portrait",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "1863 typography",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Spin → dark dip → reveal"
+    },
+    {
+      "n": 16,
+      "startFrame": 900,
+      "endFrame": 960,
+      "startSeconds": 30,
+      "endSeconds": 32,
+      "sourceFrameStart": 900,
+      "sourceFrameEnd": 959,
+      "atlasPage": 16,
+      "section": "Royce’s birth and family",
+      "phase": "TRANSITION",
+      "observation": "Spinning Rolls-Royce mark settles, dips to dark, then portrait/1863 reveal begins.",
+      "motion": "Complete the dark dip and begin the portrait/date reveal.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Portrait",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "1863 typography",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Dark reveal"
+    },
+    {
+      "n": 17,
+      "startFrame": 960,
+      "endFrame": 1020,
+      "startSeconds": 32,
+      "endSeconds": 34,
+      "sourceFrameStart": 960,
+      "sourceFrameEnd": 1019,
+      "atlasPage": 17,
+      "section": "Royce’s birth and family",
+      "phase": "PROGRESS",
+      "observation": "Logo/portrait, 1863 date, family cutouts and flour-mill exterior build the biography setting.",
+      "motion": "Build the setting in layers: mark/portrait, 1863, family cutouts, flour-mill exterior.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Logo",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "portrait",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "date",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "family",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-5",
+          "role": "mill exterior",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Layered build"
+    },
+    {
+      "n": 18,
+      "startFrame": 1020,
+      "endFrame": 1080,
+      "startSeconds": 34,
+      "endSeconds": 36,
+      "sourceFrameStart": 1020,
+      "sourceFrameEnd": 1079,
+      "atlasPage": 18,
+      "section": "Royce’s birth and family",
+      "phase": "PROGRESS",
+      "observation": "Logo/portrait, 1863 date, family cutouts and flour-mill exterior build the biography setting.",
+      "motion": "Hold biography collage; keep date, family and mill readable as separate planes.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Portrait",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "date",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "family",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "mill exterior",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Parallax hold"
+    },
+    {
+      "n": 19,
+      "startFrame": 1080,
+      "endFrame": 1140,
+      "startSeconds": 36,
+      "endSeconds": 38,
+      "sourceFrameStart": 1080,
+      "sourceFrameEnd": 1139,
+      "atlasPage": 19,
+      "section": "Royce’s birth and family",
+      "phase": "PROGRESS",
+      "observation": "Logo/portrait, 1863 date, family cutouts and flour-mill exterior build the biography setting.",
+      "motion": "Continue the layered biography tableau with gentle depth separation.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Portrait",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "family",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "mill exterior",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Parallax hold"
+    },
+    {
+      "n": 20,
+      "startFrame": 1140,
+      "endFrame": 1200,
+      "startSeconds": 38,
+      "endSeconds": 40,
+      "sourceFrameStart": 1140,
+      "sourceFrameEnd": 1199,
+      "atlasPage": 20,
+      "section": "Royce’s birth and family",
+      "phase": "TRANSITION",
+      "observation": "Flour-mill/family plate is overlaid by smoke and translucent BANKRUPT text; bright radial exit.",
+      "motion": "Introduce smoke and translucent BANKRUPT over the mill/family plate; prepare bright radial exit.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Mill/family plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "smoke",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Smoke overlay"
+    },
+    {
+      "n": 21,
+      "startFrame": 1200,
+      "endFrame": 1260,
+      "startSeconds": 40,
+      "endSeconds": 42,
+      "sourceFrameStart": 1200,
+      "sourceFrameEnd": 1259,
+      "atlasPage": 21,
+      "section": "Bankruptcy and family poverty",
+      "phase": "TRANSITION",
+      "observation": "Flour-mill/family plate is overlaid by smoke and translucent BANKRUPT text; bright radial exit.",
+      "motion": "Carry the translucent word across the image, then trigger the bright radial exit.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Mill/family plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "smoke",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Radial exit"
+    },
+    {
+      "n": 22,
+      "startFrame": 1260,
+      "endFrame": 1320,
+      "startSeconds": 42,
+      "endSeconds": 44,
+      "sourceFrameStart": 1260,
+      "sourceFrameEnd": 1319,
+      "atlasPage": 22,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Push through mill/family imagery; red translucent BANKRUPT stays superimposed.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Mill/family",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "red type",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "rural plate",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Forward zoom"
+    },
+    {
+      "n": 23,
+      "startFrame": 1320,
+      "endFrame": 1380,
+      "startSeconds": 44,
+      "endSeconds": 46,
+      "sourceFrameStart": 1320,
+      "sourceFrameEnd": 1379,
+      "atlasPage": 23,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Continue forward zoom into distressed rural imagery under the persistent word.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Rural imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Forward zoom"
+    },
+    {
+      "n": 24,
+      "startFrame": 1380,
+      "endFrame": 1440,
+      "startSeconds": 46,
+      "endSeconds": 48,
+      "sourceFrameStart": 1380,
+      "sourceFrameEnd": 1439,
+      "atlasPage": 24,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Hold the rural plate while the typography remains a translucent overlay.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Rural plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Overlay hold"
+    },
+    {
+      "n": 25,
+      "startFrame": 1440,
+      "endFrame": 1500,
+      "startSeconds": 48,
+      "endSeconds": 50,
+      "sourceFrameStart": 1440,
+      "sourceFrameEnd": 1499,
+      "atlasPage": 25,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Maintain the same visual motif; advance the background plate through the zoom.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Rural imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Forward zoom"
+    },
+    {
+      "n": 26,
+      "startFrame": 1500,
+      "endFrame": 1560,
+      "startSeconds": 50,
+      "endSeconds": 52,
+      "sourceFrameStart": 1500,
+      "sourceFrameEnd": 1559,
+      "atlasPage": 26,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Continue the distressed rural passage, preserving red title transparency.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Rural imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Forward zoom"
+    },
+    {
+      "n": 27,
+      "startFrame": 1560,
+      "endFrame": 1620,
+      "startSeconds": 52,
+      "endSeconds": 54,
+      "sourceFrameStart": 1560,
+      "sourceFrameEnd": 1619,
+      "atlasPage": 27,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Hold the composite briefly before moving toward the road/railway transition.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Rural plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Composite hold"
+    },
+    {
+      "n": 28,
+      "startFrame": 1620,
+      "endFrame": 1680,
+      "startSeconds": 54,
+      "endSeconds": 56,
+      "sourceFrameStart": 1620,
+      "sourceFrameEnd": 1679,
+      "atlasPage": 28,
+      "section": "Bankruptcy and family poverty",
+      "phase": "PROGRESS",
+      "observation": "Mill/family plates, translucent red BANKRUPT text, forward zooms and distressed rural imagery.",
+      "motion": "Continue the gradual zoom through rural/family imagery.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Rural imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "BANKRUPT type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Forward zoom"
+    },
+    {
+      "n": 29,
+      "startFrame": 1680,
+      "endFrame": 1740,
+      "startSeconds": 56,
+      "endSeconds": 58,
+      "sourceFrameStart": 1680,
+      "sourceFrameEnd": 1739,
+      "atlasPage": 29,
+      "section": "Bankruptcy and family poverty",
+      "phase": "TRANSITION",
+      "observation": "Family/road imagery zooms toward the railway and expanding-hole reveal.",
+      "motion": "Zoom toward railway; open an irregular expanding aperture into the next image.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Family/road plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "railway",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "aperture mask",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Zoom + expanding irregular hole"
+    },
+    {
+      "n": 30,
+      "startFrame": 1740,
+      "endFrame": 1800,
+      "startSeconds": 58,
+      "endSeconds": 60,
+      "sourceFrameStart": 1740,
+      "sourceFrameEnd": 1799,
+      "atlasPage": 30,
+      "section": "Road, railway and boy",
+      "phase": "TRANSITION",
+      "observation": "Family/road imagery zooms toward the railway and expanding-hole reveal.",
+      "motion": "Complete the aperture expansion; dark field takes over before the boy/landscape reveal.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Railway plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "dark field",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "aperture",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Aperture completion"
+    },
+    {
+      "n": 31,
+      "startFrame": 1800,
+      "endFrame": 1860,
+      "startSeconds": 60,
+      "endSeconds": 62,
+      "sourceFrameStart": 1800,
+      "sourceFrameEnd": 1859,
+      "atlasPage": 31,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Reveal boy and foreground birds over a landscape that brightens from darkness.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy cutout",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "birds",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Aperture reveal + light rise"
+    },
+    {
+      "n": 32,
+      "startFrame": 1860,
+      "endFrame": 1920,
+      "startSeconds": 62,
+      "endSeconds": 64,
+      "sourceFrameStart": 1860,
+      "sourceFrameEnd": 1919,
+      "atlasPage": 32,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Keep the boy as anchor; let birds cross foreground as landscape illumination rises.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "birds",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Foreground crossing"
+    },
+    {
+      "n": 33,
+      "startFrame": 1920,
+      "endFrame": 1980,
+      "startSeconds": 64,
+      "endSeconds": 66,
+      "sourceFrameStart": 1920,
+      "sourceFrameEnd": 1979,
+      "atlasPage": 33,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Continue the brightening landscape and layered bird movement.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "birds",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Light progression"
+    },
+    {
+      "n": 34,
+      "startFrame": 1980,
+      "endFrame": 2040,
+      "startSeconds": 66,
+      "endSeconds": 68,
+      "sourceFrameStart": 1980,
+      "sourceFrameEnd": 2039,
+      "atlasPage": 34,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Hold the image while foreground elements sustain depth.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "birds",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Parallax hold"
+    },
+    {
+      "n": 35,
+      "startFrame": 2040,
+      "endFrame": 2100,
+      "startSeconds": 68,
+      "endSeconds": 70,
+      "sourceFrameStart": 2040,
+      "sourceFrameEnd": 2099,
+      "atlasPage": 35,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Maintain the slow visual opening; avoid a new cut within this atlas window.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "birds",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Continuous hold"
+    },
+    {
+      "n": 36,
+      "startFrame": 2100,
+      "endFrame": 2160,
+      "startSeconds": 70,
+      "endSeconds": 72,
+      "sourceFrameStart": 2100,
+      "sourceFrameEnd": 2159,
+      "atlasPage": 36,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Continue the same landscape build and foreground layering.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "birds",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Continuous hold"
+    },
+    {
+      "n": 37,
+      "startFrame": 2160,
+      "endFrame": 2220,
+      "startSeconds": 72,
+      "endSeconds": 74,
+      "sourceFrameStart": 2160,
+      "sourceFrameEnd": 2219,
+      "atlasPage": 37,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Let the landscape reach its brighter state; keep the boy/foreground separation.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "birds",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Brightening resolves"
+    },
+    {
+      "n": 38,
+      "startFrame": 2220,
+      "endFrame": 2280,
+      "startSeconds": 74,
+      "endSeconds": 76,
+      "sourceFrameStart": 2220,
+      "sourceFrameEnd": 2279,
+      "atlasPage": 38,
+      "section": "Road, railway and boy",
+      "phase": "PROGRESS",
+      "observation": "Expanding irregular opening leads into a dark field; boy and foreground birds appear over a brightening landscape.",
+      "motion": "Continue on the held composition, tracking the atlas frames for subtle motion.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "birds",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "landscape",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Held progression"
+    },
+    {
+      "n": 39,
+      "startFrame": 2280,
+      "endFrame": 2340,
+      "startSeconds": 76,
+      "endSeconds": 78,
+      "sourceFrameStart": 2280,
+      "sourceFrameEnd": 2339,
+      "atlasPage": 39,
+      "section": "Road, railway and boy",
+      "phase": "TRANSITION",
+      "observation": "Field/boy image resolves from dark; foreground birds cross the boy.",
+      "motion": "Resolve field/boy from dark; birds pass in front of the boy as a depth cue.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Field",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "boy",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "birds",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Dark resolve + foreground cross"
+    },
+    {
+      "n": 40,
+      "startFrame": 2340,
+      "endFrame": 2400,
+      "startSeconds": 78,
+      "endSeconds": 80,
+      "sourceFrameStart": 2340,
+      "sourceFrameEnd": 2399,
+      "atlasPage": 40,
+      "section": "Family loss and hardship",
+      "phase": "TRANSITION",
+      "observation": "Field/boy image resolves from dark; foreground birds cross the boy.",
+      "motion": "Finish bird crossing and begin the shift from boy/field toward family detail.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Boy/field",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "family detail",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Crossing into next plate"
+    },
+    {
+      "n": 41,
+      "startFrame": 2400,
+      "endFrame": 2460,
+      "startSeconds": 80,
+      "endSeconds": 82,
+      "sourceFrameStart": 2400,
+      "sourceFrameEnd": 2459,
+      "atlasPage": 41,
+      "section": "Family loss and hardship",
+      "phase": "PROGRESS",
+      "observation": "Family/hand/baby details darken; school and work imagery take over.",
+      "motion": "Darken hand/baby details; let school/work imagery replace them.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Family hand/baby",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "school/work plates",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Darkening transition"
+    },
+    {
+      "n": 42,
+      "startFrame": 2460,
+      "endFrame": 2520,
+      "startSeconds": 82,
+      "endSeconds": 84,
+      "sourceFrameStart": 2460,
+      "sourceFrameEnd": 2519,
+      "atlasPage": 42,
+      "section": "Family loss and hardship",
+      "phase": "PROGRESS",
+      "observation": "Family/hand/baby details darken; school and work imagery take over.",
+      "motion": "Advance the replacement imagery; preserve the dark tonal descent.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "School/work plates",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Layered replacement"
+    },
+    {
+      "n": 43,
+      "startFrame": 2520,
+      "endFrame": 2580,
+      "startSeconds": 84,
+      "endSeconds": 86,
+      "sourceFrameStart": 2520,
+      "sourceFrameEnd": 2579,
+      "atlasPage": 43,
+      "section": "Family loss and hardship",
+      "phase": "PROGRESS",
+      "observation": "Family/hand/baby details darken; school and work imagery take over.",
+      "motion": "Continue the school/work montage takeover.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "School/work imagery",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage progression"
+    },
+    {
+      "n": 44,
+      "startFrame": 2580,
+      "endFrame": 2640,
+      "startSeconds": 86,
+      "endSeconds": 88,
+      "sourceFrameStart": 2580,
+      "sourceFrameEnd": 2639,
+      "atlasPage": 44,
+      "section": "Family loss and hardship",
+      "phase": "PROGRESS",
+      "observation": "Family/hand/baby details darken; school and work imagery take over.",
+      "motion": "Hold the working-life imagery long enough to read the composition.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Work imagery",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Hold"
+    },
+    {
+      "n": 45,
+      "startFrame": 2640,
+      "endFrame": 2700,
+      "startSeconds": 88,
+      "endSeconds": 90,
+      "sourceFrameStart": 2640,
+      "sourceFrameEnd": 2699,
+      "atlasPage": 45,
+      "section": "Family loss and hardship",
+      "phase": "PROGRESS",
+      "observation": "Family/hand/baby details darken; school and work imagery take over.",
+      "motion": "Continue the montage with restrained image changes and darkening tone.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Work imagery",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage progression"
+    },
+    {
+      "n": 46,
+      "startFrame": 2700,
+      "endFrame": 2760,
+      "startSeconds": 90,
+      "endSeconds": 92,
+      "sourceFrameStart": 2700,
+      "sourceFrameEnd": 2759,
+      "atlasPage": 46,
+      "section": "Family loss and hardship",
+      "phase": "PROGRESS",
+      "observation": "Family/hand/baby details darken; school and work imagery take over.",
+      "motion": "Finish the family-to-work passage before the labor title transition.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Work imagery",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Passage hold"
+    },
+    {
+      "n": 47,
+      "startFrame": 2760,
+      "endFrame": 2820,
+      "startSeconds": 92,
+      "endSeconds": 94,
+      "sourceFrameStart": 2760,
+      "sourceFrameEnd": 2819,
+      "atlasPage": 47,
+      "section": "Debt, food and labor",
+      "phase": "TRANSITION",
+      "observation": "Hardship montage turns into the labor/title beat.",
+      "motion": "Turn the hardship montage into a labor/title beat; title enters as the image changes.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Labor imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "HARD LABOUR type",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Title transition"
+    },
+    {
+      "n": 48,
+      "startFrame": 2820,
+      "endFrame": 2880,
+      "startSeconds": 94,
+      "endSeconds": 96,
+      "sourceFrameStart": 2820,
+      "sourceFrameEnd": 2879,
+      "atlasPage": 48,
+      "section": "Debt, food and labor",
+      "phase": "TRANSITION",
+      "observation": "Hardship montage turns into the labor/title beat.",
+      "motion": "Complete the transition into the debt/food/labor visual cluster.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Debt/food/work imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Layered transition"
+    },
+    {
+      "n": 49,
+      "startFrame": 2880,
+      "endFrame": 2940,
+      "startSeconds": 96,
+      "endSeconds": 98,
+      "sourceFrameStart": 2880,
+      "sourceFrameEnd": 2939,
+      "atlasPage": 49,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Intercut red DEBT text, bread/milk close-ups, and yellow HARD LABOUR over worker imagery.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "DEBT type",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "bread/milk",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "worker imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "HARD LABOUR",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Close-up cuts + title overlay"
+    },
+    {
+      "n": 50,
+      "startFrame": 2940,
+      "endFrame": 3000,
+      "startSeconds": 98,
+      "endSeconds": 100,
+      "sourceFrameStart": 2940,
+      "sourceFrameEnd": 2999,
+      "atlasPage": 50,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Continue close-up and worker montage; keep red and yellow typography distinct.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Food close-ups",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "titles",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage"
+    },
+    {
+      "n": 51,
+      "startFrame": 3000,
+      "endFrame": 3060,
+      "startSeconds": 100,
+      "endSeconds": 102,
+      "sourceFrameStart": 3000,
+      "sourceFrameEnd": 3059,
+      "atlasPage": 51,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Hold/advance worker image beneath HARD LABOUR overlay.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Worker imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "HARD LABOUR",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Overlay progression"
+    },
+    {
+      "n": 52,
+      "startFrame": 3060,
+      "endFrame": 3120,
+      "startSeconds": 102,
+      "endSeconds": 104,
+      "sourceFrameStart": 3060,
+      "sourceFrameEnd": 3119,
+      "atlasPage": 52,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Continue debt/food/labor passage with source-visible image changes.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "DEBT",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "food",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "HARD LABOUR",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage"
+    },
+    {
+      "n": 53,
+      "startFrame": 3120,
+      "endFrame": 3180,
+      "startSeconds": 104,
+      "endSeconds": 106,
+      "sourceFrameStart": 3120,
+      "sourceFrameEnd": 3179,
+      "atlasPage": 53,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Sustain the editorial montage; no new graphic language beyond observed overlays.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Food",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "titles",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage"
+    },
+    {
+      "n": 54,
+      "startFrame": 3180,
+      "endFrame": 3240,
+      "startSeconds": 106,
+      "endSeconds": 108,
+      "sourceFrameStart": 3180,
+      "sourceFrameEnd": 3239,
+      "atlasPage": 54,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Continue the visual alternation and title hold.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "food",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "title",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage hold"
+    },
+    {
+      "n": 55,
+      "startFrame": 3240,
+      "endFrame": 3300,
+      "startSeconds": 108,
+      "endSeconds": 110,
+      "sourceFrameStart": 3240,
+      "sourceFrameEnd": 3299,
+      "atlasPage": 55,
+      "section": "Debt, food and labor",
+      "phase": "PROGRESS",
+      "observation": "Red DEBT, bread/milk close-ups and yellow HARD LABOUR text over worker imagery.",
+      "motion": "Finish the sustained labor sequence before transitioning toward apprenticeship.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Worker imagery",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "HARD LABOUR",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Passage hold"
+    },
+    {
+      "n": 56,
+      "startFrame": 3300,
+      "endFrame": 3360,
+      "startSeconds": 110,
+      "endSeconds": 112,
+      "sourceFrameStart": 3300,
+      "sourceFrameEnd": 3359,
+      "atlasPage": 56,
+      "section": "Debt, food and labor",
+      "phase": "TRANSITION",
+      "observation": "Railway/work images shift into the apprenticeship fee close-up.",
+      "motion": "Move from railway/work imagery into a close view of the apprenticeship fee.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Railway/work plate",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "fee close-up",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Image-to-detail transition"
+    },
+    {
+      "n": 57,
+      "startFrame": 3360,
+      "endFrame": 3420,
+      "startSeconds": 112,
+      "endSeconds": 114,
+      "sourceFrameStart": 3360,
+      "sourceFrameEnd": 3419,
+      "atlasPage": 57,
+      "section": "Apprenticeship and tools",
+      "phase": "TRANSITION",
+      "observation": "Railway/work images shift into the apprenticeship fee close-up.",
+      "motion": "Complete the fee close-up entrance; prepare worker/tools inserts.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Fee graphic",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "worker/tools",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Close-up settle"
+    },
+    {
+      "n": 58,
+      "startFrame": 3420,
+      "endFrame": 3480,
+      "startSeconds": 114,
+      "endSeconds": 116,
+      "sourceFrameStart": 3420,
+      "sourceFrameEnd": 3479,
+      "atlasPage": 58,
+      "section": "Apprenticeship and tools",
+      "phase": "PROGRESS",
+      "observation": "Fee, worker, tools and model wheelbarrow inserts; dark industrial plates and bright radial bridges.",
+      "motion": "Alternate fee, worker, tools and model wheelbarrow inserts; bridge with dark industry and bright radial flashes.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Fee",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "tools",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "model wheelbarrow",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-5",
+          "role": "industrial plate",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Insert montage + radial bridge"
+    },
+    {
+      "n": 59,
+      "startFrame": 3480,
+      "endFrame": 3540,
+      "startSeconds": 116,
+      "endSeconds": 118,
+      "sourceFrameStart": 3480,
+      "sourceFrameEnd": 3539,
+      "atlasPage": 59,
+      "section": "Apprenticeship and tools",
+      "phase": "PROGRESS",
+      "observation": "Fee, worker, tools and model wheelbarrow inserts; dark industrial plates and bright radial bridges.",
+      "motion": "Continue the insert montage and radial bridges; end at the 02:00 boundary.",
+      "layers": [
+        {
+          "id": "layer-1",
+          "role": "Fee",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-2",
+          "role": "worker",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-3",
+          "role": "tools",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-4",
+          "role": "model wheelbarrow",
+          "source": null,
+          "required": true
+        },
+        {
+          "id": "layer-5",
+          "role": "industrial plate",
+          "source": null,
+          "required": true
+        }
+      ],
+      "transition": "Montage / radial bridge"
+    }
+  ],
+  "assetPolicy": "Every source field is null until linked to an extracted original asset. Do not substitute unrelated repository artwork.",
+  "accuracy": {
+    "observed": "Visual contents and transition descriptions transcribed from atlas annotations and frame inspection.",
+    "historicalClaims": "Atlas is a visual reference and is not proof of biographical claims; verify narration separately.",
+    "sourceAssets": "The PDF atlas contains thumbnails. Full-resolution source plates are not embedded in this template."
+  }
+}
