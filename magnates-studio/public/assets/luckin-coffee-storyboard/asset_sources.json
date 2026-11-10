@@ -1,0 +1,59 @@
+{
+  "originals_are_unchanged": true,
+  "items": [
+    {
+      "filename": "plates/city_night_plate.png",
+      "sha256": "2b0bc3d7fc26b2668c375648fe3c5d755e24168092b26dc8dc1015a35e0a5a1a",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "kind": "original generated illustrative background",
+      "prompt": "High-resolution 16:9 cinematic background plate for a business documentary about a fast-growing coffee chain in China. Top-down oblique aerial night view of a dense modern East Asian city grid with warm window lights, deep navy-blue atmosphere, subtle haze, restrained moody contrast, soft luminous clusters that can accept separately animated markers. Compose for a slow digital push-in: retain generous central detail and edge falloff, no central landmark, no logos, no text, no labels, no routes, no dots, no UI, no charts. Atmospheric illustration, not an accurate map or documentary evidence. Keep marker glows and animation as separate overlays."
+    },
+    {
+      "filename": "plates/cafe_counter_plate.png",
+      "sha256": "383dee37cb173445ba443dc7c5c16f6833a6959d7861f5f9de19631c8ecb0715",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "kind": "original generated illustrative background",
+      "prompt": "Photorealistic 16:9 contemporary urban coffee shop interior, warm amber pendant lights, muted navy accents, polished stone counter foreground, soft distant silhouettes, shallow depth of field, clean negative space for separate phone/cup overlays; no readable signage, logos, menu prices, foreground cup, hands, text, or overlays. Background plate only."
+    },
+    {
+      "filename": "plates/evidence_desk_plate.png",
+      "sha256": "d3a6fcc805650ff2cd2570936cdc215d7a3a7d6cdba3ecd5360ffd494450bc07",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "kind": "original generated illustrative background",
+      "prompt": "Photorealistic 16:9 overhead dark charcoal documentary evidence desk with directional lamp from upper left, subtle texture, a few blurred paper edges and neutral binder clip at far edge, broad empty center for separate documents and receipts; no readable text, logos, stamps, dates, hands, graphs, or overlays. Background plate only."
+    },
+    {
+      "filename": "plates/storefront_glass_plate.png",
+      "sha256": "853ac54f00c50ade1b950b050c1ea1f81e15d05bc2876eaed2bf2478c3093b48",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "kind": "original generated illustrative background",
+      "prompt": "Photorealistic 16:9 nighttime street-level exterior of a contemporary urban coffee shop in China, seen through reflective glass from sidewalk, warm interior light, indistinct customers deep inside, blank unbranded fascia sign, glass reflections, subdued blue shadows, parallax-friendly depth; no readable signage, logo, text, identifiable person, or real-location claim. Background plate only."
+    },
+    {
+      "filename": "cutouts/blank_blue_sleeve_cup.png",
+      "sha256": "8bbee949c2628c3141a9cf983f25b44c0af3cc1fdd5fb291dae6b6492466f1e5",
+      "dimensions": [
+        1107,
+        1421
+      ],
+      "alpha_extrema": [
+        0,
+        255
+      ],
+      "kind": "original generated transparent cutout",
+      "prompt": "Isolated photorealistic white takeaway cup with subtle cobalt-blue blank sleeve, white lid, three-quarter view slightly left, soft contact shadow underneath, studio light from upper left, crisp edges, transparent surrounding space, no logo, text, hand, saucer, steam, or extra objects. Reusable independent foreground cutout."
+    }
+  ]
+}

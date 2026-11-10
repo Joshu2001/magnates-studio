@@ -1,0 +1,310 @@
+{
+  "name": "Luckin Coffee first 30 seconds layered asset kit",
+  "status": "assets prepared; animation not activated",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30,
+    "units": "normalized 0..1 for template placement"
+  },
+  "visual_truth_note": "Generated plates and blank vector props are illustrative. Do not present them as historical Luckin footage, authentic transactions, actual company app screens, receipts, or regulatory filings. Replace evidence surfaces with sourced primary material.",
+  "tracks": [
+    {
+      "id": "bg.cityNight",
+      "asset": "plates/city_night_plate.webp",
+      "fromFrames": [
+        1,
+        4
+      ],
+      "role": "atmospheric background only; not a map",
+      "animatable": [
+        "position",
+        "scale",
+        "opacity",
+        "blur"
+      ],
+      "suggestedDepth": 0.1
+    },
+    {
+      "id": "map.globe",
+      "asset": "svg/abstract_globe.svg",
+      "fromFrames": [
+        1,
+        5
+      ],
+      "role": "optional abstract globe transition; no geographic boundary",
+      "animatable": [
+        "position",
+        "scale",
+        "rotationY",
+        "opacity",
+        "cameraPush"
+      ],
+      "suggestedDepth": 0.25
+    },
+    {
+      "id": "map.route",
+      "asset": "svg/route_draw_overlay.svg",
+      "fromFrames": [
+        2,
+        5
+      ],
+      "role": "editable illustrative path; replace with verified geo path if factual",
+      "animatable": [
+        "strokeDashoffset",
+        "opacity"
+      ],
+      "suggestedDepth": 0.3
+    },
+    {
+      "id": "map.markers",
+      "asset": "svg/map_markers_sample_positions.svg",
+      "fromFrames": [
+        2,
+        5
+      ],
+      "role": "sample positions only, never imply actual store locations",
+      "animatable": [
+        "perMarkerOpacity",
+        "perMarkerScale",
+        "position"
+      ],
+      "suggestedDepth": 0.4
+    },
+    {
+      "id": "effect.glow",
+      "asset": "effects/glow_halo_overlay.svg",
+      "fromFrames": [
+        2,
+        4
+      ],
+      "role": "separate glow/light effect",
+      "animatable": [
+        "opacity",
+        "position",
+        "scale",
+        "blur"
+      ],
+      "suggestedDepth": 0.5
+    },
+    {
+      "id": "phone.body",
+      "asset": "svg/phone_shell.svg",
+      "fromFrames": [
+        5,
+        8
+      ],
+      "role": "editable device silhouette",
+      "animatable": [
+        "position",
+        "scale",
+        "rotation",
+        "opacity"
+      ],
+      "suggestedDepth": 0.5
+    },
+    {
+      "id": "phone.ui",
+      "asset": "svg/phone_ui_placeholder.svg",
+      "fromFrames": [
+        6,
+        8
+      ],
+      "role": "fictional blank UI placeholder; replace with verified-era capture or labeled reconstruction",
+      "animatable": [
+        "perGroupOpacity",
+        "position",
+        "scale"
+      ],
+      "suggestedDepth": 0.6
+    },
+    {
+      "id": "cafe.bg",
+      "asset": "plates/cafe_counter_plate.webp",
+      "fromFrames": [
+        5,
+        8,
+        27,
+        28
+      ],
+      "role": "illustrative cafe plate; not period evidence",
+      "animatable": [
+        "position",
+        "scale",
+        "blur",
+        "colorGrade"
+      ],
+      "suggestedDepth": 0.1
+    },
+    {
+      "id": "cup.cutout",
+      "asset": "cutouts/blank_blue_sleeve_cup.webp",
+      "fromFrames": [
+        8,
+        28
+      ],
+      "role": "isolated illustrative cup; no brand mark",
+      "animatable": [
+        "position",
+        "scale",
+        "rotation",
+        "opacity",
+        "shadow"
+      ],
+      "suggestedDepth": 0.8
+    },
+    {
+      "id": "comparison.panels",
+      "asset": "svg/comparison_panels.svg",
+      "fromFrames": [
+        9,
+        12,
+        19,
+        22
+      ],
+      "role": "empty data-card framework; figures and labels inserted from sources",
+      "animatable": [
+        "perPanelPosition",
+        "opacity",
+        "lineReveal"
+      ],
+      "suggestedDepth": 0.4
+    },
+    {
+      "id": "storefront.bg",
+      "asset": "plates/storefront_glass_plate.webp",
+      "fromFrames": [
+        13,
+        14,
+        27
+      ],
+      "role": "generated unbranded illustrative storefront",
+      "animatable": [
+        "position",
+        "scale",
+        "parallax"
+      ],
+      "suggestedDepth": 0.1
+    },
+    {
+      "id": "investigator.silhouette",
+      "asset": "svg/investigator_silhouette.svg",
+      "fromFrames": [
+        14,
+        15
+      ],
+      "role": "anonymous illustrative silhouette only",
+      "animatable": [
+        "position",
+        "scale",
+        "opacity",
+        "blur"
+      ],
+      "suggestedDepth": 0.35
+    },
+    {
+      "id": "evidence.desk",
+      "asset": "plates/evidence_desk_plate.webp",
+      "fromFrames": [
+        15,
+        18
+      ],
+      "role": "illustrative background plate",
+      "animatable": [
+        "position",
+        "scale",
+        "colorGrade"
+      ],
+      "suggestedDepth": 0.1
+    },
+    {
+      "id": "paper.document",
+      "asset": "svg/blank_document_surface.svg",
+      "fromFrames": [
+        16,
+        25
+      ],
+      "role": "blank placeholder; replace for evidence close-up",
+      "animatable": [
+        "position",
+        "scale",
+        "rotation",
+        "blur"
+      ],
+      "suggestedDepth": 0.5
+    },
+    {
+      "id": "paper.receipt",
+      "asset": "svg/blank_receipt_cutout.svg",
+      "fromFrames": [
+        14,
+        17,
+        18
+      ],
+      "role": "illustrative receipt prop, never factual evidence",
+      "animatable": [
+        "position",
+        "scale",
+        "rotation",
+        "opacity"
+      ],
+      "suggestedDepth": 0.8
+    },
+    {
+      "id": "effect.highlight",
+      "asset": "effects/discrepancy_highlight.svg",
+      "fromFrames": [
+        21,
+        25
+      ],
+      "role": "separate annotation outline",
+      "animatable": [
+        "strokeDashoffset",
+        "opacity",
+        "position",
+        "scale"
+      ],
+      "suggestedDepth": 0.9
+    },
+    {
+      "id": "effect.wipe",
+      "asset": "effects/glass_wipe_overlay.svg",
+      "fromFrames": [
+        12,
+        13,
+        14
+      ],
+      "role": "separate foreground occlusion/wipe",
+      "animatable": [
+        "position",
+        "opacity",
+        "mask"
+      ],
+      "suggestedDepth": 1.0
+    },
+    {
+      "id": "effect.haze",
+      "asset": "effects/light_haze_overlay.svg",
+      "fromFrames": [
+        1,
+        4,
+        27
+      ],
+      "role": "separate ambient overlay; use very low opacity",
+      "animatable": [
+        "position",
+        "opacity",
+        "blur"
+      ],
+      "suggestedDepth": 0.2
+    }
+  ],
+  "motion_rule": "Animate layers in the template, not inside plate pixels. Camera movement and individual object movement must be separate tracks. Keep at least one stable anchor during each reveal and stop motion for evidence readability.",
+  "video_required": [
+    {
+      "shot": "hand_pickup_04_7_to_08_0",
+      "reason": "Natural grip, finger contact, cup lift, and occlusion need continuous motion; a still cutout would likely look artificial.",
+      "promptFile": "docs/gemini_video_prompts.md"
+    }
+  ]
+}
