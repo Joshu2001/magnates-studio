@@ -2,6 +2,13 @@
 
 A 28-state continuation to the existing 0–30 second gallery template. This is a storyboard and motion specification, not a finished animation and not a pack of production evidence assets.
 
+## The actual storyboard
+
+- [`STORYBOARD.md`](STORYBOARD.md): complete 28-frame sequence, voiceover, visual grammar, motion entry/hold/exit, transition, asset plan, and accuracy gate.
+- [`storyboard.svg`](storyboard.svg): scalable 28-panel contact sheet.
+- A high-resolution PNG contact sheet is also provided as a direct download in this handoff. The repository’s canonical preview is the scalable SVG.
+- [`timeline.json`](timeline.json): exact 720-frame timing and source links.
+
 ## Preview in Magnates Studio
 
 Open the **Luckin Coffee · The Fraud Unravels (30–60s)** card in the Business Storytelling template gallery. The preview is embedded in the Studio flow and lets you scrub the 28 frames, read the voiceover draft, inspect motion choreography, and see what assets will be needed in the next production pass.

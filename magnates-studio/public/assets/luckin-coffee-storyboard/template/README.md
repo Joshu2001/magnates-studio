@@ -20,3 +20,6 @@ The standalone rendered MP4 is an animatic without narration or licensed music. 
 ## Next 30 seconds: storyboard only
 
 The continuation for 00:30–01:00 is available as **The Fraud Unravels** in the Studio template gallery. Its embedded storyboard preview contains 28 timed states and per-frame animation choreography, voiceover, accuracy notes, and future asset needs. It is deliberately not animated yet; production assets will be created individually in the next pass. See [`part2/README.md`](part2/README.md) and [`part2/timeline.json`](part2/timeline.json).
+
+
+The 30–60 second continuation now has a dedicated visual board: [`part2/STORYBOARD.md`](part2/STORYBOARD.md) and the [28-frame SVG contact sheet](part2/storyboard.svg). Its production assets and final animation remain a later step.
