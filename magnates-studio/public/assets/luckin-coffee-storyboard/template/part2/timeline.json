@@ -1,0 +1,711 @@
+{
+  "title": "Luckin Coffee — The Fraud Unravels",
+  "segment": {
+    "fromSeconds": 30,
+    "toSeconds": 60,
+    "label": "Part 2 · Evidence, response, and delisting"
+  },
+  "durationFrames": 720,
+  "fps": 24,
+  "width": 1280,
+  "height": 720,
+  "timebase": "Integer timeline frames, 24 fps; segment timecode starts at 00:00:30:00 in the full film; local frame 0 equals full-film frame 720.",
+  "status": "Storyboard and motion plan only. Do not treat this file as a completed animation or a sourced documentary edit.",
+  "voiceoverDraft": "To understand what survived, first understand the SEC’s allegations. The SEC alleged that Luckin fabricated more than RMB 2.12 billion in retail sales from April 2019 through January 2020. Its complaint described three purchasing schemes involving related parties. It also said employees inflated expenses by more than $190 million, created a fake operations database, and altered accounting and bank records. The matter surfaced during the annual external audit. Luckin reported it and began an internal investigation. It later agreed to a $180 million SEC penalty without admitting or denying the charges. Nasdaq delisted the shares in July 2020. The ticker vanished. What happened to the coffee business?",
+  "sourceNotes": [
+    {
+      "id": "sec-complaint",
+      "title": "SEC complaint against Luckin Coffee, Inc.",
+      "url": "https://www.sec.gov/files/litigation/complaints/2020/comp-pr2020-319.pdf",
+      "supports": "SEC allegations on fabricated sales, period, purchasing schemes, related parties, record alteration, audit discovery, and response."
+    },
+    {
+      "id": "sec-release",
+      "title": "SEC press release, Dec. 16, 2020",
+      "url": "https://www.sec.gov/newsroom/press-releases/2020-319",
+      "supports": "$180 million penalty; more than $190 million in expenses; audit discovery, internal investigation, personnel, and no admission or denial."
+    }
+  ],
+  "researchGaps": [
+    "The exact date and terms of the company’s public disclosure require a primary company filing citation before final narration.",
+    "The exact delisting date should be shown only after verifying the Nasdaq notice or an SEC/company filing; current narration uses July 2020 at month precision.",
+    "The next segment must source the operating business after delisting; this segment poses the question but does not claim recovery metrics."
+  ],
+  "accuracyRules": [
+    "Attribute the fraud mechanics to the SEC complaint; use allegation wording, not an unsourced narration voice that states allegations as adjudicated findings.",
+    "All diagrams and record-like surfaces are illustrative; never fabricate receipt text, order IDs, account records, auditor marks, or company documents.",
+    "Settlement wording must preserve the SEC statement that Luckin agreed without admitting or denying the charges.",
+    "A delisting is not a business closure; do not imply that operations ended or recovered without separate sourcing."
+  ],
+  "tracks": [
+    {
+      "id": "plate.desk",
+      "type": "image",
+      "src": "../../plates/evidence_desk_plate.webp",
+      "role": "illustrative desk plate, not a real investigative scene",
+      "depth": 0.1
+    },
+    {
+      "id": "plate.cafe",
+      "type": "image",
+      "src": "../../plates/cafe_counter_plate.webp",
+      "role": "illustrative cafe plate for the closing pivot",
+      "depth": 0.1
+    },
+    {
+      "id": "data.amounts",
+      "type": "editable-text",
+      "role": "SEC-attributed amounts; no unsourced data visualization",
+      "depth": 0.5
+    },
+    {
+      "id": "schematic.records",
+      "type": "vector",
+      "role": "abstract records and related-party diagrams, visibly illustrative",
+      "depth": 0.6
+    },
+    {
+      "id": "source.attribution",
+      "type": "editable-text",
+      "role": "SEC complaint, SEC release, and legal qualifier labels",
+      "depth": 0.8
+    },
+    {
+      "id": "market.ticker",
+      "type": "editable-text",
+      "role": "delisting status card; no invented prices",
+      "depth": 0.7
+    },
+    {
+      "id": "cup.anchor",
+      "type": "image",
+      "src": "../../cutouts/blank_blue_sleeve_cup.webp",
+      "role": "existing illustrative product cutout",
+      "depth": 0.85
+    },
+    {
+      "id": "editorial.type",
+      "type": "editable-text",
+      "role": "frame title, narration cue, and chapter question",
+      "depth": 1
+    }
+  ],
+  "frames": [
+    {
+      "n": 1,
+      "startFrame": 0,
+      "endFrameExclusive": 18,
+      "startSeconds": 0.0,
+      "endSeconds": 0.75,
+      "timecode": "00:00:00:00",
+      "durationFrames": 18,
+      "label": "The surviving question",
+      "visual": "What survived?",
+      "narration": "The cup from the previous segment hangs in near-black; the question stays visible as the lens turns toward a paper trail.",
+      "sceneType": "question",
+      "voiceover": "To understand what survived,",
+      "motion": {
+        "enter": "Warm cup rim dissolves into a cold evidence-desk edge; no new prop appears before the cut.",
+        "hold": "Hold the question for a breath, then pull focus to the desk grain.",
+        "exit": "Camera eases back 2% and settles; question opacity falls only after desk texture resolves.",
+        "transition": "Match-cut from the previous segment’s cup; hold the open loop."
+      },
+      "assetNeeds": "Existing cafe/evidence-desk plates; title only.",
+      "accuracyGuardrail": "No factual claim; transition is editorial."
+    },
+    {
+      "n": 2,
+      "startFrame": 18,
+      "endFrameExclusive": 40,
+      "startSeconds": 0.75,
+      "endSeconds": 1.667,
+      "timecode": "00:00:00:18",
+      "durationFrames": 22,
+      "label": "The allegation frame",
+      "visual": "What the SEC alleged",
+      "narration": "A restrained SEC case-file motif appears as a clearly labeled editorial card, never as a reproduction of an official filing.",
+      "sceneType": "source",
+      "voiceover": "first understand what the SEC alleged.",
+      "motion": {
+        "enter": "A thin cyan rule draws left to right; a plain label resolves beneath it.",
+        "hold": "Card holds without parallax so the attribution is readable.",
+        "exit": "Card slides down a few pixels and fades; background remains fixed.",
+        "transition": "Cut from the question into a source-led title."
+      },
+      "assetNeeds": "Editorial SEC attribution card; later replace with a sourced filing crop if desired.",
+      "accuracyGuardrail": "Label the card as an editorial summary; use the official SEC complaint for exact wording."
+    },
+    {
+      "n": 3,
+      "startFrame": 40,
+      "endFrameExclusive": 62,
+      "startSeconds": 1.667,
+      "endSeconds": 2.583,
+      "timecode": "00:00:01:16",
+      "durationFrames": 22,
+      "label": "Time window begins",
+      "visual": "April 2019",
+      "narration": "A horizontal time rail starts at April 2019, with the first month illuminated and the endpoint still dark.",
+      "sceneType": "timeline",
+      "voiceover": "From April 2019",
+      "motion": {
+        "enter": "Timeline rule grows from a single point; month label enters on a separate type layer.",
+        "hold": "Small, deliberate pulse at the date marker; no decorative ticking.",
+        "exit": "Marker glow reduces to a steady pin as the next date appears.",
+        "transition": "A measured timeline reveal starts the factual chronology."
+      },
+      "assetNeeds": "Editable date typography and a timeline line; no new photographic asset.",
+      "accuracyGuardrail": "Date range is stated in the SEC complaint."
+    },
+    {
+      "n": 4,
+      "startFrame": 62,
+      "endFrameExclusive": 86,
+      "startSeconds": 2.583,
+      "endSeconds": 3.583,
+      "timecode": "00:00:02:14",
+      "durationFrames": 24,
+      "label": "Sales figure resolves",
+      "visual": "RMB 2.12 billion",
+      "narration": "The figure is built in two typographic layers: currency/unit first, magnitude second; negative space prevents it reading as a stock-price graphic.",
+      "sceneType": "amount",
+      "voiceover": "The SEC alleged that Luckin fabricated more than 2.12 billion renminbi in retail sales.",
+      "motion": {
+        "enter": "Unit appears first, then digits resolve in grouped blocks; the attribution stays on screen.",
+        "hold": "Brief 12-frame hold after full amount resolves; no flashing or odometer effect.",
+        "exit": "Digits settle downward into a ledger-like baseline.",
+        "transition": "Amount resolves after the sales window is established."
+      },
+      "assetNeeds": "Large editable amount, unit, SEC-allegation caption.",
+      "accuracyGuardrail": "SEC complaint alleges more than RMB 2.12 billion in fabricated retail sales."
+    },
+    {
+      "n": 5,
+      "startFrame": 86,
+      "endFrameExclusive": 112,
+      "startSeconds": 3.583,
+      "endSeconds": 4.667,
+      "timecode": "00:00:03:14",
+      "durationFrames": 26,
+      "label": "Sales label clarifies",
+      "visual": "Fabricated retail sales",
+      "narration": "A stack of neutral transaction tiles is explicitly labeled as an illustrative diagram, not a literal transaction record.",
+      "sceneType": "transactions",
+      "voiceover": "in fabricated retail sales",
+      "motion": {
+        "enter": "Tiles enter as a controlled 3×2 stack; no shop names, order IDs, or fake receipt details.",
+        "hold": "One clean read hold; retain the word “alleged” in the source context.",
+        "exit": "Tile stack compresses into a line that carries into the time window.",
+        "transition": "Graphics are schematic; no invented primary evidence."
+      },
+      "assetNeeds": "Abstract transaction tiles; on-screen illustrative label.",
+      "accuracyGuardrail": "The SEC complaint is the source; this stack is not a reconstruction of actual entries."
+    },
+    {
+      "n": 6,
+      "startFrame": 112,
+      "endFrameExclusive": 140,
+      "startSeconds": 4.667,
+      "endSeconds": 5.833,
+      "timecode": "00:00:04:16",
+      "durationFrames": 28,
+      "label": "Time window closes",
+      "visual": "January 2020",
+      "narration": "The rail reaches January 2020 and brackets the alleged period without implying the exact dates of individual transactions.",
+      "sceneType": "timeline",
+      "voiceover": "from April 2019 through January 2020.",
+      "motion": {
+        "enter": "Endpoint marker draws in; the bracket closes gently around the period.",
+        "hold": "Date labels stay static and legible.",
+        "exit": "Bracket dims as the composition shifts to mechanism.",
+        "transition": "Complete the SEC complaint’s alleged date range."
+      },
+      "assetNeeds": "Editable date labels and timeline rule.",
+      "accuracyGuardrail": "Use the complaint’s period wording; do not imply day-level precision."
+    },
+    {
+      "n": 7,
+      "startFrame": 140,
+      "endFrameExclusive": 166,
+      "startSeconds": 5.833,
+      "endSeconds": 6.917,
+      "timecode": "00:00:05:20",
+      "durationFrames": 26,
+      "label": "Three mechanisms",
+      "visual": "Three purchasing schemes",
+      "narration": "Three unbranded lanes form a clean graphic system, each empty until its related-party connection is shown.",
+      "sceneType": "schemes",
+      "voiceover": "The SEC described three purchasing schemes",
+      "motion": {
+        "enter": "Three lanes assemble sequentially with consistent spacing.",
+        "hold": "Each lane holds briefly; no made-up company names or transaction amounts.",
+        "exit": "The lanes converge toward a single neutral ledger panel.",
+        "transition": "A three-part visual explains the complaint’s structure."
+      },
+      "assetNeeds": "Three abstract paths, editable vector lines and labels.",
+      "accuracyGuardrail": "The SEC complaint describes three separate purchasing schemes."
+    },
+    {
+      "n": 8,
+      "startFrame": 166,
+      "endFrameExclusive": 190,
+      "startSeconds": 6.917,
+      "endSeconds": 7.917,
+      "timecode": "00:00:06:22",
+      "durationFrames": 24,
+      "label": "Related-party links",
+      "visual": "Related parties",
+      "narration": "Dotted connectors enter from outside the company boundary toward the three abstract purchasing lanes.",
+      "sceneType": "related_parties",
+      "voiceover": "involving related parties,",
+      "motion": {
+        "enter": "Connectors draw outward-to-inward; the diagram labels itself “SEC complaint summary.”",
+        "hold": "One restrained connector pulse travels once, then stops.",
+        "exit": "External nodes fade first; the receiving ledger remains.",
+        "transition": "Show relationship and direction, not a fabricated corporate org chart."
+      },
+      "assetNeeds": "Generic node-and-link diagram, editable labels.",
+      "accuracyGuardrail": "Exact scheme details must be sourced to the complaint; avoid invented entities."
+    },
+    {
+      "n": 9,
+      "startFrame": 190,
+      "endFrameExclusive": 214,
+      "startSeconds": 7.917,
+      "endSeconds": 8.917,
+      "timecode": "00:00:07:22",
+      "durationFrames": 24,
+      "label": "Transactions enter records",
+      "visual": "Sales entered into records",
+      "narration": "The abstract transaction tiles feed into a company-records plane; the surface remains blank except for generic rules.",
+      "sceneType": "records",
+      "voiceover": "and sales were entered into company records.",
+      "motion": {
+        "enter": "Tiles move on one straight path into the records plane; no floating piles.",
+        "hold": "Camera stays orthographic for easy reading.",
+        "exit": "The records plane turns slightly edge-on, motivating the next concealment layer.",
+        "transition": "Tiles land inside the records plane, then the plane turns edge-on."
+      },
+      "assetNeeds": "Abstract ledger plane; generic lines only.",
+      "accuracyGuardrail": "Do not show fabricated order IDs, dates, receipts, or original records."
+    },
+    {
+      "n": 10,
+      "startFrame": 214,
+      "endFrameExclusive": 238,
+      "startSeconds": 8.917,
+      "endSeconds": 9.917,
+      "timecode": "00:00:08:22",
+      "durationFrames": 24,
+      "label": "Concealment claim",
+      "visual": "More than $190 million",
+      "narration": "A second amount appears below the first in a separate panel, with “SEC alleged” attached to the whole claim rather than hidden in a footnote.",
+      "sceneType": "expenses",
+      "voiceover": "The SEC also said employees inflated expenses by more than 190 million dollars.",
+      "motion": {
+        "enter": "Amount rises a short distance and locks; no equation is shown.",
+        "hold": "Hold the attribution and unit together for readability.",
+        "exit": "Second panel slides back to reveal the accounting surface beneath.",
+        "transition": "Separate the sales allegation from expense allegation."
+      },
+      "assetNeeds": "Editable amount card; no invoices or named vendors.",
+      "accuracyGuardrail": "SEC press release reports complaint allegation of more than $190 million in overstated expenses."
+    },
+    {
+      "n": 11,
+      "startFrame": 238,
+      "endFrameExclusive": 262,
+      "startSeconds": 9.917,
+      "endSeconds": 10.917,
+      "timecode": "00:00:09:22",
+      "durationFrames": 24,
+      "label": "Expense layer",
+      "visual": "Expenses inflated",
+      "narration": "A muted expense column grows behind the sales ledger, visually signaling concealment without suggesting a precise reconciliation.",
+      "sceneType": "expenses",
+      "voiceover": "The SEC also said employees inflated expenses by more than 190 million dollars.",
+      "motion": {
+        "enter": "Bars grow to qualitative heights; scale is explicitly marked “illustrative, not to scale.”",
+        "hold": "No animated count-up and no axis with implied magnitude.",
+        "exit": "Column dims as a document-like layer enters.",
+        "transition": "Create a second layer rather than merging claims into one number."
+      },
+      "assetNeeds": "Abstract non-data columns; editable label.",
+      "accuracyGuardrail": "Do not infer a mathematical offset between fabricated sales and expenses."
+    },
+    {
+      "n": 12,
+      "startFrame": 262,
+      "endFrameExclusive": 288,
+      "startSeconds": 10.917,
+      "endSeconds": 12.0,
+      "timecode": "00:00:10:22",
+      "durationFrames": 26,
+      "label": "Records altered",
+      "visual": "Accounting records",
+      "narration": "A transparent overlay shifts one generic row out of alignment, then marks the surface as an editorial illustration.",
+      "sceneType": "records",
+      "voiceover": "and altered records to conceal the sales.",
+      "motion": {
+        "enter": "Overlay drifts 8px laterally; a non-flashing outline marks the changed region.",
+        "hold": "The base record stays fixed while only the overlay moves.",
+        "exit": "Outline closes, then the record plane rotates toward the audit beat.",
+        "transition": "Layered planes make alteration legible without inventing document content."
+      },
+      "assetNeeds": "Generic record surface, separate overlay, annotation line.",
+      "accuracyGuardrail": "SEC complaint alleges altered accounting and bank records; show no fake excerpts."
+    },
+    {
+      "n": 13,
+      "startFrame": 288,
+      "endFrameExclusive": 314,
+      "startSeconds": 12.0,
+      "endSeconds": 13.083,
+      "timecode": "00:00:12:00",
+      "durationFrames": 26,
+      "label": "Fake operations database",
+      "visual": "Operations database",
+      "narration": "A second schematic screen layer slides behind the records, clearly labeled as an SEC-alleged fake operations database.",
+      "sceneType": "database",
+      "voiceover": "It said employees created a fake operations database.",
+      "motion": {
+        "enter": "A blank grid panel assembles behind the record layer; no interface text or data rows are invented.",
+        "hold": "Hold the label and attribution together; keep the panel visibly schematic.",
+        "exit": "Grid lines drift out of alignment, then freeze.",
+        "transition": "Expose concealment as another alleged mechanism without reconstructing an internal system."
+      },
+      "assetNeeds": "Generic database grid and an attribution label.",
+      "accuracyGuardrail": "SEC press release describes a fake operations database; do not imply this is the actual system."
+    },
+    {
+      "n": 14,
+      "startFrame": 314,
+      "endFrameExclusive": 342,
+      "startSeconds": 13.083,
+      "endSeconds": 14.25,
+      "timecode": "00:00:13:02",
+      "durationFrames": 28,
+      "label": "Bank record alteration",
+      "visual": "Accounting and bank records",
+      "narration": "Two translucent record planes shift by a few pixels, but no values or institutions are shown.",
+      "sceneType": "bankrecords",
+      "voiceover": "The complaint also alleged altered accounting and bank records.",
+      "motion": {
+        "enter": "Front plane slides 7px; back plane remains locked; one thin outline indicates an editorial annotation.",
+        "hold": "Keep each plane legible and distinct; no numeric reconciliation.",
+        "exit": "Both planes flatten into one page that motivates the accuracy note.",
+        "transition": "Show the allegation at a structural level, without fake record contents."
+      },
+      "assetNeeds": "Two abstract paper planes; no text except the labels.",
+      "accuracyGuardrail": "SEC complaint alleges altered accounting and bank records."
+    },
+    {
+      "n": 15,
+      "startFrame": 342,
+      "endFrameExclusive": 368,
+      "startSeconds": 14.25,
+      "endSeconds": 15.333,
+      "timecode": "00:00:14:06",
+      "durationFrames": 26,
+      "label": "Allegation boundary",
+      "visual": "Allegations, not a filing facsimile",
+      "narration": "The evidence montage pauses. A clean source label occupies the upper left while all abstract records remain visibly schematic.",
+      "sceneType": "caveat",
+      "voiceover": "These are allegations in the SEC complaint,",
+      "motion": {
+        "enter": "Source label draws in; “ILLUSTRATIVE DIAGRAM” remains visible.",
+        "hold": "Static hold long enough for clear legal attribution.",
+        "exit": "Source label carries into the audit timeline.",
+        "transition": "A brief accuracy pause protects the viewer from reading props as evidence."
+      },
+      "assetNeeds": "Typography only over schematic records.",
+      "accuracyGuardrail": "SEC press release says the complaint alleges; settlement was without admitting or denying."
+    },
+    {
+      "n": 16,
+      "startFrame": 368,
+      "endFrameExclusive": 394,
+      "startSeconds": 15.333,
+      "endSeconds": 16.417,
+      "timecode": "00:00:15:08",
+      "durationFrames": 26,
+      "label": "Audit begins",
+      "visual": "Annual external audit",
+      "narration": "An audit folder edge slides in from frame left, with no invented auditor identity, stamp, or signature.",
+      "sceneType": "audit",
+      "voiceover": "The matter surfaced during Luckin’s annual external audit.",
+      "motion": {
+        "enter": "Folder enters by 140px and stops with a soft ease; paper texture remains generic.",
+        "hold": "Camera locks; source label remains on screen.",
+        "exit": "A narrow light pass tracks along the folder edge into the review cue.",
+        "transition": "A physical paper entrance motivates the discovery beat."
+      },
+      "assetNeeds": "Generic folder plate/cutout; no fabricated audit report.",
+      "accuracyGuardrail": "SEC says misconduct was discovered in the course of annual external audit."
+    },
+    {
+      "n": 17,
+      "startFrame": 394,
+      "endFrameExclusive": 420,
+      "startSeconds": 16.417,
+      "endSeconds": 17.5,
+      "timecode": "00:00:16:10",
+      "durationFrames": 26,
+      "label": "Review cue",
+      "visual": "Audit flags a discrepancy",
+      "narration": "A thin review marker lands on the abstract ledger. It does not claim to show the exact detection procedure.",
+      "sceneType": "audit",
+      "voiceover": "(visual beat: discrepancy found)",
+      "motion": {
+        "enter": "A simple outline traces once around an unlabeled region; use no siren red.",
+        "hold": "Two-second equivalent editorial hold in the final edit; keep the motion restrained.",
+        "exit": "Marker lifts off; the record stays in frame for disclosure.",
+        "transition": "The source establishes discovery during audit, not specific audit tests."
+      },
+      "assetNeeds": "Highlight outline and generic ledger only.",
+      "accuracyGuardrail": "Do not imply a particular audit procedure absent sourcing."
+    },
+    {
+      "n": 18,
+      "startFrame": 420,
+      "endFrameExclusive": 446,
+      "startSeconds": 17.5,
+      "endSeconds": 18.583,
+      "timecode": "00:00:17:12",
+      "durationFrames": 26,
+      "label": "Disclosure",
+      "visual": "Matter reported",
+      "narration": "The paper plane opens into a neutral disclosure card with a clear company-to-regulator directional line.",
+      "sceneType": "disclosure",
+      "voiceover": "Luckin reported the matter,",
+      "motion": {
+        "enter": "Card appears in two stages: “reported” then “SEC”; no fabricated press-release screenshot.",
+        "hold": "Hold a beat on the act of disclosure, not a dramatic alarm.",
+        "exit": "Card folds down into the internal-review plane.",
+        "transition": "Source-led transition from discovery to response."
+      },
+      "assetNeeds": "Editorial disclosure card; source text can be replaced with official filing later.",
+      "accuracyGuardrail": "SEC says Luckin reported the matter to SEC staff and cooperated."
+    },
+    {
+      "n": 19,
+      "startFrame": 446,
+      "endFrameExclusive": 472,
+      "startSeconds": 18.583,
+      "endSeconds": 19.667,
+      "timecode": "00:00:18:14",
+      "durationFrames": 26,
+      "label": "Internal investigation",
+      "visual": "Company investigation",
+      "narration": "A ring of neutral review nodes encloses the record plane, while the outside composition quiets.",
+      "sceneType": "investigation",
+      "voiceover": "and began an internal investigation.",
+      "motion": {
+        "enter": "Nodes appear one at a time around the central file; center remains readable.",
+        "hold": "The ring completes, then pauses; no investigator silhouettes.",
+        "exit": "Nodes reduce to two endpoints that carry the consequence forward.",
+        "transition": "Abstract process graphic signals an internal review."
+      },
+      "assetNeeds": "Generic node ring, central file card.",
+      "accuracyGuardrail": "SEC states that Luckin initiated an internal investigation."
+    },
+    {
+      "n": 20,
+      "startFrame": 472,
+      "endFrameExclusive": 500,
+      "startSeconds": 19.667,
+      "endSeconds": 20.833,
+      "timecode": "00:00:19:16",
+      "durationFrames": 28,
+      "label": "Personnel consequences",
+      "visual": "Personnel removed",
+      "narration": "Two role labels dim and leave the page; do not create portraits or imply specific individuals unless verified in a sourced chapter.",
+      "sceneType": "personnel",
+      "voiceover": "The SEC said certain personnel were terminated.",
+      "motion": {
+        "enter": "Role cards slide down and disappear; no faces and no name cards.",
+        "hold": "The exact scope remains the phrase “certain personnel.”",
+        "exit": "Cards clear the stage before the settlement amount.",
+        "transition": "Keep consequences specific to source wording."
+      },
+      "assetNeeds": "Typography cards only.",
+      "accuracyGuardrail": "SEC press release says Luckin terminated certain personnel."
+    },
+    {
+      "n": 21,
+      "startFrame": 500,
+      "endFrameExclusive": 530,
+      "startSeconds": 20.833,
+      "endSeconds": 22.083,
+      "timecode": "00:00:20:20",
+      "durationFrames": 30,
+      "label": "Settlement terms",
+      "visual": "$180 million SEC penalty",
+      "narration": "A settlement card resolves with amount, agency, and date context; a separate disclaimer states no admission or denial.",
+      "sceneType": "settlement",
+      "voiceover": "Luckin later agreed to a 180 million dollar SEC penalty,",
+      "motion": {
+        "enter": "Amount and agency appear together; disclaimer is a distinct, legible layer.",
+        "hold": "Hold amount and legal qualification together, not sequentially.",
+        "exit": "Card eases down and narrows into a ticker strip.",
+        "transition": "Avoid presenting settlement as a criminal conviction."
+      },
+      "assetNeeds": "Editorial settlement card; no reproduced legal document.",
+      "accuracyGuardrail": "SEC press release dated December 16, 2020; settlement without admitting or denying."
+    },
+    {
+      "n": 22,
+      "startFrame": 530,
+      "endFrameExclusive": 558,
+      "startSeconds": 22.083,
+      "endSeconds": 23.25,
+      "timecode": "00:00:22:02",
+      "durationFrames": 28,
+      "label": "Settlement qualification",
+      "visual": "Without admitting or denying",
+      "narration": "The legal qualification takes the full width for a deliberate read, then collapses to a lower-third source note.",
+      "sceneType": "settlement",
+      "voiceover": "without admitting or denying the charges.",
+      "motion": {
+        "enter": "Text reveals as one complete phrase; no word-by-word suspense.",
+        "hold": "At least 24 frames of clean hold at 24 fps.",
+        "exit": "Source note persists as the market card enters.",
+        "transition": "A pacing breath that prevents a misleading simplification."
+      },
+      "assetNeeds": "Editable legal qualifier and source note.",
+      "accuracyGuardrail": "Use SEC’s precise formulation; do not paraphrase as guilt admission."
+    },
+    {
+      "n": 23,
+      "startFrame": 558,
+      "endFrameExclusive": 584,
+      "startSeconds": 23.25,
+      "endSeconds": 24.333,
+      "timecode": "00:00:23:06",
+      "durationFrames": 26,
+      "label": "Market consequence",
+      "visual": "Nasdaq delisting",
+      "narration": "An abstract ticker strip loses its listing tag; no stock-price crash graph or invented day-by-day prices.",
+      "sceneType": "delisting",
+      "voiceover": "Nasdaq delisted the shares in July 2020.",
+      "motion": {
+        "enter": "Listing tag slides away; ticker typography remains momentarily.",
+        "hold": "One directional move, then a quiet hold.",
+        "exit": "Ticker compresses to a single line that fades at the next cut.",
+        "transition": "Show delisting as a status change, not a market chart."
+      },
+      "assetNeeds": "Editable ticker/status card; no numerical price series.",
+      "accuracyGuardrail": "SEC says shares traded until July 13, 2020; date can be sourced in the final graphics."
+    },
+    {
+      "n": 24,
+      "startFrame": 584,
+      "endFrameExclusive": 610,
+      "startSeconds": 24.333,
+      "endSeconds": 25.417,
+      "timecode": "00:00:24:08",
+      "durationFrames": 26,
+      "label": "Ticker disappears",
+      "visual": "Public-market identity ends",
+      "narration": "Ticker letters fade while the underlying dark plane remains, creating a short visual void before the warmer cafe return.",
+      "sceneType": "void",
+      "voiceover": "The ticker vanished.",
+      "motion": {
+        "enter": "Typography reduces in opacity and scale; do not shatter or burn it.",
+        "hold": "A half-second silent visual pause gives the transition room.",
+        "exit": "Black lifts into cafe warmth at the edge of frame.",
+        "transition": "End the public-market consequence without claiming the company ceased to exist."
+      },
+      "assetNeeds": "Typography only; existing cafe plate for the next transition.",
+      "accuracyGuardrail": "Distinguish delisting from business closure."
+    },
+    {
+      "n": 25,
+      "startFrame": 610,
+      "endFrameExclusive": 636,
+      "startSeconds": 25.417,
+      "endSeconds": 26.5,
+      "timecode": "00:00:25:10",
+      "durationFrames": 26,
+      "label": "Return to coffee",
+      "visual": "The cafe remains",
+      "narration": "A warm counter plane returns under the empty ticker area; product and service become the next question.",
+      "sceneType": "cafe",
+      "voiceover": "(visual beat: the operating business remains the subject)",
+      "motion": {
+        "enter": "Warm practical light lifts from the rear plane; cup silhouette enters only after the counter resolves.",
+        "hold": "Hold a stable composition; no celebratory comeback imagery.",
+        "exit": "Camera starts a slow push toward the cup.",
+        "transition": "A tonal pivot from capital markets to physical operations."
+      },
+      "assetNeeds": "Existing cafe plate and cup cutout; no new production asset yet.",
+      "accuracyGuardrail": "Do not imply scale, store count, or post-scandal performance without sourcing."
+    },
+    {
+      "n": 26,
+      "startFrame": 636,
+      "endFrameExclusive": 662,
+      "startSeconds": 26.5,
+      "endSeconds": 27.583,
+      "timecode": "00:00:26:12",
+      "durationFrames": 26,
+      "label": "Ticker to cup match",
+      "visual": "From ticker to cup",
+      "narration": "A narrow ticker line match-cuts into the rim of a coffee cup; one world gives way to the other.",
+      "sceneType": "matchcut",
+      "voiceover": "(no new narration)",
+      "motion": {
+        "enter": "Horizontal line aligns to cup rim; use a controlled 10-frame cross-dissolve.",
+        "hold": "Depth changes from flat graphic to shallow product plane.",
+        "exit": "Cup remains still while background shifts into focus.",
+        "transition": "One motivated transition; no extra montage."
+      },
+      "assetNeeds": "Existing cup cutout and cafe plate; later replace with approved product asset.",
+      "accuracyGuardrail": "Symbolic match cut, not a claim about company recovery."
+    },
+    {
+      "n": 27,
+      "startFrame": 662,
+      "endFrameExclusive": 690,
+      "startSeconds": 27.583,
+      "endSeconds": 28.75,
+      "timecode": "00:00:27:14",
+      "durationFrames": 28,
+      "label": "Business question",
+      "visual": "The coffee business",
+      "narration": "The cup stays in foreground while the unlisted ticker remains as a faint, separate rear layer.",
+      "sceneType": "business",
+      "voiceover": "What happened to the coffee business?",
+      "motion": {
+        "enter": "Question enters from lower left after the cup is locked; rear ticker is nearly invisible.",
+        "hold": "Hold the question cleanly; avoid a success slogan.",
+        "exit": "A slow 2% push carries toward the next segment.",
+        "transition": "Make the operational question distinct from shareholder recovery."
+      },
+      "assetNeeds": "Editable question type, cup, cafe background.",
+      "accuracyGuardrail": "Next segment requires sourced evidence on operations after delisting."
+    },
+    {
+      "n": 28,
+      "startFrame": 690,
+      "endFrameExclusive": 720,
+      "startSeconds": 28.75,
+      "endSeconds": 30.0,
+      "timecode": "00:00:28:18",
+      "durationFrames": 30,
+      "label": "Next chapter bridge",
+      "visual": "How did it rebuild?",
+      "narration": "The final card leaves room for the next 30-second section; no answer is prematurely supplied.",
+      "sceneType": "bridge",
+      "voiceover": "The next segment answers that question from sourced operating evidence.",
+      "motion": {
+        "enter": "Small chapter label appears first; central question follows a beat later.",
+        "hold": "End on a 24-frame readable hold with gentle practical-light movement only.",
+        "exit": "Fade to black on the last 8 frames; retain a clean cut point.",
+        "transition": "End with an editorial question, not a resolved comeback claim."
+      },
+      "assetNeeds": "Chapter title and one coffee/cafe anchor; later assets to be requested individually.",
+      "accuracyGuardrail": "Build the next segment from sourced post-scandal operations and financial records."
+    }
+  ]
+}

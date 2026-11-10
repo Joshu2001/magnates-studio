@@ -46,6 +46,9 @@
  const luckinId='luckin-coffee-investigation-intro';
  const luckinTemplate={id:luckinId,title:'Luckin Coffee · Investigation Intro (30s)',category:'Business Storytelling',origCategory:'Business Storytelling',libraryKind:'scene',previewOnly:true,badge:'28-STATE ANIMATIC',difficulty:'Preview',timeToApply:'30 sec',previewGradient:'linear-gradient(135deg,#0d1d2a,#07090d)',description:'Evidence-led cinematic opening with staged map, app, cup-pickup, investigation, and paper reveals. Open the interactive 24 fps preview to scrub all 28 storyboard states and inspect layer groups.',tags:['Luckin Coffee','Documentary','Investigation','28 Frames','Layered Motion'],defaultImage:'/assets/luckin-coffee-storyboard/template/card-preview.jpg'};
  if(!meta().some(t=>t.id===luckinId))meta().push(luckinTemplate);
+ const luckinPart2Id='luckin-coffee-fraud-unravels';
+ const luckinPart2={id:luckinPart2Id,title:'Luckin Coffee · The Fraud Unravels (30–60s)',category:'Business Storytelling',origCategory:'Business Storytelling',libraryKind:'scene',previewOnly:true,badge:'28-FRAME STORYBOARD',difficulty:'Storyboard',timeToApply:'30 sec',previewGradient:'linear-gradient(135deg,#14232d,#080b10)',description:'The next 30 seconds: SEC-attributed allegations, the audit discovery, company response, settlement, and delisting. Scrub 28 storyboard frames and inspect the planned motion and later asset needs.',tags:['Luckin Coffee','Documentary','Storyboard','28 Frames','Motion Plan'],defaultImage:'/assets/luckin-coffee-storyboard/template/card-preview.jpg'};
+ if(!meta().some(t=>t.id===luckinPart2Id))meta().push(luckinPart2);
  const previewDialog=document.createElement('dialog');previewDialog.id='modal-luckin-template-preview';previewDialog.setAttribute('aria-label','Luckin Coffee investigation intro template preview');previewDialog.style.cssText='width:min(96vw,1540px);height:min(94vh,980px);max-width:none;max-height:none;padding:0;border:1px solid rgba(121,215,239,.3);border-radius:14px;background:#080b10;color:#eef5f9;box-shadow:0 28px 100px rgba(0,0,0,.75);overflow:hidden';
  previewDialog.innerHTML='<div style="height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;background:#101722;border-bottom:1px solid #283445;font:600 13px Inter,Arial,sans-serif"><span>Luckin Coffee · Investigation Intro · 30-second template preview</span><button type="button" data-luckin-close aria-label="Close Luckin Coffee template preview" style="border:1px solid #34475a;border-radius:7px;background:#1c2937;color:#eef5f9;padding:6px 12px;cursor:pointer">Close</button></div><iframe title="Interactive Luckin Coffee 30-second template preview" data-luckin-frame src="about:blank" style="display:block;width:100%;height:calc(100% - 48px);border:0;background:#080b10"></iframe>';
  document.body.appendChild(previewDialog);
@@ -55,12 +58,15 @@
  previewDialog.addEventListener('click',event=>{if(event.target===previewDialog)closePreview();});
  previewDialog.addEventListener('close',()=>{previewFrame.src='about:blank';});
  const openLuckinPreview=()=>{previewFrame.src='/assets/luckin-coffee-storyboard/template/';previewDialog.showModal();previewDialog.querySelector('[data-luckin-close]').focus();};
+ const part2Dialog=previewDialog.cloneNode(true);part2Dialog.id='modal-luckin-part2-preview';part2Dialog.setAttribute('aria-label','Luckin Coffee Part 2 storyboard preview');part2Dialog.querySelector('span').textContent='Luckin Coffee · The Fraud Unravels · 30–60-second storyboard';part2Dialog.querySelector('iframe').title='Interactive Luckin Coffee next 30 seconds storyboard';document.body.appendChild(part2Dialog);
+ const part2Frame=part2Dialog.querySelector('[data-luckin-frame]');part2Dialog.querySelector('[data-luckin-close]').addEventListener('click',()=>part2Dialog.close());part2Dialog.addEventListener('click',event=>{if(event.target===part2Dialog)part2Dialog.close();});part2Dialog.addEventListener('close',()=>{part2Frame.src='about:blank';});
+ const openLuckinPart2Preview=()=>{part2Frame.src='/assets/luckin-coffee-storyboard/template/part2/';part2Dialog.showModal();part2Dialog.querySelector('[data-luckin-close]').focus();};
  const applyTemplate=window.applySelectedHomepageTemplate;
- window.applySelectedHomepageTemplate=function(templateId,...args){if(templateId===luckinId){openLuckinPreview();return;}return applyTemplate?.call(this,templateId,...args);};
+ window.applySelectedHomepageTemplate=function(templateId,...args){if(templateId===luckinId){openLuckinPreview();return;}if(templateId===luckinPart2Id){openLuckinPart2Preview();return;}return applyTemplate?.call(this,templateId,...args);};
  const startHover=window.startTemplateHoverVideo;
- if(startHover)window.startTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId)return;return startHover.call(this,card,tpl,...args);};
+ if(startHover)window.startTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId||tpl?.id===luckinPart2Id)return;return startHover.call(this,card,tpl,...args);};
  const stopHover=window.stopTemplateHoverVideo;
- if(stopHover)window.stopTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId)return;return stopHover.call(this,card,tpl,...args);};
+ if(stopHover)window.stopTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId||tpl?.id===luckinPart2Id)return;return stopHover.call(this,card,tpl,...args);};
  window.renderHomepageTemplates?.();
  // Match homepage rail icons to the editor's thin outline icon language.
  const rail=document.getElementById('main-nav-rail');

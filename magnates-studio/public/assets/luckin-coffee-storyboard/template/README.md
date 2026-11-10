@@ -15,3 +15,8 @@ Serve the MagnatesStudio `public` directory locally, then open `/assets/luckin-c
 
 The standalone rendered MP4 is an animatic without narration or licensed music. It is not a finished factual film: map points are illustrative, chart surfaces contain no data, and the paper/evidence tableau is labeled as a reconstruction. Replace those with sourced material before publishing.
 
+
+
+## Next 30 seconds: storyboard only
+
+The continuation for 00:30–01:00 is available as **The Fraud Unravels** in the Studio template gallery. Its embedded storyboard preview contains 28 timed states and per-frame animation choreography, voiceover, accuracy notes, and future asset needs. It is deliberately not animated yet; production assets will be created individually in the next pass. See [`part2/README.md`](part2/README.md) and [`part2/timeline.json`](part2/timeline.json).
