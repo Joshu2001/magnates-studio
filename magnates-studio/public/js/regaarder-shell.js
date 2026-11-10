@@ -33,7 +33,7 @@
  window.tplGetSnapshot=function(id){return posters[id]?'/assets/template-previews/'+posters[id]+'.jpg':originalSnapshot?.apply(this,arguments);};
  function polishCard(card,tpl){
   const action=card.querySelector('.home-tpl-btn-use');
-  if(action&&!action.dataset.rmCustomize){const button=document.createElement('button');button.type='button';button.className=action.className;button.dataset.rmCustomize='true';button.setAttribute('aria-label','Customize '+(tpl.title||card.querySelector('h4')?.textContent||'template'));button.textContent='Customize';const icon=action.querySelector('svg');if(icon)button.appendChild(icon);action.replaceWith(button);}
+  if(action&&!action.dataset.rmCustomize){const button=document.createElement('button');button.type='button';button.className=action.className;button.dataset.rmCustomize='true';button.setAttribute('aria-label',(tpl.previewOnly?'Preview ':'Customize ')+(tpl.title||card.querySelector('h4')?.textContent||'template'));button.textContent=tpl.previewOnly?'Preview':'Customize';const icon=action.querySelector('svg');if(icon)button.appendChild(icon);action.replaceWith(button);}
   const badge=card.querySelector('.home-tpl-badge');if(badge&&!badge.dataset.rmKind){badge.textContent=({full:'Full video',scene:'Scene',effect:'Effect'})[kind(tpl)];badge.dataset.rmKind='true';}
   const img=card.querySelector('.home-tpl-img'),poster=posters[card.dataset.templateId];if(img&&poster&&!img.dataset.rmPoster){img.src='/assets/template-previews/'+poster+'.jpg';img.dataset.rmPoster='true';}
  }
@@ -43,6 +43,25 @@
  tabs.addEventListener('click',e=>{const button=e.target.closest('[data-library-kind]');if(button){selected=button.dataset.libraryKind;apply();}});
  tabs.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const buttons=[...tabs.children],index=buttons.indexOf(document.activeElement),next=e.key==='Home'?0:e.key==='End'?buttons.length-1:(index+(e.key==='ArrowRight'?1:-1)+buttons.length)%buttons.length;buttons[next].click();buttons[next].focus();});
  new MutationObserver(apply).observe(grid,{childList:true});apply();
+ const luckinId='luckin-coffee-investigation-intro';
+ const luckinTemplate={id:luckinId,title:'Luckin Coffee · Investigation Intro (30s)',category:'Business Storytelling',origCategory:'Business Storytelling',libraryKind:'scene',previewOnly:true,badge:'28-STATE ANIMATIC',difficulty:'Preview',timeToApply:'30 sec',previewGradient:'linear-gradient(135deg,#0d1d2a,#07090d)',description:'Evidence-led cinematic opening with staged map, app, cup-pickup, investigation, and paper reveals. Open the interactive 24 fps preview to scrub all 28 storyboard states and inspect layer groups.',tags:['Luckin Coffee','Documentary','Investigation','28 Frames','Layered Motion'],defaultImage:'/assets/luckin-coffee-storyboard/template/card-preview.jpg'};
+ if(!meta().some(t=>t.id===luckinId))meta().push(luckinTemplate);
+ const previewDialog=document.createElement('dialog');previewDialog.id='modal-luckin-template-preview';previewDialog.setAttribute('aria-label','Luckin Coffee investigation intro template preview');previewDialog.style.cssText='width:min(96vw,1540px);height:min(94vh,980px);max-width:none;max-height:none;padding:0;border:1px solid rgba(121,215,239,.3);border-radius:14px;background:#080b10;color:#eef5f9;box-shadow:0 28px 100px rgba(0,0,0,.75);overflow:hidden';
+ previewDialog.innerHTML='<div style="height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;background:#101722;border-bottom:1px solid #283445;font:600 13px Inter,Arial,sans-serif"><span>Luckin Coffee · Investigation Intro · 30-second template preview</span><button type="button" data-luckin-close aria-label="Close Luckin Coffee template preview" style="border:1px solid #34475a;border-radius:7px;background:#1c2937;color:#eef5f9;padding:6px 12px;cursor:pointer">Close</button></div><iframe title="Interactive Luckin Coffee 30-second template preview" data-luckin-frame src="about:blank" style="display:block;width:100%;height:calc(100% - 48px);border:0;background:#080b10"></iframe>';
+ document.body.appendChild(previewDialog);
+ const previewFrame=previewDialog.querySelector('[data-luckin-frame]');
+ const closePreview=()=>previewDialog.close();
+ previewDialog.querySelector('[data-luckin-close]').addEventListener('click',closePreview);
+ previewDialog.addEventListener('click',event=>{if(event.target===previewDialog)closePreview();});
+ previewDialog.addEventListener('close',()=>{previewFrame.src='about:blank';});
+ const openLuckinPreview=()=>{previewFrame.src='/assets/luckin-coffee-storyboard/template/';previewDialog.showModal();previewDialog.querySelector('[data-luckin-close]').focus();};
+ const applyTemplate=window.applySelectedHomepageTemplate;
+ window.applySelectedHomepageTemplate=function(templateId,...args){if(templateId===luckinId){openLuckinPreview();return;}return applyTemplate?.call(this,templateId,...args);};
+ const startHover=window.startTemplateHoverVideo;
+ if(startHover)window.startTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId)return;return startHover.call(this,card,tpl,...args);};
+ const stopHover=window.stopTemplateHoverVideo;
+ if(stopHover)window.stopTemplateHoverVideo=function(card,tpl,...args){if(tpl?.id===luckinId)return;return stopHover.call(this,card,tpl,...args);};
+ window.renderHomepageTemplates?.();
  // Match homepage rail icons to the editor's thin outline icon language.
  const rail=document.getElementById('main-nav-rail');
  const syncRail=()=>{if(home.style.display==='none')return;for(const button of rail.querySelectorAll('.rail-btn')){const active=button.dataset.railTab==='templates';if(button.classList.contains('active')!==active)button.classList.toggle('active',active);}};

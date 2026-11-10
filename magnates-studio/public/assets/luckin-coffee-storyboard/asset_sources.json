@@ -54,6 +54,27 @@
       ],
       "kind": "original generated transparent cutout",
       "prompt": "Isolated photorealistic white takeaway cup with subtle cobalt-blue blank sleeve, white lid, three-quarter view slightly left, soft contact shadow underneath, studio light from upper left, crisp edges, transparent surrounding space, no logo, text, hand, saucer, steam, or extra objects. Reusable independent foreground cutout."
+    },
+    {
+      "filename": "template/media/cup_pickup_source.mp4",
+      "sha256": "fd2d89478aa826f4c416b5a8f8815ddf07155cfbcfbb51778328611d68d3b8a4",
+      "dimensions": [
+        1280,
+        720
+      ],
+      "durationSeconds": 2.5,
+      "frameRate": "24/1",
+      "kind": "user-supplied generated video shot, trimmed to the first pickup; not historical footage",
+      "edit": {
+        "sourceInSeconds": 0,
+        "sourceOutSeconds": 2.5,
+        "timelineFrames": [
+          132,
+          191
+        ],
+        "timelineFrameRate": "24/1",
+        "derivedPreviewFrames": "Browser predecodes 60 exact 24 fps timestamps from the trimmed source clip; offline renderer can regenerate the WebP cache"
+      }
     }
   ]
 }

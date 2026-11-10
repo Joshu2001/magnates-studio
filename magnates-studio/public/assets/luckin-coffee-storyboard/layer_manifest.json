@@ -1,10 +1,10 @@
 {
   "name": "Luckin Coffee first 30 seconds layered asset kit",
-  "status": "assets prepared; animation not activated",
+  "status": "animated 30-second Option B template implemented; silent review animatic rendered; source evidence still needs verification before publication",
   "canvas": {
-    "width": 1920,
-    "height": 1080,
-    "fps": 30,
+    "width": 1280,
+    "height": 720,
+    "fps": 24,
     "units": "normalized 0..1 for template placement"
   },
   "visual_truth_note": "Generated plates and blank vector props are illustrative. Do not present them as historical Luckin footage, authentic transactions, actual company app screens, receipts, or regulatory filings. Replace evidence surfaces with sourced primary material.",
@@ -300,11 +300,27 @@
     }
   ],
   "motion_rule": "Animate layers in the template, not inside plate pixels. Camera movement and individual object movement must be separate tracks. Keep at least one stable anchor during each reveal and stop motion for evidence readability.",
-  "video_required": [
+  "video_used": [
     {
-      "shot": "hand_pickup_04_7_to_08_0",
-      "reason": "Natural grip, finger contact, cup lift, and occlusion need continuous motion; a still cutout would likely look artificial.",
-      "promptFile": "docs/gemini_video_prompts.md"
+      "shot": "cup_pickup_first_action",
+      "source": "template/media/cup_pickup_source.mp4",
+      "sourceInSeconds": 0,
+      "sourceOutSeconds": 2.5,
+      "timelineFrames": [
+        132,
+        191
+      ],
+      "timelineSeconds": [
+        5.5,
+        8.0
+      ],
+      "notes": "User-supplied clip trimmed to the first pickup. The repeated later pickup is excluded. Browser preview decodes 60 timestamps from the clip for deterministic frame stepping."
     }
-  ]
+  ],
+  "template": {
+    "entry": "template/index.html",
+    "timeline": "template/timeline.json",
+    "renderScript": "template/render_sequence.py",
+    "shotRequestGuide": "template/SHOT_REQUESTS.md"
+  }
 }
