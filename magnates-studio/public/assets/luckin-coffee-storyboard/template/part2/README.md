@@ -5,8 +5,9 @@ A 28-state continuation to the existing 0–30 second gallery template. This is 
 ## The actual storyboard
 
 - [`STORYBOARD.md`](STORYBOARD.md): complete 28-frame sequence, voiceover, visual grammar, motion entry/hold/exit, transition, asset plan, and accuracy gate.
-- [`storyboard.svg`](storyboard.svg): scalable 28-panel contact sheet.
-- A high-resolution PNG contact sheet is also provided as a direct download in this handoff. The repository’s canonical preview is the scalable SVG.
+- [`storyboard_photo_reference.png`](storyboard_photo_reference.png): image-led 28-frame contact sheet with the proposed photographic shot contents.
+- [`storyboard.svg`](storyboard.svg): secondary simplified layout/motion sheet.
+- The PNG contact sheet is the primary storyboard reference. The SVG remains a secondary layout guide.
 - [`timeline.json`](timeline.json): exact 720-frame timing and source links.
 
 ## Preview in Magnates Studio

@@ -35,7 +35,8 @@
     "Attribute the fraud mechanics to the SEC complaint; use allegation wording, not an unsourced narration voice that states allegations as adjudicated findings.",
     "All diagrams and record-like surfaces are illustrative; never fabricate receipt text, order IDs, account records, auditor marks, or company documents.",
     "Settlement wording must preserve the SEC statement that Luckin agreed without admitting or denying the charges.",
-    "A delisting is not a business closure; do not imply that operations ended or recovered without separate sourcing."
+    "A delisting is not a business closure; do not imply that operations ended or recovered without separate sourcing.",
+    "The photorealistic storyboard contact sheet is AI-generated concept art; generic papers, office scenes, monitors, café staff, and customers are not historical Luckin evidence or identifiable real people."
   ],
   "tracks": [
     {
@@ -791,5 +792,11 @@
       "fullFilmStartSeconds": 58.75,
       "fullFilmEndSeconds": 60.0
     }
-  ]
+  ],
+  "visualStoryboard": {
+    "file": "storyboard_photo_reference.png",
+    "layout": "4 columns × 7 rows; frames read left-to-right then top-to-bottom",
+    "role": "Photorealistic AI-generated concept references showing planned scene subjects, props, backgrounds, and cutout candidates. Not historical footage or source documents.",
+    "productionBoundary": "Use the frame notes and image/layer plan to source or create individual approved production assets later."
+  }
 }

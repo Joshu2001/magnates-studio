@@ -2,7 +2,9 @@
 
 **28 storyboard frames · 24 fps · 1280×720 · 720 total frames**
 
-![28-frame visual storyboard](storyboard.svg)
+![Image-led 28-frame storyboard](storyboard_photo_reference.png)
+
+Read the 4-column by 7-row board left-to-right, then top-to-bottom. Each cell is a distinct photorealistic concept shot; the frame index and exact timing are in the sections below. The pictures are AI-generated visual references, not real Luckin footage, actual people, or source records. Use the source checklist below when replacing concept references with final assets.
 
 ## Story purpose
 
@@ -23,6 +25,21 @@ Draft pace: approximately 160–170 words per minute. Attribution is deliberatel
 - **Depth is motivated:** background desk/cafe plane, one or two schematic document layers, then annotation. Camera stays still during legal and numerical holds.
 - **Transitions connect story logic:** sales tiles feed into records; records flatten into the audit; ticker line match-cuts to the cup. No shattering, flames, villain silhouettes, or fake source paperwork.
 - **Readability before spectacle:** settle each layer before narration’s key noun; keep frame annotations out of the final video unless deliberately retained as editorial labels.
+
+
+## Image and layer plan
+
+The contact sheet now shows the planned shot content. The animation notes are secondary. For each group, the image layer and future cutout/source need are:
+
+| Frames | Image content to build the shot around | Future production asset or source |
+|---|---|---|
+| 01–06 | Blue-sleeved cup, complaint folder, calendar, receipt and ledger surfaces | Reuse the approved cup reference; source the actual SEC complaint page; create clean generic paper props only for illustrative beats |
+| 07–14 | Three paper bundles, linked invoice packets, sales slips, expense paperwork, database monitor, misaligned records, bank-style statement | Create separate paper/monitor cutouts and a dark desk background; replace any evidence-like page with an attributed source image |
+| 15–20 | Complaint page, auditor hands, magnifier over generic row, disclosure packet, review table, cleared office | Use the actual SEC complaint/release for document close-ups; generate or license hands, desk, and office plates; no invented executive portraits |
+| 21–24 | Settlement pages, civic office exterior, delisting screen, dark monitor reflection | Source settlement language and delisting status; build the listing screen as an editable graphic, with no invented prices |
+| 25–28 | Warm operating café, barista and cup, customers, final cup close-up | Source licensed Luckin store/operations imagery or create approved illustrative plates; prepare cup and hand as separate cutouts for compositing |
+
+The contact sheet is **photographic storyboard concept art**. It is there to show the actual subjects, backgrounds, and foreground objects each frame needs. It is not a claim that the pictured people, papers, office, or café are historical Luckin material. The final sourced or approved cutouts/backgrounds are still to be created individually.
 
 ## Frame-by-frame board
 
