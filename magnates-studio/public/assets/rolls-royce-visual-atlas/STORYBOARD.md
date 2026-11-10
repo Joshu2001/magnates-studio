@@ -541,3 +541,11 @@ Transition: Montage / radial bridge
 - Preserve the atlas’s smoky/scanline texture, textured title treatment, radial bridges, irregular aperture, and tonal shift from monochrome hardship to warm/olive family passages.
 - Text visible in the atlas (including “1863,” “BANKRUPT,” “FAMILY,” “DEBT,” and “HARD LABOUR”) is recorded as visual content. Verify wording and underlying historical claims independently before publication.
 - Source role arrays intentionally have null paths until real extracted assets are added. Do not use unrelated children, cars, family portraits, or landscapes from other templates.
+
+### 01:58–02:00 · Page 60 · F003540–F003599
+
+**Apprenticeship and tools · PROGRESS**  
+Atlas observation: Fee, worker, tools and model wheelbarrow inserts; dark industrial plates and bright radial bridges.  
+Motion instruction: Continue the fee/worker/tools/model-wheelbarrow insert montage with dark industrial plates and bright radial bridges; carry through the two-minute endpoint.  
+Layer roles: Fee; worker; tools; model wheelbarrow; industrial plate  
+Transition: Montage / radial bridge
