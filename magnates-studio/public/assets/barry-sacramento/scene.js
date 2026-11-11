@@ -29,26 +29,58 @@
     const m=measure.measureText(text),ascent=m.actualBoundingBoxAscent||size*.78,descent=m.actualBoundingBoxDescent||size*.2,pad=36;
     const width=Math.ceil(m.width+pad*2),height=Math.ceil(ascent+descent+pad*2),base=pad+ascent;
     const c=document.createElement('canvas');c.width=width;c.height=height;const g=c.getContext('2d');g.font=measure.font;g.textBaseline='alphabetic';g.textAlign='left';
-    // Deep, photographic gold: dark body edge + warm face + narrow top bevel. Avoid the
-    // flat yellow/plastic look by keeping a large luminance range inside the material.
-    g.shadowColor='rgba(22,9,0,.88)';g.shadowBlur=14;g.shadowOffsetY=9;g.lineJoin='round';
-    g.strokeStyle='rgba(67,31,2,.94)';g.lineWidth=Math.max(4,size*.042);g.strokeText(text,pad,base);
+    // Weighty pseudo-3D gold: build a dark bronze extrusion first, then the metallic face.
+    // This gives the word physical depth instead of reading like a flat yellow graphic.
+    g.lineJoin='round';
+    for(let d=12;d>=1;d--){
+      const k=d/12;
+      g.strokeStyle=`rgba(${Math.round(45+30*(1-k))},${Math.round(20+18*(1-k))},3,${.82+.12*k})`;
+      g.fillStyle=`rgba(${Math.round(83+33*(1-k))},${Math.round(39+22*(1-k))},4,.98)`;
+      g.lineWidth=Math.max(4,size*.048);
+      g.strokeText(text,pad+d*.72,base+d*.82);
+      g.fillText(text,pad+d*.72,base+d*.82);
+    }
+    g.shadowColor='rgba(20,8,0,.84)';g.shadowBlur=15;g.shadowOffsetY=8;
+    g.strokeStyle='rgba(64,29,2,.98)';g.lineWidth=Math.max(4,size*.044);g.strokeText(text,pad,base);
     g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
+
     const gold=g.createLinearGradient(0,base-ascent,0,base+descent);
-    gold.addColorStop(0,'#fff09a');gold.addColorStop(.075,'#ffd34b');gold.addColorStop(.32,s.gold);
-    gold.addColorStop(.62,'#d98a09');gold.addColorStop(.86,'#b86306');gold.addColorStop(1,'#6f3404');
+    gold.addColorStop(0,'#fff2a8');gold.addColorStop(.07,'#ffd75b');gold.addColorStop(.26,'#f5b51d');
+    gold.addColorStop(.48,s.gold);gold.addColorStop(.68,'#d88908');gold.addColorStop(.86,'#a85304');gold.addColorStop(1,'#673004');
     g.fillStyle=gold;g.fillText(text,pad,base);
-    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.28;
-    const bevel=g.createLinearGradient(0,base-ascent,0,base-ascent+size*.34);
-    bevel.addColorStop(0,'rgba(255,255,220,.95)');bevel.addColorStop(.42,'rgba(255,224,117,.28)');bevel.addColorStop(1,'rgba(255,255,255,0)');
-    g.fillStyle=bevel;g.fillRect(pad,base-ascent,m.width,size*.38);g.restore();
-    // Fine mineral speckle, clustered pigment and hairline scratches match the weathered reference without the large repeated dash pattern.
-    const distress=s.titleDistress;g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.22*distress;
-    for(let i=0;i<Math.round(width*height/210);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.35+rand()*2.1;g.fillStyle=rand()<.64?'#48290b':'#8a510d';g.beginPath();g.ellipse(x,y,r*(1+rand()*1.4),r*(.35+rand()*.9),rand()*Math.PI,0,Math.PI*2);g.fill();}
-    g.globalAlpha=.19*distress;for(let i=0;i<Math.round(width*height/1450);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=1.5+rand()*7,ry=.7+rand()*3.2;g.fillStyle=rand()<.76?'#60350a':'#9a5a0b';g.beginPath();for(let k=0;k<11;k++){const a=k*Math.PI*2/11,r=.67+rand()*.52,px=x+Math.cos(a)*rx*r,py=y+Math.sin(a)*ry*r;if(k===0)g.moveTo(px,py);else g.lineTo(px,py);}g.closePath();g.fill();}
-    g.globalAlpha=.23*distress;g.strokeStyle='#4b2d08';for(let i=0;i<74;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.lineWidth=.35+rand()*.8;g.beginPath();g.moveTo(x,y);g.lineTo(x+2+rand()*13,y-1+rand()*2);g.stroke();}g.restore();
-    g.save();g.globalCompositeOperation='destination-out';g.globalAlpha=.13*distress;for(let i=0;i<Math.round(width*height/5600);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.5+rand()*2.7;g.beginPath();g.ellipse(x,y,r*1.5,r*.7,rand()*Math.PI,0,Math.PI*2);g.fill();}g.restore();
-    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.30;g.strokeStyle='#fff4b0';g.lineWidth=1.5;g.strokeText(text,pad,base-1);g.restore();
+
+    // Narrow hot top bevel and darker lower bevel increase perceived thickness.
+    g.save();g.globalCompositeOperation='source-atop';
+    const bevel=g.createLinearGradient(0,base-ascent,0,base+descent);
+    bevel.addColorStop(0,'rgba(255,255,225,.72)');
+    bevel.addColorStop(.12,'rgba(255,224,112,.30)');
+    bevel.addColorStop(.52,'rgba(255,184,39,.03)');
+    bevel.addColorStop(.84,'rgba(88,35,0,.18)');
+    bevel.addColorStop(1,'rgba(48,17,0,.44)');
+    g.fillStyle=bevel;g.fillRect(pad,base-ascent,m.width,ascent+descent);g.restore();
+
+    // Dense non-transparent mineral wear: pits, oxidation islands and fine scratches.
+    // Nothing is punched out of the alpha channel, so the clean glyph edges stay intact.
+    const distress=s.titleDistress;g.save();g.globalCompositeOperation='source-atop';
+    g.globalAlpha=.30*distress;
+    for(let i=0;i<Math.round(width*height/185);i++){
+      const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.45+rand()*2.5;
+      g.fillStyle=rand()<.58?'#3c2109':(rand()<.72?'#71400a':'#a15e0b');
+      g.beginPath();g.ellipse(x,y,r*(1+rand()*1.8),r*(.32+rand()*1.0),rand()*Math.PI,0,Math.PI*2);g.fill();
+    }
+    g.globalAlpha=.26*distress;
+    for(let i=0;i<Math.round(width*height/1250);i++){
+      const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=2+rand()*10,ry=1+rand()*5;
+      g.fillStyle=rand()<.72?'#2f1b08':'#75400a';g.beginPath();
+      for(let k=0;k<12;k++){const a=k*Math.PI*2/12,r=.58+rand()*.62,px=x+Math.cos(a)*rx*r,py=y+Math.sin(a)*ry*r;if(k===0)g.moveTo(px,py);else g.lineTo(px,py);}
+      g.closePath();g.fill();
+    }
+    g.globalAlpha=.28*distress;g.strokeStyle='#3b2208';
+    for(let i=0;i<96;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.lineWidth=.4+rand()*1.0;g.beginPath();g.moveTo(x,y);g.lineTo(x+3+rand()*18,y-1.5+rand()*3);g.stroke();}
+    g.restore();
+
+    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.42;
+    g.strokeStyle='#fff0a1';g.lineWidth=1.6;g.strokeText(text,pad,base-1.2);g.restore();
     const glyphs=[];let cursor=pad;for(const ch of text){const w=measure.measureText(ch).width;glyphs.push({x:cursor-pad,w,ch});cursor+=w;}
     titleLayer=c;titleMetrics={w:width,h:height,base,ascent,descent,glyphs};
 
@@ -74,44 +106,87 @@
     const rawX=sx+Math.cos(angle)*620,rawY=sy+Math.sin(angle)*620;
     return {sx,sy,tx:(rawX-W/2)*push+W/2,ty:(rawY-H/2)*push+H/2,phase};
   }
+  function drawSearchlightBulbs(time,s,lightIn){
+    if(time<s.beamIn||lightIn<=0)return;
+    const a=beamAim(time,s),tint=s.beamTint||'#ffc15b';
+    // Eight distinct industrial lamps. These sit on top of the pre-baked rig so the source
+    // retains individual bulb structure instead of collapsing into one white bloom.
+    const bulbs=[[-19,-22],[3,-23],[23,-12],[-24,-3],[-2,-3],[20,8],[-16,17],[7,18]];
+    ctx.save();
+    bulbs.forEach((o,i)=>{
+      const x=a.sx+o[0],y=a.sy+o[1],f=.92+.06*Math.sin(time*13+i*1.73);
+      ctx.save();
+      // restrained local halo
+      ctx.globalCompositeOperation='screen';ctx.globalAlpha=lightIn*f;
+      const halo=ctx.createRadialGradient(x,y,1,x,y,29);
+      halo.addColorStop(0,'rgba(255,244,190,.78)');
+      halo.addColorStop(.24,rgba(tint,.52));
+      halo.addColorStop(1,rgba(tint,0));
+      ctx.fillStyle=halo;ctx.fillRect(x-31,y-31,62,62);
+
+      // physical dark metal rim + amber glass + white-hot filament core
+      ctx.globalCompositeOperation='source-over';ctx.globalAlpha=.96;
+      ctx.fillStyle='rgba(48,28,12,.94)';ctx.beginPath();ctx.arc(x,y,9.4,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(193,122,38,.88)';ctx.lineWidth=1.4;ctx.stroke();
+      const glass=ctx.createRadialGradient(x-1.5,y-1.5,.7,x,y,7.5);
+      glass.addColorStop(0,'rgba(255,255,231,.99)');
+      glass.addColorStop(.20,'rgba(255,232,151,.98)');
+      glass.addColorStop(.52,'rgba(255,177,55,.94)');
+      glass.addColorStop(.82,'rgba(224,104,15,.86)');
+      glass.addColorStop(1,'rgba(94,42,5,.95)');
+      ctx.fillStyle=glass;ctx.beginPath();ctx.arc(x,y,7.1,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(255,220,125,.64)';ctx.lineWidth=.9;ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+  }
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
     const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.max(1,Math.hypot(dx,dy)),nx=-dy/len,ny=dx/len,width=s.lightWidth;
-    const tint=s.beamTint||'#ffd18a';
+    const tint=s.beamTint||'#ffc15b';
     ctx.save();ctx.globalCompositeOperation='screen';
-    // Source bloom: a compact white-hot lamp wrapped in warm amber halation.
-    const lamp=ctx.createRadialGradient(a.sx,a.sy,0,a.sx,a.sy,132);
-    lamp.addColorStop(0,'rgba(255,255,242,.98)');
-    lamp.addColorStop(.075,rgba(tint,.92*lightIn));
-    lamp.addColorStop(.28,rgba(tint,.42*lightIn));
+    // Keep source bloom compact so the separate bulbs remain visible.
+    const lamp=ctx.createRadialGradient(a.sx,a.sy,8,a.sx,a.sy,92);
+    lamp.addColorStop(0,rgba(tint,.42*lightIn));
+    lamp.addColorStop(.34,rgba(tint,.22*lightIn));
     lamp.addColorStop(1,rgba(tint,0));
-    ctx.fillStyle=lamp;ctx.fillRect(a.sx-140,a.sy-140,280,280);
+    ctx.fillStyle=lamp;ctx.fillRect(a.sx-100,a.sy-100,200,200);
 
-    // Broad atmospheric cone. Two blurred passes remove the synthetic triangular edge
-    // and make the beam read as light suspended in smoke/haze.
-    ctx.filter='blur(32px)';ctx.globalAlpha=.78*lightIn;
+    // Dense amber atmospheric cone: warm, directional and textured rather than pale white.
+    ctx.filter='blur(22px)';ctx.globalAlpha=.88*lightIn;
     const haze=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);
-    haze.addColorStop(0,rgba(tint,.78));haze.addColorStop(.24,rgba(tint,.52));haze.addColorStop(.72,rgba(tint,.20));haze.addColorStop(1,rgba(tint,.035));
+    haze.addColorStop(0,rgba(tint,.84));haze.addColorStop(.22,rgba(tint,.63));
+    haze.addColorStop(.60,rgba(tint,.30));haze.addColorStop(1,rgba(tint,.05));
     ctx.fillStyle=haze;ctx.beginPath();ctx.moveTo(a.sx,a.sy);
-    ctx.lineTo(a.tx+nx*width*1.92,a.ty+ny*width*1.92);
-    ctx.lineTo(a.tx-nx*width*1.92,a.ty-ny*width*1.92);ctx.closePath();ctx.fill();
+    ctx.lineTo(a.tx+nx*width*1.62,a.ty+ny*width*1.62);
+    ctx.lineTo(a.tx-nx*width*1.62,a.ty-ny*width*1.62);ctx.closePath();ctx.fill();
 
-    ctx.filter='blur(12px)';ctx.globalAlpha=.42*lightIn;
+    ctx.filter='blur(8px)';ctx.globalAlpha=.46*lightIn;
     const inner=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);
-    inner.addColorStop(0,'rgba(255,248,220,.80)');inner.addColorStop(.18,rgba(tint,.54));inner.addColorStop(.78,rgba(tint,.12));inner.addColorStop(1,rgba(tint,0));
+    inner.addColorStop(0,'rgba(255,231,150,.74)');
+    inner.addColorStop(.18,rgba(tint,.58));inner.addColorStop(.72,rgba(tint,.18));inner.addColorStop(1,rgba(tint,0));
     ctx.fillStyle=inner;ctx.beginPath();ctx.moveTo(a.sx,a.sy);
-    ctx.lineTo(a.tx+nx*width*.72,a.ty+ny*width*.72);
-    ctx.lineTo(a.tx-nx*width*.72,a.ty-ny*width*.72);ctx.closePath();ctx.fill();
+    ctx.lineTo(a.tx+nx*width*.62,a.ty+ny*width*.62);
+    ctx.lineTo(a.tx-nx*width*.62,a.ty-ny*width*.62);ctx.closePath();ctx.fill();
     ctx.filter='none';
 
-    // Narrow luminous spine and irregular atmospheric modulation.
-    ctx.globalAlpha=.46*lightIn;ctx.lineCap='round';ctx.lineWidth=Math.max(12,width*.24);
-    ctx.strokeStyle=rgba(tint,.46);ctx.shadowColor=tint;ctx.shadowBlur=30;
-    ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx,a.ty);ctx.stroke();ctx.shadowBlur=0;
-    for(let i=0;i<5;i++){
-      const u=.16+i*.16,px=a.sx+dx*u,py=a.sy+dy*u,r=50+i*14;
+    // Fine parallel shafts create real volumetric structure inside the beam.
+    ctx.lineCap='round';ctx.shadowColor=tint;ctx.shadowBlur=12;
+    [-.34,-.16,.05,.23].forEach((off,i)=>{
+      ctx.globalAlpha=(.15+(i%2)*.045)*lightIn;
+      ctx.strokeStyle=rgba(tint,.72);
+      ctx.lineWidth=Math.max(5,width*(.055+(i%2)*.018));
+      ctx.beginPath();
+      ctx.moveTo(a.sx+nx*off*width*.25,a.sy+ny*off*width*.25);
+      ctx.lineTo(a.tx+nx*off*width,a.ty+ny*off*width);
+      ctx.stroke();
+    });
+    ctx.shadowBlur=0;
+
+    for(let i=0;i<6;i++){
+      const u=.12+i*.135,px=a.sx+dx*u,py=a.sy+dy*u,r=42+i*13;
       const puff=ctx.createRadialGradient(px,py,0,px,py,r);
-      puff.addColorStop(0,rgba(tint,.08*lightIn));puff.addColorStop(1,rgba(tint,0));
+      puff.addColorStop(0,rgba(tint,.10*lightIn));puff.addColorStop(1,rgba(tint,0));
       ctx.fillStyle=puff;ctx.fillRect(px-r,py-r,r*2,r*2);
     }
 
@@ -130,12 +205,12 @@
     // Large diffuse bounce first, then a tighter specular response. Both are clipped
     // to the building so windows, tarp and scaffold inherit the same moving light.
     let g=rc.createRadialGradient(a.tx,a.ty,4,a.tx,a.ty,310*flicker);
-    g.addColorStop(0,'rgba(255,239,205,.72)');g.addColorStop(.16,rgba(tint,.60*flicker));
-    g.addColorStop(.48,rgba(tint,.28));g.addColorStop(1,rgba(tint,0));rc.fillStyle=g;rc.fillRect(0,0,W,H);
+    g.addColorStop(0,'rgba(255,218,132,.62)');g.addColorStop(.16,rgba(tint,.68*flicker));
+    g.addColorStop(.48,rgba(tint,.34));g.addColorStop(1,rgba(tint,0));rc.fillStyle=g;rc.fillRect(0,0,W,H);
 
     rc.save();rc.translate(a.tx,a.ty);rc.rotate(Math.atan2(a.ty-a.sy,a.tx-a.sx));
     g=rc.createRadialGradient(0,0,2,0,0,230);
-    g.addColorStop(0,'rgba(255,248,221,.52)');g.addColorStop(.24,rgba(tint,.38));g.addColorStop(1,rgba(tint,0));
+    g.addColorStop(0,'rgba(255,224,151,.46)');g.addColorStop(.24,rgba(tint,.48));g.addColorStop(1,rgba(tint,0));
     rc.fillStyle=g;rc.beginPath();rc.ellipse(22,0,275,82,0,0,Math.PI*2);rc.fill();rc.restore();
     rc.restore();
 
@@ -147,7 +222,7 @@
 
     // Low-level warm bounce into the local atmosphere prevents the illuminated façade
     // from looking like a sticker on an otherwise unaffected scene.
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.16*s.pool;
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.23*s.pool;
     const spill=ctx.createRadialGradient(a.tx,a.ty,30,a.tx,a.ty,390);
     spill.addColorStop(0,rgba(tint,.30));spill.addColorStop(.52,rgba(tint,.10));spill.addColorStop(1,rgba(tint,0));
     ctx.fillStyle=spill;ctx.fillRect(a.tx-400,a.ty-400,800,800);ctx.restore();
@@ -180,6 +255,7 @@
     // Keep the source rig behind the tower plate, but project its soft amber beam across the tower.
     if(layers.searchlight)drawBeam(time,s,lightIn);
     if(layers.reflection&&buildingAlpha>0)buildReflection(time,s);
+    if(layers.searchlight)drawSearchlightBulbs(time,s,lightIn);
     // Fine dust drifts within the beam path and follows the lamp's current aim.
     if(layers.searchlight&&time>s.beamIn){const aim=beamAim(time,s);ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<18;i++){const u=.24+((i*.213+time*.06)% .7),phase=time*(.65+i*.013)+i*1.9,x=aim.sx+(aim.tx-aim.sx)*u+Math.sin(phase)*18,y=aim.sy+(aim.ty-aim.sy)*u+Math.cos(phase*1.1)*12,r=1+(i%4)*.55;ctx.globalAlpha=.10+.11*(.5+.5*Math.sin(phase*3));ctx.fillStyle='#ffd38b';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}ctx.restore();}
     const titleProgress=smooth((time-s.titleStart)/s.titleRise);
@@ -206,7 +282,7 @@
       ctx.save();
       // Slight cinematic perspective without distorting the letter reveal direction.
       ctx.translate(W/2,base-58);
-      ctx.transform(.992,-.016,-.052,.992,0,0);
+      ctx.transform(.992,-.022,-.074,.995,0,0);
       ctx.translate(-W/2,-(base-58));
 
       titleMetrics.glyphs.forEach((glyph,i)=>{
