@@ -229,7 +229,8 @@
     ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.50,s.pool*.60);ctx.drawImage(reflection,0,0);ctx.restore();
   }
   function drawLightPathGuide(time,s){
-    if(!s.showPath||time<s.beamIn)return;
+    // Diagnostic geometry is editor-only: visible while paused/scrubbing, never during playback/export.
+    if(!s.showPath||playing||time<s.beamIn)return;
     const g=beamGeometry(time,s),u=REFERENCE_LIGHT.extension,ex=g.sx+(g.tx-g.sx)*u,ey=g.sy+(g.ty-g.sy)*u,ew=g.farHalf*(1+(u-1)*.42)*1.55;
     ctx.save();ctx.lineWidth=1.15;ctx.setLineDash([8,7]);ctx.strokeStyle='rgba(75,235,105,.92)';ctx.globalAlpha=.72;
     ctx.beginPath();ctx.moveTo(g.sx,g.sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.globalAlpha=.42;
@@ -349,7 +350,7 @@
   }
   function loop(now){if(playing){const next=anchorT+(now-anchor)/1000;if(next>=D){t=D;playing=false;syncPlay();render(D);}else{if($('soundOn').checked&&!soundFired&&lastT<.20&&next>=.20)playBoom();if(next<lastT-.1)soundFired=false;lastT=next;render(next);}}requestAnimationFrame(loop);}
   function syncPlay(){const label=playing?'Pause':'Play';$('play').textContent=label;$('playTop').textContent=playing?'Pause preview':'Play preview';}
-  function togglePlay(){playing=!playing;anchor=performance.now();anchorT=t;if(playing&&t>=D){t=0;anchorT=0;soundFired=false;}syncPlay();}
+  function togglePlay(){playing=!playing;anchor=performance.now();anchorT=t;if(playing&&t>=D){t=0;anchorT=0;soundFired=false;}syncPlay();render(t);}
   function restart(){playing=true;t=0;anchor=performance.now();anchorT=0;lastT=0;soundFired=false;syncPlay();render(0);}
   function playBoom(){try{seed=91823;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioCtx)audioCtx=new AC();if(audioCtx.state==='suspended')audioCtx.resume();const now=audioCtx.currentTime,level=readSettings().boom;
       const osc=audioCtx.createOscillator(),gain=audioCtx.createGain(),filter=audioCtx.createBiquadFilter();osc.type='sine';osc.frequency.setValueAtTime(72,now);osc.frequency.exponentialRampToValueAtTime(39,now+.46);filter.type='lowpass';filter.frequency.value=260;gain.gain.setValueAtTime(.0001,now);gain.gain.exponentialRampToValueAtTime(Math.max(.0002,.25*level),now+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+.72);osc.connect(filter);filter.connect(gain);gain.connect(audioCtx.destination);osc.start(now);osc.stop(now+.74);
