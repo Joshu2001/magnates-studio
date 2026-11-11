@@ -6,7 +6,7 @@ BASE=Path(__file__).resolve().parent
 AS=BASE/'assets'
 OUT=BASE/'preview-frames'; OUT.mkdir(exist_ok=True)
 W,H,FPS=1280,720,24
-im={k:Image.open(AS/v).convert('RGBA') for k,v in {'sky':'sacramento-storm-sky.webp','city':'sacramento-skyline.webp','tower':'sacramento-tower-podium-cutout.webp','corridor':'construction-corridor.webp','pbg':'portrait-facade-background.webp','portrait':'barry-minkow-caption-free-portrait.webp'}.items()}
+im={k:Image.open(AS/v).convert('RGBA') for k,v in {'sky':'sacramento-storm-sky.webp','city':'sacramento-skyline.webp','tower':'sacramento-tower-base-cutout.webp','corridor':'construction-corridor.webp','pbg':'portrait-facade-background.webp','portrait':'barry-minkow-caption-free-portrait.webp'}.items()}
 font='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 font_cond='/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf'
 def fnt(size,cond=False): return ImageFont.truetype(font_cond if cond else font,size)
@@ -34,7 +34,7 @@ def draw(t):
  sky.putalpha(mask)
  blend(frame,sky)
  haze=Image.new('RGBA',(W,H));hd=ImageDraw.Draw(haze);hd.rectangle((0,340,W,H),fill=(5,10,16,60));haze=haze.filter(ImageFilter.GaussianBlur(48));blend(frame,haze,.8)
- # One tower+podium cutout arrives, pushes close, then eases back.
+ # The exact tower cutout arrives, pushes close, then eases back.
  rev=sm((t-1.05)/.95);close=sm((t-2.2)/1.25);pull=sm((t-3.6)/.8)
  tower_box=None
  if rev>0:
@@ -43,7 +43,7 @@ def draw(t):
  p=max(0,min(1,(t-2.55)/1.35))
  if 0<p<1:
   x=int(1010-540*sm(p)+max(0,(p-.84)/.16)*100); glow=Image.new('RGBA',(W,H));g=ImageDraw.Draw(glow);g.polygon([(1188,148),(x-88,416),(x+106,434),(1210,167)],fill=(255,192,104,86));g.line([(1184,151),(x+5,425)],fill=(255,226,172,170),width=4);g.ellipse((x-190,245,x+190,475),fill=(255,209,139,48));glow=glow.filter(ImageFilter.GaussianBlur(23));blend(frame,glow,math.sin(p*math.pi)*1.1); core=Image.new('RGBA',(W,H));cd=ImageDraw.Draw(core);cd.line([(1184,151),(x+5,425)],fill=(255,225,165,180),width=5);cd.ellipse((x-20,408,x+28,448),fill=(255,210,125,130));core=core.filter(ImageFilter.GaussianBlur(8));blend(frame,core,math.sin(p*math.pi))
- # A rightward-moving location title uses the same image pixels as the podium.
+ # A rightward-moving location title uses the same image pixels as the lower facade.
  d=ImageDraw.Draw(frame)
  loc=sm((t-2.25)/.34)*(1-sm((t-4.78)/.48))
  if loc>0 and tower_box:

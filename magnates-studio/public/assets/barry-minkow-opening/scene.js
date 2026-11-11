@@ -2,14 +2,14 @@
 'use strict';
 const W=1280,H=720,D=8,cv=document.getElementById('stage'),ctx=cv.getContext('2d',{alpha:false});
 const root='assets/';
-const specs=[['sky','sacramento-storm-sky.webp'],['city','sacramento-skyline.webp'],['tower','sacramento-tower-podium-cutout.webp'],['corridor','construction-corridor.webp'],['portraitBackground','portrait-facade-background.webp'],['portrait','barry-minkow-caption-free-portrait.webp']];
+const specs=[['sky','sacramento-storm-sky.webp'],['city','sacramento-skyline.webp'],['tower','sacramento-tower-base-cutout.webp'],['corridor','construction-corridor.webp'],['portraitBackground','portrait-facade-background.webp'],['portrait','barry-minkow-caption-free-portrait.webp']];
 const images={}; let ready=false,playing=true,anchor=performance.now(),anchorT=0,lastBeat=-1;
 const beats=[
  {a:0,b:.72,label:'A full-frame optical flare contracts to a hot spot, then dissipates',layers:['Contracting flash','Film texture']},
  {a:.55,b:1.45,label:'Storm sky and Sacramento emerge',layers:['Moving storm sky','City plate','Film grain']},
- {a:1.45,b:2.65,label:'The blue construction tower and illuminated podium emerge as one cutout',layers:['Tower + podium cutout','City plate','Storm sky']},
+ {a:1.45,b:2.65,label:'The blue construction tower with its distinctive scaffold bay rises as one cutout',layers:['Tower cutout','City plate','Storm sky']},
  {a:2.65,b:3.85,label:'A warm searchlight scans the facade',layers:['Searchlight beam','Tower cutout']},
- {a:3.85,b:5.05,label:'Textured gold “SACRAMENTO” glides right across the podium',layers:['Editable location text','Facade-texture fill','Tower + podium cutout']},
+ {a:3.85,b:5.05,label:'Textured gold “SACRAMENTO” glides right across the building base',layers:['Editable location text','Facade-texture fill','Tower cutout']},
  {a:5.05,b:6.35,label:'A gold-edged occlusion reveals the unfinished corridor',layers:['Corridor plate','Gold wipe']},
  {a:6.35,b:7.12,label:'The corridor advances toward camera',layers:['Corridor plate']},
  {a:7.12,b:8,label:'Flash cut: separate facade and portrait layers assemble',layers:['Facade background','Caption-free portrait cutout']}
@@ -42,7 +42,7 @@ function drawGoldTitle(t,tower){const p=smooth((t-3.65)/.9);if(p<=0||!tower)retu
  const loc=smooth((t-2.25)/.34)*(1-smooth((t-4.78)/.48));if(loc<=0)return;
  const label=(document.getElementById('location')?.value||'SACRAMENTO').toUpperCase();
  const startX=610,endX=720,x=mix(startX,endX,smooth((t-3.75)/.78)),y=tower.y+tower.h*.855,size=29;
- // Make the letters from the actual podium pixels, then glaze them with translucent gold.
+ // Make the letters from the actual facade pixels, then glaze them with translucent gold.
  const mask=document.createElement('canvas');mask.width=W;mask.height=H;const m=mask.getContext('2d');m.font='800 '+size+'px Arial, sans-serif';m.textBaseline='middle';m.textAlign='left';m.letterSpacing='2px';m.fillStyle='#fff';m.fillText(label,x,y);
  const ink=document.createElement('canvas');ink.width=W;ink.height=H;const ic=ink.getContext('2d');ic.drawImage(images.tower,tower.x,tower.y,tower.w,tower.h);ic.globalCompositeOperation='destination-in';ic.drawImage(mask,0,0);ic.globalCompositeOperation='source-atop';ic.fillStyle='rgba(235,169,48,.62)';ic.fillRect(0,0,W,H);
  ctx.save();ctx.globalAlpha=loc;ctx.shadowColor='rgba(255,188,67,.42)';ctx.shadowBlur=11;ctx.drawImage(ink,0,0);ctx.restore();
