@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const W=1280,H=720,D=8,canvas=document.getElementById('stage'),ctx=canvas.getContext('2d',{alpha:false});
-  const assetFiles={background:'background',building:'building',searchlightRig:'searchlight-rig',clouds:'clouds'};
+  const assetFiles={background:'background',building:'building',clouds:'clouds'};
   const images={}; const layers={background:true,building:true,searchlight:true,reflection:true,clouds:true,title:true};
   const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null,titleParts=[];
