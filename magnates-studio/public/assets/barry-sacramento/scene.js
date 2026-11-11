@@ -1,8 +1,26 @@
 (() => {
   'use strict';
   const W=1280,H=720,D=8,canvas=document.getElementById('stage'),ctx=canvas.getContext('2d',{alpha:false});
+  const RENDER_SCALE=Math.max(1,Math.min(2,window.devicePixelRatio||1));canvas.width=Math.round(W*RENDER_SCALE);canvas.height=Math.round(H*RENDER_SCALE);
   const assetFiles={background:'background.webp',building:'building.webp',clouds:'clouds.webp'};
   const images={}; const layers={background:true,building:true,searchlight:true,reflection:true,clouds:true,title:true};
+  // Deterministic reference-traced Spatial Distribution Transfer Function (SDTF).
+  // Measured from the approved target image and mapped to the 1280×720 logical stage:
+  // optical run ≈292 px, source full width ≈67 px, impact full width ≈122 px,
+  // target core ≈ RGB(250,198,105), with smooth measured lateral decay into amber penumbra.
+  const REFERENCE_LIGHT={
+    length:292,nearHalf:33,farHalf:61,extension:1.22,baseTint:[255,173,61],
+    axial:[[0,.78],[.18,.76],[.45,.69],[.70,.58],[.92,.43],[1,.34],[1.10,.16],[1.22,0]],
+    radial:[
+      [-1.55,[214,113,18],0],[-1.33,[218,121,22],.025],[-1.16,[223,130,27],.06],
+      [-1.00,[228,141,34],.14],[-.83,[235,151,42],.22],[-.67,[241,164,54],.31],
+      [-.50,[246,177,69],.49],[-.33,[249,189,89],.71],[-.17,[251,199,105],.90],
+      [0,[252,204,113],1],
+      [.17,[251,199,105],.90],[.33,[249,189,89],.71],[.50,[246,177,69],.49],
+      [.67,[241,164,54],.31],[.83,[235,151,42],.22],[1.00,[228,141,34],.14],
+      [1.16,[223,130,27],.06],[1.33,[218,121,22],.025],[1.55,[214,113,18],0]
+    ]
+  };
   const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null,titleParts=[];
   const off=document.createElement('canvas'); off.width=W; off.height=H; const oc=off.getContext('2d');
@@ -36,7 +54,7 @@
     titleStart:val('titleStart'), titleRise:val('titleRise'), lightSpeed:val('lightSpeed'), cameraPush:val('cameraPush')/100,
     titleSize:val('titleSize'), titleY:val('titleY'), cloudOffset:val('cloudOffset'), cloudSpeed:val('cloudSpeed'), skyDrift:val('skyDrift')/100, titleOpacity:val('titleOpacity')/100, titleDistress:val('titleDistress')/100, lightWidth:val('lightWidth'), beamSweep:val('beamSweep'), gold:$('titleGold').value, beamTint:$('beamTint').value,
     flash:val('flashStrength')/100, pool:val('poolStrength')/100, cloud:val('cloudStrength')/100,
-    boom:val('boomStrength')/100, beamIn:val('beamIn'), cloudIn:val('cloudIn'), cloudOut:val('cloudOut'), buildingIn:val('buildingIn'), buildingReveal:val('buildingReveal')
+    boom:val('boomStrength')/100, beamIn:val('beamIn'), cloudIn:val('cloudIn'), cloudOut:val('cloudOut'), buildingIn:val('buildingIn'), buildingReveal:val('buildingReveal'), showPath:$('showLightPath')?$('showLightPath').checked:false
   };}
   function rebuildTitle(){
     if(!ready||!images.titleAsset)return;
@@ -48,9 +66,10 @@
   function drawCover(im,xoff=0,yoff=0,scale=1){const w=W*scale,h=H*scale;ctx.drawImage(im,(W-w)/2+xoff,(H-h)/2+yoff,w,h);}
   function drawBuildingAlpha(target,x,y,scale){target.drawImage(images.building,x,y,W*scale,H*scale);}
   function beamAim(time,s){
-    const sx=1082,sy=108,phase=(time-s.beamIn)*s.lightSpeed*.78,angle=2.83+Math.sin(phase)*s.beamSweep*Math.PI/180,push=1+s.cameraPush*clamp(time/D,0,1);
-    const rawX=sx+Math.cos(angle)*620,rawY=sy+Math.sin(angle)*620;
-    return {sx,sy,tx:(rawX-W/2)*push+W/2,ty:(rawY-H/2)*push+H/2,phase};
+    const sx=1082,sy=108,phase=(time-s.beamIn)*s.lightSpeed*.78;
+    const angle=2.83+Math.sin(phase)*s.beamSweep*Math.PI/180,push=1+s.cameraPush*clamp(time/D,0,1);
+    const rawX=sx+Math.cos(angle)*REFERENCE_LIGHT.length,rawY=sy+Math.sin(angle)*REFERENCE_LIGHT.length;
+    return {sx,sy,tx:(rawX-W/2)*push+W/2,ty:(rawY-H/2)*push+H/2,phase,angle};
   }
   function drawPhysicalSearchlightRig(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
@@ -92,25 +111,26 @@
   }
   function beamGeometry(time,s){
     const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.max(1,Math.hypot(dx,dy));
-    const ux=dx/len,uy=dy/len,nx=-uy,ny=ux;
-    const nearHalf=25,farHalf=s.lightWidth*.88;
-    const nearCenter={x:a.sx-4*ux,y:a.sy-4*uy};
-    const farCenter={x:a.tx,y:a.ty};
-    return {
-      ...a,ux,uy,nx,ny,len,nearHalf,farHalf,nearCenter,farCenter,
-      outer:[
-        {x:nearCenter.x+nx*nearHalf,y:nearCenter.y+ny*nearHalf},
-        {x:farCenter.x+nx*farHalf,y:farCenter.y+ny*farHalf},
-        {x:farCenter.x-nx*farHalf,y:farCenter.y-ny*farHalf},
-        {x:nearCenter.x-nx*nearHalf,y:nearCenter.y-ny*nearHalf}
-      ]
-    };
+    const ux=dx/len,uy=dy/len,nx=-uy,ny=ux,widthScale=s.lightWidth/76;
+    const nearHalf=REFERENCE_LIGHT.nearHalf*widthScale,farHalf=REFERENCE_LIGHT.farHalf*widthScale;
+    return {...a,ux,uy,nx,ny,len,nearHalf,farHalf};
   }
   function traceQuad(target,pts){
     target.beginPath();target.moveTo(pts[0].x,pts[0].y);
     for(let i=1;i<pts.length;i++)target.lineTo(pts[i].x,pts[i].y);
     target.closePath();
   }
+  function sampleStops(stops,u){
+    if(u<=stops[0][0])return stops[0][1];
+    for(let i=1;i<stops.length;i++){if(u<=stops[i][0]){const a=stops[i-1],b=stops[i],p=(u-a[0])/(b[0]-a[0]);return mix(a[1],b[1],p);}}
+    return stops[stops.length-1][1];
+  }
+  function tintRgb(rgb,hex){
+    const h=hex.replace('#',''),n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);
+    const t=[(n>>16)&255,(n>>8)&255,n&255],b=REFERENCE_LIGHT.baseTint;
+    return rgb.map((v,i)=>Math.round(clamp(v*(t[i]/Math.max(1,b[i])),0,255)));
+  }
+  function rgbaRgb(rgb,a){return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${a})`;}
   function drawSearchlightBulbs(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
     const g=beamGeometry(time,s),pulse=.985+.015*Math.sin(time*11.5),rot=Math.sin(g.phase)*.012-.025;
@@ -142,128 +162,80 @@
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
     const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d';
-    const {sx,sy,tx,ty,nx,ny,nearHalf,farHalf}=g;
+    const {sx,sy,tx,ty,nx,ny,nearHalf,farHalf}=g,UEND=REFERENCE_LIGHT.extension,SL=36,RMAX=1.55;
 
-    // High-fidelity penumbra model. Several nested frustums approximate the angular
-    // distribution of a real multi-lamp floodlight without any raster beam texture.
-    const layers=[
-      {near:1.00,far:1.00,alpha:.16,blur:4,  c0:'rgba(255,185,75,.48)',c1:'rgba(235,128,24,.055)'},
-      {near:1.12,far:1.18,alpha:.105,blur:9, c0:'rgba(255,174,60,.40)',c1:'rgba(228,119,18,.035)'},
-      {near:1.28,far:1.40,alpha:.060,blur:16,c0:'rgba(255,161,48,.31)',c1:'rgba(220,108,14,.018)'},
-      {near:1.48,far:1.72,alpha:.028,blur:27,c0:'rgba(255,151,40,.22)',c1:'rgba(210,98,10,.006)'}
-    ];
-
-    // Outer atmospheric body: progressively softer frustums eliminate the visible cutoff.
-    layers.slice().reverse().forEach(L=>{
-      const pts=[
-        {x:sx+nx*nearHalf*L.near,y:sy+ny*nearHalf*L.near},
-        {x:tx+nx*farHalf*L.far,y:ty+ny*farHalf*L.far},
-        {x:tx-nx*farHalf*L.far,y:ty-ny*farHalf*L.far},
-        {x:sx-nx*nearHalf*L.near,y:sy-ny*nearHalf*L.near}
-      ];
-      ctx.save();ctx.globalCompositeOperation='source-over';ctx.filter=`blur(${L.blur}px)`;ctx.globalAlpha=L.alpha*lightIn;
-      const grad=ctx.createLinearGradient(sx,sy,tx,ty);
-      grad.addColorStop(0,L.c0);grad.addColorStop(.24,'rgba(246,145,34,.32)');
-      grad.addColorStop(.70,'rgba(229,121,20,.10)');grad.addColorStop(1,L.c1);
-      ctx.fillStyle=grad;traceQuad(ctx,pts);ctx.fill();ctx.restore();
-    });
-
-    // Brighter inner optical volume.
-    const innerNear=nearHalf*.54,innerFar=farHalf*.47;
-    const inner=[
-      {x:sx+nx*innerNear,y:sy+ny*innerNear},
-      {x:tx+nx*innerFar,y:ty+ny*innerFar},
-      {x:tx-nx*innerFar,y:ty-ny*innerFar},
-      {x:sx-nx*innerNear,y:sy-ny*innerNear}
-    ];
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.filter='blur(5px)';ctx.globalAlpha=.30*lightIn;
-    let grad=ctx.createLinearGradient(sx,sy,tx,ty);
-    grad.addColorStop(0,'rgba(255,226,143,.70)');
-    grad.addColorStop(.22,rgba(tint,.48));grad.addColorStop(.72,rgba(tint,.12));grad.addColorStop(1,rgba(tint,0));
-    ctx.fillStyle=grad;traceQuad(ctx,inner);ctx.fill();ctx.restore();
-
-    // Each lamp has a slightly different divergence. Their overlapping shafts make the
-    // beam edge naturally irregular instead of mathematically identical.
-    const emitters=[
-      [-.82,-.035],[-.61,.018],[-.40,-.012],[-.20,.026],[0,-.020],
-      [.20,.012],[.40,-.027],[.61,.020],[.82,-.008]
-    ];
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';
-    emitters.forEach(([v,d],i)=>{
-      const src=v*nearHalf*.72;
-      const spread=farHalf*(.66+d);
-      const dst=v*spread;
-      ctx.globalAlpha=(.038+(i%3)*.006)*lightIn;
-      ctx.strokeStyle='rgba(255,193,86,.70)';
-      ctx.lineWidth=2.4+(i%2)*.55;
-      ctx.shadowColor='rgba(255,165,42,.36)';ctx.shadowBlur=4.5;
-      ctx.beginPath();ctx.moveTo(sx+nx*src,sy+ny*src);ctx.lineTo(tx+nx*dst,ty+ny*dst);ctx.stroke();
-    });
+    ctx.save();ctx.globalCompositeOperation='source-over';
+    for(let j=0;j<SL;j++){
+      const u0=UEND*j/SL,u1=UEND*(j+1)/SL,um=(u0+u1)*.5,axial=sampleStops(REFERENCE_LIGHT.axial,um)*lightIn;
+      if(axial<=.001)continue;
+      const w0=mix(nearHalf,farHalf,Math.min(u0,1))*(1+Math.max(0,u0-1)*.42);
+      const w1=mix(nearHalf,farHalf,Math.min(u1,1))*(1+Math.max(0,u1-1)*.42);
+      const wm=(w0+w1)*.5;
+      const c0={x:sx+(tx-sx)*u0,y:sy+(ty-sy)*u0},c1={x:sx+(tx-sx)*u1,y:sy+(ty-sy)*u1},cm={x:(c0.x+c1.x)*.5,y:(c0.y+c1.y)*.5};
+      const grad=ctx.createLinearGradient(cm.x-nx*wm*RMAX,cm.y-ny*wm*RMAX,cm.x+nx*wm*RMAX,cm.y+ny*wm*RMAX);
+      REFERENCE_LIGHT.radial.forEach(([q,rgb,a])=>grad.addColorStop((q+RMAX)/(2*RMAX),rgbaRgb(tintRgb(rgb,tint),a)));
+      ctx.fillStyle=grad;ctx.globalAlpha=.78*axial;
+      ctx.beginPath();ctx.moveTo(c0.x-nx*w0*RMAX,c0.y-ny*w0*RMAX);ctx.lineTo(c1.x-nx*w1*RMAX,c1.y-ny*w1*RMAX);
+      ctx.lineTo(c1.x+nx*w1*RMAX,c1.y+ny*w1*RMAX);ctx.lineTo(c0.x+nx*w0*RMAX,c0.y+ny*w0*RMAX);ctx.closePath();ctx.fill();
+    }
     ctx.restore();
 
-    // Volumetric particulate scattering at many depths. Spread grows continuously with
-    // distance from the lamps and fades before the nominal edge, preventing a "cutout" look.
+    // High-energy optical core uses the traced warm core, never neutral white.
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.20*lightIn;
+    for(let j=0;j<20;j++){
+      const u0=j/20,u1=(j+1)/20,w0=mix(nearHalf*.31,farHalf*.34,u0),w1=mix(nearHalf*.31,farHalf*.34,u1);
+      const c0={x:sx+(tx-sx)*u0,y:sy+(ty-sy)*u0},c1={x:sx+(tx-sx)*u1,y:sy+(ty-sy)*u1},cm={x:(c0.x+c1.x)*.5,y:(c0.y+c1.y)*.5},wm=(w0+w1)*.5;
+      const gr=ctx.createLinearGradient(cm.x-nx*wm,cm.y-ny*wm,cm.x+nx*wm,cm.y+ny*wm);
+      gr.addColorStop(0,rgbaRgb(tintRgb([241,164,54],tint),0));gr.addColorStop(.5,rgbaRgb(tintRgb([252,204,113],tint),.78));gr.addColorStop(1,rgbaRgb(tintRgb([241,164,54],tint),0));
+      ctx.fillStyle=gr;ctx.beginPath();ctx.moveTo(c0.x-nx*w0,c0.y-ny*w0);ctx.lineTo(c1.x-nx*w1,c1.y-ny*w1);ctx.lineTo(c1.x+nx*w1,c1.y+ny*w1);ctx.lineTo(c0.x+nx*w0,c0.y+ny*w0);ctx.closePath();ctx.fill();
+    }
+    ctx.restore();
+
+    // Depth scattering is sampled throughout the same SDTF envelope and fades past impact.
     ctx.save();ctx.globalCompositeOperation='screen';
-    for(let i=0;i<72;i++){
-      const u=.055+((i*.61803398875+time*.021)% .91);
-      const envelope=Math.pow(Math.sin(Math.PI*u),.42);
-      const signed=((i*0.754877666)%1)*2-1;
-      const localHalf=mix(nearHalf*1.15,farHalf*1.34,u);
-      const edgeFade=Math.pow(Math.max(0,1-Math.abs(signed)),.34);
-      const px=sx+(tx-sx)*u+nx*(signed*localHalf)+Math.sin(time*.47+i*2.17)*2.8;
-      const py=sy+(ty-sy)*u+ny*(signed*localHalf)+Math.cos(time*.41+i*1.73)*2.2;
-      const rr=.45+(i%5)*.24+(1-u)*.45;
-      ctx.globalAlpha=(.010+.030*edgeFade)*envelope*lightIn;
-      ctx.fillStyle=i%4===0?'#ffe0a1':(i%2===0?'#ffc46e':'#efa044');
+    for(let i=0;i<104;i++){
+      const u=.025+((i*.61803398875+time*.017)%1.18),axial=sampleStops(REFERENCE_LIGHT.axial,Math.min(u,UEND));
+      if(axial<=0)continue;
+      const local=mix(nearHalf,farHalf,Math.min(u,1))*(1+Math.max(0,u-1)*.42),signed=((i*.754877666)%1)*2-1;
+      const edge=Math.max(0,1-Math.pow(Math.abs(signed)/1.48,1.55));
+      const px=sx+(tx-sx)*u+nx*signed*local*1.42+Math.sin(time*.43+i*2.17)*1.9;
+      const py=sy+(ty-sy)*u+ny*signed*local*1.42+Math.cos(time*.39+i*1.71)*1.6,rr=.38+(i%6)*.18;
+      ctx.globalAlpha=(.005+.024*edge)*axial*lightIn;ctx.fillStyle=rgbaRgb(tintRgb(i%4===0?[252,211,133]:i%2===0?[247,184,77]:[232,143,39],tint),1);
       ctx.beginPath();ctx.arc(px,py,rr,0,Math.PI*2);ctx.fill();
     }
     ctx.restore();
 
-    // Source bloom remains local to the fixture.
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.22*lightIn;
-    const source=ctx.createRadialGradient(sx,sy,3,sx,sy,46);
-    source.addColorStop(0,'rgba(255,235,168,.58)');
-    source.addColorStop(.40,'rgba(255,181,65,.24)');
-    source.addColorStop(1,'rgba(255,136,25,0)');
-    ctx.fillStyle=source;ctx.fillRect(sx-50,sy-50,100,100);ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.18*lightIn;
+    const source=ctx.createRadialGradient(sx,sy,2,sx,sy,44);
+    source.addColorStop(0,rgbaRgb(tintRgb([252,211,133],tint),.54));source.addColorStop(.42,rgbaRgb(tintRgb([235,151,42],tint),.20));source.addColorStop(1,rgbaRgb(tintRgb([235,151,42],tint),0));
+    ctx.fillStyle=source;ctx.fillRect(sx-47,sy-47,94,94);ctx.restore();
   }
   function buildReflection(time,s){
     const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d',flicker=.99+.01*Math.sin(time*15);
     rc.clearRect(0,0,W,H);
-
-    const fx=g.tx,fy=g.ty,depth=132;
-    const backX=fx-g.ux*depth,backY=fy-g.uy*depth;
-    const footprintLayers=[
-      {scale:1.34,alpha:.10,blur:12},
-      {scale:1.16,alpha:.15,blur:7},
-      {scale:1.00,alpha:.22,blur:3},
-      {scale:.72,alpha:.18,blur:1.5}
-    ];
-
-    footprintLayers.forEach((L,idx)=>{
-      const half=g.farHalf*.72*L.scale;
-      const pts=[
-        {x:backX+g.nx*half*.56,y:backY+g.ny*half*.56},
-        {x:fx+g.nx*half,y:fy+g.ny*half},
-        {x:fx-g.nx*half,y:fy-g.ny*half},
-        {x:backX-g.nx*half*.56,y:backY-g.ny*half*.56}
+    const fx=g.tx,fy=g.ty,depth=104,backX=fx-g.ux*depth,backY=fy-g.uy*depth;
+    const bands=[{scale:1.46,a:.045,blur:16},{scale:1.27,a:.075,blur:10},{scale:1.10,a:.11,blur:6},{scale:.91,a:.15,blur:3},{scale:.67,a:.14,blur:1.4}];
+    bands.forEach(B=>{
+      const half=g.farHalf*B.scale,pts=[
+        {x:backX+g.nx*half*.58,y:backY+g.ny*half*.58},{x:fx+g.nx*half,y:fy+g.ny*half},
+        {x:fx-g.nx*half,y:fy-g.ny*half},{x:backX-g.nx*half*.58,y:backY-g.ny*half*.58}
       ];
-      rc.save();rc.globalCompositeOperation='screen';rc.filter=`blur(${L.blur}px)`;rc.globalAlpha=L.alpha*flicker;
-      const fg=rc.createLinearGradient(backX,backY,fx,fy);
-      fg.addColorStop(0,'rgba(255,146,29,0)');
-      fg.addColorStop(.30,rgba(tint,.14));
-      fg.addColorStop(.72,rgba(tint,.30));
-      fg.addColorStop(1,idx===3?'rgba(255,211,105,.36)':'rgba(255,191,68,.18)');
+      const core=tintRgb([250,198,105],tint),edge=tintRgb([228,141,34],tint);
+      rc.save();rc.globalCompositeOperation='screen';rc.filter=`blur(${B.blur}px)`;rc.globalAlpha=B.a*flicker;
+      const fg=rc.createLinearGradient(backX,backY,fx,fy);fg.addColorStop(0,rgbaRgb(edge,0));fg.addColorStop(.42,rgbaRgb(edge,.12));fg.addColorStop(.82,rgbaRgb(core,.27));fg.addColorStop(1,rgbaRgb(core,.16));
       rc.fillStyle=fg;traceQuad(rc,pts);rc.fill();rc.restore();
     });
-
-    // Clip all reflected energy to the actual building plate.
-    rc.save();rc.globalCompositeOperation='destination-in';
-    const push=1+s.cameraPush*clamp(time/D,0,1);
-    drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
-
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.58,s.pool*.68);
-    ctx.drawImage(reflection,0,0);ctx.restore();
+    rc.save();rc.globalCompositeOperation='destination-in';const push=1+s.cameraPush*clamp(time/D,0,1);drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.50,s.pool*.60);ctx.drawImage(reflection,0,0);ctx.restore();
+  }
+  function drawLightPathGuide(time,s){
+    if(!s.showPath||time<s.beamIn)return;
+    const g=beamGeometry(time,s),u=REFERENCE_LIGHT.extension,ex=g.sx+(g.tx-g.sx)*u,ey=g.sy+(g.ty-g.sy)*u,ew=g.farHalf*(1+(u-1)*.42)*1.55;
+    ctx.save();ctx.lineWidth=1.15;ctx.setLineDash([8,7]);ctx.strokeStyle='rgba(75,235,105,.92)';ctx.globalAlpha=.72;
+    ctx.beginPath();ctx.moveTo(g.sx,g.sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.globalAlpha=.42;
+    ctx.beginPath();ctx.moveTo(g.sx+g.nx*g.nearHalf*1.55,g.sy+g.ny*g.nearHalf*1.55);ctx.lineTo(ex+g.nx*ew,ey+g.ny*ew);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(g.sx-g.nx*g.nearHalf*1.55,g.sy-g.ny*g.nearHalf*1.55);ctx.lineTo(ex-g.nx*ew,ey-g.ny*ew);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(75,235,105,.95)';ctx.beginPath();ctx.arc(g.tx,g.ty,4,0,Math.PI*2);ctx.fill();ctx.font='600 10px ui-monospace,monospace';ctx.fillText('TRACED LIGHT PATH',g.tx+8,g.ty-8);ctx.restore();
   }
   function drawFlash(time,s){
     const burst=s.flash*(.92*Math.exp(-Math.pow((time-.19)/.12,2))+.26*Math.exp(-Math.pow((time-.34)/.10,2)));
@@ -281,7 +253,7 @@
     ctx.globalAlpha*=.44;ctx.drawImage(images.clouds,-28-drift*.35,y+24,W+56,H+36);ctx.restore();
   }
   function render(time){
-    if(!ready)return;const s=readSettings();time=clamp(time,0,D);t=time;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#070b11';ctx.fillRect(0,0,W,H);
+    if(!ready)return;const s=readSettings();time=clamp(time,0,D);t=time;ctx.setTransform(RENDER_SCALE,0,0,RENDER_SCALE,0,0);ctx.fillStyle='#070b11';ctx.fillRect(0,0,W,H);
     const bgIn=smooth((time-.02)/.44),push=1+s.cameraPush*clamp(time/D,0,1),pan=Math.sin(time*.32)*5*s.skyDrift;
     if(layers.background){ctx.save();ctx.globalAlpha=bgIn;drawCover(images.background,pan,Math.sin(time*.25)*2*s.skyDrift,1.025);ctx.restore();}
     // Reference grade: richer burnt-orange atmosphere on the left, deeper blue-black on the right.
@@ -303,6 +275,7 @@
     if(layers.searchlight)drawBeam(time,s,lightIn);
     if(layers.reflection&&buildingAlpha>0)buildReflection(time,s);
     if(layers.searchlight)drawSearchlightBulbs(time,s,lightIn);
+    if(layers.searchlight)drawLightPathGuide(time,s);
     const titleProgress=smooth((time-s.titleStart)/s.titleRise);
     // Keep the cloud bank behind the title: the title sits on the mist instead of
     // being swallowed by a foreground veil during its reveal.
@@ -390,5 +363,5 @@
   document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.dataset.pane===btn.dataset.tab));}));
   const numeric={lightWidth:['lightWidthOut',v=>`${Math.round(v)}px`],beamSweep:['beamSweepOut',v=>`${Math.round(v)}°`],titleOpacity:['titleOpacityOut',v=>`${Math.round(v)}%`],titleDistress:['titleDistressOut',v=>`${Math.round(v)}%`],titleStart:['titleStartOut',v=>`${v.toFixed(1)}s`],titleRise:['titleRiseOut',v=>`${v.toFixed(1)}s`],lightSpeed:['lightSpeedOut',v=>`${v.toFixed(2)}×`],cameraPush:['cameraPushOut',v=>`${Math.round(v)}%`],titleSize:['titleSizeOut',v=>`${Math.round(v)}px`],titleY:['titleYOut',v=>`${Math.round(v)}px`],cloudOffset:['cloudOffsetOut',v=>`${Math.round(v)}px`],flashStrength:['flashStrengthOut',v=>`${Math.round(v)}%`],poolStrength:['poolStrengthOut',v=>`${Math.round(v)}%`],cloudStrength:['cloudStrengthOut',v=>`${Math.round(v)}%`],boomStrength:['boomStrengthOut',v=>`${Math.round(v)}%`],beamIn:['beamInOut',v=>`${v.toFixed(2)}s`],cloudIn:['cloudInOut',v=>`${v.toFixed(2)}s`],cloudOut:['cloudOutOut',v=>`${v.toFixed(1)}s`],buildingIn:['buildingInOut',v=>`${v.toFixed(2)}s`],buildingReveal:['buildingRevealOut',v=>`${v.toFixed(2)}s`],cloudSpeed:['cloudSpeedOut',v=>`${v.toFixed(2)}×`],skyDrift:['skyDriftOut',v=>`${Math.round(v)}%`]};
   for(const [id,[out,fmt]] of Object.entries(numeric)){$(id).addEventListener('input',()=>{setOut(id,out,fmt);if(id==='titleSize')rebuildTitle();render(t);});setOut(id,out,fmt);}
-  $('titleGold').addEventListener('input',()=>{rebuildTitle();render(t);});$('beamTint').addEventListener('input',()=>render(t));
+  $('titleGold').addEventListener('input',()=>{rebuildTitle();render(t);});$('beamTint').addEventListener('input',()=>render(t));if($('showLightPath'))$('showLightPath').addEventListener('change',()=>render(t));
 })();
