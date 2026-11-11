@@ -17,9 +17,9 @@
   function val(id){return Number($(id).value);}
   function readSettings(){return {
     titleStart:val('titleStart'), titleRise:val('titleRise'), lightSpeed:val('lightSpeed'), cameraPush:val('cameraPush')/100,
-    titleSize:val('titleSize'), titleY:val('titleY'), gold:$('titleGold').value, beamTint:$('beamTint').value,
+    titleSize:val('titleSize'), titleY:val('titleY'), cloudSpeed:val('cloudSpeed'), skyDrift:val('skyDrift')/100, gold:$('titleGold').value, beamTint:$('beamTint').value,
     flash:val('flashStrength')/100, pool:val('poolStrength')/100, cloud:val('cloudStrength')/100,
-    boom:val('boomStrength')/100, beamIn:val('beamIn'), cloudIn:val('cloudIn'), cloudOut:val('cloudOut'), buildingIn:val('buildingIn')
+    boom:val('boomStrength')/100, beamIn:val('beamIn'), cloudIn:val('cloudIn'), cloudOut:val('cloudOut'), buildingIn:val('buildingIn'), buildingReveal:val('buildingReveal')
   };}
   function rebuildTitle(){
     if(!ready) return; seed=91823; const s=readSettings(),text=$('titleText').value||'SACRAMENTO';
@@ -67,20 +67,20 @@
     if(!layers.clouds)return;const inP=smooth((time-s.cloudIn)/.45),outP=time<s.cloudOut?1:mix(1,.58,smooth((time-s.cloudOut)/1.2));
     // Cloud stays in front of the title, thinning only after the gold letters have risen into place.
     const titleThinning=.78+.22*smooth(titleProgress-.25);ctx.save();ctx.globalAlpha=s.cloud*inP*outP*titleThinning;
-    const drift=Math.sin(time*.55)*32;ctx.drawImage(images.clouds,-38+drift,-8,W+76,H+16);ctx.restore();
+    const drift=Math.sin(time*.55*s.cloudSpeed)*32;ctx.drawImage(images.clouds,-38+drift,-8,W+76,H+16);ctx.restore();
   }
   function render(time){
     if(!ready)return;const s=readSettings();time=clamp(time,0,D);t=time;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#070b11';ctx.fillRect(0,0,W,H);
-    const bgIn=smooth((time-.02)/.44),push=1+s.cameraPush*clamp(time/D,0,1),pan=Math.sin(time*.32)*5;
-    if(layers.background){ctx.save();ctx.globalAlpha=bgIn;drawCover(images.background,pan,Math.sin(time*.25)*2,1.025);ctx.restore();}
+    const bgIn=smooth((time-.02)/.44),push=1+s.cameraPush*clamp(time/D,0,1),pan=Math.sin(time*.32)*5*s.skyDrift;
+    if(layers.background){ctx.save();ctx.globalAlpha=bgIn;drawCover(images.background,pan,Math.sin(time*.25)*2*s.skyDrift,1.025);ctx.restore();}
     // Quiet cool vignette keeps the beam and gold title legible without crushing the supplied sky plate.
     const vignette=ctx.createRadialGradient(W*.53,H*.38,140,W*.53,H*.38,780);vignette.addColorStop(0,'rgba(5,9,15,0)');vignette.addColorStop(1,'rgba(2,5,10,.37)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
-    const buildingAlpha=layers.building?smooth((time-s.buildingIn)/.72):0;
+    const buildingAlpha=layers.building?smooth((time-s.buildingIn)/s.buildingReveal):0;
     if(layers.searchlight){const lightIn=smooth((time-s.beamIn)/.55)*(.91+.025*Math.sin(time*16));ctx.save();ctx.globalAlpha=lightIn;drawCover(images.searchlight,0,0,1);
       // Editable warm cone follows the fixture and sweeps the construction floors.
       const ph=Math.max(0,time-s.beamIn)*s.lightSpeed*.72, sx=1115,sy=105,tx=690+320*Math.cos(ph-.45),ty=330+115*Math.sin(ph*1.16),dx=tx-sx,dy=ty-sy,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len;
       const cone=ctx.createLinearGradient(sx,sy,tx,ty);cone.addColorStop(0,rgba(s.beamTint,.36));cone.addColorStop(.55,rgba(s.beamTint,.18));cone.addColorStop(1,rgba(s.beamTint,.025));ctx.globalAlpha=lightIn*.68;ctx.globalCompositeOperation='screen';ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(tx+nx*90,ty+ny*90);ctx.lineTo(tx-nx*90,ty-ny*90);ctx.closePath();ctx.fill();ctx.restore();}
-    if(buildingAlpha>0){ctx.save();ctx.globalAlpha=buildingAlpha;const bscale=push*(.965+.035*smooth((time-s.buildingIn)/1.4)),bw=W*bscale,bh=H*bscale;ctx.drawImage(images.building,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();}
+    if(buildingAlpha>0){ctx.save();ctx.globalAlpha=buildingAlpha;const bscale=push*(.965+.035*smooth((time-s.buildingIn)/Math.max(.4,s.buildingReveal*2))),bw=W*bscale,bh=H*bscale;ctx.drawImage(images.building,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();}
     if(layers.reflection&&buildingAlpha>0)buildReflection(time,s);
     // Sparse hot motes drift through the beam around the moving pool of light.
     if(layers.searchlight&&time>s.beamIn){ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<14;i++){const a=time*(.35+i*.012)+i*2.4;const x=690+350*Math.cos(a),y=290+180*Math.sin(a*1.12),r=1.2+(i%3)*.7;ctx.globalAlpha=.12+.13*(.5+.5*Math.sin(a*4));ctx.fillStyle='#ffd38b';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}ctx.restore();}
@@ -115,7 +115,7 @@
   $('titleText').addEventListener('input',()=>{rebuildTitle();render(t);});
   document.querySelectorAll('[data-layer]').forEach(el=>el.addEventListener('change',()=>{layers[el.dataset.layer]=el.checked;render(t);}));
   document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.dataset.pane===btn.dataset.tab));}));
-  const numeric={titleStart:['titleStartOut',v=>`${v.toFixed(1)}s`],titleRise:['titleRiseOut',v=>`${v.toFixed(1)}s`],lightSpeed:['lightSpeedOut',v=>`${v.toFixed(2)}×`],cameraPush:['cameraPushOut',v=>`${Math.round(v)}%`],titleSize:['titleSizeOut',v=>`${Math.round(v)}px`],titleY:['titleYOut',v=>`${Math.round(v)}px`],flashStrength:['flashStrengthOut',v=>`${Math.round(v)}%`],poolStrength:['poolStrengthOut',v=>`${Math.round(v)}%`],cloudStrength:['cloudStrengthOut',v=>`${Math.round(v)}%`],boomStrength:['boomStrengthOut',v=>`${Math.round(v)}%`],beamIn:['beamInOut',v=>`${v.toFixed(2)}s`],cloudIn:['cloudInOut',v=>`${v.toFixed(2)}s`],cloudOut:['cloudOutOut',v=>`${v.toFixed(1)}s`],buildingIn:['buildingInOut',v=>`${v.toFixed(2)}s`]};
+  const numeric={titleStart:['titleStartOut',v=>`${v.toFixed(1)}s`],titleRise:['titleRiseOut',v=>`${v.toFixed(1)}s`],lightSpeed:['lightSpeedOut',v=>`${v.toFixed(2)}×`],cameraPush:['cameraPushOut',v=>`${Math.round(v)}%`],titleSize:['titleSizeOut',v=>`${Math.round(v)}px`],titleY:['titleYOut',v=>`${Math.round(v)}px`],flashStrength:['flashStrengthOut',v=>`${Math.round(v)}%`],poolStrength:['poolStrengthOut',v=>`${Math.round(v)}%`],cloudStrength:['cloudStrengthOut',v=>`${Math.round(v)}%`],boomStrength:['boomStrengthOut',v=>`${Math.round(v)}%`],beamIn:['beamInOut',v=>`${v.toFixed(2)}s`],cloudIn:['cloudInOut',v=>`${v.toFixed(2)}s`],cloudOut:['cloudOutOut',v=>`${v.toFixed(1)}s`],buildingIn:['buildingInOut',v=>`${v.toFixed(2)}s`],buildingReveal:['buildingRevealOut',v=>`${v.toFixed(2)}s`],cloudSpeed:['cloudSpeedOut',v=>`${v.toFixed(2)}×`],skyDrift:['skyDriftOut',v=>`${Math.round(v)}%`]};
   for(const [id,[out,fmt]] of Object.entries(numeric)){$(id).addEventListener('input',()=>{setOut(id,out,fmt);if(id==='titleSize')rebuildTitle();render(t);});setOut(id,out,fmt);}
   $('titleGold').addEventListener('input',()=>{rebuildTitle();render(t);});$('beamTint').addEventListener('input',()=>render(t));
 })();

@@ -5,24 +5,131 @@
   "kind": "scene-template",
   "durationSeconds": 8,
   "frameRate": 24,
-  "resolution": {"width": 1280, "height": 720},
+  "resolution": {
+    "width": 1280,
+    "height": 720
+  },
   "status": "preview-ready",
   "independentFrom": "barry-minkow-opening",
-  "editableLayers": ["background", "building", "searchlight", "reflection", "clouds", "title", "flash bloom", "sound hit"],
+  "editableLayers": [
+    "background",
+    "building",
+    "searchlight",
+    "reflection",
+    "clouds",
+    "title",
+    "flash bloom",
+    "sound hit"
+  ],
   "sequence": [
-    {"in": 0.00, "out": 0.42, "beat": "Single flashlight bloom/boom establishes the scene", "layers": ["flash bloom", "sound hit"]},
-    {"in": 0.20, "out": 1.35, "beat": "Sunset storm sky resolves; the unfinished tower appears", "layers": ["background", "building"]},
-    {"in": 0.30, "out": 4.80, "beat": "Floodlight beam sweeps; a warm moving pool and reflected streak travel across the facade", "layers": ["searchlight", "reflection"]},
-    {"in": 0.00, "out": 8.00, "beat": "Low rolling cloud veils the podium and title baseline", "layers": ["clouds"]},
-    {"in": 3.00, "out": 4.10, "beat": "Large distressed-gold SACRAMENTO title rises behind the foreground cloud", "layers": ["title", "clouds"]},
-    {"in": 4.10, "out": 8.00, "beat": "Final layered composition holds with moving light and drifting cloud", "layers": ["all"]}
+    {
+      "in": 0.0,
+      "out": 0.42,
+      "beat": "Single flashlight bloom/boom establishes the scene",
+      "layers": [
+        "flash bloom",
+        "sound hit"
+      ]
+    },
+    {
+      "in": 0.2,
+      "out": 1.35,
+      "beat": "Sunset storm sky resolves; the unfinished tower appears",
+      "layers": [
+        "background",
+        "building"
+      ]
+    },
+    {
+      "in": 0.3,
+      "out": 4.8,
+      "beat": "Floodlight beam sweeps; a warm moving pool and reflected streak travel across the facade",
+      "layers": [
+        "searchlight",
+        "reflection"
+      ]
+    },
+    {
+      "in": 0.0,
+      "out": 8.0,
+      "beat": "Low rolling cloud veils the podium and title baseline",
+      "layers": [
+        "clouds"
+      ]
+    },
+    {
+      "in": 3.0,
+      "out": 4.1,
+      "beat": "Large distressed-gold SACRAMENTO title rises behind the foreground cloud",
+      "layers": [
+        "title",
+        "clouds"
+      ]
+    },
+    {
+      "in": 4.1,
+      "out": 8.0,
+      "beat": "Final layered composition holds with moving light and drifting cloud",
+      "layers": [
+        "all"
+      ]
+    }
   ],
   "assets": [
-    {"id":"background","src":"assets/background.webp","role":"Sacramento sunset/storm sky with capitol silhouette","classification":"user-supplied/generated illustrative scene plate"},
-    {"id":"building","src":"assets/building.webp","role":"transparent unfinished office-tower cutout with renovation signage","classification":"user-supplied/generated illustrative cutout"},
-    {"id":"searchlight","src":"assets/searchlight.webp","role":"floodlight rig and warm beam cutout","classification":"user-supplied/generated illustrative light asset"},
-    {"id":"clouds","src":"assets/clouds.webp","role":"lower foreground cloud occlusion","classification":"user-supplied/generated transparent overlay"},
-    {"id":"poster","src":"assets/poster.webp","role":"final-composition reference thumbnail","classification":"user-supplied visual reference"}
+    {
+      "id": "background",
+      "src": "assets/background.webp",
+      "role": "Sacramento sunset/storm sky with capitol silhouette",
+      "classification": "user-supplied/generated illustrative scene plate"
+    },
+    {
+      "id": "building",
+      "src": "assets/building.webp",
+      "role": "transparent unfinished office-tower cutout with renovation signage",
+      "classification": "user-supplied/generated illustrative cutout"
+    },
+    {
+      "id": "searchlight",
+      "src": "assets/searchlight.webp",
+      "role": "floodlight rig and warm beam cutout",
+      "classification": "user-supplied/generated illustrative light asset"
+    },
+    {
+      "id": "clouds",
+      "src": "assets/clouds.webp",
+      "role": "lower foreground cloud occlusion",
+      "classification": "user-supplied/generated transparent overlay"
+    },
+    {
+      "id": "poster",
+      "src": "assets/poster.webp",
+      "role": "final-composition reference thumbnail",
+      "classification": "user-supplied visual reference"
+    }
   ],
-  "flashlightReuse": {"sourceTemplate":"circular-spin-flashlight-glitch","reusedBehavior":"single warm flash-core bloom with screen blend","omittedBehaviors":["circular spin","paparazzi strobe sequence","glitch breakup"]}
+  "flashlightReuse": {
+    "sourceTemplate": "circular-spin-flashlight-glitch",
+    "reusedBehavior": "single warm flash-core bloom with screen blend",
+    "omittedBehaviors": [
+      "circular spin",
+      "paparazzi strobe sequence",
+      "glitch breakup"
+    ]
+  },
+  "editableControls": [
+    "layer visibility",
+    "title text",
+    "title reveal start and duration",
+    "searchlight sweep speed",
+    "cloud drift speed",
+    "background sky drift",
+    "camera push",
+    "title size and baseline",
+    "gold and beam tint",
+    "flashlight bloom strength",
+    "moving reflection strength",
+    "cloud opacity and timing",
+    "building reveal start and duration",
+    "opening sound enable and level"
+  ]
 }
