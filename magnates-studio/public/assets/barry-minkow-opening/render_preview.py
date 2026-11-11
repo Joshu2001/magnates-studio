@@ -1,12 +1,13 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 from pathlib import Path
-import math, random
+import math, random, json
 import numpy as np
 BASE=Path(__file__).resolve().parent
 AS=BASE/'assets'
+CAM=json.loads((BASE/'tower-camera.json').read_text())
 OUT=BASE/'preview-frames'; OUT.mkdir(exist_ok=True)
 W,H,FPS=1280,720,24
-im={k:Image.open(AS/v).convert('RGBA') for k,v in {'sky':'sacramento-storm-sky.webp','city':'sacramento-skyline.webp','tower':'sacramento-tower-base-cutout.webp','corridor':'construction-corridor.webp','pbg':'portrait-facade-background.webp','portrait':'barry-minkow-caption-free-portrait.webp'}.items()}
+im={k:Image.open(AS/v).convert('RGBA') for k,v in {'sky':'sacramento-storm-sky.webp','city':'sacramento-skyline.webp','tower':'sacramento-tower-three-story-podium.png','corridor':'construction-corridor.webp','pbg':'portrait-facade-background.webp','portrait':'barry-minkow-caption-free-portrait.webp'}.items()}
 font='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 font_cond='/usr/share/fonts/truetype/dejavu/DejaVuSansCondensed-Bold.ttf'
 def fnt(size,cond=False): return ImageFont.truetype(font_cond if cond else font,size)
@@ -34,25 +35,25 @@ def draw(t):
  sky.putalpha(mask)
  blend(frame,sky)
  haze=Image.new('RGBA',(W,H));hd=ImageDraw.Draw(haze);hd.rectangle((0,340,W,H),fill=(5,10,16,60));haze=haze.filter(ImageFilter.GaussianBlur(48));blend(frame,haze,.8)
- # The exact tower cutout arrives, pushes close, then eases back.
- rev=sm((t-1.05)/.95);close=sm((t-2.2)/1.25);pull=sm((t-3.6)/.8)
+ # Native-resolution cutout: upper tower first, then push in and glide down to the podium.
+ rev=sm((t-CAM['towerRevealStart'])/CAM['towerRevealDuration']);close=sm((t-CAM['pushStart'])/CAM['pushDuration']);glide=sm((t-CAM['glideStart'])/CAM['glideDuration'])
  tower_box=None
  if rev>0:
-  h=int((430+(660-430)*close)*(1-.12*pull));w=int(h*im['tower'].width/im['tower'].height);tower=im['tower'].resize((w,h),Image.Resampling.LANCZOS);layer=Image.new('RGBA',(W,H));cx=int(830+35*(1-close)-10*pull);x=cx-w//2;y=H+5-h;layer.alpha_composite(tower,(x,y));blend(frame,layer,rev*(1-.12*pull));tower_box=(x,y,w,h)
+  scale=CAM['scaleStart']+(CAM['scaleEnd']-CAM['scaleStart'])*close;w=int(im['tower'].width*scale);h=int(im['tower'].height*scale);tower=im['tower'].resize((w,h),Image.Resampling.LANCZOS);layer=Image.new('RGBA',(W,H));cx=int(CAM['centerStart']+(CAM['centerEnd']-CAM['centerStart'])*close);x=cx-w//2;y=int(CAM['topStart']+(CAM['topEnd']-CAM['topStart'])*close-CAM['panY']*glide);layer.paste(tower,(x,y),tower);blend(frame,layer,rev);tower_box=(x,y,w,h)
  # moving warm searchlight: directional trapezoid and soft spill
  p=max(0,min(1,(t-2.55)/1.35))
  if 0<p<1:
   x=int(1010-540*sm(p)+max(0,(p-.84)/.16)*100); glow=Image.new('RGBA',(W,H));g=ImageDraw.Draw(glow);g.polygon([(1188,148),(x-88,416),(x+106,434),(1210,167)],fill=(255,192,104,86));g.line([(1184,151),(x+5,425)],fill=(255,226,172,170),width=4);g.ellipse((x-190,245,x+190,475),fill=(255,209,139,48));glow=glow.filter(ImageFilter.GaussianBlur(23));blend(frame,glow,math.sin(p*math.pi)*1.1); core=Image.new('RGBA',(W,H));cd=ImageDraw.Draw(core);cd.line([(1184,151),(x+5,425)],fill=(255,225,165,180),width=5);cd.ellipse((x-20,408,x+28,448),fill=(255,210,125,130));core=core.filter(ImageFilter.GaussianBlur(8));blend(frame,core,math.sin(p*math.pi))
  # A rightward-moving location title uses the same image pixels as the lower facade.
  d=ImageDraw.Draw(frame)
- loc=sm((t-2.25)/.34)*(1-sm((t-4.78)/.48))
+ loc=sm((t-CAM['titleStart'])/CAM['titleInDuration'])*(1-sm((t-CAM['titleOutStart'])/CAM['titleOutDuration']))
  if loc>0 and tower_box:
-  x0,y0,tw,th=tower_box;px=int(610+110*sm((t-3.75)/.78));py=int(y0+th*.855);mask=Image.new('L',(W,H));md=ImageDraw.Draw(mask);md.text((px,py),'SACRAMENTO',font=fnt(29,True),fill=255,anchor='lm',stroke_width=0)
-  source=Image.new('RGBA',(W,H));scaled=im['tower'].resize((tw,th),Image.Resampling.LANCZOS);source.alpha_composite(scaled,(x0,y0));arr=np.asarray(source).copy();mat=np.asarray(mask,dtype=np.float32)*loc;gold=np.array([238,177,59],dtype=np.float32);arr[:,:,:3]=np.clip(arr[:,:,:3]*.42+gold*.58,0,255).astype(np.uint8);arr[:,:,3]=(arr[:,:,3].astype(np.float32)*mat/255).astype(np.uint8);frame.alpha_composite(Image.fromarray(arr,'RGBA'))
+  x0,y0,tw,th=tower_box;px=int(CAM['titleXStart']+(CAM['titleXEnd']-CAM['titleXStart'])*sm((t-CAM['titleMoveStart'])/CAM['titleMoveDuration']));py=int(y0+th*CAM['titleAnchorY']);mask=Image.new('L',(W,H));md=ImageDraw.Draw(mask);md.text((px,py),'SACRAMENTO',font=fnt(29,True),fill=255,anchor='lm',stroke_width=0)
+  source=Image.new('RGBA',(W,H));scaled=im['tower'].resize((tw,th),Image.Resampling.LANCZOS);source.paste(scaled,(x0,y0),scaled);arr=np.asarray(source).copy();mat=np.asarray(mask,dtype=np.float32)*loc;gold=np.array([238,177,59],dtype=np.float32);arr[:,:,:3]=np.clip(arr[:,:,:3]*.42+gold*.58,0,255).astype(np.uint8);arr[:,:,3]=(arr[:,:,3].astype(np.float32)*mat/255).astype(np.uint8);frame.alpha_composite(Image.fromarray(arr,'RGBA'))
  # gold downward occlusion opens corridor from bottom, like a moving layer not a crossfade
- cp=sm((t-5.05)/1.12)
+ cp=sm((t-CAM['corridorStart'])/CAM['corridorDuration'])
  if cp>0:
-  corridor=cover(im['corridor'],1.02+max(0,t-5.1)*.035,0,-4);reveal=int(H*cp);crop=corridor.crop((0,H-reveal,W,H));frame.alpha_composite(crop,(0,H-reveal))
+  corridor=cover(im['corridor'],1.02+max(0,t-CAM['corridorStart'])*.035,0,-4);reveal=int(H*cp);crop=corridor.crop((0,H-reveal,W,H));frame.alpha_composite(crop,(0,H-reveal))
   if cp<1:
    edge=Image.new('RGBA',(W,50));ed=ImageDraw.Draw(edge);ed.line((0,22,W,22),fill=(255,208,104,215),width=3);edge=edge.filter(ImageFilter.GaussianBlur(10));frame.alpha_composite(edge,(0,H-reveal-24))
  # fast light flash, then the clean portrait over a distinct facade background
