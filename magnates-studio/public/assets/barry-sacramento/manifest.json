@@ -43,7 +43,7 @@
     {
       "in": 0.3,
       "out": 4.8,
-      "beat": "Floodlight beam sweeps; a warm moving pool and reflected streak travel across the facade",
+      "beat": "The rig-anchored floodlight cone pivots across the tower; the warm reflected pool follows its moving impact point.",
       "layers": [
         "searchlight",
         "reflection"
@@ -60,7 +60,7 @@
     {
       "in": 3.0,
       "out": 4.1,
-      "beat": "Large distressed-gold SACRAMENTO title rises behind the foreground cloud",
+      "beat": "Large distressed-gold SACRAMENTO rises behind cloud and blooms in one letter at a time from left to right.",
       "layers": [
         "title",
         "clouds"
@@ -89,12 +89,6 @@
       "classification": "user-supplied/generated illustrative cutout"
     },
     {
-      "id": "searchlight",
-      "src": "assets/searchlight.webp",
-      "role": "floodlight rig and warm beam cutout",
-      "classification": "user-supplied/generated illustrative light asset"
-    },
-    {
       "id": "clouds",
       "src": "assets/clouds.webp",
       "role": "lower foreground cloud occlusion",
@@ -105,6 +99,18 @@
       "src": "assets/poster.webp",
       "role": "final-composition reference thumbnail",
       "classification": "user-supplied visual reference"
+    },
+    {
+      "id": "searchlightRig",
+      "src": "assets/searchlight-rig.webp",
+      "role": "isolated floodlight head and support rig, separated from the static beam so the cone can pivot",
+      "classification": "derived user-supplied cutout"
+    },
+    {
+      "id": "searchlight",
+      "src": "assets/searchlight.webp",
+      "role": "original combined floodlight-and-beam plate retained as source/reference; the rendered motion uses the isolated rig and editable beam cone",
+      "classification": "user-supplied/generated illustrative light asset"
     }
   ],
   "flashlightReuse": {
@@ -131,6 +137,9 @@
     "cloud opacity and timing",
     "building reveal start and duration",
     "opening sound enable and level",
-    "foreground cloud vertical offset"
+    "foreground cloud vertical offset",
+    "beam pivot sweep range and cone width",
+    "title translucency and weathering density",
+    "left-to-right per-letter reveal timing"
   ]
 }

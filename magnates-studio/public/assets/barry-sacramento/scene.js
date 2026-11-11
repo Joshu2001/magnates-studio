@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const W=1280,H=720,D=8,canvas=document.getElementById('stage'),ctx=canvas.getContext('2d',{alpha:false});
-  const assetNames=['background','building','searchlight','clouds'];
+  const assetFiles={background:'background',building:'building',searchlightRig:'searchlight-rig',clouds:'clouds'};
   const images={}; const layers={background:true,building:true,searchlight:true,reflection:true,clouds:true,title:true};
   const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null;
@@ -11,48 +11,58 @@
   const smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
   const mix=(a,b,p)=>a+(b-a)*p;
   const assetRoot='assets/';
-  Promise.all(assetNames.map(name=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images[name]=im;resolve();};im.onerror=()=>reject(new Error('Could not load '+name));im.src=assetRoot+name+'.webp';})))
+  Promise.all(Object.entries(assetFiles).map(([name,file])=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images[name]=im;resolve();};im.onerror=()=>reject(new Error('Could not load '+file));im.src=assetRoot+file+'.webp';})))
     .then(()=>{ready=true;rebuildTitle();render(0);requestAnimationFrame(loop);})
     .catch(err=>{console.error(err);$('caption').textContent='A scene asset could not be loaded. Check that this page is served from /assets/barry-sacramento/.';});
   function val(id){return Number($(id).value);}
   function readSettings(){return {
     titleStart:val('titleStart'), titleRise:val('titleRise'), lightSpeed:val('lightSpeed'), cameraPush:val('cameraPush')/100,
-    titleSize:val('titleSize'), titleY:val('titleY'), cloudOffset:val('cloudOffset'), cloudSpeed:val('cloudSpeed'), skyDrift:val('skyDrift')/100, gold:$('titleGold').value, beamTint:$('beamTint').value,
+    titleSize:val('titleSize'), titleY:val('titleY'), cloudOffset:val('cloudOffset'), cloudSpeed:val('cloudSpeed'), skyDrift:val('skyDrift')/100, titleOpacity:val('titleOpacity')/100, titleDistress:val('titleDistress')/100, lightWidth:val('lightWidth'), beamSweep:val('beamSweep'), gold:$('titleGold').value, beamTint:$('beamTint').value,
     flash:val('flashStrength')/100, pool:val('poolStrength')/100, cloud:val('cloudStrength')/100,
     boom:val('boomStrength')/100, beamIn:val('beamIn'), cloudIn:val('cloudIn'), cloudOut:val('cloudOut'), buildingIn:val('buildingIn'), buildingReveal:val('buildingReveal')
   };}
   function rebuildTitle(){
-    if(!ready) return; seed=91823; const s=readSettings(),text=$('titleText').value||'SACRAMENTO';
-    const measure=document.createElement('canvas').getContext('2d');
-    let size=s.titleSize; measure.font=`900 ${size}px Impact, "Arial Black", "DejaVu Sans", sans-serif`;
-    while(measure.measureText(text).width>1100&&size>54){size-=1;measure.font=`900 ${size}px Impact, "Arial Black", "DejaVu Sans", sans-serif`;}
-    const m=measure.measureText(text), ascent=m.actualBoundingBoxAscent||size*.78, descent=m.actualBoundingBoxDescent||size*.2;
-    const pad=32,w=Math.ceil(m.width+pad*2),h=Math.ceil(ascent+descent+pad*2),base=pad+ascent;
-    const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.font=measure.font;g.textBaseline='alphabetic';g.textAlign='left';
-    // Heavy, extruded gold title with a repeatable distressed texture clipped to the glyphs.
-    g.shadowColor='rgba(5,3,0,.85)';g.shadowBlur=12;g.shadowOffsetY=8;g.lineJoin='round';g.strokeStyle='rgba(53,30,0,.8)';g.lineWidth=Math.max(4,size*.055);g.strokeText(text,pad,base);g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
-    const gold=g.createLinearGradient(0,base-ascent,0,base+descent);gold.addColorStop(0,'#ffe65b');gold.addColorStop(.38,s.gold);gold.addColorStop(1,'#bd6809');g.fillStyle=gold;g.fillText(text,pad,base);
-    // Fine dark flecks and scratches; deterministic and fully opaque pigment.
-    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.22;
-    for(let i=0;i<Math.round(w*h/2700);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=rand()*2.2+.35;g.fillStyle=rand()<.65?'#3b2609':'#7a4d11';g.beginPath();g.ellipse(x,y,r*1.4,r*.65,rand()*Math.PI,0,Math.PI*2);g.fill();}
-    g.globalAlpha=.18;g.strokeStyle='#4c320b';g.lineWidth=1;for(let i=0;i<20;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.beginPath();g.moveTo(x,y);g.lineTo(x+3+rand()*13,y-1+rand()*3);g.stroke();}g.restore();
-    // Narrow bevel highlight and a dark lower extrusion give the title the same physical, distressed weight as the reference.
-    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.28;g.strokeStyle='#fff0a0';g.lineWidth=1.5;g.strokeText(text,pad,base-1);g.restore();
-    titleLayer=c;titleMetrics={w,h,base,ascent,descent};
+    if(!ready)return;seed=91823;const s=readSettings(),text=$('titleText').value||'SACRAMENTO';
+    const measure=document.createElement('canvas').getContext('2d');let size=s.titleSize;
+    const fontFor=n=>`900 ${n}px Impact, "Arial Black", "DejaVu Sans", sans-serif`;
+    measure.font=fontFor(size);while(measure.measureText(text).width>1100&&size>54){size-=1;measure.font=fontFor(size);}
+    const m=measure.measureText(text),ascent=m.actualBoundingBoxAscent||size*.78,descent=m.actualBoundingBoxDescent||size*.2,pad=36;
+    const width=Math.ceil(m.width+pad*2),height=Math.ceil(ascent+descent+pad*2),base=pad+ascent;
+    const c=document.createElement('canvas');c.width=width;c.height=height;const g=c.getContext('2d');g.font=measure.font;g.textBaseline='alphabetic';g.textAlign='left';
+    // Deep gold body, restrained bevel, and much denser weathering to match the reference title.
+    g.shadowColor='rgba(30,12,0,.82)';g.shadowBlur=15;g.shadowOffsetY=10;g.lineJoin='round';g.strokeStyle='rgba(75,37,2,.88)';g.lineWidth=Math.max(5,size*.055);g.strokeText(text,pad,base);g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
+    const gold=g.createLinearGradient(0,base-ascent,0,base+descent);gold.addColorStop(0,'#ffe957');gold.addColorStop(.20,'#ffd427');gold.addColorStop(.58,s.gold);gold.addColorStop(1,'#b95f05');g.fillStyle=gold;g.fillText(text,pad,base);
+    // Irregular dark flecks, scraped seams, and small transparent wear marks reveal the scene beneath.
+    const distress=s.titleDistress;g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.30*distress;
+    for(let i=0;i<Math.round(width*height/520);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.5+rand()*4.4;g.fillStyle=rand()<.72?'#3e2305':'#7b4b0c';g.beginPath();g.ellipse(x,y,r*(1.1+rand()),r*(.35+rand()*.7),rand()*Math.PI,0,Math.PI*2);g.fill();}
+    // Larger broken pigment islands keep the gold mottled like the weathered reference, not dotted evenly.
+    g.globalAlpha=.23*distress;for(let i=0;i<Math.round(width*height/1900);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=3+rand()*12,ry=1.4+rand()*6;g.fillStyle=rand()<.78?'#60350a':'#9a5a0b';g.beginPath();for(let k=0;k<9;k++){const a=k*Math.PI*2/9,r=.62+rand()*.55,px=x+Math.cos(a)*rx*r,py=y+Math.sin(a)*ry*r;if(k===0)g.moveTo(px,py);else g.lineTo(px,py);}g.closePath();g.fill();}
+    g.globalAlpha=.36*distress;g.strokeStyle='#4b2d08';g.lineWidth=.6+rand()*1.4;for(let i=0;i<90;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.beginPath();g.moveTo(x,y);g.lineTo(x+4+rand()*24,y-2+rand()*5);g.stroke();}g.restore();
+    g.save();g.globalCompositeOperation='destination-out';g.globalAlpha=.13*distress;for(let i=0;i<Math.round(width*height/5600);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.5+rand()*2.7;g.beginPath();g.ellipse(x,y,r*1.5,r*.7,rand()*Math.PI,0,Math.PI*2);g.fill();}g.restore();
+    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.30;g.strokeStyle='#fff4b0';g.lineWidth=1.5;g.strokeText(text,pad,base-1);g.restore();
+    const glyphs=[];let cursor=pad;for(const ch of text){const w=measure.measureText(ch).width;glyphs.push({x:cursor-pad,w,ch});cursor+=w;}
+    titleLayer=c;titleMetrics={w:width,h:height,base,ascent,descent,glyphs};
   }
   function rgba(hex,a){const h=hex.replace('#','');const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
   function drawCover(im,xoff=0,yoff=0,scale=1){const w=W*scale,h=H*scale;ctx.drawImage(im,(W-w)/2+xoff,(H-h)/2+yoff,w,h);}
   function drawBuildingAlpha(target,x,y,scale){target.drawImage(images.building,x,y,W*scale,H*scale);}
+  function beamAim(time,s){
+    const sx=1082,sy=108,phase=(time-s.beamIn)*s.lightSpeed*.78,angle=2.45+Math.sin(phase)*s.beamSweep*Math.PI/180,push=1+s.cameraPush*clamp(time/D,0,1);
+    const rawX=sx+Math.cos(angle)*620,rawY=sy+Math.sin(angle)*620;
+    return {sx,sy,tx:(rawX-W/2)*push+W/2,ty:(rawY-H/2)*push+H/2,phase};
+  }
+  function drawBeam(time,s,lightIn){
+    if(time<s.beamIn)return;const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len,width=s.lightWidth;
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=lightIn*.76;
+    const cone=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);cone.addColorStop(0,rgba(s.beamTint,.42));cone.addColorStop(.24,rgba(s.beamTint,.24));cone.addColorStop(1,rgba(s.beamTint,.04));ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx+nx*width,a.ty+ny*width);ctx.lineTo(a.tx-nx*width,a.ty-ny*width);ctx.closePath();ctx.fill();
+    ctx.globalAlpha=lightIn*.32;ctx.strokeStyle=rgba(s.beamTint,.54);ctx.lineWidth=13;ctx.lineCap='round';ctx.shadowColor=s.beamTint;ctx.shadowBlur=34;ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx,a.ty);ctx.stroke();
+    const hot=ctx.createRadialGradient(a.tx,a.ty,3,a.tx,a.ty,150);hot.addColorStop(0,rgba(s.beamTint,.38));hot.addColorStop(.35,rgba(s.beamTint,.17));hot.addColorStop(1,rgba(s.beamTint,0));ctx.globalAlpha=lightIn*.6;ctx.fillStyle=hot;ctx.fillRect(a.tx-160,a.ty-160,320,320);ctx.restore();
+  }
   function buildReflection(time,s){
-    rc.clearRect(0,0,W,H); const p=clamp((time-s.beamIn)/4.7,0,1.2),phase=p*s.lightSpeed*2*Math.PI;
-    // The warm flare makes one loose orbit across the tower, with small flame-like flutter.
-    const cx=690+350*Math.cos(phase-.55),cy=305+168*Math.sin(phase*1.15),flicker=.92+.08*Math.sin(time*19)+.035*Math.sin(time*37);
-    rc.save();rc.globalCompositeOperation='source-over';
-    let g=rc.createRadialGradient(cx,cy,5,cx,cy,250*flicker);g.addColorStop(0,`rgba(255,246,195,${.67*flicker})`);g.addColorStop(.19,`rgba(255,194,91,${.43*flicker})`);g.addColorStop(.62,'rgba(238,112,30,.14)');g.addColorStop(1,'rgba(255,112,20,0)');rc.fillStyle=g;rc.fillRect(0,0,W,H);
-    // A reflected lower streak echoes the moving hot spot without copying the beam geometry.
-    const rx=840-110*Math.cos(phase-.55),ry=500+42*Math.sin(phase*1.15);let r=rc.createRadialGradient(rx,ry,3,rx,ry,220);r.addColorStop(0,rgba(s.beamTint,.30));r.addColorStop(.35,rgba(s.beamTint,.15));r.addColorStop(1,rgba(s.beamTint,0));rc.fillStyle=r;rc.fillRect(0,0,W,H);
-    rc.restore();
-    // Matte the moving light to the transparent building silhouette.
+    const a=beamAim(time,s),flicker=.94+.06*Math.sin(time*21)+.025*Math.sin(time*38);rc.clearRect(0,0,W,H);rc.save();rc.globalCompositeOperation='source-over';
+    const g=rc.createRadialGradient(a.tx,a.ty,2,a.tx,a.ty,210*flicker);g.addColorStop(0,`rgba(255,246,192,${.62*flicker})`);g.addColorStop(.18,`rgba(255,195,72,${.43*flicker})`);g.addColorStop(.48,'rgba(238,115,24,.22)');g.addColorStop(1,'rgba(255,112,20,0)');rc.fillStyle=g;rc.fillRect(0,0,W,H);
+    rc.translate(a.tx,a.ty);rc.rotate(Math.atan2(a.ty-a.sy,a.tx-a.sx));const streak=rc.createRadialGradient(0,0,4,0,0,170);streak.addColorStop(0,rgba(s.beamTint,.25));streak.addColorStop(.4,rgba(s.beamTint,.14));streak.addColorStop(1,rgba(s.beamTint,0));rc.fillStyle=streak;rc.beginPath();rc.ellipse(12,0,190,55,0,0,Math.PI*2);rc.fill();rc.restore();
+    // Keep the warm pool and streak clipped to the actual tower layer.
     rc.save();rc.globalCompositeOperation='destination-in';const push=1+s.cameraPush*clamp(time/D,0,1);drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
     ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=s.pool;ctx.drawImage(reflection,0,0);ctx.restore();
   }
@@ -64,10 +74,12 @@
     const core=ctx.createRadialGradient(900,170,0,900,170,220);core.addColorStop(0,'rgba(255,255,255,.98)');core.addColorStop(.23,'rgba(255,248,220,.62)');core.addColorStop(1,'rgba(255,198,104,0)');ctx.fillStyle=core;ctx.fillRect(0,0,W,H);ctx.restore();
   }
   function drawMovingCloud(time,s,titleProgress){
-    if(!layers.clouds)return;const inP=smooth((time-s.cloudIn)/.45),outP=time<s.cloudOut?1:mix(1,.58,smooth((time-s.cloudOut)/1.2));
-    // Cloud stays in front of the title, thinning only after the gold letters have risen into place.
-    const titleThinning=.78+.22*smooth(titleProgress-.25);ctx.save();ctx.globalAlpha=s.cloud*inP*outP*titleThinning;
-    const drift=Math.sin(time*.55*s.cloudSpeed)*32;ctx.drawImage(images.clouds,-38+drift,-8+s.cloudOffset,W+76,H+16);ctx.restore();
+    if(!layers.clouds)return;const inP=smooth((time-s.cloudIn)/.45),outP=time<s.cloudOut?1:mix(1,.76,smooth((time-s.cloudOut)/1.2));
+    const titleThinning=.94+.06*smooth(titleProgress-.25),drift=Math.sin(time*.55*s.cloudSpeed)*28,y=-8+s.cloudOffset;
+    ctx.save();ctx.globalAlpha=s.cloud*inP*outP*titleThinning;
+    ctx.globalAlpha*=.38;ctx.filter='blur(18px)';ctx.drawImage(images.clouds,-44+drift*.8,y+18,W+88,H+44);ctx.filter='none';
+    ctx.globalAlpha=s.cloud*inP*outP*titleThinning*.96;ctx.drawImage(images.clouds,-38+drift,y,W+76,H+16);
+    ctx.globalAlpha*=.44;ctx.drawImage(images.clouds,-28-drift*.35,y+24,W+56,H+36);ctx.restore();
   }
   function render(time){
     if(!ready)return;const s=readSettings();time=clamp(time,0,D);t=time;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#070b11';ctx.fillRect(0,0,W,H);
@@ -76,16 +88,22 @@
     // Quiet cool vignette keeps the beam and gold title legible without crushing the supplied sky plate.
     const vignette=ctx.createRadialGradient(W*.53,H*.38,140,W*.53,H*.38,780);vignette.addColorStop(0,'rgba(5,9,15,0)');vignette.addColorStop(1,'rgba(2,5,10,.37)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
     const buildingAlpha=layers.building?smooth((time-s.buildingIn)/s.buildingReveal):0;
-    if(layers.searchlight){const lightIn=smooth((time-s.beamIn)/.55)*(.91+.025*Math.sin(time*16));ctx.save();ctx.globalAlpha=lightIn;drawCover(images.searchlight,0,0,1);
-      // Editable warm cone follows the fixture and sweeps the construction floors.
-      const ph=Math.max(0,time-s.beamIn)*s.lightSpeed*.72, sx=1115,sy=105,tx=690+320*Math.cos(ph-.45),ty=330+115*Math.sin(ph*1.16),dx=tx-sx,dy=ty-sy,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len;
-      const cone=ctx.createLinearGradient(sx,sy,tx,ty);cone.addColorStop(0,rgba(s.beamTint,.36));cone.addColorStop(.55,rgba(s.beamTint,.18));cone.addColorStop(1,rgba(s.beamTint,.025));ctx.globalAlpha=lightIn*.68;ctx.globalCompositeOperation='screen';ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(tx+nx*90,ty+ny*90);ctx.lineTo(tx-nx*90,ty-ny*90);ctx.closePath();ctx.fill();ctx.restore();}
+    const lightIn=layers.searchlight?smooth((time-s.beamIn)/.55)*(.9+.06*Math.sin(time*17)):0;
+    if(layers.searchlight){ctx.save();ctx.globalAlpha=lightIn;drawCover(images.searchlightRig,0,0,1);ctx.restore();drawBeam(time,s,lightIn);}
     if(buildingAlpha>0){ctx.save();ctx.globalAlpha=buildingAlpha;const bscale=push*(.965+.035*smooth((time-s.buildingIn)/Math.max(.4,s.buildingReveal*2))),bw=W*bscale,bh=H*bscale;ctx.drawImage(images.building,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();}
     if(layers.reflection&&buildingAlpha>0)buildReflection(time,s);
-    // Sparse hot motes drift through the beam around the moving pool of light.
-    if(layers.searchlight&&time>s.beamIn){ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<14;i++){const a=time*(.35+i*.012)+i*2.4;const x=690+350*Math.cos(a),y=290+180*Math.sin(a*1.12),r=1.2+(i%3)*.7;ctx.globalAlpha=.12+.13*(.5+.5*Math.sin(a*4));ctx.fillStyle='#ffd38b';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}ctx.restore();}
+    // Fine dust drifts within the beam path and follows the lamp's current aim.
+    if(layers.searchlight&&time>s.beamIn){const aim=beamAim(time,s);ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<18;i++){const u=.24+((i*.213+time*.06)% .7),phase=time*(.65+i*.013)+i*1.9,x=aim.sx+(aim.tx-aim.sx)*u+Math.sin(phase)*18,y=aim.sy+(aim.ty-aim.sy)*u+Math.cos(phase*1.1)*12,r=1+(i%4)*.55;ctx.globalAlpha=.10+.11*(.5+.5*Math.sin(phase*3));ctx.fillStyle='#ffd38b';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}ctx.restore();}
     const titleProgress=smooth((time-s.titleStart)/s.titleRise);
-    if(layers.title&&titleLayer&&time>s.titleStart-.18&&titleProgress>0){const base=H+80+(s.titleY-(H+80))*titleProgress,alpha=smooth((time-s.titleStart)/.22);ctx.save();ctx.globalAlpha=alpha;ctx.globalCompositeOperation='screen';const glow=ctx.createRadialGradient(W/2,base-50,15,W/2,base-35,350);glow.addColorStop(0,'rgba(255,196,49,.25)');glow.addColorStop(1,'rgba(255,154,27,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';const x=(W-titleMetrics.w)/2,y=base-titleMetrics.base;ctx.drawImage(titleLayer,x,y);ctx.restore();}
+    if(layers.title&&titleLayer&&time>s.titleStart-.12&&titleProgress>0){
+      const base=H+80+(s.titleY-(H+80))*titleProgress,alpha=smooth((time-s.titleStart)/.18)*s.titleOpacity,x=(W-titleMetrics.w)/2,y=base-titleMetrics.base;
+      ctx.save();ctx.globalAlpha=alpha;ctx.globalCompositeOperation='screen';const glow=ctx.createRadialGradient(W/2,base-50,15,W/2,base-35,350);glow.addColorStop(0,'rgba(255,195,35,.19)');glow.addColorStop(1,'rgba(255,154,27,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=alpha;
+      const count=titleMetrics.glyphs.length,interval=s.titleRise*.69/Math.max(1,count-1),glyphDuration=Math.max(.16,s.titleRise*.30);
+      titleMetrics.glyphs.forEach((glyph,i)=>{if(!glyph.ch.trim())return;const p=smooth((time-(s.titleStart+i*interval))/glyphDuration);if(p<=0)return;const cellX=x+glyph.x,cellW=Math.max(1,glyph.w),cx=cellX+cellW/2,cy=y+titleMetrics.ascent*.52,maxR=Math.max(cellW*.82,titleMetrics.ascent*.72),radius=maxR*(.12+.88*p);
+        ctx.save();ctx.beginPath();ctx.rect(cellX-1,y-4,cellW+2,titleMetrics.h+8);ctx.clip();ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.clip();ctx.drawImage(titleLayer,x,y);ctx.restore();
+        if(p<.96){ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=alpha*(1-p)*.72;const orb=ctx.createRadialGradient(cx,cy,1,cx,cy,24+22*(1-p));orb.addColorStop(0,'rgba(255,255,230,.96)');orb.addColorStop(.2,'rgba(255,208,75,.65)');orb.addColorStop(1,'rgba(255,174,32,0)');ctx.fillStyle=orb;ctx.beginPath();ctx.arc(cx,cy,25+20*(1-p),0,Math.PI*2);ctx.fill();ctx.restore();}
+      });ctx.restore();
+    }
     drawMovingCloud(time,s,titleProgress);
     // Reuse the existing circular-flashlight template's soft flash-core/screen-bloom language for one opening hit.
     drawFlash(time,s);
@@ -96,8 +114,8 @@
   function updateReadout(time,titleP){$('scrub').value=time;$('clock').textContent=`00:${time.toFixed(2).padStart(5,'0')} / 00:08.00`;
     let msg='A single flashlight bloom strikes; the Sacramento sky and construction tower resolve through the light.';
     if(time>.55&&time<2.25)msg='The floodlit unfinished tower resolves over the Sacramento sunset plate.';
-    if(time>=2.25&&time<readSettings().titleStart)msg='A warm flare orbits the façade; its reflected pool moves across the lit windows.';
-    if(titleP>0&&titleP<1)msg='SACRAMENTO rises from below the frame, behind the rolling cloud veil.';
+    if(time>=2.25&&time<readSettings().titleStart)msg='The beam pivots from the floodlight rig; its warm reflected pool tracks over the façade.';
+    if(titleP>0&&titleP<1)msg='The gold letters bloom one by one from left to right, rising behind the fuller foreground cloud.';
     if(titleP>=1)msg='Final composition holds: gold title, cloud occlusion, searchlight bloom, and moving façade reflection.';
     $('caption').textContent=msg;
   }
@@ -115,7 +133,7 @@
   $('titleText').addEventListener('input',()=>{rebuildTitle();render(t);});
   document.querySelectorAll('[data-layer]').forEach(el=>el.addEventListener('change',()=>{layers[el.dataset.layer]=el.checked;render(t);}));
   document.querySelectorAll('.tab').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn));document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.dataset.pane===btn.dataset.tab));}));
-  const numeric={titleStart:['titleStartOut',v=>`${v.toFixed(1)}s`],titleRise:['titleRiseOut',v=>`${v.toFixed(1)}s`],lightSpeed:['lightSpeedOut',v=>`${v.toFixed(2)}×`],cameraPush:['cameraPushOut',v=>`${Math.round(v)}%`],titleSize:['titleSizeOut',v=>`${Math.round(v)}px`],titleY:['titleYOut',v=>`${Math.round(v)}px`],cloudOffset:['cloudOffsetOut',v=>`${Math.round(v)}px`],flashStrength:['flashStrengthOut',v=>`${Math.round(v)}%`],poolStrength:['poolStrengthOut',v=>`${Math.round(v)}%`],cloudStrength:['cloudStrengthOut',v=>`${Math.round(v)}%`],boomStrength:['boomStrengthOut',v=>`${Math.round(v)}%`],beamIn:['beamInOut',v=>`${v.toFixed(2)}s`],cloudIn:['cloudInOut',v=>`${v.toFixed(2)}s`],cloudOut:['cloudOutOut',v=>`${v.toFixed(1)}s`],buildingIn:['buildingInOut',v=>`${v.toFixed(2)}s`],buildingReveal:['buildingRevealOut',v=>`${v.toFixed(2)}s`],cloudSpeed:['cloudSpeedOut',v=>`${v.toFixed(2)}×`],skyDrift:['skyDriftOut',v=>`${Math.round(v)}%`]};
+  const numeric={lightWidth:['lightWidthOut',v=>`${Math.round(v)}px`],beamSweep:['beamSweepOut',v=>`${Math.round(v)}°`],titleOpacity:['titleOpacityOut',v=>`${Math.round(v)}%`],titleDistress:['titleDistressOut',v=>`${Math.round(v)}%`],titleStart:['titleStartOut',v=>`${v.toFixed(1)}s`],titleRise:['titleRiseOut',v=>`${v.toFixed(1)}s`],lightSpeed:['lightSpeedOut',v=>`${v.toFixed(2)}×`],cameraPush:['cameraPushOut',v=>`${Math.round(v)}%`],titleSize:['titleSizeOut',v=>`${Math.round(v)}px`],titleY:['titleYOut',v=>`${Math.round(v)}px`],cloudOffset:['cloudOffsetOut',v=>`${Math.round(v)}px`],flashStrength:['flashStrengthOut',v=>`${Math.round(v)}%`],poolStrength:['poolStrengthOut',v=>`${Math.round(v)}%`],cloudStrength:['cloudStrengthOut',v=>`${Math.round(v)}%`],boomStrength:['boomStrengthOut',v=>`${Math.round(v)}%`],beamIn:['beamInOut',v=>`${v.toFixed(2)}s`],cloudIn:['cloudInOut',v=>`${v.toFixed(2)}s`],cloudOut:['cloudOutOut',v=>`${v.toFixed(1)}s`],buildingIn:['buildingInOut',v=>`${v.toFixed(2)}s`],buildingReveal:['buildingRevealOut',v=>`${v.toFixed(2)}s`],cloudSpeed:['cloudSpeedOut',v=>`${v.toFixed(2)}×`],skyDrift:['skyDriftOut',v=>`${Math.round(v)}%`]};
   for(const [id,[out,fmt]] of Object.entries(numeric)){$(id).addEventListener('input',()=>{setOut(id,out,fmt);if(id==='titleSize')rebuildTitle();render(t);});setOut(id,out,fmt);}
   $('titleGold').addEventListener('input',()=>{rebuildTitle();render(t);});$('beamTint').addEventListener('input',()=>render(t));
 })();
