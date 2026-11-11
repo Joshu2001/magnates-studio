@@ -77,91 +77,101 @@
     ctx.translate(a.sx,a.sy);
     ctx.rotate(sway-.025);
     ctx.globalAlpha=.99;
-    if(images.rigAsset)ctx.drawImage(images.rigAsset,60,0,300,175,-83,-54,250,146);
+    if(images.rigAsset){
+      ctx.save();ctx.filter='saturate(.92) contrast(1.10) brightness(.92)';
+      ctx.drawImage(images.rigAsset,60,0,300,175,-83,-54,250,146);ctx.restore();
+      // Dark structural connector masks the generated under-platform color noise and visually
+      // locks the fixture to the mast.
+      ctx.fillStyle='rgba(27,22,18,.96)';ctx.strokeStyle='rgba(141,91,38,.88)';ctx.lineWidth=1.5;
+      ctx.beginPath();ctx.moveTo(-4,31);ctx.lineTo(61,26);ctx.lineTo(67,43);ctx.lineTo(2,50);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.strokeStyle='rgba(227,150,55,.32)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(-2,31);ctx.lineTo(60,27);ctx.stroke();
+    }
     ctx.restore();
     ctx.restore();
   }
   function drawSearchlightBulbs(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
-    const a=beamAim(time,s),tint=s.beamTint||'#ffc35a',pulse=.94+.06*Math.sin(time*10.5);
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.34*lightIn*pulse;
-    const halo=ctx.createRadialGradient(a.sx-8,a.sy-4,8,a.sx-8,a.sy-4,62);
-    halo.addColorStop(0,'rgba(255,224,128,.66)');
-    halo.addColorStop(.38,rgba(tint,.28));
-    halo.addColorStop(1,rgba(tint,0));
-    ctx.fillStyle=halo;ctx.fillRect(a.sx-75,a.sy-70,140,135);ctx.restore();
+    const a=beamAim(time,s),tint=s.beamTint||'#ffb347',pulse=.96+.035*Math.sin(time*10.5),rot=Math.sin(a.phase)*.012-.025;
+    const lamps=[[-22,-20],[-4,-22],[14,-24],[-19,-2],[-1,-4],[17,-6],[-17,17],[1,15],[19,13]];
+    ctx.save();ctx.translate(a.sx,a.sy);ctx.rotate(rot);
+    lamps.forEach((p,i)=>{
+      const f=pulse*(.975+.025*Math.sin(time*12+i*1.7)),x=p[0],y=p[1];
+      ctx.save();ctx.globalCompositeOperation='screen';
+      // Tight amber glass halo.
+      ctx.globalAlpha=.34*lightIn*f;
+      let g=ctx.createRadialGradient(x,y,2,x,y,13);
+      g.addColorStop(0,'rgba(255,238,167,.88)');
+      g.addColorStop(.32,'rgba(255,184,62,.58)');
+      g.addColorStop(1,'rgba(255,123,18,0)');
+      ctx.fillStyle=g;ctx.translate(x,y);ctx.rotate(-.12);ctx.scale(.76,1);
+      ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();
+      // Small luminous core retains individual bulb definition.
+      ctx.globalAlpha=.92*lightIn*f;
+      g=ctx.createRadialGradient(0,0,.4,0,0,5.2);
+      g.addColorStop(0,'rgba(255,255,221,.98)');
+      g.addColorStop(.30,'rgba(255,222,118,.96)');
+      g.addColorStop(.72,'rgba(255,160,37,.72)');
+      g.addColorStop(1,'rgba(255,119,14,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,0,5.2,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+    });
+    ctx.restore();
   }
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
-    const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.max(1,Math.hypot(dx,dy)),nx=-dy/len,ny=dx/len,width=s.lightWidth;
-    const tint=s.beamTint||'#ffc35a';
-    ctx.save();ctx.globalCompositeOperation='screen';
-    // Keep source bloom compact so the separate bulbs remain visible.
-    const lamp=ctx.createRadialGradient(a.sx,a.sy,8,a.sx,a.sy,92);
-    lamp.addColorStop(0,rgba(tint,.50*lightIn));
-    lamp.addColorStop(.34,rgba(tint,.22*lightIn));
-    lamp.addColorStop(1,rgba(tint,0));
-    ctx.fillStyle=lamp;ctx.fillRect(a.sx-100,a.sy-100,200,200);
+    const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.max(1,Math.hypot(dx,dy)),nx=-dy/len,ny=dx/len,width=s.lightWidth*.88;
+    const tint=s.beamTint||'#ffb347';
 
-    // Dense amber atmospheric cone: warm, directional and textured rather than pale white.
-    ctx.filter='blur(24px)';ctx.globalAlpha=.72*lightIn;
-    const haze=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);
-    haze.addColorStop(0,rgba(tint,.72));haze.addColorStop(.22,rgba(tint,.52));
-    haze.addColorStop(.60,rgba(tint,.30));haze.addColorStop(1,rgba(tint,.05));
+    // Saturated amber atmospheric body. Source-over retains color instead of washing it toward white.
+    ctx.save();ctx.globalCompositeOperation='source-over';ctx.filter='blur(20px)';ctx.globalAlpha=.24*lightIn;
+    let haze=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);
+    haze.addColorStop(0,'rgba(255,165,43,.78)');haze.addColorStop(.28,'rgba(245,143,31,.52)');
+    haze.addColorStop(.70,'rgba(225,119,19,.18)');haze.addColorStop(1,'rgba(215,103,12,0)');
     ctx.fillStyle=haze;ctx.beginPath();ctx.moveTo(a.sx,a.sy);
-    ctx.lineTo(a.tx+nx*width*1.62,a.ty+ny*width*1.62);
-    ctx.lineTo(a.tx-nx*width*1.62,a.ty-ny*width*1.62);ctx.closePath();ctx.fill();
+    ctx.lineTo(a.tx+nx*width*1.22,a.ty+ny*width*1.22);
+    ctx.lineTo(a.tx-nx*width*1.22,a.ty-ny*width*1.22);ctx.closePath();ctx.fill();ctx.restore();
 
-    ctx.filter='blur(8px)';ctx.globalAlpha=.46*lightIn;
+    // Luminous inner shaft: narrower, warmer, and less chalky than the previous screen wash.
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.filter='blur(7px)';ctx.globalAlpha=.42*lightIn;
     const inner=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);
-    inner.addColorStop(0,'rgba(255,198,82,.68)');
-    inner.addColorStop(.18,rgba(tint,.58));inner.addColorStop(.72,rgba(tint,.18));inner.addColorStop(1,rgba(tint,0));
+    inner.addColorStop(0,'rgba(255,218,126,.72)');
+    inner.addColorStop(.20,rgba(tint,.54));inner.addColorStop(.72,rgba(tint,.15));inner.addColorStop(1,rgba(tint,0));
     ctx.fillStyle=inner;ctx.beginPath();ctx.moveTo(a.sx,a.sy);
-    ctx.lineTo(a.tx+nx*width*.62,a.ty+ny*width*.62);
-    ctx.lineTo(a.tx-nx*width*.62,a.ty-ny*width*.62);ctx.closePath();ctx.fill();
+    ctx.lineTo(a.tx+nx*width*.48,a.ty+ny*width*.48);
+    ctx.lineTo(a.tx-nx*width*.48,a.ty-ny*width*.48);ctx.closePath();ctx.fill();
     ctx.filter='none';
 
-    // Fine parallel shafts create real volumetric structure inside the beam.
-    ctx.lineCap='round';ctx.shadowColor=tint;ctx.shadowBlur=12;
-    [-.34,-.16,.05,.23].forEach((off,i)=>{
-      ctx.globalAlpha=(.15+(i%2)*.045)*lightIn;
-      ctx.strokeStyle=rgba(tint,.72);
-      ctx.lineWidth=Math.max(5,width*(.055+(i%2)*.018));
-      ctx.beginPath();
-      ctx.moveTo(a.sx+nx*off*width*.25,a.sy+ny*off*width*.25);
-      ctx.lineTo(a.tx+nx*off*width,a.ty+ny*off*width);
-      ctx.stroke();
+    // A few fine internal shafts create photographic volumetric structure without broad whitening.
+    ctx.lineCap='round';ctx.shadowColor='#f5a331';ctx.shadowBlur=8;
+    [-.27,-.09,.10,.27].forEach((off,i)=>{
+      ctx.globalAlpha=(.11+(i%2)*.025)*lightIn;ctx.strokeStyle='rgba(255,186,72,.78)';
+      ctx.lineWidth=Math.max(3.5,width*(.035+(i%2)*.010));
+      ctx.beginPath();ctx.moveTo(a.sx+nx*off*width*.18,a.sy+ny*off*width*.18);
+      ctx.lineTo(a.tx+nx*off*width*.72,a.ty+ny*off*width*.72);ctx.stroke();
     });
     ctx.shadowBlur=0;
 
-    for(let i=0;i<6;i++){
-      const u=.12+i*.135,px=a.sx+dx*u,py=a.sy+dy*u,r=42+i*13;
-      const puff=ctx.createRadialGradient(px,py,0,px,py,r);
-      puff.addColorStop(0,rgba(tint,.10*lightIn));puff.addColorStop(1,rgba(tint,0));
-      ctx.fillStyle=puff;ctx.fillRect(px-r,py-r,r*2,r*2);
-    }
-
-    // Impact bloom is broad and soft; this is what visually ties the beam to the façade.
-    const hot=ctx.createRadialGradient(a.tx,a.ty,0,a.tx,a.ty,245);
-    hot.addColorStop(0,'rgba(255,190,65,.44)');
-    hot.addColorStop(.12,rgba(tint,.62*lightIn));
-    hot.addColorStop(.46,rgba(tint,.24*lightIn));
+    // Compact impact pool, not a full-building wash.
+    const hot=ctx.createRadialGradient(a.tx,a.ty,0,a.tx,a.ty,178);
+    hot.addColorStop(0,'rgba(255,198,86,.34)');
+    hot.addColorStop(.20,rgba(tint,.30*lightIn));
+    hot.addColorStop(.56,rgba(tint,.10*lightIn));
     hot.addColorStop(1,rgba(tint,0));
-    ctx.fillStyle=hot;ctx.fillRect(a.tx-255,a.ty-255,510,510);
-    ctx.restore();
+    ctx.fillStyle=hot;ctx.fillRect(a.tx-185,a.ty-185,370,370);ctx.restore();
   }
   function buildReflection(time,s){
-    const a=beamAim(time,s),flicker=.96+.035*Math.sin(time*17)+.018*Math.sin(time*31),tint=s.beamTint||'#ffd18a';
+    const a=beamAim(time,s),flicker=.97+.025*Math.sin(time*17)+.012*Math.sin(time*31),tint=s.beamTint||'#ffb347';
     rc.clearRect(0,0,W,H);rc.save();rc.globalCompositeOperation='source-over';
     // Large diffuse bounce first, then a tighter specular response. Both are clipped
     // to the building so windows, tarp and scaffold inherit the same moving light.
-    let g=rc.createRadialGradient(a.tx,a.ty,4,a.tx,a.ty,310*flicker);
-    g.addColorStop(0,'rgba(255,184,54,.44)');g.addColorStop(.16,rgba(tint,.56*flicker));
-    g.addColorStop(.48,rgba(tint,.34));g.addColorStop(1,rgba(tint,0));rc.fillStyle=g;rc.fillRect(0,0,W,H);
+    let g=rc.createRadialGradient(a.tx,a.ty,4,a.tx,a.ty,235*flicker);
+    g.addColorStop(0,'rgba(255,177,48,.30)');g.addColorStop(.16,rgba(tint,.40*flicker));
+    g.addColorStop(.48,rgba(tint,.20));g.addColorStop(1,rgba(tint,0));rc.fillStyle=g;rc.fillRect(0,0,W,H);
 
     rc.save();rc.translate(a.tx,a.ty);rc.rotate(Math.atan2(a.ty-a.sy,a.tx-a.sx));
-    g=rc.createRadialGradient(0,0,2,0,0,230);
-    g.addColorStop(0,'rgba(255,194,74,.42)');g.addColorStop(.24,rgba(tint,.48));g.addColorStop(1,rgba(tint,0));
+    g=rc.createRadialGradient(0,0,2,0,0,175);
+    g.addColorStop(0,'rgba(255,188,64,.28)');g.addColorStop(.24,rgba(tint,.34));g.addColorStop(1,rgba(tint,0));
     rc.fillStyle=g;rc.beginPath();rc.ellipse(22,0,275,82,0,0,Math.PI*2);rc.fill();rc.restore();
     rc.restore();
 
@@ -169,12 +179,12 @@
     const push=1+s.cameraPush*clamp(time/D,0,1);
     drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
 
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(1.35,s.pool*1.12);ctx.filter='blur(1.5px)';ctx.drawImage(reflection,0,0);ctx.filter='none';ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.70,s.pool*.82);ctx.filter='blur(1.5px)';ctx.drawImage(reflection,0,0);ctx.filter='none';ctx.restore();
 
     // Low-level warm bounce into the local atmosphere prevents the illuminated façade
     // from looking like a sticker on an otherwise unaffected scene.
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.23*s.pool;
-    const spill=ctx.createRadialGradient(a.tx,a.ty,30,a.tx,a.ty,390);
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.10*s.pool;
+    const spill=ctx.createRadialGradient(a.tx,a.ty,25,a.tx,a.ty,280);
     spill.addColorStop(0,rgba(tint,.30));spill.addColorStop(.52,rgba(tint,.10));spill.addColorStop(1,rgba(tint,0));
     ctx.fillStyle=spill;ctx.fillRect(a.tx-400,a.ty-400,800,800);ctx.restore();
   }
@@ -197,6 +207,15 @@
     if(!ready)return;const s=readSettings();time=clamp(time,0,D);t=time;ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle='#070b11';ctx.fillRect(0,0,W,H);
     const bgIn=smooth((time-.02)/.44),push=1+s.cameraPush*clamp(time/D,0,1),pan=Math.sin(time*.32)*5*s.skyDrift;
     if(layers.background){ctx.save();ctx.globalAlpha=bgIn;drawCover(images.background,pan,Math.sin(time*.25)*2*s.skyDrift,1.025);ctx.restore();}
+    // Reference grade: richer burnt-orange atmosphere on the left, deeper blue-black on the right.
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.16*bgIn;
+    let skyGrade=ctx.createLinearGradient(0,0,W*.72,0);
+    skyGrade.addColorStop(0,'rgba(255,94,24,.34)');skyGrade.addColorStop(.48,'rgba(255,118,31,.10)');skyGrade.addColorStop(1,'rgba(255,100,20,0)');
+    ctx.fillStyle=skyGrade;ctx.fillRect(0,0,W,H);ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.24*bgIn;
+    skyGrade=ctx.createLinearGradient(W*.48,0,W,0);
+    skyGrade.addColorStop(0,'rgba(255,255,255,1)');skyGrade.addColorStop(.56,'rgba(65,91,122,.78)');skyGrade.addColorStop(1,'rgba(25,48,78,.92)');
+    ctx.fillStyle=skyGrade;ctx.fillRect(W*.45,0,W*.55,H);ctx.restore();
     // Quiet cool vignette keeps the beam and gold title legible without crushing the supplied sky plate.
     const vignette=ctx.createRadialGradient(W*.53,H*.38,140,W*.53,H*.38,780);vignette.addColorStop(0,'rgba(5,9,15,0)');vignette.addColorStop(1,'rgba(2,5,10,.37)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
     const buildingAlpha=layers.building?smooth((time-s.buildingIn)/s.buildingReveal):0;
@@ -222,16 +241,28 @@
         const y=s.titleY-220-(1-p)*10;
         const alpha=s.titleOpacity*smooth((time-s.titleStart)/.20);
 
-        // Warm scene halo behind the extracted title.
-        ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.25*p;
-        const glow=ctx.createRadialGradient(W/2,s.titleY-70,30,W/2,s.titleY-55,430);
-        glow.addColorStop(0,'rgba(255,188,35,.22)');glow.addColorStop(1,'rgba(255,130,12,0)');
+        // Restrained scene halo: the metal should provide the highlight, not a broad orange aura.
+        ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.08*p;
+        const glow=ctx.createRadialGradient(W/2,s.titleY-64,24,W/2,s.titleY-50,340);
+        glow.addColorStop(0,'rgba(255,211,91,.18)');glow.addColorStop(1,'rgba(255,154,23,0)');
         ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);ctx.restore();
 
-        // Soft left-to-right reveal of the exact extracted material, preserving its built-in perspective.
+        // Reveal the extracted title, but grade it toward crisp bright gold and apply a stronger
+        // shared right-leaning perspective/shear to match the approved target.
         oc.clearRect(0,0,W,H);oc.save();
         oc.globalAlpha=alpha;
+        const tcx=x+targetW*.5,tcy=y+targetH*.52;
+        oc.translate(tcx,tcy);oc.transform(1,-.018,-.105,1,0,0);oc.translate(-tcx,-tcy);
+        oc.filter='saturate(.90) brightness(1.10) contrast(1.10)';
         oc.drawImage(titleLayer,x,y,targetW,targetH);
+        oc.filter='none';
+        // Pale-gold specular lift without shifting the material orange.
+        oc.globalCompositeOperation='source-atop';oc.globalAlpha=.10;
+        const metalLift=oc.createLinearGradient(0,y,0,y+targetH);
+        metalLift.addColorStop(0,'rgba(255,244,174,.80)');metalLift.addColorStop(.45,'rgba(255,212,81,.22)');metalLift.addColorStop(1,'rgba(255,176,32,0)');
+        oc.fillStyle=metalLift;oc.fillRect(x-90,y-30,targetW+180,targetH+60);
+        oc.restore();oc.save();
+        oc.globalAlpha=1;
         oc.globalCompositeOperation='destination-in';
         const edge=x+targetW*p,feather=38;
         const mask=oc.createLinearGradient(x,0,x+targetW,0);
@@ -243,8 +274,15 @@
         oc.fillStyle=mask;oc.fillRect(0,0,W,H);
         oc.restore();
 
-        ctx.save();ctx.shadowColor='rgba(34,12,0,.50)';ctx.shadowBlur=8;ctx.shadowOffsetY=5;
+        ctx.save();ctx.shadowColor='rgba(22,10,0,.68)';ctx.shadowBlur=3;ctx.shadowOffsetY=5;
         ctx.drawImage(off,0,0);ctx.restore();
+
+        // A restrained foreground mist pass overlaps only the lower title edge, grounding the
+        // word into the scene instead of leaving it floating above the cloud bank.
+        ctx.save();ctx.beginPath();ctx.rect(0,H-112,W,112);ctx.clip();
+        ctx.globalAlpha=.24*s.cloud*p;ctx.filter='blur(9px)';
+        ctx.drawImage(images.clouds,-26+Math.sin(time*.38)*12,48+s.cloudOffset,W+52,H+18);
+        ctx.filter='none';ctx.restore();
       }
     }
     // Reuse the existing circular-flashlight template's soft flash-core/screen-bloom language for one opening hit.
