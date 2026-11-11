@@ -2486,6 +2486,13 @@
         thumb: '/assets/barry-sacramento/assets/poster.webp',
         priority: 0
       },
+      'barry-sacramento-interior-flythrough': {
+        shortTitle: 'Barry Interior',
+        shortSub: '2.5D Fly-Through',
+        cat: 'Cinematic',
+        thumb: '/assets/barry-minkow-opening/assets/construction-corridor.webp',
+        priority: 1
+      },
       'jani-spin-flash-glitch-reveal': {
         shortTitle: 'Circular Spin',
         shortSub: 'Falling Particles',
@@ -2613,6 +2620,18 @@
       const options = opts || {};
 
       if (typeof EFFECT_TEMPLATES_DATA !== 'undefined' && Array.isArray(EFFECT_TEMPLATES_DATA)) {
+        if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'barry-sacramento-interior-flythrough')) {
+          EFFECT_TEMPLATES_DATA.unshift({
+            id: 'barry-sacramento-interior-flythrough',
+            title: 'Barry Sacramento · Interior 2.5D Fly-Through',
+            category: 'Documentary',
+            badge: 'BARRY SACRAMENTO',
+            description: 'Multiplane construction-corridor fly-through with separate walking figures, shadows, foreground occluders and editable two-line title.',
+            defaultImage: '/assets/barry-minkow-opening/assets/construction-corridor.webp',
+            timeToApply: '7s',
+            tags: ['barry', 'sacramento', 'construction', '2.5d', 'parallax', 'fly-through', 'documentary']
+          });
+        }
         if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'jani-cinematic-letterbox')) {
           EFFECT_TEMPLATES_DATA.unshift({
             id: 'jani-cinematic-letterbox',
@@ -2758,6 +2777,10 @@
           drawerEl.style.display = 'none';
           if (tplId === 'barry-sacramento-searchlight') {
             window.location.assign('/assets/barry-sacramento/');
+            return;
+          }
+          if (tplId === 'barry-sacramento-interior-flythrough') {
+            window.location.assign('/assets/barry-sacramento-interior-flythrough/');
             return;
           }
           if (typeof options.onSelectTemplate === 'function') {
