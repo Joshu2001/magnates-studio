@@ -130,6 +130,7 @@
     "moving reflection strength",
     "cloud opacity and timing",
     "building reveal start and duration",
-    "opening sound enable and level"
+    "opening sound enable and level",
+    "foreground cloud vertical offset"
   ]
 }

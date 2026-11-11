@@ -14,7 +14,7 @@ The flash-core bloom follows the soft screen-blend optical treatment in `circula
 
 ## Editable controls
 
-Content controls expose the title and visibility of each scene layer. Motion controls expose title timing, searchlight sweep rate, foreground-cloud drift speed, background-sky drift, and camera push. Advanced controls expose building and cloud in/out timing plus the building reveal duration. Look controls expose title scale, baseline, title gold, and beam tint. Effects controls expose opening bloom, moving reflected-light strength, cloud opacity, and the synthesized opening audio. The JSON manifest lists the layer/source mapping and sequence beats.
+Content controls expose the title and visibility of each scene layer. Motion controls expose title timing, searchlight sweep rate, foreground-cloud drift speed, background-sky drift, camera push, and the cloud veil’s vertical offset. Advanced controls expose building and cloud in/out timing plus the building reveal duration. Look controls expose title scale, baseline, title gold, and beam tint. Effects controls expose opening bloom, moving reflected-light strength, cloud opacity, and the synthesized opening audio. The JSON manifest lists the layer/source mapping and sequence beats.
 
 ## Run
 
