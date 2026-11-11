@@ -52,7 +52,7 @@
     {
       "in": 0.0,
       "out": 8.0,
-      "beat": "Low rolling cloud veils the podium and title baseline",
+      "beat": "Low rolling cloud bank drifts behind the title",
       "layers": [
         "clouds"
       ]
@@ -60,7 +60,7 @@
     {
       "in": 3.0,
       "out": 4.1,
-      "beat": "Large distressed-gold SACRAMENTO rises behind cloud and blooms in one letter at a time from left to right.",
+      "beat": "Large weathered-gold SACRAMENTO stays on a fixed baseline above the cloud bank and blooms in one letter at a time from left to right.",
       "layers": [
         "title",
         "clouds"
@@ -125,7 +125,7 @@
   "editableControls": [
     "layer visibility",
     "title text",
-    "title reveal start and duration",
+    "title reveal start and duration (fixed baseline, left-to-right letter bloom)",
     "searchlight sweep speed",
     "cloud drift speed",
     "background sky drift",

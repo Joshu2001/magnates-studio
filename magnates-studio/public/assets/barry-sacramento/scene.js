@@ -29,15 +29,14 @@
     const m=measure.measureText(text),ascent=m.actualBoundingBoxAscent||size*.78,descent=m.actualBoundingBoxDescent||size*.2,pad=36;
     const width=Math.ceil(m.width+pad*2),height=Math.ceil(ascent+descent+pad*2),base=pad+ascent;
     const c=document.createElement('canvas');c.width=width;c.height=height;const g=c.getContext('2d');g.font=measure.font;g.textBaseline='alphabetic';g.textAlign='left';
-    // Deep gold body, restrained bevel, and much denser weathering to match the reference title.
+    // Saturated metallic gold with uneven mineral wear and a restrained bevel.
     g.shadowColor='rgba(30,12,0,.82)';g.shadowBlur=15;g.shadowOffsetY=10;g.lineJoin='round';g.strokeStyle='rgba(75,37,2,.88)';g.lineWidth=Math.max(5,size*.055);g.strokeText(text,pad,base);g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
-    const gold=g.createLinearGradient(0,base-ascent,0,base+descent);gold.addColorStop(0,'#ffe957');gold.addColorStop(.20,'#ffd427');gold.addColorStop(.58,s.gold);gold.addColorStop(1,'#b95f05');g.fillStyle=gold;g.fillText(text,pad,base);
-    // Irregular dark flecks, scraped seams, and small transparent wear marks reveal the scene beneath.
-    const distress=s.titleDistress;g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.30*distress;
-    for(let i=0;i<Math.round(width*height/520);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.5+rand()*4.4;g.fillStyle=rand()<.72?'#3e2305':'#7b4b0c';g.beginPath();g.ellipse(x,y,r*(1.1+rand()),r*(.35+rand()*.7),rand()*Math.PI,0,Math.PI*2);g.fill();}
-    // Larger broken pigment islands keep the gold mottled like the weathered reference, not dotted evenly.
-    g.globalAlpha=.23*distress;for(let i=0;i<Math.round(width*height/1900);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=3+rand()*12,ry=1.4+rand()*6;g.fillStyle=rand()<.78?'#60350a':'#9a5a0b';g.beginPath();for(let k=0;k<9;k++){const a=k*Math.PI*2/9,r=.62+rand()*.55,px=x+Math.cos(a)*rx*r,py=y+Math.sin(a)*ry*r;if(k===0)g.moveTo(px,py);else g.lineTo(px,py);}g.closePath();g.fill();}
-    g.globalAlpha=.36*distress;g.strokeStyle='#4b2d08';g.lineWidth=.6+rand()*1.4;for(let i=0;i<90;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.beginPath();g.moveTo(x,y);g.lineTo(x+4+rand()*24,y-2+rand()*5);g.stroke();}g.restore();
+    const gold=g.createLinearGradient(0,base-ascent,0,base+descent);gold.addColorStop(0,'#ffe85a');gold.addColorStop(.16,'#ffd52c');gold.addColorStop(.48,s.gold);gold.addColorStop(.78,'#e99a0a');gold.addColorStop(1,'#a94e04');g.fillStyle=gold;g.fillText(text,pad,base);
+    // Fine mineral speckle, clustered pigment and hairline scratches match the weathered reference without the large repeated dash pattern.
+    const distress=s.titleDistress;g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.22*distress;
+    for(let i=0;i<Math.round(width*height/210);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.35+rand()*2.1;g.fillStyle=rand()<.64?'#48290b':'#8a510d';g.beginPath();g.ellipse(x,y,r*(1+rand()*1.4),r*(.35+rand()*.9),rand()*Math.PI,0,Math.PI*2);g.fill();}
+    g.globalAlpha=.19*distress;for(let i=0;i<Math.round(width*height/1450);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=1.5+rand()*7,ry=.7+rand()*3.2;g.fillStyle=rand()<.76?'#60350a':'#9a5a0b';g.beginPath();for(let k=0;k<11;k++){const a=k*Math.PI*2/11,r=.67+rand()*.52,px=x+Math.cos(a)*rx*r,py=y+Math.sin(a)*ry*r;if(k===0)g.moveTo(px,py);else g.lineTo(px,py);}g.closePath();g.fill();}
+    g.globalAlpha=.23*distress;g.strokeStyle='#4b2d08';for(let i=0;i<74;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.lineWidth=.35+rand()*.8;g.beginPath();g.moveTo(x,y);g.lineTo(x+2+rand()*13,y-1+rand()*2);g.stroke();}g.restore();
     g.save();g.globalCompositeOperation='destination-out';g.globalAlpha=.13*distress;for(let i=0;i<Math.round(width*height/5600);i++){const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.5+rand()*2.7;g.beginPath();g.ellipse(x,y,r*1.5,r*.7,rand()*Math.PI,0,Math.PI*2);g.fill();}g.restore();
     g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.30;g.strokeStyle='#fff4b0';g.lineWidth=1.5;g.strokeText(text,pad,base-1);g.restore();
     const glyphs=[];let cursor=pad;for(const ch of text){const w=measure.measureText(ch).width;glyphs.push({x:cursor-pad,w,ch});cursor+=w;}
@@ -47,21 +46,25 @@
   function drawCover(im,xoff=0,yoff=0,scale=1){const w=W*scale,h=H*scale;ctx.drawImage(im,(W-w)/2+xoff,(H-h)/2+yoff,w,h);}
   function drawBuildingAlpha(target,x,y,scale){target.drawImage(images.building,x,y,W*scale,H*scale);}
   function beamAim(time,s){
-    const sx=1082,sy=108,phase=(time-s.beamIn)*s.lightSpeed*.78,angle=2.45+Math.sin(phase)*s.beamSweep*Math.PI/180,push=1+s.cameraPush*clamp(time/D,0,1);
+    const sx=1082,sy=108,phase=(time-s.beamIn)*s.lightSpeed*.78,angle=2.83+Math.sin(phase)*s.beamSweep*Math.PI/180,push=1+s.cameraPush*clamp(time/D,0,1);
     const rawX=sx+Math.cos(angle)*620,rawY=sy+Math.sin(angle)*620;
     return {sx,sy,tx:(rawX-W/2)*push+W/2,ty:(rawY-H/2)*push+H/2,phase};
   }
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn)return;const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.hypot(dx,dy),nx=-dy/len,ny=dx/len,width=s.lightWidth;
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=lightIn*.76;
-    const cone=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);cone.addColorStop(0,rgba(s.beamTint,.42));cone.addColorStop(.24,rgba(s.beamTint,.24));cone.addColorStop(1,rgba(s.beamTint,.04));ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx+nx*width,a.ty+ny*width);ctx.lineTo(a.tx-nx*width,a.ty-ny*width);ctx.closePath();ctx.fill();
-    ctx.globalAlpha=lightIn*.32;ctx.strokeStyle=rgba(s.beamTint,.54);ctx.lineWidth=13;ctx.lineCap='round';ctx.shadowColor=s.beamTint;ctx.shadowBlur=34;ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx,a.ty);ctx.stroke();
-    const hot=ctx.createRadialGradient(a.tx,a.ty,3,a.tx,a.ty,150);hot.addColorStop(0,rgba(s.beamTint,.38));hot.addColorStop(.35,rgba(s.beamTint,.17));hot.addColorStop(1,rgba(s.beamTint,0));ctx.globalAlpha=lightIn*.6;ctx.fillStyle=hot;ctx.fillRect(a.tx-160,a.ty-160,320,320);ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='screen';
+    // A real searchlight reads as a broad amber haze with a restrained luminous core,
+    // not a hard white stripe or a sharply outlined triangular graphic.
+    const bloom=ctx.createRadialGradient(a.sx,a.sy,2,a.sx,a.sy,118);bloom.addColorStop(0,`rgba(255,221,155,${.54*lightIn})`);bloom.addColorStop(.16,`rgba(255,161,55,${.28*lightIn})`);bloom.addColorStop(1,'rgba(255,115,22,0)');ctx.fillStyle=bloom;ctx.fillRect(a.sx-125,a.sy-125,250,250);
+    ctx.filter='blur(24px)';ctx.globalAlpha=lightIn*.95;
+    const cone=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);cone.addColorStop(0,'rgba(255,190,91,.58)');cone.addColorStop(.32,'rgba(255,139,43,.38)');cone.addColorStop(1,'rgba(255,104,22,.07)');ctx.fillStyle=cone;ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx+nx*width*1.55,a.ty+ny*width*1.55);ctx.lineTo(a.tx-nx*width*1.55,a.ty-ny*width*1.55);ctx.closePath();ctx.fill();ctx.filter='none';
+    ctx.globalAlpha=lightIn*.28;const core=ctx.createLinearGradient(a.sx,a.sy,a.tx,a.ty);core.addColorStop(0,'rgba(255,239,195,.24)');core.addColorStop(.25,'rgba(255,192,105,.20)');core.addColorStop(1,'rgba(255,140,48,.025)');ctx.strokeStyle=core;ctx.lineWidth=width*.38;ctx.lineCap='round';ctx.shadowColor='#ff9b37';ctx.shadowBlur=38;ctx.beginPath();ctx.moveTo(a.sx,a.sy);ctx.lineTo(a.tx,a.ty);ctx.stroke();ctx.shadowBlur=0;
+    const hot=ctx.createRadialGradient(a.tx,a.ty,2,a.tx,a.ty,174);hot.addColorStop(0,`rgba(255,192,92,${.29*lightIn})`);hot.addColorStop(.32,`rgba(255,133,42,${.16*lightIn})`);hot.addColorStop(1,'rgba(255,100,20,0)');ctx.fillStyle=hot;ctx.fillRect(a.tx-180,a.ty-180,360,360);ctx.restore();
   }
   function buildReflection(time,s){
     const a=beamAim(time,s),flicker=.94+.06*Math.sin(time*21)+.025*Math.sin(time*38);rc.clearRect(0,0,W,H);rc.save();rc.globalCompositeOperation='source-over';
-    const g=rc.createRadialGradient(a.tx,a.ty,2,a.tx,a.ty,210*flicker);g.addColorStop(0,`rgba(255,246,192,${.62*flicker})`);g.addColorStop(.18,`rgba(255,195,72,${.43*flicker})`);g.addColorStop(.48,'rgba(238,115,24,.22)');g.addColorStop(1,'rgba(255,112,20,0)');rc.fillStyle=g;rc.fillRect(0,0,W,H);
-    rc.translate(a.tx,a.ty);rc.rotate(Math.atan2(a.ty-a.sy,a.tx-a.sx));const streak=rc.createRadialGradient(0,0,4,0,0,170);streak.addColorStop(0,rgba(s.beamTint,.25));streak.addColorStop(.4,rgba(s.beamTint,.14));streak.addColorStop(1,rgba(s.beamTint,0));rc.fillStyle=streak;rc.beginPath();rc.ellipse(12,0,190,55,0,0,Math.PI*2);rc.fill();rc.restore();
+    const g=rc.createRadialGradient(a.tx,a.ty,2,a.tx,a.ty,230*flicker);g.addColorStop(0,`rgba(255,210,133,${.48*flicker})`);g.addColorStop(.17,`rgba(255,166,59,${.46*flicker})`);g.addColorStop(.46,'rgba(238,96,20,.25)');g.addColorStop(1,'rgba(255,105,18,0)');rc.fillStyle=g;rc.fillRect(0,0,W,H);
+    rc.translate(a.tx,a.ty);rc.rotate(Math.atan2(a.ty-a.sy,a.tx-a.sx));const streak=rc.createRadialGradient(0,0,4,0,0,190);streak.addColorStop(0,'rgba(255,183,75,.29)');streak.addColorStop(.4,'rgba(255,120,34,.15)');streak.addColorStop(1,'rgba(255,92,18,0)');rc.fillStyle=streak;rc.beginPath();rc.ellipse(12,0,210,62,0,0,Math.PI*2);rc.fill();rc.restore();
     // Keep the warm pool and streak clipped to the actual tower layer.
     rc.save();rc.globalCompositeOperation='destination-in';const push=1+s.cameraPush*clamp(time/D,0,1);drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
     ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=s.pool;ctx.drawImage(reflection,0,0);ctx.restore();
@@ -89,14 +92,19 @@
     const vignette=ctx.createRadialGradient(W*.53,H*.38,140,W*.53,H*.38,780);vignette.addColorStop(0,'rgba(5,9,15,0)');vignette.addColorStop(1,'rgba(2,5,10,.37)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
     const buildingAlpha=layers.building?smooth((time-s.buildingIn)/s.buildingReveal):0;
     const lightIn=layers.searchlight?smooth((time-s.beamIn)/.55)*(.9+.06*Math.sin(time*17)):0;
-    if(layers.searchlight){ctx.save();ctx.globalAlpha=lightIn;drawCover(images.searchlightRig,0,0,1);ctx.restore();drawBeam(time,s,lightIn);}
+    if(layers.searchlight){ctx.save();ctx.globalAlpha=lightIn;drawCover(images.searchlightRig,0,0,1);ctx.restore();}
     if(buildingAlpha>0){ctx.save();ctx.globalAlpha=buildingAlpha;const bscale=push*(.965+.035*smooth((time-s.buildingIn)/Math.max(.4,s.buildingReveal*2))),bw=W*bscale,bh=H*bscale;ctx.drawImage(images.building,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();}
+    // Keep the source rig behind the tower plate, but project its soft amber beam across the tower.
+    if(layers.searchlight)drawBeam(time,s,lightIn);
     if(layers.reflection&&buildingAlpha>0)buildReflection(time,s);
     // Fine dust drifts within the beam path and follows the lamp's current aim.
     if(layers.searchlight&&time>s.beamIn){const aim=beamAim(time,s);ctx.save();ctx.globalCompositeOperation='screen';for(let i=0;i<18;i++){const u=.24+((i*.213+time*.06)% .7),phase=time*(.65+i*.013)+i*1.9,x=aim.sx+(aim.tx-aim.sx)*u+Math.sin(phase)*18,y=aim.sy+(aim.ty-aim.sy)*u+Math.cos(phase*1.1)*12,r=1+(i%4)*.55;ctx.globalAlpha=.10+.11*(.5+.5*Math.sin(phase*3));ctx.fillStyle='#ffd38b';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}ctx.restore();}
     const titleProgress=smooth((time-s.titleStart)/s.titleRise);
+    // Keep the cloud bank behind the title: the title sits on the mist instead of
+    // being swallowed by a foreground veil during its reveal.
+    drawMovingCloud(time,s,titleProgress);
     if(layers.title&&titleLayer&&time>s.titleStart-.12&&titleProgress>0){
-      const base=H+80+(s.titleY-(H+80))*titleProgress,alpha=smooth((time-s.titleStart)/.18)*s.titleOpacity,x=(W-titleMetrics.w)/2,y=base-titleMetrics.base;
+      const base=s.titleY,alpha=smooth((time-s.titleStart)/.18)*s.titleOpacity,x=(W-titleMetrics.w)/2,y=base-titleMetrics.base;
       ctx.save();ctx.globalAlpha=alpha;ctx.globalCompositeOperation='screen';const glow=ctx.createRadialGradient(W/2,base-50,15,W/2,base-35,350);glow.addColorStop(0,'rgba(255,195,35,.19)');glow.addColorStop(1,'rgba(255,154,27,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation='source-over';ctx.globalAlpha=alpha;
       const count=titleMetrics.glyphs.length,interval=s.titleRise*.69/Math.max(1,count-1),glyphDuration=Math.max(.16,s.titleRise*.30);
       titleMetrics.glyphs.forEach((glyph,i)=>{if(!glyph.ch.trim())return;const p=smooth((time-(s.titleStart+i*interval))/glyphDuration);if(p<=0)return;const cellX=x+glyph.x,cellW=Math.max(1,glyph.w),cx=cellX+cellW/2,cy=y+titleMetrics.ascent*.52,maxR=Math.max(cellW*.82,titleMetrics.ascent*.72),radius=maxR*(.12+.88*p);
@@ -104,7 +112,6 @@
         if(p<.96){ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=alpha*(1-p)*.72;const orb=ctx.createRadialGradient(cx,cy,1,cx,cy,24+22*(1-p));orb.addColorStop(0,'rgba(255,255,230,.96)');orb.addColorStop(.2,'rgba(255,208,75,.65)');orb.addColorStop(1,'rgba(255,174,32,0)');ctx.fillStyle=orb;ctx.beginPath();ctx.arc(cx,cy,25+20*(1-p),0,Math.PI*2);ctx.fill();ctx.restore();}
       });ctx.restore();
     }
-    drawMovingCloud(time,s,titleProgress);
     // Reuse the existing circular-flashlight template's soft flash-core/screen-bloom language for one opening hit.
     drawFlash(time,s);
     // Film-like grain is subtle and stable; it overlays the completed comp, not the editable source plates.
