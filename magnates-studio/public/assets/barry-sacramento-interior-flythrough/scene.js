@@ -21,8 +21,8 @@
   function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Could not load '+src));im.src=src;});}
   Promise.all([
     loadImage(corridorSrc).then(im=>images.corridor=im),
-    loadImage('data:image/webp;base64,'+(window.BARRY_INTERIOR_PEOPLE||'')).then(im=>images.people=im),
-    loadImage('data:image/webp;base64,'+(window.BARRY_INTERIOR_SHADOWS||'')).then(im=>images.shadows=im)
+    loadImage('data:image/webp;base64,'+(window.BARRY_INTERIOR_PEOPLE2||'')).then(im=>images.people=im),
+    loadImage('data:image/webp;base64,'+(window.BARRY_INTERIOR_SHADOWS2||'')).then(im=>images.shadows=im)
   ]).then(()=>{ready=true;render(0);requestAnimationFrame(loop);}).catch(err=>{
     console.error(err);$('caption').textContent=err.message;
   });
