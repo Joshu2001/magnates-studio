@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#302820"/>
+      <stop offset=".45" stop-color="#171514"/>
+      <stop offset="1" stop-color="#5b3a1d"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9a6730"/>
+      <stop offset=".5" stop-color="#47301d"/>
+      <stop offset="1" stop-color="#b27835"/>
+    </linearGradient>
+    <radialGradient id="glass">
+      <stop offset="0" stop-color="#f4d98e"/>
+      <stop offset=".35" stop-color="#b77a28"/>
+      <stop offset=".78" stop-color="#5f3a16"/>
+      <stop offset="1" stop-color="#211a14"/>
+    </radialGradient>
+  </defs>
+
+  <!-- rear housing depth, extending away from the building -->
+  <path d="M153 38 L224 67 L224 137 L169 153 Z" fill="url(#metal)" stroke="#8d5e2d" stroke-width="3"/>
+  <path d="M169 153 L224 137 L243 151 L183 170 Z" fill="#181615" stroke="#76502b" stroke-width="2"/>
+
+  <!-- front lamp plane: visibly oblique, aimed left/down toward the building -->
+  <path d="M52 53 L153 38 L169 153 L66 168 Z" fill="#181615" stroke="url(#rim)" stroke-width="4"/>
+  <path d="M60 60 L146 47 L159 144 L72 157 Z" fill="#25211e" stroke="#5f4327" stroke-width="2"/>
+
+  <!-- housing ribs -->
+  <g stroke="#6f4b29" stroke-width="2" fill="none" opacity=".9">
+    <path d="M87 56 L99 153"/>
+    <path d="M117 51 L129 149"/>
+    <path d="M64 91 L155 78"/>
+    <path d="M68 123 L160 110"/>
+  </g>
+
+  <!-- nine unlit lamp lenses, compressed horizontally by perspective -->
+  <g stroke="#b57a33" stroke-width="3" fill="url(#glass)">
+    <ellipse cx="76" cy="75" rx="9" ry="12" transform="rotate(-8 76 75)"/>
+    <ellipse cx="104" cy="71" rx="9" ry="12" transform="rotate(-8 104 71)"/>
+    <ellipse cx="132" cy="67" rx="9" ry="12" transform="rotate(-8 132 67)"/>
+    <ellipse cx="80" cy="105" rx="9" ry="12" transform="rotate(-8 80 105)"/>
+    <ellipse cx="108" cy="101" rx="9" ry="12" transform="rotate(-8 108 101)"/>
+    <ellipse cx="136" cy="97" rx="9" ry="12" transform="rotate(-8 136 97)"/>
+    <ellipse cx="84" cy="135" rx="9" ry="12" transform="rotate(-8 84 135)"/>
+    <ellipse cx="112" cy="131" rx="9" ry="12" transform="rotate(-8 112 131)"/>
+    <ellipse cx="140" cy="127" rx="9" ry="12" transform="rotate(-8 140 127)"/>
+  </g>
+
+  <!-- side cage and rear bracing -->
+  <g stroke="#79512b" stroke-width="2" fill="none">
+    <path d="M155 44 L223 71 L223 135 L170 149"/>
+    <path d="M174 47 L174 150"/>
+    <path d="M194 55 L194 144"/>
+    <path d="M213 63 L213 140"/>
+    <path d="M157 75 L224 96"/>
+    <path d="M162 112 L224 124"/>
+  </g>
+
+  <!-- platform -->
+  <path d="M39 167 L184 149 L252 166 L99 188 Z" fill="#211d1a" stroke="#95632e" stroke-width="3"/>
+  <path d="M99 188 L252 166 L255 179 L103 202 Z" fill="#151313" stroke="#694723" stroke-width="2"/>
+
+  <!-- safety rail -->
+  <g stroke="#8b5d30" stroke-width="2" fill="none">
+    <path d="M48 164 L44 129 M48 134 L185 114 M185 114 L190 149"/>
+    <path d="M190 149 L245 158 M245 158 L246 126"/>
+    <path d="M66 160 L63 132 M91 157 L88 128 M117 154 L114 124 M143 151 L140 121 M169 148 L166 117"/>
+  </g>
+
+  <!-- mounting brackets -->
+  <path d="M176 181 L196 178 L205 216 L184 219 Z" fill="#201c18" stroke="#74502b" stroke-width="2"/>
+  <path d="M215 175 L234 172 L244 207 L223 211 Z" fill="#201c18" stroke="#74502b" stroke-width="2"/>
+</svg>
