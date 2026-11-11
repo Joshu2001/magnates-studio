@@ -4,7 +4,7 @@
   const assetFiles={background:'background',building:'building',searchlightRig:'searchlight-rig',clouds:'clouds'};
   const images={}; const layers={background:true,building:true,searchlight:true,reflection:true,clouds:true,title:true};
   const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null;
+  let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null,titleParts=[];
   const off=document.createElement('canvas'); off.width=W; off.height=H; const oc=off.getContext('2d');
   const reflection=document.createElement('canvas'); reflection.width=W; reflection.height=H; const rc=reflection.getContext('2d');
   let seed=91823; function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
@@ -51,6 +51,20 @@
     g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.30;g.strokeStyle='#fff4b0';g.lineWidth=1.5;g.strokeText(text,pad,base-1);g.restore();
     const glyphs=[];let cursor=pad;for(const ch of text){const w=measure.measureText(ch).width;glyphs.push({x:cursor-pad,w,ch});cursor+=w;}
     titleLayer=c;titleMetrics={w:width,h:height,base,ascent,descent,glyphs};
+
+    // Split the finished word into generously padded full-letter plates. These are not
+    // reveal masks: every glyph is already fully rendered with its bevel, texture and shadow.
+    // Sequential animation now changes only opacity/position, so no rectangular or circular
+    // clipping can bite into a letter edge.
+    titleParts=[];const bleed=Math.max(24,Math.round(size*.18));
+    glyphs.forEach(glyph=>{
+      if(!glyph.ch.trim()){titleParts.push(null);return;}
+      const sx=Math.max(0,Math.floor(pad+glyph.x-bleed));
+      const sw=Math.min(c.width-sx,Math.ceil(glyph.w+bleed*2));
+      const pc=document.createElement('canvas');pc.width=sw;pc.height=c.height;
+      const pg=pc.getContext('2d');pg.drawImage(c,sx,0,sw,c.height,0,0,sw,c.height);
+      titleParts.push({canvas:pc,dx:sx-pad,w:sw});
+    });
   }
   function rgba(hex,a){const h=hex.replace('#','');const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
   function drawCover(im,xoff=0,yoff=0,scale=1){const w=W*scale,h=H*scale;ctx.drawImage(im,(W-w)/2+xoff,(H-h)/2+yoff,w,h);}
@@ -172,38 +186,60 @@
     // Keep the cloud bank behind the title: the title sits on the mist instead of
     // being swallowed by a foreground veil during its reveal.
     drawMovingCloud(time,s,titleProgress);
-    if(layers.title&&titleLayer&&time>s.titleStart-.12&&titleProgress>0){
-      const base=s.titleY,reveal=smooth((time-s.titleStart)/Math.max(.28,s.titleRise*.72));
-      const alpha=smooth((time-s.titleStart)/.22)*s.titleOpacity*reveal;
-      const rise=(1-reveal)*16,scale=.985+.015*reveal;
-      const x=(W-titleMetrics.w)/2,y=base-titleMetrics.base+rise;
+    if(layers.title&&titleLayer&&time>s.titleStart-.08){
+      const base=s.titleY,x=(W-titleMetrics.w)/2,y=base-titleMetrics.base;
+      const count=Math.max(1,titleMetrics.glyphs.length);
+      const interval=s.titleRise*.72/Math.max(1,count-1);
+      const glyphDuration=Math.max(.16,s.titleRise*.34);
 
-      // A restrained amber halo belongs to the same scene illumination, not to the text layer itself.
-      ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=alpha*.55;
-      const glow=ctx.createRadialGradient(W/2,base-45,20,W/2,base-32,410);
-      glow.addColorStop(0,'rgba(255,193,57,.24)');glow.addColorStop(.5,'rgba(226,126,18,.08)');glow.addColorStop(1,'rgba(255,132,15,0)');
-      ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);ctx.restore();
-
-      // Unified title draw: no per-letter rectangular/circular clipping. A subtle affine
-      // transform gives the word the slight cinematic perspective visible in the reference.
-      ctx.save();
-      ctx.translate(W/2,base-58);
-      ctx.transform(scale,-.018,-.055,scale,0,0);
-      ctx.translate(-W/2,-(base-58));
-      ctx.globalAlpha=alpha;
-      ctx.shadowColor='rgba(36,15,0,.72)';ctx.shadowBlur=13;ctx.shadowOffsetY=8;
-      ctx.drawImage(titleLayer,x,y);
-      ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
-
-      // Soft traveling highlight during the reveal, masked naturally by source-atop rather
-      // than clipping the glyph geometry.
-      if(reveal<.995){
-        ctx.globalCompositeOperation='source-atop';ctx.globalAlpha=.22*(1-reveal*.35);
-        const hx=x-120+reveal*(titleMetrics.w+240);
-        const sheen=ctx.createLinearGradient(hx-90,0,hx+90,0);
-        sheen.addColorStop(0,'rgba(255,255,255,0)');sheen.addColorStop(.5,'rgba(255,246,191,.72)');sheen.addColorStop(1,'rgba(255,255,255,0)');
-        ctx.fillStyle=sheen;ctx.fillRect(x-30,y-20,titleMetrics.w+60,titleMetrics.h+40);
+      // Scene-level halo behind the word.
+      const wholeP=smooth((time-s.titleStart)/Math.max(.25,s.titleRise));
+      if(wholeP>0){
+        ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.42*wholeP;
+        const glow=ctx.createRadialGradient(W/2,base-44,20,W/2,base-32,410);
+        glow.addColorStop(0,'rgba(255,193,57,.22)');
+        glow.addColorStop(.5,'rgba(226,126,18,.07)');
+        glow.addColorStop(1,'rgba(255,132,15,0)');
+        ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);ctx.restore();
       }
+
+      ctx.save();
+      // Slight cinematic perspective without distorting the letter reveal direction.
+      ctx.translate(W/2,base-58);
+      ctx.transform(.992,-.016,-.052,.992,0,0);
+      ctx.translate(-W/2,-(base-58));
+
+      titleMetrics.glyphs.forEach((glyph,i)=>{
+        const part=titleParts[i];
+        if(!part)return;
+        const p=smooth((time-(s.titleStart+i*interval))/glyphDuration);
+        if(p<=0)return;
+        const rise=(1-p)*10;
+        const scale=.982+.018*p;
+        const px=x+part.dx, py=y+rise;
+        ctx.save();
+        ctx.globalAlpha=s.titleOpacity*p;
+        // Tiny per-letter bloom as it enters, but the glyph itself is always drawn whole.
+        ctx.translate(px+part.w/2,py+titleMetrics.h/2);
+        ctx.scale(scale,scale);
+        ctx.translate(-(px+part.w/2),-(py+titleMetrics.h/2));
+        ctx.shadowColor='rgba(35,14,0,.66)';
+        ctx.shadowBlur=10;ctx.shadowOffsetY=7;
+        ctx.drawImage(part.canvas,px,py);
+        ctx.shadowColor='transparent';ctx.shadowBlur=0;ctx.shadowOffsetY=0;
+
+        if(p<.9){
+          ctx.globalCompositeOperation='screen';
+          ctx.globalAlpha=(1-p)*.34;
+          const cx=px+part.w*.5,cy=py+titleMetrics.ascent*.48;
+          const orb=ctx.createRadialGradient(cx,cy,0,cx,cy,30);
+          orb.addColorStop(0,'rgba(255,248,207,.76)');
+          orb.addColorStop(.35,'rgba(255,196,58,.30)');
+          orb.addColorStop(1,'rgba(255,164,30,0)');
+          ctx.fillStyle=orb;ctx.beginPath();ctx.arc(cx,cy,30,0,Math.PI*2);ctx.fill();
+        }
+        ctx.restore();
+      });
       ctx.restore();
     }
     // Reuse the existing circular-flashlight template's soft flash-core/screen-bloom language for one opening hit.
