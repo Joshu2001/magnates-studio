@@ -297,10 +297,23 @@
 
     }
 
-    // People and their shadows form separate planes. Shadows move slightly less, keeping them
-    // anchored to the floor while the figures sit one depth step closer to camera.
-    if(layers.shadows)drawWalkingShadows(t,p,s);
-    if(layers.people)drawWalkingPeople(t,p,s);
+    // Separate floor-shadow and walking-figure depth planes.
+    if(layers.shadows){
+      const sy=602-s.glide*.72*p;
+      const sc=1+s.peopleDepth*.075*p;
+      drawShadowVector(603,sy,sc,s.shadowOpacity*(.88+.12*p),-18);
+      drawShadowVector(665,sy+2,sc*.98,s.shadowOpacity*.88*(.88+.12*p),16);
+    }
+    if(layers.people)drawPeopleVector(t,p,s);
+
+    // Near foreground architecture is rendered AFTER the people so it can genuinely pass
+    // in front of them during the forward/downward camera glide.
+    if(layers.foreground){
+      const d=s.depth;
+      clipPlane(images.corridor,{x:0,y:0,w:215,h:H},-48*d*p,-34-s.glide*1.72*p,1.10+s.push*.205*p,0.90,1.3+1.9*p);
+      clipPlane(images.corridor,{x:1090,y:0,w:190,h:H},48*d*p,-34-s.glide*1.76*p,1.10+s.push*.215*p,0.90,1.3+1.9*p);
+      clipPlane(images.corridor,{x:0,y:0,w:W,h:120},0,-58-s.glide*1.78*p,1.09+s.push*.19*p,0.72,1.5+2.0*p);
+    }
 
     drawDust(t,p,s);
 
