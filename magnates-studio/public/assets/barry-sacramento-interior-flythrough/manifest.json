@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -11,7 +11,7 @@
   },
   "status": "preview-ready",
   "textLayersEditable": true,
-  "provenance": "Construction corridor reuses the existing Barry Minkow opening corridor plate. Walking figures and shadows are independent illustrative vector layers reconstructed from the supplied storyboard reference; they are not archival photography.",
+  "provenance": "Construction corridor reuses the existing Barry Minkow opening corridor plate. Walking figures and shadows are separate procedural vector illustration layers modeled from the supplied storyboard composition; not archival photography.",
   "motion": {
     "effect": "2.5D parallax fly-through / downward camera glide",
     "principle": "continuous forward/downward camera travel through one coherent scene; near clipped architecture moves fastest, background moves slowest, people and shadows occupy separate depth planes; no orbiting or lateral dance",
@@ -27,17 +27,17 @@
     {
       "id": "foregroundArchitecture",
       "src": "derived from corridor plate at runtime",
-      "role": "left/right/top near occluder planes"
+      "role": "mid and near left/right/top occluder planes"
     },
     {
       "id": "people",
-      "src": "procedural vector/canvas cutout",
-      "role": "two walking business figures on independent depth plane"
+      "src": "procedural vector layer",
+      "role": "two walking suited business figures with briefcase and folder"
     },
     {
       "id": "shadows",
-      "src": "procedural soft multiply plane",
-      "role": "separate floor shadows following the walking figures"
+      "src": "procedural vector layer",
+      "role": "separate soft perspective floor shadows"
     },
     {
       "id": "atmosphere",
