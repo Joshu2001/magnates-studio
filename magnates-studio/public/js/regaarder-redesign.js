@@ -2479,6 +2479,13 @@
         thumb: '/jani_cinematic_letterbox_ref.png',
         priority: 1
       },
+      'barry-sacramento-searchlight': {
+        shortTitle: 'Barry Sacramento',
+        shortSub: 'Searchlight Reveal',
+        cat: 'Cinematic',
+        thumb: '/assets/barry-sacramento/assets/poster.webp',
+        priority: 0
+      },
       'jani-spin-flash-glitch-reveal': {
         shortTitle: 'Circular Spin',
         shortSub: 'Falling Particles',
@@ -2749,6 +2756,10 @@
         }
         card.addEventListener('click', () => {
           drawerEl.style.display = 'none';
+          if (tplId === 'barry-sacramento-searchlight') {
+            window.location.assign('/assets/barry-sacramento/');
+            return;
+          }
           if (typeof options.onSelectTemplate === 'function') {
             options.onSelectTemplate(tplId, tpl);
             return;

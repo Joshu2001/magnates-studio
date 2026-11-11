@@ -3,6 +3,29 @@
 (function() {
   window.NEW_TESTER_TEMPLATES = [
   {
+    "id": "barry-sacramento-searchlight",
+    "title": "Barry Sacramento · Searchlight Reveal",
+    "category": "Cinematic",
+    "origCategory": "Cinematic",
+    "badge": "BARRY SACRAMENTO",
+    "difficulty": "Pro",
+    "timeToApply": "8.0s",
+    "previewGradient": "linear-gradient(135deg, rgba(37, 25, 16, 0.98), rgba(9, 16, 25, 0.99))",
+    "description": "An independent 8-second Sacramento construction reveal: one flashlight bloom, a sweeping work light and façade reflection, rolling foreground cloud, then a distressed gold title rise.",
+    "tags": [
+      "Barry Sacramento",
+      "Searchlight",
+      "Facade Reflection",
+      "Cloud Occlusion",
+      "Distressed Gold",
+      "Scene Template"
+    ],
+    "previewType": "barry-sacramento-scene",
+    "isTesterTemplate": true,
+    "defaultImage": "/assets/barry-sacramento/assets/poster.webp"
+  },
+
+  {
     "id": "regaarder-full-documentary",
     "title": "Regaarder Documentary · Master Full Sequence (0:00–26:54)",
     "category": "3D Spatial",
