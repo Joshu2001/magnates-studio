@@ -7,12 +7,13 @@
   let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null,titleParts=[];
   const off=document.createElement('canvas'); off.width=W; off.height=H; const oc=off.getContext('2d');
   const reflection=document.createElement('canvas'); reflection.width=W; reflection.height=H; const rc=reflection.getContext('2d');
+  const rigClean=document.createElement('canvas'); rigClean.width=W; rigClean.height=H; const rg=rigClean.getContext('2d');
   let seed=91823; function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
   const smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
   const mix=(a,b,p)=>a+(b-a)*p;
   const assetRoot='assets/';
   Promise.all(Object.entries(assetFiles).map(([name,file])=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images[name]=im;resolve();};im.onerror=()=>reject(new Error('Could not load '+file));im.src=assetRoot+file+'.webp';})))
-    .then(()=>{ready=true;rebuildTitle();render(0);requestAnimationFrame(loop);})
+    .then(()=>{ready=true;rebuildRigClean();rebuildTitle();render(0);requestAnimationFrame(loop);})
     .catch(err=>{console.error(err);$('caption').textContent='A scene asset could not be loaded. Check that this page is served from /assets/barry-sacramento/.';});
   function val(id){return Number($(id).value);}
   function readSettings(){return {
@@ -101,6 +102,46 @@
   function rgba(hex,a){const h=hex.replace('#','');const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
   function drawCover(im,xoff=0,yoff=0,scale=1){const w=W*scale,h=H*scale;ctx.drawImage(im,(W-w)/2+xoff,(H-h)/2+yoff,w,h);}
   function drawBuildingAlpha(target,x,y,scale){target.drawImage(images.building,x,y,W*scale,H*scale);}
+  function rebuildRigClean(){
+    rg.clearRect(0,0,W,H);
+    rg.drawImage(images.searchlightRig,0,0,W,H);
+
+    // Suppress the baked pale flare around the lamp head. The metal mast/platform stay,
+    // while all visible illumination is rebuilt procedurally below.
+    rg.save();
+    rg.globalCompositeOperation='multiply';
+    const kill=rg.createRadialGradient(1082,108,8,1082,108,90);
+    kill.addColorStop(0,'rgba(18,10,4,.22)');
+    kill.addColorStop(.20,'rgba(12,7,3,.62)');
+    kill.addColorStop(.55,'rgba(7,4,2,.94)');
+    kill.addColorStop(1,'rgba(0,0,0,0)');
+    rg.fillStyle=kill;
+    rg.beginPath();rg.arc(1082,108,92,0,Math.PI*2);rg.fill();
+    rg.restore();
+
+    // Remove the hottest center from the source plate so the new individual bulbs own
+    // the lamp cores instead of competing with a pre-baked white blob.
+    rg.save();
+    rg.globalCompositeOperation='destination-out';
+    const hot=rg.createRadialGradient(1082,108,0,1082,108,58);
+    hot.addColorStop(0,'rgba(0,0,0,.96)');
+    hot.addColorStop(.30,'rgba(0,0,0,.78)');
+    hot.addColorStop(.64,'rgba(0,0,0,.22)');
+    hot.addColorStop(1,'rgba(0,0,0,0)');
+    rg.fillStyle=hot;
+    rg.beginPath();rg.arc(1082,108,60,0,Math.PI*2);rg.fill();
+    rg.restore();
+
+    // Reconstruct a little cage/platform structure through the cleaned head so the rig
+    // remains physical even after the flare removal.
+    rg.save();
+    rg.strokeStyle='rgba(118,73,25,.78)';
+    rg.lineWidth=1.15;
+    [[1058,85,1105,94],[1057,111,1110,119],[1065,137,1105,128],[1057,96,1064,140],[1099,89,1112,133]].forEach(([x1,y1,x2,y2])=>{
+      rg.beginPath();rg.moveTo(x1,y1);rg.lineTo(x2,y2);rg.stroke();
+    });
+    rg.restore();
+  }
   function beamAim(time,s){
     const sx=1082,sy=108,phase=(time-s.beamIn)*s.lightSpeed*.78,angle=2.83+Math.sin(phase)*s.beamSweep*Math.PI/180,push=1+s.cameraPush*clamp(time/D,0,1);
     const rawX=sx+Math.cos(angle)*620,rawY=sy+Math.sin(angle)*620;
@@ -250,7 +291,7 @@
     const vignette=ctx.createRadialGradient(W*.53,H*.38,140,W*.53,H*.38,780);vignette.addColorStop(0,'rgba(5,9,15,0)');vignette.addColorStop(1,'rgba(2,5,10,.37)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);
     const buildingAlpha=layers.building?smooth((time-s.buildingIn)/s.buildingReveal):0;
     const lightIn=layers.searchlight?smooth((time-s.beamIn)/.55)*(.9+.06*Math.sin(time*17)):0;
-    if(layers.searchlight){ctx.save();ctx.globalAlpha=lightIn;drawCover(images.searchlightRig,0,0,1);ctx.restore();}
+    if(layers.searchlight){ctx.save();ctx.globalAlpha=lightIn;ctx.drawImage(rigClean,0,0);ctx.restore();}
     if(buildingAlpha>0){ctx.save();ctx.globalAlpha=buildingAlpha;const bscale=push*(.965+.035*smooth((time-s.buildingIn)/Math.max(.4,s.buildingReveal*2))),bw=W*bscale,bh=H*bscale;ctx.drawImage(images.building,(W-bw)/2,(H-bh)/2,bw,bh);ctx.restore();}
     // Keep the source rig behind the tower plate, but project its soft amber beam across the tower.
     if(layers.searchlight)drawBeam(time,s,lightIn);
