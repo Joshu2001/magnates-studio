@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const W=1280,H=720,D=8,canvas=document.getElementById('stage'),ctx=canvas.getContext('2d',{alpha:false});
-  const assetFiles={background:'background',building:'building',clouds:'clouds'};
+  const assetFiles={background:'background.webp',building:'building.webp',clouds:'clouds.webp',searchlightHead:'searchlight-head-three-quarter.svg'};
   const images={}; const layers={background:true,building:true,searchlight:true,reflection:true,clouds:true,title:true};
   const $=id=>document.getElementById(id), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
   let ready=false,playing=true,anchor=performance.now(),anchorT=0,t=0,lastT=0,audioCtx=null,soundFired=false,titleLayer=null,titleMetrics=null,titleParts=[];
@@ -11,7 +11,7 @@
   const smooth=x=>{x=clamp(x,0,1);return x*x*(3-2*x);};
   const mix=(a,b,p)=>a+(b-a)*p;
   const assetRoot='assets/';
-  Promise.all(Object.entries(assetFiles).map(([name,file])=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images[name]=im;resolve();};im.onerror=()=>reject(new Error('Could not load '+file));im.src=assetRoot+file+'.webp';})))
+  Promise.all(Object.entries(assetFiles).map(([name,file])=>new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>{images[name]=im;resolve();};im.onerror=()=>reject(new Error('Could not load '+file));im.src=assetRoot+file;})))
     .then(()=>{ready=true;rebuildTitle();render(0);requestAnimationFrame(loop);})
     .catch(err=>{console.error(err);$('caption').textContent='A scene asset could not be loaded. Check that this page is served from /assets/barry-sacramento/.';});
   function val(id){return Number($(id).value);}
@@ -29,58 +29,72 @@
     const m=measure.measureText(text),ascent=m.actualBoundingBoxAscent||size*.78,descent=m.actualBoundingBoxDescent||size*.2,pad=36;
     const width=Math.ceil(m.width+pad*2),height=Math.ceil(ascent+descent+pad*2),base=pad+ascent;
     const c=document.createElement('canvas');c.width=width;c.height=height;const g=c.getContext('2d');g.font=measure.font;g.textBaseline='alphabetic';g.textAlign='left';
-    // Aged brass face: subtle depth, warm ochre gold, fine mottling and restrained wear.
+    // Bright cinematic gold with the stronger dimensionality of the earlier treatment.
+    // The face stays luminous gold while the extrusion and mineral wear remain warm brown,
+    // avoiding both flat yellow and muddy orange.
     g.lineJoin='round';
-    for(let d=6;d>=1;d--){
-      const k=d/6;
-      g.strokeStyle=`rgba(${Math.round(58+18*(1-k))},${Math.round(32+12*(1-k))},7,${.80+.10*k})`;
-      g.fillStyle=`rgba(${Math.round(112+24*(1-k))},${Math.round(64+18*(1-k))},10,.96)`;
-      g.lineWidth=Math.max(3,size*.035);
-      g.strokeText(text,pad+d*.58,base+d*.66);
-      g.fillText(text,pad+d*.58,base+d*.66);
+    for(let d=10;d>=1;d--){
+      const k=d/10;
+      g.strokeStyle=`rgba(${Math.round(48+30*(1-k))},${Math.round(24+18*(1-k))},4,${.82+.11*k})`;
+      g.fillStyle=`rgba(${Math.round(91+35*(1-k))},${Math.round(46+25*(1-k))},6,.98)`;
+      g.lineWidth=Math.max(4,size*.044);
+      g.strokeText(text,pad+d*.68,base+d*.76);
+      g.fillText(text,pad+d*.68,base+d*.76);
     }
-
-    g.shadowColor='rgba(27,13,2,.70)';g.shadowBlur=10;g.shadowOffsetY=6;
-    g.strokeStyle='rgba(91,52,8,.88)';g.lineWidth=Math.max(3,size*.028);g.strokeText(text,pad,base);
+    g.shadowColor='rgba(22,9,0,.80)';g.shadowBlur=14;g.shadowOffsetY=8;
+    g.strokeStyle='rgba(78,39,3,.94)';g.lineWidth=Math.max(4,size*.040);g.strokeText(text,pad,base);
     g.shadowColor='transparent';g.shadowBlur=0;g.shadowOffsetY=0;
 
     const gold=g.createLinearGradient(0,base-ascent,0,base+descent);
-    gold.addColorStop(0,'#f5d477');
-    gold.addColorStop(.10,'#e6b843');
-    gold.addColorStop(.35,'#d5a12e');
-    gold.addColorStop(.60,s.gold);
-    gold.addColorStop(.82,'#b87518');
-    gold.addColorStop(1,'#815010');
+    gold.addColorStop(0,'#fff4aa');
+    gold.addColorStop(.065,'#ffe064');
+    gold.addColorStop(.23,'#f7c633');
+    gold.addColorStop(.48,s.gold);
+    gold.addColorStop(.70,'#d79212');
+    gold.addColorStop(.88,'#a95f08');
+    gold.addColorStop(1,'#6f3904');
     g.fillStyle=gold;g.fillText(text,pad,base);
 
-    // Fine metallic variation, no alpha holes and no oversized black stains.
+    // Strong but narrow top bevel, plus a subtle darker lower rolloff.
+    g.save();g.globalCompositeOperation='source-atop';
+    const bevel=g.createLinearGradient(0,base-ascent,0,base+descent);
+    bevel.addColorStop(0,'rgba(255,255,224,.82)');
+    bevel.addColorStop(.10,'rgba(255,232,133,.38)');
+    bevel.addColorStop(.47,'rgba(255,191,45,.04)');
+    bevel.addColorStop(.82,'rgba(98,43,2,.16)');
+    bevel.addColorStop(1,'rgba(51,20,0,.36)');
+    g.fillStyle=bevel;g.fillRect(pad,base-ascent,m.width,ascent+descent);g.restore();
+
+    // Organic weathering: fine dark mineral pits, medium irregular islands, and scratches.
+    // The marks stay inside the gold face and never punch holes through the letters.
     const distress=s.titleDistress;
     g.save();g.globalCompositeOperation='source-atop';
-    g.globalAlpha=.20*distress;
-    for(let i=0;i<Math.round(width*height/150);i++){
-      const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.25+rand()*1.45;
-      g.fillStyle=rand()<.52?'#7b571d':(rand()<.72?'#a26e20':'#e1bd66');
-      g.beginPath();g.ellipse(x,y,r*(1+rand()*1.25),r*(.35+rand()*.72),rand()*Math.PI,0,Math.PI*2);g.fill();
+    g.globalAlpha=.27*distress;
+    for(let i=0;i<Math.round(width*height/190);i++){
+      const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),r=.35+rand()*2.25;
+      g.fillStyle=rand()<.58?'#4b2b08':(rand()<.72?'#7f4b0d':'#b27016');
+      g.beginPath();g.ellipse(x,y,r*(1+rand()*1.65),r*(.33+rand()*.88),rand()*Math.PI,0,Math.PI*2);g.fill();
     }
-    g.globalAlpha=.14*distress;
-    for(let i=0;i<Math.round(width*height/1150);i++){
-      const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=1.2+rand()*5.5,ry=.7+rand()*2.4;
-      g.fillStyle=rand()<.66?'#6c4918':'#c18b2c';g.beginPath();g.ellipse(x,y,rx,ry,rand()*Math.PI,0,Math.PI*2);g.fill();
+    g.globalAlpha=.22*distress;
+    for(let i=0;i<Math.round(width*height/1350);i++){
+      const x=pad+rand()*m.width,y=base-ascent+rand()*(ascent+descent),rx=1.5+rand()*8,ry=.8+rand()*3.8;
+      g.fillStyle=rand()<.70?'#593209':'#91540e';
+      g.beginPath();
+      for(let k=0;k<11;k++){
+        const a=k*Math.PI*2/11,r=.62+rand()*.56,px=x+Math.cos(a)*rx*r,py=y+Math.sin(a)*ry*r;
+        if(k===0)g.moveTo(px,py);else g.lineTo(px,py);
+      }
+      g.closePath();g.fill();
     }
-    g.globalAlpha=.15*distress;g.strokeStyle='#6b4818';
-    for(let i=0;i<72;i++){const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;g.lineWidth=.3+rand()*.55;g.beginPath();g.moveTo(x,y);g.lineTo(x+3+rand()*11,y-1+rand()*2);g.stroke();}
+    g.globalAlpha=.23*distress;g.strokeStyle='#4a2a08';
+    for(let i=0;i<88;i++){
+      const x=pad+rand()*m.width,y=base-ascent+rand()*ascent;
+      g.lineWidth=.35+rand()*.75;g.beginPath();g.moveTo(x,y);g.lineTo(x+3+rand()*15,y-1.2+rand()*2.4);g.stroke();
+    }
     g.restore();
 
-    // Narrow brushed highlight across the top face.
-    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.27;
-    const bevel=g.createLinearGradient(0,base-ascent,0,base-ascent+size*.34);
-    bevel.addColorStop(0,'rgba(255,247,194,.72)');
-    bevel.addColorStop(.35,'rgba(255,218,119,.24)');
-    bevel.addColorStop(1,'rgba(255,255,255,0)');
-    g.fillStyle=bevel;g.fillRect(pad,base-ascent,m.width,size*.36);g.restore();
-
-    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.25;
-    g.strokeStyle='#f8dfa0';g.lineWidth=1.15;g.strokeText(text,pad,base-.8);g.restore();
+    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.37;
+    g.strokeStyle='#fff0a8';g.lineWidth=1.45;g.strokeText(text,pad,base-1);g.restore();
     const glyphs=[];let cursor=pad;for(const ch of text){const w=measure.measureText(ch).width;glyphs.push({x:cursor-pad,w,ch});cursor+=w;}
     titleLayer=c;titleMetrics={w:width,h:height,base,ascent,descent,glyphs};
 
@@ -111,94 +125,71 @@
   }
   function drawPhysicalSearchlightRig(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
-    const a=beamAim(time,s);
-    const sway=Math.sin(a.phase)*.018;
+    const a=beamAim(time,s),sway=Math.sin(a.phase)*.018;
     ctx.save();
 
-    // Tapered lattice mast: dark steel with warm edge catches from the scene.
-    const topL={x:a.sx+18,y:a.sy+52},topR={x:a.sx+47,y:a.sy+48};
-    const botL={x:1150,y:684},botR={x:1192,y:684};
-    ctx.fillStyle='rgba(24,22,20,.96)';
+    // Tapered lattice mast. It terminates beneath the mounting brackets of the SVG head.
+    const topL={x:1135,y:160},topR={x:1161,y:156};
+    const botL={x:1151,y:684},botR={x:1192,y:684};
+    ctx.fillStyle='rgba(23,21,19,.97)';
     ctx.beginPath();ctx.moveTo(topL.x,topL.y);ctx.lineTo(topR.x,topR.y);ctx.lineTo(botR.x,botR.y);ctx.lineTo(botL.x,botL.y);ctx.closePath();ctx.fill();
-    ctx.strokeStyle='rgba(118,78,39,.76)';ctx.lineWidth=2.2;ctx.stroke();
+    ctx.strokeStyle='rgba(111,75,40,.78)';ctx.lineWidth=2.1;ctx.stroke();
 
-    // Main vertical rails.
-    ctx.strokeStyle='rgba(108,72,38,.88)';ctx.lineWidth=2;
-    [0,.33,.66,1].forEach(u=>{
+    ctx.strokeStyle='rgba(103,70,38,.88)';ctx.lineWidth=1.8;
+    [0,.34,.67,1].forEach(u=>{
       const tx=topL.x+(topR.x-topL.x)*u,ty=topL.y+(topR.y-topL.y)*u;
-      const bx=botL.x+(botR.x-botL.x)*u,by=botL.y;
-      ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(bx,by);ctx.stroke();
+      const bx=botL.x+(botR.x-botL.x)*u;
+      ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(bx,botL.y);ctx.stroke();
     });
-
-    // Cross-braced lattice.
-    const levels=11;
-    for(let i=0;i<levels;i++){
-      const u0=i/levels,u1=(i+1)/levels;
+    for(let i=0;i<12;i++){
+      const u0=i/12,u1=(i+1)/12;
       const lx0=topL.x+(botL.x-topL.x)*u0,rx0=topR.x+(botR.x-topR.x)*u0,y0=topL.y+(botL.y-topL.y)*u0;
       const lx1=topL.x+(botL.x-topL.x)*u1,rx1=topR.x+(botR.x-topR.x)*u1,y1=topL.y+(botL.y-topL.y)*u1;
-      ctx.strokeStyle='rgba(83,57,34,.82)';ctx.lineWidth=1.25;
+      ctx.strokeStyle='rgba(77,54,34,.82)';ctx.lineWidth=1.15;
       ctx.beginPath();ctx.moveTo(lx0,y0);ctx.lineTo(rx1,y1);ctx.moveTo(rx0,y0);ctx.lineTo(lx1,y1);ctx.stroke();
     }
+    ctx.fillStyle='rgba(42,35,29,.98)';ctx.fillRect(1138,680,69,12);
+    ctx.strokeStyle='rgba(105,72,40,.76)';ctx.strokeRect(1138.5,680.5,68,11);
 
-    // Base feet.
-    ctx.fillStyle='rgba(44,37,31,.98)';ctx.fillRect(1137,680,70,12);
-    ctx.strokeStyle='rgba(111,74,38,.72)';ctx.strokeRect(1137.5,680.5,69,11);
-
-    // Lamp platform + rail cage.
-    ctx.save();
-    ctx.translate(a.sx+8,a.sy+33);
+    // Clean transparent fixture. Its lamp face is already modeled in a three-quarter
+    // orientation toward the building. Small sway follows the animated beam.
+    ctx.translate(a.sx,a.sy);
     ctx.rotate(sway);
-    ctx.fillStyle='rgba(37,31,25,.98)';ctx.strokeStyle='rgba(132,89,43,.90)';ctx.lineWidth=1.6;
-    ctx.beginPath();ctx.moveTo(-45,18);ctx.lineTo(58,11);ctx.lineTo(66,29);ctx.lineTo(-41,38);ctx.closePath();ctx.fill();ctx.stroke();
-    ctx.strokeStyle='rgba(122,83,43,.82)';ctx.lineWidth=1.25;
-    for(let x=-38;x<=56;x+=16){ctx.beginPath();ctx.moveTo(x,18);ctx.lineTo(x+5,36);ctx.stroke();}
-    ctx.beginPath();ctx.moveTo(-41,4);ctx.lineTo(57,-3);ctx.lineTo(62,22);ctx.moveTo(-41,4);ctx.lineTo(-41,35);ctx.stroke();
-
-    // Rectangular lamp housing, slightly angled with the platform.
-    ctx.translate(-4,-13);
-    ctx.fillStyle='rgba(28,24,20,.99)';ctx.strokeStyle='rgba(151,99,42,.95)';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(-34,-25);ctx.lineTo(38,-29);ctx.lineTo(44,25);ctx.lineTo(-39,30);ctx.closePath();ctx.fill();ctx.stroke();
-    // Housing ribs.
-    ctx.strokeStyle='rgba(98,66,36,.86)';ctx.lineWidth=1.1;
-    for(let x=-22;x<=26;x+=16){ctx.beginPath();ctx.moveTo(x,-25);ctx.lineTo(x+3,27);ctx.stroke();}
-    for(let y=-13;y<=15;y+=14){ctx.beginPath();ctx.moveTo(-36,y);ctx.lineTo(42,y-4);ctx.stroke();}
-    ctx.restore();
+    ctx.globalAlpha=.98;
+    ctx.drawImage(images.searchlightHead,-72,-69,210,144);
     ctx.restore();
   }
   function drawSearchlightBulbs(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
-    const a=beamAim(time,s),tint=s.beamTint||'#ffc15b',sway=Math.sin(a.phase)*.018;
-    const bulbs=[[-22,-21],[0,-22],[22,-20],[-22,0],[0,-1],[22,1],[-20,21],[2,20],[23,19]];
-    ctx.save();ctx.translate(a.sx+4,a.sy+20);ctx.rotate(sway);
+    const a=beamAim(time,s),tint=s.beamTint||'#ffc96a',sway=Math.sin(a.phase)*.018;
+    const bulbs=[[-22.1,-19.9],[-3.8,-22.5],[14.6,-25.1],[-19.5,-.3],[-1.1,-2.9],[17.2,-5.5],[-16.9,19.4],[1.5,16.7],[19.9,14.1]];
+    ctx.save();ctx.translate(a.sx,a.sy);ctx.rotate(sway);
     bulbs.forEach((o,i)=>{
       const x=o[0],y=o[1],f=.965+.025*Math.sin(time*11+i*1.31);
-      // Metal bezel.
-      ctx.globalCompositeOperation='source-over';ctx.globalAlpha=.98;
-      ctx.fillStyle='rgba(38,28,19,.98)';ctx.beginPath();ctx.arc(x,y,8.5,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='rgba(169,111,44,.92)';ctx.lineWidth=1.5;ctx.stroke();
 
-      // Amber glass with a controlled white-hot filament center.
-      const glass=ctx.createRadialGradient(x-1.4,y-1.4,.4,x,y,6.8);
-      glass.addColorStop(0,'rgba(255,255,226,.98)');
-      glass.addColorStop(.18,'rgba(255,230,139,.98)');
-      glass.addColorStop(.48,'rgba(255,178,55,.96)');
-      glass.addColorStop(.82,'rgba(208,96,15,.90)');
-      glass.addColorStop(1,'rgba(83,36,5,.98)');
-      ctx.fillStyle=glass;ctx.beginPath();ctx.arc(x,y,6.5,0,Math.PI*2);ctx.fill();
+      // Hot amber lens, elliptical because we are viewing the lamp plane obliquely.
+      ctx.globalCompositeOperation='screen';ctx.globalAlpha=.82*lightIn*f;
+      const core=ctx.createRadialGradient(x-1,y-1,.3,x,y,7);
+      core.addColorStop(0,'rgba(255,255,224,.98)');
+      core.addColorStop(.18,'rgba(255,232,145,.96)');
+      core.addColorStop(.50,'rgba(255,182,61,.88)');
+      core.addColorStop(1,'rgba(255,125,20,0)');
+      ctx.fillStyle=core;
+      ctx.save();ctx.translate(x,y);ctx.rotate(-.14);ctx.scale(.76,1);
+      ctx.beginPath();ctx.arc(0,0,7,0,Math.PI*2);ctx.fill();ctx.restore();
 
-      // Small restrained halo; never merge the nine lamps into one blob.
-      ctx.globalCompositeOperation='screen';ctx.globalAlpha=.30*lightIn*f;
-      const halo=ctx.createRadialGradient(x,y,4,x,y,19);
-      halo.addColorStop(0,'rgba(255,222,132,.52)');
-      halo.addColorStop(.42,rgba(tint,.23));halo.addColorStop(1,rgba(tint,0));
-      ctx.fillStyle=halo;ctx.fillRect(x-20,y-20,40,40);
+      // Tight individual halo, deliberately too small to merge with neighboring lamps.
+      ctx.globalAlpha=.24*lightIn*f;
+      const halo=ctx.createRadialGradient(x,y,4,x,y,17);
+      halo.addColorStop(0,rgba(tint,.48));halo.addColorStop(.48,rgba(tint,.18));halo.addColorStop(1,rgba(tint,0));
+      ctx.fillStyle=halo;ctx.fillRect(x-18,y-18,36,36);
     });
     ctx.restore();
   }
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
     const a=beamAim(time,s),dx=a.tx-a.sx,dy=a.ty-a.sy,len=Math.max(1,Math.hypot(dx,dy)),nx=-dy/len,ny=dx/len,width=s.lightWidth;
-    const tint=s.beamTint||'#ffc15b';
+    const tint=s.beamTint||'#ffc96a';
     ctx.save();ctx.globalCompositeOperation='screen';
     // Keep source bloom compact so the separate bulbs remain visible.
     const lamp=ctx.createRadialGradient(a.sx,a.sy,8,a.sx,a.sy,92);
@@ -337,7 +328,7 @@
       ctx.save();
       // Slight cinematic perspective without distorting the letter reveal direction.
       ctx.translate(W/2,base-58);
-      ctx.transform(.997,-.012,-.038,.996,0,0);
+      ctx.transform(.995,-.026,-.066,.998,0,0);
       ctx.translate(-W/2,-(base-58));
 
       titleMetrics.glyphs.forEach((glyph,i)=>{
@@ -347,9 +338,9 @@
         if(p<=0)return;
         const rise=(1-p)*8;
         const u=(glyph.x+glyph.w*.5)/Math.max(1,titleMetrics.w-72);
-        const perspective=1.018-.038*u;
+        const perspective=1.045-.085*u;
         const scale=(.987+.013*p)*perspective;
-        const px=x+part.dx-u*9, py=y+rise-u*5;
+        const px=x+part.dx-u*18, py=y+rise-u*11;
         ctx.save();
         ctx.globalAlpha=s.titleOpacity*p;
         // Tiny per-letter bloom as it enters, but the glyph itself is always drawn whole.
