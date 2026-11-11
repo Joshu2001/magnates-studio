@@ -142,6 +142,69 @@
     ctx.restore();
   }
 
+  function drawShadowVector(x,y,scale,alpha,lean){
+    ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=alpha;
+    const g=ctx.createLinearGradient(0,0,0,170);
+    g.addColorStop(0,'rgba(27,16,9,.55)');g.addColorStop(.45,'rgba(20,12,7,.33)');g.addColorStop(1,'rgba(8,6,5,0)');
+    ctx.fillStyle=g;ctx.filter='blur(6px)';
+    ctx.beginPath();ctx.moveTo(-12,0);ctx.lineTo(18,0);ctx.lineTo(56+lean,168);ctx.lineTo(15+lean,170);ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  function drawBusinessman(x,y,scale,variant,walkPhase){
+    ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+    const dark=variant===0?'#191713':'#40352a', mid=variant===0?'#2a2722':'#5a4938', hi=variant===0?'#51483c':'#8b6d4d';
+    const step=Math.sin(walkPhase)*4;
+
+    // head + neck
+    ctx.fillStyle='#6d4229';ctx.beginPath();ctx.arc(0,-160,11,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#52311f';ctx.fillRect(-5,-151,10,10);
+
+    // jacket body
+    ctx.fillStyle=dark;ctx.beginPath();ctx.moveTo(-26,-141);ctx.quadraticCurveTo(-15,-150,0,-148);ctx.quadraticCurveTo(17,-151,28,-138);
+    ctx.lineTo(23,-72);ctx.lineTo(-22,-72);ctx.closePath();ctx.fill();
+    // warm rim light
+    ctx.strokeStyle='rgba(255,181,88,.35)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-24,-136);ctx.lineTo(-20,-80);ctx.moveTo(25,-136);ctx.lineTo(20,-82);ctx.stroke();
+
+    // arms
+    ctx.strokeStyle=dark;ctx.lineWidth=12;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-22,-128);ctx.lineTo(-29,-82);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(22,-128);ctx.lineTo(29,-82);ctx.stroke();
+
+    // trousers / walking stance
+    ctx.strokeStyle=mid;ctx.lineWidth=13;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(-10,-72);ctx.lineTo(-12-step*.35,-22);ctx.lineTo(-15-step*.75,0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(10,-72);ctx.lineTo(12+step*.35,-22);ctx.lineTo(15+step*.75,0);ctx.stroke();
+
+    // shoes
+    ctx.strokeStyle='#0d0c0b';ctx.lineWidth=7;
+    ctx.beginPath();ctx.moveTo(-17-step*.75,0);ctx.lineTo(-6-step*.75,0);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(11+step*.75,0);ctx.lineTo(21+step*.75,0);ctx.stroke();
+
+    // briefcase / folder
+    if(variant===0){
+      ctx.fillStyle='#3a1d0d';ctx.strokeStyle='#8b522b';ctx.lineWidth=1.5;ctx.fillRect(-43,-63,20,24);ctx.strokeRect(-43,-63,20,24);
+      ctx.strokeStyle='#6a3d21';ctx.lineWidth=2;ctx.strokeRect(-37,-68,9,6);
+    }else{
+      ctx.save();ctx.translate(30,-87);ctx.rotate(-.10);ctx.fillStyle='#d9c9a5';ctx.strokeStyle='#6b5740';ctx.lineWidth=1.5;ctx.fillRect(-2,-16,12,31);ctx.strokeRect(-2,-16,12,31);ctx.restore();
+    }
+
+    // subtle jacket highlight
+    ctx.fillStyle=hi;ctx.globalAlpha=.16;ctx.beginPath();ctx.moveTo(-3,-145);ctx.lineTo(15,-138);ctx.lineTo(12,-80);ctx.lineTo(1,-78);ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  function drawPeopleVector(time,p,s){
+    const depth=1+s.peopleDepth*.10*p;
+    const y=600-s.glide*.74*p;
+    const sway=Math.sin(time*2.15)*1.2*(1-p*.5);
+    const phase=time*3.0;
+    ctx.save();ctx.translate(W/2,H/2);ctx.scale(depth,depth);ctx.translate(-W/2,-H/2);
+    drawBusinessman(602+sway,y,0.92,0,phase);
+    drawBusinessman(665-sway*.45,y+2,0.95,1,phase+Math.PI);
+    ctx.restore();
+  }
+
   function drawDust(time,p,s){
     if(!layers.atmosphere||s.dust<=0)return;
     ctx.save();ctx.globalCompositeOperation='screen';
@@ -215,7 +278,14 @@
     const bgScale=1.03+s.push*.092*p+overshoot;
     const bgY=-8-s.glide*p;
     const bgX=-3*p;
-    if(layers.background)drawPlane(images.corridor,bgX,bgY,bgScale,1);
+    if(layers.background){
+      drawPlane(images.corridor,bgX,bgY,bgScale,1);
+      ctx.save();ctx.globalCompositeOperation='screen';
+      const warm=ctx.createRadialGradient(W*.50,H*.60,80,W*.50,H*.60,520);
+      warm.addColorStop(0,'rgba(255,183,79,.27)');warm.addColorStop(.45,'rgba(255,132,38,.10)');warm.addColorStop(1,'rgba(255,110,24,0)');
+      ctx.fillStyle=warm;ctx.fillRect(0,0,W,H);ctx.restore();
+      ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.16;ctx.fillStyle='#2b160d';ctx.fillRect(0,0,W,H);ctx.restore();
+    }
 
     // Mid-depth side architecture: same physical corridor, isolated by viewport clips so
     // perspective remains coherent but the side structure travels faster than the vanishing point.
@@ -224,11 +294,7 @@
       clipPlane(images.corridor,{x:0,y:0,w:390,h:H},-18*d*p,-14-s.glide*1.18*p,1.045+s.push*.125*p,0.95,0.35+1.1*p);
       clipPlane(images.corridor,{x:890,y:0,w:390,h:H},18*d*p,-14-s.glide*1.20*p,1.045+s.push*.13*p,0.95,0.35+1.1*p);
 
-      // Near occluders rush past the lens. These are not separate invented objects: they
-      // are clipped from the exact corridor plate to maintain structural continuity.
-      clipPlane(images.corridor,{x:0,y:0,w:235,h:H},-42*d*p,-30-s.glide*1.62*p,1.09+s.push*.19*p,0.92,1.2+1.8*p);
-      clipPlane(images.corridor,{x:1080,y:0,w:200,h:H},42*d*p,-30-s.glide*1.68*p,1.09+s.push*.205*p,0.92,1.2+1.8*p);
-      clipPlane(images.corridor,{x:0,y:0,w:W,h:145},0,-54-s.glide*1.74*p,1.08+s.push*.18*p,0.78,1.4+2.0*p);
+
     }
 
     // People and their shadows form separate planes. Shadows move slightly less, keeping them
