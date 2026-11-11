@@ -16,4 +16,31 @@
 <section class="pane" data-pane="look"><div class="section-title">Composition</div><div class="field"><label for="titleSize">Title scale <output id="titleSizeOut">148px</output></label><input id="titleSize" type="range" min="72" max="152" step="1" value="148"></div><div class="field"><label for="titleY">Title baseline <output id="titleYOut">620px</output></label><input id="titleY" type="range" min="560" max="690" step="1" value="620"></div><div class="field"><label for="cloudOffset">Cloud veil vertical offset <output id="cloudOffsetOut">40px</output></label><input id="cloudOffset" type="range" min="-20" max="120" step="1" value="40"></div><div class="field"><label for="titleOpacity">Gold translucency <output id="titleOpacityOut">100%</output></label><input id="titleOpacity" type="range" min="70" max="100" step="1" value="100"></div><div class="field"><label for="titleDistress">Weathered gold texture <output id="titleDistressOut">122%</output></label><input id="titleDistress" type="range" min="0" max="180" step="1" value="122"></div><div class="field"><label for="titleGold">Gold tone</label><input id="titleGold" type="color" value="#e6ad24" style="width:100%;height:34px;background:#080a0d;border:1px solid #353a40;border-radius:5px;padding:3px"></div><div class="field"><label for="beamTint">Searchlight tint</label><input id="beamTint" type="color" value="#ffc35a" style="width:100%;height:34px;background:#080a0d;border:1px solid #353a40;border-radius:5px;padding:3px"></div></section>
 <section class="pane" data-pane="effects"><div class="section-title">Flashlight optics</div><div class="field"><label for="flashStrength">Opening bloom <output id="flashStrengthOut">100%</output></label><input id="flashStrength" type="range" min="0" max="150" step="1" value="100"></div><div class="field"><label for="poolStrength">Moving pool/reflection <output id="poolStrengthOut">72%</output></label><input id="poolStrength" type="range" min="0" max="100" step="1" value="72"></div><div class="field"><label for="cloudStrength">Cloud bank density <output id="cloudStrengthOut">96%</output></label><input id="cloudStrength" type="range" min="0" max="100" step="1" value="96"></div><div class="field"><label class="layer" style="justify-content:flex-start"><input id="soundOn" type="checkbox" checked>Play synthesized low boom and airy whoosh</label></div><div class="field"><label for="boomStrength">Boom level <output id="boomStrengthOut">55%</output></label><input id="boomStrength" type="range" min="0" max="100" step="1" value="55"></div><p class="note">The bloom uses the circular flashlight template’s soft flash-core/screen-blend treatment, adapted to one warm searchlight hit without its spin, paparazzi strobes, or glitch.</p></section>
 </div><details class="advanced"><summary>Advanced controls · layer timing</summary><div class="field"><label for="beamIn">Searchlight in <output id="beamInOut">0.3s</output></label><input id="beamIn" type="range" min="0" max="2" step="0.05" value="0.3"></div><div class="field"><label for="cloudIn">Cloud veil in <output id="cloudInOut">0.0s</output></label><input id="cloudIn" type="range" min="0" max="5" step="0.05" value="0"></div><div class="field"><label for="cloudOut">Cloud veil clears <output id="cloudOutOut">5.2s</output></label><input id="cloudOut" type="range" min="2" max="7.5" step="0.1" value="5.2"></div><div class="field"><label for="buildingIn">Building reveal <output id="buildingInOut">0.4s</output></label><input id="buildingIn" type="range" min="0" max="2.5" step="0.05" value="0.4"></div><div class="field"><label for="buildingReveal">Reveal duration <output id="buildingRevealOut">0.7s</output></label><input id="buildingReveal" type="range" min="0.2" max="2" step="0.05" value="0.7"></div></details></aside></div></main>
-<script src="scene.js"></script></body></html>
+<script>
+(function(){
+  var c=document.getElementById('stage'),x=c&&c.getContext&&c.getContext('2d');
+  if(!x)return;
+  window.__showBarryRuntimeError=function(msg){
+    try{
+      x.save();x.setTransform(1,0,0,1,0,0);
+      x.fillStyle='#08101a';x.fillRect(0,0,c.width,c.height);
+      x.fillStyle='#f0c85e';x.font='700 22px Arial';x.fillText('Barry Sacramento preview runtime error',42,72);
+      x.fillStyle='#ffffff';x.font='16px monospace';
+      String(msg||'Unknown error').match(/.{1,95}/g)?.slice(0,7).forEach(function(line,i){x.fillText(line,42,112+i*25);});
+      x.restore();
+    }catch(_){}
+  };
+  // Paint a guaranteed first frame before the animation engine starts.
+  x.fillStyle='#08101a';x.fillRect(0,0,c.width,c.height);
+  var bg=new Image();
+  bg.onload=function(){try{x.drawImage(bg,0,0,c.width,c.height);}catch(_){}};
+  bg.onerror=function(){window.__showBarryRuntimeError('Core background asset failed to load: assets/background.webp');};
+  bg.src='assets/background.webp?v=3';
+  window.addEventListener('error',function(e){
+    if(e && e.message) window.__showBarryRuntimeError(e.message+' @ '+(e.filename||'')+':'+(e.lineno||0));
+  });
+  setTimeout(function(){
+    if(!window.__BARRY_ENGINE_BOOTED__) window.__showBarryRuntimeError('scene-runtime-v3.js did not execute. This is a script-loading/cache problem, not a scene asset problem.');
+  },1500);
+})();
+</script><script src="scene-runtime-v3.js?v=20261112-0311" onerror="window.__showBarryRuntimeError&&window.__showBarryRuntimeError('scene-runtime-v3.js failed to load')"></script></body></html>
