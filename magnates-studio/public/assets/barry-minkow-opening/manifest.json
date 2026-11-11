@@ -12,7 +12,7 @@
   "sequence": [
     {"in":0,"out":0.72,"beat":"A full-frame optical flare contracts to a hot spot, then dissipates","layers":["contracting optical flash","film texture"]},
     {"in":0.55,"out":1.45,"beat":"Storm sky and Sacramento skyline emerge","layers":["moving storm sky","city plate","grain"]},
-    {"in":1.45,"out":2.65,"beat":"The blue construction tower and illuminated lower facade emerge as one cutout; camera pushes in","layers":["tower cutout","city plate","storm sky"]},
+    {"in":1.45,"out":2.65,"beat":"The same blue construction tower plate, including its left scaffold bay, rises as one cutout; camera pushes in","layers":["tower cutout","city plate","storm sky"]},
     {"in":2.65,"out":3.85,"beat":"Warm searchlight sweeps across the facade","layers":["moving light beam","tower cutout"]},
     {"in":3.85,"out":5.05,"beat":"Textured translucent gold SACRAMENTO glides right across the building base","layers":["editable location title","building facade texture fill","tower cutout"]},
     {"in":5.05,"out":6.35,"beat":"Gold-edged occlusion reveals the unfinished corridor","layers":["corridor plate","gold wipe"]},
