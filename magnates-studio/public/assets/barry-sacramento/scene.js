@@ -142,120 +142,128 @@
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
     const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d';
-    const {sx,sy,tx,ty,ux,uy,nx,ny,nearHalf,farHalf,outer}=g;
+    const {sx,sy,tx,ty,nx,ny,nearHalf,farHalf}=g;
 
-    // 1) Physical outer frustum / penumbra: no radial "bubble" at the destination.
-    ctx.save();
-    ctx.globalCompositeOperation='source-over';
-    ctx.filter='blur(14px)';
-    ctx.globalAlpha=.21*lightIn;
-    let grad=ctx.createLinearGradient(sx,sy,tx,ty);
-    grad.addColorStop(0,'rgba(255,168,49,.72)');
-    grad.addColorStop(.22,'rgba(248,148,34,.48)');
-    grad.addColorStop(.70,'rgba(232,126,21,.18)');
-    grad.addColorStop(1,'rgba(220,112,13,.045)');
-    ctx.fillStyle=grad;traceQuad(ctx,outer);ctx.fill();
-    ctx.restore();
+    // High-fidelity penumbra model. Several nested frustums approximate the angular
+    // distribution of a real multi-lamp floodlight without any raster beam texture.
+    const layers=[
+      {near:1.00,far:1.00,alpha:.16,blur:4,  c0:'rgba(255,185,75,.48)',c1:'rgba(235,128,24,.055)'},
+      {near:1.12,far:1.18,alpha:.105,blur:9, c0:'rgba(255,174,60,.40)',c1:'rgba(228,119,18,.035)'},
+      {near:1.28,far:1.40,alpha:.060,blur:16,c0:'rgba(255,161,48,.31)',c1:'rgba(220,108,14,.018)'},
+      {near:1.48,far:1.72,alpha:.028,blur:27,c0:'rgba(255,151,40,.22)',c1:'rgba(210,98,10,.006)'}
+    ];
 
-    // 2) Brighter inner frustum, still bounded by straight rays.
-    const innerNear=nearHalf*.55,innerFar=farHalf*.48;
+    // Outer atmospheric body: progressively softer frustums eliminate the visible cutoff.
+    layers.slice().reverse().forEach(L=>{
+      const pts=[
+        {x:sx+nx*nearHalf*L.near,y:sy+ny*nearHalf*L.near},
+        {x:tx+nx*farHalf*L.far,y:ty+ny*farHalf*L.far},
+        {x:tx-nx*farHalf*L.far,y:ty-ny*farHalf*L.far},
+        {x:sx-nx*nearHalf*L.near,y:sy-ny*nearHalf*L.near}
+      ];
+      ctx.save();ctx.globalCompositeOperation='source-over';ctx.filter=`blur(${L.blur}px)`;ctx.globalAlpha=L.alpha*lightIn;
+      const grad=ctx.createLinearGradient(sx,sy,tx,ty);
+      grad.addColorStop(0,L.c0);grad.addColorStop(.24,'rgba(246,145,34,.32)');
+      grad.addColorStop(.70,'rgba(229,121,20,.10)');grad.addColorStop(1,L.c1);
+      ctx.fillStyle=grad;traceQuad(ctx,pts);ctx.fill();ctx.restore();
+    });
+
+    // Brighter inner optical volume.
+    const innerNear=nearHalf*.54,innerFar=farHalf*.47;
     const inner=[
       {x:sx+nx*innerNear,y:sy+ny*innerNear},
       {x:tx+nx*innerFar,y:ty+ny*innerFar},
       {x:tx-nx*innerFar,y:ty-ny*innerFar},
       {x:sx-nx*innerNear,y:sy-ny*innerNear}
     ];
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.filter='blur(6px)';ctx.globalAlpha=.34*lightIn;
-    grad=ctx.createLinearGradient(sx,sy,tx,ty);
-    grad.addColorStop(0,'rgba(255,222,132,.72)');
-    grad.addColorStop(.18,'rgba(255,185,69,.54)');
-    grad.addColorStop(.68,'rgba(255,151,36,.16)');
-    grad.addColorStop(1,'rgba(255,133,24,.025)');
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.filter='blur(5px)';ctx.globalAlpha=.30*lightIn;
+    let grad=ctx.createLinearGradient(sx,sy,tx,ty);
+    grad.addColorStop(0,'rgba(255,226,143,.70)');
+    grad.addColorStop(.22,rgba(tint,.48));grad.addColorStop(.72,rgba(tint,.12));grad.addColorStop(1,rgba(tint,0));
     ctx.fillStyle=grad;traceQuad(ctx,inner);ctx.fill();ctx.restore();
 
-    // 3) Nine synchronized emitter shafts. They overlap into one floodlight volume.
-    const emit=[-1,-.75,-.5,-.25,0,.25,.5,.75,1];
+    // Each lamp has a slightly different divergence. Their overlapping shafts make the
+    // beam edge naturally irregular instead of mathematically identical.
+    const emitters=[
+      [-.82,-.035],[-.61,.018],[-.40,-.012],[-.20,.026],[0,-.020],
+      [.20,.012],[.40,-.027],[.61,.020],[.82,-.008]
+    ];
     ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';
-    emit.forEach((v,i)=>{
-      const srcN=v*nearHalf*.78;
-      const dstN=v*farHalf*.72;
-      const jitter=(i%3-1)*2.2;
-      ctx.globalAlpha=(.055+(i%3)*.008)*lightIn;
-      ctx.strokeStyle='rgba(255,190,79,.72)';
-      ctx.lineWidth=3.1+(i%2)*.7;
-      ctx.shadowColor='rgba(255,169,48,.45)';ctx.shadowBlur=5;
-      ctx.beginPath();
-      ctx.moveTo(sx+nx*srcN+ux*jitter,sy+ny*srcN+uy*jitter);
-      ctx.lineTo(tx+nx*dstN,ty+ny*dstN);
-      ctx.stroke();
+    emitters.forEach(([v,d],i)=>{
+      const src=v*nearHalf*.72;
+      const spread=farHalf*(.66+d);
+      const dst=v*spread;
+      ctx.globalAlpha=(.038+(i%3)*.006)*lightIn;
+      ctx.strokeStyle='rgba(255,193,86,.70)';
+      ctx.lineWidth=2.4+(i%2)*.55;
+      ctx.shadowColor='rgba(255,165,42,.36)';ctx.shadowBlur=4.5;
+      ctx.beginPath();ctx.moveTo(sx+nx*src,sy+ny*src);ctx.lineTo(tx+nx*dst,ty+ny*dst);ctx.stroke();
     });
     ctx.restore();
 
-    // 4) Suspended particles are clipped to the frustum so "photons" never form a free-floating orb.
-    ctx.save();traceQuad(ctx,outer);ctx.clip();ctx.globalCompositeOperation='screen';
-    for(let i=0;i<34;i++){
-      const u=.10+((i*.137+time*.035)% .86);
-      const lateral=Math.sin(i*12.9898)*.5+.5;
-      const spread=mix(nearHalf,farHalf,u)*(.84*(lateral*2-1));
-      const px=sx+(tx-sx)*u+nx*spread+Math.sin(time*.7+i)*2.2;
-      const py=sy+(ty-sy)*u+ny*spread+Math.cos(time*.63+i*1.4)*1.8;
-      const rr=.55+(i%4)*.28;
-      ctx.globalAlpha=(.035+.045*(1-u))*lightIn;
-      ctx.fillStyle=i%3===0?'#ffd28a':'#ffb654';
+    // Volumetric particulate scattering at many depths. Spread grows continuously with
+    // distance from the lamps and fades before the nominal edge, preventing a "cutout" look.
+    ctx.save();ctx.globalCompositeOperation='screen';
+    for(let i=0;i<72;i++){
+      const u=.055+((i*.61803398875+time*.021)% .91);
+      const envelope=Math.pow(Math.sin(Math.PI*u),.42);
+      const signed=((i*0.754877666)%1)*2-1;
+      const localHalf=mix(nearHalf*1.15,farHalf*1.34,u);
+      const edgeFade=Math.pow(Math.max(0,1-Math.abs(signed)),.34);
+      const px=sx+(tx-sx)*u+nx*(signed*localHalf)+Math.sin(time*.47+i*2.17)*2.8;
+      const py=sy+(ty-sy)*u+ny*(signed*localHalf)+Math.cos(time*.41+i*1.73)*2.2;
+      const rr=.45+(i%5)*.24+(1-u)*.45;
+      ctx.globalAlpha=(.010+.030*edgeFade)*envelope*lightIn;
+      ctx.fillStyle=i%4===0?'#ffe0a1':(i%2===0?'#ffc46e':'#efa044');
       ctx.beginPath();ctx.arc(px,py,rr,0,Math.PI*2);ctx.fill();
     }
     ctx.restore();
 
-    // Compact source halo only; no destination radial bloom.
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.26*lightIn;
-    const source=ctx.createRadialGradient(sx,sy,3,sx,sy,48);
-    source.addColorStop(0,'rgba(255,231,154,.62)');
-    source.addColorStop(.42,'rgba(255,176,55,.28)');
-    source.addColorStop(1,'rgba(255,137,25,0)');
-    ctx.fillStyle=source;ctx.fillRect(sx-52,sy-52,104,104);ctx.restore();
+    // Source bloom remains local to the fixture.
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.22*lightIn;
+    const source=ctx.createRadialGradient(sx,sy,3,sx,sy,46);
+    source.addColorStop(0,'rgba(255,235,168,.58)');
+    source.addColorStop(.40,'rgba(255,181,65,.24)');
+    source.addColorStop(1,'rgba(255,136,25,0)');
+    ctx.fillStyle=source;ctx.fillRect(sx-50,sy-50,100,100);ctx.restore();
   }
   function buildReflection(time,s){
-    const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d',flicker=.985+.015*Math.sin(time*15);
+    const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d',flicker=.99+.01*Math.sin(time*15);
     rc.clearRect(0,0,W,H);
 
-    // Projected beam footprint on the facade: elongated quadrilateral aligned to the arriving beam.
-    const fx=g.tx,fy=g.ty,half=g.farHalf*.72,depth=122;
+    const fx=g.tx,fy=g.ty,depth=132;
     const backX=fx-g.ux*depth,backY=fy-g.uy*depth;
-    const footprint=[
-      {x:backX+g.nx*half*.58,y:backY+g.ny*half*.58},
-      {x:fx+g.nx*half,y:fy+g.ny*half},
-      {x:fx-g.nx*half,y:fy-g.ny*half},
-      {x:backX-g.nx*half*.58,y:backY-g.ny*half*.58}
+    const footprintLayers=[
+      {scale:1.34,alpha:.10,blur:12},
+      {scale:1.16,alpha:.15,blur:7},
+      {scale:1.00,alpha:.22,blur:3},
+      {scale:.72,alpha:.18,blur:1.5}
     ];
 
-    rc.save();rc.globalCompositeOperation='source-over';
-    let fg=rc.createLinearGradient(backX,backY,fx,fy);
-    fg.addColorStop(0,'rgba(255,147,31,0)');
-    fg.addColorStop(.36,rgba(tint,.16*flicker));
-    fg.addColorStop(.78,rgba(tint,.30*flicker));
-    fg.addColorStop(1,'rgba(255,194,72,.24)');
-    rc.fillStyle=fg;traceQuad(rc,footprint);rc.fill();
-
-    // Soft inner footprint, still directional and non-circular.
-    rc.globalAlpha=.55;
-    const inner=footprint.map((p,i)=>{
-      const cx=(backX+fx)/2,cy=(backY+fy)/2;
-      return {x:cx+(p.x-cx)*.66,y:cy+(p.y-cy)*.66};
+    footprintLayers.forEach((L,idx)=>{
+      const half=g.farHalf*.72*L.scale;
+      const pts=[
+        {x:backX+g.nx*half*.56,y:backY+g.ny*half*.56},
+        {x:fx+g.nx*half,y:fy+g.ny*half},
+        {x:fx-g.nx*half,y:fy-g.ny*half},
+        {x:backX-g.nx*half*.56,y:backY-g.ny*half*.56}
+      ];
+      rc.save();rc.globalCompositeOperation='screen';rc.filter=`blur(${L.blur}px)`;rc.globalAlpha=L.alpha*flicker;
+      const fg=rc.createLinearGradient(backX,backY,fx,fy);
+      fg.addColorStop(0,'rgba(255,146,29,0)');
+      fg.addColorStop(.30,rgba(tint,.14));
+      fg.addColorStop(.72,rgba(tint,.30));
+      fg.addColorStop(1,idx===3?'rgba(255,211,105,.36)':'rgba(255,191,68,.18)');
+      rc.fillStyle=fg;traceQuad(rc,pts);rc.fill();rc.restore();
     });
-    fg=rc.createLinearGradient(backX,backY,fx,fy);
-    fg.addColorStop(0,'rgba(255,152,34,0)');
-    fg.addColorStop(.50,rgba(tint,.16));
-    fg.addColorStop(1,'rgba(255,210,101,.26)');
-    rc.fillStyle=fg;traceQuad(rc,inner);rc.fill();rc.restore();
 
-    // Reflection may only exist on the actual building plate.
+    // Clip all reflected energy to the actual building plate.
     rc.save();rc.globalCompositeOperation='destination-in';
     const push=1+s.cameraPush*clamp(time/D,0,1);
     drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
 
-    ctx.save();ctx.globalCompositeOperation='screen';
-    ctx.globalAlpha=Math.min(.62,s.pool*.72);ctx.filter='blur(2.2px)';
-    ctx.drawImage(reflection,0,0);ctx.filter='none';ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.58,s.pool*.68);
+    ctx.drawImage(reflection,0,0);ctx.restore();
   }
   function drawFlash(time,s){
     const burst=s.flash*(.92*Math.exp(-Math.pow((time-.19)/.12,2))+.26*Math.exp(-Math.pow((time-.34)/.10,2)));
