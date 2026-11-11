@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Barry Sacramento · Physical Floodlight Preview</title>
+<title>Barry Sacramento · High-Fidelity Penumbra Preview</title>
 <style>
 :root{color-scheme:dark;--bg:#08090c;--panel:#101318;--line:#2a2e34;--gold:#e5b54c;--muted:#989fa8;--text:#f0eee9;font:14px Inter,ui-sans-serif,system-ui,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -12%,#28241e 0,#111318 45%,var(--bg) 85%);color:var(--text);min-height:100vh}.wrap{max-width:1460px;margin:auto;padding:22px}.top{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:16px}.kicker{color:var(--gold);font-size:10px;font-weight:800;letter-spacing:.2em;text-transform:uppercase}.top h1{font-size:clamp(22px,3vw,34px);margin:5px 0 2px;letter-spacing:-.035em}.top p{margin:0;color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid #4b412c;color:#f4d68e;background:#19170f;padding:9px 13px;border-radius:7px;cursor:pointer;font-weight:650}.btn:hover{background:#282315}.btn.subtle{color:#d7dce2;background:#15181d;border-color:#343941}.layout{display:grid;grid-template-columns:minmax(0,1fr) 318px;gap:14px;align-items:start}.main{min-width:0}.stage{position:relative;background:#030405;border:1px solid #5c4b2e;border-radius:10px;overflow:hidden;box-shadow:0 26px 90px #000b}.stage canvas{display:block;width:100%;height:auto;aspect-ratio:16/9}.stage-label{position:absolute;top:12px;left:14px;font-size:9px;letter-spacing:.15em;color:#e3c273;text-transform:uppercase;background:#080a0dcc;padding:6px 8px;border-radius:4px;pointer-events:none}.transport{display:grid;grid-template-columns:auto minmax(90px,1fr) auto auto;align-items:center;gap:10px;padding:11px 12px;background:#101318;border:1px solid var(--line);border-top:0;border-radius:0 0 9px 9px}.transport input{width:100%;accent-color:#d6aa50}.clock{font:12px ui-monospace,SFMono-Regular,monospace;color:#ddd2b5;white-space:nowrap}.beats{display:flex;gap:3px;margin-top:8px}.beat{height:5px;flex:1;border-radius:9px;background:#383a3e}.beat:nth-child(1){background:#f0c85e}.beat:nth-child(2){background:#b57937}.beat:nth-child(3){background:#6e5937}.beat:nth-child(4){background:#e1b64e}.caption{min-height:19px;margin:10px 2px;color:#c5bdac;font-size:12px}.side{background:linear-gradient(180deg,#13161b,#0d1014);border:1px solid var(--line);border-radius:10px;overflow:hidden}.side-head{padding:13px 14px 10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.side-head strong{font-size:12px;letter-spacing:.12em;text-transform:uppercase}.live{color:#a5b07d;font-size:9px;letter-spacing:.13em}.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);background:#0b0d10}.tab{padding:10px 2px;border:0;border-bottom:2px solid transparent;background:transparent;color:#8d949c;font-size:10px;font-weight:700;cursor:pointer}.tab.active{color:#f1d38c;border-bottom-color:#d3a94f}.tabpanes{padding:13px;min-height:440px}.pane{display:none}.pane.active{display:block}.field{margin:0 0 15px}.field label,.field-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:11px;color:#c6c9ce;margin-bottom:6px}.field output{color:#e9c66d;font:11px ui-monospace,monospace}.field input[type=range]{width:100%;accent-color:#d5a64b}.field input[type=text]{width:100%;background:#080a0d;color:#f4e5bf;border:1px solid #353a40;border-radius:5px;padding:8px 9px;font:12px inherit}.field small{display:block;color:#818992;font-size:9px;line-height:1.4;margin-top:5px}.layers{display:grid;gap:5px}.layer{display:flex;align-items:center;gap:8px;border:1px solid #292e34;border-radius:6px;padding:8px 9px;color:#c7ccd0;font-size:10px}.layer input{accent-color:#d9ad55}.layer .dot{width:6px;height:6px;border-radius:50%;background:#e3b753;margin-left:auto}.section-title{font-size:9px;color:#dfb960;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin:17px 0 9px}.advanced{border-top:1px solid var(--line);padding:11px 13px}.advanced summary{cursor:pointer;color:#b9c0c7;font-size:10px;font-weight:700;letter-spacing:.08em}.advanced .field:first-of-type{margin-top:12px}.note{font-size:9px;color:#777f89;line-height:1.55;margin:10px 0 0}.tag{border:1px solid #343a41;border-radius:999px;padding:5px 8px;font-size:9px;color:#b9c0c7}.footer{font-size:10px;color:#7f8790;margin:9px 1px 0;line-height:1.5}.hidden{display:none!important}@media(max-width:920px){.layout{grid-template-columns:1fr}.side{order:2}.tabpanes{min-height:unset}.top{align-items:flex-start}.actions{flex-wrap:wrap;justify-content:flex-end}}@media(max-width:620px){.wrap{padding:12px 8px}.top{display:block}.actions{justify-content:flex-start;margin-top:12px}.transport{gap:6px;padding:8px}.btn{padding:8px 9px}.clock{font-size:10px}}
 </style></head>
-<body><!-- Self-contained preview: bounded multi-emitter floodlight frustum + directional facade footprint. --><main class="wrap">
+<body><!-- Self-contained high-fidelity vector/Canvas penumbra: nested frustums, divergent emitters, depth scatter, feathered facade footprint. --><main class="wrap">
 <header class="top"><div><div class="kicker">Magnates Studio · Independent Scene Template</div><h1>Barry Sacramento · Searchlight Reveal</h1><p>Storm-sky construction scene · independent editable layers · 8 seconds</p></div><div class="actions"><a class="btn subtle" href="/" style="text-decoration:none">Back to Studio</a><button class="btn" id="playTop" type="button">Pause preview</button></div></header>
 <div class="layout"><section class="main"><div class="stage"><canvas id="stage" width="1280" height="720" aria-label="Animated Sacramento tower with moving searchlight and gold title"></canvas><div class="stage-label">Searchlight pass · façade reflection · rolling cloud title reveal</div></div>
 <div class="transport"><button class="btn" id="play" type="button">Pause</button><input id="scrub" type="range" min="0" max="8" step="0.01" value="0" aria-label="Scrub the eight-second scene"><span class="clock" id="clock">00:00.00 / 00:08.00</span><button class="btn subtle" id="restart" type="button">Restart</button></div><div class="beats"><span class="beat"></span><span class="beat"></span><span class="beat"></span><span class="beat"></span></div><div class="caption" id="caption">A single flashlight bloom strikes; the Sacramento sky and construction tower resolve through the light.</div><div class="footer"><span class="tag">Source plates remain separate</span> &nbsp;Illustrative composite from supplied/generated assets, not archival documentation.</div></section>
@@ -193,120 +193,128 @@
   function drawBeam(time,s,lightIn){
     if(time<s.beamIn||lightIn<=0)return;
     const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d';
-    const {sx,sy,tx,ty,ux,uy,nx,ny,nearHalf,farHalf,outer}=g;
+    const {sx,sy,tx,ty,nx,ny,nearHalf,farHalf}=g;
 
-    // 1) Physical outer frustum / penumbra: no radial "bubble" at the destination.
-    ctx.save();
-    ctx.globalCompositeOperation='source-over';
-    ctx.filter='blur(14px)';
-    ctx.globalAlpha=.21*lightIn;
-    let grad=ctx.createLinearGradient(sx,sy,tx,ty);
-    grad.addColorStop(0,'rgba(255,168,49,.72)');
-    grad.addColorStop(.22,'rgba(248,148,34,.48)');
-    grad.addColorStop(.70,'rgba(232,126,21,.18)');
-    grad.addColorStop(1,'rgba(220,112,13,.045)');
-    ctx.fillStyle=grad;traceQuad(ctx,outer);ctx.fill();
-    ctx.restore();
+    // High-fidelity penumbra model. Several nested frustums approximate the angular
+    // distribution of a real multi-lamp floodlight without any raster beam texture.
+    const layers=[
+      {near:1.00,far:1.00,alpha:.16,blur:4,  c0:'rgba(255,185,75,.48)',c1:'rgba(235,128,24,.055)'},
+      {near:1.12,far:1.18,alpha:.105,blur:9, c0:'rgba(255,174,60,.40)',c1:'rgba(228,119,18,.035)'},
+      {near:1.28,far:1.40,alpha:.060,blur:16,c0:'rgba(255,161,48,.31)',c1:'rgba(220,108,14,.018)'},
+      {near:1.48,far:1.72,alpha:.028,blur:27,c0:'rgba(255,151,40,.22)',c1:'rgba(210,98,10,.006)'}
+    ];
 
-    // 2) Brighter inner frustum, still bounded by straight rays.
-    const innerNear=nearHalf*.55,innerFar=farHalf*.48;
+    // Outer atmospheric body: progressively softer frustums eliminate the visible cutoff.
+    layers.slice().reverse().forEach(L=>{
+      const pts=[
+        {x:sx+nx*nearHalf*L.near,y:sy+ny*nearHalf*L.near},
+        {x:tx+nx*farHalf*L.far,y:ty+ny*farHalf*L.far},
+        {x:tx-nx*farHalf*L.far,y:ty-ny*farHalf*L.far},
+        {x:sx-nx*nearHalf*L.near,y:sy-ny*nearHalf*L.near}
+      ];
+      ctx.save();ctx.globalCompositeOperation='source-over';ctx.filter=`blur(${L.blur}px)`;ctx.globalAlpha=L.alpha*lightIn;
+      const grad=ctx.createLinearGradient(sx,sy,tx,ty);
+      grad.addColorStop(0,L.c0);grad.addColorStop(.24,'rgba(246,145,34,.32)');
+      grad.addColorStop(.70,'rgba(229,121,20,.10)');grad.addColorStop(1,L.c1);
+      ctx.fillStyle=grad;traceQuad(ctx,pts);ctx.fill();ctx.restore();
+    });
+
+    // Brighter inner optical volume.
+    const innerNear=nearHalf*.54,innerFar=farHalf*.47;
     const inner=[
       {x:sx+nx*innerNear,y:sy+ny*innerNear},
       {x:tx+nx*innerFar,y:ty+ny*innerFar},
       {x:tx-nx*innerFar,y:ty-ny*innerFar},
       {x:sx-nx*innerNear,y:sy-ny*innerNear}
     ];
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.filter='blur(6px)';ctx.globalAlpha=.34*lightIn;
-    grad=ctx.createLinearGradient(sx,sy,tx,ty);
-    grad.addColorStop(0,'rgba(255,222,132,.72)');
-    grad.addColorStop(.18,'rgba(255,185,69,.54)');
-    grad.addColorStop(.68,'rgba(255,151,36,.16)');
-    grad.addColorStop(1,'rgba(255,133,24,.025)');
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.filter='blur(5px)';ctx.globalAlpha=.30*lightIn;
+    let grad=ctx.createLinearGradient(sx,sy,tx,ty);
+    grad.addColorStop(0,'rgba(255,226,143,.70)');
+    grad.addColorStop(.22,rgba(tint,.48));grad.addColorStop(.72,rgba(tint,.12));grad.addColorStop(1,rgba(tint,0));
     ctx.fillStyle=grad;traceQuad(ctx,inner);ctx.fill();ctx.restore();
 
-    // 3) Nine synchronized emitter shafts. They overlap into one floodlight volume.
-    const emit=[-1,-.75,-.5,-.25,0,.25,.5,.75,1];
+    // Each lamp has a slightly different divergence. Their overlapping shafts make the
+    // beam edge naturally irregular instead of mathematically identical.
+    const emitters=[
+      [-.82,-.035],[-.61,.018],[-.40,-.012],[-.20,.026],[0,-.020],
+      [.20,.012],[.40,-.027],[.61,.020],[.82,-.008]
+    ];
     ctx.save();ctx.globalCompositeOperation='screen';ctx.lineCap='round';
-    emit.forEach((v,i)=>{
-      const srcN=v*nearHalf*.78;
-      const dstN=v*farHalf*.72;
-      const jitter=(i%3-1)*2.2;
-      ctx.globalAlpha=(.055+(i%3)*.008)*lightIn;
-      ctx.strokeStyle='rgba(255,190,79,.72)';
-      ctx.lineWidth=3.1+(i%2)*.7;
-      ctx.shadowColor='rgba(255,169,48,.45)';ctx.shadowBlur=5;
-      ctx.beginPath();
-      ctx.moveTo(sx+nx*srcN+ux*jitter,sy+ny*srcN+uy*jitter);
-      ctx.lineTo(tx+nx*dstN,ty+ny*dstN);
-      ctx.stroke();
+    emitters.forEach(([v,d],i)=>{
+      const src=v*nearHalf*.72;
+      const spread=farHalf*(.66+d);
+      const dst=v*spread;
+      ctx.globalAlpha=(.038+(i%3)*.006)*lightIn;
+      ctx.strokeStyle='rgba(255,193,86,.70)';
+      ctx.lineWidth=2.4+(i%2)*.55;
+      ctx.shadowColor='rgba(255,165,42,.36)';ctx.shadowBlur=4.5;
+      ctx.beginPath();ctx.moveTo(sx+nx*src,sy+ny*src);ctx.lineTo(tx+nx*dst,ty+ny*dst);ctx.stroke();
     });
     ctx.restore();
 
-    // 4) Suspended particles are clipped to the frustum so "photons" never form a free-floating orb.
-    ctx.save();traceQuad(ctx,outer);ctx.clip();ctx.globalCompositeOperation='screen';
-    for(let i=0;i<34;i++){
-      const u=.10+((i*.137+time*.035)% .86);
-      const lateral=Math.sin(i*12.9898)*.5+.5;
-      const spread=mix(nearHalf,farHalf,u)*(.84*(lateral*2-1));
-      const px=sx+(tx-sx)*u+nx*spread+Math.sin(time*.7+i)*2.2;
-      const py=sy+(ty-sy)*u+ny*spread+Math.cos(time*.63+i*1.4)*1.8;
-      const rr=.55+(i%4)*.28;
-      ctx.globalAlpha=(.035+.045*(1-u))*lightIn;
-      ctx.fillStyle=i%3===0?'#ffd28a':'#ffb654';
+    // Volumetric particulate scattering at many depths. Spread grows continuously with
+    // distance from the lamps and fades before the nominal edge, preventing a "cutout" look.
+    ctx.save();ctx.globalCompositeOperation='screen';
+    for(let i=0;i<72;i++){
+      const u=.055+((i*.61803398875+time*.021)% .91);
+      const envelope=Math.pow(Math.sin(Math.PI*u),.42);
+      const signed=((i*0.754877666)%1)*2-1;
+      const localHalf=mix(nearHalf*1.15,farHalf*1.34,u);
+      const edgeFade=Math.pow(Math.max(0,1-Math.abs(signed)),.34);
+      const px=sx+(tx-sx)*u+nx*(signed*localHalf)+Math.sin(time*.47+i*2.17)*2.8;
+      const py=sy+(ty-sy)*u+ny*(signed*localHalf)+Math.cos(time*.41+i*1.73)*2.2;
+      const rr=.45+(i%5)*.24+(1-u)*.45;
+      ctx.globalAlpha=(.010+.030*edgeFade)*envelope*lightIn;
+      ctx.fillStyle=i%4===0?'#ffe0a1':(i%2===0?'#ffc46e':'#efa044');
       ctx.beginPath();ctx.arc(px,py,rr,0,Math.PI*2);ctx.fill();
     }
     ctx.restore();
 
-    // Compact source halo only; no destination radial bloom.
-    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.26*lightIn;
-    const source=ctx.createRadialGradient(sx,sy,3,sx,sy,48);
-    source.addColorStop(0,'rgba(255,231,154,.62)');
-    source.addColorStop(.42,'rgba(255,176,55,.28)');
-    source.addColorStop(1,'rgba(255,137,25,0)');
-    ctx.fillStyle=source;ctx.fillRect(sx-52,sy-52,104,104);ctx.restore();
+    // Source bloom remains local to the fixture.
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=.22*lightIn;
+    const source=ctx.createRadialGradient(sx,sy,3,sx,sy,46);
+    source.addColorStop(0,'rgba(255,235,168,.58)');
+    source.addColorStop(.40,'rgba(255,181,65,.24)');
+    source.addColorStop(1,'rgba(255,136,25,0)');
+    ctx.fillStyle=source;ctx.fillRect(sx-50,sy-50,100,100);ctx.restore();
   }
   function buildReflection(time,s){
-    const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d',flicker=.985+.015*Math.sin(time*15);
+    const g=beamGeometry(time,s),tint=s.beamTint||'#ffad3d',flicker=.99+.01*Math.sin(time*15);
     rc.clearRect(0,0,W,H);
 
-    // Projected beam footprint on the facade: elongated quadrilateral aligned to the arriving beam.
-    const fx=g.tx,fy=g.ty,half=g.farHalf*.72,depth=122;
+    const fx=g.tx,fy=g.ty,depth=132;
     const backX=fx-g.ux*depth,backY=fy-g.uy*depth;
-    const footprint=[
-      {x:backX+g.nx*half*.58,y:backY+g.ny*half*.58},
-      {x:fx+g.nx*half,y:fy+g.ny*half},
-      {x:fx-g.nx*half,y:fy-g.ny*half},
-      {x:backX-g.nx*half*.58,y:backY-g.ny*half*.58}
+    const footprintLayers=[
+      {scale:1.34,alpha:.10,blur:12},
+      {scale:1.16,alpha:.15,blur:7},
+      {scale:1.00,alpha:.22,blur:3},
+      {scale:.72,alpha:.18,blur:1.5}
     ];
 
-    rc.save();rc.globalCompositeOperation='source-over';
-    let fg=rc.createLinearGradient(backX,backY,fx,fy);
-    fg.addColorStop(0,'rgba(255,147,31,0)');
-    fg.addColorStop(.36,rgba(tint,.16*flicker));
-    fg.addColorStop(.78,rgba(tint,.30*flicker));
-    fg.addColorStop(1,'rgba(255,194,72,.24)');
-    rc.fillStyle=fg;traceQuad(rc,footprint);rc.fill();
-
-    // Soft inner footprint, still directional and non-circular.
-    rc.globalAlpha=.55;
-    const inner=footprint.map((p,i)=>{
-      const cx=(backX+fx)/2,cy=(backY+fy)/2;
-      return {x:cx+(p.x-cx)*.66,y:cy+(p.y-cy)*.66};
+    footprintLayers.forEach((L,idx)=>{
+      const half=g.farHalf*.72*L.scale;
+      const pts=[
+        {x:backX+g.nx*half*.56,y:backY+g.ny*half*.56},
+        {x:fx+g.nx*half,y:fy+g.ny*half},
+        {x:fx-g.nx*half,y:fy-g.ny*half},
+        {x:backX-g.nx*half*.56,y:backY-g.ny*half*.56}
+      ];
+      rc.save();rc.globalCompositeOperation='screen';rc.filter=`blur(${L.blur}px)`;rc.globalAlpha=L.alpha*flicker;
+      const fg=rc.createLinearGradient(backX,backY,fx,fy);
+      fg.addColorStop(0,'rgba(255,146,29,0)');
+      fg.addColorStop(.30,rgba(tint,.14));
+      fg.addColorStop(.72,rgba(tint,.30));
+      fg.addColorStop(1,idx===3?'rgba(255,211,105,.36)':'rgba(255,191,68,.18)');
+      rc.fillStyle=fg;traceQuad(rc,pts);rc.fill();rc.restore();
     });
-    fg=rc.createLinearGradient(backX,backY,fx,fy);
-    fg.addColorStop(0,'rgba(255,152,34,0)');
-    fg.addColorStop(.50,rgba(tint,.16));
-    fg.addColorStop(1,'rgba(255,210,101,.26)');
-    rc.fillStyle=fg;traceQuad(rc,inner);rc.fill();rc.restore();
 
-    // Reflection may only exist on the actual building plate.
+    // Clip all reflected energy to the actual building plate.
     rc.save();rc.globalCompositeOperation='destination-in';
     const push=1+s.cameraPush*clamp(time/D,0,1);
     drawBuildingAlpha(rc,(W-W*push)/2,(H-H*push)/2,push);rc.restore();
 
-    ctx.save();ctx.globalCompositeOperation='screen';
-    ctx.globalAlpha=Math.min(.62,s.pool*.72);ctx.filter='blur(2.2px)';
-    ctx.drawImage(reflection,0,0);ctx.filter='none';ctx.restore();
+    ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.58,s.pool*.68);
+    ctx.drawImage(reflection,0,0);ctx.restore();
   }
   function drawFlash(time,s){
     const burst=s.flash*(.92*Math.exp(-Math.pow((time-.19)/.12,2))+.26*Math.exp(-Math.pow((time-.34)/.10,2)));
