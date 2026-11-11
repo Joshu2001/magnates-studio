@@ -5,10 +5,13 @@
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
-  "resolution": {"width":1280,"height":720},
+  "resolution": {
+    "width": 1280,
+    "height": 720
+  },
   "status": "preview-ready",
   "textLayersEditable": true,
-  "provenance": "Construction corridor reuses the existing Barry Minkow opening corridor plate. Walking figures and shadows are extracted/generated illustrative layers based on the supplied storyboard reference, not archival photography.",
+  "provenance": "Construction corridor reuses the existing Barry Minkow opening corridor plate. Walking figures and shadows are independent illustrative vector layers reconstructed from the supplied storyboard reference; they are not archival photography.",
   "motion": {
     "effect": "2.5D parallax fly-through / downward camera glide",
     "principle": "continuous forward/downward camera travel through one coherent scene; near clipped architecture moves fastest, background moves slowest, people and shadows occupy separate depth planes; no orbiting or lateral dance",
@@ -16,11 +19,35 @@
     "titleStartSeconds": 3.05
   },
   "layers": [
-    {"id":"corridor","src":"/assets/barry-minkow-opening/assets/construction-corridor.webp","role":"deep construction-interior background"},
-    {"id":"foregroundArchitecture","src":"derived from corridor plate at runtime","role":"left/right/top near occluder planes"},
-    {"id":"people","src":"assets/people-00.js + assets/people-01.js","role":"two walking business figures, transparent full-frame cutout"},
-    {"id":"shadows","src":"assets/shadows.js","role":"separate soft floor-shadow layer"},
-    {"id":"atmosphere","src":"procedural","role":"warm depth haze and dust motes"},
-    {"id":"title","src":"editable canvas typography","role":"two-line editable fact title appearing after camera settles"}
+    {
+      "id": "corridor",
+      "src": "/assets/barry-minkow-opening/assets/construction-corridor.webp",
+      "role": "deep construction-interior background"
+    },
+    {
+      "id": "foregroundArchitecture",
+      "src": "derived from corridor plate at runtime",
+      "role": "left/right/top near occluder planes"
+    },
+    {
+      "id": "people",
+      "src": "procedural vector/canvas cutout",
+      "role": "two walking business figures on independent depth plane"
+    },
+    {
+      "id": "shadows",
+      "src": "procedural soft multiply plane",
+      "role": "separate floor shadows following the walking figures"
+    },
+    {
+      "id": "atmosphere",
+      "src": "procedural",
+      "role": "warm depth haze and dust motes"
+    },
+    {
+      "id": "title",
+      "src": "editable canvas typography",
+      "role": "two-line editable fact title appearing after camera settles"
+    }
   ]
 }
