@@ -7,6 +7,7 @@
   const registry=new Map();
   const media=new Map();
   const mounts=new Map();
+  const masterMute=new Map();
   let selected=null;
 
   const legacyCatalog={
@@ -99,7 +100,7 @@
       }
     }catch(e){}
   }
-  function register(id,spec){if(!id)return null;const n=applySaved(id,normalise(id,spec));registry.set(id,n);rerenderTemplate(id);refresh();return n;}
+  function register(id,spec){if(!id)return null;isMuted(id);const n=applySaved(id,normalise(id,spec));registry.set(id,n);rerenderTemplate(id);refresh();return n;}
   function get(id){return registry.get(id)||normalise(id,{duration:resolveDuration(id),clips:[]});}
   function resolveDuration(id){
     const tpl=(window.EFFECT_TEMPLATES_DATA||[]).find(function(x){return x&&x.id===id;});
@@ -150,8 +151,8 @@
     return a;
   }
 
-  function effectiveGain(clip,local){
-    let g=clip.muted?0:clip.volume;
+  function effectiveGain(clip,local,templateId){
+    let g=(clip.muted||masterMute.get(templateId)===true)?0:clip.volume;
     if(clip.fadeIn>0)g*=clamp(local/clip.fadeIn,0,1);
     if(clip.fadeOut>0)g*=clamp((clip.duration-local)/clip.fadeOut,0,1);
     return clamp(g,0,1);
@@ -165,7 +166,7 @@
       if(!inside){if(!a.paused)a.pause();return;}
       const target=clamp(local,0,Math.max(0,clip.duration-.01));
       if(Math.abs((a.currentTime||0)-target)>.16){try{a.currentTime=target}catch(e){}}
-      a.volume=effectiveGain(clip,local);
+      a.volume=effectiveGain(clip,local,templateId);
       if(playing){if(a.paused){const p=a.play();if(p&&p.catch)p.catch(function(){});}}else{a.pause();}
     });
     updatePlayheads(templateId,time);
@@ -173,6 +174,30 @@
 
   function stop(templateId){
     media.forEach(function(a,key){if(!templateId||key.indexOf(templateId+':')===0){a.pause();}});
+  }
+  function setMuted(templateId,muted){
+    const value=!!muted;
+    masterMute.set(templateId,value);
+    try{localStorage.setItem('regaarder.audio.masterMute.'+templateId,value?'1':'0');}catch(e){}
+    const spec=registry.get(templateId);
+    if(spec){
+      spec.clips.forEach(function(clip){
+        const a=createMedia(templateId,clip);if(!a)return;
+        if(value)a.volume=0;
+        else{
+          const local=(a.currentTime||0);
+          a.volume=effectiveGain(clip,local,templateId);
+        }
+      });
+    }
+    return value;
+  }
+  function isMuted(templateId){
+    if(!masterMute.has(templateId)){
+      try{masterMute.set(templateId,localStorage.getItem('regaarder.audio.masterMute.'+templateId)==='1');}
+      catch(e){masterMute.set(templateId,false);}
+    }
+    return masterMute.get(templateId)===true;
   }
   function unlock(templateId){
     const spec=registry.get(templateId);if(!spec)return;
@@ -385,7 +410,7 @@
   setInterval(refresh,350);
 
   window.RegaarderAudioLayers={
-    register:register,get:get,select:select,sync:sync,stop:stop,unlock:unlock,mountStandalone:mountStandalone,refresh:refresh,
+    register:register,get:get,select:select,sync:sync,stop:stop,unlock:unlock,setMuted:setMuted,isMuted:isMuted,mountStandalone:mountStandalone,refresh:refresh,
     list:function(id){return get(id).clips;},formatTime:fmt
   };
   refresh();
