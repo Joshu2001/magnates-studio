@@ -6066,3 +6066,14 @@
     setTimeout(initRegaarderRedesign, 60);
   }
 })();
+
+/* Shared first-class audio layer timeline + inspector. Loaded here so all universal
+   Studio template builders inherit audio support without modifying the 3.3 MB app.js. */
+(function loadRegaarderAudioLayers(){
+  if (window.RegaarderAudioLayers || document.getElementById('rg-audio-layers-module')) return;
+  const script=document.createElement('script');
+  script.id='rg-audio-layers-module';
+  script.src='/js/regaarder-audio-layers.js?v=20261112-audio-layers-v1';
+  script.defer=true;
+  document.head.appendChild(script);
+})();
