@@ -29,7 +29,7 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
 </head>
 <body>
 <header class="top">
-  <div><div class="eyebrow">Magnates Studio · Independent Scene Template</div><h1>Barry Sacramento · Interior Fly-Through</h1><div class="sub">Multiplane 2.5D camera glide · staggered fade/settle entrances · left-swipe dissipation exits · foot-anchored floor shadows · editable title · 6.5 seconds</div></div>
+  <div><div class="eyebrow">Magnates Studio · Independent Scene Template</div><h1>Barry Sacramento · Interior Fly-Through</h1><div class="sub">Multiplane 2.5D camera glide · staggered depth-push entrances · opposing corridor parallax · left-swipe dissipation exits · foot-anchored shadows · 6.5 seconds</div></div>
   <div style="display:flex;gap:8px"><button id="playTop">Pause preview</button><a class="btn" href="standalone-preview.html">Standalone Preview</a><a class="btn" href="/">Back to Studio</a></div>
 </header>
 <main>
@@ -56,7 +56,7 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
         <label class="layer"><input data-layer="atmosphere" type="checkbox" checked>Fog passage + warm haze + dust</label>
         <label class="layer"><input data-layer="title" type="checkbox" checked>Editable title</label>
       </div>
-      <p class="note">The clean corridor appears first and remains one continuous plate. Each businessman fades and settles in independently, then exits with a leftward dissipating swipe and a synchronized, foot-anchored floor shadow. Fog/haze and typography remain separate layers; no rectangular corridor slices are duplicated over the background.</p>
+      <p class="note">The clean corridor appears first and remains one continuous plate. Each businessman visibly pushes toward camera as he resolves, while the corridor subtly pulls backward; both later exit with a leftward dissipating swipe and synchronized foot-anchored shadows. Fog/haze and typography remain separate layers; no rectangular corridor slices are duplicated over the background.</p>
     </div>
     <div class="section"><div class="sectionTitle">Fly-through motion</div>
       <div class="field"><label>Camera glide duration <output id="flyDurationOut"></output></label><input id="flyDuration" type="range" min="1.8" max="4.2" step="0.05" value="2.9"></div>
@@ -74,6 +74,6 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
   </aside>
 </main>
 
-<script src="scene.js?v=20261112-left-swipe-dissipation-v2"></script>
+<script src="scene.js?v=20261112-depth-push-entrance-v3"></script>
 </body>
 </html>
