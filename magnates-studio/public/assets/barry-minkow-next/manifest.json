@@ -1,30 +1,99 @@
 {
   "id": "barry-minkow-contract-deception",
   "title": "Barry Minkow · Contract Deception Continuation",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "kind": "scene-template",
   "durationSeconds": 17,
   "frameRate": 24,
   "beats": [
-    {"start":0,"end":3,"title":"Barry Minkow","visual":"white flash, character depth entrance, moving spotlight, title lock","audio":"white flash impact, low boom, metallic typography accent"},
-    {"start":3,"end":6,"title":"$7 Million Contract","visual":"hero contract push-in, duplicate papers pull outward into financial grid","audio":"paper flicks, banknote-counting/shuffling rhythm"},
-    {"start":6,"end":9,"title":"No Work Was Done","visual":"evidence-wall pullback, red diagonal warning sweeps, title impact","audio":"faster counting, descending financial sting, deep impact"},
-    {"start":9,"end":13,"title":"And Yet… Wall Street Believed It","visual":"violent red radial zoom into ember-filled environment; Wall Street architecture, invoices, bills and particles drift at independent depths; large diagonal words emerge through moving shadows","audio":"reverse cymbal, rushing wind, fluttering paper, pulsing bass"},
-    {"start":13,"end":17,"title":"Over $300 Million","visual":"composition zooms farther out into Wall Street/ZZZZ Best/Barry/skyline valuation tableau; animated red financial graph moves behind massive typography while papers drift in front","audio":"bass drop, metallic glint, swelling tension, final low impact"}
+    {
+      "start": 0,
+      "end": 3,
+      "title": "Barry Minkow",
+      "visual": "white flash, character depth entrance, moving spotlight, title lock",
+      "audio": "white flash impact, low boom, metallic typography accent"
+    },
+    {
+      "start": 3,
+      "end": 6,
+      "title": "$7 Million Contract",
+      "visual": "hero contract push-in, duplicate papers pull outward into financial grid",
+      "audio": "paper flicks, banknote-counting/shuffling rhythm"
+    },
+    {
+      "start": 6,
+      "end": 9,
+      "title": "No Work Was Done",
+      "visual": "evidence-wall pullback, red diagonal warning sweeps, title impact",
+      "audio": "faster counting, descending financial sting, deep impact"
+    },
+    {
+      "start": 9,
+      "end": 13,
+      "title": "And Yet… Wall Street Believed It",
+      "visual": "violent red radial zoom into ember-filled environment; Wall Street architecture, invoices, bills and particles drift at independent depths; large diagonal words emerge through moving shadows",
+      "audio": "reverse cymbal, rushing wind, fluttering paper, pulsing bass"
+    },
+    {
+      "start": 13,
+      "end": 17,
+      "title": "Over $300 Million",
+      "visual": "composition zooms farther out into Wall Street/ZZZZ Best/Barry/skyline valuation tableau; animated red financial graph moves behind massive typography while papers drift in front",
+      "audio": "bass drop, metallic glint, swelling tension, final low impact"
+    }
   ],
   "assets": [
-    {"id":"barryBg","src":"assets/barry-bg.webp","role":"clean unfinished-office background"},
-    {"id":"barryPerson","src":"assets/barry-person.webp","role":"independent businessman cutout reused as valuation portrait plane"},
-    {"id":"contractBg","src":"assets/contract-bg.webp","role":"supporting evidence-document collage"},
-    {"id":"contractHero","src":"assets/contract-hero.webp","role":"independent $7M restoration contract"},
-    {"id":"wallBg","src":"assets/wall-bg.webp","role":"evidence wall of contracts/invoices/project files"}
+    {
+      "id": "barryBg",
+      "src": "assets/barry-bg.webp",
+      "role": "clean unfinished-office background"
+    },
+    {
+      "id": "barryPerson",
+      "src": "assets/barry-person.webp",
+      "role": "independent businessman cutout reused as valuation portrait plane"
+    },
+    {
+      "id": "contractBg",
+      "src": "assets/contract-bg.webp",
+      "role": "supporting evidence-document collage"
+    },
+    {
+      "id": "contractHero",
+      "src": "assets/contract-hero.webp",
+      "role": "independent $7M restoration contract"
+    },
+    {
+      "id": "wallBg",
+      "src": "assets/wall-bg.webp",
+      "role": "evidence wall of contracts/invoices/project files"
+    },
+    {
+      "id": "wallAtlas",
+      "src": "assets/wallstreet-extracted-atlas.webp",
+      "role": "photographic sprite atlas for Wall Street architecture, documents, bills, shards and extracted headline typography"
+    },
+    {
+      "id": "valueAtlas",
+      "src": "assets/valuation-extracted-atlas.webp",
+      "role": "photographic sprite atlas for Barry, Wall Street/ZZZZ Best buildings, skyline, chart, decline percentages, papers and valuation typography"
+    }
   ],
   "proceduralLayers": [
-    "Barry title", "$7 MILLION CONTRACT title", "NO WORK WAS DONE title + underline",
-    "crimson radial ember atmosphere", "Wall Street classical facade", "ZZZZ Best valuation building", "city skyline",
-    "multi-depth $100 bill layers", "invoice/contract/financial paper layers", "AND YET… WALL STREET BELIEVED IT diagonal typography",
-    "dark red financial grid", "animated neon financial line + volume bars + decline percentages", "OVER $300 MILLION valuation typography + metallic glint",
-    "white/gold flashes", "moving spotlight", "dust/ember particles", "red warning sweeps", "procedural Web Audio cues"
+    "Barry title",
+    "$7 MILLION CONTRACT title",
+    "NO WORK WAS DONE title + underline",
+    "crimson radial ember atmosphere",
+    "dark red financial grid",
+    "white/gold flashes",
+    "moving spotlight",
+    "dust/ember particles",
+    "red warning sweeps",
+    "procedural Web Audio cues",
+    "crimson radial ember atmosphere and camera parallax",
+    "dark red moving financial grid",
+    "moving shadow reveal, vignette, glint and screen glow",
+    "procedural Web Audio cues"
   ],
   "sourceTimingReference": "Storyboard source labels continue from 00:22–00:30; this local continuation follows the existing 0–9s template directly and maps the two supplied reference beats to local 9–13s and 13–17s."
 }
