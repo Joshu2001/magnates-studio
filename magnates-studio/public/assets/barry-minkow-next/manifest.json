@@ -1,0 +1,68 @@
+{
+  "id": "barry-minkow-contract-deception",
+  "title": "Barry Minkow · Contract Deception Continuation",
+  "version": "1.0.0",
+  "kind": "scene-template",
+  "durationSeconds": 9,
+  "frameRate": 24,
+  "beats": [
+    {
+      "start": 0,
+      "end": 3,
+      "title": "Barry Minkow",
+      "visual": "white flash, character depth entrance, moving spotlight, title lock",
+      "audio": "white flash impact, low boom, metallic typography accent"
+    },
+    {
+      "start": 3,
+      "end": 6,
+      "title": "$7 Million Contract",
+      "visual": "hero contract push-in, duplicate papers pull outward into financial grid",
+      "audio": "paper flicks, banknote-counting/shuffling rhythm"
+    },
+    {
+      "start": 6,
+      "end": 9,
+      "title": "No Work Was Done",
+      "visual": "evidence-wall pullback, red diagonal warning sweeps, title impact",
+      "audio": "faster counting, descending financial sting, deep impact"
+    }
+  ],
+  "assets": [
+    {
+      "id": "barryBg",
+      "src": "assets/barry-bg.webp",
+      "role": "clean unfinished-office background"
+    },
+    {
+      "id": "barryPerson",
+      "src": "assets/barry-person.webp",
+      "role": "independent businessman cutout"
+    },
+    {
+      "id": "contractBg",
+      "src": "assets/contract-bg.webp",
+      "role": "supporting evidence-document collage"
+    },
+    {
+      "id": "contractHero",
+      "src": "assets/contract-hero.webp",
+      "role": "independent $7M restoration contract"
+    },
+    {
+      "id": "wallBg",
+      "src": "assets/wall-bg.webp",
+      "role": "evidence wall of contracts/invoices/project files"
+    }
+  ],
+  "proceduralLayers": [
+    "Barry title",
+    "$7 MILLION CONTRACT title",
+    "NO WORK WAS DONE title + underline",
+    "white/gold flashes",
+    "moving spotlight",
+    "dust particles",
+    "red warning sweeps"
+  ],
+  "sourceTimingReference": "Storyboard source labels 00:09–00:18; this template is a self-contained local 0–9 second continuation."
+}
