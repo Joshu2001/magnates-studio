@@ -280,8 +280,8 @@
     ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=Math.min(.50,s.pool*.60);ctx.drawImage(reflection,0,0);ctx.restore();
   }
   function drawLightPathGuide(time,s){
-    // Diagnostic geometry is editor-only: visible while paused/scrubbing, never during playback/export.
-    if(!s.showPath||playing||time<s.beamIn)return;
+    // Standalone/export surface: editor guide is never rasterized into the scene canvas.
+    if(true)return;
     const g=beamGeometry(time,s),u=REFERENCE_LIGHT.extension,ex=g.sx+(g.tx-g.sx)*u,ey=g.sy+(g.ty-g.sy)*u,ew=g.farHalf*(1+(u-1)*.42)*1.55;
     ctx.save();ctx.lineWidth=1.15;ctx.setLineDash([8,7]);ctx.strokeStyle='rgba(75,235,105,.92)';ctx.globalAlpha=.72;
     ctx.beginPath();ctx.moveTo(g.sx,g.sy);ctx.lineTo(ex,ey);ctx.stroke();ctx.globalAlpha=.42;
