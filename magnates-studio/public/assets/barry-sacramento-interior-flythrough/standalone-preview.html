@@ -226,7 +226,7 @@ function loop(now){
  renderMaster(t);
  requestAnimationFrame(loop);
 }
-function toggle(){playing=!playing;if(playing&&t>=MASTER_DURATION)t=0;anchor=performance.now();anchorT=t;syncPlay()}
+function toggle(){playing=!playing;if(playing&&t>=MASTER_DURATION)t=0;anchor=performance.now();anchorT=t;if(playing&&window.RegaarderAudioLayers)window.RegaarderAudioLayers.unlock(MASTER_AUDIO_ID);syncPlay();if(window.RegaarderAudioLayers)window.RegaarderAudioLayers.sync(MASTER_AUDIO_ID,t,playing)}
 frames.forEach((f,i)=>{
  f.onload=()=>{
    ready[i]=true;pauseChild(i);setChildTime(i,0);
