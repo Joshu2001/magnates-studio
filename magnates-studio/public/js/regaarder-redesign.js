@@ -2645,10 +2645,10 @@
             title: 'Barry Minkow · Contract Deception Continuation',
             category: 'Documentary',
             badge: 'BARRY MINKOW',
-            description: 'Three-beat cinematic continuation: Barry reveal, $7 million contract duplication, evidence-wall pullback with NO WORK WAS DONE warning treatment.',
+            description: 'Five-beat cinematic continuation: Barry reveal, $7 million contract duplication, NO WORK WAS DONE evidence wall, violent Wall Street belief zoom, and animated $300M valuation climax.',
             defaultImage: '/assets/barry-minkow-next/assets/contract-bg.webp',
-            timeToApply: '9s',
-            tags: ['barry minkow','zzzz best','contract','fraud','evidence wall','documentary','cinematic']
+            timeToApply: '17s',
+            tags: ['barry minkow','zzzz best','contract','fraud','evidence wall','wall street','valuation','financial graph','documentary','cinematic']
           });
         }
         if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'jani-cinematic-letterbox')) {
