@@ -223,3 +223,30 @@
  setInterval(()=>{for(const shell of document.querySelectorAll('.rg-inspector-shell'))if(shell.getClientRects().length)syncContext(shell);},300);
  schedule();
 })();
+
+
+/* Tesla documentary: non-invasive entry from the existing Studio shell.
+ * The editing workspace is a native source canvas, not a baked MP4.
+ */
+(function () {
+  'use strict';
+  const url = '/tesla-opening.html';
+  function offerTesla() {
+    if (document.querySelector('[data-tesla-opening-link]')) return;
+    const anchor = document.createElement('a');
+    anchor.dataset.teslaOpeningLink = 'true';
+    anchor.href = url;
+    anchor.textContent = 'Tesla · Electrical Age';
+    anchor.title = 'Open the editable Tesla documentary template';
+    anchor.setAttribute('aria-label', 'Open Tesla editable documentary template');
+    Object.assign(anchor.style, {
+      position: 'fixed', bottom: '16px', left: '16px', zIndex: '999',
+      border: '1px solid #574a79', borderRadius: '12px',
+      padding: '10px 14px', color: '#fff', background: '#282237',
+      textDecoration: 'none', boxShadow: '0 6px 22px #0008', font: '600 12px system-ui'
+    });
+    document.body.appendChild(anchor);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', offerTesla, {once:true});
+  else offerTesla();
+})();
