@@ -1,27 +1,34 @@
 # Barry Sacramento Interior Fly-Through · Layer Plan
 
-The scene is intentionally separated before animation.
+The interior is decomposed into real independent compositing planes rather than procedural stand-ins.
 
-1. **Deep corridor plate** — existing clean `construction-corridor.webp`; lowest parallax speed.
-2. **Mid architecture** — corridor plate redrawn through side clips; medium parallax speed.
-3. **Walking shadows** — independent procedural vector floor-shadow layer, moving slightly less than the figures so it remains floor-anchored.
-4. **Two walking figures** — independent scalable vector layer with two suited businessmen, briefcase and document folder.
-5. **Near foreground occluders** — left wall, right scaffold/column and ceiling strips clipped from the corridor plate; fastest parallax and rendered in front of the people.
-6. **Atmosphere** — procedural amber haze/dust; depth-scaled.
-7. **Editable title** — `AN 18-STORY` + `OFFICE BUILDING`; appears only after the camera glide settles.
+1. **Deep corridor plate** — clean construction corridor; slowest parallax.
+2. **Mid architecture** — corridor side structure clipped from the same plate; medium parallax.
+3. **Shadow A** — photographed long floor shadow for the briefcase businessman.
+4. **Shadow B** — photographed long floor shadow for the document-holding businessman.
+5. **Man A** — photographic transparent cutout, briefcase.
+6. **Man B** — photographic transparent cutout, document folder.
+7. **Near foreground architecture** — left/right/top corridor structure; fastest architectural parallax and can pass in front of the people.
+8. **Fog occluder** — photographic amber fog, full-lens transition plane.
+9. **Interior haze + dust** — photographic haze plus subtle procedural particles.
+10. **Editable title** — `AN 18-STORY` + `OFFICE BUILDING`.
 
 ## Camera choreography
 
-**0.00–2.90s** — continuous Z push plus downward camera glide. No orbiting. Foreground planes accelerate past the viewer while the distant corridor moves slowly.
+**0.00–1.35s** — residual foreground fog begins across the lens and clears **downward** using the established Barry smoothstep glide duration. The corridor and photographic people are already advancing behind it.
 
-**2.90–3.05s** — short settle/overshoot.
+**0.00–2.90s** — continuous Z push plus downward camera glide. Rear corridor moves slowest, people/shadows move moderately, near architecture moves fastest.
 
-**3.05–4.10s** — title resolves in two staggered editable lines.
+**2.90–3.05s** — short camera settle.
 
-**4.10–6.50s** — composition holds with subtle walking sway and atmospheric motion.
+**3.05–4.10s** — editable two-line title resolves.
+
+**4.10–6.50s** — composition holds with subtle atmospheric motion.
+
+## Transition rule
+
+The master exterior→interior cut must be hidden by the foreground fog/barrier. No dissolve is visible. The exterior continues its push while fog rises to cover the lens; the interior begins underneath; the fog then sweeps downward and exposes the already-moving interior. This mirrors the established spatial-occlusion / continuous-downward-camera-passage grammar used elsewhere in Magnates Studio.
 
 ## Depth order
 
-Deep corridor → mid architecture → floor shadows → walking figures → near foreground occluders → haze/dust → title.
-
-This ordering is deliberate: the nearest columns can pass in front of the people, which is what sells the 2.5D fly-through rather than a flat Ken Burns zoom.
+Deep corridor → mid architecture → two floor shadows → two photographic people → near architecture → fog/haze → title.
