@@ -77,19 +77,38 @@
     ctx.restore();
   }
 
+
+  function drawAtlasSlice(key,sliceIndex,sliceCount,x,y,w,h,alpha=1,filter='none',blend='source-over'){
+    const r=atlasRects[key];
+    if(!r||!images.atlas||alpha<=0)return;
+    const f0=sliceIndex/sliceCount,f1=(sliceIndex+1)/sliceCount;
+    const sy=r[1]+r[3]*f0,sh=r[3]*(f1-f0);
+    const dy=y+h*f0,dh=h*(f1-f0)+.65;
+    ctx.save();
+    ctx.globalAlpha=alpha;
+    ctx.globalCompositeOperation=blend;
+    ctx.filter=filter;
+    ctx.drawImage(images.atlas,r[0],sy,r[2],sh,x,dy,w,dh);
+    ctx.restore();
+  }
+
   function figureMotion(time,entryStart,entryDuration,exitStart,exitDuration){
     const enter=smooth((time-entryStart)/Math.max(.08,entryDuration));
     const leave=smooth((time-exitStart)/Math.max(.08,exitDuration));
     return {
+      enter,
+      leave,
       alpha:clamp(enter*(1-leave),0,1),
-      y:mix(10,0,enter)+mix(0,-7,leave),
-      scale:mix(.985,1,enter)*mix(1,1.016,leave)
+      // Entrance deliberately uses the previous exit language in reverse:
+      // a soft fade/settle from slightly enlarged and raised into the grounded pose.
+      y:mix(-7,0,enter)+mix(0,-2,leave),
+      scale:mix(1.016,1,enter)*mix(1,.994,leave),
+      // Exit is now a separate leftward swipe with progressive breakup.
+      x:mix(0,-58,leave)
     };
   }
 
   function figureStates(time){
-    // The room is intentionally visible by itself first. The figures then enter one at
-    // a time and later exit in reverse order, making the cutout construction legible.
     return {
       left:figureMotion(time,.58,.42,5.62,.38),
       right:figureMotion(time,1.02,.42,5.24,.38)
@@ -105,14 +124,25 @@
     ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
     ctx.translate(0,dy);
 
-    // The original crops were previously enlarged to almost twice their natural scale
-    // and animated on a different depth transform, which made them detach from the feet.
-    // These tighter placements share the exact figure transform and keep the shadow root
-    // just beneath each shoe while still projecting toward camera from the rear light.
-    const lw=122*state.left.scale,lh=78*state.left.scale;
-    const rw=138*state.right.scale,rh=68*state.right.scale;
-    drawAtlas('shadowLeft',606-lw/2+micro*.18,606+state.left.y,lw,lh,state.left.alpha*s.shadowOpacity*.52,'blur(1.0px)','multiply');
-    drawAtlas('shadowRight',691-rw/2-micro*.08,599+state.right.y,rw,rh,state.right.alpha*s.shadowOpacity*.48,'blur(.9px)','multiply');
+    function shadow(key,cx,baseY,baseW,baseH,st,microX,opacity){
+      if(st.alpha<=.002)return;
+      const w=baseW*st.scale,h=baseH*st.scale;
+      // Shadow follows the person, but with reduced lateral travel so it remains floor-anchored.
+      const x=cx-w/2+microX+st.x*.58;
+      const y=baseY+st.y;
+      const a=st.alpha*s.shadowOpacity*opacity;
+      drawAtlas(key,x,y,w,h,a,'blur(1.0px)','multiply');
+
+      // Soft floor smear during the left-swipe exit.
+      if(st.leave>.01){
+        const q=st.leave;
+        drawAtlas(key,x-10*q,y,w,h,a*(1-q)*.22,'blur(2.2px)','multiply');
+        drawAtlas(key,x-22*q,y,w,h,a*(1-q)*.10,'blur(3.8px)','multiply');
+      }
+    }
+
+    shadow('shadowLeft',606,606,122,78,state.left,micro*.18,.52);
+    shadow('shadowRight',691,599,138,68,state.right,-micro*.08,.48);
     ctx.restore();
   }
 
@@ -125,18 +155,45 @@
     ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
     ctx.translate(0,dy);
 
-    // Scale around the feet rather than the crop origin so each entrance/exit remains
-    // grounded. The slight Y travel keeps the fade cinematic without looking like a
-    // flat dissolve pasted over the room.
-    const lw=82*state.left.scale,lh=210*state.left.scale;
-    const lx=558+micro+(82-lw)/2;
-    const ly=407+state.left.y+(210-lh);
-    drawAtlas('manLeft',lx,ly,lw,lh,state.left.alpha,'none','source-over');
+    function figure(key,baseX,baseY,baseW,baseH,st,microX){
+      if(st.alpha<=.002)return;
+      const w=baseW*st.scale,h=baseH*st.scale;
+      const x=baseX+microX+st.x+(baseW-w)/2;
+      const y=baseY+st.y+(baseH-h);
 
-    const rw=83*state.right.scale,rh=190*state.right.scale;
-    const rx=642-micro*.28+(83-rw)/2;
-    const ry=419+state.right.y+(190-rh);
-    drawAtlas('manRight',rx,ry,rw,rh,state.right.alpha,'none','source-over');
+      // Main body. Entrance is the old fade/settle motion reversed into place.
+      drawAtlas(key,x,y,w,h,st.alpha,'none','source-over');
+
+      if(st.leave>.01){
+        const q=st.leave;
+
+        // Broad leftward ghosting gives the swipe direction before the body fragments.
+        drawAtlas(key,x-14*q,y,w,h,st.alpha*(1-q)*.18,'blur(2.0px)','screen');
+        drawAtlas(key,x-30*q,y,w,h,st.alpha*(1-q)*.08,'blur(4.5px)','screen');
+
+        // Horizontal bands progressively shear farther left to create dissipation rather
+        // than a single rigid translation. Deterministic offsets avoid frame-to-frame noise.
+        const bands=11;
+        for(let i=0;i<bands;i++){
+          const seed=(Math.sin((i+1)*12.9898)*43758.5453)%1;
+          const jitter=Math.abs(seed);
+          const phase=clamp((q-i*.018)/.82,0,1);
+          if(phase<=0)continue;
+          const extra=(10+24*jitter)*phase;
+          const bandAlpha=st.alpha*(.12+.10*(1-phase))*(1-q*.72);
+          drawAtlasSlice(
+            key,i,bands,
+            x-extra,y,w,h,
+            bandAlpha,
+            'blur('+(1.1+2.6*phase)+'px)',
+            'screen'
+          );
+        }
+      }
+    }
+
+    figure('manLeft',558,407,82,210,state.left,micro);
+    figure('manRight',642,419,83,190,state.right,-micro*.28);
     ctx.restore();
   }
 
@@ -265,10 +322,10 @@
     $('scrub').value=t.toFixed(3);
     $('timecode').textContent=t.toFixed(2)+' / '+D.toFixed(2)+'s';
     let cap='Clean corridor plate appears first; no people are baked into the room.';
-    if(t>=.58&&t<1.44)cap='Photographic cutouts enter one at a time with their foot-anchored floor shadows.';
-    if(t>=1.44&&t<s.titleStart)cap='Both figures are fully grounded while the camera continues its forward/downward glide.';
+    if(t>=.58&&t<1.44)cap='Cutouts enter one after another using the soft fade-and-settle motion, with grounded shadows.';
+    if(t>=1.44&&t<s.titleStart)cap='Both figures hold naturally while the camera continues its forward/downward glide.';
     if(t>=s.titleStart&&t<5.24)cap='Editable title resolves independently above the live cutout composition.';
-    if(t>=5.24)cap='Figures exit independently in reverse order; each shadow leaves with its person and the clean room remains.';
+    if(t>=5.24)cap='Figures swipe left and dissipate in reverse order; their shadows leave with them and the clean room remains.';
     $('caption').textContent=cap;
   }
 
