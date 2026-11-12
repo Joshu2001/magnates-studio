@@ -254,6 +254,63 @@
     }
   }
 
+  function blueprintContext(){
+    const select=document.getElementById('magnates-bp-select-preset');
+    const preset=(select&&select.value)||'printer_glitch_card';
+    const hp=window.HPDocEngine&&window.HPDocEngine.chapterMap&&window.HPDocEngine.chapterMap[preset];
+    if(hp){
+      if(!registry.has(preset)){
+        registry.set(preset,normalise(preset,{
+          duration:num(hp.duration,10),
+          clips:[{
+            id:'hp-reference-audio',
+            name:preset==='hp_full_6m30s_doc'?'HP Documentary Master Audio Bus':'Reference Audio · '+(hp.shortTitle||hp.title||preset),
+            url:'/hp_recon/hp_ref_audio_6m30s.mp3',
+            start:0,duration:num(hp.duration,10),volume:.85,kind:preset==='hp_full_6m30s_doc'?'music':'reference',
+            managed:false,editable:false,
+            description:(hp.audioCueSummary||'Existing synchronized documentary audio and SFX map.')+(hp.startSec?' Source offset: '+fmt(hp.startSec)+'.':'')
+          }]
+        }));
+      }
+      return preset;
+    }
+    const map={
+      printer_glitch_card:'magnates-media-printer-glitch-card',
+      full_story_flow:'magnates-media-paper-blueprint',
+      brand_wavy_intro:'magnates-media-brand-wavy-hook',
+      products_unfurl:'magnates-media-product-price-unfurl',
+      globe_wavy_nothing:'magnates-media-globe-wavy-nothing',
+      dual_silhouette:'magnates-media-dual-silhouettes',
+      article_capitol_zoom:'magnates-media-article-capitol-zoom',
+      room_spawn:'magnates-media-article-capitol-zoom'
+    };
+    return map[preset]||preset;
+  }
+
+  function ensureBlueprint(){
+    const modal=document.getElementById('modal-magnates-paper-blueprint-suite');if(!modal)return;
+    const id=blueprintContext();if(!id)return;
+    const state=window.magnatesBPState||{},time=Math.max(0,num(state.playhead,0));
+    if(!registry.has(id)){
+      const preset=document.getElementById('magnates-bp-select-preset');
+      const raw=preset&&window.MAGNATES_BP_PRESETS&&window.MAGNATES_BP_PRESETS[preset.value];
+      registry.set(id,normalise(id,{duration:num(raw&&raw.duration,resolveDuration(id)),clips:[]}));
+    }
+    const shell=modal.querySelector('.rg-inspector-shell'),effects=shell&&shell.querySelector('[data-pane="effects"]');
+    if(effects){
+      let slot=effects.querySelector('[data-rg-blueprint-audio-inspector-slot]');
+      if(!slot){slot=document.createElement('div');slot.dataset.rgBlueprintAudioInspectorSlot='1';effects.appendChild(slot);}
+      if(slot.dataset.audioTemplate!==id){slot.dataset.audioTemplate=id;renderInspector(id,slot);}
+    }
+    const canvasBox=document.getElementById('magnates-bp-canvas-box'),previewCol=document.getElementById('magnates-bp-preview-col');
+    if(canvasBox&&previewCol){
+      let host=previewCol.querySelector('[data-rg-blueprint-audio-lane-host]');
+      if(!host){host=document.createElement('div');host.dataset.rgBlueprintAudioLaneHost='1';canvasBox.insertAdjacentElement('afterend',host);}
+      if(host.dataset.audioTemplate!==id){host.dataset.audioTemplate=id;buildLane(id,host);}
+      updatePlayheads(id,time);
+    }
+  }
+
   function mountStandalone(opts){
     opts=opts||{};const id=opts.templateId;if(!id)return null;
     const timelineHost=typeof opts.timelineHost==='string'?document.querySelector(opts.timelineHost):opts.timelineHost;
@@ -282,7 +339,7 @@
   }
 
   function refresh(){
-    ensureStyles();ensureStandard();
+    ensureStyles();ensureStandard();ensureBlueprint();
     mounts.forEach(function(m,id){if(m.timeProvider){const v=m.timeProvider();if(v&&typeof v==='object')sync(id,num(v.time,0),!!v.playing);else updatePlayheads(id,num(v,0));}});
   }
 
