@@ -77,30 +77,66 @@
     ctx.restore();
   }
 
-  function drawPhotographicShadows(time,p,s){
-    const sc=1+s.peopleDepth*.050*p;
-    const dy=-s.glide*.50*p;
-    ctx.save();
-    ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
-    ctx.translate(0,dy);
-    // Each photographed shadow is a separate floor plane. They deliberately move less
-    // than the bodies so the contact point stays floor-anchored while the camera advances.
-    drawAtlas('shadowLeft',510,584,210,148,s.shadowOpacity*.72,'blur(1.2px)','multiply');
-    drawAtlas('shadowRight',590,584,225,126,s.shadowOpacity*.66,'blur(1.1px)','multiply');
-    ctx.restore();
+  function figureMotion(time,entryStart,entryDuration,exitStart,exitDuration){
+    const enter=smooth((time-entryStart)/Math.max(.08,entryDuration));
+    const leave=smooth((time-exitStart)/Math.max(.08,exitDuration));
+    return {
+      alpha:clamp(enter*(1-leave),0,1),
+      y:mix(10,0,enter)+mix(0,-7,leave),
+      scale:mix(.985,1,enter)*mix(1,1.016,leave)
+    };
   }
 
-  function drawPhotographicPeople(time,p,s){
+  function figureStates(time){
+    // The room is intentionally visible by itself first. The figures then enter one at
+    // a time and later exit in reverse order, making the cutout construction legible.
+    return {
+      left:figureMotion(time,.58,.42,5.62,.38),
+      right:figureMotion(time,1.02,.42,5.24,.38)
+    };
+  }
+
+  function drawPhotographicShadows(time,p,s){
+    const state=figureStates(time);
     const sc=1+s.peopleDepth*.082*p;
     const dy=-s.glide*.66*p;
     const micro=Math.sin(time*1.65)*.42*(1-p*.45);
     ctx.save();
     ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
     ctx.translate(0,dy);
-    // Photographic cutouts derived from the approved corridor composition.
-    // No procedural replacement figures are used.
-    drawAtlas('manLeft',558+micro,407,82,210,1,'none','source-over');
-    drawAtlas('manRight',642-micro*.28,419,83,190,1,'none','source-over');
+
+    // The original crops were previously enlarged to almost twice their natural scale
+    // and animated on a different depth transform, which made them detach from the feet.
+    // These tighter placements share the exact figure transform and keep the shadow root
+    // just beneath each shoe while still projecting toward camera from the rear light.
+    const lw=122*state.left.scale,lh=78*state.left.scale;
+    const rw=138*state.right.scale,rh=68*state.right.scale;
+    drawAtlas('shadowLeft',606-lw/2+micro*.18,606+state.left.y,lw,lh,state.left.alpha*s.shadowOpacity*.52,'blur(1.0px)','multiply');
+    drawAtlas('shadowRight',691-rw/2-micro*.08,599+state.right.y,rw,rh,state.right.alpha*s.shadowOpacity*.48,'blur(.9px)','multiply');
+    ctx.restore();
+  }
+
+  function drawPhotographicPeople(time,p,s){
+    const state=figureStates(time);
+    const sc=1+s.peopleDepth*.082*p;
+    const dy=-s.glide*.66*p;
+    const micro=Math.sin(time*1.65)*.42*(1-p*.45);
+    ctx.save();
+    ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
+    ctx.translate(0,dy);
+
+    // Scale around the feet rather than the crop origin so each entrance/exit remains
+    // grounded. The slight Y travel keeps the fade cinematic without looking like a
+    // flat dissolve pasted over the room.
+    const lw=82*state.left.scale,lh=210*state.left.scale;
+    const lx=558+micro+(82-lw)/2;
+    const ly=407+state.left.y+(210-lh);
+    drawAtlas('manLeft',lx,ly,lw,lh,state.left.alpha,'none','source-over');
+
+    const rw=83*state.right.scale,rh=190*state.right.scale;
+    const rx=642-micro*.28+(83-rw)/2;
+    const ry=419+state.right.y+(190-rh);
+    drawAtlas('manRight',rx,ry,rw,rh,state.right.alpha,'none','source-over');
     ctx.restore();
   }
 
@@ -228,9 +264,11 @@
 
     $('scrub').value=t.toFixed(3);
     $('timecode').textContent=t.toFixed(2)+' / '+D.toFixed(2)+'s';
-    let cap='Clean corridor plate renders once; photographed people and shadows travel independently while residual fog clears downward.';
-    if(t>s.flyDuration-.05&&t<s.titleStart)cap='Camera settles after the 3.00s spatial-occlusion passage. Depth motion decelerates before typography enters.';
-    if(t>=s.titleStart)cap='Editable two-line title resolves after the camera move, matching the reference beat.';
+    let cap='Clean corridor plate appears first; no people are baked into the room.';
+    if(t>=.58&&t<1.44)cap='Photographic cutouts enter one at a time with their foot-anchored floor shadows.';
+    if(t>=1.44&&t<s.titleStart)cap='Both figures are fully grounded while the camera continues its forward/downward glide.';
+    if(t>=s.titleStart&&t<5.24)cap='Editable title resolves independently above the live cutout composition.';
+    if(t>=5.24)cap='Figures exit independently in reverse order; each shadow leaves with its person and the clean room remains.';
     $('caption').textContent=cap;
   }
 
