@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -148,5 +148,43 @@
       "mute",
       "loop"
     ]
+  },
+  "masterSequenceAudio": [
+    {
+      "id": "downward-whoosh",
+      "name": "Heavy Downward Whoosh",
+      "src": "audio/downward-whoosh.wav",
+      "globalStartSeconds": 6.1,
+      "durationSeconds": 2.8,
+      "volume": 0.9,
+      "fadeInSeconds": 0.06,
+      "fadeOutSeconds": 0.24,
+      "kind": "transition"
+    },
+    {
+      "id": "construction-bed",
+      "name": "Distant Construction Ambience",
+      "src": "audio/distant-construction.wav",
+      "globalStartSeconds": 9,
+      "durationSeconds": 6.5,
+      "volume": 0.48,
+      "kind": "ambience"
+    },
+    {
+      "id": "corridor-footsteps",
+      "name": "Echoing Footsteps",
+      "src": "audio/echoing-footsteps.wav",
+      "globalStartSeconds": 9.55,
+      "durationSeconds": 3.65,
+      "volume": 0.72,
+      "kind": "foley"
+    }
+  ],
+  "audioSystem": {
+    "sharedModule": "/js/regaarder-audio-layers.js",
+    "timelineLane": true,
+    "effectsInspector": true,
+    "persistentEdits": true,
+    "browserGestureUnlock": true
   }
 }
