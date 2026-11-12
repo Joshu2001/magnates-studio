@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.3.0",
+  "version": "1.2.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -11,7 +11,7 @@
   },
   "status": "preview-ready",
   "textLayersEditable": true,
-  "provenance": "Clean construction corridor plus generated photographic cutouts derived from the user-approved reference composition: two independent businessmen, two independent floor shadows, foreground fog and residual haze. These are illustrative generated assets, not archival documentation.",
+  "provenance": "Interior background and photographic people/shadow/fog assets are derived from the user-approved construction-corridor reference composition. The two men and their shadows are separate transparent layers; fog/haze are separate transition layers.",
   "motion": {
     "effect": "photographic 2.5D parallax fly-through / foreground fog occlusion / downward camera glide",
     "principle": "continuous forward/downward camera travel; foreground fog fully occludes the lens before clearing downward; incoming interior is already moving underneath; nearer architecture clears faster than rear corridor; people and shadows remain independent depth planes",
@@ -25,43 +25,79 @@
   "layers": [
     {
       "id": "corridor",
-      "src": "/assets/barry-minkow-opening/assets/construction-corridor.webp",
-      "role": "clean construction-interior background plate"
-    },
-    {
-      "id": "foregroundArchitecture",
-      "src": "derived from corridor plate at runtime",
-      "role": "mid and near corridor occluder planes"
-    },
-    {
-      "id": "manLeft",
-      "src": "assets/transition-atlas-v2-*.js :: atlas manLeft",
-      "role": "photographic businessman with briefcase cutout"
-    },
-    {
-      "id": "manRight",
-      "src": "assets/transition-atlas-v2-*.js :: atlas manRight",
-      "role": "photographic businessman with document folder cutout"
+      "src": "assets/corridor-clean.webp",
+      "role": "clean people-free supplied-image-derived corridor background"
     },
     {
       "id": "shadowLeft",
-      "src": "assets/transition-atlas-v2-*.js :: atlas shadowLeft",
-      "role": "independent long soft floor shadow"
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        96,
+        225,
+        92,
+        65
+      ],
+      "role": "independent left figure floor shadow"
     },
     {
       "id": "shadowRight",
-      "src": "assets/transition-atlas-v2-*.js :: atlas shadowRight",
-      "role": "independent long soft floor shadow"
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        95,
+        306,
+        120,
+        58
+      ],
+      "role": "independent right figure floor shadow"
+    },
+    {
+      "id": "manLeft",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        26,
+        5,
+        81,
+        207
+      ],
+      "role": "photographic businessman with briefcase"
+    },
+    {
+      "id": "manRight",
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        176,
+        10,
+        87,
+        199
+      ],
+      "role": "photographic businessman with documents"
+    },
+    {
+      "id": "foregroundArchitecture",
+      "src": "assets/corridor-clean.webp",
+      "role": "near clipped construction framing for spatial occlusion"
     },
     {
       "id": "fog",
-      "src": "assets/transition-atlas-v2-*.js :: atlas fog",
-      "role": "foreground full-lens transition occluder"
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        288,
+        219,
+        288,
+        159
+      ],
+      "role": "near-lens foreground fog transition"
     },
     {
       "id": "haze",
-      "src": "assets/transition-atlas-v2-*.js :: atlas haze",
-      "role": "residual interior atmospheric continuity"
+      "src": "assets/transition-atlas.webp",
+      "crop": [
+        318,
+        411,
+        235,
+        127
+      ],
+      "role": "residual interior atmospheric haze"
     },
     {
       "id": "title",
