@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -11,7 +11,7 @@
   },
   "status": "preview-ready",
   "textLayersEditable": true,
-  "provenance": "Clean Sacramento construction corridor rendered once as the continuous interior plate, plus generated photographic cutouts derived from the user-approved reference composition: two independent businessmen, two independent floor shadows, foreground fog and residual haze. No duplicated rectangular corridor slices are used.",
+  "provenance": "Clean Sacramento construction corridor rendered once as the continuous interior plate, plus generated photographic cutouts derived from the user-approved reference composition: two independent businessmen, two synchronized foot-anchored floor shadows, foreground fog and residual haze. Figures enter and exit as separate cutout layers; no duplicated rectangular corridor slices are used.",
   "motion": {
     "effect": "photographic 2.5D parallax fly-through / foreground fog occlusion / downward camera glide",
     "principle": "continuous forward/downward camera travel; one clean corridor plate remains spatially coherent; foreground fog fully occludes the lens before clearing downward; people and shadows remain independent depth planes",
@@ -20,7 +20,15 @@
     "entryOcclusionSeconds": 1.35,
     "masterTransitionWindow": "00:06–00:09",
     "masterTransitionSeconds": 3,
-    "masterTransition": "foreground construction dust/fog rises across the lens, vertical whoosh smear hides the substitution, then the same occluder sweeps downward while the already-moving interior resolves"
+    "masterTransition": "foreground construction dust/fog rises across the lens, vertical whoosh smear hides the substitution, then the same occluder sweeps downward while the already-moving interior resolves",
+    "figureReveal": {
+      "roomOnlyUntilSeconds": 0.58,
+      "leftEntry": "0.58–1.00",
+      "rightEntry": "1.02–1.44",
+      "rightExit": "5.24–5.62",
+      "leftExit": "5.62–6.00",
+      "behavior": "opacity fade plus subtle Y/scale travel; each shadow shares its figure camera transform and visibility"
+    }
   },
   "layers": [
     {
@@ -37,7 +45,7 @@
         92,
         65
       ],
-      "role": "independent left figure floor shadow"
+      "role": "independent left figure floor shadow, tightened to foot contact and synchronized with left figure entry/exit"
     },
     {
       "id": "shadowRight",
@@ -48,7 +56,7 @@
         120,
         58
       ],
-      "role": "independent right figure floor shadow"
+      "role": "independent right figure floor shadow, tightened to foot contact and synchronized with right figure entry/exit"
     },
     {
       "id": "manLeft",
@@ -59,7 +67,7 @@
         81,
         207
       ],
-      "role": "photographic businessman with briefcase"
+      "role": "photographic businessman with briefcase; independent staggered entrance and exit"
     },
     {
       "id": "manRight",
@@ -70,7 +78,7 @@
         87,
         199
       ],
-      "role": "photographic businessman with documents"
+      "role": "photographic businessman with documents; independent staggered entrance and exit"
     },
     {
       "id": "fog",
