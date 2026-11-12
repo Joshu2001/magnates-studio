@@ -174,6 +174,19 @@
   function stop(templateId){
     media.forEach(function(a,key){if(!templateId||key.indexOf(templateId+':')===0){a.pause();}});
   }
+  function unlock(templateId){
+    const spec=registry.get(templateId);if(!spec)return;
+    spec.clips.forEach(function(clip){
+      const a=createMedia(templateId,clip);if(!a)return;
+      const oldVol=a.volume;
+      a.volume=0;
+      try{
+        const p=a.play();
+        if(p&&p.then)p.then(function(){a.pause();try{a.currentTime=0}catch(e){}a.volume=oldVol;}).catch(function(){a.volume=oldVol;});
+        else{a.pause();a.volume=oldVol;}
+      }catch(e){a.volume=oldVol;}
+    });
+  }
 
   function clipRows(spec){
     const groups=[];spec.clips.forEach(function(c){if(groups.indexOf(c.kind)<0)groups.push(c.kind);});
@@ -372,7 +385,7 @@
   setInterval(refresh,350);
 
   window.RegaarderAudioLayers={
-    register:register,get:get,select:select,sync:sync,stop:stop,mountStandalone:mountStandalone,refresh:refresh,
+    register:register,get:get,select:select,sync:sync,stop:stop,unlock:unlock,mountStandalone:mountStandalone,refresh:refresh,
     list:function(id){return get(id).clips;},formatTime:fmt
   };
   refresh();
