@@ -16,7 +16,7 @@
   let ready=false,playing=true,t=0,anchor=performance.now(),anchorT=0;
   const images={};
   const layers={background:true,foreground:false,people:true,shadows:true,atmosphere:true,title:true};
-  const corridorSrc='assets/corridor-clean.webp';
+  const corridorSrc='/assets/barry-sacramento-interior-flythrough/assets/corridor-clean.webp';
   const atlasSrc='assets/transition-atlas.webp';
   const atlasRects={
     // Exact alpha bounds inside the 576×576 transition atlas.
@@ -65,12 +65,6 @@
 
   function drawPlane(im,tx,ty,scale,alpha=1,filter='none'){
     ctx.save();ctx.globalAlpha=alpha;ctx.filter=filter;drawCover(im,tx,ty,scale);ctx.restore();
-  }
-
-  function clipPlane(im,rect,tx,ty,scale,alpha=1,blur=0){
-    ctx.save();ctx.beginPath();ctx.rect(rect.x,rect.y,rect.w,rect.h);ctx.clip();
-    ctx.globalAlpha=alpha;if(blur>0)ctx.filter='blur('+blur+'px)';
-    drawCover(im,tx,ty,scale);ctx.restore();
   }
 
   function drawAtlas(key,x,y,w,h,alpha=1,filter='none',blend='source-over'){
@@ -235,7 +229,7 @@
 
     $('scrub').value=t.toFixed(3);
     $('timecode').textContent=t.toFixed(2)+' / '+D.toFixed(2)+'s';
-    let cap='Photographic cutouts travel on independent depth planes; residual fog clears downward while the corridor advances.';
+    let cap='Clean corridor plate renders once; photographed people and shadows travel independently while residual fog clears downward.';
     if(t>s.flyDuration-.05&&t<s.titleStart)cap='Camera settles after the 3.00s spatial-occlusion passage. Depth motion decelerates before typography enters.';
     if(t>=s.titleStart)cap='Editable two-line title resolves after the camera move, matching the reference beat.';
     $('caption').textContent=cap;
