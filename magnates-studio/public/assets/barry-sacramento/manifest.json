@@ -23,7 +23,7 @@
   ],
   "sequence": [
     {
-      "in": 0.0,
+      "in": 0,
       "out": 0.42,
       "beat": "Single flashlight bloom/boom establishes the scene",
       "layers": [
@@ -50,15 +50,15 @@
       ]
     },
     {
-      "in": 0.0,
-      "out": 8.0,
+      "in": 0,
+      "out": 8,
       "beat": "Low rolling cloud bank drifts behind the title",
       "layers": [
         "clouds"
       ]
     },
     {
-      "in": 3.0,
+      "in": 3,
       "out": 4.1,
       "beat": "Large weathered-gold SACRAMENTO stays on a fixed baseline above the cloud bank and blooms in one letter at a time from left to right.",
       "layers": [
@@ -68,7 +68,7 @@
     },
     {
       "in": 4.1,
-      "out": 8.0,
+      "out": 8,
       "beat": "Final layered composition holds with moving light and drifting cloud",
       "layers": [
         "all"
@@ -141,5 +141,22 @@
     "beam pivot sweep range and cone width",
     "title translucency and weathering density",
     "left-to-right per-letter reveal timing"
-  ]
+  ],
+  "audio": [
+    {
+      "id": "opening-boom-whoosh",
+      "name": "Opening Boom + Airy Whoosh",
+      "kind": "procedural",
+      "startSeconds": 0.2,
+      "durationSeconds": 0.74,
+      "volumeControl": "boomStrength",
+      "muteControl": "soundOn",
+      "engine": "Web Audio oscillator + filtered noise"
+    }
+  ],
+  "audioEditing": {
+    "ui": "shared audio lane + existing Effects controls",
+    "selectable": true,
+    "engineDriven": true
+  }
 }
