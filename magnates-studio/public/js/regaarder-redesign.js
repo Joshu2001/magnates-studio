@@ -2493,6 +2493,13 @@
         thumb: '/assets/barry-minkow-opening/assets/construction-corridor.webp',
         priority: 1
       },
+      'barry-minkow-contract-deception': {
+        shortTitle: 'Barry Contract Reveal',
+        shortSub: '$7M · No Work',
+        cat: 'Cinematic',
+        thumb: '/assets/barry-minkow-next/assets/contract-bg.webp',
+        priority: 2
+      },
       'jani-spin-flash-glitch-reveal': {
         shortTitle: 'Circular Spin',
         shortSub: 'Falling Particles',
@@ -2630,6 +2637,18 @@
             defaultImage: '/assets/barry-minkow-opening/assets/construction-corridor.webp',
             timeToApply: '7s',
             tags: ['barry', 'sacramento', 'construction', '2.5d', 'parallax', 'fly-through', 'documentary']
+          });
+        }
+        if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'barry-minkow-contract-deception')) {
+          EFFECT_TEMPLATES_DATA.unshift({
+            id: 'barry-minkow-contract-deception',
+            title: 'Barry Minkow · Contract Deception Continuation',
+            category: 'Documentary',
+            badge: 'BARRY MINKOW',
+            description: 'Three-beat cinematic continuation: Barry reveal, $7 million contract duplication, evidence-wall pullback with NO WORK WAS DONE warning treatment.',
+            defaultImage: '/assets/barry-minkow-next/assets/contract-bg.webp',
+            timeToApply: '9s',
+            tags: ['barry minkow','zzzz best','contract','fraud','evidence wall','documentary','cinematic']
           });
         }
         if (!EFFECT_TEMPLATES_DATA.some((t) => t.id === 'jani-cinematic-letterbox')) {
@@ -2781,6 +2800,10 @@
           }
           if (tplId === 'barry-sacramento-interior-flythrough') {
             window.location.assign('/assets/barry-sacramento-interior-flythrough/');
+            return;
+          }
+          if (tplId === 'barry-minkow-contract-deception') {
+            window.location.assign('/assets/barry-minkow-next/');
             return;
           }
           if (typeof options.onSelectTemplate === 'function') {
