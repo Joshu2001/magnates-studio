@@ -27,3 +27,13 @@ Do not reconstruct foreground architecture by clipping rectangular regions from 
 - 00:05.62–00:06.00 — Man A + Shadow A exit, returning to the clean corridor.
 
 The shadows project toward camera because the dominant source light is behind the businessmen. Their roots remain attached to the shoes throughout the camera move.
+
+## Audio layers
+
+The scene uses first-class selectable audio clips through the shared Regaarder audio-layer system.
+
+- **Distant Construction Ambience** — local 00:00.00–00:06.50. Low machinery, room air and intermittent construction impacts.
+- **Echoing Footsteps** — local 00:00.55–00:04.20. Alternating footsteps with corridor reflections, beginning with the figure entrance choreography.
+- **Heavy Downward Whoosh** — master-sequence 00:06.10–00:08.90. Transition-only stem synchronized to the foreground fog/vertical whip.
+
+In the 15.5-second master preview the construction bed starts at 00:09.00 and footsteps at 00:09.55. Audio blocks are selectable in the lower Audio lane; editable file-backed clips expose start, duration, fades, volume, mute and loop in the audio inspector. Existing procedural template sounds are surfaced as engine-driven clips and retain their native controls.
