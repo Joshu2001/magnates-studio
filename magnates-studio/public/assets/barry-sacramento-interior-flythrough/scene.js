@@ -16,15 +16,16 @@
   let ready=false,playing=true,t=0,anchor=performance.now(),anchorT=0;
   const images={};
   const layers={background:true,foreground:true,people:true,shadows:true,atmosphere:true,title:true};
-  const corridorSrc='/assets/barry-minkow-opening/assets/construction-corridor.webp';
-  const atlasSrc='data:image/webp;base64,'+(window.BARRY_TRANSITION_ATLAS||'');
+  const corridorSrc='assets/corridor-clean.webp';
+  const atlasSrc='assets/transition-atlas.webp';
   const atlasRects={
-    manLeft:[0,0,144,216],
-    manRight:[144,0,144,216],
-    shadowLeft:[26,216,236,79],
-    shadowRight:[26,295,236,79],
-    fog:[288,216,288,162],
-    haze:[288,378,288,162]
+    // Exact alpha bounds inside the 576×576 transition atlas.
+    manLeft:[26,5,81,207],
+    manRight:[176,10,87,199],
+    shadowLeft:[96,225,92,65],
+    shadowRight:[95,306,120,58],
+    fog:[288,219,288,159],
+    haze:[318,411,235,127]
   };
 
   function loadImage(src){return new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=()=>reject(new Error('Could not load '+src));im.src=src;});}
@@ -84,46 +85,49 @@
   }
 
   function drawPhotographicShadows(time,p,s){
-    const sc=1+s.peopleDepth*.055*p;
-    const dy=-s.glide*.56*p;
+    const sc=1+s.peopleDepth*.050*p;
+    const dy=-s.glide*.50*p;
     ctx.save();
     ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
     ctx.translate(0,dy);
-    // Long photographed shadows remain attached to the floor plane, therefore they
-    // move less than the bodies as the camera advances.
-    drawAtlas('shadowLeft',430,568,360,120,s.shadowOpacity*.82,'blur(.7px)','multiply');
-    drawAtlas('shadowRight',565,568,360,120,s.shadowOpacity*.78,'blur(.7px)','multiply');
+    // Each photographed shadow is a separate floor plane. They deliberately move less
+    // than the bodies so the contact point stays floor-anchored while the camera advances.
+    drawAtlas('shadowLeft',510,584,210,148,s.shadowOpacity*.72,'blur(1.2px)','multiply');
+    drawAtlas('shadowRight',590,584,225,126,s.shadowOpacity*.66,'blur(1.1px)','multiply');
     ctx.restore();
   }
 
   function drawPhotographicPeople(time,p,s){
-    const sc=1+s.peopleDepth*.095*p;
-    const dy=-s.glide*.72*p;
-    const micro=Math.sin(time*2.0)*.55*(1-p*.45);
+    const sc=1+s.peopleDepth*.082*p;
+    const dy=-s.glide*.66*p;
+    const micro=Math.sin(time*1.65)*.42*(1-p*.45);
     ctx.save();
     ctx.translate(W/2,H/2);ctx.scale(sc,sc);ctx.translate(-W/2,-H/2);
     ctx.translate(0,dy);
-    // These are the actual generated photographic cutouts from the approved reference
-    // composition, not procedural stand-ins. Only sub-pixel camera-relative drift is used.
-    drawAtlas('manLeft',500+micro,392,176,264,1);
-    drawAtlas('manRight',604-micro*.35,392,176,264,1);
+    // Photographic cutouts derived from the approved corridor composition.
+    // No procedural replacement figures are used.
+    drawAtlas('manLeft',558+micro,407,82,210,1,'none','source-over');
+    drawAtlas('manRight',642-micro*.28,419,83,190,1,'none','source-over');
     ctx.restore();
   }
 
   function drawPhotographicAtmosphere(time,p,s){
     if(!layers.atmosphere||!images.atlas)return;
-    // Persistent interior haze is a rear atmospheric plane.
-    drawAtlas('haze',-45,-8,W+90,H+20,.30*s.fogOpacity,'blur(.8px)','screen');
 
-    // Entry fog is the remnant of the exterior foreground occluder. It begins across
-    // the lens, then sweeps downward using the same 1.35s smoothstep glide duration
-    // as the established Barry tower camera passage.
-    const clear=smooth(time/1.35);
-    const y=-H*.11 + clear*H*1.03;
-    const a=(1-clear)*.76*s.fogOpacity;
+    // Residual interior haze remains behind the foreground architecture after the transition.
+    const hazeDrift=Math.sin(time*.42)*7;
+    drawAtlas('haze',-80+hazeDrift,-20,W+160,H+60,.28*s.fogOpacity,'blur(1.2px)','screen');
+
+    // The incoming scene starts already behind a near-lens fog plane. During the first
+    // three seconds the fog sweeps DOWN and clears. The master sequence supplies the
+    // preceding upward rise, giving the same rise → full occlusion → downward release
+    // used by the established spatial-occlusion / Alcatraz-style passage.
+    const q=smooth(time/3.00);
+    const y=-H*.18 + q*H*1.28;
+    const a=Math.pow(1-q,.72)*.88*s.fogOpacity;
     if(a>.003){
-      drawAtlas('fog',-130,y,W+260,H*.78,a,'blur('+(1.8+4.2*(1-clear))+'px)','screen');
-      drawAtlas('fog',-210,y-74,W+420,H*.92,a*.48,'blur('+(5+6*(1-clear))+'px)','source-over');
+      drawAtlas('fog',-150,y,W+300,H*.82,a,'blur('+(2.4+7.5*(1-q))+'px)','screen');
+      drawAtlas('fog',-250,y-92,W+500,H*.98,a*.52,'blur('+(7+9*(1-q))+'px)','source-over');
     }
   }
 
@@ -245,7 +249,7 @@
     $('scrub').value=t.toFixed(3);
     $('timecode').textContent=t.toFixed(2)+' / '+D.toFixed(2)+'s';
     let cap='Photographic cutouts travel on independent depth planes; residual fog clears downward while the corridor advances.';
-    if(t>s.flyDuration-.05&&t<s.titleStart)cap='Camera settles after the 1.35s occlusion passage. Depth motion decelerates before typography enters.';
+    if(t>s.flyDuration-.05&&t<s.titleStart)cap='Camera settles after the 3.00s spatial-occlusion passage. Depth motion decelerates before typography enters.';
     if(t>=s.titleStart)cap='Editable two-line title resolves after the camera move, matching the reference beat.';
     $('caption').textContent=cap;
   }
