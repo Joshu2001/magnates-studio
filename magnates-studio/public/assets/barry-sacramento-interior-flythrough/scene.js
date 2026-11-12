@@ -16,6 +16,25 @@
   let ready=false,playing=true,t=0,anchor=performance.now(),anchorT=0;
   const images={};
   const layers={background:true,foreground:false,people:true,shadows:true,atmosphere:true,title:true};
+  const AUDIO_TEMPLATE_ID='barry-sacramento-interior-flythrough';
+  const AUDIO_SPEC={
+    duration:D,
+    clips:[
+      {id:'construction-bed',name:'Distant Construction Ambience',url:'/assets/barry-sacramento-interior-flythrough/audio/distant-construction.wav',start:0,duration:6.5,volume:.48,fadeIn:.35,fadeOut:.45,kind:'ambience',managed:true,description:'Low distant machinery, room air, intermittent metallic work and structural noise.'},
+      {id:'corridor-footsteps',name:'Echoing Footsteps',url:'/assets/barry-sacramento-interior-flythrough/audio/echoing-footsteps.wav',start:.55,duration:3.65,volume:.72,fadeIn:.08,fadeOut:.28,kind:'foley',managed:true,description:'Alternating shoe impacts with corridor reflections synchronized to the people entrance and hold.'}
+    ]
+  };
+  function initAudioLayers(){
+    if(!window.RegaarderAudioLayers)return;
+    window.RegaarderAudioLayers.register(AUDIO_TEMPLATE_ID,AUDIO_SPEC);
+    window.RegaarderAudioLayers.mountStandalone({
+      templateId:AUDIO_TEMPLATE_ID,
+      timelineHost:'#rgBarryAudioLane',
+      inspectorHost:'#rgBarryAudioInspector',
+      timeProvider:()=>({time:t,playing})
+    });
+  }
+  initAudioLayers();
   const corridorSrc='/assets/barry-sacramento-interior-flythrough/assets/corridor-clean.webp';
   const atlasSrc='assets/transition-atlas.webp';
   const atlasRects={
@@ -341,6 +360,7 @@
     if(t>=s.titleStart&&t<5.24)cap='Editable title resolves independently above the live cutout composition.';
     if(t>=5.24)cap='Figures swipe left and dissipate in reverse order; their shadows leave with them and the clean room remains.';
     $('caption').textContent=cap;
+    if(window.RegaarderAudioLayers)window.RegaarderAudioLayers.sync(AUDIO_TEMPLATE_ID,t,playing);
   }
 
   function loop(now){
@@ -359,6 +379,7 @@
     playing=!playing;anchor=performance.now();anchorT=t;
     if(playing&&t>=D){t=0;anchorT=0;}
     syncPlay();render(t);
+    if(window.RegaarderAudioLayers)window.RegaarderAudioLayers.sync(AUDIO_TEMPLATE_ID,t,playing);
   }
   function restart(){playing=true;t=0;anchor=performance.now();anchorT=0;syncPlay();render(0);}
 
