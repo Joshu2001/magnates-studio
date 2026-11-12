@@ -73,7 +73,7 @@
       return Object.assign({
         id:c.id||('audio-'+i),name:c.name||('Audio '+(i+1)),url:c.url||'',start:start,duration:cd,
         volume:clamp(num(c.volume,1),0,1),fadeIn:Math.max(0,num(c.fadeIn,0)),fadeOut:Math.max(0,num(c.fadeOut,0)),
-        loop:!!c.loop,muted:!!c.muted,kind:c.kind||'audio',managed:c.managed!==false,description:c.description||''
+        loop:!!c.loop,muted:!!c.muted,kind:c.kind||'audio',managed:c.managed!==false,editable:(c.editable!==undefined?!!c.editable:c.managed!==false),description:c.description||''
       },c);
     });
     return {id:id,duration:duration,clips:clips};
@@ -200,14 +200,16 @@
       host.appendChild(section);return;
     }
     section.innerHTML='<h4>'+escapeHtml(clip.name)+'</h4><div class="rg-audio-meta">'+escapeHtml(clip.kind)+' · '+fmt(clip.start)+' → '+fmt(clip.start+clip.duration)+' · '+clip.duration.toFixed(2)+'s</div>'+
-      (clip.description?'<div class="rg-audio-procedural">'+escapeHtml(clip.description)+'</div>':'')+
+      (clip.description?'<div class="rg-audio-procedural">'+escapeHtml(clip.description)+(clip.editable?'':'<br><strong>Engine-driven:</strong> edit this cue with the template’s native sound controls.')+'</div>':'')+
       '<div class="rg-audio-grid" style="margin-top:9px">'+
       field('Start (s)','start',clip.start,.01,0,spec.duration)+field('Duration (s)','duration',clip.duration,.01,.01,spec.duration)+
       field('Fade in (s)','fadeIn',clip.fadeIn,.01,0,clip.duration)+field('Fade out (s)','fadeOut',clip.fadeOut,.01,0,clip.duration)+
       '</div><div class="rg-audio-field" style="margin-top:9px"><label>Volume · '+Math.round(clip.volume*100)+'%</label><input data-audio-prop="volume" type="range" min="0" max="1" step=".01" value="'+clip.volume+'"></div>'+
       '<div class="rg-audio-toggles"><label><input data-audio-prop="muted" type="checkbox" '+(clip.muted?'checked':'')+'> Mute</label><label><input data-audio-prop="loop" type="checkbox" '+(clip.loop?'checked':'')+'> Loop</label></div>';
     section.querySelectorAll('[data-audio-prop]').forEach(function(input){
+      if(!clip.editable)input.disabled=true;
       input.addEventListener('input',function(){
+        if(!clip.editable)return;
         const prop=input.dataset.audioProp;
         if(prop==='muted'||prop==='loop')clip[prop]=input.checked;else clip[prop]=Math.max(prop==='duration'?.01:0,num(input.value,clip[prop]));
         if(prop==='start')clip.start=clamp(clip.start,0,spec.duration);
