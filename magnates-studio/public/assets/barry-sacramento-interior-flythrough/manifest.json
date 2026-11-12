@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.2.0",
+  "version": "1.4.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -11,10 +11,10 @@
   },
   "status": "preview-ready",
   "textLayersEditable": true,
-  "provenance": "Interior background and photographic people/shadow/fog assets are derived from the user-approved construction-corridor reference composition. The two men and their shadows are separate transparent layers; fog/haze are separate transition layers.",
+  "provenance": "Clean Sacramento construction corridor rendered once as the continuous interior plate, plus generated photographic cutouts derived from the user-approved reference composition: two independent businessmen, two independent floor shadows, foreground fog and residual haze. No duplicated rectangular corridor slices are used.",
   "motion": {
     "effect": "photographic 2.5D parallax fly-through / foreground fog occlusion / downward camera glide",
-    "principle": "continuous forward/downward camera travel; foreground fog fully occludes the lens before clearing downward; incoming interior is already moving underneath; nearer architecture clears faster than rear corridor; people and shadows remain independent depth planes",
+    "principle": "continuous forward/downward camera travel; one clean corridor plate remains spatially coherent; foreground fog fully occludes the lens before clearing downward; people and shadows remain independent depth planes",
     "flyThroughSeconds": 2.9,
     "titleStartSeconds": 3.05,
     "entryOcclusionSeconds": 1.35,
@@ -71,11 +71,6 @@
         199
       ],
       "role": "photographic businessman with documents"
-    },
-    {
-      "id": "foregroundArchitecture",
-      "src": "assets/corridor-clean.webp",
-      "role": "near clipped construction framing for spatial occlusion"
     },
     {
       "id": "fog",
