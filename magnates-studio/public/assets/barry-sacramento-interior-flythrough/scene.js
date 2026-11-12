@@ -378,6 +378,7 @@
   function togglePlay(){
     playing=!playing;anchor=performance.now();anchorT=t;
     if(playing&&t>=D){t=0;anchorT=0;}
+    if(playing&&window.RegaarderAudioLayers)window.RegaarderAudioLayers.unlock(AUDIO_TEMPLATE_ID);
     syncPlay();render(t);
     if(window.RegaarderAudioLayers)window.RegaarderAudioLayers.sync(AUDIO_TEMPLATE_ID,t,playing);
   }
