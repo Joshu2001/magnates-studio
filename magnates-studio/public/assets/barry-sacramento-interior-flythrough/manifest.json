@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -27,9 +27,11 @@
       "rightEntry": "1.02–1.44",
       "rightExit": "5.24–5.62",
       "leftExit": "5.62–6.00",
-      "behavior": "staggered fade-and-settle entrance using the former exit motion in reverse; exit uses a leftward swipe with deterministic sliced dissipation; each shadow remains synchronized and floor-anchored",
+      "behavior": "staggered visible depth-push entrance: person scales from 0.90 toward camera with a subtle overshoot/settle while corridor counter-scales backward; exit remains leftward multi-band dissipation",
       "exitDirection": "left",
-      "exitEffect": "multi-band photographic dissipation with blurred leftward ghosting"
+      "exitEffect": "multi-band photographic dissipation with blurred leftward ghosting",
+      "entranceParallax": "foreground cutout pushes toward camera while corridor scale decreases by up to 2.8% and shifts down subtly",
+      "foregroundFog": "brief 0.42s residual release only; fully clears before first person enters"
     }
   },
   "layers": [
