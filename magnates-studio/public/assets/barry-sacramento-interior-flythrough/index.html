@@ -29,7 +29,7 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
 </head>
 <body>
 <header class="top">
-  <div><div class="eyebrow">Magnates Studio · Independent Scene Template</div><h1>Barry Sacramento · Interior Fly-Through</h1><div class="sub">Multiplane 2.5D camera glide · independent vector people + shadow planes · editable title · 6.5 seconds</div></div>
+  <div><div class="eyebrow">Magnates Studio · Independent Scene Template</div><h1>Barry Sacramento · Interior Fly-Through</h1><div class="sub">Multiplane 2.5D camera glide · photographic people cutouts + independent floor shadows · fog occlusion · editable title · 6.5 seconds</div></div>
   <div style="display:flex;gap:8px"><button id="playTop">Pause preview</button><a class="btn" href="standalone-preview.html">Standalone Preview</a><a class="btn" href="/">Back to Studio</a></div>
 </header>
 <main>
@@ -52,12 +52,12 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
       <div class="layers">
         <label class="layer"><input data-layer="background" type="checkbox" checked>Deep corridor plate</label>
         <label class="layer"><input data-layer="foreground" type="checkbox" checked>Foreground architecture</label>
-        <label class="layer"><input data-layer="people" type="checkbox" checked>Two walking figures</label>
-        <label class="layer"><input data-layer="shadows" type="checkbox" checked>Separate walking shadows</label>
-        <label class="layer"><input data-layer="atmosphere" type="checkbox" checked>Warm haze + dust</label>
+        <label class="layer"><input data-layer="people" type="checkbox" checked>Two photographic people cutouts</label>
+        <label class="layer"><input data-layer="shadows" type="checkbox" checked>Separate photographed floor shadows</label>
+        <label class="layer"><input data-layer="atmosphere" type="checkbox" checked>Fog passage + warm haze + dust</label>
         <label class="layer"><input data-layer="title" type="checkbox" checked>Editable title</label>
       </div>
-      <p class="note">The foreground planes are clipped from the exact corridor plate so the fly-through remains structurally coherent instead of looking like unrelated sliding cutouts.</p>
+      <p class="note">The two people, their floor shadows, and the fog/haze are independent photographic layers. Foreground architecture still comes from the corridor plate so it can pass physically in front of the people during the glide.</p>
     </div>
     <div class="section"><div class="sectionTitle">Fly-through motion</div>
       <div class="field"><label>Camera glide duration <output id="flyDurationOut"></output></label><input id="flyDuration" type="range" min="1.8" max="4.2" step="0.05" value="2.9"></div>
@@ -70,10 +70,15 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
     <div class="section"><div class="sectionTitle">Timing + atmosphere</div>
       <div class="field"><label>Title starts <output id="titleStartOut"></output></label><input id="titleStart" type="range" min="2.3" max="4.5" step="0.05" value="3.05"></div>
       <div class="field"><label>Title reveal duration <output id="titleDurationOut"></output></label><input id="titleDuration" type="range" min="0.35" max="1.8" step="0.05" value="0.95"></div>
-      <div class="field"><label>Dust / haze <output id="dustStrengthOut"></output></label><input id="dustStrength" type="range" min="0" max="100" step="1" value="54"></div>
+      <div class="field"><label>Fog / haze <output id="fogOpacityOut"></output></label><input id="fogOpacity" type="range" min="0" max="100" step="1" value="72"></div>
+      <div class="field"><label>Dust / haze <output id="dustStrengthOut"></output></label><input id="dustStrength" type="range" min="0" max="100" step="1" value="42"></div>
     </div>
   </aside>
 </main>
+<script src="assets/transition-atlas-v2-00.js"></script>
+<script src="assets/transition-atlas-v2-01.js"></script>
+<script src="assets/transition-atlas-v2-02.js"></script>
+<script src="assets/transition-atlas-v2-03.js"></script>
 <script src="scene.js"></script>
 </body>
 </html>
