@@ -32,7 +32,7 @@ button:hover,.btn:hover{background:#20262e}.gold{border-color:#6a5527;color:#f5d
 <body>
 <div class="wrap">
 <header class="top">
-  <div><div class="eyebrow">Magnates Studio · Barry Sacramento continuous sequence</div><h1>Exterior Searchlight → Interior Fly-Through</h1><div class="sub">One uninterrupted preview. Scene tabs below change only the inspector; they do not create another video preview.</div></div>
+  <div><div class="eyebrow">Magnates Studio · Barry Sacramento continuous sequence</div><h1>Exterior Searchlight → Interior Fly-Through</h1><div class="sub">One uninterrupted preview. One continuous 13.7-second film. Scene tabs below are inspector selectors only; playback never stops between scenes.</div></div>
   <div class="actions"><button id="play" class="gold">Play sequence</button><button id="restart">Restart</button><a class="btn" href="index.html">Interior live template</a><a class="btn" href="../barry-sacramento/index.html">Exterior live template</a></div>
 </header>
 
@@ -46,10 +46,10 @@ button:hover,.btn:hover{background:#20262e}.gold{border-color:#6a5527;color:#f5d
   <button class="sceneTab active" data-scene="0"><b>Scene 1 · Sacramento Exterior</b><small>Searchlight / façade / title · 8.00s</small></button>
   <button class="sceneTab" data-scene="1"><b>Scene 2 · Interior Fly-Through</b><small>Forward/downward parallax / people / title · 6.50s</small></button>
 </div>
-<div class="bridge">The sequence itself stays continuous. Selecting a scene below only switches which scene inspector is visible.</div>
+<div class="bridge">Scene 1 flows automatically into Scene 2. These buttons only choose which inspector you are editing; they never seek, stop, or start a scene.</div>
 
 <section class="editorShell">
-  <div class="editorHead"><strong id="editorTitle">Scene 1 Inspector · Sacramento Exterior</strong><span>No duplicate scene canvas here.</span></div>
+  <div class="editorHead"><strong id="editorTitle">Scene 1 Inspector · Sacramento Exterior</strong><span>Inspector only · master playback remains continuous.</span></div>
   <iframe id="scene0" class="editorFrame active" title="Exterior inspector"></iframe>
   <iframe id="scene1" class="editorFrame" title="Interior inspector"></iframe>
 </section>
@@ -69,6 +69,11 @@ const frames=[document.getElementById('scene0'),document.getElementById('scene1'
 
 function childDoc(i){try{return frames[i].contentDocument||frames[i].contentWindow.document}catch(e){return null}}
 function childCanvas(i){const d=childDoc(i);return d&&d.getElementById('stage')}
+function pauseChild(i){
+  const d=childDoc(i);if(!d)return;
+  const btn=d.getElementById('play');
+  if(btn && /pause/i.test(btn.textContent||'')) btn.click();
+}
 function setChildTime(i,v){
   const d=childDoc(i);if(!d)return;
   const s=d.getElementById('scrub');if(!s)return;
@@ -105,31 +110,44 @@ function renderMaster(mt){
   scrub.value=t.toFixed(2);timeEl.textContent=t.toFixed(2)+' / 13.70s';
 }
 function syncPlay(){document.getElementById('play').textContent=playing?'Pause sequence':'Play sequence'}
+let lastPlaybackScene=0;
 function loop(now){
   if(playing){
     const n=anchorT+(now-anchor)/1000;
     if(n>=MASTER_DURATION){playing=false;t=MASTER_DURATION;syncPlay()}else t=n;
+    const activeScene=t<8?0:1;
+    if(activeScene!==lastPlaybackScene){
+      lastPlaybackScene=activeScene;
+      selectScene(activeScene);
+    }
   }
-  // Always resample the child canvases. This prevents an initially black master while scene assets finish decoding.
+  // Always resample the child canvases. The master remains one continuous movie.
   renderMaster(t);
   requestAnimationFrame(loop);
 }
 function toggle(){playing=!playing;if(playing&&t>=MASTER_DURATION)t=0;anchor=performance.now();anchorT=t;syncPlay()}
-function selectScene(i,seek){
-  selected=i;document.querySelectorAll('.sceneTab').forEach((b,j)=>b.classList.toggle('active',j===i));frames.forEach((f,j)=>f.classList.toggle('active',j===i));
+function selectScene(i){
+  selected=i;
+  document.querySelectorAll('.sceneTab').forEach((b,j)=>b.classList.toggle('active',j===i));
+  frames.forEach((f,j)=>f.classList.toggle('active',j===i));
   document.getElementById('editorTitle').textContent='Scene '+(i+1)+' Inspector · '+SCENES[i].name;
-  if(seek){playing=false;syncPlay();t=i===0?0:8}
 }
 frames.forEach((f,i)=>{
-  f.onload=()=>{ready[i]=true;setChildTime(i,0)};
+  f.onload=()=>{
+    ready[i]=true;
+    // Child scene is a render engine only. The master timeline is the single playback authority.
+    pauseChild(i);
+    setChildTime(i,0);
+    setTimeout(()=>{pauseChild(i);setChildTime(i,0)},80);
+  };
   f.srcdoc=decodeScene(SCENES[i].htmlB64);
 });
 document.getElementById('play').addEventListener('click',toggle);
-document.getElementById('restart').addEventListener('click',()=>{playing=true;t=0;anchor=performance.now();anchorT=0;syncPlay()});
+document.getElementById('restart').addEventListener('click',()=>{playing=true;t=0;lastPlaybackScene=0;selectScene(0);anchor=performance.now();anchorT=0;syncPlay()});
 document.getElementById('back').addEventListener('click',()=>{playing=false;syncPlay();t=Math.max(0,t-1)});
 document.getElementById('forward').addEventListener('click',()=>{playing=false;syncPlay();t=Math.min(MASTER_DURATION,t+1)});
 scrub.addEventListener('input',e=>{playing=false;syncPlay();t=Number(e.target.value)});
-document.querySelectorAll('.sceneTab').forEach((b,i)=>b.addEventListener('click',()=>selectScene(i,true)));
+document.querySelectorAll('.sceneTab').forEach((b,i)=>b.addEventListener('click',()=>selectScene(i)));
 requestAnimationFrame(loop);
 </script>
 </body>
