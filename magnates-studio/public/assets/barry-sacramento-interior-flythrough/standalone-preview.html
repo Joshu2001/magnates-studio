@@ -18,7 +18,7 @@ button:hover,.btn:hover{background:#20262e}.gold{border-color:#6a5527;color:#f5d
 .previewHead strong{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#efc75f}.previewHead span{font:700 11px ui-monospace,monospace;color:#aeb7c2}
 .previewBox{position:relative;aspect-ratio:16/9;background:#000}#masterCanvas{display:block;width:100%;height:100%;background:#000}
 .transitionBadge{position:absolute;left:14px;top:14px;background:#090b0dd9;border:1px solid #5c4920;color:#f0cc6b;padding:6px 9px;border-radius:6px;font:800 9px ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;pointer-events:none}
-.controls{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;padding:11px 13px;background:#0f1216;border-top:1px solid #252a30}
+.controls{display:grid;grid-template-columns:auto auto auto 1fr auto;gap:10px;align-items:center;padding:11px 13px;background:#0f1216;border-top:1px solid #252a30}
 .controls input{width:100%;accent-color:#e5b54c}.time{font:700 11px ui-monospace,monospace;color:#c2cad4;min-width:108px;text-align:right}
 .sceneStrip{display:flex;gap:8px;padding:13px 0 10px;overflow:auto}.sceneTab{min-width:220px;text-align:left;border-color:#343a43;background:#11151a}
 .sceneTab.active{border-color:#c59a37;background:#211b0f;box-shadow:inset 0 0 0 1px #5c451b}.sceneTab b{display:block;color:#f4d37b;font-size:12px;margin-bottom:3px}.sceneTab small{display:block;color:#9ca7b5;font-weight:550}
@@ -26,7 +26,7 @@ button:hover,.btn:hover{background:#20262e}.gold{border-color:#6a5527;color:#f5d
 .editorShell{border:1px solid #303641;border-radius:12px;background:#0c0f13;overflow:hidden}
 .editorHead{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border-bottom:1px solid #282e36;background:#11151a}.editorHead strong{font-size:12px}.editorHead span{font-size:11px;color:#9ba6b3}
 .editorFrame{display:none;width:100%;height:650px;border:0;background:#0c0f13}.editorFrame.active{display:block}.note{color:#8e98a5;font-size:10px;margin-top:8px}
-@media(max-width:900px){.top{flex-direction:column}.controls{grid-template-columns:auto auto 1fr}.time{grid-column:1/-1;text-align:left}.editorFrame{height:760px}}
+@media(max-width:900px){.top{flex-direction:column}.controls{grid-template-columns:auto auto auto 1fr}.time{grid-column:1/-1;text-align:left}.editorFrame{height:760px}}
 </style>
 </head>
 <body>
@@ -39,7 +39,7 @@ button:hover,.btn:hover{background:#20262e}.gold{border-color:#6a5527;color:#f5d
 <section class="sequence">
   <div class="previewHead"><strong>Continuous sequence preview</strong><span id="phaseLabel">Scene 1 · Exterior</span></div>
   <div class="previewBox"><canvas id="masterCanvas" width="1280" height="720"></canvas><div class="transitionBadge" id="badge">Loading Scene 1…</div></div>
-  <div class="controls"><button id="back">−1s</button><button id="forward">+1s</button><input id="masterScrub" type="range" min="0" max="13.70" step="0.01" value="0"><div class="time" id="masterTime">0.00 / 13.70s</div></div>
+  <div class="controls"><button id="back">−1s</button><button id="transportPlay" class="gold">Play</button><button id="forward">+1s</button><input id="masterScrub" type="range" min="0" max="13.70" step="0.01" value="0"><div class="time" id="masterTime">0.00 / 13.70s</div></div>
 </section>
 
 <div class="sceneStrip">
@@ -109,7 +109,10 @@ function renderMaster(mt){
   }
   scrub.value=t.toFixed(2);timeEl.textContent=t.toFixed(2)+' / 13.70s';
 }
-function syncPlay(){document.getElementById('play').textContent=playing?'Pause sequence':'Play sequence'}
+function syncPlay(){
+    document.getElementById('play').textContent=playing?'Pause sequence':'Play sequence';
+    document.getElementById('transportPlay').textContent=playing?'Pause':'Play';
+  }
 let lastPlaybackScene=0;
 function loop(now){
   if(playing){
@@ -143,6 +146,7 @@ frames.forEach((f,i)=>{
   f.srcdoc=decodeScene(SCENES[i].htmlB64);
 });
 document.getElementById('play').addEventListener('click',toggle);
+document.getElementById('transportPlay').addEventListener('click',toggle);
 document.getElementById('restart').addEventListener('click',()=>{playing=true;t=0;lastPlaybackScene=0;selectScene(0);anchor=performance.now();anchorT=0;syncPlay()});
 document.getElementById('back').addEventListener('click',()=>{playing=false;syncPlay();t=Math.max(0,t-1)});
 document.getElementById('forward').addEventListener('click',()=>{playing=false;syncPlay();t=Math.min(MASTER_DURATION,t+1)});
