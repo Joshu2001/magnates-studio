@@ -15,7 +15,7 @@
 
   let ready=false,playing=true,t=0,anchor=performance.now(),anchorT=0;
   const images={};
-  const layers={background:true,foreground:true,people:true,shadows:true,atmosphere:true,title:true};
+  const layers={background:true,foreground:false,people:true,shadows:true,atmosphere:true,title:true};
   const corridorSrc='assets/corridor-clean.webp';
   const atlasSrc='assets/transition-atlas.webp';
   const atlasRects={
@@ -213,28 +213,15 @@
       ctx.save();ctx.globalCompositeOperation='multiply';ctx.globalAlpha=.16;ctx.fillStyle='#2b160d';ctx.fillRect(0,0,W,H);ctx.restore();
     }
 
-    // Mid-depth side architecture: same physical corridor, isolated by viewport clips so
-    // perspective remains coherent but the side structure travels faster than the vanishing point.
-    if(layers.foreground){
-      const d=s.depth;
-      clipPlane(images.corridor,{x:0,y:0,w:390,h:H},-18*d*p,-14-s.glide*1.18*p,1.045+s.push*.125*p,0.95,0.35+1.1*p);
-      clipPlane(images.corridor,{x:890,y:0,w:390,h:H},18*d*p,-14-s.glide*1.20*p,1.045+s.push*.13*p,0.95,0.35+1.1*p);
-
-
-    }
+    // Clean corridor is rendered exactly once as a coherent camera plane.
+    // No rectangular re-sampling of the same background is allowed.
 
     // Separate photographic floor-shadow and human depth planes.
     if(layers.shadows)drawPhotographicShadows(t,p,s);
     if(layers.people)drawPhotographicPeople(t,p,s);
 
-    // Near foreground architecture is rendered AFTER the people so it can genuinely pass
-    // in front of them during the forward/downward camera glide.
-    if(layers.foreground){
-      const d=s.depth;
-      clipPlane(images.corridor,{x:0,y:0,w:215,h:H},-48*d*p,-34-s.glide*1.72*p,1.10+s.push*.205*p,0.90,1.3+1.9*p);
-      clipPlane(images.corridor,{x:1090,y:0,w:190,h:H},48*d*p,-34-s.glide*1.76*p,1.10+s.push*.215*p,0.90,1.3+1.9*p);
-      clipPlane(images.corridor,{x:0,y:0,w:W,h:120},0,-58-s.glide*1.78*p,1.09+s.push*.19*p,0.72,1.5+2.0*p);
-    }
+    // No synthetic corridor slices are drawn over the photographic people.
+    // Only genuine independent layers remain above the clean background.
 
     drawPhotographicAtmosphere(t,p,s);
     drawDust(t,p,s);
