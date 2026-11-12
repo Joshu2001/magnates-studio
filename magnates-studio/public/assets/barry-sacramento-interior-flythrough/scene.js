@@ -93,17 +93,22 @@
   }
 
   function figureMotion(time,entryStart,entryDuration,exitStart,exitDuration){
-    const enter=smooth((time-entryStart)/Math.max(.08,entryDuration));
+    const enterRaw=clamp((time-entryStart)/Math.max(.08,entryDuration),0,1);
+    const enter=smooth(enterRaw);
     const leave=smooth((time-exitStart)/Math.max(.08,exitDuration));
+    // A half-sine gives the entrance a readable depth push without a mechanical bounce:
+    // the cutout starts smaller, pushes slightly past its final depth, then settles.
+    const entryPush=Math.sin(Math.PI*enterRaw);
     return {
       enter,
+      enterRaw,
+      entryPush,
       leave,
-      alpha:clamp(enter*(1-leave),0,1),
-      // Entrance deliberately uses the previous exit language in reverse:
-      // a soft fade/settle from slightly enlarged and raised into the grounded pose.
-      y:mix(-7,0,enter)+mix(0,-2,leave),
-      scale:mix(1.016,1,enter)*mix(1,.994,leave),
-      // Exit is now a separate leftward swipe with progressive breakup.
+      alpha:clamp(smoother(enterRaw/.86)*(1-leave),0,1),
+      y:mix(15,0,enter)-3.2*entryPush+mix(0,-2,leave),
+      scale:(mix(.90,1,enter)+.055*entryPush)*mix(1,.994,leave),
+      shadowScale:mix(.96,1,enter)*mix(1,.996,leave),
+      // Exit remains the leftward swipe with progressive breakup.
       x:mix(0,-58,leave)
     };
   }
@@ -126,7 +131,7 @@
 
     function shadow(key,cx,baseY,baseW,baseH,st,microX,opacity){
       if(st.alpha<=.002)return;
-      const w=baseW*st.scale,h=baseH*st.scale;
+      const w=baseW*st.shadowScale,h=baseH*st.shadowScale;
       // Shadow follows the person, but with reduced lateral travel so it remains floor-anchored.
       const x=cx-w/2+microX+st.x*.58;
       const y=baseY+st.y;
@@ -161,8 +166,14 @@
       const x=baseX+microX+st.x+(baseW-w)/2;
       const y=baseY+st.y+(baseH-h);
 
-      // Main body. Entrance is the old fade/settle motion reversed into place.
+      // Main body. Entrance resolves from smaller/farther away toward camera.
       drawAtlas(key,x,y,w,h,st.alpha,'none','source-over');
+
+      if(st.enterRaw>0&&st.enterRaw<1){
+        const q=1-st.enter;
+        drawAtlas(key,x+5*q,y+2*q,w,h,st.alpha*q*.16,'blur(1.8px)','screen');
+        drawAtlas(key,x+10*q,y+4*q,w,h,st.alpha*q*.07,'blur(3.8px)','screen');
+      }
 
       if(st.leave>.01){
         const q=st.leave;
@@ -204,16 +215,15 @@
     const hazeDrift=Math.sin(time*.42)*7;
     drawAtlas('haze',-80+hazeDrift,-20,W+160,H+60,.28*s.fogOpacity,'blur(1.2px)','screen');
 
-    // The incoming scene starts already behind a near-lens fog plane. During the first
-    // three seconds the fog sweeps DOWN and clears. The master sequence supplies the
-    // preceding upward rise, giving the same rise → full occlusion → downward release
-    // used by the established spatial-occlusion / Alcatraz-style passage.
-    const q=smooth(time/3.00);
-    const y=-H*.18 + q*H*1.28;
-    const a=Math.pow(1-q,.72)*.88*s.fogOpacity;
+    // A brief residual release remains when this scene is previewed alone, but it is
+    // finished before the first cutout begins entering. The master sequence already owns
+    // the full 6–9s foreground fog transition, so a second three-second fog pass would
+    // hide the entrance choreography.
+    const q=smooth(time/.42);
+    const y=-H*.10 + q*H*.92;
+    const a=Math.pow(1-q,.80)*.28*s.fogOpacity;
     if(a>.003){
-      drawAtlas('fog',-150,y,W+300,H*.82,a,'blur('+(2.4+7.5*(1-q))+'px)','screen');
-      drawAtlas('fog',-250,y-92,W+500,H*.98,a*.52,'blur('+(7+9*(1-q))+'px)','source-over');
+      drawAtlas('fog',-150,y,W+300,H*.72,a,'blur('+(1.8+4.5*(1-q))+'px)','screen');
     }
   }
 
@@ -287,8 +297,12 @@
 
     // Deep plane: slowest. The image moves upward while scaling forward, producing the
     // downward/forward camera glide described in the reference choreography.
-    const bgScale=1.03+s.push*.092*p+overshoot;
-    const bgY=-8-s.glide*p;
+    const figureState=figureStates(t);
+    const entryParallax=Math.max(figureState.left.entryPush,figureState.right.entryPush);
+    // Opposing depth cue: while a person pushes toward camera, the corridor gently pulls
+    // backward. This is intentionally subtle so the architecture never feels elastic.
+    const bgScale=1.03+s.push*.092*p+overshoot-.028*entryParallax;
+    const bgY=-8-s.glide*p+4.5*entryParallax;
     const bgX=-3*p;
     if(layers.background){
       drawPlane(images.corridor,bgX,bgY,bgScale,1);
@@ -322,7 +336,7 @@
     $('scrub').value=t.toFixed(3);
     $('timecode').textContent=t.toFixed(2)+' / '+D.toFixed(2)+'s';
     let cap='Clean corridor plate appears first; no people are baked into the room.';
-    if(t>=.58&&t<1.44)cap='Cutouts enter one after another using the soft fade-and-settle motion, with grounded shadows.';
+    if(t>=.58&&t<1.44)cap='Cutouts enter one after another with a visible depth push while the corridor subtly pulls backward.';
     if(t>=1.44&&t<s.titleStart)cap='Both figures hold naturally while the camera continues its forward/downward glide.';
     if(t>=s.titleStart&&t<5.24)cap='Editable title resolves independently above the live cutout composition.';
     if(t>=5.24)cap='Figures swipe left and dissipate in reverse order; their shadows leave with them and the clean room remains.';
