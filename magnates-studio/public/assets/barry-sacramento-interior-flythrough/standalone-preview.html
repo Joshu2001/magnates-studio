@@ -207,7 +207,10 @@ frames.forEach((f,i)=>{
    ready[i]=true;pauseChild(i);setChildTime(i,0);
    setTimeout(()=>{pauseChild(i);setChildTime(i,0)},100);
  };
- f.srcdoc=decodeScene(SCENES[i].htmlB64);
+ // Keep the exterior self-contained, but load the interior from the live template so
+ // standalone playback cannot drift behind scene.js fixes such as cutout timing/shadows.
+ if(i===1) f.src='index.html';
+ else f.srcdoc=decodeScene(SCENES[i].htmlB64);
 });
 document.getElementById('play').addEventListener('click',toggle);
 document.getElementById('transportPlay').addEventListener('click',toggle);
