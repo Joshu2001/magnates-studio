@@ -79,7 +79,27 @@
     return {id:id,duration:duration,clips:clips};
   }
   function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
-  function register(id,spec){if(!id)return null;const n=normalise(id,spec);registry.set(id,n);rerenderTemplate(id);refresh();return n;}
+  function applySaved(id,spec){
+    try{
+      const raw=localStorage.getItem('regaarder.audio.'+id);if(!raw)return spec;
+      const saved=JSON.parse(raw);if(!Array.isArray(saved))return spec;
+      saved.forEach(function(s){const c=spec.clips.find(function(x){return x.id===s.id;});if(c&&c.editable!==false){['start','duration','volume','fadeIn','fadeOut','muted','loop'].forEach(function(k){if(s[k]!==undefined)c[k]=s[k];});}});
+    }catch(e){}
+    return spec;
+  }
+  function persist(id){
+    const spec=registry.get(id);if(!spec)return;
+    const data=spec.clips.filter(function(c){return c.editable!==false;}).map(function(c){return {id:c.id,start:c.start,duration:c.duration,volume:c.volume,fadeIn:c.fadeIn,fadeOut:c.fadeOut,muted:c.muted,loop:c.loop};});
+    try{localStorage.setItem('regaarder.audio.'+id,JSON.stringify(data));}catch(e){}
+    try{
+      if(window.tplGetContextualData&&window.tplSetContextualData&&activeId()===id){
+        const cur=window.tplGetContextualData(id)||{};
+        const next=Object.assign({},cur,{audioLayers:data});
+        window.tplSetContextualData(id,next);
+      }
+    }catch(e){}
+  }
+  function register(id,spec){if(!id)return null;const n=applySaved(id,normalise(id,spec));registry.set(id,n);rerenderTemplate(id);refresh();return n;}
   function get(id){return registry.get(id)||normalise(id,{duration:resolveDuration(id),clips:[]});}
   function resolveDuration(id){
     const tpl=(window.EFFECT_TEMPLATES_DATA||[]).find(function(x){return x&&x.id===id;});
@@ -146,7 +166,7 @@
       const target=clamp(local,0,Math.max(0,clip.duration-.01));
       if(Math.abs((a.currentTime||0)-target)>.16){try{a.currentTime=target}catch(e){}}
       a.volume=effectiveGain(clip,local);
-      if(playing){const p=a.play();if(p&&p.catch)p.catch(function(){});}else{a.pause();}
+      if(playing){if(a.paused){const p=a.play();if(p&&p.catch)p.catch(function(){});}}else{a.pause();}
     });
     updatePlayheads(templateId,time);
   }
@@ -215,6 +235,7 @@
         if(prop==='start')clip.start=clamp(clip.start,0,spec.duration);
         if(prop==='duration')clip.duration=clamp(clip.duration,.01,Math.max(.01,spec.duration-clip.start));
         const a=createMedia(templateId,clip);if(a){a.volume=clip.muted?0:clip.volume;a.loop=clip.loop;}
+        persist(templateId);
         rerenderTemplate(templateId);
       });
     });
