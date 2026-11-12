@@ -1,34 +1,19 @@
-# Barry Sacramento Interior Fly-Through · Layer Plan
+# Barry Sacramento Interior Fly-Through · Corrected Layer Plan
 
-The interior is decomposed into real independent compositing planes rather than procedural stand-ins.
+The scene uses a clean single background plate. The corridor is **not** re-cropped into rectangular faux-parallax panels.
 
-1. **Deep corridor plate** — clean construction corridor; slowest parallax.
-2. **Mid architecture** — corridor side structure clipped from the same plate; medium parallax.
-3. **Shadow A** — photographed long floor shadow for the briefcase businessman.
-4. **Shadow B** — photographed long floor shadow for the document-holding businessman.
-5. **Man A** — photographic transparent cutout, briefcase.
-6. **Man B** — photographic transparent cutout, document folder.
-7. **Near foreground architecture** — left/right/top corridor structure; fastest architectural parallax and can pass in front of the people.
-8. **Fog occluder** — photographic amber fog, full-lens transition plane.
-9. **Interior haze + dust** — photographic haze plus subtle procedural particles.
-10. **Editable title** — `AN 18-STORY` + `OFFICE BUILDING`.
+1. **Clean corridor plate** — `assets/corridor-clean.webp`; rendered once as one coherent background.
+2. **Shadow A** — independent photographed floor shadow for the briefcase businessman.
+3. **Shadow B** — independent photographed floor shadow for the document-holding businessman.
+4. **Man A** — independent photographic transparent cutout.
+5. **Man B** — independent photographic transparent cutout.
+6. **Foreground fog / residual haze** — genuine atmospheric occlusion layers used for the 00:06–00:09 transition.
+7. **Editable title** — appears after the camera settles.
 
-## Camera choreography
+## Transition
 
-**0.00–1.35s** — residual foreground fog begins across the lens and clears **downward** using the established Barry smoothstep glide duration. The corridor and photographic people are already advancing behind it.
+The approved master transition is preserved: exterior momentum continues into a foreground fog/dust rise, full lens occlusion and vertical whoosh, followed by a downward fog release that reveals the already-moving interior.
 
-**0.00–2.90s** — continuous Z push plus downward camera glide. Rear corridor moves slowest, people/shadows move moderately, near architecture moves fastest.
+## Important constraint
 
-**2.90–3.05s** — short camera settle.
-
-**3.05–4.10s** — editable two-line title resolves.
-
-**4.10–6.50s** — composition holds with subtle atmospheric motion.
-
-## Transition rule
-
-The master exterior→interior cut must be hidden by the foreground fog/barrier. No dissolve is visible. The exterior continues its push while fog rises to cover the lens; the interior begins underneath; the fog then sweeps downward and exposes the already-moving interior. This mirrors the established spatial-occlusion / continuous-downward-camera-passage grammar used elsewhere in Magnates Studio.
-
-## Depth order
-
-Deep corridor → mid architecture → two floor shadows → two photographic people → near architecture → fog/haze → title.
+Do not reconstruct foreground architecture by clipping rectangular regions from the corridor plate. That technique created visible seams and a glass-panel look. Add future parallax architecture only when a genuinely isolated foreground asset exists.
