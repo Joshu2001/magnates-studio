@@ -36,7 +36,7 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
   <section class="stageWrap">
     <div class="stageBox"><canvas id="stage"></canvas><div class="badge">2.5D FLY-THROUGH · DEPTH PARALLAX · TITLE AFTER SETTLE</div></div>
     <div class="caption" id="caption"></div>
-    <div class="transport"><button id="play">Pause</button><button id="restart">Restart</button><input id="scrub" type="range" min="0" max="6.5" step="0.01" value="0"><div class="time" id="timecode">0.00 / 6.50s</div></div>
+    <div class="transport"><button id="play">Pause</button><button id="restart">Restart</button><input id="scrub" type="range" min="0" max="6.5" step="0.01" value="0"><div class="time" id="timecode">0.00 / 6.50s</div></div><div id="rgBarryAudioLane"></div>
   </section>
   <aside>
     <h2>SCENE INSPECTOR</h2>
@@ -65,6 +65,7 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
       <div class="field"><label>People depth <output id="peopleDepthOut"></output></label><input id="peopleDepth" type="range" min="20" max="150" step="1" value="100"></div>
       <div class="field"><label>Shadow opacity <output id="shadowOpacityOut"></output></label><input id="shadowOpacity" type="range" min="0" max="100" step="1" value="62"></div>
     </div>
+    <div class="section"><div class="sectionTitle">Audio layers</div><div id="rgBarryAudioInspector"></div><p class="note">Select an audio block below the preview to edit timing, duration, fades, volume, mute, or loop.</p></div>
     <div class="section"><div class="sectionTitle">Timing + atmosphere</div>
       <div class="field"><label>Title starts <output id="titleStartOut"></output></label><input id="titleStart" type="range" min="2.3" max="4.5" step="0.05" value="3.05"></div>
       <div class="field"><label>Title reveal duration <output id="titleDurationOut"></output></label><input id="titleDuration" type="range" min="0.35" max="1.8" step="0.05" value="0.95"></div>
@@ -74,6 +75,7 @@ input[type=range]{width:100%}input[type=color]{width:100%;height:34px;background
   </aside>
 </main>
 
-<script src="scene.js?v=20261112-depth-push-entrance-v3"></script>
+<script src="/js/regaarder-audio-layers.js?v=20261112-audio-layers-v1"></script>
+<script src="scene.js?v=20261112-depth-push-audio-v4"></script>
 </body>
 </html>
