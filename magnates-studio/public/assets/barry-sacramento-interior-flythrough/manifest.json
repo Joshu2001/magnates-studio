@@ -1,7 +1,7 @@
 {
   "id": "barry-sacramento-interior-flythrough",
   "title": "Barry Sacramento · Interior 2.5D Fly-Through",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "kind": "scene-template",
   "durationSeconds": 6.5,
   "frameRate": 24,
@@ -27,7 +27,9 @@
       "rightEntry": "1.02–1.44",
       "rightExit": "5.24–5.62",
       "leftExit": "5.62–6.00",
-      "behavior": "opacity fade plus subtle Y/scale travel; each shadow shares its figure camera transform and visibility"
+      "behavior": "staggered fade-and-settle entrance using the former exit motion in reverse; exit uses a leftward swipe with deterministic sliced dissipation; each shadow remains synchronized and floor-anchored",
+      "exitDirection": "left",
+      "exitEffect": "multi-band photographic dissipation with blurred leftward ghosting"
     }
   },
   "layers": [
@@ -67,7 +69,7 @@
         81,
         207
       ],
-      "role": "photographic businessman with briefcase; independent staggered entrance and exit"
+      "role": "photographic businessman with briefcase; staggered fade/settle entrance, left-swipe dissipation exit"
     },
     {
       "id": "manRight",
@@ -78,7 +80,7 @@
         87,
         199
       ],
-      "role": "photographic businessman with documents; independent staggered entrance and exit"
+      "role": "photographic businessman with documents; staggered fade/settle entrance, left-swipe dissipation exit"
     },
     {
       "id": "fog",
